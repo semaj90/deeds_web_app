@@ -1,0 +1,136 @@
+{
+  "schema": "atlas.packet-chunk-lineage-backfill-scope-01.v1",
+  "task": "PACKET-CHUNK-LINEAGE-BACKFILL-SCOPE-01",
+  "readOnly": true,
+  "writesPerformed": false,
+  "populatesNothing": true,
+  "purpose": "Planning-only census: determine exactly what fraction of the existing 61,660-packet corpus can be reconstructed as proven PacketChunkMembershipV1 rows under the corrected 1:N model, keeping membership and revision/namespace provenance as separate dimensions.",
+  "population": 61660,
+  "dimensions": {
+    "membership": {
+      "NO_MEMBER": 56973,
+      "EXACT_SINGLE_MEMBER": 353,
+      "EXACT_MULTI_MEMBER": 4334
+    },
+    "namespace": {
+      "PROVEN": 778,
+      "UNPROVEN": 60882
+    },
+    "revision": {
+      "PROVEN": 778,
+      "UNPROVEN": 60882
+    }
+  },
+  "methodologyNote": "Membership uses count(DISTINCT chunk_id) per source_ref, not raw row count -- 725 source_refs repo-wide have literal duplicate (relative_path, chunk_id) row pairs that would otherwise overstate true membership cardinality. atlas_packets.repository_id was NOT used for namespace (confirmed corrupted: 58,365/58,365 populated values are all distinct, consistent with the same randomUUID()-per-row pattern found in backfill-unified-id-hierarchy.mjs). graphify_files.workspace_id is the only real namespace signal, and it is coupled to the same 885-row population as the revision authority in this corpus -- namespace-proof and revision-proof are NOT independent in practice here, even though they are modeled as separate dimensions.",
+  "admissionClassification": {
+    "priorityOrder": [
+      "NO_MEMBER",
+      "CONFLICTING_MEMBERSHIP (reserved, unused this pass)",
+      "NAMESPACE_UNPROVEN",
+      "MEMBERSHIP_EXACT_REVISION_PROVEN or MEMBERSHIP_EXACT_REVISION_UNPROVEN"
+    ],
+    "counts": {
+      "MEMBERSHIP_EXACT_REVISION_PROVEN": 577,
+      "MEMBERSHIP_EXACT_REVISION_UNPROVEN": 0,
+      "NAMESPACE_UNPROVEN": 4110,
+      "CONFLICTING_MEMBERSHIP": 0,
+      "NO_MEMBER": 56973
+    },
+    "conflictingMembershipNote": "CONFLICTING_MEMBERSHIP is reserved and reports 0 this pass -- no operational conflict signal (e.g. the same chunk_id resolving to genuinely different chunk rows) was found or defined precisely enough to populate this bucket. Not claimed to be truly zero conflicts corpus-wide, only that none were detected under the criteria checked."
+  },
+  "dataQualityCaveat": {
+    "nullChunkIdRowsAmongMultiMemberSources": 0,
+    "meaning": "Among source_refs classified EXACT_MULTI_MEMBER, this many additional codebase_chunk_index rows exist for those same source_refs but lack a populated chunk_id (durable identity) and were therefore excluded from membership entirely -- not counted as members, not counted as conflicts. The true chunk count for these files may be higher than what member_count captures; this is a coverage gap in codebase_chunk_index.chunk_id population (55,816/55,853 populated repo-wide), not a bug in this census."
+  },
+  "recommendedNextSteps": [
+    "Freeze PACKET-CHUNK-LINEAGE-CONTRACT-01 with a PacketChunkMembershipV1 shape that can represent membershipStatus and revisionStatus as independent fields (not a single combined enum), per this census showing they decouple in practice.",
+    "PACKET-CHUNK-LINEAGE-MIGRATION-01 -- schema/migration proof, disposable DB first.",
+    "PACKET-CHUNK-LINEAGE-CANARY-01 -- future-capture writer, 3 shapes.",
+    "PACKET-CHUNK-LINEAGE-BACKFILL-DRY-01 -- full historical read-only classification at per-row granularity (this census is aggregate/summary; BACKFILL-DRY-01 would need to emit the actual per-packet admitted rows for review before any write).",
+    "PACKET-CHUNK-LINEAGE-BACKFILL-CANARY-01 -- tiny bounded write+readback on a handful of MEMBERSHIP_EXACT_REVISION_PROVEN rows only."
+  ],
+  "samples": {
+    "MEMBERSHIP_EXACT_REVISION_PROVEN": [
+      {
+        "packet_key": "ace:packet:0051e908c9be",
+        "source_ref": "docs/architecture/phase8-query-optimization-taxonomy.md",
+        "member_count": 30
+      },
+      {
+        "packet_key": "ace:packet:02dae66923a3",
+        "source_ref": "docs/LANGGRAPH-KANBAN-ERROR-FIXING-INTEGRATION.md",
+        "member_count": 17
+      },
+      {
+        "packet_key": "ace:packet:04518e5714ed",
+        "source_ref": "docs/GEMMA4-POLICY-ORCHESTRATOR-ARCHITECTURE.md",
+        "member_count": 17
+      },
+      {
+        "packet_key": "ace:packet:06568f01c146",
+        "source_ref": "docs/PHASE-85-P9-LANGEXTRACT-AGENTIC-INTEGRATION.md",
+        "member_count": 17
+      },
+      {
+        "packet_key": "ace:packet:07b76f513d2a",
+        "source_ref": "docs/PHASE-B-P3-DEPENDENCY-CLARIFICATION.md",
+        "member_count": 14
+      }
+    ],
+    "MEMBERSHIP_EXACT_REVISION_UNPROVEN": [],
+    "NAMESPACE_UNPROVEN": [
+      {
+        "packet_key": "ace:packet:001be68ca4b0",
+        "source_ref": "src/routes/api/admin/inference-stats/+server.ts",
+        "member_count": 6
+      },
+      {
+        "packet_key": "ace:packet:0050126ac87d",
+        "source_ref": "src/lib/components/ui/MicroInteraction.svelte",
+        "member_count": 4
+      },
+      {
+        "packet_key": "ace:packet:006566131ba9",
+        "source_ref": "src/lib/server/nlp/analyzer.ts",
+        "member_count": 12
+      },
+      {
+        "packet_key": "ace:packet:00735225f796",
+        "source_ref": "src/routes/(app)/admin/memory-inspector/+page.server.ts",
+        "member_count": 1
+      },
+      {
+        "packet_key": "ace:packet:0079b248e86d",
+        "source_ref": "src/lib/components/ui/badge/index.ts",
+        "member_count": 1
+      }
+    ],
+    "NO_MEMBER": [
+      {
+        "packet_key": "0ba2345cd9c542fa",
+        "source_ref": "proto:RetrievalService.Health",
+        "member_count": 0
+      },
+      {
+        "packet_key": "0bffe0382a0d44bb",
+        "source_ref": "proto:ToolCallingService.ExecuteToolBatch",
+        "member_count": 0
+      },
+      {
+        "packet_key": "0ee918abc8c53e8d",
+        "source_ref": "proto:TurboVecCudaService.Transform",
+        "member_count": 0
+      },
+      {
+        "packet_key": "1703d9c005252a62",
+        "source_ref": "proto:LibrarySearchService.Health",
+        "member_count": 0
+      },
+      {
+        "packet_key": "175066b8a4ceee3c",
+        "source_ref": "proto:TurboVecService.Transform",
+        "member_count": 0
+      }
+    ]
+  }
+}

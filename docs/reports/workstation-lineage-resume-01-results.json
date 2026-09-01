@@ -198,7 +198,47 @@
     },
     "fixTarget": "scripts/atlas/register-orphaned-chunks.mjs is the single, well-scoped fix point for PACKET-CHUNK-LINEAGE-CONTRACT-01 / -CANARY-01 / -PROMOTION-01: change its orphan query to select cci.id (chunkRowId) and cci.chunk_id (canonicalChunkId, durable) per matched row instead of DISTINCT relative_path, decide an explicit multi-chunk-per-file policy (this repo's atlas_packets model is currently file-granularity while codebase_chunk_index is chunk-granularity -- an open design question flagged below, not resolved by this gate), and add source_revision capture once a source_revision authority is confirmed available at this point in the pipeline (not yet checked in this pass)."
   },
-  "openDesignQuestionSurfacedByThisGate": "atlas_packets is currently FILE-granularity (one row per source_ref, by register-orphaned-chunks.mjs's own DISTINCT design) while codebase_chunk_index is CHUNK-granularity (many rows per source_ref for multi-chunk files). PacketChunkLineageV1's canonicalChunkId as a single string assumes a 1:1 packet-to-chunk relationship that does not match the current packet model. PACKET-CHUNK-LINEAGE-CONTRACT-01 must resolve this explicitly -- e.g. either (a) redefine packet granularity to be chunk-level going forward (breaking change to what a 'packet' means), or (b) keep packets file-level and define canonicalChunkId as 'the primary/representative chunk for this file' under an explicit, documented rule (e.g. lowest line_start), or (c) change canonicalChunkId to canonicalChunkIds: string[] and drop the single-EXACT-resolution assumption entirely. This gate surfaces the question; it does not answer it.",
+  "packetSourceRevisionOwner01": {
+    "status": "PASS",
+    "readOnly": true,
+    "writesPerformed": false,
+    "authority": "graphify_files (source_revision + code_source_revision, 885 rows, 100% populated inside the table, single workspace_id)",
+    "corpusCoverage": "885/61,660 (1.4%); 0/58 overlap with the current live orphan-discovery queue",
+    "verdict": "Real, well-formed authority; insufficient corpus coverage. SOURCE_REVISION_UNPROVEN is the expected common case for legacy data, not an edge case.",
+    "additionalFinding": "atlas_packets.repository_id is ALSO corrupted the same way chunk_id was: 58,365/58,365 populated values are all distinct (a synthetic randomUUID()-per-row, matching backfill-unified-id-hierarchy.mjs's own generation pattern for repository_id). NOT usable for sourceNamespace. graphify_files.workspace_id is the only real namespace signal found, and it is coupled 1:1 to the same 885-row population as the revision authority in this corpus -- namespace-proof and revision-proof track together in practice here even though modeled as independent dimensions."
+  },
+  "packetChunkLineageBackfillScope01": {
+    "status": "PASS",
+    "readOnly": true,
+    "writesPerformed": false,
+    "populatesNothing": true,
+    "script": "sveltekit-frontend/scripts/atlas/packet-chunk-lineage-backfill-scope-01.mts",
+    "report": "docs/reports/packet-chunk-lineage-backfill-scope-01-results.json",
+    "population": 61660,
+    "membership": { "NO_MEMBER": 56973, "EXACT_SINGLE_MEMBER": 353, "EXACT_MULTI_MEMBER": 4334 },
+    "namespaceAndRevision": { "PROVEN": 778, "UNPROVEN": 60882 },
+    "admission": {
+      "MEMBERSHIP_EXACT_REVISION_PROVEN": 577,
+      "MEMBERSHIP_EXACT_REVISION_UNPROVEN": 0,
+      "NAMESPACE_UNPROVEN": 4110,
+      "CONFLICTING_MEMBERSHIP": 0,
+      "NO_MEMBER": 56973
+    },
+    "verdict": "Only 577/61,660 (0.94%) of the existing packet corpus is currently admissible as proven PacketChunkMembershipV1 under the corrected model. Confirms BRIDGE-RECON-DRY-03 run against the existing corpus without a dedicated historical backfill pass would prove almost nothing. Historical membership backfill is a first-class prerequisite for meaningful reconciliation coverage, not optional.",
+    "methodologyNote": "Used count(DISTINCT chunk_id) per source_ref, not raw row count -- 725 source_refs repo-wide have literal duplicate (relative_path, chunk_id) row pairs that would otherwise overstate true membership cardinality."
+  },
+  "packetChunkLineageContract01": {
+    "status": "FROZEN",
+    "file": "sveltekit-frontend/src/lib/server/atlas/lineage/packet-chunk-membership-v1.ts",
+    "spec": "sveltekit-frontend/src/lib/server/atlas/lineage/packet-chunk-membership-v1.spec.ts",
+    "testResult": "8/8 PASS",
+    "shape": "PacketChunkMembershipV1: packetKey, canonicalChunkId, chunkRowId, sourceRef, sourceNamespace (required, non-empty), sourceRevision (nullable), membershipStatus (EXACT_SINGLE_MEMBER|EXACT_MULTI_MEMBER only -- no ambiguous/candidate statuses admitted into this table), revisionStatus (PROVEN|UNPROVEN), chunkOrdinal, lineageProducerRevision, evidenceRefs[]. .strict() Zod schema with a .refine() enforcing revisionStatus PROVEN iff sourceRevision is non-null.",
+    "relationShape": "atlas_packet_chunk_lineage (documented in-file, NOT yet migrated -- see nextGate). NOT NULL on all fields except source_revision. UNIQUE(packet_key, canonical_chunk_id, lineage_producer_revision) -- source_revision deliberately excluded from uniqueness since it is expected absent for the dominant historical case.",
+    "notDoneThisGate": "No schema-postgres.ts change, no Drizzle migration, no DB writes. PACKET-CHUNK-LINEAGE-MIGRATION-01 (disposable DB first) is a separate, later gate per explicit instruction.",
+    "nextGate": "PACKET-CHUNK-LINEAGE-MIGRATION-01",
+    "checkpointNote": "This is a deliberate semantic checkpoint: the contract is frozen and tested (8/8) while zero PostgreSQL schema/migration work has been done. DB schema writes: 0. Canonical lineage writes: 0. Historical backfill writes: 0. MIGRATION-01 is a separate, later gate -- do not combine physical migration work into this checkpoint."
+  },
+  "openDesignQuestionSurfacedByThisGate_RESOLVED_SUPERSEDED": "STATUS: RESOLVED_SUPERSEDED. The a/b/c fork below is preserved verbatim for history only -- do not reopen it. The decision was made in the very next exchange (see architecturalCorrection, reinterpretedFanOutBug, revisedCanonicalContract below): none of a/b/c as originally framed. atlas_packets stays FILE-granularity (option (b)'s premise, rejected as knowingly lossy) and chunk lineage is represented as an explicit normalized 1:N relation (closest to (c), but as a relational table -- atlas_packet_chunk_lineage -- never as an array column on atlas_packets). This is now frozen in PacketChunkMembershipV1 (packetChunkLineageContract01 below) and physically implemented in packetChunkLineageMigration01. Original superseded text: atlas_packets is currently FILE-granularity (one row per source_ref, by register-orphaned-chunks.mjs's own DISTINCT design) while codebase_chunk_index is CHUNK-granularity (many rows per source_ref for multi-chunk files). PacketChunkLineageV1's canonicalChunkId as a single string assumes a 1:1 packet-to-chunk relationship that does not match the current packet model. PACKET-CHUNK-LINEAGE-CONTRACT-01 must resolve this explicitly -- e.g. either (a) redefine packet granularity to be chunk-level going forward (breaking change to what a 'packet' means), or (b) keep packets file-level and define canonicalChunkId as 'the primary/representative chunk for this file' under an explicit, documented rule (e.g. lowest line_start), or (c) change canonicalChunkId to canonicalChunkIds: string[] and drop the single-EXACT-resolution assumption entirely. This gate surfaces the question; it does not answer it.",
   "architecturalCorrection": "The FILE-vs-chunk fork above was framed incorrectly as a-vs-b-vs-c. The correct model is closest to (c) but normalized as an explicit relational membership, not an array embedded in atlas_packets: packet identity and chunk identity are NOT the same thing -- a packet<->chunk relation is LINEAGE MEMBERSHIP (1 FILE packet contains/was-derived-from N canonical chunks), not identity equality. Do not redefine packets to chunk-granularity (large breaking migration) and do not pick a 'representative chunk' (would knowingly turn a many-chunk file into a false 1:1 identity). Preserve atlas_packets granularity as-is.",
   "reinterpretedFanOutBug": "There were two distinct bugs conflated as one. BUG (real, this is what invalidated BRIDGE-RECON-DRY-02): a script picks one arbitrary chunk out of N candidates sharing a source_ref and treats that arbitrary choice as canonical packet identity. NOT A BUG (legitimate, once membership replaces identity-equality as the model): one FILE packet genuinely has N canonical chunk members -- an exact 37-chunk file packet is not ambiguous merely because cardinality is 37, if all 37 chunks are proven members of that exact file/revision. Every downstream gate must stop labeling every multi-chunk match as UNRESOLVED_PACKET_TO_CHUNK_AMBIGUITY on cardinality alone -- membership classification needs its own vocabulary: EXACT_SINGLE_MEMBER, EXACT_MULTI_MEMBER, SOURCE_NAMESPACE_UNPROVEN, SOURCE_REVISION_UNPROVEN, NO_MEMBER, CONFLICTING_MEMBERSHIP.",
   "revisedCanonicalContract": {
