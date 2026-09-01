@@ -1,0 +1,63 @@
+{
+  "schema": "atlas.retrieval-01g-empty-result-historical-impact.v1",
+  "task": "RETRIEVAL-01G",
+  "openspecChange": "parent-atlas-retrieval-lineage-dag-convergence",
+  "readOnly": true,
+  "writesPerformed": false,
+  "generatedAt": "2026-09-01T00:00:00.000Z",
+  "purpose": "Audit historical impact of pre-existing empty/wrong Qdrant results across all live readers of the canonical semantic search path. This does not re-run the investigation -- it consolidates evidence already produced and committed earlier the same day (commit 128e052ba4) by a concurrent QDRANT-READER-FIX-02 / WRITER-ROOT-01 / REPRESENTATION-OWNER-01 investigation chain.",
+  "consolidatedFrom": [
+    "docs/reports/writer-root-01-representation-owner-01-results.json",
+    "docs/reports/qdrant-reader-shadow-01-results.json",
+    "docs/reports/qdrant-d-hydration-01-results.json",
+    "docs/reports/qdrant-reader-shadow-02-results.json",
+    "docs/reports/qdrant-reader-fix-02-canary-results.json"
+  ],
+  "liveReadersEnumerated": {
+    "method": "rg for callers of searchQdrantCodeStrictV1 | searchCodebaseAnn | search_hybrid, excluding *.spec.ts",
+    "files": [
+      "sveltekit-frontend/src/lib/server/atlas/policy/oak-dag-semantic-qdrant-handler-v1.ts",
+      "sveltekit-frontend/src/lib/server/ai/tool-shim.ts",
+      "sveltekit-frontend/src/lib/server/ai/mcp-tool-dispatch.ts",
+      "sveltekit-frontend/src/lib/server/ai/ace-builder.ts",
+      "sveltekit-frontend/src/lib/server/features/ai/ai/gemma4-agent.ts",
+      "sveltekit-frontend/src/lib/server/search/turbovec-search.ts",
+      "sveltekit-frontend/src/lib/server/search/qdrant-search.ts",
+      "sveltekit-frontend/src/lib/server/search/index.ts",
+      "sveltekit-frontend/src/lib/server/retrieval/rrf-integration.ts"
+    ],
+    "note": "All 9 files funnel through the single QdrantSearchBackend.search() implementation in qdrant-search.ts (per the retrieval-layer-separation.md rule: callers never call QdrantManager directly). This means one root-cause fix in one file corrects the historical behavior for all 9 call sites simultaneously -- there is no per-caller divergence to separately audit, confirmed by reading each file's call shape (all pass through searchCodebaseAnn/searchQdrantCode, none construct their own Qdrant client query for semantic_768 search).",
+    "exception": "turbovec-search.ts is its OWN backend implementation (TurboVecSearchBackend), not a caller of QdrantSearchBackend. It has a separately-flagged, NOT-fixed-by-this-chain gap (its own hardcoded 'codebase_chunks_768' literal defaults, no hydration step) -- but it is not the active backend by default (CODEBASE_ANN_BACKEND unset -> 'qdrant'), so it did not carry live historical query traffic under normal configuration. Recorded as an open gap, not silently absorbed into this audit's PASS verdict."
+  },
+  "twoDistinctRootCausesFound": [
+    {
+      "id": "GENERATION_CONTAMINATION",
+      "description": "codebase_chunks_768 (the pre-fix default collection) contains at least 4 distinct write-generations (A/B/C/D) with overlapping/duplicate source_ref values, different point-ID schemes, and inconsistent representation_id fields -- the result of multiple historical backfills (including the July 28 2026 Phase 108D backfill) never being reconciled into one clean generation.",
+      "measuredImpact": "QDRANT-READER-SHADOW-01: 50 frozen, already-known-correct query vectors submitted against the pre-fix default collection. Exact self-match (querying a chunk's own content and expecting that exact chunk back as top-1) succeeded only 58% of the time -- the remaining 42% returned a near-duplicate stale-generation point or, in a minority of cases, a genuinely different file. The canonical replacement collection (codebase_chunks_768_v2) returned exact self-match 100% of the time on the identical 50 queries.",
+      "natureOfDegradation": "WRONG top-1 result, not literally empty -- a caller received A result, just not reliably the correct one 42% of the time.",
+      "fixCommit": "128e052ba4",
+      "fixMechanism": "qdrant-search.ts's QdrantSearchBackend now always queries QDRANT_SEMANTIC_COLLECTION (codebase_chunks_768_v2), never a caller-supplied or defaulted legacy collection name, for the canonical path."
+    },
+    {
+      "id": "MISSING_NAMED_VECTOR_USING_PARAMETER",
+      "description": "Both codebase_chunks_768 and codebase_chunks_768_v2 are multi-named-vector collections (content/error/signature) with no unnamed default vector. The TypeScript client's .query() call previously omitted the `using` parameter, which Qdrant rejects with a 400 'Wrong input: Not existing vector name' error on every call.",
+      "measuredImpact": "The 400 error was caught by qdrant-search.ts's existing try/catch and silently converted to an empty [] result array. Per the in-code comment (qdrant-search.ts lines ~261-268, itself written the same day this bug was found live), this failure mode was confirmed to reproduce identically against the OLD default collection too -- meaning it was not a side effect of the _768_v2 migration, but a pre-existing defect in the query construction itself.",
+      "natureOfDegradation": "Literally EMPTY result set (hitCount: 0) on every call through this code path, for every caller, for however long this line of code existed uncorrected.",
+      "fixCommit": "128e052ba4",
+      "fixMechanism": "Added `using: 'content'` to the client.query() call (qdrant-search.ts).",
+      "postFixVerification": "QDRANT-READER-FIX-02 canary: 50 live queries via the actual public entry point (searchCodebaseAnn, exactly as production callers invoke it) -- 0 zero-hit queries, 47/50 exact self-match, all hits carry hydrated content."
+    }
+  ],
+  "durationOfImpactNotPreciselyBounded": {
+    "finding": "git log --follow -S\"using: 'content'\" --all against this file shows exactly one commit ever introducing that string: 128e052ba4, committed today (2026-09-01). This means the MISSING_NAMED_VECTOR_USING_PARAMETER defect was present in every prior version of this file's .query() call.",
+    "caveat": "This audit does not establish the exact calendar date the defect was introduced (e.g. whether it predates the file's creation, or was introduced when the collections were migrated to named-only vectors) -- only that it was live and uncorrected up to and including the moment this fix landed. Bounding the exact introduction date would require a deeper git-blame walk across the file's full rename history, not attempted here as it does not change the remediation state.",
+    "cachedStaleEmptyResultsCheck": "Not separately re-verified in this consolidation pass. If any Redis-layer cache (e.g. the ACE Stage A0 topo-byte cache, ace:topo:{topoClass}:{queryHash}, TTL 300s) captured an empty result during the defect window, its short TTL (5 minutes) means any such stale cache entry would already have expired naturally by the time this report was written, given the fix and this audit landed in the same session. Not independently confirmed by inspecting live Redis keys -- flagged as a theoretical residual, not measured."
+  },
+  "verdict": "AUDITED_BOTH_ROOT_CAUSES_FIXED_SAME_COMMIT",
+  "verdictMeaning": "Both distinct defects behind 'pre-existing empty/wrong Qdrant results' have been identified, their live historical impact measured against real data (not assumed), and both were corrected in the same commit (128e052ba4) that also introduced the QDRANT_SEMANTIC_READER_OWNERSHIP freeze (RETRIEVAL-01H) and ProjectionRegistryV1 (RETRIEVAL-01I). The one open, explicitly-flagged, not-fixed-by-this-chain gap is TurboVecSearchBackend's separate hardcoded defaults -- out of scope because it is not the active default backend.",
+  "openGapNotClosedByThisAudit": {
+    "file": "sveltekit-frontend/src/lib/server/search/turbovec-search.ts",
+    "issue": "Own hardcoded 'codebase_chunks_768' literal collection defaults, no hydration step wired in, not reconciled against the QDRANT_SEMANTIC_READER_OWNERSHIP freeze.",
+    "risk": "Only materializes if CODEBASE_ANN_BACKEND is ever set to 'turbovec' in a live environment -- confirmed not the case by default (unset -> 'qdrant')."
+  }
+}

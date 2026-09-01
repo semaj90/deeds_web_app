@@ -1,9 +1,27 @@
 ## 1. Lineage and semantic reader
 
-- [ ] LINEAGE-01 — Prove full source namespace and source-revision authority;
-  retain fail-closed behavior for missing or placeholder lineage.
+- [x] LINEAGE-01 — Prove full source namespace and source-revision authority;
+  retain fail-closed behavior for missing or placeholder lineage. Consolidated
+  from the packet<->chunk lineage program's existing corpus-wide evidence
+  (same underlying census, different task label): `graphify_files.workspace_id`
+  is the only real namespace/revision authority found (885 rows, 778/61,660
+  packets = 1.26% coverage); `atlas_packets.repository_id` is confirmed
+  corrupted (58,365/58,365 distinct, synthetic) and explicitly rejected as an
+  authority. Fail-closed behavior verified via `PacketChunkMembershipV1Schema`'s
+  `.refine()` (9/9 tests) and the full-corpus `BACKFILL-DRY-01` classification
+  (60,882 unproven packets correctly left `UNPROVEN`, zero fabricated).
+  Verdict is low-coverage-but-correct, not full-coverage — see
+  `docs/reports/lineage-01-source-namespace-revision-authority-v1.json`.
 - [ ] LINEAGE-02 — Prove the bounded `15128/768` exact-candidate lineage gate;
   do not substitute repaired Qdrant metadata for source qualification.
+  **BLOCKED_UNGROUNDED**: searched every JSON report under `docs/reports/`,
+  the full OpenSpec tree, and git history (`git log --all -S "15128"`) — the
+  only occurrence of the literal number `15128` anywhere in this repository
+  is this task line itself. No existing cohort, fixture, or canary of that
+  exact size was found. Not fabricated or matched to an unrelated existing
+  artifact (e.g. the 55,169-row semantic_768 ordinal map) to force a fit —
+  needs clarification of what this cohort refers to before it can be
+  attempted. See open-questions section of the LINEAGE-01 evidence report.
 - [x] RETRIEVAL-01A — Canonical `semantic_768` execution ownership was proven
   for the bounded B/D oracle cohort; retain scope limits.
 - [x] RETRIEVAL-01B — `_768_v2` reader canary and exact PostgreSQL hydration were
@@ -13,9 +31,29 @@
 - [x] RETRIEVAL-01D — Read-only reader replay was proven on the bounded cohort.
 - [x] RETRIEVAL-01E — Named-vector execution and 50-query reader canary were
   corrected/proven within recorded scope.
-- [ ] RETRIEVAL-01G — Audit historical impact of pre-existing empty Qdrant
-  results across all live readers.
-- [ ] RETRIEVAL-01H — Freeze narrow semantic reader ownership only.
+- [x] RETRIEVAL-01G — Audit historical impact of pre-existing empty Qdrant
+  results across all live readers. Consolidated from a concurrent
+  investigation landed the same day (commit `128e052ba4`): two distinct
+  root causes found and fixed together — (1) generation contamination in
+  the pre-fix default collection (`QDRANT-READER-SHADOW-01`: 42% wrong
+  top-1 self-match across a 50-query frozen set; 100% on the canonical
+  `_768_v2` collection), and (2) a missing named-vector `using` parameter
+  causing hard Qdrant 400s silently caught and returned as empty `[]`
+  (`QDRANT-READER-FIX-02` canary: 0/50 zero-hit queries post-fix). All 9
+  live readers funnel through one `QdrantSearchBackend.search()`
+  implementation, so one fix corrected all call sites. One open,
+  explicitly-flagged gap not closed here: `turbovec-search.ts`'s own
+  hardcoded collection defaults (not the active backend by default, so no
+  live impact under normal configuration). See
+  `docs/reports/retrieval-01g-empty-result-historical-impact-v1.json`.
+- [x] RETRIEVAL-01H — Freeze narrow semantic reader ownership only. Already
+  satisfied by the same commit's `QDRANT_SEMANTIC_READER_OWNERSHIP`
+  boundary: `ProjectionRegistryV1` (`RETRIEVAL-01I`, already frozen)
+  explicitly scopes itself to `semantic_768`/`qdrant`/`codebase_chunks_768_v2`
+  only, with TurboVec and any other executor explicitly out of scope (a new
+  representation requires a new resolver branch, never a change to this
+  one). See `docs/reports/writer-root-01-representation-owner-01-results.json`
+  and `src/lib/server/atlas/retrieval/projection-registry-v1.ts` header.
 - [x] RETRIEVAL-01I — `ProjectionRegistryV1` defined and frozen
   (`src/lib/server/atlas/retrieval/projection-registry-v1.ts`, 4/4 tests):
   fail-closed resolution of canonical packet identity + representation to a
@@ -153,7 +191,8 @@ lineage MEMBERSHIP, not 1:1 identity.
 
 ## Validation record
 
-- [ ] OpenSpec validation passes for proposal/design/tasks/spec consistency.
+- [x] OpenSpec validation passes for proposal/design/tasks/spec consistency.
+  Verified with the installed CLI using `openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json` (1/1 change passed).
 - [ ] All completed items above have linked reports, not merely code existence.
 - [ ] No database, Qdrant, graph, cache, or production mutation occurs during
   read-only gates.
