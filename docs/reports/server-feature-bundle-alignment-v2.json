@@ -1,6 +1,6 @@
 {
   "schema": "atlas.server-feature-bundle-alignment-report.v2",
-  "status": "IMPLEMENTED_TESTS_ADDED_NOT_EXECUTED_BY_THIS_SESSION",
+  "status": "IMPLEMENTED_TESTS_AND_REPLAY_HARNESS_NOT_EXECUTED_BY_THIS_SESSION",
   "branch": "chatgpt/server-feature-bundle-alignment-v2",
   "changes": {
     "revisionAuthorityEnvelope": {
@@ -8,6 +8,8 @@
       "contract": "atlas.revision-authority-envelope.v1",
       "workspaceRevisionAuthority": "WORKSPACE_SOURCE_MANIFEST_SHA256_V1",
       "sourceRevisionAuthority": "SOURCE_BYTES_SHA256_V1",
+      "sourceClaimsEmbedded": true,
+      "candidateSourceClaimAdmission": true,
       "syntheticRevisionCount": 0
     },
     "serverFeatureBundle": {
@@ -28,9 +30,30 @@
       "snapshotRematerializedDownstream": false,
       "clientSuppliedBundleAccepted": false
     },
+    "aceManifestAdmission": {
+      "status": "IMPLEMENTED_TYPED",
+      "schemaExported": true,
+      "contextManifestV2Preserved": true,
+      "canonicalAuthority": false
+    },
+    "aceLiveDryReplayHarness": {
+      "status": "IMPLEMENTED_NOT_EXECUTED",
+      "script": "scripts/atlas/prove-ace-live-dry-v2.mts",
+      "inputOwnedByCaller": true,
+      "fabricatesCandidateCohort": false,
+      "requiresExactCandidateCountByDefault": 15,
+      "requiresSingleExactGraphRevision": true,
+      "checksLogicalReplayIdentity": true,
+      "checksRequestEnvelopeSeparation": true,
+      "checksAceManifestReplayIdentity": true,
+      "checksCandidateSourceAuthority": true,
+      "cacheWritesPerformed": false,
+      "writesPerformed": false,
+      "canonicalAuthority": false
+    },
     "legacyRetrievalRouterWorkspaceRevision": {
       "status": "COMPATIBILITY_ONLY",
-      "note": "Governed sealed-bundle construction now starts from CandidateOrdinalMapV1 + CandidateFeatureSnapshotV1 + RevisionAuthorityEnvelopeV1 and does not reinterpret the legacy numeric RetrievalRouterFeatureRowV1.workspaceRevision field."
+      "note": "Governed sealed-bundle construction starts from CandidateOrdinalMapV1 + CandidateFeatureSnapshotV1 + RevisionAuthorityEnvelopeV1 and does not reinterpret the legacy numeric RetrievalRouterFeatureRowV1.workspaceRevision field."
     }
   },
   "testsAdded": [
@@ -40,6 +63,7 @@
     "same evidence with different request IDs preserves bundleLogicalChecksum",
     "different request IDs change bundleEnvelopeChecksum",
     "workspace revision is content-addressed and matches revision authority",
+    "each candidate sourceRef/sourceRevision matches an exact authority claim",
     "source/graph/semantic revision-set checksums are present",
     "mismatched revision authority is rejected",
     "RLM consumes the sealed snapshot without rematerialization"
@@ -47,18 +71,21 @@
   "notClaimed": [
     "focused Vitest pass",
     "project typecheck pass",
+    "ACE-LIVE-DRY-02 proof pass",
     "15-row live ACE replay",
     "live OaK replay",
     "BitFrost/Valkey live warm or invalidation",
     "LangGraph checkpoint/HITL proof"
   ],
   "recommendedValidation": [
-    "npm --prefix sveltekit-frontend exec -- vitest run src/lib/server/atlas/retrieval/search-runtime-feature-bundle-provider-v1.spec.ts src/lib/server/atlas/rlm/rlm-runtime.spec.ts --pool=forks --maxWorkers=1 --minWorkers=1",
-    "npm --prefix sveltekit-frontend exec -- svelte-check --tsconfig ./tsconfig.json"
+    "npm --prefix sveltekit-frontend exec -- vitest run src/lib/server/atlas/retrieval/search-runtime-feature-bundle-provider-v1.spec.ts src/lib/server/atlas/rlm/rlm-runtime.spec.ts src/lib/server/atlas/context/ace-context-manifest-admission-v1.spec.ts --pool=forks --maxWorkers=1 --minWorkers=1",
+    "npm --prefix sveltekit-frontend exec -- svelte-check --tsconfig ./tsconfig.json",
+    "openspec validate parent-atlas-ace-rlm-bitfrost-integration --type change --strict --json"
   ],
+  "aceLiveDryCommand": "npm exec -- tsx scripts/atlas/prove-ace-live-dry-v2.mts -- --input <revision-qualified-input.json>",
   "nextGates": [
-    "ACE-LIVE-DRY-02: bind a real exact candidate cohort to the new sealed bundle and replay twice",
-    "OAK-LIVE-READONLY-01: feed the same logical bundle identity to already-registered live handlers",
+    "ACE-LIVE-DRY-02: provide one reviewed exact 15-row cohort and execute prove-ace-live-dry-v2.mts twice-equivalent within one invocation",
+    "OAK-LIVE-READONLY-01: feed the same bundleLogicalChecksum and revision authority to already-registered live handlers",
     "BITFROST-LIVE-01: use bundleLogicalChecksum/ContextManifest identity for MISS/HIT/revision-MISS proof",
     "LANGGRAPH-CHECKPOINT-01: checkpoint receipt references/checksums, not duplicate evidence artifacts"
   ]
