@@ -324,9 +324,11 @@ section above, unchanged by this census, not re-litigated): 7 production routes 
 `ContextManifestV1` producer supplies the complete input yet" finding.
 
 **Recommended migration target for the actual ACE-CONTEXT-LIVE-02 step (not yet started)**:
-`routes/api/ace/stream/+server.ts` — it already does a full read+write round trip (unlike the
-write-only LDR bridge) and is a real, auth-gated, live SSE route, making it a representative
-candidate for the "MISS → write → replay HIT; revision change → MISS" acceptance criteria. **Real
+`routes/api/ace/stream/+server.ts` — **wording correction (2026-09-02)**: this is the preferred
+*representative canary target* for the strict revision-qualified path, not "the only full-round-trip
+live route among the two candidates" as an earlier draft of this section said — the census table
+above shows `api/chat/stream` also does a full read+write round trip. `ace/stream` is preferred
+because it is the more central ACE-labeled entrypoint, not because it uniquely qualifies. **Real
 open dependency before that migration can be written, flagged rather than glossed over**: the
 acceptance criteria require a `sourceRevision` to test against, but this session's own
 `OaK revision qualification` work (`parent-atlas-retrieval-lineage-dag-convergence/tasks.md`)
@@ -337,6 +339,52 @@ a mix of stale/orphaned and fresh-but-unpersisted values, not one coherent live 
 bundle here would just relocate that problem into ACE rather than solve it. This dependency needs
 resolving (or an explicitly scoped, narrower revision source specific to this route) before writing
 the migration, not worked around with a placeholder revision.
+
+**The architectural conclusion stands regardless of the wording issue**: the strict ACE cache
+mechanics exist and are test-proven; live adoption is blocked on revision authority, not on cache
+implementation.
+
+**Closing summary (2026-09-02)**:
+
+| Bucket | Members |
+|---|---|
+| Legacy live readers/writers | `api/ace/stream`, `api/chat/stream` |
+| Legacy write-only | `ldr-ace-bridge.ts` |
+| Non-cache `hashQuery` consumer | `api/ace/packet` |
+| Strict revision-qualified path | implemented, test-proven, **production callers = 0** |
+| Live migration | `BLOCKED_REVISION_INPUT_UNPROVEN` |
+
+**Next gate for this workstream, when intentionally resumed (not started, read-only when it runs)**:
+
+### ACE-REVISION-SOURCE-OWNER-01 (not started)
+
+For `api/ace/stream`, determine whether an existing live request path already owns each value
+required by the strict cache key — `sourceRevision`, `representationRevision`,
+`retrievalPolicyRevision`. For each field, record: producer, storage/source, scope, freshness
+semantics, whether it is request-bound, whether it is persisted, whether it is authoritative, and
+whether it can disagree with OaK/global revision state. Return exactly one of
+`ROUTE_LOCAL_REVISION_AUTHORITY_PROVEN`, `PARTIAL_ROUTE_LOCAL_AUTHORITY`, or
+`NO_ROUTE_LOCAL_AUTHORITY`. Do not fabricate values. Do not migrate callers. Do not alter cache
+keys. Do not write Redis.
+
+This keeps two possibilities cleanly separated: either the global coherent revision bundle becomes
+proven (OaK unblocks) and ACE may consume it directly, or `api/ace/stream` has a narrower,
+independently authoritative route-local revision tuple and ACE can proceed without waiting for
+global OaK convergence. Until one of those is proven:
+
+| Item | Status |
+|---|---|
+| ACE-CONTEXT-LIVE-02 | CLOSED (this census) |
+| ACE strict cache mechanics | PROVEN |
+| Live strict caller adoption | BLOCKED |
+| BITFROST-LIVE-WARM-01 | NOT STARTED |
+| BITFROST-INVALIDATION-01/02 | NOT STARTED |
+| ACE-RESIDENCY-01 | NOT STARTED |
+| CENTROID-BITFROST-01 | NOT STARTED |
+
+Parked here for this session. Convergence work resumes on the already-authorized Qdrant
+reconciliation track (`parent-atlas-retrieval-lineage-dag-convergence`), not on a new
+revision-ownership investigation.
 
 ## KAG-03: additive, non-ranking type-level integration point (2026-08-25)
 
