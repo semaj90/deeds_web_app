@@ -40,7 +40,10 @@
 
 ## 3. Fix the spec/test break (finding #3)
 
-- [ ] 3.1 Determine whether `api-contract-observation-v1.spec.ts` should be updated to use `compileApiContractObservationV1` with the new nomination-object input shape, or whether `buildApiContractObservationV1` should be restored. Depends on which function is the actual intended canonical builder post-diff — check the diff's own intent (commit message, if committed) before choosing.
+- [x] 3.1 **RESOLVED, verified 2026-09-01.** Already fixed by an intervening change (unclear which
+  session/commit): `api-contract-observation-v1.ts` now exports BOTH `buildApiContractObservationV1`
+  (line 140) and `compileApiContractObservationV1` (line 207) — the spec's original dual import is
+  valid again, not a broken reference to a removed function. Ran the spec directly: 5/5 pass.
 
 ## 4. Investigate, don't assume (finding #4 — AST byte offsets)
 
@@ -62,4 +65,9 @@ The separate embedding-runtime convergence issue remains open: `retrieval/embedd
 
 ## 7. Low-priority cleanup (finding #8)
 
-- [ ] 7.1 `simdjson-bridge.ts`'s `fastJsonParse()`: compute the UTF-8 buffer once, reuse its byte length and pass it (or the buffer itself) into `fnv1aKey()` instead of two independent encodes. Pure performance, safe to defer — do this last, after all correctness findings above are resolved.
+- [x] 7.1 **FIXED, 2026-09-01.** `fastJsonParse()` now does a single `Buffer.from(input, 'utf8')`
+  encode, reused for the cache-key hash (`fnv1aKey()` now takes a `Buffer`, not a `string`, forcing
+  callers to pass the shared encode rather than silently re-encoding). The OOM-guard byte-length
+  check still uses `Buffer.byteLength()` first (does not materialize bytes, cheap to call before
+  deciding whether to proceed at all) — the actual buffer allocation only happens once, after that
+  guard passes. Pure perf, no behavior change; only call site updated consistently.

@@ -92,9 +92,11 @@ let   cacheBytes = 0;
  * Derive a collision-resistant cache key from the complete UTF-8 input.
  * A sampled/non-cryptographic key is unsafe here: a collision could return
  * the wrong parsed value while still looking like a successful cache hit.
+ * Accepts a pre-encoded buffer so callers that already need UTF-8 byte
+ * length (e.g. the OOM guard) can share one encode instead of two.
  */
-function fnv1aKey(input: string): string {
-	return createHash('sha256').update(input, 'utf8').digest('hex');
+function fnv1aKey(inputUtf8: Buffer): string {
+	return createHash('sha256').update(inputUtf8).digest('hex');
 }
 
 function approximateSize(value: unknown): number {
@@ -188,6 +190,8 @@ export function utf8ByteLength(input: string): number {
  * Inputs > 64 MB throw RangeError to prevent OOM.
  */
 export function fastJsonParse<T = unknown>(input: string): T {
+	// Buffer.byteLength does not materialize the encoded bytes -- cheap to call
+	// before deciding whether the input is even small enough to proceed.
 	const inputBytes = utf8ByteLength(input);
 
 	// OOM guard — bail before any allocation
@@ -198,8 +202,11 @@ export function fastJsonParse<T = unknown>(input: string): T {
 		);
 	}
 
-	// Check LRU cache (hash computed over L1-friendly prefix)
-	const cacheKey = fnv1aKey(input);
+	// Single UTF-8 encode, reused for both the cache-key hash and (below) the
+	// simdjson native call -- previously this and the OOM-guard byte length
+	// were two independent encodes of the same input (finding #8).
+	const inputUtf8 = Buffer.from(input, 'utf8');
+	const cacheKey = fnv1aKey(inputUtf8);
 	const cached = lruGet(cacheKey);
 	if (cached !== undefined) return cached as T;
 
