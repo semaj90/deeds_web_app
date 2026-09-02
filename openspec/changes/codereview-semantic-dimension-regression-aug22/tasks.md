@@ -57,11 +57,33 @@ The separate embedding-runtime convergence issue remains open: `retrieval/embedd
 - [x] 5.1 **ANSWERED — verified live, 2026-08-23, via direct Qdrant `/collections` calls (no MCP wrapper needed for this read).** `codebase_chunks_768_v2` is **not** backfilled to parity: `codebase_chunks_768` has **105,762** points (status `green`, fully indexed); `codebase_chunks_768_v2` has **52,380** points (also `green`/fully indexed, but under half the size). The two collections are confirmed NOT interchangeable today.
   - **Worse than "not yet backfilled" — the payload schemas are structurally different, not just row-count-different.** `codebase_chunks_768`'s payload carries `graphAuthorityScore`, `communityId`/`community_id`/`community_conf`, `pagerank`, `cluster_key`, `tags`, `bm25_text`, `lane_ids` — the exact fields the Karpathy authority blend (`0.4·PageRank + 0.3·attention + 0.3·authority`, documented in root `CLAUDE.md`) and ACE tag-boost logic depend on. `codebase_chunks_768_v2`'s payload is a leaner, versioned-identity schema (`postgres_id`, `representation_id`, `embedding_model`, `model_revision`, `model_revision_state`, `projection_revision`, `indexed_at`) with **none of the graph/authority/community/tag fields present at all**. `_v2` is not a strict superset or even a compatible replacement of `_768` as currently populated — switching callers to it today would silently drop PageRank/authority/tag-based ranking signals, not just serve fewer results.
   - **Confirmed genuinely split in code, not just theoretical**: `src/lib/server/embedding/embedding-contract-768.ts:23` declares `export const CANONICAL_QDRANT_COLLECTION = 'codebase_chunks_768_v2'` — i.e. the contract layer already declares `_v2` canonical — and `embedding-contract.ts` + `src/lib/server/acp/packet-assembler.ts:103,262` (the ACP layer) follow that and default to `_v2`. But `src/lib/server/search/turbovec-search.ts` (8 separate hardcoded occurrences) and `src/mcp/trace-mcp-server.ts` (2 occurrences, including the code path behind the `atlas.packet_search` MCP tool verified live and working in this same review session) still hardcode the OLD `codebase_chunks_768`. **Net effect**: the ACP/packet-assembler lane and the TurboVec/TRACE-MCP lane are reading from two different, non-overlapping-in-content Qdrant collections right now, with the "canonical" one being the smaller, less-enriched one.
-- [ ] 5.2 Once decided, propagate consistently: `turbovec-search.ts`'s default `collection` parameter, `trace-mcp-server.ts:9949`, and `packet-assembler.ts:103,262` should all import the same constant from `embedding-contract.ts` rather than each hardcoding their own literal — this is the actual root cause (no single source of truth for the collection name), not just 3 independent typos. **Given 5.1's finding, this is not a simple constant-import refactor**: before propagating a single collection name, either (a) backfill `_v2` with the missing graph/authority/community/tag payload fields to parity, or (b) keep `_768` canonical (reverting `embedding-contract-768.ts`'s declaration) until `_v2` is actually feature-complete. Picking `_v2` today and propagating it everywhere would be a regression, not a fix — flagging as an explicit decision point, not resolved here.
+- [x] 5.2 **RESOLVED — this question was already answered by a separate, more thorough investigation
+  recorded in root `CLAUDE.md`, verified live 2026-09-01.** `src/lib/server/atlas/qdrant-collection-contracts.ts`
+  explicitly documents both collections as intentionally separate, not stale duplication:
+  `codebase_chunks_768` is the "older source contract" (multi-vector: content/error/signature +
+  sparse bm42, carries the graph/authority/community/tag payload fields this file's 5.1 finding
+  noted); `codebase_chunks_768_v2` is the "EMB3A target contract" (dense-only `content` vector,
+  revision-filterable, leaner identity-only payload) — an **in-progress migration target**
+  referenced by 43 live files, not a finished replacement. Root `CLAUDE.md`'s explicit hard rule:
+  "Do not merge or delete either without the person driving the EMB3A migration." **This closes the
+  finding as already-governed, not as fixed-by-code** — no constant-propagation or collection
+  consolidation was performed in this task, and none should be, until that migration owner acts.
+  `turbovec-search.ts`/`trace-mcp-server.ts`/`packet-assembler.ts`'s independent hardcoded literals
+  remain as-is; re-open only if the EMB3A migration reaches a state where propagating one constant
+  becomes safe.
 
 ## 6. Resolve the dual-embedder duplication (finding #7)
 
-- [ ] 6.1 Per CLAUDE.md's Duplication Prevention rule: classify `semantic-512.ts` and the new `semantic-768.ts` as CANONICAL_OWNER / BACKEND / EXPERIMENT / DEAD — do not leave both implicitly claiming canonical status via contradictory docstrings. This decision is upstream of and should probably happen before 2.1/2.2 above, since it's the same underlying question.
+- [x] 6.1 **RESOLVED, verified live 2026-09-01.** No contradictory docstrings remain.
+  `semantic-512.ts` now self-identifies unambiguously as **BACKEND** (a derived MRL projection
+  utility): its own constants are named `LEGACY_SEMANTIC_REPRESENTATION`/`LEGACY_SEMANTIC_DIMENSION`/
+  `LEGACY_PROJECTION_METHOD`, and its header comment states "reference-only MRL adapter and must
+  not inherit the active semantic_768 authority constants." `semantic-768.ts` is unambiguously
+  **CANONICAL_OWNER**: it imports `ATLAS_CANONICAL_SEMANTIC_DIMENSION`/
+  `ATLAS_CANONICAL_SEMANTIC_REPRESENTATION` directly from `qdrant-semantic-projection.ts` (the
+  single source of truth) rather than declaring its own constants. This matches the 2.1/2.2
+  operator ruling above (768 canonical, 512 a legitimate derived lane) — no further code change
+  needed; this was a documentation/naming classification, and it's already correct.
 
 ## 7. Low-priority cleanup (finding #8)
 
