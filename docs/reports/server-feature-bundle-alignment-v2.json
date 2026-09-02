@@ -1,6 +1,6 @@
 {
   "schema": "atlas.server-feature-bundle-alignment-report.v2",
-  "status": "IMPLEMENTED_TESTS_AND_REPLAY_HARNESS_NOT_EXECUTED_BY_THIS_SESSION",
+  "status": "IMPLEMENTED_WORKSTATION_EXECUTION_PENDING",
   "branch": "chatgpt/server-feature-bundle-alignment-v2",
   "changes": {
     "revisionAuthorityEnvelope": {
@@ -42,7 +42,7 @@
       "inputOwnedByCaller": true,
       "fabricatesCandidateCohort": false,
       "requiresExactCandidateCountByDefault": 15,
-      "graphRevisionPolicy": "LANE_AWARE",
+      "graphRevisionPolicy": "LANE_AWARE_AND_REVISION_EXACT",
       "graphRevisionRequiredWhen": "graph lane or graph-derived score is admitted",
       "graphRevisionMayBeNullWhen": "semantic/lineage-only snapshot carries no graph evidence",
       "checksLogicalReplayIdentity": true,
@@ -70,15 +70,74 @@
       "fabricatesMissingArtifacts": false
     },
     "existing15RowCanary": {
-      "status": "SEMANTIC_LINEAGE_CANARY_ONLY",
+      "status": "BASE_IDENTITY_AND_SEMANTIC_LINEAGE_PROVEN",
       "rowCount": 15,
-      "graphRevision": null,
-      "graphStatus": "OPTIONAL_CURRENT_RELATIONSHIP_CORPUS_EMPTY",
-      "note": "This is valid input lineage evidence for a semantic-only ACE proof only when the resulting feature snapshot does not admit graph-lane or graph-derived evidence. A graph revision must never be fabricated to satisfy the replay harness."
+      "candidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
+      "ordinalMapChecksum": "86fee5d38619d3065d8710942068f26fb5b0d3c09992b1b523083ae0a593d297",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "baseGraphRevision": null,
+      "note": "The base ordinal map predates graph-feature admission. It remains immutable evidence and is never patched in place."
+    },
+    "goldenRetrievalEvidence": {
+      "status": "EXISTING_PROVEN_ARTIFACT",
+      "report": "docs/reports/parent-atlas-golden-retrieval-v1.json",
+      "semanticScores": 15,
+      "exactSemantic768": true,
+      "replayChecksum": "d1db484f15dfd70cc59ab33802d19fa883ed3abd5993c78683d252c46af98d2c",
+      "graphFeaturesAttached": 7,
+      "graphFeaturesAffectRanking": false,
+      "writesPerformed": false
+    },
+    "graphFeatureEvidence": {
+      "status": "EXISTING_PROVEN_ARTIFACT",
+      "report": "docs/reports/current-graph-feature-gather-v1.json",
+      "graphRevision": "sha256:e0807b80454a71995bb87c42f62a3b966b501ce56e6a6b106e6e2237ab81d3ab",
+      "featureRevision": "graph-pagerank:cugraph-v1:alpha-0.85:tol-1e-6:maxIter-100",
+      "featureRows": 7,
+      "authorityProjection": "pagerankMax -> graphAuthority; matches existing authority_norm feature-matrix projection",
+      "missingGraphFeaturePolicy": "NULL_NOT_ZERO",
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    "aceGoldenFeatureSnapshotProducer": {
+      "status": "IMPLEMENTED_NOT_EXECUTED",
+      "script": "scripts/atlas/materialize-ace-golden-feature-snapshot-v1.mts",
+      "inputs": [
+        ".tmp/atlas/lineage-qualified-candidate-map-v1.json",
+        "docs/reports/parent-atlas-golden-retrieval-v1.json",
+        "docs/reports/current-graph-feature-gather-v1.json"
+      ],
+      "outputs": [
+        ".tmp/atlas/ace-golden-candidate-map-v1.json",
+        ".tmp/atlas/ace-candidate-feature-snapshot-v1.json",
+        "docs/reports/ace-candidate-feature-snapshot-v1.json"
+      ],
+      "derivesNewCandidateSnapshotRevision": true,
+      "mutatesBaseOrdinalMap": false,
+      "preservesCanonicalOrdering": true,
+      "semanticScoreSource": "existing deterministic exact semantic_768 golden replay",
+      "graphAuthoritySource": "existing bounded cuGraph PageRank feature artifact",
+      "fabricatesScores": false,
+      "rankingPromotion": false,
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    "aceRevisionAuthorityMaterializer": {
+      "status": "IMPLEMENTED_NOT_EXECUTED",
+      "script": "scripts/atlas/materialize-ace-revision-authority-v1.mts",
+      "authorityOwner": "materializeWorkspaceRevisionOriginV1 -> buildRevisionAuthorityEnvelopeV1",
+      "requiresCompleteWorkspaceRecordAndBindings": true,
+      "databaseSubsetReconstructionProhibited": true,
+      "expectedWorkspaceRevisionFromCandidateMap": true,
+      "workspaceMismatchBehavior": "BLOCK_WITHOUT_ENVELOPE",
+      "supportsExplicitWorkspaceRoot": true,
+      "syntheticRevisionFallbacks": false,
+      "canonicalAuthority": false,
+      "writesPerformed": false
     },
     "aceLiveDryCurrentBlocker": {
-      "status": "CANDIDATE_FEATURE_SNAPSHOT_ARTIFACT_MISSING",
-      "note": "Repository search found the exact 15-row CandidateOrdinalMapV1 canary and lineage report, but no persisted CandidateFeatureSnapshotV1 for the same candidateSnapshotRevision/ordinalMapChecksum. The next safe implementation is a read-only feature-snapshot producer using existing feature owners; do not synthesize scores or lane masks merely to make the ACE gate pass."
+      "status": "WORKSTATION_EXECUTION_AND_FROZEN_AUTHORITY_MATCH_PENDING",
+      "note": "The feature snapshot and revision-authority materializers are implemented, but this GitHub session cannot execute against the workstation-only .tmp candidate map or prove that the current/alternate workspace root reproduces the frozen b19 workspace revision. If the current worktree differs, the authority materializer must block; use exact frozen workspace bytes or a preserved complete WorkspaceRevisionRecordV1 plus all bindings rather than reconstructing authority from partial DB rows."
     },
     "legacyRetrievalRouterWorkspaceRevision": {
       "status": "COMPATIBILITY_ONLY",
@@ -98,8 +157,9 @@
     "RLM consumes the sealed snapshot without rematerialization"
   ],
   "notClaimed": [
-    "focused Vitest pass",
-    "project typecheck pass",
+    "new producer scripts executed on workstation",
+    "focused Vitest pass for current branch head",
+    "project typecheck pass for current branch head",
     "ACE-LIVE-DRY-02 proof pass",
     "15-row live ACE replay",
     "live OaK replay",
@@ -111,11 +171,18 @@
     "npm --prefix sveltekit-frontend exec -- svelte-check --tsconfig ./tsconfig.json",
     "openspec validate parent-atlas-ace-rlm-bitfrost-integration --type change --strict --json"
   ],
-  "aceLiveDryReadinessCommand": "npm exec -- tsx scripts/atlas/audit-ace-live-dry-input-readiness-v2.mts -- --ordinal-map <candidate-map.json> --snapshot <feature-snapshot.json> --revision-authority <revision-authority.json>",
-  "aceLiveDryCommand": "npm exec -- tsx scripts/atlas/prove-ace-live-dry-v2.mts -- --input <revision-qualified-input.json>",
+  "workstationSequence": [
+    "npm exec -- tsx scripts/atlas/materialize-ace-golden-feature-snapshot-v1.mts",
+    "npm exec -- tsx scripts/atlas/materialize-ace-revision-authority-v1.mts -- --ordinal-map .tmp/atlas/ace-golden-candidate-map-v1.json",
+    "npm exec -- tsx scripts/atlas/audit-ace-live-dry-input-readiness-v2.mts -- --ordinal-map .tmp/atlas/ace-golden-candidate-map-v1.json --snapshot .tmp/atlas/ace-candidate-feature-snapshot-v1.json --revision-authority .tmp/atlas/ace-revision-authority-envelope-v1.json",
+    "assemble one reviewed atlas.ace-live-dry-input.v2 using explicit retrievalPolicyRevision/acePlaybookRevision/representationRevision values already owned by the caller",
+    "npm exec -- tsx scripts/atlas/prove-ace-live-dry-v2.mts -- --input <reviewed-ace-live-dry-input-v2.json>"
+  ],
   "nextGates": [
-    "ACE-FEATURE-SNAPSHOT-PRODUCER-02: produce one read-only CandidateFeatureSnapshotV1 for the exact 15-row CandidateOrdinalMapV1 using existing feature owners and honest lane masks; no synthetic scores or graph revision",
-    "ACE-LIVE-DRY-02: execute the readiness audit, then prove the sealed bundle + ACE manifest replay for the exact cohort",
+    "ACE-FEATURE-SNAPSHOT-PRODUCER-02: execute the implemented frozen-artifact composer and review its 15-row receipt",
+    "ACE-REVISION-AUTHORITY-02: execute the fail-closed authority materializer; exact frozen workspace revision required",
+    "ACE-LIVE-DRY-INPUT-02: readiness audit must pass all three artifacts and cross-contract checks",
+    "ACE-LIVE-DRY-02: prove sealed bundle + ContextManifestV2 replay with zero writes",
     "OAK-LIVE-READONLY-01: feed the same bundleLogicalChecksum and revision authority to already-registered live handlers",
     "BITFROST-LIVE-01: use bundleLogicalChecksum/ContextManifest identity for MISS/HIT/revision-MISS proof",
     "LANGGRAPH-CHECKPOINT-01: checkpoint receipt references/checksums, not duplicate evidence artifacts"
