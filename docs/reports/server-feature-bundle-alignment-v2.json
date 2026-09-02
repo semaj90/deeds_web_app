@@ -1,0 +1,65 @@
+{
+  "schema": "atlas.server-feature-bundle-alignment-report.v2",
+  "status": "IMPLEMENTED_TESTS_ADDED_NOT_EXECUTED_BY_THIS_SESSION",
+  "branch": "chatgpt/server-feature-bundle-alignment-v2",
+  "changes": {
+    "revisionAuthorityEnvelope": {
+      "status": "IMPLEMENTED",
+      "contract": "atlas.revision-authority-envelope.v1",
+      "workspaceRevisionAuthority": "WORKSPACE_SOURCE_MANIFEST_SHA256_V1",
+      "sourceRevisionAuthority": "SOURCE_BYTES_SHA256_V1",
+      "syntheticRevisionCount": 0
+    },
+    "serverFeatureBundle": {
+      "status": "IMPLEMENTED",
+      "snapshotTyped": true,
+      "candidateCardinalitySealed": true,
+      "sourceRevisionSetChecksum": true,
+      "graphRevisionSetChecksum": true,
+      "semanticRevisionSetChecksum": true,
+      "logicalChecksumExcludesRequestId": true,
+      "envelopeChecksumIncludesRequestId": true,
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    "rlmAceHandoff": {
+      "status": "IMPLEMENTED",
+      "sealedBundleConsumed": true,
+      "snapshotRematerializedDownstream": false,
+      "clientSuppliedBundleAccepted": false
+    },
+    "legacyRetrievalRouterWorkspaceRevision": {
+      "status": "COMPATIBILITY_ONLY",
+      "note": "Governed sealed-bundle construction now starts from CandidateOrdinalMapV1 + CandidateFeatureSnapshotV1 + RevisionAuthorityEnvelopeV1 and does not reinterpret the legacy numeric RetrievalRouterFeatureRowV1.workspaceRevision field."
+    }
+  },
+  "testsAdded": [
+    "sveltekit-frontend/src/lib/server/atlas/retrieval/search-runtime-feature-bundle-provider-v1.spec.ts"
+  ],
+  "testAssertions": [
+    "same evidence with different request IDs preserves bundleLogicalChecksum",
+    "different request IDs change bundleEnvelopeChecksum",
+    "workspace revision is content-addressed and matches revision authority",
+    "source/graph/semantic revision-set checksums are present",
+    "mismatched revision authority is rejected",
+    "RLM consumes the sealed snapshot without rematerialization"
+  ],
+  "notClaimed": [
+    "focused Vitest pass",
+    "project typecheck pass",
+    "15-row live ACE replay",
+    "live OaK replay",
+    "BitFrost/Valkey live warm or invalidation",
+    "LangGraph checkpoint/HITL proof"
+  ],
+  "recommendedValidation": [
+    "npm --prefix sveltekit-frontend exec -- vitest run src/lib/server/atlas/retrieval/search-runtime-feature-bundle-provider-v1.spec.ts src/lib/server/atlas/rlm/rlm-runtime.spec.ts --pool=forks --maxWorkers=1 --minWorkers=1",
+    "npm --prefix sveltekit-frontend exec -- svelte-check --tsconfig ./tsconfig.json"
+  ],
+  "nextGates": [
+    "ACE-LIVE-DRY-02: bind a real exact candidate cohort to the new sealed bundle and replay twice",
+    "OAK-LIVE-READONLY-01: feed the same logical bundle identity to already-registered live handlers",
+    "BITFROST-LIVE-01: use bundleLogicalChecksum/ContextManifest identity for MISS/HIT/revision-MISS proof",
+    "LANGGRAPH-CHECKPOINT-01: checkpoint receipt references/checksums, not duplicate evidence artifacts"
+  ]
+}
