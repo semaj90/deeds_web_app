@@ -270,12 +270,13 @@ lineage MEMBERSHIP, not 1:1 identity.
   confirm it's still stable before trusting it. Not started. Deliberately
   kept separate from PKT-LINEAGE-08 (future capture vs. historical
   reconstruction are different risk profiles).
-- [ ] PKT-LINEAGE-10 (BRIDGE-RECON-DRY-03) — Reconcile Qdrant projections per
+- [x] PKT-LINEAGE-10 (BRIDGE-RECON-DRY-03/04) — Reconcile Qdrant projections per
   packet<->chunk MEMBERSHIP (not per packet alone), consuming only rows
-  proven by PKT-LINEAGE-08/09. Blocked on both.
-- [ ] PKT-LINEAGE-11 (RECON-CANARY-01) — Tiny bounded Qdrant metadata
-  write canary. Blocked, zero writes, until PKT-LINEAGE-10 admits a
-  zero-ambiguity cohort.
+  proven by PKT-LINEAGE-08/09. Superseded by the fresh fail-closed dry-04
+  receipt; see `docs/reports/bridge-recon-dry-04-v1.json`.
+- [x] PKT-LINEAGE-11 (RECON-CANARY-01) — Tiny bounded Qdrant metadata
+  write canary. Proven previously; full authorized reconciliation is now
+  separately receipted below.
 
 ## Three bounded tracks — 2026-09-01/02 session (re-verified concurrent-session evidence, closed 1 real caller-mismatch bug)
 
@@ -639,6 +640,73 @@ generation), not a reconciliation failure to be papered over.
 `EXACT_CANONICAL_MEMBERSHIP` rows) is NOT authorized by this canary — it requires a separately
 authorized, refreshed full dry reconciliation against these now-proven mutation semantics first.
 `RF7` not started. OaK remains `BLOCKED_REVISION_BUNDLE_UNPROVEN`. `graphify:daily` not run.
+
+## BRIDGE-RECON-DRY-04 / FULL RECONCILIATION (2026-09-02) — proven with bounded resume
+
+The fresh read-only gate consumed only `atlas_packet_chunk_lineage` membership rows and the
+proven Qdrant physical-point mapping. It classified every row without source-ref fan-out:
+
+```
+ALREADY_RECONCILED:   6 before apply; 6,312 after apply
+EXACT_PATCH_REQUIRED: 6,306 before apply
+QDRANT_POINT_MISSING: 675 (untouched)
+PREIMAGE_DRIFT:       0
+IDENTITY_CONFLICT:    0
+REVISION_MISMATCH:    0
+FOREIGN_CHUNK:        0
+```
+
+The authorized apply changed only the approved lineage payload fields for the 6,306 present
+points. A transient readback failure halted the first pass before continuation; the resumable
+apply then completed with 3,564 effective changes and 2,742 exact idempotent skips. All 6,306
+targets passed payload, vector, and point-ID readback. No missing points were created and no
+points or vectors were deleted or replaced. See:
+`docs/reports/bridge-recon-dry-04-v1.json`, `docs/reports/bridge-recon-apply-v1.json`.
+
+The post-apply audit found 6,312 already reconciled points and the same 675 missing physical
+points. The replay target was reconstructed from the prior dry-03 classifications because the
+post-apply audit overwrote the serialized dry-04 patch list. It produced zero effective changes
+and exact readback for all 6,312 targets; this is recorded as a replay proof with that artifact
+limitation, not as a claim that the original serialized 6,306-entry artifact was preserved:
+`docs/reports/bridge-recon-replay-v1.json`.
+
+Status: `FULL_QDRANT_LINEAGE_RECONCILIATION_PROVEN` for the 6,312 present projections. The 675
+missing physical points remain a separate unresolved population and were not created. OaK
+replay, RF6/RF7, graphify daily, and legacy cleanup remain stopped.
+
+### QDRANT-VECTOR-WRITER-OWNER-01 (2026-09-02, read-only writer-ownership audit)
+
+The "transient readback failure" above was investigated for root cause before accepting it as
+benign, per explicit instruction not to promote "something else is rewriting this collection"
+from inference to fact without tracing it. Read-only only; no scripts executed, no processes
+touched, no mutation performed.
+
+- **Live process/service census**: no running process (Node, Python, or Docker) currently reaches
+  `codebase_chunks_768_v2`. The TurboVec sidecar targets the separate `codebase_chunks_768`
+  collection at dim 64, not this one. No graphify/backfill/embedding job is currently alive.
+- **Static writer census**: exactly one real `VECTOR_WRITER` found for this collection —
+  `sveltekit-frontend/src/lib/server/ace/ace-materializer.ts` (`embedText()` →
+  `qdrant.upsert('codebase_chunks_768_v2', {...})`). Structurally ruled out for this incident: its
+  point IDs are minted as `` `${packetKey}:${Date.now()}` ``, which can never collide with the
+  stable lineage-sourced UUIDs that showed the readback failure. Three other files
+  (`qdrant-provision-768v2.mjs`, `qdrant-parity-repair-core.mjs`, `qdrant-summary-sync.ts`) were
+  not deep-dived and are left `UNKNOWN`, not cleared.
+- **Qdrant observation probe**: took 5 of the exact previously-failed physical point IDs, read
+  vector fingerprint + `indexed_at` at T0, waited 6s, read again at T1 — `STABLE_DURING_PROBE`,
+  zero change. `indexed_at` on all 5 reads `2026-07-29T17:0x`, over a month old and untouched by
+  any of this session's activity (payload-only writes don't touch it).
+- **Log/receipt correlation**: several of the exact point IDs that failed the first attempt's
+  vector-fingerprint check later reported `skippedAlreadyApplied: true` in the successful run —
+  meaning that write had already landed correctly before the failure was reported. The only code
+  change between the failing and succeeding runs was adding a 5-attempt/250ms-backoff retry
+  around the same fingerprint-equality check.
+
+**Verdict: `VECTOR_DRIFT_NOT_CURRENTLY_REPRODUCIBLE`.** No external vector writer identified or
+reproduced. The evidence is consistent with a read-after-write consistency race in the original
+single-shot readback (fixed by the retry/backoff), not a genuine concurrent rewrite of this
+collection's vectors — but that remains the best-supported explanation, not a proven one, since 3
+static candidates were not fully cleared. If this signal recurs, re-run this same audit rather
+than assuming it is the same benign cause.
 
 ## Validation record
 
