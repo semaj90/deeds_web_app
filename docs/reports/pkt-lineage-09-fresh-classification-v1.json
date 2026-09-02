@@ -1,0 +1,56 @@
+{
+  "schema": "atlas.pkt-lineage-09-fresh-classification.v1",
+  "task": "PKT-LINEAGE-09-FRESH-DRY",
+  "generatedAt": "2026-09-02T01:57:57.206Z",
+  "mode": "READ_ONLY_FRESH_HISTORICAL_CLASSIFICATION",
+  "readOnly": true,
+  "writesPerformed": false,
+  "frozenAuthority": [
+    "atlas_packets",
+    "codebase_chunk_index",
+    "graphify_files"
+  ],
+  "excludedFromAuthority": [
+    "atlas_packet_chunk_lineage -- comparison target only, not a classification input"
+  ],
+  "databaseError": null,
+  "populationClassified": 61660,
+  "admittedPackets": 577,
+  "proposedMembershipRowCount": 6987,
+  "namespaceUnproven": 60882,
+  "noMember": 201,
+  "membershipExactRevisionProven": 577,
+  "proposedMembershipSetChecksum": "sha256:08c8c3e2d531cfd39605a80710ee5c09fb22b5569d80738b94d1f2da77a394bd",
+  "admittedPacketSetChecksum": "sha256:42b7c411bff526a954a17120f3b4e126a1ab58b5a2b0fbbf834b38e15d72870b",
+  "lineageTableExists": true,
+  "existingLineageRowCount": 89,
+  "liveCanonicalComparison": {
+    "alreadyCanonicalIdentical": 89,
+    "newInserts": 6898,
+    "provenanceUpdates": 0,
+    "conflicts": 0,
+    "deletesRequired": 0,
+    "existingRowsNotInFreshProposal": 0
+  },
+  "baselineFound": true,
+  "baselineComparison": {
+    "baselinePopulationClassified": 61660,
+    "freshPopulationClassified": 61660,
+    "populationMatch": true,
+    "baselineAdmittedPackets": 577,
+    "freshAdmittedPackets": 577,
+    "admittedMatch": true,
+    "baselineProposedMembershipRowCount": 6987,
+    "freshProposedMembershipRowCount": 6987,
+    "membershipCountMatch": true,
+    "baselineNamespaceUnproven": 4110,
+    "freshNamespaceUnproven": 60882,
+    "namespaceUnprovenMatch": false,
+    "baselineNoMember": 56973,
+    "freshNoMember": 201,
+    "noMemberMatch": false,
+    "note": "Row-level checksums are NOT compared -- the baseline's checksum serialization method is unknown (its producer script was not found in the repo). Aggregate counts are the comparison surface.",
+    "drift": "SAFE_EXPLAINED_DRIFT"
+  },
+  "verdict": "READY_FOR_HISTORICAL_PROMOTION_AUTHORIZATION"
+}

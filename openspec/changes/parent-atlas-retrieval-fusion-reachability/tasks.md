@@ -502,6 +502,36 @@ hard cases against `fuseSearchRuntimeCandidates`. Cases 1/2/4/5 already safe by 
 `canonicalChunkId` is unset). 5 new tests, 43/43 total pass, `tsc` clean. `RF6-OWNER-MATRIX-01` and
 `RF6-LIVE-REPLAY-01` remain explicitly not started.
 
+## RF6-OWNER-MATRIX-01 (2026-09-02, read-only, done) — 5 owners frozen, no refactor, no live replay
+
+Read-only census only, per explicit instruction: no refactor, no live replay, no RF7. Exactly 5
+live non-canonical fusion owner rows frozen (matches this file's own prior count — no ambiguous
+"other" row introduced). Fields consolidated from this file's existing `RF6-IDENTITY-AUDIT-01`
+findings plus direct code reading this session (weight ownership, dedup key exact field, revision
+qualification) to fill the gaps those findings left open.
+
+| Field | `rrf-integration.ts`/`rrf-combiner.ts` | `rrf-fusion.ts` | `service.ts::rrfFusion` | `unified-orchestrator.ts`/`rrf-combiner-utils.ts::combineRRFLanes` | `rrf-fuse.ts` |
+|---|---|---|---|---|---|
+| entrypoint | `/api/search/rrf` | `/api/retrieval/rrf` (admin-gated eval/debug) | `/api/atlas/studio/search`, `/api/atlas/search` | `/api/admin/retrieval/stream`, transitively `/api/retrieval/go`, `/api/retrieval/multi-vector` | 6+ callers incl. an MCP tool (broadest usage of the 5) |
+| productionReachable | YES | YES (admin route, still live) | YES | YES | YES |
+| logicalLaneVocabulary | canonical `LogicalRetrievalLane` (dense/lexical/exact/ast/schema/rg/bm42) | ad hoc lane names keyed by `FUSION_WEIGHTS` | `SearchLaneRegistry` lane names | caller-supplied lane name strings (`Map<string, ...>` keys) | fixed `RrfLaneName` enum (bm42/rg/dense_384/dense_768/turbovec/topology/authority/dispatcher) |
+| candidateEnvelope | `Candidate` (rich: symbolVersionId/packetKey/sourceRef/contentHash/canonicalChunkId) | thin (`candidate_id`, `source_ref`, `content_hash` only — no symbol_version_id/packet_key/revision fields) | `SearchResult` (post-join, has source_ref/content_hash from an earlier stage) | thin (`id`, `rrfContribution`, `rank`, `metadata`) | thin (`id`/`packetKey`, `score`, `rank`, `payload`) |
+| identityResolver | `resolveCanonicalIdentity` (V1, shared) | none — trusts caller `candidate_id` directly | none at the fusion step itself (an earlier stage joins `atlas_packets` by `source_ref`, but `rrfFusion()` re-keys on raw `result.id`, discarding that join) | none — trusts caller `id` directly | none — trusts caller `packetKey ?? id` directly |
+| canonicalHydration | yes (`ProjectionRegistryV1` via `RF-QDRANT-HYDRATION-02`, dense lane only) | no | partial, then discarded (see identityResolver) | no | no |
+| dedupLocation | `getFusionIdentityKey`/`getFusionBackendIdentityKey`, canonical-vs-degraded aware | `candidateMap` keyed on raw `candidate_id` | `scoreMap` keyed on raw `result.id` | `hitAccumulator` keyed on raw `hit.id` | `byPacket` keyed on raw `packetKey ?? id` |
+| oneLaneOneVoteSemantics | YES (best-rank-wins within a lane, proven by tests) | not applicable to this router's per-lane score merge (best-of-all-lanes per candidate_id, not a per-lane vote model) | NO (`scoreMap.set(key, (scoreMap.get(key) ?? 0) + weighted)` sums unconditionally, no per-lane cap) | YES (`if (hit.rrfContribution <= existingLane.rrfContribution) return` — proven by `rrf-split.test.ts`) | NO (`current.fusionScore += score` sums unconditionally per hit, no per-lane cap — a lane returning duplicate `packetKey`s can cast >1 vote) |
+| weightOwner | shared config (`RRF_LANE_WEIGHTS`-style, canonical path) | this file itself — module-level `FUSION_WEIGHTS` constant | `SearchLaneRegistry` (`lane.config().weight`) — a 3rd distinct weight-ownership model | caller (pre-weighted `rrfContribution` passed in; internal `laneWeight` field hardcoded to `1.0`, explicitly "will be set by caller if needed") | caller (`weightsOrOptions` map passed in per call, default `1`) |
+| weightPolicy | centrally defined, `k=60` standard RRF | centrally defined, **enforced to sum to 1.0** (`if (Math.abs(weightSum - 1.0) > 0.001) throw`) — the only owner of the 5 with a hard invariant on its own weights | per-lane-config, no sum invariant | no sum invariant, weight math is entirely upstream of this function | no sum invariant, defaults every unweighted lane to `1` |
+| revisionQualified | YES for the dense lane only (`workspaceRevision`/`sourceRevision` fields on `Candidate`, post RF-QDRANT-HYDRATION-02) | NO (no revision fields in the request/response schema at all) | NO at the fusion step (revision fields, if any, are dropped by the same re-keying that drops packet identity) | NO (no revision fields in the lane-hit shape) | NO (no revision fields in the lane-hit shape) |
+| evidenceQualified | YES (`laneEvidence`, `supportingBackendIds`, `contributingSources` per fused candidate) | partial (per-lane scores retained in `candidateMap`, but no cross-lane evidence trail object) | NO (`rescored` only carries the final `score`, no per-lane breakdown) | YES (`rrfBreakdown`/`contributions` array per hit, richest evidence trail of the 4 non-canonical owners) | partial (`provenance` object per fused hit, rank+contribution only, no lane-weight-policy trail) |
+| decision | `CANONICAL_OWNER` (not part of this row set — the reference other rows are measured against) | `RETAIN_INDEPENDENT` — admin/eval-only surface, thin envelope is fit-for-purpose for a debug endpoint; migrating it to canonical identity would over-engineer a diagnostic tool. Revisit only if it is ever promoted to a non-admin route. | `DELEGATE_TO_CANONICAL` — the most architecturally confused of the 5 (a real Postgres identity join happens upstream and is then discarded at the fusion step); highest-value target once a real shared boundary exists, per this file's own prior note. | `RETAIN_INDEPENDENT` (for now) — one-lane-one-vote is already correctly proven here; its remaining gap (no canonical identity, only raw `id`) is real but this owner's dedup discipline is already better than 3 of the other 4, so delegating it is lower priority than fixing `service.ts`/`rrf-fuse.ts` first. | `DELEGATE_TO_CANONICAL` (highest breadth priority, per this file's own prior note — 6+ callers incl. an MCP tool) — the one-vote-per-lane gap (real, not yet proven) combined with the widest blast radius makes this the second-highest-value target after `service.ts`. |
+
+**No shared RF7 extraction performed or proposed as part of this task** (still `BLOCKED` per this
+file's own governance section, pending RF5/RF6 convergence). No route was migrated, no fusion owner
+was refactored, no live replay was run. This is a classification-only artifact.
+
+**Next**: `RF6-LIVE-REPLAY-01` (not started — a live, revision-qualified replay after this classification, per this file's own frozen RF sequence). Per the corrected sequence, RF7 remains blocked until both RF5 and RF6 converge; RF6-OWNER-MATRIX-01 alone does not unblock it.
+
 ## RF7 - Long-term convergence (explicitly deferred, do not start before RF4-RF6)
 
 - [ ] Extract `SearchRuntime.fuseCandidates`'s semantics into a shared, importable canonical

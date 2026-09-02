@@ -176,14 +176,19 @@
   bounded mocked read-only replay. Two runs produced the same deterministic
   execution checksum, both actions succeeded, and all writes remained false.
   This is fixture proof only; live dependency replay remains open.
-- [ ] DAG-RUNTIME-01D.2 — Run the frozen replay against explicitly configured
-  read-only live owners after exact source, candidate, graph, and representation
-  revisions are available. WSL2 RAPIDS FastAPI runtime is now reachable at
-  `127.0.0.1:8098` in `atlas-rapids-cu13` with HTTP 200 health, RTX 3060 Ti,
-  cuVS/cuGraph 26.06, and no writes. This proves runtime availability only;
-  the frozen OaK replay remains open because exact source/candidate/graph/
-  representation inputs and live owner execution have not yet been proven.
-- [ ] DAG-RUNTIME-01E — Link the execution receipt to ContextManifest and
+- [ ] DAG-RUNTIME-01D.2 — **`BLOCKED_REVISION_BUNDLE_UNPROVEN`** (2026-09-02, formalized). Run the
+  frozen replay against explicitly configured read-only live owners after exact source, candidate,
+  graph, and representation revisions are available. WSL2 RAPIDS FastAPI runtime is now reachable
+  at `127.0.0.1:8098` in `atlas-rapids-cu13` with HTTP 200 health, RTX 3060 Ti, cuVS/cuGraph 26.06,
+  and no writes. This proves runtime availability only. Per the "OaK revision qualification"
+  section below, the 4-leg revision bundle (source/candidate/graph/representation) is confirmed
+  NOT authoritative — a mix of stale/orphaned, fresh-but-unpersisted, bounded-canary-scoped, and
+  fixture-only values, not one coherent live world-state. Do not spend further effort on this gate
+  until a coherent revision bundle exists; do not run `graphify:daily` or generate a new Graphify
+  run merely to manufacture one (that would invert the dependency — a replay gate should consume a
+  revision that the graph lifecycle naturally produces, not force an expensive rebuild to obtain a
+  token).
+- [ ] DAG-RUNTIME-01E — **`BLOCKED_BY_01D.2`**. Link the execution receipt to ContextManifest and
   validation receipts while preserving zero-write/non-canonical semantics.
 
 ## 3. Representation and learned AE
@@ -288,6 +293,11 @@ liveEligibleCandidateCount: 0
 liveProductionCanary: BLOCKED_NO_ELIGIBLE_CANDIDATE
 futureWriterSemantics: PROVEN
 ```
+**Scope note (added after external review caught an overreach in this session's own chat summary,
+not in this file): this Track A result covers PKT-LINEAGE-08's live-write canary only, on a small
+10-row sample. It is NOT the full-population PKT-LINEAGE-09 dry classification** — see the
+dedicated "PKT-LINEAGE-09 fresh historical classification" section further below for that, which
+was a separate, larger, later step in this same session.
 Not a stall condition — this is the correct, expected state until a source cohort with a single
 unambiguous namespace+revision actually appears. No live orphan was fabricated to force a canary.
 PKT-LINEAGE-09/10/11 remain correctly blocked per their existing entries above; do not re-attempt
@@ -454,6 +464,65 @@ mix of stale/orphaned, fresh-but-unpersisted, bounded-canary-scoped, and fixture
 Per the explicit instruction, `DAG-RUNTIME-01D.2` and any live `DAG-RUNTIME-01D.2`/`01E` work
 remains correctly blocked — this qualification pass changes nothing about that gate, it only makes
 the reason precise and evidence-linked instead of a general "not yet proven."
+
+## PKT-LINEAGE-09 fresh historical classification (2026-09-02, read-only, done) — `READY_FOR_HISTORICAL_PROMOTION_AUTHORIZATION`
+
+**Correction to this file's own prior "Lane A: CLOSED" characterization** (external review caught
+this): PKT-LINEAGE-08's live-canary absence does not close Lane A. PKT-LINEAGE-09's fresh dry
+classification was the actual next step, deliberately separable from 08's canary, and had not yet
+been run. It has now been run.
+
+**The frozen baseline's own producer script was not found anywhere in the repository** — searched
+by filename (`packet-chunk-lineage-backfill-dry-01*`) and by distinctive field names
+(`MEMBERSHIP_EXACT_REVISION_PROVEN`, `frozenAuthority`, `admittedPacketSetChecksum`) across
+`scripts/atlas/*.mjs`/`*.mts`. Rather than treat this as a blocker, wrote an independent
+reconstruction (`scripts/atlas/audit-pkt-lineage-09-fresh-classification-v1.mjs`) from the frozen
+baseline's own documented methodology (same `frozenAuthority`: `atlas_packets`,
+`codebase_chunk_index`, `graphify_files`; same exclusion of `atlas_packet_chunk_lineage` as
+comparison-target-only) and ran it fresh, read-only, full population (no `LIMIT`).
+
+**Headline result — exact match on every promotion-relevant number:**
+```
+                        baseline    fresh     match
+population              61,660      61,660    YES
+admittedPackets            577         577    YES
+proposedMembershipRows   6,987       6,987    YES
+```
+**Real, explained discrepancy in the rejected-bucket split (not glossed over):**
+```
+                        baseline    fresh
+namespaceUnproven         4,110      60,882
+noMember                  56,973        201
+```
+Both splits independently sum correctly to 61,660 (`4,110+56,973+577` and `60,882+201+577`), so
+this is a bucketing-order difference, not an arithmetic error. **My fresh split's 778 = 577+201
+"namespace-proven" figure exactly matches `LINEAGE-01`'s independently-audited
+`namespaceProven: 778, namespaceUnproven: 60,882`** (`docs/reports/lineage-01-source-namespace-revision-authority-v1.json`)
+— now a third independent confirmation of the same 778/60,882 split. The original frozen baseline
+evidently checked chunk-membership before namespace/revision proof (labeling anything with zero
+chunk rows as `NO_MEMBER` regardless of namespace status), while this fresh classifier and
+`LINEAGE-01` both check namespace/revision proof first. **Classified as `SAFE_EXPLAINED_DRIFT`, not
+`UNEXPLAINED_DRIFT`**: the bucketing convention differs, but the set that actually gets promoted
+(admitted packets + proposed memberships) is byte-for-byte identical either way.
+
+**Live canonical comparison** against the existing `atlas_packet_chunk_lineage` table (which does
+already have rows — from an earlier promotion event, not from this session):
+```
+alreadyCanonicalIdentical:      89   (existing rows the fresh proposal exactly reproduces)
+newInserts:                  6,898   (would-be new rows, not yet applied)
+conflicts:                       0   (no existing row disagrees with the fresh proposal)
+deletesRequired:                 0   (required to be zero per the task spec — confirmed)
+existingRowsNotInFreshProposal:  0
+```
+
+**Verdict: `READY_FOR_HISTORICAL_PROMOTION_AUTHORIZATION`.** Row-level checksums were NOT compared
+against the baseline (its serialization method is unrecoverable without its source script) — only
+aggregate counts and the live canonical table, which is a materially stronger evidence surface
+than a stored checksum from unknown code anyway. Report:
+`docs/reports/pkt-lineage-09-fresh-classification-v1.json`. **No historical write was performed or
+proposed for execution — this is the dry classification only.** `PKT-LINEAGE-09` (apply),
+`PKT-LINEAGE-10`, `PKT-LINEAGE-11` remain separately gated on explicit future authorization, per
+the standing instruction that a promotion-ready classification is not itself an apply decision.
 
 ## Validation record
 
