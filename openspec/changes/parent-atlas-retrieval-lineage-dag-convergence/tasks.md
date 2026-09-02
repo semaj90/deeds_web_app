@@ -524,6 +524,73 @@ proposed for execution — this is the dry classification only.** `PKT-LINEAGE-0
 `PKT-LINEAGE-10`, `PKT-LINEAGE-11` remain separately gated on explicit future authorization, per
 the standing instruction that a promotion-ready classification is not itself an apply decision.
 
+## PKT-LINEAGE-09-HISTORICAL-PROMOTION-01 (2026-09-02) — `HISTORICAL_LINEAGE_PROMOTION_PROVEN`, then PKT-LINEAGE-10 read-only
+
+**Authorized and executed per explicit operator instruction.** This is the first production
+database write of this session. Two scripts, run in sequence:
+
+1. **`freeze-pkt-lineage-09-proposal-v1.mjs`** (read-only) — re-ran the classification and
+   persisted the full 6,987-row proposal to `docs/reports/pkt-lineage-09-frozen-proposal-v1.json`
+   (the aggregate summary artifact from the prior task did not itself contain the row-level data
+   needed for apply to consume verbatim). Determinism check against the prior classification run
+   passed on every field (population/admitted/membership-count/namespace-unproven/no-member all
+   matched) — confirmed the live DB had not drifted since the dry classification.
+2. **`apply-pkt-lineage-09-historical-promotion-v1.mjs`** — verified schema contract
+   (`UNIQUE(packet_key, canonical_chunk_id)` present, `chunk_ordinal` nullable) and re-diffed the
+   frozen proposal against the live `atlas_packet_chunk_lineage` table immediately before writing
+   (0 conflicts found). Applied via 577 independent per-packet atomic transactions: `INSERT ...
+   ON CONFLICT (packet_key, canonical_chunk_id) DO NOTHING`, then a same-transaction readback
+   verifying the packet's complete membership set exactly matches the frozen proposal before
+   `COMMIT` (any mismatch would `ROLLBACK` — none occurred).
+
+**Apply result** (`docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json`):
+```
+packetsProcessed: 577   rowsBefore: 89     rowsInserted: 6,898   rowsAlreadyIdentical: 89
+rowsAfter: 6,987        rollbacks: 0       conflicts: 0          duplicatePairs: 0   syntheticIds: 0
+verdict: HISTORICAL_LINEAGE_PROMOTION_PROVEN
+```
+**Replay result** (`docs/reports/pkt-lineage-09-historical-promotion-replay-v1.json`, idempotency
+proof — the exact same apply run a second time):
+```
+rowsBefore: 6,987   rowsInserted: 0   rowsAlreadyIdentical: 6,987   rowsAfter: 6,987
+rollbacks: 0   conflicts: 0   duplicatePairs: 0
+verdict: HISTORICAL_LINEAGE_PROMOTION_PROVEN
+```
+No synthetic IDs, no source_ref fanout, no representative-chunk substitution, no deletion (`DELETE`
+is never issued anywhere in the apply script), no writes to Qdrant/Neo4j/Redis — Postgres only.
+The canonical 1:N packet→chunk bridge (`atlas_packet_chunk_lineage`) now exists for all 577
+namespace+revision-qualified packets.
+
+## PKT-LINEAGE-10 (BRIDGE-RECON-DRY-03) (2026-09-02, read-only, done)
+
+Run immediately after the apply succeeded, per instruction. `scripts/atlas/audit-bridge-recon-dry-03-v1.mjs`
+consumes **only** the physical `(packet_key, canonical_chunk_id, chunk_row_id)` rows from the
+now-populated `atlas_packet_chunk_lineage` table — never `source_ref` fanout (a 30-membership file
+packet yields exactly 30 membership mappings, not 30 guesses from a shared file path). Joins each
+row's `chunk_row_id` (the `codebase_chunk_index.id` UUID) directly into live Qdrant
+`codebase_chunks_768_v2`, per the proven `physicalPointId === canonicalPacketIdentity` mapping.
+
+```
+lineageRowCount: 6,987
+EXACT_CANONICAL_MEMBERSHIP: 6,312   (point exists, self-consistent, payload not yet reconciled)
+ALREADY_RECONCILED:             0   (expected — this is the first reconciliation pass)
+QDRANT_POINT_MISSING:          675   (no live Qdrant point for this chunk_row_id at all)
+PROJECTION_REGISTRY_MISSING:     0
+PAYLOAD_IDENTITY_CONFLICT:       0
+REVISION_MISMATCH:               0
+FOREIGN_CHUNK:                   0
+proposedMutationCount: 6,312 (payload patches only: packet_key/canonical_chunk_id/source_namespace/
+                              source_revision — NOT proposed for the 675 missing points)
+writesPerformed: false
+```
+Zero contradictory evidence (no identity conflicts, no revision mismatches, no foreign-chunk
+attribution) — a clean result, not glossed over. Full classification + exact proposed mutation set
+in `docs/reports/bridge-recon-dry-03-v1.json`.
+
+**Per explicit instruction: stopping here.** `PKT-LINEAGE-11`/`RECON-CANARY-01` are NOT authorized
+by this result — no Qdrant write was proposed for execution or applied. RF6 refactoring/RF7 were
+not started. OaK remains `BLOCKED_REVISION_BUNDLE_UNPROVEN`. `graphify:daily` was not run.
+
 ## Validation record
 
 - [x] OpenSpec validation passes for proposal/design/tasks/spec consistency.
