@@ -419,6 +419,42 @@ files. Next per the frozen lane plan: OaK revision qualification (read-only, whe
 `RF6-OWNER-MATRIX-01`/`RF6-LIVE-REPLAY-01` remain explicitly not started (RF6 is a separate,
 larger per-pipeline census task, not implied by this task's completion).
 
+## OaK revision qualification (2026-09-02, read-only, done) — bundle NOT authoritative, DAG-RUNTIME-01D.2 correctly stays blocked
+
+Read-only qualification of the 4 revision legs `DAG-RUNTIME-01D.2` needs before a live replay is
+eligible: source, candidate, graph, representation. No revision was fabricated; each finding below
+cites the concurrent-session artifact it came from (all genuinely read-only: every one asserts
+`writesPerformed: false`/`canonicalWritesAllowed: false`/`readOnly: true`).
+
+- **Source revision — NOT unified.** Two different, non-interchangeable values exist:
+  (1) `sha256:55edaaad...` (24,192 sources) — the value bound to the `graphify_runs` row, but that
+  row is the same orphaned `RUNNING`/`completed_at: null` record found in this task's own
+  `GRAPHIFY-STALE-RUN-RECON-01` track (see above) — `docs/reports/current-graphify-run-owner-v1.json`
+  confirms `authoritativeGraphRun: false`, `graphRevisionAllowed: false`. (2) `sha256:8a3a9085...`
+  (25,048 sources) — a freshly, correctly re-derived live workspace revision from
+  `docs/reports/graphify-revision-owner-v2.json`, but explicitly `revisionOwnerProven: false` and
+  `persistedMatchingRows: 0` (zero DB rows currently bound to it — `blockers:
+  ["CONTROLLED_PERSISTENCE_CANARY_NOT_PROVEN"]`). Neither value is simultaneously live, complete,
+  AND persisted/bound.
+- **Candidate revision — real but out of scope for this bundle.** `candidateSnapshotRevision:
+  "lineage-qualified-canary:sha256:...:v1:15"` (`docs/reports/current-candidate-feature-matrix-manifest-v1.json`,
+  status `GRAPH_FEATURE_MATRIX_REPLAY_PROVEN`) — a genuine, bounded n=15 canary revision in its own
+  independent namespace, not demonstrated to correspond to either source revision above.
+- **Graph revision — explicitly fixture-only.** `astGraphRevision: sha256:914f8880...`
+  (`docs/reports/ast-structural-revision-v1.json`) carries `status: "PROVEN_FIXTURE_ONLY"` in its
+  own field — not a live-corpus revision by its own admission.
+- **Representation revision — not separately catalogued this pass.** Dozens of reports reference
+  `representationRevision`/`representation_revision` fields; no single dedicated
+  "representation-revision-authority" report was found in a reasonable-effort search. Recorded
+  honestly as unresolved rather than assumed absent or fabricated as present.
+
+**Verdict: the complete 4-leg revision bundle is NOT authoritative** — each leg is independently
+real evidence, but they do not currently form one mutually-consistent, live, persisted bundle (a
+mix of stale/orphaned, fresh-but-unpersisted, bounded-canary-scoped, and fixture-only values).
+Per the explicit instruction, `DAG-RUNTIME-01D.2` and any live `DAG-RUNTIME-01D.2`/`01E` work
+remains correctly blocked — this qualification pass changes nothing about that gate, it only makes
+the reason precise and evidence-linked instead of a general "not yet proven."
+
 ## Validation record
 
 - [x] OpenSpec validation passes for proposal/design/tasks/spec consistency.
