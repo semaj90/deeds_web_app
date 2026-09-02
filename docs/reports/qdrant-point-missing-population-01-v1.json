@@ -1,0 +1,44 @@
+{
+  "schema": "atlas.qdrant-point-missing-population-01.v1",
+  "task": "QDRANT-POINT-MISSING-POPULATION-01",
+  "generatedAt": "2026-09-02T03:34:30.729Z",
+  "mode": "READ_ONLY",
+  "missingRowCount": 675,
+  "aggregate": {
+    "total": "675",
+    "not_eligible": "675",
+    "eligible": "0",
+    "eligible_null": "0",
+    "has_768": "28",
+    "not_in_pg_at_all": "0"
+  },
+  "byTopDirectory": [
+    {
+      "top_dir": "sveltekit-frontend",
+      "n": "517",
+      "n_has_768": "28"
+    },
+    {
+      "top_dir": "scripts",
+      "n": "152",
+      "n_has_768": "0"
+    },
+    {
+      "top_dir": "src",
+      "n": "4",
+      "n_has_768": "0"
+    },
+    {
+      "top_dir": "simd-bridge",
+      "n": "2",
+      "n_has_768": "0"
+    }
+  ],
+  "identityColumnMismatchCheck": {
+    "sampledQdrantIdColumnValues": 25,
+    "foundInQdrantUnderQdrantIdColumn": 0,
+    "conclusion": "RULED_OUT -- no point exists under the qdrant_id column value either; not an id-vs-qdrant_id identity mismatch"
+  },
+  "verdict": "MISSING_POPULATION_EXPLAINED_BY_EMBEDDING_ELIGIBILITY_POLICY",
+  "openAnomaly": "28 of 675 rows have a non-null content_embedding despite embedding_eligible=false -- not investigated further (would require reading the ingestion/eligibility-policy code), flagged not fixed"
+}

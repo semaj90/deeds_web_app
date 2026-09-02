@@ -773,6 +773,34 @@ recordkeeping gap, not an open correctness risk. Stopping here. Not rerunning bu
 Not touching the 675 `QDRANT_POINT_MISSING` rows. `RF6`/`RF7` not started. ACE not resumed.
 `graphify:daily` not run.
 
+### QDRANT-POINT-MISSING-POPULATION-01 (2026-09-02, read-only characterization, closes the "separate unresolved population" question)
+
+The 675 `QDRANT_POINT_MISSING` rows left untouched throughout this track were left as an open
+question ("stale packets / intentionally unprojected chunks / incomplete projection / another
+generation"). Characterized read-only, zero Postgres/Qdrant writes. Script:
+`scripts/atlas/audit-qdrant-point-missing-population-v1.mjs`. Result:
+`docs/reports/qdrant-point-missing-population-01-v1.json`.
+
+- All 675 rows exist in Postgres `codebase_chunk_index` (`not_in_pg_at_all: 0`).
+- All 675/675 (100%) carry `embedding_eligible = false` — a clean, total correlation, not a
+  partial or coincidental one.
+- Ruled out an identity-column mismatch before accepting this at face value: sampled 25 rows'
+  `qdrant_id` column values (distinct from the `id` column used as `chunk_row_id` throughout this
+  track) and confirmed Qdrant has no point under those IDs either
+  (`foundInQdrantUnderQdrantIdColumn: 0`) — this is not a case of the lineage table pointing at
+  the wrong UUID column.
+- Distribution: 517 under `sveltekit-frontend/`, 152 under `scripts/`, 4 under `src/`, 2 under
+  `simd-bridge/` — consistent with test/tooling/script files being excluded from embedding, not
+  core application code.
+- **Verdict: `MISSING_POPULATION_EXPLAINED_BY_EMBEDDING_ELIGIBILITY_POLICY`.** The Qdrant mirror
+  correctly reflects Postgres's own eligibility policy; this is not a reconciliation defect.
+- **Open anomaly, flagged not fixed**: 28 of the 675 (all under `sveltekit-frontend/`) have a
+  non-null `content_embedding` in Postgres despite `embedding_eligible = false`. Not investigated
+  further — would require reading the ingestion/eligibility-policy code, out of scope for this
+  read-only characterization.
+
+This closes the population question this track raised without touching Qdrant or Postgres.
+
 ## Validation record
 
 - [x] OpenSpec validation passes for proposal/design/tasks/spec consistency.
