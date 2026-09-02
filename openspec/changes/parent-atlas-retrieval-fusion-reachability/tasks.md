@@ -147,10 +147,16 @@ This is the highest-value fix: it protects real production traffic through
       available; blank-string fields are treated as absent, not present.
 - [x] `unified-orchestrator.ts::buildRrfLaneMap`'s identical pattern was NOT touched in this task,
       as planned — tracked under RF6 since it's a different live pipeline with its own fusion owner.
-- [x] Acceptance: `CANONICAL_IDENTITY_ON_LIVE_PATH` moves from `DEGRADED` to `PASS` for the
-      canonical spine — degraded cases are now observable via `identityStatus`/`identitySource`
-      instead of silently absent. (Full end-to-end live proof against real Postgres/Qdrant data is
-      RF5's `ONE_ENTITY_ENRICHMENT_TRACE_PROVEN` step, not yet run — this closes the code-level gap.)
+- [x] Acceptance (DOWNGRADED 2026-09-01, operator review — see RF-IDENTITY-SEMANTICS-02 below):
+      the original claim `CANONICAL_IDENTITY_ON_LIVE_PATH: DEGRADED -> PASS` was too strong for
+      what this task actually proved. Corrected framing: `IDENTITY_DEGRADATION_OBSERVABILITY:
+      PASS` (degraded cases are now observable via `identityStatus`/`identitySource` instead of
+      silently absent — this part is genuinely proven), `CANONICAL_IDENTITY_HYDRATION: PARTIAL`
+      (only some tiers hydrate real canonical identity; `content_hash`/`source_ref` were being
+      treated as the same trust class as `symbol_version_id`/`packet_key`, which was wrong — see
+      RF-IDENTITY-SEMANTICS-02), `CANONICAL_IDENTITY_ON_LIVE_PATH: PARTIAL_PROVEN` (not a full
+      PASS — full end-to-end live proof against real Postgres/Qdrant data is still RF5's
+      `ONE_ENTITY_ENRICHMENT_TRACE_PROVEN` step, not yet run).
 - [x] Validation commands run:
   - `npx vitest run src/lib/server/retrieval/__tests__/identity-resolution.test.ts src/lib/server/retrieval/__tests__/rrf-canonical-identity.test.ts src/lib/server/retrieval/__tests__/search-runtime-fusion.test.ts` → **23/23 pass**
   - `npx tsgo --noEmit` (repo-wide) → zero errors in any modified file
@@ -238,6 +244,126 @@ This is the highest-value fix: it protects real production traffic through
     in unit tests against synthetic data. `IDENTITY_ROUND_TRIP` can be upgraded from `PARTIAL` to
     `PARTIAL_PROVEN_LIVE` for the Postgres↔Qdrant leg specifically (Neo4j/Redis legs still
     unattempted, so not a full round-trip proof).
+
+## RF-IDENTITY-SEMANTICS-02 - Identity vocabulary contract correction (complete, 2026-09-01)
+
+Operator review adopted in full (2026-09-01), with two extra safeguards. Core correction: identity
+semantics had outrun RF4/RF5's vocabulary. `content_hash` solved a real over-merge problem (RF5's
+23-chunks-share-one-source_ref finding) but was wrongly promoted into the same trust class as
+`symbol_version_id`/`packet_key` — a real conceptual contradiction, not a naming nitpick.
+
+Frozen identity model:
+- **CANONICAL ENTITY** `symbol_version_id`
+- **CANONICAL PACKET** `packet_key`
+- **CANONICAL CHUNK** `canonical_chunk_id` — only when supplied by proven packet<->chunk
+  ProjectionRegistryV1/lineage hydration (see `parent-atlas-retrieval-lineage-dag-convergence`'s
+  `PacketChunkMembershipV1` contract). Never reconstructed from a hash, source path, AST range,
+  Qdrant point ID, or file grouping.
+- **EXACT PROJECTION EVIDENCE** `content_hash` — only reaches `PROJECTION_EXACT` when a qualifying
+  `HashContractV1` (`hashAlgorithm`/`hashDomain`/`producerRevision`) is also supplied. Safeguard 1:
+  this repo has at least one confirmed historical hash domain where the producer hashed generated
+  artifact content rather than source chunk bytes — an unqualified hash must never be silently
+  trusted as interchangeable with a qualified one from a different producer. Unqualified =
+  `HASH_EVIDENCE_UNQUALIFIED`, falls through, never reaches `PROJECTION_EXACT`.
+- **SOURCE GROUP** `source_ref` — a file-level grouping key, never promoted to canonical status.
+- **DEGRADED LOCAL IDENTITY** backend/lane-local id (Qdrant point id, TurboVec candidate id, etc.)
+
+Safeguard 2: `canonical_chunk_id` is added to the resolver's precedence, but the resolver only
+*consumes* it when present — it must never reconstruct one. Enforced in code by having no fallback
+path that derives `canonicalChunkId` from any other field.
+
+- [x] Defined `IdentityResolutionStatus` (`'CANONICAL' | 'PROJECTION_EXACT' | 'SOURCE_GROUP' |
+      'DEGRADED'`), `IdentitySource` (adds `canonical_chunk_id` to the existing vocabulary),
+      `HashContractV1`, `IdentityResolutionInputV2`, and `IdentityResolutionV2` (`key`,
+      `resolutionStatus`, `identitySource?`, `canonicalEntityId?`, `packetKey?`,
+      `canonicalChunkId?`, `evidenceRefs?`) in `identity-resolution.ts`.
+- [x] Implemented `resolveCanonicalIdentityV2()` — additive, does not replace or alter the existing
+      `resolveCanonicalIdentity()`/`ResolvedIdentity` V1 primitive (a concurrent same-day pass had
+      already broadened V1's own `status` field from `'canonical' | 'degraded'` to
+      `'canonical' | 'projection_exact' | 'source_group' | 'degraded'`, in place, with its tests
+      updated to match — left untouched here, not re-litigated). V2 additionally enforces hash-
+      domain qualification (V1 does not) and adds the `canonical_chunk_id` tier (V1 does not have
+      one at all).
+- [x] This is a small contract correction, not a retrieval redesign, per the operator's explicit
+      instruction — no fusion owner (`SearchRuntime.fuseCandidates`, `rrf-integration.ts`, etc.)
+      was migrated onto V2 in this task. That migration is `RF-QDRANT-HYDRATION-02` below.
+- [x] 8 new tests added (`identity-resolution.test.ts`), covering the explicit hard cases: hydrated
+      `canonical_chunk_id` consumed as `CANONICAL`; qualified `content_hash` -> `PROJECTION_EXACT`;
+      unqualified `content_hash` (no `hashContract`) does NOT reach `PROJECTION_EXACT`, falls
+      through to `SOURCE_GROUP`/`DEGRADED`; a partially-qualified hash contract (missing
+      `producerRevision`) is treated as unqualified; bare `source_ref` -> `SOURCE_GROUP` never
+      `CANONICAL`; negative assertion that `canonicalChunkId` is never populated on the result
+      unless explicitly supplied (proves no reconstruction). 18/18 pass in the full file
+      (10 pre-existing V1 + 8 new V2). Repo-wide `tsgo --noEmit`: zero errors touching this file.
+- [x] Cross-reference recorded, not enforced by code: this correction does NOT block
+      `PKT-LINEAGE-08`'s production canary (`parent-atlas-retrieval-lineage-dag-convergence`) — the
+      two are independent lanes that can proceed in parallel. `RF-QDRANT-HYDRATION-02` and
+      `RF5-LIVE-REPLAY-01` (below) should consume the lineage program's `PacketChunkMembershipV1`/
+      `ProjectionRegistryV1` hydration as it becomes proven, rather than constructing an
+      alternative `canonical_chunk_id` source inside retrieval fusion.
+
+### Operator verdict on this whole change (2026-09-01)
+
+| Item | Verdict |
+|---|---|
+| RF1, RF2 reachability | KEEP |
+| RF3 inventory | KEEP — fix stale counts (the dead `RRF_LANE_WEIGHTS` "doesn't sum to 1.0" note stays recorded as a fact about that dead table, not a live defect; weighted RRF does not require weights to sum to 1 — `score(d) = Σ weight_i / (k + rank_i(d))` is valid unnormalized) |
+| RF4 observability | KEEP — downgrade canonical claim (done above) |
+| RF5 vote arithmetic | KEEP |
+| RF5 identity vocabulary | REVISED (this task) — `content_hash` and `source_ref` removed from `CANONICAL` status; `canonical_chunk_id` added, consumed-only, never reconstructed |
+| RF6 owner census | RECONCILE — see `RF6-OWNER-MATRIX-01` below |
+| RF6 cross-owner proof | OPEN |
+| RF7 shared consolidation | BLOCKED — do not start before RF5/RF6 converge; premature shared-helper extraction risks centralizing the wrong abstraction |
+
+### Corrected RF sequence (2026-09-01)
+
+```
+RF-IDENTITY-SEMANTICS-02  (this task, complete)
+       |
+RF-QDRANT-HYDRATION-02    bind the canonical semantic (dense) lane to the EXISTING
+                           ProjectionRegistryV1/PacketChunkMembershipV1 hydration authority --
+                           do not invent a second identity bridge inside fusion. Target shape:
+                           Qdrant physical point -> ProjectionRegistryV1 -> Postgres canonical
+                           hydration (packet_key, canonical_chunk_id, symbol_version_id when
+                           applicable) -> revision coordinates fusion. content_hash becomes
+                           verification evidence, not the dedup key.
+       |
+RF5-LIVE-REPLAY-01         Invariant: one logical lane, one canonical hydrated entity, at most
+                           one RRF vote. Explicit hard cases to test: same entity via multiple
+                           Qdrant physical hits; same entity via multiple backend-local IDs; same
+                           packet with multiple legitimate canonical chunks; same source_ref with
+                           different canonical chunks; same content_hash but wrong/unproven hash
+                           domain (this last case is what prevents the new resolver from
+                           recreating either the old source_ref over-merge or a new hash-based
+                           over-merge).
+       |
+RF6-OWNER-MATRIX-01        Reconcile the COUNT before doing code work. If 5 live non-canonical
+                           fusion families exist, freeze exactly 5 rows -- no ambiguous "other" row
+                           while 5 are separately listed. Per-row fields: owner, productionReachable,
+                           logicalLaneVocabulary, identitySemantics, dedupLocation, weightOwner,
+                           decision (DELEGATE_TO_CANONICAL | RETAIN_INDEPENDENT | LEGACY_RETIRE).
+       |
+RF6-LIVE-REPLAY-01
+       |
+RF7  (still BLOCKED -- wait for RF5/RF6 to converge before any shared-helper extraction)
+```
+
+Boundary this sequence preserves (do not alias any of these merely because they happen to be
+available as strings/integers on the same object): Qdrant point ID = physical projection
+coordinate; CandidateOrdinal = retrieval snapshot coordinate; `canonicalChunkId` = chunk identity;
+`packetKey` = file-level packet identity; `symbolVersionId` = symbol version identity.
+
+### RETRIEVAL-02 tightening (recorded here, implemented in the sibling
+`parent-atlas-retrieval-lineage-dag-convergence` change's census)
+
+Per the same review: retain the census, but classify every direct Qdrant reader as one of
+`NAMED_VECTOR_REQUIRED_MISSING` / `DEFAULT_VECTOR_VALID` / `EXPLICIT_NAMED_VECTOR_VALID` /
+`COLLECTION_SCHEMA_UNKNOWN` / `NON_QDRANT_FALSE_POSITIVE`, rather than a flat "has using / doesn't
+have using" split. A missing `using` is a proven defect only once target collection, its vector
+schema, and the required vector name are all known — for `codebase_chunks_768_v2`'s `content`
+vector that condition is satisfied; it is not automatically satisfied for every other call site the
+census found. Not re-implemented in this file — see the sibling change's `RETRIEVAL-02` task for
+the actual script update.
 
 ## RF6 - Per-pipeline decisions for the other 4 live fusion owners (not started, unblocked — can run parallel to RF4/RF5)
 
