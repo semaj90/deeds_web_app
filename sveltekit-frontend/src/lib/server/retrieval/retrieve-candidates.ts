@@ -21,6 +21,7 @@ import { embedQueryForLane } from './embedding-service.js';
 import { VECTOR_INDEX_REGISTRY } from '$lib/server/vector/vector-index-registry.js';
 import { RETRIEVAL_LIMITS, identifierVariants, tokenizeKeywordSurface } from './search-contract.js';
 import { resolveCanonicalIdentity } from './identity-resolution.js';
+import { resolveProjectionsBatch } from '$lib/server/atlas/retrieval/projection-registry-v1.js';
 
 const BM25_LIMIT = RETRIEVAL_LIMITS.postgresFtsTopK;
 const QDRANT_LIMIT = RETRIEVAL_LIMITS.denseTopK;
@@ -76,7 +77,7 @@ export function deriveIdentity(input: {
   source_ref: string | null;
   content_hash: string | null;
   fallback_id: string;
-  identityStatus: 'canonical' | 'degraded';
+  identityStatus: 'canonical' | 'projection_exact' | 'source_group' | 'degraded';
   identitySource: ReturnType<typeof resolveCanonicalIdentity>['source'];
 } {
   const resolved = resolveCanonicalIdentity({
@@ -97,6 +98,41 @@ export function deriveIdentity(input: {
     identityStatus: resolved.status,
     identitySource: resolved.source,
   };
+}
+
+/**
+ * RF-QDRANT-HYDRATION-02: batch-validate each dense candidate's Qdrant point id against its own
+ * `postgres_id` payload via `ProjectionRegistryV1`, and attach `canonicalChunkId` only when it
+ * checks out. Fail-open by design -- a `ProjectionRegistryV1` error (network, schema drift) must
+ * never remove or block candidates that already resolved via the existing symbol_version_id ->
+ * packet_key -> content_hash -> source_ref precedence; it only adds evidence, never subtracts it.
+ */
+export async function hydrateCanonicalChunkIds(candidates: Candidate[]): Promise<void> {
+  if (candidates.length === 0) return;
+  try {
+    // Deduplicate by point id -- `resolveProjectionsBatch` does not guarantee output order
+    // matches input order, so results are matched back by key, never by array position.
+    const byPointId = new Map<string, Candidate[]>();
+    for (const candidate of candidates) {
+      const pointId = candidate.qdrantPointId ?? candidate.id;
+      const bucket = byPointId.get(pointId) ?? [];
+      bucket.push(candidate);
+      byPointId.set(pointId, bucket);
+    }
+    const keys = [...byPointId.keys()].map((canonicalPacketIdentity) => ({
+      canonicalPacketIdentity,
+      representationIdentity: 'semantic_768' as const,
+    }));
+    const resolutions = await resolveProjectionsBatch(keys);
+    for (const resolution of resolutions) {
+      if (!resolution.ok) continue;
+      const bucket = byPointId.get(resolution.ref.physicalPointId);
+      if (!bucket) continue;
+      for (const candidate of bucket) candidate.canonicalChunkId = resolution.ref.physicalPointId;
+    }
+  } catch (error) {
+    console.warn('[retrieveQdrant] RF-QDRANT-HYDRATION-02 batch hydration failed (fail-open):', (error as Error).message);
+  }
 }
 
 async function getDb() {
@@ -417,11 +453,13 @@ export async function retrieveQdrant(query: string): Promise<Candidate[]> {
     }
 
     if (resultsByKey.size > 0) {
-      return [...new Map(
+      const deduped = [...new Map(
         [...resultsByKey.values()].map((candidate) => [candidate.packetKey || candidate.id, candidate])
       ).values()]
         .sort((a, b) => b.score - a.score)
         .slice(0, QDRANT_LIMIT);
+      await hydrateCanonicalChunkIds(deduped);
+      return deduped;
     }
   } catch (error) {
     console.warn('[retrieveQdrant] adaptive hybrid search failed, falling back to dense-only:', (error as Error).message);
@@ -436,7 +474,7 @@ export async function retrieveQdrant(query: string): Promise<Candidate[]> {
       limit: QDRANT_LIMIT,
     });
 
-    return results.results.map(hit => ({
+    const fallbackCandidates = results.results.map(hit => ({
       id: String(hit.id),
       sourceRef: (hit.payload?.source_ref as string) || '',
       summary: (hit.payload?.summary as string) || '',
@@ -457,6 +495,8 @@ export async function retrieveQdrant(query: string): Promise<Candidate[]> {
         fallbackId: String(hit.id),
       }),
     }));
+    await hydrateCanonicalChunkIds(fallbackCandidates);
+    return fallbackCandidates;
   } catch (fallbackError) {
     console.warn('[retrieveQdrant] dense-only fallback also failed:', (fallbackError as Error).message);
     return [];

@@ -483,6 +483,16 @@ RF-IDENTITY-SEMANTICS-02 broadened the resolver to 4-way) — type-only fix, zer
 behavior change (verified: `identityStatus === 'canonical'` branches already treated every other
 value identically). One stale test fixed to match. Next: `RF-QDRANT-HYDRATION-02` (not started).
 
+## RF-QDRANT-HYDRATION-02 (2026-09-02, done — WIRED, not yet DEDUP_PROVEN)
+
+Full result in `parent-atlas-retrieval-lineage-dag-convergence/tasks.md` (not duplicated here to
+avoid drift). Summary: `ProjectionRegistryV1` already existed, fully tested, correctly designed,
+zero production callers. Wired it into `retrieve-candidates.ts::retrieveQdrant`'s dense
+`semantic_768` lane (both primary and fallback paths) as a fail-open, observability-only
+`canonicalChunkId` attachment — not yet consumed by dedup/fusion, which stays on V1
+`resolveCanonicalIdentity` precedence. 4 new tests, `tsc` clean, 38/38 pass. Next:
+`RF5-LIVE-REPLAY-01`.
+
 ## RF7 - Long-term convergence (explicitly deferred, do not start before RF4-RF6)
 
 - [ ] Extract `SearchRuntime.fuseCandidates`'s semantics into a shared, importable canonical

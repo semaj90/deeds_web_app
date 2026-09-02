@@ -342,6 +342,45 @@ explicit instruction, `graphify:daily` was **not** run to silence this. No OaK/D
 follows from this track's `STALE_RUN_NON_PROMOTABLE` result until a human decides to abandon or
 resume the orphaned run.
 
+## RF-QDRANT-HYDRATION-02 (2026-09-02, done — WIRED, not yet DEDUP_PROVEN)
+
+Read-only discovery first: `ProjectionRegistryV1` (`sveltekit-frontend/src/lib/server/atlas/retrieval/projection-registry-v1.ts`)
+already exists, is fully tested (`projection-registry-v1.spec.ts`), and already matches the target
+hydration ontology exactly — canonical packet identity + representation identity resolves to a
+projection coordinate, validated against the live Qdrant point's own `postgres_id` payload rather
+than trusted blindly (the exact anti-pattern that produced the earlier 7,773-row stale-payload
+finding). It had **zero production callers** — a correctly-designed, fully dead path. This is the
+real RF-QDRANT-HYDRATION-02 finding, not "needs to be built from scratch."
+
+Wired it (smallest necessary integration, no new abstraction, no V3):
+- `retrieve-candidates.ts::retrieveQdrant` (the `semantic_768`/`codebase_chunks_768_v2` dense lane
+  — matches `ProjectionRegistryV1`'s declared scope exactly) now calls a new
+  `hydrateCanonicalChunkIds()` helper on both its primary and dense-only-fallback return paths,
+  right before returning candidates.
+- `hydrateCanonicalChunkIds()` batches by unique Qdrant point id (dedup first — `resolveProjectionsBatch`
+  does not guarantee output order matches input order, so results are matched back by key, never
+  by array position), calls `resolveProjectionsBatch()` once per `retrieveQdrant()` invocation, and
+  sets a new `Candidate.canonicalChunkId` field ONLY on `ok: true` results.
+- **Fail-open by design**: wrapped in try/catch: a `ProjectionRegistryV1` error (network, schema
+  drift) never drops or blocks candidates already resolved via the existing V1
+  `resolveCanonicalIdentity` precedence — it only adds evidence, never subtracts it.
+- **Scope boundary honored**: `canonicalChunkId` is observability/evidence only in this step. It is
+  NOT yet consumed by `resolveCanonicalIdentityV2` or by `fuseSearchRuntimeCandidates`'s dedup —
+  that remains on the existing V1 `identityStatus` precedence, untouched. Wiring `canonicalChunkId`
+  into V2-based dedup is a distinct, separate future step (not started), consistent with "don't
+  create another identity abstraction, don't skip to bulk migration."
+- 4 new focused unit tests added (`__tests__/qdrant-hydration.test.ts`): validated-attach,
+  fail-open-on-throw, no-op-on-empty-list, dedup-into-one-lookup. `tsc --noEmit` clean on all 3
+  touched files (`retrieve-candidates.ts`, `search-runtime.ts`, `projection-registry-v1.ts`); 38/38
+  tests pass across the full identity/fusion/hydration suite set.
+
+**Status honestly**: `WIRED` (per this repo's enforced status-language rules) — the hydration path
+is live and observable on every dense-lane query, but not yet `DEDUP_PROVEN` (no live-traffic
+evidence yet of how often `canonicalChunkId` actually resolves `ok: true` vs. `PROJECTION_NOT_FOUND`/
+`CANONICAL_IDENTITY_MISMATCH` on real queries — that requires a live-replay proof, not claimed
+here). Next: `RF5-LIVE-REPLAY-01` (in parallel per the frozen lane plan) and, separately, the
+V2-dedup consumption step once hydration's real-traffic hit rate is observed.
+
 ## Validation record
 
 - [x] OpenSpec validation passes for proposal/design/tasks/spec consistency.

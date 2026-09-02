@@ -240,8 +240,7 @@ export interface Candidate {
    * `identity-resolution.ts::resolveCanonicalIdentity` — the shared precedence primitive also
    * used by `rrf-integration.ts`. Absent on candidates constructed before this field existed;
    * treat absence the same as `'canonical'` for backward compatibility, never as `'degraded'`.
-   */
-  /**
+   *
    * Widened 2026-09-02 (RF-IDENTITY-CALLER-MATRIX-01) to match `identity-resolution.ts`'s 4-way
    * `resolveCanonicalIdentity` status (RF-IDENTITY-SEMANTICS-02). `projection_exact` (content_hash)
    * and `source_group` (source_ref) are deliberately treated identically to `degraded` by every
@@ -250,6 +249,16 @@ export interface Candidate {
    */
   identityStatus?: 'canonical' | 'projection_exact' | 'source_group' | 'degraded';
   identitySource?: 'symbol_version_id' | 'packet_key' | 'content_hash' | 'source_ref' | 'lane_id_fallback';
+  /**
+   * RF-QDRANT-HYDRATION-02 (2026-09-02): the Postgres-hydrated, `ProjectionRegistryV1`-validated
+   * canonical chunk identity for a `semantic_768`/`codebase_chunks_768_v2` dense hit. Populated
+   * ONLY when `resolveProjectionsBatch` confirms the Qdrant point's own `postgres_id` payload
+   * agrees with its point id (fail-closed -- absent, not guessed, on `PROJECTION_NOT_FOUND` or
+   * `CANONICAL_IDENTITY_MISMATCH`). This is observability/evidence only in this step: it is not
+   * yet consumed by `resolveCanonicalIdentityV2` or fusion/dedup, which remains on the V1
+   * `identityStatus` precedence above. Wiring it into V2-based dedup is a separate, later step.
+   */
+  canonicalChunkId?: string | null;
 }
 
 /**
