@@ -1,9 +1,13 @@
 import type { RlmAceFeatureBundleProviderV1 } from '../rlm/rlm-ace-feature-admission-v1.js';
 import type { RlmSearchRequest, RlmSearchResult } from '../rlm/rlm-contract.js';
 import {
-  produceAceFeatureSnapshotV1,
-  type AceFeatureSnapshotProducerInputV1,
-} from '../context/ace-feature-snapshot-producer-v1.js';
+  candidateOrdinalMapV1Schema,
+  type CandidateOrdinalMapV1,
+} from '../features/canonical-candidate-v1.js';
+import {
+  candidateFeatureSnapshotV1Schema,
+  type CandidateFeatureSnapshotV1,
+} from '../features/candidate-feature-snapshot-v1.js';
 import {
   serverFeatureBundleChecksumV1,
   serverFeatureBundleLogicalIdentityV1,
@@ -16,10 +20,18 @@ import {
   type RevisionAuthorityEnvelopeV1,
 } from '../identity/revision-authority-envelope-v1.js';
 
-export type SearchRuntimeFeatureBundleInputV1 = AceFeatureSnapshotProducerInputV1 & {
-  featureRevision: string;
+/**
+ * Already-admitted SearchRuntime evidence. This intentionally starts after
+ * candidate identity/ordinal assignment and feature snapshot materialization,
+ * so this composition owner never has to reinterpret the legacy numeric
+ * retrieval-router workspace revision field.
+ */
+export interface SearchRuntimeFeatureBundleInputV1 {
+  requestId: string;
+  ordinalMap: CandidateOrdinalMapV1;
+  snapshot: CandidateFeatureSnapshotV1;
   revisionAuthority: RevisionAuthorityEnvelopeV1;
-};
+}
 
 function revisionSetChecksum(schema: string, revisions: readonly (string | null)[]): string {
   return serverFeatureBundleChecksumV1({
@@ -36,15 +48,16 @@ function revisionSetChecksum(schema: string, revisions: readonly (string | null)
 export function buildSearchRuntimeFeatureBundleV1(
   input: SearchRuntimeFeatureBundleInputV1,
 ): ServerFeatureBundleV1 {
+  if (!input.requestId.trim()) throw new Error('SERVER_FEATURE_BUNDLE_REQUEST_ID_REQUIRED');
+  const ordinalMap = candidateOrdinalMapV1Schema.parse(input.ordinalMap);
+  const snapshot = candidateFeatureSnapshotV1Schema.parse(input.snapshot);
   const revisionAuthority = revisionAuthorityEnvelopeV1Schema.parse(input.revisionAuthority);
-  const produced = produceAceFeatureSnapshotV1(input);
-  const { ordinalMap, snapshot } = produced;
 
   if (ordinalMap.workspaceRevision !== revisionAuthority.workspaceRevision) {
     throw new Error('SERVER_FEATURE_BUNDLE_REVISION_AUTHORITY_WORKSPACE_MISMATCH');
   }
-  if (snapshot.featureRevision !== input.featureRevision) {
-    throw new Error('SERVER_FEATURE_BUNDLE_FEATURE_REVISION_MISMATCH');
+  if (snapshot.workspaceRevision !== revisionAuthority.workspaceRevision) {
+    throw new Error('SERVER_FEATURE_BUNDLE_SNAPSHOT_AUTHORITY_WORKSPACE_MISMATCH');
   }
 
   const sourceRevisionSetChecksum = revisionSetChecksum(
@@ -100,8 +113,8 @@ export const verifySearchRuntimeFeatureBundleV1 = verifyServerFeatureBundleV1;
 
 /**
  * Creates the RLM-facing provider without making RLM a retrieval owner. The
- * resolver must return already-admitted SearchRuntime inputs; this adapter
- * seals them exactly once and exposes only the sealed bundle downstream.
+ * resolver must return already-admitted SearchRuntime evidence; this adapter
+ * seals it exactly once and exposes only the sealed bundle downstream.
  */
 export function createSearchRuntimeFeatureBundleProviderV1(
   resolve: (input: { request: RlmSearchRequest; result: RlmSearchResult }) =>
