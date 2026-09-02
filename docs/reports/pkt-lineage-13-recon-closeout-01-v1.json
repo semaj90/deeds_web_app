@@ -1,0 +1,84 @@
+{
+  "schema": "atlas.pkt-lineage-13-recon-closeout-01.v1",
+  "task": "PKT-LINEAGE-13-RECON-CLOSEOUT-01",
+  "generatedAt": "2026-09-02T03:30:04.813Z",
+  "mode": "READ_ONLY_EVIDENCE_FREEZE",
+  "note": "No Qdrant or Postgres I/O performed by this script. All values sourced from already-existing local report artifacts.",
+  "step1_originalPatchSetRecoverability": {
+    "inspected": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\bridge-recon-apply-v1.json",
+    "applyReceiptResultFields": [
+      "effectiveChange",
+      "exactPayload",
+      "pointId",
+      "skippedAlreadyApplied",
+      "unchangedId",
+      "unchangedVector"
+    ],
+    "requiredFieldsForExactReconstruction": [
+      "packetKey",
+      "canonicalChunkId",
+      "sourceNamespace",
+      "sourceRevision",
+      "proposedPayloadChecksum"
+    ],
+    "missingFields": [
+      "packetKey",
+      "canonicalChunkId",
+      "sourceNamespace",
+      "sourceRevision",
+      "proposedPayloadChecksum"
+    ],
+    "verdict": "ORIGINAL_PATCH_SET_NOT_DURABLY_RECOVERABLE",
+    "conclusion": "audit-history defect, not a reason to undo the already-proven mutation"
+  },
+  "step2_frozenFinalState": {
+    "lineageRows": 6987,
+    "qdrantPresent": 6312,
+    "qdrantMissing": 675,
+    "preApply": {
+      "alreadyReconciled": 6,
+      "exactPatchRequired": 6306
+    },
+    "apply": {
+      "effectiveChanges": 3564,
+      "skippedAlreadyApplied": 2742,
+      "readbackExact": 6306,
+      "targetCount": 6306,
+      "vectorChanges": 0,
+      "pointIdChanges": 0,
+      "deletes": 0,
+      "missingPointsCreated": 0,
+      "writesPerformed": true,
+      "verdict": "FULL_QDRANT_LINEAGE_RECONCILIATION_APPLY_PROVEN"
+    },
+    "postApply": {
+      "alreadyReconciled": 6312,
+      "exactPatchRequired": 0,
+      "blockingCount": 0,
+      "generatedAt": "2026-09-02T02:57:36.302Z"
+    }
+  },
+  "step3_idempotencyCloseout": {
+    "exactOriginalSetReplayAttempted": true,
+    "replayUsedDry03Fallback": true,
+    "replayNote": "The six RECON-CANARY-01 points were already applied before DRY-03 was generated, making DRY-03 a different, earlier target population than the real 6,306-patch bulk proposal it superseded. A zero-change replay against DRY-03 does NOT prove the original 6,306-patch set replays idempotently -- it proves a different, smaller historical population is stable, which is a weaker and distinct claim.",
+    "originalPatchSetReplayVerdict": "ORIGINAL_PATCH_SET_REPLAY_UNPROVEN",
+    "finalStateIdempotencyProof": {
+      "source": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\bridge-recon-dry-04-v1.json",
+      "sourceGeneratedAt": "2026-09-02T02:57:36.302Z",
+      "method": "fresh read-only comparison of live Qdrant payload vs live atlas_packet_chunk_lineage rows, independent script from the apply",
+      "allPresentMembershipsAlreadyReconciled": true,
+      "exactPatchRequiredIsZero": true,
+      "verdict": "FINAL_STATE_IDEMPOTENCY_PROVEN"
+    }
+  },
+  "step4_lifecycleDefectNoteForFutureRuns": {
+    "defect": "bridge-recon-dry-04-v1.json is a single mutable path that both the dry classifier and the apply script read/overwrite in place, so the exact proposal an apply consumed cannot be recovered after a later dry rerun overwrites it.",
+    "recommendationForFutureProtocol": "Emit immutable versioned artifacts per run (e.g. bridge-recon-dry-05-v1.json, bridge-recon-apply-<runId>-v1.json, bridge-recon-replay-<runId>-v1.json). Apply/replay receipts should record consumedProposalChecksum and consumedTargetPointSetChecksum referencing the exact frozen dry artifact consumed.",
+    "retroactiveAction": "NONE -- this is a forward-looking recommendation only; historical evidence is not altered."
+  },
+  "step5_attribution": {
+    "note": "The BRIDGE-RECON-DRY-04 classification, the full 6,306-patch apply, and the DRY-03-fallback replay were executed by a concurrent process/session outside this session's authorization chain. This session performed only: PKT-LINEAGE-09 historical promotion, PKT-LINEAGE-10 BRIDGE-RECON-DRY-03 (read-only), PKT-LINEAGE-11 RECON-CANARY-01 (6-point canary apply+replay), the CONCURRENT-RECON-STATE-AUDIT-01 read-only audit, QDRANT-VECTOR-WRITER-OWNER-01 read-only audit, and this PKT-LINEAGE-13 read-only evidence freeze. This session did not author or authorize the concurrent bulk apply/replay."
+  },
+  "finalVerdict": "FULL_QDRANT_LINEAGE_RECONCILIATION_STATE_PROVEN_AUDIT_REPLAY_INCOMPLETE_ORIGINAL_ARTIFACT_NOT_DURABLE"
+}

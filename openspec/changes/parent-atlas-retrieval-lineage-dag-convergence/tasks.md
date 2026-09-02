@@ -702,11 +702,76 @@ touched, no mutation performed.
   around the same fingerprint-equality check.
 
 **Verdict: `VECTOR_DRIFT_NOT_CURRENTLY_REPRODUCIBLE`.** No external vector writer identified or
-reproduced. The evidence is consistent with a read-after-write consistency race in the original
-single-shot readback (fixed by the retry/backoff), not a genuine concurrent rewrite of this
-collection's vectors — but that remains the best-supported explanation, not a proven one, since 3
-static candidates were not fully cleared. If this signal recurs, re-run this same audit rather
-than assuming it is the same benign cause.
+reproduced. **Correction (2026-09-02, external review)**: the original working label for this —
+"a read-after-write consistency race" — overclaimed. Without timestamped same-process write/read
+evidence, the correct label is `SUPERSEDED_TRANSIENT_READ_VISIBILITY_FAILURE`: the later evidence
+proves the affected points had become reconciled and that retrying reads eliminated the symptom,
+which is consistent with a read-after-write race, Qdrant visibility/eventual-consistency timing,
+or overlap with the concurrent apply itself — but does not distinguish between them. 3 static
+writer candidates were not fully cleared either. If this signal recurs, re-run this same audit
+rather than assuming it is the same benign cause.
+
+### PKT-LINEAGE-13 RECON-CLOSEOUT-01 (2026-09-02, read-only evidence freeze — no bulk mutation, no replay against the wrong population)
+
+Closes the successful full Qdrant reconciliation above without recreating or rerunning the bulk
+mutation. Read-only only: zero Qdrant reads/writes, zero Postgres reads/writes performed by this
+step — all values sourced from already-existing local report artifacts. Script:
+`scripts/atlas/freeze-pkt-lineage-13-recon-closeout-01-v1.mjs`. Result:
+`docs/reports/pkt-lineage-13-recon-closeout-01-v1.json`.
+
+**Step 1 — original 6,306-patch set recoverability**: `bridge-recon-apply-v1.json`'s `results`
+array carries only `pointId, effectiveChange, skippedAlreadyApplied, exactPayload,
+unchangedVector, unchangedId` for all 6,306 entries — no `packetKey`, `canonicalChunkId`,
+`sourceNamespace`, `sourceRevision`, proposed payload, or `proposedPayloadChecksum`. Verdict:
+`ORIGINAL_PATCH_SET_NOT_DURABLY_RECOVERABLE` — an audit-history defect, not a reason to doubt or
+undo the already-proven mutation.
+
+**Step 2 — frozen final-state evidence**: `lineageRows: 6,987`, `qdrantPresent: 6,312`,
+`qdrantMissing: 675`, pre-apply `alreadyReconciled: 6` / `exactPatchRequired: 6,306`, apply
+`effectiveChanges: 3,564` / `skippedAlreadyApplied: 2,742` / `readbackExact: 6,306` /
+`vectorChanges: 0` / `pointIdChanges: 0` / `deletes: 0` / `missingPointsCreated: 0`, post-apply
+`alreadyReconciled: 6,312` / `exactPatchRequired: 0` / `blockingCount: 0`.
+
+**Step 3 — idempotency closeout, corrected**: the replay that actually ran
+(`bridge-recon-replay-v1.json`) used the DRY-03 reconstruction fallback — **not** the original
+6,306-patch artifact. DRY-03 predates the six RECON-CANARY-01 writes and is a different, smaller,
+earlier target population than the real bulk proposal it superseded; its
+`source_namespace`/`source_revision` values are also pulled live from the current point rather
+than from the lineage table, making its zero-change result close to tautological. **This does not
+prove the original 6,306-patch set replays idempotently** — it proves a different, smaller
+historical population stayed stable, which is a weaker and distinct claim, explicitly not treated
+as equivalent. `originalPatchSetReplayVerdict: ORIGINAL_PATCH_SET_REPLAY_UNPROVEN`.
+
+In place of a fabricated exact replay, a read-only idempotency **state** proof was used instead:
+the post-apply `BRIDGE-RECON-DRY-04` rerun (`generatedAt: 2026-09-02T02:57:36Z`) is itself a fresh,
+independent, live-Qdrant + live-Postgres-lineage comparison — not a self-report by the apply
+script — and it shows all 6,312 present canonical memberships already equal their authoritative
+lineage payload (`ALREADY_RECONCILED === qdrantPointsFound`, `EXACT_PATCH_REQUIRED: 0`).
+`FINAL_STATE_IDEMPOTENCY_PROVEN`.
+
+**Step 4 — lifecycle defect, recorded for future protocol only, no retroactive change**:
+`bridge-recon-dry-04-v1.json` is a single mutable path both the dry classifier and the apply
+script read/overwrite in place, so the exact proposal an apply consumed cannot be recovered once a
+later dry rerun overwrites it. Future protocol should emit immutable versioned artifacts per run
+(e.g. `bridge-recon-dry-05-v1.json`, `bridge-recon-apply-<runId>-v1.json`) and have apply/replay
+receipts record `consumedProposalChecksum` / `consumedTargetPointSetChecksum`. Historical evidence
+is not altered by this recommendation.
+
+**Step 5 — attribution**: `BRIDGE-RECON-DRY-04`, the 6,306-patch apply, and the DRY-03-fallback
+replay were executed by a concurrent process/session outside this session's authorization chain.
+This session performed only: `PKT-LINEAGE-09` historical promotion, `PKT-LINEAGE-10`
+`BRIDGE-RECON-DRY-03` (read-only), `PKT-LINEAGE-11` `RECON-CANARY-01` (the 6-point canary
+apply+replay), `CONCURRENT-RECON-STATE-AUDIT-01`, `QDRANT-VECTOR-WRITER-OWNER-01`, and this
+`PKT-LINEAGE-13` evidence freeze — all read-only except the bounded canary. This session did not
+author or authorize the concurrent bulk apply or its replay.
+
+**Final verdict: `FULL_QDRANT_LINEAGE_RECONCILIATION_STATE_PROVEN` /
+`AUDIT_REPLAY_INCOMPLETE_ORIGINAL_ARTIFACT_NOT_DURABLE`.** The live reconciliation itself is
+effectively complete and independently state-verified; the audit trail proving the *original*
+6,306-entry proposal specifically (rather than the current live state) is not durable, which is a
+recordkeeping gap, not an open correctness risk. Stopping here. Not rerunning bulk reconciliation.
+Not touching the 675 `QDRANT_POINT_MISSING` rows. `RF6`/`RF7` not started. ACE not resumed.
+`graphify:daily` not run.
 
 ## Validation record
 
