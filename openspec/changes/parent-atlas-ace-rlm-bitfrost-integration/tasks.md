@@ -227,6 +227,54 @@ is not yet made and should not be assumed here.
    `acePlaybookRevision` from whatever revision values that producer already
    has in scope (do not fabricate placeholder revisions to make the call
    compile).
+   **Progress 2026-09-01:** the existing assembler now accepts explicit
+   `ContextManifestV2` cache admission and forwards caller-owned retrieval
+   revisions. Added `ace-context-manifest-admission-v1.ts` to adapt a
+   validated candidate-feature snapshot into the existing V2 manifest. The
+   adapter is test-proven, but no live `ContextManifestV1` producer supplies
+   the complete input yet; keep this task open as `WIRED_PARTIAL`.
+   **Admission audit 2026-09-01:** a server-scope search found only the
+   snapshot contract/materializers and focused fixtures; no production caller
+   owns `CandidateFeatureSnapshotV1`. Do not promote a route or client payload
+   as the missing producer. The next gate is a server-owned snapshot producer
+   with verified candidate, workspace, source, feature, ordinal, and graph
+   revisions.
+   **Adapter progress 2026-09-01:** added and test-proven
+   `retrieval-router-to-candidate-feature-snapshot-v1.ts`. It preserves
+   identity/revisions from `CandidateOrdinalMapV1`, maps only existing router
+   features, and rejects nullable workspace lineage. It remains `CREATED +
+   TEST_PROVEN`, not live-wired; callers must provide explicit lane masks and
+   validated server-owned inputs.
+   The adapter now also accepts the existing revision-qualified
+   `QueryAdaptiveFeatureRowV1` output with deterministic ordinal rematerialization.
+   This is still caller-invoked and does not make ACE live by itself.
+   **Producer gate 2026-09-01:** keep the live caller blocked until a
+   server-owned retrieval boundary supplies an existing `CandidateOrdinalMapV1`
+   plus revision-qualified feature-resolver output. The current generic Atlas
+   runtime context still derives omitted `workspaceRevision` and
+   `packetRevision` from wall-clock timestamps in
+   `atlas-runtime-context.ts`/`atlas-semantic-tools.ts`; those values are not
+   admissible ACE lineage. Do not replace them with another placeholder.
+   The next narrow task is **ACE-FEATURE-SNAPSHOT-PRODUCER-01**: compose
+   SearchRuntime → existing ordinal admission → query-adaptive feature compiler
+   → `CandidateFeatureSnapshotV1` → existing ACE admission, with missing or
+   unqualified revisions rejected before snapshot construction.
+   **Owner sweep 2026-09-01:**
+   `sveltekit-frontend/src/lib/server/atlas/retrieval/fanout-admission-v1.ts`
+   is an existing revision-qualified executor-result admission owner. It
+   correctly consumes an existing ordinal map and refuses degraded identity,
+   revision mismatch, and executor-ID substitution, but it does not emit a
+   feature snapshot or invoke the QAS resolver. Treat it as an upstream
+   admission dependency for ACE-FEATURE-SNAPSHOT-PRODUCER-01, not as the ACE
+   producer itself. No production caller was found that supplies the complete
+   SearchRuntime + ordinal map + feature resolver bundle.
+   **Implementation progress 2026-09-01:** added
+   `sveltekit-frontend/src/lib/server/atlas/context/ace-feature-snapshot-producer-v1.ts`.
+   It composes the existing ordinal-map feature adapter with ACE manifest
+   admission, validates explicit revisions, and returns `writesPerformed=false`.
+   Focused coverage is now 8/8. This is `CREATED + TEST_PROVEN`; live caller
+   adoption remains blocked until an authoritative retrieval entrypoint can
+   supply the complete input bundle.
 3. **Persist KAG-01/KAG-02 output** — only after (1) proves the projection
    is trustworthy: decide the row shape (array-per-canonical-id vs.
    join-table-per-pair), add the migration following the ORF-2 GIN-index
@@ -234,6 +282,61 @@ is not yet made and should not be assumed here.
    bounded-`--limit`-apply-second discipline used throughout this session.
 4. **SIMD-01** — unrelated to the above three; still blocked on running
    PERF0 first, per this file's original text.
+
+## ACE-CONTEXT-LIVE-02: caller census (2026-09-02, read-only, done before any migration)
+
+Before migrating any caller to strict `ContextManifestV2`, censused every real caller of the ACE
+packet cache surface (`redisGetAcePacket`/`redisSetAcePacket`/`hashQuery` from
+`sveltekit-frontend/src/lib/server/cache/ace-packet-cache.ts`) and cross-referenced the existing
+`ContextManifestV2` caller finding above (`assembleACEContext`). **Important false-lead avoided**:
+a naive grep for `hashQuery` across the repo returns 40+ hits, but `hashQuery` is independently
+redefined as an unrelated local helper in at least 12 other files (`engram-memory.ts`,
+`packet-stream-cache.ts`, `atlas-cache-envelope.ts`, `hypergraph-builder.ts`,
+`opencode-atlas-bridge.ts`, `embedding-service.ts`, `recommendation-events.ts`,
+`semantic-cache.ts`, `RedisCacheService.ts`, `trace-mcp-server.ts`, `event-logger.ts`,
+`stage-a0-routing.ts`, `synthesis-engine.ts`) — none of those import from `ace-packet-cache.ts` and
+none are ACE-packet-cache callers at all. This is itself a separate, real duplication finding
+(13 independent `hashQuery` implementations, likely all near-identical sha256-of-query-text) but
+out of scope for this census — flagged, not fixed. Filtered to only files whose import statement
+literally resolves to `$lib/server/cache/ace-packet-cache.js`:
+
+| Caller | Uses | Classification |
+|---|---|---|
+| `routes/api/ace/stream/+server.ts` (GET+POST, auth-gated) | `redisGetAcePacket`/`redisSetAcePacket`/`hashQuery` — full read+write round trip, cache key is `hashQuery(query)` only | **LEGACY_QUERY_CACHE** |
+| `routes/api/chat/stream/+server.ts` (GET+POST, auth-gated) | same pattern, same query-only key | **LEGACY_QUERY_CACHE** |
+| `lib/server/analytics/ldr-ace-bridge.ts` (`cacheLdrAcePacket`, fire-and-forget export pipeline) | `redisSetAcePacket`/`redisSetSemanticProvenanceTuple` — write-only, never reads back, same query-only key | **LEGACY_QUERY_CACHE** (write-only variant) |
+| `routes/api/ace/packet/+server.ts` (GET+POST, auth-gated) | imports `hashQuery` only, uses it purely as a `.tmp/ace/packet-{hash}.json` filename — **never calls `redisGetAcePacket`/`redisSetAcePacket` at all** | doesn't fit the 5-bucket taxonomy cleanly — real, live, production route, but has no Redis ACE-cache interaction to migrate. Not LEGACY_QUERY_CACHE (no cache read/write), not DEAD, not DIAGNOSTIC_ONLY. Noted honestly rather than force-fit. |
+| `lib/server/cache/ace-packet-cache-v1.spec.ts` | imports `redisGetRevisionedAcePacketV1`/`redisSetRevisionedAcePacketV1` (the strict V2 functions) | **DIAGNOSTIC_ONLY** (test-only) |
+
+**`redisGetRevisionedAcePacketV1`/`redisSetRevisionedAcePacketV1`/`buildRevisionedAcePacketCacheKeyV1`
+(the strict, revision-qualified cache path) have zero production callers anywhere** — confirmed by
+grep, only the spec file above imports them. This is the concrete evidence behind "cache mechanics
+PROVEN, live caller adoption NOT YET PROVEN": the strict path exists, is presumably correctly built
+(per its own identity-checksum design mirroring `ContextManifestV2`'s), but no live route has ever
+called it. **STRICT_V2_WIRED count: 0.**
+
+**Cross-referenced against the existing `ContextManifestV2` finding** (this file's own CM-02
+section above, unchanged by this census, not re-litigated): 7 production routes call
+`assembleACEContext` (`api/ace/summarize`, `api/cases/[id]/similar`,
+`api/reconstruction/scene-intent`, `api/synthesis/generate` (3 call sites), `api/v1/query`,
+`api/wiki/encyclopedia`) — all still produce only `ContextManifestV1`. Zero currently call
+`buildContextManifestV2`. This matches, not contradicts, the file's existing "no live
+`ContextManifestV1` producer supplies the complete input yet" finding.
+
+**Recommended migration target for the actual ACE-CONTEXT-LIVE-02 step (not yet started)**:
+`routes/api/ace/stream/+server.ts` — it already does a full read+write round trip (unlike the
+write-only LDR bridge) and is a real, auth-gated, live SSE route, making it a representative
+candidate for the "MISS → write → replay HIT; revision change → MISS" acceptance criteria. **Real
+open dependency before that migration can be written, flagged rather than glossed over**: the
+acceptance criteria require a `sourceRevision` to test against, but this session's own
+`OaK revision qualification` work (`parent-atlas-retrieval-lineage-dag-convergence/tasks.md`)
+found the live workspace/source revision bundle is currently `BLOCKED_REVISION_BUNDLE_UNPROVEN` —
+a mix of stale/orphaned and fresh-but-unpersisted values, not one coherent live world-state. Migrating
+`ace/stream` to a strict revision-qualified key needs *some* source of `sourceRevision`/
+`representationRevision`/`retrievalPolicyRevision` for a live request; using the same unproven
+bundle here would just relocate that problem into ACE rather than solve it. This dependency needs
+resolving (or an explicitly scoped, narrower revision source specific to this route) before writing
+the migration, not worked around with a placeholder revision.
 
 ## KAG-03: additive, non-ranking type-level integration point (2026-08-25)
 
