@@ -1139,13 +1139,26 @@ export class SearchRuntime {
   }
 }
 
-/** Same precedence as `identity-resolution.ts`, kept here for exact backward-compatible ranking behavior. */
+/**
+ * Same precedence as `identity-resolution.ts`, kept here for exact backward-compatible ranking
+ * behavior. RF5-LIVE-REPLAY-01 (2026-09-02) found a real over-merge risk in the `packetKey` tier:
+ * `packetKey` is file/packet-granular, not chunk-granular, so two legitimately distinct chunks of
+ * the same packet would otherwise collapse into one fused result under this key alone. When
+ * `canonicalChunkId` (RF-QDRANT-HYDRATION-02's hydrated, Qdrant-validated chunk identity) is
+ * present, it disambiguates the `packetKey` tier by chunk. Absent on every candidate before that
+ * wiring existed, so this is purely additive -- zero behavior change when `canonicalChunkId` is
+ * unset, which covers 100% of pre-existing candidates/tests. `symbolVersionId` is left untouched:
+ * it is already symbol/version-granular and does not need chunk disambiguation.
+ */
 export function getFusionIdentityKey(candidate: Candidate): string {
-  return (
-    candidate.symbolVersionId?.trim() ||
-    candidate.packetKey?.trim() ||
-    candidate.id
-  );
+  const symbolVersionId = candidate.symbolVersionId?.trim();
+  if (symbolVersionId) return symbolVersionId;
+  const packetKey = candidate.packetKey?.trim();
+  if (packetKey) {
+    const canonicalChunkId = candidate.canonicalChunkId?.trim();
+    return canonicalChunkId ? `${packetKey}::chunk:${canonicalChunkId}` : packetKey;
+  }
+  return candidate.id;
 }
 
 function getFusionBackendIdentityKey(candidate: Candidate): string {

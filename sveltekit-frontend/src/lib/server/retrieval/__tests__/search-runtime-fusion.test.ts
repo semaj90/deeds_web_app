@@ -279,6 +279,87 @@ describe('fuseSearchRuntimeCandidates — RF5 within-lane canonical dedup', () =
   });
 });
 
+describe('RF5-LIVE-REPLAY-01 — invariant: one logical lane, one canonical hydrated entity, at most one RRF vote', () => {
+  it('[case 1/2] same entity via multiple Qdrant physical hits AND multiple backend-local IDs collapses to one vote (regression, already covered above by the RF5 within-lane block — reasserted here for the explicit case-name record)', () => {
+    const candidates = [
+      candidate({ id: 'dense-a', packetKey: 'pkt:shared', sourceRef: 'a.ts', score: 0.96, scoreSource: 'qdrant_768', embeddingLane: 'dense_768', qdrantPointId: 'qp-a', fallback_id: 'qp-a' }),
+      candidate({ id: 'dense-b', packetKey: 'pkt:shared', sourceRef: 'a.ts', score: 0.81, scoreSource: 'qdrant_768', embeddingLane: 'dense_768', qdrantPointId: 'qp-b', fallback_id: 'qp-b' }),
+    ];
+    const fused = fuseSearchRuntimeCandidates(candidates);
+    expect(fused).toHaveLength(1);
+  });
+
+  it('[case 3] same packet with multiple legitimate canonical chunks stays SEPARATE, not silently merged (real bug found + fixed this task)', () => {
+    const candidates = [
+      candidate({
+        id: 'chunk-1', packetKey: 'pkt:multi-chunk', sourceRef: 'big-file.ts', score: 0.9,
+        scoreSource: 'qdrant_768', embeddingLane: 'dense_768', qdrantPointId: 'qp-1', fallback_id: 'qp-1',
+        canonicalChunkId: 'qp-1', identityStatus: 'canonical', identitySource: 'packet_key',
+      }),
+      candidate({
+        id: 'chunk-2', packetKey: 'pkt:multi-chunk', sourceRef: 'big-file.ts', score: 0.85,
+        scoreSource: 'qdrant_768', embeddingLane: 'dense_768', qdrantPointId: 'qp-2', fallback_id: 'qp-2',
+        canonicalChunkId: 'qp-2', identityStatus: 'canonical', identitySource: 'packet_key',
+      }),
+    ];
+    const fused = fuseSearchRuntimeCandidates(candidates);
+    // Before the fix: getFusionIdentityKey returned 'pkt:multi-chunk' for both -> length 1, chunk-2 lost.
+    expect(fused).toHaveLength(2);
+    expect(fused.map((c) => c.packetKey)).toEqual(['pkt:multi-chunk', 'pkt:multi-chunk']);
+  });
+
+  it('[case 3, control] the SAME packet+chunk pair still dedupes to one vote (the fix disambiguates, it does not over-split)', () => {
+    const candidates = [
+      candidate({
+        id: 'chunk-1a', packetKey: 'pkt:multi-chunk', sourceRef: 'big-file.ts', score: 0.9,
+        scoreSource: 'qdrant_768', embeddingLane: 'dense_768', qdrantPointId: 'qp-1', fallback_id: 'qp-1',
+        canonicalChunkId: 'qp-1', identityStatus: 'canonical', identitySource: 'packet_key',
+      }),
+      candidate({
+        id: 'chunk-1b', packetKey: 'pkt:multi-chunk', sourceRef: 'big-file.ts', score: 0.4,
+        scoreSource: 'postgres_trigram', qdrantPointId: 'qp-1', fallback_id: 'qp-1',
+        canonicalChunkId: 'qp-1', identityStatus: 'canonical', identitySource: 'packet_key',
+      }),
+    ];
+    const fused = fuseSearchRuntimeCandidates(candidates);
+    expect(fused).toHaveLength(1);
+  });
+
+  it('[case 4] same source_ref with different canonical chunks already stays separate (safe by construction — source_group/degraded status dedupes on backend-local id, never on source_ref)', () => {
+    const candidates = [
+      candidate({
+        id: 'sg-1', packetKey: 'a.ts', sourceRef: 'a.ts', score: 0.7, scoreSource: 'qdrant_768',
+        embeddingLane: 'dense_768', qdrantPointId: 'qp-sg-1', fallback_id: 'qp-sg-1',
+        canonicalChunkId: 'qp-sg-1', identityStatus: 'source_group', identitySource: 'source_ref',
+      }),
+      candidate({
+        id: 'sg-2', packetKey: 'a.ts', sourceRef: 'a.ts', score: 0.65, scoreSource: 'qdrant_768',
+        embeddingLane: 'dense_768', qdrantPointId: 'qp-sg-2', fallback_id: 'qp-sg-2',
+        canonicalChunkId: 'qp-sg-2', identityStatus: 'source_group', identitySource: 'source_ref',
+      }),
+    ];
+    const fused = fuseSearchRuntimeCandidates(candidates);
+    expect(fused).toHaveLength(2);
+  });
+
+  it('[case 5] same content_hash but unproven hash domain does not over-merge with a canonical entity (safe by construction — V1 fusion never promotes projection_exact/content_hash to the canonical dedup tier; hash-domain qualification is a V2-only concept not yet wired into fusion)', () => {
+    const candidates = [
+      candidate({
+        id: 'canon-1', packetKey: 'pkt:real', sourceRef: 'a.ts', score: 0.9, scoreSource: 'qdrant_768',
+        embeddingLane: 'dense_768', identityStatus: 'canonical', identitySource: 'packet_key',
+      }),
+      candidate({
+        id: 'hash-1', packetKey: 'hash:abc123', sourceRef: 'a.ts', score: 0.6, scoreSource: 'qdrant_768',
+        embeddingLane: 'dense_768', content_hash: 'abc123', fallback_id: 'hash-1', qdrantPointId: 'hash-1',
+        identityStatus: 'projection_exact', identitySource: 'content_hash',
+      }),
+    ];
+    const fused = fuseSearchRuntimeCandidates(candidates);
+    expect(fused).toHaveLength(2);
+    expect(fused.find((c) => c.id === 'hash-1')!.identityStatus).toBe('projection_exact');
+  });
+});
+
 describe('fuseSearchRuntimeCandidates — identity status propagation', () => {
   it('marks a fused candidate canonical when the winning candidate has canonical identity', () => {
     const candidates = [

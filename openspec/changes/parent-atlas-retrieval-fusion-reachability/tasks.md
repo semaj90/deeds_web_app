@@ -493,6 +493,15 @@ zero production callers. Wired it into `retrieve-candidates.ts::retrieveQdrant`'
 `resolveCanonicalIdentity` precedence. 4 new tests, `tsc` clean, 38/38 pass. Next:
 `RF5-LIVE-REPLAY-01`.
 
+## RF5-LIVE-REPLAY-01 (2026-09-02, done)
+
+Full result in `parent-atlas-retrieval-lineage-dag-convergence/tasks.md`. Summary: ran all 5 named
+hard cases against `fuseSearchRuntimeCandidates`. Cases 1/2/4/5 already safe by construction; case 3
+("same packet with multiple legitimate canonical chunks") was a real live over-merge bug —
+`getFusionIdentityKey()` ignored `canonicalChunkId`, fixed additively (zero behavior change when
+`canonicalChunkId` is unset). 5 new tests, 43/43 total pass, `tsc` clean. `RF6-OWNER-MATRIX-01` and
+`RF6-LIVE-REPLAY-01` remain explicitly not started.
+
 ## RF7 - Long-term convergence (explicitly deferred, do not start before RF4-RF6)
 
 - [ ] Extract `SearchRuntime.fuseCandidates`'s semantics into a shared, importable canonical

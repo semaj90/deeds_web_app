@@ -381,6 +381,44 @@ evidence yet of how often `canonicalChunkId` actually resolves `ok: true` vs. `P
 here). Next: `RF5-LIVE-REPLAY-01` (in parallel per the frozen lane plan) and, separately, the
 V2-dedup consumption step once hydration's real-traffic hit rate is observed.
 
+## RF5-LIVE-REPLAY-01 (2026-09-02, done) — 1 real bug found and fixed, 2 cases already safe
+
+Ran all 5 named hard cases from the fusion-reachability change's frozen RF5-LIVE-REPLAY-01 spec
+against `fuseSearchRuntimeCandidates`, using fixture-based candidates (not live traffic replay —
+"replay" here means replaying the invariant against representative synthetic inputs, consistent
+with this session's fixture-first proof pattern elsewhere):
+
+1. **Same entity via multiple Qdrant physical hits** — already correctly deduped (pre-existing
+   `RF5 within-lane canonical dedup` test suite covers this; reasserted here for the record).
+2. **Same entity via multiple backend-local IDs** — same as above, already correct.
+3. **Same packet with multiple legitimate canonical chunks** — **real, live bug found and fixed**.
+   `getFusionIdentityKey()` only ever considered `symbolVersionId || packetKey || id` — `packetKey`
+   is file/packet-granular, not chunk-granular, so two genuinely distinct chunks of the same packet
+   were silently collapsing into one fused result (dropping a legitimate hit). Fixed by making the
+   `packetKey` tier check `canonicalChunkId` (RF-QDRANT-HYDRATION-02's hydrated, Qdrant-validated
+   chunk identity) when present, producing a `packetKey::chunk:canonicalChunkId` composite key —
+   purely additive: `canonicalChunkId` is unset on every candidate that existed before today's
+   hydration wiring, so this is zero behavior change for all pre-existing traffic/tests. A control
+   test confirms the fix disambiguates rather than over-splits (same packet+chunk pair from two
+   lanes still dedupes to one vote).
+4. **Same source_ref with different canonical chunks** — already safe by construction: any
+   non-`'canonical'`-status candidate (including `source_group`) dedupes on its backend-local id
+   (`fallback_id`/`qdrantPointId`), never on `source_ref` itself, so distinct chunks with a shared
+   `source_ref` were never at risk of merging.
+5. **Same content_hash but unproven hash domain** — already safe by construction, for a narrower
+   reason than the spec anticipated: V1 fusion (the live path) never promotes `content_hash` to the
+   `'canonical'` dedup tier at all (it is always `'projection_exact'`, which uses the backend-local
+   key like case 4) — hash-domain qualification is a `resolveCanonicalIdentityV2`-only concept that
+   is not yet wired into fusion, so the specific failure mode the spec worried about (a wrong-domain
+   hash silently over-merging with a canonical entity) cannot occur on the current live path. This
+   will need re-checking once/if `resolveCanonicalIdentityV2` is ever wired into fusion directly.
+
+5 new tests added to `search-runtime-fusion.test.ts` (`RF5-LIVE-REPLAY-01` describe block); 43/43
+tests pass across the full identity/fusion/hydration suite; `tsc --noEmit` clean on all 3 touched
+files. Next per the frozen lane plan: OaK revision qualification (read-only, when convenient) —
+`RF6-OWNER-MATRIX-01`/`RF6-LIVE-REPLAY-01` remain explicitly not started (RF6 is a separate,
+larger per-pipeline census task, not implied by this task's completion).
+
 ## Validation record
 
 - [x] OpenSpec validation passes for proposal/design/tasks/spec consistency.
