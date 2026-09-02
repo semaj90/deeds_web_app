@@ -1,0 +1,245 @@
+{
+  "schema": "atlas.ace-context-live-caller-adoption.v1",
+  "generatedAt": "2026-09-02T03:06:50.347Z",
+  "mode": "READ_ONLY_SOURCE_CENSUS",
+  "callers": [
+    {
+      "file": "sveltekit-frontend/src/lib/server/ace/ace-wiki.ts",
+      "classification": "DIAGNOSTIC_ONLY",
+      "matched": [
+        "assembleContext"
+      ]
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/ace/stage-a0-routing.ts",
+      "classification": "LEGACY_QUERY_CACHE",
+      "matched": [
+        "hashQuery"
+      ]
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/ace/synthesis-engine.ts",
+      "classification": "LEGACY_QUERY_CACHE",
+      "matched": [
+        "hashQuery",
+        "assembleContext"
+      ]
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/ai/engram-memory.ts",
+      "classification": "LEGACY_QUERY_CACHE",
+      "matched": [
+        "hashQuery"
+      ]
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/ai/packet-stream-cache.ts",
+      "classification": "LEGACY_QUERY_CACHE",
+      "matched": [
+        "hashQuery"
+      ]
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/analytics/event-logger.ts",
+      "classification": "LEGACY_QUERY_CACHE",
+      "matched": [
+        "hashQuery"
+      ]
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/analytics/ldr-ace-bridge.ts",
+      "classification": "LEGACY_QUERY_CACHE",
+      "matched": [
+        "redisSetAcePacket",
+        "hashQuery"
+      ]
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/cache/ace-bitfrost-cache-identity-v1.ts",
+      "classification": "STRICT_V2_WIRED",
+      "matched": [
+        "ContextManifestV2"
+      ]
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/context/ace-context-manifest-admission-v1.ts",
+      "classification": "STRICT_V2_WIRED",
+      "matched": [
+        "ContextManifestV2"
+      ]
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/graph/context-manifest-v2.spec.ts",
+      "classification": "STRICT_V2_WIRED",
+      "matched": [
+        "ContextManifestV2"
+      ]
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/graph/context-manifest-v2.ts",
+      "classification": "STRICT_V2_WIRED",
+      "matched": [
+        "ContextManifestV2"
+      ]
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/retrieval/search-runtime-feature-bundle-provider-v1.ts",
+      "classification": "STRICT_V2_WIRED",
+      "matched": [
+        "buildSearchRuntimeFeatureBundleV1"
+      ]
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/rlm/rlm-runtime.ts",
+      "classification": "STRICT_V2_WIRED",
+      "matched": [
+        "aceFeatureBundleProvider"
+      ]
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/cache/ace-context-pack-cache.ts",
+      "classification": "STRICT_V2_WIRED",
+      "matched": [
+        "ContextManifestV2"
+      ]
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/cache/ace-packet-cache.ts",
+      "classification": "LEGACY_QUERY_CACHE",
+      "matched": [
+        "redisGetAcePacket",
+        "redisSetAcePacket",
+        "hashQuery"
+      ]
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/cache/atlas-cache-cascade.ts",
+      "classification": "LEGACY_QUERY_CACHE",
+      "matched": [
+        "hashQuery"
+      ]
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/cache/atlas-cache-envelope.ts",
+      "classification": "LEGACY_QUERY_CACHE",
+      "matched": [
+        "hashQuery"
+      ]
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
+      "classification": "STRICT_V2_WIRED",
+      "matched": [
+        "ContextManifestV2"
+      ]
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/features/cases/deep-research.ts",
+      "classification": "LEGACY_QUERY_CACHE",
+      "matched": [
+        "hashQuery"
+      ]
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/hypergraph/hypergraph-builder.ts",
+      "classification": "LEGACY_QUERY_CACHE",
+      "matched": [
+        "hashQuery"
+      ]
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/memory/local-engram-memory-adapter.ts",
+      "classification": "LEGACY_QUERY_CACHE",
+      "matched": [
+        "hashQuery"
+      ]
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/opencode-atlas-bridge.ts",
+      "classification": "LEGACY_QUERY_CACHE",
+      "matched": [
+        "hashQuery"
+      ]
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/retrieval/embedding-service.ts",
+      "classification": "LEGACY_QUERY_CACHE",
+      "matched": [
+        "hashQuery"
+      ]
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/retrieval/recommendation-events.ts",
+      "classification": "LEGACY_QUERY_CACHE",
+      "matched": [
+        "hashQuery"
+      ]
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/search/semantic-cache.ts",
+      "classification": "LEGACY_QUERY_CACHE",
+      "matched": [
+        "hashQuery"
+      ]
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/services/knowledge-search/RedisCacheService.ts",
+      "classification": "LEGACY_QUERY_CACHE",
+      "matched": [
+        "hashQuery"
+      ]
+    },
+    {
+      "file": "sveltekit-frontend/src/routes/api/ace/packet/+server.ts",
+      "classification": "LEGACY_QUERY_CACHE",
+      "matched": [
+        "hashQuery"
+      ]
+    },
+    {
+      "file": "sveltekit-frontend/src/routes/api/ace/stream/+server.ts",
+      "classification": "LEGACY_QUERY_CACHE",
+      "matched": [
+        "redisGetAcePacket",
+        "redisSetAcePacket",
+        "hashQuery"
+      ]
+    },
+    {
+      "file": "sveltekit-frontend/src/routes/api/chat/stream/+server.ts",
+      "classification": "LEGACY_QUERY_CACHE",
+      "matched": [
+        "redisGetAcePacket",
+        "redisSetAcePacket",
+        "hashQuery"
+      ]
+    },
+    {
+      "file": "sveltekit-frontend/src/routes/api/codeintel/wiki/+server.ts",
+      "classification": "DIAGNOSTIC_ONLY",
+      "matched": [
+        "assembleContext"
+      ]
+    },
+    {
+      "file": "sveltekit-frontend/src/routes/api/hyperrag/packet-rpc/+server.ts",
+      "classification": "LEGACY_QUERY_CACHE",
+      "matched": [
+        "hashQuery"
+      ]
+    }
+  ],
+  "counts": {
+    "LEGACY_QUERY_CACHE": 21,
+    "STRICT_V2_CAPABLE": 0,
+    "STRICT_V2_WIRED": 8,
+    "DIAGNOSTIC_ONLY": 2,
+    "DEAD": 0
+  },
+  "selectedCaller": "sveltekit-frontend/src/routes/api/ace/context/+server.ts",
+  "selectedCallerStatus": "LEGACY_QUERY_CACHE",
+  "strictCallerAdoption": false,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "nextGate": "SELECT_CALLER_WITH_VALIDATED_REVISION_BUNDLE"
+}

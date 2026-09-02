@@ -1,0 +1,26 @@
+{
+  "schema": "atlas.agentic-error-fixing.v1",
+  "inputChecksum": "sha256:44303fd4794772358e24fe598c31607a0b99dc497180c70c67a04bfb0c696833",
+  "candidates": [
+    {
+      "fingerprint": "sha256:ffd61f3e074ddfc2",
+      "errorCode": "TS2345",
+      "kind": "TYPECHECK_OR_SCHEMA",
+      "file": "src/lib/server/atlas/example.ts",
+      "owner": "SvelteKit server owner",
+      "proposedAction": "Inspect the smallest owning contract and run a scoped typecheck.",
+      "status": "PROPOSED",
+      "mutationAllowed": false
+    }
+  ],
+  "validation": null,
+  "generatedAt": "2026-09-01T23:51:58.168Z",
+  "status": "PLAN_READY",
+  "mode": "READ_ONLY_PROPOSAL",
+  "mutationAllowed": false,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "deterministicPlanChecksum": "sha256:ce346baf809d9b945cde40d926c775f5e35ea09674db43b5f1d85e20e9a739c3",
+  "candidateCount": 1,
+  "nextGate": "OPERATOR_REVIEW_THEN_SCOPED_VALIDATION"
+}

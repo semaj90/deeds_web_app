@@ -355,18 +355,16 @@ Partial audit done at OAK-00 time (grep-verified, not assumed):
   one real task class it was exercised against
   (`symbol_change_impact_analysis`).
 
-## OAK-03 — OWL projection + HermiT validation
+## OAK-03 — OWL projection, SHACL, and profile validation
 
-- [ ] Translate the compiled schema candidate to OWL, validate with HermiT
-  (class disjointness, property restrictions, domain/range consistency,
-  unsatisfiable classes) → `VERIFIED` / `REJECTED`. **Deliberately not
-  attempted this pass.** No HermiT integration exists in this repo, and
-  adding a real OWL-reasoner dependency (language bindings, licensing,
-  which HermiT distribution) is an operator decision, not something to
-  improvise inside a single implementation pass. `ontology-kernel-schema-v1.ts`
-  and `ontology-kernel-manifest-v1.ts` both structurally refuse to claim
-  `VERIFIED`/`FROZEN` in this file's absence, so nothing downstream can
-  silently pretend OAK-03 happened.
+- [ ] Translate the compiled schema candidate to OWL, validate projection
+  completeness, and run the Python-owned OWLAPI profile-check boundary before
+  selecting any formal reasoner. **Deliberately not completed this pass.** No
+  live OWLAPI, ELK, or HermiT integration exists in this repo. `UNKNOWN` must
+  route to `NONE`; no reasoner may be selected from a heuristic label.
+  `ontology-kernel-schema-v1.ts` and `ontology-kernel-manifest-v1.ts` both
+  structurally refuse to claim `VERIFIED`/`FROZEN` until the required receipts
+  exist, so nothing downstream can silently pretend OAK-03 happened.
 
   **Research done 2026-08-31 (operator asked for options, not adoption
   yet).** Confirmed via repo grep this hasn't been attempted before
@@ -2044,6 +2042,88 @@ Evidence: `python/atlas_rapids_graph_runtime.py`, live `/v1/graph/bfs` response,
 and `python/tests/test_atlas_rapids_graph_runtime.py` (5/5 retained).
 - [x] ONTO-PY-DOMAIN-01 — add a revisioned, read-only `DomainOntologyMappingV1` admission boundary for classifier labels; known labels/aliases resolve to declared `atlas:` classes, unknown labels fail closed, and no classifier label dynamically mints ontology identity. Proven by `scripts/atlas/prove-domain-ontology-admission-v1.py` and `docs/reports/domain-ontology-admission-v1.json`; this is an admission proof, not ontology promotion or a database/graph write.
 
+### ONTO-PY-DOMAIN-02 — classifier taxonomy wiring — OPEN
+
+- [ ] Reconcile the live classifier taxonomy emitted by
+  `scripts/atlas/classify-domain-ontology.mjs` (including labels such as
+  `agent_orchestration`, `rag_retrieval`, and `graph_topology`) with an
+  explicit, revisioned `DomainOntologyMappingV1` catalog.
+- [ ] Keep unmapped labels fail-closed; do not treat 100% `domain_class`
+  population in the readiness audit as ontology admission.
+- [x] Prove one read-only classifier-label → admitted ontology-class →
+  `OntologyLinkedTupleV1` fixture path before any graph materialization.
+
+Progress: the classifier taxonomy aliases that map unambiguously to existing
+broad classes are now admitted and covered by `python/test_domain_mapping.py`
+(7 passed) plus the admission proof. The classifier-to-tuple fixture now passes
+via `scripts/atlas/prove-domain-ontology-tuple-wire-v1.py`; labels without an
+existing class owner, including `mcp_agents`, remain fail-closed and open.
+The current classifier taxonomy audit leaves these labels unresolved:
+`auth_login_register`, `case_management`, `evidence_upload_storage`,
+`document_processing`, `cache_layer`, `memory_optimization`,
+`citation_engine`, and `legal_reports`. No broad-class assignment is inferred
+for them.
+The strict fixture signal path now also records `classificationRevision`,
+`mappingRevision`, `sourceNamespace`, `sourceRevision`, and zero direct
+classifier bypass counters. Live classifier-producer adoption remains open.
+The current classifier reads only `packet_id`, `packet_key`, `source_ref`, and
+`feature_id`, then writes `domain_class` directly when `--apply` is used; it
+does not yet supply `sourceRevision`/`sourceNamespace` or invoke the strict
+tuple bridge. Keep live adoption blocked until that producer boundary is
+revision-qualified and dry-run validated.
+
+Current evidence: `docs/reports/domain-classification-readiness-audit.json`
+shows classifier coverage but does not prove ontology admission. The existing
+`scripts/atlas/prove-domain-ontology-admission-v1.py` proves only the smaller
+known-label mapping catalog. No database, graph, or canonical writes are
+authorized by this task.
+
+Read-only lineage follow-up (2026-09-01): `scripts/atlas/audit-source-lineage-model-v1.mjs`
+confirmed `graphify_files` as the available source-version observation owner,
+with 885 source refs, 885 content hashes, 885 source revisions, and 373
+workspace revisions. Only 778 of 61,660 `atlas_packets` rows currently join
+to a source revision, and 111 join to the observed workspace revision. The
+classifier therefore cannot be promoted to live tuple wiring yet: its current
+`atlas_packets`-only query lacks the revision-qualified join and source
+namespace admission required by the strict bridge. Evidence is recorded in
+`docs/reports/source-lineage-model-v1.json`; no database, graph, or canonical
+writes occurred.
+
+Classifier producer coverage audit (2026-09-01):
+`scripts/atlas/audit-domain-classifier-lineage-v1.mjs` ran in a read-only
+transaction and found 3,294 classifier rows, only 78 source-revision-qualified
+joins, 0 declared source namespaces, 78 `graphify_files.workspace_id`
+namespace candidates, and 3,216 rows without a `graphify_files` join. It emitted
+`docs/reports/domain-classifier-lineage-v1.json` and invoked
+neither the classifier apply path nor any tuple/graph writer. Keep live
+`DomainOntologyMappingV1` → `OntologyLinkedTupleV1` adoption blocked until a
+declared source-namespace owner and complete revision-qualified cohort are
+available.
+
+Interim policy: `sourceNamespace` may remain `null` while the Parent Atlas
+Workstation binding is unresolved. Do not derive it from the Windows host,
+VS Code workspace path, `process.cwd()`, Git state, or
+`atlas_packets.repository_id`. A missing namespace must fail closed to no
+admitted tuple and no graph projection. `graphify_files.workspace_id` remains
+diagnostic until its stable workspace-to-namespace meaning is independently
+proven.
+
+### ONTO-PY-DOMAIN-03 — ontology owner declarations — BLOCKED
+
+- [ ] Declare the unresolved domain classes in the authoritative Atlas kernel
+  schema (or identify an existing declared parent class) before adding further
+  classifier aliases.
+- [ ] Record class owner, ontology revision, and mapping revision together;
+  classifier taxonomy names alone are not ontology identity.
+
+Current owner search found classifier/runtime references but no authoritative
+`atlas:*Domain` declarations for the unresolved labels. Keep them unmapped until
+this contract is approved.
+
+Repeatable audit: `scripts/atlas/audit-domain-ontology-taxonomy-v1.py` writes
+`docs/reports/domain-ontology-taxonomy-audit-v1.json` and intentionally reports
+`DOMAIN_ONTOLOGY_TAXONOMY_PARTIAL` while unresolved labels remain.
+
 ### ONTO-PY-GPU-02 — shared incidence algorithm parity — 2026-09-01
 
 - [x] Built one shared, revision-qualified `NARY_INCIDENCE` projection from seven
@@ -2057,6 +2137,9 @@ and `python/tests/test_atlas_rapids_graph_runtime.py` (5/5 retained).
 
 Evidence: `scripts/atlas/prove-ontology-linked-tuple-cugraph-algorithm-parity-v1.py`
 and `docs/reports/ontology-linked-tuple-cugraph-algorithm-parity-v1.json`.
+The replay rotated the fixture to projection revision `...-v3` after the
+resident 8098 process correctly returned its existing `...-v2` graph as
+reused; the fresh load then proved `renumbered: false` again.
 This closes only the bounded projection/executor proof; canonical relationship
 promotion, GRAPH-06D, FI-13C2, FI-14, and FI-16I remain blocked.
 
@@ -2072,3 +2155,19 @@ promotion, GRAPH-06D, FI-13C2, FI-14, and FI-16I remain blocked.
 
 Evidence: `scripts/atlas/prove-ontology-linked-tuple-leiden-replay-v1.py` and
 `docs/reports/ontology-linked-tuple-leiden-replay-v1.json`.
+
+### RESIDENT-GRAPH-IDENTITY-01 — revision/checksum admission — PROVEN_BOUNDED
+
+- [x] Resident status exposes projection, node-table, edge-table, graph-kind,
+  direction, counts, and `renumbered: false` identity fields.
+- [x] Algorithm requests bind `projectionRevision` and `projectionChecksum`
+  before execution; mismatched checksums fail closed.
+- [x] Sequential GPU-01/GPU-02 replays pass with the same resident identity.
+- [x] Add and require a real `ordinalMapChecksum` for algorithm admission;
+  the fixture checksum is derived from sorted `graphNodeKey → gpuNodeId`
+  bindings and is not synthesized from the node-table checksum.
+
+Evidence: `python/atlas_rapids_graph_runtime.py` and
+`docs/reports/resident-graph-identity-v1.json`. Concurrent proof jobs must not
+share the single-resident 8098 slot; a 409 during a revision swap is expected
+coordination behavior and is not parity evidence.

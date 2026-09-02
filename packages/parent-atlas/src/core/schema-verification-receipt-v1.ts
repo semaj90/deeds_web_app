@@ -40,7 +40,7 @@ const sha256Hex = z.string().regex(/^[a-f0-9]{64}$/i);
 export const owlProfileSchema = z.enum(['OWL2_EL', 'OWL2_DL', 'UNKNOWN']);
 export type OwlProfile = z.infer<typeof owlProfileSchema>;
 
-export const reasonerNameSchema = z.enum(['ELK', 'HERMIT']);
+export const reasonerNameSchema = z.enum(['ELK', 'HERMIT', 'NONE']);
 export type ReasonerName = z.infer<typeof reasonerNameSchema>;
 
 export const schemaVerificationReceiptV1Schema = z.object({
@@ -159,5 +159,7 @@ export function buildSchemaVerificationReceiptV1(input: BuildSchemaVerificationR
  * needs to pick a reasoner.
  */
 export function selectReasonerForOwlProfile(profileHeuristic: 'OWL2_EL_LIKELY' | 'OWL2_DL_REQUIRED' | 'UNKNOWN'): ReasonerName {
-  return profileHeuristic === 'OWL2_EL_LIKELY' ? 'ELK' : 'HERMIT';
+  if (profileHeuristic === 'OWL2_EL_LIKELY') return 'ELK';
+  if (profileHeuristic === 'OWL2_DL_REQUIRED') return 'HERMIT';
+  return 'NONE';
 }

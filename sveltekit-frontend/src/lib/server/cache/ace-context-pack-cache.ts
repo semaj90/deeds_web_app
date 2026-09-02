@@ -7,6 +7,8 @@ import {
   recordContextCacheAccess,
   type AceContextCacheMetrics,
 } from './ace-context-cache-metrics.js';
+import { buildAceContextManifestCacheKeyV1 } from '../atlas/cache/ace-bitfrost-cache-identity-v1.js';
+import { ContextManifestV2Schema, type ContextManifestV2 } from '../atlas/graph/context-manifest-v2.js';
 
 // ACE Context Pack Cache — skeleton implementation
 // Purpose:
@@ -372,6 +374,68 @@ export async function readAceContextPackSnapshot(key: string): Promise<AceContex
   } catch {
     return null;
   }
+}
+
+export function buildRevisionedAceContextCacheKeyV1(manifest: ContextManifestV2): string {
+  return buildAceContextManifestCacheKeyV1(manifest);
+}
+
+/**
+ * Strict manifest-bound cache read. A miss returns null; callers rebuild from
+ * canonical evidence rather than falling back to an unqualified key.
+ */
+export async function getRevisionedAceContextPackV1(
+  manifest: ContextManifestV2,
+  options: { recordMetrics?: boolean } = {},
+): Promise<AceContextPack | null> {
+  const cacheKey = buildRevisionedAceContextCacheKeyV1(manifest);
+  try {
+    const { getRedis } = await import('../redis.js');
+    const raw = await getRedis().get(cacheKey);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as
+      | AceContextPack
+      | { manifest?: ContextManifestV2; manifestChecksum?: string; pack?: AceContextPack };
+    // Revisioned entries are envelopes, not bare packs. Reject legacy or
+    // tampered values rather than treating a key hit as valid identity proof.
+    const storedManifest = 'manifest' in parsed && parsed.manifest
+      ? ContextManifestV2Schema.safeParse(parsed.manifest)
+      : null;
+    if (
+      !('pack' in parsed) ||
+      !parsed.pack ||
+      !storedManifest?.success ||
+      parsed.manifestChecksum !== storedManifest.data.identityChecksum ||
+      storedManifest.data.identityChecksum !== manifest.identityChecksum
+    ) {
+      return null;
+    }
+    if (options.recordMetrics !== false) {
+      await recordAceContextPackAccess(parsed.pack, 'redis', true);
+    }
+    return parsed.pack;
+  } catch {
+    return null;
+  }
+}
+
+export async function setRevisionedAceContextPackV1(
+  manifest: ContextManifestV2,
+  pack: AceContextPack,
+  ttlSeconds = 21600,
+): Promise<void> {
+  const cacheKey = buildRevisionedAceContextCacheKeyV1(manifest);
+  const { getRedis } = await import('../redis.js');
+  await getRedis().set(
+    cacheKey,
+    JSON.stringify({
+      manifest,
+      manifestChecksum: manifest.identityChecksum,
+      pack,
+    }),
+    'EX',
+    ttlSeconds,
+  );
 }
 
 export function getAceContextPackSnapshotPath(key: string): string {

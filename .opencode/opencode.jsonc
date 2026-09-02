@@ -18,13 +18,13 @@
         "ornith-1.5-9b": {
           "name": "Ornith 1.5 9B",
           "tools": true,
-          "reasoning": true,
+          "reasoning": false,
           "limit": {
-            "context": 65536,
-            "output": 4096,
+          "context": 65536,
+          "output": 4096,
           },
           "options": {
-            "temperature": 0.6,
+            "temperature": 0.4,
             "topP": 0.95,
             "topK": 20,
             "stream": true,
@@ -59,7 +59,7 @@
     "ldr-research": {
       "type": "local",
       "command": ["node", "./sveltekit-frontend/scripts/mcp/ldr-mcp.mjs"],
-      "enabled": true,
+      "enabled": false,
       "timeout": 120000,
     },
   },
@@ -68,7 +68,7 @@
       "mode": "primary",
       "description": "Curated Parent Atlas task agent on Ornith 1.5 9B; backend stores and BitFrost remain behind Atlas capabilities",
       "model": "llama-server/ornith-1.5-9b",
-      "temperature": 0.8,
+      "temperature": 0.4,
       "steps": 10,
       "prompt": "Use only the curated Atlas task capabilities. Never call storage, graph, cache, or raw backend tools directly. Do not narrate or imitate tool calls. Wait for actual tool results before making claims. Never edit files or execute mutations. Always use the canonicalized Atlas context rather than raw retrieval output.",
       "permission": {
@@ -94,7 +94,7 @@
       "mode": "subagent",
       "description": "Ornith 1.5 function-calling auditor on llama-server :8090",
       "model": "llama-server/ornith-1.5-9b",
-      "temperature": 0.8,
+      "temperature": 0.4,
       "steps": 10,
       "prompt": "When a tool is needed, use the provider's native structured tool-calling mechanism. Do not narrate, imitate, or manually print tool invocations in ordinary response content. Never expose raw tool-call syntax to the user. Wait for actual tool results before making claims based on them. Prefer TRACE MCP retrieval tools. Do not edit files.",
       "permission": {

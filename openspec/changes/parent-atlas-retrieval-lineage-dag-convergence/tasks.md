@@ -799,6 +799,28 @@ generation"). Characterized read-only, zero Postgres/Qdrant writes. Script:
   further — would require reading the ingestion/eligibility-policy code, out of scope for this
   read-only characterization.
 
+**Mismatch follow-up 2026-09-02:** the 28-row anomaly was characterized without mutation by
+`scripts/atlas/audit-embedding-eligibility-mismatch-v1.mjs`, producing
+`docs/reports/embedding-eligibility-mismatch-v1.json`. All 28 have 768-dimensional Postgres
+`content_embedding` values, `embedding_model = embeddinggemma:latest`,
+`embedding_normalized = true`, and no `content_embedding_768` value; all 647 remaining rows have
+neither vector. The result is `ELIGIBILITY_VECTOR_STATE_MISMATCH_REQUIRES_POLICY_AUDIT`.
+This is evidence of a producer/eligibility-policy mismatch, not evidence that the rows are
+eligible for Qdrant projection. Keep backfill and projection blocked until the writer and policy
+owner are traced.
+
+The mismatch receipt also records that the 28 rows have no `source_ref`, so they are not currently
+eligible for canonical source/revision admission even if a future policy decision permits their
+embedding state. Their vectors must remain diagnostic legacy state until source identity is proven.
+
+**Prevention repair 2026-09-02:** the active writer was traced to
+`scripts/atlas/backfill-graphify-file-embeddings-768.mjs`. Its prior selection predicate checked
+only `content_embedding IS NULL`, recency, and non-empty source text; it did not enforce the
+eligibility policy. The predicate now also requires `embedding_eligible = true`. This prevents
+future ineligible rows from receiving `content_embedding` through this writer. The existing 28
+rows remain unchanged and require a separate policy decision; this patch is not a backfill,
+cleanup, or projection authorization.
+
 This closes the population question this track raised without touching Qdrant or Postgres.
 
 ## Validation record

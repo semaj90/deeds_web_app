@@ -23,6 +23,7 @@ import {
   agentProposeFixTool,
   hypergraphSearchByLaneTool,
 } from './tools/vault-walker.tool.js';
+import { atlasPlanRepairTool } from './tools/atlas-governed-tools.js';
 
 const server = new FastMCP({
   name:    'deeds-codebase-intel',
@@ -61,6 +62,9 @@ const server = new FastMCP({
 (server.addTool as (t: any) => void)(agentExplainClusterTool);
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 (server.addTool as (t: any) => void)(agentProposeFixTool);
+// High-level governed façade; delegates to the existing proposal-only owner.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(server.addTool as (t: any) => void)(atlasPlanRepairTool);
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 (server.addTool as (t: any) => void)(hypergraphSearchByLaneTool);
 

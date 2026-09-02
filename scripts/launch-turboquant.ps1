@@ -150,6 +150,7 @@ function Get-TurboStartupProfiles {
       TemplateFile = $null
       Reasoning = 'off'
       ReasoningBudget = 0
+      ContextLength = 65536
       SpecType = 'none'
     },
     [pscustomobject]@{
@@ -158,8 +159,9 @@ function Get-TurboStartupProfiles {
       Model = Join-Path $modelRoot 'ornith-1_5-9b-ad-q5_k-q4_k\hforf.gguf'
       Alias = 'ornith-1.5-9b'
       TemplateFile = Join-Path $modelRoot 'ornith-1_5-9b-ad-q5_k-q4_k\chat_template.jinja'
-      Reasoning = 'on'
-      ReasoningBudget = 2048
+      Reasoning = 'off'
+      ReasoningBudget = 0
+      ContextLength = 65536
       SpecType = 'none'
     },
     [pscustomobject]@{
@@ -494,6 +496,7 @@ $ctxLenRequested = if ($env:LLM_CONTEXT_SIZE)  { $env:LLM_CONTEXT_SIZE }
                    elseif ($env:TURBO_CTX)     { $env:TURBO_CTX }
                    elseif ($env:LLAMA_SERVER_CTX) { $env:LLAMA_SERVER_CTX }
                    elseif ($env:OLLAMA_CONTEXT_LENGTH) { $env:OLLAMA_CONTEXT_LENGTH }
+                   elseif ($activeTurboProfile -and $activeTurboProfile.ContextLength) { $activeTurboProfile.ContextLength }
                    else { '65536' }
 $ctxLen = [int]$ctxLenRequested
 $_allowShortCtxVal = if ($env:TURBO_CTX_ALLOW_SHORT_CONTEXT) { $env:TURBO_CTX_ALLOW_SHORT_CONTEXT } else { '' }; $allowShortCtx = @('1','true','yes','on') -contains $_allowShortCtxVal.ToLower()

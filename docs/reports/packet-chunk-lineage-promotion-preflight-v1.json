@@ -1,0 +1,709 @@
+{
+  "schema": "atlas.packet-chunk-lineage-promotion-preflight.v1",
+  "mode": "READ_ONLY_PROMOTION_PREFLIGHT",
+  "limit": 10,
+  "candidates": [
+    {
+      "packetKey": "packet:d4205fcf8652",
+      "sourceRef": "sveltekit-frontend/artifacts/domain_label_audit_v1.json",
+      "namespace": null,
+      "sourceRevision": null,
+      "membershipCount": 19,
+      "membershipChecksum": "sha256:9e81c76ec1a97436709ff732a3a9a4a0c5d6e81b3b3eaf99d819d3f7843f90e5",
+      "memberships": [
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_audit_v1.json:0",
+          "chunkRowId": "41c92e52-4287-4a4d-a566-42bf10e25374"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_audit_v1.json:1",
+          "chunkRowId": "791011cc-99b4-4ae1-ba29-0576c6c93b9c"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_audit_v1.json:10",
+          "chunkRowId": "5e7c0a84-4290-43c7-9c71-fb10006dc182"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_audit_v1.json:11",
+          "chunkRowId": "b2c25a9d-4e95-41b5-85d2-94e49716e72e"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_audit_v1.json:12",
+          "chunkRowId": "d05ef1fc-c5d4-47b2-a8d1-da4d6f178e23"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_audit_v1.json:13",
+          "chunkRowId": "502b5d5c-4a99-4cad-90b5-ec21b94b805a"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_audit_v1.json:14",
+          "chunkRowId": "90a11493-eb7e-4122-a3d4-3724665bc2fc"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_audit_v1.json:15",
+          "chunkRowId": "0a1c4502-bcb1-4e62-b853-a8865f5b046e"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_audit_v1.json:16",
+          "chunkRowId": "92060be2-8e00-4345-8ff8-679743e7ff31"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_audit_v1.json:17",
+          "chunkRowId": "501cc2dd-2a24-43a8-ac8a-a923e4720862"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_audit_v1.json:18",
+          "chunkRowId": "6d0b090b-d6e4-4cd3-a5c4-47dc7a79b973"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_audit_v1.json:2",
+          "chunkRowId": "db475356-93de-4ab6-b2c1-06b02ff2a114"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_audit_v1.json:3",
+          "chunkRowId": "bf58fe92-93cc-4daf-87ab-b6ecc52fe28f"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_audit_v1.json:4",
+          "chunkRowId": "d6be5877-7e85-4f64-862c-5ff96494b5aa"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_audit_v1.json:5",
+          "chunkRowId": "92819090-2570-4f9d-b2ca-da29f1dadab8"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_audit_v1.json:6",
+          "chunkRowId": "54b18e43-aa68-41a9-a329-f6eec0cb6a2c"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_audit_v1.json:7",
+          "chunkRowId": "f0a4b209-0a44-4e85-8230-cd23fba9bd08"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_audit_v1.json:8",
+          "chunkRowId": "8a65448f-aea3-4bca-a663-cb2c51480b93"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_audit_v1.json:9",
+          "chunkRowId": "29b7d68b-09ea-40a1-866d-1474ab2f72a3"
+        }
+      ],
+      "classification": "BLOCKED_LINEAGE_AUTHORITY",
+      "blockedReasons": [
+        "SOURCE_NAMESPACE_UNPROVEN_OR_AMBIGUOUS",
+        "SOURCE_REVISION_UNPROVEN_OR_AMBIGUOUS"
+      ]
+    },
+    {
+      "packetKey": "packet:a2ca247618e4",
+      "sourceRef": "sveltekit-frontend/artifacts/domain_label_map_v1.json",
+      "namespace": null,
+      "sourceRevision": null,
+      "membershipCount": 16,
+      "membershipChecksum": "sha256:b2e24e1ae874dc2817df1cbc14d2c1f4d8eb1d6bb109aef052fb5090ee54a0c2",
+      "memberships": [
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_map_v1.json:0",
+          "chunkRowId": "1eb01f1d-f179-438b-acaf-3ccbcf2a1ff4"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_map_v1.json:1",
+          "chunkRowId": "fa7a166c-76e5-4660-9832-4344bea73158"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_map_v1.json:10",
+          "chunkRowId": "0f53eb2f-8a37-4349-87a1-b861ec310b31"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_map_v1.json:11",
+          "chunkRowId": "2e903436-335e-4ccc-9f1d-ba7ff77e8d2b"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_map_v1.json:12",
+          "chunkRowId": "2a9bba60-efb7-4c3c-a722-f19f52371c9e"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_map_v1.json:13",
+          "chunkRowId": "45be4855-0304-4a72-8751-d22ae88d3a19"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_map_v1.json:14",
+          "chunkRowId": "0dc17a7e-ad03-491a-9dca-17a733521577"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_map_v1.json:15",
+          "chunkRowId": "6007656f-9318-4088-b5b6-d16d517ae17a"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_map_v1.json:2",
+          "chunkRowId": "d8da2feb-22b4-452c-a58c-9433cd08c10c"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_map_v1.json:3",
+          "chunkRowId": "a2048840-45de-4e26-a216-6fc4e60ccf2e"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_map_v1.json:4",
+          "chunkRowId": "1208f352-17cc-4c6a-ab15-c6352132b194"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_map_v1.json:5",
+          "chunkRowId": "d402fcdd-0c6a-41ab-8325-672abf2c6642"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_map_v1.json:6",
+          "chunkRowId": "f2661d09-5154-4430-8f3e-3fa0bae6b40e"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_map_v1.json:7",
+          "chunkRowId": "f55dcca1-0ed6-4463-b2ea-6f627d1453e9"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_map_v1.json:8",
+          "chunkRowId": "d2b72bbc-c074-4849-97f1-02cb26fd7bbf"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_map_v1.json:9",
+          "chunkRowId": "62652305-d39f-4568-93a5-a4c89b2fd010"
+        }
+      ],
+      "classification": "BLOCKED_LINEAGE_AUTHORITY",
+      "blockedReasons": [
+        "SOURCE_NAMESPACE_UNPROVEN_OR_AMBIGUOUS",
+        "SOURCE_REVISION_UNPROVEN_OR_AMBIGUOUS"
+      ]
+    },
+    {
+      "packetKey": "packet:1e160dfae730",
+      "sourceRef": "sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json",
+      "namespace": null,
+      "sourceRevision": null,
+      "membershipCount": 50,
+      "membershipChecksum": "sha256:55d4dc7cd927f625552d80ba7378025ca216e7f657759868748e325f1c446ba4",
+      "memberships": [
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:0",
+          "chunkRowId": "cfe80700-5e1f-4013-b4bd-3cbd7988bc9e"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:1",
+          "chunkRowId": "5773fc04-2c62-4683-a80a-ce305a1e3d5e"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:10",
+          "chunkRowId": "cb333c1b-bfcd-43a4-ace7-08095202d9dc"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:11",
+          "chunkRowId": "bdbd8790-6984-4d27-adf7-f1dfd5f7c45e"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:12",
+          "chunkRowId": "8480bc31-2520-45ab-aeb2-ac14c82c503a"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:13",
+          "chunkRowId": "a661060c-199b-41c9-8804-d8f31a22baef"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:14",
+          "chunkRowId": "8f2f595b-fa68-45be-ac6d-b08e47dbfd94"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:15",
+          "chunkRowId": "2802fe77-4dcd-473b-98a7-9edddf66fb23"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:16",
+          "chunkRowId": "f6161039-a772-4791-8600-8e7b444a37ff"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:17",
+          "chunkRowId": "b27b254b-d30c-497a-b9bc-d223537b25c9"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:18",
+          "chunkRowId": "616bb5ba-89f6-4c99-9516-ca0790e85b4f"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:19",
+          "chunkRowId": "c8ecba07-1a64-41ed-853b-10fb850c7b7f"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:2",
+          "chunkRowId": "b141cda5-d600-4fb7-899a-572ff14ec952"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:20",
+          "chunkRowId": "30bc4852-925d-434a-9073-84e8e950a2e4"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:21",
+          "chunkRowId": "d34cb265-ffcf-4e9e-9d74-b4e91142370b"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:22",
+          "chunkRowId": "d9e8f185-10e4-4bf4-b1ba-5dc5deb55d5b"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:23",
+          "chunkRowId": "9307067e-0aa8-4098-a879-bdd20ed4fa5e"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:24",
+          "chunkRowId": "62025b77-bf6c-45c6-9c77-def097b23791"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:25",
+          "chunkRowId": "5ba81540-0771-449e-bc19-812f2a202d5d"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:26",
+          "chunkRowId": "68914412-0d61-4f81-886c-89b2dc4a653b"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:27",
+          "chunkRowId": "b7840eef-c7b8-41ea-a82b-79f0720581fb"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:28",
+          "chunkRowId": "8bd8b167-f5c8-4efc-a9de-21d105576824"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:29",
+          "chunkRowId": "16d0fc84-33c4-4fc5-b446-fabfb6ca0679"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:3",
+          "chunkRowId": "be24eb37-2368-4805-a07b-5d72e92d34e5"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:30",
+          "chunkRowId": "b33d0768-b6c7-4139-ba1d-98cf04057571"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:31",
+          "chunkRowId": "ff01b375-4706-443a-9448-d9594bbe4eea"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:32",
+          "chunkRowId": "a921ad6a-9a7b-4891-b95f-ef937f4ef523"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:33",
+          "chunkRowId": "53a6db41-da04-4fb1-bb52-affc7d1181fc"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:34",
+          "chunkRowId": "0c7bb532-5281-424c-8a3e-8fbca5a77655"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:35",
+          "chunkRowId": "2cf6ea89-9346-4cd9-899e-ee57fc605754"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:36",
+          "chunkRowId": "100f8594-0965-4390-af22-e7f544a12d23"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:37",
+          "chunkRowId": "a8b4ec51-ab0c-426a-836b-9c7bf6cd2c3c"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:38",
+          "chunkRowId": "3907a4a3-b83c-4418-b4ef-18241e70dc2b"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:39",
+          "chunkRowId": "49ee74bb-f93d-4a8c-8776-a37c9152d89b"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:4",
+          "chunkRowId": "1d69fa95-18f5-4ea2-a783-62606edadf9a"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:40",
+          "chunkRowId": "897e78e8-c3a7-4695-a29f-69bdf08dea24"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:41",
+          "chunkRowId": "46e8719e-e6d5-4153-8f47-d54e88dc537b"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:42",
+          "chunkRowId": "57626705-7188-45a5-852d-7adcb529fb3b"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:43",
+          "chunkRowId": "d43dbfac-75c5-4e66-9061-840f2e966f6d"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:44",
+          "chunkRowId": "edafb957-983c-470b-9a6a-03267117b108"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:45",
+          "chunkRowId": "7492e381-fd90-4930-9540-8d6b812b2fc8"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:46",
+          "chunkRowId": "7225fbb0-ac63-4f02-b03a-d77e6dcace50"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:47",
+          "chunkRowId": "05be92fe-d0fd-4002-bbc3-b7be40f89b9b"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:48",
+          "chunkRowId": "11d3d4e6-6d16-43d0-a7fa-a2abecd03dd0"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:49",
+          "chunkRowId": "d80c94cb-8a42-4b89-8bdb-2f46f96b3045"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:5",
+          "chunkRowId": "6ea2144a-d44c-4471-97d3-5becd13f4c61"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:6",
+          "chunkRowId": "cafce90c-bfad-42f6-a80a-534aa54d3ce0"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:7",
+          "chunkRowId": "d456a767-4f51-4f93-806f-37929a640936"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:8",
+          "chunkRowId": "ede9650d-1927-4d8e-aa48-ef50290e43b0"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:9",
+          "chunkRowId": "f3172ceb-89c8-4189-a8ab-3501ca8a1769"
+        }
+      ],
+      "classification": "BLOCKED_LINEAGE_AUTHORITY",
+      "blockedReasons": [
+        "SOURCE_NAMESPACE_UNPROVEN_OR_AMBIGUOUS",
+        "SOURCE_REVISION_UNPROVEN_OR_AMBIGUOUS"
+      ]
+    },
+    {
+      "packetKey": "packet:1053834343a5",
+      "sourceRef": "sveltekit-frontend/artifacts/phase1_5_membership_contract.json",
+      "namespace": null,
+      "sourceRevision": null,
+      "membershipCount": 2,
+      "membershipChecksum": "sha256:9fa797e9bc2dd093a93ee9c0cd3677ca6dc8005f5fe92979fe4e20f275fc8490",
+      "memberships": [
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/phase1_5_membership_contract.json:0",
+          "chunkRowId": "5e1150bc-d12a-4b49-b80f-02ef7e218367"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/phase1_5_membership_contract.json:1",
+          "chunkRowId": "594ac1d6-0733-488f-9f21-159f71faeb0a"
+        }
+      ],
+      "classification": "BLOCKED_LINEAGE_AUTHORITY",
+      "blockedReasons": [
+        "SOURCE_NAMESPACE_UNPROVEN_OR_AMBIGUOUS",
+        "SOURCE_REVISION_UNPROVEN_OR_AMBIGUOUS"
+      ]
+    },
+    {
+      "packetKey": "packet:7183a9b81576",
+      "sourceRef": "sveltekit-frontend/artifacts/phase_1_5_multi_domain_schema.sql",
+      "namespace": null,
+      "sourceRevision": null,
+      "membershipCount": 11,
+      "membershipChecksum": "sha256:d8a5d732ef5a85717ec44955291458a82182eb9ac51ff7bf409e31efea288e2c",
+      "memberships": [
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/phase_1_5_multi_domain_schema.sql:0",
+          "chunkRowId": "35662a45-a5eb-4c2f-8b4d-f22a71dc3a46"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/phase_1_5_multi_domain_schema.sql:1",
+          "chunkRowId": "f2e50425-af25-4887-975c-6f9b125ec387"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/phase_1_5_multi_domain_schema.sql:10",
+          "chunkRowId": "b7e8d5dc-35c5-4c59-84f1-4e48c475bb51"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/phase_1_5_multi_domain_schema.sql:2",
+          "chunkRowId": "4debdee7-8fb5-4993-977d-c1936669d84c"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/phase_1_5_multi_domain_schema.sql:3",
+          "chunkRowId": "428a68c1-b837-4a01-8bf0-65b21b7054d8"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/phase_1_5_multi_domain_schema.sql:4",
+          "chunkRowId": "ce078eb3-fd4c-48ce-bf0c-7449840338d8"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/phase_1_5_multi_domain_schema.sql:5",
+          "chunkRowId": "31c3e74a-6ba9-4558-927a-a7014ef0cea8"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/phase_1_5_multi_domain_schema.sql:6",
+          "chunkRowId": "a27c53ea-a0db-464b-b218-4be12a028036"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/phase_1_5_multi_domain_schema.sql:7",
+          "chunkRowId": "1b964c5a-abdb-4627-8186-c73f906d66ff"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/phase_1_5_multi_domain_schema.sql:8",
+          "chunkRowId": "f0a295b5-ece2-43fc-a005-875906d90e84"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/phase_1_5_multi_domain_schema.sql:9",
+          "chunkRowId": "f1e70cc4-e3f1-4fb6-b974-bb8862f4963c"
+        }
+      ],
+      "classification": "BLOCKED_LINEAGE_AUTHORITY",
+      "blockedReasons": [
+        "SOURCE_NAMESPACE_UNPROVEN_OR_AMBIGUOUS",
+        "SOURCE_REVISION_UNPROVEN_OR_AMBIGUOUS"
+      ]
+    },
+    {
+      "packetKey": "packet:8a91eee31142",
+      "sourceRef": "sveltekit-frontend/artifacts/security-top-10-auth-remediation.md",
+      "namespace": null,
+      "sourceRevision": null,
+      "membershipCount": 29,
+      "membershipChecksum": "sha256:90d2272d40b17958c3ddcd034f7a69b70fd08b8fdd064683c579b999d0278c25",
+      "memberships": [
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/security-top-10-auth-remediation.md:0",
+          "chunkRowId": "e7ca5dc5-f84c-474e-885d-a9862317994c"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/security-top-10-auth-remediation.md:1",
+          "chunkRowId": "5b6cfccf-79e9-4b40-9bfb-e27808653178"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/security-top-10-auth-remediation.md:10",
+          "chunkRowId": "d62ebf09-ff3e-455c-8d1e-61cf33008760"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/security-top-10-auth-remediation.md:11",
+          "chunkRowId": "56f0c996-8994-4453-961f-c4299f3a7ac6"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/security-top-10-auth-remediation.md:12",
+          "chunkRowId": "921cd9da-649e-470a-91c6-5c5f648e725b"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/security-top-10-auth-remediation.md:13",
+          "chunkRowId": "688df6a9-a895-4e4b-8e93-e85b9292d0c0"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/security-top-10-auth-remediation.md:14",
+          "chunkRowId": "cf2fff05-ede4-4b5a-8a7b-09ca3df5b840"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/security-top-10-auth-remediation.md:15",
+          "chunkRowId": "b55c09c7-8e16-433a-9b88-2408b9c21601"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/security-top-10-auth-remediation.md:16",
+          "chunkRowId": "ca29d5ea-9901-4e7f-a2dc-908a1b28ec37"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/security-top-10-auth-remediation.md:17",
+          "chunkRowId": "6b11b6ed-3f60-4c4e-9eed-0699cd931b62"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/security-top-10-auth-remediation.md:18",
+          "chunkRowId": "8fa0ddb5-f101-4430-971c-8228e7000ee7"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/security-top-10-auth-remediation.md:19",
+          "chunkRowId": "e4c6499a-0b6b-419a-b8dd-92e3f92ab7ea"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/security-top-10-auth-remediation.md:2",
+          "chunkRowId": "40640ffc-4bcf-4930-bd0a-9fa440b5527c"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/security-top-10-auth-remediation.md:20",
+          "chunkRowId": "b3ce42f0-df6e-46cc-a616-0fbd79922107"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/security-top-10-auth-remediation.md:21",
+          "chunkRowId": "305061fb-e343-4922-abc7-a275d74110ac"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/security-top-10-auth-remediation.md:22",
+          "chunkRowId": "cecbc8c7-fbcf-4c09-8c29-1bee3da6cfd8"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/security-top-10-auth-remediation.md:23",
+          "chunkRowId": "e6c9beec-d724-463f-a0b7-1cae7cafe16a"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/security-top-10-auth-remediation.md:24",
+          "chunkRowId": "d566aa55-fab1-4593-9f56-67cf5033e789"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/security-top-10-auth-remediation.md:25",
+          "chunkRowId": "6b809136-b033-4c2d-9735-37d23b0a8be0"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/security-top-10-auth-remediation.md:26",
+          "chunkRowId": "68067acd-dbb3-421b-91af-f9bcd9c74e54"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/security-top-10-auth-remediation.md:27",
+          "chunkRowId": "34ca6091-e6e7-407c-8472-433e642e289f"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/security-top-10-auth-remediation.md:28",
+          "chunkRowId": "b566f9b7-0759-46db-b290-260320f408ba"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/security-top-10-auth-remediation.md:3",
+          "chunkRowId": "a486fde8-300c-4d7d-8b1f-b447ae31b7d1"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/security-top-10-auth-remediation.md:4",
+          "chunkRowId": "4231e1d2-56e4-4bc3-8ec9-38065f1ba6b4"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/security-top-10-auth-remediation.md:5",
+          "chunkRowId": "c60bd115-2a42-4c94-a41c-995454052f7f"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/security-top-10-auth-remediation.md:6",
+          "chunkRowId": "a255bae7-d2f4-40e0-840f-57d3b16dd66f"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/security-top-10-auth-remediation.md:7",
+          "chunkRowId": "bbc66e82-c6a3-4592-8d97-f47200b5f804"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/security-top-10-auth-remediation.md:8",
+          "chunkRowId": "150dea68-bddb-423c-9159-e7c37a1469d1"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/security-top-10-auth-remediation.md:9",
+          "chunkRowId": "fd041d61-088d-4f9e-9a39-b18e6d1aae21"
+        }
+      ],
+      "classification": "BLOCKED_LINEAGE_AUTHORITY",
+      "blockedReasons": [
+        "SOURCE_NAMESPACE_UNPROVEN_OR_AMBIGUOUS",
+        "SOURCE_REVISION_UNPROVEN_OR_AMBIGUOUS"
+      ]
+    },
+    {
+      "packetKey": "packet:427ebd1ef9be",
+      "sourceRef": "sveltekit-frontend/classifier-models/xgboost-lane-classifier.json",
+      "namespace": null,
+      "sourceRevision": null,
+      "membershipCount": 1,
+      "membershipChecksum": "sha256:1847bbbeaf9f89f9fa5f321cdf1a96c4fe30f7bf618cf8d45b0528e2418316cd",
+      "memberships": [
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/classifier-models/xgboost-lane-classifier.json:0",
+          "chunkRowId": "acf26812-90f9-4557-89ba-02e22eff5859"
+        }
+      ],
+      "classification": "BLOCKED_LINEAGE_AUTHORITY",
+      "blockedReasons": [
+        "SOURCE_NAMESPACE_UNPROVEN_OR_AMBIGUOUS",
+        "SOURCE_REVISION_UNPROVEN_OR_AMBIGUOUS"
+      ]
+    },
+    {
+      "packetKey": "packet:445420bcfad3",
+      "sourceRef": "sveltekit-frontend/classifier-models/xgboost-metadata.json",
+      "namespace": null,
+      "sourceRevision": null,
+      "membershipCount": 1,
+      "membershipChecksum": "sha256:e562834a9ac884ce8a881889f4a91213ca1c11589f344c8d03a5c0666bf339bc",
+      "memberships": [
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/classifier-models/xgboost-metadata.json:0",
+          "chunkRowId": "b3613106-8888-4b0f-a339-27a512dd3ec7"
+        }
+      ],
+      "classification": "BLOCKED_LINEAGE_AUTHORITY",
+      "blockedReasons": [
+        "SOURCE_NAMESPACE_UNPROVEN_OR_AMBIGUOUS",
+        "SOURCE_REVISION_UNPROVEN_OR_AMBIGUOUS"
+      ]
+    },
+    {
+      "packetKey": "packet:9ba4c5dc2169",
+      "sourceRef": "sveltekit-frontend/classifier-models/xgboost-metrics.json",
+      "namespace": null,
+      "sourceRevision": null,
+      "membershipCount": 1,
+      "membershipChecksum": "sha256:890158460c575e51ee37af3a46b447fc70f7a285dafe0179bdca8cf4c2a78a8a",
+      "memberships": [
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/classifier-models/xgboost-metrics.json:0",
+          "chunkRowId": "6a0a2687-50e0-4452-ac49-db6f09f8e295"
+        }
+      ],
+      "classification": "BLOCKED_LINEAGE_AUTHORITY",
+      "blockedReasons": [
+        "SOURCE_NAMESPACE_UNPROVEN_OR_AMBIGUOUS",
+        "SOURCE_REVISION_UNPROVEN_OR_AMBIGUOUS"
+      ]
+    },
+    {
+      "packetKey": "packet:0d19d6938c03",
+      "sourceRef": "sveltekit-frontend/.codex_louvain_audit.mjs",
+      "namespace": null,
+      "sourceRevision": null,
+      "membershipCount": 4,
+      "membershipChecksum": "sha256:a27101ae5c57da1db2b969611349f732043f618b0607ef9b872e4a402e9e854e",
+      "memberships": [
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/.codex_louvain_audit.mjs:0",
+          "chunkRowId": "44323000-991b-4c0c-885c-e5bb0dddf759"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/.codex_louvain_audit.mjs:1",
+          "chunkRowId": "da3ef140-a26c-462b-9a91-3a5eb92ebea9"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/.codex_louvain_audit.mjs:2",
+          "chunkRowId": "d5a127c5-50e8-43ff-9e73-20daf9c7d74f"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/.codex_louvain_audit.mjs:3",
+          "chunkRowId": "bf592df3-d614-4010-a46d-b73552d67c2c"
+        }
+      ],
+      "classification": "BLOCKED_LINEAGE_AUTHORITY",
+      "blockedReasons": [
+        "SOURCE_NAMESPACE_UNPROVEN_OR_AMBIGUOUS",
+        "SOURCE_REVISION_UNPROVEN_OR_AMBIGUOUS"
+      ]
+    }
+  ],
+  "eligibleCandidateCount": 0,
+  "plannedWrites": {
+    "atlas_packets": 0,
+    "atlas_packet_chunk_lineage": 0,
+    "qdrant": 0,
+    "graph": 0,
+    "cache": 0
+  },
+  "verdict": "BLOCKED_NO_QUALIFIED_CANDIDATE",
+  "generatedAt": "2026-09-02T00:00:04.173Z",
+  "databaseError": null,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "promotionAuthorized": false,
+  "rollback": "Transaction rollback before commit; no transaction was opened by this preflight.",
+  "preflightChecksum": "sha256:345ebfa723691dfc2da42e1eb26bc89695f4ebcdc27a04f7047c2c5ab4e8f91b"
+}

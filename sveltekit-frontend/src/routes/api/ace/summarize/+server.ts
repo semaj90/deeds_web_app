@@ -9,7 +9,14 @@ const aceSummarizeSchema = z.object({
 	evidenceId: z.string().uuid().optional(),
 	caseId: z.string().uuid().optional(),
 	content: z.string().max(50000).optional(),
-	title: z.string().max(500).optional()
+	title: z.string().max(500).optional(),
+	workspaceRevision: z.string().trim().min(1).optional(),
+	candidateSnapshotRevision: z.string().trim().min(1).optional(),
+	ordinalMapChecksum: z.string().trim().min(1).optional(),
+	representationRevision: z.string().trim().min(1).optional(),
+	retrievalPolicyRevision: z.string().trim().min(1).optional(),
+	contextPolicyRevision: z.string().trim().min(1).optional(),
+	graphRevision: z.string().trim().min(1).nullable().optional(),
 }).refine(d => d.content || d.evidenceId, {
 	message: 'Must provide either content or evidenceId'
 });
@@ -38,7 +45,19 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		if (!parsed.success) {
 			return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
 		}
-		const { evidenceId, caseId, content, title } = parsed.data;
+		const {
+			evidenceId,
+			caseId,
+			content,
+			title,
+			workspaceRevision,
+			candidateSnapshotRevision,
+			ordinalMapChecksum,
+			representationRevision,
+			retrievalPolicyRevision,
+			contextPolicyRevision,
+			graphRevision,
+		} = parsed.data;
 
 		// Assemble full ACE context (7 parallel data sources)
 		const context = await assembleACEContext({
@@ -46,7 +65,14 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			userId: user.id,
 			caseId,
 			conversationId: caseId ? `board-${caseId}` : undefined,
-			maxTokens: 2000
+			maxTokens: 2000,
+			workspaceRevision,
+			candidateSnapshotRevision,
+			ordinalMapChecksum,
+			representationRevision,
+			retrievalPolicyRevision,
+			contextPolicyRevision,
+			graphRevision,
 		});
 
 		// Build the ACE prompt

@@ -1,0 +1,42 @@
+{
+  "schema": "atlas.attachment-alignment-review.v1",
+  "status": "REVIEW_COMPLETE",
+  "source": "C:/Users/james/.codex/attachments/64cf16e5-d488-4575-b614-b8cd8e39470f/pasted-text.txt",
+  "findings": [
+    {
+      "severity": "MATERIAL",
+      "claim": "RF-IDENTITY-CALLER-MATRIX-01 is the next repository gate",
+      "correction": "This is a useful proposed audit, but it is not an active task in the current convergence tasks.md. Treat it as a parallel review only; do not let it replace the explicit open Qdrant reconciliation tasks."
+    },
+    {
+      "severity": "MATERIAL",
+      "claim": "PKT-LINEAGE-08 implementationCorrect PASS",
+      "correction": "The live canary proved only the fail-closed refusal branch. The namespace-qualified success branch and the task itself remain open."
+    },
+    {
+      "severity": "MATERIAL",
+      "claim": "Move immediately into PKT-LINEAGE-09",
+      "correction": "A fresh read-only dry classification is safe, but historical promotion remains separately authorized and must stop before writes."
+    },
+    {
+      "severity": "MINOR",
+      "claim": "The MCP product surface is the last major milestone",
+      "correction": "OaK live replay, semantic baseline, representation promotion, and canonical projection ownership remain independent downstream gates."
+    }
+  ],
+  "confirmed": [
+    "Qdrant named-vector audit is schema-aware and audit-only.",
+    "semantic_768 remains the canonical dense representation; MRL and learned latent representations remain distinct.",
+    "source lineage, retrieval hydration, OaK execution, and Graphify recovery are separate lanes.",
+    "read-only Graphify recovery must not automatically rerun graphify:daily."
+  ],
+  "repositoryEvidence": [
+    "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
+    "docs/reports/chunk-registration-report.json",
+    "docs/reports/packet-chunk-lineage-promotion-preflight-v1.json",
+    "docs/reports/retrieval-02-qdrant-named-vector-census-v1.json",
+    "docs/reports/rf-identity-semantics-02-v1.json"
+  ],
+  "writesPerformed": false,
+  "canonicalAuthority": false
+}

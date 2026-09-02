@@ -24,6 +24,24 @@ class DomainOntologyMappingTests(unittest.TestCase):
         self.assertEqual(result.status, "UNMAPPED")
         self.assertIsNone(result.classId)
 
+    def test_classifier_taxonomy_labels_use_explicit_broad_classes(self):
+        results = admit_domain_classifications({
+            "rag_retrieval": 1.0,
+            "agent_orchestration": 1.0,
+            "graph_topology": 1.0,
+            "embedding_indexing": 1.0,
+        })
+        self.assertEqual([result.status for result in results], ["ADMITTED"] * 4)
+        self.assertEqual(
+            [result.classId for result in results],
+            [
+                "atlas:WorkflowDomain",
+                "atlas:ModelDomain",
+                "atlas:GraphDomain",
+                "atlas:RetrievalDomain",
+            ],
+        )
+
     def test_batch_order_is_stable(self):
         results = admit_domain_classifications({"workflow": 1.0, "database": 1.0})
         self.assertEqual([item.domainLabel for item in results], ["database", "workflow"])

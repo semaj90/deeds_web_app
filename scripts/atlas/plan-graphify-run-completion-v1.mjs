@@ -50,6 +50,9 @@ const edgeSetChecksum = digest(edges.map((edge) => ({
 const terminalResolutionStatuses = new Set([
   'RESOLVED_IN_REPO', 'RESOLVED_WORKSPACE_MODULE', 'EXTERNAL_MODULE', 'EXTERNAL_PACKAGE',
   'NODE_BUILTIN', 'EXTERNAL_RESOURCE', 'UNSUPPORTED_LANGUAGE', 'SOURCE_FILE_NOT_FOUND', 'SOURCE_MISSING',
+  // Explicit member calls are terminal observations for this structural graph plan. They are not
+  // missing modules or unresolved repository declarations; the original expression is retained.
+  'MEMBER_CALL_UNRESOLVED',
 ]);
 const resolutionCounts = resolution?.unresolvedTarget?.counts ?? {};
 const resolutionComplete = Boolean(

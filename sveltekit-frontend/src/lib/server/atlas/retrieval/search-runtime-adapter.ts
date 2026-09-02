@@ -1,6 +1,6 @@
-import { SearchRuntime, type SearchQuery, type SearchResult } from '$lib/server/retrieval/search-runtime.js';
+import { SearchRuntime, type SearchQuery, type SearchResult } from '../../retrieval/search-runtime.js';
 import { graphRetrieve, type GraphCandidate } from './graph-retriever.js';
-import { RETRIEVAL_LIMITS, SearchMetadataFilterSchema } from '$lib/server/retrieval/search-contract.js';
+import { RETRIEVAL_LIMITS, SearchMetadataFilterSchema } from '../../retrieval/search-contract.js';
 import {
   buildSearchRuntimeQasRows,
   type QueryAdaptiveFeatureRowV1,
@@ -12,6 +12,11 @@ import {
   joinSearchRuntimeQasFeatureSources,
   type SearchRuntimeQasFeatureSources,
 } from './search-runtime-qas-feature-resolver.js';
+import {
+  materializeCandidateFeatureSnapshotFromQasRowsV1,
+  type CandidateFeatureLaneV1,
+} from '../features/retrieval-router-to-candidate-feature-snapshot-v1.js';
+import { buildAceContextManifestAdmissionV1 } from '../context/ace-context-manifest-admission-v1.js';
 
 export interface AtlasSearchRequest {
   query: string;
@@ -43,6 +48,18 @@ export interface AtlasSearchQasOptions {
   sources: SearchRuntimeQasFeatureSources;
 }
 
+export interface AtlasSearchAceManifestOptions extends AtlasSearchQasOptions {
+  candidateSnapshotRevision: string;
+  retrievalPolicyRevision: string;
+  acePlaybookRevision: string;
+  tokenBudget: number;
+  laneMaskByCanonicalId: Readonly<Record<string, readonly CandidateFeatureLaneV1[]>>;
+  producerRevision: string;
+  ontologyRevision?: string | null;
+  modelRevision?: string | null;
+  promptTemplateRevision?: string | null;
+}
+
 export interface SearchRuntimeQasProjectionResult {
   requestId: string;
   accepted: QueryAdaptiveFeatureRowV1[];
@@ -60,6 +77,45 @@ export interface SearchRuntimeQasProjectionResult {
     rank: number;
     score?: number;
   }>;
+}
+
+/**
+ * Pure bridge from the existing QAS projection into ACE's revisioned manifest
+ * admission. It performs no retrieval, cache writes, or canonical writes.
+ */
+export function admitSearchRuntimeQasToAceManifestV1(input: {
+  projection: SearchRuntimeQasProjectionResult;
+  candidateSnapshotRevision: string;
+  retrievalPolicyRevision: string;
+  representationRevision: string;
+  acePlaybookRevision: string;
+  tokenBudget: number;
+  graphRevision: string | null;
+  laneMaskByCanonicalId: Readonly<Record<string, readonly CandidateFeatureLaneV1[]>>;
+  producerRevision: string;
+  ontologyRevision?: string | null;
+  modelRevision?: string | null;
+  promptTemplateRevision?: string | null;
+}) {
+  const snapshot = materializeCandidateFeatureSnapshotFromQasRowsV1({
+    rows: input.projection.accepted,
+    candidateSnapshotRevision: input.candidateSnapshotRevision,
+    producerRevision: input.producerRevision,
+    laneMaskByCanonicalId: input.laneMaskByCanonicalId,
+  });
+  return buildAceContextManifestAdmissionV1({
+    snapshot,
+    requestId: input.projection.requestId,
+    selectedOrdinals: snapshot.rows.map((row) => row.candidateOrdinal),
+    tokenBudget: input.tokenBudget,
+    retrievalPolicyRevision: input.retrievalPolicyRevision,
+    acePlaybookRevision: input.acePlaybookRevision,
+    representationRevision: input.representationRevision,
+    ontologyRevision: input.ontologyRevision,
+    modelRevision: input.modelRevision,
+    promptTemplateRevision: input.promptTemplateRevision,
+    graphRevision: input.graphRevision,
+  });
 }
 
 /**
@@ -235,6 +291,32 @@ export function createAtlasSearchAdapter(config?: {
         sources: qas.sources,
       });
       return { response, qas: projection };
+    },
+    /**
+     * Opt-in SearchRuntime -> ContextManifestV2 composition. The caller must
+     * provide revision-qualified feature sources; this method performs no
+     * cache or canonical writes and leaves legacy routes unchanged.
+     */
+    async searchWithAceManifest(
+      req: AtlasSearchRequest,
+      options: AtlasSearchAceManifestOptions,
+    ) {
+      const result = await this.searchWithQas(req, options);
+      const admission = admitSearchRuntimeQasToAceManifestV1({
+        projection: result.qas,
+        candidateSnapshotRevision: options.candidateSnapshotRevision,
+        retrievalPolicyRevision: options.retrievalPolicyRevision,
+        representationRevision: options.representationRevision,
+        acePlaybookRevision: options.acePlaybookRevision,
+        tokenBudget: options.tokenBudget,
+        graphRevision: null,
+        laneMaskByCanonicalId: options.laneMaskByCanonicalId,
+        producerRevision: options.producerRevision,
+        ontologyRevision: options.ontologyRevision,
+        modelRevision: options.modelRevision,
+        promptTemplateRevision: options.promptTemplateRevision,
+      });
+      return { ...result, admission, writesPerformed: false as const, canonicalAuthority: false as const };
     },
   };
 }

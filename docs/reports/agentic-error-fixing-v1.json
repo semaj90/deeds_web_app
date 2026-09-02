@@ -1,0 +1,20 @@
+{
+  "schema": "atlas.agentic-error-fixing.v1",
+  "inputChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "candidates": [],
+  "validation": {
+    "command": "npm --prefix sveltekit-frontend run check",
+    "exitCode": 1,
+    "timedOut": false,
+    "outputChecksum": "sha256:01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+  },
+  "generatedAt": "2026-09-01T23:46:36.047Z",
+  "status": "NO_DIAGNOSTICS",
+  "mode": "READ_ONLY_PROPOSAL",
+  "mutationAllowed": false,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "deterministicPlanChecksum": "sha256:d0cd4238c7b6b56aeebabd609dbf651ea61edc76bbb96865e0511bc0008ed5e1",
+  "candidateCount": 0,
+  "nextGate": "SUPPLY_DIAGNOSTICS"
+}

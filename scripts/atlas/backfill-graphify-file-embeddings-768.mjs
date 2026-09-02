@@ -280,6 +280,7 @@ async function main() {
       SELECT id::text, relative_path, symbol, kind, summary, content, source_ref, content_hash, ast_symbols
       FROM codebase_chunk_index
       WHERE content_embedding IS NULL
+        AND embedding_eligible = true
         AND updated_at >= NOW() - ($1 * INTERVAL '1 hour')
         AND COALESCE(content, summary, relative_path, source_ref, '') <> ''
       ORDER BY updated_at DESC, id

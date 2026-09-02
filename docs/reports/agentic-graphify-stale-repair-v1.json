@@ -1,0 +1,27 @@
+{
+  "schema": "atlas.agentic-error-fixing.v1",
+  "inputChecksum": "sha256:87264e4c950f736c1722b9744f870ed0ef0bb5ed5f126f2a7161d77e129c2963",
+  "candidates": [
+    {
+      "fingerprint": "sha256:6e99ce6dcecbcd11",
+      "errorCode": null,
+      "kind": "DATABASE_SCHEMA",
+      "file": null,
+      "owner": "Postgres/Drizzle read-side owner",
+      "proposedAction": "Read the live schema and migration ledger; do not apply a migration from this plan.",
+      "status": "PROPOSED",
+      "mutationAllowed": false
+    }
+  ],
+  "validation": null,
+  "generatedAt": "2026-09-02T00:02:30.958Z",
+  "status": "PLAN_READY",
+  "mode": "READ_ONLY_PROPOSAL",
+  "mutationAllowed": false,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "validationDetails": null,
+  "deterministicPlanChecksum": "sha256:e22bae23aa64b343d2b889a58b3deaa06ba7c5c2713c53f411add426d33f2750",
+  "candidateCount": 1,
+  "nextGate": "OPERATOR_REVIEW_THEN_SCOPED_VALIDATION"
+}

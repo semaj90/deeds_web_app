@@ -1,7 +1,7 @@
 {
   "schema": "atlas.qdrant-point-missing-population-01.v1",
   "task": "QDRANT-POINT-MISSING-POPULATION-01",
-  "generatedAt": "2026-09-02T03:34:30.729Z",
+  "generatedAt": "2026-09-02T03:41:25.117Z",
   "mode": "READ_ONLY",
   "missingRowCount": 675,
   "aggregate": {

@@ -1,0 +1,31 @@
+{
+  "schema": "atlas.domain-ontology-tuple-wire-receipt.v1",
+  "status": "DOMAIN_ONTOLOGY_WIRE_PROVEN",
+  "tupleId": "7d40c3ca4cd3d5707b2a0e05643efa61381e60fb8a31606bbff462e9877294a3",
+  "sourceRevision": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "classificationRevision": "classifier:v1",
+  "mappingRevision": "sha256:e6039ff04c33b48deeb179aecd69c17a2ad7f84e91dbcf120d61289732120fc2",
+  "sourceNamespace": "workspace:ontology-linked-tuple-fixture-v1",
+  "signalCount": 2,
+  "admittedCount": 1,
+  "rejectedCount": 1,
+  "directClassifierToOntologyIdentityCount": 0,
+  "directClassifierToTupleCount": 0,
+  "tupleConstructionAttempted": 1,
+  "tupleConstructionAdmitted": 1,
+  "admittedDomainLabel": "rag_retrieval",
+  "admittedClassId": "atlas:RetrievalDomain",
+  "rejectedDomainLabel": "mcp_agents",
+  "rejectedStatus": "UNMAPPED",
+  "checks": {
+    "admitted_label": true,
+    "declared_class_attached": true,
+    "tuple_identity_preserved": true,
+    "source_revision_preserved": true,
+    "unknown_label_rejected": true,
+    "writes_false": true,
+    "canonical_false": true
+  },
+  "writesPerformed": false,
+  "canonicalAuthority": false
+}

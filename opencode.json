@@ -14,10 +14,14 @@
         "ornith-1.5-9b": {
           "name": "Ornith 1.5 9B (Qwen-compatible tool-calling)",
           "tools": true,
-          "reasoning": true,
+          "reasoning": false,
           "limit": {
             "context": 65536,
             "output": 4096
+          },
+          "options": {
+            "maxTokens": 4096,
+            "temperature": 0.4
           }
         }
       }
@@ -37,6 +41,12 @@
       "type": "local",
       "command": ["node", "./sveltekit-frontend/scripts/mcp/atlas-tools-mcp.mjs"],
       "enabled": false,
+      "timeout": 30000
+    },
+    "atlas-task-kernel": {
+      "type": "local",
+      "command": ["node", "./sveltekit-frontend/scripts/mcp/atlas-task-kernel-mcp.mjs"],
+      "enabled": true,
       "timeout": 30000
     }
   },
@@ -61,6 +71,7 @@
         "git diff": "allow",
         "rg": "allow",
         "atlas.*": "allow",
+        "atlas-task-kernel*": "allow",
         "ace.*": "allow",
         "trace.*": "allow",
         "kag.*": "allow",
@@ -94,6 +105,7 @@
         "lsp": "allow",
         "bash": "ask",
         "atlas.*": "allow",
+        "atlas-task-kernel*": "allow",
         "ace.*": "allow",
         "trace.*": "allow",
         "kag.*": "allow",

@@ -12,7 +12,7 @@
   "admissions": [
     {
       "schema": "atlas.domain-ontology-admission.v1",
-      "mappingRevision": "sha256:0afb17760433481d41d06607d2f5be15222b0ac5db9dde3d03cfce944efe1f38",
+      "mappingRevision": "sha256:e6039ff04c33b48deeb179aecd69c17a2ad7f84e91dbcf120d61289732120fc2",
       "domainLabel": "retrieval",
       "classId": "atlas:RetrievalDomain",
       "confidence": 0.95,
@@ -22,7 +22,7 @@
     },
     {
       "schema": "atlas.domain-ontology-admission.v1",
-      "mappingRevision": "sha256:0afb17760433481d41d06607d2f5be15222b0ac5db9dde3d03cfce944efe1f38",
+      "mappingRevision": "sha256:e6039ff04c33b48deeb179aecd69c17a2ad7f84e91dbcf120d61289732120fc2",
       "domainLabel": "search",
       "classId": "atlas:RetrievalDomain",
       "confidence": 0.9,
@@ -32,7 +32,7 @@
     },
     {
       "schema": "atlas.domain-ontology-admission.v1",
-      "mappingRevision": "sha256:0afb17760433481d41d06607d2f5be15222b0ac5db9dde3d03cfce944efe1f38",
+      "mappingRevision": "sha256:e6039ff04c33b48deeb179aecd69c17a2ad7f84e91dbcf120d61289732120fc2",
       "domainLabel": "unknown-label",
       "classId": null,
       "confidence": 1.0,

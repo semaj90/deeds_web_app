@@ -1,0 +1,82 @@
+{
+  "schema": "atlas.domain-ontology-taxonomy-audit-receipt.v1",
+  "status": "DOMAIN_ONTOLOGY_TAXONOMY_PARTIAL",
+  "classifierPath": "scripts/atlas/classify-domain-ontology.mjs",
+  "classifierLabelCount": 15,
+  "admittedLabelCount": 7,
+  "unresolvedLabelCount": 8,
+  "mappingRevision": "sha256:e6039ff04c33b48deeb179aecd69c17a2ad7f84e91dbcf120d61289732120fc2",
+  "admitted": [
+    {
+      "domainLabel": "agent_orchestration",
+      "classId": "atlas:WorkflowDomain",
+      "status": "ADMITTED"
+    },
+    {
+      "domainLabel": "cluster_analysis",
+      "classId": "atlas:ModelDomain",
+      "status": "ADMITTED"
+    },
+    {
+      "domainLabel": "embedding_indexing",
+      "classId": "atlas:ModelDomain",
+      "status": "ADMITTED"
+    },
+    {
+      "domainLabel": "graph_topology",
+      "classId": "atlas:GraphDomain",
+      "status": "ADMITTED"
+    },
+    {
+      "domainLabel": "rag_retrieval",
+      "classId": "atlas:RetrievalDomain",
+      "status": "ADMITTED"
+    },
+    {
+      "domainLabel": "repair_workflow",
+      "classId": "atlas:WorkflowDomain",
+      "status": "ADMITTED"
+    },
+    {
+      "domainLabel": "trace_mcp",
+      "classId": "atlas:WorkflowDomain",
+      "status": "ADMITTED"
+    }
+  ],
+  "unresolved": [
+    {
+      "domainLabel": "auth_login_register",
+      "status": "UNMAPPED"
+    },
+    {
+      "domainLabel": "cache_layer",
+      "status": "UNMAPPED"
+    },
+    {
+      "domainLabel": "case_management",
+      "status": "UNMAPPED"
+    },
+    {
+      "domainLabel": "citation_engine",
+      "status": "UNMAPPED"
+    },
+    {
+      "domainLabel": "document_processing",
+      "status": "UNMAPPED"
+    },
+    {
+      "domainLabel": "evidence_upload_storage",
+      "status": "UNMAPPED"
+    },
+    {
+      "domainLabel": "legal_reports",
+      "status": "UNMAPPED"
+    },
+    {
+      "domainLabel": "memory_optimization",
+      "status": "UNMAPPED"
+    }
+  ],
+  "writesPerformed": false,
+  "canonicalAuthority": false
+}

@@ -9,6 +9,13 @@ const queryRequestSchema = z.object({
   userId: z.string().uuid().optional(),
   caseId: z.string().uuid().optional(),
   conversationId: z.string().uuid().optional(),
+  workspaceRevision: z.string().trim().min(1).optional(),
+  candidateSnapshotRevision: z.string().trim().min(1).optional(),
+  ordinalMapChecksum: z.string().trim().min(1).optional(),
+  representationRevision: z.string().trim().min(1).optional(),
+  retrievalPolicyRevision: z.string().trim().min(1).optional(),
+  contextPolicyRevision: z.string().trim().min(1).optional(),
+  graphRevision: z.string().trim().min(1).nullable().optional(),
 });
 
 export const POST: RequestHandler = async ({ request, locals }) => {
@@ -25,14 +32,34 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       }, { status: 400 });
     }
 
-    const { query, limit, userId, caseId, conversationId } = parse.data;
+    const {
+      query,
+      limit,
+      userId,
+      caseId,
+      conversationId,
+      workspaceRevision,
+      candidateSnapshotRevision,
+      ordinalMapChecksum,
+      representationRevision,
+      retrievalPolicyRevision,
+      contextPolicyRevision,
+      graphRevision,
+    } = parse.data;
 
     // Execute multi-lane RAG retrieval + 4x4 matrix tensor routing
     const context = await assembleACEContext({
       query,
       userId: userId || undefined,
       caseId: caseId || undefined,
-      conversationId: conversationId || undefined
+      conversationId: conversationId || undefined,
+      workspaceRevision,
+      candidateSnapshotRevision,
+      ordinalMapChecksum,
+      representationRevision,
+      retrievalPolicyRevision,
+      contextPolicyRevision,
+      graphRevision,
     });
 
     if (!context) {

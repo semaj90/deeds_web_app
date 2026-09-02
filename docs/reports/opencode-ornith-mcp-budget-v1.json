@@ -1,0 +1,53 @@
+{
+  "schema": "atlas.opencode-ornith-mcp-budget.v1",
+  "status": "CONFIGURED_AND_SMOKE_PROVEN",
+  "model": "llama-server/ornith-1.5-9b",
+  "modelIdentityNote": "Local configuration describes Ornith as Qwen-compatible; no DeepSeek model identity was inferred.",
+  "globalConfig": "C:/Users/james/.config/opencode/opencode.jsonc",
+  "reasoning": false,
+  "contextTokens": 65536,
+  "outputTokens": 4096,
+  "maxTokens": 4096,
+  "agentSteps": 10,
+  "liveServerObservation": {
+    "endpoint": "http://127.0.0.1:8090/props",
+    "reachable": true,
+    "modelAlias": "ornith-1.5-9b",
+    "reportedContextTokens": 65536,
+    "reportedReasoningFormat": "none",
+    "interpretation": "OpenCode and the llama-server profile are aligned to the 65536-token context target; restart OpenCode or the model server if an already-running process still reports older settings."
+  },
+  "enabledMcpServers": [
+    "trace",
+    "atlas-task-kernel"
+  ],
+  "disabledMcpServers": [
+    "atlas-tools",
+    "gemma4-offload",
+    "ldr-research"
+  ],
+  "taskKernelTools": [
+    "atlas_context",
+    "atlas_inspect",
+    "atlas_expand",
+    "atlas_verify",
+    "atlas_validate_plan",
+    "atlas_research"
+  ],
+  "taskCreation": {
+    "available": false,
+    "reason": "The configured task-kernel façade exposes proposal and evidence tools, not a task persistence/write tool.",
+    "existingLocalGenerator": "sveltekit-frontend/package.json:opencode:tasks:refresh",
+    "externalTaskPluginInstalled": false
+  },
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "validation": {
+    "rootJsonParsed": true,
+    "resolvedOpenCodeConfig": true,
+    "taskKernelInitialize": true,
+    "taskKernelToolsList": true,
+    "gitDiffCheck": true,
+    "launcherPowerShellParsed": true
+  }
+}

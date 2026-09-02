@@ -1,6 +1,6 @@
 # Cache Namespace Proof
 
-Generated: 2026-08-28T18:17:40.173Z
+Generated: 2026-09-02T00:23:38.291Z
 Status: FAIL
 
 | Namespace | Pattern | Role | Keys | Status |

@@ -1,4 +1,4 @@
-import { getNeo4jDriver } from '$lib/server/neo4j-driver.js';
+import { getNeo4jDriver } from '../../neo4j-driver.js';
 
 export interface GraphRetrievalRequest {
   seedPacketKeys: string[];

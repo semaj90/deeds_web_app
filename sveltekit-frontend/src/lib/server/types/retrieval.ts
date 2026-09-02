@@ -87,12 +87,12 @@ export interface UnifiedRetrievalResult {
   /** Backend-local storage ID when the source has one distinct from canonical identity */
   backendLocalId?: string;
   /** Canonical versus degraded identity resolution for this candidate */
-  identityStatus?: 'canonical' | 'degraded';
+  identityStatus?: 'canonical' | 'projection_exact' | 'source_group' | 'degraded';
   /** Explicit canonical identity resolution and its provenance */
   canonicalIdentity?: {
     value: string;
-    source: 'symbol_version_id' | 'packet_key' | 'source_ref' | 'lane_id_fallback';
-    status: 'canonical' | 'degraded';
+    source: 'symbol_version_id' | 'packet_key' | 'content_hash' | 'source_ref' | 'lane_id_fallback';
+    status: 'canonical' | 'projection_exact' | 'source_group' | 'degraded';
     backendLocalId: string | null;
   };
   /** Canonical packet identity when the source already resolved one */

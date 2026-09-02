@@ -386,6 +386,19 @@ Parked here for this session. Convergence work resumes on the already-authorized
 reconciliation track (`parent-atlas-retrieval-lineage-dag-convergence`), not on a new
 revision-ownership investigation.
 
+**Route revision-authority audit 2026-09-01:** the preferred `api/ace/stream`
+canary was checked read-only before any caller migration. It has no local
+authoritative `sourceRevision`, `representationRevision`, or
+`retrievalPolicyRevision`; it uses `hashQuery` plus the legacy
+`redisGetAcePacket`/`redisSetAcePacket` query-only cache surface and has no
+strict V2 imports. The result is recorded in
+`docs/reports/ace-route-revision-authority-v1.json` as
+`NO_ROUTE_LOCAL_AUTHORITY`. Keep live strict caller adoption blocked; do not
+fabricate revisions or alter cache keys. The next implementation gate is an
+authoritative server composition provider that supplies an existing
+`CandidateOrdinalMapV1` and revision-qualified feature rows, followed by the
+bounded ACE live-admission canary.
+
 ## KAG-03: additive, non-ranking type-level integration point (2026-08-25)
 
 Investigated wiring KAG-01/KAG-02 into the live retrieval path before

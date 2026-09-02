@@ -22,8 +22,8 @@ SOURCE = ROOT / "docs" / "reports" / "fixtures" / "ontology-linked-tuple-fixture
 FIXTURE = ROOT / "sveltekit-frontend" / "docs" / "reports" / "ontology-linked-tuple-cugraph-algorithm-fixture-v1"
 REPORT = ROOT / "docs" / "reports" / "ontology-linked-tuple-cugraph-algorithm-parity-v1.json"
 SIDECAR = os.environ.get("ATLAS_RAPIDS_SIDECAR_URL", "http://127.0.0.1:8098")
-GRAPH_REVISION = "graph:ontology-linked-tuple-cugraph-algorithm-fixture-v2"
-PROJECTION_REVISION = "projection:ontology-linked-tuple-cugraph-algorithm-fixture-v2"
+GRAPH_REVISION = "graph:ontology-linked-tuple-cugraph-algorithm-fixture-v3"
+PROJECTION_REVISION = "projection:ontology-linked-tuple-cugraph-algorithm-fixture-v3"
 SOURCE_NAMESPACE = "workspace:ontology-linked-tuple-fixture-v1"
 
 sys.path.insert(0, str(ROOT / "python"))
@@ -91,6 +91,7 @@ def main() -> int:
     if projection.skippedParticipants:
         raise SystemExit(f"PROJECTION_PARTICIPANTS_SKIPPED:{len(projection.skippedParticipants)}")
     nodes = [{"gpu_node_id": ordinal, "graph_node_key": node_key, "packet_key": node_key} for node_key, ordinal in sorted(projection.projectionOrdinalByNodeKey.items(), key=lambda item: item[1])]
+    ordinal_map_checksum = digest([{"graphNodeKey": key, "gpuNodeId": ordinal} for key, ordinal in sorted(projection.projectionOrdinalByNodeKey.items())])
     edges = [(edge.sourceProjectionOrdinal, edge.destinationProjectionOrdinal, 1.0) for edge in projection.operationalEdges]
     graph = nx.Graph()
     graph.add_nodes_from(range(len(nodes)))
@@ -106,12 +107,13 @@ def main() -> int:
     FIXTURE.mkdir(parents=True, exist_ok=True)
     pd.DataFrame(nodes).to_parquet(FIXTURE / "nodes.parquet", index=False)
     pd.DataFrame(edges, columns=["src_gpu_node_id", "dst_gpu_node_id", "weight"]).to_parquet(FIXTURE / "edges.parquet", index=False)
-    manifest = {"graphRevision": GRAPH_REVISION, "projectionRevision": PROJECTION_REVISION, "producerRevision": "ontology-linked-tuple-cugraph-algorithm-fixture-v1", "graphKind": "NARY_INCIDENCE", "directed": False, "symmetrizationPolicy": "NONE_ALREADY_UNDIRECTED", "nodeCount": len(nodes), "edgeCount": len(edges), "nodeTableHash": digest(nodes), "edgeTableHash": digest(edges), "projectionChecksum": projection.projectionChecksum, "sourceNamespace": SOURCE_NAMESPACE, "sourceRevisionQualifiedCount": len(tuples), "syntheticRevisionCount": 0, "revisionUnprovenCount": 0}
+    manifest = {"graphRevision": GRAPH_REVISION, "projectionRevision": PROJECTION_REVISION, "producerRevision": "ontology-linked-tuple-cugraph-algorithm-fixture-v1", "graphKind": "NARY_INCIDENCE", "directed": False, "symmetrizationPolicy": "NONE_ALREADY_UNDIRECTED", "nodeCount": len(nodes), "edgeCount": len(edges), "nodeTableHash": digest(nodes), "edgeTableHash": digest(edges), "ordinalMapChecksum": ordinal_map_checksum, "projectionChecksum": projection.projectionChecksum, "sourceNamespace": SOURCE_NAMESPACE, "sourceRevisionQualifiedCount": len(tuples), "syntheticRevisionCount": 0, "revisionUnprovenCount": 0}
     (FIXTURE / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
-    load = post("/v1/graph/load", {"artifactDir": "/mnt/c/Users/james/Videos/deeds-web-app/sveltekit-frontend/docs/reports/ontology-linked-tuple-cugraph-algorithm-fixture-v1", "expectedGraphRevision": GRAPH_REVISION, "expectedProjectionRevision": PROJECTION_REVISION, "replaceResident": True})
-    gpu_bfs = post("/v1/graph/bfs", {"graphRevision": GRAPH_REVISION, "startNodeKey": start_key, "depthLimit": 2})
-    gpu_cc = post("/v1/graph/connected-components", {"graphRevision": GRAPH_REVISION})
-    gpu_pr = post("/v1/graph/pagerank", {"graphRevision": GRAPH_REVISION, "topK": len(nodes), "alpha": 0.85, "tol": 1e-6, "maxIter": 100})
+    load = post("/v1/graph/load", {"artifactDir": "/mnt/c/Users/james/Videos/deeds-web-app/sveltekit-frontend/docs/reports/ontology-linked-tuple-cugraph-algorithm-fixture-v1", "expectedGraphRevision": GRAPH_REVISION, "expectedProjectionRevision": PROJECTION_REVISION, "expectedProjectionChecksum": projection.projectionChecksum, "expectedGraphOrdinalMapChecksum": ordinal_map_checksum, "replaceResident": True})
+    identity = {"graphRevision": GRAPH_REVISION, "projectionRevision": PROJECTION_REVISION, "projectionChecksum": projection.projectionChecksum, "expectedGraphOrdinalMapChecksum": ordinal_map_checksum}
+    gpu_bfs = post("/v1/graph/bfs", {**identity, "startNodeKey": start_key, "depthLimit": 2})
+    gpu_cc = post("/v1/graph/connected-components", identity)
+    gpu_pr = post("/v1/graph/pagerank", {**identity, "topK": len(nodes), "alpha": 0.85, "tol": 1e-6, "maxIter": 100})
     gpu_bfs_rows = gpu_bfs.get("results", [])
     gpu_distances = {str(row["nodeKey"]): int(row["distance"]) for row in gpu_bfs_rows}
     key_by_id = {str(node["gpu_node_id"]): str(node["graph_node_key"]) for node in nodes}

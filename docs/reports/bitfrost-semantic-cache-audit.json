@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-30T07:56:58.307Z",
+  "generatedAt": "2026-09-02T00:28:07.848Z",
   "status": "PASS",
   "redis": {
     "container": "legal-ai-valkey",
@@ -13,36 +13,36 @@
       "note": "ACE/Karpathy summary hot-cache. ~4,827 keys live at rewrite time.",
       "count": 4826,
       "sample": [
-        "bitfrost:summary:packet:v1:packet:052e26c72e4d",
-        "bitfrost:summary:packet:v1:packet:8a68ca1ca8a7",
-        "bitfrost:summary:packet:v1:packet:32bce8852cc0",
-        "bitfrost:summary:packet:v1:packet:0c0fd3a65758",
-        "bitfrost:summary:packet:v1:packet:03d9c8b9c4a4"
+        "bitfrost:summary:packet:v1:packet:29d902b14689",
+        "bitfrost:summary:packet:v1:packet:f163c0a34186",
+        "bitfrost:summary:packet:v1:packet:836ba385968f",
+        "bitfrost:summary:packet:v1:packet:8ff2841f7419",
+        "bitfrost:summary:packet:v1:packet:834f04fa096e"
       ],
       "ttlSamples": [
         {
-          "key": "bitfrost:summary:packet:v1:packet:052e26c72e4d",
-          "ttl": 604239,
+          "key": "bitfrost:summary:packet:v1:packet:29d902b14689",
+          "ttl": 595744,
           "ok": true
         },
         {
-          "key": "bitfrost:summary:packet:v1:packet:8a68ca1ca8a7",
-          "ttl": 604239,
+          "key": "bitfrost:summary:packet:v1:packet:f163c0a34186",
+          "ttl": 595744,
           "ok": true
         },
         {
-          "key": "bitfrost:summary:packet:v1:packet:32bce8852cc0",
-          "ttl": 604238,
+          "key": "bitfrost:summary:packet:v1:packet:836ba385968f",
+          "ttl": 595744,
           "ok": true
         },
         {
-          "key": "bitfrost:summary:packet:v1:packet:0c0fd3a65758",
-          "ttl": 604238,
+          "key": "bitfrost:summary:packet:v1:packet:8ff2841f7419",
+          "ttl": 595744,
           "ok": true
         },
         {
-          "key": "bitfrost:summary:packet:v1:packet:03d9c8b9c4a4",
-          "ttl": 604238,
+          "key": "bitfrost:summary:packet:v1:packet:834f04fa096e",
+          "ttl": 595744,
           "ok": true
         }
       ],
@@ -57,36 +57,36 @@
       "note": "SOM BMU assignment per packet. ~5,000 keys live.",
       "count": 5000,
       "sample": [
-        "gpu:som:packet:4475",
-        "gpu:som:packet:3706",
-        "gpu:som:packet:111",
-        "gpu:som:packet:1140",
-        "gpu:som:packet:2920"
+        "gpu:som:packet:3535",
+        "gpu:som:packet:3448",
+        "gpu:som:packet:1732",
+        "gpu:som:packet:4397",
+        "gpu:som:packet:1972"
       ],
       "ttlSamples": [
         {
-          "key": "gpu:som:packet:4475",
-          "ttl": 242788,
+          "key": "gpu:som:packet:3535",
+          "ttl": 10518,
           "ok": true
         },
         {
-          "key": "gpu:som:packet:3706",
-          "ttl": 242788,
+          "key": "gpu:som:packet:3448",
+          "ttl": 10517,
           "ok": true
         },
         {
-          "key": "gpu:som:packet:111",
-          "ttl": 242788,
+          "key": "gpu:som:packet:1732",
+          "ttl": 10517,
           "ok": true
         },
         {
-          "key": "gpu:som:packet:1140",
-          "ttl": 242788,
+          "key": "gpu:som:packet:4397",
+          "ttl": 10517,
           "ok": true
         },
         {
-          "key": "gpu:som:packet:2920",
-          "ttl": 242788,
+          "key": "gpu:som:packet:1972",
+          "ttl": 10517,
           "ok": true
         }
       ],
@@ -101,36 +101,36 @@
       "note": "SOM grid cell membership index. ~296 keys live across 20 cells.",
       "count": 296,
       "sample": [
-        "gpu:som:cell:3:1",
-        "gpu:som:cell:12:17",
-        "gpu:som:cell:11:1",
-        "gpu:som:cell:5:6",
-        "gpu:som:cell:13:5"
+        "gpu:som:cell:7:0",
+        "gpu:som:cell:19:12",
+        "gpu:som:cell:15:12",
+        "gpu:som:cell:12:19",
+        "gpu:som:cell:3:18"
       ],
       "ttlSamples": [
         {
-          "key": "gpu:som:cell:3:1",
-          "ttl": 242787,
+          "key": "gpu:som:cell:7:0",
+          "ttl": 10516,
           "ok": true
         },
         {
-          "key": "gpu:som:cell:12:17",
-          "ttl": 242787,
+          "key": "gpu:som:cell:19:12",
+          "ttl": 10516,
           "ok": true
         },
         {
-          "key": "gpu:som:cell:11:1",
-          "ttl": 242787,
+          "key": "gpu:som:cell:15:12",
+          "ttl": 10516,
           "ok": true
         },
         {
-          "key": "gpu:som:cell:5:6",
-          "ttl": 242787,
+          "key": "gpu:som:cell:12:19",
+          "ttl": 10516,
           "ok": true
         },
         {
-          "key": "gpu:som:cell:13:5",
-          "ttl": 242787,
+          "key": "gpu:som:cell:3:18",
+          "ttl": 10516,
           "ok": true
         }
       ],
@@ -145,36 +145,36 @@
       "note": "Active trained LibTorch 768->128->64 autoencoder cache consumed by the SOM topology pipeline. This is distinct from the retired/random Karpathy H6 path (gpu:karpathy:encoded) and from the newer NestedSemanticAutoencoder latent_256/128/64 challenger, which has no live consumers. Active here means SOM/topology ownership, not canonical semantic retrieval authority.",
       "count": 5000,
       "sample": [
-        "gpu:autoencoder:latent_64:2050",
-        "gpu:autoencoder:latent_64:3343",
-        "gpu:autoencoder:latent_64:816",
-        "gpu:autoencoder:latent_64:3243",
-        "gpu:autoencoder:latent_64:2034"
+        "gpu:autoencoder:latent_64:91",
+        "gpu:autoencoder:latent_64:3516",
+        "gpu:autoencoder:latent_64:297",
+        "gpu:autoencoder:latent_64:2285",
+        "gpu:autoencoder:latent_64:1950"
       ],
       "ttlSamples": [
         {
-          "key": "gpu:autoencoder:latent_64:2050",
-          "ttl": 242754,
+          "key": "gpu:autoencoder:latent_64:91",
+          "ttl": 10482,
           "ok": true
         },
         {
-          "key": "gpu:autoencoder:latent_64:3343",
-          "ttl": 242753,
+          "key": "gpu:autoencoder:latent_64:3516",
+          "ttl": 10482,
           "ok": true
         },
         {
-          "key": "gpu:autoencoder:latent_64:816",
-          "ttl": 242753,
+          "key": "gpu:autoencoder:latent_64:297",
+          "ttl": 10482,
           "ok": true
         },
         {
-          "key": "gpu:autoencoder:latent_64:3243",
-          "ttl": 242753,
+          "key": "gpu:autoencoder:latent_64:2285",
+          "ttl": 10482,
           "ok": true
         },
         {
-          "key": "gpu:autoencoder:latent_64:2034",
-          "ttl": 242753,
+          "key": "gpu:autoencoder:latent_64:1950",
+          "ttl": 10482,
           "ok": true
         }
       ],
@@ -194,7 +194,7 @@
       "ttlSamples": [
         {
           "key": "gpu:karpathy:scores",
-          "ttl": 597462,
+          "ttl": 365190,
           "ok": true
         }
       ],
@@ -214,7 +214,7 @@
       "ttlSamples": [
         {
           "key": "gpu:karpathy:summary",
-          "ttl": 597462,
+          "ttl": 365190,
           "ok": true
         }
       ],
@@ -241,24 +241,24 @@
       "note": "Embedding query cache, v2 key shape. Low steady-state count (cache-of-recent-queries, not bulk).",
       "count": 3,
       "sample": [
-        "embed:v2:embeddinggemma:latest:ddc1ba0424a7319cd51df5572f2abb6b502cf4141789cf165c7552a4d406585a",
+        "embed:v2:embeddinggemma:latest:8e6565b4d5aed79ca0dff3fad3b2ce706e3b152494a629e4e1a9fe4dcb7e3525",
         "embed:v2:embeddinggemma:latest:6bd35c5d44ccb95707b7d54f7f530a05579dcda94994c1f55fc1e0fbe2e03eed",
-        "embed:v2:embeddinggemma:latest:8e6565b4d5aed79ca0dff3fad3b2ce706e3b152494a629e4e1a9fe4dcb7e3525"
+        "embed:v2:embeddinggemma:latest:ddc1ba0424a7319cd51df5572f2abb6b502cf4141789cf165c7552a4d406585a"
       ],
       "ttlSamples": [
         {
-          "key": "embed:v2:embeddinggemma:latest:ddc1ba0424a7319cd51df5572f2abb6b502cf4141789cf165c7552a4d406585a",
-          "ttl": 327491,
+          "key": "embed:v2:embeddinggemma:latest:8e6565b4d5aed79ca0dff3fad3b2ce706e3b152494a629e4e1a9fe4dcb7e3525",
+          "ttl": 102095,
           "ok": true
         },
         {
           "key": "embed:v2:embeddinggemma:latest:6bd35c5d44ccb95707b7d54f7f530a05579dcda94994c1f55fc1e0fbe2e03eed",
-          "ttl": 597461,
+          "ttl": 365188,
           "ok": true
         },
         {
-          "key": "embed:v2:embeddinggemma:latest:8e6565b4d5aed79ca0dff3fad3b2ce706e3b152494a629e4e1a9fe4dcb7e3525",
-          "ttl": 334367,
+          "key": "embed:v2:embeddinggemma:latest:ddc1ba0424a7319cd51df5572f2abb6b502cf4141789cf165c7552a4d406585a",
+          "ttl": 95218,
           "ok": true
         }
       ],
@@ -271,41 +271,9 @@
       "pattern": "embed:embeddinggemma:latest:*",
       "ownership": "LEGACY",
       "note": "Embedding query cache, v1 key shape (no embed:v2: prefix). Small residual count; embed:v2:* is the current shape.",
-      "count": 11,
-      "sample": [
-        "embed:embeddinggemma:latest:ffc6b1ffa6e9fdcc",
-        "embed:embeddinggemma:latest:05119d06ad98a2a0",
-        "embed:embeddinggemma:latest:4f6592940c90014f",
-        "embed:embeddinggemma:latest:5011075a83c3c4e6",
-        "embed:embeddinggemma:latest:45a57a03995f2fe0"
-      ],
-      "ttlSamples": [
-        {
-          "key": "embed:embeddinggemma:latest:ffc6b1ffa6e9fdcc",
-          "ttl": 79555,
-          "ok": true
-        },
-        {
-          "key": "embed:embeddinggemma:latest:05119d06ad98a2a0",
-          "ttl": 79379,
-          "ok": true
-        },
-        {
-          "key": "embed:embeddinggemma:latest:4f6592940c90014f",
-          "ttl": 79337,
-          "ok": true
-        },
-        {
-          "key": "embed:embeddinggemma:latest:5011075a83c3c4e6",
-          "ttl": 79335,
-          "ok": true
-        },
-        {
-          "key": "embed:embeddinggemma:latest:45a57a03995f2fe0",
-          "ttl": 79449,
-          "ok": true
-        }
-      ],
+      "count": 0,
+      "sample": [],
+      "ttlSamples": [],
       "ok": true,
       "error": null,
       "driftFlag": null
@@ -315,32 +283,20 @@
       "pattern": "ace:*",
       "ownership": "ACTIVE",
       "note": "Small set of ACE cluster/probe/path keys (ace:cluster:members:*, ace:probe:*, ace:path:*). Not the ace:context:*/ace:summary:*/etc. family listed below -- those are aspirational.",
-      "count": 4,
+      "count": 2,
       "sample": [
-        "ace:cluster:members:unclassified:community-67456",
-        "ace:probe:embed:karpathy",
-        "ace:path:cluster:1",
-        "ace:cluster:members:unclassified:community-26562"
+        "ace:cluster:members:unclassified:community-26562",
+        "ace:path:cluster:1"
       ],
       "ttlSamples": [
         {
-          "key": "ace:cluster:members:unclassified:community-67456",
-          "ttl": 231596,
-          "ok": true
-        },
-        {
-          "key": "ace:probe:embed:karpathy",
-          "ttl": 79059,
+          "key": "ace:cluster:members:unclassified:community-26562",
+          "ttl": 365187,
           "ok": true
         },
         {
           "key": "ace:path:cluster:1",
-          "ttl": 597460,
-          "ok": true
-        },
-        {
-          "key": "ace:cluster:members:unclassified:community-26562",
-          "ttl": 597459,
+          "ttl": 365187,
           "ok": true
         }
       ],

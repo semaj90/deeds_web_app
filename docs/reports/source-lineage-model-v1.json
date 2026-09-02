@@ -1,6 +1,6 @@
 {
   "schema": "atlas.source-lineage-model.v1",
-  "generatedAt": "2026-08-29T09:30:33.780Z",
+  "generatedAt": "2026-09-01T22:38:53.737Z",
   "readOnly": true,
   "postgresWrites": false,
   "observation": {

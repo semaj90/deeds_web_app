@@ -56,7 +56,7 @@ describe('selectReasonerForOwlProfile', () => {
     expect(selectReasonerForOwlProfile('OWL2_DL_REQUIRED')).toBe('HERMIT');
   });
 
-  it('routes UNKNOWN conservatively to HERMIT (the stronger lane), not ELK', () => {
-    expect(selectReasonerForOwlProfile('UNKNOWN')).toBe('HERMIT');
+  it('routes UNKNOWN to NONE until a real profile result exists', () => {
+    expect(selectReasonerForOwlProfile('UNKNOWN')).toBe('NONE');
   });
 });

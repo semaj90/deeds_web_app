@@ -1,6 +1,6 @@
 {
   "schema": "atlas.current-graphify-run-owner.v1",
-  "generatedAt": "2026-08-29T22:37:05.105Z",
+  "generatedAt": "2026-09-01T23:31:08.530Z",
   "mode": "READ_ONLY_RUN_OWNER_AUDIT",
   "readOnly": true,
   "writes": {

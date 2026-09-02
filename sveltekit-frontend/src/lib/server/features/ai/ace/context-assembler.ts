@@ -180,7 +180,9 @@ import { getAuthorityForContext } from '$lib/server/graph/karpathy-authority.js'
 import {
   setAceContextPackPointer,
   buildAceContextPack,
+  setRevisionedAceContextPackV1,
 } from '$lib/server/cache/ace-context-pack-cache.js';
+import type { ContextManifestV2 } from '$lib/server/atlas/graph/context-manifest-v2.js';
 import {
   persistNesChromPacketWithHits,
 } from '$lib/server/features/ai/ace/nes-chrom-packet-service.js';
@@ -1533,6 +1535,14 @@ export async function assembleACEContext(opts: {
   corpusHash?: string;
   ragBundleHash?: string;
   graphSnapshotHash?: string;
+  /** Optional caller-owned retrieval identity forwarded to QueryRouter. */
+  workspaceRevision?: string;
+  candidateSnapshotRevision?: string;
+  ordinalMapChecksum?: string;
+  representationRevision?: string;
+  retrievalPolicyRevision?: string;
+  contextPolicyRevision?: string;
+  graphRevision?: string | null;
   /**
    * nes-arch path-first preflight (LLMS.md spec). When provided, the
    * assembler does a sub-5ms Redis lookup for the nearest LLMS.md
@@ -1547,6 +1557,15 @@ export async function assembleACEContext(opts: {
   tokenAwarePacking?: boolean;
   statsOut?: Record<string, any>;
   traceId?: string;
+  /**
+   * Opt-in revision-qualified cache admission. The caller must provide a
+   * complete ContextManifestV2; the assembler never derives missing lineage
+   * revisions from query, timestamps, or legacy packet metadata.
+   */
+  revisionedContextCache?: {
+    manifest: ContextManifestV2;
+    ttlSeconds?: number;
+  };
 }): Promise<ACEContext> {
   if (opts.statsOut) {
     opts.statsOut.topo_hit = false;
@@ -1571,7 +1590,16 @@ export async function assembleACEContext(opts: {
         }
       }
       if (!routeResult) {
-        routeResult = await routeQuery({ query: opts.query });
+        routeResult = await routeQuery({
+          query: opts.query,
+          workspaceRevision: opts.workspaceRevision,
+          candidateSnapshotRevision: opts.candidateSnapshotRevision,
+          ordinalMapChecksum: opts.ordinalMapChecksum,
+          representationRevision: opts.representationRevision,
+          retrievalPolicyRevision: opts.retrievalPolicyRevision,
+          contextPolicyRevision: opts.contextPolicyRevision,
+          graphRevision: opts.graphRevision,
+        });
       }
       const packet = routeResult.packet;
 
@@ -3899,6 +3927,22 @@ export async function assembleACEContext(opts: {
             authority: (finalContext as any).authority ?? undefined,
           });
           void setAceContextPackPointer(acePlannerState.cacheKey, acePack).catch(() => {});
+          // Revisioned BitFrost admission is deliberately opt-in and strict.
+          // The legacy pointer remains for compatibility, but it is not used
+          // as a substitute when a complete ContextManifestV2 is unavailable.
+          if (opts.revisionedContextCache) {
+            try {
+              await setRevisionedAceContextPackV1(
+                opts.revisionedContextCache.manifest,
+                acePack,
+                opts.revisionedContextCache.ttlSeconds,
+              );
+              if (opts.statsOut) opts.statsOut.revisioned_context_cache_write = true;
+            } catch (cacheErr) {
+              if (opts.statsOut) opts.statsOut.revisioned_context_cache_write = false;
+              console.warn('[ACE revisioned cache] admission/write skipped:', (cacheErr as Error)?.message ?? cacheErr);
+            }
+          }
           // Fire-and-forget: persist a lightweight intent_synthesis row for non-blocking analysis
           try {
             const { intentSynthesis } = await import('$lib/server/db/schema-postgres.js');

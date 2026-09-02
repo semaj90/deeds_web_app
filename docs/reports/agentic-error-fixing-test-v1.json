@@ -1,0 +1,36 @@
+{
+  "schema": "atlas.agentic-error-fixing.v1",
+  "inputChecksum": "sha256:ae46a9084c3cfac2204c76170d1023b3c809e362d56851aa8c6d7d4d80a6977a",
+  "candidates": [
+    {
+      "fingerprint": "sha256:04492fd38ea15f85",
+      "errorCode": null,
+      "kind": "TIMEOUT",
+      "file": "python/graph.py",
+      "owner": "Operator review",
+      "proposedAction": "Reduce the bounded input or isolate the dependency timeout before changing limits.",
+      "status": "PROPOSED",
+      "mutationAllowed": false
+    },
+    {
+      "fingerprint": "sha256:6608f3f3451e95ea",
+      "errorCode": "TS2307",
+      "kind": "TYPECHECK_OR_SCHEMA",
+      "file": "src/lib/server/retrieval/qdrant.ts",
+      "owner": "SearchRuntime/retrieval owner",
+      "proposedAction": "Inspect the smallest owning contract and run a scoped typecheck.",
+      "status": "PROPOSED",
+      "mutationAllowed": false
+    }
+  ],
+  "validation": null,
+  "generatedAt": "2026-09-01T23:48:33.949Z",
+  "status": "PLAN_READY",
+  "mode": "READ_ONLY_PROPOSAL",
+  "mutationAllowed": false,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "deterministicPlanChecksum": "sha256:b1176560f8ecdce2a3080ab8cfd9653aa4e1dcfb05fd46a060de954fa29c109b",
+  "candidateCount": 2,
+  "nextGate": "OPERATOR_REVIEW_THEN_SCOPED_VALIDATION"
+}

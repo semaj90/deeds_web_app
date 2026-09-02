@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
 import { createRlmSearchAdapter, type RlmSearchCache } from './rlm-search-adapter.js';
 import type { RlmBudget, RlmEnvironmentV1, RlmInspectionTools, RlmSearchRequest, RlmSearchResult, RlmTrace, RlmTraceStep } from './rlm-contract.js';
+import { admitRlmResultToAceFeatureSnapshotV1, type RlmAceFeatureAdmissionResultV1, type RlmAceFeatureBundleProviderV1 } from './rlm-ace-feature-admission-v1.js';
 
 interface Counters {
 	depthReached: number; subcalls: number; searchCalls: number; graphCalls: number;
@@ -13,6 +14,7 @@ export interface RlmRuntimeOptions {
 	environment?: RlmEnvironmentV1;
 	cache?: RlmSearchCache; tools: RlmInspectionTools;
 	search?: (request: RlmSearchRequest) => Promise<RlmSearchResult>;
+	aceFeatureBundleProvider?: RlmAceFeatureBundleProviderV1;
 }
 
 export interface RlmRuntimeReceipt extends RlmTrace {
@@ -100,6 +102,14 @@ export function createRlmRuntime(options: RlmRuntimeOptions) {
 			counters.subcalls += 1;
 			counters.depthReached = Math.max(counters.depthReached, depth);
 			return operation();
+		},
+		async admitAceFeatureSnapshot(request: RlmSearchRequest, result: RlmSearchResult): Promise<RlmAceFeatureAdmissionResultV1> {
+			if (!options.aceFeatureBundleProvider) return { status: 'UNAVAILABLE', reason: 'SERVER_FEATURE_BUNDLE_UNAVAILABLE' };
+			return admitRlmResultToAceFeatureSnapshotV1({
+				provider: options.aceFeatureBundleProvider,
+				request,
+				result,
+			});
 		},
 		inspectPacket: (packetKey: string) => inspect('PACKET', () => options.tools.packet(packetKey)),
 		inspectSource: (sourceRef: string, span?: { start: number; end: number }) => inspect('SOURCE', () => options.tools.source(sourceRef, span)),

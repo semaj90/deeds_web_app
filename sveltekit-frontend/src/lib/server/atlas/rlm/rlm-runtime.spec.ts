@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { createRlmRuntime } from './rlm-runtime.js';
 import type { RlmBudget } from './rlm-contract.js';
+import { admitRlmResultToAceFeatureSnapshotV1 } from './rlm-ace-feature-admission-v1.js';
 
 const budget = (overrides: Partial<RlmBudget> = {}): RlmBudget => ({
 	maxDepth: 2, maxSubcalls: 2, maxSearchCalls: 1, maxGraphExpansions: 1, maxProcessLookups: 1,
@@ -33,6 +34,14 @@ describe('bounded RLM runtime', () => {
 		await expect(rlm.search({ query: 'failure' })).resolves.toBeNull();
 		expect(rlm.receipt().termination).toBe('FAILED');
 		expect(rlm.receipt().failureCode).toBe('RLM_PROGRAM_FAILED');
+	});
+	it('returns typed unavailable when no server feature bundle exists', async () => {
+		const result = await admitRlmResultToAceFeatureSnapshotV1({
+			provider: { get: async () => null },
+			request: { requestId: 'req-1', workspaceRevision: 'workspace-r1', policyRevision: 'policy-r1', query: 'q', budget: budget() },
+			result: { response: { packets: [], topPacketKeys: [], metadata: {} as never, provenance: {} as never }, trace: { requestId: 'req-1', workspaceRevision: 'workspace-r1', policyRevision: 'policy-r1', depthReached: 0, subcalls: 0, steps: [], status: 'COMPLETED' } },
+		});
+		expect(result).toEqual({ status: 'UNAVAILABLE', reason: 'SERVER_FEATURE_BUNDLE_UNAVAILABLE' });
 	});
 });
 

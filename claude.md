@@ -3085,7 +3085,7 @@ rg "from.*cache-keys" src/lib/server/cache/redis-exact-match.ts src/lib/server/a
 # If either file still has a local generateCacheKey/hashContext → DRY violation remains
 ```
 
-### G4/G5 open finding — 5 real unauthenticated + unvalidated API routes (2026-08-31 deep-audit)
+### G4/G5 open finding — 8 real unauthenticated + unvalidated API routes (2026-08-31 deep-audit, +3 2026-09-01 /deep-audit rerun)
 
 Not fixed yet (intentional — dev testing currently relies on `DEV_BYPASS_AUTH`, so adding real
 auth guards now would be premature). Recorded here per the Duplication Prevention rule ("record
@@ -3105,13 +3105,70 @@ validation** (hand-rolled or none):
 | `api/telemetry/implementation-clusters` | GET | Reads Redis-backed MCP telemetry, read-only | Low — no mutation, no secrets observed |
 | `api/phase102/retrieval-pipeline` | GET | Queries `codeFeatures` table, returns ranked results; file has explicit `// Mock implementation` / `// Mock scores` comments — looks like an early scaffold | Low-moderate — reachable unauthenticated, not production-hardened |
 
+**+3 more found in the 2026-09-01 `/deep-audit` rerun** (re-verified each of that pass's 21
+`hasAuth === false` candidates individually against `requireAdmin`/`locals.user`/`getSession`
+before counting — 12 of 21 were `requireAdmin` false positives, same detector blind spot as above):
+
+| Route | Method | Input handling | Risk |
+|---|---|---|---|
+| `api/metrics/retrieval` | GET | `branch` free string param, `hours` bounded via `Math.max/min(1,72)` | Low — read-only telemetry dashboard, no mutation |
+| `api/retrieval/cache-layers/health` | GET | No params | Low — read-only cache-layer health probe |
+| `api/retrieval/cache-layers/metrics` | GET | No params | Low — read-only Prometheus metrics export |
+
 Also not chased further: `api/trpc/[...procedure]` has no route-level auth guard, but tRPC's
 per-procedure auth (if any) lives inside `createContext`/`appRouter` middleware, invisible to a
 route-level static check — verify inside the router before assuming it's a gap.
 
 **When ready to fix**: add `requireAuth`/`requireAdmin` (matching this repo's existing pattern, not
-a new auth mechanism) to the 5 real gaps above, and add Zod schemas per the G5 convention. Do this
-as a deliberate pass once dev-bypass is no longer the active mode, not piecemeal.
+a new auth mechanism) to the 8 real gaps above, and add Zod schemas per the G5 convention. Do this
+as a deliberate production-hardening pass — with tests added alongside, per operator direction
+2026-09-01 — once dev-bypass is no longer the active mode, not piecemeal.
+
+### G5 open finding — 18 authenticated mutating routes with zero Zod validation (2026-09-01 /deep-audit)
+
+**Distinct from the G4 finding above.** The graph's `hasZod === false` flag surfaced 200 routes,
+but 175 of those are GET-only (no body to validate — likely a false inclusion in the raw flag, not
+a real gap). Narrowing to routes with a mutating method (POST/PUT/PATCH/DELETE) drops the count to
+25. Individually checking each of those 25 for an auth guard found **every one of them already has
+real auth** (`locals.user`, `requireAdmin`, or an explicit `DEV_BYPASS_AUTH` check) — this is NOT
+the same 12-false-positive detector blind spot from the G4 section above; these routes are
+genuinely authenticated. The real, remaining risk is narrower but still live: an **authenticated**
+caller can send a malformed/malicious body with nothing rejecting it before it reaches business
+logic or a Drizzle query.
+
+18 confirmed authenticated-but-unvalidated mutating routes:
+
+| Route | Methods | Auth pattern found |
+|---|---|---|
+| `api/admin/atlas/taxonomy-candidates` | GET, POST | `requireAdmin(event)` |
+| `api/admin/citations/discover` | POST | `locals.user \|\| DEV_BYPASS_AUTH` |
+| `api/admin/packets/enrich-labels` | GET, POST | `locals.user?.role !== 'admin'` |
+| `api/analytics/research-summaries/[id]` | GET, DELETE | `locals.user?.id` |
+| `api/cases/[id]/export/pdf` | POST | `locals.user?.id` |
+| `api/codebase-index/cluster-assign` | POST | `locals.user?.id` |
+| `api/codebase-index/couchdb-pagerank` | GET, POST | `locals.user?.id` (body read via `request.json().catch(() => null)`, no schema) |
+| `api/codebase-index/index-stream` | GET, POST | `locals.user?.id` |
+| `api/evidence/analyze` | GET, POST | `locals.user?.id` |
+| `api/evidence/[id]/gpu-analysis` | GET, POST | `locals.user?.id` |
+| `api/evidence/[id]/suggest-summary` | POST | `locals.user?.id` |
+| `api/files/[id]` | DELETE | `locals.user \|\| DEV_BYPASS_AUTH` |
+| `api/library/ingest-codebase-docs` | POST | `locals.user?.id` |
+| `api/persons-of-interest/[id]/associates/[associateId]` | DELETE | `locals.user` |
+| `api/persons-of-interest/[id]/gpu-analyze` | POST | `locals.user?.id` |
+| `api/phase89/analysis` | POST | `locals.user` |
+| `api/phase89/reindex` | POST | `locals.user` |
+| `api/reports/[id]/publish` | POST, DELETE | `locals.user` |
+| `api/wiki/watch` | GET, POST, DELETE | `locals.user` |
+
+Not double-counted here: `api/ai/emotion` (already tracked above — it has neither auth nor Zod, a
+strictly worse dual gap). Not chased: `api/auth/logout`, `api/dev/login-demo`,
+`api/test/redis-direct`, `api/test/webgpu-modules` (auth/dev/test-only routes, low value to
+Zod-harden) and `api/trpc/[...procedure]` (per-procedure validation, if any, lives in the tRPC
+router, invisible to this route-level check).
+
+**When ready to fix**: add Zod schemas to these 18 in the same production-hardening pass as the G4
+list above — same deferred posture (dev-bypass active, tests added alongside per operator
+direction), not a separate or earlier pass.
 
 ### Decision Tree (post-gate)
 

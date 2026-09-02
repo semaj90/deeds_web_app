@@ -1,0 +1,29 @@
+{
+  "schema": "atlas.resident-graph-identity-receipt.v1",
+  "status": "RESIDENT_GRAPH_IDENTITY_PROVEN_BOUNDED",
+  "runtime": "atlas_rapids_sidecar_graph",
+  "runtimeRevision": "atlas.cugraph-pagerank.v1",
+  "projectionRevision": "projection:ontology-linked-tuple-cugraph-algorithm-fixture-v3",
+  "projectionChecksum": "b68087a95c276b022b1443cce9b3a29c25f1b0d2304a13854fd439d0b07f6dee",
+  "nodeTableChecksum": "8812ed91f4cb463f3795788add9feea03279a1d1b02896b650737cd688656eeb",
+  "edgeTableChecksum": "153bcf6194f316cd99763044e217a88d0f4fdd20389247e58279c4e8505a57d7",
+  "ordinalMapChecksum": "0a6d05db3f7e20e8507aac50defcbb390621292461d6c50d1fa430ebb097ac11",
+  "graphKind": "NARY_INCIDENCE",
+  "directed": false,
+  "symmetrizationPolicy": "NONE_ALREADY_UNDIRECTED",
+  "vertexCount": 21,
+  "edgeCount": 16,
+  "renumbered": false,
+  "checks": {
+    "resident_projection_checksum_exposed": true,
+    "algorithm_requests_bind_projection_identity": true,
+    "mismatched_projection_checksum_rejected": true,
+    "dense_ordinal_abi": true,
+    "ordinal_map_checksum_present": true,
+    "writes_false": true,
+    "canonical_false": true
+  },
+  "mismatchResponseCode": "PROJECTION_CHECKSUM_MISMATCH",
+  "writesPerformed": false,
+  "canonicalAuthority": false
+}

@@ -1,0 +1,19 @@
+{
+  "schema": "atlas.plan-repair-facade.v1",
+  "status": "WIRED_READ_ONLY",
+  "tool": "atlas.planRepair",
+  "delegatesTo": "agent.proposeFix",
+  "proposalOnly": true,
+  "sourceWrites": false,
+  "databaseWrites": false,
+  "qdrantWrites": false,
+  "graphWrites": false,
+  "cacheWrites": false,
+  "canonicalAuthority": false,
+  "validation": {
+    "diffCheck": "PASS",
+    "standaloneTypecheck": "BLOCKED_SVELTEKIT_ALIAS_CONTEXT",
+    "detail": "Imported vault owner requires the project $lib alias configuration."
+  },
+  "nextGate": "Run the SvelteKit project-scoped typecheck or MCP smoke after service startup."
+}

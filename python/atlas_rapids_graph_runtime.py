@@ -59,6 +59,7 @@ class GraphLoadRequest(BaseModel):
     artifactDir: str
     expectedGraphRevision: str | None = None
     expectedProjectionRevision: str | None = None
+    expectedProjectionChecksum: str | None = None
     expectedArtifactChecksum: str | None = None
     expectedGraphOrdinalMapChecksum: str | None = None
     expectedWorkspaceRevision: str | None = None
@@ -73,6 +74,8 @@ class PageRankSeed(BaseModel):
 
 class PageRankRequest(BaseModel):
     graphRevision: str
+    projectionRevision: str | None = None
+    projectionChecksum: str | None = None
     seeds: list[PageRankSeed] = Field(default_factory=list)
     candidateNodeKeys: list[str] = Field(default_factory=list)
     topK: int = 128
@@ -89,6 +92,8 @@ class PageRankRequest(BaseModel):
 
 class BFSRequest(BaseModel):
     graphRevision: str
+    projectionRevision: str | None = None
+    projectionChecksum: str | None = None
     startNodeKey: str
     depthLimit: int = Field(default=8, ge=0, le=64)
     expectedArtifactChecksum: str | None = None
@@ -97,6 +102,8 @@ class BFSRequest(BaseModel):
 
 class ComponentsRequest(BaseModel):
     graphRevision: str
+    projectionRevision: str | None = None
+    projectionChecksum: str | None = None
     expectedArtifactChecksum: str | None = None
     expectedGraphOrdinalMapChecksum: str | None = None
 
@@ -152,12 +159,15 @@ class ResidentGraph:
         self.artifact_dir = artifact_dir
         self.graph_revision = str(manifest["graphRevision"])
         self.projection_revision = str(manifest["projectionRevision"])
+        self.projection_checksum = str(manifest.get("projectionChecksum") or manifest.get("artifactChecksum") or "")
         self.node_table_hash = str(manifest["nodeTableHash"])
         self.edge_table_hash = str(manifest["edgeTableHash"])
         self.producer_revision = str(manifest.get("producerRevision") or "unknown")
         self.workspace_revision = manifest.get("workspaceRevision")
         self.candidate_snapshot_revision = manifest.get("candidateSnapshotRevision")
         self.graph_ordinal_map_checksum = manifest.get("ordinalMapChecksum") or manifest.get("graphOrdinalMapChecksum")
+        self.graph_kind = str(manifest.get("graphKind") or "UNKNOWN")
+        self.symmetrization_policy = str(manifest.get("symmetrizationPolicy") or "UNSPECIFIED")
         artifact_identity = {
             "graphRevision": self.graph_revision,
             "projectionRevision": self.projection_revision,
@@ -169,6 +179,8 @@ class ResidentGraph:
         self.artifact_checksum = str(manifest.get("artifactChecksum") or hashlib.sha256(
             json.dumps(artifact_identity, separators=(",", ":"), sort_keys=True).encode("utf-8")
         ).hexdigest())
+        if not self.projection_checksum:
+            self.projection_checksum = self.artifact_checksum
         self.loaded_at = time.time()
 
         nodes_path = artifact_dir / "nodes.parquet"
@@ -509,6 +521,17 @@ class GraphRuntimeManager:
         self._resident: ResidentGraph | None = None
         self._gpu_memory_reader = gpu_memory_reader
 
+    def _assert_request_identity(self, req: Any) -> None:
+        resident = self._resident
+        if resident is None:
+            _fail("GRAPH_NOT_RESIDENT", "load a revision-qualified graph projection first", 409)
+        if req.graphRevision != resident.graph_revision:
+            _fail("GRAPH_REVISION_MISMATCH", "request graph revision does not match resident graph", 409)
+        if req.projectionRevision is not None and req.projectionRevision != resident.projection_revision:
+            _fail("PROJECTION_REVISION_MISMATCH", "request projection revision does not match resident graph", 409)
+        if req.projectionChecksum is not None and req.projectionChecksum != resident.projection_checksum:
+            _fail("PROJECTION_CHECKSUM_MISMATCH", "request projection checksum does not match resident graph", 409)
+
     def capability(self) -> dict[str, Any]:
         return {
             "available": _IMPORT_ERROR is None,
@@ -532,6 +555,13 @@ class GraphRuntimeManager:
                 else {
                     "graphRevision": resident.graph_revision,
                     "projectionRevision": resident.projection_revision,
+                    "projectionChecksum": resident.projection_checksum,
+                    "nodeTableHash": resident.node_table_hash,
+                    "edgeTableHash": resident.edge_table_hash,
+                    "ordinalMapChecksum": resident.graph_ordinal_map_checksum,
+                    "graphKind": resident.graph_kind,
+                    "directed": resident.directed,
+                    "symmetrizationPolicy": resident.symmetrization_policy,
                     "nodeCount": resident.node_count,
                     "edgeCount": resident.edge_count,
                     "renumbered": False,
@@ -563,6 +593,7 @@ class GraphRuntimeManager:
             _fail("GRAPH_REVISION_MISMATCH", f"manifest {graph_revision} != expected {req.expectedGraphRevision}")
         if req.expectedProjectionRevision and req.expectedProjectionRevision != projection_revision:
             _fail("PROJECTION_REVISION_MISMATCH", f"manifest {projection_revision} != expected {req.expectedProjectionRevision}")
+        projection_checksum = str(manifest.get("projectionChecksum") or manifest.get("artifactChecksum") or "")
         resident_artifact_identity = {
             "graphRevision": graph_revision,
             "projectionRevision": projection_revision,
@@ -576,6 +607,10 @@ class GraphRuntimeManager:
         ).hexdigest())
         if req.expectedArtifactChecksum and req.expectedArtifactChecksum != artifact_checksum:
             _fail("ARTIFACT_CHECKSUM_MISMATCH", f"manifest {artifact_checksum} != expected {req.expectedArtifactChecksum}")
+        if not projection_checksum:
+            projection_checksum = artifact_checksum
+        if req.expectedProjectionChecksum and req.expectedProjectionChecksum != projection_checksum:
+            _fail("PROJECTION_CHECKSUM_MISMATCH", f"manifest {projection_checksum} != expected {req.expectedProjectionChecksum}")
         ordinal_checksum = manifest.get("ordinalMapChecksum") or manifest.get("graphOrdinalMapChecksum")
         if req.expectedGraphOrdinalMapChecksum and req.expectedGraphOrdinalMapChecksum != ordinal_checksum:
             _fail("GRAPH_ORDINAL_MAP_CHECKSUM_MISMATCH", "graph ordinal map checksum does not match resident manifest")
@@ -586,6 +621,36 @@ class GraphRuntimeManager:
 
         with self._lock:
             if self._resident is not None and self._resident.graph_revision == graph_revision:
+                resident_identity = (
+                    self._resident.projection_revision,
+                    self._resident.projection_checksum,
+                    self._resident.node_table_hash,
+                    self._resident.edge_table_hash,
+                    self._resident.graph_ordinal_map_checksum,
+                    self._resident.graph_kind,
+                    self._resident.directed,
+                    self._resident.symmetrization_policy,
+                    self._resident.node_count,
+                    self._resident.edge_count,
+                )
+                requested_identity = (
+                    projection_revision,
+                    projection_checksum,
+                    str(manifest["nodeTableHash"]),
+                    str(manifest["edgeTableHash"]),
+                    ordinal_checksum,
+                    str(manifest.get("graphKind") or "UNKNOWN"),
+                    bool(manifest.get("directed", True)),
+                    str(manifest.get("symmetrizationPolicy") or "UNSPECIFIED"),
+                    int(manifest["nodeCount"]),
+                    int(manifest["edgeCount"]),
+                )
+                if resident_identity != requested_identity:
+                    _fail(
+                        "PROJECTION_REVISION_CHECKSUM_CONFLICT",
+                        f"projection revision {projection_revision} is resident with a different semantic identity",
+                        409,
+                    )
                 return {**self.status(), "reused": True}
             if self._resident is not None and not req.replaceResident:
                 _fail(
@@ -604,6 +669,7 @@ class GraphRuntimeManager:
                     )
 
             started = time.perf_counter()
+            content_equivalent = self._resident is not None and self._resident.projection_checksum == projection_checksum
             resident = ResidentGraph(artifact_dir, manifest)
             self._resident = resident
             load_ms = (time.perf_counter() - started) * 1000
@@ -611,8 +677,10 @@ class GraphRuntimeManager:
             return {
                 "schema": "atlas.graph-projection-load-receipt.v1",
                 "reused": False,
+                "contentEquivalent": content_equivalent,
                 "graphRevision": resident.graph_revision,
                 "projectionRevision": resident.projection_revision,
+                "projectionChecksum": resident.projection_checksum,
                 "artifactChecksum": resident.artifact_checksum,
                 "graphOrdinalMapChecksum": resident.graph_ordinal_map_checksum,
                 "workspaceRevision": resident.workspace_revision,
@@ -636,8 +704,7 @@ class GraphRuntimeManager:
 
     def pagerank(self, req: PageRankRequest) -> dict[str, Any]:
         with self._lock:
-            if self._resident is None:
-                _fail("GRAPH_NOT_RESIDENT", "load a revision-qualified graph projection first", 409)
+            self._assert_request_identity(req)
             try:
                 return self._resident.pagerank(req)
             except KeyError as exc:
@@ -654,8 +721,7 @@ class GraphRuntimeManager:
 
     def connected_components(self, req: ComponentsRequest) -> dict[str, Any]:
         with self._lock:
-            if self._resident is None:
-                _fail("GRAPH_NOT_RESIDENT", "load a revision-qualified graph projection first", 409)
+            self._assert_request_identity(req)
             try:
                 return self._resident.connected_components(req)
             except LookupError as exc:
@@ -668,8 +734,7 @@ class GraphRuntimeManager:
 
     def bfs(self, req: BFSRequest) -> dict[str, Any]:
         with self._lock:
-            if self._resident is None:
-                _fail("GRAPH_NOT_RESIDENT", "load a revision-qualified graph projection first", 409)
+            self._assert_request_identity(req)
             try:
                 return self._resident.bfs(req)
             except KeyError as exc:

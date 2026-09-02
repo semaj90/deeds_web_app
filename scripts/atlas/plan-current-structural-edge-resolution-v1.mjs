@@ -75,6 +75,30 @@ function importedNodeBuiltinReference(edge, sourceText) {
   return null;
 }
 
+// The compiler definition request is useful for declarations and imported symbols, but it is
+// not a reliable definition oracle for every JavaScript call expression. Runtime members such as
+// `pool.query`, `rows.map`, and `console.log` often have no source location in the current project
+// even though the call is syntactically explicit. Keep these observations out of the missing-file
+// bucket without pretending that they resolved to a repository declaration.
+function classifyUnresolvedCallTarget(edge) {
+  if (edge.type !== 'CALLS') return null;
+  const target = String(edge.toEvidenceKey ?? '').trim();
+  if (!target) return null;
+
+  const globalBuiltin = /^(?:console|performance|JSON|Math|Reflect|Promise|Map|Set|WeakMap|WeakSet|Error|TypeError|RangeError|SyntaxError|URL|URLSearchParams)\.[A-Za-z_$][\w$]*$/.exec(target);
+  if (globalBuiltin) {
+    return { status: 'NODE_BUILTIN', builtin: `global:${target.split('.')[0]}`, resolutionEvidence: 'GLOBAL_STANDARD_BUILTIN' };
+  }
+  const constructedBuiltin = /^new\s+(?:Error|TypeError|RangeError|SyntaxError|Map|Set|WeakMap|WeakSet|URL|URLSearchParams)$/.exec(target);
+  if (constructedBuiltin) {
+    return { status: 'NODE_BUILTIN', builtin: `global:${target.slice(4)}`, resolutionEvidence: 'GLOBAL_STANDARD_BUILTIN' };
+  }
+  if (/^[A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)+$/.test(target)) {
+    return { status: 'MEMBER_CALL_UNRESOLVED', targetKind: 'MEMBER_EXPRESSION', resolutionEvidence: 'EXPLICIT_MEMBER_EXPRESSION_NO_DEFINITION' };
+  }
+  return null;
+}
+
 async function main() {
   const artifact = JSON.parse(fs.readFileSync(inputPath, 'utf8'));
   const unresolvedEdges = Array.isArray(artifact.unresolvedEdges) ? artifact.unresolvedEdges : [];
@@ -240,6 +264,11 @@ async function main() {
     const importedBuiltin = importedNodeBuiltinReference(edge, sourceText);
     if (importedBuiltin) {
       unresolvedTargetResults.push({ sourceRef: edge.sourceRef, edgeType: edge.type, language, fromEvidenceKey: edge.fromEvidenceKey, toEvidenceKey: edge.toEvidenceKey, status: 'NODE_BUILTIN', targetCount: 0, builtin: importedBuiltin, positionConfidence });
+      return;
+    }
+    const explicitCallClassification = classifyUnresolvedCallTarget(edge);
+    if (explicitCallClassification) {
+      unresolvedTargetResults.push({ sourceRef: edge.sourceRef, edgeType: edge.type, language, fromEvidenceKey: edge.fromEvidenceKey, toEvidenceKey: edge.toEvidenceKey, ...explicitCallClassification, targetCount: 0, positionConfidence });
       return;
     }
     const resolver = source.absolutePath.startsWith(frontendRoot) ? frontendResolver : rootResolver;

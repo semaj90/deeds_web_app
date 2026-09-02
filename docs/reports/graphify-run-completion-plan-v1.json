@@ -1,6 +1,6 @@
 {
   "schema": "atlas.graphify-run-completion-plan.v1",
-  "generatedAt": "2026-08-29T20:40:04.022Z",
+  "generatedAt": "2026-09-02T00:02:30.905Z",
   "mode": "READ_ONLY_COMPLETION_PLAN",
   "canonicalAuthority": false,
   "writes": {
@@ -70,7 +70,7 @@
     ],
     "nodeSetChecksum": "sha256:b14a4aadd896c517cc4fc019ad12e497cef658ecd075d75976ed1988d090a740",
     "edgeSetChecksum": "sha256:7adec17d5309a77ea6537c55e92063ad50a5ffb7a5a3bc8dd7843ec102a39a7c",
-    "reportChecksum": "sha256:7e628abfc52d6459765f478288753b92be8dd0c8d5669781ec435eba677a7426"
+    "reportChecksum": "sha256:d841a3f80bcbe6b48ce8828b9f34ecde00d1702e1c0032cbccd896b646f5e4e5"
   },
   "sourceSelection": {
     "status": "CURRENT_GRAPHIFY_BATCH_PLAN_READY",
@@ -113,5 +113,5 @@
     "reason": "Completion receipt cannot be admitted until all blockers are cleared."
   },
   "status": "COMPLETION_PLAN_BLOCKED",
-  "planChecksum": "sha256:eab22f2b69ab2e90d84199a69f399579eb6e0fc7c4980e8220303c14f8ea709b"
+  "planChecksum": "sha256:a1304eb7f35f8148c06567db91c9a9a99ba11170bcb96daa3a12add494d111cc"
 }

@@ -3,12 +3,12 @@
 > Generated projection from `docs/reports/document-governance-registry-v1.json`.
 > This file is navigation, not canonical architecture or supersession authority.
 
-Registry checksum: `abdceff3e3d71de40006d2c30fd98a3d2725c41a3b9f9b7f20a0fa76492c74a0`
+Registry checksum: `4136a59c933a8ad03bfe014877f0b5990f3cc38ec7773148a6ae502355fd4011`
 
 ## Project instructions
 
 - [AGENTS.md](AGENTS.md) — CANONICAL_CURRENT — `c41250dfa671`
-- [CLAUDE.md](CLAUDE.md) — CANONICAL_CURRENT — `0c071ff74bd6`
+- [CLAUDE.md](CLAUDE.md) — CANONICAL_CURRENT — `fcc36b01091b`
 - [llama-cpp-turboquant-gemma4/AGENTS.md](llama-cpp-turboquant-gemma4/AGENTS.md) — CANONICAL_CURRENT — `4e9830e84d20`
 - [mcp-server-mcp/documentation/docs/20-instructions/.generated/agents.md](mcp-server-mcp/documentation/docs/20-instructions/.generated/agents.md) — CANONICAL_CURRENT — `d2a3fb0c935c`
 - [mcp-server-mcp/tools/instructions/AGENTS.md](mcp-server-mcp/tools/instructions/AGENTS.md) — CANONICAL_CURRENT — `d2a3fb0c935c`
@@ -31,7 +31,7 @@ Registry checksum: `abdceff3e3d71de40006d2c30fd98a3d2725c41a3b9f9b7f20a0fa76492c
 - [docker-compose-duplication-remediation](openspec/changes/docker-compose-duplication-remediation) — 9/9 tasks (100%)
 - [feature-label-semantic-derivation](openspec/changes/feature-label-semantic-derivation) — 2/3 tasks (67%)
 - [inference-wiring-deep-audit-aug22](openspec/changes/inference-wiring-deep-audit-aug22) — 48/49 tasks (98%)
-- [manual-migration-reconciliation](openspec/changes/manual-migration-reconciliation) — 25/56 tasks (45%)
+- [manual-migration-reconciliation](openspec/changes/manual-migration-reconciliation) — 30/61 tasks (49%)
 - [parent-atlas-ace-bitfrost-cache-correctness](openspec/changes/parent-atlas-ace-bitfrost-cache-correctness) — 2/9 tasks (22%)
 - [parent-atlas-ace-rlm-bitfrost-integration](openspec/changes/parent-atlas-ace-rlm-bitfrost-integration) — 65/67 tasks (97%)
 - [parent-atlas-adaptive-dag-fabric](openspec/changes/parent-atlas-adaptive-dag-fabric) — 5/10 tasks (50%)
@@ -61,18 +61,19 @@ Registry checksum: `abdceff3e3d71de40006d2c30fd98a3d2725c41a3b9f9b7f20a0fa76492c
 - [parent-atlas-live-graph-proof](openspec/changes/parent-atlas-live-graph-proof) — 0/0 tasks (n/a)
 - [parent-atlas-memory-architecture-freeze](openspec/changes/parent-atlas-memory-architecture-freeze) — 14/23 tasks (61%)
 - [parent-atlas-native-acceleration-cabi](openspec/changes/parent-atlas-native-acceleration-cabi) — 14/62 tasks (23%)
-- [parent-atlas-neural-prefill-encoder](openspec/changes/parent-atlas-neural-prefill-encoder) — 1167/1719 tasks (68%)
+- [parent-atlas-neural-prefill-encoder](openspec/changes/parent-atlas-neural-prefill-encoder) — 1184/1743 tasks (68%)
 - [parent-atlas-nlp-sidecar-feature-compiler](openspec/changes/parent-atlas-nlp-sidecar-feature-compiler) — 24/53 tasks (45%)
 - [parent-atlas-observation-routing-fabric](openspec/changes/parent-atlas-observation-routing-fabric) — 16/26 tasks (62%)
 - [parent-atlas-okf-knowledge-layers](openspec/changes/parent-atlas-okf-knowledge-layers) — 20/36 tasks (56%)
 - [parent-atlas-onnx-webgpu-embedding-promotion](openspec/changes/parent-atlas-onnx-webgpu-embedding-promotion) — 0/17 tasks (0%)
-- [parent-atlas-ontology-kernel](openspec/changes/parent-atlas-ontology-kernel) — 29/34 tasks (85%)
+- [parent-atlas-ontology-kernel](openspec/changes/parent-atlas-ontology-kernel) — 47/56 tasks (84%)
 - [parent-atlas-opencode-replay-proof](openspec/changes/parent-atlas-opencode-replay-proof) — 2/19 tasks (11%)
 - [parent-atlas-pass-fabric](openspec/changes/parent-atlas-pass-fabric) — 6/43 tasks (14%)
 - [parent-atlas-policy-routing-integration](openspec/changes/parent-atlas-policy-routing-integration) — 25/40 tasks (63%)
 - [parent-atlas-query-routing-classifier](openspec/changes/parent-atlas-query-routing-classifier) — 41/98 tasks (42%)
 - [parent-atlas-repair-candidate-feature-matrix](openspec/changes/parent-atlas-repair-candidate-feature-matrix) — 34/41 tasks (83%)
 - [parent-atlas-retrieval-fusion-reachability](openspec/changes/parent-atlas-retrieval-fusion-reachability) — 35/49 tasks (71%)
+- [parent-atlas-retrieval-lineage-dag-convergence](openspec/changes/parent-atlas-retrieval-lineage-dag-convergence) — 27/44 tasks (61%)
 - [parent-atlas-retrieval-lod-algorithm-taxonomy](openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy) — 44/95 tasks (46%)
 - [parent-atlas-semantic-512-canonicalization](openspec/changes/parent-atlas-semantic-512-canonicalization) — 23/31 tasks (74%)
 - [parent-atlas-semantic-768-canonical-contract](openspec/changes/parent-atlas-semantic-768-canonical-contract) — 0/0 tasks (n/a)

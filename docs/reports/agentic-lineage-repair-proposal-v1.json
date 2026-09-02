@@ -1,0 +1,77 @@
+{
+  "schema": "atlas.agentic-error-fixing.v1",
+  "inputChecksum": "sha256:c9a1d5115c60b4669becec2f83973a9c3749c1ef68a099c9d6426793b3db410d",
+  "candidates": [
+    {
+      "fingerprint": "sha256:24bbcee55f3f126c",
+      "errorCode": null,
+      "kind": "LINEAGE_ADMISSION",
+      "file": null,
+      "owner": "Packet/source lineage authority",
+      "proposedAction": "Trace the authoritative workspace namespace and source revision; keep promotion blocked until both are proven.",
+      "status": "PROPOSED",
+      "mutationAllowed": false
+    },
+    {
+      "fingerprint": "sha256:407e2c2b80c79abb",
+      "errorCode": null,
+      "kind": "UNKNOWN",
+      "file": null,
+      "owner": "Operator review",
+      "proposedAction": "Collect a focused diagnostic and identify the owning boundary before proposing a patch.",
+      "status": "PROPOSED",
+      "mutationAllowed": false
+    },
+    {
+      "fingerprint": "sha256:59f174604859b867",
+      "errorCode": null,
+      "kind": "UNKNOWN",
+      "file": null,
+      "owner": "Operator review",
+      "proposedAction": "Collect a focused diagnostic and identify the owning boundary before proposing a patch.",
+      "status": "PROPOSED",
+      "mutationAllowed": false
+    },
+    {
+      "fingerprint": "sha256:6e99ce6dcecbcd11",
+      "errorCode": null,
+      "kind": "DATABASE_SCHEMA",
+      "file": null,
+      "owner": "Postgres/Drizzle read-side owner",
+      "proposedAction": "Read the live schema and migration ledger; do not apply a migration from this plan.",
+      "status": "PROPOSED",
+      "mutationAllowed": false
+    },
+    {
+      "fingerprint": "sha256:7e7cfd28ca4b8f95",
+      "errorCode": null,
+      "kind": "LINEAGE_ADMISSION",
+      "file": null,
+      "owner": "Packet/source lineage authority",
+      "proposedAction": "Trace the authoritative workspace namespace and source revision; keep promotion blocked until both are proven.",
+      "status": "PROPOSED",
+      "mutationAllowed": false
+    },
+    {
+      "fingerprint": "sha256:893859b0c54026ea",
+      "errorCode": null,
+      "kind": "UNKNOWN",
+      "file": null,
+      "owner": "Operator review",
+      "proposedAction": "Collect a focused diagnostic and identify the owning boundary before proposing a patch.",
+      "status": "PROPOSED",
+      "mutationAllowed": false
+    }
+  ],
+  "validation": null,
+  "generatedAt": "2026-09-01T23:55:33.529Z",
+  "status": "PLAN_READY",
+  "mode": "READ_ONLY_PROPOSAL",
+  "mutationAllowed": false,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "validationDetails": null,
+  "deterministicPlanChecksum": "sha256:24e1abf2279a548ab402fae6c52354bffa665035f3a6420df17f6443b7604b8f",
+  "candidateCount": 6,
+  "nextGate": "OPERATOR_REVIEW_THEN_SCOPED_VALIDATION"
+}

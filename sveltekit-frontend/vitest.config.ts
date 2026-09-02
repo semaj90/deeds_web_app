@@ -1,10 +1,28 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import { svelteTesting } from '@testing-library/svelte/vite';
 import { defineConfig } from 'vitest/config';
+import fs from 'fs';
 import path from 'path';
 
+function sourceJsSpecifierFallback() {
+  return {
+    name: 'source-js-specifier-fallback',
+    resolveId(source: string, importer?: string) {
+      if (!source.endsWith('.js')) return null;
+      const candidate = source.startsWith('$lib/')
+        ? path.resolve(__dirname, 'src/lib', source.slice('$lib/'.length))
+        : importer && source.startsWith('.')
+          ? path.resolve(path.dirname(importer), source)
+          : null;
+      if (!candidate) return null;
+      const tsCandidate = candidate.slice(0, -3) + '.ts';
+      return fs.existsSync(tsCandidate) ? tsCandidate : null;
+    },
+  };
+}
+
 export default defineConfig({
-  plugins: [sveltekit(), svelteTesting()],
+  plugins: [sourceJsSpecifierFallback(), sveltekit(), svelteTesting()],
   resolve: {
     // Ensure Svelte components render in client mode for tests
     conditions: ['browser'],

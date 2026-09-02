@@ -2,6 +2,12 @@ import { getValkeyClient } from './valkey-client.js';
 import { ENV } from '../env.server.js';
 import crypto from 'crypto';
 import type { VarianceRecovery } from '../ace/variance-recovery-schema.js';
+import {
+  AceBitfrostCacheIdentityV1Schema,
+  aceBitfrostCacheIdentityChecksumV1,
+  buildAceBitfrostCacheKeyV1,
+  type AceBitfrostCacheIdentityV1,
+} from '../atlas/cache/ace-bitfrost-cache-identity-v1.js';
 
 const redis = getValkeyClient();
 
@@ -102,6 +108,67 @@ export async function redisSetSemanticProvenanceTuple(
   } catch (err) {
     console.warn(`[Redis ACE] Error writing ${semanticTupleCacheKey(cacheKey)}:`, err);
   }
+}
+
+export function buildRevisionedAcePacketCacheKeyV1(
+  input: Omit<AceBitfrostCacheIdentityV1, 'cacheKind'>,
+): string {
+  return buildAceBitfrostCacheKeyV1(
+    AceBitfrostCacheIdentityV1Schema.parse({
+      cacheKind: 'ACE_PACKET',
+      ...input,
+    }),
+  );
+}
+
+export async function redisGetRevisionedAcePacketV1(
+  identity: AceBitfrostCacheIdentityV1,
+): Promise<AcePacket | null> {
+  const cacheKey = buildAceBitfrostCacheKeyV1(identity);
+  if (!redis) return null;
+  try {
+    const data = await redis.get(cacheKey);
+    if (!data) return null;
+    const parsed = JSON.parse(data) as {
+      identity?: AceBitfrostCacheIdentityV1;
+      identityChecksum?: string;
+      packet?: AcePacket;
+    };
+    const storedIdentity = parsed.identity
+      ? AceBitfrostCacheIdentityV1Schema.safeParse(parsed.identity)
+      : null;
+    if (
+      !parsed.identity ||
+      !storedIdentity?.success ||
+      parsed.identityChecksum !== aceBitfrostCacheIdentityChecksumV1(identity) ||
+      parsed.identityChecksum !== aceBitfrostCacheIdentityChecksumV1(storedIdentity.data) ||
+      !parsed.packet
+    ) {
+      return null;
+    }
+    return parsed.packet;
+  } catch {
+    return null;
+  }
+}
+
+export async function redisSetRevisionedAcePacketV1(
+  identity: AceBitfrostCacheIdentityV1,
+  packet: AcePacket,
+  ttlSeconds = 3600,
+): Promise<void> {
+  if (!redis) return;
+  const cacheKey = buildAceBitfrostCacheKeyV1(identity);
+  await redis.set(
+    cacheKey,
+    JSON.stringify({
+      identity,
+      identityChecksum: aceBitfrostCacheIdentityChecksumV1(identity),
+      packet: deepFreezePacket(packet),
+    }),
+    'EX',
+    ttlSeconds,
+  );
 }
 
 export function hashQuery(query: string): string {

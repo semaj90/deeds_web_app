@@ -1,0 +1,108 @@
+{
+  "schema": "atlas.domain-classifier-lineage.v1",
+  "generatedAt": "2026-09-01T22:42:04.493Z",
+  "readOnly": true,
+  "postgresWrites": false,
+  "tupleWrites": false,
+  "classifierApplyInvoked": false,
+  "status": "CLASSIFIER_LINEAGE_BLOCKED",
+  "owner": {
+    "sourceRevision": "graphify_files.code_source_revision",
+    "workspaceRevision": "graphify_files.workspace_revision",
+    "sourceNamespace": "NO_DECLARED_GRAPHIFY_SOURCE_NAMESPACE",
+    "namespaceCandidate": "graphify_files.workspace_id (candidate only; semantic namespace proof required)"
+  },
+  "summary": {
+    "classifier_rows": 3294,
+    "source_ref_present": 3293,
+    "source_revision_available": 78,
+    "workspace_revision_available": 3294,
+    "source_namespace_available": 0,
+    "workspace_id_namespace_candidate": 78,
+    "revision_qualified_join": 78,
+    "missing_graphify_join": 3216
+  },
+  "sample": [
+    {
+      "packet_key": "ace:packet:001be68ca4b0",
+      "source_ref": "src/routes/api/admin/inference-stats/+server.ts",
+      "source_revision": null,
+      "workspace_revision": null,
+      "source_namespace": null,
+      "workspace_id": null
+    },
+    {
+      "packet_key": "ace:packet:0050126ac87d",
+      "source_ref": "src/lib/components/ui/MicroInteraction.svelte",
+      "source_revision": null,
+      "workspace_revision": null,
+      "source_namespace": null,
+      "workspace_id": null
+    },
+    {
+      "packet_key": "ace:packet:0051e908c9be",
+      "source_ref": "docs/architecture/phase8-query-optimization-taxonomy.md",
+      "source_revision": "sha256:3ca5d3c6d57114328d4347f8a4141bb5231bab3ccef86da45bd73f461a127b9c",
+      "workspace_revision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "source_namespace": null,
+      "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80"
+    },
+    {
+      "packet_key": "ace:packet:006566131ba9",
+      "source_ref": "src/lib/server/nlp/analyzer.ts",
+      "source_revision": null,
+      "workspace_revision": null,
+      "source_namespace": null,
+      "workspace_id": null
+    },
+    {
+      "packet_key": "ace:packet:00735225f796",
+      "source_ref": "src/routes/(app)/admin/memory-inspector/+page.server.ts",
+      "source_revision": null,
+      "workspace_revision": null,
+      "source_namespace": null,
+      "workspace_id": null
+    },
+    {
+      "packet_key": "ace:packet:0079b248e86d",
+      "source_ref": "src/lib/components/ui/badge/index.ts",
+      "source_revision": null,
+      "workspace_revision": null,
+      "source_namespace": null,
+      "workspace_id": null
+    },
+    {
+      "packet_key": "ace:packet:007d98744901",
+      "source_ref": "src/lib/components/poi/AddPoiModal.svelte",
+      "source_revision": null,
+      "workspace_revision": null,
+      "source_namespace": null,
+      "workspace_id": null
+    },
+    {
+      "packet_key": "ace:packet:00907d16462d",
+      "source_ref": "src/lib/components/PhaseStatusPills.svelte",
+      "source_revision": null,
+      "workspace_revision": null,
+      "source_namespace": null,
+      "workspace_id": null
+    },
+    {
+      "packet_key": "ace:packet:0098519ac98d",
+      "source_ref": "src/routes/api/health/database/+server.ts",
+      "source_revision": null,
+      "workspace_revision": null,
+      "source_namespace": null,
+      "workspace_id": null
+    },
+    {
+      "packet_key": "ace:packet:00b551ec7011",
+      "source_ref": "src/lib/server/indexer/som-summary.ts",
+      "source_revision": null,
+      "workspace_revision": null,
+      "source_namespace": null,
+      "workspace_id": null
+    }
+  ],
+  "nextGate": "RESOLVE_SOURCE_NAMESPACE_AND_REVISION_COVERAGE_BEFORE_LIVE_TUPLE_WIRING"
+}

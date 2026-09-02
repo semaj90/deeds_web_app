@@ -2,6 +2,11 @@ import Redis from 'ioredis';
 import type { RedisOptions } from 'ioredis';
 import { getValkeyClient } from '$lib/server/cache/valkey-client.js';
 import { assertSemantic768 } from '$lib/server/embedding/embedding-contract-768.js';
+import {
+  aceBitfrostCacheIdentityChecksumV1,
+  buildAceBitfrostCacheKeyV1,
+  type AceBitfrostCacheIdentityV1,
+} from '$lib/server/atlas/cache/ace-bitfrost-cache-identity-v1.js';
 
 /**
  * Aggressive Bitfrost Redis cache with L1/L2/L3/L4 tiers.
@@ -206,6 +211,52 @@ export class AggressiveRedisCache {
     if (!cached) return null;
 
     return new Float32Array(cached.buffer, cached.byteOffset, cached.length / 4);
+  }
+
+  async setRevisionedCentroid(
+    identity: AceBitfrostCacheIdentityV1,
+    centroid: Float32Array,
+    ttlSeconds = 86400,
+  ): Promise<void> {
+    assertSemantic768(centroid);
+    const key = buildAceBitfrostCacheKeyV1(identity);
+    const value = JSON.stringify({
+      identity,
+      identityChecksum: aceBitfrostCacheIdentityChecksumV1(identity),
+      centroid: Array.from(centroid),
+      dimension: centroid.length,
+      canonicalAuthority: false,
+    });
+    await this.client.set(key, value, 'EX', ttlSeconds);
+  }
+
+  async getRevisionedCentroid(
+    identity: AceBitfrostCacheIdentityV1,
+  ): Promise<{ centroid: Float32Array; identityChecksum: string } | null> {
+    const key = buildAceBitfrostCacheKeyV1(identity);
+    const cached = await this.client.get(key);
+    if (!cached) return null;
+
+    try {
+      const parsed = JSON.parse(cached) as {
+        identity?: AceBitfrostCacheIdentityV1;
+        identityChecksum?: string;
+        centroid?: number[];
+      };
+      if (
+        !parsed.identity ||
+        parsed.identityChecksum !== aceBitfrostCacheIdentityChecksumV1(identity) ||
+        parsed.identityChecksum !== aceBitfrostCacheIdentityChecksumV1(parsed.identity) ||
+        !Array.isArray(parsed.centroid)
+      ) {
+        return null;
+      }
+      const vector = new Float32Array(parsed.centroid);
+      assertSemantic768(vector);
+      return { centroid: vector, identityChecksum: parsed.identityChecksum };
+    } catch {
+      return null;
+    }
   }
 
   async setL3ClusterMembers(

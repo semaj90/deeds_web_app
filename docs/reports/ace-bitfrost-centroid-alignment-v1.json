@@ -1,0 +1,274 @@
+{
+  "schema": "atlas.ace-bitfrost-centroid-alignment.v1",
+  "status": "AUDIT_COMPLETE_GAPS_REMAIN",
+  "generatedAt": "2026-09-01",
+  "scope": [
+    "ACE packet/context assembly",
+    "BitFrost Redis/Valkey residency",
+    "centroid and representation alignment"
+  ],
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "liveValidation": {
+    "command": "node scripts/atlas/audit-bitfrost-semantic-cache.mjs",
+    "status": "PASS",
+    "container": "legal-ai-valkey",
+    "familyCount": 28,
+    "driftFlagCount": 0,
+    "result": "Valkey connectivity, key-family census, and sampled TTL checks passed."
+  },
+  "operationalReplay": {
+    "command": "npm exec -- tsx scripts/atlas/prove-bitfrost-centroid-replay-v1.mts",
+    "status": "BITFROST_CENTROID_REPLAY_PROVEN",
+    "missBeforeWrite": true,
+    "hitAfterWrite": true,
+    "staleRevisionMiss": true,
+    "dimension": 768,
+    "cacheWritePerformed": true,
+    "canonicalWritesPerformed": false,
+    "canonicalAuthority": false,
+    "cleanup": "Temporary key deleted after readback."
+  },
+  "aceContextReplay": {
+    "command": "npm exec -- tsx scripts/atlas/prove-ace-context-cache-replay-v1.mts",
+    "status": "ACE_CONTEXT_CACHE_REPLAY_PROVEN",
+    "missBeforeWrite": true,
+    "hitAfterWrite": true,
+    "staleChecksumMiss": true,
+    "manifestEnvelopeChecksumVerified": true,
+    "cacheWritePerformed": true,
+    "canonicalWritesPerformed": false,
+    "metricsPersistenceDuringProof": false,
+    "cleanup": "Temporary key deleted after readback."
+  },
+  "acePacketReplay": {
+    "command": "npm exec -- tsx scripts/atlas/prove-ace-packet-cache-replay-v1.mts",
+    "status": "ACE_PACKET_CACHE_REPLAY_PROVEN",
+    "missBeforeWrite": true,
+    "hitAfterWrite": true,
+    "staleLineageMiss": true,
+    "identityEnvelopeSchemaVerified": true,
+    "cacheWritePerformed": true,
+    "canonicalWritesPerformed": false,
+    "canonicalAuthority": false,
+    "cleanup": "Temporary key deleted after readback."
+  },
+  "liveAssemblerWiring": {
+    "status": "WIRED_OPT_IN_FAIL_CLOSED",
+    "owner": "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
+    "contract": "ContextManifestV2",
+    "behavior": "The assembler admits revisioned ACE context caching only when the caller supplies a validated ContextManifestV2; no lineage fields are inferred from query hashes, timestamps, or legacy packet metadata.",
+    "legacyCompatibility": "Existing unqualified context-pointer and packet-cache paths remain unchanged.",
+    "canonicalWritesPerformed": false,
+    "canonicalAuthority": false
+  },
+  "liveCallerAudit": {
+    "status": "NO_REVISIONED_CALLER_ADMITTED",
+    "command": "rg -n --no-heading \"assembleACEContext\\(|revisionedContextCache|buildContextManifestV2\\(|ContextManifestV2\" sveltekit-frontend/src/lib/server/ai sveltekit-frontend/src/lib/server/agent sveltekit-frontend/src/routes/api --glob '*.ts'",
+    "result": "Existing ACE callers do not currently supply ContextManifestV2 to the assembler.",
+    "upstreamSeam": {
+      "status": "ORDINAL_ADMISSION_EXISTS_SNAPSHOT_PRODUCER_MISSING",
+      "owner": "sveltekit-frontend/src/lib/server/atlas/graph/fanout-admission-v1.ts",
+      "capability": "Can produce a validated CandidateOrdinalMapV1 for an admitted fanout node, but does not produce CandidateFeatureSnapshotV1 or invoke ACE admission.",
+      "prohibitedPromotion": "Do not treat a CandidateOrdinalMapV1 or client-provided revisions as a complete ACE snapshot."
+    },
+    "featureRowNearMatch": {
+      "status": "ADAPTER_CREATED_TEST_PROVEN_NOT_LIVE_WIRED",
+      "owner": "sveltekit-frontend/src/lib/server/atlas/contracts/retrieval-router-feature-row-v1.ts",
+      "capability": "Contains retrieval, semantic, graph, ontology, and evidence features, but uses a separate row contract and permits nullable numeric workspaceRevision; it is not currently a CandidateFeatureSnapshotV1 producer.",
+      "adapter": "sveltekit-frontend/src/lib/server/atlas/features/retrieval-router-to-candidate-feature-snapshot-v1.ts",
+      "requiredBeforeUse": "A production caller must supply the validated ordinal map, router rows, and explicit lane masks; the adapter then validates identity/revisions before producing CandidateFeatureSnapshotV1.",
+      "tests": "sveltekit-frontend/src/lib/server/atlas/features/retrieval-router-to-candidate-feature-snapshot-v1.spec.ts",
+      "qasBridge": "Revision-qualified QueryAdaptiveFeatureRowV1 conversion is now included in the adapter and test-proven; it remains caller-invoked only."
+    },
+    "queryAdaptiveFeatureOwner": {
+      "status": "EXISTING_PRODUCER_INJECTED_NOT_LIVE_ACE",
+      "owner": "sveltekit-frontend/src/lib/server/atlas/retrieval/query-adaptive-feature-compiler.ts",
+      "capability": "Can build revision-qualified query-time feature rows when supplied candidates, projections, and an injected feature resolver.",
+      "blocker": "No production ACE caller supplies the required resolver output plus CandidateOrdinalMapV1 to the new snapshot adapter.",
+      "internalComposition": {
+        "status": "COMPOSED_TEST_PROVEN_NOT_LIVE_CALLED",
+        "owner": "sveltekit-frontend/src/lib/server/atlas/retrieval/search-runtime-adapter.ts",
+        "path": "SearchRuntime QAS projection -> CandidateFeatureSnapshotV1 -> ACE ContextManifestV2 admission",
+        "tests": "sveltekit-frontend/src/lib/server/atlas/retrieval/search-runtime-adapter-qas.spec.ts"
+      },
+      "productionCallerCandidates": {
+        "status": "CALLERS_EXIST_QAS_NOT_ADOPTED",
+        "callers": [
+          "sveltekit-frontend/src/lib/server/retrieval/semantic-search-workflow.ts",
+          "sveltekit-frontend/src/lib/server/atlas/atlas-semantic-tools.ts"
+        ],
+        "reason": "Both call ordinary SearchRuntime search() and do not provide feature sources, CandidateOrdinalMapV1, or explicit lane masks."
+      }
+    },
+    "policy": "Do not synthesize missing candidateSnapshotRevision, ordinalMapChecksum, graphRevision, featureRevision, producerRevision, or artifactChecksum.",
+    "nextGate": "ACE-CONTEXT-LIVE-ADMISSION-01"
+  },
+  "retrievalRouterWiring": {
+    "status": "WIRED_OPTIONAL",
+    "owner": "sveltekit-frontend/src/lib/server/ace/query-router.ts",
+    "behavior": "When the caller supplies the complete retrieval identity tuple, QueryRouter uses the revision-qualified BitFrost key; otherwise it preserves the legacy query key.",
+    "fieldsForwardedByAssembler": [
+      "workspaceRevision",
+      "candidateSnapshotRevision",
+      "ordinalMapChecksum",
+      "representationRevision",
+      "retrievalPolicyRevision",
+      "contextPolicyRevision",
+      "graphRevision"
+    ],
+    "canonicalWritesPerformed": false,
+    "canonicalAuthority": false
+  },
+  "manifestAdmissionAdapter": {
+    "status": "CREATED_TEST_PROVEN_NOT_LIVE_ADOPTED",
+    "owner": "sveltekit-frontend/src/lib/server/atlas/context/ace-context-manifest-admission-v1.ts",
+    "behavior": "Builds the existing ContextManifestV2 from an already validated candidate-feature snapshot and explicit policy/graph inputs; rejects ordinals outside the snapshot and performs no retrieval or writes.",
+    "tests": "2 focused tests passed",
+    "nextGate": "ACE-CONTEXT-LIVE-ADMISSION-01"
+  },
+  "featureSnapshotProducerGate": {
+    "status": "PRODUCER_CREATED_TEST_PROVEN_LIVE_CALLER_BLOCKED",
+    "nextGate": "ACE-FEATURE-SNAPSHOT-PRODUCER-01",
+    "requiredFlow": "server-owned SearchRuntime -> existing CandidateOrdinalMapV1 -> query-adaptive feature compiler -> CandidateFeatureSnapshotV1 -> ACE admission",
+    "existingComposition": "IMPLEMENTED_TEST_PROVEN_NOT_LIVE_ADOPTED",
+    "owner": "sveltekit-frontend/src/lib/server/atlas/context/ace-feature-snapshot-producer-v1.ts",
+    "tests": "sveltekit-frontend/src/lib/server/atlas/features/retrieval-router-to-candidate-feature-snapshot-v1.spec.ts",
+    "blockers": [
+      "No production caller supplies CandidateOrdinalMapV1 and complete feature-resolver output.",
+      "Generic Atlas runtime context derives omitted workspaceRevision and packetRevision from wall-clock timestamps.",
+      "Timestamp-derived revisions are not admissible ACE lineage and must not be replaced with placeholders."
+    ],
+    "requiredAdmission": [
+      "candidateSnapshotRevision",
+      "ordinalMapChecksum",
+      "workspaceRevision",
+      "sourceRevision",
+      "featureRevision",
+      "graphRevision",
+      "producerRevision"
+    ],
+    "canonicalWritesPerformed": false,
+    "canonicalAuthority": false
+  },
+  "rlmCallerAudit": {
+    "status": "BEST_ADOPTION_TARGET_MISSING_FEATURE_BUNDLE",
+    "owner": "sveltekit-frontend/src/lib/server/atlas/rlm/rlm-search-adapter.ts",
+    "strengths": [
+      "Carries explicit workspaceRevision, candidateSnapshotRevision, and ordinalMapChecksum.",
+      "Uses the existing SearchRuntime boundary and revisioned retrieval cache key."
+    ],
+    "missing": [
+      "CandidateFeatureSnapshotV1 input rows.",
+      "Server-owned feature resolver output and lane masks.",
+      "Explicit graphRevision and featureRevision bundle for ACE admission."
+    ],
+    "decision": "Do not enable ACE caller until RLM supplies the complete producer input bundle.",
+    "canonicalWritesPerformed": false,
+    "canonicalAuthority": false
+  },
+  "rlmAceHandoff": {
+    "status": "SERVER_INJECTION_READY_FAIL_CLOSED_TEST_PROVEN",
+    "owner": "sveltekit-frontend/src/lib/server/atlas/rlm/rlm-ace-feature-admission-v1.ts",
+    "runtimeOption": "sveltekit-frontend/src/lib/server/atlas/rlm/rlm-runtime.ts:aceFeatureBundleProvider",
+    "behavior": "An injected server provider may supply the complete producer bundle; absent provider data returns typed UNAVAILABLE before snapshot construction.",
+    "tests": "sveltekit-frontend/src/lib/server/atlas/rlm/rlm-runtime.spec.ts",
+    "testCount": 1,
+    "liveCaller": false,
+    "cacheWritesPerformed": false,
+    "canonicalWritesPerformed": false,
+    "canonicalAuthority": false
+  },
+  "findings": [
+    {
+      "id": "ACE-PACKET-01",
+      "area": "ACE packet",
+      "status": "WIRED_PARTIAL",
+      "evidence": [
+        "packages/parent-atlas/src/core/ace-packet-v2.ts",
+        "sveltekit-frontend/src/lib/server/cache/ace-packet-cache.ts"
+      ],
+      "gap": "The cache packet is query-hash keyed and has sourceRefs, but the cache schema does not require a complete ContextManifest identity tuple such as candidateSnapshotRevision, graphRevision, representationRevision, inputPolicyRevision, and packetChecksum before reuse.",
+      "nextGate": "ACE-PACKET-IDENTITY-01"
+    },
+    {
+      "id": "ACE-CONTEXT-01",
+      "area": "ACE context injection",
+      "status": "WIRED_PARTIAL_REPLAY_PROVEN",
+      "evidence": [
+        "sveltekit-frontend/src/lib/server/cache/ace-context-pack-cache.ts",
+        "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
+        "scripts/atlas/prove-ace-context-cache-replay-v1.mts"
+      ],
+      "gap": "The revisioned cache write is now wired behind an explicit ContextManifestV2 admission input and its disposable replay passes. Existing production callers do not yet supply that V2 input, so live assembler adoption remains open.",
+      "nextGate": "ACE-CONTEXT-LIVE-ADMISSION-01"
+    },
+    {
+      "id": "BITFROST-01",
+      "area": "BitFrost/Valkey",
+      "status": "PROVEN_INFRASTRUCTURE_ONLY",
+      "evidence": [
+        "docs/reports/bitfrost-semantic-cache-audit.json",
+        "sveltekit-frontend/src/lib/server/cache/valkey-client.ts"
+      ],
+      "gap": "Valkey is healthy and TTLs are present, but TTL is expiration policy, not revision validation. Cache reads need envelope identity checks and stale/mismatched entries must be treated as misses.",
+      "nextGate": "BITFROST-IDENTITY-01"
+    },
+    {
+      "id": "BITFROST-02",
+      "area": "BitFrost residency",
+      "status": "TEST_PROVEN_LIVE_WRITE_PATH_UNPROVEN",
+      "evidence": [
+        "docs/reports/bitfrost-residency-policy-v1.json",
+        "sveltekit-frontend/src/lib/server/atlas/tensors/bitfrost-valkey-contract.ts"
+      ],
+      "gap": "The residency policy and adapter behavior are test-proven, while live Valkey apply/readback remains explicitly unproven.",
+      "nextGate": "BITFROST-RESIDENCY-REPLAY-01"
+    },
+    {
+      "id": "CENTROID-01",
+      "area": "Centroid alignment",
+      "status": "CONTRACT_PARTIAL_LIVE_FAMILY_EMPTY",
+      "evidence": [
+        "sveltekit-frontend/src/lib/server/atlas/tensors/bitfrost-valkey-contract.ts",
+        "sveltekit-frontend/src/lib/server/cache/redis-cache-aggressive.ts",
+        "docs/reports/bitfrost-semantic-cache-audit.json"
+      ],
+      "gap": "Centroid keys are representation-revision keyed or only semantic_768 plus cluster/feature ID. They do not consistently bind candidateSnapshotRevision, ordinalMapChecksum, graphRevision, featureRevision, producerRevision, normalization policy, and artifactChecksum. The audited centroid:directory, centroid:feature, and centroid:packet families currently have zero live rows.",
+      "nextGate": "CENTROID-ALIGNMENT-01"
+    },
+    {
+      "id": "CENTROID-02",
+      "area": "Representation separation",
+      "status": "PARTIAL",
+      "evidence": [
+        "sveltekit-frontend/src/lib/server/cache/redis-cache-aggressive.ts",
+        "docs/reports/candidate-feature-gpu-residency-proof-v4.json"
+      ],
+      "gap": "The active cache path distinguishes semantic_768 from latent_64 in documented reports, but the centroid contract must explicitly reject MRL and learned latent vectors sharing a dimension without distinct representationId and representationRevision.",
+      "nextGate": "CENTROID-REPRESENTATION-01"
+    }
+  ],
+  "required_invariants": [
+    "ACE cache reuse requires packetChecksum and ContextManifest identity equality.",
+    "Cache keys include representationId, representationRevision, candidateSnapshotRevision, graphRevision, featureRevision, and artifactChecksum where applicable.",
+    "TTL never substitutes for revision/checksum admission.",
+    "Redis/Valkey remains a rebuildable cache; PostgreSQL remains canonical.",
+    "Centroid artifacts are derived and cannot create canonical identity or retrieval votes.",
+    "No hidden reasoning, KV cache, tensors, or unvalidated model state is cached.",
+    "Cache unavailable means read-through or miss, never stale success."
+  ],
+  "web_alignment": [
+    "https://redis.io/docs/latest/commands/expire/",
+    "https://redis.io/docs/latest/develop/data-types/streams/",
+    "https://redis.io/docs/latest/develop/ai/search-and-query/"
+  ],
+  "safeNextGate": "ACE-PACKET-IDENTITY-01 plus CENTROID-ALIGNMENT-01, using a disposable or explicitly approved test namespace only.",
+  "notProven": [
+    "Current ContextManifest production readback replay",
+    "Revision-mismatch cache rejection",
+    "Live BitFrost residency apply/readback",
+    "Centroid artifact checksum parity against a frozen CandidateOrdinal cohort",
+    "Centroid live-family population"
+  ]
+}

@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { bifrostRevisionedRetrievalKey } from '$lib/server/ace/cache-keys.js';
+import { bifrostRevisionedRetrievalKey } from '../../ace/cache-keys.js';
 import { createAtlasSearchAdapter, type AtlasSearchResponse } from '../retrieval/search-runtime-adapter.js';
 import type { RlmSearchRequest, RlmSearchResult } from './rlm-contract.js';
 

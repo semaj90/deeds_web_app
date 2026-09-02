@@ -1,0 +1,62 @@
+{
+  "schema": "atlas.ace-route-revision-authority.v1",
+  "route": "sveltekit-frontend/src/routes/api/ace/stream/+server.ts",
+  "status": "NO_ROUTE_LOCAL_AUTHORITY",
+  "reason": "The route uses query-only ACE cache identity and does not receive authoritative source, representation, or retrieval-policy revisions.",
+  "requiredFields": {
+    "sourceRevision": {
+      "presentInRouteSource": false,
+      "occurrenceCount": 0,
+      "producer": null,
+      "authoritative": false,
+      "requestBound": false,
+      "persisted": false
+    },
+    "representationRevision": {
+      "presentInRouteSource": false,
+      "occurrenceCount": 0,
+      "producer": null,
+      "authoritative": false,
+      "requestBound": false,
+      "persisted": false
+    },
+    "retrievalPolicyRevision": {
+      "presentInRouteSource": false,
+      "occurrenceCount": 0,
+      "producer": null,
+      "authoritative": false,
+      "requestBound": false,
+      "persisted": false
+    }
+  },
+  "strictV2": {
+    "importsOrReferences": {
+      "redisGetRevisionedAcePacketV1": 0,
+      "redisSetRevisionedAcePacketV1": 0,
+      "buildRevisionedAcePacketCacheKeyV1": 0,
+      "ContextManifestV2": 0,
+      "CandidateOrdinalMapV1": 0
+    },
+    "wired": false
+  },
+  "legacyCacheSurface": [
+    {
+      "needle": "redisGetAcePacket",
+      "occurrenceCount": 2
+    },
+    {
+      "needle": "redisSetAcePacket",
+      "occurrenceCount": 2
+    },
+    {
+      "needle": "hashQuery",
+      "occurrenceCount": 3
+    }
+  ],
+  "migrationAllowed": false,
+  "redisWritesPerformed": false,
+  "databaseWritesPerformed": false,
+  "qdrantWritesPerformed": false,
+  "canonicalAuthority": false,
+  "reportChecksum": "ee3ff856037e6957d6f94d3fb46fb051e02d7448a89ff25223521102fe8d98fe"
+}

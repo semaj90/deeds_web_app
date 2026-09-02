@@ -1,7 +1,7 @@
 {
   "schema": "atlas.ontology-linked-tuple-gpu-algorithm-parity-receipt.v1",
   "status": "ONTO_PY_GPU_02_PROVEN",
-  "projectionRevision": "projection:ontology-linked-tuple-cugraph-algorithm-fixture-v2",
+  "projectionRevision": "projection:ontology-linked-tuple-cugraph-algorithm-fixture-v3",
   "projectionChecksum": "b68087a95c276b022b1443cce9b3a29c25f1b0d2304a13854fd439d0b07f6dee",
   "tupleCount": 7,
   "relationNodeCount": 7,

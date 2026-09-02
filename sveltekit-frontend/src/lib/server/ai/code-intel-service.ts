@@ -300,6 +300,7 @@ export async function generateClaudePlan(params: { goal: string; scope: string }
 	// Canonical EmbeddingGemma semantic_768 retrieval lane.
 	const { points: hits } = await qdrant.query('codebase_chunks_768_v2', {
 		query: queryEmbedding,
+		using: 'content',
 		limit: 3,
 		with_payload: true
 	});

@@ -32,7 +32,7 @@ export interface ResolvedCandidateId {
 /**
  * Resolve a lane hit's canonical dedup identity. Thin adapter over the shared
  * `identity-resolution.ts::resolveCanonicalIdentity` primitive — same precedence
- * (symbol_version_id -> packet_key -> source_ref -> lane-local fallback), just mapped from
+ * (symbol_version_id -> packet_key -> content_hash -> source_ref -> lane-local fallback), just mapped from
  * `ContextHit`'s nested `metadata` shape into the primitive's flat input shape.
  *
  * Without this, combineViaRRF's `deduplicateBy: 'id'` collapses candidates on

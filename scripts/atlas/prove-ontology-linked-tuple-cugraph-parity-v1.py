@@ -93,7 +93,7 @@ def main() -> int:
     (FIXTURE / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
 
     load = post("/v1/graph/load", {"artifactDir": "/mnt/c/Users/james/Videos/deeds-web-app/sveltekit-frontend/docs/reports/ontology-linked-tuple-cugraph-fixture-v1", "expectedGraphRevision": GRAPH_REVISION, "expectedProjectionRevision": PROJECTION_REVISION, "replaceResident": True})
-    gpu = post("/v1/graph/pagerank", {"graphRevision": GRAPH_REVISION, "topK": len(nodes), "alpha": ALPHA, "tol": TOL, "maxIter": MAX_ITER})
+    gpu = post("/v1/graph/pagerank", {"graphRevision": GRAPH_REVISION, "projectionRevision": PROJECTION_REVISION, "projectionChecksum": projection.projectionChecksum, "topK": len(nodes), "alpha": ALPHA, "tol": TOL, "maxIter": MAX_ITER})
     by_key = {str(row["nodeKey"]): float(row.get("score", row.get("pagerank"))) for row in gpu.get("rows", gpu.get("results", []))}
     key_by_ordinal = {str(node["gpu_node_id"]): node["graph_node_key"] for node in nodes}
     gpu_scores = {key_by_ordinal[str(row["vertex"])] if "vertex" in row else str(row["nodeKey"]): float(row.get("score", row.get("pagerank"))) for row in gpu.get("rows", gpu.get("results", []))}

@@ -1,0 +1,35 @@
+{
+  "schema": "atlas.rf-identity-semantics-02.v1",
+  "status": "PROVEN_BOUNDED",
+  "scope": "retrieval identity vocabulary only",
+  "precedence": [
+    "symbol_version_id",
+    "packet_key",
+    "content_hash",
+    "source_ref",
+    "lane_id_fallback"
+  ],
+  "statusMapping": {
+    "symbol_version_id": "canonical",
+    "packet_key": "canonical",
+    "content_hash": "projection_exact",
+    "source_ref": "source_group",
+    "lane_id_fallback": "degraded"
+  },
+  "focusedTests": {
+    "files": 2,
+    "tests": 18,
+    "passed": 18
+  },
+  "writesPerformed": false,
+  "canonicalAuthorityChanged": false,
+  "qdrantWrites": false,
+  "databaseWrites": false,
+  "nextGate": "PKT-LINEAGE-08 production-path readiness/canary",
+  "notes": [
+    "Dedup precedence is unchanged.",
+    "content_hash remains usable as an exact projection dedup key but is no longer labeled canonical Atlas identity.",
+    "source_ref remains usable as a grouping key but is no longer labeled canonical Atlas identity.",
+    "ProjectionRegistryV1 and Qdrant ownership were not reopened."
+  ]
+}
