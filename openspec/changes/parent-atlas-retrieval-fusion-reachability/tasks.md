@@ -532,6 +532,45 @@ was refactored, no live replay was run. This is a classification-only artifact.
 
 **Next**: `RF6-LIVE-REPLAY-01` (not started — a live, revision-qualified replay after this classification, per this file's own frozen RF sequence). Per the corrected sequence, RF7 remains blocked until both RF5 and RF6 converge; RF6-OWNER-MATRIX-01 alone does not unblock it.
 
+## RF6-LIVE-REPLAY-01 (2026-09-02, read-only observation, done) — confirmed divergence found, no migration performed
+
+Per explicit instruction, ran before any `service.ts`/`rrf-fuse.ts` migration: observe actual
+behavioral divergence over the 6 named hard cases, comparing the two highest-risk owners against
+the canonical owner (`fuseSearchRuntimeCandidates`).
+
+**`service.ts::rrfFusion` could NOT be live-replayed** — it is an unexported, module-private
+function coupled to a live, stateful `getSearchLaneRegistry()` lookup. Testing it in isolation
+would require either exporting it (a production code change — explicitly out of scope, "no
+refactor") or fixture-mocking the registry/DB layer, a materially bigger lift than this
+observational step warrants. Its divergence risk remains evidenced only by `RF6-OWNER-MATRIX-01`'s
+static code reading, not a live replay. Recorded as an explicit limitation, not silently treated
+as covered.
+
+**`rrf-fuse.ts` was fully live-replayed** (self-contained, exported, no external dependencies) —
+6 new tests, `sveltekit-frontend/src/lib/server/retrieval/__tests__/rf6-live-replay-01.test.ts`,
+all passing (i.e., the assertions correctly describe *actual observed* behavior, not an ideal):
+
+| Case | Canonical owner | `rrf-fuse.ts` | Divergence |
+|---|---|---|---|
+| 1. multiple physical IDs, same entity | collapses to 1 vote | collapses to 1 vote | none |
+| 2. duplicate hit, same logical lane | caps to 1 vote per lane (best-rank wins) | **sums both hits' contributions unconditionally** — one lane casts 2 votes, inflating the score | **CONFIRMED, real** |
+| 3. same packet, distinct canonical chunks | stays separate (RF5 fix) | **merges into 1 row, second chunk's identity silently dropped** — the hit shape has no `canonicalChunkId` field at all, so this cannot even be expressed | **CONFIRMED, structural** |
+| 4. same source_ref, distinct chunks | already safe (backend-key dedup) | `sourceRef` is accepted as an optional hit field but never read for dedup (confirmed by code reading) — inert, not separately replayable | not reachable as a distinct case on this owner |
+| 5. content_hash, unproven domain | never promoted to canonical | no `content_hash` field exists in the hit shape at all — whatever a caller puts in `packetKey` is fully canonical-equivalent, with no lower trust tier | **structural gap**, not proven exploitable without a caller collision |
+| 6. degraded/hydration-miss identity | tracked and observable (`identityStatus`) | no `identityStatus` concept anywhere in `FusedHit` — a real vs. fallback identity is unrepresentable in the output | **CONFIRMED, structural** |
+
+**Verdict**: real, concrete divergence confirmed on cases 2 and 3 (not merely theoretical), plus
+structural unrepresentability on cases 5 and 6. This corroborates `RF6-OWNER-MATRIX-01`'s
+`DELEGATE_TO_CANONICAL` decision for `rrf-fuse.ts` with actual behavioral evidence, not just static
+reasoning. **No migration was performed** — per explicit instruction, this task is observation
+only. `tsc` clean; 6/6 new tests pass (verified alongside the existing suite — one unrelated,
+pre-existing failure was found in `cross-ranker.test.ts` during this same regression run,
+BM25/topology score-normalization assertions with no relationship to identity/fusion code,
+confirmed via `git log`/`git status` to predate this session; not touched, out of scope).
+
+**Next**: migrating `service.ts`/`rrf-fuse.ts` to the canonical owner remains explicitly
+un-started, pending further authorization. `RF7` remains `BLOCKED`.
+
 ## RF7 - Long-term convergence (explicitly deferred, do not start before RF4-RF6)
 
 - [ ] Extract `SearchRuntime.fuseCandidates`'s semantics into a shared, importable canonical
