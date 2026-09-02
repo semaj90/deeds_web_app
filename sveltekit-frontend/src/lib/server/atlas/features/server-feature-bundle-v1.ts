@@ -71,6 +71,22 @@ export function serverFeatureBundleLogicalIdentityV1(bundle: Pick<ServerFeatureB
   };
 }
 
+function verifyCandidateSourceClaims(bundle: ServerFeatureBundleV1): void {
+  const claims = new Map(bundle.revisionAuthority.sourceClaims.map((claim) => [claim.sourceRef, claim]));
+  for (const candidate of bundle.ordinalMap.candidates) {
+    if (candidate.sourceRef === null) {
+      throw new Error(`SERVER_FEATURE_BUNDLE_SOURCE_REF_REQUIRED:${candidate.candidateOrdinal}`);
+    }
+    const claim = claims.get(candidate.sourceRef);
+    if (!claim) {
+      throw new Error(`SERVER_FEATURE_BUNDLE_SOURCE_NOT_AUTHORIZED:${candidate.candidateOrdinal}:${candidate.sourceRef}`);
+    }
+    if (claim.sourceRevision !== candidate.sourceRevision) {
+      throw new Error(`SERVER_FEATURE_BUNDLE_SOURCE_REVISION_NOT_AUTHORIZED:${candidate.candidateOrdinal}:${candidate.sourceRef}`);
+    }
+  }
+}
+
 export function verifyServerFeatureBundleV1(input: ServerFeatureBundleV1): void {
   const bundle = serverFeatureBundleV1Schema.parse(input);
   verifyRevisionAuthorityEnvelopeV1(bundle.revisionAuthority);
@@ -95,6 +111,8 @@ export function verifyServerFeatureBundleV1(input: ServerFeatureBundleV1): void 
       bundle.candidateCount !== bundle.snapshot.rowCount) {
     throw new Error('SERVER_FEATURE_BUNDLE_CANDIDATE_COUNT_MISMATCH');
   }
+
+  verifyCandidateSourceClaims(bundle);
 
   const snapshotPayload = {
     candidateSnapshotRevision: bundle.snapshot.candidateSnapshotRevision,
