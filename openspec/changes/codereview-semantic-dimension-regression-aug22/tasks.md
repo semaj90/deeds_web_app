@@ -1,3 +1,27 @@
+## Handoff (2026-09-01) — 7/8 findings closed, 1 independent follow-up open
+
+**Status: effectively done.** All 8 original code-review findings are resolved except one
+explicitly-independent test-coverage item. No further work on this change is expected unless that
+item is picked up.
+
+| # | Finding | Status |
+|---|---|---|
+| 1/2 | 512-vs-768 canonical reversal + functional break | RESOLVED 2026-08-23 — operator ruled `semantic_768` canonical; live code already matched, no revert needed |
+| 3 | Broken spec import (`buildApiContractObservationV1`) | RESOLVED — already fixed by an intervening change; 5/5 tests pass |
+| 4 | AST byte-offset double-conversion risk | RESOLVED — investigated against the live binding, not a real bug; 6/6 regression passes |
+| 5/6 | Qdrant `codebase_chunks_768` vs `_768_v2` payload parity | RESOLVED-AS-GOVERNED — not a bug; `qdrant-collection-contracts.ts` + root `CLAUDE.md` document this as an intentional, in-progress EMB3A migration. Do not consolidate without the migration owner. |
+| 6.1 | Dual-embedder (512/768) ownership classification | RESOLVED — naming already unambiguous (`semantic-512.ts` = BACKEND/legacy, `semantic-768.ts` = CANONICAL_OWNER) |
+| 8 | `simdjson-bridge.ts` double UTF-8 encode | FIXED 2026-09-01 — single `Buffer.from()` shared between OOM guard and cache-key hash |
+| **2.3** | **Integration test for `/api/admin/atlas/synthesize`'s semantic512 branch end-to-end** | **STILL OPEN** — see task 2.3 below |
+
+**Next step for a future session**: task 2.3 is the only remaining item. It needs a real
+integration test (not a unit test) that calls the live `/api/admin/atlas/synthesize` route with
+its semantic512 branch selected, asserting it succeeds end-to-end — so a future silent dimension
+regression like the one this whole change investigated gets caught by CI, not by another
+code-review pass. Nothing else in this file needs re-investigation; the 8 findings above have
+already been verified against live code/data more than once across 2026-08-23, 2026-08-31, and
+2026-09-01 — treat re-litigating any of them without new contradicting evidence as wasted work.
+
 ## 1. Triage — establish ground truth before touching anything
 
 - [x] 1.1 **ANSWERED, 2026-08-23.** `git log -5 --oneline -- .../qdrant-semantic-projection.ts` (plus a full `git show`) identifies the exact origin: commit `cdae3e454b` "feat(atlas): align semantic 768 retrieval lane" (2026-08-22 23:34:32, subject line only — zero commit-message body, no justification recorded). Its diff flips `ATLAS_CANONICAL_SEMANTIC_REPRESENTATION`/`ATLAS_CANONICAL_SEMANTIC_DIMENSION` from `'semantic_512'`/`512` to `'semantic_768'`/`768`, `QDRANT_SEMANTIC_COLLECTION` from `'codebase_chunks_512'` to `'codebase_chunks_768_v2'`, and touches 13 files across the retrieval/embedding stack in the same commit (`qdrant-recall.adapter.ts`, `retrieval-executor-policy.ts`, `embeddinggemma-task-runtime-v1.ts`, `qdrant-semantic-indexes.ts`, `qdrant-semantic-projection.test.ts`, `qdrant-semantic-scorer.ts`, `semantic-512.ts`, `embedding-contract-768.ts`, `embedding-contract.ts`, `ollama-embed.ts`, `grpc/embedding-client.ts`, `retrieval/embedding-service.ts`). A later commit, `a2e4dab329` (2026-08-23 02:33:10, ~3 hours after), builds directly on top of this flip (updates `canonical-chunk-contract.ts`'s enum to match) but did NOT originate it — `cdae3e454b` is the actual origin commit. **This flip is still live in the current codebase** — verified directly: `sveltekit-frontend/src/lib/server/atlas/retrieval/qdrant-semantic-projection.ts:8` currently reads `export const ATLAS_CANONICAL_SEMANTIC_REPRESENTATION = 'semantic_768' as const;`, and `canonical-chunk-contract.ts`'s `CanonicalRepresentationNameSchema` enum no longer contains `'semantic_512'` at all.
