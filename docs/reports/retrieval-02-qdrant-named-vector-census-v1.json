@@ -5,21 +5,61 @@
   "readOnly": true,
   "writesPerformed": false,
   "callersModified": false,
-  "generatedAt": "2026-09-01T23:29:18.463Z",
+  "generatedAt": "2026-09-02T00:04:41.585Z",
   "method": "Textual scan of every tracked .ts file under sveltekit-frontend/src/lib/server (excluding *.spec.ts, *.d.ts) for a call of the shape <identifier(.client)?>.query(...) or .search(...) where the receiver name contains \"qdrant\" (case-insensitive) or is exactly \"q\"/\"client\". Bare \"client.query(...)\" calls whose window contains SQL keywords (SELECT / INSERT INTO / UPDATE / DELETE FROM / CREATE TABLE|EXTENSION|INDEX / ALTER TABLE / LISTEN / NOTIFY / information_schema) in the window, or a first-argument transaction-control string (BEGIN/COMMIT/ROLLBACK/LISTEN/NOTIFY/UNLISTEN/SET/CREATE EXTENSION), are excluded as Postgres pg.Pool calls, not Qdrant -- found live during this pass across several files (context-assembler.ts:311, pagerank-schema-audit.ts:69, analysis/worker.ts:528, and multiple graph-adapter ROLLBACK calls were all false positives before these exclusions were added; comment/JSDoc lines were also excluded after unified/legal-ai-service.ts:8 and hypergraph-4d.ts:791 were found matching inside documentation examples, not real code). For each remaining match, the following 15 lines are checked for EITHER of two valid named-vector selector shapes seen in this codebase: the newer top-level \"using: 'name'\" (Query API), or the older \"vector: { name: 'name', vector: [...] }\" shape (also found live during this pass, e.g. ai/llm-cache.ts:106, which would have been a false negative under a using-only check). This is still a HEURISTIC, not a type-checked AST analysis -- a call whose request object is constructed elsewhere and spread in, or whose selector falls outside the line window, would be misclassified. Each finding below is reported individually with its own code snippet so a human can verify, not just a trusted aggregate count.",
   "summary": {
     "totalCallSitesFound": 32,
-    "explicitSelectionFound": 12,
-    "noExplicitSelectionFoundInWindow": 20,
-    "ofWhichConfident": 19,
-    "ofWhichUncertainReceiver": 1,
-    "distinctFiles": 25
+    "distinctFiles": 25,
+    "byClassification": {
+      "NAMED_VECTOR_REQUIRED_MISSING": 3,
+      "DEFAULT_VECTOR_VALID": 1,
+      "EXPLICIT_NAMED_VECTOR_VALID": 12,
+      "COLLECTION_SCHEMA_UNKNOWN": 16
+    },
+    "provenDefectCount": 3
   },
-  "interpretationNote": "A missing `using:` in the window does NOT necessarily mean the call is broken today -- some call sites target single-named-vector or unnamed-default collections where Qdrant does not require `using`. This census reports presence/absence of the parameter only; it does NOT verify each target collection's actual vector schema (that would require a live Qdrant introspection pass per collection, out of scope for this static census). RETRIEVAL-02 is explicitly audit-only (\"do not mass-edit callers\") -- findings below are not remediated here.",
+  "interpretationNote": "v2 (2026-09-01): classification is schema-aware, not a flat using-present/using-absent split. Only NAMED_VECTOR_REQUIRED_MISSING is a proven defect -- it requires the target collection to be a live, resolvable literal name AND its live Qdrant vector config to be confirmed NAMED_VECTORS. DEFAULT_VECTOR_VALID sites (e.g. document_tags, live-confirmed SINGLE_DEFAULT_VECTOR) are correct code, not defects, despite having no `using:` -- v1 of this census would have wrongly flagged them. COLLECTION_SCHEMA_UNKNOWN sites (unresolvable variable/constant collection expressions, or a live lookup returning \"collection does not exist\") are NEVER counted as proven defects -- absence of proof is not proof of a defect. RETRIEVAL-02 is explicitly audit-only (\"do not mass-edit callers\") -- findings below are not remediated here, only NAMED_VECTOR_REQUIRED_MISSING sites should be treated as an actionable backlog.",
+  "liveSchemaLookups": {
+    "embedding": {
+      "schemaKnown": false,
+      "reason": "Not found: Collection `embedding` doesn't exist!"
+    },
+    "document_tags": {
+      "schemaKnown": true,
+      "vectorSchemaType": "SINGLE_DEFAULT_VECTOR",
+      "vectorNames": null
+    },
+    "codebase_chunks_768_v2": {
+      "schemaKnown": true,
+      "vectorSchemaType": "NAMED_VECTORS",
+      "vectorNames": [
+        "content",
+        "error",
+        "signature"
+      ]
+    },
+    "scenario_cache": {
+      "schemaKnown": false,
+      "reason": "Not found: Collection `scenario_cache` doesn't exist!"
+    },
+    "user_searches": {
+      "schemaKnown": false,
+      "reason": "Not found: Collection `user_searches` doesn't exist!"
+    },
+    "codebase_chunks_768": {
+      "schemaKnown": true,
+      "vectorSchemaType": "NAMED_VECTORS",
+      "vectorNames": [
+        "content",
+        "error",
+        "signature"
+      ]
+    }
+  },
   "canonicalPathAlreadyFixed": {
     "note": "sveltekit-frontend/src/lib/server/search/qdrant-search.ts (the canonical searchCodebaseAnn/searchQdrantCode entry point per retrieval-layer-separation.md) was already fixed for the missing-using defect in commit 128e052ba4, per RETRIEVAL-01G/01H. This census additionally surfaces every OTHER direct Qdrant call site in the codebase that retrieval-layer-separation.md says should not exist (callers should route through the orchestrator/qdrant-search.ts, never call a Qdrant client directly) -- that architectural violation is a separate, larger finding this census makes visible for the first time, not something previously tracked."
   },
-  "sitesWithoutExplicitUsing": [
+  "sites": [
     {
       "file": "sveltekit-frontend/src/lib/server/ace/retrieval/hyperrag-retriever.ts",
       "line": 95,
@@ -31,7 +71,10 @@
       "hasExplicitSelection": false,
       "uncertainReceiver": false,
       "windowLines": 15,
-      "codeSnippet": "      this.qdrantDense.search(embedding, 20),\n      this.neo4jTopology.search('', 2, 20),\n      this.playbook.search(query, this.config.playbookRevision),\n      this.outcomeLedger.search(queryHash, 5),"
+      "codeSnippet": "      this.qdrantDense.search(embedding, 20),\n      this.neo4jTopology.search('', 2, 20),\n      this.playbook.search(query, this.config.playbookRevision),\n      this.outcomeLedger.search(queryHash, 5),",
+      "resolvedCollectionName": "embedding",
+      "rf2Classification": "COLLECTION_SCHEMA_UNKNOWN",
+      "classificationReason": "live Qdrant lookup for \"embedding\" failed: Not found: Collection `embedding` doesn't exist!"
     },
     {
       "file": "sveltekit-frontend/src/lib/server/ace/tag-sync.ts",
@@ -44,7 +87,12 @@
       "hasExplicitSelection": false,
       "uncertainReceiver": false,
       "windowLines": 15,
-      "codeSnippet": "    const results = await client.search('document_tags', {\n      vector: queryEmbedding,\n      limit,\n      score_threshold: 0.6,"
+      "codeSnippet": "    const results = await client.search('document_tags', {\n      vector: queryEmbedding,\n      limit,\n      score_threshold: 0.6,",
+      "resolvedCollectionName": "document_tags",
+      "liveVectorSchemaType": "SINGLE_DEFAULT_VECTOR",
+      "liveVectorNames": null,
+      "rf2Classification": "DEFAULT_VECTOR_VALID",
+      "classificationReason": "\"document_tags\" is live-confirmed SINGLE_DEFAULT_VECTOR -- no using needed, not a defect"
     },
     {
       "file": "sveltekit-frontend/src/lib/server/ai/ace-prompt-preflight.ts",
@@ -57,231 +105,10 @@
       "hasExplicitSelection": false,
       "uncertainReceiver": false,
       "windowLines": 15,
-      "codeSnippet": "        const { points } = await qdrant.query(collection, {\n          query: queryEmbedding!,\n          limit,\n          with_payload: true,"
+      "codeSnippet": "        const { points } = await qdrant.query(collection, {\n          query: queryEmbedding!,\n          limit,\n          with_payload: true,",
+      "rf2Classification": "COLLECTION_SCHEMA_UNKNOWN",
+      "classificationReason": "collection expression \"collection\" is a variable/constant reference this static scan cannot resolve"
     },
-    {
-      "file": "sveltekit-frontend/src/lib/server/ai/scenario-cache.ts",
-      "line": 217,
-      "receiver": "qdrantClient",
-      "method": "query",
-      "collectionExpr": "scenario_cache",
-      "hasExplicitUsingInWindow": false,
-      "hasNamedVectorShapeInWindow": false,
-      "hasExplicitSelection": false,
-      "uncertainReceiver": false,
-      "windowLines": 15,
-      "codeSnippet": "    const { points: searchRes } = await qdrantClient.query('scenario_cache', {\n      query: embedding,\n      limit: 1,\n      score_threshold: SCENARIO_HIT_THRESHOLD,"
-    },
-    {
-      "file": "sveltekit-frontend/src/lib/server/atlas/retrieval/qdrant-semantic-scorer.ts",
-      "line": 89,
-      "receiver": "client",
-      "method": "query",
-      "collectionExpr": "QDRANT_SEMANTIC_COLLECTION",
-      "hasExplicitUsingInWindow": false,
-      "hasNamedVectorShapeInWindow": false,
-      "hasExplicitSelection": false,
-      "uncertainReceiver": false,
-      "windowLines": 15,
-      "codeSnippet": "  const response = (await client.query(QDRANT_SEMANTIC_COLLECTION, {\n    query: Array.from(embedding.vector),\n    filter: {\n      must: [{ key: 'packet_key', match: { any: uniquePacketKeys } }],"
-    },
-    {
-      "file": "sveltekit-frontend/src/lib/server/db/qdrant-integration.ts",
-      "line": 44,
-      "receiver": "qdrant",
-      "method": "query",
-      "collectionExpr": "collectionName",
-      "hasExplicitUsingInWindow": false,
-      "hasNamedVectorShapeInWindow": false,
-      "hasExplicitSelection": false,
-      "uncertainReceiver": false,
-      "windowLines": 15,
-      "codeSnippet": "            const { points } = await this.qdrant.query(collectionName, {\n                query: vector,\n                limit,\n                with_payload: true"
-    },
-    {
-      "file": "sveltekit-frontend/src/lib/server/db/qdrant-sync.ts",
-      "line": 258,
-      "receiver": "qdrant",
-      "method": "query",
-      "collectionExpr": "COLLECTION_NAME",
-      "hasExplicitUsingInWindow": false,
-      "hasNamedVectorShapeInWindow": false,
-      "hasExplicitSelection": false,
-      "uncertainReceiver": false,
-      "windowLines": 15,
-      "codeSnippet": "    const { points: searchResult } = await qdrant.query(COLLECTION_NAME, {\n      query: queryEmbedding,\n      limit,\n      filter,"
-    },
-    {
-      "file": "sveltekit-frontend/src/lib/server/db/unified-client.ts",
-      "line": 334,
-      "receiver": "qdrantClient",
-      "method": "query",
-      "collectionExpr": "collection",
-      "hasExplicitUsingInWindow": false,
-      "hasNamedVectorShapeInWindow": false,
-      "hasExplicitSelection": false,
-      "uncertainReceiver": false,
-      "windowLines": 15,
-      "codeSnippet": "                    const qRes = await qdrantClient.query(collection, {\n                        query: queryEmbedding,\n                        limit,\n                        score_threshold: threshold,"
-    },
-    {
-      "file": "sveltekit-frontend/src/lib/server/fixer/fixer-memory.ts",
-      "line": 144,
-      "receiver": "q",
-      "method": "query",
-      "collectionExpr": "QDRANT_COLL",
-      "hasExplicitUsingInWindow": false,
-      "hasNamedVectorShapeInWindow": false,
-      "hasExplicitSelection": false,
-      "uncertainReceiver": false,
-      "windowLines": 15,
-      "codeSnippet": "    const { points: results } = await q.query(QDRANT_COLL, {\n      query: queryEmbedding,\n      limit,\n      score_threshold: 0.70,"
-    },
-    {
-      "file": "sveltekit-frontend/src/lib/server/graph/user-interaction-sync.ts",
-      "line": 182,
-      "receiver": "qdrant.client",
-      "method": "query",
-      "collectionExpr": "user_searches",
-      "hasExplicitUsingInWindow": false,
-      "hasNamedVectorShapeInWindow": false,
-      "hasExplicitSelection": false,
-      "uncertainReceiver": false,
-      "windowLines": 15,
-      "codeSnippet": "\t\tconst results = await qdrant.client.query('user_searches', {\n\t\t\tquery: queryVector,\n\t\t\tlimit,\n\t\t\tscore_threshold: 0.4,"
-    },
-    {
-      "file": "sveltekit-frontend/src/lib/server/retrieval/go-retrieval-orchestrator.ts",
-      "line": 203,
-      "receiver": "qdrant",
-      "method": "search",
-      "collectionExpr": "codebase_chunks_768",
-      "hasExplicitUsingInWindow": false,
-      "hasNamedVectorShapeInWindow": false,
-      "hasExplicitSelection": false,
-      "uncertainReceiver": false,
-      "windowLines": 15,
-      "codeSnippet": "      const results = await qdrant.search('codebase_chunks_768', {\n        vector: embedding,\n        limit: topK,\n        with_payload: true,"
-    },
-    {
-      "file": "sveltekit-frontend/src/lib/server/retrieval/parallel-orchestrator.ts",
-      "line": 164,
-      "receiver": "qdrant",
-      "method": "query",
-      "collectionExpr": "codebase_chunks_768",
-      "hasExplicitUsingInWindow": false,
-      "hasNamedVectorShapeInWindow": false,
-      "hasExplicitSelection": false,
-      "uncertainReceiver": false,
-      "windowLines": 15,
-      "codeSnippet": "    const searchRes = await qdrant.query('codebase_chunks_768', {\n\t      query: Array.from(vector),\n      limit,\n      with_payload: true,"
-    },
-    {
-      "file": "sveltekit-frontend/src/lib/server/retrieval/soft-routing-orchestrator.ts",
-      "line": 267,
-      "receiver": "client",
-      "method": "query",
-      "collectionExpr": "query",
-      "hasExplicitUsingInWindow": false,
-      "hasNamedVectorShapeInWindow": false,
-      "hasExplicitSelection": false,
-      "uncertainReceiver": true,
-      "windowLines": 15,
-      "codeSnippet": "        const result = await client.query(query, [request.query_text, request.top_k * 2]);\n\n        const candidates: RetrievalCandidate[] = (result.rows || []).map((row, rank) => ({\n          packet_key: row.packet_key,"
-    },
-    {
-      "file": "sveltekit-frontend/src/lib/server/retrieval/summary-card-retrieval.ts",
-      "line": 260,
-      "receiver": "qdrant",
-      "method": "search",
-      "collectionExpr": "DEFAULT_COLLECTION",
-      "hasExplicitUsingInWindow": false,
-      "hasNamedVectorShapeInWindow": false,
-      "hasExplicitSelection": false,
-      "uncertainReceiver": false,
-      "windowLines": 15,
-      "codeSnippet": "  const hits = await qdrant.search(DEFAULT_COLLECTION, {\n    vector,\n    limit,\n    with_payload: true,"
-    },
-    {
-      "file": "sveltekit-frontend/src/lib/server/semantic-contracts/qdrant-staging-mirror.ts",
-      "line": 140,
-      "receiver": "qdrant",
-      "method": "search",
-      "collectionExpr": "collectionName",
-      "hasExplicitUsingInWindow": false,
-      "hasNamedVectorShapeInWindow": false,
-      "hasExplicitSelection": false,
-      "uncertainReceiver": false,
-      "windowLines": 15,
-      "codeSnippet": "    const results = await qdrant.search(collectionName, {\n      vector: queryEmbedding,\n      limit,\n      query_filter: {"
-    },
-    {
-      "file": "sveltekit-frontend/src/lib/server/semantic-contracts/qdrant-staging-mirror.ts",
-      "line": 196,
-      "receiver": "qdrant",
-      "method": "search",
-      "collectionExpr": "collectionName",
-      "hasExplicitUsingInWindow": false,
-      "hasNamedVectorShapeInWindow": false,
-      "hasExplicitSelection": false,
-      "uncertainReceiver": false,
-      "windowLines": 15,
-      "codeSnippet": "    const results = await qdrant.search(collectionName, {\n      vector: queryEmbedding,\n      limit,\n      query_filter: {"
-    },
-    {
-      "file": "sveltekit-frontend/src/lib/server/services/knowledge-search/KnowledgeSearcher.ts",
-      "line": 66,
-      "receiver": "qdrant",
-      "method": "search",
-      "collectionExpr": "Array.from",
-      "hasExplicitUsingInWindow": false,
-      "hasNamedVectorShapeInWindow": false,
-      "hasExplicitSelection": false,
-      "uncertainReceiver": false,
-      "windowLines": 15,
-      "codeSnippet": "    const semanticResults = await this.qdrant.search(Array.from(queryEmbedding), {\n      topK: topK * 2,\n      threshold,\n      filters,"
-    },
-    {
-      "file": "sveltekit-frontend/src/lib/server/services/knowledge-search/PostgresKnowledgeStore.ts",
-      "line": 119,
-      "receiver": "qdrant",
-      "method": "search",
-      "collectionExpr": "queryEmbedding",
-      "hasExplicitUsingInWindow": false,
-      "hasNamedVectorShapeInWindow": false,
-      "hasExplicitSelection": false,
-      "uncertainReceiver": false,
-      "windowLines": 15,
-      "codeSnippet": "      return qdrant.search(queryEmbedding, options);\n    }\n\n    const { topK = 10, threshold = 0.5, filters } = options;"
-    },
-    {
-      "file": "sveltekit-frontend/src/lib/server/services/knowledge-search/PostgresKnowledgeStore.ts",
-      "line": 184,
-      "receiver": "qdrant",
-      "method": "search",
-      "collectionExpr": "queryEmbedding",
-      "hasExplicitUsingInWindow": false,
-      "hasNamedVectorShapeInWindow": false,
-      "hasExplicitSelection": false,
-      "uncertainReceiver": false,
-      "windowLines": 15,
-      "codeSnippet": "    return qdrant.search(queryEmbedding, options);\n  }\n\n  /**"
-    },
-    {
-      "file": "sveltekit-frontend/src/lib/server/vector/image-search.ts",
-      "line": 188,
-      "receiver": "qdrant.client",
-      "method": "search",
-      "collectionExpr": "collection",
-      "hasExplicitUsingInWindow": false,
-      "hasNamedVectorShapeInWindow": false,
-      "hasExplicitSelection": false,
-      "uncertainReceiver": false,
-      "windowLines": 15,
-      "codeSnippet": "    const res = await qdrant.client.search(collection, {\n      vector: vector as Parameters<typeof qdrant.client.search>[1]['vector'],\n      limit: limit * 2,\n      score_threshold: threshold,"
-    }
-  ],
-  "sitesWithExplicitUsing": [
     {
       "file": "sveltekit-frontend/src/lib/server/ai/code-intel-service.ts",
       "line": 301,
@@ -293,7 +120,9 @@
       "hasExplicitSelection": true,
       "uncertainReceiver": false,
       "windowLines": 15,
-      "codeSnippet": "\tconst { points: hits } = await qdrant.query('codebase_chunks_768_v2', {\n\t\tquery: queryEmbedding,\n\t\tusing: 'content',\n\t\tlimit: 3,"
+      "codeSnippet": "\tconst { points: hits } = await qdrant.query('codebase_chunks_768_v2', {\n\t\tquery: queryEmbedding,\n\t\tusing: 'content',\n\t\tlimit: 3,",
+      "rf2Classification": "EXPLICIT_NAMED_VECTOR_VALID",
+      "classificationReason": "call already specifies using: or vector:{name,...}"
     },
     {
       "file": "sveltekit-frontend/src/lib/server/ai/llm-cache.ts",
@@ -306,7 +135,123 @@
       "hasExplicitSelection": true,
       "uncertainReceiver": false,
       "windowLines": 15,
-      "codeSnippet": "    const searchRes = await qdrant.client.search(qdrant.collections.llm_cache, {\n      vector: {\n        name: 'query',\n        vector: queryEmbedding,"
+      "codeSnippet": "    const searchRes = await qdrant.client.search(qdrant.collections.llm_cache, {\n      vector: {\n        name: 'query',\n        vector: queryEmbedding,",
+      "rf2Classification": "EXPLICIT_NAMED_VECTOR_VALID",
+      "classificationReason": "call already specifies using: or vector:{name,...}"
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/ai/scenario-cache.ts",
+      "line": 217,
+      "receiver": "qdrantClient",
+      "method": "query",
+      "collectionExpr": "scenario_cache",
+      "hasExplicitUsingInWindow": false,
+      "hasNamedVectorShapeInWindow": false,
+      "hasExplicitSelection": false,
+      "uncertainReceiver": false,
+      "windowLines": 15,
+      "codeSnippet": "    const { points: searchRes } = await qdrantClient.query('scenario_cache', {\n      query: embedding,\n      limit: 1,\n      score_threshold: SCENARIO_HIT_THRESHOLD,",
+      "resolvedCollectionName": "scenario_cache",
+      "rf2Classification": "COLLECTION_SCHEMA_UNKNOWN",
+      "classificationReason": "live Qdrant lookup for \"scenario_cache\" failed: Not found: Collection `scenario_cache` doesn't exist!"
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/retrieval/qdrant-semantic-scorer.ts",
+      "line": 89,
+      "receiver": "client",
+      "method": "query",
+      "collectionExpr": "QDRANT_SEMANTIC_COLLECTION",
+      "hasExplicitUsingInWindow": false,
+      "hasNamedVectorShapeInWindow": false,
+      "hasExplicitSelection": false,
+      "uncertainReceiver": false,
+      "windowLines": 15,
+      "codeSnippet": "  const response = (await client.query(QDRANT_SEMANTIC_COLLECTION, {\n    query: Array.from(embedding.vector),\n    filter: {\n      must: [{ key: 'packet_key', match: { any: uniquePacketKeys } }],",
+      "resolvedCollectionName": "codebase_chunks_768_v2",
+      "liveVectorSchemaType": "NAMED_VECTORS",
+      "liveVectorNames": [
+        "content",
+        "error",
+        "signature"
+      ],
+      "rf2Classification": "NAMED_VECTOR_REQUIRED_MISSING",
+      "classificationReason": "\"codebase_chunks_768_v2\" is live-confirmed NAMED_VECTORS (content/error/signature) and this call has no using/named-vector selector -- proven defect"
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/db/qdrant-integration.ts",
+      "line": 44,
+      "receiver": "qdrant",
+      "method": "query",
+      "collectionExpr": "collectionName",
+      "hasExplicitUsingInWindow": false,
+      "hasNamedVectorShapeInWindow": false,
+      "hasExplicitSelection": false,
+      "uncertainReceiver": false,
+      "windowLines": 15,
+      "codeSnippet": "            const { points } = await this.qdrant.query(collectionName, {\n                query: vector,\n                limit,\n                with_payload: true",
+      "rf2Classification": "COLLECTION_SCHEMA_UNKNOWN",
+      "classificationReason": "collection expression \"collectionName\" is a variable/constant reference this static scan cannot resolve"
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/db/qdrant-sync.ts",
+      "line": 258,
+      "receiver": "qdrant",
+      "method": "query",
+      "collectionExpr": "COLLECTION_NAME",
+      "hasExplicitUsingInWindow": false,
+      "hasNamedVectorShapeInWindow": false,
+      "hasExplicitSelection": false,
+      "uncertainReceiver": false,
+      "windowLines": 15,
+      "codeSnippet": "    const { points: searchResult } = await qdrant.query(COLLECTION_NAME, {\n      query: queryEmbedding,\n      limit,\n      filter,",
+      "rf2Classification": "COLLECTION_SCHEMA_UNKNOWN",
+      "classificationReason": "collection expression \"COLLECTION_NAME\" is a variable/constant reference this static scan cannot resolve"
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/db/unified-client.ts",
+      "line": 334,
+      "receiver": "qdrantClient",
+      "method": "query",
+      "collectionExpr": "collection",
+      "hasExplicitUsingInWindow": false,
+      "hasNamedVectorShapeInWindow": false,
+      "hasExplicitSelection": false,
+      "uncertainReceiver": false,
+      "windowLines": 15,
+      "codeSnippet": "                    const qRes = await qdrantClient.query(collection, {\n                        query: queryEmbedding,\n                        limit,\n                        score_threshold: threshold,",
+      "rf2Classification": "COLLECTION_SCHEMA_UNKNOWN",
+      "classificationReason": "collection expression \"collection\" is a variable/constant reference this static scan cannot resolve"
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/fixer/fixer-memory.ts",
+      "line": 144,
+      "receiver": "q",
+      "method": "query",
+      "collectionExpr": "QDRANT_COLL",
+      "hasExplicitUsingInWindow": false,
+      "hasNamedVectorShapeInWindow": false,
+      "hasExplicitSelection": false,
+      "uncertainReceiver": false,
+      "windowLines": 15,
+      "codeSnippet": "    const { points: results } = await q.query(QDRANT_COLL, {\n      query: queryEmbedding,\n      limit,\n      score_threshold: 0.70,",
+      "rf2Classification": "COLLECTION_SCHEMA_UNKNOWN",
+      "classificationReason": "collection expression \"QDRANT_COLL\" is a variable/constant reference this static scan cannot resolve"
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/graph/user-interaction-sync.ts",
+      "line": 182,
+      "receiver": "qdrant.client",
+      "method": "query",
+      "collectionExpr": "user_searches",
+      "hasExplicitUsingInWindow": false,
+      "hasNamedVectorShapeInWindow": false,
+      "hasExplicitSelection": false,
+      "uncertainReceiver": false,
+      "windowLines": 15,
+      "codeSnippet": "\t\tconst results = await qdrant.client.query('user_searches', {\n\t\t\tquery: queryVector,\n\t\t\tlimit,\n\t\t\tscore_threshold: 0.4,",
+      "resolvedCollectionName": "user_searches",
+      "rf2Classification": "COLLECTION_SCHEMA_UNKNOWN",
+      "classificationReason": "live Qdrant lookup for \"user_searches\" failed: Not found: Collection `user_searches` doesn't exist!"
     },
     {
       "file": "sveltekit-frontend/src/lib/server/pipeline/error-embedding-pipeline.ts",
@@ -319,7 +264,9 @@
       "hasExplicitSelection": true,
       "uncertainReceiver": false,
       "windowLines": 15,
-      "codeSnippet": "\t\tconst results = await qdrant.client.query(COLLECTION, {\n\t\t\tquery: embedding,\n\t\t\tusing: 'error',\n\t\t\tlimit: 1,"
+      "codeSnippet": "\t\tconst results = await qdrant.client.query(COLLECTION, {\n\t\t\tquery: embedding,\n\t\t\tusing: 'error',\n\t\t\tlimit: 1,",
+      "rf2Classification": "EXPLICIT_NAMED_VECTOR_VALID",
+      "classificationReason": "call already specifies using: or vector:{name,...}"
     },
     {
       "file": "sveltekit-frontend/src/lib/server/pipeline/error-embedding-pipeline.ts",
@@ -332,7 +279,9 @@
       "hasExplicitSelection": true,
       "uncertainReceiver": false,
       "windowLines": 15,
-      "codeSnippet": "\t\tconst results = await qdrant.client.query(COLLECTION, {\n\t\t\tquery: embedding,\n\t\t\tusing: 'error',\n\t\t\tlimit,"
+      "codeSnippet": "\t\tconst results = await qdrant.client.query(COLLECTION, {\n\t\t\tquery: embedding,\n\t\t\tusing: 'error',\n\t\t\tlimit,",
+      "rf2Classification": "EXPLICIT_NAMED_VECTOR_VALID",
+      "classificationReason": "call already specifies using: or vector:{name,...}"
     },
     {
       "file": "sveltekit-frontend/src/lib/server/research/web-research-ingester.ts",
@@ -345,7 +294,31 @@
       "hasExplicitSelection": true,
       "uncertainReceiver": false,
       "windowLines": 15,
-      "codeSnippet": "    const results = await qdrant.client.query(RESEARCH_COLLECTION, {\n      query: opts.queryEmbedding,\n      using: 'content',\n      limit: opts.limit ?? 10,"
+      "codeSnippet": "    const results = await qdrant.client.query(RESEARCH_COLLECTION, {\n      query: opts.queryEmbedding,\n      using: 'content',\n      limit: opts.limit ?? 10,",
+      "rf2Classification": "EXPLICIT_NAMED_VECTOR_VALID",
+      "classificationReason": "call already specifies using: or vector:{name,...}"
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/retrieval/go-retrieval-orchestrator.ts",
+      "line": 203,
+      "receiver": "qdrant",
+      "method": "search",
+      "collectionExpr": "codebase_chunks_768",
+      "hasExplicitUsingInWindow": false,
+      "hasNamedVectorShapeInWindow": false,
+      "hasExplicitSelection": false,
+      "uncertainReceiver": false,
+      "windowLines": 15,
+      "codeSnippet": "      const results = await qdrant.search('codebase_chunks_768', {\n        vector: embedding,\n        limit: topK,\n        with_payload: true,",
+      "resolvedCollectionName": "codebase_chunks_768",
+      "liveVectorSchemaType": "NAMED_VECTORS",
+      "liveVectorNames": [
+        "content",
+        "error",
+        "signature"
+      ],
+      "rf2Classification": "NAMED_VECTOR_REQUIRED_MISSING",
+      "classificationReason": "\"codebase_chunks_768\" is live-confirmed NAMED_VECTORS (content/error/signature) and this call has no using/named-vector selector -- proven defect"
     },
     {
       "file": "sveltekit-frontend/src/lib/server/retrieval/multi-vector-orchestrator.ts",
@@ -358,7 +331,9 @@
       "hasExplicitSelection": true,
       "uncertainReceiver": false,
       "windowLines": 15,
-      "codeSnippet": "    const contentResponse = await qdrant.query(collection, {\n      query: request.queryEmbedding,\n      using: 'content',\n      limit: config.topK,"
+      "codeSnippet": "    const contentResponse = await qdrant.query(collection, {\n      query: request.queryEmbedding,\n      using: 'content',\n      limit: config.topK,",
+      "rf2Classification": "EXPLICIT_NAMED_VECTOR_VALID",
+      "classificationReason": "call already specifies using: or vector:{name,...}"
     },
     {
       "file": "sveltekit-frontend/src/lib/server/retrieval/multi-vector-orchestrator.ts",
@@ -371,7 +346,9 @@
       "hasExplicitSelection": true,
       "uncertainReceiver": false,
       "windowLines": 15,
-      "codeSnippet": "    const summaryResponse = await qdrant.query(collection, {\n      query: request.queryEmbedding,\n      using: 'error', // Remapped from 'error' to 'summary' semantics\n      limit: config.topK,"
+      "codeSnippet": "    const summaryResponse = await qdrant.query(collection, {\n      query: request.queryEmbedding,\n      using: 'error', // Remapped from 'error' to 'summary' semantics\n      limit: config.topK,",
+      "rf2Classification": "EXPLICIT_NAMED_VECTOR_VALID",
+      "classificationReason": "call already specifies using: or vector:{name,...}"
     },
     {
       "file": "sveltekit-frontend/src/lib/server/retrieval/multi-vector-orchestrator.ts",
@@ -384,7 +361,31 @@
       "hasExplicitSelection": true,
       "uncertainReceiver": false,
       "windowLines": 15,
-      "codeSnippet": "    const titleResponse = await qdrant.query(collection, {\n      query: request.queryEmbedding,\n      using: 'signature', // Remapped from 'signature' to 'title' semantics\n      limit: config.topK,"
+      "codeSnippet": "    const titleResponse = await qdrant.query(collection, {\n      query: request.queryEmbedding,\n      using: 'signature', // Remapped from 'signature' to 'title' semantics\n      limit: config.topK,",
+      "rf2Classification": "EXPLICIT_NAMED_VECTOR_VALID",
+      "classificationReason": "call already specifies using: or vector:{name,...}"
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/retrieval/parallel-orchestrator.ts",
+      "line": 164,
+      "receiver": "qdrant",
+      "method": "query",
+      "collectionExpr": "codebase_chunks_768",
+      "hasExplicitUsingInWindow": false,
+      "hasNamedVectorShapeInWindow": false,
+      "hasExplicitSelection": false,
+      "uncertainReceiver": false,
+      "windowLines": 15,
+      "codeSnippet": "    const searchRes = await qdrant.query('codebase_chunks_768', {\n\t      query: Array.from(vector),\n      limit,\n      with_payload: true,",
+      "resolvedCollectionName": "codebase_chunks_768",
+      "liveVectorSchemaType": "NAMED_VECTORS",
+      "liveVectorNames": [
+        "content",
+        "error",
+        "signature"
+      ],
+      "rf2Classification": "NAMED_VECTOR_REQUIRED_MISSING",
+      "classificationReason": "\"codebase_chunks_768\" is live-confirmed NAMED_VECTORS (content/error/signature) and this call has no using/named-vector selector -- proven defect"
     },
     {
       "file": "sveltekit-frontend/src/lib/server/retrieval/soft-routing-orchestrator.ts",
@@ -397,7 +398,39 @@
       "hasExplicitSelection": true,
       "uncertainReceiver": false,
       "windowLines": 15,
-      "codeSnippet": "      const results = await this.qdrant.query('codebase_chunks_768', {\n        query: request.query_embedding,\n        using: 'content',\n        limit: request.top_k * 2, // Over-fetch for deduplication"
+      "codeSnippet": "      const results = await this.qdrant.query('codebase_chunks_768', {\n        query: request.query_embedding,\n        using: 'content',\n        limit: request.top_k * 2, // Over-fetch for deduplication",
+      "rf2Classification": "EXPLICIT_NAMED_VECTOR_VALID",
+      "classificationReason": "call already specifies using: or vector:{name,...}"
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/retrieval/soft-routing-orchestrator.ts",
+      "line": 267,
+      "receiver": "client",
+      "method": "query",
+      "collectionExpr": "query",
+      "hasExplicitUsingInWindow": false,
+      "hasNamedVectorShapeInWindow": false,
+      "hasExplicitSelection": false,
+      "uncertainReceiver": true,
+      "windowLines": 15,
+      "codeSnippet": "        const result = await client.query(query, [request.query_text, request.top_k * 2]);\n\n        const candidates: RetrievalCandidate[] = (result.rows || []).map((row, rank) => ({\n          packet_key: row.packet_key,",
+      "rf2Classification": "COLLECTION_SCHEMA_UNKNOWN",
+      "classificationReason": "ambiguous receiver -- likely a Postgres call this scanner cannot rule out"
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/retrieval/summary-card-retrieval.ts",
+      "line": 260,
+      "receiver": "qdrant",
+      "method": "search",
+      "collectionExpr": "DEFAULT_COLLECTION",
+      "hasExplicitUsingInWindow": false,
+      "hasNamedVectorShapeInWindow": false,
+      "hasExplicitSelection": false,
+      "uncertainReceiver": false,
+      "windowLines": 15,
+      "codeSnippet": "  const hits = await qdrant.search(DEFAULT_COLLECTION, {\n    vector,\n    limit,\n    with_payload: true,",
+      "rf2Classification": "COLLECTION_SCHEMA_UNKNOWN",
+      "classificationReason": "collection expression \"DEFAULT_COLLECTION\" is a variable/constant reference this static scan cannot resolve"
     },
     {
       "file": "sveltekit-frontend/src/lib/server/search/qdrant-search.ts",
@@ -410,7 +443,84 @@
       "hasExplicitSelection": true,
       "uncertainReceiver": false,
       "windowLines": 15,
-      "codeSnippet": "      const response = await client.query(collection, {\n        query: embedding,\n        using: 'content',\n        limit: compiled.finalLimit,"
+      "codeSnippet": "      const response = await client.query(collection, {\n        query: embedding,\n        using: 'content',\n        limit: compiled.finalLimit,",
+      "rf2Classification": "EXPLICIT_NAMED_VECTOR_VALID",
+      "classificationReason": "call already specifies using: or vector:{name,...}"
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/semantic-contracts/qdrant-staging-mirror.ts",
+      "line": 140,
+      "receiver": "qdrant",
+      "method": "search",
+      "collectionExpr": "collectionName",
+      "hasExplicitUsingInWindow": false,
+      "hasNamedVectorShapeInWindow": false,
+      "hasExplicitSelection": false,
+      "uncertainReceiver": false,
+      "windowLines": 15,
+      "codeSnippet": "    const results = await qdrant.search(collectionName, {\n      vector: queryEmbedding,\n      limit,\n      query_filter: {",
+      "rf2Classification": "COLLECTION_SCHEMA_UNKNOWN",
+      "classificationReason": "collection expression \"collectionName\" is a variable/constant reference this static scan cannot resolve"
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/semantic-contracts/qdrant-staging-mirror.ts",
+      "line": 196,
+      "receiver": "qdrant",
+      "method": "search",
+      "collectionExpr": "collectionName",
+      "hasExplicitUsingInWindow": false,
+      "hasNamedVectorShapeInWindow": false,
+      "hasExplicitSelection": false,
+      "uncertainReceiver": false,
+      "windowLines": 15,
+      "codeSnippet": "    const results = await qdrant.search(collectionName, {\n      vector: queryEmbedding,\n      limit,\n      query_filter: {",
+      "rf2Classification": "COLLECTION_SCHEMA_UNKNOWN",
+      "classificationReason": "collection expression \"collectionName\" is a variable/constant reference this static scan cannot resolve"
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/services/knowledge-search/KnowledgeSearcher.ts",
+      "line": 66,
+      "receiver": "qdrant",
+      "method": "search",
+      "collectionExpr": "Array.from",
+      "hasExplicitUsingInWindow": false,
+      "hasNamedVectorShapeInWindow": false,
+      "hasExplicitSelection": false,
+      "uncertainReceiver": false,
+      "windowLines": 15,
+      "codeSnippet": "    const semanticResults = await this.qdrant.search(Array.from(queryEmbedding), {\n      topK: topK * 2,\n      threshold,\n      filters,",
+      "rf2Classification": "COLLECTION_SCHEMA_UNKNOWN",
+      "classificationReason": "collection expression \"Array.from\" is a variable/constant reference this static scan cannot resolve"
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/services/knowledge-search/PostgresKnowledgeStore.ts",
+      "line": 119,
+      "receiver": "qdrant",
+      "method": "search",
+      "collectionExpr": "queryEmbedding",
+      "hasExplicitUsingInWindow": false,
+      "hasNamedVectorShapeInWindow": false,
+      "hasExplicitSelection": false,
+      "uncertainReceiver": false,
+      "windowLines": 15,
+      "codeSnippet": "      return qdrant.search(queryEmbedding, options);\n    }\n\n    const { topK = 10, threshold = 0.5, filters } = options;",
+      "rf2Classification": "COLLECTION_SCHEMA_UNKNOWN",
+      "classificationReason": "collection expression \"queryEmbedding\" is a variable/constant reference this static scan cannot resolve"
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/services/knowledge-search/PostgresKnowledgeStore.ts",
+      "line": 184,
+      "receiver": "qdrant",
+      "method": "search",
+      "collectionExpr": "queryEmbedding",
+      "hasExplicitUsingInWindow": false,
+      "hasNamedVectorShapeInWindow": false,
+      "hasExplicitSelection": false,
+      "uncertainReceiver": false,
+      "windowLines": 15,
+      "codeSnippet": "    return qdrant.search(queryEmbedding, options);\n  }\n\n  /**",
+      "rf2Classification": "COLLECTION_SCHEMA_UNKNOWN",
+      "classificationReason": "collection expression \"queryEmbedding\" is a variable/constant reference this static scan cannot resolve"
     },
     {
       "file": "sveltekit-frontend/src/lib/server/vector/image-search.ts",
@@ -423,7 +533,24 @@
       "hasExplicitSelection": true,
       "uncertainReceiver": false,
       "windowLines": 15,
-      "codeSnippet": "    const res = await qdrant.client.search(collection, {\n      vector: { name: 'content', vector } as Parameters<typeof qdrant.client.search>[1]['vector'],\n      limit: limit * 2, // over-fetch for tag reranking\n      score_threshold: threshold,"
+      "codeSnippet": "    const res = await qdrant.client.search(collection, {\n      vector: { name: 'content', vector } as Parameters<typeof qdrant.client.search>[1]['vector'],\n      limit: limit * 2, // over-fetch for tag reranking\n      score_threshold: threshold,",
+      "rf2Classification": "EXPLICIT_NAMED_VECTOR_VALID",
+      "classificationReason": "call already specifies using: or vector:{name,...}"
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/vector/image-search.ts",
+      "line": 188,
+      "receiver": "qdrant.client",
+      "method": "search",
+      "collectionExpr": "collection",
+      "hasExplicitUsingInWindow": false,
+      "hasNamedVectorShapeInWindow": false,
+      "hasExplicitSelection": false,
+      "uncertainReceiver": false,
+      "windowLines": 15,
+      "codeSnippet": "    const res = await qdrant.client.search(collection, {\n      vector: vector as Parameters<typeof qdrant.client.search>[1]['vector'],\n      limit: limit * 2,\n      score_threshold: threshold,",
+      "rf2Classification": "COLLECTION_SCHEMA_UNKNOWN",
+      "classificationReason": "collection expression \"collection\" is a variable/constant reference this static scan cannot resolve"
     },
     {
       "file": "sveltekit-frontend/src/lib/server/vector/multi-store.ts",
@@ -436,7 +563,9 @@
       "hasExplicitSelection": true,
       "uncertainReceiver": false,
       "windowLines": 15,
-      "codeSnippet": "\t\t\t\t\tqdrant.client.search(collection, {\n\t\t\t\t\t\tvector: { name: 'content', vector: embedding },\n\t\t\t\t\t\tlimit: topK,\n\t\t\t\t\t\twith_payload: true"
+      "codeSnippet": "\t\t\t\t\tqdrant.client.search(collection, {\n\t\t\t\t\t\tvector: { name: 'content', vector: embedding },\n\t\t\t\t\t\tlimit: topK,\n\t\t\t\t\t\twith_payload: true",
+      "rf2Classification": "EXPLICIT_NAMED_VECTOR_VALID",
+      "classificationReason": "call already specifies using: or vector:{name,...}"
     }
   ]
 }

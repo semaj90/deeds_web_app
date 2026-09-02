@@ -1,5 +1,9 @@
 ## 0. Governance admission
 
+- [x] CONV-0A — Establish this convergence change as the active planning
+  authority. `openspec status`, strict validation, and apply-instructions
+  resolution all pass for the repo-local change. No planning command applies
+  runtime work or mutates stores.
 - [x] CONV-0B — Generate a read-only OpenSpec portfolio classification from the
   root change store. The report records task progress, declared gate references,
   blockers, supersession hints, and one explicit `CURRENT_AUTHORITY` for this
@@ -82,29 +86,61 @@
   Static scan of every direct Qdrant-like `.query(`/`.search(` call site
   under `sveltekit-frontend/src/lib/server` (excluding the 9 canonical
   callers already covered by `RETRIEVAL-01G`/`01H`): 32 direct call sites
-  across 25 files, of which 12 already specify an explicit named-vector
-  selector (`using:` or the older `vector: { name, vector }` shape) and 19
-  confidently do not (1 additional site flagged `uncertainReceiver` — a
-  Postgres FTS call the forward-only text scanner cannot fully distinguish
-  from a Qdrant call without full AST parsing). Confirms a real,
-  previously-untracked finding: most of these 19 call direct
-  Qdrant/`QdrantClient` instances, bypassing the canonical
-  `searchCodebaseAnn`/`qdrant-search.ts` orchestration boundary entirely
-  (a `retrieval-layer-separation.md` violation), and at least one
-  (`atlas/retrieval/qdrant-semantic-scorer.ts:89`, querying the canonical
-  `QDRANT_SEMANTIC_COLLECTION` directly) carries the same missing-`using`
-  defect class that `RETRIEVAL-01G` fixed only in `qdrant-search.ts`. Per
-  this task's explicit instruction, none of the 19/20 findings were
-  remediated — this is audit evidence for a future, separate remediation
-  decision. Three real false-positive/false-negative classes were found
-  and corrected during the scan itself (Postgres `client.query()` SQL/
-  transaction-control calls misclassified as Qdrant; the older
+  across 25 files. Three real false-positive/false-negative classes were
+  found and corrected during the scan itself (Postgres `client.query()`
+  SQL/transaction-control calls misclassified as Qdrant; the older
   `vector: { name, vector }` named-vector shape misclassified as missing
   selection; JSDoc/comment example lines misclassified as real call sites)
-  — each documented in the report's own methodology section, not silently
-  fixed and hidden. See
+  — each documented in the report's own methodology section.
+  **v2 tightening (2026-09-01, per operator review):** the original v1 pass
+  reported "19 confidently missing `using`" from static heuristics alone.
+  Per the review's explicit correction — "a missing `using` is a proven
+  defect only after target collection, collection vector schema, and
+  required vector name are all known" — v2 adds a live, read-only Qdrant
+  schema lookup (`GET /collections/<name>`) per resolvable literal
+  collection name and reclassifies every site into exactly one of
+  `NAMED_VECTOR_REQUIRED_MISSING` / `DEFAULT_VECTOR_VALID` /
+  `EXPLICIT_NAMED_VECTOR_VALID` / `COLLECTION_SCHEMA_UNKNOWN`. Result: only
+  **3 proven defects** survive schema verification (down from 19 unverified
+  heuristic guesses) — `atlas/retrieval/qdrant-semantic-scorer.ts:89`
+  (querying the canonical `QDRANT_SEMANTIC_COLLECTION` = `codebase_chunks_768_v2`
+  directly, live-confirmed `NAMED_VECTORS`, same missing-`using` defect
+  class `RETRIEVAL-01G` fixed only in `qdrant-search.ts`),
+  `retrieval/go-retrieval-orchestrator.ts:203`, and
+  `retrieval/parallel-orchestrator.ts:164` (both querying literal
+  `codebase_chunks_768`, also live-confirmed `NAMED_VECTORS`). One real
+  false-positive from v1 was caught and corrected in the process:
+  `ace/tag-sync.ts:135` queries `document_tags`, which is live-confirmed
+  `SINGLE_DEFAULT_VECTOR` — v1 would have wrongly counted this as a defect;
+  v2 correctly classifies it `DEFAULT_VECTOR_VALID`. The remaining 16 sites
+  are `COLLECTION_SCHEMA_UNKNOWN` (unresolvable variable/constant
+  collection expressions, or a live lookup confirming the named collection
+  doesn't currently exist) and are explicitly NOT counted as proven
+  defects — absence of proof is not proof of a defect. Per this task's
+  instruction, none of the 3 proven defects were remediated — this is
+  audit evidence for a future, separate remediation decision. See
   `docs/reports/retrieval-02-qdrant-named-vector-census-v1.json` and
   `scripts/atlas/retrieval-02-qdrant-named-vector-census.mjs`.
+- [x] RF-IDENTITY-SEMANTICS-02 — Preserve the existing dedup precedence while
+  distinguishing canonical Atlas identity from projection and grouping
+  evidence: `content_hash` is `projection_exact`, `source_ref` is
+  `source_group`, and lane-local IDs remain `degraded`. Focused identity/RRF
+  tests passed 18/18; no persistence or projection ownership changed. See
+  `docs/reports/rf-identity-semantics-02-v1.json`.
+  **Naming collision note (2026-09-01):** this entry documents the initial,
+  same-day V1 status-broadening only (`ResolvedIdentity.status` widened
+  in-place). The operator's full review of this same correction — adding a
+  `canonical_chunk_id` tier (consumed only from proven ProjectionRegistryV1/
+  lineage hydration, never reconstructed) and a `HashContractV1` gate on
+  `content_hash` (unqualified hashes must not reach `PROJECTION_EXACT`,
+  since this repo has a confirmed historical hash domain that hashed
+  generated artifact content, not source bytes) — landed as the fuller,
+  additive `resolveCanonicalIdentityV2()` under the SAME task name in the
+  sibling `parent-atlas-retrieval-fusion-reachability` change's `tasks.md`.
+  Both are real and both are live (additive, non-conflicting code); this
+  note exists so a future reader doesn't assume one supersedes the other
+  without checking — the fusion-reachability entry is the complete
+  implementation of the operator's full review.
 
 ## 2. OaK DAG runtime convergence
 
@@ -216,7 +252,13 @@ lineage MEMBERSHIP, not 1:1 identity.
   values plus `graphify_files.workspace_id`, and commits each packet and its
   complete membership set transactionally. Dry-run evidence is in
   `docs/reports/chunk-registration-report.json`; production canary/apply
-  remains separately authorized and therefore this task stays open.
+  remains separately authorized and therefore this task stays open. A bounded
+  authorized apply canary on 2026-09-01 exercised the active entrypoint:
+  one orphan packet row was inserted, but its 22 memberships were correctly
+  refused because `graphify_files.workspace_id` was absent; readback confirmed
+  zero lineage rows. This proves the fail-closed branch, not the
+  namespace-qualified success branch. See
+  `docs/reports/chunk-registration-report.json`.
 - [ ] PKT-LINEAGE-09 (BACKFILL-PROMOTION-01) — Separately authorize applying
   the full 6,987-row admitted cohort (all 577 packets) from the frozen
   `BACKFILL-DRY-01` artifact. Re-run the dry classification fresh first to
