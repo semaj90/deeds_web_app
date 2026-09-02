@@ -1,21 +1,25 @@
 import {
-  produceAceFeatureSnapshotV1,
-  type AceFeatureSnapshotProducerInputV1,
-} from '../context/ace-feature-snapshot-producer-v1.js';
+  verifyServerFeatureBundleV1,
+  type ServerFeatureBundleV1,
+} from '../features/server-feature-bundle-v1.js';
+import type { CandidateFeatureSnapshotV1 } from '../features/candidate-feature-snapshot-v1.js';
 import type { RlmSearchRequest, RlmSearchResult } from './rlm-contract.js';
 
 export interface RlmAceFeatureBundleProviderV1 {
   get(input: {
     request: RlmSearchRequest;
     result: RlmSearchResult;
-  }): Promise<AceFeatureSnapshotProducerInputV1 | null>;
+  }): Promise<ServerFeatureBundleV1 | null>;
 }
 
 export type RlmAceFeatureAdmissionResultV1 =
-  | { status: 'ADMITTED'; result: ReturnType<typeof produceAceFeatureSnapshotV1> }
+  | { status: 'ADMITTED'; bundle: ServerFeatureBundleV1; snapshot: CandidateFeatureSnapshotV1 }
   | { status: 'UNAVAILABLE'; reason: 'SERVER_FEATURE_BUNDLE_UNAVAILABLE' };
 
-/** Server-only RLM -> ACE handoff. It never accepts feature bundles from clients. */
+/**
+ * Server-only RLM -> ACE handoff. It never accepts feature bundles from clients
+ * and never rematerializes a snapshot from raw producer inputs.
+ */
 export async function admitRlmResultToAceFeatureSnapshotV1(input: {
   provider: RlmAceFeatureBundleProviderV1;
   request: RlmSearchRequest;
@@ -23,5 +27,6 @@ export async function admitRlmResultToAceFeatureSnapshotV1(input: {
 }): Promise<RlmAceFeatureAdmissionResultV1> {
   const bundle = await input.provider.get({ request: input.request, result: input.result });
   if (!bundle) return { status: 'UNAVAILABLE', reason: 'SERVER_FEATURE_BUNDLE_UNAVAILABLE' };
-  return { status: 'ADMITTED', result: produceAceFeatureSnapshotV1(bundle) };
+  verifyServerFeatureBundleV1(bundle);
+  return { status: 'ADMITTED', bundle, snapshot: bundle.snapshot };
 }
