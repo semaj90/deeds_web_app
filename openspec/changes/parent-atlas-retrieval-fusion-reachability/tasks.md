@@ -468,6 +468,21 @@ projection/file IDs before its later Postgres join. No alternate identity was in
 database, Qdrant, cache, or production writes were performed. The next RF6 gate is a live,
 revision-qualified replay after the shared candidate envelope is available.
 
+## RF-IDENTITY-CALLER-MATRIX-01 (2026-09-01/02, done) — verdict `V2_READY_FOR_CANONICAL_HYDRATION`
+
+Full result recorded in `parent-atlas-retrieval-lineage-dag-convergence/tasks.md`'s "Three bounded
+tracks" section (Track B) — not duplicated here in full to avoid drift between the two files.
+Summary: no live caller of any of the 3 `resolveCanonicalIdentity`/`V2` implementations ever
+labels `content_hash` or `source_ref` as `'canonical'` — the canonical `SearchRuntime` spine
+(`retrieve-candidates.ts` -> `search-runtime.ts`) already grades them `projection_exact`/
+`source_group`. No `V1_LIVE_SEMANTIC_COLLISION`. `resolveCanonicalIdentityV2` has zero production
+callers yet — clear to wire it as the `RF-QDRANT-HYDRATION-02` resolver without migrating existing
+V1 callers. Found and fixed one real, live, currently-broken `tsc` type contract in
+`search-runtime.ts` (`Candidate`/`LaneGroup`/`AggregatedCandidate.identityStatus` still 2-way,
+RF-IDENTITY-SEMANTICS-02 broadened the resolver to 4-way) — type-only fix, zero dedup/runtime
+behavior change (verified: `identityStatus === 'canonical'` branches already treated every other
+value identically). One stale test fixed to match. Next: `RF-QDRANT-HYDRATION-02` (not started).
+
 ## RF7 - Long-term convergence (explicitly deferred, do not start before RF4-RF6)
 
 - [ ] Extract `SearchRuntime.fuseCandidates`'s semantics into a shared, importable canonical

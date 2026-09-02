@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { deriveIdentity } from '../retrieve-candidates.js';
 
 describe('deriveIdentity', () => {
-  it('promotes content_hash over source_ref and preserves raw identity metadata', () => {
+  it('resolves content_hash as projection_exact (not canonical) and preserves raw identity metadata', () => {
     const resolved = deriveIdentity({
       symbolVersionId: '   ',
       packetKey: '',
@@ -20,7 +20,7 @@ describe('deriveIdentity', () => {
       source_ref: 'src/foo.ts',
       content_hash: 'hash:abc123',
       fallback_id: 'qdrant-point-abc',
-      identityStatus: 'canonical',
+      identityStatus: 'projection_exact',
       identitySource: 'content_hash',
     });
   });

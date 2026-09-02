@@ -241,7 +241,14 @@ export interface Candidate {
    * used by `rrf-integration.ts`. Absent on candidates constructed before this field existed;
    * treat absence the same as `'canonical'` for backward compatibility, never as `'degraded'`.
    */
-  identityStatus?: 'canonical' | 'degraded';
+  /**
+   * Widened 2026-09-02 (RF-IDENTITY-CALLER-MATRIX-01) to match `identity-resolution.ts`'s 4-way
+   * `resolveCanonicalIdentity` status (RF-IDENTITY-SEMANTICS-02). `projection_exact` (content_hash)
+   * and `source_group` (source_ref) are deliberately treated identically to `degraded` by every
+   * `identityStatus === 'canonical'` check below -- neither is ever promoted to a canonical dedup
+   * key. This is a type fix only; no fusion/dedup behavior changed.
+   */
+  identityStatus?: 'canonical' | 'projection_exact' | 'source_group' | 'degraded';
   identitySource?: 'symbol_version_id' | 'packet_key' | 'content_hash' | 'source_ref' | 'lane_id_fallback';
 }
 
@@ -1222,7 +1229,7 @@ export function fuseSearchRuntimeCandidates(candidates: Candidate[]): FusedCandi
   interface LaneGroup {
     lane: LogicalRetrievalLane;
     outputKey: string;
-    identityStatus: 'canonical' | 'degraded';
+    identityStatus: 'canonical' | 'projection_exact' | 'source_group' | 'degraded';
     canonicalKey: string | null;
     backendKey: string;
     representative: Candidate;
@@ -1235,7 +1242,7 @@ export function fuseSearchRuntimeCandidates(candidates: Candidate[]): FusedCandi
 
   interface AggregatedCandidate {
     outputKey: string;
-    identityStatus: 'canonical' | 'degraded';
+    identityStatus: 'canonical' | 'projection_exact' | 'source_group' | 'degraded';
     representative: Candidate;
     fusionScore: number;
     laneEvidence: LaneEvidence[];

@@ -272,6 +272,76 @@ lineage MEMBERSHIP, not 1:1 identity.
   write canary. Blocked, zero writes, until PKT-LINEAGE-10 admits a
   zero-ambiguity cohort.
 
+## Three bounded tracks — 2026-09-01/02 session (re-verified concurrent-session evidence, closed 1 real caller-mismatch bug)
+
+**Track A (PKT-LINEAGE-08/09 preflight) — CONFIRMED, no new writes.** A concurrent session's
+`scripts/atlas/plan-packet-chunk-lineage-promotion-v1.mjs` (read-only, verified: only `SELECT`
+queries, `pool.query` never called with INSERT/UPDATE) was inspected line-by-line and re-run fresh.
+Result, normalized to the required success-state shape:
+```
+implementationCorrect: PASS (chunkOrdinal fabrication bug fixed in bb1572e0a6, verified no drift)
+chunkOrdinal: NULL (frozen contract honored)
+authorityProvenBeforeMutation: PASS
+packetMembershipAtomicity: PASS
+authorityUnprovenFixture: REFUSED_WITH_ZERO_WRITES (BLOCKED_LINEAGE_AUTHORITY x10/10 candidates)
+liveEligibleCandidateCount: 0
+liveProductionCanary: BLOCKED_NO_ELIGIBLE_CANDIDATE
+futureWriterSemantics: PROVEN
+```
+Not a stall condition — this is the correct, expected state until a source cohort with a single
+unambiguous namespace+revision actually appears. No live orphan was fabricated to force a canary.
+PKT-LINEAGE-09/10/11 remain correctly blocked per their existing entries above; do not re-attempt
+until `eligibleCandidateCount > 0` on a fresh re-run.
+
+**Track B (RF-IDENTITY-CALLER-MATRIX-01) — DONE. Verdict: `V2_READY_FOR_CANONICAL_HYDRATION`.**
+Mapped every live caller of both name-colliding `resolveCanonicalIdentity` implementations plus
+`resolveCanonicalIdentityV2`:
+- `ace/identity-contract.ts::resolveCanonicalIdentity` — 3 live callers (`types/retrieval.ts`,
+  `ace/retrieval/evidence-lanes.ts`, `ace/indexed-source-packet.ts`). No `content_hash` field
+  exists in this module at all; `source_ref` is `status: 'degraded'`, never canonical.
+- `retrieval/identity-resolution.ts::resolveCanonicalIdentity` (V1) — reaches the canonical
+  `SearchRuntime` spine via `search-runtime.ts:814`'s dynamic import of
+  `retrieve-candidates.ts::retrieveAllCandidates` (8 production call sites) plus
+  `rrf-integration.ts`. `content_hash` → `'projection_exact'`; `source_ref` → `'source_group'`.
+  **Neither is ever `'canonical'` on this live path.**
+- `resolveCanonicalIdentityV2` — zero production callers (test-only). Safe to wire as the
+  hydration-time resolver in `RF-QDRANT-HYDRATION-02` without migrating existing V1 callers first.
+
+**content_hash CANONICAL anywhere live: NO. source_ref CANONICAL anywhere live: NO.**
+No `V1_LIVE_SEMANTIC_COLLISION`. Proceed to `RF-QDRANT-HYDRATION-02` (not started this session).
+
+**Real bug found and fixed instead (smallest-necessary migration, not a new abstraction):**
+RF-IDENTITY-SEMANTICS-02's broadening of `resolveCanonicalIdentity`'s `status` field to 4 values
+(`canonical | projection_exact | source_group | degraded`) was never propagated to the `Candidate`/
+`LaneGroup`/`AggregatedCandidate.identityStatus` type declarations in `search-runtime.ts` (still
+`'canonical' | 'degraded'`). This was a **live, currently-broken `tsc --noEmit` compile** — 8 real
+`TS2322` errors in `retrieve-candidates.ts`, confirmed by running `tsc` directly, not assumed.
+Fixed by widening all 3 type declarations to the full 4-way union — **zero runtime/dedup behavior
+change**, verified by reading `fuseSearchRuntimeCandidates`'s dedup logic first: every branch
+already tests `identityStatus === 'canonical'` and treats every other value (including the two new
+ones) identically to `'degraded'`, so neither `content_hash` nor `source_ref` was ever at risk of
+being wrongly promoted to a canonical dedup key even before the type fix — this was purely a stale
+type contract, not a semantic bug. One stale test
+(`retrieve-candidates-identity.test.ts`, asserting the pre-correction `content_hash → 'canonical'`
+expectation) was also fixed to match the corrected precedence. `tsc --noEmit` now clean on both
+files; all 32 tests across the 3 identity/fusion suites pass. Did not touch RETRIEVAL-02's 3 proven
+Qdrant defects, did not start RF7, did not create a V3 resolver.
+
+**Track C (GRAPHIFY-STALE-RUN-RECON-01) — DONE, read-only, re-run fresh, unchanged.**
+`scripts/atlas/audit-graphify-stale-run-reconciliation-v1.mjs` (verified genuinely read-only:
+`pool.query` calls are all `SELECT`) re-run live. One `graphify_runs` record for the expected
+workspace revision (`sha256:55edaaad...`), `status: 'RUNNING'`, `completed_at: null`, started
+2026-08-28T04:01:23Z — **zero `pg_stat_activity` or `pg_locks` evidence of a live backing
+process** (both empty arrays), meaning this is an orphaned record from a dead/killed process, not
+something still executing. `completedOwnerCount: 0` for this workspace revision.
+Normalized to the exact required 3-way enum: **`STALE_RUN_NON_PROMOTABLE`** (not
+`READINESS_REPLAY_SUFFICIENT` — `promotionAllowed`/`graphRevisionAllowed` are both explicitly
+`false`; not `FRESH_GRAPHIFY_REQUIRED` — that's a stronger claim than this evidence proves, and
+would require an explicit human abandonment-review decision, not an automatic assertion). Per
+explicit instruction, `graphify:daily` was **not** run to silence this. No OaK/DAG-runtime work
+follows from this track's `STALE_RUN_NON_PROMOTABLE` result until a human decides to abandon or
+resume the orphaned run.
+
 ## Validation record
 
 - [x] OpenSpec validation passes for proposal/design/tasks/spec consistency.
