@@ -42,7 +42,9 @@
       "inputOwnedByCaller": true,
       "fabricatesCandidateCohort": false,
       "requiresExactCandidateCountByDefault": 15,
-      "requiresSingleExactGraphRevision": true,
+      "graphRevisionPolicy": "LANE_AWARE",
+      "graphRevisionRequiredWhen": "graph lane or graph-derived score is admitted",
+      "graphRevisionMayBeNullWhen": "semantic/lineage-only snapshot carries no graph evidence",
       "checksLogicalReplayIdentity": true,
       "checksRequestEnvelopeSeparation": true,
       "checksAceManifestReplayIdentity": true,
@@ -50,6 +52,33 @@
       "cacheWritesPerformed": false,
       "writesPerformed": false,
       "canonicalAuthority": false
+    },
+    "aceLiveDryInputReadinessAudit": {
+      "status": "IMPLEMENTED_NOT_EXECUTED",
+      "script": "scripts/atlas/audit-ace-live-dry-input-readiness-v2.mts",
+      "validates": [
+        "CandidateOrdinalMapV1",
+        "CandidateFeatureSnapshotV1",
+        "RevisionAuthorityEnvelopeV1"
+      ],
+      "crossContractChecks": [
+        "ordinalMapChecksum",
+        "candidateSnapshotRevision",
+        "workspaceRevision",
+        "rowCount"
+      ],
+      "fabricatesMissingArtifacts": false
+    },
+    "existing15RowCanary": {
+      "status": "SEMANTIC_LINEAGE_CANARY_ONLY",
+      "rowCount": 15,
+      "graphRevision": null,
+      "graphStatus": "OPTIONAL_CURRENT_RELATIONSHIP_CORPUS_EMPTY",
+      "note": "This is valid input lineage evidence for a semantic-only ACE proof only when the resulting feature snapshot does not admit graph-lane or graph-derived evidence. A graph revision must never be fabricated to satisfy the replay harness."
+    },
+    "aceLiveDryCurrentBlocker": {
+      "status": "CANDIDATE_FEATURE_SNAPSHOT_ARTIFACT_MISSING",
+      "note": "Repository search found the exact 15-row CandidateOrdinalMapV1 canary and lineage report, but no persisted CandidateFeatureSnapshotV1 for the same candidateSnapshotRevision/ordinalMapChecksum. The next safe implementation is a read-only feature-snapshot producer using existing feature owners; do not synthesize scores or lane masks merely to make the ACE gate pass."
     },
     "legacyRetrievalRouterWorkspaceRevision": {
       "status": "COMPATIBILITY_ONLY",
@@ -82,9 +111,11 @@
     "npm --prefix sveltekit-frontend exec -- svelte-check --tsconfig ./tsconfig.json",
     "openspec validate parent-atlas-ace-rlm-bitfrost-integration --type change --strict --json"
   ],
+  "aceLiveDryReadinessCommand": "npm exec -- tsx scripts/atlas/audit-ace-live-dry-input-readiness-v2.mts -- --ordinal-map <candidate-map.json> --snapshot <feature-snapshot.json> --revision-authority <revision-authority.json>",
   "aceLiveDryCommand": "npm exec -- tsx scripts/atlas/prove-ace-live-dry-v2.mts -- --input <revision-qualified-input.json>",
   "nextGates": [
-    "ACE-LIVE-DRY-02: provide one reviewed exact 15-row cohort and execute prove-ace-live-dry-v2.mts twice-equivalent within one invocation",
+    "ACE-FEATURE-SNAPSHOT-PRODUCER-02: produce one read-only CandidateFeatureSnapshotV1 for the exact 15-row CandidateOrdinalMapV1 using existing feature owners and honest lane masks; no synthetic scores or graph revision",
+    "ACE-LIVE-DRY-02: execute the readiness audit, then prove the sealed bundle + ACE manifest replay for the exact cohort",
     "OAK-LIVE-READONLY-01: feed the same bundleLogicalChecksum and revision authority to already-registered live handlers",
     "BITFROST-LIVE-01: use bundleLogicalChecksum/ContextManifest identity for MISS/HIT/revision-MISS proof",
     "LANGGRAPH-CHECKPOINT-01: checkpoint receipt references/checksums, not duplicate evidence artifacts"
