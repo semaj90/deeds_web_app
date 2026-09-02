@@ -591,6 +591,55 @@ in `docs/reports/bridge-recon-dry-03-v1.json`.
 by this result — no Qdrant write was proposed for execution or applied. RF6 refactoring/RF7 were
 not started. OaK remains `BLOCKED_REVISION_BUNDLE_UNPROVEN`. `graphify:daily` was not run.
 
+## PKT-LINEAGE-11 (RECON-CANARY-01) (2026-09-02) — `RECON_CANARY_PROVEN`, the first Qdrant write
+
+Authorized and executed per explicit operator instruction, immediately after `BRIDGE-RECON-DRY-03`.
+Consumed **only** the existing `bridge-recon-dry-03-v1.json` classifications plus
+`pkt-lineage-09-frozen-proposal-v1.json` (for `sourceNamespace`/`sourceRevision`) — no identity was
+rediscovered from `source_ref`/`content_hash`/Qdrant payload during selection or mutation.
+
+**Cohort** (6 points, deterministic, all restricted to `EXACT_CANONICAL_MEMBERSHIP` rows — zero
+identity conflict, zero revision mismatch, zero foreign-chunk attribution per the dry run):
+```
+2× SINGLE_MEMBER  (packet:08007d10d8a0, packet:080a1ec5ed80)
+2× FEW_MEMBER     (ace:packet:7802b2572378 — both of its 2 members, full packet)
+2× MULTI_MEMBER   (ace:packet:0051e908c9be — 2 of its 30 members, sampled)
+```
+No point already carried the expected metadata (`ALREADY_RECONCILED` was 0 for the whole corpus
+per the dry run), so the "one point tests no-op replay" ask was not satisfiable from live data —
+noted honestly rather than fabricated; idempotency was instead proven by replaying the full canary
+patch a second time (below).
+
+**Per-point protocol**: fetch (payload+vector) → freeze preimage checksum → immediately-before-
+write re-fetch and verify preimage unchanged (would abort as `PREIMAGE_DRIFT`, none occurred) →
+`POST .../points/payload` (set-payload only — `packet_key`, `canonical_chunk_id`,
+`source_namespace`, `source_revision`; never the vector, never the point ID, never other payload
+fields) → readback verifying exact expected payload, unchanged vector fingerprint, unchanged
+point ID.
+
+**Apply result** (`docs/reports/pkt-lineage-11-recon-canary-01-apply-v1.json`):
+```
+selectedPoints: 6   pointsWritten: 6   readbackExact: 6
+preimageDrift: 0   identityConflicts: 0   revisionMismatches: 0   foreignChunkIds: 0
+vectorChanges: 0   pointIdChanges: 0   deletes: 0   unexpectedPayloadChanges: 0
+verdict: RECON_CANARY_PROVEN
+```
+**Replay result** (`docs/reports/pkt-lineage-11-recon-canary-01-replay-v1.json`, same 6 points,
+identical patch reapplied):
+```
+replayEffectiveChanges: 0   (all other fields identical to apply — see above)
+verdict: RECON_CANARY_PROVEN
+```
+The 675-row `QDRANT_POINT_MISSING` cohort was never touched — no Qdrant point was created,
+consistent with the explicit instruction that missing-point rows are a separate population
+question (stale packets / intentionally unprojected chunks / incomplete projection / another
+generation), not a reconciliation failure to be papered over.
+
+**Per explicit instruction: stopping here.** Full Qdrant reconciliation (the remaining 6,306
+`EXACT_CANONICAL_MEMBERSHIP` rows) is NOT authorized by this canary — it requires a separately
+authorized, refreshed full dry reconciliation against these now-proven mutation semantics first.
+`RF7` not started. OaK remains `BLOCKED_REVISION_BUNDLE_UNPROVEN`. `graphify:daily` not run.
+
 ## Validation record
 
 - [x] OpenSpec validation passes for proposal/design/tasks/spec consistency.

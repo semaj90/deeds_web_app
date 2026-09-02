@@ -1,0 +1,130 @@
+{
+  "schema": "atlas.pkt-lineage-11-recon-canary-01.v1",
+  "task": "PKT-LINEAGE-11-RECON-CANARY-01-REPLAY",
+  "generatedAt": "2026-09-02T02:31:37.183Z",
+  "inputAuthority": "bridge-recon-dry-03-v1.json classifications + pkt-lineage-09-frozen-proposal-v1.json only -- no rediscovery",
+  "qdrantCollection": "codebase_chunks_768_v2",
+  "selectedPoints": 6,
+  "pointsWritten": 6,
+  "readbackExact": 6,
+  "preimageDrift": 0,
+  "identityConflicts": 0,
+  "revisionMismatches": 0,
+  "foreignChunkIds": 0,
+  "vectorChanges": 0,
+  "pointIdChanges": 0,
+  "deletes": 0,
+  "unexpectedPayloadChanges": 0,
+  "replayEffectiveChanges": 0,
+  "verdict": "RECON_CANARY_PROVEN",
+  "results": [
+    {
+      "shape": "SINGLE_MEMBER",
+      "packetKey": "packet:08007d10d8a0",
+      "canonicalChunkId": "fullrepo:docs/graph/repo-workspace-map.md:0",
+      "physicalPointId": "fa8973c3-4d68-46ce-8c70-9bedff442d0f",
+      "sourceRef": "docs/graph/repo-workspace-map.md",
+      "sourceNamespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+      "sourceRevision": "sha256:9ab6e3ddb707cf1f4b92e8389ea50d6352a301a174dee0999eaae4932dad9afb",
+      "evidenceRefs": [
+        "docs/reports/bridge-recon-dry-03-v1.json",
+        "docs/reports/pkt-lineage-09-frozen-proposal-v1.json"
+      ],
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "beforePayloadChecksum": "9ffe6413d3d147f9da68d5fc16bc383aee5bd0a781fc6e95358a9da542d85fed",
+      "afterPayloadChecksum": "9ffe6413d3d147f9da68d5fc16bc383aee5bd0a781fc6e95358a9da542d85fed",
+      "vectorUnchanged": true,
+      "pointIdUnchanged": true
+    },
+    {
+      "shape": "SINGLE_MEMBER",
+      "packetKey": "packet:080a1ec5ed80",
+      "canonicalChunkId": "fullrepo:docs/profile-cards/data/docker_langgraph-synthesis_.venv_Lib_site-packages_plotly_package_data_plotly.min.js.json:0",
+      "physicalPointId": "d264a247-fc51-413b-a349-3082090af676",
+      "sourceRef": "docs/profile-cards/data/docker_langgraph-synthesis_.venv_Lib_site-packages_plotly_package_data_plotly.min.js.json",
+      "sourceNamespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+      "sourceRevision": "sha256:1ec85671f9925a69e0fa237a37b509e40af49edecefd2b00c661d42ae5ed65fc",
+      "evidenceRefs": [
+        "docs/reports/bridge-recon-dry-03-v1.json",
+        "docs/reports/pkt-lineage-09-frozen-proposal-v1.json"
+      ],
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "beforePayloadChecksum": "e0c533d1f62f79a493d04998831f35e5e7576dda6614deff9d679b781ec91804",
+      "afterPayloadChecksum": "e0c533d1f62f79a493d04998831f35e5e7576dda6614deff9d679b781ec91804",
+      "vectorUnchanged": true,
+      "pointIdUnchanged": true
+    },
+    {
+      "shape": "FEW_MEMBER",
+      "packetKey": "ace:packet:7802b2572378",
+      "canonicalChunkId": "fullrepo:docs/atlas/package-boundary-registry.json:0",
+      "physicalPointId": "47e22098-d633-4d04-a72c-9be5fc73476b",
+      "sourceRef": "docs/atlas/package-boundary-registry.json",
+      "sourceNamespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+      "sourceRevision": "sha256:8dbbb7d8db03b5a99c52259eddb1061ef05bec7c73722df468d25e3d163bcba7",
+      "evidenceRefs": [
+        "docs/reports/bridge-recon-dry-03-v1.json",
+        "docs/reports/pkt-lineage-09-frozen-proposal-v1.json"
+      ],
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "beforePayloadChecksum": "963814293255173802d2519e504f48d51473bd593f41597e8a7fd51e649785f8",
+      "afterPayloadChecksum": "963814293255173802d2519e504f48d51473bd593f41597e8a7fd51e649785f8",
+      "vectorUnchanged": true,
+      "pointIdUnchanged": true
+    },
+    {
+      "shape": "FEW_MEMBER",
+      "packetKey": "ace:packet:7802b2572378",
+      "canonicalChunkId": "fullrepo:docs/atlas/package-boundary-registry.json:1",
+      "physicalPointId": "61274536-a570-4852-a4ac-a7fdf0e94193",
+      "sourceRef": "docs/atlas/package-boundary-registry.json",
+      "sourceNamespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+      "sourceRevision": "sha256:8dbbb7d8db03b5a99c52259eddb1061ef05bec7c73722df468d25e3d163bcba7",
+      "evidenceRefs": [
+        "docs/reports/bridge-recon-dry-03-v1.json",
+        "docs/reports/pkt-lineage-09-frozen-proposal-v1.json"
+      ],
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "beforePayloadChecksum": "e835ed453d0c0b64dcb374b841f2848bc2c274403ff9c9d92d22853e38d8ecc0",
+      "afterPayloadChecksum": "e835ed453d0c0b64dcb374b841f2848bc2c274403ff9c9d92d22853e38d8ecc0",
+      "vectorUnchanged": true,
+      "pointIdUnchanged": true
+    },
+    {
+      "shape": "MULTI_MEMBER",
+      "packetKey": "ace:packet:0051e908c9be",
+      "canonicalChunkId": "fullrepo:docs/architecture/phase8-query-optimization-taxonomy.md:0",
+      "physicalPointId": "3f33423c-8daf-4abe-b81a-a3b0f4980bae",
+      "sourceRef": "docs/architecture/phase8-query-optimization-taxonomy.md",
+      "sourceNamespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+      "sourceRevision": "sha256:3ca5d3c6d57114328d4347f8a4141bb5231bab3ccef86da45bd73f461a127b9c",
+      "evidenceRefs": [
+        "docs/reports/bridge-recon-dry-03-v1.json",
+        "docs/reports/pkt-lineage-09-frozen-proposal-v1.json"
+      ],
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "beforePayloadChecksum": "725ffb4c53cea6c36711f344a701889b24acc57a39f0469b73a1ff6294934517",
+      "afterPayloadChecksum": "725ffb4c53cea6c36711f344a701889b24acc57a39f0469b73a1ff6294934517",
+      "vectorUnchanged": true,
+      "pointIdUnchanged": true
+    },
+    {
+      "shape": "MULTI_MEMBER",
+      "packetKey": "ace:packet:0051e908c9be",
+      "canonicalChunkId": "fullrepo:docs/architecture/phase8-query-optimization-taxonomy.md:1",
+      "physicalPointId": "693215aa-e7d4-4571-9618-2317bdca5118",
+      "sourceRef": "docs/architecture/phase8-query-optimization-taxonomy.md",
+      "sourceNamespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+      "sourceRevision": "sha256:3ca5d3c6d57114328d4347f8a4141bb5231bab3ccef86da45bd73f461a127b9c",
+      "evidenceRefs": [
+        "docs/reports/bridge-recon-dry-03-v1.json",
+        "docs/reports/pkt-lineage-09-frozen-proposal-v1.json"
+      ],
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "beforePayloadChecksum": "2bb65fa6567085145b1667e6da27c219a6f4ddec51c00c436f8cd8977f4e89e2",
+      "afterPayloadChecksum": "2bb65fa6567085145b1667e6da27c219a6f4ddec51c00c436f8cd8977f4e89e2",
+      "vectorUnchanged": true,
+      "pointIdUnchanged": true
+    }
+  ]
+}
