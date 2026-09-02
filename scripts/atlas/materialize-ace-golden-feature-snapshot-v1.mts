@@ -1,4 +1,3 @@
-import { createHash } from 'node:crypto';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 
@@ -9,10 +8,7 @@ import {
 import {
   materializeCandidateFeatureSnapshot,
 } from '../../sveltekit-frontend/src/lib/server/atlas/features/candidate-feature-snapshot-v1.js';
-
-function sha256(value: unknown): string {
-  return createHash('sha256').update(JSON.stringify(value), 'utf8').digest('hex');
-}
+import { canonicalSha256V1 } from '../../sveltekit-frontend/src/lib/server/atlas/prefill/canonical-hash-v1.js';
 
 function parseArgs(argv: readonly string[]) {
   let ordinalMap = '.tmp/atlas/lineage-qualified-candidate-map-v1.json';
@@ -52,13 +48,22 @@ async function readJson(path: string): Promise<any> {
   return JSON.parse(await readFile(path, 'utf8'));
 }
 
-function assertGoldenReplay(baseMap: ReturnType<typeof candidateOrdinalMapV1Schema.parse>, golden: any, graph: any): void {
+function assertGoldenReplay(
+  baseMap: ReturnType<typeof candidateOrdinalMapV1Schema.parse>,
+  golden: any,
+  graph: any,
+): void {
   if (golden?.schema !== 'atlas.parent-atlas-golden-retrieval.v1' || golden?.status !== 'GOLDEN_RETRIEVAL_REPLAY_PROVEN') {
     throw new Error('ACE_FEATURE_SNAPSHOT_GOLDEN_REPLAY_NOT_PROVEN');
   }
   if (golden?.mode !== 'READ_ONLY_EXACT_REPLAY' || golden?.replay?.identical !== true) {
     throw new Error('ACE_FEATURE_SNAPSHOT_GOLDEN_REPLAY_NOT_DETERMINISTIC');
   }
+  if (typeof golden?.replay?.firstChecksum !== 'string' || golden.replay.firstChecksum.length !== 64 ||
+      golden?.replay?.secondChecksum !== golden.replay.firstChecksum) {
+    throw new Error('ACE_FEATURE_SNAPSHOT_GOLDEN_REPLAY_CHECKSUM_INVALID');
+  }
+
   const writes = golden?.writes ?? {};
   if (writes.postgresWrites !== false || writes.qdrantWrites !== false || writes.redisWrites !== false || writes.neo4jWrites !== false) {
     throw new Error('ACE_FEATURE_SNAPSHOT_GOLDEN_REPLAY_WRITE_FLAG_PRESENT');
@@ -79,6 +84,9 @@ function assertGoldenReplay(baseMap: ReturnType<typeof candidateOrdinalMapV1Sche
   if (graph?.writesPerformed !== false || graph?.canonicalAuthority !== false) {
     throw new Error('ACE_FEATURE_SNAPSHOT_GRAPH_REPORT_AUTHORITY_OR_WRITE_MISMATCH');
   }
+  if (typeof graph?.graphRevision !== 'string' || !graph.graphRevision.startsWith('sha256:')) {
+    throw new Error('ACE_FEATURE_SNAPSHOT_GRAPH_REVISION_INVALID');
+  }
   if (graph?.workspaceRevision !== baseMap.workspaceRevision ||
       graph?.candidateSnapshotRevision !== baseMap.candidateSnapshotRevision ||
       graph?.ordinalMapChecksum !== baseMap.ordinalMapChecksum) {
@@ -90,15 +98,17 @@ function assertGoldenReplay(baseMap: ReturnType<typeof candidateOrdinalMapV1Sche
   }
 
   const hits = Array.isArray(golden?.hits) ? golden.hits : [];
-  if (hits.length !== baseMap.rowCount) throw new Error(`ACE_FEATURE_SNAPSHOT_HIT_COUNT_MISMATCH:${hits.length}:${baseMap.rowCount}`);
-  const seen = new Set<number>();
+  if (hits.length !== baseMap.rowCount) {
+    throw new Error(`ACE_FEATURE_SNAPSHOT_HIT_COUNT_MISMATCH:${hits.length}:${baseMap.rowCount}`);
+  }
+  const seenHits = new Set<number>();
   for (const hit of hits) {
     const ordinal = Number(hit?.candidateOrdinal);
     if (!Number.isInteger(ordinal) || ordinal < 0 || ordinal >= baseMap.rowCount) {
       throw new Error(`ACE_FEATURE_SNAPSHOT_HIT_ORDINAL_INVALID:${String(hit?.candidateOrdinal)}`);
     }
-    if (seen.has(ordinal)) throw new Error(`ACE_FEATURE_SNAPSHOT_HIT_ORDINAL_DUPLICATE:${ordinal}`);
-    seen.add(ordinal);
+    if (seenHits.has(ordinal)) throw new Error(`ACE_FEATURE_SNAPSHOT_HIT_ORDINAL_DUPLICATE:${ordinal}`);
+    seenHits.add(ordinal);
     const candidate = baseMap.candidates[ordinal];
     if (!candidate || hit?.canonicalId !== candidate.canonicalId || hit?.packetKey !== candidate.packetKey || hit?.sourceRef !== candidate.sourceRef) {
       throw new Error(`ACE_FEATURE_SNAPSHOT_HIT_IDENTITY_MISMATCH:${ordinal}`);
@@ -106,21 +116,29 @@ function assertGoldenReplay(baseMap: ReturnType<typeof candidateOrdinalMapV1Sche
     if (!Number.isFinite(Number(hit?.score))) throw new Error(`ACE_FEATURE_SNAPSHOT_SEMANTIC_SCORE_INVALID:${ordinal}`);
   }
   for (let ordinal = 0; ordinal < baseMap.rowCount; ordinal += 1) {
-    if (!seen.has(ordinal)) throw new Error(`ACE_FEATURE_SNAPSHOT_HIT_ORDINAL_MISSING:${ordinal}`);
+    if (!seenHits.has(ordinal)) throw new Error(`ACE_FEATURE_SNAPSHOT_HIT_ORDINAL_MISSING:${ordinal}`);
   }
 
   const graphFeatures = Array.isArray(graph?.features) ? graph.features : [];
   if (graphFeatures.length !== Number(graph?.candidateCount ?? graphFeatures.length)) {
     throw new Error('ACE_FEATURE_SNAPSHOT_GRAPH_FEATURE_COUNT_MISMATCH');
   }
+  const seenGraphOrdinals = new Set<number>();
   for (const feature of graphFeatures) {
     const ordinal = Number(feature?.candidateOrdinal);
     if (!Number.isInteger(ordinal) || ordinal < 0 || ordinal >= baseMap.rowCount) {
       throw new Error(`ACE_FEATURE_SNAPSHOT_GRAPH_ORDINAL_INVALID:${String(feature?.candidateOrdinal)}`);
     }
+    if (seenGraphOrdinals.has(ordinal)) {
+      throw new Error(`ACE_FEATURE_SNAPSHOT_GRAPH_ORDINAL_DUPLICATE:${ordinal}`);
+    }
+    seenGraphOrdinals.add(ordinal);
     if (!Number.isFinite(Number(feature?.pagerankMax))) {
       throw new Error(`ACE_FEATURE_SNAPSHOT_GRAPH_AUTHORITY_INVALID:${ordinal}`);
     }
+  }
+  if (golden?.graphFeatureJoin?.attachedHitFeatureCount !== graphFeatures.length) {
+    throw new Error(`ACE_FEATURE_SNAPSHOT_GRAPH_ATTACH_COUNT_MISMATCH:${String(golden?.graphFeatureJoin?.attachedHitFeatureCount)}:${graphFeatures.length}`);
   }
 }
 
@@ -136,7 +154,8 @@ async function main() {
   }
 
   const graphRevision = String(graph.graphRevision);
-  const evidenceRevisionHash = sha256({
+  const evidenceRevisionHash = canonicalSha256V1({
+    schema: 'atlas.ace-golden-feature-snapshot-evidence-set.v1',
     baseOrdinalMapChecksum: baseMap.ordinalMapChecksum,
     goldenReplayChecksum: golden.replay.firstChecksum,
     graphRevision,
@@ -172,7 +191,9 @@ async function main() {
 
   for (const candidate of derivedMap.candidates) {
     const prior = baseMap.candidates[candidate.candidateOrdinal];
-    if (!prior || prior.canonicalId !== candidate.canonicalId || prior.packetKey !== candidate.packetKey || prior.sourceRevision !== candidate.sourceRevision) {
+    if (!prior || prior.canonicalId !== candidate.canonicalId || prior.packetKey !== candidate.packetKey ||
+        prior.sourceRef !== candidate.sourceRef || prior.sourceRevision !== candidate.sourceRevision ||
+        prior.semanticRevision !== candidate.semanticRevision) {
       throw new Error(`ACE_FEATURE_SNAPSHOT_DERIVED_ORDINAL_DRIFT:${candidate.candidateOrdinal}`);
     }
   }
@@ -184,7 +205,6 @@ async function main() {
     const hit = hitByOrdinal.get(candidate.candidateOrdinal);
     if (!hit) throw new Error(`ACE_FEATURE_SNAPSHOT_HIT_MISSING:${candidate.candidateOrdinal}`);
     const graphFeature = graphByOrdinal.get(candidate.candidateOrdinal) ?? null;
-    const laneMask = graphFeature ? ['semantic', 'graph'] as const : ['semantic'] as const;
     return {
       schema: 'atlas.candidate-feature-row.v1' as const,
       candidateOrdinal: candidate.candidateOrdinal,
@@ -211,7 +231,7 @@ async function main() {
       domainAffinity: null,
       executionUtility: null,
       memoryUtility: null,
-      laneMask: [...laneMask],
+      laneMask: graphFeature ? ['semantic', 'graph'] : ['semantic'],
       degradedIdentity: candidate.degradedIdentity,
       evidenceRefs: [...new Set([
         ...candidate.evidenceRefs,
@@ -254,6 +274,7 @@ async function main() {
       identityAuthority: false,
     },
     semantics: {
+      evidenceRevisionHashOwner: 'canonicalSha256V1 / ATLAS_CANONICAL_V1',
       semanticScoreOwner: 'parent-atlas-golden-retrieval-v1 exact semantic_768 score',
       graphAuthorityOwner: 'current-graph-feature-gather-v1 pagerankMax -> authority_norm precedent',
       graphRevisionAppliesToCandidateUniverse: true,
