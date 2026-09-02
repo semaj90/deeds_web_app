@@ -40,6 +40,7 @@ const aceLiveDryInputV2Schema = z.object({
 }).strict();
 
 type AceLiveDryInputV2 = z.infer<typeof aceLiveDryInputV2Schema>;
+type SnapshotRow = AceLiveDryInputV2['snapshot']['rows'][number];
 
 function parseArgs(argv: readonly string[]) {
   let inputPath: string | null = null;
@@ -59,7 +60,7 @@ function parseArgs(argv: readonly string[]) {
   return { inputPath: resolve(inputPath), reportPath: resolve(reportPath) };
 }
 
-function selectedRows(input: AceLiveDryInputV2) {
+function selectedRows(input: AceLiveDryInputV2): SnapshotRow[] {
   const ordinals = [...new Set(input.ace.selectedOrdinals ?? input.snapshot.rows.map((row) => row.candidateOrdinal))]
     .sort((a, b) => a - b);
   return ordinals.map((ordinal) => {
@@ -69,7 +70,7 @@ function selectedRows(input: AceLiveDryInputV2) {
   });
 }
 
-function exactSourceRevisionSet(rows: ReturnType<typeof selectedRows>): string[] {
+function exactSourceRevisionSet(rows: readonly SnapshotRow[]): string[] {
   return [...new Set(rows.map((row) => row.sourceRevision))]
     .filter((revision): revision is string => revision !== null)
     .sort();
@@ -151,9 +152,8 @@ async function main() {
     throw new Error('ACE_LIVE_DRY_CONTEXT_REPLAY_MISMATCH');
   }
 
-  const selected = selectedRows(input);
-  const selectedSourceRevisions = exactSourceRevisionSet(selected);
-  const fullSnapshotSourceRevisions = exactSourceRevisionSet({ ...input, ace: { ...input.ace, selectedOrdinals: input.snapshot.rows.map((row) => row.candidateOrdinal) } } as AceLiveDryInputV2);
+  const selectedSourceRevisions = exactSourceRevisionSet(selectedRows(input));
+  const fullSnapshotSourceRevisions = exactSourceRevisionSet(input.snapshot.rows);
   if (JSON.stringify(selectedSourceRevisions) !== JSON.stringify(fullSnapshotSourceRevisions)) {
     throw new Error('ACE_LIVE_DRY_SOURCE_REVISION_MEMBERSHIP_MISMATCH');
   }
