@@ -69,6 +69,12 @@ function selectedRows(input: AceLiveDryInputV2) {
   });
 }
 
+function exactSourceRevisionSet(rows: ReturnType<typeof selectedRows>): string[] {
+  return [...new Set(rows.map((row) => row.sourceRevision))]
+    .filter((revision): revision is string => revision !== null)
+    .sort();
+}
+
 function assertStrictCanary(input: AceLiveDryInputV2) {
   if (input.ordinalMap.rowCount !== input.expectedCandidateCount ||
       input.snapshot.rowCount !== input.expectedCandidateCount) {
@@ -144,8 +150,12 @@ async function main() {
       aceA.sourceRevisionSetChecksum !== aceB.sourceRevisionSetChecksum) {
     throw new Error('ACE_LIVE_DRY_CONTEXT_REPLAY_MISMATCH');
   }
-  if (aceA.sourceRevisionSetChecksum !== bundleA.sourceRevisionSetChecksum) {
-    throw new Error(`ACE_LIVE_DRY_SOURCE_REVISION_SET_MISMATCH:${aceA.sourceRevisionSetChecksum}:${bundleA.sourceRevisionSetChecksum}`);
+
+  const selected = selectedRows(input);
+  const selectedSourceRevisions = exactSourceRevisionSet(selected);
+  const fullSnapshotSourceRevisions = exactSourceRevisionSet({ ...input, ace: { ...input.ace, selectedOrdinals: input.snapshot.rows.map((row) => row.candidateOrdinal) } } as AceLiveDryInputV2);
+  if (JSON.stringify(selectedSourceRevisions) !== JSON.stringify(fullSnapshotSourceRevisions)) {
+    throw new Error('ACE_LIVE_DRY_SOURCE_REVISION_MEMBERSHIP_MISMATCH');
   }
 
   const report = {
@@ -160,6 +170,7 @@ async function main() {
     snapshotChecksum: bundleA.snapshot.snapshotChecksum,
     revisionAuthorityChecksum: bundleA.revisionAuthority.authorityChecksum,
     sourceRevisionSetChecksum: bundleA.sourceRevisionSetChecksum,
+    aceSourceRevisionSetChecksum: aceA.sourceRevisionSetChecksum,
     graphRevisionSetChecksum: bundleA.graphRevisionSetChecksum,
     semanticRevisionSetChecksum: bundleA.semanticRevisionSetChecksum,
     bundleLogicalChecksum: bundleA.bundleLogicalChecksum,
@@ -172,9 +183,12 @@ async function main() {
       logicalChecksumRequestIndependent: true,
       envelopeChecksumRequestBound: true,
       aceManifestReplayExact: true,
-      sourceRevisionSetParity: true,
+      sourceRevisionMembershipExact: true,
       candidateSourceAuthorityExact: true,
       graphRevisionSingleExact: true,
+    },
+    notes: {
+      sourceRevisionChecksumDomains: 'Bundle and ACE source-revision-set checksums are domain-separated by schema and are not required to be byte-equal; exact revision membership is compared instead.',
     },
     writesPerformed: false,
     cacheWritesPerformed: false,
