@@ -35,7 +35,7 @@ const aceLiveDryInputV2Schema = z.object({
     ontologyRevision: z.string().min(1).nullable().optional(),
     modelRevision: z.string().min(1).nullable().optional(),
     promptTemplateRevision: z.string().min(1).nullable().optional(),
-    graphRevision: z.string().min(1),
+    graphRevision: z.string().min(1).nullable().default(null),
   }).strict(),
 }).strict();
 
@@ -71,9 +71,37 @@ function selectedRows(input: AceLiveDryInputV2): SnapshotRow[] {
 }
 
 function exactSourceRevisionSet(rows: readonly SnapshotRow[]): string[] {
-  return [...new Set(rows.map((row) => row.sourceRevision))]
-    .filter((revision): revision is string => revision !== null)
-    .sort();
+  return [...new Set(rows.map((row) => row.sourceRevision))].sort();
+}
+
+function rowCarriesGraphEvidence(row: SnapshotRow): boolean {
+  return row.laneMask.includes('graph') ||
+    row.graphAuthority !== null ||
+    row.personalizedPageRank !== null ||
+    row.communityAffinity !== null;
+}
+
+function graphAdmission(rows: readonly SnapshotRow[], requestedGraphRevision: string | null) {
+  const graphEvidenceRequired = rows.some(rowCarriesGraphEvidence);
+  const graphRevisions = [...new Set(rows.map((row) => row.graphRevision))];
+
+  if (graphEvidenceRequired) {
+    if (rows.some((row) => row.graphRevision === null)) {
+      throw new Error('ACE_LIVE_DRY_GRAPH_EVIDENCE_REQUIRES_REVISION');
+    }
+    if (graphRevisions.length !== 1 || graphRevisions[0] === null) {
+      throw new Error(`ACE_LIVE_DRY_GRAPH_REVISION_NOT_SINGLE_EXACT:${graphRevisions.map(String).join(',')}`);
+    }
+    if (requestedGraphRevision === null || graphRevisions[0] !== requestedGraphRevision) {
+      throw new Error(`ACE_LIVE_DRY_GRAPH_REVISION_MISMATCH:${graphRevisions[0]}:${requestedGraphRevision}`);
+    }
+    return { mode: 'REQUIRED_EXACT' as const, graphRevision: graphRevisions[0] };
+  }
+
+  if (rows.some((row) => row.graphRevision !== null) || requestedGraphRevision !== null) {
+    throw new Error('ACE_LIVE_DRY_GRAPH_REVISION_WITHOUT_GRAPH_EVIDENCE');
+  }
+  return { mode: 'NOT_ADMITTED' as const, graphRevision: null };
 }
 
 function assertStrictCanary(input: AceLiveDryInputV2) {
@@ -85,23 +113,17 @@ function assertStrictCanary(input: AceLiveDryInputV2) {
   if (rows.length !== input.expectedCandidateCount) {
     throw new Error(`ACE_LIVE_DRY_SELECTED_COUNT_MISMATCH:${rows.length}:${input.expectedCandidateCount}`);
   }
-  const graphRevisions = [...new Set(rows.map((row) => row.graphRevision))];
-  if (graphRevisions.length !== 1 || graphRevisions[0] === null) {
-    throw new Error(`ACE_LIVE_DRY_GRAPH_REVISION_NOT_SINGLE_EXACT:${graphRevisions.map(String).join(',')}`);
-  }
-  if (graphRevisions[0] !== input.ace.graphRevision) {
-    throw new Error(`ACE_LIVE_DRY_GRAPH_REVISION_MISMATCH:${graphRevisions[0]}:${input.ace.graphRevision}`);
-  }
-  if (rows.some((row) => row.sourceRevision === null)) {
+  if (rows.some((row) => !row.sourceRevision.trim())) {
     throw new Error('ACE_LIVE_DRY_SOURCE_REVISION_MISSING');
   }
+  return graphAdmission(rows, input.ace.graphRevision);
 }
 
 async function main() {
   const { inputPath, reportPath } = parseArgs(process.argv.slice(2));
   const raw = JSON.parse(await readFile(inputPath, 'utf8')) as unknown;
   const input = aceLiveDryInputV2Schema.parse(raw);
-  assertStrictCanary(input);
+  const graph = assertStrictCanary(input);
 
   const bundleInput = {
     requestId: input.ace.requestId,
@@ -141,7 +163,7 @@ async function main() {
     ontologyRevision: input.ace.ontologyRevision ?? null,
     modelRevision: input.ace.modelRevision ?? null,
     promptTemplateRevision: input.ace.promptTemplateRevision ?? null,
-    graphRevision: input.ace.graphRevision,
+    graphRevision: graph.graphRevision,
   };
   const aceA = buildAceContextManifestAdmissionV1(admissionInput);
   const aceB = buildAceContextManifestAdmissionV1(admissionInput);
@@ -172,6 +194,8 @@ async function main() {
     sourceRevisionSetChecksum: bundleA.sourceRevisionSetChecksum,
     aceSourceRevisionSetChecksum: aceA.sourceRevisionSetChecksum,
     graphRevisionSetChecksum: bundleA.graphRevisionSetChecksum,
+    graphAdmissionMode: graph.mode,
+    graphRevision: graph.graphRevision,
     semanticRevisionSetChecksum: bundleA.semanticRevisionSetChecksum,
     bundleLogicalChecksum: bundleA.bundleLogicalChecksum,
     bundleEnvelopeChecksum: bundleA.bundleEnvelopeChecksum,
@@ -185,10 +209,11 @@ async function main() {
       aceManifestReplayExact: true,
       sourceRevisionMembershipExact: true,
       candidateSourceAuthorityExact: true,
-      graphRevisionSingleExact: true,
+      graphEvidenceAdmissionExact: true,
     },
     notes: {
       sourceRevisionChecksumDomains: 'Bundle and ACE source-revision-set checksums are domain-separated by schema and are not required to be byte-equal; exact revision membership is compared instead.',
+      graphRevisionPolicy: 'Graph revision is required only when the selected feature snapshot actually admits graph-lane or graph-derived evidence. Semantic-only canaries must carry graphRevision=null rather than fabricate graph identity.',
     },
     writesPerformed: false,
     cacheWritesPerformed: false,
