@@ -3,9 +3,7 @@ import { basename, dirname, resolve } from 'node:path';
 
 import {
   aceLiveDryInputV2Schema,
-  resolveAceLiveDryGraphRevisionV2,
-  selectedAceLiveDryRowsV2,
-  type AceLiveDryInputV2,
+  validateAceLiveDryCanaryV2,
   type AceLiveDrySnapshotRowV2,
 } from '../../sveltekit-frontend/src/lib/server/atlas/context/ace-live-dry-input-v2.js';
 import {
@@ -38,34 +36,11 @@ function exactSourceRevisionSet(rows: readonly AceLiveDrySnapshotRowV2[]): strin
   return [...new Set(rows.map((row) => row.sourceRevision))].sort();
 }
 
-function assertStrictCanary(input: AceLiveDryInputV2) {
-  if (input.ordinalMap.rowCount !== input.expectedCandidateCount ||
-      input.snapshot.rowCount !== input.expectedCandidateCount) {
-    throw new Error(`ACE_LIVE_DRY_CANDIDATE_COUNT_MISMATCH:${input.ordinalMap.rowCount}:${input.snapshot.rowCount}:${input.expectedCandidateCount}`);
-  }
-  const rows = selectedAceLiveDryRowsV2(input);
-  if (rows.length !== input.expectedCandidateCount) {
-    throw new Error(`ACE_LIVE_DRY_SELECTED_COUNT_MISMATCH:${rows.length}:${input.expectedCandidateCount}`);
-  }
-  if (rows.some((row) => !row.sourceRevision.trim())) {
-    throw new Error('ACE_LIVE_DRY_SOURCE_REVISION_MISSING');
-  }
-
-  const graphRevision = resolveAceLiveDryGraphRevisionV2(rows);
-  if (graphRevision !== input.ace.graphRevision) {
-    throw new Error(`ACE_LIVE_DRY_GRAPH_REVISION_MISMATCH:${graphRevision}:${input.ace.graphRevision}`);
-  }
-  return {
-    mode: graphRevision === null ? 'NOT_ADMITTED' as const : 'REQUIRED_EXACT' as const,
-    graphRevision,
-  };
-}
-
 async function main() {
   const { inputPath, reportPath } = parseArgs(process.argv.slice(2));
   const raw = JSON.parse(await readFile(inputPath, 'utf8')) as unknown;
   const input = aceLiveDryInputV2Schema.parse(raw);
-  const graph = assertStrictCanary(input);
+  const canary = validateAceLiveDryCanaryV2(input);
 
   const bundleInput = {
     requestId: input.ace.requestId,
@@ -105,7 +80,7 @@ async function main() {
     ontologyRevision: input.ace.ontologyRevision ?? null,
     modelRevision: input.ace.modelRevision ?? null,
     promptTemplateRevision: input.ace.promptTemplateRevision ?? null,
-    graphRevision: graph.graphRevision,
+    graphRevision: canary.graphRevision,
   };
   const aceA = buildAceContextManifestAdmissionV1(admissionInput);
   const aceB = buildAceContextManifestAdmissionV1(admissionInput);
@@ -116,7 +91,7 @@ async function main() {
     throw new Error('ACE_LIVE_DRY_CONTEXT_REPLAY_MISMATCH');
   }
 
-  const selectedSourceRevisions = exactSourceRevisionSet(selectedAceLiveDryRowsV2(input));
+  const selectedSourceRevisions = exactSourceRevisionSet(canary.selectedRows);
   const fullSnapshotSourceRevisions = exactSourceRevisionSet(input.snapshot.rows);
   if (JSON.stringify(selectedSourceRevisions) !== JSON.stringify(fullSnapshotSourceRevisions)) {
     throw new Error('ACE_LIVE_DRY_SOURCE_REVISION_MEMBERSHIP_MISMATCH');
@@ -136,8 +111,8 @@ async function main() {
     sourceRevisionSetChecksum: bundleA.sourceRevisionSetChecksum,
     aceSourceRevisionSetChecksum: aceA.sourceRevisionSetChecksum,
     graphRevisionSetChecksum: bundleA.graphRevisionSetChecksum,
-    graphAdmissionMode: graph.mode,
-    graphRevision: graph.graphRevision,
+    graphAdmissionMode: canary.graphAdmissionMode,
+    graphRevision: canary.graphRevision,
     semanticRevisionSetChecksum: bundleA.semanticRevisionSetChecksum,
     bundleLogicalChecksum: bundleA.bundleLogicalChecksum,
     bundleEnvelopeChecksum: bundleA.bundleEnvelopeChecksum,
@@ -145,6 +120,7 @@ async function main() {
     aceManifestIdentityChecksum: aceA.manifest.identityChecksum,
     selectedOrdinalSetChecksum: aceA.selectedOrdinalSetChecksum,
     checks: {
+      sharedCanaryValidation: true,
       bundleReplayExact: true,
       logicalChecksumRequestIndependent: true,
       envelopeChecksumRequestBound: true,
