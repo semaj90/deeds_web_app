@@ -34,6 +34,12 @@ export const aceLiveDryInputV2Schema = z.object({
 export type AceLiveDryInputV2 = z.infer<typeof aceLiveDryInputV2Schema>;
 export type AceLiveDrySnapshotRowV2 = AceLiveDryInputV2['snapshot']['rows'][number];
 
+export interface AceLiveDryCanaryValidationV2 {
+  selectedRows: AceLiveDrySnapshotRowV2[];
+  graphRevision: string | null;
+  graphAdmissionMode: 'REQUIRED_EXACT' | 'NOT_ADMITTED';
+}
+
 export function rowCarriesAceGraphEvidenceV2(row: AceLiveDrySnapshotRowV2): boolean {
   return row.laneMask.includes('graph') ||
     row.graphAuthority !== null ||
@@ -69,4 +75,46 @@ export function resolveAceLiveDryGraphRevisionV2(rows: readonly AceLiveDrySnapsh
     throw new Error('ACE_LIVE_DRY_GRAPH_REVISION_WITHOUT_GRAPH_EVIDENCE');
   }
   return null;
+}
+
+export function validateAceLiveDryCanaryV2(input: AceLiveDryInputV2): AceLiveDryCanaryValidationV2 {
+  if (input.ordinalMap.rowCount !== input.expectedCandidateCount ||
+      input.snapshot.rowCount !== input.expectedCandidateCount) {
+    throw new Error(
+      `ACE_LIVE_DRY_CANDIDATE_COUNT_MISMATCH:${input.ordinalMap.rowCount}:${input.snapshot.rowCount}:${input.expectedCandidateCount}`,
+    );
+  }
+  if (input.ordinalMap.ordinalMapChecksum !== input.snapshot.ordinalMapChecksum) {
+    throw new Error(
+      `ACE_LIVE_DRY_ORDINAL_MAP_CHECKSUM_MISMATCH:${input.ordinalMap.ordinalMapChecksum}:${input.snapshot.ordinalMapChecksum}`,
+    );
+  }
+  if (input.ordinalMap.candidateSnapshotRevision !== input.snapshot.candidateSnapshotRevision) {
+    throw new Error(
+      `ACE_LIVE_DRY_CANDIDATE_SNAPSHOT_REVISION_MISMATCH:${input.ordinalMap.candidateSnapshotRevision}:${input.snapshot.candidateSnapshotRevision}`,
+    );
+  }
+  if (input.ordinalMap.workspaceRevision !== input.snapshot.workspaceRevision ||
+      input.ordinalMap.workspaceRevision !== input.revisionAuthority.workspaceRevision) {
+    throw new Error('ACE_LIVE_DRY_WORKSPACE_REVISION_MISMATCH');
+  }
+
+  const selectedRows = selectedAceLiveDryRowsV2(input);
+  if (selectedRows.length !== input.expectedCandidateCount) {
+    throw new Error(`ACE_LIVE_DRY_SELECTED_COUNT_MISMATCH:${selectedRows.length}:${input.expectedCandidateCount}`);
+  }
+  if (selectedRows.some((row) => !row.sourceRevision.trim())) {
+    throw new Error('ACE_LIVE_DRY_SOURCE_REVISION_MISSING');
+  }
+
+  const graphRevision = resolveAceLiveDryGraphRevisionV2(selectedRows);
+  if (input.ace.graphRevision !== graphRevision) {
+    throw new Error(`ACE_LIVE_DRY_GRAPH_REVISION_MISMATCH:${String(graphRevision)}:${String(input.ace.graphRevision)}`);
+  }
+
+  return {
+    selectedRows,
+    graphRevision,
+    graphAdmissionMode: graphRevision === null ? 'NOT_ADMITTED' : 'REQUIRED_EXACT',
+  };
 }
