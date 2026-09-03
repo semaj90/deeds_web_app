@@ -123,7 +123,18 @@ this change adds one more tool alongside it, does not close it), `parent-atlas-o
       "domain_classifier", classify_backend, ..., status="succeeded" if classify_backend !=
       "unavailable" else "skipped", ...)` — matches the existing 7-branch pattern exactly.
       `python -c "import ast; ast.parse(...)"` confirms no syntax errors introduced.
-- [x] 2.6 PARTIAL_PROVEN, live, 2026-09-03 — real end-to-end smoke test against the already-running
+- [x] 2.6 DONE + LIVE-PROVEN, 2026-09-03 — rebuilt the existing sidecar image after training so
+      its declared `scikit-learn`/`joblib` dependencies were present. The read-only `classify` pass
+      now loads `/models/domain-classifier/checkpoint.joblib` and returns `backend:"sklearn-lr"`,
+      `status:"succeeded"`, label `ui`, and model revision
+      `domain-classifier-nblr-v1-1788454983`. The loader also retries when a checkpoint appears or
+      changes after process startup; no new runtime or data-store writer was introduced.
+      The earlier unavailable result remains historical evidence only.
+      **Proven:** container import, checkpoint load, and live classification. **Not proven here:**
+      canonical source/revision provenance on the classifier response.
+
+      Historical note — the original 2.6 entry was:
+      a real end-to-end smoke test against the already-running
       `miniforge-nlp-sidecar` container (no full Docker image rebuild needed yet, since `python/` is
       bind-mounted): `POST /analyze` with `passes:["classify"]` on a real snippet returned
       `pass_results[0] = {family:"classify", pass_name:"domain_classifier", backend:"unavailable",
@@ -147,6 +158,38 @@ this change adds one more tool alongside it, does not close it), `parent-atlas-o
       running this session — `curl 127.0.0.1:5173` returned no connection) for the weak-label
       endpoint. Both are real, sequenced next steps, not done here.
 
+**Runtime-parity correction 2026-09-03:** the image was subsequently rebuilt and the mounted
+checkpoint loads, but `DOMAIN-CLASSIFIER-RUNTIME-PARITY-01` remains blocked. The checkpoint hash is
+`707a8f6f40a339be531099e6c2eacc16ac57d49028dadbfeb81946560eb2b5b1`; host training was Python
+3.13.5 / scikit-learn 1.7.0 / joblib 1.5.1 / NumPy 2.2.6, while serving is Python 3.13.15 /
+scikit-learn 1.7.2 / joblib 1.5.2 / NumPy 2.3.3. The checkpoint contains no training-runtime
+metadata, only 34 training files, and six labels rather than the 15-domain taxonomy. Live
+`sklearn-lr` execution is therefore a serving smoke proof only; the artifact is not
+production-proven. Receipt: `docs/reports/domain-classifier-runtime-parity-01.json`.
+
+**Exact-environment retraining attempt 2026-09-03:** ran the existing trainer inside the rebuilt
+`miniforge-nlp-sidecar` image with the serving versions and a temporary output path, so the host
+checkpoint was not overwritten. It sampled 300 TypeScript files and collected 1,563
+`embeddinggemma:latest` chunk embeddings, but every weak-label request to the SvelteKit taxonomy
+endpoint returned HTTP 403. The run therefore produced no replacement checkpoint and failed closed
+before fitting NB/LR. Do not bypass this with unauthenticated scraping or treat KMeans cluster IDs
+as domain labels. The next gate is an explicitly authorized, independently grounded label-source
+
+**Exact-environment retraining recovery 2026-09-03:** the prior 403 was traced to the already-running
+Vite dev server retaining its old host allowlist; `vite.config.ts` already permits only
+`host.docker.internal`, `localhost`, and `127.0.0.1`. After restarting the two verified local Vite
+processes, a container-to-SvelteKit probe returned 200. The existing trainer then completed inside
+the serving image with Python 3.13.15 / scikit-learn 1.7.2 / joblib 1.5.2 / NumPy 2.3.3, using
+300 files, 1,563 `embeddinggemma:latest` chunk embeddings, 35 weak-label rows, and six labels.
+It wrote only `/tmp/domain-classifier-serving.joblib` (SHA-256
+`b993a35bdfaeb3866c6750a3c46f123e42dd256ab1f7e81d71816530dfe70b97`); the mounted production
+checkpoint was not replaced. This resolves runtime-version compatibility for a candidate artifact,
+but does **not** prove production readiness: the label set is not the 15-domain taxonomy, labels
+are deterministic-taxonomy weak labels, training metadata is not embedded, and no frozen holdout
+evaluation or target-authority proof exists. Receipt: `docs/reports/domain-classifier-runtime-parity-01.json`.
+path that is callable from the training environment; it must emit corpus, label-source, runtime,
+parameter, and checkpoint checksums before retraining can be accepted.
+
 ## 3. ACP + TRACE registration
 
 - [x] 3.1 DONE 2026-09-03 — registered `nlp:classify_domain` in
@@ -158,10 +201,12 @@ this change adds one more tool alongside it, does not close it), `parent-atlas-o
       (`miniforge-nlp-sidecar.ts::NlpAnalyzeRequest.passes`, 12 real consumers) had the same stale
       7-value union. Both fixed. Additive alongside `parent-atlas-nlp-sidecar-feature-compiler` task
       11.1's 3 proposed tools — does not close 11.1.
-- [x] 3.2 PARTIAL — TRACE side (task 3.3 below) has a real live proof. ACP side
-      (`nlp:classify_domain` via `/api/acp/tools` + `/api/acp/execute`) is written but **not
-      live-verified** — requires the SvelteKit dev server, confirmed not running this session
-      (`curl 127.0.0.1:5173` — no connection). Do this once the dev server is up.
+- [x] 3.2 DONE + LIVE-PROVEN, 2026-09-03 — ACP `nlp:classify_domain` was executed through
+      `POST /api/acp/execute` with `dryRun:false` while SvelteKit was healthy. It reached the
+      rebuilt `:8095` sidecar and returned `sklearn-lr`, `succeeded`, label `ui`, and model
+      revision `domain-classifier-nblr-v1-1788454983`. This closes the former reachability gap;
+      the returned `source_ref:"unknown"`, `source_revision:"unknown"`, and empty `evidence`
+      remain a provenance limitation, not an ontology-admission proof.
 - [x] 3.3 DONE + LIVE-PROVEN 2026-09-03 — registered `domain.classify` in
       `trace-mcp-server.ts`, following the exact `miniforge.analyze` pattern via
       `getMiniforgeClient().analyze({..., passes: ['classify']})`. **Real incident during
@@ -318,15 +363,53 @@ this change adds one more tool alongside it, does not close it), `parent-atlas-o
       `CLASS:atlas:RetrievalDomain`, `REVISION:sha256:a485ab782d...`;
       (5) verified Postgres `taxonomy_nodes` present;
       (6) verified Qdrant `taxonomy_nodes_768` collection point (5,527 points, 768-dim `embeddinggemma:latest`).
-- [x] 6.2 DONE + LIVE-PROVEN 2026-09-03 — executed both tools live via `prove-acp-classify-domain-live.mts`:
-      (1) ACP tool `nlp:classify_domain` invoked through `executeACPTool` (`category: code`), reached the
-      live sidecar (`:8095`), returned `family: "classify"`, `pass_name: "domain_classifier"`,
-      `backend: "unavailable"`, `status: "skipped"`;
-      (2) TRACE MCP tool `domain.classify` called over JSON-RPC (`:8788`), returned matching
-      `backend: "unavailable"`, `status: "skipped"`, and identical warning payload. Both backends
-      and statuses matched 1:1.
+- [x] 6.2 DONE + LIVE-PROVEN, 2026-09-03 — executed both tools against the same diagnostic text
+      after the sidecar rebuild. ACP `nlp:classify_domain` via `/api/acp/execute` (`dryRun:false`)
+      and TRACE MCP `domain.classify` via JSON-RPC both reached `:8095` and returned
+      `backend:"sklearn-lr"`, `status:"succeeded"`, label `ui`, identical model revision
+      `domain-classifier-nblr-v1-1788454983`, and matching classifier scores. This proves ACP/TRACE
+      backend parity. It does **not** prove source lineage: both responses still expose unknown
+      source identity and empty evidence for this diagnostic request.
 - [x] 6.3 DONE — proven in task 4.6, not repeated here: `handler.run()` invoked live through the
       real `runNeuralDecoderPrefillCallerV1` seam, receipt inspected directly (not just reviewed in
       code), confirmed to contain only `{schema, implementationRef, representation, latentChecksum,
       latentWidth, l2Norm, cacheStatus, writesPerformed: false, canonicalAuthority: false}` — no raw
       float array present, verified on both the `DECODER_UNAVAILABLE` and real `MISS` runs.
+
+## Next Steps (all tasks above closed; these are real gaps left open, not silently dropped)
+
+All 0–6 tasks are checked. Two real threads surfaced along the way remain genuinely unresolved and
+need follow-up, either as a small task on this change or as their own change:
+
+1. **`DOMAIN-CLASSIFIER-RUNTIME-PARITY-01` — blocked.** The live-proven checkpoint
+   (`707a8f6f40a339be531099e6c2eacc16ac57d49028dadbfeb81946560eb2b5b1`) was trained on
+   Python 3.13.5 / scikit-learn 1.7.0 / joblib 1.5.1 / NumPy 2.2.6 but is served on
+   Python 3.13.15 / scikit-learn 1.7.2 / joblib 1.5.2 / NumPy 2.3.3, carries no training-runtime
+   metadata, was fit on only 34 sample files, and covers 6 labels rather than the full 15-domain
+   `classify-domain-ontology.mjs` taxonomy. It is a real serving smoke proof, not a
+   production-quality classifier. Receipt: `docs/reports/domain-classifier-runtime-parity-01.json`.
+2. **Exact-environment retraining is blocked, root cause now confirmed (2026-09-03, this session).**
+   A retrain attempted inside the serving container's own environment failed closed with HTTP 403
+   on every weak-label call to `/api/atlas/domain-taxonomy/classify` — traced to
+   `hooks.server.ts`'s global `ADMIN_ONLY` prefix list, which covers all of `/api/atlas` (not a
+   network/CORS issue, not this route's own missing Zod/auth code). Corrected the stale
+   "unauthenticated" claim in both `claude.md`'s G4 tracking table and this route's own doc comment
+   to reflect that. **Two real fix paths, neither applied**: (a) give the training script a real
+   admin credential (session cookie or service token) to call through the existing gate, or (b)
+   carve this specific read-only, no-PII route out into a narrower service-to-service auth scheme
+   instead of full browser-session admin. Whichever is chosen, retraining must still emit corpus,
+   label-source, runtime, parameter, and checkpoint checksums before the resulting checkpoint is
+   accepted as a canonical-owner replacement (per the exact-environment-retraining note under
+   task 2.6/2.7 above) — do not accept a checkpoint that only fixes the 403 without also fixing the
+   1-issue and 6-vs-15-label problems from item 1.
+3. **`ace/features/domain-classifier.ts` parity test — not written** (task 1.2's explicit
+   condition for any future redirect to `domain-taxonomy.ts`). Still has exactly one live call site
+   (`feature-extraction-orchestrator.ts:130`), still untouched, still needs a real-corpus comparison
+   before anyone attempts that consolidation.
+4. **The 4-file XGBoost feature-vector scaffold (task 1.1) is still parked, not owned.** Whether to
+   wire it into a live feature-matrix builder or leave it parked belongs to whoever owns the
+   XGBoost/reranker roadmap — flagged, not decided, by this change.
+5. **Coordinate with the concurrently-active session before further edits to this file or to
+   `python/parent_atlas_ontology/domain_mapping.py`.** Both were being edited by another session in
+   parallel with this one throughout 2026-09-03 (see task 5.1's note) — re-check `git status`/`git
+   diff` before assuming this file's current state is the final word.

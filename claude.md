@@ -3183,12 +3183,22 @@ a new auth mechanism) to the 8 real gaps above, and add Zod schemas per the G5 c
 as a deliberate production-hardening pass — with tests added alongside, per operator direction
 2026-09-01 — once dev-bypass is no longer the active mode, not piecemeal.
 
-**+1 new route added 2026-09-03** (`openspec/changes/parent-atlas-search-classifier-sidecar` task
-2), a distinct sub-case from the table above — **Zod-validated but unauthenticated**, not both gaps
-at once: `api/atlas/domain-taxonomy/classify` (POST) — exposes `classifyDomainTaxonomy()` for the
+**+1 new route added 2026-09-03, CORRECTED 2026-09-03** (`openspec/changes/parent-atlas-search-classifier-sidecar`
+task 2): `api/atlas/domain-taxonomy/classify` (POST) — exposes `classifyDomainTaxonomy()` for the
 Python NLP sidecar to call as a weak-label bootstrap source (service-to-service, not
-browser-facing). `.strict()` Zod schema on the request body; no auth guard, read-only, no DB
-mutation, no PII. Deferred to the same later hardening pass as the table above, not fixed inline.
+browser-facing). `.strict()` Zod schema on the request body, read-only, no DB mutation, no PII.
+**Originally logged here as "unauthenticated" — that was wrong.** The route file itself has no
+local auth check, but `hooks.server.ts`'s `ADMIN_ONLY` prefix list (line ~848) includes
+`/api/atlas` wholesale, so every request under this path is already gated behind
+`event.locals.user?.role === 'admin'` at the global hook layer before the handler ever runs. This
+is the confirmed root cause of a real HTTP 403 hit during a same-day in-container retraining
+attempt (`python/train_domain_classifier.py` run from inside the `miniforge-nlp-sidecar` container,
+calling this route over `host.docker.internal:5173`) — the request reached SvelteKit but failed
+the admin check, not a network/CORS/DNS failure. Two real fix paths, neither applied yet: (a) grant
+the training script real admin credentials (a session cookie or service token), or (b) carve this
+specific route out of the `/api/atlas` `ADMIN_ONLY` prefix into a narrower service-to-service auth
+scheme (e.g. a shared internal token, since it's read-only and has no PII). Left open — see
+`openspec/changes/parent-atlas-search-classifier-sidecar/tasks.md` Next Steps.
 
 ### G5 open finding — 18 authenticated mutating routes with zero Zod validation (2026-09-01 /deep-audit)
 

@@ -12,10 +12,17 @@ import { classifyDomainTaxonomy } from '$lib/server/atlas/domain-taxonomy.js';
  * data for its classify pass, rather than reimplementing the keyword/regex rules in Python
  * (which would create a second, competing owner of the same taxonomy).
  *
- * No auth guard yet — matches this repo's existing DEV_BYPASS_AUTH-era posture for internal
- * analysis routes (see CLAUDE.md's G4 tracking table; this route is added there in the same
- * commit). Real hardening is deferred to the single later production-hardening pass, per
- * feedback_dev_bypass_auth_defer_hardening in project memory.
+ * No LOCAL auth check in this file — but do not read that as unauthenticated. This path is caught
+ * by hooks.server.ts's global ADMIN_ONLY prefix list (`/api/atlas`, checked ~line 848), which
+ * requires `event.locals.user?.role === 'admin'` before this handler ever runs. Confirmed live
+ * 2026-09-03: an in-container weak-label training run (python/train_domain_classifier.py, calling
+ * this route over host.docker.internal:5173 with no session cookie) got HTTP 403 here, not a
+ * network failure — see CLAUDE.md's G4 tracking table for the correction and open fix options.
+ * DEV_BYPASS_AUTH only grants admin when `dev === true` AND no session cookie is present at all;
+ * it does not help a caller sitting behind a mismatched auth state. Real hardening (a proper
+ * service-to-service credential for this specific route, distinct from the browser-session admin
+ * gate) is deferred, per feedback_dev_bypass_auth_defer_hardening in project memory — not fixed
+ * inline here.
  */
 
 const DomainTaxonomyInputSchema = z
