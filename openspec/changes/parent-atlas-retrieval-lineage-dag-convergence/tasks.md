@@ -3857,6 +3857,20 @@ artifact ACE/ContextManifest consumes — not raw per-lane hits.
   do not install another runtime merely for this). Keep production XGBoost ranking weight at `0`
   until the frozen evaluation passes.
 
+  **Cross-reference (2026-09-03, `BEST-FIT-SCORE-AUDIT-01`)**: this gate concerns a *future*
+  training/eval XGBoost path over `CandidateFeatureMatrixV1` (not built yet). A DIFFERENT,
+  already-deployed XGBoost path exists today in `canonical-rerank-executor.ts:487-501` — real
+  sidecar `xgbScore` placed into `crossEncoderScore`, `blendScores()` called with
+  `{...DEFAULT_BLEND_WEIGHTS, crossEncoder: 0}`. Verified live by direct code read (this session,
+  not just cited from the audit). **Ambiguous intent, not resolved here**: this line's own "Keep
+  production XGBoost ranking weight at 0 until the frozen evaluation passes" reads as if
+  `crossEncoder: 0` on the live path is a deliberate safety gate — but it could equally be an
+  accidental consequence of nobody having wired a real weight for that path yet. Which one is true
+  is exactly what `openspec/changes/parent-atlas-best-fit-score-fabric/tasks.md`'s
+  `XGBOOST-RERANK-ACTIVATION-01` (task 3) should establish before this gate starts — don't assume
+  either reading, and don't start training against the live path's current output as if it reflects
+  a working, ranking-active XGBoost signal.
+
 `RL-RETRIEVAL-POLICY-01` stays at P3/experiment — not registered as an active gate — until
 immutable `Query -> CandidateSnapshot -> Decision -> Outcome` receipts have actually accumulated
 from the pipeline above.
