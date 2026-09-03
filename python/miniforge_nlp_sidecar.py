@@ -141,6 +141,26 @@ except Exception:
     cupy = None  # type: ignore
     CUPY_AVAILABLE = False
 
+try:
+    import numpy as np  # type: ignore
+    from sklearn.naive_bayes import MultinomialNB  # type: ignore
+    from sklearn.linear_model import LogisticRegression  # type: ignore
+    from sklearn.cluster import KMeans  # type: ignore
+    SKLEARN_AVAILABLE = True
+except Exception:
+    np = None  # type: ignore
+    MultinomialNB = None  # type: ignore
+    LogisticRegression = None  # type: ignore
+    KMeans = None  # type: ignore
+    SKLEARN_AVAILABLE = False
+
+try:
+    import joblib  # type: ignore
+    JOBLIB_AVAILABLE = True
+except Exception:
+    joblib = None  # type: ignore
+    JOBLIB_AVAILABLE = False
+
 
 SOURCE_TYPES = Literal[
     "plain_text",
@@ -187,7 +207,7 @@ class AnalyzeRequest(BaseModel):
     language: Optional[str] = None
     model_id: Optional[str] = None
     max_chars: int = Field(default=50_000, ge=1, le=200_000)
-    passes: list[Literal["structural", "lexical", "linguistic", "semantic", "sequence", "rerank", "grounded"]] = Field(default_factory=list)
+    passes: list[Literal["structural", "lexical", "linguistic", "semantic", "sequence", "rerank", "grounded", "classify"]] = Field(default_factory=list)
     grounded_extraction_required: bool = False
 
 
@@ -306,7 +326,7 @@ class AnalysisPassResult(BaseModel):
     packet_key: Optional[str] = None
     source_ref: str
     source_revision: str
-    family: Literal["structural", "lexical", "linguistic", "semantic", "sequence", "rerank", "grounded"]
+    family: Literal["structural", "lexical", "linguistic", "semantic", "sequence", "rerank", "grounded", "classify"]
     pass_name: str
     pass_revision: str
     backend: str
@@ -1791,6 +1811,190 @@ def _build_event_hypergraph(
     )
 
 
+# ---------------------------------------------------------------------------
+# Domain-classify pass (openspec/changes/parent-atlas-search-classifier-sidecar)
+#
+# Inference-only at request time. Training (weak-label bootstrap via the
+# canonical sveltekit-frontend classifyDomainTaxonomy(), embedding via
+# embeddinggemma, KMeans word-cluster fitting, MultinomialNB + LogisticRegression
+# fitting) happens offline in train_domain_classifier.py and is persisted via
+# joblib to DOMAIN_CLASSIFIER_CHECKPOINT_PATH. This pass never trains inline —
+# it only loads a checkpoint (if one exists) and predicts.
+# ---------------------------------------------------------------------------
+
+OLLAMA_URL = os.getenv("OLLAMA_URL", "http://127.0.0.1:11434").rstrip("/")
+DOMAIN_CLASSIFIER_EMBED_MODEL = os.getenv("DOMAIN_CLASSIFIER_EMBED_MODEL", "embeddinggemma:latest")
+DOMAIN_CLASSIFIER_CHECKPOINT_PATH = Path(
+    os.getenv("DOMAIN_CLASSIFIER_CHECKPOINT_PATH", "/models/domain-classifier/checkpoint.joblib")
+)
+
+_domain_classifier_checkpoint: Optional[dict[str, Any]] = None
+_domain_classifier_checkpoint_loaded = False
+
+
+def _load_domain_classifier_checkpoint() -> Optional[dict[str, Any]]:
+    """Lazy-load the persisted NB/LR/KMeans checkpoint. Returns None if unavailable —
+    never raises, matching this file's optional-import-gated degrade pattern."""
+    global _domain_classifier_checkpoint, _domain_classifier_checkpoint_loaded
+    if _domain_classifier_checkpoint_loaded:
+        return _domain_classifier_checkpoint
+    _domain_classifier_checkpoint_loaded = True
+    if not (SKLEARN_AVAILABLE and JOBLIB_AVAILABLE):
+        return None
+    if not DOMAIN_CLASSIFIER_CHECKPOINT_PATH.exists():
+        return None
+    try:
+        loaded = joblib.load(DOMAIN_CLASSIFIER_CHECKPOINT_PATH)
+    except Exception:
+        return None
+    if not isinstance(loaded, dict) or "labels" not in loaded:
+        return None
+    _domain_classifier_checkpoint = loaded
+    return _domain_classifier_checkpoint
+
+
+def _fetch_ollama_embedding(text: str, *, timeout_seconds: float = 10.0) -> Optional[list[float]]:
+    """Real network call to the canonical embedding path (Ollama embeddinggemma).
+    Returns None on any failure — the classify pass degrades to 'unavailable',
+    never raises past this boundary."""
+    if not text.strip():
+        return None
+    payload = json.dumps({"model": DOMAIN_CLASSIFIER_EMBED_MODEL, "prompt": text[:2000]}).encode("utf-8")
+    request = urllib.request.Request(
+        f"{OLLAMA_URL}/api/embeddings",
+        data=payload,
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=timeout_seconds) as response:
+            body = json.loads(response.read())
+    except Exception:
+        return None
+    embedding = body.get("embedding")
+    return embedding if isinstance(embedding, list) and embedding else None
+
+
+def _chunk_text_for_clustering(text: str, max_chunks: int = 8) -> list[str]:
+    """Sentence-level chunking (bounded) for word/phrase-level embedding —
+    per design.md D2, avoids both spaCy word vectors (en_core_web_sm has none)
+    and a new standalone embedding table by reusing the canonical embed path."""
+    sentences = [s.strip() for s in re.split(r"(?<=[.!?])\s+", text) if s.strip()]
+    if not sentences:
+        stripped = text.strip()
+        return [stripped[:500]] if stripped else []
+    return sentences[:max_chunks]
+
+
+def _extract_cluster_features(text: str, checkpoint: dict[str, Any]) -> Optional[dict[str, float]]:
+    """KMeans distance-to-centroid features over embedded text chunks. The KMeans
+    model itself is fit offline (train_domain_classifier.py) and only predicts here."""
+    kmeans = checkpoint.get("kmeans")
+    if kmeans is None or np is None:
+        return None
+    chunks = _chunk_text_for_clustering(text)
+    if not chunks:
+        return None
+    embeddings: list[list[float]] = []
+    for chunk in chunks:
+        vector = _fetch_ollama_embedding(chunk)
+        if vector:
+            embeddings.append(vector)
+    if not embeddings:
+        return None
+    matrix = np.array(embeddings)
+    try:
+        distances = kmeans.transform(matrix)
+        assignments = kmeans.predict(matrix)
+    except Exception:
+        return None
+    nearest_distances = distances[np.arange(len(assignments)), assignments]
+    n_clusters = getattr(kmeans, "n_clusters", None) or 1
+    return {
+        "cluster_mean_distance": float(np.mean(nearest_distances)),
+        "cluster_distance_std": float(np.std(nearest_distances)) if len(nearest_distances) > 1 else 0.0,
+        "cluster_diversity": float(len(set(assignments.tolist()))) / float(n_clusters),
+        "chunk_count": float(len(chunks)),
+    }
+
+
+def _classify_domain_pass(text: str) -> tuple[str, dict[str, Any], dict[str, Any], list[str]]:
+    """Returns (backend, features_map, artifacts, warnings) for the classify AnalysisPassResult.
+    backend is 'sklearn-nb', 'sklearn-lr', or 'unavailable' — never 'pytorch' (no trained
+    PyTorch model exists yet; see design.md for the documented future upgrade path)."""
+    checkpoint = _load_domain_classifier_checkpoint()
+    if checkpoint is None:
+        return (
+            "unavailable",
+            {},
+            {},
+            ["no trained domain-classifier checkpoint present; run train_domain_classifier.py"],
+        )
+
+    cluster_features = _extract_cluster_features(text, checkpoint)
+    if cluster_features is None:
+        return (
+            "unavailable",
+            {},
+            {},
+            ["failed to compute cluster features (embedding service unreachable or empty text)"],
+        )
+
+    labels = checkpoint.get("labels") or []
+    feature_vector = np.array(
+        [[
+            cluster_features["cluster_mean_distance"],
+            cluster_features["cluster_distance_std"],
+            cluster_features["cluster_diversity"],
+            cluster_features["chunk_count"],
+        ]]
+    )
+
+    nb_label: Optional[str] = None
+    nb_score = 0.0
+    nb = checkpoint.get("nb")
+    if nb is not None:
+        try:
+            proba = nb.predict_proba(feature_vector)[0]
+            idx = int(proba.argmax())
+            nb_label, nb_score = labels[idx], float(proba[idx])
+        except Exception:
+            pass
+
+    lr_label: Optional[str] = None
+    lr_score = 0.0
+    lr = checkpoint.get("lr")
+    if lr is not None:
+        try:
+            proba = lr.predict_proba(feature_vector)[0]
+            idx = int(proba.argmax())
+            lr_label, lr_score = labels[idx], float(proba[idx])
+        except Exception:
+            pass
+
+    if lr_label is not None:
+        backend = "sklearn-lr"
+    elif nb_label is not None:
+        backend = "sklearn-nb"
+    else:
+        backend = "unavailable"
+
+    final_label = lr_label or nb_label
+    features_map: dict[str, Any] = {
+        "naive_bayes_score": nb_score,
+        "logistic_regression_score": lr_score,
+        **cluster_features,
+    }
+    artifacts: dict[str, Any] = {
+        "label": final_label,
+        "naive_bayes_label": nb_label,
+        "logistic_regression_label": lr_label,
+        "model_revision": checkpoint.get("model_revision", "unknown"),
+    }
+    warnings = [] if final_label else ["checkpoint present but produced no confident label"]
+    return backend, features_map, artifacts, warnings
+
+
 def _build_pass_results(
     req: AnalyzeRequest,
     text: str,
@@ -1960,6 +2164,20 @@ def _build_pass_results(
             {"grounded_only": bool(LANGEXTRACT_AVAILABLE and req.grounded_extraction_required)},
             status=grounded_status,
             warnings=[] if LANGEXTRACT_AVAILABLE else ["LangExtract unavailable; grounded extraction skipped"],
+        )
+
+    if "classify" in requested:
+        classify_backend, classify_features, classify_artifacts, classify_warnings = _classify_domain_pass(text)
+        add_pass(
+            "classify",
+            "domain_classifier",
+            classify_backend,
+            str(classify_artifacts.get("model_revision", "unknown")),
+            "cpu",
+            classify_features,
+            classify_artifacts,
+            status="succeeded" if classify_backend != "unavailable" else "skipped",
+            warnings=classify_warnings,
         )
 
     control5 = _build_control5(pass_results)
@@ -2489,7 +2707,21 @@ def extract_web(req: dict[str, Any]) -> dict[str, Any]:
 def main() -> None:
     host = os.getenv("MINIFORGE_SIDECAR_HOST", "127.0.0.1")
     port = int(os.getenv("MINIFORGE_SIDECAR_PORT", "8095"))
-    uvicorn.run(app, host=host, port=port, log_level=os.getenv("UVICORN_LOG_LEVEL", "info"))
+    log_level = os.getenv("UVICORN_LOG_LEVEL", "info")
+    # See miniforge_nlp_sidecar_oak.py's matching UVICORN_RELOAD handling for why this
+    # exists — default stays off, reload=True needs an import-string target.
+    reload_enabled = os.getenv("UVICORN_RELOAD", "false").strip().lower() in ("1", "true", "yes")
+    if reload_enabled:
+        uvicorn.run(
+            "miniforge_nlp_sidecar:app",
+            host=host,
+            port=port,
+            log_level=log_level,
+            reload=True,
+            reload_dirs=[os.path.dirname(os.path.abspath(__file__))],
+        )
+    else:
+        uvicorn.run(app, host=host, port=port, log_level=log_level)
 
 
 if __name__ == "__main__":  # pragma: no cover - process entrypoint

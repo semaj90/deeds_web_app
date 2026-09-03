@@ -140,6 +140,7 @@ export * from './core/kernel-dag-execution-binding-v1.js';
 export * from './core/oak-semantic-qdrant-owner-v1.js';
 export * from './core/oak-kag-neighbor-owner-v1.js';
 export * from './core/oak-context-manifest-owner-v1.js';
+export * from './core/oak-neural-latent-owner-v1.js';
 export * from './core/temporal-packet.js';
 export * from './core/processing-pass.js';
 export * from './core/qdrant-semantic-payload-envelope.js';

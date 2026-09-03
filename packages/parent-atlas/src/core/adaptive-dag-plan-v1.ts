@@ -8,7 +8,7 @@ const sha256Hex = z.string().regex(/^[a-f0-9]{64}$/);
 export const DAG_ACTION_KIND_VALUES = [
   'FETCH_POSTGRES', 'FETCH_QDRANT', 'FETCH_FILE', 'AST_SCAN',
   'SIMDJSON_SCAN', 'GRAPH_EXPAND', 'WEB_SEARCH', 'RERANK',
-  'BUILD_CONTEXT', 'SYNTHESIZE',
+  'BUILD_CONTEXT', 'SYNTHESIZE', 'FETCH_LATENT',
 ] as const;
 export const dagActionKindSchema = z.enum(DAG_ACTION_KIND_VALUES);
 export type DagActionKind = z.infer<typeof dagActionKindSchema>;

@@ -50,6 +50,7 @@ export const AnalysisPassFamilySchema = z.enum([
 	'sequence',
 	'rerank',
 	'grounded',
+	'classify',
 ]);
 export type AnalysisPassFamily = z.infer<typeof AnalysisPassFamilySchema>;
 

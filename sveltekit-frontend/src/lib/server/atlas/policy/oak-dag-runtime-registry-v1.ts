@@ -5,6 +5,7 @@ import { createOakDagGraphHandlerV1 } from './oak-dag-graph-handler-v1.js';
 import { createOakDagKagNeighborHandlerV1 } from './oak-dag-kag-neighbor-handler-v1.js';
 import { createOakDagLexicalHandlerV1 } from './oak-dag-lexical-handler-v1.js';
 import { createOakDagSemanticQdrantHandlerV1 } from './oak-dag-semantic-qdrant-handler-v1.js';
+import { createOakDagNeuralLatentHandlerV1 } from './oak-dag-neural-latent-handler-v1.js';
 
 export type OakDagRuntimeRegistryV1 = Readonly<{
   handlers: readonly OakDagActionHandlerV1[];
@@ -25,6 +26,7 @@ export function createOakDagRuntimeRegistryV1(): OakDagRuntimeRegistryV1 {
     createOakDagKagNeighborHandlerV1(),
     createOakDagLexicalHandlerV1(),
     createOakDagSemanticQdrantHandlerV1(),
+    createOakDagNeuralLatentHandlerV1(),
   ] as const;
   const refs = handlers.map((handler) => handler.implementationRef);
   if (new Set(refs).size !== refs.length) {

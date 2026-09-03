@@ -14,6 +14,10 @@ services:
       - ../..:/workspace:ro
       # Source-only changes are visible without rebuilding the dependency image.
       - ../../python:/app/python:ro
+      # Domain-classifier checkpoint (openspec/changes/parent-atlas-search-classifier-sidecar):
+      # trained offline by python/train_domain_classifier.py (run on the host, outside this
+      # container), read-only mount so the sidecar can load it without a rebuild.
+      - ../../models/domain-classifier:/models/domain-classifier:ro
     environment:
       MINIFORGE_SIDECAR_HOST: 0.0.0.0
       MINIFORGE_SIDECAR_PORT: 8095
@@ -21,6 +25,10 @@ services:
       MINIFORGE_SIDECAR_URL: http://127.0.0.1:8095
       NLP_SIDECAR_URL: http://127.0.0.1:8095
       LANGEXTRACT_RUNTIME: official
+      # The embedding model server runs on the Windows host, same as LLAMA_SERVER_URL below —
+      # 127.0.0.1 inside this container would NOT reach the host's Ollama instance.
+      OLLAMA_URL: http://host.docker.internal:11434
+      DOMAIN_CLASSIFIER_CHECKPOINT_PATH: /models/domain-classifier/checkpoint.joblib
       LANGEXTRACT_PROVIDER: ${LANGEXTRACT_PROVIDER:-openai}
       LANGEXTRACT_MODEL: ${LANGEXTRACT_MODEL_ID:-ornith-1.5-9b}
       LANGEXTRACT_MODEL_ID: ${LANGEXTRACT_MODEL_ID:-ornith-1.5-9b}
@@ -34,6 +42,12 @@ services:
       # production must provide a reviewed, revision-qualified locator explicitly.
       ATLAS_OAK_ADAPTER: ${ATLAS_OAK_ADAPTER:-}
       UVICORN_LOG_LEVEL: info
+      # Dev-only: python/ is bind-mounted above, but uvicorn does not pick up source
+      # edits without --reload (found live 2026-09-03 -- a bind-mounted change was
+      # silently invisible until a manual `docker restart`). Opt in with
+      # UVICORN_RELOAD=true in .env for local dev; stays off by default so this
+      # compose file's behavior is unchanged for anyone not opting in.
+      UVICORN_RELOAD: ${UVICORN_RELOAD:-false}
     healthcheck:
       test:
         [

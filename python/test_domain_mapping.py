@@ -46,6 +46,30 @@ class DomainOntologyMappingTests(unittest.TestCase):
         results = admit_domain_classifications({"workflow": 1.0, "database": 1.0})
         self.assertEqual([item.domainLabel for item in results], ["database", "workflow"])
 
+    def test_all_fifteen_classifier_taxonomy_labels_are_admitted(self):
+        all_fifteen_labels = [
+            "auth_login_register",
+            "case_management",
+            "evidence_upload_storage",
+            "document_processing",
+            "rag_retrieval",
+            "cache_layer",
+            "agent_orchestration",
+            "graph_topology",
+            "embedding_indexing",
+            "trace_mcp",
+            "cluster_analysis",
+            "repair_workflow",
+            "memory_optimization",
+            "citation_engine",
+            "legal_reports",
+        ]
+        results = admit_domain_classifications({label: 1.0 for label in all_fifteen_labels})
+        self.assertEqual(len(results), 15)
+        for res in results:
+            self.assertEqual(res.status, "ADMITTED", f"Label {res.domainLabel} failed to admit: {res.status}")
+            self.assertTrue(res.classId and res.classId.startswith("atlas:"), f"Label {res.domainLabel} missing classId")
+
 
 if __name__ == "__main__":
     unittest.main()

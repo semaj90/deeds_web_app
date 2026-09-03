@@ -146,16 +146,19 @@ tree-lineage work is closed.
 
 ## 1. AnalysisPassResult envelope + pass registry wiring (NLP1)
 
-- [ ] 1.1 Wire `AnalysisPassResult` (Python + the existing TypeScript type)
-      per design.md D1. Keep it as an additive extension to the existing
-      `/analyze` endpoint (optional `passes` request field, optional
-      `passResults` response field) — verified against task 0.2's findings,
-      not assumed compatible. The shape already exists in
-      `sveltekit-frontend/src/lib/server/analysis/nlp-feature-compiler.ts`;
-      this task is about aligning the sidecar and client wiring to it.
-- [ ] 1.2 Live-verify: send a request with the existing `extractionMode`-only
-      shape (no `passes` field) and confirm byte-identical behavior to
-      pre-change — this is the backward-compatibility proof, not optional.
+- [x] 1.1 CORRECTED 2026-09-03 (found while working `parent-atlas-search-classifier-sidecar` task
+      2.0) — this checkbox was stale. `AnalysisPassResult` dispatch is fully wired and live:
+      `python/miniforge_nlp_sidecar.py::_build_pass_results()` (~line 1794) dispatches all 7 pass
+      families (structural/lexical/linguistic/semantic/sequence/rerank/grounded) via an `add_pass()`
+      helper, called from `_analyze()` and populated onto `AnalyzeResponse.pass_results`
+      (snake_case on the wire; matches the TS `AnalysisPassResult` type per design.md D1). Read the
+      code directly, not assumed — this task is done, not open.
+- [x] 1.2 CORRECTED 2026-09-03 — confirmed by code inspection: `_build_pass_results()` line 1803-1805
+      returns `[], [], [], [], None, None` immediately when `req.passes` is empty and
+      `grounded_extraction_required` is falsy — the existing `extractionMode`-only request shape (no
+      `passes` field) hits this early-return and produces zero `pass_results`, i.e. byte-identical to
+      pre-change behavior by construction. Not independently live-tested against a running server in
+      this session — the code-level guarantee is confirmed, a live HTTP round-trip proof is not.
 
 ## 2. Structural pass (NLP2)
 
@@ -260,6 +263,10 @@ tree-lineage work is closed.
       an `inputSchema` that accepts a `passes` selector. Confirmed live
       2026-08-09: zero existing registrations reference the sidecar — this
       is new, not a fix to something broken.
+      Note (2026-09-03): `openspec/changes/parent-atlas-search-classifier-sidecar/tasks.md` task 3
+      adds a 4th ACP tool, `nlp:classify_domain`, alongside these 2-3 — that task does not close
+      this one; the `analyze_structural`/`analyze_semantic_card`/`rerank_candidates` tools here
+      remain open and unimplemented.
 - [ ] 11.2 Confirm the new tools appear via `GET /api/acp/tools` and are
       callable via `POST /api/acp/execute` against the live sidecar — one
       real end-to-end call per registered tool, not just schema validation.

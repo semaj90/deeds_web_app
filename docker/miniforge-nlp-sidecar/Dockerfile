@@ -31,6 +31,9 @@ RUN python -m pip install --upgrade pip setuptools wheel \
     tree-sitter==0.25.2 \
     tree-sitter-language-pack==0.9.0 \
     ast-grep-py==0.45.3 \
+    numpy==2.3.3 \
+    scikit-learn==1.7.2 \
+    joblib==1.5.2 \
   && python -m pip check
 
 # Keep dependency installation independent from application source changes so

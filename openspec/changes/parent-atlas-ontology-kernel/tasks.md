@@ -2042,7 +2042,14 @@ Evidence: `python/atlas_rapids_graph_runtime.py`, live `/v1/graph/bfs` response,
 and `python/tests/test_atlas_rapids_graph_runtime.py` (5/5 retained).
 - [x] ONTO-PY-DOMAIN-01 — add a revisioned, read-only `DomainOntologyMappingV1` admission boundary for classifier labels; known labels/aliases resolve to declared `atlas:` classes, unknown labels fail closed, and no classifier label dynamically mints ontology identity. Proven by `scripts/atlas/prove-domain-ontology-admission-v1.py` and `docs/reports/domain-ontology-admission-v1.json`; this is an admission proof, not ontology promotion or a database/graph write.
 
-### ONTO-PY-DOMAIN-02 — classifier taxonomy wiring — OPEN
+### ONTO-PY-DOMAIN-02 — classifier taxonomy wiring — SUPERSEDED
+
+> Superseded 2026-09-03 by `openspec/changes/parent-atlas-search-classifier-sidecar/tasks.md` task 5
+> ("Taxonomy hookup"), which extends `domain_mapping.py`'s catalog to cover this exact taxonomy
+> (`classify-domain-ontology.mjs`'s 15 labels: `agent_orchestration`, `rag_retrieval`,
+> `graph_topology`, etc.) and keeps unmapped labels fail-closed per the rule below. Track further
+> progress there, not here.
+
 
 - [ ] Reconcile the live classifier taxonomy emitted by
   `scripts/atlas/classify-domain-ontology.mjs` (including labels such as

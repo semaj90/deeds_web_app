@@ -182,6 +182,73 @@
         { "path": "packages/parent-atlas/src/core/graph-node-key-v1.ts::deriveGraphNodeKeyV1 (symbolVersionId branch only)", "classification": "COMPATIBILITY", "evidence": "Produces symbol:<symbolVersionId>. Real, tested, exported function -- but symbolVersionId is only meant to come from canonicalSymbolVersionId(), itself only reachable from the DEAD symbol-registry-repository.ts path above. Not confirmed reachable from any live write. This session's own ontology-tuple-to-graph-relation-v1.ts implicitly assumed this scheme without verifying it against the actual live writer (see next entry)." },
         { "path": "sveltekit-frontend/src/lib/server/atlas/graph/graph-snapshot-materializer.ts (symbol-type node writer, ~line 322)", "classification": "CANONICAL_OWNER", "evidence": "The ACTUAL live writer of node_type='symbol' rows into atlas_graph_nodes_v2 (confirmed by reading the file directly). Keys every symbol node tree:<treeNodeId>, sourced from tree-sitter parse output, gated by classifyCanonicalGraphEligibility()'s real provenance checks (extractionMethod==='tree_sitter', structuralTruth===true, rejects the known 146,655-row heuristic batch-a-structural-materializer producer). This format matches NONE of the three entries above. Marked CANONICAL_OWNER here because it is the confirmed live write path for this table/nodeType, not because the identity SCHEME itself has been endorsed as canonical over the registry's stable_symbol_id -- that cross-scheme reconciliation is exactly the open question this entry exists to flag." }
       ]
+    },
+    "cutile_kernel_challenger": {
+      "owner": {
+        "classification": "OPTIONAL_CHALLENGER_NOT_INSTALLED",
+        "path": "wsl::/home/james/miniforge3/envs/atlas-rapids-cu13",
+        "evidence": "The existing WSL environment has PyTorch/CUDA and RAPIDS/cuVS/cuGraph GPU capability, but importlib reports that cuda.tile is not installed. cuTile is a future fused-kernel pilot, not a current retrieval or decoder owner."
+      },
+      "current_runtime_owner": "WSL atlas-rapids-cu13 for diagnostic experiments only",
+      "required_for_current_stack": false,
+      "status": "DEFERRED_OPTIONAL_PILOT",
+      "cache_scope": "disposable compiled cubin cache only",
+      "prohibited_cache_contents": ["source truth", "ACE packets", "hidden reasoning", "KV cache", "tensor data"],
+      "required_preconditions": [
+        "measured fused-kernel gap",
+        "PyTorch tensor and stream interoperability smoke test",
+        "numerical parity against existing PyTorch/cuVS path",
+        "specialization and GPU-target cache invalidation proof",
+        "bounded performance benefit"
+      ]
+    },
+    "tensorrt_rtx_decoder_challenger": {
+      "owner": {
+        "classification": "OPTIONAL_CHALLENGER_NOT_WIRED",
+        "path": "simd-bridge/cpp/tensor_bridge.cc",
+        "evidence": "The current file is a legacy JSON/N-API bridge with a TensorRT comment/stub; no NvInfer include, TensorRT-RTX engine build, torch::Tensor boundary, or live caller was found. The existing decoder owner remains the PyTorch service at python/atlas_neural_decoder_service.py."
+      },
+      "current_runtime_owner": "docker/atlas-neural-decoder (PyTorch/ATen baseline)",
+      "reuse_path": "Existing pinned PyTorch decoder image and ATen-compatible build environment",
+      "required_for_current_decoder": false,
+      "status": "DEFERRED_OPTIONAL_CHALLENGER",
+      "required_preconditions": [
+        "PyTorch C++ ABI and CUDA version match proven decoder runtime",
+        "TensorRT-RTX SDK availability independently proven",
+        "ONNX engine output parity against PyTorch baseline",
+        "stable device-buffer lifetime and non-default CUDA stream proof",
+        "engine/runtime cache identity bound to model, engine, CUDA, and adapter checksums",
+        "bounded latency/VRAM evidence showing a benefit"
+      ],
+      "prohibited_until_proven": [
+        "new production decoder owner",
+        "Valkey source/tensor/KV-cache persistence",
+        "CUDA Graph capture as a correctness prerequisite",
+        "cuTile or RAPIDS dependency added to the decoder image"
+      ]
+    },
+    "domain_classification": {
+      "note": "Populated 2026-09-03 during openspec/changes/parent-atlas-search-classifier-sidecar task 1. Original working premise (3-4 near-duplicate live classifiers needing consolidation) was WRONG on inspection -- most candidates turned out to be either unwired scaffolds (zero live callers of the actual algorithm, only a version-string constant referenced elsewhere) or narrow single-method live usages, not competing full implementations. Nothing has been deleted or redirected; this entry is documentation only. See feedback_no_delete_unwired_scaffolds in project memory for the correction that produced this note.",
+      "owner": {
+        "classification": "CANONICAL_OWNER",
+        "path": "sveltekit-frontend/src/lib/server/atlas/domain-taxonomy.ts",
+        "export": "classifyDomainTaxonomy / CANONICAL_DOMAINS (9 domains: auth, ui, retrieval, network, database, cache, agent, graph, ml)",
+        "evidence": "8 real callers confirmed live 2026-09-03; self-identifies in its own docstring as 'the authority module for domain_class handling inside the workstation control plane'. Has an unused labels[].source: 'learned' slot -- the intended ML extension point, not yet fed by anything."
+      },
+      "backends": [
+        { "name": "okf-fit-formula", "path": "sveltekit-frontend/src/lib/server/atlas/okf-fit.ts::classifyOkfFit", "classification": "BACKEND", "status": "RUNTIME_SMOKE_PROVEN", "evidence": "Real, live -- the actual path api/ldr/research/+server.ts exercises via okf-topic-ingestion.ts::buildOkfTopicAnalysis. Correctly wraps classifyDomainTaxonomy() (the canonical owner above), then adds naive_bayes_score/logistic_regression_score/fit_margin/fit_decision fields -- but these are hand-tuned linear/sigmoid formulas with hardcoded coefficients, not trained NB/LR models. classifier_version = OKF_FIT_VERSION = 'okf-fit-v1'." },
+        { "name": "ace-features-path-classifier", "path": "sveltekit-frontend/src/lib/server/ace/features/domain-classifier.ts::DomainClassifier", "classification": "BACKEND", "status": "RUNTIME_SMOKE_PROVEN", "evidence": "Exactly one live call site (feature-extraction-orchestrator.ts:130, classifyByPath(pkt.sourceRef) only -- classifyByContent() and the DB-querying classifyPacket() are never called live). Independent 14-domain regex taxonomy, does not build on domain-taxonomy.ts. A parity test comparing its output against classifyDomainTaxonomy() on a real path corpus is needed before any consolidation is attempted -- not done as of this entry." }
+      ],
+      "unwired_scaffolds": [
+        { "path": "sveltekit-frontend/src/lib/server/classifier/domain-classifier.ts::classifyDomainFromText", "classification": "UNWIRED_SCAFFOLD", "evidence": "Already correctly wraps the canonical classifyDomainTaxonomy() -- not a competing taxonomy. Zero live callers of classifyDomainFromText anywhere in src/. Part of a coherent 4-file XGBoost feature-vector scaffold (ast-keyword-types.ts types -> this producer -> packet-feature-validator.ts validator -> classifier-feature-vector.ts::toXgboostVector, feature slot ast_domain_confidence) -- checked for duplication against the live XGBoost/reranker pipeline (xgboost-ranking-lineage-v1.ts, phase18-reranker.ts, packet-feature-matrix.ts, retrieval-candidate-feature-matrix-v1.ts) and found NOT a duplicate, just never connected. Left in place; do not archive or delete without a deliberate decision from whoever owns the XGBoost/reranker roadmap." },
+        { "path": "sveltekit-frontend/src/lib/server/enrichment/domain-classifier.ts::classifyDomain/extractPathEvidence", "classification": "UNWIRED_SCAFFOLD", "evidence": "The algorithm itself (18-domain independent taxonomy, evidence-precedence scoring) has zero live callers. Its only live reference anywhere is feature-doc-enrichment.ts importing just the CLASSIFIER_VERSION string constant into an unrelated classifierPlan.classifierVersion JSON field -- not the algorithm. Left in place, not touched." }
+      ],
+      "second_owner": {
+        "domain": "WORKSTATION_LANE_CLASSIFICATION",
+        "classification": "CANONICAL_OWNER",
+        "path": "sveltekit-frontend/src/lib/server/ai/parent-atlas-workstation-domain-classifier.ts",
+        "evidence": "Genuinely distinct scope from source-code domain classification above -- 10 workstation lanes (IDENTITY, EXPORT_STORAGE, GRAPH, TELEMETRY, EMBEDDING, OKF_ONTOLOGY, TRANSPORT, COMPILER, RUNTIME_TRAINING, SHARED), not source-code domains. Built, type-checked, not wired into any live route (see openspec/changes/parent-atlas-workstation-domain-classifier/proposal.md for that gap -- tracked there, not here). Mirrors this registry's existing n_ary_relationship_synthesis dual-owner shape: two CANONICAL_OWNERs, domain-scoped, not competing."
+      }
     }
   }
 }

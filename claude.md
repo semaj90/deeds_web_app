@@ -3183,6 +3183,13 @@ a new auth mechanism) to the 8 real gaps above, and add Zod schemas per the G5 c
 as a deliberate production-hardening pass — with tests added alongside, per operator direction
 2026-09-01 — once dev-bypass is no longer the active mode, not piecemeal.
 
+**+1 new route added 2026-09-03** (`openspec/changes/parent-atlas-search-classifier-sidecar` task
+2), a distinct sub-case from the table above — **Zod-validated but unauthenticated**, not both gaps
+at once: `api/atlas/domain-taxonomy/classify` (POST) — exposes `classifyDomainTaxonomy()` for the
+Python NLP sidecar to call as a weak-label bootstrap source (service-to-service, not
+browser-facing). `.strict()` Zod schema on the request body; no auth guard, read-only, no DB
+mutation, no PII. Deferred to the same later hardening pass as the table above, not fixed inline.
+
 ### G5 open finding — 18 authenticated mutating routes with zero Zod validation (2026-09-01 /deep-audit)
 
 **Distinct from the G4 finding above.** The graph's `hasZod === false` flag surfaced 200 routes,
