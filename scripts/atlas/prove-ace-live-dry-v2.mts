@@ -1,16 +1,13 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { basename, dirname, resolve } from 'node:path';
-import { z } from 'zod';
 
 import {
-  candidateOrdinalMapV1Schema,
-} from '../../sveltekit-frontend/src/lib/server/atlas/features/canonical-candidate-v1.js';
-import {
-  candidateFeatureSnapshotV1Schema,
-} from '../../sveltekit-frontend/src/lib/server/atlas/features/candidate-feature-snapshot-v1.js';
-import {
-  revisionAuthorityEnvelopeV1Schema,
-} from '../../sveltekit-frontend/src/lib/server/atlas/identity/revision-authority-envelope-v1.js';
+  aceLiveDryInputV2Schema,
+  resolveAceLiveDryGraphRevisionV2,
+  selectedAceLiveDryRowsV2,
+  type AceLiveDryInputV2,
+  type AceLiveDrySnapshotRowV2,
+} from '../../sveltekit-frontend/src/lib/server/atlas/context/ace-live-dry-input-v2.js';
 import {
   buildSearchRuntimeFeatureBundleV1,
   verifySearchRuntimeFeatureBundleV1,
@@ -18,29 +15,6 @@ import {
 import {
   buildAceContextManifestAdmissionV1,
 } from '../../sveltekit-frontend/src/lib/server/atlas/context/ace-context-manifest-admission-v1.js';
-
-const aceLiveDryInputV2Schema = z.object({
-  schema: z.literal('atlas.ace-live-dry-input.v2'),
-  expectedCandidateCount: z.number().int().positive().default(15),
-  ordinalMap: candidateOrdinalMapV1Schema,
-  snapshot: candidateFeatureSnapshotV1Schema,
-  revisionAuthority: revisionAuthorityEnvelopeV1Schema,
-  ace: z.object({
-    requestId: z.string().min(1),
-    selectedOrdinals: z.array(z.number().int().nonnegative()).optional(),
-    tokenBudget: z.number().int().positive(),
-    retrievalPolicyRevision: z.string().min(1),
-    acePlaybookRevision: z.string().min(1),
-    representationRevision: z.string().min(1),
-    ontologyRevision: z.string().min(1).nullable().optional(),
-    modelRevision: z.string().min(1).nullable().optional(),
-    promptTemplateRevision: z.string().min(1).nullable().optional(),
-    graphRevision: z.string().min(1).nullable().default(null),
-  }).strict(),
-}).strict();
-
-type AceLiveDryInputV2 = z.infer<typeof aceLiveDryInputV2Schema>;
-type SnapshotRow = AceLiveDryInputV2['snapshot']['rows'][number];
 
 function parseArgs(argv: readonly string[]) {
   let inputPath: string | null = null;
@@ -60,48 +34,8 @@ function parseArgs(argv: readonly string[]) {
   return { inputPath: resolve(inputPath), reportPath: resolve(reportPath) };
 }
 
-function selectedRows(input: AceLiveDryInputV2): SnapshotRow[] {
-  const ordinals = [...new Set(input.ace.selectedOrdinals ?? input.snapshot.rows.map((row) => row.candidateOrdinal))]
-    .sort((a, b) => a - b);
-  return ordinals.map((ordinal) => {
-    const row = input.snapshot.rows.find((candidate) => candidate.candidateOrdinal === ordinal);
-    if (!row) throw new Error(`ACE_LIVE_DRY_SELECTED_ORDINAL_MISSING:${ordinal}`);
-    return row;
-  });
-}
-
-function exactSourceRevisionSet(rows: readonly SnapshotRow[]): string[] {
+function exactSourceRevisionSet(rows: readonly AceLiveDrySnapshotRowV2[]): string[] {
   return [...new Set(rows.map((row) => row.sourceRevision))].sort();
-}
-
-function rowCarriesGraphEvidence(row: SnapshotRow): boolean {
-  return row.laneMask.includes('graph') ||
-    row.graphAuthority !== null ||
-    row.personalizedPageRank !== null ||
-    row.communityAffinity !== null;
-}
-
-function graphAdmission(rows: readonly SnapshotRow[], requestedGraphRevision: string | null) {
-  const graphEvidenceRequired = rows.some(rowCarriesGraphEvidence);
-  const graphRevisions = [...new Set(rows.map((row) => row.graphRevision))];
-
-  if (graphEvidenceRequired) {
-    if (rows.some((row) => row.graphRevision === null)) {
-      throw new Error('ACE_LIVE_DRY_GRAPH_EVIDENCE_REQUIRES_REVISION');
-    }
-    if (graphRevisions.length !== 1 || graphRevisions[0] === null) {
-      throw new Error(`ACE_LIVE_DRY_GRAPH_REVISION_NOT_SINGLE_EXACT:${graphRevisions.map(String).join(',')}`);
-    }
-    if (requestedGraphRevision === null || graphRevisions[0] !== requestedGraphRevision) {
-      throw new Error(`ACE_LIVE_DRY_GRAPH_REVISION_MISMATCH:${graphRevisions[0]}:${requestedGraphRevision}`);
-    }
-    return { mode: 'REQUIRED_EXACT' as const, graphRevision: graphRevisions[0] };
-  }
-
-  if (rows.some((row) => row.graphRevision !== null) || requestedGraphRevision !== null) {
-    throw new Error('ACE_LIVE_DRY_GRAPH_REVISION_WITHOUT_GRAPH_EVIDENCE');
-  }
-  return { mode: 'NOT_ADMITTED' as const, graphRevision: null };
 }
 
 function assertStrictCanary(input: AceLiveDryInputV2) {
@@ -109,14 +43,22 @@ function assertStrictCanary(input: AceLiveDryInputV2) {
       input.snapshot.rowCount !== input.expectedCandidateCount) {
     throw new Error(`ACE_LIVE_DRY_CANDIDATE_COUNT_MISMATCH:${input.ordinalMap.rowCount}:${input.snapshot.rowCount}:${input.expectedCandidateCount}`);
   }
-  const rows = selectedRows(input);
+  const rows = selectedAceLiveDryRowsV2(input);
   if (rows.length !== input.expectedCandidateCount) {
     throw new Error(`ACE_LIVE_DRY_SELECTED_COUNT_MISMATCH:${rows.length}:${input.expectedCandidateCount}`);
   }
   if (rows.some((row) => !row.sourceRevision.trim())) {
     throw new Error('ACE_LIVE_DRY_SOURCE_REVISION_MISSING');
   }
-  return graphAdmission(rows, input.ace.graphRevision);
+
+  const graphRevision = resolveAceLiveDryGraphRevisionV2(rows);
+  if (graphRevision !== input.ace.graphRevision) {
+    throw new Error(`ACE_LIVE_DRY_GRAPH_REVISION_MISMATCH:${graphRevision}:${input.ace.graphRevision}`);
+  }
+  return {
+    mode: graphRevision === null ? 'NOT_ADMITTED' as const : 'REQUIRED_EXACT' as const,
+    graphRevision,
+  };
 }
 
 async function main() {
@@ -174,7 +116,7 @@ async function main() {
     throw new Error('ACE_LIVE_DRY_CONTEXT_REPLAY_MISMATCH');
   }
 
-  const selectedSourceRevisions = exactSourceRevisionSet(selectedRows(input));
+  const selectedSourceRevisions = exactSourceRevisionSet(selectedAceLiveDryRowsV2(input));
   const fullSnapshotSourceRevisions = exactSourceRevisionSet(input.snapshot.rows);
   if (JSON.stringify(selectedSourceRevisions) !== JSON.stringify(fullSnapshotSourceRevisions)) {
     throw new Error('ACE_LIVE_DRY_SOURCE_REVISION_MEMBERSHIP_MISMATCH');
@@ -210,10 +152,12 @@ async function main() {
       sourceRevisionMembershipExact: true,
       candidateSourceAuthorityExact: true,
       graphEvidenceAdmissionExact: true,
+      syntheticTimestampRevisionsRejectedBySchema: true,
     },
     notes: {
       sourceRevisionChecksumDomains: 'Bundle and ACE source-revision-set checksums are domain-separated by schema and are not required to be byte-equal; exact revision membership is compared instead.',
       graphRevisionPolicy: 'Graph revision is required only when the selected feature snapshot actually admits graph-lane or graph-derived evidence. Semantic-only canaries must carry graphRevision=null rather than fabricate graph identity.',
+      revisionPolicy: 'Policy/playbook/representation/optional ontology/model/prompt/graph revisions are validated by the shared ACE live-dry input contract and reject ISO timestamp fallbacks.',
     },
     writesPerformed: false,
     cacheWritesPerformed: false,
