@@ -10,8 +10,8 @@ Source design review: OpenWiki durability/reconciliation mechanisms, adapted to 
 - [x] **KNOW-06 — Atomic claim mutations.** ADD/CONFIRM/UPDATE/RETRACT validate targets and resolve all evidence before returning a next state; zero store writes.
 - [x] **KNOW-07 — Claim preflight.** Re-resolve evidence and classify source/symbol/ontology/version/checksum drift deterministically; zero writes.
 - [x] **KNOW-08 — Sparse reconciliation.** Preserve issue-free claims without model repetition; stale/unresolved claims require update or retraction.
-- [ ] **KNOW-09 — Source snapshot/fingerprint.** `KnowledgeSourceSnapshotV1` contract exists; still add workstation source-registry/raw-worktree comparison proof without creating a competing source authority.
-- [ ] **KNOW-10 — PageJobV1.** `KnowledgePageJobV1` contract exists; still bind it to the OaK/AdaptiveDag planner.
+- [ ] **KNOW-09 — Source snapshot/fingerprint.** `KnowledgeSourceSnapshotV1`, deterministic raw-worktree fingerprinting, and `KnowledgeSourceSnapshotAuditReceiptV1` now fail closed unless the frozen source set exactly matches injected source-registry rows and the raw-worktree fingerprint. Still requires a workstation read-only adapter/proof over the existing lineage owner before closure.
+- [x] **KNOW-10 — PageJobV1 → OaK DAG binding.** `planKnowledgePageJobV1()` accepts only `PENDING` jobs and delegates lowering to `planKernelBoundDagV1()` using the active kernel manifest/function catalog/operator library. It produces a checksum-bound read-only/propose-only binding receipt; page jobs cannot invent DAG action kinds or mutation semantics.
 - [ ] **KNOW-11 — Page snapshot/rollback.** `KnowledgePageSnapshotV1` contract exists; still implement exact before/after restoration proof around the file adapter.
 - [ ] **KNOW-12 — Resumable generation run.** `KnowledgeGenerationRunV1` contract exists; still map BEGIN/PLAN/NEXT_PAGE/INSPECT/SUBMIT/FINISH to Parent Atlas typed DAG/execution receipts.
 - [ ] **KNOW-13 — Durable page completion.** Claims persisted/proven before job completion can be recorded.
@@ -30,4 +30,4 @@ Source design review: OpenWiki durability/reconciliation mechanisms, adapted to 
 
 ## Current tranche
 
-Files remain additive under `packages/parent-atlas/src/core/knowledge/`. Source authority is injected from existing Parent Atlas lineage (`graphify_files`/source-registry adapters); structural identity is injected from existing revision-qualified symbol, Tree-sitter, and LSP/compiler owners. No PostgreSQL, Neo4j, Qdrant, Valkey, migration, MCP, CLAUDE.md, AGENTS.md, or production mutation changes are authorized by this tranche.
+Files remain additive under `packages/parent-atlas/src/core/knowledge/`. Source authority is injected from existing Parent Atlas lineage (`graphify_files`/source-registry adapters); structural identity is injected from existing revision-qualified symbol, Tree-sitter, and LSP/compiler owners. Page planning is delegated to the existing kernel-bound planner rather than a new agent controller. No PostgreSQL, Neo4j, Qdrant, Valkey, migration, MCP, CLAUDE.md, AGENTS.md, knowledge-page, or production mutation changes are authorized by this tranche.

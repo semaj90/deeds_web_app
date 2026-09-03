@@ -9,6 +9,8 @@ export * from './knowledge-claim-mutation-v1.js';
 export * from './knowledge-claim-preflight-v1.js';
 export * from './knowledge-claim-reconciliation-v1.js';
 export * from './knowledge-source-snapshot-v1.js';
+export * from './knowledge-source-snapshot-audit-v1.js';
 export * from './knowledge-page-v1.js';
+export * from './knowledge-page-dag-binding-v1.js';
 export * from './knowledge-generation-run-v1.js';
 export * from './knowledge-projection-v1.js';
