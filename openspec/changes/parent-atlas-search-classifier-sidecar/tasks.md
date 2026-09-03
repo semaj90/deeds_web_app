@@ -388,20 +388,76 @@ need follow-up, either as a small task on this change or as their own change:
    metadata, was fit on only 34 sample files, and covers 6 labels rather than the full 15-domain
    `classify-domain-ontology.mjs` taxonomy. It is a real serving smoke proof, not a
    production-quality classifier. Receipt: `docs/reports/domain-classifier-runtime-parity-01.json`.
-2. **Exact-environment retraining is blocked, root cause now confirmed (2026-09-03, this session).**
-   A retrain attempted inside the serving container's own environment failed closed with HTTP 403
-   on every weak-label call to `/api/atlas/domain-taxonomy/classify` — traced to
-   `hooks.server.ts`'s global `ADMIN_ONLY` prefix list, which covers all of `/api/atlas` (not a
-   network/CORS issue, not this route's own missing Zod/auth code). Corrected the stale
-   "unauthenticated" claim in both `claude.md`'s G4 tracking table and this route's own doc comment
-   to reflect that. **Two real fix paths, neither applied**: (a) give the training script a real
-   admin credential (session cookie or service token) to call through the existing gate, or (b)
-   carve this specific read-only, no-PII route out into a narrower service-to-service auth scheme
-   instead of full browser-session admin. Whichever is chosen, retraining must still emit corpus,
-   label-source, runtime, parameter, and checkpoint checksums before the resulting checkpoint is
-   accepted as a canonical-owner replacement (per the exact-environment-retraining note under
-   task 2.6/2.7 above) — do not accept a checkpoint that only fixes the 403 without also fixing the
-   1-issue and 6-vs-15-label problems from item 1.
+2. **SOURCE-LABEL-AUTHORITY-01 — 403 attribution RETRACTED (falsified live), root cause still
+   unknown; live-HTTP dependency removed from the offline-training critical path instead
+   (2026-09-03, this session, later same day).** My own earlier entry in this section (and the
+   matching claude.md/route-doc-comment edits) claimed the historical 403 was caused by
+   `hooks.server.ts`'s `ADMIN_ONLY` prefix list gating `/api/atlas`. **That specific causal claim
+   is now empirically falsified**, not just re-guessed: with the SvelteKit dev server confirmed up
+   (`curl 127.0.0.1:5173/api/health` → 200), the exact same strict-JSON request that the trainer
+   sends was sent twice — once from the host (`curl -i ... 127.0.0.1:5173/...`) and once from
+   inside the live `miniforge-nlp-sidecar` container (`docker exec -i ... python3 -` calling
+   `host.docker.internal:5173/...`, matching the reproduction steps given directly by the operator)
+   — **both returned a clean `200 OK` with a real classification body**, not a 403. `DEV_BYPASS_AUTH`
+   grants `role: 'admin'` whenever no session cookie is present (true for both a bare `curl` and a
+   bare `urllib.request` call), which is why the `ADMIN_ONLY` gate does not actually block either
+   caller today. `vite.config.ts`'s `allowedHosts` (`host.docker.internal`, `localhost`,
+   `127.0.0.1`) was also checked — introduced in commit `90fd865d45`, 2026-05-28, i.e. present and
+   unchanged for over three months, so it cannot explain a fresh failure either. **The true cause of
+   the original 300-request 403 run is not established** — no response body/headers were captured
+   at the time (only the fact of "HTTP 403" was recorded), and it is not currently reproducible
+   under present conditions. Do not re-assert either theory (admin-gate or Vite-host-rejection) as
+   confirmed without a fresh, headers-and-body-captured repro at the actual moment of failure.
+   **Given that ambiguity, per direct operator instruction the fix is architectural, not forensic**:
+   remove the live-HTTP dependency from offline training entirely rather than keep chasing this one
+   transient failure. Built and live-proved:
+   - `scripts/atlas/build-domain-classifier-weak-label-bundle-v1.mts` — a new, standalone TS
+     producer that imports `classifyDomainTaxonomy()`/`DOMAIN_TAXONOMY_VERSION` directly (relative
+     import, no `$lib` alias needed — `domain-taxonomy.ts` has zero imports of its own, verified),
+     walks a deterministic sorted+bounded file sample, classifies each file **in-process** (zero
+     HTTP calls), and freezes the result into a checksummed
+     `atlas.domain-classifier-training-labels.v1` JSON artifact
+     (`docs/reports/domain-classifier-weak-label-bundle-v1.json`). Read-only against the source
+     tree; no datastore writes. Does not create a second taxonomy owner — every label in the
+     bundle is a frozen call to the one canonical function, not a reimplementation.
+     **Live-run, real output** (`--limit 300` over `sveltekit-frontend/src/lib/server`): 2,855
+     candidate `.ts` files found, first 300 selected, only **35 rows kept** — 265 files got no
+     confident `primary_domain` from the deterministic keyword/path classifier and were correctly
+     excluded rather than fabricated a label. `labelDistribution: {agent:4, ui:17, cache:3,
+     retrieval:9, auth:1, database:1}` — 6 classes, matching (and now explaining, not just
+     restating) item 1's "6 labels not 15" finding: this coarse classifier's confidence threshold
+     genuinely doesn't clear most files in this sample, independent of any training bug.
+     `sourceRevision` is `null` / `sourceAuthorityStatus: "PARTIAL"` on every row, as directed — no
+     git-blob-hash resolver exists at this layer yet, and none was fabricated.
+   - `python/train_domain_classifier.py` — added `--labels-file` (bundle-driven mode: skips
+     `walk_corpus`/`fetch_weak_label` entirely, reads the bundle's `rows[]`, and **verifies each
+     row's `contentChecksum` against the file currently on disk before trusting its label** —
+     `load_labels_bundle()` drops and warns on any row with drift rather than silently trusting a
+     stale bundle) and `--repo-root` (for resolving bundle `sourceRef`s from wherever the script
+     runs). Added a full training receipt (`atlas.domain-classifier-training-receipt.v1`):
+     `taxonomyRevision`, `trainingFileSetChecksum`, `trainingLabelSetChecksum`, `embeddingModel`,
+     `nClusters`, `randomState`, `pythonVersion`/`sklearnVersion`/`joblibVersion`/`numpyVersion`,
+     `labels[]`, `labelDistribution`, `checkpointChecksum` — embedded in the persisted checkpoint
+     dict and written as a companion `training-receipt-<model_revision>.json` file (only on a real,
+     non-dry-run persist). `python -c "import ast; ast.parse(...)"` confirms no syntax errors.
+   - **Live-proved inside the exact serving runtime, per operator instruction "do not retrain yet,
+     do not overwrite checkpoint.joblib" — honored via `--dry-run` against a scratch output path,
+     never the real checkpoint**: `docker exec ... python3 /app/python/train_domain_classifier.py
+     --labels-file /workspace/docs/reports/domain-classifier-weak-label-bundle-v1.json --repo-root
+     /workspace --dry-run --output /tmp/dryrun-checkpoint.joblib`, run inside
+     `miniforge-nlp-sidecar` itself (Python 3.13.15 / scikit-learn 1.7.2 / joblib 1.5.2 /
+     NumPy 2.3.3 — the exact serving versions from item 1's mismatch finding, not the host's
+     2.2.6/1.7.0/1.5.1 set). Real output: loaded 35 bundle rows, embedded 58 chunks via
+     `embeddinggemma:latest` (real Ollama calls, `host.docker.internal:11434`), fit
+     `KMeans(n_clusters=16)`, trained NB+LR on 35 rows / 6 classes, printed a full, real receipt —
+     zero HTTP calls to the taxonomy route, zero checkpoint file touched.
+   - **Not yet done, and intentionally not attempted this session** (still blocked on operator
+     decision, per priority ordering below): promoting this to a real (non-dry-run) persisted
+     checkpoint. 35 labeled rows with 2 classes at n=1 (`auth`, `database`) is too thin to be a
+     credible classifier — widening the corpus sample (raise `--limit`, broaden `--corpus-dir`
+     beyond `src/lib/server`, or lower the deterministic classifier's confidence threshold for
+     bundle-generation purposes only) is a prerequisite to a real retrain, not just re-running the
+     same 35-row bundle through a real (non-dry-run) persist.
 3. **`ace/features/domain-classifier.ts` parity test — not written** (task 1.2's explicit
    condition for any future redirect to `domain-taxonomy.ts`). Still has exactly one live call site
    (`feature-extraction-orchestrator.ts:130`), still untouched, still needs a real-corpus comparison
@@ -413,3 +469,17 @@ need follow-up, either as a small task on this change or as their own change:
    `python/parent_atlas_ontology/domain_mapping.py`.** Both were being edited by another session in
    parallel with this one throughout 2026-09-03 (see task 5.1's note) — re-check `git status`/`git
    diff` before assuming this file's current state is the final word.
+
+**Priority now, per direct operator instruction (2026-09-03), status after this session's work:**
+
+1. ~~Attribute the 403~~ — attempted and retracted, see item 2 above; root cause remains genuinely
+   unknown, not solved by assumption.
+2. ~~Freeze deterministic weak-label bundle~~ — **DONE**, live-proved (item 2 above).
+3. Retrain inside exact serving runtime — **wiring DONE and dry-run-proved** (item 2 above); the
+   actual promoted (non-dry-run) retrain is **not done**, correctly blocked on widening the corpus
+   sample past 35 rows / 6 thin classes first, per operator instruction not to retrain yet.
+4. Held-out classifier evaluation — **not started**.
+5. `sourceRef`/`sourceRevision`/`evidenceRefs` propagation (`DOMAIN-CLASSIFICATION-PROVENANCE-01`)
+   — **not started**; still blocked behind a real retrain per item 3.
+6. One learned ontology-admission canary — **not started**.
+7. Return to `PKT-LINEAGE-08` — **not started**, out of this change's scope regardless.

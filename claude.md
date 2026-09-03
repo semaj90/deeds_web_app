@@ -3183,22 +3183,31 @@ a new auth mechanism) to the 8 real gaps above, and add Zod schemas per the G5 c
 as a deliberate production-hardening pass — with tests added alongside, per operator direction
 2026-09-01 — once dev-bypass is no longer the active mode, not piecemeal.
 
-**+1 new route added 2026-09-03, CORRECTED 2026-09-03** (`openspec/changes/parent-atlas-search-classifier-sidecar`
-task 2): `api/atlas/domain-taxonomy/classify` (POST) — exposes `classifyDomainTaxonomy()` for the
-Python NLP sidecar to call as a weak-label bootstrap source (service-to-service, not
-browser-facing). `.strict()` Zod schema on the request body, read-only, no DB mutation, no PII.
-**Originally logged here as "unauthenticated" — that was wrong.** The route file itself has no
-local auth check, but `hooks.server.ts`'s `ADMIN_ONLY` prefix list (line ~848) includes
-`/api/atlas` wholesale, so every request under this path is already gated behind
-`event.locals.user?.role === 'admin'` at the global hook layer before the handler ever runs. This
-is the confirmed root cause of a real HTTP 403 hit during a same-day in-container retraining
-attempt (`python/train_domain_classifier.py` run from inside the `miniforge-nlp-sidecar` container,
-calling this route over `host.docker.internal:5173`) — the request reached SvelteKit but failed
-the admin check, not a network/CORS/DNS failure. Two real fix paths, neither applied yet: (a) grant
-the training script real admin credentials (a session cookie or service token), or (b) carve this
-specific route out of the `/api/atlas` `ADMIN_ONLY` prefix into a narrower service-to-service auth
-scheme (e.g. a shared internal token, since it's read-only and has no PII). Left open — see
-`openspec/changes/parent-atlas-search-classifier-sidecar/tasks.md` Next Steps.
+**+1 new route added 2026-09-03, CORRECTED 2026-09-03, CORRECTION ITSELF PARTIALLY RETRACTED
+2026-09-03 (same day)** (`openspec/changes/parent-atlas-search-classifier-sidecar` task 2):
+`api/atlas/domain-taxonomy/classify` (POST) — exposes `classifyDomainTaxonomy()` for the Python
+NLP sidecar to call as a weak-label bootstrap source (service-to-service, not browser-facing).
+`.strict()` Zod schema on the request body, read-only, no DB mutation, no PII. Originally logged
+here as "unauthenticated"; then corrected to claim `hooks.server.ts`'s global `ADMIN_ONLY` prefix
+list (`/api/atlas`, line ~848) was the confirmed root cause of an in-container retraining run's
+HTTP 403. **That causal claim is itself now falsified by a live repro, not just re-asserted**:
+with the dev server confirmed up, the identical request was sent from both the host and from
+inside the live `miniforge-nlp-sidecar` container to `host.docker.internal:5173`, and **both
+returned a clean `200 OK`** with a real classification — `DEV_BYPASS_AUTH` grants `role: 'admin'`
+whenever no session cookie is present, which both a bare `curl` and a bare Python `urllib` request
+satisfy, so the `ADMIN_ONLY` gate does not block either caller under current conditions.
+`vite.config.ts`'s `allowedHosts` (also a candidate 403 source — Vite's own host-rejection
+mechanism) was checked too and found unchanged since 2026-05-28 (commit `90fd865d45`), so it can't
+explain a fresh failure either. **The real cause of the original 403 is unestablished** — no
+response body was captured at the time. Per the operator's direct instruction, the resolved path
+forward is architectural rather than forensic: remove live HTTP from the offline-training critical
+path entirely via a frozen weak-label bundle
+(`scripts/atlas/build-domain-classifier-weak-label-bundle-v1.mts`) — see
+`openspec/changes/parent-atlas-search-classifier-sidecar/tasks.md` Next Steps item 2 for the full,
+live-proved build. This route itself is left as-is (still reachable, still behind whatever
+`hooks.server.ts` actually enforces for `/api/atlas` — that enforcement's exact real-world
+behavior under the container caller's original conditions remains unresolved, not proven safe or
+unsafe either way).
 
 ### G5 open finding — 18 authenticated mutating routes with zero Zod validation (2026-09-01 /deep-audit)
 
