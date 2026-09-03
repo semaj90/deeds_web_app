@@ -1,0 +1,49 @@
+{
+  "schema": "atlas.sem768-coverage-01.report",
+  "gate": "SEM768-COVERAGE-01",
+  "generatedAt": "2026-09-02T19:34:05.731Z",
+  "databaseWrites": false,
+  "embeddingRequests": 0,
+  "totalRows": 55853,
+  "missingRows": 684,
+  "classifiedRows": 684,
+  "classificationCounts": {
+    "EMPTY_INPUT": 37,
+    "MISSING_SOURCE": 0,
+    "REVISION_UNPROVEN": 0,
+    "LEGACY_ROW": 0,
+    "EMBED_FAILURE": 0,
+    "OVER_CONTEXT": 0,
+    "EXCLUDED_BY_POLICY": 647,
+    "UNKNOWN": 0
+  },
+  "extensionsByBucket": {
+    "EXCLUDED_BY_POLICY": {
+      ".ts": 341,
+      ".md": 79,
+      ".mjs": 214,
+      ".mts": 11,
+      ".sh": 2
+    },
+    "EMPTY_INPUT": {
+      "(none)": 37
+    }
+  },
+  "timeRangeByBucket": {
+    "EXCLUDED_BY_POLICY": {
+      "earliest": "2026-08-29T09:18:02.070Z",
+      "latest": "2026-08-29T09:18:28.649Z"
+    },
+    "EMPTY_INPUT": {
+      "earliest": "2026-04-20T18:22:08.302Z",
+      "latest": "2026-04-20T18:22:12.903Z"
+    }
+  },
+  "findings": [
+    "The 684 missing rows split cleanly into exactly two disjoint groups by indexed_at batch — they are NOT one uniform failure population, confirming the operator caution not to assume a single root cause.",
+    "Group 1 (647 rows, 94.6%): indexed_at all within a 26-second window on 2026-08-29. Real, non-empty content (.ts 341 / .mjs 214 / .md 79 / .mts 11 / .sh 2 — ordinary source files, not garbage). embedding_eligible=false explicitly set. metadata carries packet_key (real UUIDs), domain_class=\"backend\", and reserved-but-JSON-null source_revision/workspace_revision keys. embedding_model is set to \"embeddinggemma:latest\" with no version — read as a declared target model annotation, not a completed-embedding marker, since no vector exists. Classified EXCLUDED_BY_POLICY: an explicit ineligibility flag, not an embed-time failure.",
+    "Group 2 (37 rows, 5.4%): indexed_at all within a 5-second window on 2026-04-20 — a single old indexing run, 4+ months before Group 1. content is NULL/empty for all 37. embedding_eligible=true (marked eligible despite having nothing to embed) and embedding_model is unset (never attempted). Classified EMPTY_INPUT as the proximate technical cause; also flagged as correlating with LEGACY_ROW (single old batch, not seen in any indexing run since) as a secondary observation.",
+    "The :8081 physical-batch-size fix (EMBED-SERVER-PHYSICAL-BATCH-01, closed earlier this session) does NOT explain any of these 684 rows — none show the EMBED_FAILURE signature (embedding_model set AND non-empty content AND embedding_eligible not explicitly false), which is what a batch-size-ceiling rejection would look like at write time. Confirmed by direct classification, not assumed."
+  ],
+  "conclusion": "Zero of the 684 missing rows are attributable to the embed-server batch-size defect fixed earlier this session. 647/684 (94.6%) were deliberately excluded by an explicit embedding_eligible=false policy flag on real source files from a single 2026-08-29 batch; 37/684 (5.4%) are legacy rows with genuinely empty content from a single 2026-04-20 batch. Backfilling these 684 is not a \"fix the batch bug and re-embed\" task — it requires either (a) understanding and possibly reversing the policy decision behind the 647 exclusions, or (b) accepting the 37 legacy empty rows as correctly unembedded."
+}

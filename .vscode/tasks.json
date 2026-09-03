@@ -2019,6 +2019,10 @@
       },
       "isBackground": true,
       "dependsOn": "🧪 Startup: Semantic Valkey Smoke",
+      "runOptions": {
+        "runOn": "folderOpen",
+        "instanceLimit": 1
+      },
       "problemMatcher": {
         "owner": "graphify",
         "pattern": {
@@ -4878,7 +4882,7 @@
         "clear": false
       },
       "problemMatcher": [],
-      "detail": "Start Go RAG+KAG+DAG retrieval service (gRPC :50053, HTTP :8098) — GPU embed, JSONB filters, gob cache"
+      "detail": "Start Go RAG+KAG+DAG retrieval service (gRPC :50053, HTTP :8100) — GPU embed, JSONB filters, gob cache"
     },
     {
       "label": "🧠 CodeIntel: Build",

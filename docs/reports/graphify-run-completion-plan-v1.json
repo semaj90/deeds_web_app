@@ -1,6 +1,6 @@
 {
   "schema": "atlas.graphify-run-completion-plan.v1",
-  "generatedAt": "2026-09-02T00:02:30.905Z",
+  "generatedAt": "2026-09-03T00:53:01.633Z",
   "mode": "READ_ONLY_COMPLETION_PLAN",
   "canonicalAuthority": false,
   "writes": {
@@ -113,5 +113,5 @@
     "reason": "Completion receipt cannot be admitted until all blockers are cleared."
   },
   "status": "COMPLETION_PLAN_BLOCKED",
-  "planChecksum": "sha256:a1304eb7f35f8148c06567db91c9a9a99ba11170bcb96daa3a12add494d111cc"
+  "planChecksum": "sha256:fc4520ca3ec77d5ca04625f6be4f9a1b96650e1d1cc6093d74f81fcf8c9da62c"
 }

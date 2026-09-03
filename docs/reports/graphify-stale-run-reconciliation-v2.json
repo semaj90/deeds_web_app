@@ -1,0 +1,38 @@
+{
+  "schema": "atlas.graphify-stale-run-reconciliation-v2.report",
+  "generatedAt": "2026-09-02",
+  "type": "READ_ONLY_AUDIT",
+  "databaseWrites": false,
+  "question": "Is the RUNNING graphify_runs state genuinely stale, or is it backed by a live process this session hasn't found yet?",
+  "method": "Independent re-verification (not trusting the prior workspace-source-namespace-v1.json claim at face value): queried all graphify_runs rows directly, checked for a live node.exe process, checked .tmp/graphify-daemon.pid's age and whether its PID is running, and separately noted but did not touch .git/index.lock.",
+  "findings": {
+    "allRuns": [
+      { "runId": "14643371-f6f2-4131-906b-235a5c06619a", "startedAt": "2026-08-28T04:01:23.454Z", "status": "RUNNING", "completedAt": null, "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9" },
+      { "runId": "b1a103ac-c717-430b-9643-a8c9818064ae", "startedAt": "2026-08-28T00:16:13.803Z", "status": "RUNNING", "completedAt": null, "workspaceRevision": "sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70" },
+      { "runId": "b3a5b14e-0065-41bb-bfe0-96e1062d1e07", "startedAt": "2026-08-27T16:53:01.074Z", "status": "RUNNING", "completedAt": null, "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc" },
+      { "runId": "a7377c07-acb2-4d68-bf83-19d8eca586d4", "startedAt": "2026-08-27T16:45:38.585Z", "status": "RUNNING", "completedAt": null, "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc" },
+      { "runId": "3f13703e-5944-487c-a5a9-10dcecc00124", "startedAt": "2026-08-27T16:35:34.282Z", "status": "RUNNING", "completedAt": null, "workspaceRevision": "sha256:2c9f63df1ac60860756143caf4ce52da7d96a5f0169d21a69568c6f5301c52b1" }
+    ],
+    "completedRunCount": 0,
+    "totalRunCount": 5,
+    "liveProcessCheck": "tasklist for node.exe shows many unrelated running Node processes (this dev environment, other tooling) but no evidence tying any of them to a graphify run.",
+    "lockFileCheck": {
+      "path": ".tmp/graphify-daemon.pid",
+      "fileDate": "2026-06-28T14:57:00 (local)",
+      "containedPid": 11724,
+      "pidCurrentlyRunning": false,
+      "verdict": "STALE -- predates even the oldest graphify_runs row by 2 months; the process it names does not exist."
+    },
+    "unrelatedArtifactNoted": {
+      "path": ".git/index.lock",
+      "fileDate": "2026-09-02T12:18 (local)",
+      "note": "Exists and is recent, but is a git-tooling artifact, not a graphify lock. Not touched, not implicated in this finding."
+    }
+  },
+  "conclusion": "STALE_RUN_NON_PROMOTABLE, independently re-confirmed. All 5 recorded graphify_runs rows are RUNNING with no completed_at, ranging 5-6 days old, and none is backed by any live process or valid lock. This repo has never recorded a single completed graphify run. This is a genuine human/lifecycle decision (abandon the stale rows / supersede them with a fresh run / investigate why runs never complete their own status transition) -- not something to resolve by running graphify:daily to force a new revision token, and not something this read-only audit resolves unilaterally.",
+  "decisionPointForOperator": [
+    "Option A: Mark the 5 stale RUNNING rows as ABANDONED/FAILED (requires a real write -- out of scope for this read-only audit) and let a future graphify:daily naturally produce a fresh, real completed run.",
+    "Option B: Investigate why graphify_runs' own writer never transitions status to COMPLETED even on success -- possibly a real bug in the runner/writer, not just an operational gap. Not investigated this pass (would require reading the graphify run orchestrator code, out of scope for a DB-only audit).",
+    "Option C: Leave as-is and continue treating LINEAGE-01/PKT-LINEAGE-08 as blocked until a human decides which of the above to pursue."
+  ]
+}

@@ -140,8 +140,14 @@ export function buildProjectionOrdinalMapV1(input: {
     if (keys.has(node.projectionNodeKey)) throw new Error(`PROJECTION_ORDINAL_DUPLICATE_NODE_KEY:${node.projectionNodeKey}`);
     keys.add(node.projectionNodeKey);
   }
+  // Plain default-comparator sort (not .localeCompare()) — must match the
+  // schema's own re-validation sort exactly (see projectionOrdinalMapV1Schema
+  // above) and the convention buildGraphOrdinalMapV1 already uses.
+  // localeCompare() can diverge from default sort on real-world keys (found
+  // live 2026-09-02 in the sibling buildTaxonomyOrdinalMapV1, which had this
+  // same bug — see taxonomy-ordinal-map-v1.ts).
   const rows = [...input.nodes]
-    .sort((a, b) => a.projectionNodeKey.localeCompare(b.projectionNodeKey))
+    .sort((a, b) => (a.projectionNodeKey < b.projectionNodeKey ? -1 : a.projectionNodeKey > b.projectionNodeKey ? 1 : 0))
     .map((node, projectionOrdinal) => ({
       projectionOrdinal,
       projectionNodeKey: node.projectionNodeKey,

@@ -1,0 +1,26 @@
+{
+  "schema": "atlas.rapids-cross-runtime-jaccard-parity.v1",
+  "status": "CROSS_RUNTIME_JACCARD_PARITY_PROVEN_BOUNDED",
+  "fixture": "ontology-linked-tuple-cugraph-algorithm-fixture-v1",
+  "graphRevision": "graph:ontology-linked-tuple-cugraph-algorithm-fixture-v3",
+  "projectionRevision": "projection:ontology-linked-tuple-cugraph-algorithm-fixture-v3",
+  "projectionChecksum": "b68087a95c276b022b1443cce9b3a29c25f1b0d2304a13854fd439d0b07f6dee",
+  "ordinalMapChecksum": "0a6d05db3f7e20e8507aac50defcbb390621292461d6c50d1fa430ebb097ac11",
+  "candidatePairChecksum": "766ee7a3fa9119873947b74b7c9a26cfa23bb429a29f3eb9b7491d8a8eff71db",
+  "candidatePairCount": 3,
+  "pairs": [
+    { "leftNodeKey": "ordinal:0", "rightNodeKey": "ordinal:1", "cpu": 1.0, "wsl": 1.0, "dockerHttp": 1.0 },
+    { "leftNodeKey": "ordinal:2", "rightNodeKey": "ordinal:3", "cpu": 1.0, "wsl": 1.0, "dockerHttp": 1.0 },
+    { "leftNodeKey": "ordinal:5", "rightNodeKey": "ordinal:8", "cpu": 0.0, "wsl": 0.0, "dockerHttp": 0.0 }
+  ],
+  "wslMaxAbsoluteError": 0.0,
+  "dockerHttpMaxAbsoluteError": 0.0,
+  "wslRenumbered": false,
+  "dockerHttpRenumbered": false,
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "notes": [
+    "NetworkX, WSL cuGraph, and HTTP 8098 used the same external node keys and candidate pairs.",
+    "Bounded fixture proof only; no canonical relationship promotion."
+  ]
+}

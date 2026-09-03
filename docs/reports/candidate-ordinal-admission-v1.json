@@ -1,0 +1,36 @@
+{
+  "schema": "atlas.candidate-ordinal-admission.v1",
+  "mode": "READ_ONLY_AUDIT",
+  "sourceReceipt": "docs/reports/candidate-ordinal-corpus-receipt-v1.json",
+  "sourceReceiptDigest": "sha256:a8013b9fc94dc65ecd06042408155e437bfdbff51674a3b61b353af1274a1f9b",
+  "sourceMap": "docs/reports/candidate-ordinal-corpus-v1.json",
+  "sourceMapDigest": "sha256:b4328a07624574c57ade9b942439fdeb2e7604d70d029da00a6d02ca5750eca5",
+  "candidateSnapshotRevision": "corpus-snapshot:workspace-active-v1:v1",
+  "ordinalMapChecksum": "9669b018f17de4e85315ab882fa6c6088c94b96aa6feea434174b97a9c41a3a3",
+  "rowCount": 4951,
+  "checks": {
+    "revisionPresent": true,
+    "checksumValid": true,
+    "sampledReceiptShapeValid": true,
+    "fullPopulationRowsPresent": true,
+    "denseOrdinals": true,
+    "mapRevisionMatchesReceipt": true,
+    "mapChecksumMatchesReceipt": true
+  },
+  "population": {
+    "actualRows": 4951,
+    "uniqueOrdinals": 4951,
+    "missingOrdinals": 0,
+    "duplicateOrdinalCount": 0
+  },
+  "sourceReceiptLegacyFieldsMissing": [
+    "status",
+    "canonicalAuthority",
+    "writesPerformed"
+  ],
+  "status": "CANDIDATE_ORDINAL_ADMISSION_READY",
+  "downstreamAllowed": false,
+  "reason": "This audit validates the existing full map without rebuilding it; downstream execution remains separately gated by KNN parameter and population receipts.",
+  "writesPerformed": false,
+  "canonicalAuthority": false
+}

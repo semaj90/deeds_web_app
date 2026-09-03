@@ -1,0 +1,23 @@
+{
+  "schema": "atlas.legacy-embedding-lineage-bridge.v1",
+  "task": "PKT-LINEAGE-14",
+  "mode": "READ_ONLY",
+  "inputMismatchCount": 28,
+  "inputRelativePathCount": 1,
+  "graphifyMatchCount": 1,
+  "graphifyMatches": [
+    {
+      "source_ref": "sveltekit-frontend/docs/design/2026-05-11_agents-directory-card-regen.md",
+      "source_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "content_hash": "57a4837b0c7a57ee8c790abbf9d11c5b08801c1952e2d6cee9e0ec80dc83022b",
+      "workspace_revision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "parse_status": "UNPROCESSED",
+      "last_seen_run_id": "14643371-f6f2-4131-906b-235a5c06619a"
+    }
+  ],
+  "databaseError": null,
+  "verdict": "PATH_ONLY_BRIDGE_FOUND_SOURCE_IDENTITY_STILL_UNPROVEN",
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "nextAction": "Compare exact content_hash and authoritative revisions before any reuse; do not infer chunk identity from path alone."
+}

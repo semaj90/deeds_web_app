@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import json
+from dataclasses import replace
 from pathlib import Path
 
 from parent_atlas_ontology.domain_mapping import mapping_revision
@@ -19,10 +20,25 @@ REPORT = ROOT / "docs" / "reports" / "domain-ontology-tuple-wire-v1.json"
 def main() -> None:
     value = OntologyLinkedTupleV1.from_dict(json.loads(FIXTURE.read_text(encoding="utf-8")))
     source_namespace = "workspace:ontology-linked-tuple-fixture-v1"
-    signal = DomainClassificationSignalV1("rag_retrieval", 0.95, "classifier:v1", mapping_revision(), source_namespace, value.provenance.sourceRevision)
-    admitted = wire_domain_classification_to_tuple(value, signal, expected_source_namespace=source_namespace)
-    rejected_signal = DomainClassificationSignalV1("mcp_agents", 0.95, "classifier:v1", mapping_revision(), source_namespace, value.provenance.sourceRevision)
-    rejected = wire_domain_classification_to_tuple(value, rejected_signal, expected_source_namespace=source_namespace)
+    ontology_revision = "sha256:" + ("d" * 64)
+    value = replace(value, provenance=replace(value.provenance, ontologyRevision=ontology_revision))
+    evidence_refs = ("fixture:source.ts#L1-L2",)
+    signal = DomainClassificationSignalV1(
+        "rag_retrieval", 0.95, "classifier:v1", mapping_revision(),
+        source_namespace, value.provenance.sourceRevision, ontology_revision, tuple(value.evidenceRefs),
+        "request:wire-proof", value.sourceRef, "atlas-domain-classifier", "atlas-domain-classifier:v1",
+        "domain-bridge:v1",
+    )
+    manifest = {"ontologyRevision": ontology_revision, "mappingRevision": mapping_revision()}
+    evidence = {value.evidenceRefs[0]: {"sourceRef": value.sourceRef, "sourceRevision": value.provenance.sourceRevision, "contentHash": "sha256:" + ("e" * 64), "producer": "fixture-evidence:v1"}}
+    admitted = wire_domain_classification_to_tuple(value, signal, expected_source_namespace=source_namespace, ontology_manifest=manifest, evidence_records=evidence)
+    rejected_signal = DomainClassificationSignalV1(
+        "mcp_agents", 0.95, "classifier:v1", mapping_revision(),
+        source_namespace, value.provenance.sourceRevision, ontology_revision, tuple(value.evidenceRefs),
+        "request:wire-proof", value.sourceRef, "atlas-domain-classifier", "atlas-domain-classifier:v1",
+        "domain-bridge:v1",
+    )
+    rejected = wire_domain_classification_to_tuple(value, rejected_signal, expected_source_namespace=source_namespace, ontology_manifest=manifest, evidence_records=evidence)
     checks = {
         "admitted_label": admitted.admission.status == "ADMITTED",
         "declared_class_attached": admitted.tupleValue is not None and "atlas:RetrievalDomain" in admitted.tupleValue.ontologyIds,

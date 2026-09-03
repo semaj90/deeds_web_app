@@ -1,0 +1,103 @@
+{
+  "schema": "atlas.runtime-capability-registry.v1",
+  "generatedAt": "2026-09-03T00:00:00.000Z",
+  "policy": "DEPENDENCY-CAPABILITY-GUARD-01",
+  "invariant": "NO_NEW_CAPABILITY_OWNER_WITHOUT_PROVEN_GAP",
+  "purpose": "Canonical lookup of which runtime already owns a given capability, so a future dependency-mutation decision resolves a capability against this registry FIRST, before any pip/conda/docker/npm install is proposed. installAllowed=false on an entry means: do not add a new runtime/package for this capability without first proving every listed owner cannot satisfy the task.",
+  "runtimes": [
+    {
+      "runtimeId": "wsl::atlas-rapids-cu13",
+      "kind": "conda-env",
+      "location": "WSL2 Ubuntu, /home/james/miniforge3/envs/atlas-rapids-cu13",
+      "role": "GPU development / algorithm proof and CPU/GPU parity oracle",
+      "liveProof": {
+        "verifiedAt": "2026-09-01",
+        "method": "invoked target env's Python by absolute path (not a bare `python3 -c` in a non-interactive shell, which silently runs against base system Python -- documented pitfall, see root CLAUDE.md GPU-MINI-FABRIC-01 section)",
+        "gpu": "NVIDIA GeForce RTX 3060 Ti, CUDA available: True"
+      },
+      "packagesInstalled": {
+        "cuvs": "26.06.00",
+        "cugraph": "26.06.00",
+        "cudf": "26.06.01",
+        "cupy": "14.1.1",
+        "pytorch": "2.13.0+cu130"
+      },
+      "capabilitiesProven": [
+        "graph.jaccard.gpu",
+        "graph.pagerank.gpu",
+        "graph.bfs.gpu",
+        "ann.exact.gpu",
+        "ann.cagra.gpu",
+        "tensor.gemm.gpu (via pytorch, distinct from the graph capabilities above)"
+      ],
+      "evidence": [
+        "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md GRAPH-LINK-TOPOLOGY-01 (PROVEN_BOUNDED): scripts/atlas/prove-nary-jaccard-cugraph-parity-v1.py, 15 CPU pairs vs 15 GPU pairs, zero missing/extra, maxAbsoluteError=0.0",
+        "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md RAPIDS-CROSS-RUNTIME-JACCARD-01 (PROVEN_BOUNDED): NetworkX/WSL-cuGraph/Docker-cuGraph-sidecar 3-way parity, identical scores",
+        "root CLAUDE.md GPU-MINI-FABRIC-01 section: SEMANTIC-EXACT-PARITY-01 (PASS, recall@16=1.0), GPU-GRAPH-ANN-01/02/03, GPU-GRAPH-STRUCT-01/02 (PageRank/BFS parity)"
+      ],
+      "installAllowed": false,
+      "notes": "This is the preferred owner for any new graph-algorithm capability probe. Do not create a second conda env or a second Docker image for a capability this env already proves live, without first recording why this env cannot satisfy the task."
+    },
+    {
+      "runtimeId": "docker::atlas-gpu-8098",
+      "kind": "docker-image",
+      "location": "docker/atlas-gpu-8098/Dockerfile, image atlas-gpu-8098:26.08-cuda12-py3.13, profile atlas-gpu in docker/docker-compose.gpu.yml",
+      "role": "production HTTP GPU boundary for graph algorithms (currently: Jaccard at /v1/graph/jaccard)",
+      "baseImage": "rapidsai/base:26.08-cuda12-py3.13-amd64",
+      "actualPythonImports": {
+        "verifiedAt": "2026-09-03",
+        "method": "grep '^import|^from' across services/atlas-gpu-8098/app.py and python/atlas_rapids_graph_runtime.py",
+        "topLevelImports": ["hashlib", "json", "math", "os", "sys", "threading", "time", "pathlib", "typing", "pyarrow", "pyarrow.ipc", "pyarrow.parquet", "fastapi", "pydantic"],
+        "lazyImportsInsideFunctions": ["cudf", "cugraph"]
+      },
+      "requiredCapabilities": ["dataframe.gpu (cudf)", "graph.jaccard.gpu (cugraph)", "http.fastapi", "arrow.ipc (pyarrow)"],
+      "notRequiredButPresentInBaseImage": ["pytorch", "cuml", "cugraph-pyg", "wholegraph", "jupyter", "cutlass-dsl", "cutile"],
+      "finding": "DEPENDENCY_OVER_INSTALL_CONFIRMED. The Dockerfile pulls rapidsai/base:26.08-cuda12-py3.13-amd64 -- the full prebuilt RAPIDS suite -- but the service's own code only ever imports cudf and cugraph (both lazily, inside function bodies) plus fastapi/pydantic/pyarrow for the HTTP boundary. This is the exact 'installed a whole framework for one primitive' pattern DEPENDENCY-CAPABILITY-GUARD-01 exists to prevent. NVIDIA's own RAPIDS docs recommend a custom image with only the needed libraries for exactly this reason (smaller image, narrower attack/maintenance surface). Not fixed in this pass -- flagged as a real, verified finding for a future minimal-rebuild task, not silently left unrecorded.",
+      "minimalRebuildTarget": {
+        "required": ["python", "cudf", "cugraph", "cupy (only if a future route needs array ops beyond what cudf/cugraph expose directly)", "fastapi", "uvicorn", "pyarrow", "pandas", "pydantic"],
+        "notRequired": ["pytorch", "cuml", "cuvs (unless a future route serves vector ops -- distinct capability, see graph.jaccard.gpu vs ann.*.gpu split above)", "wholegraph", "jupyter", "cutlass-dsl", "cutile", "tensorrt"]
+      },
+      "installAllowed": false,
+      "notes": "Reuse this image for any new graph-algorithm HTTP route before building a second Docker service. Do not add pytorch/cuml/cuvs to this image merely because the base RAPIDS image already contains them -- explicit new capability required first."
+    },
+    {
+      "runtimeId": "python::xgboost-native-cuda",
+      "kind": "pip-package",
+      "location": "python/atlas_xgboost_grouped_ranking_v1.py (dataset prep, storage/runtime-neutral) + python/prove_atlas_xgboost_gpu_runtime_v1.py (GPU proof harness, tree_method=hist, device=cuda:0)",
+      "role": "domain classification / grouped ranking (gradient boosting), the owner for the xgboost-lane-classifier.json / xgboost-metadata.json / xgboost-metrics.json artifacts referenced under PKT-LINEAGE-08 above",
+      "distinctFrom": "wsl::atlas-rapids-cu13 -- XGBoost's own device=cuda param is native to the xgboost pip package itself, it does NOT require cudf/cugraph/cuml or any RAPIDS component. Do not install cuML merely because gradient boosting needs GPU acceleration; xgboost already owns this capability on its own.",
+      "liveProof": {
+        "verifiedAt": "2026-09-03",
+        "status": "NOT_YET_RUN",
+        "note": "prove_atlas_xgboost_gpu_runtime_v1.py exists and asserts XGBOOST_CUDA_REQUEST_NOT_HONORED if device=cuda isn't actually configured (fail-closed design), but grepping this repo's openspec ledger for XGBOOST_GPU_RUNTIME_PROVEN / XGBOOST_RUNTIME_PROVEN returns zero hits -- it has not actually been executed and its result recorded yet. Do not assume this capability is proven live merely because the harness exists; run it and record the real status before relying on it."
+      },
+      "requiredCapabilities": ["gradient-boosting.gpu (xgboost's own device=cuda)"],
+      "installAllowed": false,
+      "notes": "No requirements*.txt in this repo currently declares xgboost (checked: python/requirements-*.txt, workers/requirements.txt, scripts/requirements-reranker.txt, services/atlas-gpu-8098/requirements.txt -- none match). Before installing it anywhere, first run prove_atlas_xgboost_gpu_runtime_v1.py against whatever environment currently has it (if any) and record a real liveProof here."
+    }
+  ],
+  "capabilities": {
+    "graph.jaccard.gpu": { "provenOwner": "wsl::atlas-rapids-cu13", "secondaryOwner": "docker::atlas-gpu-8098", "installAllowed": false },
+    "graph.pagerank.gpu": { "provenOwner": "wsl::atlas-rapids-cu13", "secondaryOwner": "python::networkx (CPU reference oracle, not GPU -- see networkxOracle note below)", "installAllowed": false },
+    "graph.bfs.gpu": { "provenOwner": "wsl::atlas-rapids-cu13", "installAllowed": false },
+    "ann.exact.gpu": { "provenOwner": "wsl::atlas-rapids-cu13", "installAllowed": false },
+    "ann.cagra.gpu": { "provenOwner": "wsl::atlas-rapids-cu13", "installAllowed": false },
+    "gradient-boosting.gpu": { "provenOwner": null, "candidateOwner": "python::xgboost-native-cuda", "status": "HARNESS_EXISTS_NOT_YET_RUN", "installAllowed": false },
+    "reinforcement-learning.policy": { "provenOwner": null, "status": "NOT_BUILT", "installAllowed": false, "note": "find python -iname '*ppo*' -o -iname '*grpo*' -o -iname '*policy*' returns zero files (verified 2026-09-03). Root CLAUDE.md's Canonical Lineage Contract section already lists policy.pt / RL policy training as explicitly deferred. Resolve a capability gap explicitly before starting this -- do not default to PyTorch+gym/stable-baselines without checking whether wsl::atlas-rapids-cu13's existing PyTorch install can host it first." },
+    "candidate-generation": { "provenOwner": "typescript::search-runtime (retrieve-candidates.ts::retrieveAllCandidates)", "runtime": "Node/TypeScript, Postgres+Qdrant-backed, 8 production call sites", "installAllowed": false, "note": "Not a Python/GPU capability -- app-layer TypeScript, no dependency-install question applies here." },
+    "graph.oracle.cpu (NetworkX)": { "provenOwner": "python::networkx", "role": "CPU correctness/parity oracle for every GPU graph-algorithm challenger (PageRank, Jaccard, BFS) -- never the persistent topology store (that's Neo4j, a separate mirror role per root CLAUDE.md)", "installAllowed": false, "note": "Already a standing dependency across python/graph_snapshot_parity_networkx_oracle.py and the GPU-MINI-FABRIC-01 fixture scripts -- reuse, do not reinstall or fork a second oracle." },
+    "tile.programming.gpu (cuTile)": {
+      "provenOwner": null,
+      "status": "AVAILABLE_FUTURE_CHALLENGER",
+      "currentDependency": false,
+      "installAllowed": false,
+      "gate": "ACE-RADIX-01 full PASS on a CUDA 13.2+ host (this dev host's CUDA 13.0 toolkit ships only a compiler-intrinsic stub, per root CLAUDE.md's ACE-RADIX-01 result: cuTile went stable on Ampere at CUDA 13.2, not 13.0)",
+      "note": "CUDA 13.3 (toolkit/runtime release) is NOT cuTile (Python DSL for the tile programming model) is NOT Tensor Cores (hardware units, 3rd-gen on this RTX 3060 Ti / Ampere sm_86). SIMT is the existing execution model cuGraph/cuDF/CuPy kernels already use; tile programming coexists with it per-kernel, it does not replace it. Do not install cuTile toolchain (cuda-tile, TileIR/compiler components) until a benchmark gate explicitly proves a graph or projection kernel needs it -- Jaccard/BFS/connected-components/irregular graph traversal are not Tensor-Core-shaped workloads and do not motivate this."
+    }
+  },
+  "prohibitedDuplicateOwners": [
+    "A second WSL/conda RAPIDS environment for a capability wsl::atlas-rapids-cu13 already proves live",
+    "A second Docker GPU image for a capability docker::atlas-gpu-8098 or wsl::atlas-rapids-cu13 already proves live",
+    "Upgrading wsl::atlas-rapids-cu13 (26.06) merely to version-match docker::atlas-gpu-8098's base image (26.08) -- capability parity, not version symmetry, is the bar. See root CLAUDE.md's own existing note against upgrading atlas-rapids-cu13 mid-series without demonstrating a specific unusable-for-a-specific-reason case."
+  ]
+}

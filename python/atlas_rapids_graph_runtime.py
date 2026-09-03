@@ -108,6 +108,15 @@ class ComponentsRequest(BaseModel):
     expectedGraphOrdinalMapChecksum: str | None = None
 
 
+class JaccardRequest(BaseModel):
+    graphRevision: str
+    projectionRevision: str | None = None
+    projectionChecksum: str | None = None
+    vertexPairs: list[tuple[str, str]] = Field(default_factory=list)
+    expectedArtifactChecksum: str | None = None
+    expectedGraphOrdinalMapChecksum: str | None = None
+
+
 def normalize_seed_pairs(seeds: list[tuple[str, float]]) -> list[tuple[str, float]]:
     if not seeds:
         return []
@@ -228,6 +237,13 @@ class ResidentGraph:
                 raise ValueError("edge endpoint below zero")
             if int(self.edges_df["src_gpu_node_id"].max()) >= self.node_count or int(self.edges_df["dst_gpu_node_id"].max()) >= self.node_count:
                 raise ValueError("edge endpoint exceeds node table")
+
+        # This is an admission result, not a configuration assumption. The
+        # executor uses renumber=False only after the node and edge tables
+        # prove the cuGraph ABI: unique ordinals covering [0, V). A future
+        # non-dense path must use renumber=True and restore results through
+        # the external node-key map before it is admitted.
+        self.renumbered = False
 
         # Keep canonical identity lookup in host RAM; only integer vertex IDs and
         # topology need to remain in VRAM. This avoids paying VRAM for millions of
@@ -462,7 +478,7 @@ class ResidentGraph:
             "graphOrdinalMapChecksum": self.graph_ordinal_map_checksum,
             "startNodeKey": req.startNodeKey,
             "depthLimit": int(req.depthLimit),
-            "renumbered": False,
+            "renumbered": self.renumbered,
             "nodeCount": self.node_count,
             "edgeCount": self.edge_count,
             "results": results,
@@ -509,6 +525,59 @@ class ResidentGraph:
             "nodeCount": self.node_count,
             "edgeCount": self.edge_count,
             "results": results,
+            "writesPerformed": False,
+            "canonicalAuthority": False,
+            "timings": {"kernelMs": round((time.perf_counter() - started) * 1000, 3)},
+        }
+
+    def jaccard(self, req: JaccardRequest) -> dict[str, Any]:
+        if not req.vertexPairs:
+            raise ValueError("vertexPairs must not be empty")
+        if len(req.vertexPairs) > _MAX_RESULT_NODES * 2:
+            raise ValueError("vertexPairs exceeds bounded limit")
+        if req.graphRevision != self.graph_revision:
+            raise LookupError(f"resident revision {self.graph_revision} != requested {req.graphRevision}")
+        if req.expectedArtifactChecksum and req.expectedArtifactChecksum != self.artifact_checksum:
+            raise LookupError("artifact checksum does not match resident graph")
+        if req.expectedGraphOrdinalMapChecksum and req.expectedGraphOrdinalMapChecksum != self.graph_ordinal_map_checksum:
+            raise LookupError("artifact ordinal map checksum does not match resident graph")
+        pairs = []
+        seen: set[tuple[str, str]] = set()
+        for left, right in req.vertexPairs:
+            pair = (str(left).strip(), str(right).strip())
+            if not pair[0] or not pair[1] or pair[0] == pair[1]:
+                raise ValueError("vertexPairs must contain distinct non-empty node keys")
+            if pair in seen:
+                raise ValueError("vertexPairs must not contain duplicates")
+            seen.add(pair)
+            pairs.append((self.resolve_node_keys([pair[0]], "pair")[0], self.resolve_node_keys([pair[1]], "pair")[0]))
+        started = time.perf_counter()
+        pair_df = cudf.DataFrame({"first": [pair[0] for pair in pairs], "second": [pair[1] for pair in pairs]})
+        result_df = cugraph.jaccard(self.graph, vertex_pair=pair_df)
+        rows = result_df.to_pandas()
+        score_column = "jaccard_coeff" if "jaccard_coeff" in rows.columns else "jaccard"
+        results = []
+        for row in rows.itertuples(index=False):
+            first = int(getattr(row, "first"))
+            second = int(getattr(row, "second"))
+            results.append({
+                "leftNodeKey": self.gpu_id_to_identity[first]["nodeKey"],
+                "rightNodeKey": self.gpu_id_to_identity[second]["nodeKey"],
+                "jaccard": float(getattr(row, score_column)),
+            })
+        results.sort(key=lambda item: (item["leftNodeKey"], item["rightNodeKey"]))
+        return {
+            "schema": "atlas.graph-jaccard-receipt.v1",
+            "operation": "jaccard",
+            "backend": "cugraph.jaccard",
+            "algorithmRevision": "atlas.cugraph-jaccard.v1",
+            "graphRevision": self.graph_revision,
+            "projectionRevision": self.projection_revision,
+            "artifactChecksum": self.artifact_checksum,
+            "graphOrdinalMapChecksum": self.graph_ordinal_map_checksum,
+            "candidatePairCount": len(results),
+            "results": results,
+            "renumbered": self.renumbered,
             "writesPerformed": False,
             "canonicalAuthority": False,
             "timings": {"kernelMs": round((time.perf_counter() - started) * 1000, 3)},
@@ -564,9 +633,7 @@ class GraphRuntimeManager:
                     "symmetrizationPolicy": resident.symmetrization_policy,
                     "nodeCount": resident.node_count,
                     "edgeCount": resident.edge_count,
-                    "renumbered": False,
-                    "nodeTableHash": resident.node_table_hash,
-                    "edgeTableHash": resident.edge_table_hash,
+                    "renumbered": resident.renumbered,
                     "loadedAtUnixMs": int(resident.loaded_at * 1000),
                 },
             }
@@ -689,7 +756,7 @@ class GraphRuntimeManager:
                 "edgeTableHash": resident.edge_table_hash,
                 "nodeCount": resident.node_count,
                 "edgeCount": resident.edge_count,
-                "renumbered": False,
+                "renumbered": resident.renumbered,
                 "storeTransposed": True,
                 "precomputedOutWeight": True,
                 "timings": {
@@ -717,6 +784,21 @@ class GraphRuntimeManager:
                 _fail("PAGERANK_INVALID_REQUEST", str(exc))
             except Exception as exc:
                 _fail("PAGERANK_EXECUTION_FAILED", f"{type(exc).__name__}: {exc}", 500)
+        raise AssertionError("unreachable")
+
+    def jaccard(self, req: JaccardRequest) -> dict[str, Any]:
+        with self._lock:
+            self._assert_request_identity(req)
+            try:
+                return self._resident.jaccard(req)
+            except KeyError as exc:
+                _fail("GRAPH_NODE_NOT_RESIDENT", str(exc))
+            except LookupError as exc:
+                _fail("GRAPH_REVISION_MISMATCH", str(exc), 409)
+            except ValueError as exc:
+                _fail("JACCARD_INVALID_REQUEST", str(exc))
+            except Exception as exc:
+                _fail("JACCARD_EXECUTION_FAILED", f"{type(exc).__name__}: {exc}", 500)
         raise AssertionError("unreachable")
 
     def connected_components(self, req: ComponentsRequest) -> dict[str, Any]:
@@ -778,6 +860,10 @@ def install_graph_routes(
     @router.post("/connected-components")
     def graph_connected_components(req: ComponentsRequest) -> dict[str, Any]:
         return manager.connected_components(req)
+
+    @router.post("/jaccard")
+    def graph_jaccard(req: JaccardRequest) -> dict[str, Any]:
+        return manager.jaccard(req)
 
     app.include_router(router)
     return manager

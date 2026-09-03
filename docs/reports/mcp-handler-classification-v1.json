@@ -1,0 +1,244 @@
+{
+  "schema": "atlas.mcp-handler-classification.v1",
+  "generatedAt": "2026-09-03T03:55:21.247Z",
+  "supersedes": "mcp-tool-registry-drift-classification-v1.json",
+  "entries": [
+    {
+      "name": "identity:quarantine",
+      "previousClassification": "PRIVATE",
+      "classification": "UNKNOWN",
+      "liveOnTrace": false,
+      "astHypothesis": "INTERNAL_HANDLER",
+      "reason": "Not found in live TRACE discovery. mcp-server.ts (the AST audit's target) has no confirmed live launcher in this environment, so the AST-only classification cannot be independently verified -- fail-closed to UNKNOWN rather than trusting AST alone, per this gate's live-discovery-first rule."
+    },
+    {
+      "name": "identity:recover",
+      "previousClassification": "PRIVATE",
+      "classification": "UNKNOWN",
+      "liveOnTrace": false,
+      "astHypothesis": "INTERNAL_HANDLER",
+      "reason": "Not found in live TRACE discovery. mcp-server.ts (the AST audit's target) has no confirmed live launcher in this environment, so the AST-only classification cannot be independently verified -- fail-closed to UNKNOWN rather than trusting AST alone, per this gate's live-discovery-first rule."
+    },
+    {
+      "name": "envelope:validate",
+      "previousClassification": "PRIVATE",
+      "classification": "UNKNOWN",
+      "liveOnTrace": false,
+      "astHypothesis": "INTERNAL_HANDLER",
+      "reason": "Not found in live TRACE discovery. mcp-server.ts (the AST audit's target) has no confirmed live launcher in this environment, so the AST-only classification cannot be independently verified -- fail-closed to UNKNOWN rather than trusting AST alone, per this gate's live-discovery-first rule."
+    },
+    {
+      "name": "mirror:sync_qdrant",
+      "previousClassification": "LEGACY",
+      "classification": "UNKNOWN",
+      "liveOnTrace": false,
+      "astHypothesis": "DEAD_ORPHAN",
+      "reason": "Not found in live TRACE discovery. mcp-server.ts (the AST audit's target) has no confirmed live launcher in this environment, so the AST-only classification cannot be independently verified -- fail-closed to UNKNOWN rather than trusting AST alone, per this gate's live-discovery-first rule."
+    },
+    {
+      "name": "mirror:sync_neo4j",
+      "previousClassification": "LEGACY",
+      "classification": "UNKNOWN",
+      "liveOnTrace": false,
+      "astHypothesis": "DEAD_ORPHAN",
+      "reason": "Not found in live TRACE discovery. mcp-server.ts (the AST audit's target) has no confirmed live launcher in this environment, so the AST-only classification cannot be independently verified -- fail-closed to UNKNOWN rather than trusting AST alone, per this gate's live-discovery-first rule."
+    },
+    {
+      "name": "graph:expand",
+      "previousClassification": "LEGACY",
+      "classification": "UNKNOWN",
+      "liveOnTrace": false,
+      "astHypothesis": "DEAD_ORPHAN",
+      "reason": "Not found in live TRACE discovery. mcp-server.ts (the AST audit's target) has no confirmed live launcher in this environment, so the AST-only classification cannot be independently verified -- fail-closed to UNKNOWN rather than trusting AST alone, per this gate's live-discovery-first rule."
+    },
+    {
+      "name": "retrieval:rerank",
+      "previousClassification": "LEGACY",
+      "classification": "UNKNOWN",
+      "liveOnTrace": false,
+      "astHypothesis": "DEAD_ORPHAN",
+      "reason": "Not found in live TRACE discovery. mcp-server.ts (the AST audit's target) has no confirmed live launcher in this environment, so the AST-only classification cannot be independently verified -- fail-closed to UNKNOWN rather than trusting AST alone, per this gate's live-discovery-first rule."
+    },
+    {
+      "name": "answer:synthesize",
+      "previousClassification": "LEGACY",
+      "classification": "UNKNOWN",
+      "liveOnTrace": false,
+      "astHypothesis": "DEAD_ORPHAN",
+      "reason": "Not found in live TRACE discovery. mcp-server.ts (the AST audit's target) has no confirmed live launcher in this environment, so the AST-only classification cannot be independently verified -- fail-closed to UNKNOWN rather than trusting AST alone, per this gate's live-discovery-first rule."
+    },
+    {
+      "name": "escalation:route",
+      "previousClassification": "PRIVATE",
+      "classification": "UNKNOWN",
+      "liveOnTrace": false,
+      "astHypothesis": "INTERNAL_HANDLER",
+      "reason": "Not found in live TRACE discovery. mcp-server.ts (the AST audit's target) has no confirmed live launcher in this environment, so the AST-only classification cannot be independently verified -- fail-closed to UNKNOWN rather than trusting AST alone, per this gate's live-discovery-first rule."
+    },
+    {
+      "name": "atlas.discover",
+      "previousClassification": "DELEGATED_CANONICAL",
+      "classification": "UNKNOWN",
+      "liveOnTrace": false,
+      "astHypothesis": "LISTING_OMISSION (scanner does not resolve spread array; likely already listed)",
+      "reason": "Not found in live TRACE discovery. mcp-server.ts (the AST audit's target) has no confirmed live launcher in this environment, so the AST-only classification cannot be independently verified -- fail-closed to UNKNOWN rather than trusting AST alone, per this gate's live-discovery-first rule."
+    },
+    {
+      "name": "atlas.retrieve",
+      "previousClassification": "DELEGATED_CANONICAL",
+      "classification": "UNKNOWN",
+      "liveOnTrace": false,
+      "astHypothesis": "LISTING_OMISSION (scanner does not resolve spread array; likely already listed)",
+      "reason": "Not found in live TRACE discovery. mcp-server.ts (the AST audit's target) has no confirmed live launcher in this environment, so the AST-only classification cannot be independently verified -- fail-closed to UNKNOWN rather than trusting AST alone, per this gate's live-discovery-first rule."
+    },
+    {
+      "name": "atlas.build_context",
+      "previousClassification": "DELEGATED_CANONICAL",
+      "classification": "UNKNOWN",
+      "liveOnTrace": false,
+      "astHypothesis": "LISTING_OMISSION (scanner does not resolve spread array; likely already listed)",
+      "reason": "Not found in live TRACE discovery. mcp-server.ts (the AST audit's target) has no confirmed live launcher in this environment, so the AST-only classification cannot be independently verified -- fail-closed to UNKNOWN rather than trusting AST alone, per this gate's live-discovery-first rule."
+    },
+    {
+      "name": "atlas.inspect_runtime",
+      "previousClassification": "DELEGATED_CANONICAL",
+      "classification": "UNKNOWN",
+      "liveOnTrace": false,
+      "astHypothesis": "LISTING_OMISSION (scanner does not resolve spread array; likely already listed)",
+      "reason": "Not found in live TRACE discovery. mcp-server.ts (the AST audit's target) has no confirmed live launcher in this environment, so the AST-only classification cannot be independently verified -- fail-closed to UNKNOWN rather than trusting AST alone, per this gate's live-discovery-first rule."
+    },
+    {
+      "name": "atlas.apply_change",
+      "previousClassification": "DELEGATED_CANONICAL",
+      "classification": "UNKNOWN",
+      "liveOnTrace": false,
+      "astHypothesis": "LISTING_OMISSION (scanner does not resolve spread array; likely already listed)",
+      "reason": "Not found in live TRACE discovery. mcp-server.ts (the AST audit's target) has no confirmed live launcher in this environment, so the AST-only classification cannot be independently verified -- fail-closed to UNKNOWN rather than trusting AST alone, per this gate's live-discovery-first rule."
+    },
+    {
+      "name": "atlas.validate_change",
+      "previousClassification": "DELEGATED_CANONICAL",
+      "classification": "UNKNOWN",
+      "liveOnTrace": false,
+      "astHypothesis": "LISTING_OMISSION (scanner does not resolve spread array; likely already listed)",
+      "reason": "Not found in live TRACE discovery. mcp-server.ts (the AST audit's target) has no confirmed live launcher in this environment, so the AST-only classification cannot be independently verified -- fail-closed to UNKNOWN rather than trusting AST alone, per this gate's live-discovery-first rule."
+    },
+    {
+      "name": "atlas.delegate",
+      "previousClassification": "DELEGATED_CANONICAL",
+      "classification": "UNKNOWN",
+      "liveOnTrace": false,
+      "astHypothesis": "LISTING_OMISSION (scanner does not resolve spread array; likely already listed)",
+      "reason": "Not found in live TRACE discovery. mcp-server.ts (the AST audit's target) has no confirmed live launcher in this environment, so the AST-only classification cannot be independently verified -- fail-closed to UNKNOWN rather than trusting AST alone, per this gate's live-discovery-first rule."
+    },
+    {
+      "name": "phase109a_archive_signal",
+      "previousClassification": "DELEGATED_CANONICAL",
+      "classification": "DEPRECATED_ALIAS",
+      "liveOnTrace": true,
+      "astHypothesis": "DEPRECATED_ALIAS candidate",
+      "reason": "Live tools/list against TRACE confirms this exact name is served there today; treated as a canonical-TRACE / deprecated-alias-elsewhere pair, matching this repo's existing ALIAS precedent."
+    },
+    {
+      "name": "phase109a_supersede_signal",
+      "previousClassification": "DELEGATED_CANONICAL",
+      "classification": "DEPRECATED_ALIAS",
+      "liveOnTrace": true,
+      "astHypothesis": "DEPRECATED_ALIAS candidate",
+      "reason": "Live tools/list against TRACE confirms this exact name is served there today; treated as a canonical-TRACE / deprecated-alias-elsewhere pair, matching this repo's existing ALIAS precedent."
+    },
+    {
+      "name": "phase109a_promote_recommendation",
+      "previousClassification": "DELEGATED_CANONICAL",
+      "classification": "DEPRECATED_ALIAS",
+      "liveOnTrace": true,
+      "astHypothesis": "DEPRECATED_ALIAS candidate",
+      "reason": "Live tools/list against TRACE confirms this exact name is served there today; treated as a canonical-TRACE / deprecated-alias-elsewhere pair, matching this repo's existing ALIAS precedent."
+    },
+    {
+      "name": "phase109a_query_signal_history",
+      "previousClassification": "DELEGATED_CANONICAL",
+      "classification": "DEPRECATED_ALIAS",
+      "liveOnTrace": true,
+      "astHypothesis": "DEPRECATED_ALIAS candidate",
+      "reason": "Live tools/list against TRACE confirms this exact name is served there today; treated as a canonical-TRACE / deprecated-alias-elsewhere pair, matching this repo's existing ALIAS precedent."
+    },
+    {
+      "name": "phase109a_validate_state_transition",
+      "previousClassification": "DELEGATED_CANONICAL",
+      "classification": "DEPRECATED_ALIAS",
+      "liveOnTrace": true,
+      "astHypothesis": "DEPRECATED_ALIAS candidate",
+      "reason": "Live tools/list against TRACE confirms this exact name is served there today; treated as a canonical-TRACE / deprecated-alias-elsewhere pair, matching this repo's existing ALIAS precedent."
+    },
+    {
+      "name": "ldr_research",
+      "previousClassification": "DELEGATED_CANONICAL",
+      "classification": "DEPRECATED_ALIAS",
+      "liveOnTrace": true,
+      "astHypothesis": "DEPRECATED_ALIAS candidate",
+      "reason": "Live tools/list against TRACE confirms this exact name is served there today; treated as a canonical-TRACE / deprecated-alias-elsewhere pair, matching this repo's existing ALIAS precedent."
+    },
+    {
+      "name": "atlas.packet_search",
+      "previousClassification": "ALIAS",
+      "classification": "DEPRECATED_ALIAS",
+      "liveOnTrace": true,
+      "astHypothesis": "ALIAS (canonical=trace-mcp-server)",
+      "reason": "Live tools/list against TRACE confirms this exact name is served there today -- the prior ALIAS classification's canonical side is independently verified live."
+    },
+    {
+      "name": "atlas.coverage",
+      "previousClassification": "ALIAS",
+      "classification": "DEPRECATED_ALIAS",
+      "liveOnTrace": true,
+      "astHypothesis": "ALIAS (canonical=trace-mcp-server)",
+      "reason": "Live tools/list against TRACE confirms this exact name is served there today -- the prior ALIAS classification's canonical side is independently verified live."
+    },
+    {
+      "name": "clusters.get_summary_lenses",
+      "previousClassification": "ALIAS",
+      "classification": "DEPRECATED_ALIAS",
+      "liveOnTrace": true,
+      "astHypothesis": "ALIAS (canonical=trace-mcp-server)",
+      "reason": "Live tools/list against TRACE confirms this exact name is served there today -- the prior ALIAS classification's canonical side is independently verified live."
+    },
+    {
+      "name": "wiki.status",
+      "previousClassification": "ALIAS",
+      "classification": "DEPRECATED_ALIAS",
+      "liveOnTrace": true,
+      "astHypothesis": "ALIAS (canonical=trace-mcp-server)",
+      "reason": "Live tools/list against TRACE confirms this exact name is served there today -- the prior ALIAS classification's canonical side is independently verified live."
+    },
+    {
+      "name": "wiki.search",
+      "previousClassification": "ALIAS",
+      "classification": "DEPRECATED_ALIAS",
+      "liveOnTrace": true,
+      "astHypothesis": "ALIAS (canonical=trace-mcp-server)",
+      "reason": "Live tools/list against TRACE confirms this exact name is served there today -- the prior ALIAS classification's canonical side is independently verified live."
+    },
+    {
+      "name": "wiki.explain_page",
+      "previousClassification": "ALIAS",
+      "classification": "DEPRECATED_ALIAS",
+      "liveOnTrace": true,
+      "astHypothesis": "ALIAS (canonical=trace-mcp-server)",
+      "reason": "Live tools/list against TRACE confirms this exact name is served there today -- the prior ALIAS classification's canonical side is independently verified live."
+    },
+    {
+      "name": "wiki.refresh_directory",
+      "previousClassification": "ALIAS",
+      "classification": "DEPRECATED_ALIAS",
+      "liveOnTrace": true,
+      "astHypothesis": "ALIAS (canonical=trace-mcp-server)",
+      "reason": "Live tools/list against TRACE confirms this exact name is served there today -- the prior ALIAS classification's canonical side is independently verified live."
+    }
+  ],
+  "counts": {
+    "UNKNOWN": 16,
+    "DEPRECATED_ALIAS": 13
+  },
+  "totalEntries": 29
+}

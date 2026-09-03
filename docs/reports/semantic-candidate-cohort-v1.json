@@ -1,0 +1,80 @@
+{
+  "schema": "atlas.semantic-candidate-cohort.v1",
+  "mode": "READ_ONLY_AUDIT",
+  "semanticManifest": "python/atlas_compute/gpu_mini_fabric/fixtures/semantic-768-real-frozen-manifest.json",
+  "semanticNodeKeys": "python/atlas_compute/gpu_mini_fabric/fixtures/semantic-768-real-frozen-node-keys.json",
+  "semanticSnapshotRevision": "semantic-snapshot:bd36c163938a661f9c0b3f68dd1a0eb7e576405268ebe9c2221df689697441b0",
+  "representationId": "semantic_768",
+  "cohortAuthority": {
+    "status": "UNRESOLVED",
+    "classification": "UNKNOWN",
+    "authorityStatus": "BLOCKED_UNGROUNDED",
+    "cohortId": null,
+    "cohortOwner": null,
+    "populationDefinition": "semantic fixture node-key population; authority not established by this audit",
+    "sourcePopulation": null,
+    "selectionRule": "fixture manifest/node-key export only; no authoritative cohort-selection receipt found",
+    "workspaceRevision": null,
+    "sourceRevisionSetChecksum": null,
+    "representationRevision": "semantic_768",
+    "populationCount": 55169,
+    "populationChecksum": null,
+    "evidenceArtifact": null,
+    "requiredAuthorityFieldsProven": false,
+    "historicalLiteral": "15128/768",
+    "unsupportedLiteral": "151128"
+  },
+  "counts": {
+    "requested": 55169,
+    "resolved": 55169,
+    "unresolvedIds": 0,
+    "chunkIdPresent": 55169,
+    "sourceRefPresent": 52380,
+    "repoIdPresent": 38969,
+    "contentHashPresent": 55169,
+    "contentPresent": 55169,
+    "sourceRevisionPresent": 0,
+    "authoritativeBindingPresent": 0,
+    "sourceRegistryRefPresent": 32239,
+    "sourceRegistryContentHashMatch": 2067,
+    "sourceRegistryCommitPresent": 0
+  },
+  "eligibilityPolicy": [
+    "codebase_chunk_index.id",
+    "chunk_id",
+    "source_ref",
+    "content_hash",
+    "authoritative workspace source_revision binding",
+    "binding content_digest == content_hash"
+  ],
+  "sourceInputHydration": {
+    "exactSemanticRows": 55169,
+    "nonEmptyContentRows": 55169,
+    "contentHashRows": 55169,
+    "revisionQualifiedRows": 0,
+    "readyRows": 0,
+    "contentDigestAlgorithm": "not inferred by this audit",
+    "readOnly": true
+  },
+  "registryCoverage": {
+    "owner": "atlas_source_refs",
+    "joinCandidates": [
+      "source_ref_key == codebase_chunk_index.source_ref",
+      "relative_path == codebase_chunk_index.source_ref"
+    ],
+    "diagnosticOnly": true,
+    "doesNotSubstituteForWorkspaceBinding": true
+  },
+  "eligibleCount": 0,
+  "rejectedCount": 55169,
+  "eligibleIdChecksum": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "status": "SEMANTIC_CANDIDATE_COHORT_BLOCKED",
+  "blockers": [
+    "SOURCE_REF_MISSING",
+    "AUTHORITATIVE_SOURCE_BINDING_MISSING",
+    "SOURCE_REGISTRY_COVERAGE_INCOMPLETE",
+    "SOURCE_REGISTRY_COMMIT_REVISION_INCOMPLETE"
+  ],
+  "writesPerformed": false,
+  "canonicalAuthority": false
+}

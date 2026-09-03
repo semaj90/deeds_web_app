@@ -1,0 +1,27 @@
+{
+  "schema": "atlas.graphify-lifecycle-entrypoint-audit.v1",
+  "status": "READY_FOR_INJECTED_WIRING",
+  "readOnly": true,
+  "workspaceRevision": "sha256:96baafe600fec977283cdb5ebc5fb9dcd4be995dbd200f37eefa12c71f598bef",
+  "sourceManifestDigest": "96baafe600fec977283cdb5ebc5fb9dcd4be995dbd200f37eefa12c71f598bef",
+  "repositoryId": "semaj90/deeds_web_app",
+  "repositoryRevision": "85e6f3d509856c75d77e175fc823623c2cd4e18c",
+  "sourceCount": 25264,
+  "bindingCount": 25264,
+  "skippedCount": 106,
+  "producerRevision": "atlas.graphify-lifecycle-entrypoint.v1",
+  "requiredOpenInputs": [
+    "workspaceRevision",
+    "repositoryRevision",
+    "sourceManifestDigest",
+    "sourceBindings",
+    "parserContractVersion",
+    "extractionContractVersion"
+  ],
+  "lifecycleComposition": "open -> fanout(runId) -> close(runId)",
+  "liveStartupWired": false,
+  "graphifyRunsWritten": false,
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "blockers": []
+}

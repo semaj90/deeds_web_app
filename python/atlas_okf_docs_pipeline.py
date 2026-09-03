@@ -43,6 +43,8 @@ from atlas_external_docs import (
     qdrant_points,
     stanza_observations,
 )
+from parent_atlas_ontology.domain_mapping import admit_domain_classification
+from parent_atlas_ontology.domain_tuple_bridge import build_domain_classification_signal_from_chunk
 
 
 Json = dict[str, Any]
@@ -98,6 +100,7 @@ class SourceConfig:
     maximum_depth: int
     pages: tuple[str, ...]
     ldr_export_files: tuple[str, ...]
+    source_namespace: str | None = None
 
 
 @dataclass(frozen=True)
@@ -211,6 +214,7 @@ def load_manifest(path: str | Path) -> PipelineManifest:
             maximum_depth=int(raw.get("maximum_depth", 3)),
             pages=tuple(str(item) for item in raw.get("pages") or []),
             ldr_export_files=tuple(str(item) for item in raw.get("ldr_export_files") or []),
+            source_namespace=(str(raw["source_namespace"]).strip() or None) if raw.get("source_namespace") is not None else None,
         ))
     qdrant = payload.get("qdrant") or {}
     embedding = payload.get("embedding") or {}
@@ -435,6 +439,61 @@ def compile_chunks(
             nlp=nlp,
         ))
     return tuple(chunks)
+
+
+def preview_domain_ontology_admission(
+    chunks: Sequence[ChunkRecord],
+    *,
+    source_namespace: str | None,
+    ontology_revision: str | None,
+    classification_revision: str,
+    mapping_revision_value: str,
+) -> Json:
+    """Read-only OKF classifier admission preview; never persists or projects."""
+
+    if not source_namespace:
+        return {
+            "schema": "atlas.okf-domain-ontology-admission-preview.v1",
+            "status": "SOURCE_NAMESPACE_UNPROVEN",
+            "chunkCount": len(chunks), "signalCount": 0, "admittedCount": 0,
+            "rejectedCount": 0, "writesPerformed": False, "canonicalAuthority": False,
+        }
+    if not ontology_revision:
+        return {
+            "schema": "atlas.okf-domain-ontology-admission-preview.v1",
+            "status": "ONTOLOGY_REVISION_UNPROVEN",
+            "chunkCount": len(chunks), "signalCount": 0, "admittedCount": 0,
+            "rejectedCount": 0, "writesPerformed": False, "canonicalAuthority": False,
+        }
+
+    statuses: list[str] = []
+    evidence_refs: list[str] = []
+    for chunk in chunks:
+        signal = build_domain_classification_signal_from_chunk(
+            domain_label=chunk.domain_class,
+            confidence=1.0,
+            classification_revision=classification_revision,
+            mapping_revision_value=mapping_revision_value,
+            ontology_revision=ontology_revision,
+            source_namespace=source_namespace,
+            source_revision=chunk.source_revision,
+            chunk_id=chunk.chunk_id,
+            start_char=chunk.start_char,
+            end_char=chunk.end_char,
+        )
+        admission = admit_domain_classification(signal.domainLabel, confidence=signal.confidence)
+        statuses.append(admission.status)
+        evidence_refs.extend(signal.evidenceRefs)
+    admitted = sum(status == "ADMITTED" for status in statuses)
+    return {
+        "schema": "atlas.okf-domain-ontology-admission-preview.v1",
+        "status": "PREVIEW_PROVEN" if all(status == "ADMITTED" for status in statuses) else "PARTIAL",
+        "chunkCount": len(chunks), "signalCount": len(statuses),
+        "admittedCount": admitted, "rejectedCount": len(statuses) - admitted,
+        "statusCounts": {status: statuses.count(status) for status in sorted(set(statuses))},
+        "evidenceRefCount": len(set(evidence_refs)),
+        "writesPerformed": False, "canonicalAuthority": False,
+    }
 
 
 def compute_page_rank_features(pages: Sequence[PageArtifact], chunks: Sequence[ChunkRecord]) -> tuple[dict[str, Json], Json]:
@@ -702,6 +761,7 @@ def write_source_artifacts(root: Path, source: SourceConfig, pages: Sequence[Pag
             handle.write(json.dumps(chunk.to_dict(), sort_keys=True, ensure_ascii=False) + "\n")
     return {
         "source_id": source.source_id,
+        "source_namespace": source.source_namespace,
         "pages": len(pages),
         "chunks": len(chunks),
         "chunks_path": str(chunks_path),

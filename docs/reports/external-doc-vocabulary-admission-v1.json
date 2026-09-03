@@ -1,0 +1,188 @@
+{
+  "schema": "atlas.external-doc-vocabulary-admission.v1",
+  "mode": "READ_ONLY",
+  "sourceVocabulary": "EXTERNAL_DOC_DOMAIN",
+  "mappingRevision": "sha256:e6039ff04c33b48deeb179aecd69c17a2ad7f84e91dbcf120d61289732120fc2",
+  "declaredLabelCount": 17,
+  "admittedCount": 5,
+  "unmappedCount": 12,
+  "ambiguousCount": 0,
+  "rows": [
+    {
+      "sourceVocabulary": "EXTERNAL_DOC_DOMAIN",
+      "sourceLabel": "documentation",
+      "status": "ADMITTED",
+      "targetClassId": "atlas:DocumentationDomain",
+      "mappingRevision": "sha256:e6039ff04c33b48deeb179aecd69c17a2ad7f84e91dbcf120d61289732120fc2",
+      "ontologyRevision": null,
+      "evidenceRefs": [],
+      "canonicalAuthority": false
+    },
+    {
+      "sourceVocabulary": "EXTERNAL_DOC_DOMAIN",
+      "sourceLabel": "api",
+      "status": "UNMAPPED",
+      "targetClassId": null,
+      "mappingRevision": "sha256:e6039ff04c33b48deeb179aecd69c17a2ad7f84e91dbcf120d61289732120fc2",
+      "ontologyRevision": null,
+      "evidenceRefs": [],
+      "canonicalAuthority": false
+    },
+    {
+      "sourceVocabulary": "EXTERNAL_DOC_DOMAIN",
+      "sourceLabel": "retrieval",
+      "status": "ADMITTED",
+      "targetClassId": "atlas:RetrievalDomain",
+      "mappingRevision": "sha256:e6039ff04c33b48deeb179aecd69c17a2ad7f84e91dbcf120d61289732120fc2",
+      "ontologyRevision": null,
+      "evidenceRefs": [],
+      "canonicalAuthority": false
+    },
+    {
+      "sourceVocabulary": "EXTERNAL_DOC_DOMAIN",
+      "sourceLabel": "graph",
+      "status": "ADMITTED",
+      "targetClassId": "atlas:GraphDomain",
+      "mappingRevision": "sha256:e6039ff04c33b48deeb179aecd69c17a2ad7f84e91dbcf120d61289732120fc2",
+      "ontologyRevision": null,
+      "evidenceRefs": [],
+      "canonicalAuthority": false
+    },
+    {
+      "sourceVocabulary": "EXTERNAL_DOC_DOMAIN",
+      "sourceLabel": "gpu",
+      "status": "UNMAPPED",
+      "targetClassId": null,
+      "mappingRevision": "sha256:e6039ff04c33b48deeb179aecd69c17a2ad7f84e91dbcf120d61289732120fc2",
+      "ontologyRevision": null,
+      "evidenceRefs": [],
+      "canonicalAuthority": false
+    },
+    {
+      "sourceVocabulary": "EXTERNAL_DOC_DOMAIN",
+      "sourceLabel": "database",
+      "status": "ADMITTED",
+      "targetClassId": "atlas:DatabaseDomain",
+      "mappingRevision": "sha256:e6039ff04c33b48deeb179aecd69c17a2ad7f84e91dbcf120d61289732120fc2",
+      "ontologyRevision": null,
+      "evidenceRefs": [],
+      "canonicalAuthority": false
+    },
+    {
+      "sourceVocabulary": "EXTERNAL_DOC_DOMAIN",
+      "sourceLabel": "cache",
+      "status": "UNMAPPED",
+      "targetClassId": null,
+      "mappingRevision": "sha256:e6039ff04c33b48deeb179aecd69c17a2ad7f84e91dbcf120d61289732120fc2",
+      "ontologyRevision": null,
+      "evidenceRefs": [],
+      "canonicalAuthority": false
+    },
+    {
+      "sourceVocabulary": "EXTERNAL_DOC_DOMAIN",
+      "sourceLabel": "agent",
+      "status": "UNMAPPED",
+      "targetClassId": null,
+      "mappingRevision": "sha256:e6039ff04c33b48deeb179aecd69c17a2ad7f84e91dbcf120d61289732120fc2",
+      "ontologyRevision": null,
+      "evidenceRefs": [],
+      "canonicalAuthority": false
+    },
+    {
+      "sourceVocabulary": "EXTERNAL_DOC_DOMAIN",
+      "sourceLabel": "workflow",
+      "status": "ADMITTED",
+      "targetClassId": "atlas:WorkflowDomain",
+      "mappingRevision": "sha256:e6039ff04c33b48deeb179aecd69c17a2ad7f84e91dbcf120d61289732120fc2",
+      "ontologyRevision": null,
+      "evidenceRefs": [],
+      "canonicalAuthority": false
+    },
+    {
+      "sourceVocabulary": "EXTERNAL_DOC_DOMAIN",
+      "sourceLabel": "protocol",
+      "status": "UNMAPPED",
+      "targetClassId": null,
+      "mappingRevision": "sha256:e6039ff04c33b48deeb179aecd69c17a2ad7f84e91dbcf120d61289732120fc2",
+      "ontologyRevision": null,
+      "evidenceRefs": [],
+      "canonicalAuthority": false
+    },
+    {
+      "sourceVocabulary": "EXTERNAL_DOC_DOMAIN",
+      "sourceLabel": "security",
+      "status": "UNMAPPED",
+      "targetClassId": null,
+      "mappingRevision": "sha256:e6039ff04c33b48deeb179aecd69c17a2ad7f84e91dbcf120d61289732120fc2",
+      "ontologyRevision": null,
+      "evidenceRefs": [],
+      "canonicalAuthority": false
+    },
+    {
+      "sourceVocabulary": "EXTERNAL_DOC_DOMAIN",
+      "sourceLabel": "testing",
+      "status": "UNMAPPED",
+      "targetClassId": null,
+      "mappingRevision": "sha256:e6039ff04c33b48deeb179aecd69c17a2ad7f84e91dbcf120d61289732120fc2",
+      "ontologyRevision": null,
+      "evidenceRefs": [],
+      "canonicalAuthority": false
+    },
+    {
+      "sourceVocabulary": "EXTERNAL_DOC_DOMAIN",
+      "sourceLabel": "training",
+      "status": "UNMAPPED",
+      "targetClassId": null,
+      "mappingRevision": "sha256:e6039ff04c33b48deeb179aecd69c17a2ad7f84e91dbcf120d61289732120fc2",
+      "ontologyRevision": null,
+      "evidenceRefs": [],
+      "canonicalAuthority": false
+    },
+    {
+      "sourceVocabulary": "EXTERNAL_DOC_DOMAIN",
+      "sourceLabel": "model_runtime",
+      "status": "UNMAPPED",
+      "targetClassId": null,
+      "mappingRevision": "sha256:e6039ff04c33b48deeb179aecd69c17a2ad7f84e91dbcf120d61289732120fc2",
+      "ontologyRevision": null,
+      "evidenceRefs": [],
+      "canonicalAuthority": false
+    },
+    {
+      "sourceVocabulary": "EXTERNAL_DOC_DOMAIN",
+      "sourceLabel": "configuration",
+      "status": "UNMAPPED",
+      "targetClassId": null,
+      "mappingRevision": "sha256:e6039ff04c33b48deeb179aecd69c17a2ad7f84e91dbcf120d61289732120fc2",
+      "ontologyRevision": null,
+      "evidenceRefs": [],
+      "canonicalAuthority": false
+    },
+    {
+      "sourceVocabulary": "EXTERNAL_DOC_DOMAIN",
+      "sourceLabel": "error_fixing",
+      "status": "UNMAPPED",
+      "targetClassId": null,
+      "mappingRevision": "sha256:e6039ff04c33b48deeb179aecd69c17a2ad7f84e91dbcf120d61289732120fc2",
+      "ontologyRevision": null,
+      "evidenceRefs": [],
+      "canonicalAuthority": false
+    },
+    {
+      "sourceVocabulary": "EXTERNAL_DOC_DOMAIN",
+      "sourceLabel": "other",
+      "status": "UNMAPPED",
+      "targetClassId": null,
+      "mappingRevision": "sha256:e6039ff04c33b48deeb179aecd69c17a2ad7f84e91dbcf120d61289732120fc2",
+      "ontologyRevision": null,
+      "evidenceRefs": [],
+      "canonicalAuthority": false
+    }
+  ],
+  "postgresWrites": false,
+  "neo4jWrites": false,
+  "valkeyWrites": false,
+  "canonicalAuthority": false,
+  "status": "EXTERNAL_DOC_VOCABULARY_ADMISSION_AUDITED",
+  "nextGate": "ADD_EXPLICIT_ONTOLOGY_REVISION_AND_EVIDENCE_TO_ADMITTED_MAPPINGS"
+}

@@ -1,6 +1,6 @@
 {
   "schema": "atlas.graphify-lexical-owner.v1",
-  "generatedAt": "2026-08-26T03:32:06.152Z",
+  "generatedAt": "2026-09-03T00:36:32.939Z",
   "readOnly": true,
   "table": "codebase_chunk_index",
   "extensions": [
@@ -125,10 +125,6 @@
       "indexdef": "CREATE INDEX idx_codebase_chunk_bm25_search ON public.codebase_chunk_index USING gin (search_vector)"
     },
     {
-      "indexname": "idx_codebase_chunk_content_embedding_384_hnsw",
-      "indexdef": "CREATE INDEX idx_codebase_chunk_content_embedding_384_hnsw ON public.codebase_chunk_index USING hnsw (content_embedding_384 vector_cosine_ops) WITH (m='16', ef_construction='64')"
-    },
-    {
       "indexname": "idx_codebase_chunk_content_embedding_768_hnsw",
       "indexdef": "CREATE INDEX idx_codebase_chunk_content_embedding_768_hnsw ON public.codebase_chunk_index USING hnsw (content_embedding_768 vector_cosine_ops) WITH (m='16', ef_construction='64')"
     },
@@ -159,6 +155,14 @@
     {
       "indexname": "idx_codebase_chunk_latent64_hnsw",
       "indexdef": "CREATE INDEX idx_codebase_chunk_latent64_hnsw ON public.codebase_chunk_index USING hnsw (latent_64 vector_cosine_ops) WHERE (latent_64 IS NOT NULL)"
+    },
+    {
+      "indexname": "idx_codebase_chunk_latent_256_checkpoint_revision",
+      "indexdef": "CREATE INDEX idx_codebase_chunk_latent_256_checkpoint_revision ON public.codebase_chunk_index USING btree (latent_256_checkpoint_revision) WHERE (latent_256_checkpoint_revision IS NOT NULL)"
+    },
+    {
+      "indexname": "idx_codebase_chunk_latent_256_hnsw",
+      "indexdef": "CREATE INDEX idx_codebase_chunk_latent_256_hnsw ON public.codebase_chunk_index USING hnsw (latent_256 halfvec_cosine_ops) WHERE (latent_256 IS NOT NULL)"
     },
     {
       "indexname": "idx_codebase_chunk_latent_valid",
@@ -203,17 +207,28 @@
       "definition": "CREATE TRIGGER trig_update_codebase_chunk_search_vector BEFORE INSERT OR UPDATE ON public.codebase_chunk_index FOR EACH ROW EXECUTE FUNCTION compute_codebase_chunk_search_vector()"
     }
   ],
+  "documentSearchVectorProducer": {
+    "function": "public.compute_codebase_chunk_search_vector",
+    "configurations": [
+      "english",
+      "simple"
+    ],
+    "definitionAvailable": true
+  },
+  "queryConfiguration": "english",
+  "configurationAligned": false,
   "counts": {
-    "total": 55206,
-    "search_vector": 55206,
+    "total": 55853,
+    "search_vector": 55853,
     "ast_symbols": 17800,
-    "content_embedding_768": 724,
+    "content_embedding_768": 1386,
     "content_embedding": 55169
   },
   "owner": "POSTGRES_FTS_TSVECTOR_TS_RANK_CD",
   "findings": [
     "pg_search extension is installed; query ownership still requires a live pg_search scorer/index proof.",
-    "pg_search is available but is not promoted as the owner by this receipt."
+    "pg_search is available but is not promoted as the owner by this receipt.",
+    "Document search_vector uses english, simple while queries use english; benchmark or define a shared configuration before claiming alignment."
   ],
   "status": "PASS"
 }

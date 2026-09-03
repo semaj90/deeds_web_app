@@ -339,6 +339,27 @@ try {
     process.exit(0);
   }
 
+  // GRAPHIFY-OPEN-CLOSE-LIVE-WIRING-01 (2026-09-03): opens a real graphify_runs row and binds a
+  // real, materialized WorkspaceRevisionRecordV1 to it before the actual indexing chain runs.
+  // Uses the same proven openGraphifyRunV1/bindWorkspaceRevisionV1 primitives already
+  // live-proved standalone (scripts/atlas/prove-graphify-open-bind-complete-lifecycle-v1.mjs) --
+  // no new SQL here, just wiring the existing primitive into the real entrypoint for the first
+  // time. Deliberately non-fatal: lifecycle bookkeeping must never block the real indexing work
+  // it is trying to observe, so a failure here is logged and the chain proceeds regardless.
+  let lifecycleOpened = false;
+  try {
+    if (!quiet) console.log('[graphify:daily] Opening graphify_runs lifecycle row...');
+    execSync('npx tsx scripts/atlas/graphify-daily-lifecycle-open-v1.mjs', {
+      cwd: ROOT,
+      stdio: quiet ? 'ignore' : 'inherit',
+      timeout: 5 * 60 * 1000,
+      shell: true,
+    });
+    lifecycleOpened = true;
+  } catch (lifecycleOpenError) {
+    console.warn(`[graphify:daily] Lifecycle open/bind degraded; continuing daily chain without it: ${lifecycleOpenError.message}`);
+  }
+
   // Run from sveltekit-frontend directory to resolve npm scripts
   //
   // graphify:daily:chain runs 6 sequential steps (dedup-validation,
@@ -354,6 +375,24 @@ try {
     stdio: 'inherit',
     timeout: 3 * 60 * 60 * 1000 // 3 hour timeout
   });
+
+  // Close the lifecycle row opened above, only if it was actually opened. A failure here is
+  // also non-fatal for the same reason as the open step -- the real indexing work above already
+  // succeeded by this point, and a bookkeeping-close failure must not turn that into a reported
+  // daily-run failure.
+  if (lifecycleOpened) {
+    try {
+      if (!quiet) console.log('[graphify:daily] Completing graphify_runs lifecycle row...');
+      execSync('npx tsx scripts/atlas/graphify-daily-lifecycle-complete-v1.mjs', {
+        cwd: ROOT,
+        stdio: quiet ? 'ignore' : 'inherit',
+        timeout: 60 * 1000,
+        shell: true,
+      });
+    } catch (lifecycleCompleteError) {
+      console.warn(`[graphify:daily] Lifecycle completion degraded; daily chain already succeeded: ${lifecycleCompleteError.message}`);
+    }
+  }
 
   // NES/CHROM is a derived packet projection over the refreshed feature map.
   // Keep it opt-in and bounded so restoring the table cannot silently trigger

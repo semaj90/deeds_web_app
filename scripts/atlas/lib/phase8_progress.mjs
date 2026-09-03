@@ -76,7 +76,12 @@ export class Phase8ProgressTracker {
     const tmpDir = path.dirname(PROGRESS_FILE_JSON);
     if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true });
 
-    const tmpPath = `${PROGRESS_FILE_JSON}.tmp`;
+    // Multiple startup/fanout processes can report progress concurrently. A shared temporary
+    // filename lets one process overwrite or lock the other's file on Windows, causing EPERM
+    // during rename and aborting an otherwise healthy read/write stage. Keep the final snapshot
+    // path stable, but make the staging path process/run specific.
+    const safeRunId = String(this.runId).replace(/[^A-Za-z0-9_.-]/g, '_');
+    const tmpPath = `${PROGRESS_FILE_JSON}.${process.pid}.${safeRunId}.tmp`;
     fs.writeFileSync(tmpPath, `${JSON.stringify(event, null, 2)}\n`, 'utf8');
     fs.renameSync(tmpPath, PROGRESS_FILE_JSON);
 

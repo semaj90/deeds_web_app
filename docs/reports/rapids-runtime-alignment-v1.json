@@ -1,0 +1,47 @@
+{
+  "schema": "atlas.rapids-runtime-alignment.v1",
+  "status": "ALIGNED_WITH_SEPARATE_LANES",
+  "generatedFor": "GRAPH-LINK-TOPOLOGY-01",
+  "serviceOwner": {
+    "runtime": "DOCKER",
+    "service": "atlas-gpu-8098",
+    "port": 8098,
+    "composeFile": "docker/docker-compose.gpu.yml",
+    "composeProfile": "atlas-gpu",
+    "image": "atlas-gpu-8098:26.08-cuda12-py3.13",
+    "baseImage": "rapidsai/base:26.08-cuda12-py3.13-amd64",
+    "artifactMount": "/mnt/c/Users/james/Videos/deeds-web-app:ro",
+    "canonicalAuthority": false,
+    "writesPerformed": false
+  },
+  "nativeWslLane": {
+    "runtime": "WSL2_MINIFORGE",
+    "miniforgePrefix": "$HOME/miniforge3",
+    "environment": "atlas-rapids-cu13",
+    "pythonTarget": "3.14",
+    "cudaTarget": "13.3",
+    "role": "DEVELOPMENT_DIAGNOSTIC_EXECUTOR",
+    "httpServiceOwner": false,
+    "versionParityWithDocker": "UNPROVEN"
+  },
+  "retrievalLane": {
+    "service": "go-retrieval-service",
+    "httpPort": 8100,
+    "grpcPort": 50053,
+    "staleDocumentationCorrected": true
+  },
+  "findings": [
+    "Docker atlas-gpu-8098 is profile-gated and was not running during the health check.",
+    "Native WSL Miniforge does not automatically provide an HTTP listener on 8098.",
+    "WSL Python/CUDA targets differ from the Docker image and must not be claimed equivalent without a live capability receipt.",
+    "The RAPIDS Jaccard comparison must target the Docker service or an explicitly launched WSL HTTP adapter, never an assumed endpoint."
+  ],
+  "writes": {
+    "postgres": false,
+    "qdrant": false,
+    "neo4j": false,
+    "valkey": false,
+    "graphify": false
+  },
+  "nextGate": "START_ONE_EXPLICIT_RAPIDS_RUNTIME_THEN_HEALTH_AND_CAPABILITY_CHECK"
+}

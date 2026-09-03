@@ -53,8 +53,17 @@ async function getSession(): Promise<any> {
   _sessionLoading = (async () => {
     const ort = await import('onnxruntime-node');
     _session = await ort.InferenceSession.create(MODEL_PATH, {
-      executionProviders: ['cuda', 'cpu'],
+      // CPU-only, deliberately. This module is the designated GPU-occupied
+      // fallback lane (executor policy: 8081 GGUF/CUDA primary, this ONNX
+      // path second when the GPU is busy, Ollama compatibility fallback
+      // last) — it must never compete for VRAM with the primary GPU
+      // executors. Found live 2026-09-02: with 'cuda' listed first,
+      // initializing a third CUDA context here (after llama-server :8090 +
+      // the :8081 GGUF embed server already hold ~7.5GB/8GB) crashed the
+      // whole Node process with no catchable JS error.
+      executionProviders: ['cpu'],
       graphOptimizationLevel: 'all',
+      executionMode: 'sequential',
     });
     return _session;
   })();

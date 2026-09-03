@@ -1,0 +1,24 @@
+{
+  "schema": "atlas.ontology-python-typescript-parity.v1",
+  "status": "PYTHON_TS_ONTOLOGY_SIGNAL_PARITY_PROVEN",
+  "fixture": "docs/reports/fixtures/domain-classification-admission-v1.json",
+  "python": {
+    "tests": "python/test_domain_classification_signal_parity.py",
+    "result": "2 passed"
+  },
+  "typescript": {
+    "tests": "packages/parent-atlas/src/core/domain-classification-signal-v1.spec.ts",
+    "result": "2 passed"
+  },
+  "packageBuild": "PASS",
+  "signalChecksum": "sha256:e77080632dca6836a93ddffaa1acf546483af62e498935184c0af6a4e61375a3",
+  "mappingRevisionParity": true,
+  "ontologyRevisionParity": true,
+  "evidenceReferenceParity": true,
+  "legacyRevisionPolicy": "ONTOLOGY_REVISION_LEGACY_REJECTED",
+  "realClassifierAdmission": "OPEN",
+  "postgresWrites": false,
+  "valkeyWrites": false,
+  "neo4jWrites": false,
+  "canonicalAuthority": false
+}

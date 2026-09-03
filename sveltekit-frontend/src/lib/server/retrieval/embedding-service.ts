@@ -14,10 +14,10 @@
  * - Zero-copy tensor handling
  */
 
-import { assertSemantic768 } from '$lib/server/embedding/embedding-contract-768.js';
-import { embedSemantic768Canonical } from '$lib/server/embedding/canonical-embed.js';
+import { assertSemantic768 } from '../embedding/embedding-contract-768.js';
+import { embedSemantic768Canonical } from '../embedding/canonical-embed.js';
 
-import { ENV } from '$lib/server/env.server.js';
+import { ENV } from '../env.server.js';
 /**
  * Embedding result with provenance tracking
  */

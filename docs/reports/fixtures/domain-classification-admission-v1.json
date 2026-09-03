@@ -1,0 +1,30 @@
+{
+  "signal": {
+    "schema_version": "atlas.domain-classification-signal.v1",
+    "request_id": "request:domain-fixture-1",
+    "source_ref": "src/lib/server/atlas/retrieval.ts",
+    "source_namespace": "workspace:domain-fixture-v1",
+    "source_revision": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "classifier_id": "atlas-domain-classifier",
+    "classifier_revision": "atlas-domain-classifier:v1",
+    "label": "retrieval",
+    "probability": 0.91,
+    "mapping_revision": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "ontology_revision": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+    "evidence_refs": ["evidence:domain-fixture-1"],
+    "producer_revision": "domain-classification-fixture:v1"
+  },
+  "evidence": {
+    "evidence:domain-fixture-1": {
+      "sourceRef": "src/lib/server/atlas/retrieval.ts",
+      "sourceRevision": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "contentHash": "sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "producer": "tree-sitter-fixture:v1"
+    }
+  },
+  "manifest": {
+    "ontologyRevision": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+    "mappingRevision": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "signalChecksum": "sha256:e77080632dca6836a93ddffaa1acf546483af62e498935184c0af6a4e61375a3"
+}

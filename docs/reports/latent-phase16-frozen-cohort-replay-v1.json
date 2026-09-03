@@ -1,0 +1,13 @@
+{
+  "schema": "atlas.latent-phase16-frozen-cohort-replay.v1",
+  "status": "FROZEN_COHORT_DRY_RUN_REPLAY_PROVEN",
+  "cohortSize": 128,
+  "cohortArtifact": "docs/reports/latent-phase16-cohort-128.json",
+  "runA": { "eligibleCount": 0, "processedCount": 0, "writtenCount": 0 },
+  "runB": { "eligibleCount": 0, "processedCount": 0, "writtenCount": 0 },
+  "cohortSelection": "sorted admitted bundle IDs, frozen before staleness filtering",
+  "movingWindowPrevented": true,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "note": "This validates stable cohort selection after the apply incident. It is not a new apply proof; the selected cohort was already current after the bounded writes."
+}

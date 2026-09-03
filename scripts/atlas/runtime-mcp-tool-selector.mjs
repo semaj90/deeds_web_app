@@ -135,7 +135,8 @@ async function qdrantSearch(vector, { topK = DEFAULT_TOP_K, ontologyFilter = [] 
 }
 
 async function registrySearch(query, topK = DEFAULT_TOP_K) {
-  const { registry } = await loadRegistry();
+  const { registry, valid } = await loadRegistry();
+  if (!valid) return [];
   const tools = Array.isArray(registry?.tools) ? registry.tools : [];
   if (tools.length === 0) return [];
   return rankRegistryTools(query, tools, topK).map(tool => ({
@@ -399,7 +400,7 @@ async function runAudit() {
     { name: 'qdrant_manifest_coverage', pass: qdrantFound >= 16, detail: `${qdrantFound}/${allMcpNames.length}` },
     { name: 'embed_working',           pass: results.every(r => r.embed_ok), detail: `${EMBEDDING_MODEL} (768-dim)` },
     { name: 'tool_selection_returns_results', pass: results.every(r => r.mcp_names.length > 0), detail: `all 5 test queries returned tools` },
-    { name: 'registry_pickup_paths', pass: (await loadRegistry()).registry != null, detail: 'docs/reports/mcp-tool-registry-index.json present' },
+    { name: 'registry_pickup_paths', pass: (await loadRegistry()).valid === true, detail: 'revisioned docs/reports/mcp-tool-registry-index.json present' },
   ];
 
   console.log('\n══ Gate Results ═══════════════════════════');

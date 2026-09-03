@@ -7,8 +7,8 @@
  * without loading the entire embeddings stack at startup.
  */
 
-import { ENV } from '$lib/server/env.server.js';
-import { validateSemantic768OutputV1 } from '$lib/server/atlas/embedding/embedding-runtime-v1.js';
+import { ENV } from '../env.server.js';
+import { validateSemantic768OutputV1 } from '../atlas/embedding/embedding-runtime-v1.js';
 
 export type CanonicalEmbeddingResult = {
   model: string;

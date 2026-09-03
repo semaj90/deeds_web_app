@@ -161,6 +161,10 @@ export const ENV = Object.freeze({
   DOCLING_SERVICE_URL: privateEnv.DOCLING_SERVICE_URL,
   EMBED_MODEL_PATH: privateEnv.EMBED_MODEL_PATH,
   EMBEDDING_BASE_URL: privateEnv.EMBEDDING_BASE_URL,
+  // EMBED-PROVIDER-CONVERGENCE-01: compatibility input only, consumed
+  // exclusively by resolveEmbeddingProviderV1() (embedding-provider-v1.ts).
+  // No other module should read this directly.
+  EMBED_SERVER_URL: privateEnv.EMBED_SERVER_URL,
   EMBEDDING_SERVER_MODEL: privateEnv.EMBEDDING_SERVER_MODEL,
   EMBEDDING_MODEL_ARTIFACT_REVISION: privateEnv.EMBEDDING_MODEL_ARTIFACT_REVISION,
   EMBEDDING_TOKENIZER_REVISION: privateEnv.EMBEDDING_TOKENIZER_REVISION,

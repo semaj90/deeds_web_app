@@ -46,22 +46,71 @@ const INPUT_PATH   = inputI >= 0 ? argv[inputI + 1] : null;
 const COLLECTION   = collI  >= 0 ? argv[collI + 1]  : 'docs_chunks';
 const BATCH_SIZE   = batchI >= 0 ? Number(argv[batchI + 1]) : 20;
 
-const QDRANT_URL   = process.env.QDRANT_URL    ?? 'http://127.0.0.1:6333';
-const OLLAMA_URL   = process.env.OLLAMA_URL    ?? 'http://localhost:11434';
-const SK_URL       = process.env.SVELTEKIT_URL ?? 'http://localhost:5173';
-const EMBED_MODEL  = process.env.EMBED_MODEL   ?? 'embeddinggemma:latest';
+const QDRANT_URL   = process.env.QDRANT_URL       ?? 'http://127.0.0.1:6333';
+const OLLAMA_URL   = process.env.OLLAMA_URL       ?? 'http://localhost:11434';
+const SK_URL       = process.env.SVELTEKIT_URL    ?? 'http://localhost:5173';
+// EMBED-PROVIDER-CONVERGENCE-01: this default and the env var names below
+// (EMBEDDING_BASE_URL / OLLAMA_EMBED_BASE_URL / EMBED_SERVER_URL) are
+// compatibility inputs ONLY. The canonical resolution lives in
+// sveltekit-frontend/src/lib/server/embedding/embedding-provider-v1.ts's
+// resolveEmbeddingProviderV1() — this script asks the live SvelteKit server
+// for that resolved value (checkEmbedServer, below) whenever it's reachable,
+// and only falls back to mirroring the same precedence locally when it's
+// not (a standalone script outside the SvelteKit module graph can't import
+// that function directly).
+let EMBED_SERVER_URL =
+  process.env.EMBEDDING_BASE_URL ||
+  process.env.OLLAMA_EMBED_BASE_URL ||
+  process.env.EMBED_SERVER_URL ||
+  'http://127.0.0.1:8081';
+const EMBED_MODEL  = process.env.EMBED_MODEL      ?? 'embeddinggemma:latest';
 if (!/^embeddinggemma(?::|$)/i.test(EMBED_MODEL)) throw new Error(`CANONICAL_EMBEDDING_MODEL_REQUIRED:received=${EMBED_MODEL}`);
 
 // ── Embedding ─────────────────────────────────────────────────────────────────
 let skAvailable = false;
+let embedServerAvailable = false;
 
 async function checkSvelteKit() {
   try {
     const r = await fetch(`${SK_URL}/api/health`, { signal: AbortSignal.timeout(2000) });
     skAvailable = r.ok;
+    if (skAvailable) {
+      // Prefer the live server's own resolved provider over this script's
+      // local env-var mirror — this is the "ask the resolver" path.
+      try {
+        const info = await fetch(`${SK_URL}/api/embed`, { signal: AbortSignal.timeout(2000) }).then((r) => r.json());
+        const resolvedBaseUrl = info?.data?.embeddingBackend?.baseUrl;
+        if (resolvedBaseUrl) EMBED_SERVER_URL = resolvedBaseUrl;
+      } catch { /* keep local mirror */ }
+    }
   } catch {
     skAvailable = false;
   }
+}
+
+async function checkEmbedServer() {
+  try {
+    const r = await fetch(`${EMBED_SERVER_URL}/health`, { signal: AbortSignal.timeout(2000) });
+    embedServerAvailable = r.ok;
+  } catch {
+    embedServerAvailable = false;
+  }
+}
+
+/** Mirrors checkVectorShapeV1() in embedding-provider-v1.ts (fail-closed:
+ * wrong dimension, non-finite values, or a zero/degenerate norm all
+ * disqualify — not just a plain all-zeros check). SvelteKit's /api/embed
+ * was observed returning HTTP 200 with an all-zero fallback vector when its
+ * own upstream was unreachable (found live 2026-09-02, since fixed at the
+ * route) — this guard stays regardless, since any embedding-producing
+ * caller should fail closed independently of that route's own behavior. */
+function isValidEmbeddingVector(vector, expectedDim = 768) {
+  if (!Array.isArray(vector) || vector.length !== expectedDim) return false;
+  if (!vector.every((v) => Number.isFinite(v))) return false;
+  let sumSq = 0;
+  for (const v of vector) sumSq += v * v;
+  const norm = Math.sqrt(sumSq);
+  return norm > 1e-6 && Number.isFinite(norm);
 }
 
 async function embedViaSvelteKit(text) {
@@ -73,7 +122,25 @@ async function embedViaSvelteKit(text) {
   });
   if (!r.ok) throw new Error(`SK embed ${r.status}`);
   const data = await r.json();
-  return data.embedding ?? data.embeddings?.[0] ?? null;
+  const vector = data.embedding ?? data.embeddings?.[0] ?? null;
+  if (!isValidEmbeddingVector(vector)) throw new Error('SK embed returned an invalid vector (degraded upstream)');
+  return vector;
+}
+
+/** GGUF/CUDA embed server (scripts/startup/dev-gpu-runtime.mjs,
+ * EMBEDDING_BACKEND=llama_cpp_gguf) — OpenAI-compatible /v1/embeddings. */
+async function embedViaEmbedServer(text) {
+  const r = await fetch(`${EMBED_SERVER_URL}/v1/embeddings`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ model: 'embeddinggemma', input: text }),
+    signal: AbortSignal.timeout(15000),
+  });
+  if (!r.ok) throw new Error(`Embed server ${r.status}`);
+  const data = await r.json();
+  const vector = data.data?.[0]?.embedding ?? null;
+  if (!isValidEmbeddingVector(vector)) throw new Error('Embed server returned an invalid vector');
+  return vector;
 }
 
 async function embedViaOllama(text) {
@@ -85,12 +152,17 @@ async function embedViaOllama(text) {
   });
   if (!r.ok) throw new Error(`Ollama embed ${r.status}`);
   const data = await r.json();
-  return data.embedding ?? null;
+  const vector = data.embedding ?? null;
+  if (!isValidEmbeddingVector(vector)) throw new Error('Ollama embed returned an invalid vector');
+  return vector;
 }
 
 async function embed(text) {
   if (skAvailable) {
     try { return await embedViaSvelteKit(text); } catch { /* fall through */ }
+  }
+  if (embedServerAvailable) {
+    try { return await embedViaEmbedServer(text); } catch { /* fall through */ }
   }
   return embedViaOllama(text);
 }
@@ -160,7 +232,13 @@ async function main() {
   }
 
   await checkSvelteKit();
-  console.log(`[embed-chunks] Embed route: ${skAvailable ? `SvelteKit ${SK_URL}/api/embed` : `Ollama ${OLLAMA_URL}`}`);
+  await checkEmbedServer();
+  const embedRoute = skAvailable
+    ? `SvelteKit ${SK_URL}/api/embed`
+    : embedServerAvailable
+      ? `Embed server ${EMBED_SERVER_URL}/v1/embeddings`
+      : `Ollama ${OLLAMA_URL}`;
+  console.log(`[embed-chunks] Embed route: ${embedRoute} (falls through to the next available on error/zero-vector)`);
 
   let vectorSize = null;
   let inserted = 0;
@@ -211,6 +289,16 @@ async function main() {
             rg_terms:    rec.rg_terms ?? [],
             word_count:  rec.word_count,
             indexed_at:  new Date().toISOString(),
+            embedding_model: EMBED_MODEL,
+            embedding_dimension: vectorSize,
+            // Optional passthrough for non-chunk record shapes (e.g. taxonomy_nodes
+            // via export-taxonomy-nodes-ndjson-v1.mjs / taxonomy_nodes_768 contract).
+            // Omitted (undefined) fields are dropped by JSON.stringify, so this is a
+            // no-op for every existing NDJSON producer that doesn't set them.
+            ...(rec.node_key !== undefined ? { node_key: rec.node_key } : {}),
+            ...(rec.level !== undefined ? { level: rec.level } : {}),
+            ...(rec.parent_key !== undefined ? { parent_key: rec.parent_key } : {}),
+            ...(rec.display_name !== undefined ? { display_name: rec.display_name } : {}),
           },
         });
       } catch (err) {

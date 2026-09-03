@@ -1,0 +1,26 @@
+{
+  "schema": "atlas.latent-phase16-canary.v1",
+  "status": "LATENT_PHASE16_CANARY_READONLY_REPLAY_PROVEN",
+  "mode": "DRY_RUN",
+  "cohortLimit": 128,
+  "receiptPaths": [
+    "docs/reports/latent-phase16-representation-artifact-2026-09-02T23-50-07-790Z.json",
+    "docs/reports/latent-phase16-representation-artifact-2026-09-02T23-50-18-091Z.json"
+  ],
+  "inputRepresentationId": "semantic_768",
+  "inputRepresentationRevision": "semantic_768:embeddinggemma:latest:eg-task-prefix-v1:sha256:ca2f3477d7e24a3809b9f587a15752d2cf2eea5d234f16cf127d522d2792ce5c",
+  "inputPopulationChecksum": "sha256:7929327fdfd3f829509dc43b5c1236de8b754efe9aa2492edcdabe90efecf61e",
+  "modelChecksum": "d6e9395e60f0bb039dd03368012697c5c393d36bb001b8f020b6d7ba22654259",
+  "producerRevision": "producer:sha256:cf6ccd1beffa785d86aef02db191f742b87e81e1dac67933b9e77b1b80bb88ab",
+  "representationRevision": "latent_256:nested-semantic-autoencoder:sha256:46334782c32d477289ab9619d925c47e69d1aad5c76a96aef0c57fbbef265e84",
+  "outputPopulationChecksum": "sha256:deda0f5eee60403d92d8259a5e66406694400a46dbf04cc0103a250f933acf06",
+  "tensorDigest": "sha256:bf9ccec896794e353d62687b03d8db5e5d01fd4e1b38977644ac5ed98350e4a4",
+  "artifactDigest": "sha256:7de8a8a72f548fa6eb506254751d565862bdfacff3ad79b47c4ffdf79971d9b6",
+  "runA": { "eligibleCount": 128, "processedCount": 128, "writtenCount": 0, "outputDigest": "sha256:4b076c9338ad49b1771587794641e889487c80d7fe6980d1b60be787e8168b61" },
+  "runB": { "eligibleCount": 128, "processedCount": 128, "writtenCount": 0, "outputDigest": "sha256:4b076c9338ad49b1771587794641e889487c80d7fe6980d1b60be787e8168b61" },
+  "replay": { "semanticFieldsByteIdentical": true, "artifactDigestEqual": true, "tensorDigestEqual": true, "outputDigestEqual": true, "syntheticRevisions": 0 },
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "boundedApply": "PENDING_EXPLICIT_AUTHORIZATION",
+  "graphifyDailyRerun": "DEFERRED_UNTIL_BOUNDED_APPLY_DECISION"
+}

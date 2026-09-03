@@ -341,3 +341,318 @@ export async function writeGraphifySourceInventoryV2(input: Parameters<
     throw error;
   }
 }
+
+// GRAPHIFY-LIFECYCLE-OWNER-01 (2026-09-03): the writer above only ever INSERTs a
+// `graphify_runs` row with status='RUNNING' (or upserts non-status fields on conflict).
+// Nothing anywhere in this repo ever transitions a row to 'COMPLETED' — confirmed via
+// `scripts/atlas/audit-graphify-lifecycle-owner-v1.mjs` (`transitionPrimitiveExists: false`)
+// and a repo-wide grep. LINEAGE-01 explicitly gates on a completed `graphify_runs` row
+// ("the current Graphify run is still RUNNING with no completion receipt"), so this was a
+// genuine missing primitive, not a stylistic gap. This function is that primitive: it closes
+// exactly one RUNNING row by run_id, with the same fail-closed + independent-readback
+// discipline as the writer above. It intentionally does NOT decide which row to close, nor
+// open new rows — wiring it into the live graphify:daily fanout chain (which does not
+// currently open a graphify_runs row at all, since it never calls the writer above) is a
+// separate, distinct piece of work: that chain would first need a resolved
+// WorkspaceRevisionRecordV1, which is itself gated behind LINEAGE-01's own still-open
+// namespace/revision authority work. Do not force that wiring here to avoid recreating the
+// exact circular dependency this file has repeatedly flagged elsewhere.
+
+export const graphifyRunCompletionReceiptV2Schema = z.object({
+  schema: z.literal('atlas.graphify-run-completion.v2'),
+  runId: uuid,
+  workspaceId: uuid,
+  previousStatus: z.literal('RUNNING'),
+  status: z.literal('COMPLETED'),
+  completedAt: z.string().min(1),
+  readbackVerified: z.literal(true),
+}).strict();
+
+export type GraphifyRunCompletionReceiptV2 = z.infer<typeof graphifyRunCompletionReceiptV2Schema>;
+
+/**
+ * Closes exactly one `graphify_runs` row (RUNNING -> COMPLETED). Fails closed: no row
+ * matching (run_id, workspace_id, status='RUNNING') means no completion is recorded, not a
+ * silent no-op success. The caller must already be inside a transaction; use
+ * `completeGraphifyRunV2` below when the operation should own BEGIN/COMMIT/ROLLBACK.
+ */
+export async function completeGraphifyRunInTransactionV2(input: {
+  client: GraphifySourceInventorySqlClientV2;
+  runId: string;
+  workspaceId: string;
+}): Promise<GraphifyRunCompletionReceiptV2> {
+  const runId = uuid.parse(input.runId);
+  const workspaceId = uuid.parse(input.workspaceId);
+
+  const update = await input.client.query(
+    `UPDATE public.graphify_runs
+        SET status = 'COMPLETED',
+            completed_at = now()
+      WHERE run_id = $1
+        AND workspace_id = $2
+        AND status = 'RUNNING'
+      RETURNING run_id, workspace_id, status, completed_at`,
+    [runId, workspaceId],
+  );
+  if (update.rowCount !== 1 || !update.rows[0]) {
+    throw new Error('GRAPHIFY_RUN_COMPLETION_CONFLICT_OR_NOT_RUNNING');
+  }
+  const updated = update.rows[0];
+  if (String(updated.status) !== 'COMPLETED' || !updated.completed_at) {
+    throw new Error('GRAPHIFY_RUN_COMPLETION_WRITE_MISMATCH');
+  }
+
+  const readback = await input.client.query(
+    `SELECT run_id, workspace_id, status, completed_at
+       FROM public.graphify_runs
+      WHERE run_id = $1`,
+    [runId],
+  );
+  if (readback.rowCount !== 1 || !readback.rows[0]) {
+    throw new Error('GRAPHIFY_RUN_COMPLETION_READBACK_FAILED');
+  }
+  const persisted = readback.rows[0];
+  if (String(persisted.run_id) !== runId || String(persisted.workspace_id) !== workspaceId) {
+    throw new Error('GRAPHIFY_RUN_COMPLETION_IDENTITY_READBACK_MISMATCH');
+  }
+  if (String(persisted.status) !== 'COMPLETED' || !persisted.completed_at) {
+    throw new Error('GRAPHIFY_RUN_COMPLETION_STATUS_READBACK_MISMATCH');
+  }
+
+  return graphifyRunCompletionReceiptV2Schema.parse({
+    schema: 'atlas.graphify-run-completion.v2',
+    runId,
+    workspaceId,
+    previousStatus: 'RUNNING',
+    status: 'COMPLETED',
+    completedAt: String(persisted.completed_at),
+    readbackVerified: true,
+  });
+}
+
+export async function completeGraphifyRunV2(input: Parameters<
+  typeof completeGraphifyRunInTransactionV2
+>[0]): Promise<GraphifyRunCompletionReceiptV2> {
+  await input.client.query('BEGIN');
+  try {
+    const receipt = await completeGraphifyRunInTransactionV2(input);
+    await input.client.query('COMMIT');
+    return receipt;
+  } catch (error) {
+    try { await input.client.query('ROLLBACK'); } catch {}
+    throw error;
+  }
+}
+
+// GRAPHIFY-OPEN-CLOSE-WIRING-01 (2026-09-03, operator-directed): workspace_revision is run
+// LIFECYCLE METADATA, not run IDENTITY. run_id/workspace_id/repository_revision/started_at are
+// the run's identity and are already known at open time; workspace_revision/
+// source_manifest_digest become known only once source inventory finishes and must remain NULL
+// until then rather than being synthesized. Verified live against the real schema before writing
+// this: workspace_revision and source_manifest_digest are already nullable
+// (information_schema.columns.is_nullable = 'YES'), and the existing unique constraint
+// (graphify_runs_workspace_revision_parser_uq_v2) is already a PARTIAL index
+// `WHERE workspace_revision IS NOT NULL` -- NULL rows are excluded from that constraint
+// entirely, so no migration was needed for this. run_id (the primary key) is this pair's actual
+// identity; do not rely on the workspace_revision unique constraint to exclude concurrent
+// same-workspace RUNNING rows with NULL workspace_revision -- it does not do that.
+
+export const graphifyRunOpenReceiptV1Schema = z.object({
+  schema: z.literal('atlas.graphify-run-open.v1'),
+  runId: uuid,
+  workspaceId: uuid,
+  repositoryRevision: z.string().min(1),
+  parserContractVersion: z.string().min(1),
+  extractionContractVersion: z.string().min(1),
+  status: z.literal('RUNNING'),
+  workspaceRevision: z.null(),
+  readbackVerified: z.literal(true),
+}).strict();
+
+export type GraphifyRunOpenReceiptV1 = z.infer<typeof graphifyRunOpenReceiptV1Schema>;
+
+/**
+ * Opens a bare `graphify_runs` row -- run identity only (run_id, workspace_id,
+ * repository_revision), no workspace_revision. Deliberately does NOT reuse the upsert-on-conflict
+ * INSERT in writeGraphifySourceInventoryInTransactionV2 above: that INSERT always binds a real
+ * workspaceRevision as part of one INSERT+file-write call, which is exactly the "manufacture a
+ * revision merely so graphify_runs can contain a RUNNING row" pattern this primitive exists to
+ * avoid. This one only ever writes workspace_revision = NULL.
+ */
+export async function openGraphifyRunInTransactionV1(input: {
+  client: GraphifySourceInventorySqlClientV2;
+  workspaceId: string;
+  repositoryRevision: string;
+  parserContractVersion: string;
+  extractionContractVersion: string;
+  dryRun?: boolean;
+  configuration?: Record<string, unknown>;
+}): Promise<GraphifyRunOpenReceiptV1> {
+  const workspaceId = uuid.parse(input.workspaceId);
+  const repositoryRevision = z.string().min(1).parse(input.repositoryRevision);
+  const parserContractVersion = z.string().min(1).parse(input.parserContractVersion);
+  const extractionContractVersion = z.string().min(1).parse(input.extractionContractVersion);
+  const dryRun = input.dryRun ?? false;
+
+  const insert = await input.client.query(
+    `INSERT INTO public.graphify_runs (
+       workspace_id,
+       repository_revision,
+       parser_contract_version,
+       extraction_contract_version,
+       status,
+       dry_run,
+       configuration
+     ) VALUES ($1,$2,$3,$4,'RUNNING',$5,$6::jsonb)
+     RETURNING run_id, workspace_id, repository_revision, parser_contract_version,
+               extraction_contract_version, status, workspace_revision, dry_run`,
+    [
+      workspaceId,
+      repositoryRevision,
+      parserContractVersion,
+      extractionContractVersion,
+      dryRun,
+      JSON.stringify({ writerRevision: 'atlas.graphify-run-open.v1', ...(input.configuration ?? {}) }),
+    ],
+  );
+  if (insert.rowCount !== 1 || !insert.rows[0]) throw new Error('GRAPHIFY_RUN_OPEN_INSERT_FAILED');
+  const row = insert.rows[0];
+  const runId = uuid.parse(row.run_id);
+  if (row.workspace_revision !== null) throw new Error('GRAPHIFY_RUN_OPEN_UNEXPECTED_WORKSPACE_REVISION');
+  if (String(row.status) !== 'RUNNING') throw new Error('GRAPHIFY_RUN_OPEN_STATUS_MISMATCH');
+
+  const readback = await input.client.query(
+    `SELECT run_id, workspace_id, repository_revision, parser_contract_version,
+            extraction_contract_version, status, workspace_revision
+       FROM public.graphify_runs
+      WHERE run_id = $1`,
+    [runId],
+  );
+  if (readback.rowCount !== 1 || !readback.rows[0]) throw new Error('GRAPHIFY_RUN_OPEN_READBACK_FAILED');
+  const persisted = readback.rows[0];
+  if (String(persisted.run_id) !== runId || String(persisted.workspace_id) !== workspaceId) {
+    throw new Error('GRAPHIFY_RUN_OPEN_IDENTITY_READBACK_MISMATCH');
+  }
+  if (persisted.workspace_revision !== null || String(persisted.status) !== 'RUNNING') {
+    throw new Error('GRAPHIFY_RUN_OPEN_STATE_READBACK_MISMATCH');
+  }
+
+  return graphifyRunOpenReceiptV1Schema.parse({
+    schema: 'atlas.graphify-run-open.v1',
+    runId,
+    workspaceId,
+    repositoryRevision,
+    parserContractVersion,
+    extractionContractVersion,
+    status: 'RUNNING',
+    workspaceRevision: null,
+    readbackVerified: true,
+  });
+}
+
+export async function openGraphifyRunV1(input: Parameters<
+  typeof openGraphifyRunInTransactionV1
+>[0]): Promise<GraphifyRunOpenReceiptV1> {
+  await input.client.query('BEGIN');
+  try {
+    const receipt = await openGraphifyRunInTransactionV1(input);
+    await input.client.query('COMMIT');
+    return receipt;
+  } catch (error) {
+    try { await input.client.query('ROLLBACK'); } catch {}
+    throw error;
+  }
+}
+
+export const graphifyRunRevisionBindingReceiptV1Schema = z.object({
+  schema: z.literal('atlas.graphify-run-revision-binding.v1'),
+  runId: uuid,
+  workspaceId: uuid,
+  workspaceRevision: contentRevision,
+  sourceManifestDigest: sha256,
+  sourceManifestSourceCount: z.number().int().positive(),
+  readbackVerified: z.literal(true),
+}).strict();
+
+export type GraphifyRunRevisionBindingReceiptV1 = z.infer<typeof graphifyRunRevisionBindingReceiptV1Schema>;
+
+/**
+ * Binds a WorkspaceRevisionRecordV1 to an already-open (workspace_revision IS NULL) run, once
+ * source inventory has produced one. Fails closed if the run doesn't exist, isn't RUNNING, or
+ * already has a workspace_revision bound (this is a one-time bind, not an upsert -- a run's
+ * source snapshot identity should not silently change after being set).
+ */
+export async function bindWorkspaceRevisionInTransactionV1(input: {
+  client: GraphifySourceInventorySqlClientV2;
+  runId: string;
+  workspaceId: string;
+  record: WorkspaceRevisionRecordV1;
+}): Promise<GraphifyRunRevisionBindingReceiptV1> {
+  const runId = uuid.parse(input.runId);
+  const workspaceId = uuid.parse(input.workspaceId);
+  const record = workspaceRevisionRecordV1Schema.parse(input.record);
+
+  const update = await input.client.query(
+    `UPDATE public.graphify_runs
+        SET workspace_revision = $1,
+            source_manifest_digest = $2,
+            source_manifest_source_count = $3
+      WHERE run_id = $4
+        AND workspace_id = $5
+        AND status = 'RUNNING'
+        AND workspace_revision IS NULL
+      RETURNING run_id, workspace_id, workspace_revision, source_manifest_digest,
+                source_manifest_source_count`,
+    [record.workspaceRevision, record.sourceManifestDigest, record.sourceCount, runId, workspaceId],
+  );
+  if (update.rowCount !== 1 || !update.rows[0]) {
+    throw new Error('GRAPHIFY_RUN_REVISION_BINDING_CONFLICT_NOT_RUNNING_OR_ALREADY_BOUND');
+  }
+  const updated = update.rows[0];
+  if (String(updated.workspace_revision) !== record.workspaceRevision) {
+    throw new Error('GRAPHIFY_RUN_REVISION_BINDING_WRITE_MISMATCH');
+  }
+
+  const readback = await input.client.query(
+    `SELECT run_id, workspace_id, workspace_revision, source_manifest_digest,
+            source_manifest_source_count, status
+       FROM public.graphify_runs
+      WHERE run_id = $1`,
+    [runId],
+  );
+  if (readback.rowCount !== 1 || !readback.rows[0]) throw new Error('GRAPHIFY_RUN_REVISION_BINDING_READBACK_FAILED');
+  const persisted = readback.rows[0];
+  if (String(persisted.run_id) !== runId || String(persisted.workspace_id) !== workspaceId) {
+    throw new Error('GRAPHIFY_RUN_REVISION_BINDING_IDENTITY_READBACK_MISMATCH');
+  }
+  if (String(persisted.workspace_revision) !== record.workspaceRevision) {
+    throw new Error('GRAPHIFY_RUN_REVISION_BINDING_STATE_READBACK_MISMATCH');
+  }
+  if (normalizeDigest(persisted.source_manifest_digest) !== record.sourceManifestDigest) {
+    throw new Error('GRAPHIFY_RUN_REVISION_BINDING_MANIFEST_READBACK_MISMATCH');
+  }
+
+  return graphifyRunRevisionBindingReceiptV1Schema.parse({
+    schema: 'atlas.graphify-run-revision-binding.v1',
+    runId,
+    workspaceId,
+    workspaceRevision: record.workspaceRevision,
+    sourceManifestDigest: record.sourceManifestDigest,
+    sourceManifestSourceCount: Number(persisted.source_manifest_source_count),
+    readbackVerified: true,
+  });
+}
+
+export async function bindWorkspaceRevisionV1(input: Parameters<
+  typeof bindWorkspaceRevisionInTransactionV1
+>[0]): Promise<GraphifyRunRevisionBindingReceiptV1> {
+  await input.client.query('BEGIN');
+  try {
+    const receipt = await bindWorkspaceRevisionInTransactionV1(input);
+    await input.client.query('COMMIT');
+    return receipt;
+  } catch (error) {
+    try { await input.client.query('ROLLBACK'); } catch {}
+    throw error;
+  }
+}

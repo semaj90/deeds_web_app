@@ -1,6 +1,6 @@
 {
   "schema": "atlas.live-source-lineage-table-audit.v1",
-  "generatedAt": "2026-08-30T00:13:36.695Z",
+  "generatedAt": "2026-09-02T19:03:10.746Z",
   "status": "SOURCE_LINEAGE_OWNER_SCHEMA_READY",
   "canonicalWrites": false,
   "tables": [
@@ -574,6 +574,12 @@
     },
     {
       "table_schema": "public",
+      "table_name": "atlas_identity_ledger",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
       "table_name": "atlas_knowledge_objects",
       "column_name": "content_hash",
       "data_type": "text"
@@ -624,6 +630,18 @@
       "table_schema": "public",
       "table_name": "atlas_ontology_tuples",
       "column_name": "workspace_revision",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_packet_chunk_lineage",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_packet_chunk_lineage",
+      "column_name": "source_revision",
       "data_type": "text"
     },
     {
@@ -1410,10 +1428,10 @@
         "source_ref",
         "workspace_revision"
       ],
-      "row_count": 61660,
-      "source_ref_count": 61660,
+      "row_count": 61661,
+      "source_ref_count": 61661,
       "source_revision_count": 0,
-      "workspace_revision_count": 61660,
+      "workspace_revision_count": 61661,
       "content_hash_count": 332,
       "content_digest_count": 0,
       "source_content_count": 0,
@@ -1579,7 +1597,7 @@
       "configuredSearchPath": "\"$user\", public",
       "effectiveSearchPath": "{pg_catalog,public}",
       "serverVersion": "18.4 (Debian 18.4-1.pgdg12+1)",
-      "serverAddress": "172.18.0.9/32",
+      "serverAddress": "172.18.0.24/32",
       "serverPort": 5432,
       "relations": [
         {
@@ -1653,7 +1671,7 @@
           "selectable": true
         }
       ],
-      "fingerprintSha256": "00b2406e36705e721d9e00add05329494edd1beb5f33db579556610a161b1848"
+      "fingerprintSha256": "0c97c15570535401303fb44d7dece99057b93bfde99da396390f39002fee0c79"
     },
     "status": "READBACK_PROVEN"
   }

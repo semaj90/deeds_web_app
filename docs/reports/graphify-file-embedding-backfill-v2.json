@@ -1,6 +1,6 @@
 {
   "schema": "atlas.graphify-file-embedding-backfill.v2",
-  "generatedAt": "2026-08-31T19:07:08.073Z",
+  "generatedAt": "2026-09-03T00:36:31.345Z",
   "apply": false,
   "requireEmbedServer": false,
   "scope": {
@@ -9,18 +9,18 @@
     "canonicalColumn": "content_embedding",
     "physicalType": "halfvec(768)",
     "sinceHours": 24,
-    "limit": 128,
+    "limit": 4,
     "declaredType": "halfvec(768)"
   },
   "binding": {
     "upstreamModelId": "google/embeddinggemma-300m",
-    "upstreamRevision": "",
+    "upstreamRevision": "57c266a740f537b4dc058e1b0cda161fd15afa75",
     "runtime": "llama.cpp/llama-server",
     "endpoint": "http://127.0.0.1:8081",
-    "ggufSha256": "",
-    "llamaCppRevision": "",
-    "tokenizerSha256": "",
-    "executionProfileRevision": "",
+    "ggufSha256": "bc843658e96d2e9cc7c3402332b158f0cc4f73e61b23cef9a41acee1c0d372b7",
+    "llamaCppRevision": "8757:a29e4c0b7",
+    "tokenizerSha256": "1299c11d7cf632ef3b4e11937501358ada021bbdf7c47638d13c0ee982f2e79c",
+    "executionProfileRevision": "sha256:f1097fe6b9606ea25bff084a30668941cac008f0eb24e344bc5ed5188cbc19ea",
     "pooling": "mean",
     "normalization": "l2",
     "representationId": "semantic_768",
@@ -30,7 +30,7 @@
     "inputPolicyRevision": "embeddinggemma-token-prefix-2048-v1",
     "promptRevision": "unprompted-v0"
   },
-  "bindingChecksum": "d178d5c922e5e842c6a689b9ace32a48a8780d603178fbaa83b8e1a061e457c2",
+  "bindingChecksum": "70df1a750d4708dd778d2e731f3c580f8ddf56866ba6c1eb19ef27dcfa7a27dc",
   "inputPolicy": {
     "formatterRevision": "graphify-embed-text-v1",
     "inputPolicyRevision": "embeddinggemma-token-prefix-2048-v1",
@@ -47,5 +47,5 @@
   "inputLineageSample": [],
   "errors": [],
   "sample": [],
-  "elapsedMs": 108
+  "elapsedMs": 114
 }

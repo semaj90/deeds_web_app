@@ -22,16 +22,30 @@
  *   node scripts/atlas/register-orphaned-chunks.mjs --apply --limit=5000
  *   node scripts/atlas/register-orphaned-chunks.mjs --apply --verbose
  *   node scripts/atlas/register-orphaned-chunks.mjs --apply --capture-lineage --limit=1
+ *   node scripts/atlas/register-orphaned-chunks.mjs --apply --capture-lineage --source-refs-file=path/to/refs.json
  *
  * --capture-lineage is intentionally opt-in. It preserves the historical
  * packet registration default while admitting only memberships backed by a
  * real codebase_chunk_index.chunk_id and graphify_files.workspace_id.
+ *
+ * --source-refs-file=<path> (added PKT-LINEAGE-08 follow-up, 2026-09) is an
+ * explicit allowlist: a JSON file containing an array of exact source_ref
+ * strings. When set, orphan selection is restricted to exactly this set
+ * (still re-verified live against codebase_chunk_index/atlas_packets, never
+ * trusted blindly) instead of the default alphabetical `ORDER BY
+ * cci.relative_path LIMIT $1` scan. This exists because that alphabetical
+ * scan has no relationship to any external eligibility classification (e.g.
+ * the read-only plan-packet-chunk-lineage-promotion-v1.mjs preflight's
+ * READY_FOR_AUTHORIZATION candidates) -- without this flag, `--limit=N` picks
+ * whichever N orphans sort first, which is not necessarily the set anyone
+ * intended to register. `--limit` still applies as an additional cap on top
+ * of the allowlist.
  */
 
 import pg        from 'pg';
 import Redis     from 'ioredis';
 import { createHash } from 'node:crypto';
-import { writeFileSync, mkdirSync } from 'node:fs';
+import { writeFileSync, mkdirSync, readFileSync } from 'node:fs';
 import path      from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -45,6 +59,20 @@ const VERBOSE   = process.argv.includes('--verbose');
 const DRY_RUN   = !APPLY;
 const LIMIT_ARG = process.argv.find(a => a.startsWith('--limit='));
 const MAX_ROWS  = LIMIT_ARG ? parseInt(LIMIT_ARG.split('=')[1], 10) : 100_000;
+
+const SOURCE_REFS_FILE_ARG = process.argv.find(a => a.startsWith('--source-refs-file='));
+const SOURCE_REFS_ALLOWLIST = SOURCE_REFS_FILE_ARG
+  ? (() => {
+      const filePath = path.resolve(ROOT, SOURCE_REFS_FILE_ARG.split('=').slice(1).join('='));
+      const parsed = JSON.parse(readFileSync(filePath, 'utf8'));
+      if (!Array.isArray(parsed) || parsed.some((v) => typeof v !== 'string' || !v.trim())) {
+        throw new Error(`SOURCE_REFS_FILE_INVALID: ${filePath} must contain a JSON array of non-empty source_ref strings`);
+      }
+      const set = new Set(parsed.map((v) => v.trim()));
+      if (set.size === 0) throw new Error(`SOURCE_REFS_FILE_EMPTY: ${filePath} contains zero source_refs`);
+      return set;
+    })()
+  : null;
 
 const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
 const REDIS_HOST   = process.env.REDIS_HOST   || '127.0.0.1';
@@ -169,14 +197,43 @@ async function main() {
   try {
     // ── 1. Find orphaned chunks ────────────────────────────────────────────────
     console.log('\nFinding orphaned chunks...');
-    const { rows: orphans } = await pool.query(`
-      SELECT DISTINCT cci.relative_path as source_ref
-      FROM codebase_chunk_index cci
-      WHERE NULLIF(BTRIM(cci.relative_path), '') IS NOT NULL
-        AND cci.relative_path NOT IN (SELECT source_ref FROM atlas_packets WHERE source_ref IS NOT NULL)
-      ORDER BY cci.relative_path
-      LIMIT $1
-    `, [MAX_ROWS]);
+    let orphans;
+    let allowlistStats = null;
+    if (SOURCE_REFS_ALLOWLIST) {
+      // Explicit allowlist path: verify each requested source_ref is actually a
+      // real, current orphan (never trust the file's contents blindly -- the
+      // eligibility classification that produced the file may be stale).
+      const { rows } = await pool.query(`
+        SELECT DISTINCT cci.relative_path as source_ref
+        FROM codebase_chunk_index cci
+        WHERE NULLIF(BTRIM(cci.relative_path), '') IS NOT NULL
+          AND cci.relative_path = ANY($1::text[])
+          AND cci.relative_path NOT IN (SELECT source_ref FROM atlas_packets WHERE source_ref IS NOT NULL)
+        ORDER BY cci.relative_path
+        LIMIT $2
+      `, [[...SOURCE_REFS_ALLOWLIST], MAX_ROWS]);
+      orphans = rows;
+      const foundSet = new Set(rows.map((r) => r.source_ref));
+      allowlistStats = {
+        requested: SOURCE_REFS_ALLOWLIST.size,
+        resolvedAsOrphan: rows.length,
+        notFoundOrAlreadyRegistered: [...SOURCE_REFS_ALLOWLIST].filter((s) => !foundSet.has(s)),
+      };
+      console.log(`Allowlist: requested ${allowlistStats.requested}, resolved ${allowlistStats.resolvedAsOrphan} as real current orphans`);
+      if (allowlistStats.notFoundOrAlreadyRegistered.length > 0) {
+        console.log(`  Not found as a live orphan (already registered, or no longer in codebase_chunk_index): ${allowlistStats.notFoundOrAlreadyRegistered.length}`);
+      }
+    } else {
+      const { rows } = await pool.query(`
+        SELECT DISTINCT cci.relative_path as source_ref
+        FROM codebase_chunk_index cci
+        WHERE NULLIF(BTRIM(cci.relative_path), '') IS NOT NULL
+          AND cci.relative_path NOT IN (SELECT source_ref FROM atlas_packets WHERE source_ref IS NOT NULL)
+        ORDER BY cci.relative_path
+        LIMIT $1
+      `, [MAX_ROWS]);
+      orphans = rows;
+    }
 
     console.log(`Found ${orphans.length.toLocaleString()} orphaned source_refs`);
 
@@ -271,6 +328,7 @@ async function main() {
         orphaned_found: toRegister.length,
         would_register: toRegister.length,
         status: 'dry_run_complete',
+        allowlist: allowlistStats,
         lineage: CAPTURE_LINEAGE ? buildLineagePreview(toRegister, lineageBySourceRef, lineageStats) : lineageStats,
       });
       return;
@@ -344,6 +402,7 @@ async function main() {
       writeReport({
         generated: new Date().toISOString(),
         mode: 'apply',
+        allowlist: allowlistStats,
         lineage: lineageStats,
         orphaned_found: toRegister.length,
         registered,
@@ -412,6 +471,7 @@ async function main() {
     writeReport({
       generated: new Date().toISOString(),
       mode: 'apply',
+      allowlist: allowlistStats,
       orphaned_found: toRegister.length,
       registered: registered,
       skipped: skipped,

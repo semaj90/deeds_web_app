@@ -210,6 +210,38 @@ export const COLLECTION_CONTRACTS = {
   indexedPayloadFields: SHARED_INDEXED_PAYLOAD_FIELDS,
     nonIndexedPayloadFields: SHARED_NON_INDEXED_PAYLOAD_FIELDS,
   },
+  // Dense search over taxonomy_nodes (not a codebase-chunk projection — taxonomy
+  // nodes have no packet_key/postgres_id, so this intentionally does NOT reuse
+  // SHARED_INDEXED_PAYLOAD_FIELDS/SHARED_NON_INDEXED_PAYLOAD_FIELDS, which assume
+  // packet identity). Populated by scripts/atlas/embed-chunks.mjs (existing
+  // generic NDJSON embed+upsert script, reused as-is) fed by
+  // scripts/atlas/export-taxonomy-nodes-ndjson-v1.mjs.
+  taxonomy_nodes_768: {
+    contractVersion: 'atlas-qdrant-taxonomy-768-v1' as const,
+    vectors: {
+      content: {
+        size: 768,
+        distance: 'Cosine' as const,
+      },
+    },
+    sparseVectors: {},
+    requiredPayloadFields: [
+      'node_key',
+      'level',
+      'parent_key',
+      'display_name',
+      'source_ref',
+      'embedding_model',
+      'embedding_dimension',
+    ] as const,
+    indexedPayloadFields: {
+      node_key: 'keyword',
+      parent_key: 'keyword',
+      level: 'integer',
+      source_ref: 'keyword',
+    } as const,
+    nonIndexedPayloadFields: ['display_name', 'embedding_model', 'embedding_dimension', 'indexed_at'] as const,
+  },
 } as const;
 
 export type CollectionName = keyof typeof COLLECTION_CONTRACTS;

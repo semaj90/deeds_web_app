@@ -1,0 +1,156 @@
+{
+  "status": "FULL_CORPUS_GRAPHIFY_APPLY_PROVEN",
+  "mode": "APPLY",
+  "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+  "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+  "repositoryRevision": "85e6f3d509856c75d77e175fc823623c2cd4e18c",
+  "dirty": true,
+  "totalSourceCount": 25258,
+  "selectedSourceCount": 25258,
+  "batchSize": 1000,
+  "batchCount": 26,
+  "limit": null,
+  "runId": "369e4270-7689-4536-8816-4ec4a5517b3e",
+  "batchReceipts": [
+    {
+      "batchIndex": 0,
+      "selectedSourceCount": 1000,
+      "writtenSourceCount": 1000
+    },
+    {
+      "batchIndex": 1,
+      "selectedSourceCount": 1000,
+      "writtenSourceCount": 1000
+    },
+    {
+      "batchIndex": 2,
+      "selectedSourceCount": 1000,
+      "writtenSourceCount": 1000
+    },
+    {
+      "batchIndex": 3,
+      "selectedSourceCount": 1000,
+      "writtenSourceCount": 1000
+    },
+    {
+      "batchIndex": 4,
+      "selectedSourceCount": 1000,
+      "writtenSourceCount": 1000
+    },
+    {
+      "batchIndex": 5,
+      "selectedSourceCount": 1000,
+      "writtenSourceCount": 1000
+    },
+    {
+      "batchIndex": 6,
+      "selectedSourceCount": 1000,
+      "writtenSourceCount": 1000
+    },
+    {
+      "batchIndex": 7,
+      "selectedSourceCount": 1000,
+      "writtenSourceCount": 1000
+    },
+    {
+      "batchIndex": 8,
+      "selectedSourceCount": 1000,
+      "writtenSourceCount": 1000
+    },
+    {
+      "batchIndex": 9,
+      "selectedSourceCount": 1000,
+      "writtenSourceCount": 1000
+    },
+    {
+      "batchIndex": 10,
+      "selectedSourceCount": 1000,
+      "writtenSourceCount": 1000
+    },
+    {
+      "batchIndex": 11,
+      "selectedSourceCount": 1000,
+      "writtenSourceCount": 1000
+    },
+    {
+      "batchIndex": 12,
+      "selectedSourceCount": 1000,
+      "writtenSourceCount": 1000
+    },
+    {
+      "batchIndex": 13,
+      "selectedSourceCount": 1000,
+      "writtenSourceCount": 1000
+    },
+    {
+      "batchIndex": 14,
+      "selectedSourceCount": 1000,
+      "writtenSourceCount": 1000
+    },
+    {
+      "batchIndex": 15,
+      "selectedSourceCount": 1000,
+      "writtenSourceCount": 1000
+    },
+    {
+      "batchIndex": 16,
+      "selectedSourceCount": 1000,
+      "writtenSourceCount": 1000
+    },
+    {
+      "batchIndex": 17,
+      "selectedSourceCount": 1000,
+      "writtenSourceCount": 1000
+    },
+    {
+      "batchIndex": 18,
+      "selectedSourceCount": 1000,
+      "writtenSourceCount": 1000
+    },
+    {
+      "batchIndex": 19,
+      "selectedSourceCount": 1000,
+      "writtenSourceCount": 1000
+    },
+    {
+      "batchIndex": 20,
+      "selectedSourceCount": 1000,
+      "writtenSourceCount": 1000
+    },
+    {
+      "batchIndex": 21,
+      "selectedSourceCount": 1000,
+      "writtenSourceCount": 1000
+    },
+    {
+      "batchIndex": 22,
+      "selectedSourceCount": 1000,
+      "writtenSourceCount": 1000
+    },
+    {
+      "batchIndex": 23,
+      "selectedSourceCount": 1000,
+      "writtenSourceCount": 1000
+    },
+    {
+      "batchIndex": 24,
+      "selectedSourceCount": 1000,
+      "writtenSourceCount": 1000
+    },
+    {
+      "batchIndex": 25,
+      "selectedSourceCount": 258,
+      "writtenSourceCount": 258
+    }
+  ],
+  "totalWrittenReadback": 25258,
+  "completion": {
+    "schema": "atlas.graphify-run-completion.v2",
+    "runId": "369e4270-7689-4536-8816-4ec4a5517b3e",
+    "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+    "previousStatus": "RUNNING",
+    "status": "COMPLETED",
+    "completedAt": "Wed Sep 02 2026 17:55:51 GMT-0700 (Pacific Daylight Time)",
+    "readbackVerified": true
+  }
+}

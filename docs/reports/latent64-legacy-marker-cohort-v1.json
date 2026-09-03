@@ -1,0 +1,13 @@
+{
+  "schema": "atlas.latent64-legacy-marker-cohort.v1",
+  "status": "LEGACY_MARKER_WITHOUT_LATENT64",
+  "marker": "packet-autoencoder-768-64",
+  "totalRows": 55117,
+  "rowsWithLatent64": 0,
+  "comparableRows": 0,
+  "rowsWithoutContentEmbedding": 684,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "finding": "The legacy marker identifies a cohort with no stored latent_64 values, so numeric derivation parity cannot be evaluated for this cohort. It must be handled as missing derived output, not as proven legacy vectors.",
+  "nextGate": "Freeze a bounded ID cohort, recompute current latent outputs, and perform explicit apply/replay only after the cohort and marker policy are approved."
+}

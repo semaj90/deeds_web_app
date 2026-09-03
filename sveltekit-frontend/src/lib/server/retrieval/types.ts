@@ -406,6 +406,10 @@ export interface SearchFilter {
   /** Only include results for these specific packet_keys */
   include_packet_keys?: string[];
 
+  /** Only include results whose source_ref is in this set (e.g. resolved
+   * from taxonomyNodeKeys via taxonomy-retrieval-filter-v1.ts) */
+  include_source_refs?: string[];
+
   // ── Pagination / lane sizing ───────────────────────────────────────────────
 
   /** Max results per lane before RRF fusion */

@@ -231,6 +231,7 @@ export abstract class SearchLaneBase implements ISearchLane {
       if (filters.min_score !== undefined && r.score < filters.min_score) return false;
       if (filters.exclude_feature_ids?.includes(r.feature_id ?? '')) return false;
       if (filters.include_packet_keys && !filters.include_packet_keys.includes(r.packet_key ?? '')) return false;
+      if (filters.include_source_refs && !filters.include_source_refs.includes(r.source_ref ?? '')) return false;
       return true;
     });
   }

@@ -38,7 +38,7 @@ describe('Qdrant semantic_768 projection', () => {
   it('keeps canonical 768 representation and native model dimension explicit', () => {
     const projection = buildQdrantSemanticProjectionV1(payload(), 'cold');
     expect(projection.collection).toBe('codebase_chunks_768_v2');
-    expect(projection.vectorName).toBeNull();
+    expect(projection.vectorName).toBe('content');
     expect(projection.representationId).toBe('semantic_768');
     expect(projection.dimension).toBe(768);
     expect(projection.nativeModelDimension).toBe(768);
