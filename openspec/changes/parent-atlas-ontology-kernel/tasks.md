@@ -2327,6 +2327,50 @@ XGBoost/PyTorch classifier
   Neo4j/Valkey projection permissions and writes disabled. This proves the
   contract boundary only; it is not live classifier adoption or registry
   population.
+  **CONCEPT-SCHEMA-01 / CONCEPT-SEED-DRY-01 — real-time duplicate-owner collision found and
+  self-corrected (2026-09-03, same day, two sessions working this repo in parallel)**: this
+  session began from the operator's own separate "PARENT ATLAS CONCEPT FABRIC 01" instruction and
+  independently built `sveltekit-frontend/src/lib/server/atlas/contracts/concept-fabric-v1.ts` —
+  a `ConceptDefinitionV1`/`TermObservationV1`/`ConceptRecognitionV1` Zod contract — plus 17 passing
+  fixture tests and a `build-concept-seed-dry-v1.mts` producer script, all before checking whether
+  a concurrent session was doing the same thing. **Before committing, `git status` surfaced that a
+  concurrent session had, the same day, ALREADY built a materially more complete answer**:
+  `sveltekit-frontend/src/lib/server/atlas/taxonomy/entity-concept-taxonomy-v1.ts`, defining its
+  own `ConceptV1`/`TermObservationV1`/`ConceptRecognitionV1` (near-identical `kind`/`matchMethod`
+  enum values — both sessions were evidently working from the same underlying field list) PLUS a
+  working deterministic resolver (`recognizeConceptV1()`), and canonical-promotion wiring
+  (`promoteTaxonomyAssignmentV1()`, `createConceptBroaderThanV1()`, `createConceptPartOfV1()`
+  reusing the existing `HyperedgeV1` relation owner rather than inventing a new one) — none of
+  which my version had. Their own `scripts/atlas/concept-seed-dry-v1.mts` (note:
+  `sveltekit-frontend/scripts/atlas/`, not repo-root `scripts/atlas/`) and
+  `docs/reports/concept-seed-dry-01.json` / `docs/reports/concept-fabric-capability-alignment-v1.json`
+  / `docs/reports/concept-vocabulary-authority-01.json` are already real, live-run deliverables for
+  exactly this task.
+
+  **Resolution, per this file's own Duplication-Prevention hard rule**: did NOT commit my
+  `concept-fabric-v1.ts` / `.spec.ts` / `build-concept-seed-dry-v1.mts` — left them uncommitted,
+  local-only, not part of this repo's history, to avoid two competing `TermObservationV1`/
+  `ConceptRecognitionV1` schema owners under the same schema-version literal strings.
+  `entity-concept-taxonomy-v1.ts` is the real answer to CONCEPT-SCHEMA-01 — cite it, not this
+  paragraph's abandoned file, in any future work. Two things from the abandoned exploration ARE
+  genuinely additive, not covered by the concurrent session's version, and worth recording as open
+  follow-up rather than silently lost with the discarded file:
+  1. **A real, live-run finding**: mechanically deriving concept proposals from
+     `domain_mapping.py`'s 7 `atlas:*Domain` classes (the same source CONCEPT-02 above already
+     reads) alongside `domain-taxonomy.ts`'s 9 coarse domains found **3 direct label collisions**
+     — `retrieval`/`database`/`graph` are simultaneously a `domain-taxonomy.ts` coarse-domain
+     canonical label AND a `domain_mapping.py` `atlas:*Domain` `domainLabel`. This is new,
+     concrete evidence beyond what `concept-vocabulary-authority-01.json`'s census currently
+     covers (that report's `authorities[]` list doesn't yet include this pairing). Worth a
+     follow-up run of the concurrent session's own `concept-seed-dry-v1.mts`, extended to also
+     read `domain_mapping.py` and the two live DB CHECK constraints
+     (`atlas_ontology_relations.predicate`, `atlas_ontology_concepts.concept_type`) as additional
+     owners, to get this finding onto the canonical file/report pair instead of an abandoned one.
+  2. `entity-concept-taxonomy-v1.ts`'s `ConceptV1` has no `conceptType` enum (matching the live
+     `atlas_ontology_concepts.concept_type` CHECK constraint) or `status` lifecycle
+     (ACTIVE/PROPOSED/DEPRECATED) — both present in the abandoned `ConceptDefinitionV1`. Whether
+     those are worth folding into the canonical `ConceptV1` is an open, unresolved question for
+     whoever owns that file next — not decided here.
 - [ ] **CONCEPT-03 — establish a grounded admission fixture.** Use the existing
   LangExtract/grounded observation contract and require exact `sourceRef`,
   source revision, character interval, mapping revision, ontology revision,

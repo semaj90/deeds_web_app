@@ -29,6 +29,65 @@ or mark tasks complete. OaK replay, ONNX/WebGPU promotion, nested
 representation work, and new Qdrant mutation work remain downstream or
 separately blocked.
 
+## TENSORRT-RTX-ATEN-BRIDGE-01 (2026-09-03, deferred — no installation)
+
+TensorRT-RTX is an optional decoder challenger, not a replacement for the
+existing PyTorch/ATen decoder and not part of the RAPIDS graph environment.
+The current `docker/atlas-neural-decoder/Dockerfile` is the pinned
+`pytorch/pytorch:2.13.0-cuda13.2-cudnn9-runtime` baseline. It does not contain
+TensorRT-RTX. `simd-bridge/cpp/tensor_bridge.cc` is a legacy JSON/N-API bridge
+with a TensorRT comment/stub; it is not an implemented `torch::Tensor` or
+`NvInfer` integration. Keep it classified `OPTIONAL_CHALLENGER_NOT_WIRED`.
+
+The existing WSL RAPIDS environment is `/home/james/miniforge3/envs/atlas-rapids-cu13`
+and is the sole proven RAPIDS diagnostic/executor environment. The generic
+`rapids` environment does not exist. Package scripts must use the named
+environment directly; do not install an alias or a second RAPIDS environment.
+The Docker `atlas-gpu-8098` service remains a separate production RAPIDS
+boundary and must not be copied into the decoder image.
+
+Do not begin this gate until the PyTorch decoder baseline is independently
+proven. When authorized, execute in this order:
+
+1. PyTorch decoder baseline receipt.
+2. C++/ATen ABI smoke test using the exact decoder PyTorch/CUDA ABI.
+3. TensorRT-RTX SDK/runtime identity and ONNX engine parity.
+4. Zero-copy device-buffer lifetime proof: CUDA device, dtype, contiguous
+   shape, stable addresses through `enqueueV3`, dedicated non-default stream,
+   and no CPU round trip.
+5. Engine/runtime cache identity bound to model, engine, CUDA, and adapter
+   checksums; no source truth, hidden reasoning, KV cache, or tensors in
+   Valkey.
+6. Bounded latency/VRAM comparison. CUDA Graph capture is a later optional
+   optimization and cannot be used to claim baseline correctness.
+
+Required status fields are `created`, `wired`, `proven`, and `done`; this
+section is currently only a deferred design/ownership record. No TensorRT-RTX
+installation, CUDA upgrade, Docker rebuild, or decoder production cutover is
+authorized by this task.
+
+## CUTILE-PYTORCH-KERNEL-PILOT-01 (2026-09-03, deferred — no installation)
+
+cuTile is not part of the current RAPIDS or decoder owners. If a measured
+kernel gap is later identified, use the existing WSL `atlas-rapids-cu13`
+environment for one bounded pilot. Pass PyTorch CUDA tensors directly to a
+cuTile kernel on an explicit stream and return a device tensor without a CPU
+round trip. Use cuTile's disposable compiled-cubin cache only; it must never
+contain source truth, ACE packets, hidden reasoning, KV cache, or tensor data.
+
+The pilot requires current-stream/device-pointer proof, numerical parity with
+the existing PyTorch/cuVS implementation, a benchmark showing benefit, and a
+specialization/GPU-target cache invalidation test. Do not install cuTile,
+change the RAPIDS image, or create a production cuTile owner in this gate.
+
+## ATLAS-GPU-8098-CUDA13-CONVERGENCE-01 (2026-09-03, deferred — no rebuild)
+
+The current `atlas-gpu-8098` image remains the supported CUDA-12 RAPIDS 26.08
+HTTP boundary. A future CUDA-13 comparison may use the official
+`nvcr.io/nvidia/rapidsai/base:26.08-cuda13-py3.13` image or a smaller measured
+custom image, but only after parity and resource receipts are collected. This
+task does not authorize rebuilding, pulling, or switching the service.
+
 ## SEMANTIC-COHORT-AUTHORITY-01 (2026-09-03, read-only gate)
 
 `LINEAGE-02` consumes a first-class `SemanticCohortAuthorityV1`, not a number
@@ -348,6 +407,18 @@ to test its success branch against.
   — not by rerunning the historical bulk reconciliation merely to repair its audit artifact.
   Freeze full Qdrant projection ownership only after rollback
   and parity proof.
+
+  **UPDATE 2026-09-03 — protocol hardening implemented, promotion still closed.**
+  `scripts/atlas/audit-bridge-recon-dry-04-v1.mjs` now accepts an explicit artifact path and emits
+  proposal, target, preimage, and rollback checksums. `scripts/atlas/apply-bridge-recon-dry-04-v1.mjs`
+  accepts `--proposal=<immutable-artifact>` and records `consumedProposalChecksum`,
+  `consumedTargetPointSetChecksum`, `preimageChecksum`, and `rollbackChecksum` in apply/replay
+  receipts. Fresh read-only artifact `docs/reports/bridge-recon-dry-05-v1.json` found the expected
+  7,421 lineage memberships, 6,312 present Qdrant points, 1,109 missing physical points, and zero
+  proposed patches. The increase from the earlier 675 missing points is explained by the 434 new
+  PKT-LINEAGE-08 memberships; it is recorded as live state drift, not a repair authorization.
+  No Qdrant mutation was performed. `RETRIEVAL-01L` remains open until a non-empty frozen proposal
+  receives an authorized apply, exact readback, rollback artifact, and same-proposal replay.
 - [x] RETRIEVAL-02 — Census every Qdrant query for explicit named-vector
   selection; do not mass-edit callers. Audit-only, zero callers modified.
   Static scan of every direct Qdrant-like `.query(`/`.search(` call site
@@ -612,7 +683,17 @@ lineage MEMBERSHIP, not 1:1 identity.
   historical packets promoted from the frozen dry-run artifact (SINGLE/FEW/
   MANY/overlap-with-06), atomic per-packet-set writes, replay-proven
   idempotent under the corrected uniqueness key.
-- [ ] PKT-LINEAGE-08 (PROMOTION-01) — **`READY_FOR_AUTHORIZATION`** (2026-09-03, re-run after
+- [x] PKT-LINEAGE-08 (PROMOTION-01) — **`PASS / PRODUCTION_ENTRYPOINT_PROVEN`** (2026-09-03, authorized
+  bounded success canary completed after the read-only preflight below. The frozen allowlist registered
+  exactly 50 real orphan packets and 434 namespace-qualified `atlas_packet_chunk_lineage` memberships
+  through `scripts/atlas/register-orphaned-chunks.mjs --apply --capture-lineage --source-refs-file=...`.
+  Independent PostgreSQL readback found `packet_count: 50`, `membership_count: 434`, `missing_packets: 0`,
+  and membership checksum `03676a2b03d3736c0ba4dafc082d14cd`. Replaying the same production command
+  resolved 0 new orphans; the subsequent readback preserved the same 50/434 population and checksum.
+  No Qdrant, Neo4j, graph, or Valkey writes occurred. Evidence: `docs/reports/chunk-registration-report.json`,
+  `docs/reports/pkt-lineage-08-eligible-source-refs-v1.json`, and direct SQL readback.
+  **Historical notes below remain retained; their earlier `READY_FOR_AUTHORIZATION` wording is superseded.**
+  Historical preflight history (2026-09-03, re-run after
   `LINEAGE-01` closed — see below; was `BLOCKED_NO_ELIGIBLE_CANDIDATE` as of 2026-09-02). Was
   **`BLOCKED_NO_ELIGIBLE_CANDIDATE`** (2026-09-02, status
   corrected — this is not unfinished coding). The live preflight already proved
@@ -631,8 +712,8 @@ lineage MEMBERSHIP, not 1:1 identity.
   `atlas_packet_chunk_lineage` table, reads real `codebase_chunk_index.chunk_id`
   values plus `graphify_files.workspace_id`, and commits each packet and its
   complete membership set transactionally. Dry-run evidence is in
-  `docs/reports/chunk-registration-report.json`; production canary/apply
-  remains separately authorized and therefore this task stays open. A bounded
+  `docs/reports/chunk-registration-report.json`; at that earlier point the
+  production canary/apply remained separately authorized. A bounded
   authorized apply canary on 2026-09-01 exercised the active entrypoint:
   one orphan packet row was inserted, but its 22 memberships were correctly
   refused because `graphify_files.workspace_id` was absent; readback confirmed
@@ -1509,6 +1590,34 @@ rows remain unchanged and require a separate policy decision; this patch is not 
 cleanup, or projection authorization.
 
 This closes the population question this track raised without touching Qdrant or Postgres.
+
+**Current-population audit correction 2026-09-03:** the first rerun of
+`audit-qdrant-point-missing-population-v1.mjs` silently read its historical fixed input
+`bridge-recon-dry-04-v1.json`, so its 675-row result was not evidence about the current
+7,421-membership state. The audit now accepts `--artifact-path` and records
+`sourceArtifactPath`; rerunning against `docs/reports/bridge-recon-dry-05-v1.json` produced
+`docs/reports/qdrant-point-missing-population-02-v1.json` read-only:
+
+- 1,109 missing physical points, all present in Postgres and all `embedding_eligible = false`;
+- 0 eligible rows, 0 missing Postgres rows, and 0 sampled points found under the alternate
+  `qdrant_id` values;
+- 462 rows nevertheless have a non-null legacy `content_embedding` despite ineligibility,
+  so the eligibility/vector-state anomaly remains open and is not a projection authorization;
+- verdict remains `MISSING_POPULATION_EXPLAINED_BY_EMBEDDING_ELIGIBILITY_POLICY` for the
+  missing-point classification, with the 462-row producer/policy mismatch explicitly flagged;
+- no Postgres or Qdrant writes. `RETRIEVAL-01L` remains open pending a non-empty immutable
+  proposal, authorized apply, exact readback, rollback artifact, and same-proposal replay.
+
+The companion mismatch audit was given the same explicit-artifact inputs and produced
+`docs/reports/embedding-eligibility-mismatch-02-v1.json`: 462 mismatches, verdict
+`ELIGIBILITY_VECTOR_STATE_MISMATCH_REQUIRES_POLICY_AUDIT`. This confirms the anomaly is current
+for the 1,109-row population, while retaining the prior conclusion that no vector should be
+projected or repaired until eligibility and source-lineage policy ownership is proven.
+The report identifies `scripts/atlas/backfill-graphify-file-embeddings-768.mjs` as the current
+guarded writer (`content_embedding IS NULL AND embedding_eligible = true`) and records historical
+commit `ee807652571` as having omitted that guard. All 462 mismatches also lack `source_ref`, so
+they remain unqualified legacy vector state; this traces the likely producer defect but does not
+authorize cleanup, eligibility changes, or Qdrant projection.
 
 ## Validation record
 
@@ -2904,6 +3013,19 @@ Evidence: `docs/reports/mcp-tool-registry-drift-classification-v1.json`, `docs/r
 
 ## MCP-ACE-BITFROST-ALIGNMENT-AUDIT-01
 
+- [x] Classify the ten live `atlas-tools` MCP names explicitly in the Parent Atlas
+  policy layer (2026-09-03). Nine are read-only; `record_outcome` is write-capable and
+  approval-required. Unknown future names remain `UNKNOWN`/fail-closed. Focused policy
+  coverage is tested in `mcp-tool-policy-classifier-v1.spec.ts`.
+- [x] Audit outcome ownership (2026-09-03): two writers append to the shared
+  `.opencode/outcome-ledger.ndjson`; `atlas-tools` also projects to Neo4j, while the
+  recommendation workflow can mark its `record_outcome` stage before a durable receipt
+  exists. A third shared append path is also present in
+  `scripts/atlas/lib/agentic-toolgan-core.mjs`, and the SvelteKit observability helper has
+  multiple callers. Separately, telemetry writes the Postgres `outcome_ledger` table; that is
+  a different persistence lane and must not be conflated with the NDJSON ledger. No writer was
+  deleted or merged. Evidence:
+  `docs/reports/mcp-outcome-owner-audit-v1.json`.
 - [x] Re-run OpenSpec status and strict validation; current authority remains singular.
 - [x] Re-run atlas-tools smoke; 10 checks pass.
 - [x] Reconcile MCP parity drift against imported/delegated definitions and compatibility aliases.
@@ -2918,7 +3040,94 @@ Evidence: `docs/reports/mcp-tool-registry-drift-classification-v1.json`, `docs/r
 - [x] Audit existing producers: manifest packets are generated, but no authorized tool-manifest-to-Qdrant projection producer was found; do not invent one during routing work.
 - [ ] Prove one TRACE/stdio alias replay equivalent before changing registrations.
 - [ ] Wire one ACE caller through authoritative SearchRuntime revisions and ContextManifestV2.
+- [x] Preserve incomplete ACE/process enrichment metadata as explicit `null` (2026-09-03).
+  `AtlasProcessPacketV1.graphRevision` is now nullable and the legacy ACE adapter no longer
+  invents `graph:parent-atlas` when structural authority is unavailable. Nulls remain visible
+  through the packet/manifest boundary; strict ContextManifestV2/BitFrost admission still
+  requires authoritative revisions and therefore does not promote incomplete payloads.
+  Regression coverage: `ace-context-manifest.spec.ts`.
 - [ ] Prove BitFrost mutation invalidation and disconnect flush safety.
+- [ ] MCP-OUTCOME-RECEIPT-OWNER-01 — select one durable AgentWorkReceipt owner, remove
+  stale/default graph-version fallbacks, and require the workflow RECORD stage to succeed
+  only after the receipt is durably acknowledged. Migration remains blocked until the
+  contract includes request/workspace/source/graph revisions, tool refs, checksums, and
+  validation receipts. Existing `sveltekit-frontend/src/lib/server/observability/outcome-ledger.ts`
+  is reusable only as a low-level append helper; it is not yet the typed receipt owner because
+  it accepts arbitrary records and suppresses append failures. The additive contract now exists
+  at `sveltekit-frontend/src/lib/server/observability/agent-work-receipt-v1.ts`; writer migration
+  and durable acknowledgement remain open. The two stale graph-version defaults were removed;
+  unavailable graph metadata now remains `null`.
+- [x] Record the receipt-owner recommendation (2026-09-03): Postgres `outcome_ledger` is
+  the durable canonical owner; `.opencode/outcome-ledger.ndjson` remains a non-canonical local
+  diagnostic projection. No migration was performed. Evidence:
+  `docs/reports/mcp-outcome-receipt-owner-decision-v1.json`.
+- [x] Audit the typed-receipt adapter boundary (2026-09-03): the live `public.outcome_ledger`
+  is the 10-column schema from `drizzle/0111_tool_call_runtime_contract.sql`. A second
+  migration defines an incompatible state-transition schema under the same table name; both
+  use `CREATE TABLE IF NOT EXISTS`, so this is a migration conflict and must not be resolved
+  by rerunning or overwriting either definition. Receipt identity, idempotency, acknowledgement,
+  and UUID mapping remain open. Evidence:
+  `docs/reports/mcp-outcome-receipt-adapter-audit-v1.json`.
+- [ ] MCP-OUTCOME-RECEIPT-ADAPTER-01 — design an additive adapter for the live outcome ledger,
+  preserve incomplete receipt metadata as explicit null/metadata, require Postgres acknowledgement,
+  and prove idempotent readback/replay before migrating any writer.
+- [x] Add pure receipt-to-live-ledger mapping (2026-09-03):
+  `agent-work-receipt-outcome-adapter-v1.ts` maps `AgentWorkReceiptV1` to the current
+  10-column schema without treating `runId` as `traceId` or coercing non-UUID identifiers.
+  Unavailable revisions remain explicit `null`; receipt identity and provenance remain in
+  metadata. Persistence, acknowledgement, idempotency, and writer migration are still open.
+- [x] Design the additive receipt identity migration (2026-09-03): live `outcome_ledger` has
+  zero rows and no receipt identity index, so nullable `receipt_id`, `run_id`, receipt status,
+  and completion fields can be added without backfill. A partial unique receipt index and
+  checksum-conflict behavior are specified, but no migration was created or applied. Evidence:
+  `docs/reports/mcp-outcome-receipt-adapter-audit-v1.json`.
+- [x] Create the reviewed additive migration file (2026-09-03):
+  `drizzle/manual/20260903_outcome_receipt_identity_additive_v1.sql` adds only nullable receipt
+  identity/status fields and a partial unique receipt index. It has not been applied; normal
+  migration-owner review and explicit authorization remain required.
+- [x] Apply and independently verify the additive receipt identity migration (2026-09-03):
+  `outcome_ledger` now has nullable `receipt_id`, `run_id`, `receipt_schema`, `receipt_status`,
+  `writes_performed`, and `completion_checksum`, plus a partial unique receipt index. The table
+  remains empty; no existing rows were changed. Typed writer wiring and acknowledgement/replay
+  proof remain open.
+- [x] Add the isolated typed Postgres receipt writer (2026-09-03):
+  `recordAgentWorkReceiptV1` validates `AgentWorkReceiptV1`, writes Postgres first, returns
+  acknowledgement, treats identical `receipt_id` replay as idempotent, and rejects checksum
+  conflicts. Legacy writers are not migrated yet. Focused tests cover insert/replay/conflict.
+- [ ] Migrate one bounded workflow RECORD stage to the typed writer. The recommendation workflow
+  is a standalone `.mjs` CLI while the writer is server-side TypeScript; choose and prove one
+  explicit runtime boundary first. Do not duplicate receipt SQL or silently keep NDJSON as a
+  success acknowledgement. Current analysis: `mcp-outcome-receipt-adapter-v1.json`.
+- [x] Wire the recommendation RECORD stage through the explicit receipt endpoint (2026-09-03):
+  `agentic-recommendation-workflow.mjs` now requires Postgres acknowledgement before appending
+  the diagnostic NDJSON projection; endpoint failure is fail-closed. Internal service-token
+  authentication is supported. A fresh workflow-level live proof remains pending.
+- [x] Live-prove the recommendation RECORD ordering (2026-09-03): workflow query
+  `receipt adapter bounded proof` produced receipt `aaaba8c5101454f3ec8c8685`; Postgres
+  acknowledgement preceded the NDJSON projection, and SQL readback reported `SUCCEEDED`
+  with `writes_performed=false`. Broader caller migration remains open. Evidence:
+  `docs/reports/mcp-outcome-receipt-adapter-audit-v1.json`.
+- [x] Correct replay projection semantics (2026-09-03): identical receipt replay now emits
+  diagnostic `RECEIPT_REPLAY` with `canonicalMutation=false` and the canonical completion
+  checksum, rather than a second normal completed-work event. Existing historical NDJSON lines
+  are unchanged; new replay behavior is covered by syntax and focused writer tests.
+- [x] Live-prove frozen recommendation replay (2026-09-03): receipt
+  `99b274c796d325176819298a` returned the existing Postgres row with an equal checksum and
+  emitted `RECEIPT_REPLAY`/`canonicalMutation=false` in NDJSON. No second canonical receipt
+  was created. Broader NDJSON-writer convergence remains open.
+- [x] Live-prove receipt fail-closed behavior (2026-09-03): malformed input returned `400`,
+  Postgres row delta was `0`, NDJSON delta was `0`, and no service secret appeared in the
+  response. Receipt safety gates are complete; the next mainline is
+  `ACE-FEATURE-SOURCE-OWNER-01`.
+- [x] Define the explicit server boundary for receipt persistence (2026-09-03):
+  `POST /api/agent-work-receipts` validates `AgentWorkReceiptV1`, requires an authenticated
+  caller, delegates to the typed Postgres writer, and returns stable acknowledgement/replay/error
+  fields. Live endpoint proof and CLI migration remain open.
+- [x] Live-prove the receipt endpoint (2026-09-03): one bounded test receipt was acknowledged
+  into Postgres, an identical replay returned the same ledger ID with `replayed=true`, and
+  independent SQL readback matched status/checksum. Test receipt:
+  `live-receipt-20260903-01`. No Qdrant, Neo4j, Valkey, or NDJSON writes occurred. CLI migration
+  and broader caller migration remain open.
 - [ ] Decouple optional latent fanout from canonical Graphify completion.
 
 Evidence: `docs/reports/mcp-ace-bitfrost-alignment-audit-v1.json`, `docs/reports/mcp-tool-registry-drift-classification-v1.json`, `docs/reports/ace-route-revision-authority-v1.json`, `docs/reports/bitfrost-valkey-tracking-proof.json`, `docs/reports/graphify-fanout-criticality-01.json`.
@@ -3711,6 +3920,21 @@ own documented conventions — not unreviewed or unrelated concurrent-session ch
    works, it's just heavier than it needs to be).
 4. The 7 pre-existing `retrieval/` test failures and `src/mcp/server.ts`'s live-launch status
    (both flagged in earlier HANDOFF sections above, still open, still not this session's to fix).
+
+**Cross-reference (2026-09-03, separate session — corrected same day)**: two sessions
+independently built near-identical `ConceptDefinitionV1`/`ConceptV1` +
+`TermObservationV1`/`ConceptRecognitionV1` contracts in parallel; see
+`openspec/changes/parent-atlas-ontology-kernel/tasks.md`'s `ONTO-PY-CONCEPT-INTEGRATION-01`
+addendum for the full account. The canonical one that landed is
+`sveltekit-frontend/src/lib/server/atlas/taxonomy/entity-concept-taxonomy-v1.ts` (has a working
+resolver + hyperedge-based promotion path); a second, less-complete version was built and
+deliberately left uncommitted to avoid a duplicate schema owner. One real finding from the
+abandoned exploration survived into that addendum: mechanically deriving proposals from
+`domain_mapping.py` alongside `domain-taxonomy.ts` found 3 direct label collisions
+(`retrieval`/`database`/`graph` are canonical labels in BOTH taxonomies) — worth folding into a
+future run of the concurrent session's own `sveltekit-frontend/scripts/atlas/concept-seed-dry-v1.mts`.
+Directly relevant to this file's `DOMAIN-CLASSIFIER-OWNER-01` gate (registered but not started,
+item 6 above) — read the ontology-kernel addendum before starting that gate.
 5. Concurrent-session editing of this file was observed and handled cleanly throughout (edits
    applied against re-read current content each time) — re-read this file's current state before
    continuing, per this session's own repeated practice, don't assume it still matches this
