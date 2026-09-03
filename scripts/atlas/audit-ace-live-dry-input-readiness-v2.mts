@@ -4,6 +4,10 @@ import { dirname, resolve } from 'node:path';
 import { candidateOrdinalMapV1Schema } from '../../sveltekit-frontend/src/lib/server/atlas/features/canonical-candidate-v1.js';
 import { candidateFeatureSnapshotV1Schema } from '../../sveltekit-frontend/src/lib/server/atlas/features/candidate-feature-snapshot-v1.js';
 import { revisionAuthorityEnvelopeV1Schema } from '../../sveltekit-frontend/src/lib/server/atlas/identity/revision-authority-envelope-v1.js';
+import {
+  buildSearchRuntimeFeatureBundleV1,
+  verifySearchRuntimeFeatureBundleV1,
+} from '../../sveltekit-frontend/src/lib/server/atlas/retrieval/search-runtime-feature-bundle-provider-v1.js';
 
 function parseArgs(argv: readonly string[]) {
   let ordinalMap: string | null = null;
@@ -63,11 +67,27 @@ async function main() {
 
   let crossContractStatus: 'NOT_CHECKED' | 'PASS' | 'FAIL' = 'NOT_CHECKED';
   const crossContractErrors: string[] = [];
+  let bundleLogicalChecksum: string | null = null;
+  let bundleEnvelopeChecksum: string | null = null;
 
   if (valid) {
-    const ordinalData = ordinal.data as any;
-    const snapshotData = snapshot.data as any;
-    const authorityData = authority.data as any;
+    const ordinalData = candidateOrdinalMapV1Schema.parse(ordinal.data);
+    const snapshotData = candidateFeatureSnapshotV1Schema.parse(snapshot.data);
+    const authorityData = revisionAuthorityEnvelopeV1Schema.parse(authority.data);
+
+    try {
+      const bundle = buildSearchRuntimeFeatureBundleV1({
+        requestId: 'ace-live-dry-readiness-audit-v2',
+        ordinalMap: ordinalData,
+        snapshot: snapshotData,
+        revisionAuthority: authorityData,
+      });
+      verifySearchRuntimeFeatureBundleV1(bundle);
+      bundleLogicalChecksum = bundle.bundleLogicalChecksum;
+      bundleEnvelopeChecksum = bundle.bundleEnvelopeChecksum;
+    } catch (error) {
+      crossContractErrors.push(`SERVER_FEATURE_BUNDLE_VERIFY_FAILED:${error instanceof Error ? error.message : String(error)}`);
+    }
 
     if (ordinalData.ordinalMapChecksum !== snapshotData.ordinalMapChecksum) {
       crossContractErrors.push('ORDINAL_MAP_CHECKSUM_MISMATCH');
@@ -93,11 +113,18 @@ async function main() {
     crossContractStatus,
     crossContractErrors,
     blockers: [...blockers, ...crossContractErrors],
+    sealedBundleVerification: {
+      attempted: valid,
+      passed: ready,
+      bundleLogicalChecksum,
+      bundleEnvelopeChecksum,
+      candidateSourceAuthorityVerified: ready,
+    },
     writesPerformed: false,
     cacheWritesPerformed: false,
     canonicalAuthority: false,
     nextCommand: ready
-      ? 'npm exec -- tsx scripts/atlas/prove-ace-live-dry-v2.mts -- --input <reviewed-ace-live-dry-input-v2.json>'
+      ? 'npm exec -- tsx scripts/atlas/materialize-ace-live-dry-input-v2.mts -- --ordinal-map <file> --snapshot <file> --revision-authority <file> --request-id <id> --token-budget <n> --retrieval-policy-revision <rev> --ace-playbook-revision <rev> --representation-revision <rev>'
       : 'Provide only the missing/invalid authoritative artifacts; do not synthesize replacements.',
   };
 
