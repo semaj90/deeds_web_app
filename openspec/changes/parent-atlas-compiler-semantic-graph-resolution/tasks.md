@@ -784,3 +784,158 @@ live target identity enrichment and edge admission remain open.
 
 The source-registry contract is already proven separately for the current 111-source cohort
 (`EXISTING_EXACT: 111/111`); this reconciliation does not reopen or broaden that migration.
+
+## LSP-POSITION-KEY-VALUE-ALIGNMENT-01 (2026-09-03, bounded fixture)
+
+- [x] Proved that an LSP observation carries source, workspace, server,
+  capability, target, and negotiated position-encoding values as explicit
+  revision-qualified key/value fields.
+- [x] Reused the existing `lspSemanticObservationSchema`; no new identity or
+  coordinate authority was introduced.
+- [x] Focused LSP semantic-observation tests pass, including Unicode UTF-8 byte
+  conversion and invalid code-point boundary rejection.
+- [x] Existing read-only TypeScript LSP proof resolved one in-repository
+  definition with `typescript-language-server` 5.3.0 and reported UTF-16
+  protocol coordinates without writes. Its receipt now records the explicit
+  Parent Atlas output coordinate space as `UTF8_BYTES`, the source reference,
+  source hash, generation timestamp, and fixture validation status.
+- [x] Added Zod-backed UTF-8 byte-span validation against the exact source
+  buffer; mismatched text and spans that split a UTF-8 sequence fail closed.
+- [x] Added revision-qualified target-range alignment for target ranges and
+  selection ranges, preserving the original LSP ranges alongside UTF-8 byte
+  ranges and refusing canonical authority.
+- [x] The existing read-only TypeScript proof now applies that alignment to a
+  same-file target and records the target source revision and UTF-8 byte range
+  in its receipt.
+- [x] The read-only proof now consumes the existing workspace-revision
+  authority helper and carries its fresh proven value into the LSP receipt;
+  stale or incomplete authority still degrades to `null`. The receipt also
+  carries the authority state, freshness reason, age, and evidence reference.
+- [ ] Cross-file target source loading and cross-engine target parity remain
+  open. No synthetic revision is allowed.
+- [ ] The existing `WorkspaceSourceBindingV1` contract and exact workspace-byte
+  reader prove source metadata/bytes separately, but no live adapter currently
+  combines target-source loading with the revision-qualified symbol registry
+  lookup required by `LspTargetIdentityEnrichmentV1`; keep this gate open.
+- [x] Read-only inventory confirms the live database contains the existing
+  symbol authorities (`atlas_symbol_registry`: 10,310 rows;
+  `atlas_symbol_versions`: 285 rows). The current tree-bound input plan is
+  review-valid for 353 rows with no missing fields or invalid spans, but records
+  `promotionAuthorized: false` and zero writes; this is evidence for the next
+  adapter gate, not production promotion.
+- [x] Read-only schema inspection identifies the reusable join fields for the
+  next adapter: `atlas_symbol_versions` supplies `stable_symbol_id`,
+  `symbol_version_id`, `source_ref`, `source_revision`, `workspace_revision`,
+  and `byte_start`/`byte_end`; `atlas_ast_nodes` supplies matching source byte
+  spans and parser provenance. The adapter must still verify exact workspace
+  bytes before returning identity and must remain read-only.
+- [ ] Live join coverage is currently zero in a bounded read-only sample: all
+  285 `atlas_symbol_versions` rows match an active registry symbol, but none
+  match `atlas_ast_nodes` on source reference, source revision, and byte span.
+  Observed causes include `workspace:0` symbol revisions, null AST source
+  revisions/byte spans, and composite `source_ref_key` values. Do not use
+  fuzzy joins or synthetic revisions; reconcile these authorities before live
+  enrichment.
+- [x] Current-source hydration audit confirms the bounded 111-source input has
+  111 exact revision matches, 68 content-and-hash hydrated rows, and zero
+  evidence-span-ready rows. The audit was corrected to measure content
+  hydration instead of forcing it to zero; the 68 hydrated rows still lack a
+  qualifying chunk source revision, while 43 rows have no canonical chunk
+  owner. This keeps the live enrichment gate blocked without treating the
+  historical AST projection as current.
+- [x] A bounded read-only owner census refines the missing-owner count to 42
+  unique source paths absent from `codebase_chunk_index`; none recover through
+  `sveltekit-frontend/` path variants. All 42 are present in
+  `atlas_source_refs`, so this is a source-registry-to-canonical-chunk
+  hydration gap, not a path-normalization failure. No chunk or AST writes are
+  authorized by this finding.
+- [x] A second bounded read-only census categorizes 43 distinct normalized
+  cohort paths absent from `codebase_chunk_index`: 40 demo routes, 2 other
+  application routes, and 1 design document. The one-row difference from the
+  source-registry census is a representation mismatch in the registry lookup;
+  exclusion intent is not established. Do not assume demo exclusion is
+  correct or force these paths into the canonical chunk owner without an
+  explicit source-selection decision.
+- [x] Read-only comparison with the existing indexable-source manifest resolves
+  the selection question for 110/111 cohort files: all 110 are present and
+  marked `canonicalAdmission: true`, so their missing chunk rows represent
+  materialization lag rather than intentional exclusion. The remaining cohort
+  file, `sveltekit-frontend/tests/sprint5-6-monitoring.spec.ts`, is absent from
+  that manifest and requires separate source-authority review. No indexing or
+  chunk writes are authorized by this finding.
+- [x] Existing cohort reports expose the current projection admission boundary:
+  the lineage cohort has 111 revision-qualified rows, while the current source
+  projection cohort has only 52 `EXACT_FILE_BYTES_HASH` rows. The remaining 59
+  are outside that current projection admission boundary: 58 are present in the
+  canonical-admission manifest and match current filesystem bytes, while 1 is
+  absent from the manifest. Revision qualification alone must not authorize
+  chunk materialization.
+- [x] Added the bounded read-only comparison
+  `scripts/atlas/audit-current-source-cohort-projection-alignment-v1.mjs`.
+  Its receipt proves 52 `PROJECTION_EXACT_FILE_BYTES_ADMITTED` rows, 58
+  `LINEAGE_ONLY_NOT_PROJECTION_ADMITTED` rows present in the source manifest,
+  and 1 `LINEAGE_ONLY_MANIFEST_MISSING` row. It emits no database, vector,
+  graph, or cache writes.
+- [x] Follow-up hash classification proves all 58 lineage-only rows have
+  matching recorded lineage, manifest, and current filesystem SHA-256 values.
+  They are therefore not stale or filesystem-drifted; they are outside the
+  current 52-row projection-admission scope. The remaining one row is both
+  lineage-only and absent from the manifest. This does not authorize indexing,
+  chunk writes, or expansion of the projection cohort.
+
+## LSP-UTF8-BOUNDARY-GUARD-01 (2026-09-03) — separate session, scoped to `lsp-jsonrpc-client.mjs` only
+
+Worked concurrently with the CSGR-1/LSP-POSITION-KEY-VALUE-ALIGNMENT-01 sessions above on the same
+subsystem, deliberately narrowed to two owned files
+(`scripts/atlas/lib/lsp-jsonrpc-client.mjs`, `scripts/atlas/prove-byte-offset-to-lsp-position-readonly.mjs`)
+to avoid colliding with in-flight edits to `packages/parent-atlas/src/core/lsp-semantic-observation.ts`,
+`scripts/atlas/prove-typescript-lsp-readonly.mjs`, and `docs/reports/typescript-lsp-readonly-proof-v1.json`.
+
+- [x] Found and fixed the live boundary-rejection hole in `byteOffsetToPosition()`
+  (`lsp-jsonrpc-client.mjs`): it decoded the byte prefix with `Buffer.toString('utf8')`, which
+  Node documents as silently substituting U+FFFD for invalid sequences rather than rejecting them
+  — a `byteOffset` landing mid-codepoint could silently produce a wrong UTF-16 line/character
+  instead of failing. Fixed with `TextDecoder('utf-8', { fatal: true })`: validates the WHOLE
+  source buffer first (`LSP_SOURCE_INVALID_UTF8`), then the prefix
+  (`LSP_BYTE_OFFSET_SPLITS_UTF8_CODE_POINT:<offset>`).
+- [x] Extended `prove-byte-offset-to-lsp-position-readonly.mjs` (the existing CSGR-1 fixture proof
+  referenced above) rather than creating a competing test owner — added 6 REJECT cases (every byte
+  position inside a 2-byte and a 4-byte code point, plus two whole-source-invalid-UTF-8 cases,
+  including one specifically constructed so a prefix-only check would have missed it). 10/10
+  `PROVEN_FIXTURE`, the original 4 ASCII/BMP/astral happy-path cases unchanged.
+- [x] Confirmed the fix doesn't break the one real caller, `compiler-semantic-resolver-v1.mjs`'s
+  `resolveDefinition()` — it already wraps the `byteOffsetToPosition()` call in try/catch and
+  degrades any thrown error to `{ status: 'STALE_SOURCE', ... }`, matching on `error.message`
+  generically rather than an exact string, so the renamed error code is a no-op for that call site.
+
+## LSP-CROSS-FILE-TARGET-PROOF-01 (2026-09-03) — real finding for this file's own open item
+
+Directly informs the open item above: "Cross-file target source loading and cross-engine target
+parity remain open." Built a NEW, separate read-only probe —
+`scripts/atlas/prove-lsp-cross-file-target-alignment-readonly.mjs` — deliberately choosing a
+source/target pair that cannot resolve same-file (`compiler-semantic-resolver-v1.mjs`'s own
+`spawnLspServer` call site → its real definition in `lsp-jsonrpc-client.mjs`), specifically because
+`prove-typescript-lsp-readonly.mjs`'s existing probe (`createNodeTreeSitterAstProvider`) happens to
+resolve back into its own source file and so never exercises true cross-file alignment.
+
+- [ ] **Real, reproducible finding — NOT resolved, flagged for whoever picks up the open item
+  above**: `typescript-language-server`'s `textDocument/definition` does NOT follow a plain
+  `.mjs`↔`.mjs` relative import through to the real declaration for this pair. Tested 3 ways —
+  querying from the call site, querying from the import specifier itself, and re-rooting the LSP
+  workspace at `scripts/` (which has its own `allowJs: true` `tsconfig.json` covering both files)
+  — all three returned the SAME self-referential result: the import declaration's own location,
+  reported as its own definition (`sourceRef === targetRef`, `sourceRange === targetRange`). This
+  is not a bug in the byte-alignment math — `targetTextMatchesByteSlice: true` held in every run,
+  the returned span decodes to exactly `spawnLspServer` — the LSP server itself is not resolving
+  cross-file for this case. Root cause not yet determined (plain-JS-without-declarations behavior,
+  a `moduleResolution: NodeNext` extension-specifier nuance, or something else) — three live LSP
+  round-trips is enough evidence this is real and reproducible, not enough to diagnose the cause
+  without tsserver-level tracing, which wasn't attempted.
+- [x] Receipt: `docs/reports/lsp-cross-file-target-alignment-proof-v1.json` — `status: NOT_PROVEN`,
+  `targetIsSameFileAsSource: true`, `targetIsExpectedFile: false`. Recorded as genuine negative
+  evidence, not silently smoothed over or worked around with a synthetic fixture.
+- [ ] **Next step for whoever picks this up**: before trying more probe variants, get real
+  tsserver-level diagnostics (e.g. `--tsserver-log-file` on the underlying `tsserver` process, or
+  testing the identical import pair manually in an editor with the same `typescript-language-server`
+  version) to determine whether this is a known limitation of plain-JS cross-module go-to-definition
+  or something specific to this repo's project configuration.

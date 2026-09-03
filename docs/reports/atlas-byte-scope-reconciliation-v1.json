@@ -1,21 +1,21 @@
 {
   "schema": "atlas.byte-scope-reconciliation.v1",
-  "generatedAt": "2026-09-01T04:26:44.555Z",
+  "generatedAt": "2026-09-03T22:03:40.224Z",
   "readOnly": true,
   "writesPerformed": false,
-  "sampleLimit": 111,
+  "sampleLimit": 100,
   "status": "COMPLETE_READ_ONLY",
   "classifications": {
-    "UNPROVEN_SCOPE": 96,
-    "MISSING_SOURCE": 15
+    "UNPROVEN_SCOPE": 88,
+    "MISSING_SOURCE": 12
   },
   "samples": [
     {
       "sourceRef": "CLAUDE.md",
       "sourcePath": "CLAUDE.md",
-      "sourceSizeBytes": 260967,
+      "sourceSizeBytes": 295640,
       "sourceReadError": null,
-      "filesystemSha256": "349d13d1ead0734be2947b0d978a5258ce4c21cd5b8fd84b06e0b11108b87495",
+      "filesystemSha256": "22b15d31c396f25981aa1cec2ba4c33433db51b98fc1000c6d825558b5bd3170",
       "artifactHashes": [
         "5ef4423597047f753dfece81dad9977ba655dc3d5b71dd2a50ec8e42a501e428"
       ],
@@ -1063,9 +1063,9 @@
     {
       "sourceRef": ".gitignore",
       "sourcePath": ".gitignore",
-      "sourceSizeBytes": 26502,
+      "sourceSizeBytes": 26537,
       "sourceReadError": null,
-      "filesystemSha256": "b0580e28ec28f7cc85067f6a3deae5028ec5bde156c13b8f93f8b75e45d8fdc7",
+      "filesystemSha256": "7ad1e062440a34aa0010218d4e0cd9c09a893e16efe198fed5b7e48639bce43c",
       "artifactHashes": [
         "05eb8f21ea0df6c649c6ac32a88e83ee188428940e9fdcfde59c22c71d9eff08"
       ],
@@ -1404,160 +1404,6 @@
       "filesystemSha256": "48f96c459772a195e9ac4b99194115c8135b912ba2e3841953510fa13f725400",
       "artifactHashes": [
         "6e90968de2dd940eebcfc20c192b11b67da686fd8ddf8314e1fbb2d56c5388bd"
-      ],
-      "chunkHashes": [],
-      "packetHashes": [],
-      "chunkChecks": [],
-      "classification": "UNPROVEN_SCOPE"
-    },
-    {
-      "sourceRef": "6_13_26__.txt",
-      "sourcePath": "6_13_26__.txt",
-      "sourceSizeBytes": 4164,
-      "sourceReadError": null,
-      "filesystemSha256": "1fbd3e3734daba5f22dca33673f0a6b61a5072296bf0f62e21cc4a398b3fb6e8",
-      "artifactHashes": [
-        "288a1ee3bcbceab805b8ca1a484bd62b8f484d08a7ae35bcfa5a4ef992306527"
-      ],
-      "chunkHashes": [],
-      "packetHashes": [],
-      "chunkChecks": [],
-      "classification": "UNPROVEN_SCOPE"
-    },
-    {
-      "sourceRef": ".github/agents/legal-library-engineer.agent.md",
-      "sourcePath": ".github/agents/legal-library-engineer.agent.md",
-      "sourceSizeBytes": 6874,
-      "sourceReadError": null,
-      "filesystemSha256": "0268185c9aa78fb9d2c985a470a4b5c30ac3fae34d507ece8c948978f5851449",
-      "artifactHashes": [
-        "a85ccb9a8b0e70253865c8a4be219b3230e54e4a5e8007955a7b63106d3e93b8"
-      ],
-      "chunkHashes": [],
-      "packetHashes": [],
-      "chunkChecks": [],
-      "classification": "UNPROVEN_SCOPE"
-    },
-    {
-      "sourceRef": ".error-brain/backups/2025-12-16T20-48-16-749Z_C",
-      "sourcePath": null,
-      "sourceSizeBytes": null,
-      "sourceReadError": null,
-      "filesystemSha256": null,
-      "artifactHashes": [
-        "12bbe7fe5cfad5a8321bff9203a571429c844435774774bd7fb18cab8df7dfbc"
-      ],
-      "chunkHashes": [],
-      "packetHashes": [],
-      "chunkChecks": [],
-      "classification": "MISSING_SOURCE"
-    },
-    {
-      "sourceRef": "antigravity_prompt_611.txt",
-      "sourcePath": "antigravity_prompt_611.txt",
-      "sourceSizeBytes": 9507,
-      "sourceReadError": null,
-      "filesystemSha256": "0bebf353ba1c03cb0721c7f18b7615ee238860e7376c8ac9314f153735b9eb6f",
-      "artifactHashes": [
-        "44ea4732600568a52f12e207e02f653c3c4a9eeb99c60d0024090fcdd03ac040"
-      ],
-      "chunkHashes": [],
-      "packetHashes": [],
-      "chunkChecks": [],
-      "classification": "UNPROVEN_SCOPE"
-    },
-    {
-      "sourceRef": "6_13_26_todo.txt",
-      "sourcePath": "6_13_26_todo.txt",
-      "sourceSizeBytes": 4585,
-      "sourceReadError": null,
-      "filesystemSha256": "6d4565a729ce9b91f24496cbf950c6d981712f1c3d9e2e62ef722c99c6face3b",
-      "artifactHashes": [
-        "dfdc4d3fdee328916c01a38491cd8dbfd02a80929465e347faeab0122b4e8d91"
-      ],
-      "chunkHashes": [],
-      "packetHashes": [],
-      "chunkChecks": [],
-      "classification": "UNPROVEN_SCOPE"
-    },
-    {
-      "sourceRef": ".vscode/new-tasks.json",
-      "sourcePath": ".vscode/new-tasks.json",
-      "sourceSizeBytes": 3452,
-      "sourceReadError": null,
-      "filesystemSha256": "4fcf37d271fa709a33a2953dafe6b44188e6dd6652285f18dbc4390b48274624",
-      "artifactHashes": [
-        "d9214d29cbf4055095ee3c2b19e99cb0e2c902c5d40497af719145044a1b34b4"
-      ],
-      "chunkHashes": [],
-      "packetHashes": [],
-      "chunkChecks": [],
-      "classification": "UNPROVEN_SCOPE"
-    },
-    {
-      "sourceRef": ".error-brain/backups/2025-12-16T20-33-03-109Z_C",
-      "sourcePath": null,
-      "sourceSizeBytes": null,
-      "sourceReadError": null,
-      "filesystemSha256": null,
-      "artifactHashes": [
-        "b635fa30bd94b282d5c9182474b709817be7ad387f3b19e3622c1f9ec76f3b36"
-      ],
-      "chunkHashes": [],
-      "packetHashes": [],
-      "chunkChecks": [],
-      "classification": "MISSING_SOURCE"
-    },
-    {
-      "sourceRef": "ACE-MATERIALIZATION-BLOCKER-1-FIXED.md",
-      "sourcePath": "ACE-MATERIALIZATION-BLOCKER-1-FIXED.md",
-      "sourceSizeBytes": 8615,
-      "sourceReadError": null,
-      "filesystemSha256": "9a75bd39d28fc8637aa7157b4d82d080c753c89e2a839d6ac580b84fb62084bb",
-      "artifactHashes": [
-        "8ed13a0937e1d6ac82a89af519130d9f7ab3953cce20819c4de1ca166c33fbac"
-      ],
-      "chunkHashes": [],
-      "packetHashes": [],
-      "chunkChecks": [],
-      "classification": "UNPROVEN_SCOPE"
-    },
-    {
-      "sourceRef": ".vs/deeds-web-app/FileContentIndex/499be2e7-10b3-406b-abb5-348f05b2c4c8.vsidx",
-      "sourcePath": ".vs/deeds-web-app/FileContentIndex/499be2e7-10b3-406b-abb5-348f05b2c4c8.vsidx",
-      "sourceSizeBytes": 2943729,
-      "sourceReadError": null,
-      "filesystemSha256": "9d4149bfac9db4bc1e5f065b35b970c249d35b90c2ead6084e1f07a5d6e32d68",
-      "artifactHashes": [
-        "cbf2f4e9b61748e4250515d14457db313847c568dbd6a19e00f19b0b8b6fd55f"
-      ],
-      "chunkHashes": [],
-      "packetHashes": [],
-      "chunkChecks": [],
-      "classification": "UNPROVEN_SCOPE"
-    },
-    {
-      "sourceRef": ".error-brain/backups/2025-12-16T20-48-16-718Z_C",
-      "sourcePath": null,
-      "sourceSizeBytes": null,
-      "sourceReadError": null,
-      "filesystemSha256": null,
-      "artifactHashes": [
-        "ae0a6b9fcd88bdc72f2784a1bdd0490c3134ccf79e8ba40e58c62f71d673c280"
-      ],
-      "chunkHashes": [],
-      "packetHashes": [],
-      "chunkChecks": [],
-      "classification": "MISSING_SOURCE"
-    },
-    {
-      "sourceRef": ".github/instructions/opencode-context-prefetch.instructions.md",
-      "sourcePath": ".github/instructions/opencode-context-prefetch.instructions.md",
-      "sourceSizeBytes": 3287,
-      "sourceReadError": null,
-      "filesystemSha256": "2db1fc1c354720534aeae49dc6e8e00302ec1649162af092645a7c7978ad2ded",
-      "artifactHashes": [
-        "943abba46fcffb0f8a2b7d1b3788ab9dfb1924aeeed380be1d2e7b6b99848b90"
       ],
       "chunkHashes": [],
       "packetHashes": [],

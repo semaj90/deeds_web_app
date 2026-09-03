@@ -60,7 +60,13 @@ const report = {
   counts,
   sourceRevisionPresent: audited.filter((row) => Boolean(row.sourceRevision)).length,
   rows: audited,
-  status: databaseError ? 'AUDIT_FAILED' : counts.CONTENT_MISMATCH || counts.SOURCE_UNAVAILABLE ? 'SOURCE_BYTES_NOT_PROVEN' : 'SOURCE_BYTES_MATCH_CONTENT_HASH',
+  status: databaseError
+    ? 'AUDIT_FAILED'
+    : rows.length === 0
+      ? 'SOURCE_AUTHORITY_UNAVAILABLE'
+      : counts.CONTENT_MISMATCH || counts.SOURCE_UNAVAILABLE
+        ? 'SOURCE_BYTES_NOT_PROVEN'
+        : 'SOURCE_BYTES_MATCH_CONTENT_HASH',
 };
 fs.mkdirSync(path.dirname(reportPath), { recursive: true });
 fs.writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`);

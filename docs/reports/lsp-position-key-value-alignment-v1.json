@@ -1,0 +1,22 @@
+{
+  "schema": "atlas.lsp-position-key-value-alignment.v1",
+  "gate": "LSP-POSITION-KEY-VALUE-ALIGNMENT-01",
+  "status": "PROVEN_BOUNDED",
+  "testsPassed": 6,
+  "checks": {
+    "sourceRevisionBinding": true,
+    "workspaceRevisionBinding": true,
+    "serverAndCapabilityRevisionBinding": true,
+    "negotiatedPositionEncoding": "utf-16",
+    "unicodeUtf8ByteConversion": true,
+    "invalidCodePointBoundaryRejected": true,
+    "canonicalAuthority": false,
+    "writesPerformed": false
+  },
+  "liveNegotiation": "NOT_PROVEN",
+  "crossEngineParity": "NOT_PROVEN",
+  "testFiles": [
+    "packages/parent-atlas/test/lsp-semantic-observation.test.mjs",
+    "packages/parent-atlas/test/lsp-target-identity-enrichment-v1.test.mjs"
+  ]
+}

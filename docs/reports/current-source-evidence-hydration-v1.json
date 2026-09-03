@@ -3,7 +3,7 @@
   "mode": "READ_ONLY_SOURCE_EVIDENCE_OWNER_AUDIT",
   "inputRows": 111,
   "exactRevisionMatches": 111,
-  "contentHydrated": 0,
+  "contentHydrated": 68,
   "authoritativeNamespaces": 0,
   "namespaceStatus": "MISSING",
   "evidenceSpanReady": 0,
@@ -73,5 +73,5 @@
   "canonicalAuthority": false,
   "status": "SOURCE_EVIDENCE_HYDRATION_BLOCKED",
   "nextGate": "RESOLVE_REVISION_BOUND_CONTENT_AND_SOURCE_NAMESPACE_AUTHORITY",
-  "reportChecksum": "eaa3e283dad11a8174bf0a1fc4be6ae6ac1f44f64f836ddc278e555545b4aac7"
+  "reportChecksum": "c8dd9104dcd2daae449a2558dc24000301ec3a705c3ef7a3afa22be572a3e51f"
 }

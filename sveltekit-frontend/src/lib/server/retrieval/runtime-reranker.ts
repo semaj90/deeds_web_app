@@ -21,6 +21,27 @@ export const SIGNAL_KEYS = [
 
 export type SignalKey = (typeof SIGNAL_KEYS)[number];
 
+/**
+ * How a candidate's blendedScore/rankAfter was actually produced.
+ * Mirrors BestFitScoreV1.baseRanking.scoreMethod (openspec/changes/
+ * parent-atlas-best-fit-score-fabric/tasks.md, task 4) so this runtime
+ * contract and the future calibrated contract share one vocabulary.
+ */
+export const RERANKER_SCORE_METHODS = [
+  'SIGNAL_BLEND',
+  'LEARNED_MODEL',
+  'CROSS_ENCODER',
+  'RETRIEVAL_ORDER_FALLBACK',
+] as const;
+
+export type RerankerScoreMethod = (typeof RERANKER_SCORE_METHODS)[number];
+
+export const LEARNED_RERANKER_KINDS = ['xgboost', 'lightgbm'] as const;
+export type LearnedRerankerKind = (typeof LEARNED_RERANKER_KINDS)[number];
+
+export const LEARNED_RERANKER_NORMALIZATION_KINDS = ['QUERY_LOCAL_RANK_PERCENTILE'] as const;
+export type LearnedRerankerNormalizationKind = (typeof LEARNED_RERANKER_NORMALIZATION_KINDS)[number];
+
 export const BlendWeightsSchema = z
   .object({
     dense: z.number().min(0).max(1),
@@ -60,6 +81,19 @@ export const RerankCandidateSchema = z.object({
   domainScore: z.number().min(0).max(1).optional(),
   crossEncoderScore: z.number().finite().optional(),
   crossEncoderScoreNormalized: z.number().min(0).max(1).optional(),
+  // Learned-reranker (XGBoost/LightGBM) evidence. Deliberately NOT named
+  // crossEncoder* — a tree-model score is not a cross-encoder score, and
+  // must never be aliased as one (openspec parent-atlas-best-fit-score-fabric
+  // finding FINDING-XGB-01). Never claim `learnedRerankerRawScore` is a
+  // probability: `learnedRerankerCalibrated`/`learnedRerankerIsProbability`
+  // exist specifically to keep that claim explicit and false-by-default.
+  learnedRerankerRawScore: z.number().finite().optional(),
+  learnedRerankerScoreNormalized: z.number().min(0).max(1).optional(),
+  learnedRerankerNormalizationKind: z.enum(LEARNED_RERANKER_NORMALIZATION_KINDS).optional(),
+  learnedRerankerModelRevision: z.string().optional(),
+  learnedRerankerKind: z.enum(LEARNED_RERANKER_KINDS).optional(),
+  learnedRerankerCalibrated: z.boolean().optional(),
+  learnedRerankerIsProbability: z.boolean().optional(),
 });
 
 export type RerankCandidate = z.infer<typeof RerankCandidateSchema>;
@@ -69,6 +103,9 @@ export const RerankedCandidateSchema = RerankCandidateSchema.extend({
   rankAfter: z.number().int().min(1),
   modelVersion: z.string(),
   blendWeights: BlendWeightsSchema,
+  // Optional (not every existing construction site sets it yet) but every
+  // NEW ranking path must populate this — see RerankerScoreMethod above.
+  scoreMethod: z.enum(RERANKER_SCORE_METHODS).optional(),
   evidence: z
     .object({
       semanticLane: z.string().optional(),
@@ -204,6 +241,7 @@ export class DeterministicReranker implements RuntimeReranker {
         rankAfter: 0,
         modelVersion: this.version,
         blendWeights: this.blendWeights,
+        scoreMethod: 'SIGNAL_BLEND' as const,
         evidence: {
           semanticLane: zeroSafeLabel('dense', candidate.denseScore),
           lexicalLane: zeroSafeLabel('bm25', candidate.bm25Score),

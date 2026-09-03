@@ -216,11 +216,14 @@ to test its success branch against.
   real and proven, but the relevant Graphify run is orphaned/stale and cannot supply an
   authoritative completed revision — this is a partial, not full, authority state. Prove full
   source namespace and source-revision authority;
-  the latest read-only source audit independently confirms exact content-hash agreement for all
-  111 observed Graphify rows (`SOURCE_BYTES_MATCH_CONTENT_HASH`, `sourceRevisionPresent: 111`),
-  but that proves content integrity for the observed rows only and does not close the missing
+  the prior bounded read-only source audit independently confirmed exact content-hash agreement
+  for 111 observed Graphify rows, but that proves content integrity for those observed rows only
+  and does not close the missing
   completed-run or authoritative namespace predicates. Evidence:
   `docs/reports/current-graphify-source-revision-v1.json`.
+  The current default-run audit now fails closed when its run ID resolves to zero rows
+  (`SOURCE_AUTHORITY_UNAVAILABLE`, `rowCount: 0`) instead of incorrectly reporting a successful
+  content match. A real run ID must be supplied before any current source authority claim.
   retain fail-closed behavior for missing or placeholder lineage. Consolidated
   from the packet<->chunk lineage program's existing corpus-wide evidence
   (same underlying census, different task label): `graphify_files.workspace_id`
@@ -683,16 +686,50 @@ lineage MEMBERSHIP, not 1:1 identity.
   historical packets promoted from the frozen dry-run artifact (SINGLE/FEW/
   MANY/overlap-with-06), atomic per-packet-set writes, replay-proven
   idempotent under the corrected uniqueness key.
-- [x] PKT-LINEAGE-08 (PROMOTION-01) — **`PASS / PRODUCTION_ENTRYPOINT_PROVEN`** (2026-09-03, authorized
-  bounded success canary completed after the read-only preflight below. The frozen allowlist registered
-  exactly 50 real orphan packets and 434 namespace-qualified `atlas_packet_chunk_lineage` memberships
-  through `scripts/atlas/register-orphaned-chunks.mjs --apply --capture-lineage --source-refs-file=...`.
-  Independent PostgreSQL readback found `packet_count: 50`, `membership_count: 434`, `missing_packets: 0`,
-  and membership checksum `03676a2b03d3736c0ba4dafc082d14cd`. Replaying the same production command
-  resolved 0 new orphans; the subsequent readback preserved the same 50/434 population and checksum.
-  No Qdrant, Neo4j, graph, or Valkey writes occurred. Evidence: `docs/reports/chunk-registration-report.json`,
-  `docs/reports/pkt-lineage-08-eligible-source-refs-v1.json`, and direct SQL readback.
-  **Historical notes below remain retained; their earlier `READY_FOR_AUTHORIZATION` wording is superseded.**
+- [ ] PKT-LINEAGE-08 (PROMOTION-01) — **`IMPLEMENTATION_PROVEN / SUCCESS_CANARY_PENDING`**.
+  The corrected production entrypoint and exact `--source-refs-file` targeting are proven by
+  read-only preflight: 50 real orphan candidates and 434 namespace-qualified memberships are
+  eligible, with `writesPerformed: false`. The latest durable apply receipt records
+  `mode: apply`, `registered: 0`, and `status: no_orphans`; it does not prove that the intended
+  50-packet/434-membership success branch was applied or read back. Keep the gate open until one
+  separately authorized targeted apply produces direct SQL evidence for packet membership,
+  followed by idempotent replay. No Qdrant, Neo4j, graph, or Valkey writes are authorized by the
+  preflight. Evidence: `docs/reports/packet-chunk-lineage-promotion-preflight-v1.json`,
+  `docs/reports/pkt-lineage-08-eligible-source-refs-v1.json`, and the latest
+  `docs/reports/chunk-registration-report.json`.
+  **Historical notes below remain retained; their earlier success-branch claims are superseded.**
+  Fresh read-only preflight after this status correction now reports
+  `BLOCKED_NO_QUALIFIED_CANDIDATE` with `eligibleCandidateCount: 0`. The older 50-source
+  allowlist is therefore stale for current execution and must not be applied or regenerated
+  into a new write scope without a new authoritative preflight and explicit authorization.
+  Direct authority lookup confirms the three remaining files have chunk rows but no matching
+  `graphify_files.workspace_id`/`code_source_revision` and no populated `atlas_source_refs`
+  namespace or commit revision. This is an authority-coverage gap, not a packet-writer defect.
+  A separate manifest check confirms all three are present with `canonicalAdmission: true` and
+  stable content hashes, but the manifest carries no `sourceRevision`. Therefore the next repair
+  is additive source-revision/workspace metadata enrichment for already-admitted files; do not
+  treat manifest presence or content hash alone as sufficient lineage authority.
+  Read-only lifecycle binding confirms the newest completed `graphify_runs` row
+  (`78818366-2410-4643-8e5d-e995c75a2ad5`) has zero `graphify_files` rows attached; the
+  25,317 current file rows remain attached primarily to the older completed run
+  (`369e4270-7689-4536-8816-4ec4a5517b3e`). The source-authority repair must therefore bind
+  file observations to the completed run that actually produced them before PKT-LINEAGE-08
+  can obtain a current qualified candidate. No run or file rows were modified.
+  The bounded run/file census makes the split concrete: completed run
+  `369e4270-7689-4536-8816-4ec4a5517b3e` owns 25,258 file rows, with 25,258 source revisions
+  and content hashes; the four newer completed runs own zero file rows, while 59 additional
+  file rows remain attached to older `RUNNING` runs. This is the current evidence boundary for
+  source authority and must be reconciled before any lineage promotion.
+  Added the read-only validator `scripts/atlas/audit-graphify-run-file-binding-v1.mjs` and
+  receipt `docs/reports/graphify-run-file-binding-v1.json`. Current classification is
+  `COMPLETED_BOUND: 1`, `COMPLETED_UNBOUND: 4`, `RUNNING_BOUND_NOT_TERMINAL: 2`, and
+  `RUNNING_UNBOUND: 3`. A completed bound owner exists, but the lifecycle contract still needs
+  one current run/file binding selected explicitly; no run or file rows were modified.
+  The bound completed owner does not cover the three remaining packet candidates: a direct
+  read-only lookup finds no `graphify_files` rows for any of their `source_ref` values. Their
+  chunk rows and source-manifest entries are therefore insufficient for packet lineage; they
+  require an explicit source-selection/materialization decision before any new Graphify owner
+  can be claimed.
   Historical preflight history (2026-09-03, re-run after
   `LINEAGE-01` closed — see below; was `BLOCKED_NO_ELIGIBLE_CANDIDATE` as of 2026-09-02). Was
   **`BLOCKED_NO_ELIGIBLE_CANDIDATE`** (2026-09-02, status
@@ -3221,6 +3258,41 @@ with exact-match, changed, missing, ambiguous, revision-unproven, workspace-matc
 and workspace-mismatch/source-exact counts, plus a deterministic selection checksum
 and `writesPerformed=false`. Do not run the existing v1 builder again until this gate
 is repaired.
+
+The current lifecycle-owner audit remains `GRAPHIFY_RUN_OWNER_BLOCKED`: the expected
+workspace revision resolves to the stale `RUNNING` run `14643371-f6f2-4131-906b-235a5c06619a`
+with no `completed_at`, while the newer completed run is not bound to the current
+`graphify_files` rows. Do not close, supersede, or rewrite either run implicitly; the
+owner decision must be explicit before regenerating the projection cohort or exercising
+`PKT-LINEAGE-08`.
+
+## GRAPHIFY-RUN-IDENTITY-SEPARATION-01 (2026-09-03, read-only finding)
+
+- [ ] Separate workspace snapshot identity from execution identity before further lifecycle repair.
+  `workspaceRevision` remains a deterministic source-manifest identity and may be reused when
+  bytes are unchanged; `runId`, `startedAt`, `completedAt`, and environment metadata identify one
+  execution attempt and must be fresh per attempt.
+- [x] Read-only code audit found `sveltekit-frontend/scripts/atlas/materialize-graphify-source-inventory.mts`
+  uses `ON CONFLICT (workspace_id, workspace_revision, parser_contract_version) DO UPDATE`,
+  which can reuse a logical snapshot row instead of creating a new execution receipt. The schema
+  contains the corresponding uniqueness boundary in
+  `sveltekit-frontend/drizzle/manual/20260822_graphify_revision_authority_v2.sql`.
+- [x] Transaction tracing confirms the returned `run_id` from that upsert is then passed into
+  every `graphify_files.first_seen_run_id`/`last_seen_run_id` write and used by the file readback.
+  Therefore a repeat over identical bytes can refresh an existing logical run and relabel file
+  observations under the reused execution ID; this is the concrete run/snapshot coupling to fix.
+- [x] Current run/file census is consistent with this finding: one completed run owns the main
+  file population, newer completed runs have zero file rows, and some file rows remain tied to
+  non-terminal runs. No historical rows were changed.
+- [ ] Design the smallest additive execution-receipt separation. Preserve snapshot deduplication
+  explicitly, but never substitute a reused snapshot/run row for a fresh execution receipt. Any
+  migration or historical reconciliation requires separate authorization and readback evidence.
+- [x] Added an unapplied migration draft,
+  `drizzle/manual/20260903_graphify_execution_identity_v1.sql`, containing an additive
+  `graphify_execution_receipts` table and nullable `graphify_files.execution_id` binding. It
+  preserves existing UUID/run/file history and does not alter the current unique snapshot index.
+  The draft is not registered/applied and requires a disposable-DB contract test plus explicit
+  migration authorization before use.
 
 ## REMAINING-TASK-PRIORITY-AND-HELPERS-01 (30 unchecked items)
 

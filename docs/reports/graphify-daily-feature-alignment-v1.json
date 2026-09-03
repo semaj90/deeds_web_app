@@ -1,6 +1,6 @@
 {
   "schema": "atlas.graphify-daily-feature-alignment.v1",
-  "generatedAt": "2026-09-03T20:32:49.589Z",
+  "generatedAt": "2026-09-03T21:22:03.858Z",
   "readOnly": true,
   "scope": {
     "table": "codebase_chunk_index",

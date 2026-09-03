@@ -65,6 +65,12 @@ try {
     hasEvidenceSpan: ['start_byte', 'end_byte'].every((name) => names.includes(name)) || ['byte_start', 'byte_end'].every((name) => names.includes(name)),
     hasSourceNamespace: names.includes('source_namespace'),
   }]));
+  const chunkColumns = new Set(byTable.get('codebase_chunk_index') ?? []);
+  const chunkSourceRevision = chunkColumns.has('source_revision')
+    ? 'source_revision'
+    : chunkColumns.has('code_source_revision')
+      ? 'code_source_revision'
+      : 'NULL::text';
 
   const graphify = await pool.query(`
     SELECT source_ref, source_revision, code_source_revision, workspace_revision, content_hash
@@ -90,11 +96,12 @@ try {
     SELECT lower(regexp_replace(regexp_replace(btrim(source_ref), '\\\\', '/', 'g'), '^\\./', '')) AS source_ref,
            count(*)::integer AS chunk_count,
            count(*) FILTER (WHERE content IS NOT NULL AND btrim(content) <> '')::integer AS content_count,
-           count(*) FILTER (WHERE content_hash IS NOT NULL)::integer AS hash_count
+           count(*) FILTER (WHERE content_hash IS NOT NULL)::integer AS hash_count,
+           ${chunkSourceRevision} AS source_revision
     FROM public.codebase_chunk_index
     WHERE source_ref = ANY($1::text[]) OR source_ref = ANY($2::text[])
        OR lower(source_ref) = ANY($3::text[]) OR lower(source_ref) = ANY($4::text[])
-    GROUP BY 1
+    GROUP BY 1, ${chunkSourceRevision}
   `, [rawRefs, rawPrefixedRefs, refs, prefixedRefs]);
   const chunkByRef = new Map(chunks.rows.map((row) => [normalize(row.source_ref), row]));
   for (const row of chunks.rows) chunkByRef.set(normalize(row.source_ref).replace(/^sveltekit-frontend\//, ''), row);
@@ -103,9 +110,11 @@ try {
     if (!chunk) { addReason('CANONICAL_CHUNK_OWNER_MISSING'); continue; }
     if (Number(chunk.content_count) === 0) { addReason('CHUNK_CONTENT_MISSING'); continue; }
     if (Number(chunk.hash_count) === 0) { addReason('CHUNK_CONTENT_HASH_MISSING'); continue; }
-    addReason('CHUNK_OWNER_HAS_CONTENT_BUT_NO_SOURCE_REVISION');
+    report.contentHydrated += 1;
+    const chunkRevision = String(chunk.source_revision ?? '').trim();
+    if (!chunkRevision) { addReason('CHUNK_OWNER_HAS_CONTENT_BUT_NO_SOURCE_REVISION'); continue; }
+    if (chunkRevision !== String(binding.sourceRevision)) { addReason('CHUNK_OWNER_SOURCE_REVISION_MISMATCH'); }
   }
-  report.contentHydrated = 0;
   const astRows = await pool.query(`
     SELECT lower(relative_path) AS source_ref, source_revision, source_content_hash,
            start_byte, end_byte

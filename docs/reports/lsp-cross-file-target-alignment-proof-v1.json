@@ -1,0 +1,61 @@
+{
+  "schema": "atlas.lsp-cross-file-target-alignment-proof.v1",
+  "gate": "LSP-CROSS-FILE-TARGET-PROOF-01",
+  "generatedAt": "2026-09-03T22:18:12.172Z",
+  "status": "NOT_PROVEN",
+  "writes": false,
+  "canonicalAuthority": false,
+  "sourceRef": "scripts/atlas/lib/compiler-semantic-resolver-v1.mjs",
+  "sourceRevision": "sha256:f0c3d81471a8ce28850b2ef066c3ac7897f999d0e8e184d5d21730613e45128e",
+  "probeSymbol": "spawnLspServer",
+  "sourcePosition": {
+    "byteOffset": 1095,
+    "line": 20,
+    "character": 9
+  },
+  "resolutionStatus": "RESOLVED_IN_REPO",
+  "targetUri": "file:///c%3A/Users/james/Videos/deeds-web-app/scripts/atlas/lib/compiler-semantic-resolver-v1.mjs",
+  "targetRange": {
+    "start": {
+      "line": 20,
+      "character": 9
+    },
+    "end": {
+      "line": 20,
+      "character": 23
+    }
+  },
+  "targetIsSameFileAsSource": true,
+  "targetIsExpectedFile": false,
+  "expectedTargetSourceRef": "scripts/atlas/lib/lsp-jsonrpc-client.mjs",
+  "targetByteAlignment": {
+    "target_source_ref": "scripts/atlas/lib/compiler-semantic-resolver-v1.mjs",
+    "target_source_revision": "sha256:f0c3d81471a8ce28850b2ef066c3ac7897f999d0e8e184d5d21730613e45128e",
+    "position_encoding": "utf-16",
+    "target_range": {
+      "start": {
+        "line": 20,
+        "character": 9
+      },
+      "end": {
+        "line": 20,
+        "character": 23
+      }
+    },
+    "target_byte_range": {
+      "byte_start": 1095,
+      "byte_end": 1109
+    },
+    "target_selection_range": null,
+    "target_selection_byte_range": null,
+    "canonical_authority": false,
+    "target_content_checksum": "sha256:f0c3d81471a8ce28850b2ef066c3ac7897f999d0e8e184d5d21730613e45128e",
+    "target_text": "spawnLspServer"
+  },
+  "targetByteAlignmentError": null,
+  "targetTextMatchesByteSlice": true,
+  "jsonRpcContentEncoding": "utf-8",
+  "lspPositionEncoding": "utf-16",
+  "atlasCoordinateSpace": "UTF8_BYTES",
+  "error": null
+}

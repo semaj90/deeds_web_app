@@ -143,18 +143,191 @@ should be re-checked if any assumed the old (buggy) meaning.
       safe, not assumed. Full `candidate-scorer.spec.ts` suite: 13/13 passing, live-run.
       `npx tsgo --noEmit` clean on `candidate-scorer.ts`.
 
-## 3. XGBOOST-RERANK-ACTIVATION-01 (not started)
+## 3. XGBOOST-RERANK-ACTIVATION-01 (CORRECTED EXECUTION PLAN — in progress, 2026-09-03)
 
-- [ ] 3.1 Fix `canonical-rerank-executor.ts:487-501` so the XGBoost score actually contributes to
-      `blendedScore` (either via a real non-zero `crossEncoder` weight when the XGBoost path is
-      active, or a dedicated blend signal — the exact mechanism is an open design choice, not
-      decided here).
-- [ ] 3.2 Prove the fix actually changes candidate ordering on a real query (a live before/after
-      ranking comparison, not just a code read) — until then, keep classifying this path
-      `LEARNED_SCORE_OBSERVED_NOT_RANKING_ACTIVE`, per finding 0.7 above.
-- [ ] 3.3 Update `parent-atlas-retrieval-lineage-dag-convergence/tasks.md`'s `XGBOOST-RERANKER-EVAL-01`
+**Superseded the original 3.1** ("give crossEncoder a non-zero weight for xgbScore"): that fix was
+rejected before being applied. Two independent problems with it, both verified against live code/
+receipts, not assumed: (1) the deployed sidecar's artifact is `objective: reg:squarederror`
+(training receipt `NDCG@10=0.9624`, `MRR@10=0.9624`) with no probability calibration — a raw
+regression prediction has no `[0,1]` semantics, so blending it as if it were a normalized signal
+is a category error, and a future `rank:ndcg`/`rank:pairwise` artifact would be a ranking score,
+not a probability, either. (2) the sidecar's feature vector (`cosine_score`, `bm25_rank_norm`,
+`ann_turbovec_score`, `pagerank_score`, `domain_class_match`, `trace_score`, ...) already consumes
+dense/bm25/graph/pagerank/domain as inputs — re-blending the model's own output against those same
+signals in `blendScores()` double-counts evidence the model was trained to weigh itself.
+Architecture instead: XGBoost is a **distinct fallback ranker** behind CrossEncoder (matches
+`canonical-rerank-executor.ts`'s own docstring lifecycle: "attempt CrossEncoder" → "run XGBoost
+fallback"), never a `crossEncoder`-weight blend input.
+
+- [x] 3.1 XGBOOST-SCORE-CONTRACT-01 — DONE. `scripts/atlas/serve-xgboost-reranker.py`'s `/health`
+      now reports `modelType`, `modelRevision` (sha256 of the loaded model file), `objective`
+      (read from the booster's own config, not guessed), `featureSchemaRevision` (sha256 of the
+      ordered `FEATURE_COLS` list), `scoreSemantics` (`REGRESSION_SCORE` | `RANKING_SCORE` |
+      `UNKNOWN_SCORE_SEMANTICS`, derived from the objective prefix), and `calibrated: false`
+      (always — this sidecar performs no probability calibration). `/score` returns `rawScores`
+      (contract-correct name) with `scores` kept as a temporary compatibility alias, plus the same
+      identity fields per-response. Fails closed (HTTP 409) on a caller-asserted
+      `expectedFeatureSchemaRevision` mismatch, and fails closed (HTTP 500) on a row-count
+      mismatch or any non-finite (NaN/Infinity) prediction — never silently returns a partial or
+      poisoned score array.
+- [x] 3.2 STOP ALIASING XGBOOST AS CROSS-ENCODER — DONE. `runtime-reranker.ts`'s
+      `RerankCandidateSchema`/`RerankedCandidateSchema` gained dedicated
+      `learnedRerankerRawScore`, `learnedRerankerScoreNormalized`,
+      `learnedRerankerNormalizationKind` (only value so far: `QUERY_LOCAL_RANK_PERCENTILE`),
+      `learnedRerankerModelRevision`, `learnedRerankerKind` (`xgboost` | `lightgbm`),
+      `learnedRerankerCalibrated`, `learnedRerankerIsProbability` fields. `crossEncoderScore` /
+      `crossEncoderScoreNormalized` are now written ONLY by the real cross-encoder path
+      (`MixedbreadCanonicalReranker`) — `canonical-rerank-executor.ts`'s old
+      `scoreWithXgboostSidecar()` (which wrote `crossEncoderScore: xgbScore` at the old
+      lines 487-501 cited in finding 0.7) was deleted, not patched, and replaced by
+      `computeLearnedRerankerOrder()` + `resolveLearnedRerankerFallback()`.
+- [x] 3.3 EXECUTION MODE — DONE. `XGBOOST_RERANK_MODE` env var (`off` | `shadow` | `active`,
+      resolved per-call — not memoized at module load, so it's testable and doesn't need a
+      process restart to change), default `shadow`. `off`: sidecar never called. `shadow`: sidecar
+      called, learned-reranker order computed, a `XGBOOST-SHADOW-EVAL-01` receipt emitted to
+      Redis list `atlas:xgboost:shadow:receipts` (best-effort, non-fatal, capped at 5000 entries)
+      — but the computed order is discarded, never affecting what's served. `active`: only
+      meaningful once a shadow-eval gate passes (3.5 below, not yet run); the learned reranker's
+      own order becomes the CrossEncoder-unavailable fallback ranking.
+- [x] 3.4 XGBOOST IS THE FALLBACK RANKER, NOT A BLEND INPUT — DONE. In `active` mode, candidates
+      are ranked directly by descending `learnedRerankerRawScore` (tie-break: `retrievedRank` then
+      `packetKey`) — no `blendScores()` call against dense/bm25/graph/etc. `scoreMethod:
+      'LEARNED_MODEL'` is set on every learned-reranker-ranked candidate (new
+      `RerankerScoreMethod` vocabulary added to `runtime-reranker.ts`:
+      `SIGNAL_BLEND | LEARNED_MODEL | CROSS_ENCODER | RETRIEVAL_ORDER_FALLBACK`, matching
+      `BestFitScoreV1.baseRanking.scoreMethod` in task 4 below so the two contracts share one
+      vocabulary; also back-filled onto `DeterministicReranker`, `MixedbreadCanonicalReranker`,
+      `localFallbackRerank`, and `retrievalOrderFallback`'s existing outputs).
+      `learnedRerankerScoreNormalized` is a query-local rank percentile
+      (`1 - rankIndex/(n-1)`) used only for the `blendedScore` display/cache field — explicitly
+      NOT a claim that the raw score is a `[0,1]` probability (`learnedRerankerCalibrated: false`,
+      `learnedRerankerIsProbability: false` always set alongside it). Never named `fitScore`.
+- [x] 3.4b Tests updated in `canonical-rerank-executor.spec.ts`: the two pre-existing tests that
+      asserted the old always-active behavior now explicitly set
+      `XGBOOST_RERANK_MODE=active`/restore it in a `finally`; a new test proves the `shadow`
+      default calls the sidecar (for the receipt) but never lets `xgboost-sidecar` become
+      `provenance.modelVersion`. Full suite: 17/17 passing (`canonical-rerank-executor.spec.ts` +
+      `.test.ts`), `npx tsgo --noEmit` clean on all three touched files.
+- [x] 3.5a XGBOOST-SHADOW-RECEIPT-V1 — DONE. `emitShadowReceipt()` rebuilt to carry BOTH sides
+      of the comparison, not just the challenger: `baseline` (`scoreMethod`, `modelVersion`,
+      `orderedPacketKeys` — computed via `localFallbackRerank()` BEFORE the learned-reranker path
+      runs, so the receipt compares against the EXACT object that ends up served, not a
+      recomputed stand-in) and `challenger` (`scoreMethod: 'LEARNED_MODEL'`, `modelRevision`,
+      `modelKind`, `calibrated: false`, `isProbability: false`, `orderedPacketKeys`, per-candidate
+      `rawScore`/rank). Added `evaluationPopulation: 'CROSS_ENCODER_FALLBACK_ELIGIBLE'` and
+      `eligibilityReason` (`CROSS_ENCODER_ERROR | CROSS_ENCODER_TIMEOUT |
+      CROSS_ENCODER_UNAVAILABLE | POLICY_SELECTED_SHADOW`, classified from the actual CrossEncoder
+      failure message — `POLICY_SELECTED_SHADOW` has no live caller yet, reserved for a future
+      non-error-driven shadow route) — fallback traffic is NOT representative of all Parent Atlas
+      searches, and this tag is what lets a future consumer of these receipts know that.
+      `servedOrderChecksum`/`baselineOrderChecksum`/`challengerOrderChecksum` added; a mismatch
+      between the first two is logged loudly (never thrown — must not affect a request that
+      already succeeded) as the cheap fail-closed proof that shadow inference never leaks into
+      serving.
+- [x] 3.5b Bounded Valkey Stream — DONE. Replaced the `LPUSH`/`LTRIM` list with
+      `XADD atlas:xgboost:shadow:receipts:v1 MAXLEN ~ 10000 * schema ... requestId ...
+      modelRevision ... featureRevision ... objective ... receipt <canonical-json>` — separate
+      searchable fields alongside the full canonical receipt, matching the existing repo pattern
+      (`yjs-provider.ts`, `token-map-service.ts`). `featureRevision`/`objective` are placeholder
+      values (`'unversioned'`/`'unknown'`) until the sidecar's `/health` contract
+      (XGBOOST-SCORE-CONTRACT-01) is plumbed all the way through to this receipt — flagged, not
+      silently faked as real.
+- [x] 3.5c XGBOOST-SHADOW-EVAL-01 — DONE (aggregator built; not yet run against real production
+      traffic — no shadow receipts exist yet outside test fixtures). New, read-only
+      `scripts/atlas/evaluate-xgboost-shadow-receipts.mjs`: `XREVRANGE`s the stream, computes
+      top1Changed rate, top3/top10 overlap, Spearman's rho, `servedOrderIntegrityOk` (must be
+      100% — any violation is a real bug, not noise), and an `eligibilityReason` breakdown.
+      Deliberately emits `promotionVerdict: null` — this script is evidence for
+      XGBOOST-PROMOTION-POLICY-01 to consume, never a promotion decision by itself. Never writes
+      to the stream, never touches `XGBOOST_RERANK_MODE`.
+- [x] 3.5d Tests — DONE. `canonical-rerank-executor.spec.ts`'s shadow-mode test updated: mocks
+      `redis.xadd` (not `lpush`/`ltrim`), asserts the stream key/`MAXLEN ~ 10000` args, and parses
+      the `receipt` field to check `schema`, `evaluationPopulation`, `eligibilityReason`,
+      `servedOrderChecksum === baselineOrderChecksum`, and `challenger.scoreMethod ===
+      'LEARNED_MODEL'`. Also fixed a real (if benign) bug found while doing this: 3 tests'
+      `finally { process.env.XGBOOST_RERANK_MODE = previousMode }` assigned literal JS `undefined`
+      when no prior value existed, which Node coerces to the STRING `"undefined"` — leaked a
+      confusing (harmless, since `resolveXgboostRerankMode()` falls back to `'shadow'` on any
+      unrecognized value) warning into every later test in the file. Fixed to `delete
+      process.env.XGBOOST_RERANK_MODE` when `previousMode === undefined`. Full suite: 17/17
+      passing, `npx tsgo --noEmit` clean project-wide (3.4b full unfiltered run — the 88
+      pre-existing errors it surfaced elsewhere, e.g. missing `fastmcp`/`piper-wasm`/
+      `@playwright/test` and unrelated `QdrantClient` type mismatches, are all confirmed
+      pre-existing and untouched by this task).
+- [x] 3.6a XGBOOST-OBJECTIVE-METRIC-ALIGNMENT-01 — DONE, live-verified in
+      `scripts/atlas/train-xgboost-reranker.py`. **The qid/group blocker below was already
+      resolved before this task started** — verified live: `train_xgboost()` already accepts
+      `qid_train`/`qid_val` and calls `dtrain.set_info(qid=...)`/`dval.set_info(qid=...)` when a
+      ranking objective is selected, fed by `split_rows_by_trace()` → `build_ranking_dataset()` →
+      `prepare_grouped_ranking_dataset_v1()`. What was NOT yet fixed, and now is: the training
+      `eval_metric` was hardcoded to `'rmse'` even for `rank:ndcg`/`rank:pairwise` runs — a
+      LambdaMART objective judged by RMSE during training/early-stopping is not a fair comparison
+      basis. Now: `eval_metric = ['ndcg@5', 'ndcg@10']` + `lambdarank_pair_method = 'topk'` +
+      `lambdarank_num_pair_per_sample = 10` for ranking objectives (topk/10 targets NDCG@10, the
+      same pattern XGBoost's own docs use for an NDCG@6 target with num_pair_per_sample=6);
+      `eval_metric = 'rmse'` unchanged for `reg:squarederror`. The FINAL ranking evaluation
+      (`evaluate_ranking()`, replacing `evaluate_ndcg()` as the primary path — old name kept as a
+      backward-compatible wrapper) now always reports NDCG@5, NDCG@10, and MRR@10 regardless of
+      training objective, PLUS per-trace metrics (not just the aggregate) so a future comparison
+      can catch a challenger that improves the average while damaging a query subset. Live-verified
+      both objectives end-to-end on the real 101,708-row/930-trace corpus (CPU device, to avoid a
+      GPU dependency in the smoke test): `reg:squarederror` → NDCG@10=0.9516; `rank:ndcg` →
+      NDCG@10=0.9516 (see 3.6b candidate outputs for the actual model files this produced).
+      **Second real bug found and fixed during this live verification, not caught by reading the
+      code alone**: `rank:ndcg`'s default gain function (`ndcg_exp_gain=True`, i.e. `2^label - 1`)
+      requires an integer relevance grade and failed closed with `XGBoostError: ... label must be
+      either 0 or positive integer` against this corpus's real `label` column, which is a
+      continuous `[0,1]` float, not a discrete grade. Fixed per XGBoost's own documented guidance
+      for this exact case ("Adjust this parameter is required when...the label is not a discrete
+      grade"): added `ndcg_exp_gain: False` for ranking objectives, which uses the raw label value
+      directly as gain. Confirmed via a full re-run: `rank:ndcg` now trains and evaluates cleanly
+      end-to-end on the real corpus (xgboost 3.2.0).
+- [x] 3.6b Immutable candidate outputs — DONE. Added `models/xgboost-candidates/` +
+      `--promote` flag (default `false`). Without `--promote` (now the default for every
+      invocation, including the previously-documented plain `python train-xgboost-reranker.py`
+      usage): the trained model saves ONLY to
+      `models/xgboost-candidates/<objective-slug>-<datasetRev>-<modelRev>.ubj` (dataset/model
+      revisions are sha256-derived, content-addressed — `dataset_rev` from the feature CSV's
+      bytes, `model_rev` from the saved model file's own bytes) and the report saves ONLY to
+      `docs/reports/xgboost-objective-<slug>-<modelRev>.json`; `models/xgboost-reranker.ubj` and
+      `docs/reports/xgboost-training-report.json` (what the live sidecar and dev server default
+      to) are never touched. With `--promote`: the candidate file is additionally copied to the
+      canonical path and the canonical report is additionally written — an explicit, separate,
+      logged step (`PROMOTED: <path>`), never implicit. Graph-manifest invalidation
+      (`_invalidate_graph_manifest`) now fires only on an actual promotion, not on every candidate
+      run — it was previously firing on every gate-pass regardless of whether the canonical model
+      changed, which was itself a latent correctness bug this task's re-plumbing exposed and fixed.
+      **Live-verified, not just read**: ran a real (non-dry-run) `reg:squarederror` training pass
+      before and after — confirmed via `md5sum` that `models/xgboost-reranker.ubj`'s checksum
+      (`bf9f48c068ca0f93fed5a84b7da564fb`) was byte-identical before and after the run, while a new
+      candidate file (`reg-squarederror-f40d36559bfcd65b-6fa8f826aebfc58f.ubj`) and candidate
+      report (`docs/reports/xgboost-objective-reg-squarederror-6fa8f826aebfc58f.json`, `promoted:
+      false`) were created. This directly satisfies "do not activate globally and do not overwrite
+      the current xgboost-reranker.ubj."
+- [ ] 3.6c XGBOOST-OBJECTIVE-COMPARE-01 (not started — the actual frozen reg:squarederror vs
+      rank:ndcg comparison run + report). 3.6a/3.6b are prerequisites for this, not this task
+      itself — deliberately stopped here per explicit instruction not to proceed into the
+      comparison in this pass.
+- [ ] 3.7 Update `parent-atlas-retrieval-lineage-dag-convergence/tasks.md`'s `XGBOOST-RERANKER-EVAL-01`
       gate to reference this task and its distinct scope (future training-eval vs. this session's
-      already-deployed-path bug) before that gate starts.
+      already-deployed-path bug, now fixed) before that gate starts.
+- [ ] 3.8 XGBOOST-PROMOTION-POLICY-01 (not started) — freeze `XgboostPromotionPolicyV1` semantics
+      (candidateSetIdentical, featureSchemaMatched, predictionCountMatched, finitePredictions,
+      deterministicReplay, primaryMetric=NDCG_AT_10, noStatisticallyCredibleRegression,
+      modelRevisionRequired, datasetRevisionRequired, automaticPromotion=false, shadowRequired=true,
+      canaryRequired=true) BEFORE looking at 3.6c's comparison results — do not freeze a numeric
+      regression threshold (e.g. "NDCG must improve 3%") until real labeled-query variance is known.
+- [ ] 3.9 XGBOOST-CANARY-01 (not started) — deterministic bucketing (`hash(requestId) % 10000 <
+      configuredBasisPoints`, never `Math.random()`, so replay is reproducible), staged 1% → 5% →
+      10% rollout, one-switch rollback (`XGBOOST_RERANK_MODE=shadow`, no model mutation required).
+- [x] 3.8 Phase-lane registry reconciliation — checked, no change needed.
+      `sveltekit-frontend/src/lib/server/atlas/phase-lane-registry.ts:264-277` (phase 18, "XGBoost
+      / gradient tree boosting reranker") already correctly says `status: 'partial'`, `nextGate:
+      'keep the reranker as a mock-only evaluation surface'`. This task does not contradict that:
+      default mode is `shadow`, not `active` — no production promotion is being claimed by 3.1-3.4,
+      so the registry's mock-only characterization stays accurate. Do not flip it to
+      `'implemented'` until 3.5 passes and `XGBOOST_RERANK_MODE=active` is actually deployed
+      somewhere.
 
 ## 4. BestFitScoreV1 contract (designed, NOT implemented)
 

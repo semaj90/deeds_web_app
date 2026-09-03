@@ -1,6 +1,6 @@
 {
   "schema": "atlas.graphify-embedding-qdrant-projection.v1",
-  "generatedAt": "2026-09-03T20:32:48.882Z",
+  "generatedAt": "2026-09-03T21:22:02.871Z",
   "apply": false,
   "sourceColumn": "content_embedding_768",
   "representationId": "semantic_768",
@@ -56,5 +56,5 @@
   },
   "errors": [],
   "sample": [],
-  "elapsedMs": 145
+  "elapsedMs": 219
 }

@@ -382,45 +382,125 @@ describe('canonical rerank executor', () => {
     expect(same).not.toEqual(differentScope);
   });
 
-  it('falls back to the XGBoost lane when the cross-encoder fails', async () => {
-    const get = vi.fn().mockResolvedValue(null);
-    const setex = vi.fn().mockResolvedValue('OK');
-    const del = vi.fn().mockResolvedValue(1);
-    mockGetRedis.mockReturnValue({ get, setex, del });
+  it('falls back to the learned reranker (XGBoost) lane when the cross-encoder fails, ' +
+    'in XGBOOST_RERANK_MODE=active', async () => {
+    const previousMode = process.env.XGBOOST_RERANK_MODE;
+    process.env.XGBOOST_RERANK_MODE = 'active';
+    try {
+      const get = vi.fn().mockResolvedValue(null);
+      const setex = vi.fn().mockResolvedValue('OK');
+      const del = vi.fn().mockResolvedValue(1);
+      mockGetRedis.mockReturnValue({ get, setex, del });
 
-    mockRerankWithCrossEncoder.mockRejectedValue(new Error('crossencoder unavailable'));
+      mockRerankWithCrossEncoder.mockRejectedValue(new Error('crossencoder unavailable'));
 
-    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
-      const url = String(input);
-      if (url.endsWith('/health')) {
-        return new Response(JSON.stringify({ status: 'healthy' }), { status: 200 });
-      }
-      if (url.endsWith('/score')) {
-        return new Response(JSON.stringify({ scores: [0.88, 0.64], model: 'xgboost-sidecar' }), {
-          status: 200,
-        });
-      }
-      return new Response('not found', { status: 404 });
-    });
-    vi.stubGlobal('fetch', fetchMock);
+      const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+        const url = String(input);
+        if (url.endsWith('/health')) {
+          return new Response(
+            JSON.stringify({
+              status: 'ok',
+              model_loaded: true,
+              modelType: 'xgboost',
+              modelRevision: 'xgboost-sidecar',
+              objective: 'reg:squarederror',
+              scoreSemantics: 'REGRESSION_SCORE',
+              calibrated: false,
+            }),
+            { status: 200 },
+          );
+        }
+        if (url.endsWith('/score')) {
+          return new Response(
+            JSON.stringify({ rawScores: [0.88, 0.64], modelType: 'xgboost', modelRevision: 'xgboost-sidecar', calibrated: false }),
+            { status: 200 },
+          );
+        }
+        return new Response('not found', { status: 404 });
+      });
+      vi.stubGlobal('fetch', fetchMock);
 
-    const ranked = await rerankCanonicalFeatureEnvelopes('find canonical rerank', [...envelopes], {
-      authScope: 'scope-a',
-      rendererVersion: 'renderer-v1',
-      maxLength: 256,
-      topK: 20,
-    });
+      const ranked = await rerankCanonicalFeatureEnvelopes('find canonical rerank', [...envelopes], {
+        authScope: 'scope-a',
+        rendererVersion: 'renderer-v1',
+        maxLength: 256,
+        topK: 20,
+      });
 
-    expect(mockRerankWithCrossEncoder).toHaveBeenCalledTimes(1);
-    expect(ranked.provenance.crossEncoderAttempted).toBe(true);
-    expect(ranked.provenance.crossEncoderUsed).toBe(false);
-    expect(ranked.provenance.fallbackUsed).toBe(true);
-    expect(ranked.provenance.fallbackReason).toBe('crossencoder_unavailable');
-    // Sidecar's real model identity is retained so reports can distinguish
-    // true XGBoost scores from the local weighted fallback.
-    expect(ranked.results[0]?.model_version).toBe('xgboost-sidecar');
-    expect(setex).toHaveBeenCalledTimes(1);
-    expect(fetchMock).toHaveBeenCalledTimes(2);
+      expect(mockRerankWithCrossEncoder).toHaveBeenCalledTimes(1);
+      expect(ranked.provenance.crossEncoderAttempted).toBe(true);
+      expect(ranked.provenance.crossEncoderUsed).toBe(false);
+      expect(ranked.provenance.fallbackUsed).toBe(true);
+      expect(ranked.provenance.fallbackReason).toBe('crossencoder_unavailable');
+      // Sidecar's real model identity is retained so reports can distinguish true
+      // learned-reranker scores from the local weighted fallback. It is NOT stored
+      // as a crossEncoderScore (FINDING-XGB-01) — only in the dedicated
+      // learnedReranker* fields, with scoreMethod: 'LEARNED_MODEL'.
+      expect(ranked.results[0]?.model_version).toBe('xgboost-sidecar');
+      expect((ranked.results[0] as any).cross_encoder_score).toBeUndefined();
+      expect(setex).toHaveBeenCalledTimes(1);
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+    } finally {
+      if (previousMode === undefined) delete process.env.XGBOOST_RERANK_MODE; else process.env.XGBOOST_RERANK_MODE = previousMode;
+    }
+  });
+
+  it('does NOT let the learned reranker affect served ranking in the default ' +
+    '(shadow) mode, but still calls the sidecar to emit an evaluation receipt', async () => {
+    const previousMode = process.env.XGBOOST_RERANK_MODE;
+    delete process.env.XGBOOST_RERANK_MODE; // exercise the real default
+    try {
+      const get = vi.fn().mockResolvedValue(null);
+      const setex = vi.fn().mockResolvedValue('OK');
+      const del = vi.fn().mockResolvedValue(1);
+      const xadd = vi.fn().mockResolvedValue('1-0');
+      mockGetRedis.mockReturnValue({ get, setex, del, xadd });
+
+      mockRerankWithCrossEncoder.mockRejectedValue(new Error('crossencoder unavailable'));
+
+      const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+        const url = String(input);
+        if (url.endsWith('/health')) {
+          return new Response(
+            JSON.stringify({ status: 'ok', model_loaded: true, modelType: 'xgboost', modelRevision: 'xgboost-sidecar' }),
+            { status: 200 },
+          );
+        }
+        if (url.endsWith('/score')) {
+          return new Response(JSON.stringify({ rawScores: [0.88, 0.64], modelType: 'xgboost' }), { status: 200 });
+        }
+        return new Response('not found', { status: 404 });
+      });
+      vi.stubGlobal('fetch', fetchMock);
+
+      const ranked = await rerankCanonicalFeatureEnvelopes('find canonical rerank', [...envelopes], {
+        authScope: 'scope-a',
+        rendererVersion: 'renderer-v1',
+        maxLength: 256,
+        topK: 20,
+      });
+
+      // Sidecar was consulted (for the shadow receipt) ...
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+      expect(xadd).toHaveBeenCalledTimes(1);
+      const xaddArgs = xadd.mock.calls[0];
+      expect(xaddArgs[0]).toBe('atlas:xgboost:shadow:receipts:v1');
+      expect(xaddArgs.slice(1, 4)).toEqual(['MAXLEN', '~', 10_000]);
+      const receiptFieldIndex = xaddArgs.indexOf('receipt');
+      const receiptPayload = JSON.parse(xaddArgs[receiptFieldIndex + 1]);
+      expect(receiptPayload.schema).toBe('atlas.xgboost-shadow-receipt.v1');
+      expect(receiptPayload.evaluationPopulation).toBe('CROSS_ENCODER_FALLBACK_ELIGIBLE');
+      expect(receiptPayload.eligibilityReason).toBe('CROSS_ENCODER_UNAVAILABLE');
+      expect(receiptPayload.servedOrderChecksum).toBe(receiptPayload.baselineOrderChecksum);
+      expect(receiptPayload.challenger.scoreMethod).toBe('LEARNED_MODEL');
+      expect(receiptPayload.challenger.isProbability).toBe(false);
+      // ... but did NOT become the served ranking — falls through to the local
+      // weighted fallback, never 'xgboost-sidecar'.
+      expect(ranked.results[0]?.model_version).not.toBe('xgboost-sidecar');
+      expect(ranked.provenance.fallbackUsed).toBe(true);
+    } finally {
+      if (previousMode === undefined) delete process.env.XGBOOST_RERANK_MODE; else process.env.XGBOOST_RERANK_MODE = previousMode;
+    }
   });
 });
 
@@ -540,25 +620,42 @@ describe('rerank fail-open contract (Session 188)', () => {
   });
 
   it('missing content does not throw (n_concepts derives from sourceRef/packetKey)', async () => {
-    const input = makeEnvelopes(5).map((env) => ({ ...env, content: undefined }));
-    mockRerankWithCrossEncoder.mockRejectedValue(new Error('unavailable'));
-    // Sidecar reachable this time so the feature mapper actually runs
-    vi.stubGlobal('fetch', vi.fn().mockImplementation(async (rawInput: any) => {
-      const url = String(rawInput);
-      if (url.endsWith('/health')) return new Response(JSON.stringify({ status: 'healthy' }), { status: 200 });
-      if (url.endsWith('/score')) {
-        return new Response(JSON.stringify({ scores: [0.9, 0.8, 0.7, 0.6, 0.5], model: 'xgboost-sidecar' }), { status: 200 });
-      }
-      return new Response('not found', { status: 404 });
-    }));
+    // Explicitly force the learned-reranker fallback active so this test still exercises the
+    // feature mapper end-to-end (the default is shadow mode, which never lets the sidecar's
+    // order become the served ranking — see the dedicated shadow-mode test above).
+    const previousMode = process.env.XGBOOST_RERANK_MODE;
+    process.env.XGBOOST_RERANK_MODE = 'active';
+    try {
+      const input = makeEnvelopes(5).map((env) => ({ ...env, content: undefined }));
+      mockRerankWithCrossEncoder.mockRejectedValue(new Error('unavailable'));
+      // Sidecar reachable this time so the feature mapper actually runs
+      vi.stubGlobal('fetch', vi.fn().mockImplementation(async (rawInput: any) => {
+        const url = String(rawInput);
+        if (url.endsWith('/health')) {
+          return new Response(
+            JSON.stringify({ status: 'ok', model_loaded: true, modelType: 'xgboost', modelRevision: 'xgboost-sidecar' }),
+            { status: 200 },
+          );
+        }
+        if (url.endsWith('/score')) {
+          return new Response(
+            JSON.stringify({ rawScores: [0.9, 0.8, 0.7, 0.6, 0.5], modelType: 'xgboost', modelRevision: 'xgboost-sidecar' }),
+            { status: 200 },
+          );
+        }
+        return new Response('not found', { status: 404 });
+      }));
 
-    const output = await rerankCanonicalFeatureEnvelopes('test', input, {
-      cachePolicy: 'disabled',
-    });
+      const output = await rerankCanonicalFeatureEnvelopes('test', input, {
+        cachePolicy: 'disabled',
+      });
 
-    expect(output.results).toHaveLength(5);
-    expect(output.provenance.fallbackUsed).toBe(true);
-    expect(output.provenance.modelVersion).toBe('xgboost-sidecar');
+      expect(output.results).toHaveLength(5);
+      expect(output.provenance.fallbackUsed).toBe(true);
+      expect(output.provenance.modelVersion).toBe('xgboost-sidecar');
+    } finally {
+      if (previousMode === undefined) delete process.env.XGBOOST_RERANK_MODE; else process.env.XGBOOST_RERANK_MODE = previousMode;
+    }
   });
 
   it('threads policy provenance through the empty-input fast path', async () => {
