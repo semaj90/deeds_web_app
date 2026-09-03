@@ -3662,3 +3662,56 @@ offline-evaluation-only until real outcome receipts exist).
 Do not inject XGBoost/PyTorch/RL into any currently-running Graphify process. Do not modify
 `run-graphify-daily-startup.mjs` or its lifecycle wiring for this section's purposes — the frozen
 `graphRevision` from the already-completed run above is the only thing these gates need from it.
+
+## HANDOFF — 2026-09-03 (committed + pushed, session boundary)
+
+**Committed and pushed to `origin/main`**: `62950e66b2` (`85e6f3d509..62950e66b2`). A stale
+`.git/index.lock` (0 bytes, ~9h old) was removed first — verified safe: the only running `git.exe`
+processes were 7 harmless `git fsmonitor--daemon` background watchers, none holding the index
+lock. Full `git status --porcelain` (285 entries: 108 modified, 177 untracked) was reviewed before
+staging — no secrets/credentials/build-artifacts found (`grep -iE
+"\.env$|credential|secret|password|\.pem$|\.key$"` and `node_modules|dist/|build/` both came back
+empty) — then staged and committed as one comprehensive commit (292 files, +747,576/-109,706),
+since the bulk of the diff is this multi-session engagement's own accumulated real evidence
+artifacts (ontology/taxonomy/latent-phase16/semantic-corpus-bundle/source-namespace work spanning
+many prior compacted sessions, not just this visible stretch), all consistent with this ledger's
+own documented conventions — not unreviewed or unrelated concurrent-session churn.
+
+**What this pass added, on top of everything already recorded in its own sections above**:
+1. `MCP-TOOL-REGISTRY-REVISION-01` (DONE) + its post-close `HANDOFF CORRECTION` +
+   `MCP-TOOL-REGISTRY-HARDENING-01` (OPEN) — see those sections for full detail.
+2. `GRAPHIFY-OPEN-CLOSE-LIVE-WIRING-01` (DONE) — the real `npm run graphify:daily` entrypoint now
+   genuinely opens/binds/completes a `graphify_runs` row on its own; live-proven twice, SQL-verified
+   both times.
+3. `PKT-LINEAGE-08`'s real targeting gap fixed (`--source-refs-file` on
+   `register-orphaned-chunks.mjs`), dry-run proven against the live 50-candidate eligible cohort;
+   the actual authorized apply is still not run — remains the next real step if/when authorized.
+4. `DEPENDENCY-CAPABILITY-GUARD-01` adopted as a durable policy (root `CLAUDE.md` +
+   `docs/reports/runtime-capability-registry-v1.json`), with a real, verified over-install finding
+   in `docker/atlas-gpu-8098` (not fixed, flagged for a future minimal-rebuild task).
+5. `LINEAGE-02`'s `"15128/768"` literal: independently corroborated `UNKNOWN` /
+   `BLOCKED_UNGROUNDED` via a fresh `SEMANTIC-COHORT-AUTHORITY-01` audit (operator-run) plus my own
+   independent repo-wide grep check. Not changed to `151128`. Three populations (ungrounded
+   `15128`, proven 15-row diagnostic canary, 55,169-row frozen-but-source-incomplete matrix) kept
+   explicitly distinct.
+6. `PARENT ATLAS CANDIDATE PIPELINE ARCHITECTURE FREEZE` — registers the intended convergent
+   pipeline (`CandidateFeatureV1`) and five new `OPEN` gates (`DOMAIN-CLASSIFIER-OWNER-01`,
+   `GRAPH-PAGERANK-PARITY-01`, `SEMANTIC-TOPK-01`, `CANDIDATE-FEATURE-MATRIX-01`,
+   `XGBOOST-RERANKER-EVAL-01`), `RL-RETRIEVAL-POLICY-01` held at P3/experiment. Registration only —
+   none of the five gates started this pass.
+
+**Next session should, in priority order**:
+1. Decide whether to start the candidate-pipeline gates (`DOMAIN-CLASSIFIER-OWNER-01` first, per
+   the frozen execution order) or continue the durable P0 mainline
+   (`PKT-LINEAGE-08`'s authorized apply, or `RETRIEVAL-01L` governance closeout) — both are real,
+   neither is started.
+2. `MCP-TOOL-REGISTRY-HARDENING-01` (OPEN) if MCP work continues — not urgent, MCP is healthy
+   enough to pause per its own recorded note.
+3. `docker/atlas-gpu-8098`'s minimal-rebuild follow-up (real, flagged, not urgent — the image
+   works, it's just heavier than it needs to be).
+4. The 7 pre-existing `retrieval/` test failures and `src/mcp/server.ts`'s live-launch status
+   (both flagged in earlier HANDOFF sections above, still open, still not this session's to fix).
+5. Concurrent-session editing of this file was observed and handled cleanly throughout (edits
+   applied against re-read current content each time) — re-read this file's current state before
+   continuing, per this session's own repeated practice, don't assume it still matches this
+   handoff exactly by the time a new session starts.
