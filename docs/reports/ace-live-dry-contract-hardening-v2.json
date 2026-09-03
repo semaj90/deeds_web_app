@@ -1,0 +1,78 @@
+{
+  "schema": "atlas.ace-live-dry-contract-hardening.v2",
+  "status": "IMPLEMENTED_NOT_EXECUTED",
+  "branch": "chatgpt/server-feature-bundle-alignment-v2",
+  "changes": {
+    "sharedInputContract": {
+      "path": "sveltekit-frontend/src/lib/server/atlas/context/ace-live-dry-input-v2.ts",
+      "status": "IMPLEMENTED",
+      "schema": "atlas.ace-live-dry-input.v2",
+      "rejectsIsoTimestampRevisions": true,
+      "selectedOrdinalValidation": true,
+      "graphEvidenceRevisionDerivation": true,
+      "semanticOnlyGraphNullPolicy": true
+    },
+    "replayHarness": {
+      "path": "scripts/atlas/prove-ace-live-dry-v2.mts",
+      "status": "USES_SHARED_CONTRACT",
+      "duplicateInputSchemaRemoved": true,
+      "graphAdmissionUsesSharedOwner": true,
+      "syntheticTimestampRevisionFallback": false
+    },
+    "readinessAudit": {
+      "path": "scripts/atlas/audit-ace-live-dry-input-readiness-v2.mts",
+      "status": "HARDENED_NOT_EXECUTED",
+      "constructsSealedServerFeatureBundle": true,
+      "verifiesCandidateSourceAuthority": true,
+      "verifiesSnapshotAndOrdinalIdentity": true,
+      "fabricatesMissingAuthority": false
+    },
+    "inputMaterializer": {
+      "path": "scripts/atlas/materialize-ace-live-dry-input-v2.mts",
+      "status": "IMPLEMENTED_NOT_EXECUTED",
+      "requiresRetrievalPolicyRevision": true,
+      "requiresAcePlaybookRevision": true,
+      "requiresRepresentationRevision": true,
+      "optionalOntologyModelPromptRevisionsRemainCallerOwned": true,
+      "derivesGraphRevisionFromAdmittedRows": true,
+      "validatesSealedBundleBeforeWritingInput": true,
+      "databaseWritesPerformed": false,
+      "qdrantWritesPerformed": false,
+      "graphWritesPerformed": false,
+      "cacheWritesPerformed": false,
+      "canonicalAuthority": false
+    },
+    "focusedTests": {
+      "path": "sveltekit-frontend/src/lib/server/atlas/context/ace-live-dry-input-v2.spec.ts",
+      "status": "WRITTEN_NOT_EXECUTED",
+      "cases": [
+        "explicit non-timestamp revisions accepted",
+        "ISO timestamp policy revision rejected",
+        "graph evidence resolves one exact graph revision",
+        "semantic-only canary requires graphRevision null",
+        "graph revision without graph evidence rejected"
+      ]
+    }
+  },
+  "workstationSequence": [
+    "npm --prefix sveltekit-frontend exec -- vitest run src/lib/server/atlas/context/ace-live-dry-input-v2.spec.ts src/lib/server/atlas/retrieval/search-runtime-feature-bundle-provider-v1.spec.ts src/lib/server/atlas/rlm/rlm-runtime.spec.ts src/lib/server/atlas/context/ace-context-manifest-admission-v1.spec.ts --pool=forks --maxWorkers=1 --minWorkers=1",
+    "npm exec -- tsx scripts/atlas/materialize-ace-golden-feature-snapshot-v1.mts",
+    "npm exec -- tsx scripts/atlas/materialize-ace-revision-authority-v1.mts -- --ordinal-map .tmp/atlas/ace-golden-candidate-map-v1.json",
+    "npm exec -- tsx scripts/atlas/audit-ace-live-dry-input-readiness-v2.mts -- --ordinal-map .tmp/atlas/ace-golden-candidate-map-v1.json --snapshot .tmp/atlas/ace-candidate-feature-snapshot-v1.json --revision-authority .tmp/atlas/ace-revision-authority-envelope-v1.json",
+    "npm exec -- tsx scripts/atlas/materialize-ace-live-dry-input-v2.mts -- --ordinal-map .tmp/atlas/ace-golden-candidate-map-v1.json --snapshot .tmp/atlas/ace-candidate-feature-snapshot-v1.json --revision-authority .tmp/atlas/ace-revision-authority-envelope-v1.json --request-id <request-id> --token-budget <n> --retrieval-policy-revision <authoritative-revision> --ace-playbook-revision <authoritative-revision> --representation-revision <authoritative-revision>",
+    "npm exec -- tsx scripts/atlas/prove-ace-live-dry-v2.mts -- --input .tmp/atlas/ace-live-dry-input-v2.json",
+    "openspec validate parent-atlas-ace-rlm-bitfrost-integration --type change --strict --json"
+  ],
+  "notClaimed": [
+    "focused tests passed",
+    "materializers executed on workstation",
+    "frozen workspace authority reproduced",
+    "ACE_LIVE_DRY_REPLAY_PROVEN",
+    "live OaK replay",
+    "BitFrost live replay",
+    "LangGraph checkpoint/HITL"
+  ],
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "nextGate": "WORKSTATION_EXECUTE_SHARED_CONTRACT_TESTS_THEN_FROZEN_FEATURE_AND_AUTHORITY_MATERIALIZERS"
+}

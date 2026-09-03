@@ -1,7 +1,8 @@
+import { z } from 'zod';
 import { canonicalSha256V1 } from '../prefill/canonical-hash-v1.js';
 import {
   buildContextManifestV2,
-  type ContextManifestV2,
+  ContextManifestV2Schema,
 } from '../graph/context-manifest-v2.js';
 import { chooseCandidateBucket, type ContextManifestV1 } from '../graph/graph-runtime-contracts.js';
 import {
@@ -23,12 +24,16 @@ export interface AceContextManifestAdmissionInputV1 {
   graphRevision: string | null;
 }
 
-export interface AceContextManifestAdmissionV1 {
-  manifest: ContextManifestV2;
-  selectedOrdinalSetChecksum: string;
-  sourceRevisionSetChecksum: string;
-  canonicalAuthority: false;
-}
+const sha256 = z.string().regex(/^[a-f0-9]{64}$/);
+
+export const aceContextManifestAdmissionV1Schema = z.object({
+  manifest: ContextManifestV2Schema,
+  selectedOrdinalSetChecksum: sha256,
+  sourceRevisionSetChecksum: sha256,
+  canonicalAuthority: z.literal(false),
+}).strict();
+
+export type AceContextManifestAdmissionV1 = z.infer<typeof aceContextManifestAdmissionV1Schema>;
 
 /**
  * Converts an already validated candidate-feature snapshot into the existing
@@ -84,10 +89,10 @@ export function buildAceContextManifestAdmissionV1(
     retrievalPolicyRevision: input.retrievalPolicyRevision,
     acePlaybookRevision: input.acePlaybookRevision,
   });
-  return {
+  return aceContextManifestAdmissionV1Schema.parse({
     manifest,
     selectedOrdinalSetChecksum,
     sourceRevisionSetChecksum,
     canonicalAuthority: false,
-  };
+  });
 }
