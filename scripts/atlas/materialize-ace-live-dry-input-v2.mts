@@ -5,6 +5,7 @@ import {
   aceLiveDryInputV2Schema,
   resolveAceLiveDryGraphRevisionV2,
   selectedAceLiveDryRowsV2,
+  validateAceLiveDryCanaryV2,
 } from '../../sveltekit-frontend/src/lib/server/atlas/context/ace-live-dry-input-v2.js';
 import { candidateOrdinalMapV1Schema } from '../../sveltekit-frontend/src/lib/server/atlas/features/canonical-candidate-v1.js';
 import { candidateFeatureSnapshotV1Schema } from '../../sveltekit-frontend/src/lib/server/atlas/features/candidate-feature-snapshot-v1.js';
@@ -143,9 +144,6 @@ async function main() {
 
   const provisional = aceLiveDryInputV2Schema.parse(partial);
   const selectedRows = selectedAceLiveDryRowsV2(provisional);
-  if (selectedRows.length !== args.expectedCandidateCount) {
-    throw new Error(`ACE_LIVE_DRY_INPUT_SELECTED_COUNT_MISMATCH:${selectedRows.length}:${args.expectedCandidateCount}`);
-  }
   const graphRevision = resolveAceLiveDryGraphRevisionV2(selectedRows);
   const input = aceLiveDryInputV2Schema.parse({
     ...partial,
@@ -154,6 +152,7 @@ async function main() {
       graphRevision,
     },
   });
+  const canary = validateAceLiveDryCanaryV2(input);
 
   const output = resolve(args.output);
   const reportPath = resolve(args.report);
@@ -167,14 +166,15 @@ async function main() {
     output,
     requestId: input.ace.requestId,
     expectedCandidateCount: input.expectedCandidateCount,
-    selectedCandidateCount: selectedRows.length,
+    selectedCandidateCount: canary.selectedRows.length,
     workspaceRevision: input.ordinalMap.workspaceRevision,
     candidateSnapshotRevision: input.ordinalMap.candidateSnapshotRevision,
     ordinalMapChecksum: input.ordinalMap.ordinalMapChecksum,
     snapshotChecksum: input.snapshot.snapshotChecksum,
     revisionAuthorityChecksum: input.revisionAuthority.authorityChecksum,
     bundleLogicalChecksum: bundle.bundleLogicalChecksum,
-    graphRevision,
+    graphAdmissionMode: canary.graphAdmissionMode,
+    graphRevision: canary.graphRevision,
     callerOwnedRevisions: {
       retrievalPolicyRevision: input.ace.retrievalPolicyRevision,
       acePlaybookRevision: input.ace.acePlaybookRevision,
@@ -183,6 +183,7 @@ async function main() {
       modelRevision: input.ace.modelRevision ?? null,
       promptTemplateRevision: input.ace.promptTemplateRevision ?? null,
     },
+    sharedCanaryValidation: true,
     syntheticTimestampRevisionsRejected: true,
     writesPerformed: false,
     databaseWritesPerformed: false,
