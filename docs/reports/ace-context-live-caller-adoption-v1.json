@@ -1,6 +1,6 @@
 {
   "schema": "atlas.ace-context-live-caller-adoption.v1",
-  "generatedAt": "2026-09-02T03:06:50.347Z",
+  "generatedAt": "2026-09-03T02:04:18.492Z",
   "mode": "READ_ONLY_SOURCE_CENSUS",
   "callers": [
     {
@@ -77,6 +77,13 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/atlas/graph/context-manifest-v2.ts",
+      "classification": "STRICT_V2_WIRED",
+      "matched": [
+        "ContextManifestV2"
+      ]
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/retrieval/search-runtime-adapter.ts",
       "classification": "STRICT_V2_WIRED",
       "matched": [
         "ContextManifestV2"
@@ -232,7 +239,7 @@
   "counts": {
     "LEGACY_QUERY_CACHE": 21,
     "STRICT_V2_CAPABLE": 0,
-    "STRICT_V2_WIRED": 8,
+    "STRICT_V2_WIRED": 9,
     "DIAGNOSTIC_ONLY": 2,
     "DEAD": 0
   },

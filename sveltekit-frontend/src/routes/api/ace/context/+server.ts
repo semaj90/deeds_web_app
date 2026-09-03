@@ -1,10 +1,10 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
-import { ENV } from '$lib/server/env.server.js';
 import { generateEmbeddings } from '$lib/server/grpc/embedding-client.js';
 import { ACE_POLICIES, selectACEPolicy } from '$lib/server/types/ace.js';
 import type { ACEContextChunk, ACEPolicyTier } from '$lib/server/types/ace.js';
+import { searchQdrantCodeStrictV1, type QdrantCodeResult } from '$lib/server/search/qdrant-search.js';
 
 const contextSchema = z.object({
   query: z.string().min(1).max(4000),
@@ -60,30 +60,13 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     const embResult = await generateEmbeddings([query]);
     const vector = embResult.vectors[0];
 
-    // 3. Search Qdrant for initial candidates (extra headroom for reranking)
+    // 3. Search through the governed canonical semantic owner. This route is
+    // deliberately fail-closed: a Qdrant or canonical hydration failure must
+    // not become an apparently successful empty ACE context.
     const qdrantLimit = policy.maxChunks * 2;
-    const searchResp = await fetch(
-      `${ENV.QDRANT_URL}/collections/codebase_chunks_768/points/query`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          query: vector,
-          using: 'content',
-          limit: qdrantLimit,
-          with_payload: true,
-        }),
-        signal: AbortSignal.timeout(8000),
-      }
-    );
-
-    let qdrantResults: Record<string, unknown>[] = [];
-    if (searchResp.ok) {
-      const searchData = await searchResp.json();
-      qdrantResults = searchData?.result?.points ?? searchData?.points ?? [];
-    } else {
-      console.warn('[ace/context] Qdrant search failed:', searchResp.status);
-    }
+    const qdrantResults: QdrantCodeResult[] = await searchQdrantCodeStrictV1(vector, qdrantLimit, {
+      exactVectorSearch: true,
+    });
 
     // 4. Optionally fetch Neo4j graph neighbors when policy requires it
     let graphNeighborCount = 0;
@@ -118,20 +101,18 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     const chunks: ACEContextChunk[] = qdrantResults
       .slice(0, policy.maxChunks)
       .map((r) => {
-        const payload = (r.payload as Record<string, unknown>) ?? {};
-        const rawContent = String(payload.content ?? payload.text ?? '');
-        const content = rawContent.slice(0, policy.maxCharsPerChunk);
-        const filePath = String(payload.file_path ?? '');
+        const content = r.content.slice(0, policy.maxCharsPerChunk);
+        const filePath = r.file_path;
         const isGraphNeighbor = neighborFilePaths.has(filePath);
         return {
-          id: String(r.id),
-          score: Number(r.score ?? 0),
+          id: r.qdrant_id,
+          score: r.semantic_score,
           source: 'qdrant' as const,
           file_path: filePath || undefined,
           content,
-          summary: payload.summary ? String(payload.summary) : undefined,
-          tags: Array.isArray(payload.tags) ? (payload.tags as string[]) : [],
-          som_cluster: payload.som_cluster != null ? Number(payload.som_cluster) : null,
+          summary: undefined,
+          tags: r.tags ? r.tags.split(',').map((tag) => tag.trim()).filter(Boolean) : [],
+          som_cluster: r.som_cluster != null ? Number(r.som_cluster) : null,
           graph_distance: isGraphNeighbor ? 1 : null,
           authority_score: null,
         };
@@ -160,6 +141,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       totalTokensEstimated: 0,
       graphNeighborCount: 0,
       durationMs: Math.round(performance.now() - t0),
-    });
+      errorCode: err instanceof Error ? err.message : 'ACE_CONTEXT_EXECUTION_FAILED',
+    }, { status: 502 });
   }
 };

@@ -1,0 +1,55 @@
+{
+  "schemaVersion": "mcp-tool-routing-ace-bitfrost-gap.v1",
+  "status": "EXISTING_COMPONENTS_FOUND_INTEGRATION_OPEN",
+  "registryObservation": {
+    "path": "docs/reports/mcp-tool-registry-index.json",
+    "generatedAt": "2026-08-22T20:48:42.883Z",
+    "totalTools": 327,
+    "traceTools": 175,
+    "manifestTools": 190,
+    "contentRevision": null,
+    "contentChecksum": null,
+    "staleForLiveAdmission": true
+  },
+  "deepAudit": {
+    "atlasToolsSmoke": {"status":"PASS","checks":10,"failures":0,"evidence":"scripts/opencode/smoke-atlas-tools-mcp.mjs"},
+    "bitfrostTrackingCapability": {"status":"PROVEN_CONNECTION_CAPABILITY","evidence":"scripts/atlas/prove-bitfrost-tracking.mts"},
+    "traceStaticAudit": {"registeredTools":119,"report":"docs/TRACE-MCP-TOOLS-AUDIT.json"},
+    "registryParity": {
+      "status":"CATALOG_DRIFT",
+      "listedWithoutHandler":0,
+      "handlerWithoutListing":22,
+      "crossFileDuplicateNames":7,
+      "evidence":"docs/reports/parent-atlas-mcp-tool-registry-parity.json",
+      "impact":"The MCP surface is callable, but one catalog cannot yet be treated as the exact revisioned selection authority"
+    }
+  },
+  "existingOwners": {
+    "mcpToolRegistry": ["scripts/atlas/lib/tool-registry.mjs", "scripts/atlas/build-mcp-tool-registry-index.mjs"],
+    "traceMcp": ["sveltekit-frontend/src/mcp/trace-mcp-server.ts", "scripts/audit-trace-mcp-tools.mjs"],
+    "ruleBasedToolSelector": "sveltekit-frontend/src/lib/server/retrieval/hmm-tool-selector.ts",
+    "kBestViterbiDecoder": "sveltekit-frontend/src/lib/server/analysis/k-best-viterbi.ts",
+    "runtimeToolSelector": "scripts/atlas/runtime-mcp-tool-selector.mjs",
+    "acePacketAssembly": "scripts/atlas/ace-packet-assembly.mjs"
+  },
+  "reusePolicy": {
+    "createNewAceCache": false,
+    "createNewBitfrostCache": false,
+    "createNewCentroidStore": false,
+    "createSecondToolRegistry": false
+  },
+  "gaps": [
+    {"code":"VITERBI_NOT_WIRED_TO_TOOL_SELECTION","evidence":"k-best-viterbi.ts is generic and independent; hmm-tool-selector.ts documents rule-based MVP/future Viterbi"},
+    {"code":"TOOL_SELECTOR_LEGACY_QDRANT_PATH","evidence":"runtime-mcp-tool-selector.mjs and ai/tool-selection.ts query tool manifests directly; governed strict SearchRuntime binding is not proven"},
+    {"code":"TOOL_MANIFEST_REVISION_ADMISSION_MISSING","evidence":"tool selection output has no frozen registry revision/checksum contract"},
+    {"code":"MCP_REGISTRY_STALE_OR_UNVERSIONED","evidence":"mcp-tool-registry-index.json is generated_at=2026-08-22T20:48:42.883Z and exposes no content revision/checksum","impact":"Viterbi proposals cannot yet prove they selected against the current TRACE/atlas-tools surface"},
+    {"code":"ACE_BITFROST_IS_NOT_TOOL_AUTHORITY","evidence":"ACE assembly writes context packets/cache; it does not own MCP tool identity or authorization"},
+    {"code":"CENTROID_TOOL_ROUTING_UNPROVEN","evidence":"no live revision-qualified centroid family is proven for MCP tool selection"},
+    {"code":"MCP_EXECUTION_ADMISSION_SEPARATE","evidence":"selection routes a proposal; tool execution still requires registry lookup, permission, and read/write policy checks"}
+    ,{"code":"MCP_REGISTRY_CATALOG_DRIFT","evidence":"registry parity found 22 handler-without-listing entries and 7 cross-file duplicate tool names","impact":"Resolve catalog ownership/duplicates before live Viterbi selection is promoted"}
+  ],
+  "targetFlow": "NLP observations -> bounded Viterbi proposal -> revisioned MCP registry validation -> selected read-only tools -> SearchRuntime/ACE ContextManifest -> TRACE/atlas-tools execution",
+  "requiredInvariants": ["unknown tool fails closed", "selection is not execution", "ACE/BitFrost remain context cache only", "canonicalAuthority=false", "writesPerformed=false"],
+  "writesPerformed": false,
+  "canonicalAuthority": false
+}

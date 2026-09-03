@@ -1,0 +1,209 @@
+{
+  "schema": "atlas.sem768-8081-capacity-01.v1",
+  "generatedAt": "2026-09-02T19:15:37.322Z",
+  "sampleSize": 2000,
+  "sampleSource": "codebase_chunk_index.summary ORDER BY id LIMIT 2000 (same frozen sample as SEM768-EXECUTOR-BENCH-01)",
+  "embedUrl": "http://127.0.0.1:8081",
+  "timeoutMs": 15000,
+  "levels": [
+    {
+      "concurrency": 1,
+      "timeoutMs": 15000,
+      "rows": 2000,
+      "success": 2000,
+      "failure": 0,
+      "successRatePct": 100,
+      "elapsedMs": 23462,
+      "throughputPerSec": 85.25,
+      "p50Ms": 10.83,
+      "p95Ms": 15.66,
+      "p99Ms": 24.92,
+      "errorBreakdown": {
+        "TIMEOUT": 0,
+        "CONNECTION": 0,
+        "HTTP_ERROR": 0,
+        "INVALID_VECTOR": 0,
+        "OTHER": 0
+      },
+      "vramBefore": {
+        "usedMb": 7510,
+        "freeMb": 515
+      },
+      "vramAfter": {
+        "usedMb": 7546,
+        "freeMb": 479
+      }
+    },
+    {
+      "concurrency": 2,
+      "timeoutMs": 15000,
+      "rows": 2000,
+      "success": 2000,
+      "failure": 0,
+      "successRatePct": 100,
+      "elapsedMs": 15456,
+      "throughputPerSec": 129.4,
+      "p50Ms": 14.43,
+      "p95Ms": 19.8,
+      "p99Ms": 25.82,
+      "errorBreakdown": {
+        "TIMEOUT": 0,
+        "CONNECTION": 0,
+        "HTTP_ERROR": 0,
+        "INVALID_VECTOR": 0,
+        "OTHER": 0
+      },
+      "vramBefore": {
+        "usedMb": 7546,
+        "freeMb": 479
+      },
+      "vramAfter": {
+        "usedMb": 7449,
+        "freeMb": 576
+      }
+    },
+    {
+      "concurrency": 4,
+      "timeoutMs": 15000,
+      "rows": 2000,
+      "success": 2000,
+      "failure": 0,
+      "successRatePct": 100,
+      "elapsedMs": 11072,
+      "throughputPerSec": 180.64,
+      "p50Ms": 18.81,
+      "p95Ms": 28.66,
+      "p99Ms": 141.85,
+      "errorBreakdown": {
+        "TIMEOUT": 0,
+        "CONNECTION": 0,
+        "HTTP_ERROR": 0,
+        "INVALID_VECTOR": 0,
+        "OTHER": 0
+      },
+      "vramBefore": {
+        "usedMb": 7449,
+        "freeMb": 576
+      },
+      "vramAfter": {
+        "usedMb": 7465,
+        "freeMb": 560
+      }
+    },
+    {
+      "concurrency": 8,
+      "timeoutMs": 15000,
+      "rows": 2000,
+      "success": 2000,
+      "failure": 0,
+      "successRatePct": 100,
+      "elapsedMs": 9772,
+      "throughputPerSec": 204.67,
+      "p50Ms": 30.39,
+      "p95Ms": 42.73,
+      "p99Ms": 57.54,
+      "errorBreakdown": {
+        "TIMEOUT": 0,
+        "CONNECTION": 0,
+        "HTTP_ERROR": 0,
+        "INVALID_VECTOR": 0,
+        "OTHER": 0
+      },
+      "vramBefore": {
+        "usedMb": 7464,
+        "freeMb": 561
+      },
+      "vramAfter": {
+        "usedMb": 7477,
+        "freeMb": 548
+      }
+    },
+    {
+      "concurrency": 12,
+      "timeoutMs": 15000,
+      "rows": 2000,
+      "success": 2000,
+      "failure": 0,
+      "successRatePct": 100,
+      "elapsedMs": 10056,
+      "throughputPerSec": 198.89,
+      "p50Ms": 36.41,
+      "p95Ms": 64.82,
+      "p99Ms": 85.66,
+      "errorBreakdown": {
+        "TIMEOUT": 0,
+        "CONNECTION": 0,
+        "HTTP_ERROR": 0,
+        "INVALID_VECTOR": 0,
+        "OTHER": 0
+      },
+      "vramBefore": {
+        "usedMb": 7477,
+        "freeMb": 548
+      },
+      "vramAfter": {
+        "usedMb": 7462,
+        "freeMb": 563
+      }
+    },
+    {
+      "concurrency": 16,
+      "timeoutMs": 15000,
+      "rows": 2000,
+      "success": 2000,
+      "failure": 0,
+      "successRatePct": 100,
+      "elapsedMs": 9928,
+      "throughputPerSec": 201.44,
+      "p50Ms": 47.24,
+      "p95Ms": 86.08,
+      "p99Ms": 111.9,
+      "errorBreakdown": {
+        "TIMEOUT": 0,
+        "CONNECTION": 0,
+        "HTTP_ERROR": 0,
+        "INVALID_VECTOR": 0,
+        "OTHER": 0
+      },
+      "vramBefore": {
+        "usedMb": 7462,
+        "freeMb": 563
+      },
+      "vramAfter": {
+        "usedMb": 7468,
+        "freeMb": 557
+      }
+    },
+    {
+      "concurrency": 20,
+      "timeoutMs": 15000,
+      "rows": 2000,
+      "success": 2000,
+      "failure": 0,
+      "successRatePct": 100,
+      "elapsedMs": 10185,
+      "throughputPerSec": 196.38,
+      "p50Ms": 59.67,
+      "p95Ms": 118.29,
+      "p99Ms": 148.7,
+      "errorBreakdown": {
+        "TIMEOUT": 0,
+        "CONNECTION": 0,
+        "HTTP_ERROR": 0,
+        "INVALID_VECTOR": 0,
+        "OTHER": 0
+      },
+      "vramBefore": {
+        "usedMb": 7468,
+        "freeMb": 557
+      },
+      "vramAfter": {
+        "usedMb": 7444,
+        "freeMb": 581
+      }
+    }
+  ],
+  "highestZeroFailureConcurrency": 20,
+  "recommendation": "Freeze bulk backfill concurrency at 20 (highest level with 0/2000 failures)",
+  "writesPerformed": false
+}

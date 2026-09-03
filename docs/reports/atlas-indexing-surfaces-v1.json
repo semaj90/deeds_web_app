@@ -1,6 +1,6 @@
 {
   "schema": "atlas.indexing-surfaces.v1",
-  "generatedAt": "2026-08-30T20:38:53.989Z",
+  "generatedAt": "2026-09-02T18:07:50.376Z",
   "readOnly": true,
   "canonicalAuthority": "postgres",
   "ast": {
@@ -48,7 +48,7 @@
     "tables": {
       "atlas_packets": {
         "exists": true,
-        "count": 61660
+        "count": 61661
       },
       "codebase_chunk_index": {
         "exists": true,
@@ -64,7 +64,7 @@
       },
       "atlas_symbol_registry": {
         "exists": true,
-        "count": 10305
+        "count": 10310
       },
       "atlas_symbol_versions": {
         "exists": true,
@@ -487,7 +487,7 @@
       },
       "symbolRegistryActive": {
         "exists": true,
-        "count": 10255
+        "count": 10260
       }
     },
     "bitmapTables": [],
@@ -1742,7 +1742,7 @@
           }
         },
         "points": 52380,
-        "indexedVectors": 52380,
+        "indexedVectors": 56419,
         "status": "green"
       },
       {
@@ -2045,8 +2045,8 @@
             "distance": "Cosine"
           }
         },
-        "points": 834,
-        "indexedVectors": 834,
+        "points": 831,
+        "indexedVectors": 831,
         "status": "green"
       },
       {
@@ -2097,8 +2097,8 @@
   },
   "drizzle": {
     "journalEntries": 41,
-    "manualSqlFiles": 261,
-    "declaredSidecars": 51,
+    "manualSqlFiles": 263,
+    "declaredSidecars": 52,
     "untrackedManualFiles": [
       "0009_hybrid_graph_indexes.sql",
       "0010_distilled_table_store.sql",

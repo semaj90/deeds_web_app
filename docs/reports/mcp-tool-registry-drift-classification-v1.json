@@ -1,0 +1,52 @@
+{
+  "schemaVersion": "mcp-tool-registry-drift-classification.v1",
+  "status": "CLASSIFIED_NO_REGISTRATION_CHANGES",
+  "generatedFrom": [
+    "docs/reports/parent-atlas-mcp-tool-registry-parity.json",
+    "sveltekit-frontend/src/mcp/server.ts",
+    "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
+    "sveltekit-frontend/src/lib/server/atlas/atlas-semantic-tools.ts",
+    "sveltekit-frontend/src/lib/server/mcp/phase109a-mcp-tools.ts"
+  ],
+  "invariants": {
+    "publicRegistryEdits": 0,
+    "datastoreWrites": 0,
+    "canonicalPromotion": false,
+    "currentAuthorityCount": 1
+  },
+  "unlistedHandlerClassification": [
+    { "name": "identity:quarantine", "classification": "PRIVATE", "reason": "Older stdio dispatcher-only handler; emits operator-queue-shaped output and is not publicly listed." },
+    { "name": "identity:recover", "classification": "PRIVATE", "reason": "Older dispatcher-only recovery seam; not exposed in the public tool list." },
+    { "name": "envelope:validate", "classification": "PRIVATE", "reason": "Older dispatcher-only validation seam; public validation ownership is elsewhere." },
+    { "name": "mirror:sync_qdrant", "classification": "LEGACY", "reason": "Mutation-capable mirror handler absent from the public list; Qdrant remains a rebuildable projection." },
+    { "name": "mirror:sync_neo4j", "classification": "LEGACY", "reason": "Mutation-capable mirror handler absent from the public list; Neo4j remains a derived projection." },
+    { "name": "graph:expand", "classification": "LEGACY", "reason": "Dispatcher placeholder describes production Cypher but returns synthesized counts; not suitable as a public executor." },
+    { "name": "retrieval:rerank", "classification": "LEGACY", "reason": "Dispatcher placeholder returns a fixed score and is not the SearchRuntime fusion owner." },
+    { "name": "answer:synthesize", "classification": "LEGACY", "reason": "Dispatcher placeholder returns a synthesized string and is not the active synthesis owner." },
+    { "name": "escalation:route", "classification": "PRIVATE", "reason": "Dispatcher-only operator escalation seam; not publicly listed and has queue side-effect semantics." },
+    { "name": "atlas.discover", "classification": "DELEGATED_CANONICAL", "reason": "Public definition is spread from ATLAS_SEMANTIC_TOOL_DEFINITIONS; parity scanner sees the dispatch branch, not the imported registration." },
+    { "name": "atlas.retrieve", "classification": "DELEGATED_CANONICAL", "reason": "Public definition is spread from ATLAS_SEMANTIC_TOOL_DEFINITIONS and dispatched through handleAtlasSemanticToolCall." },
+    { "name": "atlas.build_context", "classification": "DELEGATED_CANONICAL", "reason": "Public definition is spread from ATLAS_SEMANTIC_TOOL_DEFINITIONS and dispatched through handleAtlasSemanticToolCall." },
+    { "name": "atlas.inspect_runtime", "classification": "DELEGATED_CANONICAL", "reason": "Public definition is spread from ATLAS_SEMANTIC_TOOL_DEFINITIONS and dispatched through handleAtlasSemanticToolCall." },
+    { "name": "atlas.apply_change", "classification": "DELEGATED_CANONICAL", "reason": "Public definition is spread from ATLAS_SEMANTIC_TOOL_DEFINITIONS; implementation remains dry-run/proposal constrained." },
+    { "name": "atlas.validate_change", "classification": "DELEGATED_CANONICAL", "reason": "Public definition is spread from ATLAS_SEMANTIC_TOOL_DEFINITIONS and dispatched through handleAtlasSemanticToolCall." },
+    { "name": "atlas.delegate", "classification": "DELEGATED_CANONICAL", "reason": "Public definition is spread from ATLAS_SEMANTIC_TOOL_DEFINITIONS and dispatched through handleAtlasSemanticToolCall." },
+    { "name": "phase109a_archive_signal", "classification": "DELEGATED_CANONICAL", "reason": "Public definition is spread from getPhase109aToolDefinitions; manual dispatch is an older compatibility path." },
+    { "name": "phase109a_supersede_signal", "classification": "DELEGATED_CANONICAL", "reason": "Public definition is spread from getPhase109aToolDefinitions; manual dispatch is an older compatibility path." },
+    { "name": "phase109a_promote_recommendation", "classification": "DELEGATED_CANONICAL", "reason": "Public definition is spread from getPhase109aToolDefinitions; execution remains authorization-gated by its owner." },
+    { "name": "phase109a_query_signal_history", "classification": "DELEGATED_CANONICAL", "reason": "Public definition is spread from getPhase109aToolDefinitions; manual dispatch is an older compatibility path." },
+    { "name": "phase109a_validate_state_transition", "classification": "DELEGATED_CANONICAL", "reason": "Public definition is spread from getPhase109aToolDefinitions; manual dispatch is an older compatibility path." },
+    { "name": "ldr_research", "classification": "DELEGATED_CANONICAL", "reason": "Public definition is supplied by LDR_RESEARCH_TOOL; the parity scanner does not resolve the imported constant as an array literal." }
+  ],
+  "duplicateNameClassification": [
+    { "name": "atlas.packet_search", "canonical": "trace-mcp-server", "secondary": "mcp-server", "classification": "ALIAS", "reason": "stdio server proxies the TRACE implementation; keep one canonical live owner." },
+    { "name": "atlas.coverage", "canonical": "trace-mcp-server", "secondary": "mcp-server", "classification": "ALIAS", "reason": "same public capability appears on the compatibility stdio surface and canonical TRACE surface." },
+    { "name": "clusters.get_summary_lenses", "canonical": "trace-mcp-server", "secondary": "mcp-server", "classification": "ALIAS", "reason": "TRACE owns the registered live implementation; stdio retains compatibility exposure." },
+    { "name": "wiki.status", "canonical": "trace-mcp-server", "secondary": "mcp-server", "classification": "ALIAS", "reason": "TRACE owns the registered live implementation; stdio retains compatibility exposure." },
+    { "name": "wiki.search", "canonical": "trace-mcp-server", "secondary": "mcp-server", "classification": "ALIAS", "reason": "TRACE owns the registered live implementation; stdio retains compatibility exposure." },
+    { "name": "wiki.explain_page", "canonical": "trace-mcp-server", "secondary": "mcp-server", "classification": "ALIAS", "reason": "TRACE owns the registered live implementation; stdio retains compatibility exposure." },
+    { "name": "wiki.refresh_directory", "canonical": "trace-mcp-server", "secondary": "mcp-server", "classification": "ALIAS", "reason": "TRACE owns the registered live implementation; stdio retains compatibility exposure." }
+  ],
+  "nextGate": "MCP-TOOL-REGISTRY-REVISION-01",
+  "nextGateRule": "Generate a revisioned manifest from the canonical registry and explicit delegated definitions; do not delete or promote drift entries until a compatibility caller census is complete."
+}

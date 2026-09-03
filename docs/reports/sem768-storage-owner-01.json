@@ -1,0 +1,38 @@
+{
+  "gate": "SEM768-STORAGE-OWNER-01",
+  "type": "READ_ONLY_AUDIT",
+  "ranAt": "2026-09-02",
+  "question": "Which column owns semantic_768: codebase_chunk_index.content_embedding, content_embedding_768, or is semantic_768 a column at all?",
+  "findings": {
+    "content_embedding": {
+      "pgType": "halfvec(768)",
+      "populatedRows": 55169,
+      "totalRows": 55853,
+      "hnswIndex": "codebase_chunk_index_content_hnsw (m=16, ef_construction=200)",
+      "drizzleDeclaration": "schema-postgres.ts:4469 halfvec('content_embedding', { dimensions: 768 })",
+      "codeReferences": 23,
+      "verdict": "CANONICAL — matches CLAUDE.md's 2026-08-23 operator-confirmed resolution (semantic_768 primary), largest population, best-tuned HNSW index, referenced by the current canonical schema declaration and the broad atlas retrieval/embedding contract layer"
+    },
+    "content_embedding_768": {
+      "pgType": "vector(768)",
+      "populatedRows": 1386,
+      "totalRows": 55853,
+      "hnswIndex": "idx_codebase_chunk_content_embedding_768_hnsw (m=16, ef_construction=64)",
+      "codeReferences": 2,
+      "referencingFiles": [
+        "src/routes/api/codebase-index/index-stream/+server.ts (writer — legacy streaming indexer, INSERT/UPDATE)",
+        "src/lib/server/features/rag/codebase-context.ts (reader — legacy cosine-search helper)"
+      ],
+      "lastTouched": "2026-08-30",
+      "verdict": "LEGACY / SMALL-FOOTPRINT — a strict small subset (739 of its 1386 rows overlap with content_embedding), fed by exactly one legacy indexing route with no other writers or readers found repo-wide. Not canonical. Do not extend; do not backfill."
+    },
+    "semantic_768": {
+      "isColumn": false,
+      "isRepresentationId": true,
+      "codeReferences": 210,
+      "verdict": "Not a database column — a logical representation identifier used pervasively across the newer Atlas contract/policy layer (embedding-provider-v1.ts, qdrant-collection-contracts.ts, canonical-chunk-contract.ts, semantic-packet-v1.ts, and 200+ others). content_embedding is the Postgres column backing this representation id."
+    }
+  },
+  "conclusion": "No new information contradicts CLAUDE.md's existing documented policy. content_embedding (halfvec(768), 55,169 rows) is confirmed canonical and is what any new SemanticRepresentationV1 persistence contract or 55K-row backfill must target. content_embedding_768 is confirmed dead-end legacy — one route, small population, do not migrate data into it or treat it as a second source of truth. No code changes made; this gate is read-only per its own definition.",
+  "unblocks": ["SEM768-REPRESENTATION-CONTRACT-01", "SEM768-CANONICAL-PERSIST-01"]
+}

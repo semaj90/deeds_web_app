@@ -376,15 +376,22 @@ async function generateViaQuic(texts: string[], timeoutMs = 5000): Promise<Embed
 // When the dedicated embedding server is running (npm run embed:start), route
 // batch embedding through it before Ollama. Uses OpenAI /v1/embeddings shape.
 // Batch size 512 at --ubatch-size 128 gives ~3ms per 512-text batch on GPU.
-
-const LLAMA_EMBED_URL = ENV.OLLAMA_EMBED_BASE_URL?.startsWith('http')
-  ? ENV.OLLAMA_EMBED_BASE_URL          // e.g. http://127.0.0.1:8081
-  : null;
+//
+// EMBED-PROVIDER-CONVERGENCE-01: baseUrl comes from resolveEmbeddingProviderV1()
+// (embedding-provider-v1.ts), not from reading ENV.OLLAMA_EMBED_BASE_URL
+// directly — that direct read was the exact split found live 2026-09-02
+// (this tier used OLLAMA_EMBED_BASE_URL while the /api/embed diagnostic route
+// reported the live server through EMBEDDING_BASE_URL instead).
 
 async function generateViaLlamaEmbed(
   texts: string[],
 ): Promise<number[][] | null> {
-  if (!LLAMA_EMBED_URL) return null;
+  const { resolveEmbeddingProviderV1, checkVectorShapeV1 } = await import(
+    '$lib/server/embedding/embedding-provider-v1.js'
+  );
+  const providerV1 = resolveEmbeddingProviderV1();
+  if (providerV1.provider !== 'llama_cpp_gguf' || !providerV1.baseUrl) return null;
+  const LLAMA_EMBED_URL = providerV1.baseUrl;
   try {
     const res = await fetch(`${LLAMA_EMBED_URL}/v1/embeddings`, {
       method: 'POST',
@@ -396,7 +403,9 @@ async function generateViaLlamaEmbed(
     const data = (await res.json()) as { data?: Array<{ embedding?: number[] }> };
     if (!Array.isArray(data.data) || data.data.length !== texts.length) return null;
     const vectors = data.data.map((d) => d.embedding ?? []);
-    if (vectors.some((v) => v.length !== 768)) return null;
+    // Fail-closed: wrong dimension, non-finite values, or a zero/degenerate
+    // norm all disqualify — not just the plain dimension check.
+    if (vectors.some((v) => !checkVectorShapeV1(v).ok)) return null;
     return vectors;
   } catch {
     return null;
@@ -862,27 +871,32 @@ export async function generateEmbeddings(
     });
   }
 
-  // Tier 1 (fallback, was Tier 0): dedicated OpenAI-compatible embedding endpoint, if configured.
-  if (!newVectors && LLAMA_EMBED_URL) {
-    const llamaStart = performance.now();
-    const llamaVecs = await generateViaLlamaEmbed(uncachedTexts);
-    if (llamaVecs) {
-      newVectors = llamaVecs;
-      source = 'http-ollama';
-      model = 'embeddinggemma-openai-compatible';
-      attempts.push({
-        transport: 'http-ollama',
-        status: 'success',
-        detail: `llama-embed ${LLAMA_EMBED_URL}`,
-        durationMs: Math.round(performance.now() - llamaStart),
-      });
-    } else {
-      attempts.push({
-        transport: 'http-ollama',
-        status: 'failed',
-        detail: `llama-embed ${LLAMA_EMBED_URL} unavailable`,
-        durationMs: Math.round(performance.now() - llamaStart),
-      });
+  // Tier 1 (fallback, was Tier 0): dedicated OpenAI-compatible embedding
+  // endpoint, if resolveEmbeddingProviderV1() says one is configured.
+  if (!newVectors) {
+    const { resolveEmbeddingProviderV1 } = await import('$lib/server/embedding/embedding-provider-v1.js');
+    const providerV1 = resolveEmbeddingProviderV1();
+    if (providerV1.provider === 'llama_cpp_gguf' && providerV1.baseUrl) {
+      const llamaStart = performance.now();
+      const llamaVecs = await generateViaLlamaEmbed(uncachedTexts);
+      if (llamaVecs) {
+        newVectors = llamaVecs;
+        source = 'http-ollama';
+        model = 'embeddinggemma-openai-compatible';
+        attempts.push({
+          transport: 'http-ollama',
+          status: 'success',
+          detail: `llama-embed ${providerV1.baseUrl}`,
+          durationMs: Math.round(performance.now() - llamaStart),
+        });
+      } else {
+        attempts.push({
+          transport: 'http-ollama',
+          status: 'failed',
+          detail: `llama-embed ${providerV1.baseUrl} unavailable`,
+          durationMs: Math.round(performance.now() - llamaStart),
+        });
+      }
     }
   }
 

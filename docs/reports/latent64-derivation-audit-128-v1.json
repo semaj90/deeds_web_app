@@ -1,0 +1,15 @@
+{
+  "schema": "atlas.latent64-derivation-audit.v1",
+  "status": "MATCH",
+  "sampleCount": 128,
+  "modelChecksum": "d6e9395e60f0bb039dd03368012697c5c393d36bb001b8f020b6d7ba22654259",
+  "device": "cuda",
+  "storedMarkers": [
+    "d6e9395e60f0bb039dd03368012697c5c393d36bb001b8f020b6d7ba22654259"
+  ],
+  "maxAbsoluteError": 5.662441253662109e-07,
+  "meanAbsoluteError": 5.080173650640063e-07,
+  "rowChecksum": "sha256:6a2b11d7a98ed727c1d443390b72fd9dbe3f679b2ec99a580ba5cf9066840312",
+  "writesPerformed": false,
+  "canonicalAuthority": false
+}

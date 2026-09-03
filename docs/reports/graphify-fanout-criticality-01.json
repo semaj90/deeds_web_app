@@ -1,0 +1,95 @@
+{
+  "schema": "atlas.graphify-fanout-criticality-01.v1",
+  "generatedAt": "2026-09-03T02:05:11.350Z",
+  "status": "AUDIT_COMPLETE",
+  "classification": "OPTIONAL_DERIVED_REPRESENTATION",
+  "question": "Is atlas:phase16:latent:apply required for canonical Graphify completion?",
+  "producer": {
+    "command": "atlas:phase16:latent:apply",
+    "script": "scripts/atlas/backfill-latent-vectors.mjs",
+    "representationId": "latent_64",
+    "representationFamily": "legacy/diagnostic learned autoencoder family",
+    "inputRepresentation": "semantic_768 / Qdrant codebase_chunks_768 legacy path",
+    "outputDimensions": 64,
+    "durableDestinations": [
+      "atlas_packets.latent_64",
+      "Valkey gpu:autoencoder:latent_64:*",
+      "models/autoencoder/autoencoder_latent_index.json"
+    ],
+    "revisionRequirements": [
+      "workspace revision is accepted by writer but not a canonical graph completion predicate",
+      "representation/checkpoint metadata"
+    ],
+    "writesCanonicalState": true,
+    "writesValkeyState": true,
+    "legacyUnsafeApplyGuardPresent": true
+  },
+  "orchestration": {
+    "packageInvokesLatent": false,
+    "phase8InvokesLatent": true,
+    "dailyChainInvokesPhase8": true,
+    "coupledToDailyExit": false
+  },
+  "completionDependencies": {
+    "planner": "scripts/atlas/plan-graphify-run-completion-v1.mjs",
+    "plannerMentionsLatent": false,
+    "requiredPredicates": [
+      "canonical graphify run completion",
+      "workspace/source revision binding",
+      "source selection",
+      "structural processing",
+      "unresolved structural edge outcomes",
+      "node and edge checksums"
+    ],
+    "latentRequiredByPlanner": false,
+    "canonicalSemantic768Dependency": false,
+    "graphIdentityDependency": false,
+    "packetIdentityDependency": false,
+    "sourceRevisionDependency": false,
+    "contextManifestDependency": false
+  },
+  "callers": [
+    "sveltekit-frontend/package.json: graphify:daily:chain",
+    "sveltekit-frontend/package.json: atlas:phase16:latent:apply",
+    "scripts/startup/run-atlas-phase8-fanout.mjs: PHASE8_APPLY_PLAN"
+  ],
+  "findings": [
+    "Phase 16 latent is currently invoked by the Phase 8 fanout apply plan.",
+    "graphify:daily:chain invokes the Phase 8 fanout wrapper, creating orchestration coupling.",
+    "The canonical completion planner checks run/workspace/source/structural/edge/checksum predicates and does not inspect latent output.",
+    "The latent writer produces a learned latent_64 representation and writes legacy derived state to atlas_packets/Valkey; it is not semantic_768 canonical truth.",
+    "A latent-stage failure can make the wrapper partial even though latent output is not a canonical completion predicate."
+  ],
+  "evidence": [
+    {
+      "file": "sveltekit-frontend/package.json",
+      "exists": true,
+      "checksum": "sha256:ebd9e69d693172c51313d759d010542836e3e2111c2971ebd5401e161db247d7"
+    },
+    {
+      "file": "scripts/startup/run-atlas-phase8-fanout.mjs",
+      "exists": true,
+      "checksum": "sha256:3a843838c1290703d157ce4d8c96ed060d5d865dbb42403a0d22444d4ae98f53"
+    },
+    {
+      "file": "scripts/atlas/backfill-latent-vectors.mjs",
+      "exists": true,
+      "checksum": "sha256:161e08b5de1f04aa10e35675e92c4d54e03fee4e3304557b891aa6b5cf5a0fa5"
+    },
+    {
+      "file": "scripts/atlas/plan-graphify-run-completion-v1.mjs",
+      "exists": true,
+      "checksum": "sha256:6da31f51d86151b21499bde5d8d3bad409150446264e73cb4de15f40ef1907c8"
+    },
+    {
+      "file": "packages/semantic-contracts/src/vector-manifest.ts",
+      "exists": true,
+      "checksum": "sha256:9526dadda67e13f0e09b13e973b8e133738fe6bbe889d2146f8155c3e3fffb15"
+    }
+  ],
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "nextGate": "GRAPHIFY-FANOUT-CONVERGENCE-01",
+  "safeNextCommand": "node scripts/atlas/audit-graphify-fanout-criticality-01.mjs",
+  "reportChecksum": "sha256:09d7a581e475bcd26a6952d6aba2f96fea847176b3df700435b704056c6aef0f"
+}

@@ -1,0 +1,130 @@
+{
+  "schema": "atlas.rapids-execution-path-owner.v1",
+  "status": "DIFFERENT_SUPPORTED_RUNTIMES",
+  "directPythonExecutor": {
+    "runtime": "WSL2_MINIFORGE",
+    "environment": "atlas-rapids-cu13",
+    "python": "3.14.6",
+    "cudf": "26.06.01",
+    "cugraph": "26.06.00",
+    "cuvs": "26.06.00",
+    "cupy": "14.1.1",
+    "cudaRuntime": 13020,
+    "gpuDeviceCount": 1,
+    "module": "python/atlas_rapids_graph_runtime.py",
+    "importStatus": "PASS",
+    "directExecutorAvailable": true,
+    "jaccardSmoke": {
+      "status": "PASS",
+      "pair": [2, 3],
+      "jaccard": 1.0
+    },
+    "runtimeIdentity": {
+      "cudaDriverApiVersion": 13000,
+      "cudaRuntimeVersion": 13020,
+      "packageCudaMajor": 13,
+      "gpuDeviceCount": 1,
+      "device": "NVIDIA GeForce RTX 3060 Ti"
+    }
+  },
+  "httpExecutor": {
+    "service": "atlas-gpu-8098",
+    "composeFile": "docker/docker-compose.gpu.yml",
+    "composeProfile": "atlas-gpu",
+    "port": 8098,
+    "configured": true,
+    "listening": true,
+    "containerStatus": "RUNNING",
+    "health": {
+      "status": "PASS",
+      "cudaAvailable": true,
+      "device": "NVIDIA GeForce RTX 3060 Ti",
+      "cudaRuntime": 12090,
+      "gpuDeviceCount": 1,
+      "torchAvailable": false,
+      "cupy": "14.1.1",
+      "cudf": "26.08.00",
+      "cugraph": "26.08.00",
+      "jaccardSmoke": {
+        "status": "PASS",
+        "pair": [2, 3],
+        "jaccard": 1.0
+      },
+      "runtimeIdentity": {
+        "cudaDriverApiVersion": 13000,
+        "cudaRuntimeVersion": 12090,
+        "packageCudaMajor": 12,
+        "gpuDeviceCount": 1,
+        "device": "NVIDIA GeForce RTX 3060 Ti"
+      }
+    }
+  },
+  "classification": {
+    "productionOwner": "DOCKER_HTTP_SIDECAR",
+    "parityPreferredPath": "DIRECT_PYTHON",
+    "sidecarProof": "HTTP_GPU_EXECUTION_SMOKE_PROVEN",
+    "httpGpuExecutionAvailable": true,
+    "cuGraphUnavailable": false,
+    "gpuParityExecuted": true,
+    "directSmokeExecuted": true
+  },
+  "crossRuntimeIdentity": {
+    "status": "DIFFERENT_SUPPORTED_RUNTIMES",
+    "sameGpu": true,
+    "sameDriverApiVersion": true,
+    "sameCudaRuntime": false,
+    "sameRapidsRelease": false,
+    "wsl": {
+      "python": "3.14.6",
+      "cudf": "26.06.01",
+      "cugraph": "26.06.00",
+      "cuvs": "26.06.00",
+      "cupy": "14.1.1",
+      "numpy": "2.4.6",
+      "cudaRuntimeVersion": 13020,
+      "cudaDriverApiVersion": 13000,
+      "deviceCount": 1,
+      "device": "NVIDIA GeForce RTX 3060 Ti"
+    },
+    "docker": {
+      "python": "3.13.14",
+      "cudf": "26.08.00",
+      "cugraph": "26.08.00",
+      "cupy": "14.1.1",
+      "numpy": "2.4.6",
+      "cudaRuntimeVersion": 12090,
+      "cudaDriverApiVersion": 13000,
+      "deviceCount": 1,
+      "device": "NVIDIA GeForce RTX 3060 Ti"
+    },
+    "directJaccardParity": {
+      "candidatePairChecksum": "d2006a830126de8b7f3a764ac8f2e063215c70388c71ecdc9c0edebd0fe85135",
+      "cpuPairCount": 15,
+      "wslPairCount": 15,
+      "dockerPairCount": 15,
+      "wslMaxAbsoluteError": 0.0,
+      "dockerMaxAbsoluteError": 0.0
+    },
+    "httpParity": "NOT_EXECUTED",
+    "httpJaccardSmoke": {
+      "status": "PASS",
+      "fixture": "ontology-linked-tuple-cugraph-algorithm-fixture-v1",
+      "graphRevision": "graph:ontology-linked-tuple-cugraph-algorithm-fixture-v3",
+      "projectionChecksum": "b68087a95c276b022b1443cce9b3a29c25f1b0d2304a13854fd439d0b07f6dee",
+      "ordinalMapChecksum": "0a6d05db3f7e20e8507aac50defcbb390621292461d6c50d1fa430ebb097ac11",
+      "pairCount": 3,
+      "renumbered": false,
+      "loadStatus": "PASS",
+      "jaccardStatus": "PASS",
+      "fullFrozenPairParity": "NOT_EXECUTED"
+    }
+  },
+  "writes": {
+    "postgres": false,
+    "qdrant": false,
+    "neo4j": false,
+    "valkey": false,
+    "graphify": false
+  },
+  "nextGate": "CROSS_RUNTIME_JACCARD_01"
+}

@@ -1,0 +1,62 @@
+{
+  "schema": "atlas.ace-revision-source-owner.v1",
+  "generatedAt": "2026-09-02T21:20:51.001Z",
+  "status": "NO_ROUTE_LOCAL_AUTHORITY",
+  "route": "sveltekit-frontend/src/routes/api/ace/stream/+server.ts",
+  "fields": {
+    "workspaceRevision": {
+      "producer": "not present",
+      "authoritative": false,
+      "syntheticFallbackDetected": true
+    },
+    "sourceRevision": {
+      "producer": "not supplied by api/ace/stream",
+      "authoritative": false
+    },
+    "representationRevision": {
+      "producer": "not supplied by api/ace/stream",
+      "authoritative": false
+    },
+    "retrievalPolicyRevision": {
+      "producer": "not supplied by api/ace/stream",
+      "authoritative": false
+    }
+  },
+  "cache": {
+    "legacyQueryOnlyImport": true,
+    "strictRevisionCacheImport": false
+  },
+  "findings": [
+    "api/ace/stream imports the legacy query-keyed ACE packet cache.",
+    "The route does not receive an authoritative sourceRevision, representationRevision, or retrievalPolicyRevision tuple.",
+    "Shared runtime context contains timestamp revision fallbacks; those values are inadmissible for strict ACE cache identity.",
+    "Caller migration must remain blocked until a real revision provider is injected."
+  ],
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "evidence": [
+    {
+      "name": "aceStream",
+      "file": "sveltekit-frontend/src/routes/api/ace/stream/+server.ts",
+      "checksum": "sha256:0d83b2a1c0aca780fada09b28f8a30c97acb6ea4d0dc4ea5a305f892309684c4"
+    },
+    {
+      "name": "runtimeContext",
+      "file": "sveltekit-frontend/src/lib/server/atlas/atlas-runtime-context.ts",
+      "checksum": "sha256:5a4b199989064379dfb4c36e8d197dab3f6683b4675115092e58fb1950d5ab6d"
+    },
+    {
+      "name": "semanticTools",
+      "file": "sveltekit-frontend/src/lib/server/atlas/atlas-semantic-tools.ts",
+      "checksum": "sha256:beed936e47f59467e350f1a70e47e39836e706f23b90927e267aef8f852ba7b8"
+    },
+    {
+      "name": "cache",
+      "file": "sveltekit-frontend/src/lib/server/cache/ace-packet-cache.ts",
+      "checksum": "sha256:a1939b4bf5229e69aa79f686597d3bca494886b39708450c9889631ab2371904"
+    }
+  ],
+  "nextGate": "ACE-FEATURE-SOURCE-OWNER-01",
+  "safeNextCommand": "rg -n --no-heading \"sourceRevision|representationRevision|retrievalPolicyRevision|workspaceRevision\" sveltekit-frontend/src/routes/api/ace/stream sveltekit-frontend/src/lib/server/atlas",
+  "reportChecksum": "sha256:7f5133e7bae0fd54523e4a59f7aa39cef44596de0cc5a9f5f0461e773b7dfba7"
+}

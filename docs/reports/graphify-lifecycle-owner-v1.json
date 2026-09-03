@@ -1,0 +1,107 @@
+{
+  "schema": "atlas.graphify-lifecycle-owner.v1",
+  "generatedAt": "2026-09-03T00:51:10.306Z",
+  "mode": "READ_ONLY_LIFECYCLE_OWNER_AUDIT",
+  "databaseError": null,
+  "lifecycleOwner": null,
+  "lifecycleOwnerStatus": "LIFECYCLE_OWNER_UNPROVEN",
+  "supportedLifecycleStates": [
+    "RUNNING"
+  ],
+  "transitionPrimitiveExists": false,
+  "lifecyclePaths": [
+    {
+      "path": "scripts/atlas/audit-current-graphify-source-revision-v1.mjs",
+      "classification": "READ_ONLY_AUDITOR",
+      "mutationSignals": []
+    },
+    {
+      "path": "scripts/atlas/audit-current-graphify-run-owner-v1.mjs",
+      "classification": "READ_ONLY_AUDITOR",
+      "mutationSignals": []
+    },
+    {
+      "path": "scripts/atlas/audit-graphify-git-source-authority-v1.mjs",
+      "classification": "READ_ONLY_AUDITOR",
+      "mutationSignals": []
+    },
+    {
+      "path": "scripts/atlas/audit-graphify-workspace-owner-v1.mjs",
+      "classification": "READ_ONLY_AUDITOR",
+      "mutationSignals": []
+    },
+    {
+      "path": "scripts/atlas/audit-graphify-stale-run-reconciliation-v1.mjs",
+      "classification": "READ_ONLY_AUDITOR",
+      "mutationSignals": []
+    },
+    {
+      "path": "scripts/atlas/audit-graphify-lifecycle-owner-v1.mjs",
+      "classification": "READ_ONLY_AUDITOR",
+      "mutationSignals": []
+    },
+    {
+      "path": "scripts/atlas/audit-workspace-source-namespace-v1.mjs",
+      "classification": "READ_ONLY_AUDITOR",
+      "mutationSignals": []
+    },
+    {
+      "path": "scripts/atlas/daily-graphify-mastra-workflow.mjs",
+      "classification": "UNKNOWN",
+      "mutationSignals": []
+    },
+    {
+      "path": "scripts/atlas/plan-current-structural-edge-resolution-v1.mjs",
+      "classification": "PLANNER_ONLY",
+      "mutationSignals": []
+    },
+    {
+      "path": "scripts/atlas/plan-graphify-run-completion-v1.mjs",
+      "classification": "PLANNER_ONLY",
+      "mutationSignals": []
+    },
+    {
+      "path": "scripts/atlas/prove-code-source-revision-packet-live-dry-run.mts",
+      "classification": "UNKNOWN",
+      "mutationSignals": []
+    },
+    {
+      "path": "scripts/atlas/prove-exact-promotion-live-dry-run.mts",
+      "classification": "UNKNOWN",
+      "mutationSignals": []
+    },
+    {
+      "path": "scripts/atlas/prove-graphify-run-completion-primitive-v1.mjs",
+      "classification": "UNKNOWN",
+      "mutationSignals": []
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/embedding/source-namespace-v1.ts",
+      "classification": "UNKNOWN",
+      "mutationSignals": []
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/indexing/graphify-source-inventory-writer-v2.ts",
+      "classification": "LEGACY_WRITER",
+      "mutationSignals": [
+        "INSERT INTO public.graphify_runs",
+        "UPDATE public.graphify_runs"
+      ]
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/indexing/graphify-source-inventory-writer-v2.spec.ts",
+      "classification": "LEGACY_WRITER",
+      "mutationSignals": [
+        "INSERT INTO public.graphify_runs",
+        "UPDATE public.graphify_runs"
+      ]
+    }
+  ],
+  "runningRunCount": 5,
+  "staleRunCount": 5,
+  "currentRunCount": 0,
+  "repositoryHeadRevision": "85e6f3d509856c75d77e175fc823623c2cd4e18c",
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "reportChecksum": "sha256:32e8fdf5eaa396d01d6d5f07221188ae68d3952fed9ba7a8834550a1965dff27"
+}

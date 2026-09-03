@@ -1,6 +1,6 @@
 {
   "schema": "atlas.graphify-rff-embedding-backfill.v1",
-  "generatedAt": "2026-08-26T03:32:07.152Z",
+  "generatedAt": "2026-09-03T00:36:35.152Z",
   "apply": false,
   "signatureOnly": true,
   "model": "embeddinggemma:latest",
@@ -10,7 +10,7 @@
     "batchSize": 8
   },
   "status": "DRY_RUN",
-  "selected": 128,
+  "selected": 0,
   "errorEmbedded": 0,
   "signatureEmbedded": 0,
   "written": 0,
@@ -19,36 +19,5 @@
     "error_embedding": "vector(384)",
     "signature_embedding": "halfvec(768)"
   },
-  "sample": [
-    {
-      "id": "1ae79974-3eb1-449f-aa7e-07f14655296d",
-      "sourceRef": "sveltekit-frontend/docs/graph/hypergraph-clusters.md",
-      "missingError": true,
-      "missingSignature": true
-    },
-    {
-      "id": "318bc320-96cc-4097-8b47-7dde35d278a8",
-      "sourceRef": "sveltekit-frontend/docs/graph/hypergraph-clusters.md",
-      "missingError": true,
-      "missingSignature": true
-    },
-    {
-      "id": "356f26d3-9f8a-4020-9007-de969684db89",
-      "sourceRef": "sveltekit-frontend/docs/graph/hypergraph-clusters.md",
-      "missingError": true,
-      "missingSignature": true
-    },
-    {
-      "id": "41e56dc8-d95c-4b5c-a2de-86f3e2887578",
-      "sourceRef": "sveltekit-frontend/docs/graph/hypergraph-clusters.md",
-      "missingError": true,
-      "missingSignature": true
-    },
-    {
-      "id": "493a437f-c1a6-4e0e-8d6a-20874ff03f48",
-      "sourceRef": "sveltekit-frontend/docs/graph/hypergraph-clusters.md",
-      "missingError": true,
-      "missingSignature": true
-    }
-  ]
+  "sample": []
 }

@@ -1,14 +1,22 @@
-import { embedQueryForLane, type EmbeddingResult } from '$lib/server/retrieval/embedding-service.js';
+import { embedQueryForLane, type EmbeddingResult } from '../../retrieval/embedding-service.js';
 
-// Explicit compatibility constants. This module is a reference-only MRL
-// adapter and must not inherit the active semantic_768 authority constants.
+// This module is a derived EmbeddingGemma MRL adapter. It never becomes the
+// semantic_768 storage or identity authority.
+const MRL_SEMANTIC_REPRESENTATION = 'semantic_mrl_512' as const;
 const LEGACY_SEMANTIC_REPRESENTATION = 'semantic_512' as const;
-const LEGACY_SEMANTIC_DIMENSION = 512 as const;
+const MRL_SEMANTIC_DIMENSION = 512 as const;
+const LEGACY_SEMANTIC_DIMENSION = MRL_SEMANTIC_DIMENSION;
 const EMBEDDINGGEMMA_NATIVE_DIMENSION = 768 as const;
 const LEGACY_PROJECTION_METHOD = 'embeddinggemma-mrl-prefix-renorm' as const;
 
 export interface Semantic512EmbeddingResultV1 extends EmbeddingResult {
   representationId: typeof LEGACY_SEMANTIC_REPRESENTATION;
+  nativeModelDimension: typeof EMBEDDINGGEMMA_NATIVE_DIMENSION;
+  projectionMethod: typeof LEGACY_PROJECTION_METHOD;
+}
+
+export interface SemanticMrl512EmbeddingResultV1 extends EmbeddingResult {
+  representationId: typeof MRL_SEMANTIC_REPRESENTATION;
   nativeModelDimension: typeof EMBEDDINGGEMMA_NATIVE_DIMENSION;
   projectionMethod: typeof LEGACY_PROJECTION_METHOD;
 }
@@ -37,13 +45,17 @@ export function projectEmbeddingGemmaToSemantic512(native768: Float32Array): Flo
   return l2Normalize512(native768.slice(0, LEGACY_SEMANTIC_DIMENSION));
 }
 
+/** Derive MRL semantic_mrl_512 from native semantic_768 without persistence. */
+export function projectEmbeddingGemmaToSemanticMrl512(native768: Float32Array): Float32Array {
+  return projectEmbeddingGemmaToSemantic512(native768);
+}
+
 /**
- * Canonical persisted Parent Atlas query representation.
+ * Legacy query-time compatibility representation.
  *
- * The embedding model may natively produce 768 values, but Atlas does not
- * require a persisted 768 corpus. The canonical persisted/query vector is the
- * officially-supported EmbeddingGemma MRL 512 prefix, re-normalized before it
- * is handed to Qdrant or cuVS cosine search.
+ * The canonical stored representation remains semantic_768. New callers
+ * should use embedSemanticMrl512 so the derived MRL identity is explicit;
+ * this function remains for historical semantic_512 callers only.
  */
 export async function embedSemantic512(query: string): Promise<Semantic512EmbeddingResultV1> {
   const native = await embedQueryForLane(query, 'dense_768');
@@ -53,6 +65,20 @@ export async function embedSemantic512(query: string): Promise<Semantic512Embedd
     vector,
     dimension: LEGACY_SEMANTIC_DIMENSION,
     representationId: LEGACY_SEMANTIC_REPRESENTATION,
+    nativeModelDimension: EMBEDDINGGEMMA_NATIVE_DIMENSION,
+    projectionMethod: LEGACY_PROJECTION_METHOD,
+  };
+}
+
+/** Query-time MRL adapter with the current representation identity. */
+export async function embedSemanticMrl512(query: string): Promise<SemanticMrl512EmbeddingResultV1> {
+  const native = await embedQueryForLane(query, 'dense_768');
+  const vector = projectEmbeddingGemmaToSemanticMrl512(native.vector);
+  return {
+    ...native,
+    vector,
+    dimension: MRL_SEMANTIC_DIMENSION,
+    representationId: MRL_SEMANTIC_REPRESENTATION,
     nativeModelDimension: EMBEDDINGGEMMA_NATIVE_DIMENSION,
     projectionMethod: LEGACY_PROJECTION_METHOD,
   };

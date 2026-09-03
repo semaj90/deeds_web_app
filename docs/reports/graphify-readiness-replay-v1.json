@@ -1,0 +1,44 @@
+{
+  "schema": "atlas.graphify-readiness-replay.v1",
+  "generatedAt": "2026-09-02T20:36:28.183Z",
+  "mode": "READINESS_ONLY",
+  "readOnly": true,
+  "writes": {
+    "postgres": false,
+    "qdrant": false,
+    "neo4j": false,
+    "valkey": false
+  },
+  "run": {
+    "runId": "14643371-f6f2-4131-906b-235a5c06619a",
+    "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+    "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+    "status": "RUNNING",
+    "completedAt": null,
+    "manifestCount": 24192
+  },
+  "evidence": {
+    "graphifyFileCount": 111,
+    "revisionHashReady": 111,
+    "nonempty": 111,
+    "parseStatusCounts": [
+      {
+        "parse_status": "UNPROCESSED",
+        "count": 111,
+        "revision_hash_ready": 111,
+        "nonempty": 111
+      }
+    ]
+  },
+  "checks": {
+    "runExists": true,
+    "runCompleted": false,
+    "manifestCoveragePresent": true,
+    "fileEvidencePresent": true,
+    "revisionHashCoverageComplete": true,
+    "nonemptyCoverageComplete": true
+  },
+  "status": "READINESS_REPLAY_BLOCKED_STALE_RUN",
+  "conclusion": "Existing evidence was inspected without mutating run state; a stale RUNNING record cannot be promoted or converted into a completion receipt by this replay.",
+  "nextGate": "Explicit abandonment review or separately authorized fresh Graphify execution."
+}

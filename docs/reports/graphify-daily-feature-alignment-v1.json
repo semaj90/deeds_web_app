@@ -1,6 +1,6 @@
 {
   "schema": "atlas.graphify-daily-feature-alignment.v1",
-  "generatedAt": "2026-08-26T03:32:03.557Z",
+  "generatedAt": "2026-09-03T00:36:32.342Z",
   "readOnly": true,
   "scope": {
     "table": "codebase_chunk_index",
@@ -12,325 +12,52 @@
     "collection": "codebase_chunks_768",
     "transport": "HOST_HTTP"
   },
-  "status": "PASS",
-  "rows": [
-    {
-      "id": "1ae79974-3eb1-449f-aa7e-07f14655296d",
-      "qdrant_id": "8397336a-3a62-465d-a2cf-ec53054d51d6",
-      "source_ref": null,
-      "relative_path": "sveltekit-frontend/docs/graph/hypergraph-clusters.md",
-      "semantic_768": true,
-      "bm25": true,
-      "ast": false,
-      "error_embedding": false,
-      "signature_embedding": false,
-      "pagerank": false,
-      "centroid": false,
-      "latent_64": false,
-      "som": false,
-      "kmeans": false,
-      "qdrant": true
-    },
-    {
-      "id": "318bc320-96cc-4097-8b47-7dde35d278a8",
-      "qdrant_id": "3bd95bde-7304-4fff-b031-a5e2de180b55",
-      "source_ref": null,
-      "relative_path": "sveltekit-frontend/docs/graph/hypergraph-clusters.md",
-      "semantic_768": true,
-      "bm25": true,
-      "ast": false,
-      "error_embedding": false,
-      "signature_embedding": false,
-      "pagerank": false,
-      "centroid": false,
-      "latent_64": false,
-      "som": false,
-      "kmeans": false,
-      "qdrant": true
-    },
-    {
-      "id": "356f26d3-9f8a-4020-9007-de969684db89",
-      "qdrant_id": "5d0404cd-f01b-4dd6-9f59-cd3fdcbfde6e",
-      "source_ref": null,
-      "relative_path": "sveltekit-frontend/docs/graph/hypergraph-clusters.md",
-      "semantic_768": true,
-      "bm25": true,
-      "ast": false,
-      "error_embedding": false,
-      "signature_embedding": false,
-      "pagerank": false,
-      "centroid": false,
-      "latent_64": false,
-      "som": false,
-      "kmeans": false,
-      "qdrant": true
-    },
-    {
-      "id": "41e56dc8-d95c-4b5c-a2de-86f3e2887578",
-      "qdrant_id": "f802342d-f49a-4446-a6ee-4de8371741f4",
-      "source_ref": null,
-      "relative_path": "sveltekit-frontend/docs/graph/hypergraph-clusters.md",
-      "semantic_768": true,
-      "bm25": true,
-      "ast": false,
-      "error_embedding": false,
-      "signature_embedding": false,
-      "pagerank": false,
-      "centroid": false,
-      "latent_64": false,
-      "som": false,
-      "kmeans": false,
-      "qdrant": true
-    },
-    {
-      "id": "493a437f-c1a6-4e0e-8d6a-20874ff03f48",
-      "qdrant_id": "5e0b828b-b23d-481f-9407-89e80fed3338",
-      "source_ref": null,
-      "relative_path": "sveltekit-frontend/docs/graph/hypergraph-clusters.md",
-      "semantic_768": true,
-      "bm25": true,
-      "ast": false,
-      "error_embedding": false,
-      "signature_embedding": false,
-      "pagerank": false,
-      "centroid": false,
-      "latent_64": false,
-      "som": false,
-      "kmeans": false,
-      "qdrant": true
-    },
-    {
-      "id": "56884362-3018-4a0e-8a68-f1e19a93f9fa",
-      "qdrant_id": "e92a0193-726e-4ab0-8825-0be19c35dc81",
-      "source_ref": null,
-      "relative_path": "sveltekit-frontend/docs/graph/hypergraph-clusters.md",
-      "semantic_768": true,
-      "bm25": true,
-      "ast": false,
-      "error_embedding": false,
-      "signature_embedding": false,
-      "pagerank": false,
-      "centroid": false,
-      "latent_64": false,
-      "som": false,
-      "kmeans": false,
-      "qdrant": true
-    },
-    {
-      "id": "652e7261-20cf-4c02-843b-b68be07b0bd0",
-      "qdrant_id": "c14ca9aa-ab9f-4863-b89c-281911f72c87",
-      "source_ref": null,
-      "relative_path": "sveltekit-frontend/docs/graph/hypergraph-clusters.md",
-      "semantic_768": true,
-      "bm25": true,
-      "ast": false,
-      "error_embedding": false,
-      "signature_embedding": false,
-      "pagerank": false,
-      "centroid": false,
-      "latent_64": false,
-      "som": false,
-      "kmeans": false,
-      "qdrant": true
-    },
-    {
-      "id": "74c149b4-3df2-4325-8b2e-8d1e0efd8457",
-      "qdrant_id": "98fdc04a-a20e-4f3b-b4b3-4a8f23a63459",
-      "source_ref": null,
-      "relative_path": "sveltekit-frontend/docs/graph/hypergraph-clusters.md",
-      "semantic_768": true,
-      "bm25": true,
-      "ast": false,
-      "error_embedding": false,
-      "signature_embedding": false,
-      "pagerank": false,
-      "centroid": false,
-      "latent_64": false,
-      "som": false,
-      "kmeans": false,
-      "qdrant": true
-    },
-    {
-      "id": "a058bb68-1d4f-4e35-a0df-6939bb3054e5",
-      "qdrant_id": "3808b1e7-7bcf-4e99-90c3-d4cd319eff7b",
-      "source_ref": null,
-      "relative_path": "sveltekit-frontend/docs/graph/hypergraph-clusters.md",
-      "semantic_768": true,
-      "bm25": true,
-      "ast": false,
-      "error_embedding": false,
-      "signature_embedding": false,
-      "pagerank": false,
-      "centroid": false,
-      "latent_64": false,
-      "som": false,
-      "kmeans": false,
-      "qdrant": true
-    },
-    {
-      "id": "a9ea30af-84e3-4c22-b2d7-e3175c8f0534",
-      "qdrant_id": "10faf70e-5381-49d2-89fa-2af2be6d9541",
-      "source_ref": null,
-      "relative_path": "sveltekit-frontend/docs/graph/hypergraph-clusters.md",
-      "semantic_768": true,
-      "bm25": true,
-      "ast": false,
-      "error_embedding": false,
-      "signature_embedding": false,
-      "pagerank": false,
-      "centroid": false,
-      "latent_64": false,
-      "som": false,
-      "kmeans": false,
-      "qdrant": true
-    },
-    {
-      "id": "b5313be6-133f-410c-9185-bdc4bf4e715a",
-      "qdrant_id": "9b6f34c0-5707-4f1d-86e2-2086f2764101",
-      "source_ref": null,
-      "relative_path": "sveltekit-frontend/docs/graph/hypergraph-clusters.md",
-      "semantic_768": true,
-      "bm25": true,
-      "ast": false,
-      "error_embedding": false,
-      "signature_embedding": false,
-      "pagerank": false,
-      "centroid": false,
-      "latent_64": false,
-      "som": false,
-      "kmeans": false,
-      "qdrant": true
-    },
-    {
-      "id": "c718a601-313b-4acc-8e14-6120e8b85d8f",
-      "qdrant_id": "a33de7a1-d094-4e6e-ba2f-12ec9a44503b",
-      "source_ref": null,
-      "relative_path": "sveltekit-frontend/docs/graph/hypergraph-clusters.md",
-      "semantic_768": true,
-      "bm25": true,
-      "ast": false,
-      "error_embedding": false,
-      "signature_embedding": false,
-      "pagerank": false,
-      "centroid": false,
-      "latent_64": false,
-      "som": false,
-      "kmeans": false,
-      "qdrant": true
-    },
-    {
-      "id": "ca58d121-80f6-438d-942c-f391d0f3a462",
-      "qdrant_id": "07538637-68ca-4078-afa5-f08f96c2fc58",
-      "source_ref": null,
-      "relative_path": "sveltekit-frontend/docs/graph/hypergraph-clusters.md",
-      "semantic_768": true,
-      "bm25": true,
-      "ast": false,
-      "error_embedding": false,
-      "signature_embedding": false,
-      "pagerank": false,
-      "centroid": false,
-      "latent_64": false,
-      "som": false,
-      "kmeans": false,
-      "qdrant": true
-    },
-    {
-      "id": "de30978d-dce4-4222-a8a3-13e055ec1f4a",
-      "qdrant_id": "c963725a-9fbd-462f-8a6a-68a560ca4e08",
-      "source_ref": null,
-      "relative_path": "sveltekit-frontend/docs/graph/hypergraph-clusters.md",
-      "semantic_768": true,
-      "bm25": true,
-      "ast": false,
-      "error_embedding": false,
-      "signature_embedding": false,
-      "pagerank": false,
-      "centroid": false,
-      "latent_64": false,
-      "som": false,
-      "kmeans": false,
-      "qdrant": true
-    },
-    {
-      "id": "e552e126-171d-461d-93b6-9dba9fbbad85",
-      "qdrant_id": "e7d8e0d2-f34f-4592-ae25-75d06524588a",
-      "source_ref": null,
-      "relative_path": "sveltekit-frontend/docs/graph/hypergraph-clusters.md",
-      "semantic_768": true,
-      "bm25": true,
-      "ast": false,
-      "error_embedding": false,
-      "signature_embedding": false,
-      "pagerank": false,
-      "centroid": false,
-      "latent_64": false,
-      "som": false,
-      "kmeans": false,
-      "qdrant": true
-    },
-    {
-      "id": "e7dc41cc-ae0c-4e54-a6a6-ea35081d67a0",
-      "qdrant_id": "58a4bdf0-3215-445f-92b9-262224b8a44e",
-      "source_ref": null,
-      "relative_path": "sveltekit-frontend/docs/graph/hypergraph-clusters.md",
-      "semantic_768": true,
-      "bm25": true,
-      "ast": false,
-      "error_embedding": false,
-      "signature_embedding": false,
-      "pagerank": false,
-      "centroid": false,
-      "latent_64": false,
-      "som": false,
-      "kmeans": false,
-      "qdrant": true
-    }
-  ],
+  "status": "EMPTY",
+  "rows": [],
   "coverage": {
     "semantic_768": {
-      "count": 16,
-      "total": 16
+      "count": 0,
+      "total": 0
     },
     "bm25": {
-      "count": 16,
-      "total": 16
+      "count": 0,
+      "total": 0
     },
     "ast": {
       "count": 0,
-      "total": 16
+      "total": 0
     },
     "error_embedding": {
       "count": 0,
-      "total": 16
+      "total": 0
     },
     "signature_embedding": {
       "count": 0,
-      "total": 16
+      "total": 0
     },
     "pagerank": {
       "count": 0,
-      "total": 16
+      "total": 0
     },
     "centroid": {
       "count": 0,
-      "total": 16
+      "total": 0
     },
     "latent_64": {
       "count": 0,
-      "total": 16
+      "total": 0
     },
     "som": {
       "count": 0,
-      "total": 16
+      "total": 0
     },
     "kmeans": {
       "count": 0,
-      "total": 16
+      "total": 0
     },
     "qdrant": {
-      "count": 16,
-      "total": 16
+      "count": 0,
+      "total": 0
     },
     "feature_pagerank": {
       "table": "code_features",
@@ -350,7 +77,7 @@
     "counts": {
       "centroid:*": 66,
       "som:*": 0,
-      "ace:*": 74,
+      "ace:*": 73,
       "gpu:karpathy:*": 2
     }
   }

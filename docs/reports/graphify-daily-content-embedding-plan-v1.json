@@ -1,62 +1,51 @@
 {
-  "schema": "atlas.graphify-file-embedding-backfill.v1",
-  "generatedAt": "2026-08-26T03:32:06.794Z",
+  "schema": "atlas.graphify-file-embedding-backfill.v2",
+  "generatedAt": "2026-09-03T00:36:34.952Z",
   "apply": false,
+  "requireEmbedServer": false,
   "scope": {
     "table": "codebase_chunk_index",
-    "canonicalColumn": "content_embedding_768",
+    "representationId": "semantic_768",
+    "canonicalColumn": "content_embedding",
+    "physicalType": "halfvec(768)",
     "sinceHours": 24,
     "limit": 128,
-    "declaredType": "vector(768)"
+    "declaredType": "halfvec(768)"
   },
-  "model": "embeddinggemma:latest",
-  "embedBackend": "ollama",
-  "ollamaUrl": "http://127.0.0.1:11434",
-  "embedServerUrl": null,
-  "vram": {
-    "minFreeMbThreshold": 300,
-    "freeMbAtStart": 280,
-    "freeMbAtMidpoint": null,
-    "freeMbAtEnd": 283,
-    "guardTriggered": true
+  "binding": {
+    "upstreamModelId": "google/embeddinggemma-300m",
+    "upstreamRevision": "57c266a740f537b4dc058e1b0cda161fd15afa75",
+    "runtime": "llama.cpp/llama-server",
+    "endpoint": "http://127.0.0.1:8081",
+    "ggufSha256": "bc843658e96d2e9cc7c3402332b158f0cc4f73e61b23cef9a41acee1c0d372b7",
+    "llamaCppRevision": "8757:a29e4c0b7",
+    "tokenizerSha256": "1299c11d7cf632ef3b4e11937501358ada021bbdf7c47638d13c0ee982f2e79c",
+    "executionProfileRevision": "sha256:f1097fe6b9606ea25bff084a30668941cac008f0eb24e344bc5ed5188cbc19ea",
+    "pooling": "mean",
+    "normalization": "l2",
+    "representationId": "semantic_768",
+    "dimensions": 768,
+    "maxInputTokens": 2048,
+    "formatterRevision": "graphify-embed-text-v1",
+    "inputPolicyRevision": "embeddinggemma-token-prefix-2048-v1",
+    "promptRevision": "unprompted-v0"
+  },
+  "bindingChecksum": "70df1a750d4708dd778d2e731f3c580f8ddf56866ba6c1eb19ef27dcfa7a27dc",
+  "inputPolicy": {
+    "formatterRevision": "graphify-embed-text-v1",
+    "inputPolicyRevision": "embeddinggemma-token-prefix-2048-v1",
+    "promptRevision": "unprompted-v0",
+    "maxInputTokens": 2048
   },
   "status": "DRY_RUN",
-  "selected": 128,
+  "selected": 0,
   "embedded": 0,
   "written": 0,
   "skipped": 0,
+  "truncatedInputs": 0,
+  "inputLineageChecksum": null,
+  "inputLineageSample": [],
   "errors": [],
-  "sample": [
-    {
-      "id": "82a9af4a-c4b2-4a5e-9fdb-252c663c3af9",
-      "relativePath": "sveltekit-frontend/docs/graph/hypergraph-clusters.md",
-      "sourceRef": null,
-      "textHash": "94ca3402d1ed4c2b974d1671f4a5bacd29e826cc3bc211285bae84c7ac1370d6"
-    },
-    {
-      "id": "f58154a8-6356-4e38-9150-84cdc3592108",
-      "relativePath": "sveltekit-frontend/docs/graph/hypergraph-clusters.md",
-      "sourceRef": null,
-      "textHash": "97434183b897b8a1bead980597ca3de34f8c4d468ebdac251da50f37a81cc81a"
-    },
-    {
-      "id": "4b2bc59b-2c8c-46d9-ba0c-1c466d927098",
-      "relativePath": "sveltekit-frontend/docs/graph/hypergraph-clusters.md",
-      "sourceRef": null,
-      "textHash": "4d4bcab170fe17926bd042ff8ec263c2e091a68f8574b172b28735bfe30ae095"
-    },
-    {
-      "id": "165d6e9f-d676-4f8d-a804-ebd6fd704b8a",
-      "relativePath": "sveltekit-frontend/docs/graph/hypergraph-clusters.md",
-      "sourceRef": null,
-      "textHash": "22c7aa99c80060d288716a11cbd42ac81ebbbc3bd6f90e75f4ca94dad97d8d65"
-    },
-    {
-      "id": "85bd8bc9-a881-4d6b-aa8f-f4b7e058a322",
-      "relativePath": "sveltekit-frontend/docs/graph/hypergraph-clusters.md",
-      "sourceRef": null,
-      "textHash": "1e0fbb0f60aa95736d908ac6ea59132dc39bba23a939273df5cff769120d7bde"
-    }
-  ],
-  "elapsedMs": 306
+  "sample": [],
+  "elapsedMs": 72
 }

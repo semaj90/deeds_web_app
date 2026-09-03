@@ -15,7 +15,7 @@ export const ATLAS_CANONICAL_SEMANTIC_DIMENSION = SEMANTIC_DIMENSION;
 export const ATLAS_EMBEDDINGGEMMA_NATIVE_DIMENSION = SEMANTIC_DIMENSION;
 export const ATLAS_SEMANTIC_PROJECTION_METHOD = 'embeddinggemma-native-768' as const;
 export const QDRANT_SEMANTIC_COLLECTION = 'codebase_chunks_768_v2' as const;
-export const QDRANT_SEMANTIC_VECTOR_NAME = null as null;
+export const QDRANT_SEMANTIC_VECTOR_NAME = 'content' as const;
 
 export const QDRANT_BM42_CHALLENGER_COLLECTION = 'codebase_chunks_384_hybrid' as const;
 export const QDRANT_BM42_VECTOR_NAME = 'bm42' as const;
@@ -58,7 +58,7 @@ export interface AtlasQdrantSemanticPayloadV1 {
 export interface AtlasQdrantSemanticProjectionV1 {
   schema: 'atlas.qdrant-semantic-projection.v2';
   collection: typeof QDRANT_SEMANTIC_COLLECTION;
-  vectorName: null;
+  vectorName: typeof QDRANT_SEMANTIC_VECTOR_NAME;
   representationId: typeof ATLAS_CANONICAL_SEMANTIC_REPRESENTATION;
   nativeModelDimension: typeof ATLAS_EMBEDDINGGEMMA_NATIVE_DIMENSION;
   dimension: typeof ATLAS_CANONICAL_SEMANTIC_DIMENSION;

@@ -1,0 +1,51 @@
+{
+  "schema": "atlas.workspace-owner-binding-01.report",
+  "gate": "WORKSPACE-OWNER-BINDING-01",
+  "generatedAt": "2026-09-02",
+  "type": "READ_ONLY_AUDIT",
+  "databaseWrites": false,
+  "question": "Prove one exact binding: workspaceKey -> workspaceId -> repositoryId -> directoryScope -> bindingRevision/checksum, for the corpus behind codebase_chunk_index.",
+  "candidatesAudited": [
+    {
+      "table": "atlas_packets.workspace_revision",
+      "finding": "Real, indexed integer column. Uniformly 0 (the column DEFAULT) for every row checked in SEM768-CANONICAL-CHUNK-OWNER-01 -- never actually incremented/set. Confirmed again this pass: not usable.",
+      "verdict": "DEAD -- present, joinable, but the value is always the unset default."
+    },
+    {
+      "table": "workspaces",
+      "rowCount": 1,
+      "finding": "Single row: id=625743d2-092b-4fa8-abe0-9dc094920c80, title='Graphify Default Workspace'. Real UUID, FK-referenced by graphify_files.workspace_id and graphify_runs.workspace_id. Not source_ref/content-scoped on its own -- it is a coarse single-tenant marker, not a revision.",
+      "verdict": "REAL BUT COARSE -- the only workspaceId that actually exists; every real per-file binding found this pass points back to this same one UUID (this repo currently has exactly one workspace, not several)."
+    },
+    {
+      "table": "atlas_workspace_source_bindings",
+      "rowCount": 111,
+      "finding": "Real, well-formed contract: repo_id='deeds-web-app' (100% of rows), a SINGLE real workspace_revision value ('sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9', 100% of rows), canonical_source_ref, source_revision (sha256-format), content_digest, and a CHECK-enforced 64-hex binding_checksum. This is the cleanest-shaped candidate registry found in this whole investigation.",
+      "overlapWithEmbeddedCorpus": {
+        "rowsMatchingAnyCodebaseChunkIndexRow": 647,
+        "rowsMatchingAnEmbeddedRow": 0,
+        "rowsMatchingAnUnembeddedRow": 647,
+        "significance": "EXACT MATCH to the 647-row EXCLUDED_BY_POLICY population from SEM768-COVERAGE-01, confirmed via a direct second query (matching_and_embedded=0, matching_and_unembedded=647, matching_and_ineligible=647 -- all three counts identical). This table only ever binds the deliberately embedding-excluded population, never the semantic corpus."
+      },
+      "verdict": "REAL, WELL-FORMED, BUT ZERO OVERLAP WITH THE SEMANTIC CORPUS -- structurally the best candidate, practically useless for SemanticRepresentationV1 today because it covers a completely disjoint set of rows from the 55,169 embedded ones."
+    },
+    {
+      "table": "graphify_files",
+      "rowCount": "885 total (all workspace_id=625743d2-092b-4fa8-abe0-9dc094920c80)",
+      "finding": "workspace_id (UUID, FK to workspaces.id, real and consistent), source_ref, source_revision (git-blob-style 40-hex-char SHA-1, e.g. '880b69baf405e49850a3ab88f98cefb720e8fdb1' -- NOT sha256, a different revision-identity SPACE than atlas_packet_chunk_lineage's own sha256-format source_revision), workspace_revision (TEXT, sha256-format when present, but NULL for 512/885 rows -- inconsistently populated even within this one table). Distinct workspace_revision values found: NULL (512 rows), 'sha256:b19b04...' (256 rows), 'sha256:55edaaad...' (111 rows -- matches atlas_workspace_source_bindings' single value exactly), 'sha256:a420b0f1...' (6 rows).",
+      "overlapWithEmbeddedCorpus": {
+        "rowsMatchingAnEmbeddedRow": 6312,
+        "rowsMatchingAnUnembeddedRow": 647,
+        "significance": "6,312/55,169 (11.4%) of the EMBEDDED corpus has a matching graphify_files row -- by far the largest real overlap with the semantic corpus found in this investigation. Also confirms the same 647 unembedded rows appear here too (graphify_files covers a superset including both the EXCLUDED_BY_POLICY population and a real slice of the embedded population)."
+      },
+      "overlapWithThe13ProvenLineageSampleRows": "13/13 (100%) -- every source_ref from the SEM768-CANONICAL-CHUNK-OWNER-01 sample's PROVEN atlas_packet_chunk_lineage rows resolves in graphify_files. Of those 13: 7 have workspace_revision=NULL, 6 have workspace_revision='sha256:b19b04...'. source_revision is populated for all 13 (git-SHA1 format), but does NOT match atlas_packet_chunk_lineage's own source_revision value for the same source_ref (different revision-identity space -- git blob SHA-1 vs. a sha256 the lineage table computes itself) -- these are NOT proven to be the same underlying fact without an explicit git-blob-oid <-> content-sha256 mapping, which was not checked this pass.",
+      "verdict": "REAL, MATERIALLY OVERLAPS THE EMBEDDED CORPUS, BUT workspace_revision IS INCONSISTENTLY POPULATED (58% NULL overall) AND ITS source_revision FORMAT DIVERGES FROM atlas_packet_chunk_lineage's -- the two revision values for the same file cannot currently be treated as interchangeable without an explicit reconciliation step."
+    }
+  ],
+  "conclusion": {
+    "provenBinding": "workspaceKey 'deeds-web-app' -> workspaceId 625743d2-092b-4fa8-abe0-9dc094920c80 ('Graphify Default Workspace') -> repositoryId 'deeds-web-app' IS real and provable -- this repo genuinely has exactly one workspace, and graphify_files/graphify_runs/workspaces agree on that UUID consistently. directoryScope was not further scoped this pass (no evidence of multiple directory-scoped sub-workspaces was found -- the single workspace appears to cover the whole repo).",
+    "bindingRevisionGap": "There is NOT one single, consistent bindingRevision/checksum across the corpus. Three different real revision-bearing tables exist (atlas_packets.workspace_revision [dead], atlas_workspace_source_bindings [real but zero embedded-corpus overlap], graphify_files [real, 11.4% embedded-corpus overlap but 58% NULL workspace_revision and a source_revision format that diverges from atlas_packet_chunk_lineage's own]) and none of them is both (a) populated for a meaningful share of the embedded corpus AND (b) format-consistent with the other real revision-bearing tables this investigation has already found.",
+    "recommendationForSourceNamespaceContractV1": "graphify_files is the best available real anchor for workspaceId + repositoryId (both consistently populated, FK-backed). It should NOT yet be trusted for workspaceRevision (58% NULL) or treated as source_revision-equivalent to atlas_packet_chunk_lineage's source_revision without an explicit reconciliation step proving the git-blob-SHA1 and the lineage table's sha256 refer to the same content state. A SourceNamespaceV1 binding built from graphify_files today should carry workspaceId+repositoryId as PROVEN and leave bindingRevision as UNPROVEN whenever workspace_revision is NULL -- do not synthesize a revision value to fill the gap.",
+    "impactOnPktLineage08": "This confirms the operator's own prediction: PKT-LINEAGE-08 currently has zero qualified success candidates because no single real table yet supplies a complete, consistent, embedded-corpus-overlapping namespace/revision binding. graphify_files is the closest real candidate but is incomplete (NULL workspace_revision for the majority of its own rows), not merely 'not yet checked'."
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "gate": "ORT-CPU-RUNTIME-01",
+  "type": "READ_ONLY_AUDIT",
+  "ranAt": "2026-09-02",
+  "question": "Is the ONNX crash caused by an old onnxruntime-node package version, and is upgrading it safe to attempt?",
+  "findings": {
+    "installedVersion": {
+      "topLevel": "onnxruntime-node@1.14.0 — explicitly pinned in sveltekit-frontend/package.json (not a transitive/inherited version)",
+      "nestedUnused": "node_modules/@huggingface/transformers/node_modules/onnxruntime-node@1.24.3 exists in the tree but is NOT what onnx-embed.ts loads — bare `import('onnxruntime-node')` from src/lib/server/embedding/onnx-embed.ts resolves Node's module walk-up to the top-level 1.14.0, not the nested transformers copy",
+      "significance": "the crash-prone version is confirmed to be the one actually in use at runtime, not a red herring"
+    },
+    "nodeVersion": "v22.17.1",
+    "isolatedProbeResult": {
+      "version": "onnxruntime-node@1.29.0",
+      "location": "tmp/ort-probe-1.29/ (disposable npm workspace, main lockfile untouched)",
+      "result": "ALL_PASS — P0 require, P1 CPU session create, P2 metadata, P3 one inference, P4 10x repeat inference — zero crashes",
+      "conclusion": "confirms this is an old-package-version problem, matching the operator's own diagnostic matrix (ORT 1.14 crash / ORT 1.29 pass -> old runtime/package problem), not proven to be Node-22-ABI-specific since 1.29.0 on the same Node 22.17.1 works cleanly"
+    },
+    "executionProviders": "not enumerated by installed 1.14.0 build (no version/provider introspection API exposed by this old build) — CPU-only was forced via executionProviders:['cpu'] in onnx-embed.ts as a separate fix, but did not by itself resolve the native crash",
+    "tokenizerParity": "NOT YET CHECKED — onnx-embed.ts uses the real SentencePiece tokenizer via @huggingface/transformers; ai/onnx-server.js uses a weaker codepoint-fallback tokenizer for EMBEDDING_BACKEND=onnx_directml. A 32-row cosine-parity fixture against the proven :8081 GGUF output is still required before ONNX re-enters SEM768-EXECUTOR-BENCH, per this gate's own definition — not run this pass."
+  },
+  "conclusion": "Real, not hypothetical: onnxruntime-node 1.14.0 was confirmed both the actually-loaded version and confirmed crash-free at 1.29.0 in isolation on the identical Node 22.17.1 host. UPGRADE NOW APPLIED (2026-09-02, this session, approved by operator): bumped sveltekit-frontend/package.json onnxruntime-node 1.14.0 -> 1.29.0, npm install succeeded cleanly (7 packages added, 1 changed, 15s, no install-time errors). Re-verified the REAL in-process onnx-embed.ts path (not just the isolated tmp/ort-probe-1.29/ probe) against the actual EmbeddingGemma ONNX model at static/embeddinggemma_300m_onnx/model.onnx: 5/5 sequential real texts embedded successfully, all dim=768, all finite, all correctly L2-normalized (norm=1.0000), session reuse confirmed stable (first call 3.3s model load, subsequent calls ~15ms each, zero crashes across the run). The native crash that killed the Node process with no catchable JS error is confirmed resolved by this version bump.",
+  "onnxRuntimeUpgrade": {
+    "status": "APPLIED_AND_VERIFIED_LIVE",
+    "appliedAt": "2026-09-02",
+    "from": "1.14.0",
+    "to": "1.29.0",
+    "installResult": "added 7 packages, changed 1 package, audited 1567 packages in 15s, exit 0",
+    "inProcessVerification": {
+      "method": "npx tsx against a real script importing tryEmbedOnnx from onnx-embed.ts directly (not the isolated probe workspace)",
+      "sampleSize": 5,
+      "result": "5/5 PASS — dim=768, all finite, norm=1.0000, zero crashes, session-reuse latency ~15ms after first-call model load"
+    }
+  },
+  "tokenizerParityFixtureStatus": "STILL NOT RUN — the 32-row cosine-parity fixture against the proven :8081 GGUF output remains the one remaining requirement before ONNX re-enters SEM768-EXECUTOR-BENCH-01B. The runtime crash is resolved; output-value correctness (tokenizer/model parity) is a separate, still-open question.",
+  "recommendedNextSteps": [
+    "Run the 32-row tokenizer/output cosine-parity fixture: embed the same 32 real codebase_chunk_index.summary texts through both :8081 GGUF and the now-fixed onnx-embed.ts path, compare cosine similarity per row (expect near-1.0 if tokenizer + pooling truly match) before treating ONNX as an admitted SEM768 executor",
+    "Only after that fixture passes: allow ONNX back into SEM768-EXECUTOR-BENCH-01B as a real second lane"
+  ]
+}

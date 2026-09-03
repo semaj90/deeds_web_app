@@ -110,6 +110,10 @@ export const SearchMetadataFilterSchema = z
     authorityPercentileMin: z.number().min(0).max(1).optional(),
     embeddingLaneIds: z.array(z.string().min(1)).max(20).optional(),
     graphSnapshotId: z.string().min(1).optional(),
+    /** taxonomy_nodes.node_key values; resolved to sourceRefs via
+     * taxonomy-retrieval-filter-v1.ts and applied as a post-fetch gate
+     * (SearchFilter.include_source_refs), not pushed into lane queries. */
+    taxonomyNodeKeys: z.array(z.string().min(1)).max(50).optional(),
     includeGenerated: z.boolean().default(false),
     includeLegacy: z.boolean().default(false)
   })

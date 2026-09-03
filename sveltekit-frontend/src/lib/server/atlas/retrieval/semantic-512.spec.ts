@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { l2Normalize512, projectEmbeddingGemmaToSemantic512 } from './semantic-512';
+import {
+  l2Normalize512,
+  projectEmbeddingGemmaToSemantic512,
+  projectEmbeddingGemmaToSemanticMrl512,
+} from './semantic-512';
 
 function norm(values: Float32Array): number {
   let sum = 0;
@@ -22,6 +26,15 @@ describe('semantic_512', () => {
 
   it('rejects a non-768 native source instead of padding it', () => {
     expect(() => projectEmbeddingGemmaToSemantic512(new Float32Array(512))).toThrow(/NATIVE_DIMENSION_MISMATCH/);
+  });
+
+  it('keeps the canonical MRL projection numerically identical to the legacy adapter', () => {
+    const native = new Float32Array(768);
+    native[0] = 3;
+    native[511] = 4;
+    native[512] = 100;
+    expect(Array.from(projectEmbeddingGemmaToSemanticMrl512(native)))
+      .toEqual(Array.from(projectEmbeddingGemmaToSemantic512(native)));
   });
 
   it('rejects zero-norm semantic vectors', () => {

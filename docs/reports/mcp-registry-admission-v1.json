@@ -1,0 +1,26 @@
+{
+  "schema": "atlas.mcp-registry-admission-report.v1",
+  "generatedAt": "2026-09-03T03:55:16.058Z",
+  "admissions": {
+    "atlas-tools": {
+      "schemaVersion": "mcp-registry-admission.v1",
+      "serverAuthorityId": "parent-atlas:mcp:atlas-tools",
+      "toolSurfaceRevision": "14ff8f5fb513deb24c4fbdadccc58a6d4e2250c0cef859d1cb3336c370e76b5e",
+      "toolPolicyRevision": "18a5f6db85ecd21789be6bd80ee391d21fecabe26a096f22b08613d5c3d12cdd",
+      "registryRevision": "6a4d7c1d25465e061d9db775ab03dd9c818cfcb276778e9a7dd28a89812eff90",
+      "admittedAt": "2026-09-03T03:55:16.051Z",
+      "canonicalAuthority": false
+    },
+    "trace": {
+      "schemaVersion": "mcp-registry-admission.v1",
+      "serverAuthorityId": "parent-atlas:mcp:trace",
+      "toolSurfaceRevision": "ef13f47e1ad3bba8fb2bf9f08a493742dd68fe1b5719b457e1e6afbbb224188a",
+      "toolPolicyRevision": "1aee27444b11413a11281ba294c77e23ff91a5c11445c2d64a42fdd73dc5deeb",
+      "registryRevision": "239a5ec9afad9e4835c8730dd72bcda76f78a4ef734692e19a68c9af126e547b",
+      "admittedAt": "2026-09-03T03:55:16.058Z",
+      "canonicalAuthority": false
+    }
+  },
+  "skipped": {},
+  "allAdmitted": true
+}

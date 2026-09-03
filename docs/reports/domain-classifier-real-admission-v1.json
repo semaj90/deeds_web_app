@@ -1,0 +1,19 @@
+{
+  "schema": "atlas.domain-classifier-real-admission.v1",
+  "status": "REAL_CLASSIFIER_ADMISSION_BLOCKED",
+  "sourceRef": "__tests__/data-hashing.spec.ts",
+  "sourceRevision": "sha256:da7c6ceeb3c983e9e49ae0cc8e5cdb761ada6264f8c40d78296fac48b502c3ba",
+  "observedContentHash": "sha256:da7c6ceeb3c983e9e49ae0cc8e5cdb761ada6264f8c40d78296fac48b502c3ba",
+  "sourceRevisionContentMatch": true,
+  "classifierId": "atlas_external_docs.classify_domain",
+  "classifierRevision": "atlas-domain-classifier:live-v1",
+  "label": "database",
+  "probability": 1.0,
+  "mappingRevision": "sha256:e6039ff04c33b48deeb179aecd69c17a2ad7f84e91dbcf120d61289732120fc2",
+  "sourceNamespace": null,
+  "rejectionCode": "SOURCE_NAMESPACE_UNPROVEN",
+  "directClassifierToOntologyIdentityCount": 0,
+  "directClassifierToTupleCount": 0,
+  "writesPerformed": false,
+  "canonicalAuthority": false
+}

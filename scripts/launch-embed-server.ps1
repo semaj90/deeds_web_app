@@ -29,9 +29,28 @@
   EMBED_MODEL_PATH       default: auto-discovers embeddinggemma blob from Ollama store
   EMBED_PORT             default: 8081
   EMBED_NGL              default: 99  (full GPU offload)
-  EMBED_BATCH_SIZE       default: 512 (optimal throughput for embed requests)
-  EMBED_UBATCH_SIZE      default: 128
+  EMBED_BATCH_SIZE       default: 2048 (must equal EMBED_UBATCH_SIZE and be >= EMBED_CTX — see invariant below)
+  EMBED_UBATCH_SIZE      default: 2048
   EMBED_CTX              default: 2048 (embeddinggemma-300m model-card max input tokens)
+
+.NOTES
+  EMBED-SERVER-PHYSICAL-BATCH-01 (2026-09-02): for llama.cpp's non-causal/pooled
+  embedding execution path, the PHYSICAL batch (-ub/--ubatch-size) — not the
+  logical batch (-b/--batch-size) — is what actually caps admitted input length.
+  A prior default (batch=512, ubatch=128) silently rejected any input over ~128
+  tokens with "input (N tokens) is too large to process", even though the model's
+  real declared context is 2048 tokens (SEM768-8081-CAPACITY-01 proved this live:
+  255/2000 real codebase summaries failed at every concurrency level, root-caused
+  to this exact ceiling, not to load). llama.cpp itself sets batch=ubatch for
+  embedding models when they diverge, so an explicit mismatch here was silently
+  giving up capacity, not adding safety.
+
+  This script now derives batch/ubatch from ctx by default (both = EMBED_CTX) and
+  fails closed — refuses to launch — if an operator explicitly sets
+  EMBED_BATCH_SIZE != EMBED_UBATCH_SIZE, or sets a batch/ubatch below EMBED_CTX,
+  for this canonical EmbeddingGemma profile. This does not forbid a deliberately
+  smaller admitted-context profile for some future non-canonical embedding model —
+  it forbids exactly the silent ctx/batch mismatch that caused the incident.
 #>
 [CmdletBinding()]
 param(
@@ -141,10 +160,25 @@ if (-not (Test-Path $model)) { throw "Embed model GGUF not found at: $model" }
 # -- Config -------------------------------------------------------------------
 $port       = if ($env:EMBED_PORT)       { $env:EMBED_PORT }       else { '8081' }
 $ngl        = if ($env:EMBED_NGL)        { $env:EMBED_NGL }        else { '99'   }
-$batchSize  = if ($env:EMBED_BATCH_SIZE) { $env:EMBED_BATCH_SIZE } else { '512'  }
-$ubatchSize = if ($env:EMBED_UBATCH_SIZE){ $env:EMBED_UBATCH_SIZE} else { '128'  }
 $ctxLen     = if ($env:EMBED_CTX)        { $env:EMBED_CTX }        else { '2048' }
+# batch/ubatch default to ctx (canonical EmbeddingGemma profile — see
+# EMBED-SERVER-PHYSICAL-BATCH-01 note above). Only override via env if you
+# know what you're doing; a mismatch is refused below, not silently accepted.
+$batchSize  = if ($env:EMBED_BATCH_SIZE) { $env:EMBED_BATCH_SIZE } else { $ctxLen }
+$ubatchSize = if ($env:EMBED_UBATCH_SIZE){ $env:EMBED_UBATCH_SIZE} else { $ctxLen }
 $threads    = [System.Environment]::ProcessorCount.ToString()
+
+# -- Fail-closed invariant (EMBED-SERVER-PHYSICAL-BATCH-01) -------------------
+# Refuses to launch with a config that would silently cap admitted input length
+# below the advertised context — the exact defect that caused 255/2000 real
+# embedding requests to fail with "input too large to process" while the model
+# happily advertised a 2048-token EMBED_CTX.
+if ([int]$batchSize -ne [int]$ubatchSize) {
+  throw "EMBED_BATCH_SIZE ($batchSize) must equal EMBED_UBATCH_SIZE ($ubatchSize) for the canonical EmbeddingGemma embedding profile — llama.cpp's non-causal/pooled path is capped by the smaller of the two, so a mismatch silently truncates the admitted context. See EMBED-SERVER-PHYSICAL-BATCH-01 in this file's header."
+}
+if ([int]$batchSize -lt [int]$ctxLen) {
+  throw "Canonical EmbeddingGemma executor cannot advertise EMBED_CTX=$ctxLen with physical batch EMBED_BATCH_SIZE/EMBED_UBATCH_SIZE=$batchSize — requests near the advertised context would fail with 'input too large to process'. Raise EMBED_BATCH_SIZE/EMBED_UBATCH_SIZE to at least $ctxLen, or lower EMBED_CTX to match. See EMBED-SERVER-PHYSICAL-BATCH-01 in this file's header."
+}
 
 Write-Host "`nEmbed server config:" -ForegroundColor Gray
 Write-Host "  URL:         http://127.0.0.1:$port/v1/embeddings"

@@ -163,6 +163,17 @@ export async function unifiedSearch(req: SearchRequest): Promise<SearchResponse>
   // Default lane selection is tier-aware: 768 is canonical.
   const laneNames = normalizedRequest?.lanes ?? req.lanes ?? selectLaneNamesForTier(retrievalTier);
   const laneFilters = buildLaneFilter(req, normalizedRequest, perLaneLimit);
+
+  // Taxonomy membership narrows results as a post-fetch gate (not pushed
+  // into lane queries) — resolved here, once, before fan-out to lanes.
+  const taxonomyNodeKeys = (normalizedRequest?.filters as SearchMetadataFilter | undefined)?.taxonomyNodeKeys;
+  if (taxonomyNodeKeys?.length) {
+    const { resolveTaxonomyNodeKeysToSourceRefsV1 } = await import('../atlas/taxonomy-retrieval-filter-v1.js');
+    const resolved = await resolveTaxonomyNodeKeysToSourceRefsV1(taxonomyNodeKeys);
+    laneFilters.include_source_refs = [
+      ...new Set([...(laneFilters.include_source_refs ?? []), ...resolved.resolvedSourceRefs]),
+    ];
+  }
   const laneContext: SearchLaneContext = {
     queryText,
     queryVector: queryEmbedding,

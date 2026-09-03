@@ -1,22 +1,76 @@
 {
-  "generated_at": "2026-07-01T01:15:50.015Z",
-  "status": "WARN",
+  "generated_at": "2026-09-02T18:22:05.125Z",
+  "status": "PASS",
   "neo4j": {
     "uri": "bolt://127.0.0.1:7687"
   },
   "counts": {
-    "packets": 40754,
-    "features": 0,
-    "concepts": 0,
-    "packet_feature_edges": 0,
-    "used_concept_edges": 0
+    "packets": 59692,
+    "features": 13290,
+    "concepts": 19698,
+    "packet_feature_edges": 18986,
+    "used_concept_edges": 173158
   },
   "samples": [
     {
       "labels": [
-        "Chrom97Context"
+        "Packet"
       ],
-      "id": "packet:fb289b6c5b5e"
+      "id": "ace:packet:53838a539084"
+    },
+    {
+      "labels": [
+        "Packet"
+      ],
+      "id": "ace:packet:c34901a242e1"
+    },
+    {
+      "labels": [
+        "Packet"
+      ],
+      "id": "ace:packet:c6e2693b2ea3"
+    },
+    {
+      "labels": [
+        "Packet"
+      ],
+      "id": "ace:packet:533b36a302bc"
+    },
+    {
+      "labels": [
+        "Packet"
+      ],
+      "id": "ace:packet:024deb1c6154"
+    },
+    {
+      "labels": [
+        "Packet"
+      ],
+      "id": "ace:packet:dce2848643c6"
+    },
+    {
+      "labels": [
+        "Packet"
+      ],
+      "id": "ace:packet:e910f5761118"
+    },
+    {
+      "labels": [
+        "Packet"
+      ],
+      "id": "ace:packet:1d319295db66"
+    },
+    {
+      "labels": [
+        "Packet"
+      ],
+      "id": "ace:packet:074b2faeac79"
+    },
+    {
+      "labels": [
+        "Packet"
+      ],
+      "id": "ace:packet:5169c392e5a6"
     }
   ],
   "error": null

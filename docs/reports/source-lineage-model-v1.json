@@ -1,6 +1,6 @@
 {
   "schema": "atlas.source-lineage-model.v1",
-  "generatedAt": "2026-09-01T22:38:53.737Z",
+  "generatedAt": "2026-09-02T19:10:56.425Z",
   "readOnly": true,
   "postgresWrites": false,
   "observation": {
@@ -39,13 +39,13 @@
     "graphify_refs_missing_registry": 768
   },
   "currentProjection": {
-    "packet_rows": 61660,
-    "packet_source_refs": 61659,
+    "packet_rows": 61661,
+    "packet_source_refs": 61660,
     "exact_current_projection": 778,
     "source_revision_joined": 778,
     "current_workspace_joined": 111
   },
-  "projectionChecksum": "0b040e1237ea68a7e87598411b842477ae769926191dc20741a9d6e58a7ef48a",
+  "projectionChecksum": "59e776a0b0b9fe5ad855df5f77b71a4d911306ab0fb1035d643b7fefadf2c5d3",
   "policy": {
     "sourceRef": "locator_only",
     "canonicalSource": "stable_identity",

@@ -1252,6 +1252,65 @@ non-gating. **CUB-vs-CPU half is `DRY_RUN_PROVEN`** (see result above); cuTile h
 design.md, specs/, tasks.md — 25/26 tasks done, `openspec validate --strict` passes),
 `docs/reports/ace-radix-01-results.json` (the live benchmark result).
 
+### DEPENDENCY-CAPABILITY-GUARD-01 — no install without a proven capability gap (2026-09-03)
+
+**Invariant: `NO_NEW_CAPABILITY_OWNER_WITHOUT_PROVEN_GAP`.** Never run `pip install`, `conda install`,
+`docker pull`/`build`, or `npm install` merely because a library *could* help. Resolve the
+capability against `docs/reports/runtime-capability-registry-v1.json` first:
+
+```
+NEED
+  ↓
+Is capability already proven somewhere? ──YES──→ reuse that owner
+  ↓ NO
+Is capability available in an existing runtime, no install? ──YES──→ wire it
+  ↓ NO
+Is a new dependency actually required? ──YES──→ smallest package only ──NO──→ stop
+```
+
+Before any dependency mutation, record: `CAPABILITY`, `CURRENT_OWNER`, `CURRENT_RUNTIME`,
+`AVAILABLE`, `REUSE_PATH_PROVEN`, `CALLER_RUNTIME`, `TRANSPORT_BOUNDARY`, `ABI_COMPATIBLE`,
+`LATENCY_ACCEPTABLE`, `ISOLATION_COMPATIBLE`, `FAILURE_DOMAIN_COMPATIBLE`, `VERSION`,
+`LIVE_PROOF`, `WHY_CURRENT_OWNER_CANNOT_SATISFY_CALLER`, `MINIMAL_NEW_DEPENDENCY`, and
+`NEW_OWNER_JUSTIFICATION`. `AVAILABLE=true` prohibits a new install/owner only when the
+proven reuse path satisfies the caller contract. A pinned environment rebuild is distinct
+from adding a capability or owner and still requires package/image identity plus replay proof.
+
+**Real incident this rule prevents (found 2026-09-03, not fixed yet — flagged in the registry)**:
+`docker/atlas-gpu-8098/Dockerfile` builds `FROM rapidsai/base:26.08-cuda12-py3.13-amd64` — a
+broad/full prebuilt RAPIDS environment
+— but `services/atlas-gpu-8098/app.py` and `python/atlas_rapids_graph_runtime.py` (verified via
+`grep '^import|^from'`) only ever import `cudf` and `cugraph` (both lazily), plus
+`fastapi`/`pydantic`/`pyarrow` for the HTTP boundary. The actual capability need was
+`graph.jaccard.gpu` — already proven live on `wsl::atlas-rapids-cu13` (cuVS/cuGraph/cuDF/CuPy/
+PyTorch 26.06.x, RTX 3060 Ti, see GPU-MINI-FABRIC-01 above) — but a second, heavier Docker RAPIDS
+image got built anyway rather than first asking which runtime already owns the capability. RAPIDS'
+own docs recommend a custom image with only the needed libraries for exactly this reason.
+
+**Prohibited without an explicit, recorded capability gap**: installing optional libraries to
+satisfy a health check; installing a whole framework for one primitive; creating a second runtime
+owner for a capability another runtime already proves live; upgrading a working runtime merely to
+version-match another (capability parity, not version symmetry, is the bar — this repo already had
+this rule for `atlas-rapids-cu13` specifically under GPU-MINI-FABRIC-01; this section generalizes
+it to every dependency, not just that one environment). Applies beyond RAPIDS: TensorRT, PyTorch,
+Triton, cuTile, CUTLASS, ONNX Runtime, NetworkX, Neo4j, Qdrant, Valkey — one task should never
+silently create a second owner for a capability that already has one.
+
+**Layer discipline (do not conflate)**: CUDA (the toolkit/runtime) ≠ cuTile (the Python DSL for the
+tile programming model) ≠ SIMT (the existing thread/warp execution model cuGraph/cuDF/CuPy kernels
+already use — tile programming coexists with it per-kernel, it does not replace it) ≠ Tensor Cores
+(hardware units, 3rd-gen on this RTX 3060 Ti / Ampere sm_86, useful for GEMM/attention/dense linear
+algebra — not a general accelerator for irregular graph work like Jaccard/BFS/connected
+components). cuTile stays `AVAILABLE_FUTURE_CHALLENGER`; Ampere execution requires an
+Ampere-capable TileIR compiler/toolchain from the CUDA 13.2-generation line. This does not by
+itself require upgrading the system-wide CUDA toolkit; the isolated Python environment may
+provide the compiler components. Install remains blocked until `ACE-RADIX-01` proves a real
+cuTile half (this dev host's CUDA 13.0 toolkit only ships a compiler-intrinsic stub).
+
+**See**: `docs/reports/runtime-capability-registry-v1.json` (the registry — `wsl::atlas-rapids-cu13`
+and `docker::atlas-gpu-8098` entries, per-capability owner map, the atlas-gpu-8098 over-install
+finding and its minimal-rebuild target, prohibited-duplicate-owner list).
+
 ---
 
 ## 🔐 Atlas Data Persistence + Retrieval Contract (HARD RULES)

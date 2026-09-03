@@ -1,0 +1,119 @@
+{
+  "schema": "atlas.graphify-stale-run-portfolio.v1",
+  "generatedAt": "2026-09-03T00:51:10.306Z",
+  "mode": "READ_ONLY_STALE_RUN_PORTFOLIO",
+  "runningRunCount": 5,
+  "staleRunCount": 5,
+  "currentRunCount": 0,
+  "repositoryHeadRevision": "85e6f3d509856c75d77e175fc823623c2cd4e18c",
+  "runs": [
+    {
+      "runId": "3f13703e-5944-487c-a5a9-10dcecc00124",
+      "status": "RUNNING",
+      "workspaceRevision": "sha256:2c9f63df1ac60860756143caf4ce52da7d96a5f0169d21a69568c6f5301c52b1",
+      "repositoryRevision": "53e0d6375385e6f85d6d86e3216d5de1bb15fd90",
+      "graphRevision": null,
+      "commitsBehindHead": 280,
+      "startedAt": "2026-08-27T16:35:34.281Z",
+      "lastHeartbeatAt": null,
+      "activeWorkerEvidence": false,
+      "currentAuthorityEvidence": false,
+      "structuralArtifactRevision": null,
+      "artifactMatchesRunRevision": false,
+      "recommendedDisposition": "SUPERSEDE",
+      "namespaceStatus": "UNRESOLVED",
+      "evidenceRefs": [
+        "docs/reports/graphify-lifecycle-owner-v1.json",
+        "docs/reports/workspace-source-namespace-v1.json",
+        "docs/reports/graphify-stale-run-reconciliation-v1.json"
+      ]
+    },
+    {
+      "runId": "a7377c07-acb2-4d68-bf83-19d8eca586d4",
+      "status": "RUNNING",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "repositoryRevision": "880b69baf405e49850a3ab88f98cefb720e8fdb1",
+      "graphRevision": null,
+      "commitsBehindHead": 279,
+      "startedAt": "2026-08-27T16:45:38.584Z",
+      "lastHeartbeatAt": null,
+      "activeWorkerEvidence": false,
+      "currentAuthorityEvidence": false,
+      "structuralArtifactRevision": null,
+      "artifactMatchesRunRevision": false,
+      "recommendedDisposition": "SUPERSEDE",
+      "namespaceStatus": "UNRESOLVED",
+      "evidenceRefs": [
+        "docs/reports/graphify-lifecycle-owner-v1.json",
+        "docs/reports/workspace-source-namespace-v1.json",
+        "docs/reports/graphify-stale-run-reconciliation-v1.json"
+      ]
+    },
+    {
+      "runId": "b3a5b14e-0065-41bb-bfe0-96e1062d1e07",
+      "status": "RUNNING",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "repositoryRevision": "880b69baf405e49850a3ab88f98cefb720e8fdb1",
+      "graphRevision": null,
+      "commitsBehindHead": 279,
+      "startedAt": "2026-08-27T16:53:01.074Z",
+      "lastHeartbeatAt": null,
+      "activeWorkerEvidence": false,
+      "currentAuthorityEvidence": false,
+      "structuralArtifactRevision": null,
+      "artifactMatchesRunRevision": false,
+      "recommendedDisposition": "SUPERSEDE",
+      "namespaceStatus": "UNRESOLVED",
+      "evidenceRefs": [
+        "docs/reports/graphify-lifecycle-owner-v1.json",
+        "docs/reports/workspace-source-namespace-v1.json",
+        "docs/reports/graphify-stale-run-reconciliation-v1.json"
+      ]
+    },
+    {
+      "runId": "b1a103ac-c717-430b-9643-a8c9818064ae",
+      "status": "RUNNING",
+      "workspaceRevision": "sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70",
+      "repositoryRevision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "graphRevision": null,
+      "commitsBehindHead": 278,
+      "startedAt": "2026-08-28T00:16:13.803Z",
+      "lastHeartbeatAt": null,
+      "activeWorkerEvidence": false,
+      "currentAuthorityEvidence": false,
+      "structuralArtifactRevision": null,
+      "artifactMatchesRunRevision": false,
+      "recommendedDisposition": "SUPERSEDE",
+      "namespaceStatus": "UNRESOLVED",
+      "evidenceRefs": [
+        "docs/reports/graphify-lifecycle-owner-v1.json",
+        "docs/reports/workspace-source-namespace-v1.json",
+        "docs/reports/graphify-stale-run-reconciliation-v1.json"
+      ]
+    },
+    {
+      "runId": "14643371-f6f2-4131-906b-235a5c06619a",
+      "status": "RUNNING",
+      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "repositoryRevision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "graphRevision": null,
+      "commitsBehindHead": 278,
+      "startedAt": "2026-08-28T04:01:23.454Z",
+      "lastHeartbeatAt": null,
+      "activeWorkerEvidence": false,
+      "currentAuthorityEvidence": false,
+      "structuralArtifactRevision": null,
+      "artifactMatchesRunRevision": false,
+      "recommendedDisposition": "SUPERSEDE",
+      "namespaceStatus": "UNRESOLVED",
+      "evidenceRefs": [
+        "docs/reports/graphify-lifecycle-owner-v1.json",
+        "docs/reports/workspace-source-namespace-v1.json",
+        "docs/reports/graphify-stale-run-reconciliation-v1.json"
+      ]
+    }
+  ],
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "reportChecksum": "sha256:547797e4b78bb0e9157330b3428740a7ea45a75a8297588f9b41c1ea5dec2be9"
+}

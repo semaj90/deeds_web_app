@@ -1,0 +1,25 @@
+{
+  "schema": "atlas.latent-phase16-canary-apply-incident.v1",
+  "status": "CANARY_APPLY_IDEMPOTENCE_UNPROVEN",
+  "cause": "LIMIT_IS_A_MOVING_ELIGIBILITY_WINDOW",
+  "runA": {
+    "receiptPath": "docs/reports/latent-phase16-representation-artifact-2026-09-02T23-56-10-379Z.json",
+    "requestedLimit": 128,
+    "processedCount": 128,
+    "pythonReportedWrites": 128,
+    "wrapperEffectiveWriteCount": 126
+  },
+  "runB": {
+    "receiptPath": "docs/reports/latent-phase16-representation-artifact-2026-09-02T23-56-23-341Z.json",
+    "requestedLimit": 128,
+    "processedCount": 128,
+    "pythonReportedWrites": 128,
+    "wrapperEffectiveWriteCount": 116
+  },
+  "finding": "The wrapper applies LIMIT after the current staleness predicate. After run A changes the first eligible rows, run B selects the next eligible rows rather than replaying run A's exact IDs.",
+  "writesPerformed": true,
+  "additionalWrites": "STOPPED",
+  "canonicalAuthority": false,
+  "requiredRepair": "Freeze an explicit cohort ID list and pass that exact list to the bounded executor before any further apply.",
+  "graphifyDailyRerun": "DEFERRED"
+}

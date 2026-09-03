@@ -1,0 +1,12 @@
+{
+  "schema": "atlas.source-namespace-v1-proof.report",
+  "generatedAt": "2026-09-02T20:23:34.646Z",
+  "liveRowCount": 885,
+  "writesPerformed": false,
+  "identityOnlyCount": 512,
+  "revisionBoundCount": 373,
+  "failureCount": 0,
+  "distinctBindingRevisionValues": 3,
+  "matchesWorkspaceOwnerBinding01": true,
+  "note": "WORKSPACE-OWNER-BINDING-01 found 512/885 NULL and 373/885 non-null (256+111+6) workspace_revision values. This proof confirms the contract classifies the live table identically."
+}

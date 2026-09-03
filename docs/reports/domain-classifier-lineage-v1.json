@@ -1,6 +1,6 @@
 {
   "schema": "atlas.domain-classifier-lineage.v1",
-  "generatedAt": "2026-09-01T22:42:04.493Z",
+  "generatedAt": "2026-09-02T19:00:14.621Z",
   "readOnly": true,
   "postgresWrites": false,
   "tupleWrites": false,
@@ -13,14 +13,14 @@
     "namespaceCandidate": "graphify_files.workspace_id (candidate only; semantic namespace proof required)"
   },
   "summary": {
-    "classifier_rows": 3294,
-    "source_ref_present": 3293,
+    "classifier_rows": 3295,
+    "source_ref_present": 3294,
     "source_revision_available": 78,
-    "workspace_revision_available": 3294,
+    "workspace_revision_available": 3295,
     "source_namespace_available": 0,
     "workspace_id_namespace_candidate": 78,
     "revision_qualified_join": 78,
-    "missing_graphify_join": 3216
+    "missing_graphify_join": 3217
   },
   "sample": [
     {
