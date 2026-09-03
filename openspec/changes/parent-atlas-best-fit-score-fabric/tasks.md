@@ -120,13 +120,28 @@ domain-taxonomy values, not the heuristic fit score/OKF_FIT_VERSION) — this is
 for finding #2/#12, not an accidental regression; downstream readers of those two persisted fields
 should be re-checked if any assumed the old (buggy) meaning.
 
-## 2. RERANK-WEIGHT-BOUNDARY-01 (not started)
+## 2. RERANK-WEIGHT-BOUNDARY-01 (DONE, 2026-09-03)
 
-- [ ] 2.1 Add `BlendWeightsSchema.parse()` inside `blendScores()` itself (or at minimum at every
-      externally-reachable call site that accepts a caller-supplied `blendWeights`, starting with
-      `scoreCandidates()`'s `options.blendWeights`).
-- [ ] 2.2 Add a malformed-sum rejection test (weights not summing to 1.0 ± 0.0001) proving the
-      boundary is actually enforced, not just present in the class constructors.
+- [x] 2.1 DONE — `candidate-scorer.ts::scoreCandidates()`'s `options.blendWeights` now runs through
+      `BlendWeightsSchema.parse()` before use (`const weights = options.blendWeights ?
+      BlendWeightsSchema.parse(options.blendWeights) : DEFAULT_BLEND_WEIGHTS`). Checked the other
+      real `runtime-reranker.ts::blendScores()` call sites first (`canonical-rerank-executor.ts`'s
+      3 call sites): all construct weights internally (either `this.blendWeights`, validated at
+      the reranker class's own construction, or `{...DEFAULT_BLEND_WEIGHTS, crossEncoder: 0}`
+      computed inline, always valid by construction) — none accept an external caller-supplied
+      value unvalidated, so `scoreCandidates()` was the one genuine gap, not a symptom of a wider
+      pattern. (Note: several *other*, unrelated local functions named `blendScores` exist
+      elsewhere — `ace/search-router.ts`, `cross-ranker.ts`, `parallel-orchestrator.ts` — these do
+      not use `BlendWeights`/`BlendWeightsSchema` at all and are out of this task's scope.)
+- [x] 2.2 DONE — added 3 tests to `candidate-scorer.spec.ts`: rejects a non-1.0-summing
+      `blendWeights` (`.rejects.toThrow()`), rejects an out-of-`[0,1]`-range weight, and confirms a
+      valid weights object still scores correctly (`blendedScore` closely matches the expected
+      single-signal weighted value). Verified no existing caller of `scoreCandidates()` supplies a
+      hand-crafted `blendWeights` that would now break (`search-runtime.ts`'s `scorerOptions` is
+      externally-injected and optional, defaults to `undefined`; the two other test files calling
+      `scoreCandidates()` don't pass custom weights) — confirmed by grep before declaring this
+      safe, not assumed. Full `candidate-scorer.spec.ts` suite: 13/13 passing, live-run.
+      `npx tsgo --noEmit` clean on `candidate-scorer.ts`.
 
 ## 3. XGBOOST-RERANK-ACTIVATION-01 (not started)
 
