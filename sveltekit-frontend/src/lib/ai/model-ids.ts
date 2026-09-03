@@ -91,8 +91,14 @@ export const CLIENT_EMBEDDING_TOKENIZER_PATH = '/embeddinggemma_300m_onnx/tokeni
 
 // ── Server-side models (Ollama + CUDA RTX) ───────────────────────────────
 
-/** gemma4-rotorquant:latest — Gemma 4 E4B fine-tuned legal LLM served from the local RotorQuant GGUF lane */
-export const SERVER_CHAT_MODEL = 'gemma4-rotorquant:latest';
+/**
+ * ornith-1.5-9b — currently loaded on llama-server :8090 (models/ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf).
+ * This is a snapshot of whatever llama-server was launched with, not a stable identity — it drifts
+ * every time the operator switches launch profile (see scripts/launch-turboquant.ps1 -Profile).
+ * Prefer resolving the live model via src/lib/server/ai/llama-server-model-resolver.ts (GET
+ * /v1/models) over trusting this constant where the caller can reach that resolver.
+ */
+export const SERVER_CHAT_MODEL = 'ornith-1.5-9b';
 
 /** gemma4:e4b Q4_K_M — 8B params, 131K context, native tool calling + thinking via Ollama */
 export const SERVER_GEMMA4_MODEL = 'gemma4:e4b-it-q4_K_M';
@@ -110,7 +116,12 @@ export const SERVER_EMBEDDING_FALLBACK = SERVER_EMBEDDING_MODEL;
 /** IBM Granite-Docling-258M — document understanding VLM lane (522 MB) */
 export const SERVER_GRANITE_DOCLING_MODEL = 'ibm/granite-docling:258m';
 
-/** gemma4-rotorquant:latest — merged Gemma 4 legal VLM exposed through the VLM server */
+/**
+ * gemma4-rotorquant:latest — merged Gemma 4 legal VLM served by the SEPARATE FastAPI/HF
+ * Transformers VLM server on :8085 (see VLM_BASE_URL below), not llama-server :8090. Not touched
+ * by the Ornith 1.5 switch confirmed only for :8090 — do not assume this changed too without
+ * separately confirming what's actually loaded on :8085.
+ */
 export const SERVER_VLM_MODEL = 'gemma4-rotorquant:latest';
 
 export type ModelRole =
@@ -292,7 +303,8 @@ export const VLM_BASE_URL =
 export const TURBOQUANT_BASE_URL = 
   (typeof process !== 'undefined' && process.env?.TURBOQUANT_BASE_URL) || 
   `http://${['127', '0', '0', '1'].join('.')}:8080`;
-export const TURBOQUANT_MODEL = 'gemma4-rotorquant:latest';
+/** ornith-1.5-9b — currently loaded on llama-server :8090; see SERVER_CHAT_MODEL's drift note above. */
+export const TURBOQUANT_MODEL = 'ornith-1.5-9b';
 
 /** TurboQuant KV cache quantization levels */
 export type TurboQuantLevel = 'turbo2' | 'turbo3' | 'turbo4';

@@ -67,14 +67,41 @@ await redis.quit();
 
 ---
 
+## 🔌 Ollama Phase-Out (2026-09-03 — IN PROGRESS, not complete)
+
+**Direction, not yet done**: Ollama is being removed from this stack entirely — including the
+embeddings lane, which is currently the *only* thing the July 30 hard rule below still permits it
+to do. **The replacement embeddings backend has not been decided yet.** Two live/in-progress
+candidates exist in this repo today, neither confirmed as final:
+- **Go Embedding service (`:8097`)** — already running, health-checked as `768-dim, GPU` this
+  session (`npm run graphify:validate`). Strong default candidate since it's already live.
+- **Local llama.cpp GGUF embedding executor ("EG-GGUF")** — an in-progress challenger path
+  proven only through early gates (0-2 of an unknown total) as of Session 201; not yet validated
+  against Ollama's actual output for parity.
+
+**Until a replacement is confirmed and every embeddings call site is migrated: do not delete
+Ollama, do not stop its service, and do not remove `embeddinggemma:latest` calls.** The table below
+(July 30 boundary rule) and the many `Ollama :11434` references throughout this file and the
+project-root CLAUDE.md are the **current, still-load-bearing state** — treat them as accurate until
+this section is updated to say the migration is complete, not as already-superseded. When the
+replacement is chosen, this section must be updated with which backend won, the parity proof that
+justified it, and the sweep status of every embeddings call site — the same evidentiary bar this
+file already holds the chat/synthesis model switch (Gemma4 → Ornith 1.5, see `src/lib/ai/model-ids.ts`) to.
+
+Chat/synthesis is separately already off Gemma4 and onto **Ornith 1.5 9B** on llama-server `:8090`
+(live-confirmed via `/props`: `model_alias: "ornith-1.5-9b"`, `modalities: {vision:false}` — text/tool
+lane only, no vision). The table below's model examples are stale on that point; do not treat
+`hforf`/`gemma4-legal-iq4xs-direct.gguf` as what's actually loaded — check `GET :8090/v1/models` or
+`/props` live, per `src/lib/server/ai/llama-server-model-resolver.ts`'s own resolution contract.
+
 ## 🔌 Ollama vs llama-server Boundary (July 30, 2026)
 
 **HARD RULE**: Ollama is ONLY for embeddings. All chat/synthesis goes through llama-server.exe.
 
 | Service | Port | Use Case | Models | Rule |
 |---------|------|----------|--------|------|
-| **Ollama** | 11434 | Embeddings ONLY | `embeddinggemma:latest` (768-dim) | ✅ Use for `/api/embeddings` and `/api/embed` |
-| **llama-server** | 8090 | Chat & synthesis | hforf, gemma4-legal-iq4xs-direct.gguf | ✅ Use for `/v1/chat/completions` |
+| **Ollama** | 11434 | Embeddings ONLY | `embeddinggemma:latest` (768-dim) | ✅ Use for `/api/embeddings` and `/api/embed` — **slated for removal, see "Ollama Phase-Out" above; replacement not yet decided** |
+| **llama-server** | 8090 | Chat & synthesis | currently Ornith 1.5 9B (was hforf/gemma4-legal-iq4xs-direct.gguf) | ✅ Use for `/v1/chat/completions` — verify actual loaded model live, don't hardcode |
 
 **No Ollama model pulls** (e.g., `ollama pull gemma4:e4b-it`, `ollama pull mistral`) — all chat models loaded via llama-server flags (`-m model.gguf`).
 

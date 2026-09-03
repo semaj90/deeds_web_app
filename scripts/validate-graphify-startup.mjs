@@ -11,7 +11,9 @@
  *
  * Critical Services:
  *   - Embedding service (embeddinggemma:latest, 768-dim)
- *   - Synthesis server (Gemma4 RotorQuant at :8090)
+ *   - Synthesis server (llama-server at :8090 — whatever model is currently
+ *     loaded there; historically Gemma4 RotorQuant, currently Ornith 1.5 9B.
+ *     See src/lib/ai/model-ids.ts for the drift note on hardcoding this.)
  *   - Go Retrieval (embedding sidecar + search)
  *   - TurboVec (vector prefilter at :8791)
  *
@@ -71,20 +73,23 @@ const checks = [
     }
   },
   {
-    name: 'Gemma4 Synthesis (:8090)',
+    name: 'LLM Synthesis (:8090)',
     port: 8090,
     url: 'http://127.0.0.1:8090/v1/models',
-    schema: { service: 'llama-server', model: 'gemma4', quantization: 'iq4_xs', critical: true, otel: true },
+    schema: { service: 'llama-server', model: 'any', critical: true, otel: true },
     validate: (data) => {
+      // llama-server's own GET /v1/models response is the only source of truth for what's
+      // actually loaded (see src/lib/server/ai/llama-server-model-resolver.ts's docstring for
+      // the same principle applied server-side). This check only verifies *a* model is
+      // reachable and reporting an id, not that it matches a specific hardcoded name — the
+      // model has already changed once (Gemma4 RotorQuant -> Ornith 1.5 9B) and will again.
       const model = data.data?.[0];
-      const isGemma4 = model?.id?.includes('gemma4');
-      const isHForF = model?.id?.includes('hforf');
-      const isAccepted = isGemma4 || isHForF;
-      const quantNote = isGemma4 && model.id.includes('iq4') ? ' (IQ4_XS)' : '';
+      const hasModel = typeof model?.id === 'string' && model.id.length > 0;
+      const quantNote = model?.id?.includes('iq4') ? ' (IQ4_XS)' : '';
       return {
-        ok: isAccepted,
-        msg: isAccepted ? `✓ ${model.id}${quantNote}` : `✗ Wrong model: ${model?.id}`,
-        schema: { service: 'llama-server', model: model?.id, quantization: 'iq4_xs' }
+        ok: hasModel,
+        msg: hasModel ? `✓ ${model.id}${quantNote}` : `✗ No model reported by llama-server`,
+        schema: { service: 'llama-server', model: model?.id ?? null }
       };
     }
   },
@@ -214,7 +219,7 @@ async function main() {
 
   console.log('Port Status:');
   Object.entries(portStatus).forEach(([port, listening]) => {
-    const portMap = { 8097: 'Go Embedding', 8090: 'Gemma4', 8100: 'Go Retrieval', 8791: 'TurboVec' };
+    const portMap = { 8097: 'Go Embedding', 8090: 'LLM Synthesis', 8100: 'Go Retrieval', 8791: 'TurboVec' };
     console.log(`  ${listening ? '✓' : '✗'} :${port} (${portMap[port]})`);
   });
   console.log();
@@ -226,7 +231,7 @@ async function main() {
   
   const criticalServices = [
     'Embedding Service (:8097)',
-    'Gemma4 Synthesis (:8090)',
+    'LLM Synthesis (:8090)',
     'Qdrant Vector DB (:6333)',
     'Postgres Truth Layer (port 5434)'
   ];
@@ -270,9 +275,10 @@ async function main() {
     }
 
     // Report schema conformance
+    const llmSynthesisModel = results.find(r => r.name === 'LLM Synthesis (:8090)')?.schema?.model ?? 'unknown';
     console.log('📊 Schema Conformance:');
     console.log(`  Embedding Dimension: 768-dim (canonical)`);
-    console.log(`  Quantization: IQ4_XS (Gemma4) + 4-bit (TurboVec)`);
+    console.log(`  LLM Synthesis Model: ${llmSynthesisModel} (live from :8090 /v1/models) + 4-bit (TurboVec)`);
     console.log(`  OpenTelemetry: ${otelServices.length > 0 ? otelServices.join(', ') : 'Not detected'}`);
     console.log();
 

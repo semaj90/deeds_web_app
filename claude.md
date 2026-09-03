@@ -2,6 +2,50 @@
 
 > MCP/Atlas status note (2026-08-23): The MCP and Atlas connection/tool-count statements in this document are historical snapshots. Current bounded evidence is in docs/reports/mcp-atlas-markdown-audit-2026-08-23.md. Live TRACE currently exposes 175 tools; active project config wires trace plus local atlas-tools.
 
+## 🔄 Ollama Phase-Out + Chat/Synthesis Model Switch (2026-09-03 — IN PROGRESS, not complete)
+
+Two related, active changes — neither finished, both stated operator direction rather than
+completed migrations. Read before trusting any Ollama-, Gemma4-, or `:8090`-related statement
+elsewhere in this file (many predate both changes and are now stale on specifics, though still
+correct on architecture/roles unless noted otherwise).
+
+**1. Chat/synthesis model switch — Gemma4 → Ornith 1.5 9B, confirmed live.** llama-server on
+`:8090` currently serves `ornith-1.5-9b` (`models/ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf`), not
+Gemma4 — verified directly via `GET :8090/props`: `"model_alias":"ornith-1.5-9b"`,
+`"modalities":{"vision":false,"audio":false}` (text/tool-calling only; no vision projector is
+loaded — a separate `mmproj-Ornith-1.5-9B-*.gguf` would be required for that, and none exists in
+the model directory as of this check). The "❄️ CANONICAL LLAMA-SERVER STARTUP CONTRACT" section
+immediately below this one is FROZEN from Aug 4 and documents the old Gemma4/hforf setup — treat
+its *process* (chat-template wiring, `--skip-chat-parsing` ban) as still valid, but its specific
+model identity (`gemma4-legal-iq4xs-direct.gguf`) as historical, not current. Fixed this session:
+`sveltekit-frontend/src/lib/ai/model-ids.ts`'s `SERVER_CHAT_MODEL`/`TURBOQUANT_MODEL` constants
+(were hardcoded to `gemma4-rotorquant:latest`, sent literally as the `model` field in live chat
+requests — a real bug, not just stale docs) and `scripts/validate-graphify-startup.mjs` (hardcoded
+model-name gate was rejecting Ornith as "wrong model"). **`SERVER_VLM_MODEL` was deliberately NOT
+changed** — the separate VLM server on `:8085` (FastAPI + HF Transformers) is untouched by this
+switch and still reports `"vlm_model":"gemma4:e4b"` live; do not conflate the two lanes.
+`scripts/launch-turboquant.ps1` already has a first-class `ornith-1.5` profile (not stale), but its
+doc comment still calls `gemma4-direct` the default profile — minor, not fixed yet.
+
+**2. Ollama removal — direction only, replacement backend undecided.** Ollama is intended to be
+removed from this stack entirely, including the embeddings lane (currently the *only* thing the
+"Ollama vs llama-server Boundary" hard rule elsewhere in this file permits it to do — see that
+section, and the mirrored note in `sveltekit-frontend/CLAUDE.md`, for the full rule). **No
+replacement has been chosen.** Two live/in-progress candidates, neither confirmed final:
+- Go Embedding service (`:8097`) — already running, health-checked 768-dim/GPU this session.
+- Local llama.cpp GGUF embedding executor ("EG-GGUF") — early-stage proof (gates 0-2 only),
+  not yet parity-checked against Ollama's actual output.
+
+**Until this section says the migration is complete: do not delete Ollama, do not stop its
+service, do not remove `embeddinggemma:latest` calls, and do not treat any other Ollama-embeddings
+reference in this file as dead.** Every "PRIMARY EMBEDDING MODEL: `embeddinggemma:latest` (via
+Ollama `/api/embed`)" style statement elsewhere in this document remains the current, correct,
+load-bearing state — this note documents an intent, not a completed cutover. When a replacement is
+picked, update this section with which backend won, the parity proof that justified it, and the
+migration status of every embeddings call site — the same evidentiary bar this file already
+requires (see e.g. the Embedding Dimensions Policy section's own history of undocumented
+re-decisions and what it cost to unwind them).
+
 ## ❄️ CANONICAL LLAMA-SERVER STARTUP CONTRACT (FROZEN — Session 188C, Aug 4 2026)
 
 **Status**: ✅ VALIDATED | **Validation**: 3-point contract PASS | **Commit**: TBD
