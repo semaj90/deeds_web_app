@@ -3195,6 +3195,33 @@ The existing `scripts/atlas/audit-current-source-evidence-hydration-v1.mjs` prov
 
 Scope clarification: `docs/reports/lineage-semantic-768-cohort-v1.json` proves a separate 15-row lineage-qualified semantic canary (`sourceRevision`, `workspaceRevision`, exact `codebaseChunkId`, vector presence, and producer metadata). It is eligible for an explicitly labeled bounded diagnostic KNN replay, but it is not evidence for full 55,169-row cohort admission and must not advance the corpus-wide CandidateOrdinal/KNN/SOM/AE gates.
 
+## CURRENT-SOURCE-COHORT-OWNER-01 (2026-09-03, owner found; semantics require repair before regeneration)
+
+The existing owner is `scripts/atlas/build-current-source-projection-cohort-v1.mjs`,
+which produces `docs/reports/current-source-projection-cohort-v1.json` from the
+source-manifest/projection comparison. The artifact is not a current selection
+authority: its eligibility is based on namespace plus file-byte equality and does
+not join each source to the current `graphify_files` `code_source_revision`.
+
+The companion `scripts/atlas/audit-current-source-cohort-lineage-v1.mjs` currently
+uses whole-workspace equality as its primary filter. That is too coarse for file-local
+reuse in a dirty workspace. Before regenerating the cohort, repair/reuse this owner
+with an exact per-source join:
+
+`sourceRef` + `sourceRevision/codeSourceRevision` + parser/extraction revisions.
+
+Preserve both observation and Graphify workspace revisions in the receipt and record
+when they differ; never synthesize a workspace match. Whole-workspace equality remains
+required for graph-dependent features such as PageRank, communities, cross-file edges,
+and CandidateOrdinal snapshots. The old 111-source result remains a historical canary,
+not the current selection authority.
+
+Required follow-up artifact: `docs/reports/current-source-projection-cohort-v2.json`
+with exact-match, changed, missing, ambiguous, revision-unproven, workspace-match,
+and workspace-mismatch/source-exact counts, plus a deterministic selection checksum
+and `writesPerformed=false`. Do not run the existing v1 builder again until this gate
+is repaired.
+
 ## REMAINING-TASK-PRIORITY-AND-HELPERS-01 (30 unchecked items)
 
 Use this as the coordination index for the remaining unchecked items. A helper may produce an audit, test, or proposal, but may not mark a task complete without a linked receipt and may not mutate canonical stores. One helper owns one lane at a time; helpers must not create competing revision, ordinal, graph, cache, or lifecycle authorities.
@@ -3202,23 +3229,26 @@ Use this as the coordination index for the remaining unchecked items. A helper m
 ### P0 — unblock the dependency graph
 
 1. `PKT-LINEAGE-08 / PROMOTION-01` — ready for explicit authorization; prove the real packet-writer entrypoint with one bounded source, exact membership readback, and idempotent replay. This is the first executable mutation-capable gate, but it remains dormant until authorization is explicit.
-2. `LINEAGE-02` — `LINEAGE-02-COHORT-ORIGIN-01`; recover the authoritative
+2. `CURRENT-SOURCE-COHORT-OWNER-01` — repair the existing cohort owner and
+   change admission from whole-workspace equality to exact per-source lineage
+   before any cohort regeneration.
+3. `LINEAGE-02` — `LINEAGE-02-COHORT-ORIGIN-01`; recover the authoritative
    cohort definition, owner, population checksum, and candidate-selection
    evidence. Keep `cohortSize=UNRESOLVED` until those exist; do not infer or
    substitute the 55,169-row semantic snapshot.
-3. `DAG-RUNTIME-01D.2` — blocked revision-bundle gate; source, candidate, graph, and representation revisions are not one authoritative world-state.
-4. `RETRIEVAL-01L` — governance closeout; freeze the durable proposal/rollback/readback/replay protocol for full Qdrant projection ownership. Do not rerun historical bulk reconciliation merely to recreate an unavailable proposal artifact.
-5. `PKT-LINEAGE-08` production-entrypoint proof — subordinate to item 1; no historical backfill or broad packet scan.
+4. `DAG-RUNTIME-01D.2` — blocked revision-bundle gate; source, candidate, graph, and representation revisions are not one authoritative world-state.
+5. `RETRIEVAL-01L` — governance closeout; freeze the durable proposal/rollback/readback/replay protocol for full Qdrant projection ownership. Do not rerun historical bulk reconciliation merely to recreate an unavailable proposal artifact.
+6. `PKT-LINEAGE-08` production-entrypoint proof — subordinate to item 1; no historical backfill or broad packet scan.
 
 ### P1 — execute after the P0 owner decisions
 
-6. `DAG-RUNTIME-01D` — deterministic live replay, only after 01D.2.
-7. `DAG-RUNTIME-01E` — ContextManifest and validation-receipt linkage, only after 01D.
-8. `ACE / MCP caller adoption` — one strict ACE caller through SearchRuntime and ContextManifestV2; keep the other legacy callers unchanged.
-9. `BitFrost invalidation` — prove Valkey mutation invalidation and tracking-disconnect flush safety separately.
-10. `MCP manifest/caller/alias items` — finish only the missing manifest, bounded NLP caller, and TRACE alias replay; dense tool projection remains a separate proof.
-11. `PKT-LINEAGE-09` — execute only the frozen, reverified backfill cohort after the required authorization and drift check.
-12. `PKT-LINEAGE-10/11` — reconcile from the canonical membership table, then run the tiny Qdrant canary only after zero-ambiguity dry reconciliation.
+7. `DAG-RUNTIME-01D` — deterministic live replay, only after 01D.2.
+8. `DAG-RUNTIME-01E` — ContextManifest and validation-receipt linkage, only after 01D.
+9. `ACE / MCP caller adoption` — one strict ACE caller through SearchRuntime and ContextManifestV2; keep the other legacy callers unchanged.
+10. `BitFrost invalidation` — prove Valkey mutation invalidation and tracking-disconnect flush safety separately.
+11. `MCP manifest/caller/alias items` — finish only the missing manifest, bounded NLP caller, and TRACE alias replay; dense tool projection remains a separate proof.
+12. `PKT-LINEAGE-09` — execute only the frozen, reverified backfill cohort after the required authorization and drift check.
+13. `PKT-LINEAGE-10/11` — reconcile from the canonical membership table, then run the tiny Qdrant canary only after zero-ambiguity dry reconciliation.
 
 ### P2 — validation hygiene and optional/derived lanes
 

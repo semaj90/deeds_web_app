@@ -38,6 +38,28 @@ describe('classifyMcpToolPolicyV1', () => {
     expect(policy.entries[0].policySource).toBe('atlas_tool_registry');
   });
 
+  it('classifies the live atlas-tools surface explicitly and gates record_outcome', () => {
+    const policy = classifyMcpToolPolicyV1(surfaceWithTools([
+      'classify_intent',
+      'build_agentic_rag_context',
+      'build_recommendation',
+      'find_dependencies',
+      'trace_database',
+      'trace_tool_chain',
+      'find_source_refs',
+      'find_feature',
+      'find_route',
+      'record_outcome',
+    ]));
+
+    expect(policy.policySourceStatus).toBe('PROVEN');
+    expect(policy.entries.filter((entry) => entry.permissionClass === 'READ')).toHaveLength(9);
+    expect(policy.entries.find((entry) => entry.ref.toolName === 'record_outcome')).toMatchObject({
+      permissionClass: 'WRITE',
+      approvalRequired: true,
+    });
+  });
+
   it('classifies a known atlas-tool-registry WRITE tool with approval required', () => {
     const policy = classifyMcpToolPolicyV1(surfaceWithTools(['atlas.patch.apply']));
     expect(policy.entries[0].permissionClass).toBe('WRITE');

@@ -78,7 +78,8 @@
   ],
   "capabilities": {
     "graph.jaccard.gpu": { "provenOwner": "wsl::atlas-rapids-cu13", "secondaryOwner": "docker::atlas-gpu-8098", "installAllowed": false },
-    "graph.pagerank.gpu": { "provenOwner": "wsl::atlas-rapids-cu13", "secondaryOwner": "python::networkx (CPU reference oracle, not GPU -- see networkxOracle note below)", "installAllowed": false },
+    "graph.pagerank.gpu": { "provenOwner": "wsl::atlas-rapids-cu13", "installAllowed": false },
+    "graph.pagerank.cpu.reference": { "provenOwner": "python::networkx", "parityContract": "GRAPH-PAGERANK-PARITY-01", "installAllowed": false },
     "graph.bfs.gpu": { "provenOwner": "wsl::atlas-rapids-cu13", "installAllowed": false },
     "ann.exact.gpu": { "provenOwner": "wsl::atlas-rapids-cu13", "installAllowed": false },
     "ann.cagra.gpu": { "provenOwner": "wsl::atlas-rapids-cu13", "installAllowed": false },

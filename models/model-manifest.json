@@ -1,7 +1,7 @@
 {
   "schemaVersion": "atlas-model-manifest-v3",
   "_comment": "Canonical model registry. Every production-grade model used by the YorHA legal stack is declared here. rg-searchable — do NOT add to .gitignore. Binary GGUF/ONNX blobs are stored outside git (see pathEnv). Update this file when adding or removing models.",
-  "_lastUpdated": "2026-07-17",
+  "_lastUpdated": "2026-09-03",
   "canonicalDimensions": {
     "semantic": 768,
     "latent": 64,
@@ -12,23 +12,26 @@
   "models": [
     {
       "id": "hforf-gguf",
-      "displayName": "HFORF local GGUF lane",
-      "description": "Local experimental GGUF lane registered for synthesis / lab routing. Used as the current default admin atlas chat path via /models/hfor/hforf.gguf.",
+      "displayName": "Ornith 1.5 9B local GGUF lane",
+      "description": "Current llama-server :8090 synthesis and tool-calling lane. Runtime alias is ornith-1.5-9b.",
       "runtime": "llama-server",
       "pathEnv": "HFORF_MODEL_PATH",
-      "localPath": "models/hfor/hforf.gguf",
+      "localPath": "models/ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf",
       "filename": "hforf.gguf",
-      "notes": "Registered local artifact under /models/hfor. Keep the RotorQuant GGUF as fallback while validating this lane.",
+      "notes": "Verified by GET /v1/models and /props on 2026-09-03. Active runtime reports vision=false and audio=false; no projector is attached. See docs/reports/synthesis-model-identity-audit-v1.json.",
       "embeddingDim": null,
       "port": 8090,
-      "contextLen": 64000,
-      "quantization": "unknown",
-      "tags": ["chat", "lab", "gguf", "current-default"]
+      "contextLen": 65536,
+      "quantization": "q5_k/q4_k",
+      "modelAlias": "ornith-1.5-9b",
+      "capabilities": ["chat-completions", "streaming", "tool-calling", "text-synthesis"],
+      "modalities": {"vision": false, "audio": false},
+      "tags": ["chat", "agentic", "gguf", "current-default", "text-only"]
     },
     {
       "id": "gemma4-rotorquant:latest",
       "displayName": "Gemma 4 Legal VLM (merged)",
-      "description": "Gemma 4 E4B with GRPO legal LoRA merged. Serves text + vision (unified model). Primary generation lane.",
+      "description": "Legacy Gemma 4 E4B legal VLM candidate. Not the currently loaded :8090 synthesis model.",
       "runtime": "llama-server",
       "pathEnv": "TURBO_MODEL_PATH",
       "filename": null,
@@ -37,7 +40,7 @@
       "port": 8090,
       "contextLen": 64000,
       "quantization": "q4_K_M",
-      "tags": ["chat", "legal", "vlm", "primary"]
+      "tags": ["chat", "legal", "vlm", "legacy", "non-current"]
     },
     {
       "id": "gemma4-mmproj",
@@ -178,8 +181,8 @@
       "port": 8090,
       "contextLen": 65536,
       "quantization": "iq4_xs",
-      "canonical": true,
-      "tags": ["chat", "legal", "rotorquant", "canonical", "primary", "merged"]
+      "canonical": false,
+      "tags": ["chat", "legal", "rotorquant", "legacy", "non-current", "merged"]
     },
     {
       "id": "gemma4-rotorquant-iq4xs-base",

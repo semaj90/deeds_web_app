@@ -1,0 +1,73 @@
+{
+  "schemaVersion": "synthesis-model-identity-audit.v1",
+  "auditedAt": "2026-09-03T00:00:00Z",
+  "status": "LIVE_ORNITH_PROVEN_LEGACY_REFERENCES_CLASSIFIED",
+  "liveEndpoint": {
+    "url": "http://127.0.0.1:8090/v1/models",
+    "models": [
+      {
+        "id": "ornith-1.5-9b",
+        "ownedBy": "llamacpp"
+      }
+    ]
+  },
+  "runtimeProps": {
+    "url": "http://127.0.0.1:8090/props",
+    "modelAlias": "ornith-1.5-9b",
+    "modelPath": "models/ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf",
+    "modalities": {
+      "vision": false,
+      "audio": false
+    },
+    "contextTokens": 65536,
+    "toolCalling": true
+  },
+  "upstreamCapabilityNote": {
+    "modelFamily": "Ornith-1.5-9B",
+    "upstreamMultimodalSupport": "DOCUMENTED",
+    "activeLocalVlmSupport": "NOT_PRESENT",
+    "reason": "llama-server /props reports vision=false; no vision projector is attached to the active profile"
+  },
+  "canonicalResolution": {
+    "owner": "sveltekit-frontend/src/lib/server/ai/llama-server-model-resolver.ts",
+    "method": "GET /v1/models",
+    "status": "PRESENT",
+    "staticDefault": "ornith-1.5-9b"
+  },
+  "liveRoutingChanges": [
+    {
+      "file": "sveltekit-frontend/src/mcp-gpu-orchestrator.ts",
+      "change": "legal-analysis and attention-analysis defaults now use SERVER_CHAT_MODEL; model registry entry targets llama-server :8090",
+      "status": "UPDATED"
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/ai/model-ids.ts",
+      "change": "SERVER_CHAT_MODEL and TURBOQUANT_MODEL already identify ornith-1.5-9b",
+      "status": "ALREADY_ALIGNED"
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/inference/inference-router.ts",
+      "change": "Bifrost synthesis requests and TurboQuant telemetry use SERVER_CHAT_MODEL/TURBOQUANT_MODEL; the separate HF VLM responses and health metadata use SERVER_VLM_MODEL",
+      "status": "UPDATED"
+    },
+    {
+      "file": "models/model-manifest.json",
+      "change": "Current :8090 artifact, alias, context, modalities, and legacy Gemma4 status are now recorded",
+      "status": "UPDATED"
+    }
+  ],
+  "referenceClassification": {
+    "separateVlm8085": "PRESERVED_GEMMA4_SEPARATE_OWNER",
+    "ollamaCompatibilityAliases": "PRESERVED_LEGACY_COMPATIBILITY",
+    "historicalScriptsAndDocs": "PRESERVED_HISTORICAL_RECORD",
+    "liveStaleDefaults": [
+      "sveltekit-frontend/src/mcp-gpu-orchestrator.ts"
+    ]
+  },
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "notProven": [
+    "full application end-to-end synthesis replay",
+    "Docker or alternate llama-server model identity"
+  ]
+}

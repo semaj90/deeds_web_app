@@ -2122,7 +2122,7 @@ than it is proposing new shape. Treat future re-reads of that document as a conf
 against real code, not a build spec, since most of GPU-SEM/GRAPH-PPR/CandidateOrdinal it names already
 has a concrete implementation in this repo.
 
-## ACE-FEATURE-SOURCE-OWNER-01 (2026-09-02, contract proof complete; live owner still open)
+## ACE-FEATURE-SOURCE-OWNER-01 (2026-09-03, contract proof complete; live owner still open)
 
 The thin composition contracts now exist in
 `sveltekit-frontend/src/lib/server/atlas/retrieval/search-runtime-ace-resolver-v1.ts` and
@@ -2143,7 +2143,24 @@ An explicit adapter seam was added at
 It accepts only an injected canonical source owner, rejects an incorrect implementation reference,
 fails closed when that owner is unavailable, and delegates all identity/revision/population checks to
 the existing resolver. Its focused tests pass 3/3. This is a production-boundary contract, not proof
-that the ACE stream route has been migrated.
+that the ACE stream route has been migrated. A fresh caller audit confirms zero concrete callers of
+the production adapter and zero strict `ContextManifestV2` route callers; the legacy ACE stream still
+uses the query-only cache. Evidence: `docs/reports/ace-feature-source-owner-live-audit-v1.json`.
+
+The follow-up caller trace is explicit (2026-09-03, read-only):
+`atlas-semantic-tools.ts`, `semantic-search-workflow.ts`, and `rlm-search-adapter.ts`
+construct the general `createAtlasSearchAdapter()` and remain legacy/QAS retrieval
+callers. No caller invokes `createSearchRuntimeAceProductionSourceAdapterV1`,
+`searchWithAceManifest`, or a strict `ContextManifestV2` route. The feature materializer
+is referenced by ACE producer/provider contracts and specs, not by a production route.
+This confirms an owner-adoption gap, not a missing second retrieval engine. Keep the gate
+open and do not fabricate source injection from these general SearchRuntime callers.
+
+The narrower provider trace is also empty: `buildSearchRuntimeFeatureBundleV1` and
+`produceAceFeatureSnapshotV1` have no production callers outside contract/spec coverage.
+The existing `SearchRuntime.search()` result therefore cannot be promoted into ACE by
+itself; it lacks the admitted ordinal map, feature-row population, lane masks, and
+revision authority envelope required by strict admission.
 
 | Gate | Status | Evidence |
 |---|---|---|

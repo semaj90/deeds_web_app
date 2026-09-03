@@ -11,6 +11,10 @@
       "type": "http",
       "url": "http://127.0.0.1:8788/mcp"
     },
+    "atlas-task-kernel": {
+      "command": "node",
+      "args": ["./sveltekit-frontend/scripts/mcp/atlas-task-kernel-mcp.mjs"]
+    },
     "atlas-tools": {
       "command": "node",
       "args": ["./sveltekit-frontend/scripts/mcp/atlas-tools-mcp.mjs"],

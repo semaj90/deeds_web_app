@@ -1,0 +1,240 @@
+{
+  "schema": "parent-atlas.concept-fabric-capability-alignment.v1",
+  "status": "PROVEN_BOUNDED_WITH_OPEN_GATES",
+  "readOnly": true,
+  "writesPerformed": 0,
+  "asOf": "2026-09-03",
+  "capabilities": [
+    {
+      "capability": "structural.parse",
+      "currentOwners": [
+        "Tree-sitter",
+        "ast-grep",
+        "ts-morph",
+        "LSP"
+      ],
+      "usedFor": [
+        "CST/AST spans and syntax facts",
+        "structural pattern matching",
+        "TypeScript compiler-semantic enrichment",
+        "cross-language definition/reference checks"
+      ],
+      "status": "WIRED_BOUNDED",
+      "authorityBoundary": "These tools emit evidence and observations; they do not mint canonical identity or ontology concepts.",
+      "evidence": [
+        "sveltekit-frontend/src/lib/server/atlas/language/ast-grep-structural-topk.ts",
+        "sveltekit-frontend/src/lib/server/atlas/language/ts-morph-semantic-enrichment.ts",
+        "sveltekit-frontend/src/lib/server/atlas/language/language-intelligence-plan.ts",
+        "sveltekit-frontend/src/lib/server/analysis/ast-grep-extractor.ts"
+      ],
+      "openGaps": [
+        "Live parser-process coverage is still a separate gate.",
+        "Exact source and revision binding is required before promotion."
+      ]
+    },
+    {
+      "capability": "domain.classification",
+      "currentOwners": [
+        "miniforge-nlp-sidecar",
+        "LogisticRegression",
+        "MultinomialNB",
+        "deterministic taxonomy"
+      ],
+      "usedFor": [
+        "domain evidence signals",
+        "fallback classification",
+        "learned-label augmentation"
+      ],
+      "status": "WIRED_NOT_PRODUCTION_PROVEN",
+      "authorityBoundary": "Classification is a signal. It cannot directly admit ontology identity or replace deterministic primary_domain.",
+      "evidence": [
+        "python/miniforge_nlp_sidecar.py",
+        "python/train_domain_classifier.py",
+        "sveltekit-frontend/src/lib/server/ai/parent-atlas-workstation-domain-classifier.ts",
+        "docs/reports/domain-classifier-runtime-parity-01.json"
+      ],
+      "openGaps": [
+        "Checkpoint provenance and serving-version parity must be sealed.",
+        "Training labels need independent authority; KMeans cluster IDs must not silently become labels.",
+        "Held-out evaluation is required before production influence."
+      ]
+    },
+    {
+      "capability": "neural.decoder",
+      "currentOwners": [
+        "atlas-neural-decoder",
+        "PyTorch"
+      ],
+      "usedFor": [
+        "NestedSemanticAutoencoder encode/decode/reconstruct",
+        "CUDA tensor baseline"
+      ],
+      "status": "CREATED_AND_SERVICE_TESTED; PRODUCTION_ROLE_UNPROVEN",
+      "authorityBoundary": "The decoder is a representation/feature executor, not a source or ontology authority.",
+      "evidence": [
+        "python/atlas_neural_decoder_service.py",
+        "python/test_atlas_neural_decoder_service.py",
+        "docker/atlas-neural-decoder/Dockerfile"
+      ],
+      "openGaps": [
+        "ATen/C++ ABI and zero-copy lifetime proof are open.",
+        "TensorRT-RTX remains a separate challenger and is not implied by the PyTorch service."
+      ]
+    },
+    {
+      "capability": "candidate.ranking",
+      "currentOwners": [
+        "SearchRuntime/RRF",
+        "RAG weighted reranker",
+        "MCP tool ranker",
+        "feature-matrix/reranker experiments"
+      ],
+      "usedFor": [
+        "candidate ordering",
+        "tool selection",
+        "bounded context selection"
+      ],
+      "status": "WIRED_MULTIPLE_SCOPED_RANKERS",
+      "authorityBoundary": "No single universal best-fit authority is proven. A score in [0,1] is a normalized heuristic or model output unless its formula and calibration receipt are attached.",
+      "evidence": [
+        "sveltekit-frontend/src/lib/server/rag/ranker.ts",
+        "sveltekit-frontend/src/lib/server/mcp/tool-ranker.ts",
+        "sveltekit-frontend/src/lib/server/atlas/semantic-signal-routing.ts",
+        "sveltekit-frontend/src/lib/server/ai/mcp-tool-dispatch.ts",
+        "services/go-retrieval-service/main.go"
+      ],
+      "openGaps": [
+        "Do not create a new global ranker yet.",
+        "Each score must identify its inputs, weights/model revision, normalization, and owner.",
+        "Law-rank or external recommendation claims are not evidenced by the current score paths."
+      ]
+    },
+    {
+      "capability": "synthesis",
+      "currentOwners": [
+        "Gemma4/Ornith synthesis path",
+        "ACE context and evidence packet assembly",
+        "LangGraph orchestration where explicitly used"
+      ],
+      "usedFor": [
+        "answer generation",
+        "evidence-grounded summaries",
+        "citation rendering"
+      ],
+      "status": "WIRED_BOUNDED",
+      "authorityBoundary": "Synthesis consumes bounded canonicalized context; it does not create source identity, concept identity, or retrieval authority.",
+      "evidence": [
+        "sveltekit-frontend/src/lib/gpu/gemma4-synthesis-generator.ts",
+        "sveltekit-frontend/src/lib/gpu/gemma4-policy-orchestrator.ts",
+        "docker/langgraph-synthesis/app.py"
+      ],
+      "openGaps": [
+        "ContextManifest/ACE admission must remain the input boundary.",
+        "No hidden reasoning, KV cache, or tensors may be persisted."
+      ]
+    },
+    {
+      "capability": "web.evidence",
+      "currentOwners": [
+        "SearXNG/engine fallback for discovery",
+        "Postgres saved_citations for explicit persistence",
+        "browser/client citation cache for local cache"
+      ],
+      "usedFor": [
+        "web discovery",
+        "saved user citations",
+        "evidence shown to synthesis"
+      ],
+      "status": "DISCOVERY_WIRED; REVISION_SEALED_EVIDENCE_OPEN",
+      "authorityBoundary": "Search results are transient discovery. A saved citation is durable only after explicit save and should carry URL/content/provenance metadata.",
+      "evidence": [
+        "sveltekit-frontend/src/lib/server/retrieval/web-search.ts",
+        "sveltekit-frontend/src/routes/api/websearch/+server.ts",
+        "sveltekit-frontend/src/routes/api/citations/saved/+server.ts",
+        "sveltekit-frontend/src/lib/ai/citation-cache.ts",
+        "sveltekit-frontend/drizzle/schema.ts"
+      ],
+      "openGaps": [
+        "SearXNG results are not automatically revisioned source snapshots.",
+        "Content hash and acquired snapshot references are needed for durable external evidence."
+      ]
+    },
+    {
+      "capability": "concept.fabric",
+      "currentOwners": [
+        "atlas_ontology_concepts schema",
+        "ConceptV1 taxonomy contract",
+        "OntologyLinkedTupleV1 contract"
+      ],
+      "usedFor": [
+        "concept definitions",
+        "taxonomy candidates",
+        "grounded tuples"
+      ],
+      "status": "CONTRACTS_PRESENT; LIVE_REGISTRY_EMPTY",
+      "authorityBoundary": "Postgres ontology tables remain the canonical owner; recognition and semantic similarity are non-authoritative proposals.",
+      "evidence": [
+        "sveltekit-frontend/src/lib/server/atlas/taxonomy/entity-concept-taxonomy-v1.ts",
+        "sveltekit-frontend/src/lib/server/atlas/contracts/ontology-linked-tuple-v1.ts",
+        "docs/reports/concept-seed-dry-01.json",
+        "docs/reports/concept-vocabulary-authority-01.json"
+      ],
+      "openGaps": [
+        "Live ontology registry requires an explicitly authorized bounded seed.",
+        "TermObservationV1 and ConceptRecognitionV1 need one canonical cross-language schema owner.",
+        "Definition and evidence revisioning is not yet a complete live admission path."
+      ]
+    }
+  ],
+  "scoreInterpretation": {
+    "bestFit0To1": {
+      "canonical": false,
+      "meaning": "A bounded score used for ordering or confidence display.",
+      "basedOn": [
+        "explicit weighted features",
+        "classifier probability",
+        "retrieval similarity",
+        "tool/routing heuristics"
+      ],
+      "notProvenBasedOn": [
+        "Ewin Tang recommendation theory",
+        "legal rank calculations",
+        "a single calibrated global model"
+      ],
+      "requiredBeforePromotion": [
+        "score owner",
+        "input feature checksum",
+        "formula or model revision",
+        "calibration/evaluation receipt",
+        "deterministic replay"
+      ]
+    }
+  },
+  "recommendedOrder": [
+    "CONCEPT-SCHEMA-01",
+    "CONCEPT-SEED-DRY-01",
+    "CONCEPT-VALIDATION-01",
+    "CONCEPT-SEED-CANARY-01",
+    "DOMAIN-CLASSIFIER-RUNTIME-PARITY-01",
+    "CONCEPT-RECOGNITION-01",
+    "CONCEPT-LEXICAL-INDEX-01",
+    "CONCEPT-REPRESENTATION-01",
+    "CONCEPT-RUNTIME-01"
+  ],
+  "safeNextStep": "Do not add a universal ranker or install another framework. Complete the concept seed review and classifier provenance/evaluation gates, then wire recognition to the existing ontology owner.",
+  "likely_cause": "The repository has several valid scoped producers, but their scores, observations, definitions, and evidence are not yet joined by one revision-qualified Concept Fabric admission boundary.",
+  "evidence": [
+    "Existing Tree-sitter, ast-grep, ts-morph, LSP, classifier, decoder, ranking, synthesis, citation, and ontology contract paths listed above.",
+    "Live ontology registry census remains empty while contracts and dry seed artifacts exist."
+  ],
+  "patch_targets": [
+    "docs/reports/concept-fabric-capability-alignment-v1.json",
+    "sveltekit-frontend/src/lib/server/atlas/taxonomy/entity-concept-taxonomy-v1.ts",
+    "sveltekit-frontend/scripts/atlas/concept-seed-dry-v1.mts",
+    "openspec/changes/parent-atlas-ontology-kernel/tasks.md",
+    "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md"
+  ],
+  "safe_next_command": "openspec validate parent-atlas-ontology-kernel --type change --strict --json",
+  "smoke_command": "cd sveltekit-frontend; npx vitest run --config vitest.config.ts src/lib/server/atlas/taxonomy/entity-concept-taxonomy-v1.test.ts --reporter=dot",
+  "report_path": "docs/reports/concept-fabric-capability-alignment-v1.json"
+}

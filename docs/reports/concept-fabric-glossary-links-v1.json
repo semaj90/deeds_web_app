@@ -1,0 +1,26 @@
+{
+  "schemaVersion": "concept-fabric-glossary-links.v1",
+  "status": "WIRED_NOT_EXTERNAL_EVIDENCE_COMPLETE",
+  "owner": "sveltekit-frontend/src/routes/(app)/library/glossary",
+  "sources": {
+    "canonicalDefinition": "legal_glossary.definition",
+    "corpusDefinition": "legal_definitions.definition_text",
+    "internalDocument": "library_documents.id",
+    "officialExternal": "library_documents.official_url",
+    "acquisition": "sveltekit-frontend/src/lib/server/atlas/docs/firecrawl-v2-capture.ts",
+    "schemaValidation": "docs/.okf/schema.yaml"
+  },
+  "behavior": {
+    "internalDefinitionLink": true,
+    "officialSourceLink": "HTTP(S)-only",
+    "invalidOrMissingUrl": "omitted",
+    "firecrawlFetchPerformed": false,
+    "writesPerformed": false,
+    "canonicalAuthority": false
+  },
+  "notProven": [
+    "Firecrawl capture-to-glossary evidence join",
+    "contentHash/evidenceRevision display",
+    "automatic definition updates"
+  ]
+}

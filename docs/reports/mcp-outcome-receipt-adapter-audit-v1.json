@@ -1,0 +1,206 @@
+{
+  "schema": "atlas.mcp-outcome-receipt-adapter-audit.v1",
+  "generatedAt": "2026-09-03T00:00:00.000Z",
+  "status": "PURE_ADAPTER_PROVEN_PERSISTENCE_MIGRATION_OPEN",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "liveTable": {
+    "database": "legal_ai_db",
+    "table": "public.outcome_ledger",
+    "columns": [
+      "id uuid NOT NULL",
+      "task_id uuid NULL",
+      "trace_id uuid NULL",
+      "tool_call_id uuid NULL",
+      "outcome_type text NOT NULL",
+      "score real NULL",
+      "reward real NULL",
+      "feedback text NULL",
+      "metadata jsonb NOT NULL",
+      "recorded_at timestamptz NOT NULL"
+    ],
+    "readback": "information_schema.columns",
+    "rowMutation": "NONE"
+  },
+  "schemaConflict": {
+    "existingDefinition": "sveltekit-frontend/drizzle/0111_tool_call_runtime_contract.sql",
+    "incompatibleDefinition": "sveltekit-frontend/drizzle/migrations/20260709_agent_telemetry_tables.sql",
+    "conflict": "Both define outcome_ledger with CREATE TABLE IF NOT EXISTS but different columns and lifecycle semantics.",
+    "safeDisposition": "Do not rerun either definition and do not alter the live table until an additive migration is designed against the live schema."
+  },
+  "receiptFieldMapping": {
+    "directColumns": {
+      "taskId": "task_id, only when the receipt taskId is a valid UUID",
+      "traceId": "trace_id, only when the receipt run/correlation value is a valid UUID",
+      "toolCallId": "tool_call_id, only when the value is a valid UUID",
+      "status": "outcome_type or metadata.status; outcome_type is not a safe lifecycle-status column",
+      "writesPerformed": "metadata.writesPerformed",
+      "workspaceRevision": "metadata.workspaceRevision",
+      "sourceRevision": "metadata.sourceRevision",
+      "graphRevision": "metadata.graphRevision",
+      "representationRevision": "metadata.representationRevision",
+      "toolRefs": "metadata.toolRefs",
+      "registryRevision": "metadata.registryRevision",
+      "inputChecksum": "metadata.inputChecksum",
+      "outputChecksum": "metadata.outputChecksum",
+      "validationReceipts": "metadata.validationReceipts",
+      "completionChecksum": "metadata.completionChecksum"
+    },
+    "receiptIdentityGap": [
+      "receiptId has no dedicated live column",
+      "runId has no dedicated live column",
+      "openspecChange and openspecTaskIds have no dedicated live columns",
+      "agent/model identity and timing/token fields have no dedicated live columns"
+    ],
+    "uuidSafety": "Do not cast arbitrary receiptId, runId, taskId, or tool references to uuid. Preserve non-UUID identifiers in metadata until an explicit identity mapping exists."
+  },
+  "writerGaps": [
+    "recordOutcome currently accepts arbitrary metadata and suppresses database errors",
+    "No typed AgentWorkReceiptV1 to Postgres adapter exists",
+    "No durable acknowledgement/readback is returned to the workflow RECORD stage",
+    "No receiptId/runId idempotency constraint or replay proof exists",
+    "NDJSON and Postgres outcome lanes are not yet projected from one acknowledged canonical write"
+  ],
+  "pureAdapter": {
+    "path": "sveltekit-frontend/src/lib/server/observability/agent-work-receipt-outcome-adapter-v1.ts",
+    "status": "PROVEN",
+    "mapsToLiveSchema": true,
+    "preservesNulls": true,
+    "rejectsUnsafeUuidCoercion": true,
+    "performsWrites": false,
+    "focusedTests": 2
+  },
+  "typedWriter": {
+    "path": "sveltekit-frontend/src/lib/server/observability/agent-work-receipt-store-v1.ts",
+    "status": "FOCUSED_TEST_PROVEN_LIVE_WRITE_NOT_EXECUTED",
+    "acknowledgement": "INSERT RETURNING id",
+    "replay": "same receipt_id and checksum returns existing ledger id",
+    "conflict": "same receipt_id with different checksum fails closed",
+    "legacyCallersMigrated": false,
+    "focusedTests": 2
+  },
+  "boundedWorkflowMigration": {
+    "workflow": "scripts/atlas/agentic-recommendation-workflow.mjs",
+    "status": "LIVE_BOUNDED_PROVEN_BROAD_MIGRATION_OPEN",
+    "reason": "The workflow is a standalone .mjs CLI and the acknowledged writer is server-side TypeScript; direct import would create a second boundary or require a launcher contract change.",
+    "currentBehavior": "The RECORD stage still appends the diagnostic NDJSON ledger.",
+    "selectedBoundary": "POST /api/agent-work-receipts",
+    "safeOptions": [
+      "Expose an explicit local/server receipt endpoint and call it from the CLI",
+      "Run the CLI through the approved TypeScript runtime with an explicit module contract",
+      "Move the workflow RECORD stage into the existing server owner"
+    ],
+    "prohibitedShortcut": "Do not duplicate Postgres receipt SQL in the .mjs workflow.",
+    "workflowBehavior": "The recommendation RECORD stage now calls the endpoint, requires acknowledgement, then appends diagnostic NDJSON. Endpoint-unavailable behavior is fail-closed.",
+    "liveProof": {
+      "workflowQuery": "receipt adapter bounded proof",
+      "receiptId": "aaaba8c5101454f3ec8c8685",
+      "firstRequestAcknowledged": true,
+      "replayed": false,
+      "postgresStatus": "SUCCEEDED",
+      "postgresWritesPerformed": false,
+      "ndjsonProjectionObserved": true,
+      "ordering": "Postgres acknowledgement preceded NDJSON append",
+      "replayPolicy": "A replay emits RECEIPT_REPLAY with canonicalMutation=false; it is not a second completed-work event.",
+      "canonicalChecksumProjected": true,
+      "replayProof": {
+        "receiptId": "99b274c796d325176819298a",
+        "postgresRowCountDelta": 0,
+        "ndjsonEventType": "RECEIPT_REPLAY",
+        "ndjsonCanonicalMutation": false,
+        "checksumEqual": true,
+        "workflowExit": 0
+      },
+      "failClosedProof": {
+        "input": "malformed empty payload",
+        "httpStatus": 400,
+        "postgresRowCountDelta": 0,
+        "ndjsonBytesDelta": 0,
+        "secretExposed": false
+      },
+      "otherCallersMigrated": false
+    }
+  },
+  "serverBoundary": {
+    "path": "sveltekit-frontend/src/routes/api/agent-work-receipts/+server.ts",
+    "status": "LIVE_BOUNDED_PROVEN",
+    "stableResponse": true,
+    "schemaValidation": "AgentWorkReceiptV1Schema",
+    "delegatesTo": "recordAgentWorkReceiptV1",
+    "unauthorizedStatus": 401,
+    "checksumConflictStatus": 409,
+    "writesPerformedInThisPass": true,
+    "testReceiptId": "live-receipt-20260903-01",
+    "firstRequest": "acknowledged=true,replayed=false",
+    "identicalReplay": "acknowledged=true,replayed=true,sameLedgerId=true",
+    "independentReadback": "receipt_status=SUCCEEDED,writes_performed=false",
+    "storesTouched": ["Postgres public.outcome_ledger"],
+    "storesNotTouched": ["Qdrant", "Neo4j", "Valkey", "NDJSON"]
+  },
+  "liveSafetyReadback": {
+    "rowCount": 0,
+    "existingIndexes": [
+      "outcome_ledger_pkey",
+      "idx_ol_outcome_type",
+      "idx_ol_recorded_at"
+    ],
+    "existingUniqueReceiptIdentity": false,
+    "preexistingReceiptBackfillRequired": false
+  },
+  "additiveMigrationDesign": {
+    "status": "APPLIED_VERIFIED_WRITER_WIRING_OPEN",
+    "path": "sveltekit-frontend/drizzle/manual/20260903_outcome_receipt_identity_additive_v1.sql",
+    "newColumns": [
+      "receipt_id text NULL",
+      "run_id text NULL",
+      "receipt_schema text NULL",
+      "receipt_status text NULL",
+      "writes_performed boolean NULL",
+      "completion_checksum text NULL"
+    ],
+    "newIndex": "UNIQUE partial index on receipt_id WHERE receipt_id IS NOT NULL",
+    "metadataRetainedFor": [
+      "workspaceRevision",
+      "sourceRevision",
+      "graphRevision",
+      "representationRevision",
+      "toolRefs",
+      "registryRevision",
+      "inputChecksum",
+      "outputChecksum",
+      "validationReceipts",
+      "filesObserved",
+      "filesEdited",
+      "commandsExecuted"
+    ],
+    "idempotencyBehavior": "Same receipt_id must return the existing durable row without creating a second row; conflicting receipt content must fail closed with a checksum mismatch.",
+    "acknowledgementBehavior": "The canonical insert must use INSERT ... RETURNING id, receipt_id, completion_checksum; swallowed database errors are not acknowledgement.",
+    "migrationGuard": "Add nullable columns and the partial unique index only; do not backfill, rename, drop, or reinterpret existing rows.",
+    "applied": true,
+    "appliedAt": "2026-09-03T00:00:00.000Z",
+    "postApplyRowCount": 0
+  },
+  "recommendedAdditiveSequence": [
+    "Define an explicit Postgres adapter payload for AgentWorkReceiptV1",
+    "Choose whether receiptId and runId get dedicated nullable columns or remain in metadata",
+    "Add a unique/idempotency key only after its identity type and conflict behavior are proven",
+    "Write Postgres first and require INSERT/RETURNING acknowledgement",
+    "Project the acknowledged row to diagnostic NDJSON only after success",
+    "Read back by receipt identity and replay the same receipt with zero duplicate durable rows"
+  ],
+  "blockedUntil": [
+    "Live schema migration design is reviewed against the actual 10-column table",
+    "Receipt identity mapping and UUID policy are explicit",
+    "Idempotent write plus independent readback test exists"
+  ],
+  "evidenceRefs": [
+    "sveltekit-frontend/drizzle/0111_tool_call_runtime_contract.sql",
+    "sveltekit-frontend/drizzle/migrations/20260709_agent_telemetry_tables.sql",
+    "sveltekit-frontend/src/lib/server/telemetry/tool-call-recorder.ts",
+    "sveltekit-frontend/src/lib/server/observability/agent-work-receipt-v1.ts",
+    "live information_schema.columns readback for public.outcome_ledger"
+  ],
+  "safeNextGate": "MCP-OUTCOME-RECEIPT-ADAPTER-01",
+  "safeNextCommand": "openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
+  "smokeCommand": "node --check sveltekit-frontend/scripts/mcp/atlas-tools-mcp.mjs"
+}

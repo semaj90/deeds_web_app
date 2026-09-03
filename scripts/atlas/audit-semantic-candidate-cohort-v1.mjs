@@ -6,7 +6,7 @@
  */
 
 import { createHash } from 'node:crypto';
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import pg from 'pg';
 import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
@@ -15,8 +15,12 @@ const root = resolve(import.meta.dirname, '../..');
 const keysPath = resolve(root, 'python/atlas_compute/gpu_mini_fabric/fixtures/semantic-768-real-frozen-node-keys.json');
 const manifestPath = resolve(root, 'python/atlas_compute/gpu_mini_fabric/fixtures/semantic-768-real-frozen-manifest.json');
 const outputPath = resolve(root, 'docs/reports/semantic-candidate-cohort-v1.json');
+const representationInputReportPath = resolve(root, 'docs/reports/sem768-corpus-bundle-01.json');
 const keys = JSON.parse(readFileSync(keysPath, 'utf8'));
 const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
+const representationInputReport = existsSync(representationInputReportPath)
+  ? JSON.parse(readFileSync(representationInputReportPath, 'utf8'))
+  : null;
 const env = loadRepoEnv(process.env);
 const pool = new pg.Pool({ connectionString: resolveDatabaseUrl(env), statement_timeout: 30000 });
 
@@ -79,6 +83,46 @@ const eligibleRows = rows.filter((row) => hasValue(row.chunk_id) && hasValue(row
   && row.bound_content_digest.toLowerCase() === row.content_hash.toLowerCase());
 const eligibleIds = eligibleRows.map((row) => row.id).sort();
 const eligibleChecksum = createHash('sha256').update(JSON.stringify(eligibleIds)).digest('hex');
+const inputBundle = representationInputReport?.bundle ?? null;
+const representationInputAuthority = inputBundle
+  ? {
+    status: representationInputReport.status,
+    classification: 'CURRENT_REPRESENTATION_INPUT_COHORT',
+    authorityStatus: inputBundle.sourceAuthorityStatus,
+    cohortId: null,
+    cohortOwner: representationInputReport.producerEvidence?.sourceFile ?? null,
+    populationDefinition: representationInputReport.note ?? null,
+    sourcePopulation: inputBundle.eligibleCount,
+    selectionRule: inputBundle.eligibilityPolicyRevision,
+    workspaceRevision: null,
+    sourceRevisionSetChecksum: null,
+    representationId: inputBundle.representationId,
+    representationRevision: inputBundle.representationRevision,
+    populationCount: inputBundle.eligibleCount,
+    populationChecksum: inputBundle.populationChecksum,
+    evidenceArtifact: 'docs/reports/sem768-corpus-bundle-01.json',
+    requiredAuthorityFieldsProven: inputBundle.sourceAuthorityStatus === 'PROVEN',
+    canonicalAuthority: inputBundle.canonicalAuthority,
+  }
+  : {
+    status: 'MISSING',
+    classification: 'UNKNOWN',
+    authorityStatus: 'BLOCKED_UNGROUNDED',
+    cohortId: null,
+    cohortOwner: null,
+    populationDefinition: null,
+    sourcePopulation: null,
+    selectionRule: null,
+    workspaceRevision: null,
+    sourceRevisionSetChecksum: null,
+    representationId: null,
+    representationRevision: null,
+    populationCount: null,
+    populationChecksum: null,
+    evidenceArtifact: null,
+    requiredAuthorityFieldsProven: false,
+    canonicalAuthority: false,
+  };
 
 const report = {
   schema: 'atlas.semantic-candidate-cohort.v1',
@@ -87,6 +131,7 @@ const report = {
   semanticNodeKeys: 'python/atlas_compute/gpu_mini_fabric/fixtures/semantic-768-real-frozen-node-keys.json',
   semanticSnapshotRevision: manifest.vectors_checksum ? `semantic-snapshot:${manifest.vectors_checksum}` : null,
   representationId: 'semantic_768',
+  representationInputAuthority,
   cohortAuthority: {
     status: 'UNRESOLVED',
     classification: 'UNKNOWN',

@@ -45,8 +45,8 @@ Method: TypeScript compiler API AST parse of each target file. Not regex-based. 
 | uniqueListedNames | 0 |
 | switchCaseDispatch | 0 |
 | ifChainDispatch | 0 |
-| registerToolCalls | 119 |
-| uniqueRegisterToolNames | 119 |
+| registerToolCalls | 120 |
+| uniqueRegisterToolNames | 120 |
 
 ## Cross-file DUPLICATE_TOOL_NAME (7)
 - `atlas.packet_search` in: mcp-server, trace-mcp-server

@@ -1,0 +1,31 @@
+{
+  "gate": "GRAPHIFY-STRUCTURAL-SCHEMA-ADDITIVE-01",
+  "status": "APPLIED_SCHEMA_ONLY",
+  "migration": "sveltekit-frontend/drizzle/manual/20260903_graphify_symbols_edges_additive_v1.sql",
+  "owner": "existing graphify_files Graphify lineage owner",
+  "tables": {
+    "graphify_files": { "preexisting": true, "changed": false },
+    "graphify_symbols": { "created": true, "rows": 0 },
+    "graphify_edges": { "created": true, "rows": 0 }
+  },
+  "backfilledRows": 0,
+  "revisionsFabricated": 0,
+  "deletions": 0,
+  "representationLedgerCreated": false,
+  "domainPredictionsCreated": false,
+  "notes": [
+    "The migration is guarded by existing graphify_files presence.",
+    "No Graphify extractor was run and no lifecycle row was changed.",
+    "atlas_domain_predictions has an existing semantic-contract owner but its dependency migration was not applied because the live vector registry shape differs.",
+    "atlas_representation_records has no proven canonical producer or migration owner and remains absent."
+  ],
+  "writesPerformed": true,
+  "dataWrites": 0,
+  "canonicalPromotion": false,
+  "validation": {
+    "sidecarManifestJson": "PASS",
+    "migrationOwnerAudit": "PASS_WITH_EXISTING_UNRELATED_GAP",
+    "openspecStrict": "PASS",
+    "liveTableReadback": "PASS"
+  }
+}

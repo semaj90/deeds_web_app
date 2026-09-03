@@ -1,0 +1,257 @@
+{
+  "schema": "parent-atlas.agentic-error-fixing-owner-map.v1",
+  "status": "FIXTURE_REPLAY_PROVEN_WITH_LIVE_INTEGRATION_GAPS",
+  "readOnly": true,
+  "writesPerformed": 0,
+  "goal": "Use codebase indexing and Go Retrieval to assemble evidence-grounded bounded repair context for TRACE/MCP helpers.",
+  "owners": [
+    {
+      "stage": "source_and_structure",
+      "owner": [
+        "Tree-sitter",
+        "ast-grep",
+        "ts-morph",
+        "LSP",
+        "Go code-intelligence"
+      ],
+      "functions": [
+        "ast-grep structural extraction",
+        "Tree-sitter source spans and syntax facts",
+        "ts-morph TypeScript semantic enrichment",
+        "LSP definition/reference/diagnostic checks",
+        "symbol and dependency lookup"
+      ],
+      "files": [
+        "sveltekit-frontend/src/lib/server/atlas/language/ast-grep-structural-topk.ts",
+        "sveltekit-frontend/src/lib/server/atlas/language/ts-morph-semantic-enrichment.ts",
+        "sveltekit-frontend/src/lib/server/atlas/language/language-intelligence-plan.ts",
+        "sveltekit-frontend/src/lib/server/analysis/ast-grep-extractor.ts",
+        "services/go-codeintel-service",
+        "sveltekit-frontend/src/lib/server/ace/code-intel-service.ts"
+      ],
+      "state": "WIRED_BOUNDED",
+      "must_not_do": [
+        "create CandidateOrdinal",
+        "mint canonical identity",
+        "write a repair",
+        "promote an ontology concept"
+      ],
+      "gap": "Live parser-process and exact source-revision coverage must be proven per repair packet."
+    },
+    {
+      "stage": "candidate_retrieval",
+      "owner": [
+        "SearchRuntime",
+        "retrieveAllCandidates",
+        "Go Retrieval read-only executor"
+      ],
+      "functions": [
+        "candidate population",
+        "lane normalization",
+        "same-lane deduplication",
+        "RRF/fusion input"
+      ],
+      "files": [
+        "sveltekit-frontend/src/lib/server/retrieval/retrieve-candidates.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/orchestrator.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/candidate-scorer.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/retrieval-candidate-feature-matrix-v1.ts",
+        "services/go-retrieval-service/main.go"
+      ],
+      "state": "WIRED; LIVE_REVISION_PARITY_PARTIAL",
+      "authority": "SearchRuntime owns candidate identity and population. Qdrant, KNN, PageRank, classifiers, and MCP tools are consumers/signals.",
+      "gap": "CandidateOrdinalMapV1, source/workspace revisions, and feature-row population need one live parity receipt for repair context."
+    },
+    {
+      "stage": "feature_and_context_assembly",
+      "owner": [
+        "CandidateFeatureMatrixV1",
+        "ACE context compiler",
+        "ContextManifest"
+      ],
+      "functions": [
+        "feature row composition",
+        "bounded evidence selection",
+        "duplicate candidate merge",
+        "manifest checksum and identity binding"
+      ],
+      "files": [
+        "sveltekit-frontend/src/lib/server/retrieval/retrieval-candidate-feature-matrix-v1.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/repair-candidate-feature-matrix-v1.ts",
+        "sveltekit-frontend/src/lib/server/ace/context-compiler.parent-atlas.ts",
+        "sveltekit-frontend/src/lib/server/ace/ace-context-manifest.ts",
+        "sveltekit-frontend/src/lib/server/ace/ace-agent.ts"
+      ],
+      "state": "WIRED_BOUNDED",
+      "authority": "ACE consumes canonicalized candidates and evidence; it is not a second retrieval owner.",
+      "gap": "A single live repair-oriented ContextManifest receipt with source, graph, representation, candidate, and evidence revisions is still required."
+    },
+    {
+      "stage": "trace_and_mcp_helpers",
+      "owner": [
+        "TRACE MCP HTTP server",
+        "atlas-tools stdio server",
+        "MCP tool ranker"
+      ],
+      "functions": [
+        "tool discovery",
+        "bounded read-only graph/search calls",
+        "tool selection by context and risk",
+        "repair-context handoff"
+      ],
+      "files": [
+        "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
+        "sveltekit-frontend/scripts/mcp/atlas-tools-mcp.mjs",
+        "sveltekit-frontend/src/lib/server/mcp/tool-ranker.ts",
+        "scripts/verify-mcp-json-rpc.mjs",
+        "scripts/audit-trace-mcp-tools.mjs"
+      ],
+      "state": "PROTOCOL_AND_TOOL_SURFACE_PROVEN; END_TO_END_REPAIR_PATH_PARTIAL",
+      "authority": "MCP exposes bounded operations. It does not become candidate, ontology, or repair-write authority.",
+      "gap": "Prove one same-input TRACE/atlas-tools call chain from error observation to repair context, with no mutation."
+    },
+    {
+      "stage": "repair_proposal",
+      "owner": [
+        "agentic repair bundle contracts",
+        "FixSynthesizer / repair services",
+        "KernelDagCandidate admission"
+      ],
+      "functions": [
+        "turn verified error into a bounded proposal",
+        "attach patch targets and evidence",
+        "schema/lineage/authorization admission"
+      ],
+      "files": [
+        "sveltekit-frontend/src/lib/server/services/error-analysis/FixSynthesizer.ts",
+        "sveltekit-frontend/src/lib/server/analysis",
+        "openspec/changes/parent-atlas-agentic-repair-bundle-integration",
+        "openspec/specs/openspec/changes/parent-atlas-agentic-completion"
+      ],
+      "state": "CONTRACTS_AND_PLANNING_PRESENT; LIVE_BOUNDED_REPAIR_PROOF_OPEN",
+      "authority": "Proposal only until explicit authorization and independent validation/readback.",
+      "gap": "No proposal should be applied until the packet contains exact source revision, evidence spans, candidate/context checksum, and authorization."
+    }
+  ],
+  "scoring": {
+    "currentOwners": [
+      "SearchRuntime fusion/RRF",
+      "candidate scorer",
+      "RAG weighted reranker",
+      "MCP tool ranker",
+      "optional cross-encoder/attention/reranker experiments"
+    ],
+    "bestFitScore": "Not a single canonical score.",
+    "interpretation": "Scores are scoped to a lane or decision and require an owner, inputs, formula/model revision, and replay evidence.",
+    "notEstablished": [
+      "Ewin Tang recommendation basis",
+      "law-rank calculation basis",
+      "globally calibrated 0-to-1 ranker"
+    ],
+    "recommendation": "Do not create a universal ranker. First emit per-stage explainable score components and preserve the existing fusion/ranking owners."
+  },
+  "agentic_repair_flow": [
+    "verified compiler/runtime error",
+    "revision-qualified source and structural evidence",
+    "SearchRuntime candidate population",
+    "CandidateFeatureMatrixV1",
+    "ACE ContextManifest admission",
+    "TRACE/MCP bounded helper selection",
+    "KernelDagCandidate proposal",
+    "schema/lineage/authorization gate",
+    "human-authorized bounded execution",
+    "independent readback and deterministic replay"
+  ],
+  "hard_gaps": [
+    "One end-to-end repair packet has not yet been proven through all stages.",
+    "Candidate and feature population parity must be sealed before ACE repair context is authoritative.",
+    "External/web citations need content hash and acquired snapshot metadata before durable evidence use.",
+    "Ontology tables are empty; concept recognition remains non-promotional until bounded seed admission."
+  ],
+  "proofs": [
+    {
+      "gate": "AGENTIC-REPAIR-CONTEXT-REPLAY-01",
+      "status": "PROVEN_BOUNDED_FIXTURE",
+      "test": "sveltekit-frontend/src/lib/server/ace/agentic-repair-context-replay.spec.ts",
+      "result": "2/2 passed",
+      "writes": 0,
+      "scope": "Deterministic ACE replay and incomplete-identity fail-closed behavior; no live SearchRuntime or MCP call."
+    },
+    {
+      "gate": "AGENTIC-REPAIR-CONTEXT-LIVE-01",
+      "status": "BLOCKED_BY_UPSTREAM_EVIDENCE",
+      "test": "scripts/validate-parent-atlas-integration-proof.mjs",
+      "result": {
+        "mcp": "PASS",
+        "traceDynamicContext": "LIVE_CALL_SUCCEEDED",
+        "identity": "PARTIAL",
+        "graph": "NOT_PROVEN",
+        "classification": "NOT_PROVEN",
+        "ace": "BLOCKED"
+      },
+      "writes": 0,
+      "blockers": [
+        "graphify_symbols table is missing, so cross-revision symbol identity remains blocked",
+        "freshest graph artifact is stale",
+        "domain prediction ledger is absent"
+      ]
+    },
+    {
+      "gate": "GRAPHIFY-STARTUP-AUDIT-CORRECTION-01",
+      "status": "PROVEN_BOUNDED",
+      "test": "scripts/validate-parent-atlas-integration-proof.mjs gate graphify_lock --json",
+      "result": "PASS",
+      "evidence": [
+        "tasks.json parses successfully",
+        "Auto-Map Codebase task has runOptions.runOn=folderOpen",
+        "instanceLimit=1 is configured",
+        "startup wrapper lock, exit release, contention backoff, and graphify:daily chain are present"
+      ],
+      "writes": 0,
+      "note": "The prior validator incorrectly treated folder-open startup as a problem; its audit logic now matches the configured startup contract."
+    }
+  ],
+  "next_gate": "AGENTIC-REPAIR-CONTEXT-LIVE-01",
+  "latestFullAudit": {
+    "command": "node scripts/validate-parent-atlas-integration-proof.mjs --json",
+    "status": "COMPLETED_READ_ONLY",
+    "env": "PARTIAL",
+    "identity": "PARTIAL",
+    "classification": "NOT_PROVEN",
+    "semantic": "PARTIAL",
+    "ann": "PARTIAL",
+    "clustering": "NOT_PROVEN",
+    "graph": "NOT_PROVEN",
+    "graphifyLock": "PASS",
+    "featureEnvelope": "PASS",
+    "latentDiagnostic": "PASS",
+    "latentBounded": "PASS",
+    "ace": "BLOCKED",
+    "mcp": "PASS",
+    "writes": 0,
+    "blockers": [
+      "graphify_symbols is absent from the live schema",
+      "graph artifact is stale or absent",
+      "atlas_domain_predictions is absent",
+      "semantic representation records are absent",
+      "full-corpus ACE admission is blocked by graph evidence"
+    ]
+  },
+  "safe_next_step": "Use the existing live SearchRuntime/Go Retrieval and TRACE/atlas-tools boundaries with one known compiler error. Require the same evidence refs, candidate population, revisions, and ACE manifest checksum. Do not apply a patch or write any store.",
+  "likely_cause": "The subsystem helpers exist, but the complete revision-qualified handoff from indexed source evidence through Go Retrieval and ACE into TRACE repair tooling has not been proven as one replayable packet.",
+  "evidence": [
+    "Existing structural, retrieval, ACE, MCP, and repair-contract files listed by owner.",
+    "Current repository rules keep Postgres canonical and treat Qdrant, Valkey, Neo4j, and GPU outputs as derived or cached.",
+    "Current scoped rankers are present, but no single best-fit authority is established."
+  ],
+  "patch_targets": [
+    "docs/reports/parent-atlas-agentic-error-fixing-owner-map-v1.json",
+    "sveltekit-frontend/src/lib/server/retrieval/retrieval-candidate-feature-matrix-v1.ts",
+    "sveltekit-frontend/src/lib/server/ace/context-compiler.parent-atlas.ts",
+    "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
+    "openspec/changes/parent-atlas-agentic-repair-bundle-integration/tasks.md"
+  ],
+  "safe_next_command": "rg -n --no-heading \"retrieveAllCandidates|CandidateOrdinalMapV1|ContextManifest|FixSynthesizer|KernelDagCandidate|tools/call\" sveltekit-frontend/src services/go-retrieval-service openspec",
+  "smoke_command": "cd sveltekit-frontend; npx vitest run --config vitest.config.ts src/lib/server/ace/ace-context-manifest.spec.ts src/lib/server/retrieval/repair-candidate-feature-matrix-v1.spec.ts --reporter=dot",
+  "report_path": "docs/reports/parent-atlas-agentic-error-fixing-owner-map-v1.json"
+}

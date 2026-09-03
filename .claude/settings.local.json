@@ -635,5 +635,8 @@
     "atlas-tools",
     "socraticode",
     "trace"
+  ],
+  "disabledMcpjsonServers": [
+    "atlas-task-kernel"
   ]
 }

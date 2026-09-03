@@ -1,0 +1,120 @@
+{
+  "schema": "atlas.ace-packet-completeness-structural-boundary-audit.v1",
+  "generatedAt": "2026-09-03",
+  "mode": "READ_ONLY_SOURCE_AUDIT",
+  "status": "PARTIAL_NOT_CANONICAL",
+  "acePacket": {
+    "legacyAdapter": "sveltekit-frontend/src/lib/server/ace/ace-context-manifest.ts",
+    "strictAdmissionOwner": "sveltekit-frontend/src/lib/server/atlas/context/ace-context-manifest-admission-v1.ts",
+    "contextManifestV2Owner": "sveltekit-frontend/src/lib/server/atlas/graph/context-manifest-v2.ts",
+    "complete": false,
+    "reason": "Legacy ACE adapter can compile a manifest without a complete revision-qualified candidate bundle; incomplete structural metadata is now preserved as null and remains non-promotable.",
+    "canonicalPromotion": false
+  },
+  "metadataEnrichment": {
+    "status": "PARTIAL",
+    "nullPolicy": "EXPLICIT_NULL_PRESERVED_WHEN_AUTHORITATIVE_METADATA_IS_UNAVAILABLE; NULL IS NOT A REVISION AND DOES NOT SATISFY STRICT ADMISSION",
+    "present": [
+      "requestId",
+      "featureId",
+      "sourceRefs",
+      "evidenceRefs",
+      "selectionPolicyVersion",
+      "featurePresence",
+      "candidate ordinal identity in strict admission"
+    ],
+    "missingOrNotGuaranteedAtLegacyBoundary": [
+      "workspaceRevision",
+      "sourceRevisionSetChecksum",
+      "graphRevision",
+      "representationRevision",
+      "candidateSnapshotRevision",
+      "ordinalMapChecksum",
+      "manifestChecksum exposed as a single stable response field"
+    ],
+    "strictAdmission": "WIRED_BUT_REQUIRES_AUTHORITATIVE_CandidateFeatureSnapshotV1",
+    "recentRepair": "AtlasProcessPacketV1.graphRevision is nullable and the ACE adapter no longer emits graph:parent-atlas as a fallback."
+  },
+  "parameterFetching": {
+    "status": "CONTRACTS_PRESENT_NOT_LIVE_PROVEN",
+    "evidence": [
+      "sveltekit-frontend/src/lib/server/atlas/contracts/parameter-artifact-lookup-v1.ts",
+      "sveltekit-frontend/src/lib/server/atlas/runtime/known-execution-manifests.ts",
+      "sveltekit-frontend/src/lib/server/atlas/runtime/algorithm-execution-manifest.ts"
+    ],
+    "gap": "Parameter revisions and checksums exist for execution manifests, but no single ACE production receipt proves fetch, validation, and use of those parameters for the selected request."
+  },
+  "dagSynthesis": {
+    "status": "WIRED_NON_CANONICAL",
+    "promptPlan": "sveltekit-frontend/src/lib/server/atlas/prefill/prompt-plan-v1.ts",
+    "synthesisReceipt": "sveltekit-frontend/src/lib/server/atlas/research/synthesis-receipt-v1.ts",
+    "requiredChain": [
+      "ContextManifestV2",
+      "PromptPlanV1",
+      "SynthesisReceiptV1"
+    ],
+    "gap": "The contracts bind checksums and evidence, but live end-to-end production admission and independent readback are not proven by this source audit."
+  },
+  "bitfrostWarming": {
+    "status": "WIRED_POLICY_PRESENT_LIVE_EFFECTIVENESS_OPEN",
+    "identityOwner": "sveltekit-frontend/src/lib/server/atlas/cache/ace-bitfrost-cache-identity-v1.ts",
+    "provenPolicy": [
+      "cache identity includes representation, candidate snapshot, ordinal map, graph, feature, producer, policy, and artifact checksums",
+      "warming does not add score or force prompt admission",
+      "warm and cold metrics distinguish residence from cache-hit selection"
+    ],
+    "gap": "Live invalidation, revision-change miss behavior, and residency readback remain separate proofs; stale or incomplete ACE packets must not be warmed as canonical context."
+  },
+  "encodingAndLsp": {
+    "utf8Policy": "Tree-sitter/source truth uses UTF-8 bytes and byte ranges; LSP positions must use the negotiated position encoding rather than UTF-8 character offsets.",
+    "lspBoundary": "PROVEN_CONTRACT_AND_BASIC_TESTS",
+    "owner": "packages/parent-atlas/src/core/lsp-semantic-observation.ts",
+    "tests": "packages/parent-atlas/test/lsp-semantic-observation.test.mjs",
+    "covered": [
+      "UTF-16 range conversion",
+      "UTF-8 range conversion",
+      "surrogate/code-point split rejection",
+      "workspace/source revision mismatch rejection",
+      "LSP output remains a non-canonical observation"
+    ],
+    "nextTests": [
+      "position-encoding negotiation fallback",
+      "multibyte text with cross-line ranges",
+      "cross-file target revision mismatch",
+      "missing or unavailable language server",
+      "bounded span and response-size limits"
+    ]
+  },
+  "structuralAdapters": {
+    "treeSitter": "source bytes, hierarchy, exact byte coordinates",
+    "astGrep": "syntax-aware structural pattern observations",
+    "tsMorph": "TypeScript compiler semantic enrichment",
+    "lsp": "language-server semantic/cross-file observations",
+    "ontology": "meaning and admitted definitions",
+    "status": "BOUNDARIES_EXIST; broader live adapter coverage remains partial"
+  },
+  "fastApi": {
+    "status": "NOT_PROVEN_BY_THIS_AUDIT",
+    "requiredProof": "one bounded request through the real ACE/ACP route, validated response envelope, strict admission receipt, and no direct route-level store orchestration"
+  },
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "gaps": [
+    "Legacy ACE adapter still permits incomplete identity; missing graph metadata is now explicit null and strict admission remains required.",
+    "Existing ACE packet evidence is not sufficient by itself to prove current source, graph, representation, and candidate revisions.",
+    "Parameter fetch/use is not joined to one request-scoped receipt.",
+    "DAG prompt/synthesis contracts exist, but live end-to-end admission is not proven here.",
+    "Bitfrost live invalidation/residency effectiveness remains open.",
+    "LSP needs expanded negotiated-encoding and multibyte/cross-file tests.",
+    "FastAPI route wiring needs a bounded live proof."
+  ],
+  "nextGates": [
+    "ACE-LEGACY-ADAPTER-FAIL-CLOSED-01",
+    "ACE-PARAMETER-FETCH-RECEIPT-01",
+    "ACE-DAG-SYNTHESIS-LIVE-01",
+    "BITFROST-INVALIDATION-RESIDENCY-01",
+    "LSP-UTF8-UTF16-NEGOTIATION-02",
+    "ACE-FASTAPI-BOUNDARY-01"
+  ],
+  "safeNextCommand": "rg -n --no-heading \"buildContextManifestFromACE|buildAceContextManifestAdmissionV1|parameter-artifact-lookup|PromptPlanV1|SynthesisReceiptV1|positionEncoding|lspRangeToUtf8ByteRange\" sveltekit-frontend/src packages/parent-atlas/src packages/parent-atlas/test"
+}

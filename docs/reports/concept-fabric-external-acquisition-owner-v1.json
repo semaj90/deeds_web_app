@@ -1,0 +1,27 @@
+{
+  "schemaVersion": "concept-fabric-external-acquisition-owner.v1",
+  "status": "EXISTING_OWNERS_REUSED",
+  "owners": {
+    "primaryBoundedCrawler": "python/atlas_okf_docs_pipeline.py::firecrawl_crawl_v2",
+    "localHtmlFallback": "python/atlas_external_docs.py::fetch_beautifulsoup",
+    "okfDevelopmentAdapter": "scripts/docs-atlas/crawl-okf-dev-docs.mts",
+    "revisionedCapture": "sveltekit-frontend/src/lib/server/atlas/docs/firecrawl-v2-capture.ts",
+    "glossaryConsumer": "sveltekit-frontend/src/routes/(app)/library/glossary/+page.server.ts"
+  },
+  "contract": {
+    "domainAllowlist": true,
+    "sourceRevision": true,
+    "rawChecksum": true,
+    "normalizedChecksum": true,
+    "outgoingLinks": true,
+    "okfSchemaValidation": true,
+    "crawl4aiInstalledOrWired": false
+  },
+  "policy": {
+    "glossaryCallsCrawlerDirectly": false,
+    "newCrawlerOwnerCreated": false,
+    "writesPerformed": false,
+    "canonicalAuthority": false
+  },
+  "gap": "Firecrawl capture/evidence artifacts are not yet joined revision-safely into glossary definitions."
+}

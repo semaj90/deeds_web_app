@@ -2,14 +2,14 @@
   "schema": "atlas.indexable-source-manifest.v1",
   "readOnly": true,
   "canonicalWrites": false,
-  "workspaceRevision": "880b69baf405e49850a3ab88f98cefb720e8fdb1",
-  "sourceRevision": "880b69baf405e49850a3ab88f98cefb720e8fdb1",
+  "workspaceRevision": "02e399dd9277a8adc4021d0cbce0b62f20248848",
+  "sourceRevision": "02e399dd9277a8adc4021d0cbce0b62f20248848",
   "root": "C:\\Users\\james\\Videos\\deeds-web-app",
-  "sampleLimit": 50000,
+  "sampleLimit": 16629,
   "rowCount": 16629,
   "counts": {
-    "HASHED": 16627,
-    "SOURCE_TOO_LARGE": 2
+    "HASHED": 16628,
+    "SOURCE_TOO_LARGE": 1
   },
   "exclusions": [
     ".agent",

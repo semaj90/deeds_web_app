@@ -2,11 +2,79 @@
   "schemaVersion": "atlas.graphify-bm25-index-plan.v1",
   "readOnly": true,
   "canonicalWriteAttempted": false,
-  "generatedAt": "2026-09-03T00:36:31.135Z",
+  "generatedAt": "2026-09-03T20:32:48.030Z",
   "limit": 10,
   "status": "BM25_INDEX_PLAN_READY",
-  "candidates": [],
-  "blockers": [
-    "no_completed_graphify_candidates"
-  ]
+  "candidates": [
+    {
+      "graphifyRunId": "9716c798-bb17-45c7-afb0-1c58955889bf",
+      "workflowId": "graphify-default",
+      "workspaceRevision": "sha256:46e4830a6f5c510c02b7dd0b7a1d8ea2c97916f0b7dcf8c6d2b62d0fb800ca8e",
+      "sourceManifestDigest": "46e4830a6f5c510c02b7dd0b7a1d8ea2c97916f0b7dcf8c6d2b62d0fb800ca8e",
+      "sourceManifestSourceCount": 25360,
+      "repositoryRevision": "d4fee9458c12cf603f5795717840f8a051de9057",
+      "parameters": {
+        "wrapper": "scripts/startup/run-graphify-daily-startup.mjs",
+        "writerRevision": "atlas.graphify-run-open.v1"
+      },
+      "graphifyCompletedAt": "2026-09-03T20:32:47.150Z",
+      "idempotencyKey": "graphify-default:postgres_tsvector_english:46e4830a6f5c510c02b7dd0b7a1d8ea2c97916f0b7dcf8c6d2b62d0fb800ca8e",
+      "nextAction": "CREATE_INDEX_RUN_ULID_THEN_CLAIM_LEASE"
+    },
+    {
+      "graphifyRunId": "862b952b-7623-434e-818e-407c1531abaf",
+      "workflowId": "graphify-default",
+      "workspaceRevision": "sha256:b55e7e34618f693e459cb226607dba2df700c44d7ba3185e40417ddaaa78461e",
+      "sourceManifestDigest": "b55e7e34618f693e459cb226607dba2df700c44d7ba3185e40417ddaaa78461e",
+      "sourceManifestSourceCount": 25301,
+      "repositoryRevision": "85e6f3d509856c75d77e175fc823623c2cd4e18c",
+      "parameters": {
+        "wrapper": "scripts/startup/run-graphify-daily-startup.mjs",
+        "writerRevision": "atlas.graphify-run-open.v1"
+      },
+      "graphifyCompletedAt": "2026-09-03T04:54:16.296Z",
+      "idempotencyKey": "graphify-default:postgres_tsvector_english:b55e7e34618f693e459cb226607dba2df700c44d7ba3185e40417ddaaa78461e",
+      "nextAction": "CREATE_INDEX_RUN_ULID_THEN_CLAIM_LEASE"
+    },
+    {
+      "graphifyRunId": "5b2e18fc-86e6-4fc2-932f-4887d5c14853",
+      "workflowId": "graphify-default",
+      "workspaceRevision": "sha256:dfe87604d35d381dd7b725830c0d8cd23adcb7dab156f7deefb7a15947cdd7e5",
+      "sourceManifestDigest": "dfe87604d35d381dd7b725830c0d8cd23adcb7dab156f7deefb7a15947cdd7e5",
+      "sourceManifestSourceCount": 25300,
+      "repositoryRevision": "85e6f3d509856c75d77e175fc823623c2cd4e18c",
+      "parameters": {
+        "wrapper": "scripts/startup/run-graphify-daily-startup.mjs",
+        "writerRevision": "atlas.graphify-run-open.v1"
+      },
+      "graphifyCompletedAt": "2026-09-03T04:38:06.899Z",
+      "idempotencyKey": "graphify-default:postgres_tsvector_english:dfe87604d35d381dd7b725830c0d8cd23adcb7dab156f7deefb7a15947cdd7e5",
+      "nextAction": "CREATE_INDEX_RUN_ULID_THEN_CLAIM_LEASE"
+    },
+    {
+      "graphifyRunId": "369e4270-7689-4536-8816-4ec4a5517b3e",
+      "workflowId": "graphify-default",
+      "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "sourceManifestDigest": "7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "sourceManifestSourceCount": 25258,
+      "repositoryRevision": "85e6f3d509856c75d77e175fc823623c2cd4e18c",
+      "parameters": {
+        "dirty": true,
+        "batchCount": 26,
+        "batchIndex": 25,
+        "fullCorpus": true,
+        "gitHeadRef": "refs/heads/main",
+        "baseTreeOid": "1864bd71ca8b2ee2b0b797d62ccc3111ce4f2b86",
+        "sourceCount": 25258,
+        "repositoryId": "semaj90/deeds_web_app",
+        "writerRevision": "atlas.graphify-source-inventory-writer.v2",
+        "totalSourceCount": 25258,
+        "workspaceRevisionRecordChecksum": "2913f2f312f71fc27d4749b2e2bc7af835e11eb1cb440e1477adcf1bb29db2ec"
+      },
+      "graphifyCompletedAt": "2026-09-03T00:55:51.093Z",
+      "idempotencyKey": "graphify-default:postgres_tsvector_english:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "nextAction": "CREATE_INDEX_RUN_ULID_THEN_CLAIM_LEASE"
+    }
+  ],
+  "blockers": []
 }

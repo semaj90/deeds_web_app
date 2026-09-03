@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import {
   buildExternalDocFabricManifest,
   externalDocChunkSchema,
+  externalDocFetchReceiptSchema,
   externalDocDerivedFeaturesSchema,
   externalDocsInferenceAlignmentSchema,
   externalDocsRetrievalPlanSchema,
@@ -187,4 +188,93 @@ test('chunk contract preserves source revision and derived ontology without cano
   });
   assert.equal(chunk.source_revision, 'qdrant-r1');
   assert.equal(chunk.canonical_authority, false);
+});
+
+test('OKF fetch, chunk, n-ary tuple, and retrieval plan remain revision-aligned', async () => {
+  const fetchReceipt = externalDocFetchReceiptSchema.parse({
+    fetch_id: 'fetch:typescript-r1',
+    source_id: 'typescript',
+    source_revision: 'source:typescript-r1',
+    requested_url: 'https://www.typescriptlang.org/docs/',
+    resolved_url: 'https://www.typescriptlang.org/docs/',
+    fetcher: 'FIRECRAWL_V2',
+    http_status: 200,
+    content_type: 'text/html',
+    etag: 'typescript-r1',
+    last_modified: null,
+    fetched_at: '2026-09-03T00:00:00.000Z',
+    raw_content_checksum: sha,
+    normalized_content_checksum: sha,
+    parser: 'markdown',
+    parser_revision: 'parser:markdown-r1',
+    title: 'TypeScript Documentation',
+    language: 'en',
+    outgoing_urls: ['https://www.typescriptlang.org/docs/handbook/'],
+    canonical_authority: false,
+  });
+
+  const tuple = ontologyTupleSchema.parse({
+    tuple_id: 'tuple:typescript-api-r1',
+    predicate: 'documents',
+    predicate_lemma: 'document',
+    participants: [
+      { role: 'source', text: 'TypeScript Documentation', normalized_text: 'typescript documentation', ontology_class: 'CONCEPT', start_char: 0, end_char: 23 },
+      { role: 'target', text: 'TypeScript API', normalized_text: 'typescript api', ontology_class: 'API', start_char: 28, end_char: 42 },
+    ],
+    degree: 2,
+    extraction_method: 'RULE_PATTERN',
+    evidence_span_refs: ['span:0'],
+    confidence: 0.9,
+    canonical_authority: false,
+  });
+
+  const chunk = externalDocChunkSchema.parse({
+    chunk_id: 'chunk:typescript-r1-0',
+    source_id: fetchReceipt.source_id,
+    source_revision: fetchReceipt.source_revision,
+    fetch_id: fetchReceipt.fetch_id,
+    source_url: fetchReceipt.resolved_url,
+    document_checksum: fetchReceipt.normalized_content_checksum,
+    chunk_checksum: 'b'.repeat(64),
+    ordinal: 0,
+    heading_path: ['Documentation'],
+    start_char: 0,
+    end_char: 64,
+    text: 'TypeScript Documentation describes the TypeScript API.',
+    language: 'en',
+    domain_class: 'documentation',
+    ontology_classes: ['CONCEPT', 'API'],
+    ontology_tuples: [tuple],
+    outgoing_urls: fetchReceipt.outgoing_urls,
+    canonical_authority: false,
+  });
+
+  const plan = externalDocsRetrievalPlanSchema.parse({
+    plan_revision: 'plan:typescript-r1',
+    query_id: 'query:typescript-api',
+    query_revision: 'query:typescript-api-r1',
+    maximum_candidates: 64,
+    semantic_prefetch_k: 16,
+    exact_refine_k: 8,
+    maximum_relation_hops: 1,
+    canonical_authority: false,
+  });
+
+  const fixture = { fetchReceipt, chunk, plan };
+  const checksum = async (value) => {
+    const bytes = new TextEncoder().encode(JSON.stringify(value));
+    const digest = await crypto.subtle.digest('SHA-256', bytes);
+    return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, '0')).join('');
+  };
+
+  assert.equal(chunk.source_revision, fetchReceipt.source_revision);
+  assert.equal(chunk.document_checksum, fetchReceipt.normalized_content_checksum);
+  assert.equal(chunk.ontology_tuples[0].degree, chunk.ontology_tuples[0].participants.length);
+  assert.ok(chunk.ontology_tuples[0].evidence_span_refs.includes('span:0'));
+  assert.equal(plan.semantic_lane_votes, 1);
+  assert.equal(plan.exact_source_promotion_required, true);
+  assert.equal(fetchReceipt.canonical_authority, false);
+  assert.equal(chunk.canonical_authority, false);
+  assert.equal(plan.canonical_authority, false);
+  assert.equal(await checksum(fixture), await checksum(JSON.parse(JSON.stringify(fixture))));
 });

@@ -57,8 +57,8 @@
         "uniqueListedNames": 0,
         "switchCaseDispatch": 0,
         "ifChainDispatch": 0,
-        "registerToolCalls": 119,
-        "uniqueRegisterToolNames": 119
+        "registerToolCalls": 120,
+        "uniqueRegisterToolNames": 120
       },
       "listedWithoutHandler": [],
       "handlerWithoutListing": [],

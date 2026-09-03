@@ -11,6 +11,7 @@ import {
   type PersistedEnvelope,
   type ProtocolBoundary,
 } from '$lib/shared/schemas/protocol.js';
+import { SERVER_CHAT_MODEL } from '$lib/ai/model-ids.js';
 
 /** Local type — original module `$lib/api/production-service-client` does not exist */
 interface ServiceResponse {
@@ -138,10 +139,11 @@ class MCPGPUOrchestrator {
 	}
 
 	private initializeModels(): void {
-		// Gemma3 Legal Configuration
-		this.modelConfigs.set('gemma4-rotorquant:latest', {
-			name: 'gemma4-rotorquant:latest, latest',
-			port: 11434,
+		// Current synthesis configuration. The live model identity is resolved by
+		// llama-server on :8090; this constant is only the bounded request default.
+		this.modelConfigs.set(SERVER_CHAT_MODEL, {
+			name: SERVER_CHAT_MODEL,
+			port: 8090,
 			capabilities: ['legal_analysis', 'document_processing', 'contract_review'],
 			gpu_layers: 35,
 			memory_requirement: '7.3GB',
@@ -319,7 +321,7 @@ class MCPGPUOrchestrator {
 			'/api/v1/ai/legal-analysis',
 			{
 				prompt,
-				model: task.config?.model ?? 'gemma4-rotorquant:latest',
+				model: task.config?.model ?? SERVER_CHAT_MODEL,
 				useGPU: task.config?.useGPU !== false,
 				temperature: task.config?.temperature ?? 0.1,
 				maxTokens: task.config?.maxTokens ?? 2048
@@ -395,7 +397,7 @@ class MCPGPUOrchestrator {
 			'/api/v1/ai/attention-analysis',
 			{
 				text: task.data.text,
-				model: task.config?.model ?? 'gemma4-rotorquant:latest',
+				model: task.config?.model ?? SERVER_CHAT_MODEL,
 				layer_analysis: true
 			},
 			{

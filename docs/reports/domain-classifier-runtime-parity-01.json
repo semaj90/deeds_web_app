@@ -1,0 +1,14 @@
+{
+  "schema": "atlas.domain-classifier-runtime-parity-01.v1",
+  "task": "DOMAIN-CLASSIFIER-RUNTIME-PARITY-01",
+  "mode": "READ_ONLY_AUDIT",
+  "status": "SERVING_RUNTIME_RETRAINED_CANDIDATE_NOT_PROMOTED",
+  "trainingRuntime": {"python": "3.13.5", "scikitLearn": "1.7.0", "joblib": "1.5.1", "numpy": "2.2.6", "source": "C:/Python313/python.exe"},
+  "servingRuntime": {"python": "3.13.15", "scikitLearn": "1.7.2", "joblib": "1.5.2", "numpy": "2.3.3", "container": "miniforge-nlp-sidecar"},
+  "checkpoint": {"path": "models/domain-classifier/checkpoint.joblib", "sha256": "707a8f6f40a339be531099e6c2eacc16ac57d49028dadbfeb81946560eb2b5b1", "modelRevision": "domain-classifier-nblr-v1-1788454983", "embeddingModel": "embeddinggemma:latest", "trainedOnFiles": 34, "kmeansClusters": 15, "labels": ["agent", "auth", "cache", "database", "retrieval", "ui"], "embeddedTrainingRuntimeMetadata": false},
+  "servingRetrainCandidate": {"path": "/tmp/domain-classifier-serving.joblib", "sha256": "b993a35bdfaeb3866c6750a3c46f123e42dd256ab1f7e81d71816530dfe70b97", "modelRevision": "domain-classifier-nblr-v1-1788457606", "trainingRuntime": {"python": "3.13.15", "scikitLearn": "1.7.2", "joblib": "1.5.2", "numpy": "2.3.3"}, "trainingFiles": 300, "embeddedChunkCount": 1563, "weakLabelRows": 35, "labels": ["agent", "auth", "cache", "database", "retrieval", "ui"], "kmeansClusters": 15, "labelSource": "deterministic_taxonomy_weak_label", "productionProven": false},
+  "liveServing": {"checkpointLoads": true, "backend": "sklearn-lr", "status": "succeeded", "productionProven": false, "provenanceQualified": false},
+  "blockingReasons": ["CHECKPOINT_LACKS_TRAINING_RUNTIME_METADATA", "TRAINING_LABEL_SET_IS_NOT_THE_15_DOMAIN_TAXONOMY", "WEAK_LABEL_TRAINING_REQUIRES_TARGET_AUTHORITY", "HOLDOUT_EVALUATION_NOT_PROVEN", "CANDIDATE_CHECKPOINT_NOT_INSTALLED"],
+  "writesPerformed": false,
+  "canonicalAuthority": false
+}

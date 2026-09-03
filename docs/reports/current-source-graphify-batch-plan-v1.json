@@ -1,6 +1,6 @@
 {
   "schema": "atlas.current-source-graphify-batch-plan.v1",
-  "generatedAt": "2026-08-29T19:05:18.189Z",
+  "generatedAt": "2026-09-03T20:39:30.235Z",
   "status": "CURRENT_GRAPHIFY_BATCH_PLAN_READY",
   "readOnly": true,
   "writes": {
@@ -10,1242 +10,593 @@
     "neo4j": false,
     "valkey": false
   },
-  "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+  "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
   "cohortReport": "docs/reports/current-source-projection-cohort-v1.json",
-  "cohortEligibleSources": 111,
+  "cohortEligibleSources": 52,
   "requestedLimit": 128,
-  "selectedSourceCount": 111,
-  "selectionChecksum": "1027c9671b2150da95e104c9933e80cf75cb99846fad89e2f290eb34ddd308d1",
+  "selectedSourceCount": 52,
+  "selectionChecksum": "0c4ff5b9107a9f2eb0dee9ddfac3b4393941e4dcfc3dc146fe776bc7026acaf3",
   "counts": {
-    "currentGraphifyExact": 111,
+    "currentGraphifyExact": 0,
     "missingGraphifySource": 0,
     "missingWorkspaceObservation": 0,
     "ambiguousGraphifySource": 0,
-    "graphifyRevisionOrContentMismatch": 0
+    "graphifyRevisionOrContentMismatch": 52
   },
   "databaseError": null,
-  "nextGate": "CURRENT_GRAPHIFY_COHORT_READBACK_PROVEN",
+  "nextGate": "EXPLICIT_GRAPHIFY_BATCH_REVIEW",
   "records": [
-    {
-      "sourceRef": "scripts/atlas/append-dir-agents-llms.mjs",
-      "sourceRevision": "sha256:af01f3a4c92ad9f34f00ca55edcc00630c549628fd06d8bb70c36f3bc469c53d",
-      "contentDigest": "af01f3a4c92ad9f34f00ca55edcc00630c549628fd06d8bb70c36f3bc469c53d",
-      "byteLength": 9897,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
-    },
-    {
-      "sourceRef": "scripts/atlas/audit-som-canonical-location.mjs",
-      "sourceRevision": "sha256:a73390beef021ba869bd9b682fbf568ad8a0455e7c9325de03f0aff90feba278",
-      "contentDigest": "a73390beef021ba869bd9b682fbf568ad8a0455e7c9325de03f0aff90feba278",
-      "byteLength": 12774,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
-    },
-    {
-      "sourceRef": "scripts/atlas/audit-supersedes-packet-aware.mjs",
-      "sourceRevision": "sha256:e99d40da4df68429e7cfe668c9bc1addf14c212fd1cb3bd785db4eff03e72aec",
-      "contentDigest": "e99d40da4df68429e7cfe668c9bc1addf14c212fd1cb3bd785db4eff03e72aec",
-      "byteLength": 5133,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
-    },
-    {
-      "sourceRef": "scripts/atlas/generate-concept-temperature-report.mjs",
-      "sourceRevision": "sha256:b4b02492df5c3ad9317fa682da3c047ac153fe463e68a7ef2c9a761850b7ca0e",
-      "contentDigest": "b4b02492df5c3ad9317fa682da3c047ac153fe463e68a7ef2c9a761850b7ca0e",
-      "byteLength": 5694,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
-    },
-    {
-      "sourceRef": "scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs",
-      "sourceRevision": "sha256:cbfb9d2e14a2b5f012090953aed43728ba4f7497e45d26d24167a283dd3e4a0d",
-      "contentDigest": "cbfb9d2e14a2b5f012090953aed43728ba4f7497e45d26d24167a283dd3e4a0d",
-      "byteLength": 14389,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
-    },
-    {
-      "sourceRef": "scripts/atlas/phase-16-h-glyph-bridge.mjs",
-      "sourceRevision": "sha256:b1a044cfac8444733d923d1af49c5e095ab2fd7f2057bfc1339fbbfecc0ad604",
-      "contentDigest": "b1a044cfac8444733d923d1af49c5e095ab2fd7f2057bfc1339fbbfecc0ad604",
-      "byteLength": 3547,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
-    },
-    {
-      "sourceRef": "scripts/atlas/test-p4-nats-wiring.mts",
-      "sourceRevision": "sha256:bc40de642906f5b31fb2345f27082c20cc0cdf6e08fdf439d70488a0f28cc629",
-      "contentDigest": "bc40de642906f5b31fb2345f27082c20cc0cdf6e08fdf439d70488a0f28cc629",
-      "byteLength": 7865,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
-    },
-    {
-      "sourceRef": "scripts/opencode/fill_empty_summaries.mjs",
-      "sourceRevision": "sha256:9c85c2950ff45654608bf1be8efb23f3ac6df1b513eb05a5f79a8041649f44fb",
-      "contentDigest": "9c85c2950ff45654608bf1be8efb23f3ac6df1b513eb05a5f79a8041649f44fb",
-      "byteLength": 4239,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
-    },
-    {
-      "sourceRef": "scripts/packets/load-packets-neo4j.mjs",
-      "sourceRevision": "sha256:ebcb4aea0137b099e2a822dc8e98e0b00cfb92735eb16bb903bbd9bcc2f59f64",
-      "contentDigest": "ebcb4aea0137b099e2a822dc8e98e0b00cfb92735eb16bb903bbd9bcc2f59f64",
-      "byteLength": 4635,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
-    },
-    {
-      "sourceRef": "scripts/packets/load-packets-postgres.mjs",
-      "sourceRevision": "sha256:8ff5b5e82b951394c31e643a9368ff03b83fc84d49e85162e0f3161f914c8b19",
-      "contentDigest": "8ff5b5e82b951394c31e643a9368ff03b83fc84d49e85162e0f3161f914c8b19",
-      "byteLength": 5092,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
-    },
-    {
-      "sourceRef": "scripts/run-migration.mjs",
-      "sourceRevision": "sha256:89b20a2b4512d1e1f084880eb01dafd20b719af3544521cc4339e4d9017888b1",
-      "contentDigest": "89b20a2b4512d1e1f084880eb01dafd20b719af3544521cc4339e4d9017888b1",
-      "byteLength": 1450,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
-    },
-    {
-      "sourceRef": "scripts/tests/test-citations-scroll.mjs",
-      "sourceRevision": "sha256:5c64f8b1c070b349db36a2ca2e971a7cf6fd1d6d7c70accc78fd53c05d9bfe96",
-      "contentDigest": "5c64f8b1c070b349db36a2ca2e971a7cf6fd1d6d7c70accc78fd53c05d9bfe96",
-      "byteLength": 6646,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
-    },
-    {
-      "sourceRef": "scripts/tests/test-warmup-import.mjs",
-      "sourceRevision": "sha256:45a119320791a315e42b06d5d06b3a7f11675490891099474b23e98b89b90c62",
-      "contentDigest": "45a119320791a315e42b06d5d06b3a7f11675490891099474b23e98b89b90c62",
-      "byteLength": 1691,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
-    },
-    {
-      "sourceRef": "scripts/unsloth-training/COLAB_PACKAGE/MEGA_DATASET_EXPANSION.md",
-      "sourceRevision": "sha256:92795352aef2c3b3693d70ea96956fdba85f5956b3f502adb07bc6cdd32a395a",
-      "contentDigest": "92795352aef2c3b3693d70ea96956fdba85f5956b3f502adb07bc6cdd32a395a",
-      "byteLength": 21532,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
-    },
-    {
-      "sourceRef": "simd-bridge/cpp/build_som_cache.sh",
-      "sourceRevision": "sha256:7b079f34efa19eb40575cf0fe6e2c5b67cc51944bc2267bf1f9eeca2a61bcf6a",
-      "contentDigest": "7b079f34efa19eb40575cf0fe6e2c5b67cc51944bc2267bf1f9eeca2a61bcf6a",
-      "byteLength": 946,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
-    },
-    {
-      "sourceRef": "src/lib/server/valkey.ts",
-      "sourceRevision": "sha256:912d720a88dfe793c71e49f525793d656a0a0ba2d200343b7fb4bdfedc58c28f",
-      "contentDigest": "912d720a88dfe793c71e49f525793d656a0a0ba2d200343b7fb4bdfedc58c28f",
-      "byteLength": 2550,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/docs/TODO-karpathy-gpu-features.md",
-      "sourceRevision": "sha256:3014afd64504605236e489c830a7a9940f405632d817b69021736c387d775309",
-      "contentDigest": "3014afd64504605236e489c830a7a9940f405632d817b69021736c387d775309",
-      "byteLength": 15228,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
-    },
     {
       "sourceRef": "sveltekit-frontend/docs/design/2026-05-11_agents-directory-card-regen.md",
       "sourceRevision": "sha256:57a4837b0c7a57ee8c790abbf9d11c5b08801c1952e2d6cee9e0ec80dc83022b",
       "contentDigest": "57a4837b0c7a57ee8c790abbf9d11c5b08801c1952e2d6cee9e0ec80dc83022b",
       "byteLength": 21455,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
       "bindingPresent": true,
       "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/docs/session-2026-05-04-graphify-recovery.md",
-      "sourceRevision": "sha256:5771845968629cc36c3d6dd5b7e53e188489e18bd83f0e42953fdb676707b6d9",
-      "contentDigest": "5771845968629cc36c3d6dd5b7e53e188489e18bd83f0e42953fdb676707b6d9",
-      "byteLength": 10703,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/scripts/atlas/codebase-ingester-unified.mjs",
-      "sourceRevision": "sha256:88f9530fce3ecb4339ace8c13162209b4e256cdcf84fd743312ccbe292de4a14",
-      "contentDigest": "88f9530fce3ecb4339ace8c13162209b4e256cdcf84fd743312ccbe292de4a14",
-      "byteLength": 4758,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/scripts/atlas/test-p4-summary-indexing.mjs",
-      "sourceRevision": "sha256:ce5f88afc031a6745840dfc29115e45c22e5f867178077f081d3745f1eb2c496",
-      "contentDigest": "ce5f88afc031a6745840dfc29115e45c22e5f867178077f081d3745f1eb2c496",
-      "byteLength": 12629,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/scripts/kb/graph-jsonl-to-cards.mjs",
-      "sourceRevision": "sha256:bd27239075a773df5693f7b57a8b2dc0c06cb73dd85f2abe671cd23f66a71ef9",
-      "contentDigest": "bd27239075a773df5693f7b57a8b2dc0c06cb73dd85f2abe671cd23f66a71ef9",
-      "byteLength": 23418,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/scripts/mapreduce/map-worker.mjs",
-      "sourceRevision": "sha256:b52986e1d4a2091124b9dc2d127c9a27a06e6f237fd2b9ed5072ba3c23f6ee5e",
-      "contentDigest": "b52986e1d4a2091124b9dc2d127c9a27a06e6f237fd2b9ed5072ba3c23f6ee5e",
-      "byteLength": 10539,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/scripts/seed-hypergraph-edges-lane-c.mjs",
-      "sourceRevision": "sha256:45f88002bdbf7603ce455435ec1af58442ab2849c21f66f9c4353e3ac35055f4",
-      "contentDigest": "45f88002bdbf7603ce455435ec1af58442ab2849c21f66f9c4353e3ac35055f4",
-      "byteLength": 11176,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/scripts/tests/test-reports.mjs",
-      "sourceRevision": "sha256:9b20b2c536e645277f7ae0e4ad741ee4be6834e99836409b58ccb1d91e32a97c",
-      "contentDigest": "9b20b2c536e645277f7ae0e4ad741ee4be6834e99836409b58ccb1d91e32a97c",
-      "byteLength": 9425,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/lib/server/ace/llm-context-cache.ts",
-      "sourceRevision": "sha256:18e3bfd572b94a4cf8489303a13d25581bc2a5dc9282ef6a40f370a16e2a0124",
-      "contentDigest": "18e3bfd572b94a4cf8489303a13d25581bc2a5dc9282ef6a40f370a16e2a0124",
-      "byteLength": 13507,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/lib/server/couchdb/LLMS.md",
-      "sourceRevision": "sha256:4495780237c9e99869424f8b89f009063f8408161a6eb593109c3f9cf57ff8c7",
-      "contentDigest": "4495780237c9e99869424f8b89f009063f8408161a6eb593109c3f9cf57ff8c7",
-      "byteLength": 2854,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/lib/server/features/ai/index.ts",
-      "sourceRevision": "sha256:4b93aee30149eaa7ab54b465db9694de597d12feadadb0351544cc0b35f73c7f",
-      "contentDigest": "4b93aee30149eaa7ab54b465db9694de597d12feadadb0351544cc0b35f73c7f",
-      "byteLength": 3378,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/CacheService.ts",
-      "sourceRevision": "sha256:7105c941cdb7163f36bd5340be9dec298db584070f73cec2bd397d0e3ebebd56",
-      "contentDigest": "7105c941cdb7163f36bd5340be9dec298db584070f73cec2bd397d0e3ebebd56",
-      "byteLength": 893,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/DecisionEngine.ts",
-      "sourceRevision": "sha256:2d7d06c611884fa4675bcdd284733a2f76ebf73f32faf1667ad5c9439551233f",
-      "contentDigest": "2d7d06c611884fa4675bcdd284733a2f76ebf73f32faf1667ad5c9439551233f",
-      "byteLength": 10288,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/ErrorClustering.ts",
-      "sourceRevision": "sha256:efd35051d50fc241012b1f17d043199974294dd6aadfbd87409056aa5a599444",
-      "contentDigest": "efd35051d50fc241012b1f17d043199974294dd6aadfbd87409056aa5a599444",
-      "byteLength": 1156,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/EscalationService.ts",
-      "sourceRevision": "sha256:de9b9390076e6dd35e2591db6aadae5722a15032491ad8246e607eb46e706c71",
-      "contentDigest": "de9b9390076e6dd35e2591db6aadae5722a15032491ad8246e607eb46e706c71",
-      "byteLength": 10205,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/FixSynthesizer.ts",
-      "sourceRevision": "sha256:1e76394c1194114e2178c6feb776269a013d1bd7e0b539982194de2cc0ea252c",
-      "contentDigest": "1e76394c1194114e2178c6feb776269a013d1bd7e0b539982194de2cc0ea252c",
-      "byteLength": 9813,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/GRPOPolicy.ts",
-      "sourceRevision": "sha256:de548f223257954bdcf0f0fd3d04fd2b3d60ee8882d0394b6f08b233f36c9f36",
-      "contentDigest": "de548f223257954bdcf0f0fd3d04fd2b3d60ee8882d0394b6f08b233f36c9f36",
-      "byteLength": 13671,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/JSONLStorage.ts",
-      "sourceRevision": "sha256:06f33dc43a003a3172cc5e30a95fa8ce0e01fec45fc3230ff1cfbd92c60db5c3",
-      "contentDigest": "06f33dc43a003a3172cc5e30a95fa8ce0e01fec45fc3230ff1cfbd92c60db5c3",
-      "byteLength": 1169,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/KAGTraverser.ts",
-      "sourceRevision": "sha256:1815f9906de592dfbf73778eeea35287537d7c064cbda47b2537f7a41c1e480a",
-      "contentDigest": "1815f9906de592dfbf73778eeea35287537d7c064cbda47b2537f7a41c1e480a",
-      "byteLength": 23043,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/LearningPipeline.ts",
-      "sourceRevision": "sha256:f36206bf3ba3f0d9db6e7c2220bd69d1c4c3c89e6322ef53beee7b4ec5d90cc0",
-      "contentDigest": "f36206bf3ba3f0d9db6e7c2220bd69d1c4c3c89e6322ef53beee7b4ec5d90cc0",
-      "byteLength": 10004,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/MetricsCollector.ts",
-      "sourceRevision": "sha256:dd9199251b932521d82ee4ecf193d5a6a3aab8ff2b639d0672764c0aa801b5b4",
-      "contentDigest": "dd9199251b932521d82ee4ecf193d5a6a3aab8ff2b639d0672764c0aa801b5b4",
-      "byteLength": 9235,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/PatternStorage.ts",
-      "sourceRevision": "sha256:24a72601db400ba167d129086ae7d98c8b61df47bc4ef2c5755ceec066bc2686",
-      "contentDigest": "24a72601db400ba167d129086ae7d98c8b61df47bc4ef2c5755ceec066bc2686",
-      "byteLength": 870,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
+      "exactCurrentRows": 0,
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     },
     {
       "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/ToolInvoker.ts",
       "sourceRevision": "sha256:ed076cdbcfa3d4542e62d750767a63a3770dbb5c1310b05476e849c7c673caa2",
       "contentDigest": "ed076cdbcfa3d4542e62d750767a63a3770dbb5c1310b05476e849c7c673caa2",
       "byteLength": 717,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
       "bindingPresent": true,
       "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/index.ts",
-      "sourceRevision": "sha256:a0965b330eb9b9a492da8baa285225cda63aa741ff7b6cf62cd992c09b008d1d",
-      "contentDigest": "a0965b330eb9b9a492da8baa285225cda63aa741ff7b6cf62cd992c09b008d1d",
-      "byteLength": 1007,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/types.ts",
-      "sourceRevision": "sha256:3407000d65c3fb0efb852b504736a2bfc853764a995d6ff384aa5d27ec3b5add",
-      "contentDigest": "3407000d65c3fb0efb852b504736a2bfc853764a995d6ff384aa5d27ec3b5add",
-      "byteLength": 9717,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/lib/server/services/knowledge-search/MinioKnowledgeStore.ts",
-      "sourceRevision": "sha256:13787527659f6ca208aa97d81ba56d17e80cb3377c98a97734a0635c283e1da7",
-      "contentDigest": "13787527659f6ca208aa97d81ba56d17e80cb3377c98a97734a0635c283e1da7",
-      "byteLength": 11914,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/lib/server/services/knowledge-search/PostgresKnowledgeStore.ts",
-      "sourceRevision": "sha256:f1e49bd644f01a3e3fb72eba3e11eb1252fc9969ce9b9880020deea3d934bf9d",
-      "contentDigest": "f1e49bd644f01a3e3fb72eba3e11eb1252fc9969ce9b9880020deea3d934bf9d",
-      "byteLength": 6497,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/lib/server/services/knowledge-search/RedisCacheService.ts",
-      "sourceRevision": "sha256:f6fbb7d66e12e3066a025194e07fc3741341d15baa2b65581253e35b79951e9b",
-      "contentDigest": "f6fbb7d66e12e3066a025194e07fc3741341d15baa2b65581253e35b79951e9b",
-      "byteLength": 8011,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/lib/server/services/knowledge-search/TagExtractor.ts",
-      "sourceRevision": "sha256:6d52859fe78a949c7f4ea7a75ad9c5fcdab970c8e5da6223015ca55d80824591",
-      "contentDigest": "6d52859fe78a949c7f4ea7a75ad9c5fcdab970c8e5da6223015ca55d80824591",
-      "byteLength": 6226,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/lib/server/services/knowledge-search/TfIdfRanker.ts",
-      "sourceRevision": "sha256:ae604752e1bb0cde18dca91e2de2a13c1fdc59390f8af0666ce52f3f89dea479",
-      "contentDigest": "ae604752e1bb0cde18dca91e2de2a13c1fdc59390f8af0666ce52f3f89dea479",
-      "byteLength": 8325,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/lib/server/services/knowledge-search/index.ts",
-      "sourceRevision": "sha256:1724aa649dcb83cfff0a8b32631e1a8c4a51cc4f3dc8187847eadb54f706f628",
-      "contentDigest": "1724aa649dcb83cfff0a8b32631e1a8c4a51cc4f3dc8187847eadb54f706f628",
-      "byteLength": 2236,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/lib/server/services/report-auto-populator.ts",
-      "sourceRevision": "sha256:b79d3a02fa2096a3b5c204df9d8fdf8cf86a994ff552db1e2a0bbc7491af2ed6",
-      "contentDigest": "b79d3a02fa2096a3b5c204df9d8fdf8cf86a994ff552db1e2a0bbc7491af2ed6",
-      "byteLength": 8280,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/routes/(analysis)@/audio-analysis/[evidenceId]/+page.server.ts",
-      "sourceRevision": "sha256:a195a387fe0b2aec2c7a3613ff7b3df8cd9a641e29e9dc31a1425524ca0ac287",
-      "contentDigest": "a195a387fe0b2aec2c7a3613ff7b3df8cd9a641e29e9dc31a1425524ca0ac287",
-      "byteLength": 1477,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/routes/(analysis)@/video-analysis/[evidenceId]/+page.server.ts",
-      "sourceRevision": "sha256:dca97486594622c42bed45bb87d9999c9989a3fd45d38c307585c5e34177ba17",
-      "contentDigest": "dca97486594622c42bed45bb87d9999c9989a3fd45d38c307585c5e34177ba17",
-      "byteLength": 1476,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
+      "exactCurrentRows": 0,
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     },
     {
       "sourceRef": "sveltekit-frontend/src/routes/(app)/admin/cache/+page.server.ts",
       "sourceRevision": "sha256:e02678aef7c7579be7c1ba9441464b098a65d4eefe471e43250e9b4e474330e8",
       "contentDigest": "e02678aef7c7579be7c1ba9441464b098a65d4eefe471e43250e9b4e474330e8",
       "byteLength": 244,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
       "bindingPresent": true,
       "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
+      "exactCurrentRows": 0,
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     },
     {
       "sourceRef": "sveltekit-frontend/src/routes/(app)/admin/codebase-index/+page.ts",
       "sourceRevision": "sha256:028a65cfda7baee19b14dfb3b8f9728612e4cb2d552faa0d23011bfb34c7e935",
       "contentDigest": "028a65cfda7baee19b14dfb3b8f9728612e4cb2d552faa0d23011bfb34c7e935",
       "byteLength": 94,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
       "bindingPresent": true,
       "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
+      "exactCurrentRows": 0,
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     },
     {
       "sourceRef": "sveltekit-frontend/src/routes/(app)/cases/[id]/chat/+page.server.ts",
       "sourceRevision": "sha256:57c99034d0c22587fe18d6b595be5e3ca15745c825afc1ed5e46da3dc97c8e27",
       "contentDigest": "57c99034d0c22587fe18d6b595be5e3ca15745c825afc1ed5e46da3dc97c8e27",
       "byteLength": 346,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
       "bindingPresent": true,
       "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
+      "exactCurrentRows": 0,
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     },
     {
       "sourceRef": "sveltekit-frontend/src/routes/(app)/citations/+page.ts",
       "sourceRevision": "sha256:3449a47c95f7647b70222aaea11253d323c34bbf4cd742b335a43bb7780bcc8d",
       "contentDigest": "3449a47c95f7647b70222aaea11253d323c34bbf4cd742b335a43bb7780bcc8d",
       "byteLength": 117,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
       "bindingPresent": true,
       "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/routes/(app)/citations/LLMS.md",
-      "sourceRevision": "sha256:be140bfdfe9ca892272b7d5522c304a2acbfe8555f8ee9533f15afd24b650683",
-      "contentDigest": "be140bfdfe9ca892272b7d5522c304a2acbfe8555f8ee9533f15afd24b650683",
-      "byteLength": 2896,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/routes/(app)/code-intel/wiki/LLMS.md",
-      "sourceRevision": "sha256:7485d11e10600f3517f91b26ee759d1972548ab47000f621829d70c227aa4786",
-      "contentDigest": "7485d11e10600f3517f91b26ee759d1972548ab47000f621829d70c227aa4786",
-      "byteLength": 2863,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
+      "exactCurrentRows": 0,
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     },
     {
       "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/+page.ts",
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "byteLength": 27,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
       "bindingPresent": true,
       "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
+      "exactCurrentRows": 0,
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     },
     {
       "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/agent-chat/+page.ts",
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "byteLength": 27,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
       "bindingPresent": true,
       "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
+      "exactCurrentRows": 0,
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     },
     {
       "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/ai-assistant/+page.ts",
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "byteLength": 27,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
       "bindingPresent": true,
       "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
+      "exactCurrentRows": 0,
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     },
     {
       "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/ai-chat-test/+page.ts",
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "byteLength": 27,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
       "bindingPresent": true,
       "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
+      "exactCurrentRows": 0,
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     },
     {
       "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/ai-file-upload/+page.ts",
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "byteLength": 27,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
       "bindingPresent": true,
       "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
+      "exactCurrentRows": 0,
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     },
     {
       "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/ask-ai/+page.ts",
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "byteLength": 27,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
       "bindingPresent": true,
       "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
+      "exactCurrentRows": 0,
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     },
     {
       "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/cache/+page.ts",
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "byteLength": 27,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
       "bindingPresent": true,
       "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
+      "exactCurrentRows": 0,
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     },
     {
       "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/case-form/+page.ts",
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "byteLength": 27,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
       "bindingPresent": true,
       "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
+      "exactCurrentRows": 0,
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     },
     {
       "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/chat-messages/+page.ts",
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "byteLength": 27,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
       "bindingPresent": true,
       "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
+      "exactCurrentRows": 0,
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     },
     {
       "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/citation-tools/+page.ts",
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "byteLength": 27,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
       "bindingPresent": true,
       "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
+      "exactCurrentRows": 0,
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     },
     {
       "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/client-ai-chat/+page.ts",
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "byteLength": 27,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
       "bindingPresent": true,
       "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
+      "exactCurrentRows": 0,
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     },
     {
       "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/client-inference/+page.ts",
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "byteLength": 27,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
       "bindingPresent": true,
       "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
+      "exactCurrentRows": 0,
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     },
     {
       "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/collab-canvas/+page.ts",
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "byteLength": 27,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
       "bindingPresent": true,
       "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
+      "exactCurrentRows": 0,
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     },
     {
       "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/context-menu/+page.ts",
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "byteLength": 27,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
       "bindingPresent": true,
       "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
+      "exactCurrentRows": 0,
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     },
     {
       "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/contextual-chat/+page.ts",
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "byteLength": 27,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
       "bindingPresent": true,
       "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
+      "exactCurrentRows": 0,
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     },
     {
       "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/courtroom-sim/+page.ts",
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "byteLength": 27,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
       "bindingPresent": true,
       "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
+      "exactCurrentRows": 0,
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     },
     {
       "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/embedding-stream/+page.ts",
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "byteLength": 27,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
       "bindingPresent": true,
       "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
+      "exactCurrentRows": 0,
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     },
     {
       "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/enhanced-upload/+page.ts",
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "byteLength": 27,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
       "bindingPresent": true,
       "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
+      "exactCurrentRows": 0,
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     },
     {
       "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/evidence-dashboard/+page.ts",
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "byteLength": 27,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
       "bindingPresent": true,
       "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
+      "exactCurrentRows": 0,
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     },
     {
       "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/hover-card/+page.ts",
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "byteLength": 27,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
       "bindingPresent": true,
       "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
+      "exactCurrentRows": 0,
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     },
     {
       "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/keyboard-shortcuts/+page.ts",
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "byteLength": 27,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
       "bindingPresent": true,
       "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
+      "exactCurrentRows": 0,
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     },
     {
       "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/legal-layout/+page.ts",
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "byteLength": 27,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
       "bindingPresent": true,
       "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
+      "exactCurrentRows": 0,
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     },
     {
       "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/legal-spellbook/+page.ts",
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "byteLength": 27,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
       "bindingPresent": true,
       "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
+      "exactCurrentRows": 0,
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     },
     {
       "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/modals/+page.ts",
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "byteLength": 27,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
       "bindingPresent": true,
       "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
+      "exactCurrentRows": 0,
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     },
     {
       "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/modular-upload/+page.ts",
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "byteLength": 27,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
       "bindingPresent": true,
       "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
+      "exactCurrentRows": 0,
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     },
     {
       "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/nes-toast/+page.ts",
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "byteLength": 27,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
       "bindingPresent": true,
       "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
+      "exactCurrentRows": 0,
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     },
     {
       "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/notifications/+page.ts",
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "byteLength": 27,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
       "bindingPresent": true,
       "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
+      "exactCurrentRows": 0,
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     },
     {
       "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/phantom-code-lab/+page.ts",
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "byteLength": 27,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
       "bindingPresent": true,
       "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
+      "exactCurrentRows": 0,
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     },
     {
       "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/rich-text-editor/+page.ts",
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "byteLength": 27,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
       "bindingPresent": true,
       "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
+      "exactCurrentRows": 0,
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     },
     {
       "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/search-tools/+page.ts",
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "byteLength": 27,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
       "bindingPresent": true,
       "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
+      "exactCurrentRows": 0,
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     },
     {
       "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/source-drawer/+page.ts",
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "byteLength": 27,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
       "bindingPresent": true,
       "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
+      "exactCurrentRows": 0,
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     },
     {
       "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/streaming/+page.ts",
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "byteLength": 27,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
       "bindingPresent": true,
       "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
+      "exactCurrentRows": 0,
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     },
     {
       "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/synthesis-chat/+page.ts",
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "byteLength": 27,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
       "bindingPresent": true,
       "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
+      "exactCurrentRows": 0,
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     },
     {
       "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/theory-board/+page.ts",
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "byteLength": 27,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
       "bindingPresent": true,
       "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
+      "exactCurrentRows": 0,
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     },
     {
       "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/toc-reader/+page.ts",
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "byteLength": 27,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
       "bindingPresent": true,
       "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
+      "exactCurrentRows": 0,
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     },
     {
       "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/ui-components/+page.ts",
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "byteLength": 27,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
       "bindingPresent": true,
       "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
+      "exactCurrentRows": 0,
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     },
     {
       "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/webgpu-showcase/+page.ts",
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "byteLength": 27,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
       "bindingPresent": true,
       "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
+      "exactCurrentRows": 0,
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     },
     {
       "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/yorha-assistant/+page.ts",
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "byteLength": 27,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
       "bindingPresent": true,
       "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
+      "exactCurrentRows": 0,
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     },
     {
       "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/yorha-icons/+page.ts",
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "byteLength": 27,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
       "bindingPresent": true,
       "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
+      "exactCurrentRows": 0,
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     },
     {
       "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/yorha-terminal/+page.ts",
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "byteLength": 27,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
       "bindingPresent": true,
       "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
+      "exactCurrentRows": 0,
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     },
     {
       "sourceRef": "sveltekit-frontend/src/routes/(app)/evidence/analyze/+page.server.ts",
       "sourceRevision": "sha256:03c2f124ccaf960d3b993362233dc11b80ca7c4e49b4544463467f76fbd7a33f",
       "contentDigest": "03c2f124ccaf960d3b993362233dc11b80ca7c4e49b4544463467f76fbd7a33f",
       "byteLength": 348,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
       "bindingPresent": true,
       "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
+      "exactCurrentRows": 0,
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     },
     {
       "sourceRef": "sveltekit-frontend/src/routes/(app)/evidence/hash/+page.server.ts",
       "sourceRevision": "sha256:03c2f124ccaf960d3b993362233dc11b80ca7c4e49b4544463467f76fbd7a33f",
       "contentDigest": "03c2f124ccaf960d3b993362233dc11b80ca7c4e49b4544463467f76fbd7a33f",
       "byteLength": 348,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
       "bindingPresent": true,
       "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
+      "exactCurrentRows": 0,
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     },
     {
       "sourceRef": "sveltekit-frontend/src/routes/(app)/global-search/+page.ts",
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "byteLength": 27,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
       "bindingPresent": true,
       "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
+      "exactCurrentRows": 0,
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     },
     {
       "sourceRef": "sveltekit-frontend/src/routes/(app)/persons-of-interest/[id]/+page.ts",
       "sourceRevision": "sha256:90adca11bf6dc5c942620de748a8d5c92f2c4d08d7acc19d956af7482b8bb17a",
       "contentDigest": "90adca11bf6dc5c942620de748a8d5c92f2c4d08d7acc19d956af7482b8bb17a",
       "byteLength": 97,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
       "bindingPresent": true,
       "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
+      "exactCurrentRows": 0,
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     },
     {
       "sourceRef": "sveltekit-frontend/src/routes/(app)/terminal/+page.ts",
       "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
       "byteLength": 27,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
       "bindingPresent": true,
       "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
+      "exactCurrentRows": 0,
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     },
     {
       "sourceRef": "sveltekit-frontend/src/routes/(app)/yorha-home/+page.server.ts",
       "sourceRevision": "sha256:d866f6facd9f8375969a150a0a064df86349db40f0ce4fc57b015f2507897a3c",
       "contentDigest": "d866f6facd9f8375969a150a0a064df86349db40f0ce4fc57b015f2507897a3c",
       "byteLength": 211,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
       "bindingPresent": true,
       "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/routes/api/v1/ai/cache-result/+server.ts",
-      "sourceRevision": "sha256:d51f49a9e2c378a1703aaf67810cd409d66e9761de7dfff4669f33cd88e61198",
-      "contentDigest": "d51f49a9e2c378a1703aaf67810cd409d66e9761de7dfff4669f33cd88e61198",
-      "byteLength": 1113,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/tests/evidence-view-modal.spec.ts",
-      "sourceRevision": "sha256:56ea8f2fd5603aa72769f9bfcc6dcebdb9db41deaa8938410303f66ac41ab77c",
-      "contentDigest": "56ea8f2fd5603aa72769f9bfcc6dcebdb9db41deaa8938410303f66ac41ab77c",
-      "byteLength": 2123,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/tests/intent/rank-intent.spec.ts",
-      "sourceRevision": "sha256:1d7dddaaf6d274088286a3c7838c1c7aa12984a8184360bcc0b89634f861e125",
-      "contentDigest": "1d7dddaaf6d274088286a3c7838c1c7aa12984a8184360bcc0b89634f861e125",
-      "byteLength": 924,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/tests/poi-citations-conversations-routes.spec.ts",
-      "sourceRevision": "sha256:e737c01c194819a1d8c719bae79ca017628a30561cefd2bb8d0c7e926eacf7f2",
-      "contentDigest": "e737c01c194819a1d8c719bae79ca017628a30561cefd2bb8d0c7e926eacf7f2",
-      "byteLength": 33341,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/tests/routes/auto/api/cases/__id/notes/__noteId/evidence.test.ts",
-      "sourceRevision": "sha256:df0c9019ee48aa0b380beb18d0b8c8dea7e544295481347af94d1a60e9332948",
-      "contentDigest": "df0c9019ee48aa0b380beb18d0b8c8dea7e544295481347af94d1a60e9332948",
-      "byteLength": 6514,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/tests/routes/auto/api/code-intel/graph/impact.test.ts",
-      "sourceRevision": "sha256:ccaabb1e6e9c8b7145e8b535208884ce163370d01335d43382bd1685d2a1fcc8",
-      "contentDigest": "ccaabb1e6e9c8b7145e8b535208884ce163370d01335d43382bd1685d2a1fcc8",
-      "byteLength": 2443,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/tests/routes/auto/api/codebase/auto-research.test.ts",
-      "sourceRevision": "sha256:3a34fc83c0e12e8398bd6107784bee40e1e330a22208660bc2b16bf7e705799e",
-      "contentDigest": "3a34fc83c0e12e8398bd6107784bee40e1e330a22208660bc2b16bf7e705799e",
-      "byteLength": 2631,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/tests/sprint5-6-monitoring.spec.ts",
-      "sourceRevision": "sha256:3392b96b6392dce3d6f9495f37ff1fa4c42ca3a648687c79a7a5e1aba3ed58e0",
-      "contentDigest": "3392b96b6392dce3d6f9495f37ff1fa4c42ca3a648687c79a7a5e1aba3ed58e0",
-      "byteLength": 1963,
-      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 1,
-      "classification": "CURRENT_GRAPHIFY_EXACT"
+      "exactCurrentRows": 0,
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     }
   ]
 }

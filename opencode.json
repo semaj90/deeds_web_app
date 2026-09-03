@@ -40,13 +40,13 @@
     "atlas-tools": {
       "type": "local",
       "command": ["node", "./sveltekit-frontend/scripts/mcp/atlas-tools-mcp.mjs"],
-      "enabled": false,
+      "enabled": true,
       "timeout": 30000
     },
     "atlas-task-kernel": {
       "type": "local",
       "command": ["node", "./sveltekit-frontend/scripts/mcp/atlas-task-kernel-mcp.mjs"],
-      "enabled": true,
+      "enabled": false,
       "timeout": 30000
     }
   },

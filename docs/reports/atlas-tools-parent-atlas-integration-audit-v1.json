@@ -1,0 +1,84 @@
+{
+  "gate": "ATLAS-TOOLS-PARENT-ATLAS-INTEGRATION-AUDIT-01",
+  "status": "PROVEN_WITH_INTEGRATION_GAPS",
+  "scope": "Atlas-tools MCP, task-kernel facade, TRACE surface, and OpenSpec alignment",
+  "liveEvidence": {
+    "mcpHealth": "PASS",
+    "atlasToolsSmokeChecks": 10,
+    "atlasToolsSmokeFailures": 0,
+    "traceToolCount": 173,
+    "atlasToolsListedCount": 10,
+    "atlasTaskKernelListedCount": 6,
+    "configJson": "PASS",
+    "writesPerformedByAudit": false
+  },
+  "ownership": {
+    "openCodeActiveSurface": "atlas-tools + trace",
+    "taskKernel": "available for constrained clients; disabled in OpenCode to avoid context duplication",
+    "atlasToolsImplementation": "sveltekit-frontend/scripts/mcp/atlas-tools-mcp.mjs",
+    "taskKernelImplementation": "sveltekit-frontend/scripts/mcp/atlas-task-kernel-mcp.mjs",
+    "traceImplementation": "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
+    "canonicalDataOwner": "Postgres",
+    "derivedGraphOwner": "Neo4j/TRACE diagnostic projection"
+  },
+  "createdWiredProven": {
+    "atlasTools": "WIRED_AND_LIVE_PROVEN",
+    "contextPayloadBoundary": "WIRED_AND_LIVE_PROVEN",
+    "diagnosticProvenanceEnvelope": "WIRED_AND_LIVE_PROVEN_WITH_UNRESOLVED_REVISION_STATUS",
+    "revisionAwareContextMetadata": "WIRED_AND_LIVE_PROVEN_NON_CANONICAL_FALLBACK",
+    "taskKernelFacade": "CREATED_AND_DIRECT_SMOKE_PROVEN",
+    "trace": "LIVE_PROVEN",
+    "parentAtlasAgenticRepairIntegration": "PARTIAL; downstream candidate/revision/authorization gates remain open"
+  },
+  "gaps": [
+    {
+      "gate": "MCP-CONTEXT-PAYLOAD-BOUNDARY-01",
+      "severity": "P1",
+      "finding": "build_agentic_rag_context caps card count and prompt excerpts, but returned card objects and low-level graph tool arrays do not have a shared byte/field budget",
+      "risk": "context stuffing and unstable agent prompts",
+      "safeChange": "add a bounded response envelope and truncation receipt without changing ranking or source ownership"
+    },
+    {
+      "gate": "MCP-RESULT-PROVENANCE-01",
+      "severity": "P1",
+      "finding": "find_dependencies, trace_database, trace_tool_chain, find_source_refs, find_feature, and find_route return diagnostic results without a uniform graph/source revision and evidenceRefs envelope",
+      "risk": "agent may treat a projection result as current canonical evidence",
+      "safeChange": "add optional provenance metadata; preserve existing result arrays"
+    },
+    {
+      "gate": "MCP-MUTATION-BOUNDARY-01",
+      "severity": "P1",
+      "finding": "record_outcome writes a local NDJSON ledger and may create Neo4j relationships; the tool is exposed beside read-only tools",
+      "risk": "implicit mutation during agentic repair loops",
+      "safeChange": "require explicit authorization and return writesPerformed plus target receipts"
+    },
+    {
+      "gate": "MCP-SURFACE-PARITY-01",
+      "severity": "P2",
+      "finding": "the static MCP parity audit reports seven duplicate names across mcp-server.ts and trace-mcp-server.ts and handler-only names in mcp-server.ts",
+      "risk": "client-dependent tool authority and ambiguous routing",
+      "safeChange": "classify canonical, compatibility, and trace-only names before renaming anything"
+    },
+    {
+      "gate": "MCP-REVISION-AWARE-SEARCH-01",
+      "severity": "P1",
+      "finding": "Atlas-tools context selection reads the ACE packet and uses keyword overlap; it does not require a workspace/candidate/manifest revision tuple",
+      "risk": "stale context can be presented as current repair evidence",
+      "safeChange": "reject stale or revisionless packets at the context boundary; do not create a second cache"
+    }
+  ],
+  "alignedOpenSpecFollowUps": [
+    "parent-atlas-agentic-repair-bundle-integration: MCP top-K tool retrieval remains open",
+    "parent-atlas-neural-prefill-encoder: MCP-FILE-TOPK-01 through 10 remain bounded follow-ons",
+    "parent-atlas-ace-rlm-bitfrost-integration: ACE/Valkey context and mutation boundaries remain separate",
+    "parent-atlas-retrieval-lineage-dag-convergence: revision-qualified candidate and evidence authority remains upstream"
+  ],
+  "recommendedOrder": [
+    "MCP-REVISION-AWARE-SEARCH-01_STRICT_REJECTION",
+    "MCP-MUTATION-BOUNDARY-01",
+    "MCP-SURFACE-PARITY-01",
+    "MCP-FILE-TOPK-01"
+  ],
+  "canonicalAuthority": false,
+  "writesPerformed": false
+}

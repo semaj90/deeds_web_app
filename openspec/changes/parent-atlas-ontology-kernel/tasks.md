@@ -2665,3 +2665,53 @@ a runtime env var override via the launch invocation, not yet persisted into
 `scripts/launch-embed-server.ps1`'s own default or `.env`. If the server
 restarts through the normal `npm run dev:gpu` path without that override, it
 reverts to the 128 default and the fixed failure mode returns.
+
+## CONCEPT-FABRIC-GLOSSARY-LINKS-01 (2026-09-03, additive UI wiring)
+
+- [x] Existing glossary corpus-definition links remain document-backed through
+  `/library/{docId}`.
+- [x] HTTP(S) values already present in `legal_glossary.sources` are exposed as
+  safe external links; non-URL source labels remain plain text.
+- [x] No Firecrawl fetch, ontology promotion, embedding, or datastore write was
+  added. Firecrawl/acquisition remains an upstream evidence owner and `.okf`
+  remains schema/receipt input, not direct glossary authority.
+- [ ] Add a revision-qualified external evidence join for Firecrawl content
+  before presenting provider, content hash, or freshness claims in the glossary.
+
+## CONCEPT-FABRIC-CORPUS-DEFINITION-LINKS-01 (2026-09-03, additive)
+
+- [x] Corpus-extracted definitions now expose the existing
+  `library_documents.official_url` as a validated external `Official source`
+  link when it is an HTTP(S) URL.
+- [x] Internal document links remain available through `/library/{docId}`.
+- [x] No Firecrawl request, schema migration, ontology promotion, embedding,
+  or datastore write was performed.
+- [ ] Firecrawl capture identity, content hash, evidence revision, and `.okf`
+  receipt binding remain a separate evidence-admission gate.
+
+## CONCEPT-FABRIC-EXTERNAL-ACQUISITION-OWNER-01 (2026-09-03, audit)
+
+- [x] Reuse the existing Python OKF acquisition owner:
+  `python/atlas_okf_docs_pipeline.py` provides bounded Firecrawl V2 crawling,
+  domain allowlisting, source revisions, normalized/raw checksums, outgoing
+  links, and BeautifulSoup fallback.
+- [x] Reuse `scripts/docs-atlas/crawl-okf-dev-docs.mts` only for the existing
+  `.okf` development corpus path; it already chains Firecrawl, the local
+  BeautifulSoup adapter, and bounded HTTP fallback with Zod validation.
+- [x] Do not add Crawl4AI: no repository implementation or proven caller was
+  found, and no distinct browser-rendering gap has been admitted.
+- [ ] Glossary ingestion must consume revisioned evidence artifacts from these
+  owners rather than calling a crawler from the glossary route.
+
+## CONCEPT-FABRIC-OKF-TUPLE-RETRIEVAL-ALIGNMENT-01 (2026-09-03, bounded fixture)
+
+- [x] Added a fixture-only alignment test for the existing fetch receipt,
+  external-document chunk, n-ary ontology tuple, and retrieval-plan schemas.
+- [x] Proves source-revision and normalized-document-checksum continuity,
+  tuple degree/participant alignment, evidence-span binding, and one semantic
+  retrieval lane with exact source promotion required.
+- [x] Proves deterministic replay checksum for the same canonical fixture.
+- [x] Keeps all four artifacts non-canonical; no crawl, index, promotion, or
+  datastore write was performed.
+- [ ] Live Firecrawl acquisition, concept admission, and retrieval execution
+  remain separate gates.

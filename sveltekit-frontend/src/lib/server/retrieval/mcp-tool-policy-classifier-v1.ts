@@ -37,6 +37,22 @@ const ATLAS_TOOL_REGISTRY_PERMISSIONS: Record<string, { permissionClass: MCPPerm
   'atlas.patch.apply': { permissionClass: 'WRITE', approvalRequired: true },
 };
 
+// Explicit policy for the live atlas-tools MCP surface. These names are a
+// governed compatibility surface, not inferred from MCP annotations. The
+// server's outcome tool is write-capable and therefore remains approval-gated.
+const ATLAS_TOOLS_MCP_PERMISSIONS: Record<string, { permissionClass: MCPPermissionClassV1; approvalRequired: boolean }> = {
+  classify_intent: { permissionClass: 'READ', approvalRequired: false },
+  build_agentic_rag_context: { permissionClass: 'READ', approvalRequired: false },
+  build_recommendation: { permissionClass: 'READ', approvalRequired: false },
+  find_dependencies: { permissionClass: 'READ', approvalRequired: false },
+  trace_database: { permissionClass: 'READ', approvalRequired: false },
+  trace_tool_chain: { permissionClass: 'READ', approvalRequired: false },
+  find_source_refs: { permissionClass: 'READ', approvalRequired: false },
+  find_feature: { permissionClass: 'READ', approvalRequired: false },
+  find_route: { permissionClass: 'READ', approvalRequired: false },
+  record_outcome: { permissionClass: 'WRITE', approvalRequired: true },
+};
+
 const ACP_DRY_RUN_TOOLS = new Set([
   'knowledge:search', 'db:query', 'cache:get', 'cache:set', 'llm:generate',
   'error:analyze', 'fix:synthesize', 'fix:apply', 'metrics:snapshot', 'metrics:health',
@@ -60,6 +76,9 @@ const ACP_KNOWN_TOOL_NAMES = new Set([
 function classifyByName(toolName: string): { permissionClass: MCPPermissionClassV1; approvalRequired: boolean; policySource: MCPToolPolicyEntryV1['policySource'] } {
   const atlasMatch = ATLAS_TOOL_REGISTRY_PERMISSIONS[toolName];
   if (atlasMatch) return { ...atlasMatch, policySource: 'atlas_tool_registry' };
+
+  const atlasToolsMatch = ATLAS_TOOLS_MCP_PERMISSIONS[toolName];
+  if (atlasToolsMatch) return { ...atlasToolsMatch, policySource: 'atlas_tool_registry' };
 
   if (ACP_DRY_RUN_TOOLS.has(toolName)) {
     return { permissionClass: 'WRITE', approvalRequired: true, policySource: 'acp_tool_registry' };

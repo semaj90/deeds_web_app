@@ -211,6 +211,20 @@ describe('buildContextManifestFromACE', () => {
     expect(compiled.manifest.selected_process_ids).toEqual(['process:search-route']);
   });
 
+  it('preserves missing graph metadata as null instead of inventing a revision', () => {
+    const packets = deriveProcessPacketsFromACEContext(minimalACEContext({
+      codebaseContext: [{
+        filePath: 'src/routes/search/+server.ts',
+        content: 'search route',
+        stableKey: 'step:search',
+        processIds: ['process:search-route'],
+      }],
+    }));
+
+    expect(packets).toHaveLength(1);
+    expect(packets[0]?.graphRevision).toBeNull();
+  });
+
   it('never mutates the input ACEContext', () => {
     const context = minimalACEContext({
       codebaseContext: [{ filePath: 'a.ts', content: 'z'.repeat(50), score: 0.5, stableKey: 'a' }],
