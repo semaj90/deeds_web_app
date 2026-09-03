@@ -5,6 +5,7 @@ import {
   aceLiveDryInputV2Schema,
   resolveAceLiveDryGraphRevisionV2,
   selectedAceLiveDryRowsV2,
+  validateAceLiveDryCanaryV2,
 } from './ace-live-dry-input-v2.js';
 import {
   buildWorkspaceRevisionRecordV1,
@@ -118,6 +119,10 @@ describe('ACE live dry input v2', () => {
     const parsed = aceLiveDryInputV2Schema.parse(input(true));
     const rows = selectedAceLiveDryRowsV2(parsed);
     expect(resolveAceLiveDryGraphRevisionV2(rows)).toBe(parsed.ace.graphRevision);
+    expect(validateAceLiveDryCanaryV2(parsed)).toMatchObject({
+      graphAdmissionMode: 'REQUIRED_EXACT',
+      graphRevision: parsed.ace.graphRevision,
+    });
   });
 
   it('rejects timestamp-derived policy revisions', () => {
@@ -130,6 +135,10 @@ describe('ACE live dry input v2', () => {
     const parsed = aceLiveDryInputV2Schema.parse(input(false));
     expect(resolveAceLiveDryGraphRevisionV2(selectedAceLiveDryRowsV2(parsed))).toBeNull();
     expect(parsed.ace.graphRevision).toBeNull();
+    expect(validateAceLiveDryCanaryV2(parsed)).toMatchObject({
+      graphAdmissionMode: 'NOT_ADMITTED',
+      graphRevision: null,
+    });
   });
 
   it('rejects a graph revision attached without admitted graph evidence', () => {
@@ -137,5 +146,21 @@ describe('ACE live dry input v2', () => {
     parsed.snapshot.rows[0]!.graphRevision = `sha256:${'e'.repeat(64)}`;
     expect(() => resolveAceLiveDryGraphRevisionV2(selectedAceLiveDryRowsV2(parsed)))
       .toThrow('ACE_LIVE_DRY_GRAPH_REVISION_WITHOUT_GRAPH_EVIDENCE');
+  });
+
+  it('rejects selected cardinality that does not equal the frozen canary count', () => {
+    const value = input(true);
+    value.ace.selectedOrdinals = [];
+    const parsed = aceLiveDryInputV2Schema.parse(value);
+    expect(() => validateAceLiveDryCanaryV2(parsed))
+      .toThrow('ACE_LIVE_DRY_SELECTED_COUNT_MISMATCH');
+  });
+
+  it('rejects a caller graph revision that differs from the selected evidence revision', () => {
+    const value = input(true);
+    value.ace.graphRevision = `sha256:${'e'.repeat(64)}`;
+    const parsed = aceLiveDryInputV2Schema.parse(value);
+    expect(() => validateAceLiveDryCanaryV2(parsed))
+      .toThrow('ACE_LIVE_DRY_GRAPH_REVISION_MISMATCH');
   });
 });
