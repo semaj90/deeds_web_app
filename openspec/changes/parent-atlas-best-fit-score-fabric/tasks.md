@@ -73,26 +73,52 @@ fields, first flagged there).
       `post-process-reranker.ts` downstream. Recorded so a future session doesn't waste time
       looking for a file that isn't there.
 
-## 1. BEST-FIT-SCORE-SEMANTICS-02 (not started)
+## 1. BEST-FIT-SCORE-SEMANTICS-02 (DONE, 2026-09-03 — closed by two sessions working the same
+file concurrently; see note below)
 
-- [ ] 1.1 In `okf-fit.ts`: rename `naive_bayes_score` → `heuristicPriorScore`,
+- [x] 1.1 In `okf-fit.ts`: rename `naive_bayes_score` → `heuristicPriorScore`,
       `logistic_regression_score` → `heuristicFitScore`, `fit_margin` → `heuristicFitMargin`.
       Keep the old snake_case fields as deprecated compatibility aliases (do not silently break
       OKF/HMM consumers) — mark them `@deprecated` and set from the new fields.
-- [ ] 1.2 Fix `classifyOkfFit()` to preserve `classifyDomainTaxonomy()`'s own `confidence`/
+- [x] 1.2 Fix `classifyOkfFit()` to preserve `classifyDomainTaxonomy()`'s own `confidence`/
       `classifier_version` under distinct field names (`domainTaxonomyConfidence`/
       `domainTaxonomyRevision`) instead of being overwritten by the heuristic values
       (`heuristicFitScore`/`heuristicFitRevision`).
-- [ ] 1.3 Apply the same rename to `hmm-policy-bridge.ts`'s independently hand-built
-      `naiveBayesScore`/`logisticRegressionScore` pair.
-- [ ] 1.4 Rename the live `:8095` sklearn outputs (in `miniforge_nlp_sidecar.py`'s `classify` pass
-      and every TS consumer — `train_domain_classifier.py`, `ACPToolRegistry.ts`'s
-      `nlp:classify_domain`, `trace-mcp-server.ts`'s `domain.classify`, `domain-taxonomy-ml-bridge.ts`)
-      to `naiveBayesDomainProbability`/`logisticRegressionDomainProbability`, distinct from the
-      OKF/HMM heuristic names — three genuinely different things must not share a name family.
-- [ ] 1.5 Add regression tests freezing: the exact 0.80/0.55 OKF threshold behavior, the exact
-      coefficient formula (so a future edit can't silently drift it), and that the compatibility
-      aliases stay in sync with the renamed fields.
+- [x] 1.3 DONE — `hmm-policy-bridge.ts`'s `OkfHmmPolicyEvidence` interface and its two
+      independently hand-tuned formulas renamed to `heuristic_prior_score`/`heuristic_fit_score`/
+      `heuristic_fit_margin` (different coefficients from okf-fit.ts's heuristic — confirmed a
+      genuinely separate hand-written surface, not a duplicate). **Deliberately NOT renamed**:
+      `PolicyStateInput.okf.{naiveBayesScore,logisticRegressionScore,fitMargin}` in
+      `policy-types.ts`, consumed by `policy-router.ts`/`policy-state.ts` — a deeper, more
+      load-bearing contract this pass did not audit; `withOkfHmmEvidence()`'s mapping into it was
+      kept working as-is rather than risk a production policy-routing behavior change. Flagged for
+      a future, separately-scoped pass, not silently left inconsistent.
+- [x] 1.4 DONE — renamed the live `:8095` sklearn outputs in `miniforge_nlp_sidecar.py`'s
+      `_classify_domain_pass()`'s `features_map` to `naive_bayes_domain_probability`/
+      `logistic_regression_domain_probability` (old keys kept as deprecated aliases), and updated
+      `domain-taxonomy-ml-bridge.ts` to prefer the new keys with a fallback chain to the old ones.
+      **Scope correction**: `train_domain_classifier.py`, `ACPToolRegistry.ts`'s
+      `nlp:classify_domain`, and `trace-mcp-server.ts`'s `domain.classify` do NOT hardcode these
+      field names (verified by grep) — they pass `features`/`pass_results` through generically, so
+      no changes were needed there; the original task text overstated this task's file list.
+- [x] 1.5 Regression tests added in `okf-fit.spec.ts` (0.80/0.55 boundary, exact formula via
+      alias-sync assertion, provenance-not-clobbered assertion) and `hmm-policy-bridge.spec.ts`
+      updated for the new field names. Full suite: 7/7 passing, live-run.
+
+**Process note**: this task was worked on by two sessions concurrently, editing the same files in
+real time. One session added `OKF_FIT_SCORE_SEMANTICS`/`scoreSemantics` (an explicit
+`{kind:'HEURISTIC', calibrated:false, probability:false, learnedModel:false}` marker on
+`OkfFitResult` and the persisted `OKFDomainClassificationSchema`) on top of the other's rename —
+found and fixed one real type error this produced (`score_semantics`'s Zod-inferred tuple type
+didn't structurally match the `as const` readonly tuple in code; fixed by constructing an explicit
+plain object instead of passing the readonly value through). Verified together: `npx tsgo --noEmit`
+clean on every touched file, `okf-fit.spec.ts` + `hmm-policy-bridge.spec.ts` 7/7 passing.
+
+No ranking, Graphify, lineage, or datastore behavior changed by this task. `okf-topic-ingestion.ts`'s
+persisted `domain_classification.confidence`/`classifier_version` DID change meaning (now the real
+domain-taxonomy values, not the heuristic fit score/OKF_FIT_VERSION) — this is the deliberate fix
+for finding #2/#12, not an accidental regression; downstream readers of those two persisted fields
+should be re-checked if any assumed the old (buggy) meaning.
 
 ## 2. RERANK-WEIGHT-BOUNDARY-01 (not started)
 

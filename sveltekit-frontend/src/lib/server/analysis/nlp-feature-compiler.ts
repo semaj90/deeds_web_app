@@ -156,6 +156,20 @@ export const HMMObservationSchema = z
 	.strict();
 export type HMMObservation = z.infer<typeof HMMObservationSchema>;
 
+/**
+ * BEST-FIT-SCORE-SEMANTICS-02: `heuristicFitScore`/`heuristicPriorScore`/`heuristicFitMargin`
+ * are okf-fit.ts's hand-specified heuristic outputs, not ML inference -- see okf-fit.ts's
+ * OkfFitResult doc comment. Metadata keys renamed to match; old snake_case keys kept alongside
+ * as deprecated compatibility aliases so existing HMM metadata consumers don't silently break.
+ *
+ * KNOWN UNRESOLVED (BEST-FIT-SCORE-AUDIT-01 finding #12, NOT fixed this pass): callers of this
+ * function currently pass a heuristic revision string (OKF_FIT_VERSION) as `sourceRevision`, but
+ * HMMObservationSchema.sourceRevision's real meaning is an actual source-content revision, which
+ * OKF web-research topics don't have. Substituting one for the other is exactly the provenance
+ * collision the audit flagged. Left as-is pending a real design decision (does
+ * HMMObservationSchema need an optional field for "no real source revision exists" vs. requiring
+ * one) rather than papering over it with another fabricated value.
+ */
 export function buildHMMObservationFromOkfFit(input: {
 	requestId?: string;
 	packetKey?: string | null;
@@ -163,9 +177,9 @@ export function buildHMMObservationFromOkfFit(input: {
 	sourceRevision: string;
 	position?: number;
 	fitDecision: 'ACCEPT' | 'REVIEW' | 'ABSTAIN';
-	logisticRegressionScore: number;
-	naiveBayesScore: number;
-	fitMargin: number;
+	heuristicFitScore: number;
+	heuristicPriorScore: number;
+	heuristicFitMargin: number;
 	evidenceCount?: number;
 }): HMMObservation {
 	const stateHint =
@@ -180,15 +194,19 @@ export function buildHMMObservationFromOkfFit(input: {
 		sourceRevision: input.sourceRevision,
 		position: input.position ?? 0,
 		observation: `OKF_FIT_${input.fitDecision}`,
-		weight: Math.max(0, Math.min(1, input.logisticRegressionScore)),
+		weight: Math.max(0, Math.min(1, input.heuristicFitScore)),
 		sourcePass: 'okf_fit',
 		stateHint,
 		createdAt: new Date().toISOString(),
 		metadata: {
-			logistic_regression_score: input.logisticRegressionScore,
-			naive_bayes_score: input.naiveBayesScore,
-			fit_margin: input.fitMargin,
+			heuristic_fit_score: input.heuristicFitScore,
+			heuristic_prior_score: input.heuristicPriorScore,
+			heuristic_fit_margin: input.heuristicFitMargin,
 			evidence_count: input.evidenceCount ?? 0,
+			// Deprecated compatibility aliases -- see this function's doc comment above.
+			logistic_regression_score: input.heuristicFitScore,
+			naive_bayes_score: input.heuristicPriorScore,
+			fit_margin: input.heuristicFitMargin,
 		},
 	});
 }

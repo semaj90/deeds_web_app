@@ -57,12 +57,18 @@ export async function classifyDomainTaxonomyWithLearned(
     const label = classifyPass.artifacts?.label;
     if (typeof label !== 'string' || !label.trim()) return deterministic;
 
+    // BEST-FIT-SCORE-SEMANTICS-02: reads the renamed real sklearn domain-class probability
+    // fields, falling back to the deprecated snake_case aliases for older sidecar responses.
     const score =
-      typeof classifyPass.features?.logistic_regression_score === 'number'
-        ? classifyPass.features.logistic_regression_score
-        : typeof classifyPass.features?.naive_bayes_score === 'number'
-          ? classifyPass.features.naive_bayes_score
-          : 0;
+      typeof classifyPass.features?.logistic_regression_domain_probability === 'number'
+        ? classifyPass.features.logistic_regression_domain_probability
+        : typeof classifyPass.features?.naive_bayes_domain_probability === 'number'
+          ? classifyPass.features.naive_bayes_domain_probability
+          : typeof classifyPass.features?.logistic_regression_score === 'number'
+            ? classifyPass.features.logistic_regression_score
+            : typeof classifyPass.features?.naive_bayes_score === 'number'
+              ? classifyPass.features.naive_bayes_score
+              : 0;
 
     return {
       ...deterministic,

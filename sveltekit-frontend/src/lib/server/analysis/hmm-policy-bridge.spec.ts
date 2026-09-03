@@ -10,14 +10,16 @@ describe('withOkfHmmEvidence', () => {
       execution: { compileFailed: false, testFailed: false, retryCount: 0, historicalSuccess: 0 },
       resource: { vramPressure: 0.1, contextPressure: 0.1, latencyPressure: 0.1, cacheHitRatio: 0.2 },
     }, {
-      naive_bayes_score: 0.6,
-      logistic_regression_score: 0.8,
-      fit_margin: 0.2,
+      heuristic_prior_score: 0.6,
+      heuristic_fit_score: 0.8,
+      heuristic_fit_margin: 0.2,
       fit_decision: 'ACCEPT',
       hmm_observation: 'OKF_FIT_STRONG',
       stateHint: 'TRACE',
     });
     expect(result.hmm.stateHint).toBe('TRACE');
+    // PolicyStateInput.okf's own field names were deliberately NOT renamed this pass -- see
+    // OkfHmmPolicyEvidence's doc comment in hmm-policy-bridge.ts.
     expect(result.okf.logisticRegressionScore).toBe(0.8);
   });
 });

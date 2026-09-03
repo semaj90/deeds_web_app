@@ -52,13 +52,32 @@ export type OKFKeywordCorpus = z.infer<typeof OKFKeywordCorpusSchema>;
 export const OKFDomainClassificationSchema = z.object({
   primary_domain: z.string().min(1).nullable(),
   secondary_domains: z.array(z.string().min(1)).max(8),
+  // BEST-FIT-SCORE-SEMANTICS-02: confidence/classifier_version are the REAL
+  // classifyDomainTaxonomy() values (domainTaxonomyConfidence/domainTaxonomyRevision) -- no
+  // longer clobbered by the heuristic fit score/OKF_FIT_VERSION (BEST-FIT-SCORE-AUDIT-01 finding
+  // #2). The heuristic's own score/revision now live under their own heuristic_* fields below.
   confidence: z.number().min(0).max(1),
   classifier_version: z.string().min(1),
   evidence_terms: z.array(z.string().min(1)).max(32).default([]),
-  naive_bayes_score: z.number().min(0).max(1).default(0),
-  logistic_regression_score: z.number().min(0).max(1).default(0),
-  fit_margin: z.number().finite().default(0),
+  heuristic_prior_score: z.number().min(0).max(1).default(0),
+  heuristic_fit_score: z.number().min(0).max(1).default(0),
+  heuristic_fit_margin: z.number().finite().default(0),
+  heuristic_fit_revision: z.string().min(1).default('okf-fit-v1'),
+  score_semantics: z.object({
+    kind: z.literal('HEURISTIC'),
+    range: z.tuple([z.literal(0), z.literal(1)]),
+    calibrated: z.literal(false),
+    probability: z.literal(false),
+    learnedModel: z.literal(false),
+    producerRevision: z.string().min(1),
+  }).default({ kind: 'HEURISTIC', range: [0, 1], calibrated: false, probability: false, learnedModel: false, producerRevision: 'okf-fit-v1' }),
   fit_decision: z.enum(['ACCEPT', 'REVIEW', 'ABSTAIN']).default('ABSTAIN'),
+  /** @deprecated use heuristic_prior_score */
+  naive_bayes_score: z.number().min(0).max(1).default(0),
+  /** @deprecated use heuristic_fit_score */
+  logistic_regression_score: z.number().min(0).max(1).default(0),
+  /** @deprecated use heuristic_fit_margin */
+  fit_margin: z.number().finite().default(0),
 });
 
 export type OKFDomainClassification = z.infer<typeof OKFDomainClassificationSchema>;
@@ -296,13 +315,27 @@ export function buildOkfTopicAnalysis(input: {
     domain_classification: {
       primary_domain: classified.primary_domain,
       secondary_domains: secondaryDomains,
-      confidence: classified.confidence,
-      classifier_version: OKF_FIT_VERSION,
+      // Real domain-taxonomy confidence/version -- no longer the heuristic fit score/OKF_FIT_VERSION
+      // (BEST-FIT-SCORE-AUDIT-01 finding #2/#12). The heuristic's own values are below.
+      confidence: classified.domainTaxonomyConfidence,
+      classifier_version: classified.domainTaxonomyRevision,
       evidence_terms: classified.evidence.map((evidence) => evidence.value).slice(0, 16),
-      naive_bayes_score: classified.naive_bayes_score,
-      logistic_regression_score: classified.logistic_regression_score,
-      fit_margin: classified.fit_margin,
+      heuristic_prior_score: classified.heuristicPriorScore,
+      heuristic_fit_score: classified.heuristicFitScore,
+      heuristic_fit_margin: classified.heuristicFitMargin,
+      heuristic_fit_revision: classified.heuristicFitRevision,
+      score_semantics: {
+        kind: classified.scoreSemantics.kind,
+        range: [classified.scoreSemantics.range[0], classified.scoreSemantics.range[1]] as [0, 1],
+        calibrated: classified.scoreSemantics.calibrated,
+        probability: classified.scoreSemantics.probability,
+        learnedModel: classified.scoreSemantics.learnedModel,
+        producerRevision: classified.scoreSemantics.producerRevision,
+      },
       fit_decision: classified.fit_decision,
+      naive_bayes_score: classified.heuristicPriorScore,
+      logistic_regression_score: classified.heuristicFitScore,
+      fit_margin: classified.heuristicFitMargin,
     },
     semantic_ontology: {
       ontology_version: 'okf-ontology-v1',
@@ -322,9 +355,9 @@ export function buildOkfTopicAnalysis(input: {
         sourceRef: `docs:okf:topic:${input.topicId}`,
         sourceRevision: OKF_FIT_VERSION,
         fitDecision: classified.fit_decision,
-        logisticRegressionScore: classified.logistic_regression_score,
-        naiveBayesScore: classified.naive_bayes_score,
-        fitMargin: classified.fit_margin,
+        heuristicFitScore: classified.heuristicFitScore,
+        heuristicPriorScore: classified.heuristicPriorScore,
+        heuristicFitMargin: classified.heuristicFitMargin,
         evidenceCount: classified.evidence.length,
       }),
     },
@@ -523,11 +556,17 @@ export function createFeatureRowFromResearchPacket(
       neighbors_k_hop: [],
       computed_at: new Date().toISOString()
     },
+      // NOTE (BEST-FIT-SCORE-SEMANTICS-02, not fully resolved here): ClassifiersSchema's own
+      // field names (naive_bayes_class/naive_bayes_score/logistic_regression_score) are still the
+      // pre-rename names -- feature-matrix-schema.ts itself wasn't touched this pass. Values below
+      // are the OKF heuristic's outputs (heuristic_prior_score/heuristic_fit_score), NOT a real
+      // sklearn NB/LR prediction; `naive_bayes_class` is actually the OKF-heuristic-chosen
+      // primary_domain, not an NB-predicted class. Left as a known mislabeling for a future pass.
       classifiers: packet.okf
       ? {
           naive_bayes_class: packet.okf.domain_classification.primary_domain ?? null,
-          naive_bayes_score: packet.okf.domain_classification.naive_bayes_score ?? null,
-          logistic_regression_score: packet.okf.domain_classification.logistic_regression_score ?? null,
+          naive_bayes_score: packet.okf.domain_classification.heuristic_prior_score ?? null,
+          logistic_regression_score: packet.okf.domain_classification.heuristic_fit_score ?? null,
           xgboost_score: null,
           computed_at: new Date().toISOString(),
         }

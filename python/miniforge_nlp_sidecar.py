@@ -1830,24 +1830,33 @@ DOMAIN_CLASSIFIER_CHECKPOINT_PATH = Path(
 
 _domain_classifier_checkpoint: Optional[dict[str, Any]] = None
 _domain_classifier_checkpoint_loaded = False
+_domain_classifier_checkpoint_mtime_ns: Optional[int] = None
 
 
 def _load_domain_classifier_checkpoint() -> Optional[dict[str, Any]]:
     """Lazy-load the persisted NB/LR/KMeans checkpoint. Returns None if unavailable —
     never raises, matching this file's optional-import-gated degrade pattern."""
-    global _domain_classifier_checkpoint, _domain_classifier_checkpoint_loaded
-    if _domain_classifier_checkpoint_loaded:
+    global _domain_classifier_checkpoint, _domain_classifier_checkpoint_loaded, _domain_classifier_checkpoint_mtime_ns
+    try:
+        checkpoint_mtime_ns = DOMAIN_CLASSIFIER_CHECKPOINT_PATH.stat().st_mtime_ns
+    except OSError:
+        checkpoint_mtime_ns = None
+    if _domain_classifier_checkpoint_loaded and checkpoint_mtime_ns == _domain_classifier_checkpoint_mtime_ns:
         return _domain_classifier_checkpoint
     _domain_classifier_checkpoint_loaded = True
+    _domain_classifier_checkpoint_mtime_ns = checkpoint_mtime_ns
     if not (SKLEARN_AVAILABLE and JOBLIB_AVAILABLE):
         return None
-    if not DOMAIN_CLASSIFIER_CHECKPOINT_PATH.exists():
+    if checkpoint_mtime_ns is None:
+        _domain_classifier_checkpoint = None
         return None
     try:
         loaded = joblib.load(DOMAIN_CLASSIFIER_CHECKPOINT_PATH)
     except Exception:
+        _domain_classifier_checkpoint = None
         return None
     if not isinstance(loaded, dict) or "labels" not in loaded:
+        _domain_classifier_checkpoint = None
         return None
     _domain_classifier_checkpoint = loaded
     return _domain_classifier_checkpoint
@@ -1980,7 +1989,16 @@ def _classify_domain_pass(text: str) -> tuple[str, dict[str, Any], dict[str, Any
         backend = "unavailable"
 
     final_label = lr_label or nb_label
+    # BEST-FIT-SCORE-SEMANTICS-02 (openspec/changes/parent-atlas-best-fit-score-fabric task 1.4):
+    # these are real sklearn predict_proba() domain-class probabilities -- P(domain=label |
+    # features) -- not a relevance/fit probability. Renamed to make that prediction task explicit
+    # and to stop colliding in name with okf-fit.ts's unrelated hand-specified heuristic scores
+    # (which used the exact same naive_bayes_score/logistic_regression_score names for a
+    # completely different, non-ML formula). Old keys kept as deprecated compatibility aliases.
     features_map: dict[str, Any] = {
+        "naive_bayes_domain_probability": nb_score,
+        "logistic_regression_domain_probability": lr_score,
+        # Deprecated compatibility aliases -- do not add new readers of these.
         "naive_bayes_score": nb_score,
         "logistic_regression_score": lr_score,
         **cluster_features,

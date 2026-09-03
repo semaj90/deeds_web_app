@@ -6,6 +6,15 @@ import {
 
 export const OKF_FIT_VERSION = 'okf-fit-v1';
 
+export const OKF_FIT_SCORE_SEMANTICS = {
+	kind: 'HEURISTIC' as const,
+	range: [0, 1] as const,
+	calibrated: false as const,
+	probability: false as const,
+	learnedModel: false as const,
+	producerRevision: OKF_FIT_VERSION,
+};
+
 export type OkfFitDecision = 'ACCEPT' | 'REVIEW' | 'ABSTAIN';
 
 export interface OkfFitInput {
@@ -20,11 +29,42 @@ export interface OkfFitInput {
 	sourceEngine?: string;
 }
 
+/**
+ * BEST-FIT-SCORE-SEMANTICS-02 (openspec/changes/parent-atlas-best-fit-score-fabric):
+ * heuristicPriorScore/heuristicFitScore/heuristicFitMargin are hand-specified formulas (see
+ * classifyOkfFit below), NOT Naive Bayes or Logistic Regression inference — they were previously
+ * misnamed naive_bayes_score/logistic_regression_score/fit_margin, which collided with the real
+ * sklearn MultinomialNB/LogisticRegression predict_proba() outputs the :8095 sidecar's `classify`
+ * pass produces under those same field names (see domain-taxonomy-ml-bridge.ts). The two are
+ * genuinely different things: this file's scores are a rule-based classifier-adjacent heuristic;
+ * the sidecar's are real domain-class probabilities. Never conflate them.
+ *
+ * domainTaxonomyConfidence/domainTaxonomyRevision preserve classifyDomainTaxonomy()'s own
+ * confidence/classifier_version, which classifyOkfFit() previously silently overwrote with its
+ * own heuristic values (BEST-FIT-SCORE-AUDIT-01 finding #2) — that overwrite is now fixed:
+ * `confidence`/`classifier_version` on the returned object are DomainClassification's real,
+ * unclobbered values; the heuristic fit result lives only under its own heuristic* fields.
+ *
+ * The naive_bayes_score/logistic_regression_score/fit_margin fields below are DEPRECATED
+ * compatibility aliases, kept so existing OKF/HMM consumers don't break silently. Do not add new
+ * callers of the deprecated names — read heuristicPriorScore/heuristicFitScore/heuristicFitMargin
+ * instead.
+ */
 export interface OkfFitResult extends DomainClassification {
-	naive_bayes_score: number;
-	logistic_regression_score: number;
-	fit_margin: number;
+	heuristicPriorScore: number;
+	heuristicFitScore: number;
+	heuristicFitMargin: number;
+	heuristicFitRevision: string;
+	scoreSemantics: typeof OKF_FIT_SCORE_SEMANTICS;
 	fit_decision: OkfFitDecision;
+	domainTaxonomyConfidence: number;
+	domainTaxonomyRevision: string;
+	/** @deprecated use heuristicPriorScore */
+	naive_bayes_score: number;
+	/** @deprecated use heuristicFitScore */
+	logistic_regression_score: number;
+	/** @deprecated use heuristicFitMargin */
+	fit_margin: number;
 }
 
 function clamp01(value: number): number {
@@ -76,7 +116,8 @@ export function classifyOkfFit(input: OkfFitInput): OkfFitResult {
 	);
 
 	// Cheap lexical prior: conservative, intentionally less expressive than the logistic gate.
-	const naiveBayesScore = clamp01(
+	// NOT Naive Bayes inference -- a hand-specified formula. See BEST-FIT-SCORE-SEMANTICS-02.
+	const heuristicPriorScore = clamp01(
 		0.18 +
 		0.52 * classification.confidence +
 		0.16 * features.lexicalWeight +
@@ -85,7 +126,8 @@ export function classifyOkfFit(input: OkfFitInput): OkfFitResult {
 	);
 
 	// Close-enough fit gate: use all available evidence, with a structural boost.
-	const logisticRegressionScore = clamp01(
+	// NOT Logistic Regression inference -- a hand-specified formula. See BEST-FIT-SCORE-SEMANTICS-02.
+	const heuristicFitScore = clamp01(
 		sigmoid(
 			-1.15 +
 			1.8 * classification.confidence +
@@ -97,17 +139,27 @@ export function classifyOkfFit(input: OkfFitInput): OkfFitResult {
 	);
 
 	const fitDecision: OkfFitDecision =
-		logisticRegressionScore >= 0.8 ? 'ACCEPT'
-		: logisticRegressionScore >= 0.55 ? 'REVIEW'
+		heuristicFitScore >= 0.8 ? 'ACCEPT'
+		: heuristicFitScore >= 0.55 ? 'REVIEW'
 		: 'ABSTAIN';
 
+	// confidence/classifier_version below are left as spread from `classification` (NOT
+	// overwritten by the heuristic values) -- BEST-FIT-SCORE-AUDIT-01 finding #2 found the
+	// previous version silently clobbered classifyDomainTaxonomy()'s own confidence/version with
+	// the heuristic fit score/OKF_FIT_VERSION, losing the distinction between the two. Fixed here.
 	return {
 		...classification,
-		confidence: logisticRegressionScore,
-		naive_bayes_score: naiveBayesScore,
-		logistic_regression_score: logisticRegressionScore,
-		fit_margin: logisticRegressionScore - naiveBayesScore,
+		domainTaxonomyConfidence: classification.confidence,
+		domainTaxonomyRevision: classification.classifier_version,
+		heuristicPriorScore,
+		heuristicFitScore,
+		heuristicFitMargin: heuristicFitScore - heuristicPriorScore,
+		heuristicFitRevision: OKF_FIT_VERSION,
+		scoreSemantics: OKF_FIT_SCORE_SEMANTICS,
 		fit_decision: fitDecision,
-		classifier_version: OKF_FIT_VERSION,
+		// Deprecated compatibility aliases -- see the OkfFitResult doc comment above.
+		naive_bayes_score: heuristicPriorScore,
+		logistic_regression_score: heuristicFitScore,
+		fit_margin: heuristicFitScore - heuristicPriorScore,
 	};
 }
