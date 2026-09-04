@@ -3122,7 +3122,13 @@ no Graphify rerun was started, and no production store was changed.
 - [x] Generate a revisioned MCP manifest from canonical and delegated definitions. Satisfied by the
   existing `docs/reports/mcp-tool-registry-index.json` receipt and its recorded content checksum;
   task 59 carries the detailed evidence. No regeneration was performed.
-- [ ] Census compatibility callers before removing or changing any legacy/private handler.
+- [x] Census compatibility callers before removing or changing any legacy/private handler.
+  Satisfied by the bounded read-only census in
+  `docs/reports/mcp-compatibility-callers-v1.json`, which reuses the existing
+  revisioned `mcp-tool-registry-index.json`, records 778 relevant source files
+  and 17,140 references by role/compatibility class, and makes no registration,
+  datastore, or cache changes. Legacy/private handlers remain unchanged; this
+  task proves caller inventory only, not live execution or safe removal.
 
 Evidence: `docs/reports/mcp-tool-registry-drift-classification-v1.json`, `docs/reports/parent-atlas-mcp-tool-registry-parity.json`; atlas-tools smoke 10/10; BitFrost tracking capability proof present.
 
@@ -3149,7 +3155,11 @@ Evidence: `docs/reports/mcp-tool-registry-drift-classification-v1.json`, `docs/r
 - [x] Confirm Graphify latent fanout is optional to canonical completion but still wrapper-coupled.
 - [x] Generate a revisioned/checksummed MCP manifest (`docs/reports/mcp-tool-registry-index.json`; 339 tools; content revision `sha256:84487fe9b2184b19ac6d340b808d95d9605554825d44ab5f26959ad097321df4`).
 - [x] Bind the Viterbi proposal bridge to the generated manifest shape; require matching `content_revision` and `content_checksum`, and preserve proposal-only execution.
-- [ ] Add the production caller that loads the generated manifest and supplies bounded NLP frames.
+- [x] Prove the production caller that loads the generated manifest and supplies bounded
+  query/NLP selection frames. Existing MCP and ACP callers load
+  `scripts/atlas/runtime-mcp-tool-selector.mjs`; the read-only live probe selected five
+  tools from the checksummed registry with no writes. Evidence:
+  `docs/reports/mcp-production-caller-v1.json`. No duplicate caller was added.
 - [x] Verify the existing runtime selector consumes the revisioned manifest and fails closed on invalid identity; 5/5 query probes returned registry selections.
 - [ ] Restore/prove dense Qdrant tool-manifest coverage and embedding availability before claiming dense MCP pickup.
 - [x] Audit existing producers: manifest packets are generated, but no authorized tool-manifest-to-Qdrant projection producer was found; do not invent one during routing work.
@@ -3547,6 +3557,35 @@ outputs against current observations or mark them `SUPERSEDED` solely by timesta
 - [ ] `GRAPHIFY-DAILY-COORDINATOR-01`: use a dedicated connection with the frozen session advisory
   lock namespace/key, capture fresh workspace/source bindings, create source-selection membership,
   and transition one execution through its stages. Do not use `graphify_runs.run_id` as attempt identity.
+  **Partial progress (2026-09-04), NOT closing this checkbox — the control-plane module exists and
+  is live-integration-proven, but has never run against real production source bindings.** Built
+  `sveltekit-frontend/src/lib/server/atlas/indexing/graphify-daily-coordinator-v1.ts`: pure
+  functions `acquireCoordinatorLock`/`releaseCoordinatorLock` (frozen namespace/key
+  `119041`/`641934821`, matching `docs/reports/graphify-execution-ledger-coordinator-plan-v1.json`),
+  `openExecution` (fresh `execution_id` every call, marks the `OPEN` stage `COMPLETED`),
+  `recordSourceSelectionStage` (bulk-appends caller-supplied bindings into
+  `graphify_execution_files`, marks `SOURCE_SELECTION` `COMPLETED` with a real sha256
+  `outputChecksum` over the sorted `sourceRef` set), `heartbeat`, `completeExecution` (throws
+  `GRAPHIFY_COORDINATOR_COMPLETE_EXECUTION_NOT_IN_RUNNING_STATUS` rather than inferring a terminal
+  state from a missing row, per this gate's own "never infer COMPLETED" rule). Every function
+  requires the caller's own dedicated connection (never constructs one itself) — `execution_id`
+  only, `graphify_runs.run_id` never referenced anywhere in the module.
+  `graphify-daily-coordinator-v1.integration.spec.ts` (4/4 pass, `RUN_DB_INTEGRATION=1`, opt-in
+  per this repo's established convention) proves the real flow end to end against the real dev DB
+  inside one `BEGIN...ROLLBACK` (`to_regclass` + `pg_locks` both confirmed clean afterward, zero
+  persistent footprint): open → source-selection → heartbeat → complete; two executions over the
+  identical workspace-revision tuple get distinct `execution_id`s with independently correct file
+  counts (2 vs 0); heartbeat after a terminal transition no-ops rather than throwing; a
+  double-complete attempt throws. **What remains open**: the 6 pipeline-internal stages
+  (`INVENTORY` through `VALIDATE`) are deliberately NOT owned by this control-plane module — those
+  belong to the existing Graphify pipeline, per the earlier audit finding in this same file ("the
+  new coordinator must be a separate owner... do not retrofit the legacy wrappers"). No caller
+  wires this module to the real 25,419-source cohort from
+  `docs/reports/graphify-lifecycle-entrypoint-v1.json` yet, and no execution has ever been
+  COMMITted (every run so far is inside a rolled-back proof transaction, matching this repo's
+  `authorizationRequired: true` / `canaryRequiredBeforeBroadRun: true` gating in the coordinator
+  plan receipt — a real committed run needs explicit operator authorization, not implied by this
+  module existing).
 - Audit finding: the existing `scripts/atlas/graphify-daily-lifecycle-open-v1.mjs` and
   `graphify-daily-lifecycle-complete-v1.mjs` are legacy `graphify_runs` lifecycle wrappers. No
   implementation currently owns `graphify_executions` or `SOURCE_SELECTION`. The new coordinator
