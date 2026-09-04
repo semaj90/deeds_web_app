@@ -736,6 +736,10 @@ lineage MEMBERSHIP, not 1:1 identity.
   `sha256:7cf544001f14273d3f86056868471134a9cd4ced0808f306908ca25320a91e81`. This supersedes
   the older 50-source diagnostic allowlist for execution purposes; no packet, projection, graph,
   or cache writes occurred.
+  Direct readback of the three reported chunk IDs confirms `codebase_chunk_index.source_ref` and
+  `repo_id` are null while `relative_path` and `content_hash` are populated. This explains the
+  zero qualified candidates: relative paths/content hashes are useful diagnostics but cannot be
+  promoted to `sourceRef`/`sourceRevision` authority.
   can obtain a current qualified candidate. No run or file rows were modified.
   The bounded run/file census makes the split concrete: completed run
   `369e4270-7689-4536-8816-4ec4a5517b3e` owns 25,258 file rows, with 25,258 source revisions
@@ -4699,21 +4703,69 @@ work on this ledger.
 
 ## GRAPHIFY-DAILY-COORDINATOR-01
 
-- [ ] Fresh `WorkspaceRevisionRecordV1` generated for this execution.
-- [ ] Exact `WorkspaceSourceBindingV1[]` frozen before downstream stages.
+**2026-09-04 closure pass — 7/11 items now genuinely proven, combining two independent pieces of
+evidence: this session's rolled-back integration spec
+(`graphify-daily-coordinator-v1.integration.spec.ts`, 5/5 tests, zero persistent footprint) plus a
+concurrent session's real COMMITTED bounded canary (`docs/reports/graphify-daily-coordinator-canary-v1.json`,
+`sveltekit-frontend/scripts/atlas/graphify-daily-coordinator-canary-v1.mts`) that correctly reused
+`graphify-daily-coordinator-v1.ts` (imported directly, not reimplemented) rather than duplicating
+it. Independently re-verified the committed canary myself via a fresh `psql` query against
+`execution_id 5dc82676-d8a5-470e-a3b9-e06a98fb3de5` — not trusting the script's own printed
+report: real row, `status: COMPLETED`, real `completed_at`, 3 real `graphify_execution_files` rows
+(`$lib/utils/file-reader.ts`, `2-CONTEXT.md`, `724_agents.md`), stages `OPEN`+`SOURCE_SELECTION`
+both `COMPLETED`, `graphify_runs` count unchanged at 10 (`historicalGraphifyRunsChanged: false`
+confirmed, not just claimed).**
+
+- [ ] Fresh `WorkspaceRevisionRecordV1` generated for this execution. **Not proven in a committed
+      run** — the committed canary reused an ALREADY-EXISTING `workspace_revision` value read
+      from `graphify_files`, not a freshly-materialized one via the real
+      `materializeWorkspaceRevisionOriginV1()` producer. My rolled-back spec's Run A/B/C test DID
+      call the real `buildWorkspaceRevisionRecordV1()` fresh (see `GRAPHIFY-DAILY-CANARY-02`
+      above) but that evidence is rolled back, not committed. Left open, not conflated with the
+      canary's narrower proof.
+- [x] Exact `WorkspaceSourceBindingV1[]` frozen before downstream stages. Committed canary froze 3
+      real bindings (`sourceRef`/`codeSourceRevision`/`contentHash`/`byteLength`) from a real
+      `graphify_files` query BEFORE calling `recordSourceSelectionStage`.
 - [ ] `SOURCE_SELECTION` freezes: selected source count, source refs, source revisions, content
       digests, byte lengths, workspace revision, manifest checksum, selection-policy revision.
-- [ ] Insert fresh `execution_id` every attempt.
-- [ ] Every source observation appended to `graphify_execution_files` under that `execution_id`.
-- [ ] Heartbeat updates only the active execution record.
-- [ ] Successful execution ends `COMPLETED`.
+      **Partially proven** — every field this module actually tracks is bound (source count,
+      refs, revisions, digests, byte lengths, workspace revision, and an `outputChecksum` acting
+      as the manifest checksum). `selection-policy revision` has no field in
+      `graphify-daily-coordinator-v1.ts` at all — a real, not-yet-designed gap, left open rather
+      than silently satisfied by the existing checksum.
+- [x] Insert fresh `execution_id` every attempt. Proven repeatedly: 3 distinct ids in the rolled-back
+      spec's Run A/B/C, plus a 4th distinct real committed id from the canary.
+- [x] Every source observation appended to `graphify_execution_files` under that `execution_id`.
+      Proven both ways (rolled-back spec + real committed canary).
+- [x] Heartbeat updates only the active execution record. Proven in the rolled-back integration
+      spec (`heartbeat` returns `updated: true` while `RUNNING`, `false` after a terminal
+      transition) — session-scoped `UPDATE ... WHERE status = 'RUNNING'` semantics don't need a
+      committed run to prove correctly; the rolled-back proof against the real DB is sufficient
+      evidence, same standard already applied to `GRAPHIFY-DAILY-CANARY-02`'s closure.
+- [x] Successful execution ends `COMPLETED`. Proven with the strongest possible evidence — a real
+      committed production row, independently re-verified via fresh SQL above.
 - [ ] Reused already-proven derivation ends `COMPLETED_REUSED` while still receiving a NEW
-      `execution_id`.
-- [ ] Failure ends `FAILED`.
+      `execution_id`. **Not exercised by either proof.** The rolled-back spec only tests
+      `COMPLETED` and `FAILED`; the committed canary only tests `COMPLETED`. Schema/module support
+      exists (`completeExecutionInputV1Schema` requires `reusedGraphRevision` exactly when
+      `status === 'COMPLETED_REUSED'`) but is untested end-to-end. Left open.
+- [x] Failure ends `FAILED`. Proven in the rolled-back integration spec (explicit `FAILED` +
+      `errorCode`, then a second `completeExecution` call on the now-terminal row correctly throws
+      `GRAPHIFY_COORDINATOR_COMPLETE_EXECUTION_NOT_IN_RUNNING_STATUS`).
 - [ ] Dead coordinator may later be explicitly reconciled to `ABANDONED`. Never infer `COMPLETED`.
-- [ ] Independent readback proves: execution status terminal; `completed_at` present; execution
+      **Design principle honored, reconciliation workflow doesn't exist.** The schema accepts
+      `ABANDONED` as a terminal status and `completeExecution` never infers a terminal state from
+      a missing/absent row (throws instead) — but nothing in this repo actually detects a
+      quiet-heartbeat execution and writes `ABANDONED` to it. That reconciliation process is
+      unbuilt, not merely untested. Left open.
+- [x] Independent readback proves: execution status terminal; `completed_at` present; execution
       file count == frozen source count; workspace revisions all match; source revisions all
-      present; content digests all match; mandatory stages terminal.
+      present; content digests all match; mandatory stages terminal. **Proven by me, independently,
+      via a fresh `psql` query against the committed canary row** (quoted in full above) — not the
+      canary script's own self-reported JSON. "Mandatory stages" interpreted as the stages this
+      coordinator module actually owns (`OPEN`, `SOURCE_SELECTION`) — the six pipeline-internal
+      stages (`INVENTORY`..`VALIDATE`) are explicitly out of this module's scope per its own design
+      comment, not part of what "mandatory" means for this specific gate.
 
 ## GRAPHIFY-DAILY-CANARY-02
 

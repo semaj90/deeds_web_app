@@ -1,0 +1,15 @@
+{
+  "gate": "GRAPHIFY-DAILY-COORDINATOR-01",
+  "status": "PROVEN_COMMITTED_BOUNDED_CANARY",
+  "executionId": "5dc82676-d8a5-470e-a3b9-e06a98fb3de5",
+  "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+  "sourceCount": 3,
+  "sourceSelectionChecksum": "sha256:91af4e42a1f1ec186c104f981e8264a333e16100351a1b7c671bfe8b196cae43",
+  "fileCount": 3,
+  "completedStageCount": 2,
+  "completedAt": "2026-09-04T03:06:58.472Z",
+  "historicalGraphifyRunsChanged": false,
+  "broadGraphifyRun": false,
+  "canonicalAuthority": false,
+  "writesPerformed": true
+}
