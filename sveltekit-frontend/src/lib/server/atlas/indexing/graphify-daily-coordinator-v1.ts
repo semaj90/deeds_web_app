@@ -160,23 +160,39 @@ export const sourceSelectionBindingV1Schema = z.object({
 }).strict();
 export type SourceSelectionBindingV1 = z.infer<typeof sourceSelectionBindingV1Schema>;
 
+/** Identifies which selection policy chose this execution's source cohort (e.g.
+ * "full-corpus-v1", "incremental-changed-since-v1", "bounded-canary-v1") -- distinct from
+ * workspaceRevision (identifies the BYTES selected) and outputChecksum (identifies the exact SET
+ * selected). Optional: older/simpler callers that don't yet track policy identity may omit it,
+ * matching this field's own gap note ("no field exists at all... left open rather than silently
+ * satisfied by the existing checksum") -- omitting it does not silently satisfy the freeze, it
+ * stores NULL and is visible as such on readback. No fixed enum of policy names is imposed here;
+ * this module is a ledger, not the policy registry. */
+const selectionPolicyRevisionSchema = z.string().min(1).optional();
+
 /** Runs the SOURCE_SELECTION stage: bulk-appends the frozen source cohort into
  * graphify_execution_files under this execution_id, then marks the stage COMPLETED with an
- * outputChecksum binding the exact ordered set of sourceRefs written. Bindings must already be
- * fully computed by the caller (this function performs no scanning/hashing itself) -- this keeps
- * the coordinator's own SQL bounded and independent of however the source cohort was produced. */
+ * outputChecksum binding the exact ordered set of sourceRefs written, and (when supplied) the
+ * selection-policy revision that chose this cohort, stored in the stage's existing (previously
+ * unused) receipt_ref column -- no migration required, that column already exists for exactly
+ * this kind of free-text stage provenance reference. Bindings must already be fully computed by
+ * the caller (this function performs no scanning/hashing itself) -- this keeps the coordinator's
+ * own SQL bounded and independent of however the source cohort was produced. */
 export async function recordSourceSelectionStage(
   client: GraphifyCoordinatorSqlClientV1,
   executionId: string,
   workspaceRevision: string,
   bindings: readonly SourceSelectionBindingV1[],
-): Promise<{ sourceCount: number; outputChecksum: string }> {
+  options?: { selectionPolicyRevision?: string },
+): Promise<{ sourceCount: number; outputChecksum: string; selectionPolicyRevision: string | null }> {
   uuid.parse(executionId);
   contentRevision.parse(workspaceRevision);
   const parsedBindings = bindings.map((b) => sourceSelectionBindingV1Schema.parse(b));
   if (parsedBindings.length === 0) {
     throw new Error('GRAPHIFY_COORDINATOR_SOURCE_SELECTION_REQUIRES_AT_LEAST_ONE_BINDING');
   }
+  const parsedSelectionPolicyRevision =
+    selectionPolicyRevisionSchema.parse(options?.selectionPolicyRevision) ?? null;
 
   await client.query(
     `INSERT INTO public.graphify_execution_stages (execution_id, stage, status, started_at)
@@ -208,12 +224,16 @@ export async function recordSourceSelectionStage(
 
   await client.query(
     `UPDATE public.graphify_execution_stages
-     SET status = 'COMPLETED', completed_at = now(), output_checksum = $3
+     SET status = 'COMPLETED', completed_at = now(), output_checksum = $3, receipt_ref = $4
      WHERE execution_id = $1 AND stage = $2`,
-    [executionId, 'SOURCE_SELECTION', outputChecksum],
+    [executionId, 'SOURCE_SELECTION', outputChecksum, parsedSelectionPolicyRevision],
   );
 
-  return { sourceCount: parsedBindings.length, outputChecksum };
+  return {
+    sourceCount: parsedBindings.length,
+    outputChecksum,
+    selectionPolicyRevision: parsedSelectionPolicyRevision,
+  };
 }
 
 async function computeSourceRefSetChecksum(sourceRefs: readonly string[]): Promise<string> {

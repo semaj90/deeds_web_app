@@ -4703,9 +4703,12 @@ work on this ledger.
 
 ## GRAPHIFY-DAILY-COORDINATOR-01
 
-**2026-09-04 closure pass — 8/11 items now genuinely proven (updated same day: the ABANDONED
-reconciliation item closed afterward, see its own checkbox below), combining two independent
-pieces of
+**2026-09-04 closure pass — 10/11 items now genuinely proven (updated twice same day: the
+ABANDONED reconciliation item and the selection-policy-revision field were both closed after this
+note was first written, see their own checkboxes below). Only one item remains open: a fresh
+`WorkspaceRevisionRecordV1` proven in a COMMITTED (not rolled-back) run — every other committed
+proof in this gate reused an already-existing revision value rather than freshly materializing
+one. Combining two independent pieces of
 evidence: this session's rolled-back integration spec
 (`graphify-daily-coordinator-v1.integration.spec.ts`, 5/5 tests, zero persistent footprint) plus a
 concurrent session's real COMMITTED bounded canary (`docs/reports/graphify-daily-coordinator-canary-v1.json`,
@@ -4728,13 +4731,27 @@ confirmed, not just claimed).**
 - [x] Exact `WorkspaceSourceBindingV1[]` frozen before downstream stages. Committed canary froze 3
       real bindings (`sourceRef`/`codeSourceRevision`/`contentHash`/`byteLength`) from a real
       `graphify_files` query BEFORE calling `recordSourceSelectionStage`.
-- [ ] `SOURCE_SELECTION` freezes: selected source count, source refs, source revisions, content
+- [x] `SOURCE_SELECTION` freezes: selected source count, source refs, source revisions, content
       digests, byte lengths, workspace revision, manifest checksum, selection-policy revision.
-      **Partially proven** — every field this module actually tracks is bound (source count,
-      refs, revisions, digests, byte lengths, workspace revision, and an `outputChecksum` acting
-      as the manifest checksum). `selection-policy revision` has no field in
-      `graphify-daily-coordinator-v1.ts` at all — a real, not-yet-designed gap, left open rather
-      than silently satisfied by the existing checksum.
+      **Closed 2026-09-04.** The `selectionPolicyRevision` gap (previously "no field exists at
+      all") is now closed: `recordSourceSelectionStage()` takes an optional 5th argument
+      `options?.selectionPolicyRevision` (free-text string, e.g. `"bounded-canary-v1"`,
+      `"incremental-changed-since-v1"` — this module is a ledger, not a policy-name registry, so
+      no fixed enum is imposed) and persists it into `graphify_execution_stages.receipt_ref` on
+      the `SOURCE_SELECTION` row — an existing column that was previously unused, so this closes
+      the gap additively with **no schema migration**. Omitting the option stores `NULL`
+      explicitly (verified on independent readback), not a silent default that would make the
+      freeze look satisfied when it isn't. 1 new test added to
+      `graphify-daily-coordinator-v1.integration.spec.ts` (9/9 pass total, rolled back, zero
+      persistent footprint — re-verified via fresh `psql`: `graphify_executions` still exactly 1
+      row, 0 rows matching `COORDINATOR_INTEGRATION_TEST%`): two executions, one supplying
+      `selectionPolicyRevision: 'bounded-canary-v1'` and one omitting it, both independently read
+      back via `SELECT receipt_ref FROM graphify_execution_stages WHERE stage =
+      'SOURCE_SELECTION'` — confirms the value round-trips exactly for the supplying case and is
+      genuinely `NULL` (not `'undefined'`/empty-string) for the omitting case. The one existing
+      real caller (`graphify-daily-coordinator-canary-v1.mts`) calls with the original 4
+      positional arguments and is unaffected — the new parameter is additive-optional, not a
+      breaking signature change.
 - [x] Insert fresh `execution_id` every attempt. Proven repeatedly: 3 distinct ids in the rolled-back
       spec's Run A/B/C, plus a 4th distinct real committed id from the canary.
 - [x] Every source observation appended to `graphify_execution_files` under that `execution_id`.
@@ -5636,7 +5653,36 @@ column name. No authority was silently changed in this pass; the representation 
 explicitly resolved and the contract, tests, and receipt regenerated together before a live
 manifest can be emitted.
 
+The 15-row semantic input audit found another manifest-boundary issue: all 15 rows have a
+`semanticRevision`, but the values are distinct per row because each includes its own embedding
+checksum (`distinct semanticRevision values: 15`). A cohort-level manifest must not collapse that
+set into the bare label `semantic_768` or select one row's revision as the cohort revision. The
+next manifest implementation must either carry a deterministic input-revision-set checksum or
+re-freeze the canary under an explicitly shared semantic representation revision.
+
+The existing read-only `scripts/atlas/audit-semantic-candidate-cohort-v1.mjs` was rerun and
+returned `SEMANTIC_CANDIDATE_COHORT_BLOCKED`: 0 eligible rows out of 55,169. The blocker is
+missing authoritative workspace/source bindings, not vector availability. Its fixture-level
+`representationRevision: semantic_768` and `semanticSnapshotRevision` are therefore insufficient
+to authorize a latent manifest or silently replace the per-row semantic revision set.
+Receipt: `docs/reports/semantic-candidate-cohort-v1.json`.
+
+The existing read-only `scripts/atlas/audit-current-source-cohort-lineage-v1.mjs` was then run.
+It found a bounded 52-row source cohort with 52/52 Graphify matches and 52/52 source-revision
+qualified rows, but 0/52 matched the current workspace revision
+`sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3`; all 52 were classified
+`workspaceMismatchAfterSourceQualification`. This is a real historical/stale cohort, not a
+promotion candidate. No fallback to its older workspace revision is allowed.
+Receipt: `docs/reports/current-source-cohort-lineage-v1.json`.
+
 The representation schema tests still pass independently (`34/34` across
 `representation-artifact-v1.spec.ts` and `latent-source-manifest-v1.spec.ts`), but that is schema
 behavior only. It does not override the direct producer evidence above. The current state is
 therefore `SCHEMA_PROVEN / PRODUCER_POLICY_CONFLICT`, not a closed representation gate.
+
+The conflict was then resolved against the direct producer implementation: `latent_64` is modeled
+as a `DERIVED` prefix/L2-renormalized view of `latent_256` in both existing representation
+contracts, and the contradictory co-produced fixtures were corrected. Focused contract tests pass
+34/34. This changes schema semantics only; no latent vectors, caches, or database rows were
+rewritten. A new live manifest still requires explicit `parametersDigest`, transform-policy
+revision, and exact 15-row materialization checksums.

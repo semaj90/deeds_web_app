@@ -333,6 +333,52 @@ describeIf('GRAPHIFY-DAILY-COORDINATOR-01: live coordinator flow (rolled back, z
     }
   });
 
+  it('recordSourceSelectionStage: an optional selectionPolicyRevision persists into the SOURCE_SELECTION stage\'s receipt_ref column; omitting it stores NULL, not a silent default', async () => {
+    await acquireCoordinatorLock(client);
+    try {
+      const withPolicy = await openExecution(client, {
+        workspaceId: realWorkspaceId,
+        workspaceRevision: `sha256:${'5'.repeat(64)}`,
+        parserContractVersion: 'graphify.parser.v0.1',
+        extractionContractVersion: 'graphify.extractor.v0.1',
+        triggerKind: 'COORDINATOR_INTEGRATION_TEST_SELECTION_POLICY_WITH',
+      });
+      const withoutPolicy = await openExecution(client, {
+        workspaceId: realWorkspaceId,
+        workspaceRevision: `sha256:${'6'.repeat(64)}`,
+        parserContractVersion: 'graphify.parser.v0.1',
+        extractionContractVersion: 'graphify.extractor.v0.1',
+        triggerKind: 'COORDINATOR_INTEGRATION_TEST_SELECTION_POLICY_WITHOUT',
+      });
+      const binding = [{ sourceRef: 'policy-test/one.ts', codeSourceRevision: `sha256:${'a'.repeat(64)}`, contentHash: `sha256:${'b'.repeat(64)}`, byteLength: 10 }];
+
+      const resultWith = await recordSourceSelectionStage(
+        client, withPolicy.executionId, `sha256:${'5'.repeat(64)}`, binding,
+        { selectionPolicyRevision: 'bounded-canary-v1' },
+      );
+      expect(resultWith.selectionPolicyRevision).toBe('bounded-canary-v1');
+
+      const resultWithout = await recordSourceSelectionStage(
+        client, withoutPolicy.executionId, `sha256:${'6'.repeat(64)}`, binding,
+      );
+      expect(resultWithout.selectionPolicyRevision).toBeNull();
+
+      const readback = await client.query(
+        `SELECT execution_id, receipt_ref FROM public.graphify_execution_stages
+         WHERE execution_id = ANY($1::uuid[]) AND stage = 'SOURCE_SELECTION'`,
+        [[withPolicy.executionId, withoutPolicy.executionId]],
+      );
+      const receiptRefOf = (id: string) => readback.rows.find((r) => r.execution_id === id)?.receipt_ref;
+      expect(receiptRefOf(withPolicy.executionId)).toBe('bounded-canary-v1');
+      expect(receiptRefOf(withoutPolicy.executionId)).toBeNull();
+
+      await completeExecution(client, withPolicy.executionId, { status: 'COMPLETED' });
+      await completeExecution(client, withoutPolicy.executionId, { status: 'COMPLETED' });
+    } finally {
+      await releaseCoordinatorLock(client);
+    }
+  });
+
   it('reconcileAbandonedExecutions: transitions a stale-heartbeat RUNNING execution to ABANDONED, leaves a fresh one alone, and is idempotent on re-run', async () => {
     await acquireCoordinatorLock(client);
     try {
