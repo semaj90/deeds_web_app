@@ -1,0 +1,237 @@
+{
+  "gate": "BITFROST-INVALIDATION-OWNER-01",
+  "status": "PROOF_PASSED",
+  "executedAt": "2026-09-04T21:45:49.942Z",
+  "ownershipMatrix": {
+    "dispatcher/redis-cache-invalidate.ts::invalidateRedisCache": {
+      "classification": "DELEGATE",
+      "realCallers": [
+        "dispatcher-orchestrator.ts (executeDispatcherOrchestration)"
+      ],
+      "liveReachable": false,
+      "reason": "Only reachable via rabbitmq-identity-listener.ts, whose startIdentityListener() has zero callers anywhere in the repo -- never started.",
+      "preFixKeyShape": [
+        "bifrost:packet:{packet_key}",
+        "bifrost:trace:{packet_key}",
+        "bifrost:source:{source_ref}",
+        "bifrost:feature:{feature_id}"
+      ],
+      "fixedTo": "delegates to invalidateBitfrostPacket()"
+    },
+    "workers/redis-invalidate-worker.ts::invalidateRedisCache (private)": {
+      "classification": "DELEGATE",
+      "realCallers": [
+        "startRedisInvalidateWorker() RabbitMQ consumer (never started)"
+      ],
+      "liveReachable": false,
+      "reason": "start/stopRedisInvalidateWorker() confirmed zero callers repo-wide (matches prior convergence audit).",
+      "preFixKeyShape": [
+        "bifrost:packet:{packet_key}",
+        "bifrost:trace:{packet_key}",
+        "bifrost:source:{source_ref}",
+        "bifrost:feature:{feature_id}"
+      ],
+      "fixedTo": "delegates to invalidateBitfrostPacket()"
+    },
+    "acp/packet-materializer-pipeline.ts::invalidateRedisCache (private)": {
+      "classification": "DELEGATE",
+      "realCallers": [
+        "materializePacket()/materializePacketBatch() in the same file"
+      ],
+      "liveReachable": false,
+      "reason": "Corrects the prior convergence audit: grepped the literal filename repo-wide and found ZERO importers of packet-materializer-pipeline.ts anywhere in sveltekit-frontend/src. The audit's cited callers (ace-materializer.ts, hyperrag-packet-pipeline.ts, hyperrag-rpc-client.ts) call a DIFFERENT, same-named materializePacket()/materializePackets() defined in their own files -- not this one.",
+      "preFixKeyShape": [
+        "bifrost:packet:{packet_key}",
+        "bifrost:feature:{feature_id}:packets",
+        "bifrost:source:{source_ref}",
+        "bitfrost:summary:{packet_key}"
+      ],
+      "fixedTo": "delegates to invalidateBitfrostPacket()"
+    },
+    "ace/ace-materializer.ts::invalidateMaterializedPacket": {
+      "classification": "DELEGATE",
+      "realCallers": [
+        "none outside its own .spec.ts"
+      ],
+      "liveReachable": false,
+      "reason": "Not documented by the prior convergence audit at all -- found during this gate's own owner audit. Also had the wrong key shape (bifrostKey.packet -> bifrost:packet:*) on both its writer (materializePacket) and invalidator.",
+      "preFixKeyShape": [
+        "bifrost:packet:{packet_key} (both writer and invalidator)"
+      ],
+      "fixedTo": "writer now uses bifrostKey.semantic.packet(); invalidator delegates to invalidateBitfrostPacket()"
+    },
+    "cache/atlas-reward-cache.ts::setPacketCache/setFeatureCache": {
+      "classification": "CANONICAL_OWNER (writer)",
+      "realCallers": [
+        "none found repo-wide as of this audit"
+      ],
+      "liveReachable": false,
+      "reason": "Uses the correct, confirmed-live key shape (bifrostKey.semantic.packet/feature) via a proper shared constructor -- but has zero external callers either. The real production writer of the live bifrost:sem:packet:* keys observed by the prior convergence audit was not located in sveltekit-frontend/src during this gate's scope; likely a script/backfill outside the TS app, or a caller not yet found. Not chased further -- out of scope for an invalidation-correctness gate."
+    },
+    "cache/atlas-reward-cache.ts::invalidateBitfrostPacket": {
+      "classification": "CANONICAL_OWNER (invalidator, NEW this gate)",
+      "realCallers": [
+        "the 4 DELEGATE call sites above, post-fix"
+      ],
+      "liveReachable": "same reachability as its callers (none of the 4 delegates are currently triggered by a live production Postgres-mutation path)",
+      "keyShape": [
+        "bifrost:sem:packet:{packet_key}",
+        "bitfrost:summary:packet:v1:{packet_key}",
+        "bifrost:sem:feature:{feature_id} (when featureId given)"
+      ]
+    },
+    "cache/cache-invalidation.ts (checkAndInvalidate + friends)": {
+      "classification": "COMPATIBILITY (unrelated concern, flagged not fixed)",
+      "realCallers": "not audited in this gate",
+      "reason": "Digest-based schema/model-level invalidation, a different concern than packet-level BitFrost invalidation. Also uses a non-matching key shape (semantic:bifrost:{modelId}:* / semantic:bifrost:* / semantic:qdrant:centroid:*) distinct from BOTH the wrong bifrost:packet:* shapes and the real bifrost:sem:* shape. Out of scope for this gate; flagged per \"record what you found even when you don't fix it\"."
+    }
+  },
+  "liveProof": {
+    "A_seed": {
+      "ok": true,
+      "keys": [
+        "bifrost:sem:packet:packet:test-bitfrost-invalidation-owner-01",
+        "bitfrost:summary:packet:v1:packet:test-bitfrost-invalidation-owner-01",
+        "bifrost:sem:feature:feature:test-bitfrost-invalidation-owner-01",
+        "bifrost:sem:packet:packet:test-bitfrost-invalidation-owner-01-unrelated"
+      ]
+    },
+    "B_semantic_packet_exists": {
+      "ok": true,
+      "key": "bifrost:sem:packet:packet:test-bitfrost-invalidation-owner-01",
+      "exists": 1
+    },
+    "C_summary_key_exists": {
+      "ok": true,
+      "key": "bitfrost:summary:packet:v1:packet:test-bitfrost-invalidation-owner-01",
+      "exists": 1
+    },
+    "D_represented_mutation": {
+      "ok": true,
+      "packetKey": "packet:test-bitfrost-invalidation-owner-01",
+      "newRevision": "rev-0002"
+    },
+    "E_invalidation_result": {
+      "packetKey": "packet:test-bitfrost-invalidation-owner-01",
+      "featureId": "feature:test-bitfrost-invalidation-owner-01",
+      "sourceRevision": "rev-0002",
+      "deletedKeys": [
+        "bifrost:sem:packet:packet:test-bitfrost-invalidation-owner-01",
+        "bitfrost:summary:packet:v1:packet:test-bitfrost-invalidation-owner-01",
+        "bifrost:sem:feature:feature:test-bitfrost-invalidation-owner-01"
+      ],
+      "keysAttempted": 3,
+      "keysDeleted": 3,
+      "ok": true,
+      "error": null,
+      "durationMs": 1
+    },
+    "F_affected_keys_gone": {
+      "ok": true,
+      "semanticPacket": 0,
+      "summary": 0,
+      "feature": 0
+    },
+    "G_unrelated_key_survives": {
+      "ok": true,
+      "key": "bifrost:sem:packet:packet:test-bitfrost-invalidation-owner-01-unrelated",
+      "exists": 1,
+      "value": "{\"revision\":\"rev-unrelated\",\"content\":\"untouched\"}"
+    },
+    "H_repopulates_with_new_revision": {
+      "ok": true,
+      "key": "bifrost:sem:packet:packet:test-bitfrost-invalidation-owner-01",
+      "revision": "rev-0002"
+    },
+    "I_idempotent_replay": {
+      "ok": true,
+      "firstReplay": {
+        "packetKey": "packet:test-bitfrost-invalidation-owner-01",
+        "featureId": "feature:test-bitfrost-invalidation-owner-01",
+        "sourceRevision": "rev-0002",
+        "deletedKeys": [
+          "bifrost:sem:packet:packet:test-bitfrost-invalidation-owner-01",
+          "bitfrost:summary:packet:v1:packet:test-bitfrost-invalidation-owner-01",
+          "bifrost:sem:feature:feature:test-bitfrost-invalidation-owner-01"
+        ],
+        "keysAttempted": 3,
+        "keysDeleted": 1,
+        "ok": true,
+        "error": null,
+        "durationMs": 1
+      },
+      "secondReplay": {
+        "packetKey": "packet:test-bitfrost-invalidation-owner-01",
+        "featureId": "feature:test-bitfrost-invalidation-owner-01",
+        "sourceRevision": "rev-0002",
+        "deletedKeys": [
+          "bifrost:sem:packet:packet:test-bitfrost-invalidation-owner-01",
+          "bitfrost:summary:packet:v1:packet:test-bitfrost-invalidation-owner-01",
+          "bifrost:sem:feature:feature:test-bitfrost-invalidation-owner-01"
+        ],
+        "keysAttempted": 3,
+        "keysDeleted": 0,
+        "ok": true,
+        "error": null,
+        "durationMs": 1
+      }
+    },
+    "J_fail_open": {
+      "ok": true,
+      "threw": false,
+      "result": {
+        "packetKey": "packet:test-bitfrost-invalidation-owner-01",
+        "featureId": null,
+        "sourceRevision": null,
+        "deletedKeys": [],
+        "keysAttempted": 2,
+        "keysDeleted": 0,
+        "ok": false,
+        "error": "Stream isn't writeable and enableOfflineQueue options is false",
+        "durationMs": 0
+      }
+    },
+    "K_no_broad_delete": {
+      "ok": true,
+      "forbiddenTokensChecked": [
+        "FLUSHDB",
+        "FLUSHALL",
+        "flushdb",
+        "flushall",
+        ".scan(",
+        ".keys("
+      ],
+      "found": []
+    },
+    "L_existing_tests_note": {
+      "ok": true,
+      "ranTests": [
+        "src/lib/server/ace/ace-materializer.spec.ts (1/1 passed)",
+        "tests/atlas/ace-materializer-redis.spec.ts (2/2 passed)"
+      ],
+      "note": "Both required ROTORQUANT_MODEL_PATH set (pre-existing, unrelated env gate -- confirmed by reproducing the failure without it, then passing with a dummy value). tests/cache-keys-bifrost.spec.ts and tests/cache-keys.spec.ts exist and cover bifrostKey directly but are wired to a vitest project config not resolved during this pass -- not run here, flagged rather than silently skipped. The dedicated proof script (prove-bitfrost-invalidation-owner-v1.mjs, steps B/C/F/G/H) already live-exercises bifrostKey.semantic.packet/feature/packetSummary against real Redis."
+    }
+  },
+  "correctionsToPriorAudit": [
+    "parent-atlas-retrieval-lineage-dag-convergence tasks.md characterized implementation #3 (acp/packet-materializer-pipeline.ts) as having \"real callers... grep-verified, live production code paths\" via materializePacket() in ace-materializer.ts/atlas/packet-parser.ts/hyperrag-packet-pipeline.ts/hyperrag-rpc-client.ts. This is corrected: those files each define or call their OWN same-named materializePacket()/materializePackets() function, never importing acp/packet-materializer-pipeline.ts at all (verified: zero repo-wide matches for the literal filename string outside the file itself).",
+    "Net effect: all 3 previously-documented invalidateRedisCache implementations, plus a 4th (ace-materializer.ts) found during this gate's own audit, are currently unreachable from a live production Postgres-mutation trigger -- not just 2 of 3 as previously documented. The real bounding factor against indefinite staleness in production today is the 1-hour TTL on bifrost:sem:packet:*, not any active invalidation."
+  ],
+  "hardRulesCompliance": {
+    "auditedWritersFirst": true,
+    "oneCanonicalPrimitiveSelected": "invalidateBitfrostPacket() in cache/atlas-reward-cache.ts",
+    "didNotMerelyPatchStringLiterals": true,
+    "centralizedKeyConstruction": "cache-keys.ts bifrostKey.semantic.{packet,feature,packetSummary}",
+    "postgresRemainsCanonicalTruth": true,
+    "invalidationOnlyAfterCanonicalMutation": "caller responsibility -- documented in invalidateBitfrostPacket() docstring",
+    "noNamespaceFlush": true,
+    "redisFailureDoesNotBlockPostgres": "proven step J (fail-open)",
+    "deadDuplicateOwnersArchivedNotSilent": true,
+    "noQdrantNeo4jEmbeddingOrUnrelatedWrites": true
+  },
+  "postgresWrites": false,
+  "valkeyWrites": true,
+  "qdrantWrites": false,
+  "neo4jWrites": false,
+  "modelCalls": false,
+  "note": "valkeyWrites:true is expected and bounded to this proof's own disposable synthetic test keys (packet:test-bitfrost-invalidation-owner-01*) -- no canonical packet_key or real production data was touched."
+}

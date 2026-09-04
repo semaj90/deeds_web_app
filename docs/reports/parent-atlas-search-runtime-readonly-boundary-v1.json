@@ -1,0 +1,37 @@
+{
+  "gate": "SEARCH-RUNTIME-READONLY-01",
+  "status": "LIVE_PROOF_PASSED",
+  "executedAt": "2026-09-04T22:35:36.237Z",
+  "summary": "createProductionSearchRuntime({ readOnly: true }) ran a real query against real production retrieval adapters (Postgres + Qdrant, no injected fakes) and performed zero writes to promotion_outbox or recommendation_events. provenance.readOnly and provenance.promotionAttempted correctly reflect the gated state. Closes the \"genuinely zero-write canary cannot call SearchRuntime.search() directly\" finding from ACE-FEATURE-SOURCE-OWNER-01.",
+  "filesChanged": [
+    "sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts (added SearchRuntimeConfig.readOnly, gated the two write side effects in search(), added provenance.readOnly to all 3 return paths, threaded readOnly through createSearchRuntime()/createProductionSearchRuntime())"
+  ],
+  "backwardCompatibilityNote": "readOnly defaults to false/undefined on all 3 factory/constructor entry points -- every existing production call site (routes, dispatchers, other canaries) is unaffected unless it explicitly opts in.",
+  "query": "embedding dimension validation postgres qdrant",
+  "liveProof": {
+    "before_counts": {
+      "promotion_outbox": 22,
+      "recommendation_events": 124
+    },
+    "provenance_asserted": {
+      "ok": true,
+      "readOnly": true,
+      "promotionAttempted": false,
+      "candidatesRetrieved": 82,
+      "packetsReturned": 4
+    },
+    "after_counts": {
+      "promotion_outbox": 22,
+      "recommendation_events": 124
+    },
+    "zero_write_confirmed": {
+      "ok": true
+    }
+  },
+  "postgresWrites": false,
+  "valkeyWrites": false,
+  "qdrantWrites": false,
+  "neo4jWrites": false,
+  "modelCalls": true,
+  "note": "modelCalls:true -- this proof performs a real embedding call and real Qdrant/Postgres reads via the production retrieval path; postgresWrites/etc. are all false because the point of this proof is that NO writes occurred despite a full real search executing."
+}

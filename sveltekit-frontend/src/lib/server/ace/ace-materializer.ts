@@ -8,7 +8,10 @@
  *   1. Read ACE-validated packet from Postgres
  *   2. Generate or load embedding vector (768-dim)
  *   3. Upsert to Qdrant codebase_chunks_768_v2 with metadata
- *   4. Cache in Redis under bifrost:packet:{packet_key} (24h TTL)
+ *   4. Cache in Redis under bifrost:sem:packet:{packet_key} (24h TTL) -- fixed
+ *      2026-09-04 (BITFROST-INVALIDATION-OWNER-01): this doc comment and the
+ *      code below both used to say/use bifrost:packet:{packet_key}, a shape
+ *      confirmed absent from live Redis (see the owner-audit report).
  *   5. Optional: Sync to TurboVec prefilter (SOM grid)
  */
 
@@ -18,6 +21,7 @@ import { db, pgRows } from '$lib/server/db/client.js';
 import { atlasPackets } from '$lib/server/db/schema/atlas-packets.js';
 import { embedText } from '$lib/server/embedding/embed.js';
 import { bifrostKey } from '$lib/server/cache-keys.js';
+import { invalidateBitfrostPacket } from '$lib/server/cache/atlas-reward-cache.js';
 import { eq, sql } from 'drizzle-orm';
 import { toRedisValue, type SemanticPacketDomainObject as RedisPacketProjection } from '$lib/server/atlas/projections/redis-packet-projection.js';
 import { buildCanonicalAcePacketEnvelope } from './canonical-packet-envelope.js';
@@ -261,7 +265,7 @@ export async function materializePacket(options: MaterializeOptions): Promise<Ma
       try {
         const redis = getRedis();
         const ttl = options.redisTtl || DEFAULT_REDIS_TTL;
-        const cacheKey = bifrostKey.packet(options.packetKey);
+        const cacheKey = bifrostKey.semantic.packet(options.packetKey);
         const cacheValue = buildBifrostRedisPacketValue(pkt, proofFields, ttl, new Date().toISOString());
 
         await redis.setex(cacheKey, ttl, cacheValue);
@@ -332,7 +336,7 @@ export async function getPacketMaterializationStatus(packetKey: string): Promise
   const qdrant = await getQdrantClient();
 
   // Check Redis
-  const redisKey = bifrostKey.packet(packetKey);
+  const redisKey = bifrostKey.semantic.packet(packetKey);
   const inRedis = await redis.exists(redisKey);
 
     // Check Qdrant by packet identity. Do not use a zero-vector proxy.
@@ -365,14 +369,14 @@ export async function getPacketMaterializationStatus(packetKey: string): Promise
 }
 
 /**
- * Invalidate materialized packet from mirrors
+ * Invalidate materialized packet from mirrors. Delegates to the canonical
+ * invalidateBitfrostPacket() (BITFROST-INVALIDATION-OWNER-01) so this module's
+ * invalidation stays identical to every other caller's, instead of maintaining
+ * its own second copy of the key logic.
  */
 export async function invalidateMaterializedPacket(packetKey: string): Promise<void> {
   const redis = getRedis();
-
-  // Clear Redis cache
-  const redisKey = bifrostKey.packet(packetKey);
-  await redis.del(redisKey);
+  await invalidateBitfrostPacket(redis, { packetKey });
 
   // Qdrant deletion would require point ID tracking (implement if needed)
   // For now, rely on TTL-based eviction

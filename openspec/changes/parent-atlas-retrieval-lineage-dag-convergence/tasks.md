@@ -759,6 +759,13 @@ lineage MEMBERSHIP, not 1:1 identity.
   `code_source_revision` and `workspace_revision`. Path overlap is therefore not cohort authority;
   semantic ordinal admission and KNN remain blocked. Receipt:
   `docs/reports/semantic-graphify-run-reconciliation-v1.json`.
+- **OpenSpec integration review 2026-09-04:** the core Parent Atlas integration set validated, and
+  four adjacent legacy changes were repaired additively with minimal delta specs preserving their
+  existing ownership/proof boundaries: `parent-atlas-adaptive-dag-fabric`,
+  `parent-atlas-topology-representation-admission`, `parent-atlas-retrieval-fusion-reachability`,
+  and `parent-atlas-candidate-feature-execution-fabric`. All four now validate strictly. This
+  documentation repair does not close any blocked runtime or lineage gate. Receipt:
+  `docs/reports/openspec-active-integration-review-v1.json`.
   Direct readback of the three reported chunk IDs confirms `codebase_chunk_index.source_ref` and
   `repo_id` are null while `relative_path` and `content_hash` are populated. This explains the
   zero qualified candidates: relative paths/content hashes are useful diagnostics but cannot be
@@ -3303,6 +3310,31 @@ Evidence: `docs/reports/mcp-tool-registry-drift-classification-v1.json`, `docs/r
   (feature-context resolver, `retrievalPolicyRevision`, `acePlaybookRevision`). This checkbox stays
   open until one of those three gets a real owner; do not synthesize placeholder values for any of
   them to force a close.
+
+  **`SEARCH-RUNTIME-READONLY-01` closed same day (2026-09-04) — the specific blocker this finding
+  raised is fixed.** `SearchRuntime.search()` (`src/lib/server/retrieval/search-runtime.ts`) now
+  accepts `SearchRuntimeConfig.readOnly` (default `false`/undefined — every existing production call
+  site is unaffected unless it opts in). When `true`, both write side effects
+  (`recordPromotionIntent()` to `promotion_outbox`, `logExposureEvents()` to `recommendation_events`)
+  are skipped entirely, not just their errors; every other stage (retrieve/fuse/score/hydrate/
+  rerank/postProcess/hypergraph lookup) was already read-only and is unaffected. `provenance.readOnly`
+  and `provenance.promotionAttempted` are threaded through all 3 return paths (empty-candidates,
+  degraded-no-rerank, full) so a caller can assert the gated state directly instead of inferring it.
+  `createSearchRuntime()`/`createProductionSearchRuntime()` both accept the new option.
+
+  **Live proof** (`scripts/atlas/prove-search-runtime-readonly-boundary-v1.mjs`, run from
+  `sveltekit-frontend/`, real production adapters — no injected retrievers/reranker, a real
+  embedding call, real Postgres+Qdrant reads): constructed `createProductionSearchRuntime({
+  readOnly: true })`, ran a real query (`"embedding dimension validation postgres qdrant"`, 82
+  candidates retrieved, 4 packets returned), asserted `provenance.readOnly === true` and
+  `provenance.promotionAttempted === false`, then confirmed `promotion_outbox` (22→22) and
+  `recommendation_events` (124→124) row counts were byte-identical before/after. `status:
+  LIVE_PROOF_PASSED`. Receipt: `docs/reports/parent-atlas-search-runtime-readonly-boundary-v1.json`.
+  This directly closes the "a genuinely zero-write canary cannot call `SearchRuntime.search()`
+  directly" blocker recorded above — a future `ACE-FEATURE-SOURCE-OWNER-01` canary can now call the
+  real production `SearchRuntime` with zero writes. Does NOT close the parent checkbox itself: the 3
+  missing-owner inputs (feature-context resolver, `retrievalPolicyRevision`, `acePlaybookRevision`)
+  are unrelated and remain unresolved.
 - [x] Preserve incomplete ACE/process enrichment metadata as explicit `null` (2026-09-03).
   `AtlasProcessPacketV1.graphRevision` is now nullable and the legacy ACE adapter no longer
   invents `graph:parent-atlas` when structural authority is unavailable. Nulls remain visible
@@ -3360,6 +3392,35 @@ Evidence: `docs/reports/mcp-tool-registry-drift-classification-v1.json`, `docs/r
   `stopRedisInvalidateWorker()` does correctly use `redis.quit()` (graceful, not `.disconnect()`),
   but since it's never called from anywhere, that correctness is moot — the worker's Redis
   connection is never gracefully closed on process exit because the worker itself never starts.
+
+  **Canonical invalidation primitive established + live-proven 2026-09-04 in
+  `parent-atlas-ace-rlm-bitfrost-integration` (gate BITFROST-INVALIDATION-OWNER-01), not here** —
+  per this repo's package-boundary convention, the implementation-owner work lives with that
+  change's existing BF-01..06 BitFrost contracts, not in this convergence ledger. **Status
+  precision (corrected same day after external review — do not read this as "fixed")**: that gate
+  proves the invalidation primitive itself (exact deletion, unrelated-key survival, idempotence,
+  fail-open, no broad flush) — it does NOT prove production mutation-invalidation is happening.
+  None of the 4 delegate call sites it fixed are reachable from a live Postgres-mutation trigger.
+  **Update, same day**: the follow-on gate, `BITFROST-LIVE-INVALIDATION-ADOPTION-01` (also in that
+  same change's tasks.md), ran its producer census and a follow-up producer-convergence audit —
+  the real live producer of `bifrost:sem:packet:*` IS now identified
+  (`scripts/atlas/warm-bitfrost-semantic-cache.mjs`), but it is a manual, hand-invoked npm backfill
+  script with no scheduler/cron/Docker wiring, same as every other writer found across all 4
+  BitFrost packet-cache key families. There is no live Postgres-mutation-triggered writer for any
+  of them. That gate closed as `NOT_APPLICABLE_CURRENT_RUNTIME` rather than staying open indefinitely
+  or being falsely marked complete — building a live writer was judged out of scope absent an
+  observed runtime requirement for one. **This checkbox stays open for the same underlying reason**:
+  production staleness is still bounded only by TTL (1h for `bifrost:sem:packet:*`, 7 days —
+  corrected from an earlier 1h claim — for `bitfrost:summary:packet:v1:*`), not by active
+  invalidation, and that remains true until a live writer is actually built. Do not re-implement
+  either the primitive or the adoption fix here — see that change's tasks.md for the full ownership
+  matrix, the producer census, and the producer-convergence audit (which also found and archived
+  one confirmed-dead script, `wire-bifrost-packet-mirror.mjs`, plus two narrower identity/schema
+  collisions inside the `bifrost:packet:*` and `bifrost:sem:packet:*` prefixes themselves — see
+  `docs/reports/parent-atlas-bitfrost-producer-convergence-v1.json`). Corrected findings (the "real callers"
+  claim above for implementation #3 turned out to be wrong — verified zero importers repo-wide; a
+  4th unreachable/wrong-keyed invalidator was found too), and live proof
+  (`docs/reports/parent-atlas-bitfrost-invalidation-owner-v1.json`).
 - [ ] MCP-OUTCOME-RECEIPT-OWNER-01 — select one durable AgentWorkReceipt owner, remove
   stale/default graph-version fallbacks, and require the workflow RECORD stage to succeed
   only after the receipt is durably acknowledged. Migration remains blocked until the
@@ -3673,6 +3734,32 @@ admission gates.
 
 Owner audit result: reuse the existing append-only `analysis_pass_results` lane for
 NLP/analysis receipts and bounded replay. Do not create a generic observation table.
+Read-only `ANALYSIS-PASS-CURRENT-SELECTION` proof at
+`scripts/atlas/prove-analysis-pass-current-selection-v1.mjs` confirms the existing
+`analysis_pass_current` view is present and returns five rows, but the newest selected row
+has null `source_revision` and `pass_revision`. Selection therefore remains
+`BLOCKED_INCOMPLETE_SELECTION_METADATA`; recency alone cannot promote a pass into ACE/DAG
+context. The next fix is metadata enrichment at the existing pass writer/selector boundary,
+not another table.
+The follow-up read-only audit `scripts/atlas/audit-analysis-pass-metadata-gaps-v1.mjs` found
+11,076 of 11,095 history rows missing both `source_revision` and `pass_revision`, and 11,093
+missing `provenance.workspaceRevision`. This is predominantly legacy/incomplete history;
+historical rows must not be rewritten or promoted. New eligible passes need these fields at
+write time, while the selector remains fail-closed for incomplete rows.
+The existing worker enrichment boundary was corrected additively: returned executor metadata
+now takes precedence over the original job payload for `packetKey`, `sourceRef`,
+`sourceRevision`, `workspaceRevision`, and `representationRevision`; missing values still
+remain null. The live selector remains blocked because no new eligible receipt was created by
+this change, and no historical rows were rewritten.
+Fixture proof `scripts/atlas/prove-analysis-pass-metadata-propagation-v1.mjs` passes executor
+metadata precedence and nullable-incomplete behavior without database/model calls. Live
+promotion remains open until a deliberately bounded new job produces and independently reads
+back complete source/workspace/pass revisions.
+DOC-13 composition proof now confirms the compatible handoff: existing indexed
+`symbol_version_id`/`stable_symbol_id` references + `analysis_pass_results` + bounded
+`ParameterArtifactV1` checksums + Ornith `:8090` request metadata. This remains a read-only
+owner-wiring proof; current-pass selection, ContextManifest admission, and live synthesis
+receipt validation are still required before runtime promotion.
 The repository contract audit also found two incompatible manual proposals for
 `atlas_observation_feature_rows`: the active ORF `packet_key + feature_revision`
 filter schema matches Drizzle, materializer, repository, and spectral exporter;

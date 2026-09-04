@@ -7,12 +7,18 @@
  * the hot semantic routing state to Valkey under the bifrost:sem:* key layout.
  *
  * Key layout:
- *   bifrost:sem:packet:{query_hash}        → JSON packet value  TTL 3600s
+ *   bifrost:sem:query:{query_hash}         → JSON packet value  TTL 3600s
  *   bifrost:sem:feature:{feature_id}       → JSON[] array       TTL 3600s
  *   bifrost:sem:sourceRef:{sha256(ref)}    → query_hash         TTL 7200s
  *   bifrost:sem:intent:{intent_hash}       → query_hash         TTL 3600s
  *   bifrost:sem:reward:zset                → ZADD reward score
  *   bifrost:sem:stale:zset                 → ZADD mtime epoch
+ *
+ * FIXED 2026-09-04 (BIFROST-KEY-SEMANTICS-OWNER-01 Stage 2): this script previously wrote
+ * query-hash-keyed entries under `bifrost:sem:packet:{query_hash}` — the SAME prefix
+ * atlas-reward-cache.ts uses for a totally different identity (canonical packetKey). Moved to
+ * the dedicated, previously-reserved-but-unused `bifrost:sem:query:*` prefix. See
+ * docs/reports/parent-atlas-bitfrost-key-semantics-owner-v1.json for the full conflict writeup.
  *
  * Usage:
  *   node scripts/cache/warm-bifrost-semantic-cache.mjs [--dry-run] [--limit N]
@@ -125,7 +131,7 @@ async function main() {
 
     if (DRY_RUN) {
       if (processed <= 3) {
-        console.log(`  [dry] bifrost:sem:packet:${c.query_hash} → reward=${reward.toFixed(4)}`);
+        console.log(`  [dry] bifrost:sem:query:${c.query_hash} → reward=${reward.toFixed(4)}`);
       }
       written++;
       continue;
@@ -133,8 +139,8 @@ async function main() {
 
     const pipeline = redis.pipeline();
 
-    // 1. packet key
-    pipeline.setex(`bifrost:sem:packet:${c.query_hash}`, TTL_PACKET, packetJson);
+    // 1. query-result key (was mistakenly bifrost:sem:packet:*, see file header note)
+    pipeline.setex(`bifrost:sem:query:${c.query_hash}`, TTL_PACKET, packetJson);
 
     // 2. sourceRef index
     for (const ref of (Array.isArray(c.source_refs) ? c.source_refs : [])) {

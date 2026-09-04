@@ -1,0 +1,116 @@
+{
+  "gate": "BITFROST-LIVE-INVALIDATION-ADOPTION-01 (Step 1: producer census)",
+  "status": "STAGE_1_CENSUS_COMPLETE_READ_ONLY",
+  "executedAt": "2026-09-04T23:10:00Z",
+  "mode": "READ_ONLY",
+  "writesPerformed": false,
+  "mutationsPerformed": false,
+  "scopeSearched": ["scripts/", "sveltekit-frontend/src/", "python/", "packages/", "docker/", ".vscode/tasks.json", "package.json (both root and sveltekit-frontend)"],
+  "headlineAnswer": {
+    "question": "What actually writes bifrost:sem:packet:{packetKey} and bitfrost:summary:packet:v1:{packetKey} in production?",
+    "answer": "Found both writers. NEITHER is a live production trigger -- both are manual, hand-invoked npm scripts with no scheduler, cron, or Docker-startup wiring found anywhere in the repo.",
+    "bifrost_sem_packet_writer": "scripts/atlas/warm-bitfrost-semantic-cache.mjs:349 (`bifrost:sem:packet:${packetKey}`, TTL 86400). Reads packet rows via `docker exec` into Postgres (legal-ai-postgres), writes to Valkey. Invoked only via `npm run atlas:bitfrost-semantic-cache:warm` / `:apply` (sveltekit-frontend/package.json:323-324). No scheduler/cron/task.json wiring found.",
+    "bitfrost_summary_packet_v1_writer": "scripts/atlas/summary-index-ranker.mjs:383-387 (`bitfrost:summary:packet:v1:${packet_key}`, TTL 604800 = 7 days). Invoked only via `npm run atlas:summary:index:rank` / `:apply` (sveltekit-frontend/package.json:345-346). No scheduler/cron/task.json wiring found."
+  },
+  "keyFamilies": [
+    {
+      "family": "bifrost:sem:packet:{packetKey}",
+      "suffixIdentity": "canonical packetKey (confirmed by direct read of both writer and app-code reader)",
+      "writers": ["scripts/atlas/warm-bitfrost-semantic-cache.mjs:349 (manual npm script)"],
+      "readers": ["sveltekit-frontend/src/lib/server/cache/atlas-reward-cache.ts::getPacketCache (zero external callers found in prior session's audit)"],
+      "invocation": "MANUAL_NPM_SCRIPT",
+      "invocationEvidence": "sveltekit-frontend/package.json:323-324 (`atlas:bitfrost-semantic-cache:warm[:apply]`); no cron/.vscode task/Docker entrypoint reference found",
+      "runtimeVsBackfill": "BACKFILL (one-shot warm from Postgres, --apply flag required to actually write)",
+      "canonicalDependency": "atlas_packets table (read via docker exec into legal-ai-postgres)",
+      "ttlSeconds": 86400,
+      "activeInvalidationDependency": "invalidateBitfrostPacket() (this session's canonical primitive) CAN target this key correctly by packetKey, but nothing calls it on a Postgres packet mutation -- purely TTL-bound today"
+    },
+    {
+      "family": "bitfrost:summary:packet:v1:{packetKey}",
+      "suffixIdentity": "packet_key / summary_packet_key / fingerprint (row-dependent fallback chain, confirmed at summary-index-ranker.mjs:385)",
+      "writers": ["scripts/atlas/summary-index-ranker.mjs:383-387 (manual npm script)"],
+      "readers": "not located in sveltekit-frontend/src this pass",
+      "invocation": "MANUAL_NPM_SCRIPT",
+      "invocationEvidence": "sveltekit-frontend/package.json:345-346 (`atlas:summary:index:rank[:apply]`); no cron/.vscode task/Docker entrypoint reference found",
+      "runtimeVsBackfill": "BACKFILL",
+      "canonicalDependency": "not confirmed this pass -- summary-index-ranker.mjs's row source not read in full",
+      "ttlSeconds": 604800,
+      "activeInvalidationDependency": "invalidateBitfrostPacket() covers this via bifrostKey.semantic.packetSummary() -- same as above, nothing triggers it on mutation"
+    },
+    {
+      "family": "bifrost:sem:query:{query_hash}",
+      "suffixIdentity": "query_hash (sha256 of a query string)",
+      "writers": ["scripts/cache/warm-bifrost-semantic-cache.mjs (migrated onto this prefix this session)"],
+      "readers": ["sveltekit-frontend/src/lib/server/ace/query-router.ts (migrated this session)"],
+      "invocation": "MANUAL_NPM_SCRIPT (reads memory/packets/semantic-cache-candidates.jsonl, produced by scripts/packets/semantic-cache-candidates.sql via DuckDB -- an offline pipeline, not a live trigger)",
+      "runtimeVsBackfill": "BACKFILL",
+      "canonicalDependency": "indirect, via the DuckDB-generated candidates file, not a direct live Postgres read",
+      "ttlSeconds": 3600,
+      "activeInvalidationDependency": "none -- pure TTL expiry, by design (query-result cache, not packet-identity cache)"
+    },
+    {
+      "family": "bifrost:sem:feature:{feature_id}",
+      "suffixIdentity": "feature_id",
+      "writers": ["sveltekit-frontend/src/lib/server/cache/atlas-reward-cache.ts::setFeatureCache", "scripts/atlas/warm-bitfrost-semantic-cache.mjs (plans featureKeys per its own summary counters)"],
+      "readers": ["atlas-reward-cache.ts::getFeatureCache"],
+      "invocation": "app-code path has zero external callers (per prior session's audit); script path is MANUAL_NPM_SCRIPT (same warm-bitfrost-semantic-cache.mjs as above)",
+      "runtimeVsBackfill": "BACKFILL (via the script); app-code writer path unreached",
+      "ttlSeconds": 14400,
+      "activeInvalidationDependency": "invalidateBitfrostPacket() covers this by featureId when passed one"
+    },
+    {
+      "family": "bifrost:sem:intent:{intent_hash}",
+      "suffixIdentity": "sha256 of normalized query text -> resolves to a query_hash (indirection layer)",
+      "writers": ["scripts/cache/warm-bifrost-semantic-cache.mjs"],
+      "readers": ["query-router.ts"],
+      "invocation": "MANUAL_NPM_SCRIPT (same pipeline as bifrost:sem:query above)",
+      "runtimeVsBackfill": "BACKFILL",
+      "ttlSeconds": 3600,
+      "activeInvalidationDependency": "none -- TTL expiry"
+    },
+    {
+      "family": "bifrost:sem:sourceRef:{sha256(ref)}",
+      "suffixIdentity": "sourceRef hash -> resolves to query_hash",
+      "writers": ["scripts/cache/warm-bifrost-semantic-cache.mjs"],
+      "readers": "not located this pass (flagged in Stage 1 too, still unresolved)",
+      "invocation": "MANUAL_NPM_SCRIPT",
+      "runtimeVsBackfill": "BACKFILL",
+      "ttlSeconds": 7200,
+      "activeInvalidationDependency": "none found"
+    },
+    {
+      "family": "bifrost:kag:{cacheKey}",
+      "suffixIdentity": "an arbitrary KAG-lane cache key (not a packet or query identity in the same sense)",
+      "writers": ["packages/parent-atlas-retrieval/src/bifrost/bifrost-cache-manager.ts:191"],
+      "readers": ["same file, :172"],
+      "invocation": "not determined this pass -- this package's own live-caller chain was not traced (out of the critical-path scope of this census, flagged for a future pass)",
+      "note": "NEWLY FOUND this pass, not previously inventoried. A third `bifrost-cache-manager.ts` exists (sveltekit-frontend has its own v2 retrieval-cache manager at src/lib/server/ai/bifrost-cache-manager.ts, distinct from this packages/ one) -- do not conflate the two when doing the fuller sweep this census flags as still open.",
+      "activeInvalidationDependency": "not determined"
+    },
+    {
+      "family": "atlas:lru:{query,packet,tools,kag}:*, ace:packet:*, atlas:graph_version, atlas:cache_epoch",
+      "suffixIdentity": "various (query text hash, packet key, tool name, KAG key) -- a broader epoch-invalidation sweep, not packet-specific",
+      "writers": ["scripts/atlas/invalidate-atlas-cache-epoch.mjs (deletes/increments on manual --apply run)"],
+      "readers": "not this census's scope",
+      "invocation": "MANUAL_NPM_SCRIPT with --dry-run/--apply flags. Confirmed NOT scheduled: zero references to this script's filename found anywhere in .vscode/tasks.json.",
+      "runtimeVsBackfill": "MANUAL_OPERATIONAL (global epoch bump, meant to be run by an operator after a graph-truth promotion, per its own header comment)",
+      "activeInvalidationDependency": "N/A -- this IS an invalidator, not a cache needing invalidation. Notably: it already SCAN-deletes `bifrost:sem:query:*` alongside `bifrost:sem:packet:*`, which is what led to this session's Stage 2 finding that `bifrost:sem:query:*` was the intended-but-unused prefix for query-hash identity."
+    }
+  ],
+  "dockerAndScheduling": {
+    "dockerStartupWritersFound": "none -- docker/bifrost/Dockerfile is the unrelated Go Bifrost microservice (port 3040, semantic-similarity LLM completion cache), a genuinely different system from the Redis bifrost:sem:*/bitfrost:summary:* packet-cache namespace investigated here. Do not conflate the two -- this repo's own CLAUDE.md already documents them as distinct.",
+    "vscodeTasksJsonFindings": "4 generic 'Bifrost' matches in .vscode/tasks.json, all referring to the same Go :3040 service (health checks, cache-stat dashboards) -- none reference any of the manual npm scripts (warm-bitfrost-semantic-cache, summary-index-ranker, invalidate-atlas-cache-epoch) found above.",
+    "cronOrSchedulerFindings": "none found for any BitFrost packet-cache warmer/invalidator script in this pass."
+  },
+  "pythonAndPackagesFindings": {
+    "python/": "zero matches for `bifrost:`/`bitfrost:` anywhere under python/ -- confirms this session's earlier suspicion (that the real writer might be a Python service) was wrong. It's TypeScript/Node scripts, just not live-triggered ones.",
+    "packages/": "11 files matched; only packages/parent-atlas-retrieval/src/bifrost/bifrost-cache-manager.ts writes real keys (bifrost:kag:*, a new/different namespace, see keyFamilies above). The rest are type definitions, docs, or test specs referencing 'bifrost' in prose/types, not real key writers."
+  },
+  "conclusion": "The 1-hour-TTL staleness bound stated in BITFROST-INVALIDATION-OWNER-01 is confirmed correct for bifrost:sem:packet:*, but bitfrost:summary:packet:v1:* actually has a 7-DAY TTL (604800s), not 1 hour -- this is a materially longer staleness window than previously stated and should be corrected in that gate's record. Both real writers are backfill scripts an operator runs by hand; there is no live Postgres-mutation-triggered write path for either key family anywhere in this repo. BITFROST-LIVE-INVALIDATION-ADOPTION-01's next step (wiring invalidateBitfrostPacket() to a real mutation owner) cannot proceed until a decision is made: either (a) a live app-code write path is built (which doesn't exist today for either key family), or (b) these manual backfill scripts remain the only writers, in which case 'live invalidation' isn't the right framing at all -- what's needed is calling invalidateBitfrostPacket() at the END of each backfill script's own run (self-invalidation of stale pre-backfill entries), not a Postgres-mutation trigger.",
+  "notDoneFlagged": [
+    "Did not trace packages/parent-atlas-retrieval/src/bifrost/bifrost-cache-manager.ts's live-caller chain (bifrost:kag:* namespace) -- newly found, not previously known, needs its own follow-up.",
+    "Did not confirm summary-index-ranker.mjs's Postgres row source (which table/query feeds it).",
+    "Did not find bifrost:sem:sourceRef:* readers.",
+    "Did not exhaustively check every one of the 128 scripts/ files matching a bare 'bifrost:'/'bitfrost:' substring -- narrowed to the 14 matching the exact key-shape strings under investigation, plus targeted checks on scheduling. A handful of the 128 (e.g. bitfrost-warm-startup.mjs, bitfrost-seed-cache-generator.mjs, wire-bifrost-packet-mirror.mjs, publish-bifrost-invalidation.mjs) have suggestive names and were NOT individually opened -- flagged for a follow-up pass, not assumed clean."
+  ]
+}

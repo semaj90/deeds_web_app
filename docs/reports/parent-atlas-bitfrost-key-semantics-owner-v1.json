@@ -1,0 +1,90 @@
+{
+  "gate": "BIFROST-KEY-SEMANTICS-OWNER-01",
+  "status": "STAGE_1_INVENTORY_COMPLETE_READ_ONLY",
+  "executedAt": "2026-09-04T22:15:00Z",
+  "mode": "READ_ONLY",
+  "mutationsPerformed": false,
+  "supersedesNoOwnership": "cache-keys.ts (bifrostKey) remains the single key-builder library. This audit found a semantics conflict inside an existing namespace it already builds, not a reason to build a second key library.",
+  "context": "Raised by external review 2026-09-04, same day as BITFROST-INVALIDATION-OWNER-01 shipped. That gate's canonical invalidateBitfrostPacket() is not reversed by this finding -- it correctly deletes bifrost:sem:packet:{packetKey} for the reward-cache identity. This audit found that invalidation is INCOMPLETE, not wrong: a second, incompatible identity sharing the same key prefix is untouched by it.",
+  "confirmedConflict": {
+    "namespace": "bifrost:sem:packet:{X}",
+    "builder": "bifrostKey.semantic.packet() in sveltekit-frontend/src/lib/server/cache-keys.ts",
+    "identityA": {
+      "suffix": "packetKey (canonical atlas_packets identity)",
+      "writers": ["sveltekit-frontend/src/lib/server/cache/atlas-reward-cache.ts::setPacketCache/setPacketCacheBatch"],
+      "readers": ["sveltekit-frontend/src/lib/server/cache/atlas-reward-cache.ts::getPacketCache"],
+      "invalidators": ["invalidateBitfrostPacket() (BITFROST-INVALIDATION-OWNER-01)"],
+      "value": "PacketCacheEntry (packetKey, featureId, summary, conceptIds, communityId, rewardScore)",
+      "liveCallersFound": "zero external callers of setPacketCache/getPacketCache in sveltekit-frontend/src as of BITFROST-INVALIDATION-OWNER-01's audit -- not re-verified in this pass",
+      "confirmedBy": "code read, sveltekit-frontend/src/lib/server/cache/atlas-reward-cache.ts:29-31"
+    },
+    "identityB": {
+      "suffix": "query_hash (sha256 of a query string, unrelated to any single packet)",
+      "writers": [
+        "scripts/cache/warm-bifrost-semantic-cache.mjs (pipeline.setex(`bifrost:sem:packet:${c.query_hash}`, ...))",
+        "scripts/atlas/warm-bitfrost-semantic-cache.mjs also writes `bifrost:sem:packet:${packetKey}` at line 349 -- this second script uses identity A's shape, not B's; the conflict is specifically between atlas-reward-cache.ts + warm-bitfrost-semantic-cache.mjs (packetKey) vs warm-bifrost-semantic-cache.mjs (query_hash), i.e. between the two similarly-named warm scripts, not just app-code vs script."
+      ],
+      "readers": ["sveltekit-frontend/src/lib/server/ace/query-router.ts:279,287 (bifrostKey.semantic.packet(queryHash) / bifrostKey.semantic.packet(intentQh))"],
+      "invalidators": "none found",
+      "value": "a JSON blob keyed by query_hash containing source_refs[]/feature_id/token_hints/answer_hint/state -- a query-level result cache, per query-router.ts's own comment: 'Checks warm-bifrost-semantic-cache keys written by npm run bifrost:semantic:warm'",
+      "confirmedBy": [
+        "sveltekit-frontend/src/lib/server/ace/query-router.ts:271-289 (comment literally says 'Key: bifrost:sem:packet:{query_hash}')",
+        "scripts/cache/warm-bifrost-semantic-cache.mjs:10,137 (doc comment + real setex call using c.query_hash)"
+      ]
+    },
+    "consequence": "invalidateBitfrostPacket(redis, {packetKey}) correctly deletes identity A's entry for that packetKey. It has no way to find or delete any identity B (query-hash-keyed) cache entries that reference that packet in their source_refs, because there is no packetKey -> queryHash inverse index. A packet mutation can therefore leave a stale query-level cache hit that still points to pre-mutation source_refs/feature_id, even after BITFROST-INVALIDATION-OWNER-01's fix runs.",
+    "invalidationOwnerFixStillCorrect": true,
+    "invalidationOwnerFixScope": "Proven and scoped exactly to identity A (packet-keyed reward cache + packet summary + feature cache). Never claimed to cover identity B. Not reversed by this finding."
+  },
+  "otherNamespacesInventoried": {
+    "bifrost:sem:feature:{feature_id}": {
+      "identity": "feature_id, single consistent meaning across all callers found",
+      "writers": ["atlas-reward-cache.ts::setFeatureCache"],
+      "readers": ["atlas-reward-cache.ts::getFeatureCache", "query-router.ts (not directly confirmed reading this key in this pass)"],
+      "conflictFound": false
+    },
+    "bifrost:sem:intent:{intent_hash}": {
+      "identity": "sha256 of normalized query text -> resolves to a query_hash (an indirection layer, not a packet or feature identity)",
+      "writers": ["scripts/cache/warm-bifrost-semantic-cache.mjs"],
+      "readers": ["query-router.ts:285"],
+      "conflictFound": false,
+      "note": "Consistently query-hash-indirection on both sides checked."
+    },
+    "bifrost:sem:sourceRef:{sha256(ref)}": {
+      "identity": "sourceRef hash -> resolves to query_hash",
+      "writers": ["scripts/cache/warm-bifrost-semantic-cache.mjs"],
+      "readers": "not checked this pass",
+      "conflictFound": "not determined -- flagged, not verified"
+    },
+    "bitfrost:summary:packet:v1:{packet_key}": {
+      "identity": "packetKey, single consistent meaning found",
+      "writers": "not located in sveltekit-frontend/src as of BITFROST-INVALIDATION-OWNER-01 (flagged there too)",
+      "readers": "not located this pass",
+      "invalidators": ["invalidateBitfrostPacket() via bifrostKey.semantic.packetSummary()"],
+      "conflictFound": false,
+      "note": "The user-cited 'thousands of live bitfrost:summary:packet:v1 entries' claim was not independently re-verified with a live EXISTS/SCAN count in this pass -- treat as reported, not re-confirmed here."
+    },
+    "bitfrost:retrieval:{queryHash} (legacy, unversioned)": {
+      "identity": "queryHash, no revision qualification",
+      "writers": ["query-router.ts:225,608", "context-assembler.ts:1692"],
+      "conflictFound": false,
+      "note": "Legacy retrieval cache lane, distinct from the revision-qualified v2 lane below."
+    },
+    "bitfrost:retrieval:v2:{sha256(canonical)} (revision-qualified)": {
+      "identity": "sha256 of a canonicalized request that presumably includes revision -- exact revision-qualification fields not verified line-by-line in this pass",
+      "writers": ["src/lib/server/ai/bifrost-cache-manager.ts:64"],
+      "conflictFound": false,
+      "note": "This is the 'revision-qualified retrieval cache' the reviewer correctly identified as architecturally preferable to an inverse-dependency-index approach for query-result invalidation. Worth building on for identity B's eventual fix, per the reviewer's own reasoning: a revision-qualified query cache key naturally becomes unreachable after a revision bump, without needing broad SCAN or an inverse index."
+    }
+  },
+  "classificationOfInvalidateRedisCacheImplementations": {
+    "note": "Re-scoped per this gate's request to classify beyond the 4 already found by BITFROST-INVALIDATION-OWNER-01 (PRODUCTION_OWNER / PRODUCTION_DELEGATE / BOUNDED_SCRIPT / LEGACY_SCRIPT / DEAD / TEST / VALIDATION). Not exhaustively re-swept in this pass due to context budget -- the 4 already classified in BITFROST-INVALIDATION-OWNER-01's receipt stand (all now PRODUCTION_DELEGATE, delegating to the one PRODUCTION_OWNER, invalidateBitfrostPacket). A broader sweep for older/script-level invalidateRedisCache-shaped functions (summarizers, phase scripts, packet-truth scripts) was not performed this pass -- flagged as remaining Stage 1 work, not done.",
+    "notDoneFlagged": true
+  },
+  "recommendationForStage2": "Do NOT rename bifrost:sem:packet:* yet, per explicit instruction. Two real options once ready: (a) migrate identity B (query-result cache) off the bifrost:sem:packet:* prefix entirely onto its own bifrost:sem:query:{query_hash} namespace (a prefix already reserved and unused per invalidate-atlas-cache-epoch.mjs's own pattern list, which already deletes bifrost:sem:query:* alongside bifrost:sem:packet:* -- suggesting bifrost:sem:query:* was the originally INTENDED name for identity B and warm-bifrost-semantic-cache.mjs simply wrote to the wrong prefix), or (b) make identity B revision-qualified like bitfrost:retrieval:v2 so stale entries become naturally unreachable. Recommend (a): it directly fixes the namespace collision at its root, and invalidate-atlas-cache-epoch.mjs's existing bifrost:sem:query:* pattern implies this was always the intended shape.",
+  "postgresWrites": false,
+  "valkeyWrites": false,
+  "qdrantWrites": false,
+  "neo4jWrites": false,
+  "modelCalls": false
+}

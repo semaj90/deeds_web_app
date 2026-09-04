@@ -1,10 +1,18 @@
 /**
  * Redis Cache Invalidation Service
- * Invalidates BitFrost L1/L2 cache after Postgres writes
- * Manages 4 key patterns per packet: packet, trace, source_ref, feature
+ * Invalidates BitFrost L1/L2 cache after Postgres writes.
+ *
+ * 2026-09-04 (BITFROST-INVALIDATION-OWNER-01): this module's own key patterns
+ * (bifrost:packet:*, bifrost:trace:*, bifrost:source:*, bifrost:feature:*)
+ * were confirmed live-absent from Redis -- a `--scan` sweep across all 4
+ * returned zero matches repo-wide. Delegates to the canonical
+ * invalidateBitfrostPacket() (src/lib/server/cache/atlas-reward-cache.ts)
+ * instead of maintaining its own second copy of the key logic. See
+ * docs/reports/parent-atlas-bitfrost-invalidation-owner-v1.json.
  */
 
 import type Redis from 'ioredis';
+import { invalidateBitfrostPacket } from '$lib/server/cache/atlas-reward-cache.js';
 
 export interface CacheInvalidationResult {
   invalidated: number;
@@ -15,12 +23,10 @@ export interface CacheInvalidationResult {
 }
 
 /**
- * Invalidate Redis cache after canonical packet updates
- * Covers 4 key patterns:
- *   - bifrost:packet:{packet_key}
- *   - bifrost:trace:{packet_key}
- *   - bifrost:source:{source_ref}
- *   - bifrost:feature:{feature_id}
+ * Invalidate BitFrost cache after canonical packet updates. Delegates per-packet
+ * to invalidateBitfrostPacket() (semantic packet + summary + feature keys) and
+ * aggregates the results into this function's existing return shape so its
+ * (currently unreached) caller does not need to change.
  *
  * @param redis — ioredis client
  * @param packets — Packet data with keys to invalidate
@@ -40,64 +46,23 @@ export async function invalidateRedisCache(
   let keyCount = 0;
   const errors: string[] = [];
 
-  try {
-    // Collect all keys to delete
-    const keysToDelete: string[] = [];
-
-    for (const packet of packets) {
-      // Pattern 1: packet cache
-      const packetKey = `bifrost:packet:${packet.packet_key}`;
-      keysToDelete.push(packetKey);
-      patterns.push(packetKey);
-
-      // Pattern 2: trace cache
-      const traceKey = `bifrost:trace:${packet.packet_key}`;
-      keysToDelete.push(traceKey);
-      patterns.push(traceKey);
-
-      // Pattern 3: source_ref cache
-      const sourceKey = `bifrost:source:${packet.source_ref}`;
-      keysToDelete.push(sourceKey);
-      patterns.push(sourceKey);
-
-      // Pattern 4: feature cache
-      const featureKey = `bifrost:feature:${packet.feature_id}`;
-      keysToDelete.push(featureKey);
-      patterns.push(featureKey);
+  for (const packet of packets) {
+    const result = await invalidateBitfrostPacket(redis, {
+      packetKey: packet.packet_key,
+      featureId: packet.feature_id,
+    });
+    patterns.push(...result.deletedKeys);
+    keyCount += result.keysAttempted;
+    invalidated += result.keysDeleted;
+    if (!result.ok && result.error) {
+      errors.push(`Key deletion error for ${packet.packet_key}: ${result.error}`);
     }
+  }
 
-    // Deduplicate keys
-    const uniqueKeys = [...new Set(keysToDelete)];
-    keyCount = uniqueKeys.length;
-
-    // Batch delete via Redis pipeline
-    if (uniqueKeys.length > 0) {
-      const pipeline = redis.pipeline();
-
-      for (const key of uniqueKeys) {
-        pipeline.del(key);
-      }
-
-      const results = await pipeline.exec();
-
-      // Count successful deletions
-      if (results) {
-        invalidated = results.reduce((sum, [err, val]) => {
-          if (err) {
-            errors.push(`Key deletion error: ${String(err)}`);
-          }
-          return sum + (typeof val === 'number' ? val : 0);
-        }, 0);
-      }
-
-      console.log(
-        `[redis-cache-invalidate] Invalidated ${invalidated} keys from ${uniqueKeys.length} unique patterns`
-      );
-    }
-  } catch (err) {
-    const errMsg = `Redis invalidation failed: ${String(err)}`;
-    errors.push(errMsg);
-    console.error(`[redis-cache-invalidate] ${errMsg}`);
+  if (patterns.length > 0) {
+    console.log(
+      `[redis-cache-invalidate] Invalidated ${invalidated} keys across ${packets.length} packets`
+    );
   }
 
   const durationMs = Date.now() - startMs;
@@ -118,6 +83,13 @@ export async function invalidateRedisCache(
  * @param packets — Packet data to cache
  * @param ttlSeconds — Cache TTL (default: 3600s = 1 hour)
  * @returns Warming result with cache counts
+ *
+ * NOTE (2026-09-04, BITFROST-INVALIDATION-OWNER-01 audit): this function still
+ * writes the same non-live `bifrost:packet:*` shape as the pre-fix
+ * invalidateRedisCache() above. Left as-is -- this gate's scope is invalidation
+ * correctness, not warming, and this function's own caller chain is unreached
+ * (see the owner-audit report). Flagged, not fixed, per this repo's "record
+ * what you found even when you don't fix it" rule.
  */
 export async function warmRedisCache(
   redis: Redis,

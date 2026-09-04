@@ -131,6 +131,83 @@ export async function setFeatureCache(
   }
 }
 
+// ── Canonical packet invalidation (BITFROST-INVALIDATION-OWNER-01, 2026-09-04) ────
+//
+// Co-located with setPacketCache()/setFeatureCache() above deliberately -- this is
+// the single canonical invalidation primitive for BitFrost packet-level semantic
+// cache, matched to the exact writers in this same file so the two cannot drift
+// apart again. Consumes canonical identity (packetKey/featureId), never a
+// hand-built Redis string literal -- callers must not construct bifrost:* keys
+// themselves. Ownership audit + the 3 pre-existing duplicate/broken
+// invalidateRedisCache implementations this supersedes are recorded in
+// docs/reports/parent-atlas-bitfrost-invalidation-owner-v1.json.
+
+export interface BitfrostInvalidationResult {
+  packetKey: string;
+  featureId: string | null;
+  sourceRevision: string | null;
+  deletedKeys: string[];
+  keysAttempted: number;
+  keysDeleted: number;
+  ok: boolean;
+  error: string | null;
+  durationMs: number;
+}
+
+/**
+ * Delete exactly the real, live BitFrost semantic-cache keys for one packet
+ * (and optionally its feature-level cache), using only the shared key
+ * constructors from cache-keys.ts. Never SCANs or flushes a namespace --
+ * every key deleted is an exact, individually-addressed DEL.
+ *
+ * Fail-open: a Redis error here is reported in the result (ok:false, error
+ * set) but never thrown -- canonical Postgres truth must never be rolled
+ * back because a *derived cache* invalidation failed. Callers that need to
+ * know invalidation didn't happen should check `ok`/`error`, not rely on an
+ * exception.
+ */
+export async function invalidateBitfrostPacket(
+  redis: Redis,
+  identity: { packetKey: string; featureId?: string | null; sourceRevision?: string | null },
+): Promise<BitfrostInvalidationResult> {
+  const startMs = Date.now();
+  const packetKey = identity.packetKey;
+  const featureId = identity.featureId ?? null;
+  const sourceRevision = identity.sourceRevision ?? null;
+
+  const keysToDelete = [
+    bifrostKey.semantic.packet(packetKey),
+    bifrostKey.semantic.packetSummary(packetKey),
+  ];
+  if (featureId) {
+    keysToDelete.push(bifrostKey.semantic.feature(featureId));
+  }
+
+  const result: BitfrostInvalidationResult = {
+    packetKey,
+    featureId,
+    sourceRevision,
+    deletedKeys: [],
+    keysAttempted: keysToDelete.length,
+    keysDeleted: 0,
+    ok: true,
+    error: null,
+    durationMs: 0,
+  };
+
+  try {
+    const deletedCount = await redis.del(...keysToDelete);
+    result.keysDeleted = deletedCount;
+    result.deletedKeys = keysToDelete;
+  } catch (err) {
+    result.ok = false;
+    result.error = err instanceof Error ? err.message : String(err);
+  }
+
+  result.durationMs = Date.now() - startMs;
+  return result;
+}
+
 // ── Reward sorted sets ────────────────────────────────────────────────────────
 
 /**
