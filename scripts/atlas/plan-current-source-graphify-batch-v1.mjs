@@ -109,6 +109,7 @@ const ambiguous = resultRows.filter((row) => row.classification === 'AMBIGUOUS_G
 const mismatched = resultRows.filter((row) => row.classification === 'GRAPHIFY_REVISION_OR_CONTENT_MISMATCH');
 const status = databaseError ? 'CURRENT_GRAPHIFY_BATCH_PLAN_DATABASE_ERROR'
   : missingWorkspaceBindings.length ? 'CURRENT_GRAPHIFY_BATCH_PLAN_BLOCKED_MISSING_OBSERVATION'
+    : missing.length || mismatched.length || ambiguous.length ? 'CURRENT_GRAPHIFY_BATCH_PLAN_BLOCKED_REVIEW'
     : 'CURRENT_GRAPHIFY_BATCH_PLAN_READY';
 const report = {
   schema: 'atlas.current-source-graphify-batch-plan.v1',

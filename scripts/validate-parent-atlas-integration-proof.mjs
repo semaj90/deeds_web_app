@@ -657,13 +657,20 @@ async function gateGraphifyLock() {
   const lockFileMentioned = /graphify-daily-start\.lock|graphify-pipeline-lock/.test(wrapperText);
   const releaseHookMentioned = /process\.on\(['"]exit['"]/.test(wrapperText) && /releaseStartupLock/.test(wrapperText);
   const contentionBackoffMentioned = /process\.exit\(75\)|backing off/.test(wrapperText);
-  const taskBlockMatch = taskText.match(/"label"\s*:\s*"🗺️ Startup: Auto-Map Codebase \(graphify:daily\)"[\s\S]*?(?=\n\s*"\w+"\s*:\s*"[^"]+"|\n\s*},)/);
-  const folderOpenTaskPresent = taskBlockMatch ? /"runOn"\s*:\s*"folderOpen"/.test(taskBlockMatch[0]) : false;
+  let taskConfig = null;
+  try {
+    taskConfig = JSON.parse(taskText);
+  } catch {
+    taskConfig = null;
+  }
+  const graphifyTask = Array.isArray(taskConfig?.tasks)
+    ? taskConfig.tasks.find((task) => task?.label === '🗺️ Startup: Auto-Map Codebase (graphify:daily)')
+    : null;
+  const folderOpenTaskPresent = graphifyTask?.runOptions?.runOn === 'folderOpen';
   const chainReferenced = /graphify:daily:chain/.test(chainText);
 
   const status = gateStatusFromEvidence(
-    lockFileMentioned && releaseHookMentioned && contentionBackoffMentioned && chainReferenced,
-    folderOpenTaskPresent,
+    lockFileMentioned && releaseHookMentioned && contentionBackoffMentioned && chainReferenced && folderOpenTaskPresent,
   );
 
   return makeResult('graphify_lock', status, [
@@ -679,10 +686,11 @@ async function gateGraphifyLock() {
       releaseHookMentioned,
       contentionBackoffMentioned,
       folderOpenTaskPresent,
+      taskConfigParsed: Boolean(taskConfig),
       chainReferenced,
     }),
   ], [
-    folderOpenTaskPresent ? 'graphify:daily still auto-runs on folder open' : 'graphify:daily startup is not auto-launched from the folder-open task',
+    folderOpenTaskPresent ? 'graphify:daily startup is configured on folder open with a single-instance lock' : 'graphify:daily startup is not configured on folder open',
   ]);
 }
 

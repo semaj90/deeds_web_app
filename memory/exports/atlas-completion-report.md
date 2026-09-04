@@ -1,6 +1,6 @@
 # Atlas Completion Report
 
-Generated: 2026-06-10T03:55:36.488Z
+Generated: 2026-09-04T04:04:08.443Z
 
 ## Overall: ✅ PASS
 
@@ -13,32 +13,32 @@ Generated: 2026-06-10T03:55:36.488Z
 | M1 Identity Spine (6 cross-system gates) | ✅ PASS |
 | M2 Replay Validation (302 task packets) | ✅ PASS |
 | M3 Lineage Validation (Atlas→CHR97→ACE) | ✅ PASS |
-| M4 Production Readiness (66 gates) | ⚠️ WARN |
+| M4 Production Readiness (67 gates) | ⚠️ WARN |
 
 ---
 
 ## M1: Identity Spine
 
-**6/6 gates PASS** — generated 2026-06-10T03:27:04.537Z
+**0/6 gates PASS** — generated 2026-06-10T15:12:17.942Z
 
 | Gate | Status | Coverage |
 |------|--------|----------|
-| qdrant_feature_id | ✅ | 98.3% |
-| qdrant_canonical_ref | ✅ | 99.3% |
-| qdrant_som | ✅ | 99.3% |
-| qdrant_karpathy | ✅ | 5.7% |
-| neo4j_canonical | ✅ | 55.9% |
-| valkey_warm | ✅ | 100.0% |
+| qdrant_feature_id | ❌ | undefined |
+| qdrant_canonical_ref | ❌ | undefined |
+| qdrant_som | ❌ | undefined |
+| qdrant_karpathy | ❌ | undefined |
+| neo4j_canonical | ❌ | undefined |
+| valkey_warm | ❌ | undefined |
 
 ---
 
 ## M2: Replay Validation
 
-**Replay rate: 100.0%** (302/302 packets) — generated 2026-06-10T03:42:06.742Z
+**Replay rate: 99.0%** (198/200 packets) — generated 2026-08-27T03:39:40.740Z
 
 | Check | Result |
 |-------|--------|
-| sourceRefHash | 100.0% ✅ mandatory |
+| sourceRefHash | 99.0% ✅ mandatory |
 | feature_id | 100.0% ✅ mandatory |
 | cluster_id | 0% — optional_reserved — 0% correct until GPU cluster bridge lands |
 | Qdrant | N/A — all 302 rows are task/feature refs, not file-level Qdrant docs |
@@ -47,7 +47,7 @@ Generated: 2026-06-10T03:55:36.488Z
 
 ## M3: Lineage Validation
 
-**7/7 checks PASS** — generated 2026-06-10T03:49:35.863Z
+**7/7 checks PASS** — generated 2026-06-10T13:55:26.759Z
 
 | Check | Status | Message |
 |-------|--------|---------|
@@ -63,7 +63,7 @@ Generated: 2026-06-10T03:55:36.488Z
 
 ## M4: Production Readiness
 
-**64 pass / 2 warn / 0 fail** (66 total) — generated 2026-06-10T03:14:27.121Z
+**61 pass / 6 warn / 0 fail** (67 total) — generated 2026-08-31T03:43:28.855Z
 
 Sections: summary-batch, gpu, native-json-parser, drizzle, offline, postgres, redis, qdrant, neo4j
 

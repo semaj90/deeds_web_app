@@ -1,0 +1,58 @@
+{
+  "schema": "atlas.ace-feature-source-owner-live-audit.v1",
+  "generatedAt": "2026-09-03T00:00:00.000Z",
+  "status": "CONTRACT_PRESENT_LIVE_OWNER_UNPROVEN",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "contracts": {
+    "resolver": "sveltekit-frontend/src/lib/server/atlas/retrieval/search-runtime-ace-resolver-v1.ts",
+    "featureBundleProvider": "sveltekit-frontend/src/lib/server/atlas/retrieval/search-runtime-feature-bundle-provider-v1.ts",
+    "productionSourceAdapter": "sveltekit-frontend/src/lib/server/atlas/retrieval/search-runtime-ace-production-source-adapter-v1.ts",
+    "manifestAdmission": "sveltekit-frontend/src/lib/server/atlas/context/ace-context-manifest-admission-v1.ts"
+  },
+  "ownerStatus": {
+    "SearchRuntimeCandidateOwner": "EXISTS",
+    "CandidateOrdinalMapV1Owner": "EXISTS_AS_INJECTED_CONTRACT",
+    "CandidateFeatureSnapshotV1Owner": "EXISTS_AS_INJECTED_CONTRACT",
+    "RevisionAuthorityEnvelopeV1Owner": "EXISTS_AS_INJECTED_CONTRACT",
+    "ConcreteProductionInjection": "MISSING",
+    "ACEStreamStrictCaller": "MISSING",
+    "LegacyAceStream": "STILL_ACTIVE"
+  },
+  "evidence": {
+    "productionAdapterCallers": 0,
+    "strictContextManifestV2Callers": 0,
+    "searchRuntimeProductionCallers": [
+      "sveltekit-frontend/src/lib/server/atlas/atlas-semantic-tools.ts::createAtlasSearchAdapter",
+      "sveltekit-frontend/src/lib/server/retrieval/semantic-search-workflow.ts::createAtlasSearchAdapter",
+      "sveltekit-frontend/src/lib/server/atlas/rlm/rlm-search-adapter.ts::createAtlasSearchAdapter"
+    ],
+    "strictAceAdapterCallers": [],
+    "featureBundleMaterializerCallers": [
+      "sveltekit-frontend/src/lib/server/atlas/context/ace-feature-snapshot-producer-v1.ts",
+      "sveltekit-frontend/src/lib/server/atlas/retrieval/search-runtime-feature-bundle-provider-v1.ts"
+    ],
+    "featureBundleProductionCallers": [],
+    "callerClassification": {
+      "SearchRuntimeAdapterCallers": "EXISTS_LEGACY_OR_QAS_ONLY",
+      "ProductionSourceAdapter": "CONTRACT_ONLY",
+      "StrictContextManifestV2Route": "MISSING"
+    },
+    "legacyAceStreamUsesQueryCache": true,
+    "syntheticFallbackAdmittedToStrictPath": false,
+    "unitContractProof": "present in resolver/adapter/provider specs",
+    "requiredInputOwner": "A concrete caller must inject canonical SearchRuntime candidates, ordinal map, feature rows, and revisions."
+  },
+  "requiredNextProof": [
+    "Bind one real SearchRuntime result to the production source adapter",
+    "Prove candidate/ordinal/feature population parity",
+    "Prove workspace/source/representation/graph revision authority",
+    "Call strict ContextManifestV2 admission from one bounded ACE route",
+    "Prove cache MISS/HIT and revision-change MISS"
+  ],
+  "safeDisposition": "Do not migrate /api/ace/stream or warm BitFrost until a concrete source owner is injected and independently read-only proven.",
+  "safeNextGate": "ACE-FEATURE-SOURCE-OWNER-01",
+  "safeNextCommand": "rg -n --no-heading \"createSearchRuntimeAceProductionSourceAdapterV1|searchWithAceManifest|buildSearchRuntimeFeatureBundleV1\" sveltekit-frontend/src",
+  "smokeCommand": "npm exec vitest run src/lib/server/atlas/retrieval/search-runtime-ace-resolver-v1.spec.ts src/lib/server/atlas/retrieval/search-runtime-ace-production-source-adapter-v1.spec.ts",
+  "reportPath": "docs/reports/ace-feature-source-owner-live-audit-v1.json"
+}

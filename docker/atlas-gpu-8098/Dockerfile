@@ -13,7 +13,7 @@ COPY services/atlas-gpu-8098/app.py /app/services/atlas-gpu-8098/app.py
 COPY python/atlas_rapids_graph_runtime.py /app/python/atlas_rapids_graph_runtime.py
 
 RUN mkdir -p /app/services/atlas-gpu-8098 /app/python \
-    && chown -R rapids:rapids /app
+    && chown -R rapids:conda /app
 
 USER rapids
 EXPOSE 8098

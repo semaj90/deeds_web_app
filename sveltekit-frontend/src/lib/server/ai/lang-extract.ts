@@ -23,9 +23,9 @@
 
 import { z } from 'zod';
 import { bifrostChat } from '$lib/server/ollama.js';
+import { LLM_MODEL_ID, resolveLlamaInferenceTarget } from '$lib/server/llm/runtime-contract.js';
 import { AI_CONFIG } from '$lib/server/config.js';
 import { ENV } from '$lib/server/env.server.js';
-import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -147,7 +147,9 @@ export async function extractStructured<T>(
 	}
 ): Promise<ExtractResult<T>> {
 	const t0    = performance.now();
-	const model = options?.model ?? LLM_MODEL_ID;
+	const model = options?.model ?? await resolveLlamaInferenceTarget()
+		.then((target) => target.model)
+		.catch(() => LLM_MODEL_ID);
 
 	// Build JSON shape description for system prompt
 	const shapeDesc = describeShape(schema as z.ZodTypeAny);
@@ -192,7 +194,7 @@ export async function extractStructured<T>(
 				entityTags:  options?.entityTags,
 			});
 
-		// Strip markdown code fences (Ollama wraps despite system prompt ~15% of the time)
+		// Strip markdown code fences from compatibility responses.
 		const cleaned = raw
 			.replace(/^```(?:json)?\s*/m, '')
 			.replace(/\s*```\s*$/m, '')

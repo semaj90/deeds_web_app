@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildAdaptiveDagPlanV1, buildKernelDagExecutionBindingV1, checksumKernelDagBoundArguments } from '@deeds/parent-atlas';
+import { buildAdaptiveDagPlanV1, buildKernelDagExecutionBindingV1, buildParameterArtifactV1, checksumKernelDagBoundArguments } from '@deeds/parent-atlas';
 import { executeOakDagThroughBoundedExecutorV1 } from './oak-dag-execution-adapter-v1.js';
 
 const hash = 'c'.repeat(64);
@@ -26,5 +26,21 @@ describe('OakDagExecutionAdapterV1', () => {
 			bindings: [buildKernelDagExecutionBindingV1({ action: { ...plan.actions[0], actionId: 'slow' }, functionId: 'fn:file', stepId: 'step:1', operatorId: 'op:source-span', operatorKind: 'GET_SOURCE_SPAN', implementationRef: 'file:slow', boundArguments, expectedOutputSchemaId: 'file:v1' })],
 		});
 		expect(receipt.actions[0]).toMatchObject({ status: 'TIMED_OUT', error: 'Error: OAK_EXEC_ACTION_TIMEOUT:slow', writesPerformed: false });
+	});
+
+	it('resolves a referenced parameter artifact before the handler runs', async () => {
+		const artifact = buildParameterArtifactV1({ actionId: 'artifact-fetch', actionKind: 'FETCH_FILE', schemaRef: 'file:input:v1', schemaRevision: 'schema:v1', boundArguments });
+		const artifactAction = { ...action, actionId: artifact.actionId, parameterArtifactRef: artifact.artifactId, parameterChecksum: artifact.parameterChecksum };
+		const plan = buildAdaptiveDagPlanV1({ planId: 'artifact-plan', queryId: 'q', dagRevision: 'd', plannerRevision: 'r', classificationRevision: 'c', actions: [artifactAction] });
+		const binding = buildKernelDagExecutionBindingV1({ action: plan.actions[0], functionId: 'fn:file', stepId: 'step:artifact', operatorId: 'op:source-span', operatorKind: 'GET_SOURCE_SPAN', implementationRef: 'file:artifact', boundArguments, expectedOutputSchemaId: 'file:v1' });
+		let observed: unknown;
+		const receipt = await executeOakDagThroughBoundedExecutorV1({
+			plan,
+			handlers: [{ implementationRef: 'file:artifact', operatorId: 'op:source-span', operatorKind: 'GET_SOURCE_SPAN', actionKinds: ['FETCH_FILE'], outputContract: 'file:v1', run: async ({ binding: resolved }) => { observed = resolved.boundArguments; return { sourceRef: 'x' }; } }],
+			bindings: [binding],
+			parameterArtifacts: new Map([[artifact.artifactId, artifact]]),
+		});
+		expect(observed).toEqual(boundArguments);
+		expect(receipt.actions[0].status).toBe('SUCCEEDED');
 	});
 });

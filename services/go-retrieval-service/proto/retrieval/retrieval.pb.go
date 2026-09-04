@@ -948,9 +948,17 @@ type CodebaseSearchRequest struct {
 	IncludeDebug    bool                   `protobuf:"varint,8,opt,name=include_debug,json=includeDebug,proto3" json:"include_debug,omitempty"`
 	// Optional exact packet-key allowlist for revision-qualified canary searches.
 	// This constrains the Qdrant projection; it does not create canonical identity.
-	PacketKeys    []string `protobuf:"bytes,9,rep,name=packet_keys,json=packetKeys,proto3" json:"packet_keys,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	PacketKeys []string `protobuf:"bytes,9,rep,name=packet_keys,json=packetKeys,proto3" json:"packet_keys,omitempty"`
+	// GO-RETRIEVAL-REPRESENTATION-ROUTING-01: which representation to search against.
+	// Empty string means the server's existing default (semantic_768 / codebase_chunks_768) --
+	// preserves current behavior for every caller that doesn't set this. A non-empty value is
+	// validated server-side against a small representation registry; requesting a representation
+	// whose query-side encoder is not live yet (e.g. latent_256, blocked on
+	// LATENT256-QUERY-ENCODER-01) returns an explicit error/fallback signal in
+	// CodebaseSearchResponse rather than silently substituting semantic_768.
+	RepresentationId string `protobuf:"bytes,10,opt,name=representation_id,json=representationId,proto3" json:"representation_id,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *CodebaseSearchRequest) Reset() {
@@ -1046,13 +1054,27 @@ func (x *CodebaseSearchRequest) GetPacketKeys() []string {
 	return nil
 }
 
+func (x *CodebaseSearchRequest) GetRepresentationId() string {
+	if x != nil {
+		return x.RepresentationId
+	}
+	return ""
+}
+
 type CodebaseSearchResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Chunks        []*CodebaseChunk       `protobuf:"bytes,1,rep,name=chunks,proto3" json:"chunks,omitempty"`
-	TotalMs       float32                `protobuf:"fixed32,2,opt,name=total_ms,json=totalMs,proto3" json:"total_ms,omitempty"`
-	DebugJson     string                 `protobuf:"bytes,3,opt,name=debug_json,json=debugJson,proto3" json:"debug_json,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state     protoimpl.MessageState `protogen:"open.v1"`
+	Chunks    []*CodebaseChunk       `protobuf:"bytes,1,rep,name=chunks,proto3" json:"chunks,omitempty"`
+	TotalMs   float32                `protobuf:"fixed32,2,opt,name=total_ms,json=totalMs,proto3" json:"total_ms,omitempty"`
+	DebugJson string                 `protobuf:"bytes,3,opt,name=debug_json,json=debugJson,proto3" json:"debug_json,omitempty"`
+	// GO-RETRIEVAL-REPRESENTATION-ROUTING-01: the representation actually used to serve this
+	// search. Always set (never empty), even when the request left representation_id unset.
+	RepresentationUsed string `protobuf:"bytes,4,opt,name=representation_used,json=representationUsed,proto3" json:"representation_used,omitempty"`
+	// Non-empty only when request.representation_id was set but could not be honored (e.g. its
+	// query-side encoder is not live). representation_used then names the fallback actually
+	// served -- never silent.
+	RepresentationFallbackReason string `protobuf:"bytes,5,opt,name=representation_fallback_reason,json=representationFallbackReason,proto3" json:"representation_fallback_reason,omitempty"`
+	unknownFields                protoimpl.UnknownFields
+	sizeCache                    protoimpl.SizeCache
 }
 
 func (x *CodebaseSearchResponse) Reset() {
@@ -1102,6 +1124,20 @@ func (x *CodebaseSearchResponse) GetTotalMs() float32 {
 func (x *CodebaseSearchResponse) GetDebugJson() string {
 	if x != nil {
 		return x.DebugJson
+	}
+	return ""
+}
+
+func (x *CodebaseSearchResponse) GetRepresentationUsed() string {
+	if x != nil {
+		return x.RepresentationUsed
+	}
+	return ""
+}
+
+func (x *CodebaseSearchResponse) GetRepresentationFallbackReason() string {
+	if x != nil {
+		return x.RepresentationFallbackReason
 	}
 	return ""
 }
@@ -3433,7 +3469,7 @@ const file_proto_active_retrieval_proto_rawDesc = "" +
 	"\x06hop_ms\x18\x04 \x01(\x02R\x05hopMs\x12\x15\n" +
 	"\x06kag_ms\x18\x05 \x01(\x02R\x05kagMs\x12\x15\n" +
 	"\x06dag_ms\x18\x06 \x01(\x02R\x05dagMs\x12\x19\n" +
-	"\btotal_ms\x18\a \x01(\x02R\atotalMs\"\xb7\x02\n" +
+	"\btotal_ms\x18\a \x01(\x02R\atotalMs\"\xe4\x02\n" +
 	"\x15CodebaseSearchRequest\x12\x14\n" +
 	"\x05query\x18\x01 \x01(\tR\x05query\x12\x14\n" +
 	"\x05limit\x18\x02 \x01(\x05R\x05limit\x12%\n" +
@@ -3445,12 +3481,16 @@ const file_proto_active_retrieval_proto_rawDesc = "" +
 	"\rpath_prefixes\x18\a \x03(\tR\fpathPrefixes\x12#\n" +
 	"\rinclude_debug\x18\b \x01(\bR\fincludeDebug\x12\x1f\n" +
 	"\vpacket_keys\x18\t \x03(\tR\n" +
-	"packetKeys\"\x8a\x01\n" +
+	"packetKeys\x12+\n" +
+	"\x11representation_id\x18\n" +
+	" \x01(\tR\x10representationId\"\x81\x02\n" +
 	"\x16CodebaseSearchResponse\x126\n" +
 	"\x06chunks\x18\x01 \x03(\v2\x1e.yorha.retrieval.CodebaseChunkR\x06chunks\x12\x19\n" +
 	"\btotal_ms\x18\x02 \x01(\x02R\atotalMs\x12\x1d\n" +
 	"\n" +
-	"debug_json\x18\x03 \x01(\tR\tdebugJson\"\xd0\x01\n" +
+	"debug_json\x18\x03 \x01(\tR\tdebugJson\x12/\n" +
+	"\x13representation_used\x18\x04 \x01(\tR\x12representationUsed\x12D\n" +
+	"\x1erepresentation_fallback_reason\x18\x05 \x01(\tR\x1crepresentationFallbackReason\"\xd0\x01\n" +
 	"\x12CodebaseChunkEvent\x126\n" +
 	"\x05chunk\x18\x01 \x01(\v2\x1e.yorha.retrieval.CodebaseChunkH\x00R\x05chunk\x12@\n" +
 	"\bprogress\x18\x02 \x01(\v2\".yorha.retrieval.RetrievalProgressH\x00R\bprogress\x127\n" +

@@ -1,6 +1,15 @@
 import { pool } from '$lib/server/db/client';
 import type { PageServerLoad } from './$types';
 
+function externalSourceUrl(value: string): string | null {
+	try {
+		const url = new URL(value);
+		return url.protocol === 'https:' || url.protocol === 'http:' ? url.toString() : null;
+	} catch {
+		return null;
+	}
+}
+
 export const load: PageServerLoad = async () => {
 	const safeRows = async <TRow>(
 		query: Promise<{ rows: TRow[] }>
@@ -37,13 +46,15 @@ export const load: PageServerLoad = async () => {
 				term: string;
 				definition_text: string;
 				node_heading: string | null;
-				doc_title: string | null;
-				doc_id: string | null;
+					doc_title: string | null;
+					doc_id: string | null;
+					official_url: string | null;
 			}>(
 				`SELECT ld.id, ld.term, ld.definition_text,
 				        ln.heading AS node_heading,
 				        libdoc.title AS doc_title,
-				        libdoc.id AS doc_id
+				        libdoc.id AS doc_id,
+				        libdoc.official_url
 				 FROM legal_definitions ld
 				 JOIN legal_nodes ln ON ln.id = ld.defined_in_node_id
 				 JOIN library_documents libdoc ON libdoc.id = ln.document_id
@@ -61,6 +72,9 @@ export const load: PageServerLoad = async () => {
 		jurisdiction: r.jurisdiction ?? 'Federal/State',
 		relatedTerms: Array.isArray(r.related_terms) ? (r.related_terms as string[]) : [],
 		sources: Array.isArray(r.sources) ? (r.sources as string[]) : [],
+		sourceLinks: (Array.isArray(r.sources) ? (r.sources as string[]) : [])
+			.map(externalSourceUrl)
+			.filter((source): source is string => source !== null),
 	}));
 
 	const categories = categoriesRes.map((r) => ({
@@ -75,6 +89,7 @@ export const load: PageServerLoad = async () => {
 		nodeHeading: r.node_heading,
 		docTitle: r.doc_title,
 		docId: r.doc_id,
+		sourceUrl: r.official_url ? externalSourceUrl(r.official_url) : null,
 	}));
 
 	return { terms, categories, corpusDefinitions };

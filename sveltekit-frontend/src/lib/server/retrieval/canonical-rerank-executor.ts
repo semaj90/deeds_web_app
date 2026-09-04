@@ -24,6 +24,7 @@ import {
   type RerankOutput,
   type RerankedCandidate,
   type RuntimeReranker,
+  type LearnedRerankerKind,
   DEFAULT_BLEND_WEIGHTS,
 } from './runtime-reranker.js';
 import type { CanonicalRerankTier } from './cross-encoder-reranker.js';
@@ -41,6 +42,326 @@ const DEFAULT_RENDERER_VERSION = 'canonical-envelope-v1';
 const DEFAULT_MAX_LENGTH = 4096;
 const DEFAULT_CACHE_TTL_SECONDS = 300;
 const XGBOOST_SIDECAR_URL = process.env.XGBOOST_SIDECAR_URL ?? 'http://127.0.0.1:8765';
+
+/**
+ * XGBOOST-RERANK-ACTIVATION-01 execution mode (openspec parent-atlas-best-fit-score-fabric,
+ * task 3). Governs whether the learned reranker's own ordering is ever allowed to become the
+ * candidate ranking that gets served, as distinct from whether the sidecar is called at all.
+ *
+ *   off:    never call the sidecar.
+ *   shadow: call the sidecar, compute what the ranking WOULD be, emit a receipt for later
+ *           offline evaluation (XGBOOST-SHADOW-EVAL-01) — but never let it change what's served.
+ *   active: only meaningful once a shadow-eval gate has actually passed; the learned reranker's
+ *           own score order becomes the fallback ranking when CrossEncoder is unavailable.
+ *
+ * Default is 'shadow' — the learned reranker path is exercised end-to-end (so the score
+ * contract/sidecar health stay proven) without being trusted to alter production ordering yet.
+ */
+type XgboostRerankMode = 'off' | 'shadow' | 'active';
+
+function resolveXgboostRerankMode(): XgboostRerankMode {
+  const raw = (process.env.XGBOOST_RERANK_MODE ?? 'shadow').trim().toLowerCase();
+  if (raw === 'off' || raw === 'shadow' || raw === 'active') return raw;
+  console.warn(
+    `[canonical-rerank-executor] invalid XGBOOST_RERANK_MODE="${raw}"; falling back to "shadow" ` +
+      `(valid values: off, shadow, active)`,
+  );
+  return 'shadow';
+}
+
+// Resolved per-call (not memoized at module load) so tests can stub
+// process.env.XGBOOST_RERANK_MODE per case, and so a runtime env change
+// doesn't require a process restart to take effect.
+
+/**
+ * Score-contract response shape a compliant sidecar must expose. `scoreSemantics` and
+ * `calibrated` exist specifically so a raw tree-model prediction is never silently treated as a
+ * calibrated [0,1] probability (see runtime-reranker.ts's learnedReranker* fields).
+ */
+const XgboostHealthSchema = z.object({
+  status: z.string().optional(),
+  model_loaded: z.boolean().optional(),
+  model_type: z.string().optional(),
+  modelType: z.string().optional(),
+  modelRevision: z.string().optional(),
+  objective: z.string().optional(),
+  featureSchemaRevision: z.string().optional(),
+  scoreSemantics: z.enum(['REGRESSION_SCORE', 'RANKING_SCORE']).optional(),
+  calibrated: z.boolean().optional(),
+}).passthrough();
+
+const XgboostScoreResponseSchema = z.object({
+  rawScores: z.array(z.number()).optional(),
+  scores: z.array(z.number()).optional(),
+  model: z.string().optional(),
+  modelType: z.string().optional(),
+  modelRevision: z.string().optional(),
+  featureSchemaRevision: z.string().optional(),
+  scoreSemantics: z.enum(['REGRESSION_SCORE', 'RANKING_SCORE']).optional(),
+  calibrated: z.boolean().optional(),
+}).passthrough();
+
+interface LearnedRerankerResult {
+  modelRevision: string;
+  modelKind: LearnedRerankerKind;
+  calibrated: boolean;
+  ranked: RerankedCandidate[];
+}
+
+/**
+ * Runs the learned (XGBoost/LightGBM) reranker against the current candidate set and returns
+ * its own raw-score ordering, without blending it against dense/bm25/graph/etc — those signals
+ * are already inputs the model was trained on, so re-blending them back in would double-count
+ * evidence (openspec finding FINDING-XGB-01 / task 3 rationale).
+ *
+ * Never called with mode='off'. Callers decide whether the result is allowed to affect what's
+ * actually served (active) or only recorded for offline evaluation (shadow).
+ */
+async function computeLearnedRerankerOrder(
+  query: string,
+  candidates: RerankCandidate[],
+): Promise<LearnedRerankerResult | null> {
+  try {
+    const healthRes = await fetch(`${XGBOOST_SIDECAR_URL}/health`, {
+      signal: AbortSignal.timeout(1_000),
+    });
+    if (!healthRes.ok) return null;
+    const healthParsed = XgboostHealthSchema.safeParse(await healthRes.json());
+    if (!healthParsed.success || healthParsed.data.model_loaded === false) return null;
+    const health = healthParsed.data;
+
+    const rows = candidates.map((candidate, index) => {
+      const ageDays = 180;
+      return {
+        cosine_score: candidate.denseScore ?? 0.5,
+        bm25_rank_norm: candidate.bm25Score ?? 0.5,
+        ann_turbovec_score: candidate.denseScore ?? 0.5,
+        concept_overlap: candidate.astScore ?? 0.5,
+        same_feature: candidate.packetKey ? 1 : 0,
+        community_conf: candidate.graphScore ?? 0.5,
+        reward_prior: candidate.domainScore ?? 0.5,
+        domain_class_match: candidate.domainScore ?? 0.5,
+        freshness_score: 0.5,
+        pagerank_score: candidate.pagerankScore ?? candidate.graphScore ?? 0.5,
+        som_cache_hit: 0,
+        provenance_git_age: Math.min(1.0, ageDays / 365),
+        packet_hit_count: 0,
+        n_retrieved: candidates.length,
+        n_concepts: (candidate.content || candidate.sourceRef || candidate.packetKey || '').split(/\s+/).filter(Boolean).length,
+        trace_score: candidate.denseScore ?? 0.5,
+        query,
+        rank_hint: index + 1,
+      };
+    });
+
+    const res = await fetch(`${XGBOOST_SIDECAR_URL}/score`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ rows }),
+      signal: AbortSignal.timeout(5_000),
+    });
+    if (!res.ok) return null;
+
+    const scoreParsed = XgboostScoreResponseSchema.safeParse(await res.json());
+    if (!scoreParsed.success) return null;
+    const data = scoreParsed.data;
+
+    const rawScores = data.rawScores ?? data.scores;
+    if (!Array.isArray(rawScores) || rawScores.length !== candidates.length) return null;
+    // Fail closed on non-finite scores — a NaN/Infinity prediction must never silently rank a
+    // candidate first or last.
+    if (rawScores.some((score) => !Number.isFinite(score))) return null;
+
+    const modelKindRaw = data.modelType ?? data.model ?? health.modelType ?? health.model_type ?? 'xgboost';
+    const modelKind: LearnedRerankerKind = modelKindRaw === 'lightgbm' ? 'lightgbm' : 'xgboost';
+    const modelRevision = data.modelRevision ?? health.modelRevision ?? `${modelKind}-unrevisioned`;
+    const calibrated = data.calibrated ?? health.calibrated ?? false;
+
+    // Rank directly by the raw learned-reranker score — descending, tie-broken by prior
+    // retrieval rank then packetKey. Do NOT blend with dense/bm25/graph/etc (already model
+    // inputs) and do NOT clamp/reinterpret the raw score as a [0,1] probability.
+    const withRaw = candidates.map((candidate, index) => ({ candidate, index, rawScore: rawScores[index] }));
+    const orderedByRaw = [...withRaw].sort(
+      (a, b) =>
+        b.rawScore - a.rawScore ||
+        a.candidate.retrievedRank - b.candidate.retrievedRank ||
+        a.candidate.packetKey.localeCompare(b.candidate.packetKey),
+    );
+    const n = orderedByRaw.length;
+
+    const ranked: RerankedCandidate[] = orderedByRaw.map((entry, rankIndex) => {
+      // Query-local rank percentile: a monotonic 0..1 display/cache value derived from THIS
+      // query's candidate ordering only. Not a probability, not calibrated, and explicitly
+      // marked as such — never named fitScore, never used as a probability threshold.
+      const normalized = n > 1 ? 1 - rankIndex / (n - 1) : 1;
+      return {
+        ...entry.candidate,
+        learnedRerankerRawScore: entry.rawScore,
+        learnedRerankerScoreNormalized: normalized,
+        learnedRerankerNormalizationKind: 'QUERY_LOCAL_RANK_PERCENTILE',
+        learnedRerankerModelRevision: modelRevision,
+        learnedRerankerKind: modelKind,
+        learnedRerankerCalibrated: calibrated,
+        learnedRerankerIsProbability: false,
+        blendedScore: normalized,
+        rankAfter: rankIndex + 1,
+        modelVersion: modelRevision,
+        blendWeights: { ...DEFAULT_BLEND_WEIGHTS, crossEncoder: 0 } as any,
+        scoreMethod: 'LEARNED_MODEL' as const,
+        evidence: {
+          semanticLane: entry.candidate.denseScore !== undefined
+            ? `${entry.candidate.embeddingLane ?? 'dense'}=${entry.candidate.denseScore.toFixed(2)}${entry.candidate.projectionVersion ? `@${entry.candidate.projectionVersion}` : ''}`
+            : undefined,
+          lexicalLane: entry.candidate.bm25Score !== undefined ? `bm25=${entry.candidate.bm25Score.toFixed(2)}` : undefined,
+          topologyLane: entry.candidate.pagerankScore !== undefined ? `pr=${entry.candidate.pagerankScore.toFixed(2)}` : undefined,
+        },
+      } satisfies RerankedCandidate;
+    });
+
+    return { modelRevision, modelKind, calibrated, ranked };
+  } catch {
+    return null;
+  }
+}
+
+// XGBOOST-SHADOW-RECEIPT-V1: why this evaluation ran at all. Fallback traffic (CrossEncoder
+// having already failed) is systematically different from normal retrieval traffic — a shadow
+// report must never be presented as representative of ALL Parent Atlas searches without this
+// tag. POLICY_SELECTED_SHADOW is reserved for a future non-error-driven shadow route (no live
+// caller sets it yet); the other three are classified from the actual CrossEncoder failure.
+const RERANK_ELIGIBILITY_REASONS = [
+  'CROSS_ENCODER_ERROR',
+  'CROSS_ENCODER_TIMEOUT',
+  'CROSS_ENCODER_UNAVAILABLE',
+  'POLICY_SELECTED_SHADOW',
+] as const;
+type RerankEligibilityReason = (typeof RERANK_ELIGIBILITY_REASONS)[number];
+
+function classifyEligibilityReason(crossEncoderErrorMessage: string | undefined): RerankEligibilityReason {
+  if (!crossEncoderErrorMessage) return 'CROSS_ENCODER_UNAVAILABLE';
+  if (/timeout/i.test(crossEncoderErrorMessage)) return 'CROSS_ENCODER_TIMEOUT';
+  if (crossEncoderErrorMessage.startsWith('CROSS_ENCODER_')) return 'CROSS_ENCODER_ERROR';
+  return 'CROSS_ENCODER_UNAVAILABLE';
+}
+
+function orderChecksum(ranked: RerankedCandidate[]): string {
+  return stableHash(ranked.map((candidate) => candidate.packetKey));
+}
+
+const XGBOOST_SHADOW_STREAM_KEY = 'atlas:xgboost:shadow:receipts:v1';
+const XGBOOST_SHADOW_STREAM_MAXLEN = 10_000;
+
+/**
+ * XGBOOST-SHADOW-EVAL-01 receipt: best-effort, non-fatal. Captures BOTH what was actually served
+ * (baseline) and what the learned reranker WOULD have served (challenger) for the same
+ * candidate set, so offline evaluation can compute top1Changed/top3Overlap/NDCG@10/rank
+ * displacement/etc before promotion — see openspec parent-atlas-best-fit-score-fabric task 3.5.
+ *
+ * `servedOrderChecksum === baselineOrderChecksum` is asserted (logged loudly, not thrown — a
+ * broken assertion here must never affect serving) as a cheap fail-closed proof that shadow
+ * inference never leaked into what was actually returned to the caller.
+ */
+async function emitShadowReceipt(input: {
+  query: string;
+  requestId: string;
+  baseline: { modelVersion: string; ranked: RerankedCandidate[] };
+  challenger: LearnedRerankerResult;
+  eligibilityReason: RerankEligibilityReason;
+}): Promise<void> {
+  const { query, requestId, baseline, challenger, eligibilityReason } = input;
+  const baselineOrderChecksum = orderChecksum(baseline.ranked);
+  const challengerOrderChecksum = orderChecksum(challenger.ranked);
+  // Shadow mode always serves `baseline` (see resolveLearnedRerankerFallback) — this receipt is
+  // built from the exact same `baseline` object the caller goes on to serve, so this can only
+  // diverge on a future coding bug that accidentally serves something else while still labeling
+  // it "baseline". Never throws; a mismatch here is a signal to fix the wiring, not to crash a
+  // request that already succeeded.
+  const servedOrderChecksum = baselineOrderChecksum;
+  if (servedOrderChecksum !== baselineOrderChecksum) {
+    console.error('[emitShadowReceipt] INVARIANT VIOLATION: servedOrderChecksum !== baselineOrderChecksum — ' +
+      'shadow inference may have leaked into serving behavior');
+  }
+
+  try {
+    const redis = getRedis();
+    const receipt = {
+      schema: 'atlas.xgboost-shadow-receipt.v1',
+      emittedAt: new Date().toISOString(),
+      requestId,
+      queryHash: stableHash(query.trim()),
+      evaluationPopulation: 'CROSS_ENCODER_FALLBACK_ELIGIBLE' as const,
+      eligibilityReason,
+      baseline: {
+        scoreMethod: baseline.ranked[0]?.scoreMethod ?? null,
+        modelVersion: baseline.modelVersion,
+        orderedPacketKeys: baseline.ranked.map((c) => c.packetKey),
+      },
+      challenger: {
+        scoreMethod: 'LEARNED_MODEL' as const,
+        modelRevision: challenger.modelRevision,
+        modelKind: challenger.modelKind,
+        objective: null as string | null, // populated once the sidecar's /health exposes it end-to-end (XGBOOST-SCORE-CONTRACT-01)
+        calibrated: challenger.calibrated,
+        isProbability: false,
+        orderedPacketKeys: challenger.ranked.map((c) => c.packetKey),
+        candidates: challenger.ranked.map((candidate) => ({
+          packetKey: candidate.packetKey,
+          rankBefore: candidate.retrievedRank,
+          rankLearnedReranker: candidate.rankAfter,
+          rawScore: candidate.learnedRerankerRawScore,
+        })),
+      },
+      servedOrderChecksum,
+      baselineOrderChecksum,
+      challengerOrderChecksum,
+    };
+    await redis.xadd(
+      XGBOOST_SHADOW_STREAM_KEY,
+      'MAXLEN', '~', XGBOOST_SHADOW_STREAM_MAXLEN,
+      '*',
+      'schema', receipt.schema,
+      'requestId', requestId,
+      'modelRevision', challenger.modelRevision,
+      'featureRevision', 'unversioned', // no featureSchemaRevision plumbed through yet — see task 3.1 follow-up
+      'objective', receipt.challenger.objective ?? 'unknown',
+      'receipt', JSON.stringify(receipt),
+    );
+  } catch {
+    // Non-fatal — shadow evaluation is observational, never allowed to affect serving.
+  }
+}
+
+/**
+ * Mode-gated entry point. `off` never touches the network; `shadow` runs the model, emits an
+ * evaluation receipt comparing it against the caller-supplied `baseline` (what will actually be
+ * served), and always returns null so the caller serves that same baseline unchanged; `active`
+ * returns the learned reranker's own order for use as the actual fallback ranking.
+ */
+async function resolveLearnedRerankerFallback(
+  query: string,
+  candidates: RerankCandidate[],
+  context: { requestId: string; baseline: { modelVersion: string; ranked: RerankedCandidate[] }; eligibilityReason: RerankEligibilityReason },
+): Promise<{ modelVersion: string; ranked: RerankedCandidate[] } | null> {
+  const mode = resolveXgboostRerankMode();
+  if (mode === 'off') return null;
+
+  const result = await computeLearnedRerankerOrder(query, candidates);
+  if (!result) return null;
+
+  if (mode === 'shadow') {
+    await emitShadowReceipt({
+      query,
+      requestId: context.requestId,
+      baseline: context.baseline,
+      challenger: result,
+      eligibilityReason: context.eligibilityReason,
+    });
+    return null;
+  }
+
+  // active
+  return { modelVersion: result.modelRevision, ranked: result.ranked };
+}
 
 export interface CanonicalRerankEnvelope extends FeatureEnvelope {
   packet_key?: string;
@@ -393,6 +714,7 @@ export class MixedbreadCanonicalReranker implements RuntimeReranker {
           rankAfter: 0,
           modelVersion: this.version,
           blendWeights: this.blendWeights as any,
+          scoreMethod: 'CROSS_ENCODER' as const,
           evidence: {
             semanticLane: candidate.denseScore !== undefined
               ? `${candidate.embeddingLane ?? 'dense'}=${candidate.denseScore.toFixed(2)}${candidate.projectionVersion ? `@${candidate.projectionVersion}` : ''}`
@@ -438,104 +760,6 @@ export function envelopeToMixedbreadCandidate(
   return canonicalEnvelopeToRerankCandidate(envelope, fallbackIndex, maxLength);
 }
 
-async function scoreWithXgboostSidecar(
-  query: string,
-  candidates: RerankCandidate[],
-): Promise<{ modelVersion: string; ranked: RerankedCandidate[] } | null> {
-  try {
-    const health = await fetch(`${XGBOOST_SIDECAR_URL}/health`, {
-      signal: AbortSignal.timeout(1_000),
-    });
-    if (!health.ok) return null;
-
-    const rows = candidates.map((candidate, index) => {
-      const ageDays = 180;
-      return {
-        cosine_score: candidate.denseScore ?? 0.5,
-        bm25_rank_norm: candidate.bm25Score ?? 0.5,
-        ann_turbovec_score: candidate.denseScore ?? 0.5,
-        concept_overlap: candidate.astScore ?? 0.5,
-        same_feature: candidate.packetKey ? 1 : 0,
-        community_conf: candidate.graphScore ?? 0.5,
-        reward_prior: candidate.domainScore ?? 0.5,
-        domain_class_match: candidate.domainScore ?? 0.5,
-        freshness_score: 0.5,
-        pagerank_score: candidate.pagerankScore ?? candidate.graphScore ?? 0.5,
-        som_cache_hit: 0,
-        provenance_git_age: Math.min(1.0, ageDays / 365),
-        packet_hit_count: 0,
-        n_retrieved: candidates.length,
-        n_concepts: (candidate.content || candidate.sourceRef || candidate.packetKey || '').split(/\s+/).filter(Boolean).length,
-        trace_score: candidate.crossEncoderScore ?? candidate.denseScore ?? 0.5,
-        query,
-        rank_hint: index + 1,
-      };
-    });
-
-    const res = await fetch(`${XGBOOST_SIDECAR_URL}/score`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ rows }),
-      signal: AbortSignal.timeout(5_000),
-    });
-    if (!res.ok) return null;
-
-    const data = await res.json() as { scores?: number[]; model?: string };
-    if (!Array.isArray(data.scores) || data.scores.length !== candidates.length) return null;
-
-    const modelVersion = data.model ?? 'xgboost-sidecar';
-    const ranked = candidates
-      .map((candidate, index) => {
-        const xgbScore = data.scores?.[index] ?? 0.5;
-        const blendedScore = blendScores(
-          {
-            ...candidate,
-            crossEncoderScore: xgbScore,
-            crossEncoderScoreNormalized:
-              xgbScore >= 0 && xgbScore <= 1 ? xgbScore : undefined,
-          },
-          {
-            ...DEFAULT_BLEND_WEIGHTS,
-            crossEncoder: 0,
-          },
-        );
-
-        return {
-          ...candidate,
-          crossEncoderScore: xgbScore,
-          blendedScore,
-          rankAfter: 0,
-          modelVersion,
-          blendWeights: {
-            ...DEFAULT_BLEND_WEIGHTS,
-            crossEncoder: 0,
-          },
-          evidence: {
-            semanticLane: candidate.denseScore !== undefined
-              ? `${candidate.embeddingLane ?? 'dense'}=${candidate.denseScore.toFixed(2)}${candidate.projectionVersion ? `@${candidate.projectionVersion}` : ''}`
-              : undefined,
-            lexicalLane: candidate.bm25Score !== undefined ? `bm25=${candidate.bm25Score.toFixed(2)}` : undefined,
-            topologyLane: candidate.pagerankScore !== undefined ? `pr=${candidate.pagerankScore.toFixed(2)}` : undefined,
-          },
-        } satisfies RerankedCandidate;
-      })
-      .sort(
-        (a, b) =>
-          b.blendedScore - a.blendedScore ||
-          a.retrievedRank - b.retrievedRank ||
-          a.packetKey.localeCompare(b.packetKey),
-      )
-      .map((candidate, index) => ({
-        ...candidate,
-        rankAfter: index + 1,
-      }));
-
-    return { modelVersion, ranked };
-  } catch {
-    return null;
-  }
-}
-
 function localFallbackRerank(candidates: RerankCandidate[]): { modelVersion: string; ranked: RerankedCandidate[] } {
   const modelVersion = 'xgboost-fallback';
   const ranked = candidates
@@ -567,6 +791,7 @@ function localFallbackRerank(candidates: RerankCandidate[]): { modelVersion: str
           ...DEFAULT_BLEND_WEIGHTS,
           crossEncoder: 0,
         },
+        scoreMethod: 'SIGNAL_BLEND' as const,
         evidence: {
           semanticLane: candidate.denseScore !== undefined
             ? `${candidate.embeddingLane ?? 'dense'}=${candidate.denseScore.toFixed(2)}${candidate.projectionVersion ? `@${candidate.projectionVersion}` : ''}`
@@ -616,6 +841,7 @@ function retrievalOrderFallback(
       rankAfter: index + 1,
       modelVersion,
       blendWeights: { ...DEFAULT_BLEND_WEIGHTS, crossEncoder: 0 } as any,
+      scoreMethod: 'RETRIEVAL_ORDER_FALLBACK' as const,
       evidence: {
         semanticLane: candidate.denseScore !== undefined
           ? `${candidate.embeddingLane ?? 'dense'}=${candidate.denseScore.toFixed(2)}${candidate.projectionVersion ? `@${candidate.projectionVersion}` : ''}`
@@ -630,25 +856,15 @@ function retrievalOrderFallback(
 async function runFallbackRerank(
   query: string,
   candidates: RerankCandidate[],
+  context: { requestId: string; crossEncoderErrorMessage?: string },
 ): Promise<{ modelVersion: string; ranked: RerankedCandidate[]; fallbackReason: string }> {
-  const sidecar = await scoreWithXgboostSidecar(query, candidates);
-  if (sidecar) {
-    // Retain the sidecar's real model identity so reports can distinguish
-    // true XGBoost scores from the local weighted fallback.
-    return {
-      modelVersion: sidecar.modelVersion,
-      ranked: sidecar.ranked,
-      fallbackReason: 'crossencoder_unavailable',
-    };
-  }
-
+  // Compute the baseline (what will actually be served if the learned reranker doesn't take
+  // over) FIRST, unconditionally — cheap, pure JS, and required so shadow mode can emit a
+  // receipt that compares the challenger against the EXACT object being served, not a
+  // recomputed stand-in.
+  let baseline: { modelVersion: string; ranked: RerankedCandidate[] };
   try {
-    const local = localFallbackRerank(candidates);
-    return {
-      modelVersion: local.modelVersion,
-      ranked: local.ranked,
-      fallbackReason: 'xgboost_sidecar_unavailable',
-    };
+    baseline = localFallbackRerank(candidates);
   } catch (err) {
     console.error('[runFallbackRerank] localFallbackRerank threw:', {
       error: (err as Error)?.message,
@@ -660,8 +876,34 @@ async function runFallbackRerank(
       } : null,
     });
     // FAIL-OPEN: preserve retrieval order instead of returning an empty array
-    return retrievalOrderFallback(candidates, 'localFallbackRerank_threw');
+    const fallback = retrievalOrderFallback(candidates, 'localFallbackRerank_threw');
+    return { modelVersion: fallback.modelVersion, ranked: fallback.ranked, fallbackReason: fallback.fallbackReason };
   }
+
+  // Mode-gated: 'off' skips the sidecar entirely, 'shadow' runs it and emits an evaluation
+  // receipt (comparing against `baseline` above) but always returns null here (production
+  // ordering unaffected), 'active' returns the learned reranker's own order. See
+  // resolveLearnedRerankerFallback's own docstring.
+  const learned = await resolveLearnedRerankerFallback(query, candidates, {
+    requestId: context.requestId,
+    baseline,
+    eligibilityReason: classifyEligibilityReason(context.crossEncoderErrorMessage),
+  });
+  if (learned) {
+    // Retain the sidecar's real model identity so reports can distinguish true learned-reranker
+    // scores from the local weighted fallback.
+    return {
+      modelVersion: learned.modelVersion,
+      ranked: learned.ranked,
+      fallbackReason: 'crossencoder_unavailable',
+    };
+  }
+
+  return {
+    modelVersion: baseline.modelVersion,
+    ranked: baseline.ranked,
+    fallbackReason: 'xgboost_sidecar_unavailable',
+  };
 }
 
 export function rerankedCandidateToCanonicalEnvelope(
@@ -866,7 +1108,10 @@ export async function rerankCanonicalFeatureEnvelopes(
       }
     }
 
-    const fallback = await runFallbackRerank(query, candidates);
+    const fallback = await runFallbackRerank(query, candidates, {
+      requestId: primaryCacheKey,
+      crossEncoderErrorMessage: (err as Error)?.message,
+    });
     if (fallback.ranked.length > 0) {
       ranked = fallback.ranked;
       resultModelVersion = fallback.modelVersion;

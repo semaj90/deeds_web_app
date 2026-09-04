@@ -20,6 +20,7 @@ GET /health
 """
 
 import argparse
+import hashlib
 import json
 import os
 import sys
@@ -44,9 +45,35 @@ FEATURE_COLS = [
     'packet_hit_count', 'n_retrieved', 'n_concepts', 'trace_score',
 ]
 
+# sha256 of the ordered feature-column list. A caller (or this sidecar itself, on model swap)
+# can compare this against a previously-observed value to detect a silent feature-schema change.
+FEATURE_SCHEMA_REVISION = hashlib.sha256('|'.join(FEATURE_COLS).encode()).hexdigest()[:16]
+
 # Global model state
 MODEL = None
 MODEL_TYPE = None
+MODEL_REVISION = None       # sha256:<hex> of the loaded model file
+MODEL_OBJECTIVE = None      # e.g. 'reg:squarederror', 'rank:ndcg' — read from the booster itself
+MODEL_SCORE_SEMANTICS = None  # 'REGRESSION_SCORE' | 'RANKING_SCORE' | 'UNKNOWN_SCORE_SEMANTICS'
+MODEL_CALIBRATED = False    # never true here — this sidecar performs no probability calibration
+
+
+def compute_model_revision(path: Path) -> str:
+    """Content-addressed model identity — lets a caller detect a swapped model file even if the
+    filename/CLI args didn't change (XGBOOST-SCORE-CONTRACT-01)."""
+    h = hashlib.sha256()
+    with open(path, 'rb') as f:
+        for chunk in iter(lambda: f.read(1 << 16), b''):
+            h.update(chunk)
+    return f'sha256:{h.hexdigest()}'
+
+
+def score_semantics_for_objective(objective: str) -> str:
+    if objective.startswith('rank:'):
+        return 'RANKING_SCORE'
+    if objective.startswith('reg:') or objective.startswith('binary:') or objective.startswith('count:'):
+        return 'REGRESSION_SCORE'
+    return 'UNKNOWN_SCORE_SEMANTICS'
 
 
 def load_xgboost(path: Path):
@@ -59,6 +86,13 @@ def load_xgboost(path: Path):
     booster = xgb.Booster()
     booster.load_model(str(path))
 
+    objective = 'unknown'
+    try:
+        cfg = json.loads(booster.save_config())
+        objective = cfg.get('learner', {}).get('objective', {}).get('name', 'unknown')
+    except Exception:
+        pass
+
     class XGBWrapper:
         def predict(self, rows):
             import xgboost as xgb
@@ -67,7 +101,7 @@ def load_xgboost(path: Path):
             dm = xgb.DMatrix(X, feature_names=FEATURE_COLS)
             return booster.predict(dm).tolist()
 
-    return XGBWrapper(), 'xgboost'
+    return XGBWrapper(), 'xgboost', objective
 
 
 def load_lightgbm(path: Path):
@@ -79,13 +113,19 @@ def load_lightgbm(path: Path):
 
     model = lgb.Booster(model_file=str(path))
 
+    objective = 'unknown'
+    try:
+        objective = model.params.get('objective', 'unknown') if hasattr(model, 'params') else 'unknown'
+    except Exception:
+        pass
+
     class LGBWrapper:
         def predict(self, rows):
             import numpy as np
             X = np.array([[float(r.get(c, 0) or 0) for c in FEATURE_COLS] for r in rows], dtype=np.float32)
             return model.predict(X).tolist()
 
-    return LGBWrapper(), 'lightgbm'
+    return LGBWrapper(), 'lightgbm', objective
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -110,10 +150,20 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         if self.path == '/health':
+            # modelType/scoreSemantics/calibrated are the score-contract fields
+            # XGBOOST-SCORE-CONTRACT-01 requires — a caller must be able to tell a
+            # regression score from a ranking score from a probability without
+            # guessing from the model file name.
             self.send_json(200, {
                 'status': 'ok',
                 'model_loaded': MODEL is not None,
                 'model_type': MODEL_TYPE,
+                'modelType': MODEL_TYPE,
+                'modelRevision': MODEL_REVISION,
+                'objective': MODEL_OBJECTIVE,
+                'featureSchemaRevision': FEATURE_SCHEMA_REVISION,
+                'scoreSemantics': MODEL_SCORE_SEMANTICS,
+                'calibrated': MODEL_CALIBRATED,
                 'features': FEATURE_COLS,
             })
         else:
@@ -136,10 +186,40 @@ class Handler(BaseHTTPRequestHandler):
                 self.send_json(400, {'error': 'rows array required'})
                 return
 
+            # Fail closed on a caller-asserted feature-schema mismatch rather than silently
+            # scoring against columns the caller didn't expect.
+            expected_schema = body.get('expectedFeatureSchemaRevision')
+            if expected_schema and expected_schema != FEATURE_SCHEMA_REVISION:
+                self.send_json(409, {
+                    'error': 'feature_schema_mismatch',
+                    'expected': expected_schema,
+                    'actual': FEATURE_SCHEMA_REVISION,
+                })
+                return
+
             scores = MODEL.predict(rows)
+
+            # Fail closed on a row-count mismatch or a non-finite prediction — never let a
+            # malformed batch silently produce a partial or NaN/Infinity-poisoned response.
+            if len(scores) != len(rows):
+                self.send_json(500, {'error': 'score_count_mismatch', 'rows': len(rows), 'scores': len(scores)})
+                return
+            if any((not isinstance(s, (int, float))) or s != s or s in (float('inf'), float('-inf')) for s in scores):
+                self.send_json(500, {'error': 'non_finite_score_produced'})
+                return
+
             self.send_json(200, {
+                # rawScores is the contract-correct name (XGBOOST-SCORE-CONTRACT-01) — a raw
+                # tree-model prediction, not a probability. `scores` is kept as a temporary
+                # compatibility alias for any caller not yet migrated.
+                'rawScores': scores,
                 'scores': scores,
                 'model': MODEL_TYPE,
+                'modelType': MODEL_TYPE,
+                'modelRevision': MODEL_REVISION,
+                'featureSchemaRevision': FEATURE_SCHEMA_REVISION,
+                'scoreSemantics': MODEL_SCORE_SEMANTICS,
+                'calibrated': MODEL_CALIBRATED,
                 'rows': len(scores),
             })
         except Exception as e:
@@ -147,7 +227,7 @@ class Handler(BaseHTTPRequestHandler):
 
 
 def main():
-    global MODEL, MODEL_TYPE
+    global MODEL, MODEL_TYPE, MODEL_REVISION, MODEL_OBJECTIVE, MODEL_SCORE_SEMANTICS
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--port',     type=int,  default=8765)
@@ -174,11 +254,17 @@ def main():
     print(f'Type:  {"LightGBM" if args.lightgbm else "XGBoost"}')
 
     if args.lightgbm or str(model_path).endswith('.txt'):
-        MODEL, MODEL_TYPE = load_lightgbm(model_path)
+        MODEL, MODEL_TYPE, MODEL_OBJECTIVE = load_lightgbm(model_path)
     else:
-        MODEL, MODEL_TYPE = load_xgboost(model_path)
+        MODEL, MODEL_TYPE, MODEL_OBJECTIVE = load_xgboost(model_path)
+
+    MODEL_REVISION = compute_model_revision(model_path)
+    MODEL_SCORE_SEMANTICS = score_semantics_for_objective(MODEL_OBJECTIVE)
 
     print(f'Loaded: {MODEL_TYPE}')
+    print(f'Objective: {MODEL_OBJECTIVE}  ->  scoreSemantics: {MODEL_SCORE_SEMANTICS}')
+    print(f'Revision: {MODEL_REVISION}')
+    print(f'Feature schema revision: {FEATURE_SCHEMA_REVISION}')
     print(f'Listen: http://{args.host}:{args.port}')
     print(f'Endpoints: GET /health  POST /score\n')
 

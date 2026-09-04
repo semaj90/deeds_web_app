@@ -24,6 +24,13 @@ RRF implementation, vector store, identity resolver, or ContextManifest owner.
   recommendation-policy receipt owners.
 - [x] ACE-02 add a pure execution-feedback bridge preserving manifest and
   selected-packet identity; persistence remains an approved curator step.
+- [x] ACE-FEATURE-SOURCE-CONTRACT-01 add the fail-closed SearchRuntime ACE
+  resolver and feature-bundle composition contracts; unit coverage is bounded
+  and does not imply a live production caller.
+- [ ] ACE-FEATURE-SOURCE-OWNER-01 bind one production source adapter that
+  supplies canonical SearchRuntime candidates, `CandidateOrdinalMapV1`, feature
+  rows, and authoritative revisions to the resolver; do not migrate the ACE
+  stream route until this gate passes.
 - [ ] SIMD-01 run PERF0 before any simdjson implementation.
 
 Fixture proof: `npm run atlas:rlm:environment:proof` writes
@@ -2114,6 +2121,59 @@ authority) matches what's already built here — it is describing this repo's ac
 than it is proposing new shape. Treat future re-reads of that document as a confirmation checklist
 against real code, not a build spec, since most of GPU-SEM/GRAPH-PPR/CandidateOrdinal it names already
 has a concrete implementation in this repo.
+
+## ACE-FEATURE-SOURCE-OWNER-01 (2026-09-03, contract proof complete; live owner still open)
+
+The thin composition contracts now exist in
+`sveltekit-frontend/src/lib/server/atlas/retrieval/search-runtime-ace-resolver-v1.ts` and
+`search-runtime-feature-bundle-provider-v1.ts`. They accept already-produced candidates,
+`CandidateOrdinalMapV1`, and `RetrievalRouterFeatureRowV1` values, enforce population and revision
+parity, reject timestamp workspace revisions, and preserve `writesPerformed=false` and
+`canonicalAuthority=false`. Focused resolver coverage passed 4/4; the existing SearchRuntime QAS
+adapter coverage passed 2/2. This proves the composition boundary, not a production caller.
+
+The remaining work is explicitly open: no production adapter currently supplies the route with the
+canonical SearchRuntime candidate population, ordinal map, feature rows, and authoritative revision
+tuple. The `api/ace/stream` route still uses the legacy query-only ACE cache, and the strict cache
+caller census remains zero. Do not mark `ACE-CONTEXT-LIVE-02`, live strict caller adoption, or
+`ACE-FEATURE-SOURCE-OWNER-01` complete from these unit tests.
+
+An explicit adapter seam was added at
+`sveltekit-frontend/src/lib/server/atlas/retrieval/search-runtime-ace-production-source-adapter-v1.ts`.
+It accepts only an injected canonical source owner, rejects an incorrect implementation reference,
+fails closed when that owner is unavailable, and delegates all identity/revision/population checks to
+the existing resolver. Its focused tests pass 3/3. This is a production-boundary contract, not proof
+that the ACE stream route has been migrated. A fresh caller audit confirms zero concrete callers of
+the production adapter and zero strict `ContextManifestV2` route callers; the legacy ACE stream still
+uses the query-only cache. Evidence: `docs/reports/ace-feature-source-owner-live-audit-v1.json`.
+
+The follow-up caller trace is explicit (2026-09-03, read-only):
+`atlas-semantic-tools.ts`, `semantic-search-workflow.ts`, and `rlm-search-adapter.ts`
+construct the general `createAtlasSearchAdapter()` and remain legacy/QAS retrieval
+callers. No caller invokes `createSearchRuntimeAceProductionSourceAdapterV1`,
+`searchWithAceManifest`, or a strict `ContextManifestV2` route. The feature materializer
+is referenced by ACE producer/provider contracts and specs, not by a production route.
+This confirms an owner-adoption gap, not a missing second retrieval engine. Keep the gate
+open and do not fabricate source injection from these general SearchRuntime callers.
+
+The narrower provider trace is also empty: `buildSearchRuntimeFeatureBundleV1` and
+`produceAceFeatureSnapshotV1` have no production callers outside contract/spec coverage.
+The existing `SearchRuntime.search()` result therefore cannot be promoted into ACE by
+itself; it lacks the admitted ordinal map, feature-row population, lane masks, and
+revision authority envelope required by strict admission.
+
+| Gate | Status | Evidence |
+|---|---|---|
+| Resolver contract and fail-closed parity | PROVEN_BOUNDED | `search-runtime-ace-resolver-v1.spec.ts` 4/4 |
+| SearchRuntime feature-bundle contract | IMPLEMENTED_NOT_LIVE | provider exists; no production resolver binding |
+| Canonical route source owner | OPEN | `docs/reports/ace-revision-source-owner-v1.json` |
+| Live ACE stream adoption | BLOCKED | legacy query-only cache remains in `api/ace/stream` |
+
+Next implementation gate: `ACE-FEATURE-SOURCE-OWNER-01` production adapter only. It must compose
+the existing SearchRuntime result and canonical ordinal/feature owners; it must not query Qdrant,
+Neo4j, or PostgreSQL directly from the route, allocate CandidateOrdinal values, or synthesize
+revisions. After that adapter has a bounded dry proof, wire one ACE stream canary and test strict
+cache MISS/HIT plus revision and candidate-population changes.
 
 **Left running**: the WSL2 RAPIDS sidecar (`python/atlas_rapids_sidecar_graph.py`, PID varies per
 `wsl -d Ubuntu -e bash -lc "pgrep -f atlas_rapids_sidecar_graph"`) is still up on `127.0.0.1:8098`

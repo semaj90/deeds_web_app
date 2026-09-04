@@ -1,6 +1,6 @@
 {
   "schema": "atlas.graphify-embedding-qdrant-projection.v1",
-  "generatedAt": "2026-08-26T03:31:59.893Z",
+  "generatedAt": "2026-09-03T21:22:02.871Z",
   "apply": false,
   "sourceColumn": "content_embedding_768",
   "representationId": "semantic_768",
@@ -40,58 +40,21 @@
     "limit": 4
   },
   "status": "DRY_RUN",
-  "selected": 4,
+  "selected": 0,
   "projected": 0,
   "skipped": 0,
   "identityCoverage": {
-    "selected": 4,
+    "selected": 0,
     "representationId": "semantic_768",
     "representationRevision": "semantic_768@v1",
     "dimension": 768,
-    "packetKey": 4,
+    "packetKey": 0,
     "sourceRef": 0,
-    "contentHash": 4,
+    "contentHash": 0,
     "sourceRevision": 0,
     "workspaceRevision": 0
   },
   "errors": [],
-  "sample": [
-    {
-      "id": "1ae79974-3eb1-449f-aa7e-07f14655296d",
-      "qdrantId": "8397336a-3a62-465d-a2cf-ec53054d51d6",
-      "packetKey": "8397336a-3a62-465d-a2cf-ec53054d51d6",
-      "sourceRef": null,
-      "contentHash": "f468ef841fe25d0c92bd9df252bfa1b8ca47ab0a087be51a654635cc24f3c083",
-      "sourceRevision": null,
-      "workspaceRevision": null
-    },
-    {
-      "id": "318bc320-96cc-4097-8b47-7dde35d278a8",
-      "qdrantId": "3bd95bde-7304-4fff-b031-a5e2de180b55",
-      "packetKey": "3bd95bde-7304-4fff-b031-a5e2de180b55",
-      "sourceRef": null,
-      "contentHash": "6fc16c35d857ccd3c83711b1a50e744b6c66754c3fd4277beffbee615db91181",
-      "sourceRevision": null,
-      "workspaceRevision": null
-    },
-    {
-      "id": "356f26d3-9f8a-4020-9007-de969684db89",
-      "qdrantId": "5d0404cd-f01b-4dd6-9f59-cd3fdcbfde6e",
-      "packetKey": "5d0404cd-f01b-4dd6-9f59-cd3fdcbfde6e",
-      "sourceRef": null,
-      "contentHash": "286d4008cfdb9ebec243c653438ef0eadd5afd70a5b3f2176677f3c2129183a8",
-      "sourceRevision": null,
-      "workspaceRevision": null
-    },
-    {
-      "id": "41e56dc8-d95c-4b5c-a2de-86f3e2887578",
-      "qdrantId": "f802342d-f49a-4446-a6ee-4de8371741f4",
-      "packetKey": "f802342d-f49a-4446-a6ee-4de8371741f4",
-      "sourceRef": null,
-      "contentHash": "2b68ab32da70c76020f9b2916de5bc2b8bdd1550eaa385c3929fe0a89e17883d",
-      "sourceRevision": null,
-      "workspaceRevision": null
-    }
-  ],
-  "elapsedMs": 2114
+  "sample": [],
+  "elapsedMs": 219
 }

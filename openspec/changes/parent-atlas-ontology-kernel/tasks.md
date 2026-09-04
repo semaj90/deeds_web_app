@@ -2042,7 +2042,14 @@ Evidence: `python/atlas_rapids_graph_runtime.py`, live `/v1/graph/bfs` response,
 and `python/tests/test_atlas_rapids_graph_runtime.py` (5/5 retained).
 - [x] ONTO-PY-DOMAIN-01 — add a revisioned, read-only `DomainOntologyMappingV1` admission boundary for classifier labels; known labels/aliases resolve to declared `atlas:` classes, unknown labels fail closed, and no classifier label dynamically mints ontology identity. Proven by `scripts/atlas/prove-domain-ontology-admission-v1.py` and `docs/reports/domain-ontology-admission-v1.json`; this is an admission proof, not ontology promotion or a database/graph write.
 
-### ONTO-PY-DOMAIN-02 — classifier taxonomy wiring — OPEN
+### ONTO-PY-DOMAIN-02 — classifier taxonomy wiring — SUPERSEDED
+
+> Superseded 2026-09-03 by `openspec/changes/parent-atlas-search-classifier-sidecar/tasks.md` task 5
+> ("Taxonomy hookup"), which extends `domain_mapping.py`'s catalog to cover this exact taxonomy
+> (`classify-domain-ontology.mjs`'s 15 labels: `agent_orchestration`, `rag_retrieval`,
+> `graph_topology`, etc.) and keeps unmapped labels fail-closed per the rule below. Track further
+> progress there, not here.
+
 
 - [ ] Reconcile the live classifier taxonomy emitted by
   `scripts/atlas/classify-domain-ontology.mjs` (including labels such as
@@ -2171,3 +2178,540 @@ Evidence: `python/atlas_rapids_graph_runtime.py` and
 `docs/reports/resident-graph-identity-v1.json`. Concurrent proof jobs must not
 share the single-resident 8098 slot; a 409 during a revision swap is expected
 coordination behavior and is not parity evidence.
+
+### ONTO-PY-CONCEPT-INTEGRATION-01 — end-to-end concept and classifier alignment — OPEN
+
+This tranche makes the existing concept surfaces usable together. It does not
+create a second ontology registry, promote Neo4j concepts to canonical status,
+or authorize bulk graph/model writes.
+
+Current audit evidence (2026-09-02):
+
+- The packet/Neo4j dry-run found 50,000 packets with `concept_ids`, 17,457
+  unique raw concept labels, and approximately 189,400 possible
+  `USED_CONCEPT` edges.
+- The live PostgreSQL counts for `concept_records`,
+  `atlas_ontology_concepts`, and `atlas_ontology_relations` are all zero.
+- `scripts/atlas/audit-grounded-concept-taxonomy-v1.mjs` reports
+  `NO_GROUNDED_CANDIDATES_TO_CLASSIFY`.
+- Existing `DomainOntologyMappingV1` admits only explicitly declared classes;
+  unresolved labels remain fail-closed.
+
+Ownership is frozen as:
+
+```text
+LangExtract / NLP sidecar
+  -> grounded observations with source spans
+DomainClassificationSignalV1
+  -> DomainOntologyMappingV1 admission
+Atlas ontology registry in PostgreSQL
+  -> OntologyLinkedTupleV1 / canonical evidence
+Neo4j Concept projection
+  -> derived traversal only
+NetworkX
+  -> CPU graph reference
+cuGraph/RAPIDS
+  -> bounded GPU graph executor
+KMeans/SOM/manifold coordinates
+  -> derived features only
+XGBoost/PyTorch classifier
+  -> revisioned prediction proposal, never ontology identity
+```
+
+- [ ] **CONCEPT-01 — inventory and normalize raw labels (read-only).** Audit
+  packet `concept_ids`, trace `selected_concepts`, Redis concept indexes, and
+  existing Neo4j `:Concept` nodes. Produce normalized labels, source counts,
+  aliases, unmapped labels, and ambiguous labels. Do not merge or delete
+  concepts during the census.
+
+  Partial implementation: `scripts/atlas/audit-raw-concept-labels-v1.mjs`
+  now inventories and normalizes packet/trace labels read-only, producing
+  `docs/reports/raw-concept-label-inventory-v1.json`. The Redis/Neo4j census
+  and authority comparison remain open; the 19,445 normalized labels are raw
+  evidence and are not admitted ontology classes.
+
+  Follow-up census (2026-09-02): Neo4j reachability is proven read-only with
+  19,698 `:Concept` nodes, 173,158 `USED_CONCEPT` edges, 59,692 packets, and
+  13,290 features (`docs/reports/concept-reachability-check.json`). The
+  Valkey ontology cache is reachable but currently empty (zero tuple, token-map,
+  blocked-hash, and HLL keys); `audit-ontology-cache-usage.mjs` reports the
+  cache population step as still pending. This proves projection reachability,
+  not canonical ontology alignment or cache adoption.
+
+  KAG persistence audit (2026-09-02) reports `READY_FOR_MATERIALIZATION`:
+  `atlas_hyperedges` contains 62,802 rows and
+  `atlas_hyperedge_members` contains 125,604 rows, while
+  `atlas_ontology_tuples` contains 0 rows. Both KAG schemas are active and
+  structurally complete, but no ontology-linked tuple materialization is
+  currently available for concept admission. Evidence:
+  `docs/reports/atlas-kag-persistence-v1.json`.
+
+  Contract repair (2026-09-02): added
+  `packages/parent-atlas/src/core/concept-admission-v1.ts` with explicit raw
+  label, admission decision, and integration receipt schemas. An admitted
+  decision requires an explicit class ID, ontology revision, source revision,
+  and evidence refs; rejected decisions cannot carry a class ID. Neo4j and
+  Valkey projection permissions are hard-coded false until canonical admission
+  is proven. Focused contract tests pass 2/2 and the package build passes.
+
+  Vocabulary alignment audit (2026-09-02) found a second declared vocabulary
+  that must not be silently merged with the Python `atlas:*Domain` catalog:
+  `DOC_DOMAIN_CLASSES`/`DOC_ONTOLOGY_CLASSES` in
+  `packages/parent-atlas/src/core/external-doc-knowledge-fabric.ts` are the
+  external-document extraction vocabulary (`retrieval`, `graph`, `MODEL`,
+  `RELATIONSHIP`, etc.). They are valid typed document fields, but they are
+  not yet a revisioned mapping to `DomainOntologyMappingV1` class IDs. Additive
+  cross-vocabulary mapping is therefore required before document labels can
+  become admitted ontology concepts. Keep the vocabularies distinct until
+  that mapping and its checksum are explicitly approved.
+- [ ] **CONCEPT-02 — align only to declared ontology classes.** Join normalized
+  labels through `DomainOntologyMappingV1` and the PostgreSQL
+  `atlas_ontology_concepts` registry. A classifier label is evidence, not an
+  ontology ID. Missing, ambiguous, namespace-mismatched, or revisionless
+  mappings must be rejected.
+
+  Partial implementation: `scripts/atlas/audit-raw-concept-admission-v1.py`
+  previews the raw inventory through the existing Python mapping owner. The
+  current preview contains 19,445 labels: 18 explicit mapping matches, 0
+  ambiguous matches, and 19,427 unmapped labels. Because the PostgreSQL
+  ontology registry is empty and raw rows lack source revisions, no preview
+  result is eligible for tuple, Neo4j, or Valkey materialization. Evidence:
+  `docs/reports/raw-concept-admission-v1.json`.
+
+  Cross-vocabulary contract (2026-09-02): added
+  `packages/parent-atlas/src/core/ontology-vocabulary-map-v1.ts` and focused
+  tests (2/2). It requires the source vocabulary, explicit target class,
+  mapping revision, ontology revision, and evidence refs, and rejects mixed
+  external-document domain/ontology vocabularies. This defines the mapping
+  boundary; it does not approve any concrete class mapping or perform writes.
+
+  External-document vocabulary audit (2026-09-02):
+  `scripts/atlas/audit-external-doc-vocabulary-admission-v1.py` compared the
+  declared 17-label `DOC_DOMAIN_CLASSES` list with the existing Python mapping
+  owner. Five labels match explicitly, 12 are unmapped, and none are
+  ambiguous. The matches remain diagnostic until an ontology revision and
+  evidence refs are attached; no document tuple, Neo4j node, or Valkey entry
+  was created. Evidence:
+  `docs/reports/external-doc-vocabulary-admission-v1.json`.
+
+  Ontology revision owner audit (2026-09-02):
+  `scripts/atlas/audit-ontology-revision-owners-v1.mjs` found producer labels
+  such as `okf-ontology-v1` and classifier/source revisions, but no
+  checksum-sealed canonical ontology revision owner. The existing tuple
+  contract has an optional `ontologyRevision` field, while the admission
+  contract correctly requires it for admitted decisions. Therefore the five
+  external-vocabulary matches remain diagnostic and cannot enter the registry,
+  Neo4j, or Valkey. Evidence:
+  `docs/reports/ontology-revision-owner-audit-v1.json`.
+
+  Revision-binding contract (2026-09-02): added
+  `packages/parent-atlas/src/core/ontology-revision-binding-v1.ts`. It requires
+  explicit checksum-shaped `ontologyRevision` and `mappingRevision`, binds
+  them to a schema artifact and evidence references, rejects producer labels
+  such as `okf-ontology-v1`, and always keeps `canonicalAuthority: false`.
+  This is a declared binding contract, not proof of an ontology owner or a
+  registry write. Focused tests pass 2/2 and the package build passes.
+
+  Revision manifest contract (2026-09-02): added
+  `packages/parent-atlas/src/core/ontology-revision-manifest-v1.ts`. It
+  deterministically derives an explicit ontology revision from the schema
+  checksum, mapping revision, admitted class IDs, and producer revision.
+  Class ordering is canonicalized; the result remains `DECLARED` with
+  `canonicalAuthority: false` until a separate owner/evidence gate approves
+  it. Focused tests pass 2/2; this does not seed the PostgreSQL registry.
+
+  Grounded fixture composition (2026-09-02): added
+  `packages/parent-atlas/src/core/ontology-concept-admission-fixture-v1.spec.ts`.
+  It composes two explicitly mapped labels with the declared ontology
+  revision, exact source revisions, and evidence references. The receipt keeps
+  Neo4j/Valkey projection permissions and writes disabled. This proves the
+  contract boundary only; it is not live classifier adoption or registry
+  population.
+  **CONCEPT-SCHEMA-01 / CONCEPT-SEED-DRY-01 — real-time duplicate-owner collision found and
+  self-corrected (2026-09-03, same day, two sessions working this repo in parallel)**: this
+  session began from the operator's own separate "PARENT ATLAS CONCEPT FABRIC 01" instruction and
+  independently built `sveltekit-frontend/src/lib/server/atlas/contracts/concept-fabric-v1.ts` —
+  a `ConceptDefinitionV1`/`TermObservationV1`/`ConceptRecognitionV1` Zod contract — plus 17 passing
+  fixture tests and a `build-concept-seed-dry-v1.mts` producer script, all before checking whether
+  a concurrent session was doing the same thing. **Before committing, `git status` surfaced that a
+  concurrent session had, the same day, ALREADY built a materially more complete answer**:
+  `sveltekit-frontend/src/lib/server/atlas/taxonomy/entity-concept-taxonomy-v1.ts`, defining its
+  own `ConceptV1`/`TermObservationV1`/`ConceptRecognitionV1` (near-identical `kind`/`matchMethod`
+  enum values — both sessions were evidently working from the same underlying field list) PLUS a
+  working deterministic resolver (`recognizeConceptV1()`), and canonical-promotion wiring
+  (`promoteTaxonomyAssignmentV1()`, `createConceptBroaderThanV1()`, `createConceptPartOfV1()`
+  reusing the existing `HyperedgeV1` relation owner rather than inventing a new one) — none of
+  which my version had. Their own `scripts/atlas/concept-seed-dry-v1.mts` (note:
+  `sveltekit-frontend/scripts/atlas/`, not repo-root `scripts/atlas/`) and
+  `docs/reports/concept-seed-dry-01.json` / `docs/reports/concept-fabric-capability-alignment-v1.json`
+  / `docs/reports/concept-vocabulary-authority-01.json` are already real, live-run deliverables for
+  exactly this task.
+
+  **Resolution, per this file's own Duplication-Prevention hard rule**: did NOT commit my
+  `concept-fabric-v1.ts` / `.spec.ts` / `build-concept-seed-dry-v1.mts` — left them uncommitted,
+  local-only, not part of this repo's history, to avoid two competing `TermObservationV1`/
+  `ConceptRecognitionV1` schema owners under the same schema-version literal strings.
+  `entity-concept-taxonomy-v1.ts` is the real answer to CONCEPT-SCHEMA-01 — cite it, not this
+  paragraph's abandoned file, in any future work. Two things from the abandoned exploration ARE
+  genuinely additive, not covered by the concurrent session's version, and worth recording as open
+  follow-up rather than silently lost with the discarded file:
+  1. **A real, live-run finding**: mechanically deriving concept proposals from
+     `domain_mapping.py`'s 7 `atlas:*Domain` classes (the same source CONCEPT-02 above already
+     reads) alongside `domain-taxonomy.ts`'s 9 coarse domains found **3 direct label collisions**
+     — `retrieval`/`database`/`graph` are simultaneously a `domain-taxonomy.ts` coarse-domain
+     canonical label AND a `domain_mapping.py` `atlas:*Domain` `domainLabel`. This is new,
+     concrete evidence beyond what `concept-vocabulary-authority-01.json`'s census currently
+     covers (that report's `authorities[]` list doesn't yet include this pairing). Worth a
+     follow-up run of the concurrent session's own `concept-seed-dry-v1.mts`, extended to also
+     read `domain_mapping.py` and the two live DB CHECK constraints
+     (`atlas_ontology_relations.predicate`, `atlas_ontology_concepts.concept_type`) as additional
+     owners, to get this finding onto the canonical file/report pair instead of an abandoned one.
+  2. `entity-concept-taxonomy-v1.ts`'s `ConceptV1` has no `conceptType` enum (matching the live
+     `atlas_ontology_concepts.concept_type` CHECK constraint) or `status` lifecycle
+     (ACTIVE/PROPOSED/DEPRECATED) — both present in the abandoned `ConceptDefinitionV1`. Whether
+     those are worth folding into the canonical `ConceptV1` is an open, unresolved question for
+     whoever owns that file next — not decided here.
+- [ ] **CONCEPT-03 — establish a grounded admission fixture.** Use the existing
+  LangExtract/grounded observation contract and require exact `sourceRef`,
+  source revision, character interval, mapping revision, ontology revision,
+  and `OntologyLinkedTupleV1` checksum. No tuple or graph projection is
+  admitted from an ungrounded decoder label.
+
+  Python bridge audit (2026-09-02):
+  `python/parent_atlas_ontology/domain_tuple_bridge.py` already enforces
+  classification revision, mapping revision, source namespace, and tuple
+  source revision, and `python/test_domain_tuple_bridge.py` passes. It does
+  not yet require the declared ontology revision or evidence references at
+  the strict wire boundary. Therefore the bridge remains fixture-proven, not
+  live grounded admission. The next repair is contract parity with the
+  TypeScript admission boundary; do not reuse the legacy fixture's
+  non-checksum ontology label as proof.
+  Python parity repair (2026-09-02): `DomainClassificationSignalV1` and the
+  strict wire path now require a checksum-shaped `ontologyRevision`, matching
+  tuple provenance, and non-empty evidence references. Legacy values such as
+  `ontology-kernel:v0` fail with `ONTOLOGY_REVISION_UNPROVEN`. Python focused
+  tests pass 9/9; this remains fixture-proven and does not enable persistence.
+
+  Proof refresh (2026-09-02): updated
+  `scripts/atlas/prove-domain-ontology-tuple-wire-v1.py` for the stricter
+  signal contract. It now supplies a checksum-shaped ontology revision and
+  evidence reference, preserves tuple identity, rejects an unknown label, and
+  reports `DOMAIN_ONTOLOGY_WIRE_PROVEN` with writes and canonical authority
+  false. This is still a controlled fixture proof, not live classifier
+  adoption.
+  Chunk adapter (2026-09-02): added
+  `build_domain_classification_signal_from_chunk` to the Python bridge. It
+  derives a grounded `chunk:<id>:<start>-<end>` evidence reference and
+  requires caller-supplied source namespace, source revision, mapping
+  revision, and ontology revision. Focused Python tests pass 12/12. This
+  closes the contract adapter gap but does not claim live classifier adoption.
+
+  OKF producer audit (2026-09-02): `python/atlas_okf_docs_pipeline.py` and
+  `python/atlas_external_docs.py` provide `ChunkRecord.source_revision`,
+  document/chunk checksums, source URL, and exact character offsets. The
+  pipeline does not yet invoke the strict admission bridge, and
+  `SourceConfig` has no authoritative `sourceNamespace`. Do not derive that
+  namespace from `source_id`, URL, or filesystem path. Live wiring remains
+  blocked until the caller supplies the approved namespace and declared
+  ontology manifest revision.
+  The pipeline now exposes optional `SourceConfig.source_namespace` and
+  carries it into source-artifact metadata, defaulting to `null` for existing
+  manifests. This makes the missing authority observable without deriving a
+  namespace or enabling admission. Focused pipeline/bridge tests pass 11/11.
+  Live PostgreSQL lineage audit (2026-09-02):
+  `scripts/atlas/audit-domain-classifier-lineage-v1.mjs` found 3,295 classifier
+  rows, 3,294 with source refs, only 78 with source revisions, zero with an
+  authoritative source namespace, 78 workspace-id namespace candidates, and
+  3,217 missing Graphify joins. Status is `CLASSIFIER_LINEAGE_BLOCKED`.
+  `workspace_id` remains a diagnostic candidate, not an admitted namespace.
+  Evidence: `docs/reports/domain-classifier-lineage-v1.json`.
+  PostgreSQL source-owner follow-up (2026-09-02): the live registry audit
+  found `graphify_files` has 885 rows with `source_revision`, 373 with
+  `workspace_revision`, but zero with `source_revision_authority` populated.
+  `atlas_source_refs` has 22,604 rows, zero populated fragments, and only six
+  commit hashes. PostgreSQL supplies revision observations, but not yet an
+  approved source-authority namespace/evidence owner for live admission.
+  Broader lineage audit (2026-09-02):
+  `scripts/atlas/audit-live-source-lineage-tables.mjs` reports
+  `SOURCE_LINEAGE_OWNER_SCHEMA_READY`, but `atlas_source_revisions` is only a
+  two-row web-ingestion revision table keyed by `web_source_id`; it does not
+  define the code/workspace namespace required by the classifier bridge.
+  It is therefore not a substitute source-authority owner. The audit was
+  read-only and reports `canonicalWrites: false`.
+  Source-lineage model audit (2026-09-02):
+  `scripts/atlas/audit-source-lineage-model-v1.mjs` confirms stable source
+  identity and Graphify-backed source-version observations are available, but
+  reports `IDENTITY_AND_VERSION_LAYERS_AVAILABLE_BINDING_LAYER_MISSING`.
+  It finds 22,604 stable source refs, 885 Graphify source revisions, 111
+  current workspace bindings, and 768 Graphify refs missing from the stable
+  registry. This keeps live classifier admission blocked until the binding
+  layer is approved and reconciled.
+  Source-authority contract (2026-09-02): added
+  `python/parent_atlas_ontology/source_authority.py`. It requires explicit
+  namespace, source/workspace revisions, content digest, and evidence refs;
+  it rejects missing authority and cannot grant canonical authority or enable
+  writes. Focused Python checks pass 14/14. This defines the missing binding
+  boundary but does not populate it from live rows.
+  Bounded source cohort follow-up (2026-09-02):
+  `scripts/atlas/audit-current-source-cohort-lineage-v1.mjs` found a clean
+  111-row cohort with one current workspace revision, 111 Graphify matches,
+  111 workspace-source bindings, and zero missing, mismatched, or ambiguous
+  rows. This cohort is eligible for a future read-only classifier preview
+  after its source namespace is explicitly bound; it does not repair or admit
+  the remaining classifier population.
+  Join normalization correction (2026-09-02): a diagnostic query that joined
+  raw `canonical_source_ref` and `graphify_files.source_ref` returned zero
+  matches because it omitted the repository's slash, separator, and case
+  normalization. Re-running the same read-only comparison with normalized
+  references produced 111/111 exact matches, with no prefix fallback required.
+  The zero-match diagnostic is therefore not evidence of missing Graphify
+  lineage and must not be used to downgrade the bounded cohort receipt.
+  Cohort capability check (2026-09-02): the 111-row lineage artifact contains
+  source paths, source revisions, and workspace revision only; it contains no
+  source text or classifier output. It therefore cannot drive a genuine
+  classifier admission preview yet. File-name or path classification would
+  be an ungrounded substitute and remains prohibited.
+  Read-only OKF admission preview (2026-09-02): added
+  `preview_domain_ontology_admission` to the Python pipeline. It consumes
+  existing `ChunkRecord` classifications, invokes the strict chunk adapter,
+  and fails closed when `source_namespace` or `ontology_revision` is absent.
+  With both explicitly supplied it reports admitted/rejected counts and
+  grounded evidence references, while keeping tuple construction, Neo4j,
+  Valkey, and all writes disabled. Focused pipeline/bridge tests pass 12/12.
+  Cross-language signal parity (2026-09-02): added the shared fixture
+  `docs/reports/fixtures/domain-classification-admission-v1.json`, the
+  TypeScript `DomainClassificationSignalV1` schema/checksum contract, and the
+  Python contract parser/checksum. Python parity tests pass 2/2, TypeScript
+  parity tests pass 2/2, and the Parent Atlas package build passes. The first
+  parity run caught Python omitting `source_namespace` from the canonical
+  checksum; that drift was corrected before promotion. Mapping revision,
+  ontology revision, and evidence-reference fields now hash identically.
+  Legacy symbolic revisions are rejected as
+  `ONTOLOGY_REVISION_LEGACY_REJECTED`. Real classifier admission, live
+  evidence resolution, and all persistence remain open and write-disabled.
+  Real classifier admission probe (2026-09-02):
+  `scripts/atlas/prove-real-domain-classifier-admission-v1.py` classified the
+  actual repository file `__tests__/data-hashing.spec.ts` as `database` and
+  verified its content hash exactly matches the bound `sourceRevision`. The
+  strict producer then rejected the signal with `SOURCE_NAMESPACE_UNPROVEN`
+  because the authoritative workspace binding has no source namespace. This
+  is the intended fail-closed result: direct classifier-to-ontology and
+  direct classifier-to-tuple counts remain zero, with no persistence or
+  projection attempted. The real admission gate remains open pending an
+  approved source-namespace owner.
+  Source-evidence hydration audit (2026-09-02): added
+  `scripts/atlas/audit-current-source-evidence-hydration-v1.mjs` and
+  `docs/reports/current-source-evidence-hydration-v1.json`. Across the 111
+  lineage-clean sources, Graphify source revisions match exactly 111/111,
+  but safe content hydration is 0/111, authoritative namespaces are 0/111,
+  and evidence-span readiness is 0/111. The existing chunk owner has content
+  for 68 sources but no source-revision field, while 43 sources have no
+  matching canonical chunk owner. The audit uses no working-tree fallback and
+  performs no writes; classifier-ready count remains 0 until a revision-bound
+  content/span owner and authoritative source namespace are identified.
+  Owner-resolution result (2026-09-02): the existing source registry and
+  workspace binding tables provide identity/revision metadata but no content or
+  byte spans; `graphify_files` provides source revisions but no content or
+  spans; and `codebase_chunk_index` provides content/content hashes for 68
+  cohort sources but no source-revision or byte-span binding. The remaining 43
+  sources have no matching canonical chunk owner. No existing table therefore
+  satisfies `GroundedSourceEvidenceV1`; creating a parallel source-text table
+  is not authorized by this audit.
+  AST-owner follow-up (2026-09-02): `atlas_ast_nodes` has schema support for
+  source revisions and byte spans, but the 111-source intersection returned
+  zero AST candidate rows and zero revision-qualified AST spans. It is
+  therefore a potential existing producer boundary, not current hydration
+  evidence. Classifier admission remains blocked until that owner is populated
+  from the same source snapshot and an authoritative namespace is bound.
+- [ ] **CONCEPT-04 — populate canonical registry only through an explicitly
+  authorized migration/seed.** The existing `atlas_ontology_concepts` and
+  `atlas_ontology_relations` schema is the target. Do not create a new JSONB
+  taxonomy table, bitmap table, or parallel Neo4j authority. This task remains
+  blocked while the global Drizzle migration baseline is unresolved.
+- [ ] **CONCEPT-05 — project admitted concepts to Neo4j.** Reuse the existing
+  packet/trace `USED_CONCEPT` projection only after PostgreSQL admission. Store
+  `concept_id` plus ontology and mapping revisions on derived nodes/edges where
+  the existing projection contract permits. Verify readback; keep
+  `canonicalAuthority: false` for this tranche.
+- [ ] **CONCEPT-06 — build one shared graph artifact.** Materialize one
+  revision-qualified concept/relation projection with `ProjectionNodeKeyV1`,
+  dense `ProjectionOrdinalMapV1`, typed edges, `projectionChecksum`, and
+  `ordinalMapChecksum`. NetworkX, cuGraph, KMeans, and SOM must consume this
+  same artifact rather than independently rebuilding topology.
+- [ ] **CONCEPT-07 — derive graph and geometry features.** Compute bounded
+  degree/PageRank/community, KMeans membership, 20x20 SOM coordinates, and the
+  existing four-dimensional topology/manifold fields. These remain derived
+  feature columns and may not become ontology identity, canonical labels, or
+  extra retrieval votes.
+- [ ] **CONCEPT-08 — create a revisioned classifier snapshot.** Assemble only
+  admitted, source-revision-qualified rows with stable `CandidateOrdinal` or
+  concept identity, mapping/schema/model revisions, feature checksum, label
+  checksum, and train/evaluation split checksum. Split by source/workspace
+  revision to prevent source leakage.
+- [ ] **CONCEPT-09 — train an XGBoost baseline first.** Use the existing Go
+  Retrieval/feature-serving boundary for inference metadata only; keep model
+  training in the existing Python/GPU lane. Serialize JSON/UBJSON with the
+  feature schema and category mapping. Record held-out accuracy, macro-F1,
+  calibration, abstention, unknown-label rate, and deterministic replay.
+- [ ] **CONCEPT-10 — add PyTorch only as a challenger.** A learned encoder or
+  multilabel classifier may consume the same frozen snapshot, but must not
+  replace the XGBoost baseline or alter ontology mappings without a separate
+  promotion receipt. Record model, dataset, seed, device, and artifact checksums.
+- [ ] **CONCEPT-11 — keep reinforcement learning deferred.** Judge feedback may
+  rank proposals or select additional evidence, but it cannot mint ontology
+  classes, rewrite canonical labels, or directly mutate Neo4j/PostgreSQL.
+- [ ] **CONCEPT-12 — end-to-end read-only replay.** Replay the chain twice and
+  require equal source/mapping/ontology revisions, tuple IDs, projection and
+  ordinal checksums, normalized graph features, classifier input checksum, and
+  prediction checksum. Require `writesPerformed: false` and
+  `canonicalAuthority: false`.
+
+The tranche cannot be marked complete until the canonical registry has declared
+classes, the grounded admission fixture passes, the Neo4j projection reads back
+from admitted PostgreSQL concepts, and the classifier replay is deterministic.
+Raw Neo4j concepts, KMeans/SOM coordinates, and model predictions remain
+non-canonical until those gates pass.
+
+Evidence reviewed: `scripts/atlas/write-used-concept-edges-from-packets.mjs`,
+`scripts/atlas/audit-grounded-concept-taxonomy-v1.mjs`,
+`python/parent_atlas_ontology/domain_mapping.py`,
+`sveltekit-frontend/drizzle/schema.ts`,
+`services/topology-gpu/manifold.py`, and the existing RAPIDS parity reports.
+
+## Session handoff (2026-09-02, ended on context budget — not blocked)
+
+**Scope note**: this session's work is embedding/retrieval infrastructure, not
+OaK/ontology-kernel proper — it started from reviewing this file's own
+priority list and diverged into a separate, real track. Recorded here only
+because this is the tasks.md the session was anchored to; no OaK gate status
+above changed.
+
+**Done and proven live, in order**:
+1. `taxonomy_nodes`/`taxonomy_edges` added to canonical Drizzle schema
+   (`schema-postgres.ts`) + 3 targeted metadata expression indexes
+   (`drizzle/manual/20260902_taxonomy_nodes_metadata_param_indexes.sql`),
+   applied live.
+2. `TaxonomyOrdinalMapV1` (`packages/parent-atlas/src/core/
+   taxonomy-ordinal-map-v1.ts`) — contract-only dense-ordinal/sort-key
+   scaffold for taxonomy nodes, proven against all 5,527 live rows
+   (`docs/reports/taxonomy-ordinal-map-v1.json`). Found and fixed a real
+   `.localeCompare()` vs plain-`.sort()` divergence bug, also fixed in the
+   sibling `projection-ordinal-map-v1.ts`.
+3. Taxonomy wired into retrieval as a post-fetch filter
+   (`SearchMetadataFilter.taxonomyNodeKeys` → `SearchFilter.include_source_refs`,
+   resolved via new `taxonomy-retrieval-filter-v1.ts`) — no new lane.
+4. `taxonomy_nodes_768` Qdrant collection — live, 5,527/5,527 real vectors,
+   query-tested (semantic search for "authentication and login routes"
+   correctly surfaces `loginSchema`/`auth.ts`).
+5. **`EMBED-PROVIDER-CONVERGENCE-01`** — new single-owner resolver
+   `sveltekit-frontend/src/lib/server/embedding/embedding-provider-v1.ts`
+   (`resolveEmbeddingProviderV1()`, `checkVectorShapeV1()`,
+   `checkEmbeddingReceiptV1()`). Wired into `/api/embed`,
+   `embedding-client.ts` Tier-1, `embed-chunks.mjs`. Found and fixed a real
+   bug: stale `EMBEDDING_PROVIDER=ollama` env var was overriding correct
+   `:8081` URL evidence, silently mislabeling the resolved provider.
+6. `PG18-AIO-OBSERVE-01` — read-only, no changes.
+   `io_method=worker, io_workers=3, io_max_concurrency=64`. No restart.
+7. **Root cause of the embed-server "12.75% failure rate" found and fixed**:
+   not a concurrency/capacity issue — `:8081`'s `EMBED_UBATCH_SIZE=128` was
+   silently rejecting any input over ~128 tokens (`HTTP 500 "input too
+   large"`), identical 255/2000 failures at every concurrency level 1–20.
+   Restarted `:8081` with `EMBED_UBATCH_SIZE=2048`/`EMBED_BATCH_SIZE=2048`
+   (matches EmbeddingGemma's real 2048-token capacity). Reran
+   `SEM768-8081-CAPACITY-01` (`docs/reports/sem768-8081-capacity-01.json`):
+   **2000/2000 success at every concurrency level 1–20, zero failures**.
+   Efficient operating point: concurrency=8 (throughput plateaus ~200 req/s
+   past that).
+8. `onnxruntime-node@1.29.0` proven clean in an isolated probe
+   (`tmp/ort-probe-1.29/`, not installed in the main app) — P0–P4 all pass
+   against the real model file, including 10x repeat inference, zero
+   crashes. Main lockfile untouched. The live app still runs `1.14.0`,
+   which crashes `InferenceSession.create()` at the native level (confirmed
+   reproducible, isolated-child-process-confirmed) — reclassify as
+   `EXECUTOR_RUNTIME_UNPROVEN`, not "failed": per the operator's correction,
+   the ORT 1.14→1.29 pass/crash matrix points at an old-runtime-package
+   problem, not a proven Node-22 ABI incompatibility.
+
+**Explicitly NOT done this session** (next gates, in the operator's stated
+order):
+- `SEM768-EXECUTOR-BENCH-01B` — batching (`input: [...]` array) vs request
+  fan-out on the now-fixed `:8081`; llama.cpp's `/slots` endpoint not yet
+  used to distinguish real capacity limits from queueing.
+- `ORT-CPU-RUNTIME-01` — audit-first (installed version, Node ABI,
+  `availableExecutionProviders`, tokenizer checksum, 32-row cosine-parity
+  fixture against the proven `:8081` output) before any main-app ORT
+  upgrade or before ONNX CPU re-enters the executor bench.
+- `SEM768-STORAGE-OWNER-01` — read-only: resolve
+  `codebase_chunk_index.content_embedding` vs `.content_embedding_768` vs
+  `semantic_768` ownership (which callers, which HNSW index, which model)
+  before any new persistence contract.
+- `SEM768-REPRESENTATION-CONTRACT-01` / `SEM768-CANONICAL-PERSIST-01` —
+  `SemanticRepresentationV1` (packetKey/canonicalChunkId/sourceRevision/
+  workspaceRevision/representationId/representationRevision/modelId/
+  modelRevision/tokenizerRevision/executorId/executorRevision/dimensions/
+  vectorChecksum/inputChecksum) — explicitly NOT started; do not begin the
+  55,169-row backfill before `SEM768-STORAGE-OWNER-01` resolves which table
+  is canonical.
+- `GraphSnapshotV1`/`GraphFeatureReceiptV1` (NetworkX/cuGraph durable
+  persistence) — flagged mid-session as likely already covered by
+  `StructuralGraphSnapshotV1` + `graph_snapshot_parity_cugraph_oracle.py` +
+  `graph-analysis-runner.ts`'s existing Postgres writers
+  (`graph_community_assignments`/`graph_communities`/`graph_node_metrics`);
+  not reconciled, don't build a second owner without checking first.
+
+**Live server state left running**: `:8081` GGUF/CUDA embed server up with
+`EMBED_UBATCH_SIZE=2048`/`EMBED_BATCH_SIZE=2048` (was default 128) — this is
+a runtime env var override via the launch invocation, not yet persisted into
+`scripts/launch-embed-server.ps1`'s own default or `.env`. If the server
+restarts through the normal `npm run dev:gpu` path without that override, it
+reverts to the 128 default and the fixed failure mode returns.
+
+## CONCEPT-FABRIC-GLOSSARY-LINKS-01 (2026-09-03, additive UI wiring)
+
+- [x] Existing glossary corpus-definition links remain document-backed through
+  `/library/{docId}`.
+- [x] HTTP(S) values already present in `legal_glossary.sources` are exposed as
+  safe external links; non-URL source labels remain plain text.
+- [x] No Firecrawl fetch, ontology promotion, embedding, or datastore write was
+  added. Firecrawl/acquisition remains an upstream evidence owner and `.okf`
+  remains schema/receipt input, not direct glossary authority.
+- [ ] Add a revision-qualified external evidence join for Firecrawl content
+  before presenting provider, content hash, or freshness claims in the glossary.
+
+## CONCEPT-FABRIC-CORPUS-DEFINITION-LINKS-01 (2026-09-03, additive)
+
+- [x] Corpus-extracted definitions now expose the existing
+  `library_documents.official_url` as a validated external `Official source`
+  link when it is an HTTP(S) URL.
+- [x] Internal document links remain available through `/library/{docId}`.
+- [x] No Firecrawl request, schema migration, ontology promotion, embedding,
+  or datastore write was performed.
+- [ ] Firecrawl capture identity, content hash, evidence revision, and `.okf`
+  receipt binding remain a separate evidence-admission gate.
+
+## CONCEPT-FABRIC-EXTERNAL-ACQUISITION-OWNER-01 (2026-09-03, audit)
+
+- [x] Reuse the existing Python OKF acquisition owner:
+  `python/atlas_okf_docs_pipeline.py` provides bounded Firecrawl V2 crawling,
+  domain allowlisting, source revisions, normalized/raw checksums, outgoing
+  links, and BeautifulSoup fallback.
+- [x] Reuse `scripts/docs-atlas/crawl-okf-dev-docs.mts` only for the existing
+  `.okf` development corpus path; it already chains Firecrawl, the local
+  BeautifulSoup adapter, and bounded HTTP fallback with Zod validation.
+- [x] Do not add Crawl4AI: no repository implementation or proven caller was
+  found, and no distinct browser-rendering gap has been admitted.
+- [ ] Glossary ingestion must consume revisioned evidence artifacts from these
+  owners rather than calling a crawler from the glossary route.
+
+## CONCEPT-FABRIC-OKF-TUPLE-RETRIEVAL-ALIGNMENT-01 (2026-09-03, bounded fixture)
+
+- [x] Added a fixture-only alignment test for the existing fetch receipt,
+  external-document chunk, n-ary ontology tuple, and retrieval-plan schemas.
+- [x] Proves source-revision and normalized-document-checksum continuity,
+  tuple degree/participant alignment, evidence-span binding, and one semantic
+  retrieval lane with exact source promotion required.
+- [x] Proves deterministic replay checksum for the same canonical fixture.
+- [x] Keeps all four artifacts non-canonical; no crawl, index, promotion, or
+  datastore write was performed.
+- [ ] Live Firecrawl acquisition, concept admission, and retrieval execution
+  remain separate gates.

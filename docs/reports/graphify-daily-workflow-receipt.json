@@ -1,46 +1,46 @@
 {
   "schemaVersion": "atlas.graphify-daily-workflow-receipt.v1",
   "workflowId": "graphify:daily:v1",
-  "runId": "05b244bc-c8c9-457e-be29-11674c5e477c",
-  "repositoryRevision": "afa0f9a6ed134d3a7c86d3dcf6e55d66d7dd0b8b",
-  "generatedAt": "2026-09-01T21:54:12.024Z",
+  "runId": "91db3d40-4bcc-4b69-9b67-10514d953e0c",
+  "repositoryRevision": "9fd3f5d43426675c15bc51a30d84a34390708d7c",
+  "generatedAt": "2026-09-03T21:09:37.168Z",
   "readOnly": true,
   "canonicalWriteAttempted": false,
   "stages": {
     "snapshot": {
       "status": "PROVEN",
-      "totalFiles": 33145,
-      "totalBytes": 371064616,
-      "currentRevision": "afa0f9a6ed134d3a7c86d3dcf6e55d66d7dd0b8b",
-      "priorRevision": "a1b03ff7edd21b9ee024d3b5970ca001a460853a"
+      "totalFiles": 33478,
+      "totalBytes": 376748511,
+      "currentRevision": "9fd3f5d43426675c15bc51a30d84a34390708d7c",
+      "priorRevision": "d4fee9458c12cf603f5795717840f8a051de9057"
     },
     "inventory": {
       "status": "PROVEN",
-      "totalFiles": 33145,
-      "codeFiles": 16183,
-      "documentationFiles": 10143,
-      "configFiles": 2131,
+      "totalFiles": 33478,
+      "codeFiles": 16344,
+      "documentationFiles": 10153,
+      "configFiles": 2293,
       "otherFiles": 4688,
       "topExtensions": [
         {
           "extension": ".md",
-          "count": 10123
+          "count": 10133
         },
         {
           "extension": ".ts",
-          "count": 8997
+          "count": 9068
         },
         {
           "extension": ".mjs",
-          "count": 3508
+          "count": 3557
         },
         {
           "extension": ".json",
-          "count": 2012
+          "count": 2174
         },
         {
           "extension": ".py",
-          "count": 1335
+          "count": 1350
         },
         {
           "extension": ".svelte",
@@ -60,11 +60,11 @@
         },
         {
           "extension": ".sql",
-          "count": 625
+          "count": 629
         },
         {
           "extension": ".mts",
-          "count": 466
+          "count": 488
         },
         {
           "extension": ".batch1000-backup",
@@ -74,16 +74,16 @@
     },
     "structural": {
       "status": "PROVEN",
-      "filesProcessed": 33145,
-      "filesWithStructure": 12608,
-      "factCount": 130862,
-      "functionCount": 48227,
+      "filesProcessed": 33478,
+      "filesWithStructure": 12750,
+      "factCount": 132153,
+      "functionCount": 48607,
       "classCount": 1895,
-      "interfaceCount": 1881,
-      "methodCount": 6438,
-      "importCount": 38361,
-      "constCount": 8032,
-      "arrowCount": 26028,
+      "interfaceCount": 1888,
+      "methodCount": 6440,
+      "importCount": 38868,
+      "constCount": 8099,
+      "arrowCount": 26356,
       "samples": [
         {
           "filePath": "__tests__/data-hashing.spec.ts",
@@ -289,49 +289,49 @@
     },
     "identity": {
       "status": "PARTIAL",
-      "uniqueIds": 130381,
+      "uniqueIds": 131672,
       "duplicateIds": 481,
-      "reusedIds": 129830,
+      "reusedIds": 131672,
       "supersededIds": 481
     },
     "lexical": {
       "status": "PROVEN",
-      "filesProcessed": 33145,
-      "entries": 33145,
-      "totalTokens": 33120872,
-      "totalUniqueTokens": 9559797,
+      "filesProcessed": 33478,
+      "entries": 33478,
+      "totalTokens": 33574470,
+      "totalUniqueTokens": 9730319,
       "topGlobalTerms": [
         {
           "term": "id",
-          "weight": 293034
+          "weight": 295122
         },
         {
           "term": "sveltekit",
-          "weight": 255346
+          "weight": 257486
         },
         {
           "term": "frontend",
-          "weight": 251350
+          "weight": 253475
         },
         {
           "term": "pagerank",
-          "weight": 245624
+          "weight": 245665
         },
         {
           "term": "filepath",
-          "weight": 240543
+          "weight": 240552
         },
         {
           "term": "unclassified",
-          "weight": 229566
+          "weight": 229589
         },
         {
           "term": "communityid",
-          "weight": 227653
+          "weight": 227657
         },
         {
           "term": "topoclass",
-          "weight": 227631
+          "weight": 227632
         },
         {
           "term": "graphauthorityscore",
@@ -339,47 +339,47 @@
         },
         {
           "term": "api",
-          "weight": 213957
-        },
-        {
-          "term": "community",
-          "weight": 204104
+          "weight": 214294
         },
         {
           "term": "if",
-          "weight": 203750
+          "weight": 204708
+        },
+        {
+          "term": "community",
+          "weight": 204113
         },
         {
           "term": "name",
-          "weight": 196182
+          "weight": 196559
         },
         {
           "term": "routes",
-          "weight": 195591
+          "weight": 195564
         },
         {
           "term": "app",
-          "weight": 195428
+          "weight": 195381
         },
         {
           "term": "//",
-          "weight": 185176
+          "weight": 185929
+        },
+        {
+          "term": "string",
+          "weight": 165450
         },
         {
           "term": "0.15000000000000002",
           "weight": 164933
         },
         {
-          "term": "string",
-          "weight": 164780
-        },
-        {
           "term": "users",
-          "weight": 154072
+          "weight": 154084
         },
         {
           "term": "deeds",
-          "weight": 150168
+          "weight": 150177
         }
       ],
       "samples": [
@@ -2142,10 +2142,10 @@
     },
     "relationships": {
       "status": "PROVEN",
-      "entries": 300085,
-      "containsEdges": 130862,
-      "importEdges": 38361,
-      "declaresEdges": 130862,
+      "entries": 303174,
+      "containsEdges": 132153,
+      "importEdges": 38868,
+      "declaresEdges": 132153,
       "samples": [
         {
           "subjectId": "35000bc035cc20349f3415aa997469ea75b4256da31d0a23671a881753312c6c",
@@ -2351,37 +2351,37 @@
     },
     "labeling": {
       "status": "PROVEN",
-      "filesProcessed": 33145,
+      "filesProcessed": 33478,
       "domainCounts": {
-        "test": 962,
-        "feature": 3301,
-        "config": 1799,
-        "graph": 901,
-        "api": 6149,
-        "ai": 1076,
-        "ui": 7255,
-        "gpu": 1363,
-        "auth": 1691,
-        "retrieval": 4270,
-        "indexer": 1670,
-        "cache": 2658,
-        "vector": 50
+        "test": 987,
+        "feature": 3410,
+        "config": 1819,
+        "graph": 933,
+        "api": 6157,
+        "ai": 1078,
+        "ui": 7276,
+        "gpu": 1368,
+        "auth": 1710,
+        "retrieval": 4313,
+        "indexer": 1691,
+        "cache": 2670,
+        "vector": 66
       },
       "ontologyCounts": {
-        "utility": 23675,
-        "model": 4143,
-        "adapter": 1104,
-        "service": 1851,
-        "manager": 1851,
-        "handler": 390,
-        "client": 44,
+        "utility": 23911,
+        "model": 4194,
+        "adapter": 1127,
+        "service": 1853,
+        "manager": 1858,
+        "handler": 399,
+        "client": 49,
         "bridge": 87
       },
       "tierCounts": {
-        "test": 2632,
-        "feature": 27569,
+        "test": 2679,
+        "feature": 27827,
         "internal": 254,
-        "middleware": 2413,
+        "middleware": 2441,
         "core": 277
       },
       "sampleLabels": [
@@ -2486,10 +2486,10 @@
     },
     "projection": {
       "status": "PROVEN",
-      "postgresCanonicalRecords": 33145,
+      "postgresCanonicalRecords": 33478,
       "qdrantProjectionRecords": 24,
-      "neo4jProjectionRecords": 300085,
-      "redisProjectionRecords": 33145,
+      "neo4jProjectionRecords": 303174,
+      "redisProjectionRecords": 33478,
       "representationName": "semantic_768",
       "denseVectorName": "content",
       "collectionName": "codebase_chunks_768_v2"
@@ -2498,7 +2498,7 @@
       "status": "PROVEN",
       "missingHashes": 0,
       "malformedHashes": 0,
-      "duplicateFileHashes": 1944,
+      "duplicateFileHashes": 1959,
       "missingStructuralIds": 0,
       "semanticDimensionMismatches": 0,
       "pass": true
@@ -2525,9 +2525,9 @@
     "incremental": {
       "status": "PROVEN",
       "priorReportFound": true,
-      "reusedFiles": 32855,
-      "invalidatedFiles": 290,
-      "reusedRatio": 0.9912505656961834
+      "reusedFiles": 33398,
+      "invalidatedFiles": 80,
+      "reusedRatio": 0.9976103709899038
     }
   },
   "outputs": {
@@ -2552,11 +2552,11 @@
   },
   "sourceBindingObservation": {
     "path": "docs/reports/workspace-source-binding-observation.json",
-    "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-    "sourceManifestDigest": "55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-    "sourceCount": 24192,
-    "boundSources": 24192,
-    "skippedSources": 90
+    "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
+    "sourceManifestDigest": "927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
+    "sourceCount": 25361,
+    "boundSources": 25361,
+    "skippedSources": 107
   },
   "nextGate": "GRAPHIFY_RUN_WRITER_AND_SOURCE_BINDING_READBACK"
 }

@@ -4,7 +4,9 @@ import { buildAdaptiveDagPlanV1 } from './adaptive-dag-plan-v1.js';
 import {
   buildKernelDagExecutionBindingV1,
   checksumKernelDagBoundArguments,
+  resolveKernelDagParameterArtifactV1,
 } from './kernel-dag-execution-binding-v1.js';
+import { buildParameterArtifactV1 } from './parameter-artifact-v1.js';
 
 const inputChecksum = createHash('sha256').update('input').digest('hex');
 const args = { symbol: 'foo', maxDepth: 2 };
@@ -85,5 +87,28 @@ describe('kernel DAG execution binding v1', () => {
       expectedOutputSchemaId: 'wrong:v1',
     })).toThrow('DAG_EXEC_BINDING_OUTPUT_SCHEMA_MISMATCH');
   });
-});
 
+  it('resolves and verifies the planner parameter artifact', () => {
+    const artifact = buildParameterArtifactV1({
+      actionId: 'plan:binding:step:artifact',
+      actionKind: 'FETCH_POSTGRES',
+      schemaRef: 'rows:input:v1',
+      schemaRevision: 'schema:v1',
+      boundArguments: args,
+    });
+    const action = buildAdaptiveDagPlanV1({
+      planId: 'plan:binding:artifact', queryId: 'query:binding', dagRevision: 'dag:v1',
+      plannerRevision: 'planner:v1', classificationRevision: 'class:v1', actions: [{
+        actionId: artifact.actionId, actionKind: 'FETCH_POSTGRES', parentActionIds: [], inputArtifactRefs: ['evidence:1'],
+        inputChecksum, parameterArtifactRef: artifact.artifactId, parameterChecksum: artifact.parameterChecksum,
+        outputContract: 'rows:v1', mutationPolicy: 'READ_ONLY', timeoutMs: 1000, failurePolicy: 'FAIL_CLOSED',
+      }],
+    }).actions[0];
+    const binding = buildKernelDagExecutionBindingV1({
+      action, functionId: 'function:symbol-repair', stepId: 'step:artifact', operatorId: 'operator:lookup-symbol',
+      operatorKind: 'LOOKUP_SYMBOL', implementationRef: 'postgres:read-symbol', boundArguments: args,
+      expectedOutputSchemaId: 'rows:v1',
+    });
+    expect(resolveKernelDagParameterArtifactV1({ action, binding, artifact })).toEqual(args);
+  });
+});

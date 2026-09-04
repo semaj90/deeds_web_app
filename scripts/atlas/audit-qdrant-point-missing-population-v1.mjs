@@ -13,8 +13,21 @@ import pg from 'pg';
 import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
 
 const root = process.cwd();
-const dryPath = path.resolve(root, 'docs/reports/bridge-recon-dry-04-v1.json');
-const reportPath = path.resolve(root, 'docs/reports/qdrant-point-missing-population-01-v1.json');
+const cliArgs = new Map(
+  process.argv.slice(2).flatMap((arg, index, argv) => {
+    if (!arg.startsWith('--') || !arg.includes('=')) return [];
+    const [key, ...value] = arg.slice(2).split('=');
+    return [[key, value.join('=')]];
+  }),
+);
+const dryPath = path.resolve(
+  root,
+  cliArgs.get('artifact-path') ?? 'docs/reports/bridge-recon-dry-04-v1.json',
+);
+const reportPath = path.resolve(
+  root,
+  cliArgs.get('report-path') ?? 'docs/reports/qdrant-point-missing-population-01-v1.json',
+);
 const qdrantUrl = (process.env.QDRANT_URL ?? 'http://127.0.0.1:6333').replace(/^0\.0\.0\.0/, '127.0.0.1');
 const collection = 'codebase_chunks_768_v2';
 
@@ -72,6 +85,7 @@ const report = {
   task: 'QDRANT-POINT-MISSING-POPULATION-01',
   generatedAt: new Date().toISOString(),
   mode: 'READ_ONLY',
+  sourceArtifactPath: path.relative(root, dryPath),
   missingRowCount: missing.length,
   aggregate: agg[0],
   byTopDirectory: byDir,

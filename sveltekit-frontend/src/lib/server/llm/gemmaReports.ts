@@ -1,7 +1,7 @@
 import { ENV } from '$lib/server/env.server.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
 import { bifrostChat } from '$lib/server/ollama.js';
-import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
+import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL, getActiveLocalVlmModel } from '$lib/server/ai/local-llama-provider.js';
 
 export type ReportTemplate = 'charging_memo' | 'intake_summary';
 
@@ -80,11 +80,12 @@ Requirements:
 `;
 
     return traceLLM('gemma-report', { model: OLLAMA_MODEL, template, caseId }, async (gen) => {
+        const activeModel = await getActiveLocalVlmModel();
         // Route through Bifrost gateway when enabled (gets semantic caching)
         if (ENV.BIFROST_ENABLED) {
             const content = await bifrostChat(
                 [{ role: 'user', content: prompt }],
-                OLLAMA_MODEL
+                activeModel
             );
             gen.end({ output: content.slice(0, 1000) });
             return content;
@@ -94,7 +95,7 @@ Requirements:
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
 	    body: JSON.stringify({
-	        model: OLLAMA_MODEL,
+	        model: activeModel,
                 messages: [
                     { role: 'system', content: 'You write prosecutorial report templates in HTML.' },
                     { role: 'user', content: prompt },

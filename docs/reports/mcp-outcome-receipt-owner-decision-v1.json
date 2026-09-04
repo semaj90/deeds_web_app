@@ -1,0 +1,38 @@
+{
+  "schema": "atlas.mcp-outcome-receipt-owner-decision.v1",
+  "generatedAt": "2026-09-03",
+  "mode": "READ_ONLY_ARCHITECTURE_DECISION",
+  "recommendedOwner": {
+    "durableCanonicalOwner": "Postgres outcome_ledger",
+    "existingWriter": "sveltekit-frontend/src/lib/server/telemetry/tool-call-recorder.ts",
+    "receiptContract": "sveltekit-frontend/src/lib/server/observability/agent-work-receipt-v1.ts",
+    "reason": "Postgres is the canonical durable state owner; NDJSON is local append-only observability and cannot provide authoritative acknowledgement or queryable integrity."
+  },
+  "projection": {
+    "ndjsonPath": ".opencode/outcome-ledger.ndjson",
+    "role": "LOCAL_DIAGNOSTIC_PROJECTION",
+    "canonical": false,
+    "mustNotOverridePostgres": true,
+    "replayKey": "receiptId"
+  },
+  "migration": {
+    "status": "DESIGN_ONLY_NOT_WIRED",
+    "required": [
+      "map AgentWorkReceiptV1 fields to existing Postgres columns or additive migration",
+      "preserve nullable revisions without synthetic fallbacks",
+      "use receiptId/runId idempotency",
+      "write Postgres first, then emit NDJSON projection",
+      "return durable acknowledgement only after Postgres success",
+      "independent SQL readback and replay proof"
+    ],
+    "doNotDo": [
+      "delete or rewrite existing NDJSON history",
+      "treat NDJSON success as Postgres success",
+      "create a second outcome table",
+      "remove existing callers before migration proof"
+    ]
+  },
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "nextGate": "MCP-OUTCOME-RECEIPT-ADAPTER-01"
+}

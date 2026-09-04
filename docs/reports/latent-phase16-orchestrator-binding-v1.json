@@ -1,0 +1,118 @@
+{
+  "schema": "atlas.latent-phase16-orchestrator-binding.v1",
+  "generatedAt": "2026-09-02T00:00:00.000Z",
+  "status": "BLOCKED_AUTHORITATIVE_INPUT_BUNDLE_INCOMPLETE",
+  "mode": "READ_ONLY_OWNER_TRACE",
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "phase16": {
+    "inputRepresentationId": "semantic_768",
+    "outputRepresentationId": "latent_256",
+    "candidateSnapshotDependency": false,
+    "ordinalMapDependency": false,
+    "graphRevisionDependency": false,
+    "outputRepresentationRevisionCallerSupplied": false,
+    "outputRepresentationRevisionOwner": "phase16 representation producer"
+  },
+  "fields": {
+    "workspaceRevision": {
+      "canonicalOwner": "Graphify revision authority / workspace source manifest",
+      "currentValueAvailable": true,
+      "currentValue": "sha256:8a3a9085b3ed383b913405e2970d94f0b57f3db00b998946f201567b6d7f3fa1",
+      "revisionQualified": true,
+      "syntheticFallbackPresent": false,
+      "safeForPhase16": false,
+      "reason": "graphify-revision-owner-v2-retry reports revisionOwnerProven=false and CONTROLLED_PERSISTENCE_CANARY_NOT_PROVEN"
+    },
+    "sourceSnapshotRevision": {
+      "canonicalOwner": "current source revision audit / workspace source snapshot owner",
+      "currentValueAvailable": false,
+      "currentValue": null,
+      "revisionQualified": false,
+      "syntheticFallbackPresent": false,
+      "safeForPhase16": false,
+      "reason": "111 source-byte matches are per-source observations; no admitted corpus source-set revision is present"
+    },
+    "inputRepresentationRevision": {
+      "canonicalOwner": "semantic_768 canonical embedding artifact",
+      "currentValueAvailable": false,
+      "currentValue": "semantic_768:content_embedding",
+      "revisionQualified": false,
+      "syntheticFallbackPresent": true,
+      "safeForPhase16": false,
+      "reason": "current wrapper hard-codes this value and sem768 admission evidence does not prove a canonical representation revision"
+    },
+    "inputPopulationChecksum": {
+      "canonicalOwner": "exact eligible semantic_768 population owner",
+      "currentValueAvailable": false,
+      "currentValue": null,
+      "revisionQualified": false,
+      "syntheticFallbackPresent": false,
+      "safeForPhase16": false,
+      "reason": "no frozen eligible semantic_768 population checksum is available to the fanout"
+    },
+    "modelChecksum": {
+      "canonicalOwner": "NestedSemanticAutoencoder training receipt v3 full01",
+      "currentValueAvailable": true,
+      "currentValue": "d6e9395e60f0bb039dd03368012697c5c393d36bb001b8f020b6d7ba22654259",
+      "revisionQualified": true,
+      "syntheticFallbackPresent": false,
+      "safeForPhase16": true
+    },
+    "producerRevision": {
+      "canonicalOwner": "NestedSemanticAutoencoder producer/training receipt",
+      "currentValueAvailable": true,
+      "currentValue": "producer:sha256:latent256-wrapper-v1",
+      "revisionQualified": true,
+      "syntheticFallbackPresent": false,
+      "safeForPhase16": true
+    }
+  },
+  "astCstBoundary": {
+    "status": "STRUCTURAL_ONLY",
+    "feeds": "graphRevision",
+    "phase16Input": false,
+    "candidateSnapshotInput": false,
+    "ordinalMapInput": false
+  },
+  "orchestrator": {
+    "currentWrapperRequiredFlags": [
+      "--workspace-revision",
+      "--source-revision",
+      "--representation-revision",
+      "--input-population-checksum"
+    ],
+    "targetOwnerInputFlags": [
+      "--workspace-revision",
+      "--source-snapshot-revision",
+      "--input-representation-revision",
+      "--input-population-checksum",
+      "--model-checksum",
+      "--producer-revision"
+    ],
+    "requiredFlags": [
+      "--workspace-revision",
+      "--source-snapshot-revision",
+      "--input-representation-revision",
+      "--input-population-checksum",
+      "--model-checksum",
+      "--producer-revision"
+    ],
+    "outputRepresentationRevisionMustBeDerived": true,
+    "currentBindingPresent": false,
+    "safeAction": "FAIL_CLOSED_NO_FANOUT_CHANGE"
+  },
+  "blockers": [
+    "WORKSPACE_REVISION_OWNER_NOT_PROMOTION_PROVEN",
+    "SOURCE_SNAPSHOT_REVISION_UNADMITTED",
+    "SEMANTIC_768_INPUT_REPRESENTATION_REVISION_UNPROVEN",
+    "SEMANTIC_768_INPUT_POPULATION_CHECKSUM_MISSING"
+  ],
+  "evidenceRefs": [
+    "docs/reports/graphify-revision-owner-v2-retry.json",
+    "docs/reports/current-graphify-source-revision-v1.json",
+    "docs/reports/latent-autoencoder-training-receipt-v3-full01.json",
+    "scripts/atlas/latent256-revision-qualified-wrapper.mts"
+  ],
+  "nextGate": "ADMIT_SEMANTIC_768_CORPUS_BUNDLE_THEN_LATENT_PHASE16_ORCHESTRATOR_BINDING"
+}

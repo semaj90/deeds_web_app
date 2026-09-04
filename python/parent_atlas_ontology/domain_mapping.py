@@ -61,12 +61,12 @@ class DomainOntologyAdmissionV1:
 
 _DEFAULT_MAPPINGS: tuple[DomainOntologyMappingV1, ...] = (
     DomainOntologyMappingV1("retrieval", "atlas:RetrievalDomain", ("search", "rag_retrieval")),
-    DomainOntologyMappingV1("database", "atlas:DatabaseDomain", ("postgres", "storage")),
+    DomainOntologyMappingV1("database", "atlas:DatabaseDomain", ("postgres", "storage", "cache_layer", "memory_optimization", "evidence_upload_storage")),
     DomainOntologyMappingV1("code", "atlas:CodeDomain", ("source", "programming")),
     DomainOntologyMappingV1("graph", "atlas:GraphDomain", ("topology", "graph_topology")),
     DomainOntologyMappingV1("model", "atlas:ModelDomain", ("embedding", "inference", "embedding_indexing", "cluster_analysis")),
-    DomainOntologyMappingV1("workflow", "atlas:WorkflowDomain", ("pipeline", "dag", "agent_orchestration", "repair_workflow", "trace_mcp")),
-    DomainOntologyMappingV1("documentation", "atlas:DocumentationDomain", ("docs",)),
+    DomainOntologyMappingV1("workflow", "atlas:WorkflowDomain", ("pipeline", "dag", "agent_orchestration", "repair_workflow", "trace_mcp", "auth_login_register", "case_management")),
+    DomainOntologyMappingV1("documentation", "atlas:DocumentationDomain", ("docs", "document_processing", "citation_engine", "legal_reports")),
 )
 
 

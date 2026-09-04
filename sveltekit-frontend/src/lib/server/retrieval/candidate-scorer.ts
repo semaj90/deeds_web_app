@@ -19,7 +19,7 @@
  */
 
 import { z } from 'zod';
-import { blendScores, DEFAULT_BLEND_WEIGHTS, type BlendWeights } from './runtime-reranker.js';
+import { blendScores, BlendWeightsSchema, DEFAULT_BLEND_WEIGHTS, type BlendWeights } from './runtime-reranker.js';
 import { staticDynamicScore, type StaticDynamicLabel } from './static-dynamic-classifier.js';
 import { provenanceScore } from '../classifier/code-symbol-provenance.js';
 import type { SourceKind } from '../classifier/source-kind-classifier.js';
@@ -190,7 +190,12 @@ export async function scoreCandidates(
 ): Promise<ScoredCandidate[]> {
   if (candidates.length === 0) return [];
 
-  const weights = options.blendWeights ?? DEFAULT_BLEND_WEIGHTS;
+  // RERANK-WEIGHT-BOUNDARY-01 (openspec/changes/parent-atlas-best-fit-score-fabric task 2):
+  // BlendWeightsSchema.parse() at every externally-reachable custom-weight boundary -- this
+  // module-level scoreCandidates() previously passed a caller-supplied blendWeights straight
+  // into blendScores() with zero runtime validation, unlike the DeterministicReranker/
+  // MixedbreadCanonicalReranker class constructors, which do validate their own weights.
+  const weights = options.blendWeights ? BlendWeightsSchema.parse(options.blendWeights) : DEFAULT_BLEND_WEIGHTS;
   const shouldNorm = options.normaliseFusion !== false;
 
   const normFusion = shouldNorm

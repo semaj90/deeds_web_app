@@ -1,0 +1,143 @@
+{
+  "schema": "atlas.kernel-parameter-schema-coverage.v1",
+  "gate": "DAG-PARAMETER-SCHEMA-COVERAGE-01",
+  "scope": "read-only operator-library audit; no runtime, database, cache, or artifact-store writes",
+  "libraryRevision": "operator-library:symbol-repair:v0",
+  "operatorCount": 18,
+  "schemaBoundCount": 6,
+  "noParameterSchemaCount": 12,
+  "schemaBound": [
+    {
+      "operatorId": "op:get_callers",
+      "kind": "GET_CALLERS",
+      "parameterSchemaRef": "param:graph-hop-bound",
+      "operatorRevision": "op-rev:symbol-repair:v0",
+      "executorClass": "GRAPH_TRAVERSAL_EXECUTOR"
+    },
+    {
+      "operatorId": "op:expand_graph",
+      "kind": "EXPAND_GRAPH",
+      "parameterSchemaRef": "param:graph-hop-bound",
+      "operatorRevision": "op-rev:symbol-repair:v0",
+      "executorClass": "GRAPH_TRAVERSAL_EXECUTOR"
+    },
+    {
+      "operatorId": "op:bounded_bfs",
+      "kind": "BOUNDED_BFS",
+      "parameterSchemaRef": "param:graph-hop-bound",
+      "operatorRevision": "op-rev:symbol-repair:v0",
+      "executorClass": "GRAPH_TRAVERSAL_EXECUTOR"
+    },
+    {
+      "operatorId": "op:search_lexical",
+      "kind": "SEARCH_LEXICAL",
+      "parameterSchemaRef": "param:top-k",
+      "operatorRevision": "op-rev:symbol-repair:v0",
+      "executorClass": "SEARCH_EXECUTOR"
+    },
+    {
+      "operatorId": "op:search_semantic",
+      "kind": "SEARCH_SEMANTIC",
+      "parameterSchemaRef": "param:top-k",
+      "operatorRevision": "op-rev:symbol-repair:v0",
+      "executorClass": "SEARCH_EXECUTOR"
+    },
+    {
+      "operatorId": "op:build_context",
+      "kind": "BUILD_CONTEXT",
+      "parameterSchemaRef": "param:token-budget",
+      "operatorRevision": "op-rev:symbol-repair:v0",
+      "executorClass": "CONTEXT_BUILD_EXECUTOR"
+    }
+  ],
+  "noParameterSchema": [
+    {
+      "operatorId": "op:lookup_symbol",
+      "kind": "LOOKUP_SYMBOL",
+      "parameterSchemaRef": null,
+      "operatorRevision": "op-rev:symbol-repair:v0",
+      "executorClass": "DB_QUERY_EXECUTOR"
+    },
+    {
+      "operatorId": "op:lookup_packet",
+      "kind": "LOOKUP_PACKET",
+      "parameterSchemaRef": null,
+      "operatorRevision": "op-rev:symbol-repair:v0",
+      "executorClass": "DB_QUERY_EXECUTOR"
+    },
+    {
+      "operatorId": "op:get_source_span",
+      "kind": "GET_SOURCE_SPAN",
+      "parameterSchemaRef": null,
+      "operatorRevision": "op-rev:symbol-repair:v0",
+      "executorClass": "DB_QUERY_EXECUTOR"
+    },
+    {
+      "operatorId": "op:get_ast_evidence",
+      "kind": "GET_AST_EVIDENCE",
+      "parameterSchemaRef": null,
+      "operatorRevision": "op-rev:symbol-repair:v0",
+      "executorClass": "DB_QUERY_EXECUTOR"
+    },
+    {
+      "operatorId": "op:get_references",
+      "kind": "GET_REFERENCES",
+      "parameterSchemaRef": null,
+      "operatorRevision": "op-rev:symbol-repair:v0",
+      "executorClass": "DB_QUERY_EXECUTOR"
+    },
+    {
+      "operatorId": "op:shortest_path",
+      "kind": "SHORTEST_PATH",
+      "parameterSchemaRef": null,
+      "operatorRevision": "op-rev:symbol-repair:v0",
+      "executorClass": "GRAPH_TRAVERSAL_EXECUTOR"
+    },
+    {
+      "operatorId": "op:rerank",
+      "kind": "RERANK",
+      "parameterSchemaRef": null,
+      "operatorRevision": "op-rev:symbol-repair:v0",
+      "executorClass": "RANK_EXECUTOR"
+    },
+    {
+      "operatorId": "op:run_typecheck",
+      "kind": "RUN_TYPECHECK",
+      "parameterSchemaRef": null,
+      "operatorRevision": "op-rev:symbol-repair:v0",
+      "executorClass": "CLI_PROCESS_EXECUTOR"
+    },
+    {
+      "operatorId": "op:run_test",
+      "kind": "RUN_TEST",
+      "parameterSchemaRef": null,
+      "operatorRevision": "op-rev:symbol-repair:v0",
+      "executorClass": "CLI_PROCESS_EXECUTOR"
+    },
+    {
+      "operatorId": "op:intersect_eligibility",
+      "kind": "INTERSECT_ELIGIBILITY",
+      "parameterSchemaRef": null,
+      "operatorRevision": "op-rev:symbol-repair:v0",
+      "executorClass": "IN_MEMORY_COMPUTE_EXECUTOR"
+    },
+    {
+      "operatorId": "op:get_callees",
+      "kind": "GET_CALLEES",
+      "parameterSchemaRef": null,
+      "operatorRevision": "op-rev:symbol-repair:v0",
+      "executorClass": "GRAPH_TRAVERSAL_EXECUTOR"
+    },
+    {
+      "operatorId": "op:compare_revision",
+      "kind": "COMPARE_REVISION",
+      "parameterSchemaRef": null,
+      "operatorRevision": "op-rev:symbol-repair:v0",
+      "executorClass": "IN_MEMORY_COMPUTE_EXECUTOR"
+    }
+  ],
+  "classification": "PARTIAL_PARAMETER_SCHEMA_COVERAGE",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "reportChecksum": "sha256:b9ec748868b38d42e8fd6dace8ce1a56724d9e417262e01b54132e5de9282687"
+}

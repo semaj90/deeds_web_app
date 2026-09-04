@@ -1,0 +1,44 @@
+{
+  "schema": "atlas.sem768-input-provenance-owner-01.report",
+  "gate": "SEM768-INPUT-PROVENANCE-OWNER-01",
+  "generatedAt": "2026-09-02",
+  "type": "READ_ONLY_AUDIT",
+  "databaseWrites": false,
+  "embeddingRequests": 0,
+  "question": "Is codebase_chunk_index.content_hash's 16-hex-character form a valid-but-truncated checksum, a different hash algorithm, or corrupted/invalid data?",
+  "method": "Empirically reverse-engineered against real row bytes (COPY ... TO STDOUT via encode(content::bytea,'hex'), decoded and rehashed in Node) rather than assumed from naming or grepping a writer script first.",
+  "producerFamilies": [
+    {
+      "name": "16-hex majority (86/128 in the SEM768-ADMISSION-DRY-01 sample, 67%)",
+      "embeddingModel": "embeddinggemma:latest:eg-task-prefix-v1",
+      "embeddingVersion": "qdrant-backfill-v1",
+      "sourceRefBehavior": "usually present",
+      "hashAlgorithm": "CONFIRMED: sha256(content).slice(0,16) -- i.e. a 16-hex-character PREFIX of a full SHA-256 digest",
+      "verificationEvidence": "Empirically proven against a real row (id=0000d635-8df8-4a03-a1b0-e33d2699f6c0, 790 raw content bytes): full sha256 digest = 981f4c3e67375a550973caa373bc6a2f025ef9fc32d29e14f6f455b0a25ebaf9; stored content_hash = 981f4c3e67375a55 -- an EXACT match on the first 16 hex characters. Also tested and ruled out: MD5[0:16], SHA1[0:16], FNV-1a-64, LF-newline-normalized SHA256 -- none of these matched; only plain sha256(raw bytes).slice(0,16) matched.",
+      "repoConvention": "sha256(x).slice(0,16) is a well-established, deliberate, repo-wide convention for compact deterministic identifiers -- confirmed via grep across sveltekit-frontend/src and scripts/ (dozens of call sites named sha256First16(), sha16(), contentHash(), text_hash, hashQuery(), intentHash(), packetKeyFor(), featureIdFor(), etc). This is NOT a bug, NOT corruption, NOT a different hash family -- it is the same intentional pattern used throughout this codebase for short IDs, applied here to content_hash.",
+      "classification": "VALID_TRUNCATED_SHA256 -- not INPUT_DIGEST_UNQUALIFIED. The algorithm is proven, not merely suspected.",
+      "entropyNote": "64 bits of entropy (vs. 256 for full SHA-256). At the current 55,169-row scale this is far below the ~2^32 birthday-bound collision-risk threshold, but it is objectively a weaker checksum than a full digest -- worth carrying an explicit algorithm tag rather than silently treating it as equivalent to a 64-hex checksum."
+    },
+    {
+      "name": "64-hex minority (42/128 in the SEM768-ADMISSION-DRY-01 sample, 33%)",
+      "embeddingModel": "embeddinggemma:latest (no suffix)",
+      "embeddingVersion": "(usually empty)",
+      "sourceRefBehavior": "null in this table for the sampled row (relative_path populated instead)",
+      "hashAlgorithm": "NOT IDENTIFIED THIS PASS -- tested and ruled out against one real row (id=00032bfb-f581-415c-9edd-a8fc7f154f3f, relative_path=sveltekit-frontend/docs/graph/enhanced-hypergraph.json, 1668 raw content bytes): plain sha256(content), sha256(relativePath+content) in 4 concatenation orders/separators, sha256(JSON.stringify(content)), sha256(content.trim()) -- none matched the stored 64-hex content_hash. Most likely explanation, not yet proven: this row's content_hash was computed over a different granularity than the currently-stored per-row content -- e.g. a whole-file hash computed before chunking (this file is a large generated .json artifact likely split into many chunks, each of which could plausibly share one file-level hash rather than each having its own chunk-level hash), or the content column was updated after the hash was written by an older/different producer pipeline.",
+      "classification": "INPUT_DIGEST_UNQUALIFIED -- format is a real 64-hex string (consistent with a full SHA-256 shape), but the exact input it was computed over is unconfirmed. Do not assume it is either 'the same algorithm as the majority group at full length' or 'garbage' -- neither claim is proven.",
+      "followUp": "Not resolved this pass (time-bounded). Identifying the exact producer script for this minority group (likely an older/different ingestion pipeline given the plain 'embeddinggemma:latest' model tag and null source_ref) would require either a broader empirical search across producer scripts or provenance metadata this table does not currently carry."
+    }
+  ],
+  "recommendationForSemanticRepresentationV1": {
+    "doNotHardcode": "inputChecksum as sha256HexSchema (64-hex only) -- this would silently reject the majority (67% of sampled rows), real, well-established truncated-SHA256 producer family as 'invalid' when it is in fact a valid, deterministic, reproducible, repo-wide-conventional digest -- just a narrower one.",
+    "proposedShape": {
+      "inputDigest": {
+        "algorithm": "'sha256' | 'sha256_16' | 'unqualified'",
+        "value": "string (hex)",
+        "producerRevision": "string, e.g. embedding_model value or a dedicated producer tag"
+      }
+    },
+    "rationale": "Matches the operator's suggested structure. 'sha256_16' is now a PROVEN, named algorithm (not a guess) for the majority producer family; 'unqualified' is the honest label for the 64-hex minority family until its exact input is identified; 'sha256' remains available for any future producer that genuinely emits a full, verified digest over the stored content."
+  },
+  "notApplied": "This report does not modify SemanticRepresentationV1 or re-run SEM768-ADMISSION-DRY-01/02. That is a separate follow-up step, pending operator confirmation."
+}

@@ -1,0 +1,77 @@
+{
+  "schema": "atlas.concept-vocabulary-authority-01.v1",
+  "task": "CONCEPT-VOCABULARY-AUTHORITY-01",
+  "mode": "READ_ONLY_CENSUS",
+  "status": "PROVEN_BOUNDED_WITH_GAPS",
+  "termOccurrenceFileCounts": {
+    "DomainClassification": 28,
+    "DomainClassificationV1": 10,
+    "semantic_768": 332,
+    "EmbeddingGemma": 106,
+    "CST": 8,
+    "AST": 322,
+    "SearXNG": 26,
+    "sourceRevision": 446,
+    "evidenceRefs": 219,
+    "OntologyLinkedTupleV1": 40,
+    "jsonb": 313,
+    "content_embedding_768": 12,
+    "searchVector": 6,
+    "pgvector": 148,
+    "PageRank": 285,
+    "KMeans": 86,
+    "SOM": 300,
+    "CandidateOrdinalMapV1": 31,
+    "citation": 206
+  },
+  "authorities": [
+    {"termId": "domain-classification", "schemaOwner": "sveltekit-frontend/src/lib/server/atlas/domain-taxonomy.ts", "storageOwner": "PostgreSQL code_features/atlas_feature_envelopes", "status": "WIRED"},
+    {"termId": "domain-classification-v1", "schemaOwner": "sveltekit-frontend/src/lib/server/atlas/contracts/semantic-signal-v1.ts", "storageOwner": "evidence/proof artifacts", "status": "PROVEN_BOUNDED"},
+    {"termId": "ontology-linked-tuple-v1", "schemaOwner": "python/parent_atlas_ontology/models.py", "storageOwner": "PostgreSQL only after explicit admission", "status": "PROVEN_BOUNDED"},
+    {"termId": "semantic-768", "schemaOwner": "sveltekit-frontend/src/lib/server/embedding/embedding-contract-768.ts", "storageOwner": "PostgreSQL codebase_chunk_index.content_embedding_768; Qdrant projection", "status": "PROVEN_BOUNDED"},
+    {"termId": "ast-cst", "schemaOwner": "8095 Tree-sitter/AST-grep provider boundary", "storageOwner": "structural evidence/projection artifacts", "status": "WIRED"},
+    {"termId": "web-citation", "schemaOwner": "sveltekit-frontend/src/routes/api/websearch/+server.ts", "storageOwner": "PostgreSQL citations only when explicitly saved", "status": "WIRED"},
+    {"termId": "postgres-jsonb", "schemaOwner": "sveltekit-frontend/drizzle/schema.ts", "storageOwner": "PostgreSQL JSONB columns with GIN where declared", "status": "PROVEN_BOUNDED"}
+  ],
+  "liveOntologyCounts": {
+    "atlas_ontology_concepts": 0,
+    "atlas_ontology_relations": 0,
+    "aliasValues": 0,
+    "namespaces": 0,
+    "conceptTypes": 0,
+    "relationPredicates": 0,
+    "activeConceptsMissingDescription": 0,
+    "danglingRelationSubjects": 0,
+    "danglingRelationObjects": 0,
+    "writesPerformed": false
+  },
+  "gaps": [
+    "No single ConceptDefinitionV1 registry currently joins term, definition, producer, storage, consumers, and revision.",
+    "SearXNG results are transient unless explicitly saved as citations; retrievedAt/contentHash/sourceRevision are not a universal saved-evidence contract.",
+    "Local DomainClassification and canonical DomainClassificationV1 remain separate contracts and require an explicit provenance adapter.",
+    "AST/CST observations do not yet share one universal evidence envelope across all producers.",
+    "The schema contains legacy 384-dimensional fields alongside canonical semantic_768 fields; lane identity must remain explicit.",
+    "Occurrence counts are repository search counts, not counts of unique concepts or database rows."
+  ],
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "existingReusableContracts": [
+    "sveltekit-frontend/src/lib/server/atlas/taxonomy/entity-concept-taxonomy-v1.ts::ConceptV1",
+    "sveltekit-frontend/src/lib/server/atlas/taxonomy/entity-concept-taxonomy-v1.ts::EntityDescriptorV1",
+    "sveltekit-frontend/src/lib/server/atlas/taxonomy/entity-concept-taxonomy-v1.ts::TaxonomyAssignmentCandidateV1",
+    "sveltekit-frontend/src/lib/server/atlas/contracts/ontology-linked-tuple-v1.ts::OntologyLinkedTupleV1",
+    "sveltekit-frontend/src/lib/server/atlas/contracts/semantic-signal-v1.ts::DomainClassificationV1"
+  ],
+  "recognitionValidation": {
+    "contract": "sveltekit-frontend/src/lib/server/atlas/taxonomy/entity-concept-taxonomy-v1.ts",
+    "observationSchema": "atlas.term-observation.v1",
+    "recognitionSchema": "atlas.concept-recognition.v1",
+    "precedence": ["concept_id", "canonical_label", "alias"],
+    "semanticAutoAdmission": false,
+    "focusedTests": 10,
+    "status": "PROVEN_BOUNDED"
+  },
+  "nextGate": "CONCEPT-SEED-DRY-01",
+  "promotionBlocker": "LIVE_CONCEPT_REGISTRY_EMPTY",
+  "designCorrection": "Do not create a parallel ConceptDefinitionV1 or tuple schema; adapt the existing ConceptV1 and OntologyLinkedTupleV1 contracts."
+}

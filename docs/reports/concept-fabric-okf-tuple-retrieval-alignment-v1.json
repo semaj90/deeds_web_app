@@ -1,0 +1,29 @@
+{
+  "reportSchema": "parent-atlas.validation-report.v1",
+  "gate": "CONCEPT-FABRIC-OKF-TUPLE-RETRIEVAL-ALIGNMENT-01",
+  "status": "PROVEN_BOUNDED",
+  "fixtureOnly": true,
+  "contracts": [
+    "atlas.external-doc-fetch-receipt.v1",
+    "atlas.external-doc-chunk.v1",
+    "atlas.external-doc-ontology-tuple.v1",
+    "atlas.external-docs-retrieval-plan.v1"
+  ],
+  "checks": {
+    "sourceRevisionContinuity": "PASS",
+    "normalizedDocumentChecksumContinuity": "PASS",
+    "tupleDegreeMatchesParticipants": "PASS",
+    "tupleEvidenceSpanBound": "PASS",
+    "singleSemanticLane": "PASS",
+    "exactSourcePromotionRequired": "PASS",
+    "deterministicReplayChecksum": "PASS",
+    "canonicalAuthority": false,
+    "writesPerformed": false
+  },
+  "productionStatus": "NOT_PROVEN",
+  "liveAcquisition": "NOT_RUN",
+  "indexing": "NOT_RUN",
+  "ontologyPromotion": "NOT_RUN",
+  "retrievalExecution": "NOT_RUN",
+  "test": "packages/parent-atlas/test/external-doc-knowledge-fabric.test.mjs"
+}

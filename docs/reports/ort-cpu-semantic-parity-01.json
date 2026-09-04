@@ -1,0 +1,372 @@
+{
+  "schema": "atlas.ort-cpu-semantic-parity-01.report",
+  "gate": "ORT-CPU-SEMANTIC-PARITY-01",
+  "generatedAt": "2026-09-02T19:49:05.451Z",
+  "sampleSize": 32,
+  "executors": {
+    "a": {
+      "name": "8081_gguf_cuda",
+      "urlOrPath": "http://127.0.0.1:8081/v1/embeddings",
+      "precision": "unquantized (llama.cpp GGUF)"
+    },
+    "b": {
+      "name": "onnx_cpu_1.29.0",
+      "modelPath": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\static\\embeddinggemma_300m_onnx\\model.onnx",
+      "modelChecksum": "sha256:e416365eaf7224cd490c508ea3b42f10855332dd8317015d2344577f73788772",
+      "tokenizerPath": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\static\\embeddinggemma_300m_onnx\\tokenizer.json",
+      "tokenizerChecksum": "sha256:6852f8d561078cc0cebe70ca03c5bfdd0d60a45f9d2e0e1e4cc05b68e9ec329e",
+      "precision": "QInt8 quantized (per model_info.json)",
+      "declaredMaxSequenceLength": 512
+    }
+  },
+  "knownAsymmetry": "ONNX export is QInt8-quantized with a declared 512-token cap; :8081 GGUF is unquantized with a 2048-token cap. All sampled texts are well under 512 tokens so capacity does not confound this run. IMPORTANT CORRECTION (post-hoc, after seeing the result): quantization alone does NOT explain what was observed. A QInt8-vs-unquantized gap would show high (~0.95+) but imperfect cosine agreement -- what was actually measured is a UNIFORM near-zero band (-0.086 to +0.090) across all 32 rows with no outliers and no high-agreement rows, which is the signature of a structural representation mismatch, not a precision difference. Do not cite this quantization note as an explanation for the NOT_ADMITTED result below.",
+  "rootCauseInvestigation": {
+    "structuralChecksPerformed": [
+      "ONNX model output tensor: confirmed 'last_hidden_state', shape [1, seq, 768] -- matches onnx-embed.ts's pooling indexing math exactly (t*768+d for a [1,seq,hidden] row-major layout). Verified live via a direct session.run() probe, not assumed.",
+      "Tokenization: confirmed real, plausible SentencePiece subword token IDs for a sample text (not empty, not all-UNK, not garbage).",
+      "config.json: architectures=['Gemma3TextModel'], use_bidirectional_attention=true, hidden_size=768, head_dim=256 -- consistent with EmbeddingGemma's documented architecture, not a wrong/mismatched checkpoint shape.",
+      "Pooling strategy: both sides configured for mean pooling -- :8081 via launch-embed-server.ps1's --pooling mean flag, onnx-embed.ts via explicit mean-pool-over-attention-mask code. Not a mean-vs-last-token mismatch as far as configuration goes."
+    ],
+    "tokenizerParityCheck": {
+      "method": "Directly compared llama.cpp's :8081 POST /tokenize endpoint against the ONNX export's AutoTokenizer (transformers.js) for 3 real sample texts.",
+      "results": [
+        { "text": "authentication and login routes", "8081Tokens": [63703, 532, 14209, 16266], "onnxContentTokens": [63703, 532, 14209, 16266], "match": true },
+        { "text": "Postgres is the canonical source of truth", "8081Tokens": [7118, 41058, 563, 506, 37778, 3738, 529, 9043], "onnxContentTokens": [7118, 41058, 563, 506, 37778, 3738, 529, 9043], "match": true },
+        { "text": "Qdrant vector search collection", "8081Tokens": [236935, 6570, 638, 3550, 3927, 5249], "onnxContentTokens": [236935, 6570, 638, 3550, 3927, 5249], "match": true }
+      ],
+      "verdict": "EXACT MATCH, 3/3 -- llama.cpp's internal tokenizer and the ONNX export's tokenizer.json produce IDENTICAL token IDs for identical text (ONNX wraps the same content-token sequence in BOS=2/EOS=1, which :8081's /tokenize output omits but the embedding call presumably adds internally -- consistent, not a discrepancy). The original 'leading hypothesis' (tokenizer/vocab mismatch) is DEFINITIVELY RULED OUT, not merely unconfirmed."
+    },
+    "explicitlyRuledOut": [
+      "QInt8 quantization precision gap alone (would show high not near-zero cosine)",
+      "Dimension/shape mismatch (confirmed 768/768, row-major layout matches)",
+      "Empty or degenerate tokenization (confirmed real subword IDs)",
+      "Tokenizer/vocabulary mismatch (confirmed IDENTICAL token IDs across 3 real texts via direct comparison against :8081's own /tokenize endpoint)"
+    ],
+    "remainingLeadingHypothesis": "SUPERSEDED by a direct, decisive follow-up test -- see withinExecutorSemanticSanityCheck below. The attention-masking hypothesis above was reasonable given the evidence at the time but was not the most direct test available; a self-consistency check localized the fault to a specific side before that hypothesis needed to be pursued."
+  },
+  "withinExecutorSemanticSanityCheck": {
+    "method": "Instead of comparing the two executors against EACH OTHER (which can't distinguish 'both broken differently' from 'one broken, one healthy'), embedded 2 semantically-similar text pairs and 2 semantically-dissimilar text pairs through EACH EXECUTOR INDEPENDENTLY, and checked whether that executor's own cosine scores separate similar from dissimilar content. A healthy executor should show a real gap; a broken one should not.",
+    "results": {
+      "8081_gguf_cuda": {
+        "similarPairCosines": [0.6442, 0.5538],
+        "dissimilarPairCosines": [0.2758, 0.2427],
+        "discriminationGap": "~0.30 (similar pairs clearly, meaningfully higher than dissimilar pairs)",
+        "verdict": "HEALTHY -- confirms :8081 is semantically discriminative on its own, independent of the ONNX comparison. This is the executor already proven live for taxonomy retrieval earlier this session."
+      },
+      "onnx_cpu_1.29.0": {
+        "similarPairCosines": [0.9426, 0.9368],
+        "dissimilarPairCosines": [0.9096, 0.8757],
+        "discriminationGap": "~0.04 (similar and dissimilar pairs nearly indistinguishable, all compressed into a narrow 0.88-0.94 band)",
+        "verdict": "UNHEALTHY -- classic embedding-space anisotropy/collapse signature: all embeddings cluster in a narrow high-cosine cone regardless of actual semantic content, a well-documented failure mode of naive post-training quantization (QInt8 here) applied to mean-pooled transformer embeddings without calibration."
+      }
+    },
+    "conclusion": "DECISIVE: the fault is on the ONNX side, not the :8081/GGUF side. :8081 is independently confirmed semantically healthy. ONNX's own embeddings fail to discriminate similar from dissimilar text even in isolation -- this is not merely 'disagreement between two valid executors', it is evidence that the ONNX QInt8 export itself produces degenerate embeddings.",
+    "correctionToEarlierReasoning": "The report originally dismissed QInt8 quantization as an explanation for the near-zero CROSS-executor cosine, reasoning that quantization alone would produce high-but-imperfect agreement rather than near-zero. That reasoning about cross-executor correlation was not wrong, but it missed the real mechanism: quantization-induced WITHIN-executor anisotropy (embeddings collapsing into a narrow, low-discrimination cone) is exactly what this follow-up test measured directly, and that alone is sufficient to explain near-zero cross-executor cosine -- a semantically-spread healthy space (:8081) compared against a collapsed narrow cone (ONNX QInt8) will look uncorrelated even though the collapse, not a tokenizer or architecture bug, is the actual root cause. The attention-masking hypothesis is no longer the leading explanation and was not needed to resolve this."
+  },
+  "validity": {
+    "v8081ValidCount": 32,
+    "vOnnxValidCount": 32,
+    "bothValidCount": 32,
+    "dimensionMismatches": 0
+  },
+  "cosineStats": {
+    "mean": -0.02350471945231759,
+    "p05": -0.07830589755143037,
+    "min": -0.08604502008258869,
+    "max": 0.09032932143458323,
+    "n": 32
+  },
+  "topKOverlapMean": 0.53125,
+  "topKOverlapK": 10,
+  "perRow": [
+    {
+      "id": "0000d635-8df8-4a03-a1b0-e33d2699f6c0",
+      "textLength": 294,
+      "v8081Valid": true,
+      "vOnnxValid": true,
+      "v8081Error": null,
+      "vOnnxError": null,
+      "cosine": -0.07389200658893794
+    },
+    {
+      "id": "0001981c-da69-4b0e-9acb-ad29544029c8",
+      "textLength": 191,
+      "v8081Valid": true,
+      "vOnnxValid": true,
+      "v8081Error": null,
+      "vOnnxError": null,
+      "cosine": 0.006509901697394419
+    },
+    {
+      "id": "0002c4d4-3f96-4a8f-934d-61d8c6985340",
+      "textLength": 274,
+      "v8081Valid": true,
+      "vOnnxValid": true,
+      "v8081Error": null,
+      "vOnnxError": null,
+      "cosine": -0.007715470453692579
+    },
+    {
+      "id": "0004791e-40fe-4736-be3b-d84796ac5476",
+      "textLength": 263,
+      "v8081Valid": true,
+      "vOnnxValid": true,
+      "v8081Error": null,
+      "vOnnxError": null,
+      "cosine": -0.05940539848294515
+    },
+    {
+      "id": "0006a6fd-d2ec-48ab-926b-2adb327acaaf",
+      "textLength": 271,
+      "v8081Valid": true,
+      "vOnnxValid": true,
+      "v8081Error": null,
+      "vOnnxError": null,
+      "cosine": -0.000628768850709729
+    },
+    {
+      "id": "000700dd-d698-4589-a3b3-62c404909095",
+      "textLength": 391,
+      "v8081Valid": true,
+      "vOnnxValid": true,
+      "v8081Error": null,
+      "vOnnxError": null,
+      "cosine": -0.03218740746111067
+    },
+    {
+      "id": "000b45f4-0368-4a92-bde7-5698e49d6f8c",
+      "textLength": 180,
+      "v8081Valid": true,
+      "vOnnxValid": true,
+      "v8081Error": null,
+      "vOnnxError": null,
+      "cosine": -0.026829877884750084
+    },
+    {
+      "id": "000d381c-017b-4154-900c-f87e54e79539",
+      "textLength": 154,
+      "v8081Valid": true,
+      "vOnnxValid": true,
+      "v8081Error": null,
+      "vOnnxError": null,
+      "cosine": -0.0415388627358168
+    },
+    {
+      "id": "0010432e-9be2-4faf-9fc6-f6c26db3fe44",
+      "textLength": 295,
+      "v8081Valid": true,
+      "vOnnxValid": true,
+      "v8081Error": null,
+      "vOnnxError": null,
+      "cosine": -0.0029660982594901853
+    },
+    {
+      "id": "00113f4e-919d-4799-8eb1-b5e65f5a72fc",
+      "textLength": 356,
+      "v8081Valid": true,
+      "vOnnxValid": true,
+      "v8081Error": null,
+      "vOnnxError": null,
+      "cosine": -0.0056022343504213805
+    },
+    {
+      "id": "00127e7c-b8b8-49cd-a3f1-04033827d5d6",
+      "textLength": 338,
+      "v8081Valid": true,
+      "vOnnxValid": true,
+      "v8081Error": null,
+      "vOnnxError": null,
+      "cosine": -0.046080522138924655
+    },
+    {
+      "id": "00135cff-8625-47cd-8956-7a30c56bdd1e",
+      "textLength": 606,
+      "v8081Valid": true,
+      "vOnnxValid": true,
+      "v8081Error": null,
+      "vOnnxError": null,
+      "cosine": -0.08604502008258869
+    },
+    {
+      "id": "0013b0dd-ebf5-4f1e-9d64-4134bacc9490",
+      "textLength": 344,
+      "v8081Valid": true,
+      "vOnnxValid": true,
+      "v8081Error": null,
+      "vOnnxError": null,
+      "cosine": -0.025084033310821773
+    },
+    {
+      "id": "0014482f-cc66-4466-9464-ee57a482acb8",
+      "textLength": 416,
+      "v8081Valid": true,
+      "vOnnxValid": true,
+      "v8081Error": null,
+      "vOnnxError": null,
+      "cosine": -0.023739823622150602
+    },
+    {
+      "id": "0014ead0-2982-4e1a-bb8f-81b8aadd8d60",
+      "textLength": 143,
+      "v8081Valid": true,
+      "vOnnxValid": true,
+      "v8081Error": null,
+      "vOnnxError": null,
+      "cosine": -0.0011597147883880214
+    },
+    {
+      "id": "00157b87-8b21-4712-bf1d-8a27ab0aba7d",
+      "textLength": 542,
+      "v8081Valid": true,
+      "vOnnxValid": true,
+      "v8081Error": null,
+      "vOnnxError": null,
+      "cosine": -0.07830589755143037
+    },
+    {
+      "id": "0016a3ab-3b9c-4e83-8527-48ee65f434b8",
+      "textLength": 265,
+      "v8081Valid": true,
+      "vOnnxValid": true,
+      "v8081Error": null,
+      "vOnnxError": null,
+      "cosine": -0.07158915535687446
+    },
+    {
+      "id": "00173130-6713-4be9-aafe-804c2d7f5899",
+      "textLength": 354,
+      "v8081Valid": true,
+      "vOnnxValid": true,
+      "v8081Error": null,
+      "vOnnxError": null,
+      "cosine": 0.002052969379200728
+    },
+    {
+      "id": "001873a1-fa8b-48f4-afbf-c1ce9ffacf5b",
+      "textLength": 285,
+      "v8081Valid": true,
+      "vOnnxValid": true,
+      "v8081Error": null,
+      "vOnnxError": null,
+      "cosine": -0.03204030203133955
+    },
+    {
+      "id": "001938cd-b242-4fb0-a783-6f3fa0b4f194",
+      "textLength": 307,
+      "v8081Valid": true,
+      "vOnnxValid": true,
+      "v8081Error": null,
+      "vOnnxError": null,
+      "cosine": -0.043361779050296555
+    },
+    {
+      "id": "0019af02-c017-4052-af51-40f4cab83988",
+      "textLength": 545,
+      "v8081Valid": true,
+      "vOnnxValid": true,
+      "v8081Error": null,
+      "vOnnxError": null,
+      "cosine": 0.09032932143458323
+    },
+    {
+      "id": "001b6a7e-f6d1-4e13-b5b5-550377e8e724",
+      "textLength": 308,
+      "v8081Valid": true,
+      "vOnnxValid": true,
+      "v8081Error": null,
+      "vOnnxError": null,
+      "cosine": -0.050147405035561504
+    },
+    {
+      "id": "001c5b43-f0d5-4e60-8a22-d1de44136304",
+      "textLength": 315,
+      "v8081Valid": true,
+      "vOnnxValid": true,
+      "v8081Error": null,
+      "vOnnxError": null,
+      "cosine": -0.05421073510216873
+    },
+    {
+      "id": "001e1899-3709-47c5-a2a1-75619cc2e38f",
+      "textLength": 232,
+      "v8081Valid": true,
+      "vOnnxValid": true,
+      "v8081Error": null,
+      "vOnnxError": null,
+      "cosine": -0.06282381234882346
+    },
+    {
+      "id": "002362ba-f59d-4b4f-9d2d-88d543455d07",
+      "textLength": 300,
+      "v8081Valid": true,
+      "vOnnxValid": true,
+      "v8081Error": null,
+      "vOnnxError": null,
+      "cosine": 0.048138181296039514
+    },
+    {
+      "id": "002612e3-6989-41bc-a330-4551092e4c79",
+      "textLength": 102,
+      "v8081Valid": true,
+      "vOnnxValid": true,
+      "v8081Error": null,
+      "vOnnxError": null,
+      "cosine": 0.02846254325910798
+    },
+    {
+      "id": "00271993-e370-4102-a285-97e20a775ff6",
+      "textLength": 85,
+      "v8081Valid": true,
+      "vOnnxValid": true,
+      "v8081Error": null,
+      "vOnnxError": null,
+      "cosine": 0.039961987993835164
+    },
+    {
+      "id": "0028a5cb-46a2-4032-bb13-b0d4c1c5f058",
+      "textLength": 297,
+      "v8081Valid": true,
+      "vOnnxValid": true,
+      "v8081Error": null,
+      "vOnnxError": null,
+      "cosine": -0.016061503170786372
+    },
+    {
+      "id": "002a48cf-46f2-439b-8bed-7d641186fd04",
+      "textLength": 252,
+      "v8081Valid": true,
+      "vOnnxValid": true,
+      "v8081Error": null,
+      "vOnnxError": null,
+      "cosine": -0.034458702350489014
+    },
+    {
+      "id": "002ac5f2-bcc5-4f09-9fab-6fe6a56f7b5c",
+      "textLength": 280,
+      "v8081Valid": true,
+      "vOnnxValid": true,
+      "v8081Error": null,
+      "vOnnxError": null,
+      "cosine": 0.008561000756742522
+    },
+    {
+      "id": "002bd89a-7ebe-4827-8b53-cb25e666b2c6",
+      "textLength": 630,
+      "v8081Valid": true,
+      "vOnnxValid": true,
+      "v8081Error": null,
+      "vOnnxError": null,
+      "cosine": -0.043112895995821604
+    },
+    {
+      "id": "002eb9ef-9556-444d-9185-3c3d5662cbda",
+      "textLength": 519,
+      "v8081Valid": true,
+      "vOnnxValid": true,
+      "v8081Error": null,
+      "vOnnxError": null,
+      "cosine": -0.057179501286726615
+    }
+  ],
+  "conclusion": "NOT_ADMITTED — worst-case cosine -0.0860 is below the 0.85 admission floor; ONNX output does not yet reliably agree with the proven :8081 executor for at least one input."
+}

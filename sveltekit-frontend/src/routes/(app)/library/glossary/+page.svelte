@@ -22,6 +22,7 @@
 		jurisdiction: string | null;
 		relatedTerms: string[];
 		sources: string[];
+		sourceLinks: string[];
 		similarity: number;
 		matchType: 'semantic' | 'fulltext' | 'prefix';
 	}
@@ -522,7 +523,12 @@
 														<span>›</span>
 														<span>{def.nodeHeading}</span>
 													{/if}
-												</div>
+														{#if def.sourceUrl}
+															<a href={def.sourceUrl} target="_blank" rel="noreferrer" class="text-blue-700 underline decoration-blue-200 underline-offset-2 hover:text-blue-900">
+																Official source
+															</a>
+														{/if}
+													</div>
 												<p class="mt-3 text-sm leading-7 text-slate-700">{def.definitionText}</p>
 											</div>
 										{/each}
@@ -540,10 +546,16 @@
 									</div>
 									{#if selectedTerm.sources.length > 0}
 										<ul class="mt-4 space-y-3">
-											{#each selectedTerm.sources as src}
-												<li class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
-													{src}
-												</li>
+							{#each selectedTerm.sources as src}
+								<li class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
+									{#if selectedTerm.sourceLinks.includes(src)}
+										<a href={src} target="_blank" rel="noreferrer" class="break-all text-blue-700 underline decoration-blue-200 underline-offset-2 hover:text-blue-900">
+											{src}
+										</a>
+									{:else}
+										{src}
+									{/if}
+								</li>
 											{/each}
 										</ul>
 									{:else}

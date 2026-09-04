@@ -90,12 +90,81 @@ export const TaxonomyAssignmentCandidateV1Schema = z.object({
 }).strict();
 export type TaxonomyAssignmentCandidateV1 = z.infer<typeof TaxonomyAssignmentCandidateV1Schema>;
 
+export const TermObservationV1Schema = z.object({
+	schema: z.literal('atlas.term-observation.v1'),
+	observationId: z.string().min(1),
+	term: z.string().min(1),
+	normalizedTerm: z.string().min(1),
+	kind: z.enum(['token', 'lemma', 'phrase', 'entity', 'ast_node_kind', 'cst_token', 'symbol', 'import', 'schema', 'domain_label', 'query_term']),
+	sourceRef: z.string().min(1).nullable(),
+	sourceRevision: z.string().min(1),
+	evidenceRefs: z.array(z.string().min(1)).min(1),
+	producer: z.string().min(1),
+	producerRevision: z.string().min(1),
+	confidence: z.number().finite().min(0).max(1),
+	canonicalAuthority: z.literal(false),
+}).strict();
+export type TermObservationV1 = z.infer<typeof TermObservationV1Schema>;
+
+export const ConceptRecognitionV1Schema = z.object({
+	schema: z.literal('atlas.concept-recognition.v1'),
+	recognitionId: z.string().min(1),
+	observationId: z.string().min(1),
+	observedTerm: z.string().min(1),
+	normalizedTerm: z.string().min(1),
+	candidateConceptIds: z.array(z.string().min(1)),
+	selectedConceptId: z.string().min(1).nullable(),
+	matchMethod: z.enum(['concept_id', 'canonical_label', 'alias', 'taxonomy_mapping', 'structural_mapping', 'lexical', 'semantic', 'hybrid']),
+	confidence: z.number().finite().min(0).max(1),
+	evidenceRefs: z.array(z.string().min(1)).min(1),
+	conceptRegistryRevision: z.string().min(1),
+	resolverRevision: z.string().min(1),
+	status: z.enum(['ADMITTED', 'PROPOSED', 'AMBIGUOUS', 'UNMAPPED', 'REJECTED']),
+}).strict();
+export type ConceptRecognitionV1 = z.infer<typeof ConceptRecognitionV1Schema>;
+
 function sha256(value: unknown): string {
 	return createHash('sha256').update(JSON.stringify(value)).digest('hex');
 }
 
 function stableUnique(values: readonly string[]): string[] {
 	return [...new Set(values.map((value) => value.trim()).filter(Boolean))].sort();
+}
+
+/** Deterministic-first concept recognition. Semantic similarity is intentionally
+ * not performed here; it belongs to a separate proposal-producing adapter. */
+export function recognizeConceptV1(input: {
+	observation: TermObservationV1;
+	concepts: readonly ConceptV1[];
+	conceptRegistryRevision: string;
+	resolverRevision: string;
+}): ConceptRecognitionV1 {
+	const observation = TermObservationV1Schema.parse(input.observation);
+	const concepts = input.concepts.map((concept) => ConceptV1Schema.parse(concept));
+	const normalized = observation.normalizedTerm.trim().toLocaleLowerCase();
+	const exactId = concepts.filter((concept) => concept.conceptId === observation.term);
+	const canonical = concepts.filter((concept) => concept.label.trim().toLocaleLowerCase() === normalized);
+	const aliases = concepts.filter((concept) => concept.aliases.some((alias) => alias.trim().toLocaleLowerCase() === normalized));
+	const matches = exactId.length > 0 ? exactId : canonical.length > 0 ? canonical : aliases;
+	const matchMethod = exactId.length > 0 ? 'concept_id' : canonical.length > 0 ? 'canonical_label' : 'alias';
+	const candidateConceptIds = stableUnique(matches.map((concept) => concept.conceptId));
+	const status = candidateConceptIds.length === 1 ? 'ADMITTED' : candidateConceptIds.length > 1 ? 'AMBIGUOUS' : 'UNMAPPED';
+	const selectedConceptId = status === 'ADMITTED' ? candidateConceptIds[0] ?? null : null;
+	return ConceptRecognitionV1Schema.parse({
+		schema: 'atlas.concept-recognition.v1',
+		recognitionId: `concept-recognition:${sha256({ observationId: observation.observationId, candidateConceptIds, input: normalized, resolverRevision: input.resolverRevision }).slice(0, 32)}`,
+		observationId: observation.observationId,
+		observedTerm: observation.term,
+		normalizedTerm: observation.normalizedTerm,
+		candidateConceptIds,
+		selectedConceptId,
+		matchMethod,
+		confidence: status === 'ADMITTED' ? observation.confidence : 0,
+		evidenceRefs: stableUnique(observation.evidenceRefs),
+		conceptRegistryRevision: input.conceptRegistryRevision,
+		resolverRevision: input.resolverRevision,
+		status,
+	});
 }
 
 export function createConceptV1(input: {

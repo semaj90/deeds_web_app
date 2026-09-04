@@ -23,6 +23,22 @@ This page is the navigation entry for the Parent Atlas workstream. It links the 
 - [Offline Synthesis Parent Atlas](</C:/Users/james/Videos/deeds-web-app/docs/architecture/offline-synthesis-parent-atlas.md>)
 - [VRAM Hygiene Policy](</C:/Users/james/Videos/deeds-web-app/docs/architecture/vram-hygiene-policy.md>)
 
+## Current Runtime Ownership
+
+| Runtime | Current role | Decision |
+|---|---|---|
+| `miniforge-nlp-sidecar :8095` | CPU NLP/OaK and classifier fallbacks; scikit-learn is already declared in its image | Keep CPU-only; do not add PyTorch for the current classifier gate |
+| `atlas-neural-decoder :8121` | PyTorch 2.13 / CUDA 13.2 decoder baseline | Keep unchanged |
+| WSL `atlas-rapids-cu13` | Proven direct cuGraph/cuVS diagnostic and parity executor | Reuse; no second RAPIDS environment |
+| `atlas-gpu-8098 :8098` | Containerized RAPIDS 26.08 HTTP graph executor | Keep `rapidsai/base:26.08-cuda12-py3.13-amd64` for now |
+| Windows `C:\Python313` | Offline/reference model environment | Not a production owner |
+| cuTile | Optional Ampere kernel challenger | Not installed; pilot only after a measured kernel gap |
+| TensorRT-RTX | Optional decoder challenger | Separate compatibility gate; not part of RAPIDS |
+
+RAPIDS CUDA-13 convergence is a future measured migration, not a current
+repair. Any future change must compare graph, Jaccard, PageRank, KNN, startup,
+VRAM, and latency receipts before changing the `:8098` owner.
+
 ## Active Todo Spine
 
 - [MASTER FEATURE TODO](</C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md>)
@@ -153,6 +169,9 @@ The next derived surfaces are compare-only until the live contract exists:
 - Replay trace export and parent-atlas health logging are live read-only report lanes.
 
 ### Remaining todo focus
+- Graphify execution-ledger separation is the current P0 lifecycle lane:
+  `GRAPHIFY-EXECUTION-LEDGER-SCHEMA-02` → coordinator → A/B/C canary. The canonical migration is
+  an unapplied draft; `graphify_runs` remains historical compatibility state.
 - reconcile the live tree / summary / topology schema before any fresh backfill or plugin promotion
 - refresh-manifest invalidation is now bound to atlas truth promotion
 - OpenCode `/api/v1/chat/completions` now delegates to the ACE facade; EmbeddingGemma, Qdrant packet retrieval, Valkey/Bitfrost reuse, and llama-server fallback are wired end to end
@@ -161,7 +180,7 @@ The next derived surfaces are compare-only until the live contract exists:
 - keep HyperRAG telemetry, replay traces, and health logging read-only and append-only
 - expand `feature_id` placement coverage across the remaining cards
 - increase replay export breadth so replay coverage rises above the current thin baseline
-- finish AE/SOM provenance wiring for `embedding_384 -> latent_128 -> latent_64 -> SOM 20x20`
+- finish nested-AE residency/provenance wiring for `semantic_768 -> latent_256 -> latent_128 -> latent_64 -> SOM 20x20`
 - keep glyph coverage separate from retrieval and SOM work
 - finish provenance parity and quality review
 - finish provenance UI and trust-tier editing
@@ -175,7 +194,7 @@ The next derived surfaces are compare-only until the live contract exists:
 - keep HyperRAG telemetry, replay traces, and health logging read-only and append-only
 - expand `feature_id` placement coverage across the remaining cards
 - increase replay export breadth so replay coverage rises above the current thin baseline
-- finish AE/SOM provenance wiring for `embedding_384 -> latent_128 -> latent_64 -> SOM 20x20`
+- finish nested-AE residency/provenance wiring for `semantic_768 -> latent_256 -> latent_128 -> latent_64 -> SOM 20x20`
 - keep glyph coverage separate from retrieval and SOM work
 - finish provenance parity and quality review
 - finish provenance UI and trust-tier editing

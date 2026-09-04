@@ -124,6 +124,21 @@ export function positionAt(text, needle) {
   return { line: before.split('\n').length - 1, character: before.slice(before.lastIndexOf('\n') + 1).length };
 }
 
+// `fatal: true` makes TextDecoder throw on invalid UTF-8 instead of Node's Buffer.toString('utf8')
+// default of silently substituting U+FFFD — required here because a byteOffset that lands inside
+// a multibyte UTF-8 code point must fail closed, not silently produce a plausible-looking but
+// wrong UTF-16 line/character (Node's own docs: invalid UTF-8 through Buffer.toString('utf8') is
+// replaced with U+FFFD; TextDecoder's fatal option is documented to throw instead).
+const strictUtf8Decoder = new TextDecoder('utf-8', { fatal: true });
+
+function decodeUtf8Strict(bytes, errorCode) {
+  try {
+    return strictUtf8Decoder.decode(bytes);
+  } catch {
+    throw new Error(errorCode);
+  }
+}
+
 /**
  * Converts a UTF-8 byte offset (the coordinate tree-sitter/the 8095 sidecar emits) into an
  * LSP position (UTF-16 code-unit line/character, LSP's default `positionEncoding`). Naively
@@ -136,7 +151,18 @@ export function byteOffsetToPosition(sourceBuffer, byteOffset) {
   if (byteOffset < 0 || byteOffset > sourceBuffer.length) {
     throw new Error(`LSP_BYTE_OFFSET_OUT_OF_RANGE:${byteOffset}:${sourceBuffer.length}`);
   }
-  const prefix = sourceBuffer.subarray(0, byteOffset).toString('utf8');
+
+  // Prove the complete source is valid UTF-8 — a boundary that only splits a code point AFTER
+  // byteOffset would otherwise go undetected by a prefix-only check.
+  decodeUtf8Strict(sourceBuffer, 'LSP_SOURCE_INVALID_UTF8');
+
+  // Proves byteOffset itself lands on a valid UTF-8 code-point boundary — fails closed rather
+  // than silently returning a position derived from a U+FFFD-corrupted prefix.
+  const prefix = decodeUtf8Strict(
+    sourceBuffer.subarray(0, byteOffset),
+    `LSP_BYTE_OFFSET_SPLITS_UTF8_CODE_POINT:${byteOffset}`,
+  );
+
   const lastNewline = prefix.lastIndexOf('\n');
   return {
     line: (prefix.match(/\n/g) ?? []).length,

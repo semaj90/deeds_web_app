@@ -1,0 +1,5 @@
+-- Non-executable compatibility pointer.
+-- The single canonical manual migration is:
+-- sveltekit-frontend/drizzle/manual/20260903_graphify_execution_ledger_v1.sql
+-- This file intentionally contains no DDL, so two migration authorities cannot drift.
+-- It remains as a historical pointer to the earlier draft name.

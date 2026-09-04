@@ -1,16 +1,16 @@
 {
-  "generated_at": "2026-08-23T06:37:13.703Z",
+  "generated_at": "2026-09-03T18:40:40.861Z",
   "source_url": "http://127.0.0.1:8788/mcp",
-  "total_tools": 175,
+  "total_tools": 173,
   "namespaces": [
     "LLMS",
     "ace",
-    "admin",
     "atlas",
     "clusters",
     "codebase",
     "context",
     "db",
+    "domain",
     "engram",
     "evidence",
     "file",
@@ -41,7 +41,7 @@
     "wiki"
   ],
   "layer_counts": {
-    "unknown": 65,
+    "unknown": 63,
     "identity": 4,
     "read": 10,
     "synthesis": 30,
@@ -58,11 +58,8 @@
       "kb.organize_messy_text",
       "kb.extract_citations",
       "kb.trace_search",
-      "trace_search",
-      "wiki_note_lookup",
       "atlas.suggest_files",
       "ui.analyze_view",
-      "admin.log_event",
       "skills.list",
       "skills.run_mission",
       "legal.get_transcript",
@@ -119,6 +116,7 @@
       "service_workers.result",
       "miniforge.health",
       "miniforge.analyze",
+      "domain.classify",
       "miniforge.extract"
     ],
     "identity": [
@@ -317,7 +315,6 @@
         "unknown"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -333,7 +330,6 @@
         "unknown"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -348,7 +344,6 @@
         "unknown"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -365,24 +360,6 @@
         "identity"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
-      "writes_to": [],
-      "required_permissions": "read_only",
-      "input_schema_keys": [
-        "query",
-        "limit",
-        "intent"
-      ]
-    },
-    {
-      "tool_name": "trace_search",
-      "namespace": "misc",
-      "description": "DEPRECATED bare-name alias for kb.trace_search. Gated by MCP_LEGACY_ALIASES.",
-      "retrieval_layer": [
-        "unknown"
-      ],
-      "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -399,23 +376,6 @@
         "read"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
-      "writes_to": [],
-      "required_permissions": "read_only",
-      "input_schema_keys": [
-        "query",
-        "limit"
-      ]
-    },
-    {
-      "tool_name": "wiki_note_lookup",
-      "namespace": "misc",
-      "description": "DEPRECATED bare-name alias for kb.wiki_note_lookup. Gated by MCP_LEGACY_ALIASES.",
-      "retrieval_layer": [
-        "unknown"
-      ],
-      "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -431,7 +391,6 @@
         "synthesis"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -449,7 +408,6 @@
         "graph"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -470,7 +428,6 @@
         "graph"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -493,7 +450,6 @@
       "identity_fields": [
         "source_ref"
       ],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -514,7 +470,6 @@
         "unknown"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -536,7 +491,6 @@
         "read"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -557,7 +511,6 @@
         "read"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -581,29 +534,11 @@
         "unknown"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
         "snapshot",
         "focus"
-      ]
-    },
-    {
-      "tool_name": "admin.log_event",
-      "namespace": "admin",
-      "description": "Logs a manual administrative event with context.",
-      "retrieval_layer": [
-        "unknown"
-      ],
-      "identity_fields": [],
-      "operation_kind": "READ",
-      "writes_to": [],
-      "required_permissions": "read_only",
-      "input_schema_keys": [
-        "event",
-        "severity",
-        "context"
       ]
     },
     {
@@ -614,7 +549,6 @@
         "ops"
       ],
       "identity_fields": [],
-      "operation_kind": "AUDIT",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -630,7 +564,6 @@
         "unknown"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -645,7 +578,6 @@
         "unknown"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -662,7 +594,6 @@
         "unknown"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": []
@@ -675,7 +606,6 @@
         "unknown"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": []
@@ -688,7 +618,6 @@
         "unknown"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": []
@@ -701,7 +630,6 @@
         "synthesis"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": []
@@ -714,7 +642,6 @@
         "unknown"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": []
@@ -727,7 +654,6 @@
         "unknown"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": []
@@ -740,7 +666,6 @@
         "dense"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": []
@@ -753,7 +678,6 @@
         "synthesis"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": []
@@ -766,7 +690,6 @@
         "dense"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": []
@@ -779,7 +702,6 @@
         "synthesis"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": []
@@ -793,7 +715,6 @@
         "dense"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": []
@@ -807,7 +728,6 @@
         "dense"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": []
@@ -820,7 +740,6 @@
         "unknown"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": []
@@ -833,7 +752,6 @@
         "synthesis"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": []
@@ -848,7 +766,6 @@
         "graph"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": []
@@ -862,7 +779,6 @@
         "synthesis"
       ],
       "identity_fields": [],
-      "operation_kind": "APPLY",
       "writes_to": [
         "engram"
       ],
@@ -881,7 +797,6 @@
         "cache"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": []
@@ -895,7 +810,6 @@
         "memory"
       ],
       "identity_fields": [],
-      "operation_kind": "APPLY",
       "writes_to": [
         "engram"
       ],
@@ -915,9 +829,10 @@
         "cache"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
-      "writes_to": [],
-      "required_permissions": "read_only",
+      "writes_to": [
+        "redis"
+      ],
+      "required_permissions": "read_write",
       "input_schema_keys": []
     },
     {
@@ -929,7 +844,6 @@
         "dense"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -948,7 +862,6 @@
         "dense"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -966,7 +879,6 @@
         "dense"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -984,7 +896,6 @@
         "dense"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1004,7 +915,6 @@
         "unknown"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": []
@@ -1017,7 +927,6 @@
         "unknown"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": []
@@ -1030,9 +939,10 @@
         "read"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
-      "writes_to": [],
-      "required_permissions": "read_only",
+      "writes_to": [
+        "postgres"
+      ],
+      "required_permissions": "read_write",
       "input_schema_keys": [
         "include_row_estimates",
         "schema"
@@ -1046,9 +956,10 @@
         "read"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
-      "writes_to": [],
-      "required_permissions": "read_only",
+      "writes_to": [
+        "postgres"
+      ],
+      "required_permissions": "read_write",
       "input_schema_keys": [
         "table",
         "schema",
@@ -1065,7 +976,6 @@
         "graph"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1080,7 +990,6 @@
         "unknown"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1100,7 +1009,6 @@
         "synthesis"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1116,7 +1024,6 @@
         "unknown"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": []
@@ -1130,7 +1037,6 @@
         "synthesis"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1148,7 +1054,6 @@
         "unknown"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1165,7 +1070,6 @@
         "unknown"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1183,7 +1087,6 @@
         "unknown"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1201,7 +1104,6 @@
         "unknown"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1220,7 +1122,6 @@
         "unknown"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1236,7 +1137,6 @@
         "unknown"
       ],
       "identity_fields": [],
-      "operation_kind": "AUDIT",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1253,7 +1153,6 @@
         "read"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1274,7 +1173,6 @@
         "read"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": []
@@ -1290,7 +1188,6 @@
         "read"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1307,7 +1204,6 @@
         "read"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1325,7 +1221,6 @@
         "read"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1340,9 +1235,10 @@
         "graph"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
-      "writes_to": [],
-      "required_permissions": "read_only",
+      "writes_to": [
+        "neo4j"
+      ],
+      "required_permissions": "read_write",
       "input_schema_keys": [
         "sourceRefs",
         "stableKey",
@@ -1363,7 +1259,6 @@
         "rerank"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1385,7 +1280,6 @@
         "memory"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1402,9 +1296,10 @@
         "graph"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
-      "writes_to": [],
-      "required_permissions": "read_only",
+      "writes_to": [
+        "neo4j"
+      ],
+      "required_permissions": "read_write",
       "input_schema_keys": [
         "fromKey",
         "toKey",
@@ -1420,7 +1315,6 @@
         "synthesis"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1437,9 +1331,10 @@
         "graph"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
-      "writes_to": [],
-      "required_permissions": "read_only",
+      "writes_to": [
+        "neo4j"
+      ],
+      "required_permissions": "read_write",
       "input_schema_keys": [
         "stableKey"
       ]
@@ -1452,7 +1347,6 @@
         "graph"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1468,7 +1362,6 @@
         "unknown"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1486,7 +1379,6 @@
         "unknown"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1502,7 +1394,6 @@
         "graph"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1520,7 +1411,6 @@
         "unknown"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1537,7 +1427,6 @@
         "graph"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1557,7 +1446,6 @@
         "graph"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1573,7 +1461,6 @@
         "unknown"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1592,7 +1479,6 @@
         "unknown"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1608,7 +1494,6 @@
         "synthesis"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1628,7 +1513,6 @@
         "unknown"
       ],
       "identity_fields": [],
-      "operation_kind": "AUDIT",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": []
@@ -1641,7 +1525,6 @@
         "rerank"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1659,7 +1542,6 @@
         "synthesis"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1675,7 +1557,6 @@
         "unknown"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1696,7 +1577,6 @@
         "unknown"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1712,7 +1592,6 @@
         "unknown"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1727,7 +1606,6 @@
         "unknown"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1748,7 +1626,6 @@
         "lexical"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1765,7 +1642,6 @@
         "lexical"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1783,7 +1659,6 @@
         "unknown"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1801,7 +1676,6 @@
         "rerank"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1823,7 +1697,6 @@
         "rerank"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1841,7 +1714,6 @@
         "unknown"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1861,7 +1733,6 @@
         "unknown"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1876,7 +1747,6 @@
         "unknown"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1891,7 +1761,6 @@
         "unknown"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1909,7 +1778,6 @@
         "unknown"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1927,7 +1795,6 @@
         "unknown"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1949,7 +1816,6 @@
         "unknown"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1967,7 +1833,6 @@
         "unknown"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1985,7 +1850,6 @@
         "memory"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2002,7 +1866,6 @@
         "synthesis"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2020,7 +1883,6 @@
         "synthesis"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2037,7 +1899,6 @@
         "identity"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2054,7 +1915,6 @@
         "unknown"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2072,7 +1932,6 @@
         "ops"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2087,7 +1946,6 @@
         "unknown"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2103,7 +1961,6 @@
         "graph"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2118,7 +1975,6 @@
         "synthesis"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2134,7 +1990,6 @@
         "synthesis"
       ],
       "identity_fields": [],
-      "operation_kind": "AUDIT",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2149,7 +2004,6 @@
         "synthesis"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2168,7 +2022,6 @@
         "source_ref",
         "packet_key"
       ],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2186,7 +2039,6 @@
         "unknown"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2203,7 +2055,6 @@
         "unknown"
       ],
       "identity_fields": [],
-      "operation_kind": "AUDIT",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2220,9 +2071,11 @@
         "ops"
       ],
       "identity_fields": [],
-      "operation_kind": "PROPOSE",
-      "writes_to": [],
-      "required_permissions": "read_only",
+      "writes_to": [
+        "postgres",
+        "kanban"
+      ],
+      "required_permissions": "read_write",
       "input_schema_keys": [
         "operator_token",
         "file_path",
@@ -2238,9 +2091,10 @@
         "ops"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
-      "writes_to": [],
-      "required_permissions": "read_only",
+      "writes_to": [
+        "postgres"
+      ],
+      "required_permissions": "read_write",
       "input_schema_keys": [
         "operator_token",
         "test_file",
@@ -2255,7 +2109,6 @@
         "ops"
       ],
       "identity_fields": [],
-      "operation_kind": "APPLY",
       "writes_to": [
         "postgres",
         "kanban"
@@ -2280,9 +2133,10 @@
         "ops"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
-      "writes_to": [],
-      "required_permissions": "read_only",
+      "writes_to": [
+        "postgres"
+      ],
+      "required_permissions": "read_write",
       "input_schema_keys": [
         "operator_token",
         "gate",
@@ -2297,7 +2151,6 @@
         "graph"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2315,7 +2168,6 @@
         "graph"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2331,7 +2183,6 @@
         "graph"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2347,9 +2198,10 @@
         "graph"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
-      "writes_to": [],
-      "required_permissions": "read_only",
+      "writes_to": [
+        "neo4j"
+      ],
+      "required_permissions": "read_write",
       "input_schema_keys": [
         "edge_hash"
       ]
@@ -2362,7 +2214,6 @@
         "unknown"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2379,7 +2230,6 @@
         "unknown"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2395,7 +2245,6 @@
         "unknown"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2412,7 +2261,6 @@
         "synthesis"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2427,7 +2275,6 @@
         "synthesis"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2442,7 +2289,6 @@
         "synthesis"
       ],
       "identity_fields": [],
-      "operation_kind": "AUDIT",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2457,7 +2303,6 @@
         "synthesis"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2473,7 +2318,6 @@
         "synthesis"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2490,7 +2334,6 @@
         "ops"
       ],
       "identity_fields": [],
-      "operation_kind": "AUDIT",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2509,7 +2352,6 @@
         "ops"
       ],
       "identity_fields": [],
-      "operation_kind": "AUDIT",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2527,7 +2369,6 @@
         "ops"
       ],
       "identity_fields": [],
-      "operation_kind": "AUDIT",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2542,7 +2383,6 @@
         "ops"
       ],
       "identity_fields": [],
-      "operation_kind": "AUDIT",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2560,7 +2400,6 @@
         "ops"
       ],
       "identity_fields": [],
-      "operation_kind": "AUDIT",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2581,7 +2420,6 @@
         "ops"
       ],
       "identity_fields": [],
-      "operation_kind": "AUDIT",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2599,7 +2437,6 @@
         "ops"
       ],
       "identity_fields": [],
-      "operation_kind": "AUDIT",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2620,7 +2457,6 @@
         "ops"
       ],
       "identity_fields": [],
-      "operation_kind": "AUDIT",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2638,7 +2474,6 @@
         "ops"
       ],
       "identity_fields": [],
-      "operation_kind": "AUDIT",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2665,7 +2500,6 @@
         "dense"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2685,7 +2519,6 @@
         "dense"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2703,9 +2536,8 @@
         "graph"
       ],
       "identity_fields": [],
-      "operation_kind": "APPLY",
       "writes_to": [
-        "neo4j"
+        "qdrant"
       ],
       "required_permissions": "read_write",
       "input_schema_keys": [
@@ -2723,7 +2555,6 @@
         "synthesis"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2744,7 +2575,6 @@
         "synthesis"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2762,7 +2592,6 @@
         "synthesis"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2783,7 +2612,6 @@
         "ops"
       ],
       "identity_fields": [],
-      "operation_kind": "AUDIT",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2802,7 +2630,6 @@
         "ops"
       ],
       "identity_fields": [],
-      "operation_kind": "AUDIT",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2820,7 +2647,6 @@
         "ops"
       ],
       "identity_fields": [],
-      "operation_kind": "AUDIT",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2836,7 +2662,6 @@
         "ops"
       ],
       "identity_fields": [],
-      "operation_kind": "AUDIT",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": []
@@ -2849,7 +2674,6 @@
         "unknown"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": []
@@ -2862,7 +2686,6 @@
         "graph"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": []
@@ -2875,7 +2698,6 @@
         "unknown"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2891,7 +2713,6 @@
         "rerank"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2910,7 +2731,6 @@
         "graph"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2934,7 +2754,6 @@
         "feature_id",
         "source_ref"
       ],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2957,9 +2776,10 @@
         "feature_id",
         "source_ref"
       ],
-      "operation_kind": "READ",
-      "writes_to": [],
-      "required_permissions": "read_only",
+      "writes_to": [
+        "postgres"
+      ],
+      "required_permissions": "read_write",
       "input_schema_keys": [
         "verbose"
       ]
@@ -2974,7 +2794,6 @@
       "identity_fields": [
         "packet_key"
       ],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2990,7 +2809,6 @@
         "unknown"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": []
@@ -3005,7 +2823,6 @@
       "identity_fields": [
         "feature_id"
       ],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -3022,7 +2839,6 @@
       "identity_fields": [
         "feature_id"
       ],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -3042,7 +2858,6 @@
         "unknown"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -3059,7 +2874,6 @@
       "identity_fields": [
         "source_ref"
       ],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -3077,7 +2891,6 @@
         "source_ref",
         "packet_key"
       ],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -3093,7 +2906,6 @@
         "unknown"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -3143,7 +2955,6 @@
         "graph"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -3165,7 +2976,6 @@
         "synthesis"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -3183,7 +2993,6 @@
         "graph"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -3198,7 +3007,6 @@
         "dense"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -3214,7 +3022,6 @@
         "graph"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -3231,7 +3038,6 @@
         "cache"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -3253,7 +3059,6 @@
       "identity_fields": [
         "source_ref"
       ],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -3272,7 +3077,6 @@
         "unknown"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": []
@@ -3285,7 +3089,6 @@
         "unknown"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -3300,7 +3103,6 @@
         "unknown"
       ],
       "identity_fields": [],
-      "operation_kind": "AUDIT",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": []
@@ -3313,7 +3115,6 @@
         "unknown"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -3330,6 +3131,22 @@
       ]
     },
     {
+      "tool_name": "domain.classify",
+      "namespace": "domain",
+      "description": "Classify text into the canonical domain taxonomy via the Miniforge sidecar's classify pass (sklearn NB/LR over KMeans word-cluster features once a trained checkpoint exists; reports backend 'unavailable' otherwise — never a hard failure). Closes the confirmed 2026-09-03 TRACE audit gap: graph/cluster/topK/hypergraph/taxonomy tools all existed, domain classification did not.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "text",
+        "sourceRef",
+        "packetKey"
+      ]
+    },
+    {
       "tool_name": "miniforge.extract",
       "namespace": "miniforge",
       "description": "Run Miniforge CUDA-backed extraction over text and return normalized structure plus extracted entities.",
@@ -3337,7 +3154,6 @@
         "unknown"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -3361,7 +3177,6 @@
         "synthesis"
       ],
       "identity_fields": [],
-      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [

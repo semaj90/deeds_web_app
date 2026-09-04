@@ -212,6 +212,56 @@ const (
 	maxLimit           = 50
 )
 
+// ── Representation registry (GO-RETRIEVAL-REPRESENTATION-ROUTING-01) ───────
+//
+// Config-owned map, not inferred from Qdrant collection names -- matches the
+// parent-atlas-retrieval-lineage-dag-convergence registration for this gate.
+//
+// Only semantic_768 is query-executable today. latent_256 is registered (its Qdrant
+// collection and dimension are real and live -- see LATENT256-REPRESENTATION-CONTRACT-02)
+// but has no query-side encoder yet: PostgresLatent256CandidateProvider is explicitly
+// candidate-side-hydration only (canonicalAuthority=false, queryEncoder=false,
+// activeRetrievalLane=false), and standing up a query-time encoder was explicitly deferred
+// by the operator (models/nested-semantic-autoencoder/README.md, 2026-08-29) pending a VRAM
+// budget decision (LATENT256-QUERY-ENCODER-01, still OPEN).
+//
+// entry.collection is deliberately NOT yet wired into query execution below -- selecting it
+// would require a real latent_256 query embedding, which does not exist. This registry exists
+// so a caller's requested representation is validated and explicitly reported on, not silently
+// dropped, ahead of that encoder becoming available.
+type representationEntry struct {
+	dimension    int
+	collection   string
+	queryEncoder bool
+}
+
+const defaultRepresentationID = "semantic_768"
+
+var representationRegistry = map[string]representationEntry{
+	defaultRepresentationID: {dimension: 768, collection: collectionCodebase, queryEncoder: true},
+	"latent_256":            {dimension: 256, collection: "codebase_chunks_latent256", queryEncoder: false},
+}
+
+// resolveRepresentation never silently substitutes: if the caller's requested representation
+// is unknown or not yet query-executable, it returns the semantic_768 fallback AND a non-empty
+// fallbackReason that the caller must surface (CodebaseSearchResponse.representation_used /
+// .representation_fallback_reason), not swallow.
+func resolveRepresentation(requested string) (id string, entry representationEntry, fallbackReason string) {
+	if requested == "" {
+		requested = defaultRepresentationID
+	}
+	found, ok := representationRegistry[requested]
+	if !ok {
+		return defaultRepresentationID, representationRegistry[defaultRepresentationID],
+			fmt.Sprintf("REPRESENTATION_UNKNOWN:%s", requested)
+	}
+	if !found.queryEncoder {
+		return defaultRepresentationID, representationRegistry[defaultRepresentationID],
+			fmt.Sprintf("REPRESENTATION_NOT_QUERY_EXECUTABLE:%s", requested)
+	}
+	return requested, found, ""
+}
+
 // ── GPU / ONNX Embedding ───────────────────────────────────────────────────
 //
 // Priority order:
@@ -1847,15 +1897,20 @@ func (s *retrievalServer) searchCodebase(ctx context.Context, req *pb.CodebaseSe
 		limit = maxLimit
 	}
 
+	representationUsed, _, representationFallbackReason := resolveRepresentation(req.RepresentationId)
+	if representationFallbackReason != "" {
+		slog.Warn("[retrieval] representation fallback", "requested", req.RepresentationId, "used", representationUsed, "reason", representationFallbackReason)
+	}
+
 	vec, err := s.embed(ctx, req.Query)
 	if err != nil {
 		slog.Warn("[retrieval] codebase embed failed", "err", err)
-		return &pb.CodebaseSearchResponse{}, nil
+		return &pb.CodebaseSearchResponse{RepresentationUsed: representationUsed, RepresentationFallbackReason: representationFallbackReason}, nil
 	}
 
 	if len(req.PacketKeys) > 0 {
 		if len(req.PacketKeys) > 768 {
-			return &pb.CodebaseSearchResponse{}, nil
+			return &pb.CodebaseSearchResponse{RepresentationUsed: representationUsed, RepresentationFallbackReason: representationFallbackReason}, nil
 		}
 		extraFilters = append(extraFilters, qdrantclient.NewMatchKeywords("packet_key", req.PacketKeys...))
 	}
@@ -1863,7 +1918,7 @@ func (s *retrievalServer) searchCodebase(ctx context.Context, req *pb.CodebaseSe
 	chunks, err := s.qdrantSearchCodebase(ctx, vec, req.Kinds, req.PathPrefixes, extraFilters, limit)
 	if err != nil {
 		slog.Warn("[retrieval] codebase search failed", "err", err)
-		return &pb.CodebaseSearchResponse{}, nil
+		return &pb.CodebaseSearchResponse{RepresentationUsed: representationUsed, RepresentationFallbackReason: representationFallbackReason}, nil
 	}
 
 	// HTTP method filter
@@ -1907,8 +1962,10 @@ func (s *retrievalServer) searchCodebase(ctx context.Context, req *pb.CodebaseSe
 	}
 
 	return &pb.CodebaseSearchResponse{
-		Chunks:  protoChunks,
-		TotalMs: float32(time.Since(start).Milliseconds()),
+		Chunks:                       protoChunks,
+		TotalMs:                      float32(time.Since(start).Milliseconds()),
+		RepresentationUsed:           representationUsed,
+		RepresentationFallbackReason: representationFallbackReason,
 	}, nil
 }
 
@@ -2410,13 +2467,14 @@ func (s *retrievalServer) httpSearchCodebase(w http.ResponseWriter, r *http.Requ
 		return
 	}
 	var body struct {
-		Query        string   `json:"query"`
-		Limit        int32    `json:"limit"`
-		Kinds        []string `json:"kinds"`
-		PathPrefixes []string `json:"path_prefixes"`
-		HTTPMethod   string   `json:"http_method"`
-		PacketKeys   []string `json:"packet_keys"`
-		Tags         []string `json:"tags"`
+		Query            string   `json:"query"`
+		Limit            int32    `json:"limit"`
+		Kinds            []string `json:"kinds"`
+		PathPrefixes     []string `json:"path_prefixes"`
+		HTTPMethod       string   `json:"http_method"`
+		PacketKeys       []string `json:"packet_keys"`
+		Tags             []string `json:"tags"`
+		RepresentationID string   `json:"representation_id"`
 	}
 	if err := json.NewDecoder(io.LimitReader(r.Body, 1<<20)).Decode(&body); err != nil {
 		http.Error(w, "bad request", http.StatusBadRequest)
@@ -2428,12 +2486,13 @@ func (s *retrievalServer) httpSearchCodebase(w http.ResponseWriter, r *http.Requ
 	}
 	tagFilters := buildCodebaseTagFilters(body.Tags)
 	resp, err := s.searchCodebase(r.Context(), &pb.CodebaseSearchRequest{
-		Query:        body.Query,
-		Limit:        body.Limit,
-		Kinds:        body.Kinds,
-		PathPrefixes: body.PathPrefixes,
-		HttpMethod:   body.HTTPMethod,
-		PacketKeys:   body.PacketKeys,
+		Query:            body.Query,
+		Limit:            body.Limit,
+		Kinds:            body.Kinds,
+		PathPrefixes:     body.PathPrefixes,
+		HttpMethod:       body.HTTPMethod,
+		PacketKeys:       body.PacketKeys,
+		RepresentationId: body.RepresentationID,
 	}, tagFilters)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

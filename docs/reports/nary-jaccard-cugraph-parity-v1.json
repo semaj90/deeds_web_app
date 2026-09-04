@@ -1,0 +1,18 @@
+{
+  "schema": "atlas.nary-jaccard-cugraph-parity.v1",
+  "status": "NARY_JACCARD_CUGRAPH_PARITY_PROVEN",
+  "executorPath": "DIRECT_PYTHON",
+  "graphRevision": "graph:nary-jaccard-fixture-v1",
+  "vertexCount": 9,
+  "edgeCount": 8,
+  "candidatePairChecksum": "d2006a830126de8b7f3a764ac8f2e063215c70388c71ecdc9c0edebd0fe85135",
+  "cpuPairCount": 15,
+  "gpuPairCount": 15,
+  "missingGpuPairs": [],
+  "extraGpuPairs": 0,
+  "maxAbsoluteError": 0.0,
+  "mismatchedPairs": [],
+  "renumbered": false,
+  "canonicalAuthority": false,
+  "writesPerformed": false
+}

@@ -1,0 +1,58 @@
+{
+  "schema": "atlas.sem768-within-executor-sanity-check.report",
+  "generatedAt": "2026-09-02T20:16:37.871Z",
+  "databaseWrites": false,
+  "healthyGapThreshold": 0.15,
+  "cases": [
+    {
+      "a": "user login and password authentication",
+      "b": "session validation and auth tokens",
+      "expected": "SIMILAR"
+    },
+    {
+      "a": "Postgres database query and SQL joins",
+      "b": "relational database indexing and transactions",
+      "expected": "SIMILAR"
+    },
+    {
+      "a": "user login and password authentication",
+      "b": "chocolate cake recipe with frosting",
+      "expected": "DISSIMILAR"
+    },
+    {
+      "a": "Postgres database query and SQL joins",
+      "b": "weather forecast for tomorrow afternoon",
+      "expected": "DISSIMILAR"
+    }
+  ],
+  "results": [
+    {
+      "name": "8081_gguf_cuda",
+      "available": true,
+      "similarPairCosines": [
+        0.6441967450314926,
+        0.5538201231868984
+      ],
+      "dissimilarPairCosines": [
+        0.27584685877730986,
+        0.24268845416079043
+      ],
+      "discriminationGap": 0.3397407776401453,
+      "verdict": "HEALTHY"
+    },
+    {
+      "name": "onnx_cpu",
+      "available": true,
+      "similarPairCosines": [
+        0.9425688798188253,
+        0.9367922289415953
+      ],
+      "dissimilarPairCosines": [
+        0.909588106839334,
+        0.8757135066905378
+      ],
+      "discriminationGap": 0.04702974761527434,
+      "verdict": "UNHEALTHY"
+    }
+  ]
+}

@@ -2,6 +2,50 @@
 
 > MCP/Atlas status note (2026-08-23): The MCP and Atlas connection/tool-count statements in this document are historical snapshots. Current bounded evidence is in docs/reports/mcp-atlas-markdown-audit-2026-08-23.md. Live TRACE currently exposes 175 tools; active project config wires trace plus local atlas-tools.
 
+## 🔄 Ollama Phase-Out + Chat/Synthesis Model Switch (2026-09-03 — IN PROGRESS, not complete)
+
+Two related, active changes — neither finished, both stated operator direction rather than
+completed migrations. Read before trusting any Ollama-, Gemma4-, or `:8090`-related statement
+elsewhere in this file (many predate both changes and are now stale on specifics, though still
+correct on architecture/roles unless noted otherwise).
+
+**1. Chat/synthesis model switch — Gemma4 → Ornith 1.5 9B, confirmed live.** llama-server on
+`:8090` currently serves `ornith-1.5-9b` (`models/ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf`), not
+Gemma4 — verified directly via `GET :8090/props`: `"model_alias":"ornith-1.5-9b"`,
+`"modalities":{"vision":false,"audio":false}` (text/tool-calling only; no vision projector is
+loaded — a separate `mmproj-Ornith-1.5-9B-*.gguf` would be required for that, and none exists in
+the model directory as of this check). The "❄️ CANONICAL LLAMA-SERVER STARTUP CONTRACT" section
+immediately below this one is FROZEN from Aug 4 and documents the old Gemma4/hforf setup — treat
+its *process* (chat-template wiring, `--skip-chat-parsing` ban) as still valid, but its specific
+model identity (`gemma4-legal-iq4xs-direct.gguf`) as historical, not current. Fixed this session:
+`sveltekit-frontend/src/lib/ai/model-ids.ts`'s `SERVER_CHAT_MODEL`/`TURBOQUANT_MODEL` constants
+(were hardcoded to `gemma4-rotorquant:latest`, sent literally as the `model` field in live chat
+requests — a real bug, not just stale docs) and `scripts/validate-graphify-startup.mjs` (hardcoded
+model-name gate was rejecting Ornith as "wrong model"). **`SERVER_VLM_MODEL` was deliberately NOT
+changed** — the separate VLM server on `:8085` (FastAPI + HF Transformers) is untouched by this
+switch and still reports `"vlm_model":"gemma4:e4b"` live; do not conflate the two lanes.
+`scripts/launch-turboquant.ps1` already has a first-class `ornith-1.5` profile (not stale), but its
+doc comment still calls `gemma4-direct` the default profile — minor, not fixed yet.
+
+**2. Ollama removal — direction only, replacement backend undecided.** Ollama is intended to be
+removed from this stack entirely, including the embeddings lane (currently the *only* thing the
+"Ollama vs llama-server Boundary" hard rule elsewhere in this file permits it to do — see that
+section, and the mirrored note in `sveltekit-frontend/CLAUDE.md`, for the full rule). **No
+replacement has been chosen.** Two live/in-progress candidates, neither confirmed final:
+- Go Embedding service (`:8097`) — already running, health-checked 768-dim/GPU this session.
+- Local llama.cpp GGUF embedding executor ("EG-GGUF") — early-stage proof (gates 0-2 only),
+  not yet parity-checked against Ollama's actual output.
+
+**Until this section says the migration is complete: do not delete Ollama, do not stop its
+service, do not remove `embeddinggemma:latest` calls, and do not treat any other Ollama-embeddings
+reference in this file as dead.** Every "PRIMARY EMBEDDING MODEL: `embeddinggemma:latest` (via
+Ollama `/api/embed`)" style statement elsewhere in this document remains the current, correct,
+load-bearing state — this note documents an intent, not a completed cutover. When a replacement is
+picked, update this section with which backend won, the parity proof that justified it, and the
+migration status of every embeddings call site — the same evidentiary bar this file already
+requires (see e.g. the Embedding Dimensions Policy section's own history of undocumented
+re-decisions and what it cost to unwind them).
+
 ## ❄️ CANONICAL LLAMA-SERVER STARTUP CONTRACT (FROZEN — Session 188C, Aug 4 2026)
 
 **Status**: ✅ VALIDATED | **Validation**: 3-point contract PASS | **Commit**: TBD
@@ -1251,6 +1295,65 @@ non-gating. **CUB-vs-CPU half is `DRY_RUN_PROVEN`** (see result above); cuTile h
 **See**: `sveltekit-frontend/openspec/changes/parent-atlas-ace-radix-residency/` (proposal.md,
 design.md, specs/, tasks.md — 25/26 tasks done, `openspec validate --strict` passes),
 `docs/reports/ace-radix-01-results.json` (the live benchmark result).
+
+### DEPENDENCY-CAPABILITY-GUARD-01 — no install without a proven capability gap (2026-09-03)
+
+**Invariant: `NO_NEW_CAPABILITY_OWNER_WITHOUT_PROVEN_GAP`.** Never run `pip install`, `conda install`,
+`docker pull`/`build`, or `npm install` merely because a library *could* help. Resolve the
+capability against `docs/reports/runtime-capability-registry-v1.json` first:
+
+```
+NEED
+  ↓
+Is capability already proven somewhere? ──YES──→ reuse that owner
+  ↓ NO
+Is capability available in an existing runtime, no install? ──YES──→ wire it
+  ↓ NO
+Is a new dependency actually required? ──YES──→ smallest package only ──NO──→ stop
+```
+
+Before any dependency mutation, record: `CAPABILITY`, `CURRENT_OWNER`, `CURRENT_RUNTIME`,
+`AVAILABLE`, `REUSE_PATH_PROVEN`, `CALLER_RUNTIME`, `TRANSPORT_BOUNDARY`, `ABI_COMPATIBLE`,
+`LATENCY_ACCEPTABLE`, `ISOLATION_COMPATIBLE`, `FAILURE_DOMAIN_COMPATIBLE`, `VERSION`,
+`LIVE_PROOF`, `WHY_CURRENT_OWNER_CANNOT_SATISFY_CALLER`, `MINIMAL_NEW_DEPENDENCY`, and
+`NEW_OWNER_JUSTIFICATION`. `AVAILABLE=true` prohibits a new install/owner only when the
+proven reuse path satisfies the caller contract. A pinned environment rebuild is distinct
+from adding a capability or owner and still requires package/image identity plus replay proof.
+
+**Real incident this rule prevents (found 2026-09-03, not fixed yet — flagged in the registry)**:
+`docker/atlas-gpu-8098/Dockerfile` builds `FROM rapidsai/base:26.08-cuda12-py3.13-amd64` — a
+broad/full prebuilt RAPIDS environment
+— but `services/atlas-gpu-8098/app.py` and `python/atlas_rapids_graph_runtime.py` (verified via
+`grep '^import|^from'`) only ever import `cudf` and `cugraph` (both lazily), plus
+`fastapi`/`pydantic`/`pyarrow` for the HTTP boundary. The actual capability need was
+`graph.jaccard.gpu` — already proven live on `wsl::atlas-rapids-cu13` (cuVS/cuGraph/cuDF/CuPy/
+PyTorch 26.06.x, RTX 3060 Ti, see GPU-MINI-FABRIC-01 above) — but a second, heavier Docker RAPIDS
+image got built anyway rather than first asking which runtime already owns the capability. RAPIDS'
+own docs recommend a custom image with only the needed libraries for exactly this reason.
+
+**Prohibited without an explicit, recorded capability gap**: installing optional libraries to
+satisfy a health check; installing a whole framework for one primitive; creating a second runtime
+owner for a capability another runtime already proves live; upgrading a working runtime merely to
+version-match another (capability parity, not version symmetry, is the bar — this repo already had
+this rule for `atlas-rapids-cu13` specifically under GPU-MINI-FABRIC-01; this section generalizes
+it to every dependency, not just that one environment). Applies beyond RAPIDS: TensorRT, PyTorch,
+Triton, cuTile, CUTLASS, ONNX Runtime, NetworkX, Neo4j, Qdrant, Valkey — one task should never
+silently create a second owner for a capability that already has one.
+
+**Layer discipline (do not conflate)**: CUDA (the toolkit/runtime) ≠ cuTile (the Python DSL for the
+tile programming model) ≠ SIMT (the existing thread/warp execution model cuGraph/cuDF/CuPy kernels
+already use — tile programming coexists with it per-kernel, it does not replace it) ≠ Tensor Cores
+(hardware units, 3rd-gen on this RTX 3060 Ti / Ampere sm_86, useful for GEMM/attention/dense linear
+algebra — not a general accelerator for irregular graph work like Jaccard/BFS/connected
+components). cuTile stays `AVAILABLE_FUTURE_CHALLENGER`; Ampere execution requires an
+Ampere-capable TileIR compiler/toolchain from the CUDA 13.2-generation line. This does not by
+itself require upgrading the system-wide CUDA toolkit; the isolated Python environment may
+provide the compiler components. Install remains blocked until `ACE-RADIX-01` proves a real
+cuTile half (this dev host's CUDA 13.0 toolkit only ships a compiler-intrinsic stub).
+
+**See**: `docs/reports/runtime-capability-registry-v1.json` (the registry — `wsl::atlas-rapids-cu13`
+and `docker::atlas-gpu-8098` entries, per-capability owner map, the atlas-gpu-8098 over-install
+finding and its minimal-rebuild target, prohibited-duplicate-owner list).
 
 ---
 
@@ -3123,6 +3226,32 @@ route-level static check — verify inside the router before assuming it's a gap
 a new auth mechanism) to the 8 real gaps above, and add Zod schemas per the G5 convention. Do this
 as a deliberate production-hardening pass — with tests added alongside, per operator direction
 2026-09-01 — once dev-bypass is no longer the active mode, not piecemeal.
+
+**+1 new route added 2026-09-03, CORRECTED 2026-09-03, CORRECTION ITSELF PARTIALLY RETRACTED
+2026-09-03 (same day)** (`openspec/changes/parent-atlas-search-classifier-sidecar` task 2):
+`api/atlas/domain-taxonomy/classify` (POST) — exposes `classifyDomainTaxonomy()` for the Python
+NLP sidecar to call as a weak-label bootstrap source (service-to-service, not browser-facing).
+`.strict()` Zod schema on the request body, read-only, no DB mutation, no PII. Originally logged
+here as "unauthenticated"; then corrected to claim `hooks.server.ts`'s global `ADMIN_ONLY` prefix
+list (`/api/atlas`, line ~848) was the confirmed root cause of an in-container retraining run's
+HTTP 403. **That causal claim is itself now falsified by a live repro, not just re-asserted**:
+with the dev server confirmed up, the identical request was sent from both the host and from
+inside the live `miniforge-nlp-sidecar` container to `host.docker.internal:5173`, and **both
+returned a clean `200 OK`** with a real classification — `DEV_BYPASS_AUTH` grants `role: 'admin'`
+whenever no session cookie is present, which both a bare `curl` and a bare Python `urllib` request
+satisfy, so the `ADMIN_ONLY` gate does not block either caller under current conditions.
+`vite.config.ts`'s `allowedHosts` (also a candidate 403 source — Vite's own host-rejection
+mechanism) was checked too and found unchanged since 2026-05-28 (commit `90fd865d45`), so it can't
+explain a fresh failure either. **The real cause of the original 403 is unestablished** — no
+response body was captured at the time. Per the operator's direct instruction, the resolved path
+forward is architectural rather than forensic: remove live HTTP from the offline-training critical
+path entirely via a frozen weak-label bundle
+(`scripts/atlas/build-domain-classifier-weak-label-bundle-v1.mts`) — see
+`openspec/changes/parent-atlas-search-classifier-sidecar/tasks.md` Next Steps item 2 for the full,
+live-proved build. This route itself is left as-is (still reachable, still behind whatever
+`hooks.server.ts` actually enforces for `/api/atlas` — that enforcement's exact real-world
+behavior under the container caller's original conditions remains unresolved, not proven safe or
+unsafe either way).
 
 ### G5 open finding — 18 authenticated mutating routes with zero Zod validation (2026-09-01 /deep-audit)
 

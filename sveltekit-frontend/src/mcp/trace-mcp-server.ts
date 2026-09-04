@@ -10458,6 +10458,45 @@ server.registerTool(
 );
 
 server.registerTool(
+  'domain.classify',
+  {
+    description:
+      'Classify text into the canonical domain taxonomy via the Miniforge sidecar\'s classify pass ' +
+      '(sklearn NB/LR over KMeans word-cluster features once a trained checkpoint exists; reports ' +
+      "backend 'unavailable' otherwise — never a hard failure). Closes the confirmed 2026-09-03 TRACE " +
+      'audit gap: graph/cluster/topK/hypergraph/taxonomy tools all existed, domain classification did not.',
+    inputSchema: z.object({
+      text: z.string().min(1).describe('Text to classify'),
+      sourceRef: z.string().optional(),
+      packetKey: z.string().optional(),
+    }),
+  },
+  async (input: Record<string, unknown>) => {
+    const client = getMiniforgeClient();
+    const result = await client.analyze({
+      text: String(input.text ?? ''),
+      sourceRef: typeof input.sourceRef === 'string' ? input.sourceRef : undefined,
+      packetKey: typeof input.packetKey === 'string' ? input.packetKey : undefined,
+      passes: ['classify'],
+    });
+
+    const classifyResult = (result.pass_results ?? []).find((pass) => pass.family === 'classify');
+    if (!classifyResult) {
+      return { status: 'error', error: 'no classify pass_result in sidecar response' };
+    }
+
+    return {
+      status: classifyResult.status === 'succeeded' ? 'success' : classifyResult.status,
+      backend: classifyResult.backend,
+      device: classifyResult.device,
+      features: classifyResult.features,
+      artifacts: classifyResult.artifacts,
+      warnings: classifyResult.warnings,
+    };
+  }
+);
+
+server.registerTool(
   'miniforge.extract',
   {
     description:

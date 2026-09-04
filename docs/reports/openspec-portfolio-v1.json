@@ -1,1167 +1,1087 @@
 {
-  "schema": "openspec-portfolio-v1",
-  "generatedAt": "2026-09-01T23:50:15.825Z",
-  "secondaryRootFinding": {
-    "path": "sveltekit-frontend/openspec/changes",
-    "changeIds": [
-      "add-gemma4-retrieval-loop-hook-harness",
-      "add-packet-ontology-registry",
-      "parent-atlas-ace-radix-residency",
-      "parent-atlas-gpu-mini-fabric-01",
-      "parent-atlas-graph-retrieval-proof",
-      "phase-109b-repository-provenance-workflow",
-      "phase-2f1-real-evaluation-corpus",
-      "phase1-rrf-semantic-fusion",
-      "session-96-event-sourcing-gpu-complete",
-      "wire-agentic-workflows-e2e-test"
-    ],
-    "collidingWithPrimaryRoot": [
-      "parent-atlas-graph-retrieval-proof",
-      "phase-2f1-real-evaluation-corpus"
-    ],
-    "note": "Unreconciled second OpenSpec root, found live while building this report. Not scanned/classified by this script (which reports on the repo-root openspec/changes/ tree only, matching MASTER-TOC.md and the operator classification table). Colliding change IDs need manual reconciliation before trusting either copy."
-  },
-  "methodology": "queueClass is a manually curated classification (see CLASSIFICATION table in this script), transcribed directly from an operator portfolio review. It is NEVER inferred from completion percentage. parent-atlas-retrieval-lineage-dag-convergence is the sole CURRENT_AUTHORITY and owns dependency ordering; ACTIVE_DEPENDENCY changes may only generate work for the specific currentGateRefs listed, not their full remaining task count. FROZEN_REFERENCE and PARKED_CHALLENGER changes have mayGenerateNewWork=false. UNCLASSIFIED means this change was not present in the operator review and has been given NO classification -- it is not silently defaulted into any queue.",
-  "hardStops": [
-    {
-      "id": "REL-FI-01",
-      "status": "BLOCKED_MIGRATION_BASELINE"
-    },
-    {
-      "id": "feature_registry live apply",
-      "status": "BLOCKED"
-    },
-    {
-      "id": "global Drizzle repair",
-      "status": "BLOCKED"
-    },
-    {
-      "id": "Qdrant cleanup/cutover",
-      "status": "BLOCKED until projection ownership"
-    },
-    {
-      "id": "legacy deletion",
-      "status": "BLOCKED"
-    }
-  ],
-  "summary": {
-    "totalChanges": 72,
-    "totalTasksCounted": 4435,
-    "totalTasksCompleted": 2452,
-    "byQueueClass": {
-      "CURRENT_AUTHORITY": 1,
-      "ACTIVE_DEPENDENCY": 15,
-      "FROZEN_REFERENCE": 6,
-      "PARKED_CHALLENGER": 8,
-      "BLOCKED_EXTERNAL": 0,
-      "UNCLASSIFIED": 42
-    },
-    "unclassifiedChangeIds": [
-      "ace-hyperrag-chr97-graphify-audit",
-      "agent-branch-review-fanout-ace-centroid-aug22",
-      "atlas-feature-intelligence",
-      "atlas-hot-vector-schema-decision",
-      "codereview-inference-wiring-followup-aug22",
-      "codereview-semantic-dimension-regression-aug22",
-      "deep-audit-code-gates-aug22",
-      "docker-compose-duplication-remediation",
-      "feature-label-semantic-derivation",
-      "inference-wiring-deep-audit-aug22",
-      "manual-migration-reconciliation",
-      "parent-atlas-768-dim-migration",
-      "parent-atlas-ace-bitfrost-cache-correctness",
-      "parent-atlas-ace-rlm-bitfrost-integration",
-      "parent-atlas-adaptive-dag-fabric",
-      "parent-atlas-code-ingestion-pipeline",
-      "parent-atlas-compute-rank-cache-eval-dspy-gepa",
-      "parent-atlas-deep-research-ingestion",
-      "parent-atlas-deep-research-learning-circuit",
-      "parent-atlas-document-governance-master-index",
-      "parent-atlas-error-research-lane",
-      "parent-atlas-gpu-runtime-abi-alignment",
-      "parent-atlas-graph-pagerank-okf-fanout-hardening",
-      "parent-atlas-graph-runtime-enhancement",
-      "parent-atlas-graph-runtime-python-consolidation",
-      "parent-atlas-graphify-recovery-proof-ladder",
-      "parent-atlas-kafka-projection-initiative",
-      "parent-atlas-memory-architecture-freeze",
-      "parent-atlas-nlp-sidecar-feature-compiler",
-      "parent-atlas-observation-routing-fabric",
-      "parent-atlas-okf-knowledge-layers",
-      "parent-atlas-opencode-replay-proof",
-      "parent-atlas-pass-fabric",
-      "parent-atlas-policy-routing-integration",
-      "parent-atlas-query-routing-classifier",
-      "parent-atlas-runtime-ownership-precall",
-      "parent-atlas-tensor-residency-integration",
-      "parent-atlas-transport-memory-boundaries",
-      "parent-atlas-triton-trtllm-readiness",
-      "parent-atlas-workstation-domain-classifier",
-      "phase-2f1-real-evaluation-corpus",
-      "route-import-infra-isolation"
-    ]
-  },
+  "schema": "atlas.openspec-portfolio.v1",
+  "generatedAt": "2026-09-04T05:01:46.439Z",
+  "readOnly": true,
+  "currentAuthority": "parent-atlas-retrieval-lineage-dag-convergence",
+  "currentAuthorityCount": 1,
+  "status": "PORTFOLIO_AUDIT_PROVEN",
+  "changeCount": 76,
   "changes": [
     {
       "changeId": "ace-hyperrag-chr97-graphify-audit",
-      "hasTasksFile": true,
-      "completed": 4,
-      "total": 7,
-      "percent": 57.1,
-      "queueClass": "UNCLASSIFIED",
+      "taskProgress": {
+        "done": 4,
+        "open": 3,
+        "total": 7
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
       "currentGateRefs": [],
-      "mayGenerateNewWork": null,
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": null
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "agent-branch-review-fanout-ace-centroid-aug22",
-      "hasTasksFile": true,
-      "completed": 17,
-      "total": 20,
-      "percent": 85,
-      "queueClass": "UNCLASSIFIED",
+      "taskProgress": {
+        "done": 17,
+        "open": 3,
+        "total": 20
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
       "currentGateRefs": [],
-      "mayGenerateNewWork": null,
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": null
+      "mayGenerateNewWork": false
+    },
+    {
+      "changeId": "archive",
+      "taskProgress": {
+        "done": 0,
+        "open": 0,
+        "total": 0
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
+      "currentGateRefs": [],
+      "blockedBy": [],
+      "supersededBy": null,
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "atlas-feature-intelligence",
-      "hasTasksFile": true,
-      "completed": 19,
-      "total": 73,
-      "percent": 26,
-      "queueClass": "UNCLASSIFIED",
+      "taskProgress": {
+        "done": 19,
+        "open": 54,
+        "total": 73
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
       "currentGateRefs": [],
-      "mayGenerateNewWork": null,
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [
-        "FI-02"
-      ],
-      "declaredSupersededBy": [],
-      "note": null
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "atlas-hot-vector-schema-decision",
-      "hasTasksFile": false,
-      "completed": 0,
-      "total": 0,
-      "percent": null,
-      "queueClass": "UNCLASSIFIED",
+      "taskProgress": {
+        "done": 0,
+        "open": 0,
+        "total": 0
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
       "currentGateRefs": [],
-      "mayGenerateNewWork": null,
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": null
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "codereview-inference-wiring-followup-aug22",
-      "hasTasksFile": true,
-      "completed": 7,
-      "total": 10,
-      "percent": 70,
-      "queueClass": "UNCLASSIFIED",
+      "taskProgress": {
+        "done": 7,
+        "open": 3,
+        "total": 10
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
       "currentGateRefs": [],
-      "mayGenerateNewWork": null,
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": null
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "codereview-semantic-dimension-regression-aug22",
-      "hasTasksFile": true,
-      "completed": 7,
-      "total": 12,
-      "percent": 58.3,
-      "queueClass": "UNCLASSIFIED",
+      "taskProgress": {
+        "done": 11,
+        "open": 1,
+        "total": 12
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
       "currentGateRefs": [],
-      "mayGenerateNewWork": null,
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": null
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "deep-audit-code-gates-aug22",
-      "hasTasksFile": true,
-      "completed": 10,
-      "total": 21,
-      "percent": 47.6,
-      "queueClass": "UNCLASSIFIED",
+      "taskProgress": {
+        "done": 10,
+        "open": 11,
+        "total": 21
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
       "currentGateRefs": [],
-      "mayGenerateNewWork": null,
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": null
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "docker-compose-duplication-remediation",
-      "hasTasksFile": true,
-      "completed": 9,
-      "total": 9,
-      "percent": 100,
-      "queueClass": "UNCLASSIFIED",
+      "taskProgress": {
+        "done": 9,
+        "open": 0,
+        "total": 9
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
       "currentGateRefs": [],
-      "mayGenerateNewWork": null,
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": null
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "feature-label-semantic-derivation",
-      "hasTasksFile": true,
-      "completed": 2,
-      "total": 3,
-      "percent": 66.7,
-      "queueClass": "UNCLASSIFIED",
+      "taskProgress": {
+        "done": 2,
+        "open": 1,
+        "total": 3
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
       "currentGateRefs": [],
-      "mayGenerateNewWork": null,
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": null
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "inference-wiring-deep-audit-aug22",
-      "hasTasksFile": true,
-      "completed": 48,
-      "total": 49,
-      "percent": 98,
-      "queueClass": "UNCLASSIFIED",
+      "taskProgress": {
+        "done": 49,
+        "open": 1,
+        "total": 50
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
       "currentGateRefs": [],
-      "mayGenerateNewWork": null,
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": null
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "manual-migration-reconciliation",
-      "hasTasksFile": true,
-      "completed": 30,
-      "total": 61,
-      "percent": 49.2,
-      "queueClass": "UNCLASSIFIED",
+      "taskProgress": {
+        "done": 30,
+        "open": 31,
+        "total": 61
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
       "currentGateRefs": [],
-      "mayGenerateNewWork": null,
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": null
+      "mayGenerateNewWork": false
+    },
+    {
+      "changeId": "openspec",
+      "taskProgress": {
+        "done": 0,
+        "open": 0,
+        "total": 0
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
+      "currentGateRefs": [],
+      "blockedBy": [],
+      "supersededBy": null,
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "parent-atlas-768-dim-migration",
-      "hasTasksFile": false,
-      "completed": 0,
-      "total": 0,
-      "percent": null,
-      "queueClass": "UNCLASSIFIED",
+      "taskProgress": {
+        "done": 0,
+        "open": 0,
+        "total": 0
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
       "currentGateRefs": [],
-      "mayGenerateNewWork": null,
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": null
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "parent-atlas-ace-bitfrost-cache-correctness",
-      "hasTasksFile": true,
-      "completed": 2,
-      "total": 9,
-      "percent": 22.2,
-      "queueClass": "UNCLASSIFIED",
+      "taskProgress": {
+        "done": 2,
+        "open": 7,
+        "total": 9
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
       "currentGateRefs": [],
-      "mayGenerateNewWork": null,
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": null
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "parent-atlas-ace-rlm-bitfrost-integration",
-      "hasTasksFile": true,
-      "completed": 65,
-      "total": 67,
-      "percent": 97,
-      "queueClass": "UNCLASSIFIED",
+      "taskProgress": {
+        "done": 66,
+        "open": 3,
+        "total": 69
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
       "currentGateRefs": [],
-      "mayGenerateNewWork": null,
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": null
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "parent-atlas-adaptive-dag-fabric",
-      "hasTasksFile": true,
-      "completed": 5,
-      "total": 10,
-      "percent": 50,
-      "queueClass": "UNCLASSIFIED",
+      "taskProgress": {
+        "done": 7,
+        "open": 6,
+        "total": 13
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
       "currentGateRefs": [],
-      "mayGenerateNewWork": null,
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": null
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "parent-atlas-agentic-file-compiler",
-      "hasTasksFile": true,
-      "completed": 10,
-      "total": 21,
-      "percent": 47.6,
-      "queueClass": "ACTIVE_DEPENDENCY",
-      "currentGateRefs": [
-        "CONV-2"
-      ],
-      "mayGenerateNewWork": true,
+      "taskProgress": {
+        "done": 10,
+        "open": 11,
+        "total": 21
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
+      "currentGateRefs": [],
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": null
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "parent-atlas-agentic-repair-bundle-integration",
-      "hasTasksFile": true,
-      "completed": 18,
-      "total": 84,
-      "percent": 21.4,
-      "queueClass": "ACTIVE_DEPENDENCY",
-      "currentGateRefs": [
-        "CONV-2"
-      ],
-      "mayGenerateNewWork": true,
+      "taskProgress": {
+        "done": 18,
+        "open": 66,
+        "total": 84
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
+      "currentGateRefs": [],
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": null
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "parent-atlas-agentic-run-receipt-binding",
-      "hasTasksFile": true,
-      "completed": 2,
-      "total": 11,
-      "percent": 18.2,
-      "queueClass": "ACTIVE_DEPENDENCY",
-      "currentGateRefs": [
-        "CONV-2"
-      ],
-      "mayGenerateNewWork": true,
+      "taskProgress": {
+        "done": 2,
+        "open": 9,
+        "total": 11
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
+      "currentGateRefs": [],
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": null
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "parent-atlas-autoresearch-fabric",
-      "hasTasksFile": true,
-      "completed": 8,
-      "total": 8,
-      "percent": 100,
+      "taskProgress": {
+        "done": 8,
+        "open": 0,
+        "total": 8
+      },
+      "reachableTaskProgress": null,
       "queueClass": "FROZEN_REFERENCE",
       "currentGateRefs": [],
-      "mayGenerateNewWork": false,
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": "COMPLETE (8/8). No new work."
+      "mayGenerateNewWork": false
+    },
+    {
+      "changeId": "parent-atlas-best-fit-score-fabric",
+      "taskProgress": {
+        "done": 30,
+        "open": 4,
+        "total": 34
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
+      "currentGateRefs": [],
+      "blockedBy": [],
+      "supersededBy": null,
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "parent-atlas-branch-merge-consolidation-aug20",
-      "hasTasksFile": true,
-      "completed": 18,
-      "total": 35,
-      "percent": 51.4,
+      "taskProgress": {
+        "done": 18,
+        "open": 17,
+        "total": 35
+      },
+      "reachableTaskProgress": null,
       "queueClass": "FROZEN_REFERENCE",
       "currentGateRefs": [],
-      "mayGenerateNewWork": false,
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": "HISTORICAL. Unchecked items are not current work."
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "parent-atlas-candidate-feature-execution-fabric",
-      "hasTasksFile": true,
-      "completed": 194,
-      "total": 291,
-      "percent": 66.7,
-      "queueClass": "ACTIVE_DEPENDENCY",
-      "currentGateRefs": [
-        "CONV-3",
-        "CONV-4"
-      ],
-      "mayGenerateNewWork": true,
+      "taskProgress": {
+        "done": 194,
+        "open": 97,
+        "total": 291
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
+      "currentGateRefs": [],
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": "291 tasks (largest raw count in this group) -- only CONV-3/CONV-4-referenced gates are current, not the full remaining count."
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "parent-atlas-code-ingestion-pipeline",
-      "hasTasksFile": true,
-      "completed": 23,
-      "total": 35,
-      "percent": 65.7,
-      "queueClass": "UNCLASSIFIED",
+      "taskProgress": {
+        "done": 23,
+        "open": 12,
+        "total": 35
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
       "currentGateRefs": [],
-      "mayGenerateNewWork": null,
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": null
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "parent-atlas-compiler-semantic-graph-resolution",
-      "hasTasksFile": true,
-      "completed": 19,
-      "total": 32,
-      "percent": 59.4,
-      "queueClass": "ACTIVE_DEPENDENCY",
-      "currentGateRefs": [
-        "CONV-3"
-      ],
-      "mayGenerateNewWork": true,
+      "taskProgress": {
+        "done": 40,
+        "open": 18,
+        "total": 58
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
+      "currentGateRefs": [],
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": null
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "parent-atlas-compute-rank-cache-eval-dspy-gepa",
-      "hasTasksFile": true,
-      "completed": 18,
-      "total": 69,
-      "percent": 26.1,
-      "queueClass": "UNCLASSIFIED",
+      "taskProgress": {
+        "done": 18,
+        "open": 51,
+        "total": 69
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
       "currentGateRefs": [],
-      "mayGenerateNewWork": null,
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": null
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "parent-atlas-deep-research-ingestion",
-      "hasTasksFile": false,
-      "completed": 0,
-      "total": 0,
-      "percent": null,
-      "queueClass": "UNCLASSIFIED",
+      "taskProgress": {
+        "done": 0,
+        "open": 0,
+        "total": 0
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
       "currentGateRefs": [],
-      "mayGenerateNewWork": null,
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": null
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "parent-atlas-deep-research-learning-circuit",
-      "hasTasksFile": false,
-      "completed": 0,
-      "total": 0,
-      "percent": null,
-      "queueClass": "UNCLASSIFIED",
+      "taskProgress": {
+        "done": 0,
+        "open": 0,
+        "total": 0
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
       "currentGateRefs": [],
-      "mayGenerateNewWork": null,
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": null
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "parent-atlas-document-governance-master-index",
-      "hasTasksFile": true,
-      "completed": 7,
-      "total": 64,
-      "percent": 10.9,
-      "queueClass": "UNCLASSIFIED",
+      "taskProgress": {
+        "done": 7,
+        "open": 57,
+        "total": 64
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
       "currentGateRefs": [],
-      "mayGenerateNewWork": null,
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": null
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "parent-atlas-error-research-lane",
-      "hasTasksFile": true,
-      "completed": 0,
-      "total": 0,
-      "percent": null,
-      "queueClass": "UNCLASSIFIED",
+      "taskProgress": {
+        "done": 0,
+        "open": 0,
+        "total": 0
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
       "currentGateRefs": [],
-      "mayGenerateNewWork": null,
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": null
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "parent-atlas-governed-compute-fabric",
-      "hasTasksFile": true,
-      "completed": 0,
-      "total": 155,
-      "percent": 0,
-      "queueClass": "PARKED_CHALLENGER",
+      "taskProgress": {
+        "done": 0,
+        "open": 155,
+        "total": 155
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
       "currentGateRefs": [],
-      "mayGenerateNewWork": false,
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": "0/155. Must not become the next 155-task program just because it exists at 0% -- OaK/kernel/receipt/runtime surfaces prove the small governed read DAG first; this fabric absorbs proven patterns only after that."
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "parent-atlas-gpu-graph-vector-substrate",
-      "hasTasksFile": true,
-      "completed": 2,
-      "total": 26,
-      "percent": 7.7,
-      "queueClass": "PARKED_CHALLENGER",
+      "taskProgress": {
+        "done": 2,
+        "open": 24,
+        "total": 26
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
       "currentGateRefs": [],
-      "mayGenerateNewWork": false,
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": null
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "parent-atlas-gpu-runtime-abi-alignment",
-      "hasTasksFile": true,
-      "completed": 4,
-      "total": 7,
-      "percent": 57.1,
-      "queueClass": "UNCLASSIFIED",
+      "taskProgress": {
+        "done": 4,
+        "open": 3,
+        "total": 7
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
       "currentGateRefs": [],
-      "mayGenerateNewWork": null,
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": null
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "parent-atlas-gpu-sidecar-patch-tournament",
-      "hasTasksFile": true,
-      "completed": 12,
-      "total": 63,
-      "percent": 19,
-      "queueClass": "PARKED_CHALLENGER",
+      "taskProgress": {
+        "done": 12,
+        "open": 51,
+        "total": 63
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
       "currentGateRefs": [],
-      "mayGenerateNewWork": false,
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": null
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "parent-atlas-graph-analysis-contract",
-      "hasTasksFile": true,
-      "completed": 62,
-      "total": 84,
-      "percent": 73.8,
-      "queueClass": "ACTIVE_DEPENDENCY",
-      "currentGateRefs": [
-        "CONV-4"
-      ],
-      "mayGenerateNewWork": true,
+      "taskProgress": {
+        "done": 62,
+        "open": 22,
+        "total": 84
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
+      "currentGateRefs": [],
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": null
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "parent-atlas-graph-pagerank-okf-fanout-hardening",
-      "hasTasksFile": true,
-      "completed": 3,
-      "total": 4,
-      "percent": 75,
-      "queueClass": "UNCLASSIFIED",
+      "taskProgress": {
+        "done": 3,
+        "open": 1,
+        "total": 4
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
       "currentGateRefs": [],
-      "mayGenerateNewWork": null,
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": null
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "parent-atlas-graph-retrieval-proof",
-      "hasTasksFile": true,
-      "completed": 157,
-      "total": 284,
-      "percent": 55.3,
-      "queueClass": "ACTIVE_DEPENDENCY",
-      "currentGateRefs": [
-        "CONV-4"
-      ],
-      "mayGenerateNewWork": true,
+      "taskProgress": {
+        "done": 157,
+        "open": 127,
+        "total": 284
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
+      "currentGateRefs": [],
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [
-        "missing"
-      ],
-      "declaredSupersededBy": [],
-      "note": "284 tasks -- graph evidence gates only, consumed as a CONV-4 dependency, not an independently expanding workboard."
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "parent-atlas-graph-runtime-enhancement",
-      "hasTasksFile": true,
-      "completed": 2,
-      "total": 8,
-      "percent": 25,
-      "queueClass": "UNCLASSIFIED",
+      "taskProgress": {
+        "done": 2,
+        "open": 6,
+        "total": 8
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
       "currentGateRefs": [],
-      "mayGenerateNewWork": null,
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": null
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "parent-atlas-graph-runtime-python-consolidation",
-      "hasTasksFile": true,
-      "completed": 5,
-      "total": 18,
-      "percent": 27.8,
-      "queueClass": "UNCLASSIFIED",
+      "taskProgress": {
+        "done": 5,
+        "open": 13,
+        "total": 18
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
       "currentGateRefs": [],
-      "mayGenerateNewWork": null,
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": null
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "parent-atlas-graph-validation-fabric",
-      "hasTasksFile": true,
-      "completed": 8,
-      "total": 14,
-      "percent": 57.1,
-      "queueClass": "ACTIVE_DEPENDENCY",
-      "currentGateRefs": [
-        "CONV-4"
-      ],
-      "mayGenerateNewWork": true,
+      "taskProgress": {
+        "done": 8,
+        "open": 6,
+        "total": 14
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
+      "currentGateRefs": [],
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": null
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "parent-atlas-graphify-recovery-proof-ladder",
-      "hasTasksFile": true,
-      "completed": 0,
-      "total": 9,
-      "percent": 0,
-      "queueClass": "UNCLASSIFIED",
+      "taskProgress": {
+        "done": 0,
+        "open": 9,
+        "total": 9
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
       "currentGateRefs": [],
-      "mayGenerateNewWork": null,
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": null
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "parent-atlas-kafka-projection-initiative",
-      "hasTasksFile": false,
-      "completed": 0,
-      "total": 0,
-      "percent": null,
-      "queueClass": "UNCLASSIFIED",
+      "taskProgress": {
+        "done": 0,
+        "open": 0,
+        "total": 0
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
       "currentGateRefs": [],
-      "mayGenerateNewWork": null,
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": null
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "parent-atlas-kv-cache-adaptation-research",
-      "hasTasksFile": true,
-      "completed": 3,
-      "total": 15,
-      "percent": 20,
-      "queueClass": "PARKED_CHALLENGER",
+      "taskProgress": {
+        "done": 3,
+        "open": 12,
+        "total": 15
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
       "currentGateRefs": [],
-      "mayGenerateNewWork": false,
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": null
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "parent-atlas-live-graph-proof",
-      "hasTasksFile": true,
-      "completed": 0,
-      "total": 0,
-      "percent": null,
+      "taskProgress": {
+        "done": 0,
+        "open": 0,
+        "total": 0
+      },
+      "reachableTaskProgress": null,
       "queueClass": "FROZEN_REFERENCE",
       "currentGateRefs": [],
-      "mayGenerateNewWork": false,
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": "EVIDENCE/REPORT (0/0 tasks). Not a workboard."
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "parent-atlas-memory-architecture-freeze",
-      "hasTasksFile": true,
-      "completed": 14,
-      "total": 23,
-      "percent": 60.9,
-      "queueClass": "UNCLASSIFIED",
+      "taskProgress": {
+        "done": 14,
+        "open": 9,
+        "total": 23
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
       "currentGateRefs": [],
-      "mayGenerateNewWork": null,
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": null
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "parent-atlas-native-acceleration-cabi",
-      "hasTasksFile": true,
-      "completed": 14,
-      "total": 62,
-      "percent": 22.6,
-      "queueClass": "PARKED_CHALLENGER",
+      "taskProgress": {
+        "done": 14,
+        "open": 48,
+        "total": 62
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
       "currentGateRefs": [],
-      "mayGenerateNewWork": false,
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": null
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "parent-atlas-neural-prefill-encoder",
-      "hasTasksFile": true,
-      "completed": 1184,
-      "total": 1742,
-      "percent": 68,
-      "queueClass": "ACTIVE_DEPENDENCY",
-      "currentGateRefs": [
-        "CONV-3",
-        "CONV-4"
-      ],
-      "mayGenerateNewWork": true,
+      "taskProgress": {
+        "done": 1184,
+        "open": 558,
+        "total": 1742
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
+      "currentGateRefs": [],
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [
-        "pre-existing",
-        "source-lineage"
-      ],
-      "declaredSupersededBy": [],
-      "note": "1,719 tasks (~43% of the counted backlog). Only exact-768/lineage-gate-referenced tasks are current; the remainder is not an active queue by virtue of existing."
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "parent-atlas-nlp-sidecar-feature-compiler",
-      "hasTasksFile": true,
-      "completed": 24,
-      "total": 53,
-      "percent": 45.3,
-      "queueClass": "UNCLASSIFIED",
+      "taskProgress": {
+        "done": 26,
+        "open": 27,
+        "total": 53
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
       "currentGateRefs": [],
-      "mayGenerateNewWork": null,
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": null
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "parent-atlas-observation-routing-fabric",
-      "hasTasksFile": true,
-      "completed": 16,
-      "total": 26,
-      "percent": 61.5,
-      "queueClass": "UNCLASSIFIED",
+      "taskProgress": {
+        "done": 16,
+        "open": 10,
+        "total": 26
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
       "currentGateRefs": [],
-      "mayGenerateNewWork": null,
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": null
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "parent-atlas-okf-knowledge-layers",
-      "hasTasksFile": true,
-      "completed": 20,
-      "total": 36,
-      "percent": 55.6,
-      "queueClass": "UNCLASSIFIED",
+      "taskProgress": {
+        "done": 20,
+        "open": 16,
+        "total": 36
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
       "currentGateRefs": [],
-      "mayGenerateNewWork": null,
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": null
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "parent-atlas-onnx-webgpu-embedding-promotion",
-      "hasTasksFile": true,
-      "completed": 0,
-      "total": 17,
-      "percent": 0,
-      "queueClass": "PARKED_CHALLENGER",
+      "taskProgress": {
+        "done": 0,
+        "open": 17,
+        "total": 17
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
       "currentGateRefs": [],
-      "mayGenerateNewWork": false,
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": null
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "parent-atlas-ontology-kernel",
-      "hasTasksFile": true,
-      "completed": 47,
-      "total": 56,
-      "percent": 83.9,
-      "queueClass": "ACTIVE_DEPENDENCY",
-      "currentGateRefs": [
-        "OAK-EXEC-01A.1",
-        "OAK-EXEC-01B",
-        "OAK-EXEC-01C",
-        "OAK-EXEC-01C.1",
-        "OAK-EXEC-01D.1"
-      ],
-      "mayGenerateNewWork": true,
+      "taskProgress": {
+        "done": 60,
+        "open": 25,
+        "total": 85
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
+      "currentGateRefs": [],
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": "85% complete does not mean finish the last five tasks. Scope is exact implementationRefs -> registry proof -> deterministic receipts -> replay A/B only."
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "parent-atlas-opencode-replay-proof",
-      "hasTasksFile": true,
-      "completed": 2,
-      "total": 19,
-      "percent": 10.5,
-      "queueClass": "UNCLASSIFIED",
+      "taskProgress": {
+        "done": 2,
+        "open": 17,
+        "total": 19
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
       "currentGateRefs": [],
-      "mayGenerateNewWork": null,
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": null
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "parent-atlas-pass-fabric",
-      "hasTasksFile": true,
-      "completed": 6,
-      "total": 43,
-      "percent": 14,
-      "queueClass": "UNCLASSIFIED",
+      "taskProgress": {
+        "done": 6,
+        "open": 37,
+        "total": 43
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
       "currentGateRefs": [],
-      "mayGenerateNewWork": null,
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": null
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "parent-atlas-policy-routing-integration",
-      "hasTasksFile": true,
-      "completed": 25,
-      "total": 40,
-      "percent": 62.5,
-      "queueClass": "UNCLASSIFIED",
+      "taskProgress": {
+        "done": 25,
+        "open": 15,
+        "total": 40
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
       "currentGateRefs": [],
-      "mayGenerateNewWork": null,
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": null
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "parent-atlas-query-routing-classifier",
-      "hasTasksFile": true,
-      "completed": 41,
-      "total": 98,
-      "percent": 41.8,
-      "queueClass": "UNCLASSIFIED",
+      "taskProgress": {
+        "done": 41,
+        "open": 57,
+        "total": 98
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
       "currentGateRefs": [],
-      "mayGenerateNewWork": null,
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": null
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "parent-atlas-repair-candidate-feature-matrix",
-      "hasTasksFile": true,
-      "completed": 34,
-      "total": 41,
-      "percent": 82.9,
-      "queueClass": "ACTIVE_DEPENDENCY",
-      "currentGateRefs": [
-        "CONV-3"
-      ],
-      "mayGenerateNewWork": true,
+      "taskProgress": {
+        "done": 34,
+        "open": 7,
+        "total": 41
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
+      "currentGateRefs": [],
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": null
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "parent-atlas-retrieval-fusion-reachability",
-      "hasTasksFile": true,
-      "completed": 35,
-      "total": 49,
-      "percent": 71.4,
-      "queueClass": "ACTIVE_DEPENDENCY",
-      "currentGateRefs": [
-        "CONV-1",
-        "CONV-4"
-      ],
-      "mayGenerateNewWork": true,
+      "taskProgress": {
+        "done": 40,
+        "open": 14,
+        "total": 54
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
+      "currentGateRefs": [],
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": null
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "parent-atlas-retrieval-lineage-dag-convergence",
-      "hasTasksFile": true,
-      "completed": 27,
-      "total": 44,
-      "percent": 61.4,
+      "taskProgress": {
+        "done": 120,
+        "open": 38,
+        "total": 158
+      },
+      "reachableTaskProgress": {
+        "done": 120,
+        "open": 38,
+        "total": 158
+      },
       "queueClass": "CURRENT_AUTHORITY",
       "currentGateRefs": [
-        "CONV-0",
-        "CONV-1",
-        "CONV-2",
-        "CONV-3",
-        "CONV-4",
-        "CONV-5",
-        "CONV-6"
+        "LINEAGE-01",
+        "PKT-LINEAGE-08"
       ],
-      "mayGenerateNewWork": true,
+      "blockedBy": [
+        "GRAPHIFY_RUN_LIFECYCLE",
+        "SOURCE_NAMESPACE_AUTHORITY"
+      ],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": "Owns dependency ordering and acceptance gates only. Does not absorb implementation-owner code."
+      "mayGenerateNewWork": true
     },
     {
       "changeId": "parent-atlas-retrieval-lod-algorithm-taxonomy",
-      "hasTasksFile": true,
-      "completed": 44,
-      "total": 95,
-      "percent": 46.3,
-      "queueClass": "ACTIVE_DEPENDENCY",
-      "currentGateRefs": [
-        "CONV-4"
-      ],
-      "mayGenerateNewWork": true,
+      "taskProgress": {
+        "done": 44,
+        "open": 51,
+        "total": 95
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
+      "currentGateRefs": [],
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": null
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "parent-atlas-runtime-ownership-precall",
-      "hasTasksFile": false,
-      "completed": 0,
-      "total": 0,
-      "percent": null,
-      "queueClass": "UNCLASSIFIED",
+      "taskProgress": {
+        "done": 0,
+        "open": 0,
+        "total": 0
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
       "currentGateRefs": [],
-      "mayGenerateNewWork": null,
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": null
+      "mayGenerateNewWork": false
+    },
+    {
+      "changeId": "parent-atlas-search-classifier-sidecar",
+      "taskProgress": {
+        "done": 36,
+        "open": 0,
+        "total": 36
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
+      "currentGateRefs": [],
+      "blockedBy": [],
+      "supersededBy": null,
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "parent-atlas-semantic-512-canonicalization",
-      "hasTasksFile": true,
-      "completed": 23,
-      "total": 31,
-      "percent": 74.2,
+      "taskProgress": {
+        "done": 23,
+        "open": 8,
+        "total": 31
+      },
+      "reachableTaskProgress": null,
       "queueClass": "FROZEN_REFERENCE",
       "currentGateRefs": [],
-      "mayGenerateNewWork": false,
-      "supersededBy": "parent-atlas-semantic-768-canonical-contract",
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": "SUPERSEDED POLICY. Do not chase from its counted percentage to 100% -- unchecked items are not evidence 512 is unfinished current policy; see CLAUDE.md Embedding Dimensions Policy (768 canonical, 512 derived/secondary)."
+      "blockedBy": [],
+      "supersededBy": null,
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "parent-atlas-semantic-768-canonical-contract",
-      "hasTasksFile": true,
-      "completed": 0,
-      "total": 0,
-      "percent": null,
+      "taskProgress": {
+        "done": 0,
+        "open": 0,
+        "total": 0
+      },
+      "reachableTaskProgress": null,
       "queueClass": "FROZEN_REFERENCE",
       "currentGateRefs": [],
-      "mayGenerateNewWork": false,
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": "CONTRACT AUTHORITY (0/0 tasks). Referenced by other changes, does not itself carry a task queue."
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "parent-atlas-telemetry-lowrank-recommendation-okf-integration",
-      "hasTasksFile": true,
-      "completed": 0,
-      "total": 31,
-      "percent": 0,
-      "queueClass": "PARKED_CHALLENGER",
+      "taskProgress": {
+        "done": 0,
+        "open": 31,
+        "total": 31
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
       "currentGateRefs": [],
-      "mayGenerateNewWork": false,
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": null
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "parent-atlas-tensor-residency-integration",
-      "hasTasksFile": true,
-      "completed": 22,
-      "total": 49,
-      "percent": 44.9,
-      "queueClass": "UNCLASSIFIED",
+      "taskProgress": {
+        "done": 22,
+        "open": 27,
+        "total": 49
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
       "currentGateRefs": [],
-      "mayGenerateNewWork": null,
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": null
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "parent-atlas-topology-representation-admission",
-      "hasTasksFile": true,
-      "completed": 3,
-      "total": 18,
-      "percent": 16.7,
-      "queueClass": "ACTIVE_DEPENDENCY",
-      "currentGateRefs": [
-        "CONV-4",
-        "CONV-5"
-      ],
-      "mayGenerateNewWork": true,
+      "taskProgress": {
+        "done": 6,
+        "open": 18,
+        "total": 24
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
+      "currentGateRefs": [],
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": null
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "parent-atlas-transport-memory-boundaries",
-      "hasTasksFile": true,
-      "completed": 5,
-      "total": 64,
-      "percent": 7.8,
-      "queueClass": "UNCLASSIFIED",
+      "taskProgress": {
+        "done": 5,
+        "open": 59,
+        "total": 64
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
       "currentGateRefs": [],
-      "mayGenerateNewWork": null,
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": null
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "parent-atlas-triton-trtllm-readiness",
-      "hasTasksFile": false,
-      "completed": 0,
-      "total": 0,
-      "percent": null,
-      "queueClass": "UNCLASSIFIED",
+      "taskProgress": {
+        "done": 0,
+        "open": 0,
+        "total": 0
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
       "currentGateRefs": [],
-      "mayGenerateNewWork": null,
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": null
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "parent-atlas-unified-symbol-ranking",
-      "hasTasksFile": true,
-      "completed": 17,
-      "total": 17,
-      "percent": 100,
+      "taskProgress": {
+        "done": 17,
+        "open": 0,
+        "total": 17
+      },
+      "reachableTaskProgress": null,
       "queueClass": "FROZEN_REFERENCE",
       "currentGateRefs": [],
-      "mayGenerateNewWork": false,
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": "COMPLETE (17/17). No new work."
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "parent-atlas-unordered-execution-contract",
-      "hasTasksFile": true,
-      "completed": 7,
-      "total": 26,
-      "percent": 26.9,
-      "queueClass": "ACTIVE_DEPENDENCY",
-      "currentGateRefs": [
-        "CONV-2"
-      ],
-      "mayGenerateNewWork": true,
+      "taskProgress": {
+        "done": 7,
+        "open": 19,
+        "total": 26
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
+      "currentGateRefs": [],
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": null
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "parent-atlas-workstation-domain-classifier",
-      "hasTasksFile": true,
-      "completed": 17,
-      "total": 21,
-      "percent": 81,
-      "queueClass": "UNCLASSIFIED",
+      "taskProgress": {
+        "done": 17,
+        "open": 4,
+        "total": 21
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
       "currentGateRefs": [],
-      "mayGenerateNewWork": null,
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": null
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "parent-atlas-xgboost-cuda-runtime-proof",
-      "hasTasksFile": true,
-      "completed": 12,
-      "total": 30,
-      "percent": 40,
-      "queueClass": "PARKED_CHALLENGER",
+      "taskProgress": {
+        "done": 12,
+        "open": 18,
+        "total": 30
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
       "currentGateRefs": [],
-      "mayGenerateNewWork": false,
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": null
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "phase-2f1-real-evaluation-corpus",
-      "hasTasksFile": false,
-      "completed": 0,
-      "total": 0,
-      "percent": null,
-      "queueClass": "UNCLASSIFIED",
+      "taskProgress": {
+        "done": 0,
+        "open": 0,
+        "total": 0
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
       "currentGateRefs": [],
-      "mayGenerateNewWork": null,
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": null
+      "mayGenerateNewWork": false
     },
     {
       "changeId": "route-import-infra-isolation",
-      "hasTasksFile": true,
-      "completed": 13,
-      "total": 16,
-      "percent": 81.3,
-      "queueClass": "UNCLASSIFIED",
+      "taskProgress": {
+        "done": 13,
+        "open": 3,
+        "total": 16
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
       "currentGateRefs": [],
-      "mayGenerateNewWork": null,
+      "blockedBy": [],
       "supersededBy": null,
-      "declaredBlockedBy": [],
-      "declaredSupersededBy": [],
-      "note": null
+      "mayGenerateNewWork": false
     }
-  ]
+  ],
+  "writesPerformed": false,
+  "canonicalAuthority": false
 }

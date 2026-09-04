@@ -58,7 +58,9 @@ export const AtlasProcessPacketInputSchema = z.object({
   tools: z.array(z.string().trim().min(1)).default([]),
   endpoints: z.array(z.string().trim().min(1)).default([]),
   caches: z.array(z.string().trim().min(1)).default([]),
-  graphRevision: z.string().trim().min(1),
+  // Structural metadata may be unavailable while the packet is being enriched.
+  // Preserve that absence as null; strict graph admission remains downstream.
+  graphRevision: z.string().trim().min(1).nullable(),
   packetKey: z.string().trim().min(1).optional(),
 }).strict();
 
@@ -75,7 +77,7 @@ export interface AtlasProcessPacket {
   tools: string[];
   endpoints: string[];
   caches: string[];
-  graphRevision: string;
+  graphRevision: string | null;
   processHash: string;
   qdrantPayload: Record<string, unknown>;
   createdAt: string;
@@ -108,7 +110,7 @@ export interface AtlasProcessPacketReadbackResult {
     tools: string[];
     endpoints: string[];
     caches: string[];
-    graphRevision: string;
+    graphRevision: string | null;
   }>;
 }
 

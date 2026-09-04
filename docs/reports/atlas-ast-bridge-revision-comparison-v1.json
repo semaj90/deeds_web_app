@@ -1,21 +1,22 @@
 {
   "schema": "atlas.ast-bridge-revision-comparison.v1",
-  "generatedAt": "2026-08-25T23:24:54.081Z",
+  "generatedAt": "2026-09-03T22:12:13.175Z",
   "readOnly": true,
   "databaseWrites": false,
   "inputCandidatesPath": "docs\\reports\\graphify-ast-declaration-candidates-v2.jsonl",
   "counts": {
     "candidateRows": 59915,
     "existingAstRows": 7565,
-    "graphifyFiles": 0,
+    "graphifyFiles": 25317,
     "sharedFiles": 799,
     "mismatchedCandidateRows": 3780,
     "filesWithRevisionDrift": 0,
-    "filesWithHashDrift": 0,
+    "filesWithHashDrift": 1,
     "filesWithMissingCurrentSource": 0
   },
   "byClassification": {
-    "REVISION_AUTHORITY_UNAVAILABLE": 554
+    "REVISION_AUTHORITY_UNAVAILABLE": 553,
+    "AST_REVISION_MISSING": 1
   },
   "byParserVersion": {
     "tree-sitter:chunk-index-v1": 3218
@@ -47,7 +48,7 @@
       "existingKeyCount": 3,
       "graphifyRevision": null,
       "existingRevisions": [],
-      "currentFileSha256": "491b1ab4ac038e324bc32c9efe77f2b95ad9d48364c02c0d38769e85ae4871b3",
+      "currentFileSha256": "d34527f2dc0ebbe6b697568edb164cd7042435b10e895792fcb8126aa60391c2",
       "graphifyContentHash": null,
       "classification": "REVISION_AUTHORITY_UNAVAILABLE",
       "existingKeys": [
@@ -62,7 +63,7 @@
       "existingKeyCount": 1,
       "graphifyRevision": null,
       "existingRevisions": [],
-      "currentFileSha256": "d94481fdc75234fe393eecd4c3a68020ebb35bccbaa405e8140ddec44557387e",
+      "currentFileSha256": "17116815d72cd667291f7584e5be1af3c96180f12abe91a4d10e622e52d6e4d2",
       "graphifyContentHash": null,
       "classification": "REVISION_AUTHORITY_UNAVAILABLE",
       "existingKeys": [
@@ -185,7 +186,7 @@
       "existingKeyCount": 14,
       "graphifyRevision": null,
       "existingRevisions": [],
-      "currentFileSha256": "463cb73ed6b1fdcd194c3b6607a9bccf692b07ef2661a38b19b4af52861ef4f8",
+      "currentFileSha256": "310ed4d92bbcc3b63748534a470e9fa34995c9f3b4ea5181bead1a353c7f59ff",
       "graphifyContentHash": null,
       "classification": "REVISION_AUTHORITY_UNAVAILABLE",
       "existingKeys": [
@@ -225,7 +226,7 @@
       "existingKeyCount": 3,
       "graphifyRevision": null,
       "existingRevisions": [],
-      "currentFileSha256": "4bcf60c3bf640cf1bd328f2dd547cb14715fa70593a0b0e2564f014a7d1d5fd9",
+      "currentFileSha256": "c48ca93b055c2a9ff621d9395d07173fab0f63aa2fbbeaad09b18daa951ee3f5",
       "graphifyContentHash": null,
       "classification": "REVISION_AUTHORITY_UNAVAILABLE",
       "existingKeys": [

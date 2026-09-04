@@ -1,5 +1,5 @@
 {
-  "generated": "2026-08-30T02:16:57.076Z",
+  "generated": "2026-09-04T02:34:31.634Z",
   "qdrantFound": 0,
   "gates": [
     {
@@ -20,7 +20,7 @@
     {
       "name": "registry_pickup_paths",
       "pass": true,
-      "detail": "docs/reports/mcp-tool-registry-index.json present"
+      "detail": "revisioned docs/reports/mcp-tool-registry-index.json present"
     }
   ],
   "results": [
@@ -31,14 +31,14 @@
         "codebase:search",
         "memory:prior_answer_lookup",
         "karpathy.attention_rank_files",
-        "trace.kag_search"
+        "atlas.identity_audit"
       ],
       "llama_names": [
         "wiki__search",
         "codebase:search",
         "memory:prior_answer_lookup",
         "karpathy__attention_rank_files",
-        "trace__kag_search"
+        "atlas__identity_audit"
       ],
       "hits": [
         {
@@ -54,7 +54,7 @@
           "tool": "karpathy.attention_rank_files"
         },
         {
-          "tool": "trace.kag_search"
+          "tool": "atlas.identity_audit"
         }
       ],
       "signals": [
@@ -75,15 +75,15 @@
         "wiki.search",
         "codebase:search",
         "memory:prior_answer_lookup",
-        "trace.kag_search",
-        "atlas.packet_search"
+        "atlas.identity_audit",
+        "trace.kag_search"
       ],
       "llama_names": [
         "wiki__search",
         "codebase:search",
         "memory:prior_answer_lookup",
-        "trace__kag_search",
-        "atlas__packet_search"
+        "atlas__identity_audit",
+        "trace__kag_search"
       ],
       "hits": [
         {
@@ -96,10 +96,10 @@
           "tool": "memory:prior_answer_lookup"
         },
         {
-          "tool": "trace.kag_search"
+          "tool": "atlas.identity_audit"
         },
         {
-          "tool": "atlas.packet_search"
+          "tool": "trace.kag_search"
         }
       ],
       "signals": [
@@ -123,15 +123,15 @@
         "wiki.search",
         "memory:prior_answer_lookup",
         "codebase:search",
-        "atlas.packet_search",
-        "trace.kag_search"
+        "atlas.identity_audit",
+        "atlas.packet_search"
       ],
       "llama_names": [
         "wiki__search",
         "memory:prior_answer_lookup",
         "codebase:search",
-        "atlas__packet_search",
-        "trace__kag_search"
+        "atlas__identity_audit",
+        "atlas__packet_search"
       ],
       "hits": [
         {
@@ -144,10 +144,10 @@
           "tool": "codebase:search"
         },
         {
-          "tool": "atlas.packet_search"
+          "tool": "atlas.identity_audit"
         },
         {
-          "tool": "trace.kag_search"
+          "tool": "atlas.packet_search"
         }
       ],
       "signals": [
@@ -167,14 +167,14 @@
         "memory:prior_answer_lookup",
         "codebase:search",
         "trace.kag_search",
-        "atlas.packet_search"
+        "atlas.identity_audit"
       ],
       "llama_names": [
         "wiki__search",
         "memory:prior_answer_lookup",
         "codebase:search",
         "trace__kag_search",
-        "atlas__packet_search"
+        "atlas__identity_audit"
       ],
       "hits": [
         {
@@ -190,7 +190,7 @@
           "tool": "trace.kag_search"
         },
         {
-          "tool": "atlas.packet_search"
+          "tool": "atlas.identity_audit"
         }
       ],
       "signals": [
@@ -218,15 +218,15 @@
         "wiki.search",
         "codebase:search",
         "memory:prior_answer_lookup",
-        "trace.kag_search",
-        "atlas.packet_search"
+        "atlas.identity_audit",
+        "trace.kag_search"
       ],
       "llama_names": [
         "wiki__search",
         "codebase:search",
         "memory:prior_answer_lookup",
-        "trace__kag_search",
-        "atlas__packet_search"
+        "atlas__identity_audit",
+        "trace__kag_search"
       ],
       "hits": [
         {
@@ -239,10 +239,10 @@
           "tool": "memory:prior_answer_lookup"
         },
         {
-          "tool": "trace.kag_search"
+          "tool": "atlas.identity_audit"
         },
         {
-          "tool": "atlas.packet_search"
+          "tool": "trace.kag_search"
         }
       ],
       "signals": [

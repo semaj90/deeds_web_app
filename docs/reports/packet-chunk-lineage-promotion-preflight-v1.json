@@ -1,416 +1,8 @@
 {
   "schema": "atlas.packet-chunk-lineage-promotion-preflight.v1",
   "mode": "READ_ONLY_PROMOTION_PREFLIGHT",
-  "limit": 10,
+  "limit": 100,
   "candidates": [
-    {
-      "packetKey": "packet:d4205fcf8652",
-      "sourceRef": "sveltekit-frontend/artifacts/domain_label_audit_v1.json",
-      "namespace": null,
-      "sourceRevision": null,
-      "membershipCount": 19,
-      "membershipChecksum": "sha256:9e81c76ec1a97436709ff732a3a9a4a0c5d6e81b3b3eaf99d819d3f7843f90e5",
-      "memberships": [
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_audit_v1.json:0",
-          "chunkRowId": "41c92e52-4287-4a4d-a566-42bf10e25374"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_audit_v1.json:1",
-          "chunkRowId": "791011cc-99b4-4ae1-ba29-0576c6c93b9c"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_audit_v1.json:10",
-          "chunkRowId": "5e7c0a84-4290-43c7-9c71-fb10006dc182"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_audit_v1.json:11",
-          "chunkRowId": "b2c25a9d-4e95-41b5-85d2-94e49716e72e"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_audit_v1.json:12",
-          "chunkRowId": "d05ef1fc-c5d4-47b2-a8d1-da4d6f178e23"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_audit_v1.json:13",
-          "chunkRowId": "502b5d5c-4a99-4cad-90b5-ec21b94b805a"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_audit_v1.json:14",
-          "chunkRowId": "90a11493-eb7e-4122-a3d4-3724665bc2fc"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_audit_v1.json:15",
-          "chunkRowId": "0a1c4502-bcb1-4e62-b853-a8865f5b046e"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_audit_v1.json:16",
-          "chunkRowId": "92060be2-8e00-4345-8ff8-679743e7ff31"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_audit_v1.json:17",
-          "chunkRowId": "501cc2dd-2a24-43a8-ac8a-a923e4720862"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_audit_v1.json:18",
-          "chunkRowId": "6d0b090b-d6e4-4cd3-a5c4-47dc7a79b973"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_audit_v1.json:2",
-          "chunkRowId": "db475356-93de-4ab6-b2c1-06b02ff2a114"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_audit_v1.json:3",
-          "chunkRowId": "bf58fe92-93cc-4daf-87ab-b6ecc52fe28f"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_audit_v1.json:4",
-          "chunkRowId": "d6be5877-7e85-4f64-862c-5ff96494b5aa"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_audit_v1.json:5",
-          "chunkRowId": "92819090-2570-4f9d-b2ca-da29f1dadab8"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_audit_v1.json:6",
-          "chunkRowId": "54b18e43-aa68-41a9-a329-f6eec0cb6a2c"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_audit_v1.json:7",
-          "chunkRowId": "f0a4b209-0a44-4e85-8230-cd23fba9bd08"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_audit_v1.json:8",
-          "chunkRowId": "8a65448f-aea3-4bca-a663-cb2c51480b93"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_audit_v1.json:9",
-          "chunkRowId": "29b7d68b-09ea-40a1-866d-1474ab2f72a3"
-        }
-      ],
-      "classification": "BLOCKED_LINEAGE_AUTHORITY",
-      "blockedReasons": [
-        "SOURCE_NAMESPACE_UNPROVEN_OR_AMBIGUOUS",
-        "SOURCE_REVISION_UNPROVEN_OR_AMBIGUOUS"
-      ]
-    },
-    {
-      "packetKey": "packet:a2ca247618e4",
-      "sourceRef": "sveltekit-frontend/artifacts/domain_label_map_v1.json",
-      "namespace": null,
-      "sourceRevision": null,
-      "membershipCount": 16,
-      "membershipChecksum": "sha256:b2e24e1ae874dc2817df1cbc14d2c1f4d8eb1d6bb109aef052fb5090ee54a0c2",
-      "memberships": [
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_map_v1.json:0",
-          "chunkRowId": "1eb01f1d-f179-438b-acaf-3ccbcf2a1ff4"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_map_v1.json:1",
-          "chunkRowId": "fa7a166c-76e5-4660-9832-4344bea73158"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_map_v1.json:10",
-          "chunkRowId": "0f53eb2f-8a37-4349-87a1-b861ec310b31"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_map_v1.json:11",
-          "chunkRowId": "2e903436-335e-4ccc-9f1d-ba7ff77e8d2b"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_map_v1.json:12",
-          "chunkRowId": "2a9bba60-efb7-4c3c-a722-f19f52371c9e"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_map_v1.json:13",
-          "chunkRowId": "45be4855-0304-4a72-8751-d22ae88d3a19"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_map_v1.json:14",
-          "chunkRowId": "0dc17a7e-ad03-491a-9dca-17a733521577"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_map_v1.json:15",
-          "chunkRowId": "6007656f-9318-4088-b5b6-d16d517ae17a"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_map_v1.json:2",
-          "chunkRowId": "d8da2feb-22b4-452c-a58c-9433cd08c10c"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_map_v1.json:3",
-          "chunkRowId": "a2048840-45de-4e26-a216-6fc4e60ccf2e"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_map_v1.json:4",
-          "chunkRowId": "1208f352-17cc-4c6a-ab15-c6352132b194"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_map_v1.json:5",
-          "chunkRowId": "d402fcdd-0c6a-41ab-8325-672abf2c6642"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_map_v1.json:6",
-          "chunkRowId": "f2661d09-5154-4430-8f3e-3fa0bae6b40e"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_map_v1.json:7",
-          "chunkRowId": "f55dcca1-0ed6-4463-b2ea-6f627d1453e9"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_map_v1.json:8",
-          "chunkRowId": "d2b72bbc-c074-4849-97f1-02cb26fd7bbf"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/domain_label_map_v1.json:9",
-          "chunkRowId": "62652305-d39f-4568-93a5-a4c89b2fd010"
-        }
-      ],
-      "classification": "BLOCKED_LINEAGE_AUTHORITY",
-      "blockedReasons": [
-        "SOURCE_NAMESPACE_UNPROVEN_OR_AMBIGUOUS",
-        "SOURCE_REVISION_UNPROVEN_OR_AMBIGUOUS"
-      ]
-    },
-    {
-      "packetKey": "packet:1e160dfae730",
-      "sourceRef": "sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json",
-      "namespace": null,
-      "sourceRevision": null,
-      "membershipCount": 50,
-      "membershipChecksum": "sha256:55d4dc7cd927f625552d80ba7378025ca216e7f657759868748e325f1c446ba4",
-      "memberships": [
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:0",
-          "chunkRowId": "cfe80700-5e1f-4013-b4bd-3cbd7988bc9e"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:1",
-          "chunkRowId": "5773fc04-2c62-4683-a80a-ce305a1e3d5e"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:10",
-          "chunkRowId": "cb333c1b-bfcd-43a4-ace7-08095202d9dc"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:11",
-          "chunkRowId": "bdbd8790-6984-4d27-adf7-f1dfd5f7c45e"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:12",
-          "chunkRowId": "8480bc31-2520-45ab-aeb2-ac14c82c503a"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:13",
-          "chunkRowId": "a661060c-199b-41c9-8804-d8f31a22baef"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:14",
-          "chunkRowId": "8f2f595b-fa68-45be-ac6d-b08e47dbfd94"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:15",
-          "chunkRowId": "2802fe77-4dcd-473b-98a7-9edddf66fb23"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:16",
-          "chunkRowId": "f6161039-a772-4791-8600-8e7b444a37ff"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:17",
-          "chunkRowId": "b27b254b-d30c-497a-b9bc-d223537b25c9"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:18",
-          "chunkRowId": "616bb5ba-89f6-4c99-9516-ca0790e85b4f"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:19",
-          "chunkRowId": "c8ecba07-1a64-41ed-853b-10fb850c7b7f"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:2",
-          "chunkRowId": "b141cda5-d600-4fb7-899a-572ff14ec952"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:20",
-          "chunkRowId": "30bc4852-925d-434a-9073-84e8e950a2e4"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:21",
-          "chunkRowId": "d34cb265-ffcf-4e9e-9d74-b4e91142370b"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:22",
-          "chunkRowId": "d9e8f185-10e4-4bf4-b1ba-5dc5deb55d5b"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:23",
-          "chunkRowId": "9307067e-0aa8-4098-a879-bdd20ed4fa5e"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:24",
-          "chunkRowId": "62025b77-bf6c-45c6-9c77-def097b23791"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:25",
-          "chunkRowId": "5ba81540-0771-449e-bc19-812f2a202d5d"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:26",
-          "chunkRowId": "68914412-0d61-4f81-886c-89b2dc4a653b"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:27",
-          "chunkRowId": "b7840eef-c7b8-41ea-a82b-79f0720581fb"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:28",
-          "chunkRowId": "8bd8b167-f5c8-4efc-a9de-21d105576824"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:29",
-          "chunkRowId": "16d0fc84-33c4-4fc5-b446-fabfb6ca0679"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:3",
-          "chunkRowId": "be24eb37-2368-4805-a07b-5d72e92d34e5"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:30",
-          "chunkRowId": "b33d0768-b6c7-4139-ba1d-98cf04057571"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:31",
-          "chunkRowId": "ff01b375-4706-443a-9448-d9594bbe4eea"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:32",
-          "chunkRowId": "a921ad6a-9a7b-4891-b95f-ef937f4ef523"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:33",
-          "chunkRowId": "53a6db41-da04-4fb1-bb52-affc7d1181fc"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:34",
-          "chunkRowId": "0c7bb532-5281-424c-8a3e-8fbca5a77655"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:35",
-          "chunkRowId": "2cf6ea89-9346-4cd9-899e-ee57fc605754"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:36",
-          "chunkRowId": "100f8594-0965-4390-af22-e7f544a12d23"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:37",
-          "chunkRowId": "a8b4ec51-ab0c-426a-836b-9c7bf6cd2c3c"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:38",
-          "chunkRowId": "3907a4a3-b83c-4418-b4ef-18241e70dc2b"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:39",
-          "chunkRowId": "49ee74bb-f93d-4a8c-8776-a37c9152d89b"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:4",
-          "chunkRowId": "1d69fa95-18f5-4ea2-a783-62606edadf9a"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:40",
-          "chunkRowId": "897e78e8-c3a7-4695-a29f-69bdf08dea24"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:41",
-          "chunkRowId": "46e8719e-e6d5-4153-8f47-d54e88dc537b"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:42",
-          "chunkRowId": "57626705-7188-45a5-852d-7adcb529fb3b"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:43",
-          "chunkRowId": "d43dbfac-75c5-4e66-9061-840f2e966f6d"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:44",
-          "chunkRowId": "edafb957-983c-470b-9a6a-03267117b108"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:45",
-          "chunkRowId": "7492e381-fd90-4930-9540-8d6b812b2fc8"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:46",
-          "chunkRowId": "7225fbb0-ac63-4f02-b03a-d77e6dcace50"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:47",
-          "chunkRowId": "05be92fe-d0fd-4002-bbc3-b7be40f89b9b"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:48",
-          "chunkRowId": "11d3d4e6-6d16-43d0-a7fa-a2abecd03dd0"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:49",
-          "chunkRowId": "d80c94cb-8a42-4b89-8bdb-2f46f96b3045"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:5",
-          "chunkRowId": "6ea2144a-d44c-4471-97d3-5becd13f4c61"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:6",
-          "chunkRowId": "cafce90c-bfad-42f6-a80a-534aa54d3ce0"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:7",
-          "chunkRowId": "d456a767-4f51-4f93-806f-37929a640936"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:8",
-          "chunkRowId": "ede9650d-1927-4d8e-aa48-ef50290e43b0"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/evaluations/quantization-recall/quantization-recall-2026-07-18T171233Z.json:9",
-          "chunkRowId": "f3172ceb-89c8-4189-a8ab-3501ca8a1769"
-        }
-      ],
-      "classification": "BLOCKED_LINEAGE_AUTHORITY",
-      "blockedReasons": [
-        "SOURCE_NAMESPACE_UNPROVEN_OR_AMBIGUOUS",
-        "SOURCE_REVISION_UNPROVEN_OR_AMBIGUOUS"
-      ]
-    },
-    {
-      "packetKey": "packet:1053834343a5",
-      "sourceRef": "sveltekit-frontend/artifacts/phase1_5_membership_contract.json",
-      "namespace": null,
-      "sourceRevision": null,
-      "membershipCount": 2,
-      "membershipChecksum": "sha256:9fa797e9bc2dd093a93ee9c0cd3677ca6dc8005f5fe92979fe4e20f275fc8490",
-      "memberships": [
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/phase1_5_membership_contract.json:0",
-          "chunkRowId": "5e1150bc-d12a-4b49-b80f-02ef7e218367"
-        },
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/artifacts/phase1_5_membership_contract.json:1",
-          "chunkRowId": "594ac1d6-0733-488f-9f21-159f71faeb0a"
-        }
-      ],
-      "classification": "BLOCKED_LINEAGE_AUTHORITY",
-      "blockedReasons": [
-        "SOURCE_NAMESPACE_UNPROVEN_OR_AMBIGUOUS",
-        "SOURCE_REVISION_UNPROVEN_OR_AMBIGUOUS"
-      ]
-    },
     {
       "packetKey": "packet:7183a9b81576",
       "sourceRef": "sveltekit-frontend/artifacts/phase_1_5_multi_domain_schema.sql",
@@ -602,85 +194,88 @@
       ]
     },
     {
-      "packetKey": "packet:427ebd1ef9be",
-      "sourceRef": "sveltekit-frontend/classifier-models/xgboost-lane-classifier.json",
+      "packetKey": "packet:bb3563cefb17",
+      "sourceRef": "sveltekit-frontend/docs/GPU-ACCELERATION-IMPLEMENTATION.md",
       "namespace": null,
       "sourceRevision": null,
-      "membershipCount": 1,
-      "membershipChecksum": "sha256:1847bbbeaf9f89f9fa5f321cdf1a96c4fe30f7bf618cf8d45b0528e2418316cd",
+      "membershipCount": 19,
+      "membershipChecksum": "sha256:9a986d28ede8505b9df4cec119ae44d092ca14fc986344f0d3a9d024396fff91",
       "memberships": [
         {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/classifier-models/xgboost-lane-classifier.json:0",
-          "chunkRowId": "acf26812-90f9-4557-89ba-02e22eff5859"
-        }
-      ],
-      "classification": "BLOCKED_LINEAGE_AUTHORITY",
-      "blockedReasons": [
-        "SOURCE_NAMESPACE_UNPROVEN_OR_AMBIGUOUS",
-        "SOURCE_REVISION_UNPROVEN_OR_AMBIGUOUS"
-      ]
-    },
-    {
-      "packetKey": "packet:445420bcfad3",
-      "sourceRef": "sveltekit-frontend/classifier-models/xgboost-metadata.json",
-      "namespace": null,
-      "sourceRevision": null,
-      "membershipCount": 1,
-      "membershipChecksum": "sha256:e562834a9ac884ce8a881889f4a91213ca1c11589f344c8d03a5c0666bf339bc",
-      "memberships": [
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/classifier-models/xgboost-metadata.json:0",
-          "chunkRowId": "b3613106-8888-4b0f-a339-27a512dd3ec7"
-        }
-      ],
-      "classification": "BLOCKED_LINEAGE_AUTHORITY",
-      "blockedReasons": [
-        "SOURCE_NAMESPACE_UNPROVEN_OR_AMBIGUOUS",
-        "SOURCE_REVISION_UNPROVEN_OR_AMBIGUOUS"
-      ]
-    },
-    {
-      "packetKey": "packet:9ba4c5dc2169",
-      "sourceRef": "sveltekit-frontend/classifier-models/xgboost-metrics.json",
-      "namespace": null,
-      "sourceRevision": null,
-      "membershipCount": 1,
-      "membershipChecksum": "sha256:890158460c575e51ee37af3a46b447fc70f7a285dafe0179bdca8cf4c2a78a8a",
-      "memberships": [
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/classifier-models/xgboost-metrics.json:0",
-          "chunkRowId": "6a0a2687-50e0-4452-ac49-db6f09f8e295"
-        }
-      ],
-      "classification": "BLOCKED_LINEAGE_AUTHORITY",
-      "blockedReasons": [
-        "SOURCE_NAMESPACE_UNPROVEN_OR_AMBIGUOUS",
-        "SOURCE_REVISION_UNPROVEN_OR_AMBIGUOUS"
-      ]
-    },
-    {
-      "packetKey": "packet:0d19d6938c03",
-      "sourceRef": "sveltekit-frontend/.codex_louvain_audit.mjs",
-      "namespace": null,
-      "sourceRevision": null,
-      "membershipCount": 4,
-      "membershipChecksum": "sha256:a27101ae5c57da1db2b969611349f732043f618b0607ef9b872e4a402e9e854e",
-      "memberships": [
-        {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/.codex_louvain_audit.mjs:0",
-          "chunkRowId": "44323000-991b-4c0c-885c-e5bb0dddf759"
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/docs/GPU-ACCELERATION-IMPLEMENTATION.md:0",
+          "chunkRowId": "53f74d20-12b0-4f19-8016-55537bb6c0cd"
         },
         {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/.codex_louvain_audit.mjs:1",
-          "chunkRowId": "da3ef140-a26c-462b-9a91-3a5eb92ebea9"
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/docs/GPU-ACCELERATION-IMPLEMENTATION.md:1",
+          "chunkRowId": "7ff7e311-1196-4bbd-9b20-b9682e33d1f3"
         },
         {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/.codex_louvain_audit.mjs:2",
-          "chunkRowId": "d5a127c5-50e8-43ff-9e73-20daf9c7d74f"
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/docs/GPU-ACCELERATION-IMPLEMENTATION.md:10",
+          "chunkRowId": "b361ffa3-4d75-47dc-924c-f2f56cba04cb"
         },
         {
-          "canonicalChunkId": "fullrepo:sveltekit-frontend/.codex_louvain_audit.mjs:3",
-          "chunkRowId": "bf592df3-d614-4010-a46d-b73552d67c2c"
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/docs/GPU-ACCELERATION-IMPLEMENTATION.md:11",
+          "chunkRowId": "fcf747b5-aed2-4116-92cc-78ac8afc86bc"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/docs/GPU-ACCELERATION-IMPLEMENTATION.md:12",
+          "chunkRowId": "ee259582-be54-4880-8901-e56fd0da1ec3"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/docs/GPU-ACCELERATION-IMPLEMENTATION.md:13",
+          "chunkRowId": "57d63108-920b-4f73-8b81-852032e17869"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/docs/GPU-ACCELERATION-IMPLEMENTATION.md:14",
+          "chunkRowId": "bad5198e-0d5c-49be-b6b2-c8a41b5abda8"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/docs/GPU-ACCELERATION-IMPLEMENTATION.md:15",
+          "chunkRowId": "932c3d22-c240-49e0-a483-30645b3a358a"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/docs/GPU-ACCELERATION-IMPLEMENTATION.md:16",
+          "chunkRowId": "f0ad9e83-3415-4f56-abe4-b80bcd7c9e00"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/docs/GPU-ACCELERATION-IMPLEMENTATION.md:17",
+          "chunkRowId": "3283c55c-4897-4668-bf66-93cbc5c8212b"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/docs/GPU-ACCELERATION-IMPLEMENTATION.md:18",
+          "chunkRowId": "6e01c729-b33f-43cb-b700-bd023e52baf5"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/docs/GPU-ACCELERATION-IMPLEMENTATION.md:2",
+          "chunkRowId": "d55fb710-6f0b-4dc7-9655-bc49ce8dc2dd"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/docs/GPU-ACCELERATION-IMPLEMENTATION.md:3",
+          "chunkRowId": "0aac5474-cb4b-4ff8-8e0c-be6d60ac13de"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/docs/GPU-ACCELERATION-IMPLEMENTATION.md:4",
+          "chunkRowId": "6e7077a9-fa70-48c9-bdb5-b9cc11cdf07b"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/docs/GPU-ACCELERATION-IMPLEMENTATION.md:5",
+          "chunkRowId": "33afde57-da65-4d3f-a4e1-a18f323d3b88"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/docs/GPU-ACCELERATION-IMPLEMENTATION.md:6",
+          "chunkRowId": "3ffaaa16-24cb-42b5-9d2f-c16ecc613a3b"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/docs/GPU-ACCELERATION-IMPLEMENTATION.md:7",
+          "chunkRowId": "e8186df0-1b5e-4ae9-bc83-3cb91b54c036"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/docs/GPU-ACCELERATION-IMPLEMENTATION.md:8",
+          "chunkRowId": "0110cfde-9520-4bcc-8dfc-5ae3416b153d"
+        },
+        {
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/docs/GPU-ACCELERATION-IMPLEMENTATION.md:9",
+          "chunkRowId": "16b5ed4a-d159-4e8c-a9a9-c8fd8e5422cb"
         }
       ],
       "classification": "BLOCKED_LINEAGE_AUTHORITY",
@@ -699,11 +294,11 @@
     "cache": 0
   },
   "verdict": "BLOCKED_NO_QUALIFIED_CANDIDATE",
-  "generatedAt": "2026-09-02T00:00:04.173Z",
+  "generatedAt": "2026-09-04T04:18:00.531Z",
   "databaseError": null,
   "writesPerformed": false,
   "canonicalAuthority": false,
   "promotionAuthorized": false,
   "rollback": "Transaction rollback before commit; no transaction was opened by this preflight.",
-  "preflightChecksum": "sha256:345ebfa723691dfc2da42e1eb26bc89695f4ebcdc27a04f7047c2c5ab4e8f91b"
+  "preflightChecksum": "sha256:1c067b4437ce28182fed00f74d6e65929f57319498f53e6a23ee6b09e2769384"
 }

@@ -1,0 +1,50 @@
+{
+  "schema": "atlas.candidate-feature-matrix-representation-plan.v1",
+  "status": "MANIFEST_SHAPE_DEFINED_LIVE_BINDING_REQUIRED",
+  "manifest": {
+    "schema": "atlas.candidate-feature-matrix-representation-manifest.v1",
+    "candidateSnapshotRevision": null,
+    "ordinalMapChecksum": null,
+    "representationAlignmentChecksum": null,
+    "representations": {
+      "semantic_768": {
+        "role": "CANONICAL_REQUIRED",
+        "artifactRef": null,
+        "representationRevision": null,
+        "availabilityByOrdinalRef": null
+      },
+      "latent_256": {
+        "role": "OPTIONAL_PERSISTED_PARENT",
+        "artifactRef": null,
+        "representationRevision": null,
+        "availabilityByOrdinalRef": null
+      },
+      "latent_128": {
+        "role": "OPTIONAL_VIRTUAL_DERIVED_VIEW",
+        "parentRepresentationId": "latent_256",
+        "artifactRef": null,
+        "representationRevision": null,
+        "availabilityByOrdinalRef": null
+      },
+      "latent_64": {
+        "role": "OPTIONAL_PERSISTED_PHYSICAL_OUTPUT",
+        "parentRepresentationId": null,
+        "artifactRef": null,
+        "representationRevision": null,
+        "availabilityByOrdinalRef": null
+      }
+    },
+    "rawVectorsInline": false,
+    "rankingBehaviorChanged": false,
+    "canonicalAuthority": false,
+    "writesPerformed": false
+  },
+  "nullPolicy": "null means unavailable or unproven; no fallback identity is permitted",
+  "alignmentRule": "all available representations share candidateSnapshotRevision and ordinalMapChecksum",
+  "checksumRule": "alignment checksum covers ordered candidateOrdinal plus representation id, revision, artifact ref, and availability state; never raw vectors",
+  "nextProof": "bind one existing CandidateFeatureSnapshotV1 and independently replay ordinal/checksum alignment",
+  "sourceAudit": "docs/reports/candidate-feature-matrix-representation-v1.json",
+  "planChecksum": "sha256:981eb1051da768d461c63aef307941ed0396849161e202dce260485ce264ce97",
+  "canonicalAuthority": false,
+  "writesPerformed": false
+}

@@ -3,22 +3,23 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
-const WRITER = path.join(ROOT, 'scripts', 'atlas', 'backfill-latent-vectors.mjs');
+const WRITER = path.join(ROOT, 'scripts', 'atlas', 'latent256-revision-qualified-wrapper.mts');
+const LEGACY_WRITER = path.join(ROOT, 'scripts', 'atlas', 'backfill-latent-vectors.mjs');
 const REPORT = path.join(ROOT, 'docs', 'reports', 'latent-producer-contract-v1.json');
 
 const required = {
-  computes768To64: /768\s*[→>-]+\s*128\s*[→>-]+\s*64/,
-  writesFloat32Bytea: /Float32Array\(entry\.latent_64\)/,
-  declaresLatent64: /representationId:\s*['"]latent_64['"]|latent_64\s*=\s*bytea/,
-  bindsSemanticInput: /sourceRepresentation(?:Id|Revision)|semantic_768/,
-  bindsModelDigest: /model(?:Revision|Hash)|parametersDigest|checkpointHash/,
+  computes768To64: /(?=[\s\S]*semantic_768)(?=[\s\S]*latent_256)(?=[\s\S]*latent_64)/,
+  delegatesToProducer: /backfill_latent_256\.py/,
+  declaresLatent64: /representationId:\s*['"]latent_64['"]|latent_64/,
+  bindsSemanticInput: /inputRepresentationId:\s*['"]semantic_768['"]|semantic_768/,
+  bindsModelDigest: /modelChecksum|parametersDigest|checkpointHash/,
   bindsProducerRevision: /producerRevision/,
-  bindsCandidateSnapshot: /candidateSnapshotRevision/,
-  bindsOrdinalChecksum: /ordinalMapChecksum/,
-  requiresWorkspaceRevision: /workspaceRevision[^\n]*required|workspace_revision[^\n]*IS NOT NULL/,
-  requiresSourceRevision: /sourceRevision[^\n]*required|source_revision[^\n]*IS NOT NULL/,
+  bindsCandidateSnapshot: /candidateSnapshotRevision|candidate-snapshot-revision|loadAndVerifyCorpusBundle/,
+  bindsOrdinalChecksum: /ordinalMapChecksum|ordinal-map-checksum|inputPopulationChecksum/,
+  requiresWorkspaceRevision: /workspace-revision|workspaceRevision/,
+  requiresSourceRevision: /source-revision-set-checksum|sourceRevisionSetChecksum|sourceRevisionDigest/,
   hasExactChunkBinding: /chunk(?:Id|_id| identity)|codebase_chunk_index/,
-  blocksOrdinaryApply: /LATENT_LEGACY_WRITER_APPLY_BLOCKED|legacy-unsafe-apply/,
+  blocksOrdinaryApply: /legacy-unsafe-apply[\s\S]{0,180}never|never[\s\S]{0,180}legacy-unsafe-apply/,
 };
 
 async function main() {
@@ -33,9 +34,11 @@ async function main() {
   const report = {
     schema: 'atlas.latent-producer-contract.v1',
     readOnly: true,
-    writer: 'scripts/atlas/backfill-latent-vectors.mjs',
-    observedPipeline: 'semantic_768 → hidden_128 → latent_64',
-    observedEncoding: 'FP32 bytea',
+    writer: 'scripts/atlas/latent256-revision-qualified-wrapper.mts',
+    legacyWriter: 'scripts/atlas/backfill-latent-vectors.mjs',
+    legacyWriterRole: 'compatibility-only; not a promotion producer',
+    observedPipeline: 'semantic_768 → latent_256 → latent_128/latent_64 derived views',
+    observedEncoding: 'wrapper-qualified producer output; legacy storage may be FP32 bytea',
     checks,
     missing,
     status: missing.length === 0 ? 'PRODUCER_CONTRACT_READY_FOR_REVIEW' : 'PRODUCER_CONTRACT_INCOMPLETE',

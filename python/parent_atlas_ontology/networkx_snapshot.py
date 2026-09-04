@@ -8,6 +8,8 @@ edges; no participant clique is created.
 
 from __future__ import annotations
 
+import json
+from itertools import combinations
 from typing import Any, Sequence
 
 from atlas_semantic_ontology_projection import (
@@ -22,9 +24,14 @@ def _node_key(node: Any, attrs: dict[str, Any]) -> tuple[str, str]:
     return (str(attrs.get("node_kind", "")), str(node))
 
 
+def _json_safe(value: Any) -> Any:
+    """Normalize tuple/set-like attributes to the JSON interchange shape."""
+    return json.loads(json.dumps(value, sort_keys=True, default=str))
+
+
 def _canonical_graph_payload(graph: Any, graph_revision: str) -> dict[str, Any]:
     nodes = [
-        {"graph_ordinal": ordinal, "node_id": str(node), "attributes": dict(graph.nodes[node])}
+        {"graph_ordinal": ordinal, "node_id": str(node), "attributes": _json_safe(dict(graph.nodes[node]))}
         for ordinal, node in enumerate(sorted(graph.nodes, key=lambda n: _node_key(n, graph.nodes[n])))
     ]
     ordinal_by_node = {row["node_id"]: row["graph_ordinal"] for row in nodes}
@@ -34,7 +41,7 @@ def _canonical_graph_payload(graph: Any, graph_revision: str) -> dict[str, Any]:
             "source_graph_ordinal": ordinal_by_node[str(source)],
             "target_graph_ordinal": ordinal_by_node[str(target)],
             "edge_key": str(key),
-            "attributes": dict(attrs),
+            "attributes": _json_safe(dict(attrs)),
         })
     edges.sort(key=lambda row: (
         row["source_graph_ordinal"], row["target_graph_ordinal"], row["edge_key"],
@@ -56,6 +63,107 @@ def _canonical_graph_payload(graph: Any, graph_revision: str) -> dict[str, Any]:
     }
     payload["projection_checksum"] = logical_checksum(payload)
     return payload
+
+
+def node_link_roundtrip_receipt(
+    assertions: Sequence[SemanticAssertion],
+    relations: Sequence[NarySemanticRelation] = tuple(),
+    *,
+    graph_revision: str,
+) -> dict[str, Any]:
+    """Prove JSON node-link interchange without changing graph ownership."""
+    if not graph_revision.strip():
+        raise ValueError("graph_revision is required")
+    import networkx as nx
+
+    original = build_networkx_projection(assertions, relations)
+    before = _canonical_graph_payload(original, graph_revision)
+    node_link = _json_safe(nx.node_link_data(original))
+    restored = nx.node_link_graph(node_link, directed=True, multigraph=True)
+    after = _canonical_graph_payload(restored, graph_revision)
+    checks = {
+        "nodeCount": len(before["nodes"]) == len(after["nodes"]),
+        "edgeCount": len(before["edges"]) == len(after["edges"]),
+        "ordinalMapChecksum": before["graph_ordinal_map_checksum"] == after["graph_ordinal_map_checksum"],
+        "nodeSetChecksum": before["node_set_checksum"] == after["node_set_checksum"],
+        "edgeSetChecksum": before["edge_set_checksum"] == after["edge_set_checksum"],
+    }
+    return {
+        "schema": "atlas.ontology-networkx-node-link-roundtrip.v1",
+        "status": "NETWORKX_NODE_LINK_ROUNDTRIP_PROVEN" if all(checks.values()) else "ROUNDTRIP_FAILED",
+        "graphRevision": graph_revision,
+        "format": "networkx.node_link_data",
+        "checks": checks,
+        "beforeProjectionChecksum": before["projection_checksum"],
+        "afterProjectionChecksum": after["projection_checksum"],
+        "canonicalAuthority": False,
+        "writesPerformed": False,
+    }
+
+
+def bounded_incidence_jaccard(
+    graph: Any,
+    *,
+    graph_revision: str,
+    max_pairs: int = 1024,
+) -> dict[str, Any]:
+    """Score bounded participant pairs by shared relation-node neighborhoods.
+
+    This deliberately does not materialize participant cliques. Relation nodes
+    remain the topology intermediary, so the result is a derived feature only.
+    """
+    if max_pairs <= 0:
+        raise ValueError("max_pairs must be positive")
+    if not graph_revision.strip():
+        raise ValueError("graph_revision is required")
+    projection = _canonical_graph_payload(graph, graph_revision)
+    participants = sorted(
+        str(node) for node, attrs in graph.nodes(data=True)
+        if attrs.get("node_kind") == "ENTITY"
+    )
+    relation_neighbors: dict[str, frozenset[str]] = {}
+    for participant in participants:
+        relation_neighbors[participant] = frozenset(
+            str(neighbor)
+            for neighbor in set(graph.predecessors(participant)) | set(graph.successors(participant))
+            if graph.nodes[neighbor].get("node_kind") == "NARY_RELATION"
+        )
+
+    rows: list[dict[str, Any]] = []
+    for left, right in combinations(participants, 2):
+        left_neighbors = relation_neighbors[left]
+        right_neighbors = relation_neighbors[right]
+        union = left_neighbors | right_neighbors
+        if not union:
+            continue
+        intersection = left_neighbors & right_neighbors
+        rows.append({
+            "leftNodeKey": left,
+            "rightNodeKey": right,
+            "intersectionCount": len(intersection),
+            "unionCount": len(union),
+            "jaccard": len(intersection) / len(union),
+        })
+        if len(rows) >= max_pairs:
+            break
+    pair_rows = [
+        {"leftNodeKey": row["leftNodeKey"], "rightNodeKey": row["rightNodeKey"]}
+        for row in rows
+    ]
+    return {
+        "schema": "atlas.ontology-incidence-jaccard.v1",
+        "algorithm": "bounded_shared_relation_neighborhood_jaccard",
+        "graphRevision": graph_revision,
+        "projectionChecksum": projection["projection_checksum"],
+        "ordinalMapChecksum": projection["graph_ordinal_map_checksum"],
+        "maxPairs": max_pairs,
+        "candidatePairCount": len(rows),
+        "candidatePairChecksum": logical_checksum(pair_rows),
+        "scoresChecksum": logical_checksum(rows),
+        "results": rows,
+        "canonicalAuthority": False,
+        "writesPerformed": False,
+    }
 
 
 def build_networkx_snapshot(

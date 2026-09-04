@@ -50,6 +50,12 @@
 - [x] Add the typed `RepresentationArtifactV1` contract and focused tests;
   this defines the admission shape but does not make the existing writer
   promotion-safe.
+- [x] Record the complete nested family in an unapplied registry draft:
+  `sveltekit-frontend/drizzle/manual/20260903_nested_latent_representation_registry_v1.sql`.
+  `latent_256` is the physical learned bottleneck stored on
+  `codebase_chunk_index`; `latent_128` and nested `latent_64` remain derived
+  prefix-plus-renormalization views and are not duplicated as independent
+  tables or vector columns.
 - [x] Add a read-only 15-row latent canary plan bound to the current ordinal
   map; it reports the required artifact fields and refuses to authorize apply.
 - [x] Make the legacy latent writer fail closed on ordinary `--apply`; its
@@ -57,6 +63,32 @@
   flag and remains outside promotion.
 - [ ] TOPO-03 Implement/read-prove `RepresentationArtifactV1` digests and
   revision bindings.
+- [ ] TOPO-03A Read-prove `latent_256` storage/index coverage and deterministic
+  `latent_128`/`latent_64` derivation from the same parent artifact.
+- [x] Read-only derivation sample confirms the nested projection numerically
+  (`8/8` rows, CUDA, bounded error); this does not close representation
+  admission because producer/input/revision lineage is still incomplete.
+- [x] Read-only live coverage confirms `latent_256` is populated for `55,169`
+  rows with its HNSW/checkpoint indexes, while `latent_128` has no stored
+  column as designed. The registry table is absent because the additive draft
+  is unapplied. Receipt: `docs/reports/latent-dimension-coverage-audit-2026-09-03.json`.
+- [ ] TOPO-03B Reconcile the pre-existing generic `latent_64` registry entry
+  with the nested-autoencoder derived view; do not silently reuse an ambiguous
+  representation ID.
+- [ ] TOPO-03C Validate registry migration order in a proof database:
+  `0152_atlas_representations_registry.sql` must establish the existing
+  `atlas_representations` owner before the nested-family insert runs. Do not
+  duplicate or silently recreate that registry table. The similarly named
+  `0152_atlas_representations_registry_revised.sql` is a separate, incompatible
+  manual candidate: its columns do not match the nested draft and it places
+  `CREATE INDEX CONCURRENTLY` inside a transaction. Neither candidate is
+  journaled or applied; resolve this in a proof database before any registry
+  admission. Older Phase 110 documents that call the revised file “current” are
+  documentation history, not evidence of live migration state. Receipt:
+  `docs/reports/latent-dimension-coverage-audit-2026-09-03.json`.
+  The existing disposable proof harness can be reused, but its `postgres:18`
+  image is not present locally; do not pull it implicitly or apply the migration
+  to the live database.
 - [ ] TOPO-04 Prove `ae_latent_64` numeric FP32 identity separately from its
   FP16/MsgPack transport encoding.
 - [ ] TOPO-05 Bind `SOMAssignmentV1` to one input artifact and SOM model
@@ -77,9 +109,10 @@
 
 - `semantic_768 -> exact retrieval -> ContextManifestV1`: proven independently.
 - `rff_128`: optional challenger, producer not yet proven.
-- `ae_latent_128`: reserved/future.
-- `ae_latent_64`: representation contract corrected; live artifact admission
+- `latent_256`: physical nested-autoencoder parent; live artifact admission
   remains open.
+- `latent_128`/`latent_64`: derived nested views; live artifact admission and
+  legacy `latent_64` identity reconciliation remain open.
 - SOM/4D/fan-out: downstream and non-blocking for Workstation V1.
 
 ## Ordered next steps

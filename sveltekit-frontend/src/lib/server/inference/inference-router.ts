@@ -39,9 +39,16 @@ import { acquireGpuLease, releaseGpuLease, getGpuLeaseStatus } from './gpu-arbit
 import { inferLLM, healthCheck as trtHealthCheck, streamLLM as streamTrtLLM } from '$lib/server/trt-llm.js';
 import { inferLLM as inferTritonLLM, healthCheck as tritonHealthCheck, streamLLM as streamTritonLLM } from '$lib/server/triton-llm.js';
 import { bifrostChat, ollamaFetch, type OllamaMessage } from '$lib/server/ollama.js';
-import { LLAMA_SERVER_BASE_URL, getActiveLocalVlmModel } from '$lib/server/ai/local-llama-provider.js';
+import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL, getActiveLocalVlmModel } from '$lib/server/ai/local-llama-provider.js';
 import { getGpuStats, type GpuMemory } from '$lib/server/gpu/gpu-monitor.js';
-import { TURBOQUANT_BASE_URL, LITERT_BASE_URL, VLM_BASE_URL } from '$lib/ai/model-ids.js';
+import {
+  TURBOQUANT_BASE_URL,
+  LITERT_BASE_URL,
+  VLM_BASE_URL,
+  SERVER_CHAT_MODEL,
+  SERVER_VLM_MODEL,
+  TURBOQUANT_MODEL,
+} from '$lib/ai/model-ids.js';
 import { isPrefixWarm } from '$lib/server/inference/turbo-prefix-cache.js';
 import { execSync, spawn } from 'node:child_process';
 import { db } from '$lib/server/db/client';
@@ -212,7 +219,7 @@ export async function routeInference(request: InferenceRequest): Promise<Inferen
       const cartridgePayload = {
         kvProfile: 'turbo3/4',
         backend: 'turboquant',
-        model: 'gemma4-rotorquant:latest-turbo3',
+        model: TURBOQUANT_MODEL,
         stabilityTestPassed: true,
         promotedAt,
         grpoReward: 1.0,
@@ -442,7 +449,7 @@ async function tryTurboQuant(request: InferenceRequest, startTime: number): Prom
 
     return {
       text,
-      model: 'gemma4-rotorquant:latest-turbo3',
+		model: TURBOQUANT_MODEL,
       backend: 'turboquant',
       kvProfile: 'turbo3/4',
       usage: data.usage
@@ -538,7 +545,7 @@ async function tryBifrostCacheCheck(request: InferenceRequest, startTime: number
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), CACHE_HIT_TIMEOUT_MS);
 
-  const model = 'gemma4-rotorquant:latest';
+	  const model = SERVER_CHAT_MODEL;
   // Normalize prompt to increase semantic cache hit rate
   const normalizedPrompt = normalizePromptForCache(request.prompt);
   const messages: Array<{ role: string; content: string }> = [];
@@ -606,7 +613,7 @@ async function tryBifrostCacheCheck(request: InferenceRequest, startTime: number
 }
 
 async function tryBifrost(request: InferenceRequest, startTime: number): Promise<InferenceResponse | null> {
-	const model = 'gemma4-rotorquant:latest';
+	const model = SERVER_CHAT_MODEL;
 	const messages: Array<OllamaMessage> = [];
 	if (request.systemPrompt) messages.push({ role: 'system', content: request.systemPrompt });
 	messages.push({ role: 'user', content: request.prompt });
@@ -624,7 +631,7 @@ async function tryBifrost(request: InferenceRequest, startTime: number): Promise
 
 		return {
 			text,
-			model: 'gemma4-rotorquant:latest-bifrost',
+			model: SERVER_CHAT_MODEL,
 			backend: 'bifrost',
 			latencyMs: Math.round(performance.now() - startTime)
 		};
@@ -687,7 +694,7 @@ async function tryHfVlmServer(request: InferenceRequest, startTime: number): Pro
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				model: 'gemma4-rotorquant:latest',
+				model: SERVER_VLM_MODEL,
 				messages,
 				max_tokens: request.maxTokens ?? 512,
 				temperature: request.temperature ?? 0.3,
@@ -704,7 +711,7 @@ async function tryHfVlmServer(request: InferenceRequest, startTime: number): Pro
 
 		return {
 			text,
-			model: 'gemma4-rotorquant:latest',
+			model: SERVER_VLM_MODEL,
 			backend: 'vlm-hf',
 			usage: data.usage ? {
 				prompt_tokens: data.usage.prompt_tokens ?? 0,
@@ -752,7 +759,7 @@ async function tryOllamaVlm(request: InferenceRequest, startTime: number): Promi
 
 /** Raw llama-server VLM call — no VRAM swap logic */
 async function _ollamaVlmCall(request: InferenceRequest, startTime: number): Promise<InferenceResponse | null> {
-	const model = await getActiveLocalVlmModel().catch(() => 'gemma4:e4b-it-q4_K_M');
+	const model = await getActiveLocalVlmModel().catch(() => LOCAL_VLM_MODEL);
 
 	try {
 		const res = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
@@ -1077,7 +1084,7 @@ export async function* routeStreamingInference(
 
 	// Tier 5: llama-server compatibility wrapper (uses /api/chat if messages provided, /api/generate otherwise)
 	const ollamaUrl = getOllamaEndpoint();
-	const model = request.model ?? 'gemma4-rotorquant:latest';
+	const model = request.model ?? await getActiveLocalVlmModel().catch(() => LOCAL_VLM_MODEL);
 
 	const [endpoint, body] = request.messages
 		? [`${ollamaUrl}/api/chat`, { model, messages: request.messages, stream: true, keep_alive: '24h' }]
@@ -1163,7 +1170,7 @@ export async function getRouterStatus() {
     vlm: {
       available: vlmOk,
       url: VLM_BASE_URL,
-      model: 'gemma4-rotorquant:latest',
+      model: SERVER_VLM_MODEL,
       backend: 'hf-nf4',
       visionCapable: true,
     },

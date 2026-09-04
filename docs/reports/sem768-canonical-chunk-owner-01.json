@@ -1,0 +1,71 @@
+{
+  "schema": "atlas.sem768-canonical-chunk-owner-01.report",
+  "gate": "SEM768-CANONICAL-CHUNK-OWNER-01",
+  "generatedAt": "2026-09-02",
+  "type": "READ_ONLY_AUDIT",
+  "databaseWrites": false,
+  "embeddingRequests": 0,
+  "question": "Which component actually owns canonicalChunkId for codebase_chunk_index rows? SEM768-ADMISSION-DRY-01 checked only the empty `canonical_chunks` table and concluded CANONICAL_CHUNK_UNPROVEN for all 128 sampled rows -- that conclusion is now known to be INCOMPLETE, not necessarily wrong overall, because two other real, populated candidate tables were not checked.",
+  "candidatesAudited": [
+    {
+      "table": "canonical_chunks",
+      "rowCount": 0,
+      "keyShape": "chunk_id (varchar) + document_id (uuid) + chunk_index (int) -- a DIFFERENT domain (document-centric), not keyed on codebase_chunk_index.id at all",
+      "verdict": "CONFIRMED EMPTY, CONFIRMED WRONG DOMAIN -- correctly excluded as a candidate owner for codebase_chunk_index rows. This was the only table SEM768-ADMISSION-DRY-01 checked."
+    },
+    {
+      "table": "atlas_packet_chunk_lineage",
+      "rowCount": 6987,
+      "keyShape": "packet_key + canonical_chunk_id (text, format fullrepo:<path>:<line>) + chunk_row_id (uuid, joins directly to codebase_chunk_index.id) + source_ref + source_revision (nullable) + membership_status (EXACT_SINGLE_MEMBER|EXACT_MULTI_MEMBER) + revision_status (PROVEN|UNPROVEN, DB-enforced: PROVEN requires source_revision NOT NULL)",
+      "joinResultAgainstThe128RowAdmissionSample": {
+        "rowsWithRevisionStatusProven": 13,
+        "membershipStatusForThose13": "EXACT_MULTI_MEMBER (all 13)",
+        "lineageProducerRevision": "PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1 (all 13)",
+        "sampleRow": {
+          "chunkIndexId": "00317389-cb4d-44d7-b1bd-63a8bf27da01",
+          "canonicalChunkId": "fullrepo:docs/ENGRAM-ACE-MEMORY-SYSTEM-ARCHITECTURE.md:17",
+          "packetKey": "ace:packet:bb37e38434d1",
+          "sourceRef": "docs/ENGRAM-ACE-MEMORY-SYSTEM-ARCHITECTURE.md",
+          "sourceRevision": "sha256:a72630a1b869416f6c938f21f0b6842926b01a31d98cb85c2eeca035138c3579"
+        }
+      },
+      "verdict": "REAL CANDIDATE OWNER -- populated, joins directly, provides canonicalChunkId + packetKey + sourceRef + a genuinely non-null sourceRevision together, gated by a DB CHECK constraint (not just convention) that PROVEN implies sourceRevision IS NOT NULL. This is materially stronger evidence than the empty canonical_chunks table."
+    },
+    {
+      "table": "atlas_chunk_packet_identity_links",
+      "rowCount": 105762,
+      "keyShape": "chunk_index_id (uuid, joins directly to codebase_chunk_index.id) + canonical_packet_key (text, format packet:<12hex> or ace:packet:<12hex>) + match_method (EXACT_CANONICAL_ID|EXACT_SOURCE_SPAN|STRUCTURAL_AST_COORDINATE|CONTENT_HASH_UNIQUE|STRUCTURAL_FINGERPRINT|AMBIGUOUS|UNRESOLVED) + confidence (EXACT|UNIQUE_DERIVATION|AMBIGUOUS|NONE) + canonical_packet_minted (boolean) + canonical_writes_allowed (boolean)",
+      "globalDistribution": {
+        "NONE_UNRESOLVED": 101237,
+        "EXACT_EXACT_CANONICAL_ID": 4517,
+        "AMBIGUOUS_AMBIGUOUS": 8,
+        "note": "95.7% of all 105,762 rows in this table are recorded UNRESOLVED attempts, not successful links. Only 4.3% achieved EXACT confidence."
+      },
+      "joinResultAgainstThe128RowAdmissionSample": {
+        "rowsWithAnyLinkRowAtAll": 120,
+        "rowsWithConfidenceExact": 18,
+        "rowsWithConfidenceNoneUnresolved": 105,
+        "canonicalPacketMintedForThe18ExactRows": false,
+        "canonicalWritesAllowedForThe18ExactRows": false
+      },
+      "verdict": "REAL CANDIDATE OWNER, BUT EXPLICITLY NOT YET AUTHORIZED -- for all 18 EXACT-confidence rows in the sample, canonical_packet_minted=false AND canonical_writes_allowed=false. This table's own schema encodes a deliberate two-phase gate: an algorithm can FIND an exact match without that match being MINTED/AUTHORIZED as canonical. Per the SemanticRepresentationV1 contract's own principle (storage ownership != proven lineage), an EXACT match with canonical_writes_allowed=false should NOT be treated as canonicalChunkId=PROVEN -- it is a strong candidate pending its own authorization step, not yet a proven identity."
+    },
+    {
+      "table": "atlas_packets (workspace_revision lookup, joined via atlas_packet_chunk_lineage.packet_key)",
+      "finding": "atlas_packets DOES have real workspace_id (varchar, e.g. 'docs', 'crates', 'docs/architecture' -- meaningfully differentiated, not the schema default 'unknown') and workspace_revision (integer, indexed) columns. For all 13 packet_keys resolved via the PROVEN atlas_packet_chunk_lineage rows in the sample, workspace_id is a real non-default value, but workspace_revision is uniformly 0 -- the column's own DEFAULT, meaning it was never actually incremented/set for these rows.",
+      "verdict": "workspace_id is usable as a coarse workspace identity marker for the PROVEN-lineage subset. workspace_revision remains UNPROVEN in practice -- the column exists and is technically joinable, but its value is the untouched default for every row checked, which does not meet the 'independently proven' bar any more than an absent column would."
+    }
+  ],
+  "overlapFinding": {
+    "exactLinkCount": 18,
+    "provenLineageCount": 13,
+    "overlapCount": 0,
+    "significance": "ZERO overlap between the two real candidate-owner tables in this 128-row sample. atlas_chunk_packet_identity_links (producer: atlas.chunk-packet-identity-linker.v1) and atlas_packet_chunk_lineage (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1) are two independent, disconnected canonical-identity resolution pipelines operating on the same codebase_chunk_index table, covering disjoint subsets, with no reconciliation between them. Combined, 31/128 (24.2%) of the sample has SOME real resolved-identity signal from one pipeline or the other -- materially more than the 0/128 the admission dry-run's canonical_chunks-only check found, but via two uncoordinated owners rather than one canonical one."
+  },
+  "conclusion": {
+    "canonicalChunkOwner": "SPLIT -- no single populated, authoritative canonical-chunk resolver exists today. atlas_packet_chunk_lineage (PROVEN rows only, 13/128 in this sample) is the stronger of the two real candidates: it ties canonicalChunkId + packetKey + sourceRef + a genuinely non-null sourceRevision together under a DB-enforced consistency check. atlas_chunk_packet_identity_links (EXACT rows, 18/128) is a real but explicitly pre-authorization candidate (canonical_writes_allowed=false) -- treat it as evidence toward future canonical status, not as canonicalChunkId=PROVEN today.",
+    "recommendationForSemanticRepresentationV1Resolution": "When resolving canonicalChunkId for a codebase_chunk_index row: (1) check atlas_packet_chunk_lineage WHERE chunk_row_id = <id> AND revision_status = 'PROVEN' first -- if found, canonicalChunkId = canonical_chunk_id, packetKey = packet_key, sourceRevision = source_revision, all independently proven together; (2) do NOT treat an atlas_chunk_packet_identity_links EXACT match as canonicalChunkId=PROVEN while canonical_writes_allowed=false -- that flag is the table's own authority boundary and should be respected, not bypassed; (3) do not check the empty canonical_chunks table at all -- it is confirmed wrong-domain for this table.",
+    "doNotDo": "Do not set canonicalChunkId = codebase_chunk_index.id. Neither of the two real candidate owners uses that column as canonicalChunkId -- one uses a fullrepo:<path>:<line> chunk coordinate, the other uses a packet_key. codebase_chunk_index.id remains exactly chunkIndexId (the physical storage coordinate), never canonicalChunkId, confirmed by the actual shape of both real registries."
+  },
+  "notApplied": "This report does not modify SemanticRepresentationV1, does not re-run SEM768-ADMISSION-DRY-01/02, and performs zero writes. Recommendations above are for a follow-up step pending operator confirmation."
+}

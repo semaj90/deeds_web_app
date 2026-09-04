@@ -2,7 +2,9 @@
 import { sql } from 'drizzle-orm';
 import {
     bigint,
+    bigserial,
     boolean,
+    customType,
     date,
     foreignKey,
     index,
@@ -15,6 +17,7 @@ import {
     doublePrecision,
     real,
     serial,
+    smallint,
     text,
     timestamp,
     unique,
@@ -25,6 +28,20 @@ import {
     halfvec,
 } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm/relations';
+
+// Matches the local `bytea` customType pattern already established in
+// src/lib/server/db/schema/atlas-packets.ts and packet-binary-registry.ts.
+const bytea = customType<{ data: Buffer; driverData: Buffer }>({
+  dataType() {
+    return 'bytea';
+  },
+  fromDriver(value) {
+    return value as Buffer;
+  },
+  toDriver(value) {
+    return value;
+  },
+});
 
 // Re-export chatMessages and toolTraces from schema-chat for broader availability
 export { chatMessages, toolTraces, type ChatMessage, type NewChatMessage, type ToolTrace, type NewToolTrace } from './schema-chat';
@@ -4471,8 +4488,7 @@ export const codebaseChunkIndex = pgTable('codebase_chunk_index', {
 	// Learned nested-autoencoder representation (2026-08-29). NOT a prefix truncation of
 	// content_embedding -- an actual model forward pass (NestedSemanticAutoencoder.encode()).
 	// canonical_authority: false always -- routing/reranking lane only, never the primary
-	// retrieval authority. latent_128/latent_64 are NOT stored separately: they're free
-	// prefix+renormalize views of latent_256, derived at query time.
+	// retrieval authority.
 	// See openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md for the recall
 	// comparison that justified this column (latent_256 beats semantic_mrl_256, 0.8957 vs 0.8575).
 	latent256: halfvec('latent_256', { dimensions: 256 }),
@@ -4480,6 +4496,28 @@ export const codebaseChunkIndex = pgTable('codebase_chunk_index', {
 	// A future retrain must not silently mix generations -- a mismatch here means the row
 	// needs re-encoding, not that the column is stale/broken.
 	latent256CheckpointRevision: varchar('latent_256_checkpoint_revision', { length: 64 }),
+
+	// latent_64 (2026-09-02 LATENT-SCHEMA-ALIGN-01 correction): this file previously claimed
+	// latent_128/latent_64 "are NOT stored separately: they're free prefix+renormalize views of
+	// latent_256" -- that was false against live Postgres. `python/backfill_latent_256.py`
+	// persists latent_64 as its own learned-model output (same NestedSemanticAutoencoder forward
+	// pass, not a prefix of latent_256), and the column has been live and indexed
+	// (idx_codebase_chunk_latent64_hnsw) since before this correction. latent_128 genuinely has
+	// no Postgres column (in-memory only, per that script's own docstring) -- the claim was only
+	// half wrong. Declaration alignment only, no migration: every column below already exists on
+	// the live table. Live HNSW/checksum indexes (idx_codebase_chunk_latent64_hnsw,
+	// idx_codebase_chunk_latent_valid, idx_codebase_chunk_latent_256_hnsw,
+	// idx_codebase_chunk_latent_256_checkpoint_revision) are intentionally not declared here,
+	// consistent with this repo's existing convention of keeping HNSW/GIN indexes in manual SQL
+	// rather than Drizzle's index() API (which cannot express vector_cosine_ops/halfvec_cosine_ops
+	// opclasses) -- see drizzle/0013_research_summaries.sql for the established pattern.
+	latent64: vector('latent_64', { dimensions: 64 }),
+	latent64Model: text('latent64_model').default('packet-autoencoder-768-64'),
+	latent64Meta: jsonb('latent64_meta').default(sql`'{"gates": {}, "validated_at": null}'::jsonb`),
+	latent64ValidatedAt: timestamp('latent64_validated_at', { withTimezone: true }),
+	latent64Msgpack: bytea('latent64_msgpack'),
+	latentEmbeddingValid: boolean('latent_embedding_valid'),
+	latentEmbeddingValidatedAt: timestamp('latent_embedding_validated_at', { withTimezone: true }),
 
 	// 4D manifold coords: [som_x, som_y, semantic_z, grpo_w] — matches research_summaries.manifold4
 	manifold4: real('manifold4').array(),
@@ -5686,4 +5724,51 @@ export const recommendationLog = pgTable('recommendation_log', {
 
 export type RecommendationLogEntry    = typeof recommendationLog.$inferSelect;
 export type NewRecommendationLogEntry = typeof recommendationLog.$inferInsert;
+
+// === TOPOLOGY TAXONOMY (DB-only, protected via drizzle.config.ts tablesFilter) ===
+// Ontological hierarchy over the topological data store: codebase -> topo_class ->
+// topo_byte -> cluster -> file. Live schema: drizzle/manual/20260507_topology_taxonomy.sql.
+// Declared here for typed query access only; migrations for these two tables remain
+// excluded ('!taxonomy_nodes', '!taxonomy_edges' in tablesFilter) per the Drizzle Safety Rule.
+export const taxonomyNodes = pgTable('taxonomy_nodes', {
+    id:             bigserial('id', { mode: 'number' }).primaryKey(),
+    nodeKey:        text('node_key').notNull(),
+    level:          smallint('level').notNull(),
+    parentKey:      text('parent_key'),
+    displayName:    text('display_name').notNull(),
+    metadata:       jsonb('metadata').notNull().default({}),
+    memberCount:    integer('member_count').notNull().default(0),
+    createdAt:      timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+}, (t) => ({
+    nodeKeyUnique:  unique('taxonomy_nodes_node_key_key').on(t.nodeKey),
+    levelIdx:       index('taxonomy_nodes_level_idx').on(t.level),
+    parentIdx:      index('taxonomy_nodes_parent_idx').on(t.parentKey),
+    metadataGinIdx: index('taxonomy_nodes_metadata_gin_idx').using('gin', t.metadata),
+    // Targeted expression indexes on the metadata keys real rows carry (verified
+    // live 2026-09-02: topo_class/topo_byte/kind — see the migration this mirrors,
+    // drizzle/manual/20260902_taxonomy_nodes_metadata_param_indexes.sql).
+    topoClassIdx:   index('taxonomy_nodes_topo_class_idx').on(sql`(metadata ->> 'topo_class')`),
+    topoByteIdx:    index('taxonomy_nodes_topo_byte_idx').on(sql`(metadata ->> 'topo_byte')`),
+    kindIdx:        index('taxonomy_nodes_kind_idx').on(sql`(metadata ->> 'kind')`),
+}));
+
+export type TaxonomyNode    = typeof taxonomyNodes.$inferSelect;
+export type NewTaxonomyNode = typeof taxonomyNodes.$inferInsert;
+
+export const taxonomyEdges = pgTable('taxonomy_edges', {
+    id:             bigserial('id', { mode: 'number' }).primaryKey(),
+    sourceKey:      text('source_key').notNull(),
+    targetKey:      text('target_key').notNull(),
+    relation:       text('relation').notNull(), // IS_A | PART_OF | SIBLING_OF | SHARES_TOPO | INHERITS_FROM
+    weight:         real('weight').notNull().default(1.0),
+    evidence:       jsonb('evidence').notNull().default({}),
+    createdAt:      timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+}, (t) => ({
+    edgeUnique:     unique('taxonomy_edges_source_key_target_key_relation_key').on(t.sourceKey, t.targetKey, t.relation),
+    sourceIdx:      index('taxonomy_edges_source_idx').on(t.sourceKey, t.relation),
+    targetIdx:      index('taxonomy_edges_target_idx').on(t.targetKey, t.relation),
+}));
+
+export type TaxonomyEdge    = typeof taxonomyEdges.$inferSelect;
+export type NewTaxonomyEdge = typeof taxonomyEdges.$inferInsert;
 

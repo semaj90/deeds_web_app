@@ -135,9 +135,9 @@ describe('CanonicalCandidateV1 / CandidateOrdinalMapV1', () => {
             family: 'LEARNED_LATENT',
             dimensions: 64,
             modelRevision: 'nested-semantic-autoencoder-v3-full01',
-            projectionKind: 'NESTED_PREFIX_L2_RENORMALIZE',
-            sourceRepresentationId: 'latent_256',
-            projectionRevision: 'nested-prefix-l2-v1',
+            projectionKind: 'LEARNED_AUTOENCODER',
+            sourceRepresentationId: 'semantic_768',
+            projectionRevision: 'nested-semantic-autoencoder-v3-full01',
             normalized: true,
             available: true,
             availabilityReason: null,
@@ -173,7 +173,7 @@ describe('CanonicalCandidateV1 / CandidateOrdinalMapV1', () => {
     })).toThrow('LEARNED_LATENT_PROJECTION_REVISION_REQUIRED');
   });
 
-  it('rejects an available nested latent prefix when latent_256 is missing or unavailable', () => {
+  it('rejects a stale latent_64 derived-view binding that bypasses its physical owner', () => {
     expect(() => materializeCandidateOrdinalMap({
       candidates: [{
         ...identities()[0],
@@ -196,7 +196,7 @@ describe('CanonicalCandidateV1 / CandidateOrdinalMapV1', () => {
       candidateSnapshotRevision: 'candidate:s1',
       workspaceRevision: 'workspace:1',
       producerRevision: 'test:v1',
-    })).toThrow('AVAILABLE_REPRESENTATION_SOURCE_UNAVAILABLE:latent_64:latent_256');
+    })).toThrow('LEARNED_LATENT_PROJECTION_KIND_MISMATCH');
   });
 
   it('rejects duplicate representation IDs within one canonical candidate', () => {

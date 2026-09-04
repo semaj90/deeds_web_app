@@ -1,0 +1,100 @@
+{
+  "schema": "atlas.ontology-revision-owner-audit.v1",
+  "status": "ONTOLOGY_REVISION_OWNER_UNPROVEN",
+  "readOnly": true,
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "scannedFiles": [
+    "packages/parent-atlas/src/core/external-doc-knowledge-fabric.ts",
+    "packages/parent-atlas/src/core/ontology-vocabulary-map-v1.ts",
+    "sveltekit-frontend/src/lib/server/atlas/okf-topic-ingestion.ts",
+    "sveltekit-frontend/src/lib/server/atlas/contracts/ontology-linked-tuple-v1.ts",
+    "python/parent_atlas_ontology/domain_mapping.py"
+  ],
+  "canonicalOntologyRevisionObservations": [],
+  "producerLabelObservations": [
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/okf-topic-ingestion.ts",
+      "field": "ontologyVersion",
+      "value": "okf-ontology-v1",
+      "fileChecksum": "4c83d4cbc99497004c51111e0f5e00f8ce37d5b285a2282bd18f2f81123e8463"
+    }
+  ],
+  "allRevisionObservations": [
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/okf-topic-ingestion.ts",
+      "field": "ontologyVersion",
+      "value": "okf-ontology-v1",
+      "fileChecksum": "4c83d4cbc99497004c51111e0f5e00f8ce37d5b285a2282bd18f2f81123e8463"
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/okf-topic-ingestion.ts",
+      "field": "sourceRevision",
+      "value": "sourceRevision: OKF_FIT_VERSION",
+      "fileChecksum": "4c83d4cbc99497004c51111e0f5e00f8ce37d5b285a2282bd18f2f81123e8463"
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/contracts/ontology-linked-tuple-v1.ts",
+      "field": "sourceRevision",
+      "value": "sourceRevision: z.string().min(1).nullable().optional()",
+      "fileChecksum": "34d3edacb89e6f38dd07245f593d843592940a94cd2b43e5932863a9846a1cfc"
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/contracts/ontology-linked-tuple-v1.ts",
+      "field": "sourceRevision",
+      "value": "sourceRevision: input.sourceRevision ?? null",
+      "fileChecksum": "34d3edacb89e6f38dd07245f593d843592940a94cd2b43e5932863a9846a1cfc"
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/contracts/ontology-linked-tuple-v1.ts",
+      "field": "sourceRevision",
+      "value": "sourceRevision: input.sourceRevision ?? null",
+      "fileChecksum": "34d3edacb89e6f38dd07245f593d843592940a94cd2b43e5932863a9846a1cfc"
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/contracts/ontology-linked-tuple-v1.ts",
+      "field": "sourceRevision",
+      "value": "sourceRevision: input.sourceRevision ?? null",
+      "fileChecksum": "34d3edacb89e6f38dd07245f593d843592940a94cd2b43e5932863a9846a1cfc"
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/contracts/ontology-linked-tuple-v1.ts",
+      "field": "sourceRevision",
+      "value": "sourceRevision: input.sourceRevision",
+      "fileChecksum": "34d3edacb89e6f38dd07245f593d843592940a94cd2b43e5932863a9846a1cfc"
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/contracts/ontology-linked-tuple-v1.ts",
+      "field": "producerRevision",
+      "value": "producerRevision: z.string().min(1).nullable().optional()",
+      "fileChecksum": "34d3edacb89e6f38dd07245f593d843592940a94cd2b43e5932863a9846a1cfc"
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/contracts/ontology-linked-tuple-v1.ts",
+      "field": "producerRevision",
+      "value": "producerRevision: input.producerRevision ?? null",
+      "fileChecksum": "34d3edacb89e6f38dd07245f593d843592940a94cd2b43e5932863a9846a1cfc"
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/contracts/ontology-linked-tuple-v1.ts",
+      "field": "producerRevision",
+      "value": "producerRevision: input.producerRevision ?? null",
+      "fileChecksum": "34d3edacb89e6f38dd07245f593d843592940a94cd2b43e5932863a9846a1cfc"
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/contracts/ontology-linked-tuple-v1.ts",
+      "field": "producerRevision",
+      "value": "producerRevision: input.producerRevision ?? null",
+      "fileChecksum": "34d3edacb89e6f38dd07245f593d843592940a94cd2b43e5932863a9846a1cfc"
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/contracts/ontology-linked-tuple-v1.ts",
+      "field": "producerRevision",
+      "value": "producerRevision: input.producerRevision",
+      "fileChecksum": "34d3edacb89e6f38dd07245f593d843592940a94cd2b43e5932863a9846a1cfc"
+    }
+  ],
+  "admissionDecision": "EXTERNAL_VOCABULARY_MATCHES_REMAIN_DIAGNOSTIC",
+  "reason": "Observed ontology version/producer labels do not establish a checksum-sealed ontology revision owner.",
+  "reportPath": "docs/reports/ontology-revision-owner-audit-v1.json"
+}

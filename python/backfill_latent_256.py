@@ -35,13 +35,17 @@ from latent_autoencoder import NestedAutoencoderConfig, NestedSemanticAutoencode
 DEFAULT_DATABASE_URL = "postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db"
 
 
-def fetch_batch(conn, batch_size: int, offset: int) -> list[dict]:
+def fetch_batch(conn, batch_size: int, offset: int, frozen_ids: list[str] | None = None) -> list[dict]:
     with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+        id_clause = "id = ANY(%s::uuid[]) AND" if frozen_ids is not None else ""
+        params = ((frozen_ids, CHECKPOINT_REVISION, CHECKPOINT_REVISION, batch_size, offset)
+                  if frozen_ids is not None else
+                  (CHECKPOINT_REVISION, CHECKPOINT_REVISION, batch_size, offset))
         cur.execute(
-            """
+            f"""
             SELECT id::text AS id, content_embedding
             FROM codebase_chunk_index
-            WHERE content_embedding IS NOT NULL
+            WHERE {id_clause} content_embedding IS NOT NULL
               AND (
                 latent_256_checkpoint_revision IS NULL OR latent_256_checkpoint_revision != %s
                 OR latent_64 IS NULL OR latent64_model IS NULL OR latent64_model != %s
@@ -49,7 +53,7 @@ def fetch_batch(conn, batch_size: int, offset: int) -> list[dict]:
             ORDER BY id
             LIMIT %s OFFSET %s
             """,
-            (CHECKPOINT_REVISION, CHECKPOINT_REVISION, batch_size, offset),
+            params,
         )
         return cur.fetchall()
 
@@ -62,12 +66,19 @@ def main() -> None:
     parser.add_argument("--receipt", default="docs/reports/latent-autoencoder-training-receipt-v3-full01.json")
     parser.add_argument("--batch-size", type=int, default=2000)
     parser.add_argument("--limit", type=int, default=0, help="0 = all eligible rows")
+    parser.add_argument("--ids-file", help="JSON array of frozen UUIDs for a stable cohort")
     parser.add_argument("--apply", action="store_true", help="write to Postgres; default is dry-run")
     args = parser.parse_args()
 
     with open(args.receipt, "r", encoding="utf-8") as fh:
         receipt = json.load(fh)
     CHECKPOINT_REVISION = receipt["model_checksum"][:64]
+    frozen_ids = None
+    if args.ids_file:
+        with open(args.ids_file, "r", encoding="utf-8") as fh:
+            frozen_ids = json.load(fh)
+        if not isinstance(frozen_ids, list) or not all(isinstance(value, str) for value in frozen_ids):
+            raise ValueError("--ids-file must contain a JSON array of UUID strings")
     print(json.dumps({"event": "checkpoint_revision", "value": CHECKPOINT_REVISION}))
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -85,7 +96,7 @@ def main() -> None:
 
     try:
         while True:
-            rows = fetch_batch(conn, args.batch_size, 0)  # always offset 0: WHERE excludes already-written rows
+            rows = fetch_batch(conn, args.batch_size, 0, frozen_ids)
             if not rows:
                 break
             if args.limit and total_processed + len(rows) > args.limit:

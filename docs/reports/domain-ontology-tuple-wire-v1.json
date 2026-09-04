@@ -4,7 +4,7 @@
   "tupleId": "7d40c3ca4cd3d5707b2a0e05643efa61381e60fb8a31606bbff462e9877294a3",
   "sourceRevision": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
   "classificationRevision": "classifier:v1",
-  "mappingRevision": "sha256:e6039ff04c33b48deeb179aecd69c17a2ad7f84e91dbcf120d61289732120fc2",
+  "mappingRevision": "sha256:a485ab782de9dc306fa260a7d0805890bb15d746ae9dea89fc7a44771cc95cab",
   "sourceNamespace": "workspace:ontology-linked-tuple-fixture-v1",
   "signalCount": 2,
   "admittedCount": 1,

@@ -13,7 +13,8 @@ import pg from 'pg';
 import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
 
 const root = process.cwd();
-const dryPath = path.resolve(root, 'docs/reports/bridge-recon-dry-04-v1.json');
+const proposalArg = process.argv.find((arg) => arg.startsWith('--proposal='));
+const dryPath = path.resolve(root, proposalArg?.split('=').slice(1).join('=') || 'docs/reports/bridge-recon-dry-04-v1.json');
 const replay = process.argv.includes('--replay');
 const apply = process.argv.includes('--apply');
 const authorized = process.env.ATLAS_AUTHORIZE_QDRANT_LINEAGE_RECONCILIATION === '1';
@@ -103,7 +104,7 @@ for (const patch of patches) {
 }
 const preflightFailures = preflight.filter((r) => !r.found || !r.identityOk || !r.payloadOk || !r.vectorOk);
 if (preflightFailures.length) {
-  const report = { schema: 'atlas.bridge-recon-apply.v1', mode: replay ? 'REPLAY_BLOCKED' : 'APPLY_BLOCKED', dryReport: dryPath, preflightCount: preflight.length, preflightFailures: preflightFailures.slice(0, 50), writesPerformed: false, canonicalAuthority: false, verdict: 'STOP_PREIMAGE_DRIFT' };
+  const report = { schema: 'atlas.bridge-recon-apply.v1', mode: replay ? 'REPLAY_BLOCKED' : 'APPLY_BLOCKED', dryReport: dryPath, consumedProposalChecksum: dry.proposedPatchSetChecksum, consumedTargetPointSetChecksum: dry.targetPointSetChecksum, preimageChecksum: dry.preimageArtifact?.checksum ?? null, rollbackChecksum: dry.rollbackArtifact?.checksum ?? null, preflightCount: preflight.length, preflightFailures: preflightFailures.slice(0, 50), writesPerformed: false, canonicalAuthority: false, verdict: 'STOP_PREIMAGE_DRIFT' };
   fs.writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
   console.log(JSON.stringify({ reportPath, preflightFailures: preflightFailures.length, writesPerformed: false, verdict: report.verdict }, null, 2));
   process.exitCode = 1;
@@ -130,7 +131,7 @@ if (preflightFailures.length) {
   }
   const effectiveChanges = results.filter((r) => r.effectiveChange).length;
   const verdict = stopReason ? 'STOP_READBACK_FAILURE' : replay ? (effectiveChanges === 0 ? 'FULL_QDRANT_LINEAGE_RECONCILIATION_REPLAY_PROVEN' : 'STOP_REPLAY_NOT_IDEMPOTENT') : 'FULL_QDRANT_LINEAGE_RECONCILIATION_APPLY_PROVEN';
-  const report = { schema: 'atlas.bridge-recon-apply.v1', mode: replay ? 'REPLAY_FROZEN_PATCH_SET' : 'APPLY_FROZEN_PATCH_SET', replayArtifactStatus: reconstructedReplay ? 'RECONSTRUCTED_FROM_PRIOR_DRY03_AFTER_DRY04_REPORT_OVERWRITE' : 'FROZEN_DRY04_ARTIFACT', dryReport: dryPath, collection, vectorName, targetCount: patches.length, processedCount: results.length, preflightCount: preflight.length, pointsWritten: replay ? 0 : effectiveChanges, effectiveChanges, readbackExact: results.filter((r) => r.exactPayload && r.unchangedVector && r.unchangedId).length, vectorChanges: results.filter((r) => !r.unchangedVector).length, pointIdChanges: results.filter((r) => !r.unchangedId).length, writesPerformed: !replay && effectiveChanges > 0, canonicalAuthority: false, deletes: 0, missingPointsCreated: 0, stopReason, results, verdict };
+  const report = { schema: 'atlas.bridge-recon-apply.v1', mode: replay ? 'REPLAY_FROZEN_PATCH_SET' : 'APPLY_FROZEN_PATCH_SET', replayArtifactStatus: reconstructedReplay ? 'RECONSTRUCTED_FROM_PRIOR_DRY03_AFTER_DRY04_REPORT_OVERWRITE' : 'FROZEN_DRY04_ARTIFACT', dryReport: dryPath, collection, vectorName, consumedProposalChecksum: dry.proposedPatchSetChecksum, consumedTargetPointSetChecksum: dry.targetPointSetChecksum, preimageChecksum: dry.preimageArtifact?.checksum ?? null, rollbackChecksum: dry.rollbackArtifact?.checksum ?? null, targetCount: patches.length, processedCount: results.length, preflightCount: preflight.length, pointsWritten: replay ? 0 : effectiveChanges, effectiveChanges, readbackExact: results.filter((r) => r.exactPayload && r.unchangedVector && r.unchangedId).length, vectorChanges: results.filter((r) => !r.unchangedVector).length, pointIdChanges: results.filter((r) => !r.unchangedId).length, writesPerformed: !replay && effectiveChanges > 0, canonicalAuthority: false, deletes: 0, missingPointsCreated: 0, stopReason, results, verdict };
   fs.writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
   console.log(JSON.stringify({ reportPath, targetCount: patches.length, effectiveChanges, readbackExact: report.readbackExact, writesPerformed: report.writesPerformed, verdict: report.verdict }, null, 2));
   if (report.verdict.startsWith('STOP_')) process.exitCode = 1;

@@ -188,6 +188,9 @@ function generateReport(config, results, duration) {
     execution_date: new Date().toISOString(),
     duration_seconds: Math.round(duration / 1000),
     workspace_id: config.workspace_id,
+    workspace_uuid: config.workspace_uuid ?? null,
+    repository_key: config.repository_key ?? null,
+    directory_scope: config.directory_scope ?? null,
     stages: results,
     summary: {
       total_stages: results.length,
@@ -237,6 +240,9 @@ async function main() {
 
   logEvent('ORCHESTRATOR_START', {
     workspace_id: config.workspace_id,
+    workspace_uuid: config.workspace_uuid ?? null,
+    repository_key: config.repository_key ?? null,
+    directory_scope: config.directory_scope ?? null,
     schedule: config.schedule.cron,
     stages: config.stages.length,
   });

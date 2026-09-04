@@ -1,0 +1,154 @@
+{
+  "schema": "atlas.concept-seed-dry-01.v1",
+  "task": "CONCEPT-SEED-DRY-01",
+  "mode": "READ_ONLY_PROPOSAL",
+  "source": "sveltekit-frontend/src/lib/server/atlas/domain-taxonomy.ts",
+  "taxonomyRevision": "parent-atlas-domain-taxonomy-v1",
+  "candidateCount": 9,
+  "candidateSetChecksum": "b9dd458cf7d2038b300d3d9cfacc14b3426bcbd765601260e0f5d1ee9e287610",
+  "candidates": [
+    {
+      "schema": "atlas.concept.v1",
+      "conceptId": "concept:9480a5005751e1c23360da4f4eaf183b",
+      "conceptKey": "domain.auth",
+      "namespace": "parent-atlas.domain",
+      "label": "auth",
+      "aliases": [],
+      "description": "Parent Atlas canonical coarse domain: auth.",
+      "taxonomyRevision": "parent-atlas-domain-taxonomy-v1",
+      "definitionEvidenceRefs": [
+        "source:domain-taxonomy.ts"
+      ],
+      "producerRevision": "parent-atlas-domain-taxonomy-v1",
+      "status": "proposed"
+    },
+    {
+      "schema": "atlas.concept.v1",
+      "conceptId": "concept:0c81f800a2579bb6f6ee8ba23952a9b9",
+      "conceptKey": "domain.ui",
+      "namespace": "parent-atlas.domain",
+      "label": "ui",
+      "aliases": [],
+      "description": "Parent Atlas canonical coarse domain: ui.",
+      "taxonomyRevision": "parent-atlas-domain-taxonomy-v1",
+      "definitionEvidenceRefs": [
+        "source:domain-taxonomy.ts"
+      ],
+      "producerRevision": "parent-atlas-domain-taxonomy-v1",
+      "status": "proposed"
+    },
+    {
+      "schema": "atlas.concept.v1",
+      "conceptId": "concept:267167f50ceb97c6447451fc8bbb5ad1",
+      "conceptKey": "domain.retrieval",
+      "namespace": "parent-atlas.domain",
+      "label": "retrieval",
+      "aliases": [],
+      "description": "Parent Atlas canonical coarse domain: retrieval.",
+      "taxonomyRevision": "parent-atlas-domain-taxonomy-v1",
+      "definitionEvidenceRefs": [
+        "source:domain-taxonomy.ts"
+      ],
+      "producerRevision": "parent-atlas-domain-taxonomy-v1",
+      "status": "proposed"
+    },
+    {
+      "schema": "atlas.concept.v1",
+      "conceptId": "concept:8cfff51f4a7dcb1a0941a51d6008e0c4",
+      "conceptKey": "domain.network",
+      "namespace": "parent-atlas.domain",
+      "label": "network",
+      "aliases": [],
+      "description": "Parent Atlas canonical coarse domain: network.",
+      "taxonomyRevision": "parent-atlas-domain-taxonomy-v1",
+      "definitionEvidenceRefs": [
+        "source:domain-taxonomy.ts"
+      ],
+      "producerRevision": "parent-atlas-domain-taxonomy-v1",
+      "status": "proposed"
+    },
+    {
+      "schema": "atlas.concept.v1",
+      "conceptId": "concept:1d1de2c666d9b53c2980ddd3bfe92b23",
+      "conceptKey": "domain.database",
+      "namespace": "parent-atlas.domain",
+      "label": "database",
+      "aliases": [],
+      "description": "Parent Atlas canonical coarse domain: database.",
+      "taxonomyRevision": "parent-atlas-domain-taxonomy-v1",
+      "definitionEvidenceRefs": [
+        "source:domain-taxonomy.ts"
+      ],
+      "producerRevision": "parent-atlas-domain-taxonomy-v1",
+      "status": "proposed"
+    },
+    {
+      "schema": "atlas.concept.v1",
+      "conceptId": "concept:ba0696488750a7c45e9f3b6f7f900042",
+      "conceptKey": "domain.cache",
+      "namespace": "parent-atlas.domain",
+      "label": "cache",
+      "aliases": [],
+      "description": "Parent Atlas canonical coarse domain: cache.",
+      "taxonomyRevision": "parent-atlas-domain-taxonomy-v1",
+      "definitionEvidenceRefs": [
+        "source:domain-taxonomy.ts"
+      ],
+      "producerRevision": "parent-atlas-domain-taxonomy-v1",
+      "status": "proposed"
+    },
+    {
+      "schema": "atlas.concept.v1",
+      "conceptId": "concept:5af5d6d4150ee0924de24f1328aa724f",
+      "conceptKey": "domain.agent",
+      "namespace": "parent-atlas.domain",
+      "label": "agent",
+      "aliases": [],
+      "description": "Parent Atlas canonical coarse domain: agent.",
+      "taxonomyRevision": "parent-atlas-domain-taxonomy-v1",
+      "definitionEvidenceRefs": [
+        "source:domain-taxonomy.ts"
+      ],
+      "producerRevision": "parent-atlas-domain-taxonomy-v1",
+      "status": "proposed"
+    },
+    {
+      "schema": "atlas.concept.v1",
+      "conceptId": "concept:477a65d2fb448fd82073f4c2095f84d1",
+      "conceptKey": "domain.graph",
+      "namespace": "parent-atlas.domain",
+      "label": "graph",
+      "aliases": [],
+      "description": "Parent Atlas canonical coarse domain: graph.",
+      "taxonomyRevision": "parent-atlas-domain-taxonomy-v1",
+      "definitionEvidenceRefs": [
+        "source:domain-taxonomy.ts"
+      ],
+      "producerRevision": "parent-atlas-domain-taxonomy-v1",
+      "status": "proposed"
+    },
+    {
+      "schema": "atlas.concept.v1",
+      "conceptId": "concept:d93beba12df9e2e85ba45a428e8d1a83",
+      "conceptKey": "domain.ml",
+      "namespace": "parent-atlas.domain",
+      "label": "ml",
+      "aliases": [],
+      "description": "Parent Atlas canonical coarse domain: ml.",
+      "taxonomyRevision": "parent-atlas-domain-taxonomy-v1",
+      "definitionEvidenceRefs": [
+        "source:domain-taxonomy.ts"
+      ],
+      "producerRevision": "parent-atlas-domain-taxonomy-v1",
+      "status": "proposed"
+    }
+  ],
+  "databaseWrites": 0,
+  "canonicalPromotion": false,
+  "blockers": [
+    "atlas_ontology_concepts is empty in the live database",
+    "definition evidence is source-contract evidence only",
+    "bounded domain seed does not establish the complete controlled vocabulary"
+  ],
+  "nextGate": "CONCEPT-SEED-REVIEW-01"
+}

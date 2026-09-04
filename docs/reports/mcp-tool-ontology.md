@@ -1,8 +1,8 @@
 # MCP Tool Ontology
 
-**Generated**: 2026-08-23T06:37:13.714Z  
+**Generated**: 2026-09-03T18:40:40.865Z  
 **Source**: http://127.0.0.1:8788/mcp  
-**Total tools**: 175  
+**Total tools**: 173  
 
 ## Retrieval Layer Routing Table
 
@@ -209,11 +209,8 @@ This is the canonical routing table for OpenCode. Use the layer that matches the
 - `kb.organize_messy_text`
 - `kb.extract_citations`
 - `kb.trace_search`
-- `trace_search`
-- `wiki_note_lookup`
 - `atlas.suggest_files`
 - `ui.analyze_view`
-- `admin.log_event`
 - `skills.list`
 - `skills.run_mission`
 - `legal.get_transcript`
@@ -270,6 +267,7 @@ This is the canonical routing table for OpenCode. Use the layer that matches the
 - `service_workers.result`
 - `miniforge.health`
 - `miniforge.analyze`
+- `domain.classify`
 - `miniforge.extract`
 
 ## Full Tool Inventory
@@ -280,9 +278,7 @@ This is the canonical routing table for OpenCode. Use the layer that matches the
 | `kb.extract_citations` | kb | unknown | — | — | read_only |
 | `kb.trace_search` | kb | unknown | — | — | read_only |
 | `atlas.query` | atlas | identity | — | — | read_only |
-| `trace_search` | misc | unknown | — | — | read_only |
 | `kb.wiki_note_lookup` | kb | read | — | — | read_only |
-| `wiki_note_lookup` | misc | unknown | — | — | read_only |
 | `kb.archive_synthesis` | kb | synthesis | — | — | read_only |
 | `context.prefetch_feature_context` | context | graph | — | — | read_only |
 | `atlas.compact_context` | atlas | graph | — | — | read_only |
@@ -291,7 +287,6 @@ This is the canonical routing table for OpenCode. Use the layer that matches the
 | `atlas.explain_trace` | atlas | graph, read | — | — | read_only |
 | `atlas.get_chunk` | atlas | read | — | — | read_only |
 | `ui.analyze_view` | ui | unknown | — | — | read_only |
-| `admin.log_event` | admin | unknown | — | — | read_only |
 | `ops.execute_graphify` | ops | ops | — | — | read_only |
 | `skills.list` | skills | unknown | — | — | read_only |
 | `skills.run_mission` | skills | unknown | — | — | read_only |
@@ -313,15 +308,15 @@ This is the canonical routing table for OpenCode. Use the layer that matches the
 | `engram.ace_packet_inject` | engram | cache, synthesis | — | engram | read_write |
 | `atlas_get_active_context` | misc | cache | — | — | read_only |
 | `engram.chat_memory_store` | engram | cache, memory | — | engram | read_write |
-| `engram.redis_health` | engram | cache | — | — | read_only |
+| `engram.redis_health` | engram | cache | — | redis | read_write |
 | `atlas.embedding_keywords` | atlas | cache, dense | — | — | read_only |
 | `atlas.embedding_cluster_tags` | atlas | cache, dense | — | — | read_only |
 | `atlas.embedding_neighbors` | atlas | dense | — | — | read_only |
 | `atlas.embedding_all_tags` | atlas | dense | — | — | read_only |
 | `topology.hydration_status` | topology | unknown | — | — | read_only |
 | `topology.recompute_manifold_plan` | topology | unknown | — | — | read_only |
-| `db.schema_overview` | db | read | — | — | read_only |
-| `db.table_inspect` | db | read | — | — | read_only |
+| `db.schema_overview` | db | read | — | postgres | read_write |
+| `db.table_inspect` | db | read | — | postgres | read_write |
 | `library.registry_lookup` | library | graph | — | — | read_only |
 | `library.registry_search` | library | unknown | — | — | read_only |
 | `library.registry_fetch_tier` | library | graph, synthesis | — | — | read_only |
@@ -338,12 +333,12 @@ This is the canonical routing table for OpenCode. Use the layer that matches the
 | `wiki.search` | wiki | cache, dense, graph, read | — | — | read_only |
 | `wiki.refresh_directory` | wiki | graph, read | — | — | read_only |
 | `wiki.explain_page` | wiki | dense, graph, read | — | — | read_only |
-| `graph.expand_neighborhood` | graph | graph | — | — | read_only |
+| `graph.expand_neighborhood` | graph | graph | — | neo4j | read_write |
 | `turbovec.rank_chunks` | turbovec | rerank | — | — | read_only |
 | `engram.chat_memory_recent` | engram | memory | — | — | read_only |
-| `graph.shortest_path` | graph | graph | — | — | read_only |
+| `graph.shortest_path` | graph | graph | — | neo4j | read_write |
 | `graph.semantic_path_synthesis` | graph | graph, synthesis | — | — | read_only |
-| `graph.community_for_node` | graph | graph | — | — | read_only |
+| `graph.community_for_node` | graph | graph | — | neo4j | read_write |
 | `graph.pagerank_top` | graph | graph | — | — | read_only |
 | `topology.search_near` | topology | unknown | — | — | read_only |
 | `topology.same_som_cluster` | topology | unknown | — | — | read_only |
@@ -388,14 +383,14 @@ This is the canonical routing table for OpenCode. Use the layer that matches the
 | `clusters.som_cell_lookup` | clusters | graph | source_ref, packet_key | — | read_only |
 | `clusters.kmeans_members` | clusters | unknown | — | — | read_only |
 | `trace.validate_ace_hit` | trace | unknown | — | — | read_only |
-| `ops.propose_patch` | ops | ops | — | — | read_only |
-| `ops.run_targeted_test` | ops | ops | — | — | read_only |
+| `ops.propose_patch` | ops | ops | — | postgres, kanban | read_write |
+| `ops.run_targeted_test` | ops | ops | — | postgres | read_write |
 | `ops.record_fix_attempt` | ops | ops | — | postgres, kanban | read_write |
-| `ops.run_quality_gate` | ops | ops | — | — | read_only |
+| `ops.run_quality_gate` | ops | ops | — | postgres | read_write |
 | `hypergraph.search` | hypergraph | graph | — | — | read_only |
 | `hypergraph.get_edge` | hypergraph | graph | — | — | read_only |
 | `hypergraph.explain_activation` | hypergraph | graph | — | — | read_only |
-| `hypergraph.expand_members` | hypergraph | graph | — | — | read_only |
+| `hypergraph.expand_members` | hypergraph | graph | — | neo4j | read_write |
 | `knowledge.get_minified_map` | knowledge | unknown | — | — | read_only |
 | `tools.batch_call` | tools | unknown | — | — | read_only |
 | `codebase.context_for_file` | codebase | unknown | — | — | read_only |
@@ -415,7 +410,7 @@ This is the canonical routing table for OpenCode. Use the layer that matches the
 | `ops.fixer_pattern_store` | ops | dense, ops | — | — | read_only |
 | `evidence.search_by_image` | evidence | dense | — | — | read_only |
 | `evidence.image_feedback` | evidence | cache, dense | — | — | read_only |
-| `evidence.link_image_graph` | evidence | graph | — | neo4j | read_write |
+| `evidence.link_image_graph` | evidence | graph | — | qdrant | read_write |
 | `image.search_by_text` | image | dense, synthesis | — | — | read_only |
 | `image.caption` | image | dense, synthesis | — | — | read_only |
 | `image.enrich_tags` | image | dense, graph, synthesis | — | — | read_only |
@@ -429,7 +424,7 @@ This is the canonical routing table for OpenCode. Use the layer that matches the
 | `atlas.prefilter` | atlas | dense, rerank | — | — | read_only |
 | `ace.compact_search` | ace | cache, lexical, dense, graph | — | — | read_only |
 | `atlas.packet_search` | atlas | dense, graph, identity | feature_id, source_ref | — | read_only |
-| `atlas.coverage` | atlas | dense, rerank | feature_id, source_ref | — | read_only |
+| `atlas.coverage` | atlas | dense, rerank | feature_id, source_ref | postgres | read_write |
 | `atlas.graph.pagerank` | atlas | graph | packet_key | — | read_only |
 | `atlas.workstation_status` | atlas | unknown | — | — | read_only |
 | `atlas.feature_document_status` | atlas | unknown | feature_id | — | read_only |
@@ -449,6 +444,7 @@ This is the canonical routing table for OpenCode. Use the layer that matches the
 | `service_workers.result` | service_workers | unknown | — | — | read_only |
 | `miniforge.health` | miniforge | unknown | — | — | read_only |
 | `miniforge.analyze` | miniforge | unknown | — | — | read_only |
+| `domain.classify` | domain | unknown | — | — | read_only |
 | `miniforge.extract` | miniforge | unknown | — | — | read_only |
 | `shell.run` | shell | synthesis | — | — | read_only |
 

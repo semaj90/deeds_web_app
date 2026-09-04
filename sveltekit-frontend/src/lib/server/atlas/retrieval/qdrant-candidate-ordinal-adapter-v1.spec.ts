@@ -45,7 +45,7 @@ function receiptFixture(): QdrantSemanticScoreReceiptV1 {
   return {
     schema: 'atlas.qdrant-semantic-score-receipt.v2',
     collection: 'codebase_chunks_768_v2',
-    vectorName: null,
+    vectorName: 'content',
     representationId: 'semantic_768',
     representationRevision: 'projection:test:r12',
     dimension: 768,

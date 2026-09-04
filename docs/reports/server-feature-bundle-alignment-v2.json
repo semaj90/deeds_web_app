@@ -1,0 +1,190 @@
+{
+  "schema": "atlas.server-feature-bundle-alignment-report.v2",
+  "status": "IMPLEMENTED_WORKSTATION_EXECUTION_PENDING",
+  "branch": "chatgpt/server-feature-bundle-alignment-v2",
+  "changes": {
+    "revisionAuthorityEnvelope": {
+      "status": "IMPLEMENTED",
+      "contract": "atlas.revision-authority-envelope.v1",
+      "workspaceRevisionAuthority": "WORKSPACE_SOURCE_MANIFEST_SHA256_V1",
+      "sourceRevisionAuthority": "SOURCE_BYTES_SHA256_V1",
+      "sourceClaimsEmbedded": true,
+      "candidateSourceClaimAdmission": true,
+      "syntheticRevisionCount": 0
+    },
+    "serverFeatureBundle": {
+      "status": "IMPLEMENTED",
+      "snapshotTyped": true,
+      "candidateCardinalitySealed": true,
+      "sourceRevisionSetChecksum": true,
+      "graphRevisionSetChecksum": true,
+      "semanticRevisionSetChecksum": true,
+      "logicalChecksumExcludesRequestId": true,
+      "envelopeChecksumIncludesRequestId": true,
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    "rlmAceHandoff": {
+      "status": "IMPLEMENTED",
+      "sealedBundleConsumed": true,
+      "snapshotRematerializedDownstream": false,
+      "clientSuppliedBundleAccepted": false
+    },
+    "aceManifestAdmission": {
+      "status": "IMPLEMENTED_TYPED",
+      "schemaExported": true,
+      "contextManifestV2Preserved": true,
+      "canonicalAuthority": false
+    },
+    "aceLiveDryReplayHarness": {
+      "status": "IMPLEMENTED_NOT_EXECUTED",
+      "script": "scripts/atlas/prove-ace-live-dry-v2.mts",
+      "inputOwnedByCaller": true,
+      "fabricatesCandidateCohort": false,
+      "requiresExactCandidateCountByDefault": 15,
+      "graphRevisionPolicy": "LANE_AWARE_AND_REVISION_EXACT",
+      "graphRevisionRequiredWhen": "graph lane or graph-derived score is admitted",
+      "graphRevisionMayBeNullWhen": "semantic/lineage-only snapshot carries no graph evidence",
+      "checksLogicalReplayIdentity": true,
+      "checksRequestEnvelopeSeparation": true,
+      "checksAceManifestReplayIdentity": true,
+      "checksCandidateSourceAuthority": true,
+      "cacheWritesPerformed": false,
+      "writesPerformed": false,
+      "canonicalAuthority": false
+    },
+    "aceLiveDryInputReadinessAudit": {
+      "status": "IMPLEMENTED_NOT_EXECUTED",
+      "script": "scripts/atlas/audit-ace-live-dry-input-readiness-v2.mts",
+      "validates": [
+        "CandidateOrdinalMapV1",
+        "CandidateFeatureSnapshotV1",
+        "RevisionAuthorityEnvelopeV1"
+      ],
+      "crossContractChecks": [
+        "ordinalMapChecksum",
+        "candidateSnapshotRevision",
+        "workspaceRevision",
+        "rowCount"
+      ],
+      "fabricatesMissingArtifacts": false
+    },
+    "existing15RowCanary": {
+      "status": "BASE_IDENTITY_AND_SEMANTIC_LINEAGE_PROVEN",
+      "rowCount": 15,
+      "candidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
+      "ordinalMapChecksum": "86fee5d38619d3065d8710942068f26fb5b0d3c09992b1b523083ae0a593d297",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "baseGraphRevision": null,
+      "note": "The base ordinal map predates graph-feature admission. It remains immutable evidence and is never patched in place."
+    },
+    "goldenRetrievalEvidence": {
+      "status": "EXISTING_PROVEN_ARTIFACT",
+      "report": "docs/reports/parent-atlas-golden-retrieval-v1.json",
+      "semanticScores": 15,
+      "exactSemantic768": true,
+      "replayChecksum": "d1db484f15dfd70cc59ab33802d19fa883ed3abd5993c78683d252c46af98d2c",
+      "graphFeaturesAttached": 7,
+      "graphFeaturesAffectRanking": false,
+      "writesPerformed": false
+    },
+    "graphFeatureEvidence": {
+      "status": "EXISTING_PROVEN_ARTIFACT",
+      "report": "docs/reports/current-graph-feature-gather-v1.json",
+      "graphRevision": "sha256:e0807b80454a71995bb87c42f62a3b966b501ce56e6a6b106e6e2237ab81d3ab",
+      "featureRevision": "graph-pagerank:cugraph-v1:alpha-0.85:tol-1e-6:maxIter-100",
+      "featureRows": 7,
+      "authorityProjection": "pagerankMax -> graphAuthority; matches existing authority_norm feature-matrix projection",
+      "missingGraphFeaturePolicy": "NULL_NOT_ZERO",
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    "aceGoldenFeatureSnapshotProducer": {
+      "status": "IMPLEMENTED_NOT_EXECUTED",
+      "script": "scripts/atlas/materialize-ace-golden-feature-snapshot-v1.mts",
+      "inputs": [
+        ".tmp/atlas/lineage-qualified-candidate-map-v1.json",
+        "docs/reports/parent-atlas-golden-retrieval-v1.json",
+        "docs/reports/current-graph-feature-gather-v1.json"
+      ],
+      "outputs": [
+        ".tmp/atlas/ace-golden-candidate-map-v1.json",
+        ".tmp/atlas/ace-candidate-feature-snapshot-v1.json",
+        "docs/reports/ace-candidate-feature-snapshot-v1.json"
+      ],
+      "derivesNewCandidateSnapshotRevision": true,
+      "mutatesBaseOrdinalMap": false,
+      "preservesCanonicalOrdering": true,
+      "semanticScoreSource": "existing deterministic exact semantic_768 golden replay",
+      "graphAuthoritySource": "existing bounded cuGraph PageRank feature artifact",
+      "fabricatesScores": false,
+      "rankingPromotion": false,
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    "aceRevisionAuthorityMaterializer": {
+      "status": "IMPLEMENTED_NOT_EXECUTED",
+      "script": "scripts/atlas/materialize-ace-revision-authority-v1.mts",
+      "authorityOwner": "materializeWorkspaceRevisionOriginV1 -> buildRevisionAuthorityEnvelopeV1",
+      "requiresCompleteWorkspaceRecordAndBindings": true,
+      "databaseSubsetReconstructionProhibited": true,
+      "expectedWorkspaceRevisionFromCandidateMap": true,
+      "workspaceMismatchBehavior": "BLOCK_WITHOUT_ENVELOPE",
+      "supportsExplicitWorkspaceRoot": true,
+      "syntheticRevisionFallbacks": false,
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    "aceLiveDryCurrentBlocker": {
+      "status": "WORKSTATION_EXECUTION_AND_FROZEN_AUTHORITY_MATCH_PENDING",
+      "note": "The feature snapshot and revision-authority materializers are implemented, but this GitHub session cannot execute against the workstation-only .tmp candidate map or prove that the current/alternate workspace root reproduces the frozen b19 workspace revision. If the current worktree differs, the authority materializer must block; use exact frozen workspace bytes or a preserved complete WorkspaceRevisionRecordV1 plus all bindings rather than reconstructing authority from partial DB rows."
+    },
+    "legacyRetrievalRouterWorkspaceRevision": {
+      "status": "COMPATIBILITY_ONLY",
+      "note": "Governed sealed-bundle construction starts from CandidateOrdinalMapV1 + CandidateFeatureSnapshotV1 + RevisionAuthorityEnvelopeV1 and does not reinterpret the legacy numeric RetrievalRouterFeatureRowV1.workspaceRevision field."
+    }
+  },
+  "testsAdded": [
+    "sveltekit-frontend/src/lib/server/atlas/retrieval/search-runtime-feature-bundle-provider-v1.spec.ts"
+  ],
+  "testAssertions": [
+    "same evidence with different request IDs preserves bundleLogicalChecksum",
+    "different request IDs change bundleEnvelopeChecksum",
+    "workspace revision is content-addressed and matches revision authority",
+    "each candidate sourceRef/sourceRevision matches an exact authority claim",
+    "source/graph/semantic revision-set checksums are present",
+    "mismatched revision authority is rejected",
+    "RLM consumes the sealed snapshot without rematerialization"
+  ],
+  "notClaimed": [
+    "new producer scripts executed on workstation",
+    "focused Vitest pass for current branch head",
+    "project typecheck pass for current branch head",
+    "ACE-LIVE-DRY-02 proof pass",
+    "15-row live ACE replay",
+    "live OaK replay",
+    "BitFrost/Valkey live warm or invalidation",
+    "LangGraph checkpoint/HITL proof"
+  ],
+  "recommendedValidation": [
+    "npm --prefix sveltekit-frontend exec -- vitest run src/lib/server/atlas/retrieval/search-runtime-feature-bundle-provider-v1.spec.ts src/lib/server/atlas/rlm/rlm-runtime.spec.ts src/lib/server/atlas/context/ace-context-manifest-admission-v1.spec.ts --pool=forks --maxWorkers=1 --minWorkers=1",
+    "npm --prefix sveltekit-frontend exec -- svelte-check --tsconfig ./tsconfig.json",
+    "openspec validate parent-atlas-ace-rlm-bitfrost-integration --type change --strict --json"
+  ],
+  "workstationSequence": [
+    "npm exec -- tsx scripts/atlas/materialize-ace-golden-feature-snapshot-v1.mts",
+    "npm exec -- tsx scripts/atlas/materialize-ace-revision-authority-v1.mts -- --ordinal-map .tmp/atlas/ace-golden-candidate-map-v1.json",
+    "npm exec -- tsx scripts/atlas/audit-ace-live-dry-input-readiness-v2.mts -- --ordinal-map .tmp/atlas/ace-golden-candidate-map-v1.json --snapshot .tmp/atlas/ace-candidate-feature-snapshot-v1.json --revision-authority .tmp/atlas/ace-revision-authority-envelope-v1.json",
+    "assemble one reviewed atlas.ace-live-dry-input.v2 using explicit retrievalPolicyRevision/acePlaybookRevision/representationRevision values already owned by the caller",
+    "npm exec -- tsx scripts/atlas/prove-ace-live-dry-v2.mts -- --input <reviewed-ace-live-dry-input-v2.json>"
+  ],
+  "nextGates": [
+    "ACE-FEATURE-SNAPSHOT-PRODUCER-02: execute the implemented frozen-artifact composer and review its 15-row receipt",
+    "ACE-REVISION-AUTHORITY-02: execute the fail-closed authority materializer; exact frozen workspace revision required",
+    "ACE-LIVE-DRY-INPUT-02: readiness audit must pass all three artifacts and cross-contract checks",
+    "ACE-LIVE-DRY-02: prove sealed bundle + ContextManifestV2 replay with zero writes",
+    "OAK-LIVE-READONLY-01: feed the same bundleLogicalChecksum and revision authority to already-registered live handlers",
+    "BITFROST-LIVE-01: use bundleLogicalChecksum/ContextManifest identity for MISS/HIT/revision-MISS proof",
+    "LANGGRAPH-CHECKPOINT-01: checkpoint receipt references/checksums, not duplicate evidence artifacts"
+  ]
+}

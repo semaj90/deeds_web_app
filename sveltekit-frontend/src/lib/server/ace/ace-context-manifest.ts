@@ -44,12 +44,12 @@ function stableUnique(values: readonly string[]): string[] {
   return result;
 }
 
-function inferGraphRevision(context: ACEContext): string {
+function inferGraphRevision(context: ACEContext): string | null {
   for (const item of context.codebaseContext ?? []) {
     const graphRevision = String(item.graphRevision ?? '').trim();
     if (graphRevision) return graphRevision;
   }
-  return 'graph:parent-atlas';
+  return null;
 }
 
 function inferProcessName(processId: string, items: NonNullable<ACEContext['codebaseContext']>): string {

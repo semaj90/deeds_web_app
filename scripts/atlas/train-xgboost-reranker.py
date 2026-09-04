@@ -23,9 +23,11 @@ Usage:
 """
 
 import argparse
+import hashlib
 import json
 import math
 import os
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -36,12 +38,31 @@ ROOT = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(ROOT / 'python'))
 from atlas_xgboost_grouped_ranking_v1 import prepare_grouped_ranking_dataset_v1  # noqa: E402
 
-CSV_PATH    = ROOT / 'docs' / 'reports' / 'xgboost-features.csv'
-MODEL_DIR   = ROOT / 'models'
+CSV_PATH        = ROOT / 'docs' / 'reports' / 'xgboost-features.csv'
+MODEL_DIR       = ROOT / 'models'
+# XGBOOST-OBJECTIVE-COMPARE-01 immutable candidate outputs (3.6b): every training run writes
+# HERE by default — a content-addressed, objective-specific path that a later run can never
+# silently collide with or overwrite. The single canonical `xgboost-reranker.ubj`/
+# `xgboost-training-report.json` paths below are touched ONLY when `--promote` is passed
+# explicitly; comparing reg:squarederror vs rank:ndcg must never risk clobbering whatever the
+# live sidecar currently serves.
+MODEL_CANDIDATES_DIR = MODEL_DIR / 'xgboost-candidates'
 REPORT_DIR  = ROOT / 'docs' / 'reports'
 MODEL_PATH  = MODEL_DIR / 'xgboost-reranker.ubj'
 LGB_PATH    = MODEL_DIR / 'lgbm-reranker.txt'
 REPORT_PATH = REPORT_DIR / 'xgboost-training-report.json'
+
+
+def sha256_file(path: Path) -> str:
+    h = hashlib.sha256()
+    with open(path, 'rb') as f:
+        for chunk in iter(lambda: f.read(1 << 16), b''):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def objective_slug(objective: str) -> str:
+    return objective.replace(':', '-')
 
 FEATURE_COLS = [
     # Retrieval signals (all tabular, tree-splittable)
@@ -177,8 +198,13 @@ def build_ranking_dataset(rows: list[dict]):
     return dataset.X, dataset.y, dataset.qid, group_labels
 
 
-def evaluate_ndcg(model, X_val, y_val, val_groups: list[str], k: int = 10, use_lgbm: bool = False):
-    """Group val rows by trace_id, rank by predicted score, compute NDCG@k and MRR@k."""
+def evaluate_ranking(model, X_val, y_val, val_groups: list[str]):
+    """Group val rows by trace_id, rank by predicted score, compute NDCG@5, NDCG@10, MRR@10 —
+    the same three metrics regardless of training objective (XGBOOST-OBJECTIVE-METRIC-ALIGNMENT-01
+    'final ranking evaluation' set), so a reg:squarederror run and a rank:ndcg run are judged on
+    identical criteria. Also returns PER-TRACE metrics (not just the aggregate average) so a
+    future objective comparison can inspect whether a challenger's aggregate gain comes from
+    broad improvement or from catastrophically damaging a small query subset."""
     preds = model.predict(X_val)
 
     # Group by trace_id
@@ -186,16 +212,36 @@ def evaluate_ndcg(model, X_val, y_val, val_groups: list[str], k: int = 10, use_l
     for i, trace_id in enumerate(val_groups):
         trace_data[trace_id].append((float(preds[i]), float(y_val[i])))
 
-    ndcgs, mrrs = [], []
-    for rows_t in trace_data.values():
+    per_trace = []
+    for trace_id, rows_t in trace_data.items():
         rows_sorted = sorted(rows_t, key=lambda x: x[0], reverse=True)
         relevances  = [r[1] for r in rows_sorted]
-        ndcgs.append(ndcg_at_k(relevances, k))
-        mrrs.append(mrr_at_k(relevances, k))
+        per_trace.append({
+            'trace_id':   trace_id,
+            'ndcg_at_5':  ndcg_at_k(relevances, 5),
+            'ndcg_at_10': ndcg_at_k(relevances, 10),
+            'mrr_at_10':  mrr_at_k(relevances, 10),
+            'n_candidates': len(relevances),
+        })
 
-    avg_ndcg = sum(ndcgs) / len(ndcgs) if ndcgs else 0.0
-    avg_mrr  = sum(mrrs)  / len(mrrs)  if mrrs  else 0.0
-    return avg_ndcg, avg_mrr, len(ndcgs)
+    def _avg(key: str) -> float:
+        return sum(t[key] for t in per_trace) / len(per_trace) if per_trace else 0.0
+
+    return {
+        'ndcg_at_5':  _avg('ndcg_at_5'),
+        'ndcg_at_10': _avg('ndcg_at_10'),
+        'mrr_at_10':  _avg('mrr_at_10'),
+        'n_traces':   len(per_trace),
+        'per_trace':  per_trace,
+    }
+
+
+def evaluate_ndcg(model, X_val, y_val, val_groups: list[str], k: int = 10, use_lgbm: bool = False):
+    """Backward-compatible (avg_ndcg_at_k, avg_mrr_at_k, n_traces) wrapper over
+    evaluate_ranking() — kept for any external caller expecting the old 3-tuple shape."""
+    result = evaluate_ranking(model, X_val, y_val, val_groups)
+    ndcg_key = 'ndcg_at_5' if k == 5 else 'ndcg_at_10'
+    return result[ndcg_key], result['mrr_at_10'], result['n_traces']
 
 
 def _find_any_value_containing(value, needle: str) -> bool:
@@ -219,6 +265,13 @@ def train_xgboost(X_train, y_train, X_val, y_val, objective: str, device: str,
 
     print(f'\nTraining XGBoost ({objective}) — {X_train.shape[0]:,} train rows, {X_val.shape[0]:,} val rows, device={device}')
 
+    # XGBOOST-OBJECTIVE-METRIC-ALIGNMENT-01: the TRAINING eval_metric (used for early stopping)
+    # must match what the objective actually optimizes for — a LambdaMART ranking objective
+    # (rank:ndcg/rank:pairwise) judged by RMSE during training is not a fair or meaningful
+    # comparison against reg:squarederror. This is distinct from the FINAL ranking evaluation
+    # (evaluate_ranking(), always NDCG@5/NDCG@10/MRR@10 regardless of objective) — that stays
+    # uniform across objectives; only the in-training metric differs.
+    is_ranking = objective in ('rank:pairwise', 'rank:ndcg')
     params = {
         'objective':        objective,
         'learning_rate':    0.05,
@@ -231,9 +284,21 @@ def train_xgboost(X_train, y_train, X_val, y_val, objective: str, device: str,
         'reg_lambda':       1.0,
         'tree_method':      'hist',
         'device':           device,
-        'eval_metric':      'rmse',
+        'eval_metric':      ['ndcg@5', 'ndcg@10'] if is_ranking else 'rmse',
         'verbosity':        0,
     }
+    if is_ranking:
+        # lambdarank_num_pair_per_sample=10 under the topk pair method is the documented
+        # XGBoost pattern for targeting NDCG@10 (analogous to their own NDCG@6 example using 6).
+        params['lambdarank_pair_method'] = 'topk'
+        params['lambdarank_num_pair_per_sample'] = 10
+        # Found live while smoke-testing this task: rank:ndcg's DEFAULT gain function
+        # (ndcg_exp_gain=True, i.e. 2^label - 1) requires an integer relevance grade and fails
+        # closed with "label must be either 0 or positive integer" — this corpus's `label` column
+        # is a continuous [0,1] float, not a discrete grade. XGBoost's own docs describe exactly
+        # this case: "Adjust this parameter is required when...the label is not a discrete
+        # grade" — ndcg_exp_gain=False uses the raw label value directly as gain instead.
+        params['ndcg_exp_gain'] = False
 
     # QuantileDMatrix is the current stable recommendation for GPU training
     # (lower memory footprint than a plain DMatrix's intermediate CSR build).
@@ -332,6 +397,14 @@ def main():
                              'no report written) if CUDA does not actually engage — never silently '
                              'downgrades to CPU and reports success. Pass --device cpu for an '
                              'intentional CPU run.')
+    parser.add_argument('--promote',    action='store_true',
+                        help='Also copy this run\'s output to the canonical models/xgboost-reranker.ubj '
+                             '(or lgbm-reranker.txt) and docs/reports/xgboost-training-report.json paths '
+                             'that the live sidecar defaults to. WITHOUT this flag (the default), every '
+                             'run writes ONLY to models/xgboost-candidates/ + a candidate-specific report '
+                             '— the canonical path is never touched, so running reg:squarederror and '
+                             'rank:ndcg back to back can never silently overwrite each other or whatever '
+                             'model the sidecar currently serves.')
     args = parser.parse_args()
     is_ranking = args.objective in ('rank:pairwise', 'rank:ndcg')
 
@@ -343,6 +416,10 @@ def main():
     if not CSV_PATH.exists():
         print(f'ERROR: {CSV_PATH} not found. Run: npm run atlas:xgboost:export')
         sys.exit(1)
+
+    # Dataset identity for immutable candidate output naming (3.6b) — content-addressed, not a
+    # timestamp, so two runs against the byte-identical CSV produce the same dataset_rev.
+    dataset_rev = sha256_file(CSV_PATH)[:16]
 
     rows = load_csv(CSV_PATH)
 
@@ -363,6 +440,7 @@ def main():
         sys.exit(1)
 
     MODEL_DIR.mkdir(parents=True, exist_ok=True)
+    MODEL_CANDIDATES_DIR.mkdir(parents=True, exist_ok=True)
     REPORT_DIR.mkdir(parents=True, exist_ok=True)
 
     qid_train = qid_val = None
@@ -385,24 +463,41 @@ def main():
     print(f'\nTrain: {X_train.shape[0]:,} rows ({len(set(groups_train))} traces)')
     print(f'Val:   {X_val.shape[0]:,} rows ({len(set(groups_val))} traces)')
 
+    # 3.6b — save to the immutable, content-addressed candidate path FIRST (always). The
+    # canonical models/xgboost-reranker.ubj (or lgbm-reranker.txt) is touched only afterward,
+    # and only when --promote was passed explicitly.
+    slug = 'lightgbm' if args.lightgbm else objective_slug(args.objective)
+    candidate_model_ext = '.txt' if args.lightgbm else '.ubj'
+    # Placeholder filename until the real model_rev (hash of the saved bytes) is known — models
+    # can't be named by their own content hash before they're written. Renamed immediately after.
+    tmp_candidate_path = MODEL_CANDIDATES_DIR / f'{slug}-{dataset_rev}-pending{candidate_model_ext}'
+
     if args.lightgbm:
         model, importance = train_lightgbm(X_train, y_train, X_val, y_val)
-        model.save_model(str(LGB_PATH))
-        print(f'\nModel saved: {LGB_PATH}')
-        model_path_str = str(LGB_PATH)
+        model.save_model(str(tmp_candidate_path))
     else:
         wrapper, booster, importance, evals = train_xgboost(
             X_train, y_train, X_val, y_val, args.objective, args.device,
             qid_train=qid_train, qid_val=qid_val,
         )
-        booster.save_model(str(MODEL_PATH))
-        print(f'\nModel saved: {MODEL_PATH}')
-        model     = wrapper
-        model_path_str = str(MODEL_PATH)
+        booster.save_model(str(tmp_candidate_path))
+        model = wrapper
 
-    # Evaluate
-    avg_ndcg, avg_mrr, n_traces = evaluate_ndcg(model, X_val, y_val, groups_val)
+    model_rev = sha256_file(tmp_candidate_path)[:16]
+    candidate_model_path = MODEL_CANDIDATES_DIR / f'{slug}-{dataset_rev}-{model_rev}{candidate_model_ext}'
+    tmp_candidate_path.rename(candidate_model_path)
+    print(f'\nCandidate model saved: {candidate_model_path}')
+    model_path_str = str(candidate_model_path)
+
+    # Evaluate — NDCG@5, NDCG@10, MRR@10 uniformly regardless of objective (3.6a "final ranking
+    # evaluation" set), plus per-trace metrics for future per-query delta inspection.
+    ranking_result = evaluate_ranking(model, X_val, y_val, groups_val)
+    avg_ndcg_5  = ranking_result['ndcg_at_5']
+    avg_ndcg    = ranking_result['ndcg_at_10']
+    avg_mrr     = ranking_result['mrr_at_10']
+    n_traces    = ranking_result['n_traces']
     print(f'\nEvaluation ({n_traces} val traces):')
+    print(f'  NDCG@5:  {avg_ndcg_5:.4f}')
     print(f'  NDCG@10: {avg_ndcg:.4f}')
     print(f'  MRR@10:  {avg_mrr:.4f}')
 
@@ -416,34 +511,54 @@ def main():
     gate_pass = avg_ndcg >= args.ndcg_gate
     print(f'\n══ Gate ══════════════════════════')
     print(f'  {"✅" if gate_pass else "❌"} NDCG@10 = {avg_ndcg:.4f} (gate ≥{args.ndcg_gate})')
-    print(f'  {"✅ GATE PASS — promote to Stage 4" if gate_pass else "⚠️  GATE FAIL — more training data needed"}')
+    print(f'  {"✅ GATE PASS" if gate_pass else "⚠️  GATE FAIL — more training data needed"}')
+    if gate_pass and not args.promote:
+        print('  (candidate output only — pass --promote to update the canonical model path)')
 
     report = {
-        'generated':    __import__('datetime').datetime.utcnow().isoformat() + 'Z',
-        'model_type':   'lightgbm' if args.lightgbm else 'xgboost',
-        'objective':    'regression' if args.lightgbm else args.objective,
-        'device':       'gpu-requested (see lightgbm device_type)' if args.lightgbm else args.device,
-        'model_path':   model_path_str,
-        'train_rows':   int(X_train.shape[0]),
-        'val_rows':     int(X_val.shape[0]),
-        'val_traces':   n_traces,
-        'ndcg_at_10':   round(avg_ndcg, 4),
-        'mrr_at_10':    round(avg_mrr, 4),
-        'ndcg_gate':    args.ndcg_gate,
-        'gate_pass':    gate_pass,
+        'generated':      __import__('datetime').datetime.utcnow().isoformat() + 'Z',
+        'model_type':     'lightgbm' if args.lightgbm else 'xgboost',
+        'objective':      'regression' if args.lightgbm else args.objective,
+        'device':         'gpu-requested (see lightgbm device_type)' if args.lightgbm else args.device,
+        'model_path':     model_path_str,
+        'dataset_revision': dataset_rev,
+        'model_revision':   model_rev,
+        'promoted':         bool(args.promote),
+        'train_rows':     int(X_train.shape[0]),
+        'val_rows':       int(X_val.shape[0]),
+        'val_traces':     n_traces,
+        'ndcg_at_5':      round(avg_ndcg_5, 4),
+        'ndcg_at_10':     round(avg_ndcg, 4),
+        'mrr_at_10':      round(avg_mrr, 4),
+        'ndcg_gate':      args.ndcg_gate,
+        'gate_pass':      gate_pass,
+        'per_trace':      ranking_result['per_trace'],
         'feature_importance': dict(imp_sorted),
         'promotion_cmd': (
-            'Set XGBOOST_RERANKER_PATH env var to model_path and restart the dev server '
-            'to activate Stage 4 cross-encoder replacement.'
+            f'Re-run with --promote to update models/xgboost-reranker.ubj + '
+            f'docs/reports/xgboost-training-report.json, OR set XGBOOST_RERANKER_PATH / pass '
+            f'--model={model_path_str} to the sidecar to use this candidate directly without promoting.'
         ) if gate_pass else 'Collect more diverse traces (need ≥20 feature_ids) and retrain.',
     }
 
-    with open(REPORT_PATH, 'w') as f:
+    candidate_report_path = REPORT_DIR / f'xgboost-objective-{slug}-{model_rev}.json'
+    with open(candidate_report_path, 'w') as f:
         json.dump(report, f, indent=2)
-    print(f'\nReport: {REPORT_PATH}')
+    print(f'\nCandidate report: {candidate_report_path}')
+
+    if args.promote:
+        # Explicit, separate write to the canonical paths the sidecar and dev server default to
+        # — never implicit, never the default behavior.
+        canonical_model_path = LGB_PATH if args.lightgbm else MODEL_PATH
+        shutil.copyfile(candidate_model_path, canonical_model_path)
+        with open(REPORT_PATH, 'w') as f:
+            json.dump(report, f, indent=2)
+        print(f'PROMOTED: {canonical_model_path}')
+        print(f'PROMOTED: {REPORT_PATH}')
 
     if gate_pass:
-        _invalidate_graph_manifest('xgboost gate-pass: NDCG@10=' + str(round(avg_ndcg, 4)))
+        if args.promote:
+            _invalidate_graph_manifest('xgboost gate-pass (promoted): NDCG@10=' + str(round(avg_ndcg, 4)))
     else:
         sys.exit(1)
 

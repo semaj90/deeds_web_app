@@ -211,6 +211,7 @@ async function main() {
   const sourceCache = new Map(); // sourceRef -> { buffer, absolutePath } | null (missing)
   const unresolvedTargetResults = [];
   let requestCount = 0;
+  const requestDurationsMs = [];
   const startedAt = Date.now();
   const concurrency = Math.max(1, Math.min(8, Number(process.env.ATLAS_CSGR2_CONCURRENCY ?? 4)));
   const timeoutMs = Math.max(250, Math.min(15000, Number(process.env.ATLAS_CSGR2_TIMEOUT_MS ?? 5000)));
@@ -273,28 +274,35 @@ async function main() {
     }
     const resolver = source.absolutePath.startsWith(frontendRoot) ? frontendResolver : rootResolver;
     requestCount += 1;
-    const resolution = await resolver.resolveDefinition({
-      requestId: `csgr2:${edge.sourceRef}:${edge.fromEvidenceKey}`,
-      workspaceRevision: artifact.workspaceRevision,
-      sourceRef: edge.sourceRef,
-      sourceRevision: edge.sourceRevision ?? null,
-      sourceAbsolutePath: source.absolutePath,
-      // REQUIRED — without this, ensureOpen()'s didOpen() sends `text: undefined`, which
-      // JSON.stringify silently drops from the wire message entirely. The server then falls back
-      // to reading the file live from disk, which means resolution runs against whatever is on
-      // disk *right now*, not the exact bytes bound to sourceRevision — the exact STALE_SOURCE
-      // risk this contract exists to prevent. Found live 2026-08-29 (resolution appeared to work,
-      // 148/200, but was silently checking disk content instead of the bound revision).
-      sourceText,
-      // Sidecar convention is 1-indexed line/column (verified live 2026-08-29); LSP positions are
-      // 0-indexed for both.
-      position: { line: edge.evidenceStartLine - 1, character: edge.evidenceStartColumn },
-      edgeType: edge.type,
-      sourceEvidenceRef: edge.toEvidenceKey,
-      language,
-      timeoutMs,
-    });
-    unresolvedTargetResults.push({ sourceRef: edge.sourceRef, edgeType: edge.type, language, fromEvidenceKey: edge.fromEvidenceKey, toEvidenceKey: edge.toEvidenceKey, status: resolution.result.status, targetCount: resolution.result.targets.length, error: resolution.result.error ?? null, positionConfidence });
+    const requestStartedAt = Date.now();
+    try {
+      const resolution = await resolver.resolveDefinition({
+        requestId: `csgr2:${edge.sourceRef}:${edge.fromEvidenceKey}`,
+        workspaceRevision: artifact.workspaceRevision,
+        sourceRef: edge.sourceRef,
+        sourceRevision: edge.sourceRevision ?? null,
+        sourceAbsolutePath: source.absolutePath,
+        // REQUIRED — without this, ensureOpen()'s didOpen() sends `text: undefined`, which
+        // JSON.stringify silently drops from the wire message entirely. The server then falls back
+        // to reading the file live from disk, which means resolution runs against whatever is on
+        // disk *right now*, not the exact bytes bound to sourceRevision — the exact STALE_SOURCE
+        // risk this contract exists to prevent. Found live 2026-08-29 (resolution appeared to work,
+        // 148/200, but was silently checking disk content instead of the bound revision).
+        sourceText,
+        // Sidecar convention is 1-indexed line/column (verified live 2026-08-29); LSP positions are
+        // 0-indexed for both.
+        position: { line: edge.evidenceStartLine - 1, character: edge.evidenceStartColumn },
+        edgeType: edge.type,
+        sourceEvidenceRef: edge.toEvidenceKey,
+        language,
+        timeoutMs,
+      });
+      requestDurationsMs.push(Date.now() - requestStartedAt);
+      unresolvedTargetResults.push({ sourceRef: edge.sourceRef, edgeType: edge.type, language, fromEvidenceKey: edge.fromEvidenceKey, toEvidenceKey: edge.toEvidenceKey, status: resolution.result.status, targetCount: resolution.result.targets.length, error: resolution.result.error ?? null, positionConfidence });
+    } catch (error) {
+      requestDurationsMs.push(Date.now() - requestStartedAt);
+      unresolvedTargetResults.push({ sourceRef: edge.sourceRef, edgeType: edge.type, language, fromEvidenceKey: edge.fromEvidenceKey, toEvidenceKey: edge.toEvidenceKey, status: 'ERROR', targetCount: 0, error: error instanceof Error ? error.message : String(error), positionConfidence });
+    }
   }
   let nextIndex = 0;
   async function worker() {
@@ -336,6 +344,11 @@ async function main() {
     }
   }
 
+  const sortedRequestDurationsMs = [...requestDurationsMs].sort((a, b) => a - b);
+  const percentile = (values, fraction) => values.length === 0 ? null : values[Math.min(values.length - 1, Math.floor((values.length - 1) * fraction))];
+  const timeoutCount = unresolvedTargetResults.filter((result) => result.status === 'TIMEOUT').length;
+  const errorCount = unresolvedTargetResults.filter((result) => result.status === 'ERROR' || result.status === 'SERVER_ERROR').length;
+
   const report = {
     schema: 'atlas.current-structural-edge-resolution.v1',
     mode: 'READ_ONLY_PLAN',
@@ -350,10 +363,19 @@ async function main() {
       sampled: sampled.length,
       sampleIsPartial: sampled.length < unresolvedTargetEdges.length,
       requestCount,
+      lspRequestCount: requestCount,
+      requestRate: sampled.length > 0 ? requestCount / sampled.length : null,
       concurrency,
       timeoutMs,
       durationMs,
       avgMsPerRequest: requestCount > 0 ? Math.round(durationMs / requestCount) : null,
+      lspWallTimeMs: durationMs,
+      lspMeanMs: requestDurationsMs.length > 0 ? Math.round(requestDurationsMs.reduce((sum, value) => sum + value, 0) / requestDurationsMs.length) : null,
+      lspP50Ms: percentile(sortedRequestDurationsMs, 0.5),
+      lspP95Ms: percentile(sortedRequestDurationsMs, 0.95),
+      lspMaxMs: sortedRequestDurationsMs.length > 0 ? sortedRequestDurationsMs.at(-1) : null,
+      errors: errorCount,
+      timeouts: timeoutCount,
       counts: unresolvedTargetCounts,
       dimensions: unresolvedTargetDimensions,
       diagnosticSamples,

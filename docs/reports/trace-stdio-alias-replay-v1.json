@@ -1,0 +1,18 @@
+{
+  "generatedAt": "2026-09-04T02:33:29.029Z",
+  "schema": "atlas.trace-stdio-alias-replay.v1",
+  "endpoint": "http://127.0.0.1:8788/mcp",
+  "alias": "trace__kag_search",
+  "canonical": "trace.kag_search",
+  "aliasMapping": {
+    "trace__kag_search": "trace.kag_search"
+  },
+  "argumentsChecksum": "sha256:68881245210083b866cc5a40fca74c24f9d802252c62c9d1e06d62bca810af3d",
+  "directResultChecksum": "sha256:404eb13178d41bd7e58f7a389aee0d1f2da8c012f6377a5aa092fa98396d305b",
+  "aliasResultChecksum": "sha256:404eb13178d41bd7e58f7a389aee0d1f2da8c012f6377a5aa092fa98396d305b",
+  "equivalent": true,
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "status": "PROVEN_READ_ONLY_ALIAS_REPLAY",
+  "reportChecksum": "sha256:48f738904c1eb818ef87ddcf95fc867a7373fd6eb4049a0ea07d57a563b8d560"
+}

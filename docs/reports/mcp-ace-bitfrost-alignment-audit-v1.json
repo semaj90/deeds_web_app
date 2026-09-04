@@ -1,0 +1,95 @@
+{
+  "schemaVersion": "mcp-ace-bitfrost-alignment-audit.v1",
+  "status": "HEALTHY_WITH_ADMISSION_GAPS",
+  "generatedAt": "2026-09-03",
+  "scope": ["MCP registry", "atlas-tools", "TRACE", "ACE", "BitFrost/Valkey", "Graphify fanout"],
+  "proofModel": "CREATED_WIRED_PROVEN_DONE",
+  "proven": {
+    "openspecCurrentAuthority": "parent-atlas-retrieval-lineage-dag-convergence",
+    "openspecCurrentAuthorityCount": 1,
+    "openspecStrictValidation": true,
+    "atlasToolsSmokeChecks": 10,
+    "runtimeSelectorManifestValidation": true,
+    "runtimeSelectorQuerySelection": "5/5 queries returned registry selections",
+    "traceStaticRegisteredTools": 119,
+    "bitfrostValkeyReachable": true,
+    "clientTrackingAccepted": true,
+    "networkWritesPerformed": false,
+    "canonicalPromotion": false
+  },
+  "partial": {
+    "runtimeSelector": {
+      "registryPickupPath": "PASS",
+      "qdrantManifestCoverage": "0/20",
+      "qdrantManifestProjectionProducerFound": false,
+      "embeddingAvailable": false,
+      "selectionFallback": "REGISTRY",
+      "sourceReport": "docs/reports/mcp-tool-selection-audit.json"
+    },
+    "mcpRegistry": {
+      "parity": "CATALOG_DRIFT",
+      "listedTools": 85,
+      "traceRegisteredTools": 119,
+      "handlerWithoutListing": 22,
+      "crossFileDuplicateNames": 7,
+      "classificationRecorded": true,
+      "revisionedManifest": true,
+      "manifestToolCount": 339,
+      "manifestContentRevision": "sha256:84487fe9b2184b19ac6d340b808d95d9605554825d44ab5f26959ad097321df4",
+      "viterbiManifestAdapter": true,
+      "viterbiManifestAdapterTests": 5,
+      "sourceReport": "docs/reports/mcp-tool-registry-drift-classification-v1.json"
+    },
+    "ace": {
+      "callerCount": 32,
+      "legacyQueryCache": 21,
+      "strictV2Wired": 9,
+      "diagnosticOnly": 2,
+      "selectedRoute": "sveltekit-frontend/src/routes/api/ace/context/+server.ts",
+      "selectedRouteStatus": "LEGACY_QUERY_CACHE",
+      "routeLocalRevisionAuthority": false,
+      "sourceReport": "docs/reports/ace-route-revision-authority-v1.json"
+    },
+    "bitfrost": {
+      "trackingCapability": "PROVEN_CONNECTION_CAPABILITY",
+      "liveInvalidationOnMutation": false,
+      "disconnectFlushSafety": false,
+      "semanticCacheStatus": "PASS_WITH_DRIFT",
+      "latent64FamilyCount": 0,
+      "centroidFamilyCount": 0,
+      "sourceReports": [
+        "docs/reports/bitfrost-valkey-tracking-proof.json",
+        "docs/reports/bitfrost-semantic-cache-audit.json"
+      ]
+    },
+    "graphify": {
+      "fanoutClassification": "OPTIONAL_DERIVED_REPRESENTATION",
+      "dailyWrapperStillInvokesPhase16": true,
+      "plannerRequiresLatent": false,
+      "sourceReport": "docs/reports/graphify-fanout-criticality-01.json"
+    }
+  },
+  "gaps": [
+    { "id": "MCP_TOOL_REGISTRY_REVISION_01", "severity": "P1", "description": "Revisioned/checksummed manifest and typed Viterbi adapter now exist; live Viterbi admission still needs an explicit production consumer." },
+    { "id": "MCP_TOOL_ALIAS_LIVE_PARITY_01", "severity": "P2", "description": "TRACE-canonical and stdio compatibility aliases are classified but not live-replay proven equivalent." },
+    { "id": "MCP_TOOL_DENSE_PICKUP_01", "severity": "P1", "description": "Dense Qdrant tool-manifest coverage is 0/20 and the embedding endpoint was unavailable; registry fallback works but dense pickup is not proven." },
+    { "id": "ACE_CONTEXT_LIVE_02", "severity": "P0", "description": "The selected production ACE route still lacks authoritative revision bundle, ContextManifestV2 admission, and strict V2 cache identity." },
+    { "id": "BITFROST_INVALIDATION_01", "severity": "P1", "description": "Tracking capability is proven, but mutation invalidation delivery and local-cache eviction are not proven." },
+    { "id": "BITFROST_INVALIDATION_02", "severity": "P1", "description": "Tracking disconnect must flush local BitFrost state before the next read; no proof receipt exists." },
+    { "id": "GRAPHIFY_FANOUT_CONVERGENCE_01", "severity": "P1", "description": "Optional latent fanout remains coupled to the daily wrapper despite not being a canonical completion predicate." },
+    { "id": "TASK_EVIDENCE_COVERAGE_01", "severity": "P2", "description": "15 of 35 checked task items lack explicit evidence references in the convergence task ledger." },
+    { "id": "BITFROST_PREFIX_NAMING_01", "severity": "P2", "description": "The tracking proof records bifrost prefixes while live cache audits use bitfrost prefixes; naming must be reconciled before invalidation claims." }
+  ],
+  "nextOrder": [
+    "MCP_TOOL_REGISTRY_VITERBI_CONSUMER_01",
+    "ACE_SEARCHRUNTIME_RESOLVER_01",
+    "ACE_CONTEXT_LIVE_02",
+    "BITFROST_INVALIDATION_01",
+    "BITFROST_INVALIDATION_02",
+    "GRAPHIFY_FANOUT_CONVERGENCE_01"
+  ],
+  "safeNextCommand": "node scripts/atlas/build-mcp-tool-registry-index.mjs",
+  "smokeCommand": "node scripts/opencode/smoke-atlas-tools-mcp.mjs",
+  "writesPerformed": false,
+  "canonicalAuthority": false
+}

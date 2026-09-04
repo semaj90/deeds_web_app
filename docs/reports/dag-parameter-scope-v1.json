@@ -1,0 +1,14 @@
+{
+  "schema": "atlas.dag-parameter-scope.v1",
+  "gate": "DAG-PARAMETER-SCOPE-AUDIT-01",
+  "scope": "read-only planner source audit; no runtime, database, cache, or artifact-store writes",
+  "plannerPath": "packages/parent-atlas/src/core/kernel-bound-dag-planner-v1.ts",
+  "artifactBuilderPresent": true,
+  "genericRequestBinding": false,
+  "scopedArgumentsSupported": true,
+  "classification": "PER_OPERATOR_ARGUMENT_SCOPE_SUPPORTED",
+  "finding": "planner does not contain the audited scoped-argument binding pattern",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "reportChecksum": "sha256:94ef360a92cd979cd59ba22ab12feea434a2d2dfb5fb51d883a4cf708a09dc85"
+}

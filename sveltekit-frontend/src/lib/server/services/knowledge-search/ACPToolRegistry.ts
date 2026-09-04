@@ -816,7 +816,7 @@ const handlers: Record<string, HandlerFn> = {
 
     const sourceTypes = new Set(['plain_text', 'docling_markdown', 'docling_json', 'ocr_text', 'transcript', 'codebase', 'general']);
     const extractionModes = new Set(['entities', 'relationships', 'concepts', 'full']);
-    const passNames = new Set(['structural', 'lexical', 'linguistic', 'semantic', 'sequence', 'rerank', 'grounded']);
+    const passNames = new Set(['structural', 'lexical', 'linguistic', 'semantic', 'sequence', 'rerank', 'grounded', 'classify']);
 
     if (!text || typeof text !== 'string' || !text.trim()) {
       return fail('text must be a non-empty string', startTime);
@@ -862,6 +862,60 @@ const handlers: Record<string, HandlerFn> = {
       }
       const data = await response.json();
       return { success: true, kind: 'result', data, duration: Date.now() - startTime };
+    } catch (error: any) {
+      return fail(error.message ?? String(error), startTime);
+    }
+  },
+
+  async nlpClassifyDomain(args: any, options?: ACPToolOptions): Promise<ToolResult> {
+    const startTime = Date.now();
+    const { text, source_ref, packet_key } = args ?? {};
+
+    if (!text || typeof text !== 'string' || !text.trim()) {
+      return fail('text must be a non-empty string', startTime);
+    }
+    if (text.length > 200_000) return fail('text exceeds max length (200000 chars)', startTime);
+
+    const body = {
+      text,
+      source_type: 'plain_text',
+      extraction_mode: 'full',
+      source_ref: source_ref ?? null,
+      packet_key: packet_key ?? null,
+      max_chars: 50000,
+      passes: ['classify'],
+    };
+
+    if (options?.dryRun) {
+      return planResult([
+        { action: 'analyze', target: 'nlp-sidecar', detail: `POST /analyze — passes=[classify], ${text.length} chars` },
+      ], startTime);
+    }
+
+    try {
+      const response = await fetch(`${CONFIG.endpoints.nlpSidecar}/analyze`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+        signal: AbortSignal.timeout(CONFIG.timeouts.llm),
+      });
+      if (!response.ok) {
+        const detail = await response.text().catch(() => '');
+        return fail(`NLP sidecar /analyze failed: HTTP ${response.status}${detail ? ` — ${detail.slice(0, 300)}` : ''}`, startTime);
+      }
+      const data = await response.json();
+      // Unwrap the single classify pass_result into a flat, tool-friendly shape —
+      // the raw /analyze envelope also carries entities/relationships/chunks/etc.
+      // that this tool's callers (a domain-classification lookup) don't need.
+      const classifyResult = Array.isArray(data?.pass_results)
+        ? data.pass_results.find((pass: any) => pass?.family === 'classify')
+        : null;
+      return {
+        success: true,
+        kind: 'result',
+        data: classifyResult ?? { backend: 'unavailable', status: 'skipped', warnings: ['no classify pass_result in sidecar response'] },
+        duration: Date.now() - startTime,
+      };
     } catch (error: any) {
       return fail(error.message ?? String(error), startTime);
     }
@@ -994,7 +1048,7 @@ const DRY_RUN_TOOLS = new Set([
   'knowledge:search', 'db:query', 'cache:get', 'cache:set', 'llm:generate',
   'error:analyze', 'fix:synthesize', 'fix:apply', 'metrics:snapshot', 'metrics:health',
   'langextract:extract', 'langextract:batch', 'search:hyperrag',
-  'nlp:capabilities', 'nlp:analyze', 'nlp:ast-chunk',
+  'nlp:capabilities', 'nlp:analyze', 'nlp:ast-chunk', 'nlp:classify_domain',
   'phase89:board-workflow', 'graph:snapshot-parity:validate',
   'atlas:cugraph:pagerank', 'atlas:cugraph:pagerank:dry',
   'atlas.kanban.list', 'atlas.kanban.show',
@@ -1355,7 +1409,7 @@ export const TOOLS: Record<string, ACPTool> = {
         packet_key: { type: 'string' },
         language: { type: 'string' },
         max_chars: { type: 'integer', minimum: 1, maximum: 200000, default: 50000 },
-        passes: { type: 'array', items: { type: 'string', enum: ['structural', 'lexical', 'linguistic', 'semantic', 'sequence', 'rerank', 'grounded'] } }
+        passes: { type: 'array', items: { type: 'string', enum: ['structural', 'lexical', 'linguistic', 'semantic', 'sequence', 'rerank', 'grounded', 'classify'] } }
       },
       required: ['text'],
       additionalProperties: false
@@ -1369,6 +1423,30 @@ export const TOOLS: Record<string, ACPTool> = {
       }
     ],
     handler: handlers.nlpAnalyze
+  },
+  'nlp:classify_domain': {
+    name: 'nlp:classify_domain',
+    description: 'Classify text into the canonical domain taxonomy via the NLP sidecar\'s classify pass (sklearn NB/LR over KMeans word-cluster features once a trained checkpoint exists; reports backend: "unavailable" otherwise — never a hard failure). Additive alongside the 2-3 tools proposed in openspec/changes/parent-atlas-nlp-sidecar-feature-compiler task 11.1, does not close that task.',
+    category: 'code',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        text: { type: 'string', description: 'Text to classify (max 200,000 chars)', maxLength: 200000 },
+        source_ref: { type: 'string' },
+        packet_key: { type: 'string' }
+      },
+      required: ['text'],
+      additionalProperties: false
+    },
+    outputSchema: { type: 'object' },
+    examples: [
+      {
+        input: { text: 'function login(session) { return authenticate(session.token); }', source_ref: 'src/auth/session.ts' },
+        output: { family: 'classify', backend: 'unavailable', status: 'skipped', warnings: ['no trained domain-classifier checkpoint present; run train_domain_classifier.py'] },
+        description: 'Classify with no trained checkpoint yet — graceful degradation, not an error'
+      }
+    ],
+    handler: handlers.nlpClassifyDomain
   },
   'nlp:ast-chunk': {
     name: 'nlp:ast-chunk',

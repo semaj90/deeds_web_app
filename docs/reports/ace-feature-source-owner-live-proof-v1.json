@@ -1,0 +1,70 @@
+{
+  "schema": "atlas.ace-feature-source-owner-live-proof.v1",
+  "generatedAt": "2026-09-04T04:14:16.547Z",
+  "status": "STATIC_OWNER_SURFACE_PROVEN_LIVE_CANDIDATES_BOUND_FEATURE_CONTEXT_OWNER_MISSING",
+  "summary": "The ACE production-source composition boundary (createSearchRuntimeAceProductionSourceAdapterV1 -> createSearchRuntimeAceResolverV1) is fully built, type-safe, and correctly fails closed. Real candidate identity and a real, replay-stable CandidateOrdinalMapV1 were bound from a genuine 15-row Postgres-sourced cohort with zero new writes. The composition cannot proceed past ordinal-map binding because three real production owners do not exist anywhere in this repo: a QAS feature-context resolver (rows/laneMaskByOrdinal), a retrievalPolicyRevision producer, and an acePlaybookRevision producer. This is a genuine owner-adoption gap, not a code-quality gap -- the contracts and invariant checks are already correct; nothing here should be re-implemented.",
+  "searchRuntimeSearchWriteSideEffectFinding": "SearchRuntime.search() (src/lib/server/retrieval/search-runtime.ts) always calls recordPromotionIntent() and logExposureEvents() as fire-and-forget side effects on every real invocation, with no read-only/dry-run mode. A genuinely zero-write canary cannot call it directly; this script uses the already-proven frozen cohort instead.",
+  "cohortSource": "docs/reports/lineage-semantic-768-cohort-v1.json",
+  "candidateCount": 15,
+  "ordinalMap": {
+    "checksum": "f3a54f01be372c21a07737043c5e4b0ba8f0f95b7f6d24470060835cb0ae35a9",
+    "rowCount": 15,
+    "candidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
+    "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+    "replayMatch": true
+  },
+  "ownerCensus": [
+    {
+      "field": "candidates",
+      "status": "AUTHORITATIVE",
+      "evidence": "15 real candidates from docs/reports/lineage-semantic-768-cohort-v1.json (Postgres-sourced, SEMANTIC-TOPK-01 proven cohort), canonicalId=packetKey (strong identity, non-degraded)."
+    },
+    {
+      "field": "ordinalMap",
+      "status": "AUTHORITATIVE",
+      "evidence": "Built via the real materializeCandidateOrdinalMap() from the 15 real candidates above. ordinalMapChecksum=f3a54f01be372c21a07737043c5e4b0ba8f0f95b7f6d24470060835cb0ae35a9, replay-stable across two independent calls: true."
+    },
+    {
+      "field": "rows (RetrievalRouterFeatureRowV1[] / QAS feature rows)",
+      "status": "MISSING",
+      "evidence": "grep across src/ (excluding *.spec.ts) for a real (non-test) implementation of SearchRuntimeQasFeatureResolver / a real context() supplying graphRevision/featureRevision/representationRevision/taskKind/features found ZERO production owners. Only the boundary-definition files themselves (query-adaptive-feature-compiler.ts, search-runtime-qas-feature-resolver.ts, search-runtime-adapter.ts, qas-neural-execution-bridge.ts) reference the type; no file supplies a real instance."
+    },
+    {
+      "field": "laneMaskByOrdinal",
+      "status": "MISSING",
+      "evidence": "Depends on the same missing feature-context owner as rows above; no independent real producer found."
+    },
+    {
+      "field": "producerRevision",
+      "status": "AVAILABLE_BUT_UNQUALIFIED",
+      "evidence": "This script supplies a literal ('ace-feature-source-owner-01:census-run:v1') scoped to this audit run itself -- it is a real, non-synthetic string (passes rejectSyntheticRevision), but it is not a value emitted by a real running production producer, so it does not qualify as AUTHORITATIVE."
+    },
+    {
+      "field": "retrievalPolicyRevision",
+      "status": "MISSING",
+      "evidence": "grep -rn \"retrievalPolicyRevision:\\s*['\\\"]\" src (excluding *.spec.ts) returned ZERO matches repo-wide. No production value exists anywhere."
+    },
+    {
+      "field": "acePlaybookRevision",
+      "status": "MISSING",
+      "evidence": "grep -rn \"acePlaybookRevision:\\s*['\\\"]\" src (excluding *.spec.ts) returned ZERO matches repo-wide. No production value exists anywhere."
+    },
+    {
+      "field": "representationRevision",
+      "status": "AVAILABLE_BUT_UNQUALIFIED",
+      "evidence": "Each of the 15 real candidates carries its own real per-row semanticRevision (content-hash-qualified, e.g. \"semantic_768:embeddinggemma:latest:...:<contentHash>:encoder-unspecified\") -- these are genuinely distinct across candidates. The resolver contract instead expects ONE aggregate cohort-level representationRevision string; no real producer emits a single snapshot-level semantic_768 representation revision covering an entire candidate cohort. Per-row values are real; the required aggregate value is not."
+    },
+    {
+      "field": "graphRevision",
+      "status": "AVAILABLE_BUT_UNQUALIFIED",
+      "evidence": "Explicitly modeled as nullable in the resolver contract; null is a legitimate, honest value here (no PageRank/graph snapshot data bound to this cohort), not a gap in this specific field."
+    }
+  ],
+  "resolverAttempt": {
+    "threw": true,
+    "errorMessage": "ACE_RESOLVER_FEATURE_ROWS_MISSING"
+  },
+  "canonicalAuthority": false,
+  "rankingPromotion": false,
+  "writesPerformed": false
+}

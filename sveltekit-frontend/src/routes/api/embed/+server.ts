@@ -10,17 +10,13 @@ import { traceEmbedding } from '$lib/server/observability/langfuse.js';
 import { z } from 'zod';
 import { ENV } from '$lib/server/env.server.js';
 import { logError, categorizeError, categorizeSeverity } from '$lib/server/error-logging.js';
-import {
-	resolveEmbeddingBackend,
-	classifyEmbeddingError,
-} from '$lib/server/embedding/embedding-backend-resolution.js';
+import { classifyEmbeddingError } from '$lib/server/embedding/embedding-backend-resolution.js';
+import { resolveEmbeddingProviderV1, checkVectorShapeV1 } from '$lib/server/embedding/embedding-provider-v1.js';
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
-const EMBEDDING_BACKEND = resolveEmbeddingBackend('embeddinggemma:latest', {
-	configuredProvider: ENV.EMBEDDING_PROVIDER,
-	configuredBaseUrl: ENV.EMBEDDING_BASE_URL,
-	fallbackBaseUrl: ENV.OLLAMA_BASE_URL,
-});
+// EMBED-PROVIDER-CONVERGENCE-01: single resolver, not an independent
+// interpretation of EMBEDDING_PROVIDER/EMBEDDING_BASE_URL/OLLAMA_BASE_URL.
+const EMBEDDING_PROVIDER_V1 = resolveEmbeddingProviderV1();
 
 const embedRequestSchema = z.object({
 	text: z.string().min(1, 'Text is required').max(50000),
@@ -72,19 +68,25 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 		switch (model) {
 			case 'embeddinggemma': {
-				// EMBEDDING_BACKEND=onnx_directml: try the in-process ONNX/DirectML
-				// session first (no separate port, doesn't compete with TurboQuant's
-				// CUDA context for VRAM). Known limitation: runOnnxDirectMLEmbedding
-				// uses a codepoint-level fallback tokenizer, not the model's real
+				// EMBED-PROVIDER-CONVERGENCE-01: provider comes from the one
+				// resolver, not an independent process.env.EMBEDDING_BACKEND check.
+				// onnx_directml known limitation: runOnnxDirectMLEmbedding uses a
+				// codepoint-level fallback tokenizer, not the model's real
 				// SentencePiece tokenizer — embeddings from this path are not yet
 				// production-quality. Falls back to the standard embedText() cascade
-				// (gRPC -> Ollama/llama-server) on null or any other backend.
+				// (ONNX Tier-0 -> llama_cpp_gguf Tier-1 -> gRPC -> Ollama) on null.
 				let embedding: number[] | null = null;
-				if (process.env.EMBEDDING_BACKEND === 'onnx_directml') {
+				if (EMBEDDING_PROVIDER_V1.provider === 'onnx_directml') {
 					embedding = await runOnnxDirectMLEmbedding(text);
 				}
 				if (!embedding) {
 					embedding = await embedText(text);
+				}
+				// Fail-closed: reject wrong dimension, non-finite values, or a
+				// zero/degenerate norm rather than returning it as success.
+				const shapeCheck = checkVectorShapeV1(embedding);
+				if (!shapeCheck.ok) {
+					throw new Error(`EMBED_RECEIPT_SHAPE_INVALID:${shapeCheck.failures.join(',')}`);
 				}
 				result = { embedding, model: 'embeddinggemma:latest', dimensions: embedding.length };
 				break;
@@ -130,8 +132,17 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			contextKey: `embed:${failureKind}`,
 		});
 
-		// Degraded response — return mock embedding instead of 500
-		return json({ embedding: new Array(768).fill(0), model: 'embeddinggemma:latest', dimensions: 768 });
+		// A zero vector is not a valid embedding — returning HTTP 200 with one
+		// here let this look like success while every real backend was down
+		// (found live 2026-09-02: a taxonomy embed run would have silently
+		// upserted 5,527 meaningless vectors into Qdrant). POST/action routes
+		// return {error} on real failure per CLAUDE.md's Degraded Response
+		// Contract — that rule's 200-with-empty-defaults carve-out is for GET
+		// reads, not for a route that computes and returns a value.
+		return json(
+			{ error: 'Embedding generation failed — all backends unavailable', failureKind },
+			{ status: 503 }
+		);
 	}
 };
 
@@ -142,6 +153,6 @@ export const GET: RequestHandler = async () => {
 			models: ['embeddinggemma', 'mock'],
 			maxTextLength: 50000,
 			ollamaUrl: OLLAMA_URL,
-			embeddingBackend: EMBEDDING_BACKEND,
+			embeddingBackend: EMBEDDING_PROVIDER_V1,
 		});
 };

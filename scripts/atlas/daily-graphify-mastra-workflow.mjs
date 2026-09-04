@@ -126,6 +126,10 @@ function logPhase(phase, status, details = {}) {
 // ─────────────────────────────────────────────────────────────────────────
 
 async function ensureWorkflowTables() {
+  if (DRY_RUN) {
+    log('Dry-run: skipping workflow table creation', 'info');
+    return true;
+  }
   try {
     await pool.query(`
       CREATE TABLE IF NOT EXISTS graphify_workflow_runs (
@@ -192,21 +196,23 @@ async function executePhase(phase, phaseLogic) {
     const result = await phaseLogic();
     const duration = Date.now() - phaseStartTime;
 
-    await pool.query(
-      `INSERT INTO graphify_phase_executions (run_id, phase, status, started_at, completed_at, duration_ms, input_count, output_count, metadata)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
-      [
-        RUN_ID,
-        phase,
-        'PASS',
-        new Date(phaseStartTime),
-        new Date(),
-        duration,
-        result.inputCount || 0,
-        result.outputCount || 0,
-        JSON.stringify(result.metadata || {}),
-      ]
-    );
+    if (!DRY_RUN) {
+      await pool.query(
+        `INSERT INTO graphify_phase_executions (run_id, phase, status, started_at, completed_at, duration_ms, input_count, output_count, metadata)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+        [
+          RUN_ID,
+          phase,
+          'PASS',
+          new Date(phaseStartTime),
+          new Date(),
+          duration,
+          result.inputCount || 0,
+          result.outputCount || 0,
+          JSON.stringify(result.metadata || {}),
+        ]
+      );
+    }
 
     logPhase(phase, 'PASS', {
       duration: `${(duration / 1000).toFixed(1)}s`,
@@ -219,11 +225,13 @@ async function executePhase(phase, phaseLogic) {
     log(`Phase ${phase} failed: ${err.message}`, 'error');
     workflowState.errors.push({ phase, error: err.message });
 
-    await pool.query(
-      `INSERT INTO graphify_phase_executions (run_id, phase, status, error_message, metadata)
-       VALUES ($1, $2, $3, $4, $5)`,
-      [RUN_ID, phase, 'FAIL', err.message, JSON.stringify({})]
-    );
+    if (!DRY_RUN) {
+      await pool.query(
+        `INSERT INTO graphify_phase_executions (run_id, phase, status, error_message, metadata)
+         VALUES ($1, $2, $3, $4, $5)`,
+        [RUN_ID, phase, 'FAIL', err.message, JSON.stringify({})]
+      );
+    }
 
     logPhase(phase, 'FAIL', { error: err.message });
     return false;
@@ -403,19 +411,21 @@ async function phaseF_reEvaluation() {
 
   for (const gate of gates) {
     const passed = gate.actual >= gate.target;
-    await pool.query(
-      `INSERT INTO graphify_evaluation_gates (run_id, gate_number, gate_name, metric_value, threshold, passed, reason)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-      [
-        RUN_ID,
-        gate.number,
-        gate.name,
-        gate.actual,
-        gate.target,
-        passed,
-        passed ? 'Gate passed' : 'Gate failed',
-      ]
-    );
+    if (!DRY_RUN) {
+      await pool.query(
+        `INSERT INTO graphify_evaluation_gates (run_id, gate_number, gate_name, metric_value, threshold, passed, reason)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+        [
+          RUN_ID,
+          gate.number,
+          gate.name,
+          gate.actual,
+          gate.target,
+          passed,
+          passed ? 'Gate passed' : 'Gate failed',
+        ]
+      );
+    }
 
     workflowState.gates[`gate_${gate.number}`] = {
       name: gate.name,
@@ -488,12 +498,14 @@ async function runWorkflow() {
     await ensureWorkflowTables();
 
     // Insert or update run record
-    await pool.query(
-      `INSERT INTO graphify_workflow_runs (run_id, started_at, current_phase, status, dry_run)
-       VALUES ($1, $2, $3, $4, $5)
-       ON CONFLICT (run_id) DO UPDATE SET current_phase = $3, status = $4`,
-      [RUN_ID, new Date(), startPhaseArg || 'A', 'RUNNING', DRY_RUN]
-    );
+    if (!DRY_RUN) {
+      await pool.query(
+        `INSERT INTO graphify_workflow_runs (run_id, started_at, current_phase, status, dry_run)
+         VALUES ($1, $2, $3, $4, $5)
+         ON CONFLICT (run_id) DO UPDATE SET current_phase = $3, status = $4`,
+        [RUN_ID, new Date(), startPhaseArg || 'A', 'RUNNING', DRY_RUN]
+      );
+    }
 
     log(`Workflow Run ID: ${RUN_ID}`);
     log(`Mode: ${DRY_RUN ? 'DRY-RUN' : 'APPLY'}`);
@@ -533,17 +545,21 @@ async function runWorkflow() {
       }
 
       // Update current phase
-      await pool.query(
-        `UPDATE graphify_workflow_runs SET current_phase = $1 WHERE run_id = $2`,
-        [phase, RUN_ID]
-      );
+      if (!DRY_RUN) {
+        await pool.query(
+          `UPDATE graphify_workflow_runs SET current_phase = $1 WHERE run_id = $2`,
+          [phase, RUN_ID]
+        );
+      }
     }
 
     // Finalize
-    await pool.query(
-      `UPDATE graphify_workflow_runs SET status = $1, completed_at = $2 WHERE run_id = $3`,
-      ['COMPLETE', new Date(), RUN_ID]
-    );
+    if (!DRY_RUN) {
+      await pool.query(
+        `UPDATE graphify_workflow_runs SET status = $1, completed_at = $2 WHERE run_id = $3`,
+        ['COMPLETE', new Date(), RUN_ID]
+      );
+    }
 
     workflowState.completedAt = new Date().toISOString();
     workflowState.summary.status = 'COMPLETE';

@@ -10,12 +10,30 @@ import pg from 'pg';
 import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
 
 const root = process.cwd();
-const missingReport = JSON.parse(fs.readFileSync(path.resolve(root, 'docs/reports/qdrant-point-missing-population-01-v1.json'), 'utf8'));
-const dry = JSON.parse(fs.readFileSync(path.resolve(root, 'docs/reports/bridge-recon-dry-04-v1.json'), 'utf8'));
+const cliArgs = new Map(
+  process.argv.slice(2).flatMap((arg) => {
+    if (!arg.startsWith('--') || !arg.includes('=')) return [];
+    const [key, ...value] = arg.slice(2).split('=');
+    return [[key, value.join('=')]];
+  }),
+);
+const missingReportPath = path.resolve(
+  root,
+  cliArgs.get('missing-report-path') ?? 'docs/reports/qdrant-point-missing-population-01-v1.json',
+);
+const dryPath = path.resolve(
+  root,
+  cliArgs.get('artifact-path') ?? 'docs/reports/bridge-recon-dry-04-v1.json',
+);
+const missingReport = JSON.parse(fs.readFileSync(missingReportPath, 'utf8'));
+const dry = JSON.parse(fs.readFileSync(dryPath, 'utf8'));
 const missingIds = dry.classifications
   .filter((row) => row.classification === 'QDRANT_POINT_MISSING')
   .map((row) => row.canonicalChunkRowId);
-const reportPath = path.resolve(root, 'docs/reports/embedding-eligibility-mismatch-v1.json');
+const reportPath = path.resolve(
+  root,
+  cliArgs.get('report-path') ?? 'docs/reports/embedding-eligibility-mismatch-v1.json',
+);
 const pool = new pg.Pool({ connectionString: resolveDatabaseUrl(loadRepoEnv(process.env)), max: 1 });
 
 const { rows } = await pool.query(`
@@ -46,6 +64,8 @@ const report = {
   schema: 'atlas.embedding-eligibility-mismatch.v1',
   task: 'PKT-LINEAGE-14',
   mode: 'READ_ONLY',
+  sourceArtifactPath: path.relative(root, dryPath),
+  sourceMissingPopulationReportPath: path.relative(root, missingReportPath),
   inputMissingPopulation: missingReport.missingRowCount,
   mismatchCount: rows.length,
   nonMismatchMissingCount: missingReport.missingRowCount - rows.length,

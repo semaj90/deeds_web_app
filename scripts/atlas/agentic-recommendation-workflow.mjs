@@ -902,16 +902,15 @@ export async function runRecommendationWorkflow(userQuery, initialSourceRefs = [
 
   workflow.recommendation = recommendation;
 
-  workflow.workflow_status = 'COMPLETE';
-  workflow.workflow_state = 'COMPLETE';
+  // The CLI may persist the outcome after this workflow returns. Do not claim
+  // completion or a successful RECORD stage before that durable acknowledgement.
+  workflow.workflow_status = 'AWAITING_OUTCOME_RECEIPT';
+  workflow.workflow_state = 'RECORD';
   appendWorkflowStage(workflow, 'record_outcome', 'RECORD', {
     dependsOn: ['gate'],
+    status: 'pending',
     outputRef: 'workflow.outcome',
     evidenceRefs: recommendation.evidence.rg_matches.slice(0, 10),
-  });
-  appendWorkflowStage(workflow, 'complete', 'COMPLETE', {
-    dependsOn: ['record_outcome'],
-    outputRef: 'workflow.complete',
   });
 
   await writeWorkflowReport(workflow, recommendation, workflow.outcome);
@@ -980,6 +979,7 @@ export async function emitBoardProposal(recommendation) {
 
 export async function recordOutcome(recommendation, outcome = {}) {
   const outcomePath = path.join(REPO_ROOT, '.opencode', 'outcome-ledger.ndjson');
+  const completedAt = new Date().toISOString();
   const entry = {
     id: recommendation.task_promotion?.recommendation_id ?? recommendation.source_id ?? createHash('sha256').update(JSON.stringify(recommendation)).digest('hex').slice(0, 36),
     intent: recommendation.gemma4?.intent ?? recommendation.decision ?? 'planning',
@@ -996,16 +996,73 @@ export async function recordOutcome(recommendation, outcome = {}) {
     reward: typeof outcome.reward === 'number'
       ? outcome.reward
       : (recommendation.task_promotion?.gate_decision === 'PROMOTE' ? 1 : 0.5),
-    graphVersion: outcome.graphVersion ?? recommendation.task_promotion?.graph_version ?? '2026-07-28',
+    graphVersion: outcome.graphVersion ?? recommendation.task_promotion?.graph_version ?? null,
     workflowState: recommendation.workflow_state ?? recommendation.workflow_report?.workflow_state ?? null,
     workflowStatus: recommendation.workflow_status ?? recommendation.workflow_report?.workflow_status ?? null,
     errorMsg: outcome.errorMsg ?? null,
-    timestamp: new Date().toISOString(),
+    timestamp: completedAt,
   };
 
+  const receiptContent = {
+    schema: 'atlas.agent-work-receipt.v1',
+    receiptId: String(entry.id),
+    runId: String(recommendation.source_id ?? recommendation.task_promotion?.recommendation_id ?? entry.id),
+    taskId: null,
+    openspecChange: null,
+    openspecTaskIds: [],
+    agentId: 'agentic-recommendation-workflow',
+    modelId: recommendation.gemma4?.model ?? null,
+    modelRevision: null,
+    startedAt: recommendation.workflow_report?.generated_at ?? completedAt,
+    completedAt,
+    elapsedMs: null,
+    inputTokens: null,
+    outputTokens: null,
+    cachedTokens: null,
+    estimatedCostUsd: null,
+    workspaceRevision: recommendation.workspace_revision ?? null,
+    sourceRevision: recommendation.source_revision ?? null,
+    graphRevision: entry.graphVersion,
+    representationRevision: null,
+    toolRefs: [entry.tool],
+    registryRevision: null,
+    inputChecksum: null,
+    outputChecksum: null,
+    filesObserved: recommendation.target_files ?? [],
+    filesEdited: [],
+    commandsExecuted: [],
+    validationReceipts: recommendation.validation_commands ?? [],
+    status: 'SUCCEEDED',
+    writesPerformed: false,
+    completionChecksum: null,
+  };
+  const receiptUrl = (process.env.ATLAS_RECEIPT_API_URL ?? 'http://127.0.0.1:5173/api/agent-work-receipts').replace(/\/$/, '');
+  const receiptResponse = await fetch(receiptUrl, {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      ...(process.env.SERVICE_AUTH_TOKEN ? { 'x-internal-token': process.env.SERVICE_AUTH_TOKEN } : {}),
+    },
+    body: JSON.stringify(receiptContent),
+    signal: AbortSignal.timeout(15_000),
+  });
+  const receiptBody = await receiptResponse.json().catch(() => null);
+  if (!receiptResponse.ok || receiptBody?.acknowledged !== true) {
+    throw new Error(`AGENT_WORK_RECEIPT_NOT_ACKNOWLEDGED: ${receiptBody?.error ?? receiptResponse.status}`);
+  }
+
+  // The NDJSON file is only a diagnostic projection and is appended after the
+  // canonical Postgres acknowledgement succeeds.
+  const projectionEntry = {
+    ...entry,
+    receiptId: receiptBody.receiptId,
+    receiptChecksum: receiptBody.completionChecksum,
+    eventType: receiptBody.replayed ? 'RECEIPT_REPLAY' : 'RECEIPT_RECORDED',
+    canonicalMutation: false,
+  };
   await fs.mkdir(path.dirname(outcomePath), { recursive: true });
-  await fs.appendFile(outcomePath, `${JSON.stringify(entry)}\n`);
-  return entry;
+  await fs.appendFile(outcomePath, `${JSON.stringify(projectionEntry)}\n`);
+  return { ...projectionEntry, receipt_acknowledgement: receiptBody };
 }
 
 // ── CLI entrypoint ────────────────────────────────────────────────────────────
@@ -1026,11 +1083,25 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       if (args.includes('--record-outcome') || args.includes('--emit-board-proposal')) {
         rec.outcome_record = await recordOutcome(rec, {
           reward: rec.task_promotion?.gate_decision === 'PROMOTE' ? 1 : 0.5,
-          graphVersion: rec.task_promotion?.graph_version ?? '2026-07-28',
+          graphVersion: rec.task_promotion?.graph_version ?? null,
           sourceRefs: rec.evidence?.rg_matches ?? [],
         });
         if (rec.workflow_report) {
           rec.workflow_report.outcome = rec.outcome_record;
+          rec.workflow_report.workflow_status = 'COMPLETE';
+          rec.workflow_report.workflow_state = 'COMPLETE';
+          const recordStage = rec.workflow_report.dag?.find((stage) => stage.stage === 'record_outcome');
+          if (recordStage) recordStage.status = 'ok';
+          rec.workflow_report.dag?.push({
+            stage: 'complete',
+            state: 'COMPLETE',
+            status: 'ok',
+            dependsOn: ['record_outcome'],
+            evidenceRefs: [],
+            outputRef: 'workflow.complete',
+            updated_at: new Date().toISOString(),
+            notes: null,
+          });
           await writeWorkflowReport(rec.workflow_report, rec, rec.outcome_record);
         }
       }

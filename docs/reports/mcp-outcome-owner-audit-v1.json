@@ -1,0 +1,75 @@
+{
+  "schema": "atlas.mcp-outcome-owner-audit.v1",
+  "generatedAt": "2026-09-03",
+  "mode": "READ_ONLY_SOURCE_AUDIT",
+  "status": "MULTIPLE_OUTCOME_LANES_NEED_BOUNDARY",
+  "writers": [
+    {
+      "owner": "atlas-tools MCP record_outcome",
+      "path": "sveltekit-frontend/scripts/mcp/atlas-tools-mcp.mjs",
+      "writes": [".opencode/outcome-ledger.ndjson", "Neo4j Intent/Tool/Outcome relationships"],
+      "defaultGraphVersion": "2026-05-29",
+      "approval": "MCP policy now WRITE + approval required"
+    },
+    {
+      "owner": "agentic recommendation workflow recordOutcome",
+      "path": "scripts/atlas/agentic-recommendation-workflow.mjs",
+      "writes": [".opencode/outcome-ledger.ndjson"],
+      "defaultGraphVersion": "2026-07-28",
+      "invocation": "CLI --record-outcome or --emit-board-proposal"
+    },
+    {
+      "owner": "Agentic ToolGAN core append helper",
+      "path": "scripts/atlas/lib/agentic-toolgan-core.mjs",
+      "writes": [".opencode/outcome-ledger.ndjson"],
+      "invocation": "shared append helper used by ToolGAN logging"
+    },
+    {
+      "owner": "SvelteKit observability append helper",
+      "path": "sveltekit-frontend/src/lib/server/observability/outcome-ledger.ts",
+      "writes": [".opencode/outcome-ledger.ndjson"],
+      "callers": [
+        "features/ai/ai/gemma4-agent.ts",
+        "features/ai/agents/trace-subagent-orchestrator.ts",
+        "features/ai/ace/context-assembler.ts",
+        "admin/subagent-orchestrator.ts",
+        "atlas/contracts/classification-ledger-writer.ts"
+      ]
+    },
+    {
+      "owner": "SvelteKit telemetry recordOutcome",
+      "path": "sveltekit-frontend/src/lib/server/telemetry/tool-call-recorder.ts",
+      "writes": ["Postgres outcome_ledger"],
+      "status": "SEPARATE_DURABLE_DATABASE_LANE"
+    }
+  ],
+  "conflict": {
+    "sharedLedger": true,
+    "singleNdjsonOwnerProven": false,
+    "postgresOutcomeLedgerIsSeparate": true,
+    "workflowMarksRecordStageBeforeReceipt": true,
+    "syntheticOrStaleGraphVersionDefaults": true,
+    "agentWorkReceiptV1": "NOT_YET_IMPLEMENTED",
+    "existingReusableHelper": {
+      "path": "sveltekit-frontend/src/lib/server/observability/outcome-ledger.ts",
+      "status": "OBSERVABILITY_HELPER_ONLY",
+      "limitations": [
+        "accepts an untyped Record",
+        "adds its own timestamp",
+        "swallows append failures",
+        "does not enforce receipt identity or revision/checksum fields"
+      ]
+    }
+  },
+  "safeDisposition": "DO_NOT_DELETE_OR_MERGE_WRITERS_YET; keep record_outcome approval-gated and inventory all callers before migration",
+  "lifecycleRepair": {
+    "status": "WIRED_NOT_YET_LIVE_PROVEN",
+    "workflowBeforeReceipt": "AWAITING_OUTCOME_RECEIPT",
+    "workflowAfterReceipt": "COMPLETE",
+    "recordStageBeforeReceipt": "pending",
+    "recordStageAfterReceipt": "ok"
+  },
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "nextGate": "MCP-OUTCOME-RECEIPT-OWNER-01"
+}

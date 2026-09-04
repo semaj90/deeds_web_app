@@ -1,21 +1,65 @@
 {
   "schema": "atlas.typescript-lsp-readonly-proof.v1",
+  "generatedAt": "2026-09-03T22:12:25.174Z",
   "status": "PROVEN_READ_ONLY",
   "writes": false,
+  "coordinateAlignment": {
+    "jsonRpcContentEncoding": "utf-8",
+    "lspPositionEncoding": "utf-16",
+    "atlasCoordinateSpace": "UTF8_BYTES",
+    "conversionValidation": "LSP_POSITION_CODEC_FIXTURE_PROVEN",
+    "sourceRef": "src/lib/server/atlas/indexing/node-tree-sitter-ast-provider.ts",
+    "sourceRevision": "sha256:8993f48be46ff8b6ad93c984ee6e689982cae82e6c093d159cfa51cdc4ad9198",
+    "sourceContentChecksum": "sha256:8993f48be46ff8b6ad93c984ee6e689982cae82e6c093d159cfa51cdc4ad9198",
+    "targetByteAlignment": {
+      "target_source_ref": "src/lib/server/atlas/indexing/node-tree-sitter-ast-provider.ts",
+      "target_source_revision": "sha256:8993f48be46ff8b6ad93c984ee6e689982cae82e6c093d159cfa51cdc4ad9198",
+      "position_encoding": "utf-16",
+      "target_range": {
+        "start": {
+          "line": 363,
+          "character": 16
+        },
+        "end": {
+          "line": 363,
+          "character": 47
+        }
+      },
+      "target_byte_range": {
+        "byte_start": 13948,
+        "byte_end": 13979
+      },
+      "target_selection_range": null,
+      "target_selection_byte_range": null,
+      "canonical_authority": false,
+      "target_content_checksum": "sha256:8993f48be46ff8b6ad93c984ee6e689982cae82e6c093d159cfa51cdc4ad9198",
+      "target_is_same_file_as_source": true
+    },
+    "targetByteAlignmentError": null,
+    "workspaceRevisionAuthority": {
+      "authority": "PROVEN",
+      "value": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
+      "reason": "observation_fresh_dirty_worktree (uncommitted changes present at observation time)",
+      "ageMs": 5859774,
+      "evidenceRefs": [
+        "docs\\reports\\workspace-source-binding-observation.json"
+      ]
+    }
+  },
   "probeSymbol": "createNodeTreeSitterAstProvider",
   "resolution": {
     "schema": "atlas.compiler-semantic-resolution.v1",
     "requestId": "prove-typescript-lsp-readonly",
-    "workspaceRevision": null,
+    "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
     "sourceRef": "src/lib/server/atlas/indexing/node-tree-sitter-ast-provider.ts",
-    "sourceRevision": "sha256:88298e4ad456199331330f8c8f9ca5cb44bdef1a4e7c9433362eeaf443118495",
+    "sourceRevision": "sha256:8993f48be46ff8b6ad93c984ee6e689982cae82e6c093d159cfa51cdc4ad9198",
     "edgeType": null,
     "sourceEvidenceRef": null,
     "language": "typescript",
     "canonicalAuthority": false,
     "writesPerformed": false,
     "sourcePosition": {
-      "byteOffset": 13846,
+      "byteOffset": 13948,
       "line": 363,
       "character": 16
     },

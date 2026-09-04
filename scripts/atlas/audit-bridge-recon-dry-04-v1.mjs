@@ -14,7 +14,8 @@ import pg from 'pg';
 import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
 
 const root = process.cwd();
-const reportPath = path.resolve(root, 'docs/reports/bridge-recon-dry-04-v1.json');
+const artifactArg = process.argv.find((arg) => arg.startsWith('--artifact-path='));
+const reportPath = path.resolve(root, artifactArg?.split('=').slice(1).join('=') || 'docs/reports/bridge-recon-dry-04-v1.json');
 const collection = process.env.ATLAS_QDRANT_LINEAGE_COLLECTION ?? 'codebase_chunks_768_v2';
 const vectorName = process.env.ATLAS_QDRANT_LINEAGE_VECTOR ?? 'content';
 const qdrantUrl = (process.env.QDRANT_URL ?? 'http://127.0.0.1:6333').replace(/^0\.0\.0\.0/, '127.0.0.1');
@@ -107,6 +108,7 @@ for (const row of rows) {
           proposedPayloadChecksum: payloadChecksum(proposedPayload),
           vectorFingerprint: currentVector,
           payloadPatch: expectedPatch,
+          preimagePayload: currentPayload,
           evidenceRefs: ['atlas_packet_chunk_lineage', 'QDRANT-D-IDENTITY-01'],
         });
       }
@@ -128,7 +130,25 @@ for (const row of rows) {
 
 const targetPointSetChecksum = sha256(JSON.stringify(patches.map((p) => p.physicalPointId).sort()));
 const proposedPatchSetChecksum = sha256(JSON.stringify(patches.slice().sort((a, b) => a.physicalPointId.localeCompare(b.physicalPointId))));
+const preimageEntries = patches.map((p) => ({
+  physicalPointId: p.physicalPointId,
+  currentPayloadChecksum: p.currentPayloadChecksum,
+  vectorFingerprint: p.vectorFingerprint,
+})).sort((a, b) => a.physicalPointId.localeCompare(b.physicalPointId));
+const rollbackEntries = patches.map((p) => ({
+  physicalPointId: p.physicalPointId,
+  restorePayload: p.preimagePayload,
+})).sort((a, b) => a.physicalPointId.localeCompare(b.physicalPointId));
+const preimageChecksum = sha256(JSON.stringify(preimageEntries));
+const rollbackChecksum = sha256(JSON.stringify(rollbackEntries));
 const blockingCount = counts.PREIMAGE_DRIFT + counts.IDENTITY_CONFLICT + counts.REVISION_MISMATCH + counts.FOREIGN_CHUNK + duplicateMemberships;
+const verdict = blockingCount > 0
+  ? 'STOP_NO_APPLY'
+  : patches.length > 0
+    ? 'READY_FOR_AUTHORIZED_APPLY'
+    : counts.QDRANT_POINT_MISSING > 0
+      ? 'NO_PATCHES_MISSING_POINTS_REMAIN'
+      : 'NO_PATCHES_REQUIRED';
 const report = {
   schema: 'atlas.bridge-recon-dry-04.v1',
   task: 'BRIDGE-RECON-DRY-04',
@@ -143,10 +163,24 @@ const report = {
   counts,
   targetPointSetChecksum,
   proposedPatchSetChecksum,
+  proposalArtifact: {
+    proposalChecksum: proposedPatchSetChecksum,
+    targetPointSetChecksum,
+    patchCount: patches.length,
+  },
+  preimageArtifact: {
+    entryCount: preimageEntries.length,
+    checksum: preimageChecksum,
+  },
+  rollbackArtifact: {
+    entryCount: rollbackEntries.length,
+    checksum: rollbackChecksum,
+    supported: true,
+  },
   proposedPatchCount: patches.length,
   missingPhysicalPointCount: counts.QDRANT_POINT_MISSING,
   blockingCount,
-  verdict: blockingCount === 0 ? 'READY_FOR_FULL_RECONCILIATION_APPLY' : 'STOP_NO_APPLY',
+  verdict,
   writesPerformed: false,
   canonicalAuthority: false,
   writes: { postgres: false, qdrant: false, neo4j: false, valkey: false },

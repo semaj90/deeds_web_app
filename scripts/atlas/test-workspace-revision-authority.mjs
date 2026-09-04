@@ -75,13 +75,19 @@ function withFixture(record, fn) {
   console.log('PASS: incomplete record -> UNPROVEN');
 }
 
-// 6. Against the REAL repo artifact (read-only, no mutation) — confirms the
-// resolver correctly identifies it as stale right now (generatedAt 2026-08-23,
-// well past the default 24h threshold), proving the honesty behavior end to end.
+// 6. Against the REAL repo artifact (read-only, no mutation) — validate the
+// current honest state without hard-coding a historical freshness expectation.
 {
   const result = resolveWorkspaceRevisionCoordinate({ repoRoot: path.resolve(import.meta.dirname, '../..') });
   console.log(`REAL ARTIFACT: authority=${result.coordinate.authority} reason=${result.reason}`);
-  assert.equal(result.coordinate.authority, 'UNPROVEN', 'expected the real artifact to currently be stale');
+  assert.ok(['PROVEN', 'UNPROVEN'].includes(result.coordinate.authority));
+  if (result.coordinate.authority === 'PROVEN') {
+    assert.match(result.reason, /observation_fresh_(clean|dirty)_worktree/);
+    assert.ok(result.coordinate.value);
+    assert.equal(result.coordinate.evidence_refs.length, 1);
+  } else {
+    assert.equal(result.coordinate.value, null);
+  }
 }
 
 console.log('All workspace-revision-authority tests passed.');

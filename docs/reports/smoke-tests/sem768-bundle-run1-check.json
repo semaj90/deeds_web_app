@@ -1,0 +1,39 @@
+{
+  "schema": "atlas.semantic-corpus-bundle-01.report.v1",
+  "generatedAt": "2026-09-02T23:22:55.475Z",
+  "mode": "READ_ONLY",
+  "writesPerformed": false,
+  "producerEvidence": {
+    "sourceFile": "scripts/atlas/reembed-corpus-document-prefix-v1.mjs",
+    "applyReceiptPath": "docs/reports/atlas-corpus-reembed-document-prefix-v1-apply.json",
+    "applyReceiptUpdatedCount": 52324,
+    "applyReceiptGeneratedAt": "2026-08-25T18:45:45.079Z",
+    "liveEligibleCount": 52364,
+    "countDeltaNote": "Receipt says 52324 updated; live query finds 52364 rows still carrying this tag today -- difference is real drift (later re-writes, deletions, or other passes touching these rows since 2026-08-25), not an error in this script."
+  },
+  "sourceAuthorityEvidence": {
+    "workspaceHasEvidence": true,
+    "sourceHasEvidence": true,
+    "workspaceOwnerProven": false,
+    "sourceByteMatchCount": 111,
+    "note": "Real partial evidence exists (workspace value present but revisionOwnerProven=false; source audit shows real per-source byte matches but no corpus-wide source-set revision) -- neither reaches admission. Not forced to UNPROVEN (there is real evidence) or PROVEN (nothing is admitted)."
+  },
+  "bundle": {
+    "schemaVersion": "semantic-corpus-bundle.v1",
+    "workspaceId": "deeds-web-app",
+    "repositoryId": "semaj90/deeds_web_app",
+    "representationId": "semantic_768",
+    "representationRevision": "semantic_768:embeddinggemma:latest:eg-task-prefix-v1:sha256:ca2f3477d7e24a3809b9f587a15752d2cf2eea5d234f16cf127d522d2792ce5c",
+    "eligibilityPolicyRevision": "sem768-dominant-cohort-v1:sha256:77d7fc50b670136609ba1e7549fbeca1f17244bdce692edb421a3086254dd7e7",
+    "eligibleCount": 52364,
+    "populationChecksum": "sha256:7929327fdfd3f829509dc43b5c1236de8b754efe9aa2492edcdabe90efecf61e",
+    "modelRevision": "model:embeddinggemma:latest",
+    "producerRevision": "producer:sha256:96b9564d4a1c4a370b391f0e8929a854ee5970148d6785554c273037fb98b713",
+    "sourceAuthorityStatus": "PARTIAL",
+    "checksum": "sha256:c557712e6d92519b3241dc8806b3af639bb2585be56893b265a32ffb0d1394bf",
+    "canonicalAuthority": false,
+    "authorityScope": "REPRESENTATION_INPUT"
+  },
+  "status": "ADMITTED_REPRESENTATION_INPUT_ONLY",
+  "note": "This bundle authorizes Phase 16 representation production for the exact dominant-cohort semantic_768 population. It does NOT prove canonical source lineage -- sourceAuthorityStatus=PARTIAL records that honestly. LINEAGE-01 remains the separate, still-open authority for the canonical source/world binding."
+}

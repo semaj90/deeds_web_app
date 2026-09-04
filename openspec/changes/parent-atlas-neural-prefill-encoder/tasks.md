@@ -5,14 +5,13 @@
 - [x] Preserved `semantic_768` as the canonical 768-dimensional retrieval
   representation; the exact 15-candidate retrieval and ContextManifestV1
   replay are proven in current workstation receipts.
-- [x] Removed the implied nested dependency between `latent_128` and
-  `latent_64`. The current learned encoder is `768 -> 256 -> 64`.
-  **Corrected 2026-08-29 — this entry was wrong; see the correction directly
-  below.**
+- [x] Removed the implied independent-branch interpretation. The current
+  learned encoder is `semantic_768 -> latent_256 -> latent_128 -> latent_64`.
+  The earlier `768 -> 256 -> 64` wording is historical and superseded below.
 - [x] Classified `rff_128` as an independent deterministic projection
-  challenger, `ae_latent_128` as reserved/future, and `ae_latent_64` as the
-  current learned branch. **Corrected 2026-08-29 — `ae_latent_128` is no
-  longer reserved/future; see the correction directly below.**
+  challenger. The nested learned family owns `latent_256`, with derived
+  `latent_128` and `latent_64`; the earlier reserved/future wording is
+  historical and superseded below.
 
 ### Correction (2026-08-29): the encoder is genuinely nested, not two independent branches
 
@@ -20,17 +19,18 @@ The two `[x]` entries directly above were wrong and are superseded here rather t
 this repo's archive-not-delete convention. Live code, read this session, contradicts both claims:
 
 `python/atlas_compute/latent_autoencoder.py:53` defines a single `NestedSemanticAutoencoder`, not
-two independent `768 -> 256 -> 64` and `768 -> 128` branches. Its actual shape:
-- One physical encoder produces `latent_128` (768 → 128).
-- `latent_64` is **not** a second learned branch — it is
-  `normalize(latent_128[:, :64])` (`decode64()` at line 88): an L2-renormalized 64-element prefix
-  of the same `latent_128` tensor, matching a Matryoshka-style nested-dimension design.
-- There is one training run, one checkpoint, one set of weights. `latent_128` and `latent_64` are
-  two evaluation/decode views of that one model, not independent representations with independent
-  lifecycles.
+two independent branches. The earlier two-tier notes below are retained as historical context;
+the active shape is corrected later in this file:
+- One physical encoder produces `latent_256` (768 → 256).
+- `latent_128` is `normalize(latent_256[:, :128])` and `latent_64` is
+  `normalize(latent_128[:, :64])`: deterministic L2-renormalized prefixes
+  of the same learned parent, matching a nested-dimension design.
+- There is one training run, one checkpoint, one set of weights. `latent_256`,
+  `latent_128`, and `latent_64` are one physical learned parent plus two
+  derived views, not independent representations with independent lifecycles.
 
-This makes `ae_latent_128` **not** "reserved/future" — it is the model's primary learned output;
-`latent_64` is derived from it, not parallel to it. A real checkpoint now exists
+This historical two-tier interpretation made `ae_latent_128` **not** "reserved/future" and treated
+it as the primary learned output. It is superseded by the three-tier correction below. A real checkpoint now exists
 (`python/checkpoints/nested_semantic_autoencoder_v1.pt`, trained 2026-08-29 on 55,169 rows/50
 epochs) — see the `latent_64` lane sections further below in this file for the training history.
 That checkpoint's training run predates a later correction (source-grouped split, immutable
@@ -2668,8 +2668,8 @@ the current Graphify `source_ref`/upstream-node keys do not match `atlas_ast_nod
   `TTL taxonomy:clusters:gpu:7` (21587s, matching the 6h `TTL.CENTROID`).
 - [ ] NE-29 Add Qdrant latent projection with canonical identity and revision
   payloads; do not overwrite `semantic_768` points.
-- [ ] NE-29A Add Valkey warm `latent_128` and hot `latent_64` namespaces with
-  model/source/projection revisions and rebuild-only semantics.
+- [ ] NE-29A Add Valkey warm `latent_256` and hot derived `latent_128`/`latent_64`
+  namespaces with parent model/source/projection revisions and rebuild-only semantics.
 - [ ] NE-30 Add ACE synthesis gate requiring canonicalized top-K evidence,
   confidence, source references, and model/projection revisions.
 

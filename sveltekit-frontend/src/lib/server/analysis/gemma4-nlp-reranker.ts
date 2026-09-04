@@ -16,10 +16,7 @@
  */
 
 import { traceLLM } from '$lib/server/observability/langfuse.js';
-import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
-
-const GEMMA4_URL = process.env.GEMMA4_URL || 'http://127.0.0.1:8090';
-const MODEL = LLM_MODEL_ID;
+import { resolveLlamaInferenceTarget } from '$lib/server/llm/runtime-contract.js';
 
 export interface PatternRanking {
 	type: string;
@@ -71,16 +68,17 @@ Return a JSON object: {"rankings": [{"type": "...", "confidence": 0.9, "legalRel
 Each ranking entry must have type, confidence, legalRelevance, and contextSummary.`;
 
 	try {
-		return await traceLLM('pattern-rerank-gemma4', { model: MODEL, patternCount: patterns.length }, async (gen) => {
+		return await traceLLM('pattern-rerank-llama-server', { modelSource: 'llama-server-8090', patternCount: patterns.length }, async (gen) => {
+				const target = await resolveLlamaInferenceTarget();
 			const controller = new AbortController();
 			const timeoutId = setTimeout(() => controller.abort(), 60_000);
 
 			try {
-				const res = await fetch(`${GEMMA4_URL}/v1/chat/completions`, {
+				const res = await fetch(`${target.baseUrl}/v1/chat/completions`, {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify({
-						model: MODEL,
+						model: target.model,
 						messages: [
 							{ role: 'system', content: systemPrompt },
 							{ role: 'user', content: userPrompt },

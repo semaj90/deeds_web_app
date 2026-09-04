@@ -1,0 +1,44 @@
+{
+  "schema": "atlas.som-ae-knn-kmeans-alignment.v1",
+  "status": "OPEN_ALIGNMENT_GAPS",
+  "authority": {
+    "candidateOrdinalMap": "sveltekit-frontend/src/lib/server/atlas/features/canonical-candidate-v1.ts",
+    "exactKnn": "python/atlas_compute/cuvs_analytics.py:run_cuvs_exact_knn",
+    "kmeans": "python/atlas_compute/cluster_softmax.py:run_cuvs_soft_kmeans",
+    "som": "python/atlas_compute/som.py:train_deterministic_som",
+    "coordinator": "python/atlas_compute/aligned_snapshot_experiment_v2.py"
+  },
+  "order": [
+    "CANDIDATE_ORDINAL_MAP_FREEZE",
+    "KNN_PARAMETER_FREEZE",
+    "KNN_POPULATION_PROOF",
+    "KMEANS_CENTROID_MEMBERSHIP_PROOF",
+    "SOM_20X20_REPLAY",
+    "AE_FANOUT"
+  ],
+  "currentFindings": {
+    "candidateOrdinalSchemaPresent": true,
+    "existingCandidateOrdinalCorpusReport": "docs/reports/candidate-ordinal-corpus-receipt-v1.json",
+    "existingCandidateOrdinalCorpusRows": 4951,
+    "existingCandidateOrdinalCorpusChecksum": "9669b018f17de4e85315ab882fa6c6088c94b96aa6feea434174b97a9c41a3a3",
+    "existingCandidateOrdinalCorpusIsNewArtifactRequired": false,
+    "existingCandidateOrdinalCorpusHasExplicitAdmissionStatus": false,
+    "candidateOrdinalProductionPopulationProven": false,
+    "exactKnnExecutorPresent": true,
+    "knnReceiptHasTopKMetricChecksums": true,
+    "knnBoundToAdmittedPopulation": false,
+    "kmeansExecutorPresent": true,
+    "kmeansCentroidMembershipProven": false,
+    "somExecutorPresent": true,
+    "som20x20ExplicitlyRequired": true,
+    "coordinatorImplicitClusterOrGridDefaults": true,
+    "aeFanoutAllowed": false
+  },
+  "networkxJson": {
+    "role": "DETERMINISTIC_INTERCHANGE_CPU_ORACLE",
+    "phase16ArtifactIdentity": false,
+    "gpuHotPath": false
+  },
+  "writesPerformed": false,
+  "canonicalAuthority": false
+}

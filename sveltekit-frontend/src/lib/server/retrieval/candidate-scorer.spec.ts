@@ -101,3 +101,55 @@ describe('scoreCandidates — regression smoke test', () => {
     expect(scored.blendedScore).toBeGreaterThan(0);
   });
 });
+
+describe('RERANK-WEIGHT-BOUNDARY-01: scoreCandidates blendWeights validation', () => {
+  it('rejects a caller-supplied blendWeights that does not sum to 1.0', async () => {
+    const candidate = baseCandidate({ packetKey: 'x', denseScore: 0.7 });
+    await expect(
+      scoreCandidates('query', [candidate], {
+        blendWeights: {
+          dense: 0.5,
+          bm25: 0.5,
+          ast: 0.5, // sum is now 1.5, not 1.0
+          graph: 0,
+          pagerank: 0,
+          domain: 0,
+          crossEncoder: 0,
+        },
+      }),
+    ).rejects.toThrow();
+  });
+
+  it('rejects a caller-supplied blendWeights with an out-of-range weight', async () => {
+    const candidate = baseCandidate({ packetKey: 'x', denseScore: 0.7 });
+    await expect(
+      scoreCandidates('query', [candidate], {
+        blendWeights: {
+          dense: 1.5, // out of [0,1]
+          bm25: -0.5,
+          ast: 0,
+          graph: 0,
+          pagerank: 0,
+          domain: 0,
+          crossEncoder: 0,
+        },
+      }),
+    ).rejects.toThrow();
+  });
+
+  it('accepts a valid caller-supplied blendWeights that sums to 1.0', async () => {
+    const candidate = baseCandidate({ packetKey: 'x', denseScore: 0.7 });
+    const [scored] = await scoreCandidates('query', [candidate], {
+      blendWeights: {
+        dense: 1,
+        bm25: 0,
+        ast: 0,
+        graph: 0,
+        pagerank: 0,
+        domain: 0,
+        crossEncoder: 0,
+      },
+    });
+    expect(scored.blendedScore).toBeCloseTo(0.7, 5);
+  });
+});

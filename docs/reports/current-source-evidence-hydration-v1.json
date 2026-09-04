@@ -1,0 +1,77 @@
+{
+  "schema": "atlas.current-source-evidence-hydration.v1",
+  "mode": "READ_ONLY_SOURCE_EVIDENCE_OWNER_AUDIT",
+  "inputRows": 52,
+  "exactRevisionMatches": 52,
+  "contentHydrated": 9,
+  "authoritativeNamespaces": 0,
+  "namespaceStatus": "MISSING",
+  "evidenceSpanReady": 0,
+  "revisionBoundSpanOwner": 0,
+  "astCandidateRows": 0,
+  "astRevisionQualifiedRows": 0,
+  "classifierReady": 0,
+  "ownerCandidates": {
+    "atlas_ast_nodes": {
+      "present": true,
+      "hasSourceRevision": true,
+      "hasContent": false,
+      "hasContentHash": false,
+      "hasEvidenceSpan": true,
+      "hasSourceNamespace": false
+    },
+    "atlas_packets": {
+      "present": true,
+      "hasSourceRevision": false,
+      "hasContent": false,
+      "hasContentHash": true,
+      "hasEvidenceSpan": true,
+      "hasSourceNamespace": false
+    },
+    "atlas_source_refs": {
+      "present": true,
+      "hasSourceRevision": false,
+      "hasContent": false,
+      "hasContentHash": true,
+      "hasEvidenceSpan": true,
+      "hasSourceNamespace": false
+    },
+    "atlas_workspace_source_bindings": {
+      "present": true,
+      "hasSourceRevision": true,
+      "hasContent": false,
+      "hasContentHash": true,
+      "hasEvidenceSpan": false,
+      "hasSourceNamespace": false
+    },
+    "codebase_chunk_index": {
+      "present": true,
+      "hasSourceRevision": false,
+      "hasContent": true,
+      "hasContentHash": true,
+      "hasEvidenceSpan": false,
+      "hasSourceNamespace": false
+    },
+    "graphify_files": {
+      "present": true,
+      "hasSourceRevision": true,
+      "hasContent": false,
+      "hasContentHash": true,
+      "hasEvidenceSpan": false,
+      "hasSourceNamespace": false
+    }
+  },
+  "missingByReason": {
+    "CANONICAL_CHUNK_OWNER_MISSING": 43,
+    "CHUNK_OWNER_HAS_CONTENT_BUT_NO_SOURCE_REVISION": 9
+  },
+  "writes": 0,
+  "postgresWrites": false,
+  "qdrantWrites": false,
+  "neo4jWrites": false,
+  "valkeyWrites": false,
+  "canonicalAuthority": false,
+  "status": "SOURCE_EVIDENCE_HYDRATION_BLOCKED",
+  "nextGate": "RESOLVE_REVISION_BOUND_CONTENT_AND_SOURCE_NAMESPACE_AUTHORITY",
+  "reportChecksum": "7cb589d8494b6b5cc739e5365eb69b14d90c3fa32e621538f6ea7eaa6440d13f"
+}

@@ -15,7 +15,14 @@ from typing import Any
 import pyarrow as pa
 import pyarrow.ipc as ipc
 import pyarrow.parquet as pq
-import torch
+try:
+    import torch
+except ImportError:  # Graph-only images do not need the optional tensor lane.
+    torch = None  # type: ignore[assignment]
+try:
+    import cupy
+except ImportError:  # pragma: no cover - depends on the RAPIDS image
+    cupy = None  # type: ignore[assignment]
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
@@ -53,6 +60,10 @@ GRAPH_RESIDENT: dict[str, Any] = {}
 GRAPH_RUNTIME = install_graph_routes(app)
 
 
+def cuda_available() -> bool:
+    return bool(cupy is not None and cupy.cuda.runtime.getDeviceCount() > 0)
+
+
 def resolve_artifact(relative_path: str) -> Path:
     candidate = (ARTIFACT_ROOT / relative_path).resolve()
     if candidate != ARTIFACT_ROOT and ARTIFACT_ROOT not in candidate.parents:
@@ -86,7 +97,7 @@ def load_table(path: Path) -> tuple[Any, str]:
 
 
 def vectors_on_cuda(table: Any) -> torch.Tensor:
-    if not torch.cuda.is_available():
+    if torch is None or not torch.cuda.is_available():
         raise HTTPException(status_code=503, detail="CUDA_DEVICE_UNAVAILABLE")
     blobs = table.column("vector_f32").to_pylist()
     if not blobs:
@@ -101,12 +112,14 @@ def vectors_on_cuda(table: Any) -> torch.Tensor:
 
 @app.get("/health")
 def health() -> dict[str, Any]:
+    has_cuda = cuda_available()
     return {
         "ok": True,
         "service": "atlas-gpu-8098",
         "executionOnly": True,
-        "cudaAvailable": bool(torch.cuda.is_available()),
-        "device": torch.cuda.get_device_name(0) if torch.cuda.is_available() else None,
+        "cudaAvailable": has_cuda,
+        "device": cupy.cuda.runtime.getDeviceProperties(0).get("name", b"").decode(errors="replace") if has_cuda else None,
+        "torchAvailable": torch is not None,
         "writes": {"postgres": False, "qdrant": False, "valkey": False},
     }
 

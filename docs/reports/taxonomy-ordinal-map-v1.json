@@ -1,0 +1,24 @@
+{
+  "schema": "atlas.taxonomy-ordinal-map-v1.proof",
+  "generatedAt": "2026-09-02T18:22:01.103Z",
+  "liveRowCount": 5527,
+  "mapRowCount": 5527,
+  "rowCountMatches": true,
+  "deterministic": true,
+  "taxonomyOrdinalMapChecksum": "8119b00a2f2693c5b7969a616b102644eb316467060d7349b3912de214703196",
+  "denseOrdinalRange": [
+    0,
+    5526
+  ],
+  "rowsByLevel": {
+    "0": 1,
+    "1": 8,
+    "2": 43,
+    "3": 475,
+    "4": 5000
+  },
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "gpuExecutionPerformed": false,
+  "note": "Contract-only proof. No live radix-sort/BitFrost execution — blocked on ACE-RADIX-01 full PASS per root CLAUDE.md governance."
+}

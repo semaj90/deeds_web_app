@@ -137,7 +137,7 @@ export interface NlpAnalyzeRequest {
   language?: string;
   modelId?: string;
   maxChars?: number;
-  passes?: Array<'structural' | 'lexical' | 'linguistic' | 'semantic' | 'sequence' | 'rerank' | 'grounded'>;
+  passes?: Array<'structural' | 'lexical' | 'linguistic' | 'semantic' | 'sequence' | 'rerank' | 'grounded' | 'classify'>;
   groundedExtractionRequired?: boolean;
 }
 

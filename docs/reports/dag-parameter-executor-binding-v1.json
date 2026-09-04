@@ -1,0 +1,11 @@
+{
+  "schema": "atlas.dag-parameter-executor-binding.v1",
+  "mode": "READ_ONLY_PROOF",
+  "artifactRefResolved": true,
+  "parameterChecksumVerified": true,
+  "tamperRejected": true,
+  "executorMutationAuthority": false,
+  "writesPerformed": false,
+  "status": "PROVEN_BOUNDED",
+  "runtimePersistence": "OPEN"
+}

@@ -1,6 +1,6 @@
 # Parent Atlas workstation status and deferred integration queue
 
-Updated: 2026-08-28
+Updated: 2026-09-03
 
 ## Historical checkpoint and deferred-lanes appendix (2026-08-20)
 
@@ -44,26 +44,33 @@ EmbeddingGemma `classification_mrl_128` vector. Evidence is recorded in
 This section is retained as a historical checkpoint. Its percentages and
 August 20 claims are not the current promotion status.
 
-## Current proof-gated status (2026-08-27)
+## Current proof-gated status (2026-09-03)
 
 | Lane | Current state | Next gate |
 | --- | --- | --- |
 | Replay admission | `PROVEN` — 10,135/10,135 | Preserve scope/checksum |
-| Frozen DAG | `PROVEN / FROZEN` — checksum `2a74d304...` | No more topology work |
-| Graphify source-byte integrity | `PROVEN` — 640 observed rows | Expand exact current-source coverage |
-| Packet/chunk integrity | `PROVEN_PARTIAL` — 332 exact, 4,148 ambiguous | Quarantine ambiguous cases |
-| Source lineage coverage | `BLOCKED` — 61,126 packet refs lack exact Graphify joins | Classify/materialize eligible current sources |
-| CandidateOrdinal | Contract exists; promotion blocked | Freeze qualified cohort |
-| CandidateFeatureMatrix | Not promotion-grade | Build from qualified cohort |
+| Frozen DAG | `PROVEN / FROZEN` — reference checksum retained | Frozen artifact is not the end of topology work; representation admission is separate |
+| Graphify source-byte integrity | `PROVEN_BOUND_OWNER / LIFECYCLE_SPLIT` | Additive execution ledger, coordinator, and A/B/C canary |
+| Packet/chunk integrity | `PROVEN_PARTIAL` — 15-row canary exact; broader rows remain ambiguous/revision-unproven | Keep unresolved rows excluded; no synthetic lineage |
+| Source lineage coverage | `STAGING_ALLOWED / CANONICAL_ADMISSION_BLOCKED` — incomplete enrichment may be stored with honest nulls; fresh packet preflight has 0 qualified promotion candidates | Store observations, run bounded NLP passes, then resolve source-selection/namespace/revision authority before canonical apply |
+| Staged observation ranking | `ALLOWED / NON-CANONICAL` | Rank only within a checksum- and producer-qualified scope; mark older records `SUPERSEDED` only with an exact replacement receipt |
+| NLP observation receipts | `EXISTING OWNER` — `analysis_pass_results`; legacy importer remains staged | Reuse append-only analysis receipts; update the Gemma4 importer before current Ornith outputs can be ranked or supersede anything |
+| Incomplete NLP metadata | `STAGEABLE` — `source_ref`, `source_revision`, and `workspace_revision` may remain `null`; `packet_key` remains required | Run NLP receipts first; defer canonical integration events until source identity is proven |
+| Analysis-pass staging contract | `PROVEN_FIXTURE` — 4/4 focused identity tests | Run a bounded NLP batch only after selecting an explicit staged input scope |
+| CandidateOrdinal | `PROVEN_CANARY` — 15 rows | Expand exact identity cohort to 128, then 768 |
+| CandidateFeatureMatrix | `PROVEN_CANARY` — 15 rows / 25 features; graph A/B replay | Scale only with the same ordinal checksum; global promotion remains blocked |
+| Representation DAG | `OPEN` — `semantic_768 → latent_256 → latent_128 → latent_64` | Bind parent representation revision and derived-view checksums |
+| Hot / warm / cold residency | `DESIGN_ALIGNED / READBACK_OPEN` | Prove representation-ledger readback before default promotion |
+| DAG parameter materialization | `OPEN` — generic bound arguments remain | Per-operator `ParameterArtifactV1` and checksum proof |
 | Ranking | Diagnostic only | Held-out Recall/MRR/NDCG |
 | Valkey prefill | Infrastructure exists | Deterministic MISS → HIT proof |
 | Live repair DAG | Not promotion-proven | One bounded real execution |
-| Neural DAG | Not trained | Dataset → challenger → held-out evaluation |
+| Neural DAG | `CHALLENGER_NOT_PROMOTED` | Validated inputs → parity → held-out evaluation |
 | Package promotion | Deferred correctly | Complete `scripts/atlas` proof gates first |
 
-## Active checkpoint (2026-08-28)
+## Historical canary checkpoint (2026-08-28; superseded by the 2026-09-03 table above)
 
-The 15-row Workstation V1 canary is now proven end-to-end. This closes the
+The 15-row Workstation V1 canary was proven end-to-end at that checkpoint. This closes the
 canary only; it does not close the full Parent Atlas phases or promote the
 global corpus.
 
@@ -89,6 +96,34 @@ global corpus.
 
 ### Updated active TODO
 
+- [ ] **GRAPHIFY-EXECUTION-LEDGER-SCHEMA-02** — validate the canonical additive
+  `graphify_executions` / `graphify_execution_files` / `graphify_execution_stages` draft in an
+  isolated database. Keep `workspaceRevision` as exact source-manifest identity and use a fresh
+  `executionId` for every attempt. Do not apply to the live database yet.
+- [ ] **GRAPHIFY-DAILY-COORDINATOR-01** — after schema proof, add the dedicated session-lock
+  coordinator, fresh source selection, immutable execution membership, heartbeat, terminal status,
+  and independent readback. Do not route through `graphify_runs` as attempt identity.
+- [ ] **GRAPHIFY-DAILY-CANARY-02** — prove A/B identical-byte executions share the workspace
+  revision but have distinct execution IDs, then C changes one source and produces a new revision.
+- [ ] **SOURCE-EVIDENCE-AUTHORITY-01** — resolve the 52 exact Graphify source-revision matches:
+  only 9 are content-hydrated, 0 have authoritative namespaces, and 0 are evidence-span/classifier
+  ready. Reuse existing owners; do not create a second chunk store or promote content without
+  explicit source-revision and namespace binding. Evidence:
+  `docs/reports/current-source-evidence-hydration-v1.json`.
+- [ ] **SOURCE-REGISTRY-OWNER-JOIN-01** — reconcile the existing 22,604-row
+  `atlas_source_refs` registry with the 111 workspace bindings; the current source plan selects
+  0 rows and proves 0 exact registry/binding key matches. Add no registry or copy revisions until
+  the owner join and namespace authority are explicit. Evidence:
+  `docs/reports/current-source-registry-contract-v1.json`.
+- [ ] **SOURCE-LINEAGE-OWNER-READBACK-01** — reuse `public.graphify_files` as the existing
+  schema-level owner for `source_ref`, `source_revision`, `content_hash`, and `workspace_revision`
+  (25,317 rows present), then prove the active selection and namespace join. Schema presence alone
+  does not authorize packet materialization. Evidence:
+  `docs/reports/live-source-lineage-table-audit.json`.
+- [ ] **CURRENT-GRAPHIFY-BATCH-PLAN-REVIEW-01** — the existing planner selects 52 bound sources,
+  but exact readback is 0/52 and all 52 are revision/content mismatches. Its status now correctly
+  remains `CURRENT_GRAPHIFY_BATCH_PLAN_BLOCKED_REVIEW`; no apply path was invoked. Evidence:
+  `docs/reports/current-source-graphify-batch-plan-v1.json`.
 - [x] Prove exact packet → chunk bridge for the current 15-row canary.
 - [x] Produce a real 15-row `CandidateOrdinalMapV1` through the canonical owner.
 - [x] Prove semantic_768 exact retrieval and deterministic ContextManifest replay.
@@ -123,6 +158,24 @@ global corpus.
 - [x] Add typed `RepresentationArtifactV1` admission schema and focused tests;
   the latent backfill still needs adaptation to emit and read back this
   contract before topology promotion.
+- [x] Align the nested latent family: `latent_256` is the physical learned
+  representation and existing indexed storage owner; `latent_128` and
+  `latent_64` are derived views, not separate learned/table authorities.
+  Registry admission draft:
+  `sveltekit-frontend/drizzle/manual/20260903_nested_latent_representation_registry_v1.sql`.
+- [x] Run the read-only latent identity audit and bounded derivation check.
+  The 8-row CUDA derivation sample matched (`maxAbsoluteError` about
+  `5.18e-7`), but the broader representation ledger is absent, sampled Qdrant
+  payloads lack source/workspace revisions, and legacy latent rows remain
+  diagnostic-only. Receipt: `docs/reports/latent-representation-identity-audit-2026-09-03.json`.
+- [x] Verify live dimension coverage: `latent_256` has `55,169` populated rows
+  and HNSW/checkpoint indexes; `latent_128` has no independent column. The
+  representation registry is not live because its migration remains unapplied.
+- [x] Audit registry migration duplication: the nested draft matches the
+  original `0152_atlas_representations_registry.sql`; the separately named
+  revised candidate has an incompatible column contract and transaction-invalid
+  `CREATE INDEX CONCURRENTLY` statements. Neither is journaled or applied.
+  Receipt: `docs/reports/latent-dimension-coverage-audit-2026-09-03.json`.
 - [x] Add the read-only latent canary plan for the 15-row CandidateOrdinal
   cohort; it remains `BLOCKED_LEGACY_LATENT_PROVENANCE` until the producer is
   repaired.
@@ -548,6 +601,21 @@ WARM  Qdrant dense, approved lexical executor, bounded graph expansion
 COLD  Postgres/source reconstruction, Arrow/mmap snapshots, broad evidence
 ```
 
+Nested latent residency is dimension-specific and remains derived from one
+`latent_256` parent artifact:
+
+| Tier | Preferred representation | Purpose | Admission requirement |
+| --- | --- | --- | --- |
+| COLD | `semantic_768` FP32 / canonical source | reconstruction, exact retrieval, re-derivation | authoritative source and representation revisions |
+| WARM | `latent_256` `halfvec(256)` | bounded diversity/reranking and GPU candidate work | exact `RepresentationArtifactV1` and checkpoint checksum |
+| HOT | derived `latent_128` or `latent_64` | compact routing/residency hints | parent `latent_256` revision plus derived checksum |
+
+This is a residency choice, not a new retrieval vote. `latent_128` and
+`latent_64` may be materialized in an approved hot buffer or cache, but their
+identity must derive from the same `latent_256` artifact. Valkey stores only
+revision-qualified references or bounded payloads; PostgreSQL remains the
+durable representation and provenance owner.
+
 The current Qdrant collection is dense-only. The WARM sparse branch remains
 deferred until a sparse BM42 schema and identity round trip are proven.
 The latest read-only sparse source audit found 52,417 source rows and 52,380
@@ -616,8 +684,10 @@ Qdrant HNSW, or pgvector. The current official FastEmbed Python model table
 does not list EmbeddingGemma. Jina Embeddings v2 base-en and base-code can
 produce 768-dimensional vectors, but they are separate representation spaces
 and require their own parity/evaluation receipt before use. EmbeddingGemma
-MRL targets are 768/512/256/128; 384 remains legacy-only. `latent_64` is a
-separate routing autoencoder projection from the 768 source, not an MRL lane.
+MRL targets are 768/512/256/128; 384 remains legacy-only. The nested learned
+family is `semantic_768 -> latent_256 -> latent_128 -> latent_64`; these are
+not EmbeddingGemma MRL aliases. `latent_256` is the physical parent and the
+smaller views are derived for warm/hot routing.
 
 TurboVec LOD clarification: the approximately 32 GB → 4 GB target is a
 quantization benchmark hypothesis, not a current workstation fact. Rust

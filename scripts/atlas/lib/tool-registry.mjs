@@ -111,9 +111,14 @@ export async function loadRegistry(root = REPO_ROOT) {
   try {
     const raw = await fs.readFile(registryPath, 'utf8');
     const registry = JSON.parse(raw);
-    return { registry, registryPath };
+    const registryRevision = typeof registry.content_revision === 'string' ? registry.content_revision.trim() : '';
+    const contentChecksum = typeof registry.content_checksum === 'string' ? registry.content_checksum.trim() : '';
+    if (!registryRevision || registryRevision !== contentChecksum) {
+      return { registry: null, registryPath, registryRevision: null, valid: false, error: 'MCP_TOOL_REGISTRY_MANIFEST_REVISION_INVALID' };
+    }
+    return { registry, registryPath, registryRevision, valid: true, error: null };
   } catch {
-    return { registry: null, registryPath };
+    return { registry: null, registryPath, registryRevision: null, valid: false, error: 'MCP_TOOL_REGISTRY_MANIFEST_UNREADABLE' };
   }
 }
 
@@ -141,4 +146,3 @@ export function canonicalPickupQueries() {
     { name: 'hyperrag', query: 'hyperrag dense search bm25 rrf turbovec qdrant neo4j' },
   ];
 }
-

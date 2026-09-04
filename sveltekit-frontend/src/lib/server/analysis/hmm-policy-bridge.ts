@@ -11,10 +11,24 @@ export interface RerankSignal {
   packetKey?: string | null;
 }
 
+/**
+ * BEST-FIT-SCORE-SEMANTICS-02: this file independently hand-builds its own heuristic formulas
+ * (see buildPolicyStateFromRerankSignals below -- different coefficients from okf-fit.ts's
+ * heuristic, a genuinely separate hand-tuned surface) and was, like okf-fit.ts, misleadingly
+ * naming them after Naive Bayes / Logistic Regression. Renamed to heuristic_*.
+ *
+ * NOT renamed this pass (flagged, not fixed -- BEST-FIT-SCORE-AUDIT-01 / this rename's own scope
+ * decision): `PolicyStateInput.okf.{naiveBayesScore,logisticRegressionScore,fitMargin}` in
+ * policy-types.ts, consumed by policy-router.ts and policy-state.ts. That is a deeper, more
+ * load-bearing contract this pass did not audit — renaming it risks a real behavior change in
+ * production policy routing without first reviewing those consumers. This function's own mapping
+ * into that field is kept working as-is (heuristic_fit_score -> okf.logisticRegressionScore,
+ * etc.) rather than changed.
+ */
 export interface OkfHmmPolicyEvidence {
-  naive_bayes_score: number;
-  logistic_regression_score: number;
-  fit_margin: number;
+  heuristic_prior_score: number;
+  heuristic_fit_score: number;
+  heuristic_fit_margin: number;
   fit_decision: FitDecision;
   hmm_observation?: string;
   stateHint?: string;
@@ -49,9 +63,11 @@ export function withOkfHmmEvidence(
   return {
     ...base,
     okf: {
-      naiveBayesScore: evidence.naive_bayes_score,
-      logisticRegressionScore: evidence.logistic_regression_score,
-      fitMargin: evidence.fit_margin,
+      // Deliberately still mapped into PolicyStateInput.okf's pre-existing field names -- see
+      // this file's OkfHmmPolicyEvidence doc comment for why that deeper contract wasn't renamed.
+      naiveBayesScore: evidence.heuristic_prior_score,
+      logisticRegressionScore: evidence.heuristic_fit_score,
+      fitMargin: evidence.heuristic_fit_margin,
       decision: evidence.fit_decision,
     },
     hmm: {
@@ -91,8 +107,9 @@ export function buildPolicyStateFromRerankSignals(input: {
       : best >= 0.55
         ? 'REVIEW'
         : 'ABSTAIN';
-  const logisticRegressionScore = clamp01(0.18 + 0.56 * best + 0.12 * astEvidence + 0.08 * graphAuthority + 0.06 * exactPathMatch);
-  const naiveBayesScore = clamp01(0.12 + 0.48 * best + 0.10 * lexicalHitCount + 0.08 * communityAgreement);
+  // Hand-specified formulas -- not ML inference. See OkfHmmPolicyEvidence's doc comment above.
+  const heuristicFitScore = clamp01(0.18 + 0.56 * best + 0.12 * astEvidence + 0.08 * graphAuthority + 0.06 * exactPathMatch);
+  const heuristicPriorScore = clamp01(0.12 + 0.48 * best + 0.10 * lexicalHitCount + 0.08 * communityAgreement);
 
   return withOkfHmmEvidence(
     {
@@ -128,9 +145,9 @@ export function buildPolicyStateFromRerankSignals(input: {
       },
     },
     {
-      naive_bayes_score: naiveBayesScore,
-      logistic_regression_score: logisticRegressionScore,
-      fit_margin: logisticRegressionScore - naiveBayesScore,
+      heuristic_prior_score: heuristicPriorScore,
+      heuristic_fit_score: heuristicFitScore,
+      heuristic_fit_margin: heuristicFitScore - heuristicPriorScore,
       fit_decision: fitDecision,
       hmm_observation: 'POLICY_ROUTING_SIGNAL',
       stateHint: queryStateHint(input.query),

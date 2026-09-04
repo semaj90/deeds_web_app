@@ -89,6 +89,7 @@ const TOOLS = [
         query: { type: 'string', description: 'The user query or repair goal used to score cards.' },
         maxCards: { type: 'number', description: 'Maximum number of cards to return (1-50). Default 20.' },
         domainFilter: { type: 'string', description: 'Optional domain to filter cards (e.g. "retrieval", "graph"). Omit for all.' },
+        maxPayloadBytes: { type: 'number', description: 'Maximum serialized response budget (4096-65536). Default 24576.' },
       },
       required: ['query'],
       additionalProperties: false,
@@ -268,7 +269,9 @@ function classifyIntent({ prompt, context = '' }) {
   return { intent, domain, subdomain, confidence: subdomain !== 'unknown' ? 0.85 : 0.65, safeNextCommand };
 }
 
-function buildAgenticRagContext({ query, maxCards = 20, domainFilter }) {
+function buildAgenticRagContext({ query, maxCards = 20, domainFilter, maxPayloadBytes = 24576 }) {
+  const queryText = String(query ?? '').slice(0, 2048);
+  const payloadBudget = Math.max(4096, Math.min(65536, Number(maxPayloadBytes) || 24576));
   const root = process.cwd();
   const packetCandidates = [
     path.join(root, '.opencode', 'ace-packet.json'),
@@ -294,6 +297,20 @@ function buildAgenticRagContext({ query, maxCards = 20, domainFilter }) {
   } catch (e) {
     return { ok: false, error: `Failed to parse ACE packet: ${e.message}`, cards: [], promptPacket: '', sourceRefs: [] };
   }
+
+  const packetWorkspaceRevision = packet.workspaceRevision ?? packet.workspace_revision ?? null;
+  const packetSourceRevision = packet.sourceRevision ?? packet.source_revision ?? packet.sourceArtifact?.sourceRevision ?? null;
+  const packetCreatedAt = packet.createdAt ?? packet.generatedAt ?? null;
+  const packetExpiresInSeconds = Number(packet.expiresInSeconds);
+  const packetExpired = packetCreatedAt && Number.isFinite(packetExpiresInSeconds)
+    ? Date.now() > new Date(packetCreatedAt).getTime() + packetExpiresInSeconds * 1000
+    : false;
+  const revisionStatus = !packetWorkspaceRevision
+    ? 'MISSING_WORKSPACE_REVISION'
+    : !packetSourceRevision
+      ? 'PARTIAL_MISSING_SOURCE_REVISION'
+      : 'PRESENT';
+  const freshnessStatus = packetExpired ? 'EXPIRED' : packetCreatedAt ? 'CURRENT_OR_UNVERIFIED' : 'UNKNOWN';
 
   const signalSummary = {
     pagerank: packet.signalSummary?.pagerank ?? packet.pagerank ?? packet.pageRank ?? null,
@@ -390,7 +407,7 @@ function buildAgenticRagContext({ query, maxCards = 20, domainFilter }) {
   }
 
   const cap = Math.max(1, Math.min(50, Number(maxCards) || 20));
-  const queryTerms = query.toLowerCase().split(/\s+/).filter(t => t.length > 2);
+  const queryTerms = queryText.toLowerCase().split(/\s+/).filter(t => t.length > 2);
 
   cards = cards
     .map(c => {
@@ -402,31 +419,68 @@ function buildAgenticRagContext({ query, maxCards = 20, domainFilter }) {
     .slice(0, cap)
     .map(({ _qs, ...c }) => c);
 
-  const sourceRefs = [...new Set(cards.map(c => c.sourceRef).filter(Boolean))];
+  cards = cards.map((card) => ({
+    ...card,
+    title: String(card.title ?? '').slice(0, 240),
+    summary: String(card.summary ?? '').slice(0, 1000),
+    sourceRef: String(card.sourceRef ?? '').slice(0, 512),
+  }));
 
-  const promptPacket = [
-    `[ACE CONTEXT — ${cards.length} cards, query: "${query}"]`,
-    domainFilter ? `Domain filter: ${domainFilter}` : '',
-    '',
-    ...cards.slice(0, 10).map(
-      (c, i) =>
-        `${i + 1}. ${c.title ?? 'Untitled'} (score: ${c.score?.toFixed(3) ?? '?'})` +
-        (c.summary ? `\n   ${c.summary.slice(0, 120)}` : '') +
-        (c.sourceRef ? `\n   sourceRef: ${c.sourceRef}` : ''),
-    ),
-  ].filter(l => l !== '').join('\n');
+  let payloadTruncated = queryText !== String(query ?? '');
+  const boundedCards = [];
+  for (const card of cards) {
+    const candidateCards = [...boundedCards, card];
+    const candidateBytes = Buffer.byteLength(JSON.stringify({ query: queryText, cards: candidateCards }), 'utf8');
+    if (candidateBytes > payloadBudget && boundedCards.length > 0) {
+      payloadTruncated = true;
+      break;
+    }
+    boundedCards.push(card);
+  }
+  if (boundedCards.length < cards.length) payloadTruncated = true;
+  cards = boundedCards;
+
+  let sourceRefs = [];
+  let promptPacket = '';
+  let payloadBytes = 0;
+  do {
+    sourceRefs = [...new Set(cards.map(c => c.sourceRef).filter(Boolean))];
+    promptPacket = [
+      `[ACE CONTEXT — ${cards.length} cards, query: "${queryText}"]`,
+      domainFilter ? `Domain filter: ${domainFilter}` : '',
+      '',
+      ...cards.slice(0, 10).map(
+        (c, i) =>
+          `${i + 1}. ${c.title ?? 'Untitled'} (score: ${c.score?.toFixed(3) ?? '?'})` +
+          (c.summary ? `\n   ${c.summary.slice(0, 120)}` : '') +
+          (c.sourceRef ? `\n   sourceRef: ${c.sourceRef}` : ''),
+      ),
+    ].filter(l => l !== '').join('\n');
+    payloadBytes = Buffer.byteLength(JSON.stringify({ query: queryText, signalSummary, cards, sourceRefs, promptPacket }), 'utf8');
+    if (payloadBytes <= payloadBudget || cards.length === 0) break;
+    cards.pop();
+    payloadTruncated = true;
+  } while (cards.length > 0);
 
   return {
     ok: true,
-    query,
+    query: queryText,
     totalCards: cards.length,
     signalSummary,
-    packetAge: packet.generatedAt || packet.createdAt
-      ? Math.round((Date.now() - new Date(packet.generatedAt ?? packet.createdAt).getTime()) / 60000) + 'min'
+    packetAge: packetCreatedAt
+      ? Math.round((Date.now() - new Date(packetCreatedAt).getTime()) / 60000) + 'min'
       : 'unknown',
+    revisionStatus,
+    freshnessStatus,
+    admissionStatus: revisionStatus === 'PRESENT' && freshnessStatus !== 'EXPIRED'
+      ? 'ELIGIBLE_PENDING_FULL_MANIFEST_CHECK'
+      : 'NON_CANONICAL_DIAGNOSTIC_ONLY',
     cards,
     sourceRefs,
     promptPacket,
+    payloadTruncated,
+    maxPayloadBytes: payloadBudget,
+    payloadBytes,
     safeNextCommand: cards.length === 0 ? 'npm run ingest:pipeline' : 'node scripts/ingest/cache-ace-packet.mjs --audit',
   };
 }
@@ -466,7 +520,7 @@ function buildRecommendation({ intent, domain, errorSummary, evidenceLines, patc
 }
 
 async function recordOutcome(args) {
-  const { intent, tool, sourceRefs, recommendationAccepted, reward, graphVersion = '2026-05-29', errorMsg = null } = args;
+  const { intent, tool, sourceRefs, recommendationAccepted, reward, graphVersion = null, errorMsg = null } = args;
   if (MOCK_MODE) {
     return { ok: true, id: 'mock-outcome', syncedToNeo4j: false, mock: true, sourceRefs: sourceRefs ?? [] };
   }
@@ -584,6 +638,21 @@ async function recordOutcome(args) {
   return { ok: true, id: outcomeRecord.id, syncedToNeo4j };
 }
 
+function diagnosticProvenance(tool, subject) {
+  return {
+    provenance: {
+      tool,
+      authority: 'neo4j_projection',
+      graphRevision: null,
+      evidenceRefs: [],
+      status: 'UNRESOLVED',
+      subject: subject ?? null,
+    },
+    canonicalAuthority: false,
+    writesPerformed: false,
+  };
+}
+
 async function findDependencies({ target }) {
   if (MOCK_MODE) return mockGraphResult('find_dependencies', { target });
   const normalizedTarget = target.replace(/\\/g, '/').replace(/^sveltekit-frontend\//, '');
@@ -596,7 +665,7 @@ async function findDependencies({ target }) {
       { normalizedTarget }
     );
     const deps = res.records.map(r => ({ dep: r.get('dep'), type: r.get('type') }));
-    return { target: normalizedTarget, dependencies: deps };
+    return { target: normalizedTarget, dependencies: deps, ...diagnosticProvenance('find_dependencies', normalizedTarget) };
   } finally {
     await session.close();
   }
@@ -614,7 +683,7 @@ async function traceDatabase({ query }) {
       { query }
     );
     const traces = res.records.map(r => ({ file: r.get('file'), table: r.get('table'), operation: r.get('operation') }));
-    return { query, traces };
+    return { query, traces, ...diagnosticProvenance('trace_database', query) };
   } finally {
     await session.close();
   }
@@ -632,7 +701,7 @@ async function traceToolChain({ tool }) {
       { tool }
     );
     const traces = res.records.map(r => ({ file: r.get('file'), tool: r.get('tool'), type: r.get('type') }));
-    return { tool, traces };
+    return { tool, traces, ...diagnosticProvenance('trace_tool_chain', tool) };
   } finally {
     await session.close();
   }
@@ -649,7 +718,7 @@ async function findSourceRefs({ query }) {
       { query }
     );
     const refs = res.records.map(r => r.get('name'));
-    return { query, sourceRefs: refs };
+    return { query, sourceRefs: refs, ...diagnosticProvenance('find_source_refs', query) };
   } finally {
     await session.close();
   }
@@ -666,7 +735,7 @@ async function findFeature({ feature }) {
       { feature }
     );
     const features = res.records.map(r => ({ name: r.get('name'), description: r.get('description') }));
-    return { feature, features };
+    return { feature, features, ...diagnosticProvenance('find_feature', feature) };
   } finally {
     await session.close();
   }
@@ -683,7 +752,7 @@ async function findRoute({ route }) {
       { route }
     );
     const routes = res.records.map(r => ({ path: r.get('path'), type: r.get('type') }));
-    return { route, routes };
+    return { route, routes, ...diagnosticProvenance('find_route', route) };
   } finally {
     await session.close();
   }

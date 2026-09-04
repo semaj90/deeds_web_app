@@ -3,6 +3,7 @@ import {
 	createConceptBroaderThanV1,
 	createConceptPartOfV1,
 	createConceptV1,
+	recognizeConceptV1,
 	createTaxonomyAssignmentCandidateV1,
 	promoteTaxonomyAssignmentV1,
 	TaxonomyAssignmentCandidateV1Schema,
@@ -10,6 +11,33 @@ import {
 
 
 describe('entity-concept taxonomy contracts', () => {
+	it('recognizes exact concept labels deterministically and keeps provenance', () => {
+		const concept = createConceptV1({
+			conceptKey: 'retrieval.knn', namespace: 'parent-atlas', label: 'KNN', aliases: ['nearest neighbour'],
+			taxonomyRevision: 'taxonomy:1', definitionEvidenceRefs: ['spec:knn'], producerRevision: 'taxonomy-builder:1',
+		});
+		const result = recognizeConceptV1({
+			observation: { schema: 'atlas.term-observation.v1', observationId: 'obs:1', term: 'KNN', normalizedTerm: 'knn', kind: 'query_term', sourceRef: 'query:1', sourceRevision: 'query:rev1', evidenceRefs: ['query:1'], producer: 'query-parser', producerRevision: 'parser:1', confidence: 0.9, canonicalAuthority: false },
+			concepts: [concept], conceptRegistryRevision: 'registry:1', resolverRevision: 'resolver:1',
+		});
+		expect(result.status).toBe('ADMITTED');
+		expect(result.selectedConceptId).toBe(concept.conceptId);
+		expect(result.evidenceRefs).toEqual(['query:1']);
+	});
+
+	it('does not admit semantic-looking text without an exact concept or alias match', () => {
+		const concept = createConceptV1({ conceptKey: 'retrieval.knn', namespace: 'parent-atlas', label: 'KNN', taxonomyRevision: 'taxonomy:1', definitionEvidenceRefs: ['spec:knn'], producerRevision: 'taxonomy-builder:1' });
+		const result = recognizeConceptV1({ observation: { schema: 'atlas.term-observation.v1', observationId: 'obs:2', term: 'search nearby vectors', normalizedTerm: 'search nearby vectors', kind: 'query_term', sourceRef: 'query:2', sourceRevision: 'query:rev1', evidenceRefs: ['query:2'], producer: 'query-parser', producerRevision: 'parser:1', confidence: 0.9, canonicalAuthority: false }, concepts: [concept], conceptRegistryRevision: 'registry:1', resolverRevision: 'resolver:1' });
+		expect(result.status).toBe('UNMAPPED');
+		expect(result.selectedConceptId).toBeNull();
+	});
+
+	it('rejects ambiguous aliases instead of silently selecting one concept', () => {
+		const make = (key: string) => createConceptV1({ conceptKey: key, namespace: 'parent-atlas', label: key, aliases: ['vector search'], taxonomyRevision: 'taxonomy:1', definitionEvidenceRefs: ['spec:' + key], producerRevision: 'taxonomy-builder:1' });
+		const result = recognizeConceptV1({ observation: { schema: 'atlas.term-observation.v1', observationId: 'obs:3', term: 'vector search', normalizedTerm: 'vector search', kind: 'phrase', sourceRef: 'doc:1', sourceRevision: 'doc:rev1', evidenceRefs: ['doc:1:0-12'], producer: 'nlp', producerRevision: 'nlp:1', confidence: 0.8, canonicalAuthority: false }, concepts: [make('retrieval.semantic'), make('retrieval.knn')], conceptRegistryRevision: 'registry:1', resolverRevision: 'resolver:1' });
+		expect(result.status).toBe('AMBIGUOUS');
+		expect(result.candidateConceptIds).toHaveLength(2);
+	});
 	it('keeps concept identity stable across label/alias presentation changes', () => {
 		const left = createConceptV1({
 			conceptKey: 'retrieval.semantic',

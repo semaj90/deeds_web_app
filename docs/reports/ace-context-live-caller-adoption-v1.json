@@ -1,6 +1,6 @@
 {
   "schema": "atlas.ace-context-live-caller-adoption.v1",
-  "generatedAt": "2026-09-02T03:06:50.347Z",
+  "generatedAt": "2026-09-04T02:35:22.888Z",
   "mode": "READ_ONLY_SOURCE_CENSUS",
   "callers": [
     {
@@ -80,6 +80,20 @@
       "classification": "STRICT_V2_WIRED",
       "matched": [
         "ContextManifestV2"
+      ]
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/retrieval/search-runtime-adapter.ts",
+      "classification": "STRICT_V2_WIRED",
+      "matched": [
+        "ContextManifestV2"
+      ]
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/retrieval/search-runtime-feature-bundle-provider-v1.spec.ts",
+      "classification": "STRICT_V2_WIRED",
+      "matched": [
+        "buildSearchRuntimeFeatureBundleV1"
       ]
     },
     {
@@ -232,7 +246,7 @@
   "counts": {
     "LEGACY_QUERY_CACHE": 21,
     "STRICT_V2_CAPABLE": 0,
-    "STRICT_V2_WIRED": 8,
+    "STRICT_V2_WIRED": 10,
     "DIAGNOSTIC_ONLY": 2,
     "DEAD": 0
   },

@@ -1,0 +1,22 @@
+{
+  "schema": "atlas.graph-context-dag-consumer-audit.v1",
+  "inputSchema": "atlas.graph-context-dag-input.v1",
+  "status": "SCRIPT_HANDOFF_VALIDATED",
+  "inputArtifact": "docs/reports/graph-context-dag-composition-v1.json",
+  "graphArtifactRef": "docs/reports/neo4j-concept-networkx-export-v1.json",
+  "graphRevision": "sha256:a44822cbd06c1ea50eeb2112a48b902802b013909e7e96170d1e3bede102c003",
+  "graphProjectionChecksum": "sha256:1578ff30ca5439f22d73584be515bcd38215b088ede7e7108a932a61131231db",
+  "ontologyTupleArtifactRef": "docs/reports/fixtures/ontology-linked-tuple-fixture-v1.json",
+  "ontologyTupleProjectionChecksum": "sha256:0dfc800f2684b6fa6bae8a7be64773bb129c6ad566bc32779679553088cd6516",
+  "checks": {
+    "missing": [],
+    "graphExists": true,
+    "tupleExists": true,
+    "safetyFlagsValid": true
+  },
+  "nextBoundary": "ContextManifestV2/DAG admission",
+  "liveProductionInvocation": false,
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "receiptChecksum": "sha256:232b050e73a2f873a0bd0491ec6cf53e92813e134c9cceb77c930b0b0456cceb"
+}

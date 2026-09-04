@@ -1,0 +1,1011 @@
+{
+  "schema": "atlas.openspec-supersession-audit.v1",
+  "generatedAt": "2026-09-04T03:56:01.716Z",
+  "mode": "READ_ONLY_EXPLICIT_RELATIONSHIP_SCAN",
+  "source": "npx openspec list --json + active change artifacts",
+  "activeChangeCount": 71,
+  "completeChangeCount": 4,
+  "nodes": [
+    {
+      "changeId": "parent-atlas-retrieval-lineage-dag-convergence",
+      "status": "in-progress",
+      "completedTasks": 119,
+      "totalTasks": 157,
+      "lastModified": "2026-09-04T03:49:52.449Z",
+      "artifactFiles": [
+        "proposal.md",
+        "design.md",
+        "tasks.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 34,
+      "unresolvedRelationshipMentionCount": 34
+    },
+    {
+      "changeId": "parent-atlas-adaptive-dag-fabric",
+      "status": "in-progress",
+      "completedTasks": 7,
+      "totalTasks": 13,
+      "lastModified": "2026-09-04T00:43:46.417Z",
+      "artifactFiles": [
+        "tasks.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 1,
+      "unresolvedRelationshipMentionCount": 1
+    },
+    {
+      "changeId": "parent-atlas-topology-representation-admission",
+      "status": "in-progress",
+      "completedTasks": 6,
+      "totalTasks": 24,
+      "lastModified": "2026-09-03T23:39:01.389Z",
+      "artifactFiles": [
+        "proposal.md",
+        "design.md",
+        "tasks.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 0,
+      "unresolvedRelationshipMentionCount": 0
+    },
+    {
+      "changeId": "parent-atlas-neural-prefill-encoder",
+      "status": "in-progress",
+      "completedTasks": 1177,
+      "totalTasks": 1735,
+      "lastModified": "2026-09-03T23:29:38.321Z",
+      "artifactFiles": [
+        "proposal.md",
+        "design.md",
+        "tasks.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 34,
+      "unresolvedRelationshipMentionCount": 34
+    },
+    {
+      "changeId": "parent-atlas-compiler-semantic-graph-resolution",
+      "status": "in-progress",
+      "completedTasks": 40,
+      "totalTasks": 58,
+      "lastModified": "2026-09-03T23:09:58.801Z",
+      "artifactFiles": [
+        "proposal.md",
+        "tasks.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 6,
+      "unresolvedRelationshipMentionCount": 6
+    },
+    {
+      "changeId": "parent-atlas-best-fit-score-fabric",
+      "status": "in-progress",
+      "completedTasks": 30,
+      "totalTasks": 34,
+      "lastModified": "2026-09-03T23:00:54.928Z",
+      "artifactFiles": [
+        "proposal.md",
+        "tasks.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 2,
+      "unresolvedRelationshipMentionCount": 2
+    },
+    {
+      "changeId": "parent-atlas-ontology-kernel",
+      "status": "in-progress",
+      "completedTasks": 60,
+      "totalTasks": 85,
+      "lastModified": "2026-09-03T21:17:47.624Z",
+      "artifactFiles": [
+        "proposal.md",
+        "design.md",
+        "tasks.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 7,
+      "unresolvedRelationshipMentionCount": 7
+    },
+    {
+      "changeId": "parent-atlas-ace-rlm-bitfrost-integration",
+      "status": "in-progress",
+      "completedTasks": 66,
+      "totalTasks": 69,
+      "lastModified": "2026-09-03T21:04:16.783Z",
+      "artifactFiles": [
+        "proposal.md",
+        "design.md",
+        "tasks.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 4,
+      "unresolvedRelationshipMentionCount": 4
+    },
+    {
+      "changeId": "inference-wiring-deep-audit-aug22",
+      "status": "in-progress",
+      "completedTasks": 48,
+      "totalTasks": 49,
+      "lastModified": "2026-09-03T21:04:16.781Z",
+      "artifactFiles": [
+        "proposal.md",
+        "design.md",
+        "tasks.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 1,
+      "unresolvedRelationshipMentionCount": 1
+    },
+    {
+      "changeId": "feature-label-semantic-derivation",
+      "status": "in-progress",
+      "completedTasks": 2,
+      "totalTasks": 3,
+      "lastModified": "2026-09-03T18:55:42.251Z",
+      "artifactFiles": [
+        "proposal.md",
+        "tasks.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 1,
+      "unresolvedRelationshipMentionCount": 1
+    },
+    {
+      "changeId": "parent-atlas-nlp-sidecar-feature-compiler",
+      "status": "in-progress",
+      "completedTasks": 26,
+      "totalTasks": 53,
+      "lastModified": "2026-09-03T17:16:00.495Z",
+      "artifactFiles": [
+        "proposal.md",
+        "design.md",
+        "tasks.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 2,
+      "unresolvedRelationshipMentionCount": 2
+    },
+    {
+      "changeId": "parent-atlas-retrieval-fusion-reachability",
+      "status": "in-progress",
+      "completedTasks": 40,
+      "totalTasks": 54,
+      "lastModified": "2026-09-02T02:24:12.576Z",
+      "artifactFiles": [
+        "proposal.md",
+        "tasks.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 0,
+      "unresolvedRelationshipMentionCount": 0
+    },
+    {
+      "changeId": "codereview-semantic-dimension-regression-aug22",
+      "status": "in-progress",
+      "completedTasks": 11,
+      "totalTasks": 12,
+      "lastModified": "2026-09-02T00:14:29.134Z",
+      "artifactFiles": [
+        "proposal.md",
+        "tasks.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 1,
+      "unresolvedRelationshipMentionCount": 1
+    },
+    {
+      "changeId": "parent-atlas-candidate-feature-execution-fabric",
+      "status": "in-progress",
+      "completedTasks": 164,
+      "totalTasks": 258,
+      "lastModified": "2026-09-01T21:37:29.622Z",
+      "artifactFiles": [
+        "tasks.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 4,
+      "unresolvedRelationshipMentionCount": 4
+    },
+    {
+      "changeId": "parent-atlas-deep-research-learning-circuit",
+      "status": "no-tasks",
+      "completedTasks": 0,
+      "totalTasks": 0,
+      "lastModified": "2026-09-01T20:32:30.302Z",
+      "artifactFiles": [],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 0,
+      "unresolvedRelationshipMentionCount": 0
+    },
+    {
+      "changeId": "manual-migration-reconciliation",
+      "status": "in-progress",
+      "completedTasks": 30,
+      "totalTasks": 48,
+      "lastModified": "2026-09-01T18:43:58.739Z",
+      "artifactFiles": [
+        "proposal.md",
+        "tasks.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 4,
+      "unresolvedRelationshipMentionCount": 4
+    },
+    {
+      "changeId": "parent-atlas-tensor-residency-integration",
+      "status": "in-progress",
+      "completedTasks": 22,
+      "totalTasks": 49,
+      "lastModified": "2026-09-01T17:18:42.854Z",
+      "artifactFiles": [
+        "proposal.md",
+        "tasks.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 2,
+      "unresolvedRelationshipMentionCount": 2
+    },
+    {
+      "changeId": "atlas-feature-intelligence",
+      "status": "in-progress",
+      "completedTasks": 19,
+      "totalTasks": 73,
+      "lastModified": "2026-09-01T16:45:34.867Z",
+      "artifactFiles": [
+        "proposal.md",
+        "tasks.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 0,
+      "unresolvedRelationshipMentionCount": 0
+    },
+    {
+      "changeId": "parent-atlas-retrieval-lod-algorithm-taxonomy",
+      "status": "in-progress",
+      "completedTasks": 44,
+      "totalTasks": 95,
+      "lastModified": "2026-09-01T04:31:02.341Z",
+      "artifactFiles": [
+        "proposal.md",
+        "tasks.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 1,
+      "unresolvedRelationshipMentionCount": 1
+    },
+    {
+      "changeId": "parent-atlas-telemetry-lowrank-recommendation-okf-integration",
+      "status": "in-progress",
+      "completedTasks": 0,
+      "totalTasks": 31,
+      "lastModified": "2026-09-01T02:45:56.057Z",
+      "artifactFiles": [
+        "proposal.md",
+        "design.md",
+        "tasks.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 0,
+      "unresolvedRelationshipMentionCount": 0
+    },
+    {
+      "changeId": "parent-atlas-okf-knowledge-layers",
+      "status": "in-progress",
+      "completedTasks": 20,
+      "totalTasks": 36,
+      "lastModified": "2026-09-01T02:45:06.996Z",
+      "artifactFiles": [
+        "proposal.md",
+        "design.md",
+        "tasks.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 0,
+      "unresolvedRelationshipMentionCount": 0
+    },
+    {
+      "changeId": "parent-atlas-semantic-768-canonical-contract",
+      "status": "no-tasks",
+      "completedTasks": 0,
+      "totalTasks": 0,
+      "lastModified": "2026-09-01T02:43:26.255Z",
+      "artifactFiles": [
+        "proposal.md",
+        "tasks.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 3,
+      "unresolvedRelationshipMentionCount": 3
+    },
+    {
+      "changeId": "parent-atlas-policy-routing-integration",
+      "status": "in-progress",
+      "completedTasks": 25,
+      "totalTasks": 40,
+      "lastModified": "2026-09-01T02:41:34.571Z",
+      "artifactFiles": [
+        "proposal.md",
+        "tasks.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 1,
+      "unresolvedRelationshipMentionCount": 1
+    },
+    {
+      "changeId": "parent-atlas-opencode-replay-proof",
+      "status": "in-progress",
+      "completedTasks": 2,
+      "totalTasks": 19,
+      "lastModified": "2026-09-01T02:40:10.220Z",
+      "artifactFiles": [
+        "tasks.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 0,
+      "unresolvedRelationshipMentionCount": 0
+    },
+    {
+      "changeId": "parent-atlas-pass-fabric",
+      "status": "in-progress",
+      "completedTasks": 6,
+      "totalTasks": 43,
+      "lastModified": "2026-09-01T02:36:18.198Z",
+      "artifactFiles": [
+        "tasks.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 3,
+      "unresolvedRelationshipMentionCount": 3
+    },
+    {
+      "changeId": "parent-atlas-graph-runtime-python-consolidation",
+      "status": "in-progress",
+      "completedTasks": 5,
+      "totalTasks": 18,
+      "lastModified": "2026-08-31T21:53:33.048Z",
+      "artifactFiles": [
+        "proposal.md",
+        "tasks.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 1,
+      "unresolvedRelationshipMentionCount": 1
+    },
+    {
+      "changeId": "parent-atlas-compute-rank-cache-eval-dspy-gepa",
+      "status": "in-progress",
+      "completedTasks": 18,
+      "totalTasks": 69,
+      "lastModified": "2026-08-31T21:22:45.346Z",
+      "artifactFiles": [
+        "proposal.md",
+        "tasks.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 0,
+      "unresolvedRelationshipMentionCount": 0
+    },
+    {
+      "changeId": "parent-atlas-document-governance-master-index",
+      "status": "in-progress",
+      "completedTasks": 7,
+      "totalTasks": 64,
+      "lastModified": "2026-08-31T21:14:52.586Z",
+      "artifactFiles": [
+        "proposal.md",
+        "design.md",
+        "tasks.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 10,
+      "unresolvedRelationshipMentionCount": 10
+    },
+    {
+      "changeId": "parent-atlas-repair-candidate-feature-matrix",
+      "status": "in-progress",
+      "completedTasks": 34,
+      "totalTasks": 41,
+      "lastModified": "2026-08-31T21:10:00.515Z",
+      "artifactFiles": [
+        "proposal.md",
+        "tasks.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 0,
+      "unresolvedRelationshipMentionCount": 0
+    },
+    {
+      "changeId": "parent-atlas-xgboost-cuda-runtime-proof",
+      "status": "in-progress",
+      "completedTasks": 12,
+      "totalTasks": 22,
+      "lastModified": "2026-08-31T20:24:09.951Z",
+      "artifactFiles": [
+        "proposal.md",
+        "tasks.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 4,
+      "unresolvedRelationshipMentionCount": 4
+    },
+    {
+      "changeId": "parent-atlas-transport-memory-boundaries",
+      "status": "in-progress",
+      "completedTasks": 5,
+      "totalTasks": 64,
+      "lastModified": "2026-08-31T20:24:09.913Z",
+      "artifactFiles": [
+        "proposal.md",
+        "tasks.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 0,
+      "unresolvedRelationshipMentionCount": 0
+    },
+    {
+      "changeId": "parent-atlas-semantic-512-canonicalization",
+      "status": "in-progress",
+      "completedTasks": 23,
+      "totalTasks": 30,
+      "lastModified": "2026-08-31T20:24:09.902Z",
+      "artifactFiles": [
+        "tasks.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 0,
+      "unresolvedRelationshipMentionCount": 0
+    },
+    {
+      "changeId": "parent-atlas-query-routing-classifier",
+      "status": "in-progress",
+      "completedTasks": 41,
+      "totalTasks": 98,
+      "lastModified": "2026-08-31T20:24:09.897Z",
+      "artifactFiles": [
+        "tasks.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 0,
+      "unresolvedRelationshipMentionCount": 0
+    },
+    {
+      "changeId": "parent-atlas-onnx-webgpu-embedding-promotion",
+      "status": "in-progress",
+      "completedTasks": 0,
+      "totalTasks": 17,
+      "lastModified": "2026-08-31T20:24:09.893Z",
+      "artifactFiles": [
+        "tasks.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 1,
+      "unresolvedRelationshipMentionCount": 1
+    },
+    {
+      "changeId": "parent-atlas-observation-routing-fabric",
+      "status": "in-progress",
+      "completedTasks": 16,
+      "totalTasks": 26,
+      "lastModified": "2026-08-31T20:24:09.889Z",
+      "artifactFiles": [
+        "tasks.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 1,
+      "unresolvedRelationshipMentionCount": 1
+    },
+    {
+      "changeId": "parent-atlas-memory-architecture-freeze",
+      "status": "in-progress",
+      "completedTasks": 14,
+      "totalTasks": 23,
+      "lastModified": "2026-08-31T20:24:09.874Z",
+      "artifactFiles": [
+        "proposal.md",
+        "tasks.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 8,
+      "unresolvedRelationshipMentionCount": 8
+    },
+    {
+      "changeId": "parent-atlas-live-graph-proof",
+      "status": "no-tasks",
+      "completedTasks": 0,
+      "totalTasks": 0,
+      "lastModified": "2026-08-31T20:24:09.867Z",
+      "artifactFiles": [
+        "tasks.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 0,
+      "unresolvedRelationshipMentionCount": 0
+    },
+    {
+      "changeId": "parent-atlas-graph-validation-fabric",
+      "status": "in-progress",
+      "completedTasks": 8,
+      "totalTasks": 14,
+      "lastModified": "2026-08-31T20:24:09.865Z",
+      "artifactFiles": [
+        "proposal.md",
+        "tasks.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 0,
+      "unresolvedRelationshipMentionCount": 0
+    },
+    {
+      "changeId": "parent-atlas-graph-retrieval-proof",
+      "status": "in-progress",
+      "completedTasks": 157,
+      "totalTasks": 284,
+      "lastModified": "2026-08-31T20:24:09.862Z",
+      "artifactFiles": [
+        "proposal.md",
+        "design.md",
+        "tasks.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 15,
+      "unresolvedRelationshipMentionCount": 15
+    },
+    {
+      "changeId": "parent-atlas-graph-analysis-contract",
+      "status": "in-progress",
+      "completedTasks": 62,
+      "totalTasks": 84,
+      "lastModified": "2026-08-31T20:24:09.828Z",
+      "artifactFiles": [
+        "tasks.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 5,
+      "unresolvedRelationshipMentionCount": 5
+    },
+    {
+      "changeId": "parent-atlas-gpu-runtime-abi-alignment",
+      "status": "in-progress",
+      "completedTasks": 4,
+      "totalTasks": 7,
+      "lastModified": "2026-08-31T20:24:09.826Z",
+      "artifactFiles": [
+        "tasks.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 0,
+      "unresolvedRelationshipMentionCount": 0
+    },
+    {
+      "changeId": "parent-atlas-gpu-graph-vector-substrate",
+      "status": "in-progress",
+      "completedTasks": 2,
+      "totalTasks": 26,
+      "lastModified": "2026-08-31T20:24:09.825Z",
+      "artifactFiles": [
+        "proposal.md",
+        "design.md",
+        "tasks.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 3,
+      "unresolvedRelationshipMentionCount": 3
+    },
+    {
+      "changeId": "parent-atlas-code-ingestion-pipeline",
+      "status": "in-progress",
+      "completedTasks": 23,
+      "totalTasks": 35,
+      "lastModified": "2026-08-31T20:24:09.813Z",
+      "artifactFiles": [
+        "tasks.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 3,
+      "unresolvedRelationshipMentionCount": 3
+    },
+    {
+      "changeId": "parent-atlas-branch-merge-consolidation-aug20",
+      "status": "in-progress",
+      "completedTasks": 18,
+      "totalTasks": 27,
+      "lastModified": "2026-08-31T20:24:09.803Z",
+      "artifactFiles": [
+        "proposal.md",
+        "tasks.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 1,
+      "unresolvedRelationshipMentionCount": 1
+    },
+    {
+      "changeId": "parent-atlas-agentic-run-receipt-binding",
+      "status": "in-progress",
+      "completedTasks": 2,
+      "totalTasks": 11,
+      "lastModified": "2026-08-31T20:24:09.800Z",
+      "artifactFiles": [
+        "proposal.md",
+        "tasks.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 0,
+      "unresolvedRelationshipMentionCount": 0
+    },
+    {
+      "changeId": "parent-atlas-agentic-file-compiler",
+      "status": "in-progress",
+      "completedTasks": 10,
+      "totalTasks": 21,
+      "lastModified": "2026-08-31T20:24:09.798Z",
+      "artifactFiles": [
+        "proposal.md",
+        "design.md",
+        "tasks.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 0,
+      "unresolvedRelationshipMentionCount": 0
+    },
+    {
+      "changeId": "parent-atlas-ace-bitfrost-cache-correctness",
+      "status": "in-progress",
+      "completedTasks": 2,
+      "totalTasks": 9,
+      "lastModified": "2026-08-31T20:24:09.754Z",
+      "artifactFiles": [
+        "tasks.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 0,
+      "unresolvedRelationshipMentionCount": 0
+    },
+    {
+      "changeId": "parent-atlas-768-dim-migration",
+      "status": "no-tasks",
+      "completedTasks": 0,
+      "totalTasks": 0,
+      "lastModified": "2026-08-31T20:24:09.753Z",
+      "artifactFiles": [],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 0,
+      "unresolvedRelationshipMentionCount": 0
+    },
+    {
+      "changeId": "deep-audit-code-gates-aug22",
+      "status": "in-progress",
+      "completedTasks": 10,
+      "totalTasks": 21,
+      "lastModified": "2026-08-31T20:24:09.643Z",
+      "artifactFiles": [
+        "proposal.md",
+        "tasks.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 4,
+      "unresolvedRelationshipMentionCount": 4
+    },
+    {
+      "changeId": "codereview-inference-wiring-followup-aug22",
+      "status": "in-progress",
+      "completedTasks": 7,
+      "totalTasks": 10,
+      "lastModified": "2026-08-31T20:24:09.615Z",
+      "artifactFiles": [
+        "proposal.md",
+        "tasks.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 1,
+      "unresolvedRelationshipMentionCount": 1
+    },
+    {
+      "changeId": "agent-branch-review-fanout-ace-centroid-aug22",
+      "status": "in-progress",
+      "completedTasks": 17,
+      "totalTasks": 20,
+      "lastModified": "2026-08-31T20:24:09.547Z",
+      "artifactFiles": [
+        "proposal.md",
+        "tasks.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 1,
+      "unresolvedRelationshipMentionCount": 1
+    },
+    {
+      "changeId": "parent-atlas-graph-pagerank-okf-fanout-hardening",
+      "status": "in-progress",
+      "completedTasks": 3,
+      "totalTasks": 4,
+      "lastModified": "2026-08-22T02:16:00.494Z",
+      "artifactFiles": [
+        "tasks.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 0,
+      "unresolvedRelationshipMentionCount": 0
+    },
+    {
+      "changeId": "parent-atlas-workstation-domain-classifier",
+      "status": "in-progress",
+      "completedTasks": 17,
+      "totalTasks": 21,
+      "lastModified": "2026-08-21T02:15:51.255Z",
+      "artifactFiles": [
+        "proposal.md",
+        "tasks.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 2,
+      "unresolvedRelationshipMentionCount": 2
+    },
+    {
+      "changeId": "parent-atlas-governed-compute-fabric",
+      "status": "in-progress",
+      "completedTasks": 0,
+      "totalTasks": 155,
+      "lastModified": "2026-08-20T18:16:22.450Z",
+      "artifactFiles": [
+        "tasks.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 1,
+      "unresolvedRelationshipMentionCount": 1
+    },
+    {
+      "changeId": "parent-atlas-gpu-sidecar-patch-tournament",
+      "status": "in-progress",
+      "completedTasks": 12,
+      "totalTasks": 63,
+      "lastModified": "2026-08-14T16:31:32.603Z",
+      "artifactFiles": [
+        "proposal.md",
+        "tasks.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 1,
+      "unresolvedRelationshipMentionCount": 1
+    },
+    {
+      "changeId": "parent-atlas-native-acceleration-cabi",
+      "status": "in-progress",
+      "completedTasks": 14,
+      "totalTasks": 62,
+      "lastModified": "2026-08-14T04:17:28.051Z",
+      "artifactFiles": [
+        "proposal.md",
+        "design.md",
+        "tasks.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 5,
+      "unresolvedRelationshipMentionCount": 5
+    },
+    {
+      "changeId": "parent-atlas-graphify-recovery-proof-ladder",
+      "status": "in-progress",
+      "completedTasks": 0,
+      "totalTasks": 9,
+      "lastModified": "2026-08-13T18:06:17.385Z",
+      "artifactFiles": [
+        "proposal.md",
+        "tasks.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 2,
+      "unresolvedRelationshipMentionCount": 2
+    },
+    {
+      "changeId": "parent-atlas-error-research-lane",
+      "status": "no-tasks",
+      "completedTasks": 0,
+      "totalTasks": 0,
+      "lastModified": "2026-08-12T20:32:39.075Z",
+      "artifactFiles": [
+        "tasks.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 0,
+      "unresolvedRelationshipMentionCount": 0
+    },
+    {
+      "changeId": "ace-hyperrag-chr97-graphify-audit",
+      "status": "in-progress",
+      "completedTasks": 4,
+      "totalTasks": 7,
+      "lastModified": "2026-08-12T03:42:07.108Z",
+      "artifactFiles": [
+        "proposal.md",
+        "tasks.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 0,
+      "unresolvedRelationshipMentionCount": 0
+    },
+    {
+      "changeId": "route-import-infra-isolation",
+      "status": "in-progress",
+      "completedTasks": 13,
+      "totalTasks": 16,
+      "lastModified": "2026-08-11T21:58:15.949Z",
+      "artifactFiles": [
+        "proposal.md",
+        "tasks.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 0,
+      "unresolvedRelationshipMentionCount": 0
+    },
+    {
+      "changeId": "parent-atlas-unordered-execution-contract",
+      "status": "in-progress",
+      "completedTasks": 7,
+      "totalTasks": 26,
+      "lastModified": "2026-08-10T02:47:35.235Z",
+      "artifactFiles": [
+        "proposal.md",
+        "design.md",
+        "tasks.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 0,
+      "unresolvedRelationshipMentionCount": 0
+    },
+    {
+      "changeId": "parent-atlas-graph-runtime-enhancement",
+      "status": "in-progress",
+      "completedTasks": 2,
+      "totalTasks": 8,
+      "lastModified": "2026-08-09T09:34:26.258Z",
+      "artifactFiles": [
+        "proposal.md",
+        "tasks.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 1,
+      "unresolvedRelationshipMentionCount": 1
+    },
+    {
+      "changeId": "parent-atlas-agentic-repair-bundle-integration",
+      "status": "in-progress",
+      "completedTasks": 18,
+      "totalTasks": 84,
+      "lastModified": "2026-08-09T04:46:16.571Z",
+      "artifactFiles": [
+        "proposal.md",
+        "tasks.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 3,
+      "unresolvedRelationshipMentionCount": 3
+    },
+    {
+      "changeId": "phase-2f1-real-evaluation-corpus",
+      "status": "no-tasks",
+      "completedTasks": 0,
+      "totalTasks": 0,
+      "lastModified": "2026-08-09T01:16:01.619Z",
+      "artifactFiles": [
+        "proposal.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 0,
+      "unresolvedRelationshipMentionCount": 0
+    },
+    {
+      "changeId": "openspec",
+      "status": "no-tasks",
+      "completedTasks": 0,
+      "totalTasks": 0,
+      "lastModified": "2026-08-07T17:57:58.554Z",
+      "artifactFiles": [],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 0,
+      "unresolvedRelationshipMentionCount": 0
+    },
+    {
+      "changeId": "parent-atlas-kv-cache-adaptation-research",
+      "status": "in-progress",
+      "completedTasks": 3,
+      "totalTasks": 15,
+      "lastModified": "2026-08-05T19:59:23.728Z",
+      "artifactFiles": [
+        "proposal.md",
+        "tasks.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 0,
+      "unresolvedRelationshipMentionCount": 0
+    },
+    {
+      "changeId": "parent-atlas-triton-trtllm-readiness",
+      "status": "no-tasks",
+      "completedTasks": 0,
+      "totalTasks": 0,
+      "lastModified": "2026-08-05T19:59:04.450Z",
+      "artifactFiles": [
+        "proposal.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 0,
+      "unresolvedRelationshipMentionCount": 0
+    },
+    {
+      "changeId": "parent-atlas-kafka-projection-initiative",
+      "status": "no-tasks",
+      "completedTasks": 0,
+      "totalTasks": 0,
+      "lastModified": "2026-08-03T09:24:21.992Z",
+      "artifactFiles": [
+        "proposal.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 0,
+      "unresolvedRelationshipMentionCount": 0
+    },
+    {
+      "changeId": "parent-atlas-runtime-ownership-precall",
+      "status": "no-tasks",
+      "completedTasks": 0,
+      "totalTasks": 0,
+      "lastModified": "2026-08-02T00:42:17.694Z",
+      "artifactFiles": [
+        "proposal.md",
+        "design.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 3,
+      "unresolvedRelationshipMentionCount": 3
+    },
+    {
+      "changeId": "parent-atlas-deep-research-ingestion",
+      "status": "no-tasks",
+      "completedTasks": 0,
+      "totalTasks": 0,
+      "lastModified": "2026-08-01T23:22:44.279Z",
+      "artifactFiles": [
+        "proposal.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 0,
+      "unresolvedRelationshipMentionCount": 0
+    },
+    {
+      "changeId": "atlas-hot-vector-schema-decision",
+      "status": "no-tasks",
+      "completedTasks": 0,
+      "totalTasks": 0,
+      "lastModified": "2026-08-01T21:46:40.249Z",
+      "artifactFiles": [
+        "proposal.md",
+        "design.md"
+      ],
+      "explicitRelationshipCount": 0,
+      "relationshipMentionCount": 0,
+      "unresolvedRelationshipMentionCount": 0
+    }
+  ],
+  "edges": [],
+  "counts": {
+    "explicitSupersessionCount": 0,
+    "movedToCount": 0,
+    "satisfiedByCount": 0,
+    "duplicateAliasCount": 0,
+    "dependencyCount": 0,
+    "blockedByCount": 0
+  },
+  "nodeChecksum": "sha256:02ec8f7231de74e93dc4944b2e87364a06b8a1ee2792374f3c29c1f9765ed24a",
+  "edgeChecksum": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "classificationPolicy": {
+    "datesDoNotImplySupersession": true,
+    "semanticOverlapRequiresReview": true,
+    "automaticArchive": false,
+    "automaticOpenSpecMutation": false,
+    "zeroEdgesMeansNoInventoryBoundExplicitEdgesOnly": true,
+    "unresolvedMentionsRequireHumanReview": true
+  },
+  "writesPerformed": false,
+  "canonicalMutationAuthority": false
+}

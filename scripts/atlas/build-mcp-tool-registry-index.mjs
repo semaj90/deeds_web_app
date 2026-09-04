@@ -18,6 +18,7 @@
  */
 
 import { spawn } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -345,6 +346,28 @@ async function main() {
 
   const tools = [...combined.values()].sort((a, b) => b.score - a.score || a.tool_name.localeCompare(b.tool_name));
   const ranked = tools.map((tool, idx) => ({ ...tool, rank: idx + 1 }));
+  const registryContent = JSON.stringify(
+    [...traceTools, ...manifestTools]
+      .map((tool) => ({
+        tool_name: tool.tool_name,
+        namespace: tool.namespace,
+        description: tool.description,
+        layers: normalizeLayers(tool.layers),
+        identity_fields: tool.identity_fields ?? [],
+        writes_to: tool.writes_to ?? [],
+        permissions: tool.permissions ?? 'read_only',
+        packet_kind: tool.packet_kind ?? 'tool_manifest',
+        source: tool.source ?? ['unknown'],
+        source_ref: tool.source_ref ?? tool.tool_name,
+        transport: tool.transport ?? null,
+        domain: tool.domain ?? 'unknown',
+        ontology: tool.ontology ?? [],
+        service: tool.service ?? null,
+        method: tool.method ?? null,
+      }))
+      .sort((a, b) => a.tool_name.localeCompare(b.tool_name) || JSON.stringify(a).localeCompare(JSON.stringify(b))),
+  );
+  const contentChecksum = `sha256:${createHash('sha256').update(registryContent, 'utf8').digest('hex')}`;
   const byLayer = groupByLayer(ranked);
 
   const layerSummaries = {};
@@ -361,6 +384,8 @@ async function main() {
 
   const report = {
     generated_at: new Date().toISOString(),
+    content_revision: contentChecksum,
+    content_checksum: contentChecksum,
     sources: [ONTOLOGY_JSON, MANIFEST_JSON],
     trace_tools: traceTools.length,
     manifest_tools: manifestTools.length,

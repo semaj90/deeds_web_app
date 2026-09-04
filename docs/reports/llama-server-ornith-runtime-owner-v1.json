@@ -1,0 +1,44 @@
+{
+  "schema": "llama-server-ornith-runtime-owner-v1",
+  "observedAt": "2026-09-03",
+  "chatGenerationOwner": {
+    "baseUrl": "http://127.0.0.1:8090",
+    "modelAuthority": "GET /v1/models",
+    "loadedModel": "ornith-1.5-9b",
+    "health": "PASS"
+  },
+  "selectionPolicy": {
+    "schema": "atlas.runtime-model-selection-policy.v1",
+    "mode": "LOADED_ACTIVE",
+    "allowedModelFamilies": ["ornith-1.5"],
+    "configuredVerifyAvailable": true
+  },
+  "alignedAdapters": [
+    "LangGraph synthesis",
+    "LangExtract structured extraction",
+    "decomposition and planning",
+    "summarization and enrichment"
+  ],
+  "embeddingOwner": {
+    "runtime": "Ollama",
+    "model": "embeddinggemma:latest",
+    "purpose": "semantic_768 embeddings only"
+  },
+  "enforcedBoundaries": [
+    "chat and generation do not fall back to Ollama",
+    "legacy generation endpoint overrides cannot redirect to Ollama",
+    "GPU release may target only the embedding model",
+    "Ollama pull endpoint accepts only embeddinggemma"
+  ],
+  "validation": {
+    "gitDiffCheck": "PASS",
+    "liveModelsProbe": "PASS",
+    "liveHealthProbe": "PASS",
+    "fullTypecheck": "BASELINE_ERRORS_OUTSIDE_TOUCHED_FILES",
+    "datastoreWrites": 0,
+    "runtimeInstalls": 0,
+    "dockerRebuilds": 0
+  },
+  "canonicalAuthority": false,
+  "writesPerformed": false
+}

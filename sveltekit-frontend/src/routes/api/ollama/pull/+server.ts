@@ -3,14 +3,15 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 import { z } from 'zod';
 import { ENV } from '$lib/server/env.server.js';
-import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
+import { getOllamaEmbeddingEndpoint } from '$lib/server/utils/ollama-endpoint.js';
 
 // Zod schema validates model name (trimmed, 1-200)
 const ollamaPullSchema = z.object({
 	model: z.string().trim().min(1, 'Missing model').max(200),
 });
 
-const OLLAMA_BASE = ENV.OLLAMA_BASE_URL;
+const OLLAMA_BASE = getOllamaEmbeddingEndpoint();
+const EMBEDDING_MODEL = ENV.OLLAMA_EMBED_MODEL ?? 'embeddinggemma:latest';
 
 export const GET: RequestHandler = async ({ locals }) => {
  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
@@ -19,7 +20,7 @@ export const GET: RequestHandler = async ({ locals }) => {
  service: 'ollama',
  version: '0.11.10',
  url: OLLAMA_BASE,
- model: LLM_MODEL_ID,
+ model: EMBEDDING_MODEL,
  timestamp: new Date().toISOString(),
  });
 };
@@ -32,6 +33,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
  return json({ ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid request' }, { status: 400 });
  }
  const { model } = parsed.data;
+ if (model !== EMBEDDING_MODEL && !model.startsWith('embeddinggemma')) {
+ return json({ ok: false, error: 'ONLY_EMBEDDINGGEMMA_ALLOWED' }, { status: 400 });
+ }
 
  const res = await fetch(`${OLLAMA_BASE}/api/pull`, {
  method: 'POST',

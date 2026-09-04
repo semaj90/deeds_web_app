@@ -172,12 +172,27 @@ message CodebaseSearchRequest {
   // Optional exact packet-key allowlist for revision-qualified canary searches.
   // This constrains the Qdrant projection; it does not create canonical identity.
   repeated string packet_keys = 9;
+  // GO-RETRIEVAL-REPRESENTATION-ROUTING-01: which representation to search against.
+  // Empty string means the server's existing default (semantic_768 / codebase_chunks_768) --
+  // preserves current behavior for every caller that doesn't set this. A non-empty value is
+  // validated server-side against a small representation registry; requesting a representation
+  // whose query-side encoder is not live yet (e.g. latent_256, blocked on
+  // LATENT256-QUERY-ENCODER-01) returns an explicit error/fallback signal in
+  // CodebaseSearchResponse rather than silently substituting semantic_768.
+  string representation_id = 10;
 }
 
 message CodebaseSearchResponse {
   repeated CodebaseChunk chunks = 1;
   float total_ms = 2;
   string debug_json = 3;
+  // GO-RETRIEVAL-REPRESENTATION-ROUTING-01: the representation actually used to serve this
+  // search. Always set (never empty), even when the request left representation_id unset.
+  string representation_used = 4;
+  // Non-empty only when request.representation_id was set but could not be honored (e.g. its
+  // query-side encoder is not live). representation_used then names the fallback actually
+  // served -- never silent.
+  string representation_fallback_reason = 5;
 }
 
 message CodebaseChunkEvent {

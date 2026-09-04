@@ -7,7 +7,7 @@ import unittest
 
 import numpy as np
 
-from atlas_external_docs import ChunkRecord
+from atlas_external_docs import ChunkRecord, chunk_document
 from atlas_okf_docs_pipeline import (
     build_qdrant_points,
     deterministic_qdrant_uuid,
@@ -16,7 +16,9 @@ from atlas_okf_docs_pipeline import (
     qdrant_payload_index_requests,
     qdrant_query_body,
     read_ldr_export_urls,
+    preview_domain_ontology_admission,
 )
+from parent_atlas_ontology.domain_mapping import mapping_revision
 
 
 class OkfDocsPipelineTests(unittest.TestCase):
@@ -50,6 +52,7 @@ class OkfDocsPipelineTests(unittest.TestCase):
             }), encoding="utf-8")
             manifest = load_manifest(path)
             self.assertEqual(manifest.sources[0].source_id, "qdrant")
+            self.assertIsNone(manifest.sources[0].source_namespace)
 
             payload = json.loads(path.read_text(encoding="utf-8"))
             payload["sources"][0]["pages"] = ["https://example.com/not-qdrant"]
@@ -70,6 +73,25 @@ class OkfDocsPipelineTests(unittest.TestCase):
             }), encoding="utf-8")
             urls = read_ldr_export_urls(path, allowed_domains=["qdrant.tech"])
             self.assertEqual(urls, ("https://qdrant.tech/documentation/search/",))
+
+    def test_domain_admission_preview_requires_namespace_and_revision(self) -> None:
+        chunks = chunk_document(
+            source_id="qdrant", source_revision="sha256:" + ("c" * 64),
+            source_url="https://qdrant.tech/documentation/", title="Qdrant retrieval",
+            text="Qdrant retrieval search", maximum_chars=100, overlap_chars=0,
+        )
+        blocked = preview_domain_ontology_admission(
+            chunks, source_namespace=None, ontology_revision=None,
+            classification_revision="classifier:v1", mapping_revision_value=mapping_revision(),
+        )
+        self.assertEqual(blocked["status"], "SOURCE_NAMESPACE_UNPROVEN")
+        admitted = preview_domain_ontology_admission(
+            chunks, source_namespace="docs:qdrant", ontology_revision="sha256:" + ("d" * 64),
+            classification_revision="classifier:v1", mapping_revision_value=mapping_revision(),
+        )
+        self.assertEqual(admitted["status"], "PREVIEW_PROVEN")
+        self.assertTrue(admitted["admittedCount"])
+        self.assertFalse(admitted["writesPerformed"])
 
     def test_qdrant_query_uses_large_quantized_prefetch_then_rescore(self) -> None:
         query = np.ones(768, dtype=np.float32)

@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "graphify-daily-null-gap-audit.v1",
+  "sourceReport": "docs/reports/graphify-daily-workflow-receipt.json",
+  "sourceRunStatus": "PROCESS_COMPLETE_WITH_PARTIAL_STAGES",
+  "nullPolicy": "preserve-honest-null; never synthesize revision, representation, or baseline identity",
+  "intentionalNulls": [
+    {"report":"docs/reports/graphify-daily-content-embedding-plan-v1.json","path":"inputLineageChecksum","reason":"No admitted input lineage cohort was selected by the dry-run plan"},
+    {"report":"docs/reports/query-adaptive-sampling-proof.json","path":"featureRevision","reason":"Sampling deferred because the feature matrix is unavailable"},
+    {"report":"docs/reports/query-adaptive-sampling-proof.json","path":"inputPath","reason":"No feature-matrix input was available"},
+    {"report":"docs/reports/query-adaptive-sampling-eval.json","path":"inputPath","reason":"Evaluation deferred because required input was unavailable"},
+    {"report":"docs/reports/query-adaptive-sampling-eval.json","path":"baselinePath","reason":"Evaluation deferred because no baseline was available"}
+  ],
+  "blockingGaps": [
+    {"code":"GRAPHIFY_IDENTITY_DUPLICATES","evidence":"stages.identity.duplicateIds=481; status=PARTIAL","impact":"Identity completeness is not proven"},
+    {"code":"SEMANTIC_REPRESENTATION_NOT_CANONICAL","evidence":"stages.semantic.status=PARTIAL; sampledFiles=24; modelNames=[deterministic-hash-embedder]","impact":"Bounded probe only; no canonical semantic corpus admission"},
+    {"code":"GPU_EXECUTOR_PARTIAL","evidence":"stages.gpu.status=PARTIAL; embeddingProbeCount=24","impact":"GPU readiness is not full-corpus completion"},
+    {"code":"NO_COMPLETED_GRAPHIFY_CANDIDATE","evidence":"BM25 plan blocker=no_completed_graphify_candidates","impact":"BM25/index promotion remains deferred"},
+    {"code":"QUERY_ADAPTIVE_PREREQUISITES_MISSING","evidence":"sampling=DEFERRED_NO_FEATURE_MATRIX; evaluation=DEFERRED_MISSING_INPUT_OR_BASELINE","impact":"No adaptive sampling or evaluation claim"},
+    {"code":"SOURCE_NAMESPACE_AUTHORITY_UNPROVEN","evidence":"This receipt emits workspace/source binding observation but no authoritative source namespace","impact":"Lineage and ontology admission remain blocked"},
+    {"code":"GRAPHIFY_LIFECYCLE_NOT_CLOSED","evidence":"nextGate=GRAPHIFY_RUN_WRITER_AND_SOURCE_BINDING_READBACK","impact":"Process completion is not a completed graphify_runs lifecycle record"}
+  ],
+  "safeInterpretation":{"workflowProcess":"COMPLETE","graphifyCanonicalCompletion":"NOT_PROVEN","semanticPromotion":"BLOCKED","lineagePromotion":"BLOCKED","canonicalAuthority":false,"writesPerformed":false,"syntheticValuesAdded":false}
+}

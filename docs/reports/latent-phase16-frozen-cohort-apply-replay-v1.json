@@ -1,0 +1,24 @@
+{
+  "schema": "atlas.latent-phase16-frozen-cohort-apply-replay.v1",
+  "status": "FROZEN_COHORT_APPLY_REPLAY_PROVEN",
+  "cohortReport": "docs/reports/latent64-canary-cohort-v1.json",
+  "cohortSize": 128,
+  "runA": {
+    "mode": "APPLY",
+    "processedCount": 128,
+    "writtenCount": 128,
+    "receiptPath": "docs/reports/latent-phase16-representation-artifact-2026-09-03T00-16-38-294Z.json"
+  },
+  "runB": {
+    "mode": "APPLY",
+    "processedCount": 0,
+    "writtenCount": 0,
+    "receiptPath": "docs/reports/latent-phase16-representation-artifact-2026-09-03T00-16-46-199Z.json"
+  },
+  "sameFrozenCohort": true,
+  "idempotentReplay": true,
+  "writesPerformed": true,
+  "canonicalAuthority": false,
+  "bulkRepair": "NOT_RUN",
+  "graphifyDailyRerun": "DEFERRED"
+}
