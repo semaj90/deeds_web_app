@@ -139,17 +139,9 @@ from `parent-atlas-retrieval-lineage-dag-convergence`.
   it (`to_tsquery('english','Ampere')` matched via the generated `search_vector`). Confirmed
   `ON DELETE CASCADE` works (deleting the page rows cascaded chunk deletion). All test rows
   cleaned up afterward — both tables verified empty (`count(*) = 0` on both) before moving on.
-- [ ] **DOC-27** stale version rejection — `NEW`, depends on DOC-02. A query for `product=X
-  version=Y` must never silently fall back to a different version's chunks; fail closed (same
-  fail-closed pattern as `local-llm-offload-ownership`'s model resolution) if the exact version
-  isn't indexed yet. **Partial evidence only — do not mark done from this alone.** DOC-06's live
-  proof covers the *write-side* half of this invariant (the DB physically cannot collide two
-  versions under one row, and physically cannot store a duplicate `(provider, product,
-  product_version, url)` — both proven via real unique-constraint violations against the live
-  table). It does **not** cover the *read-side* half this task is actually about: an application
-  query for a `product_version` that has zero indexed rows must return a fail-closed
-  "not indexed yet" result, not silently substitute the nearest other version's chunks. No query
-  layer exists yet to prove or disprove that behavior — this remains unstarted until one does.
+- [x] **DOC-27** stale version rejection — moved to Phase B (see below, after DOC-06A), where
+  the entry with full write-side + read-side evidence now lives — this line kept only so the
+  task numbering stays discoverable from its originally-drafted position.
 
 ## Phase B — Deterministic extraction (before any LLM touches a page)
 
@@ -260,6 +252,104 @@ from `parent-atlas-retrieval-lineage-dag-convergence`.
   nullable for now — `NOT NULL` is deferred until DOC-06A's admission writer (below) is the thing
   actually enforcing every row populates them, not added as a premature constraint ahead of it.
   Combined regression across all Phase A/B test files after this change: 67/67 pass.
+- [x] **DOC-06A** `EXTERNAL_DOC_POSTGRES_ADMISSION_01` — done, live-proven. Operator-directed,
+  depends on DOC-04/05/06. The missing join: DOC-06 proved the tables and their invariants via
+  hand-written SQL; nothing yet takes the real Python `chunk_document()`/`fetch_beautifulsoup()`
+  output and transactionally admits it. Scope: a TypeScript admission adapter — Pydantic-validated
+  manifest + BeautifulSoup page/chunk artifacts (already produced by the Python pipeline) →
+  `PostgresAdmissionAdapter` → `atlas_external_doc_pages`/`atlas_external_doc_chunks` → readback
+  verification → `ExternalDocAdmissionReceiptV1`. Python crawler must not write Qdrant/Postgres
+  directly going forward for this lane; the order is crawl → canonical Postgres admission →
+  (later) semantic/NLP enrichment → Qdrant/Neo4j/cache projections, never crawl → semantic → Qdrant
+  → maybe-Postgres-later.
+  **Duplication-prevention audit performed before writing any code** (per this repo's own hard
+  rule, and per the earlier DOC-00 pass's own documented failure mode — CLAUDE.md's "Hard Rule:
+  Audit packages/* Before Moving Anything" — of searching app-side first and missing a real
+  packages/* contract). Found a real, substantial, previously-unaudited TS fabric:
+  `packages/parent-atlas/src/core/external-doc-*.ts` (8 files, built 2026-08-19 — ~2 weeks before
+  this session's Python DOC-01 work, and NOT caught by this change's original DOC-00 audit, which
+  only checked `packages/parent-atlas/src/core/ast-grep-observation-adapter.ts` and missed this
+  entire adjacent family — recorded here as the same mis-scoped-search failure mode CLAUDE.md
+  already warns about, happening again). Verified directly, not assumed:
+    - `external-doc-knowledge-fabric.ts` — Zod contracts (`externalDocSourceSchema`,
+      `externalDocChunkSchema`, `externalDocFabricManifestSchema`, etc.) strikingly similar in
+      shape to this change's Python `SourceConfigV1`/`ChunkRecord`/`PipelineManifestV1` — but
+      **zero Postgres usage anywhere in the whole `external-doc-*` family** (confirmed via grep
+      across all 8 files, 0 hits for postgres/drizzle/db.insert/db.execute). **This confirms
+      DOC-06A is not a duplicate** — no existing owner writes validated external-doc evidence to
+      Postgres anywhere in this repo.
+    - `firecrawl-v2-capture.ts` (writer, → SeaweedFS cold storage via `archiveExternalDocCapture`)
+      has **zero callers** anywhere in `sveltekit-frontend/src` — unwired.
+    - `external-doc-retrieval-port.ts` (Qdrant hybrid reader, collection
+      `external_programming_docs_hybrid_768`) has exactly one real caller:
+      `scripts/docs-atlas/prove-external-doc-retrieval.mts`, a fixture-driven recall@k/MRR
+      benchmark for a Qdrant-version capability-gated hybrid-migration cutover — requires external
+      fixture files never checked into this repo, and no result artifact exists on disk
+      (`docs/reports/parent-atlas/external-doc-retrieval-proof-latest.json` doesn't exist) —
+      **never actually run**.
+    - `external-doc-qdrant-hybrid.ts` confirms `external_programming_docs_768` (the exact
+      collection name this change's own manifest fixture and DOC-08 already target) is that
+      migration's own `source_collection` — i.e. **DOC-08's planned dense-only projection is the
+      prerequisite this fabric is waiting for, not a naming collision with it.**
+    - **Real staleness flag for DOC-08/DOC-09, not fixed here (out of DOC-06A's bounded scope,
+      recorded so the next session doesn't miss it)**: `externalDocChunkSchema`/
+      `externalDocSourceSchema` predate DOC-02's version-qualification entirely — no
+      `productVersion`/`architecture`/`DocCoordinateV1` fields, no byte-safe spans, no
+      `codeBlocks`/`apiSignatures`. Whoever implements DOC-08 must extend these TS contracts (or
+      explicitly supersede them) rather than silently building a second, disconnected chunk shape
+      on the TS side while the Python side already carries version identity.
+  **Implementation**: `sveltekit-frontend/src/lib/server/atlas/docs/external-doc-admission.ts` —
+  follows this repo's established raw-`pg.Pool`-injected pattern (matching
+  `pagerank-promotion-gate.ts`'s `constructor(private db: Pool)` / parameterized-query style, not
+  Drizzle ORM, since these two tables aren't declared in `schema-postgres.ts`). Exports
+  `admitExternalDocPage(pool, input)`: recomputes every chunk's sha256 checksum server-side
+  (never trusts the caller-provided checksum — the canonical-evidence-authority boundary), opens a
+  transaction, upserts the page row (`ON CONFLICT (evidence_revision) DO UPDATE` — same
+  evidence_revision means identical content, safe idempotent no-op-ish touch; a genuinely
+  different evidence_revision under the same `(provider,product,product_version,url)` correctly
+  still hits the *other* unique constraint and fails loudly, which is the right behavior — an
+  operator must decide explicitly when content changes under an unchanged version/url, never a
+  silent overwrite), upserts every chunk row the same way, re-**reads back** every chunk from the
+  table (not trusting the `RETURNING` clause of its own `INSERT` alone) and verifies count +
+  checksums before `COMMIT`; rolls back and rethrows on any mismatch. Returns
+  `ExternalDocAdmissionReceiptV1` (`manifestRevision`, `sourceRevision`, `pageEvidenceRevision`,
+  `pageId`, `chunkIds`, `pageCount`, `chunkCount`, `expectedChecksums`, `readbackChecksums`,
+  `versionQualified`, `architectureQualified`, `transactionCommitted`, `writesPerformed`). Also
+  exports `retrieveExternalDocs(pool, query)` — DOC-27's read-side (see below), same file.
+  **Correction on the checksum-mismatch behavior actually implemented**: the checksum-recompute
+  validation runs *before* any DB connection is opened (not a mid-transaction rollback for that
+  specific case) — a stronger guarantee (never even attempts a write), verified precisely rather
+  than the original task text's looser "rolls back and rethrows on any mismatch" framing; a true
+  mid-transaction rollback path exists separately for the readback-count/checksum-mismatch case.
+  **Live-proven against the real Postgres database, not simulated or mocked** (per this repo's own
+  "integration tests must hit a real database, not mocks" convention): new
+  `sveltekit-frontend/scripts/atlas/prove-doc-06a-admission-v1.mts`, connects via `pg.Pool` directly
+  (`DATABASE_URL` from `.env`), run from `sveltekit-frontend/` (running from the repo root hits a
+  duplicate `@types/pg` across workspaces — a real, confirmed structural TS mismatch even though
+  it's the same package at runtime; documented in the script's own header comment). 14/14 checks
+  pass: first admission commits with matching expected/readback checksums and
+  `versionQualified`/`architectureQualified` both `true`; identical-input replay returns the same
+  `pageId` with zero duplicate chunk rows (idempotent); a chunk with a deliberately wrong checksum
+  is rejected (`ADMISSION_CHUNK_CHECKSUM_MISMATCH`) with zero extra page rows created; a page with
+  genuinely different content under the *same* `(provider,product,productVersion,url)` fails with a
+  real Postgres `duplicate key value violates unique constraint` error (not a silent overwrite —
+  the original row's `content_hash` confirmed unchanged afterward); `retrieveExternalDocs` returns
+  `FOUND` for an indexed version and `VERSION_NOT_INDEXED` (listing `13.2` as available, `13.3` as
+  not) for a genuinely unindexed one — DOC-27's exact required behavior, live-proven, not asserted
+  from the write-side alone. All test rows cleaned up and confirmed empty afterward.
+- [x] **DOC-27** stale version rejection — done, live-proven (both halves). Write-side proven by
+  DOC-06 (version-collision rejection via the DB's own unique constraints) and reconfirmed by
+  DOC-06A's "same identity, different content" test above. Read-side — the actual subject of this
+  task — is `retrieveExternalDocs(pool, {provider, product, productVersion, architecture?})` in
+  `external-doc-admission.ts`: queries `atlas_external_doc_pages` filtered by the exact requested
+  version (+ optional architecture); if zero rows match, returns `{status:
+  'VERSION_NOT_INDEXED', requestedVersion, availableVersions}` (a second query lists what *is*
+  actually indexed for that provider/product, purely informational — never returned as if it
+  answered the request) instead of silently falling back to a different version's rows. Live-proven
+  as part of DOC-06A's proof script above: requesting the indexed `13.2` returns `FOUND` with
+  exactly one page; requesting the never-indexed `13.3` returns `VERSION_NOT_INDEXED` with
+  `availableVersions: ["13.2"]` — confirms the fail-closed behavior end to end, not just at the
+  database-constraint level.
 - [ ] **DOC-03** Firecrawl bounded crawler — `EXISTS` (`fetch_firecrawl_v2`), verify
   bounded-crawl behavior (maxPages/maxDepth/sitemap-follow) matches the manifest's
   `maximum_pages`/`maximum_depth` fields; **blocked** on Firecrawl actually being registered
@@ -280,10 +370,26 @@ from `parent-atlas-retrieval-lineage-dag-convergence`.
   `20260904_external_doc_intelligence_v1.sql` and were live-proven there (`to_tsquery('english',
   'Ampere')` matched a real inserted row via the generated column). Recorded as its own line item
   here only for traceability against this task's own numbering — no further work needed.
-- [ ] **DOC-08** Qdrant dense+BM25 hybrid projection — `EXTEND`. `qdrant_points()` exists (dense
-  only, confirmed by reading the function); confirm/add named sparse (BM25) vector alongside dense
-  `semantic_768` in the same point, per Qdrant's documented hybrid-query support — verify current
-  `external_programming_docs_768` collection schema before assuming sparse is already there.
+- [ ] **DOC-08** Qdrant dense+BM25 hybrid projection — `AUDIT_FIRST` (upgraded from `EXTEND` —
+  DOC-06A's audit found real prior art this task must reconcile with before writing code, not
+  just extend `qdrant_points()` in isolation). `qdrant_points()` exists (dense only, confirmed by
+  reading the function). **Before implementing**: `packages/parent-atlas/src/core/
+  external-doc-qdrant-hybrid.ts` already has a designed (not yet live-run) blue/green migration
+  from `external_programming_docs_768` (this task's own dense-only target — confirmed to be that
+  migration's own `source_collection`, not a naming collision) to a hybrid
+  `external_programming_docs_hybrid_768` shadow collection, gated behind a live Qdrant-version
+  capability probe (`external-doc-runtime-capabilities.ts`). **Do not build a third, disconnected
+  hybrid-projection design.** Either: (a) implement DOC-08 as dense-only into
+  `external_programming_docs_768` first (matches this task's original scope, and IS the
+  prerequisite the existing migration plan is already waiting for), and leave the hybrid cutover
+  to that existing, more mature TS design; or (b) if hybrid is wanted in the same pass, extend the
+  existing `external-doc-qdrant-hybrid.ts` machinery rather than writing new sparse-vector logic
+  from scratch. Also: `externalDocChunkSchema`/`externalDocSourceSchema` in
+  `external-doc-knowledge-fabric.ts` predate DOC-02's version-qualification (no
+  `productVersion`/`architecture`/`DocCoordinateV1`, no byte-safe spans, no
+  `codeBlocks`/`apiSignatures`) — if DOC-08's payload construction imports these TS contracts,
+  extend them with version-qualification first rather than silently shipping a Qdrant payload that
+  can't be filtered by version/architecture.
 
 ## Phase D — Semantic extraction (LangExtract/Ornith, source-grounded only)
 
