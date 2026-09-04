@@ -3,8 +3,10 @@
 The remaining work is intentionally ordered by evidence dependency. Do not use
 checkbox completion percentage as permission to skip a blocker.
 
-1. **Active packet admission:** `PKT-LINEAGE-08` (explicit authorization required) →
-   exact production-entrypoint canary → packet readback/replay. `LINEAGE-02` is a
+1. **Graphify execution authority:** `GRAPHIFY-DAILY-COORDINATOR-01` → wire the
+   existing `INVENTORY` through `VALIDATE` owners under the committed execution ledger.
+   Then `PKT-LINEAGE-08` (explicit authorization required) can run its exact
+   production-entrypoint canary and packet readback/replay. `LINEAGE-02` is a
    separate blocked archaeology helper and must not be treated as an executable
    cohort-selection gate until its population origin is proven.
 2. **Qdrant reconciliation:** `RETRIEVAL-01J` → `RETRIEVAL-01K` →
@@ -17,8 +19,9 @@ checkbox completion percentage as permission to skip a blocker.
 6. **Validation record:** items 44 and 45 close only after the evidence-link
    and mutation-scope audit is complete.
 
-Current execution priority is the narrow `PKT-LINEAGE-08` production-entrypoint
-proof, followed by `RETRIEVAL-01L` governance closeout. `LINEAGE-02` remains
+Current execution priority is the remaining `GRAPHIFY-DAILY-COORDINATOR-01`
+stage-owner wiring, followed by the narrow `PKT-LINEAGE-08` production-entrypoint
+proof and `RETRIEVAL-01L` governance closeout. `LINEAGE-02` remains
 `BLOCKED_UNGROUNDED`: recover the origin, owner, and checksum of the requested
 bounded cohort. `151128` is unsupported, and the historical `15128/768` literal
 has no authoritative cohort artifact. Until one is found, `cohortSize` remains
@@ -728,6 +731,11 @@ lineage MEMBERSHIP, not 1:1 identity.
   25,317 current file rows remain attached primarily to the older completed run
   (`369e4270-7689-4536-8816-4ec4a5517b3e`). The source-authority repair must therefore bind
   file observations to the completed run that actually produced them before PKT-LINEAGE-08
+- **Fresh preflight (2026-09-04):** `node scripts/atlas/plan-packet-chunk-lineage-promotion-v1.mjs`
+  returned `BLOCKED_NO_QUALIFIED_CANDIDATE`, `eligibleCandidateCount: 0`, and checksum
+  `sha256:7cf544001f14273d3f86056868471134a9cd4ced0808f306908ca25320a91e81`. This supersedes
+  the older 50-source diagnostic allowlist for execution purposes; no packet, projection, graph,
+  or cache writes occurred.
   can obtain a current qualified candidate. No run or file rows were modified.
   The bounded run/file census makes the split concrete: completed run
   `369e4270-7689-4536-8816-4ec4a5517b3e` owns 25,258 file rows, with 25,258 source revisions
@@ -3598,13 +3606,14 @@ outputs against current observations or mark them `SUPERSEDED` solely by timesta
 - `scripts/atlas/plan-graphify-execution-ledger-coordinator-v1.mjs` now produces a dry coordinator
   plan from the existing source-selection receipt: 25,419 bindings, a valid workspace revision,
   fresh execution identity, fixed advisory-lock namespace/key, and the ten lifecycle stages. The
-  plan explicitly keeps migration unapplied and requires authorization/canary proof; it performs
-  no writes. Receipt: `docs/reports/graphify-execution-ledger-coordinator-plan-v1.json`.
+  plan required authorization/canary proof; the migration is now applied as a documented sidecar
+  and the bounded committed canary receipt is `docs/reports/graphify-daily-coordinator-canary-v1.json`.
 - [ ] `GRAPHIFY-DAILY-COORDINATOR-01`: use a dedicated connection with the frozen session advisory
   lock namespace/key, capture fresh workspace/source bindings, create source-selection membership,
   and transition one execution through its stages. Do not use `graphify_runs.run_id` as attempt identity.
   **Partial progress (2026-09-04), NOT closing this checkbox — the control-plane module exists and
-  is live-integration-proven, but has never run against real production source bindings.** Built
+  is live-integration-proven, and one bounded committed canary now uses real production source
+  bindings; the full Graphify internal pipeline stages remain unwired.** Built
   `sveltekit-frontend/src/lib/server/atlas/indexing/graphify-daily-coordinator-v1.ts`: pure
   functions `acquireCoordinatorLock`/`releaseCoordinatorLock` (frozen namespace/key
   `119041`/`641934821`, matching `docs/reports/graphify-execution-ledger-coordinator-plan-v1.json`),
@@ -3627,11 +3636,31 @@ outputs against current observations or mark them `SUPERSEDED` solely by timesta
   belong to the existing Graphify pipeline, per the earlier audit finding in this same file ("the
   new coordinator must be a separate owner... do not retrofit the legacy wrappers"). No caller
   wires this module to the real 25,419-source cohort from
-  `docs/reports/graphify-lifecycle-entrypoint-v1.json` yet, and no execution has ever been
-  COMMITted (every run so far is inside a rolled-back proof transaction, matching this repo's
-  `authorizationRequired: true` / `canaryRequiredBeforeBroadRun: true` gating in the coordinator
-  plan receipt — a real committed run needs explicit operator authorization, not implied by this
-  module existing).
+  `docs/reports/graphify-lifecycle-entrypoint-v1.json` yet. A bounded 3-source committed canary
+  is now proven by `sveltekit-frontend/scripts/atlas/graphify-daily-coordinator-canary-v1.mts`:
+  execution `5dc82676-d8a5-470e-a3b9-e06a98fb3de5`, terminal `COMPLETED`, 3 immutable source
+  memberships, and no historical `graphify_runs` or broad Graphify changes. The six internal
+  stages remain open and still require the existing Graphify pipeline to be wired to this ledger.
+- **Entrypoint alignment audit (2026-09-04):** `sveltekit-frontend/scripts/startup/run-graphify-daily-startup.mjs`
+  still orchestrates the legacy `npm run` steps and writes its cooldown/validation files directly;
+  it does not call `graphify-daily-coordinator-v1.ts` or propagate `execution_id` into
+  `INVENTORY` through `VALIDATE`. Treat `graphify:daily` as a legacy wrapper until an additive
+  adapter delegates those existing steps under the committed coordinator execution. No broad run
+  was started in this audit.
+- **Stage-owner mapping audit (2026-09-04):** the legacy startup wrapper's required step is
+  `graphify:audit:gemma4`; its other configured steps are optional directory streaming,
+  cluster-card generation/validation/load, BM25 planning, Qdrant-link repair, and optional
+  EmbeddingGemma refresh. None is an implementation of the six ledger stages
+  `INVENTORY` through `VALIDATE`, and the wrapper has no execution-ledger callback. Do not map
+  these labels by name or mark ledger stages complete; identify or build the narrow adapter at the
+  actual existing Graphify pipeline owner first.
+- **Incremental-owner audit (2026-09-04):** `sveltekit-frontend/scripts/atlas/graphify-incremental.mjs`
+  is the nearest real changed-file pipeline, but it is a top-level script with interleaved source
+  reads, embedding writes, cluster assignment, Qdrant projection enqueue, and BitFrost invalidation.
+  It has no callable stage interface and no `execution_id` propagation. It cannot be placed under
+  the ledger by renaming its eight console steps; an adapter/refactor must first isolate the
+  existing operations and attach stage receipts without creating another writer. No incremental
+  run was started during this audit.
 - Audit finding: the existing `scripts/atlas/graphify-daily-lifecycle-open-v1.mjs` and
   `graphify-daily-lifecycle-complete-v1.mjs` are legacy `graphify_runs` lifecycle wrappers. No
   implementation currently owns `graphify_executions` or `SOURCE_SELECTION`. The new coordinator
@@ -4308,15 +4337,67 @@ artifact ACE/ContextManifest consumes — not raw per-lane hits.
 
 ### Five new gates (all `OPEN`, none started — registered, not executed, this pass)
 
-- [ ] `DOMAIN-CLASSIFIER-OWNER-01` — audit existing domain classifiers (rules / SQL / Naive Bayes /
+- [x] `DOMAIN-CLASSIFIER-OWNER-01` — audit existing domain classifiers (rules / SQL / Naive Bayes /
   Python ML sidecar / XGBoost); establish the one `DomainClassificationV1` contract above. Models
-  become executors/challengers, not independent authorities.
+  become executors/challengers, not independent authorities. **Closed 2026-09-04.** Audit found
+  domain classification in this repo was ALREADY correctly composed as one deterministic owner
+  plus additive learned executors, not four independent authorities — the target state, mostly
+  already true in code, just not yet formalized as one shared contract:
+  - **RULES** (canonical owner of `primary_domain`/`confidence`): `classifyDomainTaxonomy()`
+    (`sveltekit-frontend/src/lib/server/atlas/domain-taxonomy.ts`) — deterministic,
+    keyword/evidence-weighted over the 9 `CANONICAL_DOMAINS`, 8 real live callers per
+    `domain-taxonomy-ml-bridge.ts`'s own doc comment.
+  - **NAIVE_BAYES / LOGISTIC_REGRESSION** (additive learned executors, never override the rules
+    verdict): real `sklearn.naive_bayes.MultinomialNB` / `sklearn.linear_model.LogisticRegression`
+    in `python/miniforge_nlp_sidecar.py`, wired in via `classifyDomainTaxonomyWithLearned()`
+    (`domain-taxonomy-ml-bridge.ts`) as an appended `labels[]` entry with `source: 'learned'`,
+    fail-open on sidecar unavailability.
+  - **No SQL-expressed classifier authority found** — grepped every migration referencing
+    `domain_taxonomy`/`domain_classification`/`predicted_domain` for a `CASE WHEN` pattern; none
+    exist. Those columns are storage for the TS classifier's output, not a second SQL-rules engine.
+  - **No XGBoost domain classifier found.** XGBoost's role elsewhere in this repo (per
+    `CANDIDATE-FEATURE-MATRIX-01`/`XGBOOST-RERANKER-EVAL-01` above) is candidate RE-RANKING,
+    consuming domain probabilities as an input feature — not itself a domain classifier. Confirmed
+    these are two distinct capabilities, not a missing fourth authority.
+
+  **Built**: `DomainClassificationV1` (`packages/parent-atlas/src/core/domain-classification-v1.ts`
+  + `.spec.ts`, 6/6 tests) — the frozen per-executor contract from this file's own earlier
+  architecture-freeze section, `classifierFamily: 'RULES' | 'NAIVE_BAYES' | 'LOGISTIC_REGRESSION'`,
+  `trainingSnapshotRevision` required for trained families and rejected for `RULES` (enforced by
+  `superRefine`, not just documented), `predictedDomain` must appear in `probabilities` when
+  non-null. `sveltekit-frontend/src/lib/server/atlas/domain-classification-adapter-v1.ts` (+
+  `.spec.ts`, 3/3 tests, exercised against the REAL `classifyDomainTaxonomy()` function, not a
+  mock) — `buildRulesDomainClassificationV1()` maps the existing `DomainClassification` output
+  into the canonical shape without rewriting or duplicating the classifier itself.
+
+  **Honest gap left open, not worked around**: `classifyDomainTaxonomyWithLearned()` currently
+  appends at most ONE merged `source: 'learned'` label, picking whichever of
+  `logistic_regression_domain_probability` / `naive_bayes_domain_probability` the sidecar returned
+  first — it does not record WHICH algorithm actually produced that score. Since
+  `DomainClassificationV1.classifierFamily` is a closed enum requiring exactly `'NAIVE_BAYES'` or
+  `'LOGISTIC_REGRESSION'`, a learned-family adapter cannot be built honestly from the bridge's
+  current output shape. Only `buildRulesDomainClassificationV1` is implemented; a
+  `buildLearnedDomainClassificationV1` needs the bridge extended first to record which sklearn
+  algorithm won (a small, real, separately-scoped fix — not attempted here, since it touches a
+  file with 8 live callers and deserves its own change, not a drive-by edit).
 - [ ] `GRAPH-PAGERANK-PARITY-01` — build NetworkX and cuGraph projections from the *same*
   `StructuralGraphSnapshotV1` (the one frozen by `GRAPHIFY-OPEN-CLOSE-LIVE-WIRING-01`'s completed
   run above), binding identical `graphRevision`/`vertexMapChecksum`/`edgeSetChecksum`. NetworkX =
   CPU correctness oracle; cuGraph = GPU executor (reuses `wsl::atlas-rapids-cu13`'s already-proven
   `graph.pagerank.gpu` capability per `docs/reports/runtime-capability-registry-v1.json` — no new
-  runtime). Compare PageRank with a frozen tolerance and a replay receipt.
+  runtime). Compare PageRank with a frozen tolerance and a replay receipt. **Blocked finding
+  (2026-09-04), not attempted this round.** The reusable pipeline already exists —
+  `sveltekit-frontend/scripts/atlas/export-graph-snapshot-parity-parquet.mts`,
+  `python/graph_snapshot_parity_networkx_oracle.py`,
+  `python/graph_snapshot_parity_cugraph_oracle.py` — but its input,
+  `graphify/frozen-graph-snapshot-v2.json` (486MB, ~162,234 nodes / 108,156 edges per CLAUDE.md's
+  own prior parity record), is dated 2026-08-08 — **stale relative to the 2026-09-03
+  `GRAPHIFY-OPEN-CLOSE-LIVE-WIRING-01` run** this checkbox explicitly requires binding to (checked
+  live via file mtime, not assumed). Re-materializing a fresh frozen snapshot bound to that run's
+  `graphRevision` from the live ~162K-node Neo4j graph, then re-running both oracles over it, is a
+  large, separate, multi-hour-class operation — not attempted in this pass. Left open rather than
+  reused/relabeled against the stale snapshot, which would silently violate the checkbox's own
+  "the SAME `StructuralGraphSnapshotV1`" requirement.
 - [x] `SEMANTIC-TOPK-01` — on an admitted semantic cohort (not `LINEAGE-02`'s ungrounded `15128`;
   the proven 15-row canary or a properly-authorized cohort only), `cuVS brute-force` = exact
   oracle, `CAGRA`/Qdrant = ANN executors/challengers. Preserve `LANE != EXECUTOR`. **Closed
