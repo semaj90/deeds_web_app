@@ -56,6 +56,7 @@ export * from './core/domain-classification-v1.js';
 export * from './core/kernel-bound-dag-planner-v1.js';
 export * from './core/kernel-bound-dag-executor-v1.js';
 export * from './core/kernel-bound-dag-adapter-registry-v1.js';
+export * from './core/oak-execution-lineage-v1.js';
 export * from './core/ontology-kernel-schema-v1.js';
 export * from './core/ontology-revision-binding-v1.js';
 export * from './core/ontology-revision-manifest-v1.js';
