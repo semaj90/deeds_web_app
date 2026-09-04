@@ -1,0 +1,139 @@
+{
+  "schema": "atlas.semantic-topk-01-real-canary.v1",
+  "sourceVectors": "docs/reports/semantic-768-canary-vectors-v1.json",
+  "sourceReceipt": "docs/reports/lineage-semantic-768-cohort-v1.json",
+  "candidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
+  "ordinalMapChecksum": "86fee5d38619d3065d8710942068f26fb5b0d3c09992b1b523083ae0a593d297",
+  "device": "cuda",
+  "candidateCount": 15,
+  "topK": 5,
+  "scaleCaveat": "N=15 is too small to meaningfully distinguish exact-search implementations from each other -- this proves cuVS wiring/CandidateOrdinal binding correctness against real production vectors, not exact-vs-approximate recall behavior at scale.",
+  "rank1Matches": 15,
+  "topKSetMatches": 15,
+  "maxTop1ScoreDelta": 2.980232238769531e-07,
+  "scoreDeltaTolerance": 0.0001,
+  "nanOrInfCount": 0,
+  "perQuery": [
+    {
+      "queryCandidateOrdinal": 0,
+      "torchTop1CandidateOrdinal": 0,
+      "cuvsTop1CandidateOrdinal": 0,
+      "rank1Match": true,
+      "topKSetMatch": true
+    },
+    {
+      "queryCandidateOrdinal": 1,
+      "torchTop1CandidateOrdinal": 1,
+      "cuvsTop1CandidateOrdinal": 1,
+      "rank1Match": true,
+      "topKSetMatch": true
+    },
+    {
+      "queryCandidateOrdinal": 2,
+      "torchTop1CandidateOrdinal": 2,
+      "cuvsTop1CandidateOrdinal": 2,
+      "rank1Match": true,
+      "topKSetMatch": true
+    },
+    {
+      "queryCandidateOrdinal": 3,
+      "torchTop1CandidateOrdinal": 3,
+      "cuvsTop1CandidateOrdinal": 3,
+      "rank1Match": true,
+      "topKSetMatch": true
+    },
+    {
+      "queryCandidateOrdinal": 4,
+      "torchTop1CandidateOrdinal": 4,
+      "cuvsTop1CandidateOrdinal": 4,
+      "rank1Match": true,
+      "topKSetMatch": true
+    },
+    {
+      "queryCandidateOrdinal": 5,
+      "torchTop1CandidateOrdinal": 5,
+      "cuvsTop1CandidateOrdinal": 5,
+      "rank1Match": true,
+      "topKSetMatch": true
+    },
+    {
+      "queryCandidateOrdinal": 6,
+      "torchTop1CandidateOrdinal": 6,
+      "cuvsTop1CandidateOrdinal": 6,
+      "rank1Match": true,
+      "topKSetMatch": true
+    },
+    {
+      "queryCandidateOrdinal": 7,
+      "torchTop1CandidateOrdinal": 7,
+      "cuvsTop1CandidateOrdinal": 7,
+      "rank1Match": true,
+      "topKSetMatch": true
+    },
+    {
+      "queryCandidateOrdinal": 8,
+      "torchTop1CandidateOrdinal": 8,
+      "cuvsTop1CandidateOrdinal": 8,
+      "rank1Match": true,
+      "topKSetMatch": true
+    },
+    {
+      "queryCandidateOrdinal": 9,
+      "torchTop1CandidateOrdinal": 9,
+      "cuvsTop1CandidateOrdinal": 9,
+      "rank1Match": true,
+      "topKSetMatch": true
+    },
+    {
+      "queryCandidateOrdinal": 10,
+      "torchTop1CandidateOrdinal": 10,
+      "cuvsTop1CandidateOrdinal": 10,
+      "rank1Match": true,
+      "topKSetMatch": true
+    },
+    {
+      "queryCandidateOrdinal": 11,
+      "torchTop1CandidateOrdinal": 11,
+      "cuvsTop1CandidateOrdinal": 11,
+      "rank1Match": true,
+      "topKSetMatch": true
+    },
+    {
+      "queryCandidateOrdinal": 12,
+      "torchTop1CandidateOrdinal": 12,
+      "cuvsTop1CandidateOrdinal": 12,
+      "rank1Match": true,
+      "topKSetMatch": true
+    },
+    {
+      "queryCandidateOrdinal": 13,
+      "torchTop1CandidateOrdinal": 13,
+      "cuvsTop1CandidateOrdinal": 13,
+      "rank1Match": true,
+      "topKSetMatch": true
+    },
+    {
+      "queryCandidateOrdinal": 14,
+      "torchTop1CandidateOrdinal": 14,
+      "cuvsTop1CandidateOrdinal": 14,
+      "rank1Match": true,
+      "topKSetMatch": true
+    }
+  ],
+  "cuvsReceipt": {
+    "schema": "atlas.cuvs-exact-knn-receipt.v1",
+    "rows": 15,
+    "dimensions": 768,
+    "queries": 15,
+    "top_k": 5,
+    "metric": "cosine",
+    "neighbors_checksum": "3722010b7c233d60c1b429d4fad7a9d5126e6e54cd0349ac0b2563eeca24764b",
+    "distances_checksum": "ed1b76e0afb5ba064ba58e416d220da1cc17a19af9d904a936b5e226c37e8b65",
+    "canonical_authority": false
+  },
+  "gate": {
+    "RESULT": "PASS"
+  },
+  "canonicalAuthority": false,
+  "writesPerformed": false
+}
