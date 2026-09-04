@@ -358,11 +358,48 @@ from `parent-atlas-retrieval-lineage-dag-convergence`.
 
 ## Phase C — Classification and multi-representation projection
 
-- [ ] **DOC-09** okf domain classification extension — `EXTEND`. `classify_domain`/
-  `classify_ontology`/`domain_mapping.py::admit_domain_classification` exist; extend the taxonomy
-  with the `kind: ExternalDocumentation` shape from design.md's `DomainClassificationV1`, keeping
-  `canonicalAuthority: false` (okf classifies, does not own — per proposal.md's audit finding that
-  Postgres, not okf, must be the evidence owner).
+- [x] **DOC-09** okf domain classification extension — done, live-tested. Reused, did not
+  duplicate: `atlas_external_docs.classify_domain`/`classify_ontology` (rule-based label
+  extraction) and `parent_atlas_ontology.domain_mapping.admit_domain_classification` (okf's
+  existing classifies-does-not-own admission boundary).
+  **Real gap found and fixed in the existing mapping table**: `classify_domain()`'s `DOMAIN_RULES`
+  can emit `gpu`/`training`/`model_runtime`/`cache`/`protocol`/`testing`/`api` for external
+  documentation, but `domain_mapping.py`'s `_DEFAULT_MAPPINGS` (built for codebase-file
+  classification, a different corpus) never covered any of them — every external-doc chunk
+  landing in one of those domains was silently `UNMAPPED`. Added all 7 as new
+  `DomainOntologyMappingV1` entries (additive, existing entries untouched). Confirmed this doesn't
+  regress anything: `mapping_revision()`'s checksum changes when this tuple changes, but nothing
+  in this repo's tests pins the old checksum value — the one test that touches a related checksum
+  (`test_domain_classification_signal_parity.py::test_shared_fixture_matches_typescript_checksum_contract`)
+  tests a *different* function (`domain_classification_signal_checksum` from `domain_tuple_bridge.py`)
+  and was already failing before this change for an unrelated reason (`FileNotFoundError` on a
+  fixture path outside this container's `python/`-only mount) — re-ran the pre-existing 6-failure
+  baseline in `test_domain_classification_signal_parity.py`/`test_domain_tuple_bridge.py` after
+  this change and got the identical 6 failures, confirming no new regression.
+  **New**: `python/atlas_doc_domain_classification.py` — `DomainClassificationV1` (Pydantic,
+  frozen, `extra="forbid"`), design.md's exact `kind: 'ExternalDocumentation'` envelope
+  (`metadata.{domain,provider,product,version,capabilities,architectures,languages,retrievalTags}`,
+  `primary`, `subdomain`, `confidence`, `evidenceRefs`, `producerRevision`, `canonicalAuthority`
+  hard-literal `false`). `classify_external_doc_domain(chunk, producer_revision=...)` builds it
+  from a `ChunkRecord`: `provider`/`product`/`version`/`architecture`/`language` from the chunk's
+  own `DocCoordinateV1` (DOC-02, empty strings/tuples when absent — no crash on pre-DOC-02
+  callers); `confidence` from the *real* `admit_domain_classification()` result (`1.0` if
+  `ADMITTED`, `0.5` otherwise) — deliberately not a bare "isn't the fallback label" heuristic, so
+  it actually exercises the mapping-table extension above. **`capabilities` deliberately reuses
+  the chunk's own already-extracted `api_signatures` (DOC-05) rather than a hand-curated keyword
+  list** — design.md's governing principle is "extract deterministic structure first, enrich
+  semantically second," and inventing a second, speculative capability taxonomy here would be
+  exactly what that principle warns against.
+  **Live-tested inside the real container**: `python/test_atlas_doc_domain_classification.py`,
+  16/16 pass — all 7 newly-admitted labels confirmed `ADMITTED` (not just `gpu`); envelope shape
+  matches design.md field-for-field including the `kind`/`canonicalAuthority` literals; confidence
+  genuinely reflects the real admission result (proven with a fixture requiring a literal `CUDA`
+  keyword to actually trigger the `gpu` `DOMAIN_RULES` pattern, not `tile_ir`/`sm_86` alone, which
+  don't match any rule); capabilities proven to equal the chunk's own `api_signatures` exactly, not
+  a separately-invented list; no-`DocCoordinateV1` case handled without crashing;
+  `canonical_authority` confirmed `False` on every chunk; frozen immutability; out-of-range
+  confidence and empty-evidence-refs both rejected. Combined regression across every Phase A/B/C
+  test file: 83/83 pass.
 - [ ] **DOC-07** `semantic_768` representation — `EXISTS` (`embed_llama_server_768`), reuse as-is.
 - [x] **DOC-06b** Postgres FTS projection — done as part of DOC-06's migration, not a separate
   step. `atlas_external_doc_chunks.search_vector` (`GENERATED ALWAYS AS
