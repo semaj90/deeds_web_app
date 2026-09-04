@@ -77,6 +77,24 @@ from `parent-atlas-retrieval-lineage-dag-convergence`.
   `test_domain_tuple_bridge.py`, `tests/test_parent_atlas_networkx_pagerank.py` — none import
   anything this task touched) — identical 16 failures on the pre-DOC-01 baseline, confirming they
   predate this change rather than being caused by it, before restoring the stash.
+  **Hardening pass (same day, operator direction "OKF-DOC-PYDANTIC-MANIFEST-01")**: restructured
+  `PipelineManifestV1`/`SourceConfigV1` to mirror the real on-disk manifest shape 1:1 with nested
+  `QdrantConfigV1`/`EmbeddingConfigV1`/`FeaturesConfigV1`/`SomConfigV1` submodels (verified against
+  the real `docs/.okf/dev/atlas-doc-fabric.manifest.example.json` fixture, embedded inline in the
+  test file since the `miniforge-nlp-sidecar` container only mounts `python/`, not `docs/` —
+  confirmed live via `docker exec ... ls /app/`) instead of the flattened
+  `qdrant_collection`/`som_rows`-style fields from the first pass. Every model now sets
+  `model_config = {"frozen": True, "extra": "forbid"}` at every nesting level, so a misspelled
+  field (`allowd_domains`, `manifets_revision`, a typo'd nested `qdrant.colection`) is a validation
+  error, not silently ignored. New `parse_manifest_json_v1(raw: bytes | str)` — real
+  `model_validate_json` admission boundary, raw bytes straight to a validated model, no untyped
+  dict passed through — and `atlas_okf_docs_pipeline.load_manifest()` now calls it directly on
+  `Path(path).read_bytes()` instead of `json.loads()` + `parse_manifest_v1(dict)`.
+  **Live-tested inside the real container**: `test_atlas_doc_manifest.py` grew from 11 to 16 tests
+  (added: raw-bytes `model_validate_json` proof, three `extra="forbid"` rejection tests at
+  top-level/source-level/nested-qdrant-level, and an end-to-end validation of the real fixture's
+  exact embedded content) — 16/16 pass. Full combined regression: 59/59 pass across every Phase
+  A/B test file, zero regression from the restructure.
 - [x] **DOC-02** `DocCoordinateV1` version-qualified identity — done, live-tested. New
   `python/atlas_doc_coordinate.py`: Pydantic (frozen) `DocCoordinateV1`
   (`provider/product/product_version/architecture/language/url/section_anchor/content_hash` +

@@ -30,7 +30,7 @@ from uuid import NAMESPACE_URL, UUID, uuid5
 
 import numpy as np
 
-from atlas_doc_manifest import parse_manifest_v1
+from atlas_doc_manifest import parse_manifest_json_v1
 from atlas_external_docs import (
     ChunkRecord,
     classify_domain,
@@ -183,15 +183,16 @@ def load_manifest(path: str | Path) -> PipelineManifest:
     """Load+validate a manifest JSON document, returning the dataclass every
     downstream pipeline stage already consumes.
 
-    Validation itself now lives in atlas_doc_manifest.py's Pydantic layer
-    (DOC-01) -- this function is a thin front door that parses via
-    parse_manifest_v1() (ValidationError, which subclasses ValueError, so
-    every existing caller/test is unaffected) and converts the validated
-    Pydantic model into the exact same SourceConfig/PipelineManifest
-    dataclasses this function returned before DOC-01.
+    Validation itself lives in atlas_doc_manifest.py's Pydantic layer
+    (DOC-01 / OKF-DOC-PYDANTIC-MANIFEST-01) -- this function is a thin front
+    door that hands the raw file bytes straight to parse_manifest_json_v1()
+    (model_validate_json -- no untyped dict passed through in between; a
+    ValidationError, which subclasses ValueError, so every existing
+    caller/test is unaffected) and converts the validated Pydantic model into
+    the exact same SourceConfig/PipelineManifest dataclasses this function
+    returned before DOC-01.
     """
-    payload = json.loads(Path(path).read_text(encoding="utf-8"))
-    validated = parse_manifest_v1(payload)
+    validated = parse_manifest_json_v1(Path(path).read_bytes())
     sources = tuple(
         SourceConfig(
             source_id=source.source_id,
@@ -219,15 +220,15 @@ def load_manifest(path: str | Path) -> PipelineManifest:
         producer_revision=validated.producer_revision,
         output_root=validated.output_root,
         sources=sources,
-        qdrant_collection=validated.qdrant_collection,
-        qdrant_url=validated.qdrant_url,
-        qdrant_api_key_env=validated.qdrant_api_key_env,
-        embedding_url=validated.embedding_url,
-        embedding_model=validated.embedding_model,
-        low_rank=validated.low_rank,
-        kmeans_clusters=validated.kmeans_clusters,
-        som_rows=validated.som_rows,
-        som_columns=validated.som_columns,
+        qdrant_collection=validated.qdrant.collection,
+        qdrant_url=validated.qdrant.url,
+        qdrant_api_key_env=validated.qdrant.api_key_env,
+        embedding_url=validated.embedding.url,
+        embedding_model=validated.embedding.model,
+        low_rank=validated.features.low_rank,
+        kmeans_clusters=validated.features.kmeans_clusters,
+        som_rows=validated.features.som.rows,
+        som_columns=validated.features.som.columns,
     )
 
 
