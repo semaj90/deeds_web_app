@@ -400,7 +400,28 @@ from `parent-atlas-retrieval-lineage-dag-convergence`.
   `canonical_authority` confirmed `False` on every chunk; frozen immutability; out-of-range
   confidence and empty-evidence-refs both rejected. Combined regression across every Phase A/B/C
   test file: 83/83 pass.
-- [ ] **DOC-07** `semantic_768` representation — `EXISTS` (`embed_llama_server_768`), reuse as-is.
+- [x] **DOC-07** `semantic_768` representation — done, live-proven (was previously untested
+  reuse, not just unverified). `embed_llama_server_768()` already existed and was already wired
+  into `atlas_okf_docs_pipeline.py`'s real end-to-end pipeline stage (`discover_and_fetch ->
+  compile_chunks -> embed_llama_server_768 -> PageRank/low-rank/cluster features ->
+  build_qdrant_points -> optional explicit-opt-in `write_qdrant`), confirmed by reading the source
+  — but had **zero existing tests anywhere in this repo** before this session. Confirmed the
+  target embedding server is genuinely live in this environment: `curl :8081/v1/models` ->
+  `n_embd: 768`, `owned_by: llamacpp` (matches memory's Session 201 "EG-GGUF" local llama.cpp
+  challenger executor, not the Ollama `embeddinggemma:latest` primary path — this function targets
+  whichever backend `manifest.embedding_url`/`embedding_model` point at, unchanged either way).
+  **New**: `python/test_atlas_doc_semantic_768.py`, 8/8 pass — 3 real live-integration tests against
+  the actual running `:8081` server (768-dim + finite + L2-normalized output; distinct texts
+  produce distinct vectors, not a degenerate constant embedding; two calls on identical text are
+  bit-reproducible), auto-skipped with a clear reason if the server isn't reachable in a given
+  environment rather than failing hard; 4 fail-closed guard tests (mocked, since a healthy real
+  server won't produce these failure shapes on demand) proving `embed_llama_server_768()` actually
+  raises — never silently substitutes a zero vector — on a missing `embedding` key, an empty
+  `data` array, a wrong-dimension vector (512 instead of 768), and a non-finite (`NaN`) vector; one
+  static source-inspection test proving the pipeline's real call sites actually pass
+  `manifest.embedding_url`/`manifest.embedding_model` through, so a future refactor that silently
+  drops that wiring fails a test instead of going unnoticed. Combined regression across every Phase
+  A/B/C test file: 91/91 pass.
 - [x] **DOC-06b** Postgres FTS projection — done as part of DOC-06's migration, not a separate
   step. `atlas_external_doc_chunks.search_vector` (`GENERATED ALWAYS AS
   to_tsvector('english', coalesce(text,'')) STORED`) + `aedc_fts_gin` GIN index landed in
