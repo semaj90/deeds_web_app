@@ -44,12 +44,39 @@ from `parent-atlas-retrieval-lineage-dag-convergence`.
 
 ## Phase A — Identity and canonical ownership (blocking, do first)
 
-- [ ] **DOC-01** `ExternalDocSourceManifestV1` — Pydantic model for manifest sources. `EXTEND`:
-  `PipelineManifest` exists in `atlas_okf_docs_pipeline.py` as a `@dataclass`; add a Pydantic
-  schema (matches the user's "Pydantic first" direction and the existing `WebEvidenceRequestV1`
-  convention in the same sidecar) without breaking the existing CLI's dataclass consumers — either
-  a Pydantic model that the dataclass loader validates through, or a parallel `model_validate` at
-  `load_manifest()`'s entry point.
+- [x] **DOC-01** `ExternalDocSourceManifestV1` — done, live-tested, zero regression. New
+  `python/atlas_doc_manifest.py`: Pydantic (frozen) `SourceConfigV1`/`PipelineManifestV1` mirroring
+  `atlas_okf_docs_pipeline.py`'s `@dataclass` `SourceConfig`/`PipelineManifest` field-for-field, plus
+  `parse_manifest_v1()` reproducing the exact same default-resolution rules the old hand-rolled
+  loader used (per-source `output_namespace` defaulting to `docs/.okf/<source_id>`, `title`
+  defaulting to `source_id`, nested `qdrant`/`embedding`/`features.som` blocks). Chose the
+  "dataclass loader validates through" option from this task's own two listed approaches, not the
+  parallel-`model_validate` one: `atlas_okf_docs_pipeline.load_manifest()` is now a thin front door
+  that calls `parse_manifest_v1()` then converts the validated Pydantic model into the same
+  `SourceConfig`/`PipelineManifest` dataclasses it always returned — every downstream pipeline
+  stage (fetch/chunk/embed/Qdrant/SOM) is unaffected, confirmed by re-running its own existing test
+  file unmodified. Two of the hand-rolled loader's validation helpers were shared rather than
+  duplicated: `enforce_allowed_domain` (already in `atlas_external_docs.py`) and a newly-extracted
+  `validate_okf_output_namespace` (moved there from a private function in the pipeline module,
+  which now delegates to it) — both a leaf `atlas_external_docs.py` dependency, avoiding a circular
+  import back into the pipeline module. Confirmed live: `pydantic.ValidationError` subclasses
+  `ValueError` (checked `ValidationError.__mro__` against the real pydantic 2.13.5 install in the
+  `miniforge-nlp-sidecar` container), so every existing `assertRaises(ValueError)` caller in
+  `test_atlas_okf_docs_pipeline.py` keeps passing unchanged with no compat shim needed.
+  **Live-tested inside the real container**: `python/test_atlas_doc_manifest.py`, 11/11 pass
+  (valid-manifest parse, domain-allowlist rejection, missing-required-field rejection, duplicate
+  source-id rejection, missing-URLs rejection, invalid-namespace rejection, output-namespace
+  default resolution, frozen immutability at both manifest and per-source level, domain
+  lowercasing/dot-stripping, blank-namespace normalization, and a cross-module bridge test proving
+  `load_manifest()`'s dataclass output matches `parse_manifest_v1()`'s Pydantic output field-for-field).
+  **Zero-regression proof, not just claimed**: ran the full pre-existing suite twice — once on this
+  change (36/36 pass across `test_atlas_doc_manifest.py` + `test_atlas_okf_docs_pipeline.py` +
+  `test_atlas_doc_coordinate.py` + `test_atlas_external_docs.py`), then `git stash`ed this change's
+  files and re-ran the wider repo suite to find 16 pre-existing failures in unrelated test files
+  (`test_atlas_structured_value_arrow.py`, `test_domain_classification_signal_parity.py`,
+  `test_domain_tuple_bridge.py`, `tests/test_parent_atlas_networkx_pagerank.py` — none import
+  anything this task touched) — identical 16 failures on the pre-DOC-01 baseline, confirming they
+  predate this change rather than being caused by it, before restoring the stash.
 - [x] **DOC-02** `DocCoordinateV1` version-qualified identity — done, live-tested. New
   `python/atlas_doc_coordinate.py`: Pydantic (frozen) `DocCoordinateV1`
   (`provider/product/product_version/architecture/language/url/section_anchor/content_hash` +
@@ -97,7 +124,14 @@ from `parent-atlas-retrieval-lineage-dag-convergence`.
 - [ ] **DOC-27** stale version rejection — `NEW`, depends on DOC-02. A query for `product=X
   version=Y` must never silently fall back to a different version's chunks; fail closed (same
   fail-closed pattern as `local-llm-offload-ownership`'s model resolution) if the exact version
-  isn't indexed yet.
+  isn't indexed yet. **Partial evidence only — do not mark done from this alone.** DOC-06's live
+  proof covers the *write-side* half of this invariant (the DB physically cannot collide two
+  versions under one row, and physically cannot store a duplicate `(provider, product,
+  product_version, url)` — both proven via real unique-constraint violations against the live
+  table). It does **not** cover the *read-side* half this task is actually about: an application
+  query for a `product_version` that has zero indexed rows must return a fail-closed
+  "not indexed yet" result, not silently substitute the nearest other version's chunks. No query
+  layer exists yet to prove or disprove that behavior — this remains unstarted until one does.
 
 ## Phase B — Deterministic extraction (before any LLM touches a page)
 
@@ -131,8 +165,12 @@ from `parent-atlas-retrieval-lineage-dag-convergence`.
   `canonicalAuthority: false` (okf classifies, does not own — per proposal.md's audit finding that
   Postgres, not okf, must be the evidence owner).
 - [ ] **DOC-07** `semantic_768` representation — `EXISTS` (`embed_llama_server_768`), reuse as-is.
-- [ ] **DOC-06b** Postgres FTS projection — depends on DOC-06's table existing; add the tsvector
-  column/GIN index per this repo's existing manual-SQL pattern for indexes Drizzle can't express.
+- [x] **DOC-06b** Postgres FTS projection — done as part of DOC-06's migration, not a separate
+  step. `atlas_external_doc_chunks.search_vector` (`GENERATED ALWAYS AS
+  to_tsvector('english', coalesce(text,'')) STORED`) + `aedc_fts_gin` GIN index landed in
+  `20260904_external_doc_intelligence_v1.sql` and were live-proven there (`to_tsquery('english',
+  'Ampere')` matched a real inserted row via the generated column). Recorded as its own line item
+  here only for traceability against this task's own numbering — no further work needed.
 - [ ] **DOC-08** Qdrant dense+BM25 hybrid projection — `EXTEND`. `qdrant_points()` exists (dense
   only, confirmed by reading the function); confirm/add named sparse (BM25) vector alongside dense
   `semantic_768` in the same point, per Qdrant's documented hybrid-query support — verify current

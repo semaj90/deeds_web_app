@@ -30,6 +30,7 @@ from uuid import NAMESPACE_URL, UUID, uuid5
 
 import numpy as np
 
+from atlas_doc_manifest import parse_manifest_v1
 from atlas_external_docs import (
     ChunkRecord,
     classify_domain,
@@ -42,6 +43,7 @@ from atlas_external_docs import (
     low_rank_sample_query_features,
     qdrant_points,
     stanza_observations,
+    validate_okf_output_namespace,
 )
 from parent_atlas_ontology.domain_mapping import admit_domain_classification
 from parent_atlas_ontology.domain_tuple_bridge import build_domain_classification_signal_from_chunk
@@ -171,71 +173,61 @@ def is_uuid(value: str) -> bool:
 
 
 def _validate_output_namespace(value: str) -> None:
-    normalized = value.replace("\\", "/")
-    if not re.fullmatch(r"docs/\.okf/[A-Za-z0-9_./-]+", normalized):
-        raise ValueError(f"INVALID_OKF_OUTPUT_NAMESPACE:{value}")
-    if ".." in Path(normalized).parts:
-        raise ValueError(f"INVALID_OKF_OUTPUT_NAMESPACE:{value}")
+    """Thin compat wrapper -- the real check moved to atlas_external_docs.py
+    (validate_okf_output_namespace) so atlas_doc_manifest.py's Pydantic layer
+    (DOC-01) can share it without a circular import back into this module."""
+    validate_okf_output_namespace(value)
 
 
 def load_manifest(path: str | Path) -> PipelineManifest:
+    """Load+validate a manifest JSON document, returning the dataclass every
+    downstream pipeline stage already consumes.
+
+    Validation itself now lives in atlas_doc_manifest.py's Pydantic layer
+    (DOC-01) -- this function is a thin front door that parses via
+    parse_manifest_v1() (ValidationError, which subclasses ValueError, so
+    every existing caller/test is unaffected) and converts the validated
+    Pydantic model into the exact same SourceConfig/PipelineManifest
+    dataclasses this function returned before DOC-01.
+    """
     payload = json.loads(Path(path).read_text(encoding="utf-8"))
-    required = ["manifest_revision", "workspace_revision", "source_snapshot_revision", "producer_revision", "sources"]
-    for key in required:
-        if not payload.get(key):
-            raise ValueError(f"MANIFEST_MISSING:{key}")
-    sources: list[SourceConfig] = []
-    seen: set[str] = set()
-    for raw in payload["sources"]:
-        source_id = str(raw["source_id"])
-        if source_id in seen:
-            raise ValueError(f"DUPLICATE_SOURCE_ID:{source_id}")
-        seen.add(source_id)
-        output_namespace = str(raw.get("output_namespace") or f"docs/.okf/{source_id}")
-        _validate_output_namespace(output_namespace)
-        base_urls = tuple(str(item) for item in raw.get("base_urls") or [])
-        allowed_domains = tuple(str(item).lower().lstrip(".") for item in raw.get("allowed_domains") or [])
-        if not base_urls or not allowed_domains:
-            raise ValueError(f"SOURCE_URLS_AND_DOMAINS_REQUIRED:{source_id}")
-        for url in (*base_urls, *tuple(raw.get("pages") or [])):
-            enforce_allowed_domain(str(url), allowed_domains)
-        sources.append(SourceConfig(
-            source_id=source_id,
-            source_revision=str(raw["source_revision"]),
-            title=str(raw.get("title") or source_id),
-            base_urls=base_urls,
-            allowed_domains=allowed_domains,
-            authority_class=str(raw.get("authority_class") or "PRIMARY_PROJECT"),
-            default_fetcher=str(raw.get("default_fetcher") or "BEAUTIFULSOUP_HTTP"),
-            output_namespace=output_namespace,
-            include_paths=tuple(str(item) for item in raw.get("include_paths") or []),
-            exclude_paths=tuple(str(item) for item in raw.get("exclude_paths") or []),
-            maximum_pages=int(raw.get("maximum_pages", 100)),
-            maximum_depth=int(raw.get("maximum_depth", 3)),
-            pages=tuple(str(item) for item in raw.get("pages") or []),
-            ldr_export_files=tuple(str(item) for item in raw.get("ldr_export_files") or []),
-            source_namespace=(str(raw["source_namespace"]).strip() or None) if raw.get("source_namespace") is not None else None,
-        ))
-    qdrant = payload.get("qdrant") or {}
-    embedding = payload.get("embedding") or {}
-    features = payload.get("features") or {}
-    som = features.get("som") or {}
+    validated = parse_manifest_v1(payload)
+    sources = tuple(
+        SourceConfig(
+            source_id=source.source_id,
+            source_revision=source.source_revision,
+            title=source.title,
+            base_urls=source.base_urls,
+            allowed_domains=source.allowed_domains,
+            authority_class=source.authority_class,
+            default_fetcher=source.default_fetcher,
+            output_namespace=source.output_namespace,
+            include_paths=source.include_paths,
+            exclude_paths=source.exclude_paths,
+            maximum_pages=source.maximum_pages,
+            maximum_depth=source.maximum_depth,
+            pages=source.pages,
+            ldr_export_files=source.ldr_export_files,
+            source_namespace=source.source_namespace,
+        )
+        for source in validated.sources
+    )
     return PipelineManifest(
-        manifest_revision=str(payload["manifest_revision"]),
-        workspace_revision=str(payload["workspace_revision"]),
-        source_snapshot_revision=str(payload["source_snapshot_revision"]),
-        producer_revision=str(payload["producer_revision"]),
-        output_root=str(payload.get("output_root") or "."),
-        sources=tuple(sources),
-        qdrant_collection=str(qdrant.get("collection") or "external_programming_docs_768"),
-        qdrant_url=str(qdrant.get("url") or "http://127.0.0.1:6333"),
-        qdrant_api_key_env=(str(qdrant["api_key_env"]) if qdrant.get("api_key_env") else None),
-        embedding_url=str(embedding.get("url") or "http://127.0.0.1:8081"),
-        embedding_model=str(embedding.get("model") or "embeddinggemma-300m-f16.gguf"),
-        low_rank=int(features.get("low_rank", 64)),
-        kmeans_clusters=int(features.get("kmeans_clusters", 64)),
-        som_rows=int(som.get("rows", 20)),
-        som_columns=int(som.get("columns", 20)),
+        manifest_revision=validated.manifest_revision,
+        workspace_revision=validated.workspace_revision,
+        source_snapshot_revision=validated.source_snapshot_revision,
+        producer_revision=validated.producer_revision,
+        output_root=validated.output_root,
+        sources=sources,
+        qdrant_collection=validated.qdrant_collection,
+        qdrant_url=validated.qdrant_url,
+        qdrant_api_key_env=validated.qdrant_api_key_env,
+        embedding_url=validated.embedding_url,
+        embedding_model=validated.embedding_model,
+        low_rank=validated.low_rank,
+        kmeans_clusters=validated.kmeans_clusters,
+        som_rows=validated.som_rows,
+        som_columns=validated.som_columns,
     )
 
 

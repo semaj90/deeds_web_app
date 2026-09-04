@@ -15,6 +15,7 @@ from dataclasses import asdict, dataclass
 from hashlib import sha256
 import json
 import math
+from pathlib import PurePosixPath
 import re
 from typing import Any, Callable, Iterable, Mapping, Sequence
 from urllib.parse import urljoin, urlparse
@@ -210,6 +211,17 @@ def enforce_allowed_domain(url: str, allowed_domains: Sequence[str]) -> None:
     allowed = {domain.lower().lstrip(".") for domain in allowed_domains}
     if not hostname or not any(hostname == domain or hostname.endswith(f".{domain}") for domain in allowed):
         raise ValueError(f"EXTERNAL_DOC_DOMAIN_NOT_ALLOWED:{hostname}")
+
+
+def validate_okf_output_namespace(value: str) -> None:
+    """Shared with atlas_okf_docs_pipeline.py's manifest loader and
+    atlas_doc_manifest.py's Pydantic layer (DOC-01) -- kept here, not
+    duplicated, so both validate identically."""
+    normalized = value.replace("\\", "/")
+    if not re.fullmatch(r"docs/\.okf/[A-Za-z0-9_./-]+", normalized):
+        raise ValueError(f"INVALID_OKF_OUTPUT_NAMESPACE:{value}")
+    if ".." in PurePosixPath(normalized).parts:
+        raise ValueError(f"INVALID_OKF_OUTPUT_NAMESPACE:{value}")
 
 
 def stanza_observations(text: str, *, pipeline: Any, model_revision: str) -> tuple[tuple[Json, ...], tuple[Json, ...]]:
