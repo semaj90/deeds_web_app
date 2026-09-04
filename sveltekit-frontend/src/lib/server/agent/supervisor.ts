@@ -17,7 +17,7 @@ import {
 	END,
 	START,
 } from '@langchain/langgraph';
-import { ChatOllama } from '@langchain/ollama';
+import { ChatOpenAI } from '@langchain/openai';
 import { HumanMessage, SystemMessage } from '@langchain/core/messages';
 import type { DynamicStructuredTool } from '@langchain/core/tools';
 import { ENV } from '$lib/server/env.server.js';
@@ -88,7 +88,7 @@ export class SupervisorAgent {
 	private graphPromise: Promise<ReturnType<typeof StateGraph.prototype.compile> | null> | null = null;
 	private subagents: Map<SubagentName, SubagentInstance> = new Map();
 	private allTools: DynamicStructuredTool[];
-	private routerLlm: ChatOllama;
+	private routerLlm: ChatOpenAI;
 	private config: SupervisorConfig;
 
 	constructor(
@@ -98,8 +98,9 @@ export class SupervisorAgent {
 		this.allTools = allTools;
 		this.config = config;
 
-		this.routerLlm = new ChatOllama({
-			baseUrl: ENV.OLLAMA_BASE_URL,
+		this.routerLlm = new ChatOpenAI({
+			apiKey: 'local',
+			configuration: { baseURL: `${ENV.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090'}/v1` },
 			model: LLM_MODEL_ID,
 			temperature: 0, // deterministic routing
 		});

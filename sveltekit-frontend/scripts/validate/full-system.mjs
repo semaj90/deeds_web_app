@@ -938,13 +938,17 @@ async function G29() {
 }
 
 /**
- * G30 — gemma4-offload MCP stdio server: spawn + initialize handshake.
+ * G30 — local-llm-offload MCP stdio server: spawn + initialize handshake.
  *
- * Boots `scripts/mcp/gemma4-offload-mcp.mjs` as a stdio child, sends
- * the JSON-RPC `initialize` then `tools/list`, expects ≥4 tools back.
+ * Boots `scripts/mcp/gemma4-offload-mcp.mjs` (canonical capability identity
+ * is "local-llm-offload"; the filename and process registration key are a
+ * temporary compatibility alias, see LOCAL-LLM-OFFLOAD-OWNERSHIP-01) as a
+ * stdio child, sends the JSON-RPC `initialize` then `tools/list`, expects
+ * >=9 tools back (5 canonical repo_* + 4 deprecated gemma4_* aliases).
  * Catches: missing file, JSON-RPC handler crash, stdin/stdout deadlock.
  *
- * Independent of TurboQuant/Ollama — just exercises the protocol layer.
+ * Independent of TurboQuant — just exercises the protocol layer. This MCP
+ * never talks to Ollama; Ollama is embeddings-only elsewhere in this repo.
  */
 async function G30() {
   const path = 'scripts/mcp/gemma4-offload-mcp.mjs';
@@ -966,7 +970,7 @@ async function G30() {
         if (msg.id === 2 && msg.result?.tools) {
           clearTimeout(t);
           const n = msg.result.tools.length;
-          finish(n >= 4 ? pass(`${n} tools registered`) : fail(`only ${n} tools (need ≥4)`));
+          finish(n >= 9 ? pass(`${n} tools registered`) : fail(`only ${n} tools (need ≥9: 5 canonical + 4 deprecated aliases)`));
         }
       }
     });
@@ -981,10 +985,18 @@ async function G30() {
 }
 
 /**
- * G31 — gemma4-offload MCP tool round-trip via gemma4_health.
+ * G31 — local-llm-offload MCP tool round-trip via repo_llm_health.
  *
- * Calls the cheap health probe tool — proves stdin → tool dispatch → backend
- * fetch → stdout response works end-to-end. Skip if G30 didn't pass.
+ * Calls the cheap health probe tool — proves stdin -> tool dispatch -> backend
+ * fetch -> stdout response works end-to-end. Skip if G30 didn't pass.
+ *
+ * This MCP only ever talks to OpenAI-compatible llama-server routes
+ * (primary :8090, fallback Atomic Chat :1337) — never Ollama, which is
+ * embeddings-only elsewhere in this repo. The real tool response is a
+ * LocalLlmOffloadReceiptV1 envelope with a `backends: [{backend, health,
+ * models, ...}]` array, not top-level `turboquant`/`ollama` fields — a
+ * prior version of this gate checked those two fields, which never existed
+ * in the tool's actual output, so it could only ever warn, never truly pass.
  */
 async function G31() {
   const path = 'scripts/mcp/gemma4-offload-mcp.mjs';
@@ -1006,16 +1018,18 @@ async function G31() {
           clearTimeout(t);
           const text = msg.result.content[0]?.text ?? '';
           let body; try { body = JSON.parse(text); } catch { return finish(fail(`non-JSON content: ${text.slice(0, 80)}`)); }
-          const turbo = body.turboquant ?? '?', ollama = body.ollama ?? '?';
-          const liveCount = [turbo, ollama].filter(s => s === 'ok').length;
-          if (liveCount === 0) return finish(warn(`both backends down (turbo=${turbo}, ollama=${ollama})`));
-          finish(pass(`turbo=${turbo} ollama=${ollama}`));
+          const backends = Array.isArray(body.backends) ? body.backends : [];
+          if (backends.length === 0) return finish(fail(`no backends[] in response: ${text.slice(0, 120)}`));
+          const liveCount = backends.filter(b => b.health === 'ok' && b.models === 'ok').length;
+          const summary = backends.map(b => `${b.backend}=${b.health}/${b.models}`).join(' ');
+          if (liveCount === 0) return finish(warn(`no backends fully live (${summary})`));
+          finish(pass(`${summary} loadedModel=${body.loadedModel ?? '?'} modelMatch=${body.modelMatch}`));
         }
       }
     });
     child.on('error', err => { clearTimeout(t); finish(fail(`spawn failed: ${err.message}`)); });
     child.stdin.write(JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'initialize', params: { protocolVersion: '2024-11-05', capabilities: {}, clientInfo: { name: 'g31', version: '0' } } }) + '\n');
-    child.stdin.write(JSON.stringify({ jsonrpc: '2.0', id: 2, method: 'tools/call', params: { name: 'gemma4_health', arguments: {} } }) + '\n');
+    child.stdin.write(JSON.stringify({ jsonrpc: '2.0', id: 2, method: 'tools/call', params: { name: 'repo_llm_health', arguments: {} } }) + '\n');
   });
 }
 
@@ -1098,9 +1112,10 @@ const GATES = [
   // T0 — Drizzle migration safety: scan pending SQL for destructive ops.
   { id: 'G29', tier: 0, name: 'drizzle:destructive-pending', fn: G29, fatal: false },
 
-  // T1 — gemma4-offload MCP server (Claude Code → local Gemma4 routing).
-  { id: 'G30', tier: 1, name: 'mcp:gemma4-offload-handshake', fn: G30, fatal: false },
-  { id: 'G31', tier: 1, name: 'mcp:gemma4-offload-roundtrip', fn: G31, fatal: false },
+  // T1 — local-llm-offload MCP server (Claude Code/OpenCode -> local llama-server routing;
+  // registered under the compatibility key "gemma4-offload", see LOCAL-LLM-OFFLOAD-OWNERSHIP-01).
+  { id: 'G30', tier: 1, name: 'mcp:local-llm-offload-handshake', fn: G30, fatal: false },
+  { id: 'G31', tier: 1, name: 'mcp:local-llm-offload-roundtrip', fn: G31, fatal: false },
 
   // T0 — db-inspection-tools.ts must contain zero write verbs (Phase B).
   { id: 'G33', tier: 0, name: 'mcp:db-inspection-readonly',  fn: G33, fatal: true  },

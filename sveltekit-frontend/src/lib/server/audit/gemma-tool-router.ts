@@ -1,8 +1,8 @@
 /**
- * Gemma 4 Tool Router for GPU Audit Operations
+ * Local-LLM Tool Router for GPU Audit Operations
  *
- * Lets Gemma 4 plan, execute, and explain codebase audit results via native
- * function calling. The model selects which audit tools to run based on the
+ * Lets the active local model plan, execute, and explain codebase audit results
+ * via OpenAI-compatible function calling. The model selects which audit tools to run based on the
  * user's query, then synthesizes a readable understanding report.
  *
  * Available tools:
@@ -17,15 +17,10 @@
  */
 
 import { z } from 'zod';
-import {
-  assertDirectOllamaAllowed,
-  getOllamaEndpoint,
-  ollamaFetch,
-  VLM_MODELS,
-} from '$lib/server/ollama.js';
-import { ENV } from '$lib/server/env.server.js';
+import { resolveLlamaInferenceTarget } from '$lib/server/llm/runtime-contract.js';
+import { getOllamaEndpoint, ollamaFetch } from '$lib/server/ollama.js';
 
-// ── Tool Definitions (OpenAI-compatible format for Ollama) ────────────
+// ── Tool Definitions (OpenAI-compatible format for llama-server) ─────
 
 export const AUDIT_TOOLS = [
   {
@@ -492,40 +487,28 @@ export async function runAuditPlanner(req: AuditPlannerRequest): Promise<AuditPl
   let totalToolCalls = 0;
   const allResults: AuditToolResult[] = [];
 
-  const messages: Array<{ role: string; content: string }> = [
+  const messages: Array<{ role: string; content: string; tool_calls?: unknown }> = [
     { role: 'system', content: AUDIT_SYSTEM_PROMPT },
     ...(req.conversationHistory ?? []).slice(-6),
     { role: 'user', content: req.query },
   ];
 
-  const ollamaUrl = getOllamaEndpoint();
-  const keepAlive = '2m';
-
   // Multi-round tool-calling loop
   while (toolRounds < MAX_TOOL_ROUNDS) {
     let res: Response;
     try {
-      assertDirectOllamaAllowed(
-        'audit/gemma-tool-router',
-        'audit-planner',
-        'Planner loop needs native tools payload with local executor roundtrips.'
-      );
-      res = await ollamaFetch(`${ollamaUrl}/api/chat`, {
+      const target = await resolveLlamaInferenceTarget();
+      res = await fetch(`${target.baseUrl}/v1/chat/completions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: VLM_MODELS.legal,
+          model: target.model,
           messages,
           stream: false,
           tools: AUDIT_TOOLS,
-          keep_alive: keepAlive,
-          options: {
-            temperature: 0.1,
-            top_k: 20,
-            top_p: 0.8,
-            num_ctx: 8192,
-            num_predict: 512,
-          },
+          temperature: 0.1,
+          top_p: 0.8,
+          max_tokens: 512,
         }),
         signal: AbortSignal.timeout(30_000),
       });
@@ -542,8 +525,9 @@ export async function runAuditPlanner(req: AuditPlannerRequest): Promise<AuditPl
       break;
     }
 
-    const toolCalls = data.message?.tool_calls;
-    const assistantContent = data.message?.content || '';
+    const assistantMessage = data.choices?.[0]?.message ?? {};
+    const toolCalls = assistantMessage.tool_calls;
+    const assistantContent = assistantMessage.content || '';
 
     // No tool calls — model is done, return its response
     if (!toolCalls || !Array.isArray(toolCalls) || toolCalls.length === 0) {
@@ -555,7 +539,7 @@ export async function runAuditPlanner(req: AuditPlannerRequest): Promise<AuditPl
     }
 
     // Append assistant message (may contain thinking)
-    messages.push({ role: 'assistant', content: assistantContent });
+    messages.push({ role: 'assistant', content: assistantContent, tool_calls: toolCalls });
 
     // Execute each tool call
     for (const tc of toolCalls) {
@@ -588,28 +572,24 @@ export async function runAuditPlanner(req: AuditPlannerRequest): Promise<AuditPl
 
   // If we exhausted rounds without a final response, make one last call without tools
   try {
-    assertDirectOllamaAllowed(
-      'audit/gemma-tool-router',
-      'audit-planner',
-      'Final synthesis call in planner loop remains direct by design.'
-    );
-    const finalRes = await ollamaFetch(`${ollamaUrl}/api/chat`, {
+    const target = await resolveLlamaInferenceTarget();
+    const finalRes = await fetch(`${target.baseUrl}/v1/chat/completions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: VLM_MODELS.legal,
+        model: target.model,
         messages,
         stream: false,
-        keep_alive: keepAlive,
-        options: { temperature: 0.3, num_ctx: 8192, num_predict: 1024 },
+        temperature: 0.3,
+        max_tokens: 1024,
       }),
       signal: AbortSignal.timeout(30_000),
     });
 
     if (finalRes.ok) {
-      const finalData = await finalRes.json();
+      const finalData = await finalRes.json() as { choices?: Array<{ message?: { content?: string } }> };
       return {
-        response: finalData.message?.content || 'Audit tools executed but no summary generated.',
+        response: finalData.choices?.[0]?.message?.content || 'Audit tools executed but no summary generated.',
         toolResults: allResults,
         totalDurationMs: Date.now() - totalStart,
       };

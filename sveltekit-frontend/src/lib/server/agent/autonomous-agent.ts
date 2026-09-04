@@ -12,7 +12,7 @@
  *   const result = await agent.investigate("Find all Svelte 4 patterns");
  */
 
-import { ChatOllama } from '@langchain/ollama';
+import { ChatOpenAI } from '@langchain/openai';
 import { createReactAgent } from '@langchain/langgraph/prebuilt';
 import { HumanMessage } from '@langchain/core/messages';
 import { DynamicStructuredTool } from '@langchain/core/tools';
@@ -97,7 +97,7 @@ interface InvestigationResult {
 }
 
 export class AutonomousAgent {
-  private llm: ChatOllama;
+  private llm: ChatOpenAI;
   private tools: DynamicStructuredTool[];
   private reactAgent: ReturnType<typeof createReactAgent> | null = null;
   private config: AgentConfig;
@@ -110,9 +110,10 @@ export class AutonomousAgent {
       ...config,
     };
 
-    // Initialize Ollama LLM
-    this.llm = new ChatOllama({
-      baseUrl: ENV.OLLAMA_BASE_URL,
+    // Initialize the OpenAI-compatible llama-server boundary.
+    this.llm = new ChatOpenAI({
+      apiKey: 'local',
+      configuration: { baseURL: `${ENV.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090'}/v1` },
       model: LLM_MODEL_ID,
       temperature: this.config.temperature,
     });

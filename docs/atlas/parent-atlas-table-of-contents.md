@@ -49,6 +49,7 @@ VRAM, and latency receipts before changing the `:8098` owner.
 - [OKF bundle export](</C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/.okf/README.md>) - generated derived index, not canonical source
 - [TurboVec kanban consolidation report](</C:/Users/james/Videos/deeds-web-app/docs/reports/kanban-turbovec-consolidation-latest.md>)
 - [Raw rg transcript organizer](</C:/Users/james/Videos/deeds-web-app/docs/reports/parent-atlas-rg-dump-organizer.md>)
+- [Concept Fabric owner and contract audit](</C:/Users/james/Videos/deeds-web-app/docs/reports/parent-atlas-concept-fabric-audit-v1.json>) - read-only inventory of OKF, domain, AST/NLP, retrieval, ACE, DAG, cache, and synthesis owners
 - [Raw rg transcript projection](</C:/Users/james/Videos/deeds-web-app/docs/reports/parent-atlas-rg-dump-projection.md>)
 - [Offline synthesis mapreduce DuckDB](</C:/Users/james/Videos/deeds-web-app/docs/reports/offline-synthesis-mapreduce-duckdb-report.md>)
 - [Compressed semantic geometry report](</C:/Users/james/Videos/deeds-web-app/docs/reports/compressed-semantic-geometry-report.md>)

@@ -40,8 +40,7 @@ import { rerank as semanticRerank, healthCheckReranker } from '$lib/server/retri
 import { fastJsonParse } from '$lib/server/gpu/simdjson-bridge.js';
 import { attentionScoreChunks } from '$lib/server/gpu/libtorch-bridge.js';
 import { getRedis } from '$lib/server/redis.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
-import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
+import { resolveLlamaInferenceTarget } from '$lib/server/llm/runtime-contract.js';
 
 // Re-export ContextDoc so callers don't need graph-informed-retrieval import
 export type { ContextDoc };
@@ -49,6 +48,7 @@ export type { ContextDoc };
 // ── Config ──────────────────────────────────────────────────────────────────
 
 const EMBEDDING_MODEL = ENV.OLLAMA_EMBED_MODEL;
+// Ollama is retained here only for the EmbeddingGemma embedding lane.
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 const RAG_MAX_CHUNKS = 12;
 const CORRECTIVE_RAG_THRESHOLD = 0.5;
@@ -220,21 +220,22 @@ async function correctiveRetrieval(
 	if (topScore >= CORRECTIVE_RAG_THRESHOLD) return { docs, reformulated: false };
 
 	try {
-		const res = await ollamaFetch(`${OLLAMA_URL}/api/generate`, {
+		const target = await resolveLlamaInferenceTarget();
+		const res = await fetch(`${target.baseUrl}/v1/chat/completions`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				model: LLM_MODEL_ID,
-				prompt: `Rephrase this legal search query to improve retrieval results. Return ONLY the rephrased query, no explanation.\n\nOriginal query: "${query}"`,
+				model: target.model,
+				messages: [{ role: 'user', content: `Rephrase this legal search query to improve retrieval results. Return ONLY the rephrased query, no explanation.\n\nOriginal query: "${query}"` }],
 				stream: false,
-				keep_alive: '2m',
-				options: { temperature: 0.3, num_predict: 100 },
+				temperature: 0.3,
+				max_tokens: 100,
 			}),
 			signal: AbortSignal.timeout(15_000),
 		});
 		if (!res.ok) return { docs, reformulated: false };
-		const data = (await res.json()) as { response?: string };
-		const newQuery = String(data.response ?? '').trim().replace(/^["']|["']$/g, '');
+		const data = (await res.json()) as { choices?: Array<{ message?: { content?: string } }> };
+		const newQuery = String(data.choices?.[0]?.message?.content ?? '').trim().replace(/^["']|["']$/g, '');
 		if (!newQuery || newQuery.length < 5) return { docs, reformulated: false };
 
 		const newVector = await embedQuery(newQuery);

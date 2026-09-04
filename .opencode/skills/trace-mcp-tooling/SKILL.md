@@ -1,6 +1,6 @@
 ---
 name: trace-mcp-tooling
-description: Use when calling TRACE MCP tools (port 8788) or the gemma4-offload stdio MCP. Covers tool naming, when to use which tool, how to read the responses, and the "no raw infra" rule.
+description: Use when calling TRACE MCP tools (port 8788) or the local-llm-offload stdio MCP. Covers tool naming, when to use which tool, how to read the responses, and the "no raw infra" rule. The registered gemma4-offload name is a compatibility alias.
 allowed-tools:
   - mcp__trace__kag_search
   - mcp__trace__wiki_note_lookup
@@ -17,8 +17,9 @@ allowed-tools:
 # TRACE MCP tooling
 
 Use TRACE MCP whenever you need to read project context safely. Use the
-`gemma4-offload` MCP whenever a subtask is small enough that local
-Gemma4 should handle it instead of spending Claude tokens.
+local-llm-offload MCP for bounded repo-audit summaries or classifications
+when the local llama-server model policy permits it. The current runtime is
+Ornith 1.5 on `:8090`; do not select a model by the historical MCP name.
 
 ## Hard rule
 
@@ -38,9 +39,9 @@ don't ripple into the model side.
 | "Find files in the same 4D topology cell as this query" | `topology.search_4d` |
 | "Build a compressed context card for the LLM" | `context.build_kv_packet` |
 | "Schema shape / column list" *(when implemented)* | `db.schema_overview` / `db.table_inspect` |
-| "Summarize this 8 KB tool output to 80 words" | `gemma4-offload.gemma4_summarize` |
-| "Classify this snippet into one of {bug, feature, docs}" | `gemma4-offload.gemma4_classify` |
-| "Draft a short paraphrase / commit message" | `gemma4-offload.gemma4_chat` |
+| "Summarize this 8 KB tool output to 80 words" | `gemma4-offload.repo_summarize` (server name is a compatibility alias) |
+| "Classify this snippet into one of {bug, feature, docs}" | `gemma4-offload.repo_classify` (server name is a compatibility alias) |
+| "Draft a short paraphrase / commit message" | `gemma4-offload.repo_chat` |
 
 ## Reading responses
 
@@ -56,11 +57,11 @@ Use `mcporter` for shell-level smoke testing:
 ```bash
 npx mcporter list                                          # discover registered tools
 npx mcporter call trace.kag_search query:"reranker topology"
-npx mcporter call gemma4-offload.gemma4_health
+npx mcporter call gemma4-offload.gemma4_health  # compatibility registration; resolves the active local model
 ```
 
 Validator gates `G30` and `G31` already cover handshake + round-trip
-for `gemma4-offload`. Run a single gate:
+for the local-LLM offload MCP (currently registered as `gemma4-offload`). Run a single gate:
 
 ```bash
 node scripts/validate/full-system.mjs --gate=G30
@@ -70,8 +71,8 @@ node scripts/validate/full-system.mjs --gate=G30
 
 - Calling an HTTP endpoint directly when an MCP tool exists for the
   same data (defeats the boundary; the tool may add caching / scrubbing).
-- Using `gemma4-offload.gemma4_chat` for tasks that need the full
-  Claude context window — Gemma4 is for short-form work.
+- Using local-LLM offload for tasks that need the full Claude context window;
+  it is for bounded short-form work only.
 - Writing a new ad-hoc script that talks to Postgres/Qdrant when the
   same query could be a new TRACE MCP tool. Add the tool, then use it.
 

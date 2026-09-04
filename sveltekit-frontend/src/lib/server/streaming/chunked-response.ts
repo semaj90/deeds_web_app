@@ -3,13 +3,14 @@
  * Optimizes LLM responses with incremental delivery via SSE
  *
  * Integrates with:
- * - Ollama (gemma4-rotorquant:latest)
+ * - llama-server /v1 (active Ornith model)
  * - RAG pipeline (Qdrant vector search)
  * - RabbitMQ background jobs
  */
 
 import { ENV } from '$lib/server/env.server.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
+import { resolveLlamaInferenceTarget } from '$lib/server/llm/runtime-contract.js';
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 const QDRANT_URL = ENV.QDRANT_URL;
@@ -133,25 +134,26 @@ export function createSSEStream(
 }
 
 /**
- * Example: Stream LLM response with Ollama
+ * Compatibility-named export: stream LLM response with llama-server /v1.
  */
 export async function* streamOllamaResponse(
 	prompt: string,
-	model: string = 'gemma4-rotorquant:latest'
+	_requestedModel: string = 'ornith-1.5-9b'
 ): AsyncGenerator<StreamChunk> {
 	try {
-		const response = await ollamaFetch(`${OLLAMA_URL}/api/generate`, {
+		const target = await resolveLlamaInferenceTarget();
+		const response = await fetch(`${target.baseUrl}/v1/chat/completions`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-				model,
-				prompt,
+				model: target.model,
+				messages: [{ role: 'user', content: prompt }],
 				stream: true
 			})
 		});
 
 		if (!response.ok) {
-			throw new Error(`Ollama request failed: ${response.statusText}`);
+			throw new Error(`llama-server request failed: ${response.statusText}`);
 		}
 
 		const reader = response.body?.getReader();
@@ -172,29 +174,31 @@ export async function* streamOllamaResponse(
 				if (!line.trim()) continue;
 
 				try {
-					const data = JSON.parse(line);
+					const payload = line.startsWith('data:') ? line.slice(5).trim() : line;
+					if (payload === '[DONE]') {
+						yield { type: 'metadata', metadata: { done: true }, timestamp: Date.now() };
+						continue;
+					}
+					const data = JSON.parse(payload);
 
-					if (data.response) {
+					const content = data.choices?.[0]?.delta?.content;
+					if (content) {
 						yield {
 							type: 'content',
-							content: data.response,
+							content,
 							timestamp: Date.now()
 						};
 					}
 
-					if (data.done) {
+					if (data.choices?.[0]?.finish_reason) {
 						yield {
 							type: 'metadata',
-							metadata: {
-	total_duration: data.total_duration,
-								prompt_eval_count: data.prompt_eval_count,
-								eval_count: data.eval_count
-							},
-	timestamp: Date.now()
+							metadata: { finish_reason: data.choices[0].finish_reason },
+			timestamp: Date.now()
 						};
 					}
 				} catch (e) {
-					console.warn('Failed to parse Ollama chunk:', e);
+					console.warn('Failed to parse llama-server chunk:', e);
 				}
 			}
 		}

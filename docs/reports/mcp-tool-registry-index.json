@@ -1,15 +1,15 @@
 {
-  "generated_at": "2026-09-03T02:08:25.379Z",
-  "content_revision": "sha256:84487fe9b2184b19ac6d340b808d95d9605554825d44ab5f26959ad097321df4",
-  "content_checksum": "sha256:84487fe9b2184b19ac6d340b808d95d9605554825d44ab5f26959ad097321df4",
+  "generated_at": "2026-09-04T15:58:39.323Z",
+  "content_revision": "sha256:f456fe6b6fe4cfc3da6548e95a41e94565dbdde218b73321de8c10cd5ff0fc4b",
+  "content_checksum": "sha256:f456fe6b6fe4cfc3da6548e95a41e94565dbdde218b73321de8c10cd5ff0fc4b",
   "sources": [
     "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\mcp-tool-ontology.json",
     "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\mcp-tool-manifest-packets.json"
   ],
-  "trace_tools": 175,
+  "trace_tools": 173,
   "manifest_tools": 206,
   "rpc_methods": 74,
-  "total_tools": 339,
+  "total_tools": 337,
   "by_layer": {
     "identity": [
       {
@@ -970,8 +970,10 @@
           "cache"
         ],
         "identity_fields": [],
-        "writes_to": [],
-        "permissions": "read_only",
+        "writes_to": [
+          "redis"
+        ],
+        "permissions": "read_write",
         "packet_kind": "trace_tool",
         "sources": [
           "trace-mcp"
@@ -984,8 +986,8 @@
         "service": null,
         "method": null,
         "primary_layer": "cache",
-        "score": 96,
-        "rank": 99
+        "score": 86,
+        "rank": 121
       },
       {
         "tool_name": "inference:route",
@@ -1018,7 +1020,7 @@
         "method": null,
         "primary_layer": "cache",
         "score": 86,
-        "rank": 123
+        "rank": 122
       },
       {
         "tool_name": "redis",
@@ -3453,7 +3455,7 @@
         "method": null,
         "primary_layer": "dense",
         "score": 88,
-        "rank": 116
+        "rank": 114
       },
       {
         "tool_name": "atlas.embedding_neighbors",
@@ -3478,7 +3480,7 @@
         "method": null,
         "primary_layer": "dense",
         "score": 88,
-        "rank": 117
+        "rank": 115
       },
       {
         "tool_name": "evidence.search_by_image",
@@ -3503,7 +3505,7 @@
         "method": null,
         "primary_layer": "dense",
         "score": 88,
-        "rank": 119
+        "rank": 117
       },
       {
         "tool_name": "legal.batch_ingest",
@@ -3528,7 +3530,7 @@
         "method": null,
         "primary_layer": "dense",
         "score": 88,
-        "rank": 120
+        "rank": 118
       },
       {
         "tool_name": "legal.cross_reference_evidence",
@@ -3553,7 +3555,7 @@
         "method": null,
         "primary_layer": "dense",
         "score": 88,
-        "rank": 121
+        "rank": 119
       },
       {
         "tool_name": "topology.language_distribution",
@@ -3578,7 +3580,7 @@
         "method": null,
         "primary_layer": "dense",
         "score": 88,
-        "rank": 122
+        "rank": 120
       },
       {
         "tool_name": "CyberElephantService.GetClusters",
@@ -4327,7 +4329,7 @@
         "method": null,
         "primary_layer": "graph",
         "score": 94,
-        "rank": 100
+        "rank": 99
       },
       {
         "tool_name": "atlas.compact_context",
@@ -4352,7 +4354,7 @@
         "method": null,
         "primary_layer": "graph",
         "score": 94,
-        "rank": 101
+        "rank": 100
       },
       {
         "tool_name": "context.prefetch_feature_context",
@@ -4377,7 +4379,7 @@
         "method": null,
         "primary_layer": "graph",
         "score": 94,
-        "rank": 102
+        "rank": 101
       },
       {
         "tool_name": "graph.materialize_pathway",
@@ -4402,32 +4404,7 @@
         "method": null,
         "primary_layer": "graph",
         "score": 94,
-        "rank": 103
-      },
-      {
-        "tool_name": "hypergraph.expand_members",
-        "namespace": "hypergraph",
-        "description": "Returns all related edges for a given edge hash by member overlap.",
-        "layers": [
-          "graph"
-        ],
-        "identity_fields": [],
-        "writes_to": [],
-        "permissions": "read_only",
-        "packet_kind": "trace_tool",
-        "sources": [
-          "trace-mcp"
-        ],
-        "source_ref": "hypergraph.expand_members",
-        "examples": [],
-        "transport": null,
-        "domain": "unknown",
-        "ontology": [],
-        "service": null,
-        "method": null,
-        "primary_layer": "graph",
-        "score": 94,
-        "rank": 104
+        "rank": 102
       },
       {
         "tool_name": "hypergraph.explain_activation",
@@ -4452,7 +4429,7 @@
         "method": null,
         "primary_layer": "graph",
         "score": 94,
-        "rank": 105
+        "rank": 103
       },
       {
         "tool_name": "hypergraph.get_edge",
@@ -4477,7 +4454,7 @@
         "method": null,
         "primary_layer": "graph",
         "score": 94,
-        "rank": 106
+        "rank": 104
       },
       {
         "tool_name": "kb.search_pathways",
@@ -4502,7 +4479,7 @@
         "method": null,
         "primary_layer": "graph",
         "score": 94,
-        "rank": 107
+        "rank": 105
       },
       {
         "tool_name": "library.registry_lookup",
@@ -4527,7 +4504,7 @@
         "method": null,
         "primary_layer": "graph",
         "score": 94,
-        "rank": 108
+        "rank": 106
       },
       {
         "tool_name": "research.playbook_lookup_by_language",
@@ -4552,7 +4529,7 @@
         "method": null,
         "primary_layer": "graph",
         "score": 94,
-        "rank": 109
+        "rank": 107
       },
       {
         "tool_name": "runtime.sse_probe",
@@ -4577,7 +4554,7 @@
         "method": null,
         "primary_layer": "graph",
         "score": 94,
-        "rank": 110
+        "rank": 108
       },
       {
         "tool_name": "taxonomy.path",
@@ -4602,7 +4579,7 @@
         "method": null,
         "primary_layer": "graph",
         "score": 94,
-        "rank": 111
+        "rank": 109
       },
       {
         "tool_name": "topology.search_som_neighborhood",
@@ -4627,7 +4604,7 @@
         "method": null,
         "primary_layer": "graph",
         "score": 94,
-        "rank": 112
+        "rank": 110
       },
       {
         "tool_name": "hypergraph.search",
@@ -4652,7 +4629,7 @@
         "method": null,
         "primary_layer": "graph",
         "score": 90,
-        "rank": 115
+        "rank": 113
       },
       {
         "tool_name": "codebase:file_intel",
@@ -4686,7 +4663,7 @@
         "method": null,
         "primary_layer": "graph",
         "score": 84,
-        "rank": 124
+        "rank": 123
       },
       {
         "tool_name": "codebase:graph_neighbors",
@@ -4719,7 +4696,7 @@
         "method": null,
         "primary_layer": "graph",
         "score": 84,
-        "rank": 125
+        "rank": 124
       },
       {
         "tool_name": "evidence.link_image_graph",
@@ -4730,7 +4707,7 @@
         ],
         "identity_fields": [],
         "writes_to": [
-          "neo4j"
+          "qdrant"
         ],
         "permissions": "read_write",
         "packet_kind": "trace_tool",
@@ -4746,7 +4723,7 @@
         "method": null,
         "primary_layer": "graph",
         "score": 84,
-        "rank": 126
+        "rank": 125
       },
       {
         "tool_name": "graph.community_for_node",
@@ -4757,6 +4734,7 @@
         ],
         "identity_fields": [],
         "writes_to": [
+          "neo4j",
           "postgres"
         ],
         "permissions": "read_only",
@@ -4780,7 +4758,7 @@
         "method": null,
         "primary_layer": "graph",
         "score": 84,
-        "rank": 127
+        "rank": 126
       },
       {
         "tool_name": "graph.expand_neighborhood",
@@ -4791,6 +4769,7 @@
         ],
         "identity_fields": [],
         "writes_to": [
+          "neo4j",
           "postgres"
         ],
         "permissions": "read_only",
@@ -4814,7 +4793,7 @@
         "method": null,
         "primary_layer": "graph",
         "score": 84,
-        "rank": 128
+        "rank": 127
       },
       {
         "tool_name": "graph.index",
@@ -4847,7 +4826,7 @@
         "method": null,
         "primary_layer": "graph",
         "score": 84,
-        "rank": 129
+        "rank": 128
       },
       {
         "tool_name": "graph.shortest_path",
@@ -4858,6 +4837,7 @@
         ],
         "identity_fields": [],
         "writes_to": [
+          "neo4j",
           "postgres"
         ],
         "permissions": "read_only",
@@ -4882,7 +4862,7 @@
         "method": null,
         "primary_layer": "graph",
         "score": 84,
-        "rank": 130
+        "rank": 129
       },
       {
         "tool_name": "graphrag_expand_context",
@@ -4911,6 +4891,33 @@
           "neo4j",
           "relationship"
         ],
+        "service": null,
+        "method": null,
+        "primary_layer": "graph",
+        "score": 84,
+        "rank": 130
+      },
+      {
+        "tool_name": "hypergraph.expand_members",
+        "namespace": "hypergraph",
+        "description": "Returns all related edges for a given edge hash by member overlap.",
+        "layers": [
+          "graph"
+        ],
+        "identity_fields": [],
+        "writes_to": [
+          "neo4j"
+        ],
+        "permissions": "read_write",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "hypergraph.expand_members",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
         "service": null,
         "method": null,
         "primary_layer": "graph",
@@ -5107,7 +5114,7 @@
         "method": null,
         "primary_layer": "rerank",
         "score": 92,
-        "rank": 113
+        "rank": 111
       },
       {
         "tool_name": "turbovec.rank_chunks",
@@ -5132,7 +5139,7 @@
         "method": null,
         "primary_layer": "rerank",
         "score": 92,
-        "rank": 114
+        "rank": 112
       },
       {
         "tool_name": "GpuBridgeService.AssignSom",
@@ -5294,7 +5301,7 @@
         "method": null,
         "primary_layer": "synthesis",
         "score": 88,
-        "rank": 118
+        "rank": 116
       },
       {
         "tool_name": "legal.build_timeline",
@@ -5768,7 +5775,7 @@
         "method": null,
         "primary_layer": "synthesis",
         "score": 72,
-        "rank": 199
+        "rank": 197
       },
       {
         "tool_name": "langextract:legal",
@@ -5802,7 +5809,7 @@
         "method": null,
         "primary_layer": "synthesis",
         "score": 72,
-        "rank": 201
+        "rank": 199
       },
       {
         "tool_name": "ace.wiki",
@@ -5835,7 +5842,7 @@
         "method": null,
         "primary_layer": "synthesis",
         "score": 70,
-        "rank": 202
+        "rank": 200
       },
       {
         "tool_name": "atlas.cross_store_proof",
@@ -5868,7 +5875,7 @@
         "method": null,
         "primary_layer": "synthesis",
         "score": 70,
-        "rank": 203
+        "rank": 201
       },
       {
         "tool_name": "cluster.summary.get",
@@ -5901,7 +5908,7 @@
         "method": null,
         "primary_layer": "synthesis",
         "score": 70,
-        "rank": 204
+        "rank": 202
       },
       {
         "tool_name": "clusters.get_summary_lenses",
@@ -5935,7 +5942,7 @@
         "method": null,
         "primary_layer": "synthesis",
         "score": 70,
-        "rank": 205
+        "rank": 203
       },
       {
         "tool_name": "codebase:explain_cluster",
@@ -5968,7 +5975,7 @@
         "method": null,
         "primary_layer": "synthesis",
         "score": 70,
-        "rank": 206
+        "rank": 204
       },
       {
         "tool_name": "CodeIntelService.SummarizeCluster",
@@ -6001,7 +6008,7 @@
         "method": "SummarizeCluster",
         "primary_layer": "synthesis",
         "score": 70,
-        "rank": 207
+        "rank": 205
       },
       {
         "tool_name": "EnrichmentService.SummarizeCluster",
@@ -6034,7 +6041,7 @@
         "method": "SummarizeCluster",
         "primary_layer": "synthesis",
         "score": 70,
-        "rank": 208
+        "rank": 206
       },
       {
         "tool_name": "llm_synthesis.log_event",
@@ -6067,7 +6074,7 @@
         "method": null,
         "primary_layer": "synthesis",
         "score": 70,
-        "rank": 209
+        "rank": 207
       },
       {
         "tool_name": "poi:face_synth",
@@ -6100,7 +6107,7 @@
         "method": null,
         "primary_layer": "synthesis",
         "score": 70,
-        "rank": 210
+        "rank": 208
       },
       {
         "tool_name": "stable_diffusion_generate",
@@ -6134,7 +6141,7 @@
         "method": null,
         "primary_layer": "synthesis",
         "score": 70,
-        "rank": 211
+        "rank": 209
       },
       {
         "tool_name": "gemma4-opencode",
@@ -6167,7 +6174,7 @@
         "method": null,
         "primary_layer": "synthesis",
         "score": 66,
-        "rank": 213
+        "rank": 211
       }
     ],
     "ops": [
@@ -6309,81 +6316,6 @@
         "rank": 217
       },
       {
-        "tool_name": "ops.propose_patch",
-        "namespace": "ops",
-        "description": "PROPOSES a patch for a file. READ-ONLY PREVIEW. Does NOT modify files.",
-        "layers": [
-          "ops"
-        ],
-        "identity_fields": [],
-        "writes_to": [],
-        "permissions": "read_only",
-        "packet_kind": "trace_tool",
-        "sources": [
-          "trace-mcp"
-        ],
-        "source_ref": "ops.propose_patch",
-        "examples": [],
-        "transport": null,
-        "domain": "unknown",
-        "ontology": [],
-        "service": null,
-        "method": null,
-        "primary_layer": "ops",
-        "score": 58,
-        "rank": 218
-      },
-      {
-        "tool_name": "ops.run_quality_gate",
-        "namespace": "ops",
-        "description": "Executes a project-wide quality gate (tsc or vitest-all).",
-        "layers": [
-          "ops"
-        ],
-        "identity_fields": [],
-        "writes_to": [],
-        "permissions": "read_only",
-        "packet_kind": "trace_tool",
-        "sources": [
-          "trace-mcp"
-        ],
-        "source_ref": "ops.run_quality_gate",
-        "examples": [],
-        "transport": null,
-        "domain": "unknown",
-        "ontology": [],
-        "service": null,
-        "method": null,
-        "primary_layer": "ops",
-        "score": 58,
-        "rank": 219
-      },
-      {
-        "tool_name": "ops.run_targeted_test",
-        "namespace": "ops",
-        "description": "Executes a single Vitest test file and returns the outcome.",
-        "layers": [
-          "ops"
-        ],
-        "identity_fields": [],
-        "writes_to": [],
-        "permissions": "read_only",
-        "packet_kind": "trace_tool",
-        "sources": [
-          "trace-mcp"
-        ],
-        "source_ref": "ops.run_targeted_test",
-        "examples": [],
-        "transport": null,
-        "domain": "unknown",
-        "ontology": [],
-        "service": null,
-        "method": null,
-        "primary_layer": "ops",
-        "score": 58,
-        "rank": 220
-      },
-      {
         "tool_name": "ops.validate_claims",
         "namespace": "ops",
         "description": "Parses proposed agent response claims and verifies each one against evidence. Detects false completion claims (claiming success without proof). MUST be called before the agent sends any response that asserts a write occurred. Returns supported=true only for claims backed by ops.verify_write or ops.audit_tool_result evidence.",
@@ -6406,7 +6338,7 @@
         "method": null,
         "primary_layer": "ops",
         "score": 58,
-        "rank": 221
+        "rank": 218
       },
       {
         "tool_name": "ops.validate_tool_call",
@@ -6431,7 +6363,7 @@
         "method": null,
         "primary_layer": "ops",
         "score": 58,
-        "rank": 222
+        "rank": 219
       },
       {
         "tool_name": "ops.execute_graphify",
@@ -6456,7 +6388,35 @@
         "method": null,
         "primary_layer": "ops",
         "score": 54,
-        "rank": 223
+        "rank": 220
+      },
+      {
+        "tool_name": "ops.propose_patch",
+        "namespace": "ops",
+        "description": "PROPOSES a patch for a file. READ-ONLY PREVIEW. Does NOT modify files.",
+        "layers": [
+          "ops"
+        ],
+        "identity_fields": [],
+        "writes_to": [
+          "postgres",
+          "kanban"
+        ],
+        "permissions": "read_write",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "ops.propose_patch",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "ops",
+        "score": 48,
+        "rank": 224
       },
       {
         "tool_name": "ops.record_fix_attempt",
@@ -6476,6 +6436,60 @@
           "trace-mcp"
         ],
         "source_ref": "ops.record_fix_attempt",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "ops",
+        "score": 48,
+        "rank": 225
+      },
+      {
+        "tool_name": "ops.run_quality_gate",
+        "namespace": "ops",
+        "description": "Executes a project-wide quality gate (tsc or vitest-all).",
+        "layers": [
+          "ops"
+        ],
+        "identity_fields": [],
+        "writes_to": [
+          "postgres"
+        ],
+        "permissions": "read_write",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "ops.run_quality_gate",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "ops",
+        "score": 48,
+        "rank": 226
+      },
+      {
+        "tool_name": "ops.run_targeted_test",
+        "namespace": "ops",
+        "description": "Executes a single Vitest test file and returns the outcome.",
+        "layers": [
+          "ops"
+        ],
+        "identity_fields": [],
+        "writes_to": [
+          "postgres"
+        ],
+        "permissions": "read_write",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "ops.run_targeted_test",
         "examples": [],
         "transport": null,
         "domain": "unknown",
@@ -6514,56 +6528,6 @@
         "rank": 194
       },
       {
-        "tool_name": "db.schema_overview",
-        "namespace": "db",
-        "description": "Lists every table in the public schema with row estimate + structural flags.",
-        "layers": [
-          "read"
-        ],
-        "identity_fields": [],
-        "writes_to": [],
-        "permissions": "read_only",
-        "packet_kind": "trace_tool",
-        "sources": [
-          "trace-mcp"
-        ],
-        "source_ref": "db.schema_overview",
-        "examples": [],
-        "transport": null,
-        "domain": "unknown",
-        "ontology": [],
-        "service": null,
-        "method": null,
-        "primary_layer": "read",
-        "score": 72,
-        "rank": 197
-      },
-      {
-        "tool_name": "db.table_inspect",
-        "namespace": "db",
-        "description": "Returns columns + indexes + foreign keys for one table. No row data.",
-        "layers": [
-          "read"
-        ],
-        "identity_fields": [],
-        "writes_to": [],
-        "permissions": "read_only",
-        "packet_kind": "trace_tool",
-        "sources": [
-          "trace-mcp"
-        ],
-        "source_ref": "db.table_inspect",
-        "examples": [],
-        "transport": null,
-        "domain": "unknown",
-        "ontology": [],
-        "service": null,
-        "method": null,
-        "primary_layer": "read",
-        "score": 72,
-        "rank": 198
-      },
-      {
         "tool_name": "file.read_window",
         "namespace": "file",
         "description": "Reads a bounded window/range of lines from a file. Highly recommended for reading large markdown (.md) or JSON files to avoid context bloating.",
@@ -6586,7 +6550,7 @@
         "method": null,
         "primary_layer": "read",
         "score": 72,
-        "rank": 200
+        "rank": 198
       },
       {
         "tool_name": "kb.wiki_note_lookup",
@@ -6611,7 +6575,61 @@
         "method": null,
         "primary_layer": "read",
         "score": 68,
+        "rank": 210
+      },
+      {
+        "tool_name": "db.schema_overview",
+        "namespace": "db",
+        "description": "Lists every table in the public schema with row estimate + structural flags.",
+        "layers": [
+          "read"
+        ],
+        "identity_fields": [],
+        "writes_to": [
+          "postgres"
+        ],
+        "permissions": "read_write",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "db.schema_overview",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "read",
+        "score": 62,
         "rank": 212
+      },
+      {
+        "tool_name": "db.table_inspect",
+        "namespace": "db",
+        "description": "Returns columns + indexes + foreign keys for one table. No row data.",
+        "layers": [
+          "read"
+        ],
+        "identity_fields": [],
+        "writes_to": [
+          "postgres"
+        ],
+        "permissions": "read_write",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "db.table_inspect",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "read",
+        "score": 62,
+        "rank": 213
       }
     ],
     "unknown": [
@@ -6970,7 +6988,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 52,
-        "rank": 224
+        "rank": 221
       },
       {
         "tool_name": "atlas.feature_document_status",
@@ -6997,7 +7015,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 52,
-        "rank": 225
+        "rank": 222
       },
       {
         "tool_name": "atlas.materialize_feature_evidence_tuples",
@@ -7025,7 +7043,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 52,
-        "rank": 226
+        "rank": 223
       },
       {
         "tool_name": "atlas.feature_document_ingestion_plan",
@@ -7203,6 +7221,31 @@
         "rank": 234
       },
       {
+        "tool_name": "domain.classify",
+        "namespace": "domain",
+        "description": "Classify text into the canonical domain taxonomy via the Miniforge sidecar's classify pass (sklearn NB/LR over KMeans word-cluster features once a trained checkpoint exists; reports backend 'unavailable' otherwise — never a hard failure). Closes the confirmed 2026-09-03 TRACE audit gap: graph/cluster/topK/hypergraph/taxonomy tools all existed, domain classification did not.",
+        "layers": [
+          "unknown"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "domain.classify",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "unknown",
+        "score": 44,
+        "rank": 235
+      },
+      {
         "tool_name": "kag.ingest_error",
         "namespace": "kag",
         "description": "Fingerprints and stores a raw error text for future retrieval.",
@@ -7225,7 +7268,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 44,
-        "rank": 235
+        "rank": 236
       },
       {
         "tool_name": "kag.ingest_memory_directory",
@@ -7250,7 +7293,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 44,
-        "rank": 236
+        "rank": 237
       },
       {
         "tool_name": "kag.panel_context",
@@ -7275,7 +7318,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 44,
-        "rank": 237
+        "rank": 238
       },
       {
         "tool_name": "kag.record_agent_run",
@@ -7300,7 +7343,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 44,
-        "rank": 238
+        "rank": 239
       },
       {
         "tool_name": "kb.organize_messy_text",
@@ -7325,7 +7368,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 44,
-        "rank": 239
+        "rank": 240
       },
       {
         "tool_name": "kb.search_notecards",
@@ -7350,7 +7393,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 44,
-        "rank": 240
+        "rank": 241
       },
       {
         "tool_name": "kb.search_summary_tree",
@@ -7375,7 +7418,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 44,
-        "rank": 241
+        "rank": 242
       },
       {
         "tool_name": "kb.trace_search",
@@ -7400,7 +7443,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 44,
-        "rank": 242
+        "rank": 243
       },
       {
         "tool_name": "knowledge.get_minified_map",
@@ -7425,7 +7468,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 44,
-        "rank": 243
+        "rank": 244
       },
       {
         "tool_name": "legal.find_precedents",
@@ -7450,7 +7493,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 44,
-        "rank": 244
+        "rank": 245
       },
       {
         "tool_name": "legal.get_transcript",
@@ -7475,7 +7518,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 44,
-        "rank": 245
+        "rank": 246
       },
       {
         "tool_name": "legal.score_case",
@@ -7500,7 +7543,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 44,
-        "rank": 246
+        "rank": 247
       },
       {
         "tool_name": "legal.search_recordings",
@@ -7525,7 +7568,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 44,
-        "rank": 247
+        "rank": 248
       },
       {
         "tool_name": "legal.similar_cases",
@@ -7550,7 +7593,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 44,
-        "rank": 248
+        "rank": 249
       },
       {
         "tool_name": "legal.write_obsidian_note",
@@ -7575,7 +7618,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 44,
-        "rank": 249
+        "rank": 250
       },
       {
         "tool_name": "library.registry_rescan",
@@ -7600,7 +7643,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 44,
-        "rank": 250
+        "rank": 251
       },
       {
         "tool_name": "library.registry_search",
@@ -7625,7 +7668,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 44,
-        "rank": 251
+        "rank": 252
       },
       {
         "tool_name": "miniforge.analyze",
@@ -7650,7 +7693,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 44,
-        "rank": 252
+        "rank": 253
       },
       {
         "tool_name": "miniforge.extract",
@@ -7675,7 +7718,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 44,
-        "rank": 253
+        "rank": 254
       },
       {
         "tool_name": "miniforge.health",
@@ -7700,7 +7743,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 44,
-        "rank": 254
+        "rank": 255
       },
       {
         "tool_name": "phase109a_archive_signal",
@@ -7725,7 +7768,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 44,
-        "rank": 255
+        "rank": 256
       },
       {
         "tool_name": "phase109a_promote_recommendation",
@@ -7750,7 +7793,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 44,
-        "rank": 256
+        "rank": 257
       },
       {
         "tool_name": "phase109a_query_signal_history",
@@ -7775,7 +7818,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 44,
-        "rank": 257
+        "rank": 258
       },
       {
         "tool_name": "phase109a_supersede_recommendation",
@@ -7800,7 +7843,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 44,
-        "rank": 258
+        "rank": 259
       },
       {
         "tool_name": "phase109a_supersede_signal",
@@ -7825,7 +7868,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 44,
-        "rank": 259
+        "rank": 260
       },
       {
         "tool_name": "phase109a_validate_state_transition",
@@ -7850,7 +7893,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 44,
-        "rank": 260
+        "rank": 261
       },
       {
         "tool_name": "runtime.quic_status",
@@ -7875,7 +7918,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 44,
-        "rank": 261
+        "rank": 262
       },
       {
         "tool_name": "runtime.simdjson_status",
@@ -7900,7 +7943,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 44,
-        "rank": 262
+        "rank": 263
       },
       {
         "tool_name": "service_workers.result",
@@ -7925,7 +7968,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 44,
-        "rank": 263
+        "rank": 264
       },
       {
         "tool_name": "service_workers.status",
@@ -7950,7 +7993,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 44,
-        "rank": 264
+        "rank": 265
       },
       {
         "tool_name": "taxonomy.children",
@@ -7975,7 +8018,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 44,
-        "rank": 265
+        "rank": 266
       },
       {
         "tool_name": "tools.batch_call",
@@ -8000,7 +8043,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 44,
-        "rank": 266
+        "rank": 267
       },
       {
         "tool_name": "topology.hydration_status",
@@ -8025,7 +8068,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 44,
-        "rank": 267
+        "rank": 268
       },
       {
         "tool_name": "topology.recompute_manifold_plan",
@@ -8050,7 +8093,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 44,
-        "rank": 268
+        "rank": 269
       },
       {
         "tool_name": "trace_dynamic_context",
@@ -8067,31 +8110,6 @@
           "trace-mcp"
         ],
         "source_ref": "trace_dynamic_context",
-        "examples": [],
-        "transport": null,
-        "domain": "unknown",
-        "ontology": [],
-        "service": null,
-        "method": null,
-        "primary_layer": "unknown",
-        "score": 44,
-        "rank": 269
-      },
-      {
-        "tool_name": "trace_search",
-        "namespace": "misc",
-        "description": "DEPRECATED bare-name alias for kb.trace_search. Gated by MCP_LEGACY_ALIASES.",
-        "layers": [
-          "unknown"
-        ],
-        "identity_fields": [],
-        "writes_to": [],
-        "permissions": "read_only",
-        "packet_kind": "trace_tool",
-        "sources": [
-          "trace-mcp"
-        ],
-        "source_ref": "trace_search",
         "examples": [],
         "transport": null,
         "domain": "unknown",
@@ -8178,56 +8196,6 @@
         "rank": 273
       },
       {
-        "tool_name": "wiki_note_lookup",
-        "namespace": "misc",
-        "description": "DEPRECATED bare-name alias for kb.wiki_note_lookup. Gated by MCP_LEGACY_ALIASES.",
-        "layers": [
-          "unknown"
-        ],
-        "identity_fields": [],
-        "writes_to": [],
-        "permissions": "read_only",
-        "packet_kind": "trace_tool",
-        "sources": [
-          "trace-mcp"
-        ],
-        "source_ref": "wiki_note_lookup",
-        "examples": [],
-        "transport": null,
-        "domain": "unknown",
-        "ontology": [],
-        "service": null,
-        "method": null,
-        "primary_layer": "unknown",
-        "score": 44,
-        "rank": 274
-      },
-      {
-        "tool_name": "admin.log_event",
-        "namespace": "admin",
-        "description": "Logs a manual administrative event with context.",
-        "layers": [
-          "unknown"
-        ],
-        "identity_fields": [],
-        "writes_to": [],
-        "permissions": "read_only",
-        "packet_kind": "trace_tool",
-        "sources": [
-          "trace-mcp"
-        ],
-        "source_ref": "admin.log_event",
-        "examples": [],
-        "transport": null,
-        "domain": "unknown",
-        "ontology": [],
-        "service": null,
-        "method": null,
-        "primary_layer": "unknown",
-        "score": 40,
-        "rank": 275
-      },
-      {
         "tool_name": "kb.extract_citations",
         "namespace": "kb",
         "description": "Extract legal citations and statutes from text.",
@@ -8250,7 +8218,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 40,
-        "rank": 276
+        "rank": 274
       },
       {
         "tool_name": "skills.list",
@@ -8275,7 +8243,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 40,
-        "rank": 277
+        "rank": 275
       },
       {
         "tool_name": "skills.run_mission",
@@ -8300,7 +8268,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 40,
-        "rank": 278
+        "rank": 276
       },
       {
         "tool_name": "analytics:mapreduce_matrix",
@@ -8333,7 +8301,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 34,
-        "rank": 279
+        "rank": 277
       },
       {
         "tool_name": "ast:cross_language",
@@ -8366,7 +8334,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 34,
-        "rank": 280
+        "rank": 278
       },
       {
         "tool_name": "cases:create",
@@ -8399,7 +8367,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 34,
-        "rank": 281
+        "rank": 279
       },
       {
         "tool_name": "cases:delete",
@@ -8432,7 +8400,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 34,
-        "rank": 282
+        "rank": 280
       },
       {
         "tool_name": "ChatAssistantService.CreateSession",
@@ -8465,7 +8433,7 @@
         "method": "CreateSession",
         "primary_layer": "unknown",
         "score": 34,
-        "rank": 283
+        "rank": 281
       },
       {
         "tool_name": "ChatAssistantService.GetHistory",
@@ -8498,7 +8466,7 @@
         "method": "GetHistory",
         "primary_layer": "unknown",
         "score": 34,
-        "rank": 284
+        "rank": 282
       },
       {
         "tool_name": "ChatAssistantService.Health",
@@ -8531,7 +8499,7 @@
         "method": "Health",
         "primary_layer": "unknown",
         "score": 34,
-        "rank": 285
+        "rank": 283
       },
       {
         "tool_name": "ChatAssistantService.RAGQuery",
@@ -8564,7 +8532,7 @@
         "method": "RAGQuery",
         "primary_layer": "unknown",
         "score": 34,
-        "rank": 286
+        "rank": 284
       },
       {
         "tool_name": "ChatAssistantService.SendMessage",
@@ -8597,7 +8565,7 @@
         "method": "SendMessage",
         "primary_layer": "unknown",
         "score": 34,
-        "rank": 287
+        "rank": 285
       },
       {
         "tool_name": "ChatAssistantService.StreamMessage",
@@ -8630,7 +8598,7 @@
         "method": "StreamMessage",
         "primary_layer": "unknown",
         "score": 34,
-        "rank": 288
+        "rank": 286
       },
       {
         "tool_name": "Chr97Agent.GetCartridge",
@@ -8663,7 +8631,7 @@
         "method": "GetCartridge",
         "primary_layer": "unknown",
         "score": 34,
-        "rank": 289
+        "rank": 287
       },
       {
         "tool_name": "Chr97Agent.GetTimeline",
@@ -8696,7 +8664,7 @@
         "method": "GetTimeline",
         "primary_layer": "unknown",
         "score": 34,
-        "rank": 290
+        "rank": 288
       },
       {
         "tool_name": "Chr97Agent.QueryTags",
@@ -8729,7 +8697,7 @@
         "method": "QueryTags",
         "primary_layer": "unknown",
         "score": 34,
-        "rank": 291
+        "rank": 289
       },
       {
         "tool_name": "citations:add_to_case",
@@ -8762,7 +8730,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 34,
-        "rank": 292
+        "rank": 290
       },
       {
         "tool_name": "codebase:get_buffer",
@@ -8795,7 +8763,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 34,
-        "rank": 293
+        "rank": 291
       },
       {
         "tool_name": "codeintel.health",
@@ -8828,7 +8796,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 34,
-        "rank": 294
+        "rank": 292
       },
       {
         "tool_name": "CodeIntelService.GetClusterSummary",
@@ -8861,7 +8829,7 @@
         "method": "GetClusterSummary",
         "primary_layer": "unknown",
         "score": 34,
-        "rank": 295
+        "rank": 293
       },
       {
         "tool_name": "CodeIntelService.GetJobStatus",
@@ -8894,7 +8862,7 @@
         "method": "GetJobStatus",
         "primary_layer": "unknown",
         "score": 34,
-        "rank": 296
+        "rank": 294
       },
       {
         "tool_name": "CodeIntelService.ListClusterSummaries",
@@ -8927,7 +8895,7 @@
         "method": "ListClusterSummaries",
         "primary_layer": "unknown",
         "score": 34,
-        "rank": 297
+        "rank": 295
       },
       {
         "tool_name": "context.build_kv_packet",
@@ -8961,7 +8929,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 34,
-        "rank": 298
+        "rank": 296
       },
       {
         "tool_name": "context.get_compressed_card",
@@ -8995,7 +8963,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 34,
-        "rank": 299
+        "rank": 297
       },
       {
         "tool_name": "EnrichmentService.BatchEnrich",
@@ -9028,7 +8996,7 @@
         "method": "BatchEnrich",
         "primary_layer": "unknown",
         "score": 34,
-        "rank": 300
+        "rank": 298
       },
       {
         "tool_name": "evidence:detect_objects",
@@ -9062,7 +9030,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 34,
-        "rank": 301
+        "rank": 299
       },
       {
         "tool_name": "evidence:transcribe_gpu",
@@ -9095,7 +9063,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 34,
-        "rank": 302
+        "rank": 300
       },
       {
         "tool_name": "facial_analysis",
@@ -9128,7 +9096,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 34,
-        "rank": 303
+        "rank": 301
       },
       {
         "tool_name": "hmm_infer_repair_states",
@@ -9161,7 +9129,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 34,
-        "rank": 304
+        "rank": 302
       },
       {
         "tool_name": "langextract_extract_error_facts",
@@ -9194,7 +9162,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 34,
-        "rank": 305
+        "rank": 303
       },
       {
         "tool_name": "langextract:evidence",
@@ -9227,7 +9195,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 34,
-        "rank": 306
+        "rank": 304
       },
       {
         "tool_name": "reports:create",
@@ -9261,7 +9229,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 34,
-        "rank": 307
+        "rank": 305
       },
       {
         "tool_name": "reports:delete",
@@ -9295,7 +9263,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 34,
-        "rank": 308
+        "rank": 306
       },
       {
         "tool_name": "reports:export",
@@ -9328,7 +9296,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 34,
-        "rank": 309
+        "rank": 307
       },
       {
         "tool_name": "reports:list",
@@ -9362,7 +9330,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 34,
-        "rank": 310
+        "rank": 308
       },
       {
         "tool_name": "sveltekit_import_boundary_check",
@@ -9395,7 +9363,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 34,
-        "rank": 311
+        "rank": 309
       },
       {
         "tool_name": "sveltekit_route_audit",
@@ -9428,7 +9396,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 34,
-        "rank": 312
+        "rank": 310
       },
       {
         "tool_name": "ToolCallingService.ExecuteTool",
@@ -9461,7 +9429,7 @@
         "method": "ExecuteTool",
         "primary_layer": "unknown",
         "score": 34,
-        "rank": 313
+        "rank": 311
       },
       {
         "tool_name": "ToolCallingService.ExecuteToolBatch",
@@ -9494,7 +9462,7 @@
         "method": "ExecuteToolBatch",
         "primary_layer": "unknown",
         "score": 34,
-        "rank": 314
+        "rank": 312
       },
       {
         "tool_name": "ToolCallingService.ExecuteToolStream",
@@ -9527,7 +9495,7 @@
         "method": "ExecuteToolStream",
         "primary_layer": "unknown",
         "score": 34,
-        "rank": 315
+        "rank": 313
       },
       {
         "tool_name": "ToolCallingService.ListTools",
@@ -9560,7 +9528,7 @@
         "method": "ListTools",
         "primary_layer": "unknown",
         "score": 34,
-        "rank": 316
+        "rank": 314
       },
       {
         "tool_name": "ToolRouter.CallTool",
@@ -9593,7 +9561,7 @@
         "method": "CallTool",
         "primary_layer": "unknown",
         "score": 34,
-        "rank": 317
+        "rank": 315
       },
       {
         "tool_name": "ToolRouter.CallToolBatch",
@@ -9626,7 +9594,7 @@
         "method": "CallToolBatch",
         "primary_layer": "unknown",
         "score": 34,
-        "rank": 318
+        "rank": 316
       },
       {
         "tool_name": "ToolRouter.CallToolStream",
@@ -9659,7 +9627,7 @@
         "method": "CallToolStream",
         "primary_layer": "unknown",
         "score": 34,
-        "rank": 319
+        "rank": 317
       },
       {
         "tool_name": "ToolRouter.ListTools",
@@ -9692,7 +9660,7 @@
         "method": "ListTools",
         "primary_layer": "unknown",
         "score": 34,
-        "rank": 320
+        "rank": 318
       },
       {
         "tool_name": "toposort_repair_plan",
@@ -9725,7 +9693,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 34,
-        "rank": 321
+        "rank": 319
       },
       {
         "tool_name": "transcribe_audio",
@@ -9759,7 +9727,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 34,
-        "rank": 322
+        "rank": 320
       },
       {
         "tool_name": "video_to_frames",
@@ -9793,7 +9761,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 34,
-        "rank": 323
+        "rank": 321
       },
       {
         "tool_name": "vlm:switch_mode",
@@ -9826,7 +9794,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 34,
-        "rank": 324
+        "rank": 322
       },
       {
         "tool_name": "cases:load",
@@ -9859,7 +9827,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 30,
-        "rank": 325
+        "rank": 323
       },
       {
         "tool_name": "cases:update",
@@ -9892,7 +9860,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 30,
-        "rank": 326
+        "rank": 324
       },
       {
         "tool_name": "citations:list_by_case",
@@ -9925,7 +9893,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 30,
-        "rank": 327
+        "rank": 325
       },
       {
         "tool_name": "content",
@@ -9958,7 +9926,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 30,
-        "rank": 328
+        "rank": 326
       },
       {
         "tool_name": "context_lines",
@@ -9991,7 +9959,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 30,
-        "rank": 329
+        "rank": 327
       },
       {
         "tool_name": "issue",
@@ -10024,7 +9992,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 30,
-        "rank": 330
+        "rank": 328
       },
       {
         "tool_name": "notes",
@@ -10057,7 +10025,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 30,
-        "rank": 331
+        "rank": 329
       },
       {
         "tool_name": "operator_token",
@@ -10090,7 +10058,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 30,
-        "rank": 332
+        "rank": 330
       },
       {
         "tool_name": "outcome",
@@ -10123,7 +10091,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 30,
-        "rank": 333
+        "rank": 331
       },
       {
         "tool_name": "playwright:browser_action",
@@ -10156,7 +10124,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 30,
-        "rank": 334
+        "rank": 332
       },
       {
         "tool_name": "postgres",
@@ -10189,7 +10157,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 30,
-        "rank": 335
+        "rank": 333
       },
       {
         "tool_name": "rag:index_page",
@@ -10222,7 +10190,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 30,
-        "rank": 336
+        "rank": 334
       },
       {
         "tool_name": "reports:update",
@@ -10255,7 +10223,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 30,
-        "rank": 337
+        "rank": 335
       },
       {
         "tool_name": "section",
@@ -10288,7 +10256,7 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 30,
-        "rank": 338
+        "rank": 336
       },
       {
         "tool_name": "unknown",
@@ -10321,24 +10289,24 @@
         "method": null,
         "primary_layer": "unknown",
         "score": 30,
-        "rank": 339
+        "rank": 337
       }
     ]
   },
   "layer_summaries": {
     "identity": "Layer identity contains 5 tools. 4 expose identity fields and 3 write surfaces. Top-ranked tools: atlas.identity_audit, marco_rerank_chunks, schema-dependents:find, atlas.source_refs, atlas.query.",
     "memory": "Layer memory contains 2 tools. 0 expose identity fields and 1 write surfaces. Top-ranked tools: memory:prior_answer_lookup, engram.chat_memory_recent.",
-    "cache": "Layer cache contains 28 tools. 0 expose identity fields and 13 write surfaces. Top-ranked tools: wiki.search, ace.compact_search, karpathy.attention_rank_files, wiki.status, ops.fixer_semantic_recall.",
+    "cache": "Layer cache contains 28 tools. 0 expose identity fields and 14 write surfaces. Top-ranked tools: wiki.search, ace.compact_search, karpathy.attention_rank_files, wiki.status, ops.fixer_semantic_recall.",
     "lexical": "Layer lexical contains 53 tools. 0 expose identity fields and 48 write surfaces. Top-ranked tools: codebase:search, search.go_hybrid, kag.recall_similar_fix, kb.search_cards, chunk.lookup.",
     "dense": "Layer dense contains 33 tools. 2 expose identity fields and 21 write surfaces. Top-ranked tools: atlas.packet_search, image.enrich_tags, wiki.explain_page, ldr_research, atlas.coverage.",
-    "graph": "Layer graph contains 40 tools. 3 expose identity fields and 17 write surfaces. Top-ranked tools: clusters.som_cell_lookup, wiki.refresh_directory, kag.feature_lookup, trace.graphrag_search, codebase:graph_traverse.",
+    "graph": "Layer graph contains 40 tools. 3 expose identity fields and 18 write surfaces. Top-ranked tools: clusters.som_cell_lookup, wiki.refresh_directory, kag.feature_lookup, trace.graphrag_search, codebase:graph_traverse.",
     "rerank": "Layer rerank contains 6 tools. 0 expose identity fields and 4 write surfaces. Top-ranked tools: search.rerank, turbovec.rank_chunks, GpuBridgeService.AssignSom, GpuBridgeService.BatchCosine, GpuBridgeService.EncodeLatent.",
     "synthesis": "Layer synthesis contains 31 tools. 1 expose identity fields and 15 write surfaces. Top-ranked tools: atlas.populate_feature_documents, legal.build_timeline, legal.cross_examine, legal.issue_spotter, legal.mock_trial.",
-    "ops": "Layer ops contains 12 tools. 0 expose identity fields and 2 write surfaces. Top-ranked tools: ops.search_tools, ops.audit_tool_result, ops.gpu_pipeline_stats, ops.gpu_topk, ops.inspect_tool_contract.",
-    "read": "Layer read contains 5 tools. 0 expose identity fields and 0 write surfaces. Top-ranked tools: atlas.get_chunk, db.schema_overview, db.table_inspect, file.read_window, kb.wiki_note_lookup.",
-    "unknown": "Layer unknown contains 124 tools. 3 expose identity fields and 70 write surfaces. Top-ranked tools: trace.kag_search, clusters.get_members, topology.search_near, search.dev_context, topology.search_4d."
+    "ops": "Layer ops contains 12 tools. 0 expose identity fields and 5 write surfaces. Top-ranked tools: ops.search_tools, ops.audit_tool_result, ops.gpu_pipeline_stats, ops.gpu_topk, ops.inspect_tool_contract.",
+    "read": "Layer read contains 5 tools. 0 expose identity fields and 2 write surfaces. Top-ranked tools: atlas.get_chunk, file.read_window, kb.wiki_note_lookup, db.schema_overview, db.table_inspect.",
+    "unknown": "Layer unknown contains 122 tools. 3 expose identity fields and 70 write surfaces. Top-ranked tools: trace.kag_search, clusters.get_members, topology.search_near, search.dev_context, topology.search_4d."
   },
-  "overall_summary": "error: all llama-server routes failed: llama-primary: llama-primary 500: {\"error\":{\"code\":500,\"message\":\"\\n------------\\nWhile executing CallExpression at line 85, column 32 in source:\\n...first %}↵            {{- raise_exception('System message must be at the beginnin...\\n                                           ^\\nError: Jinja Exception: System message must be at the beginning.\",\"type\":\"server_error\"}} | atomic-llama: fetch failed",
+  "overall_summary": "The Parent Atlas MCP tool registry contains 40 tools organized by category, primarily focused on codebase search, retrieval, and knowledge management. Most tools write to Postgres, with several reading from Redis, Qdrant, Neo4j, and other services. Search tools use hybrid approaches combining lexical ripgrep, dense vector embeddings in Qdrant, and graph metadata from Neo4j. Memory and caching tools leverage a three-tier system spanning Redis, Postgres, and Qdrant. Identity and audit tools validate data parity across services, while graph tools navigate SOM clusters and knowledge graphs. Additional tools handle legal research, GPU attention, image enrichment, and operational diagnostics, with several tools reading from multiple backing services to provide comprehensive context retrieval.",
   "tools": [
     {
       "tool_name": "wiki.search",
@@ -13523,31 +13491,6 @@
       "rank": 98
     },
     {
-      "tool_name": "engram.redis_health",
-      "namespace": "engram",
-      "description": "Check Redis availability used by engram memory tools.",
-      "layers": [
-        "cache"
-      ],
-      "identity_fields": [],
-      "writes_to": [],
-      "permissions": "read_only",
-      "packet_kind": "trace_tool",
-      "sources": [
-        "trace-mcp"
-      ],
-      "source_ref": "engram.redis_health",
-      "examples": [],
-      "transport": null,
-      "domain": "unknown",
-      "ontology": [],
-      "service": null,
-      "method": null,
-      "primary_layer": "cache",
-      "score": 96,
-      "rank": 99
-    },
-    {
       "tool_name": "atlas.build_taxonomy_topology_packet",
       "namespace": "atlas",
       "description": "Build a compact ACE packet for taxonomy/topology routing. Combines ontology path, top children, SOM 20x20 neighborhood, K-means labels, linked tuples, and fanout hints into a small Valkey-backed packet suitable for KAG/DAG and classifier lanes.",
@@ -13570,7 +13513,7 @@
       "method": null,
       "primary_layer": "graph",
       "score": 94,
-      "rank": 100
+      "rank": 99
     },
     {
       "tool_name": "atlas.compact_context",
@@ -13595,7 +13538,7 @@
       "method": null,
       "primary_layer": "graph",
       "score": 94,
-      "rank": 101
+      "rank": 100
     },
     {
       "tool_name": "context.prefetch_feature_context",
@@ -13620,7 +13563,7 @@
       "method": null,
       "primary_layer": "graph",
       "score": 94,
-      "rank": 102
+      "rank": 101
     },
     {
       "tool_name": "graph.materialize_pathway",
@@ -13645,32 +13588,7 @@
       "method": null,
       "primary_layer": "graph",
       "score": 94,
-      "rank": 103
-    },
-    {
-      "tool_name": "hypergraph.expand_members",
-      "namespace": "hypergraph",
-      "description": "Returns all related edges for a given edge hash by member overlap.",
-      "layers": [
-        "graph"
-      ],
-      "identity_fields": [],
-      "writes_to": [],
-      "permissions": "read_only",
-      "packet_kind": "trace_tool",
-      "sources": [
-        "trace-mcp"
-      ],
-      "source_ref": "hypergraph.expand_members",
-      "examples": [],
-      "transport": null,
-      "domain": "unknown",
-      "ontology": [],
-      "service": null,
-      "method": null,
-      "primary_layer": "graph",
-      "score": 94,
-      "rank": 104
+      "rank": 102
     },
     {
       "tool_name": "hypergraph.explain_activation",
@@ -13695,7 +13613,7 @@
       "method": null,
       "primary_layer": "graph",
       "score": 94,
-      "rank": 105
+      "rank": 103
     },
     {
       "tool_name": "hypergraph.get_edge",
@@ -13720,7 +13638,7 @@
       "method": null,
       "primary_layer": "graph",
       "score": 94,
-      "rank": 106
+      "rank": 104
     },
     {
       "tool_name": "kb.search_pathways",
@@ -13745,7 +13663,7 @@
       "method": null,
       "primary_layer": "graph",
       "score": 94,
-      "rank": 107
+      "rank": 105
     },
     {
       "tool_name": "library.registry_lookup",
@@ -13770,7 +13688,7 @@
       "method": null,
       "primary_layer": "graph",
       "score": 94,
-      "rank": 108
+      "rank": 106
     },
     {
       "tool_name": "research.playbook_lookup_by_language",
@@ -13795,7 +13713,7 @@
       "method": null,
       "primary_layer": "graph",
       "score": 94,
-      "rank": 109
+      "rank": 107
     },
     {
       "tool_name": "runtime.sse_probe",
@@ -13820,7 +13738,7 @@
       "method": null,
       "primary_layer": "graph",
       "score": 94,
-      "rank": 110
+      "rank": 108
     },
     {
       "tool_name": "taxonomy.path",
@@ -13845,7 +13763,7 @@
       "method": null,
       "primary_layer": "graph",
       "score": 94,
-      "rank": 111
+      "rank": 109
     },
     {
       "tool_name": "topology.search_som_neighborhood",
@@ -13870,7 +13788,7 @@
       "method": null,
       "primary_layer": "graph",
       "score": 94,
-      "rank": 112
+      "rank": 110
     },
     {
       "tool_name": "search.rerank",
@@ -13895,7 +13813,7 @@
       "method": null,
       "primary_layer": "rerank",
       "score": 92,
-      "rank": 113
+      "rank": 111
     },
     {
       "tool_name": "turbovec.rank_chunks",
@@ -13920,7 +13838,7 @@
       "method": null,
       "primary_layer": "rerank",
       "score": 92,
-      "rank": 114
+      "rank": 112
     },
     {
       "tool_name": "hypergraph.search",
@@ -13945,7 +13863,7 @@
       "method": null,
       "primary_layer": "graph",
       "score": 90,
-      "rank": 115
+      "rank": 113
     },
     {
       "tool_name": "atlas.embedding_all_tags",
@@ -13970,7 +13888,7 @@
       "method": null,
       "primary_layer": "dense",
       "score": 88,
-      "rank": 116
+      "rank": 114
     },
     {
       "tool_name": "atlas.embedding_neighbors",
@@ -13995,7 +13913,7 @@
       "method": null,
       "primary_layer": "dense",
       "score": 88,
-      "rank": 117
+      "rank": 115
     },
     {
       "tool_name": "atlas.populate_feature_documents",
@@ -14022,7 +13940,7 @@
       "method": null,
       "primary_layer": "synthesis",
       "score": 88,
-      "rank": 118
+      "rank": 116
     },
     {
       "tool_name": "evidence.search_by_image",
@@ -14047,7 +13965,7 @@
       "method": null,
       "primary_layer": "dense",
       "score": 88,
-      "rank": 119
+      "rank": 117
     },
     {
       "tool_name": "legal.batch_ingest",
@@ -14072,7 +13990,7 @@
       "method": null,
       "primary_layer": "dense",
       "score": 88,
-      "rank": 120
+      "rank": 118
     },
     {
       "tool_name": "legal.cross_reference_evidence",
@@ -14097,7 +14015,7 @@
       "method": null,
       "primary_layer": "dense",
       "score": 88,
-      "rank": 121
+      "rank": 119
     },
     {
       "tool_name": "topology.language_distribution",
@@ -14122,7 +14040,34 @@
       "method": null,
       "primary_layer": "dense",
       "score": 88,
-      "rank": 122
+      "rank": 120
+    },
+    {
+      "tool_name": "engram.redis_health",
+      "namespace": "engram",
+      "description": "Check Redis availability used by engram memory tools.",
+      "layers": [
+        "cache"
+      ],
+      "identity_fields": [],
+      "writes_to": [
+        "redis"
+      ],
+      "permissions": "read_write",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "engram.redis_health",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "cache",
+      "score": 86,
+      "rank": 121
     },
     {
       "tool_name": "inference:route",
@@ -14155,7 +14100,7 @@
       "method": null,
       "primary_layer": "cache",
       "score": 86,
-      "rank": 123
+      "rank": 122
     },
     {
       "tool_name": "codebase:file_intel",
@@ -14189,7 +14134,7 @@
       "method": null,
       "primary_layer": "graph",
       "score": 84,
-      "rank": 124
+      "rank": 123
     },
     {
       "tool_name": "codebase:graph_neighbors",
@@ -14222,7 +14167,7 @@
       "method": null,
       "primary_layer": "graph",
       "score": 84,
-      "rank": 125
+      "rank": 124
     },
     {
       "tool_name": "evidence.link_image_graph",
@@ -14233,7 +14178,7 @@
       ],
       "identity_fields": [],
       "writes_to": [
-        "neo4j"
+        "qdrant"
       ],
       "permissions": "read_write",
       "packet_kind": "trace_tool",
@@ -14249,7 +14194,7 @@
       "method": null,
       "primary_layer": "graph",
       "score": 84,
-      "rank": 126
+      "rank": 125
     },
     {
       "tool_name": "graph.community_for_node",
@@ -14260,6 +14205,7 @@
       ],
       "identity_fields": [],
       "writes_to": [
+        "neo4j",
         "postgres"
       ],
       "permissions": "read_only",
@@ -14283,7 +14229,7 @@
       "method": null,
       "primary_layer": "graph",
       "score": 84,
-      "rank": 127
+      "rank": 126
     },
     {
       "tool_name": "graph.expand_neighborhood",
@@ -14294,6 +14240,7 @@
       ],
       "identity_fields": [],
       "writes_to": [
+        "neo4j",
         "postgres"
       ],
       "permissions": "read_only",
@@ -14317,7 +14264,7 @@
       "method": null,
       "primary_layer": "graph",
       "score": 84,
-      "rank": 128
+      "rank": 127
     },
     {
       "tool_name": "graph.index",
@@ -14350,7 +14297,7 @@
       "method": null,
       "primary_layer": "graph",
       "score": 84,
-      "rank": 129
+      "rank": 128
     },
     {
       "tool_name": "graph.shortest_path",
@@ -14361,6 +14308,7 @@
       ],
       "identity_fields": [],
       "writes_to": [
+        "neo4j",
         "postgres"
       ],
       "permissions": "read_only",
@@ -14385,7 +14333,7 @@
       "method": null,
       "primary_layer": "graph",
       "score": 84,
-      "rank": 130
+      "rank": 129
     },
     {
       "tool_name": "graphrag_expand_context",
@@ -14414,6 +14362,33 @@
         "neo4j",
         "relationship"
       ],
+      "service": null,
+      "method": null,
+      "primary_layer": "graph",
+      "score": 84,
+      "rank": 130
+    },
+    {
+      "tool_name": "hypergraph.expand_members",
+      "namespace": "hypergraph",
+      "description": "Returns all related edges for a given edge hash by member overlap.",
+      "layers": [
+        "graph"
+      ],
+      "identity_fields": [],
+      "writes_to": [
+        "neo4j"
+      ],
+      "permissions": "read_write",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "hypergraph.expand_members",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
       "service": null,
       "method": null,
       "primary_layer": "graph",
@@ -16444,56 +16419,6 @@
       "rank": 196
     },
     {
-      "tool_name": "db.schema_overview",
-      "namespace": "db",
-      "description": "Lists every table in the public schema with row estimate + structural flags.",
-      "layers": [
-        "read"
-      ],
-      "identity_fields": [],
-      "writes_to": [],
-      "permissions": "read_only",
-      "packet_kind": "trace_tool",
-      "sources": [
-        "trace-mcp"
-      ],
-      "source_ref": "db.schema_overview",
-      "examples": [],
-      "transport": null,
-      "domain": "unknown",
-      "ontology": [],
-      "service": null,
-      "method": null,
-      "primary_layer": "read",
-      "score": 72,
-      "rank": 197
-    },
-    {
-      "tool_name": "db.table_inspect",
-      "namespace": "db",
-      "description": "Returns columns + indexes + foreign keys for one table. No row data.",
-      "layers": [
-        "read"
-      ],
-      "identity_fields": [],
-      "writes_to": [],
-      "permissions": "read_only",
-      "packet_kind": "trace_tool",
-      "sources": [
-        "trace-mcp"
-      ],
-      "source_ref": "db.table_inspect",
-      "examples": [],
-      "transport": null,
-      "domain": "unknown",
-      "ontology": [],
-      "service": null,
-      "method": null,
-      "primary_layer": "read",
-      "score": 72,
-      "rank": 198
-    },
-    {
       "tool_name": "face:identify",
       "namespace": "face",
       "description": "Multi-pass GRPO face matching for a reference POI using gemma4 VLM.",
@@ -16524,7 +16449,7 @@
       "method": null,
       "primary_layer": "synthesis",
       "score": 72,
-      "rank": 199
+      "rank": 197
     },
     {
       "tool_name": "file.read_window",
@@ -16549,7 +16474,7 @@
       "method": null,
       "primary_layer": "read",
       "score": 72,
-      "rank": 200
+      "rank": 198
     },
     {
       "tool_name": "langextract:legal",
@@ -16583,7 +16508,7 @@
       "method": null,
       "primary_layer": "synthesis",
       "score": 72,
-      "rank": 201
+      "rank": 199
     },
     {
       "tool_name": "ace.wiki",
@@ -16616,7 +16541,7 @@
       "method": null,
       "primary_layer": "synthesis",
       "score": 70,
-      "rank": 202
+      "rank": 200
     },
     {
       "tool_name": "atlas.cross_store_proof",
@@ -16649,7 +16574,7 @@
       "method": null,
       "primary_layer": "synthesis",
       "score": 70,
-      "rank": 203
+      "rank": 201
     },
     {
       "tool_name": "cluster.summary.get",
@@ -16682,7 +16607,7 @@
       "method": null,
       "primary_layer": "synthesis",
       "score": 70,
-      "rank": 204
+      "rank": 202
     },
     {
       "tool_name": "clusters.get_summary_lenses",
@@ -16716,7 +16641,7 @@
       "method": null,
       "primary_layer": "synthesis",
       "score": 70,
-      "rank": 205
+      "rank": 203
     },
     {
       "tool_name": "codebase:explain_cluster",
@@ -16749,7 +16674,7 @@
       "method": null,
       "primary_layer": "synthesis",
       "score": 70,
-      "rank": 206
+      "rank": 204
     },
     {
       "tool_name": "CodeIntelService.SummarizeCluster",
@@ -16782,7 +16707,7 @@
       "method": "SummarizeCluster",
       "primary_layer": "synthesis",
       "score": 70,
-      "rank": 207
+      "rank": 205
     },
     {
       "tool_name": "EnrichmentService.SummarizeCluster",
@@ -16815,7 +16740,7 @@
       "method": "SummarizeCluster",
       "primary_layer": "synthesis",
       "score": 70,
-      "rank": 208
+      "rank": 206
     },
     {
       "tool_name": "llm_synthesis.log_event",
@@ -16848,7 +16773,7 @@
       "method": null,
       "primary_layer": "synthesis",
       "score": 70,
-      "rank": 209
+      "rank": 207
     },
     {
       "tool_name": "poi:face_synth",
@@ -16881,7 +16806,7 @@
       "method": null,
       "primary_layer": "synthesis",
       "score": 70,
-      "rank": 210
+      "rank": 208
     },
     {
       "tool_name": "stable_diffusion_generate",
@@ -16915,7 +16840,7 @@
       "method": null,
       "primary_layer": "synthesis",
       "score": 70,
-      "rank": 211
+      "rank": 209
     },
     {
       "tool_name": "kb.wiki_note_lookup",
@@ -16940,7 +16865,7 @@
       "method": null,
       "primary_layer": "read",
       "score": 68,
-      "rank": 212
+      "rank": 210
     },
     {
       "tool_name": "gemma4-opencode",
@@ -16973,6 +16898,60 @@
       "method": null,
       "primary_layer": "synthesis",
       "score": 66,
+      "rank": 211
+    },
+    {
+      "tool_name": "db.schema_overview",
+      "namespace": "db",
+      "description": "Lists every table in the public schema with row estimate + structural flags.",
+      "layers": [
+        "read"
+      ],
+      "identity_fields": [],
+      "writes_to": [
+        "postgres"
+      ],
+      "permissions": "read_write",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "db.schema_overview",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "read",
+      "score": 62,
+      "rank": 212
+    },
+    {
+      "tool_name": "db.table_inspect",
+      "namespace": "db",
+      "description": "Returns columns + indexes + foreign keys for one table. No row data.",
+      "layers": [
+        "read"
+      ],
+      "identity_fields": [],
+      "writes_to": [
+        "postgres"
+      ],
+      "permissions": "read_write",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "db.table_inspect",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "read",
+      "score": 62,
       "rank": 213
     },
     {
@@ -17076,81 +17055,6 @@
       "rank": 217
     },
     {
-      "tool_name": "ops.propose_patch",
-      "namespace": "ops",
-      "description": "PROPOSES a patch for a file. READ-ONLY PREVIEW. Does NOT modify files.",
-      "layers": [
-        "ops"
-      ],
-      "identity_fields": [],
-      "writes_to": [],
-      "permissions": "read_only",
-      "packet_kind": "trace_tool",
-      "sources": [
-        "trace-mcp"
-      ],
-      "source_ref": "ops.propose_patch",
-      "examples": [],
-      "transport": null,
-      "domain": "unknown",
-      "ontology": [],
-      "service": null,
-      "method": null,
-      "primary_layer": "ops",
-      "score": 58,
-      "rank": 218
-    },
-    {
-      "tool_name": "ops.run_quality_gate",
-      "namespace": "ops",
-      "description": "Executes a project-wide quality gate (tsc or vitest-all).",
-      "layers": [
-        "ops"
-      ],
-      "identity_fields": [],
-      "writes_to": [],
-      "permissions": "read_only",
-      "packet_kind": "trace_tool",
-      "sources": [
-        "trace-mcp"
-      ],
-      "source_ref": "ops.run_quality_gate",
-      "examples": [],
-      "transport": null,
-      "domain": "unknown",
-      "ontology": [],
-      "service": null,
-      "method": null,
-      "primary_layer": "ops",
-      "score": 58,
-      "rank": 219
-    },
-    {
-      "tool_name": "ops.run_targeted_test",
-      "namespace": "ops",
-      "description": "Executes a single Vitest test file and returns the outcome.",
-      "layers": [
-        "ops"
-      ],
-      "identity_fields": [],
-      "writes_to": [],
-      "permissions": "read_only",
-      "packet_kind": "trace_tool",
-      "sources": [
-        "trace-mcp"
-      ],
-      "source_ref": "ops.run_targeted_test",
-      "examples": [],
-      "transport": null,
-      "domain": "unknown",
-      "ontology": [],
-      "service": null,
-      "method": null,
-      "primary_layer": "ops",
-      "score": 58,
-      "rank": 220
-    },
-    {
       "tool_name": "ops.validate_claims",
       "namespace": "ops",
       "description": "Parses proposed agent response claims and verifies each one against evidence. Detects false completion claims (claiming success without proof). MUST be called before the agent sends any response that asserts a write occurred. Returns supported=true only for claims backed by ops.verify_write or ops.audit_tool_result evidence.",
@@ -17173,7 +17077,7 @@
       "method": null,
       "primary_layer": "ops",
       "score": 58,
-      "rank": 221
+      "rank": 218
     },
     {
       "tool_name": "ops.validate_tool_call",
@@ -17198,7 +17102,7 @@
       "method": null,
       "primary_layer": "ops",
       "score": 58,
-      "rank": 222
+      "rank": 219
     },
     {
       "tool_name": "ops.execute_graphify",
@@ -17223,7 +17127,7 @@
       "method": null,
       "primary_layer": "ops",
       "score": 54,
-      "rank": 223
+      "rank": 220
     },
     {
       "tool_name": "atlas.feature_document_enrichment_plan",
@@ -17250,7 +17154,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 52,
-      "rank": 224
+      "rank": 221
     },
     {
       "tool_name": "atlas.feature_document_status",
@@ -17277,7 +17181,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 52,
-      "rank": 225
+      "rank": 222
     },
     {
       "tool_name": "atlas.materialize_feature_evidence_tuples",
@@ -17305,7 +17209,35 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 52,
-      "rank": 226
+      "rank": 223
+    },
+    {
+      "tool_name": "ops.propose_patch",
+      "namespace": "ops",
+      "description": "PROPOSES a patch for a file. READ-ONLY PREVIEW. Does NOT modify files.",
+      "layers": [
+        "ops"
+      ],
+      "identity_fields": [],
+      "writes_to": [
+        "postgres",
+        "kanban"
+      ],
+      "permissions": "read_write",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "ops.propose_patch",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "ops",
+      "score": 48,
+      "rank": 224
     },
     {
       "tool_name": "ops.record_fix_attempt",
@@ -17325,6 +17257,60 @@
         "trace-mcp"
       ],
       "source_ref": "ops.record_fix_attempt",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "ops",
+      "score": 48,
+      "rank": 225
+    },
+    {
+      "tool_name": "ops.run_quality_gate",
+      "namespace": "ops",
+      "description": "Executes a project-wide quality gate (tsc or vitest-all).",
+      "layers": [
+        "ops"
+      ],
+      "identity_fields": [],
+      "writes_to": [
+        "postgres"
+      ],
+      "permissions": "read_write",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "ops.run_quality_gate",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "ops",
+      "score": 48,
+      "rank": 226
+    },
+    {
+      "tool_name": "ops.run_targeted_test",
+      "namespace": "ops",
+      "description": "Executes a single Vitest test file and returns the outcome.",
+      "layers": [
+        "ops"
+      ],
+      "identity_fields": [],
+      "writes_to": [
+        "postgres"
+      ],
+      "permissions": "read_write",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "ops.run_targeted_test",
       "examples": [],
       "transport": null,
       "domain": "unknown",
@@ -17511,6 +17497,31 @@
       "rank": 234
     },
     {
+      "tool_name": "domain.classify",
+      "namespace": "domain",
+      "description": "Classify text into the canonical domain taxonomy via the Miniforge sidecar's classify pass (sklearn NB/LR over KMeans word-cluster features once a trained checkpoint exists; reports backend 'unavailable' otherwise — never a hard failure). Closes the confirmed 2026-09-03 TRACE audit gap: graph/cluster/topK/hypergraph/taxonomy tools all existed, domain classification did not.",
+      "layers": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "domain.classify",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "unknown",
+      "score": 44,
+      "rank": 235
+    },
+    {
       "tool_name": "kag.ingest_error",
       "namespace": "kag",
       "description": "Fingerprints and stores a raw error text for future retrieval.",
@@ -17533,7 +17544,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 44,
-      "rank": 235
+      "rank": 236
     },
     {
       "tool_name": "kag.ingest_memory_directory",
@@ -17558,7 +17569,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 44,
-      "rank": 236
+      "rank": 237
     },
     {
       "tool_name": "kag.panel_context",
@@ -17583,7 +17594,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 44,
-      "rank": 237
+      "rank": 238
     },
     {
       "tool_name": "kag.record_agent_run",
@@ -17608,7 +17619,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 44,
-      "rank": 238
+      "rank": 239
     },
     {
       "tool_name": "kb.organize_messy_text",
@@ -17633,7 +17644,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 44,
-      "rank": 239
+      "rank": 240
     },
     {
       "tool_name": "kb.search_notecards",
@@ -17658,7 +17669,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 44,
-      "rank": 240
+      "rank": 241
     },
     {
       "tool_name": "kb.search_summary_tree",
@@ -17683,7 +17694,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 44,
-      "rank": 241
+      "rank": 242
     },
     {
       "tool_name": "kb.trace_search",
@@ -17708,7 +17719,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 44,
-      "rank": 242
+      "rank": 243
     },
     {
       "tool_name": "knowledge.get_minified_map",
@@ -17733,7 +17744,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 44,
-      "rank": 243
+      "rank": 244
     },
     {
       "tool_name": "legal.find_precedents",
@@ -17758,7 +17769,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 44,
-      "rank": 244
+      "rank": 245
     },
     {
       "tool_name": "legal.get_transcript",
@@ -17783,7 +17794,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 44,
-      "rank": 245
+      "rank": 246
     },
     {
       "tool_name": "legal.score_case",
@@ -17808,7 +17819,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 44,
-      "rank": 246
+      "rank": 247
     },
     {
       "tool_name": "legal.search_recordings",
@@ -17833,7 +17844,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 44,
-      "rank": 247
+      "rank": 248
     },
     {
       "tool_name": "legal.similar_cases",
@@ -17858,7 +17869,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 44,
-      "rank": 248
+      "rank": 249
     },
     {
       "tool_name": "legal.write_obsidian_note",
@@ -17883,7 +17894,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 44,
-      "rank": 249
+      "rank": 250
     },
     {
       "tool_name": "library.registry_rescan",
@@ -17908,7 +17919,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 44,
-      "rank": 250
+      "rank": 251
     },
     {
       "tool_name": "library.registry_search",
@@ -17933,7 +17944,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 44,
-      "rank": 251
+      "rank": 252
     },
     {
       "tool_name": "miniforge.analyze",
@@ -17958,7 +17969,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 44,
-      "rank": 252
+      "rank": 253
     },
     {
       "tool_name": "miniforge.extract",
@@ -17983,7 +17994,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 44,
-      "rank": 253
+      "rank": 254
     },
     {
       "tool_name": "miniforge.health",
@@ -18008,7 +18019,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 44,
-      "rank": 254
+      "rank": 255
     },
     {
       "tool_name": "phase109a_archive_signal",
@@ -18033,7 +18044,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 44,
-      "rank": 255
+      "rank": 256
     },
     {
       "tool_name": "phase109a_promote_recommendation",
@@ -18058,7 +18069,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 44,
-      "rank": 256
+      "rank": 257
     },
     {
       "tool_name": "phase109a_query_signal_history",
@@ -18083,7 +18094,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 44,
-      "rank": 257
+      "rank": 258
     },
     {
       "tool_name": "phase109a_supersede_recommendation",
@@ -18108,7 +18119,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 44,
-      "rank": 258
+      "rank": 259
     },
     {
       "tool_name": "phase109a_supersede_signal",
@@ -18133,7 +18144,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 44,
-      "rank": 259
+      "rank": 260
     },
     {
       "tool_name": "phase109a_validate_state_transition",
@@ -18158,7 +18169,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 44,
-      "rank": 260
+      "rank": 261
     },
     {
       "tool_name": "runtime.quic_status",
@@ -18183,7 +18194,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 44,
-      "rank": 261
+      "rank": 262
     },
     {
       "tool_name": "runtime.simdjson_status",
@@ -18208,7 +18219,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 44,
-      "rank": 262
+      "rank": 263
     },
     {
       "tool_name": "service_workers.result",
@@ -18233,7 +18244,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 44,
-      "rank": 263
+      "rank": 264
     },
     {
       "tool_name": "service_workers.status",
@@ -18258,7 +18269,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 44,
-      "rank": 264
+      "rank": 265
     },
     {
       "tool_name": "taxonomy.children",
@@ -18283,7 +18294,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 44,
-      "rank": 265
+      "rank": 266
     },
     {
       "tool_name": "tools.batch_call",
@@ -18308,7 +18319,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 44,
-      "rank": 266
+      "rank": 267
     },
     {
       "tool_name": "topology.hydration_status",
@@ -18333,7 +18344,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 44,
-      "rank": 267
+      "rank": 268
     },
     {
       "tool_name": "topology.recompute_manifold_plan",
@@ -18358,7 +18369,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 44,
-      "rank": 268
+      "rank": 269
     },
     {
       "tool_name": "trace_dynamic_context",
@@ -18375,31 +18386,6 @@
         "trace-mcp"
       ],
       "source_ref": "trace_dynamic_context",
-      "examples": [],
-      "transport": null,
-      "domain": "unknown",
-      "ontology": [],
-      "service": null,
-      "method": null,
-      "primary_layer": "unknown",
-      "score": 44,
-      "rank": 269
-    },
-    {
-      "tool_name": "trace_search",
-      "namespace": "misc",
-      "description": "DEPRECATED bare-name alias for kb.trace_search. Gated by MCP_LEGACY_ALIASES.",
-      "layers": [
-        "unknown"
-      ],
-      "identity_fields": [],
-      "writes_to": [],
-      "permissions": "read_only",
-      "packet_kind": "trace_tool",
-      "sources": [
-        "trace-mcp"
-      ],
-      "source_ref": "trace_search",
       "examples": [],
       "transport": null,
       "domain": "unknown",
@@ -18486,56 +18472,6 @@
       "rank": 273
     },
     {
-      "tool_name": "wiki_note_lookup",
-      "namespace": "misc",
-      "description": "DEPRECATED bare-name alias for kb.wiki_note_lookup. Gated by MCP_LEGACY_ALIASES.",
-      "layers": [
-        "unknown"
-      ],
-      "identity_fields": [],
-      "writes_to": [],
-      "permissions": "read_only",
-      "packet_kind": "trace_tool",
-      "sources": [
-        "trace-mcp"
-      ],
-      "source_ref": "wiki_note_lookup",
-      "examples": [],
-      "transport": null,
-      "domain": "unknown",
-      "ontology": [],
-      "service": null,
-      "method": null,
-      "primary_layer": "unknown",
-      "score": 44,
-      "rank": 274
-    },
-    {
-      "tool_name": "admin.log_event",
-      "namespace": "admin",
-      "description": "Logs a manual administrative event with context.",
-      "layers": [
-        "unknown"
-      ],
-      "identity_fields": [],
-      "writes_to": [],
-      "permissions": "read_only",
-      "packet_kind": "trace_tool",
-      "sources": [
-        "trace-mcp"
-      ],
-      "source_ref": "admin.log_event",
-      "examples": [],
-      "transport": null,
-      "domain": "unknown",
-      "ontology": [],
-      "service": null,
-      "method": null,
-      "primary_layer": "unknown",
-      "score": 40,
-      "rank": 275
-    },
-    {
       "tool_name": "kb.extract_citations",
       "namespace": "kb",
       "description": "Extract legal citations and statutes from text.",
@@ -18558,7 +18494,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 40,
-      "rank": 276
+      "rank": 274
     },
     {
       "tool_name": "skills.list",
@@ -18583,7 +18519,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 40,
-      "rank": 277
+      "rank": 275
     },
     {
       "tool_name": "skills.run_mission",
@@ -18608,7 +18544,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 40,
-      "rank": 278
+      "rank": 276
     },
     {
       "tool_name": "analytics:mapreduce_matrix",
@@ -18641,7 +18577,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 34,
-      "rank": 279
+      "rank": 277
     },
     {
       "tool_name": "ast:cross_language",
@@ -18674,7 +18610,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 34,
-      "rank": 280
+      "rank": 278
     },
     {
       "tool_name": "cases:create",
@@ -18707,7 +18643,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 34,
-      "rank": 281
+      "rank": 279
     },
     {
       "tool_name": "cases:delete",
@@ -18740,7 +18676,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 34,
-      "rank": 282
+      "rank": 280
     },
     {
       "tool_name": "ChatAssistantService.CreateSession",
@@ -18773,7 +18709,7 @@
       "method": "CreateSession",
       "primary_layer": "unknown",
       "score": 34,
-      "rank": 283
+      "rank": 281
     },
     {
       "tool_name": "ChatAssistantService.GetHistory",
@@ -18806,7 +18742,7 @@
       "method": "GetHistory",
       "primary_layer": "unknown",
       "score": 34,
-      "rank": 284
+      "rank": 282
     },
     {
       "tool_name": "ChatAssistantService.Health",
@@ -18839,7 +18775,7 @@
       "method": "Health",
       "primary_layer": "unknown",
       "score": 34,
-      "rank": 285
+      "rank": 283
     },
     {
       "tool_name": "ChatAssistantService.RAGQuery",
@@ -18872,7 +18808,7 @@
       "method": "RAGQuery",
       "primary_layer": "unknown",
       "score": 34,
-      "rank": 286
+      "rank": 284
     },
     {
       "tool_name": "ChatAssistantService.SendMessage",
@@ -18905,7 +18841,7 @@
       "method": "SendMessage",
       "primary_layer": "unknown",
       "score": 34,
-      "rank": 287
+      "rank": 285
     },
     {
       "tool_name": "ChatAssistantService.StreamMessage",
@@ -18938,7 +18874,7 @@
       "method": "StreamMessage",
       "primary_layer": "unknown",
       "score": 34,
-      "rank": 288
+      "rank": 286
     },
     {
       "tool_name": "Chr97Agent.GetCartridge",
@@ -18971,7 +18907,7 @@
       "method": "GetCartridge",
       "primary_layer": "unknown",
       "score": 34,
-      "rank": 289
+      "rank": 287
     },
     {
       "tool_name": "Chr97Agent.GetTimeline",
@@ -19004,7 +18940,7 @@
       "method": "GetTimeline",
       "primary_layer": "unknown",
       "score": 34,
-      "rank": 290
+      "rank": 288
     },
     {
       "tool_name": "Chr97Agent.QueryTags",
@@ -19037,7 +18973,7 @@
       "method": "QueryTags",
       "primary_layer": "unknown",
       "score": 34,
-      "rank": 291
+      "rank": 289
     },
     {
       "tool_name": "citations:add_to_case",
@@ -19070,7 +19006,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 34,
-      "rank": 292
+      "rank": 290
     },
     {
       "tool_name": "codebase:get_buffer",
@@ -19103,7 +19039,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 34,
-      "rank": 293
+      "rank": 291
     },
     {
       "tool_name": "codeintel.health",
@@ -19136,7 +19072,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 34,
-      "rank": 294
+      "rank": 292
     },
     {
       "tool_name": "CodeIntelService.GetClusterSummary",
@@ -19169,7 +19105,7 @@
       "method": "GetClusterSummary",
       "primary_layer": "unknown",
       "score": 34,
-      "rank": 295
+      "rank": 293
     },
     {
       "tool_name": "CodeIntelService.GetJobStatus",
@@ -19202,7 +19138,7 @@
       "method": "GetJobStatus",
       "primary_layer": "unknown",
       "score": 34,
-      "rank": 296
+      "rank": 294
     },
     {
       "tool_name": "CodeIntelService.ListClusterSummaries",
@@ -19235,7 +19171,7 @@
       "method": "ListClusterSummaries",
       "primary_layer": "unknown",
       "score": 34,
-      "rank": 297
+      "rank": 295
     },
     {
       "tool_name": "context.build_kv_packet",
@@ -19269,7 +19205,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 34,
-      "rank": 298
+      "rank": 296
     },
     {
       "tool_name": "context.get_compressed_card",
@@ -19303,7 +19239,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 34,
-      "rank": 299
+      "rank": 297
     },
     {
       "tool_name": "EnrichmentService.BatchEnrich",
@@ -19336,7 +19272,7 @@
       "method": "BatchEnrich",
       "primary_layer": "unknown",
       "score": 34,
-      "rank": 300
+      "rank": 298
     },
     {
       "tool_name": "evidence:detect_objects",
@@ -19370,7 +19306,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 34,
-      "rank": 301
+      "rank": 299
     },
     {
       "tool_name": "evidence:transcribe_gpu",
@@ -19403,7 +19339,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 34,
-      "rank": 302
+      "rank": 300
     },
     {
       "tool_name": "facial_analysis",
@@ -19436,7 +19372,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 34,
-      "rank": 303
+      "rank": 301
     },
     {
       "tool_name": "hmm_infer_repair_states",
@@ -19469,7 +19405,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 34,
-      "rank": 304
+      "rank": 302
     },
     {
       "tool_name": "langextract_extract_error_facts",
@@ -19502,7 +19438,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 34,
-      "rank": 305
+      "rank": 303
     },
     {
       "tool_name": "langextract:evidence",
@@ -19535,7 +19471,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 34,
-      "rank": 306
+      "rank": 304
     },
     {
       "tool_name": "reports:create",
@@ -19569,7 +19505,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 34,
-      "rank": 307
+      "rank": 305
     },
     {
       "tool_name": "reports:delete",
@@ -19603,7 +19539,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 34,
-      "rank": 308
+      "rank": 306
     },
     {
       "tool_name": "reports:export",
@@ -19636,7 +19572,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 34,
-      "rank": 309
+      "rank": 307
     },
     {
       "tool_name": "reports:list",
@@ -19670,7 +19606,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 34,
-      "rank": 310
+      "rank": 308
     },
     {
       "tool_name": "sveltekit_import_boundary_check",
@@ -19703,7 +19639,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 34,
-      "rank": 311
+      "rank": 309
     },
     {
       "tool_name": "sveltekit_route_audit",
@@ -19736,7 +19672,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 34,
-      "rank": 312
+      "rank": 310
     },
     {
       "tool_name": "ToolCallingService.ExecuteTool",
@@ -19769,7 +19705,7 @@
       "method": "ExecuteTool",
       "primary_layer": "unknown",
       "score": 34,
-      "rank": 313
+      "rank": 311
     },
     {
       "tool_name": "ToolCallingService.ExecuteToolBatch",
@@ -19802,7 +19738,7 @@
       "method": "ExecuteToolBatch",
       "primary_layer": "unknown",
       "score": 34,
-      "rank": 314
+      "rank": 312
     },
     {
       "tool_name": "ToolCallingService.ExecuteToolStream",
@@ -19835,7 +19771,7 @@
       "method": "ExecuteToolStream",
       "primary_layer": "unknown",
       "score": 34,
-      "rank": 315
+      "rank": 313
     },
     {
       "tool_name": "ToolCallingService.ListTools",
@@ -19868,7 +19804,7 @@
       "method": "ListTools",
       "primary_layer": "unknown",
       "score": 34,
-      "rank": 316
+      "rank": 314
     },
     {
       "tool_name": "ToolRouter.CallTool",
@@ -19901,7 +19837,7 @@
       "method": "CallTool",
       "primary_layer": "unknown",
       "score": 34,
-      "rank": 317
+      "rank": 315
     },
     {
       "tool_name": "ToolRouter.CallToolBatch",
@@ -19934,7 +19870,7 @@
       "method": "CallToolBatch",
       "primary_layer": "unknown",
       "score": 34,
-      "rank": 318
+      "rank": 316
     },
     {
       "tool_name": "ToolRouter.CallToolStream",
@@ -19967,7 +19903,7 @@
       "method": "CallToolStream",
       "primary_layer": "unknown",
       "score": 34,
-      "rank": 319
+      "rank": 317
     },
     {
       "tool_name": "ToolRouter.ListTools",
@@ -20000,7 +19936,7 @@
       "method": "ListTools",
       "primary_layer": "unknown",
       "score": 34,
-      "rank": 320
+      "rank": 318
     },
     {
       "tool_name": "toposort_repair_plan",
@@ -20033,7 +19969,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 34,
-      "rank": 321
+      "rank": 319
     },
     {
       "tool_name": "transcribe_audio",
@@ -20067,7 +20003,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 34,
-      "rank": 322
+      "rank": 320
     },
     {
       "tool_name": "video_to_frames",
@@ -20101,7 +20037,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 34,
-      "rank": 323
+      "rank": 321
     },
     {
       "tool_name": "vlm:switch_mode",
@@ -20134,7 +20070,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 34,
-      "rank": 324
+      "rank": 322
     },
     {
       "tool_name": "cases:load",
@@ -20167,7 +20103,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 30,
-      "rank": 325
+      "rank": 323
     },
     {
       "tool_name": "cases:update",
@@ -20200,7 +20136,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 30,
-      "rank": 326
+      "rank": 324
     },
     {
       "tool_name": "citations:list_by_case",
@@ -20233,7 +20169,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 30,
-      "rank": 327
+      "rank": 325
     },
     {
       "tool_name": "content",
@@ -20266,7 +20202,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 30,
-      "rank": 328
+      "rank": 326
     },
     {
       "tool_name": "context_lines",
@@ -20299,7 +20235,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 30,
-      "rank": 329
+      "rank": 327
     },
     {
       "tool_name": "issue",
@@ -20332,7 +20268,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 30,
-      "rank": 330
+      "rank": 328
     },
     {
       "tool_name": "notes",
@@ -20365,7 +20301,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 30,
-      "rank": 331
+      "rank": 329
     },
     {
       "tool_name": "operator_token",
@@ -20398,7 +20334,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 30,
-      "rank": 332
+      "rank": 330
     },
     {
       "tool_name": "outcome",
@@ -20431,7 +20367,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 30,
-      "rank": 333
+      "rank": 331
     },
     {
       "tool_name": "playwright:browser_action",
@@ -20464,7 +20400,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 30,
-      "rank": 334
+      "rank": 332
     },
     {
       "tool_name": "postgres",
@@ -20497,7 +20433,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 30,
-      "rank": 335
+      "rank": 333
     },
     {
       "tool_name": "rag:index_page",
@@ -20530,7 +20466,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 30,
-      "rank": 336
+      "rank": 334
     },
     {
       "tool_name": "reports:update",
@@ -20563,7 +20499,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 30,
-      "rank": 337
+      "rank": 335
     },
     {
       "tool_name": "section",
@@ -20596,7 +20532,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 30,
-      "rank": 338
+      "rank": 336
     },
     {
       "tool_name": "unknown",
@@ -20629,7 +20565,7 @@
       "method": null,
       "primary_layer": "unknown",
       "score": 30,
-      "rank": 339
+      "rank": 337
     }
   ]
 }

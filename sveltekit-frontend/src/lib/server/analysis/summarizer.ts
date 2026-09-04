@@ -1,7 +1,7 @@
 /**
- * Legal document summarization via Gemma4 RotorQuant at :8090.
+ * Legal document summarization via the active Ornith llama-server at :8090.
  * Generates a concise summary for each uploaded evidence document.
- * Wired to use Gemma4 synthesis server with streaming support.
+ * Wired to use llama-server /v1 with streaming support.
  */
 
 import { traceLLM } from '$lib/server/observability/langfuse.js';
@@ -9,10 +9,10 @@ import { resolveLlamaInferenceTarget } from '$lib/server/llm/runtime-contract.js
 
 
 /**
- * Assemble summary by reading streaming response from Gemma4.
+ * Assemble summary by reading the llama-server streaming response.
  * Returns accumulated content or truncation fallback on error.
  */
-async function fetchGemma4Summary(systemPrompt: string, userPrompt: string, timeoutMs: number = 90_000): Promise<string> {
+async function fetchLlamaSummary(systemPrompt: string, userPrompt: string, timeoutMs: number = 90_000): Promise<string> {
 	try {
 		const target = await resolveLlamaInferenceTarget();
 		const controller = new AbortController();
@@ -29,7 +29,7 @@ async function fetchGemma4Summary(systemPrompt: string, userPrompt: string, time
 				],
 				max_tokens: 1024,
 				temperature: 0.3,
-				stream: true, // REQUIRED for Gemma4 to avoid thinking block exhausting max_tokens
+				stream: true, // Keeps the local synthesis response bounded while streaming.
 			}),
 			signal: controller.signal,
 		});
@@ -37,7 +37,7 @@ async function fetchGemma4Summary(systemPrompt: string, userPrompt: string, time
 		clearTimeout(timeoutId);
 
 		if (!res.ok) {
-			console.warn(`[Summarizer] Gemma4 returned ${res.status}: ${res.statusText}`);
+			console.warn(`[Summarizer] llama-server returned ${res.status}: ${res.statusText}`);
 			return '';
 		}
 
@@ -47,7 +47,7 @@ async function fetchGemma4Summary(systemPrompt: string, userPrompt: string, time
 		let buffer = '';
 
 		if (!res.body) {
-			console.warn('[Summarizer] No response body from Gemma4');
+			console.warn('[Summarizer] No response body from llama-server');
 			return '';
 		}
 
@@ -81,9 +81,9 @@ async function fetchGemma4Summary(systemPrompt: string, userPrompt: string, time
 		return accumulated.trim();
 	} catch (err: any) {
 		if (err?.name === 'AbortError') {
-			console.warn(`[Summarizer] Gemma4 timeout after ${timeoutMs}ms`);
+			console.warn(`[Summarizer] llama-server timeout after ${timeoutMs}ms`);
 		} else {
-			console.warn('[Summarizer] Gemma4 fetch failed:', err?.message);
+			console.warn('[Summarizer] llama-server fetch failed:', err?.message);
 		}
 		return '';
 	}
@@ -101,15 +101,15 @@ export async function summarizeDocument(text: string, maxWords: number = 150): P
 
 			const userPrompt = `Summarize the following legal document in ${maxWords} words or less. Focus on key facts, dates, parties involved, and legal issues:\n\n${input}`;
 
-			const summary = await fetchGemma4Summary(systemPrompt, userPrompt);
+			const summary = await fetchLlamaSummary(systemPrompt, userPrompt);
 
 			if (summary) {
 				gen.end({ output: summary.slice(0, 1000), level: 'DEFAULT' });
 				return summary;
 			}
 
-			// Fallback on Gemma4 failure
-			gen.end({ output: 'gemma4-failed-truncation', level: 'WARNING' });
+			// Safe bounded fallback when llama-server is unavailable.
+			gen.end({ output: 'llama-server-failed-truncation', level: 'WARNING' });
 			return text.slice(0, 500) + '...';
 		});
 	} catch (err) {

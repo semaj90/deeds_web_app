@@ -32,10 +32,8 @@ import {
   lookupCachedResponse,
   storeCachedResponse
 } from '$lib/server/ai/llm-cache.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
-import { ENV } from '$lib/server/env.server.js';
-
-const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
+import { LLAMA_SERVER_BASE_URL } from '$lib/server/ai/local-llama-provider.js';
+import { resolveLoadedLlamaModel } from '$lib/server/ai/llama-server-model-resolver.js';
 
 export interface TieredCacheOptions {
   model?: string;
@@ -156,31 +154,31 @@ export async function tieredLLMQuery(
   }
 
   // ═══════════════════════════════════════════════════════════
-  // L3: Ollama Cold Inference (3.2s avg for gemma3:270m)
+  // L3: llama-server cold inference (active local model)
   // ═══════════════════════════════════════════════════════════
-  const res = await ollamaFetch(`${OLLAMA_URL}/api/chat`, {
+  const { resolvedModel } = await resolveLoadedLlamaModel(
+    LLAMA_SERVER_BASE_URL.replace(/\/v1\/?$/, ''), model ?? null);
+  const res = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model,
+      model: resolvedModel,
       messages,
       stream: false,
       cache_prompt: true,
-      options: {
-        temperature,
-        num_predict: maxTokens,
-      },
+      temperature,
+      max_tokens: maxTokens,
     }),
   });
 
   if (!res.ok) {
-    throw new Error(`Ollama error: ${res.status} ${await res.text()}`);
+    throw new Error(`llama-server error: ${res.status} ${await res.text()}`);
   }
 
   const data = await res.json();
-  const response = data.message?.content ?? '';
-  const promptTokens: number = data.prompt_eval_count ?? 0;
-  const completionTokens: number = data.eval_count ?? 0;
+  const response = data.choices?.[0]?.message?.content ?? '';
+  const promptTokens: number = data.usage?.prompt_tokens ?? 0;
+  const completionTokens: number = data.usage?.completion_tokens ?? 0;
   // Ollama reports prompt_eval_count=0 when prompt was fully served from KV cache
   const cachedPromptTokens: number = promptTokens === 0 && completionTokens > 0
     ? (data.prompt_tokens_details?.cached_tokens ?? 0)

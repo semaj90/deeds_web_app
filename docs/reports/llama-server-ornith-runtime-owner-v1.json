@@ -1,6 +1,6 @@
 {
   "schema": "llama-server-ornith-runtime-owner-v1",
-  "observedAt": "2026-09-03",
+  "observedAt": "2026-09-04",
   "chatGenerationOwner": {
     "baseUrl": "http://127.0.0.1:8090",
     "modelAuthority": "GET /v1/models",
@@ -17,7 +17,13 @@
     "LangGraph synthesis",
     "LangExtract structured extraction",
     "decomposition and planning",
-    "summarization and enrichment"
+    "summarization and enrichment",
+    "service adapter generation",
+    "tiered cold inference",
+    "research self-prompting",
+    "queue and cluster synthesis",
+    "inference-router fallback",
+    "legacy completion adapter"
   ],
   "embeddingOwner": {
     "runtime": "Ollama",

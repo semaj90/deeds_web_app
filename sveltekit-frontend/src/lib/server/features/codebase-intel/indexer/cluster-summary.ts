@@ -10,15 +10,16 @@
  * and in Claude / Copilot context enrichment.
  */
 import { ENV } from '$lib/server/env.server.js';
-import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
-import { getOllamaEndpoint, ollamaFetch } from '$lib/server/ollama.js';
+import { ollamaFetch } from '$lib/server/ollama.js';
+import { LLAMA_SERVER_BASE_URL } from '$lib/server/ai/local-llama-provider.js';
+import { resolveLoadedLlamaModel } from '$lib/server/ai/llama-server-model-resolver.js';
 import { pool } from '$lib/server/db/client';
 import { TTL, clusterSummaryKey } from '$lib/server/cache-keys.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
 
 const QDRANT_COLLECTION = 'codebase_chunks_768';
 const TOP_CHUNKS         = 10;
-const MODEL = LLM_MODEL_ID;
+const MODEL = 'ornith-1.5-9b';
 
 export interface ClusterSummary {
 	clusterId: number;
@@ -387,39 +388,40 @@ export async function generateClusterSummary(
 
   let raw: string;
   try {
+    const { resolvedModel } = await resolveLoadedLlamaModel(
+      LLAMA_SERVER_BASE_URL.replace(/\/v1\/?$/, ''), null);
     raw = await traceLLM(
       'codebase-cluster-summary',
-      { model: MODEL, clusterId, chunkCount: chunks.length, prompt: userMessage.slice(0, 500) },
+      { model: resolvedModel, clusterId, chunkCount: chunks.length, prompt: userMessage.slice(0, 500) },
       async (gen) => {
-        // Direct Ollama call (bypasses Bifrost — Bifrost provider is unreliable)
-        const ollamaUrl = `${getOllamaEndpoint()}/api/chat`;
-        console.log(`[cluster-summary] Calling Ollama directly: ${ollamaUrl} model=${MODEL}`);
-        const res = await ollamaFetch(ollamaUrl, {
+        console.log(`[cluster-summary] Calling llama-server directly model=${resolvedModel}`);
+        const res = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            model: MODEL,
+            model: resolvedModel,
             messages: [
               { role: 'system', content: systemPrompt },
               { role: 'user', content: userMessage },
             ],
             stream: false,
-            options: { temperature: 0.2, num_predict: 2048 },
+            temperature: 0.2,
+            max_tokens: 2048,
           }),
           signal: AbortSignal.timeout(120_000),
         });
         if (!res.ok) {
           const errText = await res.text().catch(() => '');
-          const message = `Ollama ${res.status}: ${errText.slice(0, 200)}`;
+          const message = `llama-server ${res.status}: ${errText.slice(0, 200)}`;
           gen.end({ output: message, level: 'ERROR' });
           throw new Error(message);
         }
 
-        const data = (await res.json()) as { message?: { content?: string } };
-        const content = data.message?.content ?? '';
+        const data = (await res.json()) as { choices?: Array<{ message?: { content?: string } }> };
+        const content = data.choices?.[0]?.message?.content ?? '';
         gen.end({ output: content.slice(0, 1000), level: content ? 'DEFAULT' : 'WARNING' });
         console.log(
-          `[cluster-summary] Ollama OK (${content.length} chars) for cluster ${clusterId}`
+          `[cluster-summary] llama-server OK (${content.length} chars) for cluster ${clusterId}`
         );
         return content;
       }
@@ -427,12 +429,12 @@ export async function generateClusterSummary(
   } catch (err) {
     const msg = (err as Error)?.message ?? 'unknown';
     console.warn(`[cluster-summary] LLM call failed for cluster ${clusterId}:`, msg);
-    return { ok: false, reason: `Ollama call failed: ${msg}` };
+    return { ok: false, reason: `llama-server call failed: ${msg}` };
   }
 
   if (!raw) {
     console.warn(`[cluster-summary] Empty LLM response for cluster ${clusterId}`);
-    return { ok: false, reason: `Ollama returned empty response for cluster ${clusterId}` };
+    return { ok: false, reason: `llama-server returned empty response for cluster ${clusterId}` };
   }
 
   let parsed: {

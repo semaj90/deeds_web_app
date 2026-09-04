@@ -73,11 +73,19 @@ class ChunkRecord:
     ontology_classes: tuple[str, ...]
     lexical_tokens: tuple[Json, ...]
     ontology_tuples: tuple[Json, ...]
+    # DocCoordinateV1 | None, kept as `Any` here (not a hard import) so this
+    # module's existing dataclass-only callers are unaffected -- optional,
+    # additive, per parent-atlas-versioned-doc-intelligence DOC-02. None for
+    # any caller that hasn't been updated to pass a manifest-source-derived
+    # DocCoordinateV1 yet; such chunks simply carry no version qualifier.
+    doc_coordinate: Any = None
 
     def to_dict(self) -> Json:
         result = asdict(self)
         result["chunk_checksum"] = _sha(self.text)
         result["canonical_authority"] = False
+        if self.doc_coordinate is not None:
+            result["doc_coordinate"] = self.doc_coordinate.to_json_dict()
         return result
 
 
@@ -322,6 +330,7 @@ def chunk_document(
     maximum_chars: int = 3000,
     overlap_chars: int = 300,
     nlp: Callable[[str], tuple[tuple[Json, ...], tuple[Json, ...]]] | None = None,
+    doc_coordinate: Any = None,
 ) -> tuple[ChunkRecord, ...]:
     if maximum_chars <= 0 or overlap_chars < 0 or overlap_chars >= maximum_chars:
         raise ValueError("INVALID_CHUNK_WINDOW")
@@ -348,6 +357,12 @@ def chunk_document(
                 absolute_start = max(0, section_start + cursor)
                 absolute_end = absolute_start + len(chunk_text)
                 chunk_id = f"doc:{source_id}:{document_checksum[:16]}:{ordinal}"
+                chunk_coordinate = None
+                if doc_coordinate is not None:
+                    section_anchor = "/".join(heading_path) or None
+                    chunk_coordinate = doc_coordinate.model_copy(
+                        update={"content_hash": document_checksum, "section_anchor": section_anchor}
+                    )
                 chunks.append(ChunkRecord(
                     chunk_id=chunk_id,
                     source_id=source_id,
@@ -363,6 +378,7 @@ def chunk_document(
                     ontology_classes=classify_ontology(chunk_text),
                     lexical_tokens=lexical,
                     ontology_tuples=tuples,
+                    doc_coordinate=chunk_coordinate,
                 ))
                 ordinal += 1
             if end >= len(body):

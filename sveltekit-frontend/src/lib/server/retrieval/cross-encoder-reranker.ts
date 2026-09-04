@@ -31,7 +31,7 @@
  */
 
 import { createHash } from 'crypto';
-import { ollamaFetch, VLM_MODELS } from '$lib/server/ollama.js';
+import { VLM_MODELS } from '$lib/server/ollama.js';
 import { getRedis } from '$lib/server/redis.js';
 import { webSearch, type WebSearchResult } from '$lib/server/retrieval/web-search.js';
 import { traceCache, traceGraph } from '$lib/server/observability/langfuse.js';
@@ -39,7 +39,6 @@ import { fastJsonParse } from '$lib/server/gpu/simdjson-bridge.js';
 import { fromRerankResult, type UnifiedRetrievalResult } from '$lib/server/types/retrieval.js';
 import { scoreBatchCrossEncoder, isRerankerReady } from './triton-reranker.js';
 import { ENV } from '$lib/server/env.server.js';
-import { getOllamaEndpoint } from '$lib/server/ollama.js';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -383,38 +382,9 @@ async function _scoreOne(query: string, doc: RerankCandidate): Promise<number> {
   const llamaScore = await _scoreLlamaServer(prompt);
   if (llamaScore !== null) return llamaScore;
 
-  try {
-    const res = await ollamaFetch(
-      `${getOllamaEndpoint()}/api/generate`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: LEGACY_RERANK_MODEL,
-          prompt,
-          format: 'json',
-          stream: false,
-          keep_alive: '10m',
-          options: {
-            temperature: 0,
-            num_predict: 24, // {"score": 0.87} is ~12 tokens, headroom for whitespace
-            top_k: 1,
-          },
-        }),
-      }
-    );
-
-    if (!res.ok) return 0.5;
-
-    const raw = await res.text();
-    const body = fastJsonParse<{ response?: string }>(raw);
-    const parsedScore = parseScoreFromText(body?.response);
-    if (parsedScore !== null) return parsedScore;
-
-    return 0.5; // neutral on parse failure
-  } catch {
-    return 0.5;
-  }
+  // Do not fall back to Ollama generation. Keep ranking neutral when the
+  // governed llama-server/Triton paths are unavailable.
+  return 0.5;
 }
 
 /**

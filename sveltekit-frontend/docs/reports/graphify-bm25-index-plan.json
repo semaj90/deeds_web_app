@@ -2,10 +2,25 @@
   "schemaVersion": "atlas.graphify-bm25-index-plan.v1",
   "readOnly": true,
   "canonicalWriteAttempted": false,
-  "generatedAt": "2026-09-03T21:22:01.057Z",
+  "generatedAt": "2026-09-04T16:19:10.354Z",
   "limit": 10,
   "status": "BM25_INDEX_PLAN_READY",
   "candidates": [
+    {
+      "graphifyRunId": "9816c4d0-d2ad-42ca-8da9-f9d4393277b0",
+      "workflowId": "graphify-default",
+      "workspaceRevision": "sha256:c8d3a1d99f15dbfe9393d3ebe03f721680abb11747855944019bea92a4311691",
+      "sourceManifestDigest": "c8d3a1d99f15dbfe9393d3ebe03f721680abb11747855944019bea92a4311691",
+      "sourceManifestSourceCount": 25499,
+      "repositoryRevision": "def7d78fcf98ecca3ec8c60d2f761e97529e4927",
+      "parameters": {
+        "wrapper": "scripts/startup/run-graphify-daily-startup.mjs",
+        "writerRevision": "atlas.graphify-run-open.v1"
+      },
+      "graphifyCompletedAt": "2026-09-04T16:19:09.274Z",
+      "idempotencyKey": "graphify-default:postgres_tsvector_english:c8d3a1d99f15dbfe9393d3ebe03f721680abb11747855944019bea92a4311691",
+      "nextAction": "CREATE_INDEX_RUN_ULID_THEN_CLAIM_LEASE"
+    },
     {
       "graphifyRunId": "78818366-2410-4643-8e5d-e995c75a2ad5",
       "workflowId": "graphify-default",

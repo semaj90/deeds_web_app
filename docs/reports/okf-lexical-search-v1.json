@@ -1,0 +1,104 @@
+{
+  "schema": "atlas.okf-lexical-search.v1",
+  "generatedAt": "2026-09-04T17:03:49.105Z",
+  "query": "Firecrawl API documentation",
+  "queryTerms": [
+    "firecrawl",
+    "api",
+    "documentation"
+  ],
+  "inputPlan": "docs/reports/okf-chunk-plan-v1.json",
+  "workspaceRevision": "sha256:f7c6f2c974d72c2d1fdaeade6b1722be61c8f7b6d369e018d58dbd72497b6b55",
+  "candidateCount": 5,
+  "candidates": [
+    {
+      "chunkId": "sha256:80cd4d5b1afcb82f1559cae146c66a7a4c57dd80b059489aba70d5e17cee1b79",
+      "sourceRef": "workspace:firecrawl/docs-firecrawl-dev-api-reference-introduction-introduction.json",
+      "sourceRevision": "sha256:1c7d56cc65793bead233186fa85ba70c02293bb4115435a022d5fc37eb1ef57f",
+      "chunkChecksum": "sha256:341bdd79d825d098e057ab2ace9e1c84a5df7c5a566f19b7ddf15b1a458c14b9",
+      "byteSpan": {
+        "startByte": 747,
+        "endByte": 1771
+      },
+      "matchedTerms": [
+        "firecrawl",
+        "api",
+        "documentation"
+      ],
+      "lexicalScore": 4.430816798843313,
+      "canonicalAuthority": false
+    },
+    {
+      "chunkId": "sha256:8dfedabdb1d32abb06ff9f22a72b5fe0155964ceaf53ff49b0f433c5f5cb6d86",
+      "sourceRef": "workspace:firecrawl/docs-firecrawl-dev-api-reference-introduction-introduction.md",
+      "sourceRevision": "sha256:17b6c5e46e0634be1c09d6c00ec070dc582acdd8d960df68439ae670fa27b604",
+      "chunkChecksum": "sha256:c93611de3595246ea4c6e6334cdb5f0c3de355577be54dbb1f19f2311ecf3db6",
+      "byteSpan": {
+        "startByte": 0,
+        "endByte": 1024
+      },
+      "matchedTerms": [
+        "firecrawl",
+        "api",
+        "documentation"
+      ],
+      "lexicalScore": 4.430816798843313,
+      "canonicalAuthority": false
+    },
+    {
+      "chunkId": "sha256:55498030858b6e5653c71402261d2ea216ff24623e736b1fc847e2cccc6ef90e",
+      "sourceRef": "workspace:firecrawl/docs-firecrawl-dev-api-reference-introduction-introduction.json",
+      "sourceRevision": "sha256:1c7d56cc65793bead233186fa85ba70c02293bb4115435a022d5fc37eb1ef57f",
+      "chunkChecksum": "sha256:6f536d08820f6879810f690597c9f18398363a7055130f1dedf565a899bf646b",
+      "byteSpan": {
+        "startByte": 1771,
+        "endByte": 2738
+      },
+      "matchedTerms": [
+        "firecrawl",
+        "api",
+        "documentation"
+      ],
+      "lexicalScore": 2.772588722239781,
+      "canonicalAuthority": false
+    },
+    {
+      "chunkId": "sha256:8766905f05dfdfb29daea0807d9c819d2ecb5fb4accd767cc288552680852638",
+      "sourceRef": "workspace:firecrawl/docs-firecrawl-dev-api-reference-introduction-introduction.json",
+      "sourceRevision": "sha256:1c7d56cc65793bead233186fa85ba70c02293bb4115435a022d5fc37eb1ef57f",
+      "chunkChecksum": "sha256:882bafc4a0dee1c161e7c8464dd202ad57052bd8a8627599cbf04f5816a3e6f5",
+      "byteSpan": {
+        "startByte": 2738,
+        "endByte": 3721
+      },
+      "matchedTerms": [
+        "firecrawl",
+        "api"
+      ],
+      "lexicalScore": 2.4849066497880004,
+      "canonicalAuthority": false
+    },
+    {
+      "chunkId": "sha256:a5aacec419a3a81925dc1bc6caf72e1422cfc39f3b776e2ec3e95d0c23133d4a",
+      "sourceRef": "workspace:firecrawl/docs-firecrawl-dev-api-reference-introduction-introduction.md",
+      "sourceRevision": "sha256:17b6c5e46e0634be1c09d6c00ec070dc582acdd8d960df68439ae670fa27b604",
+      "chunkChecksum": "sha256:d5f11d517badfef0c999a5f6b93f50352f6efb2286c9ea1637347cb0438cb793",
+      "byteSpan": {
+        "startByte": 2048,
+        "endByte": 3072
+      },
+      "matchedTerms": [
+        "firecrawl",
+        "api"
+      ],
+      "lexicalScore": 2.484906649788,
+      "canonicalAuthority": false
+    }
+  ],
+  "searchOwner": "scripts/atlas/search-okf-chunk-plan-v1.mjs",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "datastoreWritesPerformed": false,
+  "externalNetworkCallsPerformed": false,
+  "note": "BM25-style bounded diagnostic; PostgreSQL FTS/GIN remains the durable lexical owner."
+}

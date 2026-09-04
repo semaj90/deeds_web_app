@@ -12,8 +12,7 @@
  *   4. LLM Synthesis — generate 6 candidates, self-rank, return top 4
  */
 
-import { ENV } from '$lib/server/env.server.js';
-import { getOllamaEndpoint, ollamaFetch } from '$lib/server/ollama.js';
+import { resolveLlamaInferenceTarget } from '$lib/server/llm/runtime-contract.js';
 import { z } from 'zod';
 // SimulationSession is exported from the simulation API route
 type SimulationSession = import('../../../routes/api/simulation/+server').SimulationSession;
@@ -295,28 +294,30 @@ export async function generateStrategyRecommendations(
 	const { system, user } = buildSynthesisPrompt(session, rag, kag, semantic);
 
 	try {
-		const res = await ollamaFetch(`${getOllamaEndpoint()}/api/chat`, {
+		const target = await resolveLlamaInferenceTarget();
+		const res = await fetch(`${target.baseUrl}/v1/chat/completions`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				model: 'gemma4-rotorquant:latest',
+				model: target.model,
 				messages: [
 					{ role: 'system', content: system },
 					{ role: 'user', content: user },
 				],
 				stream: false,
-				format: strategyOutputSchema,
-				options: { temperature: 0.8, num_predict: 2048 },
+				response_format: { type: 'json_object' },
+				temperature: 0.8,
+				max_tokens: 2048,
 			}),
 			signal: AbortSignal.timeout(60_000),
 		});
 
 		if (!res.ok) {
-			throw new Error(`Ollama returned ${res.status}`);
+			throw new Error(`llama-server returned ${res.status}`);
 		}
 
 		const data = await res.json();
-		const content = data.message?.content || data.response || '';
+		const content = data.choices?.[0]?.message?.content || '';
 
 		// Parse structured output
 		let parsed: z.infer<typeof strategyOutputSchema>;

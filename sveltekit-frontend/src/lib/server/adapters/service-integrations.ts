@@ -18,6 +18,8 @@ import { ENV } from '$lib/server/env.server.js';
 import { VECTOR_CONFIG } from '$lib/server/config/vector-config.js';
 import { getOllamaEndpoint, getOllamaEmbeddingEndpoint } from '$lib/server/utils/ollama-endpoint.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
+import { LLAMA_SERVER_BASE_URL } from '$lib/server/ai/local-llama-provider.js';
+import { resolveLoadedLlamaModel } from '$lib/server/ai/llama-server-model-resolver.js';
 import { getQdrantClient } from '$lib/server/vector/qdrant-singleton.js';
 import type {
 	MinIOClient,
@@ -81,7 +83,7 @@ export function loadServiceEnvironment(): ServiceEnvironment {
     ollamaConfig: {
       baseUrl: getOllamaEndpoint(),
       embeddingModel: privateEnv.EMBEDDING_MODEL || 'embeddinggemma:latest',
-      chatModel: privateEnv.CHAT_MODEL || 'gemma4-rotorquant:latest',
+      chatModel: privateEnv.LLAMA_SERVER_MODEL || 'ornith-1.5-9b',
       gpuLayers: parseInt(privateEnv.OLLAMA_GPU_LAYERS || '30', 10),
       timeout: 60000,
     },
@@ -191,46 +193,47 @@ export class OllamaAdapter implements OllamaClient {
     prompt: string,
     opts?: { model?: string; maxTokens?: number }
   ): Promise<string> {
-    const model = opts?.model || this.config.chatModel;
-    const url = this.config.baseUrl + '/api/generate';
-    const response = await ollamaFetch(url, {
+    const { resolvedModel: model } = await resolveLoadedLlamaModel(
+      LLAMA_SERVER_BASE_URL.replace(/\/v1\/?$/, ''), opts?.model ?? null);
+    const response = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: model,
-        prompt: prompt,
-        options: { num_predict: opts?.maxTokens || 512 },
+        model,
+        messages: [{ role: 'user', content: prompt }],
+        max_tokens: opts?.maxTokens || 512,
+        stream: false,
       }),
       signal: AbortSignal.timeout(this.config.timeout || 60000),
     });
 
     if (!response.ok) {
-      throw new Error('Ollama generate failed: ' + response.statusText);
+      throw new Error('llama-server generate failed: ' + response.statusText);
     }
 
     const data = await response.json();
-    return data.response;
+    return data.choices?.[0]?.message?.content ?? '';
   }
 
   async chat(
     messages: Array<{ role: string; content: string }>,
     opts?: { model?: string; stream?: boolean }
   ): Promise<string | AsyncIterable<string>> {
-    const model = opts?.model || this.config.chatModel;
-    const url = this.config.baseUrl + '/api/chat';
-    const response = await ollamaFetch(url, {
+    const { resolvedModel: model } = await resolveLoadedLlamaModel(
+      LLAMA_SERVER_BASE_URL.replace(/\/v1\/?$/, ''), opts?.model ?? null);
+    const response = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: model,
-        messages: messages,
+        model,
+        messages,
         stream: opts?.stream || false,
       }),
       signal: AbortSignal.timeout(this.config.timeout || 60000),
     });
 
     if (!response.ok) {
-      throw new Error('Ollama chat failed: ' + response.statusText);
+      throw new Error('llama-server chat failed: ' + response.statusText);
     }
 
     if (opts?.stream) {
@@ -248,8 +251,9 @@ export class OllamaAdapter implements OllamaClient {
           for (const line of lines) {
             try {
               const json = JSON.parse(line);
-              if (json.message?.content) {
-                yield json.message.content;
+              const content = json.choices?.[0]?.delta?.content;
+              if (content) {
+                yield content;
               }
             } catch {}
           }
@@ -258,7 +262,7 @@ export class OllamaAdapter implements OllamaClient {
     }
 
     const data = await response.json();
-    return data.message?.content || '';
+    return data.choices?.[0]?.message?.content ?? '';
   }
 }
 

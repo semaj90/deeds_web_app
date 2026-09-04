@@ -17,9 +17,10 @@
  */
 
 import { pool } from '$lib/server/db/client';
-import { getOllamaEndpoint, ollamaFetch, VLM_MODELS } from '$lib/server/ollama.js';
+import { ollamaFetch } from '$lib/server/ollama.js';
 import { ENV } from '$lib/server/env.server.js';
 import { SERVER_EMBEDDING_MODEL } from '$lib/ai/model-ids.js';
+import { resolveLlamaInferenceTarget } from '$lib/server/llm/runtime-contract.js';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -117,21 +118,23 @@ async function summarizeError(entry: ErrorKagEntry): Promise<string> {
   ].filter(Boolean).join('\n');
 
   try {
-    const res = await ollamaFetch(`${getOllamaEndpoint()}/api/generate`, {
+    const target = await resolveLlamaInferenceTarget();
+    const res = await fetch(`${target.baseUrl}/v1/chat/completions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: VLM_MODELS.legal,
-        prompt,
+        model: target.model,
+        messages: [{ role: 'user', content: prompt }],
         stream: false,
-        options: { temperature: 0.1, num_predict: 256 },
+        temperature: 0.1,
+        max_tokens: 256,
       }),
       signal: AbortSignal.timeout(30_000),
     });
 
     if (!res.ok) return entry.errorMessage.slice(0, 500);
-    const data = (await res.json()) as { response?: string };
-    return (data.response ?? entry.errorMessage).slice(0, 1000);
+    const data = (await res.json()) as { choices?: Array<{ message?: { content?: string } }> };
+    return (data.choices?.[0]?.message?.content ?? entry.errorMessage).slice(0, 1000);
   } catch {
     return entry.errorMessage.slice(0, 500);
   }
@@ -141,7 +144,7 @@ async function summarizeError(entry: ErrorKagEntry): Promise<string> {
 
 /**
  * Store an error summary into the Knowledge-Augmented Generation stores:
- *   1. Gemma 4 summarization
+ *   1. Ornith summarization via llama-server /v1
  *   2. Embedding via embeddinggemma
  *   3. Postgres research_summaries INSERT
  *   4. Redis ZSET update (L1 fast path)

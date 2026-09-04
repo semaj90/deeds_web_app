@@ -1,16 +1,16 @@
 {
   "schema": "atlas.graphify-daily-lifecycle.v1",
-  "runId": "78818366-2410-4643-8e5d-e995c75a2ad5",
+  "runId": "9816c4d0-d2ad-42ca-8da9-f9d4393277b0",
   "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
-  "repositoryRevision": "9fd3f5d43426675c15bc51a30d84a34390708d7c",
-  "workspaceRevision": "sha256:b39bca3b48f64f945e842b607e56f689ae5f4b85f31f6dc61e30aca98f7c80cd",
-  "sourceManifestDigest": "b39bca3b48f64f945e842b607e56f689ae5f4b85f31f6dc61e30aca98f7c80cd",
-  "sourceCount": 25366,
-  "bindingsCount": 25366,
-  "skippedCount": 107,
+  "repositoryRevision": "def7d78fcf98ecca3ec8c60d2f761e97529e4927",
+  "workspaceRevision": "sha256:c8d3a1d99f15dbfe9393d3ebe03f721680abb11747855944019bea92a4311691",
+  "sourceManifestDigest": "c8d3a1d99f15dbfe9393d3ebe03f721680abb11747855944019bea92a4311691",
+  "sourceCount": 25499,
+  "bindingsCount": 25499,
+  "skippedCount": 108,
   "dirty": true,
   "status": "COMPLETED",
-  "openedAt": "2026-09-03T21:11:47.128Z",
-  "boundAt": "2026-09-03T21:12:15.646Z",
-  "completedAt": "Thu Sep 03 2026 14:21:58 GMT-0700 (Pacific Daylight Time)"
+  "openedAt": "2026-09-04T16:09:53.309Z",
+  "boundAt": "2026-09-04T16:10:13.111Z",
+  "completedAt": "Fri Sep 04 2026 09:19:09 GMT-0700 (Pacific Daylight Time)"
 }

@@ -127,7 +127,7 @@ workflows:
         - name: classify-error
           stepType: llm_completion
           description: Classify error and assess severity
-          model: gemma4-legal-iq4xs-direct.gguf
+          model: ornith-1.5-9b
           timeout_ms: 10000
 
           input:
@@ -155,8 +155,8 @@ workflows:
 
         - name: propose-repair
           stepType: llm_completion
-          description: Generate patch using Gemma4
-          model: gemma4-legal-iq4xs-direct.gguf
+          description: Generate patch using the active local llama-server model
+          model: ornith-1.5-9b
           timeout_ms: 15000
 
           depends_on:
@@ -342,8 +342,13 @@ tools:
     kind: Tool
     metadata:
       name: classify-error
-      provider: gemma4-offload
-      description: Classify code error via Gemma4
+      # Canonical MCP capability identity (LOCAL-LLM-OFFLOAD-OWNERSHIP-01).
+      # "gemma4-offload" is the process registration key / compatibility
+      # alias, not the model identity — the underlying model is resolved
+      # live from llama-server, currently Ornith 1.5 9B, and this workflow
+      # must not assume Gemma4.
+      provider: local-llm-offload
+      description: Classify code error via the local repo-audit LLM (repo_classify)
 
     spec:
       input:
@@ -393,7 +398,10 @@ tools:
 stepTypes:
 
   llm_completion:
-    description: Call LLM (Gemma4 or Ollama)
+    # Chat/synthesis goes through llama-server (:8090, model resolved live —
+    # currently Ornith 1.5 9B). Ollama is embeddings-only in this repo and is
+    # never a chat/generation backend; do not reintroduce it as one here.
+    description: Call LLM via llama-server (local-llm-offload)
     idempotent: true
     retryable: true
 

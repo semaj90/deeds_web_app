@@ -450,6 +450,9 @@ node scripts/synth/run-loop.mjs --query "wire browser context lane" --dry-run
 ls -t memory/implementation-briefs/ | head -1 | xargs -I{} cat memory/implementation-briefs/{}
 
 # round-trip via mcporter (no Claude in the loop at all)
-npx mcporter call gemma4-offload.gemma4_summarize text:"..." target_words:80
+# "gemma4-offload" is the MCP registration key (compatibility alias); the
+# canonical tool name is repo_summarize (gemma4_summarize also still works
+# as a deprecated alias). See LOCAL-LLM-OFFLOAD-OWNERSHIP-01.
+npx mcporter call gemma4-offload.repo_summarize text:"..." target_words:80
 npx mcporter call trace.kag_search query:"reranker topology"
 ```

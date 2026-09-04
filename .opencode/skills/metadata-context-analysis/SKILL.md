@@ -6,9 +6,7 @@ allowed-tools:
   - mcp__trace__wiki_note_lookup
   - mcp__trace__graph_expand_neighborhood
   - mcp__trace__context_build_kv_packet
-  - mcp__gemma4-offload__gemma4_summarize
-  - mcp__gemma4-offload__gemma4_classify
-  - mcp__gemma4-offload__gemma4_chat
+  - mcp__gemma4-offload__repo_summarize
 ---
 
 # Metadata context analysis
@@ -25,7 +23,9 @@ Keep retrieval compact. Prefer schema summaries, targeted usage hits, and 1-2 li
 2. Use `trace.kag_search` for concrete usage sites like API routes, serializers, or persistence helpers.
 3. Use `trace.graph_expand_neighborhood` only if you need nearby files to understand a flow.
 4. Convert results into a short fact packet: purpose, tables, writers, readers, and risks.
-5. If the answer is getting long, summarize with `gemma4-offload.gemma4_summarize`.
+5. If the answer is getting long, use the registered local-LLM offload
+   compatibility surface `gemma4-offload.repo_summarize`; it resolves the
+   active llama-server model rather than assuming Gemma4.
 
 ## Reading limits
 
@@ -40,7 +40,7 @@ Keep retrieval compact. Prefer schema summaries, targeted usage hits, and 1-2 li
 | What does this metadata store? | `db.table_inspect` |
 | Where is it written? | `trace.kag_search` |
 | Where is it read? | `trace.kag_search` |
-| What is the minimal summary? | `gemma4-offload.gemma4_summarize` |
+| What is the minimal summary? | `gemma4-offload.repo_summarize` |
 
 ## Anti-patterns
 

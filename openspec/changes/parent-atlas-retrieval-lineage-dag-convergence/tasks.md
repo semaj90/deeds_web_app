@@ -5981,6 +5981,13 @@ and 0 packet/chunk exact sources. The result is `CURRENT_PACKET_CHUNK_JOIN_MISSI
 revision `sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9`. This is the
 concrete coverage gap blocking packet promotion; no fallback path or synthetic revision is allowed.
 
+**Packet/chunk promotion preflight recheck 2026-09-04:** The bounded read-only preflight
+`scripts/atlas/plan-packet-chunk-lineage-promotion-v1.mjs --limit=100` returned
+`BLOCKED_NO_QUALIFIED_CANDIDATE` with `eligibleCandidateCount=0`. Sample candidates remain blocked
+by `SOURCE_NAMESPACE_UNPROVEN_OR_AMBIGUOUS` and `SOURCE_REVISION_UNPROVEN_OR_AMBIGUOUS`; planned
+writes are zero for `atlas_packets`, `atlas_packet_chunk_lineage`, Qdrant, graph, and cache. No
+promotion authorization is implied by the existing lineage rows.
+
 **Task-evidence recheck 2026-09-04:** `scripts/atlas/audit-tasks-md-evidence-links-v2.mjs` found
 120 checked blocks, 88 with detectable task/section evidence, and 32 without. This does not close
 Task 44: the missing-evidence list requires review, and the checker currently reports some
@@ -5988,3 +5995,60 @@ continuation prose as checkbox blocks in older sections. Treat the receipt as an
 not proof that every completed task is current or production-proven. The refined classification
 identifies all 32 entries as likely continuation/subtask blocks; none should be auto-closed from
 this audit. No task statuses were changed.
+
+## CONCEPT-FABRIC-INVENTORY-01 (2026-09-04, read-only implementation)
+
+- [x] Added `scripts/atlas/audit-parent-atlas-concept-fabric-v1.mjs` as the initial
+  `scripts/atlas` owner inventory. It maps the existing `.okf`/Zod contracts, concept/domain
+  owners, source/chunk and AST/LangExtract observers, external-document adapters, retrieval and
+  graph projections, ACE/prefill, BitFrost/Valkey, DAG parameter/synthesis paths, and language
+  resolution helpers.
+- [x] Added the non-mutating `atlas:concept-fabric:audit` command at the repository root.
+- [x] Receipt: `docs/reports/parent-atlas-concept-fabric-audit-v1.json` records the inventory
+  checksum, dependency availability, canonical owner summary, and open integration bridges.
+- [x] Proof boundary: `writesPerformed=false`, `datastoreWritesPerformed=false`, and
+  `externalNetworkCallsPerformed=false`. This is an owner/contract inventory, not proof of live
+  indexing, cache warming, Graphify completion, classifier promotion, or production ACE wiring.
+- [x] Reviewed the existing docs pipeline rather than creating a duplicate: bounded crawl in
+  `scripts/docs-atlas/crawl-okf-dev-docs.mts`, code-block extraction in
+  `scripts/docs-atlas/index-okf-dev-corpus.mjs`, and manifest-bound directory graph streaming in
+  `scripts/atlas/daily-graphify-directory-stream.mjs`. Limited dry runs completed for three
+  Firecrawl manifest entries and three corpus entries without network acquisition or writes.
+- [x] Added the `scripts/atlas/validate-okf-beautifulsoup-pydantic-v1.py` boundary validator around
+  the existing BeautifulSoup capture adapter. It rejects extra fields, invalid URLs/checksums,
+  checksum/text mismatches, and any attempt to mark an acquisition capture as canonical authority;
+  it performs no persistence.
+- [x] Exercised the existing Python documentation pipeline tests: `python/test_atlas_okf_docs_pipeline.py`
+  passed 7 tests. The current host probe reports Pydantic 2.11.7 and BeautifulSoup 4.13.4;
+  container-pinned versions remain an environment-parity concern and are not silently promoted
+  by this gate.
+- [x] Added `scripts/atlas/plan-okf-directory-index-v1.mjs` as the source-binding bridge. It hashes
+  exact file bytes, derives a deterministic workspace manifest revision, selects language-aware
+  chunking/observer plans, and declares Postgres FTS, semantic_768, structural, ACE, cache, and
+  synthesis projections without executing any of them.
+- [x] Added `scripts/atlas/plan-okf-chunks-v1.mjs` to materialize deterministic UTF-8 byte-bound
+  chunk plans from those sources. Chunk identity binds `sourceRef`, `sourceRevision`, byte span,
+  and chunk checksum; downstream AST-grep, LangExtract, FTS, semantic_768, and ACE consumers are
+  declared as projections only. No canonical or datastore writes occur.
+- [x] Corrected the chunk artifact to an explicit pre-admission plan schema and added
+  `scripts/atlas/validate-okf-chunk-plan-v1.mjs`. Existing `CanonicalChunkSchema` admission remains
+  blocked until its UUID/workspace adapter is proven; plan hashes must not be mistaken for canonical
+  chunk identity.
+- [x] Added `scripts/atlas/plan-okf-agentic-context-v1.mjs` to compose the validated chunk plan
+  into a deterministic candidate ordinal proposal, ACE context-manifest proposal, per-action
+  parameter artifact, BitFrost key material, and Ornith `:8090` synthesis request metadata. The
+  plan is explicitly non-executing and cannot promote identity, warm cache, call a model, or apply
+  a patch.
+- [x] Added `scripts/atlas/test-okf-agentic-fabric-e2e-v1.mjs` and verified the dry end-to-end
+  spine: source workspace revision -> UTF-8 chunk plan -> candidate ordinals -> ACE manifest ->
+  parameter artifact -> BitFrost key material -> Ornith request metadata. The test requires shared
+  workspace revision and explicit non-execution/write boundaries.
+- [x] Added `scripts/atlas/search-okf-chunk-plan-v1.mjs` as a bounded lexical search diagnostic
+  over exact chunk bytes. It preserves source/chunk revisions and explicitly leaves PostgreSQL
+  FTS/GIN as the durable lexical owner; no database index or projection is created.
+- [x] Wired the lexical receipt into `plan-okf-agentic-context-v1.mjs` through an optional
+  revision-checked search input. Context assembly now rejects a search result whose workspace
+  revision differs from the chunk plan, preventing stale candidates from entering ACE prefill.
+- [ ] Keep implementation in `scripts/atlas` until the directory-index, evidence, ACE, DAG,
+  language-parity, and cache readback gates each have their own receipts; only then consider
+  promotion into `packages/atlas*`.
