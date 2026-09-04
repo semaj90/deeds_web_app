@@ -23,8 +23,8 @@ Current execution priority is the remaining `GRAPHIFY-DAILY-COORDINATOR-01`
 stage-owner wiring, followed by the narrow `PKT-LINEAGE-08` production-entrypoint
 proof and `RETRIEVAL-01L` governance closeout. `LINEAGE-02` remains
 `BLOCKED_UNGROUNDED`: recover the origin, owner, and checksum of the requested
-bounded cohort. `151128` is unsupported, and the historical `15128/768` literal
-has no authoritative cohort artifact. Until one is found, `cohortSize` remains
+bounded cohort. `151128` is undefined/unsupported, and the `15128/768` cohort does not
+exist as an authoritative population artifact. Until one is found, `cohortSize` remains
 `UNRESOLVED`; do not execute either value.
 The stale-run/cohort-origin and revision-bundle investigations are read-only
 helper lanes; they may produce evidence but may not select a replacement cohort
@@ -290,13 +290,14 @@ to test its success branch against.
   binding, real script fix, all independently verified via SQL/test runs/live script output
   across this session, not asserted from partial evidence.
 - [ ] LINEAGE-02 — **`BLOCKED_ARTIFACT_UNPROVEN`** / helper
-  `LINEAGE-02-COHORT-ORIGIN-01`. Do not reconstruct the exact `15128/768`
+  `LINEAGE-02-COHORT-ORIGIN-01`. Do not reconstruct the nonexistent `15128/768`
   requirement by inference or match it to an unrelated existing artifact.
   The literal was introduced in the initial convergence-task scaffold by
   commit `128e052ba44` and is not backed by a database query, fixture, report,
   or measured cohort. Follow-up commit `5e5c78580c` explicitly recorded that
-  `git log --all -S "15128"` found no cohort artifact. `151128` has no
-  meaningful repository match and is unsupported. Keep `cohortSize` unresolved
+  `git log --all -S "15128"` found no cohort artifact. The `15128/768` pairing has no
+  authoritative population definition, and `151128` has no meaningful repository match.
+  Keep `cohortSize` unresolved
   until an authoritative artifact defines the population; do not execute
   either number or substitute the 55,169-row semantic snapshot. Do not use
   repaired Qdrant metadata for source qualification. See the open-questions
@@ -433,6 +434,12 @@ to test its success branch against.
   PKT-LINEAGE-08 memberships; it is recorded as live state drift, not a repair authorization.
   No Qdrant mutation was performed. `RETRIEVAL-01L` remains open until a non-empty frozen proposal
   receives an authorized apply, exact readback, rollback artifact, and same-proposal replay.
+
+  **READ-ONLY RECHECK 2026-09-04:** `scripts/atlas/audit-bridge-recon-dry-04-v1.mjs` was rerun
+  against the existing owner. It found 6,312 already-reconciled points, 1,109 missing points,
+  0 exact patches, and 0 preimage/identity/revision conflicts. Its verdict is now
+  `NO_PATCHES_MISSING_POINTS_REMAIN`, not `READY_FOR_FULL_RECONCILIATION_APPLY`; the prior
+  wording overstated readiness when no non-empty proposal existed. `writesPerformed=false`.
 - [x] RETRIEVAL-02 — Census every Qdrant query for explicit named-vector
   selection; do not mass-edit callers. Audit-only, zero callers modified.
   Static scan of every direct Qdrant-like `.query(`/`.search(` call site
@@ -3223,6 +3230,46 @@ Evidence: `docs/reports/mcp-tool-registry-drift-classification-v1.json`, `docs/r
   `CandidateOrdinalMapV1`, `CandidateFeatureSnapshotV1`, or
   `RevisionAuthorityEnvelopeV1` artifacts were supplied; no replacements were
   synthesized. Evidence: `docs/reports/ace-live-dry-input-readiness-v2.json`.
+
+  **ACE-FEATURE-SOURCE-OWNER-01 owner census + bounded canary (2026-09-04) — real progress, still
+  NOT closing this checkbox.** Per operator direction: do not build another retrieval engine or
+  ordinal owner; compose only the existing production-capable boundary
+  (`createSearchRuntimeAceProductionSourceAdapterV1` -> `createSearchRuntimeAceResolverV1`,
+  `materializeCandidateOrdinalMap`). Built `scripts/atlas/ace-feature-source-owner-live-proof-v1.mts`
+  (read-only, zero writes) and ran it live. **Real finding, not previously documented**:
+  `SearchRuntime.search()` (`src/lib/server/retrieval/search-runtime.ts`) is not read-only — it
+  unconditionally fires `recordPromotionIntent()` and `logExposureEvents()` (real writes to the
+  promotion outbox and recommendation ledger) as fire-and-forget side effects on every call, with
+  no dry-run mode. A genuinely zero-write canary cannot call it directly, so this canary reused the
+  already-proven 15-row Postgres-sourced cohort (`docs/reports/lineage-semantic-768-cohort-v1.json`,
+  SEMANTIC-TOPK-01) as real candidate identity instead — real production data, zero new writes, zero
+  new retrieval code. Built a real, replay-stable `CandidateOrdinalMapV1` from those 15 candidates
+  via the existing `materializeCandidateOrdinalMap()` (checksum
+  `f3a54f01be372c21a07737043c5e4b0ba8f0f95b7f6d24470060835cb0ae35a9`, identical across two
+  independent calls). Then ran the real `createSearchRuntimeAceProductionSourceAdapterV1` resolver
+  against it and let it fail on its own terms rather than fabricating the missing inputs to force a
+  pass — it threw `ACE_RESOLVER_FEATURE_ROWS_MISSING`, exactly as designed (fails closed).
+
+  **Owner census (grep-verified, not asserted) — 3 real, zero production owners found repo-wide**:
+  `retrievalPolicyRevision` and `acePlaybookRevision` each have ZERO real (non-test) values
+  anywhere in `src/` (`grep -rn "retrievalPolicyRevision:\s*['\"]" src` and the `acePlaybookRevision`
+  equivalent both return 0 matches). No real `SearchRuntimeQasFeatureResolver` / feature-context
+  owner (`rows`/`laneMaskByOrdinal` source) exists either — only the boundary-definition files
+  reference the type; nothing instantiates it outside tests. `representationRevision` is
+  `AVAILABLE_BUT_UNQUALIFIED`: each real candidate carries its own genuine per-row
+  content-hash-qualified `semantic_768` revision, but the resolver contract wants ONE aggregate
+  cohort-level value, and no real producer emits that aggregate. `candidates` and `ordinalMap` are
+  the only fields classified `AUTHORITATIVE`. Full census + evidence:
+  `docs/reports/ace-feature-source-owner-live-proof-v1.json`
+  (`status: STATIC_OWNER_SURFACE_PROVEN_LIVE_CANDIDATES_BOUND_FEATURE_CONTEXT_OWNER_MISSING`,
+  `writesPerformed: false`).
+
+  **This converts the gate from a vague "blocked" note into a precise adoption gap**: the ACE
+  composition contracts and invariant checks are already correct and complete — nothing here should
+  be re-implemented. What is genuinely missing is real production ownership of 3 specific inputs
+  (feature-context resolver, `retrievalPolicyRevision`, `acePlaybookRevision`). This checkbox stays
+  open until one of those three gets a real owner; do not synthesize placeholder values for any of
+  them to force a close.
 - [x] Preserve incomplete ACE/process enrichment metadata as explicit `null` (2026-09-03).
   `AtlasProcessPacketV1.graphRevision` is now nullable and the legacy ACE adapter no longer
   invents `graph:parent-atlas` when structural authority is unavailable. Nulls remain visible
@@ -5686,3 +5733,32 @@ contracts, and the contradictory co-produced fixtures were corrected. Focused co
 34/34. This changes schema semantics only; no latent vectors, caches, or database rows were
 rewritten. A new live manifest still requires explicit `parametersDigest`, transform-policy
 revision, and exact 15-row materialization checksums.
+
+**Completion correction 2026-09-04:** `15128/768` is not a live or historical cohort that can
+be completed, regenerated, or promoted; its authoritative population definition does not exist.
+`151128` is likewise undefined and unsupported. `LINEAGE-02` therefore remains
+`BLOCKED_UNGROUNDED`, with `cohortSize=UNRESOLVED`. Completion must be based on a future
+`SemanticCohortAuthorityV1` receipt, never on either literal.
+
+## OPENSPEC-SUPERSESSION-AUDIT-01 (2026-09-04, read-only, proven)
+
+- [x] Ran `scripts/atlas/audit-openspec-supersession-v1.mjs` using the OpenSpec CLI
+  inventory and active `proposal.md` / `design.md` / `tasks.md` artifacts.
+- Inventory contained 71 active changes and 4 completed changes. The conservative parser
+  found 0 inventory-bound explicit relationship edges: no `SUPERSEDES`, `MOVED_TO`,
+  `SATISFIED_BY`, `DUPLICATE_ALIAS_OF`, `DEPENDS_ON`, or `BLOCKED_BY` edge was emitted.
+- The receipt records 34 relationship-language mentions that did not name a known OpenSpec
+  change target. These remain unresolved review material; they are not classified as
+  supersession. Dates, proximity, and semantic overlap are explicitly non-authoritative.
+- Receipt: `docs/reports/openspec-supersession-audit-v1.json`.
+- `writesPerformed=false`, `canonicalMutationAuthority=false`; no archive, task mutation,
+  or change lifecycle update was performed by the audit itself.
+
+## COMPLETION-EVIDENCE-AGE-AUDIT-01 (2026-09-04, read-only finding)
+
+The existing `scripts/atlas/audit-final-completion-report.mjs --json` was inspected. It returns
+`overall=PASS`, but its embedded milestone receipts are dated June/August and its summary does
+not incorporate the current blocked semantic cohort, stale graph snapshot, or open reconciliation
+proposal state. Treat that output as a historical/advisory report, not current convergence
+authority. Task 44 remains open until completed-task evidence is reconciled against current
+receipts; no status was auto-promoted and no datastore writes occurred.
