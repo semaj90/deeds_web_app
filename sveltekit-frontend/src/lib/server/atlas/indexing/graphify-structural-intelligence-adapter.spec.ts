@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { compileGraphifyStructuralIntelligence } from './graphify-structural-intelligence-adapter.js';
+import {
+  buildGraphifyStructuralStageReceiptsV1,
+  compileGraphifyStructuralIntelligence,
+} from './graphify-structural-intelligence-adapter.js';
 import type { StructuralMaterializationResult } from './graphify-structural-materializer.js';
 
 const source = 'export function PATCH() { return authorizeCase(); }';
@@ -132,5 +135,20 @@ describe('Graphify structural intelligence adapter', () => {
     expect(result.receipt.canonicalPromotionMayBeAttempted).toBe(false);
     expect(result.receipt.provenanceStatus).toBe('NATIVE_RECOVERED');
     expect(result.fabric).not.toBeNull();
+  });
+
+  it('builds chained AST and structural stage receipts without persistence', () => {
+    const result = compileGraphifyStructuralIntelligence({
+      source,
+      workspaceRevision: 'ws-742',
+      materialization: materialization('PROVEN'),
+      revisions,
+    });
+
+    const stages = buildGraphifyStructuralStageReceiptsV1({ result });
+    expect(stages.astParse.inputChecksum).toMatch(/^sha256:[a-f0-9]{64}$/);
+    expect(stages.astParse.outputChecksum).toMatch(/^sha256:[a-f0-9]{64}$/);
+    expect(stages.structuralExtract.inputChecksum).toBe(stages.astParse.outputChecksum);
+    expect(stages.structuralExtract.outputChecksum).toMatch(/^sha256:[a-f0-9]{64}$/);
   });
 });

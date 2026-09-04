@@ -1,6 +1,6 @@
 {
   "schema": "atlas.indexing-surfaces.v1",
-  "generatedAt": "2026-09-03T22:09:03.366Z",
+  "generatedAt": "2026-09-04T17:36:27.689Z",
   "readOnly": true,
   "canonicalAuthority": "postgres",
   "ast": {
@@ -631,6 +631,41 @@
         "table": "atlas_evidence_entities",
         "name": "atlas_evidence_entities_metadata_gin_idx",
         "definition": "CREATE INDEX atlas_evidence_entities_metadata_gin_idx ON public.atlas_evidence_entities USING gin (metadata jsonb_path_ops)"
+      },
+      {
+        "table": "atlas_external_doc_chunks",
+        "name": "aedc_api_signatures_gin",
+        "definition": "CREATE INDEX aedc_api_signatures_gin ON public.atlas_external_doc_chunks USING gin (api_signatures)"
+      },
+      {
+        "table": "atlas_external_doc_chunks",
+        "name": "aedc_domain_tags_gin",
+        "definition": "CREATE INDEX aedc_domain_tags_gin ON public.atlas_external_doc_chunks USING gin (domain_tags)"
+      },
+      {
+        "table": "atlas_external_doc_chunks",
+        "name": "aedc_embedding_hnsw",
+        "definition": "CREATE INDEX aedc_embedding_hnsw ON public.atlas_external_doc_chunks USING hnsw (content_embedding vector_cosine_ops) WITH (m='16', ef_construction='64')"
+      },
+      {
+        "table": "atlas_external_doc_chunks",
+        "name": "aedc_fts_gin",
+        "definition": "CREATE INDEX aedc_fts_gin ON public.atlas_external_doc_chunks USING gin (search_vector)"
+      },
+      {
+        "table": "atlas_external_doc_chunks",
+        "name": "aedc_heading_path_gin",
+        "definition": "CREATE INDEX aedc_heading_path_gin ON public.atlas_external_doc_chunks USING gin (heading_path)"
+      },
+      {
+        "table": "atlas_external_doc_chunks",
+        "name": "aedc_symbols_gin",
+        "definition": "CREATE INDEX aedc_symbols_gin ON public.atlas_external_doc_chunks USING gin (symbols)"
+      },
+      {
+        "table": "atlas_external_doc_pages",
+        "name": "aedp_url_trgm",
+        "definition": "CREATE INDEX aedp_url_trgm ON public.atlas_external_doc_pages USING gin (url gin_trgm_ops)"
       },
       {
         "table": "atlas_feature_embeddings",
@@ -1722,7 +1757,7 @@
           }
         },
         "points": 109776,
-        "indexedVectors": 116175,
+        "indexedVectors": 112841,
         "status": "green"
       },
       {
@@ -2045,8 +2080,8 @@
             "distance": "Cosine"
           }
         },
-        "points": 831,
-        "indexedVectors": 831,
+        "points": 1031,
+        "indexedVectors": 1031,
         "status": "green"
       },
       {
@@ -2107,8 +2142,8 @@
   },
   "drizzle": {
     "journalEntries": 41,
-    "manualSqlFiles": 267,
-    "declaredSidecars": 53,
+    "manualSqlFiles": 270,
+    "declaredSidecars": 54,
     "untrackedManualFiles": [
       "0009_hybrid_graph_indexes.sql",
       "0010_distilled_table_store.sql",

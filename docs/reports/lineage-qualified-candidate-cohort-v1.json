@@ -1,6 +1,6 @@
 {
   "schema": "atlas.lineage-qualified-candidate-cohort-v1",
-  "generatedAt": "2026-09-01T03:30:11.725Z",
+  "generatedAt": "2026-09-04T17:44:53.948Z",
   "readOnly": true,
   "postgresWrites": false,
   "authority": {
@@ -17,96 +17,96 @@
     "semanticRevision": false
   },
   "counts": {
-    "total_packets": 61660,
-    "packets_with_source_ref": 61659,
-    "exact_graphify_source": 778,
-    "workspace_revision_present": 373,
-    "source_revision_present": 778,
-    "packet_chunk_exact": 43,
-    "packet_chunk_ambiguous": 524,
+    "total_packets": 61715,
+    "packets_with_source_ref": 61714,
+    "exact_graphify_source": 17261,
+    "workspace_revision_present": 17261,
+    "source_revision_present": 17261,
+    "packet_chunk_exact": 79,
+    "packet_chunk_ambiguous": 736,
     "graph_revision_present": 0,
-    "semantic_revision_present": 778,
-    "source_chunk_qualified": 15,
+    "semantic_revision_present": 17261,
+    "source_chunk_qualified": 79,
     "fully_qualified": 0
   },
   "sampleExactJoins": [
     {
+      "packet_key": "packet:0003850e84ca",
+      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/tests__cases-sub-routes.spec.md",
+      "workspace_revision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "source_revision": "sha256:262fe09f9fdf919a68a916d551f70b6136dd1c5ec599255afaf36bfd4a3998ea",
+      "graph_revision": null,
+      "semantic_revision": "0"
+    },
+    {
+      "packet_key": "packet:0003ab694534",
+      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/tests__routes__auto__api__cache__metrics.test.md",
+      "workspace_revision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "source_revision": "sha256:2bbc964e88cac5b24299188ab8417f4d7b77d1bbc984d3140b99b52790ff523c",
+      "graph_revision": null,
+      "semantic_revision": "0"
+    },
+    {
       "packet_key": "packet:0004f849be72",
       "source_ref": "sveltekit-frontend/tests/sprint5-6-monitoring.spec.ts",
-      "workspace_revision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "workspace_revision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
       "source_revision": "sha256:3392b96b6392dce3d6f9495f37ff1fa4c42ca3a648687c79a7a5e1aba3ed58e0",
+      "graph_revision": null,
+      "semantic_revision": "0"
+    },
+    {
+      "packet_key": "packet:000b2df0cfdf",
+      "source_ref": "sveltekit-frontend/tests/phase76-acp-tools.property.test.ts",
+      "workspace_revision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "source_revision": "sha256:e52f4adc252c5fba4b87ca1ea64420e7766ffcced00caecb4c0d281760833a29",
+      "graph_revision": null,
+      "semantic_revision": "0"
+    },
+    {
+      "packet_key": "packet:000db15dc8ef",
+      "source_ref": "sveltekit-frontend/src/lib/utils/keyboard-shortcuts.svelte.ts",
+      "workspace_revision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "source_revision": "sha256:838c841a80ea6846aa318b9c23ba08af82bde99af907631a70d9a985cde210c8",
+      "graph_revision": null,
+      "semantic_revision": "0"
+    },
+    {
+      "packet_key": "packet:000fde9311af",
+      "source_ref": "sveltekit-frontend/src/routes/api/ai/bifrost/+server.ts",
+      "workspace_revision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "source_revision": "sha256:d261d3b4a891e3a9c2f9b038adf7a7b963f4957033225711fbf454e927c685b9",
       "graph_revision": null,
       "semantic_revision": "0"
     },
     {
       "packet_key": "packet:001007058f4a",
       "source_ref": "scripts/atlas/generate-concept-temperature-report.mjs",
-      "workspace_revision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "workspace_revision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
       "source_revision": "sha256:b4b02492df5c3ad9317fa682da3c047ac153fe463e68a7ef2c9a761850b7ca0e",
       "graph_revision": null,
       "semantic_revision": "0"
     },
     {
-      "packet_key": "packet:0017ebe58f96",
-      "source_ref": "scripts/run-migration.mjs",
-      "workspace_revision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "source_revision": "sha256:89b20a2b4512d1e1f084880eb01dafd20b719af3544521cc4339e4d9017888b1",
+      "packet_key": "packet:001375b841d0",
+      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/tests__routes__auto__api__cases____id__connections.test.md",
+      "workspace_revision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "source_revision": "sha256:650c8bb19e401e02566332378456d00ecfe2eb50015baf5392389124e6a3d000",
       "graph_revision": null,
       "semantic_revision": "0"
     },
     {
-      "packet_key": "packet:001f13a6f8f0",
-      "source_ref": "scripts/packets/load-packets-postgres.mjs",
-      "workspace_revision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "source_revision": "sha256:8ff5b5e82b951394c31e643a9368ff03b83fc84d49e85162e0f3161f914c8b19",
+      "packet_key": "packet:0014d8ac7795",
+      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/src__routes__api__cases___id___persons___server.md",
+      "workspace_revision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "source_revision": "sha256:4e4ac39a92cdb90a37a8537ec873f51c6ab704503bf8058d6397577d774cac76",
       "graph_revision": null,
       "semantic_revision": "0"
     },
     {
-      "packet_key": "packet:002461508185",
-      "source_ref": "data/external-docs/raw/drizzle/queries.md",
-      "workspace_revision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
-      "source_revision": "sha256:20f7b92ab8dd2fc4885d1f0f3c88e17c4d912092f85468566a7ad99c316f356c",
-      "graph_revision": null,
-      "semantic_revision": "0"
-    },
-    {
-      "packet_key": "packet:0046c7db4fb2",
-      "source_ref": "sveltekit-frontend/src/lib/server/features/ai/index.ts",
-      "workspace_revision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "source_revision": "sha256:4b93aee30149eaa7ab54b465db9694de597d12feadadb0351544cc0b35f73c7f",
-      "graph_revision": null,
-      "semantic_revision": "0"
-    },
-    {
-      "packet_key": "packet:0055a733c702",
-      "source_ref": "sveltekit-frontend/docs/design/2026-05-11_agents-directory-card-regen.md",
-      "workspace_revision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "source_revision": "sha256:57a4837b0c7a57ee8c790abbf9d11c5b08801c1952e2d6cee9e0ec80dc83022b",
-      "graph_revision": null,
-      "semantic_revision": "0"
-    },
-    {
-      "packet_key": "packet:0057df284547",
-      "source_ref": "scripts/atlas/test-p4-nats-wiring.mts",
-      "workspace_revision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "source_revision": "sha256:bc40de642906f5b31fb2345f27082c20cc0cdf6e08fdf439d70488a0f28cc629",
-      "graph_revision": null,
-      "semantic_revision": "0"
-    },
-    {
-      "packet_key": "packet:00581022d8d5",
-      "source_ref": "sveltekit-frontend/src/routes/(app)/code-intel/wiki/LLMS.md",
-      "workspace_revision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "source_revision": "sha256:7485d11e10600f3517f91b26ee759d1972548ab47000f621829d70c227aa4786",
-      "graph_revision": null,
-      "semantic_revision": "0"
-    },
-    {
-      "packet_key": "packet:0058e67db61b",
-      "source_ref": "scripts/tests/test-warmup-import.mjs",
-      "workspace_revision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-      "source_revision": "sha256:45a119320791a315e42b06d5d06b3a7f11675490891099474b23e98b89b90c62",
+      "packet_key": "packet:0015b28db252",
+      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/scripts__phase104-backups__src__lib__services__concurrent-indexeddb-search.md",
+      "workspace_revision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "source_revision": "sha256:d797764b31ad11d1a923c07d55e1910c452ebea599a2a4e17ad505f79094842d",
       "graph_revision": null,
       "semantic_revision": "0"
     }

@@ -743,6 +743,22 @@ lineage MEMBERSHIP, not 1:1 identity.
   `sha256:7cf544001f14273d3f86056868471134a9cd4ced0808f306908ca25320a91e81`. This supersedes
   the older 50-source diagnostic allowlist for execution purposes; no packet, projection, graph,
   or cache writes occurred.
+- **PKT-LINEAGE-08 recheck 2026-09-04:** the same read-only preflight was rerun after the semantic
+  owner audit and still returns `BLOCKED_NO_QUALIFIED_CANDIDATE` with `eligibleCandidateCount: 0`.
+  No bounded mutation is authorized by this result; the prior 50-source list remains stale and
+  non-executable until a fresh non-empty authoritative target exists.
+- **Graphify run/file binding recheck 2026-09-04:** `scripts/atlas/audit-graphify-run-file-binding-v1.mjs`
+  still finds one completed bound owner (`run_id=369e4270-7689-4536-8816-4ec4a5517b3e`,
+  `25,258` source-revision/content-hash rows), five completed unbound runs, and five non-terminal
+  running rows. This is useful lifecycle evidence, but it does not establish that the bound run
+  covers the `55,169` semantic population; no packet promotion or semantic cohort substitution is
+  authorized. Receipt: `docs/reports/graphify-run-file-binding-v1.json`.
+- **Semantic-to-Graphify reconciliation 2026-09-04:** a direct read-only comparison against the
+  completed bound run found `9,843` source-reference overlaps with the populated semantic owner,
+  but `0` exact source-reference/content-hash matches and `0` rows with exact hash plus both
+  `code_source_revision` and `workspace_revision`. Path overlap is therefore not cohort authority;
+  semantic ordinal admission and KNN remain blocked. Receipt:
+  `docs/reports/semantic-graphify-run-reconciliation-v1.json`.
   Direct readback of the three reported chunk IDs confirms `codebase_chunk_index.source_ref` and
   `repo_id` are null while `relative_path` and `content_hash` are populated. This explains the
   zero qualified candidates: relative paths/content hashes are useful diagnostics but cannot be
@@ -971,6 +987,18 @@ would require an explicit human abandonment-review decision, not an automatic as
 explicit instruction, `graphify:daily` was **not** run to silence this. No OaK/DAG-runtime work
 follows from this track's `STALE_RUN_NON_PROMOTABLE` result until a human decides to abandon or
 resume the orphaned run.
+
+**UPDATE 2026-09-04 — focused recheck of the current receipt:**
+`docs/reports/graphify-stale-run-reconciliation-v1.json` still reports the same historical row as
+`RUNNING` with `completed_at: null`, started `2026-08-28T04:01:23Z`, with no process owner,
+startup lock, PostgreSQL backend, or run-bound lock. The report currently classifies the result as
+`CONFLICTING_EVIDENCE` because `anyGraphifyRelationLockPresent` is true; the only listed lock is
+the audit connection's own granted `AccessShareLock` on `graphify_runs` (PID 4017), not a
+coordinator lock. It is therefore not runtime ownership evidence and must not keep the row
+eligible for promotion or readiness replay. The current blockers remain canonical completion not
+proven, graph revision not recorded on the legacy row, per-edge structural outcomes not persisted,
+and runtime-owner binding unproven. This is a read-only interpretation correction; no historical
+row was changed and no Graphify execution was started.
 
 **Follow-up (2026-09-02, re-verified independently, strengthens the case for `FRESH_GRAPHIFY_REQUIRED`
 without asserting it unilaterally).** `docs/reports/graphify-stale-run-reconciliation-v2.json`:
@@ -3772,10 +3800,170 @@ outputs against current observations or mark them `SUPERSEDED` solely by timesta
   implementation currently owns `graphify_executions` or `SOURCE_SELECTION`. The new coordinator
   must be a separate owner after migration authorization; do not retrofit the legacy wrappers or
   infer readiness from unrelated `execution_id` tables.
+- **Source-writer boundary rechecked 2026-09-04:**
+  `graphify-lifecycle-composition-v1.ts` still exposes `runId` and delegates its `open` operation
+  to `writeGraphifySourceInventoryV2`, whose receipt and persistence owner remain the legacy
+  `graphify_runs`/`graphify_files` path. The writer's revision checks are useful evidence, but this
+  composition is not yet a `graphify_executions` adapter and does not record the new
+  `SOURCE_SELECTION` stage. Keep the two identities separate; the next implementation step is a
+  narrow coordinator-to-writer adapter or an explicit stage-aware writer extension, not a rename
+  of `runId` and not a second parallel source inventory implementation.
 - The existing read-only producer audit is ready for injected wiring: 25,419 source bindings,
   108 skipped entries, workspace revision `sha256:35e032dee4202bcb34e31efed5baebcd602d4b7e23e7c98d226f5bb2aa75aeb3`,
   and no writes. Receipt: `docs/reports/graphify-lifecycle-entrypoint-v1.json`. This proves the
   source-selection producer, not the new execution-ledger coordinator.
+- **Receipt-shape audit and handoff update 2026-09-04:** the lifecycle receipt originally exposed
+  only a summary, while declaring `sourceBindings` as a required open input. The existing read-only
+  audit was extended to include the actual validated `WorkspaceSourceBindingV1[]` payload and skipped
+  source reasons. Fresh execution now reports `sourceCount`/`bindingCount` **25,548**,
+  `skippedCount` **108**, and workspace revision
+  `sha256:fc051ccfc7e5627b480d369c84eeb3cc73e790b4d3a0ae2ee6da971585c05c11`. The coordinator plan
+  was re-frozen from this receipt and remains `READY_FOR_EXPLICIT_LEDGER_AUTHORIZATION`, with
+  `25,548` bindings and no writes. Its legacy lifecycle summary remains
+  `open -> fanout(runId) -> close(runId)` and `liveStartupWired: false`; the new payload is a
+  read-only handoff, not yet production coordinator wiring. Do not construct missing binding fields
+  from counts or timestamps.
+- **Bounded handoff canary 2026-09-04:** updated
+  `sveltekit-frontend/scripts/atlas/graphify-daily-coordinator-canary-v1.mts` to consume the
+  handoff's validated bindings through `adaptWorkspaceBindingsToSourceSelectionV1()` rather than
+  re-querying and reshaping legacy `graphify_files` rows. With the explicit committed-canary guard,
+  live readback passed: execution `bfc5739f-554a-44c9-86f6-d239cb9b842a`, workspace revision
+  `sha256:fc051ccfc7e5627b480d369c84eeb3cc73e790b4d3a0ae2ee6da971585c05c11`, 3 source memberships,
+  source-selection checksum `sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030`,
+  and 2 completed stages (`OPEN`, `SOURCE_SELECTION`). `graphify_runs`, `graphify_files`, Neo4j,
+  Qdrant, and Valkey were not changed; this proves bounded coordinator/source-selection wiring,
+  not full Graphify completion or canonical graph promotion.
+- **Compatibility test evidence 2026-09-04:** focused unit/property suites for
+  `graphify-lifecycle-composition-v1.ts` and `graphify-source-inventory-writer-v2.ts` passed
+  **17/17**. This confirms the existing legacy writer/composition contracts remain stable; it does
+  not promote them to the new execution-ledger owner and does not prove `SOURCE_SELECTION` wiring
+  until a coordinator adapter is implemented and independently read back.
+- **Coordinator adapter proof 2026-09-04:** added the pure
+  `adaptWorkspaceBindingsToSourceSelectionV1()` boundary in
+  `graphify-daily-coordinator-v1.ts` with `graphify-daily-coordinator-v1.adapter.spec.ts`.
+  Focused tests pass **3/3**: exact workspace-binding field mapping, cross-workspace revision
+  rejection, and duplicate `sourceRef` rejection before SQL insertion. The adapter omits
+  `legacyFileId` when the authoritative binding has no such field; it does not invent legacy
+  identity. No database or external-store writes occur in this proof.
+- **Combined recheck 2026-09-04:** adapter tests plus the opt-in live coordinator integration suite
+  pass **12/12** with `RUN_DB_INTEGRATION=1`. The live portion remains transactional and rolled
+  back with zero persistent footprint. This strengthens coordinator/adapter compatibility only;
+  the production source-selection producer has not yet been wired to invoke the adapter.
+- **INVENTORY stage boundary 2026-09-04:** added `recordInventoryStage()` and its strict
+  `ExecutionStageReceiptV1` checksum contract to `graphify-daily-coordinator-v1.ts`. The focused
+  suite passes **4/4**, including proof that the stage primitive records only execution-ledger
+  stage state and never queries or writes legacy `graphify_files`. This is stage-boundary wiring,
+  not inventory execution; the existing inventory owner must still produce and supply the exact
+  input/output receipt before this stage can be called in a production coordinator flow.
+- **Read-only inventory receipt 2026-09-04:** added
+  `scripts/atlas/plan-graphify-inventory-stage-v1.mjs`, consuming the complete lifecycle handoff
+  and validating all **25,548** bindings: unique source references, one workspace revision,
+  source-revision/content-digest equality, and non-negative byte lengths. Result is
+  `INVENTORY_RECEIPT_READY`, with source-selection input checksum
+  `sha256:bf447d6092fe4ed400b06ce72221ff5425c413e417df453ccba32fc097c80541` and inventory output
+  checksum `sha256:551d4c2fd428b452e4a4576f2efb0f36cfd080cfef6cfd688f4c5a3fd3930303` in
+  `docs/reports/graphify-inventory-stage-plan-v1.json`. This is read-only planning evidence;
+  `recordInventoryStage()` has not been called for the full population and no inventory, Graphify,
+  Qdrant, Neo4j, or Valkey writes occurred.
+- **Bounded inventory-stage readback 2026-09-04:** added a three-source transactional integration
+  fixture covering `SOURCE_SELECTION -> INVENTORY -> COMPLETED`. The live coordinator suite now
+  passes **10/10** with the inventory stage included; `input_checksum`, `output_checksum`, and
+  `receipt_ref` were independently read back from `graphify_execution_stages`, then the enclosing
+  transaction rolled back. This proves the ledger stage wiring and checksum handoff only; it does
+  not claim full-corpus inventory execution or canonical promotion.
+- **Committed canary inventory wiring 2026-09-04:** the explicitly guarded three-source canary now
+  calls `recordInventoryStage()` after `recordSourceSelectionStage()`. Live readback passed with
+  execution `6e64486f-c195-4b31-9b9e-7fe8f194523b`, `fileCount: 3`, `completedStageCount: 3`,
+  matching `inventoryInputChecksum`/`sourceSelectionChecksum`
+  `sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030`, and inventory output
+  checksum `sha256:e88dff850f752f49115e799d2262b6a13fcae690a6768fc34c4b500bb742f7de`. This proves
+  bounded `OPEN -> SOURCE_SELECTION -> INVENTORY -> COMPLETED` ledger wiring only; the full
+  25,548-source inventory and downstream Graphify stages remain open. Receipt:
+  `docs/reports/graphify-daily-coordinator-canary-v1.json`.
+- **Structural-owner recheck 2026-09-04:** the existing `graphify-structural-materializer.ts`
+  remains the AST/Tree-sitter materialization owner, while
+  `graphify-structural-intelligence-adapter.ts` composes AST-grep/LangExtract evidence and keeps
+  canonical promotion fail-closed when native provenance or source-revision authority is missing.
+  Focused materializer, intelligence-adapter, and structural-parity suites pass **11/11**. This
+  proves the existing structural owner and its provenance boundary; it does not yet connect
+  `AST_PARSE` or `STRUCTURAL_EXTRACT` receipts to a live execution-ledger attempt.
+- **Structural stage receipt adapter 2026-09-04:** added the pure
+  `buildGraphifyStructuralStageReceiptsV1()` adapter to
+  `graphify-structural-intelligence-adapter.ts`. It derives chained, revision-bound checksums
+  for `AST_PARSE` and `STRUCTURAL_EXTRACT` from the existing structural receipt/fabric result;
+  it performs no persistence or identity promotion. Structural focused suites now pass **12/12**.
+  This proves receipt construction and checksum chaining only; a live coordinator execution still
+  must explicitly bind these receipts before either ledger stage can be closed.
+- **Live structural provider probe 2026-09-04:** the exact handoff source
+  `__tests__/data-hashing.spec.ts` was read from its current UTF-8 bytes, matched its authoritative
+  `sourceRevision` and byte length, and sent read-only to the existing `treesitter-chunker-8095`
+  provider. The provider returned `RECOVERED_WITH_ERRORS` with 16 normalized symbols and explicit
+  parse diagnostics; provenance status was `NATIVE_RECOVERED`, therefore canonical promotion was
+  correctly denied. This is live provider/revision evidence, not a successful `AST_PARSE` or
+  `STRUCTURAL_EXTRACT` ledger-stage completion.
+- **Clean-fixture provider probe 2026-09-04:** a read-only TypeScript fixture with a locally
+  computed UTF-8 SHA-256 source revision was sent to the live `treesitter-chunker-8095` provider.
+  The provider returned `RECOVERED_WITH_ERRORS` with two normalized symbols and an explicit parser
+  error, `NATIVE_RECOVERED`, and `canonicalPromotionAllowed: false`. The fixture was not a
+  workspace source and produced no canonical or datastore writes; this records an open provider
+  quality/parity issue rather than authorizing parser changes or ledger-stage completion.
+- **Parser-diagnostic isolation 2026-09-04:** bounded live probes show the `treesitter-chunker-8095`
+  response is `PROVEN` for `const answer = 42;` without a terminal newline, but
+  `RECOVERED_WITH_ERRORS` for the same source with a terminal newline. The diagnostic is reported
+  at the final column and the provider still returns a chunk. This isolates a likely newline/line-end
+  parser-wrapper compatibility issue; no normalization or source-byte rewrite was applied, because
+  doing so could invalidate canonical UTF-8 offsets and source checksums.
+- **Newline probe correction 2026-09-04:** added
+  `scripts/atlas/probe-graphify-newline-parity-v1.mjs` for a reproducible direct `/ast/chunk`
+  comparison. The live sidecar returned HTTP 200, `CLEAN`, zero diagnostics, and one chunk for
+  both `const answer = 42;` and the same source with a terminal LF. The earlier recovered result
+  is therefore not independently reproducible and is not sufficient evidence of a parser defect;
+  no newline normalization, parser change, or ledger-stage promotion was made.
+- **Structural ledger writer boundary 2026-09-04:** added restricted
+  `recordStructuralStage()` support for `AST_PARSE` and `STRUCTURAL_EXTRACT` only. It validates
+  the execution receipt, chains input/output checksums, rejects non-structural stages, and never
+  touches `graphify_files`. Coordinator/structural adapter tests pass **8/8** in this focused
+  recheck. This is a reusable persistence seam, not live structural-stage completion; an actual
+  producer still must invoke it for a bounded execution.
+- **Bounded structural ledger binding 2026-09-04:** after correcting the canary's normalized
+  `codeSourceRevision` field mapping, the explicitly guarded canary completed
+  `OPEN -> SOURCE_SELECTION -> INVENTORY -> AST_PARSE -> STRUCTURAL_EXTRACT -> COMPLETED` with
+  execution `f9115616-7747-4879-a98f-fc0e189f71d8`, three immutable source memberships, and five
+  completed stages. The structural source returned `RECOVERED_WITH_ERRORS` / `NATIVE_RECOVERED`,
+  so `canonicalPromotionMayBeAttempted` remained `false`. Two earlier failed canary attempts were
+  reconciled explicitly to `ABANDONED` with `CANARY_STRUCTURAL_SOURCE_REVISION_MISMATCH`; neither
+  was treated as completed. This proves bounded structural receipt binding, not clean structural
+  promotion or full Graphify execution. Receipt:
+  `docs/reports/graphify-daily-coordinator-canary-v1.json`.
+- **Downstream stage-owner audit 2026-09-04:** no safe coordinator owner was found yet for
+  `SEMANTIC_ENRICH` through `VALIDATE`. `sveltekit-frontend/scripts/atlas/analysis-pass-orchestrator.mts`
+  is a pass-key CLI that directly writes `analysis_pass_results` and declares mixed downstream
+  destinations; it is not an execution-ledger stage adapter. The Qdrant projection worker is also
+  a separate durable projection worker and currently defaults to the legacy `384` hybrid contract,
+  so it cannot be mapped to `PROJECT` or the canonical `semantic_768` lane by name. Keep these
+  stages open until an owner audit identifies one stage-aware adapter with explicit
+  `execution_id`, revision checks, and receipt-only dry-run behavior.
+- **Semantic-owner audit 2026-09-04:** `sveltekit-frontend/scripts/atlas/batch-d-semantic-embedder.mts`
+  is not eligible to own `SEMANTIC_ENRICH`: it batches multiple texts into one Ollama request,
+  derives per-node vectors through perturbation, uses numeric Qdrant IDs, and reports pgvector
+  success without performing the canonical write. It is therefore a historical/experimental
+  768-dimension script, not the current `semantic_768` authority. Keep it out of the coordinator;
+  use the existing populated PostgreSQL `codebase_chunk_index.content_embedding` owner and its
+  revision-qualified read-only reconciliation path when identifying the real semantic producer.
+- **Semantic-enrichment owner correction 2026-09-04 (`SEMANTIC-ENRICH-OWNER-AUDIT-01`):** a live
+  read-only schema/count check resolves the prior column-name ambiguity. `public.codebase_chunk_index.content_embedding`
+  is `halfvec(768)` and populated for `55,169/55,853` rows; `content_embedding_768` is a separate
+  `vector(768)` column populated for only `1,386/55,853` rows. The latter is legacy/separate storage,
+  not the current canonical `semantic_768` owner. Producer metadata is heterogeneous and exact
+  source-revision coverage remains unproven, so `SEMANTIC_ENRICH` and cohort admission remain open.
+  Receipt: `docs/reports/semantic-enrichment-owner-audit-v1.json`. No embedding, database, Qdrant,
+  graph, or cache writes were performed.
+- **Fresh semantic cohort reconciliation 2026-09-04:** the existing read-only cohort auditor was
+  rerun against the live `semantic_768` fixture population. It resolved `55,169/55,169` chunk IDs
+  and found content hashes for all rows, but only `52,380` source refs, `0` authoritative workspace
+  bindings, and `0` populated registry commit revisions. Result remains
+  `SEMANTIC_CANDIDATE_COHORT_BLOCKED` with `eligibleCount=0`; no ordinal map, KNN, KMeans, SOM, or
+  latent execution is authorized. Receipt: `docs/reports/semantic-candidate-cohort-v1.json`.
 - [x] `GRAPHIFY-DAILY-CANARY-02`: prove executions A/B over identical bytes have distinct IDs but
   equal workspace/manifest/source revisions, then execution C changes only the modified source and
   receives a new workspace revision. Require independent SQL readback and zero out-of-scope writes.
@@ -3798,7 +3986,21 @@ outputs against current observations or mark them `SUPERSEDED` solely by timesta
   and `pg_locks` (advisory) both confirmed clean immediately after the run (5/5 tests pass, full
   file including this test: `RUN_DB_INTEGRATION=1 npx vitest run
   src/lib/server/atlas/indexing/graphify-daily-coordinator-v1.integration.spec.ts`). Standalone SQL
-  proof for the A/B half: `sveltekit-frontend/scripts/atlas/graphify-daily-canary-02-proof-2026-09-04.sql`.
+proof for the A/B half: `sveltekit-frontend/scripts/atlas/graphify-daily-canary-02-proof-2026-09-04.sql`.
+
+**Execution note 2026-09-04:** a normal targeted Vitest invocation without
+`RUN_DB_INTEGRATION=1` intentionally skipped all 9 database integration tests, as required by
+the spec file's opt-in guard. That invocation is therefore **not new live proof** and did not
+connect to or write the database. The `5/5` live result above remains the earlier explicit
+integration run; reproduce it only with `RUN_DB_INTEGRATION=1` when the migration and canary
+authorization are available. Do not downgrade the prior evidence to a skip, and do not upgrade
+this default invocation to a pass.
+
+**Fresh live proof 2026-09-04:** reran the same suite with explicit
+`RUN_DB_INTEGRATION=1`: **9/9 tests passed** against `127.0.0.1:5434/legal_ai_db`. The suite's
+single transaction was rolled back, preserving the zero-persistent-footprint contract; this
+proves the coordinator integration behavior and readback checks, not a broad Graphify execution.
+No historical `graphify_runs` rows, Qdrant points, Neo4j nodes, or Valkey entries were changed.
 
 ## REMAINING-TASK-PRIORITY-AND-HELPERS-01 (30 unchecked items)
 

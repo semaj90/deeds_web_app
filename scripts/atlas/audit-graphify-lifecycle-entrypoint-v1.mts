@@ -24,6 +24,8 @@ const report = {
   sourceCount: origin.record.sourceCount,
   bindingCount: origin.bindings.length,
   skippedCount: origin.skipped.length,
+  sourceBindings: origin.bindings,
+  skippedSources: origin.skipped,
   producerRevision,
   requiredOpenInputs: ['workspaceRevision', 'repositoryRevision', 'sourceManifestDigest', 'sourceBindings', 'parserContractVersion', 'extractionContractVersion'],
   lifecycleComposition: 'open -> fanout(runId) -> close(runId)',

@@ -1,0 +1,34 @@
+{
+  "schema": "atlas.semantic-graphify-run-reconciliation.v1",
+  "gate": "SEMANTIC-GRAPHIFY-RUN-RECONCILIATION-01",
+  "mode": "READ_ONLY",
+  "generatedAt": "2026-09-04T19:18:24.6684655Z",
+  "runId": "369e4270-7689-4536-8816-4ec4a5517b3e",
+  "semanticOwner": "public.codebase_chunk_index.content_embedding",
+  "semanticRepresentation": "semantic_768",
+  "comparison": {
+    "semanticRowsWithVectorAndSourceRefAndHash": 52380,
+    "graphifyFileRows": 25258,
+    "sourceRefOverlap": 9843,
+    "exactSourceRefAndContentHashOverlap": 0,
+    "exactOverlapWithCodeSourceAndWorkspaceRevision": 0
+  },
+  "sourceTable": "public.graphify_files",
+  "membershipPredicate": "first_seen_run_id = runId OR last_seen_run_id = runId",
+  "hashComparison": "lower(codebase_chunk_index.content_hash) = lower(graphify_files.content_hash)",
+  "determination": {
+    "status": "NOT_A_SEMANTIC_COHORT_AUTHORITY",
+    "reason": "Source-reference overlap without exact content-hash equality does not bind semantic chunks to the completed Graphify execution.",
+    "lineagePromotionAllowed": false,
+    "ordinalMapAllowed": false,
+    "knnAllowed": false,
+    "nextGate": "AUTHORITATIVE_SOURCE_REVISION_HYDRATION"
+  },
+  "writes": {
+    "database": false,
+    "embeddings": false,
+    "qdrant": false,
+    "graph": false,
+    "cache": false
+  }
+}

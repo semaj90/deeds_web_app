@@ -1,6 +1,6 @@
 {
   "schema": "atlas.postgres-fts-rejection-reasons.v1",
-  "generatedAt": "2026-08-27T02:39:21.506Z",
+  "generatedAt": "2026-09-04T17:38:46.080Z",
   "readOnly": true,
   "databaseWrites": false,
   "queries": [
@@ -22,10 +22,11 @@
     "PACKET_NOT_CANONICAL": "A candidate packet exists but lacks required canonical fields."
   },
   "counts": {
-    "UNRESOLVED_BRIDGE": 357,
+    "UNRESOLVED_BRIDGE": 354,
     "BRIDGE_EXACT_BOUND": 11,
     "AMBIGUOUS_BRIDGE": 1,
-    "HASH_EXACT_BOUND": 4
+    "HASH_EXACT_BOUND": 4,
+    "HASH_SCOPE_MISMATCH": 3
   },
   "byQuery": [
     {
@@ -75,7 +76,8 @@
     {
       "query": "embedding search",
       "counts": {
-        "UNRESOLVED_BRIDGE": 99,
+        "UNRESOLVED_BRIDGE": 96,
+        "HASH_SCOPE_MISMATCH": 3,
         "BRIDGE_EXACT_BOUND": 1
       }
     },

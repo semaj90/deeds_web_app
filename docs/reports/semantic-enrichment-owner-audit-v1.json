@@ -1,0 +1,81 @@
+{
+  "schema": "atlas.semantic-enrichment-owner-audit.v1",
+  "gate": "SEMANTIC-ENRICH-OWNER-AUDIT-01",
+  "mode": "READ_ONLY",
+  "generatedAt": "2026-09-04T19:11:59.7640312Z",
+  "databaseWrites": false,
+  "embeddingCalls": false,
+  "projectionWrites": false,
+  "canonicalAuthority": false,
+  "table": "public.codebase_chunk_index",
+  "representation": {
+    "representationId": "semantic_768",
+    "dimensions": 768,
+    "metric": "cosine",
+    "modelFamily": "EmbeddingGemma"
+  },
+  "liveSchema": {
+    "canonicalColumn": {
+      "name": "content_embedding",
+      "type": "halfvec(768)",
+      "populatedRows": 55169,
+      "totalRows": 55853,
+      "status": "CURRENT_POPULATED_OWNER"
+    },
+    "legacyColumn": {
+      "name": "content_embedding_768",
+      "type": "vector(768)",
+      "populatedRows": 1386,
+      "totalRows": 55853,
+      "status": "LEGACY_SEPARATE_COLUMN"
+    }
+  },
+  "producerMetadata": {
+    "dominantModel": "embeddinggemma:latest:eg-task-prefix-v1",
+    "dominantVersion": "qdrant-backfill-v1",
+    "declaredDimension": 768,
+    "note": "Metadata is heterogeneous in the live table; producer revision and source-lineage qualification still require separate reconciliation."
+  },
+  "auditedProducers": [
+    {
+      "path": "scripts/atlas/backfill-graphify-file-embeddings-768.mjs",
+      "classification": "CURRENT_WRITE_CAPABLE_CANDIDATE",
+      "target": "content_embedding",
+      "guards": ["embedding_eligible = true", "content_embedding IS NULL"],
+      "status": "PRODUCER_CANDIDATE_NOT_COORDINATOR_OWNER",
+      "reason": "It writes the populated column, but its current selection is a time-windowed backfill and does not yet emit the execution-ledger SEMANTIC_ENRICH receipt or prove full source-revision coverage."
+    },
+    {
+      "path": "sveltekit-frontend/scripts/atlas/batch-d-semantic-embedder.mts",
+      "classification": "EXCLUDED_EXPERIMENTAL",
+      "reasons": [
+        "batched request is not one input to one output",
+        "per-node vectors are derived by perturbation",
+        "numeric Qdrant IDs are not canonical identity",
+        "reports PostgreSQL success without the canonical write"
+      ]
+    },
+    {
+      "path": "sveltekit-frontend/scripts/atlas/backfill-codebase-chunk-embeddings.mjs",
+      "classification": "WRITE_CAPABLE_LEGACY_REVIEW_REQUIRED",
+      "target": "content_embedding_768",
+      "status": "NOT_AUTHORIZED_FOR_COORDINATOR_SEMANTIC_ENRICHMENT"
+    },
+    {
+      "path": "sveltekit-frontend/scripts/atlas/embeddinggemma-batch-worker.mts",
+      "classification": "WRITE_CAPABLE_DIFFERENT_TABLE",
+      "target": "atlas_summary_layers.embedding",
+      "status": "NOT_A_CODEBASE_CHUNK_SEMANTIC_OWNER"
+    }
+  ],
+  "determination": {
+    "status": "SEMANTIC_ENRICHMENT_OWNER_PARTIAL",
+    "currentReadOwner": "public.codebase_chunk_index.content_embedding",
+    "coordinatorWriter": null,
+    "sourceRevisionCoverage": "UNPROVEN",
+    "representationRevisionCoverage": "HETEROGENEOUS",
+    "nextGate": "SEMANTIC-CANDIDATE-COHORT-AUTHORITY-01",
+    "promotionAllowed": false
+  },
+  "correction": "Do not call content_embedding_768 the canonical semantic_768 column. The current populated owner is content_embedding; the similarly named column is a smaller legacy population."
+}

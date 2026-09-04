@@ -1,7 +1,7 @@
 # CPU-First Packet Retrieval Readiness
 
-Generated: 2026-08-28T01:07:13.171Z
-Status: WARN
+Generated: 2026-09-04T17:38:35.247Z
+Status: LIVE_PASS
 
 ## Rule
 
@@ -11,34 +11,34 @@ Postgres owns packets. Qdrant finds vectors. RRF decides rank. Gemma4 summarizes
 
 - Postgres truth/indexes: LIVE_PASS
 - Qdrant named-vector mirror: LIVE_PASS
-- Redis/BitFrost cache surface: WARN
+- Redis/BitFrost cache surface: LIVE_PASS
 - Code surfaces: LIVE_PASS
 
 ## Postgres Coverage
 
-- atlas_packets: 61660
+- atlas_packets: 61715
 - packet_key: 100%
 - source_ref: 100%
 - feature_id: 100%
-- source_ref_key: 100%
-- qdrant_point_id: 10.46%
-- packet summary: 11.17%
-- pgvector embedding: 100%
+- source_ref_key: 99.91%
+- qdrant_point_id: 10.45%
+- packet summary: 11.16%
+- pgvector embedding: 99.91%
 
 ## Qdrant
 
 - collection: codebase_chunks_768
-- points: 109129
+- points: 109776
 - named vectors: content, error, signature
 - content vector dim: 768
 
 ## Redis
 
-- bifrost:*: 0
-- bifrost:sem:packet:*: 0
-- bifrost:sem:feature:*: 0
+- bifrost:*: 46
+- bifrost:sem:packet:*: 25
+- bifrost:sem:feature:*: 21
 - ace:context:*: 0
-- centroid:*: 0
+- centroid:*: 66
 - som:*: 0
 
 ## Later Acceleration Lanes
