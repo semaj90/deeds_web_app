@@ -1,0 +1,417 @@
+{
+  "schema": "atlas.row-alignment-15.v1",
+  "generatedAt": "2026-09-04T04:40:53.724Z",
+  "status": "ROW_ALIGN_15_01_PARTIAL_HONEST_ABSENCE",
+  "modelCorrection": "latent_64 origin corrected from an earlier CO_PRODUCED_AUTOENCODER_OUTPUT claim to DERIVED (NESTED_PREFIX_L2_RENORMALIZE from latent_256), verified directly against python/atlas_compute/latent_autoencoder.py and docs/reports/latent-autoencoder-training-receipt-v3-full01.json.",
+  "candidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
+  "ordinalMapChecksum": "f3a54f01be372c21a07737043c5e4b0ba8f0f95b7f6d24470060835cb0ae35a9",
+  "ordinalMapReplayMatch": true,
+  "currentLatentCheckpointRevision": "d6e9395e60f0bb039dd03368012697c5c393d36bb001b8f020b6d7ba22654259",
+  "gates": {
+    "candidateCount": 15,
+    "identitySetParity": "15/15",
+    "ordinalParity": "15/15",
+    "sourceRevisionParity": "15/15",
+    "semanticBinding": "15/15",
+    "latent256Binding": "15/15",
+    "latent64Binding": "1/15",
+    "missing": 0,
+    "duplicates": 0,
+    "reordered": 0
+  },
+  "rows": [
+    {
+      "candidateOrdinal": 0,
+      "canonicalCandidateId": "packet:196138c47be8",
+      "sourceRef": "docs/ai-os/atlas-retry-index.json",
+      "sourceRevision": "sha256:7b0b603adcefed1df8ca784fb55c3ddf90439c4268aa841d9198751441a71628",
+      "codebaseChunkId": "7252a838-1e9b-445a-8abd-0d5ad413567d",
+      "semantic768": {
+        "bound": true,
+        "representationRevision": "semantic_768:embeddinggemma:latest:semantic_768:embeddinggemma:latest:a5f00035d57d79b22bb00ef34e5750a56db13e86366692062cc044ef2bc036a8:encoder-unspecified"
+      },
+      "latent256": {
+        "bound": true,
+        "checksum": "4a3e46dd54517d38fca4504c2e6caf7a",
+        "checkpointRevision": "d6e9395e60f0bb039dd03368012697c5c393d36bb001b8f020b6d7ba22654259"
+      },
+      "latent64": {
+        "bound": false,
+        "checksum": null,
+        "modelTag": "packet-autoencoder-768-64",
+        "origin": "DERIVED",
+        "transform": "NESTED_PREFIX_L2_RENORMALIZE",
+        "prefixDimensions": 64,
+        "parentRepresentationId": "latent_256",
+        "rejectedOrigin": "CO_PRODUCED_AUTOENCODER_OUTPUT"
+      }
+    },
+    {
+      "candidateOrdinal": 1,
+      "canonicalCandidateId": "packet:1daa458bdb73",
+      "sourceRef": "crates/atlas_packet_parser/wrapper.js",
+      "sourceRevision": "sha256:7d127f6ad38bf4fea345831f0afd0c4f7f5d2afdbebcc505b95191af6994f484",
+      "codebaseChunkId": "bec6f7b7-0a45-42e6-b7f9-0d7d16e39383",
+      "semantic768": {
+        "bound": true,
+        "representationRevision": "semantic_768:embeddinggemma:latest:semantic_768:embeddinggemma:latest:1396a2468c022278fdfa4c62310906c4c730fbf4ef51a395509118bbcd267980:encoder-unspecified"
+      },
+      "latent256": {
+        "bound": true,
+        "checksum": "6b94395878875fb60394b410f57b69fc",
+        "checkpointRevision": "d6e9395e60f0bb039dd03368012697c5c393d36bb001b8f020b6d7ba22654259"
+      },
+      "latent64": {
+        "bound": false,
+        "checksum": null,
+        "modelTag": "packet-autoencoder-768-64",
+        "origin": "DERIVED",
+        "transform": "NESTED_PREFIX_L2_RENORMALIZE",
+        "prefixDimensions": 64,
+        "parentRepresentationId": "latent_256",
+        "rejectedOrigin": "CO_PRODUCED_AUTOENCODER_OUTPUT"
+      }
+    },
+    {
+      "candidateOrdinal": 2,
+      "canonicalCandidateId": "packet:225fa0b05a89",
+      "sourceRef": "crates/atlas_packet_parser/index.d.ts",
+      "sourceRevision": "sha256:0e7602dfb459b9ac3c51f34542f7461bbd9d6fc073de96b106740680ec671733",
+      "codebaseChunkId": "144079f0-43df-42f1-a363-e77fb913b76e",
+      "semantic768": {
+        "bound": true,
+        "representationRevision": "semantic_768:embeddinggemma:latest:semantic_768:embeddinggemma:latest:291832d023e8529d1740425fa76a9445d3ce0e0bb82787a8732168ac162645ff:encoder-unspecified"
+      },
+      "latent256": {
+        "bound": true,
+        "checksum": "3075ed80d11a39143017516833dca448",
+        "checkpointRevision": "d6e9395e60f0bb039dd03368012697c5c393d36bb001b8f020b6d7ba22654259"
+      },
+      "latent64": {
+        "bound": false,
+        "checksum": null,
+        "modelTag": "packet-autoencoder-768-64",
+        "origin": "DERIVED",
+        "transform": "NESTED_PREFIX_L2_RENORMALIZE",
+        "prefixDimensions": 64,
+        "parentRepresentationId": "latent_256",
+        "rejectedOrigin": "CO_PRODUCED_AUTOENCODER_OUTPUT"
+      }
+    },
+    {
+      "candidateOrdinal": 3,
+      "canonicalCandidateId": "packet:25ac9148f9bf",
+      "sourceRef": "crates/atlas_packet_parser/package.json",
+      "sourceRevision": "sha256:da4e8e5a20040ddec287d85c871667b6dee636df1a4dda2a3c81d70640300830",
+      "codebaseChunkId": "a4a643ab-c3fb-49d5-976b-845820c67a7e",
+      "semantic768": {
+        "bound": true,
+        "representationRevision": "semantic_768:embeddinggemma:latest:semantic_768:embeddinggemma:latest:f808e536608b5e30bf95574aeefbe64837f1f0450254bb155f6a4efe231308a6:encoder-unspecified"
+      },
+      "latent256": {
+        "bound": true,
+        "checksum": "50009225a66c0196c30b9042c40caa8f",
+        "checkpointRevision": "d6e9395e60f0bb039dd03368012697c5c393d36bb001b8f020b6d7ba22654259"
+      },
+      "latent64": {
+        "bound": false,
+        "checksum": null,
+        "modelTag": "packet-autoencoder-768-64",
+        "origin": "DERIVED",
+        "transform": "NESTED_PREFIX_L2_RENORMALIZE",
+        "prefixDimensions": 64,
+        "parentRepresentationId": "latent_256",
+        "rejectedOrigin": "CO_PRODUCED_AUTOENCODER_OUTPUT"
+      }
+    },
+    {
+      "candidateOrdinal": 4,
+      "canonicalCandidateId": "packet:41aaad7c7e65",
+      "sourceRef": "crates/atlas_packet_parser/Cargo.toml",
+      "sourceRevision": "sha256:fb7c517edecc838e066c2cd04b41e9e60975d0f4c915faef4ebe9d654334c068",
+      "codebaseChunkId": "822a81b8-5e81-4ff0-a645-b1ed7df2584e",
+      "semantic768": {
+        "bound": true,
+        "representationRevision": "semantic_768:embeddinggemma:latest:semantic_768:embeddinggemma:latest:eae73ddfb07efc85380e9d02f994b6a9431573396d9d02a49dd1a411e9985b3d:encoder-unspecified"
+      },
+      "latent256": {
+        "bound": true,
+        "checksum": "dfcc1aedb0ad3877bf742720fd4f2484",
+        "checkpointRevision": "d6e9395e60f0bb039dd03368012697c5c393d36bb001b8f020b6d7ba22654259"
+      },
+      "latent64": {
+        "bound": false,
+        "checksum": null,
+        "modelTag": "packet-autoencoder-768-64",
+        "origin": "DERIVED",
+        "transform": "NESTED_PREFIX_L2_RENORMALIZE",
+        "prefixDimensions": 64,
+        "parentRepresentationId": "latent_256",
+        "rejectedOrigin": "CO_PRODUCED_AUTOENCODER_OUTPUT"
+      }
+    },
+    {
+      "candidateOrdinal": 5,
+      "canonicalCandidateId": "packet:547e1c54b3a0",
+      "sourceRef": "docs/architecture/neo4j-graphrag-parent-atlas.md",
+      "sourceRevision": "sha256:d9d704dd555a3163fe7fa68c84bcb3dbded2c9fdc561aaaa85db880365715cfe",
+      "codebaseChunkId": "bb0c9b56-45e4-46e5-8347-25ea009ddfea",
+      "semantic768": {
+        "bound": true,
+        "representationRevision": "semantic_768:embeddinggemma:latest:semantic_768:embeddinggemma:latest:c6ad357a3940eab1232feff8a9346c37b6c5ecb4921ff060d874b7d8f08ea969:encoder-unspecified"
+      },
+      "latent256": {
+        "bound": true,
+        "checksum": "9fd86fc3382fec5d997e97cdb7613f00",
+        "checkpointRevision": "d6e9395e60f0bb039dd03368012697c5c393d36bb001b8f020b6d7ba22654259"
+      },
+      "latent64": {
+        "bound": false,
+        "checksum": null,
+        "modelTag": "packet-autoencoder-768-64",
+        "origin": "DERIVED",
+        "transform": "NESTED_PREFIX_L2_RENORMALIZE",
+        "prefixDimensions": 64,
+        "parentRepresentationId": "latent_256",
+        "rejectedOrigin": "CO_PRODUCED_AUTOENCODER_OUTPUT"
+      }
+    },
+    {
+      "candidateOrdinal": 6,
+      "canonicalCandidateId": "packet:64838394f8dc",
+      "sourceRef": "docs/architecture/couchdb-mapreduce-atlas-ingestion.md",
+      "sourceRevision": "sha256:22428ba7391697f35336a1da8b71478a70f3fd8d36bdbdb6247306c1813b3d7e",
+      "codebaseChunkId": "a0e64259-6219-4c97-9b04-e22b9808c36b",
+      "semantic768": {
+        "bound": true,
+        "representationRevision": "semantic_768:embeddinggemma:latest:semantic_768:embeddinggemma:latest:35dd8438740b96e5eec90f8990c22252e83911cc30aab834e9076e55ec753349:encoder-unspecified"
+      },
+      "latent256": {
+        "bound": true,
+        "checksum": "b4e2fe39a68d03403146d87f8cc3c363",
+        "checkpointRevision": "d6e9395e60f0bb039dd03368012697c5c393d36bb001b8f020b6d7ba22654259"
+      },
+      "latent64": {
+        "bound": false,
+        "checksum": null,
+        "modelTag": "packet-autoencoder-768-64",
+        "origin": "DERIVED",
+        "transform": "NESTED_PREFIX_L2_RENORMALIZE",
+        "prefixDimensions": 64,
+        "parentRepresentationId": "latent_256",
+        "rejectedOrigin": "CO_PRODUCED_AUTOENCODER_OUTPUT"
+      }
+    },
+    {
+      "candidateOrdinal": 7,
+      "canonicalCandidateId": "packet:64b8a0ed69b3",
+      "sourceRef": "crates/omni-bridge/build.rs",
+      "sourceRevision": "sha256:a6e6f76185b8d0bc2849c53c1af9f0bc16771dfc03c878797215c275f430acc9",
+      "codebaseChunkId": "fbc57936-1be4-4fb2-a6fe-3f84a1486d5a",
+      "semantic768": {
+        "bound": true,
+        "representationRevision": "semantic_768:embeddinggemma:latest:semantic_768:embeddinggemma:latest:fa2905ddb43ca9aeae8d0a3a007439c0614f747ee359ef8ba086c8d919e677ce:encoder-unspecified"
+      },
+      "latent256": {
+        "bound": true,
+        "checksum": "3ebb62abb2f6d3bac81a8ba36adef753",
+        "checkpointRevision": "d6e9395e60f0bb039dd03368012697c5c393d36bb001b8f020b6d7ba22654259"
+      },
+      "latent64": {
+        "bound": false,
+        "checksum": null,
+        "modelTag": "packet-autoencoder-768-64",
+        "origin": "DERIVED",
+        "transform": "NESTED_PREFIX_L2_RENORMALIZE",
+        "prefixDimensions": 64,
+        "parentRepresentationId": "latent_256",
+        "rejectedOrigin": "CO_PRODUCED_AUTOENCODER_OUTPUT"
+      }
+    },
+    {
+      "candidateOrdinal": 8,
+      "canonicalCandidateId": "packet:6bd874a60226",
+      "sourceRef": "crates/turbovec-napi/wrapper.js",
+      "sourceRevision": "sha256:7eab75bf1fce68e8672b405ca64db4bb62159d5e4660b80e240f88c1f0435d56",
+      "codebaseChunkId": "5b9447df-c4b5-4634-853c-c06384abfc0b",
+      "semantic768": {
+        "bound": true,
+        "representationRevision": "semantic_768:embeddinggemma:latest:semantic_768:embeddinggemma:latest:83157e31c15d7edf413068d0dff881c4410081892ea29fc3e80893244e287b7b:encoder-unspecified"
+      },
+      "latent256": {
+        "bound": true,
+        "checksum": "beeb55f6bd7c575808222f3ecc9f832b",
+        "checkpointRevision": "d6e9395e60f0bb039dd03368012697c5c393d36bb001b8f020b6d7ba22654259"
+      },
+      "latent64": {
+        "bound": false,
+        "checksum": null,
+        "modelTag": "packet-autoencoder-768-64",
+        "origin": "DERIVED",
+        "transform": "NESTED_PREFIX_L2_RENORMALIZE",
+        "prefixDimensions": 64,
+        "parentRepresentationId": "latent_256",
+        "rejectedOrigin": "CO_PRODUCED_AUTOENCODER_OUTPUT"
+      }
+    },
+    {
+      "candidateOrdinal": 9,
+      "canonicalCandidateId": "packet:7c61a052540c",
+      "sourceRef": "docs/atlas/cluster-cards.json",
+      "sourceRevision": "sha256:dfedffa0dace728095fb8f1d30e2d0d84806feb0f820187f271b68f7dcd0beb6",
+      "codebaseChunkId": "44318cbc-211b-4b57-8212-6a8b9f7abac6",
+      "semantic768": {
+        "bound": true,
+        "representationRevision": "semantic_768:embeddinggemma:latest:semantic_768:embeddinggemma:latest:a1b172a49a9d1733a290f7356c206c5801f0a72324f3dddeddf97d30539bb0a4:encoder-unspecified"
+      },
+      "latent256": {
+        "bound": true,
+        "checksum": "eddd03f010dc456cb952df481afe82c6",
+        "checkpointRevision": "d6e9395e60f0bb039dd03368012697c5c393d36bb001b8f020b6d7ba22654259"
+      },
+      "latent64": {
+        "bound": false,
+        "checksum": null,
+        "modelTag": "packet-autoencoder-768-64",
+        "origin": "DERIVED",
+        "transform": "NESTED_PREFIX_L2_RENORMALIZE",
+        "prefixDimensions": 64,
+        "parentRepresentationId": "latent_256",
+        "rejectedOrigin": "CO_PRODUCED_AUTOENCODER_OUTPUT"
+      }
+    },
+    {
+      "candidateOrdinal": 10,
+      "canonicalCandidateId": "packet:8589ed47d789",
+      "sourceRef": "crates/atlas_packet_parser/build.rs",
+      "sourceRevision": "sha256:aa7d2ac01ee024deb2df8891a498123bb7c15d9303fb767f6085a9aac92f0d4f",
+      "codebaseChunkId": "76266fe6-4285-4dbb-8724-270c139fd4f8",
+      "semantic768": {
+        "bound": true,
+        "representationRevision": "semantic_768:embeddinggemma:latest:semantic_768:embeddinggemma:latest:fea29b92856b32923629d4aefbee190a0d7b9bd8628f6a552e4810116451ca14:encoder-unspecified"
+      },
+      "latent256": {
+        "bound": true,
+        "checksum": "17d10bc11f338ceabcc647ef3dd9ed60",
+        "checkpointRevision": "d6e9395e60f0bb039dd03368012697c5c393d36bb001b8f020b6d7ba22654259"
+      },
+      "latent64": {
+        "bound": false,
+        "checksum": null,
+        "modelTag": "packet-autoencoder-768-64",
+        "origin": "DERIVED",
+        "transform": "NESTED_PREFIX_L2_RENORMALIZE",
+        "prefixDimensions": 64,
+        "parentRepresentationId": "latent_256",
+        "rejectedOrigin": "CO_PRODUCED_AUTOENCODER_OUTPUT"
+      }
+    },
+    {
+      "candidateOrdinal": 11,
+      "canonicalCandidateId": "packet:8d268e81f842",
+      "sourceRef": "crates/turbovec-napi/package.json",
+      "sourceRevision": "sha256:fdca83ec264edd7f987c60bbe1993bbdfa0ef0d51ceb17873f9f54780dab3b5a",
+      "codebaseChunkId": "39a3a174-f87c-41ae-8221-1557c187c078",
+      "semantic768": {
+        "bound": true,
+        "representationRevision": "semantic_768:embeddinggemma:latest:semantic_768:embeddinggemma:latest:6528a33d34d91c48d1d326eab9cda4904fc0fc57b88d9f723c6971b71c36c3f1:encoder-unspecified"
+      },
+      "latent256": {
+        "bound": true,
+        "checksum": "43b546ea8c39e93821493220ba4af968",
+        "checkpointRevision": "d6e9395e60f0bb039dd03368012697c5c393d36bb001b8f020b6d7ba22654259"
+      },
+      "latent64": {
+        "bound": false,
+        "checksum": null,
+        "modelTag": "packet-autoencoder-768-64",
+        "origin": "DERIVED",
+        "transform": "NESTED_PREFIX_L2_RENORMALIZE",
+        "prefixDimensions": 64,
+        "parentRepresentationId": "latent_256",
+        "rejectedOrigin": "CO_PRODUCED_AUTOENCODER_OUTPUT"
+      }
+    },
+    {
+      "candidateOrdinal": 12,
+      "canonicalCandidateId": "packet:c6c4bb257069",
+      "sourceRef": "crates/atlas_packet_parser/wrapper.d.ts",
+      "sourceRevision": "sha256:2821d678d3eb726b3a3fc3388d8907197db0e1a99e2cd70cf6c77d7782e38c50",
+      "codebaseChunkId": "bc31cec8-73d5-4f4c-be58-3fafb1898bf9",
+      "semantic768": {
+        "bound": true,
+        "representationRevision": "semantic_768:embeddinggemma:latest:semantic_768:embeddinggemma:latest:9b387b82c05a8ca982e59ba1df994a036d52bf5e4be010dab3bc5f246f8f0f7f:encoder-unspecified"
+      },
+      "latent256": {
+        "bound": true,
+        "checksum": "f73b631c49bc1b5b9079f5bba23beb51",
+        "checkpointRevision": "d6e9395e60f0bb039dd03368012697c5c393d36bb001b8f020b6d7ba22654259"
+      },
+      "latent64": {
+        "bound": false,
+        "checksum": null,
+        "modelTag": "packet-autoencoder-768-64",
+        "origin": "DERIVED",
+        "transform": "NESTED_PREFIX_L2_RENORMALIZE",
+        "prefixDimensions": 64,
+        "parentRepresentationId": "latent_256",
+        "rejectedOrigin": "CO_PRODUCED_AUTOENCODER_OUTPUT"
+      }
+    },
+    {
+      "candidateOrdinal": 13,
+      "canonicalCandidateId": "packet:d2c2643163a8",
+      "sourceRef": "docs/atlas/native-gemm-deferral.md",
+      "sourceRevision": "sha256:54bbcac440335b02c62a9af09888810b763bf3b3129eee31ea740a541979f384",
+      "codebaseChunkId": "748c3951-eed7-4139-a2ea-aa279ce82796",
+      "semantic768": {
+        "bound": true,
+        "representationRevision": "semantic_768:embeddinggemma:latest:semantic_768:embeddinggemma:latest:1d98fa2cbb8e2ac9f0542a675f1c5037506588eaa034dccf58494e98f1786bdd:encoder-unspecified"
+      },
+      "latent256": {
+        "bound": true,
+        "checksum": "5f1a79acc2b7c58f9446bf9d48c7c32a",
+        "checkpointRevision": "d6e9395e60f0bb039dd03368012697c5c393d36bb001b8f020b6d7ba22654259"
+      },
+      "latent64": {
+        "bound": false,
+        "checksum": null,
+        "modelTag": "packet-autoencoder-768-64",
+        "origin": "DERIVED",
+        "transform": "NESTED_PREFIX_L2_RENORMALIZE",
+        "prefixDimensions": 64,
+        "parentRepresentationId": "latent_256",
+        "rejectedOrigin": "CO_PRODUCED_AUTOENCODER_OUTPUT"
+      }
+    },
+    {
+      "candidateOrdinal": 14,
+      "canonicalCandidateId": "packet:db66369e866a",
+      "sourceRef": "crates/turbovec-napi/build.rs",
+      "sourceRevision": "sha256:aa7d2ac01ee024deb2df8891a498123bb7c15d9303fb767f6085a9aac92f0d4f",
+      "codebaseChunkId": "01130d0c-6d1f-4fb4-8592-43f3550794d5",
+      "semantic768": {
+        "bound": true,
+        "representationRevision": "semantic_768:embeddinggemma:latest:semantic_768:embeddinggemma:latest:fd5043d3abdfef4ee0934eb63c0d5977c5dba3d1d0f9025943b573a9c1d31268:encoder-unspecified"
+      },
+      "latent256": {
+        "bound": true,
+        "checksum": "9bb037884396ebef699497cfa9728c34",
+        "checkpointRevision": "d6e9395e60f0bb039dd03368012697c5c393d36bb001b8f020b6d7ba22654259"
+      },
+      "latent64": {
+        "bound": true,
+        "checksum": "a7cf40600d54810ba83278d042e70519",
+        "modelTag": "d6e9395e60f0bb039dd03368012697c5c393d36bb001b8f020b6d7ba22654259",
+        "origin": "DERIVED",
+        "transform": "NESTED_PREFIX_L2_RENORMALIZE",
+        "prefixDimensions": 64,
+        "parentRepresentationId": "latent_256",
+        "rejectedOrigin": "CO_PRODUCED_AUTOENCODER_OUTPUT"
+      }
+    }
+  ],
+  "latent64CoverageFinding": "14/15 candidates have no current-checkpoint latent_64 bound (NULL or stale model tag) -- a real backfill-coverage gap on this cohort, not a proof defect.",
+  "canonicalAuthority": false,
+  "writesPerformed": false
+}

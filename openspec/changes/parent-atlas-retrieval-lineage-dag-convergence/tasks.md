@@ -747,6 +747,11 @@ lineage MEMBERSHIP, not 1:1 identity.
   `repo_id` are null while `relative_path` and `content_hash` are populated. This explains the
   zero qualified candidates: relative paths/content hashes are useful diagnostics but cannot be
   promoted to `sourceRef`/`sourceRevision` authority.
+  **Authorization-boundary dry check (2026-09-04):** running the explicitly allowlisted 50-source
+  canary through `register-orphaned-chunks.mjs --capture-lineage --source-refs-file=...` resolved
+  0 current orphans (all 50 were already registered or absent from the live orphan set), so no
+  apply was attempted. This is not a success canary and does not close PKT-LINEAGE-08; a fresh
+  authoritative preflight must produce a non-empty current target before any future apply.
   can obtain a current qualified candidate. No run or file rows were modified.
   The bounded run/file census makes the split concrete: completed run
   `369e4270-7689-4536-8816-4ec4a5517b3e` owns 25,258 file rows, with 25,258 source revisions
@@ -5583,6 +5588,100 @@ rebuilt. `vitest run src/core/latent-source-manifest-v1.spec.ts` — 12/12 pass 
 real fixture bug of my own mid-pass: an invalid non-hex-character sha fixture `'g'`, unrelated to
 the contract logic itself).
 
+## LATENT-SOURCE-MANIFEST-01 correction (2026-09-04, same day) — the CO_PRODUCED claim above was
+## itself wrong, verified against the real model source, not against a comment
+
+**The `latent_64` = `LEARNED`/`coProducedWith: 'latent_256'` claim in the section immediately above
+this one — asserted as "verified live, unchanged since" — is factually wrong.** Found while about
+to build `ROW-ALIGN-15-01` on top of it: the operator's message this session again asserted
+`latent_64` should be recorded as `CO_PRODUCED_AUTOENCODER_OUTPUT`, matching the (wrong) claim
+above. Rather than build a proof artifact on an unverified repeated claim, checked the actual
+producer directly instead of trusting either instruction:
+
+- `python/atlas_compute/latent_autoencoder.py::NestedSemanticAutoencoder.encode()` (the real,
+  raw tensor code, not a comment about it):
+  ```python
+  latent256 = F.normalize(self.encoder(semantic_768), p=2, dim=-1)
+  latent128 = F.normalize(latent256[:, :128], p=2, dim=-1)
+  latent64  = F.normalize(latent128[:, :64], p=2, dim=-1)
+  ```
+  The class's own docstring states outright: "one physical encoder produces latent256; latent128
+  and latent64 are prefix + L2-renormalize views of it, not independently learned branches."
+- `docs/reports/latent-autoencoder-training-receipt-v3-full01.json` (the real training receipt):
+  `"latent128_is_prefix_of_latent256": true`, `"latent64_is_prefix_of_latent128": true`.
+
+Both are unambiguous: `latent_64` **is** a `NESTED_PREFIX_L2_RENORMALIZE` transform, chained
+through `latent_128`, exactly like `latent_128` is of `latent_256` — i.e. `DERIVED`, not
+`LEARNED`/`coProducedWith`. The `representation-artifact-v1.ts` "own audit comment" cited as the
+basis for the CO_PRODUCED claim above was itself wrong, and has since been independently corrected
+(uncommitted, found in-progress in the working tree by a concurrent session at the time of this
+check — `representation-artifact-v1.ts` and `latent-source-manifest-v1.ts`/`.spec.ts` all now
+encode `latent_64` as `DERIVED` with `parentRepresentationId: 'latent_256'`,
+`transform: 'NESTED_PREFIX_L2_RENORMALIZE'`, `prefixDimensions: 64` — matching this correction
+independently and by the same route). Left that concurrent fix untouched rather than reverting it
+or duplicating it.
+
+**Lesson, stated plainly**: a repeated assertion (this session's own prior close, the operator's
+own message, and this file's own "verified live" language) is not evidence on its own — the actual
+model tensor operations and the training receipt are. Do not re-open this specific question again
+without re-reading `latent_autoencoder.py::encode()` directly.
+
+## ROW-ALIGN-15-01 (2026-09-04) — real Postgres binding over the frozen 15-row cohort,
+## `ROW_ALIGN_15_01_PARTIAL_HONEST_ABSENCE`, not a forced pass
+
+Built `sveltekit-frontend/scripts/atlas/row-align-15-01.mts` (read-only, zero writes) using the
+corrected `DERIVED` model above. For each of the 15 real candidates from
+`docs/reports/lineage-semantic-768-cohort-v1.json`, independently bound canonical identity,
+`sourceRevision`, `semantic_768` availability (proven upstream by `SEMANTIC-TOPK-01`), and real
+Postgres `latent_256`/`latent_64` presence + checksum (`md5(vector::text)`, never the raw float
+array — per this file's Wire Format Layering Rule) for the matching `codebase_chunk_index.id`.
+
+**Real result, not smoothed over**:
+```
+candidateCount: 15  identitySetParity: 15/15  ordinalParity: 15/15  sourceRevisionParity: 15/15
+semanticBinding: 15/15  latent256Binding: 15/15  latent64Binding: 1/15
+missing: 0  duplicates: 0  reordered: 0
+ordinalMapChecksum: f3a54f01be372c21a07737043c5e4b0ba8f0f95b7f6d24470060835cb0ae35a9 (replay-stable
+  across two independent materializeCandidateOrdinalMap() calls; identical to the checksum
+  ACE-FEATURE-SOURCE-OWNER-01 independently produced from the SAME cohort, same session)
+currentLatentCheckpointRevision (read live from the majority-vote of populated latent_256 rows,
+  not hardcoded): d6e9395e60f0bb039dd03368012697c5c393d36bb001b8f020b6d7ba22654259
+```
+`latent_256` is fully populated and current-checkpoint for all 15. `latent_64` is populated and
+current-checkpoint for only **1 of 15** — the other 14 are either `NULL` or carry a stale
+pre-retrain model tag (`packet-autoencoder-768-64`, not the current checkpoint revision). This is a
+real backfill-coverage gap on this cohort, not a script defect — recorded per this gate's own
+design principle ("the gate proves honest alignment including honest absence"), and status is
+correctly `ROW_ALIGN_15_01_PARTIAL_HONEST_ABSENCE`, not forced to `PROVEN`. Full receipt:
+`docs/reports/row-alignment-15-v1.json`.
+
+**Per the operator's own stated population-selection rule**: this cohort's selection did not
+depend on graph/PageRank data (`selectionUsesGraph: false` implicitly — no graph field referenced
+anywhere in the cohort or this proof), so `ROW-ALIGN-128-01`/`768-01` may proceed independently of
+`GRAPH-PAGERANK-PARITY-01` **only if** the 128/768-row population-selection rule is confirmed to be
+equally graph-independent before construction — not assumed from this 15-row result alone.
+
+**Not attempted this pass**: closing the `latent_64` backfill-coverage gap (would require running
+`python/backfill_latent_256.py --apply`, a real write, out of scope for a read-only alignment
+proof); `ROW-ALIGN-128-01`/`768-01`; re-running `karpathy:gpu` or any other unrelated pipeline.
+
+**`ROW-ALIGN-128-01` population-scoping check (read-only, no code written)**: before attempting a
+128-row extension, checked whether a 128-row lineage-qualified population exists to draw from at
+all. It does not — this file's own `SEMANTIC-COHORT-AUTHORITY-01` gate (above, ~line 94-107)
+already establishes that **the 15-row cohort is the only lineage-qualified population that
+currently exists**; the 55,169-row semantic snapshot is a separate, non-lineage-qualified
+matrix/representation artifact, and `SOURCE-REGISTRY-TO-CHUNK-HYDRATION`'s own audit (~line 3392)
+found the existing 4,951-row `CandidateOrdinal` admission has **zero intersection** with that
+55,169-row snapshot. **This is a different, more fundamental blocker than the graph/PageRank
+question the operator's own decision tree anticipated** — it is not "128-row selection depends on
+PageRank, so wait for `GRAPH-PAGERANK-PARITY-01`"; it is "no 128-row lineage-qualified population
+exists yet, graph-dependent or not." Classifying `ROW-ALIGN-128-01` as
+`BLOCKED_NO_128_ROW_LINEAGE_QUALIFIED_POPULATION_EXISTS`, distinct from
+`BLOCKED_BY_GRAPH_PAGERANK_PARITY`. Building a real 128-row lineage-qualified selection (extending
+whatever process produced the 15-row cohort) is itself a new, unstarted producer task — not
+attempted here, and not something to synthesize by e.g. padding the 15-row cohort with rows drawn
+from the ungualified 55,169-row snapshot.
+
 ## SEMANTIC-TOPK-01 strengthening pass (2026-09-04, same day — addendum, NOT a re-close)
 
 An operator message arrived proposing a full `SEMANTIC-TOPK-01` spec that largely matched what was
@@ -5734,11 +5833,60 @@ contracts, and the contradictory co-produced fixtures were corrected. Focused co
 rewritten. A new live manifest still requires explicit `parametersDigest`, transform-policy
 revision, and exact 15-row materialization checksums.
 
+**ROW-ALIGN-15-01 recheck 2026-09-04:** The corrected contract was revalidated before resuming
+the bounded alignment audit. `scripts/atlas/audit-lineage-latent-cohort-v1.mjs` found 15/15 current
+`latent_256` rows for the proven semantic canary. `scripts/atlas/audit-latent64-derivation-v1.py`
+independently matched all 15 stored `latent_64` outputs against the current producer, with the
+stored model marker and `maxAbsoluteError: 5.178153514862061e-7`; both receipts are read-only and
+`writesPerformed=false`. This closes the bounded row-alignment diagnostic only. The producer
+contract audit remains `PRODUCER_CONTRACT_INCOMPLETE` because the legacy writer does not yet carry
+manifest-level semantic input, model/producer, ordinal, workspace, and source-revision bindings;
+no `LatentSourceManifestV1` or promotion claim is emitted.
+
+**Producer-owner audit correction 2026-09-04:** The prior `PRODUCER_CONTRACT_INCOMPLETE` result
+audited `scripts/atlas/backfill-latent-vectors.mjs`, which is explicitly a legacy compatibility
+writer and is guarded from ordinary apply. The authoritative read-only audit now targets
+`scripts/atlas/latent256-revision-qualified-wrapper.mts`, which owns the admitted corpus bundle,
+model checksum, producer revision, transform policy, population checksum, and source-revision-set
+binding. It returns `PRODUCER_CONTRACT_READY_FOR_REVIEW` with no missing checks and
+`writesPerformed=false`; this authorizes only the next independent canary readback, not vector
+materialization or production promotion.
+
+**Independent canary readback attempt 2026-09-04:** The guarded
+`latent256-revision-qualified-wrapper.mts` was invoked in dry-run mode with the existing
+`SemanticCorpusBundleV1`, model checksum, and bounded 15-row canary file. It failed closed with
+`latentEligibleCount: 0` and `latent256_wrapper_noop: NO_ELIGIBLE_ROWS`; the receipt reports
+`writtenCount: 0`. The proven 15-row latent alignment audit therefore remains diagnostic evidence,
+but it is not currently admitted to the semantic corpus bundle used by the wrapper. No cohort was
+manufactured and no apply/materialization was attempted. The next gate is to establish an
+authoritative, revision-qualified canary membership bridge before constructing a live manifest.
+
+**Canary identity comparison 2026-09-04:** The 15 `codebase_chunk_index.id` values from
+`lineage-latent256-cohort-v2.json` have `0/15` intersection with the 52,364 `eligibleIds` in
+`sem768-corpus-bundle-01.json`. The existing `latent64-canary-cohort-v1.json` contains 128 IDs and
+is a different population; it cannot be substituted for the proven 15-row lineage canary. This
+confirms the wrapper result is an identity-namespace mismatch, not missing latent mathematics.
+No ID translation was invented and no source, vector, or cohort records were changed.
+
+**Representation-generation comparison 2026-09-04:** The 15 lineage rows do have
+`content_embedding_768` and dimension 768, but their stored `embedding_model` is
+`embeddinggemma:latest` with distinct per-row `embedding_version` values. The regenerated
+semantic bundle selects the newer tagged model generation `embeddinggemma:latest:eg-task-prefix-v1`
+and now contains 576 rows; the exact 15-row ID intersection remains `0/15`. This is a genuine
+representation-generation mismatch, not a reason to relabel the canary or reuse its revisions.
+The canary remains diagnostic-only until a shared representation-generation authority is proven.
+
 **Completion correction 2026-09-04:** `15128/768` is not a live or historical cohort that can
 be completed, regenerated, or promoted; its authoritative population definition does not exist.
 `151128` is likewise undefined and unsupported. `LINEAGE-02` therefore remains
 `BLOCKED_UNGROUNDED`, with `cohortSize=UNRESOLVED`. Completion must be based on a future
 `SemanticCohortAuthorityV1` receipt, never on either literal.
+
+**Source-owner recheck 2026-09-04:** `scripts/atlas/audit-live-source-lineage-tables.mjs` confirms
+`public.graphify_files` is structurally ready with the required `source_ref`, `source_revision`,
+`content_hash`, and `workspace_revision` columns and 25,317 rows. This proves owner schema
+availability only; it does not prove that current packet candidates are covered or that their
+content hashes/revisions match. `PKT-LINEAGE-08` remains blocked until coverage is proven.
 
 ## OPENSPEC-SUPERSESSION-AUDIT-01 (2026-09-04, read-only, proven)
 
@@ -5762,3 +5910,17 @@ not incorporate the current blocked semantic cohort, stale graph snapshot, or op
 proposal state. Treat that output as a historical/advisory report, not current convergence
 authority. Task 44 remains open until completed-task evidence is reconciled against current
 receipts; no status was auto-promoted and no datastore writes occurred.
+
+**Current join recheck 2026-09-04:** `scripts/atlas/audit-current-workspace-packet-chunk-join-v1.mjs`
+found 111 workspace bindings, but 0 exact Graphify sources, 0 binding-to-chunk content matches,
+and 0 packet/chunk exact sources. The result is `CURRENT_PACKET_CHUNK_JOIN_MISSING` for workspace
+revision `sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9`. This is the
+concrete coverage gap blocking packet promotion; no fallback path or synthetic revision is allowed.
+
+**Task-evidence recheck 2026-09-04:** `scripts/atlas/audit-tasks-md-evidence-links-v2.mjs` found
+120 checked blocks, 88 with detectable task/section evidence, and 32 without. This does not close
+Task 44: the missing-evidence list requires review, and the checker currently reports some
+continuation prose as checkbox blocks in older sections. Treat the receipt as an audit inventory,
+not proof that every completed task is current or production-proven. The refined classification
+identifies all 32 entries as likely continuation/subtask blocks; none should be auto-closed from
+this audit. No task statuses were changed.
