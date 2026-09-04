@@ -428,7 +428,8 @@ from `parent-atlas-retrieval-lineage-dag-convergence`.
   `20260904_external_doc_intelligence_v1.sql` and were live-proven there (`to_tsquery('english',
   'Ampere')` matched a real inserted row via the generated column). Recorded as its own line item
   here only for traceability against this task's own numbering — no further work needed.
-- [ ] **DOC-08** Qdrant dense+BM25 hybrid projection — `AUDIT_FIRST` (upgraded from `EXTEND` —
+- [x] **DOC-08** Qdrant dense projection — done, live-proven. Scoped per this task's own
+  reconciliation decision below: option (a), dense-only. `AUDIT_FIRST` (upgraded from `EXTEND` —
   DOC-06A's audit found real prior art this task must reconcile with before writing code, not
   just extend `qdrant_points()` in isolation). `qdrant_points()` exists (dense only, confirmed by
   reading the function). **Before implementing**: `packages/parent-atlas/src/core/
@@ -448,6 +449,41 @@ from `parent-atlas-retrieval-lineage-dag-convergence`.
   `codeBlocks`/`apiSignatures`) — if DOC-08's payload construction imports these TS contracts,
   extend them with version-qualification first rather than silently shipping a Qdrant payload that
   can't be filtered by version/architecture.
+  **Resolution taken**: option (a) — dense-only into `external_programming_docs_768`, leaving the
+  hybrid (dense+BM25) cutover to the existing, more mature `external-doc-qdrant-hybrid.ts`
+  machinery rather than building competing sparse-vector logic. The TS staleness flag on
+  `externalDocChunkSchema` doesn't block this option — DOC-08's payload construction is Python-side
+  (`qdrant_points()`/`build_qdrant_points()`), it never imports the TS contracts, so the flag
+  remains open for whoever eventually builds the TS-side hybrid cutover, not resolved here.
+  **Discovered during this task, not previously known**: `qdrant_points()`/`build_qdrant_points()`
+  (dense-only point construction + fail-closed shape/finiteness checks + deterministic UUID
+  point-id projection replacing a raw-hex string that Qdrant's point-ID format wouldn't accept)
+  already had real unit test coverage before this session
+  (`test_build_points_replaces_legacy_hex_projection_with_uuid`,
+  `test_qdrant_projection_fails_closed_on_zero_or_wrong_vectors`) — this task's "dense only,
+  confirmed by reading the function" framing undersold how complete this half already was.
+  **The actual gap**: `qdrant_upsert()`/`qdrant_ensure_payload_indexes()` — the real HTTP write
+  path — had zero tests, live or otherwise, anywhere in this repo. Verified live before writing
+  any test that `external_programming_docs_768`'s real, currently-deployed vector schema is
+  exactly the unnamed dense `{size: 768, distance: "Cosine"}` this task assumes (`GET
+  /collections/external_programming_docs_768`), confirming no named-vector/hybrid conflict exists
+  today (`points_count: 0` — genuinely never populated, consistent with DOC-06A's audit finding
+  that this whole lane has never been run end to end).
+  **New**: `python/test_atlas_doc_qdrant_projection.py`, 2/2 pass — live-proven against the real
+  Qdrant instance (not mocked), using a disposable test collection
+  (`external_programming_docs_768_doc08_proof`, created and torn down within the test fixture,
+  never touching the real collection). Asserts, before creating the disposable collection, that
+  the real collection's live vector schema still matches this task's dense-only assumption (fails
+  loudly instead of silently testing a stale assumption if that ever drifts). First test:
+  `build_qdrant_points()` output round-trips through a real `qdrant_upsert()` PUT and a real
+  point-level `GET` readback — point ID, payload `chunk_id`, and `canonical_authority: false` all
+  confirmed to match on the server, not just in the constructed payload. Second test:
+  `qdrant_ensure_payload_indexes()`'s receipt shape confirmed correct, and the fields it declared
+  (`source_revision`, `domain_class`) are confirmed present in the collection's own
+  `payload_schema` afterward via a direct `GET`. Confirmed live afterward that the disposable
+  collection was fully deleted and `external_programming_docs_768` remained untouched
+  (`points_count: 0`, unchanged). Combined regression across every Phase A/B/C test file: 93/93
+  pass.
 
 ## Phase D — Semantic extraction (LangExtract/Ornith, source-grounded only)
 
