@@ -2340,3 +2340,58 @@ cache MISS/HIT plus revision and candidate-population changes.
 `wsl -d Ubuntu -e bash -lc "pgrep -f atlas_rapids_sidecar_graph"`) is still up on `127.0.0.1:8098`
 with the 162K graph resident, for anyone continuing this thread without a cold restart. It is a local
 dev process with no persistence — killing it is always safe; the artifact and fix are what's durable.
+
+## Session handoff (2026-09-04, end of session — operator pausing)
+
+**Closed this session** (all pushed, commit `cef902bec6`): `BITFROST-INVALIDATION-OWNER-01`
+(canonical `invalidateBitfrostPacket()` primitive, 4 duplicate implementations delegated, live
+Valkey proof A-L); `BIFROST-KEY-SEMANTICS-OWNER-01` (found + fixed a real `bifrost:sem:packet:*`
+dual-identity collision — packetKey vs query_hash sharing one prefix — split query_hash onto
+`bifrost:sem:query:*`, live-proved distinct); `BITFROST-LIVE-INVALIDATION-ADOPTION-01` (producer
+census + convergence audit found no live mutation-triggered writer exists for either target key
+family; closed `NOT_APPLICABLE_CURRENT_RUNTIME`, correctly not `BLOCKED` or falsely "done"; also
+found and archived one dead script, `wire-bifrost-packet-mirror.mjs`); and, in the sibling
+`parent-atlas-retrieval-lineage-dag-convergence` ledger, `SEARCH-RUNTIME-READONLY-01`
+(`SearchRuntime.search()` now accepts `readOnly: true`, backward-compatible, live-proved zero
+writes against real Postgres+Qdrant).
+
+**Also settled this session, operator-directed, recorded for continuity — do not re-litigate**:
+BitFrost should stay a warmed resident cache tier (cache-aside + bounded prewarming), NOT grow into
+a second retrieval index. The 4 BitFrost key families (`bifrost:packet:*`, `bifrost:sem:packet:*`,
+`bifrost:sem:query:*`, `bitfrost:summary:packet:v1:*`) are genuinely distinct value contracts and
+should stay separate — do not collapse them into one universal packet-cache value or add a Valkey
+FT/vector index. Postgres/Qdrant/Neo4j remain the durable index owners; BitFrost only decides what
+already-derived data is worth keeping resident.
+
+**Next queued gate — `BITFROST-RESIDENCY-WARMING-01` (not started)**. Scope, per operator direction:
+prove only `HotnessSnapshotV1` (deterministic top-N hot-artifact selection), `BucketWarmPlanV1`
+(bounded warming pipeline), cache-aside promotion-on-miss, LFU/LRU/TTL memory bounds, and that
+canonical stores always reconstruct on cache loss (BitFrost never becomes identity-bearing). Small
+control indexes (e.g. `bitfrost:heat:packet`/`bitfrost:heat:query`/`bitfrost:heat:feature`/
+`bitfrost:heat:summary` ZSETs of a `ResidencyScore` blending frequency/breadth/recency/
+reconstruction-cost/latency-saved/byte-cost) are the right Valkey primitive for this — not a
+secondary FT/vector index. Start with a real bounded warm-plan proof (startup load of a
+`HotnessSnapshotV1` top-N, not all ~60K packets), not a new indexing architecture.
+
+**Two narrower, deliberately-not-fixed defects carried forward from the BitFrost convergence audit**
+(zero/low blast radius today, fix alongside `BITFROST-RESIDENCY-WARMING-01` or whenever their losing
+side gains a live caller, not before): `bifrost:packet:{suffix}` has an identity collision
+(`packet_key` in `bitfrost-warm-startup.mjs`/`mcp-tool-implementations.ts` vs `intentHash` in
+`cache-layers-orchestrator.ts::measureLayer3Exact`, a read-only benchmark probe); `bifrost:sem:packet:{packetKey}`
+has a value-contract mismatch on the identical key (`atlas-reward-cache.ts`'s narrow 7-field
+`PacketCacheEntry` vs the real writer's ~25-field lineage/topology envelope — `getPacketCache()`'s
+unchecked `as PacketCacheEntry` cast would silently return `undefined` fields if it ever gained a
+live caller). Full detail: `docs/reports/parent-atlas-bitfrost-producer-convergence-v1.json`.
+
+**Standing restriction, unchanged**: do NOT touch `parent-atlas-versioned-doc-intelligence`
+(DOC-12/DOC-13/DOC-14) — a separate, actively-changing concurrent session owns that lane. This
+session's own code-review pass (resumed after the fact) found its 3 flagged findings were already
+either false positives or already-fixed live in that lane's files by the concurrent session — no
+action needed there, but do not assume that stays true; re-check before touching.
+
+**Priority order for the next session, per operator direction**: (1) `BITFROST-RESIDENCY-WARMING-01`
+(above); (2) `outcome_ledger` fresh-install schema convergence; (3) current-workspace source/chunk
+lineage bridge (see the concurrent same-day audit entries just above this section in
+`parent-atlas-retrieval-lineage-dag-convergence/tasks.md` — source-authority and hydration rechecks
+found real, unresolved gaps: 0 current-workspace matches, 0 exact packet/chunk joins, 43 missing
+canonical chunk-owner rows); (4) only then return to DOC-13/14 once that lane settles.

@@ -743,6 +743,19 @@ lineage MEMBERSHIP, not 1:1 identity.
   `sha256:7cf544001f14273d3f86056868471134a9cd4ced0808f306908ca25320a91e81`. This supersedes
   the older 50-source diagnostic allowlist for execution purposes; no packet, projection, graph,
   or cache writes occurred.
+- **Source-authority recheck (2026-09-04):** `audit-current-source-cohort-lineage-v1.mjs` found
+  52 source-qualified rows but `0` current-workspace matches; `audit-current-workspace-packet-chunk-join-v1.mjs`
+  found 111 binding rows but `0` exact graphify/chunk/packet joins. `audit-current-source-registry-contract-v1.mjs`
+  found 22,604 registry rows but no selected authoritative source set, and
+  `audit-current-graphify-source-revision-v1.mjs` found no current source-revision authority rows.
+  These read-only results keep the explicitly authorized success canary stopped; do not reuse the
+  historical 50-source allowlist.
+- **Hydration recheck (2026-09-04):** `audit-current-source-evidence-hydration-v1.mjs` found
+  52 input rows and 52 exact revision matches, but only 9 content-hydrated rows, 0 authoritative
+  namespaces, and 0 evidence-span/classifier-ready rows. The remaining blockers are 43 missing
+  canonical chunk-owner rows and 9 chunk-owner rows lacking source revision. This confirms the
+  next repair is additive source/chunk authority enrichment; no packet canary or cohort expansion
+  is justified yet. Receipt: `docs/reports/current-source-evidence-hydration-v1.json`.
 - **PKT-LINEAGE-08 recheck 2026-09-04:** the same read-only preflight was rerun after the semantic
   owner audit and still returns `BLOCKED_NO_QUALIFIED_CANDIDATE` with `eligibleCandidateCount: 0`.
   No bounded mutation is authorized by this result; the prior 50-source list remains stale and
