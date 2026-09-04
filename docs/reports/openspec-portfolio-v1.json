@@ -1,6 +1,6 @@
 {
   "schema": "atlas.openspec-portfolio.v1",
-  "generatedAt": "2026-09-04T02:16:23.501Z",
+  "generatedAt": "2026-09-04T02:23:22.008Z",
   "readOnly": true,
   "currentAuthority": "parent-atlas-retrieval-lineage-dag-convergence",
   "currentAuthorityCount": 1,
@@ -836,13 +836,13 @@
     {
       "changeId": "parent-atlas-retrieval-lineage-dag-convergence",
       "taskProgress": {
-        "done": 100,
-        "open": 57,
+        "done": 103,
+        "open": 54,
         "total": 157
       },
       "reachableTaskProgress": {
-        "done": 100,
-        "open": 57,
+        "done": 103,
+        "open": 54,
         "total": 157
       },
       "queueClass": "CURRENT_AUTHORITY",

@@ -376,7 +376,7 @@ to test its success branch against.
   physical point, revisions). Requires live payload `postgres_id` to match
   the requested canonical identity before resolving — never trusts a stored
   point-id field blindly.
-- [ ] RETRIEVAL-01J — **`NEEDS_ACCEPTANCE_SCOPE_RECONCILIATION`** (2026-09-02, wording
+- [x] RETRIEVAL-01J — **`DONE / ACCEPTANCE_SCOPE_RECONCILED`** (2026-09-02, wording
   correction, do not rerun reconciliation). The dry reconciliation did not literally produce
   zero missing targets — it found 6,312 present / 675 `QDRANT_POINT_MISSING`, with zero
   identity conflicts, zero revision mismatches, zero foreign chunks. The 675 were later fully
@@ -3119,7 +3119,9 @@ no Graphify rerun was started, and no production store was changed.
 - [x] Classify the 22 handler-without-listing entries from the parity report against their actual definitions and dispatch paths.
 - [x] Classify the 7 cross-file duplicate names as canonical TRACE ownership with stdio compatibility aliases.
 - [x] Preserve all registrations and handlers during classification; no datastore or canonical projection writes.
-- [ ] Generate a revisioned MCP manifest from canonical and delegated definitions.
+- [x] Generate a revisioned MCP manifest from canonical and delegated definitions. Satisfied by the
+  existing `docs/reports/mcp-tool-registry-index.json` receipt and its recorded content checksum;
+  task 59 carries the detailed evidence. No regeneration was performed.
 - [ ] Census compatibility callers before removing or changing any legacy/private handler.
 
 Evidence: `docs/reports/mcp-tool-registry-drift-classification-v1.json`, `docs/reports/parent-atlas-mcp-tool-registry-parity.json`; atlas-tools smoke 10/10; BitFrost tracking capability proof present.
@@ -3557,6 +3559,17 @@ outputs against current observations or mark them `SUPERSEDED` solely by timesta
 - [ ] `GRAPHIFY-DAILY-CANARY-02`: prove executions A/B over identical bytes have distinct IDs but
   equal workspace/manifest/source revisions, then execution C changes only the modified source and
   receives a new workspace revision. Require independent SQL readback and zero out-of-scope writes.
+  **Partial progress (2026-09-04), NOT closing this checkbox yet — only half proven.** Run A/B half
+  proven live against the real dev DB, inside one `BEGIN...ROLLBACK` transaction (zero persistent
+  writes, verified via `to_regclass` before/after): `execution_id_a != execution_id_b` (true),
+  `workspace_revision_a == workspace_revision_b` (true), 2 independent `graphify_execution_files`
+  rows correctly bound per execution_id under the same source cohort (4 rows total, 2+2, not
+  deduped across executions). Script: `sveltekit-frontend/scripts/atlas/graphify-daily-canary-02-proof-2026-09-04.sql`
+  (reusable, documents both a local-psql and a docker-exec invocation method). **Run C
+  (changed-source-bytes -> different workspaceRevision) deliberately NOT attempted** — doing it
+  honestly requires a real second workspace_revision computed the same way production does (sha256
+  of the sorted exact-byte source manifest after changing one canary source), not a second
+  synthetic literal; faking that value would prove nothing. Left open for a follow-up pass.
 
 ## REMAINING-TASK-PRIORITY-AND-HELPERS-01 (30 unchecked items)
 
@@ -4438,9 +4451,27 @@ work on this ledger.
       and a `DELETE` (same rejection, `DELETE is not permitted`), then `ROLLBACK`. Verified live
       afterward: `to_regclass('public.graphify_executions')` NULL and the fixture workspace row
       count is 0 — nothing leaked.
-- [ ] Freeze the coordinator session advisory-lock contract: one dedicated PostgreSQL connection,
+- [x] Freeze the coordinator session advisory-lock contract: one dedicated PostgreSQL connection,
       session-level lock held for the complete coordinator lifetime, unlock in `finally`, no giant
-      long-running transaction.
+      long-running transaction. **(2026-09-04, live-verified against the real dev DB, rolled back,
+      zero persistent footprint)** Ran the frozen namespace/key from
+      `docs/reports/graphify-execution-ledger-coordinator-plan-v1.json`
+      (`pg_try_advisory_lock(119041, 641934821)`) inside one `BEGIN...ROLLBACK` transaction, applied
+      the full migration DDL body in that same transaction, and confirmed live: first `try_lock`
+      succeeds; `to_regclass` before/after the transaction shows the tables never persisted;
+      `pg_locks` shows zero rows for that (classid, objid) key after the session closed.
+      **Real correction to the contract wording, found live, not assumed**: PostgreSQL session-level
+      advisory locks are re-entrant/stacked per session -- a second `pg_try_advisory_lock` call for
+      the SAME key on the SAME connection also returns `true` (increments an internal hold count),
+      it does not report "already held" or fail. This means "unlock in `finally`" is only safe if
+      the coordinator calls `pg_try_advisory_lock` **exactly once** per execution attempt on its
+      dedicated connection -- a stray second acquire (e.g. a retry path that re-calls try-lock
+      without checking whether it already holds the lock) would require a matching SECOND unlock to
+      fully release, or the lock persists past the intended `finally` release. Recorded here so the
+      eventual `GRAPHIFY-DAILY-COORDINATOR-01` implementation gets this right the first time.
+      Proof script: `scripts/atlas/graphify-daily-canary-02-proof-2026-09-04.sql` (see the linked
+      canary note under `GRAPHIFY-DAILY-CANARY-02` below for the paired execution-identity proof
+      run in the same transaction).
 - [x] Identify ONE durable inventory-persistence owner. `graphify-source-inventory-writer-v2.ts`
       is the preferred candidate; `materialize-graphify-source-inventory.mts` should eventually
       become a thin wrapper rather than retaining an independent SQL implementation. **(2026-09-04,
