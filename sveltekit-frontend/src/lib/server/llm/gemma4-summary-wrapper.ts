@@ -8,7 +8,7 @@
  * - Graceful fallback to the live llama-server lane
  */
 
-import { LLM_MODEL_ID } from './runtime-contract.js';
+import { resolveLlamaInferenceTarget } from './runtime-contract.js';
 
 interface SummarizeRequest {
   prompt: string;
@@ -25,8 +25,6 @@ interface SummarizeResponse {
   totalTokens?: number;
 }
 
-const LLAMA_SERVER_URL = process.env.LLAMA_SERVER_URL || 'http://127.0.0.1:8090';
-const LLAMA_SERVER_FALLBACK_URL = process.env.LLAMA_SERVER_URL || 'http://127.0.0.1:8090';
 const SUMMARY_PROMPT_TEMPLATE_VERSION = 'phase7-v2';
 
 function buildStableSummaryPrompt(prompt: string): string {
@@ -73,11 +71,12 @@ export async function summarizeWithGemma4(req: SummarizeRequest): Promise<Summar
   const timeoutId = setTimeout(() => controller.abort(), timeout);
 
   try {
-    const response = await fetch(`${LLAMA_SERVER_URL}/v1/chat/completions`, {
+    const target = await resolveLlamaInferenceTarget();
+    const response = await fetch(`${target.baseUrl}/v1/chat/completions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: LLM_MODEL_ID,
+        model: target.model,
         messages: [
           {
             role: 'system',
@@ -106,17 +105,17 @@ export async function summarizeWithGemma4(req: SummarizeRequest): Promise<Summar
 
     return {
       summary: content,
-      model: 'gemma4-rotorquant:iq4_xs',
+      model: target.model,
       promptTokens: data.usage?.prompt_tokens,
       completionTokens: data.usage?.completion_tokens,
       totalTokens: data.usage?.total_tokens
     };
   } catch (error) {
     if ((error as any).name === 'AbortError') {
-      throw new Error('Gemma4 summarization timed out');
+      throw new Error('Ornith summarization timed out');
     }
     // Fall through to a second llama-server pass with a lighter prompt
-    console.warn('Gemma4 summarization failed:', error);
+    console.warn('Ornith summarization failed:', error);
     return summarizeWithLlamaServerFallback(req);
   } finally {
     clearTimeout(timeoutId);
@@ -128,12 +127,13 @@ export async function summarizeWithGemma4(req: SummarizeRequest): Promise<Summar
  */
 async function summarizeWithLlamaServerFallback(req: SummarizeRequest): Promise<SummarizeResponse> {
   const { prompt, maxTokens = 512, temperature = 0.3 } = req;
+  const target = await resolveLlamaInferenceTarget();
 
-  const response = await fetch(`${LLAMA_SERVER_FALLBACK_URL}/v1/chat/completions`, {
+  const response = await fetch(`${target.baseUrl}/v1/chat/completions`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: LLM_MODEL_ID,
+      model: target.model,
       messages: [
         {
           role: 'system',
@@ -154,7 +154,7 @@ async function summarizeWithLlamaServerFallback(req: SummarizeRequest): Promise<
   const data = (await response.json()) as any;
   return {
     summary: data.choices?.[0]?.message?.content || '',
-    model: LLM_MODEL_ID,
+    model: target.model,
     totalTokens: data.usage?.prompt_tokens + data.usage?.completion_tokens
   };
 }

@@ -5,8 +5,7 @@
  * and extract structural relationships (triples) for the knowledge graph.
  */
 
-import { ENV } from '$lib/server/env.server.js';
-import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
+import { resolveLlamaInferenceTarget } from '$lib/server/llm/runtime-contract.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
 import { LLAMA_SERVER_BASE_URL } from '$lib/server/ai/local-llama-provider.js';
 import { z } from 'zod';
@@ -21,8 +20,6 @@ const RUNTIME_CONTEXT_SIZE = Number(
 );
 
 
-const MODEL = LLM_MODEL_ID;
-const TURBOQUANT_BASE_URL = ENV.TURBOQUANT_BASE_URL;
 
 const synthesisSchema = z.object({
   globalSummary: z.string(),
@@ -72,14 +69,14 @@ Text:
 ${input}`;
 
   try {
-    return await traceLLM('holistic-synthesis', { model: MODEL, prompt: input.slice(0, 500) }, async (gen) => {
-      // Prefer TurboQuant if available for faster long-context inference
-      const baseUrl = TURBOQUANT_BASE_URL;
+    return await traceLLM('holistic-synthesis', { modelSource: 'llama-server-8090', prompt: input.slice(0, 500) }, async (gen) => {
+      const target = await resolveLlamaInferenceTarget(5_000);
+      const baseUrl = target.baseUrl;
       const res = await fetch(`${baseUrl}/v1/chat/completions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'gemma4-rotorquant:latest',
+          model: target.model,
           messages: [{ role: 'user', content: prompt }],
           temperature: 0.1,
           max_tokens: 4096,
@@ -98,7 +95,7 @@ ${input}`;
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            model: MODEL,
+            model: target.model,
             messages: [{ role: 'user', content: prompt }],
             stream: false,
             response_format: {

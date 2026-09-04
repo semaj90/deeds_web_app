@@ -30,9 +30,7 @@ export function getOllamaEndpoint(): string {
       readEnv('VITE_LLAMA_SERVER_URL') ??
       readEnv('TURBOQUANT_URL') ??
       readEnv('TURBOQUANT_BASE_URL') ??
-      readEnv('LLAMA_SERVER_URL') ??
-      readEnv('OLLAMA_URL') ??
-      readEnv('OLLAMA_BASE_URL'),
+      readEnv('LLAMA_SERVER_URL'),
     `http://localhost:${chatPort}`
   );
 }
@@ -42,7 +40,9 @@ export function getOllamaChatEndpoint(): string {
 }
 
 export function getOllamaGenerationEndpoint(): string {
-  return normalizeUrl(readEnv('OLLAMA_GENERATION_URL'), getOllamaEndpoint());
+  // Chat/generation is llama-server-owned. Do not allow the legacy Ollama
+  // generation override to redirect synthesis or tool calls to :11434.
+  return getOllamaEndpoint();
 }
 
 export function getOllamaEmbeddingEndpoint(): string {

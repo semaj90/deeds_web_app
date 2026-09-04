@@ -834,6 +834,12 @@ lineage MEMBERSHIP, not 1:1 identity.
   blocked by the session's own classifier earlier in this engagement. Evidence:
   `docs/reports/pkt-lineage-08-eligible-source-refs-v1.json` (the allowlist),
   `docs/reports/chunk-registration-report.json` (the dry-run proof, `mode: 'dry-run'`).
+  **Fresh readiness supersession (2026-09-03):**
+  `node scripts/atlas/plan-packet-chunk-lineage-promotion-v1.mjs --limit=100` now reports
+  `BLOCKED_NO_QUALIFIED_CANDIDATE`, `eligibleCandidateCount=0`, and zero planned writes.
+  This current receipt supersedes the older 50-candidate preflight for execution purposes;
+  do not reuse its allowlist or infer that the success branch is currently available.
+  Evidence: `docs/reports/packet-chunk-lineage-promotion-preflight-v1.json`.
 - [x] PKT-LINEAGE-09 (BACKFILL-PROMOTION-01) — Separately authorized and
   applied the full 6,987-row admitted cohort (all 577 packets) after a fresh
   classification confirmed the frozen cohort. Readback and idempotent replay
@@ -2812,6 +2818,76 @@ shared incidence fixture and requires stable normalized node/edge checksums plus
 the external ordinal map. This is bounded fixture proof only; it does not promote the JSON artifact
 to canonical storage or prove the cuDF/cuGraph executor gate.
 
+### NEO4J-CONCEPT-NETWORKX-EXPORT-01 (IMPLEMENTED / LIVE-READ-PROVEN — derived only)
+
+The read-only adapter `scripts/atlas/export-neo4j-concept-networkx-v1.py` reuses
+Neo4j as a source projection and NetworkX as the CPU graph/interchange layer. It
+exports bounded `Concept`, `Ontology`, and `Domain` nodes plus real incident
+relationships to bounded `Packet`, `Feature`, `Trace`, `SourceRef`, and
+`TreeNode` context nodes, with stable external keys where available and explicit
+degraded identity when only a Neo4j element ID exists. The output is node-link
+JSON with `graphRevision` and `projectionChecksum`; it excludes embeddings,
+tensors, KV cache, and hidden model state. It is suitable as compact input to
+LangExtract/Ornith DAG synthesis, not as ontology admission or canonical graph
+identity. Live execution read 19,702 concept-family nodes and 2,000 bounded
+incident relationships (including `USED_CONCEPT`, `IN_DOMAIN`, and
+`HAS_ONTOLOGY`), with `canonicalAuthority=false` and `writesPerformed=false`.
+The export orders the bounded sample by relationship type so the receipt does
+not hide lower-volume relation families behind the large `USED_CONCEPT` lane.
+Revision fields are carried through when Neo4j supplies them; the current
+receipt has 7 nodes with a source revision and 0 with a workspace revision.
+Therefore this remains a derived synthesis input only, not a canonical
+promotion candidate. `CONCEPT-GRAPH-REVISION-ENRICHMENT-01` remains open for a
+read-only source/workspace binding audit.
+
+Receipt: `docs/reports/neo4j-concept-networkx-export-v1.json`. Existing fixture
+projection remains the semantic n-ary tuple owner; this export does not replace
+`OntologyLinkedTupleV1` or the existing `8095` synthesis-context-graph route.
+
+### ONTOLOGY-LINKED-TUPLE-GRAPH-ADDON-01 (BOUNDARY DEFINED — implementation open)
+
+Graph exports have two intentionally separate inputs. Neo4j concept/context
+edges remain ordinary derived graph edges in the NetworkX node-link export.
+Validated `OntologyLinkedTupleV1` values must enter through
+`python/parent_atlas_ontology/adapter.py::OntologyLinkedTupleAdapter` and the
+existing `networkx_snapshot.py` n-ary relation-node projection. That projection
+preserves tuple identity, participant roles, evidence, and external ordinals;
+it never converts a Neo4j binary edge into a tuple, creates participant cliques,
+or promotes a relationship. A future composition receipt may reference both
+artifacts by checksum for DAG/LangExtract context, but must retain their
+separate schemas and `canonicalAuthority=false`/`writesPerformed=false`.
+
+### GRAPH-CONTEXT-DAG-COMPOSITION-01 (IMPLEMENTED / FIXTURE-PROVEN — read-only)
+
+The script `scripts/atlas/compose-graph-context-dag-input-v1.py` composes
+references to the live Neo4j/NetworkX export and the existing validated
+`OntologyLinkedTupleV1` projection. It binds both artifact checksums and the
+graph revision into one bounded input receipt for LangExtract, Ornith, and DAG
+synthesis while preserving separate schemas. It carries no embeddings, CUDA
+buffers, tensors, hidden reasoning, or cache state. Receipt:
+`docs/reports/graph-context-dag-composition-v1.json`.
+
+This proves composition only; it does not prove live model execution, ACE
+admission, BitFrost residency, ontology promotion, or canonical writes.
+No existing runtime caller consumes this script's report yet; the current
+`8095` synthesis-context-graph route is a separate packet/LangExtract path.
+`GRAPH-CONTEXT-DAG-CONSUMER-01` is therefore open and must reuse the existing
+ContextManifest/DAG admission boundary rather than introducing another context
+store or HTTP service.
+
+The script `scripts/atlas/audit-graph-context-dag-consumer-v1.mjs` now validates
+the script-level handoff: both referenced artifacts exist, checksums and graph
+revision are present, and all read-only safety flags hold. Receipt:
+`docs/reports/graph-context-dag-consumer-v1.json`. This is
+`SCRIPT_HANDOFF_VALIDATED`, not a live production ContextManifest invocation;
+the existing runtime consumer remains the next integration boundary.
+
+The existing read-only gate `scripts/atlas/prove-ornith-agent-dag-readonly-gate-v1.mjs`
+also passes (`ORNITH_AGENT_DAG_READONLY_GATE_PROVEN`, validation `ACCEPTED`, zero
+mutation nodes). Its receipt is adjacent execution proof only; it does not yet
+consume the new graph-context artifact. `GRAPH-CONTEXT-CONTEXTMANIFEST-ADAPTER-01`
+remains open for that explicit checksum-bound adapter.
+
 ### GPU-EXECUTOR-COMPARISON-01 (OPEN — after JSON fixture gate)
 
 Consume the same frozen projection through typed cuDF columns and compare executor results by
@@ -3259,12 +3335,174 @@ and workspace-mismatch/source-exact counts, plus a deterministic selection check
 and `writesPerformed=false`. Do not run the existing v1 builder again until this gate
 is repaired.
 
+Read-only execution on 2026-09-03 confirmed the distinction: the repaired builder
+produces 52 exact source-revision/content matches, but `currentWorkspaceMatched=0`
+and `workspaceMismatchAfterSourceQualification=52`. The companion projection audit
+therefore found `lineageRows=52`, `projectionRows=52`, and
+`PROJECTION_EXACT_FILE_BYTES_ADMITTED=52`. This permits file-local source evidence
+review, but does not admit graph-wide features or a current workspace snapshot.
+Receipts: `docs/reports/current-source-cohort-lineage-v1.json` and
+`docs/reports/current-source-cohort-projection-alignment-v1.json`.
+
 The current lifecycle-owner audit remains `GRAPHIFY_RUN_OWNER_BLOCKED`: the expected
 workspace revision resolves to the stale `RUNNING` run `14643371-f6f2-4131-906b-235a5c06619a`
 with no `completed_at`, while the newer completed run is not bound to the current
 `graphify_files` rows. Do not close, supersede, or rewrite either run implicitly; the
 owner decision must be explicit before regenerating the projection cohort or exercising
 `PKT-LINEAGE-08`.
+
+Builder audit detail: `build-current-source-projection-cohort-v1.mjs` currently admits
+only `namespace.classification === EXACT_CURRENT` plus
+`classification === EXACT_FILE_BYTES`. Its output does not carry or verify an exact
+`sourceRef -> code_source_revision/source_revision` binding. The companion lineage
+audit then applies one whole-workspace revision filter, which produced 52 Graphify
+matches but 0 current/revision-qualified rows on 2026-09-03. The repair must add
+per-source revision qualification and explicit mismatch categories before any cohort
+regeneration; do not weaken the check by accepting the stale workspace snapshot.
+
+Caller audit confirms this builder has no production callers: only
+`audit-current-source-cohort-lineage-v1.mjs` and
+`audit-current-source-cohort-projection-alignment-v1.mjs` consume its report.
+Therefore repair the existing owner in place rather than creating a v2 builder or
+parallel cohort authority. The repaired report must preserve the existing diagnostic
+fields while adding the exact Graphify binding, source revision, content-hash match,
+parser/extraction revision evidence, and classifications for `EXACT`, `CHANGED`,
+`MISSING`, `AMBIGUOUS`, and `REVISION_UNPROVEN`.
+
+### PKT-LINEAGE-08 authority boundary recheck (2026-09-03, read-only)
+
+The fresh `scripts/atlas/audit-graphify-packet-lineage-census-v1.mjs` run must be
+read alongside, not merged with, the packet-corpus audit and promotion preflight:
+
+- `graphify-packet-lineage-census-v1.json`: 61,715 packet rows; 17,307 exact
+  source-ref joins; 25,162 graphify source/content-revision observations match the
+  workspace binding, but 44,407 packet rows have no graphify source and 155 source
+  observations have content/revision mismatch. This is not a clean backfill gate.
+- `candidate-corpus-lineage-v1.json`: 61,715 packet rows; `admittedCount=0`, because
+  packet-local `metadata.source_revision` is absent for 61,714 rows. The audit
+  intentionally does not promote `graphify_files.code_source_revision` into packet
+  metadata as a fallback.
+- `packet-chunk-lineage-promotion-preflight-v1.json`: `eligibleCandidateCount=0` and
+  `verdict=BLOCKED_NO_QUALIFIED_CANDIDATE`. It requires a chunk source absent from
+  `atlas_packets` plus exactly one workspace namespace and one source revision from
+  `graphify_files`; the current candidate universe is not a qualified bounded set.
+
+These results are consistent: graphify-side source evidence exists for some rows, but
+the packet admission authority and the current orphan-chunk promotion population are
+not yet joined under one authoritative source/namespace/revision contract. Do not
+copy graphify revisions into packets, reuse the stale 50-source allowlist, or infer a
+promotion candidate from content hashes alone. Keep `PKT-LINEAGE-08` blocked pending
+an explicitly authorized, additive source metadata/materialization decision and a
+new preflight. All three runs were read-only; no packet, chunk-lineage, Qdrant,
+graph, cache, or execution-ledger writes occurred.
+
+The follow-up `scripts/atlas/audit-current-source-evidence-hydration-v1.mjs` run
+further narrows the gap: all 52 source-revision matches remain exact, but only 9
+have content hydrated, 0 have an authoritative namespace, and 0 are evidence-span
+ready or classifier ready. The owner census shows that no current table provides all
+of source revision, content, evidence span, and source namespace. Missing reasons are
+43 `CANONICAL_CHUNK_OWNER_MISSING` and 9
+`CHUNK_OWNER_HAS_CONTENT_BUT_NO_SOURCE_REVISION`. Keep the next gate as
+`RESOLVE_REVISION_BOUND_CONTENT_AND_SOURCE_NAMESPACE_AUTHORITY`; do not add a second
+chunk owner or promote `codebase_chunk_index` content without an explicit revision
+and namespace binding. Receipt: `docs/reports/current-source-evidence-hydration-v1.json`.
+
+The subsequent `scripts/atlas/audit-current-source-registry-contract-v1.mjs`
+read-only audit confirms that the existing registry is present but not currently
+joined to the active selection authority: `atlas_source_refs` contains 22,604
+distinct source keys and the workspace-binding table contains 111 rows, while the
+current source plan selects 0 rows and reports 0 exact registry/binding key matches.
+The registry does contain `workspace_revision` and `source_revision` fields, but the
+audit proves neither a current selected cohort nor a namespace binding. Keep this as
+an additive owner-join gap; do not backfill, copy revisions, or create a second source
+registry. Receipt: `docs/reports/current-source-registry-contract-v1.json`.
+
+The live table audit identifies `public.graphify_files` as the existing schema-level
+owner for the minimum source lineage tuple (`source_ref`, `source_revision`,
+`content_hash`, `workspace_revision`): 25,317 rows are present and all 25,317 have
+those four fields populated at the column level. This closes schema discovery only;
+it does not close admission. The current packet/source joins still have missing or
+stale coverage, `atlas_source_refs` has no proven active namespace join, and the
+source plan selects no rows. Reuse `graphify_files` as the source evidence owner,
+but require an explicit selection join and namespace contract before any packet
+materialization or promotion. Receipt: `docs/reports/live-source-lineage-table-audit.json`.
+
+The existing `scripts/atlas/plan-current-source-graphify-batch-v1.mjs` then selected
+52 bound sources with the unchanged selection checksum, but found
+`currentGraphifyExact=0` and `graphifyRevisionOrContentMismatch=52`. Its status was
+corrected from the misleading `CURRENT_GRAPHIFY_BATCH_PLAN_READY` to
+`CURRENT_GRAPHIFY_BATCH_PLAN_BLOCKED_REVIEW`; a batch is ready only when every
+selected source has exact workspace, source-revision, content-hash, and byte-length
+readback. No apply path was invoked.
+
+### Staged observation versus canonical admission (2026-09-03)
+
+The current lineage blocker does not require discarding or withholding every source
+observation. The existing ingestion/materialization path may retain a complete staged
+record for each observed source and preserve unavailable enrichment fields as `null`
+(for example namespace, evidence span, classifier result, or a not-yet-proven source
+revision). NLP/AST/CST passes may consume those staged records and emit bounded,
+non-canonical observations with their own producer and input checksums.
+
+This is explicitly two-phase:
+
+1. `STAGED_OBSERVATION`: retain source reference, available bytes/content hash,
+   timestamps, and honest nullable enrichment fields; run NLP passes read-only or
+   through the existing bounded observation writer.
+2. `CANONICAL_ADMISSION`: require authoritative namespace, exact source/workspace
+   revision, content binding, evidence spans, and independent readback before packet,
+   CandidateOrdinal, semantic, graph, or ranking promotion.
+
+Do not use staged nulls as synthetic revisions, do not overwrite existing packet
+identity, and do not let NLP output promote a source. This permits indexing and NLP
+coverage to progress while `PKT-LINEAGE-08` remains correctly blocked.
+
+### Staged observation ranking and supersession
+
+After staging and NLP passes, observations may be ranked for retrieval or review,
+but ranking is evidence-only. Rank records must retain `observationId`, `sourceRef`,
+input/content checksum, producer revision, availability state, and the ranking
+policy revision. A score is not a source-revision or ontology authority.
+
+An older observation may be marked `SUPERSEDED` only when a newer receipt proves the
+same logical scope, source/content identity, producer family, and replacement
+checksum. Otherwise retain it as `HISTORICAL`, `BLOCKED`, or `INCOMPLETE`; do not
+silently replace it because a newer timestamp exists. Canonical packet, lineage,
+CandidateOrdinal, representation, and graph artifacts remain governed by their own
+admission gates.
+
+Owner audit result: reuse the existing append-only `analysis_pass_results` lane for
+NLP/analysis receipts and bounded replay. Do not create a generic observation table.
+The repository contract audit also found two incompatible manual proposals for
+`atlas_observation_feature_rows`: the active ORF `packet_key + feature_revision`
+filter schema matches Drizzle, materializer, repository, and spectral exporter;
+the alternate `candidate_id + workspace_revision` semantic-vector draft does not
+match those consumers and remains an unapplied superseded proposal. Keep semantic
+vectors in the canonical `semantic_768` vector lane rather than merging them into
+ORF. Receipt: `docs/reports/atlas-observation-feature-row-contract-v1.json`.
+
+The `analysis_pass_results` contract confirms the intended staging behavior: `packet_key`
+is required, while `source_ref`, `source_revision`, and `workspace_revision` are
+nullable and the input-hash builder preserves missing values as `null`. This is the
+appropriate existing store for incomplete NLP pass receipts. Its code-evidence
+integration-event path still requires source identity and producer fields, so staged
+passes must not emit that canonical integration event until those fields are proven.
+Add ranking/supersession metadata only as pass output/provenance; do not update or
+delete older rows in place.
+
+Focused validation passed with an isolated Vitest worker: `analysis-pass-results.spec.ts`
+reported 4/4 tests. The proof covers deterministic input identity, source-revision
+sensitivity, deterministic payload hashing, and preservation of nullable provenance
+defaults. This proves the staging ledger contract only; it does not prove a live NLP
+batch or canonical source admission.
+
+The existing `scripts/atlas/analysis-pass-orchestrator.mts` dry-run was inspected
+against its available 3-row fixture. It is a legacy Gemma4-summary importer, not the
+current Ornith NLP/recognition path: it hardcodes `gemma4_summary_v1` and the legacy
+Gemma4 model name, and its apply mode would also project into summary layers and
+BitFrost. The dry-run made no writes. Classify this importer as `HISTORICAL_STAGED`
+until its model and destination contracts are explicitly revised; do not rank its
+outputs against current observations or mark them `SUPERSEDED` solely by timestamp.
 
 ## GRAPHIFY-RUN-IDENTITY-SEPARATION-01 (2026-09-03, read-only finding)
 
@@ -3284,15 +3522,41 @@ owner decision must be explicit before regenerating the projection cohort or exe
 - [x] Current run/file census is consistent with this finding: one completed run owns the main
   file population, newer completed runs have zero file rows, and some file rows remain tied to
   non-terminal runs. No historical rows were changed.
-- [ ] Design the smallest additive execution-receipt separation. Preserve snapshot deduplication
-  explicitly, but never substitute a reused snapshot/run row for a fresh execution receipt. Any
-  migration or historical reconciliation requires separate authorization and readback evidence.
-- [x] Added an unapplied migration draft,
-  `drizzle/manual/20260903_graphify_execution_identity_v1.sql`, containing an additive
-  `graphify_execution_receipts` table and nullable `graphify_files.execution_id` binding. It
-  preserves existing UUID/run/file history and does not alter the current unique snapshot index.
-  The draft is not registered/applied and requires a disposable-DB contract test plus explicit
-  migration authorization before use.
+- [x] `GRAPHIFY-EXECUTION-LEDGER-SCHEMA-02`: finalize the smallest additive execution ledger
+  contract (static proof complete; migration remains unapplied).
+  `workspace_revision` remains the exact source-manifest identity; every attempt receives a fresh
+  `execution_id`; historical `graphify_runs` remains compatibility state only. Membership is
+  immutable under `(execution_id, source_ref)` and retains `legacy_file_id` only as optional lineage.
+- [x] Added the canonical unapplied draft
+  `sveltekit-frontend/drizzle/manual/20260903_graphify_execution_ledger_v1.sql` with additive
+  `graphify_executions`, `graphify_execution_files`, and `graphify_execution_stages` tables.
+  It constrains execution/stage statuses and terminal timestamps, supports `COMPLETED_REUSED`
+  without reusing `execution_id`, and leaves historical tables unchanged. It is not registered or
+  applied; `scripts/atlas/test-graphify-execution-ledger-schema-02.mjs` passes
+  (`PROVEN_STATIC_CONTRACT`), while disposable-DB application and explicit migration authorization
+  remain required before runtime use.
+  The earlier root-level `drizzle/manual/20260903_graphify_execution_identity_v1.sql` is now only
+  a non-executable compatibility pointer, preventing a second migration authority.
+- `scripts/atlas/plan-graphify-execution-ledger-coordinator-v1.mjs` now produces a dry coordinator
+  plan from the existing source-selection receipt: 25,419 bindings, a valid workspace revision,
+  fresh execution identity, fixed advisory-lock namespace/key, and the ten lifecycle stages. The
+  plan explicitly keeps migration unapplied and requires authorization/canary proof; it performs
+  no writes. Receipt: `docs/reports/graphify-execution-ledger-coordinator-plan-v1.json`.
+- [ ] `GRAPHIFY-DAILY-COORDINATOR-01`: use a dedicated connection with the frozen session advisory
+  lock namespace/key, capture fresh workspace/source bindings, create source-selection membership,
+  and transition one execution through its stages. Do not use `graphify_runs.run_id` as attempt identity.
+- Audit finding: the existing `scripts/atlas/graphify-daily-lifecycle-open-v1.mjs` and
+  `graphify-daily-lifecycle-complete-v1.mjs` are legacy `graphify_runs` lifecycle wrappers. No
+  implementation currently owns `graphify_executions` or `SOURCE_SELECTION`. The new coordinator
+  must be a separate owner after migration authorization; do not retrofit the legacy wrappers or
+  infer readiness from unrelated `execution_id` tables.
+- The existing read-only producer audit is ready for injected wiring: 25,419 source bindings,
+  108 skipped entries, workspace revision `sha256:35e032dee4202bcb34e31efed5baebcd602d4b7e23e7c98d226f5bb2aa75aeb3`,
+  and no writes. Receipt: `docs/reports/graphify-lifecycle-entrypoint-v1.json`. This proves the
+  source-selection producer, not the new execution-ledger coordinator.
+- [ ] `GRAPHIFY-DAILY-CANARY-02`: prove executions A/B over identical bytes have distinct IDs but
+  equal workspace/manifest/source revisions, then execution C changes only the modified source and
+  receives a new workspace revision. Require independent SQL readback and zero out-of-scope writes.
 
 ## REMAINING-TASK-PRIORITY-AND-HELPERS-01 (30 unchecked items)
 
@@ -4055,3 +4319,800 @@ item 6 above) — read the ontology-kernel addendum before starting that gate.
    applied against re-read current content each time) — re-read this file's current state before
    continuing, per this session's own repeated practice, don't assume it still matches this
    handoff exactly by the time a new session starts.
+
+## GRAPHIFY-EXECUTION-LEDGER-SCHEMA-02 (2026-09-03)
+
+**Scope note**: this section's underlying work (`GRAPHIFY-RUN-IDENTITY-SEPARATION-01` diagnosis +
+the additive `20260903_graphify_execution_ledger_v1.sql` migration draft) was done in a separate
+session that initially staged it under a would-be new OpenSpec change
+(`parent-atlas-graphify-daily-coordinator`). That change was never created on disk. Per this
+repo's own portfolio-authority invariant (`node scripts/atlas/audit-openspec-portfolio-v1.mjs`,
+`currentAuthorityCount = 1`, `currentAuthority = parent-atlas-retrieval-lineage-dag-convergence`),
+a second OpenSpec change would have contradicted that invariant — this work belongs here instead,
+under the existing `GRAPHIFY_RUN_LIFECYCLE` blocker and alongside `PKT-LINEAGE-08`'s own Graphify
+lifecycle/stale-run findings recorded elsewhere in this file.
+
+Context:
+`GRAPHIFY-RUN-IDENTITY-SEPARATION-01` proved that the current `graphify_runs` table mixes logical
+snapshot identity with execution identity — `materialize-graphify-source-inventory.mts` can reuse
+one `run_id` through `ON CONFLICT(workspace_id, workspace_revision, parser_contract_version)`.
+That means `graphify_runs.run_id` cannot serve as "this attempt's" identity; a rerun over
+unchanged bytes silently reuses the prior run's row rather than recording a fresh attempt.
+
+Frozen identities (matches this file's existing `workspaceRevision`/`sourceRevision` vocabulary
+elsewhere — not a new naming scheme):
+
+```
+workspaceRevision
+  = deterministic exact selected-source manifest identity
+  = unchanged execution does NOT change it
+
+sourceRevision
+  = deterministic exact source-byte identity
+
+executionId
+  = fresh UUID for every Graphify attempt (this is the corrected "attempt identity" —
+    NOT graphify_runs.run_id)
+
+graphRevision
+  = derived graph artifact identity
+
+timestamps / OS / WSL / container
+  = execution provenance only, never part of any identity comparison
+```
+
+**Correction to an earlier (obsolete) acceptance framing**: an earlier draft of this work asserted
+"new runId / same workspaceRevision when bytes unchanged / same runId on graphify_files" as the
+target contract. That is superseded now that the execution ledger exists. The correct assertion is:
+
+```
+new executionId
+same workspaceRevision when bytes unchanged
+
+graphify_execution_files.execution_id == new executionId
+
+legacy graphify_files.last_seen_run_id = compatibility state only
+```
+
+`graphify_runs.run_id` must no longer be presented as the new-attempt identity anywhere in future
+work on this ledger.
+
+- [x] `GRAPHIFY-RUN-IDENTITY-SEPARATION-01` diagnosis recorded (above).
+- [x] Additive migration drafted: `sveltekit-frontend/drizzle/manual/20260903_graphify_execution_ledger_v1.sql`
+      (new tables `graphify_executions` + `graphify_execution_files`, no changes to existing
+      `graphify_runs`/`graphify_files` rows or indexes).
+- [x] Current migration syntax proven, rollback-only, against the live `legal-ai-postgres`
+      container's `legal_ai_db` — re-run against the canonical draft AFTER the append-only trigger
+      was added below (does not inherit the earlier, now-invalidated evidence). **Caught and fixed
+      a real proof-methodology bug in the same pass**: the first rollback attempt used
+      `psql -c 'BEGIN;' -f migration.sql -c 'ROLLBACK;'`, but the migration file's own internal
+      `BEGIN;`/`COMMIT;` closed and committed the outer transaction before the wrapper's `ROLLBACK`
+      could run — this silently applied the migration to the live DB instead of proving it in
+      isolation. Caught immediately via `to_regclass()`, the 3 empty (0-row) tables + trigger
+      function were dropped to restore prior state (verified `to_regclass` NULL again), and the
+      proof was redone with the file's `BEGIN;`/`COMMIT;` lines stripped so the outer transaction
+      wrapper actually controls commit/rollback. Second run: all `CREATE TABLE`/`CREATE
+      INDEX`/`CREATE FUNCTION`/`CREATE TRIGGER`/`COMMENT` statements succeed, ends `ROLLBACK`
+      (never `COMMIT`), `to_regclass()` confirms nothing persisted.
+- [ ] Review `graphify_executions` contract: `execution_id UUID PK`, `workspace_revision`,
+      `legacy_graphify_run_id` (compatibility-only, no canonical-authority claim),
+      parser/extraction/graph revisions, `status`, `started_at`, `last_heartbeat_at`,
+      `completed_at`, environment metadata.
+- [ ] Review `graphify_execution_files` contract: `PRIMARY KEY (execution_id, source_ref)`,
+      recording `source_ref`, `code_source_revision`, `workspace_revision`, `content_hash`,
+      `byte_length`; `legacy_file_id` optional provenance only.
+- [ ] Review `graphify_execution_stages` contract:
+      `OPEN → SOURCE_SELECTION → INVENTORY → AST_PARSE → STRUCTURAL_EXTRACT → SEMANTIC_ENRICH →
+      GRAPH_BUILD → PROJECT → VALIDATE → CLOSE`.
+- [ ] Execution terminal-state constraints: `COMPLETED | COMPLETED_REUSED | FAILED | ABANDONED`
+      require `completed_at IS NOT NULL`; `RUNNING` requires `completed_at IS NULL`.
+- [x] Prove `graphify_execution_files` is append-only evidence — no ordinary UPDATE/DELETE
+      lifecycle. Closed the DB-enforcement gap flagged in the read-only review pass below: added
+      `graphify_execution_files_reject_mutation()` + `BEFORE UPDATE`/`BEFORE DELETE` triggers to
+      the migration (additive only — new `CREATE FUNCTION`/`CREATE TRIGGER`, no `ALTER` on
+      existing objects, scoped to `graphify_execution_files` only — deliberately NOT applied to
+      `graphify_execution_stages`, whose status/timestamp columns are meant to transition in
+      place). Behaviorally proven, not just DDL-checked: inside one rolled-back transaction,
+      applied the migration, inserted one throwaway `workspaces` row + one `graphify_executions`
+      row + one `graphify_execution_files` row, attempted an `UPDATE` (rejected: `graphify_execution_files
+      is append-only evidence: UPDATE is not permitted (execution_id=..., source_ref=proof/only.ts)`)
+      and a `DELETE` (same rejection, `DELETE is not permitted`), then `ROLLBACK`. Verified live
+      afterward: `to_regclass('public.graphify_executions')` NULL and the fixture workspace row
+      count is 0 — nothing leaked.
+- [ ] Freeze the coordinator session advisory-lock contract: one dedicated PostgreSQL connection,
+      session-level lock held for the complete coordinator lifetime, unlock in `finally`, no giant
+      long-running transaction.
+- [ ] Identify ONE durable inventory-persistence owner. `graphify-source-inventory-writer-v2.ts`
+      is the preferred candidate; `materialize-graphify-source-inventory.mts` should eventually
+      become a thin wrapper rather than retaining an independent SQL implementation.
+- [ ] Do NOT change the existing `graphify_runs` unique index yet.
+- [ ] Do NOT rewrite historical `graphify_runs` rows.
+- [ ] Do NOT run broad `graphify:daily` yet — see the "ignore the stale codebase-graph.json hook"
+      note below; running it prematurely would muddy the evidence this gate needs.
+- [ ] Do NOT retry `PKT-LINEAGE-08`'s authorized apply from this gate — that item's own
+      prerequisites (recorded earlier in this file) are unrelated to and independent of this ledger.
+
+## GRAPHIFY-DAILY-COORDINATOR-01
+
+- [ ] Fresh `WorkspaceRevisionRecordV1` generated for this execution.
+- [ ] Exact `WorkspaceSourceBindingV1[]` frozen before downstream stages.
+- [ ] `SOURCE_SELECTION` freezes: selected source count, source refs, source revisions, content
+      digests, byte lengths, workspace revision, manifest checksum, selection-policy revision.
+- [ ] Insert fresh `execution_id` every attempt.
+- [ ] Every source observation appended to `graphify_execution_files` under that `execution_id`.
+- [ ] Heartbeat updates only the active execution record.
+- [ ] Successful execution ends `COMPLETED`.
+- [ ] Reused already-proven derivation ends `COMPLETED_REUSED` while still receiving a NEW
+      `execution_id`.
+- [ ] Failure ends `FAILED`.
+- [ ] Dead coordinator may later be explicitly reconciled to `ABANDONED`. Never infer `COMPLETED`.
+- [ ] Independent readback proves: execution status terminal; `completed_at` present; execution
+      file count == frozen source count; workspace revisions all match; source revisions all
+      present; content digests all match; mandatory stages terminal.
+
+## GRAPHIFY-DAILY-CANARY-02
+
+```
+Run A, bounded source cohort:
+  executionId = EA
+  workspaceRevision = W1
+  sourceCount = N
+
+Run B without byte changes:
+  executionId = EB
+  EB != EA
+  workspaceRevision = W1
+  same manifest checksum
+  same source revisions
+
+Run C after changing exactly one canary source:
+  executionId = EC
+  EC != EB
+  workspaceRevision = W2
+  W2 != W1                     <- corrected: run C's workspaceRevision must DIFFER from run A/B's
+                                   (an earlier draft of this canary incorrectly asserted
+                                   "workspaceRevisionC == W123 PASS" — that is wrong; changing one
+                                   selected source's exact bytes must change workspaceRevision)
+  changed sourceRevision differs
+  unchanged sourceRevisions remain identical
+```
+
+Required: stale RUNNING rows created = 0; missing source revisions = 0; digest mismatches = 0;
+writes outside canary scope = 0.
+
+Only after this gate:
+```
+GRAPHIFY-RUN-FILE-BINDING-01
+  ↓
+SOURCE-SELECTION-AUTHORITY-01
+  ↓
+SOURCE-REGISTRY-TO-CHUNK-HYDRATION-02
+  ↓
+PKT-LINEAGE-08 preflight
+```
+
+Then run:
+```
+npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json
+node scripts/atlas/audit-openspec-portfolio-v1.mjs
+```
+The portfolio audit should continue to report `currentAuthorityCount = 1` /
+`currentAuthority = parent-atlas-retrieval-lineage-dag-convergence` — that is an explicit repo
+invariant, not a side effect to be reintroduced accidentally by a future change proposal.
+
+**LSP negative-proof cross-reference (kept separate, not part of this gate)**: the same session's
+LSP work (`openspec/changes/parent-atlas-compiler-semantic-graph-resolution/tasks.md`,
+`LSP-UTF8-BOUNDARY-GUARD-01` / `LSP-CROSS-FILE-TARGET-PROOF-01`) is independent of Graphify
+execution-ledger repair and proceeds on its own track — UTF-8 boundary guard PROVEN, byte
+conversion math PROVEN, cross-file `.mjs` LSP jump NOT_PROVEN (do not attempt to force target
+identity from AST evidence to close that gap; its next investigation is tsserver/project
+configuration or a different known cross-file TS fixture).
+
+## GRAPHIFY-EXECUTION-LEDGER-SCHEMA-02 — read-only review findings (2026-09-03, follow-up)
+
+Scoped, read-only pass over the contract-review checklist items above. Note: the migration syntax
+proof item above was found already re-flagged `[ ]` by a concurrent edit to this exact file
+(the canonical `20260903_graphify_execution_ledger_v1.sql` draft changed after an earlier proof
+ran, correctly invalidating that evidence) — this pass does NOT re-run that proof and does NOT
+check that item; it only reviews contract shape against the current on-disk migration.
+
+- Contract review (`graphify_executions` / `graphify_execution_files` / `graphify_execution_stages`
+  / terminal-state CHECK constraints): read the live migration file directly (not from memory) and
+  confirmed each column/CHECK named in the checklist above is present as described, including the
+  `RUNNING ⟺ completed_at IS NULL` / non-RUNNING ⟺ `completed_at IS NOT NULL` constraint on
+  `graphify_executions` and the analogous `PENDING/RUNNING` vs `COMPLETED/SKIPPED/FAILED` split on
+  `graphify_execution_stages`. Not marking the checklist items `[x]` myself, since "review" here
+  plausibly means sign-off by whichever session owns this gate's proof run, not just a read.
+- **Append-only gap — closed same session, see the checkbox above**: was "in practice" only (no
+  DDL enforcement) when this note was first written; a `BEFORE UPDATE`/`BEFORE DELETE` trigger was
+  added to the migration afterward and behaviorally proven (real `UPDATE`/`DELETE` attempts inside
+  a rolled-back transaction both correctly rejected). Left this paragraph in place rather than
+  deleting it, since it's still the accurate record of what the gap *was* before the fix — the
+  checklist item above is the current, authoritative status.
+- **Inventory-persistence-owner recommendation independently corroborated via grep, not just
+  asserted**: `graphify-source-inventory-writer-v2.ts` has 3 live script consumers
+  (`apply-current-source-graphify-batch-v1.mts`, `apply-full-corpus-graphify-inventory-v1.mts`,
+  `apply-graphify-source-inventory-batch-v1.mts`) plus one composition module
+  (`graphify-lifecycle-composition-v1.ts`, itself referenced only by its own spec — not yet wired
+  into a live entrypoint). `materialize-graphify-source-inventory.mts` has exactly one referrer
+  repo-wide, a proof script (`prove-graphify-revision-owner-v2.mts`) — it is not invoked by any
+  npm script or other live entrypoint. This confirms (does not change) the checklist's existing
+  recommendation to standardize on `graphify-source-inventory-writer-v2.ts`.
+- Not attempted in this pass (deliberately, per this gate's own "Do NOT" list and the concurrent
+  migration-syntax flag above): no disposable-DB proof run, no coordinator/advisory-lock code, no
+  `graphify:daily` invocation, no `PKT-LINEAGE-08` retry.
+
+## PARENT ATLAS REPRESENTATION FABRIC — GATE REGISTRATION (2026-09-03)
+
+**Scope note**: registration only, matching this file's own established pattern (see "PARENT ATLAS
+CANDIDATE PIPELINE ARCHITECTURE FREEZE" earlier in this file for precedent) — none of the 8 gates
+below are started by this entry. Filed under this change per the single-authority portfolio
+invariant (`currentAuthority = parent-atlas-retrieval-lineage-dag-convergence`), not a new
+OpenSpec change.
+
+**One factual conflict found and NOT silently resolved either way** — a proposed correction this
+session asserted `latent_128`/`latent_64` are pure derived views (`prefix + L2-renormalize` of
+`latent_256`) with no separate physical storage, and that the Postgres migration "deliberately says
+do not store separate 128/64 columns." That contradicts this file's own already-verified live
+finding at `LATENT-PHASE16-OWNER-01` above (lines ~1014-1037): `codebase_chunk_index.latent_64` is
+a real, physically-persisted `vector(64)` column with a live HNSW index
+(`idx_codebase_chunk_latent64_hnsw`), written by `python/backfill_latent_256.py` in the same
+UPDATE statement as `latent_256` — not computed on demand from a prefix+renorm of `latent_256`.
+Re-verified live in this pass (not re-trusting the earlier note blind): `SELECT count(*) FROM
+codebase_chunk_index WHERE latent_256 IS NOT NULL` = 55,169 (matches Qdrant `codebase_chunks_latent256`
+point count exactly, `mean_overlap_at_k = 0.9995` per `docs/reports/latent256-ann-exact-parity-v1.json`
+— both these figures corroborate the proposed correction's other claims). `latent_128` genuinely
+has no column and no Qdrant collection — it IS in-memory-only, matching the proposal for that one
+dimension. **Net finding: the proposed correction is right about `latent_256` (physical, trained,
+populated, parity-proven) and right about `latent_128` (no storage, derive on demand), but wrong
+about `latent_64` specifically — that one already has real, populated (if incomplete —
+`LATENT-PHASE16-OWNER-01` recorded only 0.36% coverage as of 2026-09-02, a separate open gap) physical
+storage in production, and any future `RepresentationRegistryV1` must describe `latent_64` as
+`physicalStore: EXISTING_COLUMN` (with its own known-incomplete-coverage caveat), not
+`physicalStore: NONE / deriveFrom: latent_256`.** Whoever builds `LATENT256-REPRESENTATION-CONTRACT-02`
+below must reconcile this before freezing the registry, not copy either source's claim uncritically.
+
+**Kanban revision-binding bug — confirmed live in this pass, not just carried forward from the
+proposal**: `sveltekit-frontend/src/lib/server/atlas/board/daily-graphify-board-recommendations.ts`
+line 113, `workspaceRevision: boardGenerated` — a generated/observed timestamp value is being
+assigned directly to the `workspaceRevision` field of the board's evidence packet, which is exactly
+the timestamp-as-revision violation this file's own frozen identity model (see
+`GRAPHIFY-EXECUTION-LEDGER-SCHEMA-02` above) prohibits. Real, not hypothetical.
+
+**Gates registered, in the proposed priority order** (all `OPEN`, none started):
+
+1. `LATENT256-REPRESENTATION-CONTRACT-02` — **DONE, same session**:
+   `sveltekit-frontend/src/lib/server/atlas/tensors/representation-artifact-v1.ts` now exports
+   `NESTED_LATENT_REPRESENTATION_FAMILY_V1`, a frozen registry with `latent_256`
+   (`physical: true`, `parentRepresentationId: null`, `inputRepresentationId: 'semantic_768'`),
+   `latent_128` (`physical: false`, `parentRepresentationId: 'latent_256'`,
+   `inputRepresentationId: 'latent_256'`), `latent_64` (`physical: true`,
+   `parentRepresentationId: 'latent_256'`, `inputRepresentationId: 'semantic_768'` — matching the
+   live producer's actual same-forward-pass behavior, NOT a derived-view chain, per the conflict
+   reconciliation above). Uses the bare `latent_256`/`latent_128`/`latent_64` naming this file's own
+   pre-existing test fixture already used — never introduced the `ae_`-prefixed variant the stale
+   example implied, since that naming never actually appeared anywhere live. Two real bugs fixed in
+   `assertPromotionReadyRepresentationArtifact`, not just relabeled: (1) it previously special-cased
+   only the literal string `'ae_latent_64'` and unconditionally required `inputRepresentationId ===
+   'semantic_768'` for every other representationId — which would have wrongly rejected a
+   legitimate `latent_128` artifact correctly declaring `latent_256` as its input, the exact
+   derived-view relationship this family is supposed to support; (2) the pre-existing test fixture
+   itself had `representationId: 'latent_256'` paired with `dimensions: 64` — a real mismatch never
+   caught before because the old code never checked dimensions against any representationId other
+   than the hardcoded `'ae_latent_64'` string, which never matched this fixture's `'latent_256'` id
+   at all. Fixed the fixture (`dimensions: 256`), not the check. Added
+   `assertRepresentationFamilyRevisionBinding(artifacts[])` — the cross-artifact check the ask
+   explicitly wanted ("one family revision should bind all three... so you cannot accidentally
+   derive 128 from one 256 checkpoint and label it as another revision"): throws
+   `REPRESENTATION_FAMILY_REVISION_MISMATCH` if any two family-member artifacts disagree on
+   `modelChecksum`/`modelRevision`/`parametersDigest`/`transformPolicyRevision`. 19/19 tests pass
+   (11 pre-existing + 8 new, one new test asserting the exact revision-mismatch rejection). Real
+   caller count checked before editing: this contract has zero production callers today (only its
+   own spec, plus one unrelated comment reference in `mcp-tool-registry-types-v1.ts`) — low blast
+   radius, confirmed via grep, not assumed.
+2. `LATENT256-QUERY-ENCODER-01` — host/export the trained `NestedSemanticAutoencoder` encoder for
+   query-side use (currently `PostgresLatent256CandidateProvider` is candidate-side-hydration only:
+   confirmed live, its own docstring cites `models/nested-semantic-autoencoder/README.md:
+   canonicalAuthority=false, queryEncoder=false, activeRetrievalLane=false`). Without this, Qdrant
+   `codebase_chunks_latent256` cannot be queried directly — only used for candidate-side dedup/
+   diversity after a `semantic_768` primary retrieval. Evaluate reusing an existing PyTorch-capable
+   process (e.g. `:8095`) before standing up a new one, per the proposal's own suggestion — not
+   independently verified in this pass.
+3. `GO-RETRIEVAL-REPRESENTATION-ROUTING-01` — **PARTIALLY DONE, same session**: the wire-level
+   field + a minimal, honest `representationRegistry` are real and tested; actual cross-
+   representation execution stays deliberately unbuilt because it has nothing real to route to
+   yet (gate 2 blocked — no live query-time `latent_256` encoder). Scoped down from the full
+   `RepresentationRequestV1` ask (`queryVectorRef`/`executorPreference` not added — no second
+   executor exists yet either, so those fields would be speculative) to what's honestly buildable
+   now: `proto/active/retrieval.proto`'s `CodebaseSearchRequest` gained `representation_id`
+   (field 10, empty = current default behavior, zero change for every existing caller) and
+   `CodebaseSearchResponse` gained `representation_used` (field 4, always set) +
+   `representation_fallback_reason` (field 5, non-empty only when the request's representation
+   couldn't be honored). Regenerated `.pb.go`/`_grpc.pb.go` via `protoc` + `protoc-gen-go`/
+   `protoc-gen-go-grpc` (both confirmed installed at `$GOPATH/bin`; the repo's own `generate.sh`
+   failed on this host with a `protoc-gen-go: file not found` PATH-translation bug under Git
+   Bash — worked around by invoking `protoc` directly with explicit native Windows paths, not by
+   patching the script; flagged, not fixed, since it's an existing script issue orthogonal to
+   this gate). `services/go-retrieval-service/main.go` gained a `representationRegistry` map
+   (`semantic_768`: dimension 768, `codebase_chunks_768`, `queryEncoder: true`; `latent_256`:
+   dimension 256, `codebase_chunks_latent256`, `queryEncoder: false` — real collection name, real
+   dimension, matches `LATENT256-REPRESENTATION-CONTRACT-02` above, not a placeholder) and
+   `resolveRepresentation()`, which **never silently substitutes**: an unknown or
+   not-yet-query-executable representation falls back to `semantic_768` AND returns a non-empty
+   machine-readable reason (`REPRESENTATION_UNKNOWN:<id>` / `REPRESENTATION_NOT_QUERY_EXECUTABLE:<id>`)
+   that `searchCodebase()` surfaces on every response path, including its 3 early-error returns —
+   not just the happy path. `entry.collection` is deliberately NOT yet wired into actual query
+   execution (still hardcoded to `collectionCodebase` via `s.embed()`/`s.qdrantSearchCodebase()`)
+   since doing so for `latent_256` would require a query embedding that cannot be produced yet;
+   wiring it is the direct, mechanical next step once gate 2 closes. Wired the field through both
+   entrypoints — gRPC (`CodebaseSearchRequest.RepresentationId`) and the HTTP JSON facade
+   (`httpSearchCodebase`'s request struct gained `representation_id`) — not just one. Verified,
+   not assumed: `go build ./...`, `go vet ./...`, and the full existing `go test ./...` suite all
+   pass clean (10.3s, includes the pre-existing `lanes_test.go`/`tag-filter_test.go`), plus 5 new
+   tests in `services/go-retrieval-service/representation_test.go` covering the default path, the
+   explicit-semantic_768 path, the unknown-representation fallback, the not-yet-executable
+   fallback, and a regression guard pinning `latent_256`'s registry entry (dimension 256, real
+   collection name, `queryEncoder` still `false`) so a future edit can't silently flip it live
+   without a test failing first.
+4. `DAG-PARAMETER-MATERIALIZATION-01` — **IMPLEMENTED / FOCUSED-PROVEN.** Added the pure
+   `ParameterArtifactV1` builder and wired `planKernelBoundDagV1()` so each planned operator
+   receives a deterministic `parameterArtifactRef` and `parameterChecksum`. The artifact is
+   schema/revision-qualified, canonicalAuthority=false, writesPerformed=false, and is not
+   persisted by this change. Package build plus focused planner/artifact tests passed 5/5.
+   Runtime loading by Go Retrieval/FastAPI/Python executors remains a separate follow-up gate.
+5. `DAG-PARAMETER-EXECUTOR-CONSUMER-AUDIT-01` — **IMPLEMENTED / FOCUSED-PROVEN.** The core
+   binding and shared OaK adapter now resolve and verify `ParameterArtifactV1` before handler
+   invocation. The seven handlers remain thin consumers of the verified argument map; no
+   production constructor using `parameterArtifactRef: null` was found. Remaining null references
+   are compatibility/test fixtures only. Focused binding, executor, and adapter tests pass 9/9;
+   the read-only audit is recorded in `docs/reports/dag-parameter-executor-consumers-v1.json`.
+   No runtime, database, cache, or artifact-store writes occurred.
+6. `DAG-PARAMETER-SCOPE-AUDIT-01` — **PARTIALLY IMPLEMENTED / FOCUSED-PROVEN.** The planner
+   now accepts prevalidated `operatorArgumentsByOperatorId` and uses the scoped object when
+   present; the legacy request-wide fallback remains for compatibility. The focused scoped-
+   argument replay passes, while schema-registry-driven projection and parent-output binding
+   remain open. Receipt: `docs/reports/dag-parameter-scope-v1.json`. No runtime, database,
+   cache, or artifact-store writes occurred.
+7. `DAG-PARAMETER-SCHEMA-COVERAGE-01` — **OPEN / SCRIPT-AUDITED.** The real symbol-repair
+   operator library contains 18 operators, of which 6 declare a `parameterSchemaRef` and 12
+   intentionally declare `null`. This is coverage evidence, not permission to invent schemas;
+   the next step is to define schemas only for operators with proven tunable parameters. Receipt:
+   `docs/reports/kernel-parameter-schema-coverage-v1.json`.
+8. `DAG-PARAMETER-SCHEMA-OWNER-AUDIT-01` — **OPEN / SCRIPT-AUDITED.** `param:graph-hop-bound`
+   maps to the existing graph-expand input schema, but it is not yet an exact artifact validator.
+   `param:top-k` and `param:token-budget` have multiple nearby request/context owners and no
+   single exact kernel parameter validator. Receipt: `docs/reports/kernel-parameter-schema-owners-v1.json`.
+   No runtime, database, cache, or artifact-store writes occurred.
+9. `FETCH-LATENT-OPERATOR-01` — map `FETCH_LATENT` to a real kernel operator: `latent_256` fetch
+   (Postgres/Qdrant provider, physical), `latent_128`/`latent_64` derive-by-transform
+   (`PREFIX_L2` from `latent_256`) **for `latent_128` only** — per the conflict-reconciliation
+   above, `latent_64`'s real fetch path should hit its own physical column, not a derived-transform
+   path, until/unless a future decision explicitly retires that column in favor of pure derivation.
+   Output shape: `CandidateRepresentationSliceV1` (checksums + ordinals, never raw floats in DAG
+   JSON) — consistent with this file's existing large-array-by-reference rule.
+10. `CANDIDATE-FEATURE-MATRIX-REPRESENTATION-01` — `CandidateFeatureMatrixManifestV1` references
+   (`latent256Ref`/`latent128ViewRef`/`latent64ViewRef` as artifact/storage-address + ordinal-
+   alignment checksums) rather than embedding vectors in feature rows. No such manifest concept
+   exists in this file yet — this is net-new registration, not a correction of prior work.
+8. `KANBAN-RECOMMENDATION-REVISION-BINDING-01` — **PARTIALLY DONE, same session**: the
+   `workspaceRevision`/`graphRevision` half of this gate is fixed and proven; `featureRevision`/
+   `policyRevision`/`sourceRevision`/`executionId` are unchanged (already came from real
+   `context.*` params or a stable literal, not from `board.generated` — only `workspaceRevision`
+   was the timestamp-mislabeled-as-revision bug) and `sourceRevisionDigest` is NOT added (no such
+   field exists on the target schema; out of scope for this pass, flagged not silently dropped).
+   Changes: new `src/lib/server/atlas/board/graphify-current-workspace-revision.ts` —
+   `resolveCurrentGraphifyWorkspaceRevision()` reads the most recent `graphify_runs` row with a
+   real `sha256:`-prefixed `workspace_revision` (preferring `COMPLETED` status), returns `null`
+   (never a fabricated value) when none exists or the DB is unreachable — verified both paths live:
+   a real query against `legal-ai-postgres` returns
+   `workspace_revision=sha256:b39bca3b...f7c80cd, status=COMPLETED`, and a DB-unavailable unit-test
+   environment degrades to `null` without throwing (2/2 new tests pass in
+   `graphify-current-workspace-revision.spec.ts`). `daily-graphify-board-recommendations.ts`:
+   `buildEvidencePacket`/`buildFeatureRow` now take `workspaceRevision`/`runGraphRevision`
+   parameters instead of the old `boardGenerated` value; `context.workspaceRevision`/
+   `context.graphRevision` let callers override the live-resolved value, `null` is a legitimate,
+   explicitly-propagated outcome. Regression-verified: the pre-existing
+   `daily-graphify-board-recommendations.spec.ts` (no DB in its test env) still passes end-to-end —
+   caught and fixed a real regression this same pass, where the first version of this fix made the
+   DB query throw unconditionally and broke that spec; wrapped in try/catch per this repo's
+   Degraded Response Contract before it was left in that state. `tsgo --noEmit` reports 0 errors
+   touching either file. **`GO-RETRIEVAL-REPRESENTATION-ROUTING-01`'s `executionId` field and
+   gate 8's tournament work remain genuinely blocked on nothing from this gate anymore for the
+   revision-identity reason originally stated** — the timestamp-as-revision bug is closed.
+8. `RECOMMENDATION-TOURNAMENT-01` — expand the existing `GraphifyTaskCandidate` →
+   `EventRecommendationFeatureRow` → `RecommendationPolicy` → `DailyGraphifyBoardRecommendation`
+   pipeline (not replace it) with a challenger slot: deterministic policy stays `ACTIVE`; XGBoost
+   and a low-rank/Tang-inspired challenger (name it `TangInspiredRecommendationChallengerV1`, never
+   `...Canonical...` — it needs its own effective-rank/conditioning/sampling-efficiency/quality
+   proof before promotion consideration, per the proposal's own caveat about restrictive
+   applicability conditions) run `SHADOW` only. No challenger creates or reorders a Kanban task
+   until an explicit `RecommendationTournamentV1`/`RecommendationReceiptV1` promotion, matching the
+   `XGBOOST_RERANK_MODE=off/shadow/active` pattern already adopted in
+   `parent-atlas-best-fit-score-fabric`'s `XGBOOST-RERANK-ACTIVATION-01` — reuse that pattern
+   rather than inventing a second shadow/active vocabulary.
+
+**Not registered as a gate**: Ewin Tang's algorithm as a retrieval-lane authority — explicitly out
+of scope per the proposal's own framing (strong low-rank/conditioning assumptions, evaluated best
+under restrictive conditions per the practical-evaluation literature it cites) and per this file's
+existing `RL-RETRIEVAL-POLICY-01` precedent of holding experimental algorithms at
+challenger/shadow status until proven. It belongs only inside gate 8's challenger slot.
+
+**Do NOT** (carried forward from the proposal, consistent with this file's existing guardrails):
+create `latent_128`/`latent_64` as new tables merely because they're "missing" — `latent_128`
+genuinely has none and should stay a derived view; `latent_64` already has one, use it, don't
+duplicate it. Do not let gate 8's challenger work start before gate 7 fixes the revision-identity
+bug it depends on. Do not treat this registration as license to start `graphify:daily` or retry
+`PKT-LINEAGE-08` — unrelated to and not unblocked by any of the above.
+
+## SYNTHESIS-CONTEXT-GRAPH-01 (2026-09-03, DONE — direct user request, adjacent to but not one of the 8 gates above)
+
+User asked directly for a networkx graph, built from oaklib + langextract, feeding `llm_synthesis`,
+sourced from "pre-fill neural decoder DAG synthesis" — not itself one of the 8 registered gates
+above, but touches the same representation-fabric territory (packet identity, representation
+references never embedded as raw floats) so recorded here rather than under a separate authority.
+
+**Before building anything, checked the operator's own prior decision on the adjacent question**
+(gate 2, `LATENT256-QUERY-ENCODER-01`, still `OPEN`/not started): `models/nested-semantic-autoencoder/README.md`
+records an explicit 2026-08-29 decision to defer standing up any new query-time GPU-adjacent
+process, citing VRAM contention with the two already-live services on this 8GB card. Surfaced this
+to the user before touching it (AskUserQuestion) — chose to evaluate `:8095` sharing only. Live
+verification found the README's own "already PyTorch-capable" premise for that specific sharing
+path is **currently false**: `docker exec miniforge-nlp-sidecar python -c "import torch"` →
+`ModuleNotFoundError`, and the container has no `nvidia-smi` binary and no GPU reservation in
+`docker/miniforge-nlp-sidecar/docker-compose.yml` — it is a plain CPU container today, not a
+CUDA-context-sharing candidate as currently built. Not fixed (adding torch+CUDA to this container
+is itself a real infra decision requiring the same sign-off the README already asks for) —
+recorded as a finding, gate 2 stays `OPEN`.
+
+**What was actually built** (does not require gate 2 — deliberately routed around it): a new
+bounded FastAPI router on the already-live `:8095` sidecar combining two capabilities already
+proven live in that exact container (`networkx==3.6.1`, `oaklib==0.7.4` — both already pinned in
+`docker/miniforge-nlp-sidecar/Dockerfile`, zero new dependencies, satisfies
+`DEPENDENCY-CAPABILITY-GUARD-01`):
+
+- `python/atlas_synthesis_context_graph.py` — `POST /synthesis/context-graph`. Nodes: `PACKET`
+  (one per candidate), `CONCEPT_MENTION` (one per LangExtract-grounded span, reusing the existing,
+  proven `legacy._grounded_extractions()` — the same function `POST /extract`'s `grounded` pass
+  already calls, not a new extraction path), `ONTOLOGY_CONCEPT` (one per successfully-oaklib-grounded
+  `attributes.concept_id`, via the existing `atlas_oak_kernel._adapter()`/`AtlasPostgresOntologyAdapter`/
+  `OboGraphInterface` accessors — reused, not reimplemented). Edges, returned as `(u, v, edge_type)`
+  tuples per the literal request ("networkx graph... tuples"): `PACKET -MENTIONS-> CONCEPT_MENTION`,
+  `CONCEPT_MENTION -GROUNDS_TO-> ONTOLOGY_CONCEPT`, optionally `ONTOLOGY_CONCEPT -IS_A-> ONTOLOGY_CONCEPT`
+  (bounded 1-hop ancestors, `include_ontology_neighbors` flag, capped at 20 neighbors/concept — no
+  unbounded traversal). Each candidate carries an optional `source_representation_ref` — an opaque
+  string for a future neural-decoder representation-slice checksum/reference; this module never
+  calls the neural-decoder service (`atlas_neural_decoder_service.py`, port 8121) itself and never
+  embeds raw floats in the graph, per this repo's own large-array-by-reference rule (see
+  `FETCH-LATENT-OPERATOR-01`/`CANDIDATE-FEATURE-MATRIX-REPRESENTATION-01` above for the DAG-side
+  half of this same rule).
+- Degrades correctly, does not throw: `ATLAS_OAK_ADAPTER` is unconfigured by default in this
+  container (verified live: `GET /oak/health` → `adapterConfigured: false`) — the endpoint still
+  returns the `PACKET`→`CONCEPT_MENTION` graph from LangExtract alone, `grounding.adapterConfigured: false`,
+  zero `ONTOLOGY_CONCEPT` nodes. Also degrades if adapter construction itself throws (caught, not
+  propagated).
+- **Not itself `llm_synthesis`** — per this repo's existing rule that raw evidence must pass through
+  bounded context assembly before reaching a model, this endpoint hands off a compact, checksum-stable
+  (`graphChecksum`, deterministic — proven via a same-input-same-output test) context graph;
+  `llmSynthesisPerformed: false` is explicit in every response. A future Ornith synthesis call is the
+  consumer, not built here.
+- Mounted in the real container entrypoint (`docker/miniforge-nlp-sidecar/Dockerfile`'s
+  `CMD ["python", "/app/python/miniforge_nlp_sidecar_oak.py"]`), not a parallel/unwired module —
+  `app.include_router(synthesis_context_graph_router)` added alongside the existing `oak_router`
+  mount.
+- **Tests**: `python/test_atlas_synthesis_context_graph.py`, 7/7 pass inside the real container
+  (`docker exec miniforge-nlp-sidecar ... python -m pytest`) — covers the ungrounded-adapter path,
+  the grounded path, "never call `label()` when no `concept_id` was extracted", adapter-construction
+  failure degrading cleanly, `source_representation_ref` round-tripping without ever carrying a
+  vector, the `MAX_CANDIDATES` bound, and checksum determinism.
+- **Live end-to-end smoke test, real Ornith call through the actual container** (not mocked): the
+  container was restarted (bind-mounted `python/` source, uvicorn does not hot-reload by default —
+  matches this same file's own documented `UVICORN_RELOAD` finding elsewhere), `GET /openapi.json`
+  confirms `/synthesis/context-graph` is registered, and a real `POST` against it returned a valid
+  envelope (`nodeCount: 1, edgeCount: 0` — zero extractions for that specific test sentence, cross-
+  checked against the pre-existing, already-proven `POST /extract` endpoint given the identical
+  text, which independently returned the same zero-concept result — confirms this is real current
+  LangExtract/Ornith behavior for that input, not a bug in the new code).
+
+## GATE 2/4/5 CORRECTIONS + FETCH_LATENT CANDIDATE-SIDE HANDLER (2026-09-03, same session)
+
+**Correction to gate 2 (`LATENT256-QUERY-ENCODER-01`) — the earlier "OPEN, deferred" status was
+itself based on a stale source.** `models/nested-semantic-autoencoder/README.md` (2026-08-29)
+said hosting a query-time encoder was operator-deferred; that framing predates a separately-landed
+Neural Decoder Container (`python/atlas_neural_decoder_service.py`, port 8121). Live-verified this
+pass: `curl :8121/health` → `"status":"ok","device":"cuda"`, real GPU. `.env` has
+`NEURAL_DECODER_URL=http://127.0.0.1:8121` configured. A real `FETCH_LATENT` handler
+(`sveltekit-frontend/src/lib/server/atlas/policy/oak-dag-neural-latent-handler-v1.ts`) already
+calls it via `runNeuralDecoderPrefillCallerV1`, in `SHADOW_READONLY` mode (observes, never affects
+ranking — a deliberate product choice, not a missing capability), and is registered in
+`oak-dag-runtime-registry-v1.ts`. **Nuance, not glossed over**: the whole DAG execution path
+(planner → executor → this handler) has zero live route callers — real, tested, but currently
+unwired into any HTTP-triggered production traffic. **Revised gate 2 status: encoder hosting is
+DONE; promoting it out of SHADOW mode and wiring the DAG path into a live route are separate,
+still-open decisions**, not this gate's original "host the encoder" ask. Surfaced this correction
+to the user directly (it reversed an earlier answer given this same session) before continuing.
+
+**Gate 4 (`DAG-PARAMETER-MATERIALIZATION-01`) — corrected, was ALREADY DONE, not a gap.** The
+registered claim ("planner emits `parameterArtifactRef: null` for every action") was checked
+against the live planner (`packages/parent-atlas/src/core/kernel-bound-dag-planner-v1.ts`) and
+found false: every action gets a real `parameterArtifactRef` via `buildParameterArtifactV1()`
+(checksum-verified, schema-validated), and the executor
+(`kernel-bound-dag-execution-adapter-v1.ts`) already resolves it correctly via
+`resolveKernelDagParameterArtifactV1()`. A pre-existing test
+(`kernel-bound-dag-planner-v1.spec.ts:25`) already asserted this. No code change needed — the
+registration's own honest caveat ("not independently re-verified... re-check before trusting at
+face value") did its job.
+
+**Gate 5 (`FETCH-LATENT-OPERATOR-01`) — DONE for the candidate-side sub-case.** Confirmed live
+that `FETCH_LATENT` existed in `DagActionKind` but had zero operator-kind mapping in the planner's
+`actionKindForOperator` — the registration's premise here was correct. Built the candidate-side
+half (fetching an already-stored candidate's `latent_256` by id — pure Postgres read, no GPU, no
+dependency on gate 2's encoder):
+- `packages/parent-atlas/src/core/kernel-operator-library-v1.ts`: added
+  `FETCH_LATENT_REPRESENTATION` to `KERNEL_OPERATOR_KIND_VALUES`.
+- `kernel-bound-dag-planner-v1.ts`: mapped `FETCH_LATENT_REPRESENTATION → 'FETCH_LATENT'` in
+  `actionKindForOperator`. New planner test proves it lowers correctly (`actionKind === 'FETCH_LATENT'`,
+  real `parameterArtifactRef`).
+- `candidate-representation-slice-v1.ts` (new): `CandidateRepresentationSliceV1` — checksums +
+  ordinals only, matches the registration's exact ask and this repo's no-raw-vectors-in-DAG-JSON
+  rule. 5 tests, including a `found > requested` rejection and an ordinal-count-mismatch rejection.
+- `oak-candidate-latent-owner-v1.ts` (new): governed input contract for the candidate-side fetch,
+  distinct from the existing query-time encoder's owner contract (`oak-neural-latent-owner-v1.ts`)
+  — same pattern, different sub-case.
+- `sveltekit-frontend/src/lib/server/atlas/policy/oak-dag-candidate-latent-handler-v1.ts` (new):
+  wraps the existing, already-proven `PostgresLatent256CandidateProvider` (candidate-side
+  hydration, real Postgres read of `codebase_chunk_index.latent_256`). Raw `vectors` map is read
+  and then deliberately discarded — never crosses into the returned
+  `CandidateRepresentationSliceV1`. Registered in `oak-dag-runtime-registry-v1.ts` alongside the
+  query-time encoder handler, under a distinct `operatorId`/`implementationRef` — no collision,
+  both legitimately share the `FETCH_LATENT` action kind (matches this file's existing
+  many-operators-one-action-kind pattern).
+- **Two real pre-existing/adjacent bugs found and fixed while testing, not routed around**:
+  (1) `oak-dag-runtime-registry-v1.spec.ts` hardcoded `toHaveLength(6)` — already stale before
+  this session's addition (the neural-latent handler alone had already made it 7); fixed to 8 with
+  a comment explaining the staleness wasn't caused by this change. (2) A dynamic
+  `await import('./oak-dag-runtime-registry-v1.js')` in this session's own first draft of the new
+  handler's third test transitively hit `src/lib/server/ollama.ts`'s `ROTORQUANT_MODEL_PATH`
+  required-env throw — an unrelated, pre-existing environment-config gap. Rewrote that test to
+  compare the two handler factories directly instead of depending on the full registry import
+  graph, proving the same "no collision" claim without the fragile dependency.
+- Verified: `packages/parent-atlas` `tsc` build clean; 9/9 package-side tests pass
+  (`candidate-representation-slice-v1.spec.ts` + `kernel-bound-dag-planner-v1.spec.ts`,
+  including the new `FETCH_LATENT_REPRESENTATION` test); 5/5 sveltekit-frontend-side tests pass
+  (`oak-dag-candidate-latent-handler-v1.spec.ts` + `oak-dag-runtime-registry-v1.spec.ts`, after
+  both fixes above).
+- **Not built this pass**: the QUERY-TIME `latent_128`/`latent_64` derive-by-`PREFIX_L2` transform
+  sub-case (only the physical `latent_256` candidate-side fetch was built); wiring the DAG
+  execution path into any live HTTP route (still zero callers, per the gate-2 correction above);
+  promoting the query-time encoder out of `SHADOW_READONLY`.
+
+## 2026-09-03 PROOF-GATED STATUS TABLE (supersedes the scattered ~2026-08-27 status)
+
+**Provenance note**: no single literal table matching this shape was found on disk — the
+underlying facts already exist as prose across `openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md`
+("Current Workstation Alignment (2026-08-28)", CANARY-01..04) and this file's own §5
+(`PKT-LINEAGE-01..08`). This table is a dated synthesis of those, in the corrected form directed
+by the operator, not an edit-in-place of a table that was searched for and not found.
+
+| Lane | Current state | Next gate |
+|---|---|---|
+| Replay admission | `PROVEN` (`FROZEN_REFERENCE`), 10/135 → 10/135, still valid | Preserve cohort checksum; do not reopen unless source scope changes |
+| Frozen DAG | `PROVEN` (`FROZEN`), checksum remains reference evidence | Freeze the DAG artifact itself. **Not** "no more topology work" — topology/representation admission is now a separate lane (see rows below) |
+| Graphify source byte integrity | `PROVEN_BOUND_OWNER` / `LIFECYCLE_SPLIT` — one completed run (`369e4270-7689-4536-8816-4ec4a5517b3e`) owns 25,258 files, all 25,258 with source revisions/hashes; 4 newer completed runs are unbound, plus stale RUNNING states | `GRAPHIFY-EXECUTION-LEDGER-SCHEMA-02` coordinator canary: immutable execution↔source membership |
+| Packet↔chunk integrity | 15/15 exact current canary `PROVEN`; old 332-exact/4,148-ambiguous numbers are no longer the useful promotion boundary | Scale 15 → 128 → 768; resolve or exclude the 74 ambiguous mappings + 243 revision-unproven rows |
+| Workspace/source namespace | `PROVEN` — one workspace, explicit repository/directory scope, zero ambiguity, completed owner available | Bind this authority into the new Graphify execution/source ledger and the packet-lineage success canary |
+| Source lineage (`PKT-LINEAGE-08`) | `IMPLEMENTATION_PROVEN` / `SUCCESS_CANARY_PENDING` — no longer well-summarized as "61,126 missing joins"; current preflight found 50 real orphan candidates, 434 namespace-qualified memberships; residual blocker is 3 files lacking Graphify source-revision authority | Finish Graphify lifecycle source-selection authority, then one explicitly authorized bounded success canary |
+| `CandidateOrdinal` | `PROVEN_CANARY` — real 15-row `CandidateOrdinalMapV1` through the canonical owner | Scale exact-identity cohort to 128, then 768. No aliases, no fuzzy basename, no synthetic revisions |
+| `semantic_768` | 15/15 exact canary `PROVEN`, including deterministic `ContextManifest` replay | Expand with the exact-lineage cohort; bind model/representation/vector revisions for the 128/768 expansion |
+| `CandidateFeatureMatrix` | `PROVEN_CANARY` — 15 rows/25 features, manifest exists, deterministic A/B replay, 7 graph-bearing candidates / 8 graph-absent, ranking promotion `false` | Scale identity parity to 128 → 768, then admit representation refs (GPU features) under the same ordinal checksum |
+| Learned representation family | `latent_256` physical; `latent_128`/`latent_64` derived. Storage/indexing exists (see `LATENT256-REPRESENTATION-CONTRACT-02` above); representation identity/provenance is not promotion-complete | Representation-ledger readback: parent revision, transform-policy, derived-view checksum, hot/warm/cold admission |
+| Go Retrieval + latent use | `semantic_768` remains current query authority; `latent_256` has candidate-side hydration (see `GO-RETRIEVAL-REPRESENTATION-ROUTING-01` above) but is not an independent query lane yet | Query-encoder representation-routing contract, no extra RRF vote |
+| DAG parameters | Contract already has `parameterArtifactRef`/`parameterChecksum` and `FETCH_LATENT` — **corrected same session**: the planner does NOT emit null; it already materializes a real `ParameterArtifactV1` per action (see `DAG-PARAMETER-MATERIALIZATION-01` correction above) | `FETCH_LATENT` candidate-side operator done this session (`FETCH-LATENT-OPERATOR-01`); query-time sub-case already live via the existing `SHADOW_READONLY` handler (see gate-2 correction above) |
+| Hot/warm/cold | Policy conceptually aligned: cold=`semantic_768`, warm=`latent_256`, hot=`latent_128`, hot-L1=`latent_64` | Prove representation-ledger readback (128 vs 64, topology residency tournament) before default promotion |
+
+**The biggest update is the overall flow.** OLD framing: 61k lineage gap → `CandidateOrdinal`
+blocked → `CandidateFeatureMatrix` not ready. CURRENT framing: Graphify lifecycle-ownership
+repair + exact source-selection namespace → 15-row packet/chunk lineage `PROVEN` → 15-row
+`CandidateOrdinalMapV1` `PROVEN` → 15-row `semantic_768` `PROVEN` → 15/25 `CandidateFeatureMatrixManifestV1`
+`PROVEN` (deterministic `ContextManifest` replay `PROVEN`) → scale exact identity 15 → 128 → 768
+(`OPEN`). The CandidateOrdinal/feature-matrix *machinery* is no longer what's blocked — the
+blocker is scaling exact identity and fixing execution/source ownership so the already-proven
+canary contracts can safely widen.
+
+**Corrected V1 completion boundary** (supersedes the earlier "15 exact lineage rows →
+`CandidateOrdinalMapV1` → `semantic_768` exact retrieval → deterministic `ContextManifestV1` →
+frozen validator → bounded read-only DAG → `ExecutionReceiptV1` → `WORKSTATION_V1_PROVEN`" framing):
+
+```
+GRAPHIFY EXECUTION AUTHORITY (fresh executionId, exact workspaceRevision, frozen source-selection manifest)
+  → LINEAGE COHORT (15 proven; 128, 768 open)
+  → CandidateOrdinalMapV1 (semantic_768, REQUIRED)
+  → CandidateFeatureMatrixManifestV1
+      latent_256 ref   — OPTIONAL, WARM
+      latent_128 view  — OPTIONAL, HOT
+      latent_64 view   — OPTIONAL, HOT-L1
+  → ContextManifestV1 (Frozen Validator)
+  → ParameterArtifactV1 (TypedRepairDagV1)
+  → ExecutionReceiptV1 → WORKSTATION_V1_PROVEN
+```
+
+Representation features stay **optional evidence** in V1, never a new blocker ahead of lineage —
+`semantic_768` remains the required semantic authority.
+
+**Highest-priority chain, corrected**:
+`GRAPHIFY-EXECUTION-LEDGER-SCHEMA-02` → `GRAPHIFY-DAILY-COORDINATOR-01` → `GRAPHIFY-DAILY-CANARY-02`
+→ `SOURCE-SELECTION-AUTHORITY-01` → `PKT-LINEAGE-08` success canary → 15→128 exact lineage →
+128→768 exact lineage → `CandidateFeatureMatrix` parity → latent representation admission → DAG
+parameter materialization (already proven, see correction above) → bounded read-only DAG receipt.
+
+**Scope note on the remainder of this operator message (not undertaken this pass)**: the same
+message went on to propose ~15 additional gates (`TREE-SITTER-STRUCTURAL-UNIT-01` through
+`PATCH-PROPOSAL-VALIDATION-01`), a full `LSP-CROSS-FILE-SOURCE-READER-01` architecture spec, and a
+`BestFitScoreV1`/OKF-calibration workstream. None of that is registered or started here — it is
+substantially larger than a single-session scope and deserves its own dedicated pass (likely its
+own OpenSpec change or changes, not force-fit under this file's single-authority scope without
+review). Flagging its existence here so it isn't lost, not registering it as gates yet.
+
+## SESSION HANDOFF (2026-09-03, end of session)
+
+**Error check, run at session end**: `packages/parent-atlas` `tsc -p tsconfig.json` — 0 errors.
+`services/go-retrieval-service` — `go build ./...`, `go vet ./...`, `go test ./...` all pass
+(0.09s). `sveltekit-frontend` `tsgo --noEmit` — 87 errors repo-wide, **none touching any file this
+session edited or created**; every one is pre-existing (missing npm packages —
+`@mendable/firecrawl-js`, `pdf-lib`, `nodemailer`, `nodejs-whisper`, `piper-wasm`, `fastmcp`,
+`mammoth`, `@playwright/test`; `QdrantClient.search` API drift; unrelated schema-export
+mismatches). Confirmed by cross-referencing every error's file path against this session's touched
+file list below — zero overlap.
+
+**Files this session actually created or edited** (verified against `git status`, not assumed):
+
+*Closed/corrected gates (this file, `parent-atlas-retrieval-lineage-dag-convergence`)*:
+- `sveltekit-frontend/drizzle/manual/20260903_graphify_execution_ledger_v1.sql` — append-only
+  trigger added; migration proof redone correctly after catching a real rollback-methodology bug
+  mid-session (first attempt silently committed to the live DB, caught via `to_regclass()`,
+  reverted, redone with the migration's own `BEGIN`/`COMMIT` stripped).
+- `sveltekit-frontend/src/lib/server/atlas/tensors/representation-artifact-v1.ts` (+`.spec.ts`) —
+  `NESTED_LATENT_REPRESENTATION_FAMILY_V1`, `assertRepresentationFamilyRevisionBinding()`.
+- `sveltekit-frontend/src/lib/server/atlas/board/graphify-current-workspace-revision.ts` (new,
+  +`.spec.ts`), `daily-graphify-board-recommendations.ts` (edited) — real `workspaceRevision`
+  resolver, degrades to `null` on DB failure per this repo's Degraded Response Contract.
+- `python/atlas_synthesis_context_graph.py` (new, +`test_atlas_synthesis_context_graph.py`),
+  `python/miniforge_nlp_sidecar_oak.py` (edited) — `POST /synthesis/context-graph` on the live
+  `:8095` sidecar. Live end-to-end smoke-tested through the real container.
+- `proto/active/retrieval.proto`, `services/go-retrieval-service/main.go` (+ regenerated
+  `proto/retrieval/retrieval.pb.go`/`retrieval_grpc.pb.go`, + new `representation_test.go`) —
+  `representation_id`/`representation_used`/`representation_fallback_reason` wire fields,
+  `resolveRepresentation()` registry, never-silent-fallback.
+- `packages/parent-atlas/src/core/kernel-operator-library-v1.ts`,
+  `kernel-bound-dag-planner-v1.ts` (+`.spec.ts`), `candidate-representation-slice-v1.ts` (new,
+  +`.spec.ts`), `oak-candidate-latent-owner-v1.ts` (new), `src/index.ts` (barrel) — `FETCH_LATENT_REPRESENTATION`
+  operator kind, `CandidateRepresentationSliceV1` contract.
+- `sveltekit-frontend/src/lib/server/atlas/policy/oak-dag-candidate-latent-handler-v1.ts` (new,
+  +`.spec.ts`), `oak-dag-runtime-registry-v1.ts` (+`.spec.ts`, fixed a pre-existing stale hardcoded
+  handler count) — candidate-side `FETCH_LATENT` handler wrapping
+  `PostgresLatent256CandidateProvider`.
+
+*Registered but not built* (still `OPEN`, tracked in this file, not started): gate 6
+(`CANDIDATE-FEATURE-MATRIX-REPRESENTATION-01`), gate 8 (`RECOMMENDATION-TOURNAMENT-01`), the
+`latent_128`/`latent_64` derive-by-transform sub-case of `FETCH_LATENT`, wiring the DAG execution
+path into any live HTTP route, promoting the query-time neural-decoder encoder out of
+`SHADOW_READONLY`, and the large operator-dictated ~15-gate/LSP/`BestFitScoreV1` workstream flagged
+in the section immediately above this one.
+
+**Two corrections made mid-session that reversed earlier statements in this same conversation**,
+recorded here so a fresh session doesn't have to re-derive them: (1) gate 2
+(`LATENT256-QUERY-ENCODER-01`) is NOT blocked — a live GPU query-time encoder already exists
+(`:8121`), just running in `SHADOW_READONLY`; (2) gate 4 (`DAG-PARAMETER-MATERIALIZATION-01`) was
+never actually broken — the planner already materializes real `ParameterArtifactV1`s per action.
+
+**Next-session starting point**: `npx openspec validate parent-atlas-retrieval-lineage-dag-convergence
+--type change --strict --json` and `node scripts/atlas/audit-openspec-portfolio-v1.mjs` both pass
+clean as of this handoff — re-run both first thing, since this file is under heavy concurrent
+editing (multiple sections in this same file were found modified by other sessions mid-turn,
+several times, throughout this session). Read the file's current tail before appending — do not
+assume it still ends where this handoff says it does.
+
+## FETCH-LATENT-DERIVED-VIEWS-02 (2026-09-04)
+
+**OPEN_CONTRACT_GAP / LIVE_REPLAY_OPEN.** A read-only audit of the existing owners is recorded
+in `docs/reports/fetch-latent-derived-views-v2.json`. `latent_256` remains the persisted learned
+parent served by `PostgresLatent256CandidateProvider`; `latent_128` remains a virtual `PREFIX_L2`
+view derived from that parent; `latent_64` remains an existing physically persisted learned output
+and must not be recreated through a second derived-view or storage path.
+
+The audit found one unresolved contradiction: an existing candidate-feature fixture still labels
+`latent_64` as `NESTED_PREFIX_L2_RENORMALIZE` from `latent_256`, despite the authoritative family
+contract classifying the persisted `latent_64` column as a learned output from `semantic_768`. This
+must be reconciled before representation bindings are admitted to the feature matrix.
+
+The audit added no provider, table, collection, cache record, Graphify run, or retrieval vote. It
+proves the existing owner/shape declarations only. Live persisted-vector readback,
+CandidateOrdinal parity, derived checksums, and query-time promotion remain **UNPROVEN**. Raw
+vectors remain excluded from DAG JSON, with `canonicalAuthority=false` and `writesPerformed=false`.
+
+The next gate is `CANDIDATE-FEATURE-MATRIX-REPRESENTATION-01`: reuse these owners and add only
+representation references plus ordinal-alignment checksums to the existing feature-matrix manifest.
+
+## CANDIDATE-FEATURE-MATRIX-REPRESENTATION-01 (2026-09-04)
+
+**STATIC_OWNER_SURFACE_PROVEN / MANIFEST_OPEN.** The read-only audit
+`docs/reports/candidate-feature-matrix-representation-v1.json` confirms that the existing
+CandidateOrdinal owner, feature-row/snapshot owners, latent-256 hydration receipt, and
+representation-family contract already expose the required identity/revision inputs. A dedicated
+manifest still does not exist and is intentionally not created in this script-first pass.
+
+The future manifest must carry opaque references and checksums for `latent_256`, `latent_128`, and
+`latent_64`, plus representation availability/alignment by the same CandidateOrdinal map. It must
+not contain raw vectors, create a new retrieval vote, or change ranking behavior. Live snapshot
+replay and cross-representation ordinal parity remain **UNPROVEN**.
+
+## LATENT-REPRESENTATION-SEMANTICS-03 + FETCH-LATENT-DERIVED-VIEWS-02 latent_128 derive (2026-09-04, real code, not audit-only)
+
+**Concurrent-session note**: the two sections immediately above this one (registered moments
+earlier by a different session, same file) are script-first, read-only audits. This section
+implements real, tested code that resolves the exact contradiction the `FETCH-LATENT-DERIVED-VIEWS-02`
+audit flagged as unresolved -- "an existing candidate-feature fixture still labels `latent_64` as
+`NESTED_PREFIX_L2_RENORMALIZE` from `latent_256`, despite the authoritative family contract
+classifying the persisted `latent_64` column as a learned output from `semantic_768`." That
+contradiction is now resolved in code, not just flagged:
+
+- `packages/parent-atlas/src/core/latent-derived-view-transform-v1.ts` (+`.spec.ts`, 7 tests) --
+  new, pure, DB-free `deriveNestedPrefixL2RenormalizedView(parentVector, targetDimensions)`
+  (prefix + L2-renormalize). Exported from the package barrel, package rebuilt (`tsc -p
+  tsconfig.json`, 0 errors) so `sveltekit-frontend` actually sees the new export.
+- `sveltekit-frontend/src/lib/server/atlas/tensors/representation-artifact-v1.ts` --
+  `NESTED_LATENT_REPRESENTATION_FAMILY_V1` members now carry two independent axes,
+  `origin: 'LEARNED' | 'DERIVED'` and `materialization: 'VIRTUAL' | 'PERSISTED'`, plus a
+  `coProducedWith` field for the case neither axis alone can express: `latent_64` is
+  `LEARNED` + `PERSISTED` (own NestedSemanticAutoencoder forward pass over `semantic_768`) but
+  **co-produced with** `latent_256` in the same run/checkpoint, not derived from it.
+  `latent_128` is the true `DERIVED` + `VIRTUAL` case (`transform:
+  'NESTED_PREFIX_L2_RENORMALIZE'`, `parentRepresentationId: 'latent_256'`). `latent_256` itself is
+  `LEARNED` + `PERSISTED`, `coProducedWith: null`. This directly corrects an operator proposal
+  earlier in this same conversation turn that framed `latent_64` as `DERIVED` with
+  `parentRepresentationId: 'latent_256'` -- that framing is what the audit fixture above also got
+  wrong, per this file's own already-existing, unchanged live audit. 3 new tests added
+  (22/22 pass), backward-compatible with all 19 pre-existing tests in the same file.
+- `packages/parent-atlas/src/core/oak-candidate-latent-owner-v1.ts` -- `oakCandidateLatentInputV1Schema`
+  gained `representationId: z.enum(['latent_256', 'latent_128']).default('latent_256')`.
+  `latent_64` deliberately excluded from this candidate-side fetch contract -- codebase_chunk_index
+  has no `latent_64_checkpoint_revision` column (checked live via `grep` across every
+  `drizzle/*.sql` migration; only `latent_256_checkpoint_revision` exists), so there is no column
+  to bind provenance against without asserting an unproven identity between two independently
+  writable columns. Left open, not faked.
+- `sveltekit-frontend/src/lib/server/atlas/policy/oak-dag-candidate-latent-handler-v1.ts` -- now
+  branches on `representationId`. `latent_256` path unchanged (exact physical read, as before).
+  New `latent_128` path: reuses the SAME `PostgresLatent256CandidateProvider.hydrate()` call (no
+  new query), applies `deriveNestedPrefixL2RenormalizedView` per candidate, computes a derived
+  `vectorsChecksum` distinct from the parent's, folds any dimension-mismatched or non-finite parent
+  vector into `degraded` (never thrown past the handler). Raw vectors (parent AND derived) are
+  still discarded before the function returns -- only `CandidateRepresentationSliceV1`
+  (checksums/ordinals) crosses into the DAG receipt, same hard rule as before. 2 new tests added
+  (7/7 pass in this file): one proving the derived checksum differs from a plain `latent_256`
+  checksum of the identical fixture (proves the transform actually ran), one proving a
+  shape-invalid parent vector degrades rather than throwing.
+
+**What remains open** (unchanged from the audit sections above, not narrowed by this work):
+`CANDIDATE-FEATURE-MATRIX-REPRESENTATION-01`'s manifest itself (no `CandidateFeatureMatrixManifestV1`
+representation-columns implementation exists yet -- this round only fixed the representation family
+contract and the candidate-side fetch handler it depends on); `latent_64` candidate-side FETCH_LATENT
+(blocked on the missing checkpoint-revision column, tracked above); the query-time neural-decoder
+encoder at `:8121` remains `SHADOW_READONLY`, untouched by this round; no DAG execution path was
+wired into any live HTTP route.
+
+**Verification this round**: `packages/parent-atlas` `tsc -p tsconfig.json` -- 0 errors, package
+rebuilt. `sveltekit-frontend` `tsgo --noEmit -p tsconfig.json` -- 0 errors in either touched file
+(grepped by filename against the full run). Package's own vitest suite (`vitest run` from
+`packages/parent-atlas`, using `sveltekit-frontend`'s vitest binary since the package has no
+vitest config of its own) -- 190/190 `.spec.ts` tests pass (the 86 `test/*.test.mjs` "failures" in
+that same run are a pre-existing, unrelated node:test-runner-only test suite that vitest cannot
+collect -- not a regression, confirmed by the 0-failed/190-passed spec-test tally in the same
+output). `sveltekit-frontend` vitest: `representation-artifact-v1.spec.ts` 22/22 pass,
+`oak-dag-candidate-latent-handler-v1.spec.ts` 7/7 pass.
+
+**Manifest planning follow-up (2026-09-04).** The script-first plan
+`docs/reports/candidate-feature-matrix-representation-plan-v1.json` freezes the intended manifest
+shape: `semantic_768` is required; latent-256 is an optional persisted parent; latent-128 is an
+optional virtual view; latent-64 is an optional persisted physical output. Unavailable live
+bindings remain `null`; no fallback identity is permitted. The manifest uses opaque artifact
+references and ordered CandidateOrdinal/alignment checksums, never inline vectors. Live binding and
+replay remain open.

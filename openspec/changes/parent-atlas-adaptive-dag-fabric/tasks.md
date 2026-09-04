@@ -298,3 +298,21 @@ implied when `atlas/research/*` looked like the live planner substrate.
   are real and proven; introducing a second broker before the first
   contract is even defined is the exact anti-pattern this change exists to
   avoid.
+## LLAMA-SERVER-ORNITH-RUNTIME-OWNER-01 — live model identity
+
+- [x] Route the existing decomposition, synthesis/enrichment, pattern-reranking,
+  entity-extraction, and Bifrost chat fallback callers through the existing
+  `llama-server-model-resolver.ts` against the configured `:8090` endpoint.
+  Requests use the model ID returned by `GET /v1/models` when available; the
+  configured alias remains a bounded fallback only when the server is
+  unreachable.
+- [x] Keep responsibilities separate: `:8090` owns LLM NLP/enrichment and
+  synthesis; the sklearn NLP sidecar remains the domain-classifier owner;
+  `:8121` remains the separate PyTorch neural-decoder lane; Ollama remains
+  the embedding lane.
+- [ ] Live Ornith identity and output parity remain environment-dependent and
+  require a running `:8090` health/model probe. The workstation policy is
+  `LOADED_ACTIVE` with an `ornith-1.5` family allowlist; deployments may use
+  `CONFIGURED_VERIFY` to fail closed on model drift. No canonical writes,
+  classifier promotion, Graphify execution, or hidden-state persistence is
+  implied by this wiring.

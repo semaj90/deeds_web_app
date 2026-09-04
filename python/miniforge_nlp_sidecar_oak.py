@@ -3,8 +3,10 @@
 
 from miniforge_nlp_sidecar_v2 import app
 from atlas_oak_kernel import router as oak_router
+from atlas_synthesis_context_graph import router as synthesis_context_graph_router
 
 app.include_router(oak_router)
+app.include_router(synthesis_context_graph_router)
 
 if __name__ == "__main__":
     import os

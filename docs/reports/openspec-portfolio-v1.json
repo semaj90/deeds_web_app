@@ -1,11 +1,11 @@
 {
   "schema": "atlas.openspec-portfolio.v1",
-  "generatedAt": "2026-09-03T02:05:11.167Z",
+  "generatedAt": "2026-09-04T02:02:57.253Z",
   "readOnly": true,
   "currentAuthority": "parent-atlas-retrieval-lineage-dag-convergence",
   "currentAuthorityCount": 1,
   "status": "PORTFOLIO_AUDIT_PROVEN",
-  "changeCount": 74,
+  "changeCount": 76,
   "changes": [
     {
       "changeId": "ace-hyperrag-chr97-graphify-audit",
@@ -150,9 +150,9 @@
     {
       "changeId": "inference-wiring-deep-audit-aug22",
       "taskProgress": {
-        "done": 48,
+        "done": 49,
         "open": 1,
-        "total": 49
+        "total": 50
       },
       "reachableTaskProgress": null,
       "queueClass": "FROZEN_REFERENCE",
@@ -234,9 +234,9 @@
     {
       "changeId": "parent-atlas-adaptive-dag-fabric",
       "taskProgress": {
-        "done": 5,
-        "open": 5,
-        "total": 10
+        "done": 7,
+        "open": 6,
+        "total": 13
       },
       "reachableTaskProgress": null,
       "queueClass": "FROZEN_REFERENCE",
@@ -302,6 +302,20 @@
       "mayGenerateNewWork": false
     },
     {
+      "changeId": "parent-atlas-best-fit-score-fabric",
+      "taskProgress": {
+        "done": 30,
+        "open": 4,
+        "total": 34
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
+      "currentGateRefs": [],
+      "blockedBy": [],
+      "supersededBy": null,
+      "mayGenerateNewWork": false
+    },
+    {
       "changeId": "parent-atlas-branch-merge-consolidation-aug20",
       "taskProgress": {
         "done": 18,
@@ -346,9 +360,9 @@
     {
       "changeId": "parent-atlas-compiler-semantic-graph-resolution",
       "taskProgress": {
-        "done": 19,
-        "open": 13,
-        "total": 32
+        "done": 40,
+        "open": 18,
+        "total": 58
       },
       "reachableTaskProgress": null,
       "queueClass": "FROZEN_REFERENCE",
@@ -668,8 +682,8 @@
     {
       "changeId": "parent-atlas-nlp-sidecar-feature-compiler",
       "taskProgress": {
-        "done": 24,
-        "open": 29,
+        "done": 26,
+        "open": 27,
         "total": 53
       },
       "reachableTaskProgress": null,
@@ -724,9 +738,9 @@
     {
       "changeId": "parent-atlas-ontology-kernel",
       "taskProgress": {
-        "done": 47,
-        "open": 21,
-        "total": 68
+        "done": 60,
+        "open": 25,
+        "total": 85
       },
       "reachableTaskProgress": null,
       "queueClass": "FROZEN_REFERENCE",
@@ -822,14 +836,14 @@
     {
       "changeId": "parent-atlas-retrieval-lineage-dag-convergence",
       "taskProgress": {
-        "done": 35,
-        "open": 15,
-        "total": 50
+        "done": 95,
+        "open": 62,
+        "total": 157
       },
       "reachableTaskProgress": {
-        "done": 35,
-        "open": 15,
-        "total": 50
+        "done": 95,
+        "open": 62,
+        "total": 157
       },
       "queueClass": "CURRENT_AUTHORITY",
       "currentGateRefs": [
@@ -863,6 +877,20 @@
         "done": 0,
         "open": 0,
         "total": 0
+      },
+      "reachableTaskProgress": null,
+      "queueClass": "FROZEN_REFERENCE",
+      "currentGateRefs": [],
+      "blockedBy": [],
+      "supersededBy": null,
+      "mayGenerateNewWork": false
+    },
+    {
+      "changeId": "parent-atlas-search-classifier-sidecar",
+      "taskProgress": {
+        "done": 36,
+        "open": 0,
+        "total": 36
       },
       "reachableTaskProgress": null,
       "queueClass": "FROZEN_REFERENCE",
@@ -930,9 +958,9 @@
     {
       "changeId": "parent-atlas-topology-representation-admission",
       "taskProgress": {
-        "done": 3,
-        "open": 15,
-        "total": 18
+        "done": 6,
+        "open": 18,
+        "total": 24
       },
       "reachableTaskProgress": null,
       "queueClass": "FROZEN_REFERENCE",

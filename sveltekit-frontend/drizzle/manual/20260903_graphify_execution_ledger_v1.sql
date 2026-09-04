@@ -51,7 +51,7 @@ CREATE TABLE IF NOT EXISTS public.graphify_executions (
   -- Optional linkage to the existing graphify_runs snapshot/inventory row this execution is
   -- associated with, for the transition period. Nullable: a pure execution-ledger consumer need
   -- not depend on graphify_runs at all.
-  graphify_run_id uuid REFERENCES public.graphify_runs(run_id) ON DELETE RESTRICT,
+  legacy_graphify_run_id uuid REFERENCES public.graphify_runs(run_id) ON DELETE RESTRICT,
 
   parser_contract_version text NOT NULL,
   extraction_contract_version text NOT NULL,
@@ -80,7 +80,10 @@ CREATE TABLE IF NOT EXISTS public.graphify_executions (
 
   CHECK (workspace_revision ~ '^sha256:[a-f0-9]{64}$'),
   CHECK (status IN ('RUNNING', 'COMPLETED', 'COMPLETED_REUSED', 'FAILED', 'ABANDONED')),
-  CHECK (completed_at IS NULL OR status IN ('COMPLETED', 'COMPLETED_REUSED', 'FAILED', 'ABANDONED'))
+  CHECK ((status = 'RUNNING' AND completed_at IS NULL) OR
+         (status <> 'RUNNING' AND completed_at IS NOT NULL)),
+  CHECK ((status = 'COMPLETED_REUSED' AND reused_graph_revision IS NOT NULL) OR
+         (status <> 'COMPLETED_REUSED' AND reused_graph_revision IS NULL))
 );
 
 -- Deliberately NO unique constraint on (workspace_id, workspace_revision, parser_contract_version)
@@ -90,9 +93,9 @@ CREATE INDEX IF NOT EXISTS graphify_executions_workspace_revision_idx_v1
   ON public.graphify_executions (workspace_id, workspace_revision);
 CREATE INDEX IF NOT EXISTS graphify_executions_status_started_at_idx_v1
   ON public.graphify_executions (status, started_at DESC);
-CREATE INDEX IF NOT EXISTS graphify_executions_graphify_run_id_idx_v1
-  ON public.graphify_executions (graphify_run_id)
-  WHERE graphify_run_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS graphify_executions_legacy_graphify_run_id_idx_v1
+  ON public.graphify_executions (legacy_graphify_run_id)
+  WHERE legacy_graphify_run_id IS NOT NULL;
 -- Fast lookup for stale-run reconciliation: RUNNING executions whose heartbeat has gone quiet.
 CREATE INDEX IF NOT EXISTS graphify_executions_running_heartbeat_idx_v1
   ON public.graphify_executions (last_heartbeat_at)
@@ -100,7 +103,7 @@ CREATE INDEX IF NOT EXISTS graphify_executions_running_heartbeat_idx_v1
 
 CREATE TABLE IF NOT EXISTS public.graphify_execution_files (
   execution_id uuid NOT NULL REFERENCES public.graphify_executions(execution_id) ON DELETE RESTRICT,
-  file_id uuid NOT NULL,
+  legacy_file_id uuid NULL,
 
   workspace_revision text NOT NULL,
   source_ref text NOT NULL,
@@ -110,7 +113,7 @@ CREATE TABLE IF NOT EXISTS public.graphify_execution_files (
 
   observed_at timestamptz NOT NULL DEFAULT now(),
 
-  PRIMARY KEY (execution_id, file_id),
+  PRIMARY KEY (execution_id, source_ref),
 
   CHECK (workspace_revision ~ '^sha256:[a-f0-9]{64}$'),
   CHECK (code_source_revision ~ '^sha256:[a-f0-9]{64}$'),
@@ -118,14 +121,64 @@ CREATE TABLE IF NOT EXISTS public.graphify_execution_files (
   CHECK (byte_length >= 0)
 );
 
--- Append-only in practice (no UPDATE/DELETE path is provided by this migration) — this is what
--- makes "which execution observed this exact sourceRef@sourceRevision under this exact
--- workspaceRevision" answerable without depending on graphify_files.last_seen_run_id, which is
--- mutable current-state information, not historical proof.
+-- Append-only, database-enforced (see graphify_execution_files_reject_update/_delete triggers
+-- below — UPDATE/DELETE both raise) — this is what makes "which execution observed this exact
+-- sourceRef@sourceRevision under this exact workspaceRevision" answerable without depending on
+-- graphify_files.last_seen_run_id, which is mutable current-state information, not historical
+-- proof.
 CREATE INDEX IF NOT EXISTS graphify_execution_files_source_ref_idx_v1
   ON public.graphify_execution_files (workspace_revision, source_ref);
 CREATE INDEX IF NOT EXISTS graphify_execution_files_code_source_revision_idx_v1
   ON public.graphify_execution_files (code_source_revision);
+
+CREATE TABLE IF NOT EXISTS public.graphify_execution_stages (
+  execution_id uuid NOT NULL REFERENCES public.graphify_executions(execution_id) ON DELETE RESTRICT,
+  stage text NOT NULL,
+  status text NOT NULL,
+  started_at timestamptz NULL,
+  completed_at timestamptz NULL,
+  input_checksum text NULL,
+  output_checksum text NULL,
+  receipt_ref text NULL,
+  error_code text NULL,
+  PRIMARY KEY (execution_id, stage),
+  CHECK (stage IN ('OPEN', 'SOURCE_SELECTION', 'INVENTORY', 'AST_PARSE', 'STRUCTURAL_EXTRACT',
+                   'SEMANTIC_ENRICH', 'GRAPH_BUILD', 'PROJECT', 'VALIDATE', 'CLOSE')),
+  CHECK (status IN ('PENDING', 'RUNNING', 'COMPLETED', 'SKIPPED', 'FAILED')),
+  CHECK ((status IN ('PENDING', 'RUNNING') AND completed_at IS NULL) OR
+         (status IN ('COMPLETED', 'SKIPPED', 'FAILED') AND completed_at IS NOT NULL))
+);
+
+CREATE INDEX IF NOT EXISTS graphify_execution_files_workspace_idx_v1
+  ON public.graphify_execution_files (workspace_revision, execution_id);
+
+-- GRAPHIFY-EXECUTION-LEDGER-SCHEMA-02 review finding: "append-only in practice" (comment above)
+-- was not database-enforced — nothing rejected an UPDATE or DELETE against this table. This
+-- trigger closes that gap. It is additive (CREATE FUNCTION / CREATE TRIGGER only, no ALTER on
+-- existing objects) and scoped to graphify_execution_files ONLY — graphify_execution_stages is
+-- intentionally NOT covered, since its status/timestamp columns are meant to transition in place
+-- (PENDING -> RUNNING -> COMPLETED/SKIPPED/FAILED) as a normal part of the coordinator's own
+-- lifecycle, unlike the append-only observation-evidence table below.
+CREATE OR REPLACE FUNCTION public.graphify_execution_files_reject_mutation()
+RETURNS trigger AS $$
+BEGIN
+  RAISE EXCEPTION
+    'graphify_execution_files is append-only evidence: % is not permitted (execution_id=%, source_ref=%)',
+    TG_OP,
+    COALESCE(OLD.execution_id, NEW.execution_id),
+    COALESCE(OLD.source_ref, NEW.source_ref);
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS graphify_execution_files_reject_update ON public.graphify_execution_files;
+CREATE TRIGGER graphify_execution_files_reject_update
+  BEFORE UPDATE ON public.graphify_execution_files
+  FOR EACH ROW EXECUTE FUNCTION public.graphify_execution_files_reject_mutation();
+
+DROP TRIGGER IF EXISTS graphify_execution_files_reject_delete ON public.graphify_execution_files;
+CREATE TRIGGER graphify_execution_files_reject_delete
+  BEFORE DELETE ON public.graphify_execution_files
+  FOR EACH ROW EXECUTE FUNCTION public.graphify_execution_files_reject_mutation();
 
 COMMENT ON TABLE public.graphify_executions IS
   'True per-attempt execution history. One row per Graphify invocation — ALWAYS a fresh execution_id, even when workspace_revision is unchanged from a prior execution. Distinct from graphify_runs, which graphify_runs_workspace_revision_parser_uq_v2 constrains to one row per (workspace_id, workspace_revision, parser_contract_version) and therefore cannot represent repeat executions over unchanged source bytes.';
@@ -134,7 +187,7 @@ COMMENT ON COLUMN public.graphify_executions.workspace_revision IS
 COMMENT ON COLUMN public.graphify_executions.reused_graph_revision IS
   'Set when this execution determined an existing COMPLETED/COMPLETED_REUSED graph artifact already satisfies its derivation tuple and reused it rather than recomputing — the execution_id itself is still fresh, only the derived graph output was reused.';
 COMMENT ON TABLE public.graphify_execution_files IS
-  'Immutable, append-only run-to-file observation membership. Proves historical execution/file binding independent of graphify_files.last_seen_run_id, which is mutable current-state pointer information, not a historical audit trail.';
+  'Immutable, append-only run-to-file observation membership (enforced by graphify_execution_files_reject_update/_delete BEFORE triggers — this is a database guarantee, not a convention). Proves historical execution/file binding independent of graphify_files.last_seen_run_id, which is mutable current-state pointer information, not a historical audit trail.';
 
 COMMIT;
 

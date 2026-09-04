@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import type { AdaptiveDagActionV1, AdaptiveDagPlanV1, DagActionKind, KernelDagExecutionBindingV1 } from '@deeds/parent-atlas';
+import { resolveKernelDagParameterArtifactV1, type AdaptiveDagActionV1, type AdaptiveDagPlanV1, type DagActionKind, type KernelDagExecutionBindingV1, type ParameterArtifactV1 } from '@deeds/parent-atlas';
 import { runBoundedExecutionPlan, type ExecutorLimits, type ResourceClass } from './bounded-executor.js';
 
 export type OakDagActionHandlerV1 = {
@@ -64,6 +64,7 @@ export async function executeOakDagThroughBoundedExecutorV1(input: {
 	plan: AdaptiveDagPlanV1;
 	handlers: readonly OakDagActionHandlerV1[];
 	bindings: readonly KernelDagExecutionBindingV1[];
+	parameterArtifacts?: ReadonlyMap<string, ParameterArtifactV1>;
 	limits?: ExecutorLimits;
 }): Promise<OakExecutionReceiptV1> {
 	if (input.plan.actions.some((action) => action.mutationPolicy === 'MUTATES_WITH_RECEIPT')) {
@@ -90,12 +91,19 @@ export async function executeOakDagThroughBoundedExecutorV1(input: {
 		priority: input.plan.actions.length - input.plan.actions.indexOf(action),
 		dependencies: action.parentActionIds,
 		resourceClass: RESOURCE_BY_ACTION[action.actionKind] ?? 'CPU_LIGHT',
-		run: async () => {
-			startedAt.set(action.actionId, Date.now());
-			const binding = bindingByActionId.get(action.actionId)!;
-			const handler = byImplementationRef.get(binding.implementationRef)!;
-			const result = await withTimeout(
-				handler.run({ action, parentResults: action.parentActionIds.map((id) => completed.get(id)), binding }),
+			run: async () => {
+				startedAt.set(action.actionId, Date.now());
+				const binding = bindingByActionId.get(action.actionId)!;
+				const effectiveBinding = action.parameterArtifactRef
+					? { ...binding, boundArguments: resolveKernelDagParameterArtifactV1({
+						action,
+						binding,
+						artifact: input.parameterArtifacts?.get(action.parameterArtifactRef) ?? (() => { throw new Error(`OAK_EXEC_PARAMETER_ARTIFACT_MISSING:${action.actionId}`); })(),
+					}) }
+					: binding;
+				const handler = byImplementationRef.get(effectiveBinding.implementationRef)!;
+				const result = await withTimeout(
+					handler.run({ action, parentResults: action.parentActionIds.map((id) => completed.get(id)), binding: effectiveBinding }),
 				action.timeoutMs,
 				action.actionId,
 			);

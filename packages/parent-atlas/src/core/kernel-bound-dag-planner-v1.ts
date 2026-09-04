@@ -5,6 +5,7 @@ import { type AtlasKernelFunctionCatalogV1 } from './kernel-function-catalog-v1.
 import { findAtlasKernelFunctionV1 } from './kernel-function-catalog-v1.js';
 import { findKernelOperator, type KernelOperatorKind, type KernelOperatorLibraryV1 } from './kernel-operator-library-v1.js';
 import { buildAdaptiveDagPlanV1, type AdaptiveDagPlanV1, type DagActionKind } from './adaptive-dag-plan-v1.js';
+import { buildParameterArtifactV1 } from './parameter-artifact-v1.js';
 
 const sha256Hex = z.string().regex(/^[a-f0-9]{64}$/);
 
@@ -14,6 +15,9 @@ export const kernelBoundDagPlannerInputSchema = z.object({
   plannerRevision: z.string().min(1),
   classificationRevision: z.string().min(1),
   boundArguments: z.record(z.string(), z.unknown()),
+  /** Optional prevalidated per-operator arguments. The request-wide object is
+   * retained only as a compatibility fallback until a schema registry exists. */
+  operatorArgumentsByOperatorId: z.record(z.string(), z.record(z.string(), z.unknown())).optional(),
   evidenceRefs: z.array(z.string().min(1)),
   inputChecksum: sha256Hex,
 }).strict();
@@ -39,6 +43,7 @@ const actionKindForOperator: Partial<Record<KernelOperatorKind, DagActionKind>> 
   GET_SOURCE_SPAN: 'FETCH_FILE', GET_AST_EVIDENCE: 'AST_SCAN',
   INTERSECT_ELIGIBILITY: 'FETCH_POSTGRES', RERANK: 'RERANK', VALIDATE_SCHEMA: 'SIMDJSON_SCAN',
   RUN_TEST: 'FETCH_FILE', RUN_TYPECHECK: 'FETCH_FILE', COMPARE_REVISION: 'FETCH_POSTGRES', BUILD_CONTEXT: 'BUILD_CONTEXT',
+  FETCH_LATENT_REPRESENTATION: 'FETCH_LATENT',
 };
 
 /** Lower one catalog function into the bounded adaptive-DAG action contract. */
@@ -73,15 +78,24 @@ export function planKernelBoundDagV1(input: {
     if (!operator) throw new Error(`KERNEL_BOUND_PLAN_UNDECLARED_OPERATOR:${step.operatorId}`);
     const actionKind = actionKindForOperator[operator.kind];
     if (!actionKind) throw new Error(`KERNEL_BOUND_PLAN_UNMAPPED_OPERATOR:${operator.kind}`);
-    const actionBody = { functionId: fn.functionId, stepId: step.stepId, boundArguments: input.request.boundArguments, evidenceRefs: input.request.evidenceRefs };
+    const operatorArguments = input.request.operatorArgumentsByOperatorId?.[operator.operatorId]
+      ?? input.request.boundArguments;
+    const parameterArtifact = buildParameterArtifactV1({
+      actionId: `${input.request.planId}:${step.stepId}`,
+      actionKind,
+      schemaRef: operator.parameterSchemaRef ?? operator.inputSchemaId,
+      schemaRevision: operator.operatorRevision,
+      boundArguments: operatorArguments,
+    });
+    const actionBody = { functionId: fn.functionId, stepId: step.stepId, parameterArtifactId: parameterArtifact.artifactId, boundArguments: operatorArguments, evidenceRefs: input.request.evidenceRefs };
     return {
       actionId: `${input.request.planId}:${step.stepId}`,
       actionKind,
       parentActionIds: step.dependsOnStepIds.map((id) => `${input.request.planId}:${id}`),
       inputArtifactRefs: input.request.evidenceRefs,
       inputChecksum: sha256({ requestInputChecksum: input.request.inputChecksum, ...actionBody }),
-      parameterArtifactRef: null,
-      parameterChecksum: sha256(input.request.boundArguments),
+      parameterArtifactRef: parameterArtifact.artifactId,
+      parameterChecksum: parameterArtifact.parameterChecksum,
       outputContract: operator.outputSchemaId,
       mutationPolicy: fn.mutationPolicy === 'PROPOSE_ONLY' ? 'PROPOSE_ONLY' as const : 'READ_ONLY' as const,
       timeoutMs: 30_000,

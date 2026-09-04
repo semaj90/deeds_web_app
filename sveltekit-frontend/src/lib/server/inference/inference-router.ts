@@ -39,7 +39,7 @@ import { acquireGpuLease, releaseGpuLease, getGpuLeaseStatus } from './gpu-arbit
 import { inferLLM, healthCheck as trtHealthCheck, streamLLM as streamTrtLLM } from '$lib/server/trt-llm.js';
 import { inferLLM as inferTritonLLM, healthCheck as tritonHealthCheck, streamLLM as streamTritonLLM } from '$lib/server/triton-llm.js';
 import { bifrostChat, ollamaFetch, type OllamaMessage } from '$lib/server/ollama.js';
-import { LLAMA_SERVER_BASE_URL, getActiveLocalVlmModel } from '$lib/server/ai/local-llama-provider.js';
+import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL, getActiveLocalVlmModel } from '$lib/server/ai/local-llama-provider.js';
 import { getGpuStats, type GpuMemory } from '$lib/server/gpu/gpu-monitor.js';
 import {
   TURBOQUANT_BASE_URL,
@@ -759,7 +759,7 @@ async function tryOllamaVlm(request: InferenceRequest, startTime: number): Promi
 
 /** Raw llama-server VLM call — no VRAM swap logic */
 async function _ollamaVlmCall(request: InferenceRequest, startTime: number): Promise<InferenceResponse | null> {
-	const model = await getActiveLocalVlmModel().catch(() => 'gemma4:e4b-it-q4_K_M');
+	const model = await getActiveLocalVlmModel().catch(() => LOCAL_VLM_MODEL);
 
 	try {
 		const res = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
@@ -1084,7 +1084,7 @@ export async function* routeStreamingInference(
 
 	// Tier 5: llama-server compatibility wrapper (uses /api/chat if messages provided, /api/generate otherwise)
 	const ollamaUrl = getOllamaEndpoint();
-	const model = request.model ?? 'gemma4-rotorquant:latest';
+	const model = request.model ?? await getActiveLocalVlmModel().catch(() => LOCAL_VLM_MODEL);
 
 	const [endpoint, body] = request.messages
 		? [`${ollamaUrl}/api/chat`, { model, messages: request.messages, stream: true, keep_alive: '24h' }]

@@ -1,6 +1,6 @@
 {
   "schema": "atlas.live-source-lineage-table-audit.v1",
-  "generatedAt": "2026-09-02T19:03:10.746Z",
+  "generatedAt": "2026-09-04T00:01:37.410Z",
   "status": "SOURCE_LINEAGE_OWNER_SCHEMA_READY",
   "canonicalWrites": false,
   "tables": [
@@ -158,11 +158,19 @@
     },
     {
       "table_schema": "public",
+      "table_name": "graphify_edges"
+    },
+    {
+      "table_schema": "public",
       "table_name": "graphify_files"
     },
     {
       "table_schema": "public",
       "table_name": "graphify_runs"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "graphify_symbols"
     },
     {
       "table_schema": "public",
@@ -1162,6 +1170,12 @@
     },
     {
       "table_schema": "public",
+      "table_name": "graphify_edges",
+      "column_name": "source_revision",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
       "table_name": "graphify_files",
       "column_name": "source_ref",
       "data_type": "text"
@@ -1428,10 +1442,10 @@
         "source_ref",
         "workspace_revision"
       ],
-      "row_count": 61661,
-      "source_ref_count": 61661,
+      "row_count": 61715,
+      "source_ref_count": 61715,
       "source_revision_count": 0,
-      "workspace_revision_count": 61661,
+      "workspace_revision_count": 61715,
       "content_hash_count": 332,
       "content_digest_count": 0,
       "source_content_count": 0,
@@ -1563,11 +1577,11 @@
         "source_revision",
         "workspace_revision"
       ],
-      "row_count": 885,
-      "source_ref_count": 885,
-      "source_revision_count": 885,
-      "workspace_revision_count": 373,
-      "content_hash_count": 885,
+      "row_count": 25317,
+      "source_ref_count": 25317,
+      "source_revision_count": 25317,
+      "workspace_revision_count": 25273,
+      "content_hash_count": 25317,
       "content_digest_count": 0,
       "source_content_count": 0,
       "content_count": 0
@@ -1582,7 +1596,7 @@
       "workspace_revision"
     ],
     "missingColumns": [],
-    "rowCount": 885,
+    "rowCount": 25317,
     "status": "SCHEMA_READY"
   },
   "diagnostics": [],

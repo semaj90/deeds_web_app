@@ -1,9 +1,9 @@
 {
   "schema": "atlas.current-source-evidence-hydration.v1",
   "mode": "READ_ONLY_SOURCE_EVIDENCE_OWNER_AUDIT",
-  "inputRows": 111,
-  "exactRevisionMatches": 111,
-  "contentHydrated": 68,
+  "inputRows": 52,
+  "exactRevisionMatches": 52,
+  "contentHydrated": 9,
   "authoritativeNamespaces": 0,
   "namespaceStatus": "MISSING",
   "evidenceSpanReady": 0,
@@ -62,8 +62,8 @@
     }
   },
   "missingByReason": {
-    "CHUNK_OWNER_HAS_CONTENT_BUT_NO_SOURCE_REVISION": 68,
-    "CANONICAL_CHUNK_OWNER_MISSING": 43
+    "CANONICAL_CHUNK_OWNER_MISSING": 43,
+    "CHUNK_OWNER_HAS_CONTENT_BUT_NO_SOURCE_REVISION": 9
   },
   "writes": 0,
   "postgresWrites": false,
@@ -73,5 +73,5 @@
   "canonicalAuthority": false,
   "status": "SOURCE_EVIDENCE_HYDRATION_BLOCKED",
   "nextGate": "RESOLVE_REVISION_BOUND_CONTENT_AND_SOURCE_NAMESPACE_AUTHORITY",
-  "reportChecksum": "c8dd9104dcd2daae449a2558dc24000301ec3a705c3ef7a3afa22be572a3e51f"
+  "reportChecksum": "7cb589d8494b6b5cc739e5365eb69b14d90c3fa32e621538f6ea7eaa6440d13f"
 }

@@ -131,6 +131,6 @@ export async function assertExpectedLlamaModel(
  *
  * This keeps callers on the loaded model identity without forcing a startup warning.
  */
-export async function getActiveLocalVlmModel(): Promise<string> {
-	return getLlamaSessionModel();
+export async function getActiveLocalVlmModel(refresh = true): Promise<string> {
+	return getLlamaSessionModel(refresh);
 }

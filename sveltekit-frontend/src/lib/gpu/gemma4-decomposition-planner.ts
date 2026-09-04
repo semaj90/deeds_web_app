@@ -9,8 +9,7 @@
 
 import type { DecomposedQuery, Subgoal } from './gemma4-policy-orchestrator';
 import { bifrostChat } from '$lib/server/ollama.js';
-import { ENV } from '$lib/server/env.server.js';
-import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
+import { resolveLlamaInferenceTarget } from '$lib/server/llm/runtime-contract.js';
 
 const DECOMPOSITION_PROMPT = `You are an expert research assistant breaking down complex questions into focused search tasks.
 
@@ -84,12 +83,13 @@ User Question: ${originalQuery}${
 Respond with ONLY valid JSON, no other text.`;
 
   try {
-    // Try TurboQuant at :8090
-    const response = await fetch(`${ENV.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090'}/v1/chat/completions`, {
+    // Use the model actually loaded by llama-server at :8090.
+    const target = await resolveLlamaInferenceTarget();
+    const response = await fetch(`${target.baseUrl}/v1/chat/completions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: LLM_MODEL_ID,
+        model: target.model,
         messages: [
           {
             role: 'system',
@@ -238,7 +238,7 @@ export async function decomposeQueryFallback(
           content: `${DECOMPOSITION_PROMPT}\n\nUser Question: ${originalQuery}\n\nRespond with ONLY valid JSON.`
         }
       ],
-      LLM_MODEL_ID,
+      (await resolveLlamaInferenceTarget()).model,
       { temperature: 0.3, maxTokens: 1024 }
     );
 

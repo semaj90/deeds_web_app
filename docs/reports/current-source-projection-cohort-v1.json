@@ -1,6 +1,6 @@
 {
   "schema": "atlas.current-source-projection-cohort.v1",
-  "generatedAt": "2026-09-03T20:39:24.073Z",
+  "generatedAt": "2026-09-03T23:48:48.009Z",
   "mode": "READ_ONLY_COHORT_PLANNING",
   "inputs": {
     "comparison": {
@@ -11,6 +11,11 @@
       "path": "docs/reports/source-scope-reconciliation-v1.json",
       "manifestChecksum": "072324d4b80f8668d2425d27c3910f7c8d667c940077e2ab7df74f71707fcc25"
     }
+  },
+  "database": {
+    "table": "public.graphify_files",
+    "readOnly": true,
+    "error": null
   },
   "counts": {
     "total": 16629,
@@ -31,8 +36,14 @@
       "namespaceClassification": "EXACT_CURRENT",
       "hashClassification": "EXACT_FILE_BYTES",
       "filesystemHash": "57a4837b0c7a57ee8c790abbf9d11c5b08801c1952e2d6cee9e0ec80dc83022b",
+      "graphifyRowCount": 1,
+      "sourceRevision": "sha256:57a4837b0c7a57ee8c790abbf9d11c5b08801c1952e2d6cee9e0ec80dc83022b",
+      "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "parserContractVersion": null,
+      "extractionContractVersion": null,
+      "sourceBindingClassification": "EXACT_CURRENT_SOURCE",
       "eligibleCurrentSource": true,
-      "admissionReason": "EXACT_NAMESPACE_AND_FILE_BYTES"
+      "admissionReason": "EXACT_NAMESPACE_BYTES_AND_REVISION_BINDING"
     },
     {
       "relativePath": "sveltekit-frontend/src/lib/server/services/error-analysis/ToolInvoker.ts",
@@ -40,8 +51,14 @@
       "namespaceClassification": "EXACT_CURRENT",
       "hashClassification": "EXACT_FILE_BYTES",
       "filesystemHash": "ed076cdbcfa3d4542e62d750767a63a3770dbb5c1310b05476e849c7c673caa2",
+      "graphifyRowCount": 1,
+      "sourceRevision": "sha256:ed076cdbcfa3d4542e62d750767a63a3770dbb5c1310b05476e849c7c673caa2",
+      "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "parserContractVersion": null,
+      "extractionContractVersion": null,
+      "sourceBindingClassification": "EXACT_CURRENT_SOURCE",
       "eligibleCurrentSource": true,
-      "admissionReason": "EXACT_NAMESPACE_AND_FILE_BYTES"
+      "admissionReason": "EXACT_NAMESPACE_BYTES_AND_REVISION_BINDING"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/admin/cache/+page.server.ts",
@@ -49,8 +66,14 @@
       "namespaceClassification": "EXACT_CURRENT",
       "hashClassification": "EXACT_FILE_BYTES",
       "filesystemHash": "e02678aef7c7579be7c1ba9441464b098a65d4eefe471e43250e9b4e474330e8",
+      "graphifyRowCount": 1,
+      "sourceRevision": "sha256:e02678aef7c7579be7c1ba9441464b098a65d4eefe471e43250e9b4e474330e8",
+      "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "parserContractVersion": null,
+      "extractionContractVersion": null,
+      "sourceBindingClassification": "EXACT_CURRENT_SOURCE",
       "eligibleCurrentSource": true,
-      "admissionReason": "EXACT_NAMESPACE_AND_FILE_BYTES"
+      "admissionReason": "EXACT_NAMESPACE_BYTES_AND_REVISION_BINDING"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/admin/codebase-index/+page.ts",
@@ -58,8 +81,14 @@
       "namespaceClassification": "EXACT_CURRENT",
       "hashClassification": "EXACT_FILE_BYTES",
       "filesystemHash": "028a65cfda7baee19b14dfb3b8f9728612e4cb2d552faa0d23011bfb34c7e935",
+      "graphifyRowCount": 1,
+      "sourceRevision": "sha256:028a65cfda7baee19b14dfb3b8f9728612e4cb2d552faa0d23011bfb34c7e935",
+      "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "parserContractVersion": null,
+      "extractionContractVersion": null,
+      "sourceBindingClassification": "EXACT_CURRENT_SOURCE",
       "eligibleCurrentSource": true,
-      "admissionReason": "EXACT_NAMESPACE_AND_FILE_BYTES"
+      "admissionReason": "EXACT_NAMESPACE_BYTES_AND_REVISION_BINDING"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/cases/[id]/chat/+page.server.ts",
@@ -67,8 +96,14 @@
       "namespaceClassification": "EXACT_CURRENT",
       "hashClassification": "EXACT_FILE_BYTES",
       "filesystemHash": "57c99034d0c22587fe18d6b595be5e3ca15745c825afc1ed5e46da3dc97c8e27",
+      "graphifyRowCount": 1,
+      "sourceRevision": "sha256:57c99034d0c22587fe18d6b595be5e3ca15745c825afc1ed5e46da3dc97c8e27",
+      "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "parserContractVersion": null,
+      "extractionContractVersion": null,
+      "sourceBindingClassification": "EXACT_CURRENT_SOURCE",
       "eligibleCurrentSource": true,
-      "admissionReason": "EXACT_NAMESPACE_AND_FILE_BYTES"
+      "admissionReason": "EXACT_NAMESPACE_BYTES_AND_REVISION_BINDING"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/citations/+page.ts",
@@ -76,8 +111,14 @@
       "namespaceClassification": "EXACT_CURRENT",
       "hashClassification": "EXACT_FILE_BYTES",
       "filesystemHash": "3449a47c95f7647b70222aaea11253d323c34bbf4cd742b335a43bb7780bcc8d",
+      "graphifyRowCount": 1,
+      "sourceRevision": "sha256:3449a47c95f7647b70222aaea11253d323c34bbf4cd742b335a43bb7780bcc8d",
+      "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "parserContractVersion": null,
+      "extractionContractVersion": null,
+      "sourceBindingClassification": "EXACT_CURRENT_SOURCE",
       "eligibleCurrentSource": true,
-      "admissionReason": "EXACT_NAMESPACE_AND_FILE_BYTES"
+      "admissionReason": "EXACT_NAMESPACE_BYTES_AND_REVISION_BINDING"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/+page.ts",
@@ -85,8 +126,14 @@
       "namespaceClassification": "EXACT_CURRENT",
       "hashClassification": "EXACT_FILE_BYTES",
       "filesystemHash": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "graphifyRowCount": 1,
+      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "parserContractVersion": null,
+      "extractionContractVersion": null,
+      "sourceBindingClassification": "EXACT_CURRENT_SOURCE",
       "eligibleCurrentSource": true,
-      "admissionReason": "EXACT_NAMESPACE_AND_FILE_BYTES"
+      "admissionReason": "EXACT_NAMESPACE_BYTES_AND_REVISION_BINDING"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/agent-chat/+page.ts",
@@ -94,8 +141,14 @@
       "namespaceClassification": "EXACT_CURRENT",
       "hashClassification": "EXACT_FILE_BYTES",
       "filesystemHash": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "graphifyRowCount": 1,
+      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "parserContractVersion": null,
+      "extractionContractVersion": null,
+      "sourceBindingClassification": "EXACT_CURRENT_SOURCE",
       "eligibleCurrentSource": true,
-      "admissionReason": "EXACT_NAMESPACE_AND_FILE_BYTES"
+      "admissionReason": "EXACT_NAMESPACE_BYTES_AND_REVISION_BINDING"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/ai-assistant/+page.ts",
@@ -103,8 +156,14 @@
       "namespaceClassification": "EXACT_CURRENT",
       "hashClassification": "EXACT_FILE_BYTES",
       "filesystemHash": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "graphifyRowCount": 1,
+      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "parserContractVersion": null,
+      "extractionContractVersion": null,
+      "sourceBindingClassification": "EXACT_CURRENT_SOURCE",
       "eligibleCurrentSource": true,
-      "admissionReason": "EXACT_NAMESPACE_AND_FILE_BYTES"
+      "admissionReason": "EXACT_NAMESPACE_BYTES_AND_REVISION_BINDING"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/ai-chat-test/+page.ts",
@@ -112,8 +171,14 @@
       "namespaceClassification": "EXACT_CURRENT",
       "hashClassification": "EXACT_FILE_BYTES",
       "filesystemHash": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "graphifyRowCount": 1,
+      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "parserContractVersion": null,
+      "extractionContractVersion": null,
+      "sourceBindingClassification": "EXACT_CURRENT_SOURCE",
       "eligibleCurrentSource": true,
-      "admissionReason": "EXACT_NAMESPACE_AND_FILE_BYTES"
+      "admissionReason": "EXACT_NAMESPACE_BYTES_AND_REVISION_BINDING"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/ai-file-upload/+page.ts",
@@ -121,8 +186,14 @@
       "namespaceClassification": "EXACT_CURRENT",
       "hashClassification": "EXACT_FILE_BYTES",
       "filesystemHash": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "graphifyRowCount": 1,
+      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "parserContractVersion": null,
+      "extractionContractVersion": null,
+      "sourceBindingClassification": "EXACT_CURRENT_SOURCE",
       "eligibleCurrentSource": true,
-      "admissionReason": "EXACT_NAMESPACE_AND_FILE_BYTES"
+      "admissionReason": "EXACT_NAMESPACE_BYTES_AND_REVISION_BINDING"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/ask-ai/+page.ts",
@@ -130,8 +201,14 @@
       "namespaceClassification": "EXACT_CURRENT",
       "hashClassification": "EXACT_FILE_BYTES",
       "filesystemHash": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "graphifyRowCount": 1,
+      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "parserContractVersion": null,
+      "extractionContractVersion": null,
+      "sourceBindingClassification": "EXACT_CURRENT_SOURCE",
       "eligibleCurrentSource": true,
-      "admissionReason": "EXACT_NAMESPACE_AND_FILE_BYTES"
+      "admissionReason": "EXACT_NAMESPACE_BYTES_AND_REVISION_BINDING"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/cache/+page.ts",
@@ -139,8 +216,14 @@
       "namespaceClassification": "EXACT_CURRENT",
       "hashClassification": "EXACT_FILE_BYTES",
       "filesystemHash": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "graphifyRowCount": 1,
+      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "parserContractVersion": null,
+      "extractionContractVersion": null,
+      "sourceBindingClassification": "EXACT_CURRENT_SOURCE",
       "eligibleCurrentSource": true,
-      "admissionReason": "EXACT_NAMESPACE_AND_FILE_BYTES"
+      "admissionReason": "EXACT_NAMESPACE_BYTES_AND_REVISION_BINDING"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/case-form/+page.ts",
@@ -148,8 +231,14 @@
       "namespaceClassification": "EXACT_CURRENT",
       "hashClassification": "EXACT_FILE_BYTES",
       "filesystemHash": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "graphifyRowCount": 1,
+      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "parserContractVersion": null,
+      "extractionContractVersion": null,
+      "sourceBindingClassification": "EXACT_CURRENT_SOURCE",
       "eligibleCurrentSource": true,
-      "admissionReason": "EXACT_NAMESPACE_AND_FILE_BYTES"
+      "admissionReason": "EXACT_NAMESPACE_BYTES_AND_REVISION_BINDING"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/chat-messages/+page.ts",
@@ -157,8 +246,14 @@
       "namespaceClassification": "EXACT_CURRENT",
       "hashClassification": "EXACT_FILE_BYTES",
       "filesystemHash": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "graphifyRowCount": 1,
+      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "parserContractVersion": null,
+      "extractionContractVersion": null,
+      "sourceBindingClassification": "EXACT_CURRENT_SOURCE",
       "eligibleCurrentSource": true,
-      "admissionReason": "EXACT_NAMESPACE_AND_FILE_BYTES"
+      "admissionReason": "EXACT_NAMESPACE_BYTES_AND_REVISION_BINDING"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/citation-tools/+page.ts",
@@ -166,8 +261,14 @@
       "namespaceClassification": "EXACT_CURRENT",
       "hashClassification": "EXACT_FILE_BYTES",
       "filesystemHash": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "graphifyRowCount": 1,
+      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "parserContractVersion": null,
+      "extractionContractVersion": null,
+      "sourceBindingClassification": "EXACT_CURRENT_SOURCE",
       "eligibleCurrentSource": true,
-      "admissionReason": "EXACT_NAMESPACE_AND_FILE_BYTES"
+      "admissionReason": "EXACT_NAMESPACE_BYTES_AND_REVISION_BINDING"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/client-ai-chat/+page.ts",
@@ -175,8 +276,14 @@
       "namespaceClassification": "EXACT_CURRENT",
       "hashClassification": "EXACT_FILE_BYTES",
       "filesystemHash": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "graphifyRowCount": 1,
+      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "parserContractVersion": null,
+      "extractionContractVersion": null,
+      "sourceBindingClassification": "EXACT_CURRENT_SOURCE",
       "eligibleCurrentSource": true,
-      "admissionReason": "EXACT_NAMESPACE_AND_FILE_BYTES"
+      "admissionReason": "EXACT_NAMESPACE_BYTES_AND_REVISION_BINDING"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/client-inference/+page.ts",
@@ -184,8 +291,14 @@
       "namespaceClassification": "EXACT_CURRENT",
       "hashClassification": "EXACT_FILE_BYTES",
       "filesystemHash": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "graphifyRowCount": 1,
+      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "parserContractVersion": null,
+      "extractionContractVersion": null,
+      "sourceBindingClassification": "EXACT_CURRENT_SOURCE",
       "eligibleCurrentSource": true,
-      "admissionReason": "EXACT_NAMESPACE_AND_FILE_BYTES"
+      "admissionReason": "EXACT_NAMESPACE_BYTES_AND_REVISION_BINDING"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/collab-canvas/+page.ts",
@@ -193,8 +306,14 @@
       "namespaceClassification": "EXACT_CURRENT",
       "hashClassification": "EXACT_FILE_BYTES",
       "filesystemHash": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "graphifyRowCount": 1,
+      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "parserContractVersion": null,
+      "extractionContractVersion": null,
+      "sourceBindingClassification": "EXACT_CURRENT_SOURCE",
       "eligibleCurrentSource": true,
-      "admissionReason": "EXACT_NAMESPACE_AND_FILE_BYTES"
+      "admissionReason": "EXACT_NAMESPACE_BYTES_AND_REVISION_BINDING"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/context-menu/+page.ts",
@@ -202,8 +321,14 @@
       "namespaceClassification": "EXACT_CURRENT",
       "hashClassification": "EXACT_FILE_BYTES",
       "filesystemHash": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "graphifyRowCount": 1,
+      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "parserContractVersion": null,
+      "extractionContractVersion": null,
+      "sourceBindingClassification": "EXACT_CURRENT_SOURCE",
       "eligibleCurrentSource": true,
-      "admissionReason": "EXACT_NAMESPACE_AND_FILE_BYTES"
+      "admissionReason": "EXACT_NAMESPACE_BYTES_AND_REVISION_BINDING"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/contextual-chat/+page.ts",
@@ -211,8 +336,14 @@
       "namespaceClassification": "EXACT_CURRENT",
       "hashClassification": "EXACT_FILE_BYTES",
       "filesystemHash": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "graphifyRowCount": 1,
+      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "parserContractVersion": null,
+      "extractionContractVersion": null,
+      "sourceBindingClassification": "EXACT_CURRENT_SOURCE",
       "eligibleCurrentSource": true,
-      "admissionReason": "EXACT_NAMESPACE_AND_FILE_BYTES"
+      "admissionReason": "EXACT_NAMESPACE_BYTES_AND_REVISION_BINDING"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/courtroom-sim/+page.ts",
@@ -220,8 +351,14 @@
       "namespaceClassification": "EXACT_CURRENT",
       "hashClassification": "EXACT_FILE_BYTES",
       "filesystemHash": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "graphifyRowCount": 1,
+      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "parserContractVersion": null,
+      "extractionContractVersion": null,
+      "sourceBindingClassification": "EXACT_CURRENT_SOURCE",
       "eligibleCurrentSource": true,
-      "admissionReason": "EXACT_NAMESPACE_AND_FILE_BYTES"
+      "admissionReason": "EXACT_NAMESPACE_BYTES_AND_REVISION_BINDING"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/embedding-stream/+page.ts",
@@ -229,8 +366,14 @@
       "namespaceClassification": "EXACT_CURRENT",
       "hashClassification": "EXACT_FILE_BYTES",
       "filesystemHash": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "graphifyRowCount": 1,
+      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "parserContractVersion": null,
+      "extractionContractVersion": null,
+      "sourceBindingClassification": "EXACT_CURRENT_SOURCE",
       "eligibleCurrentSource": true,
-      "admissionReason": "EXACT_NAMESPACE_AND_FILE_BYTES"
+      "admissionReason": "EXACT_NAMESPACE_BYTES_AND_REVISION_BINDING"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/enhanced-upload/+page.ts",
@@ -238,8 +381,14 @@
       "namespaceClassification": "EXACT_CURRENT",
       "hashClassification": "EXACT_FILE_BYTES",
       "filesystemHash": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "graphifyRowCount": 1,
+      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "parserContractVersion": null,
+      "extractionContractVersion": null,
+      "sourceBindingClassification": "EXACT_CURRENT_SOURCE",
       "eligibleCurrentSource": true,
-      "admissionReason": "EXACT_NAMESPACE_AND_FILE_BYTES"
+      "admissionReason": "EXACT_NAMESPACE_BYTES_AND_REVISION_BINDING"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/evidence-dashboard/+page.ts",
@@ -247,8 +396,14 @@
       "namespaceClassification": "EXACT_CURRENT",
       "hashClassification": "EXACT_FILE_BYTES",
       "filesystemHash": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "graphifyRowCount": 1,
+      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "parserContractVersion": null,
+      "extractionContractVersion": null,
+      "sourceBindingClassification": "EXACT_CURRENT_SOURCE",
       "eligibleCurrentSource": true,
-      "admissionReason": "EXACT_NAMESPACE_AND_FILE_BYTES"
+      "admissionReason": "EXACT_NAMESPACE_BYTES_AND_REVISION_BINDING"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/hover-card/+page.ts",
@@ -256,8 +411,14 @@
       "namespaceClassification": "EXACT_CURRENT",
       "hashClassification": "EXACT_FILE_BYTES",
       "filesystemHash": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "graphifyRowCount": 1,
+      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "parserContractVersion": null,
+      "extractionContractVersion": null,
+      "sourceBindingClassification": "EXACT_CURRENT_SOURCE",
       "eligibleCurrentSource": true,
-      "admissionReason": "EXACT_NAMESPACE_AND_FILE_BYTES"
+      "admissionReason": "EXACT_NAMESPACE_BYTES_AND_REVISION_BINDING"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/keyboard-shortcuts/+page.ts",
@@ -265,8 +426,14 @@
       "namespaceClassification": "EXACT_CURRENT",
       "hashClassification": "EXACT_FILE_BYTES",
       "filesystemHash": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "graphifyRowCount": 1,
+      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "parserContractVersion": null,
+      "extractionContractVersion": null,
+      "sourceBindingClassification": "EXACT_CURRENT_SOURCE",
       "eligibleCurrentSource": true,
-      "admissionReason": "EXACT_NAMESPACE_AND_FILE_BYTES"
+      "admissionReason": "EXACT_NAMESPACE_BYTES_AND_REVISION_BINDING"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/legal-layout/+page.ts",
@@ -274,8 +441,14 @@
       "namespaceClassification": "EXACT_CURRENT",
       "hashClassification": "EXACT_FILE_BYTES",
       "filesystemHash": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "graphifyRowCount": 1,
+      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "parserContractVersion": null,
+      "extractionContractVersion": null,
+      "sourceBindingClassification": "EXACT_CURRENT_SOURCE",
       "eligibleCurrentSource": true,
-      "admissionReason": "EXACT_NAMESPACE_AND_FILE_BYTES"
+      "admissionReason": "EXACT_NAMESPACE_BYTES_AND_REVISION_BINDING"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/legal-spellbook/+page.ts",
@@ -283,8 +456,14 @@
       "namespaceClassification": "EXACT_CURRENT",
       "hashClassification": "EXACT_FILE_BYTES",
       "filesystemHash": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "graphifyRowCount": 1,
+      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "parserContractVersion": null,
+      "extractionContractVersion": null,
+      "sourceBindingClassification": "EXACT_CURRENT_SOURCE",
       "eligibleCurrentSource": true,
-      "admissionReason": "EXACT_NAMESPACE_AND_FILE_BYTES"
+      "admissionReason": "EXACT_NAMESPACE_BYTES_AND_REVISION_BINDING"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/modals/+page.ts",
@@ -292,8 +471,14 @@
       "namespaceClassification": "EXACT_CURRENT",
       "hashClassification": "EXACT_FILE_BYTES",
       "filesystemHash": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "graphifyRowCount": 1,
+      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "parserContractVersion": null,
+      "extractionContractVersion": null,
+      "sourceBindingClassification": "EXACT_CURRENT_SOURCE",
       "eligibleCurrentSource": true,
-      "admissionReason": "EXACT_NAMESPACE_AND_FILE_BYTES"
+      "admissionReason": "EXACT_NAMESPACE_BYTES_AND_REVISION_BINDING"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/modular-upload/+page.ts",
@@ -301,8 +486,14 @@
       "namespaceClassification": "EXACT_CURRENT",
       "hashClassification": "EXACT_FILE_BYTES",
       "filesystemHash": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "graphifyRowCount": 1,
+      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "parserContractVersion": null,
+      "extractionContractVersion": null,
+      "sourceBindingClassification": "EXACT_CURRENT_SOURCE",
       "eligibleCurrentSource": true,
-      "admissionReason": "EXACT_NAMESPACE_AND_FILE_BYTES"
+      "admissionReason": "EXACT_NAMESPACE_BYTES_AND_REVISION_BINDING"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/nes-toast/+page.ts",
@@ -310,8 +501,14 @@
       "namespaceClassification": "EXACT_CURRENT",
       "hashClassification": "EXACT_FILE_BYTES",
       "filesystemHash": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "graphifyRowCount": 1,
+      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "parserContractVersion": null,
+      "extractionContractVersion": null,
+      "sourceBindingClassification": "EXACT_CURRENT_SOURCE",
       "eligibleCurrentSource": true,
-      "admissionReason": "EXACT_NAMESPACE_AND_FILE_BYTES"
+      "admissionReason": "EXACT_NAMESPACE_BYTES_AND_REVISION_BINDING"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/notifications/+page.ts",
@@ -319,8 +516,14 @@
       "namespaceClassification": "EXACT_CURRENT",
       "hashClassification": "EXACT_FILE_BYTES",
       "filesystemHash": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "graphifyRowCount": 1,
+      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "parserContractVersion": null,
+      "extractionContractVersion": null,
+      "sourceBindingClassification": "EXACT_CURRENT_SOURCE",
       "eligibleCurrentSource": true,
-      "admissionReason": "EXACT_NAMESPACE_AND_FILE_BYTES"
+      "admissionReason": "EXACT_NAMESPACE_BYTES_AND_REVISION_BINDING"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/phantom-code-lab/+page.ts",
@@ -328,8 +531,14 @@
       "namespaceClassification": "EXACT_CURRENT",
       "hashClassification": "EXACT_FILE_BYTES",
       "filesystemHash": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "graphifyRowCount": 1,
+      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "parserContractVersion": null,
+      "extractionContractVersion": null,
+      "sourceBindingClassification": "EXACT_CURRENT_SOURCE",
       "eligibleCurrentSource": true,
-      "admissionReason": "EXACT_NAMESPACE_AND_FILE_BYTES"
+      "admissionReason": "EXACT_NAMESPACE_BYTES_AND_REVISION_BINDING"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/rich-text-editor/+page.ts",
@@ -337,8 +546,14 @@
       "namespaceClassification": "EXACT_CURRENT",
       "hashClassification": "EXACT_FILE_BYTES",
       "filesystemHash": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "graphifyRowCount": 1,
+      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "parserContractVersion": null,
+      "extractionContractVersion": null,
+      "sourceBindingClassification": "EXACT_CURRENT_SOURCE",
       "eligibleCurrentSource": true,
-      "admissionReason": "EXACT_NAMESPACE_AND_FILE_BYTES"
+      "admissionReason": "EXACT_NAMESPACE_BYTES_AND_REVISION_BINDING"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/search-tools/+page.ts",
@@ -346,8 +561,14 @@
       "namespaceClassification": "EXACT_CURRENT",
       "hashClassification": "EXACT_FILE_BYTES",
       "filesystemHash": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "graphifyRowCount": 1,
+      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "parserContractVersion": null,
+      "extractionContractVersion": null,
+      "sourceBindingClassification": "EXACT_CURRENT_SOURCE",
       "eligibleCurrentSource": true,
-      "admissionReason": "EXACT_NAMESPACE_AND_FILE_BYTES"
+      "admissionReason": "EXACT_NAMESPACE_BYTES_AND_REVISION_BINDING"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/source-drawer/+page.ts",
@@ -355,8 +576,14 @@
       "namespaceClassification": "EXACT_CURRENT",
       "hashClassification": "EXACT_FILE_BYTES",
       "filesystemHash": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "graphifyRowCount": 1,
+      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "parserContractVersion": null,
+      "extractionContractVersion": null,
+      "sourceBindingClassification": "EXACT_CURRENT_SOURCE",
       "eligibleCurrentSource": true,
-      "admissionReason": "EXACT_NAMESPACE_AND_FILE_BYTES"
+      "admissionReason": "EXACT_NAMESPACE_BYTES_AND_REVISION_BINDING"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/streaming/+page.ts",
@@ -364,8 +591,14 @@
       "namespaceClassification": "EXACT_CURRENT",
       "hashClassification": "EXACT_FILE_BYTES",
       "filesystemHash": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "graphifyRowCount": 1,
+      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "parserContractVersion": null,
+      "extractionContractVersion": null,
+      "sourceBindingClassification": "EXACT_CURRENT_SOURCE",
       "eligibleCurrentSource": true,
-      "admissionReason": "EXACT_NAMESPACE_AND_FILE_BYTES"
+      "admissionReason": "EXACT_NAMESPACE_BYTES_AND_REVISION_BINDING"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/synthesis-chat/+page.ts",
@@ -373,8 +606,14 @@
       "namespaceClassification": "EXACT_CURRENT",
       "hashClassification": "EXACT_FILE_BYTES",
       "filesystemHash": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "graphifyRowCount": 1,
+      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "parserContractVersion": null,
+      "extractionContractVersion": null,
+      "sourceBindingClassification": "EXACT_CURRENT_SOURCE",
       "eligibleCurrentSource": true,
-      "admissionReason": "EXACT_NAMESPACE_AND_FILE_BYTES"
+      "admissionReason": "EXACT_NAMESPACE_BYTES_AND_REVISION_BINDING"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/theory-board/+page.ts",
@@ -382,8 +621,14 @@
       "namespaceClassification": "EXACT_CURRENT",
       "hashClassification": "EXACT_FILE_BYTES",
       "filesystemHash": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "graphifyRowCount": 1,
+      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "parserContractVersion": null,
+      "extractionContractVersion": null,
+      "sourceBindingClassification": "EXACT_CURRENT_SOURCE",
       "eligibleCurrentSource": true,
-      "admissionReason": "EXACT_NAMESPACE_AND_FILE_BYTES"
+      "admissionReason": "EXACT_NAMESPACE_BYTES_AND_REVISION_BINDING"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/toc-reader/+page.ts",
@@ -391,8 +636,14 @@
       "namespaceClassification": "EXACT_CURRENT",
       "hashClassification": "EXACT_FILE_BYTES",
       "filesystemHash": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "graphifyRowCount": 1,
+      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "parserContractVersion": null,
+      "extractionContractVersion": null,
+      "sourceBindingClassification": "EXACT_CURRENT_SOURCE",
       "eligibleCurrentSource": true,
-      "admissionReason": "EXACT_NAMESPACE_AND_FILE_BYTES"
+      "admissionReason": "EXACT_NAMESPACE_BYTES_AND_REVISION_BINDING"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/ui-components/+page.ts",
@@ -400,8 +651,14 @@
       "namespaceClassification": "EXACT_CURRENT",
       "hashClassification": "EXACT_FILE_BYTES",
       "filesystemHash": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "graphifyRowCount": 1,
+      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "parserContractVersion": null,
+      "extractionContractVersion": null,
+      "sourceBindingClassification": "EXACT_CURRENT_SOURCE",
       "eligibleCurrentSource": true,
-      "admissionReason": "EXACT_NAMESPACE_AND_FILE_BYTES"
+      "admissionReason": "EXACT_NAMESPACE_BYTES_AND_REVISION_BINDING"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/webgpu-showcase/+page.ts",
@@ -409,8 +666,14 @@
       "namespaceClassification": "EXACT_CURRENT",
       "hashClassification": "EXACT_FILE_BYTES",
       "filesystemHash": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "graphifyRowCount": 1,
+      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "parserContractVersion": null,
+      "extractionContractVersion": null,
+      "sourceBindingClassification": "EXACT_CURRENT_SOURCE",
       "eligibleCurrentSource": true,
-      "admissionReason": "EXACT_NAMESPACE_AND_FILE_BYTES"
+      "admissionReason": "EXACT_NAMESPACE_BYTES_AND_REVISION_BINDING"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/yorha-assistant/+page.ts",
@@ -418,8 +681,14 @@
       "namespaceClassification": "EXACT_CURRENT",
       "hashClassification": "EXACT_FILE_BYTES",
       "filesystemHash": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "graphifyRowCount": 1,
+      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "parserContractVersion": null,
+      "extractionContractVersion": null,
+      "sourceBindingClassification": "EXACT_CURRENT_SOURCE",
       "eligibleCurrentSource": true,
-      "admissionReason": "EXACT_NAMESPACE_AND_FILE_BYTES"
+      "admissionReason": "EXACT_NAMESPACE_BYTES_AND_REVISION_BINDING"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/yorha-icons/+page.ts",
@@ -427,8 +696,14 @@
       "namespaceClassification": "EXACT_CURRENT",
       "hashClassification": "EXACT_FILE_BYTES",
       "filesystemHash": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "graphifyRowCount": 1,
+      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "parserContractVersion": null,
+      "extractionContractVersion": null,
+      "sourceBindingClassification": "EXACT_CURRENT_SOURCE",
       "eligibleCurrentSource": true,
-      "admissionReason": "EXACT_NAMESPACE_AND_FILE_BYTES"
+      "admissionReason": "EXACT_NAMESPACE_BYTES_AND_REVISION_BINDING"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/demos/yorha-terminal/+page.ts",
@@ -436,8 +711,14 @@
       "namespaceClassification": "EXACT_CURRENT",
       "hashClassification": "EXACT_FILE_BYTES",
       "filesystemHash": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "graphifyRowCount": 1,
+      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "parserContractVersion": null,
+      "extractionContractVersion": null,
+      "sourceBindingClassification": "EXACT_CURRENT_SOURCE",
       "eligibleCurrentSource": true,
-      "admissionReason": "EXACT_NAMESPACE_AND_FILE_BYTES"
+      "admissionReason": "EXACT_NAMESPACE_BYTES_AND_REVISION_BINDING"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/evidence/analyze/+page.server.ts",
@@ -445,8 +726,14 @@
       "namespaceClassification": "EXACT_CURRENT",
       "hashClassification": "EXACT_FILE_BYTES",
       "filesystemHash": "03c2f124ccaf960d3b993362233dc11b80ca7c4e49b4544463467f76fbd7a33f",
+      "graphifyRowCount": 1,
+      "sourceRevision": "sha256:03c2f124ccaf960d3b993362233dc11b80ca7c4e49b4544463467f76fbd7a33f",
+      "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "parserContractVersion": null,
+      "extractionContractVersion": null,
+      "sourceBindingClassification": "EXACT_CURRENT_SOURCE",
       "eligibleCurrentSource": true,
-      "admissionReason": "EXACT_NAMESPACE_AND_FILE_BYTES"
+      "admissionReason": "EXACT_NAMESPACE_BYTES_AND_REVISION_BINDING"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/evidence/hash/+page.server.ts",
@@ -454,8 +741,14 @@
       "namespaceClassification": "EXACT_CURRENT",
       "hashClassification": "EXACT_FILE_BYTES",
       "filesystemHash": "03c2f124ccaf960d3b993362233dc11b80ca7c4e49b4544463467f76fbd7a33f",
+      "graphifyRowCount": 1,
+      "sourceRevision": "sha256:03c2f124ccaf960d3b993362233dc11b80ca7c4e49b4544463467f76fbd7a33f",
+      "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "parserContractVersion": null,
+      "extractionContractVersion": null,
+      "sourceBindingClassification": "EXACT_CURRENT_SOURCE",
       "eligibleCurrentSource": true,
-      "admissionReason": "EXACT_NAMESPACE_AND_FILE_BYTES"
+      "admissionReason": "EXACT_NAMESPACE_BYTES_AND_REVISION_BINDING"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/global-search/+page.ts",
@@ -463,8 +756,14 @@
       "namespaceClassification": "EXACT_CURRENT",
       "hashClassification": "EXACT_FILE_BYTES",
       "filesystemHash": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "graphifyRowCount": 1,
+      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "parserContractVersion": null,
+      "extractionContractVersion": null,
+      "sourceBindingClassification": "EXACT_CURRENT_SOURCE",
       "eligibleCurrentSource": true,
-      "admissionReason": "EXACT_NAMESPACE_AND_FILE_BYTES"
+      "admissionReason": "EXACT_NAMESPACE_BYTES_AND_REVISION_BINDING"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/persons-of-interest/[id]/+page.ts",
@@ -472,8 +771,14 @@
       "namespaceClassification": "EXACT_CURRENT",
       "hashClassification": "EXACT_FILE_BYTES",
       "filesystemHash": "90adca11bf6dc5c942620de748a8d5c92f2c4d08d7acc19d956af7482b8bb17a",
+      "graphifyRowCount": 1,
+      "sourceRevision": "sha256:90adca11bf6dc5c942620de748a8d5c92f2c4d08d7acc19d956af7482b8bb17a",
+      "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "parserContractVersion": null,
+      "extractionContractVersion": null,
+      "sourceBindingClassification": "EXACT_CURRENT_SOURCE",
       "eligibleCurrentSource": true,
-      "admissionReason": "EXACT_NAMESPACE_AND_FILE_BYTES"
+      "admissionReason": "EXACT_NAMESPACE_BYTES_AND_REVISION_BINDING"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/terminal/+page.ts",
@@ -481,8 +786,14 @@
       "namespaceClassification": "EXACT_CURRENT",
       "hashClassification": "EXACT_FILE_BYTES",
       "filesystemHash": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "graphifyRowCount": 1,
+      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
+      "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "parserContractVersion": null,
+      "extractionContractVersion": null,
+      "sourceBindingClassification": "EXACT_CURRENT_SOURCE",
       "eligibleCurrentSource": true,
-      "admissionReason": "EXACT_NAMESPACE_AND_FILE_BYTES"
+      "admissionReason": "EXACT_NAMESPACE_BYTES_AND_REVISION_BINDING"
     },
     {
       "relativePath": "sveltekit-frontend/src/routes/(app)/yorha-home/+page.server.ts",
@@ -490,8 +801,14 @@
       "namespaceClassification": "EXACT_CURRENT",
       "hashClassification": "EXACT_FILE_BYTES",
       "filesystemHash": "d866f6facd9f8375969a150a0a064df86349db40f0ce4fc57b015f2507897a3c",
+      "graphifyRowCount": 1,
+      "sourceRevision": "sha256:d866f6facd9f8375969a150a0a064df86349db40f0ce4fc57b015f2507897a3c",
+      "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "parserContractVersion": null,
+      "extractionContractVersion": null,
+      "sourceBindingClassification": "EXACT_CURRENT_SOURCE",
       "eligibleCurrentSource": true,
-      "admissionReason": "EXACT_NAMESPACE_AND_FILE_BYTES"
+      "admissionReason": "EXACT_NAMESPACE_BYTES_AND_REVISION_BINDING"
     }
   ],
   "diagnosticCounts": {
@@ -506,5 +823,5 @@
   "relationshipWrites": false,
   "status": "CURRENT_SOURCE_COHORT_READY_FOR_PROJECTION_REVIEW",
   "nextGate": "SOURCE_PROJECTION_REVISION_REVIEW_REQUIRED",
-  "cohortChecksum": "3c5b85ef128153be4c67cdfaa82b0d7ee8e26f9d4c99bd053535e1a38b7b6df7"
+  "cohortChecksum": "fd88703ca428261206575d95204c31795f956645dd46dc4607a2b3048d464151"
 }

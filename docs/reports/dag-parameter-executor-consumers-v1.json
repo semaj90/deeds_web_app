@@ -1,0 +1,108 @@
+{
+  "schema": "atlas.dag-parameter-executor-consumers.v1",
+  "gate": "DAG-PARAMETER-EXECUTOR-CONSUMER-AUDIT-01",
+  "scope": "read-only source audit; no runtime, database, cache, or artifact writes",
+  "plannerArtifactEmission": {
+    "status": "FOCUSED_PROVEN",
+    "owner": "packages/parent-atlas/src/core/kernel-bound-dag-planner-v1.ts",
+    "fields": [
+      "parameterArtifactRef",
+      "parameterChecksum"
+    ]
+  },
+  "runtimeBinding": {
+    "status": "IMPLEMENTED_FOCUSED_PROVEN",
+    "owner": "packages/parent-atlas/src/core/kernel-dag-execution-binding-v1.ts",
+    "finding": "core binding and OaK adapter resolve and verify ParameterArtifactV1 before handler invocation; legacy null-reference bindings remain compatible"
+  },
+  "artifactAwareConsumers": [
+    "packages/parent-atlas/src/core/kernel-dag-execution-binding-v1.ts",
+    "packages/parent-atlas/src/core/kernel-bound-dag-executor-v1.ts",
+    "sveltekit-frontend/src/lib/server/atlas/policy/oak-dag-execution-adapter-v1.ts"
+  ],
+  "runtimeArgumentOnlyConsumers": [
+    "sveltekit-frontend/src/lib/server/atlas/policy/oak-dag-ast-evidence-handler-v1.ts",
+    "sveltekit-frontend/src/lib/server/atlas/policy/oak-dag-context-manifest-handler-v1.ts",
+    "sveltekit-frontend/src/lib/server/atlas/policy/oak-dag-graph-handler-v1.ts",
+    "sveltekit-frontend/src/lib/server/atlas/policy/oak-dag-kag-neighbor-handler-v1.ts",
+    "sveltekit-frontend/src/lib/server/atlas/policy/oak-dag-lexical-handler-v1.ts",
+    "sveltekit-frontend/src/lib/server/atlas/policy/oak-dag-neural-latent-handler-v1.ts",
+    "sveltekit-frontend/src/lib/server/atlas/policy/oak-dag-semantic-qdrant-handler-v1.ts"
+  ],
+  "scans": [
+    {
+      "relativePath": "packages/parent-atlas/src/core/kernel-dag-execution-binding-v1.ts",
+      "artifactAware": true,
+      "runtimeArgumentOnly": false,
+      "boundArgumentsReads": 0,
+      "parameterArtifactRefReads": 11
+    },
+    {
+      "relativePath": "packages/parent-atlas/src/core/kernel-bound-dag-executor-v1.ts",
+      "artifactAware": true,
+      "runtimeArgumentOnly": false,
+      "boundArgumentsReads": 0,
+      "parameterArtifactRefReads": 2
+    },
+    {
+      "relativePath": "sveltekit-frontend/src/lib/server/atlas/policy/oak-dag-execution-adapter-v1.ts",
+      "artifactAware": true,
+      "runtimeArgumentOnly": false,
+      "boundArgumentsReads": 0,
+      "parameterArtifactRefReads": 2
+    },
+    {
+      "relativePath": "sveltekit-frontend/src/lib/server/atlas/policy/oak-dag-ast-evidence-handler-v1.ts",
+      "artifactAware": false,
+      "runtimeArgumentOnly": true,
+      "boundArgumentsReads": 1,
+      "parameterArtifactRefReads": 0
+    },
+    {
+      "relativePath": "sveltekit-frontend/src/lib/server/atlas/policy/oak-dag-context-manifest-handler-v1.ts",
+      "artifactAware": false,
+      "runtimeArgumentOnly": true,
+      "boundArgumentsReads": 1,
+      "parameterArtifactRefReads": 0
+    },
+    {
+      "relativePath": "sveltekit-frontend/src/lib/server/atlas/policy/oak-dag-graph-handler-v1.ts",
+      "artifactAware": false,
+      "runtimeArgumentOnly": true,
+      "boundArgumentsReads": 1,
+      "parameterArtifactRefReads": 0
+    },
+    {
+      "relativePath": "sveltekit-frontend/src/lib/server/atlas/policy/oak-dag-kag-neighbor-handler-v1.ts",
+      "artifactAware": false,
+      "runtimeArgumentOnly": true,
+      "boundArgumentsReads": 1,
+      "parameterArtifactRefReads": 0
+    },
+    {
+      "relativePath": "sveltekit-frontend/src/lib/server/atlas/policy/oak-dag-lexical-handler-v1.ts",
+      "artifactAware": false,
+      "runtimeArgumentOnly": true,
+      "boundArgumentsReads": 1,
+      "parameterArtifactRefReads": 0
+    },
+    {
+      "relativePath": "sveltekit-frontend/src/lib/server/atlas/policy/oak-dag-neural-latent-handler-v1.ts",
+      "artifactAware": false,
+      "runtimeArgumentOnly": true,
+      "boundArgumentsReads": 1,
+      "parameterArtifactRefReads": 0
+    },
+    {
+      "relativePath": "sveltekit-frontend/src/lib/server/atlas/policy/oak-dag-semantic-qdrant-handler-v1.ts",
+      "artifactAware": false,
+      "runtimeArgumentOnly": true,
+      "boundArgumentsReads": 1,
+      "parameterArtifactRefReads": 0
+    }
+  ],
+  "classification": "ADAPTER_RESOLUTION_PROVEN_LEGACY_COMPATIBILITY_OPEN",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "reportChecksum": "sha256:11282352401ec8d779a3a1e1c8101c56a0e59721d63146232bb5eea79afed14e"
+}

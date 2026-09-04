@@ -69,6 +69,7 @@ import { fastJsonParse } from '$lib/server/gpu/simdjson-bridge.js';
 import { logInference } from '$lib/server/observability/inference-log.js';
 import { TURBOQUANT_BASE_URL } from '$lib/ai/model-ids.js';
 import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
+import { resolveLoadedLlamaModel } from '$lib/server/ai/llama-server-model-resolver.js';
 import crypto from 'node:crypto';
 import type { LlmCacheTrace } from '$lib/server/ai/llm-cache-trace.js';
 import { resolveRuntimeConfig } from '$lib/server/ai/inference-configs.js';
@@ -324,9 +325,9 @@ function logBifrostCacheTrace(
 }
 
 // ── TurboQuant Intercept ──────────────────────────────────────────────────
-// When enabled, ollamaFetch() transparently routes /api/chat and /api/generate
-// through TurboQuant llama-server (:8080) for ~78 tok/s GPU inference.
-// llama-server is the fallback when TurboQuant is unavailable.
+// When enabled, ollamaFetch() transparently routes compatibility /api/chat and
+// /api/generate calls through llama-server (:8090). Ollama remains embeddings-
+// only in this deployment; it is never a chat fallback.
 // Toggle: TURBOQUANT_INTERCEPT=false to disable.
 const runtimeConfig = resolveRuntimeConfig();
 const TURBOQUANT_INTERCEPT_ENABLED =
@@ -355,8 +356,8 @@ async function isTurboQuantHealthy(): Promise<boolean> {
 
 /**
  * Try to intercept an Ollama /api/chat or /api/generate request and route
- * it through TurboQuant instead. Returns a Response in Ollama-compatible
- * format, or null to fall through to Ollama.
+ * it through llama-server instead. Returns a Response in Ollama-compatible
+ * format, or null when llama-server cannot answer.
  *
  * Only intercepts non-streaming requests (stream: false). Streaming stays
  * on Ollama since TurboQuant SSE → Ollama ndjson conversion is non-trivial.
@@ -553,9 +554,8 @@ async function isGpuCongested(): Promise<boolean> {
  * Shared fetch wrapper for Ollama requests with connection pooling.
  * All Ollama HTTP calls should use this instead of raw fetch().
  *
- * When TurboQuant (llama-server :8090) is running, /api/chat and /api/generate
- * requests are transparently routed through TurboQuant for ~78 tok/s GPU
- * inference. Ollama is used as automatic fallback.
+ * `/api/chat` and `/api/generate` are compatibility shapes only. Their
+ * inference owner is llama-server :8090; Ollama is reserved for embeddings.
  */
 export async function ollamaFetch(url: string, init?: RequestInit): Promise<Response> {
   const meta = extractOllamaRequestMeta(url, init);
@@ -599,11 +599,17 @@ export async function ollamaFetch(url: string, init?: RequestInit): Promise<Resp
       if (openaiMessages.length > 0 && ollamaBody.stream !== true) {
         const temperature = ollamaBody.options?.temperature ?? 0.7;
         const maxTokens = ollamaBody.options?.num_predict ?? 2048;
+        let loadedModel = ollamaBody.model ?? (isChatEndpoint ? VLM_MODELS.gemma4 : VLM_MODELS.tool);
+        try {
+          loadedModel = (await resolveLoadedLlamaModel(CHAT_BASE_URL, loadedModel)).resolvedModel;
+        } catch {
+          // Keep the configured compatibility fallback if discovery is unavailable.
+        }
         const llamaResponse = await fetch(`${CHAT_BASE_URL}/v1/chat/completions`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            model: ollamaBody.model ?? (isChatEndpoint ? VLM_MODELS.gemma4 : VLM_MODELS.tool),
+            model: loadedModel,
             messages: openaiMessages,
             temperature,
             max_tokens: maxTokens,
@@ -656,7 +662,7 @@ export async function ollamaFetch(url: string, init?: RequestInit): Promise<Resp
 
           const response = isChatEndpoint
             ? {
-                model: ollamaBody.model ?? VLM_MODELS.gemma4,
+                model: loadedModel,
                 created_at: new Date().toISOString(),
                 message: {
                   role: 'assistant',
@@ -672,7 +678,7 @@ export async function ollamaFetch(url: string, init?: RequestInit): Promise<Resp
                 eval_duration: 0,
               }
             : {
-                model: ollamaBody.model ?? VLM_MODELS.tool,
+                model: loadedModel,
                 created_at: new Date().toISOString(),
                 response: content,
                 done: true,
@@ -696,8 +702,20 @@ export async function ollamaFetch(url: string, init?: RequestInit): Promise<Resp
     }
   }
 
-  // VRAM Contention Guard: If this is a large model call (VLM/Gemma4) to Ollama,
-  // but TurboQuant is already active, we risk an OOM or massive swapping.
+  // Do not silently fall through to Ollama for chat/generation. That would
+  // create a second synthesis owner and can report a misleading success.
+  if (isChatEndpoint || isGenerateEndpoint) {
+    const message = `[llama-server] ${urlPath} could not be served by llama-server :8090; Ollama chat/generation fallback is disabled`;
+    console.error(message);
+    logOllamaDiagnostics('error', meta, Date.now() - startedAt, 503, message, 'llama-server');
+    return new Response(JSON.stringify({ error: 'LLAMA_SERVER_CHAT_UNAVAILABLE', message }), {
+      status: 503,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
+  // VRAM Contention Guard: embeddings remain on Ollama and must not compete
+  // with an active large llama-server model.
   const isLargeModel = meta.model === VLM_MODELS.vision || meta.model === VLM_MODELS.gemma4;
   if (isLargeModel && (await isGpuCongested())) {
     const msg = `[ollama] VRAM congestion: skipping Ollama ${meta.model} while TurboQuant is active`;
@@ -979,7 +997,14 @@ export async function bifrostChat(
   // loaded — so, same as the direct llama-server fallback path below, announce
   // LLM_MODEL_ID rather than the caller's tag. An already-qualified `provider/model`
   // string (containing '/') is passed through unchanged.
-  const bifrostModel = effectiveModel.includes('/') ? effectiveModel : `openai/${LLM_MODEL_ID}`;
+  let loadedLlamaModel = LLM_MODEL_ID;
+  try {
+    loadedLlamaModel = (await resolveLoadedLlamaModel(CHAT_BASE_URL, LLM_MODEL_ID)).resolvedModel;
+  } catch {
+    // Preserve the existing gateway fallback when the local server is down;
+    // direct callers still fail closed rather than inventing a model identity.
+  }
+  const bifrostModel = effectiveModel.includes('/') ? effectiveModel : `openai/${loadedLlamaModel}`;
   // x-bf-cache-key is REQUIRED for Bifrost semantic caching to activate.
   // Without it, every request bypasses the cache entirely (Bifrost docs).
   // 'legal-ai-global' creates a shared namespace: semantically similar questions

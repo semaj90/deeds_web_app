@@ -1,11 +1,11 @@
 /**
  * Node: Synthesize Answer
- * Decision: Generate final answer using Gemma4 with ranked candidates
+ * Decision: Generate final answer using the active llama-server model with ranked candidates
  * MCP Tool: answer:synthesize
  */
 
 import type { DispatcherState, NodeContext } from './types.js';
-import { LLM_MODEL_ID } from '../../llm/runtime-contract.js';
+import { LLM_MODEL_ID, resolveLlamaInferenceTarget } from '../../llm/runtime-contract.js';
 import {
   updateSynthesisPath,
   recordToolCall,
@@ -33,11 +33,13 @@ export async function nodeSynthesizeAnswer(
       return { ...current, latency_ms: totalDuration };
     }
 
-    // Call MCP tool for Gemma4 synthesis
+    const synthesisModel = await resolveLlamaInferenceTarget().then((target) => target.model).catch(() => LLM_MODEL_ID);
+
+    // Call MCP tool through the llama-server-owned synthesis boundary.
     const { result, error, duration_ms } = await callMcpTool(ctx, 'answer:synthesize', {
       query: state.query,
       context_packets: state.candidates.slice(0, 5), // top 5 candidates
-      synthesis_model: LLM_MODEL_ID,
+      synthesis_model: synthesisModel,
       max_tokens: 1024,
       temperature: 0.3,
       include_citations: true,

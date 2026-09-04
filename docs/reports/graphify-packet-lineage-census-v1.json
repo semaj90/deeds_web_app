@@ -1,6 +1,6 @@
 {
   "schema": "atlas.graphify-packet-lineage-census-v1",
-  "generatedAt": "2026-09-01T04:23:49.095Z",
+  "generatedAt": "2026-09-03T23:55:19.610Z",
   "readOnly": true,
   "postgresWrites": false,
   "packetSourceColumn": "source_ref",
@@ -10,23 +10,24 @@
   "gitProvenanceColumn": "graphify_files.source_revision",
   "packetWorkspaceRevisionColumn": "workspace_revision",
   "counts": {
-    "packet_rows": 61660,
-    "packet_rows_with_source_ref": 61659,
-    "exact_source_ref": 778,
-    "missing_graphify_source": 60881,
-    "duplicate_source_ref": 0,
+    "packet_rows": 61715,
+    "packet_rows_with_source_ref": 61714,
+    "exact_source_ref": 17307,
+    "missing_graphify_source": 44407,
+    "duplicate_source_ref": 46,
     "source_revision_match": 0,
-    "stale_packet": 373
+    "stale_packet": 17307
   },
   "classificationCounts": {
+    "DUPLICATE_LOGICAL_SOURCE": 46,
     "IDENTITY_UNRESOLVED": 1,
-    "MISSING_GRAPHIFY_SOURCE": 60881,
-    "PACKET_CONTENT_HASH_UNAVAILABLE": 735,
-    "SOURCE_JOINED_PACKET_HASH_REQUIRES_CHUNK_GATE": 43
+    "MISSING_GRAPHIFY_SOURCE": 44407,
+    "PACKET_CONTENT_HASH_UNAVAILABLE": 17182,
+    "SOURCE_JOINED_PACKET_HASH_REQUIRES_CHUNK_GATE": 79
   },
   "packetContentIntegrity": {
     "identity_unresolved": 1,
-    "chunk_source_missing": 57111,
+    "chunk_source_missing": 57166,
     "packet_chunk_hash_ambiguous": 4207,
     "packet_content_hash_unavailable": 9,
     "packet_chunk_hash_exact": 332,
@@ -34,18 +35,18 @@
   },
   "sourceContentIntegrity": {
     "observedBindingPath": "docs/reports/workspace-source-binding-observation.json",
-    "workspaceBindingMatches": 885,
-    "hashExact": 885,
-    "hashMismatch": 0,
+    "workspaceBindingMatches": 25317,
+    "hashExact": 25162,
+    "hashMismatch": 155,
     "observationMissing": 0,
-    "revisionExact": 885,
-    "revisionMismatch": 0
+    "revisionExact": 25162,
+    "revisionMismatch": 155
   },
   "reconciliation": {
-    "graphify_files_total_rows": 885,
-    "graphify_distinct_source_refs": 885,
-    "workspace_binding_matches": 885,
-    "source_digest_matches": 885,
+    "graphify_files_total_rows": 25317,
+    "graphify_distinct_source_refs": 25258,
+    "workspace_binding_matches": 25317,
+    "source_digest_matches": 25162,
     "latest_batch_selection_checksum": "b10d96c96e018e9b8317a918a768d025af7fa3c653ca9a7d5e45b2bb62a7efb9",
     "latest_batch_applied": true,
     "latest_batch_readback_count": 6,
@@ -137,93 +138,93 @@
     ],
     "graphifyOnly": [
       {
-        "source_ref": ".claude/AGENT_CONSTITUTION.md",
+        "source_ref": ".claude/hooks/pretooluse-deny.mjs",
+        "count": 2
+      },
+      {
+        "source_ref": ".claude/settings.local.json",
+        "count": 2
+      },
+      {
+        "source_ref": ".claude/skills/codebase-indexing-agentic-error-fixing.md",
+        "count": 2
+      },
+      {
+        "source_ref": ".cline/rules/10-architecture.md",
+        "count": 2
+      },
+      {
+        "source_ref": ".clinerules/10-architecture.md",
+        "count": 2
+      },
+      {
+        "source_ref": ".clinerules/10-backend-retrieval.md",
+        "count": 2
+      },
+      {
+        "source_ref": ".okf/concepts/cluster-run-lineage-gap.yaml",
+        "count": 2
+      },
+      {
+        "source_ref": ".okf/concepts/concept-edge-ledger-gap.yaml",
+        "count": 2
+      },
+      {
+        "source_ref": ".okf/concepts/domain-lineage-gap.yaml",
+        "count": 2
+      },
+      {
+        "source_ref": ".okf/concepts/representation-fragmentation-gap.yaml",
+        "count": 2
+      },
+      {
+        "source_ref": ".okf/concepts/som-run-lineage-gap.yaml",
+        "count": 2
+      },
+      {
+        "source_ref": ".okf/concepts/topology-schema-drift-gap.yaml",
+        "count": 2
+      },
+      {
+        "source_ref": ".okf/pipelines/ast-entity-prefill.yaml",
+        "count": 2
+      },
+      {
+        "source_ref": "2-CONTEXT.md",
         "count": 1
       },
       {
-        "source_ref": ".claude/AGENT_RECOMMENDATIONS.md",
+        "source_ref": "724_agents.md",
         "count": 1
       },
       {
-        "source_ref": ".claude/agents/drizzle-inspector.md",
+        "source_ref": "ACE-BITFROST-WORKER-INTEGRATION.md",
         "count": 1
       },
       {
-        "source_ref": ".claude/agents/obsidian-cartographer.md",
+        "source_ref": "ACE-QUICK-REFERENCE.md",
         "count": 1
       },
       {
-        "source_ref": ".claude/agents/sveltekit-route-auditor.md",
+        "source_ref": "ACE-SUMMARY-LATENCY-IMPACT.md",
         "count": 1
       },
       {
-        "source_ref": ".claude/agents/topology-medic.md",
+        "source_ref": "ace-vector-selection-slice/INTEGRATION-NOTES.md",
         "count": 1
       },
       {
-        "source_ref": ".claude/ATLAS-ENGINEERING-PROMPT.md",
-        "count": 1
-      },
-      {
-        "source_ref": ".claude/CLAUDE.md",
-        "count": 1
-      },
-      {
-        "source_ref": ".claude/commands/audit-components.md",
-        "count": 1
-      },
-      {
-        "source_ref": ".claude/commands/audit-duplication.md",
-        "count": 1
-      },
-      {
-        "source_ref": ".claude/commands/deep-audit.md",
-        "count": 1
-      },
-      {
-        "source_ref": ".claude/commands/graphify.md",
-        "count": 1
-      },
-      {
-        "source_ref": ".claude/commands/nes-arch.md",
-        "count": 1
-      },
-      {
-        "source_ref": ".claude/commands/prune-codebase.md",
-        "count": 1
-      },
-      {
-        "source_ref": ".claude/commands/shallow-wiring-analysis.md",
-        "count": 1
-      },
-      {
-        "source_ref": ".claude/commands/wire-modules.md",
-        "count": 1
-      },
-      {
-        "source_ref": ".claude/DISTILLED_MEMORY.md",
-        "count": 1
-      },
-      {
-        "source_ref": ".claude/FORBIDDEN.md",
-        "count": 1
-      },
-      {
-        "source_ref": ".claude/GPU_RULES.md",
-        "count": 1
-      },
-      {
-        "source_ref": ".claude/hooks/LLMS.md",
+        "source_ref": "ace-vector-selection-slice/src/lib/server/ace/ranking/packet-feature-matrix.test.ts",
         "count": 1
       }
     ]
   },
   "gates": {
     "sourceBinding": {
-      "exact": 778,
-      "missing": 60881,
+      "exact": 17307,
+      "missing": 44407,
       "unresolved": 1,
-      "duplicate": 0,
+      "duplicate": 46,
       "proven": false
     },
     "packetContentIntegrity": {
@@ -234,16 +235,16 @@
       "proven": true
     },
     "sourceContentIntegrity": {
-      "exact": 885,
-      "mismatch": 0,
+      "exact": 25162,
+      "mismatch": 155,
       "observationMissing": 0,
-      "proven": true
+      "proven": false
     },
     "sourceRevisionBinding": {
-      "exact": 885,
-      "mismatch": 0,
+      "exact": 25162,
+      "mismatch": 155,
       "available": true,
-      "proven": true
+      "proven": false
     },
     "exactSourceRefAvailable": true,
     "exactContentHashAvailable": true,

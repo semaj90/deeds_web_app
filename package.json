@@ -95,6 +95,7 @@
     "atlas:graphify:rff:signature:dry": "node scripts/atlas/backfill-graphify-rff-embeddings-768.mjs --signature-only",
     "atlas:graphify:rff:signature:apply": "node scripts/atlas/backfill-graphify-rff-embeddings-768.mjs --signature-only --apply",
     "test:atlas:graphify:embedding-alignment": "node scripts/atlas/test-graphify-embedding-alignment.mjs",
+    "test:atlas:graphify:execution-ledger-schema": "node scripts/atlas/test-graphify-execution-ledger-schema-02.mjs",
     "atlas:graphify:pipeline:768:dry": "npm run test:atlas:graphify:embedding-alignment",
     "atlas:embedding:emb3a:writer-audit": "node scripts/atlas/audit-emb3a-qdrant-writer-lineage.mjs",
     "atlas:embedding:emb3a:lineage-readback": "node scripts/atlas/prove-emb3a-revision-lineage-readback.mjs",

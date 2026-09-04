@@ -22,6 +22,7 @@ import {
 	type GraphifyTaskCandidateBuildContext,
 } from './graphify-task-candidates.js';
 import type { DailyGraphifyBoardData } from './daily-graphify-board.js';
+import { resolveCurrentGraphifyWorkspaceRevision } from './graphify-current-workspace-revision.js';
 type GraphifyTaskCandidate = ReturnType<typeof buildDailyGraphifyTaskCandidates>[number];
 
 export const DailyGraphifyBoardRecommendationSchema = z
@@ -53,6 +54,16 @@ export interface DailyGraphifyBoardRecommendationContext extends GraphifyTaskCan
 	traceId?: string;
 	sourceRef?: string;
 	maxResults?: number;
+	/**
+	 * KANBAN-RECOMMENDATION-REVISION-BINDING-01: the real content-derived Graphify workspace
+	 * revision (`sha256:...`), NOT a timestamp. When omitted, resolved live from `graphify_runs`
+	 * via `resolveCurrentGraphifyWorkspaceRevision()`; when no proven revision exists yet (e.g.
+	 * before the first successful Graphify run), this stays `null` rather than falling back to
+	 * `board.generated` — a generated/observed timestamp is never a valid workspaceRevision value.
+	 */
+	workspaceRevision?: string | null;
+	/** Paired with `workspaceRevision` above — see the same resolver for provenance/caveats. */
+	graphRevision?: string | null;
 }
 
 function priorityScore(priority: 'P0' | 'P1' | 'P2' | 'P3'): number {
@@ -89,6 +100,8 @@ async function buildEvidencePacket(
 	boardGenerated: string,
 	featureRevision: string,
 	eventRevision: string,
+	workspaceRevision: string | null,
+	runGraphRevision: string | null,
 ) {
 	const packetKey = candidate.packet_keys[0] ?? `kanban:${candidate.task_id}`;
 	const sourceRef = candidate.source_ref ?? `kanban:${candidate.task_id}`;
@@ -110,7 +123,7 @@ async function buildEvidencePacket(
 		packetKey,
 		sourceRef,
 		sourceRevision: eventRevision,
-		workspaceRevision: boardGenerated,
+		workspaceRevision,
 		featureId: candidate.task_id,
 		featureLabel: candidate.task_label ?? candidate.task_id,
 		text,
@@ -121,7 +134,7 @@ async function buildEvidencePacket(
 		producerId: 'daily-graphify-board-recommendations',
 		producerRevision: boardGenerated,
 		featureRevision,
-		graphRevision: candidate.graph_revision ?? null,
+		graphRevision: candidate.graph_revision ?? runGraphRevision,
 		modelRevision: featureRevision,
 		partOfSpeech: pos,
 		semanticConceptIds: candidate.evidence_refs,
@@ -148,6 +161,7 @@ function buildFeatureRow(
 	eventRevision: string,
 	domainClassificationConfidence: number,
 	posConfidence: number,
+	runGraphRevision: string | null,
 ): EventRecommendationFeatureRow {
 	const evidenceCoverage = clamp((candidate.evidence_refs.length + candidate.source_refs.length) / 8);
 	const structuralScore = clamp(
@@ -178,7 +192,7 @@ function buildFeatureRow(
 		evidenceCoverage,
 		freshnessScore: 1,
 		featureRevision,
-		graphRevision: candidate.graph_revision ?? null,
+		graphRevision: candidate.graph_revision ?? runGraphRevision,
 		eventRevision,
 	});
 }
@@ -197,8 +211,25 @@ export async function buildDailyGraphifyBoardRecommendations(
 
 	if (candidates.length === 0) return [];
 
+	// KANBAN-RECOMMENDATION-REVISION-BINDING-01: resolve real workspaceRevision/graphRevision
+	// instead of defaulting to board.generated (a timestamp, not a content-derived identity —
+	// see the frozen identity model this violated). Explicit context values still win; `null` is
+	// a legitimate outcome (no proven Graphify run yet) and is propagated as-is, never coerced
+	// into a fabricated placeholder.
+	let workspaceRevision = context.workspaceRevision ?? null;
+	let runGraphRevision = context.graphRevision ?? null;
+	if (context.workspaceRevision === undefined) {
+		const resolved = await resolveCurrentGraphifyWorkspaceRevision();
+		workspaceRevision = resolved?.workspaceRevision ?? null;
+		if (context.graphRevision === undefined) {
+			runGraphRevision = resolved?.graphRevision ?? null;
+		}
+	}
+
 	const evidencePackets = await Promise.all(
-		candidates.map((candidate) => buildEvidencePacket(candidate, board.generated, featureRevision, eventRevision)),
+		candidates.map((candidate) =>
+			buildEvidencePacket(candidate, board.generated, featureRevision, eventRevision, workspaceRevision, runGraphRevision),
+		),
 	);
 	const featureRows = candidates.map((candidate, index) => {
 		const evidencePacket = evidencePackets[index]?.packet;
@@ -211,6 +242,7 @@ export async function buildDailyGraphifyBoardRecommendations(
 			eventRevision,
 			evidencePacket.domainClassification?.confidence ?? 0,
 			evidencePacket.posTaggerOutput.confidence ?? 0,
+			runGraphRevision,
 		);
 	});
 	const policyResults = buildRecommendationPolicyResults({

@@ -10,6 +10,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { sanitizeGemma4Summary } from '../../../../../../scripts/atlas/lib/gemma4-summary-sanitizer.mjs';
+import { resolveLoadedLlamaModel } from '$lib/server/ai/llama-server-model-resolver.js';
 
 const LLAMA_SERVER = 'http://127.0.0.1:8090';
 
@@ -17,10 +18,11 @@ export const POST: RequestHandler = async ({ request }) => {
   try {
     const body = await request.json();
 
+    const loaded = await resolveLoadedLlamaModel(LLAMA_SERVER, null);
     const response = await fetch(`${LLAMA_SERVER}/v1/chat/completions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
+      body: JSON.stringify({ ...body, model: loaded.resolvedModel }),
     });
 
     if (!response.ok) {

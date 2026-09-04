@@ -1,0 +1,56 @@
+{
+  "schema": "atlas.fetch-latent-derived-views-audit.v2",
+  "status": "PROVEN_STATIC_CONTRACT",
+  "representations": {
+    "latent_256": {
+      "dimensions": 256,
+      "origin": "LEARNED",
+      "materialization": "PERSISTED",
+      "input": "semantic_768",
+      "owner": "PostgresLatent256CandidateProvider"
+    },
+    "latent_128": {
+      "dimensions": 128,
+      "origin": "DERIVED",
+      "materialization": "VIRTUAL",
+      "parent": "latent_256",
+      "transform": "PREFIX_L2",
+      "owner": "latent-derive.ts"
+    },
+    "latent_64": {
+      "dimensions": 64,
+      "origin": "LEARNED",
+      "materialization": "PERSISTED",
+      "input": "semantic_768",
+      "owner": "existing physical latent_64 storage",
+      "derived_view": false
+    }
+  },
+  "checks": {
+    "latent128_prefix_l2_helper": true,
+    "latent64_helper_is_existing_only": true,
+    "latent256_provider_exists": true,
+    "candidate_handler_is_fetch_latent": true,
+    "latent128_virtual": true,
+    "latent64_physical": true,
+    "latent128_parent_latent256": true,
+    "latent64_input_semantic768": true,
+    "latent64_candidate_fixture_has_physical_binding": true,
+    "writes_performed": false,
+    "canonical_authority": false
+  },
+  "sourceFiles": {
+    "derive": "sveltekit-frontend/src/lib/server/retrieval/latent-derive.ts",
+    "family": "sveltekit-frontend/src/lib/server/atlas/tensors/representation-artifact-v1.ts",
+    "handler": "sveltekit-frontend/src/lib/server/atlas/policy/oak-dag-candidate-latent-handler-v1.ts",
+    "provider": "sveltekit-frontend/src/lib/server/retrieval/latent256-candidate-provider.ts",
+    "candidate_fixture": "sveltekit-frontend/src/lib/server/atlas/features/candidate-feature-snapshot-v1.spec.ts"
+  },
+  "contractChecksum": "sha256:a81a638cdb1f42bbbe9c187e3e88d76b39859fcc3024a316b700fce8c4efff81",
+  "liveDatabaseReplay": "UNPROVEN",
+  "candidateOrdinalParity": "UNPROVEN",
+  "derivedChecksums": "UNPROVEN",
+  "queryTimePromotion": false,
+  "canonicalAuthority": false,
+  "writesPerformed": false
+}

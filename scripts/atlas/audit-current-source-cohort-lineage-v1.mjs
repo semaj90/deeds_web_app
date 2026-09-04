@@ -52,15 +52,34 @@ const resultRows = rows.map((row) => {
   const matches = [...(byRef.get(ref) ?? []), ...(byRef.get(`sveltekit-frontend/${ref}`) ?? [])];
   const unique = [...new Map(matches.map((match) => [JSON.stringify(match), match])).values()];
   const current = unique.filter((match) => match.workspace_revision === currentWorkspaceRevision && String(match.workspace_revision ?? '').startsWith('sha256:'));
-  const qualified = current.filter((match) => Boolean(match.content_hash) && Boolean(match.code_source_revision ?? match.source_revision));
+  const expectedSourceRevision = String(row.sourceRevision ?? '').trim();
+  const expectedContentHash = String(row.filesystemHash ?? '').trim().toLowerCase().replace(/^sha256:/, '');
+  const qualified = unique.filter((match) => {
+    const actualRevision = String(match.code_source_revision ?? match.source_revision ?? '').trim();
+    const actualHash = String(match.content_hash ?? '').trim().toLowerCase().replace(/^sha256:/, '');
+    return Boolean(actualRevision)
+      && (!expectedSourceRevision || actualRevision === expectedSourceRevision)
+      && (!expectedContentHash || actualHash === expectedContentHash);
+  });
+  const workspaceQualified = qualified.filter((match) => match.workspace_revision === currentWorkspaceRevision && String(match.workspace_revision ?? '').startsWith('sha256:'));
   return {
     relativePath: row.relativePath,
     graphifyRows: unique.length,
     currentWorkspaceRows: current.length,
+    sourceRevisionQualifiedRows: qualified.length,
     revisionQualifiedRows: qualified.length,
-    sourceRevision: qualified[0]?.code_source_revision ?? qualified[0]?.source_revision ?? null,
+    workspaceRevisionQualifiedRows: workspaceQualified.length,
+    sourceRevision: qualified[0]?.code_source_revision ?? qualified[0]?.source_revision ?? row.sourceRevision ?? null,
     workspaceRevision: qualified[0]?.workspace_revision ?? null,
-    classification: qualified.length === 1 ? 'CURRENT_REVISION_QUALIFIED' : unique.length === 0 ? 'GRAPHIFY_SOURCE_MISSING' : current.length === 0 ? 'WORKSPACE_REVISION_MISMATCH' : 'AMBIGUOUS_REVISION_BINDING',
+    classification: qualified.length === 1 && workspaceQualified.length === 1
+      ? 'CURRENT_REVISION_QUALIFIED'
+      : qualified.length === 1
+        ? 'SOURCE_REVISION_QUALIFIED_WORKSPACE_MISMATCH'
+        : unique.length === 0
+          ? 'GRAPHIFY_SOURCE_MISSING'
+          : current.length === 0
+            ? 'WORKSPACE_REVISION_MISMATCH'
+            : 'AMBIGUOUS_REVISION_BINDING',
   };
 });
 const counts = {
@@ -68,7 +87,9 @@ const counts = {
   currentWorkspaceRevision,
   graphifyMatched: resultRows.filter((row) => row.graphifyRows > 0).length,
   currentWorkspaceMatched: resultRows.filter((row) => row.currentWorkspaceRows > 0).length,
+  sourceRevisionQualified: resultRows.filter((row) => row.sourceRevisionQualifiedRows > 0).length,
   revisionQualified: resultRows.filter((row) => row.classification === 'CURRENT_REVISION_QUALIFIED').length,
+  workspaceMismatchAfterSourceQualification: resultRows.filter((row) => row.classification === 'SOURCE_REVISION_QUALIFIED_WORKSPACE_MISMATCH').length,
   missing: resultRows.filter((row) => row.classification === 'GRAPHIFY_SOURCE_MISSING').length,
   mismatched: resultRows.filter((row) => row.classification === 'WORKSPACE_REVISION_MISMATCH').length,
   ambiguous: resultRows.filter((row) => row.classification === 'AMBIGUOUS_REVISION_BINDING').length,
@@ -86,8 +107,14 @@ const report = {
   postgresWrites: false,
   graphifyWrites: false,
   qdrantWrites: false,
-  status: error ? 'LINEAGE_AUDIT_ERROR' : counts.revisionQualified > 0 ? 'CURRENT_LINEAGE_COHORT_FOUND' : 'CURRENT_LINEAGE_COHORT_EMPTY',
-  nextGate: counts.revisionQualified > 0 ? 'PROJECTION_REVIEW_REQUIRED' : 'GRAPHIFY_REVISION_RECONCILIATION_REQUIRED',
+  status: error
+    ? 'LINEAGE_AUDIT_ERROR'
+    : counts.revisionQualified > 0
+      ? 'CURRENT_LINEAGE_COHORT_FOUND'
+      : counts.sourceRevisionQualified > 0
+        ? 'SOURCE_LINEAGE_COHORT_FOUND_WORKSPACE_MISMATCH'
+        : 'CURRENT_LINEAGE_COHORT_EMPTY',
+  nextGate: counts.sourceRevisionQualified > 0 ? 'SOURCE_PROJECTION_EXACT_BYTES_ADMISSION_REVIEW' : 'GRAPHIFY_REVISION_RECONCILIATION_REQUIRED',
 };
 report.reportChecksum = crypto.createHash('sha256').update(JSON.stringify(report)).digest('hex');
 fs.mkdirSync(path.dirname(reportPath), { recursive: true });

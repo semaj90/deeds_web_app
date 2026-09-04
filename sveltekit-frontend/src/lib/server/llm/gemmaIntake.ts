@@ -1,5 +1,5 @@
 import { traceLLM } from '$lib/server/observability/langfuse.js';
-import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
+import { LLAMA_SERVER_BASE_URL, getActiveLocalVlmModel } from '$lib/server/ai/local-llama-provider.js';
 
 export type ExtractedPerson = {
  fullName: string;
@@ -71,12 +71,13 @@ NARRATIVE:
 ${narrative}
 `;
 
- const data = await traceLLM('gemma-intake', { model: LOCAL_VLM_MODEL, prompt: narrative.slice(0, 500) }, async (gen) => {
+ const data = await traceLLM('ornith-intake', { modelSource: 'llama-server-8090', prompt: narrative.slice(0, 500) }, async (gen) => {
+	const activeModel = await getActiveLocalVlmModel();
 	const res = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify({
-			model: LOCAL_VLM_MODEL,
+			model: activeModel,
 			messages: [
 				{ role: 'system', content: 'You extract legal intake structure as strict JSON.' },
 				{ role: 'user', content: prompt },

@@ -44,6 +44,12 @@ export const KERNEL_OPERATOR_KIND_VALUES = [
   'INTERSECT_ELIGIBILITY', 'RERANK',
   'VALIDATE_SCHEMA', 'RUN_TEST', 'RUN_TYPECHECK',
   'COMPARE_REVISION', 'BUILD_CONTEXT',
+  // FETCH-LATENT-OPERATOR-01 (parent-atlas-retrieval-lineage-dag-convergence): fetches an
+  // already-materialized candidate-side representation slice (currently only latent_256 is
+  // physically stored -- see LATENT256-REPRESENTATION-CONTRACT-02). This is candidate-side
+  // hydration by known candidate id, NEVER live query-time encoding -- it has no dependency on
+  // LATENT256-QUERY-ENCODER-01 (still blocked/OPEN) and must not be conflated with it.
+  'FETCH_LATENT_REPRESENTATION',
 ] as const;
 
 export const kernelOperatorKindSchema = z.enum(KERNEL_OPERATOR_KIND_VALUES);

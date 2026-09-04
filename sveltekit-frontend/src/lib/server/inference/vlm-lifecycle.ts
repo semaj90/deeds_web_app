@@ -106,7 +106,7 @@ export async function switchVlmMode(targetMode: VlmMode): Promise<{ success: boo
       if (tqProcess) {
         stopTurboQuant(tqProcess.pid);
       }
-      await unloadOllamaModel(ollamaModel);
+      await unloadLlamaServerModel(ollamaModel);
       await new Promise(r => setTimeout(r, RESTART_DELAY_MS));
     } else if (targetMode === VlmMode.VISION) {
       // Transitioning to Vision mode (runs TurboQuant with mmproj)
@@ -115,7 +115,7 @@ export async function switchVlmMode(targetMode: VlmMode): Promise<{ success: boo
         stopTurboQuant(tqProcess.pid);
         await new Promise(r => setTimeout(r, RESTART_DELAY_MS));
       }
-      await unloadOllamaModel(ollamaModel);
+      await unloadLlamaServerModel(ollamaModel);
 
       const modelPath = TURBOQUANT_GGUF;
       const mmprojPath = TURBOQUANT_MMPROJ;
@@ -130,7 +130,7 @@ export async function switchVlmMode(targetMode: VlmMode): Promise<{ success: boo
         stopTurboQuant(tqProcess.pid);
         await new Promise(r => setTimeout(r, RESTART_DELAY_MS));
       }
-      await unloadOllamaModel(ollamaModel);
+      await unloadLlamaServerModel(ollamaModel);
 
       const modelPath = TURBOQUANT_GGUF;
       if (modelPath) {
@@ -233,9 +233,10 @@ function restartTurboQuant(modelPath: string, mmprojPath?: string): void {
 }
 
 /**
- * Unload a model from Ollama to free VRAM
+ * Ask the active llama-server to release a model, when supported.
+ * Ollama is not a chat/generation fallback in this lifecycle.
  */
-async function unloadOllamaModel(model: string): Promise<void> {
+async function unloadLlamaServerModel(model: string): Promise<void> {
   try {
     await fetch(`${getOllamaEndpoint()}/api/generate`, {
       method: 'POST',
@@ -243,9 +244,9 @@ async function unloadOllamaModel(model: string): Promise<void> {
       body: JSON.stringify({ model, prompt: '', keep_alive: 0 }),
       signal: AbortSignal.timeout(5000),
     });
-    console.info(`[vlm-lifecycle] Unloaded Ollama model: ${model}`);
-  } catch {
-    // Ignore errors during unload
+    console.info(`[vlm-lifecycle] Requested llama-server model release: ${model}`);
+  } catch (error) {
+    console.error('[vlm-lifecycle] llama-server model release failed:', error);
   }
 }
 

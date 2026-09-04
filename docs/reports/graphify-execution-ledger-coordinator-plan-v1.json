@@ -1,0 +1,45 @@
+{
+  "schema": "atlas.graphify-execution-ledger-coordinator-plan.v1",
+  "status": "READY_FOR_EXPLICIT_LEDGER_AUTHORIZATION",
+  "sourceReceipt": "docs/reports/graphify-lifecycle-entrypoint-v1.json",
+  "workspaceRevision": "sha256:35e032dee4202bcb34e31efed5baebcd602d4b7e23e7c98d226f5bb2aa75aeb3",
+  "sourceManifestDigest": "35e032dee4202bcb34e31efed5baebcd602d4b7e23e7c98d226f5bb2aa75aeb3",
+  "sourceCount": 25419,
+  "bindingCount": 25419,
+  "executionIdentity": "NEW_UUID_PER_ATTEMPT",
+  "legacyGraphifyRunId": null,
+  "advisoryLock": {
+    "function": "pg_try_advisory_lock",
+    "namespace": 119041,
+    "key": 641934821,
+    "scope": "dedicated connection for one execution"
+  },
+  "stages": [
+    "OPEN",
+    "SOURCE_SELECTION",
+    "INVENTORY",
+    "AST_PARSE",
+    "STRUCTURAL_EXTRACT",
+    "SEMANTIC_ENRICH",
+    "GRAPH_BUILD",
+    "PROJECT",
+    "VALIDATE",
+    "CLOSE"
+  ],
+  "writesPlanned": {
+    "graphifyExecutions": true,
+    "graphifyExecutionFiles": true,
+    "graphifyExecutionStages": true,
+    "graphifyRuns": false,
+    "graphifyFiles": false,
+    "neo4j": false,
+    "qdrant": false,
+    "valkey": false
+  },
+  "authorizationRequired": true,
+  "migrationApplied": false,
+  "canaryRequiredBeforeBroadRun": true,
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "planChecksum": "sha256:2ffb40e1d00cd1ba7024861c3e56923eba37b13b6599a3b1b436f025a688a77b"
+}

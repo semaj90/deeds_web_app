@@ -1,7 +1,8 @@
 import { createHash } from 'node:crypto';
 import { z } from 'zod';
 import { adaptiveDagPlanV1Schema, type AdaptiveDagActionV1, type AdaptiveDagPlanV1, type DagActionKind } from './adaptive-dag-plan-v1.js';
-import { type KernelDagExecutionBindingV1 } from './kernel-dag-execution-binding-v1.js';
+import { resolveKernelDagParameterArtifactV1, type KernelDagExecutionBindingV1 } from './kernel-dag-execution-binding-v1.js';
+import { type ParameterArtifactV1 } from './parameter-artifact-v1.js';
 
 const sha256 = z.string().regex(/^[a-f0-9]{64}$/);
 
@@ -44,6 +45,7 @@ export async function executeKernelBoundDagReadOnlyV1(input: {
   handlers: Partial<Record<DagActionKind, KernelBoundDagHandlerV1>>;
   bindings?: ReadonlyMap<string, KernelDagExecutionBindingV1>;
   implementationHandlers?: Readonly<Record<string, KernelBoundDagHandlerV1>>;
+  parameterArtifacts?: ReadonlyMap<string, ParameterArtifactV1>;
 }): Promise<KernelBoundDagExecutionReceiptV1> {
   const plan = adaptiveDagPlanV1Schema.parse(input.plan);
   if (plan.actions.some((action) => action.mutationPolicy === 'MUTATES_WITH_RECEIPT')) {
@@ -68,8 +70,11 @@ export async function executeKernelBoundDagReadOnlyV1(input: {
       : input.handlers[action.actionKind];
     if (binding && binding.action.actionId !== action.actionId) throw new Error(`KERNEL_BOUND_EXECUTOR_BINDING_ACTION_MISMATCH:${action.actionId}`);
     if (!handler) throw new Error(`KERNEL_BOUND_EXECUTOR_HANDLER_MISSING:${action.actionKind}`);
+    const resolvedBinding = binding && action.parameterArtifactRef
+      ? { ...binding, boundArguments: resolveKernelDagParameterArtifactV1({ action, binding, artifact: input.parameterArtifacts?.get(action.parameterArtifactRef) ?? (() => { throw new Error(`KERNEL_BOUND_EXECUTOR_PARAMETER_ARTIFACT_MISSING:${action.actionId}`); })() }) }
+      : binding;
     const parentResults = action.parentActionIds.map((parentId) => completed.get(parentId));
-    const output = await handler({ action, parentResults, binding });
+    const output = await handler({ action, parentResults, binding: resolvedBinding });
     completed.set(action.actionId, output);
     order.push(action.actionId);
     results.push({ actionId: action.actionId, actionChecksum: action.inputChecksum, outputChecksum: digest(output), status: 'SUCCEEDED' });

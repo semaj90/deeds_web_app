@@ -1,0 +1,53 @@
+{
+  "schema": "atlas.latent-dimension-coverage-audit.v1",
+  "observedAt": "2026-09-03",
+  "database": "legal_ai_db",
+  "sourceTable": "public.codebase_chunk_index",
+  "totalRows": 55853,
+  "semantic768ColumnObserved": "content_embedding",
+  "semantic768Rows": 1386,
+  "latent256Rows": 55169,
+  "latent256RevisionRows": 55169,
+  "latent64Rows": 1164,
+  "latent128StoredColumn": false,
+  "indexesObserved": [
+    "idx_codebase_chunk_latent_256_hnsw",
+    "idx_codebase_chunk_latent_256_checkpoint_revision",
+    "idx_codebase_chunk_latent64_hnsw",
+    "idx_codebase_chunk_latent_valid"
+  ],
+  "representationRegistryTablePresent": false,
+  "registryMigrationCandidates": [
+    {
+      "path": "sveltekit-frontend/drizzle/0152_atlas_representations_registry.sql",
+      "role": "COMPATIBLE_DEPENDENCY_CANDIDATE",
+      "matchesNestedDraftColumns": true,
+      "appliedOrJournaled": false
+    },
+    {
+      "path": "sveltekit-frontend/drizzle/0152_atlas_representations_registry_revised.sql",
+      "role": "INCOMPATIBLE_ALTERNATE_CANDIDATE",
+      "matchesNestedDraftColumns": false,
+      "appliedOrJournaled": false,
+      "blockingObservation": "Uses a different registry column contract and CREATE INDEX CONCURRENTLY within BEGIN/COMMIT."
+    }
+  ],
+  "registryMigrationDependency": "sveltekit-frontend/drizzle/0152_atlas_representations_registry.sql",
+  "registryAuthorityStatus": "UNRESOLVED_MANUAL_MIGRATION_DUPLICATES",
+  "proofDatabaseStatus": "NOT_RUN_POSTGRES18_IMAGE_ABSENT",
+  "proofHarnessReuse": "scripts/atlas/prove-feature-registry-disposable-postgres.mjs",
+  "documentationDrift": {
+    "phase110DocsDescribeRevisedAsCurrent": true,
+    "interpretation": "Historical documentation does not prove that either manual migration is journaled or applied."
+  },
+  "classification": "PARTIAL_STORAGE_PROVEN_REGISTRY_UNAVAILABLE",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "notes": [
+    "latent_256 is physically populated and indexed in codebase_chunk_index.",
+    "latent_128 remains a derived prefix view and has no independent stored column.",
+    "The nested representation registry draft is unapplied, so representation admission is not proven.",
+    "Counts are coverage evidence only and do not prove source, workspace, or candidate lineage.",
+    "An existing disposable-Postgres proof harness was found, but postgres:18 is not present locally; no image pull, container creation, migration apply, or live datastore write was attempted."
+  ]
+}

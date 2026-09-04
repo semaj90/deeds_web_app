@@ -1,0 +1,25 @@
+{
+  "schema": "atlas.graph-context-dag-input.v1",
+  "generatedAt": "2026-09-03T18:29:57.040081-07:00",
+  "graphArtifactRef": "docs/reports/neo4j-concept-networkx-export-v1.json",
+  "graphRevision": "sha256:a44822cbd06c1ea50eeb2112a48b902802b013909e7e96170d1e3bede102c003",
+  "graphProjectionChecksum": "sha256:1578ff30ca5439f22d73584be515bcd38215b088ede7e7108a932a61131231db",
+  "ontologyTupleArtifactRef": "docs/reports/fixtures/ontology-linked-tuple-fixture-v1.json",
+  "ontologyTupleProjectionChecksum": "sha256:0dfc800f2684b6fa6bae8a7be64773bb129c6ad566bc32779679553088cd6516",
+  "nodeCount": 20389,
+  "edgeCount": 2000,
+  "ontologyTupleCount": 1,
+  "tupleNodeCount": 5,
+  "tupleEdgeCount": 4,
+  "consumers": [
+    "LangExtract",
+    "Ornith",
+    "bounded DAG synthesis"
+  ],
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "containsEmbeddings": false,
+  "containsTensors": false,
+  "containsHiddenReasoning": false,
+  "compositionChecksum": "sha256:db457a1a511c490201117f57e549d65284057f528dc7b19b81784234cc8d8f28"
+}

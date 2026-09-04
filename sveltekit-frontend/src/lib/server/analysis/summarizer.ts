@@ -4,12 +4,9 @@
  * Wired to use Gemma4 synthesis server with streaming support.
  */
 
-import { ENV } from '$lib/server/env.server.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
-import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
+import { resolveLlamaInferenceTarget } from '$lib/server/llm/runtime-contract.js';
 
-const GEMMA4_URL = process.env.GEMMA4_URL || 'http://127.0.0.1:8090';
-const MODEL = LLM_MODEL_ID;
 
 /**
  * Assemble summary by reading streaming response from Gemma4.
@@ -17,14 +14,15 @@ const MODEL = LLM_MODEL_ID;
  */
 async function fetchGemma4Summary(systemPrompt: string, userPrompt: string, timeoutMs: number = 90_000): Promise<string> {
 	try {
+		const target = await resolveLlamaInferenceTarget();
 		const controller = new AbortController();
 		const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
-		const res = await fetch(`${GEMMA4_URL}/v1/chat/completions`, {
+		const res = await fetch(`${target.baseUrl}/v1/chat/completions`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				model: MODEL,
+				model: target.model,
 				messages: [
 					{ role: 'system', content: systemPrompt },
 					{ role: 'user', content: userPrompt },
@@ -98,7 +96,7 @@ export async function summarizeDocument(text: string, maxWords: number = 150): P
 	const input = text.slice(0, 16_000);
 
 	try {
-		return await traceLLM('summarize-document', { model: MODEL, prompt: input.slice(0, 500) }, async (gen) => {
+		return await traceLLM('summarize-document', { modelSource: 'llama-server-8090', prompt: input.slice(0, 500) }, async (gen) => {
 			const systemPrompt = `You are a legal document summarizer. Provide concise, factual summaries focusing on key parties, dates, legal issues, and outcomes.`;
 
 			const userPrompt = `Summarize the following legal document in ${maxWords} words or less. Focus on key facts, dates, parties involved, and legal issues:\n\n${input}`;

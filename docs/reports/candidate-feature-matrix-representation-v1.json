@@ -1,0 +1,42 @@
+{
+  "schema": "atlas.candidate-feature-matrix-representation-audit.v1",
+  "status": "STATIC_OWNER_SURFACE_PROVEN_MANIFEST_OPEN",
+  "checks": {
+    "ordinal_owner_has_representation_bindings": true,
+    "feature_row_has_representation_bindings": true,
+    "feature_snapshot_binds_ordinal_checksum": true,
+    "latent256_receipt_has_vectors_checksum": true,
+    "latent256_receipt_has_candidate_snapshot_revision": true,
+    "representation_family_declares_latent256": true,
+    "representation_family_declares_latent128": true,
+    "representation_family_declares_latent64": true,
+    "raw_vectors_absent_from_feature_row_contract": true
+  },
+  "existingOwners": {
+    "candidateOrdinal": "canonical-candidate-v1.ts",
+    "featureRow": "candidate-feature-row-v1.ts",
+    "featureSnapshot": "candidate-feature-snapshot-v1.ts",
+    "latent256Hydration": "candidate-latent256-hydration-receipt-v1.ts",
+    "representationFamily": "representation-artifact-v1.ts"
+  },
+  "requiredManifestFieldsNotYetOwned": [
+    "latent256Ref",
+    "latent128ViewRef",
+    "latent64ViewRef",
+    "representationAlignmentChecksum",
+    "representationAvailabilityByOrdinal"
+  ],
+  "representationAlignment": {
+    "candidateOrdinal": "same ordinal map required",
+    "semantic_768": "required canonical semantic lane",
+    "latent_256": "optional persisted parent reference",
+    "latent_128": "optional virtual derived-view reference",
+    "latent_64": "optional persisted physical reference"
+  },
+  "liveSnapshotReplay": "UNPROVEN",
+  "vectorMaterialization": "NOT_PERFORMED",
+  "rankingBehaviorChanged": false,
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "sourceChecksum": "sha256:8990bce484a2afa157f3be64dc08da745155a7fdc5a5a583cdb8ab03b409df43"
+}

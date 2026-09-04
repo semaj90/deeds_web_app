@@ -1,20 +1,18 @@
 // @ts-nocheck
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
-import { ENV } from '$lib/server/env.server.js';
-import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
+import { resolveLoadedLlamaModel } from '$lib/server/ai/llama-server-model-resolver.js';
 
 const LLAMA_SERVER_URL = process.env.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090';
-const MODEL_PREFERENCE = [LLM_MODEL_ID];
 
 async function callLlamaServer(prompt: string, format?: 'json' | 'text', timeoutMs = 90_000): Promise<string> {
-  for (const model of MODEL_PREFERENCE) {
-    try {
+  try {
+      const loaded = await resolveLoadedLlamaModel(LLAMA_SERVER_URL, null, Math.min(timeoutMs, 5_000));
       const res = await fetch(`${LLAMA_SERVER_URL}/v1/chat/completions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model,
+          model: loaded.resolvedModel,
           messages: [{ role: 'user', content: prompt }],
           temperature: 0.3,
           max_tokens: 2048,
@@ -25,21 +23,14 @@ async function callLlamaServer(prompt: string, format?: 'json' | 'text', timeout
       });
 
       if (!res.ok) {
-        if (model === MODEL_PREFERENCE[MODEL_PREFERENCE.length - 1]) {
-          throw new Error(`llama-server ${res.status}`);
-        }
-        continue;
+        throw new Error(`llama-server ${res.status}`);
       }
 
       const data = await res.json() as { choices?: Array<{ message?: { content?: string } }> };
       return data.choices?.[0]?.message?.content ?? '{}';
-    } catch (err) {
-      if (model === MODEL_PREFERENCE[MODEL_PREFERENCE.length - 1]) {
-        throw err;
-      }
-    }
+  } catch (err) {
+    throw err;
   }
-  throw new Error('No LLM models available');
 }
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;

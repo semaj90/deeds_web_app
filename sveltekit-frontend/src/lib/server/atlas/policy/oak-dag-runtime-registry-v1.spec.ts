@@ -13,7 +13,10 @@ describe('OaK runtime owner registry', () => {
     const registry = createOakDagRuntimeRegistryV1();
     expect(registry.canonicalAuthority).toBe(false);
     expect(registry.implementationRefs).toEqual([...registry.implementationRefs].sort());
-    expect(registry.implementationRefs).toHaveLength(6);
+    // FETCH-LATENT-OPERATOR-01: was 6, already stale before this addition (neural-latent
+    // handler already brought the real count to 7; this assertion had not been updated to
+    // match). Now 8 with createOakDagCandidateLatentHandlerV1 added alongside it.
+    expect(registry.implementationRefs).toHaveLength(8);
     expect(registry.implementationRefs).not.toContain('search_hybrid');
     expect(registry.implementationRefs).not.toContain('search_postgres_fts');
     expect(resolveOakDagRuntimeHandlerV1(registry, registry.implementationRefs[0]).implementationRef).toBe(registry.implementationRefs[0]);

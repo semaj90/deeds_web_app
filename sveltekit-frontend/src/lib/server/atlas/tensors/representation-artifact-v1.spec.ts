@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 import {
   RepresentationArtifactV1Schema,
   assertPromotionReadyRepresentationArtifact,
+  assertRepresentationFamilyRevisionBinding,
+  NESTED_LATENT_REPRESENTATION_FAMILY_V1,
 } from './representation-artifact-v1.js';
 
 const artifact = {
@@ -9,7 +11,11 @@ const artifact = {
   representationId: 'latent_256',
   representationFamily: 'nested-semantic-autoencoder',
   representationRevision: 'latent:sha256:revision',
-  dimensions: 64,
+  // LATENT256-REPRESENTATION-CONTRACT-02: was 64, mismatched against representationId
+  // 'latent_256' — never caught before because the pre-fix assertPromotionReadyRepresentationArtifact
+  // only special-cased the literal string 'ae_latent_64', so this fixture's own dimensions field
+  // was never actually validated against its representationId. Corrected to 256 to match.
+  dimensions: 256,
   dtype: 'float32' as const,
   normalization: 'none' as const,
   inputRepresentationId: 'semantic_768',
@@ -111,5 +117,122 @@ describe('RepresentationArtifactV1', () => {
     expect(() => RepresentationArtifactV1Schema.parse(invalid)).toThrow(
       'SOURCE_AUTHORITY_PROVEN_REQUIRES_SOURCE_REVISION_DIGEST',
     );
+  });
+});
+
+describe('LATENT256-REPRESENTATION-CONTRACT-02: nested latent family', () => {
+  it('accepts a latent_128 (derived-view) artifact declaring latent_256 as its input', () => {
+    const latent128 = RepresentationArtifactV1Schema.parse({
+      ...artifact,
+      representationId: 'latent_128',
+      dimensions: 128,
+      inputRepresentationId: 'latent_256',
+      inputRepresentationRevision: 'latent:sha256:input',
+    });
+    expect(() => assertPromotionReadyRepresentationArtifact(latent128)).not.toThrow();
+  });
+
+  it('rejects a latent_128 artifact that (incorrectly) declares semantic_768 as its input', () => {
+    const invalid = RepresentationArtifactV1Schema.parse({
+      ...artifact,
+      representationId: 'latent_128',
+      dimensions: 128,
+      // inputRepresentationId left as 'semantic_768' from the base fixture — wrong for latent_128
+    });
+    expect(() => assertPromotionReadyRepresentationArtifact(invalid)).toThrow(
+      'LATENT_INPUT_REPRESENTATION_MISMATCH',
+    );
+  });
+
+  it('accepts a latent_64 artifact declaring semantic_768 as its input (matches the live physical producer, NOT a derived-view chain from latent_256)', () => {
+    const latent64 = RepresentationArtifactV1Schema.parse({
+      ...artifact,
+      representationId: 'latent_64',
+      dimensions: 64,
+      inputRepresentationId: 'semantic_768',
+    });
+    expect(() => assertPromotionReadyRepresentationArtifact(latent64)).not.toThrow();
+  });
+
+  it('rejects a latent_128 artifact whose dimensions do not match the frozen family (128)', () => {
+    const invalid = RepresentationArtifactV1Schema.parse({
+      ...artifact,
+      representationId: 'latent_128',
+      dimensions: 64,
+      inputRepresentationId: 'latent_256',
+    });
+    expect(() => assertPromotionReadyRepresentationArtifact(invalid)).toThrow(
+      'LATENT_128_DIMENSION_MISMATCH',
+    );
+  });
+
+  it('records latent_64 as physically stored and latent_128 as a derived view, matching live Postgres (not the reverse)', () => {
+    expect(NESTED_LATENT_REPRESENTATION_FAMILY_V1.members.latent_64.physical).toBe(true);
+    expect(NESTED_LATENT_REPRESENTATION_FAMILY_V1.members.latent_128.physical).toBe(false);
+    expect(NESTED_LATENT_REPRESENTATION_FAMILY_V1.members.latent_256.physical).toBe(true);
+  });
+
+  it('accepts family members that share one root modelChecksum/modelRevision/parametersDigest/transformPolicyRevision', () => {
+    const latent256 = RepresentationArtifactV1Schema.parse(artifact);
+    const latent64 = RepresentationArtifactV1Schema.parse({
+      ...artifact,
+      representationId: 'latent_64',
+      dimensions: 64,
+      inputRepresentationId: 'semantic_768',
+    });
+    expect(() => assertRepresentationFamilyRevisionBinding([latent256, latent64])).not.toThrow();
+  });
+
+  it('rejects a latent_64 artifact silently derived from a different latent_256 checkpoint than it claims (the exact bug this gate closes)', () => {
+    const latent256 = RepresentationArtifactV1Schema.parse(artifact);
+    const latent64WrongChecksum = RepresentationArtifactV1Schema.parse({
+      ...artifact,
+      representationId: 'latent_64',
+      dimensions: 64,
+      inputRepresentationId: 'semantic_768',
+      modelChecksum: 'b'.repeat(64),
+    });
+    expect(() =>
+      assertRepresentationFamilyRevisionBinding([latent256, latent64WrongChecksum]),
+    ).toThrow('REPRESENTATION_FAMILY_REVISION_MISMATCH');
+  });
+
+  it('does nothing for a single artifact or unrelated representationIds (no cross-artifact claim to check)', () => {
+    const latent256 = RepresentationArtifactV1Schema.parse(artifact);
+    expect(() => assertRepresentationFamilyRevisionBinding([latent256])).not.toThrow();
+    expect(() => assertRepresentationFamilyRevisionBinding([])).not.toThrow();
+  });
+});
+
+describe('LATENT-REPRESENTATION-SEMANTICS-03: origin/materialization axes', () => {
+  it('latent_256 is LEARNED + PERSISTED, not co-produced with anything', () => {
+    const m = NESTED_LATENT_REPRESENTATION_FAMILY_V1.members.latent_256;
+    expect(m.origin).toBe('LEARNED');
+    expect(m.materialization).toBe('PERSISTED');
+    expect(m.coProducedWith).toBeNull();
+    expect(m.parentRepresentationId).toBeNull();
+  });
+
+  it('latent_128 is DERIVED + VIRTUAL, a true transform of the latent_256 parent', () => {
+    const m = NESTED_LATENT_REPRESENTATION_FAMILY_V1.members.latent_128;
+    expect(m.origin).toBe('DERIVED');
+    expect(m.materialization).toBe('VIRTUAL');
+    expect(m.parentRepresentationId).toBe('latent_256');
+    expect(m.transform).toBe('NESTED_PREFIX_L2_RENORMALIZE');
+    expect(m.coProducedWith).toBeNull();
+  });
+
+  it('latent_64 is LEARNED + PERSISTED and co-produced with latent_256 -- NOT a derived view of it', () => {
+    // This is the live-evidence correction: an operator proposal in this same OpenSpec change
+    // framed latent_64 as origin:'DERIVED' with a parentRepresentationId of latent_256. That
+    // contradicts this file's own prior audit (unchanged) -- latent_64 is written by the SAME
+    // NestedSemanticAutoencoder.encode() forward pass over semantic_768 as latent_256, not
+    // computed by transforming an already-persisted latent_256 row.
+    const m = NESTED_LATENT_REPRESENTATION_FAMILY_V1.members.latent_64;
+    expect(m.origin).toBe('LEARNED');
+    expect(m.materialization).toBe('PERSISTED');
+    expect(m.parentRepresentationId).toBeNull();
+    expect(m.coProducedWith).toBe('latent_256');
+    expect(m.inputRepresentationId).toBe('semantic_768');
   });
 });

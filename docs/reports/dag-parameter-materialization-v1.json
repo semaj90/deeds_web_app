@@ -1,0 +1,37 @@
+{
+  "schema": "atlas.dag-parameter-materialization.v1",
+  "mode": "READ_ONLY_PROOF",
+  "artifactCount": 2,
+  "deterministicReplay": true,
+  "distinctOperatorArtifacts": true,
+  "artifacts": [
+    {
+      "schema": "atlas.parameter-artifact.v1",
+      "artifactId": "parameter:v1:c69aaa6c8d2e3d6121f198a017cc5a8c3d2061a0ab61232fddd1cd6a64ab8233",
+      "actionId": "plan:proof:lexical",
+      "actionKind": "FETCH_POSTGRES",
+      "schemaRef": "input:lexical-search",
+      "schemaRevision": "operator:lexical:v1",
+      "parameterChecksum": "8f141e40ef4aed5850cd17aa6ef2c0c898827fda2fa602337c7707444a108b0f",
+      "artifactChecksum": "c69aaa6c8d2e3d6121f198a017cc5a8c3d2061a0ab61232fddd1cd6a64ab8233",
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    {
+      "schema": "atlas.parameter-artifact.v1",
+      "artifactId": "parameter:v1:da5ef7ec02be8c56a7c8a6be804ebddcb968df28b7f475f1a69a5a36ce59be4d",
+      "actionId": "plan:proof:semantic",
+      "actionKind": "FETCH_QDRANT",
+      "schemaRef": "input:semantic-search",
+      "schemaRevision": "operator:semantic:v1",
+      "parameterChecksum": "a13f9601b4ed729ea3662eceb0f9876e2c27d0cda9e0af09701fc6da0e7cc204",
+      "artifactChecksum": "da5ef7ec02be8c56a7c8a6be804ebddcb968df28b7f475f1a69a5a36ce59be4d",
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    }
+  ],
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "status": "PROVEN_BOUNDED",
+  "runtimeExecutorLoading": "OPEN"
+}

@@ -63,7 +63,9 @@ export const candidateRepresentationBindingV1Schema = z.object({
     if (binding.family !== 'LEARNED_LATENT') {
       ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['family'], message: 'LEARNED_LATENT_FAMILY_MISMATCH' });
     }
-    const isPhysicalLatent = binding.representationId === 'latent_256';
+    // latent_256 and latent_64 are persisted learned outputs from semantic_768.
+    // Only latent_128 is the virtual PREFIX_L2 view of latent_256.
+    const isPhysicalLatent = binding.representationId !== 'latent_128';
     const expectedProjection = isPhysicalLatent ? 'LEARNED_AUTOENCODER' : 'NESTED_PREFIX_L2_RENORMALIZE';
     const expectedSource = isPhysicalLatent ? 'semantic_768' : 'latent_256';
     if (binding.projectionKind !== expectedProjection) {
@@ -158,7 +160,9 @@ export const canonicalCandidateV1Schema = canonicalCandidateV1BaseSchema.superRe
   requireAvailableSource('semantic_mrl_128', 'semantic_768');
   requireAvailableSource('latent_256', 'semantic_768');
   requireAvailableSource('latent_128', 'latent_256');
-  requireAvailableSource('latent_64', 'latent_256');
+  // latent_64 is a persisted sibling output of the same encoder pass, not a
+  // virtual prefix of latent_256. Its direct source is semantic_768.
+  requireAvailableSource('latent_64', 'semantic_768');
 });
 export type CanonicalCandidateV1 = z.infer<typeof canonicalCandidateV1Schema>;
 

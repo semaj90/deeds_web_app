@@ -1,12 +1,12 @@
 /**
- * GPU Arbiter — VRAM Mutex for TRT-LLM / Ollama Exclusive Access
+ * GPU Arbiter — VRAM Mutex for TRT-LLM / EmbeddingGemma Exclusive Access
  *
  * RTX 3060 Ti has 8GB VRAM. Ollama uses ~5.2GB when loaded.
  * TRT-LLM and Ollama cannot coexist at full model load.
  * This arbiter manages exclusive GPU lease via Redis.
  *
  * Wired into inference pipeline:
- *   - /api/chat acquires lease before Ollama chat ✅
+ *   - chat/generation uses llama-server :8090
  *   - /api/chat/stream acquires lease before streaming ✅
  *   - /api/embed acquires lease before embedding ✅
  *   - /api/health/capabilities exposes lease status ✅
@@ -16,6 +16,7 @@
 import type { Redis } from 'ioredis';
 import { getRedis } from '$lib/server/redis.js';
 import { ENV } from '$lib/server/env.server.js';
+import { getOllamaEmbeddingEndpoint } from '$lib/server/utils/ollama-endpoint.js';
 
 export type InferenceBackend = 'ollama' | 'llama-server' | 'tensorrt';
 
@@ -69,7 +70,7 @@ export async function acquireGpuLease(
 
 		// If switching to TRT-LLM, unload Ollama models first
 		if (backend === 'tensorrt') {
-			await unloadOllamaModels();
+			await unloadEmbeddingModel();
 		}
 
 		await redis.set(LEASE_KEY, JSON.stringify(lease), 'EX', ttlSeconds);
@@ -175,34 +176,24 @@ export async function getGpuSemaphoreStatus(): Promise<{ active: number; max: nu
 }
 
 /**
- * Tell Ollama to unload all models (free VRAM for TRT-LLM).
- * Uses keep_alive: 0 which signals immediate unload.
+ * Release only the embedding model before another approved GPU executor runs.
+ * Chat and generation are owned by llama-server :8090 and are never unloaded
+ * through the embedding-only Ollama lane.
  */
-async function unloadOllamaModels(): Promise<void> {
-	const ollamaUrl = ENV.OLLAMA_BASE_URL;
+async function unloadEmbeddingModel(): Promise<void> {
+	const ollamaUrl = getOllamaEmbeddingEndpoint();
 	try {
-		// List loaded models
-		const tagsRes = await fetch(`${ollamaUrl}/api/tags`, {
-			signal: AbortSignal.timeout(3000)
+		await fetch(`${ollamaUrl}/api/generate`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				model: ENV.OLLAMA_EMBED_MODEL ?? 'embeddinggemma:latest',
+				prompt: '',
+				keep_alive: 0
+			}),
+			signal: AbortSignal.timeout(5000)
 		});
-		if (!tagsRes.ok) return;
-		const data = await tagsRes.json();
-		const models = (data.models ?? []) as { name: string }[];
-
-		// Unload each model by sending a noop generate with keep_alive: 0
-		for (const m of models) {
-			await fetch(`${ollamaUrl}/api/generate`, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					model: m.name,
-					prompt: '',
-					keep_alive: 0
-				}),
-				signal: AbortSignal.timeout(5000)
-			}).catch(() => {});
-		}
-	} catch {
-		// Non-critical — Ollama may not be running
+	} catch (error) {
+		console.error('[gpu-arbiter] EmbeddingGemma unload failed:', error);
 	}
 }
