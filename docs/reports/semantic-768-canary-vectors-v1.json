@@ -4,8 +4,11 @@
   "candidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
   "ordinalMapChecksum": "86fee5d38619d3065d8710942068f26fb5b0d3c09992b1b523083ae0a593d297",
   "vectorColumn": "content_embedding",
+  "sourceStorageDtype": "halfvec",
   "dimensions": 768,
   "candidateCount": 15,
+  "inputVectorsChecksum": "4e64d6a4ecd11ea6ce5d734c18b82aebcadff78fa295f734cdd30adce77d52fe",
+  "orderedCandidateBindingChecksum": "6ec7f16caaf7b37686304cb6a82e8228b190dca038cb8f5e9eb54d5681fb557c",
   "canonicalAuthority": false,
   "writesPerformed": false,
   "candidates": [

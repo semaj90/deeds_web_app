@@ -4,120 +4,515 @@
   "sourceReceipt": "docs/reports/lineage-semantic-768-cohort-v1.json",
   "candidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
   "ordinalMapChecksum": "86fee5d38619d3065d8710942068f26fb5b0d3c09992b1b523083ae0a593d297",
-  "device": "cuda",
-  "candidateCount": 15,
-  "topK": 5,
+  "inputVectorsChecksum": "4e64d6a4ecd11ea6ce5d734c18b82aebcadff78fa295f734cdd30adce77d52fe",
+  "orderedCandidateBindingChecksum": "6ec7f16caaf7b37686304cb6a82e8228b190dca038cb8f5e9eb54d5681fb557c",
+  "source": {
+    "table": "codebase_chunk_index",
+    "column": "content_embedding",
+    "storageType": "halfvec(768)"
+  },
+  "execution": {
+    "pytorchDevice": "cuda",
+    "torchVersion": "2.13.0+cu130",
+    "cuvsVersion": "26.06.00",
+    "executionDtype": "float32"
+  },
+  "corpusCount": 15,
+  "queryCount": 15,
+  "dimensions": 768,
+  "topK": 10,
   "scaleCaveat": "N=15 is too small to meaningfully distinguish exact-search implementations from each other -- this proves cuVS wiring/CandidateOrdinal binding correctness against real production vectors, not exact-vs-approximate recall behavior at scale.",
-  "rank1Matches": 15,
-  "topKSetMatches": 15,
-  "maxTop1ScoreDelta": 2.980232238769531e-07,
+  "metrics": {
+    "meanRecallAtK": 1.0,
+    "minRecallAtK": 1.0,
+    "rank1MatchRate": 1.0,
+    "fullRankAgreementRate": 1.0,
+    "candidateOrdinalIdentityMatchRate": 1.0,
+    "maxScoreDelta": 2.980232238769531e-07,
+    "meanScoreDelta": 8.344650268554687e-08,
+    "nanInfCount": 0
+  },
   "scoreDeltaTolerance": 0.0001,
-  "nanOrInfCount": 0,
   "perQuery": [
     {
+      "rowIndex": 0,
       "queryCandidateOrdinal": 0,
-      "torchTop1CandidateOrdinal": 0,
-      "cuvsTop1CandidateOrdinal": 0,
+      "torchTopKCandidateOrdinals": [
+        0,
+        9,
+        3,
+        5,
+        4,
+        6,
+        12,
+        2,
+        13,
+        11
+      ],
+      "cuvsTopKCandidateOrdinals": [
+        0,
+        9,
+        3,
+        5,
+        4,
+        6,
+        12,
+        2,
+        13,
+        11
+      ],
       "rank1Match": true,
-      "topKSetMatch": true
+      "fullRankAgreement": true,
+      "recallAtK": 1.0,
+      "candidateOrdinalIdentityMatch": true
     },
     {
+      "rowIndex": 1,
       "queryCandidateOrdinal": 1,
-      "torchTop1CandidateOrdinal": 1,
-      "cuvsTop1CandidateOrdinal": 1,
+      "torchTopKCandidateOrdinals": [
+        1,
+        8,
+        3,
+        10,
+        12,
+        2,
+        4,
+        11,
+        14,
+        7
+      ],
+      "cuvsTopKCandidateOrdinals": [
+        1,
+        8,
+        3,
+        10,
+        12,
+        2,
+        4,
+        11,
+        14,
+        7
+      ],
       "rank1Match": true,
-      "topKSetMatch": true
+      "fullRankAgreement": true,
+      "recallAtK": 1.0,
+      "candidateOrdinalIdentityMatch": true
     },
     {
+      "rowIndex": 2,
       "queryCandidateOrdinal": 2,
-      "torchTop1CandidateOrdinal": 2,
-      "cuvsTop1CandidateOrdinal": 2,
+      "torchTopKCandidateOrdinals": [
+        2,
+        12,
+        3,
+        4,
+        1,
+        10,
+        11,
+        8,
+        9,
+        14
+      ],
+      "cuvsTopKCandidateOrdinals": [
+        2,
+        12,
+        3,
+        4,
+        1,
+        10,
+        11,
+        8,
+        9,
+        14
+      ],
       "rank1Match": true,
-      "topKSetMatch": true
+      "fullRankAgreement": true,
+      "recallAtK": 1.0,
+      "candidateOrdinalIdentityMatch": true
     },
     {
+      "rowIndex": 3,
       "queryCandidateOrdinal": 3,
-      "torchTop1CandidateOrdinal": 3,
-      "cuvsTop1CandidateOrdinal": 3,
+      "torchTopKCandidateOrdinals": [
+        3,
+        11,
+        4,
+        2,
+        10,
+        12,
+        1,
+        8,
+        7,
+        14
+      ],
+      "cuvsTopKCandidateOrdinals": [
+        3,
+        11,
+        4,
+        2,
+        10,
+        12,
+        1,
+        8,
+        7,
+        14
+      ],
       "rank1Match": true,
-      "topKSetMatch": true
+      "fullRankAgreement": true,
+      "recallAtK": 1.0,
+      "candidateOrdinalIdentityMatch": true
     },
     {
+      "rowIndex": 4,
       "queryCandidateOrdinal": 4,
-      "torchTop1CandidateOrdinal": 4,
-      "cuvsTop1CandidateOrdinal": 4,
+      "torchTopKCandidateOrdinals": [
+        4,
+        3,
+        11,
+        10,
+        2,
+        12,
+        1,
+        14,
+        7,
+        8
+      ],
+      "cuvsTopKCandidateOrdinals": [
+        4,
+        3,
+        11,
+        10,
+        2,
+        12,
+        1,
+        14,
+        7,
+        8
+      ],
       "rank1Match": true,
-      "topKSetMatch": true
+      "fullRankAgreement": true,
+      "recallAtK": 1.0,
+      "candidateOrdinalIdentityMatch": true
     },
     {
+      "rowIndex": 5,
       "queryCandidateOrdinal": 5,
-      "torchTop1CandidateOrdinal": 5,
-      "cuvsTop1CandidateOrdinal": 5,
+      "torchTopKCandidateOrdinals": [
+        5,
+        6,
+        9,
+        3,
+        13,
+        4,
+        0,
+        12,
+        2,
+        10
+      ],
+      "cuvsTopKCandidateOrdinals": [
+        5,
+        6,
+        9,
+        3,
+        13,
+        4,
+        0,
+        12,
+        2,
+        10
+      ],
       "rank1Match": true,
-      "topKSetMatch": true
+      "fullRankAgreement": true,
+      "recallAtK": 1.0,
+      "candidateOrdinalIdentityMatch": true
     },
     {
+      "rowIndex": 6,
       "queryCandidateOrdinal": 6,
-      "torchTop1CandidateOrdinal": 6,
-      "cuvsTop1CandidateOrdinal": 6,
+      "torchTopKCandidateOrdinals": [
+        6,
+        9,
+        5,
+        4,
+        3,
+        12,
+        2,
+        13,
+        0,
+        10
+      ],
+      "cuvsTopKCandidateOrdinals": [
+        6,
+        9,
+        5,
+        4,
+        3,
+        12,
+        2,
+        13,
+        0,
+        10
+      ],
       "rank1Match": true,
-      "topKSetMatch": true
+      "fullRankAgreement": true,
+      "recallAtK": 1.0,
+      "candidateOrdinalIdentityMatch": true
     },
     {
+      "rowIndex": 7,
       "queryCandidateOrdinal": 7,
-      "torchTop1CandidateOrdinal": 7,
-      "cuvsTop1CandidateOrdinal": 7,
+      "torchTopKCandidateOrdinals": [
+        7,
+        14,
+        10,
+        11,
+        3,
+        4,
+        8,
+        1,
+        2,
+        12
+      ],
+      "cuvsTopKCandidateOrdinals": [
+        7,
+        14,
+        10,
+        11,
+        3,
+        4,
+        8,
+        1,
+        2,
+        12
+      ],
       "rank1Match": true,
-      "topKSetMatch": true
+      "fullRankAgreement": true,
+      "recallAtK": 1.0,
+      "candidateOrdinalIdentityMatch": true
     },
     {
+      "rowIndex": 8,
       "queryCandidateOrdinal": 8,
-      "torchTop1CandidateOrdinal": 8,
-      "cuvsTop1CandidateOrdinal": 8,
+      "torchTopKCandidateOrdinals": [
+        8,
+        11,
+        1,
+        14,
+        3,
+        2,
+        10,
+        12,
+        7,
+        4
+      ],
+      "cuvsTopKCandidateOrdinals": [
+        8,
+        11,
+        1,
+        14,
+        3,
+        2,
+        10,
+        12,
+        7,
+        4
+      ],
       "rank1Match": true,
-      "topKSetMatch": true
+      "fullRankAgreement": true,
+      "recallAtK": 1.0,
+      "candidateOrdinalIdentityMatch": true
     },
     {
+      "rowIndex": 9,
       "queryCandidateOrdinal": 9,
-      "torchTop1CandidateOrdinal": 9,
-      "cuvsTop1CandidateOrdinal": 9,
+      "torchTopKCandidateOrdinals": [
+        9,
+        6,
+        0,
+        3,
+        5,
+        4,
+        12,
+        11,
+        13,
+        2
+      ],
+      "cuvsTopKCandidateOrdinals": [
+        9,
+        6,
+        0,
+        3,
+        5,
+        4,
+        12,
+        11,
+        13,
+        2
+      ],
       "rank1Match": true,
-      "topKSetMatch": true
+      "fullRankAgreement": true,
+      "recallAtK": 1.0,
+      "candidateOrdinalIdentityMatch": true
     },
     {
+      "rowIndex": 10,
       "queryCandidateOrdinal": 10,
-      "torchTop1CandidateOrdinal": 10,
-      "cuvsTop1CandidateOrdinal": 10,
+      "torchTopKCandidateOrdinals": [
+        10,
+        14,
+        7,
+        3,
+        4,
+        1,
+        11,
+        2,
+        12,
+        8
+      ],
+      "cuvsTopKCandidateOrdinals": [
+        10,
+        14,
+        7,
+        3,
+        4,
+        1,
+        11,
+        2,
+        12,
+        8
+      ],
       "rank1Match": true,
-      "topKSetMatch": true
+      "fullRankAgreement": true,
+      "recallAtK": 1.0,
+      "candidateOrdinalIdentityMatch": true
     },
     {
+      "rowIndex": 11,
       "queryCandidateOrdinal": 11,
-      "torchTop1CandidateOrdinal": 11,
-      "cuvsTop1CandidateOrdinal": 11,
+      "torchTopKCandidateOrdinals": [
+        11,
+        3,
+        4,
+        8,
+        14,
+        10,
+        7,
+        2,
+        12,
+        1
+      ],
+      "cuvsTopKCandidateOrdinals": [
+        11,
+        3,
+        4,
+        8,
+        14,
+        10,
+        7,
+        2,
+        12,
+        1
+      ],
       "rank1Match": true,
-      "topKSetMatch": true
+      "fullRankAgreement": true,
+      "recallAtK": 1.0,
+      "candidateOrdinalIdentityMatch": true
     },
     {
+      "rowIndex": 12,
       "queryCandidateOrdinal": 12,
-      "torchTop1CandidateOrdinal": 12,
-      "cuvsTop1CandidateOrdinal": 12,
+      "torchTopKCandidateOrdinals": [
+        12,
+        2,
+        3,
+        4,
+        1,
+        10,
+        8,
+        11,
+        9,
+        6
+      ],
+      "cuvsTopKCandidateOrdinals": [
+        12,
+        2,
+        3,
+        4,
+        1,
+        10,
+        8,
+        11,
+        9,
+        6
+      ],
       "rank1Match": true,
-      "topKSetMatch": true
+      "fullRankAgreement": true,
+      "recallAtK": 1.0,
+      "candidateOrdinalIdentityMatch": true
     },
     {
+      "rowIndex": 13,
       "queryCandidateOrdinal": 13,
-      "torchTop1CandidateOrdinal": 13,
-      "cuvsTop1CandidateOrdinal": 13,
+      "torchTopKCandidateOrdinals": [
+        13,
+        9,
+        5,
+        6,
+        0,
+        4,
+        3,
+        11,
+        8,
+        10
+      ],
+      "cuvsTopKCandidateOrdinals": [
+        13,
+        9,
+        5,
+        6,
+        0,
+        4,
+        3,
+        11,
+        8,
+        10
+      ],
       "rank1Match": true,
-      "topKSetMatch": true
+      "fullRankAgreement": true,
+      "recallAtK": 1.0,
+      "candidateOrdinalIdentityMatch": true
     },
     {
+      "rowIndex": 14,
       "queryCandidateOrdinal": 14,
-      "torchTop1CandidateOrdinal": 14,
-      "cuvsTop1CandidateOrdinal": 14,
+      "torchTopKCandidateOrdinals": [
+        14,
+        10,
+        7,
+        11,
+        8,
+        3,
+        4,
+        1,
+        2,
+        12
+      ],
+      "cuvsTopKCandidateOrdinals": [
+        14,
+        10,
+        7,
+        11,
+        8,
+        3,
+        4,
+        1,
+        2,
+        12
+      ],
       "rank1Match": true,
-      "topKSetMatch": true
+      "fullRankAgreement": true,
+      "recallAtK": 1.0,
+      "candidateOrdinalIdentityMatch": true
     }
   ],
   "cuvsReceipt": {
@@ -125,15 +520,17 @@
     "rows": 15,
     "dimensions": 768,
     "queries": 15,
-    "top_k": 5,
+    "top_k": 10,
     "metric": "cosine",
-    "neighbors_checksum": "3722010b7c233d60c1b429d4fad7a9d5126e6e54cd0349ac0b2563eeca24764b",
-    "distances_checksum": "ed1b76e0afb5ba064ba58e416d220da1cc17a19af9d904a936b5e226c37e8b65",
+    "neighbors_checksum": "38ebf05912561a9a704d7dc4d6d08d0b42d89a6834ca940f110ef587a957e3a0",
+    "distances_checksum": "3d5d8ff2ca2a48d01fe1c5664711220b2f4f471c1224f6582f37eb0c5ab88c2e",
     "canonical_authority": false
   },
+  "status": "SEMANTIC_TOPK_PROVEN",
   "gate": {
     "RESULT": "PASS"
   },
   "canonicalAuthority": false,
+  "rankingPromotion": false,
   "writesPerformed": false
 }

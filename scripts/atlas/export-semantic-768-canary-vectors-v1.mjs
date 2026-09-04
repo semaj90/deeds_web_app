@@ -16,10 +16,17 @@
  * re-verified numerically here, but the column CHOICE follows the documented canonical policy,
  * not the receipt's possibly-stale claim.
  *
+ * Exactly-one-row guarantee: `codebase_chunk_index.id` is the table's real PRIMARY KEY (confirmed
+ * live via pg_constraint, contype='p'), so a `WHERE id = ANY(...)` query cannot structurally
+ * return duplicate rows per id -- this script still asserts `rows.length === ids.length` as a
+ * cheap belt-and-braces check on the query result shape, not because a duplicate is actually
+ * possible here.
+ *
  * Usage: node scripts/atlas/export-semantic-768-canary-vectors-v1.mjs
  */
 
 import pg from 'pg';
+import { createHash } from 'node:crypto';
 import { readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
@@ -55,11 +62,16 @@ async function main() {
        WHERE id = ANY($1::uuid[])`,
       [ids],
     );
+    if (result.rows.length !== ids.length) {
+      throw new Error(
+        `SEMANTIC_768_CANARY_EXPORT_ROW_COUNT_MISMATCH:requested=${ids.length},returned=${result.rows.length}`,
+      );
+    }
     const byId = new Map(result.rows.map((r) => [r.id, r.vec]));
 
     const missing = ids.filter((id) => !byId.has(id) || byId.get(id) == null);
     if (missing.length > 0) {
-      throw new Error(`SEMANTIC_768_CANARY_EXPORT_MISSING_VECTORS:${missing.join(',')}`);
+      throw new Error(`SEMANTIC_TOPK_INPUT_NOT_EXACT:missing=${missing.join(',')}`);
     }
 
     const ordered = receipt.candidates.map((c) => ({
@@ -79,6 +91,16 @@ async function main() {
       }
     }
 
+    const inputVectorsChecksum = createHash('sha256');
+    for (const row of ordered) {
+      const bytes = Buffer.alloc(row.vector.length * 4);
+      row.vector.forEach((v, i) => bytes.writeFloatLE(v, i * 4));
+      inputVectorsChecksum.update(bytes);
+    }
+    const orderedCandidateBindingChecksum = createHash('sha256')
+      .update(ordered.map((r) => `${r.candidateOrdinal}:${r.codebaseChunkId}`).join(','))
+      .digest('hex');
+
     const outPath = path.resolve(REPO_ROOT, 'docs/reports/semantic-768-canary-vectors-v1.json');
     const payload = {
       schema: 'atlas.semantic-768-canary-vectors.v1',
@@ -86,8 +108,11 @@ async function main() {
       candidateSnapshotRevision: receipt.candidateMap.candidateSnapshotRevision,
       ordinalMapChecksum: receipt.candidateMap.ordinalMapChecksum,
       vectorColumn: 'content_embedding',
+      sourceStorageDtype: 'halfvec',
       dimensions: 768,
       candidateCount: ordered.length,
+      inputVectorsChecksum: inputVectorsChecksum.digest('hex'),
+      orderedCandidateBindingChecksum,
       canonicalAuthority: false,
       writesPerformed: false,
       candidates: ordered,

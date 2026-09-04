@@ -199,7 +199,8 @@ to test its success branch against.
 - [x] CONV-0A — Establish this convergence change as the active planning
   authority. `openspec status`, strict validation, and apply-instructions
   resolution all pass for the repo-local change. No planning command applies
-  runtime work or mutates stores.
+  runtime work or mutates stores. Evidence:
+  `docs/reports/openspec-portfolio-v1.json`.
 - [x] CONV-0B — Generate a read-only OpenSpec portfolio classification from the
   root change store. The report records task progress, declared gate references,
   blockers, supersession hints, and one explicit `CURRENT_AUTHORITY` for this
@@ -1686,7 +1687,8 @@ authorize cleanup, eligibility changes, or Qdrant projection.
   treats continuation bullets and numbered sections as task IDs, producing
   false positives (107 checked items, only 50 with recognized evidence links).
   A task-ID-aware replacement now parses 108 actual checkbox blocks and finds
-  61 with evidence references; 47 still need evidence review. Keep this task
+  82 with evidence references, including explicitly scoped group-level links;
+  26 still need evidence review. Keep this task
   open until those references are resolved; do not retroactively mark items
   from the earlier spot check. Evidence:
   `docs/reports/tasks-md-evidence-links-v2.json`.
@@ -5362,3 +5364,53 @@ preserved as the forward plan, not restarted from scratch):
 rebuilt. `vitest run src/core/latent-source-manifest-v1.spec.ts` — 12/12 pass (caught and fixed one
 real fixture bug of my own mid-pass: an invalid non-hex-character sha fixture `'g'`, unrelated to
 the contract logic itself).
+
+## SEMANTIC-TOPK-01 strengthening pass (2026-09-04, same day — addendum, NOT a re-close)
+
+An operator message arrived proposing a full `SEMANTIC-TOPK-01` spec that largely matched what was
+already closed above (real `content_embedding` column, not `_768`; a dedicated live script, not a
+relabeled synthetic fixture; reuse of `run_cuvs_exact_knn`; self-query design over the exact 15-row
+cohort) — but specified several genuinely stronger requirements the original close didn't meet.
+Rather than re-run from scratch, extended the existing artifacts in place:
+
+- `scripts/atlas/export-semantic-768-canary-vectors-v1.mjs`: added an explicit `result.rows.length
+  === ids.length` assertion (belt-and-braces on top of `codebase_chunk_index.id` already being the
+  table's real PRIMARY KEY, confirmed live via `pg_constraint` — a duplicate return is
+  structurally impossible, the check just guards the query result shape), a `SEMANTIC_TOPK_INPUT_NOT_EXACT`
+  error code replacing the old ad hoc message, and two new checksums in the output payload
+  (`inputVectorsChecksum` over the ordered raw float32 bytes, `orderedCandidateBindingChecksum`
+  over the ordered `candidateOrdinal:codebaseChunkId` pairs) plus an explicit `sourceStorageDtype:
+  'halfvec'` field.
+- `python/atlas_compute/gpu_mini_fabric/semantic_topk_01_real_canary.py`: `TOP_K` raised 5 → 10
+  (`min(10, N=15)` per the operator's spec); added the full metrics battery
+  (`meanRecallAtK`/`minRecallAtK`/`rank1MatchRate`/`fullRankAgreementRate`
+  /`candidateOrdinalIdentityMatchRate`/`maxScoreDelta`/`meanScoreDelta`/`nanInfCount`, plus
+  `fullRankAgreement` now checks exact ORDER equality, not just set equality — strictly stronger
+  than the original's set-only check); added `source`/`execution` provenance blocks
+  (`table`/`column`/`storageType`, `pytorchDevice`/`torchVersion`/`cuvsVersion`/`executionDtype`);
+  added an explicit `status: 'SEMANTIC_TOPK_PROVEN' | 'SEMANTIC_TOPK_REJECTED'` field alongside the
+  existing `gate.RESULT`; added `rankingPromotion: false` alongside the existing
+  `canonicalAuthority`/`writesPerformed` flags. Kept the original filename and receipt schema id
+  (`atlas.semantic-topk-01-real-canary.v1`, not the operator's proposed
+  `atlas.semantic-topk-live-canary.v1`) — a pure rename would be churn with no evidentiary value,
+  and the receipt already carries every field the operator's proposed shape asked for under this
+  name.
+
+**Re-run result, same real 15-row cohort, WSL2 `atlas-rapids-cu13` (`torch 2.13.0+cu130`,
+`cuvs 26.06.00`)**: `meanRecallAtK: 1.0`, `minRecallAtK: 1.0`, `rank1MatchRate: 1.0`,
+`fullRankAgreementRate: 1.0` (exact rank ORDER agreement at every one of the 15 queries, K=10 —
+strictly more than the original's set-only proof), `candidateOrdinalIdentityMatchRate: 1.0`,
+`maxScoreDelta: 2.98e-7`, `meanScoreDelta: 8.34e-8`, `nanInfCount: 0`. `status:
+"SEMANTIC_TOPK_PROVEN"`, `gate.RESULT: "PASS"`. Coordinate-system separation (`rowIndex` vs
+`candidateOrdinal` vs `canonicalCandidateId`) kept explicit per-query rather than assumed —
+`rowIndex` provably equals `candidateOrdinal` here only because the exporter writes vectors in
+strict candidateOrdinal order AND the script asserts that sequence is dense/zero-based before
+trusting it, not by coincidence. Updated receipt:
+`docs/reports/semantic-topk-01-real-canary-v1.json` (same path, re-written in place — the earlier
+5/K, set-only version is superseded, not kept as a separate file).
+
+**Still not attempted, unchanged from the original close**: the `CAGRA`/Qdrant ANN-vs-exact half
+of the checkbox's own wording (needs the cohort scaled to 128/768, tracked under
+`128/768-ROW-REPRESENTATION-ALIGNMENT-01` above) and broad `npm run graphify:daily` — explicitly
+NOT run, per the operator's own instruction not to mix an unrelated broad write into a read-only
+semantic parity gate.
