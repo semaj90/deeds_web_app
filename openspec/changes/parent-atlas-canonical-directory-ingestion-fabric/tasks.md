@@ -2,9 +2,9 @@
 
 ## Safety and ownership preflight
 
-- [ ] **DIR-INDEX-00A** Read `openspec/changes/parent-atlas-code-ingestion-pipeline/tasks.md`, `parent-atlas-transport-memory-boundaries/tasks.md`, the semantic-768 canonical change, retrieval/fusion ownership changes, and current source/Graphify lineage reports before creating any new writer or table.
-- [ ] **DIR-INDEX-00B** Produce an ownership matrix for existing source inventory, chunk identity, AST owner, semantic materializer, Qdrant projector, lexical FTS owner, graph projector, NLP enrichment, OpenSpec/task parsing, ContextManifest, ACE packet, and prefill receipt paths. Classify each `REUSE`, `EXTEND`, `SUPERSEDE_AFTER_PROOF`, or `MISSING`.
-- [ ] **DIR-INDEX-00C** Fail the implementation plan if it would create a second canonical source/chunk identity, a second `semantic_768` representation owner, a second RRF/fusion owner, or a second Graphify canonical writer.
+- [x] **DIR-INDEX-00A** Read `openspec/changes/parent-atlas-code-ingestion-pipeline/tasks.md`, `parent-atlas-transport-memory-boundaries/tasks.md`, the semantic-768 canonical change, retrieval/fusion ownership changes, and current source/Graphify lineage reports before creating any new writer or table. Evidence: `dir-index-00-ownership-audit.md`.
+- [x] **DIR-INDEX-00B** Produce an ownership matrix for existing source inventory, chunk identity, AST owner, semantic materializer, Qdrant projector, lexical FTS owner, graph projector, NLP enrichment, OpenSpec/task parsing, ContextManifest, ACE packet, and prefill receipt paths. Classify each `REUSE`, `EXTEND`, `SUPERSEDE_AFTER_PROOF`, or `MISSING`. Evidence: `dir-index-00-ownership-audit.md`.
+- [x] **DIR-INDEX-00C** Fail the implementation plan if it would create a second canonical source/chunk identity, a second `semantic_768` representation owner, a second RRF/fusion owner, or a second Graphify canonical writer. Result: `PASS_WITH_GUARDS`; directory fabric may add inventory/representation glue but must reuse existing semantic, fusion, graph, context/prefill, and transport owners. GPU artifact work remains blocked on existing contract-owner selection.
 
 ## DIR-INDEX-01 — deterministic inventory
 
@@ -85,12 +85,14 @@
 - [ ] **DIR-INDEX-11B** Build `CandidateFeatureSnapshotV1` with explicit feature/representation revisions and evidence refs.
 - [ ] **DIR-INDEX-11C** Prove ordinal-map checksum replay and canonical-ID round-trip before any GPU executor consumes ordinals.
 
-## DIR-INDEX-12 — ContextManifest / ACE / prefill
+## DIR-INDEX-12 — ContextManifest / ACE / prefill integration
 
-- [ ] **DIR-INDEX-12A** Emit `ContextManifestV2` from selected canonical evidence, LOD levels, token budget, lane diagnostics, representation revisions, and checksums.
+Ownership guard: reuse the existing ACE ContextManifest compiler and `parent-atlas-agentic-file-compiler`; this change does not create a parallel context/prefill owner.
+
+- [ ] **DIR-INDEX-12A** Feed selected canonical evidence, LOD levels, token budget, lane diagnostics, representation revisions, and checksums into the existing ContextManifest owner; version-extend only if compatibility proof requires it.
 - [ ] **DIR-INDEX-12B** Keep ACE packet/reference payloads compact; do not inject entire files or duplicate durable source text into `SmartRpcPacketV1`.
-- [ ] **DIR-INDEX-12C** Compile `PromptPlanV1` only from manifest-selected evidence and preserve the selected evidence checksum set.
-- [ ] **DIR-INDEX-12D** Run bounded Ornith `:8090` synthesis replay and emit `PrefillReceiptV1` without tools/mutations; verify evidence references and stable receipt envelope semantics.
+- [ ] **DIR-INDEX-12C** Reuse the existing `PromptPlanV1`/prefill compiler so prompt plans contain only manifest-selected evidence and preserve the selected evidence checksum set.
+- [ ] **DIR-INDEX-12D** Run bounded Ornith `:8090` synthesis replay through the existing prefill path without tools/mutations; extend existing receipt lineage only where needed and verify evidence references/stable receipt-envelope semantics.
 
 ## DIR-INDEX-13 — incremental invalidation
 
@@ -101,8 +103,10 @@
 
 ## DIR-INDEX-14 — GPU tensor/execution provenance
 
-- [ ] **DIR-INDEX-14A** Separate immutable `GpuTensorArtifactV1` identity from GPU execution identity and prefill identity.
-- [ ] **DIR-INDEX-14B** Define or extend `GpuExecutionEnvironmentV1`/receipt fields for CUDA toolkit/runtime/driver, relevant cuBLAS/cuVS/cuGraph revisions, compute capability, context class (`DEFAULT`/`GREEN`), optional context identity, and custom kernel binary checksum.
+Ownership guard: existing numeric/tensor artifact contracts overlap. No new `GpuTensorArtifactV1` owner may be created here until the existing contract-owner audit selects an extension target.
+
+- [ ] **DIR-INDEX-14A** Select and extend the existing immutable tensor-artifact owner so tensor identity remains distinct from GPU execution identity and prefill identity; do not add another overlapping artifact contract.
+- [ ] **DIR-INDEX-14B** Extend the selected GPU execution receipt/environment owner with CUDA toolkit/runtime/driver, relevant cuBLAS/cuVS/cuGraph revisions, compute capability, context class (`DEFAULT`/`GREEN`), optional context identity, and custom kernel binary checksum where applicable.
 - [ ] **DIR-INDEX-14C** Keep raw CUDA IPC/VMM handles ephemeral; durable packets carry artifact/lease/execution-receipt references only.
 - [ ] **DIR-INDEX-14D** Replay one deterministic GEMM/vector-ranking fixture across the current approved environment and record whether toolkit/library/context changes alter the execution identity or numerical result.
 - [ ] **DIR-INDEX-14E** Keep cuVS brute force as the exact GPU oracle; run CAGRA/IVF-PQ against the same `CandidateOrdinalMapV1` with Recall@K/MRR/latency/VRAM receipts before promotion.
@@ -112,19 +116,19 @@
 - [ ] **DIR-INDEX-15A** Map Parent Atlas canonical contracts to gRPC control envelopes without making protobuf bytes the canonical Parent Atlas checksum format.
 - [ ] **DIR-INDEX-15B** Keep large immutable vectors/tensors behind references and approved Arrow/mmap/CUDA-local bulk transport; do not serialize bulk tensors through A2A messages.
 - [ ] **DIR-INDEX-15C** Map durable Parent Atlas task results and receipts to A2A task/artifact semantics; use messages for request/control/progress as appropriate.
-- [ ] **DIR-INDEX-15D** Prove disconnect/reconnect does not make ephemeral streaming messages the sole persistence location for critical `PrefillReceiptV1` or GPU evidence.
+- [ ] **DIR-INDEX-15D** Prove disconnect/reconnect does not make ephemeral streaming messages the sole persistence location for critical prefill/GPU evidence.
 - [ ] **DIR-INDEX-15E** Add adapter compatibility tests proving source/chunk/revision/evidence IDs survive Parent Atlas -> gRPC/A2A -> Parent Atlas round-trip without transport-owned identity substitution.
 
 ## Promotion sequence
 
-1. `DIR-INDEX-00A..C` ownership audit.
+1. `DIR-INDEX-00A..C` ownership audit — complete with guards.
 2. `DIR-INDEX-01` deterministic source inventory.
 3. `DIR-INDEX-02` canonical chunk identity.
 4. `DIR-INDEX-03` representation registry.
 5. `DIR-INDEX-04` PostgreSQL lexical proof.
 6. Only then materialize semantic/Qdrant/enrichment/graph/LOD projections.
 7. Freeze candidate ordinals before GPU experiments.
-8. Prove ContextManifest/ACE/PromptPlan synthesis path before A2A promotion.
+8. Prove integration with the existing ContextManifest/ACE/PromptPlan/prefill path before A2A promotion.
 9. Prove incremental invalidation before enabling unattended directory ingestion.
 
 ## Promotion gates
