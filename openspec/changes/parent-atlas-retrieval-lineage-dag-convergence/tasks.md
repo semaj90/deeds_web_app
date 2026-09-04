@@ -3162,9 +3162,30 @@ Evidence: `docs/reports/mcp-tool-registry-drift-classification-v1.json`, `docs/r
   `docs/reports/mcp-production-caller-v1.json`. No duplicate caller was added.
 - [x] Verify the existing runtime selector consumes the revisioned manifest and fails closed on invalid identity; 5/5 query probes returned registry selections.
 - [ ] Restore/prove dense Qdrant tool-manifest coverage and embedding availability before claiming dense MCP pickup.
+  Read-only audit re-run: EmbeddingGemma is reachable and reports 768-dimensional
+  embeddings, but Qdrant contains `0/20` known tool-manifest mappings and zero
+  `tool_manifest` packets. The existing registry fallback remains the active
+  bounded selector path. Evidence: `docs/reports/mcp-tool-selection-audit.json`.
+  This remains blocked; no Qdrant projection producer or write was added.
 - [x] Audit existing producers: manifest packets are generated, but no authorized tool-manifest-to-Qdrant projection producer was found; do not invent one during routing work.
-- [ ] Prove one TRACE/stdio alias replay equivalent before changing registrations.
+- [x] Prove one TRACE/stdio alias replay equivalent before changing registrations.
+  `trace__kag_search` maps to canonical `trace.kag_search`; identical bounded
+  read-only replays produced equivalent normalized result checksums. Volatile
+  timing fields were excluded from comparison. Evidence:
+  `docs/reports/trace-stdio-alias-replay-v1.json`. No registrations or writes
+  were changed.
 - [ ] Wire one ACE caller through authoritative SearchRuntime revisions and ContextManifestV2.
+  Current read-only audit remains `NO_ROUTE_LOCAL_AUTHORITY`: 21 callers use
+  legacy query-only cache identity, 10 strict-capable/wired references exist,
+  but the selected `/api/ace/stream` caller still lacks authoritative source,
+  representation, and retrieval-policy revisions. Do not migrate or promote
+  until one caller consumes a validated revision bundle. Evidence:
+  `docs/reports/ace-context-live-caller-adoption-v1.json` and
+  `docs/reports/ace-route-revision-authority-v1.json`. No writes occurred.
+  The strict dry-input checker also remains blocked because no authoritative
+  `CandidateOrdinalMapV1`, `CandidateFeatureSnapshotV1`, or
+  `RevisionAuthorityEnvelopeV1` artifacts were supplied; no replacements were
+  synthesized. Evidence: `docs/reports/ace-live-dry-input-readiness-v2.json`.
 - [x] Preserve incomplete ACE/process enrichment metadata as explicit `null` (2026-09-03).
   `AtlasProcessPacketV1.graphRevision` is now nullable and the legacy ACE adapter no longer
   invents `graph:parent-atlas` when structural authority is unavailable. Nulls remain visible
@@ -3595,20 +3616,29 @@ outputs against current observations or mark them `SUPERSEDED` solely by timesta
   108 skipped entries, workspace revision `sha256:35e032dee4202bcb34e31efed5baebcd602d4b7e23e7c98d226f5bb2aa75aeb3`,
   and no writes. Receipt: `docs/reports/graphify-lifecycle-entrypoint-v1.json`. This proves the
   source-selection producer, not the new execution-ledger coordinator.
-- [ ] `GRAPHIFY-DAILY-CANARY-02`: prove executions A/B over identical bytes have distinct IDs but
+- [x] `GRAPHIFY-DAILY-CANARY-02`: prove executions A/B over identical bytes have distinct IDs but
   equal workspace/manifest/source revisions, then execution C changes only the modified source and
   receives a new workspace revision. Require independent SQL readback and zero out-of-scope writes.
-  **Partial progress (2026-09-04), NOT closing this checkbox yet — only half proven.** Run A/B half
-  proven live against the real dev DB, inside one `BEGIN...ROLLBACK` transaction (zero persistent
-  writes, verified via `to_regclass` before/after): `execution_id_a != execution_id_b` (true),
-  `workspace_revision_a == workspace_revision_b` (true), 2 independent `graphify_execution_files`
-  rows correctly bound per execution_id under the same source cohort (4 rows total, 2+2, not
-  deduped across executions). Script: `sveltekit-frontend/scripts/atlas/graphify-daily-canary-02-proof-2026-09-04.sql`
-  (reusable, documents both a local-psql and a docker-exec invocation method). **Run C
-  (changed-source-bytes -> different workspaceRevision) deliberately NOT attempted** — doing it
-  honestly requires a real second workspace_revision computed the same way production does (sha256
-  of the sorted exact-byte source manifest after changing one canary source), not a second
-  synthetic literal; faking that value would prove nothing. Left open for a follow-up pass.
+  **Closed 2026-09-04, full A/B/C canary proven, not faked.** Run A/B proven 2026-09-04 (see the
+  standalone SQL proof still referenced below). **Run C closed this same day** in
+  `graphify-daily-coordinator-v1.integration.spec.ts`'s final test, using the REAL production
+  revision-computation function `buildWorkspaceRevisionRecordV1`
+  (`sveltekit-frontend/src/lib/server/atlas/identity/workspace-source-binding-v1.ts`) — not a
+  synthetic literal standing in for a changed revision, closing exactly the gap the earlier partial
+  note flagged. Three manifests built (A: 3 canary sources; B: byte-identical to A; C: same 3
+  sources with ONLY `canary/two.ts`'s contentDigest/byteLength changed), then bound through three
+  real `openExecution()` calls against the live dev DB inside one rolled-back transaction. Proven
+  live: `workspaceRevision(A) == workspaceRevision(B)` (unchanged bytes); `workspaceRevision(C) !=
+  workspaceRevision(A)` (changed bytes); `canary/one.ts`'s `sourceRevision` identical between A and
+  C (unchanged source untouched by the one-file edit); `canary/two.ts`'s `sourceRevision` differs
+  between the "before" manifest and C (changed source's revision moved); all three `execution_id`s
+  distinct; independent SQL readback via a fresh `SELECT` confirms the DB-stored
+  `workspace_revision` on each row matches the pure-function-computed value exactly, not merely
+  "some non-null string." Zero out-of-scope writes: `to_regclass('public.graphify_executions')`
+  and `pg_locks` (advisory) both confirmed clean immediately after the run (5/5 tests pass, full
+  file including this test: `RUN_DB_INTEGRATION=1 npx vitest run
+  src/lib/server/atlas/indexing/graphify-daily-coordinator-v1.integration.spec.ts`). Standalone SQL
+  proof for the A/B half: `sveltekit-frontend/scripts/atlas/graphify-daily-canary-02-proof-2026-09-04.sql`.
 
 ## REMAINING-TASK-PRIORITY-AND-HELPERS-01 (30 unchecked items)
 

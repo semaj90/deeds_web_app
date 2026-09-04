@@ -17,6 +17,7 @@
 
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { createHash } from 'node:crypto';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 const RUN_DB_INTEGRATION = process.env.RUN_DB_INTEGRATION === '1';
@@ -29,6 +30,8 @@ for (const file of ['.env', '.env.local']) {
     config({ path, override: false });
   }
 }
+
+const { buildWorkspaceRevisionRecordV1 } = await import('../identity/workspace-source-binding-v1.js');
 
 const {
   acquireCoordinatorLock,
@@ -177,5 +180,95 @@ describeIf('GRAPHIFY-DAILY-COORDINATOR-01: live coordinator flow (rolled back, z
 
   it('uses the exact frozen advisory-lock namespace/key from the coordinator plan receipt', () => {
     expect(GRAPHIFY_COORDINATOR_ADVISORY_LOCK).toEqual({ namespace: 119041, key: 641934821 });
+  });
+
+  it('GRAPHIFY-DAILY-CANARY-02 Run C: changing one canary source\'s bytes produces a different workspaceRevision through the REAL production revision-computation function, then two live executions bind it correctly (completes the A/B/C canary left open in the earlier partial-progress note)', async () => {
+    // buildWorkspaceRevisionRecordV1 is the pure, git-free function this repo's own producer
+    // (materializeWorkspaceRevisionOriginV1) delegates to for the actual sha256-of-sorted-manifest
+    // computation -- using it directly here (rather than a synthetic literal standing in for a
+    // "changed" revision) is what makes this a real Run C proof, not a faked one. baseCommitOid /
+    // baseTreeOid are well-formed-but-synthetic sha256-format git OIDs (this function only
+    // validates OID *shape*, never that the OID resolves to a real object) -- deliberately not a
+    // real `git rev-parse HEAD` against the actual 25,419-file workspace, which this bounded
+    // canary has no need to touch.
+    const gitObjectFormat = 'sha256' as const;
+    const syntheticOid = (seed: string) => createHash('sha256').update(seed).digest('hex');
+    const baseCommitOid = syntheticOid('canary-commit');
+    const baseTreeOid = syntheticOid('canary-tree');
+    const producerRevision = 'graphify.canary-run-c.2026-09-04.v1';
+    const generatedAt = new Date().toISOString();
+
+    const manifestBefore = [
+      { sourceRef: 'canary/one.ts', sourceRevision: `sha256:${'1'.repeat(64)}`, contentDigest: '1'.repeat(64), byteLength: 100, gitBlobOid: null },
+      { sourceRef: 'canary/two.ts', sourceRevision: `sha256:${'2'.repeat(64)}`, contentDigest: '2'.repeat(64), byteLength: 200, gitBlobOid: null },
+      { sourceRef: 'canary/three.ts', sourceRevision: `sha256:${'3'.repeat(64)}`, contentDigest: '3'.repeat(64), byteLength: 300, gitBlobOid: null },
+    ];
+    // Run C: ONLY canary/two.ts's bytes changed (fresh contentDigest/byteLength); one and three
+    // are byte-identical to the "before" manifest.
+    const manifestAfterOneSourceChanged = [
+      manifestBefore[0]!,
+      { sourceRef: 'canary/two.ts', sourceRevision: `sha256:${'9'.repeat(64)}`, contentDigest: '9'.repeat(64), byteLength: 999, gitBlobOid: null },
+      manifestBefore[2]!,
+    ];
+
+    const runA = buildWorkspaceRevisionRecordV1({
+      repositoryId: 'canary-repo', gitObjectFormat, baseCommitOid, baseTreeOid,
+      dirty: false, entries: manifestBefore, generatedAt, producerRevision,
+    });
+    const runB = buildWorkspaceRevisionRecordV1({
+      repositoryId: 'canary-repo', gitObjectFormat, baseCommitOid, baseTreeOid,
+      dirty: false, entries: manifestBefore, generatedAt, producerRevision,
+    });
+    const runC = buildWorkspaceRevisionRecordV1({
+      repositoryId: 'canary-repo', gitObjectFormat, baseCommitOid, baseTreeOid,
+      dirty: false, entries: manifestAfterOneSourceChanged, generatedAt, producerRevision,
+    });
+
+    // Pure computation assertions (the actual Run A/B/C spec from tasks.md's GRAPHIFY-DAILY-CANARY-02).
+    expect(runA.record.workspaceRevision).toBe(runB.record.workspaceRevision); // unchanged bytes -> same revision
+    expect(runC.record.workspaceRevision).not.toBe(runA.record.workspaceRevision); // changed bytes -> different revision
+    const changedEntryC = runC.entries.find((e) => e.sourceRef === 'canary/two.ts')!;
+    const unchangedEntryA_one = runA.entries.find((e) => e.sourceRef === 'canary/one.ts')!;
+    const unchangedEntryC_one = runC.entries.find((e) => e.sourceRef === 'canary/one.ts')!;
+    expect(changedEntryC.sourceRevision).not.toBe(manifestBefore[1]!.sourceRevision); // changed source's revision differs
+    expect(unchangedEntryC_one.sourceRevision).toBe(unchangedEntryA_one.sourceRevision); // unchanged source's revision is identical
+
+    // Now bind these three REAL computed revisions through the live coordinator ledger.
+    await acquireCoordinatorLock(client);
+    try {
+      const { executionId: executionA } = await openExecution(client, {
+        workspaceId: realWorkspaceId, workspaceRevision: runA.record.workspaceRevision,
+        parserContractVersion: 'graphify.parser.v0.1', extractionContractVersion: 'graphify.extractor.v0.1',
+        triggerKind: 'COORDINATOR_INTEGRATION_TEST_CANARY_RUN_A',
+      });
+      const { executionId: executionB } = await openExecution(client, {
+        workspaceId: realWorkspaceId, workspaceRevision: runB.record.workspaceRevision,
+        parserContractVersion: 'graphify.parser.v0.1', extractionContractVersion: 'graphify.extractor.v0.1',
+        triggerKind: 'COORDINATOR_INTEGRATION_TEST_CANARY_RUN_B',
+      });
+      const { executionId: executionC } = await openExecution(client, {
+        workspaceId: realWorkspaceId, workspaceRevision: runC.record.workspaceRevision,
+        parserContractVersion: 'graphify.parser.v0.1', extractionContractVersion: 'graphify.extractor.v0.1',
+        triggerKind: 'COORDINATOR_INTEGRATION_TEST_CANARY_RUN_C',
+      });
+
+      expect(new Set([executionA, executionB, executionC]).size).toBe(3); // all three distinct
+
+      const readback = await client.query(
+        `SELECT execution_id, workspace_revision FROM public.graphify_executions
+         WHERE execution_id = ANY($1::uuid[])`,
+        [[executionA, executionB, executionC]],
+      );
+      const revisionOf = (id: string) => readback.rows.find((r) => r.execution_id === id)?.workspace_revision;
+      expect(revisionOf(executionA)).toBe(runA.record.workspaceRevision);
+      expect(revisionOf(executionB)).toBe(runA.record.workspaceRevision); // A and B share the unchanged-bytes revision
+      expect(revisionOf(executionC)).not.toBe(runA.record.workspaceRevision); // C's changed-bytes revision differs
+
+      for (const id of [executionA, executionB, executionC]) {
+        await completeExecution(client, id, { status: 'COMPLETED' });
+      }
+    } finally {
+      await releaseCoordinatorLock(client);
+    }
   });
 });
