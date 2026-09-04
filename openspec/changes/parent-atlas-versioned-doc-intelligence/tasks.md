@@ -531,12 +531,41 @@ from `parent-atlas-retrieval-lineage-dag-convergence`.
   routed live traffic; the edit was `git checkout`-reverted cleanly (`172 insertions` removed,
   clean diff after revert) and the container restarted again to confirm it returned to its
   original, unmodified, healthy state (`GET /health` → `ornith-1.5-9b`, unchanged).
-  **Not yet done**: the actual correctly-targeted addition (the same `DocumentationFactV1`
-  contract/prompt/schema design, this time added to `miniforge_nlp_sidecar_v2.py`'s real `app`,
-  following the same `legacy._ensure_grounded_provider_controls()` reuse pattern
-  `_native_grounded_extractions` already establishes there) was not attempted a second time in
-  this session, deliberately — a live-service edit deserves full attention, not a rushed retry
-  under context pressure. DOC-12 (`ApiRuleV1`) depends on this and is equally not started.
+  **Second attempt, correctly targeted this time, status `WIRED` — NOT `DRY_RUN_PROVEN`, exact
+  cause not yet found.** Added `_native_documentation_facts()` + `DocumentationFactRequestV1`/
+  `DocumentationFactV1`/`DocumentationFactResponseV1` + `POST /extract/documentation-facts` to
+  `miniforge_nlp_sidecar_v2.py` (the real `app`), mirroring `_native_grounded_extractions()`'s
+  exact pattern (`factory.ModelConfig` + `OpenAISchema` strict schema, `host.docker.internal:8090`
+  base URL, few-shot `ExampleData`, `legacy._ensure_grounded_provider_controls()` reuse for the
+  Ornith no-thinking/no-cache_prompt patch) plus an explicit exact-match span check the CONCEPT
+  path doesn't have (`text[start_pos:end_pos] != extraction_text` → reject), since design.md
+  requires exact alignment for `DocumentationFactV1` specifically. Syntax-checked
+  (`ast.parse`), container restarted, `GET /health` confirmed healthy, `GET /openapi.json`
+  confirmed the route registered this time (the mistake above is what surfaced needing to check
+  this). **Confirmed non-breaking**: re-ran the pre-existing `/extract` CONCEPT path with real
+  input after the restart — still produces real `alignment_status: match_exact` grounded
+  extractions (`sm_86`→`ARCHITECTURE`, `Kepler`→`GPU_GENERATION`), unaffected by the new addition.
+  **The new route itself, however, returns zero facts on real input** (`{"facts":[],"error":null}`)
+  for text that obviously contains extractable claims ("Tile IR kernel programming requires sm_86
+  or later architecture. CUDA Tile IR is deprecated on Kepler-generation GPUs..."). Debugged
+  directly in Python (bypassing HTTP) before giving up: confirmed `legacy._grounded_extraction_error`
+  stays `None` (no exception, no silently-swallowed failure) and the raw
+  `result.extractions` list from `langextract.extract()` itself is empty (`len() == 0`) — the
+  problem is upstream of this task's own extraction/filtering logic, inside LangExtract's own
+  handling of the stricter 5-required-field schema (`subject`/`predicate`/`object`/`statement`/
+  `confidence`, vs `CONCEPT`'s 2-field `concept_id`/`ontology_class`, which works). Ruled out two
+  specific hypotheses with real tests, not guessed: (1) the generated JSON Schema itself is
+  malformed — compared side-by-side against `legacy._grounded_output_schema()`'s working shape,
+  structurally identical (`additionalProperties: false`, correct `required` list); (2)
+  `max_tokens: 256` is too small for a 5-field structured response — retested with `max_tokens:
+  1024`, still zero extractions. **Real, open question for the next session**: why a stricter/
+  larger LangExtract schema silently yields zero extractions on this model/provider combination
+  even with a matching few-shot example and generous token budget — needs deeper debugging (e.g.
+  inspecting the raw completion behind langextract's parsing, trying `strict=False`, or a smaller
+  attribute set) before this can be marked `DRY_RUN_PROVEN`. Left deployed live (additive-only,
+  confirmed non-breaking, returns a well-formed empty response rather than erroring) since removing
+  it would only cost re-investigation time later for zero safety benefit. DOC-12 (`ApiRuleV1`)
+  depends on DOC-10 actually producing real extractions and is not started.
 - [ ] **DOC-12** `ApiRuleV1` — `NEW`. Extraction target for LangExtract/Ornith on genuinely
   semantic material only (capability/constraint/deprecation/migration), per design.md. Blocked on
   DOC-10's correctly-targeted live-service wiring (see above) landing first.

@@ -237,6 +237,208 @@ def _native_grounded_extractions(text: str, model_id: Optional[str] = None) -> l
 legacy._grounded_extractions = _native_grounded_extractions
 
 
+# DOC-10/DOC-12 (parent-atlas-versioned-doc-intelligence): design.md's DocumentationFactV1 --
+# genuinely semantic material only (capability, constraint, deprecation, supported-architecture
+# claims, performance recommendations, incompatibility, migration advice), never structure a
+# deterministic parser already extracts exactly (headings, code fences, function signatures --
+# those are atlas_external_docs.py's DOC-04/DOC-05 job, not this one's). A sibling of
+# _native_grounded_extractions() above, mirroring its exact pattern (OpenAISchema strict JSON
+# schema, host.docker.internal base_url, few-shot examples, legacy._ensure_grounded_provider_controls()
+# reuse for the Ornith no-thinking/no-cache_prompt provider patch) -- deliberately NOT a second
+# process/module, so that process-global patch is never silently missed.
+_DOCUMENTATION_FACT_PROMPT = (
+    "Extract only genuinely semantic documentation claims explicitly present in the supplied "
+    "source text for Parent Atlas: capability, constraint, deprecation, supported-architecture "
+    "claims, performance recommendations, incompatibility, or migration advice. Do not extract "
+    "structure a deterministic parser already handles exactly (headings, code fences, function "
+    "signatures, tables). For each claim, return extraction_class DOCUMENTATION_FACT with "
+    "extraction_text copied verbatim as one contiguous substring that is the exact evidence span, "
+    "and attributes containing subject, predicate, object, statement (a concise paraphrase of the "
+    "claim), and confidence (0.0-1.0). Never infer a claim not explicitly stated in the text. If no "
+    "exact source span supports a claim, return an empty extractions array."
+)
+
+
+def _documentation_fact_output_schema() -> dict[str, Any]:
+    item_schema = legacy.langextract.schema.extraction_item_schema(  # type: ignore[union-attr]
+        "DOCUMENTATION_FACT",
+        attributes={
+            "subject": {"type": "string"},
+            "predicate": {"type": "string"},
+            "object": {"type": "string"},
+            "statement": {"type": "string"},
+            "confidence": {"type": "number"},
+        },
+        additional_properties=False,
+    )
+    return legacy.langextract.schema.extractions_schema(item_schema, additional_properties=False)  # type: ignore[union-attr]
+
+
+def _native_documentation_facts(text: str, model_id: Optional[str] = None) -> list[dict[str, Any]]:
+    """Same provider/grounding machinery as _native_grounded_extractions(), a different
+    prompt/schema/output shape, and -- unlike that function -- an explicit exact-match span
+    check: design.md requires exact alignment before a fuzzy fallback would even be considered,
+    and DocumentationFactV1's evidenceText is meant to be verbatim-quotable, unlike CONCEPT's
+    looser grounding tolerance."""
+
+    legacy._grounded_extraction_error = None
+    if not legacy.LANGEXTRACT_AVAILABLE or legacy.langextract is None:
+        legacy._grounded_extraction_error = "LANGEXTRACT_UNAVAILABLE"
+        return []
+    try:
+        legacy._ensure_grounded_provider_controls()
+        extract_fn = getattr(legacy.langextract, "extract", None)
+        if extract_fn is None:
+            legacy._grounded_extraction_error = "LANGEXTRACT_EXTRACT_FUNCTION_UNAVAILABLE"
+            return []
+        data_module = getattr(legacy.langextract, "data", None)
+        example_data = getattr(data_module, "ExampleData", None)
+        extraction_type = getattr(data_module, "Extraction", None)
+        examples = None
+        if example_data is not None and extraction_type is not None:
+            examples = [
+                example_data(
+                    text="CUDA Tile IR requires sm_86 or later architecture.",
+                    extractions=[
+                        extraction_type(
+                            extraction_class="DOCUMENTATION_FACT",
+                            extraction_text="CUDA Tile IR requires sm_86 or later architecture.",
+                            attributes={
+                                "subject": "CUDA Tile IR",
+                                "predicate": "requires",
+                                "object": "sm_86 or later architecture",
+                                "statement": "CUDA Tile IR requires sm_86 or later architecture.",
+                                "confidence": 0.95,
+                            },
+                        )
+                    ],
+                )
+            ]
+        selected_model = model_id or os.getenv("LANGEXTRACT_MODEL", "miniforge-nlp-sidecar")
+        extraction_max_tokens = int(os.getenv("LANGEXTRACT_MAX_TOKENS", "256"))
+        extraction_reasoning_budget = int(os.getenv("LANGEXTRACT_REASONING_BUDGET", "0"))
+        factory = getattr(legacy.langextract, "factory", None)
+        model_config_type = getattr(factory, "ModelConfig", None)
+        extract_kwargs: dict[str, Any] = {
+            "text_or_documents": text,
+            "prompt_description": _DOCUMENTATION_FACT_PROMPT,
+            "examples": examples,
+            "extraction_passes": 1,
+            "max_workers": 1,
+            "max_char_buffer": 2000,
+            "temperature": 0.0,
+        }
+        if model_config_type is not None:
+            from langextract.providers.schemas.openai import OpenAISchema  # type: ignore
+
+            extract_kwargs["config"] = model_config_type(
+                model_id=selected_model,
+                provider="openai",
+                provider_kwargs={
+                    "api_key": os.getenv("LANGEXTRACT_API_KEY", "local"),
+                    "base_url": os.getenv("LANGEXTRACT_BASE_URL", "http://host.docker.internal:8090/v1"),
+                    "max_tokens": extraction_max_tokens,
+                    "reasoning_format": "none",
+                    "reasoning_budget": extraction_reasoning_budget,
+                    "chat_template_kwargs": {"enable_thinking": False},
+                    "seed": 1729,
+                    "top_p": 1.0,
+                    "reasoning_effort": "none",
+                    "cache_prompt": False,
+                    "openai_schema": OpenAISchema(
+                        _documentation_fact_output_schema(),
+                        schema_name="atlas_documentation_fact_v1",
+                        strict=True,
+                        from_output_schema=True,
+                    ),
+                },
+            )
+        else:
+            extract_kwargs["model_id"] = selected_model
+            extract_kwargs["model_url"] = os.getenv("LANGEXTRACT_BASE_URL", "http://host.docker.internal:8090/v1")
+        result = getattr(extract_fn, "extract", extract_fn)(**extract_kwargs)
+    except Exception as error:
+        legacy._grounded_extraction_error = f"{type(error).__name__}: {str(error)[:240]}"
+        return []
+
+    extracted: list[dict[str, Any]] = []
+    for item in (getattr(result, "extractions", None) or [])[:50]:
+        normalized = normalize_langextract_extraction(item)
+        interval = normalized.get("char_interval")
+        extraction_text = normalized.get("extraction_text")
+        if not extraction_text or interval is None:
+            continue
+        start_pos = int(interval["start_pos"])
+        end_pos = int(interval["end_pos"])
+        if start_pos < 0 or end_pos <= start_pos or end_pos > len(text):
+            continue
+        # Explicit exact-match check (see docstring) -- normalize_langextract_extraction()
+        # alone doesn't enforce this for every alignment_status; DocumentationFactV1 requires it.
+        if text[start_pos:end_pos] != str(extraction_text):
+            continue
+        attributes = normalized.get("attributes") or {}
+        subject = str(attributes.get("subject") or "").strip()
+        predicate = str(attributes.get("predicate") or "").strip()
+        obj = str(attributes.get("object") or "").strip()
+        if not subject or not predicate or not obj:
+            continue
+        try:
+            confidence = float(attributes.get("confidence", 0.0))
+        except (TypeError, ValueError):
+            confidence = 0.0
+        confidence = max(0.0, min(1.0, confidence))
+        extracted.append({
+            "subject": subject,
+            "predicate": predicate,
+            "object": obj,
+            "statement": str(attributes.get("statement") or "").strip(),
+            "evidence_text": str(extraction_text),
+            "start_char": start_pos,
+            "end_char": end_pos,
+            "confidence": confidence,
+        })
+    return extracted
+
+
+class DocumentationFactRequestV1(BaseModel):
+    """Input to /extract/documentation-facts. sourceUrl/sourceRevision/productVersion bind
+    the caller's DocCoordinateV1 identity through -- this route never invents identity."""
+
+    text: str = Field(..., min_length=1, max_length=200_000)
+    source_url: str = Field(..., alias="sourceUrl", min_length=1)
+    source_revision: str = Field(..., alias="sourceRevision", min_length=1)
+    product_version: str = Field(default="", alias="productVersion")
+    model_id: Optional[str] = None
+
+    model_config = {"populate_by_name": True}
+
+
+class DocumentationFactV1(BaseModel):
+    """design.md's DocumentationFactV1 -- source-grounded, never canonical on its own."""
+
+    schema_: str = Field(default="atlas.documentation-fact.v1", alias="schema")
+    subject: str
+    predicate: str
+    object: str
+    statement: str
+    evidence_text: str = Field(alias="evidenceText")
+    source_url: str = Field(alias="sourceUrl")
+    source_revision: str = Field(alias="sourceRevision")
+    start_char: int = Field(alias="startChar")
+    end_char: int = Field(alias="endChar")
+    product_version: str = Field(alias="productVersion")
+    confidence: float = Field(ge=0.0, le=1.0)
+    extraction_method: str = Field(default="LANGEXTRACT_ORNITH", alias="extractionMethod")
+    canonical_authority: bool = Field(default=False, alias="canonicalAuthority")
+
+    model_config = {"populate_by_name": True}
+
+
+class DocumentationFactResponseV1(BaseModel):
+    facts: list[DocumentationFactV1]
+    error: Optional[str] = None
+
+
 def _line_span_to_utf8_byte_offsets(source: str, start_line: int, end_line: int) -> tuple[int, int]:
     """Convert the legacy character-based line fallback into UTF-8 offsets."""
 
@@ -736,6 +938,28 @@ def analyze(req: legacy.AnalyzeRequest) -> legacy.AnalyzeResponse:
 @app.post("/extract", response_model=legacy.ExtractResponse)
 def extract(req: legacy.AnalyzeRequest) -> legacy.ExtractResponse:
     return legacy._extract(req)
+
+
+@app.post("/extract/documentation-facts", response_model=DocumentationFactResponseV1)
+def extract_documentation_facts(req: DocumentationFactRequestV1) -> DocumentationFactResponseV1:
+    raw = _native_documentation_facts(req.text, model_id=req.model_id)
+    facts = [
+        DocumentationFactV1(
+            subject=item["subject"],
+            predicate=item["predicate"],
+            object=item["object"],
+            statement=item["statement"],
+            evidenceText=item["evidence_text"],
+            sourceUrl=req.source_url,
+            sourceRevision=req.source_revision,
+            startChar=item["start_char"],
+            endChar=item["end_char"],
+            productVersion=req.product_version,
+            confidence=item["confidence"],
+        )
+        for item in raw
+    ]
+    return DocumentationFactResponseV1(facts=facts, error=legacy._grounded_extraction_error)
 
 
 @app.post("/extract/file")
