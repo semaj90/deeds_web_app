@@ -12,6 +12,7 @@ export * from './knowledge-source-snapshot-v1.js';
 export * from './knowledge-source-snapshot-audit-v1.js';
 export * from './knowledge-page-v1.js';
 export * from './knowledge-page-dag-binding-v1.js';
+export * from './knowledge-page-completion-v1.js';
 export * from './knowledge-page-recovery-v1.js';
 export * from './knowledge-generation-run-v1.js';
 export * from './knowledge-generation-lifecycle-v1.js';

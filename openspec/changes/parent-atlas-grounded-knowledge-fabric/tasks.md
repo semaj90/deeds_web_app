@@ -4,30 +4,30 @@ Source design review: OpenWiki durability/reconciliation mechanisms, adapted to 
 
 - [x] **KNOW-01 — EvidenceResourceV1.** Typed namespaces, bounded source-location hints, deterministic resource key.
 - [x] **KNOW-02 — EvidenceResolver registry.** One deterministic resolver per namespace plus phase-scoped exact cache; resolver owns evidence version/revision.
-- [x] **KNOW-03 — Race/symlink-safe source resolver.** `RepositoryEvidenceResolverV1` resolves only repository-contained regular files, rejects traversal/symlink evidence, validates strict UTF-8, detects inspect/read races, and requires exact content/workspace agreement with an injected existing source-registry owner. It does not mint source revisions or query a new source store.
-- [x] **KNOW-04 — Relocation hierarchy contract.** `relocateEvidenceHierarchyV1()` freezes exact sourceRevision/byte → symbolVersion → Tree-sitter → LSP/compiler → exact text → contextual anchor ordering. Structural ambiguity/unresolved results fail closed and do not fall through to textual guessing. Runtime readers remain adapters over existing Parent Atlas identity/AST/LSP owners.
-- [x] **KNOW-05 — AtlasKnowledgeClaimV1.** Stable logical claim id, claim revision, content/evidence checksum, revision-qualified evidence, non-canonical authority.
-- [x] **KNOW-06 — Atomic claim mutations.** ADD/CONFIRM/UPDATE/RETRACT validate targets and resolve all evidence before returning a next state; zero store writes.
-- [x] **KNOW-07 — Claim preflight.** Re-resolve evidence and classify source/symbol/ontology/version/checksum drift deterministically; zero writes.
-- [x] **KNOW-08 — Sparse reconciliation.** Preserve issue-free claims without model repetition; stale/unresolved claims require update or retraction.
-- [ ] **KNOW-09 — Source snapshot/fingerprint.** `KnowledgeSourceSnapshotV1`, deterministic raw-worktree fingerprinting, and `KnowledgeSourceSnapshotAuditReceiptV1` now fail closed unless the frozen source set exactly matches injected source-registry rows and the raw-worktree fingerprint. Still requires a workstation read-only adapter/proof over the existing lineage owner before closure.
-- [x] **KNOW-10 — PageJobV1 → OaK DAG binding.** `planKnowledgePageJobV1()` accepts only `PENDING` jobs and delegates lowering to `planKernelBoundDagV1()` using the active kernel manifest/function catalog/operator library. It produces a checksum-bound read-only/propose-only binding receipt; page jobs cannot invent DAG action kinds or mutation semantics.
-- [ ] **KNOW-11 — Page snapshot/rollback.** `executeKnowledgePageWorkerWithRollbackV1()` now snapshots page + claim-sidecar bytes through an injected file adapter, restores them exactly for worker/durable-submit failures before a completion receipt exists, and explicitly refuses rollback after durable submission. It remains open until focused tests and a temporary-filesystem adapter proof are green.
-- [ ] **KNOW-12 — Resumable generation run.** `KnowledgeGenerationLifecycleV1` now freezes `BEGIN → PLAN → NEXT_PAGE → optional INSPECT → SUBMIT → FINISH`, checksum-seals every operation against evidence receipts, persists explicit COMPLETE/SKIPPED page state, and rejects `FINISH` while any job remains pending. Serialization/resume tests are present; bind `SUBMIT` to the concrete KNOW-13 completion receipt and run focused validation before closure.
-- [ ] **KNOW-13 — Durable page completion.** Claims persisted/proven before job completion can be recorded; define the concrete completion receipt that KNOW-12 `SUBMIT` must validate rather than accepting an opaque checksum alone.
-- [ ] **KNOW-14 — Page manifest replay.** Manifest currentness helper exists; still prove page bytes + claim set + evidence + verification receipt + source snapshot on two runs.
-- [x] **KNOW-15 — Generated provenance contract.** Producer/model/program metadata advances only when page body bytes change; runtime write/readback proof remains downstream.
-- [x] **KNOW-16 — OKF source projection contract.** Deterministic Parent Atlas-owned source IDs; preserve non-Parent-Atlas producers.
-- [x] **KNOW-17 — Multi-producer verification contract.** Replace/remove only Parent Atlas verifier events; preserve human/other-process verification.
-- [x] **KNOW-18 — Master TOC/index projection contract.** Deterministic `KnowledgeIndexV1` is ready to feed the existing Master TOC owner; no competing index authority.
-- [x] **KNOW-19 — Admin graph projection contract.** Typed KnowledgePage/Claim/Evidence/Concept/OpenSpec/Receipt/Source graph; Markdown links are not ontology authority.
-- [ ] **KNOW-20 — semantic_768 knowledge projection.** Index verified page/claim artifacts only after exact candidate/source revision qualification.
+- [x] **KNOW-03 — Race/symlink-safe source resolver.** Existing source registry remains revision authority; traversal/symlink/race conditions fail closed.
+- [x] **KNOW-04 — Relocation hierarchy contract.** exact revision/byte → symbolVersion → Tree-sitter → LSP/compiler → exact text → context; structural disagreement fails closed.
+- [x] **KNOW-05 — AtlasKnowledgeClaimV1.** Stable logical claim id, claim revision, evidence checksum, non-canonical authority.
+- [x] **KNOW-06 — Atomic claim mutations.** Resolve all evidence before constructing a next claim set; zero store writes.
+- [x] **KNOW-07 — Claim preflight.** Deterministic source/symbol/ontology/version/checksum drift classification.
+- [x] **KNOW-08 — Sparse reconciliation.** Issue-free claims survive; stale/unresolved claims require explicit update/retraction.
+- [ ] **KNOW-09 — Source snapshot/fingerprint.** Contract implemented; workstation adapter/proof against the live lineage owner remains open.
+- [x] **KNOW-10 — PageJobV1 → OaK DAG binding.** Delegates to KernelBoundDagPlannerV1; read-only/propose-only only.
+- [ ] **KNOW-11 — Page snapshot/rollback.** Exact pre-submit rollback controller exists. Durable snapshot artifact persistence + process-loss filesystem proof remain open.
+- [ ] **KNOW-12 — Resumable generation run.** Lifecycle now requires `INSPECT` before `SUBMIT`; COMPLETE transitions require a verified typed `KnowledgePageCompletionReceiptV1`; opaque checksum-only completion is forbidden. Focused build/replay is still pending.
+- [ ] **KNOW-13 — Durable page completion.** `KnowledgePagePersistenceReceiptV1` + `KnowledgePageCompletionReceiptV1` now bind readback-verified page/claim persistence, verification receipt, source snapshot, page snapshot, DAG binding, DAG execution receipt and CURRENT manifest identity. Runtime persistence adapter/readback proof remains open.
+- [ ] **KNOW-14 — Page manifest replay.** Manifest currentness helper exists; prove page bytes + claim set + verification + source snapshot on two runs.
+- [x] **KNOW-15 — Generated provenance contract.** Producer/model/program metadata advances only on body-byte change.
+- [x] **KNOW-16 — OKF source projection contract.** Parent Atlas replaces only Parent Atlas-owned source entries.
+- [x] **KNOW-17 — Multi-producer verification contract.** Parent Atlas replaces only `parent-atlas/*` verification events.
+- [x] **KNOW-18 — Master TOC/index projection contract.** Deterministic KnowledgeIndexV1; no competing authority.
+- [x] **KNOW-19 — Admin graph projection contract.** Derived KnowledgePage/Claim/Evidence/Concept/OpenSpec/Receipt/Source graph.
+- [ ] **KNOW-20 — semantic_768 knowledge projection.** Verified page/claim artifacts only after exact source/revision qualification.
 - [ ] **KNOW-21 — ConceptAdmission bridge.** Verified claims may nominate concept evidence but cannot mint ontology classes.
 - [ ] **KNOW-22 — OntologyLinkedTuple bridge.** Promotion only through existing evidence/revision-qualified ontology owner.
-- [ ] **KNOW-23 — Full two-run read-only replay.** Same frozen source snapshot → same claims/page/index checksums, zero writes outside bounded file artifacts.
-- [ ] **KNOW-24 — Interruption/resume proof.** Completed pages remain durable recovery units; skipped/pending jobs resume without regenerating complete pages. The lifecycle contract now preserves completed/skipped status across serialization; workstation interruption proof remains open.
-- [ ] **KNOW-25 — Failed-worker rollback proof.** Pre-submit failure restores page+claims exactly; post-submit failure never rolls back durable completion. The recovery controller now models both boundaries; filesystem replay proof remains open.
+- [ ] **KNOW-23 — Full two-run read-only replay.** Same frozen source snapshot → same claims/page/index checksums.
+- [ ] **KNOW-24 — Interruption/resume proof.** Lifecycle preserves COMPLETE/SKIPPED state; workstation kill/resume proof remains open.
+- [ ] **KNOW-25 — Failed-worker rollback proof.** Pre-submit failure restores page+claims exactly; post-submit failure never rolls back durable completion. Process-loss replay remains open.
 
 ## Current tranche
 
-Files remain additive under `packages/parent-atlas/src/core/knowledge/`. Source authority is injected from existing Parent Atlas lineage (`graphify_files`/source-registry adapters); structural identity is injected from existing revision-qualified symbol, Tree-sitter, and LSP/compiler owners. Page planning is delegated to the existing kernel-bound planner rather than a new agent controller. Lifecycle completion is explicit state and is never inferred from model/process exit. No PostgreSQL, Neo4j, Qdrant, Valkey, migration, MCP, CLAUDE.md, AGENTS.md, generated knowledge-page, or production mutation changes are authorized by this tranche.
+The branch remains additive under `packages/parent-atlas/src/core/knowledge/`. No PostgreSQL, Neo4j, Qdrant, Valkey, migration, MCP, CLAUDE.md, AGENTS.md, generated knowledge-page, or production-store mutation is authorized. PR #78 remains draft. As of 2026-09-04 its branch has diverged from current `main`; synchronization/rebase against current `main` is an explicit integration gate because the current kernel DAG spine includes `ParameterArtifactV1` materialization/resolution that is newer than the branch base.
