@@ -4394,18 +4394,37 @@ work on this ledger.
       wrapper actually controls commit/rollback. Second run: all `CREATE TABLE`/`CREATE
       INDEX`/`CREATE FUNCTION`/`CREATE TRIGGER`/`COMMENT` statements succeed, ends `ROLLBACK`
       (never `COMMIT`), `to_regclass()` confirms nothing persisted.
-- [ ] Review `graphify_executions` contract: `execution_id UUID PK`, `workspace_revision`,
+- [x] Review `graphify_executions` contract: `execution_id UUID PK`, `workspace_revision`,
       `legacy_graphify_run_id` (compatibility-only, no canonical-authority claim),
       parser/extraction/graph revisions, `status`, `started_at`, `last_heartbeat_at`,
-      `completed_at`, environment metadata.
-- [ ] Review `graphify_execution_files` contract: `PRIMARY KEY (execution_id, source_ref)`,
+      `completed_at`, environment metadata. **(2026-09-04, reviewed against the live migration
+      text)** `sveltekit-frontend/drizzle/manual/20260903_graphify_execution_ledger_v1.sql` lines
+      45-79 declares every field named here exactly: `execution_id uuid PRIMARY KEY`,
+      `workspace_revision text NOT NULL` (CHECK'd `^sha256:...$`), `legacy_graphify_run_id uuid
+      REFERENCES graphify_runs(run_id)` (nullable, compatibility-only per its own comment),
+      `parser_contract_version`/`extraction_contract_version`/`graph_algorithm_revision`,
+      `status`, `started_at`, `last_heartbeat_at`, `completed_at`, plus `trigger_kind` /
+      `scheduler_revision` / `environment_revision` for environment metadata. Confirmed the
+      companion root-level file `drizzle/manual/20260903_graphify_execution_identity_v1.sql` is a
+      non-executable pointer to this one canonical file, not a second migration authority (no
+      duplication). Review only -- no schema change, no apply.
+- [x] Review `graphify_execution_files` contract: `PRIMARY KEY (execution_id, source_ref)`,
       recording `source_ref`, `code_source_revision`, `workspace_revision`, `content_hash`,
-      `byte_length`; `legacy_file_id` optional provenance only.
-- [ ] Review `graphify_execution_stages` contract:
+      `byte_length`; `legacy_file_id` optional provenance only. **(2026-09-04)** Same migration
+      lines 104-122: `PRIMARY KEY (execution_id, source_ref)`, `source_ref text NOT NULL`,
+      `code_source_revision text NOT NULL` (CHECK'd sha256), `workspace_revision text NOT NULL`,
+      `content_hash text NOT NULL`, `byte_length bigint NOT NULL`, `legacy_file_id uuid NULL` with
+      no FK/NOT NULL constraint -- exactly "optional provenance only" as specified. Matches.
+- [x] Review `graphify_execution_stages` contract:
       `OPEN → SOURCE_SELECTION → INVENTORY → AST_PARSE → STRUCTURAL_EXTRACT → SEMANTIC_ENRICH →
-      GRAPH_BUILD → PROJECT → VALIDATE → CLOSE`.
-- [ ] Execution terminal-state constraints: `COMPLETED | COMPLETED_REUSED | FAILED | ABANDONED`
-      require `completed_at IS NOT NULL`; `RUNNING` requires `completed_at IS NULL`.
+      GRAPH_BUILD → PROJECT → VALIDATE → CLOSE`. **(2026-09-04)** Migration lines 145-146's CHECK
+      constraint enumerates exactly these 10 stage names in exactly this order. Matches.
+- [x] Execution terminal-state constraints: `COMPLETED | COMPLETED_REUSED | FAILED | ABANDONED`
+      require `completed_at IS NOT NULL`; `RUNNING` requires `completed_at IS NULL`. **(2026-09-04)**
+      Migration lines 82-84: `CHECK (status IN ('RUNNING', 'COMPLETED', 'COMPLETED_REUSED',
+      'FAILED', 'ABANDONED'))` plus `CHECK ((status = 'RUNNING' AND completed_at IS NULL) OR
+      (status <> 'RUNNING' AND completed_at IS NOT NULL))` -- exactly this rule, database-enforced,
+      not merely documented. Matches.
 - [x] Prove `graphify_execution_files` is append-only evidence — no ordinary UPDATE/DELETE
       lifecycle. Closed the DB-enforcement gap flagged in the read-only review pass below: added
       `graphify_execution_files_reject_mutation()` + `BEFORE UPDATE`/`BEFORE DELETE` triggers to
@@ -4422,9 +4441,21 @@ work on this ledger.
 - [ ] Freeze the coordinator session advisory-lock contract: one dedicated PostgreSQL connection,
       session-level lock held for the complete coordinator lifetime, unlock in `finally`, no giant
       long-running transaction.
-- [ ] Identify ONE durable inventory-persistence owner. `graphify-source-inventory-writer-v2.ts`
+- [x] Identify ONE durable inventory-persistence owner. `graphify-source-inventory-writer-v2.ts`
       is the preferred candidate; `materialize-graphify-source-inventory.mts` should eventually
-      become a thin wrapper rather than retaining an independent SQL implementation.
+      become a thin wrapper rather than retaining an independent SQL implementation. **(2026-09-04,
+      confirmed live, not assumed)**
+      `sveltekit-frontend/src/lib/server/atlas/indexing/graphify-source-inventory-writer-v2.ts`
+      (658 lines) has 5 real callers: `graphify-lifecycle-composition-v1.ts` (production
+      composition path), 3 `apply-*-graphify-*-batch-v1.mts` scripts, and its own spec file.
+      `sveltekit-frontend/scripts/atlas/materialize-graphify-source-inventory.mts` (264 lines) has
+      exactly 1 caller (`prove-graphify-revision-owner-v2.mts`) and, checked directly, still
+      contains its own independent `INSERT INTO graphify_runs` / `INSERT INTO graphify_files` SQL
+      via a locally-constructed `pg.Pool` -- it does NOT import or delegate to writer-v2 at all.
+      This confirms the suspicion in this task's own wording: writer-v2 is the durable owner;
+      materialize-graphify-source-inventory.mts still needs the thin-wrapper refactor, not yet
+      done (out of scope for this identification-only task -- tracked as a follow-up, not a new
+      gate).
 - [ ] Do NOT change the existing `graphify_runs` unique index yet.
 - [ ] Do NOT rewrite historical `graphify_runs` rows.
 - [ ] Do NOT run broad `graphify:daily` yet — see the "ignore the stale codebase-graph.json hook"
