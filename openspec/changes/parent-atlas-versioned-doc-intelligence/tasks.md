@@ -135,27 +135,79 @@ from `parent-atlas-retrieval-lineage-dag-convergence`.
 
 ## Phase B — Deterministic extraction (before any LLM touches a page)
 
-- [ ] **DOC-04** BeautifulSoup deterministic normalizer, richer structure — `EXTEND`. Audit done:
-  two owners exist and are correctly classified as non-competing, not duplicates needing merging.
-  `atlas_external_docs.py::fetch_beautifulsoup()` is `CANONICAL_OWNER` for this pipeline — title +
-  main-content targeting (`<main>`/`<article>`) + outgoing-link extraction + raw/normalized
-  checksums + domain-allowlist support (`enforce_allowed_domain`), already wired to
-  `atlas_okf_docs_pipeline.py` and the `/evidence/web` sidecar endpoint. `langextract_service.py`'s
-  `_fetch_html`/`_extract_html_text` (plain-text-only, regex fallback if bs4 unavailable, no link
-  extraction, no allowlist, no checksums) backs `POST /extract/web` — confirmed a narrower,
-  self-contained ad hoc "fetch one URL and run LangExtract on it" convenience endpoint, unrelated
-  to and not feeding the versioned doc corpus. **Resolution**: DOC-04's richer-structure work
-  (headings/code-blocks/tables/API-signatures) extends `atlas_external_docs.py::fetch_beautifulsoup()`
-  only. Do not touch `langextract_service.py`'s fetcher — it stays `COMPATIBILITY`, its own
-  narrower purpose, not part of this pipeline's ownership.
+- [x] **DOC-04** BeautifulSoup deterministic normalizer, richer structure — done, live-tested.
+  Audit (recorded before implementation, still holds): two owners exist and are correctly
+  classified as non-competing, not duplicates needing merging. `atlas_external_docs.py::
+  fetch_beautifulsoup()` is `CANONICAL_OWNER` for this pipeline; `langextract_service.py`'s
+  `_fetch_html`/`_extract_html_text` stays `COMPATIBILITY`, unrelated to and not feeding the
+  versioned doc corpus. **Implementation**: new pure function `extract_structured_text()` (no
+  network I/O, unit-testable directly) replaces the old flatten-everything
+  `main.get_text("\n", strip=True)` with a structure-preserving pass — `<pre>`/`<code>` blocks
+  become fenced code blocks with language detected from Sphinx/Pygments/MkDocs/Docusaurus-style
+  `class="language-python"`/`lang-cpp`/`highlight-sql"` conventions (checked on the tag and up to 4
+  ancestors), `<table>` rows become pipe-delimited lines, `<h1>`-`<h6>` become `#`-`######`-prefixed
+  lines matching `_heading_sections()`'s existing regex exactly (so real HTML headings now actually
+  drive heading-based chunking, not just literal markdown input), and remaining inline `<code>`
+  spans keep backtick markers. `fetch_beautifulsoup()` itself is now a thin wrapper: do the HTTP
+  fetch, then call `extract_structured_text()`.
+  **Real bug found and fixed while implementing, not just claimed**: the final `_normalize_ws()`
+  pass collapses runs of spaces/tabs, which would have destroyed Python-significant indentation
+  inside fenced code blocks (confirmed live: a `def kernel(x):\n    if x:\n        return 1`
+  fixture came out as `def kernel(x):\n if x:\n  return 1` before the fix). Fixed by extracting
+  each `<pre>` block into a single-line null-byte placeholder before normalization, then
+  substituting the real (unnormalized, indentation-intact) fence text back in afterward — verified
+  live with a nested-if fixture that the exact original indentation survives round-trip.
+  **Live-tested inside the real container**: `python/test_atlas_doc_structure_extraction.py`,
+  8/8 pass (heading-regex compatibility incl. a real `_heading_sections()` split proof, language
+  detection + indentation preservation, table serialization, inline-code backticks, a
+  double-counting regression guard for `<code>` nested inside `<pre>`, relative/fragment/mailto
+  link handling, title fallback, empty-page handling). Full existing suite re-run alongside:
+  `test_atlas_external_docs.py` + `test_atlas_okf_docs_pipeline.py` + `test_atlas_doc_coordinate.py`
+  + `test_atlas_doc_manifest.py` = 36/36 pass, zero regression.
+- [x] **DOC-05** `ExternalDocChunkV1` section-chunk contract — done, live-tested. `ChunkRecord`
+  gained two new fields, both additive with empty-tuple defaults (zero behavior change for any
+  existing caller that doesn't pass them): `code_blocks: tuple[Json, ...]` and
+  `api_signatures: tuple[str, ...]`. New `extract_code_blocks_and_signatures(text)` — deterministic
+  regex extraction only (design.md's governing principle: "never let an LLM invent structure a
+  parser can extract exactly"), never LLM-derived: fenced-code-block regex for `code_blocks`
+  (`{language, code}` per block, `language: None` not `""` when undetected); four signature-line
+  patterns (function/method defs across `def`/`function`/`fn`/`func` styles, class/interface/
+  struct/enum/trait declarations, `type X =` aliases, SQL `CREATE|ALTER|DROP TABLE|INDEX|
+  FUNCTION|TYPE|VIEW` DDL) plus an inline-backtick-call pattern for `` `foo(bar)` ``-shaped spans,
+  all deduplicated. Wired into `chunk_document()`: called once per chunk on that chunk's own text,
+  so results stay scoped to that chunk's evidence span, matching `DocCoordinateV1`'s existing
+  per-chunk section-anchor binding from DOC-02 (already wired, no additional work needed for the
+  "DocCoordinateV1 binding" part of this task).
+  **Real interaction bug found and fixed, not just the new fields added**: `_heading_sections()`'s
+  existing chunker regex (`^(#{1,6})\s+...`) matches a `# comment` line inside a *fenced code
+  block* just as eagerly as a real heading — confirmed live with a fixture where a Python
+  `# Load the tile` comment inside a ` ```python ` fence split the code block apart and corrupted
+  the heading stack (`('Load the tile',)` appeared as its own bogus top-level heading). This bug
+  did not exist before DOC-04, because the old flatten-everything extractor never produced real
+  fenced code blocks for `_heading_sections()` to misparse. Fixed: `_heading_sections()` now
+  tracks fence state (toggles on a line starting with `` ``` ``) and skips heading-regex matching
+  while inside one — verified live that the same fixture now keeps the fence intact under its real
+  `('Usage',)` section and does not produce a bogus heading.
+  **Known, accepted limitation, not silently ignored**: `chunk_document()`'s char-window slicer
+  (the `maximum_chars`/`overlap_chars` boundary-finding loop) is not fence-aware — a single fenced
+  code block that happens to straddle a char-window boundary can still be split across two chunks,
+  which would make `extract_code_blocks_and_signatures()` see an unterminated fence in one half and
+  extract zero `code_blocks` for it (the raw text itself is unaffected, only the parsed
+  `code_blocks` field). This is a pre-existing limitation of the char-window design in general (the
+  same was already true for splitting mid-paragraph), not something DOC-04/DOC-05 introduced or
+  need to fully solve — recorded here rather than left as a silent gap; a future fence-aware
+  boundary search in the char-window loop would close it if it proves to matter in practice.
+  **Live-tested inside the real container**: `python/test_atlas_doc_code_signatures.py`, 10/10 pass
+  (fenced block + language extraction, `None`-not-`""` for missing language, multi-block ordering,
+  function/class/SQL-DDL signature detection, inline-backtick-call detection, cross-source
+  deduplication, empty-input handling, full `chunk_document()` end-to-end wiring proof across two
+  real heading sections, and the fence-awareness regression guard above). Combined regression run
+  with all prior Phase A/B test files: 54/54 pass.
 - [ ] **DOC-03** Firecrawl bounded crawler — `EXISTS` (`fetch_firecrawl_v2`), verify
   bounded-crawl behavior (maxPages/maxDepth/sitemap-follow) matches the manifest's
   `maximum_pages`/`maximum_depth` fields; **blocked** on Firecrawl actually being registered
   (API key) — not required for Phase A/B, only for sources that need JS-rendering/recursive crawl
   beyond what a static BeautifulSoup fetch covers.
-- [ ] **DOC-05** `ExternalDocChunkV1` section-chunk contract — `EXTEND`. `chunk_document()`/
-  `ChunkRecord` exist (heading-based chunking); add `codeBlocks`, `apiSignatures`, and the
-  `DocCoordinateV1` binding from DOC-02.
 
 ## Phase C — Classification and multi-representation projection
 
