@@ -1,0 +1,48 @@
+{
+  "schema": "atlas.oak-dag-governance-integration.v1",
+  "status": "IMPLEMENTED_NOT_WORKSTATION_PROVEN",
+  "createdAt": "2026-09-04",
+  "branch": "agent/oak-dag-lineage-bitfrost-hitl-20260904",
+  "implemented": [
+    "Parent-Atlas execution lineage contract",
+    "lineage-bound deterministic OaK execution receipt",
+    "revision-qualified BitFrost DAG cache identity and read-through seam",
+    "stable LangGraph approval thread-id builder",
+    "LangGraph interrupt approval boundary with proposal-checksum binding",
+    "focused governance contract tests"
+  ],
+  "reusedOwners": {
+    "planner": "KernelBoundDagPlannerV1",
+    "dagContract": "AdaptiveDagPlanV1",
+    "scheduler": "runBoundedExecutionPlan",
+    "runtimeRegistry": "createOakDagRuntimeRegistryV1",
+    "cache": "BifrostCacheManager",
+    "checkpoint": "getLangGraphCheckpointer"
+  },
+  "safety": {
+    "canonicalAuthority": false,
+    "sourceMutationAdded": false,
+    "databaseWritesRun": false,
+    "qdrantWritesRun": false,
+    "neo4jWritesRun": false,
+    "valkeyWritesRunDuringImplementation": false,
+    "approvalHelperPerformsMutation": false
+  },
+  "stillOpen": [
+    "run focused Vitest for the new governance spec",
+    "run Parent Atlas package build for oak-execution-lineage-v1.ts",
+    "audit all registered handlers for executable input/output validation parity",
+    "bind live request lineage into execution admission",
+    "prove one real registry DAG twice with zero authoritative writes",
+    "prove BitFrost MISS -> HIT -> stale-revision MISS -> cache-down read-through",
+    "compile a LangGraph approval node with the existing Postgres checkpointer and resume it with the same thread_id",
+    "implement or explicitly narrow AdaptiveDagPlanV1 RETRY/FALLBACK/SKIP_OPTIONAL semantics at the scheduler boundary"
+  ],
+  "focusedCommands": [
+    "cd sveltekit-frontend && npx vitest run src/lib/server/atlas/policy/oak-dag-execution-adapter-v1.spec.ts src/lib/server/atlas/policy/oak-dag-governance-v1.spec.ts --pool=forks --maxWorkers=1 --minWorkers=1",
+    "cd packages/parent-atlas && node ../../node_modules/typescript/bin/tsc -p tsconfig.json",
+    "git diff --check"
+  ],
+  "fullWorkspaceTsgoRequired": false,
+  "canonicalAuthority": false
+}
