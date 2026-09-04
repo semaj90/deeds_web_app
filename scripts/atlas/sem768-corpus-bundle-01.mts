@@ -7,7 +7,7 @@
  * correction: Graphify cannot be the prerequisite for this bundle (Graphify is itself blocked on
  * Phase 16), and LINEAGE-01 cannot be the prerequisite either (it stays open until a completed
  * Graphify lifecycle exists). This bundle is owned by the semantic corpus itself:
- * codebase_chunk_index.content_embedding.
+ * codebase_chunk_index.content_embedding_768.
  *
  * Corrects a real mistake from the first draft of this gate: that draft guessed the dominant
  * cohort's producer constituents from `backfill-graphify-file-embeddings-768.mjs` (a llama.cpp/
@@ -81,7 +81,7 @@ async function main(): Promise<void> {
   // eligibilityPolicyRevision: frozen description of what counts as "eligible" for THIS bundle.
   const eligibilityPolicyDefinition = {
     id: 'sem768-dominant-cohort-v1',
-    filter: `embedding_model = '${DOMINANT_EMBEDDING_MODEL}' AND content_embedding IS NOT NULL`,
+  filter: `embedding_model = '${DOMINANT_EMBEDDING_MODEL}' AND content_embedding_768 IS NOT NULL`,
     rationale: 'Scoped to the single homogeneous producer generation confirmed by the real apply receipt, excluding the ~19 other heterogeneous cohorts found in SEM768-CORPUS-BUNDLE-01 draft 1.',
   };
   const eligibilityPolicyRevision = `sem768-dominant-cohort-v1:sha256:${sha256(JSON.stringify(eligibilityPolicyDefinition))}`;
@@ -90,7 +90,7 @@ async function main(): Promise<void> {
   // revision), never hardcoded.
   const representationConstituents = {
     representationId: 'semantic_768',
-    canonicalColumn: 'content_embedding',
+    canonicalColumn: 'content_embedding_768',
     physicalType: 'halfvec(768)',
     modelTag: DOMINANT_EMBEDDING_MODEL,
     upstreamModel: OLLAMA_MODEL_TAG,
@@ -140,7 +140,7 @@ async function main(): Promise<void> {
       `
       SELECT id::text AS id, content_hash
       FROM codebase_chunk_index
-      WHERE content_embedding IS NOT NULL AND embedding_model = $1
+      WHERE content_embedding_768 IS NOT NULL AND embedding_model = $1
       ORDER BY id;
       `,
       [DOMINANT_EMBEDDING_MODEL],

@@ -32,7 +32,7 @@ export const SemanticCorpusBundleV1Schema = z.object({
   representationRevision: z.string().min(1),
 
   // Frozen description of which rows count as "eligible" for this bundle (e.g. "embedding_model
-  // = X AND content_embedding IS NOT NULL"), hashed. Must change if the eligibility definition
+  // = X AND content_embedding_768 IS NOT NULL"), hashed. Must change if the eligibility definition
   // changes, independent of whether the underlying data changes.
   eligibilityPolicyRevision: z.string().min(1),
 

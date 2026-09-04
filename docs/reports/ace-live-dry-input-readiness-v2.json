@@ -1,0 +1,42 @@
+{
+  "schema": "atlas.ace-live-dry-input-readiness.v2",
+  "status": "ACE_LIVE_DRY_INPUT_BLOCKED",
+  "checks": [
+    {
+      "label": "CandidateOrdinalMapV1",
+      "status": "MISSING_ARGUMENT",
+      "path": null,
+      "issues": []
+    },
+    {
+      "label": "CandidateFeatureSnapshotV1",
+      "status": "MISSING_ARGUMENT",
+      "path": null,
+      "issues": []
+    },
+    {
+      "label": "RevisionAuthorityEnvelopeV1",
+      "status": "MISSING_ARGUMENT",
+      "path": null,
+      "issues": []
+    }
+  ],
+  "crossContractStatus": "NOT_CHECKED",
+  "crossContractErrors": [],
+  "blockers": [
+    "CandidateOrdinalMapV1:MISSING_ARGUMENT",
+    "CandidateFeatureSnapshotV1:MISSING_ARGUMENT",
+    "RevisionAuthorityEnvelopeV1:MISSING_ARGUMENT"
+  ],
+  "sealedBundleVerification": {
+    "attempted": false,
+    "passed": false,
+    "bundleLogicalChecksum": null,
+    "bundleEnvelopeChecksum": null,
+    "candidateSourceAuthorityVerified": false
+  },
+  "writesPerformed": false,
+  "cacheWritesPerformed": false,
+  "canonicalAuthority": false,
+  "nextCommand": "Provide only the missing/invalid authoritative artifacts; do not synthesize replacements."
+}

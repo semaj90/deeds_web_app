@@ -1,5 +1,5 @@
 {
-  "generated": "2026-09-03T02:28:32.386Z",
+  "generated": "2026-09-04T02:34:31.634Z",
   "qdrantFound": 0,
   "gates": [
     {
@@ -9,7 +9,7 @@
     },
     {
       "name": "embed_working",
-      "pass": false,
+      "pass": true,
       "detail": "embeddinggemma:latest (768-dim)"
     },
     {
@@ -65,7 +65,7 @@
         "ranking",
         "retrieval"
       ],
-      "embed_ok": false,
+      "embed_ok": true,
       "registry_ok": true,
       "retrieval_source": "registry"
     },
@@ -113,7 +113,7 @@
         "vector",
         "inference"
       ],
-      "embed_ok": false,
+      "embed_ok": true,
       "registry_ok": true,
       "retrieval_source": "registry"
     },
@@ -156,7 +156,7 @@
         "atlas_indexing",
         "retrieval"
       ],
-      "embed_ok": false,
+      "embed_ok": true,
       "registry_ok": true,
       "retrieval_source": "registry"
     },
@@ -208,7 +208,7 @@
         "lexical",
         "graph"
       ],
-      "embed_ok": false,
+      "embed_ok": true,
       "registry_ok": true,
       "retrieval_source": "registry"
     },
@@ -255,7 +255,7 @@
         "read",
         "retrieval"
       ],
-      "embed_ok": false,
+      "embed_ok": true,
       "registry_ok": true,
       "retrieval_source": "registry"
     }

@@ -142,6 +142,13 @@ const rollbackEntries = patches.map((p) => ({
 const preimageChecksum = sha256(JSON.stringify(preimageEntries));
 const rollbackChecksum = sha256(JSON.stringify(rollbackEntries));
 const blockingCount = counts.PREIMAGE_DRIFT + counts.IDENTITY_CONFLICT + counts.REVISION_MISMATCH + counts.FOREIGN_CHUNK + duplicateMemberships;
+const verdict = blockingCount > 0
+  ? 'STOP_NO_APPLY'
+  : patches.length > 0
+    ? 'READY_FOR_AUTHORIZED_APPLY'
+    : counts.QDRANT_POINT_MISSING > 0
+      ? 'NO_PATCHES_MISSING_POINTS_REMAIN'
+      : 'NO_PATCHES_REQUIRED';
 const report = {
   schema: 'atlas.bridge-recon-dry-04.v1',
   task: 'BRIDGE-RECON-DRY-04',
@@ -173,7 +180,7 @@ const report = {
   proposedPatchCount: patches.length,
   missingPhysicalPointCount: counts.QDRANT_POINT_MISSING,
   blockingCount,
-  verdict: blockingCount === 0 ? 'READY_FOR_FULL_RECONCILIATION_APPLY' : 'STOP_NO_APPLY',
+  verdict,
   writesPerformed: false,
   canonicalAuthority: false,
   writes: { postgres: false, qdrant: false, neo4j: false, valkey: false },

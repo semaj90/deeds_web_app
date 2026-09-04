@@ -47,31 +47,27 @@ describe('LatentSourceManifestV1', () => {
     expect(manifest.canonicalAuthority).toBe(false);
   });
 
-  it('builds a valid latent_64 manifest: LEARNED, co-produced with latent_256 -- NOT derived', () => {
+  it('builds a valid latent_64 manifest: DERIVED from latent_256 via prefix+L2-renormalize', () => {
     const manifest = buildLatentSourceManifestV1(
       baseInput({
         representationId: 'latent_64',
         representationRevision: 'latent_64:v1',
         dimensions: 64,
-        origin: { kind: 'LEARNED', coProducedWith: 'latent_256' },
+        origin: {
+          kind: 'DERIVED', parentRepresentationId: 'latent_256', parentRepresentationRevision: 'latent_256:v1',
+          transform: 'NESTED_PREFIX_L2_RENORMALIZE', prefixDimensions: 64, parentVectorsChecksum: sha('e'),
+        },
       }),
     );
-    expect(manifest.output.origin).toEqual({ kind: 'LEARNED', coProducedWith: 'latent_256' });
+    expect(manifest.output.origin).toMatchObject({ kind: 'DERIVED', parentRepresentationId: 'latent_256', prefixDimensions: 64 });
   });
 
-  it('rejects latent_64 framed as DERIVED from latent_256 -- the real correction this contract enforces', () => {
+  it('rejects latent_64 framed as LEARNED co-produced when the producer is prefix-derived', () => {
     const invalid = baseInput({
       representationId: 'latent_64',
       representationRevision: 'latent_64:v1',
       dimensions: 64,
-      origin: {
-        kind: 'DERIVED',
-        parentRepresentationId: 'latent_256',
-        parentRepresentationRevision: 'latent_256:v1',
-        transform: 'NESTED_PREFIX_L2_RENORMALIZE',
-        prefixDimensions: 64,
-        parentVectorsChecksum: sha('e'),
-      },
+      origin: { kind: 'LEARNED', coProducedWith: 'latent_256' },
     });
     expect(() => buildLatentSourceManifestV1(invalid)).toThrow();
   });

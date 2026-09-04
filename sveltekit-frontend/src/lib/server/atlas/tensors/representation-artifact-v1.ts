@@ -107,29 +107,16 @@ export type RepresentationArtifactV1 = z.infer<typeof RepresentationArtifactV1Sc
 //      ANY inputRepresentationId other than 'semantic_768' for EVERY representationId, which
 //      would incorrectly reject a legitimate latent_128 artifact declaring latent_256 as its
 //      input (the actual derived-view relationship this family is supposed to support).
-//   2. latent_64 is NOT a pure derived view of latent_256 the way latent_128 is — verified live
-//      (see GRAPHIFY... / PARENT ATLAS REPRESENTATION FABRIC registration, and
-//      LATENT-PHASE16-OWNER-01 above): codebase_chunk_index.latent_64 is a real, physically
-//      persisted vector(64) column with its own HNSW index, written by the SAME
-//      NestedSemanticAutoencoder.encode() forward pass as latent_256 (both read content_embedding
-//      directly) — not computed on demand by prefixing/renormalizing a persisted latent_256 row.
-//      latent_128 genuinely has no physical storage anywhere (no column, no Qdrant collection) —
-//      it stays a true derived view.
+//   2. Physical persistence and mathematical origin are separate axes. The producer contract
+//      defines latent_128 and latent_64 as prefix/L2-renormalized views of latent_256; either
+//      view may be persisted for a residency tier. A persisted latent_64 row therefore does
+//      not become independently learned merely because it has a database column or index.
+//      Derived views require the parent representation revision and transform policy in their
+//      manifest binding.
 // LATENT-REPRESENTATION-SEMANTICS-03 (parent-atlas-retrieval-lineage-dag-convergence, 2026-09-03):
 // `physical` (above) conflated two independent axes into one boolean, which cannot express
-// latent_64's actual shape -- it is NOT a transform of latent_256 (would be `origin: 'DERIVED'`)
-// and it IS physically stored (would be `materialization: 'PERSISTED'`), but it is also NOT
-// LEARNED-FROM-SCRATCH the way latent_256 is: both are produced by the SAME
-// NestedSemanticAutoencoder.encode() forward pass over semantic_768 within one materialization
-// run, sharing one modelChecksum/checkpointRevision (see the comment above this const). Modeling
-// that as a single `origin`/`materialization` pair per representation would still lose the "same
-// forward pass, same checkpoint, two output heads" relationship. `coProducedWith` captures it
-// explicitly: latent_64 and latent_256 are marked as siblings of one production event, distinct
-// from latent_128's true derived-view relationship (a separate, later, purely mathematical
-// transform of an already-persisted latent_256 row). This directly corrects an operator proposal
-// in this same OpenSpec change that framed latent_64 as "DERIVED + materialization depending on
-// the admitted artifact" -- live evidence (this file's own prior audit, unchanged since) says
-// latent_64 is co-produced with latent_256, not derived from it.
+// The live producer and training receipt define both lower-width outputs as prefix + L2-normalize
+// views of latent_256. Physical persistence remains a separate materialization axis.
 export const NESTED_LATENT_REPRESENTATION_FAMILY_V1 = {
   familyId: 'nested-semantic-autoencoder',
   members: {
@@ -155,11 +142,12 @@ export const NESTED_LATENT_REPRESENTATION_FAMILY_V1 = {
     latent_64: {
       dimensions: 64,
       physical: true,
-      origin: 'LEARNED' as const,
+      origin: 'DERIVED' as const,
       materialization: 'PERSISTED' as const,
-      parentRepresentationId: null as string | null,
-      coProducedWith: 'latent_256' as string | null,
-      inputRepresentationId: 'semantic_768',
+      parentRepresentationId: 'latent_256' as string | null,
+      coProducedWith: null as string | null,
+      inputRepresentationId: 'latent_256',
+      transform: 'NESTED_PREFIX_L2_RENORMALIZE' as const,
     },
   },
 } as const;

@@ -17,15 +17,10 @@ import { z } from 'zod';
  * every candidate row would duplicate an identity surface this repo already keeps at the artifact
  * level.
  *
- * Real correction to the originally proposed shape, found live and preserved here rather than
- * copied uncritically: `latent_64` is NOT a `NESTED_PREFIX_L2_RENORMALIZE` derivation of
- * `latent_256` the way `latent_128` is. Per representation-artifact-v1.ts's own live-verified
- * audit (unchanged, cited there): `codebase_chunk_index.latent_64` is written by the SAME
- * NestedSemanticAutoencoder.encode() forward pass over semantic_768 as latent_256 -- a
- * CO-PRODUCED learned output, not a transform of an already-persisted latent_256 row. The
- * `origin` union below therefore keeps `LEARNED` for both latent_256 and latent_64 (with an
- * optional `coProducedWith` sibling reference for latent_64), and reserves `DERIVED` for the one
- * representation that genuinely is a transform: latent_128.
+ * The producer contract is prefix-derived: `NestedSemanticAutoencoder.encode()` emits latent_256
+ * and then creates latent_128 and latent_64 by prefix slicing and L2 renormalization. The schema
+ * therefore treats latent_128 and latent_64 as DERIVED views of latent_256, while keeping storage
+ * materialization separate from mathematical origin.
  */
 
 export const LATENT_SOURCE_MANIFEST_V1 = 'atlas.latent-source-manifest.v1' as const;
@@ -100,8 +95,8 @@ export const latentSourceManifestV1Schema = z.object({
     }
   }
   if (output.representationId === 'latent_64') {
-    if (output.origin.kind !== 'LEARNED' || output.origin.coProducedWith !== 'latent_256') {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['output', 'origin'], message: 'LATENT_64_MUST_BE_LEARNED_CO_PRODUCED_WITH_LATENT_256_NOT_DERIVED' });
+    if (output.origin.kind !== 'DERIVED' || output.origin.prefixDimensions !== 64) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['output', 'origin'], message: 'LATENT_64_MUST_BE_DERIVED_WITH_PREFIX_DIMENSIONS_64' });
     }
   }
   if (output.representationId === 'latent_128') {

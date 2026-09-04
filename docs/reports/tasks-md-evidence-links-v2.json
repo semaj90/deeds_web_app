@@ -1,0 +1,244 @@
+{
+  "generatedAt": "2026-09-04T04:34:51.332Z",
+  "schema": "atlas.tasks-md-evidence-links.v2",
+  "input": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
+  "parser": "top_level_checkbox_block_until_next_checkbox",
+  "checkedTaskCount": 120,
+  "checkedWithEvidenceCount": 88,
+  "taskBlockEvidenceCount": 70,
+  "sectionEvidenceCount": 18,
+  "checkedWithoutEvidence": [
+    {
+      "taskId": "Keep",
+      "title": "Keep `semantic_768` as the canonical representation and keep `semantic_mrl_512/256/128` as derived truncation views.",
+      "startLine": 3372,
+      "section": "SOM-AE-KNN-KMEANS-ALIGNMENT-01",
+      "classification": "LIKELY_CONTINUATION_OR_SUBTASK"
+    },
+    {
+      "taskId": "Keep",
+      "title": "Keep `latent_256` as the learned nested-autoencoder artifact; `latent_128` and `latent_64` are derived prefix+L2 views unless a separate artifact contract proves otherwise.",
+      "startLine": 3373,
+      "section": "SOM-AE-KNN-KMEANS-ALIGNMENT-01",
+      "classification": "LIKELY_CONTINUATION_OR_SUBTASK"
+    },
+    {
+      "taskId": "Keep",
+      "title": "Keep NetworkX node-link JSON as deterministic interchange/CPU-oracle data only; it is not a GPU hot path or canonical identity source.",
+      "startLine": 3374,
+      "section": "SOM-AE-KNN-KMEANS-ALIGNMENT-01",
+      "classification": "LIKELY_CONTINUATION_OR_SUBTASK"
+    },
+    {
+      "taskId": "Keep",
+      "title": "Keep one shared projection for KNN, KMeans, SOM, NetworkX, cuDF, and cuGraph; do not rebuild topology per algorithm.",
+      "startLine": 3375,
+      "section": "SOM-AE-KNN-KMEANS-ALIGNMENT-01",
+      "classification": "LIKELY_CONTINUATION_OR_SUBTASK"
+    },
+    {
+      "taskId": "Keep",
+      "title": "Keep MCP/ACE routing separate from SOM/AE artifact production; registry selection cannot create vectors, centroids, or graph identity.",
+      "startLine": 3376,
+      "section": "SOM-AE-KNN-KMEANS-ALIGNMENT-01",
+      "classification": "LIKELY_CONTINUATION_OR_SUBTASK"
+    },
+    {
+      "taskId": "01",
+      "title": "01 Run the existing semantic snapshot audit read-only and record the exact row count, vector checksum, and node-key owner.",
+      "startLine": 3405,
+      "section": "SEMANTIC-CANDIDATE-COHORT-IMPLEMENTATION-SLICE-01 (15 narrow tasks)",
+      "classification": "LIKELY_CONTINUATION_OR_SUBTASK"
+    },
+    {
+      "taskId": "02",
+      "title": "02 Audit the existing `CandidateOrdinalMapV1` independently; do not treat its `proto:*`/`packet:*` IDs as semantic vector IDs.",
+      "startLine": 3406,
+      "section": "SEMANTIC-CANDIDATE-COHORT-IMPLEMENTATION-SLICE-01 (15 narrow tasks)",
+      "classification": "LIKELY_CONTINUATION_OR_SUBTASK"
+    },
+    {
+      "taskId": "03",
+      "title": "03 Freeze an explicit bounded query population from the admitted candidate map; prohibit an empty query list from becoming an implicit executor default.",
+      "startLine": 3407,
+      "section": "SEMANTIC-CANDIDATE-COHORT-IMPLEMENTATION-SLICE-01 (15 narrow tasks)",
+      "classification": "LIKELY_CONTINUATION_OR_SUBTASK"
+    },
+    {
+      "taskId": "04",
+      "title": "04 Freeze KNN parameters (`topK`, metric, candidate-pair policy, and parameter checksum) independently of execution.",
+      "startLine": 3408,
+      "section": "SEMANTIC-CANDIDATE-COHORT-IMPLEMENTATION-SLICE-01 (15 narrow tasks)",
+      "classification": "LIKELY_CONTINUATION_OR_SUBTASK"
+    },
+    {
+      "taskId": "05",
+      "title": "05 Test direct intersection between frozen query IDs and semantic snapshot keys; record zero intersection as a blocking result.",
+      "startLine": 3409,
+      "section": "SEMANTIC-CANDIDATE-COHORT-IMPLEMENTATION-SLICE-01 (15 narrow tasks)",
+      "classification": "LIKELY_CONTINUATION_OR_SUBTASK"
+    },
+    {
+      "taskId": "06",
+      "title": "06 Inspect `codebase_chunk_index` for exact semantic-row enrichment fields (`chunk_id`, `source_ref`, `content_hash`, `repo_id`).",
+      "startLine": 3410,
+      "section": "SEMANTIC-CANDIDATE-COHORT-IMPLEMENTATION-SLICE-01 (15 narrow tasks)",
+      "classification": "LIKELY_CONTINUATION_OR_SUBTASK"
+    },
+    {
+      "taskId": "07",
+      "title": "07 Audit `atlas_workspace_source_bindings` as the authoritative source-revision candidate using exact reference and content-digest equality.",
+      "startLine": 3411,
+      "section": "SEMANTIC-CANDIDATE-COHORT-IMPLEMENTATION-SLICE-01 (15 narrow tasks)",
+      "classification": "LIKELY_CONTINUATION_OR_SUBTASK"
+    },
+    {
+      "taskId": "08",
+      "title": "08 Audit `atlas_source_refs` and `graphify_files` as diagnostic alternatives without promoting workspace IDs, paths, or empty commit SHAs to source identity.",
+      "startLine": 3412,
+      "section": "SEMANTIC-CANDIDATE-COHORT-IMPLEMENTATION-SLICE-01 (15 narrow tasks)",
+      "classification": "LIKELY_CONTINUATION_OR_SUBTASK"
+    },
+    {
+      "taskId": "09",
+      "title": "09 Produce `semantic-candidate-cohort-v1.json` with resolved, hydratable, revision-qualified, and rejected counts.",
+      "startLine": 3413,
+      "section": "SEMANTIC-CANDIDATE-COHORT-IMPLEMENTATION-SLICE-01 (15 narrow tasks)",
+      "classification": "LIKELY_CONTINUATION_OR_SUBTASK"
+    },
+    {
+      "taskId": "10",
+      "title": "10 Fail closed when `source_ref` is missing; do not create packet, source-ref, or synthetic identity fallbacks.",
+      "startLine": 3414,
+      "section": "SEMANTIC-CANDIDATE-COHORT-IMPLEMENTATION-SLICE-01 (15 narrow tasks)",
+      "classification": "LIKELY_CONTINUATION_OR_SUBTASK"
+    },
+    {
+      "taskId": "11",
+      "title": "11 Fail closed when authoritative source revision coverage is incomplete; do not use `indexed_at`, wall-clock time, or workspace ID as a revision.",
+      "startLine": 3415,
+      "section": "SEMANTIC-CANDIDATE-COHORT-IMPLEMENTATION-SLICE-01 (15 narrow tasks)",
+      "classification": "LIKELY_CONTINUATION_OR_SUBTASK"
+    },
+    {
+      "taskId": "12",
+      "title": "12 Resolve the canonical source-snapshot or revision-set owner that covers the semantic export population. Audit result: `graphify_files` is the only observed source-revision-bearing owner candidate, but its proven coverage is limited to 778/61,660 packet rows and zero of the 55,169 semantic snapshot rows; no owner currently covers the semantic export population.",
+      "startLine": 3416,
+      "section": "SEMANTIC-CANDIDATE-COHORT-IMPLEMENTATION-SLICE-01 (15 narrow tasks)",
+      "classification": "LIKELY_CONTINUATION_OR_SUBTASK"
+    },
+    {
+      "taskId": "Transaction",
+      "title": "Transaction tracing confirms the returned `run_id` from that upsert is then passed into",
+      "startLine": 3640,
+      "section": "GRAPHIFY-RUN-IDENTITY-SEPARATION-01 (2026-09-03, read-only finding)",
+      "classification": "LIKELY_CONTINUATION_OR_SUBTASK"
+    },
+    {
+      "taskId": "Current",
+      "title": "Current run/file census is consistent with this finding: one completed run owns the main",
+      "startLine": 3644,
+      "section": "GRAPHIFY-RUN-IDENTITY-SEPARATION-01 (2026-09-03, read-only finding)",
+      "classification": "LIKELY_CONTINUATION_OR_SUBTASK"
+    },
+    {
+      "taskId": "`GRAPHIFY-EXECUTION-LEDGER-SCHEMA-02`:",
+      "title": "`GRAPHIFY-EXECUTION-LEDGER-SCHEMA-02`: finalize the smallest additive execution ledger",
+      "startLine": 3647,
+      "section": "GRAPHIFY-RUN-IDENTITY-SEPARATION-01 (2026-09-03, read-only finding)",
+      "classification": "LIKELY_CONTINUATION_OR_SUBTASK"
+    },
+    {
+      "taskId": "`GRAPHIFY-RUN-IDENTITY-SEPARATION-01`",
+      "title": "`GRAPHIFY-RUN-IDENTITY-SEPARATION-01` diagnosis recorded (above).",
+      "startLine": 4652,
+      "section": "GRAPHIFY-EXECUTION-LEDGER-SCHEMA-02 (2026-09-03)",
+      "classification": "LIKELY_CONTINUATION_OR_SUBTASK"
+    },
+    {
+      "taskId": "Current",
+      "title": "Current migration syntax proven, rollback-only, against the live `legal-ai-postgres`",
+      "startLine": 4656,
+      "section": "GRAPHIFY-EXECUTION-LEDGER-SCHEMA-02 (2026-09-03)",
+      "classification": "LIKELY_CONTINUATION_OR_SUBTASK"
+    },
+    {
+      "taskId": "Review",
+      "title": "Review `graphify_execution_files` contract: `PRIMARY KEY (execution_id, source_ref)`,",
+      "startLine": 4683,
+      "section": "GRAPHIFY-EXECUTION-LEDGER-SCHEMA-02 (2026-09-03)",
+      "classification": "LIKELY_CONTINUATION_OR_SUBTASK"
+    },
+    {
+      "taskId": "Review",
+      "title": "Review `graphify_execution_stages` contract:",
+      "startLine": 4690,
+      "section": "GRAPHIFY-EXECUTION-LEDGER-SCHEMA-02 (2026-09-03)",
+      "classification": "LIKELY_CONTINUATION_OR_SUBTASK"
+    },
+    {
+      "taskId": "Execution",
+      "title": "Execution terminal-state constraints: `COMPLETED | COMPLETED_REUSED | FAILED | ABANDONED`",
+      "startLine": 4694,
+      "section": "GRAPHIFY-EXECUTION-LEDGER-SCHEMA-02 (2026-09-03)",
+      "classification": "LIKELY_CONTINUATION_OR_SUBTASK"
+    },
+    {
+      "taskId": "Prove",
+      "title": "Prove `graphify_execution_files` is append-only evidence — no ordinary UPDATE/DELETE",
+      "startLine": 4700,
+      "section": "GRAPHIFY-EXECUTION-LEDGER-SCHEMA-02 (2026-09-03)",
+      "classification": "LIKELY_CONTINUATION_OR_SUBTASK"
+    },
+    {
+      "taskId": "Exact",
+      "title": "Exact `WorkspaceSourceBindingV1[]` frozen before downstream stages. Committed canary froze 3",
+      "startLine": 4783,
+      "section": "GRAPHIFY-DAILY-COORDINATOR-01",
+      "classification": "LIKELY_CONTINUATION_OR_SUBTASK"
+    },
+    {
+      "taskId": "Insert",
+      "title": "Insert fresh `execution_id` every attempt. Proven repeatedly: 3 distinct ids in the rolled-back",
+      "startLine": 4807,
+      "section": "GRAPHIFY-DAILY-COORDINATOR-01",
+      "classification": "LIKELY_CONTINUATION_OR_SUBTASK"
+    },
+    {
+      "taskId": "Every",
+      "title": "Every source observation appended to `graphify_execution_files` under that `execution_id`.",
+      "startLine": 4809,
+      "section": "GRAPHIFY-DAILY-COORDINATOR-01",
+      "classification": "LIKELY_CONTINUATION_OR_SUBTASK"
+    },
+    {
+      "taskId": "Heartbeat",
+      "title": "Heartbeat updates only the active execution record. Proven in the rolled-back integration",
+      "startLine": 4811,
+      "section": "GRAPHIFY-DAILY-COORDINATOR-01",
+      "classification": "LIKELY_CONTINUATION_OR_SUBTASK"
+    },
+    {
+      "taskId": "Successful",
+      "title": "Successful execution ends `COMPLETED`. Proven with the strongest possible evidence — a real",
+      "startLine": 4816,
+      "section": "GRAPHIFY-DAILY-COORDINATOR-01",
+      "classification": "LIKELY_CONTINUATION_OR_SUBTASK"
+    },
+    {
+      "taskId": "Failure",
+      "title": "Failure ends `FAILED`. Proven in the rolled-back integration spec (explicit `FAILED` +",
+      "startLine": 4828,
+      "section": "GRAPHIFY-DAILY-COORDINATOR-01",
+      "classification": "LIKELY_CONTINUATION_OR_SUBTASK"
+    }
+  ],
+  "missingEvidenceCounts": {
+    "likelyContinuationOrSubtask": 32,
+    "reviewRequired": 0
+  },
+  "falsePositiveGuard": "continuation prose and numbered criteria are not task blocks; section evidence is reported separately",
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "status": "PROVEN_READ_ONLY_TASK_BLOCK_AUDIT"
+}

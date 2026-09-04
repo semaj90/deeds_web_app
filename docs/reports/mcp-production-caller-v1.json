@@ -1,0 +1,28 @@
+{
+  "generatedAt": "2026-09-04T02:29:36.773Z",
+  "schema": "atlas.mcp-production-caller.v1",
+  "registryPath": "docs/reports/mcp-tool-registry-index.json",
+  "registryRevision": "sha256:84487fe9b2184b19ac6d340b808d95d9605554825d44ab5f26959ad097321df4",
+  "callers": [
+    "sveltekit-frontend/src/mcp/server.ts",
+    "sveltekit-frontend/src/routes/api/acp/tools/+server.ts"
+  ],
+  "selector": "scripts/atlas/runtime-mcp-tool-selector.mjs",
+  "boundedQueryHint": "find graph search and domain classification tools",
+  "topK": 5,
+  "selectedToolCount": 5,
+  "selectedToolNames": [
+    "wiki.search",
+    "codebase:search",
+    "memory:prior_answer_lookup",
+    "atlas.identity_audit",
+    "trace.kag_search"
+  ],
+  "retrievalSource": "registry",
+  "registryOk": true,
+  "embeddingAttempted": true,
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "status": "PROVEN_READ_ONLY_BOUNDED_CALLER",
+  "reportChecksum": "sha256:590111582da3471fd9a911190e66be2249d3759a29c9fbf3a036575bf2bbc228"
+}

@@ -144,12 +144,12 @@ describe('LATENT256-REPRESENTATION-CONTRACT-02: nested latent family', () => {
     );
   });
 
-  it('accepts a latent_64 artifact declaring semantic_768 as its input (matches the live physical producer, NOT a derived-view chain from latent_256)', () => {
+  it('accepts a latent_64 artifact declaring latent_256 as its input (prefix-derived view)', () => {
     const latent64 = RepresentationArtifactV1Schema.parse({
       ...artifact,
       representationId: 'latent_64',
       dimensions: 64,
-      inputRepresentationId: 'semantic_768',
+      inputRepresentationId: 'latent_256',
     });
     expect(() => assertPromotionReadyRepresentationArtifact(latent64)).not.toThrow();
   });
@@ -222,17 +222,13 @@ describe('LATENT-REPRESENTATION-SEMANTICS-03: origin/materialization axes', () =
     expect(m.coProducedWith).toBeNull();
   });
 
-  it('latent_64 is LEARNED + PERSISTED and co-produced with latent_256 -- NOT a derived view of it', () => {
-    // This is the live-evidence correction: an operator proposal in this same OpenSpec change
-    // framed latent_64 as origin:'DERIVED' with a parentRepresentationId of latent_256. That
-    // contradicts this file's own prior audit (unchanged) -- latent_64 is written by the SAME
-    // NestedSemanticAutoencoder.encode() forward pass over semantic_768 as latent_256, not
-    // computed by transforming an already-persisted latent_256 row.
+  it('latent_64 is DERIVED + PERSISTED from latent_256 via prefix+L2-renormalize', () => {
     const m = NESTED_LATENT_REPRESENTATION_FAMILY_V1.members.latent_64;
-    expect(m.origin).toBe('LEARNED');
+    expect(m.origin).toBe('DERIVED');
     expect(m.materialization).toBe('PERSISTED');
-    expect(m.parentRepresentationId).toBeNull();
-    expect(m.coProducedWith).toBe('latent_256');
-    expect(m.inputRepresentationId).toBe('semantic_768');
+    expect(m.parentRepresentationId).toBe('latent_256');
+    expect(m.coProducedWith).toBeNull();
+    expect(m.inputRepresentationId).toBe('latent_256');
+    expect(m.transform).toBe('NESTED_PREFIX_L2_RENORMALIZE');
   });
 });

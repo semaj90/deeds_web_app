@@ -1,6 +1,6 @@
 {
   "schema": "atlas.live-source-lineage-table-audit.v1",
-  "generatedAt": "2026-09-04T00:01:37.410Z",
+  "generatedAt": "2026-09-04T04:59:33.314Z",
   "status": "SOURCE_LINEAGE_OWNER_SCHEMA_READY",
   "canonicalWrites": false,
   "tables": [
@@ -159,6 +159,18 @@
     {
       "table_schema": "public",
       "table_name": "graphify_edges"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "graphify_execution_files"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "graphify_execution_stages"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "graphify_executions"
     },
     {
       "table_schema": "public",
@@ -1172,6 +1184,30 @@
       "table_schema": "public",
       "table_name": "graphify_edges",
       "column_name": "source_revision",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "graphify_execution_files",
+      "column_name": "workspace_revision",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "graphify_execution_files",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "graphify_execution_files",
+      "column_name": "content_hash",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "graphify_executions",
+      "column_name": "workspace_revision",
       "data_type": "text"
     },
     {

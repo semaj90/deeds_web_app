@@ -7,7 +7,7 @@
   "counts": {
     "binding_rows": 111,
     "binding_sources": 111,
-    "graphify_exact_sources": 111,
+    "graphify_exact_sources": 0,
     "binding_chunk_content_matches": 0,
     "packet_chunk_exact_sources": 0,
     "packet_content_matches": 0

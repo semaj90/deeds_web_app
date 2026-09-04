@@ -1,6 +1,6 @@
 {
-  "generated": "2026-09-03T16:53:28.335Z",
-  "mode": "apply",
+  "generated": "2026-09-04T04:16:20.740Z",
+  "mode": "dry-run",
   "orphaned_found": 0,
   "registered": 0,
   "status": "no_orphans"
