@@ -1,0 +1,23 @@
+{
+  "schema": "atlas.doc-25-compiler-test-replay-receipt.v1",
+  "gate": "DOC-25",
+  "status": "DOC_25_VALIDATION_RECEIPT_FIXTURE_PROVEN",
+  "proposalRef": "docs/reports/parent-atlas/doc-24-patch-proposal-fixture-v1.json",
+  "validationChecks": [
+    {
+      "name": "patch-proposal-script-syntax",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "name": "versioned-doc-openspec-validation",
+      "status": "PASS",
+      "exitCode": 0
+    }
+  ],
+  "validationChecksum": "sha256:15a8cfc60bac8552cac4e00ec0f3751e36d279414ca43b5a40bc78366fe92b92",
+  "patchApplied": false,
+  "mutationAuthorized": false,
+  "writesPerformed": false,
+  "nextGate": "DOC_25_LIVE_ISOLATED_PATCH_REPLAY"
+}

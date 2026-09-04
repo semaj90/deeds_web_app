@@ -1,6 +1,12 @@
 # Parent Atlas Retrieval Reconciliation — Requirements
 
-## Requirement: Retrieval lanes remain semantically distinct
+## Purpose
+
+Define identity-safe reconciliation across lexical, dense, graph, and feature retrieval lanes.
+
+## Requirements
+
+### Requirement: Retrieval lanes remain semantically distinct
 
 The system SHALL preserve logical retrieval lane identity across executors.
 

@@ -18,6 +18,8 @@ entrypoint a one-line container change while the contracts are being proven.
 from __future__ import annotations
 
 import os
+import hashlib
+import json
 import re
 import tempfile
 import time
@@ -176,7 +178,12 @@ def _native_grounded_extractions(text: str, model_id: Optional[str] = None) -> l
                 provider_kwargs={
                     "api_key": os.getenv("LANGEXTRACT_API_KEY", "local"),
                     "base_url": os.getenv("LANGEXTRACT_BASE_URL", "http://host.docker.internal:8090/v1"),
-                    "max_tokens": extraction_max_tokens,
+                    # NOTE: OpenAILanguageModel._build_chat_completions_params() reads
+                    # config['max_output_tokens'], not 'max_tokens' -- confirmed by reading
+                    # langextract's provider source directly (2026-09-04 DOC-10 investigation).
+                    # The old 'max_tokens' key was silently dropped on every call; the request
+                    # went out with no token limit at all rather than the intended cap.
+                    "max_output_tokens": extraction_max_tokens,
                     "reasoning_format": "none",
                     "reasoning_budget": extraction_reasoning_budget,
                     "chat_template_kwargs": {"enable_thinking": False},
@@ -195,7 +202,15 @@ def _native_grounded_extractions(text: str, model_id: Optional[str] = None) -> l
         else:
             extract_kwargs["model_id"] = selected_model
             extract_kwargs["model_url"] = os.getenv("LANGEXTRACT_BASE_URL", "http://host.docker.internal:8090/v1")
-        result = getattr(extract_fn, "extract", extract_fn)(**extract_kwargs)
+        # 2026-09-04 DOC-10/DOC-12 finding: LangExtract flattens prompt_description + examples
+        # into one literal "Q:/A:" text block, which ornith-1.5-9b fails to extract from
+        # reliably (verified live, both schemas). Hand the structured examples/description to
+        # legacy's build_params() patch so it rebuilds a real multi-turn request instead.
+        try:
+            legacy._set_grounded_extraction_context(extract_kwargs["prompt_description"], examples)
+            result = getattr(extract_fn, "extract", extract_fn)(**extract_kwargs)
+        finally:
+            legacy._clear_grounded_extraction_context()
     except Exception as error:
         # Preserve a redacted diagnostic in the response metadata. The old
         # behavior returned an empty list, making provider/runtime failures
@@ -253,8 +268,10 @@ _DOCUMENTATION_FACT_PROMPT = (
     "structure a deterministic parser already handles exactly (headings, code fences, function "
     "signatures, tables). For each claim, return extraction_class DOCUMENTATION_FACT with "
     "extraction_text copied verbatim as one contiguous substring that is the exact evidence span, "
-    "and attributes containing subject, predicate, object, statement (a concise paraphrase of the "
-    "claim), and confidence (0.0-1.0). Never infer a claim not explicitly stated in the text. If no "
+    "For ordinary claims use extraction_class DOCUMENTATION_FACT with attributes subject, predicate, "
+    "object, statement and confidence. For versioned API guidance use extraction_class API_RULE with "
+    "attributes apiSymbol, versionRange, condition, recommendation, parameterName, expectedValue and "
+    "confidence. Never infer a claim not explicitly stated in the text. If no "
     "exact source span supports a claim, return an empty extractions array."
 )
 
@@ -272,6 +289,36 @@ def _documentation_fact_output_schema() -> dict[str, Any]:
         additional_properties=False,
     )
     return legacy.langextract.schema.extractions_schema(item_schema, additional_properties=False)  # type: ignore[union-attr]
+
+
+def _documentation_output_schema() -> dict[str, Any]:
+    """One LangExtract envelope containing fact and API-rule item shapes."""
+
+    fact = legacy.langextract.schema.extraction_item_schema(
+        "DOCUMENTATION_FACT",
+        attributes={
+            "subject": {"type": "string"},
+            "predicate": {"type": "string"},
+            "object": {"type": "string"},
+            "statement": {"type": "string"},
+            "confidence": {"type": "number"},
+        },
+        additional_properties=False,
+    )
+    rule = legacy.langextract.schema.extraction_item_schema(
+        "API_RULE",
+        attributes={
+            "apiSymbol": {"type": "string"},
+            "versionRange": {"type": "string"},
+            "condition": {"type": "string"},
+            "recommendation": {"type": "string"},
+            "parameterName": {"type": ["string", "null"]},
+            "expectedValue": {"type": ["string", "null"]},
+            "confidence": {"type": "number"},
+        },
+        additional_properties=False,
+    )
+    return legacy.langextract.schema.extractions_schema(fact, rule, additional_properties=False)  # type: ignore[union-attr]
 
 
 def _native_documentation_facts(text: str, model_id: Optional[str] = None) -> list[dict[str, Any]]:
@@ -304,15 +351,33 @@ def _native_documentation_facts(text: str, model_id: Optional[str] = None) -> li
                             extraction_class="DOCUMENTATION_FACT",
                             extraction_text="CUDA Tile IR requires sm_86 or later architecture.",
                             attributes={
-                                "subject": "CUDA Tile IR",
-                                "predicate": "requires",
-                                "object": "sm_86 or later architecture",
-                                "statement": "CUDA Tile IR requires sm_86 or later architecture.",
+                            "subject": "CUDA Tile IR",
+                            "predicate": "requires",
+                            "object": "sm_86 or later architecture",
+                            "statement": "CUDA Tile IR requires sm_86 or later architecture.",
+                            "confidence": 0.95,
+                            },
+                        )
+                    ],
+                ),
+                example_data(
+                    text="In version 2.0, use Graph.from_cudf_edgelist with renumber=true.",
+                    extractions=[
+                        extraction_type(
+                            extraction_class="API_RULE",
+                            extraction_text="In version 2.0, use Graph.from_cudf_edgelist with renumber=true.",
+                            attributes={
+                                "apiSymbol": "Graph.from_cudf_edgelist",
+                                "versionRange": "2.0",
+                                "condition": "version 2.0",
+                                "recommendation": "use Graph.from_cudf_edgelist with renumber=true",
+                                "parameterName": "renumber",
+                                "expectedValue": "true",
                                 "confidence": 0.95,
                             },
                         )
                     ],
-                )
+                ),
             ]
         selected_model = model_id or os.getenv("LANGEXTRACT_MODEL", "miniforge-nlp-sidecar")
         extraction_max_tokens = int(os.getenv("LANGEXTRACT_MAX_TOKENS", "256"))
@@ -323,6 +388,10 @@ def _native_documentation_facts(text: str, model_id: Optional[str] = None) -> li
             "text_or_documents": text,
             "prompt_description": _DOCUMENTATION_FACT_PROMPT,
             "examples": examples,
+            # ModelConfig alone leaves LangExtract in its example-derived
+            # schema path. The explicit envelope is required for the live
+            # OpenAI-compatible llama-server provider.
+            "output_schema": _documentation_output_schema(),
             "extraction_passes": 1,
             "max_workers": 1,
             "max_char_buffer": 2000,
@@ -337,7 +406,12 @@ def _native_documentation_facts(text: str, model_id: Optional[str] = None) -> li
                 provider_kwargs={
                     "api_key": os.getenv("LANGEXTRACT_API_KEY", "local"),
                     "base_url": os.getenv("LANGEXTRACT_BASE_URL", "http://host.docker.internal:8090/v1"),
-                    "max_tokens": extraction_max_tokens,
+                    # NOTE: OpenAILanguageModel._build_chat_completions_params() reads
+                    # config['max_output_tokens'], not 'max_tokens' -- confirmed by reading
+                    # langextract's provider source directly (2026-09-04 DOC-10 investigation).
+                    # The old 'max_tokens' key was silently dropped on every call; the request
+                    # went out with no token limit at all rather than the intended cap.
+                    "max_output_tokens": extraction_max_tokens,
                     "reasoning_format": "none",
                     "reasoning_budget": extraction_reasoning_budget,
                     "chat_template_kwargs": {"enable_thinking": False},
@@ -345,18 +419,17 @@ def _native_documentation_facts(text: str, model_id: Optional[str] = None) -> li
                     "top_p": 1.0,
                     "reasoning_effort": "none",
                     "cache_prompt": False,
-                    "openai_schema": OpenAISchema(
-                        _documentation_fact_output_schema(),
-                        schema_name="atlas_documentation_fact_v1",
-                        strict=True,
-                        from_output_schema=True,
-                    ),
                 },
             )
         else:
             extract_kwargs["model_id"] = selected_model
             extract_kwargs["model_url"] = os.getenv("LANGEXTRACT_BASE_URL", "http://host.docker.internal:8090/v1")
-        result = getattr(extract_fn, "extract", extract_fn)(**extract_kwargs)
+        # See the matching comment in _native_grounded_extractions() above: same multi-turn fix.
+        try:
+            legacy._set_grounded_extraction_context(extract_kwargs["prompt_description"], examples)
+            result = getattr(extract_fn, "extract", extract_fn)(**extract_kwargs)
+        finally:
+            legacy._clear_grounded_extraction_context()
     except Exception as error:
         legacy._grounded_extraction_error = f"{type(error).__name__}: {str(error)[:240]}"
         return []
@@ -377,10 +450,14 @@ def _native_documentation_facts(text: str, model_id: Optional[str] = None) -> li
         if text[start_pos:end_pos] != str(extraction_text):
             continue
         attributes = normalized.get("attributes") or {}
+        extraction_class = str(normalized.get("extraction_class") or "DOCUMENTATION_FACT").upper()
         subject = str(attributes.get("subject") or "").strip()
         predicate = str(attributes.get("predicate") or "").strip()
         obj = str(attributes.get("object") or "").strip()
-        if not subject or not predicate or not obj:
+        api_symbol = str(attributes.get("apiSymbol") or attributes.get("api_symbol") or "").strip()
+        if extraction_class == "API_RULE" and not api_symbol:
+            continue
+        if extraction_class != "API_RULE" and (not subject or not predicate or not obj):
             continue
         try:
             confidence = float(attributes.get("confidence", 0.0))
@@ -388,6 +465,7 @@ def _native_documentation_facts(text: str, model_id: Optional[str] = None) -> li
             confidence = 0.0
         confidence = max(0.0, min(1.0, confidence))
         extracted.append({
+            "extraction_class": extraction_class,
             "subject": subject,
             "predicate": predicate,
             "object": obj,
@@ -395,7 +473,15 @@ def _native_documentation_facts(text: str, model_id: Optional[str] = None) -> li
             "evidence_text": str(extraction_text),
             "start_char": start_pos,
             "end_char": end_pos,
+            "start_byte": len(text[:start_pos].encode("utf-8")),
+            "end_byte": len(text[:end_pos].encode("utf-8")),
             "confidence": confidence,
+            "api_symbol": api_symbol,
+            "version_range": str(attributes.get("versionRange") or attributes.get("version_range") or "").strip(),
+            "condition": str(attributes.get("condition") or "").strip(),
+            "recommendation": str(attributes.get("recommendation") or "").strip(),
+            "parameter_name": attributes.get("parameterName", attributes.get("parameter_name")),
+            "expected_value": attributes.get("expectedValue", attributes.get("expected_value")),
         })
     return extracted
 
@@ -426,6 +512,11 @@ class DocumentationFactV1(BaseModel):
     source_revision: str = Field(alias="sourceRevision")
     start_char: int = Field(alias="startChar")
     end_char: int = Field(alias="endChar")
+    start_byte: int = Field(alias="startByte", ge=0)
+    end_byte: int = Field(alias="endByte", ge=1)
+    alignment_status: Literal["MATCH_EXACT", "MATCH_FUZZY", "MATCH_LESSER"] = Field(
+        default="MATCH_EXACT", alias="alignmentStatus"
+    )
     product_version: str = Field(alias="productVersion")
     confidence: float = Field(ge=0.0, le=1.0)
     extraction_method: str = Field(default="LANGEXTRACT_ORNITH", alias="extractionMethod")
@@ -434,9 +525,62 @@ class DocumentationFactV1(BaseModel):
     model_config = {"populate_by_name": True}
 
 
+class ApiRuleV1(BaseModel):
+    """Source-grounded documentation-to-code guidance; never canonical by itself."""
+
+    schema_: str = Field(default="atlas.api-rule.v1", alias="schema")
+    api_symbol: str = Field(alias="apiSymbol")
+    version_range: str = Field(alias="versionRange")
+    condition: str
+    recommendation: str
+    parameter_name: Optional[str] = Field(default=None, alias="parameterName")
+    expected_value: Optional[str] = Field(default=None, alias="expectedValue")
+    evidence_span: dict[str, Any] = Field(alias="evidenceSpan")
+    confidence: float = Field(ge=0.0, le=1.0)
+    canonical_authority: bool = Field(default=False, alias="canonicalAuthority")
+
+    model_config = {"populate_by_name": True}
+
+
 class DocumentationFactResponseV1(BaseModel):
     facts: list[DocumentationFactV1]
+    api_rules: list[ApiRuleV1] = Field(default_factory=list, alias="apiRules")
+    model_id: Optional[str] = Field(default=None, alias="modelId")
+    provider: str = "openai-compatible"
+    producer_revision: str = Field(default="", alias="producerRevision")
+    input_hash: str = Field(default="", alias="inputHash")
+    output_hash: str = Field(default="", alias="outputHash")
+    generation_controls: dict[str, Any] = Field(default_factory=dict, alias="generationControls")
+    alignment_summary: dict[str, int] = Field(default_factory=dict, alias="alignmentSummary")
+    canonical_authority: bool = Field(default=False, alias="canonicalAuthority")
     error: Optional[str] = None
+
+    model_config = {"populate_by_name": True}
+
+
+def _utf8_span(source: str, start_char: int, end_char: int) -> tuple[int, int] | None:
+    """Return an exact UTF-8 byte span for a Python character interval."""
+
+    if start_char < 0 or end_char <= start_char or end_char > len(source):
+        return None
+    start_byte = len(source[:start_char].encode("utf-8"))
+    end_byte = len(source[:end_char].encode("utf-8"))
+    source_bytes = source.encode("utf-8")
+    if source_bytes[start_byte:end_byte].decode("utf-8") != source[start_char:end_char]:
+        return None
+    return start_byte, end_byte
+
+
+def _source_revision_is_consistent(source: str, source_revision: str) -> bool:
+    """Verify revisions when they use the repository's explicit SHA-256 form.
+
+    Other revision authorities are preserved, but cannot be recomputed by this
+    sidecar because it has no registry lookup; they remain caller-owned.
+    """
+
+    if source_revision.startswith("sha256:"):
+        return source_revision == f"sha256:{hashlib.sha256(source.encode('utf-8')).hexdigest()}"
+    return bool(source_revision.strip())
 
 
 def _line_span_to_utf8_byte_offsets(source: str, start_line: int, end_line: int) -> tuple[int, int]:
@@ -942,9 +1086,43 @@ def extract(req: legacy.AnalyzeRequest) -> legacy.ExtractResponse:
 
 @app.post("/extract/documentation-facts", response_model=DocumentationFactResponseV1)
 def extract_documentation_facts(req: DocumentationFactRequestV1) -> DocumentationFactResponseV1:
+    if not _source_revision_is_consistent(req.text, req.source_revision):
+        raise HTTPException(status_code=422, detail="SOURCE_REVISION_MISMATCH")
     raw = _native_documentation_facts(req.text, model_id=req.model_id)
-    facts = [
-        DocumentationFactV1(
+    facts: list[DocumentationFactV1] = []
+    api_rules: list[ApiRuleV1] = []
+    alignment_summary: dict[str, int] = {}
+    for item in raw:
+        byte_span = _utf8_span(req.text, item["start_char"], item["end_char"])
+        if byte_span is None or byte_span != (item["start_byte"], item["end_byte"]):
+            continue
+        # Count only items that actually end up in facts/api_rules below -- counting here,
+        # before the API_RULE required-field check, over-counted alignmentSummary.MATCH_EXACT
+        # for items that get silently dropped by that check (found by code review 2026-09-04).
+        if item.get("extraction_class") == "API_RULE":
+            if not item.get("version_range") or not item.get("condition") or not item.get("recommendation"):
+                continue
+            alignment_summary["MATCH_EXACT"] = alignment_summary.get("MATCH_EXACT", 0) + 1
+            api_rules.append(ApiRuleV1(
+                apiSymbol=item["api_symbol"],
+                versionRange=item["version_range"],
+                condition=item["condition"],
+                recommendation=item["recommendation"],
+                parameterName=item.get("parameter_name") or None,
+                expectedValue=item.get("expected_value") or None,
+                evidenceSpan={
+                    "sourceRevision": req.source_revision,
+                    "startChar": item["start_char"],
+                    "endChar": item["end_char"],
+                    "startByte": item["start_byte"],
+                    "endByte": item["end_byte"],
+                    "alignmentStatus": "MATCH_EXACT",
+                },
+                confidence=item["confidence"],
+            ))
+            continue
+        alignment_summary["MATCH_EXACT"] = alignment_summary.get("MATCH_EXACT", 0) + 1
+        facts.append(DocumentationFactV1(
             subject=item["subject"],
             predicate=item["predicate"],
             object=item["object"],
@@ -954,12 +1132,31 @@ def extract_documentation_facts(req: DocumentationFactRequestV1) -> Documentatio
             sourceRevision=req.source_revision,
             startChar=item["start_char"],
             endChar=item["end_char"],
+            startByte=item["start_byte"],
+            endByte=item["end_byte"],
             productVersion=req.product_version,
             confidence=item["confidence"],
-        )
-        for item in raw
-    ]
-    return DocumentationFactResponseV1(facts=facts, error=legacy._grounded_extraction_error)
+        ))
+    selected_model = req.model_id or os.getenv("LANGEXTRACT_MODEL", "miniforge-nlp-sidecar")
+    normalized_output = {"facts": [fact.model_dump(by_alias=True) for fact in facts], "apiRules": [rule.model_dump(by_alias=True) for rule in api_rules]}
+    return DocumentationFactResponseV1(
+        facts=facts,
+        apiRules=api_rules,
+        modelId=selected_model,
+        producerRevision=legacy._provider_revision(),
+        inputHash=hashlib.sha256(req.text.encode("utf-8")).hexdigest(),
+        outputHash=hashlib.sha256(json.dumps(normalized_output, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest(),
+        generationControls={
+            "temperature": 0.0,
+            "top_p": 1.0,
+            "seed": 1729,
+            "enable_thinking": False,
+            "cache_prompt": False,
+        },
+        alignmentSummary=alignment_summary,
+        canonicalAuthority=False,
+        error=legacy._grounded_extraction_error,
+    )
 
 
 @app.post("/extract/file")

@@ -1,0 +1,60 @@
+{
+  "schema": "parent-atlas.analysis-pass-metadata-gaps.v1",
+  "gate": "ANALYSIS-PASS-METADATA-ENRICHMENT",
+  "status": "BLOCKED_METADATA_GAPS",
+  "readOnly": true,
+  "writesPerformed": false,
+  "requiredForPromotion": [
+    "source_ref",
+    "source_revision",
+    "pass_revision",
+    "input_hash"
+  ],
+  "totals": {
+    "total": 11095,
+    "missing_source_ref": 0,
+    "missing_source_revision": 11076,
+    "missing_pass_revision": 11076,
+    "missing_input_hash": 130,
+    "missing_workspace_revision": 11093,
+    "succeeded": 19
+  },
+  "byPassType": [
+    {
+      "pass_type": "summarization",
+      "rows": 10906,
+      "missing_source_revision": 10906,
+      "missing_pass_revision": 10906,
+      "missing_workspace_revision": 10906
+    },
+    {
+      "pass_type": "embedding",
+      "rows": 150,
+      "missing_source_revision": 150,
+      "missing_pass_revision": 150,
+      "missing_workspace_revision": 150
+    },
+    {
+      "pass_type": "cache_push",
+      "rows": 20,
+      "missing_source_revision": 20,
+      "missing_pass_revision": 20,
+      "missing_workspace_revision": 20
+    },
+    {
+      "pass_type": "code_feature_registry",
+      "rows": 15,
+      "missing_source_revision": 0,
+      "missing_pass_revision": 0,
+      "missing_workspace_revision": 15
+    },
+    {
+      "pass_type": "pos-concept-tagging",
+      "rows": 4,
+      "missing_source_revision": 0,
+      "missing_pass_revision": 0,
+      "missing_workspace_revision": 2
+    }
+  ],
+  "reportChecksum": "sha256:8f553add7fa90eb1d155523cb87da8ce86c615e2c198682368ff00e54d918bac"
+}

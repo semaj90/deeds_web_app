@@ -1,0 +1,55 @@
+{
+  "gate": "DOC-10-12-LIVE-01",
+  "status": "DOC10_AND_DOC12_LIVE_EXTRACTION_REPLAY_PROVEN_ADMISSION_CASES_OPEN",
+  "executedAt": "2026-09-04T20:47:46.5787102Z",
+  "owner": "python/miniforge_nlp_sidecar_oak.py -> miniforge_nlp_sidecar_v2.py",
+  "route": "/extract/documentation-facts",
+  "runtime": {
+    "sidecarPort": 8095,
+    "modelId": "ornith-1.5-9b",
+    "langextractAvailable": true,
+    "langextractVersion": "1.6.0",
+    "beautifulSoupVersion": "4.15.0"
+  },
+  "controls": {
+    "temperature": 0.0,
+    "top_p": 1.0,
+    "seed": 1729,
+    "enable_thinking": false,
+    "cache_prompt": false
+  },
+  "boundaryProof": {
+    "routeRegistered": true,
+    "canonicalAuthority": false,
+    "utf8ByteSpanContract": true,
+    "sha256SourceRevisionRejectsMismatch": true,
+    "datastoreWrites": false,
+    "postgresWrites": false,
+    "qdrantWrites": false,
+    "neo4jWrites": false
+  },
+  "fixtureResult": {
+    "inputHash": "280040780eb32cb57bf8b9baa0acb3e66eaf49c83d1a973db5dc383e15e96b47",
+    "documentationFactCount": 1,
+    "apiRuleCount": 1,
+    "error": null,
+    "replayOutputHashEqual": true,
+    "apiRuleReplayCountA": 1,
+    "apiRuleReplayCountB": 1,
+    "apiRuleReplayOutputHashEqual": true,
+    "apiRuleWrongRevisionStatus": 422,
+    "alignmentStatus": "MATCH_EXACT",
+    "interpretation": "One exact grounded DocumentationFactV1 replayed with identical normalized output checksum."
+  },
+  "statusByTask": {
+    "DOC-10": "LIVE_FACT_PROVEN_REMAINING_NEGATIVE_CASES_OPEN",
+    "DOC-12": "LIVE_API_RULE_REPLAY_PROVEN_REMAINING_NEGATIVE_CASES_OPEN",
+    "DOC-11": "PROVEN"
+  },
+  "nextInvestigation": [
+    "Inspect raw llama-server structured completion behind LangExtract parsing.",
+    "Test a minimal permissive extraction schema before restoring strict fact/rule attributes.",
+    "Replay normalized non-empty DocumentationFactV1 and ApiRuleV1 checksums before promotion."
+  ],
+  "writesPerformed": false
+}

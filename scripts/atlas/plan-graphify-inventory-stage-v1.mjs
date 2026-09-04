@@ -47,7 +47,11 @@ for (const [index, binding] of sourceBindings.entries()) {
 }
 
 const orderedBindings = [...sourceBindings].sort((a, b) => String(a.sourceRef).localeCompare(String(b.sourceRef)));
-const sourceSelectionChecksum = checksum(orderedBindings.map((binding) => String(binding.sourceRef)).join(''));
+// Found by code review (2026-09-04): joining sourceRefs with no delimiter let distinct
+// binding sets collide on the same checksum (e.g. ['ab','c'] vs ['a','bc']). stable() already
+// serializes arrays delimiter-safely (JSON.stringify per element, ',' between them) -- reuse it
+// instead of a second, unsafe ad hoc join.
+const sourceSelectionChecksum = checksum(stable(orderedBindings.map((binding) => String(binding.sourceRef))));
 const inventoryOutputChecksum = checksum(stable(orderedBindings.map((binding) => ({
   sourceRef: binding.sourceRef,
   sourceRevision: binding.sourceRevision,

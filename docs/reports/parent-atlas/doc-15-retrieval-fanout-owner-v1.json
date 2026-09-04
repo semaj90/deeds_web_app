@@ -1,0 +1,54 @@
+{
+  "schema": "atlas.doc-15-retrieval-fanout-owner-audit.v1",
+  "gate": "DOC-15",
+  "status": "DOC_15_OWNER_SURFACE_PRESENT",
+  "owner": "existing retrieval orchestrator",
+  "lanes": [
+    "lexical",
+    "semantic_768",
+    "structural",
+    "graph",
+    "external_documentation"
+  ],
+  "checks": [
+    {
+      "owner": "hybridSearch",
+      "path": "sveltekit-frontend/src/lib/server/search/hybrid-search.ts",
+      "present": true,
+      "size": 13342
+    },
+    {
+      "owner": "qdrantSearch",
+      "path": "sveltekit-frontend/src/lib/server/search/qdrant-search.ts",
+      "present": true,
+      "size": 16094
+    },
+    {
+      "owner": "postgresFts",
+      "path": "sveltekit-frontend/src/lib/server/search/postgres-fts.ts",
+      "present": true,
+      "size": 9590
+    },
+    {
+      "owner": "retrievalOrchestrator",
+      "path": "sveltekit-frontend/src/lib/server/retrieval/orchestrator.ts",
+      "present": true,
+      "size": 26938
+    },
+    {
+      "owner": "identityResolution",
+      "path": "sveltekit-frontend/src/lib/server/retrieval/identity-resolution.ts",
+      "present": true,
+      "size": 9497
+    }
+  ],
+  "policy": {
+    "noSecondOrchestrator": true,
+    "noCanonicalWrites": true,
+    "qdrantIsProjection": true,
+    "searchRuntimeOwnsFusion": true,
+    "liveFanoutProven": false
+  },
+  "writesPerformed": false,
+  "nextGate": "DOC_15_BOUNDED_SAME_QUERY_FANOUT_REPLAY"
+}

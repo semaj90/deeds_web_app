@@ -824,6 +824,82 @@ def _spacy_entities(text: str) -> list[Entity]:
 _grounded_extraction_error: Optional[str] = None
 _grounded_provider_patched = False
 
+# 2026-09-04 (parent-atlas-versioned-doc-intelligence DOC-10/DOC-12): live-isolated finding --
+# LangExtract's QAPromptGenerator flattens prompt_description + every few-shot example into ONE
+# literal "Examples\nQ: ...\nA: {...}\n\nQ: <target>\nA: " user message (no real multi-turn
+# structure). ornith-1.5-9b deterministically returns {"extractions": []} for that shape -- proven
+# by direct comparison against the identical task sent as a real multi-turn chat (system + per-
+# example user/assistant turns + final user), which reliably succeeds. Reproduced for both the
+# CONCEPT schema and the stricter DocumentationFactV1 schema; not schema-specific.
+# _grounded_extraction_context lets _native_grounded_extractions()/_native_documentation_facts()
+# (miniforge_nlp_sidecar_v2.py) hand the original structured `examples`/`prompt_description` to the
+# build_params() patch below, which restructures the request into real multi-turn messages instead
+# of relying on LangExtract's flattened text. Single global, not thread-local: this lane already
+# runs at max_workers=1 (see both call sites), matching the existing _grounded_provider_patched /
+# _grounded_extraction_error single-flight convention in this module.
+_grounded_extraction_context: Optional[dict[str, Any]] = None
+
+
+def _set_grounded_extraction_context(description: str, examples: Optional[list[Any]]) -> None:
+    global _grounded_extraction_context
+    _grounded_extraction_context = {"description": description, "examples": examples or []}
+
+
+def _clear_grounded_extraction_context() -> None:
+    global _grounded_extraction_context
+    _grounded_extraction_context = None
+
+
+def _example_answer_json(extractions: list[Any]) -> str:
+    """Mirror QAPromptGenerator's rendered answer shape for one example, without going through
+    LangExtract's own format_handler (which isn't reachable from build_params' call signature).
+    Shape verified live against the strings LangExtract itself rendered: {"CLASS": text,
+    "CLASS_attributes": {...}} per extraction, wrapped in {"extractions": [...]}."""
+
+    items = []
+    for extraction in extractions:
+        extraction_class = getattr(extraction, "extraction_class", None)
+        extraction_text = getattr(extraction, "extraction_text", None)
+        attributes = getattr(extraction, "attributes", None) or {}
+        if not extraction_class or not extraction_text:
+            continue
+        items.append({
+            str(extraction_class): str(extraction_text),
+            f"{extraction_class}_attributes": attributes,
+        })
+    return json.dumps({"extractions": items})
+
+
+def _restructure_as_multiturn(prompt: str, description: str, examples: list[Any]) -> Optional[list[dict[str, str]]]:
+    """Rebuild LangExtract's flattened Q/A prompt into real multi-turn chat messages for the
+    current chunk. Returns None (caller keeps the flattened single-message prompt) when the
+    target question can't be recovered deterministically from `prompt` -- never guesses."""
+
+    marker = "\nQ: "
+    idx = prompt.rfind(marker)
+    if idx == -1:
+        return None
+    question = prompt[idx + len(marker):]
+    for suffix in ("\nA: ", "\nA:"):
+        if question.endswith(suffix):
+            question = question[: -len(suffix)]
+            break
+    if not question.strip():
+        return None
+    messages = [{
+        "role": "system",
+        "content": "You are a helpful assistant that responds in JSON format.\n\n" + description,
+    }]
+    for example in examples:
+        example_text = getattr(example, "text", None)
+        example_extractions = getattr(example, "extractions", None) or []
+        if not example_text:
+            continue
+        messages.append({"role": "user", "content": example_text})
+        messages.append({"role": "assistant", "content": _example_answer_json(example_extractions)})
+    messages.append({"role": "user", "content": question})
+    return messages
+
 
 def _ensure_grounded_provider_controls() -> None:
     """Pass Ornith's no-thinking template control through LangExtract.
@@ -843,13 +919,25 @@ def _ensure_grounded_provider_controls() -> None:
 
         def build_params(self: Any, prompt: str, config: dict[str, Any]) -> dict[str, Any]:
             params = original(self, prompt, config)
+            # The OpenAI Python client rejects llama.cpp-only fields at the
+            # top level; extra_body is its supported escape hatch.
             extra_body = dict(params.get("extra_body") or {})
             extra_body.setdefault("chat_template_kwargs", {"enable_thinking": False})
-            # Grounding determinism is measured independently of llama.cpp
-            # prompt-KV reuse. This is scoped to the proof/promotion lane and
-            # does not change the general analysis or chat paths.
             extra_body.setdefault("cache_prompt", False)
             params["extra_body"] = extra_body
+            response_format = params.get("response_format")
+            if isinstance(response_format, dict) and response_format.get("type") == "json_schema":
+                wrapper = response_format.get("json_schema") or {}
+                schema = wrapper.get("schema")
+                if isinstance(schema, dict):
+                    # llama-server documents json_object with an embedded
+                    # schema as its compatible constrained-JSON form.
+                    params["response_format"] = {"type": "json_object", "schema": schema}
+            ctx = _grounded_extraction_context
+            if ctx is not None:
+                multiturn_messages = _restructure_as_multiturn(prompt, ctx["description"], ctx["examples"])
+                if multiturn_messages is not None:
+                    params["messages"] = multiturn_messages
             return params
 
         OpenAILanguageModel._build_chat_completions_params = build_params  # type: ignore[method-assign]

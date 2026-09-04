@@ -1,0 +1,44 @@
+{
+  "schema": "atlas.doc-16-ace-repair-packet-fixture-proof.v1",
+  "gate": "DOC-16",
+  "status": "DOC_16_ACE_PACKET_FIXTURE_PROVEN",
+  "packet": {
+    "schema": "atlas.ace-repair-packet.v1",
+    "requestId": "request:doc-16-fixture",
+    "candidateSnapshotRevision": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+    "ordinalMapChecksum": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+    "selectedCandidateOrdinals": [
+      0
+    ],
+    "packetRefs": [
+      "packet:doc-16-fixture"
+    ],
+    "sourceRefs": [
+      "docs/cuda-runtime.md"
+    ],
+    "sourceRevisions": [
+      "sha256:3333333333333333333333333333333333333333333333333333333333333333"
+    ],
+    "evidenceRefs": [
+      "evidence:doc-12-fixture"
+    ],
+    "diagnosticRef": "diagnostic:cuda-legacy-allocation",
+    "structuralEvidenceRefs": [
+      "ast-grep:call-site:cudaMalloc"
+    ],
+    "documentationRuleRefs": [
+      "api-rule:cudaMalloc:cuda-11"
+    ],
+    "graphEvidenceRefs": [],
+    "representationRefs": [],
+    "canonicalAuthority": false,
+    "writesPerformed": false
+  },
+  "packetChecksum": "sha256:4d93036f06d3f5f6040ed497b081d42b5865a9b26f8cd94b049bd62d76fe314c",
+  "forbiddenFieldsPresent": [],
+  "descriptorOnly": true,
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "modelCalls": false,
+  "nextGate": "DOC_16_LIVE_ACE_REPAIR_PACKET_COMPOSITION"
+}

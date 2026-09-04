@@ -1,0 +1,38 @@
+{
+  "schema": "parent-atlas.doc-12-api-rule-negative-matrix.v1",
+  "gate": "DOC-12",
+  "status": "DOC_12_NEGATIVE_MATRIX_PROVEN",
+  "endpoint": "http://127.0.0.1:8095",
+  "modelId": "ornith-1.5-9b",
+  "cases": [
+    {
+      "name": "grounded_api_rule",
+      "passed": true,
+      "status": 200,
+      "apiRuleCount": 1,
+      "alignmentStatus": "MATCH_EXACT",
+      "evidenceBytesMatch": true
+    },
+    {
+      "name": "wrong_source_revision_rejected",
+      "passed": true,
+      "status": 422
+    },
+    {
+      "name": "structure_only_not_api_rule",
+      "passed": true,
+      "status": 200,
+      "apiRuleCount": 0
+    },
+    {
+      "name": "missing_source_revision_rejected",
+      "passed": true,
+      "status": 422
+    }
+  ],
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "datastoreWrites": false,
+  "qdrantWrites": false,
+  "neo4jWrites": false
+}

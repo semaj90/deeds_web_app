@@ -1,0 +1,42 @@
+{
+  "schema": "atlas.openspec-active-integration-review.v1",
+  "gate": "OPENSPEC-ACTIVE-INTEGRATION-REVIEW-01",
+  "mode": "READ_ONLY",
+  "generatedAt": "2026-09-04T20:37:48.6146674Z",
+  "scope": "Current Parent Atlas integration changes and adjacent active ledgers",
+  "validatedActiveChanges": 14,
+  "validActiveChanges": 10,
+  "invalidActiveChanges": 0,
+  "validChanges": [
+    "parent-atlas-versioned-doc-intelligence",
+    "parent-atlas-canonical-directory-ingestion-fabric",
+    "parent-atlas-retrieval-lineage-dag-convergence",
+    "parent-atlas-compiler-semantic-graph-resolution",
+    "parent-atlas-best-fit-score-fabric",
+    "parent-atlas-ace-rlm-bitfrost-integration",
+    "parent-atlas-nlp-sidecar-feature-compiler",
+    "parent-atlas-ontology-kernel",
+    "parent-atlas-document-governance-master-index",
+    "local-llm-offload-ownership"
+  ],
+  "repairedLegacyChanges": [
+    "parent-atlas-adaptive-dag-fabric",
+    "parent-atlas-topology-representation-admission",
+    "parent-atlas-retrieval-fusion-reachability",
+    "parent-atlas-candidate-feature-execution-fabric"
+  ],
+  "repair": "Added minimal non-behavioral delta specs preserving existing ownership and proof-gate boundaries.",
+  "determination": {
+    "integrationAlignment": "CORE_SET_VALID_AND_LEGACY_ARTIFACTS_REPAIRED",
+    "runtimeRegressionFound": false,
+    "legacyArtifactCleanup": "DEFERRED",
+    "doNotInterpretAs": "permission to close blocked runtime or lineage gates"
+  },
+  "writes": {
+    "database": false,
+    "qdrant": false,
+    "graph": false,
+    "cache": false,
+    "runtime": false
+  }
+}

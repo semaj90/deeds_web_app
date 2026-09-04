@@ -1,6 +1,12 @@
 # Parent Atlas Feature Evidence Graph — Requirements
 
-## Requirement: Feature evidence is many-to-many
+## Purpose
+
+Define revision-qualified evidence relationships for Parent Atlas feature and graph analysis.
+
+## Requirements
+
+### Requirement: Feature evidence is many-to-many
 
 The system SHALL represent feature state through explicit evidence relations rather than a single inferred label.
 
@@ -10,7 +16,7 @@ An evidence item MAY support more than one feature.
 
 ---
 
-## Requirement: Typed evidence edges
+### Requirement: Typed evidence edges
 
 Feature evidence edges SHALL include a relation type and revision-qualified source reference.
 

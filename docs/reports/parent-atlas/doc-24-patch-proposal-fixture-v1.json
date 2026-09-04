@@ -1,0 +1,40 @@
+{
+  "schema": "atlas.doc-24-patch-proposal-fixture-proof.v1",
+  "gate": "DOC-24",
+  "status": "DOC_24_PATCH_PROPOSAL_FIXTURE_PROVEN",
+  "proposal": {
+    "schema": "atlas.patch-proposal.v1",
+    "proposalId": "patch-proposal:sha256:470b00916faf0a8e33d5b87abf9ffdf52286fc834ebd7bbf6600df545baf3e7d",
+    "sourceRef": "src/example.ts",
+    "baseSourceRevision": "sha256:e2e846d0811ba3ca2ff75fcc41f163648e3e136dc4bc32c073b9e10543c77c61",
+    "patchDigest": "sha256:da333ac861170a3fb29ac9a1dfedbbc45a16f497574da9c5917a413c5282b239",
+    "hunks": [
+      {
+        "startByte": 14,
+        "endByte": 22,
+        "before": "oldValue",
+        "after": "newValue"
+      }
+    ],
+    "reasoningEvidenceRefs": [
+      "diagnostic:example:1",
+      "ast-grep:replace-legacy-value:1"
+    ],
+    "analysisPassRefs": [
+      "analysis-pass:doc-23-fixture"
+    ],
+    "modelRevision": "ornith-1.5-9b",
+    "promptRevision": "atlas.repair-plan.v1",
+    "status": "PROPOSED",
+    "mutationAuthorized": false,
+    "canonicalAuthority": false
+  },
+  "checks": {
+    "baseRevisionBound": true,
+    "hunkEvidencePresent": true,
+    "modelAndPromptRecorded": true,
+    "mutationAuthorized": false
+  },
+  "writesPerformed": false,
+  "nextGate": "DOC_25_COMPILER_TEST_REPLAY_RECEIPT"
+}

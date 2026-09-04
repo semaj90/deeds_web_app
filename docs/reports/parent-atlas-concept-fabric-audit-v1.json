@@ -1,12 +1,12 @@
 {
   "schema": "atlas.parent-atlas-concept-fabric-audit.v1",
-  "generatedAt": "2026-09-04T16:48:54.411Z",
+  "generatedAt": "2026-09-04T21:14:55.524Z",
   "scope": "repository-owner-and-contract-inventory",
   "writesPerformed": false,
   "datastoreWritesPerformed": false,
   "externalNetworkCallsPerformed": false,
-  "inventoryChecksum": "sha256:61b69b0cf91f41fe6a24b9cc75af8827c15834c25a06cb3248dae166d01576a1",
-  "inventoryFileCount": 320385,
+  "inventoryChecksum": "sha256:9fce044f497e0058fb56917520a2b4338cd3705a9d68bc4e9b66adce3cb9aac8",
+  "inventoryFileCount": 320508,
   "canonicalOwnerSummary": {
     "sourceAndIdentity": "PostgreSQL packet/chunk/source-revision tables",
     "observations": "8095 Tree-sitter, AST-grep, bounded NLP/LangExtract adapters",
@@ -59,9 +59,13 @@
       ]
     },
     "sourceChunkAndAst": {
-      "matchedFileCount": 6,
+      "matchedFileCount": 10,
       "files": [
+        "docs/reports/parent-atlas/dir-index-02-canonical-chunk-owner-audit-v1.md",
         "docs/reports/sem768-canonical-chunk-owner-01.json",
+        "packages/parent-atlas/src/core/canonical-chunk-v1.ts",
+        "packages/parent-atlas/test/canonical-chunk-v1.test.mjs",
+        "scripts/atlas/prove-dir-index-02-canonical-chunk-v1.mjs",
         "sveltekit-frontend/src/lib/server/analysis/ast-grep-extractor.ts",
         "sveltekit-frontend/src/lib/server/analysis/ast-langextract-bridge.ts",
         "sveltekit-frontend/src/lib/server/analysis/atlas-ast-evidence-normalizer.ts",
@@ -70,13 +74,14 @@
       ]
     },
     "externalDocsAndEvidence": {
-      "matchedFileCount": 2110,
+      "matchedFileCount": 2111,
       "files": [
         "7_24_26_todo_enhance_recommendations_firecrawl.txt",
         "docker/langgraph-synthesis/.venv/Lib/site-packages/langchain_community/document_loaders/__pycache__/firecrawl.cpython-313.pyc",
         "docker/langgraph-synthesis/.venv/Lib/site-packages/langchain_community/document_loaders/firecrawl.py",
         "docs/.okf/dev/raw/firecrawl/docs-firecrawl-dev-api-reference-introduction-introduction.json",
         "docs/.okf/dev/raw/firecrawl/docs-firecrawl-dev-api-reference-introduction-introduction.md",
+        "scripts/atlas/validate-okf-beautifulsoup-pydantic-v1.py",
         "scripts/docs-atlas/__pycache__/fetch-beautifulsoup.cpython-313.pyc",
         "scripts/docs-atlas/fetch-beautifulsoup.py",
         "sveltekit-frontend/docs/architecture/bifrost-firecrawl-programming-reference.md",
@@ -150,8 +155,7 @@
         "tools/agentic-research/.venv/Lib/site-packages/crawl4ai/async_webcrawler.py",
         "tools/agentic-research/.venv/Lib/site-packages/crawl4ai/browser_adapter.py",
         "tools/agentic-research/.venv/Lib/site-packages/crawl4ai/browser_manager.py",
-        "tools/agentic-research/.venv/Lib/site-packages/crawl4ai/browser_profiler.py",
-        "tools/agentic-research/.venv/Lib/site-packages/crawl4ai/cache_context.py"
+        "tools/agentic-research/.venv/Lib/site-packages/crawl4ai/browser_profiler.py"
       ]
     },
     "retrievalAndSearch": {
@@ -325,7 +329,7 @@
       ]
     },
     "aceAndPrefill": {
-      "matchedFileCount": 76,
+      "matchedFileCount": 77,
       "files": [
         ".okf/pipelines/ast-entity-prefill.yaml",
         ".venv-cu130/Lib/site-packages/torch/include/ATen/native/mps/kernels/PrefillAttention.h",
@@ -361,6 +365,7 @@
         "openspec/changes/archive/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/tasks.md",
         "openspec/changes/parent-atlas-neural-prefill-encoder/design.md",
         "openspec/changes/parent-atlas-neural-prefill-encoder/proposal.md",
+        "openspec/changes/parent-atlas-neural-prefill-encoder/specs/neural-prefill-encoder/spec.md",
         "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
         "packages/parent-atlas/src/core/contextual-prefill-fabric.ts",
         "packages/parent-atlas/src/core/inference-prefill-runtime.ts",
@@ -406,7 +411,7 @@
       ]
     },
     "cacheAndResidency": {
-      "matchedFileCount": 188,
+      "matchedFileCount": 189,
       "files": [
         ".tmp/atlas-cluster-assignments.centroids.json",
         ".tmp/qdrant-som-centroid-backfill-report.json",
@@ -452,6 +457,7 @@
         "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/proposal.md",
         "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/specs/agent-branch-verification/spec.md",
         "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md",
+        "openspec/changes/parent-atlas-ace-bitfrost-cache-correctness/specs/ace-bitfrost-cache-correctness/spec.md",
         "openspec/changes/parent-atlas-ace-bitfrost-cache-correctness/tasks.md",
         "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/design.md",
         "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/proposal.md",
@@ -486,8 +492,7 @@
         "openspec/drafts/2026-08-22_bitfrost-semantic-5.md",
         "openspec/drafts/2026-08-22_bitfrost-semantic-6.md",
         "openspec/drafts/2026-08-22_bitfrost-semantic.md",
-        "openspec/drafts/2026-08-23_bitfrost-semantic-2.md",
-        "openspec/drafts/2026-08-23_bitfrost-semantic-3.md"
+        "openspec/drafts/2026-08-23_bitfrost-semantic-2.md"
       ]
     },
     "dagAndSynthesis": {

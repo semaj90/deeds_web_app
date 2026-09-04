@@ -90,6 +90,8 @@ def main() -> int:
         "fetcher": capture.fetcher,
         "resolvedUrl": str(capture.resolved_url),
         "contentChecksum": capture.normalized_checksum,
+        "parser": capture.metadata.get("parser"),
+        "parserVersion": capture.metadata.get("parserVersion"),
         "canonicalAuthority": False,
         "writesPerformed": False,
     }))

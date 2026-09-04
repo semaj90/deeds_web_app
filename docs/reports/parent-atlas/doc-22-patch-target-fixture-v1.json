@@ -1,0 +1,27 @@
+{
+  "schema": "atlas.doc-22-patch-target-fixture-proof.v1",
+  "gate": "DOC-22",
+  "status": "DOC_22_PATCH_TARGET_FIXTURE_PROVEN",
+  "target": {
+    "schema": "atlas.patch-target.v1",
+    "sourceRef": "src/example.ts",
+    "baseSourceRevision": "sha256:e2e846d0811ba3ca2ff75fcc41f163648e3e136dc4bc32c073b9e10543c77c61",
+    "startByte": 0,
+    "endByte": 24,
+    "expectedBytesChecksum": "sha256:e2e846d0811ba3ca2ff75fcc41f163648e3e136dc4bc32c073b9e10543c77c61",
+    "replacementBytesChecksum": "sha256:da333ac861170a3fb29ac9a1dfedbbc45a16f497574da9c5917a413c5282b239",
+    "evidenceRefs": [
+      "diagnostic:example:1",
+      "ast-grep:example:assignment"
+    ],
+    "canonicalAuthority": false
+  },
+  "checks": {
+    "exactBaseBytes": true,
+    "staleBaseRevisionRejected": true,
+    "utf8ByteRange": true
+  },
+  "mutationPerformed": false,
+  "canonicalAuthority": false,
+  "nextGate": "DOC_23_AST_GREP_REPAIR_PLANNER"
+}

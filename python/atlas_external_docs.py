@@ -344,6 +344,11 @@ def fetch_beautifulsoup(url: str, *, timeout_seconds: int = 30, user_agent: str 
     title, text, outgoing_urls = extract_structured_text(raw, base_url=resolved)
     if not text:
         raise ValueError("BEAUTIFULSOUP_EMPTY_TEXT")
+    try:
+        from importlib.metadata import version as package_version
+        parser_version = package_version("beautifulsoup4")
+    except Exception:  # pragma: no cover - package metadata can be unavailable in source-only tests
+        parser_version = "unknown"
     return FetchResult(
         fetcher="BEAUTIFULSOUP_HTTP",
         url=url,
@@ -353,7 +358,7 @@ def fetch_beautifulsoup(url: str, *, timeout_seconds: int = 30, user_agent: str 
         raw_checksum=_sha(raw),
         normalized_checksum=_sha(text),
         outgoing_urls=outgoing_urls,
-        metadata={"parser": "html.parser", "structured": True},
+        metadata={"parser": "html.parser", "parserVersion": parser_version, "structured": True},
     )
 
 

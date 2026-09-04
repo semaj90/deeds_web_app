@@ -100,6 +100,7 @@ class SourceConfig:
     exclude_paths: tuple[str, ...]
     maximum_pages: int
     maximum_depth: int
+    follow_sitemap: bool
     pages: tuple[str, ...]
     ldr_export_files: tuple[str, ...]
     source_namespace: str | None = None
@@ -207,6 +208,7 @@ def load_manifest(path: str | Path) -> PipelineManifest:
             exclude_paths=source.exclude_paths,
             maximum_pages=source.maximum_pages,
             maximum_depth=source.maximum_depth,
+            follow_sitemap=source.follow_sitemap,
             pages=source.pages,
             ldr_export_files=source.ldr_export_files,
             source_namespace=source.source_namespace,
@@ -274,6 +276,7 @@ def firecrawl_crawl_v2(
         "excludePaths": list(source.exclude_paths),
         "maxDiscoveryDepth": source.maximum_depth,
         "limit": source.maximum_pages,
+        "ignoreSitemap": not source.follow_sitemap,
         "crawlEntireDomain": False,
         "allowExternalLinks": False,
         "allowSubdomains": False,

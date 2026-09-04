@@ -98,6 +98,7 @@ class SourceConfigV1(BaseModel):
     exclude_paths: tuple[str, ...] = Field(default_factory=tuple)
     maximum_pages: int = Field(default=100, ge=1)
     maximum_depth: int = Field(default=3, ge=0)
+    follow_sitemap: bool = True
     pages: tuple[str, ...] = Field(default_factory=tuple)
     ldr_export_files: tuple[str, ...] = Field(default_factory=tuple)
     source_namespace: Optional[str] = None

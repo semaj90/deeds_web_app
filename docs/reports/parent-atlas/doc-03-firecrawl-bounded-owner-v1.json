@@ -1,0 +1,62 @@
+{
+  "schema": "atlas.doc-03.firecrawl-bounded-owner-audit.v1",
+  "gate": "DOC-03",
+  "status": "DOC_03_OWNER_BOUNDED_IMPLEMENTED_EXTERNAL_PROOF_OPEN",
+  "owner": "python/atlas_okf_docs_pipeline.py::firecrawl_crawl_v2",
+  "captureOwner": "sveltekit-frontend/src/lib/server/atlas/docs/firecrawl-v2-capture.ts",
+  "bounds": {
+    "maximumPages": "manifest.maximum_pages -> Firecrawl.limit",
+    "maximumDepth": "manifest.maximum_depth -> Firecrawl.maxDiscoveryDepth",
+    "followSitemap": "manifest.follow_sitemap -> Firecrawl.ignoreSitemap inverse",
+    "externalLinks": false,
+    "subdomains": false
+  },
+  "checks": [
+    {
+      "name": "manifest maximum_pages exists",
+      "pass": true
+    },
+    {
+      "name": "manifest maximum_depth exists",
+      "pass": true
+    },
+    {
+      "name": "Firecrawl limit receives maximum_pages",
+      "pass": true
+    },
+    {
+      "name": "Firecrawl depth receives maximum_depth",
+      "pass": true
+    },
+    {
+      "name": "manifest sitemap policy maps to Firecrawl ignoreSitemap",
+      "pass": true
+    },
+    {
+      "name": "external links are disabled",
+      "pass": true
+    },
+    {
+      "name": "subdomains are disabled",
+      "pass": true
+    },
+    {
+      "name": "domain scope is validated",
+      "pass": true
+    },
+    {
+      "name": "Firecrawl API key is configuration-backed",
+      "pass": true
+    },
+    {
+      "name": "live registration/API key proof is intentionally absent",
+      "pass": true
+    }
+  ],
+  "crawlerCalled": false,
+  "apiKeyRead": false,
+  "datastoreWrites": false,
+  "canonicalPromotion": false,
+  "remainingBlocker": "Firecrawl registration/API key and live bounded-crawl readback are external prerequisites.",
+  "generatedAt": "2026-09-04T22:32:14.110Z"
+}

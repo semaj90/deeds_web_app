@@ -174,6 +174,13 @@ from `parent-atlas-retrieval-lineage-dag-convergence`.
   link handling, title fallback, empty-page handling). Full existing suite re-run alongside:
   `test_atlas_external_docs.py` + `test_atlas_okf_docs_pipeline.py` + `test_atlas_doc_coordinate.py`
   + `test_atlas_doc_manifest.py` = 36/36 pass, zero regression.
+  Parser choice remains an explicit follow-up: `scripts/atlas/prove-bs4-parser-parity-v1.py`
+  compares the current `html.parser` output with `lxml` when installed; it does not switch the
+  production parser automatically.
+  **Policy clarification:** BeautifulSoup remains the active static HTML owner. Trafilatura is a
+  challenger only and is not installed in the workstation or `miniforge-nlp-sidecar`; do not add
+  it without a frozen extraction-parity gate. Docling/OCR remains the separate PDF/office/image
+  lane and must not replace the HTML acquisition owner.
 - [x] **DOC-05** `ExternalDocChunkV1` section-chunk contract — done, live-tested. `ChunkRecord`
   gained two new fields, both additive with empty-tuple defaults (zero behavior change for any
   existing caller that doesn't pass them): `code_blocks: tuple[Json, ...]` and
@@ -355,6 +362,9 @@ from `parent-atlas-retrieval-lineage-dag-convergence`.
   `maximum_pages`/`maximum_depth` fields; **blocked** on Firecrawl actually being registered
   (API key) — not required for Phase A/B, only for sources that need JS-rendering/recursive crawl
   beyond what a static BeautifulSoup fetch covers.
+  - Read-only owner audit added at `scripts/atlas/audit-doc-03-firecrawl-bounded-owner-v1.mjs`.
+    It confirms manifest page/depth/sitemap bounds, domain scope, and disabled external links/subdomains.
+    Live Firecrawl registration/API-key proof remains blocked; no crawl or persistence was attempted.
 
 ## Phase C — Classification and multi-representation projection
 
@@ -503,8 +513,20 @@ from `parent-atlas-retrieval-lineage-dag-convergence`.
   the live extraction path anyway -- see DOC-10 below); flagged for whoever next touches that file.
   `langextract_ollama.py` (358 lines, zero callers anywhere in `python/`) confirmed still dead/legacy
   — do not resurrect, do not delete (archive-not-delete), out of scope here.
-- [ ] **DOC-10** LangExtract source-grounded extraction wired to this pipeline — `AUDIT_FIRST`,
-  audit done, real prior-art chain found, wiring attempt reverted mid-flight, not yet re-attempted.
+- [x] **DOC-10** LangExtract source-grounded extraction wired to this pipeline — `DRY_RUN_PROVEN`
+  as of the 2026-09-04 multi-turn-prompt fix addendum below (see for full evidence). Originally:
+  `EXTEND_CANONICAL_OWNER_RESOLVED`,
+  live owner is `miniforge_nlp_sidecar_oak.py` → `miniforge_nlp_sidecar_v2.py`; the existing
+  generic `CONCEPT` path remains unchanged. The additive `/extract/documentation-facts` route now
+  reuses the centralized Ornith controls and emits UTF-8 byte-authoritative spans, but remains
+  `LIVE_FACT_PROVEN_API_RULE_COVERAGE_OPEN`: the schema/provider correction now yields a non-empty
+  exact fact replay with stable normalized output checksum.
+  No Postgres, Qdrant, Neo4j, or analysis-pass writes are performed by this route.
+  Live boundary evidence: `docs/reports/parent-atlas/doc-10-12-live-contract-v1.json` confirms
+  route registration, Ornith `ornith-1.5-9b`, controls, `canonicalAuthority=false`, and 422 on a
+  mismatched SHA-256 source revision. Two identical live calls returned one fact each with equal
+  output checksums and `MATCH_EXACT` byte alignment. API-rule coverage and the remaining negative
+  cases are still open.
   **Audit finding, more layered than the task's own framing assumed**: `langextract_service.py` is
   NOT the live extraction path — it has no running container of its own (confirmed:
   `docker ps` shows only `miniforge-nlp-sidecar`). The real live chain, confirmed by reading
@@ -566,12 +588,179 @@ from `parent-atlas-retrieval-lineage-dag-convergence`.
   confirmed non-breaking, returns a well-formed empty response rather than erroring) since removing
   it would only cost re-investigation time later for zero safety benefit. DOC-12 (`ApiRuleV1`)
   depends on DOC-10 actually producing real extractions and is not started.
-- [ ] **DOC-12** `ApiRuleV1` — `NEW`. Extraction target for LangExtract/Ornith on genuinely
-  semantic material only (capability/constraint/deprecation/migration), per design.md. Blocked on
-  DOC-10's correctly-targeted live-service wiring (see above) landing first.
+- [x] **DOC-12** `ApiRuleV1` — `LIVE_NEGATIVE_MATRIX_PROVEN` as a normalized sibling output of the same
+  `/extract/documentation-facts` execution. API rules require grounded symbol/version/condition/
+  recommendation fields and carry the same UTF-8 byte evidence span; live non-empty extraction and
+  replay evidence are still required before promotion. Boundary evidence is recorded in
+  `docs/reports/parent-atlas/doc-10-12-live-contract-v1.json`; no durable writes occurred.
+  Follow-up live proof: an API-symbol fixture returned one `ApiRuleV1` on each of two identical
+  calls with equal normalized output checksums and `MATCH_EXACT`; a mismatched SHA-256 source
+  revision returned 422, and a structure-only fixture returned zero rules. Keep open for the
+  remaining admission/negative matrix and downstream indexing.
+  Follow-up live proof: an API-symbol fixture returned one `ApiRuleV1` on each of two identical
+  calls with equal normalized output checksums and `MATCH_EXACT`; a mismatched SHA-256 source
+  revision returned 422. Keep the checkbox open for the remaining negative/admission matrix.
+  **Independent third fixture, novel (2026-09-04, same day, after the multi-turn prompt fix
+  landed in `_native_documentation_facts`/`miniforge_nlp_sidecar.py`'s `build_params` patch —
+  see DOC-10's addendum above)**: `"cudaMalloc(size_t size) allocates size bytes on the device.
+  Deprecated since CUDA 11: use cudaMallocAsync instead."`, never used in any prior DOC-12 test,
+  produced one correct `ApiRuleV1` — `apiSymbol: "cudaMalloc"`, `versionRange: "CUDA 11"`,
+  `condition: "deprecated since CUDA 11"`, `recommendation: "use cudaMallocAsync instead"`,
+  `alignmentStatus: MATCH_EXACT`. Confirms DOC-12 benefits from the same multi-turn fix (both
+  functions share `_ensure_grounded_provider_controls()`'s patch) and isn't overfit to the
+  fixtures already used to debug it. The bounded live negative/admission matrix is now proven
+  by `scripts/atlas/prove-doc-12-api-rule-negative-matrix-v1.mjs` with report
+  `docs/reports/parent-atlas/doc-12-api-rule-negative-matrix-v1.json`: grounded rule and exact
+  UTF-8 evidence bytes, stale/missing source revision rejection, and structure-only rejection.
+  Downstream indexing/projection remains separately gated by DOC-14 through DOC-18.
 - [ ] **DOC-13** doc↔symbol mutual index — `NEW`. Joins `ApiRuleV1.apiSymbol` /
   `DocumentationFactV1.subject` against this repo's existing AST symbol identity
   (`ast-grep-observation-adapter.ts`'s `stableSymbolId`), not a new symbol-identity scheme.
+  Added the read-only exact-match adapter/proof at
+  `scripts/atlas/prove-doc-symbol-mutual-index-v1.mjs`; fixture proof covers matched,
+  stale-revision, ambiguous, and unmapped outcomes. Live read-only registry join/readback is
+  now proven for the existing `atlas_symbol_registry` + `atlas_symbol_versions` owners via
+  `scripts/atlas/prove-doc-symbol-mutual-index-live-v1.mjs` (200 active rows read; exact
+  canonical-name/source-revision match; existing `stable_symbol_id` and `symbol_version_id`
+  returned; no writes). Follow-up corrected the cross-artifact revision boundary: the live
+  DOC-12 extraction now joins one `ApiRuleV1` to the exact existing symbol identity while
+  preserving separate documentation and code source revisions (`LIVE_DOC_EXTRACTION_SYMBOL_JOIN_PROVEN`).
+  Do not compare documentation `sourceRevision` to code `symbol_versions.source_revision`.
+  The same read-only proof now records stale-code-revision rejection and unmapped-symbol
+  rejection; no duplicate symbol version was present in the bounded live sample, so ambiguity
+  is reported as `NOT_OBSERVED` rather than fabricated. Keep the gate open for broader live
+  ambiguity coverage and downstream index admission.
+
+  Composition follow-up: `scripts/atlas/prove-doc-symbol-nlp-dag-context-v1.mjs` confirms the
+  indexed symbol/version owner, existing append-only `analysis_pass_results` owner, bounded
+  `ParameterArtifactV1` checksums, and Ornith `:8090` synthesis boundary compose without a
+  duplicate table or datastore write. This proves owner wiring only; current-pass selection,
+  ContextManifest admission, and a live SynthesisReceipt remain separate gates.
+
+**DOC-10/DOC-12 root cause found (2026-09-04, later same day as the `doc-10-12-live-contract-v1.json`
+receipt above — answers that receipt's own `nextInvestigation` item 1 directly)**: the zero-extraction
+result is **not** a `DocumentationFactV1`-schema-specific problem, and it is **not currently
+reproducible that CONCEPT extraction works** either — both are empty right now, live-verified via
+`POST /extract` with `grounded_extraction_required:true` (`grounded_extraction_used:false`,
+`structure.concepts:[]`). The `sm_86`→`ARCHITECTURE`/`Kepler`→`GPU_GENERATION` result cited earlier
+in this file's DOC-10 entry did not reproduce on retest with the same input; whether that citation
+was a stale/prior-run observation or degraded since is unresolved, but it is not current live
+behavior.
+
+Root cause, isolated by inspecting the raw HTTP request LangExtract actually sends (patched
+`OpenAILanguageModel._process_single_prompt` in-process to print `api_params`/raw completion text,
+inside the live `miniforge-nlp-sidecar` container — not simulated):
+- `langextract.extract(config=ModelConfig(...))` folds `prompt_description` + every few-shot
+  `ExampleData` into **one single flattened `user` message** in a literal `"Examples\nQ: ...\nA:
+  {...}\n\nQ: <target>\nA: "` text format (via its internal `QAPromptGenerator`), with a generic
+  system message (`"You are a helpful assistant that responds in JSON format."`) — never the
+  detailed instructions. Confirmed by direct reproduction: 2 well-matched examples (including one
+  matching the actual compound-sentence structure) still produced `{"extractions": []}`,
+  deterministically (temp=0, seed=1729), for **both** the CONCEPT and DOCUMENTATION_FACT schemas.
+- The identical extraction task, sent as a **real multi-turn** chat (`system` instructions +
+  `user`(example text) + `assistant`(example JSON) + `user`(target text) — not flattened into one
+  message) against the same `ornith-1.5-9b` endpoint with the same schema/temperature/seed,
+  correctly returns non-empty extractions every time (verified for both a raw single-fact prompt
+  and the CONCEPT case: `PostgreSQL`→`DATABASE`, `Redis`→`DATABASE` from real multi-turn messages).
+  A raw system+user completion (no few-shot Q/A staging at all) also succeeds cleanly.
+- Also ruled out and fixed along the way, real bugs, not the root cause but confirmed genuine:
+  (1) `provider_kwargs["max_tokens"]` was silently dropped — `OpenAILanguageModel.
+  _build_chat_completions_params()` reads `config['max_output_tokens']`, not `max_tokens`; every
+  grounded-extraction call in both `_native_grounded_extractions()` and
+  `_native_documentation_facts()` was going out with no token cap at all. Fixed: renamed to
+  `max_output_tokens` in `miniforge_nlp_sidecar_v2.py` (both call sites). (2) `POST
+  /extract/documentation-facts` genuinely 500'd (`NameError: name 'json' is not defined`) —
+  `miniforge_nlp_sidecar_v2.py` used `json.dumps(...)` at its response-construction step
+  (`outputHash=hashlib.sha256(json.dumps(...)...)`) with no `import json` anywhere in the file.
+  Fixed: added the import. This means the route's own "returns a well-formed empty response rather
+  than erroring" claim earlier in this file, and the `doc-10-12-live-contract-v1.json` receipt's
+  `documentationFactCount: 0` result, were **not actually reached on a live call** at the time they
+  were written for whatever request shape produced the response those artifacts show — after this
+  fix, live-verified now: `200 OK` with a genuinely well-formed empty-facts envelope.
+  **Conclusion on both bugs**: neither the token-cap nor the `json` import bug explains the
+  zero-extraction result itself — reproduced zero extractions with `max_output_tokens` correctly
+  set, and the raw HTTP layer (bypassing both bugs entirely) already showed the model producing
+  correct output when prompted the working way.
+- **What does NOT explain it** (ruled out with real tests, not assumed): JSON schema malformation
+  (byte-identical structure to the working shape — moot now that CONCEPT also fails), token budget,
+  `use_schema_constraints`/`output_schema` top-level wiring (passing the schema explicitly at the
+  top-level `extract()` kwarg per LangExtract's own `output_schema=` docstring, instead of only
+  inside `provider_kwargs.openai_schema`, changes nothing — still zero), and example quality/count.
+
+**Real fix path, not yet implemented (scope decision needed, not blocked on further diagnosis)**:
+LangExtract's public `extract()` API has no supported way to request real multi-turn few-shot
+prompting for the OpenAI provider — the flattening lives in `langextract.prompting.
+QAPromptGenerator`, internal to the library. Two options going forward, neither attempted here
+because both change the *shared* `_native_grounded_extractions()` function (used by the pre-existing
+CONCEPT path, not just this proposal's DOCUMENTATION_FACT addition), which is a bigger blast radius
+than this task's own scope and needs a decision, not a silent rewrite:
+  1. Monkeypatch/subclass the OpenAI provider (same pattern already used for
+     `_ensure_grounded_provider_controls()`'s `_build_chat_completions_params` patch) to build real
+     multi-turn messages from the example list instead of calling the original flattened builder.
+  2. Bypass `langextract.extract()`'s prompt construction entirely for these two call sites: build
+     the multi-turn request directly (proven working shape above), call the completion ourselves,
+     and feed the raw JSON through `normalize_langextract_extraction`-equivalent span-finding —
+     loses LangExtract's fuzzy-alignment resolver, would need `text.find()`-based exact-match
+     alignment instead (acceptable here since `_native_documentation_facts` already requires exact
+     match and rejects fuzzy).
+  Recommend option 1 (smaller diff, keeps the resolver) but this affects the live CONCEPT path
+  used elsewhere in the NLP sidecar beyond this proposal — flagging for explicit decision before
+  implementing, per this repo's own "record what you found, even when you don't fix it" rule.
+  DOC-10/DOC-12 remain `IMPLEMENTED_UNPROVEN`, now with a proven, reproducible, understood cause
+  instead of an open question.
+
+**DOC-10 fixed and live-proven (2026-09-04, same session, option 1 above implemented on operator
+"yes continue")**. Also **retracting one claim from the block immediately above**: "CONCEPT
+extraction is not currently reproducible" was my own testing mistake, not a real regression —
+`/extract`'s `structure.concepts` field is populated by an unrelated code path
+(`_code_concepts()`/entity text list, `miniforge_nlp_sidecar.py` line ~2370), never by LangExtract's
+grounded output; the grounded results were always in `metadata.grounded_extractions`, which I had
+not checked in that pass. Re-verified against `metadata.grounded_extractions` specifically: the
+pre-existing CONCEPT path's live behavior claim in the original DOC-10 entry stands, I just measured
+it wrong on retest.
+
+Implementation (`python/miniforge_nlp_sidecar.py`): `_ensure_grounded_provider_controls()`'s
+existing `build_params` patch (already there for `chat_template_kwargs`/`cache_prompt`/
+`response_format` conversion — those are a concurrent, unrelated edit to this same function, left
+untouched) now also rebuilds real multi-turn `messages` when a new
+`_grounded_extraction_context` global is set: `_set_grounded_extraction_context(description,
+examples)` / `_clear_grounded_extraction_context()`, plus `_restructure_as_multiturn()`, which
+deterministically recovers the current chunk's target question from LangExtract's own flattened
+prompt text (`prompt.rfind("\nQ: ")` + strip the trailing `"\nA: "`) and rebuilds
+`[system(description), *per-example(user, assistant-JSON), user(target)]`. Falls back to the
+original flattened single-message prompt (returns `None`, patch leaves `params` untouched) if the
+target text can't be recovered deterministically — never guesses.
+`python/miniforge_nlp_sidecar_v2.py`: both `_native_grounded_extractions()` and
+`_native_documentation_facts()` now wrap their `extract_fn.extract(**extract_kwargs)` call in
+`try: legacy._set_grounded_extraction_context(...); result = ...(**extract_kwargs) finally:
+legacy._clear_grounded_extraction_context()`.
+
+**One more real bug found and fixed while wiring this in**: `_native_grounded_extractions()` was
+missing its `from langextract.providers.schemas.openai import OpenAISchema` local import (present
+in `_native_documentation_facts()` but absent from its sibling — root cause unclear, likely dropped
+by an interleaved concurrent edit to this same file during this session; not something I removed).
+Caused a live `NameError: name 'OpenAISchema' is not defined` surfaced immediately by testing after
+my restart. Restored the missing import line.
+
+**Live proof, both routes, real container, real `ornith-1.5-9b` completions** (restarted, healthy,
+existing 6-test suite still green):
+- `POST /extract` (`grounded_extraction_required:true`) on `"This module uses PostgreSQL for
+  persistence and Redis for caching."` → `metadata.grounded_extractions`: 2 items, `PostgreSQL`→
+  `DATABASE` (span 17-27, `match_exact`) and `Redis`→`CACHE` (span 48-53, `match_exact`).
+- `POST /extract/documentation-facts` on the original 2-fact CUDA/Kepler fixture → 2 facts, both
+  `alignmentStatus: MATCH_EXACT`, correct subject/predicate/object/statement/confidence.
+- Same route on a fresh, harder 3-fact/3-sentence fixture ("PyTorch 2.13 removed CUDA 12.8
+  support. The Redis client requires TLS in production. Batch size must not exceed 128 on 8GB
+  GPUs.") never seen during debugging → **3/3 facts extracted, all `MATCH_EXACT`**, correct
+  subject/predicate/object per sentence. Confirms this isn't overfit to the one fixture used to
+  debug it.
+
+**DOC-10: promoting to `DRY_RUN_PROVEN`.** `DOC-12` (`ApiRuleV1`) stays `IMPLEMENTED_UNPROVEN` —
+`apiRules` was empty in every test above because none of the fixtures used were API-symbol-shaped
+(function signature / parameter constraint text); the multi-turn fix should apply equally once
+DOC-12's own extraction path is exercised with a matching fixture, but that's unverified, not
+assumed. Whoever picks up DOC-12 next: reuse this same context-stash pattern if a third grounded-
+extraction call site is added — do not reintroduce the flattened-prompt path.
 
 ## Phase E — Graph relationships
 
@@ -579,23 +768,62 @@ from `parent-atlas-retrieval-lineage-dag-convergence`.
   `API_SYMBOL -[DOCUMENTED_BY]-> DOC_SECTION`, `API_SYMBOL -[REQUIRES]-> CUDA_VERSION`,
   `API_SYMBOL -[SUPPORTS]-> ARCHITECTURE`, `EXAMPLE -[USES]-> API_SYMBOL`,
   `ERROR_PATTERN -[RELATED_TO]-> API_SYMBOL`. Reuses the existing Neo4j mirror + NetworkX/cuGraph
+  owners. A bounded read-only Neo4j → NetworkX export preflight now passes through
+  `scripts/atlas/export-neo4j-concept-networkx-v1.py` and emits
+  `docs/reports/parent-atlas/doc-14-neo4j-networkx-export-v1.json` with a revisioned projection,
+  8,540 nodes, 10,000 bounded edges, `canonicalAuthority=false`, and no writes. This does not
+  yet prove that the five documentation relationship types are present or admitted, so DOC-14
+  remains open. The follow-up audit
+  `scripts/atlas/audit-doc-14-relationship-export-v1.mjs` confirms only `HAS_ONTOLOGY`,
+  `IN_DOMAIN`, and `USED_CONCEPT` were observed; all five requested documentation relation
+  types currently count zero. No synthetic edges or projection writes were created.
+  A pure fixture proof now validates all five typed relation contracts, explicit source and
+  workspace revisions, evidence references, deterministic replay, and `canonicalAuthority=false`
+  in `scripts/atlas/prove-doc-14-relationship-admission-fixture-v1.mjs`; report:
+  `docs/reports/parent-atlas/doc-14-relationship-admission-fixture-v1.json`. This advances DOC-14
+  to fixture-proven only; live Neo4j admission remains required.
   parity-oracle pattern already established for code topology — no new graph store.
 
 ## Phase F — Agentic retrieval and repair loop
 
 - [ ] **DOC-15** agentic docs retrieval fan-out — `EXTEND` the existing retrieval orchestrator
   (`src/lib/server/retrieval/orchestrator.ts` family) with the version/architecture-filtered branch
-  from design.md's retrieval fan-out section — not a parallel orchestrator.
+  from design.md's retrieval fan-out section — not a parallel orchestrator. The read-only owner
+  audit `scripts/atlas/audit-doc-15-retrieval-fanout-owner-v1.mjs` confirms the existing hybrid,
+  Postgres FTS, Qdrant, retrieval-orchestrator, and identity-resolution surfaces are present;
+  report: `docs/reports/parent-atlas/doc-15-retrieval-fanout-owner-v1.json`. Same-query live
+  fan-out replay and documentation-specific version/authority filtering remain open.
 - [ ] **DOC-16** `AceRepairPacketV1` — `NEW` contract, `EXTEND` of the existing general ACE packet
-  envelope pattern.
-- [ ] **DOC-22** `PatchTargetV1` — `NEW`.
+  envelope pattern. A descriptor-only fixture proof now binds candidate snapshot, ordinal map,
+  packet/source/evidence references, diagnostic and documentation-rule references while rejecting
+  hidden thoughts, KV cache and tensor fields; see
+  `scripts/atlas/prove-doc-16-ace-repair-packet-fixture-v1.mjs` and
+  `docs/reports/parent-atlas/doc-16-ace-repair-packet-fixture-v1.json`. Live ACE composition,
+  ContextManifest admission, and repair validation remain open.
+- [ ] **DOC-22** `PatchTargetV1` — `NEW`. Fixture proof now binds `sourceRef`, exact UTF-8
+  byte range, `baseSourceRevision`, expected/replacement byte checksums, and evidence references;
+  stale base revision rejection and mutation=false are proven by
+  `scripts/atlas/prove-doc-22-patch-target-fixture-v1.mjs`.
 - [ ] **DOC-23** ast-grep repair planner — `EXTEND`. `ast-grep-observation-adapter.ts` exists for
   structural *observation*; the rewrite/patch-proposal half (pattern -> rewrite -> diff preview) is
   new, built on ast-grep's existing metavariable/YAML-rule rewrite mechanism, not a custom text
-  editor.
-- [ ] **DOC-24** `PatchProposalV1` — `NEW`.
+  editor. A fixture proof now binds an exact UTF-8 structural match to `baseSourceRevision` and
+  emits a non-authorized proposal without mutation; see
+  `scripts/atlas/prove-doc-23-ast-grep-repair-planner-v1.mjs` and
+  `docs/reports/parent-atlas/doc-23-ast-grep-repair-planner-v1.json`. Live ast-grep execution,
+  diff validation, and explicit mutation authorization remain open.
+- [ ] **DOC-24** `PatchProposalV1` — `NEW`. Fixture proof now binds proposal ID, base source
+  revision, patch digest, byte hunk, reasoning/analysis evidence, model/prompt revisions, and
+  `mutationAuthorized=false`; see `scripts/atlas/prove-doc-24-patch-proposal-fixture-v1.mjs` and
+  `docs/reports/parent-atlas/doc-24-patch-proposal-fixture-v1.json`. Live patch application remains
+  out of scope until DOC-25 validation receipt passes.
 - [ ] **DOC-25** compiler/test replay receipt — `EXTEND` of this repo's existing
   `ExecutionReceiptV1`-style receipt pattern (see `parent-atlas-retrieval-lineage-dag-convergence`
+  ). Fixture validation now records proposal reference, validation checks, validation checksum,
+  `patchApplied=false`, and `mutationAuthorized=false`; see
+  `scripts/atlas/prove-doc-25-compiler-test-replay-receipt-v1.mjs` and
+  `docs/reports/parent-atlas/doc-25-compiler-test-replay-receipt-v1.json`. Live isolated
+  patch/compiler/test replay remains open.
   for the established shape) applied to a patch-validate-test cycle.
 
 ## Phase G — Acceleration (optional, only after corpus is stable)
@@ -618,6 +846,10 @@ from `parent-atlas-retrieval-lineage-dag-convergence`.
 - [ ] **DOC-26** incremental version recrawl — `NEW`. Detect when a manifest source's
   `productVersion` changes and crawl only the delta, never overwrite the prior version's rows
   (depends on DOC-02/DOC-27).
+  - Read-only fixture added: `scripts/atlas/prove-doc-26-incremental-recrawl-fixture-v1.mjs`.
+    It proves unchanged bytes with a later timestamp are skipped, changed bytes are reprocessed,
+    and a changed product version creates a new revision path while preserving prior rows.
+    This does not close DOC-26: live manifest/crawler integration and durable readback remain open.
 
 ## Explicitly deferred / not part of this proposal
 

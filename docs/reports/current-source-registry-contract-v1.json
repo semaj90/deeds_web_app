@@ -1,6 +1,6 @@
 {
   "schema": "atlas.current-source-registry-contract.v1",
-  "generatedAt": "2026-09-03T23:59:58.725Z",
+  "generatedAt": "2026-09-04T22:45:44.232Z",
   "mode": "READ_ONLY_CONTRACT_AUDIT",
   "readOnly": true,
   "writes": {

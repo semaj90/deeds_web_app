@@ -1,0 +1,28 @@
+{
+  "schema": "atlas.doc-symbol-mutual-index-proof.v1",
+  "gate": "DOC-13",
+  "status": "READ_ONLY_PROVEN",
+  "result": {
+    "matched": true,
+    "staleRejected": true,
+    "ambiguousRejected": true,
+    "unmappedRejected": true,
+    "result": {
+      "status": "MATCHED",
+      "reason": "EXACT_NAME_AND_SOURCE_REVISION",
+      "matches": [
+        {
+          "stableSymbolId": "symbol:graph.from_cudf_edgelist",
+          "symbolVersionId": "symbol-version:graph.from_cudf_edgelist:1",
+          "sourceRef": "src/graph.py",
+          "sourceRevision": "sha256:doc-fixture-revision"
+        }
+      ]
+    }
+  },
+  "identityOwner": "existing stableSymbolId/symbolVersionId registry",
+  "matchingPolicy": "exact symbol name plus exact sourceRevision; no fuzzy identity",
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "reportChecksum": "6eb8859902b0547dedae09de9f8de12d0b77c22b5139ff5f2e5c0e4f77ffa3b5"
+}

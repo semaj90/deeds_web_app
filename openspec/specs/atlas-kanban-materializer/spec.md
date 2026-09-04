@@ -1,6 +1,12 @@
 # Parent Atlas Kanban Materializer — Requirements
 
-## Requirement: Kanban is a projection
+## Purpose
+
+Define the evidence-backed Kanban projection of Parent Atlas work and completion state.
+
+## Requirements
+
+### Requirement: Kanban is a projection
 
 The Kanban board SHALL be rebuilt from canonical `FeatureV1`, `FeatureEvidenceV1` and `FeatureStateV1` records.
 
@@ -8,13 +14,13 @@ Manual board text SHALL NOT override canonical feature/evidence state.
 
 ---
 
-## Requirement: Current-state reconstruction
+### Requirement: Current-state reconstruction
 
 Given a repository revision and evidence snapshot revision, Atlas SHALL be able to reconstruct the current feature board without relying on an old progress document.
 
 ---
 
-## Requirement: Board columns
+### Requirement: Board columns
 
 The materialized board SHALL support at least:
 

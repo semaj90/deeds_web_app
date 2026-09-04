@@ -102,6 +102,9 @@ sourceUrl: string
 sourceRevision: string
 startChar: number
 endChar: number
+startByte: number              // authoritative offset into canonical UTF-8 bytes
+endByte: number                // authoritative offset into canonical UTF-8 bytes
+alignmentStatus: 'MATCH_EXACT' | 'MATCH_FUZZY' | 'MATCH_LESSER'
 productVersion: string
 confidence: number
 extractionMethod: 'LANGEXTRACT_ORNITH'
@@ -124,7 +127,14 @@ condition: string
 recommendation: string
 parameterName: string | null
 expectedValue: string | null
-evidenceSpan: { sourceRevision: string, startChar: number, endChar: number }
+evidenceSpan: {
+  sourceRevision: string
+  startChar: number             // diagnostic LangExtract coordinate
+  endChar: number               // diagnostic LangExtract coordinate
+  startByte: number             // authoritative UTF-8 coordinate
+  endByte: number               // authoritative UTF-8 coordinate
+  alignmentStatus: 'MATCH_EXACT' | 'MATCH_FUZZY' | 'MATCH_LESSER'
+}
 confidence: number
 ```
 

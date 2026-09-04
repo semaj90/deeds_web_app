@@ -50,16 +50,30 @@ Ornith) is invoked on that page's content.
 
 ### Requirement: Semantic extraction is source-grounded with exact character spans
 
-LLM-derived facts (`DocumentationFactV1`) SHALL carry `sourceUrl`, `sourceRevision`, `startChar`,
-and `endChar` such that `evidenceText` matches the canonical UTF-8 source bytes at that span
-exactly (exact alignment first, fuzzy fallback only when exact alignment fails). A fact whose span
-does not validate against the canonical source SHALL NOT be admitted.
+LLM-derived facts (`DocumentationFactV1`) SHALL carry `sourceUrl`, `sourceRevision`, diagnostic
+`startChar`/`endChar`, and authoritative `startByte`/`endByte` offsets into the canonical UTF-8
+source. `evidenceText` MUST match those bytes exactly. A fact whose span does not validate against
+the canonical source SHALL NOT be admitted; fuzzy or lesser alignment may be reported but is not
+promotion-eligible.
 
 #### Scenario: Fact admission requires span validation
 
-- **GIVEN** a `DocumentationFactV1` with a `[startChar, endChar)` span
-- **WHEN** the span is read back against the canonical UTF-8 source bytes for that `sourceRevision`
+- **GIVEN** a `DocumentationFactV1` with character and byte spans
+- **WHEN** the byte span is read back against the canonical UTF-8 source bytes for that `sourceRevision`
 - **THEN** the resulting substring equals `evidenceText` exactly, or the fact is rejected
+
+### Requirement: Documentation API rules share the grounded extraction boundary
+
+`ApiRuleV1` SHALL be emitted by the same bounded LangExtract execution as documentation facts,
+with a revision-qualified evidence span containing authoritative UTF-8 byte offsets. The sidecar
+response SHALL keep `canonicalAuthority=false`; durable admission remains a separate owner.
+
+#### Scenario: API rule output remains evidence-only
+
+- **GIVEN** a grounded API rule with a valid source revision and UTF-8 byte span
+- **WHEN** the sidecar returns the documentation extraction response
+- **THEN** the rule carries its evidence span and `canonicalAuthority=false`, and no durable
+  ontology or retrieval projection is written
 
 ### Requirement: Structural patch targeting uses stable coordinates, not line numbers
 

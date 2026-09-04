@@ -1,6 +1,12 @@
 # Parent Atlas Feature State — Requirements
 
-## Requirement: Completion is evidence-derived
+## Purpose
+
+Define evidence-derived feature completion, confidence, priority, and staleness semantics.
+
+## Requirements
+
+### Requirement: Completion is evidence-derived
 
 The system SHALL compute feature completion from configured acceptance evidence.
 
@@ -8,7 +14,7 @@ Topology, similarity, centrality, cluster membership, model confidence and docum
 
 ---
 
-## Requirement: Separate completion and confidence
+### Requirement: Separate completion and confidence
 
 `completion` SHALL represent satisfied acceptance criteria on a 0–100 scale.
 
@@ -18,7 +24,7 @@ They SHALL be stored and displayed separately.
 
 ---
 
-## Requirement: Feature state vocabulary
+### Requirement: Feature state vocabulary
 
 The canonical state machine SHALL support at least:
 

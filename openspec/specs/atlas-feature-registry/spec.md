@@ -1,6 +1,12 @@
 # Parent Atlas Feature Registry — Requirements
 
-## Requirement: Stable feature identity
+## Purpose
+
+Define stable feature identity, revision, labels, and evidence-based promotion boundaries.
+
+## Requirements
+
+### Requirement: Stable feature identity
 
 The system SHALL assign each canonical application capability a stable `feature_id` and `feature_key` independent of file paths, graph node IDs, Qdrant point IDs, cluster IDs, or human-readable labels.
 
@@ -12,13 +18,13 @@ then the canonical `feature_id` SHALL remain unchanged when semantic identity is
 
 ---
 
-## Requirement: Feature labels are mutable metadata
+### Requirement: Feature labels are mutable metadata
 
 `feature_label`, aliases and descriptions MAY change without changing canonical feature identity.
 
 ---
 
-## Requirement: Tree and cluster identifiers are projections
+### Requirement: Tree and cluster identifiers are projections
 
 `tree_node_id`, hierarchy paths, K-means cluster IDs, SOM cells and graph community IDs SHALL be treated as revision-qualified projections.
 

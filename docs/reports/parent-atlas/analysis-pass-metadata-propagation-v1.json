@@ -1,0 +1,14 @@
+{
+  "schema": "parent-atlas.analysis-pass-metadata-propagation.v1",
+  "gate": "ANALYSIS-PASS-METADATA-ENRICHMENT",
+  "status": "FIXTURE_PROVEN",
+  "result": {
+    "executorMetadataPrecedence": true,
+    "jobFallbackPreserved": true,
+    "absentMetadataRemainsNull": true
+  },
+  "writesPerformed": false,
+  "modelCalls": false,
+  "canonicalAuthority": false,
+  "reportChecksum": "sha256:a083e47ead788a141538c5389eee5a575180e659009be69803123677abd04903"
+}
