@@ -40,6 +40,7 @@ const {
   recordSourceSelectionStage,
   heartbeat,
   completeExecution,
+  reconcileAbandonedExecutions,
   GRAPHIFY_COORDINATOR_ADVISORY_LOCK,
 } = await import('./graphify-daily-coordinator-v1.js');
 
@@ -327,6 +328,69 @@ describeIf('GRAPHIFY-DAILY-COORDINATOR-01: live coordinator flow (rolled back, z
       for (const id of [executionA, executionB, executionC]) {
         await completeExecution(client, id, { status: 'COMPLETED' });
       }
+    } finally {
+      await releaseCoordinatorLock(client);
+    }
+  });
+
+  it('reconcileAbandonedExecutions: transitions a stale-heartbeat RUNNING execution to ABANDONED, leaves a fresh one alone, and is idempotent on re-run', async () => {
+    await acquireCoordinatorLock(client);
+    try {
+      const { executionId: staleId } = await openExecution(client, {
+        workspaceId: realWorkspaceId,
+        workspaceRevision: `sha256:${'7'.repeat(64)}`,
+        parserContractVersion: 'graphify.parser.v0.1',
+        extractionContractVersion: 'graphify.extractor.v0.1',
+        triggerKind: 'COORDINATOR_INTEGRATION_TEST_RECONCILE_STALE',
+      });
+      const { executionId: freshId } = await openExecution(client, {
+        workspaceId: realWorkspaceId,
+        workspaceRevision: `sha256:${'8'.repeat(64)}`,
+        parserContractVersion: 'graphify.parser.v0.1',
+        extractionContractVersion: 'graphify.extractor.v0.1',
+        triggerKind: 'COORDINATOR_INTEGRATION_TEST_RECONCILE_FRESH',
+      });
+
+      // Directly backdate staleId's heartbeat past a 1000ms threshold -- this test does not wait
+      // in real time, it manipulates the timestamp the same way a genuinely-dead coordinator
+      // process (crashed, never heartbeats again) would produce.
+      await client.query(
+        `UPDATE public.graphify_executions SET last_heartbeat_at = now() - interval '1 hour'
+         WHERE execution_id = $1`,
+        [staleId],
+      );
+
+      const { abandonedExecutionIds } = await reconcileAbandonedExecutions(client, 1000);
+      expect(abandonedExecutionIds).toContain(staleId);
+      expect(abandonedExecutionIds).not.toContain(freshId);
+
+      const readback = await client.query(
+        `SELECT execution_id, status, completed_at, error_code FROM public.graphify_executions
+         WHERE execution_id = ANY($1::uuid[])`,
+        [[staleId, freshId]],
+      );
+      const staleRow = readback.rows.find((r) => r.execution_id === staleId);
+      const freshRow = readback.rows.find((r) => r.execution_id === freshId);
+      expect(staleRow?.status).toBe('ABANDONED');
+      expect(staleRow?.completed_at).not.toBeNull();
+      expect(staleRow?.error_code).toBe('RECONCILED_STALE_HEARTBEAT');
+      expect(freshRow?.status).toBe('RUNNING');
+      expect(freshRow?.completed_at).toBeNull();
+
+      // Idempotent: re-running finds nothing left to transition (staleId is now terminal, not RUNNING).
+      const second = await reconcileAbandonedExecutions(client, 1000);
+      expect(second.abandonedExecutionIds).not.toContain(staleId);
+
+      // Clean up freshId so it doesn't leak into a subsequent test's readback as an unexpected
+      // stray RUNNING row (rolled back at the end anyway, but keeps this test self-contained).
+      await completeExecution(client, freshId, { status: 'COMPLETED' });
+
+      await expect(reconcileAbandonedExecutions(client, 0)).rejects.toThrow(
+        'GRAPHIFY_COORDINATOR_RECONCILE_INVALID_STALE_AFTER_MS',
+      );
+      await expect(reconcileAbandonedExecutions(client, -5)).rejects.toThrow(
+        'GRAPHIFY_COORDINATOR_RECONCILE_INVALID_STALE_AFTER_MS',
+      );
     } finally {
       await releaseCoordinatorLock(client);
     }

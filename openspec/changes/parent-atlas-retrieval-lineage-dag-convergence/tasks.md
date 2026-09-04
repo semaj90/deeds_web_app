@@ -4703,7 +4703,9 @@ work on this ledger.
 
 ## GRAPHIFY-DAILY-COORDINATOR-01
 
-**2026-09-04 closure pass — 7/11 items now genuinely proven, combining two independent pieces of
+**2026-09-04 closure pass — 8/11 items now genuinely proven (updated same day: the ABANDONED
+reconciliation item closed afterward, see its own checkbox below), combining two independent
+pieces of
 evidence: this session's rolled-back integration spec
 (`graphify-daily-coordinator-v1.integration.spec.ts`, 5/5 tests, zero persistent footprint) plus a
 concurrent session's real COMMITTED bounded canary (`docs/reports/graphify-daily-coordinator-canary-v1.json`,
@@ -4757,12 +4759,26 @@ confirmed, not just claimed).**
 - [x] Failure ends `FAILED`. Proven in the rolled-back integration spec (explicit `FAILED` +
       `errorCode`, then a second `completeExecution` call on the now-terminal row correctly throws
       `GRAPHIFY_COORDINATOR_COMPLETE_EXECUTION_NOT_IN_RUNNING_STATUS`).
-- [ ] Dead coordinator may later be explicitly reconciled to `ABANDONED`. Never infer `COMPLETED`.
-      **Design principle honored, reconciliation workflow doesn't exist.** The schema accepts
-      `ABANDONED` as a terminal status and `completeExecution` never infers a terminal state from
-      a missing/absent row (throws instead) — but nothing in this repo actually detects a
-      quiet-heartbeat execution and writes `ABANDONED` to it. That reconciliation process is
-      unbuilt, not merely untested. Left open.
+- [x] Dead coordinator may later be explicitly reconciled to `ABANDONED`. Never infer `COMPLETED`.
+      **Closed 2026-09-04.** Built `reconcileAbandonedExecutions(client, staleAfterMs?)` in
+      `graphify-daily-coordinator-v1.ts` — never called automatically by `openExecution`/
+      `heartbeat`/`completeExecution` (explicit-invocation only, matching this item's own "never
+      infer COMPLETED" spirit extended to never-infer-ABANDONED-implicitly either), transitions
+      every `RUNNING` row whose `last_heartbeat_at` is older than `staleAfterMs` (default 30 min,
+      documented as an unmeasured conservative default, not derived from a real production
+      heartbeat cadence) to `ABANDONED` with `completed_at = now()` and
+      `error_code = 'RECONCILED_STALE_HEARTBEAT'`, reusing the migration's existing partial index
+      `ON graphify_executions (last_heartbeat_at) WHERE status = 'RUNNING'`. Rejects
+      `staleAfterMs <= 0`. 3 new tests added to `graphify-daily-coordinator-v1.integration.spec.ts`
+      (8/8 pass total, rolled back, zero persistent footprint — independently re-verified via a
+      fresh `psql` count after the run: `graphify_executions` still has exactly 1 row, the
+      pre-existing committed canary, 0 rows matching `COORDINATOR_INTEGRATION_TEST%`): (1) a
+      backdated stale-heartbeat row is reconciled to `ABANDONED` while a fresh `RUNNING` row is
+      left untouched, (2) re-running finds nothing left to transition (idempotent — the row is now
+      terminal, not `RUNNING`, so the partial index no longer matches it), (3) `staleAfterMs` of 0
+      or negative throws `GRAPHIFY_COORDINATOR_RECONCILE_INVALID_STALE_AFTER_MS`. No scheduled
+      sweep/cron wiring this into a live invocation path — that remains a separate, unbuilt
+      concern, honestly not claimed here.
 - [x] Independent readback proves: execution status terminal; `completed_at` present; execution
       file count == frozen source count; workspace revisions all match; source revisions all
       present; content digests all match; mandatory stages terminal. **Proven by me, independently,
@@ -5586,3 +5602,41 @@ The manifest contract was independently re-run with
 passed. This confirms the schema-level distinction between latent origin and materialization,
 including rejection of a co-produced `latent_64` output incorrectly framed as a derived prefix.
 It does not create a live manifest or authorize representation promotion.
+
+The live inputs were checked before constructing a manifest. The 15-row cohort supplies a real
+`candidateSnapshotRevision` and ordinal-map checksum, and the training receipt supplies the model
+checksum and producer revision. However, the current training receipt does not independently
+provide the manifest-required `parametersDigest`, `transformPolicyRevision`, or a non-null
+`latent_256` representation revision. Therefore no `LatentSourceManifestV1` was manufactured;
+the next implementation must derive those values from the existing checkpoint/config producer
+and validate them against the exact cohort before any binding is emitted.
+
+The existing `sveltekit-frontend/scripts/atlas/prove-latent256-provider-live-readonly-v1.mts`
+was also run read-only. It returned `LIVE_READBACK_PROVEN` for a separate 32-row provider sample:
+32/32 canonical IDs resolved, 32/32 vectors hydrated, zero missing/ambiguous rows, and two replay
+runs with identity and checksum parity. Receipt: `docs/reports/latent256-live-readback-v1.json`.
+This is provider/readback evidence only; its `candidateSnapshotRevision` is
+`live-readonly-sample-v1`, not the frozen 15-row ordinal map, so it cannot satisfy the cohort-level
+`LatentSourceManifestV1` gate or justify promotion.
+
+Additional provenance audit found a producer-contract conflict that must be resolved before live
+manifest construction: the checked-in `LatentSourceManifestV1` contract and current task authority
+classify `latent_64` as co-produced with `latent_256`, while the training receipt and
+`python/atlas_compute/latent_autoencoder.py` describe `latent_64` as a prefix/renormalized view.
+This is not safe to reconcile by selecting whichever wording is newer. The producer implementation,
+checkpoint, and receipt must be aligned under one explicit transform policy and then re-proven on
+the bounded cohort. Until that happens, manifest admission remains blocked.
+
+The producer trace strengthens this blocker. `python/atlas_compute/latent_autoencoder.py` implements
+`latent_128 = normalize(latent_256[:, :128])` and
+`latent_64 = normalize(latent_128[:, :64])`; `python/train_latent_autoencoder.py` records the same
+relationships in the training receipt, and `scripts/atlas/latent256-revision-qualified-wrapper.mts`
+documents the same prefix transform. These are direct producer artifacts, not inferred from a
+column name. No authority was silently changed in this pass; the representation policy must be
+explicitly resolved and the contract, tests, and receipt regenerated together before a live
+manifest can be emitted.
+
+The representation schema tests still pass independently (`34/34` across
+`representation-artifact-v1.spec.ts` and `latent-source-manifest-v1.spec.ts`), but that is schema
+behavior only. It does not override the direct producer evidence above. The current state is
+therefore `SCHEMA_PROVEN / PRODUCER_POLICY_CONFLICT`, not a closed representation gate.

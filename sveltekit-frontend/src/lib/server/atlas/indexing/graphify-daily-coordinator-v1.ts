@@ -273,3 +273,39 @@ export async function completeExecution(
     throw new Error('GRAPHIFY_COORDINATOR_COMPLETE_EXECUTION_NOT_IN_RUNNING_STATUS');
   }
 }
+
+/** Default staleness window for reconcileAbandonedExecutions -- 30 minutes with no heartbeat.
+ * No existing heartbeat-cadence convention was found elsewhere in this repo to derive this from;
+ * chosen as a conservative multiple of a plausible minutes-scale heartbeat interval, not measured
+ * against a real production heartbeat frequency. Callers with a known cadence should pass an
+ * explicit staleAfterMs rather than relying on this default. */
+export const GRAPHIFY_COORDINATOR_RECONCILE_DEFAULT_STALE_MS = 30 * 60 * 1000;
+
+/** Explicit reconciliation only -- this function is never called automatically by openExecution,
+ * heartbeat, or completeExecution. It must be invoked deliberately (e.g. by a scheduled sweep) and
+ * NEVER infers COMPLETED for a stale row -- only ABANDONED, matching this gate's own "Dead
+ * coordinator may later be explicitly reconciled to ABANDONED. Never infer COMPLETED" rule.
+ * Transitions every RUNNING execution whose last_heartbeat_at is older than staleAfterMs to
+ * ABANDONED with completed_at = now() and error_code = 'RECONCILED_STALE_HEARTBEAT'. Idempotent:
+ * re-running finds nothing to transition once a row is already terminal. */
+export async function reconcileAbandonedExecutions(
+  client: GraphifyCoordinatorSqlClientV1,
+  staleAfterMs: number = GRAPHIFY_COORDINATOR_RECONCILE_DEFAULT_STALE_MS,
+): Promise<{ abandonedExecutionIds: string[] }> {
+  if (!Number.isFinite(staleAfterMs) || staleAfterMs <= 0) {
+    throw new Error('GRAPHIFY_COORDINATOR_RECONCILE_INVALID_STALE_AFTER_MS');
+  }
+
+  const result = await client.query(
+    `UPDATE public.graphify_executions
+     SET status = 'ABANDONED', completed_at = now(), error_code = 'RECONCILED_STALE_HEARTBEAT'
+     WHERE status = 'RUNNING'
+       AND last_heartbeat_at < now() - make_interval(secs => $1::double precision / 1000)
+     RETURNING execution_id`,
+    [staleAfterMs],
+  );
+
+  return {
+    abandonedExecutionIds: result.rows.map((row) => row.execution_id as string),
+  };
+}
