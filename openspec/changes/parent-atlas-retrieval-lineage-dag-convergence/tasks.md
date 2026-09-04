@@ -4744,11 +4744,16 @@ confirmed, not just claimed).**
       evidence, same standard already applied to `GRAPHIFY-DAILY-CANARY-02`'s closure.
 - [x] Successful execution ends `COMPLETED`. Proven with the strongest possible evidence — a real
       committed production row, independently re-verified via fresh SQL above.
-- [ ] Reused already-proven derivation ends `COMPLETED_REUSED` while still receiving a NEW
-      `execution_id`. **Not exercised by either proof.** The rolled-back spec only tests
-      `COMPLETED` and `FAILED`; the committed canary only tests `COMPLETED`. Schema/module support
-      exists (`completeExecutionInputV1Schema` requires `reusedGraphRevision` exactly when
-      `status === 'COMPLETED_REUSED'`) but is untested end-to-end. Left open.
+- [x] Reused already-proven derivation ends `COMPLETED_REUSED` while still receiving a NEW
+      `execution_id`. **Closed 2026-09-04.** Added 2 new tests to
+      `graphify-daily-coordinator-v1.integration.spec.ts` (7/7 pass total, rolled back, zero
+      persistent footprint — verified `count(*) FROM graphify_executions WHERE trigger_kind LIKE
+      'COORDINATOR_INTEGRATION_TEST%'` returns 0 after the run; the table's one real row remains
+      exactly the pre-existing committed canary, unaffected): (1) a fresh `execution_id` completed
+      with `status: 'COMPLETED_REUSED'` + `reusedGraphRevision` correctly persists both fields on
+      independent readback; (2) `completeExecution` rejects `COMPLETED_REUSED` missing
+      `reusedGraphRevision`, and separately rejects a non-`COMPLETED_REUSED` status that supplies
+      one — both directions of the schema's `superRefine` pairing now proven, not just declared.
 - [x] Failure ends `FAILED`. Proven in the rolled-back integration spec (explicit `FAILED` +
       `errorCode`, then a second `completeExecution` call on the now-terminal row correctly throws
       `GRAPHIFY_COORDINATOR_COMPLETE_EXECUTION_NOT_IN_RUNNING_STATUS`).
@@ -5547,3 +5552,37 @@ of the checkbox's own wording (needs the cohort scaled to 128/768, tracked under
 `128/768-ROW-REPRESENTATION-ALIGNMENT-01` above) and broad `npm run graphify:daily` — explicitly
 NOT run, per the operator's own instruction not to mix an unrelated broad write into a read-only
 semantic parity gate.
+
+## LATENT256-ROW-ALIGNMENT-15-01 evidence pass (2026-09-04)
+
+The existing read-only `scripts/atlas/audit-lineage-latent-cohort-v1.mjs` was run against the
+same bounded semantic canary. It found `candidateCount: 15`, `rowsFound: 15`, and classified all
+rows as `LATENT256_CURRENT_COHORT_CANDIDATE`; `promotionEligible: true` is eligibility for the
+next diagnostic derivation check only, not production promotion. Receipt:
+`docs/reports/lineage-latent256-cohort-v2.json`.
+
+This proves the current 15-row `semantic_768` → `latent_256` row population is present and
+joinable through the existing source/content identity fields. It does **not** yet prove the
+`LatentSourceManifestV1` materialization checksum, `latent_64` completeness, query/document
+encoder parity, or 128/768 scaling. The next gate remains
+`LATENT256_F32_DERIVATION_PARITY`; no writes were performed by this audit.
+
+The existing read-only `scripts/atlas/audit-latent64-derivation-v1.py` was then run with an
+8-row bound against the checked-in autoencoder receipt/checkpoint. All 8 rows had 768-dimensional
+inputs and stored 64-dimensional outputs; the stored marker matched model checksum
+`d6e9395e60f0bb039dd03368012697c5c393d36bb001b8f020b6d7ba22654259`, and the current CUDA
+forward pass matched with `maxAbsoluteError: 5.178153514862061e-7`. Receipt:
+`docs/reports/latent64-derivation-audit-v1.json`. This is bounded diagnostic evidence only: it
+does not close `LatentSourceManifestV1`, prove latent-256 F32 parity, or expand latent-64 coverage.
+
+The same audit was extended to the complete proven 15-row canary. It again returned `MATCH`, with
+15/15 valid 768-dimensional inputs, one uniform model marker, `maxAbsoluteError: 5.178153514862061e-7`,
+and `writesPerformed: false`. The receipt path above was refreshed in place with row checksum
+`sha256:e629e20be52d42321904a83df2145e07a29b8b3d28b2ccb6d1b1db6b1b734d2c`. This closes only the
+bounded 15-row stored-output replay check; full-population coverage and manifest admission remain open.
+
+The manifest contract was independently re-run with
+`npx vitest run packages/parent-atlas/src/core/latent-source-manifest-v1.spec.ts`: 12/12 tests
+passed. This confirms the schema-level distinction between latent origin and materialization,
+including rejection of a co-produced `latent_64` output incorrectly framed as a derived prefix.
+It does not create a live manifest or authorize representation promotion.

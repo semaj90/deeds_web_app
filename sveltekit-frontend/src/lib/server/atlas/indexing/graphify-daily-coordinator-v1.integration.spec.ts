@@ -178,6 +178,66 @@ describeIf('GRAPHIFY-DAILY-COORDINATOR-01: live coordinator flow (rolled back, z
     }
   });
 
+  it('COMPLETED_REUSED: an execution that reused an existing derivation still gets its own fresh execution_id and terminal status', async () => {
+    await acquireCoordinatorLock(client);
+    try {
+      const { executionId } = await openExecution(client, {
+        workspaceId: realWorkspaceId,
+        workspaceRevision: `sha256:${'d'.repeat(64)}`,
+        parserContractVersion: 'graphify.parser.v0.1',
+        extractionContractVersion: 'graphify.extractor.v0.1',
+        triggerKind: 'COORDINATOR_INTEGRATION_TEST_REUSED',
+      });
+
+      await completeExecution(client, executionId, {
+        status: 'COMPLETED_REUSED',
+        reusedGraphRevision: 'graphRevision:already-derived-elsewhere:v1',
+      });
+
+      const readback = await client.query(
+        `SELECT status, completed_at, reused_graph_revision FROM public.graphify_executions WHERE execution_id = $1`,
+        [executionId],
+      );
+      expect(readback.rows[0]?.status).toBe('COMPLETED_REUSED');
+      expect(readback.rows[0]?.completed_at).not.toBeNull();
+      expect(readback.rows[0]?.reused_graph_revision).toBe('graphRevision:already-derived-elsewhere:v1');
+    } finally {
+      await releaseCoordinatorLock(client);
+    }
+  });
+
+  it('rejects COMPLETED_REUSED without a reusedGraphRevision, and rejects a non-COMPLETED_REUSED status that supplies one', async () => {
+    await acquireCoordinatorLock(client);
+    try {
+      const { executionId: missingRevisionId } = await openExecution(client, {
+        workspaceId: realWorkspaceId,
+        workspaceRevision: `sha256:${'e'.repeat(64)}`,
+        parserContractVersion: 'graphify.parser.v0.1',
+        extractionContractVersion: 'graphify.extractor.v0.1',
+        triggerKind: 'COORDINATOR_INTEGRATION_TEST_REUSED_INVALID',
+      });
+      await expect(
+        completeExecution(client, missingRevisionId, { status: 'COMPLETED_REUSED' } as never),
+      ).rejects.toThrow();
+
+      const { executionId: spuriousRevisionId } = await openExecution(client, {
+        workspaceId: realWorkspaceId,
+        workspaceRevision: `sha256:${'f'.repeat(64)}`,
+        parserContractVersion: 'graphify.parser.v0.1',
+        extractionContractVersion: 'graphify.extractor.v0.1',
+        triggerKind: 'COORDINATOR_INTEGRATION_TEST_REUSED_INVALID_2',
+      });
+      await expect(
+        completeExecution(client, spuriousRevisionId, {
+          status: 'COMPLETED',
+          reusedGraphRevision: 'should-not-be-here',
+        } as never),
+      ).rejects.toThrow();
+    } finally {
+      await releaseCoordinatorLock(client);
+    }
+  });
+
   it('uses the exact frozen advisory-lock namespace/key from the coordinator plan receipt', () => {
     expect(GRAPHIFY_COORDINATOR_ADVISORY_LOCK).toEqual({ namespace: 119041, key: 641934821 });
   });
