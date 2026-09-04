@@ -487,18 +487,59 @@ from `parent-atlas-retrieval-lineage-dag-convergence`.
 
 ## Phase D — Semantic extraction (LangExtract/Ornith, source-grounded only)
 
-- [ ] **DOC-11** Ornith OpenAI-compatible provider for LangExtract — `EXISTS, already default`.
-  `langextract_service.py`: `LANGEXTRACT_PROVIDER` defaults to `"openai"`, `base_url` defaults to
-  `http://localhost:8090/v1`. No work needed beyond confirming this path is what DOC-10 actually
-  calls. `langextract_ollama.py` (358 lines, zero callers anywhere in `python/`) is dead/legacy —
-  do not resurrect it, do not delete it (archive-not-delete), out of scope here.
-- [ ] **DOC-10** LangExtract source-grounded extraction wired to this pipeline — `AUDIT_FIRST`.
-  `langextract_service.py`/`atlas_langextract_runtime.py`/`atlas_structural_provenance.py` all
-  exist; confirm which is the current canonical LangExtract entry point for *this* doc pipeline
-  specifically (as opposed to code-extraction use cases) before wiring `DocumentationFactV1`
-  production through it.
+- [x] **DOC-11** Ornith OpenAI-compatible provider for LangExtract — audited, confirmed correct
+  live, one non-blocking finding recorded. `langextract_service.py`'s `DEFAULT_MODEL` fallback
+  string (`"gemma4-legal-iq4xs-direct"`) is stale code -- live-confirmed `GET :8090/v1/models`
+  actually serves `ornith-1.5-9b`. **Confirmed NOT a live bug**: llama-server accepts a mismatched
+  `model` field silently when only one model is loaded (verified live: a request with the stale
+  name got a real completion back, `response.model: "ornith-1.5-9b"`), and the deployed
+  `miniforge-nlp-sidecar` container has `LANGEXTRACT_MODEL_ID=ornith-1.5-9b` /
+  `LANGEXTRACT_MODEL=ornith-1.5-9b` correctly set as environment variables (confirmed via `docker
+  exec`), which `DEFAULT_MODEL`'s `os.getenv(...)` chain reads before ever reaching the stale
+  literal. Real risk is narrower than a live bug: a *fresh* deployment without those env vars set
+  would silently claim the wrong model in `run_extraction()`'s own `metadata.model_id` and
+  `/health`'s `"model"` field -- a provenance-accuracy gap, not a functional one. Not fixed here
+  (out of DOC-11's own "no work needed" scope, and `langextract_service.py` turned out not to be
+  the live extraction path anyway -- see DOC-10 below); flagged for whoever next touches that file.
+  `langextract_ollama.py` (358 lines, zero callers anywhere in `python/`) confirmed still dead/legacy
+  — do not resurrect, do not delete (archive-not-delete), out of scope here.
+- [ ] **DOC-10** LangExtract source-grounded extraction wired to this pipeline — `AUDIT_FIRST`,
+  audit done, real prior-art chain found, wiring attempt reverted mid-flight, not yet re-attempted.
+  **Audit finding, more layered than the task's own framing assumed**: `langextract_service.py` is
+  NOT the live extraction path — it has no running container of its own (confirmed:
+  `docker ps` shows only `miniforge-nlp-sidecar`). The real live chain, confirmed by reading
+  `docker inspect miniforge-nlp-sidecar`'s actual entrypoint (not assumed from a plausible-looking
+  filename) is three files deep: `miniforge_nlp_sidecar.py` (base module, defines
+  `_grounded_extractions()`/`_ensure_grounded_provider_controls()` — the real, mature,
+  well-guarded CONCEPT-extraction machinery, including a critical Ornith/llama.cpp-specific
+  provider patch: forces `chat_template_kwargs.enable_thinking: False` and disables
+  `cache_prompt`, applied by monkeypatching `OpenAILanguageModel._build_chat_completions_params`
+  process-globally) → `miniforge_nlp_sidecar_v2.py` (the module that actually owns `app =
+  FastAPI(...)` and registers the real live routes — `/extract`, `/extract/file`, `/extract/web`,
+  etc. — some delegating to `legacy.*` names from the base module, some (`_native_grounded_extractions`)
+  reimplementing natively while still reusing `legacy._ensure_grounded_provider_controls()`) →
+  `miniforge_nlp_sidecar_oak.py` (the actual container entrypoint per `docker inspect`'s `Cmd`,
+  imports `_v2.py`'s `app` and attaches two more routers on top).
+  **A real mistake made and caught within this same investigation, not left standing**: first
+  attempt added a new `/extract/documentation-facts` route (with a `DocumentationFactV1`
+  Pydantic contract, a `_grounded_documentation_facts()` sibling function reusing the existing
+  provider patch, and a subject/predicate/object-shaped prompt/schema per design.md) to
+  `miniforge_nlp_sidecar.py` — the *base* module — and restarted the container assuming that was
+  the live file. `GET /openapi.json` after restart proved the route was never registered (only the
+  pre-existing `/extract`, `/extract/file`, `/extract/web` present), which is what surfaced the
+  real 3-file chain above. **Confirmed zero impact from this**: the 404 proves the change never
+  routed live traffic; the edit was `git checkout`-reverted cleanly (`172 insertions` removed,
+  clean diff after revert) and the container restarted again to confirm it returned to its
+  original, unmodified, healthy state (`GET /health` → `ornith-1.5-9b`, unchanged).
+  **Not yet done**: the actual correctly-targeted addition (the same `DocumentationFactV1`
+  contract/prompt/schema design, this time added to `miniforge_nlp_sidecar_v2.py`'s real `app`,
+  following the same `legacy._ensure_grounded_provider_controls()` reuse pattern
+  `_native_grounded_extractions` already establishes there) was not attempted a second time in
+  this session, deliberately — a live-service edit deserves full attention, not a rushed retry
+  under context pressure. DOC-12 (`ApiRuleV1`) depends on this and is equally not started.
 - [ ] **DOC-12** `ApiRuleV1` — `NEW`. Extraction target for LangExtract/Ornith on genuinely
-  semantic material only (capability/constraint/deprecation/migration), per design.md.
+  semantic material only (capability/constraint/deprecation/migration), per design.md. Blocked on
+  DOC-10's correctly-targeted live-service wiring (see above) landing first.
 - [ ] **DOC-13** doc↔symbol mutual index — `NEW`. Joins `ApiRuleV1.apiSymbol` /
   `DocumentationFactV1.subject` against this repo's existing AST symbol identity
   (`ast-grep-observation-adapter.ts`'s `stableSymbolId`), not a new symbol-identity scheme.
