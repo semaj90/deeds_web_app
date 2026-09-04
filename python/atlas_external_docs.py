@@ -87,6 +87,20 @@ class ChunkRecord:
     # existing caller/fixture that doesn't pass them is unaffected.
     code_blocks: tuple[Json, ...] = ()
     api_signatures: tuple[str, ...] = ()
+    # DOC-05 byte-safe span alignment (operator direction): start_char/end_char
+    # are character offsets into the normalized text -- NOT safe as the
+    # authoritative evidence span for non-ASCII content, and inconsistent with
+    # this repo's other canonical chunk contract (CanonicalChunkV1 in
+    # parent-atlas-canonical-directory-ingestion-fabric/design.md, which uses
+    # startByte/endByte over exact UTF-8 bytes). start_byte/end_byte are now
+    # the authoritative span (UTF-8 byte offsets into the normalized text,
+    # encoded); start_char/end_char remain as secondary, diagnostic-only
+    # convenience fields -- never the identity/evidence-span authority.
+    # Defaulted to 0 (not required) so the three existing direct ChunkRecord(...)
+    # test fixtures that predate this field are unaffected; chunk_document()
+    # (the real production constructor) always populates real values.
+    start_byte: int = 0
+    end_byte: int = 0
 
     def to_dict(self) -> Json:
         result = asdict(self)
@@ -512,11 +526,29 @@ def chunk_document(
                         boundary += 1
                 if boundary > cursor + maximum_chars // 3:
                     end = boundary
-            chunk_text = body[cursor:end].strip()
+            raw_slice = body[cursor:end]
+            chunk_text = raw_slice.strip()
             if chunk_text:
                 lexical, tuples = nlp(chunk_text) if nlp else (tuple(), tuple())
-                absolute_start = max(0, section_start + cursor)
+                # Bug fix (found live, adversarial fixture reproduced it): the
+                # old `absolute_start = section_start + cursor` pointed at the
+                # PRE-strip cursor, so whenever raw_slice had leading
+                # whitespace (common -- the overlap-window cursor frequently
+                # lands mid-whitespace), start_char pointed one or more
+                # characters before chunk_text's real position, and
+                # normalized[start_char:end_char] != chunk_text. Account for
+                # .strip()'s leading trim explicitly instead of assuming cursor
+                # already points at chunk_text's first real character.
+                leading_trim = len(raw_slice) - len(raw_slice.lstrip())
+                absolute_start = max(0, section_start + cursor + leading_trim)
                 absolute_end = absolute_start + len(chunk_text)
+                # DOC-05 byte-safe span (authoritative): UTF-8 byte offsets of
+                # the same span, derived from prefix byte-lengths -- exact by
+                # construction, since UTF-8 encoding is prefix-consistent
+                # (encoding a string prefix always yields a byte prefix, and
+                # codepoint boundaries always land on byte boundaries).
+                start_byte = len(normalized[:absolute_start].encode("utf-8"))
+                end_byte = start_byte + len(chunk_text.encode("utf-8"))
                 chunk_id = f"doc:{source_id}:{document_checksum[:16]}:{ordinal}"
                 chunk_coordinate = None
                 if doc_coordinate is not None:
@@ -543,6 +575,8 @@ def chunk_document(
                     doc_coordinate=chunk_coordinate,
                     code_blocks=code_blocks,
                     api_signatures=api_signatures,
+                    start_byte=start_byte,
+                    end_byte=end_byte,
                 ))
                 ordinal += 1
             if end >= len(body):

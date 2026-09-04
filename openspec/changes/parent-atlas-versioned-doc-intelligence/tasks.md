@@ -221,6 +221,45 @@ from `parent-atlas-retrieval-lineage-dag-convergence`.
   deduplication, empty-input handling, full `chunk_document()` end-to-end wiring proof across two
   real heading sections, and the fence-awareness regression guard above). Combined regression run
   with all prior Phase A/B test files: 54/54 pass.
+  **Byte-safe span alignment (same day, operator direction)**: this repo already has a canonical
+  chunk-span contract elsewhere — `CanonicalChunkV1` in
+  `parent-atlas-canonical-directory-ingestion-fabric/design.md` — that uses `startByte`/`endByte`
+  over exact UTF-8 bytes, not character indices; confirmed real and live via a direct read of that
+  file (not assumed from the operator's description). `ChunkRecord` gained `start_byte: int = 0` /
+  `end_byte: int = 0` (additive, defaulted, so the three existing direct `ChunkRecord(...)` test
+  constructions are unaffected) as the new authoritative span; `start_char`/`end_char` remain but
+  are now documented as secondary/diagnostic-only, never the identity/evidence-span authority.
+  **Real, pre-existing bug found and fixed while implementing this, not just the new fields
+  added**: the old `absolute_start = section_start + cursor` used the PRE-`.strip()` cursor
+  position, so whenever a char-window's raw slice had leading whitespace — confirmed live this is
+  common, not an edge case: an adversarial-but-realistic irregular-word-length fixture at
+  `maximum_chars=53, overlap_chars=7` hit it on 12 of 50 chunks — `start_char` pointed one or more
+  characters before `chunk_text`'s real position, so `normalized[start_char:end_char] != chunk.text`
+  for those chunks. This existed before this session's DOC-05 work and was never caught because no
+  prior test asserted the char span decoded back to the exact chunk text. Fixed by computing the
+  real leading-whitespace trim (`len(raw_slice) - len(raw_slice.lstrip())`) and offsetting
+  `absolute_start` by it. `start_byte`/`end_byte` are then derived from the (now-correct)
+  `absolute_start`/`absolute_end` via UTF-8 prefix-byte-length (`len(normalized[:absolute_start]
+  .encode("utf-8"))`), which is exact by construction since UTF-8 encoding is prefix-consistent.
+  **Live-proven, not just asserted**: same adversarial ASCII fixture now has 0/50 char mismatches
+  and 0/50 byte mismatches; a non-ASCII fixture (CJK + emoji + accented Latin, genuinely multi-byte
+  UTF-8) has 0 byte mismatches across 26 chunks, and `start_byte`/`start_char` were confirmed to
+  actually diverge (17 vs 14 on one sample chunk) rather than coincidentally staying equal, proving
+  the byte computation is doing real work; `chunk_checksum` was confirmed to equal
+  `sha256(normalized_bytes[start_byte:end_byte].decode("utf-8"))` exactly; every chunk's
+  `to_dict()["canonical_authority"]` is `False` (no promotion from a chunk/plan/hash alone —
+  Postgres admission, DOC-06A below, is the only promotion path); replaying `chunk_document()`
+  twice on identical input produces byte-for-byte identical `(start_byte, end_byte, chunk_id)`
+  tuples (determinism). New test file `python/test_atlas_doc_byte_safe_spans.py`, 8/8 pass.
+  **Schema follow-through**: added `start_byte`/`end_byte` columns to the live
+  `atlas_external_doc_chunks` table via a new additive migration
+  (`sveltekit-frontend/drizzle/manual/20260904b_external_doc_chunks_byte_spans_v1.sql` —
+  `ALTER TABLE ... ADD COLUMN IF NOT EXISTS`, per the Drizzle Safety Rule's "never rewrite an
+  already-applied migration" convention rather than editing DOC-06's original file). Applied live
+  and confirmed idempotent (second run: `NOTICE: column ... already exists, skipping`). Left
+  nullable for now — `NOT NULL` is deferred until DOC-06A's admission writer (below) is the thing
+  actually enforcing every row populates them, not added as a premature constraint ahead of it.
+  Combined regression across all Phase A/B test files after this change: 67/67 pass.
 - [ ] **DOC-03** Firecrawl bounded crawler — `EXISTS` (`fetch_firecrawl_v2`), verify
   bounded-crawl behavior (maxPages/maxDepth/sitemap-follow) matches the manifest's
   `maximum_pages`/`maximum_depth` fields; **blocked** on Firecrawl actually being registered
