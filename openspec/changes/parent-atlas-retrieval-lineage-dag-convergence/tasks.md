@@ -3282,6 +3282,56 @@ Evidence: `docs/reports/mcp-tool-registry-drift-classification-v1.json`, `docs/r
   requires authoritative revisions and therefore does not promote incomplete payloads.
   Regression coverage: `ace-context-manifest.spec.ts`.
 - [ ] Prove BitFrost mutation invalidation and disconnect flush safety.
+
+  **Audit complete (2026-09-04), NOT closing this checkbox — the honest proof result is that
+  invalidation is broken, not that it's safe.** Read-only investigation, zero writes. Found **3
+  independent, non-deduplicated `invalidateRedisCache` implementations**, all targeting a key
+  shape that does not match live Redis reality:
+
+  1. `src/lib/server/dispatcher/redis-cache-invalidate.ts::invalidateRedisCache()` — real callers:
+     `dispatcher-orchestrator.ts`, re-exported from `dispatcher/index.ts`. Deletes
+     `bifrost:packet:{packet_key}`, `bifrost:trace:{packet_key}`, `bifrost:source:{source_ref}`,
+     `bifrost:feature:{feature_id}`.
+  2. `src/lib/server/workers/redis-invalidate-worker.ts` (its OWN separate inline
+     `invalidateRedisCache`, not importing #1) — **dead code**: `startRedisInvalidateWorker()` and
+     `stopRedisInvalidateWorker()` both have ZERO callers anywhere in the repo (grep-verified). The
+     RabbitMQ consumer this defines is never started. Same wrong key shape as #1.
+  3. `src/lib/server/acp/packet-materializer-pipeline.ts` (its OWN THIRD inline
+     `invalidateRedisCache`) — real callers via `materializePacket()`: `ace-materializer.ts`,
+     `atlas/packet-parser.ts`, `hyperrag/hyperrag-packet-pipeline.ts`, `hyperrag/hyperrag-rpc-client.ts`
+     (grep-verified, live production code paths). Deletes `bifrost:packet:{packet_key}`,
+     `bifrost:feature:{feature_id}:packets`, `bifrost:source:{source_ref}`,
+     `bitfrost:summary:{packet_key}` — a different wrong shape than #1/#2, but still wrong (see below).
+
+  **Live Redis reality, checked directly** (`docker exec legal-ai-valkey valkey-cli -a redis
+  --scan`), not assumed from a naming-convention doc:
+  ```
+  bifrost:sem:packet:{packet_key}          <- real cache key shape (has "sem:" segment)
+  bifrost:sem:feature:{feature_id}
+  bitfrost:summary:packet:v1:{packet_key}  <- real cache key shape (has "packet:v1:" segment)
+  ```
+  None of the 3 implementations' delete patterns match either real shape. Confirmed with a direct
+  key-existence check on a real packet: `EXISTS bifrost:packet:packet:0006ca4a45e3` → `0` (what
+  implementation #1/#2 would delete — never existed); `EXISTS bifrost:sem:packet:packet:0006ca4a45e3`
+  → `1` (the real cached key, untouched by any of the 3 implementations). A live `--scan --pattern`
+  sweep across all 4 of implementation #1's exact patterns (`bifrost:packet:*`, `bifrost:trace:*`,
+  `bifrost:source:*`, `bifrost:feature:*`) returned **zero matches repo-wide** — these patterns
+  don't just miss the target key, nothing in the whole namespace matches them at all.
+
+  **Conclusion**: the live, wired invalidation path (implementation #3, reached from real HyperRAG/
+  ACE packet materialization) deletes keys that do not exist, and therefore does not invalidate the
+  real `bifrost:sem:*`/`bitfrost:summary:packet:v1:*` cached data after a Postgres mutation. Stale
+  cached packets/summaries can persist indefinitely past a canonical update — a real violation of
+  this repo's own "Redis invalidation AFTER Postgres, never stale" hard rule, not a hypothetical
+  risk. This also matches the Duplication Prevention rule's exact failure pattern (3 competing
+  owners, one dead, none correct) — recorded here per that rule's "record what you found, even when
+  you don't fix it" clause, deliberately NOT fixed in this pass: picking a winner and rewriting the
+  key shape needs a decision about which of the 3 call sites is the actual canonical mutation path
+  going forward (dispatcher vs. ACP packet materializer), which is a real design question, not a
+  typo fix. "Disconnect flush safety" was also checked for the dead worker path specifically:
+  `stopRedisInvalidateWorker()` does correctly use `redis.quit()` (graceful, not `.disconnect()`),
+  but since it's never called from anywhere, that correctness is moot — the worker's Redis
+  connection is never gracefully closed on process exit because the worker itself never starts.
 - [ ] MCP-OUTCOME-RECEIPT-OWNER-01 — select one durable AgentWorkReceipt owner, remove
   stale/default graph-version fallbacks, and require the workflow RECORD stage to succeed
   only after the receipt is durably acknowledged. Migration remains blocked until the
@@ -5860,6 +5910,20 @@ materialization or production promotion.
 but it is not currently admitted to the semantic corpus bundle used by the wrapper. No cohort was
 manufactured and no apply/materialization was attempted. The next gate is to establish an
 authoritative, revision-qualified canary membership bridge before constructing a live manifest.
+
+**Current source-authority recheck 2026-09-04:** `scripts/atlas/audit-current-source-cohort-lineage-v1.mjs`
+still finds only a historical 52-row cohort: `graphifyMatched=52`, `sourceRevisionQualified=52`,
+but `currentWorkspaceMatched=0` and `revisionQualified=0`. All 52 are
+`workspaceMismatchAfterSourceQualification`; none can authorize the 576-row semantic generation
+or the 15-row latent canary. `LINEAGE-02` and latent manifest promotion remain blocked; no
+fallback to the stale workspace revision is allowed.
+
+**Current packet/chunk join recheck 2026-09-04:** The read-only
+`audit-current-workspace-packet-chunk-join-v1.mjs` audit found 111 workspace bindings but
+`graphify_exact_sources=0`, `binding_chunk_content_matches=0`, and `packet_chunk_exact_sources=0`.
+The current workspace revision is present, but no exact source-to-chunk join exists for it. This
+keeps semantic/latent admission blocked and confirms that the next implementation belongs in fresh
+Graphify source selection/materialization, not in a representation fallback.
 
 **Canary identity comparison 2026-09-04:** The 15 `codebase_chunk_index.id` values from
 `lineage-latent256-cohort-v2.json` have `0/15` intersection with the 52,364 `eligibleIds` in
