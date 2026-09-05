@@ -1,0 +1,36 @@
+{
+  "schema": "atlas.parent-atlas-workstation-plan-only-proof.v1",
+  "status": "PROVEN",
+  "planStatuses": [
+    null,
+    "NO_EXECUTABLE_CANDIDATE",
+    "RUNTIME_UNAVAILABLE",
+    "REFERENCE_ONLY"
+  ],
+  "synthesisDisabled": true,
+  "modelCalls": 0,
+  "observedWrites": [],
+  "writes": {
+    "taskLedgers": 0,
+    "sourceFiles": 0,
+    "postgres": 0,
+    "qdrant": 0,
+    "neo4j": 0,
+    "cache": 0,
+    "valkey": 0,
+    "redis": 0,
+    "modelCalls": 0
+  },
+  "mutationScope": "NONE_UNTIL_EXPLICIT_AUTHORIZATION",
+  "noDatastoreWrites": true,
+  "noSourceWrites": true,
+  "noCacheWrites": true,
+  "noModelCalls": true,
+  "evidence": [
+    "docs/reports/parent-atlas-workstation-openspec-workboard-v2.json",
+    "docs/reports/parent-atlas-workstation-ace-context-v1.json",
+    "docs/reports/parent-atlas-workstation-ornith-synthesis-dry-v1.json",
+    "docs/reports/parent-atlas-workstation-residency-v1.json"
+  ],
+  "proofChecksum": "sha256:a41cf3097223d0805b1cbc7d8ab02f1bb7a1be19d22c97172811124722e0203e"
+}

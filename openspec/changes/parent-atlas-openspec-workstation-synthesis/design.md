@@ -2,6 +2,8 @@
 
 The repository already has a generated OpenSpec workboard, a single portfolio authority, ACE/ContextManifest contracts, BitFrost/Valkey residency, governed DAG execution, validation receipts, and an Ornith llama-server boundary. The missing piece is a small planning adapter that joins these existing owners for one bounded workstation decision.
 
+Portfolio placement: this is an `ACTIVE_DEPENDENCY` implementation owner referenced by the sole `CURRENT_AUTHORITY` change, `parent-atlas-retrieval-lineage-dag-convergence`. The convergence ledger remains the only dependency-ordering and acceptance authority.
+
 The workflow must remain read-only until an explicit mutation authorization is supplied. OpenSpec task ledgers and linked evidence remain canonical; reports, ACE packets, model outputs, and cache entries are derived artifacts.
 
 ## Goals / Non-Goals

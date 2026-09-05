@@ -53,10 +53,18 @@
       closing, i.e. should ACE's graph-intel path also consume `code_features`/
       `feature_structural_facts` via `packet_key`. Get explicit approval before doing any wiring
       work — this is a new capability, not a bugfix.
-- [ ] Register the resolved ownership status of each of the 6 components (validator, assembler,
-      materializer, AST extraction, HyperRAG RPC, CHR97/cartridge) in
-      `docs/architecture/runtime-ownership-registry.json`. All 6 now have a fully-traced verdict;
-      this is now pure bookkeeping, not investigation.
+- [x] **DONE (2026-09-05).** Registered all 6 components in
+      `docs/architecture/runtime-ownership-registry.json`: `ace_packet_validator`,
+      `ace_context_assembler` (carrying the AST-blindness `known_gap` note), `hyperrag_rpc_packet`,
+      `ast_structural_extraction`, `chr97_cartridge_glyph` as top-level `CANONICAL_OWNER` entries,
+      and `packet_materializer` nested as a `BACKEND` under `ace_context_assembler` (its two real
+      callers). One path correction along the way: `ace_context_assembler`'s graph-intel dependency
+      is `sveltekit-frontend/src/lib/server/graph/graph-intel.ts`, not
+      `atlas/graph-intel.ts` as this change's `proposal.md` originally stated — verified the real
+      location before registering. Re-ran `node scripts/atlas/audit-runtime-ownership.mjs` before
+      and after: identical baseline violation set both times (the pre-existing
+      `cutile_kernel_challenger`/`tensorrt_rtx_decoder_challenger` classification conflicts), zero
+      new violations introduced by these 6 entries.
 
 ## Reference
 

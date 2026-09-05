@@ -1,13 +1,13 @@
 {
   "receiptKind": "PASS_FABRIC_CURRENT_MATERIALIZATION_PROVEN",
   "status": "PROVEN",
-  "generatedAt": "2026-08-11T22:33:39.032Z",
+  "generatedAt": "2026-09-05T06:47:18.451Z",
   "boundary": {
     "status": "available",
     "currentBoundaryKind": "view_only",
     "appendOnlyHistoryTable": "analysis_pass_results",
     "currentMaterializationView": "analysis_pass_current",
-    "rawRows": 11079,
+    "rawRows": 11095,
     "currentRows": 6903,
     "canonicalRepresentationId": "semantic_768",
     "canonicalDimension": 768,
@@ -16,9 +16,9 @@
   },
   "current": {
     "status": "available",
-    "rawRows": 11079,
+    "rawRows": 11095,
     "currentRows": 6903,
-    "duplicateCollapse": 4176,
+    "duplicateCollapse": 4192,
     "canonicalRepresentationId": "semantic_768",
     "canonicalDimension": 768,
     "sampleCurrentRows": [

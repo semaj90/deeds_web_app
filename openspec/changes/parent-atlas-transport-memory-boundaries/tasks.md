@@ -263,3 +263,40 @@ Structural results must resolve to `CandidateOrdinal` before fusion.
 - ColBERT/late interaction, TurboVec, AVX2, simdjson, PyTorch/logistic
   classification, Arrow/mmap, ACP/A2A, and Mastra remain downstream or optional
   lanes and must not block structural query-plan acceptance.
+
+## Re-verification pass (2026-09-05, read-only) — orphaned "temporal" sub-thread found
+
+The "Classification backlog"/"Current lane state"/"Structural CST/AST retrieval lane" sections
+above are self-consistent and show no drift from re-checking a sample of their claims. **A separate
+finding, not previously flagged anywhere in this file**: this change's own directory contains 11
+`temporal-*.md` companion documents (`temporal-action-ledger.md`,
+`temporal-action-alternative-execution-addendum.md`, `temporal-action-recommendation-addendum.md`,
+`temporal-dag-persistence-negative-control.md`, `temporal-dag-proof-harness.md`,
+`temporal-live-postgres-alternative-loop-proof.md`, `temporal-post-dispatch-proof-addendum.md`,
+`temporal-post-dispatch-recorder-addendum.md`, `temporal-recommendation-history-addendum.md`,
+`temporal-recommendation-outcome-addendum.md`) covering a "Temporal Action Ledger / DRY Agent
+Runtime" workstream — durable procedural execution history, LangGraph DAG proof harness,
+alternative-action-selection and recommendation-outcome receipts. **None of these 11 files are
+referenced anywhere in this `tasks.md` or in `proposal.md`** (`rg "temporal"` against both returns
+only one unrelated hit — `MEM-05`'s passing mention of "temporal semantic relationships", a
+different concept). This is thematically adjacent to but distinct from this change's actual scope
+(transport/memory/structural boundaries) and appears to be orphaned rather than intentionally
+scoped here — flagged per this repo's "record what you found, even when you don't fix it" rule
+(CLAUDE.md's Duplication Prevention §6), not resolved.
+
+**Self-reported status ladder across the 11 files** (by file mtime, oldest first — all dated
+2026-08-21 except the last, 2026-08-31):
+`temporal-action-ledger.md` / `-action-alternative-execution-addendum.md` /
+`-action-recommendation-addendum.md` / `-post-dispatch-recorder-addendum.md` /
+`-recommendation-history-addendum.md` → `IMPLEMENTED_UNPROVEN`;
+`-dag-persistence-negative-control.md` / `-dag-proof-harness.md` /
+`-live-postgres-alternative-loop-proof.md` → `WRITTEN_UNPROVEN`;
+`-post-dispatch-proof-addendum.md` → `PARTIAL_PROVEN` (11/11 gates, 2 real bugs found+fixed along
+the way); **most current**, `-recommendation-outcome-addendum.md` (mtime 2026-08-31, 10 days after
+the others) → `PARTIAL_PROVEN` (12/12 gates verified live, with 2 disclosed remaining caveats:
+`DAG-02`'s "selected edge reaches terminal failure" clause, and a shared "K1-seeded not forced live"
+caveat). Not independently re-verified against live code/DB in this pass — only the files' own
+self-reported status headers were read; a future session picking this up should decide whether to
+(a) cross-link these into this file's own task list, (b) split them into their own OpenSpec change
+given they're a distinct workstream, or (c) confirm they're already superseded/subsumed elsewhere
+before doing either.

@@ -1,0 +1,27 @@
+{
+  "schema": "atlas.parent-atlas-workstation-residency-proof.v1",
+  "status": "PROVEN",
+  "descriptorStatus": "REFERENCE_ONLY",
+  "deterministicReplay": true,
+  "exactHit": "EXACT_HIT",
+  "staleIdentityChanged": true,
+  "staleDecision": "STALE_REJECT",
+  "completeIdentityCompared": true,
+  "noLatestFallback": true,
+  "canonicalAuthority": false,
+  "writes": {
+    "valkey": 0,
+    "redis": 0,
+    "postgres": 0,
+    "qdrant": 0,
+    "neo4j": 0,
+    "sourceFiles": 0,
+    "modelCalls": 0
+  },
+  "evidence": [
+    "scripts/atlas/build-parent-atlas-workstation-residency-v1.mjs",
+    "docs/reports/parent-atlas-workstation-ace-context-v1.json",
+    "docs/reports/parent-atlas-workstation-ornith-synthesis-dry-v1.json"
+  ],
+  "proofChecksum": "sha256:67201478bc83b40516f2afd70f0261acf25a0e0cb9dd4e6555a6f7c468d137c3"
+}

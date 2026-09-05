@@ -1,6 +1,6 @@
 {
   "schema": "atlas.workspace-source-namespace.v1",
-  "generatedAt": "2026-09-05T06:01:52.138Z",
+  "generatedAt": "2026-09-05T06:42:53.568Z",
   "readOnly": true,
   "writes": {
     "postgres": false,

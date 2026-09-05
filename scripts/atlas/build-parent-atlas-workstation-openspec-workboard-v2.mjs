@@ -93,6 +93,13 @@ function evidenceFor(classification, changeId, text) {
   return [...new Set(refs)];
 }
 
+function resolveEvidence(refs) {
+  return refs.map((ref) => ({
+    ref,
+    exists: fs.existsSync(path.join(ROOT, ref)),
+  }));
+}
+
 const tasks = [];
 for (const entry of fs.readdirSync(path.join(ROOT, 'openspec', 'changes'), { withFileTypes: true })) {
   if (!entry.isDirectory() || entry.name === 'archive') continue;
@@ -106,6 +113,9 @@ for (const entry of fs.readdirSync(path.join(ROOT, 'openspec', 'changes'), { wit
     const classification = classify(changeId, block.text);
     const step = stepFor(block.text);
     const owner = changeId === convergence ? 'parent-atlas-retrieval-lineage-dag-convergence' : changeId;
+    const evidenceRefs = evidenceFor(classification, changeId, block.text);
+    const evidenceResolution = resolveEvidence(evidenceRefs);
+    const missingEvidenceRefs = evidenceResolution.filter((item) => !item.exists).map((item) => item.ref);
     const blocker = classification === 'BLOCKED_UPSTREAM'
       ? 'Current post-coordinator lineage is not coherent: source cohort 0/52 matches current workspace; packet/chunk join 0/111 exact.'
       : classification === 'OWNED_BY_OTHER_CHANGE'
@@ -136,10 +146,14 @@ for (const entry of fs.readdirSync(path.join(ROOT, 'openspec', 'changes'), { wit
       classification,
       currentOwner: owner,
       dependencyOrBlocker: blocker,
-      evidenceRefs: evidenceFor(classification, changeId, block.text),
+      evidenceRefs,
+      evidenceResolution,
+      missingEvidenceRefs,
       validationCommand: validation,
       safeNextAction: safeNext,
       mutationScope: classification === 'NEGATIVE_CONSTRAINT' ? 'NONE' : 'UNAUTHORIZED_UNTIL_EXPLICIT_GATE',
+      executable: false,
+      eligibilityBasis: 'EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY',
       priority: step === 'STEP-01' ? 10 : step === 'STEP-02' ? 20 : step === 'STEP-03' ? 30 : step === 'STEP-04' ? 40 : step === 'STEP-05' ? 50 : step === 'STEP-06' ? 60 : 80,
       step,
     });
@@ -148,6 +162,29 @@ for (const entry of fs.readdirSync(path.join(ROOT, 'openspec', 'changes'), { wit
 
 tasks.sort((a, b) => a.priority - b.priority || a.openspecChange.localeCompare(b.openspecChange) || a.sourceLine - b.sourceLine);
 const taskPopulationChecksum = sha256(JSON.stringify(tasks));
+const candidateLimit = 5;
+const eligibleCandidates = tasks
+  .filter((task) => task.executable === true && task.classification === 'OPEN_ACTIONABLE')
+  .sort((a, b) => a.priority - b.priority || a.openspecChange.localeCompare(b.openspecChange) || a.sourceLine - b.sourceLine);
+const selectedCandidates = eligibleCandidates.slice(0, candidateLimit);
+const workPlanBody = {
+  schema: 'atlas.openspec-work-plan.v1',
+  status: selectedCandidates.length > 0 ? 'BOUNDED_ACTION_AVAILABLE' : 'NO_EXECUTABLE_CANDIDATE',
+  taskRefs: selectedCandidates.map((task) => task.taskRef),
+  nextAction: selectedCandidates[0] ?? null,
+  blockers: selectedCandidates.length > 0 ? [] : [
+    'No task is explicitly OPEN_ACTIONABLE and executable.',
+    'Current source cohort has 0/52 current-workspace matches.',
+    'Current packet/chunk join has 0/111 exact matches.',
+  ],
+  evidenceRefs: ['docs/reports/current-source-cohort-lineage-v1.json', 'docs/reports/current-workspace-packet-chunk-join-v1.json'],
+  mutationScope: 'NONE_UNTIL_EXPLICIT_AUTHORIZATION',
+  validationCommands: ['npx openspec validate parent-atlas-openspec-workstation-synthesis --type change --strict --json'],
+};
+const workPlan = {
+  ...workPlanBody,
+  planChecksum: sha256(JSON.stringify(workPlanBody)),
+};
 
 const summary = Object.fromEntries(
   ['OPEN_ACTIONABLE', 'BLOCKED_UPSTREAM', 'CLOSED_BY_CURRENT_EVIDENCE', 'SUPERSEDED', 'OWNED_BY_OTHER_CHANGE', 'GOVERNANCE_ONLY', 'NEGATIVE_CONSTRAINT', 'HUMAN_DECISION_REQUIRED', 'UNVERIFIED']
@@ -177,8 +214,24 @@ const report = {
     packetJoinCounts: packetJoin.counts,
     conclusion: 'No current-workspace-qualified source/chunk cohort is executable; PKT-LINEAGE-08 remains blocked.',
   },
-  summary: { selectedTaskCount: tasks.length, ...summary },
+  summary: {
+    selectedTaskCount: tasks.length,
+    ...summary,
+    evidenceRefs: tasks.reduce((count, task) => count + task.evidenceRefs.length, 0),
+    missingEvidenceRefs: tasks.reduce((count, task) => count + task.missingEvidenceRefs.length, 0),
+  },
   taskPopulationChecksum,
+  planning: {
+    candidateLimit,
+    eligibleCandidateCount: eligibleCandidates.length,
+    selectedCandidateCount: selectedCandidates.length,
+    selectedTaskRefs: selectedCandidates.map((task) => task.taskRef),
+    status: selectedCandidates.length > 0 ? 'BOUNDED_CANDIDATES_AVAILABLE' : 'NO_EXECUTABLE_CANDIDATE',
+    selectionPolicy: 'EXPLICIT_OPEN_ACTIONABLE_PLUS_EXECUTABLE; PRIORITY_THEN_CHANGE_THEN_SOURCE_LINE',
+    modelCalls: 0,
+    writes: 0,
+  },
+  workPlan,
   tasks,
   writes: { taskLedgers: 0, sourceFiles: 0, databases: 0, qdrant: 0, neo4j: 0, cache: 0, modelCalls: 0 },
   notes: [
@@ -186,6 +239,7 @@ const report = {
     'The historical July workstation board was not overwritten.',
     'STEP-07 is ownership classification, not an execution queue.',
     'GPU/challenger work remains downstream of identity, provenance, and candidate prerequisites.',
+    'No task is executable from this reconciliation projection; planning and mutation are separate gates.',
   ],
 };
 
@@ -201,6 +255,8 @@ const markdown = [
   `- **${sourceCohort.status}** — source cohort ${sourceCohort.counts.cohortRows ?? 'unknown'} rows; current-workspace matches ${sourceCohort.counts.currentWorkspaceMatched ?? 'unknown'}; revision-qualified ${sourceCohort.counts.revisionQualified ?? 'unknown'}.`,
   `- **${packetJoin.status}** — packet/chunk binding rows ${packetJoin.counts.binding_rows ?? 'unknown'}; exact current joins ${packetJoin.counts.packet_chunk_exact_sources ?? 'unknown'}.`,
   '- Result: `PKT-LINEAGE-08` remains blocked; no cohort apply or broad Graphify run is authorized.',
+  `- Planning: **${report.planning.status}**; eligible ${report.planning.eligibleCandidateCount}; selected ${report.planning.selectedCandidateCount}/${report.planning.candidateLimit}; model calls ${report.planning.modelCalls}; writes ${report.planning.writes}.`,
+  `- Work plan: **${report.workPlan.status}**; checksum ${report.workPlan.planChecksum}; next action ${report.workPlan.nextAction ? report.workPlan.nextAction.taskRef : 'none'}.`,
   '',
   '## Classification summary',
   '',

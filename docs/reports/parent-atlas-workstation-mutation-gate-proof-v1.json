@@ -1,0 +1,28 @@
+{
+  "schema": "atlas.parent-atlas-workstation-mutation-gate-proof.v1",
+  "status": "PROVEN",
+  "noAuthorization": {
+    "status": "REJECTED_NO_AUTHORIZATION",
+    "reason": "explicit authorization is required"
+  },
+  "stalePlan": {
+    "status": "STALE_PLAN_REJECT",
+    "reason": "plan checksum does not match validation receipt"
+  },
+  "validationReceiptStatus": "PROVEN",
+  "mutationPerformed": false,
+  "writes": {
+    "taskLedgers": 0,
+    "sourceFiles": 0,
+    "postgres": 0,
+    "qdrant": 0,
+    "neo4j": 0,
+    "cache": 0,
+    "modelCalls": 0
+  },
+  "evidence": [
+    "docs/reports/parent-atlas-workstation-synthesis-report-v1.json",
+    "docs/reports/parent-atlas-workstation-plan-only-proof-v1.json"
+  ],
+  "proofChecksum": "sha256:cd4a163a906a4740080b63cf856788fe4cd7f9e2ae4821052b6ef59324d11312"
+}

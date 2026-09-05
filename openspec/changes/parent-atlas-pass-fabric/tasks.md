@@ -569,6 +569,51 @@ rushed. Do not attempt these without re-reading PF4C's requirements above
 first — they depend on git-history/caller investigation that wasn't done
 this session.
 
+**Re-verification pass (2026-09-05, read-only — reconciles this line against the "STEPS 2-3
+APPLIED" section above, both same-day 2026-08-11 entries)**: this line's "PF4C-PF4H remain undone"
+appears to predate the "STEPS 2-3 APPLIED" section earlier in this file (same date, different point
+in the session) — live code confirms PF4C's core mechanism (the `passIdentityHash` field +
+`resolveExecutionSemantics()` gate inside `recordAnalysisPassResult()`) IS implemented and live, not
+undone. Re-checked each sub-item individually against current code/DB, not just the file's own
+prose:
+
+- **PF4B (materialization view) — confirmed live.** Ran
+  `npm run atlas:pass-fabric:report` (`scripts/atlas/report-pass-fabric-proof.mts`) fresh:
+  `currentBoundaryKind: "view_only"`, `rawRows: 11095` (11,076 → 11,095, +19 rows since this file
+  was last dated — expected drift), `currentRows: 6903` (still matches this section's claim
+  exactly), `uniqueConstraintPresent: false`.
+- **PF4C (identity/execution hash split) — core mechanism confirmed live**, contradicting this
+  line's own "undone" claim for at least the split itself: `analysis-pass-results.ts` still has
+  `passIdentityHash`, `resolveExecutionSemantics()`, and `KNOWN_PASS_EXECUTION_SEMANTICS`; the
+  `deterministic_idempotent` short-circuit-on-reuse path is still wired into
+  `recordAnalysisPassResult()`. Genuinely still open per this line: full `pass_key`
+  git-history/original-intent investigation, and the eligibility-query migration off `pass_key`
+  onto `passIdentityHash` for anything beyond the reuse check itself.
+- **PF4D (backfill legacy revisions) — confirmed still not done, and found to be a much smaller
+  problem in practice than "wire the writer" suggests.** New diagnostic script
+  `scripts/atlas/audit-pass-fabric-revision-population-v1.mts` (`npx tsx
+  scripts/atlas/audit-pass-fabric-revision-population-v1.mts` from `sveltekit-frontend/`) queries
+  the aggregate (not sampled)
+  population rate: of 11,095 total rows, only **16** have `pass_identity_hash` populated and only
+  **19** have `source_revision`/`pass_revision` populated — as of the newest row in the table
+  (2026-08-25, two weeks after the 2026-08-11 fix). The writer's *capability* to populate these
+  fields is real and live (confirmed above), but essentially none of the real worker traffic since
+  the fix has actually exercised it — `worker.ts`'s default ledger-input path falls back to
+  `sourceRevision: ... ?? null` when `passResult`/`jobResult` don't carry a source revision, which
+  is evidently the common case; only the `codeLedgerInput` branch (line ~469-470, gated on a
+  `codeEvidenceReceipt` being present) reliably threads a real `sourceRevision` through. PF4F should
+  be read as "the writer *can* populate both fields when the caller provides them, not that it does
+  so in practice yet" — a narrower, more precise finding than either "zero code paths write" (the
+  pre-2026-08-11 framing) or "wired" (which could be misread as "populated across the board").
+- **PF4E (mark unrecoverable rows `legacy-unresolved`) — confirmed still not done.** `rg
+  "legacy-unresolved|legacy_unresolved"` across `src/` returns zero matches.
+- **PF4G (duplicate-delivery idempotency on new writes) — not independently re-proven this pass**
+  (would need a live double-submit test against a `deterministic_idempotent` pass; out of scope for
+  a read-only verification).
+- **PF4H (DB uniqueness only at the materialization boundary) — confirmed still not done**, per the
+  same `uniqueConstraintPresent: false` result above; `analysis_pass_current` remains a plain view,
+  not a uniqueness-enforcing materialization.
+
 ---
 
 ## ADDENDUM (2026-08-11): Gate 0 + Contract Additions from Review

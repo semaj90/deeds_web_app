@@ -1,0 +1,484 @@
+{
+  "schema": "atlas.parent-atlas-workstation-evidence-resolution.v1",
+  "status": "PROVEN",
+  "sourceReport": "docs/reports/parent-atlas-workstation-openspec-workboard-v2.json",
+  "taskCount": 54,
+  "evidenceRefCount": 116,
+  "resolvedCount": 116,
+  "missingCount": 0,
+  "refs": [
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    }
+  ],
+  "writes": {
+    "taskLedgers": 0,
+    "sourceFiles": 0,
+    "databases": 0,
+    "qdrant": 0,
+    "neo4j": 0,
+    "cache": 0,
+    "modelCalls": 0
+  }
+}

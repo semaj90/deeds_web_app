@@ -48,6 +48,34 @@ not confirmed clean.
 - [ ] `multi-lane-retrieval.ts`
 - [ ] Query-synthesis / prompt-build stage feeding Ornith
 
+## Re-verification pass (2026-09-05, read-only)
+
+Re-read `sveltekit-frontend/src/lib/server/ace/context-assembler.ts` fresh (confirmed this is a
+genuinely standalone `ACEContextAssembler` class, distinct from the unrelated 7,936-line
+`src/lib/server/features/ai/ace/context-assembler.ts` facade+implementation pair documented
+elsewhere in this repo — different file, same directory-adjacent name, do not conflate).
+
+- **T1 both fixes still live**: `assemble()` still takes optional `workspaceRevision`/
+  `sourceRevision` params and folds them into the cache key (lines 88-89, 135-142);
+  `getACEContextAssembler()`'s `.duplicate()`'d connection still carries the fix context (see T2
+  below — the duplicate-connection *pattern* itself was never the T1 fix, only the missing
+  revision-binding and missing TTL were).
+- **T2 item 1 (dedicated `.duplicate()` connection) — still open**, confirmed at line 69.
+- **T2 item 2 (`total_tokens`/`compression_ratio` measuring the wrong thing) — still open**,
+  confirmed at line 101: `totalTokens` is still `packet_key.length/4 + source_ref.length/4`
+  summed, not derived from any real content/summary field.
+- **T2 item 3 (`candidates.slice(0, 50)` with no visible sort) — now positively confirmed as a
+  real, reachable bug, not just "unconfirmed."** Traced the one existing caller
+  (`phase110-end-to-end-retrieval-flow.ts:270-279`): it passes `extracted_facts.map(...)` straight
+  into `assemble()`, and `extracted_facts` itself (line 213) is only
+  `g13_result.results.filter(r => r.validation_proof === 'PASS')` — no `.sort()` call anywhere in
+  the file. If a G13 extraction pass ever returns more than 50 passing facts, `slice(0, 50)` drops
+  whichever ones happen to land after index 50 in G13's own result order, not the lowest-confidence
+  ones. Not fixed here (out of this change's stated scope of re-verification), but no longer
+  speculative.
+- **T3 remains unexamined** — no evidence any of the 4 listed areas were looked at since this
+  change was created.
+
 ## Run receipt
 
 See `parent-atlas-agentic-run-receipt-binding/tasks.md` T3 — this change is the first real

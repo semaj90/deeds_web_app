@@ -482,4 +482,16 @@ need follow-up, either as a small task on this change or as their own change:
 5. `sourceRef`/`sourceRevision`/`evidenceRefs` propagation (`DOMAIN-CLASSIFICATION-PROVENANCE-01`)
    — **not started**; still blocked behind a real retrain per item 3.
 6. One learned ontology-admission canary — **not started**.
+
+## Re-verification pass (2026-09-05, read-only)
+
+- Confirmed the promoted (non-dry-run) retrain still has not happened: no `training-receipt-*.json`
+  file exists anywhere in the repo, and `models/domain-classifier/checkpoint.joblib`'s mtime
+  (2026-09-03 10:03, unchanged) predates any retrain attempt from this file's later entries —
+  item 3 of "Priority now" is still accurately `not done`.
+- Confirmed item 3's `ace/features/domain-classifier.ts` parity test is still not written (no
+  matching spec file found under `src/lib/server/ace/`).
+- No further re-verification attempted on the training-runtime-parity or 403-attribution findings
+  (items 1-2) — both are narrative/forensic conclusions already reached through live proofs earlier
+  in this file, not simple file-existence checks.
 7. Return to `PKT-LINEAGE-08` — **not started**, out of this change's scope regardless.

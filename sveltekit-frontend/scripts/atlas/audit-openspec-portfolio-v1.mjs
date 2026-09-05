@@ -85,6 +85,13 @@ const CLASSIFICATION = {
     supersededBy: null,
     note: 'Owns dependency ordering and acceptance gates only. Does not absorb implementation-owner code.',
   },
+  'parent-atlas-openspec-workstation-synthesis': {
+    queueClass: 'ACTIVE_DEPENDENCY',
+    currentGateRefs: ['CONV-0', 'CONV-1', 'CONV-2', 'CONV-3', 'CONV-4', 'CONV-5', 'CONV-6'],
+    mayGenerateNewWork: true,
+    supersededBy: null,
+    note: 'Governed workstation projection/adapter under the sole convergence authority; it may select and explain one bounded gate but cannot reorder, close, or replace convergence ownership.',
+  },
 
   // Active implementation owners -- OaK / governed execution
   'parent-atlas-ontology-kernel': {

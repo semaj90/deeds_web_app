@@ -234,4 +234,18 @@ writes are authorized by this change.
   identity. Historical rows remain unchanged.
 - [ ] Produce a non-empty approved bridge manifest.
 - [ ] Rerun the exporter and obtain a lineage-valid, revision-qualified dataset.
+
+## Re-verification pass (2026-09-05, read-only)
+
+- Ran the file's own validation command fresh:
+  `npx vitest run src/lib/server/atlas/neural-routing/query-routing-v2.spec.ts` — 6/6 pass.
+- **NLP-3's two open items (fixture embeddings + 128-d norm/digest determinism) confirmed
+  genuinely still open, not silently done elsewhere**: `EmbeddingGemmaExecutorReceiptV1Schema`
+  (`src/lib/server/atlas/embedding/embeddinggemma-executor-receipt-v1.ts`) is a real, well-formed
+  Zod contract already covering `classification_mrl_128` as a valid `projectedRepresentations`
+  value — but it is only a schema. `rg` for its literal schema tag
+  (`atlas.embeddinggemma-executor-receipt.v1`) across `docs/reports/` finds zero populated
+  instances — no fixture receipt has actually been produced yet.
+- No drift found elsewhere in NLP-0 through NLP-9 on a spot-check of the checked/unchecked split
+  against live code presence.
 - [ ] Compare XGBoost and PyTorch on the exact same frozen split and tensor.

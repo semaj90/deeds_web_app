@@ -1,0 +1,75 @@
+{
+  "schema": "atlas.parent-atlas-workstation-synthesis-report.v1",
+  "status": "BLOCKED_UPSTREAM_NO_EXECUTABLE_CANDIDATE",
+  "selectedAction": null,
+  "blockedActions": [
+    "PKT-LINEAGE-08",
+    "current-workspace-source-cohort",
+    "current-packet-chunk-join",
+    "source-selection-authority"
+  ],
+  "taskPopulationChecksum": "sha256:cf9fdd8c8208d977ae704de33f672f9b15a049412403a21872cd0241e0d6a243",
+  "planChecksum": "sha256:6a437ac81d774f5e7cf093940fdd62018dc03cd765d0996fdf16919426761598",
+  "contextChecksum": "sha256:cc93a4aa501ae9e2a13422a7f73c108214105e5df69e8db1333ffa867c3fcbb6",
+  "residencyIdentityChecksum": "sha256:f7b20c9b0d4ecc27bf7135ec459388f41596dbc101dc7ef1accc2f868283bfd1",
+  "synthesisStatus": "RUNTIME_UNAVAILABLE",
+  "loadedModel": null,
+  "evidenceRefs": [
+    "docs/reports/current-source-cohort-lineage-v1.json",
+    "docs/reports/current-workspace-packet-chunk-join-v1.json"
+  ],
+  "nextGate": "SOURCE-SELECTION-AUTHORITY-01",
+  "upstreamAuthority": {
+    "graphifySourceRevisionStatus": "SOURCE_AUTHORITY_UNAVAILABLE",
+    "graphifySourceRevisionRows": 0,
+    "workspaceNamespaceStatus": "WORKSPACE_SOURCE_NAMESPACE_PROVEN",
+    "sourceRegistryStatus": "REGISTRY_CONTRACT_AUDITED",
+    "selectedSourceCount": 0,
+    "projectionCohortStatus": "CURRENT_SOURCE_COHORT_READY_FOR_PROJECTION_REVIEW",
+    "projectionEligibleCurrentSources": 52,
+    "projectionCohortChecksum": "fd88703ca428261206575d95204c31795f956645dd46dc4607a2b3048d464151",
+    "authorityAlignmentStatus": "BLOCKED_AUTHORITY_ALIGNMENT",
+    "authorityAlignmentDecision": "DO_NOT_APPLY",
+    "lifecycleOwnerStatus": "LIFECYCLE_OWNER_UNPROVEN",
+    "runBindingStatus": "COMPLETED_BOUND_OWNER_PRESENT",
+    "runBindingCounts": {
+      "COMPLETED_UNBOUND": 5,
+      "COMPLETED_BOUND": 1,
+      "RUNNING_UNBOUND": 3,
+      "RUNNING_BOUND_NOT_TERMINAL": 2
+    },
+    "lifecycleEntrypointStatus": "READY_FOR_INJECTED_WIRING",
+    "lifecycleEntrypointWorkspaceRevision": "sha256:c12f11e18de137c63d0fceebeabaa3f23e0c1aad6e37d1fda0a9540b52fe77a6",
+    "lifecycleEntrypointBindingCount": 23684,
+    "lifecycleEntrypointWrites": false,
+    "requiredAction": "REPAIR_SOURCE_SELECTION_AUTHORITY_BEFORE_PROMOTION"
+  },
+  "mutationScope": "NONE_UNTIL_EXPLICIT_AUTHORIZATION",
+  "writes": {
+    "taskLedgers": 0,
+    "sourceFiles": 0,
+    "postgres": 0,
+    "qdrant": 0,
+    "neo4j": 0,
+    "cache": 0,
+    "valkey": 0,
+    "redis": 0,
+    "modelCalls": 0
+  },
+  "provenance": {
+    "workboard": "docs/reports/parent-atlas-workstation-openspec-workboard-v2.json",
+    "aceContext": "docs/reports/parent-atlas-workstation-ace-context-v1.json",
+    "synthesis": "docs/reports/parent-atlas-workstation-ornith-synthesis-dry-v1.json",
+    "residency": "docs/reports/parent-atlas-workstation-residency-v1.json",
+    "planOnly": "docs/reports/parent-atlas-workstation-plan-only-proof-v1.json",
+    "sourceAuthority": "docs/reports/current-graphify-source-revision-v1.json",
+    "sourceNamespace": "docs/reports/workspace-source-namespace-v1.json",
+    "sourceRegistry": "docs/reports/current-source-registry-contract-v1.json",
+    "sourceProjection": "docs/reports/current-source-projection-cohort-v1.json",
+    "sourceAlignment": "docs/reports/source-selection-authority-alignment-v1.json",
+    "lifecycleOwner": "docs/reports/graphify-lifecycle-owner-v1.json",
+    "runBinding": "docs/reports/graphify-run-file-binding-v1.json",
+    "lifecycleEntrypoint": "docs/reports/graphify-lifecycle-entrypoint-v1.json"
+  },
+  "reportChecksum": "sha256:c213309821ce649f39587d5de1506b7174b7147229af7383cc36832beb8147d7"
+}

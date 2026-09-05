@@ -1,6 +1,6 @@
 {
   "schema": "openspec-portfolio-v1",
-  "generatedAt": "2026-09-05T06:18:37.738Z",
+  "generatedAt": "2026-09-05T06:41:36.282Z",
   "secondaryRootFinding": {
     "path": "sveltekit-frontend/openspec/changes",
     "changeIds": [
@@ -47,14 +47,14 @@
   "summary": {
     "totalChanges": 79,
     "totalTasksCounted": 4878,
-    "totalTasksCompleted": 2754,
+    "totalTasksCompleted": 2779,
     "byQueueClass": {
       "CURRENT_AUTHORITY": 1,
-      "ACTIVE_DEPENDENCY": 15,
+      "ACTIVE_DEPENDENCY": 16,
       "FROZEN_REFERENCE": 6,
       "PARKED_CHALLENGER": 8,
       "BLOCKED_EXTERNAL": 0,
-      "UNCLASSIFIED": 49
+      "UNCLASSIFIED": 48
     },
     "unclassifiedChangeIds": [
       "ace-hyperrag-chr97-graphify-audit",
@@ -93,7 +93,6 @@
       "parent-atlas-observation-routing-fabric",
       "parent-atlas-okf-knowledge-layers",
       "parent-atlas-opencode-replay-proof",
-      "parent-atlas-openspec-workstation-synthesis",
       "parent-atlas-pass-fabric",
       "parent-atlas-policy-routing-integration",
       "parent-atlas-query-routing-classifier",
@@ -915,16 +914,24 @@
     {
       "changeId": "parent-atlas-openspec-workstation-synthesis",
       "hasTasksFile": true,
-      "completed": 0,
+      "completed": 25,
       "total": 25,
-      "percent": 0,
-      "queueClass": "UNCLASSIFIED",
-      "currentGateRefs": [],
-      "mayGenerateNewWork": null,
+      "percent": 100,
+      "queueClass": "ACTIVE_DEPENDENCY",
+      "currentGateRefs": [
+        "CONV-0",
+        "CONV-1",
+        "CONV-2",
+        "CONV-3",
+        "CONV-4",
+        "CONV-5",
+        "CONV-6"
+      ],
+      "mayGenerateNewWork": true,
       "supersededBy": null,
       "declaredBlockedBy": [],
       "declaredSupersededBy": [],
-      "note": null
+      "note": "Governed workstation projection/adapter under the sole convergence authority; it may select and explain one bounded gate but cannot reorder, close, or replace convergence ownership."
     },
     {
       "changeId": "parent-atlas-pass-fabric",

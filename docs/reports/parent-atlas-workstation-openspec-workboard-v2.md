@@ -1,6 +1,6 @@
 # Parent Atlas Workstation OpenSpec Workboard v2
 
-Generated: 2026-09-05T06:25:14.866Z | selected unchecked tasks: 54
+Generated: 2026-09-05T07:15:10.311Z | selected unchecked tasks: 54
 
 > Derived reconciliation projection. OpenSpec task ledgers remain authoritative; this board does not execute or close tasks.
 
@@ -9,6 +9,8 @@ Generated: 2026-09-05T06:25:14.866Z | selected unchecked tasks: 54
 - **SOURCE_LINEAGE_COHORT_FOUND_WORKSPACE_MISMATCH** — source cohort 52 rows; current-workspace matches 0; revision-qualified 0.
 - **CURRENT_PACKET_CHUNK_JOIN_MISSING** — packet/chunk binding rows 111; exact current joins 0.
 - Result: `PKT-LINEAGE-08` remains blocked; no cohort apply or broad Graphify run is authorized.
+- Planning: **NO_EXECUTABLE_CANDIDATE**; eligible 0; selected 0/5; model calls 0; writes 0.
+- Work plan: **NO_EXECUTABLE_CANDIDATE**; checksum sha256:6a437ac81d774f5e7cf093940fdd62018dc03cd765d0996fdf16919426761598; next action none.
 
 ## Classification summary
 

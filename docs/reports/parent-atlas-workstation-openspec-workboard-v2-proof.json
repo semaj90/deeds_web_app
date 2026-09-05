@@ -1,0 +1,27 @@
+{
+  "schema": "atlas.parent-atlas-workstation-openspec-workboard-proof.v1",
+  "status": "PROVEN",
+  "taskPopulationChecksumA": "sha256:cf9fdd8c8208d977ae704de33f672f9b15a049412403a21872cd0241e0d6a243",
+  "taskPopulationChecksumB": "sha256:cf9fdd8c8208d977ae704de33f672f9b15a049412403a21872cd0241e0d6a243",
+  "unchangedReplay": true,
+  "changedTextChangesTaskChecksum": true,
+  "classificationsValid": true,
+  "unclassifiedNotExecutable": true,
+  "percentageNotUsedForEligibility": true,
+  "candidateBounded": true,
+  "noExecutableCandidateHonest": true,
+  "planReplayStable": true,
+  "noCandidatePlanExplicit": true,
+  "missingEvidenceRefs": 0,
+  "writes": {
+    "taskLedgers": 0,
+    "sourceFiles": 0,
+    "databases": 0,
+    "qdrant": 0,
+    "neo4j": 0,
+    "cache": 0,
+    "modelCalls": 0
+  },
+  "reportPath": "docs/reports/parent-atlas-workstation-openspec-workboard-v2.json",
+  "evidenceResolutionReceipt": "docs/reports/parent-atlas-workstation-evidence-resolution-v1.json"
+}

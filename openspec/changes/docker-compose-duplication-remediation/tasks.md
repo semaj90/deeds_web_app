@@ -279,6 +279,25 @@ suspected.
   concrete precondition rather than an unknown — still requires an operator
   decision before acting, not a code change.
 
+## Re-verification pass (2026-09-05, read-only)
+
+All in-scope work here is genuinely complete — this change is one of a small number in the
+portfolio where "checked" and "actually done" agree, aside from items this file itself explicitly
+gates on operator sign-off (never silently marked done):
+
+- `docker-compose.yaml` (bare-name, highest collision risk) confirmed archived: absent from repo
+  root, present in `docs/archive-manifest.json` with SHA-256 + reason + recovery path.
+- `docker-compose.test.yml`, `sveltekit-frontend/docker-compose.dev.yml`,
+  `docker/docker-compose.gpu.yml`, and root `docker-compose.redis8-eval.yml` all still exist —
+  matches this file's own record that migrating `gpu.yml`'s 2 live services and archiving the
+  redis8-eval duplicate remain explicit operator decisions, not done here.
+- `RERANK_URL` still has no fallback default at `env.server.ts:259` — confirmed still exactly the
+  bug this file describes, still explicitly out of scope for this change to fix.
+
+Not reclassifying this change's `UNCLASSIFIED` status myself — `queueClass` is operator-curated by
+design (`audit-openspec-portfolio-v1.mjs`'s own hard rule), not something a re-verification pass
+should infer. Recorded here only that the underlying work is accurately self-described, not stale.
+
 ## Explicitly out of scope for this change
 
 - Does not change any running container, image, or volume.

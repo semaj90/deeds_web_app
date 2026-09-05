@@ -7,16 +7,19 @@
 >   rollback/readback proof) under `RETRIEVAL-01J/01K/01L` (Qdrant reconciliation) and
 >   `PKT-LINEAGE-01..13` (provenance/lineage). Do not execute this doc's P1a/P2a scripts as
 >   written — they'd create a second, less rigorous owner for work that change already governs.
-> - **P0's own "Redis exact-match + live fallback" cache-hit claim is now contradicted, not just
->   stale**: a 2026-09-04 read-only audit in that OpenSpec change found the live, wired
->   invalidation path for real HyperRAG packet materialization (`hyperrag/hyperrag-packet-pipeline.ts`
->   → `hyperrag/hyperrag-rpc-client.ts` → `acp/packet-materializer-pipeline.ts`) deletes Redis keys
->   in a shape (`bifrost:packet:*` etc.) that **does not match live Redis reality**
->   (`bifrost:sem:packet:*`, `bitfrost:summary:packet:v1:*` — confirmed via direct `valkey-cli
->   --scan`) — meaning stale cached packets/summaries can persist past a canonical Postgres update.
->   Left unfixed as of that audit (see that file's Redis-invalidation finding). Note the HyperRAG
->   pipeline files themselves are confirmed live/wired production code, not dead — only their cache
->   invalidation is broken.
+> - **P0's own "Redis exact-match + live fallback" cache-hit claim, corrected a second time
+>   (2026-09-05)**: a 2026-09-04 audit first found `acp/packet-materializer-pipeline.ts`'s Redis
+>   invalidation call using a stale key shape (`bifrost:packet:*`) that didn't match live Redis
+>   reality. Re-checked live 2026-09-05: `invalidateBitfrostPacket()` (canonical primitive, in
+>   `src/lib/server/cache/atlas-reward-cache.ts`) already uses the **correct** shape
+>   (`bifrost:sem:packet:{packet_key}`), and `packet-materializer-pipeline.ts` calls it correctly.
+>   The real, more current finding is different: **`packet-materializer-pipeline.ts` itself has zero
+>   importers anywhere in `src/`** (confirmed via `rg -l "from.*packet-materializer-pipeline"` — no
+>   matches) — the whole module, invalidation call included, is unreachable from any live code path,
+>   so the earlier "stale cache persists past a canonical Postgres update" claim doesn't apply (that
+>   broken path was never executed in production to begin with). The HyperRAG RPC route/pipeline
+>   files (`hyperrag/hyperrag-packet-pipeline.ts`, `hyperrag/hyperrag-rpc-client.ts`) remain
+>   confirmed live/wired production code — only this specific materializer module is orphaned.
 > - **Row/collection counts are stale by an order of magnitude, not just old**: this doc's "17,995
 >   packets" is now 61,715+ packet rows per the OpenSpec change's packet-lineage census, and the
 >   `atlas_packets.qdrant_point_id`-as-plain-FK join model this doc's P1a script assumes is not how

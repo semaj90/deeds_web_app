@@ -1,6 +1,6 @@
 {
   "schema": "atlas.current-source-graphify-batch-plan.v1",
-  "generatedAt": "2026-09-05T06:04:09.711Z",
+  "generatedAt": "2026-09-05T06:51:57.867Z",
   "status": "CURRENT_GRAPHIFY_BATCH_PLAN_BLOCKED_REVIEW",
   "readOnly": true,
   "writes": {
@@ -13,7 +13,7 @@
   "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
   "cohortReport": "docs/reports/current-source-projection-cohort-v1.json",
   "cohortEligibleSources": 52,
-  "requestedLimit": 128,
+  "requestedLimit": 111,
   "selectedSourceCount": 52,
   "selectionChecksum": "0c4ff5b9107a9f2eb0dee9ddfac3b4393941e4dcfc3dc146fe776bc7026acaf3",
   "counts": {

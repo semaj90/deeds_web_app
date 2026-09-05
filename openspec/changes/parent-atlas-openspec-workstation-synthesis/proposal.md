@@ -2,6 +2,8 @@
 
 Parent Atlas already produces an OpenSpec workboard and already has governed ACE, ContextManifest, BitFrost/Valkey, DAG, validation, and Ornith execution boundaries. What is missing is a bounded workstation workflow that turns the authoritative task ledgers and linked evidence into one revision-qualified next-work decision without sending the entire backlog to a model or treating cache state as task truth.
 
+This change is an `ACTIVE_DEPENDENCY` of the sole portfolio authority, `parent-atlas-retrieval-lineage-dag-convergence`. It does not claim `CURRENT_AUTHORITY`, does not reorder convergence gates, and cannot close upstream tasks without their owning evidence.
+
 The workflow is needed now because the repository contains thousands of open task rows across multiple dependency lanes, while the current convergence ledger requires deterministic evidence ordering and fail-closed handling of blocked lineage. A first-class planning workflow can reduce that backlog to a small, auditable action set while preserving OpenSpec as the authority.
 
 ## What Changes

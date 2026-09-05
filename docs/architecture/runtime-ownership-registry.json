@@ -11,10 +11,30 @@
         "evidence": "Dispatches pagerank/louvain/leiden/cheirank/kcore/betweenness; all live-verified 2026-08-09 (see openspec/changes/parent-atlas-graph-analysis-contract/tasks.md)."
       },
       "backends": [
-        { "name": "neo4j-gds-pagerank", "path": "sveltekit-frontend/src/lib/server/graph/pagerank-analysis-adapter.ts", "classification": "BACKEND", "status": "RUNTIME_SMOKE_PROVEN" },
-        { "name": "neo4j-gds-louvain-leiden", "path": "sveltekit-frontend/src/lib/server/graph/graph-analysis-runner.ts::runCommunityAnalysis", "classification": "BACKEND", "status": "RUNTIME_SMOKE_PROVEN" },
-        { "name": "neo4j-gds-cheirank", "path": "sveltekit-frontend/src/lib/server/graph/cheirank-analysis-adapter.ts", "classification": "BACKEND", "status": "RUNTIME_SMOKE_PROVEN" },
-        { "name": "neo4j-gds-kcore", "path": "sveltekit-frontend/src/lib/server/graph/kcore-analysis-adapter.ts", "classification": "BACKEND", "status": "RUNTIME_SMOKE_PROVEN" },
+        {
+          "name": "neo4j-gds-pagerank",
+          "path": "sveltekit-frontend/src/lib/server/graph/pagerank-analysis-adapter.ts",
+          "classification": "BACKEND",
+          "status": "RUNTIME_SMOKE_PROVEN"
+        },
+        {
+          "name": "neo4j-gds-louvain-leiden",
+          "path": "sveltekit-frontend/src/lib/server/graph/graph-analysis-runner.ts::runCommunityAnalysis",
+          "classification": "BACKEND",
+          "status": "RUNTIME_SMOKE_PROVEN"
+        },
+        {
+          "name": "neo4j-gds-cheirank",
+          "path": "sveltekit-frontend/src/lib/server/graph/cheirank-analysis-adapter.ts",
+          "classification": "BACKEND",
+          "status": "RUNTIME_SMOKE_PROVEN"
+        },
+        {
+          "name": "neo4j-gds-kcore",
+          "path": "sveltekit-frontend/src/lib/server/graph/kcore-analysis-adapter.ts",
+          "classification": "BACKEND",
+          "status": "RUNTIME_SMOKE_PROVEN"
+        },
         {
           "name": "cugraph-rapids-pagerank",
           "path": "sveltekit-frontend/src/lib/server/graph/cugraph-pagerank-adapter.ts",
@@ -23,13 +43,38 @@
           "evidence": "Wired 2026-08-31, selected via GraphAnalysisRequest.engine === 'cugraph-rapids' in graph-analysis-runner.ts. Writes the SAME canonical graph_analysis_runs/graph_node_metrics tables as the neo4j-gds backends (not a separate persistence lane). Corrects an earlier misclassification: python/atlas_rapids_graph_runtime.py was flagged 'EXPERIMENT (tested, never deployed)' in openspec/changes/parent-atlas-graph-runtime-python-consolidation's fork audit — that was wrong, the audit's caller-grep missed the services/ directory. It IS deployed: services/atlas-gpu-8098/app.py calls install_graph_routes(app) and is the real Docker CMD (docker/docker-compose.gpu.yml, profile 'atlas-gpu', real GPU reservation). A TS client (atlas-rapids-pagerank-client.ts) already existed with a passing spec but zero callers before this wiring. Fail-closed by design: if the sidecar is unreachable or has no resident graph projection loaded (POST /v1/graph/load, needs a reviewed GRAPH_SNAPSHOT_PARITY artifact), this adapter returns a skipped result rather than throwing or auto-loading — 3/3 new unit tests pass (cugraph-pagerank-adapter.spec.ts) covering unreachable, not-resident, and the full transactional-write happy path with mocked fetch/pg. NOT live-smoke-tested against a real running atlas-gpu profile + real GPU + a real resident graph — that requires operator-side infra (docker compose --profile atlas-gpu up, plus loading a real snapshot) not available from this session. Do not upgrade this status past UNIT_PROVEN_NOT_LIVE without that live proof."
         }
       ],
-      "persistence_targets": ["graph_analysis_runs", "graph_node_metrics", "graph_community_assignments", "graph_communities"],
+      "persistence_targets": [
+        "graph_analysis_runs",
+        "graph_node_metrics",
+        "graph_community_assignments",
+        "graph_communities"
+      ],
       "known_existing_duplication": [
-        { "path": "atlas_graph_authority_runs (Postgres table, v1)", "classification": "DEAD", "evidence": "Zero callers of PageRankPromotionGate anywhere in repo; one stale 2026-07-22 row." },
-        { "path": "atlas_graph_authority_runs_v2 / atlas_graph_authority_scores_v2 (Postgres tables)", "classification": "UNCLASSIFIED", "evidence": "CORRECTED 2026-08-29 (two passes, see openspec/changes/parent-atlas-graph-analysis-contract/tasks.md for full detail): the FIXTURE_ONLY claim below is wrong — this is a real promoted run (engine=networkx, algorithm_version=stage5-simple-pagerank-v1, status=PASSED, 162234 nodes/108156 edges, topology_hash matching the Aug-12 cuGraph/NetworkX parity graphRevision dff9006f...), written by a real script (stage5-pagerank-authority-validated.mjs), not stdout-only. BUT: live cross-check (DuckDB join of this table's pagerank_raw against the Aug-12 oracle's cugraph-scores.ndjson via nodes.parquet, 162234/162234 rows matched) found top-50 rank overlap = 0 despite pearson_corr≈1 (the correlation is an artifact of a hugely fragmented graph — 54,078 components on 162,234 nodes — dominated by a long near-identical tail; it does not mean the two computations agree at the ranked head, which is what an authority signal actually uses). _v2's algorithm ran only 10 iterations vs the oracle's 100/tol=1e-8, same damping=0.85 — the likely but unconfirmed cause. Do NOT treat _v2 as validated/equivalent to the oracle. Also has the known double 'packet:packet:' node_key prefix bug (writer fixed 2026-08-24, existing rows not backfilled). Neither _v2 nor non-v2 atlas_graph_authority_scores is currently trustworthy as canonical; the only cross-validated PageRank result for this graph revision is the unpromoted Aug-12 oracle NDJSON output itself." },
-        { "path": "OLD (superseded 2026-08-29) — kept for audit trail: atlas_graph_authority_runs_v2 / atlas_graph_authority_scores_v2", "classification": "FIXTURE_ONLY", "evidence": "Writer functions (persistGraphAuthorityRunV2 etc.) have zero callers; the one live row came from python/parent_atlas_networkx_pagerank.py, which only prints JSON to stdout and never calls the writer." },
-        { "path": "scripts/graphify-authority.mjs", "classification": "COMPATIBILITY", "evidence": "Separate Neo4j-property + Redis + Qdrant write path, untouched by this session's work; not confirmed dead, not folded into the canonical owner either." },
-        { "path": "scripts/run-pagerank.ts", "classification": "COMPATIBILITY", "evidence": "Separate CouchDB + GPU path (couchdb:pagerank_scores Redis cache); untouched, not confirmed dead." }
+        {
+          "path": "atlas_graph_authority_runs (Postgres table, v1)",
+          "classification": "DEAD",
+          "evidence": "Zero callers of PageRankPromotionGate anywhere in repo; one stale 2026-07-22 row."
+        },
+        {
+          "path": "atlas_graph_authority_runs_v2 / atlas_graph_authority_scores_v2 (Postgres tables)",
+          "classification": "UNCLASSIFIED",
+          "evidence": "CORRECTED 2026-08-29 (two passes, see openspec/changes/parent-atlas-graph-analysis-contract/tasks.md for full detail): the FIXTURE_ONLY claim below is wrong — this is a real promoted run (engine=networkx, algorithm_version=stage5-simple-pagerank-v1, status=PASSED, 162234 nodes/108156 edges, topology_hash matching the Aug-12 cuGraph/NetworkX parity graphRevision dff9006f...), written by a real script (stage5-pagerank-authority-validated.mjs), not stdout-only. BUT: live cross-check (DuckDB join of this table's pagerank_raw against the Aug-12 oracle's cugraph-scores.ndjson via nodes.parquet, 162234/162234 rows matched) found top-50 rank overlap = 0 despite pearson_corr≈1 (the correlation is an artifact of a hugely fragmented graph — 54,078 components on 162,234 nodes — dominated by a long near-identical tail; it does not mean the two computations agree at the ranked head, which is what an authority signal actually uses). _v2's algorithm ran only 10 iterations vs the oracle's 100/tol=1e-8, same damping=0.85 — the likely but unconfirmed cause. Do NOT treat _v2 as validated/equivalent to the oracle. Also has the known double 'packet:packet:' node_key prefix bug (writer fixed 2026-08-24, existing rows not backfilled). Neither _v2 nor non-v2 atlas_graph_authority_scores is currently trustworthy as canonical; the only cross-validated PageRank result for this graph revision is the unpromoted Aug-12 oracle NDJSON output itself."
+        },
+        {
+          "path": "OLD (superseded 2026-08-29) — kept for audit trail: atlas_graph_authority_runs_v2 / atlas_graph_authority_scores_v2",
+          "classification": "FIXTURE_ONLY",
+          "evidence": "Writer functions (persistGraphAuthorityRunV2 etc.) have zero callers; the one live row came from python/parent_atlas_networkx_pagerank.py, which only prints JSON to stdout and never calls the writer."
+        },
+        {
+          "path": "scripts/graphify-authority.mjs",
+          "classification": "COMPATIBILITY",
+          "evidence": "Separate Neo4j-property + Redis + Qdrant write path, untouched by this session's work; not confirmed dead, not folded into the canonical owner either."
+        },
+        {
+          "path": "scripts/run-pagerank.ts",
+          "classification": "COMPATIBILITY",
+          "evidence": "Separate CouchDB + GPU path (couchdb:pagerank_scores Redis cache); untouched, not confirmed dead."
+        }
       ]
     },
     "neural_decoder_prefill": {
@@ -73,11 +118,22 @@
         "evidence": "Docstring self-identifies as canonical; imports blendScores/RuntimeReranker from runtime-reranker.ts."
       },
       "backends": [
-        { "name": "cross-encoder (via runtime-reranker.ts blendScores)", "classification": "BACKEND", "unproven": false },
-        { "name": "xgboost-fallback", "classification": "BACKEND", "evidence": "Named in canonical-rerank-executor.ts's own docstring as the fallback path." }
+        {
+          "name": "cross-encoder (via runtime-reranker.ts blendScores)",
+          "classification": "BACKEND",
+          "unproven": false
+        },
+        {
+          "name": "xgboost-fallback",
+          "classification": "BACKEND",
+          "evidence": "Named in canonical-rerank-executor.ts's own docstring as the fallback path."
+        }
       ],
       "known_existing_duplication": [
-        { "note": "13 other files matching *reranker* in sveltekit-frontend/src/lib/server/retrieval/ (attention-reranker.ts, boosted-reranker.ts, cluster-aware-reranker.ts, cross-encoder-reranker.ts, cuda-rnn-reranker.ts, gpu-reranker.ts, langextract-reranker.ts, noun-reranker.ts, post-process-reranker.ts, reranker-blend.ts, runtime-reranker.ts, semantic-vector-reranker.ts, triton-reranker.ts, turbovec-rerank.ts) are UNCLASSIFIED — found live 2026-08-09, not yet audited for caller status.", "classification": "UNCLASSIFIED" }
+        {
+          "note": "13 other files matching *reranker* in sveltekit-frontend/src/lib/server/retrieval/ (attention-reranker.ts, boosted-reranker.ts, cluster-aware-reranker.ts, cross-encoder-reranker.ts, cuda-rnn-reranker.ts, gpu-reranker.ts, langextract-reranker.ts, noun-reranker.ts, post-process-reranker.ts, reranker-blend.ts, runtime-reranker.ts, semantic-vector-reranker.ts, triton-reranker.ts, turbovec-rerank.ts) are UNCLASSIFIED — found live 2026-08-09, not yet audited for caller status.",
+          "classification": "UNCLASSIFIED"
+        }
       ]
     },
     "structural_extraction": {
@@ -92,8 +148,15 @@
         "name": "treesitter-chunker",
         "evidence": "Listed as a pip dependency in docker/miniforge-nlp-sidecar/Dockerfile; TREESITTER_CHUNKER_AVAILABLE probed live in python/miniforge_nlp_sidecar.py. Container rebuild + live /health check not yet independently re-verified this session."
       },
-      "parser_engine": { "name": "tree-sitter / tree-sitter-language-pack", "classification": "BACKEND" },
-      "structural_query_rewrite": { "name": "ast-grep-py", "classification": "ADAPTER", "note": "Separate layer from the chunking application — not a competing structural owner." }
+      "parser_engine": {
+        "name": "tree-sitter / tree-sitter-language-pack",
+        "classification": "BACKEND"
+      },
+      "structural_query_rewrite": {
+        "name": "ast-grep-py",
+        "classification": "ADAPTER",
+        "note": "Separate layer from the chunking application — not a competing structural owner."
+      }
     },
     "semantic_768": {
       "owner": {
@@ -177,10 +240,26 @@
         "note": "Four incompatible key schemes for 'the identity of an AST symbol node' are simultaneously live/reachable in this repo; none is marked canonical and none is reconciled with the others. Do not pick one without reading the full audit in tasks.md first."
       },
       "known_existing_duplication": [
-        { "path": "atlas_symbol_registry.stable_symbol_id (Postgres table)", "classification": "UNCLASSIFIED", "evidence": "Real, populated (10,310 rows, confirmed live via docker exec psql). Format stable-symbol:<sha256hex-64chars>, produced by scripts/atlas/promote-ast-symbols-to-registry.mjs::stableSymbolIdFor(canonicalKey). Has real FK-referencing tables (atlas_symbol_aliases, atlas_symbol_versions, atlas_structural_reference_resolutions). Best candidate for canonical owner by population/usage, but not confirmed to be what any live graph-node writer actually keys against." },
-        { "path": "packages/parent-atlas/src/core/symbol-registry-repository.ts::canonicalStableSymbolId/createSymbolRegistryRepository", "classification": "DEAD", "evidence": "Produces a DIFFERENT format (symbol:<sha256hex-sliced-40chars>) than the live registry above. createSymbolRegistryRepository (its only exported factory) has exactly one reference in the whole repo -- its own definition (grep -rn across all .ts files). Real SQL/promotion logic, zero callers." },
-        { "path": "packages/parent-atlas/src/core/graph-node-key-v1.ts::deriveGraphNodeKeyV1 (symbolVersionId branch only)", "classification": "COMPATIBILITY", "evidence": "Produces symbol:<symbolVersionId>. Real, tested, exported function -- but symbolVersionId is only meant to come from canonicalSymbolVersionId(), itself only reachable from the DEAD symbol-registry-repository.ts path above. Not confirmed reachable from any live write. This session's own ontology-tuple-to-graph-relation-v1.ts implicitly assumed this scheme without verifying it against the actual live writer (see next entry)." },
-        { "path": "sveltekit-frontend/src/lib/server/atlas/graph/graph-snapshot-materializer.ts (symbol-type node writer, ~line 322)", "classification": "CANONICAL_OWNER", "evidence": "The ACTUAL live writer of node_type='symbol' rows into atlas_graph_nodes_v2 (confirmed by reading the file directly). Keys every symbol node tree:<treeNodeId>, sourced from tree-sitter parse output, gated by classifyCanonicalGraphEligibility()'s real provenance checks (extractionMethod==='tree_sitter', structuralTruth===true, rejects the known 146,655-row heuristic batch-a-structural-materializer producer). This format matches NONE of the three entries above. Marked CANONICAL_OWNER here because it is the confirmed live write path for this table/nodeType, not because the identity SCHEME itself has been endorsed as canonical over the registry's stable_symbol_id -- that cross-scheme reconciliation is exactly the open question this entry exists to flag." }
+        {
+          "path": "atlas_symbol_registry.stable_symbol_id (Postgres table)",
+          "classification": "UNCLASSIFIED",
+          "evidence": "Real, populated (10,310 rows, confirmed live via docker exec psql). Format stable-symbol:<sha256hex-64chars>, produced by scripts/atlas/promote-ast-symbols-to-registry.mjs::stableSymbolIdFor(canonicalKey). Has real FK-referencing tables (atlas_symbol_aliases, atlas_symbol_versions, atlas_structural_reference_resolutions). Best candidate for canonical owner by population/usage, but not confirmed to be what any live graph-node writer actually keys against."
+        },
+        {
+          "path": "packages/parent-atlas/src/core/symbol-registry-repository.ts::canonicalStableSymbolId/createSymbolRegistryRepository",
+          "classification": "DEAD",
+          "evidence": "Produces a DIFFERENT format (symbol:<sha256hex-sliced-40chars>) than the live registry above. createSymbolRegistryRepository (its only exported factory) has exactly one reference in the whole repo -- its own definition (grep -rn across all .ts files). Real SQL/promotion logic, zero callers."
+        },
+        {
+          "path": "packages/parent-atlas/src/core/graph-node-key-v1.ts::deriveGraphNodeKeyV1 (symbolVersionId branch only)",
+          "classification": "COMPATIBILITY",
+          "evidence": "Produces symbol:<symbolVersionId>. Real, tested, exported function -- but symbolVersionId is only meant to come from canonicalSymbolVersionId(), itself only reachable from the DEAD symbol-registry-repository.ts path above. Not confirmed reachable from any live write. This session's own ontology-tuple-to-graph-relation-v1.ts implicitly assumed this scheme without verifying it against the actual live writer (see next entry)."
+        },
+        {
+          "path": "sveltekit-frontend/src/lib/server/atlas/graph/graph-snapshot-materializer.ts (symbol-type node writer, ~line 322)",
+          "classification": "CANONICAL_OWNER",
+          "evidence": "The ACTUAL live writer of node_type='symbol' rows into atlas_graph_nodes_v2 (confirmed by reading the file directly). Keys every symbol node tree:<treeNodeId>, sourced from tree-sitter parse output, gated by classifyCanonicalGraphEligibility()'s real provenance checks (extractionMethod==='tree_sitter', structuralTruth===true, rejects the known 146,655-row heuristic batch-a-structural-materializer producer). This format matches NONE of the three entries above. Marked CANONICAL_OWNER here because it is the confirmed live write path for this table/nodeType, not because the identity SCHEME itself has been endorsed as canonical over the registry's stable_symbol_id -- that cross-scheme reconciliation is exactly the open question this entry exists to flag."
+        }
       ]
     },
     "cutile_kernel_challenger": {
@@ -193,7 +272,13 @@
       "required_for_current_stack": false,
       "status": "DEFERRED_OPTIONAL_PILOT",
       "cache_scope": "disposable compiled cubin cache only",
-      "prohibited_cache_contents": ["source truth", "ACE packets", "hidden reasoning", "KV cache", "tensor data"],
+      "prohibited_cache_contents": [
+        "source truth",
+        "ACE packets",
+        "hidden reasoning",
+        "KV cache",
+        "tensor data"
+      ],
       "required_preconditions": [
         "measured fused-kernel gap",
         "PyTorch tensor and stream interoperability smoke test",
@@ -236,18 +321,88 @@
         "evidence": "8 real callers confirmed live 2026-09-03; self-identifies in its own docstring as 'the authority module for domain_class handling inside the workstation control plane'. Has an unused labels[].source: 'learned' slot -- the intended ML extension point, not yet fed by anything."
       },
       "backends": [
-        { "name": "okf-fit-formula", "path": "sveltekit-frontend/src/lib/server/atlas/okf-fit.ts::classifyOkfFit", "classification": "BACKEND", "status": "RUNTIME_SMOKE_PROVEN", "evidence": "Real, live -- the actual path api/ldr/research/+server.ts exercises via okf-topic-ingestion.ts::buildOkfTopicAnalysis. Correctly wraps classifyDomainTaxonomy() (the canonical owner above), then adds naive_bayes_score/logistic_regression_score/fit_margin/fit_decision fields -- but these are hand-tuned linear/sigmoid formulas with hardcoded coefficients, not trained NB/LR models. classifier_version = OKF_FIT_VERSION = 'okf-fit-v1'." },
-        { "name": "ace-features-path-classifier", "path": "sveltekit-frontend/src/lib/server/ace/features/domain-classifier.ts::DomainClassifier", "classification": "BACKEND", "status": "RUNTIME_SMOKE_PROVEN", "evidence": "Exactly one live call site (feature-extraction-orchestrator.ts:130, classifyByPath(pkt.sourceRef) only -- classifyByContent() and the DB-querying classifyPacket() are never called live). Independent 14-domain regex taxonomy, does not build on domain-taxonomy.ts. A parity test comparing its output against classifyDomainTaxonomy() on a real path corpus is needed before any consolidation is attempted -- not done as of this entry." }
+        {
+          "name": "okf-fit-formula",
+          "path": "sveltekit-frontend/src/lib/server/atlas/okf-fit.ts::classifyOkfFit",
+          "classification": "BACKEND",
+          "status": "RUNTIME_SMOKE_PROVEN",
+          "evidence": "Real, live -- the actual path api/ldr/research/+server.ts exercises via okf-topic-ingestion.ts::buildOkfTopicAnalysis. Correctly wraps classifyDomainTaxonomy() (the canonical owner above), then adds naive_bayes_score/logistic_regression_score/fit_margin/fit_decision fields -- but these are hand-tuned linear/sigmoid formulas with hardcoded coefficients, not trained NB/LR models. classifier_version = OKF_FIT_VERSION = 'okf-fit-v1'."
+        },
+        {
+          "name": "ace-features-path-classifier",
+          "path": "sveltekit-frontend/src/lib/server/ace/features/domain-classifier.ts::DomainClassifier",
+          "classification": "BACKEND",
+          "status": "RUNTIME_SMOKE_PROVEN",
+          "evidence": "Exactly one live call site (feature-extraction-orchestrator.ts:130, classifyByPath(pkt.sourceRef) only -- classifyByContent() and the DB-querying classifyPacket() are never called live). Independent 14-domain regex taxonomy, does not build on domain-taxonomy.ts. A parity test comparing its output against classifyDomainTaxonomy() on a real path corpus is needed before any consolidation is attempted -- not done as of this entry."
+        }
       ],
       "unwired_scaffolds": [
-        { "path": "sveltekit-frontend/src/lib/server/classifier/domain-classifier.ts::classifyDomainFromText", "classification": "UNWIRED_SCAFFOLD", "evidence": "Already correctly wraps the canonical classifyDomainTaxonomy() -- not a competing taxonomy. Zero live callers of classifyDomainFromText anywhere in src/. Part of a coherent 4-file XGBoost feature-vector scaffold (ast-keyword-types.ts types -> this producer -> packet-feature-validator.ts validator -> classifier-feature-vector.ts::toXgboostVector, feature slot ast_domain_confidence) -- checked for duplication against the live XGBoost/reranker pipeline (xgboost-ranking-lineage-v1.ts, phase18-reranker.ts, packet-feature-matrix.ts, retrieval-candidate-feature-matrix-v1.ts) and found NOT a duplicate, just never connected. Left in place; do not archive or delete without a deliberate decision from whoever owns the XGBoost/reranker roadmap." },
-        { "path": "sveltekit-frontend/src/lib/server/enrichment/domain-classifier.ts::classifyDomain/extractPathEvidence", "classification": "UNWIRED_SCAFFOLD", "evidence": "The algorithm itself (18-domain independent taxonomy, evidence-precedence scoring) has zero live callers. Its only live reference anywhere is feature-doc-enrichment.ts importing just the CLASSIFIER_VERSION string constant into an unrelated classifierPlan.classifierVersion JSON field -- not the algorithm. Left in place, not touched." }
+        {
+          "path": "sveltekit-frontend/src/lib/server/classifier/domain-classifier.ts::classifyDomainFromText",
+          "classification": "UNWIRED_SCAFFOLD",
+          "evidence": "Already correctly wraps the canonical classifyDomainTaxonomy() -- not a competing taxonomy. Zero live callers of classifyDomainFromText anywhere in src/. Part of a coherent 4-file XGBoost feature-vector scaffold (ast-keyword-types.ts types -> this producer -> packet-feature-validator.ts validator -> classifier-feature-vector.ts::toXgboostVector, feature slot ast_domain_confidence) -- checked for duplication against the live XGBoost/reranker pipeline (xgboost-ranking-lineage-v1.ts, phase18-reranker.ts, packet-feature-matrix.ts, retrieval-candidate-feature-matrix-v1.ts) and found NOT a duplicate, just never connected. Left in place; do not archive or delete without a deliberate decision from whoever owns the XGBoost/reranker roadmap."
+        },
+        {
+          "path": "sveltekit-frontend/src/lib/server/enrichment/domain-classifier.ts::classifyDomain/extractPathEvidence",
+          "classification": "UNWIRED_SCAFFOLD",
+          "evidence": "The algorithm itself (18-domain independent taxonomy, evidence-precedence scoring) has zero live callers. Its only live reference anywhere is feature-doc-enrichment.ts importing just the CLASSIFIER_VERSION string constant into an unrelated classifierPlan.classifierVersion JSON field -- not the algorithm. Left in place, not touched."
+        }
       ],
       "second_owner": {
         "domain": "WORKSTATION_LANE_CLASSIFICATION",
         "classification": "CANONICAL_OWNER",
         "path": "sveltekit-frontend/src/lib/server/ai/parent-atlas-workstation-domain-classifier.ts",
         "evidence": "Genuinely distinct scope from source-code domain classification above -- 10 workstation lanes (IDENTITY, EXPORT_STORAGE, GRAPH, TELEMETRY, EMBEDDING, OKF_ONTOLOGY, TRANSPORT, COMPILER, RUNTIME_TRAINING, SHARED), not source-code domains. Built, type-checked, not wired into any live route (see openspec/changes/parent-atlas-workstation-domain-classifier/proposal.md for that gap -- tracked there, not here). Mirrors this registry's existing n_ary_relationship_synthesis dual-owner shape: two CANONICAL_OWNERs, domain-scoped, not competing."
+      }
+    },
+    "ace_packet_validator": {
+      "owner": {
+        "classification": "CANONICAL_OWNER",
+        "path": "sveltekit-frontend/src/lib/server/atlas/envelope-validator.ts",
+        "evidence": "Validates against atlas_packets (Postgres canonical identity table, populated by graphify). Registered 2026-09-05 per ace-hyperrag-chr97-graphify-audit/tasks.md item 3 (bookkeeping of a 2026-08-12 audit, no new investigation).",
+        "status": "RUNTIME_SMOKE_PROVEN"
+      }
+    },
+    "ace_context_assembler": {
+      "owner": {
+        "classification": "CANONICAL_OWNER",
+        "path": "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
+        "evidence": "Reads docs/graph/codebase-graph.json via sveltekit-frontend/src/lib/server/graph/graph-intel.ts (GRAPH_PATH). Confirmed live 2026-08-12; path corrected 2026-09-05 (proposal.md named a nonexistent atlas/graph-intel.ts, real file is server/graph/graph-intel.ts). Registered 2026-09-05 per ace-hyperrag-chr97-graphify-audit/tasks.md item 3.",
+        "status": "RUNTIME_SMOKE_PROVEN",
+        "known_gap": "AST-blind: codebase-graph.json is built from pure filesystem heuristics (index-codebase-fast.mjs imports only fs/path/crypto/url), not tree-sitter/ast-grep. Real AST facts (code_features/feature_structural_facts, see ast_structural_extraction capability) exist but are reachable only via packet_key joins, never through this graph-intel path. Open design question requiring explicit human decision, not a bug -- see ace-hyperrag-chr97-graphify-audit/tasks.md Next session section."
+      },
+      "backends": [
+        {
+          "name": "packet_materializer",
+          "classification": "BACKEND",
+          "path": "sveltekit-frontend/src/lib/server/atlas/tensors/packet-assembler.ts",
+          "evidence": "Real callers: src/lib/server/ace/indexed-source-packet.ts, src/lib/server/features/ai/ace/context-assembler.ts. Corrects an earlier verification forks incorrect DISCONNECTED finding (too narrow a grep). Registered 2026-09-05 per ace-hyperrag-chr97-graphify-audit/tasks.md item 3.",
+          "status": "RUNTIME_SMOKE_PROVEN"
+        }
+      ]
+    },
+    "hyperrag_rpc_packet": {
+      "owner": {
+        "classification": "CANONICAL_OWNER",
+        "path": "sveltekit-frontend/src/routes/api/hyperrag/packet-rpc/+server.ts",
+        "evidence": "Reads Qdrant + Postgres FTS + Neo4j, the three canonical mirrors graphify populates. Registered 2026-09-05 per ace-hyperrag-chr97-graphify-audit/tasks.md item 3.",
+        "status": "RUNTIME_SMOKE_PROVEN"
+      }
+    },
+    "ast_structural_extraction": {
+      "owner": {
+        "classification": "CANONICAL_OWNER",
+        "path": "sveltekit-frontend/src/lib/server/analysis/worker.ts -> ast-grep-extractor.ts -> code_features table",
+        "evidence": "docs/reports/phase2a-ast-grep-caller-chain-receipt.json, status PROVEN. Backfilled into feature_structural_facts by scripts/atlas/backfill-feature-layer-from-atlas-packets.mjs. Disjoint pipeline from ace_context_assembler -- not consumed by it (see that capability known_gap). Registered 2026-09-05 per ace-hyperrag-chr97-graphify-audit/tasks.md item 3.",
+        "status": "PROVEN"
+      }
+    },
+    "chr97_cartridge_glyph": {
+      "owner": {
+        "classification": "CANONICAL_OWNER",
+        "path": "sveltekit-frontend/src/routes/api/cartridge/export/+server.ts (chr97-builder.ts, glyph-record.ts)",
+        "evidence": "Fully live production route: 401 guard, Zod validation, Redis 30min cache, paginated Qdrant evidence_items scroll by case_id, buildCartridge(), Langfuse trace. Genuinely disjoint domain from codebase-intelligence graphify -- consumes case-scoped evidence Qdrant embeddings from the evidence-ingestion pipeline, NOT graphify output. Also has real callers at api/cartridge/{search,timeline} and api/glyph/search. Registered 2026-09-05 per ace-hyperrag-chr97-graphify-audit/tasks.md item 3.",
+        "status": "RUNTIME_SMOKE_PROVEN"
       }
     }
   }

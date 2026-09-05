@@ -1,0 +1,34 @@
+{
+  "schema": "atlas.graphify-current-execution-injection-plan.v1",
+  "status": "READY_FOR_EXPLICIT_AUTHORIZATION",
+  "executionOwner": "sveltekit-frontend/src/lib/server/atlas/indexing/graphify-daily-coordinator-v1.ts",
+  "lifecycleInput": "docs/reports/graphify-lifecycle-entrypoint-v1.json",
+  "workspaceRevision": "sha256:ce42d49be7a39ceb0ecf73650367d3c25d238ebc8c2df8d49b19164ca7ad814b",
+  "bindingCount": 25701,
+  "workspaceNamespaceStatus": "WORKSPACE_SOURCE_NAMESPACE_PROVEN",
+  "requiredInputs": {
+    "workspaceRevision": true,
+    "repositoryRevision": true,
+    "sourceManifestDigest": true,
+    "sourceBindings": true,
+    "parserContractVersion": true,
+    "extractionContractVersion": true
+  },
+  "intendedStages": [
+    "OPEN",
+    "SOURCE_SELECTION"
+  ],
+  "selectionPolicyRevision": "graphify-current-workspace-source-selection:v1",
+  "authorizationRequired": true,
+  "mutationPlan": {
+    "openExecution": false,
+    "recordSourceSelectionStage": false,
+    "writeScope": "NONE_UNTIL_EXPLICIT_AUTHORIZATION"
+  },
+  "notes": [
+    "This is a plan-only artifact; it does not open a database connection.",
+    "A future bounded apply must use one dedicated PostgreSQL connection and a fresh execution_id.",
+    "The full 25,701-source set is not an authorization request; scope must be explicitly chosen and bounded separately."
+  ],
+  "planChecksum": "sha256:bac29826471da682a6d70ab25d3a0903e3c1c358730ba3a2169d2944f338aace"
+}

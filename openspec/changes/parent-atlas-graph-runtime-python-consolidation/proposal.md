@@ -5,12 +5,19 @@
 A grep for pagerank/katz/eigenvector/k-truss/networkx/cugraph across `python/` returns 19 files.
 Auditing each (file-by-file, caller trace, storage-write trace) found:
 
-- **6 files with zero confirmed callers anywhere in the repo** (`atlas_subgraph_cugraph.py`,
-  `atlas_rapids_community_sidecar.py`, `atlas_compute/cugraph_ppr.py`, `atlas_compute/graph_programs.py`,
-  `atlas_rapids_graph_runtime.py` — tested but never deployed as a service, no docker-compose entry).
+- **5 files with zero confirmed callers anywhere in the repo** (`atlas_subgraph_cugraph.py`,
+  `atlas_rapids_community_sidecar.py`, `atlas_compute/cugraph_ppr.py`, `atlas_compute/graph_programs.py`).
   None of these are in `docs/architecture/runtime-ownership-registry.json` or
   `runtime-ownership-baseline.json` — this whole cluster is currently unaudited by the existing
   governance system.
+- **CORRECTED (2026-08-31, see tasks.md T1)**: `atlas_rapids_graph_runtime.py` was originally
+  audited here as "tested but never deployed" — that was wrong; the fork audit only checked
+  `python/`, `scripts/`, and `sveltekit-frontend/src/` and missed `services/`. It is actually a
+  live BACKEND: `services/atlas-gpu-8098/app.py` calls `install_graph_routes(app)` at import time
+  and is the real Docker `CMD` in `docker/atlas-gpu-8098/Dockerfile` (`docker-compose.gpu.yml`,
+  `atlas-gpu` profile, real GPU device reservation). It has since been wired end-to-end as a second
+  `graph_analysis` backend (`cugraph-pagerank-adapter.ts`, registry status `UNIT_PROVEN_NOT_LIVE` —
+  unit-proven only, no live Docker/GPU smoke test yet). See tasks.md T1 for the full evidence trail.
 - **1 file (`parent_atlas_pagerank_reference.py`) hand-rolls PageRank in dependency-free Python**
   (power iteration, no `networkx`/`cugraph` import at all). It is self-documented as an intentional
   third correctness oracle ("not the production PageRank owner"), not an accidental duplicate — but
@@ -53,11 +60,11 @@ Auditing each (file-by-file, caller trace, storage-write trace) found:
 
 ## Proposal
 
-1. **Reclassify the 6 zero-caller files** in `runtime-ownership-registry.json` as `DEAD` (or
-   `EXPERIMENT` for `atlas_rapids_graph_runtime.py`, which has test coverage but no live deployment)
+1. **Reclassify the 5 zero-caller files** in `runtime-ownership-registry.json` as `DEAD`
    with the caller-trace evidence from this audit. No code moves, no deletions — matches the repo's
    archive-not-delete discipline; deletion, if any, is a separate follow-up once flagged as tolerated
-   debt for one review cycle.
+   debt for one review cycle. (`atlas_rapids_graph_runtime.py` is excluded from this reclassification
+   — per the 2026-08-31 correction above, it is a deployed `BACKEND`, not a zero-caller/DEAD file.)
 2. **Create `python/atlas_graph_runtime/` as the canonical package boundary** for future
    Atlas-owned graph work, seeded minimally:
    - `identity.py` — promoted from `atlas_compute/typed_graph_runtime.py` (pure dataclasses/contracts,

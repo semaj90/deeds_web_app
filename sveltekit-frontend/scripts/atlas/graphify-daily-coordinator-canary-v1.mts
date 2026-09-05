@@ -47,6 +47,10 @@ try {
     producerRevision: 'graphify.committed-canary.v1',
   });
   const workspaceRevision = origin.record.workspaceRevision;
+  const expectedWorkspaceRevision = process.env.GRAPHIFY_EXPECTED_WORKSPACE_REVISION?.trim();
+  if (expectedWorkspaceRevision && expectedWorkspaceRevision !== workspaceRevision) {
+    throw new Error(`GRAPHIFY_COORDINATOR_CANARY_WORKSPACE_REVISION_MISMATCH:expected=${expectedWorkspaceRevision}:actual=${workspaceRevision}`);
+  }
   const selectedBindings = origin.bindings.slice(0, 3);
   if (selectedBindings.length !== 3) {
     throw new Error(`Expected 3 qualified source bindings from fresh materialization, got ${selectedBindings.length}`);

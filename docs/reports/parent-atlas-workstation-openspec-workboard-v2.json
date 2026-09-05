@@ -1,6 +1,6 @@
 {
   "schema": "atlas.parent-atlas-workstation-openspec-workboard.v2",
-  "generatedAt": "2026-09-05T06:25:14.866Z",
+  "generatedAt": "2026-09-05T07:15:10.311Z",
   "readOnly": true,
   "authority": {
     "mechanicalIndex": "docs/reports/openspec-workboard-v1.json",
@@ -11,8 +11,8 @@
   "sourceChecksums": {
     "workstationSpine": "sha256:710a78fe369f9f55ec7f1aaff523454688399ab890cb0cc70806f345fe53c97e",
     "workboard": "sha256:69ab3ce2959fd3e3fd45059727734f6b0a2318355980adce6f663a5e09f33195",
-    "portfolio": "sha256:51587fa1f3787480f47c452838941926de9f6f2c8481d3143343c8c7e48595ef",
-    "sourceCohort": "sha256:c1292bfbcdc0750109e788da9278d5263fe01fb58f3ba0eaf81d4c509d1ce57e",
+    "portfolio": "sha256:6ccd672f8d6ad38502269e6fb1ab2485e3052033bd88ec07346a33db6c37eeca",
+    "sourceCohort": "sha256:90f33ccf6865a3d7865dcf4a4a580575b46c3ef8bcd8aed8b0652cef9d59462d",
     "packetJoin": "sha256:a106490043c25e93e1ffc44d1de8519bc30510975b109963fb9fac046c44f83b"
   },
   "currentBlocker": {
@@ -50,9 +50,41 @@
     "GOVERNANCE_ONLY": 5,
     "NEGATIVE_CONSTRAINT": 16,
     "HUMAN_DECISION_REQUIRED": 1,
-    "UNVERIFIED": 13
+    "UNVERIFIED": 13,
+    "evidenceRefs": 116,
+    "missingEvidenceRefs": 0
   },
-  "taskPopulationChecksum": "sha256:d5780964cedf74b59703a5a31856e0919ab2c578fe8023f2224cd9f2f21c413e",
+  "taskPopulationChecksum": "sha256:cf9fdd8c8208d977ae704de33f672f9b15a049412403a21872cd0241e0d6a243",
+  "planning": {
+    "candidateLimit": 5,
+    "eligibleCandidateCount": 0,
+    "selectedCandidateCount": 0,
+    "selectedTaskRefs": [],
+    "status": "NO_EXECUTABLE_CANDIDATE",
+    "selectionPolicy": "EXPLICIT_OPEN_ACTIONABLE_PLUS_EXECUTABLE; PRIORITY_THEN_CHANGE_THEN_SOURCE_LINE",
+    "modelCalls": 0,
+    "writes": 0
+  },
+  "workPlan": {
+    "schema": "atlas.openspec-work-plan.v1",
+    "status": "NO_EXECUTABLE_CANDIDATE",
+    "taskRefs": [],
+    "nextAction": null,
+    "blockers": [
+      "No task is explicitly OPEN_ACTIONABLE and executable.",
+      "Current source cohort has 0/52 current-workspace matches.",
+      "Current packet/chunk join has 0/111 exact matches."
+    ],
+    "evidenceRefs": [
+      "docs/reports/current-source-cohort-lineage-v1.json",
+      "docs/reports/current-workspace-packet-chunk-join-v1.json"
+    ],
+    "mutationScope": "NONE_UNTIL_EXPLICIT_AUTHORIZATION",
+    "validationCommands": [
+      "npx openspec validate parent-atlas-openspec-workstation-synthesis --type change --strict --json"
+    ],
+    "planChecksum": "sha256:6a437ac81d774f5e7cf093940fdd62018dc03cd765d0996fdf16919426761598"
+  },
   "tasks": [
     {
       "openspecChange": "parent-atlas-okf-knowledge-layers",
@@ -66,9 +98,18 @@
       "evidenceRefs": [
         "docs/reports/graphify-daily-coordinator-canary-v1.json"
       ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
       "validationCommand": "npx openspec validate parent-atlas-okf-knowledge-layers --type change --strict --json",
       "safeNextAction": "Preserve this constraint while executing its parent gate.",
       "mutationScope": "NONE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
       "priority": 10,
       "step": "STEP-01"
     },
@@ -84,9 +125,18 @@
       "evidenceRefs": [
         "docs/reports/graphify-daily-coordinator-canary-v1.json"
       ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
       "validationCommand": "npx openspec validate parent-atlas-okf-knowledge-layers --type change --strict --json",
       "safeNextAction": "Preserve this constraint while executing its parent gate.",
       "mutationScope": "NONE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
       "priority": 10,
       "step": "STEP-01"
     },
@@ -103,9 +153,22 @@
         "docs/reports/openspec-portfolio-v1.json",
         "docs/reports/graphify-daily-coordinator-canary-v1.json"
       ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/openspec-portfolio-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
       "validationCommand": "npx openspec validate parent-atlas-okf-knowledge-layers --type change --strict --json",
       "safeNextAction": "Review the owning change's proof gate: parent-atlas-okf-knowledge-layers",
       "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
       "priority": 10,
       "step": "STEP-01"
     },
@@ -123,9 +186,26 @@
         "docs/reports/current-workspace-packet-chunk-join-v1.json",
         "docs/reports/graphify-daily-coordinator-canary-v1.json"
       ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
       "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
       "safeNextAction": "Preserve this constraint while executing its parent gate.",
       "mutationScope": "NONE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
       "priority": 10,
       "step": "STEP-01"
     },
@@ -143,9 +223,26 @@
         "docs/reports/current-workspace-packet-chunk-join-v1.json",
         "docs/reports/graphify-daily-coordinator-canary-v1.json"
       ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
       "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
       "safeNextAction": "Remain unexecuted until its prerequisites and proof receipt are present.",
       "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
       "priority": 10,
       "step": "STEP-01"
     },
@@ -163,9 +260,26 @@
         "docs/reports/current-workspace-packet-chunk-join-v1.json",
         "docs/reports/graphify-daily-coordinator-canary-v1.json"
       ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
       "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
       "safeNextAction": "Preserve this constraint while executing its parent gate.",
       "mutationScope": "NONE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
       "priority": 10,
       "step": "STEP-01"
     },
@@ -183,9 +297,26 @@
         "docs/reports/current-workspace-packet-chunk-join-v1.json",
         "docs/reports/graphify-daily-coordinator-canary-v1.json"
       ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
       "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
       "safeNextAction": "Preserve this constraint while executing its parent gate.",
       "mutationScope": "NONE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
       "priority": 10,
       "step": "STEP-01"
     },
@@ -203,9 +334,26 @@
         "docs/reports/current-workspace-packet-chunk-join-v1.json",
         "docs/reports/graphify-daily-coordinator-canary-v1.json"
       ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
       "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
       "safeNextAction": "Attach current evidence before changing task status.",
       "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
       "priority": 10,
       "step": "STEP-01"
     },
@@ -223,9 +371,26 @@
         "docs/reports/current-workspace-packet-chunk-join-v1.json",
         "docs/reports/graphify-daily-coordinator-canary-v1.json"
       ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
       "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
       "safeNextAction": "Remain unexecuted until its prerequisites and proof receipt are present.",
       "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
       "priority": 10,
       "step": "STEP-01"
     },
@@ -243,9 +408,26 @@
         "docs/reports/current-workspace-packet-chunk-join-v1.json",
         "docs/reports/graphify-daily-coordinator-canary-v1.json"
       ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
       "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
       "safeNextAction": "Remain unexecuted until its prerequisites and proof receipt are present.",
       "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
       "priority": 10,
       "step": "STEP-01"
     },
@@ -263,9 +445,26 @@
         "docs/reports/current-workspace-packet-chunk-join-v1.json",
         "docs/reports/graphify-daily-coordinator-canary-v1.json"
       ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
       "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
       "safeNextAction": "Remain unexecuted until its prerequisites and proof receipt are present.",
       "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
       "priority": 10,
       "step": "STEP-01"
     },
@@ -283,9 +482,26 @@
         "docs/reports/current-workspace-packet-chunk-join-v1.json",
         "docs/reports/graphify-daily-coordinator-canary-v1.json"
       ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
       "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
       "safeNextAction": "Preserve this constraint while executing its parent gate.",
       "mutationScope": "NONE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
       "priority": 10,
       "step": "STEP-01"
     },
@@ -303,9 +519,26 @@
         "docs/reports/current-workspace-packet-chunk-join-v1.json",
         "docs/reports/graphify-daily-coordinator-canary-v1.json"
       ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
       "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
       "safeNextAction": "Preserve this constraint while executing its parent gate.",
       "mutationScope": "NONE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
       "priority": 10,
       "step": "STEP-01"
     },
@@ -323,9 +556,26 @@
         "docs/reports/current-workspace-packet-chunk-join-v1.json",
         "docs/reports/graphify-daily-coordinator-canary-v1.json"
       ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
       "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
       "safeNextAction": "Preserve this constraint while executing its parent gate.",
       "mutationScope": "NONE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
       "priority": 10,
       "step": "STEP-01"
     },
@@ -343,9 +593,26 @@
         "docs/reports/current-workspace-packet-chunk-join-v1.json",
         "docs/reports/graphify-daily-coordinator-canary-v1.json"
       ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
       "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
       "safeNextAction": "Repair or identify the authoritative current source/chunk binding; do not apply a cohort.",
       "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
       "priority": 10,
       "step": "STEP-01"
     },
@@ -363,9 +630,26 @@
         "docs/reports/current-workspace-packet-chunk-join-v1.json",
         "docs/reports/graphify-daily-coordinator-canary-v1.json"
       ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
       "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
       "safeNextAction": "Remain unexecuted until its prerequisites and proof receipt are present.",
       "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
       "priority": 10,
       "step": "STEP-01"
     },
@@ -383,9 +667,26 @@
         "docs/reports/current-workspace-packet-chunk-join-v1.json",
         "docs/reports/graphify-daily-coordinator-canary-v1.json"
       ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
       "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
       "safeNextAction": "Remain unexecuted until its prerequisites and proof receipt are present.",
       "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
       "priority": 10,
       "step": "STEP-01"
     },
@@ -402,9 +703,22 @@
         "docs/reports/current-source-cohort-lineage-v1.json",
         "docs/reports/current-workspace-packet-chunk-join-v1.json"
       ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
       "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
       "safeNextAction": "Remain unexecuted until its prerequisites and proof receipt are present.",
       "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
       "priority": 10,
       "step": "STEP-01"
     },
@@ -422,9 +736,26 @@
         "docs/reports/current-workspace-packet-chunk-join-v1.json",
         "docs/reports/graphify-daily-coordinator-canary-v1.json"
       ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
       "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
       "safeNextAction": "Remain unexecuted until its prerequisites and proof receipt are present.",
       "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
       "priority": 10,
       "step": "STEP-01"
     },
@@ -442,9 +773,26 @@
         "docs/reports/current-workspace-packet-chunk-join-v1.json",
         "docs/reports/graphify-daily-coordinator-canary-v1.json"
       ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
       "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
       "safeNextAction": "Remain unexecuted until its prerequisites and proof receipt are present.",
       "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
       "priority": 10,
       "step": "STEP-01"
     },
@@ -462,9 +810,26 @@
         "docs/reports/current-workspace-packet-chunk-join-v1.json",
         "docs/reports/graphify-daily-coordinator-canary-v1.json"
       ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
       "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
       "safeNextAction": "Remain unexecuted until its prerequisites and proof receipt are present.",
       "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
       "priority": 10,
       "step": "STEP-01"
     },
@@ -482,9 +847,26 @@
         "docs/reports/current-workspace-packet-chunk-join-v1.json",
         "docs/reports/graphify-daily-coordinator-canary-v1.json"
       ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
       "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
       "safeNextAction": "Remain unexecuted until its prerequisites and proof receipt are present.",
       "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
       "priority": 10,
       "step": "STEP-01"
     },
@@ -502,9 +884,26 @@
         "docs/reports/current-workspace-packet-chunk-join-v1.json",
         "docs/reports/graphify-daily-coordinator-canary-v1.json"
       ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
       "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
       "safeNextAction": "Repair or identify the authoritative current source/chunk binding; do not apply a cohort.",
       "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
       "priority": 10,
       "step": "STEP-01"
     },
@@ -522,9 +921,26 @@
         "docs/reports/current-workspace-packet-chunk-join-v1.json",
         "docs/reports/graphify-daily-coordinator-canary-v1.json"
       ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
       "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
       "safeNextAction": "Remain unexecuted until its prerequisites and proof receipt are present.",
       "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
       "priority": 10,
       "step": "STEP-01"
     },
@@ -542,9 +958,26 @@
         "docs/reports/current-workspace-packet-chunk-join-v1.json",
         "docs/reports/graphify-daily-coordinator-canary-v1.json"
       ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
       "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
       "safeNextAction": "Preserve this constraint while executing its parent gate.",
       "mutationScope": "NONE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
       "priority": 10,
       "step": "STEP-01"
     },
@@ -562,9 +995,26 @@
         "docs/reports/current-workspace-packet-chunk-join-v1.json",
         "docs/reports/graphify-daily-coordinator-canary-v1.json"
       ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
       "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
       "safeNextAction": "Remain unexecuted until its prerequisites and proof receipt are present.",
       "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
       "priority": 10,
       "step": "STEP-01"
     },
@@ -582,9 +1032,26 @@
         "docs/reports/current-workspace-packet-chunk-join-v1.json",
         "docs/reports/graphify-daily-coordinator-canary-v1.json"
       ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
       "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
       "safeNextAction": "Preserve this constraint while executing its parent gate.",
       "mutationScope": "NONE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
       "priority": 10,
       "step": "STEP-01"
     },
@@ -602,9 +1069,26 @@
         "docs/reports/current-workspace-packet-chunk-join-v1.json",
         "docs/reports/graphify-daily-coordinator-canary-v1.json"
       ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
       "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
       "safeNextAction": "Preserve this constraint while executing its parent gate.",
       "mutationScope": "NONE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
       "priority": 10,
       "step": "STEP-01"
     },
@@ -622,9 +1106,26 @@
         "docs/reports/current-workspace-packet-chunk-join-v1.json",
         "docs/reports/graphify-daily-coordinator-canary-v1.json"
       ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
       "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
       "safeNextAction": "Attach current evidence before changing task status.",
       "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
       "priority": 10,
       "step": "STEP-01"
     },
@@ -640,9 +1141,18 @@
       "evidenceRefs": [
         "docs/reports/openspec-portfolio-v1.json"
       ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/openspec-portfolio-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
       "validationCommand": "npx openspec validate parent-atlas-okf-knowledge-layers --type change --strict --json",
       "safeNextAction": "Review the owning change's proof gate: parent-atlas-okf-knowledge-layers",
       "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
       "priority": 20,
       "step": "STEP-02"
     },
@@ -658,9 +1168,18 @@
       "evidenceRefs": [
         "docs/reports/openspec-portfolio-v1.json"
       ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/openspec-portfolio-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
       "validationCommand": "npx openspec validate parent-atlas-okf-knowledge-layers --type change --strict --json",
       "safeNextAction": "Review the owning change's proof gate: parent-atlas-okf-knowledge-layers",
       "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
       "priority": 20,
       "step": "STEP-02"
     },
@@ -676,9 +1195,18 @@
       "evidenceRefs": [
         "docs/reports/openspec-portfolio-v1.json"
       ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/openspec-portfolio-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
       "validationCommand": "npx openspec validate parent-atlas-okf-knowledge-layers --type change --strict --json",
       "safeNextAction": "Review the owning change's proof gate: parent-atlas-okf-knowledge-layers",
       "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
       "priority": 20,
       "step": "STEP-02"
     },
@@ -694,9 +1222,18 @@
       "evidenceRefs": [
         "docs/reports/openspec-portfolio-v1.json"
       ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/openspec-portfolio-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
       "validationCommand": "npx openspec validate parent-atlas-okf-knowledge-layers --type change --strict --json",
       "safeNextAction": "Review the owning change's proof gate: parent-atlas-okf-knowledge-layers",
       "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
       "priority": 20,
       "step": "STEP-02"
     },
@@ -713,9 +1250,22 @@
         "docs/reports/current-source-cohort-lineage-v1.json",
         "docs/reports/current-workspace-packet-chunk-join-v1.json"
       ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
       "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
       "safeNextAction": "Attach current evidence before changing task status.",
       "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
       "priority": 20,
       "step": "STEP-02"
     },
@@ -732,9 +1282,22 @@
         "docs/reports/current-source-cohort-lineage-v1.json",
         "docs/reports/current-workspace-packet-chunk-join-v1.json"
       ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
       "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
       "safeNextAction": "Remain unexecuted until its prerequisites and proof receipt are present.",
       "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
       "priority": 20,
       "step": "STEP-02"
     },
@@ -751,9 +1314,22 @@
         "docs/reports/current-source-cohort-lineage-v1.json",
         "docs/reports/current-workspace-packet-chunk-join-v1.json"
       ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
       "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
       "safeNextAction": "Remain unexecuted until its prerequisites and proof receipt are present.",
       "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
       "priority": 20,
       "step": "STEP-02"
     },
@@ -770,9 +1346,22 @@
         "docs/reports/current-source-cohort-lineage-v1.json",
         "docs/reports/current-workspace-packet-chunk-join-v1.json"
       ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
       "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
       "safeNextAction": "Preserve this constraint while executing its parent gate.",
       "mutationScope": "NONE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
       "priority": 20,
       "step": "STEP-02"
     },
@@ -788,9 +1377,18 @@
       "evidenceRefs": [
         "docs/reports/openspec-portfolio-v1.json"
       ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/openspec-portfolio-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
       "validationCommand": "npx openspec validate parent-atlas-okf-knowledge-layers --type change --strict --json",
       "safeNextAction": "Review the owning change's proof gate: parent-atlas-okf-knowledge-layers",
       "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
       "priority": 30,
       "step": "STEP-03"
     },
@@ -807,9 +1405,22 @@
         "docs/reports/current-source-cohort-lineage-v1.json",
         "docs/reports/current-workspace-packet-chunk-join-v1.json"
       ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
       "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
       "safeNextAction": "Repair or identify the authoritative current source/chunk binding; do not apply a cohort.",
       "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
       "priority": 30,
       "step": "STEP-03"
     },
@@ -825,9 +1436,18 @@
       "evidenceRefs": [
         "docs/reports/openspec-portfolio-v1.json"
       ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/openspec-portfolio-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
       "validationCommand": "npx openspec validate parent-atlas-okf-knowledge-layers --type change --strict --json",
       "safeNextAction": "Review the owning change's proof gate: parent-atlas-okf-knowledge-layers",
       "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
       "priority": 40,
       "step": "STEP-04"
     },
@@ -843,9 +1463,18 @@
       "evidenceRefs": [
         "docs/reports/openspec-portfolio-v1.json"
       ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/openspec-portfolio-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
       "validationCommand": "npx openspec validate parent-atlas-okf-knowledge-layers --type change --strict --json",
       "safeNextAction": "Review the owning change's proof gate: parent-atlas-okf-knowledge-layers",
       "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
       "priority": 50,
       "step": "STEP-05"
     },
@@ -862,9 +1491,22 @@
         "docs/reports/current-source-cohort-lineage-v1.json",
         "docs/reports/current-workspace-packet-chunk-join-v1.json"
       ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
       "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
       "safeNextAction": "Remain unexecuted until its prerequisites and proof receipt are present.",
       "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
       "priority": 50,
       "step": "STEP-05"
     },
@@ -881,9 +1523,22 @@
         "docs/reports/current-source-cohort-lineage-v1.json",
         "docs/reports/current-workspace-packet-chunk-join-v1.json"
       ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
       "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
       "safeNextAction": "Attach current evidence before changing task status.",
       "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
       "priority": 50,
       "step": "STEP-05"
     },
@@ -900,9 +1555,22 @@
         "docs/reports/current-source-cohort-lineage-v1.json",
         "docs/reports/current-workspace-packet-chunk-join-v1.json"
       ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
       "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
       "safeNextAction": "Preserve this constraint while executing its parent gate.",
       "mutationScope": "NONE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
       "priority": 50,
       "step": "STEP-05"
     },
@@ -919,9 +1587,22 @@
         "docs/reports/current-source-cohort-lineage-v1.json",
         "docs/reports/current-workspace-packet-chunk-join-v1.json"
       ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
       "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
       "safeNextAction": "Attach current evidence before changing task status.",
       "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
       "priority": 50,
       "step": "STEP-05"
     },
@@ -937,9 +1618,18 @@
       "evidenceRefs": [
         "docs/reports/openspec-portfolio-v1.json"
       ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/openspec-portfolio-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
       "validationCommand": "npx openspec validate parent-atlas-okf-knowledge-layers --type change --strict --json",
       "safeNextAction": "Review the owning change's proof gate: parent-atlas-okf-knowledge-layers",
       "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
       "priority": 80,
       "step": "STEP-07"
     },
@@ -953,9 +1643,13 @@
       "currentOwner": "parent-atlas-okf-knowledge-layers",
       "dependencyOrBlocker": "Constraint only; not executable work.",
       "evidenceRefs": [],
+      "evidenceResolution": [],
+      "missingEvidenceRefs": [],
       "validationCommand": "npx openspec validate parent-atlas-okf-knowledge-layers --type change --strict --json",
       "safeNextAction": "Preserve this constraint while executing its parent gate.",
       "mutationScope": "NONE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
       "priority": 80,
       "step": "STEP-07"
     },
@@ -971,9 +1665,18 @@
       "evidenceRefs": [
         "docs/reports/openspec-portfolio-v1.json"
       ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/openspec-portfolio-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
       "validationCommand": "npx openspec validate parent-atlas-okf-knowledge-layers --type change --strict --json",
       "safeNextAction": "Review the owning change's proof gate: parent-atlas-okf-knowledge-layers",
       "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
       "priority": 80,
       "step": "STEP-07"
     },
@@ -987,9 +1690,13 @@
       "currentOwner": "parent-atlas-okf-knowledge-layers",
       "dependencyOrBlocker": "Constraint only; not executable work.",
       "evidenceRefs": [],
+      "evidenceResolution": [],
+      "missingEvidenceRefs": [],
       "validationCommand": "npx openspec validate parent-atlas-okf-knowledge-layers --type change --strict --json",
       "safeNextAction": "Preserve this constraint while executing its parent gate.",
       "mutationScope": "NONE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
       "priority": 80,
       "step": "STEP-07"
     },
@@ -1005,9 +1712,18 @@
       "evidenceRefs": [
         "docs/reports/openspec-portfolio-v1.json"
       ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/openspec-portfolio-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
       "validationCommand": "npx openspec validate parent-atlas-okf-knowledge-layers --type change --strict --json",
       "safeNextAction": "Review the owning change's proof gate: parent-atlas-okf-knowledge-layers",
       "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
       "priority": 80,
       "step": "STEP-07"
     },
@@ -1023,9 +1739,18 @@
       "evidenceRefs": [
         "docs/reports/openspec-portfolio-v1.json"
       ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/openspec-portfolio-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
       "validationCommand": "npx openspec validate parent-atlas-okf-knowledge-layers --type change --strict --json",
       "safeNextAction": "Review the owning change's proof gate: parent-atlas-okf-knowledge-layers",
       "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
       "priority": 80,
       "step": "STEP-07"
     },
@@ -1042,9 +1767,22 @@
         "docs/reports/current-source-cohort-lineage-v1.json",
         "docs/reports/current-workspace-packet-chunk-join-v1.json"
       ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
       "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
       "safeNextAction": "Remain unexecuted until its prerequisites and proof receipt are present.",
       "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
       "priority": 80,
       "step": "STEP-07"
     },
@@ -1061,9 +1799,22 @@
         "docs/reports/current-source-cohort-lineage-v1.json",
         "docs/reports/current-workspace-packet-chunk-join-v1.json"
       ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
       "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
       "safeNextAction": "Remain unexecuted until its prerequisites and proof receipt are present.",
       "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
       "priority": 80,
       "step": "STEP-07"
     },
@@ -1080,9 +1831,22 @@
         "docs/reports/current-source-cohort-lineage-v1.json",
         "docs/reports/current-workspace-packet-chunk-join-v1.json"
       ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
       "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
       "safeNextAction": "Preserve this constraint while executing its parent gate.",
       "mutationScope": "NONE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
       "priority": 80,
       "step": "STEP-07"
     }
@@ -1100,6 +1864,7 @@
     "Unchecked status is not executable authority.",
     "The historical July workstation board was not overwritten.",
     "STEP-07 is ownership classification, not an execution queue.",
-    "GPU/challenger work remains downstream of identity, provenance, and candidate prerequisites."
+    "GPU/challenger work remains downstream of identity, provenance, and candidate prerequisites.",
+    "No task is executable from this reconciliation projection; planning and mutation are separate gates."
   ]
 }

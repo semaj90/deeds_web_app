@@ -1,0 +1,23 @@
+{
+  "schema": "atlas.parent-atlas-workstation-ace-context-proof.v1",
+  "status": "PROVEN",
+  "referenceOnly": true,
+  "bounded": true,
+  "backlogNotMaterialized": true,
+  "noCandidateNoModel": true,
+  "replayStable": true,
+  "selectedEvidenceRefs": [
+    "docs/reports/current-source-cohort-lineage-v1.json",
+    "docs/reports/current-workspace-packet-chunk-join-v1.json"
+  ],
+  "contextChecksum": "sha256:cc93a4aa501ae9e2a13422a7f73c108214105e5df69e8db1333ffa867c3fcbb6",
+  "writes": {
+    "taskLedgers": 0,
+    "sourceFiles": 0,
+    "databases": 0,
+    "qdrant": 0,
+    "neo4j": 0,
+    "cache": 0,
+    "modelCalls": 0
+  }
+}

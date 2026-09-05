@@ -22,6 +22,11 @@ const DEFAULT_SOURCE_EXTENSIONS = new Set([
   '.sh', '.bash', '.zsh', '.ps1', '.psm1',
 ]);
 
+// Generated receipts are evidence about a workspace, not workspace source.
+// Including them would make every audit/report write change workspaceRevision
+// and prevent a stable current-source cohort from converging.
+const DEFAULT_GENERATED_SOURCE_PREFIXES = ['docs/reports/'] as const;
+
 export type WorkspaceRevisionOriginRuntimeV1 = {
   record: WorkspaceRevisionRecordV1;
   bindings: WorkspaceSourceBindingV1[];
@@ -55,6 +60,11 @@ function isSourceFile(relativePath: string, extensions: ReadonlySet<string>): bo
   const normalized = normalizeSourceRef(relativePath);
   if (!normalized || normalized.startsWith('.git/')) return false;
   return extensions.has(path.extname(normalized).toLowerCase());
+}
+
+function isGeneratedSourceArtifact(relativePath: string): boolean {
+  const normalized = normalizeSourceRef(relativePath).toLowerCase();
+  return DEFAULT_GENERATED_SOURCE_PREFIXES.some((prefix) => normalized.startsWith(prefix));
 }
 
 export function materializeWorkspaceRevisionOriginV1(input: {
@@ -98,6 +108,7 @@ export function materializeWorkspaceRevisionOriginV1(input: {
     .split('\0')
     .filter(Boolean)
     .map(normalizeSourceRef)
+    .filter((sourceRef) => !isGeneratedSourceArtifact(sourceRef))
     .filter((sourceRef) => isSourceFile(sourceRef, extensions)))]
     .sort();
 

@@ -6530,7 +6530,26 @@ SUCCESS_POPULATION_UNAVAILABLE`, unchanged. Do not fabricate a success candidate
 three fresh workspace-revision materializations above — none of them is wired to the
 source-selection/chunk-join population these two audits actually query.
 
-## OPENSPEC-WORKSTATION-SYNTHESIS-01 (2026-09-05, PROPOSED — registered, zero implementation, zero code)
+## OPENSPEC-WORKSTATION-SYNTHESIS-01 (2026-09-05, SUPERSEDED BY REAL IMPLEMENTATION — see update below)
+
+**Update (2026-09-05, later same day)**: this section was registered as a design/placement-only
+proposal (no code, no contracts) with an explicit governance decision to land as a *section of this
+file*, not a new OpenSpec change directory, per the `currentAuthorityCount = 1` invariant. A
+separate, concurrently-running effort implemented the design independently — as its own OpenSpec
+change, `openspec/changes/parent-atlas-openspec-workstation-synthesis/` (25/25 tasks, all proof
+gates checked) — rather than as a section here. That deviates from the *placement* decision below,
+but not from the *invariant* it exists to protect: re-ran
+`node scripts/atlas/audit-openspec-portfolio-v1.mjs` fresh and confirmed `CURRENT_AUTHORITY: 1`
+still holds; the new change is classified `ACTIVE_DEPENDENCY` under this file's authority, with an
+explicit note ("cannot reorder, close, or replace convergence ownership") already present in the
+script's classification table. Independently re-ran 2 of its proof scripts fresh
+(`build-parent-atlas-workstation-openspec-workboard-v2.mjs`,
+`prove-parent-atlas-workstation-plan-only-v1.mjs`) — both reproduced byte-identical checksums
+against their committed reports, and the workboard rebuild independently re-derived the same
+`PKT-LINEAGE-08` blocker this file's own lineage audits already established (52 cohort rows, 0
+workspace-revision-qualified, `binding_rows: 111`) — real, consistent, not fabricated. The design
+below is now historical context for why that change exists, not an open proposal — do not re-read
+it as "not started."
 
 **Governance placement, decided before any design content**: per this file's own
 `GRAPHIFY-EXECUTION-LEDGER-SCHEMA-02` scope note — "a second OpenSpec change would have
@@ -6592,10 +6611,12 @@ DEFERRED | NEEDS_HUMAN_DECISION`) → `DEPENDENCY_RANK` (STEP order + explicit d
 `VALIDATION_RECEIPT` → `RECONCILE` (checkbox mutation ONLY from a proof receipt) → `REBUILD`
 (regenerate workboard, repeat).
 
-**Explicitly NOT done by this section**: no contract implemented, no gate built, no ACE packet
-shape wired, no BitFrost key scheme wired, no model call made. This is a design/placement
-registration only — matches this file's own established pattern for prior registered-not-started
-gate batches (e.g. the 5 `DOMAIN-CLASSIFIER-OWNER-01`-adjacent gates registered 2026-09-03).
+**Explicitly NOT done by this section** (true at time of writing; superseded — see the update note
+at the top of this section): no contract implemented, no gate built, no ACE packet shape wired, no
+BitFrost key scheme wired, no model call made. This was a design/placement registration only —
+matched this file's own established pattern for prior registered-not-started gate batches (e.g. the
+5 `DOMAIN-CLASSIFIER-OWNER-01`-adjacent gates registered 2026-09-03) — until the real implementation
+landed as `parent-atlas-openspec-workstation-synthesis` the same day.
 
 **Sequencing relative to the rest of this file**: this proposal explicitly does not compete with
 the active P0 chain (`PKT-LINEAGE-08` → `RETRIEVAL-01L`) for priority — its own first bounded gate
