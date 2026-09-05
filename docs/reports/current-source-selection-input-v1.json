@@ -1,0 +1,15 @@
+{
+  "schema": "atlas.current-source-selection-input.v1",
+  "status": "NOT_EMITTED_SNAPSHOT_NOT_PROVEN",
+  "executionId": null,
+  "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+  "workspaceRevision": "sha256:8e3e5851ef96d4fc399f4a2374127a5f1188a1146ef08138120253b7ffba8565",
+  "selectionPolicyRevision": null,
+  "sourceSelectionChecksum": null,
+  "sourceCount": 0,
+  "bindings": [],
+  "canonicalAuthority": false,
+  "readOnly": true,
+  "writesPerformed": false,
+  "downstreamPlannerInput": null
+}

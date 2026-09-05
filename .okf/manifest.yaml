@@ -74,6 +74,7 @@ registries:
     description: Canonical store and rebuildable index/executor ownership policies
     schemas:
       - feature-intelligence.yaml
+      - code-exploration.yaml
 
 # Extractor versions (bump on breaking changes)
 extractors:
@@ -129,6 +130,29 @@ pipeline:
   8: ontology_tuple_builder    # (feature relationships)
   9: canonical_identity_promotion
   10: projection_materialization
+
+# Stage 3 policy clarification (2026-09-05, added by
+# openspec/changes/parent-atlas-retrieval-lineage-dag-convergence -- documentation
+# only, no numbering or stage order changed above). "ast_symbol_classifier (ast-grep
+# extraction)" is a one-line shorthand that a future reader could misread as "the
+# current symbol seed is a canonical ast-grep-derived index." A fresh audit
+# (AST-EXPLORE-01 seed audit, docs/reports/ast-explore-seed-audit-v1.json) proved
+# that is not true today: the live sveltekit-frontend/memory/index/symbols.jsonl
+# seed (40,136 rows) is derived mostly by regex, with ast-grep used for import
+# observations only, carries no source_revision/workspace_revision, and has zero
+# canonical UTF-8 byte spans. This block makes the real, narrower policy explicit.
+pipeline_contract:
+  ast_symbol_classifier:
+    discovery_providers: [ast_grep, regex_legacy]
+    structural_authority: [tree_sitter, atlas_ast_nodes, atlas_symbol_versions]
+    coordinates:
+      canonical: utf8_byte
+      lsp: utf16_protocol_only
+    canonical_promotion_requires_revision_join: true
+    required_identity: [source_ref, source_revision, workspace_revision, content_hash]
+    provider_policy:
+      regex_legacy: discovery_only
+      ast_grep: exact_observation_requires_canonical_join
 
 # Parent Atlas contextual-graph projection policy. This is configuration only;
 # PostgreSQL remains the canonical graph snapshot and feature relationship store.

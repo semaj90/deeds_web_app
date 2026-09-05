@@ -1,0 +1,13 @@
+{
+  "schema": "atlas.graphify-completed-legacy-coverage.v1",
+  "gate": "GRAPHIFY-COMPLETED-LEGACY-COVERAGE-01",
+  "query": "SELECT count(*) FROM graphify_files gf JOIN graphify_runs gr_first ON gr_first.run_id = gf.first_seen_run_id JOIN graphify_runs gr_last ON gr_last.run_id = gf.last_seen_run_id WHERE gr_first.status = 'COMPLETED' AND gr_last.status != 'COMPLETED'",
+  "erodedRows": 0,
+  "totalGraphifyFilesRows": 25317,
+  "multiRowSourceRefsChecked": 59,
+  "status": "LEGACY_BRIDGE_SAFE_FOR_CURRENT_POPULATION",
+  "interpretation": "Zero graphify_files rows have a COMPLETED first_seen_run_id whose last_seen_run_id was later overwritten by a non-COMPLETED (RUNNING) run. A status='COMPLETED' filter on the legacy bridge join does not hide any currently-eroded completed evidence for today's population.",
+  "generatedAt": "2026-09-05T16:45:37.185Z",
+  "writesPerformed": false,
+  "canonicalAuthority": false
+}

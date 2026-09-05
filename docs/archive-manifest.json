@@ -367,5 +367,12 @@
     "sha256": "315a65c8e18af17c5b5e2ff7a700982a6efbec4c3113a025c90bc70d0371a32",
     "archived": "2026-09-04",
     "reason": "BITFROST-PRODUCER-CONVERGENCE-01: confirmed dead scaffold, never executed. `node --check` throws a real SyntaxError (literal backslash-escaped backticks left over from a markdown-paste, e.g. `console.log(\\`Found \\${records.length}...\\`)` outside any template literal). Also imports '../utils/redis_client.js', which does not exist anywhere in the repo (confirmed via `ls`). Found during the BitFrost producer census (BITFROST-LIVE-INVALIDATION-ADOPTION-01 Step 1) alongside its sibling scripts/atlas/bitfrost-warm-startup.mjs -- both write the same bifrost:packet:{packet_key} key shape, but only bitfrost-warm-startup.mjs is syntactically valid and was kept pending the fuller producer/value-contract convergence audit (see docs/reports/parent-atlas-bitfrost-producer-convergence-v1.json)."
+  },
+  {
+    "path": "sveltekit-frontend/scripts/atlas/audit-current-graphify-snapshot-authority-v1.mts",
+    "sha256": "5ae9a601c26f295240d7a0403d3ba5a8792e04a30d1b69f106cbfb58c15b90d2",
+    "archived": "2026-09-05T17:02:18.018Z",
+    "archivedTo": "deeds_labs/archive/2026-09-05/audit-current-graphify-snapshot-authority-v1.sveltekit-side-variant.mts.bak",
+    "reason": "Duplicate-owner collision (CURRENT-SOURCE-SNAPSHOT-RESOLVE-01): a concurrent session independently wrote scripts/atlas/audit-current-graphify-snapshot-authority-v1.mts (repo root) with the same producerRevision, same output paths, and near-identical qualification logic. The repo-root version was kept as canonical (portable relative import, explicit workspace_id resolution) and enhanced with this file's independent live-git-tree checksum cross-check plus a nonzero exit code on non-proven status. See openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md for the full merge record."
   }
 ]
