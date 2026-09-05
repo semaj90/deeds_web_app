@@ -1,6 +1,6 @@
 # Parent Atlas Workstation OpenSpec Workboard v2
 
-Generated: 2026-09-05T07:15:10.311Z | selected unchecked tasks: 54
+Generated: 2026-09-05T07:24:56.089Z | selected unchecked tasks: 54
 
 > Derived reconciliation projection. OpenSpec task ledgers remain authoritative; this board does not execute or close tasks.
 

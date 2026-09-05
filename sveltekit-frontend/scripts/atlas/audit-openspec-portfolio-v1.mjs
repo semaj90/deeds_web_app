@@ -93,6 +93,36 @@ const CLASSIFICATION = {
     note: 'Governed workstation projection/adapter under the sole convergence authority; it may select and explain one bounded gate but cannot reorder, close, or replace convergence ownership.',
   },
 
+  // Fresh regression / review reconciliation -- current bounded follow-up only.
+  'route-import-infra-isolation': {
+    queueClass: 'ACTIVE_DEPENDENCY',
+    currentGateRefs: ['ROUTE-IMPORT-RUNTIME-CONTRACT-01'],
+    mayGenerateNewWork: true,
+    supersededBy: null,
+    note: 'REGRESSED_AFTER_PROOF: historical Redis lazy-import repair remains valid, but the current 27-failure route run exposes an import-time runtime-contract regression. Repair import isolation before using broad route health for closure.',
+  },
+  'agent-branch-review-fanout-ace-centroid-aug22': {
+    queueClass: 'ACTIVE_DEPENDENCY',
+    currentGateRefs: ['CONV-2'],
+    mayGenerateNewWork: true,
+    supersededBy: null,
+    note: 'PARTIALLY_STALE / SPLIT_TRUTH: fanout-proof-db-readiness is closed by current evidence; ace-centroid-alignment remains an operator decision. Conditional 3.3/3.4 work stays downstream and is not an independent queue.',
+  },
+  'codereview-inference-wiring-followup-aug22': {
+    queueClass: 'ACTIVE_DEPENDENCY',
+    currentGateRefs: ['CONV-2'],
+    mayGenerateNewWork: true,
+    supersededBy: null,
+    note: 'Two historical targets are superseded: fetchStreamedChatCompletion refactor and the original target shape. Retain only the shared createLocalLlamaChatModel initializer as the bounded active follow-up.',
+  },
+  'parent-atlas-best-fit-score-fabric': {
+    queueClass: 'ACTIVE_DEPENDENCY',
+    currentGateRefs: ['CONV-4'],
+    mayGenerateNewWork: true,
+    supersededBy: null,
+    note: 'BOOKKEEPING_STALE: one cross-file bookkeeping item is already satisfied by current evidence. Keep score semantics, weight-boundary, and learned-ranker evaluation gates; do not rerun work solely to reach a stale percentage.',
+  },
+
   // Active implementation owners -- OaK / governed execution
   'parent-atlas-ontology-kernel': {
     queueClass: 'ACTIVE_DEPENDENCY',

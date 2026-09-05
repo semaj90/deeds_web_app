@@ -1198,6 +1198,19 @@ def _syntax_diagnostics(text: str, language: str) -> list[str]:
     return diagnostics
 
 
+def _fatal_structural_diagnostics(diagnostics: list[str]) -> list[str]:
+    """Return diagnostics that indicate degraded structural evidence.
+
+    Coordinate normalization notices are retained in the response for auditability,
+    but they do not mean that Tree-sitter failed to parse the source.
+    """
+    return [
+        diagnostic
+        for diagnostic in diagnostics
+        if not diagnostic.startswith("CONSILIENCY_LF_BYTE_SPAN_REMAPPED")
+    ]
+
+
 def _code_chunks_regex(text: str, language: str) -> list[Chunk]:
     lines = text.splitlines()
     chunks: list[Chunk] = []
@@ -2731,6 +2744,7 @@ def _ast_evidence(req: AstChunkRequest) -> AstEvidenceResponse:
         edges.extend(fallback_edges)
         diagnostics.extend(edge_diagnostics)
 
+    fatal_diagnostics = _fatal_structural_diagnostics(diagnostics)
     return AstEvidenceResponse(
         schema="atlas.ast.evidence.v1",
         engine="treesitter-chunker",
@@ -2741,8 +2755,8 @@ def _ast_evidence(req: AstChunkRequest) -> AstEvidenceResponse:
         chunks=evidence_chunks,
         edges=edges,
         diagnostics=diagnostics,
-        error_tag="ChunkingError" if diagnostics else None,
-        syntax_status="RECOVERED_WITH_ERRORS" if diagnostics else "CLEAN",
+        error_tag="ChunkingError" if fatal_diagnostics else None,
+        syntax_status="RECOVERED_WITH_ERRORS" if fatal_diagnostics else "CLEAN",
     )
 
 

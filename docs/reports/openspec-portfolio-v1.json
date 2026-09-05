@@ -1,6 +1,6 @@
 {
   "schema": "openspec-portfolio-v1",
-  "generatedAt": "2026-09-05T06:41:36.282Z",
+  "generatedAt": "2026-09-05T07:24:56.398Z",
   "secondaryRootFinding": {
     "path": "sveltekit-frontend/openspec/changes",
     "changeIds": [
@@ -47,7 +47,7 @@
   "summary": {
     "totalChanges": 79,
     "totalTasksCounted": 4878,
-    "totalTasksCompleted": 2779,
+    "totalTasksCompleted": 2782,
     "byQueueClass": {
       "CURRENT_AUTHORITY": 1,
       "ACTIVE_DEPENDENCY": 16,
@@ -111,9 +111,9 @@
     {
       "changeId": "ace-hyperrag-chr97-graphify-audit",
       "hasTasksFile": true,
-      "completed": 4,
+      "completed": 5,
       "total": 7,
-      "percent": 57.1,
+      "percent": 71.4,
       "queueClass": "UNCLASSIFIED",
       "currentGateRefs": [],
       "mayGenerateNewWork": null,
@@ -239,9 +239,9 @@
     {
       "changeId": "inference-wiring-deep-audit-aug22",
       "hasTasksFile": true,
-      "completed": 49,
+      "completed": 50,
       "total": 50,
-      "percent": 98,
+      "percent": 100,
       "queueClass": "UNCLASSIFIED",
       "currentGateRefs": [],
       "mayGenerateNewWork": null,
@@ -413,9 +413,9 @@
     {
       "changeId": "parent-atlas-best-fit-score-fabric",
       "hasTasksFile": true,
-      "completed": 30,
+      "completed": 31,
       "total": 34,
-      "percent": 88.2,
+      "percent": 91.2,
       "queueClass": "UNCLASSIFIED",
       "currentGateRefs": [],
       "mayGenerateNewWork": null,

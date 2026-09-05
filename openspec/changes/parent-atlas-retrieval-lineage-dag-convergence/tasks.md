@@ -6530,6 +6530,18 @@ SUCCESS_POPULATION_UNAVAILABLE`, unchanged. Do not fabricate a success candidate
 three fresh workspace-revision materializations above — none of them is wired to the
 source-selection/chunk-join population these two audits actually query.
 
+**Guarded canary authorization recheck (2026-09-05, no new write):** the explicitly authorized
+revision `sha256:0972ac11050af02cb94499e5da5bd24b41f647b2989a3b2c616a51241bb138b2` was supplied to
+`sveltekit-frontend/scripts/atlas/graphify-daily-coordinator-canary-v1.mts` through the expected
+workspace-revision guard. Two fresh read-only materializations immediately before the guarded
+attempt agreed at `sha256:c12f11e18de137c63d0fceebeabaa3f23e0c1aad6e37d1fda0a9540b52fe77a6` with
+`bindingCount=23684`; therefore the guard rejected the request before creating an execution row.
+Independent PostgreSQL readback confirmed the ledger remained at 9 executions. The prior bounded
+canary rows remain preserved, but neither is proof for the requested `0972...` revision. A new
+authorization is required for the currently stable revision; no `PKT-LINEAGE-08` success claim or
+source-cohort promotion follows from this recheck. Evidence: `docs/reports/graphify-daily-coordinator-canary-v1.json`,
+`docs/reports/graphify-lifecycle-entrypoint-v1.json`, and the guarded canary console receipt.
+
 ## OPENSPEC-WORKSTATION-SYNTHESIS-01 (2026-09-05, SUPERSEDED BY REAL IMPLEMENTATION — see update below)
 
 **Update (2026-09-05, later same day)**: this section was registered as a design/placement-only

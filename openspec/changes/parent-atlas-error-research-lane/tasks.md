@@ -98,7 +98,36 @@ fix).
   concurrently-edited lane (`sveltekit-frontend/src/lib/server/queue/*`,
   `integration-events.ts`, `event-fabric.ts`). Do not touch from this change.
 
+## Blocker re-verified + root-caused (2026-09-05, read-only)
+
+Re-checked this lane's stated blocker live rather than trusting the 2026-08-12 note, and traced it
+to an owner it wasn't previously linked to. Probe kept at
+`sveltekit-frontend/scripts/atlas/audit-error-research-lane-blockers-v1.mts` (run from
+`sveltekit-frontend/`) so this doesn't need re-deriving.
+
+- **All five lane tables still MISSING live**: `error_logs`, `error_research_context`,
+  `error_fix_plan`, `fix_attempt`, `verification_receipt` — the blocker is unchanged, and it is
+  wider than this file's "`error_logs` not migrated" phrasing (the receipt table this lane's own
+  ER5 depends on, `error_research_context`, is equally absent despite its migration file
+  `drizzle/manual/error_research_context.sql` existing on disk since 2026-08-12).
+- **Root cause is NOT specific to this lane, and this lane cannot unblock itself.** `error_logs` is
+  created by journaled migration `drizzle/0036_swift_mac_gargan.sql:1` (`CREATE TABLE "error_logs"`,
+  journal entry `idx: 36`), so the migration exists and is tracked — but the live DB's own applied-
+  migrations ledger `drizzle.__drizzle_migrations` has **0 rows** (verified live; `public.__drizzle_migrations`
+  doesn't exist). Nothing in the numbered-migration sequence is recorded as applied against this
+  database at all; the live 498-table schema was built by other means (hand-applied `psql`, per
+  CLAUDE.md's own documented manual-migration history).
+- **Owner of that blocker is `openspec/changes/manual-migration-reconciliation/`**, which already
+  documents this precisely and independently — 41 journal entries vs 0 live ledger rows, 66 loose
+  root SQL files outside the journal, 41 unresolved hashes, `PRE_APPLY_BLOCKED` with `ledgerCount=0`,
+  and an explicit standing instruction not to run global `drizzle-kit migrate`, `--fix-hashes`, or
+  ledger repair until the baseline decision is approved. **Do not attempt to unblock this lane by
+  hand-applying `0036` or `error_research_context.sql`** — that would add yet another
+  out-of-ledger table to the exact drift problem that change is trying to reconcile. This lane's
+  `ERROR_RESEARCH_CONTEXT_PROVEN` gate is downstream of that decision.
+
 ## Files
 
 - `scripts/atlas/research-error-fixes.mjs` — the ER0–ER6 script
 - `sveltekit-frontend/drizzle/manual/error_research_context.sql` — receipt table
+- `sveltekit-frontend/scripts/atlas/audit-error-research-lane-blockers-v1.mts` — read-only blocker probe

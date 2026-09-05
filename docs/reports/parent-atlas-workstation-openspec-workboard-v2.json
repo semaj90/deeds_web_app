@@ -1,6 +1,6 @@
 {
   "schema": "atlas.parent-atlas-workstation-openspec-workboard.v2",
-  "generatedAt": "2026-09-05T07:15:10.311Z",
+  "generatedAt": "2026-09-05T07:24:56.089Z",
   "readOnly": true,
   "authority": {
     "mechanicalIndex": "docs/reports/openspec-workboard-v1.json",
@@ -10,7 +10,7 @@
   },
   "sourceChecksums": {
     "workstationSpine": "sha256:710a78fe369f9f55ec7f1aaff523454688399ab890cb0cc70806f345fe53c97e",
-    "workboard": "sha256:69ab3ce2959fd3e3fd45059727734f6b0a2318355980adce6f663a5e09f33195",
+    "workboard": "sha256:5edbf674b8f0741c87fcc6457fb2dc65fd836b40619fff82a76fb0a13f640bea",
     "portfolio": "sha256:6ccd672f8d6ad38502269e6fb1ab2485e3052033bd88ec07346a33db6c37eeca",
     "sourceCohort": "sha256:90f33ccf6865a3d7865dcf4a4a580575b46c3ef8bcd8aed8b0652cef9d59462d",
     "packetJoin": "sha256:a106490043c25e93e1ffc44d1de8519bc30510975b109963fb9fac046c44f83b"

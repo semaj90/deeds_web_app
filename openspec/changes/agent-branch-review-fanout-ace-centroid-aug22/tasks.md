@@ -29,3 +29,20 @@
 - [x] 4.1 **This review-and-proof session's own archive-branch commits merged into `origin/main` (operator-confirmed: "yes continue update archive branch into main merge? ... we're not ready for fanout yet").** Explicitly scoped to THIS branch's doc/OpenSpec/proof-script commits only — the `fanout-proof-db-readiness` and `ace-centroid-alignment` branches themselves were deliberately NOT merged, per the operator's own "not ready for fanout yet" call. `origin/main` moved twice during the merge attempt (two more concurrent PRs landed — #64 `agent/ast-lineage-xgboost-runtime-hardening-20260822`, #65/#66 `agent/sample-query-matrix-ewintang-20260822` + `agent/ast-xgb-tang-alignment-20260822`); handled with a bounded fetch/merge/push retry loop (isolated detached worktrees each attempt, never touching the shared working directory), succeeded on the 2nd attempt. Pushed as `9dcb4d71c6`. Local `main` ref fast-forwarded to match (plumbing-only, no checkout).
 - [x] 4.2 **Real, important side-discovery from watching what else landed on `main` during the merge race**: PR #64 directly implements what this session's own `parent-atlas-xgboost-cuda-runtime-proof` change proposed — `python/prove_atlas_xgboost_gpu_runtime_v1.py` (synthetic-matrix CUDA proof, same shape as the WSL protocol section 1 of that change proposed) and `python/atlas_xgboost_grouped_ranking_v1.py` (implements the exact qid/group-sorting design section 4 of that change proposed). **Not a coincidence** — this session's `31bff54117` commit (recording that proposal) is a direct ancestor of PR #64's commits in `main`'s history, meaning a concurrent agent read the OpenSpec proposal and acted on it. Neither new file is yet wired into `scripts/atlas/train-xgboost-reranker.py` (verified unchanged, still has all 3 originally-found bugs) — recorded as a fresh duplication/integration question in that change's own tasks.md section 0, not resolved here.
 - [ ] 4.3 The `fanout-proof-db-readiness` and `ace-centroid-alignment` branches remain unmerged, both still correctness-verified and low-risk per sections 1-2 above — the actual merge-to-`main` decision for those two specific branches is still an operator call, not made in this session.
+  **Re-verified 2026-09-05 (read-only `git fetch --prune` + ancestry checks only, no merge/push
+  performed) — this claim is now split, not uniformly true**:
+  - `agent/fanout-proof-db-readiness-20260822`'s branch ref **no longer exists on origin**
+    (deleted). Its actual content is not lost, though: `git merge-base --is-ancestor` confirms both
+    `b4e08623a0` ("Repair Graphify revision authority migration syntax", the 1.1 fix) and
+    `ea3593491e` ("stand up disposable FANOUT proof DB...", the 3.1a-3.1c work) **are ancestors of
+    current `main`** — this branch's real work reached `main` through some other merge path (likely
+    folded into the `archive/orphaned-root-src-tree-20260822` merge referenced in 4.1/4.2, or a
+    separate squash/cherry-pick), and its now-redundant branch ref was cleaned up afterward. Not
+    independently attributed to a specific merge commit in this pass.
+  - `agent/ace-centroid-alignment-20260822` genuinely **remains unmerged** — its branch ref still
+    exists on origin, `git merge-base --is-ancestor` confirms it is NOT an ancestor of `main`, and
+    concretely: `main`'s copy of
+    `sveltekit-frontend/src/lib/server/db/schema/search-analytics.ts:239` still has
+    `compressedEmbedding` commented out — the exact bug 2.2 says this branch fixes. This half of
+    4.3's original claim is still accurate; the merge decision for this specific branch remains an
+    open operator call.
