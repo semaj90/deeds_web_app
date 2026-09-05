@@ -28,6 +28,7 @@ const origin = materializeWorkspaceRevisionOriginV1({
   producerRevision,
 });
 const workspace = origin.record;
+const bindingByRef = new Map(origin.bindings.map((binding) => [binding.sourceRef, binding]));
 const currentLiveTreeChecksum = liveTreeChecksum(origin.bindings.map((b) => ({ sourceRef: b.sourceRef, sourceRevision: b.sourceRevision })));
 
 const client = new Client({ connectionString: databaseUrl, statement_timeout: 30_000 });
@@ -69,10 +70,17 @@ try {
         [execution.execution_id],
       );
       const members = membersResult.rows;
-      const membershipChecksum = stableSourceRefChecksum(members.map((row) => String(row.source_ref)));
+      const sourceRefSetChecksum = stableSourceRefChecksum(members.map((row) => String(row.source_ref)));
       const workspaceRevisionMatches = members.every((row) => row.workspace_revision === workspace.workspaceRevision);
       const sourceCountMatches = members.length === workspace.sourceCount;
-      const checksumMatches = stage?.output_checksum === membershipChecksum;
+      const sourceBindingsMatch = members.every((row) => {
+        const binding = bindingByRef.get(String(row.source_ref));
+        return Boolean(binding)
+          && row.code_source_revision === binding.sourceRevision
+          && String(row.content_hash).replace(/^sha256:/, '') === binding.contentDigest
+          && Number(row.byte_length) === binding.byteLength;
+      });
+      const sourceRefSetChecksumMatches = stage?.output_checksum === sourceRefSetChecksum;
       // Independent cross-check against the live git tree (not merely the
       // ledger's own internal self-consistency) -- see liveTreeChecksum above.
       const ledgerLiveTreeChecksum = liveTreeChecksum(members.map((row) => ({ sourceRef: String(row.source_ref), sourceRevision: String(row.code_source_revision) })));
@@ -85,7 +93,8 @@ try {
         && selectionPolicyIsNonCanary
         && workspaceRevisionMatches
         && sourceCountMatches
-        && checksumMatches
+        && sourceBindingsMatch
+        && sourceRefSetChecksumMatches
         && liveTreeChecksumMatches;
       authorityCandidates.push({
         executionId: execution.execution_id,
@@ -96,12 +105,13 @@ try {
         selectionPolicyRevision: stage?.receipt_ref ?? null,
         selectionPolicyIsNonCanary,
         sourceSelectionOutputChecksum: stage?.output_checksum ?? null,
-        recomputedMembershipChecksum: membershipChecksum,
+        sourceRefSetChecksum,
         sourceCount: members.length,
         expectedSourceCount: workspace.sourceCount,
         workspaceRevisionMatches,
         sourceCountMatches,
-        checksumMatches,
+        sourceBindingsMatch,
+        sourceRefSetChecksumMatches,
         liveTreeChecksumMatches,
         eligible,
         members,
@@ -120,7 +130,8 @@ else if (eligible.length > 1) sourceStatus = 'AMBIGUOUS_QUALIFYING_EXECUTIONS';
 else if (eligible.length === 1) sourceStatus = 'CURRENT_SNAPSHOT_PROVEN';
 else if (authorityCandidates.some((candidate) => candidate.sourceSelectionStatus !== 'COMPLETED' || candidate.selectionPolicyIsNonCanary === false)) sourceStatus = 'SOURCE_SELECTION_INCOMPLETE';
 else if (authorityCandidates.some((candidate) => candidate.sourceCountMatches === false)) sourceStatus = 'SOURCE_COUNT_MISMATCH';
-else if (authorityCandidates.some((candidate) => candidate.checksumMatches === false)) sourceStatus = 'SOURCE_SET_CHECKSUM_MISMATCH';
+else if (authorityCandidates.some((candidate) => candidate.sourceRefSetChecksumMatches === false)) sourceStatus = 'SOURCE_SET_CHECKSUM_MISMATCH';
+else if (authorityCandidates.some((candidate) => candidate.sourceBindingsMatch === false)) sourceStatus = 'SOURCE_BINDING_MISMATCH';
 else if (authorityCandidates.some((candidate) => candidate.liveTreeChecksumMatches === false)) sourceStatus = 'LIVE_TREE_CHECKSUM_MISMATCH';
 
 const selected = eligible.length === 1 ? eligible[0] : null;
@@ -133,6 +144,9 @@ const authorityReport = {
     sourceManifestDigest: workspace.sourceManifestDigest,
     sourceCount: workspace.sourceCount,
     sourceManifestChecksum: workspace.checksum,
+    workspaceRevisionRecordChecksum: workspace.checksum,
+    workspaceOriginRuntimeRevision: origin.runtimeRevision,
+    observedAt: new Date().toISOString(),
   },
   qualifyingExecutionIds: eligible.map((candidate) => candidate.executionId),
   candidates: authorityCandidates.map(({ members: _members, ...candidate }) => candidate),
@@ -154,8 +168,10 @@ const selectionReport = {
   executionId: selected?.executionId ?? null,
   workspaceId,
   workspaceRevision: workspace.workspaceRevision,
+  workspaceRevisionRecordChecksum: workspace.checksum,
+  workspaceOriginRuntimeRevision: origin.runtimeRevision,
   selectionPolicyRevision: selected?.selectionPolicyRevision ?? null,
-  sourceSelectionChecksum: selected?.recomputedMembershipChecksum ?? null,
+  sourceRefSetChecksum: selected?.sourceRefSetChecksum ?? null,
   sourceCount: selected?.sourceCount ?? 0,
   bindings: selected?.members ?? [],
   canonicalAuthority: false,

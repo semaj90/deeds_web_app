@@ -1,0 +1,297 @@
+{
+  "schema": "atlas.file-exploration-record-plan.v1",
+  "status": "FILE_RECORD_PLAN_PROVEN_READ_ONLY",
+  "gate": "ATLAS-FILE-EXPLORATION-INDEX-04",
+  "workspaceRevision": "sha256:ef845f647c42b9c5f5c56b89aa237379915589b58f5903e7c516f710b1dcd3a3",
+  "sourceCount": 23705,
+  "recordCount": 23705,
+  "totalBytes": 450733934,
+  "languageCounts": {
+    "typescript": 7728,
+    "markdown": 7793,
+    "javascript": 3737,
+    "json": 1580,
+    "unknown": 1591,
+    "yaml": 92,
+    "python": 518,
+    "go": 20,
+    "rust": 10,
+    "sql": 635,
+    "java": 1
+  },
+  "sampleRecords": [
+    {
+      "sourceRef": "__tests__/data-hashing.spec.ts",
+      "workspaceRevision": "sha256:ef845f647c42b9c5f5c56b89aa237379915589b58f5903e7c516f710b1dcd3a3",
+      "sourceRevision": "sha256:da7c6ceeb3c983e9e49ae0cc8e5cdb761ada6264f8c40d78296fac48b502c3ba",
+      "contentHash": "sha256:da7c6ceeb3c983e9e49ae0cc8e5cdb761ada6264f8c40d78296fac48b502c3ba",
+      "language": "typescript",
+      "extension": ".ts",
+      "byteLength": 4781,
+      "lineCount": 119,
+      "directory": "__tests__",
+      "basename": "data-hashing.spec.ts",
+      "flags": [
+        "TEST"
+      ],
+      "searchDocument": "typescript __tests__/data-hashing.spec.ts TEST",
+      "contextCost": {
+        "metadataTokens": 11,
+        "estimatedTokensFullFile": 1196,
+        "estimatedTokensSelectedSpans": 500
+      },
+      "structuralDigest": "sha256:da7c6ceeb3c983e9e49ae0cc8e5cdb761ada6264f8c40d78296fac48b502c3ba",
+      "canonicalAuthority": false
+    },
+    {
+      "sourceRef": ".claude/AGENT_CONSTITUTION.md",
+      "workspaceRevision": "sha256:ef845f647c42b9c5f5c56b89aa237379915589b58f5903e7c516f710b1dcd3a3",
+      "sourceRevision": "sha256:2d3ee7fcce1beb28a75b8c53ea0e5417906dcd2d29fa4692475da6d7b14d0bdc",
+      "contentHash": "sha256:2d3ee7fcce1beb28a75b8c53ea0e5417906dcd2d29fa4692475da6d7b14d0bdc",
+      "language": "markdown",
+      "extension": ".md",
+      "byteLength": 251,
+      "lineCount": 16,
+      "directory": ".claude",
+      "basename": "AGENT_CONSTITUTION.md",
+      "flags": [],
+      "searchDocument": "markdown .claude/AGENT_CONSTITUTION.md",
+      "contextCost": {
+        "metadataTokens": 10,
+        "estimatedTokensFullFile": 63,
+        "estimatedTokensSelectedSpans": 63
+      },
+      "structuralDigest": "sha256:2d3ee7fcce1beb28a75b8c53ea0e5417906dcd2d29fa4692475da6d7b14d0bdc",
+      "canonicalAuthority": false
+    },
+    {
+      "sourceRef": ".claude/AGENT_RECOMMENDATIONS.md",
+      "workspaceRevision": "sha256:ef845f647c42b9c5f5c56b89aa237379915589b58f5903e7c516f710b1dcd3a3",
+      "sourceRevision": "sha256:427724d93ed9949cbf21c0373ac711059097f6a1c16f0e4aebff7f6b46cc6072",
+      "contentHash": "sha256:427724d93ed9949cbf21c0373ac711059097f6a1c16f0e4aebff7f6b46cc6072",
+      "language": "markdown",
+      "extension": ".md",
+      "byteLength": 507,
+      "lineCount": 23,
+      "directory": ".claude",
+      "basename": "AGENT_RECOMMENDATIONS.md",
+      "flags": [],
+      "searchDocument": "markdown .claude/AGENT_RECOMMENDATIONS.md",
+      "contextCost": {
+        "metadataTokens": 10,
+        "estimatedTokensFullFile": 127,
+        "estimatedTokensSelectedSpans": 127
+      },
+      "structuralDigest": "sha256:427724d93ed9949cbf21c0373ac711059097f6a1c16f0e4aebff7f6b46cc6072",
+      "canonicalAuthority": false
+    },
+    {
+      "sourceRef": ".claude/agents/drizzle-inspector.md",
+      "workspaceRevision": "sha256:ef845f647c42b9c5f5c56b89aa237379915589b58f5903e7c516f710b1dcd3a3",
+      "sourceRevision": "sha256:14f3954b456e2b64a82e7dacf5eeaf1c530a267fcddefe0af182ed8c47660bcd",
+      "contentHash": "sha256:14f3954b456e2b64a82e7dacf5eeaf1c530a267fcddefe0af182ed8c47660bcd",
+      "language": "markdown",
+      "extension": ".md",
+      "byteLength": 3538,
+      "lineCount": 80,
+      "directory": ".claude/agents",
+      "basename": "drizzle-inspector.md",
+      "flags": [],
+      "searchDocument": "markdown .claude/agents/drizzle-inspector.md",
+      "contextCost": {
+        "metadataTokens": 11,
+        "estimatedTokensFullFile": 885,
+        "estimatedTokensSelectedSpans": 500
+      },
+      "structuralDigest": "sha256:14f3954b456e2b64a82e7dacf5eeaf1c530a267fcddefe0af182ed8c47660bcd",
+      "canonicalAuthority": false
+    },
+    {
+      "sourceRef": ".claude/agents/obsidian-cartographer.md",
+      "workspaceRevision": "sha256:ef845f647c42b9c5f5c56b89aa237379915589b58f5903e7c516f710b1dcd3a3",
+      "sourceRevision": "sha256:d2a56441921f791e79501c3bbd887c44fb548233883be1c95b5b798e8464020e",
+      "contentHash": "sha256:d2a56441921f791e79501c3bbd887c44fb548233883be1c95b5b798e8464020e",
+      "language": "markdown",
+      "extension": ".md",
+      "byteLength": 4090,
+      "lineCount": 82,
+      "directory": ".claude/agents",
+      "basename": "obsidian-cartographer.md",
+      "flags": [],
+      "searchDocument": "markdown .claude/agents/obsidian-cartographer.md",
+      "contextCost": {
+        "metadataTokens": 12,
+        "estimatedTokensFullFile": 1023,
+        "estimatedTokensSelectedSpans": 500
+      },
+      "structuralDigest": "sha256:d2a56441921f791e79501c3bbd887c44fb548233883be1c95b5b798e8464020e",
+      "canonicalAuthority": false
+    },
+    {
+      "sourceRef": ".claude/agents/sveltekit-route-auditor.md",
+      "workspaceRevision": "sha256:ef845f647c42b9c5f5c56b89aa237379915589b58f5903e7c516f710b1dcd3a3",
+      "sourceRevision": "sha256:36476366b0a80a505b1067200cd8e29fc2850250686b05a01815023c2582fed2",
+      "contentHash": "sha256:36476366b0a80a505b1067200cd8e29fc2850250686b05a01815023c2582fed2",
+      "language": "markdown",
+      "extension": ".md",
+      "byteLength": 3386,
+      "lineCount": 77,
+      "directory": ".claude/agents",
+      "basename": "sveltekit-route-auditor.md",
+      "flags": [],
+      "searchDocument": "markdown .claude/agents/sveltekit-route-auditor.md",
+      "contextCost": {
+        "metadataTokens": 13,
+        "estimatedTokensFullFile": 847,
+        "estimatedTokensSelectedSpans": 500
+      },
+      "structuralDigest": "sha256:36476366b0a80a505b1067200cd8e29fc2850250686b05a01815023c2582fed2",
+      "canonicalAuthority": false
+    },
+    {
+      "sourceRef": ".claude/agents/topology-medic.md",
+      "workspaceRevision": "sha256:ef845f647c42b9c5f5c56b89aa237379915589b58f5903e7c516f710b1dcd3a3",
+      "sourceRevision": "sha256:dd61cdc14cc3070059170cdb852e50863fdfe529aa207ee001564b3d2535e534",
+      "contentHash": "sha256:dd61cdc14cc3070059170cdb852e50863fdfe529aa207ee001564b3d2535e534",
+      "language": "markdown",
+      "extension": ".md",
+      "byteLength": 3789,
+      "lineCount": 81,
+      "directory": ".claude/agents",
+      "basename": "topology-medic.md",
+      "flags": [],
+      "searchDocument": "markdown .claude/agents/topology-medic.md",
+      "contextCost": {
+        "metadataTokens": 10,
+        "estimatedTokensFullFile": 948,
+        "estimatedTokensSelectedSpans": 500
+      },
+      "structuralDigest": "sha256:dd61cdc14cc3070059170cdb852e50863fdfe529aa207ee001564b3d2535e534",
+      "canonicalAuthority": false
+    },
+    {
+      "sourceRef": ".claude/ATLAS-ENGINEERING-PROMPT.md",
+      "workspaceRevision": "sha256:ef845f647c42b9c5f5c56b89aa237379915589b58f5903e7c516f710b1dcd3a3",
+      "sourceRevision": "sha256:9048d3550bcd088cb2cd71fcdd799af686c3b305958406d523d8d939024038fb",
+      "contentHash": "sha256:9048d3550bcd088cb2cd71fcdd799af686c3b305958406d523d8d939024038fb",
+      "language": "markdown",
+      "extension": ".md",
+      "byteLength": 28338,
+      "lineCount": 792,
+      "directory": ".claude",
+      "basename": "ATLAS-ENGINEERING-PROMPT.md",
+      "flags": [],
+      "searchDocument": "markdown .claude/ATLAS-ENGINEERING-PROMPT.md",
+      "contextCost": {
+        "metadataTokens": 11,
+        "estimatedTokensFullFile": 7085,
+        "estimatedTokensSelectedSpans": 500
+      },
+      "structuralDigest": "sha256:9048d3550bcd088cb2cd71fcdd799af686c3b305958406d523d8d939024038fb",
+      "canonicalAuthority": false
+    },
+    {
+      "sourceRef": ".claude/CLAUDE.md",
+      "workspaceRevision": "sha256:ef845f647c42b9c5f5c56b89aa237379915589b58f5903e7c516f710b1dcd3a3",
+      "sourceRevision": "sha256:13bc6179f4ade55522d13a16384ef9a9603f703048181ae6c820e8f48e706252",
+      "contentHash": "sha256:13bc6179f4ade55522d13a16384ef9a9603f703048181ae6c820e8f48e706252",
+      "language": "markdown",
+      "extension": ".md",
+      "byteLength": 111,
+      "lineCount": 7,
+      "directory": ".claude",
+      "basename": "CLAUDE.md",
+      "flags": [],
+      "searchDocument": "markdown .claude/CLAUDE.md",
+      "contextCost": {
+        "metadataTokens": 7,
+        "estimatedTokensFullFile": 28,
+        "estimatedTokensSelectedSpans": 28
+      },
+      "structuralDigest": "sha256:13bc6179f4ade55522d13a16384ef9a9603f703048181ae6c820e8f48e706252",
+      "canonicalAuthority": false
+    },
+    {
+      "sourceRef": ".claude/commands/audit-components.md",
+      "workspaceRevision": "sha256:ef845f647c42b9c5f5c56b89aa237379915589b58f5903e7c516f710b1dcd3a3",
+      "sourceRevision": "sha256:20da50cb9ca2142a0cd5416c15ec73f03e10592de19ff1e14960bfd8d0b5e9d0",
+      "contentHash": "sha256:20da50cb9ca2142a0cd5416c15ec73f03e10592de19ff1e14960bfd8d0b5e9d0",
+      "language": "markdown",
+      "extension": ".md",
+      "byteLength": 17844,
+      "lineCount": 314,
+      "directory": ".claude/commands",
+      "basename": "audit-components.md",
+      "flags": [],
+      "searchDocument": "markdown .claude/commands/audit-components.md",
+      "contextCost": {
+        "metadataTokens": 11,
+        "estimatedTokensFullFile": 4461,
+        "estimatedTokensSelectedSpans": 500
+      },
+      "structuralDigest": "sha256:20da50cb9ca2142a0cd5416c15ec73f03e10592de19ff1e14960bfd8d0b5e9d0",
+      "canonicalAuthority": false
+    },
+    {
+      "sourceRef": ".claude/commands/audit-duplication.md",
+      "workspaceRevision": "sha256:ef845f647c42b9c5f5c56b89aa237379915589b58f5903e7c516f710b1dcd3a3",
+      "sourceRevision": "sha256:ffdbf1b07df2eb194c3c3289abc6bdb67144232c487945412d2bd90de1bde0b1",
+      "contentHash": "sha256:ffdbf1b07df2eb194c3c3289abc6bdb67144232c487945412d2bd90de1bde0b1",
+      "language": "markdown",
+      "extension": ".md",
+      "byteLength": 5787,
+      "lineCount": 117,
+      "directory": ".claude/commands",
+      "basename": "audit-duplication.md",
+      "flags": [],
+      "searchDocument": "markdown .claude/commands/audit-duplication.md",
+      "contextCost": {
+        "metadataTokens": 12,
+        "estimatedTokensFullFile": 1447,
+        "estimatedTokensSelectedSpans": 500
+      },
+      "structuralDigest": "sha256:ffdbf1b07df2eb194c3c3289abc6bdb67144232c487945412d2bd90de1bde0b1",
+      "canonicalAuthority": false
+    },
+    {
+      "sourceRef": ".claude/commands/deep-audit.md",
+      "workspaceRevision": "sha256:ef845f647c42b9c5f5c56b89aa237379915589b58f5903e7c516f710b1dcd3a3",
+      "sourceRevision": "sha256:8e05620ca9ab287727697fd9cae0b806308539c56eb25a8b84fe941336cedc59",
+      "contentHash": "sha256:8e05620ca9ab287727697fd9cae0b806308539c56eb25a8b84fe941336cedc59",
+      "language": "markdown",
+      "extension": ".md",
+      "byteLength": 11487,
+      "lineCount": 246,
+      "directory": ".claude/commands",
+      "basename": "deep-audit.md",
+      "flags": [],
+      "searchDocument": "markdown .claude/commands/deep-audit.md",
+      "contextCost": {
+        "metadataTokens": 10,
+        "estimatedTokensFullFile": 2872,
+        "estimatedTokensSelectedSpans": 500
+      },
+      "structuralDigest": "sha256:8e05620ca9ab287727697fd9cae0b806308539c56eb25a8b84fe941336cedc59",
+      "canonicalAuthority": false
+    }
+  ],
+  "astGrep": {
+    "provider": "existing @ast-grep/napi adapter",
+    "role": "observation only",
+    "promotion": "blocked until exact source/chunk admission"
+  },
+  "embeddings": {
+    "representation": "semantic_768",
+    "status": "not run",
+    "promotion": "blocked"
+  },
+  "persistence": {
+    "postgres": "not run",
+    "qdrant": "not run",
+    "goRetrieval": "not run",
+    "valkey": "not run"
+  },
+  "canonicalAuthority": false,
+  "readOnly": true,
+  "writesPerformed": false
+}

@@ -1,0 +1,40 @@
+{
+  "schema": "atlas.ast-explore-seed-audit.v1",
+  "generatedAt": "2026-09-05T15:51:13.331Z",
+  "input": {
+    "path": "sveltekit-frontend/memory/index/symbols.jsonl",
+    "byteLength": 8970176,
+    "contentHash": "sha256:07509f20d1415cc9c2755b9ebe79e8ec0d30b7fbb035a87f6bc31db8f8eb47df"
+  },
+  "readOnly": true,
+  "canonicalWrites": false,
+  "datastoreWrites": false,
+  "modelCalls": false,
+  "counts": {
+    "totalLines": 40136,
+    "validRows": 40136,
+    "invalidRows": 0,
+    "identityReadyRows": 0,
+    "duplicateIdentityLikeKeys": 242
+  },
+  "parserCounts": {
+    "ast-grep": 4079,
+    "ast-grep+regex": 20609,
+    "regex-static-fallback": 15448
+  },
+  "requiredIdentity": [
+    "sourceRef",
+    "sourceRevision",
+    "workspaceRevision",
+    "startByte",
+    "endByte"
+  ],
+  "status": "SEED_NOT_IDENTITY_READY",
+  "blockers": [
+    "REGEX_DERIVED_ROWS_PRESENT",
+    "REVISION_OR_BYTE_SPAN_FIELDS_MISSING",
+    "DUPLICATE_SEED_KEYS_PRESENT"
+  ],
+  "nextGate": "AST-EXPLORE-02",
+  "nextAction": "Join only revision-qualified observations to atlas_ast_nodes or atlas_symbol_versions before retrieval projection."
+}

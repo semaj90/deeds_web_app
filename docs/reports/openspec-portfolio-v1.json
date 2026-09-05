@@ -1,6 +1,6 @@
 {
   "schema": "openspec-portfolio-v1",
-  "generatedAt": "2026-09-05T07:24:56.398Z",
+  "generatedAt": "2026-09-05T07:47:18.985Z",
   "secondaryRootFinding": {
     "path": "sveltekit-frontend/openspec/changes",
     "changeIds": [
@@ -47,21 +47,19 @@
   "summary": {
     "totalChanges": 79,
     "totalTasksCounted": 4878,
-    "totalTasksCompleted": 2782,
+    "totalTasksCompleted": 2783,
     "byQueueClass": {
       "CURRENT_AUTHORITY": 1,
-      "ACTIVE_DEPENDENCY": 16,
+      "ACTIVE_DEPENDENCY": 20,
       "FROZEN_REFERENCE": 6,
       "PARKED_CHALLENGER": 8,
       "BLOCKED_EXTERNAL": 0,
-      "UNCLASSIFIED": 48
+      "UNCLASSIFIED": 44
     },
     "unclassifiedChangeIds": [
       "ace-hyperrag-chr97-graphify-audit",
-      "agent-branch-review-fanout-ace-centroid-aug22",
       "atlas-feature-intelligence",
       "atlas-hot-vector-schema-decision",
-      "codereview-inference-wiring-followup-aug22",
       "codereview-semantic-dimension-regression-aug22",
       "deep-audit-code-gates-aug22",
       "docker-compose-duplication-remediation",
@@ -74,7 +72,6 @@
       "parent-atlas-ace-rlm-bitfrost-integration",
       "parent-atlas-adaptive-dag-fabric",
       "parent-atlas-agentic-completion",
-      "parent-atlas-best-fit-score-fabric",
       "parent-atlas-canonical-directory-ingestion-fabric",
       "parent-atlas-code-ingestion-pipeline",
       "parent-atlas-compute-rank-cache-eval-dspy-gepa",
@@ -103,8 +100,7 @@
       "parent-atlas-triton-trtllm-readiness",
       "parent-atlas-versioned-doc-intelligence",
       "parent-atlas-workstation-domain-classifier",
-      "phase-2f1-real-evaluation-corpus",
-      "route-import-infra-isolation"
+      "phase-2f1-real-evaluation-corpus"
     ]
   },
   "changes": [
@@ -128,13 +124,15 @@
       "completed": 17,
       "total": 20,
       "percent": 85,
-      "queueClass": "UNCLASSIFIED",
-      "currentGateRefs": [],
-      "mayGenerateNewWork": null,
+      "queueClass": "ACTIVE_DEPENDENCY",
+      "currentGateRefs": [
+        "CONV-2"
+      ],
+      "mayGenerateNewWork": true,
       "supersededBy": null,
       "declaredBlockedBy": [],
       "declaredSupersededBy": [],
-      "note": null
+      "note": "PARTIALLY_STALE / SPLIT_TRUTH: fanout-proof-db-readiness is closed by current evidence; ace-centroid-alignment remains an operator decision. Conditional 3.3/3.4 work stays downstream and is not an independent queue."
     },
     {
       "changeId": "atlas-feature-intelligence",
@@ -172,13 +170,15 @@
       "completed": 7,
       "total": 10,
       "percent": 70,
-      "queueClass": "UNCLASSIFIED",
-      "currentGateRefs": [],
-      "mayGenerateNewWork": null,
+      "queueClass": "ACTIVE_DEPENDENCY",
+      "currentGateRefs": [
+        "CONV-2"
+      ],
+      "mayGenerateNewWork": true,
       "supersededBy": null,
       "declaredBlockedBy": [],
       "declaredSupersededBy": [],
-      "note": null
+      "note": "Two historical targets are superseded: fetchStreamedChatCompletion refactor and the original target shape. Retain only the shared createLocalLlamaChatModel initializer as the bounded active follow-up."
     },
     {
       "changeId": "codereview-semantic-dimension-regression-aug22",
@@ -416,13 +416,15 @@
       "completed": 31,
       "total": 34,
       "percent": 91.2,
-      "queueClass": "UNCLASSIFIED",
-      "currentGateRefs": [],
-      "mayGenerateNewWork": null,
+      "queueClass": "ACTIVE_DEPENDENCY",
+      "currentGateRefs": [
+        "CONV-4"
+      ],
+      "mayGenerateNewWork": true,
       "supersededBy": null,
       "declaredBlockedBy": [],
       "declaredSupersededBy": [],
-      "note": null
+      "note": "BOOKKEEPING_STALE: one cross-file bookkeeping item is already satisfied by current evidence. Keep score semantics, weight-boundary, and learned-ranker evaluation gates; do not rerun work solely to reach a stale percentage."
     },
     {
       "changeId": "parent-atlas-branch-merge-consolidation-aug20",
@@ -1264,16 +1266,18 @@
     {
       "changeId": "route-import-infra-isolation",
       "hasTasksFile": true,
-      "completed": 13,
+      "completed": 14,
       "total": 16,
-      "percent": 81.3,
-      "queueClass": "UNCLASSIFIED",
-      "currentGateRefs": [],
-      "mayGenerateNewWork": null,
+      "percent": 87.5,
+      "queueClass": "ACTIVE_DEPENDENCY",
+      "currentGateRefs": [
+        "ROUTE-IMPORT-RUNTIME-CONTRACT-01"
+      ],
+      "mayGenerateNewWork": true,
       "supersededBy": null,
       "declaredBlockedBy": [],
       "declaredSupersededBy": [],
-      "note": null
+      "note": "REGRESSED_AFTER_PROOF: historical Redis lazy-import repair remains valid, but the current 27-failure route run exposes an import-time runtime-contract regression. Repair import isolation before using broad route health for closure."
     }
   ]
 }

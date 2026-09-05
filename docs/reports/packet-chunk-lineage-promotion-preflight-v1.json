@@ -1,7 +1,7 @@
 {
   "schema": "atlas.packet-chunk-lineage-promotion-preflight.v1",
   "mode": "READ_ONLY_PROMOTION_PREFLIGHT",
-  "limit": 10,
+  "limit": 100,
   "candidates": [
     {
       "packetKey": "packet:7183a9b81576",
@@ -294,11 +294,11 @@
     "cache": 0
   },
   "verdict": "BLOCKED_NO_QUALIFIED_CANDIDATE",
-  "generatedAt": "2026-09-04T22:44:16.056Z",
+  "generatedAt": "2026-09-05T16:50:49.283Z",
   "databaseError": null,
   "writesPerformed": false,
   "canonicalAuthority": false,
   "promotionAuthorized": false,
   "rollback": "Transaction rollback before commit; no transaction was opened by this preflight.",
-  "preflightChecksum": "sha256:7cf544001f14273d3f86056868471134a9cd4ced0808f306908ca25320a91e81"
+  "preflightChecksum": "sha256:1c067b4437ce28182fed00f74d6e65929f57319498f53e6a23ee6b09e2769384"
 }

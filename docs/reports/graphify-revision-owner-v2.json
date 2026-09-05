@@ -5,11 +5,11 @@
     "schema": "atlas.graphify-revision-authority.v2",
     "authorityRevision": "atlas.graphify-revision-authority.workspace-manifest-plus-source-sha256.v2",
     "workspaceRoot": "C:\\Users\\james\\Videos\\deeds-web-app",
-    "workspaceRevision": "sha256:8a3a9085b3ed383b913405e2970d94f0b57f3db00b998946f201567b6d7f3fa1",
+    "workspaceRevision": "sha256:5713fb9008174a82b7f100abf710e2a126a16a180f1ed1af76d6c3be68f3daea",
     "workspaceRevisionKind": "SHA256_SOURCE_MANIFEST",
-    "workspaceSourceManifestDigest": "8a3a9085b3ed383b913405e2970d94f0b57f3db00b998946f201567b6d7f3fa1",
-    "baseGitCommitOid": "b8dcfc9073bc4f7e1b674134d76d25786f03dc9e",
-    "baseGitTreeOid": "02ba112b8bded812f1245b3aefd693fe5c3b8d8e",
+    "workspaceSourceManifestDigest": "5713fb9008174a82b7f100abf710e2a126a16a180f1ed1af76d6c3be68f3daea",
+    "baseGitCommitOid": "ebf1319caf0192b254f6efe3fedcb7a0a28b7599",
+    "baseGitTreeOid": "c7cc65a9bff655603f96558953e0687f3645d061",
     "sourceRef": "sveltekit-frontend/src/lib/server/atlas/indexing/code-revision-authority-v1.ts",
     "sourceRevision": "sha256:fdb36e1beac7541964613a50240d6c8a626a31cdc67f44726c252c8bc99ea701",
     "sourceRevisionKind": "SHA256_EXACT_UTF8_SOURCE_BYTES",
@@ -22,7 +22,7 @@
     "gitCommitIsProvenanceOnly": true,
     "canonicalWritesAllowed": false,
     "producerRevision": "atlas.graphify-revision-owner-v2.proof.v1",
-    "authorityChecksum": "a8ecd515b1524fb9665891d119d7aed4fa33d0b153386faa5620b347c1bf894b"
+    "authorityChecksum": "cc46f083a732d65924065e91efe8b1d0d785053b10e457cdb4fc8971873211db"
   },
   "storage": {
     "graphifyRunsPresent": true,
@@ -50,7 +50,7 @@
   "canonicalWriteAttempted": false,
   "readOnly": true,
   "producerRevision": "atlas.graphify-revision-owner-v2.proof.v1",
-  "ownerChecksum": "a9b467eb840ba0d9f8601a65ed92101def8536f23a4f6259b260d13a6c98e8c6",
+  "ownerChecksum": "6f1969e9066f0929a3383e32a8867e83d755e819cb0a7351264c1dc27aa418b5",
   "schemaObservation": {
     "schema": "atlas.graphify-source-inventory-schema.v2",
     "graphifyRunsPresent": true,
@@ -102,21 +102,21 @@
   "workspaceOrigin": {
     "record": {
       "schema": "atlas.workspace-revision.v1",
-      "workspaceRevision": "sha256:8a3a9085b3ed383b913405e2970d94f0b57f3db00b998946f201567b6d7f3fa1",
+      "workspaceRevision": "sha256:5713fb9008174a82b7f100abf710e2a126a16a180f1ed1af76d6c3be68f3daea",
       "repositoryId": "semaj90/deeds_web_app",
       "gitObjectFormat": "sha1",
-      "baseCommitOid": "b8dcfc9073bc4f7e1b674134d76d25786f03dc9e",
-      "baseTreeOid": "02ba112b8bded812f1245b3aefd693fe5c3b8d8e",
+      "baseCommitOid": "ebf1319caf0192b254f6efe3fedcb7a0a28b7599",
+      "baseTreeOid": "c7cc65a9bff655603f96558953e0687f3645d061",
       "gitHeadRef": "refs/heads/main",
       "dirty": true,
-      "sourceCount": 25048,
-      "sourceManifestDigest": "8a3a9085b3ed383b913405e2970d94f0b57f3db00b998946f201567b6d7f3fa1",
+      "sourceCount": 23701,
+      "sourceManifestDigest": "5713fb9008174a82b7f100abf710e2a126a16a180f1ed1af76d6c3be68f3daea",
       "sourceRevisionAlgorithm": "atlas.code.source-revision.v1",
-      "generatedAt": "2026-09-01T23:39:49.456Z",
+      "generatedAt": "2026-09-05T16:52:04.643Z",
       "readOnlyObservation": true,
       "canonicalAuthority": false,
       "producerRevision": "atlas.graphify-revision-owner-v2.proof.v1",
-      "checksum": "1e7f6eee0e67910ab8f8ab90c0210ce64ad735728abe224abdac206be513e90d"
+      "checksum": "467333c84b5df0f2fad439543d86a4dc4fcb804cb6559cfdb6f5361821d10862"
     },
     "skipped": [
       {
@@ -165,90 +165,6 @@
       },
       {
         "sourceRef": "docs/graph/repo-sveltekit-route-atlas.json",
-        "reason": "SOURCE_TOO_LARGE"
-      },
-      {
-        "sourceRef": "docs/reports/candidate-ordinal-corpus-v1.json",
-        "reason": "SOURCE_TOO_LARGE"
-      },
-      {
-        "sourceRef": "docs/reports/current-structural-edge-artifact-plan-v2.json",
-        "reason": "SOURCE_TOO_LARGE"
-      },
-      {
-        "sourceRef": "docs/reports/drizzle-audit-cleaned.json",
-        "reason": "NOT_VALID_UTF8_SOURCE"
-      },
-      {
-        "sourceRef": "docs/reports/drizzle-audit-current.json",
-        "reason": "NOT_VALID_UTF8_SOURCE"
-      },
-      {
-        "sourceRef": "docs/reports/neo4j-candidate-ordinal-join-v1.json",
-        "reason": "SOURCE_TOO_LARGE"
-      },
-      {
-        "sourceRef": "docs/reports/neschrom97-card-registry.json",
-        "reason": "SOURCE_TOO_LARGE"
-      },
-      {
-        "sourceRef": "docs/reports/onnx-webgpu-profile_2026-08-28_22-37-32_598.json",
-        "reason": "Code source content must be non-empty"
-      },
-      {
-        "sourceRef": "docs/reports/onnx-webgpu-profile_2026-08-28_22-38-26_828.json",
-        "reason": "Code source content must be non-empty"
-      },
-      {
-        "sourceRef": "docs/reports/onnx-webgpu-profile_2026-08-28_22-38-52_769.json",
-        "reason": "Code source content must be non-empty"
-      },
-      {
-        "sourceRef": "docs/reports/onnx-webgpu-profile_2026-08-28_22-45-38_347.json",
-        "reason": "Code source content must be non-empty"
-      },
-      {
-        "sourceRef": "docs/reports/onnx-webgpu-profile_2026-08-28_22-47-16_384.json",
-        "reason": "Code source content must be non-empty"
-      },
-      {
-        "sourceRef": "docs/reports/onnx-webgpu-profile_2026-08-28_22-48-27_696.json",
-        "reason": "Code source content must be non-empty"
-      },
-      {
-        "sourceRef": "docs/reports/onnx-webgpu-profile_2026-08-28_23-22-39_753.json",
-        "reason": "Code source content must be non-empty"
-      },
-      {
-        "sourceRef": "docs/reports/packet-chunk-lineage-backfill-dry-01-results.json",
-        "reason": "SOURCE_TOO_LARGE"
-      },
-      {
-        "sourceRef": "docs/reports/qdrant-id-prefix-01-results.json",
-        "reason": "SOURCE_TOO_LARGE"
-      },
-      {
-        "sourceRef": "docs/reports/runtime-owner-deduplication-report.md",
-        "reason": "Code source content must be non-empty"
-      },
-      {
-        "sourceRef": "docs/reports/semantic768/frozen_semantic_768_v4_ordinal_map.json",
-        "reason": "SOURCE_TOO_LARGE"
-      },
-      {
-        "sourceRef": "docs/reports/source-manifest-projection-comparison-v1.json",
-        "reason": "SOURCE_TOO_LARGE"
-      },
-      {
-        "sourceRef": "docs/reports/source-ref-binding-v1.json",
-        "reason": "SOURCE_TOO_LARGE"
-      },
-      {
-        "sourceRef": "docs/reports/structured-lexical-fanout.json",
-        "reason": "SOURCE_TOO_LARGE"
-      },
-      {
-        "sourceRef": "docs/reports/workspace-source-binding-observation.json",
         "reason": "SOURCE_TOO_LARGE"
       },
       {

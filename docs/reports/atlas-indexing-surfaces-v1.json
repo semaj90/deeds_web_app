@@ -1,6 +1,6 @@
 {
   "schema": "atlas.indexing-surfaces.v1",
-  "generatedAt": "2026-09-05T05:51:35.555Z",
+  "generatedAt": "2026-09-05T15:47:55.917Z",
   "readOnly": true,
   "canonicalAuthority": "postgres",
   "ast": {
@@ -2080,8 +2080,8 @@
             "distance": "Cosine"
           }
         },
-        "points": 1028,
-        "indexedVectors": 1031,
+        "points": 1025,
+        "indexedVectors": 1028,
         "status": "green"
       },
       {

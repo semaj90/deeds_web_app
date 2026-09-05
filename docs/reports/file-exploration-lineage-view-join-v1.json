@@ -1,0 +1,64 @@
+{
+  "schema": "atlas.file-exploration-lineage-view-join.v1",
+  "gate": "ATLAS-FILE-EXPLORATION-INDEX-07",
+  "status": "SOURCE_REF_ONLY_JOIN_INSUFFICIENT_FOR_LINEAGE",
+  "relations": {
+    "chunks_present": true,
+    "bindings_present": true
+  },
+  "counts": {
+    "chunk_rows": 55853,
+    "chunk_source_rows": 53064,
+    "source_ref_join_rows": 647,
+    "exact_content_join_rows": 0,
+    "workspace_revision_join_rows": 647,
+    "source_revision_join_rows": 647
+  },
+  "exactJoinCoverage": 0,
+  "sample": [
+    {
+      "source_ref": "src/lib/components/evidence/EvidencePrimaryUpload.svelte",
+      "content_hash": "981f4c3e67375a55",
+      "workspace_revision": null,
+      "source_revision": null,
+      "content_digest": null,
+      "binding_checksum": null
+    },
+    {
+      "source_ref": "src/routes/(app)/demos/+page.svelte",
+      "content_hash": "b593e1bef5f69ff2",
+      "workspace_revision": null,
+      "source_revision": null,
+      "content_digest": null,
+      "binding_checksum": null
+    },
+    {
+      "source_ref": "src/routes/(app)/demos/notifications/+page.svelte",
+      "content_hash": "20cdafb7059bdf3f",
+      "workspace_revision": null,
+      "source_revision": null,
+      "content_digest": null,
+      "binding_checksum": null
+    },
+    {
+      "source_ref": "src/routes/(app)/admin/codebase-index/+page.svelte",
+      "content_hash": "7bf5783879c0d416",
+      "workspace_revision": null,
+      "source_revision": null,
+      "content_digest": null,
+      "binding_checksum": null
+    },
+    {
+      "source_ref": "packages/parent-atlas-retrieval/src/gpu/gpu-job-queue.ts",
+      "content_hash": "282646a4da6c65ce19703e4b0d728b90f13e7ad8fabb8f381d11c3fe92407105",
+      "workspace_revision": null,
+      "source_revision": null,
+      "content_digest": null,
+      "binding_checksum": null
+    }
+  ],
+  "rule": "source_ref-only joins cannot supply sourceRevision; exact content identity is required",
+  "canonicalAuthority": false,
+  "readOnly": true,
+  "writesPerformed": false
+}

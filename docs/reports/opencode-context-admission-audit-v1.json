@@ -1,0 +1,100 @@
+{
+  "schema": "atlas.opencode-context-admission-audit.v1",
+  "generatedAt": "2026-09-05T15:45:49.339Z",
+  "readOnly": true,
+  "canonicalWrites": false,
+  "datastoreWrites": false,
+  "modelCalls": false,
+  "instructionFileCount": 8,
+  "generatedIndexCount": 1,
+  "oversizedFileCount": 3,
+  "files": [
+    {
+      "path": "AGENTS.md",
+      "bytes": 16694,
+      "lines": 269,
+      "classification": "CORE_OR_SCOPED_OVER_BUDGET",
+      "generatedIndexMarkers": []
+    },
+    {
+      "path": "mcp-server-mcp/tools/instructions/AGENTS.md",
+      "bytes": 1317,
+      "lines": 24,
+      "classification": "CORE_OR_SCOPED_INSTRUCTION",
+      "generatedIndexMarkers": []
+    },
+    {
+      "path": "llama-cpp-turboquant-gemma4/AGENTS.md",
+      "bytes": 6967,
+      "lines": 111,
+      "classification": "CORE_OR_SCOPED_INSTRUCTION",
+      "generatedIndexMarkers": []
+    },
+    {
+      "path": "tools/agentic-research/src/firecrawl/AGENTS.md",
+      "bytes": 1482,
+      "lines": 19,
+      "classification": "CORE_OR_SCOPED_INSTRUCTION",
+      "generatedIndexMarkers": []
+    },
+    {
+      "path": "sveltekit-frontend/src/mcp/AGENTS.md",
+      "bytes": 5225,
+      "lines": 174,
+      "classification": "CORE_OR_SCOPED_INSTRUCTION",
+      "generatedIndexMarkers": []
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/graph/AGENTS.md",
+      "bytes": 20643,
+      "lines": 649,
+      "classification": "CORE_OR_SCOPED_OVER_BUDGET",
+      "generatedIndexMarkers": []
+    },
+    {
+      "path": "sveltekit-frontend/AGENTS.md",
+      "bytes": 1160219,
+      "lines": 4543,
+      "classification": "GENERATED_INDEX",
+      "generatedIndexMarkers": [
+        "Full Repository Index",
+        "LLM jump table",
+        "npm run agents:write"
+      ]
+    },
+    {
+      "path": "sveltekit-frontend/scripts/AGENTS.md",
+      "bytes": 4848,
+      "lines": 159,
+      "classification": "CORE_OR_SCOPED_INSTRUCTION",
+      "generatedIndexMarkers": []
+    }
+  ],
+  "astGrepSurfaces": [
+    {
+      "file": "scripts/atlas/audit-atlas-indexing-surfaces.mjs",
+      "present": true
+    },
+    {
+      "file": "scripts/atlas/atlas-ast-backfill-receipt-v1.mjs",
+      "present": true
+    },
+    {
+      "file": "scripts/atlas/phase1-ast-grep-extraction.mjs",
+      "present": true
+    },
+    {
+      "file": "sveltekit-frontend/scripts/atlas/phase1-ast-grep-extraction.mjs",
+      "present": true
+    },
+    {
+      "file": "sveltekit-frontend/scripts/atlas/phase1.5-ast-grep-extraction.mjs",
+      "present": true
+    }
+  ],
+  "findings": [
+    "GENERATED_INDEX_IN_AMBIENT_INSTRUCTIONS",
+    "INSTRUCTION_FILE_OVER_BUDGET"
+  ],
+  "nextGate": "OPENCODE-CONTEXT-ADMISSION-01"
+}

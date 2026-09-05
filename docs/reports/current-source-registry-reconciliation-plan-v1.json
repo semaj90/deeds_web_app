@@ -1,6 +1,6 @@
 {
   "schema": "atlas.current-source-registry-reconciliation-plan.v1",
-  "generatedAt": "2026-09-05T06:51:58.012Z",
+  "generatedAt": "2026-09-05T16:07:58.551Z",
   "mode": "READ_ONLY_PLAN",
   "readOnly": true,
   "writes": {
@@ -11,7 +11,7 @@
     "valkey": false
   },
   "sourcePlan": "docs/reports/current-source-graphify-batch-plan-v1.json",
-  "requestedLimit": 111,
+  "requestedLimit": 3,
   "selectedSourceCount": 0,
   "registryMatchCount": 0,
   "registryMissingCount": 0,

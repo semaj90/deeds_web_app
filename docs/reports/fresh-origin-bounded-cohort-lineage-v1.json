@@ -1,0 +1,67 @@
+{
+  "schema": "atlas.fresh-origin-bounded-cohort-lineage.v1",
+  "plan": "docs/reports/fresh-origin-bounded-cohort-plan-v1.json",
+  "originWorkspaceRevision": "sha256:9302fdc4b778d0db2d31a2e2e42f68d907335c72fc78320fdf62f756ea07f8f8",
+  "status": "FRESH_ORIGIN_COHORT_READBACK_BLOCKED",
+  "counts": {
+    "proposed": 5,
+    "present": 5,
+    "workspaceRevisionMatches": 0,
+    "sourceRevisionMatches": 5,
+    "contentHashMatches": 5,
+    "byteLengthMatches": 5
+  },
+  "checks": [
+    {
+      "sourceRef": "sveltekit-frontend/docs/design/2026-05-11_agents-directory-card-regen.md",
+      "present": true,
+      "workspaceRevisionMatch": false,
+      "sourceRevisionMatch": true,
+      "contentHashMatch": true,
+      "byteLengthMatch": true
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/ToolInvoker.ts",
+      "present": true,
+      "workspaceRevisionMatch": false,
+      "sourceRevisionMatch": true,
+      "contentHashMatch": true,
+      "byteLengthMatch": true
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/routes/(app)/admin/cache/+page.server.ts",
+      "present": true,
+      "workspaceRevisionMatch": false,
+      "sourceRevisionMatch": true,
+      "contentHashMatch": true,
+      "byteLengthMatch": true
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/routes/(app)/admin/codebase-index/+page.ts",
+      "present": true,
+      "workspaceRevisionMatch": false,
+      "sourceRevisionMatch": true,
+      "contentHashMatch": true,
+      "byteLengthMatch": true
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/routes/(app)/cases/[id]/chat/+page.server.ts",
+      "present": true,
+      "workspaceRevisionMatch": false,
+      "sourceRevisionMatch": true,
+      "contentHashMatch": true,
+      "byteLengthMatch": true
+    }
+  ],
+  "databaseError": null,
+  "authorization": false,
+  "writes": {
+    "postgres": false,
+    "graphify": false,
+    "qdrant": false,
+    "neo4j": false,
+    "cache": false,
+    "modelCalls": false
+  },
+  "nextGate": "PACKET_CHUNK_EXACT_JOIN_READBACK"
+}

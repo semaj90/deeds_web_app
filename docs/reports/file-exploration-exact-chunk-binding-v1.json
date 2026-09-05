@@ -1,0 +1,74 @@
+{
+  "schema": "atlas.file-exploration-exact-chunk-binding.v1",
+  "gate": "ATLAS-FILE-EXPLORATION-INDEX-08",
+  "status": "EXACT_CHUNK_BINDING_PROVEN_BOUNDED",
+  "requestedRows": 5,
+  "inspectedRows": 5,
+  "exactUniqueRows": 5,
+  "bindings": [
+    {
+      "chunkId": "0000d635-8df8-4a03-a1b0-e33d2699f6c0",
+      "sourceRef": "src/lib/components/evidence/EvidencePrimaryUpload.svelte",
+      "status": "EXACT_UNIQUE_BYTE_SPAN",
+      "startByte": 11566,
+      "endByte": 12356,
+      "sourceFileDigest": "sha256:0b4305d10e936470f5a3116ec12cd8b7bdcb9a8dbb97f7f743f430199d52051c",
+      "chunkTextDigest": "sha256:981f4c3e67375a550973caa373bc6a2f025ef9fc32d29e14f6f455b0a25ebaf9",
+      "storedChunkHash": "981f4c3e67375a55",
+      "lineStart": null,
+      "lineEnd": null
+    },
+    {
+      "chunkId": "0001981c-da69-4b0e-9acb-ad29544029c8",
+      "sourceRef": "src/routes/(app)/demos/+page.svelte",
+      "status": "EXACT_UNIQUE_BYTE_SPAN",
+      "startByte": 4208,
+      "endByte": 4911,
+      "sourceFileDigest": "sha256:15ca3bcc373c6bb7384c0a8239a9d9e49b8a1788a3ad7a392f4b3c760f7a60f9",
+      "chunkTextDigest": "sha256:b593e1bef5f69ff2d909d060f08015abf67438ab69a8c6b84b30a2f2f7b0b05d",
+      "storedChunkHash": "b593e1bef5f69ff2",
+      "lineStart": null,
+      "lineEnd": null
+    },
+    {
+      "chunkId": "0002c4d4-3f96-4a8f-934d-61d8c6985340",
+      "sourceRef": "src/routes/(app)/demos/notifications/+page.svelte",
+      "status": "EXACT_UNIQUE_BYTE_SPAN",
+      "startByte": 688,
+      "endByte": 1464,
+      "sourceFileDigest": "sha256:0b283cfd930a64b13cb1fb15b57945738c3b1ee39e5c51c12e60035062055cd7",
+      "chunkTextDigest": "sha256:20cdafb7059bdf3f044df8361efe114eb702348a3ce4f890108c2e1246030f0d",
+      "storedChunkHash": "20cdafb7059bdf3f",
+      "lineStart": null,
+      "lineEnd": null
+    },
+    {
+      "chunkId": "0004791e-40fe-4736-be3b-d84796ac5476",
+      "sourceRef": "src/routes/(app)/admin/codebase-index/+page.svelte",
+      "status": "EXACT_UNIQUE_BYTE_SPAN",
+      "startByte": 8782,
+      "endByte": 9562,
+      "sourceFileDigest": "sha256:7fd0712ce4108b32f0d4d5d24d5745dd3e1c521acc88c28fec8ffdfbb444bf7e",
+      "chunkTextDigest": "sha256:7bf5783879c0d416f5c47fedc106c2744d61a709fc51ce7e0bcb21892b69dc77",
+      "storedChunkHash": "7bf5783879c0d416",
+      "lineStart": null,
+      "lineEnd": null
+    },
+    {
+      "chunkId": "0005b01a-8f57-4e30-8f61-5dc85bcd991d",
+      "sourceRef": "packages/parent-atlas-retrieval/src/gpu/gpu-job-queue.ts",
+      "status": "EXACT_UNIQUE_BYTE_SPAN",
+      "startByte": 2800,
+      "endByte": 3600,
+      "sourceFileDigest": "sha256:8ede2ca722e4d486f2af74e8be73e58b6b66312aa363ceefc98ecabe1c9fa63c",
+      "chunkTextDigest": "sha256:46c3485dd5e9bf0ebd5c24b65f53a1314fd1f6a5cd3b62f2c51da643ec2177b5",
+      "storedChunkHash": "282646a4da6c65ce19703e4b0d728b90f13e7ad8fabb8f381d11c3fe92407105",
+      "lineStart": 87,
+      "lineEnd": 120
+    }
+  ],
+  "sourceRevision": "not assigned by this audit; must come from canonical workspace binding",
+  "canonicalAuthority": false,
+  "readOnly": true,
+  "writesPerformed": false
+}

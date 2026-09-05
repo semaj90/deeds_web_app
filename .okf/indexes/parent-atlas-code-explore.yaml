@@ -1,0 +1,80 @@
+schema: atlas.explore-index-definition.v1
+registry_id: atlas.parent-atlas-code-explore
+status: active
+owner: parent-atlas
+purpose: bounded_agent_file_exploration
+authority: derived_projection
+mutation_policy: rebuildable_only
+
+scope:
+  roots:
+    - sveltekit-frontend/src
+    - sveltekit-frontend/scripts
+    - scripts/atlas
+    - packages/parent-atlas
+    - docs/.okf
+    - openspec/changes
+  include_extensions: [.ts, .tsx, .svelte, .js, .mjs, .mts, .py, .go, .rs, .md, .mdx, .json, .yaml, .yml, .sql]
+  exclude_directories: [node_modules, .git, .svelte-kit, dist, build, models]
+
+identity:
+  required: [source_ref, source_revision, workspace_revision, content_hash]
+  optional: [canonical_id, packet_key, symbol_version_id, tree_node_id]
+  coordinates:
+    canonical: utf8_byte
+    protocol_adapter: lsp_utf16
+    lsp_is_canonical: false
+  rule: source_and_workspace_revision_are_required_before_admission
+
+observers:
+  structural:
+    providers: [tree_sitter, ast_grep]
+    authority: structural_observation_only
+  semantic:
+    providers: [ts_morph, lsp, langextract]
+    authority: observation_only
+  language_model:
+    provider: llama_server
+    endpoint: http://127.0.0.1:8090/v1/chat/completions
+    model_policy: resolve_loaded_ornith_at_runtime
+    authority: synthesis_proposal_only
+
+rules:
+  - {id: import_static, provider: ast_grep, fallback: regex_discovery_only}
+  - {id: exported_function, provider: ast_grep, fallback: regex_discovery_only}
+  - {id: route_handler, provider: ast_grep, fallback: regex_discovery_only}
+  - {id: drizzle_table, provider: ast_grep, fallback: regex_discovery_only}
+  - {id: mcp_tool, provider: ast_grep, fallback: regex_discovery_only}
+
+projection:
+  fields: [source_ref, source_revision, workspace_revision, content_hash, start_byte, end_byte, symbol_version_id, tree_node_id, parser_revision, observed_term, domain_tags, concept_ids, estimated_tokens]
+  retrieval_lanes:
+    lexical_fts: {enabled: true, owner: postgresql18}
+    lexical_trigram: {enabled: true, owner: postgresql18}
+    structural_ast: {enabled: true, owner: search_runtime}
+    semantic: {enabled: false, representation: semantic_768, enablement_gate: exact_source_chunk_admission}
+    graph: {enabled: false, enablement_gate: graph_revision_and_source_lineage}
+
+context:
+  default_level_of_detail: identity
+  levels: [identity, symbol_summary, exact_span, bounded_neighbors]
+  max_selected_candidates: 16
+  max_span_bytes: 12000
+  assembly_owner: ace
+  synthesis_owner: ornith_1_5_llama_server
+
+parameters:
+  query_limit: 16
+  span_max_bytes: 12000
+  semantic_enabled: false
+  external_search_on: explicit_evidence_gap_only
+  cache_warming: disabled_until_revision_readback
+
+admission:
+  require_source_revision: true
+  require_workspace_revision: true
+  require_utf8_byte_span: true
+  require_existing_canonical_identity: true
+  permit_unqualified_rows: false
+  canonical_authority: false
+

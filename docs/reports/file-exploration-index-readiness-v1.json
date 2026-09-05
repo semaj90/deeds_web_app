@@ -1,0 +1,49 @@
+{
+  "schema": "atlas.file-exploration-index-readiness.v1",
+  "status": "FEI_READINESS_BLOCKED",
+  "gate": "ATLAS-FILE-EXPLORATION-INDEX-01",
+  "owner": "existing AST-grep observation surfaces plus .okf/indexes/code-exploration.yaml",
+  "workspace": {
+    "workspaceRevision": "sha256:401cf835acdebf8e42c3a0a2b2534025ff6a2cf741efd77cb699eb1cbb8f37d7",
+    "sourceManifestDigest": "401cf835acdebf8e42c3a0a2b2534025ff6a2cf741efd77cb699eb1cbb8f37d7",
+    "sourceCount": 23701
+  },
+  "checks": {
+    "feiContractPresent": true,
+    "canonicalUtf8Coordinates": true,
+    "lspTransportOnly": true,
+    "astGrepProviderPresent": true,
+    "astGrepHasByteEvidence": true,
+    "astGrepObservationOnly": false,
+    "seedAuditPresent": true,
+    "seedPopulationPresent": true,
+    "semantic768Canonical": true
+  },
+  "blockers": [
+    "SEED_NOT_IDENTITY_READY"
+  ],
+  "seed": {
+    "path": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\memory\\index\\symbols.jsonl",
+    "auditPath": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\atlas\\audit-ast-explore-seed-v1.mjs",
+    "promotionStatus": "NOT_IDENTITY_READY",
+    "canonicalAuthority": false
+  },
+  "forbiddenInThisGate": [
+    "database writes",
+    "Qdrant writes",
+    "Neo4j writes",
+    "Valkey writes",
+    "model calls",
+    "CandidateOrdinal promotion"
+  ],
+  "readOnly": true,
+  "writesPerformed": false,
+  "files": {
+    "okfIndex": "C:\\Users\\james\\Videos\\deeds-web-app\\.okf\\indexes\\code-exploration.yaml",
+    "astGrepExtractor": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\server\\analysis\\ast-grep-extractor.ts",
+    "astGrepLibrary": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\atlas\\lib\\ast-grep-symbol-extraction.mjs",
+    "seedAudit": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\atlas\\audit-ast-explore-seed-v1.mjs",
+    "seed": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\memory\\index\\symbols.jsonl"
+  },
+  "producerRevision": "atlas.file-exploration-index-readiness.v1"
+}

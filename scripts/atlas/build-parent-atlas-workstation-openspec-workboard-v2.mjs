@@ -100,6 +100,18 @@ function resolveEvidence(refs) {
   }));
 }
 
+function evidenceDisposition(classification, text) {
+  if (classification === 'SUPERSEDED') return 'SUPERSEDED';
+  if (classification === 'BLOCKED_UPSTREAM') return 'BLOCKED';
+  if (classification === 'HUMAN_DECISION_REQUIRED') return 'HUMAN_DECISION_REQUIRED';
+  if (classification === 'NEGATIVE_CONSTRAINT') return 'CONSTRAINT';
+  if (/regression|finding confirmed|follow[- ]?up open|confirmed.*unfixed/i.test(text)) {
+    return 'FINDING_CONFIRMED_FOLLOWUP_OPEN';
+  }
+  if (classification === 'OWNED_BY_OTHER_CHANGE') return 'OWNED_BY_OTHER_CHANGE';
+  return 'UNVERIFIED';
+}
+
 const tasks = [];
 for (const entry of fs.readdirSync(path.join(ROOT, 'openspec', 'changes'), { withFileTypes: true })) {
   if (!entry.isDirectory() || entry.name === 'archive') continue;
@@ -143,7 +155,9 @@ for (const entry of fs.readdirSync(path.join(ROOT, 'openspec', 'changes'), { wit
       sourceLine: block.line,
       taskText: block.text,
       taskChecksum: sha256(`${changeId}\n${block.line}\n${block.text}`),
+      taskLedgerState: 'UNCHECKED',
       classification,
+      evidenceDisposition: evidenceDisposition(classification, block.text),
       currentOwner: owner,
       dependencyOrBlocker: blocker,
       evidenceRefs,
