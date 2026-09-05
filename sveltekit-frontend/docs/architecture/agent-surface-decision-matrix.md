@@ -1,5 +1,8 @@
 # Agent Surface Decision Matrix — Local Gemma4 + TRACE MCP Stack
 
+> **Doc review (2026-09-04):** CURRENT — explicitly cross-referenced and endorsed as canonical by
+> `sveltekit-frontend/CLAUDE.md`.
+
 **Date**: 2026-05-09 · **Status**: canonical decision doc · **Supersedes**: any earlier "Cline wins / Hermes is a TUI toy / OpenCode is CLI-only" framing.
 
 This is the cross-surface comparison. Sister docs:

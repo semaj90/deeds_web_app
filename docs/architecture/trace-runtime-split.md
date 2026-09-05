@@ -16,6 +16,12 @@ tags:
 
 # TRACE/Karpathy Runtime Split
 
+> **Doc review (2026-09-04):** STALE_BUT_DIRECTIONALLY_RIGHT — MCP/runtime boundary architecture
+> still holds, but "Gemma4 = synthesis only" is now factually Ornith 1.5 9B per CLAUDE.md's
+> 2026-09-03 model-switch note. This root-level copy diverges (~71 lines, per this session's own
+> cross-check) from `sveltekit-frontend/docs/architecture/trace-runtime-split.md`, which carries its
+> own separate banner — not a duplicate, check both.
+
 TRACE/Karpathy uses this runtime division:
 
 - **TypeScript** = orchestration, APIs, MCP tools, `worker_threads`, JSONB metadata, route/service coordination

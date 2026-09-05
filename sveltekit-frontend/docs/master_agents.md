@@ -1,5 +1,11 @@
 # Master Agents — Complete Codebase Intelligence Map
 
+> **Doc review (2026-09-04):** STALE_BUT_DIRECTIONALLY_RIGHT — core file/module claims
+> (`trace-mcp-server.ts`, `libtorch-bridge.ts`, ACE/context-assembler paths) still check out, but its
+> Ollama-chat routing claims (`:11434` as chat fallback, `gemma4-rotorquant:latest`) are superseded
+> by CLAUDE.md's Ollama Phase-Out (2026-09-03) and the Gemma4→Ornith 1.5 9B chat/synthesis move;
+> MCP tool count (73) is also far stale (current: 120 live / 176 per openspec census).
+
 > Generated: 2026-05-10 | Sources: codebase-map.md + feature atlas + GPU pipeline + 65-gate audit  
 > Refresh: `npm run graphify:daily && npm run karpathy:gpu -- --limit 200`
 

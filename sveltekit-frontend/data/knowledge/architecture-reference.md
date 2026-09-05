@@ -1,5 +1,10 @@
 # Architecture Reference — Legal AI Platform
 
+> **Doc review (2026-09-04):** SUPERSEDED — Postgres-version ("PostgreSQL 16") and primary-LLM
+> ("gemma3-legal:latest") claims are outdated, see `sveltekit-frontend/CLAUDE.md` "Ollama vs
+> llama-server Boundary (July 30, 2026)" and "Ollama Phase-Out (2026-09-03)" (Postgres is now 18.4;
+> chat/synthesis moved to Ornith 1.5 9B on llama-server).
+
 ## Last Updated: February 16, 2026
 
 ---

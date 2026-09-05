@@ -1,5 +1,9 @@
 # 3D Scene Reconstruction Lane — Roadmap (3DGS / NeRF / Photogrammetry)
 
+> **Doc review (2026-09-04):** CURRENT — still cross-referenced live in CLAUDE.md, its schema anchor
+> (`drizzle/manual/screenshot_artifacts.sql`) exists, and the documented "deferred until trigger"
+> status still matches repo state (no 3DGS implementation found).
+
 > Captures planning intent for the forensic crime-scene reconstruction lane.
 > **Not** a request to implement now — this is the staged trigger map for
 > when each capability becomes load-bearing. Mirrors the structure of

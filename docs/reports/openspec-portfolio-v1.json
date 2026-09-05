@@ -1,6 +1,6 @@
 {
   "schema": "openspec-portfolio-v1",
-  "generatedAt": "2026-09-04T21:25:44.423Z",
+  "generatedAt": "2026-09-05T06:18:37.738Z",
   "secondaryRootFinding": {
     "path": "sveltekit-frontend/openspec/changes",
     "changeIds": [
@@ -45,16 +45,16 @@
     }
   ],
   "summary": {
-    "totalChanges": 78,
-    "totalTasksCounted": 4847,
-    "totalTasksCompleted": 2738,
+    "totalChanges": 79,
+    "totalTasksCounted": 4878,
+    "totalTasksCompleted": 2754,
     "byQueueClass": {
       "CURRENT_AUTHORITY": 1,
       "ACTIVE_DEPENDENCY": 15,
       "FROZEN_REFERENCE": 6,
       "PARKED_CHALLENGER": 8,
       "BLOCKED_EXTERNAL": 0,
-      "UNCLASSIFIED": 48
+      "UNCLASSIFIED": 49
     },
     "unclassifiedChangeIds": [
       "ace-hyperrag-chr97-graphify-audit",
@@ -93,6 +93,7 @@
       "parent-atlas-observation-routing-fabric",
       "parent-atlas-okf-knowledge-layers",
       "parent-atlas-opencode-replay-proof",
+      "parent-atlas-openspec-workstation-synthesis",
       "parent-atlas-pass-fabric",
       "parent-atlas-policy-routing-integration",
       "parent-atlas-query-routing-classifier",
@@ -309,9 +310,9 @@
     {
       "changeId": "parent-atlas-ace-rlm-bitfrost-integration",
       "hasTasksFile": true,
-      "completed": 66,
-      "total": 69,
-      "percent": 95.7,
+      "completed": 71,
+      "total": 74,
+      "percent": 95.9,
       "queueClass": "UNCLASSIFIED",
       "currentGateRefs": [],
       "mayGenerateNewWork": null,
@@ -458,9 +459,9 @@
     {
       "changeId": "parent-atlas-canonical-directory-ingestion-fabric",
       "hasTasksFile": true,
-      "completed": 9,
+      "completed": 17,
       "total": 67,
-      "percent": 13.4,
+      "percent": 25.4,
       "queueClass": "UNCLASSIFIED",
       "currentGateRefs": [],
       "mayGenerateNewWork": null,
@@ -912,6 +913,20 @@
       "note": null
     },
     {
+      "changeId": "parent-atlas-openspec-workstation-synthesis",
+      "hasTasksFile": true,
+      "completed": 0,
+      "total": 25,
+      "percent": 0,
+      "queueClass": "UNCLASSIFIED",
+      "currentGateRefs": [],
+      "mayGenerateNewWork": null,
+      "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
+      "note": null
+    },
+    {
       "changeId": "parent-atlas-pass-fabric",
       "hasTasksFile": true,
       "completed": 6,
@@ -989,9 +1004,9 @@
     {
       "changeId": "parent-atlas-retrieval-lineage-dag-convergence",
       "hasTasksFile": true,
-      "completed": 134,
-      "total": 173,
-      "percent": 77.5,
+      "completed": 136,
+      "total": 174,
+      "percent": 78.2,
       "queueClass": "CURRENT_AUTHORITY",
       "currentGateRefs": [
         "CONV-0",
@@ -1186,9 +1201,9 @@
     {
       "changeId": "parent-atlas-versioned-doc-intelligence",
       "hasTasksFile": true,
-      "completed": 15,
+      "completed": 16,
       "total": 31,
-      "percent": 48.4,
+      "percent": 51.6,
       "queueClass": "UNCLASSIFIED",
       "currentGateRefs": [],
       "mayGenerateNewWork": null,

@@ -1,7 +1,7 @@
 {
   "schema": "atlas.bridge-recon-dry-04.v1",
   "task": "BRIDGE-RECON-DRY-04",
-  "generatedAt": "2026-09-04T15:52:56.631Z",
+  "generatedAt": "2026-09-05T06:03:19.955Z",
   "mode": "READ_ONLY_FAIL_CLOSED_RECONCILIATION",
   "inputAuthority": "atlas_packet_chunk_lineage(packet_key, canonical_chunk_id, chunk_row_id) only",
   "collection": "codebase_chunks_768_v2",

@@ -1,5 +1,9 @@
 # Feature × Spec × Implementation Audit (2026-05-11)
 
+> **Doc review (2026-09-04):** SUPERSEDED — identity strategy resolved since (see
+> `sveltekit-frontend/CLAUDE.md` May 30 2026 entry), MCP tool count (78) far below current 120/176,
+> see `openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md`.
+
 > Counterpart to `file-move-audit-gates.md`. Where that doc verifies *refactor safety*, this doc verifies *feature delivery* — what `AGENTS.md` / `master_agents.md` say should exist, what code actually exists, and where the two diverge.
 
 ---

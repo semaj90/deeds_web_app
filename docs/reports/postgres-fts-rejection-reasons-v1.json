@@ -1,6 +1,6 @@
 {
   "schema": "atlas.postgres-fts-rejection-reasons.v1",
-  "generatedAt": "2026-09-04T17:38:46.080Z",
+  "generatedAt": "2026-09-05T05:51:35.555Z",
   "readOnly": true,
   "databaseWrites": false,
   "queries": [

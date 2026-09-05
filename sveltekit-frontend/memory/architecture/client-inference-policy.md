@@ -1,5 +1,10 @@
 # Client-Side Inference & Worker Policy
 
+> **Doc review (2026-09-04):** STALE_BUT_DIRECTIONALLY_RIGHT — the SW-must-never-proxy-backend-chat
+> policy still holds, but this doc's own "Verification" section claims no Service Worker exists yet;
+> `src/lib/client/sw-register.ts` now exists and is wired into `+layout.svelte`, contradicting that
+> premise.
+
 > Settles three recurring questions:
 >   1. Does the Service Worker proxy to backend?
 >   2. Should we use Nico Martin's Transformers.js Chrome extension (Gemma4 ONNX in browser)?

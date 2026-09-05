@@ -1,5 +1,9 @@
 # DB Schema Drift Audit — 2026-05-10
 
+> **Doc review (2026-09-04):** SUPERSEDED — the `cases.user_id` uuid vs `users.id` integer identity
+> crisis this audit flags as unresolved was resolved 2026-05-30 (Path A, all-integer), see
+> `sveltekit-frontend/CLAUDE.md` §"Schema Mismatch: user_id columns — RESOLVED (May 30, 2026)".
+
 **Method**: `docker exec legal-ai-postgres psql` introspection of live `legal_ai_db` (port 5434 via proxy) vs Drizzle declarations across `src/lib/server/db/schema-postgres.ts`, `schema/*.ts`, `schema-evidence-crud.ts`, `schema-chat.ts`, `schema-phase89-preserved.ts`.
 
 **Counts** (top-line):

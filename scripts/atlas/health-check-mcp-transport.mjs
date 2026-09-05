@@ -72,16 +72,23 @@ async function healthCheck() {
         continue;
       }
 
-      // Try to parse response as JSON
+      // Streamable HTTP may return an SSE envelope even when the payload is
+      // JSON. Accept both application/json and text/event-stream responses.
       let data;
       try {
-        data = await response.json();
+        const body = await response.text();
+        const jsonLine = body
+          .split(/\r?\n/)
+          .find((line) => line.startsWith('data:'))
+          ?.slice('data:'.length)
+          .trim();
+        data = JSON.parse(jsonLine || body);
       } catch (parseErr) {
-        console.log(`❌ JSON parse error (${elapsed}ms)`);
+        console.log(`❌ JSON/SSE parse error (${elapsed}ms)`);
         results.failed++;
         results.errors.push({
           iteration: i + 1,
-          error: 'Invalid JSON response',
+          error: 'Invalid JSON or SSE response',
           elapsed
         });
         continue;

@@ -34,7 +34,9 @@ const TURBOQUANT_URL = process.env.TURBOQUANT_URL ?? process.env.TURBO_URL ?? 'h
 const GO_RETRIEVAL_URL = process.env.GO_RETRIEVAL_HTTP_URL ?? process.env.GO_RETRIEVAL_URL ?? 'http://127.0.0.1:8100';
 const GO_RETRIEVAL_HEALTH_PATH = process.env.GO_RETRIEVAL_HEALTH_PATH ?? '/health';
 const TRACE_URL    = process.env.TRACE_MCP_URL ?? 'http://127.0.0.1:8788';
-const TURBOVEC_URL = process.env.TURBOVEC_MCP_URL ?? 'http://127.0.0.1:8792';
+const TURBOVEC_HTTP_URL = process.env.TURBOVEC_HTTP_URL
+  ?? process.env.TURBOVEC_PYTHON_URL
+  ?? 'http://127.0.0.1:8791';
 const OLLAMA_URL   = process.env.OLLAMA_BASE_URL ?? 'http://127.0.0.1:11434';
 const TIMEOUT_MS   = 3000;
 
@@ -63,9 +65,9 @@ const services = [
   { name: 'Go Retrieval',    url: `${GO_RETRIEVAL_URL}${GO_RETRIEVAL_HEALTH_PATH}`, kind: 'goRetrieval' },
   { name: 'Topology Search', url: process.env.TOPOLOGY_SEARCH_URL ?? 'http://127.0.0.1:8101/health', soft: true },
   { name: 'RabbitMQ API',    kind: 'rabbitmq' },
-  // TurboVec MCP is used by the retrieval/agentic lane, but the base dev:gpu
-  // startup path does not spawn it. Keep this as an advisory soft probe.
-  { name: 'TurboVec MCP',    url: `${TURBOVEC_URL}/mcp`, soft: true },
+  // TurboVec's live owner is an HTTP ANN sidecar, not an MCP transport.
+  // The legacy :8792 MCP/ANN wrapper remains a separate reconciliation lane.
+  { name: 'TurboVec ANN',    url: `${TURBOVEC_HTTP_URL}/health`, soft: true },
 ];
 
 let pass = 0;
@@ -433,10 +435,7 @@ for (const service of services) {
 // -- MCP /mcp POST probes (initialize -> tools/list) --------------------------
 console.log('-- MCP /mcp probes --');
 
-const [traceResult, turbovecResult] = await Promise.all([
-  probeMcpEndpoint(TRACE_URL),
-  probeMcpEndpoint(TURBOVEC_URL),
-]);
+const traceResult = await probeMcpEndpoint(TRACE_URL);
 
 if (traceResult.ok) {
   console.log(`OK TRACE MCP :8788/mcp  (${traceResult.toolCount} tools)`);
@@ -449,16 +448,9 @@ if (traceResult.ok) {
   fail += 1;
 }
 
-  if (turbovecResult.ok) {
-    console.log(`OK TurboVec MCP :8792/mcp  (${turbovecResult.toolCount} tools)`);
-    state.turbovecMcp = 'green';
-    pass += 1;
-  } else {
-    console.log(`SKIP TurboVec MCP :8792/mcp (soft dependency) -- ${turbovecResult.error}`);
-    console.log('   -> restart: node scripts/mcp/turbovec-sidecar-mcp.mjs &');
-    state.turbovecMcp = 'yellow';
-    // Advisory only: this lane is launched by the incremental startup path.
-  }
+// TurboVec ANN is checked in the service-health loop above. It is not an MCP
+// endpoint, so do not send an MCP initialize/tools-list request to :8791 or
+// emit a misleading :8792 restart instruction here.
 
 // -- Atlas dependency keys ----------------------------------------------------
 console.log('-- Atlas key presence --');

@@ -1,5 +1,11 @@
 # TRACE/Karpathy Web Development Guide
 
+> **Doc review (2026-09-04):** STALE_BUT_DIRECTIONALLY_RIGHT — still the cited practical guide, but
+> "Gemma4" synthesis references (§3, §13) are superseded on specifics by the 2026-09-03 Ornith 1.5
+> 9B model switch (CLAUDE.md). This root-level copy diverges heavily (~556 lines, per this session's
+> own cross-check) from `sveltekit-frontend/docs/architecture/trace-kag-web-development-guide.md`,
+> which carries its own separate banner — not a duplicate, check both.
+
 ## 1. Goals
 Build a SvelteKit 2 app that supports legal/evidence workflows, AI retrieval, uploads, graph analysis, and durable memory.
 

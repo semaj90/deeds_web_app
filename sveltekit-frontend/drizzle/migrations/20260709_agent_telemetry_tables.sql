@@ -86,6 +86,19 @@ CREATE INDEX IF NOT EXISTS idx_tool_call_events_created_at
   ON tool_call_events(created_at DESC);
 
 -- Outcome ledger (state transitions + decisions)
+-- RETIRED, DO NOT RUN (2026-09-04, outcome_ledger fresh-install schema
+-- convergence): this CREATE TABLE IF NOT EXISTS collides with the real live
+-- `outcome_ledger` shape from drizzle/0111_tool_call_runtime_contract.sql
+-- (task_id/outcome_type/score/reward/feedback/metadata) -- confirmed live via
+-- `\d outcome_ledger`. Whichever migration ran first on any given
+-- environment silently won; this file's own CREATE INDEX statements below
+-- would fail against the 0111 shape (columns like `previous_state` don't
+-- exist there). Kept in place per this repo's archive-not-delete convention,
+-- not applied here or anywhere going forward. The state-transition columns
+-- this block wanted (previous_state/next_state/execution_id/final_state/
+-- final_outcome/recovery_attempted/total_duration_ms/created_at) were
+-- reconciled additively onto the real table instead:
+-- see drizzle/manual/20260904_outcome_ledger_state_transition_convergence_v1.sql.
 CREATE TABLE IF NOT EXISTS outcome_ledger (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   trace_id uuid NOT NULL,

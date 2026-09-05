@@ -16,6 +16,12 @@ tags:
 
 # TRACE/Karpathy Web Development Guide
 
+> **Doc review (2026-09-04):** STALE_BUT_DIRECTIONALLY_RIGHT — architecture/patterns (route
+> contract, lane decision tree, Redis key patterns, production safety gates) still hold; some named
+> smoke scripts (`smoke:atlas`, `smoke:hypergraph:vault`, `smoke:fast-ast`, `smoke:browser-context`,
+> `smoke:graphify`) were not found verbatim in the current `package.json`, and "Gemma4" naming is
+> stale — see `sveltekit-frontend/CLAUDE.md` "Chat/synthesis model switch" (2026-09-03).
+
 ## 1. Goals
 
 Build a SvelteKit 2 app that supports legal/evidence workflows, AI retrieval, uploads, graph analysis, and durable memory — using the runtime split defined in `trace-runtime-split.md`.

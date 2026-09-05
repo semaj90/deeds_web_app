@@ -1,5 +1,10 @@
 # ACE Startup & CUDA Bridge Infrastructure Guide
 
+> **Doc review (2026-09-04):** STALE_BUT_DIRECTIONALLY_RIGHT — the native bridge path
+> (`simd-bridge/cpp/build/Release/tensorrt_bridge.node`) confirmed present; the "Verified
+> Operational (2026-05-15)" port/service claims are ~4 months old and unverifiable from static
+> files, predating the 2026-09-03 Ollama/embedding-lane changes noted in CLAUDE.md.
+
 > **Status**: Verified Operational (2026-05-15)
 > **Stack**: SvelteKit 2 + N-API (LibTorch + simdjson) + Port 8101 Topology Server
 

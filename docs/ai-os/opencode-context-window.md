@@ -1,5 +1,10 @@
 # OpenCode Context Window Configuration
 
+> **Doc review (2026-09-04):** STALE_BUT_DIRECTIONALLY_RIGHT — the `n_ctx`/launcher mechanism
+> (`scripts/launch-turboquant.ps1`, `/slots`) is still correct, but the `:8090` model identity this
+> doc's config examples name (`gemma4-legal.gguf`) was swapped to `ornith-1.5-9b` per CLAUDE.md's
+> 2026-09-03 "Chat/synthesis model switch" note.
+
 ## Problem
 
 OpenCode (antigravity agent) reports 32k context. The actual running llama-server at `:8090` was launched with `n_ctx: 16384` — confirmed via `GET /slots` returning `"n_ctx": 16384`.

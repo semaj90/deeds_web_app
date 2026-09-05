@@ -1,5 +1,11 @@
 # DB Schema Drift Audit - 2026-05-10
 
+> **Doc review (2026-09-04):** STALE_BUT_DIRECTIONALLY_RIGHT — still cited in CLAUDE.md as the drift
+> inventory, but `code_llm_index` migration was later approved and the `user_id` column-type
+> identity crisis it may reference was resolved 2026-05-30 (see CLAUDE.md). Note: this root-level
+> copy diverges by ~286 lines from `sveltekit-frontend/docs/audits/db-schema-drift-2026-05-10.md`,
+> which carries its own separate SUPERSEDED banner — the two are not duplicates, check both.
+
 Scope: `src/lib/server/db/schema-postgres.ts` vs live `information_schema` / `pg_indexes`.
 
 ## Summary

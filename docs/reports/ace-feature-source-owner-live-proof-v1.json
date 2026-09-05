@@ -1,6 +1,6 @@
 {
   "schema": "atlas.ace-feature-source-owner-live-proof.v1",
-  "generatedAt": "2026-09-04T04:14:16.547Z",
+  "generatedAt": "2026-09-05T01:02:24.770Z",
   "status": "STATIC_OWNER_SURFACE_PROVEN_LIVE_CANDIDATES_BOUND_FEATURE_CONTEXT_OWNER_MISSING",
   "summary": "The ACE production-source composition boundary (createSearchRuntimeAceProductionSourceAdapterV1 -> createSearchRuntimeAceResolverV1) is fully built, type-safe, and correctly fails closed. Real candidate identity and a real, replay-stable CandidateOrdinalMapV1 were bound from a genuine 15-row Postgres-sourced cohort with zero new writes. The composition cannot proceed past ordinal-map binding because three real production owners do not exist anywhere in this repo: a QAS feature-context resolver (rows/laneMaskByOrdinal), a retrievalPolicyRevision producer, and an acePlaybookRevision producer. This is a genuine owner-adoption gap, not a code-quality gap -- the contracts and invariant checks are already correct; nothing here should be re-implemented.",
   "searchRuntimeSearchWriteSideEffectFinding": "SearchRuntime.search() (src/lib/server/retrieval/search-runtime.ts) always calls recordPromotionIntent() and logExposureEvents() as fire-and-forget side effects on every real invocation, with no read-only/dry-run mode. A genuinely zero-write canary cannot call it directly; this script uses the already-proven frozen cohort instead.",

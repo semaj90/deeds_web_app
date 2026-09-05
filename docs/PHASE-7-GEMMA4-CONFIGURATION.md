@@ -1,5 +1,9 @@
 # Phase 7 Gemma4 Server Configuration
 
+> **Doc review (2026-09-04):** SUPERSEDED — see CLAUDE.md "Chat/synthesis model switch — Gemma4 →
+> Ornith 1.5 9B, confirmed live" (2026-09-03 entry); llama-server `:8090` now serves
+> `ornith-1.5-9b`, not `gemma4-legal-iq4xs-direct.gguf`.
+
 **Last Updated:** July 2, 2026  
 **Status:** ✅ OPERATIONAL — Clean template deployed, workers running  
 **Throughput:** 28 summaries/minute (measured), ~2-3h ETA for 40K remaining chunks

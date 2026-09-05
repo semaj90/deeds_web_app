@@ -1,0 +1,36 @@
+{
+  "schema": "atlas.embedding-dimension-policy.v1",
+  "canonicalRepresentation": {
+    "model": "EmbeddingGemma",
+    "name": "semantic_768",
+    "dimension": 768,
+    "status": "CANONICAL"
+  },
+  "embeddingGemmaViews": [
+    { "name": "semantic_mrl_512", "dimension": 512, "parent": "semantic_768", "status": "DERIVED_EXPLICIT_ONLY" },
+    { "name": "semantic_mrl_256", "dimension": 256, "parent": "semantic_768", "status": "DERIVED_EXPLICIT_ONLY" },
+    { "name": "semantic_mrl_128", "dimension": 128, "parent": "semantic_768", "status": "DERIVED_EXPLICIT_ONLY" }
+  ],
+  "latentViews": [
+    { "name": "latent_256", "dimension": 256, "parent": "semantic_768", "status": "DERIVED_EXPLICIT_ONLY" },
+    { "name": "latent_128", "dimension": 128, "parent": "latent_256", "status": "DERIVED_EXPLICIT_ONLY" },
+    { "name": "latent_64", "dimension": 64, "parent": "latent_256", "derivation": "latent_256 → latent_128 → latent_64", "status": "DERIVED_EXPLICIT_ONLY" }
+  ],
+  "retired": {
+    "dimension": 384,
+    "status": "COMPATIBILITY_AUDIT_ONLY",
+    "newRuntimeRouting": false,
+    "newWrites": false
+  },
+  "rawLengthRouting": {
+    "inferable": [768, 64],
+    "explicitRepresentationRequired": [512, 256, 128, 384]
+  },
+  "writesPerformed": false,
+  "validation": {
+    "focusedEmbeddingTests": "PASS 5/5",
+    "semanticContractTests": "PASS 2/2",
+    "openspecStrict": "PASS",
+    "dimensionProbe": "PASS"
+  }
+}

@@ -1,14 +1,13 @@
-## Remaining task dependency map (2026-09-02)
+## Remaining task dependency map (updated 2026-09-05)
 
 The remaining work is intentionally ordered by evidence dependency. Do not use
 checkbox completion percentage as permission to skip a blocker.
 
-1. **Graphify execution authority:** `GRAPHIFY-DAILY-COORDINATOR-01` → wire the
-   existing `INVENTORY` through `VALIDATE` owners under the committed execution ledger.
-   Then `PKT-LINEAGE-08` (explicit authorization required) can run its exact
-   production-entrypoint canary and packet readback/replay. `LINEAGE-02` is a
-   separate blocked archaeology helper and must not be treated as an executable
-   cohort-selection gate until its population origin is proven.
+1. **Packet lineage:** `GRAPHIFY-DAILY-COORDINATOR-01` is CLOSED with committed
+   execution-ledger proof. `PKT-LINEAGE-08` is the next production-entrypoint gate,
+   but remains dormant until a fresh authoritative source-selection/chunk-level target
+   exists and separate explicit authorization is supplied. `LINEAGE-02` is a separate
+   blocked archaeology helper and must not select an executable cohort.
 2. **Qdrant reconciliation:** `RETRIEVAL-01J` → `RETRIEVAL-01K` →
    `RETRIEVAL-01L`.
 3. **OaK execution:** `DAG-RUNTIME-01D.2` authoritative four-leg revision
@@ -19,9 +18,11 @@ checkbox completion percentage as permission to skip a blocker.
 6. **Validation record:** items 44 and 45 close only after the evidence-link
    and mutation-scope audit is complete.
 
-Current execution priority is the remaining `GRAPHIFY-DAILY-COORDINATOR-01`
-stage-owner wiring, followed by the narrow `PKT-LINEAGE-08` production-entrypoint
-proof and `RETRIEVAL-01L` governance closeout. `LINEAGE-02` remains
+**Update 2026-09-05**: `GRAPHIFY-DAILY-COORDINATOR-01` is now CLOSED (11/11 items proven, see its
+own section below). Current execution priority is the narrow `PKT-LINEAGE-08` production-entrypoint
+proof (still requires separate explicit authorization plus resolving its own namespace/source-revision
+coverage gap — this closure does not by itself clear that) and `RETRIEVAL-01L` governance closeout.
+`LINEAGE-02` remains
 `BLOCKED_UNGROUNDED`: recover the origin, owner, and checksum of the requested
 bounded cohort. `151128` is undefined/unsupported, and the `15128/768` cohort does not
 exist as an authoritative population artifact. Until one is found, `cohortSize` remains
@@ -209,8 +210,21 @@ to test its success branch against.
   blockers, supersession hints, and one explicit `CURRENT_AUTHORITY` for this
   convergence change without deriving queue priority from completion percentage
   or applying any change. See
-  `scripts/atlas/audit-openspec-portfolio-v1.mjs` and
+  `sveltekit-frontend/scripts/atlas/audit-openspec-portfolio-v1.mjs` and
   `docs/reports/openspec-portfolio-v1.json`.
+
+  **Portfolio reconciliation (2026-09-05):** the root-level auditor named in
+  earlier notes is archived and must not be recreated. The canonical auditor
+  currently reports 78 root changes, 4,853 task rows, exactly 1
+  `CURRENT_AUTHORITY`, 15 `ACTIVE_DEPENDENCY` changes, 6 frozen references,
+  8 parked challengers, and 48 explicitly `UNCLASSIFIED` changes. The derived
+  `scripts/atlas/build-openspec-workboard-v1.mjs` is a navigation/progress
+  projection writing `openspec-workboard-v1`, not a competing portfolio
+  authority. A secondary `sveltekit-frontend/openspec/changes` tree remains
+  outside the CLI-recognized root: 10 entries, with two ID collisions
+  (`parent-atlas-graph-retrieval-proof` and `phase-2f1-real-evaluation-corpus`).
+  Those entries remain an unreconciled reference surface; they do not generate
+  queue work or alter the root OpenSpec authority until separately resolved.
 
 ## 1. Lineage and semantic reader
 
@@ -440,6 +454,10 @@ to test its success branch against.
   0 exact patches, and 0 preimage/identity/revision conflicts. Its verdict is now
   `NO_PATCHES_MISSING_POINTS_REMAIN`, not `READY_FOR_FULL_RECONCILIATION_APPLY`; the prior
   wording overstated readiness when no non-empty proposal existed. `writesPerformed=false`.
+  **READ-ONLY RECHECK 2026-09-05:** the same owner still reports `6,312` reconciled points,
+  `1,109` missing physical points, `0` proposed patches, and `0` conflicts or revision
+  mismatches. `RETRIEVAL-01L` remains open because there is still no non-empty immutable
+  proposal to consume; missing points are not authorization to reconstruct one.
 - [x] RETRIEVAL-02 — Census every Qdrant query for explicit named-vector
   selection; do not mass-edit callers. Audit-only, zero callers modified.
   Static scan of every direct Qdrant-like `.query(`/`.search(` call site
@@ -3324,6 +3342,25 @@ Evidence: `docs/reports/mcp-tool-registry-drift-classification-v1.json`, `docs/r
   open until one of those three gets a real owner; do not synthesize placeholder values for any of
   them to force a close.
 
+  **Fresh read-only recheck (2026-09-04):**
+  `npx tsx scripts/atlas/ace-feature-source-owner-live-proof-v1.mts` reproduced
+  `STATIC_OWNER_SURFACE_PROVEN_LIVE_CANDIDATES_BOUND_FEATURE_CONTEXT_OWNER_MISSING`
+  with `missingCount: 4` and `resolverThrew: true`. The resolver still fails
+  closed; no candidate, policy, playbook, graph, cache, or datastore promotion
+  occurred.
+
+  **Revision-owner search confirmation (2026-09-04):** a bounded search of the
+  production/configuration surfaces found no non-test producer or configured
+  value for `retrievalPolicyRevision` or `acePlaybookRevision`; only contract
+  requirements, resolver validation, and the intentionally empty proof inputs
+  exist. This confirms the remaining blocker is owner adoption, not a missing
+  fallback value. No synthetic revision was introduced.
+
+  Nearby `policyRevision` values were not promoted as substitutes: the
+  query-adaptive and daily-Graphify policy fields are scoped to their own
+  planner/board contracts, while fixture values are test-only. They do not
+  establish the ACE retrieval-policy or playbook owner required by this gate.
+
   **`SEARCH-RUNTIME-READONLY-01` closed same day (2026-09-04) — the specific blocker this finding
   raised is fixed.** `SearchRuntime.search()` (`src/lib/server/retrieval/search-runtime.ts`) now
   accepts `SearchRuntimeConfig.readOnly` (default `false`/undefined — every existing production call
@@ -3348,6 +3385,17 @@ Evidence: `docs/reports/mcp-tool-registry-drift-classification-v1.json`, `docs/r
   real production `SearchRuntime` with zero writes. Does NOT close the parent checkbox itself: the 3
   missing-owner inputs (feature-context resolver, `retrievalPolicyRevision`, `acePlaybookRevision`)
   are unrelated and remain unresolved.
+
+  **QAS owner recheck (2026-09-04):** `scripts/atlas/audit-qas-owner.mjs` reports the
+  sampler and `searchWithQas` boundary wired, but the revision-qualified QAS input
+  artifact is missing and live invocation is `NOT_PROVEN`; the only discovered
+  CandidateFeatureMatrix caller is unproven. Evidence: `docs/reports/qas-owner-audit.json`.
+  This is a read-only audit result and does not close ACE source ownership.
+
+  **Adapter contract proof (2026-09-04):** focused QAS/SearchRuntime adapter,
+  QAS DAG, and feature-bundle tests passed `12/12`. This proves the existing
+  composition and validation behavior only; it is not live-owner or ACE
+  promotion proof because the revision-qualified QAS input remains absent.
 - [x] Preserve incomplete ACE/process enrichment metadata as explicit `null` (2026-09-03).
   `AtlasProcessPacketV1.graphRevision` is now nullable and the legacy ACE adapter no longer
   invents `graph:parent-atlas` when structural authority is unavailable. Nulls remain visible
@@ -3515,6 +3563,50 @@ Evidence: `docs/reports/mcp-tool-registry-drift-classification-v1.json`, `docs/r
   independent SQL readback matched status/checksum. Test receipt:
   `live-receipt-20260903-01`. No Qdrant, Neo4j, Valkey, or NDJSON writes occurred. CLI migration
   and broader caller migration remain open.
+- [x] `outcome_ledger` fresh-install schema convergence (2026-09-04, follow-on session,
+  closes the priority-2 item from `parent-atlas-ace-rlm-bitfrost-integration`'s end-of-session
+  handoff). Re-verified the migration-conflict finding recorded above directly against the live
+  DB rather than trusting the earlier audit note: `docker exec legal-ai-postgres psql ... \d
+  outcome_ledger` confirmed the live table is exactly the 10-column `0111_tool_call_runtime_
+  contract.sql` shape (plus this session's receipt columns); `drizzle/migrations/
+  20260709_agent_telemetry_tables.sql`'s competing `CREATE TABLE IF NOT EXISTS outcome_ledger`
+  (previous_state/next_state/execution_id/final_state/...) was never actually materialized.
+
+  **New finding beyond the prior audit, found by reading the callers, not assumed**: this isn't
+  only a fresh-install ambiguity — two REAL, already-shipped call sites are currently broken
+  against the live table on every single invocation: `src/routes/api/agent/execute/+server.ts`'s
+  outcome_ledger INSERT (comment: "Write outcome_ledger (state transition record)") targets
+  `previous_state`/`next_state`/`tool_name`/`execution_id`/`result_class`/`recovery_attempted`/
+  `final_state`/`final_outcome`/`total_duration_ms`/`created_at` — none of which existed on the
+  live table — and `src/lib/server/agent/execution-review.ts::loadOutcomeLedger()` SELECTs the
+  identical column set filtered by `execution_id`. Both are wrapped in try/catch
+  (`console.error` only), so this has been a silent no-op, not a visible crash — exactly the
+  "silent fallback masks a real bug" failure mode this repo's own conventions warn about
+  elsewhere. Live-reproduced before fixing: ran the route's exact INSERT statement directly —
+  first failure was `null value in column "outcome_type" violates not-null constraint` (a second,
+  previously undocumented gap: the writer never populates `outcome_type` because that concept
+  doesn't exist in its state-transition model).
+
+  **Fix, additive-only, no rename/drop/existing-row mutation** (matches the precedent set by
+  `drizzle/manual/20260903_outcome_receipt_identity_additive_v1.sql`): new
+  `drizzle/manual/20260904_outcome_ledger_state_transition_convergence_v1.sql` — relaxes
+  `outcome_type` from `NOT NULL` (safe: no other caller relies on the constraint, they all supply
+  a value already) and adds the 10 missing nullable columns plus 5 matching indexes
+  (`idx_outcome_ledger_execution_id`/`previous_state`/`next_state`/`final_outcome`/`created_at`).
+  Applied live via `docker exec -i legal-ai-postgres psql ...`, then **live-proved both
+  previously-broken call sites now succeed**: ran the route's exact INSERT (real UUIDs, real
+  column list) — succeeded; ran `loadOutcomeLedger`'s exact SELECT filtered by that row's
+  `execution_id` — returned the correct row with every field intact; deleted the test row
+  afterward. Re-ran the whole migration file a second time to confirm full idempotence (every
+  statement `NOTICE: ... already exists, skipping`, exit clean) — a fresh install can now run
+  this file safely regardless of how many times or in what combination it's replayed.
+  `drizzle/migrations/20260709_agent_telemetry_tables.sql`'s outcome_ledger block is left in
+  place (archive-not-delete) with an explicit "RETIRED, DO NOT RUN" comment added directly above
+  it, pointing at the real convergence migration, so a future fresh install doesn't reach for it.
+  Not touched: the two application files' own SQL (they now work as originally written; no code
+  change was needed), the 0111-shaped reward/receipt writers (`tool-call-recorder.ts`,
+  `agent-work-receipt-store-v1.ts` — re-verified they still work unchanged, since they always
+  supply `outcome_type` themselves regardless of the relaxed constraint).
 - [ ] Decouple optional latent fanout from canonical Graphify completion.
 
 Evidence: `docs/reports/mcp-ace-bitfrost-alignment-audit-v1.json`, `docs/reports/mcp-tool-registry-drift-classification-v1.json`, `docs/reports/ace-route-revision-authority-v1.json`, `docs/reports/bitfrost-valkey-tracking-proof.json`, `docs/reports/graphify-fanout-criticality-01.json`.
@@ -4216,6 +4308,13 @@ question, not silently assumed either way.
   by excluding `discoveredAt` from the hash input entirely; two more consecutive runs then
   produced byte-identical `toolSurfaceRevision` for both servers. Evidence:
   `docs/reports/mcp-tool-surface-live-v1.json`.
+
+  **TRACE transport probe correction (2026-09-04):** `health-check-mcp-transport.mjs`
+  falsely reported TRACE as unavailable because it called `response.json()` on the
+  valid `text/event-stream` response. The live `:8788/mcp` endpoint returns JSON-RPC
+  in an SSE `data:` record. The probe now accepts JSON and SSE envelopes and passes
+  `tools/list` 10/10 with 176 tools. `node --check` passes; no service, datastore,
+  cache, or canonical writes occurred. This closes the probe false-negative only.
 - [x] **Phase C** -- Policy reconciliation. `mcp-tool-policy-classifier-v1.ts` joins live tool
   refs against `atlas-tool-registry.ts`'s `permission`/`humanApproval` fields and
   `ACPToolRegistry.ts`'s `DRY_RUN_TOOLS` set -- read+reconcile only, no new execution allowlist.
@@ -4950,7 +5049,7 @@ item 6 above) — read the ontology-kernel addendum before starting that gate.
 the additive `20260903_graphify_execution_ledger_v1.sql` migration draft) was done in a separate
 session that initially staged it under a would-be new OpenSpec change
 (`parent-atlas-graphify-daily-coordinator`). That change was never created on disk. Per this
-repo's own portfolio-authority invariant (`node scripts/atlas/audit-openspec-portfolio-v1.mjs`,
+repo's own portfolio-authority invariant (`node sveltekit-frontend/scripts/atlas/audit-openspec-portfolio-v1.mjs`,
 `currentAuthorityCount = 1`, `currentAuthority = parent-atlas-retrieval-lineage-dag-convergence`),
 a second OpenSpec change would have contradicted that invariant — this work belongs here instead,
 under the existing `GRAPHIFY_RUN_LIFECYCLE` blocker and alongside `PKT-LINEAGE-08`'s own Graphify
@@ -5105,33 +5204,71 @@ work on this ledger.
 - [ ] Do NOT retry `PKT-LINEAGE-08`'s authorized apply from this gate — that item's own
       prerequisites (recorded earlier in this file) are unrelated to and independent of this ledger.
 
-## GRAPHIFY-DAILY-COORDINATOR-01
+## GRAPHIFY-DAILY-COORDINATOR-01 — CLOSED (2026-09-05, 11/11 items proven)
 
-**2026-09-04 closure pass — 10/11 items now genuinely proven (updated twice same day: the
-ABANDONED reconciliation item and the selection-policy-revision field were both closed after this
-note was first written, see their own checkboxes below). Only one item remains open: a fresh
-`WorkspaceRevisionRecordV1` proven in a COMMITTED (not rolled-back) run — every other committed
-proof in this gate reused an already-existing revision value rather than freshly materializing
-one. Combining two independent pieces of
-evidence: this session's rolled-back integration spec
-(`graphify-daily-coordinator-v1.integration.spec.ts`, 5/5 tests, zero persistent footprint) plus a
-concurrent session's real COMMITTED bounded canary (`docs/reports/graphify-daily-coordinator-canary-v1.json`,
+**2026-09-04 closure pass — 10/11 items proven** (updated twice same day: the ABANDONED
+reconciliation item and the selection-policy-revision field were both closed after this note was
+first written, see their own checkboxes below). Combining two independent pieces of evidence: this
+session's rolled-back integration spec (`graphify-daily-coordinator-v1.integration.spec.ts`, 5/5
+tests, zero persistent footprint) plus a concurrent session's real COMMITTED bounded canary
+(`docs/reports/graphify-daily-coordinator-canary-v1.json`,
 `sveltekit-frontend/scripts/atlas/graphify-daily-coordinator-canary-v1.mts`) that correctly reused
 `graphify-daily-coordinator-v1.ts` (imported directly, not reimplemented) rather than duplicating
-it. Independently re-verified the committed canary myself via a fresh `psql` query against
+it. Independently re-verified that committed canary via a fresh `psql` query against
 `execution_id 5dc82676-d8a5-470e-a3b9-e06a98fb3de5` — not trusting the script's own printed
 report: real row, `status: COMPLETED`, real `completed_at`, 3 real `graphify_execution_files` rows
 (`$lib/utils/file-reader.ts`, `2-CONTEXT.md`, `724_agents.md`), stages `OPEN`+`SOURCE_SELECTION`
 both `COMPLETED`, `graphify_runs` count unchanged at 10 (`historicalGraphifyRunsChanged: false`
-confirmed, not just claimed).**
+confirmed, not just claimed). At that point exactly one item remained open — a fresh
+`WorkspaceRevisionRecordV1` proven in a COMMITTED (not rolled-back) run, since every committed
+proof up to then had reused an already-existing revision value rather than freshly materializing
+one.
 
-- [ ] Fresh `WorkspaceRevisionRecordV1` generated for this execution. **Not proven in a committed
-      run** — the committed canary reused an ALREADY-EXISTING `workspace_revision` value read
-      from `graphify_files`, not a freshly-materialized one via the real
-      `materializeWorkspaceRevisionOriginV1()` producer. My rolled-back spec's Run A/B/C test DID
-      call the real `buildWorkspaceRevisionRecordV1()` fresh (see `GRAPHIFY-DAILY-CANARY-02`
-      above) but that evidence is rolled back, not committed. Left open, not conflated with the
-      canary's narrower proof.
+**2026-09-05 — the last item closed.** See its own checkbox below for the full evidence trail
+(edited the committed canary script to call the real `materializeWorkspaceRevisionOriginV1()`
+producer against the actual working tree instead of a static handoff artifact; independently
+re-verified via a fresh `psql` query against a new `execution_id`; also fixed 3 pre-existing type
+errors uncovered in the same file). **All 11/11 items in this gate are now proven — the gate is
+CLOSED.** Per this file's own "Remaining task dependency map" (top of file), this was the current
+execution priority and unblocks `PKT-LINEAGE-08`'s production-entrypoint canary next — though that
+canary still requires separate explicit authorization per this file's Completion Rubric and remains
+additionally blocked on its own unresolved namespace/source-revision coverage gap (see
+`PKT-LINEAGE-08` and the "Staged observation versus canonical admission" section elsewhere in this
+file) — closing this gate does not by itself clear that separate blocker.
+
+- [x] Fresh `WorkspaceRevisionRecordV1` generated for this execution. **Closed 2026-09-05 —
+      COMMITTED, not rolled back.** `scripts/atlas/graphify-daily-coordinator-canary-v1.mts` was
+      edited to call the real `materializeWorkspaceRevisionOriginV1()` producer directly
+      (git `rev-parse`/`ls-tree`/`diff`/`status` + per-file read/hash against the actual working
+      tree at `workspaceRoot`), replacing the prior read of a static, orphaned handoff artifact
+      (`docs/reports/graphify-lifecycle-entrypoint-v1.json` — produced by no script that exists in
+      this repo). Ran with `GRAPHIFY_COMMITTED_CANARY=1`: fresh materialization observed **25,666**
+      tracked source files and produced a genuinely new `workspaceRevision`
+      (`sha256:c17c40c28da9c0ec831c4a5beb7390fb73a581c6b147cae95c8da79d3fcfb4d2`, distinct from every
+      prior committed canary's revision), then fed 3 of those real bindings through the unchanged
+      `adaptWorkspaceBindingsToSourceSelectionV1()` → `openExecution`/`recordSourceSelectionStage`/
+      `completeExecution` path. **Independently re-verified via a fresh `psql` query against
+      `execution_id 'fe3dcfa6-da34-4a30-9281-e56d752f77ec'`** (not the script's own printed JSON):
+      real row, `status: COMPLETED`, `completed_at` present, all 5 stages
+      (`OPEN, SOURCE_SELECTION, INVENTORY, AST_PARSE, STRUCTURAL_EXTRACT`) `COMPLETED`, 3 real
+      `graphify_execution_files` rows (`.claude/AGENT_CONSTITUTION.md`,
+      `.claude/AGENT_RECOMMENDATIONS.md`, `__tests__/data-hashing.spec.ts`) all sharing the fresh
+      workspace revision, `SOURCE_SELECTION.receipt_ref` correctly carrying the new
+      `selectionPolicyRevision` value (`committed-canary-fresh-materialization-v1`).
+      `graphify_runs` unchanged at 11 rows (`historicalGraphifyRunsChanged: false` confirmed
+      independently, not just claimed); `graphify_executions` went 6 → 7 (exactly the one new row).
+      Also fixed 3 pre-existing (not newly introduced) type errors in the same file uncovered by
+      this edit — `binding.sourceRevision`/`binding.workspaceRevision`/`structuralBinding.baseCommitOid`
+      referenced fields that don't exist on the adapted `SourceSelectionBindingV1` shape (only
+      `sourceRef`/`codeSourceRevision`/`contentHash`/`byteLength` do) and were silently `undefined`
+      in every prior run of this script, including the earlier committed canaries this file cites
+      above; corrected to `codeSourceRevision`, the outer `workspaceRevision` variable, and
+      `selectedBindings[0].baseCommitOid` (the raw pre-adapter binding, which does carry it)
+      respectively. Added a `workspaceRevisionSource: 'materializeWorkspaceRevisionOriginV1'` +
+      `workspaceRevisionSourceCount` field to the script's own report JSON so this provenance is
+      explicit on future reads. **This closes `GRAPHIFY-DAILY-COORDINATOR-01` — 11/11 items now
+      proven.** Report: `docs/reports/graphify-daily-coordinator-canary-v1.json` (overwritten in
+      place, same path convention as every prior canary run in this file).
 - [x] Exact `WorkspaceSourceBindingV1[]` frozen before downstream stages. Committed canary froze 3
       real bindings (`sourceRef`/`codeSourceRevision`/`contentHash`/`byteLength`) from a real
       `graphify_files` query BEFORE calling `recordSourceSelectionStage`.
@@ -5253,7 +5390,7 @@ PKT-LINEAGE-08 preflight
 Then run:
 ```
 npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json
-node scripts/atlas/audit-openspec-portfolio-v1.mjs
+node sveltekit-frontend/scripts/atlas/audit-openspec-portfolio-v1.mjs
 ```
 The portfolio audit should continue to report `currentAuthorityCount = 1` /
 `currentAuthority = parent-atlas-retrieval-lineage-dag-convergence` — that is an explicit repo
@@ -5764,7 +5901,7 @@ recorded here so a fresh session doesn't have to re-derive them: (1) gate 2
 never actually broken — the planner already materializes real `ParameterArtifactV1`s per action.
 
 **Next-session starting point**: `npx openspec validate parent-atlas-retrieval-lineage-dag-convergence
---type change --strict --json` and `node scripts/atlas/audit-openspec-portfolio-v1.mjs` both pass
+--type change --strict --json` and `node sveltekit-frontend/scripts/atlas/audit-openspec-portfolio-v1.mjs` both pass
 clean as of this handoff — re-run both first thing, since this file is under heavy concurrent
 editing (multiple sections in this same file were found modified by other sessions mid-turn,
 several times, throughout this session). Read the file's current tail before appending — do not
@@ -6354,3 +6491,122 @@ this audit. No task statuses were changed.
 - [ ] Keep implementation in `scripts/atlas` until the directory-index, evidence, ACE, DAG,
   language-parity, and cache readback gates each have their own receipts; only then consider
   promotion into `packages/atlas*`.
+### Source-authority recheck (2026-09-05)
+
+Read-only audits confirm the current blocker remains upstream of packet promotion: `audit-current-graphify-source-revision-v1.mjs` found no rows for its current source-authority lookup (`SOURCE_AUTHORITY_UNAVAILABLE`); `audit-graphify-run-file-binding-v1.mjs` found one completed bound owner, five completed unbound runs, three running unbound runs, and two running bound-but-nonterminal runs; `audit-current-source-evidence-hydration-v1.mjs` found 52 exact revision matches but only 9 content-hydrated rows, with 43 missing canonical chunk-owner rows and 9 chunk-owner rows lacking source revision. No packet, semantic, Qdrant, graph, or cache writes occurred. Keep `PKT-LINEAGE-08` open until a fresh authoritative source-selection/chunk-level target exists.
+
+Source-plan recheck (2026-09-05): `plan-current-source-graphify-batch-v1.mjs` selected 52 historical inputs but produced `currentGraphifyExact=0` and `graphifyRevisionOrContentMismatch=52`; the dependent registry reconciliation plan therefore selected `0` rows. Existing registry presence must not be mistaken for a current executable cohort. No source-registry or packet promotion apply was run.
+
+Fresh workspace-origin recheck (2026-09-05): `npx tsx scripts/atlas/audit-graphify-lifecycle-entrypoint-v1.mts` produced `workspaceRevision=sha256:51b2f9d29ff1ecc589a1ad0d4e67516a89a6418ba4962f1b0b6ef207cbfda3e9` with `bindingCount=25666` and status `READY_FOR_INJECTED_WIRING`. This full-manifest observation supersedes neither historical 52-row planning nor the bounded 111-row binding artifact automatically; a new source plan must explicitly choose its scope and checksum before promotion.
+
+### Post-coordinator-closure lineage re-audit (2026-09-05) — PKT-LINEAGE-08 predicate status UNCHANGED, not fabricated
+
+Per this file's own rule that the `GRAPHIFY-DAILY-COORDINATOR-01` closure (execution
+`fe3dcfa6-da34-4a30-9281-e56d752f77ec`) must not be assumed to unblock `PKT-LINEAGE-08` without
+re-running the read-only lineage audits, both were re-run fresh, read-only, zero writes:
+
+- `node scripts/atlas/audit-current-source-cohort-lineage-v1.mjs` →
+  `SOURCE_LINEAGE_COHORT_FOUND_WORKSPACE_MISMATCH`: `currentWorkspaceRevision =
+  sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3` (identical to the
+  2026-09-04 pre-closure run), 52 cohort rows, 52 source-revision-qualified, **0**
+  current-workspace-matched — all 52 still `workspaceMismatchAfterSourceQualification`.
+- `node scripts/atlas/audit-current-workspace-packet-chunk-join-v1.mjs` →
+  `CURRENT_PACKET_CHUNK_JOIN_MISSING`: 111 binding rows, **0** exact Graphify sources, **0**
+  binding-to-chunk content matches, **0** packet/chunk exact sources — numerically identical to
+  the 2026-09-04 pre-closure run.
+
+**Both audits are numerically unchanged after the coordinator closure — this is the correct,
+honest result, not a stale/missed rerun.** The coordinator canary's fresh
+`materializeWorkspaceRevisionOriginV1()` call (25,666 files, workspace revision
+`sha256:c17c40c28da9c0ec8...`) only fed the bounded `graphify_executions`/`graphify_execution_files`
+ledger for its own 3-source proof — it never touched whatever table/view these two lineage audits
+read `currentWorkspaceRevision`/binding rows from (the concurrent session's own
+`audit-graphify-lifecycle-entrypoint-v1.mts` run immediately above produced yet a **third**,
+different workspace revision, `sha256:51b2f9d29ff1ecc...`, same 25,666 file count — three
+independently-materialized full-workspace revisions now exist this session alone, none of which
+this file's lineage-audit population currently reads). Per this gate's own decision tree: zero
+naturally-qualified candidates → `PKT-LINEAGE-08` stays exactly `IMPLEMENTATION_PROVEN /
+SUCCESS_POPULATION_UNAVAILABLE`, unchanged. Do not fabricate a success candidate from any of the
+three fresh workspace-revision materializations above — none of them is wired to the
+source-selection/chunk-join population these two audits actually query.
+
+## OPENSPEC-WORKSTATION-SYNTHESIS-01 (2026-09-05, PROPOSED — registered, zero implementation, zero code)
+
+**Governance placement, decided before any design content**: per this file's own
+`GRAPHIFY-EXECUTION-LEDGER-SCHEMA-02` scope note — "a second OpenSpec change would have
+contradicted [the `currentAuthorityCount = 1`] invariant... this work belongs here instead" — this
+proposal is registered as a section of the current authority, **not** a new OpenSpec change
+directory. `node scripts/atlas/audit-openspec-portfolio-v1.mjs` must still report exactly one
+`CURRENT_AUTHORITY` after this section lands.
+
+**Problem statement**: the OpenSpec portfolio has 4,853+ tasks (2,100+ open, undercounted per
+`docs/reports/openspec-root-reconciliation-v1.json` — the audit/workboard scripts don't scan the
+secondary `sveltekit-frontend/openspec/changes/` root). Sending all open items to a planning model
+indiscriminately would repeat this file's own "AGENT EXECUTION INTEGRITY" failure mode — a model
+guessing which checkboxes are done instead of deterministic machinery proving it. The existing
+mechanical front end (`build-openspec-workboard-v1.mjs` → `docs/OPENSPEC-WORKBOARD.md`) already
+collapses raw checkbox volume into a STEP-01..STEP-08 dependency-ranked index and already
+identifies identity/lineage as the dominant upstream blocker — proven correct by this file's own
+manual work this session, which found the exact same bottleneck by hand. The gap is: nothing turns
+that mechanical index into one bounded, evidence-grounded next action a workstation agent can
+safely execute.
+
+**Architecture (operator-directed, adopted as-is)**: reuse the existing Parent Atlas
+identity/ACE/BitFrost fabric — do not build a parallel one. Ownership split:
+
+| Layer | Owns | Must NOT do |
+|---|---|---|
+| OpenSpec `tasks.md` files | Canonical truth — checkbox state, receipts | Be inferred/mutated by a model guess |
+| `build-openspec-workboard-v1.mjs` (existing, reused) | Deterministic STEP-ranked task index (`OpenSpecWorkboardSnapshotV1`) | Judge semantic completeness |
+| Atlas resolvers (new, this proposal) | Resolve one candidate task against real evidence (receipts, code, tests, Graphify revision) | Decide anything the deterministic check can't prove |
+| ACE (existing fabric, new packet shape) | Assemble ONE bounded `ACEOpenSpecContextV1` for ONE planning decision | Discover whether a checkbox is done; become a second OpenSpec database |
+| Ornith (existing synthesis lane) | Synthesize ONE `OpenSpecWorkPlanV1` — the smallest next bounded action | Decide identity, mutate tasks.md, or invent evidence |
+| BitFrost/Valkey | Cache `ContextManifestV1`/`OpenSpecWorkPlanV1` **by exact revision-checksum key** (memory residency, not truth) | Become a second source of truth; drive invalidation before revision-keyed caching is proven safe |
+| Existing agent DAG + validators | Execute the ONE chosen bounded action, produce `ValidationReceiptV1` | Mark a checkbox done without a receipt |
+
+**Contracts (named, not yet built)**: `OpenSpecWorkboardSnapshotV1` (workspaceRevision,
+workboardChecksum, task identities, STEP, evidence refs — a thin typed wrapper around the existing
+workboard JSON, not a new ledger), `ACEOpenSpecContextV1` (workspaceRevision, workboardRevision,
+changeId, taskId, taskChecksum, dependency step, blockers/prerequisites/dependents, evidence refs,
+currentState ∈ `proven | unresolved | contradictory | staleEvidence`, candidateAction,
+filesLikelyTouched, validations, mutationClass), `OpenSpecWorkPlanV1` (the synthesized bounded next
+action: change, task, why-now, code owners to read, expected files, allowed writes, proof
+required).
+
+**BitFrost caching rule (revision-keyed, no active invalidation yet)**: this session's own
+Redis-invalidation audit (`invalidateBitfrostPacket` correctness proven, but its call sites are not
+reachable from any real production Postgres mutation path — see this file's earlier finding) means
+active invalidation cannot be trusted yet. Cache key must include `workspaceRevision` +
+`workboardChecksum` + `taskChecksum` + all referenced evidence revisions; any single upstream
+change produces a different key and a clean cache miss. This makes staleness structurally
+difficult to serve even with zero working invalidation — correct scoping given the current
+invalidation-reachability gap, not a workaround for it.
+
+**13 proposed gates** (`OWS-01`..`OWS-13`): `WORKBOARD_SNAPSHOT` (freeze existing workboard JSON +
+checksum) → `TASK_IDENTITY` (stable changePath+taskLocation+textChecksum) → `EVIDENCE_RESOLUTION`
+(resolve one candidate against tasks.md/receipts/reports/code/tests/Graphify revision) →
+`READINESS_CLASSIFICATION` (`READY | BLOCKED | PROBABLY_DONE_NEEDS_PROOF | SUPERSEDED | STALE |
+DEFERRED | NEEDS_HUMAN_DECISION`) → `DEPENDENCY_RANK` (STEP order + explicit deps) →
+`ACE_CONTEXT` → `CONTEXT_MANIFEST` → `SYNTHESIS` (Ornith produces the bounded plan) →
+`BITFROST_RESIDENCY` (revision-keyed cache) → `WORKSTATION_DAG` (execute the one chosen task) →
+`VALIDATION_RECEIPT` → `RECONCILE` (checkbox mutation ONLY from a proof receipt) → `REBUILD`
+(regenerate workboard, repeat).
+
+**Explicitly NOT done by this section**: no contract implemented, no gate built, no ACE packet
+shape wired, no BitFrost key scheme wired, no model call made. This is a design/placement
+registration only — matches this file's own established pattern for prior registered-not-started
+gate batches (e.g. the 5 `DOMAIN-CLASSIFIER-OWNER-01`-adjacent gates registered 2026-09-03).
+
+**Sequencing relative to the rest of this file**: this proposal explicitly does not compete with
+the active P0 chain (`PKT-LINEAGE-08` → `RETRIEVAL-01L`) for priority — its own first bounded gate
+(`OWS-03` EVIDENCE_RESOLUTION classifying only STEP-01/STEP-02 READY candidates first) would
+*surface* that exact chain as the top synthesized action if run today, not replace it. Building
+`OWS-01`/`OWS-02` (thin wrappers around the already-existing, already-correct workboard script) is
+the lowest-risk starting point whenever this is picked up — everything past `OWS-04` depends on
+real evidence-resolution logic that does not exist yet and needs its own design pass before
+implementation, not assumed here.
+
+**Also registered, not started**: extending `audit-openspec-portfolio-v1.mjs`/
+`build-openspec-workboard-v1.mjs`'s scan glob to include the secondary
+`sveltekit-frontend/openspec/changes/` root (flagged in `openspec-root-reconciliation-v1.json`,
+2026-09-05) — a prerequisite for `OWS-01` to snapshot a complete, not partial, portfolio.

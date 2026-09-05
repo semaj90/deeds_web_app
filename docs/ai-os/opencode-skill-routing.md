@@ -1,5 +1,13 @@
 # OpenCode Skill Routing — Keyword → Auto-Skill Hints
 
+> **Doc review (2026-09-04):** SUPERSEDED — most listed skills (`ace-recovery`, `caveman-pipeline`,
+> `context-budget`, `docs-search-ace`, `domain-router`, `error-inference-research`,
+> `feature-labeling`, `gemma4`, `graphrag-context-recovery`, `ingest-md-txt`, `project-manager`,
+> `sourceRef-ranking`, `tool-selection`) no longer exist under `.opencode/skills/`, which now only
+> contains `mcp-toolchain`, `metadata-context-analysis`, `openspec-*`, `rg-atlas`,
+> `trace-mcp-tooling`. CLAUDE.md's pointer to this file is itself still current; the routing table
+> content needs regeneration against the live `.opencode/skills/` directory.
+
 When a user message contains keywords matching a skill's domain, **suggest or invoke that skill before responding**. This is the auto-skill routing table for Gemma4 thinking.
 
 ---

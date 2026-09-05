@@ -1,7 +1,7 @@
 {
   "gate": "SEARCH-RUNTIME-READONLY-01",
   "status": "LIVE_PROOF_PASSED",
-  "executedAt": "2026-09-04T22:35:36.237Z",
+  "executedAt": "2026-09-05T05:36:17.345Z",
   "summary": "createProductionSearchRuntime({ readOnly: true }) ran a real query against real production retrieval adapters (Postgres + Qdrant, no injected fakes) and performed zero writes to promotion_outbox or recommendation_events. provenance.readOnly and provenance.promotionAttempted correctly reflect the gated state. Closes the \"genuinely zero-write canary cannot call SearchRuntime.search() directly\" finding from ACE-FEATURE-SOURCE-OWNER-01.",
   "filesChanged": [
     "sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts (added SearchRuntimeConfig.readOnly, gated the two write side effects in search(), added provenance.readOnly to all 3 return paths, threaded readOnly through createSearchRuntime()/createProductionSearchRuntime())"

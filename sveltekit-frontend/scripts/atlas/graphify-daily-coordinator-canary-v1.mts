@@ -18,7 +18,7 @@ import {
   compileGraphifyStructuralIntelligence,
 } from '../../src/lib/server/atlas/indexing/graphify-structural-intelligence-adapter.js';
 import { GraphifyStructuralMaterializer, create8095AstProvider } from '../../src/lib/server/atlas/indexing/graphify-structural-materializer.js';
-import type { WorkspaceSourceBindingV1 } from '../../src/lib/server/atlas/identity/workspace-source-binding-v1.js';
+import { materializeWorkspaceRevisionOriginV1 } from '../../src/lib/server/atlas/indexing/workspace-revision-origin-runtime-v1.js';
 
 if (process.env.GRAPHIFY_COMMITTED_CANARY !== '1') {
   throw new Error('GRAPHIFY_COMMITTED_CANARY=1 is required for the bounded committed canary');
@@ -29,7 +29,7 @@ const client = new Client({
   connectionString: process.env.DATABASE_URL ?? 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db',
 });
 const reportPath = resolve(process.cwd(), '..', 'docs', 'reports', 'graphify-daily-coordinator-canary-v1.json');
-const sourceHandoffPath = resolve(process.cwd(), '..', 'docs', 'reports', 'graphify-lifecycle-entrypoint-v1.json');
+const workspaceRoot = resolve(process.cwd(), '..');
 let locked = false;
 let executionId: string | undefined;
 
@@ -38,18 +38,20 @@ try {
   await acquireCoordinatorLock(client);
   locked = true;
 
-  const handoff = JSON.parse(await readFile(sourceHandoffPath, 'utf8')) as {
-    workspaceRevision?: string;
-    sourceBindings?: WorkspaceSourceBindingV1[];
-  };
-  if (!handoff.workspaceRevision || !handoff.sourceBindings) {
-    throw new Error('GRAPHIFY_COORDINATOR_CANARY_SOURCE_HANDOFF_INCOMPLETE');
-  }
-  const selectedBindings = handoff.sourceBindings.slice(0, 3);
+  // Freshly materialize the workspace revision from the real git+fs state of the working
+  // tree, rather than reading a stale static handoff artifact (closes GRAPHIFY-DAILY-COORDINATOR-01's
+  // last open item: "Fresh WorkspaceRevisionRecordV1 generated for this execution").
+  const origin = materializeWorkspaceRevisionOriginV1({
+    workspaceRoot,
+    repositoryId: 'semaj90/deeds_web_app',
+    producerRevision: 'graphify.committed-canary.v1',
+  });
+  const workspaceRevision = origin.record.workspaceRevision;
+  const selectedBindings = origin.bindings.slice(0, 3);
   if (selectedBindings.length !== 3) {
-    throw new Error(`Expected 3 qualified source bindings in handoff, got ${selectedBindings.length}`);
+    throw new Error(`Expected 3 qualified source bindings from fresh materialization, got ${selectedBindings.length}`);
   }
-  const bindings = adaptWorkspaceBindingsToSourceSelectionV1(handoff.workspaceRevision, selectedBindings);
+  const bindings = adaptWorkspaceBindingsToSourceSelectionV1(workspaceRevision, selectedBindings);
 
   const workspaceResult = await client.query('SELECT id FROM public.workspaces LIMIT 1');
   const workspaceId = workspaceResult.rows[0]?.id as string | undefined;
@@ -57,7 +59,7 @@ try {
 
   const opened = await openExecution(client, {
     workspaceId,
-    workspaceRevision: handoff.workspaceRevision,
+    workspaceRevision,
     parserContractVersion: 'graphify.parser.v1',
     extractionContractVersion: 'graphify.extraction.v1',
     graphAlgorithmRevision: 'graphify.graph.v1',
@@ -66,15 +68,17 @@ try {
     environmentRevision: 'operator-authorized-canary',
   });
   executionId = opened.executionId;
-  const selection = await recordSourceSelectionStage(client, executionId, handoff.workspaceRevision, bindings);
+  const selection = await recordSourceSelectionStage(client, executionId, workspaceRevision, bindings, {
+    selectionPolicyRevision: 'committed-canary-fresh-materialization-v1',
+  });
   const orderedInventoryBindings = [...bindings].sort((a, b) => a.sourceRef.localeCompare(b.sourceRef));
   const inventoryOutputChecksum = `sha256:${createHash('sha256')
     .update(JSON.stringify(orderedInventoryBindings.map((binding) => ({
       sourceRef: binding.sourceRef,
-      sourceRevision: binding.sourceRevision,
+      codeSourceRevision: binding.codeSourceRevision,
       contentHash: binding.contentHash,
       byteLength: binding.byteLength,
-      workspaceRevision: binding.workspaceRevision,
+      workspaceRevision,
     }))))
     .digest('hex')}`;
   const inventory = await recordInventoryStage(client, executionId, {
@@ -95,14 +99,14 @@ try {
   ).materialize({
     sourceRef: structuralBinding.sourceRef,
     sourceRevision: structuralBinding.codeSourceRevision,
-    sourceVersionAnchor: `base-commit:${structuralBinding.baseCommitOid ?? 'handoff'}`,
+    sourceVersionAnchor: `base-commit:${selectedBindings[0].baseCommitOid}`,
     sourceRevisionAuthority: 'PROVEN',
     language: 'typescript',
     source: structuralSource,
   });
   const structuralResult = compileGraphifyStructuralIntelligence({
     source: structuralSource,
-    workspaceRevision: handoff.workspaceRevision,
+    workspaceRevision,
     materialization,
     revisions: {
       chunker: 'treesitter-chunker-live',
@@ -137,6 +141,8 @@ try {
     status: row?.status === 'COMPLETED' && row?.completed_at && Number(row.file_count) === 3 && Number(row.completed_stage_count) === 5 ? 'PROVEN_COMMITTED_BOUNDED_CANARY' : 'READBACK_FAILED',
     executionId,
     workspaceRevision: row?.workspace_revision ?? null,
+    workspaceRevisionSource: 'materializeWorkspaceRevisionOriginV1',
+    workspaceRevisionSourceCount: origin.bindings.length,
     sourceCount: selection.sourceCount,
     sourceSelectionChecksum: selection.outputChecksum,
     inventoryInputChecksum: inventory.inputChecksum,

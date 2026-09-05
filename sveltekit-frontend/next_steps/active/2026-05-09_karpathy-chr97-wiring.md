@@ -1,5 +1,8 @@
 # Karpathy KB ↔ NES/CHR97 Cartridge Wiring — Design Doc
 
+> **Doc review (2026-09-04):** CURRENT — still accurately unimplemented; proposed new files
+> (`warm-resolver.ts`, `cartridge-pack-worker.ts`) confirmed absent, existing-parts table accurate.
+
 **Status**: design-only, not implemented. Ship in a future session after operator review.
 **Created**: 2026-05-09
 **Scope**: connect the Karpathy GPU authority blend (`gpu:karpathy:scores`) to the CHR97 cartridge format (`src/lib/server/cartridge/chr97-builder.ts`) so notecards become addressable as cartridge runes, fetched into ACE Stage A0, and cached as `llm_synthesis` payloads.

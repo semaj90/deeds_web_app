@@ -1,5 +1,11 @@
 # Feature Parity Audit - 2026-05-10
 
+> **Doc review (2026-09-04):** STALE_BUT_DIRECTIONALLY_RIGHT — named files/routes still exist, but
+> `schema_blocked`/`partial` verdicts tied to the `code_llm_index` gap are stale — CLAUDE.md later
+> marked that table approved-for-migration. This root-level copy diverges from
+> `sveltekit-frontend/docs/audits/feature-parity-2026-05-10.md` (different content, ~131 diff
+> lines, per this session's own cross-check) — not a duplicate, check both.
+
 Source: `docs/master_agents.md` feature atlas + live `feature_implementations` / `feature_file_edges` + AGENTS hierarchy.
 
 ## Summary

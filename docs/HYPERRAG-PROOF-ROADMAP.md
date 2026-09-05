@@ -1,5 +1,28 @@
 # HyperRAG Proof Roadmap — Aligned to Current Spine
 
+> **Doc review (2026-09-05, updated):** SUPERSEDED — cross-checked section-by-section against
+> `openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md` (the active, far more
+> evidence-disciplined successor for this exact subject area):
+> - **P1/P2 plans**: redone with a much stricter bar (frozen proposals, checksums,
+>   rollback/readback proof) under `RETRIEVAL-01J/01K/01L` (Qdrant reconciliation) and
+>   `PKT-LINEAGE-01..13` (provenance/lineage). Do not execute this doc's P1a/P2a scripts as
+>   written — they'd create a second, less rigorous owner for work that change already governs.
+> - **P0's own "Redis exact-match + live fallback" cache-hit claim is now contradicted, not just
+>   stale**: a 2026-09-04 read-only audit in that OpenSpec change found the live, wired
+>   invalidation path for real HyperRAG packet materialization (`hyperrag/hyperrag-packet-pipeline.ts`
+>   → `hyperrag/hyperrag-rpc-client.ts` → `acp/packet-materializer-pipeline.ts`) deletes Redis keys
+>   in a shape (`bifrost:packet:*` etc.) that **does not match live Redis reality**
+>   (`bifrost:sem:packet:*`, `bitfrost:summary:packet:v1:*` — confirmed via direct `valkey-cli
+>   --scan`) — meaning stale cached packets/summaries can persist past a canonical Postgres update.
+>   Left unfixed as of that audit (see that file's Redis-invalidation finding). Note the HyperRAG
+>   pipeline files themselves are confirmed live/wired production code, not dead — only their cache
+>   invalidation is broken.
+> - **Row/collection counts are stale by an order of magnitude, not just old**: this doc's "17,995
+>   packets" is now 61,715+ packet rows per the OpenSpec change's packet-lineage census, and the
+>   `atlas_packets.qdrant_point_id`-as-plain-FK join model this doc's P1a script assumes is not how
+>   current work references Qdrant identity (see `CandidateOrdinal`/`hydrateCanonicalChunkIds()` in
+>   that file instead).
+
 **Last Updated:** 2026-06-23 Session  
 **Current Status:** P0 COMPLETE | P1 IN PROGRESS | P2 PLANNED | P3–P4 DEFERRED
 

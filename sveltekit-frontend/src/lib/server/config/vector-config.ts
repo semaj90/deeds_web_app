@@ -294,10 +294,14 @@ export function getCollectionDimension(collection: string): number {
   return dimension;
 }
 
-export function vectorSlotFor(vector: number[]): 'dense_384' | 'dense_768' | 'latent_128' | 'latent_64' {
-  if (vector.length === 384) return 'dense_384';
+export function vectorSlotFor(vector: number[]): 'dense_768' | 'latent_64' {
+  // 384 is retired. 512/256/128 are intentionally not inferred from length:
+  // EmbeddingGemma MRL views and learned latent views use different coordinate
+  // systems and must be selected by an explicit representation contract.
+  if (vector.length === 384 || vector.length === 512 || vector.length === 256 || vector.length === 128) {
+    throw new Error(`Explicit representation required for retired/derived vector dimension: ${vector.length}`);
+  }
   if (vector.length === 768) return 'dense_768';
-  if (vector.length === 128) return 'latent_128';
   if (vector.length === 64) return 'latent_64';
   throw new Error(`Unsupported vector dimension: ${vector.length}`);
 }

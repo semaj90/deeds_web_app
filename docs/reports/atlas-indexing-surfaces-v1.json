@@ -1,6 +1,6 @@
 {
   "schema": "atlas.indexing-surfaces.v1",
-  "generatedAt": "2026-09-04T17:36:27.689Z",
+  "generatedAt": "2026-09-05T05:51:35.555Z",
   "readOnly": true,
   "canonicalAuthority": "postgres",
   "ast": {
@@ -2080,7 +2080,7 @@
             "distance": "Cosine"
           }
         },
-        "points": 1031,
+        "points": 1028,
         "indexedVectors": 1031,
         "status": "green"
       },
@@ -2142,7 +2142,7 @@
   },
   "drizzle": {
     "journalEntries": 41,
-    "manualSqlFiles": 270,
+    "manualSqlFiles": 272,
     "declaredSidecars": 54,
     "untrackedManualFiles": [
       "0009_hybrid_graph_indexes.sql",

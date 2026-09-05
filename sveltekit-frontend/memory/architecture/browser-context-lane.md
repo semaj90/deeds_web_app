@@ -1,5 +1,7 @@
 # Browser Context Lane — Admin TRACE Copilot
 
+> **Doc review (2026-09-04):** CURRENT — all named files/paths verified present; no drift detected.
+
 > Inspired by Transformers.js browser-assistant pattern. Gives the Copilot
 > *situational awareness* of the operator's browser state without giving any
 > browser extension control over backend infrastructure. The TRACE backend

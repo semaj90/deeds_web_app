@@ -1,5 +1,11 @@
 # Go Retrieval Service Integration — WIRED ✅
 
+> **Doc review (2026-09-04):** STALE_BUT_DIRECTIONALLY_RIGHT — all named files/routes
+> (`go-search-bridge.ts`, `/api/admin/retrieval/{search,clusters,clusters/[id]}`,
+> `command-center/retrieval/+page.svelte`) confirmed present in the tree; live service health, the
+> claimed :50055 port collision with chr97-agent-client, and the example result counts are
+> UNVERIFIABLE_STATIC from a file-only review.
+
 **Status**: Complete and ready for deployment  
 **Date**: June 26, 2026  
 **Service**: go-search-service (HTTP :8096 | gRPC :50055)

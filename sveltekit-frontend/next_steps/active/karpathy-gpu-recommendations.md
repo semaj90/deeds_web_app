@@ -1,5 +1,9 @@
 # Karpathy GPU Authority Blend
 
+> **Doc review (2026-09-04):** SUPERSEDED — this pipeline is marked LEGACY/REFERENCE ONLY in current
+> `sveltekit-frontend/CLAUDE.md` §"Karpathy GPU Authority Blend + Redis ACE Cache (LEGACY /
+> REFERENCE ONLY)".
+
 Generated: 2026-08-30T05:54:43.915Z
 
 - FP16 mode: auto (default)

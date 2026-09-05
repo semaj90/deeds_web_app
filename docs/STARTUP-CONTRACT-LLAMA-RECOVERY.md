@@ -1,5 +1,11 @@
 # Startup Contract: llama-server Gemma4 + Ornith Recovery
 
+> **Doc review (2026-09-04):** STALE_BUT_DIRECTIONALLY_RIGHT — Ornith is now live on :8090 but this
+> doc's Ornith profile line ("chat-template-file: NONE") contradicts CLAUDE.md, which says the
+> custom `configs/templates/custom_pub_chat_template_gemma4.jinja` override is still kept for Ornith
+> too; the anti-`--skip-chat-parsing` contract and validation methodology remain live — see
+> CLAUDE.md "Chat/synthesis model switch" (2026-09-03).
+
 **Root Cause:** `--skip-chat-parsing` flag forces reasoning/tool tags into ordinary content, breaking Cline/OpenCode tool-call parsing.
 
 ## Gemma4 Direct Profile (CORRECT)

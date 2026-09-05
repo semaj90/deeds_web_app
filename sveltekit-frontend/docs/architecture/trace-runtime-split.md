@@ -16,6 +16,11 @@ tags:
 
 # TRACE/Karpathy Runtime Split
 
+> **Doc review (2026-09-04):** STALE_BUT_DIRECTIONALLY_RIGHT — runtime-ownership rules (TS
+> orchestrates, GPU/Redis/Qdrant/Postgres/Neo4j roles, MCP tool boundary) still hold; "Gemma4" is
+> stale naming — synthesis is now Ornith 1.5 9B on llama-server :8090, see
+> `sveltekit-frontend/CLAUDE.md` "Chat/synthesis model switch" (2026-09-03).
+
 TRACE/Karpathy uses this runtime division:
 
 - **TypeScript** = orchestration, APIs, MCP tools, `worker_threads`, JSONB metadata, route/service coordination

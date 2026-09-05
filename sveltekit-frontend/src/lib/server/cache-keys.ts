@@ -411,6 +411,21 @@ export const bifrostKey = {
      */
     packetSummary: (packetKey: string) => `bitfrost:summary:packet:v1:${packetKey}`,
   },
+
+  /**
+   * Residency-heat control indexes (BITFROST-RESIDENCY-WARMING-01, 2026-09-04).
+   * Bounded ZSETs of a `ResidencyScoreV1` blend, keyed by artifact kind. These
+   * are control-plane indexes ONLY — they decide what already-derived data is
+   * worth keeping resident in the value keys above (`packet`/`semantic.*`/
+   * `packetSummary`); they never become a second retrieval index and never
+   * carry canonical identity themselves.
+   */
+  heat: {
+    packet: 'bitfrost:heat:packet',
+    query: 'bitfrost:heat:query',
+    feature: 'bitfrost:heat:feature',
+    summary: 'bitfrost:heat:summary',
+  },
 };
 
 /**

@@ -1,5 +1,8 @@
 # Drizzle Schema Reference
 
+> **Doc review (2026-09-04):** CURRENT — self-disclosed as a generated manifest snapshot; the file's
+> own disclaimer already directs readers to `schema-postgres.ts` as authority if this diverges.
+
 Generated from next_steps/active/SCHEMA_MANIFEST.json on 2026-04-25T01:28:36.139Z.
 
 > This file is generated. Current schema code is the authority; prose summaries are stale if they diverge from the manifest.

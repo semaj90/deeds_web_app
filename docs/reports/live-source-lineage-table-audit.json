@@ -1,6 +1,6 @@
 {
   "schema": "atlas.live-source-lineage-table-audit.v1",
-  "generatedAt": "2026-09-04T04:59:33.314Z",
+  "generatedAt": "2026-09-05T05:56:05.703Z",
   "status": "SOURCE_LINEAGE_OWNER_SCHEMA_READY",
   "canonicalWrites": false,
   "tables": [
@@ -428,6 +428,12 @@
       "table_schema": "public",
       "table_name": "atlas_evidence_event_hyperedges",
       "column_name": "source_revision",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_external_doc_pages",
+      "column_name": "content_hash",
       "data_type": "text"
     },
     {

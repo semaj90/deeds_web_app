@@ -119,30 +119,34 @@ try {
         const config = configData.result.config;
         const vectors = config.params.vectors;
 
+        const normalizedVectors = Number.isInteger(vectors?.size)
+          ? { __default__: vectors }
+          : vectors;
+
         audit.qdrant.collections.push({
           name: collName,
-          vector_config: Object.keys(vectors).map(k => ({
+          vector_config: Object.keys(normalizedVectors).map(k => ({
             name: k,
-            size: vectors[k].size
+            size: normalizedVectors[k].size
           }))
         });
 
-        audit.qdrant.vector_sizes[collName] = vectors;
+        audit.qdrant.vector_sizes[collName] = normalizedVectors;
 
         // Check for name/size mismatch
-        if (collName.includes('768') && Object.values(vectors).some(v => v.size !== 768)) {
+        if (collName.includes('768') && Object.values(normalizedVectors).some(v => v.size !== 768)) {
           audit.qdrant.mismatches.push({
             collection: collName,
             expected: 768,
-            actual: Object.values(vectors)[0].size,
+            actual: Object.values(normalizedVectors)[0].size,
             message: 'Collection name suggests 768 but vectors are different size'
           });
         }
-        if (collName.includes('384') && Object.values(vectors).some(v => v.size !== 384)) {
+        if (collName.includes('384') && Object.values(normalizedVectors).some(v => v.size !== 384)) {
           audit.qdrant.mismatches.push({
             collection: collName,
             expected: 384,
-            actual: Object.values(vectors)[0].size,
+            actual: Object.values(normalizedVectors)[0].size,
             message: 'Collection name suggests 384 but vectors are different size'
           });
         }

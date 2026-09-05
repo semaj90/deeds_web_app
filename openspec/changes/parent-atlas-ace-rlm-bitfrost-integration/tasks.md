@@ -2395,3 +2395,44 @@ lineage bridge (see the concurrent same-day audit entries just above this sectio
 `parent-atlas-retrieval-lineage-dag-convergence/tasks.md` — source-authority and hydration rechecks
 found real, unresolved gaps: 0 current-workspace matches, 0 exact packet/chunk joins, 43 missing
 canonical chunk-owner rows); (4) only then return to DOC-13/14 once that lane settles.
+
+- [x] BITFROST-RESIDENCY-WARMING-01 (2026-09-04, fixture-proven, follow-on session) —
+  proved the bounded pieces the prior handoff scoped: `ResidencyScoreV1` (a pure,
+  deterministic blend of frequency/breadth/recency/reconstruction-cost/latency-saved/
+  byte-cost — no wall-clock reads, same input always yields the same score),
+  `HotnessSnapshotV1` (deterministic top-N selection, score-descending with a
+  stable key-ascending tie-break, hard-capped at `MAX_HOTNESS_SNAPSHOT_TOP_N = 5_000`
+  regardless of requested size or candidate-set size — proved against a 200K-candidate
+  fixture that a plan never approaches the full ~60K-packet corpus), `BucketWarmPlanV1`
+  (splits a snapshot into disjoint, deterministic buckets for staggered warming, each
+  entry mapped through the *existing* `bifrostKey.semantic.*`/`packetSummary` builders
+  in `cache-keys.ts` — never a hand-built key string), a generic cache-aside
+  `getOrWarmCacheAsideV1()` (cache hit never calls the reconstructor; cache miss calls
+  the caller-injected reconstructor and warms on success; a reconstructor returning
+  `null` stays a genuine miss — proves BitFrost never fabricates data, i.e. never
+  becomes identity-bearing; a cache *read* failure falls through to reconstruction
+  rather than being treated as absence), and a bounded warm-plan executor
+  `executeBucketWarmPlanV1()` (bounded concurrency, per-entry failure isolation, and a
+  result type whose `writesPerformed` field is typed `false` — not just documented —
+  so a caller cannot mistake a successful warm pass for a canonical-store mutation).
+  Added 4 bounded LFU-style control-index ZSETs matching the operator's exact spec
+  (`bitfrost:heat:packet`/`query`/`feature`/`summary` in `cache-keys.ts`'s `bifrostKey`),
+  with `recordHeatSignalV1()`/`getTopHeatKeysV1()` mirroring the existing
+  `reward:zset:*` pattern in `atlas-reward-cache.ts` (same `HEAT_ZSET_MAX = 10_000`
+  bound, same fail-open-to-`[]` behavior) rather than inventing a new pattern.
+  New file: `src/lib/server/atlas/cache/bitfrost-residency-warming-v1.ts` +
+  `bitfrost-residency-warming-v1.test.ts` (19/19 pass, fake in-memory Redis covering
+  only the ioredis surface used — `get`/`set`/`zadd`/`zcard`/`zremrangebyrank`/
+  `zrevrangebyscore`). `npx tsgo --noEmit` reports 0 errors touching either new/changed
+  file. **Status: `PROVEN_BOUNDED_FIXTURE`, matching this file's own status-language
+  convention** (see the `RlmEnvironment` fixture-proof note near the top of this file)
+  — every reconstructor, every Redis client, and every heat signal in the tests above
+  is a fixture/fake. Explicitly NOT done: no live caller records a real heat signal on
+  a real cache hit/miss yet, no live caller has run `executeBucketWarmPlanV1()` against
+  the real Valkey instance with a real Postgres-backed reconstructor, and no startup
+  hook invokes any of this. That live-wiring pass is a distinct, separately-authorized
+  follow-up gate — do not treat this fixture proof as adoption. This intentionally
+  does not touch `bifrost:packet:*`, `bifrost:sem:packet:*` value semantics, or the two
+  narrower defects the prior BitFrost convergence audit carried forward (identity
+  collision / value-contract mismatch, both zero live callers today) — those remain
+  exactly as scoped in the paragraph above this task, unchanged.
