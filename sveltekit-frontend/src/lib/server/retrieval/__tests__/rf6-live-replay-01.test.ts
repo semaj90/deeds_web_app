@@ -7,9 +7,9 @@ import { reciprocalRankFusion } from '../rrf-fuse.js';
 /**
  * RF6-LIVE-REPLAY-01 began as an observational divergence test. After
  * RF6-RRF-FUSE-HARDEN-01 it becomes a regression bridge: the highest-breadth
- * legacy owner must now preserve the two canonical invariants that were proven
- * to diverge here, while still remaining a compatibility owner until RF7
- * extracts/migrates the full shared boundary.
+ * legacy owner must now preserve the canonical invariants proven here, while
+ * remaining a compatibility owner until RF7 extracts/migrates the complete
+ * SearchRuntime fusion boundary.
  */
 function canonicalCandidate(overrides: Partial<Candidate> & Pick<Candidate, 'id' | 'packetKey' | 'sourceRef' | 'score' | 'scoreSource'>): Candidate {
   return { summary: '', content: '', ...overrides };
@@ -52,7 +52,27 @@ describe('RF6-RRF-FUSE-HARDEN-01 — legacy rrf-fuse moves toward canonical inva
     expect(rrfFuse).toHaveLength(1);
     expect(rrfFuse[0]!.fusionScore).toBeCloseTo(expectedCanonicalScore, 10);
     expect(rrfFuse[0]!.sources).toHaveLength(2);
-    expect(rrfFuse[0]!.provenance?.dense_768?.rank).toBe(1);
+    expect(rrfFuse[0]!.provenance?.dense?.rank).toBe(1);
+  });
+
+  it('[case 2b] Qdrant/dense and TurboVec are executor aliases of one semantic logical lane, not two RRF votes', () => {
+    const rrfFuse = reciprocalRankFusion([
+      { lane: 'dense_768', status: 'ok', hits: [
+        { id: 'qdrant-1', packetKey: 'pkt:semantic', rank: 2, rawScore: 0.88 },
+      ] },
+      { lane: 'turbovec', status: 'ok', hits: [
+        { id: 'turbo-1', packetKey: 'pkt:semantic', rank: 1, rawScore: 0.80 },
+      ] },
+    ], { dense_768: 1, turbovec: 0.9 }, 60);
+
+    expect(rrfFuse).toHaveLength(1);
+    // max(one dense executor contribution), never sum(dense + turbovec)
+    const denseContribution = 1 / 62;
+    const turboContribution = 0.9 / 61;
+    expect(rrfFuse[0]!.fusionScore).toBeCloseTo(Math.max(denseContribution, turboContribution), 10);
+    expect(rrfFuse[0]!.fusionScore).not.toBeCloseTo(denseContribution + turboContribution, 10);
+    expect(rrfFuse[0]!.sources).toHaveLength(2);
+    expect(rrfFuse[0]!.provenance?.dense).toBeDefined();
   });
 
   it('[case 3] same packet with different explicit canonical chunks remains two outputs', () => {
