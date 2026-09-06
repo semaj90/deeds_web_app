@@ -17,6 +17,28 @@ function toRrfLaneName(value: string): RrfLaneName {
     : 'dispatcher';
 }
 
+/**
+ * RF7 compatibility grouping: executor names are not logical retrieval lanes.
+ * Dense Qdrant/legacy-dense/TurboVec aliases all represent one semantic vote.
+ */
+function toLogicalLaneName(value: string): string {
+  const normalized = value.trim().toLowerCase();
+  if (
+    normalized === 'dense' ||
+    normalized === 'dense_384' ||
+    normalized === 'dense_768' ||
+    normalized === 'qdrant' ||
+    normalized === 'qdrant_vector' ||
+    normalized === 'qdrant_768' ||
+    normalized === 'turbovec' ||
+    normalized === 'turbovec_ann' ||
+    normalized === 'cuvs' ||
+    normalized === 'cagra'
+  ) return 'dense';
+  if (normalized === 'bm25' || normalized === 'postgres_trigram' || normalized === 'lexical') return 'lexical';
+  return normalized || 'dispatcher';
+}
+
 function identityStatusForHit(hit: {
   identityStatus?: RrfIdentityStatus;
 }): RrfIdentityStatus {
@@ -36,14 +58,14 @@ function fusionIdentityKey(hit: {
   symbolVersionId?: string;
   canonicalChunkId?: string;
   identityStatus?: RrfIdentityStatus;
-}, laneName: string): string {
+}, logicalLaneName: string): string {
   const status = identityStatusForHit(hit);
   const localId = String(hit.id ?? '').trim();
 
   if (status !== 'canonical') {
     // Projection/source/degraded identities are not allowed to merge across
     // backend-local hits merely because they share a source-level packet key.
-    return `noncanonical:${laneName}:${localId || String(hit.packetKey ?? '').trim()}`;
+    return `noncanonical:${logicalLaneName}:${localId || String(hit.packetKey ?? '').trim()}`;
   }
 
   const symbolVersionId = String(hit.symbolVersionId ?? '').trim();
@@ -71,13 +93,25 @@ interface InputHit {
   identityStatus?: RrfIdentityStatus;
 }
 
+interface LogicalLaneGroup {
+  logicalLaneName: string;
+  identityKey: string;
+  representative: InputHit;
+  representativeLaneName: string;
+  representativeRank: number;
+  representativeContribution: number;
+  support: Array<{ hit: InputHit; laneName: string; rank: number }>;
+}
+
 /**
  * Legacy compatibility RRF owner.
  *
  * RF6-RRF-FUSE-HARDEN-01 narrows its behavior toward the canonical SearchRuntime
  * invariants without pretending this older envelope is already equivalent to
  * SearchRuntime Candidate:
- *   - one logical lane contributes at most one RRF vote per resolved identity;
+ *   - one LOGICAL lane contributes at most one RRF vote per resolved identity;
+ *   - dense_384/dense_768/TurboVec/Qdrant/cuVS/CAGRA aliases collapse to one
+ *     semantic logical lane, preserving executor hits only as provenance;
  *   - distinct explicitly supplied canonical chunks remain distinct;
  *   - noncanonical identities remain lane/local-id scoped and observable.
  *
@@ -102,69 +136,98 @@ export function reciprocalRankFusion(
   const includeProvenance = isOptionsForm ? (weightsOrOptions.includeProvenance ?? true) : true;
   const weights = isOptionsForm ? {} : (weightsOrOptions as Record<string, number>);
 
+  // First collapse executor-specific lanes into logical-lane groups. The best
+  // weighted contribution wins; all alternate executor hits remain support.
+  const logicalGroups = new Map<string, LogicalLaneGroup>();
   for (const lane of lanes) {
     if (lane.status && lane.status !== 'ok') continue;
     const laneName = String(lane.lane ?? lane.label ?? 'dispatcher');
+    const logicalLaneName = toLogicalLaneName(laneName);
     const laneWeight = weights[laneName] ?? lane.weight ?? 1;
 
-    // Best-rank-wins within one logical lane. Multiple physical projections of
-    // the same identity remain provenance/support, never extra RRF votes.
-    const bestByIdentity = new Map<string, { hit: InputHit; rank: number; support: InputHit[] }>();
     for (const hit of lane.hits ?? []) {
-      const identityKey = fusionIdentityKey(hit, laneName);
+      const identityKey = fusionIdentityKey(hit, logicalLaneName);
       if (!identityKey) continue;
       const rank = Math.max(1, Number(hit.rank ?? 0) || 1);
-      const existing = bestByIdentity.get(identityKey);
+      const contribution = laneWeight / (k + rank);
+      const groupKey = `${logicalLaneName}::${identityKey}`;
+      const existing = logicalGroups.get(groupKey);
       if (!existing) {
-        bestByIdentity.set(identityKey, { hit, rank, support: [hit] });
+        logicalGroups.set(groupKey, {
+          logicalLaneName,
+          identityKey,
+          representative: hit,
+          representativeLaneName: laneName,
+          representativeRank: rank,
+          representativeContribution: contribution,
+          support: [{ hit, laneName, rank }],
+        });
         continue;
       }
-      existing.support.push(hit);
-      if (rank < existing.rank) {
-        existing.hit = hit;
-        existing.rank = rank;
+
+      existing.support.push({ hit, laneName, rank });
+      if (
+        contribution > existing.representativeContribution ||
+        (Math.abs(contribution - existing.representativeContribution) <= 1e-12 && rank < existing.representativeRank)
+      ) {
+        existing.representative = hit;
+        existing.representativeLaneName = laneName;
+        existing.representativeRank = rank;
+        existing.representativeContribution = contribution;
       }
     }
+  }
 
-    for (const [identityKey, laneGroup] of bestByIdentity) {
-      const hit = laneGroup.hit;
-      const packetKey = String(hit.packetKey ?? hit.id ?? '').trim();
-      if (!packetKey) continue;
-      const rank = laneGroup.rank;
-      const score = laneWeight / (k + rank);
-      const identityStatus = identityStatusForHit(hit);
+  // Then sum exactly one contribution from each logical lane for a canonical
+  // identity. Noncanonical identity keys intentionally include logical lane +
+  // backend-local id, so they cannot cross-lane merge by accident.
+  for (const group of logicalGroups.values()) {
+    const hit = group.representative;
+    const packetKey = String(hit.packetKey ?? hit.id ?? '').trim();
+    if (!packetKey) continue;
+    const identityStatus = identityStatusForHit(hit);
+    const aggregateKey = group.identityKey;
 
-      const rankedSupport: RankedLaneHit[] = laneGroup.support.map((supportHit) => ({
-        ...supportHit,
-        packetKey: String(supportHit.packetKey ?? supportHit.id ?? packetKey),
-        lane: toRrfLaneName(laneName),
-        rank: Math.max(1, Number(supportHit.rank ?? 0) || 1),
-        rawScore: Number(supportHit.rawScore ?? supportHit.score ?? 0),
-        identityStatus: identityStatusForHit(supportHit),
-      }));
+    const rankedSupport: RankedLaneHit[] = group.support.map(({ hit: supportHit, laneName, rank }) => ({
+      ...supportHit,
+      packetKey: String(supportHit.packetKey ?? supportHit.id ?? packetKey),
+      lane: toRrfLaneName(laneName),
+      rank,
+      rawScore: Number(supportHit.rawScore ?? supportHit.score ?? 0),
+      identityStatus: identityStatusForHit(supportHit),
+    }));
 
-      const current = byIdentity.get(identityKey);
-      if (current) {
-        current.fusionScore += score;
-        current.sources.push(...rankedSupport);
-        current.rrfScore = current.fusionScore;
-        if (includeProvenance) {
-          current.provenance ??= {};
-          current.provenance[laneName] = { rank, contribution: score };
-        }
-      } else {
-        byIdentity.set(identityKey, {
-          packetKey,
-          id: packetKey,
-          fusionScore: score,
-          sources: rankedSupport,
-          rrfScore: score,
-          symbolVersionId: hit.symbolVersionId,
-          canonicalChunkId: hit.canonicalChunkId,
-          identityStatus,
-          ...(includeProvenance ? { provenance: { [laneName]: { rank, contribution: score } } } : {}),
-        });
+    const current = byIdentity.get(aggregateKey);
+    if (current) {
+      current.fusionScore += group.representativeContribution;
+      current.sources.push(...rankedSupport);
+      current.rrfScore = current.fusionScore;
+      if (includeProvenance) {
+        current.provenance ??= {};
+        current.provenance[group.logicalLaneName] = {
+          rank: group.representativeRank,
+          contribution: group.representativeContribution,
+        };
       }
+    } else {
+      byIdentity.set(aggregateKey, {
+        packetKey,
+        id: packetKey,
+        fusionScore: group.representativeContribution,
+        sources: rankedSupport,
+        rrfScore: group.representativeContribution,
+        symbolVersionId: hit.symbolVersionId,
+        canonicalChunkId: hit.canonicalChunkId,
+        identityStatus,
+        ...(includeProvenance ? {
+          provenance: {
+            [group.logicalLaneName]: {
+              rank: group.representativeRank,
+              contribution: group.representativeContribution,
+            },
+          },
+        } : {}),
+      });
     }
   }
 
