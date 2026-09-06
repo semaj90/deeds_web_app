@@ -7,6 +7,10 @@ originSessionId: current
 
 # Unified Retrieval Pipeline — Complete Wiring ✅
 
+> **Doc review (2026-09-04):** STALE_BUT_DIRECTIONALLY_RIGHT — pipeline files/routes still exist,
+> but Go Retrieval moved from "planned/:8100" to live/:8096+gRPC:50055 (CLAUDE.md Session 84 entry),
+> and the Gemma4 synthesis step is now Ornith 1.5 9B per CLAUDE.md's 2026-09-03 note.
+
 **Date**: July 1, 2026  
 **Status**: ✅ **END-TO-END VALIDATED** (6/6 stages PASS)  
 **Total Time**: ~25 seconds (mostly embedding + Gemma4)  

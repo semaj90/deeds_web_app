@@ -1,5 +1,10 @@
 # MCP Mount + Smoke — 2026-05-09 status
 
+> **Doc review (2026-09-04):** SUPERSEDED — tool-mount counts (42 live / 75 static) are far below
+> current counts (120 registered in `trace-mcp-server.ts`, 176 per live `tools/list` discovery), see
+> `openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md` (Phase E TRACE
+> count-anomaly census).
+
 Authoritative source: `npx mcporter list`. Probes every MCP config Claude Code / VS Code knows about.
 
 ## Result: 5-7 healthy, 8-10 offline (varies per run)

@@ -1,0 +1,16 @@
+{
+  "schema": "atlas.graphify-revision-tiebreak-fix-differential.v1",
+  "gate": "GRAPHIFY-REVISION-TIEBREAK-FIX-01",
+  "cohort": "source_refs with >1 graphify_files row (verified live, 2026-09-05)",
+  "multiRowSourceRefs": 59,
+  "oldSelectedRunning": 15,
+  "oldSelectedCompleted": 44,
+  "newSelectedCompleted": 59,
+  "newSelectedRunning": 0,
+  "ambiguousCompleted": 0,
+  "historyEroded": 0,
+  "interpretation": "The old hash-ordered tie-break (ORDER BY workspace_revision DESC, code_source_revision DESC) was not merely theoretically wrong -- it concretely selected the non-terminal RUNNING-run row over the COMPLETED-run row for 15 of 59 real duplicate source_refs (arbitrary hash-sort outcome, not a deliberate choice). The corrected status=COMPLETED filter resolves all 59 deterministically to their COMPLETED-run row, with zero ambiguity (each of the 59 source_refs has exactly one COMPLETED-run graphify_files row) and zero completed-history erosion (per GRAPHIFY-COMPLETED-LEGACY-COVERAGE-01).",
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "generatedAt": "2026-09-05T16:50:28.182Z"
+}

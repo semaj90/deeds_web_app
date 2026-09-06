@@ -1,0 +1,24 @@
+{
+  "schema": "atlas.doc-14-relationship-export-audit.v1",
+  "gate": "DOC-14",
+  "status": "DOC_14_RELATION_TYPES_NOT_PROVEN",
+  "inputPath": "docs/reports/parent-atlas/doc-14-neo4j-networkx-export-v1.json",
+  "graphRevision": "sha256:63889022b34d02811f8431452e97dadac618ea5fa28f7d08da77e8b15b8a4081",
+  "projectionChecksum": "sha256:9accef824dd5bab97c49e283c11f3e625f186f8e0100637c9ce5b830c833f52a",
+  "observedTypes": [
+    "HAS_ONTOLOGY",
+    "IN_DOMAIN",
+    "USED_CONCEPT"
+  ],
+  "expectedRelationCounts": {
+    "DOCUMENTED_BY": 0,
+    "REQUIRES": 0,
+    "SUPPORTS": 0,
+    "USES": 0,
+    "RELATED_TO": 0
+  },
+  "revisionCoverage": null,
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "nextGate": "DOC_14_BOUNDED_DOCUMENT_RELATION_ADMISSION"
+}

@@ -1,0 +1,83 @@
+{
+  "beautifulSoupVersion": "4.15.0",
+  "fixtureCount": 3,
+  "networkCalls": false,
+  "parity": true,
+  "parsersCompared": [
+    "html.parser",
+    "lxml"
+  ],
+  "productionParser": "html.parser",
+  "productionParserChanged": false,
+  "projections": {
+    "html.parser": {
+      "malformed-nested": {
+        "code": [],
+        "headings": [
+          "Rules"
+        ],
+        "links": [],
+        "textChecksum": "90be672bba97c6bafc2f16883fe5c59c4334be30669dda4ed1108648906d5396",
+        "title": null
+      },
+      "table-unicode": {
+        "code": [],
+        "headings": [
+          "Limits"
+        ],
+        "links": [],
+        "textChecksum": "9bd0f3365867f0c2a844240fe01f015d3617eaf03eb600b112688c0e281b2660",
+        "title": null
+      },
+      "valid-structured": {
+        "code": [
+          "def f(x):\n    return x + 1"
+        ],
+        "headings": [
+          "API Overview"
+        ],
+        "links": [
+          "/reference"
+        ],
+        "textChecksum": "5cfbf9b931ce19bbc4da6667d479c7e766012eca57752914c8af40b2fab6979e",
+        "title": "API \u00e9 \ud83d\ude80"
+      }
+    },
+    "lxml": {
+      "malformed-nested": {
+        "code": [],
+        "headings": [
+          "Rules"
+        ],
+        "links": [],
+        "textChecksum": "90be672bba97c6bafc2f16883fe5c59c4334be30669dda4ed1108648906d5396",
+        "title": null
+      },
+      "table-unicode": {
+        "code": [],
+        "headings": [
+          "Limits"
+        ],
+        "links": [],
+        "textChecksum": "9bd0f3365867f0c2a844240fe01f015d3617eaf03eb600b112688c0e281b2660",
+        "title": null
+      },
+      "valid-structured": {
+        "code": [
+          "def f(x):\n    return x + 1"
+        ],
+        "headings": [
+          "API Overview"
+        ],
+        "links": [
+          "/reference"
+        ],
+        "textChecksum": "5cfbf9b931ce19bbc4da6667d479c7e766012eca57752914c8af40b2fab6979e",
+        "title": "API \u00e9 \ud83d\ude80"
+      }
+    }
+  },
+  "schema": "atlas.bs4.parser-parity.v1",
+  "status": "BS4_PARSER_PARITY_PROVEN",
+  "writesPerformed": false
+}

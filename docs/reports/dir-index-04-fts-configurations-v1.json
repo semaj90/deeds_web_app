@@ -1,0 +1,462 @@
+{
+  "schema": "atlas.postgres-fts-configurations.v1",
+  "generatedAt": "2026-09-05T06:13:27.527Z",
+  "readOnly": true,
+  "table": "codebase_chunk_index",
+  "queryConfigurations": [
+    "english",
+    "simple"
+  ],
+  "queryConfiguration": "english",
+  "documentConfiguration": "MIXED",
+  "searchVectorProducer": "compute_codebase_chunk_search_vector",
+  "ginIndexPresent": true,
+  "configurationAligned": false,
+  "queries": [
+    "getUserById",
+    "semantic_768",
+    "qdrant_point_id",
+    "src/lib/server",
+    "CUDA",
+    "ast_symbols",
+    "Qdrant payload revision"
+  ],
+  "results": [
+    {
+      "query": "getUserById",
+      "configurations": {
+        "english": {
+          "matchCountTop10": 4,
+          "topIds": [
+            "8853b81b-af54-40d2-9cbd-0babc290fde2",
+            "22bbb9c9-2460-4740-948b-5c38260d703c",
+            "0be299a6-770d-4bca-83ae-0b2d391a0d08",
+            "e85083d6-3ba8-4f2c-bd92-9eeba4212d03"
+          ],
+          "topPaths": [
+            "src/lib/server/db/queries.ts",
+            "src/lib/server/db/queries.ts",
+            "src/mcp/index.ts",
+            "src/mcp/index.ts"
+          ],
+          "topScores": [
+            0.6153846383094788,
+            0.375,
+            0.1666666716337204,
+            0.1666666716337204
+          ]
+        },
+        "simple": {
+          "matchCountTop10": 4,
+          "topIds": [
+            "8853b81b-af54-40d2-9cbd-0babc290fde2",
+            "22bbb9c9-2460-4740-948b-5c38260d703c",
+            "0be299a6-770d-4bca-83ae-0b2d391a0d08",
+            "e85083d6-3ba8-4f2c-bd92-9eeba4212d03"
+          ],
+          "topPaths": [
+            "src/lib/server/db/queries.ts",
+            "src/lib/server/db/queries.ts",
+            "src/mcp/index.ts",
+            "src/mcp/index.ts"
+          ],
+          "topScores": [
+            0.6153846383094788,
+            0.375,
+            0.1666666716337204,
+            0.1666666716337204
+          ]
+        }
+      }
+    },
+    {
+      "query": "semantic_768",
+      "configurations": {
+        "english": {
+          "matchCountTop10": 10,
+          "topIds": [
+            "979af765-dc32-4b9e-a632-d182fcc89415",
+            "04ac0079-33fc-4063-9b8d-02640cc9010b",
+            "21ca4c15-7907-4d04-8129-0303d3303586",
+            "72766165-9015-4b67-ae3c-970619a3c808",
+            "869cab81-9008-4b6a-8094-22d92e3dcf82",
+            "88fbda5b-9264-46a5-9123-38272f27c8ea",
+            "bc869f62-a7f0-4940-ac59-efb2a1a21738",
+            "be026a9c-3e9d-4042-914c-e252a137feaf",
+            "c9ea5616-474d-4f52-a8e7-eda1a2022b70",
+            "d943ebf3-fb9b-4e49-805a-7e87f527abc6"
+          ],
+          "topPaths": [
+            "sveltekit-frontend/data/atlas-tensor-proof/t6b_cagra_recall_proof.py",
+            "sveltekit-frontend/docs/DOCKER-COMPOSE-CORRECTED-BASELINE.md",
+            "sveltekit-frontend/data/atlas-tensor-proof/t6c_kmeans_sweep_v2.py",
+            "sveltekit-frontend/docs/DOCKER-COMPOSE-CORRECTED-BASELINE.md",
+            "sveltekit-frontend/data/atlas-tensor-proof/t3_exact_gpu_proof.py",
+            "sveltekit-frontend/data/atlas-tensor-proof/t3_exact_gpu_proof.py",
+            "sveltekit-frontend/docs/DOCKER-COMPOSE-CORRECTED-BASELINE.md",
+            "sveltekit-frontend/docs/architecture/TOKEN_REMAP_LATENT_PROJECTION.md",
+            "sveltekit-frontend/docs/architecture/ACE_NEURAL_LOD.md",
+            "sveltekit-frontend/docs/DOCKER-COMPOSE-CORRECTED-BASELINE.md"
+          ],
+          "topScores": [
+            0.375,
+            0.2857142984867096,
+            0.2857142984867096,
+            0.2857142984867096,
+            0.2857142984867096,
+            0.2857142984867096,
+            0.2857142984867096,
+            0.2857142984867096,
+            0.2857142984867096,
+            0.2857142984867096
+          ]
+        },
+        "simple": {
+          "matchCountTop10": 0,
+          "topIds": [],
+          "topPaths": [],
+          "topScores": []
+        }
+      }
+    },
+    {
+      "query": "qdrant_point_id",
+      "configurations": {
+        "english": {
+          "matchCountTop10": 10,
+          "topIds": [
+            "008e3464-9b10-47f2-b186-dcf125159dcf",
+            "0f748c27-eb4e-478f-9ec2-19f4ceedf488",
+            "6a5a9da1-9467-49da-8b37-faef4f056a74",
+            "97676c26-98ef-4135-874f-0d07ac6c7d77",
+            "0aa61b4d-1f1f-4c60-ab2c-eb6b9cdf9190",
+            "11e4d738-827c-4655-a46c-466018ee8ffc",
+            "27c8fe92-ea32-4a83-8714-63942f4f5ec4",
+            "28115b8d-bd5b-47f4-a4d8-2173974f8108",
+            "2d9b6ef4-0396-43e2-9fa7-f5eebe06e879",
+            "51ae294f-2271-497f-9607-1b0cd58d7c9c"
+          ],
+          "topPaths": [
+            "src/lib/server/legal/constitution-pipeline.ts",
+            "docs/P3g-EXECUTION-READY.md",
+            "docs/HYPERRAG-PROOF-ROADMAP.md",
+            "docs/P1-P2-P3-COMPLETION-JUNE-23.md",
+            "src/routes/api/graph/colab-export/+server.ts",
+            "docs/P3G-MULTI-VECTOR-METADATA-GAP-ANALYSIS.md",
+            "docs/PHASE-16-H-COMPLETION-REPORT.md",
+            "docs/architecture/PHASE-85-ARTIFACT-REGISTRY-SPEC.md",
+            "docs/HYPERRAG-PROOF-ROADMAP.md",
+            "docs/P3G-BLOCKING-ISSUES-DECISION.md"
+          ],
+          "topScores": [
+            0.4444444477558136,
+            0.4444444477558136,
+            0.4444444477558136,
+            0.4444444477558136,
+            0.375,
+            0.375,
+            0.375,
+            0.375,
+            0.375,
+            0.375
+          ]
+        },
+        "simple": {
+          "matchCountTop10": 10,
+          "topIds": [
+            "008e3464-9b10-47f2-b186-dcf125159dcf",
+            "0f748c27-eb4e-478f-9ec2-19f4ceedf488",
+            "6a5a9da1-9467-49da-8b37-faef4f056a74",
+            "97676c26-98ef-4135-874f-0d07ac6c7d77",
+            "0aa61b4d-1f1f-4c60-ab2c-eb6b9cdf9190",
+            "11e4d738-827c-4655-a46c-466018ee8ffc",
+            "27c8fe92-ea32-4a83-8714-63942f4f5ec4",
+            "28115b8d-bd5b-47f4-a4d8-2173974f8108",
+            "2d9b6ef4-0396-43e2-9fa7-f5eebe06e879",
+            "51ae294f-2271-497f-9607-1b0cd58d7c9c"
+          ],
+          "topPaths": [
+            "src/lib/server/legal/constitution-pipeline.ts",
+            "docs/P3g-EXECUTION-READY.md",
+            "docs/HYPERRAG-PROOF-ROADMAP.md",
+            "docs/P1-P2-P3-COMPLETION-JUNE-23.md",
+            "src/routes/api/graph/colab-export/+server.ts",
+            "docs/P3G-MULTI-VECTOR-METADATA-GAP-ANALYSIS.md",
+            "docs/PHASE-16-H-COMPLETION-REPORT.md",
+            "docs/architecture/PHASE-85-ARTIFACT-REGISTRY-SPEC.md",
+            "docs/HYPERRAG-PROOF-ROADMAP.md",
+            "docs/P3G-BLOCKING-ISSUES-DECISION.md"
+          ],
+          "topScores": [
+            0.4444444477558136,
+            0.4444444477558136,
+            0.4444444477558136,
+            0.4444444477558136,
+            0.375,
+            0.375,
+            0.375,
+            0.375,
+            0.375,
+            0.375
+          ]
+        }
+      }
+    },
+    {
+      "query": "src/lib/server",
+      "configurations": {
+        "english": {
+          "matchCountTop10": 10,
+          "topIds": [
+            "668d14aa-f2a0-42f2-a8ac-855c17d84cc0",
+            "2b4f32f6-a67f-453c-968c-b881b68abe1a",
+            "bd2d5407-ea1d-4f00-bbfc-4100ddce4128",
+            "c81cec11-270a-4b4f-96f2-023b187afdc0",
+            "65165f87-7c96-4717-898a-753986d26288",
+            "731f0b97-e8f1-4919-8d31-1ce9ed956b21",
+            "766440cb-537b-42b4-801d-bdcf3b10de3f",
+            "adace123-7366-4018-9703-15e12fc0cc82",
+            "b16399f1-00d1-4772-a14b-aa0c7a41cc18",
+            "bb4abfea-dcb3-402c-bd11-c620cd05daa5"
+          ],
+          "topPaths": [
+            "src/lib/server/gpu/AGENTS.md",
+            "src/lib/server/cartridge/AGENTS.md",
+            "src/lib/server/ace/AGENTS.md",
+            "src/lib/server/graph/AGENTS.md",
+            "src/lib/server/cartridge/AGENTS.md",
+            "src/lib/server/audit/gpu-audit-orchestrator.ts",
+            "docs/HANDLER-TODO-INTEGRATION.md",
+            "src/lib/server/observability/AGENTS.md",
+            "src/lib/server/AGENTS.md",
+            "src/lib/server/vector/AGENTS.md"
+          ],
+          "topScores": [
+            0.5,
+            0.4444444477558136,
+            0.4444444477558136,
+            0.4444444477558136,
+            0.375,
+            0.375,
+            0.375,
+            0.375,
+            0.375,
+            0.375
+          ]
+        },
+        "simple": {
+          "matchCountTop10": 10,
+          "topIds": [
+            "668d14aa-f2a0-42f2-a8ac-855c17d84cc0",
+            "2b4f32f6-a67f-453c-968c-b881b68abe1a",
+            "bd2d5407-ea1d-4f00-bbfc-4100ddce4128",
+            "c81cec11-270a-4b4f-96f2-023b187afdc0",
+            "65165f87-7c96-4717-898a-753986d26288",
+            "731f0b97-e8f1-4919-8d31-1ce9ed956b21",
+            "766440cb-537b-42b4-801d-bdcf3b10de3f",
+            "adace123-7366-4018-9703-15e12fc0cc82",
+            "b16399f1-00d1-4772-a14b-aa0c7a41cc18",
+            "bb4abfea-dcb3-402c-bd11-c620cd05daa5"
+          ],
+          "topPaths": [
+            "src/lib/server/gpu/AGENTS.md",
+            "src/lib/server/cartridge/AGENTS.md",
+            "src/lib/server/ace/AGENTS.md",
+            "src/lib/server/graph/AGENTS.md",
+            "src/lib/server/cartridge/AGENTS.md",
+            "src/lib/server/audit/gpu-audit-orchestrator.ts",
+            "docs/HANDLER-TODO-INTEGRATION.md",
+            "src/lib/server/observability/AGENTS.md",
+            "src/lib/server/AGENTS.md",
+            "src/lib/server/vector/AGENTS.md"
+          ],
+          "topScores": [
+            0.5,
+            0.4444444477558136,
+            0.4444444477558136,
+            0.4444444477558136,
+            0.375,
+            0.375,
+            0.375,
+            0.375,
+            0.375,
+            0.375
+          ]
+        }
+      }
+    },
+    {
+      "query": "CUDA",
+      "configurations": {
+        "english": {
+          "matchCountTop10": 10,
+          "topIds": [
+            "0268606a-9356-455a-9285-458cc7fdecdd",
+            "063c23aa-1e6c-4318-9b5f-66cee4d53668",
+            "ab05e079-3cb8-4dfe-8c37-f3cfbff92e65",
+            "40e39bbd-ec23-45b7-8485-4da3f6b90538",
+            "8c5c5a39-e546-45a1-b567-a4e226a956e0",
+            "95bde6f4-3b94-4862-a0a3-4ec724c302c0",
+            "b59bd624-b315-4a77-a41a-98f118ef7ee3",
+            "00ddfe0d-b66c-4f3a-97e0-bf62859a0c18",
+            "025405f7-600f-45d0-af9e-bfb3ce623f4e",
+            "0662f172-c174-4673-b166-a50d771a32c7"
+          ],
+          "topPaths": [
+            "simd-bridge/rust-simdjson/build.rs",
+            "simd-bridge/cpp/build-x64-cuda-cublas/CMakeFiles/CMakeConfigureLog.yaml",
+            "packages/parent-atlas-retrieval/src/gpu/pytorch-graph.ts",
+            "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/process-document/+server.ts",
+            "packages/parent-atlas-retrieval/src/gpu/pytorch-graph.ts",
+            "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/enhanced-microservice/+server.ts",
+            "src/lib/server/audit/gemma-tool-router.ts",
+            "simd-bridge/cpp/build-x64-cuda/CMakeFiles/CheckCUDA/CMakeFiles/CMakeConfigureLog.yaml",
+            "simd-bridge/cpp/build-x64-cuda-cublas/CMakeFiles/CheckCUDA/CMakeFiles/CMakeConfigureLog.yaml",
+            "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/cuda-indexing/+server.ts"
+          ],
+          "topScores": [
+            0.7368420958518982,
+            0.7368420958518982,
+            0.7058823704719543,
+            0.6875,
+            0.6875,
+            0.6875,
+            0.6875,
+            0.6666666865348816,
+            0.6666666865348816,
+            0.6666666865348816
+          ]
+        },
+        "simple": {
+          "matchCountTop10": 10,
+          "topIds": [
+            "0268606a-9356-455a-9285-458cc7fdecdd",
+            "063c23aa-1e6c-4318-9b5f-66cee4d53668",
+            "ab05e079-3cb8-4dfe-8c37-f3cfbff92e65",
+            "40e39bbd-ec23-45b7-8485-4da3f6b90538",
+            "8c5c5a39-e546-45a1-b567-a4e226a956e0",
+            "95bde6f4-3b94-4862-a0a3-4ec724c302c0",
+            "b59bd624-b315-4a77-a41a-98f118ef7ee3",
+            "00ddfe0d-b66c-4f3a-97e0-bf62859a0c18",
+            "025405f7-600f-45d0-af9e-bfb3ce623f4e",
+            "0662f172-c174-4673-b166-a50d771a32c7"
+          ],
+          "topPaths": [
+            "simd-bridge/rust-simdjson/build.rs",
+            "simd-bridge/cpp/build-x64-cuda-cublas/CMakeFiles/CMakeConfigureLog.yaml",
+            "packages/parent-atlas-retrieval/src/gpu/pytorch-graph.ts",
+            "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/process-document/+server.ts",
+            "packages/parent-atlas-retrieval/src/gpu/pytorch-graph.ts",
+            "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/enhanced-microservice/+server.ts",
+            "src/lib/server/audit/gemma-tool-router.ts",
+            "simd-bridge/cpp/build-x64-cuda/CMakeFiles/CheckCUDA/CMakeFiles/CMakeConfigureLog.yaml",
+            "simd-bridge/cpp/build-x64-cuda-cublas/CMakeFiles/CheckCUDA/CMakeFiles/CMakeConfigureLog.yaml",
+            "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/cuda-indexing/+server.ts"
+          ],
+          "topScores": [
+            0.7368420958518982,
+            0.7368420958518982,
+            0.7058823704719543,
+            0.6875,
+            0.6875,
+            0.6875,
+            0.6875,
+            0.6666666865348816,
+            0.6666666865348816,
+            0.6666666865348816
+          ]
+        }
+      }
+    },
+    {
+      "query": "ast_symbols",
+      "configurations": {
+        "english": {
+          "matchCountTop10": 10,
+          "topIds": [
+            "26f202ed-1512-4071-9ea3-9515dc957f33",
+            "f266e770-e1f6-4ce5-856a-c62040546a15",
+            "1df01037-8472-4385-b3cd-6d7da3a0739c",
+            "36e9415d-5863-4800-b823-e102af805097",
+            "438ec8aa-babf-49ca-ab04-19805d05a688",
+            "5d7cf645-6865-4fa8-bce3-78c9f2cf79c2",
+            "a08906f9-f66c-4fcd-bce2-8ecb630bf965",
+            "c267d091-b53e-475e-9a00-c9f04666816d",
+            "d73b9a31-f14a-403e-bb91-884e8ee6aed6",
+            "d7a59d18-c252-4ce5-b5c6-05300b887d98"
+          ],
+          "topPaths": [
+            "src/lib/server/ace/retrieval-lanes.ts",
+            "src/lib/server/ace/retrieval-lanes.ts",
+            "src/lib/server/ace/retrieval-lanes.ts",
+            "src/lib/server/ace/retrieval-lanes.ts",
+            "src/lib/server/ace/retrieval-lanes.ts",
+            "sveltekit-frontend/docs/CODEBASE-REFERENCE-INDEX.md",
+            "sveltekit-frontend/docs/CODEBASE-REFERENCE-INDEX.md",
+            "docs/PARENT-ATLAS-CONSOLIDATION-INVENTORY.md",
+            "src/routes/api/admin/observability/+server.ts",
+            "src/lib/server/ace/retrieval-lanes.ts"
+          ],
+          "topScores": [
+            0.2857142984867096,
+            0.2857142984867096,
+            0.1666666716337204,
+            0.1666666716337204,
+            0.1666666716337204,
+            0.1666666716337204,
+            0.1666666716337204,
+            0.1666666716337204,
+            0.1666666716337204,
+            0.1666666716337204
+          ]
+        },
+        "simple": {
+          "matchCountTop10": 0,
+          "topIds": [],
+          "topPaths": [],
+          "topScores": []
+        }
+      }
+    },
+    {
+      "query": "Qdrant payload revision",
+      "configurations": {
+        "english": {
+          "matchCountTop10": 3,
+          "topIds": [
+            "3ea83c8e-269d-4507-a856-0638be5fdb69",
+            "0354dc11-09bf-4c66-9c69-8034ae844241",
+            "0138d9ea-6aec-4d1f-a189-f56ce124cc40"
+          ],
+          "topPaths": [
+            "sveltekit-frontend/docs/ARCHITECTURE-SEPARATION-CANONICAL-VS-DERIVED.md",
+            "docs/atlas/feature-registry.json",
+            "docs/architecture/trace-kag-web-development-guide.md"
+          ],
+          "topScores": [
+            0.007633587811142206,
+            0.002451731590554118,
+            0.0021382751874625683
+          ]
+        },
+        "simple": {
+          "matchCountTop10": 0,
+          "topIds": [],
+          "topPaths": [],
+          "topScores": []
+        }
+      }
+    }
+  ],
+  "summary": {
+    "english": {
+      "queriesWithMatches": 7,
+      "totalTop10Matches": 57
+    },
+    "simple": {
+      "queriesWithMatches": 4,
+      "totalTop10Matches": 34
+    }
+  },
+  "status": "PASS"
+}

@@ -8,6 +8,13 @@ rules:
   - Treat this registry as the navigation layer for OKF contracts.
   - Prefer the live owner in the referenced path over any copied summary.
 contracts:
+  - name: parent-atlas-code-exploration-index-v1
+    owner: .okf/indexes/code-exploration.yaml
+    role: rebuildable AST-grep and Tree-sitter exploration projection contract
+    notes:
+      - UTF-8 byte spans are canonical
+      - LSP UTF-16 is transport-only
+      - semantic_768 admission requires exact source/chunk/workspace lineage
   - name: metadata-contract-schema
     owner: docs/metadata-contract-schema.yaml
     role: indexed-field and mirror contract source of truth

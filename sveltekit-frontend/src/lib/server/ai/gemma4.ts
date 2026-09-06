@@ -6,6 +6,7 @@ import { generateEmbeddings } from '../grpc/embedding-client.js';
 import { searchQdrantCode } from '../search/qdrant-search.js';
 import { retrieveRankedEntities } from '../kb/search-logic-blended.js';
 import { tool_graph_expand_neighborhood } from './mcp-tool-dispatch.js';
+import { resolveLlamaInferenceTarget } from '$lib/server/llm/runtime-contract.js';
 
 // Constants to protect Gemma4 context window
 const MAX_RESULTS = 12;
@@ -172,7 +173,18 @@ async function* replayCacheAsStream(text: string): AsyncGenerator<string> {
  * Drop-in for TRT-LLM / vLLM: change bifrost baseURL, everything else stays.
  */
 export async function streamGemma4WithTools(prompt: string) {
-  const modelName = 'gemma4-offload';
+  // `modelName` here is the actual model id llama-server has loaded (e.g.
+  // "ornith-1.5-9b"), resolved live via the canonical runtime contract
+  // (resolveLlamaInferenceTarget — same resolver used by
+  // summarizer.ts/analyzer.ts/langextractBatch.ts) — never a hardcoded
+  // literal. "gemma4-offload" was previously hardcoded here, which was wrong
+  // on two counts: it went stale the moment the runtime model changed, and
+  // it was never a real llama-server model id to begin with (it's this
+  // repo's MCP *capability* name, a different identity entirely). Fails
+  // closed (throws) rather than silently falling back to a fake name if
+  // llama-server can't be reached, reports no models, or the loaded model
+  // falls outside the allowed model family — see LOCAL-LLM-OFFLOAD-OWNERSHIP-01.
+  const { model: modelName } = await resolveLlamaInferenceTarget();
 
   // 1–3. Semantic cache check (exact → Redis vector → pgvector)
   const cachedResponse = await checkSemanticCache(prompt, modelName, 0.90);

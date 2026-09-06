@@ -1,0 +1,59 @@
+{
+  "schema": "atlas.fresh-origin-bounded-cohort-plan.v1",
+  "status": "PLAN_ONLY_REQUIRES_EXPLICIT_AUTHORIZATION",
+  "historicalInput": "docs/reports/current-source-projection-cohort-v1.json",
+  "originInput": "docs/reports/graphify-lifecycle-entrypoint-v1.json",
+  "originWorkspaceRevision": "sha256:9302fdc4b778d0db2d31a2e2e42f68d907335c72fc78320fdf62f756ea07f8f8",
+  "historicalRefCount": 52,
+  "selectedCount": 5,
+  "limit": 5,
+  "selectionChecksum": "sha256:804e3a1a7d9da353d06795be6ac872396c0f92e7465c9b0e03dadb27a33ebbb2",
+  "rows": [
+    {
+      "sourceRef": "sveltekit-frontend/docs/design/2026-05-11_agents-directory-card-regen.md",
+      "sourceRevision": "sha256:57a4837b0c7a57ee8c790abbf9d11c5b08801c1952e2d6cee9e0ec80dc83022b",
+      "contentHash": "57a4837b0c7a57ee8c790abbf9d11c5b08801c1952e2d6cee9e0ec80dc83022b",
+      "byteLength": 21455,
+      "workspaceRevision": "sha256:9302fdc4b778d0db2d31a2e2e42f68d907335c72fc78320fdf62f756ea07f8f8"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/ToolInvoker.ts",
+      "sourceRevision": "sha256:ed076cdbcfa3d4542e62d750767a63a3770dbb5c1310b05476e849c7c673caa2",
+      "contentHash": "ed076cdbcfa3d4542e62d750767a63a3770dbb5c1310b05476e849c7c673caa2",
+      "byteLength": 717,
+      "workspaceRevision": "sha256:9302fdc4b778d0db2d31a2e2e42f68d907335c72fc78320fdf62f756ea07f8f8"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/routes/(app)/admin/cache/+page.server.ts",
+      "sourceRevision": "sha256:e02678aef7c7579be7c1ba9441464b098a65d4eefe471e43250e9b4e474330e8",
+      "contentHash": "e02678aef7c7579be7c1ba9441464b098a65d4eefe471e43250e9b4e474330e8",
+      "byteLength": 244,
+      "workspaceRevision": "sha256:9302fdc4b778d0db2d31a2e2e42f68d907335c72fc78320fdf62f756ea07f8f8"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/routes/(app)/admin/codebase-index/+page.ts",
+      "sourceRevision": "sha256:028a65cfda7baee19b14dfb3b8f9728612e4cb2d552faa0d23011bfb34c7e935",
+      "contentHash": "028a65cfda7baee19b14dfb3b8f9728612e4cb2d552faa0d23011bfb34c7e935",
+      "byteLength": 94,
+      "workspaceRevision": "sha256:9302fdc4b778d0db2d31a2e2e42f68d907335c72fc78320fdf62f756ea07f8f8"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/routes/(app)/cases/[id]/chat/+page.server.ts",
+      "sourceRevision": "sha256:57c99034d0c22587fe18d6b595be5e3ca15745c825afc1ed5e46da3dc97c8e27",
+      "contentHash": "57c99034d0c22587fe18d6b595be5e3ca15745c825afc1ed5e46da3dc97c8e27",
+      "byteLength": 346,
+      "workspaceRevision": "sha256:9302fdc4b778d0db2d31a2e2e42f68d907335c72fc78320fdf62f756ea07f8f8"
+    }
+  ],
+  "writes": {
+    "sourceSelection": false,
+    "postgres": false,
+    "graphify": false,
+    "qdrant": false,
+    "neo4j": false,
+    "cache": false,
+    "modelCalls": false
+  },
+  "authorizationRequired": true,
+  "nextGate": "READ_ONLY_COHORT_REPLAY_WITH_FRESH_ORIGIN_INPUT"
+}

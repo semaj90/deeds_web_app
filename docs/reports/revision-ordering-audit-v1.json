@@ -1,0 +1,59 @@
+{
+  "schema": "atlas.revision-ordering-audit.v1",
+  "gate": "REVISION-ORDERING-AUDIT-01",
+  "searchPatterns": [
+    "ORDER BY workspace_revision",
+    "ORDER BY code_source_revision",
+    "MAX(workspace_revision)",
+    "MIN(workspace_revision)",
+    "MAX(code_source_revision)",
+    "MIN(code_source_revision)"
+  ],
+  "scope": "scripts/atlas/**/*.{mjs,mts} (repo root)",
+  "findings": [
+    {
+      "file": "scripts/atlas/plan-packet-chunk-lineage-promotion-v1.mjs",
+      "line": 35,
+      "pattern": "ORDER BY workspace_revision DESC NULLS LAST, code_source_revision DESC NULLS LAST",
+      "classification": "TEMPORAL_SELECTION_BUG",
+      "liveConsequence": true,
+      "note": "Selects one graphify_files row per source_ref for the live, still-open PKT-LINEAGE-08/DAG-RUNTIME-01D.2 gates. Confirmed active on 59 real duplicate-row source_refs. Fixed by GRAPHIFY-REVISION-TIEBREAK-FIX-01."
+    },
+    {
+      "file": "scripts/atlas/register-orphaned-chunks.mjs",
+      "line": 289,
+      "pattern": "ORDER BY workspace_revision DESC NULLS LAST, code_source_revision DESC NULLS LAST",
+      "classification": "TEMPORAL_SELECTION_BUG",
+      "liveConsequence": true,
+      "note": "Same bug, in the write-capable --capture-lineage path. Fixed by GRAPHIFY-REVISION-TIEBREAK-FIX-01 and further hardened by the --graphify-snapshot-receipt requirement."
+    },
+    {
+      "file": "scripts/atlas/freeze-pkt-lineage-09-proposal-v1.mjs",
+      "line": 48,
+      "pattern": "ORDER BY workspace_revision DESC NULLS LAST, code_source_revision DESC NULLS LAST",
+      "classification": "HISTORICAL_STALE",
+      "liveConsequence": false,
+      "note": "Same mechanism present, but serves the already-closed PKT-LINEAGE-09 gate, whose population was independently confirmed (byte-for-byte reproduced across 3 runs) to have at most one graphify_files row per source_ref -- no duplicate-row population exists for this tie-break to act on. Not patched in this change per the plan (do not touch a closed gate's evidence trail)."
+    },
+    {
+      "file": "scripts/atlas/audit-pkt-lineage-09-fresh-classification-v1.mjs",
+      "line": 65,
+      "pattern": "ORDER BY workspace_revision DESC NULLS LAST, code_source_revision DESC NULLS LAST",
+      "classification": "HISTORICAL_STALE",
+      "liveConsequence": false,
+      "note": "Same as above -- serves the closed PKT-LINEAGE-09 gate. Not patched."
+    },
+    {
+      "file": "scripts/atlas/audit-semantic-candidate-cohort-v1.mjs",
+      "line": 40,
+      "pattern": "ORDER BY workspace_revision DESC",
+      "classification": "IDENTITY_SORT_ONLY",
+      "liveConsequence": false,
+      "note": "Different source table (atlas_workspace_source_bindings, PK (repo_id, workspace_revision, canonical_source_ref)), not graphify_files. Verified live: 0/111 canonical_source_refs currently have more than one row, so this ORDER BY currently sorts single-row result sets (a no-op in practice). Classified separately per the plan -- superficially similar pattern does not imply the same bug. Flagged as latent, not active: the table schema does permit multiple rows per canonical_source_ref across different workspace_revisions, so if that ever occurs, this ORDER BY would need the same TEMPORAL_SELECTION_BUG scrutiny. Not patched in this change; recommended as a follow-up watch item, not an active fix."
+    }
+  ],
+  "broaderScanNote": "grep for MAX(workspace_revision|code_source_revision)/MIN(...) across scripts/ returned zero matches -- the ORDER BY ... DESC pattern above is the complete set of the temporal-selection-bug mechanism in scripts/atlas/. 21 additional files reference the column names in SELECT/WHERE/GROUP BY clauses only (not as a chronological sort key) and were not individually re-classified here.",
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "generatedAt": "2026-09-05T16:46:30.624Z"
+}

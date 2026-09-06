@@ -1,5 +1,9 @@
 # Phase 101 Completion Plan — 6-12h
 
+> **Doc review (2026-09-04):** CURRENT — CLAUDE.md still cites this plan directly and its scripted
+> deliverables (Valkey swap, cold-archive, promotion, Omni-Worker scaffold, Kanban materialization)
+> all confirmed present in the repo.
+
 ## Status entering this plan (2026-06-02)
 
 - Superseded-score lane: **wired, validated** (840 candidates, 487 source-file, 266 generated-artifact, 39 packets, promotion green)

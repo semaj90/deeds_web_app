@@ -1,6 +1,6 @@
 {
   "schema": "atlas.workspace-source-namespace.v1",
-  "generatedAt": "2026-09-03T01:53:31.814Z",
+  "generatedAt": "2026-09-05T06:42:53.568Z",
   "readOnly": true,
   "writes": {
     "postgres": false,
@@ -20,15 +20,15 @@
     "logical_key"
   ],
   "workspaceRowCount": 1,
-  "graphifyRunCount": 6,
-  "completedGraphifyRunCount": 1,
+  "graphifyRunCount": 11,
+  "completedGraphifyRunCount": 6,
   "currentRun": {
-    "run_id": "369e4270-7689-4536-8816-4ec4a5517b3e",
+    "run_id": "9816c4d0-d2ad-42ca-8da9-f9d4393277b0",
     "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
-    "workspace_revision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+    "workspace_revision": "sha256:c8d3a1d99f15dbfe9393d3ebe03f721680abb11747855944019bea92a4311691",
     "status": "COMPLETED",
-    "started_at": "2026-09-03T00:54:52.654Z",
-    "completed_at": "2026-09-03T00:55:51.093Z"
+    "started_at": "2026-09-04T16:09:53.244Z",
+    "completed_at": "2026-09-04T16:19:09.274Z"
   },
   "checks": {
     "logicalKeyResolvesExactlyOneWorkspace": true,

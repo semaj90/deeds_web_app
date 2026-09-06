@@ -1,5 +1,13 @@
 [
   {
+    "path": "scripts/atlas/audit-openspec-portfolio-v1.mjs",
+    "archive_path": "deeds_labs/archive/2026-09-04/audit-openspec-portfolio-v1.mjs.root-duplicate.bak",
+    "sha256": "7a0516213033099e05406308b7ef2d304ab9582c79668fd179afafa08669a584",
+    "archived": "2026-09-04T00:00:00Z",
+    "reason": "Duplicate-owner of sveltekit-frontend/scripts/atlas/audit-openspec-portfolio-v1.mjs (the real canonical owner: 466 lines, dated 2026-09-01, operator-curated CLASSIFICATION table transcribed from a 2026-09-01 portfolio review, explicit UNCLASSIFIED-not-guessed discipline, documented repo-root-finding bug fix). This root-level copy (69 lines, dated 2026-09-02, one day newer) was a much cruder rewrite that treats every change except one hardcoded currentAuthority as FROZEN_REFERENCE uniformly, discarding the curated ACTIVE_DEPENDENCY/PARKED_CHALLENGER/BLOCKED_EXTERNAL distinctions. Both scripts wrote the identical docs/reports/openspec-portfolio-v1.json path with no coordination -- confirmed live that this crude script's run (generatedAt 2026-09-04T15:39:38.918Z) was the most recent, having silently overwritten the curated classification with a flat FROZEN_REFERENCE-for-everything report. Found via an external repo review (pasted into a Claude Code session 2026-09-04) flagging this as a P0 governance bug; independently verified before archival, not taken on faith. Neither script is wired into package.json or .vscode/tasks.json in either directory, so archiving this one has zero automation impact. The report was regenerated from the canonical script immediately after this archival.",
+    "recovery": "Full original content preserved at the archive_path above; also recoverable via git history (was tracked before this archival)."
+  },
+  {
     "path": "openspec/changes/{agent-branch-review-fanout-ace-centroid-aug22, agent-branch-review-prefanout-samplequery-aug22, codereview-inference-wiring-followup-aug22, codereview-semantic-dimension-regression-aug22, deep-audit-code-gates-aug22, inference-wiring-deep-audit-aug22, parent-atlas-xgboost-cuda-runtime-proof}/** (9 full change proposals) + 4 standalone addendum docs under still-live changes (parent-atlas-agentic-repair-bundle-integration/trace-ownership-and-shadow-tree-followup-2026-08-22.md, parent-atlas-candidate-feature-execution-fabric/{representation-matrix-index-alignment-addendum,trace-authority-addendum}.md, parent-atlas-gpu-graph-vector-substrate/candidate-materializer-design-note-2026-08-22.md, parent-atlas-transport-memory-boundaries/temporal-recommendation-dag02-real-failure-proof.md), plus a pre-recreation snapshot of parent-atlas-gpu-runtime-abi-alignment/tasks.md (35 files total)",
     "archive_path": "deeds_labs/archive/2026-08-23/retired-openspec-changes-aug22/",
     "sha256": "see deeds_labs/archive/2026-08-23/retired-openspec-changes-aug22/_manifest.json (per-file sha256, 35 entries)",
@@ -352,5 +360,19 @@
     "sha256": "9b1fabd753f48bc504c9da0432cf4f78349d14cc295590d6b6ff220e354977a0",
     "archived": "2026-09-01",
     "reason": "Duplicate-ownership resolution (OPENSPEC-PORTFOLIO-01 vs concurrent-session CONV-0B): a concurrent session independently built a second, uncommitted OpenSpec portfolio classifier at this root-level path (CONV-0B), overwriting docs/reports/openspec-portfolio-v1.json with a divergent report. Compared both: this variant (a) used its own keyword-inferred queueClass taxonomy (LINEAGE/RETRIEVAL/OAK/GRAPH/GPU/GENERAL) instead of the operator's explicitly specified CURRENT_AUTHORITY/ACTIVE_DEPENDENCY/FROZEN_REFERENCE/PARKED_CHALLENGER/BLOCKED_EXTERNAL/UNCLASSIFIED taxonomy, and (b) had a real bug -- it classified the archive/ and openspec/ meta-directories under openspec/changes/ as if they were changes. The canonical, already-committed sveltekit-frontend/scripts/atlas/audit-openspec-portfolio-v1.mjs (OPENSPEC-PORTFOLIO-01) is kept as CANONICAL_OWNER; its authorityCount invariant check and declaredBlockedBy/declaredSupersededBy text-extraction were adapted from this variant's genuinely useful ideas before archiving it. Restored copy: deeds_labs/archive/2026-09-01/audit-openspec-portfolio-v1-root-variant-CONV-0B.mjs.bak. Never committed to git before this archival."
+  },
+  {
+    "path": "scripts/atlas/wire-bifrost-packet-mirror.mjs",
+    "archive_path": "deeds_labs/archive/2026-09-04/wire-bifrost-packet-mirror.mjs.dead-scaffold.bak",
+    "sha256": "315a65c8e18af17c5b5e2ff7a700982a6efbec4c3113a025c90bc70d0371a32",
+    "archived": "2026-09-04",
+    "reason": "BITFROST-PRODUCER-CONVERGENCE-01: confirmed dead scaffold, never executed. `node --check` throws a real SyntaxError (literal backslash-escaped backticks left over from a markdown-paste, e.g. `console.log(\\`Found \\${records.length}...\\`)` outside any template literal). Also imports '../utils/redis_client.js', which does not exist anywhere in the repo (confirmed via `ls`). Found during the BitFrost producer census (BITFROST-LIVE-INVALIDATION-ADOPTION-01 Step 1) alongside its sibling scripts/atlas/bitfrost-warm-startup.mjs -- both write the same bifrost:packet:{packet_key} key shape, but only bitfrost-warm-startup.mjs is syntactically valid and was kept pending the fuller producer/value-contract convergence audit (see docs/reports/parent-atlas-bitfrost-producer-convergence-v1.json)."
+  },
+  {
+    "path": "sveltekit-frontend/scripts/atlas/audit-current-graphify-snapshot-authority-v1.mts",
+    "sha256": "5ae9a601c26f295240d7a0403d3ba5a8792e04a30d1b69f106cbfb58c15b90d2",
+    "archived": "2026-09-05T17:02:18.018Z",
+    "archivedTo": "deeds_labs/archive/2026-09-05/audit-current-graphify-snapshot-authority-v1.sveltekit-side-variant.mts.bak",
+    "reason": "Duplicate-owner collision (CURRENT-SOURCE-SNAPSHOT-RESOLVE-01): a concurrent session independently wrote scripts/atlas/audit-current-graphify-snapshot-authority-v1.mts (repo root) with the same producerRevision, same output paths, and near-identical qualification logic. The repo-root version was kept as canonical (portable relative import, explicit workspace_id resolution) and enhanced with this file's independent live-git-tree checksum cross-check plus a nonzero exit code on non-proven status. See openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md for the full merge record."
   }
 ]

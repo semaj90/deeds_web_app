@@ -1,14 +1,14 @@
 /**
- * FF1 Gemma4 Repair Planner
+ * FF1 local-LLM Repair Planner
  *
- * Takes a ranked DiagnosticEntry → produces a structured RepairPlan via Gemma4.
+ * Takes a ranked DiagnosticEntry → produces a structured RepairPlan via llama-server.
  *
  * Context pipeline (all capped to avoid OOM / token overflow):
  *   1. File content around error line (≤80 lines)
  *   2. Qdrant semantic search for similar code patterns (top-3, ≤400 chars each)
  *   3. Redis KAG note for the file's directory (≤300 chars)
  *
- * Total prompt budget: ~2000 tokens. Gemma4 responds with a JSON code block.
+ * Total prompt budget: ~2000 tokens. The local model responds with a JSON code block.
  *
  * Output: structured RepairPlan (NOT applied — planning only, safe to call freely)
  */
@@ -17,13 +17,13 @@ import { readFileSync, existsSync } from 'fs';
 import { createHash }               from 'crypto';
 import path                         from 'path';
 import { ENV } from '$lib/server/env.server.js';
+import { resolveLlamaInferenceTarget } from '$lib/server/llm/runtime-contract.js';
 import type { DiagnosticEntry, RepairPlan } from '../graph/graph-schema.js';
 
 const ROOT         = path.resolve(process.cwd());
 const MAX_BYTES    = 50_000;
 const CTX_LINES    = 10;   // lines before + after error
 const MAX_DISPLAY  = 80;   // total lines shown if no line hint
-const TURBO_BASE   = ENV.TURBOQUANT_BASE_URL;
 const OLLAMA_URL   = ENV.OLLAMA_BASE_URL;
 const QDRANT_URL   = ENV.QDRANT_URL;
 const REDIS_URL    = ENV.REDIS_URL;
@@ -131,11 +131,12 @@ Respond ONLY with a JSON code block matching this schema:
 \`\`\``;
 
 async function callGemma4(userPrompt: string): Promise<{ text: string; pt: number; ct: number }> {
-  const res = await fetch(`${TURBO_BASE}/v1/chat/completions`, {
+  const target = await resolveLlamaInferenceTarget();
+  const res = await fetch(`${target.baseUrl}/v1/chat/completions`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model:       'gemma4-rotorquant:latest',
+      model:       target.model,
       messages:    [{ role: 'system', content: SYSTEM }, { role: 'user', content: userPrompt }],
       max_tokens:  1024,
       temperature: 0.2,

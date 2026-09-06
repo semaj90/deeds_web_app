@@ -2,7 +2,7 @@
  * Shared contextual tool definitions and executor for agentic chat endpoints.
  * Used by /api/sse/chat and /api/contextual/chat.
  *
- * Uses SIMD JSON parsing for Ollama response deserialization (fastJsonParse)
+ * Uses SIMD JSON parsing for local llama-server response deserialization (fastJsonParse)
  * and Zod schema validation for tool call arguments.
  */
 import {
@@ -11,6 +11,7 @@ import {
 	type ToolExecutionPolicyContext,
 } from '$lib/server/ace/policy.js';
 import { z } from 'zod';
+import { resolveLlamaInferenceTarget } from '$lib/server/llm/runtime-contract.js';
 
 export interface ContextualToolResult {
 	ok: boolean;
@@ -20,7 +21,7 @@ export interface ContextualToolResult {
 	metadata?: Record<string, unknown>;
 }
 
-/** Ollama native function-calling tool definitions */
+/** OpenAI-compatible local llama-server function-calling tool definitions */
 export const CONTEXTUAL_TOOLS = [
   {
     type: 'function' as const,
@@ -125,7 +126,7 @@ export const CONTEXTUAL_TOOLS = [
     function: {
       name: 'crawl_web_research',
       description:
-        'Trigger a live web search crawl on a research query, summarise top results with gemma4-rotorquant:latest, ' +
+        'Trigger a live web search crawl on a research query, summarise top results with the active local llama-server, ' +
         'and index them in the glyph cache. Use when the user wants fresh web research on a legal topic, ' +
         'case law updates, or news relevant to their case. Results are also persisted for future searches.',
       parameters: {
@@ -151,7 +152,7 @@ export const CONTEXTUAL_TOOLS = [
       name: 'crawl_legal_corpus',
       description:
         'Search the local legal corpus (Legal Canon, Court Opinions, Context Documents) using vector similarity, ' +
-        'then summarise top chunks with gemma4-rotorquant:latest. Use for offline legal research across authoritative ' +
+        'then summarise top chunks with the active local llama-server. Use for offline legal research across authoritative ' +
         'primary sources plus nearby contextual local documents from the indexed Qdrant collections.',
       parameters: {
         type: 'object',
@@ -201,7 +202,7 @@ export const CONTEXTUAL_TOOLS = [
       description:
         'Identify or match a person of interest by face using gemma4 VLM multi-pass GRPO reranking. ' +
         'Pass 1: 768-dim face embedding cosine similarity (fast, ~5ms). ' +
-        'Pass 2: gemma4-rotorquant:latest visual reasoning — "same person?" → confidence 0-100. ' +
+        'Pass 2: active local VLM visual reasoning — "same person?" → confidence 0-100. ' +
         'Pass 3: GRPO reward fusion — 0.25 × embedding + 0.75 × VLM confidence. ' +
         'Use when the user asks "who is this person?", "find matching faces", or needs POI identity matching. ' +
         'Returns ranked candidates with per-pass scores and VLM reasoning snippets.',
@@ -1022,17 +1023,17 @@ export async function executeContextualTool(
 }
 
 /**
- * Run a pre-stream tool-detection pass via Ollama native function calling.
+ * Run a pre-stream tool-detection pass via llama-server function calling.
  * Returns tool results as context strings to inject into the system prompt.
  * Max 2 rounds, 3 total tool calls. Returns empty array if no tools needed.
  */
 export async function runToolDetectionPass(
-	ollamaUrl: string,
-	modelName: string,
+	_legacyUrl: string,
+	_legacyModelName: string,
 	systemPrompt: string,
 	conversationHistory: Array<{ role: string; content: string }>,
 	userMessage: string,
-	keepAlive: string,
+	_keepAlive: string,
 	policyContext: ToolExecutionPolicyContext = {}
 ): Promise<ContextualToolResult[]> {
 	const MAX_TOOL_ROUNDS = 2;
@@ -1047,18 +1048,15 @@ export async function runToolDetectionPass(
 		{ role: 'user', content: userMessage },
 	];
 
-	const isOpenAI = ollamaUrl.includes('/v1') || ollamaUrl.includes(':8090');
-
 	while (toolRounds < MAX_TOOL_ROUNDS) {
 		let res: Response;
 		try {
-			if (isOpenAI) {
-				const endpoint = ollamaUrl.endsWith('/v1') ? `${ollamaUrl}/chat/completions` : `${ollamaUrl}/v1/chat/completions`;
-				res = await fetch(endpoint, {
+			const target = await resolveLlamaInferenceTarget();
+			res = await fetch(`${target.baseUrl}/v1/chat/completions`, {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify({
-						model: modelName,
+						model: target.model,
 						messages,
 						stream: false,
 						tools: CONTEXTUAL_TOOLS,
@@ -1067,28 +1065,6 @@ export async function runToolDetectionPass(
 					}),
 					signal: AbortSignal.timeout(15_000),
 				});
-			} else {
-				const { ollamaFetch } = await import('$lib/server/ollama.js');
-				res = await ollamaFetch(`${ollamaUrl}/api/chat`, {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({
-						model: modelName,
-						messages,
-						stream: false,
-						tools: CONTEXTUAL_TOOLS,
-						keep_alive: keepAlive,
-						options: {
-							temperature: 0.1,
-							top_k: 20,
-							top_p: 0.8,
-							num_ctx: 4096,
-							num_predict: 256, // Gemma 4 uses thinking tokens before tool calls
-						},
-					}),
-					signal: AbortSignal.timeout(15_000),
-				});
-			}
 		} catch {
 			// Timeout or network error — abort tool detection silently
 			break;
@@ -1098,7 +1074,7 @@ export async function runToolDetectionPass(
 
 		let data: any;
 		try {
-			// Use SIMD JSON parsing for large Ollama responses (thinking tokens can be 10KB+)
+			// Use SIMD JSON parsing for large local-LLM responses.
 			const rawText = await res.text();
 			const { fastJsonParse } = await import('$lib/server/gpu/simdjson-bridge.js');
 			data = fastJsonParse(rawText);

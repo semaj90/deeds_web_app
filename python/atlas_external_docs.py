@@ -15,6 +15,7 @@ from dataclasses import asdict, dataclass
 from hashlib import sha256
 import json
 import math
+from pathlib import PurePosixPath
 import re
 from typing import Any, Callable, Iterable, Mapping, Sequence
 from urllib.parse import urljoin, urlparse
@@ -73,11 +74,40 @@ class ChunkRecord:
     ontology_classes: tuple[str, ...]
     lexical_tokens: tuple[Json, ...]
     ontology_tuples: tuple[Json, ...]
+    # DocCoordinateV1 | None, kept as `Any` here (not a hard import) so this
+    # module's existing dataclass-only callers are unaffected -- optional,
+    # additive, per parent-atlas-versioned-doc-intelligence DOC-02. None for
+    # any caller that hasn't been updated to pass a manifest-source-derived
+    # DocCoordinateV1 yet; such chunks simply carry no version qualifier.
+    doc_coordinate: Any = None
+    # DOC-05: design.md's ExternalDocChunkV1.codeBlocks / .apiSignatures.
+    # Deterministic regex extraction from this chunk's own text -- never LLM-
+    # derived (design.md's governing principle: "never let an LLM invent
+    # structure a parser can extract exactly"). Default empty tuples so every
+    # existing caller/fixture that doesn't pass them is unaffected.
+    code_blocks: tuple[Json, ...] = ()
+    api_signatures: tuple[str, ...] = ()
+    # DOC-05 byte-safe span alignment (operator direction): start_char/end_char
+    # are character offsets into the normalized text -- NOT safe as the
+    # authoritative evidence span for non-ASCII content, and inconsistent with
+    # this repo's other canonical chunk contract (CanonicalChunkV1 in
+    # parent-atlas-canonical-directory-ingestion-fabric/design.md, which uses
+    # startByte/endByte over exact UTF-8 bytes). start_byte/end_byte are now
+    # the authoritative span (UTF-8 byte offsets into the normalized text,
+    # encoded); start_char/end_char remain as secondary, diagnostic-only
+    # convenience fields -- never the identity/evidence-span authority.
+    # Defaulted to 0 (not required) so the three existing direct ChunkRecord(...)
+    # test fixtures that predate this field are unaffected; chunk_document()
+    # (the real production constructor) always populates real values.
+    start_byte: int = 0
+    end_byte: int = 0
 
     def to_dict(self) -> Json:
         result = asdict(self)
         result["chunk_checksum"] = _sha(self.text)
         result["canonical_authority"] = False
+        if self.doc_coordinate is not None:
+            result["doc_coordinate"] = self.doc_coordinate.to_json_dict()
         return result
 
 
@@ -130,6 +160,51 @@ def classify_ontology(text: str) -> tuple[str, ...]:
     return tuple(labels or ["CONCEPT"])
 
 
+_FENCED_CODE_BLOCK_RE = re.compile(r"```([a-zA-Z0-9+#]*)\n(.*?)\n```", re.DOTALL)
+
+# Signature-like lines: function/method defs across common doc languages, class/
+# type/interface/struct/enum declarations, and SQL DDL. Matched line-by-line
+# (re.MULTILINE) against the chunk's own text, deterministic and source-grounded
+# -- no LLM involved (design.md's governing principle for DOC-05/DocumentationFactV1).
+_API_SIGNATURE_LINE_RES: tuple[re.Pattern[str], ...] = (
+    re.compile(r"^\s*(?:async\s+)?(?:def|function|fn|func)\s+\w[\w.]*\s*\([^)]*\)[^\n{;]*", re.M),
+    re.compile(r"^\s*(?:public\s+|private\s+|export\s+)*(?:class|interface|struct|enum|trait)\s+\w[\w<>,\s]*", re.M),
+    re.compile(r"^\s*type\s+\w+\s*=", re.M),
+    re.compile(r"^\s*(?:CREATE|ALTER|DROP)\s+(?:TABLE|INDEX|FUNCTION|TYPE|VIEW)\s+\S+", re.I | re.M),
+)
+
+# Inline backtick spans that look like a call/signature (contain parens) --
+# `foo(bar)` or `cutile.tile_load(ptr, shape)`, produced by extract_structured_text()'s
+# inline <code> handling.
+_INLINE_CODE_CALL_RE = re.compile(r"`([\w][\w.]*\([^`\n]*\))`")
+
+
+def extract_code_blocks_and_signatures(text: str) -> tuple[tuple[Json, ...], tuple[str, ...]]:
+    """Deterministic regex extraction of fenced code blocks and API-signature-like
+    lines from already-chunked text (DOC-05: design.md's ExternalDocChunkV1
+    codeBlocks/apiSignatures). Operates on a single chunk's text -- called once
+    per chunk inside chunk_document(), not on the whole document, so results stay
+    scoped to that chunk's own evidence span."""
+    code_blocks = tuple(
+        {"language": (language or None), "code": code}
+        for language, code in _FENCED_CODE_BLOCK_RE.findall(text)
+    )
+    signatures: list[str] = []
+    seen: set[str] = set()
+    for pattern in _API_SIGNATURE_LINE_RES:
+        for match in pattern.finditer(text):
+            candidate = match.group(0).strip()
+            if candidate and candidate not in seen:
+                seen.add(candidate)
+                signatures.append(candidate)
+    for match in _INLINE_CODE_CALL_RE.finditer(text):
+        candidate = match.group(1).strip()
+        if candidate and candidate not in seen:
+            seen.add(candidate)
+            signatures.append(candidate)
+    return code_blocks, tuple(signatures)
+
+
 def fetch_firecrawl_v2(url: str, *, api_key: str, timeout_seconds: int = 60) -> FetchResult:
     body = json.dumps({"url": url, "formats": ["markdown"], "onlyMainContent": True}).encode("utf-8")
     request = Request(
@@ -160,30 +235,120 @@ def fetch_firecrawl_v2(url: str, *, api_key: str, timeout_seconds: int = 60) -> 
     )
 
 
-def fetch_beautifulsoup(url: str, *, timeout_seconds: int = 30, user_agent: str = "Parent-Atlas-OKF/1.0") -> FetchResult:
+_CODE_LANGUAGE_RE = re.compile(r"(?:language|lang|highlight)-([a-zA-Z0-9+#]+)")
+
+
+def _detect_code_language(tag: Any) -> str | None:
+    """Best-effort language detection from Sphinx/Pygments/MkDocs/Docusaurus-style
+    ``class="language-python"`` / ``class="lang-cpp"`` / ``class="highlight-sql"``
+    conventions, checked on the tag itself and its immediate ancestors."""
+    node = tag
+    for _ in range(4):
+        if node is None:
+            break
+        for cls in node.get("class") or []:
+            match = _CODE_LANGUAGE_RE.match(str(cls))
+            if match:
+                return match.group(1).lower()
+        node = getattr(node, "parent", None)
+    return None
+
+
+def extract_structured_text(raw_html: bytes | str, *, base_url: str) -> tuple[str, str, tuple[str, ...]]:
+    """Convert HTML into pseudo-markdown text that preserves the structure a
+    downstream chunker/extractor needs (DOC-04): heading levels become ``#``-prefixed
+    lines matching ``_heading_sections()``'s existing regex, ``<pre>``/``<code>``
+    blocks become fenced code blocks with detected language, ``<table>`` rows become
+    a pipe-delimited serialization, and inline ``<code>`` spans keep their backticks.
+
+    Pure function -- no network I/O -- so it is unit-testable without a live fetch.
+    Returns ``(title, structured_text, outgoing_urls)``.
+    """
     try:
         from bs4 import BeautifulSoup
     except ImportError as exc:  # pragma: no cover - environment dependent
         raise RuntimeError("beautifulsoup4 is required for BEAUTIFULSOUP_HTTP") from exc
 
+    soup = BeautifulSoup(raw_html, "html.parser")
+    for tag in soup(["script", "style", "noscript", "svg"]):
+        tag.decompose()
+    title = soup.title.get_text(" ", strip=True) if soup.title else urlparse(base_url).netloc
+    main = soup.find("main") or soup.find("article") or soup.body or soup
+
+    # Extract <pre> code blocks first (before flattening) so their content is
+    # replaced in-place with a fenced block instead of being flattened into
+    # plain paragraph text and instead of being double-counted by any later
+    # inline <code> handling. Fenced content is swapped for a single-line
+    # placeholder (not the fence text itself) because the final _normalize_ws()
+    # pass collapses runs of spaces/tabs -- inserting the fence directly here
+    # would destroy Python-significant indentation inside the code. The real
+    # fence text is substituted back in after normalization, verbatim.
+    code_fences: list[str] = []
+    for pre in main.find_all("pre"):
+        code_tag = pre.find("code")
+        language = _detect_code_language(code_tag) or _detect_code_language(pre)
+        code_text = (code_tag or pre).get_text("\n").strip("\n")
+        fence = f"```{language or ''}\n{code_text}\n```"
+        placeholder = f"\x00CODEBLOCK{len(code_fences)}\x00"
+        code_fences.append(fence)
+        pre.replace_with(f"\n{placeholder}\n")
+
+    # Tables -> a simple pipe-delimited serialization (header row from <th>,
+    # data rows from <td>), one row per line, so DOC-05's chunk-level
+    # apiSignatures/parameter-table extraction has line-addressable structure
+    # instead of table cells silently concatenated into one run-on sentence.
+    for table in main.find_all("table"):
+        rows: list[str] = []
+        for row in table.find_all("tr"):
+            cells = row.find_all(["th", "td"])
+            if not cells:
+                continue
+            rows.append(" | ".join(_normalize_ws(cell.get_text(" ", strip=True)) for cell in cells))
+        table.replace_with("\n" + "\n".join(rows) + "\n" if rows else "")
+
+    # Headings -> "#"-prefixed lines matching _heading_sections()'s regex
+    # (^(#{1,6})\s+(.+?)\s*$), replacing the tag (removing its children from
+    # the tree) so its own text is never also flattened as a plain paragraph.
+    for level in range(1, 7):
+        for heading in main.find_all(f"h{level}"):
+            heading_text = _normalize_ws(heading.get_text(" ", strip=True))
+            if heading_text:
+                heading.replace_with(f"\n{'#' * level} {heading_text}\n")
+            else:
+                heading.decompose()
+
+    # Remaining inline <code> spans (pre/code already extracted above) keep
+    # their backtick markers so DOC-05's apiSignatures regex can still find
+    # `functionName()`-shaped inline references outside of a fenced block.
+    for code in main.find_all("code"):
+        code_text = code.get_text()
+        code.replace_with(f"`{code_text}`" if code_text.strip() else "")
+
+    text = _normalize_ws(main.get_text("\n", strip=True))
+    for index, fence in enumerate(code_fences):
+        text = text.replace(f"\x00CODEBLOCK{index}\x00", fence)
+    urls: set[str] = set()
+    for anchor in soup.find_all("a", href=True):
+        target = urljoin(base_url, str(anchor.get("href")))
+        parsed = urlparse(target)
+        if parsed.scheme in {"http", "https"}:
+            urls.add(target.split("#", 1)[0])
+    return title, text, tuple(sorted(urls))
+
+
+def fetch_beautifulsoup(url: str, *, timeout_seconds: int = 30, user_agent: str = "Parent-Atlas-OKF/1.0") -> FetchResult:
     request = Request(url, headers={"User-Agent": user_agent})
     with urlopen(request, timeout=timeout_seconds) as response:  # noqa: S310 - caller controls allowlist
         raw = response.read()
         resolved = response.geturl()
-    soup = BeautifulSoup(raw, "html.parser")
-    for tag in soup(["script", "style", "noscript", "svg"]):
-        tag.decompose()
-    title = soup.title.get_text(" ", strip=True) if soup.title else urlparse(resolved).netloc
-    main = soup.find("main") or soup.find("article") or soup.body or soup
-    text = _normalize_ws(main.get_text("\n", strip=True))
-    urls: set[str] = set()
-    for anchor in soup.find_all("a", href=True):
-        target = urljoin(resolved, str(anchor.get("href")))
-        parsed = urlparse(target)
-        if parsed.scheme in {"http", "https"}:
-            urls.add(target.split("#", 1)[0])
+    title, text, outgoing_urls = extract_structured_text(raw, base_url=resolved)
     if not text:
         raise ValueError("BEAUTIFULSOUP_EMPTY_TEXT")
+    try:
+        from importlib.metadata import version as package_version
+        parser_version = package_version("beautifulsoup4")
+    except Exception:  # pragma: no cover - package metadata can be unavailable in source-only tests
+        parser_version = "unknown"
     return FetchResult(
         fetcher="BEAUTIFULSOUP_HTTP",
         url=url,
@@ -192,8 +357,8 @@ def fetch_beautifulsoup(url: str, *, timeout_seconds: int = 30, user_agent: str 
         markdown=text,
         raw_checksum=_sha(raw),
         normalized_checksum=_sha(text),
-        outgoing_urls=tuple(sorted(urls)),
-        metadata={"parser": "html.parser"},
+        outgoing_urls=outgoing_urls,
+        metadata={"parser": "html.parser", "parserVersion": parser_version, "structured": True},
     )
 
 
@@ -202,6 +367,17 @@ def enforce_allowed_domain(url: str, allowed_domains: Sequence[str]) -> None:
     allowed = {domain.lower().lstrip(".") for domain in allowed_domains}
     if not hostname or not any(hostname == domain or hostname.endswith(f".{domain}") for domain in allowed):
         raise ValueError(f"EXTERNAL_DOC_DOMAIN_NOT_ALLOWED:{hostname}")
+
+
+def validate_okf_output_namespace(value: str) -> None:
+    """Shared with atlas_okf_docs_pipeline.py's manifest loader and
+    atlas_doc_manifest.py's Pydantic layer (DOC-01) -- kept here, not
+    duplicated, so both validate identically."""
+    normalized = value.replace("\\", "/")
+    if not re.fullmatch(r"docs/\.okf/[A-Za-z0-9_./-]+", normalized):
+        raise ValueError(f"INVALID_OKF_OUTPUT_NAMESPACE:{value}")
+    if ".." in PurePosixPath(normalized).parts:
+        raise ValueError(f"INVALID_OKF_OUTPUT_NAMESPACE:{value}")
 
 
 def stanza_observations(text: str, *, pipeline: Any, model_revision: str) -> tuple[tuple[Json, ...], tuple[Json, ...]]:
@@ -290,8 +466,20 @@ def _heading_sections(text: str) -> list[tuple[tuple[str, ...], int, int, str]]:
     section_start = 0
     section_heading: tuple[str, ...] = tuple()
     buffer: list[str] = []
+    # DOC-04/DOC-05 interaction fix: extract_structured_text() now emits real
+    # fenced code blocks into this same text, and a Python/shell/YAML "# comment"
+    # line at column 0 inside one matches the heading regex below just as well as
+    # a real heading -- without this guard, a code comment silently splits (and
+    # corrupts the heading_stack of) what should be one contiguous code fence.
+    in_fence = False
     for line in lines:
-        match = re.match(r"^(#{1,6})\s+(.+?)\s*$", line.rstrip("\n"))
+        stripped = line.rstrip("\n")
+        if stripped.lstrip().startswith("```"):
+            in_fence = not in_fence
+            buffer.append(line)
+            offset += len(line)
+            continue
+        match = None if in_fence else re.match(r"^(#{1,6})\s+(.+?)\s*$", stripped)
         if match:
             if buffer:
                 body = "".join(buffer).strip()
@@ -322,6 +510,7 @@ def chunk_document(
     maximum_chars: int = 3000,
     overlap_chars: int = 300,
     nlp: Callable[[str], tuple[tuple[Json, ...], tuple[Json, ...]]] | None = None,
+    doc_coordinate: Any = None,
 ) -> tuple[ChunkRecord, ...]:
     if maximum_chars <= 0 or overlap_chars < 0 or overlap_chars >= maximum_chars:
         raise ValueError("INVALID_CHUNK_WINDOW")
@@ -342,12 +531,37 @@ def chunk_document(
                         boundary += 1
                 if boundary > cursor + maximum_chars // 3:
                     end = boundary
-            chunk_text = body[cursor:end].strip()
+            raw_slice = body[cursor:end]
+            chunk_text = raw_slice.strip()
             if chunk_text:
                 lexical, tuples = nlp(chunk_text) if nlp else (tuple(), tuple())
-                absolute_start = max(0, section_start + cursor)
+                # Bug fix (found live, adversarial fixture reproduced it): the
+                # old `absolute_start = section_start + cursor` pointed at the
+                # PRE-strip cursor, so whenever raw_slice had leading
+                # whitespace (common -- the overlap-window cursor frequently
+                # lands mid-whitespace), start_char pointed one or more
+                # characters before chunk_text's real position, and
+                # normalized[start_char:end_char] != chunk_text. Account for
+                # .strip()'s leading trim explicitly instead of assuming cursor
+                # already points at chunk_text's first real character.
+                leading_trim = len(raw_slice) - len(raw_slice.lstrip())
+                absolute_start = max(0, section_start + cursor + leading_trim)
                 absolute_end = absolute_start + len(chunk_text)
+                # DOC-05 byte-safe span (authoritative): UTF-8 byte offsets of
+                # the same span, derived from prefix byte-lengths -- exact by
+                # construction, since UTF-8 encoding is prefix-consistent
+                # (encoding a string prefix always yields a byte prefix, and
+                # codepoint boundaries always land on byte boundaries).
+                start_byte = len(normalized[:absolute_start].encode("utf-8"))
+                end_byte = start_byte + len(chunk_text.encode("utf-8"))
                 chunk_id = f"doc:{source_id}:{document_checksum[:16]}:{ordinal}"
+                chunk_coordinate = None
+                if doc_coordinate is not None:
+                    section_anchor = "/".join(heading_path) or None
+                    chunk_coordinate = doc_coordinate.model_copy(
+                        update={"content_hash": document_checksum, "section_anchor": section_anchor}
+                    )
+                code_blocks, api_signatures = extract_code_blocks_and_signatures(chunk_text)
                 chunks.append(ChunkRecord(
                     chunk_id=chunk_id,
                     source_id=source_id,
@@ -363,6 +577,11 @@ def chunk_document(
                     ontology_classes=classify_ontology(chunk_text),
                     lexical_tokens=lexical,
                     ontology_tuples=tuples,
+                    doc_coordinate=chunk_coordinate,
+                    code_blocks=code_blocks,
+                    api_signatures=api_signatures,
+                    start_byte=start_byte,
+                    end_byte=end_byte,
                 ))
                 ordinal += 1
             if end >= len(body):

@@ -1,0 +1,50 @@
+{
+  "schema": "parent-atlas.doc-13-symbol-nlp-dag-context.v1",
+  "gate": "DOC-13",
+  "status": "COMPOSITION_OWNER_WIRING_PROVEN",
+  "executionMode": "READ_ONLY_COMPOSITION",
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "ownership": {
+    "indexedSymbol": "atlas_symbol_registry + atlas_symbol_versions",
+    "nlpReceipts": "analysis_pass_results",
+    "dagParameters": "ParameterArtifactV1 references / checksum-bound artifacts",
+    "synthesis": "llama-server :8090 /v1 with observed Ornith model"
+  },
+  "checks": {
+    "symbolJoin": {
+      "status": "LIVE_DOC_EXTRACTION_SYMBOL_JOIN_PROVEN",
+      "matched": true,
+      "stableSymbolId": "stable-symbol:53f511eaa2e2caed42d250dd4f56ad9e3974777752245627782f22f12ba22fc2",
+      "symbolVersionId": "symbol-version:b6e205825e35704467ca92c41fb0a3f777b01d903a699faa6ecb52f9bcedfd23",
+      "documentationSourceRevision": "sha256:920b0cc5650502c5d64b0d199f131c056e73c23c36f1aab9d8f7d6b3f451dfed",
+      "codeSourceRevision": "workspace:0"
+    },
+    "dagParameters": {
+      "status": "PROVEN_BOUNDED",
+      "artifactCount": 2,
+      "artifactsHaveChecksums": true,
+      "writesPerformed": false
+    },
+    "postgresOwners": {
+      "relations": {
+        "analysis_pass_results": "r",
+        "atlas_symbol_registry": "r",
+        "atlas_symbol_versions": "r"
+      },
+      "counts": {
+        "atlas_symbol_registry": 10310,
+        "atlas_symbol_versions": 285,
+        "analysis_pass_results": 11095
+      }
+    },
+    "synthesisBoundary": {
+      "endpoint": "http://127.0.0.1:8090/v1/chat/completions",
+      "modelSelection": "runtime resolver /v1/models",
+      "observedModel": "ornith-1.5-9b",
+      "rawModelOutputPersisted": false
+    }
+  },
+  "nextGate": "ANALYSIS_PASS_CURRENT_SELECTION -> CONTEXT_MANIFEST -> ORNITH_SYNTHESIS_RECEIPT",
+  "reportChecksum": "sha256:4ef7f25f2a92c78662cbb85b1d11980d7ab732c680ea0b059b12c2bbf8de7608"
+}

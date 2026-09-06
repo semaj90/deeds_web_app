@@ -1,0 +1,23 @@
+{
+  "schema": "atlas.pkt-lineage-08-replay-stability.v1",
+  "gate": "GRAPHIFY-REVISION-TIEBREAK-FIX-01 acceptance item 1",
+  "script": "scripts/atlas/plan-packet-chunk-lineage-promotion-v1.mjs --limit=100",
+  "runs": [
+    {
+      "verdict": "BLOCKED_NO_QUALIFIED_CANDIDATE",
+      "eligibleCandidateCount": 0,
+      "preflightChecksum": "sha256:1c067b4437ce28182fed00f74d6e65929f57319498f53e6a23ee6b09e2769384"
+    },
+    {
+      "verdict": "BLOCKED_NO_QUALIFIED_CANDIDATE",
+      "eligibleCandidateCount": 0,
+      "preflightChecksum": "sha256:1c067b4437ce28182fed00f74d6e65929f57319498f53e6a23ee6b09e2769384"
+    }
+  ],
+  "checksumStable": true,
+  "verdictStable": true,
+  "interpretation": "Two consecutive live runs against unchanged DB state produce identical verdict, eligibleCandidateCount, and preflightChecksum. This is the falsifiable replay-stability proof the fix was intended to establish -- no more 0-eligible / 50-eligible flip-flopping. The current eligibleCandidateCount=0 is expected and correct: the corrected COMPLETED-only filter is stricter than the old hash-sort accident, so fewer (here, zero) source_refs qualify as READY_FOR_AUTHORIZATION under principled evidence rather than lucky hash ordering.",
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "generatedAt": "2026-09-05T16:51:04.669Z"
+}

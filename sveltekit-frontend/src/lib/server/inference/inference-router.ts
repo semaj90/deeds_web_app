@@ -40,6 +40,7 @@ import { inferLLM, healthCheck as trtHealthCheck, streamLLM as streamTrtLLM } fr
 import { inferLLM as inferTritonLLM, healthCheck as tritonHealthCheck, streamLLM as streamTritonLLM } from '$lib/server/triton-llm.js';
 import { bifrostChat, ollamaFetch, type OllamaMessage } from '$lib/server/ollama.js';
 import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL, getActiveLocalVlmModel } from '$lib/server/ai/local-llama-provider.js';
+import { resolveLoadedLlamaModel } from '$lib/server/ai/llama-server-model-resolver.js';
 import { getGpuStats, type GpuMemory } from '$lib/server/gpu/gpu-monitor.js';
 import {
   TURBOQUANT_BASE_URL,
@@ -863,24 +864,23 @@ async function tryLiteRT(request: InferenceRequest, startTime: number): Promise<
 }
 
 async function ollamaInference(request: InferenceRequest, startTime: number): Promise<InferenceResponse> {
-		const model = 'gemma4-rotorquant:latest';
+		const { resolvedModel: model } = await resolveLoadedLlamaModel(
+			LLAMA_SERVER_BASE_URL.replace(/\/v1\/?$/, ''), request.model ?? null);
 	const prompt = request.systemPrompt
 		? `${request.systemPrompt}\n\n${request.prompt}`
 		: request.prompt;
 
 	try {
-		return await traceLLM('inference-router-ollama', { model, prompt: prompt.slice(0, 500) }, async (gen) => {
-			const res = await ollamaFetch(`${getOllamaEndpoint()}/api/generate`, {
+		return await traceLLM('inference-router-llama-server', { model, prompt: prompt.slice(0, 500) }, async (gen) => {
+			const res = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
 					model,
-					prompt,
+					messages: [{ role: 'user', content: prompt }],
 					stream: false,
-					options: {
-						num_predict: request.maxTokens ?? 2048,
-						temperature: request.temperature ?? 0.7
-					}
+					max_tokens: request.maxTokens ?? 2048,
+					temperature: request.temperature ?? 0.7
 				}),
 				signal: AbortSignal.timeout(120_000)
 			});
@@ -892,20 +892,21 @@ async function ollamaInference(request: InferenceRequest, startTime: number): Pr
 					model,
 					backend: 'llama-server' as const,
 					latencyMs: Math.round(performance.now() - startTime),
-					error: `Ollama error: ${res.status}`
+					error: `llama-server error: ${res.status}`
 				};
 			}
 
 			const data = await res.json();
-			gen.end({ output: (data.response ?? '').slice(0, 1000), usage: { promptTokens: data.prompt_eval_count, completionTokens: data.eval_count } });
+			const content = data.choices?.[0]?.message?.content ?? '';
+			gen.end({ output: content.slice(0, 1000), usage: { promptTokens: data.usage?.prompt_tokens, completionTokens: data.usage?.completion_tokens } });
 			return {
-				text: data.response ?? '',
+				text: content,
 				model,
 				backend: 'llama-server' as const,
 				usage: {
-					prompt_tokens: data.prompt_eval_count ?? 0,
-					completion_tokens: data.eval_count ?? 0,
-					total_tokens: (data.prompt_eval_count ?? 0) + (data.eval_count ?? 0)
+					prompt_tokens: data.usage?.prompt_tokens ?? 0,
+					completion_tokens: data.usage?.completion_tokens ?? 0,
+					total_tokens: data.usage?.total_tokens ?? 0
 				},
 				latencyMs: Math.round(performance.now() - startTime)
 			};
@@ -916,7 +917,7 @@ async function ollamaInference(request: InferenceRequest, startTime: number): Pr
 			model,
 			backend: 'llama-server',
 			latencyMs: Math.round(performance.now() - startTime),
-			error: err instanceof Error ? err.message : 'Ollama inference failed'
+			error: err instanceof Error ? err.message : 'llama-server inference failed'
 		};
 	}
 }
@@ -1082,18 +1083,14 @@ export async function* routeStreamingInference(
 		// LiteRT unavailable
 	}
 
-	// Tier 5: llama-server compatibility wrapper (uses /api/chat if messages provided, /api/generate otherwise)
-	const ollamaUrl = getOllamaEndpoint();
-	const model = request.model ?? await getActiveLocalVlmModel().catch(() => LOCAL_VLM_MODEL);
-
-	const [endpoint, body] = request.messages
-		? [`${ollamaUrl}/api/chat`, { model, messages: request.messages, stream: true, keep_alive: '24h' }]
-		: [`${ollamaUrl}/api/generate`, { model, prompt: flatPrompt, stream: true, options: { num_predict: request.maxTokens ?? 2048, temperature: request.temperature ?? 0.7 } }];
-
-	const res = await ollamaFetch(endpoint, {
+	// Tier 5: llama-server OpenAI-compatible streaming fallback.
+	const { resolvedModel: model } = await resolveLoadedLlamaModel(
+		LLAMA_SERVER_BASE_URL.replace(/\/v1\/?$/, ''), request.model ?? null);
+	const messages = request.messages ?? [{ role: 'user', content: flatPrompt }];
+	const res = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify(body),
+	body: JSON.stringify({ model, messages, stream: true, max_tokens: request.maxTokens ?? 2048, temperature: request.temperature ?? 0.7 }),
 		signal: AbortSignal.timeout(120_000),
 	});
 
@@ -1111,8 +1108,10 @@ export async function* routeStreamingInference(
 		const text = decoder.decode(value, { stream: true });
 		for (const line of text.split('\n').filter(Boolean)) {
 			try {
-				const parsed = JSON.parse(line);
-				const chunk = parsed.message?.content ?? parsed.response ?? '';
+				const payload = line.startsWith('data:') ? line.slice(5).trim() : line;
+				if (payload === '[DONE]') continue;
+				const parsed = JSON.parse(payload);
+				const chunk = parsed.choices?.[0]?.delta?.content ?? '';
 				if (chunk) yield { content: chunk, done: false, backend: 'llama-server' };
 			} catch {
 				// skip malformed

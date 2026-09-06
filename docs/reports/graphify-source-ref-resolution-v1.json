@@ -1,6 +1,6 @@
 {
   "schema": "atlas.graphify-source-ref-resolution-v1",
-  "generatedAt": "2026-08-27T22:54:47.291Z",
+  "generatedAt": "2026-09-05T05:57:48.254Z",
   "readOnly": true,
   "postgresWrites": false,
   "matchingPolicy": {
@@ -12,18 +12,169 @@
     "crossDomainHashEqualityUsed": false
   },
   "counts": {
-    "packetSourceRefs": 61659,
-    "graphifySourceRefs": 768,
-    "exactPacketChunkGraphifyBridges": 43,
-    "RAW_EXACT": 661,
-    "NORMALIZED_EXACT": 0,
-    "BASENAME_UNIQUE": 631,
-    "BASENAME_AMBIGUOUS": 2664,
-    "UNRESOLVED": 57703,
-    "sourceRefs": 61659
+    "packetSourceRefs": 61714,
+    "graphifySourceRefs": 25258,
+    "exactPacketChunkGraphifyBridges": 79,
+    "RAW_EXACT": 17307,
+    "NORMALIZED_EXACT": 3003,
+    "BASENAME_UNIQUE": 215,
+    "BASENAME_AMBIGUOUS": 5155,
+    "UNRESOLVED": 36034,
+    "sourceRefs": 61714
   },
   "samples": {
-    "NORMALIZED_EXACT": [],
+    "NORMALIZED_EXACT": [
+      {
+        "sourceRef": "llama-cpp-turboquant-gemma4/tools/server/webui/src/app.d.ts",
+        "normalizedSourceRef": "sveltekit-frontend/src/app.d.ts",
+        "graphifySourceRef": "sveltekit-frontend/src/app.d.ts",
+        "rowCount": 1
+      },
+      {
+        "sourceRef": "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/badge/index.ts",
+        "normalizedSourceRef": "sveltekit-frontend/src/lib/components/ui/badge/index.ts",
+        "graphifySourceRef": "sveltekit-frontend/src/lib/components/ui/badge/index.ts",
+        "rowCount": 1
+      },
+      {
+        "sourceRef": "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/button/index.ts",
+        "normalizedSourceRef": "sveltekit-frontend/src/lib/components/ui/button/index.ts",
+        "graphifySourceRef": "sveltekit-frontend/src/lib/components/ui/button/index.ts",
+        "rowCount": 1
+      },
+      {
+        "sourceRef": "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/dialog/index.ts",
+        "normalizedSourceRef": "sveltekit-frontend/src/lib/components/ui/dialog/index.ts",
+        "graphifySourceRef": "sveltekit-frontend/src/lib/components/ui/dialog/index.ts",
+        "rowCount": 1
+      },
+      {
+        "sourceRef": "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/input/index.ts",
+        "normalizedSourceRef": "sveltekit-frontend/src/lib/components/ui/input/index.ts",
+        "graphifySourceRef": "sveltekit-frontend/src/lib/components/ui/input/index.ts",
+        "rowCount": 1
+      },
+      {
+        "sourceRef": "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/label/index.ts",
+        "normalizedSourceRef": "sveltekit-frontend/src/lib/components/ui/label/index.ts",
+        "graphifySourceRef": "sveltekit-frontend/src/lib/components/ui/label/index.ts",
+        "rowCount": 1
+      },
+      {
+        "sourceRef": "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/table/index.ts",
+        "normalizedSourceRef": "sveltekit-frontend/src/lib/components/ui/table/index.ts",
+        "graphifySourceRef": "sveltekit-frontend/src/lib/components/ui/table/index.ts",
+        "rowCount": 1
+      },
+      {
+        "sourceRef": "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/textarea/index.ts",
+        "normalizedSourceRef": "sveltekit-frontend/src/lib/components/ui/textarea/index.ts",
+        "graphifySourceRef": "sveltekit-frontend/src/lib/components/ui/textarea/index.ts",
+        "rowCount": 1
+      },
+      {
+        "sourceRef": "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/types/index.ts",
+        "normalizedSourceRef": "sveltekit-frontend/src/lib/types/index.ts",
+        "graphifySourceRef": "sveltekit-frontend/src/lib/types/index.ts",
+        "rowCount": 1
+      },
+      {
+        "sourceRef": "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/debounce.ts",
+        "normalizedSourceRef": "sveltekit-frontend/src/lib/utils/debounce.ts",
+        "graphifySourceRef": "sveltekit-frontend/src/lib/utils/debounce.ts",
+        "rowCount": 1
+      },
+      {
+        "sourceRef": "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/index.ts",
+        "normalizedSourceRef": "sveltekit-frontend/src/lib/utils/index.ts",
+        "graphifySourceRef": "sveltekit-frontend/src/lib/utils/index.ts",
+        "rowCount": 1
+      },
+      {
+        "sourceRef": "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/uuid.ts",
+        "normalizedSourceRef": "sveltekit-frontend/src/lib/utils/uuid.ts",
+        "graphifySourceRef": "sveltekit-frontend/src/lib/utils/uuid.ts",
+        "rowCount": 1
+      },
+      {
+        "sourceRef": "llama-cpp-turboquant-gemma4/tools/server/webui/src/routes/+error.svelte",
+        "normalizedSourceRef": "sveltekit-frontend/src/routes/+error.svelte",
+        "graphifySourceRef": "sveltekit-frontend/src/routes/+error.svelte",
+        "rowCount": 1
+      },
+      {
+        "sourceRef": "llama-cpp-turboquant-gemma4/tools/server/webui/src/routes/+layout.svelte",
+        "normalizedSourceRef": "sveltekit-frontend/src/routes/+layout.svelte",
+        "graphifySourceRef": "sveltekit-frontend/src/routes/+layout.svelte",
+        "rowCount": 1
+      },
+      {
+        "sourceRef": "llama-cpp-turboquant-gemma4/tools/server/webui/src/routes/+page.svelte",
+        "normalizedSourceRef": "sveltekit-frontend/src/routes/+page.svelte",
+        "graphifySourceRef": "sveltekit-frontend/src/routes/+page.svelte",
+        "rowCount": 1
+      },
+      {
+        "sourceRef": "src/ambient-legacy.d.ts",
+        "normalizedSourceRef": "sveltekit-frontend/src/ambient-legacy.d.ts",
+        "graphifySourceRef": "sveltekit-frontend/src/ambient-legacy.d.ts",
+        "rowCount": 1
+      },
+      {
+        "sourceRef": "src/app.d.ts",
+        "normalizedSourceRef": "sveltekit-frontend/src/app.d.ts",
+        "graphifySourceRef": "sveltekit-frontend/src/app.d.ts",
+        "rowCount": 1
+      },
+      {
+        "sourceRef": "src/auth-store.svelte.ts",
+        "normalizedSourceRef": "sveltekit-frontend/src/auth-store.svelte.ts",
+        "graphifySourceRef": "sveltekit-frontend/src/auth-store.svelte.ts",
+        "rowCount": 1
+      },
+      {
+        "sourceRef": "src/custom-modules.d.ts",
+        "normalizedSourceRef": "sveltekit-frontend/src/custom-modules.d.ts",
+        "graphifySourceRef": "sveltekit-frontend/src/custom-modules.d.ts",
+        "rowCount": 1
+      },
+      {
+        "sourceRef": "src/env.d.ts",
+        "normalizedSourceRef": "sveltekit-frontend/src/env.d.ts",
+        "graphifySourceRef": "sveltekit-frontend/src/env.d.ts",
+        "rowCount": 1
+      },
+      {
+        "sourceRef": "src/global.d.ts",
+        "normalizedSourceRef": "sveltekit-frontend/src/global.d.ts",
+        "graphifySourceRef": "sveltekit-frontend/src/global.d.ts",
+        "rowCount": 1
+      },
+      {
+        "sourceRef": "src/hooks.client.ts",
+        "normalizedSourceRef": "sveltekit-frontend/src/hooks.client.ts",
+        "graphifySourceRef": "sveltekit-frontend/src/hooks.client.ts",
+        "rowCount": 1
+      },
+      {
+        "sourceRef": "src/hooks.server.ts",
+        "normalizedSourceRef": "sveltekit-frontend/src/hooks.server.ts",
+        "graphifySourceRef": "sveltekit-frontend/src/hooks.server.ts",
+        "rowCount": 1
+      },
+      {
+        "sourceRef": "src/lib/ai/base64-fp32-quantizer.ts",
+        "normalizedSourceRef": "sveltekit-frontend/src/lib/ai/base64-fp32-quantizer.ts",
+        "graphifySourceRef": "sveltekit-frontend/src/lib/ai/base64-fp32-quantizer.ts",
+        "rowCount": 1
+      },
+      {
+        "sourceRef": "src/lib/ai/citation-cache.ts",
+        "normalizedSourceRef": "sveltekit-frontend/src/lib/ai/citation-cache.ts",
+        "graphifySourceRef": "sveltekit-frontend/src/lib/ai/citation-cache.ts",
+        "rowCount": 1
+      }
+    ],
     "BASENAME_UNIQUE": [
       {
         "sourceRef": "CLAUDE.md",
@@ -38,9 +189,15 @@
         "rowCount": 1
       },
       {
-        "sourceRef": "claude-mem/docker-compose.yml",
-        "basename": "docker-compose.yml",
-        "graphifySourceRef": "docker-compose.yml",
+        "sourceRef": "claude-mem/docker/claude-mem/build.sh",
+        "basename": "build.sh",
+        "graphifySourceRef": "simd-bridge/cpp/build.sh",
+        "rowCount": 1
+      },
+      {
+        "sourceRef": "claude-mem/evals/swebench/smoke-test.sh",
+        "basename": "smoke-test.sh",
+        "graphifySourceRef": "sveltekit-frontend/scripts/tests/smoke-test.sh",
         "rowCount": 1
       },
       {
@@ -56,123 +213,117 @@
         "rowCount": 1
       },
       {
+        "sourceRef": "claude-mem/src/cli/handlers/summarize.ts",
+        "basename": "summarize.ts",
+        "graphifySourceRef": "sveltekit-frontend/src/lib/server/pgai/summarize.ts",
+        "rowCount": 1
+      },
+      {
+        "sourceRef": "claude-mem/src/npx-cli/commands/server.ts",
+        "basename": "server.ts",
+        "graphifySourceRef": "sveltekit-frontend/src/mcp/server.ts",
+        "rowCount": 1
+      },
+      {
+        "sourceRef": "claude-mem/src/sdk/prompts.ts",
+        "basename": "prompts.ts",
+        "graphifySourceRef": "sveltekit-frontend/src/lib/ai/prompts.ts",
+        "rowCount": 1
+      },
+      {
+        "sourceRef": "claude-mem/src/server/jobs/outbox.ts",
+        "basename": "outbox.ts",
+        "graphifySourceRef": "sveltekit-frontend/src/lib/server/queue/outbox.ts",
+        "rowCount": 1
+      },
+      {
+        "sourceRef": "claude-mem/src/server/mcp/prompts.ts",
+        "basename": "prompts.ts",
+        "graphifySourceRef": "sveltekit-frontend/src/lib/ai/prompts.ts",
+        "rowCount": 1
+      },
+      {
+        "sourceRef": "claude-mem/src/server/queue/redis-config.ts",
+        "basename": "redis-config.ts",
+        "graphifySourceRef": "sveltekit-frontend/src/lib/config/redis-config.ts",
+        "rowCount": 1
+      },
+      {
+        "sourceRef": "claude-mem/src/services/server/ErrorHandler.ts",
+        "basename": "ErrorHandler.ts",
+        "graphifySourceRef": "sveltekit-frontend/scripts/phase104-backups/src/lib/utils/dashboard/ErrorHandler.ts",
+        "rowCount": 1
+      },
+      {
+        "sourceRef": "claude-mem/src/services/sqlite/migrations/runner.ts",
+        "basename": "runner.ts",
+        "graphifySourceRef": "packages/parent-atlas/src/gates/runner.ts",
+        "rowCount": 1
+      },
+      {
+        "sourceRef": "claude-mem/src/services/sqlite/timeline/queries.ts",
+        "basename": "queries.ts",
+        "graphifySourceRef": "sveltekit-frontend/src/lib/server/db/queries.ts",
+        "rowCount": 1
+      },
+      {
+        "sourceRef": "claude-mem/src/services/transcripts/state.ts",
+        "basename": "state.ts",
+        "graphifySourceRef": "sveltekit-frontend/scripts/phase104-backups/src/lib/types/state.ts",
+        "rowCount": 1
+      },
+      {
+        "sourceRef": "claude-mem/src/services/worker/http/middleware.ts",
+        "basename": "middleware.ts",
+        "graphifySourceRef": "sveltekit-frontend/src/lib/server/error-brain/middleware.ts",
+        "rowCount": 1
+      },
+      {
+        "sourceRef": "claude-mem/src/services/worker/http/shared.ts",
+        "basename": "shared.ts",
+        "graphifySourceRef": "sveltekit-frontend/scripts/phase104-backups/src/lib/types/shared.ts",
+        "rowCount": 1
+      },
+      {
+        "sourceRef": "claude-mem/src/services/worker/retry.ts",
+        "basename": "retry.ts",
+        "graphifySourceRef": "sveltekit-frontend/src/lib/server/utils/retry.ts",
+        "rowCount": 1
+      },
+      {
+        "sourceRef": "claude-mem/src/storage/postgres/pool.ts",
+        "basename": "pool.ts",
+        "graphifySourceRef": "sveltekit-frontend/src/lib/db/pool.ts",
+        "rowCount": 1
+      },
+      {
+        "sourceRef": "claude-mem/src/ui/viewer/constants/ui.ts",
+        "basename": "ui.ts",
+        "graphifySourceRef": "sveltekit-frontend/scripts/phase104-backups/src/lib/stores/_archive/old-stores/ui.ts",
+        "rowCount": 1
+      },
+      {
+        "sourceRef": "claude-mem/tests/sqlite/sessions.test.ts",
+        "basename": "sessions.test.ts",
+        "graphifySourceRef": "sveltekit-frontend/tests/routes/auto/api/v1/chat/sessions.test.ts",
+        "rowCount": 1
+      },
+      {
+        "sourceRef": "claude-mem/tests/transcripts/config.test.ts",
+        "basename": "config.test.ts",
+        "graphifySourceRef": "sveltekit-frontend/tests/routes/auto/api/phase89/config.test.ts",
+        "rowCount": 1
+      },
+      {
         "sourceRef": "data/external-docs/normalized/drizzle/migrations.md",
         "basename": "migrations.md",
         "graphifySourceRef": "data/external-docs/raw/drizzle/migrations.md",
         "rowCount": 1
       },
       {
-        "sourceRef": "docs/reports/codebase-semantics-neo4j-report.json",
-        "basename": "codebase-semantics-neo4j-report.json",
-        "graphifySourceRef": "docs/graph/codebase-semantics-neo4j-report.json",
-        "rowCount": 1
-      },
-      {
-        "sourceRef": "feature-registry.json",
-        "basename": "feature-registry.json",
-        "graphifySourceRef": "docs/atlas/feature-registry.json",
-        "rowCount": 1
-      },
-      {
-        "sourceRef": "granite-docling-258M/config.json",
-        "basename": "config.json",
-        "graphifySourceRef": "docker/bifrost/config.json",
-        "rowCount": 1
-      },
-      {
-        "sourceRef": "karpathy-wiki/project/trace-kag-web-development-guide.md",
-        "basename": "trace-kag-web-development-guide.md",
-        "graphifySourceRef": "docs/architecture/trace-kag-web-development-guide.md",
-        "rowCount": 1
-      },
-      {
-        "sourceRef": "karpathy-wiki/project/trace-runtime-split.md",
-        "basename": "trace-runtime-split.md",
-        "graphifySourceRef": "docs/architecture/trace-runtime-split.md",
-        "rowCount": 1
-      },
-      {
-        "sourceRef": "llama-cpp-turboquant-gemma4/AGENTS.md",
-        "basename": "AGENTS.md",
-        "graphifySourceRef": "AGENTS.md",
-        "rowCount": 1
-      },
-      {
-        "sourceRef": "llama-cpp-turboquant-gemma4/CLAUDE.md",
-        "basename": "CLAUDE.md",
-        "graphifySourceRef": ".claude/CLAUDE.md",
-        "rowCount": 1
-      },
-      {
-        "sourceRef": "llama-cpp-turboquant-gemma4/CMakePresets.json",
-        "basename": "CMakePresets.json",
-        "graphifySourceRef": "CMakePresets.json",
-        "rowCount": 1
-      },
-      {
-        "sourceRef": "llama-cpp-turboquant-gemma4/examples/model-conversion/scripts/utils/__init__.py",
-        "basename": "__init__.py",
-        "graphifySourceRef": ".parent-atlas/skills/claim-verifier/src/claim_verifier/__init__.py",
-        "rowCount": 1
-      },
-      {
-        "sourceRef": "llama-cpp-turboquant-gemma4/.gemini/settings.json",
-        "basename": "settings.json",
-        "graphifySourceRef": ".claude/settings.json",
-        "rowCount": 1
-      },
-      {
-        "sourceRef": "llama-cpp-turboquant-gemma4/gguf-py/gguf/__init__.py",
-        "basename": "__init__.py",
-        "graphifySourceRef": ".parent-atlas/skills/claim-verifier/src/claim_verifier/__init__.py",
-        "rowCount": 1
-      },
-      {
-        "sourceRef": "llama-cpp-turboquant-gemma4/gguf-py/tests/__init__.py",
-        "basename": "__init__.py",
-        "graphifySourceRef": ".parent-atlas/skills/claim-verifier/src/claim_verifier/__init__.py",
-        "rowCount": 1
-      },
-      {
-        "sourceRef": "llm/karpathy_llmwiki.md",
-        "basename": "karpathy_llmwiki.md",
-        "graphifySourceRef": "docs/codebase_atlas/karpathy_llmwiki.md",
-        "rowCount": 1
-      },
-      {
-        "sourceRef": "llm/repo_root_map.md",
-        "basename": "repo_root_map.md",
-        "graphifySourceRef": "docs/codebase_atlas/repo_root_map.md",
-        "rowCount": 1
-      },
-      {
-        "sourceRef": "next_steps/completed/production-history/PRODUCTION_AUDIT_2026-03-15.md",
-        "basename": "PRODUCTION_AUDIT_2026-03-15.md",
-        "graphifySourceRef": "docs/legacy-reference/PRODUCTION_AUDIT_2026-03-15.md",
-        "rowCount": 1
-      },
-      {
-        "sourceRef": "packages/parent-atlas/docs/atlas/AGENT-TASK-PACKAGES-2026-06-13.md",
-        "basename": "AGENT-TASK-PACKAGES-2026-06-13.md",
-        "graphifySourceRef": "docs/atlas/AGENT-TASK-PACKAGES-2026-06-13.md",
-        "rowCount": 1
-      },
-      {
-        "sourceRef": "packages/parent-atlas/docs/atlas/ATLAS-1.0-BASELINE.md",
-        "basename": "ATLAS-1.0-BASELINE.md",
-        "graphifySourceRef": "docs/atlas/ATLAS-1.0-BASELINE.md",
-        "rowCount": 1
-      },
-      {
-        "sourceRef": "packages/parent-atlas/docs/atlas/ATLAS-2.0-PHASE-2-COMPLETION.md",
-        "basename": "ATLAS-2.0-PHASE-2-COMPLETION.md",
-        "graphifySourceRef": "docs/atlas/ATLAS-2.0-PHASE-2-COMPLETION.md",
-        "rowCount": 1
-      },
-      {
-        "sourceRef": "packages/parent-atlas/docs/atlas/ATLAS-3.0-HYPERRAG-RUNTIME.md",
-        "basename": "ATLAS-3.0-HYPERRAG-RUNTIME.md",
-        "graphifySourceRef": "docs/atlas/ATLAS-3.0-HYPERRAG-RUNTIME.md",
+        "sourceRef": "docs/reports/packet-reader-writer-audit.json",
+        "basename": "packet-reader-writer-audit.json",
+        "graphifySourceRef": "sveltekit-frontend/docs/reports/packet-reader-writer-audit.json",
         "rowCount": 1
       }
     ],
@@ -182,12 +333,27 @@
         "basename": "README.md",
         "graphifySourceRefs": [
           "datasets/README.md",
+          "deeds_lab/README.md",
+          "deeds_labs/archive/scaffolds/2026-08-12-parent-atlas-event-merkle-identity-pack/README.md",
           "docker/langextract-optimized/README.md",
+          "docs/architecture/autoencoder/README.md",
           "docs/codebase_atlas/README.md",
           "docs/legacy-reference/README.md",
-          "docs/open-lanes/README.md"
+          "docs/.okf/README.md",
+          "docs/open-lanes/README.md",
+          "docs/openspec/README.md"
         ],
-        "candidateCount": 5,
+        "candidateCount": 96,
+        "rowCount": 1
+      },
+      {
+        "sourceRef": "claude-mem/docker/claude-mem/entrypoint.sh",
+        "basename": "entrypoint.sh",
+        "graphifySourceRefs": [
+          "sveltekit-frontend/.docker-build/sveltekit-frontend/docker/entrypoint.sh",
+          "sveltekit-frontend/docker/entrypoint.sh"
+        ],
+        "candidateCount": 2,
         "rowCount": 1
       },
       {
@@ -195,12 +361,27 @@
         "basename": "README.md",
         "graphifySourceRefs": [
           "datasets/README.md",
+          "deeds_lab/README.md",
+          "deeds_labs/archive/scaffolds/2026-08-12-parent-atlas-event-merkle-identity-pack/README.md",
           "docker/langextract-optimized/README.md",
+          "docs/architecture/autoencoder/README.md",
           "docs/codebase_atlas/README.md",
           "docs/legacy-reference/README.md",
-          "docs/open-lanes/README.md"
+          "docs/.okf/README.md",
+          "docs/open-lanes/README.md",
+          "docs/openspec/README.md"
         ],
-        "candidateCount": 5,
+        "candidateCount": 96,
+        "rowCount": 1
+      },
+      {
+        "sourceRef": "claude-mem/docker-compose.yml",
+        "basename": "docker-compose.yml",
+        "graphifySourceRefs": [
+          "docker-compose.yml",
+          "docker/miniforge-nlp-sidecar/docker-compose.yml"
+        ],
+        "candidateCount": 2,
         "rowCount": 1
       },
       {
@@ -208,9 +389,17 @@
         "basename": "package.json",
         "graphifySourceRefs": [
           "crates/atlas_packet_parser/package.json",
-          "crates/turbovec-napi/package.json"
+          "crates/turbovec-napi/package.json",
+          "package.json",
+          "packages/atlas-core/package.json",
+          "packages/atlas-duckdb/package.json",
+          "packages/atlas-orchestrator/package.json",
+          "packages/atlas/package.json",
+          "packages/parent-atlas-client/package.json",
+          "packages/parent-atlas-core/package.json",
+          "packages/parent-atlas-ingest/package.json"
         ],
-        "candidateCount": 2,
+        "candidateCount": 23,
         "rowCount": 1
       },
       {
@@ -226,9 +415,9 @@
           ".opencode/skills/metadata-context-analysis/SKILL.md",
           ".opencode/skills/rg-atlas/SKILL.md",
           ".opencode/skills/trace-mcp-tooling/SKILL.md",
-          ".parent-atlas/skills/claim-verifier/SKILL.md"
+          "packages/parent-atlas-opencode/skills/atlas-analyze/SKILL.md"
         ],
-        "candidateCount": 10,
+        "candidateCount": 21,
         "rowCount": 1
       },
       {
@@ -244,9 +433,9 @@
           ".opencode/skills/metadata-context-analysis/SKILL.md",
           ".opencode/skills/rg-atlas/SKILL.md",
           ".opencode/skills/trace-mcp-tooling/SKILL.md",
-          ".parent-atlas/skills/claim-verifier/SKILL.md"
+          "packages/parent-atlas-opencode/skills/atlas-analyze/SKILL.md"
         ],
-        "candidateCount": 10,
+        "candidateCount": 21,
         "rowCount": 1
       },
       {
@@ -262,9 +451,55 @@
           ".opencode/skills/metadata-context-analysis/SKILL.md",
           ".opencode/skills/rg-atlas/SKILL.md",
           ".opencode/skills/trace-mcp-tooling/SKILL.md",
-          ".parent-atlas/skills/claim-verifier/SKILL.md"
+          "packages/parent-atlas-opencode/skills/atlas-analyze/SKILL.md"
         ],
-        "candidateCount": 10,
+        "candidateCount": 21,
+        "rowCount": 1
+      },
+      {
+        "sourceRef": "claude-mem/openclaw/src/index.test.ts",
+        "basename": "index.test.ts",
+        "graphifySourceRefs": [
+          "sveltekit-frontend/tests/routes/auto/api/codebase/index.test.ts",
+          "sveltekit-frontend/tests/routes/auto/api/codebase/wiki/index.test.ts"
+        ],
+        "candidateCount": 2,
+        "rowCount": 1
+      },
+      {
+        "sourceRef": "claude-mem/openclaw/src/index.ts",
+        "basename": "index.ts",
+        "graphifySourceRefs": [
+          "gsd_archives/phase-2f1-baseline/schema-backup/index.ts",
+          "packages/atlas-core/src/evidence/index.ts",
+          "packages/atlas-core/src/index.ts",
+          "packages/atlas-core/src/langgraph/index.ts",
+          "packages/atlas-core/src/packet/index.ts",
+          "packages/atlas-core/src/types/index.ts",
+          "packages/atlas-duckdb/src/index.ts",
+          "packages/parent-atlas-client/src/index.ts",
+          "packages/parent-atlas-core/src/index.ts",
+          "packages/parent-atlas-ingest/src/index.ts"
+        ],
+        "candidateCount": 106,
+        "rowCount": 1
+      },
+      {
+        "sourceRef": "claude-mem/openclaw/tsconfig.json",
+        "basename": "tsconfig.json",
+        "graphifySourceRefs": [
+          "packages/atlas-core/tsconfig.json",
+          "packages/atlas-duckdb/tsconfig.json",
+          "packages/atlas-orchestrator/tsconfig.json",
+          "packages/parent-atlas-client/tsconfig.json",
+          "packages/parent-atlas-core/tsconfig.json",
+          "packages/parent-atlas-ingest/tsconfig.json",
+          "packages/parent-atlas-opencode/tsconfig.json",
+          "packages/parent-atlas-retrieval/tsconfig.json",
+          "packages/parent-atlas-runtime/tsconfig.json",
+          "packages/parent-atlas/tsconfig.json"
+        ],
+        "candidateCount": 16,
         "rowCount": 1
       },
       {
@@ -272,9 +507,17 @@
         "basename": "package.json",
         "graphifySourceRefs": [
           "crates/atlas_packet_parser/package.json",
-          "crates/turbovec-napi/package.json"
+          "crates/turbovec-napi/package.json",
+          "package.json",
+          "packages/atlas-core/package.json",
+          "packages/atlas-duckdb/package.json",
+          "packages/atlas-orchestrator/package.json",
+          "packages/atlas/package.json",
+          "packages/parent-atlas-client/package.json",
+          "packages/parent-atlas-core/package.json",
+          "packages/parent-atlas-ingest/package.json"
         ],
-        "candidateCount": 2,
+        "candidateCount": 23,
         "rowCount": 1
       },
       {
@@ -282,9 +525,17 @@
         "basename": "package.json",
         "graphifySourceRefs": [
           "crates/atlas_packet_parser/package.json",
-          "crates/turbovec-napi/package.json"
+          "crates/turbovec-napi/package.json",
+          "package.json",
+          "packages/atlas-core/package.json",
+          "packages/atlas-duckdb/package.json",
+          "packages/atlas-orchestrator/package.json",
+          "packages/atlas/package.json",
+          "packages/parent-atlas-client/package.json",
+          "packages/parent-atlas-core/package.json",
+          "packages/parent-atlas-ingest/package.json"
         ],
-        "candidateCount": 2,
+        "candidateCount": 23,
         "rowCount": 1
       },
       {
@@ -300,9 +551,9 @@
           ".opencode/skills/metadata-context-analysis/SKILL.md",
           ".opencode/skills/rg-atlas/SKILL.md",
           ".opencode/skills/trace-mcp-tooling/SKILL.md",
-          ".parent-atlas/skills/claim-verifier/SKILL.md"
+          "packages/parent-atlas-opencode/skills/atlas-analyze/SKILL.md"
         ],
-        "candidateCount": 10,
+        "candidateCount": 21,
         "rowCount": 1
       },
       {
@@ -318,9 +569,9 @@
           ".opencode/skills/metadata-context-analysis/SKILL.md",
           ".opencode/skills/rg-atlas/SKILL.md",
           ".opencode/skills/trace-mcp-tooling/SKILL.md",
-          ".parent-atlas/skills/claim-verifier/SKILL.md"
+          "packages/parent-atlas-opencode/skills/atlas-analyze/SKILL.md"
         ],
-        "candidateCount": 10,
+        "candidateCount": 21,
         "rowCount": 1
       },
       {
@@ -336,9 +587,9 @@
           ".opencode/skills/metadata-context-analysis/SKILL.md",
           ".opencode/skills/rg-atlas/SKILL.md",
           ".opencode/skills/trace-mcp-tooling/SKILL.md",
-          ".parent-atlas/skills/claim-verifier/SKILL.md"
+          "packages/parent-atlas-opencode/skills/atlas-analyze/SKILL.md"
         ],
-        "candidateCount": 10,
+        "candidateCount": 21,
         "rowCount": 1
       },
       {
@@ -354,9 +605,9 @@
           ".opencode/skills/metadata-context-analysis/SKILL.md",
           ".opencode/skills/rg-atlas/SKILL.md",
           ".opencode/skills/trace-mcp-tooling/SKILL.md",
-          ".parent-atlas/skills/claim-verifier/SKILL.md"
+          "packages/parent-atlas-opencode/skills/atlas-analyze/SKILL.md"
         ],
-        "candidateCount": 10,
+        "candidateCount": 21,
         "rowCount": 1
       },
       {
@@ -372,9 +623,9 @@
           ".opencode/skills/metadata-context-analysis/SKILL.md",
           ".opencode/skills/rg-atlas/SKILL.md",
           ".opencode/skills/trace-mcp-tooling/SKILL.md",
-          ".parent-atlas/skills/claim-verifier/SKILL.md"
+          "packages/parent-atlas-opencode/skills/atlas-analyze/SKILL.md"
         ],
-        "candidateCount": 10,
+        "candidateCount": 21,
         "rowCount": 1
       },
       {
@@ -390,9 +641,9 @@
           ".opencode/skills/metadata-context-analysis/SKILL.md",
           ".opencode/skills/rg-atlas/SKILL.md",
           ".opencode/skills/trace-mcp-tooling/SKILL.md",
-          ".parent-atlas/skills/claim-verifier/SKILL.md"
+          "packages/parent-atlas-opencode/skills/atlas-analyze/SKILL.md"
         ],
-        "candidateCount": 10,
+        "candidateCount": 21,
         "rowCount": 1
       },
       {
@@ -408,9 +659,9 @@
           ".opencode/skills/metadata-context-analysis/SKILL.md",
           ".opencode/skills/rg-atlas/SKILL.md",
           ".opencode/skills/trace-mcp-tooling/SKILL.md",
-          ".parent-atlas/skills/claim-verifier/SKILL.md"
+          "packages/parent-atlas-opencode/skills/atlas-analyze/SKILL.md"
         ],
-        "candidateCount": 10,
+        "candidateCount": 21,
         "rowCount": 1
       },
       {
@@ -426,9 +677,9 @@
           ".opencode/skills/metadata-context-analysis/SKILL.md",
           ".opencode/skills/rg-atlas/SKILL.md",
           ".opencode/skills/trace-mcp-tooling/SKILL.md",
-          ".parent-atlas/skills/claim-verifier/SKILL.md"
+          "packages/parent-atlas-opencode/skills/atlas-analyze/SKILL.md"
         ],
-        "candidateCount": 10,
+        "candidateCount": 21,
         "rowCount": 1
       },
       {
@@ -444,9 +695,9 @@
           ".opencode/skills/metadata-context-analysis/SKILL.md",
           ".opencode/skills/rg-atlas/SKILL.md",
           ".opencode/skills/trace-mcp-tooling/SKILL.md",
-          ".parent-atlas/skills/claim-verifier/SKILL.md"
+          "packages/parent-atlas-opencode/skills/atlas-analyze/SKILL.md"
         ],
-        "candidateCount": 10,
+        "candidateCount": 21,
         "rowCount": 1
       },
       {
@@ -462,9 +713,9 @@
           ".opencode/skills/metadata-context-analysis/SKILL.md",
           ".opencode/skills/rg-atlas/SKILL.md",
           ".opencode/skills/trace-mcp-tooling/SKILL.md",
-          ".parent-atlas/skills/claim-verifier/SKILL.md"
+          "packages/parent-atlas-opencode/skills/atlas-analyze/SKILL.md"
         ],
-        "candidateCount": 10,
+        "candidateCount": 21,
         "rowCount": 1
       },
       {
@@ -480,9 +731,9 @@
           ".opencode/skills/metadata-context-analysis/SKILL.md",
           ".opencode/skills/rg-atlas/SKILL.md",
           ".opencode/skills/trace-mcp-tooling/SKILL.md",
-          ".parent-atlas/skills/claim-verifier/SKILL.md"
+          "packages/parent-atlas-opencode/skills/atlas-analyze/SKILL.md"
         ],
-        "candidateCount": 10,
+        "candidateCount": 21,
         "rowCount": 1
       },
       {
@@ -498,89 +749,9 @@
           ".opencode/skills/metadata-context-analysis/SKILL.md",
           ".opencode/skills/rg-atlas/SKILL.md",
           ".opencode/skills/trace-mcp-tooling/SKILL.md",
-          ".parent-atlas/skills/claim-verifier/SKILL.md"
+          "packages/parent-atlas-opencode/skills/atlas-analyze/SKILL.md"
         ],
-        "candidateCount": 10,
-        "rowCount": 1
-      },
-      {
-        "sourceRef": "claude-mem/plugin/skills/version-bump/SKILL.md",
-        "basename": "SKILL.md",
-        "graphifySourceRefs": [
-          ".claude/skills/bits-ui-svelte5/SKILL.md",
-          ".claude/skills/drizzle-schema-review/SKILL.md",
-          ".claude/skills/metadata-context-analysis/SKILL.md",
-          ".claude/skills/trace-mcp-tooling/SKILL.md",
-          ".claude/skills/uno-css-design-system/SKILL.md",
-          ".opencode/skills/mcp-toolchain/SKILL.md",
-          ".opencode/skills/metadata-context-analysis/SKILL.md",
-          ".opencode/skills/rg-atlas/SKILL.md",
-          ".opencode/skills/trace-mcp-tooling/SKILL.md",
-          ".parent-atlas/skills/claim-verifier/SKILL.md"
-        ],
-        "candidateCount": 10,
-        "rowCount": 1
-      },
-      {
-        "sourceRef": "claude-mem/plugin/skills/weekly-digests/SKILL.md",
-        "basename": "SKILL.md",
-        "graphifySourceRefs": [
-          ".claude/skills/bits-ui-svelte5/SKILL.md",
-          ".claude/skills/drizzle-schema-review/SKILL.md",
-          ".claude/skills/metadata-context-analysis/SKILL.md",
-          ".claude/skills/trace-mcp-tooling/SKILL.md",
-          ".claude/skills/uno-css-design-system/SKILL.md",
-          ".opencode/skills/mcp-toolchain/SKILL.md",
-          ".opencode/skills/metadata-context-analysis/SKILL.md",
-          ".opencode/skills/rg-atlas/SKILL.md",
-          ".opencode/skills/trace-mcp-tooling/SKILL.md",
-          ".parent-atlas/skills/claim-verifier/SKILL.md"
-        ],
-        "candidateCount": 10,
-        "rowCount": 1
-      },
-      {
-        "sourceRef": "claude-mem/plugin/skills/wowerpoint/SKILL.md",
-        "basename": "SKILL.md",
-        "graphifySourceRefs": [
-          ".claude/skills/bits-ui-svelte5/SKILL.md",
-          ".claude/skills/drizzle-schema-review/SKILL.md",
-          ".claude/skills/metadata-context-analysis/SKILL.md",
-          ".claude/skills/trace-mcp-tooling/SKILL.md",
-          ".claude/skills/uno-css-design-system/SKILL.md",
-          ".opencode/skills/mcp-toolchain/SKILL.md",
-          ".opencode/skills/metadata-context-analysis/SKILL.md",
-          ".opencode/skills/rg-atlas/SKILL.md",
-          ".opencode/skills/trace-mcp-tooling/SKILL.md",
-          ".parent-atlas/skills/claim-verifier/SKILL.md"
-        ],
-        "candidateCount": 10,
-        "rowCount": 1
-      },
-      {
-        "sourceRef": "claude-mem/ragtime/README.md",
-        "basename": "README.md",
-        "graphifySourceRefs": [
-          "datasets/README.md",
-          "docker/langextract-optimized/README.md",
-          "docs/codebase_atlas/README.md",
-          "docs/legacy-reference/README.md",
-          "docs/open-lanes/README.md"
-        ],
-        "candidateCount": 5,
-        "rowCount": 1
-      },
-      {
-        "sourceRef": "claude-mem/README.md",
-        "basename": "README.md",
-        "graphifySourceRefs": [
-          "datasets/README.md",
-          "docker/langextract-optimized/README.md",
-          "docs/codebase_atlas/README.md",
-          "docs/legacy-reference/README.md",
-          "docs/open-lanes/README.md"
-        ],
-        "candidateCount": 5,
+        "candidateCount": 21,
         "rowCount": 1
       }
     ],
@@ -715,15 +886,256 @@
   "featureOntologyTuples": {
     "counts": {
       "sourceRefs": 27863,
-      "RAW_EXACT": 322,
-      "NORMALIZED_EXACT": 0,
-      "BASENAME_UNIQUE": 416,
-      "BASENAME_AMBIGUOUS": 37,
-      "UNRESOLVED": 27088
+      "RAW_EXACT": 1668,
+      "NORMALIZED_EXACT": 3258,
+      "BASENAME_UNIQUE": 3067,
+      "BASENAME_AMBIGUOUS": 3406,
+      "UNRESOLVED": 16464
     },
     "samples": {
-      "NORMALIZED_EXACT": [],
+      "NORMALIZED_EXACT": [
+        {
+          "sourceRef": ".docker-build/sveltekit-frontend/docker/entrypoint.sh",
+          "normalizedSourceRef": "sveltekit-frontend/docker/entrypoint.sh",
+          "graphifySourceRef": "sveltekit-frontend/docker/entrypoint.sh",
+          "rowCount": 3
+        },
+        {
+          "sourceRef": "llama-cpp-turboquant-gemma4/tools/server/webui/src/app.d.ts",
+          "normalizedSourceRef": "sveltekit-frontend/src/app.d.ts",
+          "graphifySourceRef": "sveltekit-frontend/src/app.d.ts",
+          "rowCount": 3
+        },
+        {
+          "sourceRef": "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/badge/index.ts",
+          "normalizedSourceRef": "sveltekit-frontend/src/lib/components/ui/badge/index.ts",
+          "graphifySourceRef": "sveltekit-frontend/src/lib/components/ui/badge/index.ts",
+          "rowCount": 3
+        },
+        {
+          "sourceRef": "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/button/index.ts",
+          "normalizedSourceRef": "sveltekit-frontend/src/lib/components/ui/button/index.ts",
+          "graphifySourceRef": "sveltekit-frontend/src/lib/components/ui/button/index.ts",
+          "rowCount": 3
+        },
+        {
+          "sourceRef": "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/dialog/index.ts",
+          "normalizedSourceRef": "sveltekit-frontend/src/lib/components/ui/dialog/index.ts",
+          "graphifySourceRef": "sveltekit-frontend/src/lib/components/ui/dialog/index.ts",
+          "rowCount": 3
+        },
+        {
+          "sourceRef": "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/input/index.ts",
+          "normalizedSourceRef": "sveltekit-frontend/src/lib/components/ui/input/index.ts",
+          "graphifySourceRef": "sveltekit-frontend/src/lib/components/ui/input/index.ts",
+          "rowCount": 3
+        },
+        {
+          "sourceRef": "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/label/index.ts",
+          "normalizedSourceRef": "sveltekit-frontend/src/lib/components/ui/label/index.ts",
+          "graphifySourceRef": "sveltekit-frontend/src/lib/components/ui/label/index.ts",
+          "rowCount": 3
+        },
+        {
+          "sourceRef": "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/table/index.ts",
+          "normalizedSourceRef": "sveltekit-frontend/src/lib/components/ui/table/index.ts",
+          "graphifySourceRef": "sveltekit-frontend/src/lib/components/ui/table/index.ts",
+          "rowCount": 3
+        },
+        {
+          "sourceRef": "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/textarea/index.ts",
+          "normalizedSourceRef": "sveltekit-frontend/src/lib/components/ui/textarea/index.ts",
+          "graphifySourceRef": "sveltekit-frontend/src/lib/components/ui/textarea/index.ts",
+          "rowCount": 3
+        },
+        {
+          "sourceRef": "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/types/index.ts",
+          "normalizedSourceRef": "sveltekit-frontend/src/lib/types/index.ts",
+          "graphifySourceRef": "sveltekit-frontend/src/lib/types/index.ts",
+          "rowCount": 3
+        },
+        {
+          "sourceRef": "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/debounce.ts",
+          "normalizedSourceRef": "sveltekit-frontend/src/lib/utils/debounce.ts",
+          "graphifySourceRef": "sveltekit-frontend/src/lib/utils/debounce.ts",
+          "rowCount": 3
+        },
+        {
+          "sourceRef": "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/index.ts",
+          "normalizedSourceRef": "sveltekit-frontend/src/lib/utils/index.ts",
+          "graphifySourceRef": "sveltekit-frontend/src/lib/utils/index.ts",
+          "rowCount": 3
+        },
+        {
+          "sourceRef": "llama-cpp-turboquant-gemma4/tools/server/webui/src/routes/+error.svelte",
+          "normalizedSourceRef": "sveltekit-frontend/src/routes/+error.svelte",
+          "graphifySourceRef": "sveltekit-frontend/src/routes/+error.svelte",
+          "rowCount": 3
+        },
+        {
+          "sourceRef": "llama-cpp-turboquant-gemma4/tools/server/webui/src/routes/+layout.svelte",
+          "normalizedSourceRef": "sveltekit-frontend/src/routes/+layout.svelte",
+          "graphifySourceRef": "sveltekit-frontend/src/routes/+layout.svelte",
+          "rowCount": 3
+        },
+        {
+          "sourceRef": "llama-cpp-turboquant-gemma4/tools/server/webui/src/routes/+page.svelte",
+          "normalizedSourceRef": "sveltekit-frontend/src/routes/+page.svelte",
+          "graphifySourceRef": "sveltekit-frontend/src/routes/+page.svelte",
+          "rowCount": 3
+        },
+        {
+          "sourceRef": "scripts/phase104-backups/src/lib/command-center-manifest.ts",
+          "normalizedSourceRef": "sveltekit-frontend/src/lib/command-center-manifest.ts",
+          "graphifySourceRef": "sveltekit-frontend/src/lib/command-center-manifest.ts",
+          "rowCount": 3
+        },
+        {
+          "sourceRef": "scripts/phase104-backups/src/lib/data/types.ts",
+          "normalizedSourceRef": "sveltekit-frontend/src/lib/data/types.ts",
+          "graphifySourceRef": "sveltekit-frontend/src/lib/data/types.ts",
+          "rowCount": 3
+        },
+        {
+          "sourceRef": "scripts/phase104-backups/src/lib/server/auth/utils.ts",
+          "normalizedSourceRef": "sveltekit-frontend/src/lib/server/auth/utils.ts",
+          "graphifySourceRef": "src/lib/server/auth/utils.ts",
+          "rowCount": 3
+        },
+        {
+          "sourceRef": "scripts/phase104-backups/src/lib/server/db/mirror-query.ts",
+          "normalizedSourceRef": "sveltekit-frontend/src/lib/server/db/mirror-query.ts",
+          "graphifySourceRef": "sveltekit-frontend/src/lib/server/db/mirror-query.ts",
+          "rowCount": 3
+        },
+        {
+          "sourceRef": "scripts/phase104-backups/src/lib/server/error-brain/knowledge-base.ts",
+          "normalizedSourceRef": "sveltekit-frontend/src/lib/server/error-brain/knowledge-base.ts",
+          "graphifySourceRef": "sveltekit-frontend/src/lib/server/error-brain/knowledge-base.ts",
+          "rowCount": 3
+        },
+        {
+          "sourceRef": "scripts/phase104-backups/src/lib/server/keyword-extractor.ts",
+          "normalizedSourceRef": "sveltekit-frontend/src/lib/server/keyword-extractor.ts",
+          "graphifySourceRef": "sveltekit-frontend/src/lib/server/keyword-extractor.ts",
+          "rowCount": 3
+        },
+        {
+          "sourceRef": "scripts/phase104-backups/src/lib/server/knowledge-cache.ts",
+          "normalizedSourceRef": "sveltekit-frontend/src/lib/server/knowledge-cache.ts",
+          "graphifySourceRef": "sveltekit-frontend/src/lib/server/knowledge-cache.ts",
+          "rowCount": 3
+        },
+        {
+          "sourceRef": "scripts/phase104-backups/src/lib/server/services/qdrant-client.ts",
+          "normalizedSourceRef": "sveltekit-frontend/src/lib/server/services/qdrant-client.ts",
+          "graphifySourceRef": "sveltekit-frontend/src/lib/server/services/qdrant-client.ts",
+          "rowCount": 3
+        },
+        {
+          "sourceRef": "scripts/phase104-backups/src/lib/server/utils/avatar-upload.ts",
+          "normalizedSourceRef": "sveltekit-frontend/src/lib/server/utils/avatar-upload.ts",
+          "graphifySourceRef": "sveltekit-frontend/src/lib/server/utils/avatar-upload.ts",
+          "rowCount": 3
+        },
+        {
+          "sourceRef": "scripts/phase104-backups/src/lib/types/database.ts",
+          "normalizedSourceRef": "sveltekit-frontend/src/lib/types/database.ts",
+          "graphifySourceRef": "sveltekit-frontend/src/lib/types/database.ts",
+          "rowCount": 3
+        }
+      ],
       "BASENAME_UNIQUE": [
+        {
+          "sourceRef": "add_kb_tools.cjs",
+          "basename": "add_kb_tools.cjs",
+          "graphifySourceRef": "sveltekit-frontend/add_kb_tools.cjs",
+          "rowCount": 3
+        },
+        {
+          "sourceRef": "archive/logs/deeds_labs__snapshots__2026-03-10__root-stale__logs__svelte-check-post-phase19-22-chunk-000.md",
+          "basename": "deeds_labs__snapshots__2026-03-10__root-stale__logs__svelte-check-post-phase19-22-chunk-000.md",
+          "graphifySourceRef": "sveltekit-frontend/docs/obsidian-vault/Files/deeds_labs__snapshots__2026-03-10__root-stale__logs__svelte-check-post-phase19-22-chunk-000.md",
+          "rowCount": 3
+        },
+        {
+          "sourceRef": "archive/logs/deeds_labs__snapshots__2026-03-10__root-stale__logs__svelte-check-post-phase19-22-chunk-001.md",
+          "basename": "deeds_labs__snapshots__2026-03-10__root-stale__logs__svelte-check-post-phase19-22-chunk-001.md",
+          "graphifySourceRef": "sveltekit-frontend/docs/obsidian-vault/Files/deeds_labs__snapshots__2026-03-10__root-stale__logs__svelte-check-post-phase19-22-chunk-001.md",
+          "rowCount": 3
+        },
+        {
+          "sourceRef": "archive/logs/deeds_labs__snapshots__2026-03-10__root-stale__logs__svelte-check-post-phase19-22-chunk-003.md",
+          "basename": "deeds_labs__snapshots__2026-03-10__root-stale__logs__svelte-check-post-phase19-22-chunk-003.md",
+          "graphifySourceRef": "sveltekit-frontend/docs/obsidian-vault/Files/deeds_labs__snapshots__2026-03-10__root-stale__logs__svelte-check-post-phase19-22-chunk-003.md",
+          "rowCount": 3
+        },
+        {
+          "sourceRef": "archive/logs/deeds_labs__snapshots__2026-03-10__root-stale__logs__svelte-check-post-phase19-22-chunk-006.md",
+          "basename": "deeds_labs__snapshots__2026-03-10__root-stale__logs__svelte-check-post-phase19-22-chunk-006.md",
+          "graphifySourceRef": "sveltekit-frontend/docs/obsidian-vault/Files/deeds_labs__snapshots__2026-03-10__root-stale__logs__svelte-check-post-phase19-22-chunk-006.md",
+          "rowCount": 3
+        },
+        {
+          "sourceRef": "archive/logs/deeds_labs__snapshots__2026-03-10__root-stale__logs__svelte-check-post-phase19-22-chunk-007.md",
+          "basename": "deeds_labs__snapshots__2026-03-10__root-stale__logs__svelte-check-post-phase19-22-chunk-007.md",
+          "graphifySourceRef": "sveltekit-frontend/docs/obsidian-vault/Files/deeds_labs__snapshots__2026-03-10__root-stale__logs__svelte-check-post-phase19-22-chunk-007.md",
+          "rowCount": 3
+        },
+        {
+          "sourceRef": "archive/logs/deeds_labs__snapshots__2026-03-10__root-stale__logs__svelte-check-post-phase19-22-chunk-010.md",
+          "basename": "deeds_labs__snapshots__2026-03-10__root-stale__logs__svelte-check-post-phase19-22-chunk-010.md",
+          "graphifySourceRef": "sveltekit-frontend/docs/obsidian-vault/Files/deeds_labs__snapshots__2026-03-10__root-stale__logs__svelte-check-post-phase19-22-chunk-010.md",
+          "rowCount": 3
+        },
+        {
+          "sourceRef": "archive/logs/deeds_labs__snapshots__2026-03-10__root-stale__logs__svelte-check-post-phase19-22-chunk-011.md",
+          "basename": "deeds_labs__snapshots__2026-03-10__root-stale__logs__svelte-check-post-phase19-22-chunk-011.md",
+          "graphifySourceRef": "sveltekit-frontend/docs/obsidian-vault/Files/deeds_labs__snapshots__2026-03-10__root-stale__logs__svelte-check-post-phase19-22-chunk-011.md",
+          "rowCount": 3
+        },
+        {
+          "sourceRef": "archive/logs/deeds_labs__snapshots__2026-03-10__root-stale__logs__svelte-check-post-phase19-22-chunk-014.md",
+          "basename": "deeds_labs__snapshots__2026-03-10__root-stale__logs__svelte-check-post-phase19-22-chunk-014.md",
+          "graphifySourceRef": "sveltekit-frontend/docs/obsidian-vault/Files/deeds_labs__snapshots__2026-03-10__root-stale__logs__svelte-check-post-phase19-22-chunk-014.md",
+          "rowCount": 3
+        },
+        {
+          "sourceRef": "archive/logs/deeds_labs__snapshots__2026-03-10__root-stale__logs__svelte-check-post-phase19-22-chunk-015.md",
+          "basename": "deeds_labs__snapshots__2026-03-10__root-stale__logs__svelte-check-post-phase19-22-chunk-015.md",
+          "graphifySourceRef": "sveltekit-frontend/docs/obsidian-vault/Files/deeds_labs__snapshots__2026-03-10__root-stale__logs__svelte-check-post-phase19-22-chunk-015.md",
+          "rowCount": 3
+        },
+        {
+          "sourceRef": "archive/logs/deeds_labs__snapshots__2026-03-10__root-stale__logs__svelte-check-post-phase19-22-chunk-016.md",
+          "basename": "deeds_labs__snapshots__2026-03-10__root-stale__logs__svelte-check-post-phase19-22-chunk-016.md",
+          "graphifySourceRef": "sveltekit-frontend/docs/obsidian-vault/Files/deeds_labs__snapshots__2026-03-10__root-stale__logs__svelte-check-post-phase19-22-chunk-016.md",
+          "rowCount": 3
+        },
+        {
+          "sourceRef": "archive/logs/deeds_labs__snapshots__2026-03-10__root-stale__logs__svelte-check-post-phase19-22-chunk-017.md",
+          "basename": "deeds_labs__snapshots__2026-03-10__root-stale__logs__svelte-check-post-phase19-22-chunk-017.md",
+          "graphifySourceRef": "sveltekit-frontend/docs/obsidian-vault/Files/deeds_labs__snapshots__2026-03-10__root-stale__logs__svelte-check-post-phase19-22-chunk-017.md",
+          "rowCount": 3
+        },
+        {
+          "sourceRef": "archive/logs/sveltekit-frontend__reports__deep-audit__d9-shallow-dynamic-triage.md",
+          "basename": "sveltekit-frontend__reports__deep-audit__d9-shallow-dynamic-triage.md",
+          "graphifySourceRef": "sveltekit-frontend/docs/obsidian-vault/Files/sveltekit-frontend__reports__deep-audit__d9-shallow-dynamic-triage.md",
+          "rowCount": 3
+        },
+        {
+          "sourceRef": "claude-mem/cursor-hooks/readme.md",
+          "basename": "readme.md",
+          "graphifySourceRef": "docs/.okf/langextract/raw/readme.md",
+          "rowCount": 3
+        },
+        {
+          "sourceRef": "claude-mem/docker/claude-mem/build.sh",
+          "basename": "build.sh",
+          "graphifySourceRef": "simd-bridge/cpp/build.sh",
+          "rowCount": 3
+        },
         {
           "sourceRef": "claude-mem/plugin/.mcp.json",
           "basename": ".mcp.json",
@@ -731,404 +1143,442 @@
           "rowCount": 3
         },
         {
-          "sourceRef": "data/external-docs/normalized/drizzle/migrations.md",
-          "basename": "migrations.md",
-          "graphifySourceRef": "data/external-docs/raw/drizzle/migrations.md",
+          "sourceRef": "claude-mem/src/sdk/prompts.ts",
+          "basename": "prompts.ts",
+          "graphifySourceRef": "sveltekit-frontend/src/lib/ai/prompts.ts",
           "rowCount": 3
         },
         {
-          "sourceRef": ".github/copilot.md",
-          "basename": "copilot.md",
-          "graphifySourceRef": "copilot.md",
+          "sourceRef": "claude-mem/src/server/mcp/prompts.ts",
+          "basename": "prompts.ts",
+          "graphifySourceRef": "sveltekit-frontend/src/lib/ai/prompts.ts",
           "rowCount": 3
         },
         {
-          "sourceRef": "granite-docling-258m/config.json",
-          "basename": "config.json",
-          "graphifySourceRef": "docker/bifrost/config.json",
+          "sourceRef": "claude-mem/src/server/queue/redis-config.ts",
+          "basename": "redis-config.ts",
+          "graphifySourceRef": "sveltekit-frontend/src/lib/config/redis-config.ts",
           "rowCount": 3
         },
         {
-          "sourceRef": "karpathy-wiki/project/trace-runtime-split.md",
-          "basename": "trace-runtime-split.md",
-          "graphifySourceRef": "docs/architecture/trace-runtime-split.md",
+          "sourceRef": "claude-mem/src/services/sqlite/migrations/runner.ts",
+          "basename": "runner.ts",
+          "graphifySourceRef": "packages/parent-atlas/src/gates/runner.ts",
           "rowCount": 3
         },
         {
-          "sourceRef": "llama-cpp-turboquant-gemma4/gguf-py/tests/__init__.py",
-          "basename": "__init__.py",
-          "graphifySourceRef": ".parent-atlas/skills/claim-verifier/src/claim_verifier/__init__.py",
+          "sourceRef": "claude-mem/src/services/transcripts/state.ts",
+          "basename": "state.ts",
+          "graphifySourceRef": "sveltekit-frontend/scripts/phase104-backups/src/lib/types/state.ts",
           "rowCount": 3
         },
         {
-          "sourceRef": "llm/repo_root_map.md",
-          "basename": "repo_root_map.md",
-          "graphifySourceRef": "docs/codebase_atlas/repo_root_map.md",
+          "sourceRef": "claude-mem/src/services/worker/http/middleware.ts",
+          "basename": "middleware.ts",
+          "graphifySourceRef": "sveltekit-frontend/src/lib/server/error-brain/middleware.ts",
           "rowCount": 3
         },
         {
-          "sourceRef": "packages/parent-atlas/docs/atlas/engram-api-spec.md",
-          "basename": "engram-api-spec.md",
-          "graphifySourceRef": "docs/atlas/engram-api-spec.md",
+          "sourceRef": "claude-mem/src/services/worker/readme.md",
+          "basename": "readme.md",
+          "graphifySourceRef": "docs/.okf/langextract/raw/readme.md",
           "rowCount": 3
         },
         {
-          "sourceRef": "packages/parent-atlas/docs/atlas/gemma4-provider-cache-config.md",
-          "basename": "gemma4-provider-cache-config.md",
-          "graphifySourceRef": "docs/atlas/gemma4-provider-cache-config.md",
+          "sourceRef": "claude-mem/src/services/worker/retry.ts",
+          "basename": "retry.ts",
+          "graphifySourceRef": "sveltekit-frontend/src/lib/server/utils/retry.ts",
           "rowCount": 3
         },
         {
-          "sourceRef": "packages/parent-atlas/docs/atlas/native-gemm-deferral.md",
-          "basename": "native-gemm-deferral.md",
-          "graphifySourceRef": "docs/atlas/native-gemm-deferral.md",
-          "rowCount": 3
-        },
-        {
-          "sourceRef": "packages/parent-atlas/docs/atlas/parent-atlas-data-spine.md",
-          "basename": "parent-atlas-data-spine.md",
-          "graphifySourceRef": "docs/atlas/parent-atlas-data-spine.md",
-          "rowCount": 3
-        },
-        {
-          "sourceRef": "packages/parent-atlas/docs/atlas/parent-atlas-storage-decision.md",
-          "basename": "parent-atlas-storage-decision.md",
-          "graphifySourceRef": "docs/atlas/parent-atlas-storage-decision.md",
-          "rowCount": 3
-        },
-        {
-          "sourceRef": "packages/parent-atlas/docs/atlas/parent-atlas-table-of-contents.md",
-          "basename": "parent-atlas-table-of-contents.md",
-          "graphifySourceRef": "docs/atlas/parent-atlas-table-of-contents.md",
-          "rowCount": 3
-        },
-        {
-          "sourceRef": "packages/parent-atlas/docs/atlas/phase-20-training-readiness.md",
-          "basename": "phase-20-training-readiness.md",
-          "graphifySourceRef": "docs/atlas/phase-20-training-readiness.md",
-          "rowCount": 3
-        },
-        {
-          "sourceRef": "packages/parent-atlas/docs/atlas/phase-lanes.md",
-          "basename": "phase-lanes.md",
-          "graphifySourceRef": "docs/atlas/phase-lanes.md",
-          "rowCount": 3
-        },
-        {
-          "sourceRef": "packages/parent-atlas/docs/atlas/retrieval-outcome-ledger.md",
-          "basename": "retrieval-outcome-ledger.md",
-          "graphifySourceRef": "docs/atlas/retrieval-outcome-ledger.md",
-          "rowCount": 3
-        },
-        {
-          "sourceRef": "packages/parent-atlas/docs/atlas/xgboost-reranker-contract.md",
-          "basename": "xgboost-reranker-contract.md",
-          "graphifySourceRef": "docs/atlas/xgboost-reranker-contract.md",
-          "rowCount": 3
-        },
-        {
-          "sourceRef": ".python311/lib/python3.11/asyncio/__init__.py",
-          "basename": "__init__.py",
-          "graphifySourceRef": ".parent-atlas/skills/claim-verifier/src/claim_verifier/__init__.py",
-          "rowCount": 3
-        },
-        {
-          "sourceRef": ".python311/lib/python3.11/collections/__init__.py",
-          "basename": "__init__.py",
-          "graphifySourceRef": ".parent-atlas/skills/claim-verifier/src/claim_verifier/__init__.py",
-          "rowCount": 3
-        },
-        {
-          "sourceRef": ".python311/lib/python3.11/concurrent/futures/__init__.py",
-          "basename": "__init__.py",
-          "graphifySourceRef": ".parent-atlas/skills/claim-verifier/src/claim_verifier/__init__.py",
-          "rowCount": 3
-        },
-        {
-          "sourceRef": ".python311/lib/python3.11/ctypes/__init__.py",
-          "basename": "__init__.py",
-          "graphifySourceRef": ".parent-atlas/skills/claim-verifier/src/claim_verifier/__init__.py",
-          "rowCount": 3
-        },
-        {
-          "sourceRef": ".python311/lib/python3.11/curses/__init__.py",
-          "basename": "__init__.py",
-          "graphifySourceRef": ".parent-atlas/skills/claim-verifier/src/claim_verifier/__init__.py",
-          "rowCount": 3
-        },
-        {
-          "sourceRef": ".python311/lib/python3.11/dbm/__init__.py",
-          "basename": "__init__.py",
-          "graphifySourceRef": ".parent-atlas/skills/claim-verifier/src/claim_verifier/__init__.py",
-          "rowCount": 3
-        },
-        {
-          "sourceRef": ".python311/lib/python3.11/email/mime/__init__.py",
-          "basename": "__init__.py",
-          "graphifySourceRef": ".parent-atlas/skills/claim-verifier/src/claim_verifier/__init__.py",
-          "rowCount": 3
-        },
-        {
-          "sourceRef": ".python311/lib/python3.11/http/__init__.py",
-          "basename": "__init__.py",
-          "graphifySourceRef": ".parent-atlas/skills/claim-verifier/src/claim_verifier/__init__.py",
+          "sourceRef": "claude-mem/src/storage/postgres/pool.ts",
+          "basename": "pool.ts",
+          "graphifySourceRef": "sveltekit-frontend/src/lib/db/pool.ts",
           "rowCount": 3
         }
       ],
       "BASENAME_AMBIGUOUS": [
         {
-          "sourceRef": "llama-cpp-turboquant-gemma4/examples/gguf-hash/deps/rotate-bits/package.json",
-          "basename": "package.json",
+          "sourceRef": "ambient.d.ts",
+          "basename": "ambient.d.ts",
           "graphifySourceRefs": [
-            "crates/atlas_packet_parser/package.json",
-            "crates/turbovec-napi/package.json"
+            "sveltekit-frontend/ambient.d.ts",
+            "sveltekit-frontend/src/types/ambient.d.ts"
           ],
           "candidateCount": 2,
           "rowCount": 3
         },
         {
-          "sourceRef": "llama-cpp-turboquant-gemma4/gguf-py/pyproject.toml",
-          "basename": "pyproject.toml",
+          "sourceRef": "audit-proto-registry.mjs",
+          "basename": "audit-proto-registry.mjs",
           "graphifySourceRefs": [
-            ".parent-atlas/skills/claim-verifier/pyproject.toml",
-            ".parent-atlas/skills/file-repair/pyproject.toml"
+            "scripts/atlas/audit-proto-registry.mjs",
+            "sveltekit-frontend/audit-proto-registry.mjs"
           ],
           "candidateCount": 2,
           "rowCount": 3
         },
         {
-          "sourceRef": "llama-cpp-turboquant-gemma4/tools/server/public_legacy/index.js",
-          "basename": "index.js",
+          "sourceRef": "claude-mem/claude.md",
+          "basename": "claude.md",
           "graphifySourceRefs": [
-            "crates/atlas_packet_parser/index.js",
-            "crates/turbovec-napi/index.js"
+            "claude.md",
+            "llm/claude.md",
+            "sveltekit-frontend/claude.md",
+            "sveltekit-frontend/.github/claude.md"
           ],
-          "candidateCount": 2,
+          "candidateCount": 4,
           "rowCount": 3
         },
         {
-          "sourceRef": "llama-cpp-turboquant-gemma4/tools/server/webui/package.json",
-          "basename": "package.json",
+          "sourceRef": "claude-mem/openclaw/tsconfig.json",
+          "basename": "tsconfig.json",
           "graphifySourceRefs": [
-            "crates/atlas_packet_parser/package.json",
-            "crates/turbovec-napi/package.json"
+            "packages/atlas-core/tsconfig.json",
+            "packages/atlas-duckdb/tsconfig.json",
+            "packages/atlas-orchestrator/tsconfig.json",
+            "packages/parent-atlas-client/tsconfig.json",
+            "packages/parent-atlas-core/tsconfig.json",
+            "packages/parent-atlas-ingest/tsconfig.json",
+            "packages/parent-atlas-opencode/tsconfig.json",
+            "packages/parent-atlas-retrieval/tsconfig.json",
+            "packages/parent-atlas-runtime/tsconfig.json",
+            "packages/parent-atlas/tsconfig.json"
           ],
-          "candidateCount": 2,
+          "candidateCount": 16,
           "rowCount": 3
         },
         {
-          "sourceRef": ".okf/packets/index.md",
-          "basename": "index.md",
+          "sourceRef": "claude-mem/scripts/bug-report/cli.ts",
+          "basename": "cli.ts",
           "graphifySourceRefs": [
-            "docs/codebase_atlas/index.md",
-            ".okf/index.md"
-          ],
-          "candidateCount": 2,
-          "rowCount": 3
-        },
-        {
-          "sourceRef": "packages/atlas-core/package.json",
-          "basename": "package.json",
-          "graphifySourceRefs": [
-            "crates/atlas_packet_parser/package.json",
-            "crates/turbovec-napi/package.json"
-          ],
-          "candidateCount": 2,
-          "rowCount": 3
-        },
-        {
-          "sourceRef": "packages/atlas-core/src/packet/index.d.ts",
-          "basename": "index.d.ts",
-          "graphifySourceRefs": [
-            "crates/atlas_packet_parser/index.d.ts",
-            "crates/turbovec-napi/index.d.ts"
-          ],
-          "candidateCount": 2,
-          "rowCount": 3
-        },
-        {
-          "sourceRef": "packages/atlas-core/src/packet/index.js",
-          "basename": "index.js",
-          "graphifySourceRefs": [
-            "crates/atlas_packet_parser/index.js",
-            "crates/turbovec-napi/index.js"
-          ],
-          "candidateCount": 2,
-          "rowCount": 3
-        },
-        {
-          "sourceRef": "packages/atlas-core/src/types/index.d.ts",
-          "basename": "index.d.ts",
-          "graphifySourceRefs": [
-            "crates/atlas_packet_parser/index.d.ts",
-            "crates/turbovec-napi/index.d.ts"
-          ],
-          "candidateCount": 2,
-          "rowCount": 3
-        },
-        {
-          "sourceRef": "packages/atlas-core/src/types/index.js",
-          "basename": "index.js",
-          "graphifySourceRefs": [
-            "crates/atlas_packet_parser/index.js",
-            "crates/turbovec-napi/index.js"
-          ],
-          "candidateCount": 2,
-          "rowCount": 3
-        },
-        {
-          "sourceRef": "packages/parent-atlas-core/package.json",
-          "basename": "package.json",
-          "graphifySourceRefs": [
-            "crates/atlas_packet_parser/package.json",
-            "crates/turbovec-napi/package.json"
-          ],
-          "candidateCount": 2,
-          "rowCount": 3
-        },
-        {
-          "sourceRef": "packages/parent-atlas-ingest/package.json",
-          "basename": "package.json",
-          "graphifySourceRefs": [
-            "crates/atlas_packet_parser/package.json",
-            "crates/turbovec-napi/package.json"
-          ],
-          "candidateCount": 2,
-          "rowCount": 3
-        },
-        {
-          "sourceRef": "packages/parent-atlas-opencode/package.json",
-          "basename": "package.json",
-          "graphifySourceRefs": [
-            "crates/atlas_packet_parser/package.json",
-            "crates/turbovec-napi/package.json"
-          ],
-          "candidateCount": 2,
-          "rowCount": 3
-        },
-        {
-          "sourceRef": "packages/parent-atlas/package.json",
-          "basename": "package.json",
-          "graphifySourceRefs": [
-            "crates/atlas_packet_parser/package.json",
-            "crates/turbovec-napi/package.json"
-          ],
-          "candidateCount": 2,
-          "rowCount": 3
-        },
-        {
-          "sourceRef": "packages/parent-atlas-retrieval/package.json",
-          "basename": "package.json",
-          "graphifySourceRefs": [
-            "crates/atlas_packet_parser/package.json",
-            "crates/turbovec-napi/package.json"
-          ],
-          "candidateCount": 2,
-          "rowCount": 3
-        },
-        {
-          "sourceRef": "services/topology-gpu/app.py",
-          "basename": "app.py",
-          "graphifySourceRefs": [
-            "docker/docling-vlm/app.py",
-            "docker/image-synthesis/app.py",
-            "docker/langgraph-synthesis/app.py"
+            "packages/atlas-core/src/cli.ts",
+            "packages/parent-atlas/src/cli.ts",
+            "src/lib/server/retrieval/cli.ts"
           ],
           "candidateCount": 3,
           "rowCount": 3
         },
         {
-          "sourceRef": "simd-bridge/rust/graph-engine/index.js",
-          "basename": "index.js",
+          "sourceRef": "claude-mem/scripts/translate-readme/index.ts",
+          "basename": "index.ts",
           "graphifySourceRefs": [
-            "crates/atlas_packet_parser/index.js",
-            "crates/turbovec-napi/index.js"
+            "gsd_archives/phase-2f1-baseline/schema-backup/index.ts",
+            "packages/atlas-core/src/evidence/index.ts",
+            "packages/atlas-core/src/index.ts",
+            "packages/atlas-core/src/langgraph/index.ts",
+            "packages/atlas-core/src/packet/index.ts",
+            "packages/atlas-core/src/types/index.ts",
+            "packages/atlas-duckdb/src/index.ts",
+            "packages/parent-atlas-client/src/index.ts",
+            "packages/parent-atlas-core/src/index.ts",
+            "packages/parent-atlas-ingest/src/index.ts"
+          ],
+          "candidateCount": 106,
+          "rowCount": 3
+        },
+        {
+          "sourceRef": "claude-mem/src/cli/adapters/errors.ts",
+          "basename": "errors.ts",
+          "graphifySourceRefs": [
+            "packages/parent-atlas-client/src/errors.ts",
+            "sveltekit-frontend/src/lib/server/errors.ts"
           ],
           "candidateCount": 2,
           "rowCount": 3
         },
         {
-          "sourceRef": "simd-bridge/rust/graph-engine/package.json",
-          "basename": "package.json",
+          "sourceRef": "claude-mem/src/cli/handlers/index.ts",
+          "basename": "index.ts",
           "graphifySourceRefs": [
-            "crates/atlas_packet_parser/package.json",
-            "crates/turbovec-napi/package.json"
+            "gsd_archives/phase-2f1-baseline/schema-backup/index.ts",
+            "packages/atlas-core/src/evidence/index.ts",
+            "packages/atlas-core/src/index.ts",
+            "packages/atlas-core/src/langgraph/index.ts",
+            "packages/atlas-core/src/packet/index.ts",
+            "packages/atlas-core/src/types/index.ts",
+            "packages/atlas-duckdb/src/index.ts",
+            "packages/parent-atlas-client/src/index.ts",
+            "packages/parent-atlas-core/src/index.ts",
+            "packages/parent-atlas-ingest/src/index.ts"
           ],
-          "candidateCount": 2,
+          "candidateCount": 106,
           "rowCount": 3
         },
         {
-          "sourceRef": "simd-bridge/rust/graph-engine/src/lib.rs",
-          "basename": "lib.rs",
+          "sourceRef": "claude-mem/src/cli/types.ts",
+          "basename": "types.ts",
           "graphifySourceRefs": [
-            "crates/atlas_packet_parser/src/lib.rs",
-            "crates/omni-bridge/src/lib.rs",
-            "crates/turbovec-napi/src/lib.rs"
+            "packages/atlas-core/src/langgraph/types.ts",
+            "packages/parent-atlas-core/src/types.ts",
+            "packages/parent-atlas/src/gates/types.ts",
+            "scripts/error-resolution/types.ts",
+            "src/lib/server/retrieval/types.ts",
+            "sveltekit-frontend/scripts/phase104-backups/src/lib/components/ui/bits/types.ts",
+            "sveltekit-frontend/scripts/phase104-backups/src/lib/data/types.ts",
+            "sveltekit-frontend/scripts/phase104-backups/src/lib/error-brain/types.ts",
+            "sveltekit-frontend/scripts/phase104-backups/src/lib/llms/types.ts",
+            "sveltekit-frontend/scripts/phase104-backups/src/lib/server/ai/types.ts"
+          ],
+          "candidateCount": 33,
+          "rowCount": 3
+        },
+        {
+          "sourceRef": "claude-mem/src/core/schemas/auth.ts",
+          "basename": "auth.ts",
+          "graphifySourceRefs": [
+            "sveltekit-frontend/scripts/phase104-backups/src/lib/types/auth.ts",
+            "sveltekit-frontend/src/lib/schemas/auth.ts",
+            "sveltekit-frontend/src/lib/server/auth.ts"
           ],
           "candidateCount": 3,
           "rowCount": 3
         },
         {
-          "sourceRef": "simd-bridge/rust/hmm-repair/index.d.ts",
-          "basename": "index.d.ts",
+          "sourceRef": "claude-mem/src/core/schemas/session.ts",
+          "basename": "session.ts",
           "graphifySourceRefs": [
-            "crates/atlas_packet_parser/index.d.ts",
-            "crates/turbovec-napi/index.d.ts"
+            "sveltekit-frontend/src/lib/ai/e2b/session.ts",
+            "sveltekit-frontend/src/lib/ai/onnx/session.ts"
           ],
           "candidateCount": 2,
           "rowCount": 3
         },
         {
-          "sourceRef": "simd-bridge/rust/hmm-repair/index.js",
-          "basename": "index.js",
+          "sourceRef": "claude-mem/src/integrations/opencode-plugin/index.ts",
+          "basename": "index.ts",
           "graphifySourceRefs": [
-            "crates/atlas_packet_parser/index.js",
-            "crates/turbovec-napi/index.js"
+            "gsd_archives/phase-2f1-baseline/schema-backup/index.ts",
+            "packages/atlas-core/src/evidence/index.ts",
+            "packages/atlas-core/src/index.ts",
+            "packages/atlas-core/src/langgraph/index.ts",
+            "packages/atlas-core/src/packet/index.ts",
+            "packages/atlas-core/src/types/index.ts",
+            "packages/atlas-duckdb/src/index.ts",
+            "packages/parent-atlas-client/src/index.ts",
+            "packages/parent-atlas-core/src/index.ts",
+            "packages/parent-atlas-ingest/src/index.ts"
+          ],
+          "candidateCount": 106,
+          "rowCount": 3
+        },
+        {
+          "sourceRef": "claude-mem/src/npx-cli/index.ts",
+          "basename": "index.ts",
+          "graphifySourceRefs": [
+            "gsd_archives/phase-2f1-baseline/schema-backup/index.ts",
+            "packages/atlas-core/src/evidence/index.ts",
+            "packages/atlas-core/src/index.ts",
+            "packages/atlas-core/src/langgraph/index.ts",
+            "packages/atlas-core/src/packet/index.ts",
+            "packages/atlas-core/src/types/index.ts",
+            "packages/atlas-duckdb/src/index.ts",
+            "packages/parent-atlas-client/src/index.ts",
+            "packages/parent-atlas-core/src/index.ts",
+            "packages/parent-atlas-ingest/src/index.ts"
+          ],
+          "candidateCount": 106,
+          "rowCount": 3
+        },
+        {
+          "sourceRef": "claude-mem/src/sdk/parser.ts",
+          "basename": "parser.ts",
+          "graphifySourceRefs": [
+            "sveltekit-frontend/scripts/phase104-backups/src/lib/shared/types/parser.ts",
+            "sveltekit-frontend/src/lib/shared/types/parser.ts"
           ],
           "candidateCount": 2,
           "rowCount": 3
         },
         {
-          "sourceRef": "simd-bridge/rust/hmm-repair/package.json",
-          "basename": "package.json",
+          "sourceRef": "claude-mem/src/server/generation/providers/shared/types.ts",
+          "basename": "types.ts",
           "graphifySourceRefs": [
-            "crates/atlas_packet_parser/package.json",
-            "crates/turbovec-napi/package.json"
+            "packages/atlas-core/src/langgraph/types.ts",
+            "packages/parent-atlas-core/src/types.ts",
+            "packages/parent-atlas/src/gates/types.ts",
+            "scripts/error-resolution/types.ts",
+            "src/lib/server/retrieval/types.ts",
+            "sveltekit-frontend/scripts/phase104-backups/src/lib/components/ui/bits/types.ts",
+            "sveltekit-frontend/scripts/phase104-backups/src/lib/data/types.ts",
+            "sveltekit-frontend/scripts/phase104-backups/src/lib/error-brain/types.ts",
+            "sveltekit-frontend/scripts/phase104-backups/src/lib/llms/types.ts",
+            "sveltekit-frontend/scripts/phase104-backups/src/lib/server/ai/types.ts"
           ],
-          "candidateCount": 2,
+          "candidateCount": 33,
           "rowCount": 3
         },
         {
-          "sourceRef": "simd-bridge/rust/hmm-repair/src/lib.rs",
-          "basename": "lib.rs",
+          "sourceRef": "claude-mem/src/services/integrations/types.ts",
+          "basename": "types.ts",
           "graphifySourceRefs": [
-            "crates/atlas_packet_parser/src/lib.rs",
-            "crates/omni-bridge/src/lib.rs",
-            "crates/turbovec-napi/src/lib.rs"
+            "packages/atlas-core/src/langgraph/types.ts",
+            "packages/parent-atlas-core/src/types.ts",
+            "packages/parent-atlas/src/gates/types.ts",
+            "scripts/error-resolution/types.ts",
+            "src/lib/server/retrieval/types.ts",
+            "sveltekit-frontend/scripts/phase104-backups/src/lib/components/ui/bits/types.ts",
+            "sveltekit-frontend/scripts/phase104-backups/src/lib/data/types.ts",
+            "sveltekit-frontend/scripts/phase104-backups/src/lib/error-brain/types.ts",
+            "sveltekit-frontend/scripts/phase104-backups/src/lib/llms/types.ts",
+            "sveltekit-frontend/scripts/phase104-backups/src/lib/server/ai/types.ts"
+          ],
+          "candidateCount": 33,
+          "rowCount": 3
+        },
+        {
+          "sourceRef": "claude-mem/src/services/server/index.ts",
+          "basename": "index.ts",
+          "graphifySourceRefs": [
+            "gsd_archives/phase-2f1-baseline/schema-backup/index.ts",
+            "packages/atlas-core/src/evidence/index.ts",
+            "packages/atlas-core/src/index.ts",
+            "packages/atlas-core/src/langgraph/index.ts",
+            "packages/atlas-core/src/packet/index.ts",
+            "packages/atlas-core/src/types/index.ts",
+            "packages/atlas-duckdb/src/index.ts",
+            "packages/parent-atlas-client/src/index.ts",
+            "packages/parent-atlas-core/src/index.ts",
+            "packages/parent-atlas-ingest/src/index.ts"
+          ],
+          "candidateCount": 106,
+          "rowCount": 3
+        },
+        {
+          "sourceRef": "claude-mem/src/services/sqlite/sessions/types.ts",
+          "basename": "types.ts",
+          "graphifySourceRefs": [
+            "packages/atlas-core/src/langgraph/types.ts",
+            "packages/parent-atlas-core/src/types.ts",
+            "packages/parent-atlas/src/gates/types.ts",
+            "scripts/error-resolution/types.ts",
+            "src/lib/server/retrieval/types.ts",
+            "sveltekit-frontend/scripts/phase104-backups/src/lib/components/ui/bits/types.ts",
+            "sveltekit-frontend/scripts/phase104-backups/src/lib/data/types.ts",
+            "sveltekit-frontend/scripts/phase104-backups/src/lib/error-brain/types.ts",
+            "sveltekit-frontend/scripts/phase104-backups/src/lib/llms/types.ts",
+            "sveltekit-frontend/scripts/phase104-backups/src/lib/server/ai/types.ts"
+          ],
+          "candidateCount": 33,
+          "rowCount": 3
+        },
+        {
+          "sourceRef": "claude-mem/src/services/worker/agents/types.ts",
+          "basename": "types.ts",
+          "graphifySourceRefs": [
+            "packages/atlas-core/src/langgraph/types.ts",
+            "packages/parent-atlas-core/src/types.ts",
+            "packages/parent-atlas/src/gates/types.ts",
+            "scripts/error-resolution/types.ts",
+            "src/lib/server/retrieval/types.ts",
+            "sveltekit-frontend/scripts/phase104-backups/src/lib/components/ui/bits/types.ts",
+            "sveltekit-frontend/scripts/phase104-backups/src/lib/data/types.ts",
+            "sveltekit-frontend/scripts/phase104-backups/src/lib/error-brain/types.ts",
+            "sveltekit-frontend/scripts/phase104-backups/src/lib/llms/types.ts",
+            "sveltekit-frontend/scripts/phase104-backups/src/lib/server/ai/types.ts"
+          ],
+          "candidateCount": 33,
+          "rowCount": 3
+        },
+        {
+          "sourceRef": "claude-mem/src/services/worker/search/index.ts",
+          "basename": "index.ts",
+          "graphifySourceRefs": [
+            "gsd_archives/phase-2f1-baseline/schema-backup/index.ts",
+            "packages/atlas-core/src/evidence/index.ts",
+            "packages/atlas-core/src/index.ts",
+            "packages/atlas-core/src/langgraph/index.ts",
+            "packages/atlas-core/src/packet/index.ts",
+            "packages/atlas-core/src/types/index.ts",
+            "packages/atlas-duckdb/src/index.ts",
+            "packages/parent-atlas-client/src/index.ts",
+            "packages/parent-atlas-core/src/index.ts",
+            "packages/parent-atlas-ingest/src/index.ts"
+          ],
+          "candidateCount": 106,
+          "rowCount": 3
+        },
+        {
+          "sourceRef": "claude-mem/src/storage/postgres/index.ts",
+          "basename": "index.ts",
+          "graphifySourceRefs": [
+            "gsd_archives/phase-2f1-baseline/schema-backup/index.ts",
+            "packages/atlas-core/src/evidence/index.ts",
+            "packages/atlas-core/src/index.ts",
+            "packages/atlas-core/src/langgraph/index.ts",
+            "packages/atlas-core/src/packet/index.ts",
+            "packages/atlas-core/src/types/index.ts",
+            "packages/atlas-duckdb/src/index.ts",
+            "packages/parent-atlas-client/src/index.ts",
+            "packages/parent-atlas-core/src/index.ts",
+            "packages/parent-atlas-ingest/src/index.ts"
+          ],
+          "candidateCount": 106,
+          "rowCount": 3
+        },
+        {
+          "sourceRef": "claude-mem/src/storage/postgres/schema.ts",
+          "basename": "schema.ts",
+          "graphifySourceRefs": [
+            "drizzle/schema.ts",
+            "src/lib/server/db/schema.ts",
+            "sveltekit-frontend/drizzle/introspected/schema.ts",
+            "sveltekit-frontend/drizzle/schema.ts",
+            "sveltekit-frontend/src/lib/db/schema.ts",
+            "sveltekit-frontend/src/lib/server/agents-md/schema.ts",
+            "sveltekit-frontend/src/lib/server/db/schema.ts",
+            "sveltekit-frontend/src/routes/(app)/analysis-center/schema.ts",
+            "sveltekit-frontend/src/routes/(app)/cases/new/schema.ts",
+            "sveltekit-frontend/src/routes/(app)/cases/schema.ts"
+          ],
+          "candidateCount": 13,
+          "rowCount": 3
+        },
+        {
+          "sourceRef": "claude-mem/src/storage/sqlite/auth.ts",
+          "basename": "auth.ts",
+          "graphifySourceRefs": [
+            "sveltekit-frontend/scripts/phase104-backups/src/lib/types/auth.ts",
+            "sveltekit-frontend/src/lib/schemas/auth.ts",
+            "sveltekit-frontend/src/lib/server/auth.ts"
           ],
           "candidateCount": 3,
           "rowCount": 3
         },
         {
-          "sourceRef": "simd-bridge/rust-simdjson/build.rs",
-          "basename": "build.rs",
+          "sourceRef": "claude-mem/src/storage/sqlite/index.ts",
+          "basename": "index.ts",
           "graphifySourceRefs": [
-            "crates/atlas_packet_parser/build.rs",
-            "crates/omni-bridge/build.rs",
-            "crates/turbovec-napi/build.rs"
+            "gsd_archives/phase-2f1-baseline/schema-backup/index.ts",
+            "packages/atlas-core/src/evidence/index.ts",
+            "packages/atlas-core/src/index.ts",
+            "packages/atlas-core/src/langgraph/index.ts",
+            "packages/atlas-core/src/packet/index.ts",
+            "packages/atlas-core/src/types/index.ts",
+            "packages/atlas-duckdb/src/index.ts",
+            "packages/parent-atlas-client/src/index.ts",
+            "packages/parent-atlas-core/src/index.ts",
+            "packages/parent-atlas-ingest/src/index.ts"
           ],
-          "candidateCount": 3,
+          "candidateCount": 106,
           "rowCount": 3
         },
         {
-          "sourceRef": "simd-bridge/rust-simdjson/src/lib.rs",
-          "basename": "lib.rs",
+          "sourceRef": "claude-mem/src/storage/sqlite/schema.ts",
+          "basename": "schema.ts",
           "graphifySourceRefs": [
-            "crates/atlas_packet_parser/src/lib.rs",
-            "crates/omni-bridge/src/lib.rs",
-            "crates/turbovec-napi/src/lib.rs"
+            "drizzle/schema.ts",
+            "src/lib/server/db/schema.ts",
+            "sveltekit-frontend/drizzle/introspected/schema.ts",
+            "sveltekit-frontend/drizzle/schema.ts",
+            "sveltekit-frontend/src/lib/db/schema.ts",
+            "sveltekit-frontend/src/lib/server/agents-md/schema.ts",
+            "sveltekit-frontend/src/lib/server/db/schema.ts",
+            "sveltekit-frontend/src/routes/(app)/analysis-center/schema.ts",
+            "sveltekit-frontend/src/routes/(app)/cases/new/schema.ts",
+            "sveltekit-frontend/src/routes/(app)/cases/schema.ts"
           ],
-          "candidateCount": 3,
+          "candidateCount": 13,
           "rowCount": 3
         }
       ],
@@ -1244,11 +1694,6 @@
           "rowCount": 3
         },
         {
-          "sourceRef": "add_kb_tools.cjs",
-          "normalizedSourceRef": "add_kb_tools.cjs",
-          "rowCount": 3
-        },
-        {
           "sourceRef": "agents-complete-status-2026-06-13.txt",
           "normalizedSourceRef": "agents-complete-status-2026-06-13.txt",
           "rowCount": 3
@@ -1257,11 +1702,26 @@
           "sourceRef": "agents.md",
           "normalizedSourceRef": "agents.md",
           "rowCount": 3
+        },
+        {
+          "sourceRef": "agents.md.bak",
+          "normalizedSourceRef": "agents.md.bak",
+          "rowCount": 6
         }
       ]
     }
   },
   "packetChunkGraphifyBridgeSamples": [
+    {
+      "packet_key": "packet:043fc2302d50",
+      "packet_ref": "packages/parent-atlas/src/gates/types.ts",
+      "chunk_ref": "packages/parent-atlas/src/gates/types.ts"
+    },
+    {
+      "packet_key": "packet:04ea324d6539",
+      "packet_ref": "simd-bridge/cpp/build-x64-cuda-cublas/CMakeFiles/CheckCUDA/CMakeFiles/InstallScripts.json",
+      "chunk_ref": "simd-bridge/cpp/build-x64-cuda-cublas/CMakeFiles/CheckCUDA/CMakeFiles/InstallScripts.json"
+    },
     {
       "packet_key": "packet:08007d10d8a0",
       "packet_ref": "docs/graph/repo-workspace-map.md",
@@ -1276,6 +1736,31 @@
       "packet_key": "packet:087220309988",
       "packet_ref": "docs/graph/batch-gpu-analysis-report.json",
       "chunk_ref": "docs/graph/batch-gpu-analysis-report.json"
+    },
+    {
+      "packet_key": "packet:09aa86c58386",
+      "packet_ref": "simd-bridge/cpp/build-x64-cuda-cuvs/CMakeFiles/InstallScripts.json",
+      "chunk_ref": "simd-bridge/cpp/build-x64-cuda-cuvs/CMakeFiles/InstallScripts.json"
+    },
+    {
+      "packet_key": "packet:0c91f688b736",
+      "packet_ref": "simd-bridge/cpp/build-x64-cuda-cuvs/CMakeFiles/CheckCUDA/CMakeFiles/InstallScripts.json",
+      "chunk_ref": "simd-bridge/cpp/build-x64-cuda-cuvs/CMakeFiles/CheckCUDA/CMakeFiles/InstallScripts.json"
+    },
+    {
+      "packet_key": "packet:0d8b345ee26f",
+      "packet_ref": "simd-bridge/cpp/build-verify-2026-05-31T08-06-57-567Z/CMakeFiles/InstallScripts.json",
+      "chunk_ref": "simd-bridge/cpp/build-verify-2026-05-31T08-06-57-567Z/CMakeFiles/InstallScripts.json"
+    },
+    {
+      "packet_key": "packet:0eea0e43bc80",
+      "packet_ref": "simd-bridge/cpp/build-x64-cuda-cuvs/detect_cuda_version.cc",
+      "chunk_ref": "simd-bridge/cpp/build-x64-cuda-cuvs/detect_cuda_version.cc"
+    },
+    {
+      "packet_key": "packet:114688b1f748",
+      "packet_ref": "simd-bridge/cpp/build-x64-fallback/CMakeFiles/InstallScripts.json",
+      "chunk_ref": "simd-bridge/cpp/build-x64-fallback/CMakeFiles/InstallScripts.json"
     },
     {
       "packet_key": "packet:196138c47be8",
@@ -1303,14 +1788,29 @@
       "chunk_ref": "docs/mcp_tool_update_notice.md"
     },
     {
+      "packet_key": "packet:243abb46cc0c",
+      "packet_ref": "simd-bridge/cpp/test_lstm.cpp",
+      "chunk_ref": "simd-bridge/cpp/test_lstm.cpp"
+    },
+    {
       "packet_key": "packet:25ac9148f9bf",
       "packet_ref": "crates/atlas_packet_parser/package.json",
       "chunk_ref": "crates/atlas_packet_parser/package.json"
     },
     {
+      "packet_key": "packet:26bf866ea977",
+      "packet_ref": "simd-bridge/rust/hmm-repair/Cargo.toml",
+      "chunk_ref": "simd-bridge/rust/hmm-repair/Cargo.toml"
+    },
+    {
       "packet_key": "packet:26c4544210c7",
       "packet_ref": "docs/graph/karpathy-synthesis-scale-report.json",
       "chunk_ref": "docs/graph/karpathy-synthesis-scale-report.json"
+    },
+    {
+      "packet_key": "packet:27d893fefcd5",
+      "packet_ref": "simd-bridge/rust-simdjson/Cargo.toml",
+      "chunk_ref": "simd-bridge/rust-simdjson/Cargo.toml"
     },
     {
       "packet_key": "packet:2813f4c5f0ad",
@@ -1336,56 +1836,6 @@
       "packet_key": "packet:4212b46a7842",
       "packet_ref": "docs/graph/repo-engram-memory-report.md",
       "chunk_ref": "docs/graph/repo-engram-memory-report.md"
-    },
-    {
-      "packet_key": "packet:547e1c54b3a0",
-      "packet_ref": "docs/architecture/neo4j-graphrag-parent-atlas.md",
-      "chunk_ref": "docs/architecture/neo4j-graphrag-parent-atlas.md"
-    },
-    {
-      "packet_key": "packet:5c7079139076",
-      "packet_ref": "docs/phase100/feature-graph-cycles.json",
-      "chunk_ref": "docs/phase100/feature-graph-cycles.json"
-    },
-    {
-      "packet_key": "packet:64838394f8dc",
-      "packet_ref": "docs/architecture/couchdb-mapreduce-atlas-ingestion.md",
-      "chunk_ref": "docs/architecture/couchdb-mapreduce-atlas-ingestion.md"
-    },
-    {
-      "packet_key": "packet:64b8a0ed69b3",
-      "packet_ref": "crates/omni-bridge/build.rs",
-      "chunk_ref": "crates/omni-bridge/build.rs"
-    },
-    {
-      "packet_key": "packet:69de6f3a524e",
-      "packet_ref": "docs/graph/repo-env-map.md",
-      "chunk_ref": "docs/graph/repo-env-map.md"
-    },
-    {
-      "packet_key": "packet:6bd874a60226",
-      "packet_ref": "crates/turbovec-napi/wrapper.js",
-      "chunk_ref": "crates/turbovec-napi/wrapper.js"
-    },
-    {
-      "packet_key": "packet:79d6651669c5",
-      "packet_ref": "docs/codebase_atlas/feature_map.md",
-      "chunk_ref": "docs/codebase_atlas/feature_map.md"
-    },
-    {
-      "packet_key": "packet:7c61a052540c",
-      "packet_ref": "docs/atlas/cluster-cards.json",
-      "chunk_ref": "docs/atlas/cluster-cards.json"
-    },
-    {
-      "packet_key": "packet:810aee5c353d",
-      "packet_ref": "docs/codebase_atlas/repo_root_map.md",
-      "chunk_ref": "docs/codebase_atlas/repo_root_map.md"
-    },
-    {
-      "packet_key": "packet:83178ba18c48",
-      "packet_ref": "docs/graph/repo-language-map.json",
-      "chunk_ref": "docs/graph/repo-language-map.json"
     }
   ],
   "nextGate": "DESIGN_CANONICAL_SOURCE_REF_BRIDGE"

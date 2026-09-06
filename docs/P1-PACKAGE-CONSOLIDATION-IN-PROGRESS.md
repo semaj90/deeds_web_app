@@ -1,5 +1,10 @@
 # P1 Package Consolidation — In Progress
 
+> **Doc review (2026-09-04):** CURRENT — still the live phase-tracking doc per CLAUDE.md's "CURRENT
+> MILESTONE: Parent Atlas Library Consolidation" section, though CLAUDE.md's package map now lists
+> more packages (`atlas-core`, `parent-atlas-core`/`-ingest`/`-retrieval`/`-opencode`) than this doc
+> enumerates — treat CLAUDE.md's package map as the fuller picture.
+
 **Date**: June 15, 2026 (Session 66 continuation)  
 **Status**: 🚀 REFACTORING FROM LOOSE SCRIPTS TO MONOREPO PACKAGES  
 **Objective**: Consolidate P1 verification scripts into `packages/parent-atlas` to enable a reusable repo-ingestion library model

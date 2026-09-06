@@ -1,5 +1,11 @@
 # Unified Retrieval + Summarization Pipeline
 
+> **Doc review (2026-09-04):** STALE_BUT_DIRECTIONALLY_RIGHT — pipeline shape and named files
+> (`unified-orchestrator.ts`, `/api/retrieval/unified/+server.ts`) still live, matching CLAUDE.md's
+> current description; Stage 6's Gemma4 model identity is outdated — runtime is now Ornith 1.5 9B
+> on llama-server :8090 (CLAUDE.md 2026-09-03 entry), and the API response shape has since changed
+> (see CLAUDE.md's own note that `/api/retrieval/unified` now 307-redirects to `search-unified`).
+
 **Status**: ✅ **VALIDATED END-TO-END** (6/6 stages PASS)
 **Total Pipeline Time**: ~25 seconds (mostly embedding + Gemma4, not bottleneck)
 **Command**: `npm run retrieval:unified:validate`

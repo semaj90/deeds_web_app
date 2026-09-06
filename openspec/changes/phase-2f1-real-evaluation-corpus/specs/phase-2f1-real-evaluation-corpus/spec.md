@@ -1,0 +1,14 @@
+# Phase 2F.1: Real Evaluation Corpus for Multi-Signal Retrieval
+
+## ADDED Requirements
+
+### Requirement: Phase 2f1 Real Evaluation Corpus stays evidence-bound and non-destructive
+The system MUST keep phase 2f1 real evaluation corpus actions identity-qualified, non-destructive, and traceable to real evidence rather than assumed or fabricated state.
+
+#### Scenario: An action under this proposal is planned or executed
+- **WHEN** a component covered by this proposal runs
+- **THEN** it records real evidence (source, revision, or receipt) for what it did, and never silently promotes unproven state to canonical/production status.
+
+#### Scenario: Evidence is missing or unproven
+- **WHEN** the required upstream evidence, gate, or dependency is absent or not yet proven
+- **THEN** the component fails closed (skips, blocks, or flags) rather than fabricating a result.

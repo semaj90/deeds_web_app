@@ -1,0 +1,81 @@
+{
+  "gate": "DOC-10-MULTITURN-FIX-01",
+  "status": "DRY_RUN_PROVEN",
+  "executedAt": "2026-09-04T20:58:31Z",
+  "supersedesFixtureResultIn": "docs/reports/parent-atlas/doc-10-12-live-contract-v1.json",
+  "rootCause": {
+    "summary": "LangExtract's QAPromptGenerator flattens prompt_description + all few-shot ExampleData into one literal 'Examples\\nQ: ...\\nA: {...}\\n\\nQ: <target>\\nA: ' user message with a generic system prompt. ornith-1.5-9b deterministically returns {\"extractions\": []} for that shape regardless of schema, example quality, or token budget.",
+    "isolationMethod": "Monkeypatched OpenAILanguageModel._process_single_prompt in-process inside the live miniforge-nlp-sidecar container to print the actual outgoing api_params and raw completion text; compared against a hand-built real multi-turn request (system + per-example user/assistant + final user) against the same endpoint/schema/seed/temperature, which succeeded.",
+    "ruledOut": [
+      "JSON schema malformation",
+      "token budget (max_tokens/max_output_tokens)",
+      "use_schema_constraints / output_schema top-level wiring",
+      "example quality or count"
+    ]
+  },
+  "bugsFixedAlongTheWay": [
+    {
+      "id": "max_output_tokens_key_mismatch",
+      "file": "python/miniforge_nlp_sidecar_v2.py",
+      "detail": "provider_kwargs['max_tokens'] was silently ignored; OpenAILanguageModel._build_chat_completions_params() reads config['max_output_tokens']. Renamed at both call sites."
+    },
+    {
+      "id": "missing_json_import",
+      "file": "python/miniforge_nlp_sidecar_v2.py",
+      "detail": "POST /extract/documentation-facts 500'd with NameError: name 'json' is not defined at response construction (json.dumps inside outputHash). Added 'import json'."
+    },
+    {
+      "id": "missing_openai_schema_import_in_concept_path",
+      "file": "python/miniforge_nlp_sidecar_v2.py",
+      "detail": "_native_grounded_extractions() was missing 'from langextract.providers.schemas.openai import OpenAISchema' (present in its sibling _native_documentation_facts()), causing a live NameError. Restored."
+    }
+  ],
+  "fix": {
+    "approach": "Monkeypatch (option 1 of two documented alternatives)",
+    "files": [
+      "python/miniforge_nlp_sidecar.py",
+      "python/miniforge_nlp_sidecar_v2.py"
+    ],
+    "mechanism": "_ensure_grounded_provider_controls()'s existing build_params patch now also rebuilds real multi-turn `messages` when a module-global _grounded_extraction_context is set (_set_grounded_extraction_context/_clear_grounded_extraction_context, single-flight, matching this module's existing global-state convention at max_workers=1). _restructure_as_multiturn() deterministically recovers the target question from LangExtract's own flattened prompt text and falls back to the original flattened prompt (returns None) if it can't -- never guesses.",
+    "sharedBlastRadius": "Affects both the pre-existing CONCEPT extraction path (_native_grounded_extractions, used beyond this proposal) and the new DocumentationFactV1 path (_native_documentation_facts) -- flagged before implementing per operator instruction to proceed."
+  },
+  "liveVerification": {
+    "containerRestarted": true,
+    "healthy": true,
+    "existingTestSuitePassed": "6/6 (test_miniforge_nlp_sidecar_v2_bytes.py, test_miniforge_nlp_sidecar_v2_declarator_kind.py, test_miniforge_nlp_sidecar_v2_multiline_crlf.py)",
+    "conceptPath": {
+      "route": "POST /extract (grounded_extraction_required=true)",
+      "input": "This module uses PostgreSQL for persistence and Redis for caching.",
+      "field": "metadata.grounded_extractions",
+      "result": [
+        {"extraction_text": "PostgreSQL", "attributes": {"concept_id": "DATABASE"}, "alignment_status": "match_exact"},
+        {"extraction_text": "Redis", "attributes": {"concept_id": "CACHE"}, "alignment_status": "match_exact"}
+      ]
+    },
+    "documentationFactPath": [
+      {
+        "input": "CUDA Tile IR requires sm_86 or later architecture. Tile IR is deprecated on Kepler-generation GPUs.",
+        "factCount": 2,
+        "allExactMatch": true
+      },
+      {
+        "input": "PyTorch 2.13 removed CUDA 12.8 support. The Redis client requires TLS in production. Batch size must not exceed 128 on 8GB GPUs.",
+        "factCount": 3,
+        "allExactMatch": true,
+        "note": "Novel fixture not used during debugging -- confirms the fix is not overfit to the one debug fixture."
+      }
+    ]
+  },
+  "retraction": {
+    "claim": "An earlier note in this same investigation session claimed CONCEPT extraction was also currently broken (metadata.grounded_extraction_used=false / structure.concepts=[]).",
+    "correction": "structure.concepts is populated by an unrelated code path (_code_concepts()/entity-text list in miniforge_nlp_sidecar.py ~line 2370), never by LangExtract's grounded output. Grounded results were always in metadata.grounded_extractions, which was not checked in that pass. This was a testing mistake, not a real regression."
+  },
+  "statusByTask": {
+    "DOC-10": "DRY_RUN_PROVEN",
+    "DOC-12": "IMPLEMENTED_UNPROVEN",
+    "DOC-11": "PROVEN"
+  },
+  "doc12OpenWork": "apiRules was empty in every test above because no fixture used was API-symbol-shaped (function signature / parameter constraint text). The multi-turn fix applies to the same extraction machinery DOC-12 uses, but DOC-12's own non-empty-output proof is unverified, not assumed.",
+  "writesPerformed": false,
+  "datastoreWritesPerformed": false
+}

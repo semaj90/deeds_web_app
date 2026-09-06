@@ -1,6 +1,6 @@
 {
   "schema": "atlas.agents-coverage-audit.v1",
-  "generatedAt": "2026-09-01T20:23:01.075Z",
+  "generatedAt": "2026-09-05T15:43:47.634Z",
   "readOnly": true,
   "resolution": "nearest-parent-AGENTS.md",
   "instructionFiles": [
@@ -14,18 +14,18 @@
     "tools/agentic-research/src/firecrawl/AGENTS.md"
   ],
   "coverage": {
-    "totalVisibleFiles": 26289,
-    "coveredFiles": 26289,
+    "totalVisibleFiles": 27032,
+    "coveredFiles": 27032,
     "uncoveredFiles": 0,
     "percentage": 100
   },
   "assignmentCounts": {
-    "AGENTS.md": 9611,
-    "sveltekit-frontend/AGENTS.md": 14276,
-    "sveltekit-frontend/scripts/AGENTS.md": 2277,
+    "AGENTS.md": 10245,
+    "sveltekit-frontend/AGENTS.md": 14365,
+    "sveltekit-frontend/scripts/AGENTS.md": 2296,
     "sveltekit-frontend/src/lib/server/graph/AGENTS.md": 76,
-    "sveltekit-frontend/src/mcp/AGENTS.md": 49
+    "sveltekit-frontend/src/mcp/AGENTS.md": 50
   },
   "uncoveredFiles": [],
-  "checksum": "sha256:1e13b7abc8c625d7cc8032be20ff32480d8c91dc959aa6228da11be2665896f7"
+  "checksum": "sha256:3fe6d7f3f68998f2cd8b600f5b3e5e5e29e1193e78c5e87dcf139b51eab9b8c0"
 }

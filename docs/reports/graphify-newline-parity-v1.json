@@ -1,0 +1,30 @@
+{
+  "schema": "atlas.graphify-newline-parity.v1",
+  "sidecarUrl": "http://127.0.0.1:8095",
+  "provider": "treesitter-chunker-8095",
+  "status": "PARITY_RESULT_REQUIRES_REVIEW",
+  "results": [
+    {
+      "id": "without-terminal-newline",
+      "httpStatus": 200,
+      "sourceRevision": "sha256:72342340ea6ddc123e4d372bacfeec657f7fc3f6cfc8e88333eb4d31a85f668c",
+      "syntaxStatus": "CLEAN",
+      "diagnosticCount": 0,
+      "diagnostics": [],
+      "chunkCount": 1
+    },
+    {
+      "id": "with-terminal-newline",
+      "httpStatus": 200,
+      "sourceRevision": "sha256:8691f74ea796569734dafffbbcb79088362b52c3cef154aa0d8f32696d2d4737",
+      "syntaxStatus": "CLEAN",
+      "diagnosticCount": 0,
+      "diagnostics": [],
+      "chunkCount": 1
+    }
+  ],
+  "readOnly": true,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "nextGate": "GRAPHIFY-STRUCTURAL-PARSER-NEWLINE-PARITY-01"
+}

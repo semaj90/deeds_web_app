@@ -13,9 +13,8 @@ import {
   type ToolResult
 } from '../registry.js';
 import { ENV } from '$lib/server/env.server.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { resolveLlamaInferenceTarget } from '$lib/server/llm/runtime-contract.js';
 
-const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 const QDRANT_URL = ENV.QDRANT_URL;
 const PHASE72_PYTHON = process.env?.PHASE72_PYTHON ?? 'python';
 
@@ -39,23 +38,24 @@ async function fetchVectors(collection: string, limit: number): Promise<Array<{
   return data.result.points;
 }
 
-async function generateClusterSummary(clusterPoints: string[], model: string): Promise<string> {
+async function generateClusterSummary(clusterPoints: string[], _requestedModel: string): Promise<string> {
   try {
-    const response = await ollamaFetch(`${OLLAMA_URL}/api/generate`, {
+    const target = await resolveLlamaInferenceTarget();
+    const response = await fetch(`${target.baseUrl}/v1/chat/completions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	model,
-        prompt: `Summarize this cluster of ${clusterPoints.length} error points. Generate a concise 1-2 sentence summary.`,
+        model: target.model,
+        messages: [{ role: 'user', content: `Summarize this cluster of ${clusterPoints.length} error points. Generate a concise 1-2 sentence summary.` }],
         stream: false,
-        options: {
-	temperature: 0.3 }
+        temperature: 0.3,
+        max_tokens: 100
       })
     });
 
     if (response.ok) {
-      const data = await response.json() as { response: string };
-      return data.response;
+      const data = await response.json() as { choices?: Array<{ message?: { content?: string } }> };
+      return data.choices?.[0]?.message?.content ?? '';
     }
   } catch {
     // Fallback
@@ -102,7 +102,7 @@ async function clusterTagHandler(request: ClusterTagRequest): Promise<ToolResult
     if (request.tag_config?.generate_summaries) {
       summary = await generateClusterSummary(
         clusterPoints.map(p => String(p.id)),
-        request.tag_config.model ?? 'gemma4-rotorquant:latest'
+        request.tag_config.model ?? 'ornith-1.5-9b'
       );
     }
 

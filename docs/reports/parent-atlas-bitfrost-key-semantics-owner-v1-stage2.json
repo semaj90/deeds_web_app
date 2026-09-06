@@ -1,0 +1,40 @@
+{
+  "gate": "BIFROST-KEY-SEMANTICS-OWNER-01",
+  "stage": 2,
+  "status": "STAGE_2_PROOF_PASSED",
+  "executedAt": "2026-09-04T22:01:51.157Z",
+  "summary": "bifrost:sem:packet:* (packetKey) and bifrost:sem:query:* (query_hash) confirmed genuinely distinct after migrating warm-bifrost-semantic-cache.mjs + query-router.ts off the collided prefix. invalidateBitfrostPacket() confirmed scoped to identity A only -- does not touch identity B.",
+  "filesChanged": [
+    "sveltekit-frontend/src/lib/server/cache-keys.ts (added bifrostKey.semantic.query, .sourceRef)",
+    "scripts/cache/warm-bifrost-semantic-cache.mjs (writer: bifrost:sem:packet:{query_hash} -> bifrost:sem:query:{query_hash})",
+    "sveltekit-frontend/src/lib/server/ace/query-router.ts (reader: bifrostKey.semantic.packet(queryHash) -> bifrostKey.semantic.query(queryHash), 2 call sites)"
+  ],
+  "knownUnrelatedPreExistingIssue": {
+    "file": "sveltekit-frontend/src/lib/server/ace/query-router.ts",
+    "issue": "imports bifrostRetrievalCacheKeyV2 from cache-keys.js, which has never been exported there (confirmed via `git show HEAD:...cache-keys.ts` -- zero matches). Pre-existing, not introduced by this change. Not fixed here (out of this gate's scope)."
+  },
+  "backwardCompatibilityNote": "Old bifrost:sem:packet:{query_hash} entries written before this fix are NOT read by the new code (reading them would perpetuate the identity ambiguity this migration removes). They expire naturally under their original 3600s TTL; query-router.ts cache-misses and falls through to the next retrieval lane in the meantime -- fail-open, not fail-closed.",
+  "liveProof": {
+    "namespaces_distinct": {
+      "ok": true,
+      "packetKeyKey": "bifrost:sem:packet:packet:test-bifrost-key-semantics-stage2",
+      "queryKeyKey": "bifrost:sem:query:queryhash-test-bifrost-key-semantics-stage2"
+    },
+    "both_seeded": {
+      "ok": true,
+      "packetExists": 1,
+      "queryExists": 1
+    },
+    "invalidation_scoped_to_identity_a": {
+      "ok": true,
+      "packetGone": 0,
+      "queryStillThere": 1
+    }
+  },
+  "postgresWrites": false,
+  "valkeyWrites": true,
+  "qdrantWrites": false,
+  "neo4jWrites": false,
+  "modelCalls": false,
+  "note": "valkeyWrites:true bounded to disposable synthetic test keys only."
+}

@@ -1,0 +1,77 @@
+{
+  "schema": "atlas.graphify-completed-differential-replay.v1",
+  "status": "COMPLETED_ONLY_SELECTION_AVAILABLE",
+  "plan": "docs/reports/fresh-origin-bounded-cohort-plan-v1.json",
+  "originWorkspaceRevision": "sha256:9302fdc4b778d0db2d31a2e2e42f68d907335c72fc78320fdf62f756ea07f8f8",
+  "counts": {
+    "proposed": 5,
+    "observedRefs": 5,
+    "completedAvailable": 5,
+    "selectionChanged": 0
+  },
+  "selectedRunIdsChecksum": "sha256:abca9c4d11f17cb67733fec39319b82666463f6e1b96a0722c1d5ee0108ec7fc",
+  "selections": [
+    {
+      "sourceRef": "sveltekit-frontend/docs/design/2026-05-11_agents-directory-card-regen.md",
+      "candidateCount": 1,
+      "oldHashOrderedRunId": "369e4270-7689-4536-8816-4ec4a5517b3e",
+      "oldHashOrderedStatus": "COMPLETED",
+      "newCompletedRunId": "369e4270-7689-4536-8816-4ec4a5517b3e",
+      "newCompletedStatus": "COMPLETED",
+      "selectionChanged": false,
+      "completedAvailable": true
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/ToolInvoker.ts",
+      "candidateCount": 1,
+      "oldHashOrderedRunId": "369e4270-7689-4536-8816-4ec4a5517b3e",
+      "oldHashOrderedStatus": "COMPLETED",
+      "newCompletedRunId": "369e4270-7689-4536-8816-4ec4a5517b3e",
+      "newCompletedStatus": "COMPLETED",
+      "selectionChanged": false,
+      "completedAvailable": true
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/routes/(app)/admin/cache/+page.server.ts",
+      "candidateCount": 1,
+      "oldHashOrderedRunId": "369e4270-7689-4536-8816-4ec4a5517b3e",
+      "oldHashOrderedStatus": "COMPLETED",
+      "newCompletedRunId": "369e4270-7689-4536-8816-4ec4a5517b3e",
+      "newCompletedStatus": "COMPLETED",
+      "selectionChanged": false,
+      "completedAvailable": true
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/routes/(app)/admin/codebase-index/+page.ts",
+      "candidateCount": 1,
+      "oldHashOrderedRunId": "369e4270-7689-4536-8816-4ec4a5517b3e",
+      "oldHashOrderedStatus": "COMPLETED",
+      "newCompletedRunId": "369e4270-7689-4536-8816-4ec4a5517b3e",
+      "newCompletedStatus": "COMPLETED",
+      "selectionChanged": false,
+      "completedAvailable": true
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/routes/(app)/cases/[id]/chat/+page.server.ts",
+      "candidateCount": 1,
+      "oldHashOrderedRunId": "369e4270-7689-4536-8816-4ec4a5517b3e",
+      "oldHashOrderedStatus": "COMPLETED",
+      "newCompletedRunId": "369e4270-7689-4536-8816-4ec4a5517b3e",
+      "newCompletedStatus": "COMPLETED",
+      "selectionChanged": false,
+      "completedAvailable": true
+    }
+  ],
+  "databaseError": null,
+  "readOnly": true,
+  "authorization": false,
+  "writes": {
+    "postgres": false,
+    "graphify": false,
+    "qdrant": false,
+    "neo4j": false,
+    "cache": false,
+    "modelCalls": false
+  },
+  "nextGate": "PKT_LINEAGE_08_READ_ONLY_REPLAY_WITH_EXPLICIT_CURRENT_SOURCE_INPUT"
+}

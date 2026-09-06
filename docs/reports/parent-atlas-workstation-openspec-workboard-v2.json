@@ -1,0 +1,2168 @@
+{
+  "schema": "atlas.parent-atlas-workstation-openspec-workboard.v2",
+  "generatedAt": "2026-09-05T16:45:20.794Z",
+  "readOnly": true,
+  "authority": {
+    "mechanicalIndex": "docs/reports/openspec-workboard-v1.json",
+    "scopeSpine": "docs/parent-atlas-workstation-todo.md",
+    "taskAuthority": "openspec/changes/*/tasks.md",
+    "portfolioAuthority": "docs/reports/openspec-portfolio-v1.json"
+  },
+  "sourceChecksums": {
+    "workstationSpine": "sha256:710a78fe369f9f55ec7f1aaff523454688399ab890cb0cc70806f345fe53c97e",
+    "workboard": "sha256:5edbf674b8f0741c87fcc6457fb2dc65fd836b40619fff82a76fb0a13f640bea",
+    "portfolio": "sha256:5397bc9d56e0e60d700a33170ea16c80db884b68d9d449cb5a79e796c255a67d",
+    "sourceCohort": "sha256:29bd914bd7389c4c8d5523ee76960babbf1ffd29bed144887204943249ff5170",
+    "packetJoin": "sha256:a106490043c25e93e1ffc44d1de8519bc30510975b109963fb9fac046c44f83b"
+  },
+  "currentBlocker": {
+    "status": "SOURCE_LINEAGE_COHORT_FOUND_WORKSPACE_MISMATCH",
+    "sourceCohortCounts": {
+      "cohortRows": 52,
+      "currentWorkspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
+      "graphifyMatched": 52,
+      "currentWorkspaceMatched": 0,
+      "sourceRevisionQualified": 52,
+      "revisionQualified": 0,
+      "workspaceMismatchAfterSourceQualification": 52,
+      "missing": 0,
+      "mismatched": 0,
+      "ambiguous": 0
+    },
+    "packetJoinStatus": "CURRENT_PACKET_CHUNK_JOIN_MISSING",
+    "packetJoinCounts": {
+      "binding_rows": 111,
+      "binding_sources": 111,
+      "graphify_exact_sources": 0,
+      "binding_chunk_content_matches": 0,
+      "packet_chunk_exact_sources": 0,
+      "packet_content_matches": 0
+    },
+    "conclusion": "No current-workspace-qualified source/chunk cohort is executable; PKT-LINEAGE-08 remains blocked."
+  },
+  "summary": {
+    "selectedTaskCount": 59,
+    "OPEN_ACTIONABLE": 0,
+    "BLOCKED_UPSTREAM": 3,
+    "CLOSED_BY_CURRENT_EVIDENCE": 0,
+    "SUPERSEDED": 4,
+    "OWNED_BY_OTHER_CHANGE": 12,
+    "GOVERNANCE_ONLY": 5,
+    "NEGATIVE_CONSTRAINT": 17,
+    "HUMAN_DECISION_REQUIRED": 1,
+    "UNVERIFIED": 17,
+    "evidenceRefs": 130,
+    "missingEvidenceRefs": 0
+  },
+  "taskPopulationChecksum": "sha256:507d91661554c9007f2ab953d911e5de0f0b97c8703912524b8fcef969548a0c",
+  "planning": {
+    "candidateLimit": 5,
+    "eligibleCandidateCount": 0,
+    "selectedCandidateCount": 0,
+    "selectedTaskRefs": [],
+    "status": "NO_EXECUTABLE_CANDIDATE",
+    "selectionPolicy": "EXPLICIT_OPEN_ACTIONABLE_PLUS_EXECUTABLE; PRIORITY_THEN_CHANGE_THEN_SOURCE_LINE",
+    "modelCalls": 0,
+    "writes": 0
+  },
+  "workPlan": {
+    "schema": "atlas.openspec-work-plan.v1",
+    "status": "NO_EXECUTABLE_CANDIDATE",
+    "taskRefs": [],
+    "nextAction": null,
+    "blockers": [
+      "No task is explicitly OPEN_ACTIONABLE and executable.",
+      "Current source cohort has 0/52 current-workspace matches.",
+      "Current packet/chunk join has 0/111 exact matches."
+    ],
+    "evidenceRefs": [
+      "docs/reports/current-source-cohort-lineage-v1.json",
+      "docs/reports/current-workspace-packet-chunk-join-v1.json"
+    ],
+    "mutationScope": "NONE_UNTIL_EXPLICIT_AUTHORIZATION",
+    "validationCommands": [
+      "npx openspec validate parent-atlas-openspec-workstation-synthesis --type change --strict --json"
+    ],
+    "planChecksum": "sha256:6a437ac81d774f5e7cf093940fdd62018dc03cd765d0996fdf16919426761598"
+  },
+  "tasks": [
+    {
+      "openspecChange": "parent-atlas-okf-knowledge-layers",
+      "taskRef": "parent-atlas-okf-knowledge-layers:196",
+      "sourceLine": 196,
+      "taskText": "LLM used only to summarize post-static+runtime findings — never as sole verdict source.",
+      "taskChecksum": "sha256:28379db37943bd4ebaec4d46a9fa270b3fa000b882e1b62ff909d010938cca36",
+      "taskLedgerState": "UNCHECKED",
+      "classification": "NEGATIVE_CONSTRAINT",
+      "evidenceDisposition": "CONSTRAINT",
+      "currentOwner": "parent-atlas-okf-knowledge-layers",
+      "dependencyOrBlocker": "Constraint only; not executable work.",
+      "evidenceRefs": [
+        "docs/reports/graphify-daily-coordinator-canary-v1.json"
+      ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
+      "validationCommand": "npx openspec validate parent-atlas-okf-knowledge-layers --type change --strict --json",
+      "safeNextAction": "Preserve this constraint while executing its parent gate.",
+      "mutationScope": "NONE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
+      "priority": 10,
+      "step": "STEP-01"
+    },
+    {
+      "openspecChange": "parent-atlas-okf-knowledge-layers",
+      "taskRef": "parent-atlas-okf-knowledge-layers:234",
+      "sourceLine": 234,
+      "taskText": "**OKF-06.4 Document/file derivation graph** Specify how a document, packet, source file, symbol, related file, feature row, and ontology tuple connect through evidence references. Derived relationships must be replayable from canonical Postgres/Graphify records and must not be inferred solely from a cluster label or embedding similarity.",
+      "taskChecksum": "sha256:59a69fe7686c45d6a5d7c34810a620871a321c58bbc0380b14fc99bf385caa1d",
+      "taskLedgerState": "UNCHECKED",
+      "classification": "NEGATIVE_CONSTRAINT",
+      "evidenceDisposition": "CONSTRAINT",
+      "currentOwner": "parent-atlas-okf-knowledge-layers",
+      "dependencyOrBlocker": "Constraint only; not executable work.",
+      "evidenceRefs": [
+        "docs/reports/graphify-daily-coordinator-canary-v1.json"
+      ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
+      "validationCommand": "npx openspec validate parent-atlas-okf-knowledge-layers --type change --strict --json",
+      "safeNextAction": "Preserve this constraint while executing its parent gate.",
+      "mutationScope": "NONE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
+      "priority": 10,
+      "step": "STEP-01"
+    },
+    {
+      "openspecChange": "parent-atlas-okf-knowledge-layers",
+      "taskRef": "parent-atlas-okf-knowledge-layers:277",
+      "sourceLine": 277,
+      "taskText": "**OKF-06.9 Schema proof** Validate representative document, file, feature, tuple, cluster, and recommendation fixtures with stable IDs, revision changes, missing-evidence statuses, and supersession behavior. Produce one JSON/Markdown receipt with `CREATED`, `WIRED`, `PROVEN`, and `DONE` states.",
+      "taskChecksum": "sha256:b23c0bfa637ec6fb08cae4c604ea962c6c07cee962667c2f6774a5b3b8aac274",
+      "taskLedgerState": "UNCHECKED",
+      "classification": "OWNED_BY_OTHER_CHANGE",
+      "evidenceDisposition": "OWNED_BY_OTHER_CHANGE",
+      "currentOwner": "parent-atlas-okf-knowledge-layers",
+      "dependencyOrBlocker": "Implementation owner is parent-atlas-okf-knowledge-layers; this board may reference it but does not execute its unchecked backlog.",
+      "evidenceRefs": [
+        "docs/reports/openspec-portfolio-v1.json",
+        "docs/reports/graphify-daily-coordinator-canary-v1.json"
+      ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/openspec-portfolio-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
+      "validationCommand": "npx openspec validate parent-atlas-okf-knowledge-layers --type change --strict --json",
+      "safeNextAction": "Review the owning change's proof gate: parent-atlas-okf-knowledge-layers",
+      "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
+      "priority": 10,
+      "step": "STEP-01"
+    },
+    {
+      "openspecChange": "parent-atlas-retrieval-lineage-dag-convergence",
+      "taskRef": "parent-atlas-retrieval-lineage-dag-convergence:306",
+      "sourceLine": 306,
+      "taskText": "LINEAGE-02 — **`BLOCKED_ARTIFACT_UNPROVEN`** / helper `LINEAGE-02-COHORT-ORIGIN-01`. Do not reconstruct the nonexistent `15128/768` requirement by inference or match it to an unrelated existing artifact. The literal was introduced in the initial convergence-task scaffold by commit `128e052ba44` and is not backed by a database query, fixture, report, or measured cohort. Follow-up commit `5e5c78580c` explicitly recorded that `git log --all -S \"15128\"` found no cohort artifact. The `15128/768` pairing has no authoritative population definition, and `151128` has no meaningful repository match. Keep `cohortSize` unresolved until an authoritative artifact defines the population; do not execute either number or substitute the 55,169-row semantic snapshot. Do not use repaired Qdrant metadata for source qualification. See the open-questions section of the LINEAGE-01 evidence report.",
+      "taskChecksum": "sha256:3b9a7b912f2b89188e4958655282ba675101db97c03c9164e01234a0cc5b053b",
+      "taskLedgerState": "UNCHECKED",
+      "classification": "NEGATIVE_CONSTRAINT",
+      "evidenceDisposition": "CONSTRAINT",
+      "currentOwner": "parent-atlas-retrieval-lineage-dag-convergence",
+      "dependencyOrBlocker": "Constraint only; not executable work.",
+      "evidenceRefs": [
+        "docs/reports/current-source-cohort-lineage-v1.json",
+        "docs/reports/current-workspace-packet-chunk-join-v1.json",
+        "docs/reports/graphify-daily-coordinator-canary-v1.json"
+      ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
+      "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
+      "safeNextAction": "Preserve this constraint while executing its parent gate.",
+      "mutationScope": "NONE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
+      "priority": 10,
+      "step": "STEP-01"
+    },
+    {
+      "openspecChange": "parent-atlas-retrieval-lineage-dag-convergence",
+      "taskRef": "parent-atlas-retrieval-lineage-dag-convergence:426",
+      "sourceLine": 426,
+      "taskText": "RETRIEVAL-01L — **`OPEN`** (2026-09-02, status confirmed — subtle, not simply \"blocked\"). The final live state is good: 6,312 present canonical projections reconciled, 0 exact patches remaining, 0 blocking conflicts, 675 policy-ineligible missing points correctly left untouched (`FINAL_STATE_IDEMPOTENCY_PROVEN`). But the exact original 6,306-entry consumed bulk proposal was not durably recoverable/replayable (`ORIGINAL_PATCH_SET_REPLAY_UNPROVEN` / `AUDIT_REPLAY_INCOMPLETE_ORIGINAL_ARTIFACT_NOT_DURABLE` — see `PKT-LINEAGE-13 RECON-CLOSEOUT-01` below). This task should close only when projection ownership governance freezes the future protocol (immutable proposal artifact, `consumedProposalChecksum`, `targetPointSetChecksum`, apply receipt with rollback/preimage artifact and exact readback, replay that consumes the exact same proposal) — not by rerunning the historical bulk reconciliation merely to repair its audit artifact. Freeze full Qdrant projection ownership only after rollback and parity proof.",
+      "taskChecksum": "sha256:1a8d29f5cfa20096f7454228d3d5d6e63e341a02b4ca9537aa9aad0e6ff62bdf",
+      "taskLedgerState": "UNCHECKED",
+      "classification": "SUPERSEDED",
+      "evidenceDisposition": "SUPERSEDED",
+      "currentOwner": "parent-atlas-retrieval-lineage-dag-convergence",
+      "dependencyOrBlocker": null,
+      "evidenceRefs": [
+        "docs/reports/current-source-cohort-lineage-v1.json",
+        "docs/reports/current-workspace-packet-chunk-join-v1.json",
+        "docs/reports/graphify-daily-coordinator-canary-v1.json"
+      ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
+      "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
+      "safeNextAction": "Remain unexecuted until its prerequisites and proof receipt are present.",
+      "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
+      "priority": 10,
+      "step": "STEP-01"
+    },
+    {
+      "openspecChange": "parent-atlas-retrieval-lineage-dag-convergence",
+      "taskRef": "parent-atlas-retrieval-lineage-dag-convergence:550",
+      "sourceLine": 550,
+      "taskText": "DAG-RUNTIME-01D — **`BLOCKED_BY_01D.2`** (2026-09-02, status corrected — not merely `OPEN`/independently runnable). Source revision is split between stale-but-persisted and fresh-but-unpersisted values, the candidate revision is a bounded n=15 canary, graph revision is fixture-only, and representation authority was never independently resolved — those are individually real values but not one coherent world-state, so this cannot proceed until `DAG-RUNTIME-01D.2` produces an authoritative four-leg revision bundle. Execute a frozen bounded plan twice and compare normalized outputs, evidence, statuses, and deterministic receipt checksums.",
+      "taskChecksum": "sha256:c23281e26f702218768813e079c40542e7a1865d02d1040f43fa9ea3826c2dc9",
+      "taskLedgerState": "UNCHECKED",
+      "classification": "NEGATIVE_CONSTRAINT",
+      "evidenceDisposition": "CONSTRAINT",
+      "currentOwner": "parent-atlas-retrieval-lineage-dag-convergence",
+      "dependencyOrBlocker": "Constraint only; not executable work.",
+      "evidenceRefs": [
+        "docs/reports/current-source-cohort-lineage-v1.json",
+        "docs/reports/current-workspace-packet-chunk-join-v1.json",
+        "docs/reports/graphify-daily-coordinator-canary-v1.json"
+      ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
+      "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
+      "safeNextAction": "Preserve this constraint while executing its parent gate.",
+      "mutationScope": "NONE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
+      "priority": 10,
+      "step": "STEP-01"
+    },
+    {
+      "openspecChange": "parent-atlas-retrieval-lineage-dag-convergence",
+      "taskRef": "parent-atlas-retrieval-lineage-dag-convergence:564",
+      "sourceLine": 564,
+      "taskText": "DAG-RUNTIME-01D.2 — **`BLOCKED_REVISION_BUNDLE_UNPROVEN`** (2026-09-02, formalized). Run the frozen replay against explicitly configured read-only live owners after exact source, candidate, graph, and representation revisions are available. WSL2 RAPIDS FastAPI runtime is now reachable at `127.0.0.1:8098` in `atlas-rapids-cu13` with HTTP 200 health, RTX 3060 Ti, cuVS/cuGraph 26.06, and no writes. This proves runtime availability only. Per the \"OaK revision qualification\" section below, the 4-leg revision bundle (source/candidate/graph/representation) is confirmed NOT authoritative — a mix of stale/orphaned, fresh-but-unpersisted, bounded-canary-scoped, and fixture-only values, not one coherent live world-state. Do not spend further effort on this gate until a coherent revision bundle exists; do not run `graphify:daily` or generate a new Graphify run merely to manufacture one (that would invert the dependency — a replay gate should consume a revision that the graph lifecycle naturally produces, not force an expensive rebuild to obtain a token).",
+      "taskChecksum": "sha256:a030559c56df8626b2d8fb5dc4ad3aa6eb3a368a2f69ba0a0485c3f192cfff22",
+      "taskLedgerState": "UNCHECKED",
+      "classification": "NEGATIVE_CONSTRAINT",
+      "evidenceDisposition": "CONSTRAINT",
+      "currentOwner": "parent-atlas-retrieval-lineage-dag-convergence",
+      "dependencyOrBlocker": "Constraint only; not executable work.",
+      "evidenceRefs": [
+        "docs/reports/current-source-cohort-lineage-v1.json",
+        "docs/reports/current-workspace-packet-chunk-join-v1.json",
+        "docs/reports/graphify-daily-coordinator-canary-v1.json"
+      ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
+      "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
+      "safeNextAction": "Preserve this constraint while executing its parent gate.",
+      "mutationScope": "NONE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
+      "priority": 10,
+      "step": "STEP-01"
+    },
+    {
+      "openspecChange": "parent-atlas-retrieval-lineage-dag-convergence",
+      "taskRef": "parent-atlas-retrieval-lineage-dag-convergence:651",
+      "sourceLine": 651,
+      "taskText": "NESTED-TRAIN-02 — Retrain the nested AE from an immutable source snapshot, grouped train/eval split, frozen seeds, CUDA receipt, and new checkpoint hash.",
+      "taskChecksum": "sha256:96ceba5a6b2ce47478533373ea313c2ae8576def7cba799b1b4875b0eec63921",
+      "taskLedgerState": "UNCHECKED",
+      "classification": "GOVERNANCE_ONLY",
+      "evidenceDisposition": "UNVERIFIED",
+      "currentOwner": "parent-atlas-retrieval-lineage-dag-convergence",
+      "dependencyOrBlocker": "Governance/proof bookkeeping; requires evidence, not model selection.",
+      "evidenceRefs": [
+        "docs/reports/current-source-cohort-lineage-v1.json",
+        "docs/reports/current-workspace-packet-chunk-join-v1.json",
+        "docs/reports/graphify-daily-coordinator-canary-v1.json"
+      ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
+      "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
+      "safeNextAction": "Attach current evidence before changing task status.",
+      "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
+      "priority": 10,
+      "step": "STEP-01"
+    },
+    {
+      "openspecChange": "parent-atlas-retrieval-lineage-dag-convergence",
+      "taskRef": "parent-atlas-retrieval-lineage-dag-convergence:653",
+      "sourceLine": 653,
+      "taskText": "NESTED-REP-01 — Answers TWO distinct questions, not one (corrected 2026-09-02): (1) **Quality**: compare `semantic_768`, native `semantic_mrl_128`, learned `latent_128`, and learned `latent_64` on the same CandidateOrdinal cohort — recall@K, MRR, overlap, bytes, latency, projection checksums, replay (the original scope, unchanged). (2) **Residency**: at which LOD can a query be answered without paying for the next representation? — i.e. does `latent_64` alone suffice for enough queries (sufficient confidence/breadth) to justify it as a real HOT-tier first-pass stop before expanding to `latent_128` then `semantic_768`, per the intended `RepresentationLODPolicyV1` design in this section's policy note above. Question (2) is the more Parent-Atlas-specific one and is what would actually justify building the not-yet-existing progressive-expansion wiring. The residency evaluation report should include a `safe-stop %` column per LOD — the fraction of queries for which that representation satisfies a frozen confidence/breadth criterion without requiring promotion to the next LOD — not just raw quality metrics: ``` LOD               recall@10   MRR   p95 ms   bytes   safe-stop % latent_64 latent_128 semantic_mrl_128 semantic_768 ``` `safe-stop %` answers \"does `latent_64` terminate 55% of routine queries, `latent_128` another 25%, leaving only 20% requiring `semantic_768`?\" — the design goal is avoiding unnecessary representation expansion, not compression quality alone.",
+      "taskChecksum": "sha256:860da182531dca39c51e3e7da6a359949972b98718a1505606d5ced89e271b53",
+      "taskLedgerState": "UNCHECKED",
+      "classification": "UNVERIFIED",
+      "evidenceDisposition": "UNVERIFIED",
+      "currentOwner": "parent-atlas-retrieval-lineage-dag-convergence",
+      "dependencyOrBlocker": null,
+      "evidenceRefs": [
+        "docs/reports/current-source-cohort-lineage-v1.json",
+        "docs/reports/current-workspace-packet-chunk-join-v1.json",
+        "docs/reports/graphify-daily-coordinator-canary-v1.json"
+      ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
+      "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
+      "safeNextAction": "Remain unexecuted until its prerequisites and proof receipt are present.",
+      "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
+      "priority": 10,
+      "step": "STEP-01"
+    },
+    {
+      "openspecChange": "parent-atlas-retrieval-lineage-dag-convergence",
+      "taskRef": "parent-atlas-retrieval-lineage-dag-convergence:679",
+      "sourceLine": 679,
+      "taskText": "PROMOTION-01 — Keep source lineage, graph identity, feature layout, projection ownership, and migration baseline as independent blockers.",
+      "taskChecksum": "sha256:27bcffb1aca415cdf4d4b0e1a9278ff2bf86f09b7896f37580c0988582ad24ae",
+      "taskLedgerState": "UNCHECKED",
+      "classification": "UNVERIFIED",
+      "evidenceDisposition": "UNVERIFIED",
+      "currentOwner": "parent-atlas-retrieval-lineage-dag-convergence",
+      "dependencyOrBlocker": null,
+      "evidenceRefs": [
+        "docs/reports/current-source-cohort-lineage-v1.json",
+        "docs/reports/current-workspace-packet-chunk-join-v1.json",
+        "docs/reports/graphify-daily-coordinator-canary-v1.json"
+      ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
+      "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
+      "safeNextAction": "Remain unexecuted until its prerequisites and proof receipt are present.",
+      "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
+      "priority": 10,
+      "step": "STEP-01"
+    },
+    {
+      "openspecChange": "parent-atlas-retrieval-lineage-dag-convergence",
+      "taskRef": "parent-atlas-retrieval-lineage-dag-convergence:731",
+      "sourceLine": 731,
+      "taskText": "PKT-LINEAGE-08 (PROMOTION-01) — **`IMPLEMENTATION_PROVEN / SUCCESS_CANARY_PENDING`**. The corrected production entrypoint and exact `--source-refs-file` targeting are proven by read-only preflight: 50 real orphan candidates and 434 namespace-qualified memberships are eligible, with `writesPerformed: false`. The latest durable apply receipt records `mode: apply`, `registered: 0`, and `status: no_orphans`; it does not prove that the intended 50-packet/434-membership success branch was applied or read back. Keep the gate open until one separately authorized targeted apply produces direct SQL evidence for packet membership, followed by idempotent replay. No Qdrant, Neo4j, graph, or Valkey writes are authorized by the preflight. Evidence: `docs/reports/packet-chunk-lineage-promotion-preflight-v1.json`, `docs/reports/pkt-lineage-08-eligible-source-refs-v1.json`, and the latest `docs/reports/chunk-registration-report.json`. **Historical notes below remain retained; their earlier success-branch claims are superseded.** Fresh read-only preflight after this status correction now reports `BLOCKED_NO_QUALIFIED_CANDIDATE` with `eligibleCandidateCount: 0`. The older 50-source allowlist is therefore stale for current execution and must not be applied or regenerated into a new write scope without a new authoritative preflight and explicit authorization. Direct authority lookup confirms the three remaining files have chunk rows but no matching `graphify_files.workspace_id`/`code_source_revision` and no populated `atlas_source_refs` namespace or commit revision. This is an authority-coverage gap, not a packet-writer defect. A separate manifest check confirms all three are present with `canonicalAdmission: true` and stable content hashes, but the manifest carries no `sourceRevision`. Therefore the next repair is additive source-revision/workspace metadata enrichment for already-admitted files; do not treat manifest presence or content hash alone as sufficient lineage authority. Read-only lifecycle binding confirms the newest completed `graphify_runs` row (`78818366-2410-4643-8e5d-e995c75a2ad5`) has zero `graphify_files` rows attached; the 25,317 current file rows remain attached primarily to the older completed run (`369e4270-7689-4536-8816-4ec4a5517b3e`). The source-authority repair must therefore bind file observations to the completed run that actually produced them before PKT-LINEAGE-08 - **Fresh preflight (2026-09-04):** `node scripts/atlas/plan-packet-chunk-lineage-promotion-v1.mjs` returned `BLOCKED_NO_QUALIFIED_CANDIDATE`, `eligibleCandidateCount: 0`, and checksum `sha256:7cf544001f14273d3f86056868471134a9cd4ced0808f306908ca25320a91e81`. This supersedes the older 50-source diagnostic allowlist for execution purposes; no packet, projection, graph, or cache writes occurred. - **Source-authority recheck (2026-09-04):** `audit-current-source-cohort-lineage-v1.mjs` found 52 source-qualified rows but `0` current-workspace matches; `audit-current-workspace-packet-chunk-join-v1.mjs` found 111 binding rows but `0` exact graphify/chunk/packet joins. `audit-current-source-registry-contract-v1.mjs` found 22,604 registry rows but no selected authoritative source set, and `audit-current-graphify-source-revision-v1.mjs` found no current source-revision authority rows. These read-only results keep the explicitly authorized success canary stopped; do not reuse the historical 50-source allowlist. - **Hydration recheck (2026-09-04):** `audit-current-source-evidence-hydration-v1.mjs` found 52 input rows and 52 exact revision matches, but only 9 content-hydrated rows, 0 authoritative namespaces, and 0 evidence-span/classifier-ready rows. The remaining blockers are 43 missing canonical chunk-owner rows and 9 chunk-owner rows lacking source revision. This confirms the next repair is additive source/chunk authority enrichment; no packet canary or cohort expansion is justified yet. Receipt: `docs/reports/current-source-evidence-hydration-v1.json`. - **PKT-LINEAGE-08 recheck 2026-09-04:** the same read-only preflight was rerun after the semantic owner audit and still returns `BLOCKED_NO_QUALIFIED_CANDIDATE` with `eligibleCandidateCount: 0`. No bounded mutation is authorized by this result; the prior 50-source list remains stale and non-executable until a fresh non-empty authoritative target exists. - **Graphify run/file binding recheck 2026-09-04:** `scripts/atlas/audit-graphify-run-file-binding-v1.mjs` still finds one completed bound owner (`run_id=369e4270-7689-4536-8816-4ec4a5517b3e`, `25,258` source-revision/content-hash rows), five completed unbound runs, and five non-terminal running rows. This is useful lifecycle evidence, but it does not establish that the bound run covers the `55,169` semantic population; no packet promotion or semantic cohort substitution is authorized. Receipt: `docs/reports/graphify-run-file-binding-v1.json`. - **Semantic-to-Graphify reconciliation 2026-09-04:** a direct read-only comparison against the completed bound run found `9,843` source-reference overlaps with the populated semantic owner, but `0` exact source-reference/content-hash matches and `0` rows with exact hash plus both `code_source_revision` and `workspace_revision`. Path overlap is therefore not cohort authority; semantic ordinal admission and KNN remain blocked. Receipt: `docs/reports/semantic-graphify-run-reconciliation-v1.json`. - **OpenSpec integration review 2026-09-04:** the core Parent Atlas integration set validated, and four adjacent legacy changes were repaired additively with minimal delta specs preserving their existing ownership/proof boundaries: `parent-atlas-adaptive-dag-fabric`, `parent-atlas-topology-representation-admission`, `parent-atlas-retrieval-fusion-reachability`, and `parent-atlas-candidate-feature-execution-fabric`. All four now validate strictly. This documentation repair does not close any blocked runtime or lineage gate. Receipt: `docs/reports/openspec-active-integration-review-v1.json`. Direct readback of the three reported chunk IDs confirms `codebase_chunk_index.source_ref` and `repo_id` are null while `relative_path` and `content_hash` are populated. This explains the zero qualified candidates: relative paths/content hashes are useful diagnostics but cannot be promoted to `sourceRef`/`sourceRevision` authority. **Authorization-boundary dry check (2026-09-04):** running the explicitly allowlisted 50-source canary through `register-orphaned-chunks.mjs --capture-lineage --source-refs-file=...` resolved 0 current orphans (all 50 were already registered or absent from the live orphan set), so no apply was attempted. This is not a success canary and does not close PKT-LINEAGE-08; a fresh authoritative preflight must produce a non-empty current target before any future apply. can obtain a current qualified candidate. No run or file rows were modified. The bounded run/file census makes the split concrete: completed run `369e4270-7689-4536-8816-4ec4a5517b3e` owns 25,258 file rows, with 25,258 source revisions and content hashes; the four newer completed runs own zero file rows, while 59 additional file rows remain attached to older `RUNNING` runs. This is the current evidence boundary for source authority and must be reconciled before any lineage promotion. Added the read-only validator `scripts/atlas/audit-graphify-run-file-binding-v1.mjs` and receipt `docs/reports/graphify-run-file-binding-v1.json`. Current classification is `COMPLETED_BOUND: 1`, `COMPLETED_UNBOUND: 4`, `RUNNING_BOUND_NOT_TERMINAL: 2`, and `RUNNING_UNBOUND: 3`. A completed bound owner exists, but the lifecycle contract still needs one current run/file binding selected explicitly; no run or file rows were modified. The bound completed owner does not cover the three remaining packet candidates: a direct read-only lookup finds no `graphify_files` rows for any of their `source_ref` values. Their chunk rows and source-manifest entries are therefore insufficient for packet lineage; they require an explicit source-selection/materialization decision before any new Graphify owner can be claimed. Historical preflight history (2026-09-03, re-run after `LINEAGE-01` closed — see below; was `BLOCKED_NO_ELIGIBLE_CANDIDATE` as of 2026-09-02). Was **`BLOCKED_NO_ELIGIBLE_CANDIDATE`** (2026-09-02, status corrected — this is not unfinished coding). The live preflight already proved `implementationCorrect: PASS`, `authorityProvenBeforeMutation: PASS`, `packetMembershipAtomicity: PASS`, with `liveEligibleCandidateCount: 0` and outcome `REFUSED_WITH_ZERO_WRITES`. Correct framing: `IMPLEMENTATION_PROVEN` / `SUCCESS_POPULATION_UNAVAILABLE` — the future-capture writer and its fail-closed refusal path are both proven; what remains blocked is a naturally-qualified namespace+revision candidate to exercise the success branch, not further coding. Do not fabricate a candidate and do not run `graphify:daily` merely to manufacture a fresh revision token — see `LINEAGE-01`'s stale Graphify run lifecycle blocker, which is the actual upstream dependency here. Wire the corrected membership-writing logic into the live `register-orphaned-chunks.mjs` production path so future packet creation captures real lineage. The path is now implemented behind the explicit `--capture-lineage` opt-in: it requires the additive `atlas_packet_chunk_lineage` table, reads real `codebase_chunk_index.chunk_id` values plus `graphify_files.workspace_id`, and commits each packet and its complete membership set transactionally. Dry-run evidence is in `docs/reports/chunk-registration-report.json`; at that earlier point the production canary/apply remained separately authorized. A bounded authorized apply canary on 2026-09-01 exercised the active entrypoint: one orphan packet row was inserted, but its 22 memberships were correctly refused because `graphify_files.workspace_id` was absent; readback confirmed zero lineage rows. This proves the fail-closed branch, not the namespace-qualified success branch. See `docs/reports/chunk-registration-report.json`.",
+      "taskChecksum": "sha256:f15217d52197903710b6c9c1e5da01b6b85fa64dcca56b40e538a681afa60977",
+      "taskLedgerState": "UNCHECKED",
+      "classification": "SUPERSEDED",
+      "evidenceDisposition": "SUPERSEDED",
+      "currentOwner": "parent-atlas-retrieval-lineage-dag-convergence",
+      "dependencyOrBlocker": null,
+      "evidenceRefs": [
+        "docs/reports/current-source-cohort-lineage-v1.json",
+        "docs/reports/current-workspace-packet-chunk-join-v1.json",
+        "docs/reports/graphify-daily-coordinator-canary-v1.json"
+      ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
+      "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
+      "safeNextAction": "Remain unexecuted until its prerequisites and proof receipt are present.",
+      "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
+      "priority": 10,
+      "step": "STEP-01"
+    },
+    {
+      "openspecChange": "parent-atlas-retrieval-lineage-dag-convergence",
+      "taskRef": "parent-atlas-retrieval-lineage-dag-convergence:1982",
+      "sourceLine": 1982,
+      "taskText": "All completed items above have linked reports, not merely code existence. The existing interim checker is not sufficient for closure: its block parser treats continuation bullets and numbered sections as task IDs, producing false positives (107 checked items, only 50 with recognized evidence links). A task-ID-aware replacement now parses 108 actual checkbox blocks and finds 82 with evidence references, including explicitly scoped group-level links; 26 still need evidence review. Keep this task open until those references are resolved; do not retroactively mark items from the earlier spot check. Evidence: `docs/reports/tasks-md-evidence-links-v2.json`. **Interim spot-check run 2026-09-02 (read-only, not the final checkoff — boxes above stay unchecked until a deliberate full pass)**: `scripts/atlas/audit-tasks-md-evidence-links-v1.mjs` grouped every `[x]` bullet with its full continuation text and checked for a `docs/reports/*.json` path, a backticked source-file path, or an explicit test-pass count. 19/30 real checked items cite real evidence. 11 do not: `RETRIEVAL-01A`, `RETRIEVAL-01B`, `RETRIEVAL-01C`, `RETRIEVAL-01D`, `RETRIEVAL-01E`, `DAG-RUNTIME-01D.1`, `PKT-LINEAGE-02`, `PKT-LINEAGE-03`, `PKT-LINEAGE-04`, `PKT-LINEAGE-11` are one- or two-line \"was proven\"/\"proven previously\" assertions with no file path, report reference, or test count anywhere in their block — bare claims, not linked evidence, even though the underlying work may well be real. This is a real gap this validation item exists to catch, not a false positive from the checker (each was manually spot-checked). Not resolved this pass — resolving it means either finding/adding the actual evidence reference for each of the 11, or downgrading them to `[ ]` if no evidence can be recovered. Left for the deliberate final pass this validation item is scoped for.",
+      "taskChecksum": "sha256:59006b44fb20f42dd40bb6eda2118dfc7ffbe8fa6a12a15764f949f0b35d5952",
+      "taskLedgerState": "UNCHECKED",
+      "classification": "NEGATIVE_CONSTRAINT",
+      "evidenceDisposition": "CONSTRAINT",
+      "currentOwner": "parent-atlas-retrieval-lineage-dag-convergence",
+      "dependencyOrBlocker": "Constraint only; not executable work.",
+      "evidenceRefs": [
+        "docs/reports/current-source-cohort-lineage-v1.json",
+        "docs/reports/current-workspace-packet-chunk-join-v1.json",
+        "docs/reports/graphify-daily-coordinator-canary-v1.json"
+      ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
+      "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
+      "safeNextAction": "Preserve this constraint while executing its parent gate.",
+      "mutationScope": "NONE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
+      "priority": 10,
+      "step": "STEP-01"
+    },
+    {
+      "openspecChange": "parent-atlas-retrieval-lineage-dag-convergence",
+      "taskRef": "parent-atlas-retrieval-lineage-dag-convergence:2005",
+      "sourceLine": 2005,
+      "taskText": "No database, Qdrant, graph, cache, or production mutation occurs during read-only gates. **Interim spot-check run 2026-09-02**: this evidence-synchronization pass itself performed zero Postgres/Qdrant/Neo4j/Valkey writes (checkbox-state and status-label edits to this file only). The one authorized exception in this file's own history is `PKT-LINEAGE-11 RECON-CANARY-01` (6-point bounded Qdrant canary, explicitly separately-authorized, already documented as such at its own bullet and in `RETRIEVAL-01K` above) — correctly the only mutation among the gates this file tracks. Not a full line-by-line audit of every `[x]` item's underlying script for stray writes; that deeper check is left for the deliberate final pass.",
+      "taskChecksum": "sha256:7ffbffe9a28684f4f3f5c859ac5c52fa7c1fbd494f30b0b100bb188fe68cf521",
+      "taskLedgerState": "UNCHECKED",
+      "classification": "NEGATIVE_CONSTRAINT",
+      "evidenceDisposition": "CONSTRAINT",
+      "currentOwner": "parent-atlas-retrieval-lineage-dag-convergence",
+      "dependencyOrBlocker": "Constraint only; not executable work.",
+      "evidenceRefs": [
+        "docs/reports/current-source-cohort-lineage-v1.json",
+        "docs/reports/current-workspace-packet-chunk-join-v1.json",
+        "docs/reports/graphify-daily-coordinator-canary-v1.json"
+      ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
+      "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
+      "safeNextAction": "Preserve this constraint while executing its parent gate.",
+      "mutationScope": "NONE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
+      "priority": 10,
+      "step": "STEP-01"
+    },
+    {
+      "openspecChange": "parent-atlas-retrieval-lineage-dag-convergence",
+      "taskRef": "parent-atlas-retrieval-lineage-dag-convergence:3499",
+      "sourceLine": 3499,
+      "taskText": "Wire one ACE caller through authoritative SearchRuntime revisions and ContextManifestV2. Current read-only audit remains `NO_ROUTE_LOCAL_AUTHORITY`: 21 callers use legacy query-only cache identity, 10 strict-capable/wired references exist, but the selected `/api/ace/stream` caller still lacks authoritative source, representation, and retrieval-policy revisions. Do not migrate or promote until one caller consumes a validated revision bundle. Evidence: `docs/reports/ace-context-live-caller-adoption-v1.json` and `docs/reports/ace-route-revision-authority-v1.json`. No writes occurred. The strict dry-input checker also remains blocked because no authoritative `CandidateOrdinalMapV1`, `CandidateFeatureSnapshotV1`, or `RevisionAuthorityEnvelopeV1` artifacts were supplied; no replacements were synthesized. Evidence: `docs/reports/ace-live-dry-input-readiness-v2.json`.",
+      "taskChecksum": "sha256:071ee3c41a85579a82b97fd4f886e2d867c0ffb5307a6e3db4df8684be9bd317",
+      "taskLedgerState": "UNCHECKED",
+      "classification": "NEGATIVE_CONSTRAINT",
+      "evidenceDisposition": "CONSTRAINT",
+      "currentOwner": "parent-atlas-retrieval-lineage-dag-convergence",
+      "dependencyOrBlocker": "Constraint only; not executable work.",
+      "evidenceRefs": [
+        "docs/reports/current-source-cohort-lineage-v1.json",
+        "docs/reports/current-workspace-packet-chunk-join-v1.json",
+        "docs/reports/graphify-daily-coordinator-canary-v1.json"
+      ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
+      "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
+      "safeNextAction": "Preserve this constraint while executing its parent gate.",
+      "mutationScope": "NONE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
+      "priority": 10,
+      "step": "STEP-01"
+    },
+    {
+      "openspecChange": "parent-atlas-retrieval-lineage-dag-convergence",
+      "taskRef": "parent-atlas-retrieval-lineage-dag-convergence:3692",
+      "sourceLine": 3692,
+      "taskText": "MCP-OUTCOME-RECEIPT-OWNER-01 — select one durable AgentWorkReceipt owner, remove stale/default graph-version fallbacks, and require the workflow RECORD stage to succeed only after the receipt is durably acknowledged. Migration remains blocked until the contract includes request/workspace/source/graph revisions, tool refs, checksums, and validation receipts. Existing `sveltekit-frontend/src/lib/server/observability/outcome-ledger.ts` is reusable only as a low-level append helper; it is not yet the typed receipt owner because it accepts arbitrary records and suppresses append failures. The additive contract now exists at `sveltekit-frontend/src/lib/server/observability/agent-work-receipt-v1.ts`; writer migration and durable acknowledgement remain open. The two stale graph-version defaults were removed; unavailable graph metadata now remains `null`.",
+      "taskChecksum": "sha256:7851ebed9971980b53bcfc7d550c7986137069628d23293226f1e20d5a445db2",
+      "taskLedgerState": "UNCHECKED",
+      "classification": "BLOCKED_UPSTREAM",
+      "evidenceDisposition": "BLOCKED",
+      "currentOwner": "parent-atlas-retrieval-lineage-dag-convergence",
+      "dependencyOrBlocker": "Current post-coordinator lineage is not coherent: source cohort 0/52 matches current workspace; packet/chunk join 0/111 exact.",
+      "evidenceRefs": [
+        "docs/reports/current-source-cohort-lineage-v1.json",
+        "docs/reports/current-workspace-packet-chunk-join-v1.json",
+        "docs/reports/graphify-daily-coordinator-canary-v1.json"
+      ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
+      "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
+      "safeNextAction": "Repair or identify the authoritative current source/chunk binding; do not apply a cohort.",
+      "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
+      "priority": 10,
+      "step": "STEP-01"
+    },
+    {
+      "openspecChange": "parent-atlas-retrieval-lineage-dag-convergence",
+      "taskRef": "parent-atlas-retrieval-lineage-dag-convergence:3817",
+      "sourceLine": 3817,
+      "taskText": "Decouple optional latent fanout from canonical Graphify completion.",
+      "taskChecksum": "sha256:b791addd576e15640fbf70dd568b824f1ef6550fe6b929dd74917cd6a489e9e8",
+      "taskLedgerState": "UNCHECKED",
+      "classification": "UNVERIFIED",
+      "evidenceDisposition": "UNVERIFIED",
+      "currentOwner": "parent-atlas-retrieval-lineage-dag-convergence",
+      "dependencyOrBlocker": null,
+      "evidenceRefs": [
+        "docs/reports/current-source-cohort-lineage-v1.json",
+        "docs/reports/current-workspace-packet-chunk-join-v1.json",
+        "docs/reports/graphify-daily-coordinator-canary-v1.json"
+      ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
+      "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
+      "safeNextAction": "Remain unexecuted until its prerequisites and proof receipt are present.",
+      "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
+      "priority": 10,
+      "step": "STEP-01"
+    },
+    {
+      "openspecChange": "parent-atlas-retrieval-lineage-dag-convergence",
+      "taskRef": "parent-atlas-retrieval-lineage-dag-convergence:3829",
+      "sourceLine": 3829,
+      "taskText": "Freeze `topK`, distance metric, candidate-pair checksum, feature/representation revision, and deterministic parameter checksum.",
+      "taskChecksum": "sha256:2506b67920470de903a672854e506067538c7cc0fcb0e0fdddaf3377ecaa7436",
+      "taskLedgerState": "UNCHECKED",
+      "classification": "UNVERIFIED",
+      "evidenceDisposition": "UNVERIFIED",
+      "currentOwner": "parent-atlas-retrieval-lineage-dag-convergence",
+      "dependencyOrBlocker": null,
+      "evidenceRefs": [
+        "docs/reports/current-source-cohort-lineage-v1.json",
+        "docs/reports/current-workspace-packet-chunk-join-v1.json",
+        "docs/reports/graphify-daily-coordinator-canary-v1.json"
+      ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
+      "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
+      "safeNextAction": "Remain unexecuted until its prerequisites and proof receipt are present.",
+      "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
+      "priority": 10,
+      "step": "STEP-01"
+    },
+    {
+      "openspecChange": "parent-atlas-retrieval-lineage-dag-convergence",
+      "taskRef": "parent-atlas-retrieval-lineage-dag-convergence:3832",
+      "sourceLine": 3832,
+      "taskText": "Run SOM 20x20 only from the frozen shared matrix; record coordinates as derived features, not identity or retrieval votes.",
+      "taskChecksum": "sha256:d0727f3dc93ec9ffc6b60c7a3b0ea95a43eece0dbb73f489e3dd35f6af1c2685",
+      "taskLedgerState": "UNCHECKED",
+      "classification": "UNVERIFIED",
+      "evidenceDisposition": "UNVERIFIED",
+      "currentOwner": "parent-atlas-retrieval-lineage-dag-convergence",
+      "dependencyOrBlocker": null,
+      "evidenceRefs": [
+        "docs/reports/current-source-cohort-lineage-v1.json",
+        "docs/reports/current-workspace-packet-chunk-join-v1.json"
+      ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
+      "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
+      "safeNextAction": "Remain unexecuted until its prerequisites and proof receipt are present.",
+      "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
+      "priority": 10,
+      "step": "STEP-01"
+    },
+    {
+      "openspecChange": "parent-atlas-retrieval-lineage-dag-convergence",
+      "taskRef": "parent-atlas-retrieval-lineage-dag-convergence:3868",
+      "sourceLine": 3868,
+      "taskText": "13 Re-run the cohort audit against that owner and require exact content-hash/revision parity for every admitted row.",
+      "taskChecksum": "sha256:65b7dbab6e8b24c2137257166e264cfdb6c4743e390947ad1b59e98be30f3e20",
+      "taskLedgerState": "UNCHECKED",
+      "classification": "UNVERIFIED",
+      "evidenceDisposition": "UNVERIFIED",
+      "currentOwner": "parent-atlas-retrieval-lineage-dag-convergence",
+      "dependencyOrBlocker": null,
+      "evidenceRefs": [
+        "docs/reports/current-source-cohort-lineage-v1.json",
+        "docs/reports/current-workspace-packet-chunk-join-v1.json",
+        "docs/reports/graphify-daily-coordinator-canary-v1.json"
+      ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
+      "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
+      "safeNextAction": "Remain unexecuted until its prerequisites and proof receipt are present.",
+      "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
+      "priority": 10,
+      "step": "STEP-01"
+    },
+    {
+      "openspecChange": "parent-atlas-retrieval-lineage-dag-convergence",
+      "taskRef": "parent-atlas-retrieval-lineage-dag-convergence:3869",
+      "sourceLine": 3869,
+      "taskText": "14 Only after cohort admission, materialize one semantic `CandidateOrdinalMapV1` bound to the exact vector snapshot and freeze its checksum.",
+      "taskChecksum": "sha256:0ec31a6ac7a23d136d477e1016803e2507268c6979994a6cc45207068ae18025",
+      "taskLedgerState": "UNCHECKED",
+      "classification": "UNVERIFIED",
+      "evidenceDisposition": "UNVERIFIED",
+      "currentOwner": "parent-atlas-retrieval-lineage-dag-convergence",
+      "dependencyOrBlocker": null,
+      "evidenceRefs": [
+        "docs/reports/current-source-cohort-lineage-v1.json",
+        "docs/reports/current-workspace-packet-chunk-join-v1.json",
+        "docs/reports/graphify-daily-coordinator-canary-v1.json"
+      ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
+      "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
+      "safeNextAction": "Remain unexecuted until its prerequisites and proof receipt are present.",
+      "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
+      "priority": 10,
+      "step": "STEP-01"
+    },
+    {
+      "openspecChange": "parent-atlas-retrieval-lineage-dag-convergence",
+      "taskRef": "parent-atlas-retrieval-lineage-dag-convergence:4108",
+      "sourceLine": 4108,
+      "taskText": "Separate workspace snapshot identity from execution identity before further lifecycle repair. `workspaceRevision` remains a deterministic source-manifest identity and may be reused when bytes are unchanged; `runId`, `startedAt`, `completedAt`, and environment metadata identify one execution attempt and must be fresh per attempt.",
+      "taskChecksum": "sha256:01d8f0662800354709cc4e2a84e4022668deb08e1b8e690c88a3c77965c4755c",
+      "taskLedgerState": "UNCHECKED",
+      "classification": "UNVERIFIED",
+      "evidenceDisposition": "UNVERIFIED",
+      "currentOwner": "parent-atlas-retrieval-lineage-dag-convergence",
+      "dependencyOrBlocker": null,
+      "evidenceRefs": [
+        "docs/reports/current-source-cohort-lineage-v1.json",
+        "docs/reports/current-workspace-packet-chunk-join-v1.json",
+        "docs/reports/graphify-daily-coordinator-canary-v1.json"
+      ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
+      "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
+      "safeNextAction": "Remain unexecuted until its prerequisites and proof receipt are present.",
+      "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
+      "priority": 10,
+      "step": "STEP-01"
+    },
+    {
+      "openspecChange": "parent-atlas-retrieval-lineage-dag-convergence",
+      "taskRef": "parent-atlas-retrieval-lineage-dag-convergence:4144",
+      "sourceLine": 4144,
+      "taskText": "`GRAPHIFY-DAILY-COORDINATOR-01`: use a dedicated connection with the frozen session advisory lock namespace/key, capture fresh workspace/source bindings, create source-selection membership, and transition one execution through its stages. Do not use `graphify_runs.run_id` as attempt identity. **Partial progress (2026-09-04), NOT closing this checkbox — the control-plane module exists and is live-integration-proven, and one bounded committed canary now uses real production source bindings; the full Graphify internal pipeline stages remain unwired.** Built `sveltekit-frontend/src/lib/server/atlas/indexing/graphify-daily-coordinator-v1.ts`: pure functions `acquireCoordinatorLock`/`releaseCoordinatorLock` (frozen namespace/key `119041`/`641934821`, matching `docs/reports/graphify-execution-ledger-coordinator-plan-v1.json`), `openExecution` (fresh `execution_id` every call, marks the `OPEN` stage `COMPLETED`), `recordSourceSelectionStage` (bulk-appends caller-supplied bindings into `graphify_execution_files`, marks `SOURCE_SELECTION` `COMPLETED` with a real sha256 `outputChecksum` over the sorted `sourceRef` set), `heartbeat`, `completeExecution` (throws `GRAPHIFY_COORDINATOR_COMPLETE_EXECUTION_NOT_IN_RUNNING_STATUS` rather than inferring a terminal state from a missing row, per this gate's own \"never infer COMPLETED\" rule). Every function requires the caller's own dedicated connection (never constructs one itself) — `execution_id` only, `graphify_runs.run_id` never referenced anywhere in the module. `graphify-daily-coordinator-v1.integration.spec.ts` (4/4 pass, `RUN_DB_INTEGRATION=1`, opt-in per this repo's established convention) proves the real flow end to end against the real dev DB inside one `BEGIN...ROLLBACK` (`to_regclass` + `pg_locks` both confirmed clean afterward, zero persistent footprint): open → source-selection → heartbeat → complete; two executions over the identical workspace-revision tuple get distinct `execution_id`s with independently correct file counts (2 vs 0); heartbeat after a terminal transition no-ops rather than throwing; a double-complete attempt throws. **What remains open**: the 6 pipeline-internal stages (`INVENTORY` through `VALIDATE`) are deliberately NOT owned by this control-plane module — those belong to the existing Graphify pipeline, per the earlier audit finding in this same file (\"the new coordinator must be a separate owner... do not retrofit the legacy wrappers\"). No caller wires this module to the real 25,419-source cohort from `docs/reports/graphify-lifecycle-entrypoint-v1.json` yet. A bounded 3-source committed canary is now proven by `sveltekit-frontend/scripts/atlas/graphify-daily-coordinator-canary-v1.mts`: execution `5dc82676-d8a5-470e-a3b9-e06a98fb3de5`, terminal `COMPLETED`, 3 immutable source memberships, and no historical `graphify_runs` or broad Graphify changes. The six internal stages remain open and still require the existing Graphify pipeline to be wired to this ledger. - **Entrypoint alignment audit (2026-09-04):** `sveltekit-frontend/scripts/startup/run-graphify-daily-startup.mjs` still orchestrates the legacy `npm run` steps and writes its cooldown/validation files directly; it does not call `graphify-daily-coordinator-v1.ts` or propagate `execution_id` into `INVENTORY` through `VALIDATE`. Treat `graphify:daily` as a legacy wrapper until an additive adapter delegates those existing steps under the committed coordinator execution. No broad run was started in this audit. - **Stage-owner mapping audit (2026-09-04):** the legacy startup wrapper's required step is `graphify:audit:gemma4`; its other configured steps are optional directory streaming, cluster-card generation/validation/load, BM25 planning, Qdrant-link repair, and optional EmbeddingGemma refresh. None is an implementation of the six ledger stages `INVENTORY` through `VALIDATE`, and the wrapper has no execution-ledger callback. Do not map these labels by name or mark ledger stages complete; identify or build the narrow adapter at the actual existing Graphify pipeline owner first. - **Incremental-owner audit (2026-09-04):** `sveltekit-frontend/scripts/atlas/graphify-incremental.mjs` is the nearest real changed-file pipeline, but it is a top-level script with interleaved source reads, embedding writes, cluster assignment, Qdrant projection enqueue, and BitFrost invalidation. It has no callable stage interface and no `execution_id` propagation. It cannot be placed under the ledger by renaming its eight console steps; an adapter/refactor must first isolate the existing operations and attach stage receipts without creating another writer. No incremental run was started during this audit. - Audit finding: the existing `scripts/atlas/graphify-daily-lifecycle-open-v1.mjs` and `graphify-daily-lifecycle-complete-v1.mjs` are legacy `graphify_runs` lifecycle wrappers. No implementation currently owns `graphify_executions` or `SOURCE_SELECTION`. The new coordinator must be a separate owner after migration authorization; do not retrofit the legacy wrappers or infer readiness from unrelated `execution_id` tables. - **Source-writer boundary rechecked 2026-09-04:** `graphify-lifecycle-composition-v1.ts` still exposes `runId` and delegates its `open` operation to `writeGraphifySourceInventoryV2`, whose receipt and persistence owner remain the legacy `graphify_runs`/`graphify_files` path. The writer's revision checks are useful evidence, but this composition is not yet a `graphify_executions` adapter and does not record the new `SOURCE_SELECTION` stage. Keep the two identities separate; the next implementation step is a narrow coordinator-to-writer adapter or an explicit stage-aware writer extension, not a rename of `runId` and not a second parallel source inventory implementation. - The existing read-only producer audit is ready for injected wiring: 25,419 source bindings, 108 skipped entries, workspace revision `sha256:35e032dee4202bcb34e31efed5baebcd602d4b7e23e7c98d226f5bb2aa75aeb3`, and no writes. Receipt: `docs/reports/graphify-lifecycle-entrypoint-v1.json`. This proves the source-selection producer, not the new execution-ledger coordinator. - **Receipt-shape audit and handoff update 2026-09-04:** the lifecycle receipt originally exposed only a summary, while declaring `sourceBindings` as a required open input. The existing read-only audit was extended to include the actual validated `WorkspaceSourceBindingV1[]` payload and skipped source reasons. Fresh execution now reports `sourceCount`/`bindingCount` **25,548**, `skippedCount` **108**, and workspace revision `sha256:fc051ccfc7e5627b480d369c84eeb3cc73e790b4d3a0ae2ee6da971585c05c11`. The coordinator plan was re-frozen from this receipt and remains `READY_FOR_EXPLICIT_LEDGER_AUTHORIZATION`, with `25,548` bindings and no writes. Its legacy lifecycle summary remains `open -> fanout(runId) -> close(runId)` and `liveStartupWired: false`; the new payload is a read-only handoff, not yet production coordinator wiring. Do not construct missing binding fields from counts or timestamps. - **Bounded handoff canary 2026-09-04:** updated `sveltekit-frontend/scripts/atlas/graphify-daily-coordinator-canary-v1.mts` to consume the handoff's validated bindings through `adaptWorkspaceBindingsToSourceSelectionV1()` rather than re-querying and reshaping legacy `graphify_files` rows. With the explicit committed-canary guard, live readback passed: execution `bfc5739f-554a-44c9-86f6-d239cb9b842a`, workspace revision `sha256:fc051ccfc7e5627b480d369c84eeb3cc73e790b4d3a0ae2ee6da971585c05c11`, 3 source memberships, source-selection checksum `sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030`, and 2 completed stages (`OPEN`, `SOURCE_SELECTION`). `graphify_runs`, `graphify_files`, Neo4j, Qdrant, and Valkey were not changed; this proves bounded coordinator/source-selection wiring, not full Graphify completion or canonical graph promotion. - **Compatibility test evidence 2026-09-04:** focused unit/property suites for `graphify-lifecycle-composition-v1.ts` and `graphify-source-inventory-writer-v2.ts` passed **17/17**. This confirms the existing legacy writer/composition contracts remain stable; it does not promote them to the new execution-ledger owner and does not prove `SOURCE_SELECTION` wiring until a coordinator adapter is implemented and independently read back. - **Coordinator adapter proof 2026-09-04:** added the pure `adaptWorkspaceBindingsToSourceSelectionV1()` boundary in `graphify-daily-coordinator-v1.ts` with `graphify-daily-coordinator-v1.adapter.spec.ts`. Focused tests pass **3/3**: exact workspace-binding field mapping, cross-workspace revision rejection, and duplicate `sourceRef` rejection before SQL insertion. The adapter omits `legacyFileId` when the authoritative binding has no such field; it does not invent legacy identity. No database or external-store writes occur in this proof. - **Combined recheck 2026-09-04:** adapter tests plus the opt-in live coordinator integration suite pass **12/12** with `RUN_DB_INTEGRATION=1`. The live portion remains transactional and rolled back with zero persistent footprint. This strengthens coordinator/adapter compatibility only; the production source-selection producer has not yet been wired to invoke the adapter. - **INVENTORY stage boundary 2026-09-04:** added `recordInventoryStage()` and its strict `ExecutionStageReceiptV1` checksum contract to `graphify-daily-coordinator-v1.ts`. The focused suite passes **4/4**, including proof that the stage primitive records only execution-ledger stage state and never queries or writes legacy `graphify_files`. This is stage-boundary wiring, not inventory execution; the existing inventory owner must still produce and supply the exact input/output receipt before this stage can be called in a production coordinator flow. - **Read-only inventory receipt 2026-09-04:** added `scripts/atlas/plan-graphify-inventory-stage-v1.mjs`, consuming the complete lifecycle handoff and validating all **25,548** bindings: unique source references, one workspace revision, source-revision/content-digest equality, and non-negative byte lengths. Result is `INVENTORY_RECEIPT_READY`, with source-selection input checksum `sha256:bf447d6092fe4ed400b06ce72221ff5425c413e417df453ccba32fc097c80541` and inventory output checksum `sha256:551d4c2fd428b452e4a4576f2efb0f36cfd080cfef6cfd688f4c5a3fd3930303` in `docs/reports/graphify-inventory-stage-plan-v1.json`. This is read-only planning evidence; `recordInventoryStage()` has not been called for the full population and no inventory, Graphify, Qdrant, Neo4j, or Valkey writes occurred. - **Bounded inventory-stage readback 2026-09-04:** added a three-source transactional integration fixture covering `SOURCE_SELECTION -> INVENTORY -> COMPLETED`. The live coordinator suite now passes **10/10** with the inventory stage included; `input_checksum`, `output_checksum`, and `receipt_ref` were independently read back from `graphify_execution_stages`, then the enclosing transaction rolled back. This proves the ledger stage wiring and checksum handoff only; it does not claim full-corpus inventory execution or canonical promotion. - **Committed canary inventory wiring 2026-09-04:** the explicitly guarded three-source canary now calls `recordInventoryStage()` after `recordSourceSelectionStage()`. Live readback passed with execution `6e64486f-c195-4b31-9b9e-7fe8f194523b`, `fileCount: 3`, `completedStageCount: 3`, matching `inventoryInputChecksum`/`sourceSelectionChecksum` `sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030`, and inventory output checksum `sha256:e88dff850f752f49115e799d2262b6a13fcae690a6768fc34c4b500bb742f7de`. This proves bounded `OPEN -> SOURCE_SELECTION -> INVENTORY -> COMPLETED` ledger wiring only; the full 25,548-source inventory and downstream Graphify stages remain open. Receipt: `docs/reports/graphify-daily-coordinator-canary-v1.json`. - **Structural-owner recheck 2026-09-04:** the existing `graphify-structural-materializer.ts` remains the AST/Tree-sitter materialization owner, while `graphify-structural-intelligence-adapter.ts` composes AST-grep/LangExtract evidence and keeps canonical promotion fail-closed when native provenance or source-revision authority is missing. Focused materializer, intelligence-adapter, and structural-parity suites pass **11/11**. This proves the existing structural owner and its provenance boundary; it does not yet connect `AST_PARSE` or `STRUCTURAL_EXTRACT` receipts to a live execution-ledger attempt. - **Structural stage receipt adapter 2026-09-04:** added the pure `buildGraphifyStructuralStageReceiptsV1()` adapter to `graphify-structural-intelligence-adapter.ts`. It derives chained, revision-bound checksums for `AST_PARSE` and `STRUCTURAL_EXTRACT` from the existing structural receipt/fabric result; it performs no persistence or identity promotion. Structural focused suites now pass **12/12**. This proves receipt construction and checksum chaining only; a live coordinator execution still must explicitly bind these receipts before either ledger stage can be closed. - **Live structural provider probe 2026-09-04:** the exact handoff source `__tests__/data-hashing.spec.ts` was read from its current UTF-8 bytes, matched its authoritative `sourceRevision` and byte length, and sent read-only to the existing `treesitter-chunker-8095` provider. The provider returned `RECOVERED_WITH_ERRORS` with 16 normalized symbols and explicit parse diagnostics; provenance status was `NATIVE_RECOVERED`, therefore canonical promotion was correctly denied. This is live provider/revision evidence, not a successful `AST_PARSE` or `STRUCTURAL_EXTRACT` ledger-stage completion. - **Clean-fixture provider probe 2026-09-04:** a read-only TypeScript fixture with a locally computed UTF-8 SHA-256 source revision was sent to the live `treesitter-chunker-8095` provider. The provider returned `RECOVERED_WITH_ERRORS` with two normalized symbols and an explicit parser error, `NATIVE_RECOVERED`, and `canonicalPromotionAllowed: false`. The fixture was not a workspace source and produced no canonical or datastore writes; this records an open provider quality/parity issue rather than authorizing parser changes or ledger-stage completion. - **Parser-diagnostic isolation 2026-09-04:** bounded live probes show the `treesitter-chunker-8095` response is `PROVEN` for `const answer = 42;` without a terminal newline, but `RECOVERED_WITH_ERRORS` for the same source with a terminal newline. The diagnostic is reported at the final column and the provider still returns a chunk. This isolates a likely newline/line-end parser-wrapper compatibility issue; no normalization or source-byte rewrite was applied, because doing so could invalidate canonical UTF-8 offsets and source checksums. - **Newline probe correction 2026-09-04:** added `scripts/atlas/probe-graphify-newline-parity-v1.mjs` for a reproducible direct `/ast/chunk` comparison. The live sidecar returned HTTP 200, `CLEAN`, zero diagnostics, and one chunk for both `const answer = 42;` and the same source with a terminal LF. The earlier recovered result is therefore not independently reproducible and is not sufficient evidence of a parser defect; no newline normalization, parser change, or ledger-stage promotion was made. - **Structural ledger writer boundary 2026-09-04:** added restricted `recordStructuralStage()` support for `AST_PARSE` and `STRUCTURAL_EXTRACT` only. It validates the execution receipt, chains input/output checksums, rejects non-structural stages, and never touches `graphify_files`. Coordinator/structural adapter tests pass **8/8** in this focused recheck. This is a reusable persistence seam, not live structural-stage completion; an actual producer still must invoke it for a bounded execution. - **Bounded structural ledger binding 2026-09-04:** after correcting the canary's normalized `codeSourceRevision` field mapping, the explicitly guarded canary completed `OPEN -> SOURCE_SELECTION -> INVENTORY -> AST_PARSE -> STRUCTURAL_EXTRACT -> COMPLETED` with execution `f9115616-7747-4879-a98f-fc0e189f71d8`, three immutable source memberships, and five completed stages. The structural source returned `RECOVERED_WITH_ERRORS` / `NATIVE_RECOVERED`, so `canonicalPromotionMayBeAttempted` remained `false`. Two earlier failed canary attempts were reconciled explicitly to `ABANDONED` with `CANARY_STRUCTURAL_SOURCE_REVISION_MISMATCH`; neither was treated as completed. This proves bounded structural receipt binding, not clean structural promotion or full Graphify execution. Receipt: `docs/reports/graphify-daily-coordinator-canary-v1.json`. - **Downstream stage-owner audit 2026-09-04:** no safe coordinator owner was found yet for `SEMANTIC_ENRICH` through `VALIDATE`. `sveltekit-frontend/scripts/atlas/analysis-pass-orchestrator.mts` is a pass-key CLI that directly writes `analysis_pass_results` and declares mixed downstream destinations; it is not an execution-ledger stage adapter. The Qdrant projection worker is also a separate durable projection worker and currently defaults to the legacy `384` hybrid contract, so it cannot be mapped to `PROJECT` or the canonical `semantic_768` lane by name. Keep these stages open until an owner audit identifies one stage-aware adapter with explicit `execution_id`, revision checks, and receipt-only dry-run behavior. - **Semantic-owner audit 2026-09-04:** `sveltekit-frontend/scripts/atlas/batch-d-semantic-embedder.mts` is not eligible to own `SEMANTIC_ENRICH`: it batches multiple texts into one Ollama request, derives per-node vectors through perturbation, uses numeric Qdrant IDs, and reports pgvector success without performing the canonical write. It is therefore a historical/experimental 768-dimension script, not the current `semantic_768` authority. Keep it out of the coordinator; use the existing populated PostgreSQL `codebase_chunk_index.content_embedding` owner and its revision-qualified read-only reconciliation path when identifying the real semantic producer. - **Semantic-enrichment owner correction 2026-09-04 (`SEMANTIC-ENRICH-OWNER-AUDIT-01`):** a live read-only schema/count check resolves the prior column-name ambiguity. `public.codebase_chunk_index.content_embedding` is `halfvec(768)` and populated for `55,169/55,853` rows; `content_embedding_768` is a separate `vector(768)` column populated for only `1,386/55,853` rows. The latter is legacy/separate storage, not the current canonical `semantic_768` owner. Producer metadata is heterogeneous and exact source-revision coverage remains unproven, so `SEMANTIC_ENRICH` and cohort admission remain open. Receipt: `docs/reports/semantic-enrichment-owner-audit-v1.json`. No embedding, database, Qdrant, graph, or cache writes were performed. - **Fresh semantic cohort reconciliation 2026-09-04:** the existing read-only cohort auditor was rerun against the live `semantic_768` fixture population. It resolved `55,169/55,169` chunk IDs and found content hashes for all rows, but only `52,380` source refs, `0` authoritative workspace bindings, and `0` populated registry commit revisions. Result remains `SEMANTIC_CANDIDATE_COHORT_BLOCKED` with `eligibleCount=0`; no ordinal map, KNN, KMeans, SOM, or latent execution is authorized. Receipt: `docs/reports/semantic-candidate-cohort-v1.json`.",
+      "taskChecksum": "sha256:20d63606a5336f291e19ca6b37b8af304e6bbbadad55c5cf1329ff6bf613a7a8",
+      "taskLedgerState": "UNCHECKED",
+      "classification": "SUPERSEDED",
+      "evidenceDisposition": "SUPERSEDED",
+      "currentOwner": "parent-atlas-retrieval-lineage-dag-convergence",
+      "dependencyOrBlocker": null,
+      "evidenceRefs": [
+        "docs/reports/current-source-cohort-lineage-v1.json",
+        "docs/reports/current-workspace-packet-chunk-join-v1.json",
+        "docs/reports/graphify-daily-coordinator-canary-v1.json"
+      ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
+      "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
+      "safeNextAction": "Remain unexecuted until its prerequisites and proof receipt are present.",
+      "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
+      "priority": 10,
+      "step": "STEP-01"
+    },
+    {
+      "openspecChange": "parent-atlas-retrieval-lineage-dag-convergence",
+      "taskRef": "parent-atlas-retrieval-lineage-dag-convergence:5097",
+      "sourceLine": 5097,
+      "taskText": "`GRAPH-PAGERANK-PARITY-01` — build NetworkX and cuGraph projections from the *same* `StructuralGraphSnapshotV1` (the one frozen by `GRAPHIFY-OPEN-CLOSE-LIVE-WIRING-01`'s completed run above), binding identical `graphRevision`/`vertexMapChecksum`/`edgeSetChecksum`. NetworkX = CPU correctness oracle; cuGraph = GPU executor (reuses `wsl::atlas-rapids-cu13`'s already-proven `graph.pagerank.gpu` capability per `docs/reports/runtime-capability-registry-v1.json` — no new runtime). Compare PageRank with a frozen tolerance and a replay receipt. **Blocked finding (2026-09-04), not attempted this round.** The reusable pipeline already exists — `sveltekit-frontend/scripts/atlas/export-graph-snapshot-parity-parquet.mts`, `python/graph_snapshot_parity_networkx_oracle.py`, `python/graph_snapshot_parity_cugraph_oracle.py` — but its input, `graphify/frozen-graph-snapshot-v2.json` (486MB, ~162,234 nodes / 108,156 edges per CLAUDE.md's own prior parity record), is dated 2026-08-08 — **stale relative to the 2026-09-03 `GRAPHIFY-OPEN-CLOSE-LIVE-WIRING-01` run** this checkbox explicitly requires binding to (checked live via file mtime, not assumed). Re-materializing a fresh frozen snapshot bound to that run's `graphRevision` from the live ~162K-node Neo4j graph, then re-running both oracles over it, is a large, separate, multi-hour-class operation — not attempted in this pass. Left open rather than reused/relabeled against the stale snapshot, which would silently violate the checkbox's own \"the SAME `StructuralGraphSnapshotV1`\" requirement.",
+      "taskChecksum": "sha256:2568c308070d66c8ca5d4897d03035af80e101aa24abf8e942f5d96d5469aa41",
+      "taskLedgerState": "UNCHECKED",
+      "classification": "BLOCKED_UPSTREAM",
+      "evidenceDisposition": "BLOCKED",
+      "currentOwner": "parent-atlas-retrieval-lineage-dag-convergence",
+      "dependencyOrBlocker": "Current post-coordinator lineage is not coherent: source cohort 0/52 matches current workspace; packet/chunk join 0/111 exact.",
+      "evidenceRefs": [
+        "docs/reports/current-source-cohort-lineage-v1.json",
+        "docs/reports/current-workspace-packet-chunk-join-v1.json",
+        "docs/reports/graphify-daily-coordinator-canary-v1.json"
+      ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
+      "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
+      "safeNextAction": "Repair or identify the authoritative current source/chunk binding; do not apply a cohort.",
+      "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
+      "priority": 10,
+      "step": "STEP-01"
+    },
+    {
+      "openspecChange": "parent-atlas-retrieval-lineage-dag-convergence",
+      "taskRef": "parent-atlas-retrieval-lineage-dag-convergence:5146",
+      "sourceLine": 5146,
+      "taskText": "`CANDIDATE-FEATURE-MATRIX-01` — join lexical scores, semantic exact score/rank, domain probability vector, PageRank/structural signals, and representation state by canonical identity and exact revisions into `CandidateFeatureMatrixV1`.",
+      "taskChecksum": "sha256:69ba8b6a97ec47cbe7cbc870b0ac3d26e19166cc41153518823028aa7a1069a6",
+      "taskLedgerState": "UNCHECKED",
+      "classification": "UNVERIFIED",
+      "evidenceDisposition": "UNVERIFIED",
+      "currentOwner": "parent-atlas-retrieval-lineage-dag-convergence",
+      "dependencyOrBlocker": null,
+      "evidenceRefs": [
+        "docs/reports/current-source-cohort-lineage-v1.json",
+        "docs/reports/current-workspace-packet-chunk-join-v1.json",
+        "docs/reports/graphify-daily-coordinator-canary-v1.json"
+      ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
+      "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
+      "safeNextAction": "Remain unexecuted until its prerequisites and proof receipt are present.",
+      "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
+      "priority": 10,
+      "step": "STEP-01"
+    },
+    {
+      "openspecChange": "parent-atlas-retrieval-lineage-dag-convergence",
+      "taskRef": "parent-atlas-retrieval-lineage-dag-convergence:5407",
+      "sourceLine": 5407,
+      "taskText": "Do NOT change the existing `graphify_runs` unique index yet.",
+      "taskChecksum": "sha256:f347adb8a35f5c41f1acb007e832ab0c21788eefd5a0eead5f48a7c170ccf9b9",
+      "taskLedgerState": "UNCHECKED",
+      "classification": "NEGATIVE_CONSTRAINT",
+      "evidenceDisposition": "CONSTRAINT",
+      "currentOwner": "parent-atlas-retrieval-lineage-dag-convergence",
+      "dependencyOrBlocker": "Constraint only; not executable work.",
+      "evidenceRefs": [
+        "docs/reports/current-source-cohort-lineage-v1.json",
+        "docs/reports/current-workspace-packet-chunk-join-v1.json",
+        "docs/reports/graphify-daily-coordinator-canary-v1.json"
+      ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
+      "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
+      "safeNextAction": "Preserve this constraint while executing its parent gate.",
+      "mutationScope": "NONE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
+      "priority": 10,
+      "step": "STEP-01"
+    },
+    {
+      "openspecChange": "parent-atlas-retrieval-lineage-dag-convergence",
+      "taskRef": "parent-atlas-retrieval-lineage-dag-convergence:5408",
+      "sourceLine": 5408,
+      "taskText": "Do NOT rewrite historical `graphify_runs` rows.",
+      "taskChecksum": "sha256:97791f7428a76e4398156cfb58013c142d6c6b18e0febc3e743a4252144dd6cb",
+      "taskLedgerState": "UNCHECKED",
+      "classification": "SUPERSEDED",
+      "evidenceDisposition": "SUPERSEDED",
+      "currentOwner": "parent-atlas-retrieval-lineage-dag-convergence",
+      "dependencyOrBlocker": null,
+      "evidenceRefs": [
+        "docs/reports/current-source-cohort-lineage-v1.json",
+        "docs/reports/current-workspace-packet-chunk-join-v1.json",
+        "docs/reports/graphify-daily-coordinator-canary-v1.json"
+      ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
+      "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
+      "safeNextAction": "Remain unexecuted until its prerequisites and proof receipt are present.",
+      "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
+      "priority": 10,
+      "step": "STEP-01"
+    },
+    {
+      "openspecChange": "parent-atlas-retrieval-lineage-dag-convergence",
+      "taskRef": "parent-atlas-retrieval-lineage-dag-convergence:5409",
+      "sourceLine": 5409,
+      "taskText": "Do NOT run broad `graphify:daily` yet — see the \"ignore the stale codebase-graph.json hook\" note below; running it prematurely would muddy the evidence this gate needs.",
+      "taskChecksum": "sha256:76508d34d12edcf6dad8fd353987c3759ec9d87078619023a87e3e89be7acba6",
+      "taskLedgerState": "UNCHECKED",
+      "classification": "NEGATIVE_CONSTRAINT",
+      "evidenceDisposition": "CONSTRAINT",
+      "currentOwner": "parent-atlas-retrieval-lineage-dag-convergence",
+      "dependencyOrBlocker": "Constraint only; not executable work.",
+      "evidenceRefs": [
+        "docs/reports/current-source-cohort-lineage-v1.json",
+        "docs/reports/current-workspace-packet-chunk-join-v1.json",
+        "docs/reports/graphify-daily-coordinator-canary-v1.json"
+      ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
+      "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
+      "safeNextAction": "Preserve this constraint while executing its parent gate.",
+      "mutationScope": "NONE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
+      "priority": 10,
+      "step": "STEP-01"
+    },
+    {
+      "openspecChange": "parent-atlas-retrieval-lineage-dag-convergence",
+      "taskRef": "parent-atlas-retrieval-lineage-dag-convergence:5411",
+      "sourceLine": 5411,
+      "taskText": "Do NOT retry `PKT-LINEAGE-08`'s authorized apply from this gate — that item's own prerequisites (recorded earlier in this file) are unrelated to and independent of this ledger.",
+      "taskChecksum": "sha256:87732f1e5829a34f5914a25b5350cf0f17b3b14d26b0e8947b5e184df838b13d",
+      "taskLedgerState": "UNCHECKED",
+      "classification": "NEGATIVE_CONSTRAINT",
+      "evidenceDisposition": "CONSTRAINT",
+      "currentOwner": "parent-atlas-retrieval-lineage-dag-convergence",
+      "dependencyOrBlocker": "Constraint only; not executable work.",
+      "evidenceRefs": [
+        "docs/reports/current-source-cohort-lineage-v1.json",
+        "docs/reports/current-workspace-packet-chunk-join-v1.json",
+        "docs/reports/graphify-daily-coordinator-canary-v1.json"
+      ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
+      "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
+      "safeNextAction": "Preserve this constraint while executing its parent gate.",
+      "mutationScope": "NONE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
+      "priority": 10,
+      "step": "STEP-01"
+    },
+    {
+      "openspecChange": "parent-atlas-retrieval-lineage-dag-convergence",
+      "taskRef": "parent-atlas-retrieval-lineage-dag-convergence:6698",
+      "sourceLine": 6698,
+      "taskText": "Keep implementation in `scripts/atlas` until the directory-index, evidence, ACE, DAG, language-parity, and cache readback gates each have their own receipts; only then consider promotion into `packages/atlas*`. ### Source-authority recheck (2026-09-05)",
+      "taskChecksum": "sha256:ea0a90b71adbf325261b4c487ba4712388ed42f43657bc927c2caf6d738b4a03",
+      "taskLedgerState": "UNCHECKED",
+      "classification": "GOVERNANCE_ONLY",
+      "evidenceDisposition": "UNVERIFIED",
+      "currentOwner": "parent-atlas-retrieval-lineage-dag-convergence",
+      "dependencyOrBlocker": "Governance/proof bookkeeping; requires evidence, not model selection.",
+      "evidenceRefs": [
+        "docs/reports/current-source-cohort-lineage-v1.json",
+        "docs/reports/current-workspace-packet-chunk-join-v1.json",
+        "docs/reports/graphify-daily-coordinator-canary-v1.json"
+      ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
+      "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
+      "safeNextAction": "Attach current evidence before changing task status.",
+      "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
+      "priority": 10,
+      "step": "STEP-01"
+    },
+    {
+      "openspecChange": "parent-atlas-retrieval-lineage-dag-convergence",
+      "taskRef": "parent-atlas-retrieval-lineage-dag-convergence:6861",
+      "sourceLine": 6861,
+      "taskText": "Review root/workspace `AGENTS.md` content and preserve only high-signal operating rules in ambient context. Do not delete generated knowledge; relocate or repoint it only after review.",
+      "taskChecksum": "sha256:d73a1fdcb2c17f5e0bbb9ba0282598a524833aff7554c6d790ee3ccad8d258b0",
+      "taskLedgerState": "UNCHECKED",
+      "classification": "NEGATIVE_CONSTRAINT",
+      "evidenceDisposition": "CONSTRAINT",
+      "currentOwner": "parent-atlas-retrieval-lineage-dag-convergence",
+      "dependencyOrBlocker": "Constraint only; not executable work.",
+      "evidenceRefs": [
+        "docs/reports/current-source-cohort-lineage-v1.json",
+        "docs/reports/current-workspace-packet-chunk-join-v1.json",
+        "docs/reports/graphify-daily-coordinator-canary-v1.json"
+      ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
+      "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
+      "safeNextAction": "Preserve this constraint while executing its parent gate.",
+      "mutationScope": "NONE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
+      "priority": 10,
+      "step": "STEP-01"
+    },
+    {
+      "openspecChange": "parent-atlas-retrieval-lineage-dag-convergence",
+      "taskRef": "parent-atlas-retrieval-lineage-dag-convergence:6863",
+      "sourceLine": 6863,
+      "taskText": "Route generated repository index, ast-grep metadata, symbol facts, and Graphify summaries to Parent Atlas retrievable reports/cards, then let ACE select bounded evidence for OpenCode.",
+      "taskChecksum": "sha256:9e87c381b0448b6e42b18ee229917a79a876a7b042a03eec08210a720af98f69",
+      "taskLedgerState": "UNCHECKED",
+      "classification": "UNVERIFIED",
+      "evidenceDisposition": "UNVERIFIED",
+      "currentOwner": "parent-atlas-retrieval-lineage-dag-convergence",
+      "dependencyOrBlocker": null,
+      "evidenceRefs": [
+        "docs/reports/current-source-cohort-lineage-v1.json",
+        "docs/reports/current-workspace-packet-chunk-join-v1.json",
+        "docs/reports/graphify-daily-coordinator-canary-v1.json"
+      ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
+      "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
+      "safeNextAction": "Remain unexecuted until its prerequisites and proof receipt are present.",
+      "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
+      "priority": 10,
+      "step": "STEP-01"
+    },
+    {
+      "openspecChange": "parent-atlas-retrieval-lineage-dag-convergence",
+      "taskRef": "parent-atlas-retrieval-lineage-dag-convergence:6921",
+      "sourceLine": 6921,
+      "taskText": "Runtime adapter remains open: the seed has 0/40,136 identity-ready rows and the current packet/chunk join has 0 exact sources. Next gate: `AST-EXPLORE-INDEX-ADAPTER-01` after source-selection/workspace reconciliation.",
+      "taskChecksum": "sha256:51d5682a5eb5520390d6296b394e98c14fec60517b86b278ac15bbb2b8a7587a",
+      "taskLedgerState": "UNCHECKED",
+      "classification": "UNVERIFIED",
+      "evidenceDisposition": "UNVERIFIED",
+      "currentOwner": "parent-atlas-retrieval-lineage-dag-convergence",
+      "dependencyOrBlocker": null,
+      "evidenceRefs": [
+        "docs/reports/current-source-cohort-lineage-v1.json",
+        "docs/reports/current-workspace-packet-chunk-join-v1.json",
+        "docs/reports/graphify-daily-coordinator-canary-v1.json"
+      ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
+      "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
+      "safeNextAction": "Remain unexecuted until its prerequisites and proof receipt are present.",
+      "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
+      "priority": 10,
+      "step": "STEP-01"
+    },
+    {
+      "openspecChange": "parent-atlas-retrieval-lineage-dag-convergence",
+      "taskRef": "parent-atlas-retrieval-lineage-dag-convergence:6934",
+      "sourceLine": 6934,
+      "taskText": "AST-EXPLORE-02 remains `BLOCKED_UPSTREAM`: no seed rows are admitted until exact source/chunk/workspace lineage and canonical byte-span identity are available.",
+      "taskChecksum": "sha256:84dfa8549b058ad0cb950dcbf5d727f55ff08beff7c919114361189d04866875",
+      "taskLedgerState": "UNCHECKED",
+      "classification": "UNVERIFIED",
+      "evidenceDisposition": "UNVERIFIED",
+      "currentOwner": "parent-atlas-retrieval-lineage-dag-convergence",
+      "dependencyOrBlocker": null,
+      "evidenceRefs": [
+        "docs/reports/current-source-cohort-lineage-v1.json",
+        "docs/reports/current-workspace-packet-chunk-join-v1.json",
+        "docs/reports/graphify-daily-coordinator-canary-v1.json"
+      ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
+      "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
+      "safeNextAction": "Remain unexecuted until its prerequisites and proof receipt are present.",
+      "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
+      "priority": 10,
+      "step": "STEP-01"
+    },
+    {
+      "openspecChange": "parent-atlas-okf-knowledge-layers",
+      "taskRef": "parent-atlas-okf-knowledge-layers:44",
+      "sourceLine": 44,
+      "taskText": "Validate existing `.okf/` files against OKF v0.2 (provenance, trust, lifecycle fields present and well-formed).",
+      "taskChecksum": "sha256:cecf9e0fcab8f0f170f80dc3bd1882c17f530aa2ffb6ee135183ada5bf63d5fd",
+      "taskLedgerState": "UNCHECKED",
+      "classification": "OWNED_BY_OTHER_CHANGE",
+      "evidenceDisposition": "OWNED_BY_OTHER_CHANGE",
+      "currentOwner": "parent-atlas-okf-knowledge-layers",
+      "dependencyOrBlocker": "Implementation owner is parent-atlas-okf-knowledge-layers; this board may reference it but does not execute its unchecked backlog.",
+      "evidenceRefs": [
+        "docs/reports/openspec-portfolio-v1.json"
+      ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/openspec-portfolio-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
+      "validationCommand": "npx openspec validate parent-atlas-okf-knowledge-layers --type change --strict --json",
+      "safeNextAction": "Review the owning change's proof gate: parent-atlas-okf-knowledge-layers",
+      "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
+      "priority": 20,
+      "step": "STEP-02"
+    },
+    {
+      "openspecChange": "parent-atlas-okf-knowledge-layers",
+      "taskRef": "parent-atlas-okf-knowledge-layers:209",
+      "sourceLine": 209,
+      "taskText": "Install OpenWiki; configure its generated-wiki output directory separate from `docs/okf/parent-atlas/` (hand-authored/canonical).",
+      "taskChecksum": "sha256:937bfb0a40b829a1143694ab8c0a53aa57d203bf5e95ab7951f946f4c0b453c1",
+      "taskLedgerState": "UNCHECKED",
+      "classification": "OWNED_BY_OTHER_CHANGE",
+      "evidenceDisposition": "OWNED_BY_OTHER_CHANGE",
+      "currentOwner": "parent-atlas-okf-knowledge-layers",
+      "dependencyOrBlocker": "Implementation owner is parent-atlas-okf-knowledge-layers; this board may reference it but does not execute its unchecked backlog.",
+      "evidenceRefs": [
+        "docs/reports/openspec-portfolio-v1.json"
+      ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/openspec-portfolio-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
+      "validationCommand": "npx openspec validate parent-atlas-okf-knowledge-layers --type change --strict --json",
+      "safeNextAction": "Review the owning change's proof gate: parent-atlas-okf-knowledge-layers",
+      "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
+      "priority": 20,
+      "step": "STEP-02"
+    },
+    {
+      "openspecChange": "parent-atlas-okf-knowledge-layers",
+      "taskRef": "parent-atlas-okf-knowledge-layers:269",
+      "sourceLine": 269,
+      "taskText": "**OKF-06.7 Storage/index boundary** Record PostgreSQL/pgvector as canonical or durable derived storage only where an existing owner proves it; record bitmap/table indexes as query accelerators with explainable filter parity; record PyTorch/AIO as compute/I/O capabilities, not schema owners.",
+      "taskChecksum": "sha256:0e9f4c6e6dbe0c671b16c21b5f32f9f07e6f4ec3d3260a4dbca0c24ef929197c",
+      "taskLedgerState": "UNCHECKED",
+      "classification": "OWNED_BY_OTHER_CHANGE",
+      "evidenceDisposition": "OWNED_BY_OTHER_CHANGE",
+      "currentOwner": "parent-atlas-okf-knowledge-layers",
+      "dependencyOrBlocker": "Implementation owner is parent-atlas-okf-knowledge-layers; this board may reference it but does not execute its unchecked backlog.",
+      "evidenceRefs": [
+        "docs/reports/openspec-portfolio-v1.json"
+      ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/openspec-portfolio-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
+      "validationCommand": "npx openspec validate parent-atlas-okf-knowledge-layers --type change --strict --json",
+      "safeNextAction": "Review the owning change's proof gate: parent-atlas-okf-knowledge-layers",
+      "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
+      "priority": 20,
+      "step": "STEP-02"
+    },
+    {
+      "openspecChange": "parent-atlas-okf-knowledge-layers",
+      "taskRef": "parent-atlas-okf-knowledge-layers:273",
+      "sourceLine": 273,
+      "taskText": "**OKF-06.8 Agent/document boundary** Treat LangChain/Deep Agents as optional orchestration, OpenWiki as a generated review surface, and the Kanban agent as a recommendation/execution coordinator. None may write canonical truth directly; all durable changes require promotion receipts.",
+      "taskChecksum": "sha256:f3d486e8a0dbaabff7f2070e7822418c096393988ffc611d6a7e68f6b46a2be4",
+      "taskLedgerState": "UNCHECKED",
+      "classification": "OWNED_BY_OTHER_CHANGE",
+      "evidenceDisposition": "OWNED_BY_OTHER_CHANGE",
+      "currentOwner": "parent-atlas-okf-knowledge-layers",
+      "dependencyOrBlocker": "Implementation owner is parent-atlas-okf-knowledge-layers; this board may reference it but does not execute its unchecked backlog.",
+      "evidenceRefs": [
+        "docs/reports/openspec-portfolio-v1.json"
+      ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/openspec-portfolio-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
+      "validationCommand": "npx openspec validate parent-atlas-okf-knowledge-layers --type change --strict --json",
+      "safeNextAction": "Review the owning change's proof gate: parent-atlas-okf-knowledge-layers",
+      "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
+      "priority": 20,
+      "step": "STEP-02"
+    },
+    {
+      "openspecChange": "parent-atlas-retrieval-lineage-dag-convergence",
+      "taskRef": "parent-atlas-retrieval-lineage-dag-convergence:576",
+      "sourceLine": 576,
+      "taskText": "DAG-RUNTIME-01E — **`BLOCKED_BY_01D.2`**. Link the execution receipt to ContextManifest and validation receipts while preserving zero-write/non-canonical semantics.",
+      "taskChecksum": "sha256:4f8c0e52ba7058fb50e7aabba4504e8bbf781d4fe8008e7bac31a22b47343f5d",
+      "taskLedgerState": "UNCHECKED",
+      "classification": "GOVERNANCE_ONLY",
+      "evidenceDisposition": "UNVERIFIED",
+      "currentOwner": "parent-atlas-retrieval-lineage-dag-convergence",
+      "dependencyOrBlocker": "Governance/proof bookkeeping; requires evidence, not model selection.",
+      "evidenceRefs": [
+        "docs/reports/current-source-cohort-lineage-v1.json",
+        "docs/reports/current-workspace-packet-chunk-join-v1.json"
+      ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
+      "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
+      "safeNextAction": "Attach current evidence before changing task status.",
+      "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
+      "priority": 20,
+      "step": "STEP-02"
+    },
+    {
+      "openspecChange": "parent-atlas-retrieval-lineage-dag-convergence",
+      "taskRef": "parent-atlas-retrieval-lineage-dag-convergence:681",
+      "sourceLine": 681,
+      "taskText": "PROMOTION-02 — Permit writes only through an explicit target list, rollback plan, readback receipt, and human authorization.",
+      "taskChecksum": "sha256:7477170ad0079543a33f7fe02e5a9cb5aa148348e71f50c3c419f6acabfd948e",
+      "taskLedgerState": "UNCHECKED",
+      "classification": "HUMAN_DECISION_REQUIRED",
+      "evidenceDisposition": "HUMAN_DECISION_REQUIRED",
+      "currentOwner": "parent-atlas-retrieval-lineage-dag-convergence",
+      "dependencyOrBlocker": null,
+      "evidenceRefs": [
+        "docs/reports/current-source-cohort-lineage-v1.json",
+        "docs/reports/current-workspace-packet-chunk-join-v1.json"
+      ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
+      "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
+      "safeNextAction": "Remain unexecuted until its prerequisites and proof receipt are present.",
+      "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
+      "priority": 20,
+      "step": "STEP-02"
+    },
+    {
+      "openspecChange": "parent-atlas-retrieval-lineage-dag-convergence",
+      "taskRef": "parent-atlas-retrieval-lineage-dag-convergence:3828",
+      "sourceLine": 3828,
+      "taskText": "Freeze the shared candidate population and `CandidateOrdinalMapV1` before production KNN/KMeans/SOM execution.",
+      "taskChecksum": "sha256:f3b60553269d0fb5df4d7be21ec3641198ba965d969969cc4608a0d87e67657b",
+      "taskLedgerState": "UNCHECKED",
+      "classification": "UNVERIFIED",
+      "evidenceDisposition": "UNVERIFIED",
+      "currentOwner": "parent-atlas-retrieval-lineage-dag-convergence",
+      "dependencyOrBlocker": null,
+      "evidenceRefs": [
+        "docs/reports/current-source-cohort-lineage-v1.json",
+        "docs/reports/current-workspace-packet-chunk-join-v1.json"
+      ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
+      "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
+      "safeNextAction": "Remain unexecuted until its prerequisites and proof receipt are present.",
+      "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
+      "priority": 20,
+      "step": "STEP-02"
+    },
+    {
+      "openspecChange": "parent-atlas-retrieval-lineage-dag-convergence",
+      "taskRef": "parent-atlas-retrieval-lineage-dag-convergence:5149",
+      "sourceLine": 5149,
+      "taskText": "`XGBOOST-RERANKER-EVAL-01` — train/evaluate only on the frozen `CandidateFeatureMatrixV1`. Use GPU (`device=cuda, tree_method=hist`) only if `runtime-capability-registry-v1.json` proves it live in an existing runtime first (currently `HARNESS_EXISTS_NOT_YET_RUN` — run `prove_atlas_xgboost_gpu_runtime_v1.py` and record a real `liveProof` before relying on GPU here; do not install another runtime merely for this). Keep production XGBoost ranking weight at `0` until the frozen evaluation passes.",
+      "taskChecksum": "sha256:740fb8ddceefefa05fa4448134a48d2287941e1412ecdd0f3b78e46675418b59",
+      "taskLedgerState": "UNCHECKED",
+      "classification": "NEGATIVE_CONSTRAINT",
+      "evidenceDisposition": "CONSTRAINT",
+      "currentOwner": "parent-atlas-retrieval-lineage-dag-convergence",
+      "dependencyOrBlocker": "Constraint only; not executable work.",
+      "evidenceRefs": [
+        "docs/reports/current-source-cohort-lineage-v1.json",
+        "docs/reports/current-workspace-packet-chunk-join-v1.json"
+      ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
+      "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
+      "safeNextAction": "Preserve this constraint while executing its parent gate.",
+      "mutationScope": "NONE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
+      "priority": 20,
+      "step": "STEP-02"
+    },
+    {
+      "openspecChange": "parent-atlas-okf-knowledge-layers",
+      "taskRef": "parent-atlas-okf-knowledge-layers:210",
+      "sourceLine": 210,
+      "taskText": "OpenWiki synthesizes exactly one review page summarizing this audit — verify it does not scan `.env`, secrets, model binaries, raw Qdrant vectors, or unbounded logs.",
+      "taskChecksum": "sha256:ff1c65db2e5a69c0f2d673153fe2c0e43241638c64ecc1699a8ccf9ae55a165f",
+      "taskLedgerState": "UNCHECKED",
+      "classification": "OWNED_BY_OTHER_CHANGE",
+      "evidenceDisposition": "OWNED_BY_OTHER_CHANGE",
+      "currentOwner": "parent-atlas-okf-knowledge-layers",
+      "dependencyOrBlocker": "Implementation owner is parent-atlas-okf-knowledge-layers; this board may reference it but does not execute its unchecked backlog.",
+      "evidenceRefs": [
+        "docs/reports/openspec-portfolio-v1.json"
+      ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/openspec-portfolio-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
+      "validationCommand": "npx openspec validate parent-atlas-okf-knowledge-layers --type change --strict --json",
+      "safeNextAction": "Review the owning change's proof gate: parent-atlas-okf-knowledge-layers",
+      "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
+      "priority": 30,
+      "step": "STEP-03"
+    },
+    {
+      "openspecChange": "parent-atlas-retrieval-lineage-dag-convergence",
+      "taskRef": "parent-atlas-retrieval-lineage-dag-convergence:3486",
+      "sourceLine": 3486,
+      "taskText": "Restore/prove dense Qdrant tool-manifest coverage and embedding availability before claiming dense MCP pickup. Read-only audit re-run: EmbeddingGemma is reachable and reports 768-dimensional embeddings, but Qdrant contains `0/20` known tool-manifest mappings and zero `tool_manifest` packets. The existing registry fallback remains the active bounded selector path. Evidence: `docs/reports/mcp-tool-selection-audit.json`. This remains blocked; no Qdrant projection producer or write was added.",
+      "taskChecksum": "sha256:172245f350e718029007bac78206b797beb6c035acd6cf045ea798566178eeb7",
+      "taskLedgerState": "UNCHECKED",
+      "classification": "BLOCKED_UPSTREAM",
+      "evidenceDisposition": "BLOCKED",
+      "currentOwner": "parent-atlas-retrieval-lineage-dag-convergence",
+      "dependencyOrBlocker": "Current post-coordinator lineage is not coherent: source cohort 0/52 matches current workspace; packet/chunk join 0/111 exact.",
+      "evidenceRefs": [
+        "docs/reports/current-source-cohort-lineage-v1.json",
+        "docs/reports/current-workspace-packet-chunk-join-v1.json"
+      ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
+      "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
+      "safeNextAction": "Repair or identify the authoritative current source/chunk binding; do not apply a cohort.",
+      "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
+      "priority": 30,
+      "step": "STEP-03"
+    },
+    {
+      "openspecChange": "parent-atlas-okf-knowledge-layers",
+      "taskRef": "parent-atlas-okf-knowledge-layers:195",
+      "sourceLine": 195,
+      "taskText": "AST-context classification per hit: test fixture (acceptable) / demo-flag-gated mock (acceptable, labeled) / unlabeled synthetic production response (flag) / throwing stub (flag) / unreferenced stub (flag).",
+      "taskChecksum": "sha256:cbf528226ccffa92f3952418513c9024c18d66ee88d9b5145082838369b7632e",
+      "taskLedgerState": "UNCHECKED",
+      "classification": "OWNED_BY_OTHER_CHANGE",
+      "evidenceDisposition": "OWNED_BY_OTHER_CHANGE",
+      "currentOwner": "parent-atlas-okf-knowledge-layers",
+      "dependencyOrBlocker": "Implementation owner is parent-atlas-okf-knowledge-layers; this board may reference it but does not execute its unchecked backlog.",
+      "evidenceRefs": [
+        "docs/reports/openspec-portfolio-v1.json"
+      ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/openspec-portfolio-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
+      "validationCommand": "npx openspec validate parent-atlas-okf-knowledge-layers --type change --strict --json",
+      "safeNextAction": "Review the owning change's proof gate: parent-atlas-okf-knowledge-layers",
+      "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
+      "priority": 40,
+      "step": "STEP-04"
+    },
+    {
+      "openspecChange": "parent-atlas-okf-knowledge-layers",
+      "taskRef": "parent-atlas-okf-knowledge-layers:176",
+      "sourceLine": 176,
+      "taskText": "Static pass: `rg` for `TODO|NOT_IMPLEMENTED|throw new Error.*not implemented|Math\\.random.*(mock|stub|simulate|placeholder|demo)`.",
+      "taskChecksum": "sha256:639d398382dfcf7a86ec0fdd03ae97b10c7e5e3ac21b361161e6da22e6b5de2c",
+      "taskLedgerState": "UNCHECKED",
+      "classification": "OWNED_BY_OTHER_CHANGE",
+      "evidenceDisposition": "OWNED_BY_OTHER_CHANGE",
+      "currentOwner": "parent-atlas-okf-knowledge-layers",
+      "dependencyOrBlocker": "Implementation owner is parent-atlas-okf-knowledge-layers; this board may reference it but does not execute its unchecked backlog.",
+      "evidenceRefs": [
+        "docs/reports/openspec-portfolio-v1.json"
+      ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/openspec-portfolio-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
+      "validationCommand": "npx openspec validate parent-atlas-okf-knowledge-layers --type change --strict --json",
+      "safeNextAction": "Review the owning change's proof gate: parent-atlas-okf-knowledge-layers",
+      "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
+      "priority": 50,
+      "step": "STEP-05"
+    },
+    {
+      "openspecChange": "parent-atlas-retrieval-lineage-dag-convergence",
+      "taskRef": "parent-atlas-retrieval-lineage-dag-convergence:3612",
+      "sourceLine": 3612,
+      "taskText": "Prove BitFrost mutation invalidation and disconnect flush safety.",
+      "taskChecksum": "sha256:9b21e8b17c48ffc3e99e93ab14b67177db5c0718379f2e0b261977377b388e1c",
+      "taskLedgerState": "UNCHECKED",
+      "classification": "UNVERIFIED",
+      "evidenceDisposition": "UNVERIFIED",
+      "currentOwner": "parent-atlas-retrieval-lineage-dag-convergence",
+      "dependencyOrBlocker": null,
+      "evidenceRefs": [
+        "docs/reports/current-source-cohort-lineage-v1.json",
+        "docs/reports/current-workspace-packet-chunk-join-v1.json"
+      ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
+      "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
+      "safeNextAction": "Remain unexecuted until its prerequisites and proof receipt are present.",
+      "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
+      "priority": 50,
+      "step": "STEP-05"
+    },
+    {
+      "openspecChange": "parent-atlas-retrieval-lineage-dag-convergence",
+      "taskRef": "parent-atlas-retrieval-lineage-dag-convergence:3713",
+      "sourceLine": 3713,
+      "taskText": "MCP-OUTCOME-RECEIPT-ADAPTER-01 — design an additive adapter for the live outcome ledger, preserve incomplete receipt metadata as explicit null/metadata, require Postgres acknowledgement, and prove idempotent readback/replay before migrating any writer.",
+      "taskChecksum": "sha256:86212dab79f1c45b410755e482611894d90459bd3621ee67df88467ac5200b03",
+      "taskLedgerState": "UNCHECKED",
+      "classification": "GOVERNANCE_ONLY",
+      "evidenceDisposition": "UNVERIFIED",
+      "currentOwner": "parent-atlas-retrieval-lineage-dag-convergence",
+      "dependencyOrBlocker": "Governance/proof bookkeeping; requires evidence, not model selection.",
+      "evidenceRefs": [
+        "docs/reports/current-source-cohort-lineage-v1.json",
+        "docs/reports/current-workspace-packet-chunk-join-v1.json"
+      ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
+      "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
+      "safeNextAction": "Attach current evidence before changing task status.",
+      "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
+      "priority": 50,
+      "step": "STEP-05"
+    },
+    {
+      "openspecChange": "parent-atlas-retrieval-lineage-dag-convergence",
+      "taskRef": "parent-atlas-retrieval-lineage-dag-convergence:3739",
+      "sourceLine": 3739,
+      "taskText": "Migrate one bounded workflow RECORD stage to the typed writer. The recommendation workflow is a standalone `.mjs` CLI while the writer is server-side TypeScript; choose and prove one explicit runtime boundary first. Do not duplicate receipt SQL or silently keep NDJSON as a success acknowledgement. Current analysis: `mcp-outcome-receipt-adapter-v1.json`.",
+      "taskChecksum": "sha256:3e4e1d9025962e4f550d08ee589b2719364059dddac07c1b5f8d86839f42104f",
+      "taskLedgerState": "UNCHECKED",
+      "classification": "NEGATIVE_CONSTRAINT",
+      "evidenceDisposition": "CONSTRAINT",
+      "currentOwner": "parent-atlas-retrieval-lineage-dag-convergence",
+      "dependencyOrBlocker": "Constraint only; not executable work.",
+      "evidenceRefs": [
+        "docs/reports/current-source-cohort-lineage-v1.json",
+        "docs/reports/current-workspace-packet-chunk-join-v1.json"
+      ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
+      "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
+      "safeNextAction": "Preserve this constraint while executing its parent gate.",
+      "mutationScope": "NONE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
+      "priority": 50,
+      "step": "STEP-05"
+    },
+    {
+      "openspecChange": "parent-atlas-retrieval-lineage-dag-convergence",
+      "taskRef": "parent-atlas-retrieval-lineage-dag-convergence:3870",
+      "sourceLine": 3870,
+      "taskText": "15 Run bounded exact KNN, then attach the KNN receipt before permitting KMeans, SOM, or AE/fanout.",
+      "taskChecksum": "sha256:ecc5ade4d647992e6a40901b6e54d07e71524bfb339682e4ad41f8b3676b0b73",
+      "taskLedgerState": "UNCHECKED",
+      "classification": "GOVERNANCE_ONLY",
+      "evidenceDisposition": "UNVERIFIED",
+      "currentOwner": "parent-atlas-retrieval-lineage-dag-convergence",
+      "dependencyOrBlocker": "Governance/proof bookkeeping; requires evidence, not model selection.",
+      "evidenceRefs": [
+        "docs/reports/current-source-cohort-lineage-v1.json",
+        "docs/reports/current-workspace-packet-chunk-join-v1.json"
+      ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
+      "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
+      "safeNextAction": "Attach current evidence before changing task status.",
+      "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
+      "priority": 50,
+      "step": "STEP-05"
+    },
+    {
+      "openspecChange": "parent-atlas-retrieval-lineage-dag-convergence",
+      "taskRef": "parent-atlas-retrieval-lineage-dag-convergence:6865",
+      "sourceLine": 6865,
+      "taskText": "Add a deterministic budget/duplicate/generated-content validator and a fresh-session A/B proof measuring admitted tokens, reads, compactions, and crystallized synthesis.",
+      "taskChecksum": "sha256:ee42b66b21a86ec1d1174e961e84ef15bf278f12e1035ae3ea99f13700c24250",
+      "taskLedgerState": "UNCHECKED",
+      "classification": "UNVERIFIED",
+      "evidenceDisposition": "UNVERIFIED",
+      "currentOwner": "parent-atlas-retrieval-lineage-dag-convergence",
+      "dependencyOrBlocker": null,
+      "evidenceRefs": [
+        "docs/reports/current-source-cohort-lineage-v1.json",
+        "docs/reports/current-workspace-packet-chunk-join-v1.json"
+      ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
+      "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
+      "safeNextAction": "Remain unexecuted until its prerequisites and proof receipt are present.",
+      "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
+      "priority": 50,
+      "step": "STEP-05"
+    },
+    {
+      "openspecChange": "parent-atlas-okf-knowledge-layers",
+      "taskRef": "parent-atlas-okf-knowledge-layers:197",
+      "sourceLine": 197,
+      "taskText": "Output: one JSON + Markdown report.",
+      "taskChecksum": "sha256:23c36afca4709be07237ced3c710b93c2ad4d29ae00953f963513c62539df577",
+      "taskLedgerState": "UNCHECKED",
+      "classification": "OWNED_BY_OTHER_CHANGE",
+      "evidenceDisposition": "OWNED_BY_OTHER_CHANGE",
+      "currentOwner": "parent-atlas-okf-knowledge-layers",
+      "dependencyOrBlocker": "Implementation owner is parent-atlas-okf-knowledge-layers; this board may reference it but does not execute its unchecked backlog.",
+      "evidenceRefs": [
+        "docs/reports/openspec-portfolio-v1.json"
+      ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/openspec-portfolio-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
+      "validationCommand": "npx openspec validate parent-atlas-okf-knowledge-layers --type change --strict --json",
+      "safeNextAction": "Review the owning change's proof gate: parent-atlas-okf-knowledge-layers",
+      "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
+      "priority": 80,
+      "step": "STEP-07"
+    },
+    {
+      "openspecChange": "parent-atlas-okf-knowledge-layers",
+      "taskRef": "parent-atlas-okf-knowledge-layers:201",
+      "sourceLine": 201,
+      "taskText": "Draft `atlas_work_items` + `atlas_work_item_evidence` Drizzle schema (design only — do not apply/migrate yet).",
+      "taskChecksum": "sha256:fd6b708133960664bdc8da403a41cea518e83ec6b9f8c9c381bf8c891c741acb",
+      "taskLedgerState": "UNCHECKED",
+      "classification": "NEGATIVE_CONSTRAINT",
+      "evidenceDisposition": "CONSTRAINT",
+      "currentOwner": "parent-atlas-okf-knowledge-layers",
+      "dependencyOrBlocker": "Constraint only; not executable work.",
+      "evidenceRefs": [],
+      "evidenceResolution": [],
+      "missingEvidenceRefs": [],
+      "validationCommand": "npx openspec validate parent-atlas-okf-knowledge-layers --type change --strict --json",
+      "safeNextAction": "Preserve this constraint while executing its parent gate.",
+      "mutationScope": "NONE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
+      "priority": 80,
+      "step": "STEP-07"
+    },
+    {
+      "openspecChange": "parent-atlas-okf-knowledge-layers",
+      "taskRef": "parent-atlas-okf-knowledge-layers:202",
+      "sourceLine": 202,
+      "taskText": "Repository-only fixture (in-memory or local test DB) proving the shape round-trips: insert one gap-backed work item + one evidence row, read back.",
+      "taskChecksum": "sha256:61c66781d51437edd2d5e2c8222273bb8cf4451b28679f38107d69baec8bfddf",
+      "taskLedgerState": "UNCHECKED",
+      "classification": "OWNED_BY_OTHER_CHANGE",
+      "evidenceDisposition": "OWNED_BY_OTHER_CHANGE",
+      "currentOwner": "parent-atlas-okf-knowledge-layers",
+      "dependencyOrBlocker": "Implementation owner is parent-atlas-okf-knowledge-layers; this board may reference it but does not execute its unchecked backlog.",
+      "evidenceRefs": [
+        "docs/reports/openspec-portfolio-v1.json"
+      ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/openspec-portfolio-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
+      "validationCommand": "npx openspec validate parent-atlas-okf-knowledge-layers --type change --strict --json",
+      "safeNextAction": "Review the owning change's proof gate: parent-atlas-okf-knowledge-layers",
+      "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
+      "priority": 80,
+      "step": "STEP-07"
+    },
+    {
+      "openspecChange": "parent-atlas-okf-knowledge-layers",
+      "taskRef": "parent-atlas-okf-knowledge-layers:203",
+      "sourceLine": 203,
+      "taskText": "Do NOT apply this migration against the live database in this slice.",
+      "taskChecksum": "sha256:ba72c0b335397fd200bce8a029b76161dc112e012e362c916b656eafdd088b7d",
+      "taskLedgerState": "UNCHECKED",
+      "classification": "NEGATIVE_CONSTRAINT",
+      "evidenceDisposition": "CONSTRAINT",
+      "currentOwner": "parent-atlas-okf-knowledge-layers",
+      "dependencyOrBlocker": "Constraint only; not executable work.",
+      "evidenceRefs": [],
+      "evidenceResolution": [],
+      "missingEvidenceRefs": [],
+      "validationCommand": "npx openspec validate parent-atlas-okf-knowledge-layers --type change --strict --json",
+      "safeNextAction": "Preserve this constraint while executing its parent gate.",
+      "mutationScope": "NONE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
+      "priority": 80,
+      "step": "STEP-07"
+    },
+    {
+      "openspecChange": "parent-atlas-okf-knowledge-layers",
+      "taskRef": "parent-atlas-okf-knowledge-layers:207",
+      "sourceLine": 207,
+      "taskText": "From slices 1–3's findings, generate one Kanban issue per evidence-backed gap (using the slice-4 fixture, not live Postgres, until the migration is separately approved).",
+      "taskChecksum": "sha256:3ee70a2e094743e914d4726c8ad3e9a6b830aee4fbd7e6bdbf1c82353a74a259",
+      "taskLedgerState": "UNCHECKED",
+      "classification": "OWNED_BY_OTHER_CHANGE",
+      "evidenceDisposition": "OWNED_BY_OTHER_CHANGE",
+      "currentOwner": "parent-atlas-okf-knowledge-layers",
+      "dependencyOrBlocker": "Implementation owner is parent-atlas-okf-knowledge-layers; this board may reference it but does not execute its unchecked backlog.",
+      "evidenceRefs": [
+        "docs/reports/openspec-portfolio-v1.json"
+      ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/openspec-portfolio-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
+      "validationCommand": "npx openspec validate parent-atlas-okf-knowledge-layers --type change --strict --json",
+      "safeNextAction": "Review the owning change's proof gate: parent-atlas-okf-knowledge-layers",
+      "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
+      "priority": 80,
+      "step": "STEP-07"
+    },
+    {
+      "openspecChange": "parent-atlas-okf-knowledge-layers",
+      "taskRef": "parent-atlas-okf-knowledge-layers:208",
+      "sourceLine": 208,
+      "taskText": "One recommendation per issue, each citing required evidence + prohibited changes + acceptance gates.",
+      "taskChecksum": "sha256:efda660e042e69e92fbc0fa9510527e81c3a07d1af3cb9c2ba93d9c175057c22",
+      "taskLedgerState": "UNCHECKED",
+      "classification": "OWNED_BY_OTHER_CHANGE",
+      "evidenceDisposition": "OWNED_BY_OTHER_CHANGE",
+      "currentOwner": "parent-atlas-okf-knowledge-layers",
+      "dependencyOrBlocker": "Implementation owner is parent-atlas-okf-knowledge-layers; this board may reference it but does not execute its unchecked backlog.",
+      "evidenceRefs": [
+        "docs/reports/openspec-portfolio-v1.json"
+      ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/openspec-portfolio-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
+      "validationCommand": "npx openspec validate parent-atlas-okf-knowledge-layers --type change --strict --json",
+      "safeNextAction": "Review the owning change's proof gate: parent-atlas-okf-knowledge-layers",
+      "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
+      "priority": 80,
+      "step": "STEP-07"
+    },
+    {
+      "openspecChange": "parent-atlas-retrieval-lineage-dag-convergence",
+      "taskRef": "parent-atlas-retrieval-lineage-dag-convergence:3830",
+      "sourceLine": 3830,
+      "taskText": "Prove exact KNN output population before KMeans or SOM consumes it.",
+      "taskChecksum": "sha256:1ff1da50f0e71676c4b1c516e654387a4b28bb8c2166fbd99235588378252f3d",
+      "taskLedgerState": "UNCHECKED",
+      "classification": "UNVERIFIED",
+      "evidenceDisposition": "UNVERIFIED",
+      "currentOwner": "parent-atlas-retrieval-lineage-dag-convergence",
+      "dependencyOrBlocker": null,
+      "evidenceRefs": [
+        "docs/reports/current-source-cohort-lineage-v1.json",
+        "docs/reports/current-workspace-packet-chunk-join-v1.json"
+      ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
+      "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
+      "safeNextAction": "Remain unexecuted until its prerequisites and proof receipt are present.",
+      "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
+      "priority": 80,
+      "step": "STEP-07"
+    },
+    {
+      "openspecChange": "parent-atlas-retrieval-lineage-dag-convergence",
+      "taskRef": "parent-atlas-retrieval-lineage-dag-convergence:3831",
+      "sourceLine": 3831,
+      "taskText": "Prove KMeans centroid membership and centroid checksums before SOM warm/residency use.",
+      "taskChecksum": "sha256:973870f8b251d93b094aea4e4d0f699f336d754f68dfe52dd958ddf9948b5dfc",
+      "taskLedgerState": "UNCHECKED",
+      "classification": "UNVERIFIED",
+      "evidenceDisposition": "UNVERIFIED",
+      "currentOwner": "parent-atlas-retrieval-lineage-dag-convergence",
+      "dependencyOrBlocker": null,
+      "evidenceRefs": [
+        "docs/reports/current-source-cohort-lineage-v1.json",
+        "docs/reports/current-workspace-packet-chunk-join-v1.json"
+      ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
+      "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
+      "safeNextAction": "Remain unexecuted until its prerequisites and proof receipt are present.",
+      "mutationScope": "UNAUTHORIZED_UNTIL_EXPLICIT_GATE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
+      "priority": 80,
+      "step": "STEP-07"
+    },
+    {
+      "openspecChange": "parent-atlas-retrieval-lineage-dag-convergence",
+      "taskRef": "parent-atlas-retrieval-lineage-dag-convergence:3833",
+      "sourceLine": 3833,
+      "taskText": "Run AE training/fanout only after KNN/KMeans/top-K alignment is proven; no latent or centroid writes in the current tranche.",
+      "taskChecksum": "sha256:1184c1023fc815c39fd2cf634fc606ae914b7a2f2a36c01a3138c642f1fb7900",
+      "taskLedgerState": "UNCHECKED",
+      "classification": "NEGATIVE_CONSTRAINT",
+      "evidenceDisposition": "CONSTRAINT",
+      "currentOwner": "parent-atlas-retrieval-lineage-dag-convergence",
+      "dependencyOrBlocker": "Constraint only; not executable work.",
+      "evidenceRefs": [
+        "docs/reports/current-source-cohort-lineage-v1.json",
+        "docs/reports/current-workspace-packet-chunk-join-v1.json"
+      ],
+      "evidenceResolution": [
+        {
+          "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+          "exists": true
+        },
+        {
+          "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+          "exists": true
+        }
+      ],
+      "missingEvidenceRefs": [],
+      "validationCommand": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json",
+      "safeNextAction": "Preserve this constraint while executing its parent gate.",
+      "mutationScope": "NONE",
+      "executable": false,
+      "eligibilityBasis": "EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY",
+      "priority": 80,
+      "step": "STEP-07"
+    }
+  ],
+  "writes": {
+    "taskLedgers": 0,
+    "sourceFiles": 0,
+    "databases": 0,
+    "qdrant": 0,
+    "neo4j": 0,
+    "cache": 0,
+    "modelCalls": 0
+  },
+  "notes": [
+    "Unchecked status is not executable authority.",
+    "The historical July workstation board was not overwritten.",
+    "STEP-07 is ownership classification, not an execution queue.",
+    "GPU/challenger work remains downstream of identity, provenance, and candidate prerequisites.",
+    "No task is executable from this reconciliation projection; planning and mutation are separate gates."
+  ]
+}

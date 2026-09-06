@@ -1,17 +1,16 @@
 import { ENV } from '$lib/server/env.server.js';
-import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 import { assertEmbeddingModel } from '$lib/ai/model-ids.js';
 import { traceLLM, traceEmbedding } from '$lib/server/observability/langfuse.js';
 import {
-  getChatModelKeepAlive,
   getEmbeddingModelKeepAlive,
   ollamaFetch,
 } from '$lib/server/ollama.js';
 import { getOllamaEndpoint, getOllamaEmbeddingEndpoint } from '$lib/server/utils/ollama-endpoint.js';
+import { LLAMA_SERVER_BASE_URL } from './local-llama-provider.js';
+import { resolveLoadedLlamaModel } from './llama-server-model-resolver.js';
 
 const DEFAULT_OLLAMA_URL = getOllamaEndpoint();
 const DEFAULT_EMBED_OLLAMA_URL = getOllamaEmbeddingEndpoint();
-const DEFAULT_GENERATE_MODEL = LLM_MODEL_ID;
 const DEFAULT_EMBED_MODEL = ENV.OLLAMA_EMBED_MODEL;
 const DEFAULT_TIMEOUT_MS = Number(process.env.OLLAMA_TIMEOUT_MS ?? 45_000);
 
@@ -80,31 +79,41 @@ export async function fetchFromOllama<T>(
 export async function generateCompletion(
   params: OllamaGenerateParams
 ): Promise<OllamaGenerateResponse> {
-  const model = params.model ?? DEFAULT_GENERATE_MODEL;
+  const { resolvedModel: model } = await resolveLoadedLlamaModel(
+    LLAMA_SERVER_BASE_URL.replace(/\/v1\/?$/, ''), params.model ?? null);
   const body = {
     model,
-    prompt: params.prompt,
-    system: params.systemPrompt,
-    context: params.context,
+    messages: [
+      ...(params.systemPrompt ? [{ role: 'system', content: params.systemPrompt }] : []),
+      { role: 'user', content: params.prompt },
+    ],
     stream: params.stream ?? false,
-    keep_alive: getChatModelKeepAlive(),
-    options: {
-      temperature: params.temperature ?? 0.7,
-      num_predict: params.maxTokens ?? 512,
-    },
+    temperature: params.temperature ?? 0.7,
+    max_tokens: params.maxTokens ?? 512,
   };
 
   return traceLLM(
-    'ollama-completion',
+    'llama-server-completion',
     { model, prompt: params.prompt.slice(0, 500) },
     async (gen) => {
-      const result = await fetchFromOllama<OllamaGenerateResponse>('/api/generate', {
+      const response = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
-        timeoutMs: params.timeoutMs,
+        signal: AbortSignal.timeout(params.timeoutMs ?? DEFAULT_TIMEOUT_MS),
       });
-      gen.end({ output: result.response?.slice(0, 1000) });
+      if (!response.ok) {
+        throw new Error(`llama-server request failed (${response.status}): ${await response.text()}`);
+      }
+      const data = await response.json() as {
+        choices?: Array<{ message?: { content?: string } }>;
+      };
+      const result: OllamaGenerateResponse = {
+        model,
+        response: data.choices?.[0]?.message?.content ?? '',
+        done: true,
+      };
+      gen.end({ output: result.response.slice(0, 1000) });
       return result;
     }
   );

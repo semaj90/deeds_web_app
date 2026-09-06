@@ -1,5 +1,10 @@
 # Compiler Stack Explainer — tsgo vs PyTorch vs WASM
 
+> **Doc review (2026-09-04):** STALE_BUT_DIRECTIONALLY_RIGHT — LibTorch/GPU compiler explanation
+> holds (`libtorch-bridge.ts`, `tensorrt_bridge.node` confirmed present), but the inference-cascade
+> model name ("Ollama :11434 final fallback, gemma4-rotorquant:latest") is superseded — see
+> `sveltekit-frontend/CLAUDE.md` "Ollama Phase-Out (2026-09-03)".
+
 **Audience:** This codebase. Covers how each "compiler" fits into the Legal AI Platform inference pipeline.  
 **Last Updated:** May 3, 2026
 

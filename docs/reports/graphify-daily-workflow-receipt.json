@@ -1,46 +1,46 @@
 {
   "schemaVersion": "atlas.graphify-daily-workflow-receipt.v1",
   "workflowId": "graphify:daily:v1",
-  "runId": "91db3d40-4bcc-4b69-9b67-10514d953e0c",
-  "repositoryRevision": "9fd3f5d43426675c15bc51a30d84a34390708d7c",
-  "generatedAt": "2026-09-03T21:09:37.168Z",
+  "runId": "3efbc83f-f718-4f3d-a4c9-46b1b04c1b4e",
+  "repositoryRevision": "def7d78fcf98ecca3ec8c60d2f761e97529e4927",
+  "generatedAt": "2026-09-04T16:07:29.547Z",
   "readOnly": true,
   "canonicalWriteAttempted": false,
   "stages": {
     "snapshot": {
       "status": "PROVEN",
-      "totalFiles": 33478,
-      "totalBytes": 376748511,
-      "currentRevision": "9fd3f5d43426675c15bc51a30d84a34390708d7c",
-      "priorRevision": "d4fee9458c12cf603f5795717840f8a051de9057"
+      "totalFiles": 33612,
+      "totalBytes": 377973977,
+      "currentRevision": "def7d78fcf98ecca3ec8c60d2f761e97529e4927",
+      "priorRevision": "9fd3f5d43426675c15bc51a30d84a34390708d7c"
     },
     "inventory": {
       "status": "PROVEN",
-      "totalFiles": 33478,
-      "codeFiles": 16344,
-      "documentationFiles": 10153,
-      "configFiles": 2293,
+      "totalFiles": 33612,
+      "codeFiles": 16398,
+      "documentationFiles": 10196,
+      "configFiles": 2330,
       "otherFiles": 4688,
       "topExtensions": [
         {
           "extension": ".md",
-          "count": 10133
+          "count": 10176
         },
         {
           "extension": ".ts",
-          "count": 9068
+          "count": 9087
         },
         {
           "extension": ".mjs",
-          "count": 3557
+          "count": 3576
         },
         {
           "extension": ".json",
-          "count": 2174
+          "count": 2211
         },
         {
           "extension": ".py",
-          "count": 1350
+          "count": 1358
         },
         {
           "extension": ".svelte",
@@ -60,11 +60,11 @@
         },
         {
           "extension": ".sql",
-          "count": 629
+          "count": 633
         },
         {
           "extension": ".mts",
-          "count": 488
+          "count": 491
         },
         {
           "extension": ".batch1000-backup",
@@ -74,16 +74,16 @@
     },
     "structural": {
       "status": "PROVEN",
-      "filesProcessed": 33478,
-      "filesWithStructure": 12750,
-      "factCount": 132153,
-      "functionCount": 48607,
+      "filesProcessed": 33612,
+      "filesWithStructure": 12791,
+      "factCount": 132538,
+      "functionCount": 48679,
       "classCount": 1895,
-      "interfaceCount": 1888,
+      "interfaceCount": 1891,
       "methodCount": 6440,
-      "importCount": 38868,
-      "constCount": 8099,
-      "arrowCount": 26356,
+      "importCount": 39005,
+      "constCount": 8131,
+      "arrowCount": 26497,
       "samples": [
         {
           "filePath": "__tests__/data-hashing.spec.ts",
@@ -289,37 +289,37 @@
     },
     "identity": {
       "status": "PARTIAL",
-      "uniqueIds": 131672,
+      "uniqueIds": 132057,
       "duplicateIds": 481,
-      "reusedIds": 131672,
+      "reusedIds": 131741,
       "supersededIds": 481
     },
     "lexical": {
       "status": "PROVEN",
-      "filesProcessed": 33478,
-      "entries": 33478,
-      "totalTokens": 33574470,
-      "totalUniqueTokens": 9730319,
+      "filesProcessed": 33612,
+      "entries": 33612,
+      "totalTokens": 33704302,
+      "totalUniqueTokens": 9780326,
       "topGlobalTerms": [
         {
           "term": "id",
-          "weight": 295122
+          "weight": 296012
         },
         {
           "term": "sveltekit",
-          "weight": 257486
+          "weight": 256958
         },
         {
           "term": "frontend",
-          "weight": 253475
+          "weight": 252948
         },
         {
           "term": "pagerank",
-          "weight": 245665
+          "weight": 245689
         },
         {
           "term": "filepath",
-          "weight": 240552
+          "weight": 240556
         },
         {
           "term": "unclassified",
@@ -339,35 +339,35 @@
         },
         {
           "term": "api",
-          "weight": 214294
+          "weight": 214290
         },
         {
           "term": "if",
-          "weight": 204708
+          "weight": 205441
         },
         {
           "term": "community",
-          "weight": 204113
+          "weight": 204125
         },
         {
           "term": "name",
-          "weight": 196559
+          "weight": 197360
         },
         {
           "term": "routes",
-          "weight": 195564
+          "weight": 195496
         },
         {
           "term": "app",
-          "weight": 195381
+          "weight": 195342
         },
         {
           "term": "//",
-          "weight": 185929
+          "weight": 186390
         },
         {
           "term": "string",
-          "weight": 165450
+          "weight": 165631
         },
         {
           "term": "0.15000000000000002",
@@ -375,11 +375,11 @@
         },
         {
           "term": "users",
-          "weight": 154084
+          "weight": 154099
         },
         {
           "term": "deeds",
-          "weight": 150177
+          "weight": 150193
         }
       ],
       "samples": [
@@ -2142,10 +2142,10 @@
     },
     "relationships": {
       "status": "PROVEN",
-      "entries": 303174,
-      "containsEdges": 132153,
-      "importEdges": 38868,
-      "declaresEdges": 132153,
+      "entries": 304081,
+      "containsEdges": 132538,
+      "importEdges": 39005,
+      "declaresEdges": 132538,
       "samples": [
         {
           "subjectId": "35000bc035cc20349f3415aa997469ea75b4256da31d0a23671a881753312c6c",
@@ -2351,37 +2351,37 @@
     },
     "labeling": {
       "status": "PROVEN",
-      "filesProcessed": 33478,
+      "filesProcessed": 33612,
       "domainCounts": {
-        "test": 987,
-        "feature": 3410,
-        "config": 1819,
-        "graph": 933,
-        "api": 6157,
+        "test": 1017,
+        "feature": 3451,
+        "config": 1828,
+        "graph": 952,
+        "api": 6159,
         "ai": 1078,
-        "ui": 7276,
-        "gpu": 1368,
-        "auth": 1710,
-        "retrieval": 4313,
-        "indexer": 1691,
-        "cache": 2670,
-        "vector": 66
+        "ui": 7285,
+        "gpu": 1373,
+        "auth": 1713,
+        "retrieval": 4322,
+        "indexer": 1695,
+        "cache": 2671,
+        "vector": 68
       },
       "ontologyCounts": {
-        "utility": 23911,
-        "model": 4194,
-        "adapter": 1127,
-        "service": 1853,
-        "manager": 1858,
-        "handler": 399,
+        "utility": 24013,
+        "model": 4209,
+        "adapter": 1128,
+        "service": 1860,
+        "manager": 1859,
+        "handler": 407,
         "client": 49,
         "bridge": 87
       },
       "tierCounts": {
-        "test": 2679,
-        "feature": 27827,
+        "test": 2688,
+        "feature": 27948,
         "internal": 254,
-        "middleware": 2441,
+        "middleware": 2445,
         "core": 277
       },
       "sampleLabels": [
@@ -2486,10 +2486,10 @@
     },
     "projection": {
       "status": "PROVEN",
-      "postgresCanonicalRecords": 33478,
+      "postgresCanonicalRecords": 33612,
       "qdrantProjectionRecords": 24,
-      "neo4jProjectionRecords": 303174,
-      "redisProjectionRecords": 33478,
+      "neo4jProjectionRecords": 304081,
+      "redisProjectionRecords": 33612,
       "representationName": "semantic_768",
       "denseVectorName": "content",
       "collectionName": "codebase_chunks_768_v2"
@@ -2498,7 +2498,7 @@
       "status": "PROVEN",
       "missingHashes": 0,
       "malformedHashes": 0,
-      "duplicateFileHashes": 1959,
+      "duplicateFileHashes": 1973,
       "missingStructuralIds": 0,
       "semanticDimensionMismatches": 0,
       "pass": true
@@ -2525,9 +2525,9 @@
     "incremental": {
       "status": "PROVEN",
       "priorReportFound": true,
-      "reusedFiles": 33398,
-      "invalidatedFiles": 80,
-      "reusedRatio": 0.9976103709899038
+      "reusedFiles": 33324,
+      "invalidatedFiles": 288,
+      "reusedRatio": 0.9914316315601571
     }
   },
   "outputs": {

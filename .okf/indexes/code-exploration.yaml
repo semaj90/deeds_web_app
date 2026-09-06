@@ -1,0 +1,64 @@
+schema: atlas.code-exploration-index.v1
+version: 1
+index:
+  id: parent-atlas-code-exploration
+  owner: parent-atlas
+  role: rebuildable_agent_exploration_projection
+  authority: derived
+  canonical_store: postgresql18
+  principles:
+    - exact_identity_before_admission
+    - utf8_byte_spans_are_canonical
+    - line_numbers_are_display_only
+    - regex_is_discovery_only
+    - ast_grep_observation_is_not_identity
+    - source_revision_required
+    - workspace_revision_required
+    - partial_coverage_must_be_explicit
+    - lane_not_executor
+    - metadata_before_source_promotion
+
+source:
+  seed:
+    path: sveltekit-frontend/memory/index/symbols.jsonl
+    role: discovery_seed
+    authoritative: false
+  structural_authority:
+    - atlas_ast_nodes
+    - atlas_symbol_versions
+
+identity:
+  required: [source_ref, source_revision, workspace_revision, content_hash]
+  promotion_keys: [symbol_version_id, tree_node_id]
+  coordinates:
+    canonical: utf8_byte
+    fields: [start_byte, end_byte]
+    line_role: display_and_candidate_hint
+    lsp_role: transport_only_utf16
+
+providers:
+  tree_sitter: {role: structural_authority}
+  ast_grep: {role: exact_observation}
+  regex: {role: discovery_only, retrieval_admission: false}
+
+admission:
+  require_exact_source_ref: true
+  require_source_revision: true
+  require_workspace_revision: true
+  require_canonical_utf8_span: true
+  require_canonical_join: true
+  reject: [ambiguous_identity, missing_source_revision, workspace_revision_mismatch, missing_canonical_span, line_only_identity, regex_only_identity]
+
+retrieval:
+  metadata_only_default: true
+  lanes:
+    exact_symbol: {enabled: true}
+    structural: {enabled: true}
+    lexical: {enabled: true}
+    semantic: {enabled: false, representation: semantic_768, enable_when: canonical_source_chunk_join_proven}
+
+context:
+  default_lod: identity
+  limits: {candidates: 12, promoted_spans: 4, span_bytes: 4096, total_source_bytes: 16384}
+  full_file: {enabled_by_default: false, explicit_promotion_required: true}
+

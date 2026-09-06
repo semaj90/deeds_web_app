@@ -1,0 +1,136 @@
+{
+  "gate": "BITFROST-PRODUCER-CONVERGENCE-01",
+  "parentGate": "BITFROST-LIVE-INVALIDATION-ADOPTION-01",
+  "status": "CONVERGENCE_AUDIT_COMPLETE_READ_ONLY",
+  "executedAt": "2026-09-04T23:40:00Z",
+  "mode": "READ_ONLY",
+  "writesPerformed": false,
+  "mutationsPerformed": false,
+  "correction": "The prior producer census (docs/reports/parent-atlas-bitfrost-producer-census-v1.json) described 'three parallel writers for the same packet summary cache' -- this overstated the finding. Per operator direction, value contracts were compared before calling anything a duplicate. Result: the four families below have genuinely distinct value schemas and source-of-truth tables, so they are NOT duplicates of each other -- they legitimately coexist as separate cache families. The ONE real, confirmed defect is narrower and more precise: two different writers disagree about both the KEY IDENTITY and the VALUE SCHEMA within the SAME `bifrost:packet:*` prefix (see 'crossCuttingDefectsFound' below). This is the same disease already fixed once this session for bifrost:sem:packet:* vs bifrost:sem:query:*, recurring in a sibling namespace that was not touched by that fix.",
+  "keyFamilyConvergenceTable": [
+    {
+      "namespace": "bifrost:packet:{suffix}",
+      "suffixIdentity": "CONFLICTED -- two incompatible meanings coexist under this exact prefix (see crossCuttingDefectsFound)",
+      "valueSchema": "CONFLICTED -- see per-writer breakdown below",
+      "sourceOfTruth": "conflated -- analysis_pass_results (writer A) vs no writer for the intentHash reader (writer/reader mismatch)",
+      "writers": [
+        {
+          "file": "scripts/atlas/bitfrost-warm-startup.mjs",
+          "keyedBy": "packet_key",
+          "valueSchema": "{packet_key, source_ref, feature_id, summary, tags, confidence, created_at, provenance}",
+          "sourceTable": "analysis_pass_results WHERE status='success'",
+          "invocation": "MANUAL_NPM_SCRIPT (npm run bitfrost:warm:startup), no scheduler/cron/Docker wiring found",
+          "ttlSeconds": 604800,
+          "runtimeVsBackfill": "BACKFILL"
+        }
+      ],
+      "readers": [
+        {
+          "file": "sveltekit-frontend/src/lib/server/retrieval/cache-layers-orchestrator.ts::measureLayer3Exact",
+          "keyedBy": "intentHash (a query-intent hash, NOT packet_key)",
+          "purpose": "read-only latency benchmark probe (GET only, 100ms race timeout) -- not a real production cache consumer, no SET performed",
+          "note": "This reader will NEVER hit real data written by bitfrost-warm-startup.mjs, because the two disagree on suffix identity (packet_key vs intentHash) under the identical prefix. This mirrors the exact bifrost:sem:packet vs bifrost:sem:query collision already fixed this session in a sibling namespace."
+        },
+        {
+          "file": "sveltekit-frontend/src/lib/server/dispatch/mcp-tool-implementations.ts",
+          "keyedBy": "packetKey (exact key + a wildcard SCAN pattern bifrost:packet:*{packetKey}*)",
+          "purpose": "not traced further this pass -- consistent with writer A's packet_key identity, unlike cache-layers-orchestrator.ts",
+          "note": "Flagged, not fully traced -- see notDoneFlagged"
+        }
+      ],
+      "verdict": "REAL_DEFECT_CONFIRMED -- identity collision (packet_key vs intentHash) under one prefix, not a duplicate-writer situation. Not fixed this pass per operator instruction to converge/document first, not rename bitfrost-warm-startup.mjs yet."
+    },
+    {
+      "namespace": "bifrost:sem:packet:{packetKey}",
+      "suffixIdentity": "packet_key (confirmed consistent across both writers found)",
+      "valueSchema": "TWO DIFFERENT SCHEMAS ON THE SAME KEY+PREFIX (see below) -- this is the actual cross-cutting defect, distinct from the bifrost:packet:* identity collision above",
+      "sourceOfTruth": "atlas_packets + several lineage/topology join sources (writer B, the real one) vs no live source (writer A, unreached)",
+      "writers": [
+        {
+          "file": "sveltekit-frontend/src/lib/server/cache/atlas-reward-cache.ts::setPacketCache/setPacketCacheBatch",
+          "valueSchema": "PacketCacheEntry: {packetKey, featureId, summary, conceptIds, communityId, rewardScore, cachedAt} (7 fields)",
+          "invocation": "APP_CODE_FUNCTION -- confirmed ZERO external callers anywhere in sveltekit-frontend/src (grepped setPacketCache|getPacketCache|setPacketCacheBatch, only self-references and .spec.ts found)",
+          "ttlSeconds": 3600,
+          "runtimeVsBackfill": "N/A -- unreached"
+        },
+        {
+          "file": "scripts/atlas/warm-bitfrost-semantic-cache.mjs (note: distinct file from scripts/cache/warm-bifrost-semantic-cache.mjs -- 'bitfrost' vs 'bifrost' spelling, atlas/ vs cache/ directory, do not conflate)",
+          "valueSchema": "~25-field lineage/topology envelope: {packet_key, source_ref, source_ref_key, canonical_source_ref, qdrant_point_id, qdrant_collection, qdrant_payload_key, feature_id, feature_label, community_id, community_source, community_confidence, som_cluster, cluster_id, centroid_id, content_hash, chunk_id, tree_node_id, glyph_record_id, neo4j_node_id, identity_lane, identity_confidence, evidence_mode, repair_status, lineage_version, ledger_type, summary, metadata, tags, topology, centroid_keys}",
+          "invocation": "MANUAL_NPM_SCRIPT, no scheduler/cron/Docker wiring found -- this IS the real, currently-live-when-run writer for this exact key",
+          "ttlSeconds": 86400,
+          "runtimeVsBackfill": "BACKFILL"
+        }
+      ],
+      "readers": [
+        {
+          "file": "sveltekit-frontend/src/lib/server/cache/atlas-reward-cache.ts::getPacketCache",
+          "keyedBy": "packetKey",
+          "purpose": "returns `JSON.parse(raw) as PacketCacheEntry` -- an UNCHECKED type assertion",
+          "note": "If ever called against data written by the real writer (warm-bitfrost-semantic-cache.mjs), the runtime object would be the ~25-field topology envelope, not PacketCacheEntry -- entry.conceptIds/entry.rewardScore would silently be undefined. Currently harmless ONLY because getPacketCache has zero live callers either (both sides of this contract are unreached in production)."
+        }
+      ],
+      "verdict": "REAL_DEFECT_CONFIRMED (value-contract mismatch on identical key+prefix) but currently ZERO BLAST RADIUS -- both the narrow-schema writer and its matching reader are unreached; only the real, rich-schema writer ever executes (manually), and nothing reads it back via getPacketCache today. If getPacketCache ever gains a live caller, this becomes a live bug immediately. Flagged for a future fix (either widen PacketCacheEntry to match the real envelope, or have the two writers agree on one schema) -- not fixed this pass, out of BITFROST-PRODUCER-CONVERGENCE-01's read-only scope."
+    },
+    {
+      "namespace": "bifrost:sem:query:{queryHash}",
+      "suffixIdentity": "query_hash (sha256 of a query string) -- confirmed distinct from packet_key by this session's Stage 2 live proof",
+      "valueSchema": "makePacketValue() shape: {packet_uuid, feature_id, source_refs[], state:{route,som_cluster,cache_tier}, token_hints[], answer_hint, reward, confidence, created_at}",
+      "sourceOfTruth": "memory/packets/semantic-cache-candidates.jsonl, itself produced by scripts/packets/semantic-cache-candidates.sql via DuckDB -- an offline, indirect pipeline (not a direct live Postgres read)",
+      "writers": [
+        {
+          "file": "scripts/cache/warm-bifrost-semantic-cache.mjs",
+          "invocation": "MANUAL_NPM_SCRIPT, reads a DuckDB-generated JSONL file, no scheduler/cron wiring found",
+          "ttlSeconds": 3600,
+          "runtimeVsBackfill": "BACKFILL"
+        }
+      ],
+      "readers": [
+        {
+          "file": "sveltekit-frontend/src/lib/server/ace/query-router.ts",
+          "keyedBy": "queryHash / intentHash (migrated onto bifrostKey.semantic.query() this session, Stage 2)",
+          "note": "Live app-code caller -- this is the one family in this table with a confirmed real reader in the request path (query-router.ts), though the writer remains a manual offline backfill."
+        }
+      ],
+      "verdict": "NOT_A_DUPLICATE -- distinct identity, distinct value schema, distinct (if indirect) source of truth. This is the family Stage 1/2 of BIFROST-KEY-SEMANTICS-OWNER-01 already resolved by splitting it off of bifrost:sem:packet:*."
+    },
+    {
+      "namespace": "bitfrost:summary:packet:v1:{packetKey}",
+      "suffixIdentity": "packet_key / summary_packet_key / fingerprint (fallback chain, row-dependent) -- see summary-index-ranker.mjs:383",
+      "valueSchema": "Full ranked row from the atlas_summary_layers/atlas_packets join: {packet_key, source_ref, feature_id, feature_label, domain_class, community_id, som_cluster, pagerank, summary_packet_key, summary, summary_text, keywords[], entities[], used_concepts, model_name, generated_at, updated_at, metadata, score, status}",
+      "sourceOfTruth": "atlas_summary_layers LEFT JOIN atlas_packets ON packet_key -- a genuinely different source table pairing than either bifrost:packet:* (analysis_pass_results) or bifrost:sem:packet:* (lineage/topology join)",
+      "writers": [
+        {
+          "file": "scripts/atlas/summary-index-ranker.mjs::writeRedisIndex",
+          "invocation": "MANUAL_NPM_SCRIPT (npm run atlas:summary:index:rank[:apply]), no scheduler/cron/Docker wiring found",
+          "ttlSeconds": 604800,
+          "runtimeVsBackfill": "BACKFILL",
+          "note": "Also writes a companion sorted set `bitfrost:summary:index:ranked:v1` (ZADD packet_key by score) -- not a duplicate key, a paired index structure for the same ranking pass."
+        }
+      ],
+      "readers": "not located in sveltekit-frontend/src this pass (same finding as the original producer census -- still unresolved)",
+      "verdict": "NOT_A_DUPLICATE -- distinct source table (atlas_summary_layers, a ranking/summary projection), distinct richer value schema (adds score/status/keywords/entities/used_concepts on top of what either bifrost:packet:* or bifrost:sem:packet:* carry). Legitimately a separate 'derived summary/ranking projection' layer per the operator's own end-state diagram."
+    }
+  ],
+  "crossCuttingDefectsFound": [
+    {
+      "defect": "bifrost:packet:{suffix} identity collision: packet_key (writer: bitfrost-warm-startup.mjs, reader: mcp-tool-implementations.ts) vs intentHash (reader-only: cache-layers-orchestrator.ts::measureLayer3Exact)",
+      "severity": "LOW blast radius today -- the intentHash reader is a read-only latency benchmark probe (no SET), so it just always reports cache_miss against real data; not a data-corruption risk, but it IS the same disease class as the already-fixed bifrost:sem:packet vs bifrost:sem:query collision.",
+      "fixedThisPass": false,
+      "reason": "Operator explicitly instructed: do not rename bitfrost-warm-startup.mjs yet. Documented for a future, deliberate fix alongside the identical-shape bifrost:sem:packet:* value-contract defect below."
+    },
+    {
+      "defect": "bifrost:sem:packet:{packetKey} value-contract mismatch: atlas-reward-cache.ts's PacketCacheEntry (7 fields) vs warm-bitfrost-semantic-cache.mjs's ~25-field lineage/topology envelope, written to the identical key",
+      "severity": "ZERO blast radius today -- both getPacketCache() (the reader expecting the narrow shape) and setPacketCache() (the writer producing the narrow shape) have zero live callers; only the rich-schema script writer ever actually runs.",
+      "fixedThisPass": false,
+      "reason": "Out of BITFROST-PRODUCER-CONVERGENCE-01's read-only scope; a real fix requires a product decision (widen PacketCacheEntry vs. have the script conform to it) that wasn't asked for this pass."
+    }
+  ],
+  "conclusion": "No cross-family duplication survives value-contract scrutiny -- the operator's instinct was correct: bifrost:packet:*, bifrost:sem:packet:*, bifrost:sem:query:*, and bitfrost:summary:packet:v1:* are four legitimately distinct cache families with different identities, value schemas, and source-of-truth tables, and should NOT be collapsed into one. The real, confirmed defects are two narrower identity/schema collisions WITHIN two of those families (bifrost:packet:* mixing packet_key and intentHash; bifrost:sem:packet:* mixing two incompatible value schemas on the same key) -- both currently zero-or-low blast radius because the conflicting readers/writers on the losing side of each collision are themselves unreached in production. Separately and independently: every real writer found across all four families (bitfrost-warm-startup.mjs, warm-bitfrost-semantic-cache.mjs, warm-bifrost-semantic-cache.mjs, summary-index-ranker.mjs) is a manual, hand-invoked npm backfill script with zero scheduler/cron/Docker-startup wiring anywhere in the repo. There is no live Postgres-mutation-triggered write path for ANY of these four families today.",
+  "recommendationForParentGate": "BITFROST-LIVE-INVALIDATION-ADOPTION-01 should close as NOT_APPLICABLE_CURRENT_RUNTIME, not BLOCKED and not falsely marked complete. The canonical invalidation primitive (invalidateBitfrostPacket()) is proven and ready to be called by any future live writer for bifrost:sem:packet:*/bitfrost:summary:packet:v1:* (the two families it targets). No live mutation-triggered writer exists for it to be wired into yet -- building one was explicitly out of scope per operator direction (no evidence of an observed runtime requirement for a continuously-maintained Redis packet cache). The two cross-cutting defects found (identity collision in bifrost:packet:*, value-contract mismatch in bifrost:sem:packet:*) are separate, smaller follow-ups, tracked but not fixed this pass.",
+  "notDoneFlagged": [
+    "mcp-tool-implementations.ts's full bifrost:packet:* usage (SCAN pattern) not fully traced -- consistent with packet_key identity on a skim, not verified end-to-end.",
+    "bitfrost:summary:packet:v1:* readers still not located anywhere in sveltekit-frontend/src.",
+    "packages/parent-atlas-retrieval/src/bifrost/bifrost-cache-manager.ts's bifrost:kag:* namespace and its live-caller chain still not traced (flagged by the original census, still open).",
+    "The ~51 files matching a bare 'bifrost:packet:' substring were not all individually opened -- only cache-layers-orchestrator.ts, mcp-tool-implementations.ts, and redis-packet-projection.ts (doc-comment only, no live code found) were checked this pass; the remainder are scripts/, packages/, or doc/comment references not yet individually confirmed as live or dead."
+  ]
+}

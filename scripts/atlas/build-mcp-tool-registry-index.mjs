@@ -9,15 +9,18 @@
  * The report is intentionally read-only. It summarizes the live TRACE tool
  * surface and the static MCP / gRPC manifest surface into one navigable index.
  *
- * Optional Gemma4 summarization is used when the local gemma4-offload MCP is
- * available; otherwise the script falls back to deterministic section summaries.
+ * Optional local-LLM summarization (repo_summarize, canonical tool of the
+ * local-llm-offload MCP -- currently Ornith 1.5 9B on llama-server :8090; the
+ * script filename/process key stays "gemma4-offload-mcp.mjs" as a temporary
+ * compatibility alias, see LOCAL-LLM-OFFLOAD-OWNERSHIP-01) is used when that
+ * MCP is available; otherwise the script falls back to deterministic section
+ * summaries.
  *
  * Outputs:
  *   docs/reports/mcp-tool-registry-index.json
  *   docs/reports/mcp-tool-registry-index.md
  */
 
-import { spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -30,7 +33,6 @@ const ONTOLOGY_JSON = path.join(REPORTS, 'mcp-tool-ontology.json');
 const MANIFEST_JSON = path.join(REPORTS, 'mcp-tool-manifest-packets.json');
 const OUT_JSON = path.join(REPORTS, 'mcp-tool-registry-index.json');
 const OUT_MD = path.join(REPORTS, 'mcp-tool-registry-index.md');
-const GEMMA_MCP = path.join(ROOT, 'sveltekit-frontend', 'scripts', 'mcp', 'gemma4-offload-mcp.mjs');
 
 const LAYER_ORDER = ['identity', 'memory', 'cache', 'lexical', 'dense', 'graph', 'rerank', 'synthesis', 'ops', 'read', 'unknown'];
 const LAYER_WEIGHTS = {
@@ -184,61 +186,62 @@ function buildEvidenceText(title, tools) {
   return [`${title}`, ...rows].join('\n');
 }
 
-async function summarizeWithGemma(text, targetWords = 100) {
-  if (!(await fs.stat(GEMMA_MCP).catch(() => null))) return null;
-  return new Promise((resolve) => {
-    const child = spawn('node', [GEMMA_MCP], { stdio: ['pipe', 'pipe', 'pipe'] });
-    let stdout = '';
-    let done = false;
-    let timer = null;
+// Direct llama-server /v1 call — this is a one-shot build script, not an
+// agent loop, so spawning the whole local-llm-offload MCP process (stdio
+// handshake, tool dispatch) for a single summarization is unnecessary
+// indirection. Model identity is still observed, never hardcoded/guessed:
+// GET /v1/models is verification, and this fails closed (returns null, the
+// caller falls back to deterministicLayerSummary) on any ambiguity or error
+// rather than picking an arbitrary model. See LOCAL-LLM-OFFLOAD-OWNERSHIP-01
+// for why this policy exists and where it's shared with the MCP itself.
+const LLAMA_BASE = (process.env.LLAMA_PRIMARY_BASE ?? 'http://127.0.0.1:8090').replace(/\/+$/, '');
 
-    const finish = (value) => {
-      if (done) return;
-      done = true;
-      if (timer) clearTimeout(timer);
-      try { child.kill(); } catch { /* noop */ }
-      resolve(value ?? null);
-    };
+async function resolveLlamaModel() {
+  try {
+    const res = await fetch(`${LLAMA_BASE}/v1/models`, { signal: AbortSignal.timeout(5_000) });
+    if (!res.ok) return null;
+    const body = await res.json();
+    const ids = (Array.isArray(body?.data) ? body.data : [])
+      .map((entry) => entry?.id)
+      .filter((id) => typeof id === 'string' && id.trim());
+    return ids.length === 1 ? ids[0] : null;
+  } catch {
+    return null;
+  }
+}
 
-    child.on('error', () => finish(null));
-    child.stdout.on('data', chunk => {
-      stdout += chunk.toString();
-      let idx;
-      while ((idx = stdout.indexOf('\n')) >= 0) {
-        const line = stdout.slice(0, idx).trim();
-        stdout = stdout.slice(idx + 1);
-        if (!line) continue;
-        let msg = null;
-        try { msg = JSON.parse(line); } catch { continue; }
-        if (msg?.id !== 2) continue;
-        const raw = msg?.result?.content?.[0]?.text ?? '';
-        const clean = String(raw).replace(/^\[[^\]]+\]\s*/, '').trim();
-        finish(clean || null);
-      }
+async function summarizeWithLocalLlm(text, targetWords = 100) {
+  const model = await resolveLlamaModel();
+  if (!model) return null;
+
+  try {
+    const res = await fetch(`${LLAMA_BASE}/v1/chat/completions`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      signal: AbortSignal.timeout(30_000),
+      body: JSON.stringify({
+        model,
+        stream: false,
+        temperature: 0.1,
+        max_tokens: Math.max(64, Math.ceil(targetWords * 2)),
+        messages: [
+          {
+            role: 'system',
+            content:
+              `Summarize the provided repo-evidence report in roughly ${targetWords} words. ` +
+              'Use plain prose with no preamble, no markdown headers, no self-identification.',
+          },
+          { role: 'user', content: text },
+        ],
+      }),
     });
-
-    child.stdin.write(JSON.stringify({
-      jsonrpc: '2.0',
-      id: 1,
-      method: 'initialize',
-      params: {
-        protocolVersion: '2024-11-05',
-        clientInfo: { name: 'mcp-tool-registry-index', version: '0.1.0' },
-      },
-    }) + '\n');
-    child.stdin.write(JSON.stringify({
-      jsonrpc: '2.0',
-      id: 2,
-      method: 'tools/call',
-      params: {
-        name: 'gemma4_summarize',
-        arguments: { text, target_words: targetWords },
-      },
-    }) + '\n');
-    child.stdin.end();
-
-    timer = setTimeout(() => finish(null), 12_000);
-  });
+    if (!res.ok) return null;
+    const body = await res.json();
+    const content = body?.choices?.[0]?.message?.content;
+    return typeof content === 'string' && content.trim() ? content.trim() : null;
+  } catch {
+    return null;
+  }
 }
 
 function deterministicLayerSummary(layer, items) {
@@ -302,7 +305,7 @@ function buildMarkdown(report) {
   lines.push('');
   lines.push('- TRACE MCP remains the live read surface.');
   lines.push('- Manifest packets capture the broader MCP / gRPC registry surface.');
-  lines.push('- `gemma4_summarize` is used for the section summaries when the local offload server is available; otherwise the report falls back to deterministic summaries.');
+  lines.push('- `repo_summarize` (local-llm-offload MCP, canonical tool name; `gemma4_summarize` is a deprecated alias) is used for the section summaries when the local offload server is available; otherwise the report falls back to deterministic summaries.');
   lines.push('- This index is read-only and links into the Parent Atlas navigation surface.');
   lines.push('');
   return lines.join('\n');
@@ -379,7 +382,7 @@ async function main() {
 
   const overallEvidence = buildEvidenceText('Parent Atlas MCP tool registry overview', ranked.slice(0, 40));
   const overallSummary =
-    (await summarizeWithGemma(overallEvidence, 120)) ||
+    (await summarizeWithLocalLlm(overallEvidence, 120)) ||
     `Parent Atlas tool registry spans ${ranked.length} tools across ${Object.keys(byLayer).filter(k => byLayer[k]?.length).length} active layers. TRACE MCP covers the live surface; manifest packets cover the broader MCP / gRPC registry.`;
 
   const report = {

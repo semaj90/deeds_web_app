@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import {
   adaptAtlasAstEvidenceToStructuralInput,
   adaptAstGrepExtractedFeature,
@@ -11,6 +12,7 @@ import {
 } from '@deeds/parent-atlas';
 import type { ExtractedFeature } from '$lib/server/analysis/ast-grep-extractor.js';
 import type { StructuralMaterializationResult } from './graphify-structural-materializer.js';
+import type { ExecutionStageReceiptV1 } from './graphify-daily-coordinator-v1.js';
 
 export type StructuralFabricCompilationStatus =
   | 'COMPILED_NATIVE'
@@ -48,6 +50,39 @@ export type GraphifyStructuralIntelligenceResult = {
   groundedDomainCandidates: GroundedDomainCandidateV1[];
   receipt: GraphifyStructuralIntelligenceReceipt;
 };
+
+function structuralStageChecksum(value: unknown): string {
+  return `sha256:${createHash('sha256').update(JSON.stringify(value), 'utf8').digest('hex')}`;
+}
+
+/** Pure bridge from the existing structural receipt to coordinator stage receipts. It does not
+ * persist, promote identity, or infer missing revisions; callers still decide when a receipt is
+ * safe to bind to a particular execution_id. */
+export function buildGraphifyStructuralStageReceiptsV1(input: {
+  result: GraphifyStructuralIntelligenceResult;
+}): { astParse: ExecutionStageReceiptV1; structuralExtract: ExecutionStageReceiptV1 } {
+  const { receipt, fabric } = input.result;
+  const astInput = structuralStageChecksum({
+    sourceRef: receipt.sourceRef,
+    sourceRevision: receipt.sourceRevision,
+    workspaceRevision: receipt.workspaceRevision,
+    parserSourceRevisionToken: receipt.parserSourceRevisionToken,
+  });
+  const astOutput = structuralStageChecksum({
+    schema: receipt.schema,
+    providerStatus: receipt.providerStatus,
+    provenanceStatus: receipt.provenanceStatus,
+    diagnostics: receipt.diagnostics,
+  });
+  const extractOutput = structuralStageChecksum({
+    receipt,
+    fabricReceipt: fabric?.receipt ?? null,
+  });
+  return {
+    astParse: { inputChecksum: astInput, outputChecksum: astOutput },
+    structuralExtract: { inputChecksum: astOutput, outputChecksum: extractOutput },
+  };
+}
 
 function unique(values: readonly string[]): string[] {
   return [...new Set(values.filter(Boolean))];

@@ -1,0 +1,65 @@
+{
+  "schema": "atlas.doc-14-relationship-admission-fixture.v1",
+  "gate": "DOC-14",
+  "status": "DOC_14_RELATION_ADMISSION_FIXTURE_PROVEN",
+  "relationTypes": [
+    "DOCUMENTED_BY",
+    "RELATED_TO",
+    "REQUIRES",
+    "SUPPORTS",
+    "USES"
+  ],
+  "relationCount": 5,
+  "relations": [
+    {
+      "relationType": "DOCUMENTED_BY",
+      "sourceId": "concept:cudaMalloc",
+      "targetId": "doc:cuda-runtime:section-1",
+      "sourceRevision": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+      "workspaceRevision": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+      "evidenceRef": "evidence:doc-12-fixture",
+      "canonicalAuthority": false
+    },
+    {
+      "relationType": "RELATED_TO",
+      "sourceId": "error:deprecated-allocation",
+      "targetId": "concept:cudaMalloc",
+      "sourceRevision": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+      "workspaceRevision": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+      "evidenceRef": "evidence:doc-12-fixture",
+      "canonicalAuthority": false
+    },
+    {
+      "relationType": "REQUIRES",
+      "sourceId": "concept:cudaMalloc",
+      "targetId": "version:cuda-11",
+      "sourceRevision": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+      "workspaceRevision": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+      "evidenceRef": "evidence:doc-12-fixture",
+      "canonicalAuthority": false
+    },
+    {
+      "relationType": "SUPPORTS",
+      "sourceId": "concept:cudaMalloc",
+      "targetId": "architecture:sm-86",
+      "sourceRevision": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+      "workspaceRevision": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+      "evidenceRef": "evidence:doc-12-fixture",
+      "canonicalAuthority": false
+    },
+    {
+      "relationType": "USES",
+      "sourceId": "example:cudaMalloc-basic",
+      "targetId": "concept:cudaMalloc",
+      "sourceRevision": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+      "workspaceRevision": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+      "evidenceRef": "evidence:doc-12-fixture",
+      "canonicalAuthority": false
+    }
+  ],
+  "deterministicReplayChecksum": "sha256:8cbe93c11becd3a1c13a2ad5bdee7718fb3eeb0558dbb4e24187c1063916838f",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "liveNeo4jAdmission": false,
+  "nextGate": "DOC_14_LIVE_BOUNDED_RELATION_ADMISSION"
+}

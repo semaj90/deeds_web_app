@@ -1,0 +1,21 @@
+{
+  "schema": "atlas.explore-index-contract-validation.v1",
+  "manifest": ".okf/indexes/parent-atlas-code-explore.yaml",
+  "manifestChecksum": "sha256:233fac574a9d9e60fbaa97456d0bbb16d4d4a2a46150e29e8256a8928a24eab3",
+  "status": "CONTRACT_VALID_UNPROVEN_RUNTIME",
+  "identityFieldsComplete": true,
+  "canonicalCoordinates": "utf8_byte",
+  "lspProtocolCoordinates": "lsp_utf16",
+  "semanticRepresentation": "semantic_768",
+  "semanticProjectionEnabled": false,
+  "astGrepFallbackAuthority": "discovery_only",
+  "canonicalAuthority": false,
+  "modelCalls": false,
+  "datastoreWrites": false,
+  "cacheWarming": false,
+  "nextGate": "AST-EXPLORE-INDEX-ADAPTER-01",
+  "blockers": [
+    "current workspace/source/chunk join is not exact",
+    "seed symbols lack revision and byte-span identity"
+  ]
+}

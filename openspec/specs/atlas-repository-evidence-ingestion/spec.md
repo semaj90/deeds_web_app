@@ -1,6 +1,12 @@
 # Parent Atlas Repository Evidence Ingestion — Requirements
 
-## Requirement: Multi-source repository ingestion
+## Purpose
+
+Define multi-source repository evidence ingestion, normalization, revisioning, and invalidation.
+
+## Requirements
+
+### Requirement: Multi-source repository ingestion
 
 The system SHALL ingest repository evidence from heterogeneous sources without treating any single source as sufficient proof of feature completion.
 
@@ -22,7 +28,7 @@ Supported evidence sources SHOULD include:
 
 ---
 
-## Requirement: Markdown structure extraction
+### Requirement: Markdown structure extraction
 
 Markdown ingestion SHALL preserve headings, checkboxes, tables, code references and requirement identifiers as structured evidence.
 

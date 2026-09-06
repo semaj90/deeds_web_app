@@ -12,7 +12,7 @@
  *   - validation
  */
 
-import { ChatOllama } from '@langchain/ollama';
+import { ChatOpenAI } from '@langchain/openai';
 import { createReactAgent } from '@langchain/langgraph/prebuilt';
 import type { DynamicStructuredTool } from '@langchain/core/tools';
 import { ENV } from '$lib/server/env.server.js';
@@ -160,8 +160,9 @@ export function createSubagent(
 	const scopedTools = allTools.filter((t) => toolNames.includes(t.name));
 	const prompt = SUBAGENT_PROMPTS[name];
 
-	const llm = new ChatOllama({
-		baseUrl: ENV.OLLAMA_BASE_URL,
+	const llm = new ChatOpenAI({
+		apiKey: 'local',
+		configuration: { baseURL: `${ENV.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090'}/v1` },
 		model: LLM_MODEL_ID,
 		temperature: options.temperature ?? 0.3,
 	});

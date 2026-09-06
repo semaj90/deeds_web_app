@@ -1,11 +1,12 @@
 {
   "schema": "atlas.graphify-lifecycle-owner.v1",
-  "generatedAt": "2026-09-03T00:51:10.306Z",
+  "generatedAt": "2026-09-05T06:52:59.871Z",
   "mode": "READ_ONLY_LIFECYCLE_OWNER_AUDIT",
   "databaseError": null,
   "lifecycleOwner": null,
   "lifecycleOwnerStatus": "LIFECYCLE_OWNER_UNPROVEN",
   "supportedLifecycleStates": [
+    "COMPLETED",
     "RUNNING"
   ],
   "transitionPrimitiveExists": false,
@@ -21,7 +22,17 @@
       "mutationSignals": []
     },
     {
+      "path": "scripts/atlas/audit-graphify-lifecycle-owner-v1.mjs",
+      "classification": "READ_ONLY_AUDITOR",
+      "mutationSignals": []
+    },
+    {
       "path": "scripts/atlas/audit-graphify-git-source-authority-v1.mjs",
+      "classification": "READ_ONLY_AUDITOR",
+      "mutationSignals": []
+    },
+    {
+      "path": "scripts/atlas/audit-graphify-run-file-binding-v1.mjs",
       "classification": "READ_ONLY_AUDITOR",
       "mutationSignals": []
     },
@@ -36,17 +47,17 @@
       "mutationSignals": []
     },
     {
-      "path": "scripts/atlas/audit-graphify-lifecycle-owner-v1.mjs",
-      "classification": "READ_ONLY_AUDITOR",
-      "mutationSignals": []
-    },
-    {
       "path": "scripts/atlas/audit-workspace-source-namespace-v1.mjs",
       "classification": "READ_ONLY_AUDITOR",
       "mutationSignals": []
     },
     {
       "path": "scripts/atlas/daily-graphify-mastra-workflow.mjs",
+      "classification": "UNKNOWN",
+      "mutationSignals": []
+    },
+    {
+      "path": "scripts/atlas/graphify-daily-lifecycle-open-v1.mjs",
       "classification": "UNKNOWN",
       "mutationSignals": []
     },
@@ -66,6 +77,11 @@
       "mutationSignals": []
     },
     {
+      "path": "scripts/atlas/prove-graphify-open-bind-complete-lifecycle-v1.mjs",
+      "classification": "UNKNOWN",
+      "mutationSignals": []
+    },
+    {
       "path": "scripts/atlas/prove-exact-promotion-live-dry-run.mts",
       "classification": "UNKNOWN",
       "mutationSignals": []
@@ -81,27 +97,46 @@
       "mutationSignals": []
     },
     {
-      "path": "sveltekit-frontend/src/lib/server/atlas/indexing/graphify-source-inventory-writer-v2.ts",
-      "classification": "LEGACY_WRITER",
-      "mutationSignals": [
-        "INSERT INTO public.graphify_runs",
-        "UPDATE public.graphify_runs"
-      ]
+      "path": "sveltekit-frontend/src/lib/server/atlas/board/graphify-current-workspace-revision.ts",
+      "classification": "UNKNOWN",
+      "mutationSignals": []
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/board/daily-graphify-board-recommendations.ts",
+      "classification": "UNKNOWN",
+      "mutationSignals": []
     },
     {
       "path": "sveltekit-frontend/src/lib/server/atlas/indexing/graphify-source-inventory-writer-v2.spec.ts",
       "classification": "LEGACY_WRITER",
       "mutationSignals": [
         "INSERT INTO public.graphify_runs",
+        "UPDATE public.graphify_runs",
+        "INSERT INTO public.graphify_runs",
         "UPDATE public.graphify_runs"
       ]
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/indexing/graphify-source-inventory-writer-v2.ts",
+      "classification": "LEGACY_WRITER",
+      "mutationSignals": [
+        "INSERT INTO public.graphify_runs",
+        "UPDATE public.graphify_runs",
+        "INSERT INTO public.graphify_runs",
+        "UPDATE public.graphify_runs"
+      ]
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/indexing/graphify-daily-coordinator-v1.ts",
+      "classification": "UNKNOWN",
+      "mutationSignals": []
     }
   ],
   "runningRunCount": 5,
   "staleRunCount": 5,
   "currentRunCount": 0,
-  "repositoryHeadRevision": "85e6f3d509856c75d77e175fc823623c2cd4e18c",
+  "repositoryHeadRevision": "0de34853f42dbd57cd84dbdca8e19caa6cf4e374",
   "writesPerformed": false,
   "canonicalAuthority": false,
-  "reportChecksum": "sha256:32e8fdf5eaa396d01d6d5f07221188ae68d3952fed9ba7a8834550a1965dff27"
+  "reportChecksum": "sha256:0a8d3686dcc3acaff5b47d8f42925eb5ef0827c674b726429c2a7041f914671b"
 }

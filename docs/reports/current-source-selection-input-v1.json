@@ -1,0 +1,17 @@
+{
+  "schema": "atlas.current-source-selection-input.v1",
+  "status": "NOT_EMITTED_SNAPSHOT_NOT_PROVEN",
+  "executionId": null,
+  "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+  "workspaceRevision": "sha256:b9bab9b65d9f466e2f23d9e3d7612e10df6c30d69ce2a7086535a400a1518a52",
+  "workspaceRevisionRecordChecksum": "abf3acb170f5fad4a7871c0eefbc856f9aa99b187d8873a18a612d6463ca0cd4",
+  "workspaceOriginRuntimeRevision": "atlas.workspace-revision-origin-runtime.2026-08-21.v1",
+  "selectionPolicyRevision": null,
+  "sourceRefSetChecksum": null,
+  "sourceCount": 0,
+  "bindings": [],
+  "canonicalAuthority": false,
+  "readOnly": true,
+  "writesPerformed": false,
+  "downstreamPlannerInput": null
+}

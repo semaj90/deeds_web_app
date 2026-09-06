@@ -399,11 +399,16 @@ async function pollOnce(): Promise<void> {
 							evidenceId: job.evidenceId,
 							caseId: job.caseId,
 							jobType,
-							packetKey: (jobResult.packetKey as string | null | undefined) ?? null,
-							sourceRef: (jobResult.sourceRef as string | null | undefined) ?? job.evidenceId,
-							sourceRevision: (jobResult.sourceRevision as string | null | undefined) ?? null,
-							workspaceRevision: (jobResult.workspaceRevision as string | null | undefined) ?? null,
-							representationRevision: (jobResult.representationRevision as string | null | undefined) ?? null,
+							packetKey: (passResult.packetKey as string | null | undefined)
+								?? (jobResult.packetKey as string | null | undefined) ?? null,
+							sourceRef: (passResult.sourceRef as string | null | undefined)
+								?? (jobResult.sourceRef as string | null | undefined) ?? job.evidenceId,
+							sourceRevision: (passResult.sourceRevision as string | null | undefined)
+								?? (jobResult.sourceRevision as string | null | undefined) ?? null,
+							workspaceRevision: (passResult.workspaceRevision as string | null | undefined)
+								?? (jobResult.workspaceRevision as string | null | undefined) ?? null,
+							representationRevision: (passResult.representationRevision as string | null | undefined)
+								?? (jobResult.representationRevision as string | null | undefined) ?? null,
 							family: cfg.family,
 							passName: cfg.passName,
 							passRevision: cfg.passRevision,

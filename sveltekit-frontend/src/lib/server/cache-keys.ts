@@ -365,16 +365,83 @@ export const bifrostKey = {
    * Consolidating into a single source of truth
    */
   semantic: {
-    /** bifrost:sem:packet:{packet_key} — packet-level semantic cache (TTL 1h) */
+    /**
+     * bifrost:sem:packet:{packet_key} — packet-level semantic cache (TTL 1h),
+     * keyed by canonical packetKey ONLY.
+     *
+     * HISTORICAL AMBIGUITY, found + Stage-1-audited 2026-09-04
+     * (BIFROST-KEY-SEMANTICS-OWNER-01, docs/reports/parent-atlas-bitfrost-key-semantics-owner-v1.json):
+     * this exact prefix was ALSO being written by scripts/cache/warm-bifrost-semantic-cache.mjs
+     * keyed by query_hash (a query-result cache, a completely different identity), and read as
+     * such by query-router.ts. That writer/reader pair is migrated (Stage 2, same day) onto the
+     * dedicated `query()` builder below — this `packet()` builder's identity is now unambiguous.
+     * If you find a caller passing anything other than a real packetKey here, that's the bug this
+     * migration fixed reappearing — route it through `query()` instead.
+     */
     packet: (packetKey: string) => `bifrost:sem:packet:${packetKey}`,
+
+    /**
+     * bifrost:sem:query:{query_hash} — query-result semantic cache (TTL 1h).
+     * Added 2026-09-04 (BIFROST-KEY-SEMANTICS-OWNER-01 Stage 2): this prefix was already
+     * reserved (scripts/atlas/invalidate-atlas-cache-epoch.mjs has deleted `bifrost:sem:query:*`
+     * since before this change, alongside `bifrost:sem:packet:*` — strong evidence this was
+     * always the intended shape for query-hash-keyed entries) but nothing had ever written to
+     * it; warm-bifrost-semantic-cache.mjs was instead writing query-hash entries under
+     * `packet()`'s prefix by mistake. This is the correct, single source of truth for it now.
+     */
+    query: (queryHash: string) => `bifrost:sem:query:${queryHash}`,
 
     /** bifrost:sem:feature:{feature_id} — feature-level semantic cache (TTL 4h) */
     feature: (featureId: string) => `bifrost:sem:feature:${featureId}`,
 
     /** bifrost:sem:intent:{intent_hash} — query intent cache (TTL 30min) */
     intent: (intentHash: string) => `bifrost:sem:intent:${intentHash}`,
+
+    /** bifrost:sem:sourceRef:{sha256(ref)} — sourceRef -> query_hash indirection (TTL 2h) */
+    sourceRef: (sourceRefHash: string) => `bifrost:sem:sourceRef:${sourceRefHash}`,
+
+    /**
+     * bitfrost:summary:packet:v1:{packet_key} — packet summary cache.
+     * Added 2026-09-04 (BITFROST-INVALIDATION-OWNER-01): this shape was live in Redis
+     * (verified via `EXISTS`) but had no shared builder anywhere in the codebase before
+     * this change — every caller that touched it (all 3 duplicate `invalidateRedisCache`
+     * implementations) hand-built a *different*, non-existent shape instead
+     * (`bitfrost:summary:{packet_key}`, missing the `packet:v1:` segment). This is the
+     * single source of truth for it going forward.
+     */
+    packetSummary: (packetKey: string) => `bitfrost:summary:packet:v1:${packetKey}`,
+  },
+
+  /**
+   * Residency-heat control indexes (BITFROST-RESIDENCY-WARMING-01, 2026-09-04).
+   * Bounded ZSETs of a `ResidencyScoreV1` blend, keyed by artifact kind. These
+   * are control-plane indexes ONLY — they decide what already-derived data is
+   * worth keeping resident in the value keys above (`packet`/`semantic.*`/
+   * `packetSummary`); they never become a second retrieval index and never
+   * carry canonical identity themselves.
+   */
+  heat: {
+    packet: 'bitfrost:heat:packet',
+    query: 'bitfrost:heat:query',
+    feature: 'bitfrost:heat:feature',
+    summary: 'bitfrost:heat:summary',
   },
 };
+
+/**
+ * BitFrost key identity for one packet's semantic cache lanes. `sourceRevision` is
+ * carried for logging/audit (which revision triggered an invalidation) — it is NOT
+ * embedded in the key itself, matching the real live key shape confirmed via `EXISTS`
+ * (`bifrost:sem:packet:{packet_key}`, no revision segment). Packet-level revision
+ * identity already lives in `packet_key` per this repo's packet-identity conventions;
+ * adding a second revision segment to the key would both diverge from live Redis
+ * reality and orphan already-warmed cache entries.
+ */
+export interface BitfrostPacketIdentity {
+  packetKey: string;
+  featureId?: string;
+  sourceRevision?: string;
+}
 
 // ── LLM Cache Key Utilities ───────────────────────────────────────────────
 

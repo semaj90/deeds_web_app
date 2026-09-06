@@ -308,9 +308,14 @@ fallback"), never a `crossEncoder`-weight blend input.
       rank:ndcg comparison run + report). 3.6a/3.6b are prerequisites for this, not this task
       itself — deliberately stopped here per explicit instruction not to proceed into the
       comparison in this pass.
-- [ ] 3.7 Update `parent-atlas-retrieval-lineage-dag-convergence/tasks.md`'s `XGBOOST-RERANKER-EVAL-01`
-      gate to reference this task and its distinct scope (future training-eval vs. this session's
-      already-deployed-path bug, now fixed) before that gate starts.
+- [x] 3.7 **Confirmed already satisfied (2026-09-05) — no new edit needed.**
+      `parent-atlas-retrieval-lineage-dag-convergence/tasks.md`'s `XGBOOST-RERANKER-EVAL-01` gate
+      already carries a `BEST-FIT-SCORE-AUDIT-01` cross-reference (dated 2026-09-03, predating this
+      re-check) that correctly distinguishes the future `CandidateFeatureMatrixV1` training/eval
+      path from the already-deployed `canonical-rerank-executor.ts:487-501` path, and explicitly
+      names this fabric change's `XGBOOST-RERANK-ACTIVATION-01` (task 3) as the place that must
+      resolve the `crossEncoder: 0` intent question before that gate starts. No further edit
+      required — re-read it to confirm it still matches this task's request rather than assuming.
 - [ ] 3.8 XGBOOST-PROMOTION-POLICY-01 (not started) — freeze `XgboostPromotionPolicyV1` semantics
       (candidateSetIdentical, featureSchemaMatched, predictionCountMatched, finitePredictions,
       deterministicReplay, primaryMetric=NDCG_AT_10, noStatisticallyCredibleRegression,

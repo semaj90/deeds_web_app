@@ -38,6 +38,7 @@ const {
   releaseCoordinatorLock,
   openExecution,
   recordSourceSelectionStage,
+  recordInventoryStage,
   heartbeat,
   completeExecution,
   reconcileAbandonedExecutions,
@@ -155,6 +156,46 @@ describeIf('GRAPHIFY-DAILY-COORDINATOR-01: live coordinator flow (rolled back, z
       );
       expect(fileCountA.rows[0]?.n).toBe(2);
       expect(fileCountB.rows[0]?.n).toBe(0); // never ran source-selection for B
+    } finally {
+      await releaseCoordinatorLock(client);
+    }
+  });
+
+  it('binds a bounded inventory receipt after source selection without touching legacy inventory tables', async () => {
+    await acquireCoordinatorLock(client);
+    try {
+      const workspaceRevision = `sha256:${'e'.repeat(64)}`;
+      const { executionId } = await openExecution(client, {
+        workspaceId: realWorkspaceId,
+        workspaceRevision,
+        parserContractVersion: 'graphify.parser.v0.1',
+        extractionContractVersion: 'graphify.extractor.v0.1',
+        triggerKind: 'COORDINATOR_INVENTORY_STAGE_TEST',
+      });
+      const selection = await recordSourceSelectionStage(client, executionId, workspaceRevision, [
+        { sourceRef: 'coordinator-test/inventory.ts', codeSourceRevision: `sha256:${'5'.repeat(64)}`, contentHash: `sha256:${'6'.repeat(64)}`, byteLength: 64 },
+      ]);
+      const inventory = await recordInventoryStage(client, executionId, {
+        inputChecksum: selection.outputChecksum,
+        outputChecksum: `sha256:${'7'.repeat(64)}`,
+        receiptRef: 'docs/reports/inventory-fixture-v1.json',
+      });
+      expect(inventory.inputChecksum).toBe(selection.outputChecksum);
+
+      const readback = await client.query(
+        `SELECT stage, status, input_checksum, output_checksum, receipt_ref
+           FROM public.graphify_execution_stages
+          WHERE execution_id = $1 AND stage IN ('SOURCE_SELECTION', 'INVENTORY')
+          ORDER BY stage`,
+        [executionId],
+      );
+      expect(readback.rows).toHaveLength(2);
+      const inventoryRow = readback.rows.find((row) => row.stage === 'INVENTORY');
+      expect(inventoryRow?.status).toBe('COMPLETED');
+      expect(inventoryRow?.input_checksum).toBe(selection.outputChecksum);
+      expect(inventoryRow?.output_checksum).toBe(`sha256:${'7'.repeat(64)}`);
+      expect(inventoryRow?.receipt_ref).toBe('docs/reports/inventory-fixture-v1.json');
+      await completeExecution(client, executionId, { status: 'COMPLETED' });
     } finally {
       await releaseCoordinatorLock(client);
     }

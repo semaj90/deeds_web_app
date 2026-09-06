@@ -9,7 +9,6 @@
 import { getRedis } from '$lib/server/redis.js';
 import { execSync, spawn } from 'node:child_process';
 import { ENV } from '$lib/server/env.server.js';
-import { getOllamaEndpoint } from '$lib/server/ollama.js';
 
 export enum VlmMode {
   OFF = 'OFF',
@@ -237,17 +236,10 @@ function restartTurboQuant(modelPath: string, mmprojPath?: string): void {
  * Ollama is not a chat/generation fallback in this lifecycle.
  */
 async function unloadLlamaServerModel(model: string): Promise<void> {
-  try {
-    await fetch(`${getOllamaEndpoint()}/api/generate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model, prompt: '', keep_alive: 0 }),
-      signal: AbortSignal.timeout(5000),
-    });
-    console.info(`[vlm-lifecycle] Requested llama-server model release: ${model}`);
-  } catch (error) {
-    console.error('[vlm-lifecycle] llama-server model release failed:', error);
-  }
+  // llama-server has no Ollama keep_alive control endpoint. Model release is
+  // owned by the launcher/process lifecycle; report the unsupported request
+  // instead of accidentally sending it to the embedding service.
+  console.error(`[vlm-lifecycle] model release unsupported by llama-server: ${model}`);
 }
 
 /**

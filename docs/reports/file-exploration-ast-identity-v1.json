@@ -1,0 +1,119 @@
+{
+  "schema": "atlas.file-exploration-ast-identity.v1",
+  "status": "IDENTITY_QUALIFIED_AST_OBSERVATIONS_PROVEN_BOUNDED",
+  "gate": "ATLAS-FILE-EXPLORATION-INDEX-03",
+  "sample": {
+    "requested": 3,
+    "selectedSources": 3,
+    "sourceRefs": [
+      "__tests__/data-hashing.spec.ts",
+      ".claude/hooks/posttooluse-audit.mjs",
+      ".claude/hooks/pretooluse-deny.mjs"
+    ]
+  },
+  "workspaceRevision": "sha256:d2ee50ffbf2f435045caf0a6acad52c243b4b620364e04c8451015d4f43c0583",
+  "observationCount": 6,
+  "observations": [
+    {
+      "observationId": "fei-ast:0e8b5e75a61fdd155d7e3d3c95a60750e2a71654",
+      "sourceRef": "__tests__/data-hashing.spec.ts",
+      "sourceRevision": "sha256:da7c6ceeb3c983e9e49ae0cc8e5cdb761ada6264f8c40d78296fac48b502c3ba",
+      "workspaceRevision": "sha256:d2ee50ffbf2f435045caf0a6acad52c243b4b620364e04c8451015d4f43c0583",
+      "contentHash": "da7c6ceeb3c983e9e49ae0cc8e5cdb761ada6264f8c40d78296fac48b502c3ba",
+      "byteStart": 231,
+      "byteEnd": 1294,
+      "evidenceTextChecksum": "sha256:b52824d5834668a9e60a284f3984c03f19c582e784fb3074938c59b10dd3bdf1",
+      "kind": "ast_function",
+      "name": "canonicalJsonString",
+      "ruleId": "ast-grep:function-declaration",
+      "lineageQualified": true,
+      "canonicalAuthority": false
+    },
+    {
+      "observationId": "fei-ast:8e45210066624ef00ad14e11258271f5b56516b3",
+      "sourceRef": "__tests__/data-hashing.spec.ts",
+      "sourceRevision": "sha256:da7c6ceeb3c983e9e49ae0cc8e5cdb761ada6264f8c40d78296fac48b502c3ba",
+      "workspaceRevision": "sha256:d2ee50ffbf2f435045caf0a6acad52c243b4b620364e04c8451015d4f43c0583",
+      "contentHash": "da7c6ceeb3c983e9e49ae0cc8e5cdb761ada6264f8c40d78296fac48b502c3ba",
+      "byteStart": 300,
+      "byteEnd": 1264,
+      "evidenceTextChecksum": "sha256:86bba28deb7e34ebb40f75eab02c81f1d2ccbfe53836cec6b38dca78ef98ca7b",
+      "kind": "ast_function",
+      "name": "serialize",
+      "ruleId": "ast-grep:function-declaration",
+      "lineageQualified": true,
+      "canonicalAuthority": false
+    },
+    {
+      "observationId": "fei-ast:1aabdb2a5468007e754a817dc1ba980dfa553c23",
+      "sourceRef": "__tests__/data-hashing.spec.ts",
+      "sourceRevision": "sha256:da7c6ceeb3c983e9e49ae0cc8e5cdb761ada6264f8c40d78296fac48b502c3ba",
+      "workspaceRevision": "sha256:d2ee50ffbf2f435045caf0a6acad52c243b4b620364e04c8451015d4f43c0583",
+      "contentHash": "da7c6ceeb3c983e9e49ae0cc8e5cdb761ada6264f8c40d78296fac48b502c3ba",
+      "byteStart": 1619,
+      "byteEnd": 4781,
+      "evidenceTextChecksum": "sha256:ec173b4024b55ceb36f0c3047103a17a31b53c15022f7693b2729f3694d6a15c",
+      "kind": "ast_class",
+      "name": "FeatureDomainPacket",
+      "ruleId": "ast-grep:class-declaration",
+      "lineageQualified": true,
+      "canonicalAuthority": false
+    },
+    {
+      "observationId": "fei-ast:7970f130eef00533971085d834d48efa2c20ca41",
+      "sourceRef": "__tests__/data-hashing.spec.ts",
+      "sourceRevision": "sha256:da7c6ceeb3c983e9e49ae0cc8e5cdb761ada6264f8c40d78296fac48b502c3ba",
+      "workspaceRevision": "sha256:d2ee50ffbf2f435045caf0a6acad52c243b4b620364e04c8451015d4f43c0583",
+      "contentHash": "da7c6ceeb3c983e9e49ae0cc8e5cdb761ada6264f8c40d78296fac48b502c3ba",
+      "byteStart": 3443,
+      "byteEnd": 4020,
+      "evidenceTextChecksum": "sha256:495c7ff74ce34d68e3089eb45ebc291b7e4edd070aba6371a93b14294d4c7de0",
+      "kind": "ast_method",
+      "name": "FeatureDomainPacket.public",
+      "ruleId": "ast-grep:method-definition",
+      "lineageQualified": true,
+      "canonicalAuthority": false
+    },
+    {
+      "observationId": "fei-ast:274ab02319f6053d04b5325cb12c848e9e8e5629",
+      "sourceRef": "__tests__/data-hashing.spec.ts",
+      "sourceRevision": "sha256:da7c6ceeb3c983e9e49ae0cc8e5cdb761ada6264f8c40d78296fac48b502c3ba",
+      "workspaceRevision": "sha256:d2ee50ffbf2f435045caf0a6acad52c243b4b620364e04c8451015d4f43c0583",
+      "contentHash": "da7c6ceeb3c983e9e49ae0cc8e5cdb761ada6264f8c40d78296fac48b502c3ba",
+      "byteStart": 4384,
+      "byteEnd": 4781,
+      "evidenceTextChecksum": "sha256:735bd8cb75e5fe668c1312f05682e1075cc16a15cc753fb2c0ddd29a276c106e",
+      "kind": "ast_method",
+      "name": "FeatureDomainPacket.createFeaturePacket",
+      "ruleId": "ast-grep:method-definition",
+      "lineageQualified": true,
+      "canonicalAuthority": false
+    },
+    {
+      "observationId": "fei-ast:b4d92aa7a465d160d766a7bb652514bd832cc741",
+      "sourceRef": ".claude/hooks/pretooluse-deny.mjs",
+      "sourceRevision": "sha256:09f8a67945e52bfa12c82a0b4a90016cfee4680863c9ffcd5ff0358b0bcd399c",
+      "workspaceRevision": "sha256:d2ee50ffbf2f435045caf0a6acad52c243b4b620364e04c8451015d4f43c0583",
+      "contentHash": "09f8a67945e52bfa12c82a0b4a90016cfee4680863c9ffcd5ff0358b0bcd399c",
+      "byteStart": 5198,
+      "byteEnd": 5331,
+      "evidenceTextChecksum": "sha256:6c8cf6be06731cc4dea23fa94c168b2d19d524abd4aca542f3af01aaa3c90205",
+      "kind": "ast_function",
+      "name": "matchesTool",
+      "ruleId": "ast-grep:function-declaration",
+      "lineageQualified": true,
+      "canonicalAuthority": false
+    }
+  ],
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "readOnly": true,
+  "forbiddenWrites": [
+    "PostgreSQL",
+    "Qdrant",
+    "Neo4j",
+    "Valkey",
+    "CandidateOrdinal",
+    "semantic_768"
+  ]
+}

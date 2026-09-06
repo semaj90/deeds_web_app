@@ -359,6 +359,16 @@ export interface SearchResult {
      * than throwing.
      */
     hypergraphNeighbors?: Array<{ canonicalId: string; hyperedgeIds: string[] }>;
+    /**
+     * True when this SearchRuntime instance was constructed with
+     * `readOnly: true` (see `SearchRuntimeConfig.readOnly`) — i.e. this call
+     * performed zero writes to the promotion outbox or recommendation
+     * ledger. Absent/false means the normal production write path ran.
+     * Added for ACE-FEATURE-SOURCE-OWNER-01 / the SearchRuntime zero-write
+     * boundary gate: a proof/canary script can assert on this field instead
+     * of having to infer "no writes happened" from timing or DB state.
+     */
+    readOnly?: boolean;
   };
   promotion?: {
     status: 'success' | 'partial' | 'skipped' | 'failed';
@@ -398,6 +408,21 @@ export interface SearchRuntimeConfig {
    * Passed here so post-process doesn't need a DB call.
    */
   dislikedPacketKeys?: ReadonlySet<string>;
+  /**
+   * When true, `search()` skips its two fire-and-forget write side effects
+   * (`recordPromotionIntent()` to the promotion outbox, `logExposureEvents()`
+   * to the recommendation ledger) entirely -- not just their errors. Every
+   * other stage (retrieve/fuse/score/hydrate/rerank/postProcess/hypergraph
+   * lookup) is already read-only and is unaffected.
+   *
+   * Added for the SearchRuntime zero-write read-only execution boundary gate
+   * (ACE-FEATURE-SOURCE-OWNER-01 finding, parent-atlas-retrieval-lineage-dag-convergence
+   * tasks.md 2026-09-04): a live proof/canary needed to call the real
+   * `SearchRuntime.search()` without side effects and previously could not.
+   * Defaults to false/undefined -- every existing production call site is
+   * unaffected unless it explicitly opts in.
+   */
+  readOnly?: boolean;
 }
 
 function applySearchMetadataFilter(
@@ -442,6 +467,7 @@ export class SearchRuntime {
   private postProcessConfig?: Partial<PostProcessConfig>;
   private updatedAtMap: ReadonlyMap<string, Date>;
   private dislikedPacketKeys: ReadonlySet<string>;
+  private readOnly: boolean;
 
   constructor(config: SearchRuntimeConfig) {
     this.userId = config.userId;
@@ -454,6 +480,7 @@ export class SearchRuntime {
     this.dislikedPacketKeys = config.dislikedPacketKeys
       ? new Set(config.dislikedPacketKeys)
       : new Set();
+    this.readOnly = config.readOnly ?? false;
   }
 
   /**
@@ -528,6 +555,8 @@ export class SearchRuntime {
             fusionMethod: 'rrf',
             rerankModel: 'none',
             rerankerUsed: false,
+            promotionAttempted: false,
+            readOnly: this.readOnly,
           },
         };
       }
@@ -598,6 +627,7 @@ export class SearchRuntime {
             rerankModel: 'degraded-no-rerank',
             rerankerUsed: false,
             promotionAttempted: false,
+            readOnly: this.readOnly,
             ...(hypergraphNeighborsDegraded ? { hypergraphNeighbors: hypergraphNeighborsDegraded } : {}),
           },
         };
@@ -750,33 +780,35 @@ export class SearchRuntime {
       const promoteStart = Date.now();
       stageTiming.promote = 0;
 
-      // Queue promotion jobs in outbox table (async, no wait)
-      const { recordPromotionIntent } = await import('./promote-results-outbox.js');
-      recordPromotionIntent(finalPackets, {
-        queryText: query.text,
-        userId: this.userId,
-      }).then(enqueuedCount => {
-        stageTiming.promote = Date.now() - promoteStart;
-        console.log(`Promotion queued: ${enqueuedCount} jobs enqueued from ${finalPackets.length} packets`);
-      }).catch(error => {
-        console.error('Promotion intent recording failed (non-blocking):', error);
-      });
+      if (!this.readOnly) {
+        // Queue promotion jobs in outbox table (async, no wait)
+        const { recordPromotionIntent } = await import('./promote-results-outbox.js');
+        recordPromotionIntent(finalPackets, {
+          queryText: query.text,
+          userId: this.userId,
+        }).then(enqueuedCount => {
+          stageTiming.promote = Date.now() - promoteStart;
+          console.log(`Promotion queued: ${enqueuedCount} jobs enqueued from ${finalPackets.length} packets`);
+        }).catch(error => {
+          console.error('Promotion intent recording failed (non-blocking):', error);
+        });
 
-      // Log exposure events for the recommendation ledger (fire-and-forget)
-      // Must happen after final ranking so positions are accurate.
-      const { logExposureEvents } = await import('./recommendation-events.js');
-      logExposureEvents(
-        finalPackets.map((pkt, idx) => ({
-          packet_key: pkt.packet_key ?? pkt.chunk_id,
-          source_ref: pkt.source_ref ?? '',
-          position: idx + 1,
-        })),
-        {
-          query_text: query.text,
-          session_key: query.spanContext?.traceId,
-          actor_key: this.userId,
-        },
-      );
+        // Log exposure events for the recommendation ledger (fire-and-forget)
+        // Must happen after final ranking so positions are accurate.
+        const { logExposureEvents } = await import('./recommendation-events.js');
+        logExposureEvents(
+          finalPackets.map((pkt, idx) => ({
+            packet_key: pkt.packet_key ?? pkt.chunk_id,
+            source_ref: pkt.source_ref ?? '',
+            position: idx + 1,
+          })),
+          {
+            query_text: query.text,
+            session_key: query.spanContext?.traceId,
+            actor_key: this.userId,
+          },
+        );
+      }
 
       const hypergraphNeighbors = await this.lookupHypergraphNeighbors(finalPackets);
 
@@ -806,7 +838,8 @@ export class SearchRuntime {
           fusionMethod: 'rrf',
           rerankModel: reranked[0]?.model_version ?? 'mixedbread-ai/mxbai-rerank-base-v2',
           rerankerUsed: reranked.length > 0,
-          promotionAttempted: true,
+          promotionAttempted: !this.readOnly,
+          readOnly: this.readOnly,
           ...(hypergraphNeighbors ? { hypergraphNeighbors } : {}),
         },
       };
@@ -1384,7 +1417,7 @@ export function fuseSearchRuntimeCandidates(candidates: Candidate[]): FusedCandi
  * Factory for creating search runtime instances (production path — no injected adapters).
  * Backward-compatible: existing callers require no changes.
  */
-export function createSearchRuntime(config?: { userId?: string; caseId?: string }): SearchRuntime {
+export function createSearchRuntime(config?: { userId?: string; caseId?: string; readOnly?: boolean }): SearchRuntime {
   return new SearchRuntime(config ?? {});
 }
 
@@ -1430,6 +1463,6 @@ async function makeProjected384EmbedFn(text: string): Promise<DenseEmbedding> {
  * Production factory with explicitly wired DI adapters.
  * Each adapter is fail-closed: returns [] on any error, never throws.
  */
-export function createProductionSearchRuntime(config?: { userId?: string; caseId?: string }): SearchRuntime {
+export function createProductionSearchRuntime(config?: { userId?: string; caseId?: string; readOnly?: boolean }): SearchRuntime {
   return new SearchRuntime({ ...(config ?? {}) });
 }

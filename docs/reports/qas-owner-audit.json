@@ -1,6 +1,6 @@
 {
   "schema": "parent-atlas.qas.owner-audit.v2",
-  "generatedAt": "2026-08-28T18:17:15.743Z",
+  "generatedAt": "2026-09-05T01:08:57.345Z",
   "status": "OWNER_AUDIT_PARTIAL",
   "canonicalQasOwner": "sveltekit-frontend/src/lib/server/atlas/retrieval/query-adaptive-sampler.ts",
   "bundleReference": "REFERENCE_ONLY",

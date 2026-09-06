@@ -1,4 +1,8 @@
 import { z } from 'zod';
+import {
+  workspaceSourceBindingV1Schema,
+  type WorkspaceSourceBindingV1,
+} from '../identity/workspace-source-binding-v1.js';
 
 /**
  * GRAPHIFY-DAILY-COORDINATOR-01 (parent-atlas-retrieval-lineage-dag-convergence).
@@ -160,6 +164,39 @@ export const sourceSelectionBindingV1Schema = z.object({
 }).strict();
 export type SourceSelectionBindingV1 = z.infer<typeof sourceSelectionBindingV1Schema>;
 
+/**
+ * Adapts the authoritative workspace-source binding into the execution-ledger input shape.
+ * This is intentionally pure: it does not scan, hash, select, or write. Workspace identity is
+ * checked before the coordinator receives the binding, and the legacy file ID remains only
+ * compatibility metadata; it never participates in execution membership identity.
+ */
+export function adaptWorkspaceBindingsToSourceSelectionV1(
+  workspaceRevision: string,
+  bindings: readonly WorkspaceSourceBindingV1[],
+): SourceSelectionBindingV1[] {
+  const parsedWorkspaceRevision = contentRevision.parse(workspaceRevision);
+  const parsedBindings = bindings.map((binding) => workspaceSourceBindingV1Schema.parse(binding));
+  const sourceRefs = new Set<string>();
+
+  return parsedBindings.map((binding) => {
+    if (binding.workspaceRevision !== parsedWorkspaceRevision) {
+      throw new Error(`GRAPHIFY_COORDINATOR_ADAPTER_WORKSPACE_REVISION_MISMATCH:${binding.sourceRef}`);
+    }
+    if (sourceRefs.has(binding.sourceRef)) {
+      throw new Error(`GRAPHIFY_COORDINATOR_ADAPTER_DUPLICATE_SOURCE_REF:${binding.sourceRef}`);
+    }
+    sourceRefs.add(binding.sourceRef);
+    return sourceSelectionBindingV1Schema.parse({
+      sourceRef: binding.sourceRef,
+      codeSourceRevision: binding.sourceRevision,
+      contentHash: binding.contentDigest,
+      byteLength: binding.byteLength,
+      // WorkspaceSourceBindingV1 does not own a legacy graphify_files ID.
+      // The adapter therefore omits it instead of inventing compatibility identity.
+    });
+  });
+}
+
 /** Identifies which selection policy chose this execution's source cohort (e.g.
  * "full-corpus-v1", "incremental-changed-since-v1", "bounded-canary-v1") -- distinct from
  * workspaceRevision (identifies the BYTES selected) and outputChecksum (identifies the exact SET
@@ -241,6 +278,76 @@ async function computeSourceRefSetChecksum(sourceRefs: readonly string[]): Promi
   const digest = createHash('sha256');
   for (const ref of [...sourceRefs].sort()) digest.update(ref);
   return `sha256:${digest.digest('hex')}`;
+}
+
+export const executionStageReceiptV1Schema = z.object({
+  inputChecksum: contentRevision,
+  outputChecksum: contentRevision,
+  receiptRef: z.string().min(1).optional(),
+}).strict();
+export type ExecutionStageReceiptV1 = z.infer<typeof executionStageReceiptV1Schema>;
+
+/** Records a completed INVENTORY stage for an already-open execution. The inventory producer
+ * remains responsible for scanning/materializing its own artifacts; this primitive only binds
+ * its immutable receipt checksums to the execution ledger and never writes graphify_files. */
+export async function recordInventoryStage(
+  client: GraphifyCoordinatorSqlClientV1,
+  executionId: string,
+  receipt: ExecutionStageReceiptV1,
+): Promise<ExecutionStageReceiptV1> {
+  uuid.parse(executionId);
+  const parsed = executionStageReceiptV1Schema.parse(receipt);
+  await client.query(
+    `INSERT INTO public.graphify_execution_stages (execution_id, stage, status, started_at,
+       input_checksum)
+     VALUES ($1, 'INVENTORY', 'RUNNING', now(), $2)`,
+    [executionId, parsed.inputChecksum],
+  );
+  const update = await client.query(
+    `UPDATE public.graphify_execution_stages
+        SET status = 'COMPLETED', completed_at = now(), output_checksum = $3, receipt_ref = $4
+      WHERE execution_id = $1 AND stage = $2 AND status = 'RUNNING'
+      RETURNING execution_id`,
+    [executionId, 'INVENTORY', parsed.outputChecksum, parsed.receiptRef ?? null],
+  );
+  if ((update.rowCount ?? 0) !== 1) {
+    throw new Error('GRAPHIFY_COORDINATOR_INVENTORY_STAGE_READBACK_FAILED');
+  }
+  return parsed;
+}
+
+const structuralExecutionStageSchema = z.enum(['AST_PARSE', 'STRUCTURAL_EXTRACT']);
+export type StructuralExecutionStageV1 = z.infer<typeof structuralExecutionStageSchema>;
+
+/** Binds a completed structural receipt to one of the two structural ledger stages. The
+ * allow-list is intentional: this adapter cannot mark semantic, graph, projection, or validation
+ * stages complete before their actual owners are wired. */
+export async function recordStructuralStage(
+  client: GraphifyCoordinatorSqlClientV1,
+  executionId: string,
+  stage: StructuralExecutionStageV1,
+  receipt: ExecutionStageReceiptV1,
+): Promise<ExecutionStageReceiptV1> {
+  uuid.parse(executionId);
+  const parsedStage = structuralExecutionStageSchema.parse(stage);
+  const parsed = executionStageReceiptV1Schema.parse(receipt);
+  await client.query(
+    `INSERT INTO public.graphify_execution_stages (execution_id, stage, status, started_at,
+       input_checksum)
+     VALUES ($1, $2, 'RUNNING', now(), $3)`,
+    [executionId, parsedStage, parsed.inputChecksum],
+  );
+  const update = await client.query(
+    `UPDATE public.graphify_execution_stages
+        SET status = 'COMPLETED', completed_at = now(), output_checksum = $3, receipt_ref = $4
+      WHERE execution_id = $1 AND stage = $2 AND status = 'RUNNING'
+      RETURNING execution_id`,
+    [executionId, parsedStage, parsed.outputChecksum, parsed.receiptRef ?? null],
+  );
+  if ((update.rowCount ?? 0) !== 1) {
+    throw new Error(`GRAPHIFY_COORDINATOR_${parsedStage}_STAGE_READBACK_FAILED`);
+  }
+  return parsed;
 }
 
 /** Updates last_heartbeat_at. No-ops (rowCount 0) rather than throwing when the execution is no

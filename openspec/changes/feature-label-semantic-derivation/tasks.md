@@ -120,6 +120,19 @@ distribution has been reviewed for false positives (`AMBIGUOUS` rate especially)
   one doesn't already exist as a queryable table — check `recommendation_log`/`semantic_signals`
   (phase109a schema, already live) before inventing a new table.
 
+## Re-verification pass (2026-09-05, read-only)
+
+- **The one open item (line 13, `graphify:daily:dry` misleading name) is STILL PRESENT, re-verified
+  live.** `sveltekit-frontend/package.json`'s `graphify:daily:dry` script still runs
+  `graphify:validate && graphify:materialize:apply && daily-graphify-cold-processing.mjs --dry-run
+  && atlas:phase8:fanout:dry:steps1-3 && atlas:qdrant:feature-map-sync` — `graphify:materialize:apply`
+  is a real apply, and per this same file's own Phase 0 proof, `atlas:phase8:fanout:dry:steps1-3`
+  itself applies steps 1-3 for real (`--apply-through=3`) despite its own `:dry` suffix. So a
+  script literally named `graphify:daily:dry` performs two layers of real canonical writes. No
+  other OpenSpec change references or claims ownership of this naming/safety fix
+  (`grep -rl "graphify:daily:dry" openspec/changes/*/{tasks,proposal}.md` returns only this
+  change's own two files) — genuinely still unowned, not resolved elsewhere.
+
 ## Required proof matrix (fill in as phases complete)
 
 | Item | Status |

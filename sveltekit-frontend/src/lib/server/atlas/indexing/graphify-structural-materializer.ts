@@ -57,9 +57,12 @@ export function create8095AstProvider(baseUrl?: string): AstProvider {
           sourceRevision: input.sourceRevision,
         });
         const diagnostics = evidence.diagnostics ?? [];
+        const fatalDiagnostics = diagnostics.filter(
+          (diagnostic) => !diagnostic.startsWith('CONSILIENCY_LF_BYTE_SPAN_REMAPPED'),
+        );
         return {
           provider: 'treesitter-chunker-8095',
-          status: diagnostics.length > 0 || evidence.syntax_status === 'RECOVERED_WITH_ERRORS' ? 'RECOVERED_WITH_ERRORS' : 'PROVEN',
+          status: fatalDiagnostics.length > 0 || evidence.syntax_status === 'RECOVERED_WITH_ERRORS' ? 'RECOVERED_WITH_ERRORS' : 'PROVEN',
           evidence,
           diagnostics,
           errorTag: evidence.error_tag ?? undefined,

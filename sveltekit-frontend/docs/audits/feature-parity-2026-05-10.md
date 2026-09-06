@@ -1,5 +1,9 @@
 # Feature Parity Audit — 2026-05-10
 
+> **Doc review (2026-09-04):** SUPERSEDED — MCP tool-count claims here are far stale (live source now
+> has 120 `registerTool()` calls; the Sept 2026 openspec census reports 176 via live `tools/list`
+> discovery), see `openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md`.
+
 **Method**: parsed `docs/master_agents.md` feature atlas, cross-referenced with all `AGENTS.md`, `codebase-graph.json`, `codebase-map.md`. Verified per-feature that canonical files / routes / MCP tools resolve.
 
 **Note**: this audit was performed by the obsidian-cartographer subagent which returned findings inline (no MCP exercise of live `:8788` / `:8789` surfaces — counts are source-level).

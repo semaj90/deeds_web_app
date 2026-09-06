@@ -211,6 +211,24 @@ Louvain vs. Leiden on coverage/modularity/singleton-ratio/community-size distrib
 explicitly attribute the high community count to one of the 6 candidate causes above.
 **Apply-mode succeeding is not evidence of taxonomy usefulness — keep those two proofs separate.**
 
+## Re-verification pass (2026-09-05, read-only)
+
+- Confirmed `neo4j/01-required-indexes.cypher` still does **not** exist in the canonical
+  `neo4j/` directory (only `apoc-bounded-neighborhood.cypher`, `gds-bfs.cypher`,
+  `gds-dijkstra-smoke.cypher`, `gds-pagerank-smoke.cypher` are present) — the GR0 follow-up
+  item is genuinely still open, matching its unchecked box; the copy at
+  `parent-atlas-graph-runtime-enhancement/neo4j/01-required-indexes.cypher` (repo-root bundle
+  directory) is the reference bundle file, not the formalized canonical runtime file.
+- Grepped the rest of `openspec/` for any later reference to GR5.3–GR5.7 (Leiden persistence,
+  idempotency, Louvain-vs-Leiden comparison, taxonomy promotion) — found none. No evidence this
+  advanced past GR5.2 (dry-run) since the 2026-08-09 entries above; still `NEXT`/`BLOCKED` as
+  recorded.
+- This change's low checkbox count relative to its narrative depth (most gates are proven/tracked
+  in prose tables, not `- [ ]`/`- [x]` items) is why the portfolio script's raw "2/8" undercounts
+  real completed work here — same pattern found in `parent-atlas-runtime-ownership-precall` this
+  session. Not a data quality problem to fix in this file; noted for whoever next reads the
+  portfolio counts.
+
 ## Cross-references
 
 - `openspec/changes/parent-atlas-agentic-repair-bundle-integration/tasks.md` T22 (live graph state

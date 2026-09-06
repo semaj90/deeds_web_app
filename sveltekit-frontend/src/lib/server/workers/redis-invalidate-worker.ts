@@ -3,11 +3,20 @@
  *
  * Consumes identity update events and invalidates stale cache keys.
  * Non-blocking failure behavior (cache stale doesn''t block success).
+ *
+ * DEAD CODE, confirmed 2026-09-04 (BITFROST-INVALIDATION-OWNER-01 audit):
+ * startRedisInvalidateWorker()/stopRedisInvalidateWorker() have zero callers
+ * anywhere in the repo -- this RabbitMQ consumer is never started. Left in
+ * place (archive-not-delete) rather than removed, but its key logic below is
+ * fixed to the real live shape / delegated to the canonical invalidator so it
+ * isn't a landmine if it's ever wired up later. See
+ * docs/reports/parent-atlas-bitfrost-invalidation-owner-v1.json.
  */
 
 import amqp from 'amqplib';
 import { getValkeyClient } from '$lib/server/cache/valkey-client.js';
 import { ENV } from '$lib/server/env.server.js';
+import { invalidateBitfrostPacket } from '$lib/server/cache/atlas-reward-cache.js';
 import type { IdentityUpdatedEvent } from './mirror-sync-publisher.js';
 
 let channel: any = null;
@@ -54,30 +63,23 @@ async function invalidateRedisCache(event: IdentityUpdatedEvent): Promise<void> 
     throw new Error('Redis not initialized');
   }
 
-  const patterns = [
-    `bifrost:packet:${event.packet_key}`,
-    `bifrost:trace:${event.packet_key}`,
-    `bifrost:source:${event.source_ref}`,
-    `bifrost:feature:${event.feature_id}`
-  ];
+  const result = await invalidateBitfrostPacket(redis, {
+    packetKey: event.packet_key,
+    featureId: event.feature_id,
+  });
 
-  try {
-    const pipeline = redis.pipeline();
-    for (const pattern of patterns) {
-      pipeline.del(pattern);
-    }
-    await pipeline.exec();
-
-    console.log('Redis cache invalidated:', {
-      packet_key: event.packet_key,
-      patterns_count: patterns.length
-    });
-  } catch (err) {
+  if (!result.ok) {
     console.warn('Redis invalidation partial failure (non-blocking):', {
       packet_key: event.packet_key,
-      error: err
+      error: result.error
     });
+    return;
   }
+
+  console.log('Redis cache invalidated:', {
+    packet_key: event.packet_key,
+    keys_deleted: result.keysDeleted
+  });
 }
 
 export async function stopRedisInvalidateWorker(): Promise<void> {

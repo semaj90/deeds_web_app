@@ -35,7 +35,7 @@ const DEFAULT_CONFIG: KnowledgeIndexerConfig = {
   redisUrl: ENV.REDIS_URL,
   ollamaUrl: ENV.OLLAMA_BASE_URL,
 	embeddingModel: process.env?.EMBEDDING_MODEL ?? 'embeddinggemma:latest',
-  summaryModel: process.env?.OLLAMA_MODEL ?? 'gemma4-rotorquant:latest'
+  summaryModel: process.env?.LLAMA_SERVER_MODEL ?? 'ornith-1.5-9b'
 };
 
 /**
@@ -58,7 +58,7 @@ export class KnowledgeIndexer {
    * Index a single document
    * Flow:
    * 1. Generate 768-dim embedding using embeddinggemma
-   * 2. Generate AI summary using gemma4-rotorquant:latest
+   * 2. Generate AI summary through llama-server /v1 (active Ornith model)
    * 3. Extract entities and tags
    * 4. Compute TF-IDF vector
    * 5. Store in Qdrant: PostgreSQL, MinIO

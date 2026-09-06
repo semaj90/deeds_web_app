@@ -1,0 +1,151 @@
+{
+  "schema": "atlas.okf-agentic-context-plan.v1",
+  "generatedAt": "2026-09-04T17:03:49.168Z",
+  "query": "Firecrawl API documentation",
+  "inputChunkPlan": "docs/reports/okf-chunk-plan-v1.json",
+  "inputSearchReceipt": "docs/reports/okf-lexical-search-v1.json",
+  "sourceWorkspaceRevision": "sha256:f7c6f2c974d72c2d1fdaeade6b1722be61c8f7b6d369e018d58dbd72497b6b55",
+  "candidateCount": 5,
+  "candidateOrdinalMapChecksum": "sha256:4a86cfff74d71531b3463c663181d225b73041f13a6fd826356af11320822d8a",
+  "contextManifest": {
+    "schema": "atlas.context-manifest.plan.v1",
+    "checksum": "sha256:04f4fc29e1383a63739bbfd23ed32292698c9fe881574aa6741663af062e138e",
+    "selectedCandidateOrdinals": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "evidenceRefs": [
+      "workspace:firecrawl/docs-firecrawl-dev-api-reference-introduction-introduction.json#sha256:341bdd79d825d098e057ab2ace9e1c84a5df7c5a566f19b7ddf15b1a458c14b9",
+      "workspace:firecrawl/docs-firecrawl-dev-api-reference-introduction-introduction.md#sha256:c93611de3595246ea4c6e6334cdb5f0c3de355577be54dbb1f19f2311ecf3db6",
+      "workspace:firecrawl/docs-firecrawl-dev-api-reference-introduction-introduction.json#sha256:6f536d08820f6879810f690597c9f18398363a7055130f1dedf565a899bf646b",
+      "workspace:firecrawl/docs-firecrawl-dev-api-reference-introduction-introduction.json#sha256:882bafc4a0dee1c161e7c8464dd202ad57052bd8a8627599cbf04f5816a3e6f5",
+      "workspace:firecrawl/docs-firecrawl-dev-api-reference-introduction-introduction.md#sha256:d5f11d517badfef0c999a5f6b93f50352f6efb2286c9ea1637347cb0438cb793"
+    ],
+    "lodPolicy": "bounded_chunk_span_only",
+    "acePolicyRevision": "plan-only:unadmitted"
+  },
+  "parameterArtifact": {
+    "schema": "atlas.parameter-artifact.plan.v1",
+    "actionKind": "RETRIEVE_AND_PREFILL",
+    "parameterChecksum": "sha256:b25655440f605ca1c1e0658c1e81c30a37b7cfe5800ac93999dcf547636bbbdd",
+    "arguments": {
+      "query": "Firecrawl API documentation",
+      "topK": 5,
+      "candidateOrdinalMapChecksum": "sha256:4a86cfff74d71531b3463c663181d225b73041f13a6fd826356af11320822d8a"
+    },
+    "execution": "NOT_EXECUTED"
+  },
+  "synthesis": {
+    "provider": "llama-server",
+    "endpoint": "http://127.0.0.1:8090/v1/chat/completions",
+    "modelPolicy": "resolve-loaded-ornith-at-runtime; no model call in this plan",
+    "contextManifestChecksum": "sha256:04f4fc29e1383a63739bbfd23ed32292698c9fe881574aa6741663af062e138e",
+    "status": "NOT_EXECUTED"
+  },
+  "cache": {
+    "owner": "BitFrost/Valkey",
+    "keyMaterialChecksum": "sha256:ae0ee5098a9aac98286df5f36cfda83f80419eab2c99966bbd12adea0485ac4e",
+    "status": "NOT_WARMED"
+  },
+  "candidates": [
+    {
+      "candidateOrdinal": 0,
+      "chunkId": "sha256:80cd4d5b1afcb82f1559cae146c66a7a4c57dd80b059489aba70d5e17cee1b79",
+      "sourceRef": "workspace:firecrawl/docs-firecrawl-dev-api-reference-introduction-introduction.json",
+      "sourceRevision": "sha256:1c7d56cc65793bead233186fa85ba70c02293bb4115435a022d5fc37eb1ef57f",
+      "chunkChecksum": "sha256:341bdd79d825d098e057ab2ace9e1c84a5df7c5a566f19b7ddf15b1a458c14b9",
+      "byteSpan": {},
+      "lexicalOverlap": [
+        "firecrawl",
+        "api"
+      ],
+      "lexicalScore": 4.430816798843313,
+      "domainSignals": [
+        "documentation"
+      ],
+      "canonicalAuthority": false
+    },
+    {
+      "candidateOrdinal": 1,
+      "chunkId": "sha256:8dfedabdb1d32abb06ff9f22a72b5fe0155964ceaf53ff49b0f433c5f5cb6d86",
+      "sourceRef": "workspace:firecrawl/docs-firecrawl-dev-api-reference-introduction-introduction.md",
+      "sourceRevision": "sha256:17b6c5e46e0634be1c09d6c00ec070dc582acdd8d960df68439ae670fa27b604",
+      "chunkChecksum": "sha256:c93611de3595246ea4c6e6334cdb5f0c3de355577be54dbb1f19f2311ecf3db6",
+      "byteSpan": {},
+      "lexicalOverlap": [
+        "firecrawl",
+        "api"
+      ],
+      "lexicalScore": 4.430816798843313,
+      "domainSignals": [
+        "documentation"
+      ],
+      "canonicalAuthority": false
+    },
+    {
+      "candidateOrdinal": 2,
+      "chunkId": "sha256:55498030858b6e5653c71402261d2ea216ff24623e736b1fc847e2cccc6ef90e",
+      "sourceRef": "workspace:firecrawl/docs-firecrawl-dev-api-reference-introduction-introduction.json",
+      "sourceRevision": "sha256:1c7d56cc65793bead233186fa85ba70c02293bb4115435a022d5fc37eb1ef57f",
+      "chunkChecksum": "sha256:6f536d08820f6879810f690597c9f18398363a7055130f1dedf565a899bf646b",
+      "byteSpan": {},
+      "lexicalOverlap": [
+        "firecrawl",
+        "api"
+      ],
+      "lexicalScore": 2.772588722239781,
+      "domainSignals": [
+        "documentation"
+      ],
+      "canonicalAuthority": false
+    },
+    {
+      "candidateOrdinal": 3,
+      "chunkId": "sha256:8766905f05dfdfb29daea0807d9c819d2ecb5fb4accd767cc288552680852638",
+      "sourceRef": "workspace:firecrawl/docs-firecrawl-dev-api-reference-introduction-introduction.json",
+      "sourceRevision": "sha256:1c7d56cc65793bead233186fa85ba70c02293bb4115435a022d5fc37eb1ef57f",
+      "chunkChecksum": "sha256:882bafc4a0dee1c161e7c8464dd202ad57052bd8a8627599cbf04f5816a3e6f5",
+      "byteSpan": {},
+      "lexicalOverlap": [
+        "firecrawl",
+        "api"
+      ],
+      "lexicalScore": 2.4849066497880004,
+      "domainSignals": [
+        "documentation"
+      ],
+      "canonicalAuthority": false
+    },
+    {
+      "candidateOrdinal": 4,
+      "chunkId": "sha256:a5aacec419a3a81925dc1bc6caf72e1422cfc39f3b776e2ec3e95d0c23133d4a",
+      "sourceRef": "workspace:firecrawl/docs-firecrawl-dev-api-reference-introduction-introduction.md",
+      "sourceRevision": "sha256:17b6c5e46e0634be1c09d6c00ec070dc582acdd8d960df68439ae670fa27b604",
+      "chunkChecksum": "sha256:d5f11d517badfef0c999a5f6b93f50352f6efb2286c9ea1637347cb0438cb793",
+      "byteSpan": {},
+      "lexicalOverlap": [
+        "firecrawl",
+        "api"
+      ],
+      "lexicalScore": 2.484906649788,
+      "domainSignals": [
+        "documentation"
+      ],
+      "canonicalAuthority": false
+    }
+  ],
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "datastoreWritesPerformed": false,
+  "externalNetworkCallsPerformed": false,
+  "prohibitedPromotion": [
+    "no ontology admission",
+    "no CandidateOrdinal production admission",
+    "no cache warming",
+    "no synthesis execution",
+    "no patch mutation"
+  ]
+}

@@ -1,5 +1,10 @@
 # ACP Memory Hierarchy: Infrastructure First, Gemma4 Last
 
+> **Doc review (2026-09-04):** STALE_BUT_DIRECTIONALLY_RIGHT — the "infrastructure-first, LLM-last,
+> packets not raw files" principle is still architecturally endorsed (CLAUDE.md explicitly retains
+> it as "historical guidance"), but the live synthesis owner is now llama-server/Ornith 1.5 9B on
+> :8090, not Gemma4 — see CLAUDE.md "Chat/synthesis model switch" (2026-09-03).
+
 **Last Updated**: June 26, 2026
 **Author**: James Woodard + Claude
 **Status**: Architecture Reference (Canonical)

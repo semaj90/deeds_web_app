@@ -1,0 +1,20 @@
+{
+  "schema": "atlas.graphify-injection-plan-freshness.v1",
+  "plan": "docs/reports/graphify-current-execution-injection-plan-v1.json",
+  "cohort": "docs/reports/current-source-cohort-lineage-v1.json",
+  "planStatus": "READY_FOR_EXPLICIT_AUTHORIZATION",
+  "plannedWorkspaceRevision": "sha256:43582ef959f93a9fbd25717f5e9e03bc3d1a5dce6dba5595bd844711a5870772",
+  "currentWorkspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
+  "generatedAtPresent": false,
+  "revisionAgrees": false,
+  "status": "STALE_OR_CONFLICTING_PROPOSAL_FAIL_CLOSED",
+  "authorization": false,
+  "execution": false,
+  "sourceSelectionWrites": false,
+  "blockers": [
+    "PLAN_GENERATED_AT_MISSING",
+    "PLAN_WORKSPACE_REVISION_CONFLICTS_WITH_CURRENT_COHORT",
+    "CURRENT_COHORT_HAS_ZERO_REVISION_QUALIFIED_ROWS"
+  ],
+  "nextGate": "FRESH_WORKSPACE_SOURCE_SELECTION_INPUT_AND_INDEPENDENT_READBACK"
+}

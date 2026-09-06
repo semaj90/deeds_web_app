@@ -125,6 +125,51 @@ TurboVec remains retrieval acceleration only; it does not participate in extract
 | Register this capability in the runtime ownership registry only after a proven end-to-end run | OPEN | can only promote after receipt exists |
 | Decide whether live wiring belongs in a startup hook, npm script, or CLI-only path | OPEN | product decision still open |
 
+## Re-verification pass (2026-09-05, read-only — no code/schema/index changes)
+
+Cross-checked every open item above against the live repo and the rest of the OpenSpec portfolio,
+not just re-stated. Nothing has moved since the 2026-08-12/08-20 entries above; recorded here so a
+future session doesn't have to re-derive the same checks.
+
+- **Wiring status unchanged.** `grep -rl "parent-atlas-workstation-domain-classifier" sveltekit-frontend/src`
+  returns zero callers outside the module's own file. `classifyWorkstationDomain`/
+  `classifyWorkstationFile`/`embedAndIngestWorkstationNodes` are still exported but invoked from
+  nowhere in the live tree — the "NOT WIRED INTO ANY LIVE ROUTE" premise from `proposal.md`'s
+  header and the "Next session — pick up here" table above both still hold exactly as written.
+- **Not superseded by `DOMAIN-CLASSIFIER-OWNER-01`** (closed 2026-09-04 in
+  `openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md`), despite the
+  name similarity and both landing on "9 domains." Checked directly:
+  `sveltekit-frontend/src/lib/server/atlas/domain-taxonomy.ts`'s `CANONICAL_DOMAINS` is
+  `['auth','ui','retrieval','network','database','cache','agent','graph','ml']` — a generic
+  code/query routing taxonomy, unrelated to this change's Parent-Atlas-Workstation architecture
+  lanes (`IDENTITY, EXPORT_STORAGE, GRAPH, TELEMETRY, EMBEDDING, OKF_ONTOLOGY, TRANSPORT, COMPILER,
+  RUNTIME_TRAINING`). Independently corroborated by `parent-atlas-search-classifier-sidecar/tasks.md`
+  (closed, 36/36), which explicitly lists this change as "kept fully separate — do not touch its
+  files from this change" and classifies `parent-atlas-workstation-domain-classifier.ts` as its own
+  legitimate second `CANONICAL_OWNER` under `WORKSTATION_LANE_CLASSIFICATION`, not a duplicate to
+  consolidate.
+- **Line 22's "live query/label producer + `classification_mrl_128`" blocker is correctly tracked
+  in a sibling change, not duplicated here.** `openspec/changes/parent-atlas-query-routing-classifier/tasks.md`
+  owns this exact work stream (`classification_768 -> classification_mrl_128` MRL truncate+L2
+  projection) and is itself still open at the blocking step: `NLP-1`'s "Produce fixture embeddings
+  with the proven EmbeddingGemma executor" and "Verify 128-d norm/digest determinism" remain
+  unchecked there too. MiniLM retirement (this change's line 22) accordingly remains blocked — not
+  resolved, but the right place to watch is that sibling file, not to re-derive the blocker here.
+- **Line 33 (workflow loop has no live classifier producer)** — no new evidence found anywhere in
+  the portfolio; still accurately open.
+- **Lines 108/115 (isMainModule sweep leftovers) re-verified live, unchanged:**
+  `scripts/ai/embed_and_index_scenarios.mjs` still has two shebangs (`grep -n "^#!/usr/bin/env node"`
+  → lines 1 and 148) — the file-concatenation corruption is still present, still unfixed.
+  `scripts/atlas/load-profiles-to-postgres.mjs`, `scripts/atlas/build-component-profiles.mjs`, and
+  `scripts/atlas/build-ast-topology-dry-run.mjs` all still carry the redundant
+  `|| process.argv[1].endsWith('...')` fallback clause alongside the correct primary
+  `fileURLToPath(import.meta.url)` comparison — harmless, still a trivial follow-up, not done.
+
+**Net effect of this pass**: no items closed, no items newly blocked, no duplicate-owner risk found.
+This change remains exactly what its own "Next session — pick up here" table says: waiting on a
+first real end-to-end proof run (tree-sitter → embedding → Qdrant → Redis, LLM summary as a second
+pass) before any live-wiring decision is worth making.
+
 ## Reference
 
 See `proposal.md` for the full source-copy rationale, the 3 upgrades, and the namespace-separation

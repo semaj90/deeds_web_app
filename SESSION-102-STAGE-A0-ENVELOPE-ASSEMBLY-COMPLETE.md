@@ -1,5 +1,7 @@
 # Session 102+ Continuation V — Stage A0 Envelope Assembly & Emission Complete
 
+> **Doc review (2026-09-04):** SUPERSEDED — target file moved under `sveltekit-frontend/src/lib/server/retrieval/hyperrag-packet-rpc.ts` since this was written; current envelope/identity state is `openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md`.
+
 **Date**: July 2, 2026 23:50 UTC  
 **Status**: ✅ **STAGE A0 ENVELOPE ASSEMBLY WIRED + DIRECT EMISSION IMPLEMENTED**
 

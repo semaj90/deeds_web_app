@@ -2,7 +2,7 @@
  * property-dimensions.ts
  *
  * Canonical registry for embedding/feature vector dimensions.
- * Single source of truth to replace scattered hardcoded 768/384/64 values.
+ * Single source of truth to replace scattered hardcoded representation widths.
  *
  * Usage:
  *   import { DIMENSIONS } from '$lib/server/atlas/property-dimensions';
@@ -22,10 +22,37 @@ export const DIMENSIONS = {
     size: 768,
     model: 'embeddinggemma:latest',
     role: 'semantic_truth',
-    linceage_key: 'embedding_768_native'
+    lineage_key: 'embedding_768_native'
   } as const,
 
-  /** 384-dim: Legacy retrieval projection, retained only for explicit lineage. */
+  /** EmbeddingGemma MRL prefix view derived from semantic_768. */
+  DENSE_MRL_512: {
+    name: 'semantic_mrl_512',
+    size: 512,
+    model: 'embeddinggemma:latest',
+    role: 'derived_semantic_view',
+    lineage_key: 'semantic_768:mrl_512'
+  } as const,
+
+  /** EmbeddingGemma MRL prefix view derived from semantic_768. */
+  DENSE_MRL_256: {
+    name: 'semantic_mrl_256',
+    size: 256,
+    model: 'embeddinggemma:latest',
+    role: 'derived_semantic_view',
+    lineage_key: 'semantic_768:mrl_256'
+  } as const,
+
+  /** EmbeddingGemma MRL prefix view derived from semantic_768. */
+  DENSE_MRL_128: {
+    name: 'semantic_mrl_128',
+    size: 128,
+    model: 'embeddinggemma:latest',
+    role: 'derived_semantic_view',
+    lineage_key: 'semantic_768:mrl_128'
+  } as const,
+
+  /** 384-dim: retired compatibility projection; never a live EmbeddingGemma lane. */
   DENSE_LEGACY_RETRIEVAL: {
     name: 'dense_384_retrieval',
     size: 384,
@@ -34,7 +61,25 @@ export const DIMENSIONS = {
     lineage_key: 'embedding_384_truncated'
   } as const,
 
-  /** 64-dim: Routing + clustering only (latent autoencoder). */
+  /** 256-dim: physical learned autoencoder bottleneck derived from semantic_768. */
+  LATENT_256: {
+    name: 'latent_256',
+    size: 256,
+    model: 'nested-semantic-autoencoder-v3-full01',
+    role: 'learned_routing_projection',
+    lineage_key: 'semantic_768:autoencoder:latent_256'
+  } as const,
+
+  /** 128-dim: derived learned autoencoder view. */
+  LATENT_128: {
+    name: 'latent_128',
+    size: 128,
+    model: 'nested-semantic-autoencoder-v3-full01',
+    role: 'learned_routing_projection',
+    lineage_key: 'latent_256:prefix_128'
+  } as const,
+
+  /** 64-dim: derived learned autoencoder view for routing/clustering only. */
   LATENT_ROUTING: {
     name: 'latent_64_routing',
     size: 64,
@@ -60,10 +105,10 @@ export function validateDimension(
 export function getDimensionBySize(
   size: number
 ): (typeof DIMENSIONS)[keyof typeof DIMENSIONS] | null {
-  for (const dim of Object.values(DIMENSIONS)) {
-    if (dim.size === size) return dim;
-  }
-  return null;
+  const matches = Object.values(DIMENSIONS).filter((dim) => dim.size === size);
+  // 128 and 256 are intentionally shared by MRL and latent families. A raw
+  // length cannot identify the coordinate system; callers must name it.
+  return matches.length === 1 ? matches[0] : null;
 }
 
 /**
@@ -73,7 +118,7 @@ export const QDRANT_COLLECTIONS = {
   /** Primary code/document index (768-dim native). */
   codebase_chunks_768: DIMENSIONS.DENSE_CANONICAL,
 
-  /** Secondary retrieval mirror is now canonical 768. */
+  /** Retired compatibility collection; no new 384 writes or query routing. */
   codebase_chunks_384: DIMENSIONS.DENSE_LEGACY_RETRIEVAL,
 
   /** Evidence and research documents. */
@@ -118,7 +163,7 @@ export const POSTGRES_VECTORS = {
   /** feature_matrix.dense_768 (canonical lineage) */
   feature_dense_768: DIMENSIONS.DENSE_CANONICAL,
 
-  /** feature_matrix.dense_384 (retrieval projection) */
+  /** feature_matrix.dense_384 (retired compatibility projection) */
   feature_dense_384: DIMENSIONS.DENSE_LEGACY_RETRIEVAL,
 
   /** feature_matrix.latent_64 (routing features) */

@@ -1,5 +1,9 @@
 # AGENTS.md — How-to Guide
 
+> **Doc review (2026-09-04):** STALE_BUT_DIRECTIONALLY_RIGHT — `scripts/generate-agents-md.mjs`
+> exists as claimed, but the documented `npm run agents:write*` commands are absent from
+> `package.json` today; the generator/pipeline concept remains intact.
+
 > Per-directory LLM context wiki, indexed → reranked → compressed → retrieved through the Graphify pipeline. Reference for future agents (Claude Code, Cursor, OpenAI Codex, Hermes, Aider) and humans navigating the codebase.
 
 ---

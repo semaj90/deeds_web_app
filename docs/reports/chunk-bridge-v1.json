@@ -1,6 +1,6 @@
 {
   "schema": "atlas.chunk-bridge-v1",
-  "generatedAt": "2026-09-01T04:20:06.940Z",
+  "generatedAt": "2026-09-05T05:53:13.510Z",
   "readOnly": true,
   "postgresWrites": false,
   "selection": {
@@ -9,12 +9,12 @@
   },
   "summary": {
     "examined": 332,
-    "eligibleExactChunkIdentity": 15,
+    "eligibleExactChunkIdentity": 79,
     "counts": {
-      "EXACT_CHUNK_IDENTITY": 15,
+      "EXACT_CHUNK_IDENTITY": 79,
       "SOURCE_ONLY_AMBIGUOUS": 74,
       "MISSING_ORDINAL": 0,
-      "REVISION_UNPROVEN": 243,
+      "REVISION_UNPROVEN": 179,
       "CONTENT_MISMATCH": 0,
       "SOURCE_MISMATCH": 0,
       "MISSING_CHUNK": 0

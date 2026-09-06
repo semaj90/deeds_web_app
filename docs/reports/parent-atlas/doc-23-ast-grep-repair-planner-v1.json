@@ -1,0 +1,41 @@
+{
+  "schema": "atlas.doc-23-ast-grep-repair-planner-proof.v1",
+  "gate": "DOC-23",
+  "status": "DOC_23_AST_GREP_REPAIR_FIXTURE_PROVEN",
+  "structuralMatch": {
+    "ruleId": "replace-legacy-value",
+    "language": "typescript",
+    "startByte": 14,
+    "endByte": 22,
+    "matchedText": "oldValue",
+    "evidenceRef": "ast-grep:replace-legacy-value:1"
+  },
+  "proposal": {
+    "schema": "atlas.patch-proposal.v1",
+    "sourceRef": "src/example.ts",
+    "baseSourceRevision": "sha256:e2e846d0811ba3ca2ff75fcc41f163648e3e136dc4bc32c073b9e10543c77c61",
+    "matches": [
+      {
+        "ruleId": "replace-legacy-value",
+        "language": "typescript",
+        "startByte": 14,
+        "endByte": 22,
+        "matchedText": "oldValue",
+        "evidenceRef": "ast-grep:replace-legacy-value:1"
+      }
+    ],
+    "replacementText": "newValue",
+    "evidenceRefs": [
+      "ast-grep:replace-legacy-value:1"
+    ],
+    "canonicalAuthority": false,
+    "mutationAuthorized": false
+  },
+  "checks": {
+    "exactUtf8Match": true,
+    "sourceRevisionBound": true,
+    "mutationAuthorized": false
+  },
+  "writesPerformed": false,
+  "nextGate": "DOC_24_PATCH_PROPOSAL_AND_VALIDATION_RECEIPT"
+}

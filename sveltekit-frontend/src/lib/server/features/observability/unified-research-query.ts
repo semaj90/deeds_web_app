@@ -30,7 +30,8 @@
 import { getRedis } from '$lib/server/redis.js';
 import { pool }     from '$lib/server/db/client';
 import { ENV }      from '$lib/server/env.server.js';
-import { getOllamaEndpoint } from '$lib/server/ollama.js';
+import { LLAMA_SERVER_BASE_URL } from '$lib/server/ai/local-llama-provider.js';
+import { resolveLoadedLlamaModel } from '$lib/server/ai/llama-server-model-resolver.js';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -372,21 +373,23 @@ async function generateSelfPromptChain(
     `Output ONLY the ${depth} questions, one per line, no numbering, no extra text.`;
 
   try {
-    const { ollamaFetch } = await import('$lib/server/ollama.js');
-    const res = await ollamaFetch(`${getOllamaEndpoint()}/api/generate`, {
+    const { resolvedModel } = await resolveLoadedLlamaModel(
+      LLAMA_SERVER_BASE_URL.replace(/\/v1\/?$/, ''), null);
+    const res = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify({
-        model:   ENV.ROTORQUANT_CHAT_MODEL,
-        prompt,
+        model:   resolvedModel,
+        messages: [{ role: 'user', content: prompt }],
         stream:  false,
-        options: { temperature: 0.55, num_predict: 300 },
+        temperature: 0.55,
+        max_tokens: 300,
       }),
       signal: AbortSignal.timeout(15_000),
     });
     if (!res.ok) return [];
-    const data = await res.json() as { response?: string };
-    return (data.response ?? '')
+    const data = await res.json() as { choices?: Array<{ message?: { content?: string } }> };
+    return (data.choices?.[0]?.message?.content ?? '')
       .split('\n')
       .map((l: string) => l.replace(/^[-•*\d.)\s]+/, '').trim())
       .filter((l: string) => l.length > 10)

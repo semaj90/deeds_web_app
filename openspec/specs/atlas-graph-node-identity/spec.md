@@ -1,6 +1,12 @@
 # Parent Atlas Graph Node Identity — Requirements
 
-## Requirement: Graph node identity is layered, not single-sourced
+## Purpose
+
+Define layered graph-node identity and provenance across source, symbols, tuples, and projections.
+
+## Requirements
+
+### Requirement: Graph node identity is layered, not single-sourced
 
 The system SHALL represent a graph node through four non-conflatable identity layers.
 
@@ -21,7 +27,7 @@ then the node SHALL still carry a canonical code identity (`packetKey` / `symbol
 
 ---
 
-## Requirement: Source / structural occurrence layer
+### Requirement: Source / structural occurrence layer
 
 The system SHALL preserve real upstream Tree-sitter identities when available:
 

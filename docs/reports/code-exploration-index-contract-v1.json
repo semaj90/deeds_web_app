@@ -1,0 +1,17 @@
+{
+  "schema": "atlas.code-exploration-index-contract-receipt.v1",
+  "definition": ".okf/indexes/code-exploration.yaml",
+  "definitionChecksum": "sha256:8256cb4674b9b2e5fd2493ee5ea6cf4329fd18591fcb98cff9c3aead7caea53c",
+  "valid": true,
+  "semanticAdmission": false,
+  "astExplore02": "BLOCKED_UPSTREAM",
+  "currentPopulationAdmitted": 0,
+  "writes": 0,
+  "canonicalAuthority": false,
+  "modelCalls": false,
+  "status": "CONTRACT_PROVEN_POPULATION_UNADMITTED",
+  "blockers": [
+    "current source/chunk/workspace join is not exact",
+    "existing symbol seed lacks revision and canonical byte spans"
+  ]
+}

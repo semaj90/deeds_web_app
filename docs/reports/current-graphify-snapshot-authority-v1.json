@@ -1,0 +1,24 @@
+{
+  "schema": "atlas.current-graphify-snapshot-authority.v1",
+  "status": "NO_TERMINAL_EXECUTION_FOR_CURRENT_WORKSPACE",
+  "sourceSnapshot": {
+    "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+    "workspaceRevision": "sha256:b9bab9b65d9f466e2f23d9e3d7612e10df6c30d69ce2a7086535a400a1518a52",
+    "sourceManifestDigest": "b9bab9b65d9f466e2f23d9e3d7612e10df6c30d69ce2a7086535a400a1518a52",
+    "sourceCount": 23708,
+    "sourceManifestChecksum": "abf3acb170f5fad4a7871c0eefbc856f9aa99b187d8873a18a612d6463ca0cd4",
+    "workspaceRevisionRecordChecksum": "abf3acb170f5fad4a7871c0eefbc856f9aa99b187d8873a18a612d6463ca0cd4",
+    "workspaceOriginRuntimeRevision": "atlas.workspace-revision-origin-runtime.2026-08-21.v1",
+    "observedAt": "2026-09-05T17:10:31.538Z"
+  },
+  "qualifyingExecutionIds": [],
+  "candidates": [],
+  "graphSnapshot": {
+    "status": "GRAPH_CANONICAL_AUTHORITY_UNPROVEN",
+    "canonicalAuthorityTrueExecutions": 0
+  },
+  "canonicalAuthority": false,
+  "readOnly": true,
+  "writesPerformed": false,
+  "producerRevision": "atlas.current-graphify-snapshot-authority.v1"
+}

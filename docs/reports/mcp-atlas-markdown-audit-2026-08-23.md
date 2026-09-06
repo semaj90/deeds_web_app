@@ -1,5 +1,8 @@
 # MCP and Atlas Markdown Truth Audit
 
+> **Doc review (2026-09-04):** CURRENT — self-scoped 2026-08-23 audit with proper evidence/uncertainty
+> labeling; referenced config files (`.opencode/opencode.jsonc`, `.mcp.json`) confirmed to still exist.
+
 Date: 2026-08-23
 
 ## Scope

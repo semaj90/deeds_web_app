@@ -67,6 +67,26 @@ _DEFAULT_MAPPINGS: tuple[DomainOntologyMappingV1, ...] = (
     DomainOntologyMappingV1("model", "atlas:ModelDomain", ("embedding", "inference", "embedding_indexing", "cluster_analysis")),
     DomainOntologyMappingV1("workflow", "atlas:WorkflowDomain", ("pipeline", "dag", "agent_orchestration", "repair_workflow", "trace_mcp", "auth_login_register", "case_management")),
     DomainOntologyMappingV1("documentation", "atlas:DocumentationDomain", ("docs", "document_processing", "citation_engine", "legal_reports")),
+    # DOC-09 (parent-atlas-versioned-doc-intelligence): atlas_external_docs.py's
+    # classify_domain() DOMAIN_RULES can emit "gpu", "training", "model_runtime",
+    # "cache", "protocol", "testing", "api" for external documentation -- none of
+    # these existed in the mapping table above (built for codebase-file
+    # classification, a different corpus), so every external-doc chunk in one of
+    # these domains was silently UNMAPPED. Added below, not renamed/removed above
+    # (mapping_revision()'s checksum changes when this tuple changes, and nothing
+    # in this repo's tests pins the OLD checksum -- confirmed via
+    # test_domain_classification_signal_parity.py, which tests
+    # DomainClassificationSignalV1/domain_classification_signal_checksum from
+    # domain_tuple_bridge.py, not mapping_revision(), and independently already
+    # fails on an unrelated missing-fixture-file issue -- see that test's own
+    # FIXTURE path, outside this container's python/-only mount).
+    DomainOntologyMappingV1("gpu", "atlas:GpuComputeDomain", ("gpu_compute", "cuda", "tensor_core")),
+    DomainOntologyMappingV1("training", "atlas:TrainingDomain", ("qlora", "lora", "fine_tuning")),
+    DomainOntologyMappingV1("model_runtime", "atlas:ModelRuntimeDomain", ("inference_runtime", "llama_server", "kv_cache")),
+    DomainOntologyMappingV1("cache", "atlas:CacheDomain", ("redis", "valkey", "bitfrost")),
+    DomainOntologyMappingV1("protocol", "atlas:ProtocolDomain", ("mcp", "acp", "a2a", "grpc")),
+    DomainOntologyMappingV1("testing", "atlas:TestingDomain", ("test", "validator", "benchmark")),
+    DomainOntologyMappingV1("api", "atlas:ApiDomain", ("endpoint", "sdk")),
 )
 
 

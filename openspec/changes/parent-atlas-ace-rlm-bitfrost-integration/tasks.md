@@ -385,9 +385,170 @@ global OaK convergence. Until one of those is proven:
 | ACE strict cache mechanics | PROVEN |
 | Live strict caller adoption | BLOCKED |
 | BITFROST-LIVE-WARM-01 | NOT STARTED |
-| BITFROST-INVALIDATION-01/02 | NOT STARTED |
+| BITFROST-INVALIDATION-01/02 | see BITFROST-INVALIDATION-OWNER-01 below (2026-09-04) |
 | ACE-RESIDENCY-01 | NOT STARTED |
 | CENTROID-BITFROST-01 | NOT STARTED |
+
+- [x] BIFROST-KEY-SEMANTICS-OWNER-01 Stage 1 (2026-09-04, read-only inventory, no mutations) —
+  raised same-day by external review of BITFROST-INVALIDATION-OWNER-01 below. Found a real,
+  confirmed namespace conflict this repo's own `cache-keys.ts` didn't protect against: the
+  `bifrost:sem:packet:{X}` prefix is written with **two incompatible identities** for `{X}` —
+  (A) `packetKey`, by `atlas-reward-cache.ts::setPacketCache` (this is what
+  `invalidateBitfrostPacket()` in BITFROST-INVALIDATION-OWNER-01 below correctly targets), and
+  (B) `query_hash`, by `scripts/cache/warm-bifrost-semantic-cache.mjs` and read by
+  `query-router.ts:279` (confirmed live in that file's own comment: `Key:
+  bifrost:sem:packet:{query_hash}`). **This does not reverse BITFROST-INVALIDATION-OWNER-01** — its
+  fix is correctly scoped to identity A and remains valid — but it means a packet mutation can
+  still leave a stale query-level cache hit (identity B) referencing the old packet, since there is
+  no `packetKey -> query_hash` inverse index and identity B has no invalidator at all. Full
+  inventory, evidence, and a Stage 2 recommendation (migrate identity B onto the already-reserved-
+  but-unused `bifrost:sem:query:*` prefix, which `invalidate-atlas-cache-epoch.mjs` already deletes
+  as if it were the intended shape — not yet acted on, per explicit "do not rename anything yet"):
+  `docs/reports/parent-atlas-bitfrost-key-semantics-owner-v1.json`. **Not done in this pass**: a
+  full sweep for older/script-level `invalidateRedisCache`-shaped functions beyond the 4 already
+  classified below (summarizers, phase scripts, packet-truth scripts), and read-side confirmation
+  of `bifrost:sem:sourceRef:*`'s callers.
+
+- [x] BIFROST-KEY-SEMANTICS-OWNER-01 Stage 2 (2026-09-04) — resolved the conflict Stage 1 found.
+  Added `bifrostKey.semantic.query()` (→ `bifrost:sem:query:{query_hash}`, the previously-reserved
+  but unused prefix) and `.sourceRef()` to `cache-keys.ts` — no second key library, `cache-keys.ts`
+  remains the single owner, per the reviewer's explicit instruction. Migrated the writer
+  (`scripts/cache/warm-bifrost-semantic-cache.mjs`, doc header + 2 call sites) and the reader
+  (`query-router.ts`, 2 call sites) off `bifrost:sem:packet:{query_hash}` onto the new `query()`
+  builder. `bifrostKey.semantic.packet()`'s own doc comment now states its identity is
+  packetKey-only. Old pre-migration `bifrost:sem:packet:{query_hash}` entries are deliberately not
+  read by the new code (would perpetuate the exact ambiguity being removed) — they expire under
+  their original 3600s TTL; the reader fails open (cache-miss → next retrieval lane) until
+  repopulated under the new prefix.
+
+  **Live-proven** (`scripts/atlas/prove-bifrost-key-semantics-owner-v1-stage2.mjs`, real Valkey,
+  bounded disposable synthetic keys): confirmed `packet()` and `query()` now produce genuinely
+  distinct keys; seeded one of each; ran `invalidateBitfrostPacket()` (identity A's invalidator)
+  and confirmed it deletes the packet-keyed entry but **does not touch** the query-keyed one —
+  the two identities are no longer entangled. `tsc --noEmit` confirms no new errors introduced.
+  Full result: `docs/reports/parent-atlas-bitfrost-key-semantics-owner-v1-stage2.json`.
+
+  **Found and flagged, not fixed (pre-existing, unrelated)**: `query-router.ts` imports
+  `bifrostRetrievalCacheKeyV2` from `cache-keys.js`, which has never been exported there —
+  confirmed via `git show HEAD:...cache-keys.ts` (zero matches before this session's edits). This
+  predates this gate entirely; out of scope to fix here.
+
+  **Not done**: the full `invalidateRedisCache`-shaped-function sweep and `bifrost:sem:sourceRef:*`
+  read-side audit flagged in Stage 1 remain open.
+
+- [x] BITFROST-INVALIDATION-OWNER-01 (2026-09-04) — **status correction (same day, external
+  review): this gate establishes and live-proves the canonical BitFrost invalidation primitive;
+  it does NOT prove production mutation-invalidation is happening.** Precise scope of what's
+  actually done: `invalidateBitfrostPacket()` is now the single shared implementation, all 4
+  previously-duplicated `invalidateRedisCache`-shaped call sites delegate to it instead of their
+  own key logic, and its bounded-Valkey proof (steps A-L) covers exact-key deletion, unrelated-key
+  survival, repopulation, idempotent replay, Redis fail-open behavior, and no broad SCAN/FLUSH.
+  That is DONE and PROVEN. What is NOT proven, and must not be read into the above: **none of the
+  4 delegate call sites are reachable from a live production Postgres-mutation trigger today**
+  (see cross-reference in `parent-atlas-retrieval-lineage-dag-convergence` tasks.md), and **the
+  actual live producer of `bifrost:sem:packet:*` data was never identified** within
+  `sveltekit-frontend/src` — production staleness today is still bounded by the 1-hour TTL, not by
+  this new primitive. Do not create a fourth invalidation owner to close this gap — see
+  `BITFROST-LIVE-INVALIDATION-ADOPTION-01` below, which wires the existing primitive to the real
+  mutation owner once that owner is found. Full ownership matrix, live proof (steps A-L), and
+  hard-rule compliance recorded in `docs/reports/parent-atlas-bitfrost-invalidation-owner-v1.json`.
+
+- [x] BITFROST-LIVE-INVALIDATION-ADOPTION-01 (opened 2026-09-04, closed same day as
+  `NOT_APPLICABLE_CURRENT_RUNTIME`) — Step 1 producer census (fork agent, `docs/reports/parent-atlas-bitfrost-producer-census-v1.json`)
+  found **neither targeted key family has any live production writer at all** — both
+  `bifrost:sem:packet:*` (real writer: `scripts/atlas/warm-bitfrost-semantic-cache.mjs`) and
+  `bitfrost:summary:packet:v1:*` (real writer: `scripts/atlas/summary-index-ranker.mjs`, TTL
+  corrected here to 604800s/7 days, not the 1h previously stated) are manual, hand-invoked npm
+  backfill scripts with zero scheduler/cron/Docker-startup wiring found anywhere in the repo.
+  `python/` has zero `bifrost:`/`bitfrost:` references at all — ruling out a Python-side live writer.
+
+  **Follow-up convergence audit** (`BITFROST-PRODUCER-CONVERGENCE-01`,
+  `docs/reports/parent-atlas-bitfrost-producer-convergence-v1.json`) corrected the census's own
+  overstatement that this was "three parallel duplicate writers." Comparing value contracts, not
+  just key prefixes, found **four legitimately distinct cache families** (`bifrost:packet:*`,
+  `bifrost:sem:packet:*`, `bifrost:sem:query:*`, `bitfrost:summary:packet:v1:*`) — each with its
+  own value schema and source-of-truth table — that must NOT be collapsed into one owner. It did
+  surface two real, narrower defects, neither fixed this pass (out of read-only convergence-audit
+  scope, and the operator explicitly said not to rename `bitfrost-warm-startup.mjs` yet):
+  1. `bifrost:packet:{suffix}` has an **identity collision**: `bitfrost-warm-startup.mjs` (writer)
+     and `mcp-tool-implementations.ts` (reader) key it by `packet_key`, but
+     `retrieval/cache-layers-orchestrator.ts::measureLayer3Exact` (a read-only latency benchmark
+     probe, no SET) keys the same prefix by `intentHash` — same disease as the `bifrost:sem:packet`
+     vs `bifrost:sem:query` collision already fixed this session, recurring in a sibling namespace.
+  2. `bifrost:sem:packet:{packetKey}` has a **value-contract mismatch on the identical key**:
+     `atlas-reward-cache.ts`'s `PacketCacheEntry` (7 fields) vs the real writer
+     (`warm-bitfrost-semantic-cache.mjs`)'s ~25-field lineage/topology envelope. Zero blast radius
+     today only because `getPacketCache()`/`setPacketCache()` (the narrow-schema side) both have
+     zero live callers — `getPacketCache()` does an unchecked `JSON.parse(raw) as PacketCacheEntry`
+     that would silently return `undefined` fields if it were ever called against real data.
+
+  One confirmed-dead file found and archived during this pass: `scripts/atlas/wire-bifrost-packet-mirror.mjs`
+  (`node --check` throws a real `SyntaxError` — leftover escaped backticks from a markdown paste —
+  and imports a nonexistent `../utils/redis_client.js`; never executed once). Archived to
+  `deeds_labs/archive/2026-09-04/wire-bifrost-packet-mirror.mjs.dead-scaffold.bak`, manifest entry
+  in `docs/archive-manifest.json`.
+
+  **Closure rationale, per direct operator instruction**: since no live Postgres-mutation-triggered
+  writer exists for either target key family, and there is no observed runtime evidence that Parent
+  Atlas needs a continuously-maintained live-invalidated Redis packet cache, building one now would
+  be new infrastructure built to satisfy a gate rather than a real requirement. Closing as
+  `NOT_APPLICABLE_CURRENT_RUNTIME`, not `BLOCKED` and not falsely marked complete:
+  `invalidateBitfrostPacket()` (from `BITFROST-INVALIDATION-OWNER-01`) remains the canonical,
+  proven, ready-to-call primitive for any future live writer of these two key families. Re-open
+  this gate only if/when a live mutation-triggered writer is actually built for either family.
+
+  **Also still open from prior gates, not yet resolved** (do not let this new gate obscure them):
+  `dispatcher/redis-cache-invalidate.ts::warmRedisCache()` still writes the wrong
+  (`bifrost:packet:*`) key shape; `cache/cache-invalidation.ts` (a separate digest-based
+  schema/model-level invalidator) uses a third, distinct wrong shape (`semantic:bifrost:*`), unrelated
+  concern, unresolved; `tests/cache-keys-bifrost.spec.ts`/`tests/cache-keys.spec.ts` are not
+  cleanly wired into a resolvable vitest project config — not run this session.
+
+  **Ownership audit found the prior convergence-ledger audit itself was partly wrong**: it
+  characterized `acp/packet-materializer-pipeline.ts`'s `invalidateRedisCache` as having "real
+  callers... grep-verified, live production code paths." A repo-wide grep for the literal
+  filename found **zero importers** — the files it cited (`ace-materializer.ts`,
+  `hyperrag-packet-pipeline.ts`, `hyperrag-rpc-client.ts`) each define or call their own,
+  differently-implemented, same-named `materializePacket()`/`materializePackets()`, never this
+  one. A 4th invalidator (`ace/ace-materializer.ts::invalidateMaterializedPacket`, not previously
+  documented at all) was also found, also wrong-keyed, also unreachable outside its own test spec.
+  **Corrected finding**: none of the 4 `invalidateRedisCache`-shaped implementations are reachable
+  from a live production Postgres-mutation trigger today — worse than "2 of 3 dead," and the real
+  writer of the live `bifrost:sem:packet:*` data (`atlas-reward-cache.ts::setPacketCache`) also has
+  zero external callers. The actual bound against indefinite staleness in production right now is
+  the 1-hour TTL, not active invalidation.
+
+  **Fix**: added `invalidateBitfrostPacket()` as the single canonical invalidation primitive
+  (`sveltekit-frontend/src/lib/server/cache/atlas-reward-cache.ts`, co-located with its matching
+  writer), consuming only canonical identity (`packetKey`/`featureId`/`sourceRevision`) and the
+  shared `bifrostKey.semantic.*` constructors from `cache-keys.ts` (added the missing
+  `packetSummary` builder — `bitfrost:summary:packet:v1:{packet_key}`, confirmed live, previously
+  had no shared constructor at all). All 4 pre-existing implementations now delegate to it instead
+  of maintaining their own copy of the key logic: `dispatcher/redis-cache-invalidate.ts`,
+  `workers/redis-invalidate-worker.ts` (dead code, left in place per archive-not-delete, key logic
+  fixed so it isn't a landmine if ever wired up), `acp/packet-materializer-pipeline.ts`, and
+  `ace/ace-materializer.ts` (writer's key shape fixed too, not just the invalidator).
+
+  **Live proof** (`scripts/atlas/prove-bitfrost-invalidation-owner-v1.mjs`, real Valkey, bounded
+  disposable synthetic packet keys, zero canonical Postgres/Qdrant/Neo4j writes): seeded real
+  semantic-packet/summary/feature keys plus one unrelated packet → ran canonical invalidation →
+  confirmed all 3 affected keys gone, unrelated packet's key untouched → confirmed cache
+  repopulates with new revision content → replayed invalidation twice, proved idempotent (second
+  replay deletes 0 keys, no error) → proved fail-open on a broken Redis connection (`ok:false`,
+  never throws) → confirmed the canonical function contains no `SCAN`/`FLUSHDB`/`FLUSHALL`/`.keys(`
+  call. `ace-materializer.spec.ts` (1/1) + `tests/atlas/ace-materializer-redis.spec.ts` (2/2) still
+  pass. `tsc --noEmit` clean on all 5 touched files. Full result:
+  `docs/reports/parent-atlas-bitfrost-invalidation-owner-v1.json`.
+
+  **Not done / explicitly flagged, not fixed**: the real live writer of `bifrost:sem:packet:*` in
+  production was not located within `sveltekit-frontend/src` — likely a script/backfill outside the
+  TS app; out of scope for an invalidation-correctness gate. `dispatcher/redis-cache-invalidate.ts`'s
+  `warmRedisCache()` still writes the wrong (`bifrost:packet:*`) shape — flagged, not fixed (scope
+  is invalidation, not warming). `cache/cache-invalidation.ts` (a separate digest-based
+  schema/model-level invalidation utility) uses yet another distinct wrong shape
+  (`semantic:bifrost:*`) — unrelated concern, flagged only. `tests/cache-keys-bifrost.spec.ts` /
+  `tests/cache-keys.spec.ts` exist and cover `bifrostKey` directly but are wired to a vitest project
+  config not resolved during this pass — not run, flagged rather than silently skipped.
 
 Parked here for this session. Convergence work resumes on the already-authorized Qdrant
 reconciliation track (`parent-atlas-retrieval-lineage-dag-convergence`), not on a new
@@ -2179,3 +2340,99 @@ cache MISS/HIT plus revision and candidate-population changes.
 `wsl -d Ubuntu -e bash -lc "pgrep -f atlas_rapids_sidecar_graph"`) is still up on `127.0.0.1:8098`
 with the 162K graph resident, for anyone continuing this thread without a cold restart. It is a local
 dev process with no persistence — killing it is always safe; the artifact and fix are what's durable.
+
+## Session handoff (2026-09-04, end of session — operator pausing)
+
+**Closed this session** (all pushed, commit `cef902bec6`): `BITFROST-INVALIDATION-OWNER-01`
+(canonical `invalidateBitfrostPacket()` primitive, 4 duplicate implementations delegated, live
+Valkey proof A-L); `BIFROST-KEY-SEMANTICS-OWNER-01` (found + fixed a real `bifrost:sem:packet:*`
+dual-identity collision — packetKey vs query_hash sharing one prefix — split query_hash onto
+`bifrost:sem:query:*`, live-proved distinct); `BITFROST-LIVE-INVALIDATION-ADOPTION-01` (producer
+census + convergence audit found no live mutation-triggered writer exists for either target key
+family; closed `NOT_APPLICABLE_CURRENT_RUNTIME`, correctly not `BLOCKED` or falsely "done"; also
+found and archived one dead script, `wire-bifrost-packet-mirror.mjs`); and, in the sibling
+`parent-atlas-retrieval-lineage-dag-convergence` ledger, `SEARCH-RUNTIME-READONLY-01`
+(`SearchRuntime.search()` now accepts `readOnly: true`, backward-compatible, live-proved zero
+writes against real Postgres+Qdrant).
+
+**Also settled this session, operator-directed, recorded for continuity — do not re-litigate**:
+BitFrost should stay a warmed resident cache tier (cache-aside + bounded prewarming), NOT grow into
+a second retrieval index. The 4 BitFrost key families (`bifrost:packet:*`, `bifrost:sem:packet:*`,
+`bifrost:sem:query:*`, `bitfrost:summary:packet:v1:*`) are genuinely distinct value contracts and
+should stay separate — do not collapse them into one universal packet-cache value or add a Valkey
+FT/vector index. Postgres/Qdrant/Neo4j remain the durable index owners; BitFrost only decides what
+already-derived data is worth keeping resident.
+
+**Next queued gate — `BITFROST-RESIDENCY-WARMING-01` (not started)**. Scope, per operator direction:
+prove only `HotnessSnapshotV1` (deterministic top-N hot-artifact selection), `BucketWarmPlanV1`
+(bounded warming pipeline), cache-aside promotion-on-miss, LFU/LRU/TTL memory bounds, and that
+canonical stores always reconstruct on cache loss (BitFrost never becomes identity-bearing). Small
+control indexes (e.g. `bitfrost:heat:packet`/`bitfrost:heat:query`/`bitfrost:heat:feature`/
+`bitfrost:heat:summary` ZSETs of a `ResidencyScore` blending frequency/breadth/recency/
+reconstruction-cost/latency-saved/byte-cost) are the right Valkey primitive for this — not a
+secondary FT/vector index. Start with a real bounded warm-plan proof (startup load of a
+`HotnessSnapshotV1` top-N, not all ~60K packets), not a new indexing architecture.
+
+**Two narrower, deliberately-not-fixed defects carried forward from the BitFrost convergence audit**
+(zero/low blast radius today, fix alongside `BITFROST-RESIDENCY-WARMING-01` or whenever their losing
+side gains a live caller, not before): `bifrost:packet:{suffix}` has an identity collision
+(`packet_key` in `bitfrost-warm-startup.mjs`/`mcp-tool-implementations.ts` vs `intentHash` in
+`cache-layers-orchestrator.ts::measureLayer3Exact`, a read-only benchmark probe); `bifrost:sem:packet:{packetKey}`
+has a value-contract mismatch on the identical key (`atlas-reward-cache.ts`'s narrow 7-field
+`PacketCacheEntry` vs the real writer's ~25-field lineage/topology envelope — `getPacketCache()`'s
+unchecked `as PacketCacheEntry` cast would silently return `undefined` fields if it ever gained a
+live caller). Full detail: `docs/reports/parent-atlas-bitfrost-producer-convergence-v1.json`.
+
+**Standing restriction, unchanged**: do NOT touch `parent-atlas-versioned-doc-intelligence`
+(DOC-12/DOC-13/DOC-14) — a separate, actively-changing concurrent session owns that lane. This
+session's own code-review pass (resumed after the fact) found its 3 flagged findings were already
+either false positives or already-fixed live in that lane's files by the concurrent session — no
+action needed there, but do not assume that stays true; re-check before touching.
+
+**Priority order for the next session, per operator direction**: (1) `BITFROST-RESIDENCY-WARMING-01`
+(above); (2) `outcome_ledger` fresh-install schema convergence; (3) current-workspace source/chunk
+lineage bridge (see the concurrent same-day audit entries just above this section in
+`parent-atlas-retrieval-lineage-dag-convergence/tasks.md` — source-authority and hydration rechecks
+found real, unresolved gaps: 0 current-workspace matches, 0 exact packet/chunk joins, 43 missing
+canonical chunk-owner rows); (4) only then return to DOC-13/14 once that lane settles.
+
+- [x] BITFROST-RESIDENCY-WARMING-01 (2026-09-04, fixture-proven, follow-on session) —
+  proved the bounded pieces the prior handoff scoped: `ResidencyScoreV1` (a pure,
+  deterministic blend of frequency/breadth/recency/reconstruction-cost/latency-saved/
+  byte-cost — no wall-clock reads, same input always yields the same score),
+  `HotnessSnapshotV1` (deterministic top-N selection, score-descending with a
+  stable key-ascending tie-break, hard-capped at `MAX_HOTNESS_SNAPSHOT_TOP_N = 5_000`
+  regardless of requested size or candidate-set size — proved against a 200K-candidate
+  fixture that a plan never approaches the full ~60K-packet corpus), `BucketWarmPlanV1`
+  (splits a snapshot into disjoint, deterministic buckets for staggered warming, each
+  entry mapped through the *existing* `bifrostKey.semantic.*`/`packetSummary` builders
+  in `cache-keys.ts` — never a hand-built key string), a generic cache-aside
+  `getOrWarmCacheAsideV1()` (cache hit never calls the reconstructor; cache miss calls
+  the caller-injected reconstructor and warms on success; a reconstructor returning
+  `null` stays a genuine miss — proves BitFrost never fabricates data, i.e. never
+  becomes identity-bearing; a cache *read* failure falls through to reconstruction
+  rather than being treated as absence), and a bounded warm-plan executor
+  `executeBucketWarmPlanV1()` (bounded concurrency, per-entry failure isolation, and a
+  result type whose `writesPerformed` field is typed `false` — not just documented —
+  so a caller cannot mistake a successful warm pass for a canonical-store mutation).
+  Added 4 bounded LFU-style control-index ZSETs matching the operator's exact spec
+  (`bitfrost:heat:packet`/`query`/`feature`/`summary` in `cache-keys.ts`'s `bifrostKey`),
+  with `recordHeatSignalV1()`/`getTopHeatKeysV1()` mirroring the existing
+  `reward:zset:*` pattern in `atlas-reward-cache.ts` (same `HEAT_ZSET_MAX = 10_000`
+  bound, same fail-open-to-`[]` behavior) rather than inventing a new pattern.
+  New file: `src/lib/server/atlas/cache/bitfrost-residency-warming-v1.ts` +
+  `bitfrost-residency-warming-v1.test.ts` (19/19 pass, fake in-memory Redis covering
+  only the ioredis surface used — `get`/`set`/`zadd`/`zcard`/`zremrangebyrank`/
+  `zrevrangebyscore`). `npx tsgo --noEmit` reports 0 errors touching either new/changed
+  file. **Status: `PROVEN_BOUNDED_FIXTURE`, matching this file's own status-language
+  convention** (see the `RlmEnvironment` fixture-proof note near the top of this file)
+  — every reconstructor, every Redis client, and every heat signal in the tests above
+  is a fixture/fake. Explicitly NOT done: no live caller records a real heat signal on
+  a real cache hit/miss yet, no live caller has run `executeBucketWarmPlanV1()` against
+  the real Valkey instance with a real Postgres-backed reconstructor, and no startup
+  hook invokes any of this. That live-wiring pass is a distinct, separately-authorized
+  follow-up gate — do not treat this fixture proof as adoption. This intentionally
+  does not touch `bifrost:packet:*`, `bifrost:sem:packet:*` value semantics, or the two
+  narrower defects the prior BitFrost convergence audit carried forward (identity
+  collision / value-contract mismatch, both zero live callers today) — those remain
+  exactly as scoped in the paragraph above this task, unchanged.

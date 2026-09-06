@@ -31,3 +31,29 @@
 
 - [x] 8.1 `ACPToolRegistry.ts` duplicate `miniforgeAnalyze`/`miniforgeExtract` handlers — confirmed real by the review pass but not itemized in the 8-finding cap. Still open, just not detailed here; revisit if doing a registry cleanup pass.
 - [x] 8.2 Claimed `legal-skills.tool.ts` empty-content crash — refuted by the review pass (already try/catch-wrapped, degrades gracefully). No action.
+
+## Re-verification pass (2026-09-05, read-only)
+
+- **1.1 — likely superseded, not confirmed fixed as originally described.** The real file is
+  `src/lib/server/retrieval/embedding-service.ts` (path drifted from the bare `embedding-service.ts`
+  this item names). Its current `embedQueryForLane()` `dense_768` branch has no `provider` field at
+  all anymore — it now gates on `ENV.ATLAS_CANONICAL_EMBEDDING_STRICT` between
+  `embedViaCanonicalRuntime()` and `embedViaOllama()`, a materially different shape than the
+  described "unconditional `provider: 'ollama'`" bug. This looks like the file was substantially
+  rewritten since 2026-08-22, consistent with items 2.1/5.1/6.1's own findings that this whole
+  session's audited files kept moving. Not confirmed as a deliberate fix for this specific finding
+  (no git-blame trace run) — flagging as likely-moot rather than closing it outright.
+- **7.1 — target already moot, per this file's own item 2.1.** `fetchStreamedChatCompletion()` (the
+  shared helper 7.1 proposes collapsing the SSE loop into) was already confirmed to no longer exist
+  anywhere in `src/` by item 2.1 (2026-08-23). Re-confirmed `bifrostCacheDebug` and any
+  `text/event-stream`/`for await` chunk-loop pattern are absent from current
+  `src/lib/server/ollama.ts` entirely. 7.1's proposed refactor target doesn't exist in its
+  original form; if this duplication still matters, it needs to be re-scoped against the current
+  streaming owner (`src/lib/server/inference/inference-router.ts`, per item 2.1), not against the
+  original two named sites.
+- **7.2 — confirmed still genuinely open, unchanged.** All 3 files
+  (`src/lib/server/agent/{supervisor,subagents,autonomous-agent}.ts` — paths also drifted from the
+  bare filenames this item names, all now under `agent/`) still construct their own
+  `new ChatOpenAI({...})` independently; no `createLocalLlamaChatModel`/`getLlamaSessionDescriptor`
+  helper exists anywhere in `src/lib/server/agent/`. This is the one item in this section still
+  accurately describing live code.

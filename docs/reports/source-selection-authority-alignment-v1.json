@@ -1,0 +1,52 @@
+{
+  "schema": "atlas.source-selection-authority-alignment.v1",
+  "status": "BLOCKED_AUTHORITY_ALIGNMENT",
+  "readOnly": true,
+  "artifacts": {
+    "batchPlan": {
+      "path": "docs/reports/current-source-graphify-batch-plan-v1.json",
+      "status": "CURRENT_GRAPHIFY_BATCH_PLAN_BLOCKED_REVIEW",
+      "selectedSourceCount": 52,
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
+      "selectionChecksum": "0c4ff5b9107a9f2eb0dee9ddfac3b4393941e4dcfc3dc146fe776bc7026acaf3"
+    },
+    "registryPlan": {
+      "path": "docs/reports/current-source-registry-reconciliation-plan-v1.json",
+      "status": "REGISTRY_RECONCILIATION_EMPTY",
+      "selectedSourceCount": 0,
+      "selectionChecksum": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "projectionCohort": {
+      "path": "docs/reports/current-source-projection-cohort-v1.json",
+      "status": "CURRENT_SOURCE_COHORT_READY_FOR_PROJECTION_REVIEW",
+      "eligibleCurrentSources": 52,
+      "cohortChecksum": "fd88703ca428261206575d95204c31795f956645dd46dc4607a2b3048d464151"
+    },
+    "lineage": {
+      "path": "docs/reports/current-source-cohort-lineage-v1.json",
+      "status": "SOURCE_LINEAGE_COHORT_FOUND_WORKSPACE_MISMATCH",
+      "currentWorkspaceMatched": 0,
+      "revisionQualified": 0
+    }
+  },
+  "comparison": {
+    "batchRows": 52,
+    "registryRows": 0,
+    "projectionRows": 52,
+    "sharedRefs": 52,
+    "workspaceRevisionMismatches": 52,
+    "registryAdmissionReady": false
+  },
+  "decision": "DO_NOT_APPLY",
+  "requiredAction": "ONE_SOURCE_SELECTION_OWNER_MUST_EMIT_CURRENT_NAMESPACE_SOURCE_REVISION_AND_WORKSPACE_REVISION_SET",
+  "canonicalAuthority": false,
+  "writes": {
+    "postgres": 0,
+    "graphify": 0,
+    "qdrant": 0,
+    "neo4j": 0,
+    "valkey": 0,
+    "sourceFiles": 0
+  },
+  "reportChecksum": "sha256:c7932a36192d0490a5bc058263c77f3a3ea08ef84e9614779180bd7e66910a8f"
+}

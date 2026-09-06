@@ -1,22 +1,18 @@
 /**
- * NLP Analyzer — Sentiment + Document Classification via Ollama
+ * NLP Analyzer — Sentiment + Document Classification via llama-server
  *
  * Uses the canonical local synthesis model via llama-server (Zod → JSON Schema) for:
  *   1. Sentiment analysis (positive/negative/neutral + confidence)
  *   2. Document classification (contract, deed, brief, motion, etc.)
  *   3. Key phrase extraction
  *
- * All inference runs through local Ollama — no external API needed.
+ * Generative inference runs through the local llama-server /v1 boundary.
+ * Ollama is reserved for the EmbeddingGemma embedding lane.
  */
 
-import { ENV } from '$lib/server/env.server.js';
-import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
+import { resolveLlamaInferenceTarget } from '$lib/server/llm/runtime-contract.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
 import { z } from 'zod';
-
-const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
-const MODEL = LLM_MODEL_ID;
 
 export interface SentimentResult {
 	sentiment: 'positive' | 'negative' | 'neutral' | 'mixed';
@@ -57,14 +53,14 @@ const classificationSchema = z.object({
 });
 const classificationJsonSchema = z.toJSONSchema(classificationSchema);
 
-/** Analyze sentiment of legal text via Ollama structured JSON output. */
+/** Analyze sentiment of legal text via llama-server structured JSON output. */
 export async function analyzeSentiment(text: string): Promise<SentimentResult> {
 	const prompt = `Analyze the sentiment of this legal text. Return JSON with sentiment, confidence, reasoning, and emotions.
 
 Text to analyze:
 ${text.slice(0, 2000)}`;
 
-	const result = await ollamaJSON<SentimentResult>(prompt, sentimentJsonSchema);
+	const result = await llamaServerJSON<SentimentResult>(prompt, sentimentJsonSchema);
 	return {
 		sentiment: result.sentiment ?? 'neutral',
 		confidence: Math.min(Math.max(result.confidence ?? 0.5, 0), 1),
@@ -80,7 +76,7 @@ export async function classifyDocument(text: string): Promise<ClassificationResu
 Document text:
 ${text.slice(0, 3000)}`;
 
-	const result = await ollamaJSON<ClassificationResult>(prompt, classificationJsonSchema);
+	const result = await llamaServerJSON<ClassificationResult>(prompt, classificationJsonSchema);
 	return {
 		documentType: result.documentType ?? 'other',
 		subType: result.subType ?? '',
@@ -104,28 +100,33 @@ export async function analyzeText(text: string): Promise<NLPAnalysis> {
 	};
 }
 
-/** Call Ollama with GBNF-constrained JSON schema and parse the response. */
-async function ollamaJSON<T>(prompt: string, jsonSchema: Record<string, unknown>): Promise<T> {
-	return traceLLM('nlp-analyzer', { model: MODEL, prompt: prompt.slice(0, 500) }, async (gen) => {
-		const res = await ollamaFetch(`${OLLAMA_URL}/api/generate`, {
+/** Call llama-server with JSON mode and parse the response. */
+async function llamaServerJSON<T>(prompt: string, jsonSchema: Record<string, unknown>): Promise<T> {
+	const target = await resolveLlamaInferenceTarget();
+	return traceLLM('nlp-analyzer', { model: target.model, prompt: prompt.slice(0, 500) }, async (gen) => {
+		const res = await fetch(`${target.baseUrl}/v1/chat/completions`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				model: MODEL,
-				prompt,
-				format: jsonSchema,
+				model: target.model,
+				messages: [
+					{ role: 'system', content: `Return only JSON matching this schema: ${JSON.stringify(jsonSchema)}` },
+					{ role: 'user', content: prompt },
+				],
+				response_format: { type: 'json_object' },
 				stream: false,
-				options: { temperature: 0.1, num_predict: 512 }
+				temperature: 0.1,
+				max_tokens: 512
 			}),
 			signal: AbortSignal.timeout(30_000)
 		});
 
 		if (!res.ok) {
-			throw new Error(`Ollama ${res.status}: ${await res.text()}`);
+			throw new Error(`llama-server ${res.status}: ${await res.text()}`);
 		}
 
 		const data = await res.json();
-		const raw = data.response ?? '';
+		const raw = data.choices?.[0]?.message?.content ?? '';
 		gen.end({ output: raw.slice(0, 500) });
 
 		try {
@@ -133,7 +134,7 @@ async function ollamaJSON<T>(prompt: string, jsonSchema: Record<string, unknown>
 		} catch {
 			const match = raw.match(/\{[\s\S]*\}/);
 			if (match) return JSON.parse(match[0]) as T;
-			throw new Error('Failed to parse Ollama JSON response');
+			throw new Error('Failed to parse llama-server JSON response');
 		}
 	});
 }

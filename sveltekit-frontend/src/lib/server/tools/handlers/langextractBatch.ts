@@ -12,11 +12,8 @@ import {
   type LangExtractResult,
   type ToolResult
 } from '../registry.js';
-import { ENV } from '$lib/server/env.server.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { resolveLlamaInferenceTarget } from '$lib/server/llm/runtime-contract.js';
 import { langextractFetch } from '$lib/server/langextract-client.js';
-
-const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 
 interface ExtractedEntity {
   type: string;
@@ -58,11 +55,12 @@ async function extractFromDocument(
 	relations: ExtractedRelation[] };
     }
   } catch {
-    // Fallback to Ollama
+    // Fall through to the local llama-server extraction fallback.
   }
 
-  // Fallback: Use Ollama for extraction
+  // Fallback: use the active llama-server /v1 boundary for extraction.
   try {
+    const target = await resolveLlamaInferenceTarget(timeout);
     const prompt = `Extract entities (${entityTypes.join(', ')}) and relations (${relationTypes.join(', ')}) from the following text. Return as JSON with "entities" and "relations" arrays.
 
 Text:
@@ -70,22 +68,23 @@ ${content.slice(0, 2000)}
 
 JSON:`;
 
-    const response = await ollamaFetch(`${OLLAMA_URL}/api/generate`, {
+    const response = await fetch(`${target.baseUrl}/v1/chat/completions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	model,
-        prompt,
+	model: target.model,
+        messages: [{ role: 'user', content: prompt }],
+        response_format: { type: 'json_object' },
         stream: false,
-        options: {
-	temperature: 0.1 }
+        temperature: 0.1,
+        max_tokens: 512
       })
     });
 
     if (response.ok) {
-      const data = await response.json() as { response: string };
+      const data = await response.json() as { choices?: Array<{ message?: { content?: string } }> };
       try {
-        const parsed = JSON.parse(data.response);
+        const parsed = JSON.parse(data.choices?.[0]?.message?.content ?? '');
         return {
           entities: parsed?.entities|| [],
           relations: parsed?.relations|| []
@@ -115,7 +114,7 @@ async function fetchDocumentContent(url: string, textRef: string): Promise<strin
 }
 
 async function langextractBatchHandler(request: LangExtractBatchRequest): Promise<ToolResult<LangExtractResult>> {
-  const model = request.options?.model ?? 'gemma4-rotorquant:latest';
+  const model = request.options?.model ?? 'ornith-1.5-9b';
   const timeout = request.options?.timeout_ms ?? 30000;
 
   const extractions: Array<{
@@ -172,7 +171,7 @@ async function langextractBatchHandler(request: LangExtractBatchRequest): Promis
 // Register the tool
 toolRegistry.register({
   name: 'langextract_batch',
-  description: 'Batch entity/relation extraction using LangExtract or Ollama fallback',
+  description: 'Batch entity/relation extraction using LangExtract or llama-server fallback',
   schema: LangExtractBatchRequestSchema,
   permissions: ['network'],
   handler: langextractBatchHandler

@@ -40,6 +40,22 @@
  * whichever N orphans sort first, which is not necessarily the set anyone
  * intended to register. `--limit` still applies as an additional cap on top
  * of the allowlist.
+ *
+ * GRAPHIFY-REVISION-TIEBREAK-FIX-01 (2026-09-05): the --capture-lineage namespace/
+ * revision LATERAL join previously picked one graphify_files row per source_ref
+ * via `ORDER BY workspace_revision DESC, code_source_revision DESC` -- sorting
+ * sha256 content hashes as if they were timestamps. Fixed to join graphify_runs
+ * and filter status = 'COMPLETED', tie-broken by the real completed_at timestamp.
+ * This remains a legacy bridge over a mutable table, not canonical authority --
+ * see scripts/atlas/lib/graphify-source-evidence.mjs.
+ *
+ * --graphify-snapshot-receipt=<path> (added the same session) further hardens
+ * --capture-lineage: when passed, lineage membership is sourced exclusively from
+ * the immutable graphify_execution_files ledger for the receipt's proven
+ * execution_id, never from graphify_files at all. --capture-lineage without this
+ * flag still uses the corrected-but-still-legacy-bridge LATERAL join above for
+ * backward-compatible diagnostic use; see the CLI validation below for the exact
+ * fail-closed rules once a receipt is supplied.
  */
 
 import pg        from 'pg';
@@ -73,6 +89,59 @@ const SOURCE_REFS_ALLOWLIST = SOURCE_REFS_FILE_ARG
       return set;
     })()
   : null;
+
+// GRAPHIFY-REVISION-TIEBREAK-FIX-01 / CURRENT-SOURCE-SNAPSHOT-RESOLVE-01 hardening
+// (2026-09-05): when --capture-lineage is combined with this flag, lineage
+// membership is sourced exclusively from the immutable graphify_execution_files
+// ledger for the receipt's proven execution_id -- never from graphify_files, not
+// even via the corrected legacy-bridge join above. Fails closed on any missing,
+// invalid, or unproven receipt. Without this flag, --capture-lineage still uses
+// the corrected-but-legacy-bridge LATERAL join (read-only diagnostic use only --
+// this repo's own convention is that a legacy bridge over a mutable table must
+// never be the sole authority behind a canonical write when a stronger receipt
+// mechanism exists).
+// Validated against docs/reports/current-source-selection-input-v1.json's ACTUAL
+// shape (schema atlas.current-source-selection-input.v1), as emitted by
+// scripts/atlas/audit-current-graphify-snapshot-authority-v1.mts -- top-level
+// `status`/`executionId`/`workspaceRevision`, NOT nested under a `sourceSnapshot`
+// key. (An earlier draft of this validation assumed a nested shape that didn't
+// match the actual merged resolver output; caught by the fail-closed acceptance
+// tests below before this ever reached a real --apply run.)
+const GRAPHIFY_SNAPSHOT_RECEIPT_ARG = process.argv.find(a => a.startsWith('--graphify-snapshot-receipt='));
+const GRAPHIFY_SNAPSHOT_RECEIPT = GRAPHIFY_SNAPSHOT_RECEIPT_ARG
+  ? (() => {
+      const filePath = path.resolve(ROOT, GRAPHIFY_SNAPSHOT_RECEIPT_ARG.split('=').slice(1).join('='));
+      let parsed;
+      try {
+        parsed = JSON.parse(readFileSync(filePath, 'utf8'));
+      } catch (error) {
+        throw new Error(`GRAPHIFY_SNAPSHOT_RECEIPT_UNREADABLE: ${filePath} (${error instanceof Error ? error.message : String(error)})`);
+      }
+      if (!parsed || typeof parsed !== 'object') {
+        throw new Error(`GRAPHIFY_SNAPSHOT_RECEIPT_INVALID: ${filePath} is not a JSON object`);
+      }
+      if (parsed.schema !== 'atlas.current-source-selection-input.v1') {
+        throw new Error(`GRAPHIFY_SNAPSHOT_RECEIPT_INVALID: ${filePath} schema = ${parsed.schema ?? 'undefined'} (must be atlas.current-source-selection-input.v1)`);
+      }
+      if (parsed.status !== 'CURRENT_SNAPSHOT_PROVEN') {
+        throw new Error(`GRAPHIFY_SNAPSHOT_RECEIPT_NOT_PROVEN: status = ${parsed.status ?? 'undefined'} (must be CURRENT_SNAPSHOT_PROVEN)`);
+      }
+      if (typeof parsed.executionId !== 'string' || !parsed.executionId.trim()) {
+        throw new Error(`GRAPHIFY_SNAPSHOT_RECEIPT_INVALID: ${filePath} executionId must be a non-empty string`);
+      }
+      return { filePath, executionId: parsed.executionId.trim(), workspaceRevision: parsed.workspaceRevision ?? null };
+    })()
+  : null;
+
+// The receipt is mandatory only for the write-capable path. A dry-run
+// (--capture-lineage without --apply) may still use the corrected legacy-bridge
+// LATERAL join above for read-only diagnostic purposes -- it writes nothing, so
+// the weaker bridge evidence is an acceptable diagnostic signal there. The
+// write-capable path (--apply --capture-lineage) must never write a lineage row
+// derived from anything less than a proven immutable snapshot.
+if (APPLY && CAPTURE_LINEAGE && !GRAPHIFY_SNAPSHOT_RECEIPT) {
+  throw new Error('GRAPHIFY_SNAPSHOT_RECEIPT_REQUIRED: --apply --capture-lineage requires --graphify-snapshot-receipt=<path> (a docs/reports/current-source-selection-input-v1.json with status=CURRENT_SNAPSHOT_PROVEN, produced by scripts/atlas/audit-current-graphify-snapshot-authority-v1.mts). Run without --apply for a read-only diagnostic dry-run instead.');
+}
 
 const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
 const REDIS_HOST   = process.env.REDIS_HOST   || '127.0.0.1';
@@ -272,7 +341,37 @@ async function main() {
     });
 
     const lineageBySourceRef = new Map();
-    if (CAPTURE_LINEAGE) {
+    if (CAPTURE_LINEAGE && GRAPHIFY_SNAPSHOT_RECEIPT) {
+      // Receipt-driven path: membership is read exclusively from the immutable
+      // graphify_execution_files ledger for the receipt's proven execution_id --
+      // graphify_files is not consulted at all here, so its mutability and the
+      // now-fixed (but still legacy) tie-break are entirely bypassed.
+      const sourceRefs = toRegister.map(row => row.source_ref);
+      const { rows: lineageRows } = await pool.query(`
+        SELECT
+          cci.relative_path AS source_ref,
+          cci.chunk_id AS canonical_chunk_id,
+          MIN(cci.id::text) AS chunk_row_id,
+          ge.workspace_id::text AS workspace_id,
+          NULLIF(BTRIM(gef.code_source_revision::text), '') AS source_revision
+        FROM codebase_chunk_index cci
+        JOIN graphify_execution_files gef
+          ON gef.source_ref = cci.relative_path AND gef.execution_id = $2::uuid
+        JOIN graphify_executions ge ON ge.execution_id = gef.execution_id
+        WHERE cci.relative_path = ANY($1::text[])
+          AND NULLIF(BTRIM(cci.chunk_id::text), '') IS NOT NULL
+        GROUP BY cci.relative_path, cci.chunk_id, ge.workspace_id, gef.code_source_revision
+        ORDER BY cci.relative_path, cci.chunk_id
+      `, [sourceRefs, GRAPHIFY_SNAPSHOT_RECEIPT.executionId]);
+
+      for (const row of lineageRows) {
+        const list = lineageBySourceRef.get(row.source_ref) ?? [];
+        list.push(row);
+        lineageBySourceRef.set(row.source_ref, list);
+      }
+    } else if (CAPTURE_LINEAGE) {
+      // Legacy-bridge path (diagnostic dry-run only -- see the APPLY-gate check
+      // above; this branch can never be reached with --apply).
       const sourceRefs = toRegister.map(row => row.source_ref);
       const { rows: lineageRows } = await pool.query(`
         SELECT
@@ -283,10 +382,11 @@ async function main() {
           NULLIF(BTRIM(gf.code_source_revision::text), '') AS source_revision
         FROM codebase_chunk_index cci
         LEFT JOIN LATERAL (
-          SELECT workspace_id, code_source_revision
-          FROM graphify_files
-          WHERE source_ref = cci.relative_path
-          ORDER BY workspace_revision DESC NULLS LAST, code_source_revision DESC NULLS LAST
+          SELECT gf.workspace_id, gf.code_source_revision
+          FROM graphify_files gf
+          JOIN graphify_runs gr ON gr.run_id = gf.last_seen_run_id
+          WHERE gf.source_ref = cci.relative_path AND gr.status = 'COMPLETED'
+          ORDER BY gr.completed_at DESC, gf.file_id DESC
           LIMIT 1
         ) gf ON TRUE
         WHERE cci.relative_path = ANY($1::text[])
@@ -304,6 +404,8 @@ async function main() {
 
     const lineageStats = {
       enabled: CAPTURE_LINEAGE,
+      evidenceSource: GRAPHIFY_SNAPSHOT_RECEIPT ? 'graphify_execution_files' : (CAPTURE_LINEAGE ? 'graphify_files_legacy_bridge' : null),
+      snapshotReceiptExecutionId: GRAPHIFY_SNAPSHOT_RECEIPT?.executionId ?? null,
       sourceRefsWithNamespace: 0,
       sourceRefsWithoutNamespace: 0,
       membershipsPlanned: 0,

@@ -1,5 +1,8 @@
 # AGENTS.md Incremental Update Pipeline — Design Doc
 
+> **Doc review (2026-09-04):** CURRENT — still accurately unimplemented; `scripts/kb/agents-md-refresh.mjs`
+> and the `kb-agents-md:refresh` npm script confirmed absent.
+
 **Status**: design-only. Operator must approve scope before implementation.
 **Created**: 2026-05-09
 **Hard rule**: **NEVER bulk-rewrite the 377 AGENTS.md files.** Update is incremental, hash-gated, capped per-run, triggered by real source changes.

@@ -1,0 +1,47 @@
+{
+  "schema": "atlas.parent-atlas-workstation-residency.v1",
+  "status": "REFERENCE_ONLY",
+  "authority": "BITFROST_VALKEY_RESIDENCY_ONLY",
+  "cacheKey": "bitfrost:workstation:context:v1:f7b20c9b0d4ecc27bf7135ec459388f41596dbc101dc7ef1accc2f868283bfd1",
+  "identity": {
+    "schema": "atlas.parent-atlas-workstation-residency-identity.v1",
+    "workboardChecksum": "sha256:69ab3ce2959fd3e3fd45059727734f6b0a2318355980adce6f663a5e09f33195",
+    "taskPopulationChecksum": "sha256:cf9fdd8c8208d977ae704de33f672f9b15a049412403a21872cd0241e0d6a243",
+    "planChecksum": "sha256:6a437ac81d774f5e7cf093940fdd62018dc03cd765d0996fdf16919426761598",
+    "contextChecksum": "sha256:cc93a4aa501ae9e2a13422a7f73c108214105e5df69e8db1333ffa867c3fcbb6",
+    "evidenceRefsChecksum": "sha256:bbc8cda5c64c6ef38dad081bff3c9f9ff91aefc9fd840516ea82073d6f0ec95a",
+    "evidenceRevisionSet": [
+      "docs/reports/current-source-cohort-lineage-v1.json",
+      "docs/reports/current-workspace-packet-chunk-join-v1.json"
+    ],
+    "modelRevision": null,
+    "promptRevision": "atlas.openspec-workstation.prompt.v1",
+    "producerRevision": "parent-atlas-workstation-residency:v1"
+  },
+  "identityChecksum": "sha256:f7b20c9b0d4ecc27bf7135ec459388f41596dbc101dc7ef1accc2f868283bfd1",
+  "descriptor": {
+    "contextManifestRef": "docs/reports/parent-atlas-workstation-ace-context-v1.json",
+    "synthesisReceiptRef": "docs/reports/parent-atlas-workstation-ornith-synthesis-dry-v1.json",
+    "selectedEvidenceRefs": [
+      "docs/reports/current-source-cohort-lineage-v1.json",
+      "docs/reports/current-workspace-packet-chunk-join-v1.json"
+    ],
+    "residencyClass": "WORKSTATION_CONTEXT_REFERENCE",
+    "canonicalAuthority": false
+  },
+  "cacheDecision": "NOT_EXECUTED_REFERENCE_ONLY",
+  "writes": {
+    "valkey": 0,
+    "redis": 0,
+    "postgres": 0,
+    "qdrant": 0,
+    "neo4j": 0,
+    "sourceFiles": 0,
+    "modelCalls": 0
+  },
+  "notes": [
+    "No Valkey/Redis connection is opened by this script.",
+    "A future reader must compare the complete identity object, not TTL or key suffix alone.",
+    "Any identity mismatch is a stale rejection and must not fall back to a latest key."
+  ]
+}

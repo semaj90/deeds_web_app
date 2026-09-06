@@ -2,10 +2,10 @@
   "schema": "atlas.graphify-execution-ledger-coordinator-plan.v1",
   "status": "READY_FOR_EXPLICIT_LEDGER_AUTHORIZATION",
   "sourceReceipt": "docs/reports/graphify-lifecycle-entrypoint-v1.json",
-  "workspaceRevision": "sha256:35e032dee4202bcb34e31efed5baebcd602d4b7e23e7c98d226f5bb2aa75aeb3",
-  "sourceManifestDigest": "35e032dee4202bcb34e31efed5baebcd602d4b7e23e7c98d226f5bb2aa75aeb3",
-  "sourceCount": 25419,
-  "bindingCount": 25419,
+  "workspaceRevision": "sha256:fc051ccfc7e5627b480d369c84eeb3cc73e790b4d3a0ae2ee6da971585c05c11",
+  "sourceManifestDigest": "fc051ccfc7e5627b480d369c84eeb3cc73e790b4d3a0ae2ee6da971585c05c11",
+  "sourceCount": 25548,
+  "bindingCount": 25548,
   "executionIdentity": "NEW_UUID_PER_ATTEMPT",
   "legacyGraphifyRunId": null,
   "advisoryLock": {
@@ -41,5 +41,5 @@
   "canaryRequiredBeforeBroadRun": true,
   "canonicalAuthority": false,
   "writesPerformed": false,
-  "planChecksum": "sha256:2ffb40e1d00cd1ba7024861c3e56923eba37b13b6599a3b1b436f025a688a77b"
+  "planChecksum": "sha256:032818157b49e51d1e29fc26e5f8ed2308626880c3561388c38108b8c13d3239"
 }

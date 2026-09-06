@@ -9,6 +9,51 @@
 - [ ] Capture a real RTX 3060 Ti cuTile or LibTorch receipt.
 - [ ] Prove CPU/GPU spectral parity using the same frozen ordinal map.
 
+## Re-verification pass (2026-09-05, read-only)
+
+- **Item 1 (native C ABI/N-API spectral/GEMM bridge) — still not implemented.** No file anywhere
+  in `simd-bridge/` or `sveltekit-frontend/src/lib/server/atlas/contracts/` implements a
+  spectral/GEMM C ABI bridge; `gpu-runtime-abi-v1.ts` only defines the Zod receipt schema (matches
+  the 4 checked items above — `node_api`/`libtorch`/`cutile` fields, `canonical_authority:
+  z.literal(false)` — confirmed by reading the file directly), it has no bridge implementation
+  behind it. `docs/reports/candidate-ordinal-gpu-abi-v1.json` sounded relevant by name but is a
+  different, unrelated contract (`atlas.candidate-ordinal-gpu-abi-proof.v1` —
+  CandidateOrdinal-to-graph-executor coordinate round-tripping, not C++/CUDA binary-interface
+  stability) — do not conflate the two "GPU ABI" names.
+- **Item 2 (real RTX 3060 Ti cuTile or LibTorch receipt) — still not captured.** Grepped for the
+  schema literal `atlas.gpu-runtime-abi.v1` across `docs/reports/` and `src/`: it appears only in
+  the contract file and its own spec/fixture — zero real, populated instances exist. No
+  `GpuRuntimeAbiV1` receipt has ever been produced from real hardware.
+- **Item 3 (CPU/GPU spectral parity on the same frozen ordinal map) — substantial real work exists
+  elsewhere, still correctly `BLOCKED`, and not yet cross-referenced from this change.**
+  `docs/reports/spectral-rtx-alignment-sweep-20260823.md` (990 lines, plus ~10 companion receipt
+  JSONs in the same directory) is an extremely thorough, self-correcting live investigation on this
+  exact question, run against a frozen `K=8` CandidateOrdinal-keyed fixture on this repo's real RTX
+  3060 Ti (`atlas-rapids-cu13`, cuGraph 26.06.00, CUDA runtime 13.2, driver 580.88). It found and
+  fixed 4 real upstream bugs (a reconciliation key-formula bug, a chunk/packet cardinality
+  mismatch, a missing-schema relationship step it correctly descoped rather than inventing tables
+  for, and a `cuvs.neighbors.all_neighbors.build()` return-shape bug), then ran the actual parity
+  gate on a correctly-connected 500-node graph. **Result: still genuinely `BLOCKED`** — best
+  observed CPU/GPU ARI is `0.88` (normalized-Laplacian operator at `K=6`, matching Leiden's natural
+  community count), far short of the `0.99` promotion gate; the modularity-operator variant stays
+  flat at `~0.29-0.37` across every K tested and is independently corroborated by NVIDIA's own docs
+  and a public cuGraph issue as a known reliability property of that specific function on
+  non-uniformly-sized communities, not a bug in this repo's code. Nsight Systems/Compute
+  instrumentation (the tranche's own next step) is blocked on missing tooling in the WSL2
+  environment (`nsys`/`ncu` not installed — a real environment gap, not a script defect).
+  **This document was written under a different checkout (`deeds-web-app-hardware-proof`, per its
+  own header) but its output receipts are physically present in this repo's `docs/reports/`** —
+  consistent with having been merged in, but this change's own tasks.md does not currently
+  reference it. Recommend adding a pointer here rather than re-deriving any of this work if the
+  spectral-parity item is picked up again.
+- **This change's own "Frozen priority order" list (items 1-3 above the GPU-ABI tranche) has moved
+  since 2026-08-23**: the retrieval-lineage-dag-convergence OpenSpec change has since proven a
+  15-row `CandidateOrdinalMapV1` (item 1 here) and run a real WSL2 RAPIDS version census multiple
+  times (item 3 here) — see `GPU-MINI-FABRIC-01`/`ACE-RADIX-01`/`SEMANTIC-TOPK-01` in
+  `openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md`. Scaling those to
+  128/768 rows remains open there. This change's own priority list has not been checked against
+  that progress until now — worth a cross-reference update if this tranche resumes.
+
 ## Web-verification corrections — 2026-08-23
 
 An external-docs verification pass over this tranche's ABI/cuTile

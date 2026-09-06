@@ -32,9 +32,10 @@ const CORE_TOOLS = [
   },
 ];
 
+// Only probe optional HTTP MCP transports here. TurboVec :8791 is an HTTP ANN
+// service, not MCP; Engram :8792 is stdio-only and is spawned by OpenCode.
+// Their owners perform their own transport/health checks.
 const OPTIONAL_SIDECARS = [
-  { name: 'turbovec-sidecar', url: process.env.TURBOVEC_MCP_URL ?? 'http://127.0.0.1:8791/mcp' },
-  { name: 'engram-embed', url: process.env.ENGRAM_MCP_URL ?? 'http://127.0.0.1:8792/mcp' },
   { name: 'langextract', url: process.env.LANGEXTRACT_MCP_URL ?? 'http://127.0.0.1:8793/mcp' },
 ];
 

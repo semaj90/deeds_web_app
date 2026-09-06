@@ -1,5 +1,10 @@
 # Karpathy GPU Pipeline Architecture
 
+> **Doc review (2026-09-04):** STALE_BUT_DIRECTIONALLY_RIGHT — the dual-lane
+> (Ollama-embeddings/llama-server-generation) and chunk-identity-spine architecture still holds, and
+> CLAUDE.md itself now labels this whole Karpathy blend pipeline "LEGACY / REFERENCE ONLY"; its
+> "Generation Lane... Model: Gemma4" is additionally outdated — :8090 now runs `ornith-1.5-9b`.
+
 Comprehensive technical specification for the Deeds Web App intelligence stack.
 
 ## 1. Dual-Lane Architecture

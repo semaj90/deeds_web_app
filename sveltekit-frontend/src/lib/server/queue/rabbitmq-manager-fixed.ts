@@ -3,7 +3,8 @@
 import { EventEmitter } from 'events';
 import { traceQueue, traceLLM } from '$lib/server/observability/langfuse.js';
 import { ENV } from '$lib/server/env.server.js';
-import { getOllamaEndpoint } from '$lib/server/ollama.js';
+import { LLAMA_SERVER_BASE_URL } from '$lib/server/ai/local-llama-provider.js';
+import { resolveLoadedLlamaModel } from '$lib/server/ai/llama-server-model-resolver.js';
 import { fastJsonParse } from '$lib/server/gpu/simdjson-bridge.js';
 
 interface AmqpConnection {
@@ -1273,10 +1274,9 @@ export class RabbitMQManager extends EventEmitter {
           const acePrompt = await buildACEPromptCached(context, data.query);
           const contextMs = performance.now() - t0;
 
-          // Stage 2: Direct Ollama LLM call (no Bifrost — single Ollama request)
-          const { ollamaFetch } = await import('../ollama.js');
-          const { ENV } = await import('../env.server.js');
-          const MODEL = ENV.ROTORQUANT_CHAT_MODEL;
+          // Stage 2: Direct llama-server synthesis call (single request)
+          const { resolvedModel: MODEL } = await resolveLoadedLlamaModel(
+            LLAMA_SERVER_BASE_URL.replace(/\/v1\/?$/, ''), null);
           const maxTokens = data.maxTokens ?? 2048;
           const temperature = data.temperature ?? 0.3;
 
@@ -1287,7 +1287,7 @@ export class RabbitMQManager extends EventEmitter {
             'synthesis-worker',
             {
               model: MODEL,
-              backend: 'ollama',
+              backend: 'llama-server',
               synthesisId: data.synthesisId,
               caseId: data.caseId,
               ragChunks: context.ragChunks.length,
@@ -1295,7 +1295,7 @@ export class RabbitMQManager extends EventEmitter {
             },
             async (gen) => {
               const llmStart = performance.now();
-              const res = await ollamaFetch(`${getOllamaEndpoint()}/api/chat`, {
+              const res = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -1305,21 +1305,22 @@ export class RabbitMQManager extends EventEmitter {
                     { role: 'user', content: userPrompt },
                   ],
                   stream: false,
-                  options: { num_predict: maxTokens, temperature },
+                  max_tokens: maxTokens,
+                  temperature,
                 }),
                 signal: AbortSignal.timeout(300_000), // 5 minutes — worker has no user-facing timeout
               });
 
-              if (!res.ok) throw new Error(`Ollama ${res.status}: ${res.statusText}`);
+              if (!res.ok) throw new Error(`llama-server ${res.status}: ${res.statusText}`);
 
               const llmData = await res.json();
-              const answerText = (llmData.message?.content ?? '').trim();
-              const tokens = llmData.eval_count ?? Math.ceil(answerText.length / 4);
+              const answerText = (llmData.choices?.[0]?.message?.content ?? '').trim();
+              const tokens = llmData.usage?.completion_tokens ?? Math.ceil(answerText.length / 4);
               const durationMs = performance.now() - llmStart;
 
               gen.end({
                 output: answerText.slice(0, 1000),
-                usage: { promptTokens: llmData.prompt_eval_count, completionTokens: tokens },
+                usage: { promptTokens: llmData.usage?.prompt_tokens, completionTokens: tokens },
               });
               return { answer: answerText, tokensUsed: tokens, generateMs: durationMs };
             }

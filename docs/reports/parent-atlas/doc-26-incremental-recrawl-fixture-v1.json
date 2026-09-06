@@ -1,0 +1,47 @@
+{
+  "schema": "atlas.doc-26.incremental-recrawl-fixture.v1",
+  "gate": "DOC-26",
+  "status": "DOC_26_INCREMENTAL_RECRAWL_FIXTURE_PROVEN",
+  "owner": "sveltekit-frontend/src/lib/server/atlas/acquisition/conditional-fetch.ts",
+  "identityRule": "content bytes and explicit productVersion determine reuse; timestamps and validators do not create identity",
+  "cases": [
+    {
+      "name": "same-bytes-new-timestamp",
+      "expected": "UNCHANGED_SKIP",
+      "actual": "UNCHANGED_SKIP",
+      "pass": true,
+      "reason": "source bytes and revision are unchanged",
+      "timestampOnlyDifference": true,
+      "priorRowsPreserved": false
+    },
+    {
+      "name": "changed-bytes-same-version",
+      "expected": "REPROCESS_CHANGED_BYTES",
+      "actual": "REPROCESS_CHANGED_BYTES",
+      "pass": true,
+      "reason": "canonical content identity changed",
+      "timestampOnlyDifference": false,
+      "priorRowsPreserved": false
+    },
+    {
+      "name": "changed-product-version",
+      "expected": "REPROCESS_NEW_VERSION",
+      "actual": "REPROCESS_NEW_VERSION",
+      "pass": true,
+      "reason": "productVersion changed; preserve prior rows",
+      "timestampOnlyDifference": false,
+      "priorRowsPreserved": true
+    }
+  ],
+  "incompleteMetadata": {
+    "actual": "REPROCESS_CHANGED_BYTES",
+    "expected": "REPROCESS_CHANGED_BYTES",
+    "pass": true,
+    "note": "Missing identity metadata must not silently reuse or overwrite a prior revision."
+  },
+  "writesPerformed": false,
+  "crawlerCalled": false,
+  "datastoreWrites": false,
+  "canonicalPromotion": false,
+  "generatedAt": "2026-09-04T22:24:14.793Z"
+}

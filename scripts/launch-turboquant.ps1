@@ -30,8 +30,8 @@
 
 .PARAMETER StartupProfile
   One of: gemma4-direct (default tool-calling profile), ornith (legacy Ornith 9B,
-  embedded chat template, no override), ornith-1.5 (candidate Ornith 1.5 9B,
-  local template, reasoning on), gemma4-thinking (reasoning on,
+  embedded chat template, no override), ornith-1.5 (Ornith 1.5 9B,
+  local template, reasoning off), gemma4-thinking (reasoning on,
   budget 2048). Bundles model + chat-template-file + reasoning mode so you
   pick ONE coherent config. When omitted (and -SelectProfile isn't passed
   either), the launcher falls back to legacy env-var resolution
@@ -845,13 +845,13 @@ if (-not $StatusOnly) {
                 $reasoningOk = if ($targetReasoningMode -eq 'on') {
                     ($runningReasoningFormat -and $runningReasoningFormat -ne 'none') -or
                     (($props.chat_template_caps.supports_preserve_reasoning -eq $true) -and ([string]$props.chat_template -match '<think>'))
-                } else { $runningReasoningFormat -eq 'none' }
+                } else { $runningReasoningFormat -in @('none', 'auto') }
                 $runningModelAlias = $props.model_alias
                 $runningReasoningFormat = $props.default_generation_settings.params.reasoning_format
                 $reasoningOk = if ($targetReasoningMode -eq 'on') {
                     ($runningReasoningFormat -and $runningReasoningFormat -ne 'none') -or
                     (($props.chat_template_caps.supports_preserve_reasoning -eq $true) -and ([string]$props.chat_template -match '<think>'))
-                } else { $runningReasoningFormat -eq 'none' }
+                } else { $runningReasoningFormat -in @('none', 'auto') }
                 if (-not $runningModelAlias -and $props.model_path) { $runningModelAlias = Split-Path -Leaf $props.model_path }
                 $modelOk = ($runningModelAlias -eq $targetModelAlias)
             } catch {
@@ -1109,11 +1109,10 @@ if ($kvProfile -eq 'atomicbot') {
 
 
 # -- Reasoning: --reasoning on/off (+ --reasoning-budget) and --reasoning-format --
-# reasoning-format deepseek instructs llama-server to place parsed reasoning in
-# reasoning_content rather than leaving it mixed into visible content when the
-# template/model emits compatible reasoning markers. Each named profile owns
-# its reasoning mode and OpenCode receives parsed reasoning_content separately
-# from visible content when reasoning is enabled.
+# `--reasoning-format` controls parsing of emitted thought markers; it does not
+# enable reasoning. The normal Ornith/OpenCode profile omits this optional flag
+# entirely. `auto` or `deepseek` remains an explicit opt-in through
+# TURBO_REASONING_FORMAT for a compatible reasoning profile.
 $reasoningMode = if ($activeTurboProfile) {
     $activeTurboProfile.Reasoning
 } elseif ($env:TURBO_REASONING) {
@@ -1128,7 +1127,7 @@ $reasoningBudget = if ($activeTurboProfile) {
 } else {
     0
 }
-$reasoningFormat = if ($env:TURBO_REASONING_FORMAT) { $env:TURBO_REASONING_FORMAT } else { 'deepseek' }
+$reasoningFormat = if ($env:TURBO_REASONING_FORMAT) { $env:TURBO_REASONING_FORMAT.Trim() } else { $null }
 
 if (Test-LlamaFlag $llama '--reasoning') {
     $baseArgs = $baseArgs + @('--reasoning', $reasoningMode)
@@ -1141,11 +1140,11 @@ if (Test-LlamaFlag $llama '--reasoning') {
     Write-Host "Reasoning: --reasoning not supported by this binary - relying on template-based reasoning only" -ForegroundColor DarkYellow
 }
 
-if (Test-LlamaFlag $llama '--reasoning-format') {
+if ($reasoningFormat -and (Test-LlamaFlag $llama '--reasoning-format')) {
     $baseArgs = $baseArgs + @('--reasoning-format', $reasoningFormat)
     Write-Host "Reasoning format: --reasoning-format $reasoningFormat" -ForegroundColor Cyan
 } else {
-    Write-Host "Reasoning format: --reasoning-format not supported by this binary (template-based reasoning active)" -ForegroundColor DarkYellow
+    Write-Host "Reasoning format: omitted (native template/default; set TURBO_REASONING_FORMAT=auto to opt in)" -ForegroundColor Cyan
 }
 
 # -- Chat template: custom_pub_chat_template_gemma4.jinja for Gemma4-family OpenCode-compatible chat/tool calling --

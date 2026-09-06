@@ -1,0 +1,20 @@
+{
+  "schema": "atlas.parent-atlas-workstation-ornith-synthesis-proof.v1",
+  "status": "PROVEN",
+  "liveStatus": "SKIPPED_NO_EXECUTABLE_CANDIDATE",
+  "liveModel": "ornith-1.5-9b",
+  "liveModelCalls": 0,
+  "noCandidateSkip": true,
+  "unavailableFailClosed": true,
+  "noFallback": true,
+  "writes": {
+    "taskLedgers": 0,
+    "sourceFiles": 0,
+    "databases": 0,
+    "qdrant": 0,
+    "neo4j": 0,
+    "cache": 0,
+    "modelCalls": 0
+  },
+  "receiptPath": "docs/reports/parent-atlas-workstation-ornith-synthesis-dry-v1.json"
+}

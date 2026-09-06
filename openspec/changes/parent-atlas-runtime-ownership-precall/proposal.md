@@ -263,3 +263,29 @@ GPU numerical validation gates.
   `design.md`).
 - `docs/parent-atlas/MCP_TOOL_REGISTRY_AUDIT.md` — gains a runtime column
   set, step 7 (extend, do not replace the existing structural findings).
+
+## Re-verification pass (2026-09-05, read-only — portfolio-tooling correction, not new work)
+
+This change has no `tasks.md`, so `sveltekit-frontend/scripts/atlas/audit-openspec-portfolio-v1.mjs`
+(which counts `- [ ]`/`- [x]` checkboxes) reports it as `0/0` and `UNCLASSIFIED` in
+`docs/reports/openspec-portfolio-v1.json`. **That is a tooling artifact, not evidence of no work** —
+this proposal.md is this change's chosen living record (steps + a dated "Progress" log), and step
+4/8/9 are real, still live today:
+
+- `src/lib/server/retrieval/parallel-orchestrator.ts` still exports the `not_configured` lane-status
+  variant described in Step 4.
+- `src/lib/server/parent-atlas/precall/{retrieve-evidence-schema,retrieve-evidence-service}.ts`
+  (Step 8/9) still exist, and `src/lib/server/trpc/routers/atlas.ts` still wires
+  `atlas.retrieveEvidence` to `retrieveEvidence()` with `.input()`/`.output()` Zod validation.
+- Ran both committed test files fresh: `tests/atlas/retrieve-evidence-service.test.ts` (15 tests) +
+  `tests/atlas/atlas-router.test.ts` (4 tests) — **19/19 pass**, covering all 7 unit-level proof
+  gates named in the service file's own docstring (`INVALID_INPUT_REJECTED`, `DEFAULT_LANES_APPLIED`,
+  `WORKSPACE_REVISION_PRESERVED`, `CENTROID_NOT_CONFIGURED_REPORTED`, `TURBOVEC_NOT_CONFIGURED_REPORTED`,
+  `FALLBACK_LANE_EXECUTED`, `OUTPUT_SCHEMA_VALIDATED`) plus the router-level
+  `MCP_OR_TRPC_CONSUMER_READS_RESULT` gate.
+- Steps 5–7 and 10–13 remain exactly as logged above (dispatcher orchestration unproven end-to-end,
+  centroid ownership still fragmented, no shared cross-transport pre-call layer yet) — this pass
+  found no evidence any of those advanced since the 2026-08-02 Progress entry.
+
+No code changed in this pass. Recorded so a future portfolio/triage pass doesn't mistake the `0/0`
+count for "no work happened here."

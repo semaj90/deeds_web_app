@@ -1,6 +1,6 @@
 {
   "schema": "atlas.live-source-lineage-table-audit.v1",
-  "generatedAt": "2026-09-04T04:59:33.314Z",
+  "generatedAt": "2026-09-05T16:18:13.695Z",
   "status": "SOURCE_LINEAGE_OWNER_SCHEMA_READY",
   "canonicalWrites": false,
   "tables": [
@@ -428,6 +428,12 @@
       "table_schema": "public",
       "table_name": "atlas_evidence_event_hyperedges",
       "column_name": "source_revision",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_external_doc_pages",
+      "column_name": "content_hash",
       "data_type": "text"
     },
     {
@@ -1647,7 +1653,7 @@
       "configuredSearchPath": "\"$user\", public",
       "effectiveSearchPath": "{pg_catalog,public}",
       "serverVersion": "18.4 (Debian 18.4-1.pgdg12+1)",
-      "serverAddress": "172.18.0.24/32",
+      "serverAddress": "172.18.0.23/32",
       "serverPort": 5432,
       "relations": [
         {
@@ -1721,7 +1727,7 @@
           "selectable": true
         }
       ],
-      "fingerprintSha256": "0c97c15570535401303fb44d7dece99057b93bfde99da396390f39002fee0c79"
+      "fingerprintSha256": "8537a000a167fd8c329d74db0eef8c7e9b8d4f08e64c8f389d0bd23003417d58"
     },
     "status": "READBACK_PROVEN"
   }

@@ -2,21 +2,19 @@
  * context-chunk-synthesizer.ts
  *
  * Server-side service that orchestrates token boundaries and consolidates
- * text chunks to generate action-oriented feature group summaries via Gemma 4.
+ * text chunks to generate action-oriented feature group summaries via Ornith.
  *
  * Features:
  *   - Groups incoming Atlas chunks by feature key.
  *   - Resolves appropriate prompt templates with token boundary budgets.
- *   - Probes TurboQuant vs Ollama cascade paths synchronously.
+ *   - Uses the active llama-server /v1 synthesis boundary.
  *   - Caches completed CtxPackets back into Redis ace:ctx:{featureKey} (24h TTL).
  *
  * This service runs SERVER-SIDE ONLY.
  */
 
 import { getRedis } from '$lib/server/redis.js';
-import { ENV } from '$lib/server/env.server.js';
-import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
-import { getOllamaEndpoint } from '$lib/server/ollama.js';
+import { resolveLlamaInferenceTarget } from '$lib/server/llm/runtime-contract.js';
 import type { AtlasChunk, CtxPacket } from './feature-context-matrix.js';
 
 // ── Constants & Prompts ────────────────────────────────────────────────────────
@@ -60,19 +58,6 @@ export function groupByFeature(chunks: AtlasChunk[]): Map<string, AtlasChunk[]> 
     groups.get(key)!.push(chunk);
   }
   return groups;
-}
-
-/**
- * Checks if the high-performance TurboQuant service is responsive.
- */
-async function checkTurboQuant(): Promise<boolean> {
-  const url = `${ENV.TURBOQUANT_URL}/health`;
-  try {
-    const res = await fetch(url, { signal: AbortSignal.timeout(1500) });
-    return res.ok;
-  } catch {
-    return false;
-  }
 }
 
 /**
@@ -128,13 +113,9 @@ export async function synthesizeFeatureChunks(
     }
   }
 
-  // Determine endpoint availability
-  const isTurboActive = await checkTurboQuant();
-  const endpointUrl = isTurboActive
-    ? `${ENV.TURBOQUANT_URL}/v1/chat/completions`
-    : `${getOllamaEndpoint()}/v1/chat/completions`;
-
-  const modelName = LLM_MODEL_ID;
+  const target = await resolveLlamaInferenceTarget();
+  const endpointUrl = `${target.baseUrl}/v1/chat/completions`;
+  const modelName = target.model;
 
   const systemPrompt = SYSTEM_PROMPT;
   const userPrompt = buildUserPrompt(featureKey, chunks);

@@ -109,6 +109,28 @@ Final result (both runs): `Test Files 4 passed (4)` / `Tests 12 passed (12)`, ~1
    session did for all 3 issues above — its file paths and specific claims
    do not necessarily reflect this repository's actual state.
 
+## Re-verification pass (2026-09-05, read-only)
+
+- **"Next steps" item 1 (commit the 5 touched files) — DONE.** `git status --porcelain` on the 3
+  files named below is clean; `git log` shows them committed. Not previously checked off as a
+  task item since this file predates that convention, but confirmed live, not assumed.
+- **"Next steps" item 3 (decide on RAPIDS/cuGraph GPU PageRank parity) — RESOLVED, separately.**
+  Commit `7be35ec708` (2026-08-31, "Wire cuGraph/RAPIDS as a second GPU pagerank backend under the
+  canonical graph_analysis owner") wires `cugraph-pagerank-adapter.ts` as a second `BACKEND` under
+  the existing canonical `graph_analysis` owner (`graph-analysis-runner.ts`) — same
+  `graph_analysis_runs`/`graph_node_metrics` tables the Neo4j-GDS backend already writes, not a
+  competing owner. This was a real, substantive fix to a previously-open decision, done in a
+  different change/session than this handoff, not tracked back here until now.
+- **The one remaining open item (line 86, `compute-pagerank-neo4j-v2.mjs` sequential-write perf
+  bug) is STILL PRESENT, re-verified live, not fixed.** Read the current file directly: lines
+  17-24 still default `--fixture` to the 486MB `graphify/frozen-graph-snapshot-v2.json` snapshot
+  when no `--fixture` flag is passed; lines 76-101 still issue one `await session.run(...)` per
+  node then one per edge inside a plain `for` loop — zero occurrences of `UNWIND` anywhere in the
+  file. Running this script without `--fixture` against the full ~162K-node/108K-edge frozen
+  snapshot would still reproduce the original multi-minute hang. Genuinely unfixed, exactly as
+  flagged — not stale, not resolved elsewhere in the portfolio (no other change references this
+  specific script).
+
 ## Files touched this session
 
 - `sveltekit-frontend/src/lib/server/atlas/graph/atlas-rapids-pagerank-client.ts` — `pagerank` made `async`.

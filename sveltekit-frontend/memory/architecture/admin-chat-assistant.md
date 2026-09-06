@@ -1,5 +1,7 @@
 # Admin Chat Assistant — ChatGPT-style Copilot for the Admin Panel
 
+> **Doc review (2026-09-04):** CURRENT — all listed component/store/endpoint files verified present.
+
 > Builds on the Browser Context Lane (`browser-context-lane.md`). Adds a
 > rune-module store + reusable popup so any admin panel can trigger an
 > on-demand AI analysis of its own state and have it persisted into the

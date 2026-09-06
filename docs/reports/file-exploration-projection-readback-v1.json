@@ -1,0 +1,485 @@
+{
+  "schema": "atlas.file-exploration-projection-readback.v1",
+  "gate": "ATLAS-FILE-EXPLORATION-INDEX-06",
+  "status": "PROJECTION_OWNER_FOUND_LINEAGE_COLUMNS_MISSING",
+  "owner": "public.codebase_chunk_index",
+  "columns": [
+    {
+      "column_name": "id",
+      "data_type": "uuid",
+      "is_nullable": "NO"
+    },
+    {
+      "column_name": "qdrant_id",
+      "data_type": "character varying",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "relative_path",
+      "data_type": "text",
+      "is_nullable": "NO"
+    },
+    {
+      "column_name": "symbol",
+      "data_type": "character varying",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "kind",
+      "data_type": "character varying",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "line_start",
+      "data_type": "integer",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "line_end",
+      "data_type": "integer",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "content_embedding",
+      "data_type": "USER-DEFINED",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "gpu_cluster",
+      "data_type": "integer",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "som_cluster",
+      "data_type": "integer",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "page_rank_score",
+      "data_type": "real",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "community_id",
+      "data_type": "integer",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "tags",
+      "data_type": "jsonb",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "neo4j_meta",
+      "data_type": "jsonb",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "indexed_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO"
+    },
+    {
+      "column_name": "enriched_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "updated_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO"
+    },
+    {
+      "column_name": "content",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "cluster_summary",
+      "data_type": "jsonb",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "summary_embedding",
+      "data_type": "USER-DEFINED",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "signature_embedding",
+      "data_type": "USER-DEFINED",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "domain",
+      "data_type": "character varying",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "language",
+      "data_type": "character varying",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "extension",
+      "data_type": "character varying",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "embedding_model",
+      "data_type": "character varying",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "summary_model",
+      "data_type": "character varying",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "summary",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "metadata",
+      "data_type": "jsonb",
+      "is_nullable": "NO"
+    },
+    {
+      "column_name": "semantic_tags",
+      "data_type": "ARRAY",
+      "is_nullable": "NO"
+    },
+    {
+      "column_name": "som_bmu_row",
+      "data_type": "integer",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "som_bmu_col",
+      "data_type": "integer",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "manifold4",
+      "data_type": "ARRAY",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "chunk_id",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "repo_id",
+      "data_type": "uuid",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "content_hash",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "token_count",
+      "data_type": "integer",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "neo4j_gpu_cluster",
+      "data_type": "integer",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "output_meta",
+      "data_type": "jsonb",
+      "is_nullable": "NO"
+    },
+    {
+      "column_name": "summary_embedding_384",
+      "data_type": "USER-DEFINED",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "embedding_dimension",
+      "data_type": "integer",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "embedding_normalized",
+      "data_type": "boolean",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "error_embedding",
+      "data_type": "USER-DEFINED",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "source_ref",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "latent_64",
+      "data_type": "USER-DEFINED",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "latent64_model",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "latent64_meta",
+      "data_type": "jsonb",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "latent64_validated_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "latent64_msgpack",
+      "data_type": "bytea",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "embedding_eligible",
+      "data_type": "boolean",
+      "is_nullable": "NO"
+    },
+    {
+      "column_name": "summary_hash",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "embedding_version",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "embedding_dtype",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "embedding_created_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "encoder_id",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "latent_embedding_valid",
+      "data_type": "boolean",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "latent_embedding_validated_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "search_vector",
+      "data_type": "tsvector",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "ast_symbols",
+      "data_type": "jsonb",
+      "is_nullable": "NO"
+    },
+    {
+      "column_name": "ast_imports",
+      "data_type": "ARRAY",
+      "is_nullable": "NO"
+    },
+    {
+      "column_name": "ast_exports",
+      "data_type": "ARRAY",
+      "is_nullable": "NO"
+    },
+    {
+      "column_name": "ast_facts_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "kmeans_cluster",
+      "data_type": "integer",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "centroid_distance",
+      "data_type": "real",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "second_cluster_id",
+      "data_type": "integer",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "second_distance",
+      "data_type": "real",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "cluster_margin",
+      "data_type": "real",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "kmeans_model_version",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "kmeans_assigned_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "kmeans_vector_contract",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "kmeans384_cluster",
+      "data_type": "integer",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "kmeans384_distance",
+      "data_type": "real",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "kmeans384_second_id",
+      "data_type": "integer",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "kmeans384_second_dist",
+      "data_type": "real",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "kmeans384_margin",
+      "data_type": "real",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "kmeans384_model_version",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "kmeans384_assigned_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "kmeans_distance",
+      "data_type": "real",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "content_embedding_768",
+      "data_type": "USER-DEFINED",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "centroid_id",
+      "data_type": "uuid",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "reconstruction_error",
+      "data_type": "real",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "routing_tier",
+      "data_type": "character varying",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "latent_256",
+      "data_type": "USER-DEFINED",
+      "is_nullable": "YES"
+    },
+    {
+      "column_name": "latent_256_checkpoint_revision",
+      "data_type": "character varying",
+      "is_nullable": "YES"
+    }
+  ],
+  "requiredColumns": [
+    "source_ref",
+    "source_revision",
+    "workspace_revision",
+    "content_hash",
+    "search_vector",
+    "ast_symbols"
+  ],
+  "missingRequired": [
+    "source_revision",
+    "workspace_revision"
+  ],
+  "counts": {
+    "rows": 55853,
+    "source_ref_rows": 53064,
+    "content_hash_rows": 55816,
+    "joinable_rows": 53027,
+    "semantic_768_rows": 55816,
+    "fts_rows": 55853
+  },
+  "metadataKeys": [],
+  "sample": [
+    {
+      "source_ref": "src/lib/components/evidence/EvidencePrimaryUpload.svelte",
+      "content_hash": "981f4c3e67375a55",
+      "embedding_dimension": 768,
+      "embedding_version": "qdrant-backfill-v1",
+      "output_meta": "{}"
+    },
+    {
+      "source_ref": "src/routes/(app)/demos/+page.svelte",
+      "content_hash": "b593e1bef5f69ff2",
+      "embedding_dimension": 768,
+      "embedding_version": "qdrant-backfill-v1",
+      "output_meta": "{}"
+    },
+    {
+      "source_ref": "src/routes/(app)/demos/notifications/+page.svelte",
+      "content_hash": "20cdafb7059bdf3f",
+      "embedding_dimension": 768,
+      "embedding_version": "qdrant-backfill-v1",
+      "output_meta": "{}"
+    },
+    {
+      "source_ref": "src/routes/(app)/admin/codebase-index/+page.svelte",
+      "content_hash": "7bf5783879c0d416",
+      "embedding_dimension": 768,
+      "embedding_version": "qdrant-backfill-v1",
+      "output_meta": "{}"
+    },
+    {
+      "source_ref": "packages/parent-atlas-retrieval/src/gpu/gpu-job-queue.ts",
+      "content_hash": "282646a4da6c65ce19703e4b0d728b90f13e7ad8fabb8f381d11c3fe92407105",
+      "embedding_dimension": 768,
+      "embedding_version": "qdrant-backfill-v1",
+      "output_meta": "{}"
+    }
+  ],
+  "policy": "readback only; no schema migration or projection writes in this gate",
+  "canonicalAuthority": false,
+  "readOnly": true,
+  "writesPerformed": false
+}

@@ -1,5 +1,10 @@
 # Retrieval Layer Separation
 
+> **Doc review (2026-09-04):** CURRENT — all three named layer files (`retrieval/orchestrator.ts`,
+> `search/qdrant-search.ts`, `search/turbovec-search.ts`) plus `turbovec-rerank.ts`,
+> `turbovec-prefilter.ts`, and `search/codebase-ann-backend.ts` confirmed present; doc is
+> model-agnostic and unaffected by the later Gemma4→Ornith or embedding-dimension pivots.
+
 _Date: 2026-06-02_
 
 ## The three layers

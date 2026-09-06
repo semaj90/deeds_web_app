@@ -61,6 +61,7 @@ already been verified against live code/data more than once across 2026-08-23, 2
   record, not deleted); `parent-atlas-768-dim-migration/SPEC.md` unblocked to proceed against its
   original (now-confirmed-correct) premise.
 - [ ] 2.3 Still open: add or confirm an integration test that actually calls `/api/admin/atlas/synthesize`'s semantic512 branch end-to-end, so this class of always-throws regression is caught by CI next time, not by a code-review pass discovering it after the fact. Not done this pass — the dimension-choice question was the blocker for this task section; this sub-item is independent follow-up work.
+  **Re-verified 2026-09-05**: confirmed no spec/test file exists alongside `src/routes/api/admin/atlas/synthesize/+server.ts` — still genuinely open, not silently done elsewhere.
 
 ## 3. Fix the spec/test break (finding #3)
 

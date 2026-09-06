@@ -1,6 +1,18 @@
 #!/usr/bin/env node
 
-/** Read-only preflight for the future packet↔chunk lineage capture canary. */
+/**
+ * Read-only preflight for the future packet↔chunk lineage capture canary.
+ *
+ * GRAPHIFY-REVISION-TIEBREAK-FIX-01 (2026-09-05): the namespace/revision LATERAL
+ * join below previously picked one `graphify_files` row per source_ref via
+ * `ORDER BY workspace_revision DESC, code_source_revision DESC` -- sorting sha256
+ * content hashes as if they were timestamps, with no relationship to which row was
+ * actually current. Fixed to join `graphify_runs` and filter `status = 'COMPLETED'`,
+ * tie-broken by the real `completed_at` timestamp (never a hash column). This is
+ * still a legacy bridge over a mutable table, not canonical authority -- see
+ * scripts/atlas/lib/graphify-source-evidence.mjs for the full rationale and the
+ * corpus-wide safety proof (GRAPHIFY-COMPLETED-LEGACY-COVERAGE-01).
+ */
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
@@ -29,10 +41,11 @@ try {
       NULLIF(BTRIM(gf.code_source_revision::text), '') AS source_revision
     FROM codebase_chunk_index cci
     LEFT JOIN LATERAL (
-      SELECT workspace_id, code_source_revision
-      FROM graphify_files
-      WHERE source_ref = cci.relative_path
-      ORDER BY workspace_revision DESC NULLS LAST, code_source_revision DESC NULLS LAST
+      SELECT gf.workspace_id, gf.code_source_revision
+      FROM graphify_files gf
+      JOIN graphify_runs gr ON gr.run_id = gf.last_seen_run_id
+      WHERE gf.source_ref = cci.relative_path AND gr.status = 'COMPLETED'
+      ORDER BY gr.completed_at DESC, gf.file_id DESC
       LIMIT 1
     ) gf ON TRUE
     WHERE NULLIF(BTRIM(cci.relative_path), '') IS NOT NULL

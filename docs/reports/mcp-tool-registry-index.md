@@ -1,9 +1,9 @@
 # Parent Atlas MCP Tool Registry Index
 
-**Generated**: 2026-09-03T02:08:25.379Z
+**Generated**: 2026-09-04T15:58:39.323Z
 **Sources**: C:\Users\james\Videos\deeds-web-app\docs\reports\mcp-tool-ontology.json | C:\Users\james\Videos\deeds-web-app\docs\reports\mcp-tool-manifest-packets.json
-**Unique tools**: 339
-**Trace tools**: 175
+**Unique tools**: 337
+**Trace tools**: 173
 **Manifest tools**: 206
 **RPC methods**: 74
 
@@ -18,11 +18,11 @@
 - [SYNTHESIS](#synthesis) (31)
 - [OPS](#ops) (12)
 - [READ](#read) (5)
-- [UNKNOWN](#unknown) (124)
+- [UNKNOWN](#unknown) (122)
 
 ## Executive Summary
 
-error: all llama-server routes failed: llama-primary: llama-primary 500: {"error":{"code":500,"message":"\n------------\nWhile executing CallExpression at line 85, column 32 in source:\n...first %}↵            {{- raise_exception('System message must be at the beginnin...\n                                           ^\nError: Jinja Exception: System message must be at the beginning.","type":"server_error"}} | atomic-llama: fetch failed
+The Parent Atlas MCP tool registry contains 40 tools organized by category, primarily focused on codebase search, retrieval, and knowledge management. Most tools write to Postgres, with several reading from Redis, Qdrant, Neo4j, and other services. Search tools use hybrid approaches combining lexical ripgrep, dense vector embeddings in Qdrant, and graph metadata from Neo4j. Memory and caching tools leverage a three-tier system spanning Redis, Postgres, and Qdrant. Identity and audit tools validate data parity across services, while graph tools navigate SOM clusters and knowledge graphs. Additional tools handle legal research, GPU attention, image enrichment, and operational diagnostics, with several tools reading from multiple backing services to provide comprehensive context retrieval.
 
 ## IDENTITY
 
@@ -47,7 +47,7 @@ Layer memory contains 2 tools. 0 expose identity fields and 1 write surfaces. To
 
 ## CACHE
 
-Layer cache contains 28 tools. 0 expose identity fields and 13 write surfaces. Top-ranked tools: wiki.search, ace.compact_search, karpathy.attention_rank_files, wiki.status, ops.fixer_semantic_recall.
+Layer cache contains 28 tools. 0 expose identity fields and 14 write surfaces. Top-ranked tools: wiki.search, ace.compact_search, karpathy.attention_rank_files, wiki.status, ops.fixer_semantic_recall.
 
 | Rank | Tool | Source | Score | Identity | Writes To | Summary |
 |------|------|--------|-------|----------|-----------|---------|
@@ -75,8 +75,8 @@ Layer cache contains 28 tools. 0 expose identity fields and 13 write surfaces. T
 | 83 | `ops.verify_write` | trace-mcp | 150 | — | — | Proves that a write actually occurred by reading the target back and computing its hash. A write is NOT proven merely b… |
 | 97 | `atlas_get_active_context` | trace-mcp | 96 | — | — | Read the newest bounded ACE reconciliation packet from Redis Valkey, validate it, and return compact resume context. |
 | 98 | `context.build_ace_packet` | trace-mcp | 96 | — | — | Build and persist a bounded ACE packet from a sourceRef or markdown content. Reads a local file when sourceRef resolves… |
-| 99 | `engram.redis_health` | trace-mcp | 96 | — | — | Check Redis availability used by engram memory tools. |
-| 123 | `inference:route` | manifest-packets | 86 | — | postgres | Route an inference request through the optimal backend: TRT→Triton→Bifrost→Ollama cascade. Direct import bypasses HTTP … |
+| 121 | `engram.redis_health` | trace-mcp | 86 | — | redis | Check Redis availability used by engram memory tools. |
+| 122 | `inference:route` | manifest-packets | 86 | — | postgres | Route an inference request through the optimal backend: TRT→Triton→Bifrost→Ollama cascade. Direct import bypasses HTTP … |
 | 142 | `redis` | manifest-packets | 82 | — | postgres |  |
 | 143 | `redis_only` | manifest-packets | 82 | — | postgres |  |
 
@@ -163,12 +163,12 @@ Layer dense contains 33 tools. 2 expose identity fields and 21 write surfaces. T
 | 81 | `EmbeddingService.GenerateEmbeddings` | manifest-packets | 154 | — | postgres | gRPC RPC EmbeddingService.GenerateEmbeddings: EmbeddingRequest → EmbeddingResponse (declared in proto/active/embedding.… |
 | 86 | `ops.fixer_pattern_store` | trace-mcp | 142 | — | — | [OPERATOR-GATED] Stores a fix attempt outcome to the 3-layer fixer memory. Increments success/failure counts, upserts t… |
 | 87 | `ops.trust_audit` | trace-mcp | 142 | — | — | Read-only audit of the trust-tier injection-detection system. Returns count of blocked content hashes and the most rece… |
-| 116 | `atlas.embedding_all_tags` | trace-mcp | 88 | — | — | Comprehensive tag derivation for a packet embedding. Combines keywords, cluster tags, and neighbor query in parallel. R… |
-| 117 | `atlas.embedding_neighbors` | trace-mcp | 88 | — | — | Find semantically adjacent packets via Qdrant ANN search on a 768-dimensional embedding. Returns a query structure for … |
-| 119 | `evidence.search_by_image` | trace-mcp | 88 | — | — | Search evidence by uploading an image. The VLM describes the image, embeds it, and returns semantically similar evidenc… |
-| 120 | `legal.batch_ingest` | trace-mcp | 88 | — | — | Publish one or more document URLs to the document.embed RabbitMQ queue for background embedding and indexing. Use to bu… |
-| 121 | `legal.cross_reference_evidence` | trace-mcp | 88 | — | — | Semantic cross-reference: find evidence chunks similar to a reference evidence item across one or more cases using Qdra… |
-| 122 | `topology.language_distribution` | trace-mcp | 88 | — | — | Get language distribution across Qdrant clusters. Queries codebase_chunks_768 payload tags (language field) and returns… |
+| 114 | `atlas.embedding_all_tags` | trace-mcp | 88 | — | — | Comprehensive tag derivation for a packet embedding. Combines keywords, cluster tags, and neighbor query in parallel. R… |
+| 115 | `atlas.embedding_neighbors` | trace-mcp | 88 | — | — | Find semantically adjacent packets via Qdrant ANN search on a 768-dimensional embedding. Returns a query structure for … |
+| 117 | `evidence.search_by_image` | trace-mcp | 88 | — | — | Search evidence by uploading an image. The VLM describes the image, embeds it, and returns semantically similar evidenc… |
+| 118 | `legal.batch_ingest` | trace-mcp | 88 | — | — | Publish one or more document URLs to the document.embed RabbitMQ queue for background embedding and indexing. Use to bu… |
+| 119 | `legal.cross_reference_evidence` | trace-mcp | 88 | — | — | Semantic cross-reference: find evidence chunks similar to a reference evidence item across one or more cases using Qdra… |
+| 120 | `topology.language_distribution` | trace-mcp | 88 | — | — | Get language distribution across Qdrant clusters. Queries codebase_chunks_768 payload tags (language field) and returns… |
 | 158 | `CyberElephantService.GetClusters` | manifest-packets | 78 | — | postgres | gRPC RPC CyberElephantService.GetClusters: ClusterRequest → ClusterResponse (declared in proto/active/vectors.proto). |
 | 159 | `CyberElephantService.GetDocumentById` | manifest-packets | 78 | — | postgres | gRPC RPC CyberElephantService.GetDocumentById: DocumentIdRequest → DocumentVector (declared in proto/active/vectors.pro… |
 | 160 | `CyberElephantService.GetStatus` | manifest-packets | 78 | — | postgres | gRPC RPC CyberElephantService.GetStatus: StatusRequest → SystemStatus (declared in proto/active/vectors.proto). |
@@ -182,7 +182,7 @@ Layer dense contains 33 tools. 2 expose identity fields and 21 write surfaces. T
 
 ## GRAPH
 
-Layer graph contains 40 tools. 3 expose identity fields and 17 write surfaces. Top-ranked tools: clusters.som_cell_lookup, wiki.refresh_directory, kag.feature_lookup, trace.graphrag_search, codebase:graph_traverse.
+Layer graph contains 40 tools. 3 expose identity fields and 18 write surfaces. Top-ranked tools: clusters.som_cell_lookup, wiki.refresh_directory, kag.feature_lookup, trace.graphrag_search, codebase:graph_traverse.
 
 | Rank | Tool | Source | Score | Identity | Writes To | Summary |
 |------|------|--------|-------|----------|-----------|---------|
@@ -199,28 +199,28 @@ Layer graph contains 40 tools. 3 expose identity fields and 17 write surfaces. T
 | 85 | `ops.gpu_pagerank` | trace-mcp | 148 | — | — | GPU power-iteration PageRank on a flat adjacency matrix. Returns normalised rank scores (sum to 1.0). Cached 300 s by s… |
 | 94 | `atlas.graph.pagerank` | trace-mcp | 102 | packet_key | — | List the top authoritative nodes in the codebase by PageRank score (computed by Neo4j GDS). Returns paginated results w… |
 | 95 | `context.build_indexed_source_packet` | trace-mcp | 102 | source_ref | — | Build a compact Valkey-backed packet for an already indexed source_ref. Prefers Parent Atlas identity lookup (NES card … |
-| 100 | `atlas.build_taxonomy_topology_packet` | trace-mcp | 94 | — | — | Build a compact ACE packet for taxonomy/topology routing. Combines ontology path, top children, SOM 20x20 neighborhood,… |
-| 101 | `atlas.compact_context` | trace-mcp | 94 | — | — | Build a compact Atlas context packet with top chunks, sourceRefs, a compressed summary, confidence, and retrieval path. |
-| 102 | `context.prefetch_feature_context` | trace-mcp | 94 | — | — | Build a prefetch packet for the next feature edit using recent activity, directory KAG context, community graph context… |
-| 103 | `graph.materialize_pathway` | trace-mcp | 94 | — | — | Materializes a synthesized pathway into the persistent hypergraph context. |
-| 104 | `hypergraph.expand_members` | trace-mcp | 94 | — | — | Returns all related edges for a given edge hash by member overlap. |
-| 105 | `hypergraph.explain_activation` | trace-mcp | 94 | — | — | Explains why a specific hypergraph edge was activated for a set of query terms. |
-| 106 | `hypergraph.get_edge` | trace-mcp | 94 | — | — | Returns full details for a specific hypergraph edge. |
-| 107 | `kb.search_pathways` | trace-mcp | 94 | — | — | Searches for previously synthesized and materialized pathways. |
-| 108 | `library.registry_lookup` | trace-mcp | 94 | — | — | Resolve a library/package identity by its canonical address (e.g. "npm:ts-morph@27.0.2", "pip:torch@2.8.0+cu128"). Retu… |
-| 109 | `research.playbook_lookup_by_language` | trace-mcp | 94 | — | — | Lookup code playbooks and examples by programming language. Searches CouchDB karpathy_wiki (stored playbooks indexed by… |
-| 110 | `runtime.sse_probe` | trace-mcp | 94 | — | — | Verifies TRACE MCP Streamable HTTP/SSE path by calling tools/list with Accept: text/event-stream. |
-| 111 | `taxonomy.path` | trace-mcp | 94 | — | — | Returns the full ontological path from a leaf node to root. |
-| 112 | `topology.search_som_neighborhood` | trace-mcp | 94 | — | — | Searches for nodes in the SOM grid neighborhood of an anchored query. |
-| 115 | `hypergraph.search` | trace-mcp | 90 | — | — | Semantic search across the hypergraph edges. |
-| 124 | `codebase:file_intel` | manifest-packets | 84 | — | postgres | Unified file intelligence: Neo4j AST metadata, IMPORTS graph edges (in+out), GPU cluster assignment, and missing-import… |
-| 125 | `codebase:graph_neighbors` | manifest-packets | 84 | — | postgres | Return immediate graph neighbors for a file: files it imports and files that import it. Useful for impact analysis and … |
-| 126 | `evidence.link_image_graph` | trace-mcp | 84 | — | neo4j | Create IMAGE_FOR edges in Neo4j from an evidence image node to CodebaseFile nodes. Normally fires automatically after s… |
-| 127 | `graph.community_for_node` | trace-mcp, manifest-packets | 84 | — | postgres | Get the GPU cluster, SOM cluster, and community membership for a node. |
-| 128 | `graph.expand_neighborhood` | trace-mcp, manifest-packets | 84 | — | postgres | Expand graph neighborhood from sourceRefs. Returns nodes/edges/sourceRefs/confidence and compatibility neighbors. |
-| 129 | `graph.index` | manifest-packets | 84 | — | postgres | Trigger graph indexing pipeline: Neo4j sync → SOM topology training → GPU graph analysis. |
-| 130 | `graph.shortest_path` | trace-mcp, manifest-packets | 84 | — | postgres | Find the shortest dependency path between two files or symbols in Neo4j. |
-| 131 | `graphrag_expand_context` | manifest-packets | 84 | — | postgres | Expand relationships and explain paths using GraphRAG (Neo4j, CouchDB). |
+| 99 | `atlas.build_taxonomy_topology_packet` | trace-mcp | 94 | — | — | Build a compact ACE packet for taxonomy/topology routing. Combines ontology path, top children, SOM 20x20 neighborhood,… |
+| 100 | `atlas.compact_context` | trace-mcp | 94 | — | — | Build a compact Atlas context packet with top chunks, sourceRefs, a compressed summary, confidence, and retrieval path. |
+| 101 | `context.prefetch_feature_context` | trace-mcp | 94 | — | — | Build a prefetch packet for the next feature edit using recent activity, directory KAG context, community graph context… |
+| 102 | `graph.materialize_pathway` | trace-mcp | 94 | — | — | Materializes a synthesized pathway into the persistent hypergraph context. |
+| 103 | `hypergraph.explain_activation` | trace-mcp | 94 | — | — | Explains why a specific hypergraph edge was activated for a set of query terms. |
+| 104 | `hypergraph.get_edge` | trace-mcp | 94 | — | — | Returns full details for a specific hypergraph edge. |
+| 105 | `kb.search_pathways` | trace-mcp | 94 | — | — | Searches for previously synthesized and materialized pathways. |
+| 106 | `library.registry_lookup` | trace-mcp | 94 | — | — | Resolve a library/package identity by its canonical address (e.g. "npm:ts-morph@27.0.2", "pip:torch@2.8.0+cu128"). Retu… |
+| 107 | `research.playbook_lookup_by_language` | trace-mcp | 94 | — | — | Lookup code playbooks and examples by programming language. Searches CouchDB karpathy_wiki (stored playbooks indexed by… |
+| 108 | `runtime.sse_probe` | trace-mcp | 94 | — | — | Verifies TRACE MCP Streamable HTTP/SSE path by calling tools/list with Accept: text/event-stream. |
+| 109 | `taxonomy.path` | trace-mcp | 94 | — | — | Returns the full ontological path from a leaf node to root. |
+| 110 | `topology.search_som_neighborhood` | trace-mcp | 94 | — | — | Searches for nodes in the SOM grid neighborhood of an anchored query. |
+| 113 | `hypergraph.search` | trace-mcp | 90 | — | — | Semantic search across the hypergraph edges. |
+| 123 | `codebase:file_intel` | manifest-packets | 84 | — | postgres | Unified file intelligence: Neo4j AST metadata, IMPORTS graph edges (in+out), GPU cluster assignment, and missing-import… |
+| 124 | `codebase:graph_neighbors` | manifest-packets | 84 | — | postgres | Return immediate graph neighbors for a file: files it imports and files that import it. Useful for impact analysis and … |
+| 125 | `evidence.link_image_graph` | trace-mcp | 84 | — | qdrant | Create IMAGE_FOR edges in Neo4j from an evidence image node to CodebaseFile nodes. Normally fires automatically after s… |
+| 126 | `graph.community_for_node` | trace-mcp, manifest-packets | 84 | — | neo4j, postgres | Get the GPU cluster, SOM cluster, and community membership for a node. |
+| 127 | `graph.expand_neighborhood` | trace-mcp, manifest-packets | 84 | — | neo4j, postgres | Expand graph neighborhood from sourceRefs. Returns nodes/edges/sourceRefs/confidence and compatibility neighbors. |
+| 128 | `graph.index` | manifest-packets | 84 | — | postgres | Trigger graph indexing pipeline: Neo4j sync → SOM topology training → GPU graph analysis. |
+| 129 | `graph.shortest_path` | trace-mcp, manifest-packets | 84 | — | neo4j, postgres | Find the shortest dependency path between two files or symbols in Neo4j. |
+| 130 | `graphrag_expand_context` | manifest-packets | 84 | — | postgres | Expand relationships and explain paths using GraphRAG (Neo4j, CouchDB). |
+| 131 | `hypergraph.expand_members` | trace-mcp | 84 | — | neo4j | Returns all related edges for a given edge hash by member overlap. |
 | 132 | `langextract:file` | manifest-packets | 84 | — | postgres | Extract structured information from a file path or URL. Supports PDF, TXT, and web pages. Uses LangExtract multi-pass p… |
 | 133 | `RetrievalService.GetTopologyContext` | manifest-packets | 84 | — | postgres | gRPC RPC RetrievalService.GetTopologyContext: TopologyRequest → TopologyResponse (declared in sveltekit-frontend/proto/… |
 | 145 | `dir_path` | manifest-packets | 80 | — | postgres |  |
@@ -233,8 +233,8 @@ Layer rerank contains 6 tools. 0 expose identity fields and 4 write surfaces. To
 
 | Rank | Tool | Source | Score | Identity | Writes To | Summary |
 |------|------|--------|-------|----------|-----------|---------|
-| 113 | `search.rerank` | trace-mcp | 92 | — | — | Reranks a list of document snippets for relevance to a query using llama-server. |
-| 114 | `turbovec.rank_chunks` | trace-mcp | 92 | — | — | Read-only RotorQuant blended rerank for sourceRefs. No writes. |
+| 111 | `search.rerank` | trace-mcp | 92 | — | — | Reranks a list of document snippets for relevance to a query using llama-server. |
+| 112 | `turbovec.rank_chunks` | trace-mcp | 92 | — | — | Read-only RotorQuant blended rerank for sourceRefs. No writes. |
 | 135 | `GpuBridgeService.AssignSom` | manifest-packets | 82 | — | postgres | gRPC RPC GpuBridgeService.AssignSom: AssignSomRequest → AssignSomResponse (declared in proto/active/gpu_bridge.proto). |
 | 136 | `GpuBridgeService.BatchCosine` | manifest-packets | 82 | — | postgres | gRPC RPC GpuBridgeService.BatchCosine: BatchCosineRequest → BatchCosineResponse (declared in proto/active/gpu_bridge.pr… |
 | 137 | `GpuBridgeService.EncodeLatent` | manifest-packets | 82 | — | postgres | gRPC RPC GpuBridgeService.EncodeLatent: EncodeLatentRequest → EncodeLatentResponse (declared in proto/active/gpu_bridge… |
@@ -246,7 +246,7 @@ Layer synthesis contains 31 tools. 1 expose identity fields and 15 write surface
 
 | Rank | Tool | Source | Score | Identity | Writes To | Summary |
 |------|------|--------|-------|----------|-----------|---------|
-| 118 | `atlas.populate_feature_documents` | trace-mcp | 88 | feature_id | — | Generate or refresh the feature-scoped docs bundle for Parent Atlas. Builds docs/features note content, writes docs/<fe… |
+| 116 | `atlas.populate_feature_documents` | trace-mcp | 88 | feature_id | — | Generate or refresh the feature-scoped docs bundle for Parent Atlas. Builds docs/features note content, writes docs/<fe… |
 | 138 | `legal.build_timeline` | trace-mcp | 82 | — | — | Extract a chronological timeline of events from all evidence associated with a case using Gemma4 NER. Returns TimelineE… |
 | 139 | `legal.cross_examine` | trace-mcp | 82 | — | — | Generate strategic cross-examination questions for a witness using Gemma4. Analyzes the witness statement and case cont… |
 | 140 | `legal.issue_spotter` | trace-mcp | 82 | — | — | Gemma4 legal issue analysis: identifies legal issues, applicable statutes, strengths, weaknesses, missing evidence, and… |
@@ -264,23 +264,23 @@ Layer synthesis contains 31 tools. 1 expose identity fields and 15 write surface
 | 169 | `kb.archive_synthesis` | trace-mcp | 76 | — | — | Archive a synthesis artifact. |
 | 195 | `codeintel.ace.context` | manifest-packets | 72 | — | postgres | Assemble a normalized ACE CodeIntel context bundle from cluster summaries, chunk metadata, and health stats. Returns st… |
 | 196 | `codeintel.fix_recommend` | manifest-packets | 72 | — | postgres | Given a TypeScript/SvelteKit compiler error or runtime exception, retrieves semantically similar codebase chunks from t… |
-| 199 | `face:identify` | manifest-packets | 72 | — | postgres | Multi-pass GRPO face matching for a reference POI using gemma4 VLM. |
-| 201 | `langextract:legal` | manifest-packets | 72 | — | postgres | Extract structured legal entities from text using Google LangExtract + gemma4-rotorquant:latest. Returns parties (plain… |
-| 202 | `ace.wiki` | manifest-packets | 70 | — | postgres | Generate a structured wiki-style article about a query from ACE codebase context. |
-| 203 | `atlas.cross_store_proof` | manifest-packets | 70 | — | postgres | Generate a gate-ready proof report for ATLAS_CROSS_STORE_IDENTITY_PROVEN validation. |
-| 204 | `cluster.summary.get` | manifest-packets | 70 | — | postgres | Fetch the LLM-generated summary for a GPU cluster (purpose, patterns, warnings, tags). |
-| 205 | `clusters.get_summary_lenses` | trace-mcp, manifest-packets | 70 | — | postgres | Get the LLMS.md wiki summary and KAG notes for a cluster. Fastest way to understand what a cluster does. |
-| 206 | `codebase:explain_cluster` | manifest-packets | 70 | — | postgres | Return a VLM-synthesised narrative for a GPU k-means cluster in the codebase index. |
-| 207 | `CodeIntelService.SummarizeCluster` | manifest-packets | 70 | — | postgres | gRPC RPC CodeIntelService.SummarizeCluster: SummarizeClusterRequest → SummarizeClusterResponse (declared in proto/activ… |
-| 208 | `EnrichmentService.SummarizeCluster` | manifest-packets | 70 | — | postgres | gRPC RPC EnrichmentService.SummarizeCluster: ClusterSummaryRequest → ClusterSummaryResponse (declared in proto/active/c… |
-| 209 | `llm_synthesis.log_event` | manifest-packets | 70 | — | postgres | Durably log an LLM synthesis event: writes to Postgres llm_synthesis_events, |
-| 210 | `poi:face_synth` | manifest-packets | 70 | — | postgres | Generate QLoRA synthetic training data (JSONL) for POI face identity fine-tuning. |
-| 211 | `stable_diffusion_generate` | manifest-packets | 70 | — | postgres | Generate images from text prompts using Stable Diffusion (legal document visualization, crime scene reconstruction, etc… |
-| 213 | `gemma4-opencode` | manifest-packets | 66 | — | postgres |  |
+| 197 | `face:identify` | manifest-packets | 72 | — | postgres | Multi-pass GRPO face matching for a reference POI using gemma4 VLM. |
+| 199 | `langextract:legal` | manifest-packets | 72 | — | postgres | Extract structured legal entities from text using Google LangExtract + gemma4-rotorquant:latest. Returns parties (plain… |
+| 200 | `ace.wiki` | manifest-packets | 70 | — | postgres | Generate a structured wiki-style article about a query from ACE codebase context. |
+| 201 | `atlas.cross_store_proof` | manifest-packets | 70 | — | postgres | Generate a gate-ready proof report for ATLAS_CROSS_STORE_IDENTITY_PROVEN validation. |
+| 202 | `cluster.summary.get` | manifest-packets | 70 | — | postgres | Fetch the LLM-generated summary for a GPU cluster (purpose, patterns, warnings, tags). |
+| 203 | `clusters.get_summary_lenses` | trace-mcp, manifest-packets | 70 | — | postgres | Get the LLMS.md wiki summary and KAG notes for a cluster. Fastest way to understand what a cluster does. |
+| 204 | `codebase:explain_cluster` | manifest-packets | 70 | — | postgres | Return a VLM-synthesised narrative for a GPU k-means cluster in the codebase index. |
+| 205 | `CodeIntelService.SummarizeCluster` | manifest-packets | 70 | — | postgres | gRPC RPC CodeIntelService.SummarizeCluster: SummarizeClusterRequest → SummarizeClusterResponse (declared in proto/activ… |
+| 206 | `EnrichmentService.SummarizeCluster` | manifest-packets | 70 | — | postgres | gRPC RPC EnrichmentService.SummarizeCluster: ClusterSummaryRequest → ClusterSummaryResponse (declared in proto/active/c… |
+| 207 | `llm_synthesis.log_event` | manifest-packets | 70 | — | postgres | Durably log an LLM synthesis event: writes to Postgres llm_synthesis_events, |
+| 208 | `poi:face_synth` | manifest-packets | 70 | — | postgres | Generate QLoRA synthetic training data (JSONL) for POI face identity fine-tuning. |
+| 209 | `stable_diffusion_generate` | manifest-packets | 70 | — | postgres | Generate images from text prompts using Stable Diffusion (legal document visualization, crime scene reconstruction, etc… |
+| 211 | `gemma4-opencode` | manifest-packets | 66 | — | postgres |  |
 
 ## OPS
 
-Layer ops contains 12 tools. 0 expose identity fields and 2 write surfaces. Top-ranked tools: ops.search_tools, ops.audit_tool_result, ops.gpu_pipeline_stats, ops.gpu_topk, ops.inspect_tool_contract.
+Layer ops contains 12 tools. 0 expose identity fields and 5 write surfaces. Top-ranked tools: ops.search_tools, ops.audit_tool_result, ops.gpu_pipeline_stats, ops.gpu_topk, ops.inspect_tool_contract.
 
 | Rank | Tool | Source | Score | Identity | Writes To | Summary |
 |------|------|--------|-------|----------|-----------|---------|
@@ -289,29 +289,29 @@ Layer ops contains 12 tools. 0 expose identity fields and 2 write surfaces. Top-
 | 215 | `ops.gpu_pipeline_stats` | trace-mcp | 58 | — | — | Returns GPU pipeline diagnostics: active stream slots, pending queue depth, cache hit rate over last 50 ops, and device… |
 | 216 | `ops.gpu_topk` | trace-mcp | 58 | — | — | GPU top-k index selection. Returns k indices of highest-scoring candidates in descending order. Use after pipelineAtten… |
 | 217 | `ops.inspect_tool_contract` | trace-mcp | 58 | — | — | Returns the formal input contract for a named ops.* tool: required fields, types, nullability, side-effect class, and a… |
-| 218 | `ops.propose_patch` | trace-mcp | 58 | — | — | PROPOSES a patch for a file. READ-ONLY PREVIEW. Does NOT modify files. |
-| 219 | `ops.run_quality_gate` | trace-mcp | 58 | — | — | Executes a project-wide quality gate (tsc or vitest-all). |
-| 220 | `ops.run_targeted_test` | trace-mcp | 58 | — | — | Executes a single Vitest test file and returns the outcome. |
-| 221 | `ops.validate_claims` | trace-mcp | 58 | — | — | Parses proposed agent response claims and verifies each one against evidence. Detects false completion claims (claiming… |
-| 222 | `ops.validate_tool_call` | trace-mcp | 58 | — | — | Pre-flight validation for any ops.* write tool call. Checks all required arguments are non-null non-empty strings, vali… |
-| 223 | `ops.execute_graphify` | trace-mcp | 54 | — | — | Executes an authorized graphify pipeline command. |
-| 227 | `ops.record_fix_attempt` | trace-mcp | 48 | — | postgres, kanban | Records a fix attempt and its outcome to the persistent audit log. |
+| 218 | `ops.validate_claims` | trace-mcp | 58 | — | — | Parses proposed agent response claims and verifies each one against evidence. Detects false completion claims (claiming… |
+| 219 | `ops.validate_tool_call` | trace-mcp | 58 | — | — | Pre-flight validation for any ops.* write tool call. Checks all required arguments are non-null non-empty strings, vali… |
+| 220 | `ops.execute_graphify` | trace-mcp | 54 | — | — | Executes an authorized graphify pipeline command. |
+| 224 | `ops.propose_patch` | trace-mcp | 48 | — | postgres, kanban | PROPOSES a patch for a file. READ-ONLY PREVIEW. Does NOT modify files. |
+| 225 | `ops.record_fix_attempt` | trace-mcp | 48 | — | postgres, kanban | Records a fix attempt and its outcome to the persistent audit log. |
+| 226 | `ops.run_quality_gate` | trace-mcp | 48 | — | postgres | Executes a project-wide quality gate (tsc or vitest-all). |
+| 227 | `ops.run_targeted_test` | trace-mcp | 48 | — | postgres | Executes a single Vitest test file and returns the outcome. |
 
 ## READ
 
-Layer read contains 5 tools. 0 expose identity fields and 0 write surfaces. Top-ranked tools: atlas.get_chunk, db.schema_overview, db.table_inspect, file.read_window, kb.wiki_note_lookup.
+Layer read contains 5 tools. 0 expose identity fields and 2 write surfaces. Top-ranked tools: atlas.get_chunk, file.read_window, kb.wiki_note_lookup, db.schema_overview, db.table_inspect.
 
 | Rank | Tool | Source | Score | Identity | Writes To | Summary |
 |------|------|--------|-------|----------|-----------|---------|
 | 194 | `atlas.get_chunk` | trace-mcp | 72 | — | — | Return a chunk from the compact Atlas chunk index, optionally prioritizing a chunkId, chunkIndex, or sourceRef. |
-| 197 | `db.schema_overview` | trace-mcp | 72 | — | — | Lists every table in the public schema with row estimate + structural flags. |
-| 198 | `db.table_inspect` | trace-mcp | 72 | — | — | Returns columns + indexes + foreign keys for one table. No row data. |
-| 200 | `file.read_window` | trace-mcp | 72 | — | — | Reads a bounded window/range of lines from a file. Highly recommended for reading large markdown (.md) or JSON files to… |
-| 212 | `kb.wiki_note_lookup` | trace-mcp | 68 | — | — | Look up notes in the wiki. |
+| 198 | `file.read_window` | trace-mcp | 72 | — | — | Reads a bounded window/range of lines from a file. Highly recommended for reading large markdown (.md) or JSON files to… |
+| 210 | `kb.wiki_note_lookup` | trace-mcp | 68 | — | — | Look up notes in the wiki. |
+| 212 | `db.schema_overview` | trace-mcp | 62 | — | postgres | Lists every table in the public schema with row estimate + structural flags. |
+| 213 | `db.table_inspect` | trace-mcp | 62 | — | postgres | Returns columns + indexes + foreign keys for one table. No row data. |
 
 ## UNKNOWN
 
-Layer unknown contains 124 tools. 3 expose identity fields and 70 write surfaces. Top-ranked tools: trace.kag_search, clusters.get_members, topology.search_near, search.dev_context, topology.search_4d.
+Layer unknown contains 122 tools. 3 expose identity fields and 70 write surfaces. Top-ranked tools: trace.kag_search, clusters.get_members, topology.search_near, search.dev_context, topology.search_4d.
 
 | Rank | Tool | Source | Score | Identity | Writes To | Summary |
 |------|------|--------|-------|----------|-----------|---------|
@@ -324,9 +324,9 @@ Layer unknown contains 124 tools. 3 expose identity fields and 70 write surfaces
 | 89 | `clusters.kmeans_members` | trace-mcp, manifest-packets | 124 | — | postgres | List packets belonging to one or more K-means clusters (cluster IDs 0–19). Returns source refs, authority scores, and S… |
 | 90 | `topology.same_som_cluster` | trace-mcp, manifest-packets | 124 | — | postgres | Find all files sharing the same SOM cluster as the given node. Good for finding related implementations. |
 | 92 | `kb.hybrid_search` | trace-mcp, manifest-packets | 110 | — | postgres |  |
-| 224 | `atlas.feature_document_enrichment_plan` | trace-mcp | 52 | source_ref | — | Build a deterministic, non-mutating Parent Atlas feature-document enrichment plan. Validates feature-doc sources, folds… |
-| 225 | `atlas.feature_document_status` | trace-mcp | 52 | feature_id | — | Return feature-scoped document evidence readiness for Parent Atlas. Checks docs/features notes, docs/<feature_id> bundl… |
-| 226 | `atlas.materialize_feature_evidence_tuples` | trace-mcp | 52 | source_ref, packet_key | — | Read-only tuple materializer for Parent Atlas feature-document evidence. Links feature docs to canonical packet_key, so… |
+| 221 | `atlas.feature_document_enrichment_plan` | trace-mcp | 52 | source_ref | — | Build a deterministic, non-mutating Parent Atlas feature-document enrichment plan. Validates feature-doc sources, folds… |
+| 222 | `atlas.feature_document_status` | trace-mcp | 52 | feature_id | — | Return feature-scoped document evidence readiness for Parent Atlas. Checks docs/features notes, docs/<feature_id> bundl… |
+| 223 | `atlas.materialize_feature_evidence_tuples` | trace-mcp | 52 | source_ref, packet_key | — | Read-only tuple materializer for Parent Atlas feature-document evidence. Links feature docs to canonical packet_key, so… |
 | 228 | `atlas.feature_document_ingestion_plan` | trace-mcp | 44 | — | — | Return the validated ingestion plan for a feature docs bundle. Reads docs/<feature>/manifest.json, filters officialDocs… |
 | 229 | `atlas.pos_concept_tagging` | trace-mcp | 44 | — | — | Build a deterministic POS/concept tagging packet from AST, semantic, topology, ranking, citation, screenshot, and MCP t… |
 | 230 | `atlas.suggest_files` | trace-mcp | 44 | — | — | Return the top suggested files from the compact Atlas packet. |
@@ -334,111 +334,109 @@ Layer unknown contains 124 tools. 3 expose identity fields and 70 write surfaces
 | 232 | `codebase.context_for_file` | trace-mcp | 44 | — | — | Returns the full atlas context packet for a specific file. |
 | 233 | `context.explain_compression` | trace-mcp | 44 | — | — | Explains the compression logic and token budget for a specific task packet. |
 | 234 | `context.refresh_task_toc` | trace-mcp | 44 | — | — | Refreshes the Table of Contents for a specific task context. |
-| 235 | `kag.ingest_error` | trace-mcp | 44 | — | — | Fingerprints and stores a raw error text for future retrieval. |
-| 236 | `kag.ingest_memory_directory` | trace-mcp | 44 | — | — | Ingests agent run records from the memory directory into the database. |
-| 237 | `kag.panel_context` | trace-mcp | 44 | — | — | Return recently viewed files and tools from panel_activity_log for the active user session (HyperRAG L11 prefetch). Pro… |
-| 238 | `kag.record_agent_run` | trace-mcp | 44 | — | — | Records an autonomous agent run artifact to memory. |
-| 239 | `kb.organize_messy_text` | trace-mcp | 44 | — | — | Organize messy text into structured entities and sections. |
-| 240 | `kb.search_notecards` | trace-mcp | 44 | — | — | Searches for identity-spine notecards matching a query. |
-| 241 | `kb.search_summary_tree` | trace-mcp | 44 | — | — | RAPTOR-style hierarchical search across per-chunk lens, cluster narrative, and directory-card summary tiers. |
-| 242 | `kb.trace_search` | trace-mcp | 44 | — | — | Search the hypergraph/KAG context for documents, cards, and relations matching a query. |
-| 243 | `knowledge.get_minified_map` | trace-mcp | 44 | — | — | Returns a minified architectural map for a specific directory. |
-| 244 | `legal.find_precedents` | trace-mcp | 44 | — | — | Semantic + full-text search across legal precedents, case opinions, and rulings. Returns ranked results with citation, … |
-| 245 | `legal.get_transcript` | trace-mcp | 44 | — | — | Retrieve the Whisper transcript for an audio/video evidence item that has already been processed. Returns the full text… |
-| 246 | `legal.score_case` | trace-mcp | 44 | — | — | Compute an evidence-weighted case strength score (0-100) for a given case. Factors: evidence count (×10, max 40), witne… |
-| 247 | `legal.search_recordings` | trace-mcp | 44 | — | — | Timestamp-aware semantic search across Whisper audio segments. Returns matching segments with start/end times so prosec… |
-| 248 | `legal.similar_cases` | trace-mcp | 44 | — | — | Find cases similar to a given case using PostgreSQL full-text similarity on case title and description. Returns up to 2… |
-| 249 | `legal.write_obsidian_note` | trace-mcp | 44 | — | — | Write or append a markdown note to the Obsidian vault via the Local REST API plugin (requires Obsidian running at ENV.O… |
-| 250 | `library.registry_rescan` | trace-mcp | 44 | — | — | Trigger a rescan of the library registry (npm root + sveltekit-frontend + miniforge pip sidecar). Runs scripts/atlas/li… |
-| 251 | `library.registry_search` | trace-mcp | 44 | — | — | Search the library registry by name substring, source type, package manager, or workspace root. Returns bounded metadat… |
-| 252 | `miniforge.analyze` | trace-mcp | 44 | — | — | Run Miniforge CUDA-backed NLP analysis over text for entities, relationships, chunks, and features. |
-| 253 | `miniforge.extract` | trace-mcp | 44 | — | — | Run Miniforge CUDA-backed extraction over text and return normalized structure plus extracted entities. |
-| 254 | `miniforge.health` | trace-mcp | 44 | — | — | Check the local Miniforge CUDA sidecar used for NLP and analysis. |
-| 255 | `phase109a_archive_signal` | trace-mcp | 44 | — | — | Archive a semantic signal: transitions ACTIVE or SUPERSEDED to ARCHIVED state. Creates immutable audit event in semanti… |
-| 256 | `phase109a_promote_recommendation` | trace-mcp | 44 | — | — | Promote a recommendation to APPROVED status. Enforces mutual approval safeguard (approver ≠ creator). Supports dry-run … |
-| 257 | `phase109a_query_signal_history` | trace-mcp | 44 | — | — | Query the state transition history for a semantic signal. Returns all audit events in reverse chronological order. |
-| 258 | `phase109a_supersede_recommendation` | trace-mcp | 44 | — | — | Supersede a recommendation with a replacement: transitions ACTIVE lifecycle_state to SUPERSEDED. Revision-aware — rejec… |
-| 259 | `phase109a_supersede_signal` | trace-mcp | 44 | — | — | Supersede a semantic signal with a replacement: transitions ACTIVE to SUPERSEDED. Sets superseded_by link and creates a… |
-| 260 | `phase109a_validate_state_transition` | trace-mcp | 44 | — | — | Validate whether a state transition is allowed without making changes. Useful for dry-run validation. |
-| 261 | `runtime.quic_status` | trace-mcp | 44 | — | — | Reports QUIC/HTTP3 dev-lane configuration and probes the local Caddy/Vite QUIC endpoint if present. |
-| 262 | `runtime.simdjson_status` | trace-mcp | 44 | — | — | Reports SIMD/AVX2 JSON parser availability, fallback mode, cache metrics, and safe usage notes. |
-| 263 | `service_workers.result` | trace-mcp | 44 | — | — | Fetch the result of a queued local trace service worker job by job id. |
-| 264 | `service_workers.status` | trace-mcp | 44 | — | — | Return the current local trace service worker queue status and recent job summaries. |
-| 265 | `taxonomy.children` | trace-mcp | 44 | — | — | Lists children of a specific ontological node in the topology. |
-| 266 | `tools.batch_call` | trace-mcp | 44 | — | — | Executes multiple tool calls in parallel to reduce total latency. |
-| 267 | `topology.hydration_status` | trace-mcp | 44 | — | — | Returns a diagnostic overview of topological hydration coverage. |
-| 268 | `topology.recompute_manifold_plan` | trace-mcp | 44 | — | — | Provides a recommended plan for restoring topological hydration. |
-| 269 | `trace_dynamic_context` | trace-mcp | 44 | — | — | Build a bounded evidence bundle with the first trace_dynamic_context slice: static discovery plus canonical Postgres jo… |
-| 270 | `trace_search` | trace-mcp | 44 | — | — | DEPRECATED bare-name alias for kb.trace_search. Gated by MCP_LEGACY_ALIASES. |
+| 235 | `domain.classify` | trace-mcp | 44 | — | — | Classify text into the canonical domain taxonomy via the Miniforge sidecar's classify pass (sklearn NB/LR over KMeans w… |
+| 236 | `kag.ingest_error` | trace-mcp | 44 | — | — | Fingerprints and stores a raw error text for future retrieval. |
+| 237 | `kag.ingest_memory_directory` | trace-mcp | 44 | — | — | Ingests agent run records from the memory directory into the database. |
+| 238 | `kag.panel_context` | trace-mcp | 44 | — | — | Return recently viewed files and tools from panel_activity_log for the active user session (HyperRAG L11 prefetch). Pro… |
+| 239 | `kag.record_agent_run` | trace-mcp | 44 | — | — | Records an autonomous agent run artifact to memory. |
+| 240 | `kb.organize_messy_text` | trace-mcp | 44 | — | — | Organize messy text into structured entities and sections. |
+| 241 | `kb.search_notecards` | trace-mcp | 44 | — | — | Searches for identity-spine notecards matching a query. |
+| 242 | `kb.search_summary_tree` | trace-mcp | 44 | — | — | RAPTOR-style hierarchical search across per-chunk lens, cluster narrative, and directory-card summary tiers. |
+| 243 | `kb.trace_search` | trace-mcp | 44 | — | — | Search the hypergraph/KAG context for documents, cards, and relations matching a query. |
+| 244 | `knowledge.get_minified_map` | trace-mcp | 44 | — | — | Returns a minified architectural map for a specific directory. |
+| 245 | `legal.find_precedents` | trace-mcp | 44 | — | — | Semantic + full-text search across legal precedents, case opinions, and rulings. Returns ranked results with citation, … |
+| 246 | `legal.get_transcript` | trace-mcp | 44 | — | — | Retrieve the Whisper transcript for an audio/video evidence item that has already been processed. Returns the full text… |
+| 247 | `legal.score_case` | trace-mcp | 44 | — | — | Compute an evidence-weighted case strength score (0-100) for a given case. Factors: evidence count (×10, max 40), witne… |
+| 248 | `legal.search_recordings` | trace-mcp | 44 | — | — | Timestamp-aware semantic search across Whisper audio segments. Returns matching segments with start/end times so prosec… |
+| 249 | `legal.similar_cases` | trace-mcp | 44 | — | — | Find cases similar to a given case using PostgreSQL full-text similarity on case title and description. Returns up to 2… |
+| 250 | `legal.write_obsidian_note` | trace-mcp | 44 | — | — | Write or append a markdown note to the Obsidian vault via the Local REST API plugin (requires Obsidian running at ENV.O… |
+| 251 | `library.registry_rescan` | trace-mcp | 44 | — | — | Trigger a rescan of the library registry (npm root + sveltekit-frontend + miniforge pip sidecar). Runs scripts/atlas/li… |
+| 252 | `library.registry_search` | trace-mcp | 44 | — | — | Search the library registry by name substring, source type, package manager, or workspace root. Returns bounded metadat… |
+| 253 | `miniforge.analyze` | trace-mcp | 44 | — | — | Run Miniforge CUDA-backed NLP analysis over text for entities, relationships, chunks, and features. |
+| 254 | `miniforge.extract` | trace-mcp | 44 | — | — | Run Miniforge CUDA-backed extraction over text and return normalized structure plus extracted entities. |
+| 255 | `miniforge.health` | trace-mcp | 44 | — | — | Check the local Miniforge CUDA sidecar used for NLP and analysis. |
+| 256 | `phase109a_archive_signal` | trace-mcp | 44 | — | — | Archive a semantic signal: transitions ACTIVE or SUPERSEDED to ARCHIVED state. Creates immutable audit event in semanti… |
+| 257 | `phase109a_promote_recommendation` | trace-mcp | 44 | — | — | Promote a recommendation to APPROVED status. Enforces mutual approval safeguard (approver ≠ creator). Supports dry-run … |
+| 258 | `phase109a_query_signal_history` | trace-mcp | 44 | — | — | Query the state transition history for a semantic signal. Returns all audit events in reverse chronological order. |
+| 259 | `phase109a_supersede_recommendation` | trace-mcp | 44 | — | — | Supersede a recommendation with a replacement: transitions ACTIVE lifecycle_state to SUPERSEDED. Revision-aware — rejec… |
+| 260 | `phase109a_supersede_signal` | trace-mcp | 44 | — | — | Supersede a semantic signal with a replacement: transitions ACTIVE to SUPERSEDED. Sets superseded_by link and creates a… |
+| 261 | `phase109a_validate_state_transition` | trace-mcp | 44 | — | — | Validate whether a state transition is allowed without making changes. Useful for dry-run validation. |
+| 262 | `runtime.quic_status` | trace-mcp | 44 | — | — | Reports QUIC/HTTP3 dev-lane configuration and probes the local Caddy/Vite QUIC endpoint if present. |
+| 263 | `runtime.simdjson_status` | trace-mcp | 44 | — | — | Reports SIMD/AVX2 JSON parser availability, fallback mode, cache metrics, and safe usage notes. |
+| 264 | `service_workers.result` | trace-mcp | 44 | — | — | Fetch the result of a queued local trace service worker job by job id. |
+| 265 | `service_workers.status` | trace-mcp | 44 | — | — | Return the current local trace service worker queue status and recent job summaries. |
+| 266 | `taxonomy.children` | trace-mcp | 44 | — | — | Lists children of a specific ontological node in the topology. |
+| 267 | `tools.batch_call` | trace-mcp | 44 | — | — | Executes multiple tool calls in parallel to reduce total latency. |
+| 268 | `topology.hydration_status` | trace-mcp | 44 | — | — | Returns a diagnostic overview of topological hydration coverage. |
+| 269 | `topology.recompute_manifold_plan` | trace-mcp | 44 | — | — | Provides a recommended plan for restoring topological hydration. |
+| 270 | `trace_dynamic_context` | trace-mcp | 44 | — | — | Build a bounded evidence bundle with the first trace_dynamic_context slice: static discovery plus canonical Postgres jo… |
 | 271 | `trace.system_health` | trace-mcp | 44 | — | — | Returns the health and latency status of all backend retrieval and inference services. |
 | 272 | `trace.validate_ace_hit` | trace-mcp | 44 | — | — | Validates a retrieved chunk against the ACE cache and graph contracts. |
 | 273 | `ui.analyze_view` | trace-mcp | 44 | — | — | Analyzes the current UI state based on a provided snapshot. |
-| 274 | `wiki_note_lookup` | trace-mcp | 44 | — | — | DEPRECATED bare-name alias for kb.wiki_note_lookup. Gated by MCP_LEGACY_ALIASES. |
-| 275 | `admin.log_event` | trace-mcp | 40 | — | — | Logs a manual administrative event with context. |
-| 276 | `kb.extract_citations` | trace-mcp | 40 | — | — | Extract legal citations and statutes from text. |
-| 277 | `skills.list` | trace-mcp | 40 | — | — | Filter skills by name or description. |
-| 278 | `skills.run_mission` | trace-mcp | 40 | — | — | Execute a specialized autonomous skill mission. |
-| 279 | `analytics:mapreduce_matrix` | manifest-packets | 34 | — | postgres | Execute MapReduce matrix analysis across RAG/KAG/DAG/ACE pipelines. |
-| 280 | `ast:cross_language` | manifest-packets | 34 | — | postgres | Synthesize cross-language equivalents for a TypeScript/JS function. |
-| 281 | `cases:create` | manifest-packets | 34 | — | postgres | Create a new legal case. Returns the created case with ID. |
-| 282 | `cases:delete` | manifest-packets | 34 | — | postgres | Delete a case and all associated data. Use with caution. |
-| 283 | `ChatAssistantService.CreateSession` | manifest-packets | 34 | — | postgres | gRPC RPC ChatAssistantService.CreateSession: CreateSessionRequest → SessionInfo (declared in proto/active/chat_assistan… |
-| 284 | `ChatAssistantService.GetHistory` | manifest-packets | 34 | — | postgres | gRPC RPC ChatAssistantService.GetHistory: HistoryRequest → HistoryResponse (declared in proto/active/chat_assistant.pro… |
-| 285 | `ChatAssistantService.Health` | manifest-packets | 34 | — | postgres | gRPC RPC ChatAssistantService.Health: ChatHealthRequest → ChatHealthResponse (declared in proto/active/chat_assistant.p… |
-| 286 | `ChatAssistantService.RAGQuery` | manifest-packets | 34 | — | postgres | gRPC RPC ChatAssistantService.RAGQuery: RAGQueryRequest → RAGQueryResponse (declared in proto/active/chat_assistant.pro… |
-| 287 | `ChatAssistantService.SendMessage` | manifest-packets | 34 | — | postgres | gRPC RPC ChatAssistantService.SendMessage: ChatRequest → ChatResponse (declared in proto/active/chat_assistant.proto). |
-| 288 | `ChatAssistantService.StreamMessage` | manifest-packets | 34 | — | postgres | gRPC RPC ChatAssistantService.StreamMessage: ChatRequest → ChatToken (declared in proto/active/chat_assistant.proto). |
-| 289 | `Chr97Agent.GetCartridge` | manifest-packets | 34 | — | postgres | gRPC RPC Chr97Agent.GetCartridge: GetCartridgeRequest → GetCartridgeResponse (declared in proto/active/chr97_agent.prot… |
-| 290 | `Chr97Agent.GetTimeline` | manifest-packets | 34 | — | postgres | gRPC RPC Chr97Agent.GetTimeline: TimelineRequest → TimelineResponse (declared in proto/active/chr97_agent.proto). |
-| 291 | `Chr97Agent.QueryTags` | manifest-packets | 34 | — | postgres | gRPC RPC Chr97Agent.QueryTags: TagQueryRequest → TagQueryResponse (declared in proto/active/chr97_agent.proto). |
-| 292 | `citations:add_to_case` | manifest-packets | 34 | — | postgres | Add a legal citation to a case. Stores citation text, source, and page reference. |
-| 293 | `codebase:get_buffer` | manifest-packets | 34 | — | postgres | Retrieve a pre-assembled context buffer containing high-token codebase insights (e.g. architecture overview). |
-| 294 | `codeintel.health` | manifest-packets | 34 | — | postgres | Check CodeIntel pipeline health (cluster_summaries + chunk index + gRPC reachability). |
-| 295 | `CodeIntelService.GetClusterSummary` | manifest-packets | 34 | — | postgres | gRPC RPC CodeIntelService.GetClusterSummary: GetClusterSummaryRequest → ClusterSummary (declared in proto/active/codein… |
-| 296 | `CodeIntelService.GetJobStatus` | manifest-packets | 34 | — | postgres | gRPC RPC CodeIntelService.GetJobStatus: GetJobStatusRequest → JobStatus (declared in proto/active/codeintel.proto). |
-| 297 | `CodeIntelService.ListClusterSummaries` | manifest-packets | 34 | — | postgres | gRPC RPC CodeIntelService.ListClusterSummaries: ListClusterSummariesRequest → ListClusterSummariesResponse (declared in… |
-| 298 | `context.build_kv_packet` | trace-mcp, manifest-packets | 34 | — | postgres | Build a compressed KV context packet for a set of hot files. Returns an attention TOC + file card summaries. Use when y… |
-| 299 | `context.get_compressed_card` | trace-mcp, manifest-packets | 34 | — | postgres | Fetch a compressed HCA card for a file or trace. Returns a 128-token summary: one-line description, key symbols, risks.… |
-| 300 | `EnrichmentService.BatchEnrich` | manifest-packets | 34 | — | postgres | gRPC RPC EnrichmentService.BatchEnrich: BatchEnrichRequest → BatchEnrichResponse (declared in proto/active/codeintel_en… |
-| 301 | `evidence:detect_objects` | manifest-packets | 34 | — | postgres | Detect objects in image evidence using the installed YOLO ONNX model. The live repo currently uses a restored yolov8n C… |
-| 302 | `evidence:transcribe_gpu` | manifest-packets | 34 | — | postgres | GPU-accelerated audio/video transcription using Whisper. Faster than browser WASM for long recordings (>10s). Returns f… |
-| 303 | `facial_analysis` | manifest-packets | 34 | — | postgres | Detect and analyze faces in images or video frames (witness identification, security footage analysis) |
-| 304 | `hmm_infer_repair_states` | manifest-packets | 34 | — | postgres | Infer missing implementation states and repair order using HMM. |
-| 305 | `langextract_extract_error_facts` | manifest-packets | 34 | — | postgres | Extract structured error, feature, and docs facts from messy text. |
-| 306 | `langextract:evidence` | manifest-packets | 34 | — | postgres | Extract forensic/evidentiary entities from text: persons (witnesses, suspects), locations, phone numbers, emails, docum… |
-| 307 | `reports:create` | manifest-packets | 34 | — | postgres | Create a new blank report for a case. Returns report ID and metadata. |
-| 308 | `reports:delete` | manifest-packets | 34 | — | postgres | Delete a report. Audit log entry will be created for legal compliance. |
-| 309 | `reports:export` | manifest-packets | 34 | — | postgres | Export a report to PDF, DOCX, or HTML format. Returns download URL. |
-| 310 | `reports:list` | manifest-packets | 34 | — | postgres | List reports with optional case filtering. Returns report metadata including title, status, creation date. |
-| 311 | `sveltekit_import_boundary_check` | manifest-packets | 34 | — | postgres | Check SvelteKit import boundaries (e.g., $lib/server leaked to client). |
-| 312 | `sveltekit_route_audit` | manifest-packets | 34 | — | postgres | Audit a SvelteKit 2 route for existence, Zod schema, and auth guards. |
-| 313 | `ToolCallingService.ExecuteTool` | manifest-packets | 34 | — | postgres | gRPC RPC ToolCallingService.ExecuteTool: ToolCallRequest → ToolCallResponse (declared in proto/active/tool_calling.prot… |
-| 314 | `ToolCallingService.ExecuteToolBatch` | manifest-packets | 34 | — | postgres | gRPC RPC ToolCallingService.ExecuteToolBatch: ToolCallBatchRequest → ToolCallBatchResponse (declared in proto/active/to… |
-| 315 | `ToolCallingService.ExecuteToolStream` | manifest-packets | 34 | — | postgres | gRPC RPC ToolCallingService.ExecuteToolStream: ToolCallRequest → ToolCallEvent (declared in proto/active/tool_calling.p… |
-| 316 | `ToolCallingService.ListTools` | manifest-packets | 34 | — | postgres | gRPC RPC ToolCallingService.ListTools: ListToolsRequest → ListToolsResponse (declared in proto/active/tool_calling.prot… |
-| 317 | `ToolRouter.CallTool` | manifest-packets | 34 | — | postgres | gRPC RPC ToolRouter.CallTool: CallToolRequest → CallToolResponse (declared in sveltekit-frontend/proto/active/tool_rout… |
-| 318 | `ToolRouter.CallToolBatch` | manifest-packets | 34 | — | postgres | gRPC RPC ToolRouter.CallToolBatch: CallToolBatchRequest → CallToolBatchResponse (declared in sveltekit-frontend/proto/a… |
-| 319 | `ToolRouter.CallToolStream` | manifest-packets | 34 | — | postgres | gRPC RPC ToolRouter.CallToolStream: CallToolRequest → CallToolEvent (declared in sveltekit-frontend/proto/active/tool_r… |
-| 320 | `ToolRouter.ListTools` | manifest-packets | 34 | — | postgres | gRPC RPC ToolRouter.ListTools: ListToolsRequest → ListToolsResponse (declared in sveltekit-frontend/proto/active/tool_r… |
-| 321 | `toposort_repair_plan` | manifest-packets | 34 | — | postgres | Topological sort to order the repair plan based on HMM states. |
-| 322 | `transcribe_audio` | manifest-packets | 34 | — | postgres | Transcribe audio evidence files (WAV, MP3, M4A) using Docling ASR. Returns transcript text with word count and duration. |
-| 323 | `video_to_frames` | manifest-packets | 34 | — | postgres | Extract frames from video evidence (depositions, surveillance, courtroom recordings) for analysis |
-| 324 | `vlm:switch_mode` | manifest-packets | 34 | — | postgres | Switch the VLM inference mode between TEXT (TurboQuant) and VISION (Ollama VLM). Use this to prevent VRAM OOM on 8GB ca… |
-| 325 | `cases:load` | manifest-packets | 30 | — | postgres | Load legal cases with optional filtering |
-| 326 | `cases:update` | manifest-packets | 30 | — | postgres | Update an existing case |
-| 327 | `citations:list_by_case` | manifest-packets | 30 | — | postgres | List all citations linked to a specific case. |
-| 328 | `content` | manifest-packets | 30 | — | postgres |  |
-| 329 | `context_lines` | manifest-packets | 30 | — | postgres |  |
-| 330 | `issue` | manifest-packets | 30 | — | postgres |  |
-| 331 | `notes` | manifest-packets | 30 | — | postgres |  |
-| 332 | `operator_token` | manifest-packets | 30 | — | postgres |  |
-| 333 | `outcome` | manifest-packets | 30 | — | postgres |  |
-| 334 | `playwright:browser_action` | manifest-packets | 30 | — | postgres | Execute a browser action using Playwright |
-| 335 | `postgres` | manifest-packets | 30 | — | postgres |  |
-| 336 | `rag:index_page` | manifest-packets | 30 | — | postgres | Index a web page for RAG knowledge |
-| 337 | `reports:update` | manifest-packets | 30 | — | postgres | Update an existing report |
-| 338 | `section` | manifest-packets | 30 | — | postgres |  |
-| 339 | `unknown` | manifest-packets | 30 | — | postgres |  |
+| 274 | `kb.extract_citations` | trace-mcp | 40 | — | — | Extract legal citations and statutes from text. |
+| 275 | `skills.list` | trace-mcp | 40 | — | — | Filter skills by name or description. |
+| 276 | `skills.run_mission` | trace-mcp | 40 | — | — | Execute a specialized autonomous skill mission. |
+| 277 | `analytics:mapreduce_matrix` | manifest-packets | 34 | — | postgres | Execute MapReduce matrix analysis across RAG/KAG/DAG/ACE pipelines. |
+| 278 | `ast:cross_language` | manifest-packets | 34 | — | postgres | Synthesize cross-language equivalents for a TypeScript/JS function. |
+| 279 | `cases:create` | manifest-packets | 34 | — | postgres | Create a new legal case. Returns the created case with ID. |
+| 280 | `cases:delete` | manifest-packets | 34 | — | postgres | Delete a case and all associated data. Use with caution. |
+| 281 | `ChatAssistantService.CreateSession` | manifest-packets | 34 | — | postgres | gRPC RPC ChatAssistantService.CreateSession: CreateSessionRequest → SessionInfo (declared in proto/active/chat_assistan… |
+| 282 | `ChatAssistantService.GetHistory` | manifest-packets | 34 | — | postgres | gRPC RPC ChatAssistantService.GetHistory: HistoryRequest → HistoryResponse (declared in proto/active/chat_assistant.pro… |
+| 283 | `ChatAssistantService.Health` | manifest-packets | 34 | — | postgres | gRPC RPC ChatAssistantService.Health: ChatHealthRequest → ChatHealthResponse (declared in proto/active/chat_assistant.p… |
+| 284 | `ChatAssistantService.RAGQuery` | manifest-packets | 34 | — | postgres | gRPC RPC ChatAssistantService.RAGQuery: RAGQueryRequest → RAGQueryResponse (declared in proto/active/chat_assistant.pro… |
+| 285 | `ChatAssistantService.SendMessage` | manifest-packets | 34 | — | postgres | gRPC RPC ChatAssistantService.SendMessage: ChatRequest → ChatResponse (declared in proto/active/chat_assistant.proto). |
+| 286 | `ChatAssistantService.StreamMessage` | manifest-packets | 34 | — | postgres | gRPC RPC ChatAssistantService.StreamMessage: ChatRequest → ChatToken (declared in proto/active/chat_assistant.proto). |
+| 287 | `Chr97Agent.GetCartridge` | manifest-packets | 34 | — | postgres | gRPC RPC Chr97Agent.GetCartridge: GetCartridgeRequest → GetCartridgeResponse (declared in proto/active/chr97_agent.prot… |
+| 288 | `Chr97Agent.GetTimeline` | manifest-packets | 34 | — | postgres | gRPC RPC Chr97Agent.GetTimeline: TimelineRequest → TimelineResponse (declared in proto/active/chr97_agent.proto). |
+| 289 | `Chr97Agent.QueryTags` | manifest-packets | 34 | — | postgres | gRPC RPC Chr97Agent.QueryTags: TagQueryRequest → TagQueryResponse (declared in proto/active/chr97_agent.proto). |
+| 290 | `citations:add_to_case` | manifest-packets | 34 | — | postgres | Add a legal citation to a case. Stores citation text, source, and page reference. |
+| 291 | `codebase:get_buffer` | manifest-packets | 34 | — | postgres | Retrieve a pre-assembled context buffer containing high-token codebase insights (e.g. architecture overview). |
+| 292 | `codeintel.health` | manifest-packets | 34 | — | postgres | Check CodeIntel pipeline health (cluster_summaries + chunk index + gRPC reachability). |
+| 293 | `CodeIntelService.GetClusterSummary` | manifest-packets | 34 | — | postgres | gRPC RPC CodeIntelService.GetClusterSummary: GetClusterSummaryRequest → ClusterSummary (declared in proto/active/codein… |
+| 294 | `CodeIntelService.GetJobStatus` | manifest-packets | 34 | — | postgres | gRPC RPC CodeIntelService.GetJobStatus: GetJobStatusRequest → JobStatus (declared in proto/active/codeintel.proto). |
+| 295 | `CodeIntelService.ListClusterSummaries` | manifest-packets | 34 | — | postgres | gRPC RPC CodeIntelService.ListClusterSummaries: ListClusterSummariesRequest → ListClusterSummariesResponse (declared in… |
+| 296 | `context.build_kv_packet` | trace-mcp, manifest-packets | 34 | — | postgres | Build a compressed KV context packet for a set of hot files. Returns an attention TOC + file card summaries. Use when y… |
+| 297 | `context.get_compressed_card` | trace-mcp, manifest-packets | 34 | — | postgres | Fetch a compressed HCA card for a file or trace. Returns a 128-token summary: one-line description, key symbols, risks.… |
+| 298 | `EnrichmentService.BatchEnrich` | manifest-packets | 34 | — | postgres | gRPC RPC EnrichmentService.BatchEnrich: BatchEnrichRequest → BatchEnrichResponse (declared in proto/active/codeintel_en… |
+| 299 | `evidence:detect_objects` | manifest-packets | 34 | — | postgres | Detect objects in image evidence using the installed YOLO ONNX model. The live repo currently uses a restored yolov8n C… |
+| 300 | `evidence:transcribe_gpu` | manifest-packets | 34 | — | postgres | GPU-accelerated audio/video transcription using Whisper. Faster than browser WASM for long recordings (>10s). Returns f… |
+| 301 | `facial_analysis` | manifest-packets | 34 | — | postgres | Detect and analyze faces in images or video frames (witness identification, security footage analysis) |
+| 302 | `hmm_infer_repair_states` | manifest-packets | 34 | — | postgres | Infer missing implementation states and repair order using HMM. |
+| 303 | `langextract_extract_error_facts` | manifest-packets | 34 | — | postgres | Extract structured error, feature, and docs facts from messy text. |
+| 304 | `langextract:evidence` | manifest-packets | 34 | — | postgres | Extract forensic/evidentiary entities from text: persons (witnesses, suspects), locations, phone numbers, emails, docum… |
+| 305 | `reports:create` | manifest-packets | 34 | — | postgres | Create a new blank report for a case. Returns report ID and metadata. |
+| 306 | `reports:delete` | manifest-packets | 34 | — | postgres | Delete a report. Audit log entry will be created for legal compliance. |
+| 307 | `reports:export` | manifest-packets | 34 | — | postgres | Export a report to PDF, DOCX, or HTML format. Returns download URL. |
+| 308 | `reports:list` | manifest-packets | 34 | — | postgres | List reports with optional case filtering. Returns report metadata including title, status, creation date. |
+| 309 | `sveltekit_import_boundary_check` | manifest-packets | 34 | — | postgres | Check SvelteKit import boundaries (e.g., $lib/server leaked to client). |
+| 310 | `sveltekit_route_audit` | manifest-packets | 34 | — | postgres | Audit a SvelteKit 2 route for existence, Zod schema, and auth guards. |
+| 311 | `ToolCallingService.ExecuteTool` | manifest-packets | 34 | — | postgres | gRPC RPC ToolCallingService.ExecuteTool: ToolCallRequest → ToolCallResponse (declared in proto/active/tool_calling.prot… |
+| 312 | `ToolCallingService.ExecuteToolBatch` | manifest-packets | 34 | — | postgres | gRPC RPC ToolCallingService.ExecuteToolBatch: ToolCallBatchRequest → ToolCallBatchResponse (declared in proto/active/to… |
+| 313 | `ToolCallingService.ExecuteToolStream` | manifest-packets | 34 | — | postgres | gRPC RPC ToolCallingService.ExecuteToolStream: ToolCallRequest → ToolCallEvent (declared in proto/active/tool_calling.p… |
+| 314 | `ToolCallingService.ListTools` | manifest-packets | 34 | — | postgres | gRPC RPC ToolCallingService.ListTools: ListToolsRequest → ListToolsResponse (declared in proto/active/tool_calling.prot… |
+| 315 | `ToolRouter.CallTool` | manifest-packets | 34 | — | postgres | gRPC RPC ToolRouter.CallTool: CallToolRequest → CallToolResponse (declared in sveltekit-frontend/proto/active/tool_rout… |
+| 316 | `ToolRouter.CallToolBatch` | manifest-packets | 34 | — | postgres | gRPC RPC ToolRouter.CallToolBatch: CallToolBatchRequest → CallToolBatchResponse (declared in sveltekit-frontend/proto/a… |
+| 317 | `ToolRouter.CallToolStream` | manifest-packets | 34 | — | postgres | gRPC RPC ToolRouter.CallToolStream: CallToolRequest → CallToolEvent (declared in sveltekit-frontend/proto/active/tool_r… |
+| 318 | `ToolRouter.ListTools` | manifest-packets | 34 | — | postgres | gRPC RPC ToolRouter.ListTools: ListToolsRequest → ListToolsResponse (declared in sveltekit-frontend/proto/active/tool_r… |
+| 319 | `toposort_repair_plan` | manifest-packets | 34 | — | postgres | Topological sort to order the repair plan based on HMM states. |
+| 320 | `transcribe_audio` | manifest-packets | 34 | — | postgres | Transcribe audio evidence files (WAV, MP3, M4A) using Docling ASR. Returns transcript text with word count and duration. |
+| 321 | `video_to_frames` | manifest-packets | 34 | — | postgres | Extract frames from video evidence (depositions, surveillance, courtroom recordings) for analysis |
+| 322 | `vlm:switch_mode` | manifest-packets | 34 | — | postgres | Switch the VLM inference mode between TEXT (TurboQuant) and VISION (Ollama VLM). Use this to prevent VRAM OOM on 8GB ca… |
+| 323 | `cases:load` | manifest-packets | 30 | — | postgres | Load legal cases with optional filtering |
+| 324 | `cases:update` | manifest-packets | 30 | — | postgres | Update an existing case |
+| 325 | `citations:list_by_case` | manifest-packets | 30 | — | postgres | List all citations linked to a specific case. |
+| 326 | `content` | manifest-packets | 30 | — | postgres |  |
+| 327 | `context_lines` | manifest-packets | 30 | — | postgres |  |
+| 328 | `issue` | manifest-packets | 30 | — | postgres |  |
+| 329 | `notes` | manifest-packets | 30 | — | postgres |  |
+| 330 | `operator_token` | manifest-packets | 30 | — | postgres |  |
+| 331 | `outcome` | manifest-packets | 30 | — | postgres |  |
+| 332 | `playwright:browser_action` | manifest-packets | 30 | — | postgres | Execute a browser action using Playwright |
+| 333 | `postgres` | manifest-packets | 30 | — | postgres |  |
+| 334 | `rag:index_page` | manifest-packets | 30 | — | postgres | Index a web page for RAG knowledge |
+| 335 | `reports:update` | manifest-packets | 30 | — | postgres | Update an existing report |
+| 336 | `section` | manifest-packets | 30 | — | postgres |  |
+| 337 | `unknown` | manifest-packets | 30 | — | postgres |  |
 
 ## All Tools Ranked
 
@@ -542,39 +540,39 @@ Layer unknown contains 124 tools. 3 expose identity fields and 70 write surfaces
 | 96 | `engram.chat_memory_recent` | memory | trace-mcp | read_only | 99 |
 | 97 | `atlas_get_active_context` | cache | trace-mcp | read_only | 96 |
 | 98 | `context.build_ace_packet` | cache | trace-mcp | read_only | 96 |
-| 99 | `engram.redis_health` | cache | trace-mcp | read_only | 96 |
-| 100 | `atlas.build_taxonomy_topology_packet` | graph | trace-mcp | read_only | 94 |
-| 101 | `atlas.compact_context` | graph | trace-mcp | read_only | 94 |
-| 102 | `context.prefetch_feature_context` | graph | trace-mcp | read_only | 94 |
-| 103 | `graph.materialize_pathway` | graph | trace-mcp | read_only | 94 |
-| 104 | `hypergraph.expand_members` | graph | trace-mcp | read_only | 94 |
-| 105 | `hypergraph.explain_activation` | graph | trace-mcp | read_only | 94 |
-| 106 | `hypergraph.get_edge` | graph | trace-mcp | read_only | 94 |
-| 107 | `kb.search_pathways` | graph | trace-mcp | read_only | 94 |
-| 108 | `library.registry_lookup` | graph | trace-mcp | read_only | 94 |
-| 109 | `research.playbook_lookup_by_language` | graph | trace-mcp | read_only | 94 |
-| 110 | `runtime.sse_probe` | graph | trace-mcp | read_only | 94 |
-| 111 | `taxonomy.path` | graph | trace-mcp | read_only | 94 |
-| 112 | `topology.search_som_neighborhood` | graph | trace-mcp | read_only | 94 |
-| 113 | `search.rerank` | rerank | trace-mcp | read_only | 92 |
-| 114 | `turbovec.rank_chunks` | rerank | trace-mcp | read_only | 92 |
-| 115 | `hypergraph.search` | graph | trace-mcp | read_only | 90 |
-| 116 | `atlas.embedding_all_tags` | dense | trace-mcp | read_only | 88 |
-| 117 | `atlas.embedding_neighbors` | dense | trace-mcp | read_only | 88 |
-| 118 | `atlas.populate_feature_documents` | synthesis | trace-mcp | read_only | 88 |
-| 119 | `evidence.search_by_image` | dense | trace-mcp | read_only | 88 |
-| 120 | `legal.batch_ingest` | dense | trace-mcp | read_only | 88 |
-| 121 | `legal.cross_reference_evidence` | dense | trace-mcp | read_only | 88 |
-| 122 | `topology.language_distribution` | dense | trace-mcp | read_only | 88 |
-| 123 | `inference:route` | cache | manifest-packets | read_only | 86 |
-| 124 | `codebase:file_intel` | graph | manifest-packets | read_only | 84 |
-| 125 | `codebase:graph_neighbors` | graph | manifest-packets | read_only | 84 |
-| 126 | `evidence.link_image_graph` | graph | trace-mcp | read_write | 84 |
-| 127 | `graph.community_for_node` | graph | trace-mcp, manifest-packets | read_only | 84 |
-| 128 | `graph.expand_neighborhood` | graph | trace-mcp, manifest-packets | read_only | 84 |
-| 129 | `graph.index` | graph | manifest-packets | read_only | 84 |
-| 130 | `graph.shortest_path` | graph | trace-mcp, manifest-packets | read_only | 84 |
-| 131 | `graphrag_expand_context` | graph | manifest-packets | read_only | 84 |
+| 99 | `atlas.build_taxonomy_topology_packet` | graph | trace-mcp | read_only | 94 |
+| 100 | `atlas.compact_context` | graph | trace-mcp | read_only | 94 |
+| 101 | `context.prefetch_feature_context` | graph | trace-mcp | read_only | 94 |
+| 102 | `graph.materialize_pathway` | graph | trace-mcp | read_only | 94 |
+| 103 | `hypergraph.explain_activation` | graph | trace-mcp | read_only | 94 |
+| 104 | `hypergraph.get_edge` | graph | trace-mcp | read_only | 94 |
+| 105 | `kb.search_pathways` | graph | trace-mcp | read_only | 94 |
+| 106 | `library.registry_lookup` | graph | trace-mcp | read_only | 94 |
+| 107 | `research.playbook_lookup_by_language` | graph | trace-mcp | read_only | 94 |
+| 108 | `runtime.sse_probe` | graph | trace-mcp | read_only | 94 |
+| 109 | `taxonomy.path` | graph | trace-mcp | read_only | 94 |
+| 110 | `topology.search_som_neighborhood` | graph | trace-mcp | read_only | 94 |
+| 111 | `search.rerank` | rerank | trace-mcp | read_only | 92 |
+| 112 | `turbovec.rank_chunks` | rerank | trace-mcp | read_only | 92 |
+| 113 | `hypergraph.search` | graph | trace-mcp | read_only | 90 |
+| 114 | `atlas.embedding_all_tags` | dense | trace-mcp | read_only | 88 |
+| 115 | `atlas.embedding_neighbors` | dense | trace-mcp | read_only | 88 |
+| 116 | `atlas.populate_feature_documents` | synthesis | trace-mcp | read_only | 88 |
+| 117 | `evidence.search_by_image` | dense | trace-mcp | read_only | 88 |
+| 118 | `legal.batch_ingest` | dense | trace-mcp | read_only | 88 |
+| 119 | `legal.cross_reference_evidence` | dense | trace-mcp | read_only | 88 |
+| 120 | `topology.language_distribution` | dense | trace-mcp | read_only | 88 |
+| 121 | `engram.redis_health` | cache | trace-mcp | read_write | 86 |
+| 122 | `inference:route` | cache | manifest-packets | read_only | 86 |
+| 123 | `codebase:file_intel` | graph | manifest-packets | read_only | 84 |
+| 124 | `codebase:graph_neighbors` | graph | manifest-packets | read_only | 84 |
+| 125 | `evidence.link_image_graph` | graph | trace-mcp | read_write | 84 |
+| 126 | `graph.community_for_node` | graph | trace-mcp, manifest-packets | read_only | 84 |
+| 127 | `graph.expand_neighborhood` | graph | trace-mcp, manifest-packets | read_only | 84 |
+| 128 | `graph.index` | graph | manifest-packets | read_only | 84 |
+| 129 | `graph.shortest_path` | graph | trace-mcp, manifest-packets | read_only | 84 |
+| 130 | `graphrag_expand_context` | graph | manifest-packets | read_only | 84 |
+| 131 | `hypergraph.expand_members` | graph | trace-mcp | read_write | 84 |
 | 132 | `langextract:file` | graph | manifest-packets | read_only | 84 |
 | 133 | `RetrievalService.GetTopologyContext` | graph | manifest-packets | read_write | 84 |
 | 134 | `search.hybrid` | lexical | trace-mcp | read_only | 84 |
@@ -640,37 +638,37 @@ Layer unknown contains 124 tools. 3 expose identity fields and 70 write surfaces
 | 194 | `atlas.get_chunk` | read | trace-mcp | read_only | 72 |
 | 195 | `codeintel.ace.context` | synthesis | manifest-packets | read_only | 72 |
 | 196 | `codeintel.fix_recommend` | synthesis | manifest-packets | read_only | 72 |
-| 197 | `db.schema_overview` | read | trace-mcp | read_only | 72 |
-| 198 | `db.table_inspect` | read | trace-mcp | read_only | 72 |
-| 199 | `face:identify` | synthesis | manifest-packets | read_only | 72 |
-| 200 | `file.read_window` | read | trace-mcp | read_only | 72 |
-| 201 | `langextract:legal` | synthesis | manifest-packets | read_only | 72 |
-| 202 | `ace.wiki` | synthesis | manifest-packets | read_only | 70 |
-| 203 | `atlas.cross_store_proof` | synthesis | manifest-packets | read_only | 70 |
-| 204 | `cluster.summary.get` | synthesis | manifest-packets | read_only | 70 |
-| 205 | `clusters.get_summary_lenses` | synthesis | trace-mcp, manifest-packets | read_only | 70 |
-| 206 | `codebase:explain_cluster` | synthesis | manifest-packets | read_only | 70 |
-| 207 | `CodeIntelService.SummarizeCluster` | synthesis | manifest-packets | read_write | 70 |
-| 208 | `EnrichmentService.SummarizeCluster` | synthesis | manifest-packets | read_write | 70 |
-| 209 | `llm_synthesis.log_event` | synthesis | manifest-packets | read_only | 70 |
-| 210 | `poi:face_synth` | synthesis | manifest-packets | read_only | 70 |
-| 211 | `stable_diffusion_generate` | synthesis | manifest-packets | read_only | 70 |
-| 212 | `kb.wiki_note_lookup` | read | trace-mcp | read_only | 68 |
-| 213 | `gemma4-opencode` | synthesis | manifest-packets | read_only | 66 |
+| 197 | `face:identify` | synthesis | manifest-packets | read_only | 72 |
+| 198 | `file.read_window` | read | trace-mcp | read_only | 72 |
+| 199 | `langextract:legal` | synthesis | manifest-packets | read_only | 72 |
+| 200 | `ace.wiki` | synthesis | manifest-packets | read_only | 70 |
+| 201 | `atlas.cross_store_proof` | synthesis | manifest-packets | read_only | 70 |
+| 202 | `cluster.summary.get` | synthesis | manifest-packets | read_only | 70 |
+| 203 | `clusters.get_summary_lenses` | synthesis | trace-mcp, manifest-packets | read_only | 70 |
+| 204 | `codebase:explain_cluster` | synthesis | manifest-packets | read_only | 70 |
+| 205 | `CodeIntelService.SummarizeCluster` | synthesis | manifest-packets | read_write | 70 |
+| 206 | `EnrichmentService.SummarizeCluster` | synthesis | manifest-packets | read_write | 70 |
+| 207 | `llm_synthesis.log_event` | synthesis | manifest-packets | read_only | 70 |
+| 208 | `poi:face_synth` | synthesis | manifest-packets | read_only | 70 |
+| 209 | `stable_diffusion_generate` | synthesis | manifest-packets | read_only | 70 |
+| 210 | `kb.wiki_note_lookup` | read | trace-mcp | read_only | 68 |
+| 211 | `gemma4-opencode` | synthesis | manifest-packets | read_only | 66 |
+| 212 | `db.schema_overview` | read | trace-mcp | read_write | 62 |
+| 213 | `db.table_inspect` | read | trace-mcp | read_write | 62 |
 | 214 | `ops.audit_tool_result` | ops | trace-mcp | read_only | 58 |
 | 215 | `ops.gpu_pipeline_stats` | ops | trace-mcp | read_only | 58 |
 | 216 | `ops.gpu_topk` | ops | trace-mcp | read_only | 58 |
 | 217 | `ops.inspect_tool_contract` | ops | trace-mcp | read_only | 58 |
-| 218 | `ops.propose_patch` | ops | trace-mcp | read_only | 58 |
-| 219 | `ops.run_quality_gate` | ops | trace-mcp | read_only | 58 |
-| 220 | `ops.run_targeted_test` | ops | trace-mcp | read_only | 58 |
-| 221 | `ops.validate_claims` | ops | trace-mcp | read_only | 58 |
-| 222 | `ops.validate_tool_call` | ops | trace-mcp | read_only | 58 |
-| 223 | `ops.execute_graphify` | ops | trace-mcp | read_only | 54 |
-| 224 | `atlas.feature_document_enrichment_plan` | unknown | trace-mcp | read_only | 52 |
-| 225 | `atlas.feature_document_status` | unknown | trace-mcp | read_only | 52 |
-| 226 | `atlas.materialize_feature_evidence_tuples` | unknown | trace-mcp | read_only | 52 |
-| 227 | `ops.record_fix_attempt` | ops | trace-mcp | read_write | 48 |
+| 218 | `ops.validate_claims` | ops | trace-mcp | read_only | 58 |
+| 219 | `ops.validate_tool_call` | ops | trace-mcp | read_only | 58 |
+| 220 | `ops.execute_graphify` | ops | trace-mcp | read_only | 54 |
+| 221 | `atlas.feature_document_enrichment_plan` | unknown | trace-mcp | read_only | 52 |
+| 222 | `atlas.feature_document_status` | unknown | trace-mcp | read_only | 52 |
+| 223 | `atlas.materialize_feature_evidence_tuples` | unknown | trace-mcp | read_only | 52 |
+| 224 | `ops.propose_patch` | ops | trace-mcp | read_write | 48 |
+| 225 | `ops.record_fix_attempt` | ops | trace-mcp | read_write | 48 |
+| 226 | `ops.run_quality_gate` | ops | trace-mcp | read_write | 48 |
+| 227 | `ops.run_targeted_test` | ops | trace-mcp | read_write | 48 |
 | 228 | `atlas.feature_document_ingestion_plan` | unknown | trace-mcp | read_only | 44 |
 | 229 | `atlas.pos_concept_tagging` | unknown | trace-mcp | read_only | 44 |
 | 230 | `atlas.suggest_files` | unknown | trace-mcp | read_only | 44 |
@@ -678,115 +676,113 @@ Layer unknown contains 124 tools. 3 expose identity fields and 70 write surfaces
 | 232 | `codebase.context_for_file` | unknown | trace-mcp | read_only | 44 |
 | 233 | `context.explain_compression` | unknown | trace-mcp | read_only | 44 |
 | 234 | `context.refresh_task_toc` | unknown | trace-mcp | read_only | 44 |
-| 235 | `kag.ingest_error` | unknown | trace-mcp | read_only | 44 |
-| 236 | `kag.ingest_memory_directory` | unknown | trace-mcp | read_only | 44 |
-| 237 | `kag.panel_context` | unknown | trace-mcp | read_only | 44 |
-| 238 | `kag.record_agent_run` | unknown | trace-mcp | read_only | 44 |
-| 239 | `kb.organize_messy_text` | unknown | trace-mcp | read_only | 44 |
-| 240 | `kb.search_notecards` | unknown | trace-mcp | read_only | 44 |
-| 241 | `kb.search_summary_tree` | unknown | trace-mcp | read_only | 44 |
-| 242 | `kb.trace_search` | unknown | trace-mcp | read_only | 44 |
-| 243 | `knowledge.get_minified_map` | unknown | trace-mcp | read_only | 44 |
-| 244 | `legal.find_precedents` | unknown | trace-mcp | read_only | 44 |
-| 245 | `legal.get_transcript` | unknown | trace-mcp | read_only | 44 |
-| 246 | `legal.score_case` | unknown | trace-mcp | read_only | 44 |
-| 247 | `legal.search_recordings` | unknown | trace-mcp | read_only | 44 |
-| 248 | `legal.similar_cases` | unknown | trace-mcp | read_only | 44 |
-| 249 | `legal.write_obsidian_note` | unknown | trace-mcp | read_only | 44 |
-| 250 | `library.registry_rescan` | unknown | trace-mcp | read_only | 44 |
-| 251 | `library.registry_search` | unknown | trace-mcp | read_only | 44 |
-| 252 | `miniforge.analyze` | unknown | trace-mcp | read_only | 44 |
-| 253 | `miniforge.extract` | unknown | trace-mcp | read_only | 44 |
-| 254 | `miniforge.health` | unknown | trace-mcp | read_only | 44 |
-| 255 | `phase109a_archive_signal` | unknown | trace-mcp | read_only | 44 |
-| 256 | `phase109a_promote_recommendation` | unknown | trace-mcp | read_only | 44 |
-| 257 | `phase109a_query_signal_history` | unknown | trace-mcp | read_only | 44 |
-| 258 | `phase109a_supersede_recommendation` | unknown | trace-mcp | read_only | 44 |
-| 259 | `phase109a_supersede_signal` | unknown | trace-mcp | read_only | 44 |
-| 260 | `phase109a_validate_state_transition` | unknown | trace-mcp | read_only | 44 |
-| 261 | `runtime.quic_status` | unknown | trace-mcp | read_only | 44 |
-| 262 | `runtime.simdjson_status` | unknown | trace-mcp | read_only | 44 |
-| 263 | `service_workers.result` | unknown | trace-mcp | read_only | 44 |
-| 264 | `service_workers.status` | unknown | trace-mcp | read_only | 44 |
-| 265 | `taxonomy.children` | unknown | trace-mcp | read_only | 44 |
-| 266 | `tools.batch_call` | unknown | trace-mcp | read_only | 44 |
-| 267 | `topology.hydration_status` | unknown | trace-mcp | read_only | 44 |
-| 268 | `topology.recompute_manifold_plan` | unknown | trace-mcp | read_only | 44 |
-| 269 | `trace_dynamic_context` | unknown | trace-mcp | read_only | 44 |
-| 270 | `trace_search` | unknown | trace-mcp | read_only | 44 |
+| 235 | `domain.classify` | unknown | trace-mcp | read_only | 44 |
+| 236 | `kag.ingest_error` | unknown | trace-mcp | read_only | 44 |
+| 237 | `kag.ingest_memory_directory` | unknown | trace-mcp | read_only | 44 |
+| 238 | `kag.panel_context` | unknown | trace-mcp | read_only | 44 |
+| 239 | `kag.record_agent_run` | unknown | trace-mcp | read_only | 44 |
+| 240 | `kb.organize_messy_text` | unknown | trace-mcp | read_only | 44 |
+| 241 | `kb.search_notecards` | unknown | trace-mcp | read_only | 44 |
+| 242 | `kb.search_summary_tree` | unknown | trace-mcp | read_only | 44 |
+| 243 | `kb.trace_search` | unknown | trace-mcp | read_only | 44 |
+| 244 | `knowledge.get_minified_map` | unknown | trace-mcp | read_only | 44 |
+| 245 | `legal.find_precedents` | unknown | trace-mcp | read_only | 44 |
+| 246 | `legal.get_transcript` | unknown | trace-mcp | read_only | 44 |
+| 247 | `legal.score_case` | unknown | trace-mcp | read_only | 44 |
+| 248 | `legal.search_recordings` | unknown | trace-mcp | read_only | 44 |
+| 249 | `legal.similar_cases` | unknown | trace-mcp | read_only | 44 |
+| 250 | `legal.write_obsidian_note` | unknown | trace-mcp | read_only | 44 |
+| 251 | `library.registry_rescan` | unknown | trace-mcp | read_only | 44 |
+| 252 | `library.registry_search` | unknown | trace-mcp | read_only | 44 |
+| 253 | `miniforge.analyze` | unknown | trace-mcp | read_only | 44 |
+| 254 | `miniforge.extract` | unknown | trace-mcp | read_only | 44 |
+| 255 | `miniforge.health` | unknown | trace-mcp | read_only | 44 |
+| 256 | `phase109a_archive_signal` | unknown | trace-mcp | read_only | 44 |
+| 257 | `phase109a_promote_recommendation` | unknown | trace-mcp | read_only | 44 |
+| 258 | `phase109a_query_signal_history` | unknown | trace-mcp | read_only | 44 |
+| 259 | `phase109a_supersede_recommendation` | unknown | trace-mcp | read_only | 44 |
+| 260 | `phase109a_supersede_signal` | unknown | trace-mcp | read_only | 44 |
+| 261 | `phase109a_validate_state_transition` | unknown | trace-mcp | read_only | 44 |
+| 262 | `runtime.quic_status` | unknown | trace-mcp | read_only | 44 |
+| 263 | `runtime.simdjson_status` | unknown | trace-mcp | read_only | 44 |
+| 264 | `service_workers.result` | unknown | trace-mcp | read_only | 44 |
+| 265 | `service_workers.status` | unknown | trace-mcp | read_only | 44 |
+| 266 | `taxonomy.children` | unknown | trace-mcp | read_only | 44 |
+| 267 | `tools.batch_call` | unknown | trace-mcp | read_only | 44 |
+| 268 | `topology.hydration_status` | unknown | trace-mcp | read_only | 44 |
+| 269 | `topology.recompute_manifold_plan` | unknown | trace-mcp | read_only | 44 |
+| 270 | `trace_dynamic_context` | unknown | trace-mcp | read_only | 44 |
 | 271 | `trace.system_health` | unknown | trace-mcp | read_only | 44 |
 | 272 | `trace.validate_ace_hit` | unknown | trace-mcp | read_only | 44 |
 | 273 | `ui.analyze_view` | unknown | trace-mcp | read_only | 44 |
-| 274 | `wiki_note_lookup` | unknown | trace-mcp | read_only | 44 |
-| 275 | `admin.log_event` | unknown | trace-mcp | read_only | 40 |
-| 276 | `kb.extract_citations` | unknown | trace-mcp | read_only | 40 |
-| 277 | `skills.list` | unknown | trace-mcp | read_only | 40 |
-| 278 | `skills.run_mission` | unknown | trace-mcp | read_only | 40 |
-| 279 | `analytics:mapreduce_matrix` | unknown | manifest-packets | read_only | 34 |
-| 280 | `ast:cross_language` | unknown | manifest-packets | read_only | 34 |
-| 281 | `cases:create` | unknown | manifest-packets | read_only | 34 |
-| 282 | `cases:delete` | unknown | manifest-packets | read_only | 34 |
-| 283 | `ChatAssistantService.CreateSession` | unknown | manifest-packets | read_write | 34 |
-| 284 | `ChatAssistantService.GetHistory` | unknown | manifest-packets | read_write | 34 |
-| 285 | `ChatAssistantService.Health` | unknown | manifest-packets | read_write | 34 |
-| 286 | `ChatAssistantService.RAGQuery` | unknown | manifest-packets | read_write | 34 |
-| 287 | `ChatAssistantService.SendMessage` | unknown | manifest-packets | read_write | 34 |
-| 288 | `ChatAssistantService.StreamMessage` | unknown | manifest-packets | read_write | 34 |
-| 289 | `Chr97Agent.GetCartridge` | unknown | manifest-packets | read_write | 34 |
-| 290 | `Chr97Agent.GetTimeline` | unknown | manifest-packets | read_write | 34 |
-| 291 | `Chr97Agent.QueryTags` | unknown | manifest-packets | read_write | 34 |
-| 292 | `citations:add_to_case` | unknown | manifest-packets | read_only | 34 |
-| 293 | `codebase:get_buffer` | unknown | manifest-packets | read_only | 34 |
-| 294 | `codeintel.health` | unknown | manifest-packets | read_only | 34 |
-| 295 | `CodeIntelService.GetClusterSummary` | unknown | manifest-packets | read_write | 34 |
-| 296 | `CodeIntelService.GetJobStatus` | unknown | manifest-packets | read_write | 34 |
-| 297 | `CodeIntelService.ListClusterSummaries` | unknown | manifest-packets | read_write | 34 |
-| 298 | `context.build_kv_packet` | unknown | trace-mcp, manifest-packets | read_only | 34 |
-| 299 | `context.get_compressed_card` | unknown | trace-mcp, manifest-packets | read_only | 34 |
-| 300 | `EnrichmentService.BatchEnrich` | unknown | manifest-packets | read_write | 34 |
-| 301 | `evidence:detect_objects` | unknown | manifest-packets | read_only | 34 |
-| 302 | `evidence:transcribe_gpu` | unknown | manifest-packets | read_only | 34 |
-| 303 | `facial_analysis` | unknown | manifest-packets | read_only | 34 |
-| 304 | `hmm_infer_repair_states` | unknown | manifest-packets | read_only | 34 |
-| 305 | `langextract_extract_error_facts` | unknown | manifest-packets | read_only | 34 |
-| 306 | `langextract:evidence` | unknown | manifest-packets | read_only | 34 |
-| 307 | `reports:create` | unknown | manifest-packets | read_only | 34 |
-| 308 | `reports:delete` | unknown | manifest-packets | read_only | 34 |
-| 309 | `reports:export` | unknown | manifest-packets | read_only | 34 |
-| 310 | `reports:list` | unknown | manifest-packets | read_only | 34 |
-| 311 | `sveltekit_import_boundary_check` | unknown | manifest-packets | read_only | 34 |
-| 312 | `sveltekit_route_audit` | unknown | manifest-packets | read_only | 34 |
-| 313 | `ToolCallingService.ExecuteTool` | unknown | manifest-packets | read_write | 34 |
-| 314 | `ToolCallingService.ExecuteToolBatch` | unknown | manifest-packets | read_write | 34 |
-| 315 | `ToolCallingService.ExecuteToolStream` | unknown | manifest-packets | read_write | 34 |
-| 316 | `ToolCallingService.ListTools` | unknown | manifest-packets | read_write | 34 |
-| 317 | `ToolRouter.CallTool` | unknown | manifest-packets | read_write | 34 |
-| 318 | `ToolRouter.CallToolBatch` | unknown | manifest-packets | read_write | 34 |
-| 319 | `ToolRouter.CallToolStream` | unknown | manifest-packets | read_write | 34 |
-| 320 | `ToolRouter.ListTools` | unknown | manifest-packets | read_write | 34 |
-| 321 | `toposort_repair_plan` | unknown | manifest-packets | read_only | 34 |
-| 322 | `transcribe_audio` | unknown | manifest-packets | read_only | 34 |
-| 323 | `video_to_frames` | unknown | manifest-packets | read_only | 34 |
-| 324 | `vlm:switch_mode` | unknown | manifest-packets | read_only | 34 |
-| 325 | `cases:load` | unknown | manifest-packets | read_only | 30 |
-| 326 | `cases:update` | unknown | manifest-packets | read_only | 30 |
-| 327 | `citations:list_by_case` | unknown | manifest-packets | read_only | 30 |
-| 328 | `content` | unknown | manifest-packets | read_only | 30 |
-| 329 | `context_lines` | unknown | manifest-packets | read_only | 30 |
-| 330 | `issue` | unknown | manifest-packets | read_only | 30 |
-| 331 | `notes` | unknown | manifest-packets | read_only | 30 |
-| 332 | `operator_token` | unknown | manifest-packets | read_only | 30 |
-| 333 | `outcome` | unknown | manifest-packets | read_only | 30 |
-| 334 | `playwright:browser_action` | unknown | manifest-packets | read_only | 30 |
-| 335 | `postgres` | unknown | manifest-packets | read_only | 30 |
-| 336 | `rag:index_page` | unknown | manifest-packets | read_only | 30 |
-| 337 | `reports:update` | unknown | manifest-packets | read_only | 30 |
-| 338 | `section` | unknown | manifest-packets | read_only | 30 |
-| 339 | `unknown` | unknown | manifest-packets | read_only | 30 |
+| 274 | `kb.extract_citations` | unknown | trace-mcp | read_only | 40 |
+| 275 | `skills.list` | unknown | trace-mcp | read_only | 40 |
+| 276 | `skills.run_mission` | unknown | trace-mcp | read_only | 40 |
+| 277 | `analytics:mapreduce_matrix` | unknown | manifest-packets | read_only | 34 |
+| 278 | `ast:cross_language` | unknown | manifest-packets | read_only | 34 |
+| 279 | `cases:create` | unknown | manifest-packets | read_only | 34 |
+| 280 | `cases:delete` | unknown | manifest-packets | read_only | 34 |
+| 281 | `ChatAssistantService.CreateSession` | unknown | manifest-packets | read_write | 34 |
+| 282 | `ChatAssistantService.GetHistory` | unknown | manifest-packets | read_write | 34 |
+| 283 | `ChatAssistantService.Health` | unknown | manifest-packets | read_write | 34 |
+| 284 | `ChatAssistantService.RAGQuery` | unknown | manifest-packets | read_write | 34 |
+| 285 | `ChatAssistantService.SendMessage` | unknown | manifest-packets | read_write | 34 |
+| 286 | `ChatAssistantService.StreamMessage` | unknown | manifest-packets | read_write | 34 |
+| 287 | `Chr97Agent.GetCartridge` | unknown | manifest-packets | read_write | 34 |
+| 288 | `Chr97Agent.GetTimeline` | unknown | manifest-packets | read_write | 34 |
+| 289 | `Chr97Agent.QueryTags` | unknown | manifest-packets | read_write | 34 |
+| 290 | `citations:add_to_case` | unknown | manifest-packets | read_only | 34 |
+| 291 | `codebase:get_buffer` | unknown | manifest-packets | read_only | 34 |
+| 292 | `codeintel.health` | unknown | manifest-packets | read_only | 34 |
+| 293 | `CodeIntelService.GetClusterSummary` | unknown | manifest-packets | read_write | 34 |
+| 294 | `CodeIntelService.GetJobStatus` | unknown | manifest-packets | read_write | 34 |
+| 295 | `CodeIntelService.ListClusterSummaries` | unknown | manifest-packets | read_write | 34 |
+| 296 | `context.build_kv_packet` | unknown | trace-mcp, manifest-packets | read_only | 34 |
+| 297 | `context.get_compressed_card` | unknown | trace-mcp, manifest-packets | read_only | 34 |
+| 298 | `EnrichmentService.BatchEnrich` | unknown | manifest-packets | read_write | 34 |
+| 299 | `evidence:detect_objects` | unknown | manifest-packets | read_only | 34 |
+| 300 | `evidence:transcribe_gpu` | unknown | manifest-packets | read_only | 34 |
+| 301 | `facial_analysis` | unknown | manifest-packets | read_only | 34 |
+| 302 | `hmm_infer_repair_states` | unknown | manifest-packets | read_only | 34 |
+| 303 | `langextract_extract_error_facts` | unknown | manifest-packets | read_only | 34 |
+| 304 | `langextract:evidence` | unknown | manifest-packets | read_only | 34 |
+| 305 | `reports:create` | unknown | manifest-packets | read_only | 34 |
+| 306 | `reports:delete` | unknown | manifest-packets | read_only | 34 |
+| 307 | `reports:export` | unknown | manifest-packets | read_only | 34 |
+| 308 | `reports:list` | unknown | manifest-packets | read_only | 34 |
+| 309 | `sveltekit_import_boundary_check` | unknown | manifest-packets | read_only | 34 |
+| 310 | `sveltekit_route_audit` | unknown | manifest-packets | read_only | 34 |
+| 311 | `ToolCallingService.ExecuteTool` | unknown | manifest-packets | read_write | 34 |
+| 312 | `ToolCallingService.ExecuteToolBatch` | unknown | manifest-packets | read_write | 34 |
+| 313 | `ToolCallingService.ExecuteToolStream` | unknown | manifest-packets | read_write | 34 |
+| 314 | `ToolCallingService.ListTools` | unknown | manifest-packets | read_write | 34 |
+| 315 | `ToolRouter.CallTool` | unknown | manifest-packets | read_write | 34 |
+| 316 | `ToolRouter.CallToolBatch` | unknown | manifest-packets | read_write | 34 |
+| 317 | `ToolRouter.CallToolStream` | unknown | manifest-packets | read_write | 34 |
+| 318 | `ToolRouter.ListTools` | unknown | manifest-packets | read_write | 34 |
+| 319 | `toposort_repair_plan` | unknown | manifest-packets | read_only | 34 |
+| 320 | `transcribe_audio` | unknown | manifest-packets | read_only | 34 |
+| 321 | `video_to_frames` | unknown | manifest-packets | read_only | 34 |
+| 322 | `vlm:switch_mode` | unknown | manifest-packets | read_only | 34 |
+| 323 | `cases:load` | unknown | manifest-packets | read_only | 30 |
+| 324 | `cases:update` | unknown | manifest-packets | read_only | 30 |
+| 325 | `citations:list_by_case` | unknown | manifest-packets | read_only | 30 |
+| 326 | `content` | unknown | manifest-packets | read_only | 30 |
+| 327 | `context_lines` | unknown | manifest-packets | read_only | 30 |
+| 328 | `issue` | unknown | manifest-packets | read_only | 30 |
+| 329 | `notes` | unknown | manifest-packets | read_only | 30 |
+| 330 | `operator_token` | unknown | manifest-packets | read_only | 30 |
+| 331 | `outcome` | unknown | manifest-packets | read_only | 30 |
+| 332 | `playwright:browser_action` | unknown | manifest-packets | read_only | 30 |
+| 333 | `postgres` | unknown | manifest-packets | read_only | 30 |
+| 334 | `rag:index_page` | unknown | manifest-packets | read_only | 30 |
+| 335 | `reports:update` | unknown | manifest-packets | read_only | 30 |
+| 336 | `section` | unknown | manifest-packets | read_only | 30 |
+| 337 | `unknown` | unknown | manifest-packets | read_only | 30 |
 
 ## Notes
 
 - TRACE MCP remains the live read surface.
 - Manifest packets capture the broader MCP / gRPC registry surface.
-- `gemma4_summarize` is used for the section summaries when the local offload server is available; otherwise the report falls back to deterministic summaries.
+- `repo_summarize` (local-llm-offload MCP, canonical tool name; `gemma4_summarize` is a deprecated alias) is used for the section summaries when the local offload server is available; otherwise the report falls back to deterministic summaries.
 - This index is read-only and links into the Parent Atlas navigation surface.

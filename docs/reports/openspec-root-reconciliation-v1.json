@@ -1,0 +1,71 @@
+{
+  "schema": "atlas.openspec-root-reconciliation.v1",
+  "generatedAt": "2026-09-05T23:20:00Z",
+  "mode": "READ_ONLY_NO_WRITES",
+  "roots": {
+    "primary": "openspec/changes",
+    "secondary": "sveltekit-frontend/openspec/changes"
+  },
+  "secondaryRootChangeCount": 10,
+  "secondaryRootChanges": [
+    { "changeId": "add-gemma4-retrieval-loop-hook-harness", "unchecked": 10, "total": 10, "tasksMdMtime": "2026-07-29", "collidesWithPrimary": false },
+    { "changeId": "add-packet-ontology-registry", "unchecked": 93, "total": 93, "tasksMdMtime": "2026-07-09", "collidesWithPrimary": false },
+    { "changeId": "parent-atlas-ace-radix-residency", "unchecked": 1, "total": 26, "tasksMdMtime": "2026-09-01", "collidesWithPrimary": false },
+    { "changeId": "parent-atlas-gpu-mini-fabric-01", "unchecked": 14, "total": 41, "tasksMdMtime": "2026-09-01", "collidesWithPrimary": false },
+    { "changeId": "parent-atlas-graph-retrieval-proof", "unchecked": 20, "total": 59, "tasksMdMtime": "2026-08-10", "collidesWithPrimary": true },
+    { "changeId": "phase-109b-repository-provenance-workflow", "unchecked": 11, "total": 11, "tasksMdMtime": "2026-07-29", "collidesWithPrimary": false },
+    { "changeId": "phase1-rrf-semantic-fusion", "unchecked": 52, "total": 52, "tasksMdMtime": "2026-07-06", "collidesWithPrimary": false },
+    { "changeId": "phase-2f1-real-evaluation-corpus", "unchecked": 16, "total": 56, "tasksMdMtime": "2026-07-17", "collidesWithPrimary": "PARTIAL_DIRECTORY_ONLY" },
+    { "changeId": "session-96-event-sourcing-gpu-complete", "unchecked": null, "total": null, "tasksMdMtime": null, "note": "no tasks.md present in either root", "collidesWithPrimary": false },
+    { "changeId": "wire-agentic-workflows-e2e-test", "unchecked": 90, "total": 90, "tasksMdMtime": "2026-07-06", "collidesWithPrimary": false }
+  ],
+  "collisions": [
+    {
+      "changeId": "parent-atlas-graph-retrieval-proof",
+      "classification": "DIVERGED",
+      "primary": {
+        "tasksMdLines": 1683,
+        "tasksMdMtime": "2026-08-31T13:24:09-07:00",
+        "sectionNumbering": "GS1.x (e.g. GS1.9, GS1.10, GS1.23)",
+        "hasReadme": true,
+        "hasDesign": true
+      },
+      "secondary": {
+        "tasksMdLines": 262,
+        "tasksMdMtime": "2026-08-10T11:52:16-07:00",
+        "sectionNumbering": "plain numeric (1., 2., ...)",
+        "hasReadme": false,
+        "hasDesign": true
+      },
+      "evidence": "The secondary copy's own header already documents this exact collision: 'this repo has two separate OpenSpec roots with a same-named change folder (see the root file's own GS1.23 finding...)' and explicitly defers the canonical packet->chunk->topology tree-link gate to the primary/root copy rather than duplicating it. This is not a simple stale-duplicate pair -- the two files use entirely different section-numbering schemes and cover partially non-overlapping content; a prior session already found this ambiguity and chose partial cross-referencing over merging.",
+      "recommendedCanonicalOwner": "primary (openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md)",
+      "recommendedCanonicalOwnerReason": "Newer (3 weeks), 6.4x larger, has a README.md the secondary copy lacks, and is the copy the secondary copy's own header defers to.",
+      "unresolvedRisk": "The secondary copy still carries its own independent, non-overlapping task content (numeric sections 1-N) that is NOT a subset of the primary copy's GS1.x sections. Declaring the primary copy 'canonical' does not by itself account for whatever unique content only exists in the secondary copy -- that reconciliation (does the secondary copy's unique content need to be merged forward, or was it already superseded/abandoned) was not performed here and remains open.",
+      "action": "NONE_TAKEN_READ_ONLY"
+    },
+    {
+      "changeId": "phase-2f1-real-evaluation-corpus",
+      "classification": "UNRESOLVED_ASYMMETRIC",
+      "primary": {
+        "hasTasksMd": false,
+        "filesPresent": [".openspec.yaml", "proposal.md", "specs/"],
+        "note": "directory exists in the primary root but was never given a tasks.md -- proposal-only stub"
+      },
+      "secondary": {
+        "hasTasksMd": true,
+        "tasksMdLines": 208,
+        "unchecked": 16,
+        "total": 56,
+        "tasksMdMtime": "2026-07-17"
+      },
+      "evidence": "This is not a true collision in the sense the prior portfolio note implied -- the primary root's directory has no task ledger to diverge from at all. The secondary root is the sole owner of any task-level content for this change.",
+      "recommendedCanonicalOwner": "secondary (sveltekit-frontend/openspec/changes/phase-2f1-real-evaluation-corpus/tasks.md)",
+      "recommendedCanonicalOwnerReason": "Only copy with a tasks.md; primary copy is an empty proposal-only shell.",
+      "unresolvedRisk": "Whether the primary root's proposal.md and specs/ still match the secondary root's task content, or have diverged independently, was not checked here.",
+      "action": "NONE_TAKEN_READ_ONLY"
+    }
+  ],
+  "portfolioImpact": "The existing audit-openspec-portfolio-v1.mjs / build-openspec-workboard-v1.mjs scripts scan only the primary root (openspec/changes/). They therefore undercount by 10 real change directories (9 with genuine independent task ledgers, 1 empty) and additionally do not surface the 2 items above needing a human reconciliation decision. Neither script was modified by this report -- extending their scan glob to include the secondary root is a separate, not-yet-authorized follow-up.",
+  "writesPerformed": false,
+  "canonicalMutationAuthority": false
+}

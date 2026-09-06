@@ -268,15 +268,24 @@ export async function routeQuery(opts: QueryRouterOpts): Promise<QueryRouterResu
     }
   }
 
-  // ── Lane 1.2: Bifrost semantic packet lookup ──────────────────────────
+  // ── Lane 1.2: Bifrost semantic query-result lookup ──────────────────────────
   // Checks warm-bifrost-semantic-cache keys written by npm run bifrost:semantic:warm.
-  // Key: bifrost:sem:packet:{query_hash}  TTL 24h
+  // Key: bifrost:sem:query:{query_hash}  TTL 24h
   // Also probes intent index: bifrost:sem:intent:{normalized_hash}
+  //
+  // FIXED 2026-09-04 (BIFROST-KEY-SEMANTICS-OWNER-01 Stage 2): this lane used to read
+  // bifrostKey.semantic.packet(queryHash) — the SAME prefix/builder atlas-reward-cache.ts
+  // uses for a totally different identity (canonical packetKey), a real namespace collision.
+  // Now reads the dedicated query() builder. Old bifrost:sem:packet:{query_hash} entries from
+  // before this fix are not read here on purpose (reading them would perpetuate exactly the
+  // ambiguity this migration removes) — they simply expire under their original 3600s TTL,
+  // and this lane cache-misses (fails open to the next retrieval lane) until repopulated
+  // under the new prefix.
   if (cacheHit === 'none') {
     const t0 = Date.now();
     try {
       // 1. Direct query-hash lookup
-      let bifrostRaw = await redis.get(bifrostKey.semantic.packet(queryHash)).catch(() => null);
+      let bifrostRaw = await redis.get(bifrostKey.semantic.query(queryHash)).catch(() => null);
 
       // 2. Intent-normalized lookup (cross-phrasing)
       if (!bifrostRaw) {
@@ -284,7 +293,7 @@ export async function routeQuery(opts: QueryRouterOpts): Promise<QueryRouterResu
         const intentHash = crypto.createHash('sha256').update(intentNorm).digest('hex').slice(0, 16);
         const intentQh = await redis.get(bifrostKey.semantic.intent(intentHash)).catch(() => null);
         if (intentQh) {
-          bifrostRaw = await redis.get(bifrostKey.semantic.packet(intentQh)).catch(() => null);
+          bifrostRaw = await redis.get(bifrostKey.semantic.query(intentQh)).catch(() => null);
         }
       }
 

@@ -1,446 +1,658 @@
-#!/usr/bin/env node
+#!/usr/bin/env npx tsx
 /**
- * Phase 78 - Generate LLM-Based Fix Suggestions
+ * Phase 78: Parent Atlas Ornith Repair Proposal Producer v2
  *
- * Generates fix suggestions for clustered errors:
- * 1. Get clustered errors without suggestions
- * 2. Group by cluster_id
- * 3. Generate summary and fix suggestion using Ollama/Gemma3
- * 4. Assess risk level (low/medium/high)
- * 5. Insert into error_suggestions table
+ * Produces non-canonical repair proposals for Phase 79.
+ *
+ * Owners reused instead of reimplemented:
+ * - SearchRuntime({ readOnly: true }) owns retrieval/context assembly.
+ * - The canonical semantic_768 EmbeddingGemma path is reached through SearchRuntime.
+ * - resolveLlamaInferenceTarget() owns the loaded Ornith 1.5 model selection.
+ * - error_suggestions remains the proposal queue consumed by Phase 79.
+ *
+ * Deliberately absent:
+ * - no Ollama chat path
+ * - no Redis/Valkey suggestion cache
+ * - no direct Qdrant search/upsert
+ * - no MiniLM/Gemini fallback
+ * - no source-file mutation
  *
  * Usage:
- *   npm run phase78:suggest              # Normal mode
- *   npm run phase78:suggest -- --dry-run # Preview only
- *   npm run phase78:suggest -- --verbose # Detailed logging
+ *   npx tsx scripts/phase78-generate-suggestions.mts --dry-run
+ *   npx tsx scripts/phase78-generate-suggestions.mts --limit=10
+ *   npx tsx scripts/phase78-generate-suggestions.mts --verbose
  */
 
-import dotenv from 'dotenv';
-import { isNotNull } from 'drizzle-orm';
-import { drizzle } from 'drizzle-orm/postgres-js';
-import fs from 'fs';
-import { Redis } from 'ioredis';
-import * as path from 'path';
+import { createHash } from 'node:crypto';
+import { config as loadDotenv } from 'dotenv';
+import fs from 'node:fs/promises';
+import path from 'node:path';
 import postgres from 'postgres';
-
-// Load environment variables
-dotenv.config();
-
-import { fileURLToPath } from 'url';
-import { errorClusterTable, errorSuggestionsTable } from '../src/lib/server/db/schema/index.js';
+import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const APP_ROOT = path.resolve(__dirname, '..');
+const REPO_ROOT = path.resolve(APP_ROOT, '..');
+const LOGS_DIR = path.join(APP_ROOT, 'logs', 'phase78');
 
-// Parse command-line arguments
-const args = process.argv.slice(2);
-const isDryRun = args.includes('--dry-run');
-const isVerbose = args.includes('--verbose');
+loadDotenv({ path: path.join(APP_ROOT, '.env.local') });
+loadDotenv({ path: path.join(APP_ROOT, '.env') });
+loadDotenv({ path: path.join(REPO_ROOT, '.env') });
+process.chdir(APP_ROOT);
 
-// Configuration
-const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL || 'http://127.0.0.1:11434';
-const SUGGESTION_MODEL = process.env.SUGGESTION_MODEL || 'gemma3-legal:latest';
-const TIMEOUT = parseInt(process.env.SUGGESTION_TIMEOUT || '30000', 10);
-const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
-
-// Initialize Redis
-const redis = new Redis(REDIS_URL);
-
-// Log Redis connection status
-redis.on('connect', () => {
-  if (isVerbose) console.log('✅ Redis connected');
-});
-redis.on('error', (err) => {
-  console.error('❌ Redis connection error:', err);
-});
-
-// Get database URL from environment
 const DATABASE_URL = process.env.DATABASE_URL;
 if (!DATABASE_URL) {
-  console.error('❌ DATABASE_URL environment variable not set');
-  process.exit(1);
+  throw new Error('DATABASE_URL is required; Phase 78 no longer embeds database credentials.');
 }
 
-// Initialize database connection
-const client = postgres(DATABASE_URL, {
-  onnotice: () => {},
+const args = process.argv.slice(2);
+const DRY_RUN = args.includes('--dry-run');
+const VERBOSE = args.includes('--verbose');
+const limitArg = args.find((arg) => arg.startsWith('--limit='));
+const LIMIT = limitArg
+  ? Math.max(1, Number.parseInt(limitArg.slice('--limit='.length), 10) || 25)
+  : Math.max(1, Number.parseInt(process.env.PHASE78_LIMIT ?? '25', 10) || 25);
+const TOP_K = Math.max(1, Number.parseInt(process.env.PHASE78_CONTEXT_TOP_K ?? '6', 10) || 6);
+const MAX_SOURCE_CHARS = Math.max(
+  2_000,
+  Number.parseInt(process.env.PHASE78_MAX_SOURCE_CHARS ?? '60000', 10) || 60_000
+);
+const MAX_TOKENS = Math.max(
+  512,
+  Number.parseInt(process.env.PHASE78_MAX_TOKENS ?? '2500', 10) || 2_500
+);
+const TIMEOUT_MS = Math.max(
+  5_000,
+  Number.parseInt(process.env.PHASE78_ORNITH_TIMEOUT_MS ?? '90000', 10) || 90_000
+);
+
+const sql = postgres(DATABASE_URL, {
+  max: 2,
+  idle_timeout: 5,
+  connect_timeout: 10,
 });
-const db = drizzle(client);
 
-// Ensure logs directory exists
-const LOGS_DIR = path.join(__dirname, '../logs');
-if (!fs.existsSync(LOGS_DIR)) {
-  fs.mkdirSync(LOGS_DIR, { recursive: true });
-}
-const LOG_FILE_TXT = path.join(LOGS_DIR, 'suggestions.txt');
-const LOG_FILE_JSON = path.join(LOGS_DIR, 'suggestions.json');
+await fs.mkdir(LOGS_DIR, { recursive: true });
+const JSONL_LOG = path.join(LOGS_DIR, 'ornith-proposals-v2.jsonl');
+
+type RiskLevel = 'low' | 'medium' | 'high';
 
 interface ClusterData {
   clusterId: string;
   routeId: string;
   message: string;
   code: string;
-  rawLogSnippet?: string | null;
-  filePath?: string | null;
+  errorCode: string | null;
+  category: string | null;
+  rawLogSnippet: string | null;
+  filePath: string | null;
   count: number;
 }
 
-/**
- * Get clusters that don't have suggestions yet
- */
-async function getClustersWithoutSuggestions(): Promise<ClusterData[]> {
-  if (isVerbose) {
-    console.log('📚 Fetching clusters without suggestions...');
-  }
-
-  // Get all active clusters
-  const clusters = await db
-    .select()
-    .from(errorClusterTable)
-    .where(isNotNull(errorClusterTable.clusterId));
-
-  // Get existing suggestions
-  const existingSuggestions = await db
-    .select({ clusterId: errorSuggestionsTable.clusterId })
-    .from(errorSuggestionsTable)
-    .where(isNotNull(errorSuggestionsTable.clusterId));
-
-  const existingClusterIds = new Set(existingSuggestions.map(s => s.clusterId));
-
-  // Filter out clusters that already have suggestions
-  const clustersToProcess = clusters
-    .filter(c => c.clusterId && !existingClusterIds.has(c.clusterId))
-    .map(c => ({
-      clusterId: c.clusterId!,
-      routeId: c.routeId,
-      message: c.message,
-      code: c.code,
-      rawLogSnippet: c.rawLogSnippet,
-      filePath: c.filePath,
-      count: c.count,
-    }));
-
-  if (isVerbose) {
-    console.log(`   Found ${clustersToProcess.length} clusters needing suggestions (out of ${clusters.length} total)`);
-  }
-
-  return clustersToProcess;
+interface SourceSnapshot {
+  filePath: string;
+  sourceRef: string;
+  sourceRevision: string;
+  content: string;
 }
 
-/**
- * Assess risk level based on error characteristics
- */
-function assessRiskLevel(message: string, code?: string): 'low' | 'medium' | 'high' {
-  const text = message.toLowerCase();
+interface RetrievalPacket {
+  packetKey: string | null;
+  sourceRef: string | null;
+  sourceRevision: string | null;
+  workspaceRevision: string | null;
+  summary: string;
+  title: string;
+}
 
-  // High risk: Runtime, type safety, breaking changes
-  const highRiskPatterns = [
-    'runtime error',
-    'cannot assign',
-    'not assignable',
-    'type mismatch',
-    'null reference',
-    'undefined',
-    'breaking change',
-    'TS2322', // Type assignment error
-    'TS2345', // Argument not assignable
-  ];
+interface RepairEdit {
+  search: string;
+  replace: string;
+}
 
-  if (highRiskPatterns.some(p => text.includes(p) || code?.includes(p))) {
+interface OrnithProposalPlan {
+  summary: string;
+  riskLevel: RiskLevel;
+  confidence: number;
+  edits: RepairEdit[];
+  rationale: string[];
+}
+
+function logVerbose(...values: unknown[]): void {
+  if (VERBOSE) console.log(...values);
+}
+
+function sha256(value: string | Buffer): string {
+  return createHash('sha256').update(value).digest('hex');
+}
+
+function stableStringify(value: unknown): string {
+  if (value === null || typeof value !== 'object') return JSON.stringify(value);
+  if (Array.isArray(value)) return `[${value.map(stableStringify).join(',')}]`;
+  return `{${Object.entries(value as Record<string, unknown>)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([key, item]) => `${JSON.stringify(key)}:${stableStringify(item)}`)
+    .join(',')}}`;
+}
+
+function normalizeSlashes(value: string): string {
+  return value.replace(/\\/g, '/');
+}
+
+function riskRank(value: RiskLevel): number {
+  return value === 'high' ? 3 : value === 'medium' ? 2 : 1;
+}
+
+function maxRisk(a: RiskLevel, b: RiskLevel): RiskLevel {
+  return riskRank(a) >= riskRank(b) ? a : b;
+}
+
+function assessRiskLevel(message: string, code?: string | null): RiskLevel {
+  const text = `${message} ${code ?? ''}`.toLowerCase();
+  if (
+    [
+      'runtime error',
+      'cannot assign',
+      'not assignable',
+      'type mismatch',
+      'null reference',
+      'undefined',
+      'breaking change',
+      'ts2322',
+      'ts2345',
+    ].some((pattern) => text.includes(pattern))
+  ) {
     return 'high';
   }
-
-  // Medium risk: Syntax, structure, style
-  const mediumRiskPatterns = [
-    'syntax error',
-    'expected',
-    'unexpected',
-    'missing',
-    'deprecated',
-    'TS1005', // ';' expected
-  ];
-
-  if (mediumRiskPatterns.some(p => text.includes(p) || code?.includes(p))) {
+  if (
+    ['syntax error', 'expected', 'unexpected', 'missing', 'deprecated', 'ts1005'].some((pattern) =>
+      text.includes(pattern)
+    )
+  ) {
     return 'medium';
   }
-
   return 'low';
 }
 
-/**
- * Extract patch from LLM response
- */
-function extractPatch(llmText: string): { patch: string | null; why: string } {
-  const t = (llmText ?? "").trim();
-
-  // 1) Prefer fenced code blocks (typescript/ts/js)
-  const fence = t.match(/```(?:typescript|ts|javascript|js)?\s*([\s\S]*?)\s*```/i);
-  if (fence?.[1]) {
-    const patch = fence[1].trim();
-    if (patch.length) return { patch, why: "fenced_code_block" };
-  }
-
-  // 2) PATCH: ... until END PATCH or end of string (multiline)
-  const patchSection = t.match(/(?:^|\n)\s*PATCH:\s*([\s\S]*?)(?:\n\s*END\s*PATCH\b|$)/i);
-  if (patchSection?.[1]) {
-    const patch = patchSection[1].trim();
-    if (patch.length) return { patch, why: "patch_section" };
-  }
-
-  // 3) As a fallback, return null so we can store the raw text + debug
-  return { patch: null, why: "no_patch_found" };
+async function getClustersWithoutSuggestions(): Promise<ClusterData[]> {
+  return sql<ClusterData[]>`
+    SELECT
+      ec.cluster_id AS "clusterId",
+      ec.route_id AS "routeId",
+      ec.message,
+      ec.code,
+      ec.error_code AS "errorCode",
+      ec.category,
+      ec.raw_log_snippet AS "rawLogSnippet",
+      ec.file_path AS "filePath",
+      ec.count
+    FROM error_cluster ec
+    WHERE ec.cluster_id IS NOT NULL
+      AND NOT EXISTS (
+        SELECT 1
+        FROM error_suggestions es
+        WHERE es.cluster_id = ec.cluster_id
+      )
+    ORDER BY ec.count DESC, ec.updated_at DESC NULLS LAST
+    LIMIT ${LIMIT}
+  `;
 }
 
-function getFileContext(filePath: string, rawLogSnippet: string | null): string | null {
+function resolveWithinApp(candidatePath: string): string | null {
   try {
-    // Handle relative paths
-    const absolutePath = path.isAbsolute(filePath) ? filePath : path.join(process.cwd(), filePath);
-
-    if (!fs.existsSync(absolutePath)) return null;
-
-    const content = fs.readFileSync(absolutePath, 'utf-8');
-    const lines = content.split('\n');
-
-    let lineNum = 0;
-    // Try to extract line number from rawLogSnippet
-    if (rawLogSnippet) {
-      const match = rawLogSnippet.match(/[:\(](\d+)[:,\)]/);
-      if (match) {
-        lineNum = parseInt(match[1], 10);
-      }
+    let absolutePath: string;
+    if (path.isAbsolute(candidatePath)) {
+      absolutePath = path.resolve(candidatePath);
+    } else if (normalizeSlashes(candidatePath).startsWith('sveltekit-frontend/')) {
+      absolutePath = path.resolve(REPO_ROOT, candidatePath);
+    } else {
+      absolutePath = path.resolve(APP_ROOT, candidatePath);
     }
 
-    if (lineNum > 0) {
-      const start = Math.max(0, lineNum - 6);
-      const end = Math.min(lines.length, lineNum + 5);
-      const contextLines = lines.slice(start, end).map((l, i) => {
-        const currentLine = start + i + 1;
-        const marker = currentLine === lineNum ? '> ' : '  ';
-        return `${marker}${currentLine}: ${l}`;
+    const prefix = `${APP_ROOT}${path.sep}`.toLowerCase();
+    const normalized = absolutePath.toLowerCase();
+    if (normalized !== APP_ROOT.toLowerCase() && !normalized.startsWith(prefix)) return null;
+    return absolutePath;
+  } catch {
+    return null;
+  }
+}
+
+async function resolveSourceSnapshot(cluster: ClusterData): Promise<SourceSnapshot | null> {
+  const route = cluster.routeId?.startsWith('/') ? cluster.routeId : `/${cluster.routeId ?? ''}`;
+  const candidates = [
+    cluster.filePath,
+    route && route !== '/' ? `src/routes${route}/+page.svelte` : null,
+    route && route !== '/' ? `src/routes${route}/+page.ts` : null,
+    route && route !== '/' ? `src/routes${route}/+page.server.ts` : null,
+    route && route !== '/' ? `src/routes${route}/+server.ts` : null,
+  ].filter((value): value is string => Boolean(value));
+
+  for (const candidate of candidates) {
+    const filePath = resolveWithinApp(candidate);
+    if (!filePath) continue;
+    try {
+      const bytes = await fs.readFile(filePath);
+      const sourceRef = normalizeSlashes(path.relative(REPO_ROOT, filePath));
+      const content = bytes.toString('utf8');
+      if (content.length > MAX_SOURCE_CHARS) {
+        logVerbose(`Skipping oversized source ${sourceRef}: ${content.length} chars`);
+        return null;
+      }
+      return {
+        filePath,
+        sourceRef,
+        sourceRevision: sha256(bytes),
+        content,
+      };
+    } catch {
+      // Try next candidate.
+    }
+  }
+  return null;
+}
+
+let runtimePromise: Promise<any> | null = null;
+
+async function getReadOnlySearchRuntime(): Promise<any> {
+  if (!runtimePromise) {
+    runtimePromise = (async () => {
+      const { createProductionSearchRuntime } = await import(
+        '$lib/server/retrieval/search-runtime.js'
+      );
+      return createProductionSearchRuntime({
+        userId: 'phase78-proposal-producer',
+        readOnly: true,
       });
-      return contextLines.join('\n');
-    }
-
-    // If no line number, return first 20 lines
-    return lines.slice(0, 20).map((l, i) => `  ${i + 1}: ${l}`).join('\n');
-  } catch (e) {
-    return null;
+    })();
   }
+  return runtimePromise;
 }
 
-/**
- * Generate fix suggestion using LLM
- */
-async function generateSuggestion(
-  cluster: ClusterData
-): Promise<{ summary: string; patch: string; riskLevel: 'low' | 'medium' | 'high' } | null> {
-  const cacheKey = `suggestion:${cluster.clusterId}`;
+async function retrieveContext(
+  cluster: ClusterData,
+  source: SourceSnapshot
+): Promise<{
+  packets: RetrievalPacket[];
+  retrievalSources: string[];
+  contextChecksum: string;
+}> {
+  const runtime = await getReadOnlySearchRuntime();
+  const query = [
+    cluster.errorCode,
+    cluster.category,
+    cluster.code,
+    cluster.message,
+    source.sourceRef,
+  ]
+    .filter(Boolean)
+    .join(' | ')
+    .slice(0, 1200);
 
-  try {
-    // 1. Check Redis Cache
-    const cached = await redis.get(cacheKey);
-    if (cached) {
-      if (isVerbose) console.log(`   ⚡ Cache hit for cluster ${cluster.clusterId}`);
-      return JSON.parse(cached);
-    }
+  const result = await runtime.search({ text: query, topK: TOP_K });
+  if (result?.provenance?.readOnly !== true || result?.provenance?.promotionAttempted !== false) {
+    throw new Error('SEARCH_RUNTIME_READONLY_CONTRACT_NOT_PROVEN');
+  }
 
-    let fileContext = '';
-    if (cluster.filePath) {
-      const context = getFileContext(cluster.filePath, cluster.rawLogSnippet || null);
-      if (context) {
-        fileContext = `\nFile Content (${cluster.filePath}):\n\`\`\`typescript\n${context}\n\`\`\`\n`;
+  const packets: RetrievalPacket[] = Array.isArray(result?.packets)
+    ? result.packets.slice(0, TOP_K).map((packet: any) => ({
+        packetKey: packet.packetKey ?? packet.packet_key ?? null,
+        sourceRef: packet.sourceRef ?? packet.source_ref ?? null,
+        sourceRevision: packet.sourceRevision ?? packet.source_revision ?? null,
+        workspaceRevision: packet.workspaceRevision ?? packet.workspace_revision ?? null,
+        summary: String(packet.summary ?? '').slice(0, 1200),
+        title: String(packet.semanticTitle ?? packet.title ?? packet.semantic?.title ?? '').slice(
+          0,
+          300
+        ),
+      }))
+    : [];
+
+  const retrievalSources = Array.isArray(result?.provenance?.retrievalSources)
+    ? result.provenance.retrievalSources.map(String)
+    : [];
+
+  return {
+    packets,
+    retrievalSources,
+    contextChecksum: sha256(stableStringify({ query, packets, retrievalSources })),
+  };
+}
+
+const PROPOSAL_SCHEMA = {
+  type: 'object',
+  additionalProperties: false,
+  required: ['summary', 'riskLevel', 'confidence', 'edits', 'rationale'],
+  properties: {
+    summary: { type: 'string', minLength: 1, maxLength: 600 },
+    riskLevel: { type: 'string', enum: ['low', 'medium', 'high'] },
+    confidence: { type: 'number', minimum: 0, maximum: 1 },
+    edits: {
+      type: 'array',
+      minItems: 1,
+      maxItems: 8,
+      items: {
+        type: 'object',
+        additionalProperties: false,
+        required: ['search', 'replace'],
+        properties: {
+          search: { type: 'string', minLength: 1, maxLength: 12000 },
+          replace: { type: 'string', maxLength: 20000 },
+        },
+      },
+    },
+    rationale: {
+      type: 'array',
+      minItems: 1,
+      maxItems: 6,
+      items: { type: 'string', minLength: 1, maxLength: 400 },
+    },
+  },
+} as const;
+
+async function resolveOrnithTarget() {
+  const { resolveLlamaInferenceTarget } = await import('$lib/server/llm/runtime-contract.js');
+  return resolveLlamaInferenceTarget(5_000);
+}
+
+async function streamOrnithJson(
+  modelTarget: Awaited<ReturnType<typeof resolveOrnithTarget>>,
+  messages: Array<{ role: 'system' | 'user'; content: string }>
+): Promise<{ text: string; promptHash: string }> {
+  const request = {
+    model: modelTarget.model,
+    messages,
+    temperature: 0,
+    max_tokens: MAX_TOKENS,
+    stream: true,
+    cache_prompt: true,
+    response_format: {
+      type: 'json_object',
+      schema: PROPOSAL_SCHEMA,
+    },
+  };
+
+  const response = await fetch(`${modelTarget.baseUrl.replace(/\/$/, '')}/v1/chat/completions`, {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      authorization: 'Bearer local',
+    },
+    body: JSON.stringify(request),
+    signal: AbortSignal.timeout(TIMEOUT_MS),
+  });
+  if (!response.ok || !response.body) throw new Error(`ORNITH_HTTP_${response.status}`);
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = '';
+  let content = '';
+
+  while (true) {
+    const { value, done } = await reader.read();
+    buffer += decoder.decode(value ?? new Uint8Array(), { stream: !done });
+    const lines = buffer.split(/\r?\n/);
+    buffer = lines.pop() ?? '';
+
+    for (const line of lines) {
+      if (!line.startsWith('data:')) continue;
+      const data = line.slice(5).trim();
+      if (!data || data === '[DONE]') continue;
+      try {
+        const chunk = JSON.parse(data) as {
+          choices?: Array<{ delta?: { content?: string }; message?: { content?: string } }>;
+        };
+        content += chunk.choices?.[0]?.delta?.content ?? chunk.choices?.[0]?.message?.content ?? '';
+      } catch {
+        // Ignore SSE comments/metadata; final JSON is validated below.
       }
     }
+    if (done) break;
+  }
 
-    // Create prompt for LLM
-    const prompt = `You are a TypeScript/JavaScript error analysis expert. Analyze this error and provide a detailed, actionable fix suggestion.
+  return {
+    text: content.trim(),
+    promptHash: sha256(stableStringify(messages)),
+  };
+}
 
-Error Message:
-${cluster.message}
+function parsePlan(raw: string, heuristicRisk: RiskLevel): OrnithProposalPlan {
+  const stripped = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+  let parsed: any;
+  try {
+    parsed = JSON.parse(stripped);
+  } catch {
+    throw new Error(`ORNITH_PROPOSAL_INVALID_JSON:${sha256(raw)}`);
+  }
 
-Error Code: ${cluster.code}
+  if (
+    !parsed ||
+    typeof parsed.summary !== 'string' ||
+    !['low', 'medium', 'high'].includes(parsed.riskLevel) ||
+    !Number.isFinite(parsed.confidence) ||
+    parsed.confidence < 0 ||
+    parsed.confidence > 1 ||
+    !Array.isArray(parsed.edits) ||
+    parsed.edits.length < 1 ||
+    parsed.edits.length > 8 ||
+    !Array.isArray(parsed.rationale)
+  ) {
+    throw new Error('ORNITH_PROPOSAL_SCHEMA_REJECTED');
+  }
 
-${cluster.rawLogSnippet ? `Log Snippet:\n${cluster.rawLogSnippet}\n` : ''}
-${fileContext}
-
-Return format:
-
-PATCH code block
-
-RATIONALE 1–4 bullets
-
-RISK one of low/medium/high
-
-Requirements:
-- Return a complete patch in a fenced code block.
-- Do NOT truncate.
-- If you cannot produce a valid patch, explain why.
-- Include 3-5 lines of context before and after the change.
-`.trim();
-
-    const response = await Promise.race([
-      fetch(`${OLLAMA_BASE_URL}/api/generate`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: SUGGESTION_MODEL,
-          prompt,
-          stream: false,
-        }),
-      }),
-      new Promise<Response>((_, reject) =>
-        setTimeout(() => reject(new Error('Timeout')), TIMEOUT)
-      ),
-    ]);
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
+  const edits: RepairEdit[] = parsed.edits.map((edit: any, index: number) => {
+    if (
+      typeof edit?.search !== 'string' ||
+      !edit.search ||
+      typeof edit?.replace !== 'string'
+    ) {
+      throw new Error(`ORNITH_PROPOSAL_EDIT_REJECTED:${index}`);
     }
-
-    const data = await response.json() as { response?: string };
-    const responseText = data.response || '';
-
-    // Parse response from LLM
-    const { patch, why } = extractPatch(responseText);
-
-    // Extract summary (RATIONALE)
-    const summaryMatch = responseText.match(/RATIONALE\s*([\s\S]*?)(?:\n\s*RISK|$)/i);
-    const summary = summaryMatch?.[1]?.trim().split('\n')[0].replace(/^[•-]\s*/, '') || `Fix cluster ${cluster.clusterId}`;
-
-    // Extract risk level
-    const riskMatch = responseText.match(/RISK\s*(low|medium|high)/i);
-    const riskLevel = (riskMatch?.[1]?.toLowerCase() as 'low' | 'medium' | 'high') || assessRiskLevel(cluster.message, cluster.code);
-
-    if (isVerbose) {
-      console.log(`   ✅ Generated suggestion for cluster ${cluster.clusterId}`);
-      console.log(`      Summary: ${summary.substring(0, 80)}...`);
-      console.log(`      Patch extraction: ${why}`);
-      console.log(`      Patch length: ${patch?.length || 0} chars`);
+    if (edit.search.length > 12000 || edit.replace.length > 20000) {
+      throw new Error(`ORNITH_PROPOSAL_EDIT_TOO_LARGE:${index}`);
     }
+    return { search: edit.search, replace: edit.replace };
+  });
 
-    const result = {
-      summary: summary.substring(0, 250),
-      patch: (patch || '// See error messages for details.').substring(0, 5000),
-      riskLevel,
-    };
+  return {
+    summary: parsed.summary.slice(0, 600),
+    riskLevel: maxRisk(heuristicRisk, parsed.riskLevel as RiskLevel),
+    confidence: Number(parsed.confidence),
+    edits,
+    rationale: parsed.rationale.map(String).slice(0, 6),
+  };
+}
 
-    // Cache result in Redis (24 hours)
-    await redis.set(cacheKey, JSON.stringify(result), 'EX', 86400);
-
-    return result;
-  } catch (err) {
-    if (isVerbose) {
-      console.warn(`   ⚠️  Failed to generate suggestion for cluster ${cluster.clusterId}:`, err);
-    }
-    return null;
+function countOccurrences(haystack: string, needle: string): number {
+  if (!needle) return 0;
+  let count = 0;
+  let offset = 0;
+  while (true) {
+    const index = haystack.indexOf(needle, offset);
+    if (index < 0) return count;
+    count += 1;
+    offset = index + needle.length;
   }
 }
 
-/**
- * Main suggestion generation function
- */
+function validateExactEditPreimages(plan: OrnithProposalPlan, source: SourceSnapshot): void {
+  let working = source.content;
+  for (const [index, edit] of plan.edits.entries()) {
+    const matches = countOccurrences(working, edit.search);
+    if (matches !== 1) {
+      throw new Error(`PROPOSAL_EDIT_PREIMAGE_NOT_UNIQUE:${index}:matches=${matches}`);
+    }
+    working = working.replace(edit.search, edit.replace);
+  }
+  if (working === source.content) throw new Error('PROPOSAL_HAS_NO_EFFECT');
+}
+
+function compactRetrievalContext(packets: RetrievalPacket[]): string {
+  return packets
+    .map(
+      (packet, index) =>
+        `${index + 1}. packet=${packet.packetKey ?? 'unproven'} source=${packet.sourceRef ?? 'unknown'}\n` +
+        `   ${packet.title ? `${packet.title}\n   ` : ''}${packet.summary || '(no summary)'}`
+    )
+    .join('\n');
+}
+
+async function generateProposal(cluster: ClusterData, source: SourceSnapshot) {
+  const context = await retrieveContext(cluster, source);
+  const modelTarget = await resolveOrnithTarget();
+  const heuristicRisk = assessRiskLevel(cluster.message, cluster.errorCode ?? cluster.code);
+
+  const system = [
+    'You are Phase 78, the non-canonical repair proposal producer for Parent Atlas.',
+    'Return only the requested JSON object. Do not include hidden reasoning.',
+    'Each edit.search must be an exact substring that appears exactly once in the supplied current file.',
+    'Make the smallest safe edit. Do not rewrite unrelated code.',
+    'Retrieved packets are context evidence, not mutation authority.',
+    'Do not propose database, Qdrant, Valkey, Neo4j, package-install, or unrelated refactor work.',
+    'Phase 79 will independently re-read the source preimage, retrieve context, and re-plan before any authorized apply.',
+  ].join(' ');
+
+  const user = [
+    `Cluster: ${cluster.clusterId}`,
+    `Route: ${cluster.routeId}`,
+    `Error code: ${cluster.errorCode ?? cluster.code}`,
+    `Category: ${cluster.category ?? 'unknown'}`,
+    `Error message: ${cluster.message}`,
+    cluster.rawLogSnippet ? `Log snippet: ${cluster.rawLogSnippet.slice(0, 3000)}` : '',
+    `Target sourceRef: ${source.sourceRef}`,
+    `Exact sourceRevision SHA-256: ${source.sourceRevision}`,
+    '',
+    'Parent Atlas retrieval context:',
+    compactRetrievalContext(context.packets) || '(none)',
+    '',
+    'Current target source:',
+    '<file>',
+    source.content,
+    '</file>',
+  ]
+    .filter(Boolean)
+    .join('\n');
+
+  const { text, promptHash } = await streamOrnithJson(modelTarget, [
+    { role: 'system', content: system },
+    { role: 'user', content: user },
+  ]);
+
+  const plan = parsePlan(text, heuristicRisk);
+  validateExactEditPreimages(plan, source);
+
+  const proposal = {
+    schema: 'atlas.phase78.ornith-repair-proposal.v2',
+    clusterId: cluster.clusterId,
+    routeId: cluster.routeId,
+    sourceRef: source.sourceRef,
+    sourceRevision: source.sourceRevision,
+    contextChecksum: context.contextChecksum,
+    retrievalSources: context.retrievalSources,
+    model: modelTarget.model,
+    modelSource: modelTarget.modelSource,
+    modelSelectionReceiptChecksum: modelTarget.selectionReceiptChecksum,
+    promptHash,
+    outputHash: sha256(text),
+    plan,
+    canonicalAuthority: false,
+    sourceMutationAuthorized: false,
+    writesPerformed: false,
+  };
+
+  return {
+    summary: plan.summary,
+    riskLevel: plan.riskLevel,
+    patch: JSON.stringify(proposal),
+    proposal,
+  };
+}
+
 async function generateSuggestions(): Promise<void> {
-  console.log('🤖 Phase 78 - Generate LLM-Based Fix Suggestions\n');
+  console.log('Phase 78: Parent Atlas Ornith Repair Proposal Producer v2');
+  console.log(`mode=${DRY_RUN ? 'DRY_RUN' : 'PROPOSAL_QUEUE_WRITE'} limit=${LIMIT}`);
+
+  let successCount = 0;
+  let skippedCount = 0;
+  let failedCount = 0;
 
   try {
     const clusters = await getClustersWithoutSuggestions();
+    console.log(`eligibleClusters=${clusters.length}`);
 
-    if (clusters.length === 0) {
-      console.log('✅ No clusters without suggestions');
-      return;
-    }
-
-    console.log(`💡 Generating suggestions for ${clusters.length} error clusters\n`);
-
-    if (isDryRun) {
-      console.log('🔍 DRY RUN: Would generate suggestions for:');
-      clusters.slice(0, 3).forEach(c => {
-        console.log(`   - Cluster ${c.clusterId}: ${c.count} errors`);
-      });
-      if (clusters.length > 3) {
-        console.log(`   ... and ${clusters.length - 3} more clusters`);
+    for (const [index, cluster] of clusters.entries()) {
+      console.log(`\n[${index + 1}/${clusters.length}] cluster=${cluster.clusterId} count=${cluster.count}`);
+      const source = await resolveSourceSnapshot(cluster);
+      if (!source) {
+        console.log('SKIP_SOURCE_UNRESOLVED_OR_TOO_LARGE');
+        skippedCount += 1;
+        continue;
       }
-      return;
-    }
 
-    let successCount = 0;
-    let failCount = 0;
+      console.log(`sourceRef=${source.sourceRef}`);
+      console.log(`sourceRevision=${source.sourceRevision}`);
 
-    for (let i = 0; i < clusters.length; i++) {
-      const cluster = clusters[i];
-      console.log(`⏳ Processing cluster ${i + 1}/${clusters.length} (${cluster.count} errors)...`);
+      if (DRY_RUN) {
+        console.log('DRY_RUN: proposal would be generated; no model call or datastore write performed.');
+        successCount += 1;
+        continue;
+      }
 
-      const suggestion = await generateSuggestion(cluster);
+      try {
+        const generated = await generateProposal(cluster, source);
+        await sql`
+          INSERT INTO error_suggestions (
+            route_path,
+            cluster_id,
+            summary,
+            patch,
+            risk_level,
+            source,
+            applied,
+            created_at
+          ) VALUES (
+            ${cluster.routeId},
+            ${cluster.clusterId},
+            ${generated.summary},
+            ${generated.patch},
+            ${generated.riskLevel},
+            'ornith-phase78-v2',
+            false,
+            NOW()
+          )
+        `;
 
-      if (suggestion) {
-        await db.insert(errorSuggestionsTable).values({
-          routePath: cluster.routeId,
-          clusterId: cluster.clusterId,
-          summary: suggestion.summary,
-          patch: suggestion.patch,
-          riskLevel: suggestion.riskLevel,
-        });
-
-        // Log to files
-        const logEntry = {
-          timestamp: new Date().toISOString(),
-          clusterId: cluster.clusterId,
-          routeId: cluster.routeId,
-          ...suggestion
-        };
-
-        fs.appendFileSync(LOG_FILE_TXT,
-          `[${logEntry.timestamp}] Cluster: ${cluster.clusterId}\n` +
-          `Route: ${cluster.routeId}\n` +
-          `Summary: ${suggestion.summary}\n` +
-          `Risk: ${suggestion.riskLevel}\n` +
-          `Patch:\n${suggestion.patch}\n` +
-          `----------------------------------------\n`
+        await fs.appendFile(
+          JSONL_LOG,
+          `${JSON.stringify({
+            observedAt: new Date().toISOString(),
+            ...generated.proposal,
+            writesPerformed: { errorSuggestions: 1, sourceFiles: 0, qdrant: 0, valkey: 0, neo4j: 0 },
+          })}\n`,
+          'utf8'
         );
 
-        fs.appendFileSync(LOG_FILE_JSON, JSON.stringify(logEntry) + '\n');
-
-        successCount++;
-      } else {
-        failCount++;
-      }
-
-      // Small delay between requests
-      if (i < clusters.length - 1) {
-        await new Promise(resolve => setTimeout(resolve, 500));
+        console.log(`PROPOSAL_QUEUED model=${generated.proposal.model} risk=${generated.riskLevel}`);
+        successCount += 1;
+      } catch (error) {
+        failedCount += 1;
+        console.error(`PROPOSAL_FAILED:${error instanceof Error ? error.message : String(error)}`);
       }
     }
-
-    // Summary
-    console.log('\n📝 Suggestion Generation Summary:');
-    console.log(`   Total clusters: ${clusters.length}`);
-    console.log(`   Suggestions generated: ${successCount}`);
-    if (failCount > 0) {
-      console.log(`   Failed: ${failCount}`);
-    }
-
-    // Risk distribution
-    const riskCounts = { low: 0, medium: 0, high: 0 };
-    for (const cluster of clusters) {
-      const level = assessRiskLevel(cluster.message, cluster.code);
-      riskCounts[level]++;
-    }
-
-    console.log(`\n   Risk levels:`);
-    console.log(`   🟢 Low: ${riskCounts.low}`);
-    console.log(`   🟡 Medium: ${riskCounts.medium}`);
-    console.log(`   🔴 High: ${riskCounts.high}`);
-
-    console.log('\n✅ Phase 78 suggestion generation completed');
-    console.log('   Next: Check results with npm run phase78:check-results');
-
-  } catch (err) {
-    console.error('❌ Suggestion generation failed:', err);
-    process.exit(1);
   } finally {
-    await client.end();
-    redis.disconnect();
+    await sql.end({ timeout: 5 }).catch(() => {});
   }
+
+  console.log('\nPhase 78 summary');
+  console.log(`queuedOrPlanned=${successCount}`);
+  console.log(`skipped=${skippedCount}`);
+  console.log(`failed=${failedCount}`);
+  console.log('next=npx tsx scripts/phase79-agentic-repair.mts --dry-run --limit=1');
 }
 
-generateSuggestions();
+generateSuggestions().catch(async (error) => {
+  console.error('PHASE78_FATAL:', error instanceof Error ? error.message : String(error));
+  await sql.end({ timeout: 5 }).catch(() => {});
+  process.exitCode = 1;
+});

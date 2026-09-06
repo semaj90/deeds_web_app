@@ -10564,6 +10564,44 @@ Status: `NES_CHROM_SCHEMA_RESTORED_PIPELINE_WIRED_BOUNDED_APPLY_VERIFIED`.
   or delete the endpoint until the canonical owner and transport are proven;
   keep TurboVec gRPC `50062` and HTTP ANN `8791` as the current accelerator
   lanes.
+  **Live recheck (2026-09-04):** no process is listening on `127.0.0.1:8792`;
+  TRACE is independently healthy on `:8788`, while `opencode.json` identifies
+  TurboVec MCP on `:8791` and the optional sidecar on `:8099`. The previously
+  suggested `scripts/mcp/turbovec-sidecar-mcp.mjs` restart target does not exist.
+  This confirms `:8792` is a stale/legacy ownership surface, not a TRACE outage,
+  but the checkbox remains open until historical caller ownership is reconciled.
+  **Transport audit finding (2026-09-04):** `sveltekit-frontend/scripts/mcp/audit-sidecar-transports.mjs`
+  currently models configured `turbovec` `:8791/mcp` as an MCP endpoint, but the
+  live owner is the HTTP ANN sidecar and exposes `/health`, `/rerank`, `/prefilter`,
+  and `/search`, not `/mcp`; its 404 is therefore a configuration/transport
+  classification defect, not evidence that TRACE is down. The same audit passed
+  `engram-embed` through its stdio JSON-RPC handshake. Keep the `:8791` MCP
+  registration decision open until callers are reconciled; do not disable or
+  rename it mechanically.
+  **Wrapper collision (2026-09-04):** `sveltekit-frontend/scripts/mcp/turbovec-sidecar-mcp.mjs`
+  is a separate HTTP MCP wrapper, but its default `TURBOVEC_MCP_PORT` is also
+  `8791`, the port already occupied by the canonical TurboVec ANN HTTP owner.
+  It is not currently referenced by active configuration and must not be
+  started on `8791` without an explicit dedicated-port decision. This prevents
+  treating the wrapper as proof that the current ANN service is an MCP server.
+  **Caller result (2026-09-04):** the active `turbovec.rank_chunks` workflow
+  uses TRACE `:8788` and the local `mcp-tool-dispatch.ts`; no active application
+  caller was found for the configured remote `turbovec :8791/mcp` registration.
+  The registration is therefore stale/unproven, while `:8791` remains a real
+  HTTP ANN service. It remains unchanged until compatibility callers and the
+  intended MCP wrapper port are explicitly reconciled.
+  **Smoke-gate correction (2026-09-04):**
+  `sveltekit-frontend/scripts/smoke/mcp-core-tools-gate.mjs` no longer probes
+  TurboVec `:8791` or Engram `:8792` as HTTP MCP endpoints. It now checks only
+  configured optional HTTP MCP transports; TRACE remains the required core
+  transport, TurboVec ANN and Engram stdio remain under their own owners.
+  **Startup health correction (2026-09-04):**
+  `sveltekit-frontend/scripts/startup/run-service-health-check.mjs` now probes
+  the live TurboVec HTTP ANN owner at `TURBOVEC_HTTP_URL`/`:8791/health` in the
+  ordinary service-health loop and reserves the MCP JSON-RPC probe for TRACE.
+  It no longer reports a misleading `TurboVec MCP :8792` failure or suggests
+  the nonexistent restart script. The full startup/warm workflow remains
+  intentionally unrun in this read-only reconciliation.
 - [x] Narrowed the `8792` census to active source/config files. Production
   retrieval defaults primarily target TurboVec HTTP `8791` or gRPC `50062`;
   remaining `8792` references are legacy prefilter clients, health checks,

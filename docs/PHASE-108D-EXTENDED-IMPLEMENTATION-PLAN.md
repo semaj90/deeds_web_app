@@ -1,6 +1,11 @@
 # Phase 108D Extended Implementation Plan
 ## Qdrant Embeddings Backfill → ACE Packet Retrieval → Synthesis Pipeline
 
+> **Doc review (2026-09-04):** STALE_BUT_DIRECTIONALLY_RIGHT — 108D-1/108D-2 scripts exist and row
+> counts match later CLAUDE.md figures (52,380 → `codebase_chunks_768_v2`), but the planned
+> downstream `src/lib/server/ace/packet-retrieval.ts` and an `embedding_lineage` Drizzle table were
+> not found in the live tree — those later phases are unproven/undone.
+
 **Status**: 10-row proof PASSED ✅ | Ready for 1000-row idempotency proof
 
 **Date**: 2026-07-29 | Session: Continuation (150+)

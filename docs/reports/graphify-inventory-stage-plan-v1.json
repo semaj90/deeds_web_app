@@ -1,0 +1,25 @@
+{
+  "schema": "atlas.graphify-inventory-stage-plan.v1",
+  "status": "INVENTORY_RECEIPT_READY",
+  "sourceHandoff": "docs/reports/graphify-lifecycle-entrypoint-v1.json",
+  "workspaceRevision": "sha256:fc051ccfc7e5627b480d369c84eeb3cc73e790b4d3a0ae2ee6da971585c05c11",
+  "sourceCount": 25548,
+  "sourceSelectionChecksum": "sha256:bf447d6092fe4ed400b06ce72221ff5425c413e417df453ccba32fc097c80541",
+  "inventoryOutputChecksum": "sha256:551d4c2fd428b452e4a4576f2efb0f36cfd080cfef6cfd688f4c5a3fd3930303",
+  "validation": {
+    "uniqueSourceRefs": true,
+    "allWorkspaceRevisionsMatch": true,
+    "allSourceRevisionsBindContent": true,
+    "failures": []
+  },
+  "executionStage": {
+    "stage": "INVENTORY",
+    "inputChecksum": "sha256:bf447d6092fe4ed400b06ce72221ff5425c413e417df453ccba32fc097c80541",
+    "outputChecksum": "sha256:551d4c2fd428b452e4a4576f2efb0f36cfd080cfef6cfd688f4c5a3fd3930303",
+    "receiptRef": "docs/reports/graphify-inventory-stage-plan-v1.json"
+  },
+  "readOnly": true,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "nextGate": "COORDINATOR_INVENTORY_STAGE_READBACK"
+}

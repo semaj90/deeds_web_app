@@ -914,3 +914,15 @@ evicts least-recently-used entries deterministically under a byte budget.
 Focused cache tests pass 3/3. This closes the key/eviction contract gates only;
 the cache is not wired into the Python CUDA process, so GPU-EXP-12 still needs
 measured H2D-once/repeated-kernel reuse and VRAM-pressure evidence.
+
+## Re-verification pass (2026-09-05, read-only)
+
+- Confirmed all 3 cited receipts still exist on disk:
+  `candidate-feature-gpu-residency-proof-v1.json`,
+  `candidate-feature-gpu-residency-proof-v2.json`, `gpu-feat04-input-readiness-v1.json`.
+- Re-ran `gpu-residency-cache-v1.spec.ts` fresh — still 3/3 pass, matching this section's claim
+  exactly.
+- No further re-verification attempted on the live-CUDA claims above (RTX 3060 Ti execution,
+  H2D-transfer counts, allocator telemetry) — those require live GPU hardware/process state that a
+  read-only file/test check cannot reproduce; treated as trustworthy pending a future live rerun,
+  not independently re-proven here.

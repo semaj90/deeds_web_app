@@ -103,8 +103,8 @@ vi.mock('@langchain/langgraph', () => {
   };
 });
 
-vi.mock('@langchain/ollama', () => ({
-  ChatOllama: class {
+vi.mock('@langchain/openai', () => ({
+  ChatOpenAI: class {
     async invoke() {
       return { content: 'retrieval_contract' };
     }

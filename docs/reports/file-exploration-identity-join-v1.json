@@ -1,0 +1,28 @@
+{
+  "schema": "atlas.file-exploration-identity-join.v1",
+  "status": "SEED_NOT_IDENTITY_READY",
+  "gate": "ATLAS-FILE-EXPLORATION-INDEX-03",
+  "seedPath": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\memory\\index\\symbols.jsonl",
+  "workspaceRevision": "sha256:6e711adb17ad0c84864c84bf224e0eef7188c1cb3eb0f415708e4a3a2e66309f",
+  "workspaceSourceCount": 23702,
+  "counts": {
+    "seedRows": 40136,
+    "validJsonRows": 40136,
+    "invalidJsonRows": 0,
+    "sourceRefMatched": 1112,
+    "sourceRefMissing": 39024,
+    "sourceRevisionPresent": 0,
+    "workspaceRevisionPresent": 0,
+    "byteSpanPresent": 0,
+    "identityReadyRows": 0
+  },
+  "blockerReasons": {
+    "SOURCE_REF_NOT_IN_CURRENT_WORKSPACE": 39024,
+    "SOURCE_REVISION_MISSING": 1112
+  },
+  "sourceAuthority": "existing WorkspaceSourceBindingV1 producer",
+  "observationAuthority": "existing AST-grep seed; discovery only until identity join",
+  "canonicalAuthority": false,
+  "readOnly": true,
+  "writesPerformed": false
+}

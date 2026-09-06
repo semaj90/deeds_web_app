@@ -1,5 +1,10 @@
 # Canonical Packet Wiring Blueprint — Lane Separation Enforced
 
+> **Doc review (2026-09-04):** STALE_BUT_DIRECTIONALLY_RIGHT — lane-separation architecture and
+> named owner files (`packages/atlas-duckdb`, `duckdb-registry.ts`, `changes-consumer.ts`,
+> `gpu-job-queue.ts`) still stand, but Lane D "Inference Lane" naming Gemma4/RotorQuant is outdated
+> per CLAUDE.md's 2026-09-03 Gemma4→Ornith 1.5 9B switch.
+
 **Date**: July 4, 2026  
 **Status**: PRODUCTION WIRING SPEC  
 **Scope**: One canonical semantic packet envelope with multiple physical encodings + strict lane separation (JSON/Parse, TurboVec/ANN, Neo4j/Graph, BitFrost/Cache)

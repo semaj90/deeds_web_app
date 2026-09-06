@@ -1,12 +1,36 @@
 {
   "schema": "atlas.graphify-stale-run-reconciliation.v1",
-  "generatedAt": "2026-09-03T23:03:14.196Z",
+  "generatedAt": "2026-09-04T17:47:51.184Z",
   "mode": "READ_ONLY_STALE_RUN_RECONCILIATION",
   "expectedWorkspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+  "staleAfterMs": 21600000,
   "databaseError": null,
+  "transaction": {
+    "isolation_level": "repeatable read",
+    "read_only": "on",
+    "snapshot": "6127183:6127183:",
+    "audit_pid": 4017
+  },
+  "graphifyRunColumns": [
+    "run_id",
+    "workspace_id",
+    "repository_revision",
+    "base_revision",
+    "parser_contract_version",
+    "extraction_contract_version",
+    "started_at",
+    "completed_at",
+    "status",
+    "dry_run",
+    "configuration",
+    "workspace_revision",
+    "source_manifest_digest",
+    "source_manifest_source_count"
+  ],
   "currentRun": {
     "run_id": "14643371-f6f2-4131-906b-235a5c06619a",
     "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+    "repository_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
     "workspace_revision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
     "source_manifest_digest": "55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
     "source_manifest_source_count": 24192,
@@ -18,16 +42,56 @@
   },
   "runCount": 1,
   "completedOwnerCount": 0,
-  "classification": "STALE_RUNNING_RECORD_WITHOUT_COMPLETION_RECEIPT",
+  "classification": "CONFLICTING_EVIDENCE",
+  "executionOwnership": {
+    "processOwnerPresent": false,
+    "startupLockPresent": false,
+    "startupLockParsed": false,
+    "startupLockPid": null,
+    "startupLockPidAlive": false,
+    "startupLockBoundToRun": false,
+    "postgresBackendPresent": false,
+    "postgresRelevantLockPresent": false,
+    "anyGraphifyBackendPresent": false,
+    "anyGraphifyRelationLockPresent": true,
+    "runtimeOwnerEvidenceAbsent": false,
+    "staleByAge": true,
+    "currentAgeMs": 654388183,
+    "exactRunBoundBackends": [],
+    "exactRunBoundLocks": []
+  },
+  "canonicalCompletion": {
+    "graphRevision": null,
+    "graphRevisionColumnPresent": false,
+    "structuralRevisionMatches": true,
+    "resolutionRevisionMatches": true,
+    "resolutionCoverage": {
+      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "totalUnresolvedEdges": 10506,
+      "syntaxOnlyTotal": 776,
+      "syntaxOnlyProcessed": 776,
+      "unresolvedTargetTotal": 9730,
+      "unresolvedTargetProcessed": 2010,
+      "unresolvedTargetSampleIsPartial": true,
+      "perEdgeResultsPersisted": false
+    },
+    "canonicalCompletionEligible": false,
+    "resumeEligible": "UNKNOWN_PENDING_PER_EDGE_STRUCTURAL_OUTCOME_RECONCILIATION",
+    "manualCompleteEligible": false
+  },
   "decision": {
     "promotionAllowed": false,
     "graphRevisionAllowed": false,
-    "recommendedNext": "READINESS_ONLY_REPLAY_OR_EXPLICIT_ABANDONMENT_REVIEW",
+    "readinessReplayAllowed": false,
+    "fullGraphifyDailyAllowed": false,
+    "recommendedNext": "RECHECK_RUNTIME_OWNER_AND_EVIDENCE_BINDING",
     "mutationRequiredForThisReport": false
   },
   "blockers": [
     "CANONICAL_GRAPHIFY_RUN_NOT_COMPLETED",
-    "COMPLETION_RECEIPT_ABSENT"
+    "GRAPH_REVISION_NOT_RECORDED_ON_RUN",
+    "PER_EDGE_STRUCTURAL_OUTCOME_DETAIL_NOT_PERSISTED",
+    "RUNTIME_OWNER_BINDING_CONFLICTING_OR_UNPROVEN"
   ],
   "writes": {
     "postgres": false,
@@ -40,6 +104,7 @@
     {
       "run_id": "14643371-f6f2-4131-906b-235a5c06619a",
       "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+      "repository_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
       "workspace_revision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
       "source_manifest_digest": "55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
       "source_manifest_source_count": 24192,
@@ -51,7 +116,40 @@
     }
   ],
   "processEvidence": {
+    "startupLock": {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\.graphify-daily-start.lock",
+      "present": false,
+      "parsed": false,
+      "pid": null,
+      "pidAlive": false,
+      "metadata": null,
+      "error": null
+    },
     "activity": [],
-    "locks": []
+    "locks": [
+      {
+        "pid": 4017,
+        "mode": "AccessShareLock",
+        "granted": true,
+        "relname": "graphify_runs"
+      }
+    ],
+    "note": "Filesystem/PID evidence is sampled outside PostgreSQL MVCC and is recorded separately from the repeatable-read database snapshot."
+  },
+  "structuralEvidence": {
+    "structuralPlanPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\current-structural-edge-artifact-plan-v2.json",
+    "structuralResolutionPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\current-structural-edge-resolution-v1.json",
+    "structuralPlanPresent": true,
+    "structuralResolutionPresent": true,
+    "resolutionCoverage": {
+      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "totalUnresolvedEdges": 10506,
+      "syntaxOnlyTotal": 776,
+      "syntaxOnlyProcessed": 776,
+      "unresolvedTargetTotal": 9730,
+      "unresolvedTargetProcessed": 2010,
+      "unresolvedTargetSampleIsPartial": true,
+      "perEdgeResultsPersisted": false
+    }
   }
 }

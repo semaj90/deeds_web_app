@@ -1,0 +1,43 @@
+{
+  "schema": "atlas.openspec-workstation-ace-context-reference.v1",
+  "status": "NO_EXECUTABLE_CANDIDATE",
+  "authority": "EXISTING_ACE_CONTEXTMANIFEST_OWNER",
+  "workboardChecksum": "sha256:69ab3ce2959fd3e3fd45059727734f6b0a2318355980adce6f663a5e09f33195",
+  "taskPopulationChecksum": "sha256:cf9fdd8c8208d977ae704de33f672f9b15a049412403a21872cd0241e0d6a243",
+  "planChecksum": "sha256:6a437ac81d774f5e7cf093940fdd62018dc03cd765d0996fdf16919426761598",
+  "selectedTaskRefs": [],
+  "selectedEvidenceRefs": [
+    "docs/reports/current-source-cohort-lineage-v1.json",
+    "docs/reports/current-workspace-packet-chunk-join-v1.json"
+  ],
+  "excludedTaskCount": 54,
+  "tokenBudget": 2000,
+  "maxEvidenceReferences": 8,
+  "mutationScope": "NONE",
+  "modelCalls": 0,
+  "contextChecksum": "sha256:cc93a4aa501ae9e2a13422a7f73c108214105e5df69e8db1333ffa867c3fcbb6",
+  "evidenceResolution": [
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    }
+  ],
+  "writes": {
+    "taskLedgers": 0,
+    "sourceFiles": 0,
+    "databases": 0,
+    "qdrant": 0,
+    "neo4j": 0,
+    "cache": 0,
+    "modelCalls": 0
+  },
+  "notes": [
+    "Reference-only adapter; existing ACE/ContextManifest owner remains authoritative.",
+    "The complete OpenSpec backlog is never materialized into context.",
+    "No model call occurs when the plan has no executable candidate."
+  ]
+}

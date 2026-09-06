@@ -1,0 +1,105 @@
+{
+  "schema": "atlas.okf-chunk-plan.v1",
+  "generatedAt": "2026-09-04T17:09:24.484Z",
+  "scanRoot": "docs/.okf/dev/raw",
+  "limit": 512,
+  "maxBytes": 4096,
+  "workspaceRevision": "sha256:f7c6f2c974d72c2d1fdaeade6b1722be61c8f7b6d369e018d58dbd72497b6b55",
+  "sourceCount": 2,
+  "chunkCount": 4,
+  "sourceOwner": "scripts/atlas/plan-okf-chunks-v1.mjs",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "datastoreWritesPerformed": false,
+  "externalNetworkCallsPerformed": false,
+  "coordinateContract": "startByte/endByte index exact UTF-8 source bytes; no character or timestamp identity",
+  "admissionNote": "This is a pre-admission plan. Existing CanonicalChunkSchema requires an admitted UUID chunkId and workspaceId; no plan row is canonical until that adapter proves the mapping.",
+  "sources": [
+    {
+      "sourceRef": "workspace:firecrawl/docs-firecrawl-dev-api-reference-introduction-introduction.json",
+      "relativePath": "firecrawl/docs-firecrawl-dev-api-reference-introduction-introduction.json",
+      "sourceRevision": "sha256:1c7d56cc65793bead233186fa85ba70c02293bb4115435a022d5fc37eb1ef57f",
+      "byteLength": 3722
+    },
+    {
+      "sourceRef": "workspace:firecrawl/docs-firecrawl-dev-api-reference-introduction-introduction.md",
+      "relativePath": "firecrawl/docs-firecrawl-dev-api-reference-introduction-introduction.md",
+      "sourceRevision": "sha256:17b6c5e46e0634be1c09d6c00ec070dc582acdd8d960df68439ae670fa27b604",
+      "byteLength": 4985
+    }
+  ],
+  "chunks": [
+    {
+      "schema": "atlas.okf-chunk-plan-row.v1",
+      "chunkId": "sha256:0651a3cea2f7c2eeeb54826e104e43d73d233fd5733a20e211ab166fa84fb874",
+      "sourceRef": "workspace:firecrawl/docs-firecrawl-dev-api-reference-introduction-introduction.json",
+      "sourceRevision": "sha256:1c7d56cc65793bead233186fa85ba70c02293bb4115435a022d5fc37eb1ef57f",
+      "startByte": 0,
+      "endByte": 3721,
+      "byteLength": 3721,
+      "chunkChecksum": "sha256:ea39a70e35c4390c493402029e9beda5524a2e2bac5587647944cc49ba6d69c1",
+      "canonicalAuthority": false,
+      "downstream": [
+        "ast_grep",
+        "langextract",
+        "postgres_fts",
+        "semantic_768",
+        "ace_reference"
+      ]
+    },
+    {
+      "schema": "atlas.okf-chunk-plan-row.v1",
+      "chunkId": "sha256:7a43471725c08af2f9b2ab7e917705993086496583def1c46b00a11a52ec6721",
+      "sourceRef": "workspace:firecrawl/docs-firecrawl-dev-api-reference-introduction-introduction.json",
+      "sourceRevision": "sha256:1c7d56cc65793bead233186fa85ba70c02293bb4115435a022d5fc37eb1ef57f",
+      "startByte": 3721,
+      "endByte": 3722,
+      "byteLength": 1,
+      "chunkChecksum": "sha256:d10b36aa74a59bcf4a88185837f658afaf3646eff2bb16c3928d0e9335e945d2",
+      "canonicalAuthority": false,
+      "downstream": [
+        "ast_grep",
+        "langextract",
+        "postgres_fts",
+        "semantic_768",
+        "ace_reference"
+      ]
+    },
+    {
+      "schema": "atlas.okf-chunk-plan-row.v1",
+      "chunkId": "sha256:a696ab6aa7b83c200b7264b34636750fa67d13fc2b1fa002443bb5f92b314fc1",
+      "sourceRef": "workspace:firecrawl/docs-firecrawl-dev-api-reference-introduction-introduction.md",
+      "sourceRevision": "sha256:17b6c5e46e0634be1c09d6c00ec070dc582acdd8d960df68439ae670fa27b604",
+      "startByte": 0,
+      "endByte": 4096,
+      "byteLength": 4096,
+      "chunkChecksum": "sha256:4bed9c4d3e5314168bac0a9861d5498ed61d849bf0f1f55b476bb8ac2e603f22",
+      "canonicalAuthority": false,
+      "downstream": [
+        "ast_grep",
+        "langextract",
+        "postgres_fts",
+        "semantic_768",
+        "ace_reference"
+      ]
+    },
+    {
+      "schema": "atlas.okf-chunk-plan-row.v1",
+      "chunkId": "sha256:73236b56ac1bf234c2ed225b3c0600d146466578db57016b668b933013862673",
+      "sourceRef": "workspace:firecrawl/docs-firecrawl-dev-api-reference-introduction-introduction.md",
+      "sourceRevision": "sha256:17b6c5e46e0634be1c09d6c00ec070dc582acdd8d960df68439ae670fa27b604",
+      "startByte": 4096,
+      "endByte": 4985,
+      "byteLength": 889,
+      "chunkChecksum": "sha256:d4953438f284dd2767871591d51095fe30dc925e4cd2d9945cd901e223e3c026",
+      "canonicalAuthority": false,
+      "downstream": [
+        "ast_grep",
+        "langextract",
+        "postgres_fts",
+        "semantic_768",
+        "ace_reference"
+      ]
+    }
+  ]
+}

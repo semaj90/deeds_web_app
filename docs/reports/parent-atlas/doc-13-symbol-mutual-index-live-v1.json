@@ -1,0 +1,90 @@
+{
+  "schema": "parent-atlas.doc-13-symbol-mutual-index-live.v1",
+  "gate": "DOC-13",
+  "status": "LIVE_DOC_EXTRACTION_SYMBOL_JOIN_PROVEN",
+  "readOnly": true,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "sourceOwners": [
+    "atlas_symbol_registry",
+    "atlas_symbol_versions"
+  ],
+  "query": {
+    "tables": [
+      "atlas_symbol_registry",
+      "atlas_symbol_versions"
+    ],
+    "rowsRead": 200
+  },
+  "sample": {
+    "canonicalKey": "symbol-key:00b5064f2e1c5387769e68e90eacfba819f34966",
+    "canonicalName": "classifyPacketTask",
+    "canonicalQualifiedName": "classifyPacketTask",
+    "sourceRef": "packages/atlas-core/src/policy-task-router.ts",
+    "sourceRevision": "workspace:0",
+    "workspaceRevision": "workspace:0",
+    "registryRevision": "promotion:ast-nominations:v1",
+    "symbolVersionId": "symbol-version:b6e205825e35704467ca92c41fb0a3f777b01d903a699faa6ecb52f9bcedfd23"
+  },
+  "match": {
+    "extractedRule": {
+      "schema": "atlas.api-rule.v1",
+      "apiSymbol": "classifyPacketTask",
+      "versionRange": "1.0",
+      "condition": "version 1.0",
+      "recommendation": "use classifyPacketTask with the documented default configuration",
+      "parameterName": null,
+      "expectedValue": null,
+      "evidenceSpan": {
+        "sourceRevision": "sha256:920b0cc5650502c5d64b0d199f131c056e73c23c36f1aab9d8f7d6b3f451dfed",
+        "startChar": 0,
+        "endChar": 82,
+        "startByte": 0,
+        "endByte": 82,
+        "alignmentStatus": "MATCH_EXACT"
+      },
+      "confidence": 0.9,
+      "canonicalAuthority": false
+    },
+    "join": {
+      "status": "MATCHED_DOCUMENTATION_SYMBOL",
+      "stableSymbolId": "stable-symbol:53f511eaa2e2caed42d250dd4f56ad9e3974777752245627782f22f12ba22fc2",
+      "symbolVersionId": "symbol-version:b6e205825e35704467ca92c41fb0a3f777b01d903a699faa6ecb52f9bcedfd23",
+      "sourceRef": "packages/atlas-core/src/policy-task-router.ts",
+      "documentationSourceRevision": "sha256:920b0cc5650502c5d64b0d199f131c056e73c23c36f1aab9d8f7d6b3f451dfed",
+      "codeSourceRevision": "workspace:0",
+      "workspaceRevision": "workspace:0",
+      "registryRevision": "promotion:ast-nominations:v1"
+    }
+  },
+  "evidence": [
+    "LIVE_NEGATIVE_MATRIX_READ_ONLY",
+    "READ_ONLY_EXACT_NAME_AND_SOURCE_REVISION_JOIN"
+  ],
+  "extraction": {
+    "statusCode": 200,
+    "modelId": "ornith-1.5-9b",
+    "apiRuleCount": 1,
+    "canonicalAuthority": false
+  },
+  "negativeMatrix": {
+    "staleCodeRevision": {
+      "status": "STALE_CODE_SOURCE",
+      "expected": "STALE_CODE_SOURCE",
+      "passed": true
+    },
+    "unmappedSymbol": {
+      "status": "UNRESOLVED",
+      "expected": "UNRESOLVED",
+      "passed": true
+    },
+    "ambiguousLiveName": {
+      "name": "constructor",
+      "status": "AMBIGUOUS",
+      "expected": "AMBIGUOUS",
+      "passed": true
+    },
+    "matchedCodeRevision": "workspace:0"
+  },
+  "reportChecksum": "sha256:a9a776d7ccc1039e20fb2a6d49ae03fcde5791a1acc723ff6612eda4ccf3e397"
+}

@@ -22,7 +22,7 @@ Only `Read` a file if `rg` confirms it contains what you need. Never load an ent
 
 **Status**: Stage 0 gate VERIFIED ✅ (July 23, 2026)
 
-**Infrastructure**: All 7 critical services online (Postgres, Qdrant, Neo4j, Valkey, EmbeddingGemma, Gemma4, Go Retrieval)
+**Infrastructure**: All 7 critical services online (Postgres, Qdrant, Neo4j, Valkey, EmbeddingGemma, llama-server/Ornith, Go Retrieval)
 
 **Execution Pipeline**: Ready for Graphify Stage 1 (Incremental File Inventory)
 
@@ -259,7 +259,7 @@ LangGraph is **optional orchestration and testing only**.
 
 **Allowed:**
 - Validation workflows, planning graphs, subagent sequencing
-- Gemma4 / function-tool calling, dry-run reasoning
+- Ornith via llama-server / function-tool calling, dry-run reasoning
 
 **Not allowed — hard block:**
 - Direct writes to Postgres, Qdrant, Redis, Neo4j, DuckDB, or SeaweedFS from any graph node

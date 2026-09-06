@@ -1,0 +1,72 @@
+{
+  "schema": "atlas.okf-directory-index-plan.v1",
+  "generatedAt": "2026-09-04T17:09:05.223Z",
+  "scanRoot": "docs/.okf/dev/raw",
+  "limit": 512,
+  "workspaceRevision": "sha256:f7c6f2c974d72c2d1fdaeade6b1722be61c8f7b6d369e018d58dbd72497b6b55",
+  "sourceManifestChecksum": "sha256:f7c6f2c974d72c2d1fdaeade6b1722be61c8f7b6d369e018d58dbd72497b6b55",
+  "sourceCount": 2,
+  "rejectedCount": 0,
+  "chunkingCounts": {
+    "bounded_object_or_document": 1,
+    "heading_section": 1
+  },
+  "sourceOwner": "scripts/atlas/plan-okf-directory-index-v1.mjs",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "datastoreWritesPerformed": false,
+  "externalNetworkCallsPerformed": false,
+  "projectionPlan": {
+    "postgres": "FTS/GIN candidate plan only; no SQL executed",
+    "semantic": "EmbeddingGemma semantic_768 after source/chunk admission; no embedding executed",
+    "structural": "Tree-sitter/AST-grep/compiler/LSP observations after chunking",
+    "graph": "NetworkX/Neo4j projection only after graph/source proof",
+    "context": "ACE references and bounded LOD assembly after CandidateOrdinal admission",
+    "cache": "BitFrost/Valkey descriptors only after revision-qualified context identity",
+    "synthesis": "Ornith :8090 only after validated ContextManifest"
+  },
+  "rejected": [],
+  "rows": [
+    {
+      "schema": "atlas.okf-directory-source-binding.v1",
+      "sourceRef": "workspace:firecrawl/docs-firecrawl-dev-api-reference-introduction-introduction.json",
+      "relativePath": "firecrawl/docs-firecrawl-dev-api-reference-introduction-introduction.json",
+      "extension": ".json",
+      "byteLength": 3722,
+      "contentHash": "sha256:1c7d56cc65793bead233186fa85ba70c02293bb4115435a022d5fc37eb1ef57f",
+      "sourceRevision": "sha256:1c7d56cc65793bead233186fa85ba70c02293bb4115435a022d5fc37eb1ef57f",
+      "chunking": "bounded_object_or_document",
+      "observers": [
+        "okf",
+        "schema"
+      ],
+      "projections": [
+        "postgres_fts",
+        "semantic_768_candidate",
+        "ace_reference"
+      ],
+      "canonicalAuthority": false
+    },
+    {
+      "schema": "atlas.okf-directory-source-binding.v1",
+      "sourceRef": "workspace:firecrawl/docs-firecrawl-dev-api-reference-introduction-introduction.md",
+      "relativePath": "firecrawl/docs-firecrawl-dev-api-reference-introduction-introduction.md",
+      "extension": ".md",
+      "byteLength": 4985,
+      "contentHash": "sha256:17b6c5e46e0634be1c09d6c00ec070dc582acdd8d960df68439ae670fa27b604",
+      "sourceRevision": "sha256:17b6c5e46e0634be1c09d6c00ec070dc582acdd8d960df68439ae670fa27b604",
+      "chunking": "heading_section",
+      "observers": [
+        "okf",
+        "langextract",
+        "nlp"
+      ],
+      "projections": [
+        "postgres_fts",
+        "semantic_768_candidate",
+        "ace_reference"
+      ],
+      "canonicalAuthority": false
+    }
+  ]
+}

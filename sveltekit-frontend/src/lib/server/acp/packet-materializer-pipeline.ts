@@ -14,6 +14,7 @@
 import type { PacketTopologyEnvelope } from '../db/packet-topology-envelope.js';
 import type { PoolClient } from 'pg';
 import { generateTitleIdentity } from '../ace/title-id-generator.js';
+import { invalidateBitfrostPacket } from '../cache/atlas-reward-cache.js';
 
 // Canonical title_id format: title:<slug>:<8-char-hex> where slug = [a-z0-9]+(-[a-z0-9]+)*
 const CANONICAL_TITLE_RE = /^title:[a-z0-9]+(?:-[a-z0-9]+)*:[a-f0-9]{8}$/;
@@ -313,6 +314,14 @@ async function writePacketToPostgres(
 
 /**
  * Step 4: Invalidate Redis cache
+ *
+ * 2026-09-04 (BITFROST-INVALIDATION-OWNER-01): this function's own key patterns
+ * (bifrost:packet:*, bifrost:feature:*:packets, bifrost:source:*,
+ * bitfrost:summary:{packet_key}) were confirmed live-absent from Redis -- the
+ * real shapes are bifrost:sem:packet:*, bifrost:sem:feature:*, and
+ * bitfrost:summary:packet:v1:*. Delegates to the canonical
+ * invalidateBitfrostPacket() instead of maintaining its own second copy of the
+ * key logic. See docs/reports/parent-atlas-bitfrost-invalidation-owner-v1.json.
  */
 async function invalidateRedisCache(
   packet: PacketTopologyEnvelope,
@@ -322,17 +331,10 @@ async function invalidateRedisCache(
     return; // Skip if no Redis client
   }
 
-  const redis = context.redisClient;
-  const keysToDelete = [
-    `bifrost:packet:${packet.packet_key}`,
-    `bifrost:feature:${packet.feature_id}:packets`,
-    `bifrost:source:${packet.source_ref}`,
-    `bitfrost:summary:${packet.packet_key}`,
-  ];
-
-  if (keysToDelete.length > 0) {
-    await redis.del(...keysToDelete);
-  }
+  await invalidateBitfrostPacket(context.redisClient, {
+    packetKey: packet.packet_key,
+    featureId: packet.feature_id,
+  });
 }
 
 /**

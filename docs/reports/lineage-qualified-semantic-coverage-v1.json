@@ -1,6 +1,6 @@
 {
   "schema": "atlas.lineage-qualified-semantic-coverage.v1",
-  "generatedAt": "2026-08-29T06:08:38.675Z",
+  "generatedAt": "2026-09-05T05:53:41.583Z",
   "mode": "READ_ONLY_CANARY_RECONCILIATION",
   "candidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
   "ordinalMapChecksum": "86fee5d38619d3065d8710942068f26fb5b0d3c09992b1b523083ae0a593d297",

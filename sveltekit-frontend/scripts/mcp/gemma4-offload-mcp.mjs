@@ -10,9 +10,24 @@
 //   GET  /health
 //   POST /v1/chat/completions
 //
+// Model identity is deliberately NOT hardcoded here — the launcher/runtime
+// contract owns which model is loaded (currently Ornith 1.5 9B on :8090; was
+// Gemma4 historically, will change again). This file's job is capability
+// routing (repo-audit-only, bounded, evidence-grounded), not model selection.
+// See LOCAL-LLM-OFFLOAD-OWNERSHIP-01 for the naming migration this file is
+// mid-way through: canonical MCP capability identity is "local-llm-offload";
+// "gemma4-offload" (this filename, the process registration key, and the
+// gemma4_* tool names below) is a temporary compatibility alias, not the
+// source of truth for what model is running.
+//
 // Environment variables:
 //   LLAMA_PRIMARY_BASE=http://127.0.0.1:8090
-//   LLAMA_PRIMARY_MODEL=gemma4-legal-iq4xs-direct
+//   LLAMA_PRIMARY_MODEL=                 (optional — leave unset to trust the
+//                                          single model observed live via
+//                                          GET /v1/models; set only to assert
+//                                          an explicit expected model id, e.g.
+//                                          "ornith-1.5-9b", and fail closed on
+//                                          mismatch)
 //   LLAMA_PRIMARY_API_KEY=local
 //
 //   LLAMA_FALLBACK_BASE=http://127.0.0.1:1337
@@ -24,6 +39,13 @@
 // Model filesystem paths are launch-time llama-server concerns. This MCP client
 // does not load GGUF/mmproj files itself. Start llama-server with -m/--model and
 // --mmproj as needed, then point this client at its HTTP endpoint.
+//
+// Model resolution policy (fail closed, never guess among multiple models):
+//   - LLAMA_PRIMARY_MODEL set  -> must appear in GET /v1/models; else throw.
+//   - LLAMA_PRIMARY_MODEL unset, exactly one model exposed -> trust it (this
+//     is "observe the single loaded model", not "arbitrarily pick data[0]").
+//   - LLAMA_PRIMARY_MODEL unset, multiple models exposed -> throw (ambiguous;
+//     never silently choose one).
 
 import { createInterface } from 'node:readline';
 
@@ -67,10 +89,14 @@ const REPO_OUTPUT_HINT =
   /(?:route_runtime_packets|parent_atlas_documents|feature_lineage|parent_atlas_jobs|atlas_feature_map|task_semantic_packets|nes_chrom_packets|postgres|duckdb|couchdb|qdrant|neo4j|mismatch|ready_to_promote|live_db|drizzle|schema|report|table|index)/i;
 
 const PROTOCOL_VERSION = '2024-11-05';
-const SERVER_INFO = { name: 'gemma4-offload', version: '0.2.0' };
+// Canonical capability identity. "gemma4-offload" (the process registration
+// key other configs still use, per LOCAL-LLM-OFFLOAD-OWNERSHIP-01's
+// compatibility-preserving migration) is a temporary alias of this, not a
+// second identity.
+const SERVER_INFO = { name: 'local-llm-offload', version: '0.3.0' };
 
 const log = (...args) => {
-  process.stderr.write(`[gemma4-offload] ${args.join(' ')}\n`);
+  process.stderr.write(`[local-llm-offload] ${args.join(' ')}\n`);
 };
 
 function normalizeBase(value) {
@@ -126,19 +152,33 @@ async function discoverModel(baseUrl, apiKey, preferredModel = '') {
     .map((entry) => entry?.id ?? entry?.model ?? entry?.name)
     .filter((value) => typeof value === 'string' && value.trim());
 
-  if (preferredModel) {
-    if (ids.length === 0 || ids.includes(preferredModel)) return preferredModel;
-
-    throw new Error(
-      `configured model "${preferredModel}" is not exposed by ${baseUrl}; ` +
-        `available models: ${ids.join(', ') || '<none>'}`
-    );
-  }
-
+  // GET /v1/models is verification, never selection. The runtime/launcher
+  // config (LLAMA_PRIMARY_MODEL) is the configured authority; this call only
+  // confirms configured == loaded, or fails closed. We never silently choose
+  // an arbitrary model when the observation is empty or ambiguous.
   if (ids.length === 0) {
     throw new Error(`no model IDs returned by ${baseUrl}/v1/models`);
   }
 
+  if (preferredModel) {
+    if (ids.includes(preferredModel)) return preferredModel;
+
+    throw new Error(
+      `configured model "${preferredModel}" is not exposed by ${baseUrl}; ` +
+        `available models: ${ids.join(', ')}`
+    );
+  }
+
+  if (ids.length > 1) {
+    throw new Error(
+      `no LLAMA_PRIMARY_MODEL configured and ${baseUrl}/v1/models exposes ` +
+        `${ids.length} models (${ids.join(', ')}); set LLAMA_PRIMARY_MODEL ` +
+        'explicitly rather than guessing which one to use'
+    );
+  }
+
+  // Exactly one model is loaded and none was asserted — this is "observe the
+  // single running model", not "pick the first of several".
   return ids[0];
 }
 
@@ -229,18 +269,20 @@ async function chatCascade(messages, opts) {
 }
 
 function buildRepoAuditMessages({ system, prompt }) {
-  const messages = [{ role: 'system', content: REPO_AUDIT_GUARDRAIL }];
+  // Exactly one system message, merged, placed first. Found live (this
+  // session, against Ornith 1.5 on :8090) that two separate system-role
+  // messages trip the chat template's guard: `Jinja Exception: System
+  // message must be at the beginning` — the template expects a single
+  // leading system entry, not one-per-instruction. Every caller that passes
+  // a `system` argument (repo_summarize, repo_classify, and any repo_chat
+  // call with an explicit system) was broken by this until fixed here.
+  const extra = system && String(system).trim() ? String(system).trim() : '';
+  const systemContent = extra ? `${REPO_AUDIT_GUARDRAIL}\n\n${extra}` : REPO_AUDIT_GUARDRAIL;
 
-  if (system && String(system).trim()) {
-    messages.push({ role: 'system', content: String(system).trim() });
-  }
-
-  messages.push({
-    role: 'user',
-    content: String(prompt ?? '').trim(),
-  });
-
-  return messages;
+  return [
+    { role: 'system', content: systemContent },
+    { role: 'user', content: String(prompt ?? '').trim() },
+  ];
 }
 
 function sanitizeRepoAuditOutput(content) {
@@ -311,6 +353,13 @@ async function probeBackend(backend) {
     base_url: backend.baseUrl,
     health: 'unknown',
     models: 'unknown',
+    // configuredModel: what LLAMA_PRIMARY_MODEL/LLAMA_FALLBACK_MODEL asserts,
+    // or null when unset (trusting the single observed model instead).
+    configured_model: backend.preferredModel || null,
+    // loadedModel: what GET /v1/models actually observed. Verification only,
+    // never the source of selection authority.
+    loaded_model: null,
+    model_match: null,
     selected_model: null,
   };
 
@@ -326,193 +375,228 @@ async function probeBackend(backend) {
   }
 
   try {
-    health.selected_model = await resolveModel(backend);
+    const resolved = await resolveModel(backend);
+    health.selected_model = resolved;
+    health.loaded_model = resolved;
+    health.model_match = backend.preferredModel ? resolved === backend.preferredModel : true;
     health.models = 'ok';
   } catch (error) {
     health.models = `error (${error.message.slice(0, 160)})`;
+    health.model_match = false;
   }
 
   return health;
 }
 
 // ── tool implementations ──────────────────────────────────────────────
+//
+// Canonical capability identity: local-llm-offload. Canonical tool names:
+//   repo_report_answer, repo_chat, repo_summarize, repo_classify, repo_llm_health
+// Deprecated compatibility aliases (kept until caller census = 0, per
+// LOCAL-LLM-OFFLOAD-OWNERSHIP-01 phase 4):
+//   gemma4_chat -> repo_chat
+//   gemma4_summarize -> repo_summarize
+//   gemma4_classify -> repo_classify
+//   gemma4_health -> repo_llm_health
+// Every alias below delegates to the exact same implementation as its
+// canonical counterpart — no behavior fork between old and new names.
 
-const TOOLS = [
-  {
-    name: 'gemma4_chat',
-    description:
-      'Deprecated alias for bounded repo-audit answers from local OpenAI-compatible llama-server routes. ' +
-      'Use only for supplied repo evidence, report snippets, file snippets, or command output.',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        prompt: {
-          type: 'string',
-          description:
-            'Repo evidence question or bounded audit prompt. Include report text, file snippets, or command output.',
-        },
-        system: {
-          type: 'string',
-          description: 'Optional additional repo-audit instruction.',
-        },
-        max_tokens: {
-          type: 'integer',
-          minimum: 1,
-          maximum: 4096,
-          default: 256,
-        },
-        temperature: {
-          type: 'number',
-          minimum: 0,
-          maximum: 2,
-          default: 0.2,
-        },
-      },
-      required: ['prompt'],
-      additionalProperties: false,
+const CHAT_INPUT_SCHEMA = {
+  type: 'object',
+  properties: {
+    prompt: {
+      type: 'string',
+      description:
+        'Repo evidence question or bounded audit prompt. Include report text, file snippets, or command output.',
     },
-    async run({ prompt, system, max_tokens, temperature }) {
-      const out = await repoAuditChat({
-        prompt,
-        system,
-        maxTokens: max_tokens,
-        temperature,
-      });
-      return `[${out.backend}${out.model ? `:${out.model}` : ''}] ${out.content}`;
+    system: {
+      type: 'string',
+      description: 'Optional additional repo-audit instruction.',
+    },
+    max_tokens: {
+      type: 'integer',
+      minimum: 1,
+      maximum: 4096,
+      default: 256,
+    },
+    temperature: {
+      type: 'number',
+      minimum: 0,
+      maximum: 2,
+      default: 0.2,
     },
   },
+  required: ['prompt'],
+  additionalProperties: false,
+};
+
+const SUMMARIZE_INPUT_SCHEMA = {
+  type: 'object',
+  properties: {
+    text: { type: 'string', description: 'Repo evidence to summarize.' },
+    target_words: {
+      type: 'integer',
+      minimum: 20,
+      maximum: 1000,
+      default: 80,
+    },
+  },
+  required: ['text'],
+  additionalProperties: false,
+};
+
+const CLASSIFY_INPUT_SCHEMA = {
+  type: 'object',
+  properties: {
+    text: { type: 'string', description: 'Repo evidence to classify.' },
+    labels: {
+      type: 'array',
+      items: { type: 'string' },
+      minItems: 2,
+      maxItems: 50,
+    },
+  },
+  required: ['text', 'labels'],
+  additionalProperties: false,
+};
+
+async function runChat({ prompt, system, max_tokens, temperature }) {
+  const out = await repoAuditChat({
+    prompt,
+    system,
+    maxTokens: max_tokens,
+    temperature,
+  });
+  return `[${out.backend}${out.model ? `:${out.model}` : ''}] ${out.content}`;
+}
+
+async function runSummarize({ text, target_words = 80 }) {
+  const out = await repoAuditChat({
+    prompt: text,
+    system:
+      `Summarize the provided repo evidence in roughly ${target_words} words. ` +
+      'Use plain prose with no preamble.',
+    maxTokens: Math.max(64, Math.ceil(Number(target_words) * 2)),
+    temperature: 0.1,
+  });
+  return `[${out.backend}${out.model ? `:${out.model}` : ''}] ${out.content}`;
+}
+
+async function runClassify({ text, labels }) {
+  if (!Array.isArray(labels) || labels.length < 2) {
+    throw new Error('need at least two labels');
+  }
+
+  const out = await repoAuditChat({
+    prompt: text,
+    system:
+      `Classify the provided repo evidence into exactly one label: ${labels.join(', ')}. ` +
+      'Reply with the chosen label only.',
+    maxTokens: 32,
+    temperature: 0,
+  });
+
+  const raw = String(out.content ?? '')
+    .trim()
+    .toLowerCase();
+  const exact = labels.find((label) => raw === String(label).trim().toLowerCase());
+  const prefix = labels.find((label) => raw.startsWith(String(label).trim().toLowerCase()));
+
+  return exact ?? prefix ?? labels[0];
+}
+
+async function runHealth() {
+  const backends = await Promise.all(BACKENDS.map(probeBackend));
+  const primary = backends.find((b) => b.backend === 'llama-primary') ?? null;
+
+  /** @type {LocalLlmOffloadReceiptV1} */
+  const receipt = {
+    schema: 'atlas.local-llm-offload-receipt.v1',
+    timeoutMs: REQUEST_TIMEOUT_MS,
+    backends,
+    configuredModel: primary?.configured_model ?? null,
+    loadedModel: primary?.loaded_model ?? null,
+    modelMatch: primary?.model_match ?? null,
+    canonicalService: 'local-llm-offload',
+    registeredCompatibilityName: 'gemma4-offload',
+    canonicalTools: [
+      'repo_report_answer',
+      'repo_chat',
+      'repo_summarize',
+      'repo_classify',
+      'repo_llm_health',
+    ],
+    deprecatedAliases: ['gemma4_chat', 'gemma4_summarize', 'gemma4_classify', 'gemma4_health'],
+    writesPerformed: false,
+  };
+
+  return JSON.stringify(receipt, null, 2);
+}
+
+const TOOLS = [
   {
     name: 'repo_report_answer',
     description:
       'Interpret supplied repo reports, file snippets, and command output with the configured local llama-server.',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        prompt: {
-          type: 'string',
-          description:
-            'Repo evidence question or bounded audit prompt. Include report text, file snippets, or command output.',
-        },
-        system: {
-          type: 'string',
-          description: 'Optional additional repo-audit instruction.',
-        },
-        max_tokens: {
-          type: 'integer',
-          minimum: 1,
-          maximum: 4096,
-          default: 256,
-        },
-        temperature: {
-          type: 'number',
-          minimum: 0,
-          maximum: 2,
-          default: 0.2,
-        },
-      },
-      required: ['prompt'],
-      additionalProperties: false,
-    },
-    async run({ prompt, system, max_tokens, temperature }) {
-      const out = await repoAuditChat({
-        prompt,
-        system,
-        maxTokens: max_tokens,
-        temperature,
-      });
-      return `[${out.backend}${out.model ? `:${out.model}` : ''}] ${out.content}`;
-    },
+    inputSchema: CHAT_INPUT_SCHEMA,
+    run: runChat,
+  },
+  {
+    name: 'repo_chat',
+    description:
+      'Canonical rename of the deprecated gemma4_chat tool: bounded repo-audit chat over supplied evidence ' +
+      'from the configured local llama-server. Use only for supplied repo evidence, report snippets, file ' +
+      'snippets, or command output.',
+    inputSchema: CHAT_INPUT_SCHEMA,
+    run: runChat,
+  },
+  {
+    name: 'repo_summarize',
+    description:
+      'Canonical rename of the deprecated gemma4_summarize tool: summarize supplied repo evidence through the ' +
+      'configured local llama-server.',
+    inputSchema: SUMMARIZE_INPUT_SCHEMA,
+    run: runSummarize,
+  },
+  {
+    name: 'repo_classify',
+    description:
+      'Canonical rename of the deprecated gemma4_classify tool: classify supplied repo evidence into exactly ' +
+      'one provided label using the configured local llama-server.',
+    inputSchema: CLASSIFY_INPUT_SCHEMA,
+    run: runClassify,
+  },
+  {
+    name: 'repo_llm_health',
+    description:
+      'Canonical rename of the deprecated gemma4_health tool: probe the primary llama-server and fallback ' +
+      'route, and report configured-vs-loaded model identity (fail-closed observation, never selection).',
+    inputSchema: { type: 'object', properties: {}, additionalProperties: false },
+    run: runHealth,
+  },
+  {
+    name: 'gemma4_chat',
+    description: 'Deprecated alias of repo_chat. Kept for compatibility; prefer repo_chat.',
+    inputSchema: CHAT_INPUT_SCHEMA,
+    run: runChat,
   },
   {
     name: 'gemma4_summarize',
-    description: 'Summarize supplied repo evidence through the configured local llama-server.',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        text: { type: 'string', description: 'Repo evidence to summarize.' },
-        target_words: {
-          type: 'integer',
-          minimum: 20,
-          maximum: 1000,
-          default: 80,
-        },
-      },
-      required: ['text'],
-      additionalProperties: false,
-    },
-    async run({ text, target_words = 80 }) {
-      const out = await repoAuditChat({
-        prompt: text,
-        system:
-          `Summarize the provided repo evidence in roughly ${target_words} words. ` +
-          'Use plain prose with no preamble.',
-        maxTokens: Math.max(64, Math.ceil(Number(target_words) * 2)),
-        temperature: 0.1,
-      });
-      return `[${out.backend}${out.model ? `:${out.model}` : ''}] ${out.content}`;
-    },
+    description: 'Deprecated alias of repo_summarize. Kept for compatibility; prefer repo_summarize.',
+    inputSchema: SUMMARIZE_INPUT_SCHEMA,
+    run: runSummarize,
   },
   {
     name: 'gemma4_classify',
-    description:
-      'Classify supplied repo evidence into exactly one provided label using the local llama-server.',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        text: { type: 'string', description: 'Repo evidence to classify.' },
-        labels: {
-          type: 'array',
-          items: { type: 'string' },
-          minItems: 2,
-          maxItems: 50,
-        },
-      },
-      required: ['text', 'labels'],
-      additionalProperties: false,
-    },
-    async run({ text, labels }) {
-      if (!Array.isArray(labels) || labels.length < 2) {
-        throw new Error('need at least two labels');
-      }
-
-      const out = await repoAuditChat({
-        prompt: text,
-        system:
-          `Classify the provided repo evidence into exactly one label: ${labels.join(', ')}. ` +
-          'Reply with the chosen label only.',
-        maxTokens: 32,
-        temperature: 0,
-      });
-
-      const raw = String(out.content ?? '')
-        .trim()
-        .toLowerCase();
-      const exact = labels.find((label) => raw === String(label).trim().toLowerCase());
-      const prefix = labels.find((label) => raw.startsWith(String(label).trim().toLowerCase()));
-
-      return exact ?? prefix ?? labels[0];
-    },
+    description: 'Deprecated alias of repo_classify. Kept for compatibility; prefer repo_classify.',
+    inputSchema: CLASSIFY_INPUT_SCHEMA,
+    run: runClassify,
   },
   {
     name: 'gemma4_health',
-    description:
-      'Probe the primary direct llama-server and Atomic Chat llama-server-compatible fallback.',
-    inputSchema: {
-      type: 'object',
-      properties: {},
-      additionalProperties: false,
-    },
-    async run() {
-      const results = await Promise.all(BACKENDS.map(probeBackend));
-      return JSON.stringify(
-        {
-          timeout_ms: REQUEST_TIMEOUT_MS,
-          backends: results,
-        },
-        null,
-        2
-      );
-    },
+    description: 'Deprecated alias of repo_llm_health. Kept for compatibility; prefer repo_llm_health.',
+    inputSchema: { type: 'object', properties: {}, additionalProperties: false },
+    run: runHealth,
   },
 ];
 
