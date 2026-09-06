@@ -157,6 +157,7 @@ export * from './core/qdrant-collection-registry.js';
 export * from './core/summary-context.js';
 export * from './core/contextual-tree-snapshot.js';
 export * from './core/feature-intelligence.js';
+export * from './core/feature-ontology-projection-v1.js';
 export * from './core/relationship-kernel.js';
 export * from './core/graph-snapshot-v2.js';
 export { PacketValidator } from './core/packet-validator-materializer.js';

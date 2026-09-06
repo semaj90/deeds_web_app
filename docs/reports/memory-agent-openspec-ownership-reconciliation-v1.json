@@ -1,0 +1,444 @@
+{
+  "schema": "atlas.memory-agent-openspec-ownership-reconciliation.v1",
+  "reviewedOn": "2026-09-05",
+  "status": "MEMORY_AGENT_OPEN_SPEC_OWNERSHIP_RECONCILED",
+  "scope": "LOCAL_WORKING_TREE_PLANNING_AND_SOURCE_TRACE_ONLY",
+  "canonicalAuthority": false,
+  "taskAuthority": "openspec/changes/*/tasks.md",
+  "portfolioAuthority": "docs/reports/openspec-portfolio-v1.json",
+  "newOpenSpecChanges": 0,
+  "modifiedRootChangeCount": 9,
+  "modifiedFiles": [
+    "openspec/changes/parent-atlas-retrieval-fusion-reachability/proposal.md",
+    "openspec/changes/parent-atlas-retrieval-fusion-reachability/design.md",
+    "openspec/changes/parent-atlas-retrieval-fusion-reachability/tasks.md",
+    "openspec/changes/parent-atlas-retrieval-fusion-reachability/specs/retrieval-fusion-governance/spec.md",
+    "openspec/changes/parent-atlas-memory-architecture-freeze/proposal.md",
+    "openspec/changes/parent-atlas-memory-architecture-freeze/design.md",
+    "openspec/changes/parent-atlas-memory-architecture-freeze/tasks.md",
+    "openspec/changes/parent-atlas-memory-architecture-freeze/specs/atlas-memory-architecture/spec.md",
+    "openspec/changes/parent-atlas-candidate-feature-execution-fabric/proposal.md",
+    "openspec/changes/parent-atlas-candidate-feature-execution-fabric/design.md",
+    "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+    "openspec/changes/parent-atlas-candidate-feature-execution-fabric/specs/candidate-feature-governance/spec.md",
+    "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/proposal.md",
+    "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/design.md",
+    "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md",
+    "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/specs/ace-feature-snapshot-producer/spec.md",
+    "openspec/changes/parent-atlas-ace-bitfrost-cache-correctness/proposal.md",
+    "openspec/changes/parent-atlas-ace-bitfrost-cache-correctness/design.md",
+    "openspec/changes/parent-atlas-ace-bitfrost-cache-correctness/tasks.md",
+    "openspec/changes/parent-atlas-ace-bitfrost-cache-correctness/specs/ace-bitfrost-cache-correctness/spec.md",
+    "openspec/changes/parent-atlas-kv-cache-adaptation-research/proposal.md",
+    "openspec/changes/parent-atlas-kv-cache-adaptation-research/design.md",
+    "openspec/changes/parent-atlas-kv-cache-adaptation-research/tasks.md",
+    "openspec/changes/parent-atlas-kv-cache-adaptation-research/specs/kv-cache-adaptation-research/spec.md",
+    "openspec/changes/parent-atlas-deep-research-ingestion/proposal.md",
+    "openspec/changes/parent-atlas-deep-research-ingestion/design.md",
+    "openspec/changes/parent-atlas-deep-research-ingestion/tasks.md",
+    "openspec/changes/parent-atlas-deep-research-ingestion/specs/deep-research-ingestion/spec.md",
+    "openspec/changes/parent-atlas-governed-compute-fabric/proposal.md",
+    "openspec/changes/parent-atlas-governed-compute-fabric/design.md",
+    "openspec/changes/parent-atlas-governed-compute-fabric/tasks.md",
+    "openspec/changes/parent-atlas-governed-compute-fabric/specs/governed-compute-fabric/spec.md",
+    "openspec/changes/parent-atlas-agentic-run-receipt-binding/proposal.md",
+    "openspec/changes/parent-atlas-agentic-run-receipt-binding/design.md",
+    "openspec/changes/parent-atlas-agentic-run-receipt-binding/tasks.md",
+    "openspec/changes/parent-atlas-agentic-run-receipt-binding/specs/agentic-run-receipt-binding/spec.md",
+    "openspec/changes/parent-atlas-deep-research-ingestion/README.md",
+    "sveltekit-frontend/openspec/changes/wire-agentic-workflows-e2e-test/tasks.md",
+    "scripts/atlas/build-openspec-workboard-v1.mjs",
+    "docs/OPENSPEC-WORKBOARD.md",
+    "docs/reports/openspec-workboard-v1.json",
+    "docs/reports/memory-agent-openspec-ownership-reconciliation-v1.json"
+  ],
+  "capabilities": [
+    {
+      "capability": "RRF logical lane vs executor",
+      "owner": "parent-atlas-retrieval-fusion-reachability",
+      "modifiedChange": "parent-atlas-retrieval-fusion-reachability",
+      "action": "UPDATE",
+      "status": "OWNER_DECISION_PROVEN_SEMANTIC_VOTE_BLOCKED_UPSTREAM",
+      "nextGate": "TURBOVEC-CANONICAL-ENVELOPE-01",
+      "taskAuthority": "openspec/changes/parent-atlas-retrieval-fusion-reachability/tasks.md",
+      "evidenceRefs": [
+        "sveltekit-frontend/src/lib/server/retrieval/rrf-integration.ts:934",
+        "sveltekit-frontend/src/lib/server/retrieval/rrf-combiner.ts:94",
+        "scripts/atlas/prove-rf6-executor-lane-owner-v1.mjs",
+        "docs/reports/rf6-executor-lane-owner-v1.json"
+      ],
+      "duplicateOwnerCount": 0,
+      "duplicateOwnerCountScope": "additional implementation owners assigned to this capability by this reconciliation",
+      "validationCommand": "npx --no-install openspec validate parent-atlas-retrieval-fusion-reachability --type change --strict --json"
+    },
+    {
+      "capability": "Evidence packet and memory-axis decisions",
+      "owner": "parent-atlas-memory-architecture-freeze",
+      "modifiedChange": "parent-atlas-memory-architecture-freeze",
+      "action": "DECISION_ADDENDUM",
+      "status": "OPERATOR_DECISION_RECORDED",
+      "nextGate": "2.3/2.4 resolved; implementation delegated",
+      "taskAuthority": "openspec/changes/parent-atlas-memory-architecture-freeze/tasks.md",
+      "evidenceRefs": [
+        "openspec/changes/parent-atlas-memory-architecture-freeze/tasks.md"
+      ],
+      "duplicateOwnerCount": 0,
+      "duplicateOwnerCountScope": "additional implementation owners assigned to this capability by this reconciliation",
+      "validationCommand": "npx --no-install openspec validate parent-atlas-memory-architecture-freeze --type change --strict --json"
+    },
+    {
+      "capability": "Query and lexical fingerprints",
+      "owner": "parent-atlas-candidate-feature-execution-fabric",
+      "modifiedChange": "parent-atlas-candidate-feature-execution-fabric",
+      "action": "UPDATE",
+      "status": "PLANNED",
+      "nextGate": "QUERY-FEATURE-01",
+      "taskAuthority": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+      "evidenceRefs": [
+        "openspec/changes/parent-atlas-candidate-feature-execution-fabric/spec.md"
+      ],
+      "duplicateOwnerCount": 0,
+      "duplicateOwnerCountScope": "additional implementation owners assigned to this capability by this reconciliation",
+      "validationCommand": "npx --no-install openspec validate parent-atlas-candidate-feature-execution-fabric --type change --strict --json"
+    },
+    {
+      "capability": "ACE feature source and ContextManifest",
+      "owner": "parent-atlas-ace-rlm-bitfrost-integration",
+      "modifiedChange": "parent-atlas-ace-rlm-bitfrost-integration",
+      "action": "UPDATE",
+      "status": "PRODUCTION_BRIDGE_OPEN",
+      "nextGate": "ACE-FEATURE-SOURCE-OWNER-01",
+      "taskAuthority": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md",
+      "evidenceRefs": [
+        "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/specs/ace-feature-snapshot-producer/spec.md"
+      ],
+      "duplicateOwnerCount": 0,
+      "duplicateOwnerCountScope": "additional implementation owners assigned to this capability by this reconciliation",
+      "validationCommand": "npx --no-install openspec validate parent-atlas-ace-rlm-bitfrost-integration --type change --strict --json"
+    },
+    {
+      "capability": "Exact application prompt cache",
+      "owner": "parent-atlas-ace-bitfrost-cache-correctness",
+      "modifiedChange": "parent-atlas-ace-bitfrost-cache-correctness",
+      "action": "UPDATE",
+      "status": "PLANNED",
+      "nextGate": "CACHE-PREFILL-01",
+      "taskAuthority": "openspec/changes/parent-atlas-ace-bitfrost-cache-correctness/tasks.md",
+      "evidenceRefs": [
+        "openspec/changes/parent-atlas-ace-bitfrost-cache-correctness/tasks.md"
+      ],
+      "duplicateOwnerCount": 0,
+      "duplicateOwnerCountScope": "additional implementation owners assigned to this capability by this reconciliation",
+      "validationCommand": "npx --no-install openspec validate parent-atlas-ace-bitfrost-cache-correctness --type change --strict --json"
+    },
+    {
+      "capability": "Ornith server-managed runtime prefix cache",
+      "owner": "parent-atlas-kv-cache-adaptation-research",
+      "modifiedChange": "parent-atlas-kv-cache-adaptation-research",
+      "action": "UPDATE",
+      "status": "MEASUREMENT_OPEN",
+      "nextGate": "ORNITH-CACHE-01",
+      "taskAuthority": "openspec/changes/parent-atlas-kv-cache-adaptation-research/tasks.md",
+      "evidenceRefs": [
+        "openspec/changes/parent-atlas-kv-cache-adaptation-research/tasks.md"
+      ],
+      "duplicateOwnerCount": 0,
+      "duplicateOwnerCountScope": "additional implementation owners assigned to this capability by this reconciliation",
+      "validationCommand": "npx --no-install openspec validate parent-atlas-kv-cache-adaptation-research --type change --strict --json"
+    },
+    {
+      "capability": "Discovery snapshot and acquisition handoff",
+      "owner": "parent-atlas-deep-research-ingestion",
+      "modifiedChange": "parent-atlas-deep-research-ingestion",
+      "action": "PROMOTE_EXISTING_STUB",
+      "status": "PLANNING_LIFECYCLE_COMPLETE_IMPLEMENTATION_OPEN",
+      "nextGate": "DISCOVERY-01",
+      "taskAuthority": "openspec/changes/parent-atlas-deep-research-ingestion/tasks.md",
+      "evidenceRefs": [
+        "sveltekit-frontend/src/lib/server/retrieval/web-search.ts:156",
+        "sveltekit-frontend/src/lib/server/agent/tools/web-search.ts:70",
+        "openspec/changes/parent-atlas-versioned-doc-intelligence/tasks.md"
+      ],
+      "duplicateOwnerCount": 0,
+      "duplicateOwnerCountScope": "additional implementation owners assigned to this capability by this reconciliation",
+      "validationCommand": "npx --no-install openspec validate parent-atlas-deep-research-ingestion --type change --strict --json"
+    },
+    {
+      "capability": "Persistent kernel and governed skill execution",
+      "owner": "parent-atlas-governed-compute-fabric",
+      "modifiedChange": "parent-atlas-governed-compute-fabric",
+      "action": "UPDATE",
+      "status": "IMPLEMENTATION_UNPROVEN",
+      "nextGate": "4.1..4.8",
+      "taskAuthority": "openspec/changes/parent-atlas-governed-compute-fabric/tasks.md",
+      "evidenceRefs": [
+        "openspec/changes/parent-atlas-governed-compute-fabric/tasks.md"
+      ],
+      "duplicateOwnerCount": 0,
+      "duplicateOwnerCountScope": "additional implementation owners assigned to this capability by this reconciliation",
+      "validationCommand": "npx --no-install openspec validate parent-atlas-governed-compute-fabric --type change --strict --json"
+    },
+    {
+      "capability": "ACP/MCP/A2A/backend execution integration",
+      "owner": "parent-atlas-governed-compute-fabric",
+      "modifiedChange": "parent-atlas-governed-compute-fabric",
+      "action": "RECONCILE",
+      "status": "BACKEND_DURABILITY_UNPROVEN",
+      "nextGate": "COMPUTE-BACKEND-RECONCILE-01",
+      "taskAuthority": "openspec/changes/parent-atlas-governed-compute-fabric/tasks.md",
+      "evidenceRefs": [
+        "packages/parent-atlas/src/core/workflow-execution-coordinates-v1.ts:6",
+        "sveltekit-frontend/src/lib/server/atlas/atlas-mastra-adapter.ts:8"
+      ],
+      "duplicateOwnerCount": 0,
+      "duplicateOwnerCountScope": "additional implementation owners assigned to this capability by this reconciliation",
+      "validationCommand": "npx --no-install openspec validate parent-atlas-governed-compute-fabric --type change --strict --json"
+    },
+    {
+      "capability": "Canonical workflow receipt and checkpoint reference binding",
+      "owner": "parent-atlas-agentic-run-receipt-binding",
+      "modifiedChange": "parent-atlas-agentic-run-receipt-binding",
+      "action": "UPDATE",
+      "status": "IDENTITY_OWNER_REUSED_CHECKPOINT_JOIN_OPEN",
+      "nextGate": "RUN-CHECKPOINT-BINDING-01",
+      "taskAuthority": "openspec/changes/parent-atlas-agentic-run-receipt-binding/tasks.md",
+      "evidenceRefs": [
+        "sveltekit-frontend/src/lib/server/atlas/workflow/workflow-action-event-v1.ts:88",
+        "packages/parent-atlas/src/core/workflow-execution-coordinates-v1.ts:6"
+      ],
+      "duplicateOwnerCount": 0,
+      "duplicateOwnerCountScope": "additional implementation owners assigned to this capability by this reconciliation",
+      "validationCommand": "npx --no-install openspec validate parent-atlas-agentic-run-receipt-binding --type change --strict --json"
+    },
+    {
+      "capability": "LangChain Deep Agents adoption alternative",
+      "owner": "parent-atlas-governed-compute-fabric",
+      "modifiedChange": "parent-atlas-governed-compute-fabric",
+      "action": "DECISION_ADDENDUM",
+      "status": "NOT_ADOPTED",
+      "nextGate": "No implementation: NOT_ADOPTED",
+      "taskAuthority": "openspec/changes/parent-atlas-governed-compute-fabric/tasks.md",
+      "evidenceRefs": [
+        "openspec/changes/parent-atlas-governed-compute-fabric/tasks.md"
+      ],
+      "duplicateOwnerCount": 0,
+      "duplicateOwnerCountScope": "additional implementation owners assigned to this capability by this reconciliation",
+      "validationCommand": "npx --no-install openspec validate parent-atlas-governed-compute-fabric --type change --strict --json"
+    },
+    {
+      "capability": "Hermes/Paperclip-style Kanban and agent coordination references",
+      "owner": "parent-atlas-governed-compute-fabric",
+      "modifiedChange": "parent-atlas-governed-compute-fabric",
+      "action": "REFERENCE_ONLY",
+      "status": "NO_UI_OR_CONTROL_PLANE_CREATED",
+      "nextGate": "Reconcile backend/UI boundary before any new implementation scope",
+      "taskAuthority": "openspec/changes/parent-atlas-governed-compute-fabric/tasks.md",
+      "evidenceRefs": [
+        "openspec/changes/parent-atlas-governed-compute-fabric/tasks.md"
+      ],
+      "duplicateOwnerCount": 0,
+      "duplicateOwnerCountScope": "additional implementation owners assigned to this capability by this reconciliation",
+      "validationCommand": "npx --no-install openspec validate parent-atlas-governed-compute-fabric --type change --strict --json"
+    }
+  ],
+  "duplicateOwnerCount": 0,
+  "duplicateOwnerCountScope": "new competing planning/implementation owners introduced; not a census or repair of existing runtime fusion implementations",
+  "runtimeDuplicateOwnerCount": null,
+  "runtimeDuplicateOwnerStatus": "NOT_RESOLVED_BY_THIS_RECONCILIATION",
+  "findings": [
+    {
+      "classification": "REAL_CURRENT_FINDING",
+      "finding": "qdrant_vector and turbovec_ann reach combineViaRRF as distinct map keys; same-name dedup does not prevent semantic executor double votes.",
+      "proofLevel": "SOURCE_TRACED_NOT_LIVE_REPLAY"
+    },
+    {
+      "classification": "CORRECTED_CALL_GRAPH",
+      "finding": "/api/retrieval/rrf calls fuseRetrievalLanes directly. Separate conditional Go facade -> executeMultiVectorRetrieval -> fuseLanesViaRrf path; no route-to-facade edge proven."
+    },
+    {
+      "classification": "CORRECTED_PROOF_BOUNDARY",
+      "finding": "Evaluation route checks locals.user, not an explicit admin role. Existing description of admin-gated is not supported by that check alone."
+    },
+    {
+      "classification": "EXISTING_CONTRACT_REUSED",
+      "finding": "WorkflowExecutionCoordinatesV1 already has framework/orchestrationRuntime/checkpointProvider/actionExecutor/transport; actual Mastra enum values are mastra, mastra_engine, mastra_storage."
+    },
+    {
+      "classification": "IMPLEMENTATION_NOT_PROVEN",
+      "finding": "Mastra adapter contains createTool shim; root/frontend package manifests lack @mastra/core dependency. Existing oriented files are not live durable backend proof."
+    },
+    {
+      "classification": "UNRELATED_WORKTREE_ISSUE",
+      "finding": "Global git diff --check reports trailing whitespace in simd-bridge/cpp/build-x64-cuda/CMakeFiles/CMakeConfigureLog.yaml. Left untouched; scoped diff check passes."
+    }
+  ],
+  "nestedChange": {
+    "path": "sveltekit-frontend/openspec/changes/wire-agentic-workflows-e2e-test",
+    "classification": "REFERENCE_ONLY",
+    "reason": "Historical proposed direct telemetry mutations and independent sum-score merge must be reconciled to root owners; no unchecked task is execution authorization.",
+    "validation": {
+      "command": "npx --no-install openspec validate wire-agentic-workflows-e2e-test --type change --strict --json",
+      "cwd": "sveltekit-frontend",
+      "valid": true
+    }
+  },
+  "decisionsClosed": [
+    "memory-architecture-freeze 2.3: evidence packets layer/project from ContextCandidate/ContextLane",
+    "memory-architecture-freeze 2.4: evidenceDepth/residencyTier; no fourth LOD meaning",
+    "governed-compute: Deep Agents NOT_ADOPTED by operator architecture decision"
+  ],
+  "sourceEvidence": [
+    {
+      "path": "sveltekit-frontend/src/routes/api/search/rrf/+server.ts",
+      "checksum": "sha256:0283829f9a388cb8915afa0c0ad2401f8cb752b923896bda7677dc987a23ed97"
+    },
+    {
+      "path": "sveltekit-frontend/src/routes/api/retrieval/rrf/+server.ts",
+      "checksum": "sha256:1835434774a4319bce2a38e6fdb6c9fc19b3c08bf09f8eff08022c9bdf515e9b"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/retrieval/rrf-integration.ts",
+      "checksum": "sha256:34e545259cd700260ef66e07c4725bc89638442040ad23165e98a764e235f4e1"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/retrieval/rrf-combiner.ts",
+      "checksum": "sha256:a076657fdd209918a341ee8fbecdefe7b3e898e6b846017c262b0f3bcf9fbac7"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/retrieval/go-retrieval-facade.ts",
+      "checksum": "sha256:1b8104eff3afc1cb1911f0b6b256a1254ce293ed01a2a496650206346edbfe5b"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/retrieval/multi-vector-orchestrator.ts",
+      "checksum": "sha256:89853089193ccd9b4fc0470ce12321cadb506d3ea1a262bc633e1a064424f028"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/retrieval/rrf-multi-vector.ts",
+      "checksum": "sha256:a0557b474e4d9281ed5b3598b668de13b5278b5259a27bdc5e3a27b3956ee93b"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts",
+      "checksum": "sha256:ab4a98c930991230256a510d33c4d303579e9e4d97f678c3656e765d5b1d446a"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/retrieval/web-search.ts",
+      "checksum": "sha256:3ce0eadeef20f77a6ef2d1197d81573f33ec30f284525aef5bdc9f5a963b9000"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/agent/tools/web-search.ts",
+      "checksum": "sha256:a439cc7c86766fa3299acebdb058f7a55322b12a2cc86661df96e7de6da824d5"
+    },
+    {
+      "path": "packages/parent-atlas/src/core/workflow-execution-coordinates-v1.ts",
+      "checksum": "sha256:effe83d3acbfb0592ff2d27562eeb9aa85dd338cff3f21a2b3feb898968ba11e"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/workflow/workflow-action-event-v1.ts",
+      "checksum": "sha256:270efca6071e1a9eeef1e24e73034ada62cd11c13adc4dc25a74f5a665e2e3bc"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/atlas-mastra-adapter.ts",
+      "checksum": "sha256:e18bbd1f326545a00a4d3378e9a5df0ad84606468170210f3817beeb64b214e3"
+    },
+    {
+      "path": "sveltekit-frontend/package.json",
+      "checksum": "sha256:9a40ad31c1e20b832c77dc83b370f7a84193e5469c0e2ad5f825dfdfc67ff0f7"
+    },
+    {
+      "path": "package.json",
+      "checksum": "sha256:f8a57b6e4a7d8595b2308bd800fb6579fe00420a780e2db3a369dc865b7079dd"
+    },
+    {
+      "path": "sveltekit-frontend/openspec/changes/wire-agentic-workflows-e2e-test/tasks.md",
+      "checksum": "sha256:905c60cfca95aab73cbe4f5f41b99cd64fe7895c54c8c87e021ea9d7375c6b06"
+    }
+  ],
+  "validation": [
+    {
+      "change": "parent-atlas-retrieval-fusion-reachability",
+      "command": "npx --no-install openspec validate parent-atlas-retrieval-fusion-reachability --type change --strict --json",
+      "exitCode": 0,
+      "valid": true,
+      "issues": []
+    },
+    {
+      "change": "parent-atlas-memory-architecture-freeze",
+      "command": "npx --no-install openspec validate parent-atlas-memory-architecture-freeze --type change --strict --json",
+      "exitCode": 0,
+      "valid": true,
+      "issues": []
+    },
+    {
+      "change": "parent-atlas-candidate-feature-execution-fabric",
+      "command": "npx --no-install openspec validate parent-atlas-candidate-feature-execution-fabric --type change --strict --json",
+      "exitCode": 0,
+      "valid": true,
+      "issues": []
+    },
+    {
+      "change": "parent-atlas-ace-rlm-bitfrost-integration",
+      "command": "npx --no-install openspec validate parent-atlas-ace-rlm-bitfrost-integration --type change --strict --json",
+      "exitCode": 0,
+      "valid": true,
+      "issues": []
+    },
+    {
+      "change": "parent-atlas-ace-bitfrost-cache-correctness",
+      "command": "npx --no-install openspec validate parent-atlas-ace-bitfrost-cache-correctness --type change --strict --json",
+      "exitCode": 0,
+      "valid": true,
+      "issues": []
+    },
+    {
+      "change": "parent-atlas-kv-cache-adaptation-research",
+      "command": "npx --no-install openspec validate parent-atlas-kv-cache-adaptation-research --type change --strict --json",
+      "exitCode": 0,
+      "valid": true,
+      "issues": []
+    },
+    {
+      "change": "parent-atlas-deep-research-ingestion",
+      "command": "npx --no-install openspec validate parent-atlas-deep-research-ingestion --type change --strict --json",
+      "exitCode": 0,
+      "valid": true,
+      "issues": []
+    },
+    {
+      "change": "parent-atlas-governed-compute-fabric",
+      "command": "npx --no-install openspec validate parent-atlas-governed-compute-fabric --type change --strict --json",
+      "exitCode": 0,
+      "valid": true,
+      "issues": []
+    },
+    {
+      "change": "parent-atlas-agentic-run-receipt-binding",
+      "command": "npx --no-install openspec validate parent-atlas-agentic-run-receipt-binding --type change --strict --json",
+      "exitCode": 0,
+      "valid": true,
+      "issues": []
+    }
+  ],
+  "checks": {
+    "workboardGeneratorSyntax": "PASS",
+    "scopedDiffCheck": "PASS",
+    "runtimeTests": "NOT_RUN_NO_RUNTIME_IMPLEMENTATION",
+    "liveEndpointReplay": "NOT_RUN"
+  },
+  "effects": {
+    "sourceInspectionReadOnly": true,
+    "planningFilesWritten": true,
+    "localReportsWritten": true,
+    "canonicalWritesPerformed": false,
+    "datastoreWrites": 0,
+    "cacheWrites": 0,
+    "modelCalls": 0,
+    "frameworkInstalls": 0,
+    "canaryApplies": 0
+  },
+  "nextAction": "TURBOVEC-CANONICAL-ENVELOPE-01: supply TurboVec identity/source/workspace revisions before RF6-SEMANTIC-VOTE-01; existing lineage/cohort gates unchanged.",
+  "preservedConcurrentWork": [
+    "pre-existing edits in candidate-feature, memory-freeze and agentic-run ledgers preserved",
+    "convergence, workstation synthesis/domain-classifier and registry canary work not included in this task",
+    "nothing staged or committed"
+  ]
+}

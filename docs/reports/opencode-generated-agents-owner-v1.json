@@ -1,0 +1,36 @@
+{
+  "schema": "atlas.opencode-generated-agents-owner.v1",
+  "generatedAt": "2026-09-05T21:40:03.898Z",
+  "target": "sveltekit-frontend/AGENTS.md",
+  "sourceArtifact": {
+    "checksum": "sha256:cad0382cca39e0fc417a39441dc771894ccdba7ac1b903a7e4aea09ab71a726f",
+    "byteCount": 2425,
+    "lineCount": 46,
+    "generatedMarkers": true,
+    "formerProducerCommandPresent": true
+  },
+  "preservedArtifact": {
+    "path": "docs/reports/sveltekit-frontend-full-repository-index-v1.md",
+    "checksum": "sha256:8c04b309dc73238e6187e5c5d8851b7c8fa7400d39012bf8b40951c858486167",
+    "byteCount": 1161533
+  },
+  "producerStatus": "ORPHANED_GENERATOR",
+  "producerRefs": [],
+  "currentConsumers": [
+    "OpenCode AGENTS.md directory walk-up discovery"
+  ],
+  "regenerationPaths": [],
+  "safeToRelocate": true,
+  "preservationRequired": true,
+  "writesPerformed": {
+    "filesystem": true,
+    "postgres": false,
+    "qdrant": false,
+    "neo4j": false,
+    "valkey": false,
+    "modelCalls": false
+  },
+  "canonicalAuthority": false,
+  "status": "ORPHANED_GENERATOR_RELOCATION_SAFE",
+  "nextGate": "PRESERVE_GENERATED_ARTIFACT_THEN_REDUCE_AMBIENT_AGENTS_CONTEXT"
+}

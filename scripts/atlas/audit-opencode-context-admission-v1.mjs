@@ -7,6 +7,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 
 const root = process.cwd();
@@ -30,6 +31,7 @@ const files = output.trim().split(/\r?\n/).filter(Boolean).map((name) => {
   return {
     path: relative(file),
     bytes: buffer.byteLength,
+    contentHash: `sha256:${crypto.createHash('sha256').update(buffer).digest('hex')}`,
     lines: text.split(/\r?\n/).length,
     classification: markers.length ? 'GENERATED_INDEX' : buffer.byteLength > 12 * 1024
       ? 'CORE_OR_SCOPED_OVER_BUDGET' : 'CORE_OR_SCOPED_INSTRUCTION',
@@ -47,6 +49,20 @@ const astGrepSurfaces = [
 
 const generated = files.filter((file) => file.classification === 'GENERATED_INDEX');
 const oversized = files.filter((file) => file.bytes > 12 * 1024);
+const duplicateGroups = [...files.reduce((groups, file) => {
+  const group = groups.get(file.contentHash) ?? [];
+  group.push(file.path);
+  groups.set(file.contentHash, group);
+  return groups;
+}, new Map())]
+  .map(([contentHash, paths]) => ({ contentHash, paths: paths.sort() }))
+  .filter((group) => group.paths.length > 1)
+  .sort((left, right) => left.contentHash.localeCompare(right.contentHash));
+const budgetBytes = 12 * 1024;
+const budgetViolations = files
+  .filter((file) => file.bytes > budgetBytes)
+  .map((file) => ({ path: file.path, bytes: file.bytes, budgetBytes }))
+  .sort((left, right) => right.bytes - left.bytes || left.path.localeCompare(right.path));
 const report = {
   schema: 'atlas.opencode-context-admission-audit.v1',
   generatedAt: new Date().toISOString(),
@@ -57,6 +73,15 @@ const report = {
   instructionFileCount: files.length,
   generatedIndexCount: generated.length,
   oversizedFileCount: oversized.length,
+  deterministicValidator: {
+    budgetBytes,
+    generatedContentPaths: generated.map((file) => file.path).sort(),
+    budgetViolations,
+    duplicateContentGroups: duplicateGroups,
+    duplicateFileCount: duplicateGroups.reduce((count, group) => count + group.paths.length, 0),
+    status: budgetViolations.length || duplicateGroups.length || generated.length
+      ? 'CONTEXT_ADMISSION_REVIEW_REQUIRED' : 'CONTEXT_ADMISSION_BASELINE_CLEAN',
+  },
   files,
   astGrepSurfaces,
   findings: [
@@ -73,6 +98,8 @@ console.log(JSON.stringify({
   instructionFileCount: files.length,
   generatedIndexCount: generated.length,
   oversizedFileCount: oversized.length,
+  duplicateContentGroupCount: duplicateGroups.length,
+  budgetViolationCount: budgetViolations.length,
   astGrepSurfaces: astGrepSurfaces.filter((entry) => entry.present).length,
   reportPath: relative(reportPath),
   readOnly: true,

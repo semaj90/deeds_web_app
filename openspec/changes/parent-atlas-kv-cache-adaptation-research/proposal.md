@@ -1,3 +1,19 @@
+## Memory/agent ownership update — 2026-09-05
+
+This updates the existing kv-cache-adaptation-research owner; no new OpenSpec change or control plane.
+The accompanying design addendum and spec scenarios govern the new tasks; historical
+findings below remain dated evidence, not a competing current execution queue.
+
+Record attention KV, recurrent/SSM execution state, and server-managed prompt reuse
+as distinct mechanisms. This tranche does not serialize any of them into Atlas stores.
+PrefixIdentityV1 is a descriptor of eligible exact inputs, not a copy of hidden state.
+Hash canonical structured revision fields and exact rendered prefix bytes; use observed
+server telemetry to measure reuse. An eligible prefix may still miss due to eviction.
+Application response-cache identity is owned by ace-bitfrost-cache-correctness.
+
+Impact: planning/spec/task reconciliation only. Runtime implementation and datastore
+mutation are not performed by this update. See tasks.md for pending proof gates.
+
 ## Evidence Log — Session 2026-08-05 (RotorQuant/IsoQuant provenance audit)
 
 Concrete findings from a receipted audit (binary `--help` probe, live `/props`

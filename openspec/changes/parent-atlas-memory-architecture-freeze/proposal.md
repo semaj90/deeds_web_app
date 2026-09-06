@@ -1,5 +1,24 @@
 # Parent Atlas memory architecture — recorded design freeze (2026-08-23)
 
+## Memory/agent ownership update — 2026-09-05
+
+This updates the existing memory-architecture-freeze owner; no new OpenSpec change or control plane.
+The accompanying design addendum and spec scenarios govern the new tasks; historical
+findings below remain dated evidence, not a competing current execution queue.
+
+This is a governance recording owner only. The operator resolved the evidence-axis
+decision as layering/projection over ContextCandidate/ContextLane. There is one
+ContextManifest compiler; this decision does not implement new packet classes.
+Use evidenceDepth and residencyTier for new axes, leaving existing LOD APIs intact.
+
+Keep model execution state, exact caches, ACE control, retrieval evidence, statistical
+features, external observations, and durable outcomes distinct. Delegate implementation
+to the existing owners listed in the reconciliation report; no new memory store,
+agent controller, or cross-cutting proposal results from this decision.
+
+Impact: planning/spec/task reconciliation only. Runtime implementation and datastore
+mutation are not performed by this update. See tasks.md for pending proof gates.
+
 **Status**: RECORDED, not yet implemented. This document captures an architectural design
 proposal delivered inline in a review-session chat message, plus a same-session audit of what of
 it already exists in the codebase. It is a governance record, not a build plan — see "What's
@@ -725,3 +744,280 @@ spine this document already commits to, and gives that spine a frozen build orde
 this addendum has been implemented.** The frozen P0–P4 queue supersedes any looser prioritization
 implied elsewhere in this document for future planning purposes — P0 (canonical completeness) is
 explicitly first, and P4 (performance/learning, including cuTile/CAGRA/QLoRA) is explicitly last.
+
+## Addendum (2026-09-05, fifth pass): lexical/BoW/query-fingerprint layer + Ornith recurrent-state
+boundary + SearXNG snapshot durability
+
+Recorded per an inline chat proposal, delivered while `parent-atlas-retrieval-lineage-dag-convergence`
+was mid-flight (RETRIEVAL-01L canary + a `combineViaRRF` call-site audit). Per that change's own
+scope discipline, none of this was implemented there — recorded here instead, in the document this
+repo already designates for exactly this kind of dense cross-cutting memory-architecture proposal.
+**No code written this pass.** Audited what already exists before recording, per this document's
+own established discipline (see every prior addendum's "what already exists" tables).
+
+**This is a genuinely different axis from the rest of this document.** Everything above this
+addendum is about the GPU/numerical working-set plane (tensors, Arrow/mmap, BitFrost residency for
+*large binary artifacts*). This addendum is about a plane this document hadn't separately named
+yet: **lexical/statistical evidence and external-observation provenance** — cheap, CPU-only, no
+GPU involved, sitting logically *between* canonical evidence and the retrieval plane.
+
+**Proposed memory hierarchy (L0–L6), restated as a naming frame, not a new architecture**:
+```
+L0  MODEL EXECUTION MEMORY   Ornith recurrent state, attention KV, prefix cache — ephemeral, opaque, never canonical
+L1  EXACT COMPUTE CACHE      llama.cpp prompt cache, BitFrost/Valkey exact revision-qualified artifacts
+L2  ACE CONTROL MEMORY       ContextManifest, playbook/utility/residency decisions
+L3  RETRIEVAL MEMORY         PostgreSQL canonical evidence, Qdrant semantic_768, AST/graph, lexical evidence
+L4  CORPUS STATISTICAL MEMORY  tsvector/ts_stat/pg_trgm — frequency, lexical clusters
+L5  EXTERNAL OBSERVATION MEMORY  SearXNG snapshots, timestamped external documents
+L6  DURABLE OUTCOMES         execution receipts, packet utility, analysis-pass history
+```
+**Mapping to what this document already names**: L1 = this document's existing `ResidentArtifactV1`/
+`ArtifactAddressV1`/BitFrost-residency material (first addendum) — not a new contract, a new label
+on an already-recorded one. L2 = this document's existing `ContextManifest`/`AcePacketV2` material
+(base proposal + first addendum). L3 = this document's existing retrieval-plane pipeline (first
+addendum's restated data-plane diagram) plus `SymbolFeatureAlignmentV1`/`EligibilitySetV1` (fourth
+addendum). L6 = `TensorExecutionReceiptV1`/`SomSelectionReceiptV1`/`MultiHopTraversalReceiptV1`
+(fourth addendum), generalized as a pattern rather than GPU-specific. **L0, L4, and L5 are the
+genuinely new material this addendum adds** — nothing already recorded in this document covers
+Ornith's recurrent-state boundary, corpus-statistical lexical memory, or search-snapshot
+durability.
+
+**L0 — Ornith recurrent state is an execution accelerator, never a knowledge store, hard rule.**
+Ornith runs on Qwen3.5-family architecture; current llama.cpp work maintains an explicit hybrid
+recurrent cache for Gated DeltaNet-style layers alongside ordinary attention KV state, and
+llama-server already exposes `cache_prompt`/`cache_reuse N` (prompt caching, prefix reuse) as
+documented, currently-usable features — this repo's CLAUDE.md already mandates `cache-prompt on` /
+`cache-reuse 256` in the canonical llama-server startup contract, so the mechanism is already
+turned on; what's missing is a checksum-bound identity for *what* is being reused. Hard rule,
+stated precisely because it's checkable against upstream's own stated constraints: current
+llama.cpp discussion of Gated DeltaNet-style recurrent state describes rewinding it as **not**
+equivalent to rewinding a conventional Transformer KV cache, and describes general external
+state-injection/restore as an active, unresolved implementation concern upstream — so **do not**
+build a "save Ornith's recurrent state to BitFrost, restore it later" feature yet. Use
+server-managed prefix reuse only; treat recurrent/KV state as opaque and never persist it as
+Parent Atlas knowledge (this restates, for Ornith specifically, the base proposal's existing
+"no hidden thoughts/KV cache/tensor state in any store" rule already enforced elsewhere in
+CLAUDE.md and this repo's `AGENTS.md`).
+
+**`OrnithPrefixIdentityV1` (named, not built)**: `sha256(modelRevision, chatTemplateRevision,
+toolSchemaRevision, systemPromptRevision, contextManifestPrefixChecksum)`. Same exact prefix
+identity → safe to let llama.cpp's own `cache_reuse` fire; any difference (different ACE context,
+different tools, different template, different model) → new prefix identity, no reuse assumed.
+Explicitly **not** identity: session id, wall-clock timestamp, or "similar-looking query" — those
+are telemetry fields (`cacheUsed: true/false`, `cacheIdentity`) recorded for performance
+observability, never part of a correctness proof. llama.cpp's own documentation already notes
+prompt-caching can introduce small nondeterminism from differing batch sizes between prompt
+processing and generation — another reason this stays a performance signal, not a correctness
+input.
+
+**L4 — `LexicalFingerprintV1` (named, not built) — PostgreSQL is already enough; no new sparse
+subsystem needed.** Confirmed live via grep: `to_tsvector`/`websearch_to_tsquery`-based FTS already
+exists across 30+ call sites (`postgres-lexical-scorer.ts`, `bm25-search.ts`, `search-lanes.ts`,
+etc.) and pg_trgm-based fuzzy/DYM matching is already an established pattern per this repo's own
+"Key Lessons" section. **Genuinely missing**: `ts_stat()` — PostgreSQL's per-lexeme corpus
+statistics function (document frequency, total occurrence count per word) — is not used anywhere
+in this repo (grep for it found zero hits, distinct from the 34-file `to_tsvector`/
+`websearch_to_tsquery` hit set checked above). This is the piece that would let a cheap
+IDF-style discriminative-word signal exist (`idf(word) = log((corpusDocumentCount+1) /
+documentFrequency(word))`) without adding Elasticsearch, SPLADE, or any new sparse-vector service
+— explicitly recorded as **not needed unless an evaluation proves value**, matching this document's
+existing "don't add a 5th lane" discipline (CLAUDE.md's own Hyper-graph-RAG section already states
+this for retrieval lanes generally; this addendum applies the same discipline to lexical/BoW
+specifically). Proposed shape: `LexicalFingerprintV1 { candidateId, sourceRevision, lexemes,
+lexemeFrequencies, documentFrequencies, topLexemes }`. Word/lexical clustering (cheap: hashed
+top-N weighted lexeme vector; better: reuse the existing `semantic_768` KMeans/SOM machinery this
+document already names elsewhere) is scoped as a **routing feature only** — `clusterId` selects
+which region of candidate space to prefetch first, it is never candidate identity or a retrieval
+vote, matching this document's existing SOM-is-routing-not-truth rule (fourth addendum).
+
+**L5 — `SearchSnapshotV1` (named, not built) — SearXNG/LDR integration already exists extensively;
+the durable snapshot contract does not.** Confirmed live via grep: SearXNG/LDR is wired across 35+
+files (`ldr-orchestrator.ts`, `web-search.ts`, `research_tools.ts`, MCP tool handlers, an
+ACE bridge at `ldr-ace-bridge.ts`) — this is not a capability gap, and nothing here proposes
+building web search. Read `web-search.ts`'s existing `WebSearchResult`/`WebSearchResponse` types
+directly: they carry `title`/`url`/`snippet`/`source`/`provider`/`searchMs` — no checksum, no
+`observedAt`, no reproducibility contract, no `canonicalAuthority` marker. That absence is the real
+gap: today a web-search result is a live, non-reproducible side effect, not a durable, revision-
+bound observation. Proposed shape (never implemented, matching this document's naming-only
+convention for unbuilt contracts): `SearchSnapshotV1 { query, normalizedQuery, queryChecksum,
+categories, engines, language, timeRange, observedAt, results: [{rank, url, canonicalUrl, title,
+snippet, engine, publishedAt}], resultSetChecksum, snapshotChecksum, canonicalAuthority: false }`.
+**Hard rule**: a SearXNG/web-search snippet is discovery evidence, never canonical document
+evidence — per this document's own existing "don't let raw external state become knowledge"
+principle (restated here for external search specifically, having already been stated for GPU/
+model state above): the correct path is snapshot → fetch the real source URL → content hash → the
+same canonical evidence/chunk pipeline this document already describes for source files, not
+"persist the SearXNG snippet text as if it were retrieved document content." Timestamps
+(`observedAt`/`lastAccessedAt`/`expiresAt`) are recency/TTL/decay metadata on the observation, per
+this document's existing revision-vs-recency distinction (base proposal's LOD section already
+separates "cache destination" from "content identity"; this is the same separation applied to
+external observations) — never part of the snapshot's own identity, which is
+`queryChecksum + searchConfigRevision + resultSetChecksum` only.
+
+**`QueryFingerprintV1` (named, not built)** — the thing that would let L3/L4/L5 actually
+cooperate: `{ queryChecksum, normalizedLexemes, rareLexemes, trigramFingerprint,
+lexicalClusterId, semanticVectorRef, semanticClusterId, observedAt }`. Purpose: cheap routing hint
+("this looks like a Qdrant-projection question, prefetch that lexical cluster first"), explicitly
+**not** an identity or authorization boundary — same fail-open/non-authoritative posture this
+document already requires of `TANG_INSPIRED_LOW_RANK_SHORTLIST` and SOM clustering elsewhere.
+
+**Explicitly not decided or built by this addendum** (same discipline as every prior addendum):
+whether `OrnithPrefixIdentityV1`/`LexicalFingerprintV1`/`SearchSnapshotV1`/`QueryFingerprintV1` get
+built at all, their storage location specifics beyond "BitFrost/Valkey for the exact-cache layer,
+Postgres for corpus statistics," and sequencing relative to the existing frozen P0–P4 queue (fourth
+addendum) — this addendum's material is additive to that queue, not a reordering of it, and the
+operator should decide where it slots in rather than have that decided here.
+
+## Addendum (2026-09-05, sixth pass): "8 convergence gates" collapse — spot-checked, not taken on
+faith; one real internal contradiction found
+
+An inline chat message proposed reading this document's entire L0–L10/P0–P4 material through a
+BUILT/PARTIAL/MISSING lens and collapsing the remaining work into 8 named convergence gates,
+arguing the core claim: **the architecture already exists; what's missing is one current,
+revision-qualified control path connecting already-built pieces — not new machinery.** That
+framing matches this document's own repeated finding across all five prior addenda (most things
+"missing" turned out to already exist, just unwired/uncensused) closely enough that it was
+spot-checked against live code rather than recorded on faith, per this document's own discipline.
+
+**The 8 gates, as proposed** (kept verbatim as a reference frame, not independently re-derived):
+
+| # | Gate | Collapses |
+|---|---|---|
+| 1 | Current source snapshot | `PKT-LINEAGE-08B` — **now resolved**, see `parent-atlas-retrieval-lineage-dag-convergence/tasks.md`'s `PKT-LINEAGE-08B0` section (tolerance-window selector, `CURRENT_SOURCE_EVIDENCE_AUTHORITY_PROVEN` live-proven same day) |
+| 2 | RF7 fusion migration | One logical semantic vote — owned by `parent-atlas-retrieval-fusion-reachability` (`RF6`/`RF7`, already the correct owner, not new) |
+| 3 | ACE feature source | domain_fit + query + structural + graph → one `CandidateFeatureSnapshot` — owned by `parent-atlas-candidate-feature-execution-fabric` |
+| 4 | Residency control | ACE → BitFrost/Valkey HOT/WARM/COLD bridge — **PARTIAL_OWNER_FOUND, corrected below** |
+| 5 | Current graph/tuple projection | KAG/hyperedges/ontology → Neo4j current projection — **`atlas_ontology_tuples` confirmed live at 0 rows** (see below), so this gate is real, not hypothetical |
+| 6 | Representation routing | semantic_768 → latent_256 → derived 128/64 → KMeans/SOM → centroid/Topology4 — **RESOLVED**: `latent_64` confirmed a slice of `latent_256` (see below) |
+| 7 | Context runtime | ContextManifest → OpenCode → Ornith prefix reuse — overlaps this document's own L0 material (fifth addendum) and `AGENT-ORCHESTRATION-BOUNDARY-01` (`parent-atlas-retrieval-lineage-dag-convergence`) |
+| 8 | Agent program optimization | RouteTrace/evals → DSPy → GEPA — **FULL_OWNER_FOUND, corrected below** |
+
+**Spot-check results (Explore agent, this session, read-only) — 3 confirmed accurate, 1 partially
+wrong, 1 unverifiable-as-stated, 1 real internal contradiction found and not yet resolved**:
+
+- **Valkey hot-vector index — CONFIRMED, but the claim overstates it.** The message says "Valkey
+  natively supports HNSW/FLAT" and cites `atlas_hot_vectors_v1` as already-appropriate. Real and
+  live (`scripts/atlas/ensure-valkey-hot-vector-index.mjs`, `sveltekit-frontend/scripts/atlas/
+  smoke-atlas-hot-vectors.mjs`, decision doc at `openspec/changes/atlas-hot-vector-schema-decision/`)
+  — but only **FLAT** is actually configured (`FT.CREATE ... VECTOR FLAT`), not HNSW; the decision
+  doc deliberately chose FLAT ("small working set, no HNSW build/tuning needed"). Don't cite HNSW as
+  in use here.
+- **`ClusterCard` "~1,906 stored cards" — NOT FOUND, treat as unverified/possibly stale.** The
+  `cluster_cards` table and `ClusterCard` contract are real
+  (`sveltekit-frontend/src/lib/server/retrieval/cluster-card-contract.ts`,
+  `scripts/atlas/load-cluster-cards-postgres.mjs`), but no code or report anywhere states a current
+  count of 1,906 — the only "1906" grep hit was an unrelated hash key in a different JSON file. A
+  live `SELECT COUNT(*) FROM cluster_cards` should replace this number before any
+  `CLUSTER-CARD-CURRENTNESS-01` gate (named below) is built against it.
+- **`atlas_hyperedges`/`atlas_hyperedge_members`/`atlas_ontology_tuples` — CONFIRMED to exist, and
+  the ontology-empty caveat the message itself flagged turned out to be correct.** Live per
+  `docs/reports/atlas-kag-persistence-v1.json` (2026-08-27): `atlas_hyperedges` = 62,802 rows,
+  `atlas_hyperedge_members` = 125,604 rows, **`atlas_ontology_tuples` = 0 rows.** The message's own
+  instinct ("your older state had populated hyperedges while ontology tuples were empty — re-census,
+  don't assume") is confirmed still true as of this check, not stale advice.
+- **AE latent stack (`latent_256` PHYSICAL → `latent_128`/`latent_64` DERIVED via slice+renormalize)
+  — genuinely wrong on `latent_128`, and surfaces a real, unresolved contradiction on `latent_64`
+  that predates this pass and should be resolved before building anything further on it.**
+  `latent_256` is real and live (55,169 rows, matches this document's fourth-addendum material).
+  **`latent_128` does not exist as a persisted column or Qdrant collection anywhere** — confirmed
+  across `drizzle/schema.ts`, `schema-postgres.ts`, and the backfill script's own docstring. Calling
+  it "DERIVED" implies a stored, addressable representation; it is at most a transient in-memory
+  slice computed on demand, never persisted — a materially different claim from what's built for
+  `latent_256`/`latent_64`. **`latent_64` is real and populated (HNSW-indexed,
+  `idx_codebase_chunk_latent64_hnsw`) but this repo's own code disagrees with itself about how it's
+  produced**: `sveltekit-frontend/src/lib/server/retrieval/latent-derive.ts` and the original
+  migration comment (`drizzle/manual/latent_256_columns.sql`) describe it as a cheap
+  slice-and-renormalize of `latent_256` computed at read time (matching the message's proposed
+  lineage); a later, dated correction in `schema-postgres.ts` (~2026-09-02, citing
+  "LATENT-SCHEMA-ALIGN-01") and `python/backfill_latent_256.py` instead describe it as **a
+  separate, independently-learned output of the same autoencoder forward pass, persisted
+  directly** — not a slice of `latent_256` at all. This also means the root `CLAUDE.md` note dated
+  2026-08-30 ("latent_64 column exists but zero rows populated, autoencoder untrained") is now
+  stale/superseded and should not be trusted without a fresh live row-count check. **Not resolved
+  here** — flagging the contradiction is the deliverable of this spot-check, not picking a side;
+  whichever story is true materially changes gate 6's invalidation semantics (a slice needs no
+  separate training/backfill job when `latent_256` changes; an independently-learned output does).
+- **The three named gates the message proposed (`CLUSTER-CARD-CURRENTNESS-01`,
+  `NEO4J-CURRENT-PROJECTION-01`, `GLYPH-CHR97-MAPPING-01`) are genuinely novel** — confirmed via
+  repo-wide grep, none exist under any name in `openspec/changes/` or elsewhere. No conflict to
+  reconcile if any of them are opened later.
+
+**Recorded, not decided**: whether to open the 3 novel gates above as their own OpenSpec changes,
+whether gates 4 and 8 (residency-control bridge, agent-program optimization) need a first
+audit-before-build pass the way gates 1/2/3/5/6/7 already have owners or partial owners, and how to
+resolve the `latent_64` provenance contradiction (read the two disagreeing code paths directly and
+pick one, or run a live check on which one actually produced the 55,169 populated rows) before any
+work depends on its derivation semantics.
+
+**`latent_64` resolution — CONFIRMED live, not just leaned (2026-09-05).** Web-researched lean:
+standard Matryoshka Representation Learning is a true prefix slice of one shared encoder output —
+no separate training, no per-scale head. This repo's own established convention for the *other*
+nested-truncation lane already documented in this file (`semantic_768 → 512/256/128`, first
+addendum + CLAUDE.md's Embedding Dimensions Policy) is plain slice + L2-renormalize — matching the
+**older** `latent_64` code path (`latent-derive.ts`/original migration comment), not the newer
+"LATENT-SCHEMA-ALIGN-01" separately-learned claim.
+
+**Checked directly against live data, same day** (`scripts/atlas/check-latent64-derivation-v1.mjs`,
+new, read-only, kept): sampled 10 real `codebase_chunk_index` rows with both `latent_256` and
+`latent_64` populated, computed slice-and-L2-renormalize of `latent_256[:64]` in JS, compared
+against the stored `latent_64` value for the same row. **Cosine similarity ≥ 0.9999999 on every
+sample**, with the small residual (`maxDelta` ~1e-4 on a unit vector) matching exactly the rounding
+noise expected from `halfvec`'s float16-backed storage — not a sign of a genuinely different vector
+(an independently-trained encoder converging to near-identical unit vectors across 10 unrelated
+samples by coincidence is not a plausible alternative explanation). **Verdict:
+`LATENT_64_IS_SLICE_OF_LATENT_256`.** The newer "LATENT-SCHEMA-ALIGN-01" comment describing a
+separately-learned output is incorrect (or describes a code path that isn't what actually produced
+the live data) and should not be trusted for invalidation-semantics decisions; `latent_64` requires
+no separate training/backfill job when `latent_256` changes — it is safe to treat as a pure
+derived view.
+
+Sources: [Matryoshka Embedding: Nested Representations](https://www.emergentmind.com/topics/matryoshka-embedding),
+[Matryoshka Representation Learning, Explained — Supermemory](https://supermemory.ai/blog/matryoshka-representation-learning-the-ultimate-guide-how-we-use-it/),
+[Learning Multi-Level Features with Matryoshka Sparse Autoencoders](https://arxiv.org/pdf/2503.17547)
+
+## Addendum (2026-09-05, seventh pass): gates 4 and 8 ownership audit — "no named owner yet" was
+wrong for both, per this document's own duplication-prevention discipline
+
+The sixth addendum recorded gates 4 (residency control) and 8 (agent program optimization) as
+having no named OpenSpec owner "not yet independently audited this pass." Per this repo's own hard
+rule ("a file existing is not evidence it's live, check for callers... before implementing any new
+owner of a capability, grep first"), that gap was checked with an Explore pass before treating
+either as genuinely open. Both were wrong to leave unaudited.
+
+**Gate 4 (ACE→BitFrost/Valkey residency control) — PARTIAL_OWNER_FOUND.** A real, live, tested
+`LodPromotionDecisionV1` residency-decision contract already exists at
+`sveltekit-frontend/src/lib/server/atlas/tensors/lod-promotion-contract.ts`, owned by
+`openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md` (gates `BF-LOD-01`
+through `BF-LOD-06`). It has exactly the shape this gate describes: a pure Zod-validated decision
+with `from`/`to` residency+representation tiers (`COLD`/`WARM`/`HOT` ×
+`FP32_MMAP`/`FP16`/`TURBO_4BIT`/etc.), reason codes (`VRAM_PRESSURE`, `LOW_REUSE`,
+`POLICY_EXPIRED`, `REVISION_INVALIDATION`), utility scoring, byte accounting, and revision lineage
+— `BF-LOD-01`/`BF-LOD-02` already checked off (implemented + Zod-validated), `BF-LOD-03`–`BF-LOD-06`
+still open (Postgres receipt persistence, WARM↔HOT↔COLD transition proofs, utility-input
+separation, packet-content bounding). Separately, `parent-atlas-tensor-residency-integration/
+tasks.md` independently implements a GPU-tile-specific residency state machine
+(`COLD→MMAPPED→PINNED→GPU_RESIDENT→IN_USE→DEMOTED`), and `atlas-hot-vector-schema-decision/`
+documents the Valkey hot-vector-index side with "zero real consumers" as of its own writing. **What
+this document's gate-4 framing still gets right**: no single artifact routes an ACE-selected
+candidate across all three named stores (Valkey HOT / BitFrost WARM-exact / Qdrant-Postgres COLD)
+in one decision call yet — `LodPromotionDecisionV1` is the closest real owner (representation/tier
+promotion generically) but the explicit three-store routing bridge this document names is not
+wired as one path. **Correct framing going forward**: extend `parent-atlas-retrieval-lod-algorithm-
+taxonomy`'s `BF-LOD-03`–`06` work to close this gap — do not open a second residency-decision
+contract.
+
+**Gate 8 (Agent program optimization — RouteTrace/evals→DSPy→GEPA) — FULL_OWNER_FOUND.**
+`openspec/changes/parent-atlas-compute-rank-cache-eval-dspy-gepa/` already exists as a complete
+named change (proposal.md, design.md, tasks.md, specs/) whose scope is exactly this pipeline:
+validator-receipt/evidence-quality feedback → `RepairProgramV1` (DSPy `Signature`/`Module`/
+`Predict`) → GEPA (`metric`, `reflection_lm`, `log_dir`, `track_stats`, `seed`) → held-out-set
+promotion gate. Concrete implementation already exists (`python/parent_atlas_dspy_repair.py`,
+`build_gepa_optimizer_v1()`), though most gates are `NOT_PROVEN`/blocked pending a live DSPy/GEPA
+runtime (`DSPY-SIDECAR-01`, `GEPA-VERSION-01`, `GEPA-HELDOUT-01`, `GEPA-SHADOW-01`). That same
+tasks.md already names `execution_utility`/RouteTrace as blocked on a missing `packet_key` column
+in `trace_runs` — a real, already-tracked gap, not a new one. **This document's "no named owner
+yet" claim for gate 8 was simply incorrect** — the capability was already claimed and scaffolded
+before this freeze document's sixth addendum existed. Any future work on gate 8 belongs in
+`parent-atlas-compute-rank-cache-eval-dspy-gepa`, not a new change.
+
+No code written this pass; both corrections are ownership-record fixes only.

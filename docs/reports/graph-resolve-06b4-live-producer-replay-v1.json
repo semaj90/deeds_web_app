@@ -4,15 +4,16 @@
   "inputNominationCount": 440,
   "astResolutionCount": 440,
   "identityResolutionCount": 353,
-  "eligibleCount": 5,
+  "eligibleCount": 85,
   "eligibleIdentityFailures": 0,
   "materializer": {
-    "mode": "APPLY",
-    "rowsAttempted": 5,
+    "mode": "DRY_RUN",
+    "candidateCount": 90,
+    "rowsAttempted": 0,
     "rowsInserted": 0,
-    "rowsAlreadyPresent": 5,
+    "rowsAlreadyPresent": 0,
     "identityBridgeOutcomes": {
-      "RESOLVED": 5,
+      "RESOLVED": 90,
       "UNRESOLVED": 0,
       "AMBIGUOUS": 0
     }
@@ -21,7 +22,7 @@
   "canonicalWrites": 0,
   "databaseWrites": false,
   "failures": [],
-  "replayChecksum": "sha256:d8a726c3f53eb00146cc0a9c585d2879b19af6f5882730011e350bea98675b98",
+  "replayChecksum": "sha256:28fe94f396690e2503ba55ca2cf9a20139ce912d6d6aa2a21d897ba135d097e9",
   "status": "READ_ONLY_PRODUCER_REPLAY_PROVEN",
   "readOnly": true,
   "nextGate": "GRAPH-RESOLVE-06B.4_REPLAY_SECOND_RUN_AND_EDGE_ADMISSION_SEPARATE"

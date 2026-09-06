@@ -1,0 +1,176 @@
+{
+  "schema": "atlas.current-source-evidence-authority-selector-proof.v1",
+  "gate": "SOURCE-EVIDENCE-AUTHORITY-01",
+  "mode": "PURE_FIXTURE_NO_DATABASE",
+  "status": "SELECTOR_PROVEN",
+  "totalCases": 27,
+  "passedCases": 27,
+  "failedCases": [],
+  "cases": [
+    {
+      "name": "completed_exact_current_binding_select",
+      "actual": "CANDIDATE_SELECTED",
+      "expected": "CANDIDATE_SELECTED",
+      "pass": true
+    },
+    {
+      "name": "completed_exact_current_binding_select_id",
+      "actual": "r1",
+      "expected": "r1",
+      "pass": true
+    },
+    {
+      "name": "completed_stale_workspace_reject",
+      "actual": "NO_CURRENT_COMPLETED_BOUND_SOURCE_OWNER",
+      "expected": "NO_CURRENT_COMPLETED_BOUND_SOURCE_OWNER",
+      "pass": true
+    },
+    {
+      "name": "completed_stale_workspace_reject_reason",
+      "actual": true,
+      "expected": true,
+      "pass": true
+    },
+    {
+      "name": "completed_unbound_reject",
+      "actual": "NO_CURRENT_COMPLETED_BOUND_SOURCE_OWNER",
+      "expected": "NO_CURRENT_COMPLETED_BOUND_SOURCE_OWNER",
+      "pass": true
+    },
+    {
+      "name": "completed_unbound_reject_reason",
+      "actual": true,
+      "expected": true,
+      "pass": true
+    },
+    {
+      "name": "running_exact_binding_reject",
+      "actual": "NO_CURRENT_COMPLETED_BOUND_SOURCE_OWNER",
+      "expected": "NO_CURRENT_COMPLETED_BOUND_SOURCE_OWNER",
+      "pass": true
+    },
+    {
+      "name": "running_exact_binding_reject_reason",
+      "actual": true,
+      "expected": true,
+      "pass": true
+    },
+    {
+      "name": "running_unbound_reject",
+      "actual": "NO_CURRENT_COMPLETED_BOUND_SOURCE_OWNER",
+      "expected": "NO_CURRENT_COMPLETED_BOUND_SOURCE_OWNER",
+      "pass": true
+    },
+    {
+      "name": "two_exact_completed_ambiguous",
+      "actual": "AMBIGUOUS_CURRENT_SOURCE_OWNER",
+      "expected": "AMBIGUOUS_CURRENT_SOURCE_OWNER",
+      "pass": true
+    },
+    {
+      "name": "two_exact_completed_ambiguity_count",
+      "actual": 2,
+      "expected": 2,
+      "pass": true
+    },
+    {
+      "name": "two_exact_completed_no_selection",
+      "actual": null,
+      "expected": null,
+      "pass": true
+    },
+    {
+      "name": "workspace_id_mismatch_reject",
+      "actual": "NO_CURRENT_COMPLETED_BOUND_SOURCE_OWNER",
+      "expected": "NO_CURRENT_COMPLETED_BOUND_SOURCE_OWNER",
+      "pass": true
+    },
+    {
+      "name": "workspace_id_mismatch_reason",
+      "actual": true,
+      "expected": true,
+      "pass": true
+    },
+    {
+      "name": "empty_source_population_reject",
+      "actual": "EMPTY_SOURCE_POPULATION",
+      "expected": "EMPTY_SOURCE_POPULATION",
+      "pass": true
+    },
+    {
+      "name": "empty_source_population_invalid_flag",
+      "actual": false,
+      "expected": false,
+      "pass": true
+    },
+    {
+      "name": "missing_source_revision_reject",
+      "actual": "SOURCE_POPULATION_INVALID",
+      "expected": "SOURCE_POPULATION_INVALID",
+      "pass": true
+    },
+    {
+      "name": "missing_source_revision_count",
+      "actual": 1,
+      "expected": 1,
+      "pass": true
+    },
+    {
+      "name": "synthetic_revision_reject",
+      "actual": "SOURCE_POPULATION_INVALID",
+      "expected": "SOURCE_POPULATION_INVALID",
+      "pass": true
+    },
+    {
+      "name": "synthetic_revision_count",
+      "actual": 1,
+      "expected": 1,
+      "pass": true
+    },
+    {
+      "name": "mismatched_content_hash_reject",
+      "actual": "SOURCE_POPULATION_INVALID",
+      "expected": "SOURCE_POPULATION_INVALID",
+      "pass": true
+    },
+    {
+      "name": "mismatched_content_hash_count",
+      "actual": 1,
+      "expected": 1,
+      "pass": true
+    },
+    {
+      "name": "valid_population_positive_control",
+      "actual": "SOURCE_POPULATION_VALID",
+      "expected": "SOURCE_POPULATION_VALID",
+      "pass": true
+    },
+    {
+      "name": "valid_population_source_count",
+      "actual": 1,
+      "expected": 1,
+      "pass": true
+    },
+    {
+      "name": "duplicate_source_ref_reject",
+      "actual": "SOURCE_POPULATION_INVALID",
+      "expected": "SOURCE_POPULATION_INVALID",
+      "pass": true
+    },
+    {
+      "name": "duplicate_source_ref_count",
+      "actual": 1,
+      "expected": 1,
+      "pass": true
+    },
+    {
+      "name": "deterministic_replay",
+      "actual": true,
+      "expected": true,
+      "pass": true
+    }
+  ],
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "proofChecksum": "sha256:2b691a5865283aadbc3610adacf78a9e03bba88bbc3f4c6de39af998215f8aa4"
+}

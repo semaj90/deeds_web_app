@@ -4,6 +4,54 @@
 
 A checked item means the named contract/code slice exists on this branch. Runtime application, live database proof, projection parity, and benchmark gates remain separate acceptance requirements and are not implied by code existence.
 
+## 2026-09-05 — Feature ontology projection alignment
+
+- [x] **FI-ONTO-01** Reuse canonical `FeatureV1` for the behavioral feature node
+  (`feature_id`, `feature_key`, domain, parent feature, and revisions); do not
+  reinterpret it as a file, packet, row, or retrieval identity.
+- [x] **FI-ONTO-02** Add the derived `FeatureDefinitionProjectionV1`,
+  `FeatureImplementationBindingV1`, and `FeatureDependencyEdgeV1` contracts in
+  `packages/parent-atlas/src/core/feature-ontology-projection-v1.ts`. Bindings
+  require `source_ref`, `source_revision`, evidence, and an optional existing
+  `symbol_version_id`/`tree_node_id`; dependency edges are typed relationships,
+  not alternate feature identity.
+- [x] **FI-ONTO-03** Add deterministic contract tests and the read-only proof
+  runner `scripts/atlas/prove-feature-ontology-projection-v1.mjs`.
+  Receipt: `docs/reports/feature-ontology-projection-proof-v1.json`.
+- [ ] **FI-ONTO-04** Reconcile live feature registry and implementation bindings
+  against PostgreSQL and current AST/symbol/route/test evidence. This remains
+  open: the new projection is implemented and fixture-proven, but it has not
+  authorized or performed live canonical feature/materializer writes.
+- [x] **FI-ONTO-05** Add the read-only `FEATURE-ONTOLOGY-CROSSWALK-01` adapter
+  (`scripts/atlas/lib/feature-ontology-crosswalk-v1.mjs`) over the existing
+  `feature_registry` shape. It derives domain/capability/kind/surface views and
+  many-to-many implementation observations without fabricating feature identity,
+  source revisions, dependency edges, or canonical authority.
+- [ ] **FI-ONTO-06** Run the live crosswalk and reconcile each implementation
+  binding to current AST/symbol/route/test evidence with exact source revisions;
+  emit no canonical membership until the existing registry and evidence owners
+  agree.
+
+### FI-ONTO / FI-02 live migration-state finding — 2026-09-05
+
+The read-only crosswalk and migration-owner audits agree that live registry
+adoption is blocked by migration ownership, not by the ontology projection:
+
+- `public.feature_registry` is absent in `legal_ai_db`.
+- The full journaled `0024/0025` neighborhood is absent, including
+  `feature_tasks` and `agent_progress_log`.
+- `drizzle.__drizzle_migrations` exists but contains zero rows.
+- `scripts/atlas/audit-atlas-migration-owners.mjs` classifies `feature_registry`
+  as `MISSING_MANIFEST_REGISTRATION`; the Drizzle schema owner exists, while the
+  competing manual SQL remains excluded from ownership.
+- No migration was applied and no registry rows were created in this pass.
+
+This does **not** close FI-02 or authorize applying `0024/0025`. The next
+action is a migration-ledger/manifest decision using the existing owner, then a
+separate authorized apply/readback proof. Until that happens, crosswalk output
+must remain derived and `liveImplementationMembership = UNPROVEN`.
+
+
 ## P0 — Canonical boundary
 
 - [x] FI-01 Define `FeatureV1`, `FeatureCandidateV1`, `FeatureEvidenceV1`, `FeatureStateV1`, `FeatureStateReceiptV1` and canonical `FeatureRelationshipV1` relationship/arity contracts.

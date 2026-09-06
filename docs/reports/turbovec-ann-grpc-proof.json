@@ -1,147 +1,25 @@
 {
-  "generated_at": "2026-08-27T01:39:59.811Z",
+  "generated_at": "2026-09-05T23:41:38.236Z",
   "qdrant": {
     "url": "http://127.0.0.1:6333",
-    "collection": "codebase_chunks_768",
-    "scanned": 1024,
-    "skipped": 0,
-    "usable_candidates": 1000,
-    "sample_identity": [
-      {
-        "id": "1",
-        "packet_key": "packet:6b86b273ff34",
-        "source_ref": "1",
-        "feature_id": "1",
-        "community_id": 0
-      },
-      {
-        "id": "2",
-        "packet_key": "ace:packet:3362030dfe23",
-        "source_ref": "sveltekit-frontend/src/AGENTS.md",
-        "feature_id": "AGENTS",
-        "community_id": 0
-      },
-      {
-        "id": "3",
-        "packet_key": "ace:packet:3362030dfe23",
-        "source_ref": "src/AGENTS.md",
-        "feature_id": "AGENTS",
-        "community_id": 0
-      },
-      {
-        "id": "4",
-        "packet_key": "ace:packet:3362030dfe23",
-        "source_ref": "src/AGENTS.md",
-        "feature_id": "AGENTS",
-        "community_id": 0
-      },
-      {
-        "id": "5",
-        "packet_key": "ace:packet:b5aa13ce0a61",
-        "source_ref": "sveltekit-frontend/src/hooks.server.ts",
-        "feature_id": "hooks.server",
-        "community_id": 0
-      }
-    ]
+    "collection": "codebase_chunks_768_v2",
+    "scanned": 52814,
+    "skipped": 52814,
+    "usable_candidates": 0,
+    "qualified_identity_candidates": 0,
+    "identity_set_checksum": null,
+    "sample_identity": []
   },
   "turbovec_http": "http://127.0.0.1:8791",
   "turbovec_grpc": "127.0.0.1:50062",
-  "limit": 1000,
-  "status": "PASS",
+  "limit": 50,
+  "status": "FAIL",
   "gates": {
-    "qdrant_vectors": true,
-    "http_indexed": true,
-    "grpc_ok": true,
-    "grpc_search_nonempty": true,
-    "identity_preserved": true,
-    "pass": true
+    "qdrant_vectors": false,
+    "qdrant_identity_qualified": false,
+    "pass": false
   },
   "sidecar_dim": 64,
-  "http_health_before": {
-    "ok": true,
-    "indexed": 108601,
-    "dim": 64,
-    "bits": 4,
-    "turbovec": true,
-    "collection": "codebase_chunks_768"
-  },
-  "http_build": {
-    "ok": true,
-    "indexed": 1000,
-    "build_ms": 178,
-    "build_request_ms": 199
-  },
-  "http_health_after": {
-    "ok": true,
-    "indexed": 1000,
-    "dim": 64,
-    "bits": 4,
-    "turbovec": true,
-    "collection": "codebase_chunks_768"
-  },
-  "grpc_health": {
-    "ok": true,
-    "indexed": 1000,
-    "dim": 64,
-    "bits": 4,
-    "backend": "bridge:py(python)+addon(cuda)"
-  },
-  "grpc_search": {
-    "backend": "bridge:py",
-    "indexed": 1000,
-    "candidates": [
-      {
-        "id": "packet:6b86b273ff34",
-        "score": 0.08987362682819366,
-        "clusterId": 0
-      },
-      {
-        "id": "ace:packet:83dc9fe1e87d",
-        "score": 0.08457659184932709,
-        "clusterId": 0
-      },
-      {
-        "id": "ace:packet:83dc9fe1e87d",
-        "score": 0.0826374813914299,
-        "clusterId": 0
-      },
-      {
-        "id": "ace:packet:5f4b17f5dcc7",
-        "score": 0.08047128468751907,
-        "clusterId": 0
-      },
-      {
-        "id": "ace:packet:f6e9736b0fcd",
-        "score": 0.08042333275079727,
-        "clusterId": 0
-      },
-      {
-        "id": "ace:packet:9d73425fe897",
-        "score": 0.08004969358444214,
-        "clusterId": 0
-      },
-      {
-        "id": "ace:packet:9084cc3035b3",
-        "score": 0.07975102961063385,
-        "clusterId": 0
-      },
-      {
-        "id": "ace:packet:b51c65785363",
-        "score": 0.07963229715824127,
-        "clusterId": 0
-      },
-      {
-        "id": "ace:packet:471f36a617f7",
-        "score": 0.07916934043169022,
-        "clusterId": 0
-      },
-      {
-        "id": "ace:packet:ff7458261e14",
-        "score": 0.07841788977384567,
-        "clusterId": 0
-      }
-    ],
-    "candidate_count": 10
-  },
-  "elapsed_ms": 1178
+  "error": "No usable 768d Qdrant candidates with packet_key/source_ref/feature_id",
+  "elapsed_ms": 16064
 }

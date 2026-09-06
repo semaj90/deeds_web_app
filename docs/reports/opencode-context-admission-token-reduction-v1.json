@@ -1,0 +1,63 @@
+{
+  "schema": "atlas.opencode-context-admission-token-reduction.v1",
+  "gate": "OPENCODE-CONTEXT-ADMISSION-01",
+  "task": "item-3-token-admission-ab-proof",
+  "generatedAt": "2026-09-05T21:32:30.189Z",
+  "mode": "READ_ONLY",
+  "writesPerformed": false,
+  "gitHeadSha": "b05e25b18ec817b9c21aafdf39196465e206179e",
+  "scope": "ADMITTED_TOKENS_ONLY",
+  "scopeNote": "Proves byte/estimated-token admission for the sveltekit-frontend/ walk-up chain only. Does NOT measure live-session reads, compactions, or crystallized-synthesis quality -- those require a live OpenCode session harness not available to this script and are not claimed as proven.",
+  "tokenEstimateMethod": "ceil(bytes / 4)",
+  "walkUpChain": [
+    "sveltekit-frontend/AGENTS.md",
+    "AGENTS.md"
+  ],
+  "perFile": [
+    {
+      "path": "sveltekit-frontend/AGENTS.md",
+      "before": {
+        "existedAtHead": true,
+        "bytes": 1160219,
+        "lines": 4543,
+        "estimatedTokens": 290055
+      },
+      "after": {
+        "existsInWorkingTree": true,
+        "bytes": 2425,
+        "lines": 47,
+        "estimatedTokens": 607
+      },
+      "byteReduction": 1157794,
+      "estimatedTokenReduction": 289448
+    },
+    {
+      "path": "AGENTS.md",
+      "before": {
+        "existedAtHead": true,
+        "bytes": 16426,
+        "lines": 269,
+        "estimatedTokens": 4107
+      },
+      "after": {
+        "existsInWorkingTree": true,
+        "bytes": 15388,
+        "lines": 242,
+        "estimatedTokens": 3847
+      },
+      "byteReduction": 1038,
+      "estimatedTokenReduction": 260
+    }
+  ],
+  "totals": {
+    "beforeBytes": 1176645,
+    "afterBytes": 17813,
+    "beforeTokens": 294162,
+    "afterTokens": 4454,
+    "byteReduction": 1158832,
+    "byteReductionPct": 98.49,
+    "estimatedTokenReduction": 289708,
+    "estimatedTokenReductionPct": 98.49
+  },
+  "status": "TOKEN_ADMISSION_REDUCTION_PROVEN"
+}

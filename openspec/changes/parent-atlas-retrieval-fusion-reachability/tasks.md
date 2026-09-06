@@ -1,5 +1,123 @@
 # OpenSpec: Parent Atlas Retrieval Fusion Reachability Tasks
 
+## RF5/RF6 follow-up — memory/agent owner reconciliation (2026-09-05)
+
+Current-tree code trace, not a live endpoint replay:
+`/api/search/rrf` imports `rrf-integration.ts::multiLaneRetrievalWithRRF`;
+that function sends `qdrant_vector` and `turbovec_ann` as separate names
+to `rrf-combiner.ts::combineViaRRF`. Its map deduplicates by supplied name,
+not logical lane. Thus the same admitted candidate can get two semantic votes.
+The September 1 repeated-same-name proof remains valid but does NOT prove
+cross-executor semantic deduplication. Classification: REAL_CURRENT_FINDING,
+SOURCE_TRACED; deployed traffic/replay not executed in this pass.
+
+`/api/retrieval/rrf` separately calls `rrf-fusion.ts::fuseRetrievalLanes`
+on caller-supplied lists. It does not call the Go facade. The facade conditionally
+calls `executeMultiVectorRetrieval` in `multi-vector-orchestrator.ts`, which
+calls `rrf-multi-vector.ts::fuseLanesViaRrf` for content/summary/title/keywords.
+These are separate paths, not one proven nested call chain. The route checks
+`locals.user`; this is authentication, not proof of an admin-role gate.
+
+- [x] RF6-EXECUTOR-LANE-TRACE-01 record the above current call sites and retain
+  SearchRuntime as the production spine; do not elevate combineViaRRF.
+- [x] RF6-EXECUTOR-LANE-OWNER-01 extend the existing owner matrix with explicit
+  delegate/retain decisions for these paths and define logical dense lane vs executor
+  metadata (qdrant/turbovec/cuvs/cagra); supersede only conflicting matrix decisions.
+  **PROVEN 2026-09-05 by current-source trace**:
+  `scripts/atlas/prove-rf6-executor-lane-owner-v1.mjs` passed 11/11 checks and wrote
+  `docs/reports/rf6-executor-lane-owner-v1.json`. SearchRuntime is the logical-lane
+  normalization/fusion owner. `rrf-integration.ts::combineViaRRF` and `rrf-fuse.ts`
+  are assigned `DELEGATE_TO_CANONICAL`, but runtime delegation remains open;
+  `/api/retrieval/rrf` remains an evaluation-only independent route;
+  `multi-vector-orchestrator.ts::fuseLanesViaRrf` remains a separate path pending its
+  envelope/replay. Executor labels are evidence, never additional dense votes. No
+  runtime, datastore, cache, model, or endpoint writes occurred.
+- [x] RF6-SEMANTIC-VOTE-01 after that decision, implement one semantic vote per
+  revision-qualified candidate, preserve executor evidence, and prove duplicate
+  hits/rank ties plus distinct canonical chunks using focused regressions.
+  **PROVEN 2026-09-05** by `scripts/atlas/prove-rf6-semantic-vote-v1.mjs`:
+  `RF6_SEMANTIC_VOTE_PROVEN`, 9/9 source-contract checks and the focused
+  SearchRuntime/RF6 replay suite passed 27/27. SearchRuntime now uses a
+  revision-qualified dense identity when both source/workspace revisions exist,
+  retains `executorIds` in `laneEvidence`, and gives each logical lane group one
+  RRF contribution regardless of Qdrant/TurboVec executor count. Distinct hydrated
+  chunks and source revisions remain separate; equal-score executor ties replay
+  deterministically. No datastore, cache, model, or endpoint writes occurred.
+- [ ] RF6-SEMANTIC-REPLAY-01 run a bounded read-only production-spine replay with
+  both semantic executors; no promotion, exposure, ledger, cache, or model writes.
+
+No endpoint invocation, datastore projection, or RF7 closure is authorized by this addendum.
+The bounded SearchRuntime fusion correction above is the explicitly scoped RF6 runtime change.
+
+### RF6-EXECUTOR-LANE-OWNER-01 decision record
+
+| Consumer | Decision | Current boundary |
+|---|---|---|
+| `SearchRuntime::fuseSearchRuntimeCandidates` | `CANONICAL_OWNER` | Normalizes candidates into logical lanes (`dense`, `lexical`, `exact`, `ast`, `schema`, `rg`, `bm42`) and retains lane evidence. |
+| `rrf-integration.ts::combineViaRRF` via `/api/search/rrf` | `DELEGATE_TO_CANONICAL` | Current source still passes `qdrant_vector` and `turbovec_ann` as separate executor labels; bounded SearchRuntime semantic-vote proof is complete, but runtime delegation remains open. |
+| `rrf-fusion.ts::fuseRetrievalLanes` via `/api/retrieval/rrf` | `RETAIN_INDEPENDENT_EVALUATION_ONLY` | Thin caller-supplied envelope has no revision-qualified canonical identity; no production fusion promotion. |
+| `multi-vector-orchestrator.ts::fuseLanesViaRrf` | `DELEGATE_TO_CANONICAL_AFTER_ENVELOPE` | Separate Go-facade path; its content/summary/title/keywords lanes require an explicit replay before migration. |
+| `unified-orchestrator.ts::combineRRFLanes` | `RETAIN_PENDING_OWNER_REPLAY` | Existing same-lane arithmetic proof does not establish cross-lane canonical identity. |
+| `rrf-fuse.ts` | `DELEGATE_TO_CANONICAL` | Existing replay confirmed duplicate-lane and chunk-identity divergence; no migration in this gate. |
+
+`qdrant`, `turbovec`, `cuvs`, and `cagra` are executor identities under the logical
+`dense` lane. They may be retained in `laneEvidence`/provenance but MUST contribute at
+most one semantic vote per revision-qualified candidate. This decision supersedes only
+conflicting future interpretation of the earlier five-owner matrix; it does not claim
+that runtime delegation or RF6 semantic replay is complete.
+
+### RF6-SEMANTIC-VOTE-PRECONDITIONS-01 — 2026-09-05
+
+- [x] Current-source precondition audit completed by
+  `scripts/atlas/prove-rf6-semantic-vote-preconditions-v1.mjs`.
+  The proof now records the additive HTTP and canonical split-gRPC source path.
+  The proof remains a source-contract precondition, not a live promotion claim;
+  complete cross-executor qualification still requires the live gRPC replay.
+  Report:
+  `docs/reports/rf6-semantic-vote-preconditions-v1.json`.
+- [x] `TURBOVEC-CANONICAL-ENVELOPE-HTTP-01` — additive HTTP propagation implemented:
+  `scripts/atlas/prove-turbovec-ann-grpc.mjs` carries Qdrant identity/revision payload
+  fields into `/build`, the live owner `sveltekit-frontend/scripts/turbovec-sidecar.py`
+  retains them by stable index position and returns them as optional `identity`, and
+  the TypeScript adapter passes
+  them through to RRF metadata. Backend-local IDs remain provenance only. Python and
+  Node syntax checks plus the focused SearchRuntime fusion regression passed; the
+  canonical `turbovec.proto` now carries the optional `CandidateIdentity` envelope,
+  while `turbovec_cuda.proto` remains compatibility-only.
+- [x] `TURBOVEC-CANONICAL-ENVELOPE-GRPC-01` — implementation wiring completed but
+  live-proven status remains open: `TurboVecService` now owns ANN health/search,
+  `GpuBridgeService` owns tensor methods, and the bridge keeps the deprecated
+  `TurboVecCudaService` registered for compatibility. The canonical ANN response
+  carries optional identity/revision metadata from the Python sidecar. Static source
+  proof passes; an isolated alternate-port bridge health smoke passed, while the
+  refreshed `:50062` process now answers `TurboVecService/Health` and returns ANN
+  candidates. The strict live replay still fails closed because the current Qdrant
+  projection provides packet/source/content metadata but no `sourceRevision` or
+  `workspaceRevision` on returned candidates (`grpc_identity_preserved=false`).
+  This is now a revision-propagation/projection admission gap, not a gRPC service
+  registration gap.
+- [x] `TURBOVEC-CANONICAL-ENVELOPE-01` adapt the existing TurboVec retrieval response
+  or add an upstream read-only identity join that returns revision-qualified candidate
+  metadata. Preserve backend-local IDs as executor provenance. Prove exact source/
+  packet identity, sourceRevision, workspaceRevision, namespace, and candidate checksum
+  as the envelope precondition for the RF6 semantic-vote/replay gates. The current
+  bounded live replay uses an exact read-only join because the active Qdrant projection
+  still omits workspace revision. This is an upstream envelope task, not a new fusion
+  owner. **Current replay evidence (2026-09-05):** the canonical-only v2 replay at
+  `docs/reports/turbovec-ann-grpc-proof-v2-replay.json`
+  reports 50 usable v2 768d points, 9 returned gRPC candidates, healthy `TurboVecService`,
+  `grpc_canonical_only=true`, and `grpc_identity_preserved=true`. The bridge performs
+  an exact read-only `(source_ref, code_source_revision) -> workspace_revision` join
+  against `graphify_files`, drops the one candidate without a unique join, and emits a
+  stable identity-set checksum. The Python owner now defaults to
+  `codebase_chunks_768_v2`. Raw projection qualification remains diagnostic
+  (`qdrant_identity_qualified=false`) because the source payload omits workspace
+  revision; the allowed upstream join supplies it without mutation. The legacy
+  `codebase_chunks_768` collection remains non-canonical and is not repaired. This
+  closes the bounded envelope gate and supplies the precondition used by the focused
+  RF6 semantic-vote proof; it does not authorize broad Qdrant repair, semantic
+  promotion, or the still-open live production replay.
+
 ## RF1 - Reachability trace (complete, 2026-08-08)
 
 - [x] Trace `/api/retrieval/search-unified` end to end: `search-unified/+server.ts` ->
@@ -181,12 +299,11 @@ This is the highest-value fix: it protects real production traffic through
     `rrfComponent` unconditionally (documented, not yet fixed, in
     `rrf-canonical-identity.test.ts`'s "ONE lane produces two votes" test). These are two
     different bugs in two different pipelines; fixing one does not fix the other.
-- [ ] `laneEvidence` (bestRank, bestScore, supportingHits count, rawLaneIds) retention — NOT built.
-      The current fix keeps the best rank's full candidate object as the fused base (so bestScore/
-      bestRank/rawLaneIds are implicitly available via `contributingLanes` + the base candidate's
-      own fields), but there's no explicit `laneEvidence` structure summarizing "how many
-      projections did this lane actually contribute." Open item if that summary is needed for D5's
-      inspectable-RRF-contributions goal.
+- [x] `laneEvidence` retention — **PROVEN 2026-09-05** as part of
+      `RF6-SEMANTIC-VOTE-01`. Each fused logical lane records `bestRank`, `bestScore`,
+      `supportingHitCount`, `supportingBackendIds`, `executorIds`, and contributing
+      score sources. The lane contributes exactly once; executor multiplicity remains
+      evidence only. Report: `docs/reports/rf6-semantic-vote-proof-v1.json`.
 - [ ] `combineViaRRF`'s cross-lane, same-lane-double-vote bug (distinct from the within-lane
       ranking bug just fixed) — not yet fixed. Tracked under RF6 for the `/api/search/rrf` pipeline.
 - [ ] Apply the equivalent fix to `unified-orchestrator.ts`'s `combineRRFLanes` — NOT started (RF6).

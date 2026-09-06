@@ -3,8 +3,8 @@
 - status: WARN
 - mode: apply
 - collection: codebase_chunks_768
-- packets_loaded: 55295
-- all_packets_loaded: 61660
+- packets_loaded: 55353
+- all_packets_loaded: 61718
 - qdrant_points_scanned: 5000
 - matches: 0
 - updated: 0

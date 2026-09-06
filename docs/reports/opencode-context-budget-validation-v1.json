@@ -1,0 +1,157 @@
+{
+  "schema": "atlas.opencode-context-budget-validation.v1",
+  "gate": "OPENCODE-CONTEXT-ADMISSION-01",
+  "task": "item-3-deterministic-validator",
+  "generatedAt": "2026-09-05T21:31:52.725Z",
+  "mode": "READ_ONLY",
+  "writesPerformed": false,
+  "budgetBytes": 12288,
+  "fileCount": 8,
+  "budgetViolationCount": 0,
+  "reviewedExceptionCount": 1,
+  "generatedContentViolationCount": 0,
+  "duplicateHeadingFileCount": 0,
+  "deadReferenceFileCount": 1,
+  "status": "CONTEXT_BUDGET_CLEAN",
+  "results": [
+    {
+      "path": "AGENTS.md",
+      "bytes": 15388,
+      "lines": 242,
+      "overBudget": true,
+      "budgetViolation": false,
+      "reviewedException": {
+        "reviewedAt": "2026-09-05",
+        "reason": "Reviewed this session: duplicate/truncated sections and a stale dead-referenced status block were already removed (269->241 lines). Remaining content is real, high-signal ownership/retrieval-boundary rules, not generated bulk -- see OPENCODE-CONTEXT-ADMISSION-01 item 1 in tasks.md."
+      },
+      "budgetBytes": 12288,
+      "generatedMarkersFound": [],
+      "generatedContentViolation": false,
+      "duplicateHeadings": [],
+      "referencedPaths": [],
+      "deadReferences": [],
+      "classification": "OVER_BUDGET_REVIEWED_EXCEPTION"
+    },
+    {
+      "path": "llama-cpp-turboquant-gemma4/AGENTS.md",
+      "bytes": 6967,
+      "lines": 111,
+      "overBudget": false,
+      "budgetViolation": false,
+      "reviewedException": null,
+      "budgetBytes": 12288,
+      "generatedMarkersFound": [],
+      "generatedContentViolation": false,
+      "duplicateHeadings": [],
+      "referencedPaths": [],
+      "deadReferences": [],
+      "classification": "OK"
+    },
+    {
+      "path": "mcp-server-mcp/tools/instructions/AGENTS.md",
+      "bytes": 1317,
+      "lines": 24,
+      "overBudget": false,
+      "budgetViolation": false,
+      "reviewedException": null,
+      "budgetBytes": 12288,
+      "generatedMarkersFound": [],
+      "generatedContentViolation": false,
+      "duplicateHeadings": [],
+      "referencedPaths": [],
+      "deadReferences": [],
+      "classification": "OK"
+    },
+    {
+      "path": "sveltekit-frontend/AGENTS.md",
+      "bytes": 2425,
+      "lines": 47,
+      "overBudget": false,
+      "budgetViolation": false,
+      "reviewedException": null,
+      "budgetBytes": 12288,
+      "generatedMarkersFound": [],
+      "generatedContentViolation": false,
+      "duplicateHeadings": [],
+      "referencedPaths": [
+        "docs/reports/sveltekit-frontend-full-repository-index-v1.md"
+      ],
+      "deadReferences": [],
+      "classification": "OK"
+    },
+    {
+      "path": "sveltekit-frontend/scripts/AGENTS.md",
+      "bytes": 4848,
+      "lines": 159,
+      "overBudget": false,
+      "budgetViolation": false,
+      "reviewedException": null,
+      "budgetBytes": 12288,
+      "generatedMarkersFound": [],
+      "generatedContentViolation": false,
+      "duplicateHeadings": [],
+      "referencedPaths": [],
+      "deadReferences": [],
+      "classification": "OK"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/graph/AGENTS.md",
+      "bytes": 6340,
+      "lines": 167,
+      "overBudget": false,
+      "budgetViolation": false,
+      "reviewedException": null,
+      "budgetBytes": 12288,
+      "generatedMarkersFound": [
+        "generated: timestamp header",
+        "LLMS-ENRICH header",
+        "regen command marker",
+        "do-not-edit generator comment"
+      ],
+      "generatedContentViolation": false,
+      "duplicateHeadings": [],
+      "referencedPaths": [
+        "docs/graph/hypergraph-clusters.md"
+      ],
+      "deadReferences": [
+        "docs/graph/hypergraph-clusters.md"
+      ],
+      "classification": "OK"
+    },
+    {
+      "path": "sveltekit-frontend/src/mcp/AGENTS.md",
+      "bytes": 5225,
+      "lines": 174,
+      "overBudget": false,
+      "budgetViolation": false,
+      "reviewedException": null,
+      "budgetBytes": 12288,
+      "generatedMarkersFound": [
+        "generated: timestamp header",
+        "LLMS-ENRICH header",
+        "regen command marker",
+        "do-not-edit generator comment"
+      ],
+      "generatedContentViolation": false,
+      "duplicateHeadings": [],
+      "referencedPaths": [],
+      "deadReferences": [],
+      "classification": "OK"
+    },
+    {
+      "path": "tools/agentic-research/src/firecrawl/AGENTS.md",
+      "bytes": 1482,
+      "lines": 19,
+      "overBudget": false,
+      "budgetViolation": false,
+      "reviewedException": null,
+      "budgetBytes": 12288,
+      "generatedMarkersFound": [],
+      "generatedContentViolation": false,
+      "duplicateHeadings": [],
+      "referencedPaths": [],
+      "deadReferences": [],
+      "classification": "OK"
+    }
+  ]
+}

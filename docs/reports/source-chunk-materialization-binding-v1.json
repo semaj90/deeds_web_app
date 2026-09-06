@@ -1,0 +1,98 @@
+{
+  "schema": "atlas.source-chunk-materialization-binding.v1",
+  "gate": "SOURCE-CHUNK-MATERIALIZATION-BINDING-01",
+  "generatedAt": "2026-09-06T00:21:10.810Z",
+  "mode": "READ_ONLY",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "identityAuthorityNote": "IDENTITY-AUTHORITY STATUS (2026-09-05): atlas_source_refs registry has zero coverage for this cohort (SOURCE-REGISTRY-OWNER-JOIN-01: 0/50 exact matches). Workspace/Graphify identity (SourceNamespaceV1, provenance: REVISION_BOUND) proves a revision-bound physical source observation only; stable repository namespace authority remains unresolved.",
+  "reusedEvidence": [
+    "docs/reports/pkt-lineage-08-bounded-snapshot-v1.json",
+    "docs/reports/pkt-lineage-08a-chunk-preimage-proof-v1.json",
+    "docs/reports/source-registry-owner-join-v1.json"
+  ],
+  "databaseError": null,
+  "sourceRef": "sveltekit-frontend/.codex_louvain_audit.mjs",
+  "sourceRevision": "sha256:810100c1c4e0aa5fcbbb6cdccd9f10c20295f5b6fe748ff6898d87df7b634bbb",
+  "sourceContentDigest": "810100c1c4e0aa5fcbbb6cdccd9f10c20295f5b6fe748ff6898d87df7b634bbb",
+  "sourceIdentityRef": "public.graphify_files",
+  "identityAuthorityPath": "WORKSPACE_GRAPHIFY_IDENTITY",
+  "identityProven": true,
+  "namespace": {
+    "schema": "atlas.source-namespace.v1",
+    "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+    "repositoryId": "semaj90/deeds_web_app",
+    "bindingRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+    "resolvedFrom": "graphify_files",
+    "provenance": "REVISION_BOUND"
+  },
+  "namespaceProven": false,
+  "namespaceAuthorityStatus": "SOURCE_REGISTRY_IDENTITY_UNPROVEN_FOR_COHORT",
+  "physicalMaterializationProven": true,
+  "materializerRevision": null,
+  "chunkPolicyRevision": null,
+  "chunkCount": 4,
+  "chunks": [
+    {
+      "chunkRowId": "44323000-991b-4c0c-885c-e5bb0dddf759",
+      "canonicalChunkId": "fullrepo:sveltekit-frontend/.codex_louvain_audit.mjs:0",
+      "chunkContentHash": "054f2b9a9dd759ab20cae17ef3b394ba4b5d00de98049b2f6a3f5b6154ab73a8",
+      "startByte": null,
+      "endByte": null,
+      "ordinal": 0,
+      "spotCheck": {
+        "chunkRowId": "44323000-991b-4c0c-885c-e5bb0dddf759",
+        "realRowExists": true,
+        "sourceRefMatches": true,
+        "contentHashMatchesChunkGrain": true
+      }
+    },
+    {
+      "chunkRowId": "da3ef140-a26c-462b-9a91-3a5eb92ebea9",
+      "canonicalChunkId": "fullrepo:sveltekit-frontend/.codex_louvain_audit.mjs:1",
+      "chunkContentHash": "204e5a1cc6541728724f6fe2d8593f4965331799b713248b91c7f7da4b564543",
+      "startByte": null,
+      "endByte": null,
+      "ordinal": 1,
+      "spotCheck": {
+        "chunkRowId": "da3ef140-a26c-462b-9a91-3a5eb92ebea9",
+        "realRowExists": true,
+        "sourceRefMatches": true,
+        "contentHashMatchesChunkGrain": true
+      }
+    },
+    {
+      "chunkRowId": "d5a127c5-50e8-43ff-9e73-20daf9c7d74f",
+      "canonicalChunkId": "fullrepo:sveltekit-frontend/.codex_louvain_audit.mjs:2",
+      "chunkContentHash": "390847db9935a933ceb1e3c3614803f0e9783111fe8aec8efe2bc5ccf88d9147",
+      "startByte": null,
+      "endByte": null,
+      "ordinal": 2,
+      "spotCheck": {
+        "chunkRowId": "d5a127c5-50e8-43ff-9e73-20daf9c7d74f",
+        "realRowExists": true,
+        "sourceRefMatches": true,
+        "contentHashMatchesChunkGrain": true
+      }
+    },
+    {
+      "chunkRowId": "bf592df3-d614-4010-a46d-b73552d67c2c",
+      "canonicalChunkId": "fullrepo:sveltekit-frontend/.codex_louvain_audit.mjs:3",
+      "chunkContentHash": "fc0c8c1157e5dc608a9988a7a0632cacf03f6b050338abe925aa0aef540267e0",
+      "startByte": null,
+      "endByte": null,
+      "ordinal": 3,
+      "spotCheck": {
+        "chunkRowId": "bf592df3-d614-4010-a46d-b73552d67c2c",
+        "realRowExists": true,
+        "sourceRefMatches": true,
+        "contentHashMatchesChunkGrain": true
+      }
+    }
+  ],
+  "allChunksPreimageProven": true,
+  "chunkRowsAllReal": true,
+  "chunkSetChecksum": "sha256:d8e2448efb275851c03b268cc3cbcf7b7564b62f2115b7d0ddde0b52b476b6e0",
+  "status": "SOURCE_CHUNK_MATERIALIZATION_BINDING_PROVEN_NAMESPACE_UNRESOLVED",
+  "receiptChecksum": "sha256:36661b807b5acec783083f83d140d6dcebae4577ad9fae2691611b9ed200516f"
+}

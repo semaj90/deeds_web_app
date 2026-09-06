@@ -1,5 +1,9 @@
 # Parent Atlas Workstation TODO
 
+> **Historical/superseded projection.** The current Workstation dependency spine is
+> `docs/parent-atlas-workstation-todo.md`. This file is retained for history and
+> does not own OpenSpec tasks or authorize implementation.
+
 ## Gap sweep: 3 real regressions found + fixed in atlas contract tests — 2026-08-23
 
 Prompted by the GRAPH_SNAPSHOT_PARITY regression below, ran a targeted vitest

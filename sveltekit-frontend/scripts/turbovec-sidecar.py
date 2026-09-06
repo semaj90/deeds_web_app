@@ -6,7 +6,7 @@ Listens on PORT (default 8793), accepts POST /search { vector, k }
 Returns { ids: [...], scores: [...] }
 
 Loaded at startup:
-  - Pulls all codebase_chunks_768 64d projections from Qdrant
+  - Pulls the revision-qualified codebase_chunks_768_v2 768d vectors from Qdrant
   - Builds TurboQuantIndex (4-bit) for ultra-fast ANN prefilter
   - Re-indexes on POST /reindex
 
@@ -39,7 +39,7 @@ parser.add_argument('--port', type=int, default=8793)
 parser.add_argument('--dim', type=int, default=64,  help='Projection dim for TurboVec index (max 64 for 4-bit speed)')
 parser.add_argument('--bits', type=int, default=4,   help='Quantization bits (4 or 8)')
 parser.add_argument('--qdrant', type=str, default='http://127.0.0.1:6333')
-parser.add_argument('--collection', type=str, default='codebase_chunks_encoded64')
+parser.add_argument('--collection', type=str, default='codebase_chunks_768_v2')
 parser.add_argument('--vector-name', type=str, default='content')
 args = parser.parse_args()
 
@@ -55,6 +55,21 @@ FULL_DIM   = 768            # Full Ollama embedding dimension
 index_lock  = threading.Lock()
 ann_index   = None
 ann_ids     = []  # Qdrant point IDs aligned with index rows
+ann_identity = []  # optional canonical provenance aligned with index rows
+
+def identity_from_payload(payload):
+    """Return optional projection provenance without making TurboVec canonical."""
+    payload = payload if isinstance(payload, dict) else {}
+    identity = {
+        "symbolVersionId": payload.get("symbol_version_id", payload.get("symbolVersionId")),
+        "packetKey": payload.get("packet_key", payload.get("packetKey")),
+        "sourceRef": payload.get("source_ref", payload.get("sourceRef", payload.get("file_path"))),
+        "contentHash": payload.get("content_hash", payload.get("contentHash")),
+        "sourceRevision": payload.get("source_revision", payload.get("sourceRevision")),
+        "workspaceRevision": payload.get("workspace_revision", payload.get("workspaceRevision")),
+        "namespace": payload.get("namespace", payload.get("source_namespace", payload.get("sourceNamespace"))),
+    }
+    return {key: value for key, value in identity.items() if value is not None and value != ""}
 
 def project(vec_768):
     """Simple deterministic PCA-free projection: take every 12th dim from 768 → 64."""
@@ -63,13 +78,14 @@ def project(vec_768):
 
 def load_from_qdrant():
     """Scroll Qdrant, build TurboVec index."""
-    global ann_index, ann_ids
+    global ann_index, ann_ids, ann_identity
     if not TURBOVEC_OK:
         return 0
 
     print(f"[sidecar] Scrolling {QDRANT}/collections/{COLLECTION} for ANN index...")
     new_index = turbovec.TurboQuantIndex(DIM, BITS)
     ids = []
+    identities = []
     offset = None
     batch = 500
     total = 0
@@ -79,7 +95,7 @@ def load_from_qdrant():
         body = json.dumps({
             "limit": batch,
             "with_vector": True if COLLECTION == 'codebase_chunks_encoded64' else [VEC_NAME],
-            "with_payload": False,
+            "with_payload": True,
             **({"offset": offset} if offset else {})
         }).encode()
 
@@ -100,6 +116,7 @@ def load_from_qdrant():
         points = data.get("result", {}).get("points", [])
         batch_ids = []
         batch_vecs = []
+        batch_identity = []
 
         for pt in points:
             vec = pt.get("vector", {})
@@ -108,14 +125,17 @@ def load_from_qdrant():
             if len(vec) >= FULL_DIM:
                 batch_ids.append(pt["id"])
                 batch_vecs.append(project(vec[:FULL_DIM]))
+                batch_identity.append(identity_from_payload(pt.get("payload")))
             elif len(vec) == DIM:
                 batch_ids.append(pt["id"])
                 batch_vecs.append(vec)
+                batch_identity.append(identity_from_payload(pt.get("payload")))
 
         if batch_ids:
             arr = np.array(batch_vecs, dtype=np.float32)
             new_index.add(arr)
             ids.extend(batch_ids)
+            identities.extend(batch_identity)
             indexed += len(batch_ids)
 
         total += len(points)
@@ -136,6 +156,7 @@ def load_from_qdrant():
     with index_lock:
         ann_index = new_index
         ann_ids = ids
+        ann_identity = identities
 
     return len(ids)
 
@@ -171,7 +192,7 @@ class SidecarHandler(BaseHTTPRequestHandler):
             self.send_json(404, {"error": "not found"})
 
     def do_POST(self):
-        global ann_index, ann_ids
+        global ann_index, ann_ids, ann_identity
         length = int(self.headers.get("Content-Length", 0))
         body = self.rfile.read(length)
 
@@ -193,11 +214,26 @@ class SidecarHandler(BaseHTTPRequestHandler):
                     q = np.array([vec], dtype=np.float32)
                     scores, indices = ann_index.search(q, k=min(k, len(ann_ids)))
                     result_ids = [ann_ids[i] for i in indices[0] if i < len(ann_ids)]
-                    result_scores = [float(s) for s in scores[0]]
+                    result_scores = [float(s) for s in scores[0][:len(result_ids)]]
+                    result_candidates = []
+                    for rank, (idx, score) in enumerate(zip(indices[0], scores[0])):
+                        if idx >= len(ann_ids):
+                            continue
+                        candidate = {
+                            "id": ann_ids[idx],
+                            "score": float(score),
+                            "cluster": 0,
+                            "rank": rank,
+                        }
+                        identity = ann_identity[idx] if idx < len(ann_identity) else {}
+                        if identity:
+                            candidate["identity"] = identity
+                        result_candidates.append(candidate)
 
                 self.send_json(200, {
                     "ids": result_ids,
                     "scores": result_scores,
+                    "candidates": result_candidates,
                     "indexed": len(ann_ids),
                 })
             except Exception as e:
@@ -216,6 +252,7 @@ class SidecarHandler(BaseHTTPRequestHandler):
                 
                 new_index = turbovec.TurboQuantIndex(DIM, BITS)
                 ids = []
+                identities = []
                 batch_vecs = []
                 
                 for c in candidates:
@@ -224,6 +261,7 @@ class SidecarHandler(BaseHTTPRequestHandler):
                     if cid and vec and len(vec) == DIM:
                         ids.append(cid)
                         batch_vecs.append(vec)
+                        identities.append(identity_from_payload(c.get("identity")))
                 
                 if ids:
                     arr = np.array(batch_vecs, dtype=np.float32)
@@ -233,6 +271,7 @@ class SidecarHandler(BaseHTTPRequestHandler):
                     with index_lock:
                         ann_index = new_index
                         ann_ids = ids
+                        ann_identity = identities
                 
                 build_ms = int((time.time() - t0) * 1000)
                 self.send_json(200, {

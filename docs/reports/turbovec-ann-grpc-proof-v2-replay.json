@@ -1,0 +1,272 @@
+{
+  "generated_at": "2026-09-05T23:44:49.202Z",
+  "qdrant": {
+    "url": "http://127.0.0.1:6333",
+    "collection": "codebase_chunks_768_v2",
+    "scanned": 512,
+    "skipped": 369,
+    "usable_candidates": 50,
+    "qualified_identity_candidates": 0,
+    "identity_set_checksum": null,
+    "sample_identity": [
+      {
+        "id": "00157b87-8b21-4712-bf1d-8a27ab0aba7d",
+        "packet_key": "ace:packet:e5c128787e15",
+        "source_ref": "docs/architecture/CUVS-INSTALLATION-WINDOWS-RESEARCH.md",
+        "content_hash": "94f4d2786d0d37e563ffd842e45f65181e873392acb472ae335065f59095c254",
+        "symbol_version_id": null,
+        "source_revision": "sha256:6a80c18fc745bccbf8c00c86767ad5eb1cd8716c776ce10277a9cb8f2d05274e",
+        "workspace_revision": null,
+        "namespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+        "feature_id": null,
+        "community_id": 0
+      },
+      {
+        "id": "002eb9ef-9556-444d-9185-3c3d5662cbda",
+        "packet_key": "packet:f7bef1b68082",
+        "source_ref": "docs/metadata-contract-schema.yaml",
+        "content_hash": "5d917e79f25abb940845f8655782c8fc7db77c97c4e399650812842a781e3516",
+        "symbol_version_id": null,
+        "source_revision": "sha256:ae6548446fcbc6d4dc12ebff0790732cce9a05c6dcf876abc1e5f0ff9fad12a8",
+        "workspace_revision": null,
+        "namespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+        "feature_id": null,
+        "community_id": 0
+      },
+      {
+        "id": "002f6da1-91cd-42d1-af3f-78be87dee29a",
+        "packet_key": "packet:0ef4e5eff91e",
+        "source_ref": "crates/atlas_packet_parser/index.js",
+        "content_hash": "7ee181120093255cf103945a7ed3379bc3d2b9a1fb24a7522abf5dca2b638ba7",
+        "symbol_version_id": null,
+        "source_revision": "sha256:5bb2826a27ba9434029c48b27ccf75dd1b08857d6b9ab110a14f0833cabc4769",
+        "workspace_revision": null,
+        "namespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+        "feature_id": null,
+        "community_id": 0
+      },
+      {
+        "id": "00317389-cb4d-44d7-b1bd-63a8bf27da01",
+        "packet_key": "ace:packet:bb37e38434d1",
+        "source_ref": "docs/ENGRAM-ACE-MEMORY-SYSTEM-ARCHITECTURE.md",
+        "content_hash": "2b9d761cbc55b96de9d544103b25b227573c58eecd26faf18e4cbe8b1abbfc3a",
+        "symbol_version_id": null,
+        "source_revision": "sha256:a72630a1b869416f6c938f21f0b6842926b01a31d98cb85c2eeca035138c3579",
+        "workspace_revision": null,
+        "namespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+        "feature_id": null,
+        "community_id": 0
+      },
+      {
+        "id": "003af99e-e321-4ec9-a106-cdcdaff4caf7",
+        "packet_key": "packet:02acbc232ff9",
+        "source_ref": "docs/AGENTIC-LOOP-FROZEN.md",
+        "content_hash": "180413436fdc7f46e1f8dff042ebb347b9f8e480d6ed5ccfb161f3fd8bacb849",
+        "symbol_version_id": null,
+        "source_revision": "sha256:eb91cf877bc7f2f876652db38ec71360fa855ce3c9ba5e9d4df80a10924e8c72",
+        "workspace_revision": null,
+        "namespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+        "feature_id": null,
+        "community_id": 0
+      }
+    ]
+  },
+  "turbovec_http": "http://127.0.0.1:8791",
+  "turbovec_grpc": "127.0.0.1:50062",
+  "limit": 50,
+  "status": "PASS",
+  "gates": {
+    "qdrant_vectors": true,
+    "qdrant_identity_qualified": false,
+    "http_indexed": true,
+    "grpc_ok": true,
+    "grpc_search_nonempty": true,
+    "grpc_canonical_only": true,
+    "grpc_identity_preserved": true,
+    "identity_preserved": true,
+    "pass": true
+  },
+  "sidecar_dim": 64,
+  "http_health_before": {
+    "ok": true,
+    "indexed": 50,
+    "dim": 64,
+    "bits": 4,
+    "turbovec": true,
+    "collection": "codebase_chunks_768_v2"
+  },
+  "http_build": {
+    "ok": true,
+    "indexed": 50,
+    "build_ms": 0,
+    "build_request_ms": 4
+  },
+  "http_health_after": {
+    "ok": true,
+    "indexed": 50,
+    "dim": 64,
+    "bits": 4,
+    "turbovec": true,
+    "collection": "codebase_chunks_768_v2"
+  },
+  "grpc_health": {
+    "ok": true,
+    "indexed": 50,
+    "dim": 64,
+    "bits": 4,
+    "backend": "bridge:py(python)+addon(cuda)"
+  },
+  "grpc_search": {
+    "backend": "bridge:py+pg-lineage+canonical-only",
+    "canonical_only": true,
+    "indexed": 50,
+    "candidates": [
+      {
+        "id": "ace:packet:e5c128787e15",
+        "score": 0.10430073738098145,
+        "clusterId": 0,
+        "identity": {
+          "symbolVersionId": "",
+          "packetKey": "ace:packet:e5c128787e15",
+          "sourceRef": "docs/architecture/CUVS-INSTALLATION-WINDOWS-RESEARCH.md",
+          "contentHash": "94f4d2786d0d37e563ffd842e45f65181e873392acb472ae335065f59095c254",
+          "sourceRevision": "sha256:6a80c18fc745bccbf8c00c86767ad5eb1cd8716c776ce10277a9cb8f2d05274e",
+          "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+          "namespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80"
+        }
+      },
+      {
+        "id": "ace:packet:0051e908c9be",
+        "score": 0.0562155656516552,
+        "clusterId": 0,
+        "identity": {
+          "symbolVersionId": "",
+          "packetKey": "ace:packet:0051e908c9be",
+          "sourceRef": "docs/architecture/phase8-query-optimization-taxonomy.md",
+          "contentHash": "7bd70d6b559c5b22aed9171d6d2ebe9eccccb5b963b21df5e7e71fd1848682cb",
+          "sourceRevision": "sha256:3ca5d3c6d57114328d4347f8a4141bb5231bab3ccef86da45bd73f461a127b9c",
+          "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+          "namespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80"
+        }
+      },
+      {
+        "id": "packet:a63e2368b52d",
+        "score": 0.05565306171774864,
+        "clusterId": 0,
+        "identity": {
+          "symbolVersionId": "",
+          "packetKey": "packet:a63e2368b52d",
+          "sourceRef": "docs/PARENT-ATLAS-OPERATIONAL-COMPLETION-PLAN.md",
+          "contentHash": "2e1b468ea0e080f6a317e31aac99f662c9c94eab53cbb957364a4d78f86f4ebd",
+          "sourceRevision": "sha256:9b47bcdfaa97f00997326a51d4c14471482d46fa5d559208ac1c9812bba7f810",
+          "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+          "namespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80"
+        }
+      },
+      {
+        "id": "packet:01b9e9c83754",
+        "score": 0.05500694736838341,
+        "clusterId": 0,
+        "identity": {
+          "symbolVersionId": "",
+          "packetKey": "packet:01b9e9c83754",
+          "sourceRef": "docs/engram-cache-architecture.md",
+          "contentHash": "a4e30a1d6a35ef84364aa992b9ea4260af679e35e21d6f36fb75edf2c1e07ca7",
+          "sourceRevision": "sha256:e0074f7cc033e5ec9e48fbab06bb48b6cc74b9c2e67b1bd6c0a80c31be7d5a60",
+          "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+          "namespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80"
+        }
+      },
+      {
+        "id": "ace:packet:f18963de7168",
+        "score": 0.054700903594493866,
+        "clusterId": 0,
+        "identity": {
+          "symbolVersionId": "",
+          "packetKey": "ace:packet:f18963de7168",
+          "sourceRef": "docs/CUVS-RESEARCH-INDEX.md",
+          "contentHash": "82a3022ad8fe74bdc14f4fadde59018260ef2e5229ed3bf127f1c2af02ae8da5",
+          "sourceRevision": "sha256:077ec56d2c55fce9ea99a031b7b438f24454a367b5ba9b1be17d0eb35a2e25aa",
+          "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+          "namespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80"
+        }
+      },
+      {
+        "id": "ace:packet:bb37e38434d1",
+        "score": 0.04874557629227638,
+        "clusterId": 0,
+        "identity": {
+          "symbolVersionId": "",
+          "packetKey": "ace:packet:bb37e38434d1",
+          "sourceRef": "docs/ENGRAM-ACE-MEMORY-SYSTEM-ARCHITECTURE.md",
+          "contentHash": "2b9d761cbc55b96de9d544103b25b227573c58eecd26faf18e4cbe8b1abbfc3a",
+          "sourceRevision": "sha256:a72630a1b869416f6c938f21f0b6842926b01a31d98cb85c2eeca035138c3579",
+          "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+          "namespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80"
+        }
+      },
+      {
+        "id": "packet:f7bef1b68082",
+        "score": 0.04840250685811043,
+        "clusterId": 0,
+        "identity": {
+          "symbolVersionId": "",
+          "packetKey": "packet:f7bef1b68082",
+          "sourceRef": "docs/metadata-contract-schema.yaml",
+          "contentHash": "5d917e79f25abb940845f8655782c8fc7db77c97c4e399650812842a781e3516",
+          "sourceRevision": "sha256:ae6548446fcbc6d4dc12ebff0790732cce9a05c6dcf876abc1e5f0ff9fad12a8",
+          "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+          "namespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80"
+        }
+      },
+      {
+        "id": "packet:8065d44c1335",
+        "score": 0.048390503972768784,
+        "clusterId": 0,
+        "identity": {
+          "symbolVersionId": "",
+          "packetKey": "packet:8065d44c1335",
+          "sourceRef": "docs/PHASE-85a-BLOCKER-2-COMPLETE.md",
+          "contentHash": "21cd77c871cfc2caf86226fcc7cb6f7026e08989366247f6249624edc293bc5f",
+          "sourceRevision": "sha256:f8bfc43c66034bdf1d09a53bbd59d04c8db291a8f66a27e38d31aa29fb884621",
+          "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+          "namespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80"
+        }
+      },
+      {
+        "id": "packet:db66369e866a",
+        "score": 0.047881778329610825,
+        "clusterId": 0,
+        "identity": {
+          "symbolVersionId": "",
+          "packetKey": "packet:db66369e866a",
+          "sourceRef": "crates/turbovec-napi/build.rs",
+          "contentHash": "59469232b741939e8bcc63e04bbf9ed30f4822593d4b1c802f2425c490284534",
+          "sourceRevision": "sha256:aa7d2ac01ee024deb2df8891a498123bb7c15d9303fb767f6085a9aac92f0d4f",
+          "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+          "namespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80"
+        }
+      }
+    ],
+    "candidate_count": 9,
+    "identity_count": 9,
+    "required_identity_fields": [
+      "packetKey",
+      "sourceRef",
+      "contentHash",
+      "sourceRevision",
+      "workspaceRevision",
+      "namespace"
+    ],
+    "missing_identity_fields": {
+      "packetKey": 0,
+      "sourceRef": 0,
+      "contentHash": 0,
+      "sourceRevision": 0,
+      "workspaceRevision": 0,
+      "namespace": 0
+    },
+    "identity_set_checksum": "sha256:12fd6b3734d96f6a4090433c4a6091a49c9f62f39a791ab246938ec09a6d595c"
+  },
+  "elapsed_ms": 425
+}

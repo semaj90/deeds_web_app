@@ -1,19 +1,7 @@
 {
-  "generated": "2026-09-05T17:04:54.738Z",
-  "mode": "apply",
-  "allowlist": null,
-  "lineage": {
-    "enabled": true,
-    "evidenceSource": "graphify_execution_files",
-    "snapshotReceiptExecutionId": "00000000-0000-0000-0000-000000000000",
-    "sourceRefsWithNamespace": 0,
-    "sourceRefsWithoutNamespace": 3,
-    "membershipsPlanned": 0,
-    "membershipsWritten": 0,
-    "membershipsSkipped": 0
-  },
-  "orphaned_found": 3,
-  "registered": 3,
-  "skipped": 0,
-  "status": "registration_lineage_capture_complete"
+  "generated": "2026-09-05T21:15:32.882Z",
+  "mode": "dry-run",
+  "orphaned_found": 0,
+  "registered": 0,
+  "status": "no_orphans"
 }

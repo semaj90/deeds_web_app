@@ -297,6 +297,12 @@ const result = {
 const markdown = [
   '# OpenSpec Workboard', '',
   '> Generated from OpenSpec task ledgers. This is a navigation/progress projection, not task authority.', '',
+  '## Memory/agent ownership reconciliation', '',
+  '- [2026-09-05 bounded owner reconciliation](reports/memory-agent-openspec-ownership-reconciliation-v1.json): capability-to-owner mapping, current-tree evidence, pending gates and validation results.',
+  '- Existing owning tasks.md files remain implementation authority; this report creates no new change or portfolio authority.',
+  '- SearchRuntime owns fusion; query features feed the existing ACE/ContextManifest bridge; exact caches and server prefix state retain separate owners.',
+  '- The nested wire-agentic-workflows-e2e-test ledger is reference-only. WorkflowActionEventV1 and WorkflowExecutionCoordinatesV1 retain run/backend boundaries.',
+  '- Planning reconciliation does not prove runtime convergence, authorize cache/datastore writes, or advance current source/cohort admission.', '',
   `Overall progress: ${result.summary.progressBar} ${completedTasks}/${tasks.length} tasks`,
   'ETA: UNKNOWN — no receipt-linked throughput supports a defensible estimate.', '',
   '## P10 dependency work packages', '',

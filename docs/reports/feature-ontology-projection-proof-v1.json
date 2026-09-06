@@ -1,0 +1,32 @@
+{
+  "schema": "atlas.feature-ontology-projection-proof.v1",
+  "status": "FEATURE_ONTOLOGY_PROJECTION_PROVEN",
+  "owner": "atlas-feature-intelligence",
+  "contract": "packages/parent-atlas/src/core/feature-ontology-projection-v1.ts",
+  "checks": {
+    "typescript_compile": true,
+    "projection_contract_tests": true,
+    "canonical_feature_identity_unchanged": true,
+    "revision_qualified_source_bindings": true,
+    "derived_dependency_edges_only": true
+  },
+  "commands": {
+    "compile": {
+      "command": "node ../../node_modules/typescript/bin/tsc -p tsconfig.json",
+      "status": 0,
+      "output": ""
+    },
+    "tests": {
+      "command": "node --test packages/parent-atlas/test/feature-ontology-projection-v1.test.mjs",
+      "status": 0,
+      "output": "TAP version 13\n# Subtest: projects one behavioral feature without replacing canonical feature identity\nok 1 - projects one behavioral feature without replacing canonical feature identity\n  ---\n  duration_ms: 3.5581\n  type: 'test'\n  ...\n# Subtest: binds multiple implementation units to the same feature with exact source identity\nok 2 - binds multiple implementation units to the same feature with exact source identity\n  ---\n  duration_ms: 1.1531\n  type: 'test'\n  ...\n# Subtest: models feature dependencies as typed derived edges, not feature identity\nok 3 - models feature dependencies as typed derived edges, not feature identity\n  ---\n  duration_ms: 0.6865\n  type: 'test'\n  ...\n# Subtest: rejects ungrounded implementation bindings and canonical promotion claims\nok 4 - rejects ungrounded implementation bindings and canonical promotion claims\n  ---\n  duration_ms: 1.105\n  type: 'test'\n  ...\n1..4\n# tests 4\n# suites 0\n# pass 4\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 765.5728"
+    }
+  },
+  "effects": {
+    "canonicalWrites": false,
+    "datastoreWrites": false,
+    "cacheWrites": false,
+    "modelCalls": false
+  },
+  "live_adoption": "UNPROVEN"
+}

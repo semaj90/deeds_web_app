@@ -1,5 +1,23 @@
 # Tasks — Parent Atlas memory architecture freeze
 
+## Operator decision addendum — 2026-09-05
+
+Decision authority: the operator's explicit memory/agent ownership instruction.
+2.3 and 2.4 are resolved below; this is decision closure, not implementation proof.
+Evidence-type packets layer/project from ContextCandidate/ContextLane, never replace
+that model or introduce another ContextManifest compiler. Existing LOD axes keep their
+owners; new concepts use evidenceDepth and residencyTier.
+
+Memory classes remain separate: model execution state; exact derived cache;
+ACE control state; retrieved evidence; statistical/routing features; external discovery
+observations; durable workflow outcomes. None grants another class canonical authority.
+
+Section 5's unchecked implementation ideas are OWNED_BY_OTHER_CHANGE, not this
+recording change's execution queue: fingerprints/lexical statistics -> candidate-feature
+execution fabric; discovery snapshots -> deep-research-ingestion; runtime prefix
+identity -> kv-cache-adaptation-research. The new owner tasks retain their evaluation
+and admission prerequisites. This does not close those implementation gates.
+
 This change is a **recording pass**, not an implementation pass. Tasks below are the audit steps
 already completed plus the follow-up scoping work, not feature implementation — see
 `proposal.md`'s "What's actually new and worth scoping" for the actual build candidates.
@@ -58,13 +76,17 @@ already completed plus the follow-up scoping work, not feature implementation �
   no explicit policy-scoring fields (`hot`/`nextTopicProbability`/`historicalUtility`). Extending
   the existing type looks more appropriate than a parallel `AcePacketV2` type, but this is still
   an operator call per 2.3, not decided here.
-- [ ] 2.3 Decide (operator call, not an agent call per `CLAUDE.md`'s Duplication Prevention
+- [x] 2.3 DECIDED 2026-09-05 by operator: layer/project from ContextCandidate/ContextLane;
+  no replacement or second compiler. Historical question (resolved):
+  Decide (operator call, not an agent call per `CLAUDE.md`'s Duplication Prevention
   section): does the evidence-type-axis typed packet model (`SourceEvidencePacket`/
   `AstEvidencePacket`/etc.) replace, layer onto, or project from the existing lane-axis
   `ContextCandidate`/`ContextLane` model? Do not start implementation of typed packet classes
   before this is answered — this is the single highest-risk item for creating a second
   uncoordinated "the" context-compilation system.
-- [ ] 2.4 Decide (same caveat): does the 7-level evidence-axis LOD scheme replace or layer onto
+- [x] 2.4 DECIDED 2026-09-05 by operator: retain existing LOD owners; new axes use
+  evidenceDepth/residencyTier, no fourth LOD meaning. Historical question (resolved):
+  Decide (same caveat): does the 7-level evidence-axis LOD scheme replace or layer onto
   the existing 4-level cache-destination-axis LOD scheme in `packet-lod-manifest.ts`? **Updated
   2026-08-23 follow-up pass**: a third, unrelated "LOD" meaning was found live —
   `parent_atlas_documents.summary_lod0/1/2` (Drizzle schema + real Postgres columns, a
@@ -226,3 +248,40 @@ already completed plus the follow-up scoping work, not feature implementation �
 - [ ] 4.2 Do not touch `context-compiler.parent-atlas.ts`, `packet-lod-manifest.ts`, or
   `packet-bitmap.ts` as part of this change — this is a recording pass; 2.3/2.4 must be answered
   by the operator before any of those files change.
+
+## 5. Lexical/BoW/query-fingerprint layer + Ornith recurrent-state boundary (2026-09-05, fifth
+   addendum — recording only, nothing built)
+
+- [x] 5.1 Audited whether `LexicalFingerprintV1`, `QueryFingerprintV1`, `SearchSnapshotV1`,
+  `OrnithPrefixIdentityV1` already exist as real types before recording the proposal — grep found
+  zero matches for all four across `sveltekit-frontend/src`. Genuinely new, not a duplicate.
+- [x] 5.2 Audited existing lexical/FTS infrastructure before proposing `LexicalFingerprintV1` —
+  `to_tsvector`/`websearch_to_tsquery` FTS and pg_trgm fuzzy matching already exist across 30+
+  files; confirmed `ts_stat()` (the corpus-statistics/IDF-enabling function) has zero live usage.
+  The gap is specifically the corpus-statistics layer, not lexical search itself.
+- [x] 5.3 Audited existing SearXNG/LDR integration before proposing `SearchSnapshotV1` — confirmed
+  live and extensive (35+ files: `ldr-orchestrator.ts`, `web-search.ts`, `research_tools.ts`,
+  `ldr-ace-bridge.ts`). Read `web-search.ts`'s real `WebSearchResult`/`WebSearchResponse` types
+  directly and confirmed neither carries a checksum, `observedAt`, or reproducibility contract —
+  the gap is durable/reproducible snapshot identity, not search capability.
+- [ ] 5.4 Not built: `OrnithPrefixIdentityV1` (checksum-bound llama.cpp prefix-cache identity —
+  `sha256(modelRevision, chatTemplateRevision, toolSchemaRevision, systemPromptRevision,
+  contextManifestPrefixChecksum)`). Hard rule recorded: never build a "save/restore Ornith's
+  recurrent (Gated DeltaNet-style) state" feature — upstream llama.cpp itself treats rewinding that
+  state as not equivalent to a conventional KV-cache rewind, and general state
+  injection/restoration is an active, unresolved upstream concern. Use `cache_prompt`/
+  `cache_reuse` (already mandated by this repo's canonical llama-server startup contract) as-is;
+  record cache hit/miss as telemetry only, never as a correctness input.
+- [ ] 5.5 Not built: `LexicalFingerprintV1` and the `ts_stat()`-derived IDF feature. Explicitly
+  gated: do not build unless an evaluation proves value over what FTS/pg_trgm already provide —
+  matches this repo's existing "don't add a 5th retrieval lane" discipline, applied to lexical/BoW.
+- [ ] 5.6 Not built: `SearchSnapshotV1`. Hard rule recorded: a SearXNG/web-search snippet is
+  discovery evidence, never canonical document evidence — the correct path snapshots the query/
+  result-set, then fetches and hashes the real source URL through the existing canonical evidence
+  pipeline, never persists snippet text as if it were retrieved document content.
+- [ ] 5.7 Not built: `QueryFingerprintV1`. Recorded as a routing hint only, explicitly not an
+  identity or authorization boundary — same posture already required of
+  `TANG_INSPIRED_LOW_RANK_SHORTLIST` and SOM clustering elsewhere in this document.
+- [ ] 5.8 Not decided: where this addendum's items slot into the frozen P0–P4 queue (section 2's
+  fourth addendum). This section is additive to that queue; sequencing is an explicit operator
+  decision, not made here.

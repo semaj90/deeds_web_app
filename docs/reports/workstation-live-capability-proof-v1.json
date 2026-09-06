@@ -1,0 +1,31 @@
+{
+  "schema": "atlas.workstation-live-capability-proof.v1",
+  "generatedAt": "2026-09-05T20:13:41.675Z",
+  "mode": "BOUNDED_LIVE_READ_PROOF",
+  "canonicalAuthority": false,
+  "productionPlanPath": false,
+  "canonicalDatastoreWrites": {
+    "postgres": 0,
+    "qdrant": 0,
+    "neo4j": 0
+  },
+  "cacheWritesPerformed": false,
+  "proofArtifactWritesPerformed": true,
+  "modelRequestsAttempted": 1,
+  "modelResponsesCompleted": 1,
+  "bitfrost": {
+    "cacheKey": "bifrost:sem:query:6b39a5d1e8ea2e22ac0463598e2ad981b16107863a43d9f7a29f5ff0c95fd080",
+    "status": "LIVE_GET_PROVEN",
+    "valueSchema": "MISS"
+  },
+  "ornith": {
+    "endpoint": "http://127.0.0.1:8090/v1/chat/completions",
+    "status": "LIVE_FIXTURE_PROVEN",
+    "modelId": "ornith-1.5-9b",
+    "httpStatus": 200,
+    "generated": true,
+    "outputChecksum": "sha256:00e42038feaa9bd7172e453fb56d2347aecc66d78ca04dbfa2df80ec57db9a5b",
+    "finishReason": "DONE_MARKER_OBSERVED"
+  },
+  "status": "LIVE_CAPABILITY_PROVEN"
+}

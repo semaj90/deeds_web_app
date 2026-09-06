@@ -1,0 +1,44 @@
+{
+  "schema": "atlas.rf6-semantic-vote-proof.v1",
+  "generatedAt": "2026-09-05T23:59:00.560Z",
+  "status": "RF6_SEMANTIC_VOTE_PROVEN",
+  "proofKind": "READ_ONLY_FOCUSED_FUSION_REGRESSION",
+  "owner": "SearchRuntime::fuseSearchRuntimeCandidates",
+  "invariant": "one semantic vote per revision-qualified candidate per logical dense lane",
+  "checks": {
+    "EXECUTOR_PROVENANCE_FIELD": true,
+    "LANE_EVIDENCE_EXECUTOR_IDS": true,
+    "REVISION_QUALIFIED_IDENTITY": true,
+    "REVISION_KEY_USED_FOR_CANONICAL_GROUPING": true,
+    "ONE_LANE_CONTRIBUTION": true,
+    "DENSE_EXECUTOR_REGRESSION": true,
+    "DISTINCT_CHUNK_REGRESSION": true,
+    "REVISION_SEPARATION_REGRESSION": true,
+    "DETERMINISTIC_TIE_REGRESSION": true
+  },
+  "focusedTest": {
+    "command": "npx vitest run src/lib/server/retrieval/__tests__/search-runtime-fusion.test.ts src/lib/server/retrieval/__tests__/rf6-live-replay-01.test.ts --reporter=dot",
+    "exitCode": 0,
+    "signal": null,
+    "outputTail": "\n RUN  v3.2.4 C:/Users/james/Videos/deeds-web-app/sveltekit-frontend\n\nstdout | src/lib/server/retrieval/__tests__/search-runtime-fusion.test.ts\n🧪 Property-based testing environment initialized\n   Fast-check version: 4.4.0\n   Default numRuns: 100\n\nstdout | src/lib/server/retrieval/__tests__/rf6-live-replay-01.test.ts\n🧪 Property-based testing environment initialized\n   Fast-check version: 4.4.0\n   Default numRuns: 100\n\nstdout | src/lib/server/retrieval/__tests__/rf6-live-replay-01.test.ts\n🧪 Property-based testing environment cleaned up\n\n······stdout | src/lib/server/retrieval/__tests__/search-runtime-fusion.test.ts\n🧪 Property-based testing environment cleaned up\n\n·····················\n\n Test Files  2 passed (2)\n      Tests  27 passed (27)\n   Start at  16:58:35\n   Duration  24.72s (transform 4.00s, setup 9.06s, collect 1.18s, tests 33ms, environment 21.93s, prepare 8.32s)\n\n",
+    "errorTail": ""
+  },
+  "source": {
+    "searchRuntime": {
+      "path": "sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts",
+      "checksum": "sha256:59aac12b653fff0afe22847f97742b60f2fbea579648ff7c50a552e27a43b3f2"
+    },
+    "tests": {
+      "path": "sveltekit-frontend/src/lib/server/retrieval/__tests__/search-runtime-fusion.test.ts",
+      "checksum": "sha256:e3526d5c6e46ac1a5837ac63efc642a8d48d4d3a4f5e1d2cf21562798ccd136d"
+    }
+  },
+  "effects": {
+    "sourceInspectionReadOnly": true,
+    "canonicalWrites": false,
+    "datastoreWrites": 0,
+    "cacheWrites": 0,
+    "modelCalls": 0
+  },
+  "nextGate": "RF6-SEMANTIC-REPLAY-01"
+}

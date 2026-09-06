@@ -432,3 +432,69 @@ describe('fuseSearchRuntimeCandidates — identity status propagation', () => {
     expect(fused!.identityStatus).toBe('canonical');
   });
 });
+
+describe('RF6-SEMANTIC-VOTE-01 — one vote per revision-qualified dense candidate', () => {
+  const revision = {
+    sourceRevision: 'sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+    workspaceRevision: 'sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
+  };
+
+  it('deduplicates Qdrant and TurboVec executors into one dense vote while retaining provenance', () => {
+    const fused = fuseSearchRuntimeCandidates([
+      candidate({
+        id: 'qdrant-point-1', packetKey: 'pkt:shared', sourceRef: 'src/a.ts', score: 0.91,
+        scoreSource: 'qdrant_768', embeddingLane: 'dense_768', retrievalExecutor: 'qdrant', ...revision,
+      }),
+      candidate({
+        id: 'turbovec-point-1', packetKey: 'pkt:shared', sourceRef: 'src/a.ts', score: 0.90,
+        scoreSource: 'qdrant_768', embeddingLane: 'dense_768', retrievalExecutor: 'turbovec', ...revision,
+      }),
+    ]);
+
+    expect(fused).toHaveLength(1);
+    expect(fused[0]!.fusionScore).toBeCloseTo(1 / 61, 10);
+    expect(fused[0]!.laneEvidence).toEqual([
+      expect.objectContaining({
+        lane: 'dense',
+        contributionCount: 1,
+        supportingHitCount: 2,
+        executorIds: ['qdrant', 'turbovec'],
+      }),
+    ]);
+  });
+
+  it('keeps distinct canonical chunks separate even when packet and revisions match', () => {
+    const fused = fuseSearchRuntimeCandidates([
+      candidate({
+        id: 'chunk-1', packetKey: 'pkt:file', sourceRef: 'src/a.ts', canonicalChunkId: 'chunk-1',
+        score: 0.92, scoreSource: 'qdrant_768', embeddingLane: 'dense_768', retrievalExecutor: 'qdrant', ...revision,
+      }),
+      candidate({
+        id: 'chunk-2', packetKey: 'pkt:file', sourceRef: 'src/a.ts', canonicalChunkId: 'chunk-2',
+        score: 0.91, scoreSource: 'qdrant_768', embeddingLane: 'dense_768', retrievalExecutor: 'turbovec', ...revision,
+      }),
+    ]);
+
+    expect(fused).toHaveLength(2);
+    expect(fused.map((item) => item.canonicalChunkId)).toEqual(['chunk-1', 'chunk-2']);
+    expect(fused.every((item) => item.laneEvidence?.[0]?.contributionCount === 1)).toBe(true);
+  });
+
+  it('does not merge the same packet/chunk across different source revisions', () => {
+    const fused = fuseSearchRuntimeCandidates([
+      candidate({ id: 'old', packetKey: 'pkt:file', sourceRef: 'src/a.ts', canonicalChunkId: 'chunk-1', score: 0.8, scoreSource: 'qdrant_768', embeddingLane: 'dense_768', ...revision }),
+      candidate({ id: 'new', packetKey: 'pkt:file', sourceRef: 'src/a.ts', canonicalChunkId: 'chunk-1', score: 0.8, scoreSource: 'qdrant_768', embeddingLane: 'dense_768', sourceRevision: revision.sourceRevision.replaceAll('a', 'c'), workspaceRevision: revision.workspaceRevision }),
+    ]);
+
+    expect(fused).toHaveLength(2);
+    expect(new Set(fused.map((item) => item.id))).toEqual(new Set(['old', 'new']));
+  });
+
+  it('is deterministic when executor hits tie on score and rank', () => {
+    const hits = [
+      candidate({ id: 'q', packetKey: 'pkt:tie', sourceRef: 'src/tie.ts', score: 0.5, scoreSource: 'qdrant_768', embeddingLane: 'dense_768', retrievalExecutor: 'qdrant', ...revision }),
+      candidate({ id: 't', packetKey: 'pkt:tie', sourceRef: 'src/tie.ts', score: 0.5, scoreSource: 'qdrant_768', embeddingLane: 'dense_768', retrievalExecutor: 'turbovec', ...revision }),
+    ];
+    expect(fuseSearchRuntimeCandidates(hits)).toEqual(fuseSearchRuntimeCandidates([...hits].reverse()));
+  });
+});

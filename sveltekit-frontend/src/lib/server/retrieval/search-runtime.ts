@@ -231,6 +231,8 @@ export interface Candidate {
   representationId?: string | null;
   representationRevision?: number | null;
   qdrantPointId?: string | null;
+  /** Physical executor that produced this hit; never an additional logical lane. */
+  retrievalExecutor?: string | null;
   treeNodeId?: string | null;
   pageRankScore?: number | null;
   stableSymbolId?: string | null;
@@ -280,6 +282,8 @@ export interface LaneEvidence {
   contributionCount: number;
   supportingHitCount: number;
   supportingBackendIds: string[];
+  /** Executor provenance retained for auditability; all entries still count as one lane vote. */
+  executorIds: string[];
   contributingSources: Candidate['scoreSource'][];
 }
 
@@ -905,6 +909,11 @@ export class SearchRuntime {
       representationId: typeof lc.representationId === 'string' ? lc.representationId : undefined,
       representationRevision: typeof lc.representationRevision === 'number' ? lc.representationRevision : undefined,
       qdrantPointId: typeof lc.qdrantPointId === 'string' ? lc.qdrantPointId : undefined,
+      retrievalExecutor: typeof lc.metadata?.['retrieval_executor'] === 'string'
+        ? String(lc.metadata['retrieval_executor'])
+        : typeof lc.metadata?.['executor'] === 'string'
+          ? String(lc.metadata['executor'])
+          : lc.lane === 'dense' ? 'qdrant' : lc.lane,
       treeNodeId: typeof lc.metadata?.['tree_node_id'] === 'string' ? String(lc.metadata['tree_node_id']) : undefined,
       pageRankScore: typeof lc.metadata?.['page_rank_score'] === 'number' ? lc.metadata['page_rank_score'] as number : undefined,
       stableSymbolId: typeof lc.metadata?.['stable_symbol_id'] === 'string' ? lc.metadata['stable_symbol_id'] as string : undefined,
@@ -1194,6 +1203,22 @@ export function getFusionIdentityKey(candidate: Candidate): string {
   return candidate.id;
 }
 
+/**
+ * Revision-qualified identity for fusion. A candidate with both source and workspace revisions
+ * must not merge with the same packet/chunk key from another revision. Candidates without both
+ * revisions retain the pre-existing key for compatibility, but remain visibly unqualified in
+ * their candidate envelope and cannot be promoted by this function.
+ */
+function getRevisionQualifiedFusionIdentityKey(candidate: Candidate): string {
+  const identityKey = getFusionIdentityKey(candidate);
+  const sourceRevision = candidate.sourceRevision?.trim();
+  const workspaceRevision = candidate.workspaceRevision?.trim();
+  const isRevision = (value: string | undefined): value is string =>
+    Boolean(value && /^sha256:[0-9a-f]{64}$/i.test(value));
+  if (!isRevision(sourceRevision) || !isRevision(workspaceRevision)) return identityKey;
+  return `revision:${workspaceRevision}::${sourceRevision}::${identityKey}`;
+}
+
 function getFusionBackendIdentityKey(candidate: Candidate): string {
   return (
     candidate.fallback_id?.trim() ||
@@ -1228,8 +1253,8 @@ function getFusionLogicalLane(candidate: Candidate): LogicalRetrievalLane {
 }
 
 function compareIdentityKeys(a: Candidate, b: Candidate): number {
-  const keyA = getFusionIdentityKey(a);
-  const keyB = getFusionIdentityKey(b);
+  const keyA = getRevisionQualifiedFusionIdentityKey(a);
+  const keyB = getRevisionQualifiedFusionIdentityKey(b);
   if (keyA !== keyB) return keyA.localeCompare(keyB);
 
   const backendA = getFusionBackendIdentityKey(a);
@@ -1292,6 +1317,7 @@ export function fuseSearchRuntimeCandidates(candidates: Candidate[]): FusedCandi
     bestScore: number;
     supportingHitCount: number;
     supportingBackendIds: Set<string>;
+    executorIds: Set<string>;
     contributingSources: Set<Candidate['scoreSource']>;
   }
 
@@ -1323,8 +1349,9 @@ export function fuseSearchRuntimeCandidates(candidates: Candidate[]): FusedCandi
     const groups = new Map<string, LaneGroup>();
     laneCards.forEach((candidate, index) => {
       const identityStatus = candidate.identityStatus ?? 'canonical';
-      const canonicalKey = identityStatus === 'canonical' ? getFusionIdentityKey(candidate) : null;
+      const canonicalKey = identityStatus === 'canonical' ? getRevisionQualifiedFusionIdentityKey(candidate) : null;
       const backendKey = getFusionBackendIdentityKey(candidate);
+      const executorId = candidate.retrievalExecutor?.trim() || candidate.scoreSource;
       const outputKey = identityStatus === 'canonical'
         ? `canonical:${canonicalKey}`
         : `degraded:${backendKey}::${lane}`;
@@ -1342,6 +1369,7 @@ export function fuseSearchRuntimeCandidates(candidates: Candidate[]): FusedCandi
           bestScore: candidate.score,
           supportingHitCount: 1,
           supportingBackendIds: new Set([backendKey]),
+          executorIds: new Set([executorId]),
           contributingSources: new Set([candidate.scoreSource]),
         });
         return;
@@ -1349,6 +1377,7 @@ export function fuseSearchRuntimeCandidates(candidates: Candidate[]): FusedCandi
 
       existing.supportingHitCount += 1;
       existing.supportingBackendIds.add(backendKey);
+      existing.executorIds.add(executorId);
       existing.contributingSources.add(candidate.scoreSource);
     });
 
@@ -1365,11 +1394,12 @@ export function fuseSearchRuntimeCandidates(candidates: Candidate[]): FusedCandi
       contributionCount: 1,
       supportingHitCount: group.supportingHitCount,
       supportingBackendIds: Array.from(group.supportingBackendIds).sort(),
+      executorIds: Array.from(group.executorIds).sort(),
       contributingSources: Array.from(group.contributingSources).sort(),
     };
 
     const outputKey = group.identityStatus === 'canonical'
-      ? `canonical:${group.canonicalKey ?? getFusionIdentityKey(group.representative)}`
+      ? `canonical:${group.canonicalKey ?? getRevisionQualifiedFusionIdentityKey(group.representative)}`
       : group.outputKey;
 
     const existing = aggregates.get(outputKey);

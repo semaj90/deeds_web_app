@@ -1,38 +1,74 @@
 {
   "schema": "atlas.opencode-context-admission-audit.v1",
-  "generatedAt": "2026-09-05T15:45:49.339Z",
+  "generatedAt": "2026-09-05T21:26:05.742Z",
   "readOnly": true,
   "canonicalWrites": false,
   "datastoreWrites": false,
   "modelCalls": false,
   "instructionFileCount": 8,
   "generatedIndexCount": 1,
-  "oversizedFileCount": 3,
+  "oversizedFileCount": 2,
+  "deterministicValidator": {
+    "budgetBytes": 12288,
+    "generatedContentPaths": [
+      "sveltekit-frontend/AGENTS.md"
+    ],
+    "budgetViolations": [
+      {
+        "path": "sveltekit-frontend/src/lib/server/graph/AGENTS.md",
+        "bytes": 20517,
+        "budgetBytes": 12288
+      },
+      {
+        "path": "AGENTS.md",
+        "bytes": 15388,
+        "budgetBytes": 12288
+      }
+    ],
+    "duplicateContentGroups": [],
+    "duplicateFileCount": 0,
+    "status": "CONTEXT_ADMISSION_REVIEW_REQUIRED"
+  },
   "files": [
-    {
-      "path": "AGENTS.md",
-      "bytes": 16694,
-      "lines": 269,
-      "classification": "CORE_OR_SCOPED_OVER_BUDGET",
-      "generatedIndexMarkers": []
-    },
     {
       "path": "mcp-server-mcp/tools/instructions/AGENTS.md",
       "bytes": 1317,
+      "contentHash": "sha256:d2a3fb0c935c61c81b6ef615c3463e7306918fe0d1972e8db3092dc7096b06b6",
       "lines": 24,
       "classification": "CORE_OR_SCOPED_INSTRUCTION",
       "generatedIndexMarkers": []
     },
     {
+      "path": "AGENTS.md",
+      "bytes": 15388,
+      "contentHash": "sha256:548e69a882b09bd9bc2c9af11ff0e0792d80f27d2ccdd2bceb841e971f5da0fb",
+      "lines": 242,
+      "classification": "CORE_OR_SCOPED_OVER_BUDGET",
+      "generatedIndexMarkers": []
+    },
+    {
       "path": "llama-cpp-turboquant-gemma4/AGENTS.md",
       "bytes": 6967,
+      "contentHash": "sha256:4e9830e84d20f35f0c5f01b71a94eb77eb4b4837557118262a5bc50b534c9aa1",
       "lines": 111,
       "classification": "CORE_OR_SCOPED_INSTRUCTION",
       "generatedIndexMarkers": []
     },
     {
+      "path": "sveltekit-frontend/AGENTS.md",
+      "bytes": 2425,
+      "contentHash": "sha256:cad0382cca39e0fc417a39441dc771894ccdba7ac1b903a7e4aea09ab71a726f",
+      "lines": 47,
+      "classification": "GENERATED_INDEX",
+      "generatedIndexMarkers": [
+        "Full Repository Index",
+        "npm run agents:write"
+      ]
+    },
+    {
       "path": "tools/agentic-research/src/firecrawl/AGENTS.md",
       "bytes": 1482,
+      "contentHash": "sha256:c8d2326d7ed021c7197edb9e3330e242cee64886720373a2e35af6d929d213f0",
       "lines": 19,
       "classification": "CORE_OR_SCOPED_INSTRUCTION",
       "generatedIndexMarkers": []
@@ -40,31 +76,23 @@
     {
       "path": "sveltekit-frontend/src/mcp/AGENTS.md",
       "bytes": 5225,
+      "contentHash": "sha256:19dcc918a2678b91beef22ed0a305250ed92c676dcf8c223daa0e9c6a1fb88e2",
       "lines": 174,
       "classification": "CORE_OR_SCOPED_INSTRUCTION",
       "generatedIndexMarkers": []
     },
     {
       "path": "sveltekit-frontend/src/lib/server/graph/AGENTS.md",
-      "bytes": 20643,
-      "lines": 649,
+      "bytes": 20517,
+      "contentHash": "sha256:32fbd25c9e36d6c4c373333861040783b4aab8213bdbf346afe03c3a62bde8e5",
+      "lines": 586,
       "classification": "CORE_OR_SCOPED_OVER_BUDGET",
       "generatedIndexMarkers": []
     },
     {
-      "path": "sveltekit-frontend/AGENTS.md",
-      "bytes": 1160219,
-      "lines": 4543,
-      "classification": "GENERATED_INDEX",
-      "generatedIndexMarkers": [
-        "Full Repository Index",
-        "LLM jump table",
-        "npm run agents:write"
-      ]
-    },
-    {
       "path": "sveltekit-frontend/scripts/AGENTS.md",
       "bytes": 4848,
+      "contentHash": "sha256:6dc76921686eeb0990423ebff5919b3617820cd5f613eefd409a2f579a1bb12d",
       "lines": 159,
       "classification": "CORE_OR_SCOPED_INSTRUCTION",
       "generatedIndexMarkers": []

@@ -3,18 +3,31 @@
 `parent-atlas-runtime-ownership-precall` deliberately excludes multimodal
 deep-research ingestion — folding it in would make that change too broad
 (runtime ownership + pre-call validation is already a full scope on its
-own). This is a placeholder/scope-reservation change, not an
-implementation plan: it exists so the ingestion design has an OpenSpec
-home distinct from runtime ownership, and so nothing gets built ad hoc
-against an undocumented shape.
+own). This existing scope reservation is promoted to a bounded implementation
+plan on 2026-09-05. It owns reproducible discovery observations and their handoff
+to existing acquisition owners, not a new crawler, source registry or datastore.
 
-**No code exists for this yet.** This proposal is intentionally
-unimplemented — it records the acquisition envelope and representation
-design so a future session can pick it up without re-deriving it, per
-the same pattern as `atlas-hot-vector-schema-decision` (decision-only,
-no premature schema).
+The current repo already has SearXNG discovery in
+`sveltekit-frontend/src/lib/server/retrieval/web-search.ts`, consumed by the agent
+tool adapter, and versioned HTML acquisition in `python/atlas_external_docs.py`.
+Snapshot identity and the end-to-end handoff remain to be implemented/proven under
+DISCOVERY-01..05. Existing source/acquisition contracts are reused, never duplicated.
 
-## What Changes (design sketch, not yet built)
+## What Changes (implementation plan, not execution proof)
+
+Add derived SearchObservationV1/SearchSnapshotV1 around existing discovery results.
+Freeze normalized query/checksum, normalizer revision, requested and effective
+engines/categories/language/timeRange, provider/fallback, observedAt, ordered results,
+resultSetChecksum and snapshotChecksum. Distinguish an empty successful result from
+provider failure or curated fallback. These observations are not document evidence.
+
+Route selected URLs to the existing versioned-doc acquisition owner (and existing
+media-specific owners after census). Fetched bytes, content hashes and exact spans
+enter the canonical acquisition envelope through existing PostgreSQL admission.
+Do not turn SearXNG snippets into canonical documents or add a direct Qdrant writer.
+
+The broader representation sketch below remains downstream reference scope, not an
+instruction to implement visual/latent/GPU representations in the discovery tranche.
 
 Canonical acquisition envelope for every ingested source, regardless of
 type:
@@ -50,12 +63,14 @@ untraceable summaries.
 
 ## Explicitly out of scope for now
 
-- Any actual implementation (extractor code, storage wiring).
-- Choosing which extraction library/service to use for each source type.
-- Wiring this into the existing evidence pipeline or MCP `ldr_research`
-  tool — that's a follow-up decision once this envelope is approved.
+- New crawler or independent acquisition/source identity owner.
+- Library/framework installs, public broad crawling, paid acquisition, datastore
+  writes or new media/embedding projections in this planning pass.
+- Automatic LDR/MCP promotion without the owning admission and authorization gates.
 
 ## Impact
 
-None yet — no code changes. This change exists to reserve the design
-scope, not to implement it.
+Planning artifacts now define the discovery snapshot and acquisition handoff tests.
+No production runtime is changed. Build bounded contracts/fixtures in scripts/atlas
+before package promotion. Existing DOC-04/05/06A/27 owners retain byte provenance,
+PostgreSQL admission and version selection; this change consumes their receipts.

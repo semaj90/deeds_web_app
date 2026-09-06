@@ -19,7 +19,7 @@ retirement; no model training or runtime/index writes were performed.
       normalized 128-d `classification_mrl_128` vector is supplied.
 - [x] Focused exporter/query tests pass 4/4 in the dedicated exporter lane. The exporter does not call Ollama,
       train PyTorch, write JSONL, mutate retrieval policy, or write stores.
-- [ ] A live query/label producer and same-corpus EmbeddingGemma 128-d dataset
+- [ ] A live query/label producer and same-corpus EmbeddingGemma  embeddinggemma ast cst semantic 768, 512, 256, 128, derived latent256, latent128-d dataset
       remain unproven; MiniLM retirement remains blocked.
 - [x] Added an explicit adapter from verified `ToolTrainingExampleV1` rows;
       domain, operation, retrieval-needs, and all revision metadata remain

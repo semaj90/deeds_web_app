@@ -1,0 +1,27 @@
+{
+  "schema": "atlas.parent-atlas-workstation-ornith-synthesis-fixture-proof.v1",
+  "gate": "WORKSTATION-ORNITH-LIVE-FIXTURE-01",
+  "status": "PROVEN",
+  "proofPassed": true,
+  "runnerExitCode": 0,
+  "generationProven": true,
+  "loadedModel": "ornith-1.5-9b",
+  "outputChecksum": "sha256:8c4ac7f663cabe36741654b23ab5584ca6001e99d152200b7a6e9a04a1c93422",
+  "requestChecksum": "sha256:800ed7bbefc520b9bfea38a67c54f1cb96880a2920a62f0a14b4fd430df0bfaa",
+  "responseChecksum": "sha256:442e16738d5b764ff4b9a3e1200ea138b517494dcabb2ac182599cfbbb757412",
+  "finishReason": "stop",
+  "isolation": {
+    "dryRunReceiptUntouched": true,
+    "dryRunProofUntouched": true,
+    "dryRunReceiptChecksumBefore": "sha256:cf90e16c61e5a43f14d51d3c968856b9ed0820e50e38a255a38fd2bb11e2af34",
+    "dryRunReceiptChecksumAfter": "sha256:cf90e16c61e5a43f14d51d3c968856b9ed0820e50e38a255a38fd2bb11e2af34",
+    "dryRunProofChecksumBefore": "sha256:d5589b81a85e7e38d8bb9c49b2efd77042881d67c2cc10f4a309b0578a2f58d3",
+    "dryRunProofChecksumAfter": "sha256:d5589b81a85e7e38d8bb9c49b2efd77042881d67c2cc10f4a309b0578a2f58d3"
+  },
+  "productionAdoption": "BLOCKED_CURRENT_LINEAGE",
+  "evidence": [
+    "scripts/atlas/lib/workstation-ornith-adapter.mjs",
+    "scripts/atlas/run-parent-atlas-workstation-ornith-synthesis-fixture-v1.mjs",
+    "docs/reports/parent-atlas-workstation-ornith-synthesis-fixture-v1.json"
+  ]
+}

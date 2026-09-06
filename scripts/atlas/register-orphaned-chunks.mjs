@@ -56,12 +56,17 @@
  * flag still uses the corrected-but-still-legacy-bridge LATERAL join above for
  * backward-compatible diagnostic use; see the CLI validation below for the exact
  * fail-closed rules once a receipt is supplied.
+ *
+ * --bounded-lineage-snapshot-receipt=<path> is required for an apply that uses
+ * --source-refs-file. It is a bounded source/chunk receipt and deliberately does
+ * not require unrelated files to match a full-workspace Graphify snapshot.
  */
 
 import pg        from 'pg';
 import Redis     from 'ioredis';
 import { createHash } from 'node:crypto';
-import { writeFileSync, mkdirSync, readFileSync } from 'node:fs';
+import { writeFileSync, mkdirSync, readFileSync, existsSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
 import path      from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -71,6 +76,7 @@ const ROOT  = path.resolve(__dir, '../..');
 // ── Config ────────────────────────────────────────────────────────────────────
 const APPLY     = process.argv.includes('--apply');
 const CAPTURE_LINEAGE = process.argv.includes('--capture-lineage');
+const REQUIRE_LINEAGE = process.argv.includes('--require-lineage');
 const VERBOSE   = process.argv.includes('--verbose');
 const DRY_RUN   = !APPLY;
 const LIMIT_ARG = process.argv.find(a => a.startsWith('--limit='));
@@ -129,9 +135,39 @@ const GRAPHIFY_SNAPSHOT_RECEIPT = GRAPHIFY_SNAPSHOT_RECEIPT_ARG
       if (typeof parsed.executionId !== 'string' || !parsed.executionId.trim()) {
         throw new Error(`GRAPHIFY_SNAPSHOT_RECEIPT_INVALID: ${filePath} executionId must be a non-empty string`);
       }
-      return { filePath, executionId: parsed.executionId.trim(), workspaceRevision: parsed.workspaceRevision ?? null };
+      return {
+        filePath,
+        executionId: parsed.executionId.trim(),
+        workspaceRevision: parsed.workspaceRevision ?? null,
+        workspaceRevisionRecordChecksum: parsed.workspaceRevisionRecordChecksum ?? null,
+        workspaceOriginRuntimeRevision: parsed.workspaceOriginRuntimeRevision ?? null,
+      };
     })()
   : null;
+
+const BOUNDED_LINEAGE_RECEIPT_ARG = process.argv.find(a => a.startsWith('--bounded-lineage-snapshot-receipt='));
+const BOUNDED_LINEAGE_RECEIPT = BOUNDED_LINEAGE_RECEIPT_ARG
+  ? (() => {
+      const filePath = path.resolve(ROOT, BOUNDED_LINEAGE_RECEIPT_ARG.split('=').slice(1).join('='));
+      let parsed;
+      try { parsed = JSON.parse(readFileSync(filePath, 'utf8')); }
+      catch (error) { throw new Error(`BOUNDED_LINEAGE_RECEIPT_UNREADABLE: ${filePath} (${error instanceof Error ? error.message : String(error)})`); }
+      if (!parsed || parsed.schema !== 'atlas.bounded-lineage-snapshot.v1') {
+        throw new Error(`BOUNDED_LINEAGE_RECEIPT_INVALID: ${filePath} schema must be atlas.bounded-lineage-snapshot.v1`);
+      }
+      if (parsed.status !== 'BOUNDED_LINEAGE_SNAPSHOT_PROVEN') {
+        throw new Error(`BOUNDED_LINEAGE_RECEIPT_NOT_PROVEN: status = ${parsed.status ?? 'undefined'}`);
+      }
+      if (!Array.isArray(parsed.targetSourceRefs) || parsed.targetSourceRefs.length === 0 || !Array.isArray(parsed.bindings)) {
+        throw new Error(`BOUNDED_LINEAGE_RECEIPT_INVALID: targetSourceRefs and bindings are required`);
+      }
+      return { filePath, parsed };
+    })()
+  : null;
+
+if (GRAPHIFY_SNAPSHOT_RECEIPT && BOUNDED_LINEAGE_RECEIPT) {
+  throw new Error('LINEAGE_RECEIPT_MODES_MUTUALLY_EXCLUSIVE: choose full Graphify or bounded lineage receipt');
+}
 
 // The receipt is mandatory only for the write-capable path. A dry-run
 // (--capture-lineage without --apply) may still use the corrected legacy-bridge
@@ -139,8 +175,16 @@ const GRAPHIFY_SNAPSHOT_RECEIPT = GRAPHIFY_SNAPSHOT_RECEIPT_ARG
 // the weaker bridge evidence is an acceptable diagnostic signal there. The
 // write-capable path (--apply --capture-lineage) must never write a lineage row
 // derived from anything less than a proven immutable snapshot.
-if (APPLY && CAPTURE_LINEAGE && !GRAPHIFY_SNAPSHOT_RECEIPT) {
+if (APPLY && CAPTURE_LINEAGE && !SOURCE_REFS_ALLOWLIST && !GRAPHIFY_SNAPSHOT_RECEIPT) {
   throw new Error('GRAPHIFY_SNAPSHOT_RECEIPT_REQUIRED: --apply --capture-lineage requires --graphify-snapshot-receipt=<path> (a docs/reports/current-source-selection-input-v1.json with status=CURRENT_SNAPSHOT_PROVEN, produced by scripts/atlas/audit-current-graphify-snapshot-authority-v1.mts). Run without --apply for a read-only diagnostic dry-run instead.');
+}
+
+if (APPLY && CAPTURE_LINEAGE && SOURCE_REFS_ALLOWLIST && !BOUNDED_LINEAGE_RECEIPT) {
+  throw new Error('BOUNDED_LINEAGE_RECEIPT_REQUIRED: bounded --source-refs-file applies require --bounded-lineage-snapshot-receipt=<path>');
+}
+
+if (REQUIRE_LINEAGE && !CAPTURE_LINEAGE) {
+  throw new Error('REQUIRE_LINEAGE_REQUIRES_CAPTURE_LINEAGE: --require-lineage must be combined with --capture-lineage');
 }
 
 const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
@@ -227,6 +271,48 @@ function writeReport(report) {
     console.log(`\nReport: ${reportPath}`);
   } catch (err) {
     console.error(`Failed to write report: ${err.message}`);
+  }
+}
+
+function assertFreshSnapshotReceipt() {
+  if (!(APPLY && CAPTURE_LINEAGE && GRAPHIFY_SNAPSHOT_RECEIPT)) return;
+  const tsx = path.resolve(ROOT, 'node_modules/.bin/tsx.cmd');
+  if (!existsSync(tsx)) {
+    throw new Error('SNAPSHOT_FRESHNESS_CHECK_UNAVAILABLE: node_modules/.bin/tsx.cmd is required before a lineage apply');
+  }
+  const output = execFileSync(tsx, [
+    path.resolve(ROOT, 'scripts/atlas/validate-current-snapshot-receipt-freshness-v1.mts'),
+    `--receipt=${GRAPHIFY_SNAPSHOT_RECEIPT.filePath}`,
+  ], { cwd: ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
+  let result;
+  try {
+    result = JSON.parse(output.trim().split(/\r?\n/).at(-1));
+  } catch {
+    throw new Error(`SNAPSHOT_FRESHNESS_CHECK_INVALID_OUTPUT: ${output.slice(-500)}`);
+  }
+  if (result.status !== 'RECEIPT_FRESH_FOR_BOUND_WRITE') {
+    throw new Error(`GRAPHIFY_SNAPSHOT_RECEIPT_STALE: ${result.status}; see ${result.reportPath}`);
+  }
+}
+
+function assertBoundedLineageReceipt() {
+  if (!(APPLY && CAPTURE_LINEAGE && BOUNDED_LINEAGE_RECEIPT)) return;
+  const receipt = BOUNDED_LINEAGE_RECEIPT.parsed;
+  const requested = [...SOURCE_REFS_ALLOWLIST].sort();
+  const captured = [...new Set(receipt.targetSourceRefs.map((value) => String(value).trim().replaceAll('\\', '/')))].sort();
+  if (requested.length !== captured.length || requested.some((value, index) => value !== captured[index])) {
+    throw new Error('BOUNDED_LINEAGE_TARGET_SET_MISMATCH: receipt targetSourceRefs must exactly cover --source-refs-file');
+  }
+  for (const binding of receipt.bindings) {
+    const sourceRef = String(binding.sourceRef);
+    const absolute = path.resolve(ROOT, sourceRef);
+    if (!existsSync(absolute)) throw new Error(`TARGET_SOURCE_MISSING:${sourceRef}`);
+    const bytes = readFileSync(absolute);
+    const currentDigest = `sha256:${createHash('sha256').update(bytes).digest('hex')}`;
+    if (currentDigest !== `sha256:${String(binding.contentDigest).replace(/^sha256:/i, '').toLowerCase()}`) {
+      throw new Error(`TARGET_SOURCE_CONTENT_DRIFT:${sourceRef}`);
+    }
+    if (bytes.byteLength !== Number(binding.byteLength)) throw new Error(`TARGET_SOURCE_BYTE_LENGTH_DRIFT:${sourceRef}`);
   }
 }
 
@@ -340,8 +426,28 @@ async function main() {
       };
     });
 
+    // Re-materialize and compare the live workspace immediately before any
+    // lineage-bearing INSERT. A receipt that was valid for an earlier tree is
+    // never sufficient for a current write.
+    if (BOUNDED_LINEAGE_RECEIPT) assertBoundedLineageReceipt();
+    else assertFreshSnapshotReceipt();
+
     const lineageBySourceRef = new Map();
-    if (CAPTURE_LINEAGE && GRAPHIFY_SNAPSHOT_RECEIPT) {
+    if (CAPTURE_LINEAGE && BOUNDED_LINEAGE_RECEIPT) {
+      for (const binding of BOUNDED_LINEAGE_RECEIPT.parsed.bindings) {
+        for (const chunk of binding.chunks ?? []) {
+          const list = lineageBySourceRef.get(binding.sourceRef) ?? [];
+          list.push({
+            source_ref: binding.sourceRef,
+            canonical_chunk_id: chunk.canonicalChunkId,
+            chunk_row_id: chunk.chunkRowId,
+            workspace_id: BOUNDED_LINEAGE_RECEIPT.parsed.workspaceId,
+            source_revision: binding.sourceRevision,
+          });
+          lineageBySourceRef.set(binding.sourceRef, list);
+        }
+      }
+    } else if (CAPTURE_LINEAGE && GRAPHIFY_SNAPSHOT_RECEIPT) {
       // Receipt-driven path: membership is read exclusively from the immutable
       // graphify_execution_files ledger for the receipt's proven execution_id --
       // graphify_files is not consulted at all here, so its mutability and the

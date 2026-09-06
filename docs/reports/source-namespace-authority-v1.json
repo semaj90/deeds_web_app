@@ -1,0 +1,420 @@
+{
+  "schema": "atlas.source-namespace-authority.v1",
+  "gate": "SOURCE-REGISTRY-OWNER-JOIN-01",
+  "generatedAt": "2026-09-05T21:11:38.115Z",
+  "mode": "READ_ONLY",
+  "authorityOwner": "SourceNamespaceV1 + Atlas repositoryId contract",
+  "canonicalRepositoryId": "deeds-web-app",
+  "git": {
+    "worktreeRootEvidence": "C:/Users/james/Videos/deeds-web-app",
+    "command": "git rev-parse --show-toplevel",
+    "error": null
+  },
+  "repositoryAliases": [
+    {
+      "value": "deeds-web-app",
+      "source": "SourceNamespaceV1 repositoryId contract",
+      "status": "CURRENT_ALIAS"
+    },
+    {
+      "value": "semaj90/deeds_web_app",
+      "source": "Graphify/workspace-origin tooling",
+      "status": "LEGACY_ALIAS"
+    }
+  ],
+  "sourceRefContract": {
+    "root": "GIT_WORKTREE_ROOT",
+    "separator": "/",
+    "casePolicy": "PRESERVE",
+    "dotSegmentsAllowed": false,
+    "absolutePathsAllowed": false
+  },
+  "sourcePopulationCount": 50,
+  "orderedSourceRefs": [
+    "sveltekit-frontend/.codex_louvain_audit.mjs",
+    "sveltekit-frontend/classifier-models/xgboost-lane-classifier.json",
+    "sveltekit-frontend/classifier-models/xgboost-metadata.json",
+    "sveltekit-frontend/classifier-models/xgboost-metrics.json",
+    "sveltekit-frontend/colab-enrich-clusters.py",
+    "sveltekit-frontend/colab-export-clusters/colab-summarize.py",
+    "sveltekit-frontend/colab-export/colab-summarize.py",
+    "sveltekit-frontend/colab-export/config.json",
+    "sveltekit-frontend/data/atlas-tensor-proof/entropy_norm_coverage_r1.json",
+    "sveltekit-frontend/data/atlas-tensor-proof/entropy_norm_pipeline.py",
+    "sveltekit-frontend/data/atlas-tensor-proof/kmeans_run_r1_k128.json",
+    "sveltekit-frontend/data/atlas-tensor-proof/kmeans_run_r1_k256.json",
+    "sveltekit-frontend/data/atlas-tensor-proof/kmeans_run_r1_k64.json",
+    "sveltekit-frontend/data/atlas-tensor-proof/t3_exact_gpu_proof.py",
+    "sveltekit-frontend/data/atlas-tensor-proof/t6b_cagra_recall_proof.py",
+    "sveltekit-frontend/data/atlas-tensor-proof/t6c_kmeans_sweep.py",
+    "sveltekit-frontend/data/atlas-tensor-proof/t6c_kmeans_sweep_v2.py",
+    "sveltekit-frontend/data/phase18_datasets.json",
+    "sveltekit-frontend/docs/ARCHITECTURE-SEPARATION-CANONICAL-VS-DERIVED.md",
+    "sveltekit-frontend/docs/CANONICAL-FEATURE-ENVELOPE-RETROFIT-COMPLETE.md",
+    "sveltekit-frontend/docs/CANONICAL-FEATURE-ENVELOPE-WIRED.md",
+    "sveltekit-frontend/docs/CARD-1-ENVELOPE-EXTRACTION-READY.md",
+    "sveltekit-frontend/docs/CODEBASE-REFERENCE-INDEX.md",
+    "sveltekit-frontend/docs/CROSS-RANKER-API.md",
+    "sveltekit-frontend/docs/CROSS-RANKER-INTEGRATION.md",
+    "sveltekit-frontend/docs/CUDA-GRAPH-CACHING-IMPLEMENTATION.md",
+    "sveltekit-frontend/docs/DOCKER-COMPOSE-CORRECTED-BASELINE.md",
+    "sveltekit-frontend/docs/EMBEDDING-LANES-IMPLEMENTATION.md",
+    "sveltekit-frontend/docs/EMBEDDING-LANES-QUICK-START.md",
+    "sveltekit-frontend/docs/FOUR-LANE-SEMANTIC-INDEXING-ALIGNMENT.md",
+    "sveltekit-frontend/docs/GRAPHIFY-READINESS-ENDPOINTS.md",
+    "sveltekit-frontend/docs/K-MEANS-VS-KNN-DISTINCTION.md",
+    "sveltekit-frontend/docs/architecture/ACE_NEURAL_LOD.md",
+    "sveltekit-frontend/docs/architecture/DURABLE-EXECUTION-ARCHITECTURE.md",
+    "sveltekit-frontend/docs/architecture/DURABLE-EXECUTION-SUMMARY.md",
+    "sveltekit-frontend/docs/architecture/INDEXING_AND_RETRIEVAL.md",
+    "sveltekit-frontend/docs/architecture/MASTRA-DURABLE-EXECUTION-INTEGRATION.md",
+    "sveltekit-frontend/docs/architecture/NARY_RAPIDS_METRICS.md",
+    "sveltekit-frontend/docs/architecture/NES_PS2_LOD_VISUALIZATION.md",
+    "sveltekit-frontend/docs/architecture/SERIALIZATION_AND_RPC.md",
+    "sveltekit-frontend/docs/architecture/TENSOR_RESIDENCY_PIPELINE.md",
+    "sveltekit-frontend/docs/architecture/THREE_PLANE_RUNTIME.md",
+    "sveltekit-frontend/docs/architecture/TOKEN_REMAP_LATENT_PROJECTION.md",
+    "sveltekit-frontend/docs/architecture/TOPOLOGY_TILE_TREE.md",
+    "sveltekit-frontend/docs/checklists/DURABLE-EXECUTION-INTEGRATION.md",
+    "sveltekit-frontend/docs/contracts/schema-dependency-tool.okf.json",
+    "sveltekit-frontend/docs/evaluation-system.md",
+    "sveltekit-frontend/docs/examples/DURABLE-WORKFLOW-EXAMPLE.md",
+    "sveltekit-frontend/docs/features/feature_trace-mcp.md",
+    "sveltekit-frontend/docs/graph/gph-proj-rtx-integration.md"
+  ],
+  "sourcePopulationChecksum": "sha256:a6d8319743045e9f8e65134af44ae9eca65a822c879fc50b67c699c8afe656db",
+  "registry": {
+    "table": "public.atlas_source_refs",
+    "classification": "LEGACY_PARTIAL_REGISTRY",
+    "exactCoverage": 0,
+    "targetCoverage": 50,
+    "usedAsFileIdentityOwner": false,
+    "reason": "Registry coverage is partial and excludes this cohort; it is not used as the file-level namespace owner in this scoped proof."
+  },
+  "normalizedSources": [
+    {
+      "sourceRef": "sveltekit-frontend/.codex_louvain_audit.mjs",
+      "normalizedSourceRef": "sveltekit-frontend/.codex_louvain_audit.mjs",
+      "insideWorktreeRoot": true,
+      "valid": true
+    },
+    {
+      "sourceRef": "sveltekit-frontend/classifier-models/xgboost-lane-classifier.json",
+      "normalizedSourceRef": "sveltekit-frontend/classifier-models/xgboost-lane-classifier.json",
+      "insideWorktreeRoot": true,
+      "valid": true
+    },
+    {
+      "sourceRef": "sveltekit-frontend/classifier-models/xgboost-metadata.json",
+      "normalizedSourceRef": "sveltekit-frontend/classifier-models/xgboost-metadata.json",
+      "insideWorktreeRoot": true,
+      "valid": true
+    },
+    {
+      "sourceRef": "sveltekit-frontend/classifier-models/xgboost-metrics.json",
+      "normalizedSourceRef": "sveltekit-frontend/classifier-models/xgboost-metrics.json",
+      "insideWorktreeRoot": true,
+      "valid": true
+    },
+    {
+      "sourceRef": "sveltekit-frontend/colab-enrich-clusters.py",
+      "normalizedSourceRef": "sveltekit-frontend/colab-enrich-clusters.py",
+      "insideWorktreeRoot": true,
+      "valid": true
+    },
+    {
+      "sourceRef": "sveltekit-frontend/colab-export-clusters/colab-summarize.py",
+      "normalizedSourceRef": "sveltekit-frontend/colab-export-clusters/colab-summarize.py",
+      "insideWorktreeRoot": true,
+      "valid": true
+    },
+    {
+      "sourceRef": "sveltekit-frontend/colab-export/colab-summarize.py",
+      "normalizedSourceRef": "sveltekit-frontend/colab-export/colab-summarize.py",
+      "insideWorktreeRoot": true,
+      "valid": true
+    },
+    {
+      "sourceRef": "sveltekit-frontend/colab-export/config.json",
+      "normalizedSourceRef": "sveltekit-frontend/colab-export/config.json",
+      "insideWorktreeRoot": true,
+      "valid": true
+    },
+    {
+      "sourceRef": "sveltekit-frontend/data/atlas-tensor-proof/entropy_norm_coverage_r1.json",
+      "normalizedSourceRef": "sveltekit-frontend/data/atlas-tensor-proof/entropy_norm_coverage_r1.json",
+      "insideWorktreeRoot": true,
+      "valid": true
+    },
+    {
+      "sourceRef": "sveltekit-frontend/data/atlas-tensor-proof/entropy_norm_pipeline.py",
+      "normalizedSourceRef": "sveltekit-frontend/data/atlas-tensor-proof/entropy_norm_pipeline.py",
+      "insideWorktreeRoot": true,
+      "valid": true
+    },
+    {
+      "sourceRef": "sveltekit-frontend/data/atlas-tensor-proof/kmeans_run_r1_k128.json",
+      "normalizedSourceRef": "sveltekit-frontend/data/atlas-tensor-proof/kmeans_run_r1_k128.json",
+      "insideWorktreeRoot": true,
+      "valid": true
+    },
+    {
+      "sourceRef": "sveltekit-frontend/data/atlas-tensor-proof/kmeans_run_r1_k256.json",
+      "normalizedSourceRef": "sveltekit-frontend/data/atlas-tensor-proof/kmeans_run_r1_k256.json",
+      "insideWorktreeRoot": true,
+      "valid": true
+    },
+    {
+      "sourceRef": "sveltekit-frontend/data/atlas-tensor-proof/kmeans_run_r1_k64.json",
+      "normalizedSourceRef": "sveltekit-frontend/data/atlas-tensor-proof/kmeans_run_r1_k64.json",
+      "insideWorktreeRoot": true,
+      "valid": true
+    },
+    {
+      "sourceRef": "sveltekit-frontend/data/atlas-tensor-proof/t3_exact_gpu_proof.py",
+      "normalizedSourceRef": "sveltekit-frontend/data/atlas-tensor-proof/t3_exact_gpu_proof.py",
+      "insideWorktreeRoot": true,
+      "valid": true
+    },
+    {
+      "sourceRef": "sveltekit-frontend/data/atlas-tensor-proof/t6b_cagra_recall_proof.py",
+      "normalizedSourceRef": "sveltekit-frontend/data/atlas-tensor-proof/t6b_cagra_recall_proof.py",
+      "insideWorktreeRoot": true,
+      "valid": true
+    },
+    {
+      "sourceRef": "sveltekit-frontend/data/atlas-tensor-proof/t6c_kmeans_sweep.py",
+      "normalizedSourceRef": "sveltekit-frontend/data/atlas-tensor-proof/t6c_kmeans_sweep.py",
+      "insideWorktreeRoot": true,
+      "valid": true
+    },
+    {
+      "sourceRef": "sveltekit-frontend/data/atlas-tensor-proof/t6c_kmeans_sweep_v2.py",
+      "normalizedSourceRef": "sveltekit-frontend/data/atlas-tensor-proof/t6c_kmeans_sweep_v2.py",
+      "insideWorktreeRoot": true,
+      "valid": true
+    },
+    {
+      "sourceRef": "sveltekit-frontend/data/phase18_datasets.json",
+      "normalizedSourceRef": "sveltekit-frontend/data/phase18_datasets.json",
+      "insideWorktreeRoot": true,
+      "valid": true
+    },
+    {
+      "sourceRef": "sveltekit-frontend/docs/ARCHITECTURE-SEPARATION-CANONICAL-VS-DERIVED.md",
+      "normalizedSourceRef": "sveltekit-frontend/docs/ARCHITECTURE-SEPARATION-CANONICAL-VS-DERIVED.md",
+      "insideWorktreeRoot": true,
+      "valid": true
+    },
+    {
+      "sourceRef": "sveltekit-frontend/docs/CANONICAL-FEATURE-ENVELOPE-RETROFIT-COMPLETE.md",
+      "normalizedSourceRef": "sveltekit-frontend/docs/CANONICAL-FEATURE-ENVELOPE-RETROFIT-COMPLETE.md",
+      "insideWorktreeRoot": true,
+      "valid": true
+    },
+    {
+      "sourceRef": "sveltekit-frontend/docs/CANONICAL-FEATURE-ENVELOPE-WIRED.md",
+      "normalizedSourceRef": "sveltekit-frontend/docs/CANONICAL-FEATURE-ENVELOPE-WIRED.md",
+      "insideWorktreeRoot": true,
+      "valid": true
+    },
+    {
+      "sourceRef": "sveltekit-frontend/docs/CARD-1-ENVELOPE-EXTRACTION-READY.md",
+      "normalizedSourceRef": "sveltekit-frontend/docs/CARD-1-ENVELOPE-EXTRACTION-READY.md",
+      "insideWorktreeRoot": true,
+      "valid": true
+    },
+    {
+      "sourceRef": "sveltekit-frontend/docs/CODEBASE-REFERENCE-INDEX.md",
+      "normalizedSourceRef": "sveltekit-frontend/docs/CODEBASE-REFERENCE-INDEX.md",
+      "insideWorktreeRoot": true,
+      "valid": true
+    },
+    {
+      "sourceRef": "sveltekit-frontend/docs/CROSS-RANKER-API.md",
+      "normalizedSourceRef": "sveltekit-frontend/docs/CROSS-RANKER-API.md",
+      "insideWorktreeRoot": true,
+      "valid": true
+    },
+    {
+      "sourceRef": "sveltekit-frontend/docs/CROSS-RANKER-INTEGRATION.md",
+      "normalizedSourceRef": "sveltekit-frontend/docs/CROSS-RANKER-INTEGRATION.md",
+      "insideWorktreeRoot": true,
+      "valid": true
+    },
+    {
+      "sourceRef": "sveltekit-frontend/docs/CUDA-GRAPH-CACHING-IMPLEMENTATION.md",
+      "normalizedSourceRef": "sveltekit-frontend/docs/CUDA-GRAPH-CACHING-IMPLEMENTATION.md",
+      "insideWorktreeRoot": true,
+      "valid": true
+    },
+    {
+      "sourceRef": "sveltekit-frontend/docs/DOCKER-COMPOSE-CORRECTED-BASELINE.md",
+      "normalizedSourceRef": "sveltekit-frontend/docs/DOCKER-COMPOSE-CORRECTED-BASELINE.md",
+      "insideWorktreeRoot": true,
+      "valid": true
+    },
+    {
+      "sourceRef": "sveltekit-frontend/docs/EMBEDDING-LANES-IMPLEMENTATION.md",
+      "normalizedSourceRef": "sveltekit-frontend/docs/EMBEDDING-LANES-IMPLEMENTATION.md",
+      "insideWorktreeRoot": true,
+      "valid": true
+    },
+    {
+      "sourceRef": "sveltekit-frontend/docs/EMBEDDING-LANES-QUICK-START.md",
+      "normalizedSourceRef": "sveltekit-frontend/docs/EMBEDDING-LANES-QUICK-START.md",
+      "insideWorktreeRoot": true,
+      "valid": true
+    },
+    {
+      "sourceRef": "sveltekit-frontend/docs/FOUR-LANE-SEMANTIC-INDEXING-ALIGNMENT.md",
+      "normalizedSourceRef": "sveltekit-frontend/docs/FOUR-LANE-SEMANTIC-INDEXING-ALIGNMENT.md",
+      "insideWorktreeRoot": true,
+      "valid": true
+    },
+    {
+      "sourceRef": "sveltekit-frontend/docs/GRAPHIFY-READINESS-ENDPOINTS.md",
+      "normalizedSourceRef": "sveltekit-frontend/docs/GRAPHIFY-READINESS-ENDPOINTS.md",
+      "insideWorktreeRoot": true,
+      "valid": true
+    },
+    {
+      "sourceRef": "sveltekit-frontend/docs/K-MEANS-VS-KNN-DISTINCTION.md",
+      "normalizedSourceRef": "sveltekit-frontend/docs/K-MEANS-VS-KNN-DISTINCTION.md",
+      "insideWorktreeRoot": true,
+      "valid": true
+    },
+    {
+      "sourceRef": "sveltekit-frontend/docs/architecture/ACE_NEURAL_LOD.md",
+      "normalizedSourceRef": "sveltekit-frontend/docs/architecture/ACE_NEURAL_LOD.md",
+      "insideWorktreeRoot": true,
+      "valid": true
+    },
+    {
+      "sourceRef": "sveltekit-frontend/docs/architecture/DURABLE-EXECUTION-ARCHITECTURE.md",
+      "normalizedSourceRef": "sveltekit-frontend/docs/architecture/DURABLE-EXECUTION-ARCHITECTURE.md",
+      "insideWorktreeRoot": true,
+      "valid": true
+    },
+    {
+      "sourceRef": "sveltekit-frontend/docs/architecture/DURABLE-EXECUTION-SUMMARY.md",
+      "normalizedSourceRef": "sveltekit-frontend/docs/architecture/DURABLE-EXECUTION-SUMMARY.md",
+      "insideWorktreeRoot": true,
+      "valid": true
+    },
+    {
+      "sourceRef": "sveltekit-frontend/docs/architecture/INDEXING_AND_RETRIEVAL.md",
+      "normalizedSourceRef": "sveltekit-frontend/docs/architecture/INDEXING_AND_RETRIEVAL.md",
+      "insideWorktreeRoot": true,
+      "valid": true
+    },
+    {
+      "sourceRef": "sveltekit-frontend/docs/architecture/MASTRA-DURABLE-EXECUTION-INTEGRATION.md",
+      "normalizedSourceRef": "sveltekit-frontend/docs/architecture/MASTRA-DURABLE-EXECUTION-INTEGRATION.md",
+      "insideWorktreeRoot": true,
+      "valid": true
+    },
+    {
+      "sourceRef": "sveltekit-frontend/docs/architecture/NARY_RAPIDS_METRICS.md",
+      "normalizedSourceRef": "sveltekit-frontend/docs/architecture/NARY_RAPIDS_METRICS.md",
+      "insideWorktreeRoot": true,
+      "valid": true
+    },
+    {
+      "sourceRef": "sveltekit-frontend/docs/architecture/NES_PS2_LOD_VISUALIZATION.md",
+      "normalizedSourceRef": "sveltekit-frontend/docs/architecture/NES_PS2_LOD_VISUALIZATION.md",
+      "insideWorktreeRoot": true,
+      "valid": true
+    },
+    {
+      "sourceRef": "sveltekit-frontend/docs/architecture/SERIALIZATION_AND_RPC.md",
+      "normalizedSourceRef": "sveltekit-frontend/docs/architecture/SERIALIZATION_AND_RPC.md",
+      "insideWorktreeRoot": true,
+      "valid": true
+    },
+    {
+      "sourceRef": "sveltekit-frontend/docs/architecture/TENSOR_RESIDENCY_PIPELINE.md",
+      "normalizedSourceRef": "sveltekit-frontend/docs/architecture/TENSOR_RESIDENCY_PIPELINE.md",
+      "insideWorktreeRoot": true,
+      "valid": true
+    },
+    {
+      "sourceRef": "sveltekit-frontend/docs/architecture/THREE_PLANE_RUNTIME.md",
+      "normalizedSourceRef": "sveltekit-frontend/docs/architecture/THREE_PLANE_RUNTIME.md",
+      "insideWorktreeRoot": true,
+      "valid": true
+    },
+    {
+      "sourceRef": "sveltekit-frontend/docs/architecture/TOKEN_REMAP_LATENT_PROJECTION.md",
+      "normalizedSourceRef": "sveltekit-frontend/docs/architecture/TOKEN_REMAP_LATENT_PROJECTION.md",
+      "insideWorktreeRoot": true,
+      "valid": true
+    },
+    {
+      "sourceRef": "sveltekit-frontend/docs/architecture/TOPOLOGY_TILE_TREE.md",
+      "normalizedSourceRef": "sveltekit-frontend/docs/architecture/TOPOLOGY_TILE_TREE.md",
+      "insideWorktreeRoot": true,
+      "valid": true
+    },
+    {
+      "sourceRef": "sveltekit-frontend/docs/checklists/DURABLE-EXECUTION-INTEGRATION.md",
+      "normalizedSourceRef": "sveltekit-frontend/docs/checklists/DURABLE-EXECUTION-INTEGRATION.md",
+      "insideWorktreeRoot": true,
+      "valid": true
+    },
+    {
+      "sourceRef": "sveltekit-frontend/docs/contracts/schema-dependency-tool.okf.json",
+      "normalizedSourceRef": "sveltekit-frontend/docs/contracts/schema-dependency-tool.okf.json",
+      "insideWorktreeRoot": true,
+      "valid": true
+    },
+    {
+      "sourceRef": "sveltekit-frontend/docs/evaluation-system.md",
+      "normalizedSourceRef": "sveltekit-frontend/docs/evaluation-system.md",
+      "insideWorktreeRoot": true,
+      "valid": true
+    },
+    {
+      "sourceRef": "sveltekit-frontend/docs/examples/DURABLE-WORKFLOW-EXAMPLE.md",
+      "normalizedSourceRef": "sveltekit-frontend/docs/examples/DURABLE-WORKFLOW-EXAMPLE.md",
+      "insideWorktreeRoot": true,
+      "valid": true
+    },
+    {
+      "sourceRef": "sveltekit-frontend/docs/features/feature_trace-mcp.md",
+      "normalizedSourceRef": "sveltekit-frontend/docs/features/feature_trace-mcp.md",
+      "insideWorktreeRoot": true,
+      "valid": true
+    },
+    {
+      "sourceRef": "sveltekit-frontend/docs/graph/gph-proj-rtx-integration.md",
+      "normalizedSourceRef": "sveltekit-frontend/docs/graph/gph-proj-rtx-integration.md",
+      "insideWorktreeRoot": true,
+      "valid": true
+    }
+  ],
+  "invalidSources": [],
+  "checks": {
+    "gitWorktreeRootDetermined": true,
+    "allSourcesInsideWorktree": true,
+    "deterministicPosixSourceRefs": true,
+    "noInvalidPathForms": true,
+    "canonicalRepositoryOwnerContractPresent": true,
+    "repositoryAliasRelationshipExplicit": true,
+    "namespaceAmbiguityZero": true,
+    "syntheticNamespaceZero": true
+  },
+  "ambiguityCount": 0,
+  "syntheticNamespaceCount": 0,
+  "aliasMappingChecksum": "sha256:8aded12dbc4520b493f28619178805ac9d08a3e4dd5edc4eab681b75401b4bd1",
+  "status": "SOURCE_NAMESPACE_AUTHORITY_PROVEN",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "evidenceRefs": [
+    "sveltekit-frontend/src/lib/server/atlas/embedding/source-namespace-v1.ts",
+    "sveltekit-frontend/src/lib/server/atlas/atlas-knowledge-envelope.ts",
+    "docs/reports/source-registry-owner-join-v1.json",
+    "docs/reports/pkt-lineage-08-bounded-snapshot-v1.json"
+  ],
+  "receiptChecksum": "sha256:04abf48cd8faf58036949a896e31aded57fe9f01067e5d9fd8cda7ea0c64844d"
+}

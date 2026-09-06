@@ -18,24 +18,6 @@ rg --no-ignore "keyword"           # include gitignored files (NES/CHROM packets
 ```
 Only `Read` a file if `rg` confirms it contains what you need. Never load an entire `.md` into context to find one fact.
 
-## Parent Atlas Workstation (Production-Ready)
-
-**Status**: Stage 0 gate VERIFIED ✅ (July 23, 2026)
-
-**Infrastructure**: All 7 critical services online (Postgres, Qdrant, Neo4j, Valkey, EmbeddingGemma, llama-server/Ornith, Go Retrieval)
-
-**Execution Pipeline**: Ready for Graphify Stage 1 (Incremental File Inventory)
-
-**Key Rules**:
-- **Archival, Not Deletion**: Files are moved to `deeds_labs/archive/YYYY-MM-DD/` with SHA-256 + reason + recovery instructions
-- **Embedding Contracts**: 768-dim CANONICAL_NATIVE and CANONICAL_RETRIEVAL_CONTRACT, 384-dim LEGACY_COMPATIBILITY only, 64-dim ROUTING_FEATURE
-- **Retrieval Lanes**: 7 independent lanes (lexical, dense, sparse, topology, documentation, centroid, temporal) with RRF fusion
-- **Pipeline Stages**: 0-14 sequential, no skipping, deterministic outputs (sorted NDJSON)
-
-**Reference**: `memory/parent-atlas-workstation.md` (infrastructure status), `memory/STAGE-1-INCREMENTAL-FILE-INVENTORY.md` (Stage 1 execution)
-
----
-
 ## Critical constraints
 
 - Svelte 5 runes only: no `export let`, `$:`, `on:click`, or `<slot>`; use `$state`, `$derived`, `$props`, `onclick`, and snippets.
@@ -48,10 +30,6 @@ Only `Read` a file if `rg` confirms it contains what you need. Never load an ent
 - **No hidden thoughts**: Do not persist `hiddenThoughts`, `chainOfThought`, `kv_cache`, or `tensor` to any store.
 - **Archive, never delete**: See Parent Atlas section above for archival rules
 
-## OpenCode Skill Contract (Mandatory Addendum)
-Every skill/subagent must conclude its execution by providing these structured fields:
-*   **`likely_cause`**: A one-sentence summary of the root cause or primary trigger for the task.
-...
 ## OpenCode Skill Contract (Mandatory Addendum)
 Every skill/subagent must conclude its execution by providing these structured fields:
 *   **`likely_cause`**: A one-sentence summary of the root cause or primary trigger for the task.
@@ -92,11 +70,6 @@ do_not_do: ["src/lib/server/db/qdrant-sync.ts"]
 
 ## Repo map
 - `sveltekit-frontend/` — main app root
-...
-
-## Repo map
-- `sveltekit-frontend/` — main app root
-...
 - `services/` — standalone Go/Python services
 - `docker/` — compose/runtime stacks
 - `drizzle/` — migrations and schema assets

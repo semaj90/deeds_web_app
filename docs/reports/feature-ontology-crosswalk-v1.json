@@ -1,0 +1,29 @@
+{
+  "schema": "atlas.feature-ontology-crosswalk-report.v1",
+  "status": "REGISTRY_TABLE_UNAVAILABLE",
+  "owner": "atlas-feature-intelligence",
+  "source": "public.feature_registry",
+  "tablePresent": false,
+  "records": [],
+  "rejected": [],
+  "counts": {
+    "rowsRead": 0,
+    "records": 0,
+    "rejected": 0,
+    "classified": 0,
+    "unverified": 0
+  },
+  "effects": {
+    "transactionMode": "READ ONLY",
+    "canonicalWrites": false,
+    "datastoreWrites": false,
+    "cacheWrites": false,
+    "modelCalls": false
+  },
+  "authority": {
+    "featureIdentity": "existing feature_registry.feature_key only",
+    "sourceIdentity": "not created by this report",
+    "liveImplementationMembership": "UNPROVEN",
+    "dependencyEdges": "UNPROVEN"
+  }
+}

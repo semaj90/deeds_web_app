@@ -7,7 +7,7 @@ import pg from 'pg';
 import { loadRepoEnv, resolveDatabaseUrl, REPO_ROOT } from './connection-config.mjs';
 
 const root = REPO_ROOT;
-const runId = process.env.ATLAS_GRAPHIFY_RUN_ID ?? '14643371-f6f2-4131-906b-235a5c06619a';
+const requestedRunId = process.env.ATLAS_GRAPHIFY_RUN_ID?.trim() || null;
 const reportPath = path.join(root, 'docs/reports/current-graphify-source-revision-v1.json');
 const digest = (bytes) => `sha256:${crypto.createHash('sha256').update(bytes).digest('hex')}`;
 const safePath = (sourceRef) => {
@@ -18,7 +18,29 @@ const safePath = (sourceRef) => {
 const pool = new pg.Pool({ connectionString: resolveDatabaseUrl(loadRepoEnv(process.env)), max: 1, statement_timeout: 120000 });
 let rows = [];
 let databaseError = null;
+let runId = requestedRunId;
+let runSelection = requestedRunId ? 'EXPLICIT_ENV' : 'COMPLETED_BOUND_OWNER_BY_FILE_COUNT';
 try {
+  if (!runId) {
+    const owner = await pool.query(`
+      SELECT gf.last_seen_run_id AS run_id, COUNT(*)::int AS file_count,
+             MAX(gr.completed_at) AS completed_at
+        FROM public.graphify_files gf
+        JOIN public.graphify_runs gr ON gr.run_id = gf.last_seen_run_id
+       WHERE gr.status = 'COMPLETED'
+       GROUP BY gf.last_seen_run_id
+       HAVING COUNT(*) > 0
+       ORDER BY COUNT(*) DESC, MAX(gr.completed_at) DESC, gf.last_seen_run_id
+       LIMIT 1
+    `);
+    runId = owner.rows[0]?.run_id ?? null;
+    if (!runId) runSelection = 'NO_COMPLETED_BOUND_OWNER';
+  }
+  if (!runId) throw new Error('SOURCE_AUTHORITY_UNAVAILABLE: no completed Graphify execution owns file observations');
+  const run = await pool.query('SELECT status FROM public.graphify_runs WHERE run_id = $1', [runId]);
+  if (run.rows[0]?.status !== 'COMPLETED') {
+    throw new Error(`SOURCE_AUTHORITY_NOT_TERMINAL: selected run ${runId} has status ${run.rows[0]?.status ?? 'MISSING'}`);
+  }
   const result = await pool.query(`
     SELECT gf.source_ref, gf.source_revision, gf.content_hash, gf.workspace_revision,
            gf.parse_status, gf.last_seen_run_id, gr.status AS run_status
@@ -53,6 +75,7 @@ const report = {
   generatedAt: new Date().toISOString(),
   mode: 'READ_ONLY_SOURCE_BYTES_AUDIT',
   runId,
+  runSelection,
   databaseError,
   writes: { postgres: false, qdrant: false, neo4j: false, valkey: false },
   canonicalAuthority: false,
@@ -70,4 +93,4 @@ const report = {
 };
 fs.mkdirSync(path.dirname(reportPath), { recursive: true });
 fs.writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`);
-console.log(JSON.stringify({ schema: report.schema, status: report.status, runId, rowCount: report.rowCount, counts, sourceRevisionPresent: report.sourceRevisionPresent, reportPath }, null, 2));
+console.log(JSON.stringify({ schema: report.schema, status: report.status, runId, runSelection, rowCount: report.rowCount, counts, sourceRevisionPresent: report.sourceRevisionPresent, reportPath }, null, 2));

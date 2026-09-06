@@ -1,5 +1,25 @@
 # Tasks: parent-atlas-agentic-run-receipt-binding
 
+## Checkpoint/coordinate reconciliation — 2026-09-05
+
+WorkflowActionEventV1 remains canonical workflow/action/receipt identity.
+No AgentRunSnapshotV1 or parallel AgenticRunReceiptV1 will be created.
+WorkflowExecutionCoordinatesV1 already separates framework, orchestrationRuntime,
+checkpointProvider, actionExecutor and transport; reuse its actual enums.
+Do not add duplicate fields solely to rename Mastra/LangGraph checkpoints.
+
+- [ ] RUN-CHECKPOINT-BINDING-01 audit existing evidenceRefs/artifactRefs and coordinate
+  binding for backend checkpoint references; extend only a demonstrated missing link,
+  not a second run schema. Prove same workflow/action identity across resume/retry,
+  mismatched checkpoint/coordinate rejection, and mutation authorization preservation.
+- [ ] RUN-EXPERIENCE-OWNER-01 reconcile the existing T5 curated digest question against
+  ContextManifest and receipt summary/artifact refs before defining any observation type.
+
+Mastra-oriented adapters are present but include a tool shim; this is not a live
+durability proof. The nested E2E ledger is REFERENCE_ONLY. Root governed-compute owns
+backend execution integration; this owner binds its receipts. T1-T4 remain open
+where their own acceptance evidence is missing.
+
 ## T0 — Audit before building (repo hard rule) — DONE this session
 
 - [x] Grepped `packages/atlas-core/src/telemetry/acp-mcp-telemetry.ts` (`TelemetryCollector`,
@@ -75,6 +95,46 @@ reads/writes `WorkflowActionEventV1` events, not a separate receipt type.
 - [ ] Decide whether ACP/A2A MCP tool-call chains get receipts too, or whether that's
       permanently out of scope because `acp-mcp-telemetry.ts` already covers that surface at a
       finer grain than OpenSpec-change-level receipts are meant for.
+
+## T5 — Cross-reference (2026-09-05): `AgentObservationV1`/`AgentRunSnapshotV1` proposal checked
+against this change's own T0 finding, not built as new schemas
+
+An inline chat proposal (delivered while `parent-atlas-retrieval-lineage-dag-convergence` was
+mid-flight) proposed two new contracts: `AgentRunSnapshotV1` (`runId`, `parentRunId`, `agentId`,
+`state ∈ {PLANNED, RUNNING, WAITING_APPROVAL, SUSPENDED, COMPLETED, FAILED}`,
+`completedSteps[]`/`pendingSteps[]`, `evidenceRefs[]`/`outputRefs[]`, `checkpointAt`,
+`snapshotChecksum`) and `AgentObservationV1` (`runId`/`taskId`, `observedFacts[]`/`decisions[]`/
+`unresolved[]`/`outcomes[]`, `evidenceRefs[]`, `observationChecksum`) — both intended as the
+run-state/experience layer under an optional Mastra durable-workflow outer layer.
+
+- [x] Checked `AgentRunSnapshotV1` against this change's own T0 finding before treating it as
+  new: it isn't. `WorkflowActionEventV1` (`sveltekit-frontend/src/lib/server/atlas/workflow/
+  workflow-action-event-v1.ts`) already has near-1:1 field coverage — `workflowId` +
+  `parentActionId` (run/parent-run identity), `attempt` (retry count), `state ∈ {queued, running,
+  waiting, blocked, succeeded, failed}` (maps directly onto the proposed
+  PLANNED/RUNNING/WAITING_APPROVAL/SUSPENDED/COMPLETED/FAILED enum), `lane` already including
+  `'acp'`/`'a2a'` as first-class values, and `WorkflowProgressV1` (`completedUnits`/`totalUnits`/
+  `fraction`/`etaMs`) covering the completed/pending-steps concept. **Do not add a parallel
+  `AgentRunSnapshotV1` type** — if Mastra (or any other durable-workflow engine) is ever adopted
+  as the optional outer layer this proposal describes, its snapshots should map onto
+  `WorkflowActionEventV1`'s existing shape, not introduce a second run-state contract. This is the
+  same "one canonical owner per capability" correction T0 already made once in this file for
+  `AgenticRunReceiptV1` vs `WorkflowActionEventV1` — applying it a second time here rather than
+  letting a second differently-shaped duplicate through.
+- [ ] `AgentObservationV1`'s curated-experience concept (`observedFacts[]`/`decisions[]`/
+  `unresolved[]`/`outcomes[]` — a synthesized summary, not a raw event) is NOT fully covered by
+  `WorkflowActionEventV1` (which is a raw event stream, one row per state transition, not a
+  post-hoc curated digest) — this is a genuine, distinct gap, not yet reconciled against
+  `evidenceRefs`/`artifactRefs`/the `summary` field this change's own T1 is adding. Before
+  building it: check whether `context-compiler.parent-atlas.ts`'s `ContextManifest`/
+  `CompiledContext` types (already flagged as underused in `parent-atlas-memory-architecture-
+  freeze`'s "what already exists" audit) already have a slot for exactly this kind of curated
+  run-experience digest before adding a new type — not checked this pass.
+- [ ] Recommendation recorded, not decided: this change (`parent-atlas-agentic-run-receipt-
+  binding`) remains the correct owner for the run-receipt/state-binding half of the proposal;
+  `parent-atlas-memory-architecture-freeze` remains the correct owner for the broader memory-layer
+  framing (L0-L7, per its own fifth addendum) that this run-state material slots into as L6/L7.
+  Neither file needed a new OpenSpec change created for this.
 
 ## Open questions (record, don't resolve here)
 

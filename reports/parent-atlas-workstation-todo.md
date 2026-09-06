@@ -1,5 +1,10 @@
 # Parent Atlas Workstation TODO Evidence Report
 
+> **Historical evidence report.** This file is retained as an archival snapshot.
+> The current Workstation dependency projection is
+> `docs/parent-atlas-workstation-todo.md`; OpenSpec task ledgers remain the
+> implementation authority.
+
 Generated: 2026-08-10T00:00:00-07:00
 
 This report is evidence-only. It records the current sequencing and conservative phase
@@ -267,86 +272,7 @@ This is vocabulary and sequencing only. It does not add a new implementation own
   Packet-level NLP can proceed now; document-root / tree-dependent promotion
   stays blocked until duplicate-root / idempotency closure in the tree
   lineage work.
-
-Current gate:
-
-- `feature_tensor_4x6_r1.arrow` and `ace_policy_r1.json` stay gated on T2-lineage reaching 5/5
-  proven sources.
-
-## Slotting note from the vocabulary review
-
-Keep these terms in the same L0–L10 ladder, not as new owners:
-
-| Term | Slot | Note |
-|---|---|---|
-| nibble / INT4 / INT8 packing | L8 cache tier | Quantized cache fidelity only; never encode `packet_key` / `feature_id` as canonical identity. |
-| tensor analysis / RTX matrix ops | L8 GPU | PyTorch / cuVS-style computation lane. |
-| cuVS / RAPIDS | L3 / L8 | cuVS exact stays the oracle; RAPIDS KMeans belongs in L6. |
-| HNSW | L3 (Qdrant only) | Qdrant ANN structure, not an Atlas implementation target. |
-| 4D linked topology coordinates | L6 | Topology4 routing / cache coordinates only. |
-| Hilbert (constrained dimensionality) | L6 | 2D SOM locality only, never a 4D curve over the whole topology. |
-| `ae:train` | L1 / L8, gated | Deterministic AE only, blocked behind KMeans/SOM evidence. |
-| KMeans 20×20 | no merge | KMeans and SOM are separate; do not conflate them. |
-| domain classification | L1 (`domain_fit`) | Proven source, partial coverage only. |
-| hyper-dimensional fanout | L9 | N-ary / hypergraph evidence lane. |
-| simdjson-like GPU memory swapping | none | Category error; GPU tile swapping is L7 ACE, not simdjson. |
-| Redis centroid caching | L7 / T5 | Pointers only; never raw tensors. |
-| indexing already-computed tensor for RTX analysis | L7 / T3c | GPU-resident tile reuse, not proven live yet. |
-| gradient checkpointing / N64-style memory | not applicable yet | Only relevant if L10-adjacent training work begins. |
-
-## P2 transport and ingestion gates
-
-1. Finish the MCP / `/mcp` / `/sse` diagnostics.
-2. Keep TRACE core enabled and optional sidecars opt-in until transport matches are confirmed.
-3. Resolve Claude-Mem export path alignment before any importer run.
-4. Keep the persistent Engram ingestion lane deferred until the transport and importer path are stable.
-5. Keep Redis 8 isolated as an eval lane and compare it only after the current ACE context cache lane is stable.
-
-## Registry and retrieval policy
-
-1. Replace the bootstrap feature-gap registry with a live app workspace scan when the mounted codebase is available.
-2. Ingest the current feature inventory into the registry and mark each lane as implemented, partial, missing, or eval-only.
-3. Keep the retrieval policy explicit: exact cache first, then semantic cache, then retrieval, then packet assembly.
-4. Keep single-fact lookups on vector search, code navigation on agentic search, and graph-heavy data on graph lanes.
-
-## Storage, cards, synthesis
-
-1. Build ClusterCard flow from reviewed sourceRefs and table contracts.
-2. Keep the semantic cache policy split between Redis exact-card lookup and Qdrant dense retrieval.
-3. Add graph refresh manifest discipline with version/hash and promotion state.
-4. Wire synthesis consumers only after the packet/version contract stays stable.
-
-## P3 validation and structural promotion
-
-1. Stabilize the 768d -> 64d latent -> cluster -> JSON graph path.
-2. Define the canonical ClusterCard -> GlyphRecord -> CHR97 mapping.
-3. Keep manifold4 as a later analytical lane, not a correctness gate.
-4. Treat the ACE Context Pack Cache / NES Cartridge Cache as Redis-hot-pointer plus Postgres-durable storage only; large snapshot storage stays open.
-
-## P4 semantic memory and checklist mining
-
-1. Keep the semantic indexer as a first-class lane.
-2. Keep its outputs consumable by the feature-gap registry without rereading whole corpora.
-3. Keep the semantic lane aligned with the ACE/NES packet contract and version field.
-4. Add smoke/report outputs to registry rows for retrieval lanes and feature-map lanes.
-5. Use LangChain later only as an optional organizer for messy `.md` / `.json` after LangExtract.
-
-## Token remapping and geometry lanes
-
-1. `autoencoder`: default lane for token remapping, latent projection, and route compression.
-2. `decoder-upscale`: optional reconstruction / upscaling lane; do not make it the identity owner.
-3. `bvh-geometry`: spatial traversal and visualization lane only.
-4. `riemannian-geometry`: metric-tensor and distortion diagnostics lane only.
-5. `kmeans-20x20`: centroid routing topology lane; keep it separate from semantic truth.
-6. `glyph-animation`: NES / CHR97 / sprite visualization lane; never the canonical retrieval lane.
-
-## Agent-program and model-training ladder
-
-1. Keep the deterministic HMM + linear policy baseline as the control owner.
-2. Treat DSPy as the Atlas agent-program contract layer.
-3. Place GEPA immediately after DSPy as the reflective prompt/program optimizer over RouteTrace and evaluation traces.
-4. Keep GEPA ahead of QLoRA / SFT, then DPO, then PPO only if still justified.
-5. Keep geometry / Jacobian / HyperGraphRAG experiments on a separate branch from the agent-program ladder.
+y
 
 ## Conservative phase status
 
@@ -367,6 +293,103 @@ Keep these terms in the same L0–L10 ladder, not as new owners:
 | Phase 23 QLoRA / SFT | eval-only |
 | Phase 24 DPO | eval-only |
 | Phase 25 PPO | eval-only / not yet graded |
+
+## Current phase sub-updates — 2026-09-05
+
+This addendum updates the interpretation of the historical phase table above. It
+does not erase or rewrite earlier evidence. Current implementation and promotion
+authority remain in the owning OpenSpec ledgers and the current Workstation
+projection under `docs/`.
+
+### Phase 11 — Engram / model memory wiring
+
+- **Capability:** `PARTIAL`.
+- **Current model boundary:** Ornith `ornith-1.5-9b` through llama-server `:8090`.
+- **Embedding boundary:** Ollama remains only the EmbeddingGemma lane.
+- **Missing:** complete Engram ingestion and current analysis-memory wiring.
+- **Promotion:** no hidden thoughts, KV cache, or model tensors are persisted.
+
+### Phase 12 — Parent Atlas codebase index
+
+- **Capability:** `PARTIAL`.
+- **Proven:** source identity, bounded structural indexing, canonical chunk
+  preimage validation, and Workstation workboard replay.
+- **Current evidence:** a bounded physical cohort covers 50 sources and 434
+  chunks, with source-to-chunk materialization binding proven for that recorded
+  scope. Stable source-registry/repository-namespace authority remains
+  unresolved.
+- **Blocked:** current completed Graphify source authority and full current
+  packet/chunk eligibility.
+- **Promotion:** validated chunks may become eligible for PostgreSQL admission;
+  the owning bounded admission gate performs any write. No semantic, graph, GPU,
+  or package promotion from stale index populations.
+
+### Phase 13 — feature-gap registry
+
+- **Capability:** `PARTIAL`.
+- **Proven:** registry and feature-map contracts exist with bounded audit/report
+  surfaces.
+- **Missing:** complete live workspace scan and authoritative lane coverage.
+- **Promotion:** registry labels are planning metadata, not implementation proof.
+
+### Phase 14 — Redis exact-card / BitFrost cache policy
+
+- **Capability:** `IMPLEMENTED_BOUNDED`.
+- **Proven:** canonical BitFrost invalidation primitive and bounded residency
+  planning/read behavior.
+- **Not proven:** broad live residency adoption or continuous writer convergence.
+- **Boundary:** BitFrost/Valkey remains derived cache/residency, never canonical
+  source or retrieval authority.
+
+### Phase 15 — Qdrant semantic lane
+
+- **Capability:** `PARTIAL`.
+- **Proven:** bounded `semantic_768` canary and canonical PostgreSQL/Qdrant
+  projection parity for the admitted test cohort.
+- **Blocked:** current full-cohort admission because source authority and packet
+  eligibility remain unresolved.
+- **Contract:** `semantic_768` is canonical; use the existing representation
+  owner. EmbeddingGemma is a runtime detail only when its receipt binds it to
+  the representation revision; `384` is legacy/compatibility only. Scale means
+  15 candidates → 128 candidates → 768 candidates, not vector dimensions.
+
+### Phase 16 — Graph / KAG / DAG refresh manifest
+
+- **Capability:** `PARTIAL`.
+- **Proven:** Graphify execution ledger/coordinator bounded canary and deterministic
+  Workstation workboard refresh proof.
+- **Required order:** current source/chunk cohort → execution-bound graph snapshot
+  → `GraphOrdinalMapV1` → NetworkX oracle ↔ cuGraph → graph-derived feature
+  inputs → ContextManifest/PromptPlan. Receipts bind workspace, graph,
+  source-population, node, edge, and ordinal-map checksums.
+- **Blocked:** current graph snapshot authority and production-wide source coverage.
+- **Promotion:** NetworkX/cuGraph, topology, centroid, and DAG artifacts remain
+  downstream derived projections.
+
+### Phase 17 — PyTorch feature extraction lane
+
+- **Capability:** `PARTIAL`.
+- **Proven:** fixture contracts and bounded feature/residency planning surfaces.
+- **Missing:** proof of the currently registered RAPIDS/cuVS/cuGraph endpoint,
+  capability revision, and same-corpus parity for promotion.
+- **Promotion:** latent family remains downstream of the admitted
+  `semantic_768` cohort: `latent_256 → latent_128 → latent_64`.
+- Every representation binds its parent representation revision, model revision,
+  normalization contract, population checksum, and artifact checksum.
+
+### Current cross-phase gate
+
+The active dependency order is:
+
+`current source authority → qualified source/packet/chunk cohort → CandidateOrdinalMapV1 →
+semantic_768 admission → current graph snapshot + GraphOrdinalMapV1 →
+AST/graph/retrieval features → latent_256 → latent_128/latent_64 →
+CandidateFeatureMatrix → ACE/BitFrost residency → DAG parameter materialization →
+ContextManifest/PromptPlan → bounded DAG execution → outcome receipt`.
+
+The packet-membership writer remains blocked while the current preflight reports
+zero qualified candidates. No broad Graphify run is implied by the stale-graph
+warning.
 
 ## Notes
 

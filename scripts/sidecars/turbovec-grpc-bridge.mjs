@@ -2,8 +2,8 @@
 /**
  * turbovec-grpc-bridge.mjs
  *
- * Node.js gRPC server on :50062 that implements the TurboVecCudaService
- * contract (proto/active/turbovec_cuda.proto) by composing two existing,
+ * Node.js gRPC server on :50062 that implements the canonical TurboVecService
+ * contract (proto/active/turbovec.proto) by composing two existing,
  * already-built pieces:
  *
  *   - simd-bridge/cpp/build/Release/tensorrt_bridge.node  (CUDA / N-API)
@@ -31,6 +31,7 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
+import { loadRepoEnv, resolveDatabaseUrl } from '../atlas/connection-config.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname  = path.dirname(__filename);
@@ -44,8 +45,15 @@ const protoLoader = sfRequire('@grpc/proto-loader');
 
 const PORT           = Number(process.env.PORT ?? 50062);
 const PYTHON_SIDECAR = (process.env.PYTHON_SIDECAR ?? 'http://127.0.0.1:8791').replace(/\/+$/, '');
-const PROTO_PATH     = path.join(ROOT, 'proto', 'active', 'turbovec_cuda.proto');
+const ANN_PROTO_PATH = path.join(ROOT, 'proto', 'active', 'turbovec.proto');
+const GPU_PROTO_PATH = path.join(ROOT, 'proto', 'active', 'gpu_bridge.proto');
+const LEGACY_PROTO_PATH = path.join(ROOT, 'proto', 'active', 'turbovec_cuda.proto');
 const ADDON_PATH     = path.join(ROOT, 'simd-bridge', 'cpp', 'build', 'Release', 'tensorrt_bridge.node');
+const IDENTITY_JOIN_ENABLED = process.env.TURBOVEC_IDENTITY_JOIN === '1';
+// Production is fail-closed by default: incomplete executor identities do not
+// cross the gRPC boundary into fusion. Set TURBOVEC_CANONICAL_ONLY=0 only for
+// an explicitly non-promotional compatibility/evaluation run.
+const CANONICAL_ONLY = process.env.TURBOVEC_CANONICAL_ONLY !== '0';
 
 // ── Load N-API addon (optional — bridge stays useful w/o it) ──────────────────
 
@@ -63,15 +71,25 @@ try {
 
 // ── Proto load ────────────────────────────────────────────────────────────────
 
-const pkgDef = protoLoader.loadSync(PROTO_PATH, {
+const protoLoaderOptions = {
   keepCase: false,
   longs:    Number,
   enums:    String,
   defaults: true,
   oneofs:   true,
-});
-const descriptor = grpc.loadPackageDefinition(pkgDef);
-const svcDef     = descriptor.turbovec.TurboVecCudaService.service;
+};
+const annDescriptor = grpc.loadPackageDefinition(
+  protoLoader.loadSync(ANN_PROTO_PATH, protoLoaderOptions)
+);
+const gpuDescriptor = grpc.loadPackageDefinition(
+  protoLoader.loadSync(GPU_PROTO_PATH, protoLoaderOptions)
+);
+const legacyDescriptor = grpc.loadPackageDefinition(
+  protoLoader.loadSync(LEGACY_PROTO_PATH, protoLoaderOptions)
+);
+const annSvcDef = annDescriptor.turbovec.TurboVecService.service;
+const gpuSvcDef = gpuDescriptor.gpubridge.GpuBridgeService.service;
+const legacySvcDef = legacyDescriptor.turbovec.TurboVecCudaService.service;
 
 // ── Python sidecar probe (cached, 5s TTL) ─────────────────────────────────────
 
@@ -119,6 +137,90 @@ async function pythonSearch(queryVector, topK) {
   }
 }
 
+// TurboVec is an executor. When explicitly enabled, this optional join only
+// hydrates the missing workspace revision from the canonical Graphify source
+// evidence; it never writes or chooses a historical row by timestamp. A
+// source is eligible only when the exact source_ref + code_source_revision
+// pair maps to one distinct content-addressed workspace_revision.
+let identityPool = null;
+let identityJoinDisabled = false;
+
+function getIdentityPool() {
+  if (!IDENTITY_JOIN_ENABLED || identityJoinDisabled) return null;
+  if (identityPool) return identityPool;
+  try {
+    const pg = sfRequire('pg');
+    const env = loadRepoEnv(process.env);
+    identityPool = new pg.Pool({
+      connectionString: resolveDatabaseUrl(env),
+      max: 1,
+      statement_timeout: 5000,
+      application_name: 'turbovec-read-only-identity-join',
+    });
+    return identityPool;
+  } catch (error) {
+    identityJoinDisabled = true;
+    console.warn(`[bridge] identity join unavailable: ${error.message}`);
+    return null;
+  }
+}
+
+async function hydrateWorkspaceRevisions(candidates) {
+  const pending = candidates.filter((candidate) => {
+    const identity = candidate?.identity;
+    return identity?.sourceRef && identity?.sourceRevision && !identity?.workspaceRevision;
+  });
+  const pool = getIdentityPool();
+  if (!pool || pending.length === 0) return { candidates, joined: 0, ambiguous: 0 };
+
+  const sourceRefs = [...new Set(pending.map((candidate) => String(candidate.identity.sourceRef)))];
+  const sourceRevisions = [...new Set(pending.map((candidate) => String(candidate.identity.sourceRevision)))];
+  try {
+    const result = await pool.query(`
+      SELECT source_ref, code_source_revision,
+             array_agg(DISTINCT workspace_revision) AS workspace_revisions
+      FROM public.graphify_files
+      WHERE source_ref = ANY($1::text[])
+        AND code_source_revision = ANY($2::text[])
+        AND workspace_revision ~ '^sha256:[0-9a-f]{64}$'
+      GROUP BY source_ref, code_source_revision
+    `, [sourceRefs, sourceRevisions]);
+    const revisions = new Map(result.rows.map((row) => [
+      `${String(row.source_ref)}\0${String(row.code_source_revision)}`,
+      (Array.isArray(row.workspace_revisions) ? row.workspace_revisions : [])
+        .map((value) => String(value).trim())
+        .filter(Boolean),
+    ]));
+    let joined = 0;
+    let ambiguous = 0;
+    for (const candidate of pending) {
+      const identity = candidate.identity;
+      const values = revisions.get(`${identity.sourceRef}\0${identity.sourceRevision}`) ?? [];
+      if (values.length === 1) {
+        identity.workspaceRevision = values[0];
+        joined += 1;
+      } else if (values.length > 1) {
+        ambiguous += 1;
+      }
+    }
+    return { candidates, joined, ambiguous };
+  } catch (error) {
+    console.warn(`[bridge] identity join query failed: ${error.message}`);
+    return { candidates, joined: 0, ambiguous: 0, error: error.message };
+  }
+}
+
+function hasQualifiedCandidateIdentity(candidate) {
+  const identity = candidate?.identity;
+  return Boolean(identity
+    && identity.packetKey
+    && identity.sourceRef
+    && identity.contentHash
+    && identity.sourceRevision
+    && identity.workspaceRevision
+    && identity.namespace);
+}
+
 // ── Service handlers ──────────────────────────────────────────────────────────
 
 async function health(_call, cb) {
@@ -140,14 +242,36 @@ async function search(call, cb) {
   if (!candidates) {
     return cb(null, { candidates: [], backend: 'bridge:offline', indexed: 0 });
   }
+  const hydrated = await hydrateWorkspaceRevisions(candidates);
+  const returnedCandidates = CANONICAL_ONLY
+    ? hydrated.candidates.filter(hasQualifiedCandidateIdentity)
+    : hydrated.candidates;
+  if (CANONICAL_ONLY && returnedCandidates.length !== hydrated.candidates.length) {
+    console.warn(`[bridge] canonical-only filter dropped ${hydrated.candidates.length - returnedCandidates.length} unqualified candidates`);
+  }
   const py = await probePython();
   cb(null, {
-    candidates: candidates.map((c) => ({
-      id:        String(c.id ?? ''),
-      score:     Number(c.score ?? c.turbovec_score ?? 0),
-      clusterId: Number(c.cluster ?? c.cluster_id ?? 0),
-    })),
-    backend: 'bridge:py',
+    candidates: returnedCandidates.map((c) => {
+      const rawIdentity = c.identity && typeof c.identity === 'object' ? c.identity : null;
+      const identity = rawIdentity && Object.values(rawIdentity).some((value) => value != null && value !== '')
+        ? {
+            symbolVersionId: String(rawIdentity.symbolVersionId ?? rawIdentity.symbol_version_id ?? ''),
+            packetKey: String(rawIdentity.packetKey ?? rawIdentity.packet_key ?? ''),
+            sourceRef: String(rawIdentity.sourceRef ?? rawIdentity.source_ref ?? ''),
+            contentHash: String(rawIdentity.contentHash ?? rawIdentity.content_hash ?? ''),
+            sourceRevision: String(rawIdentity.sourceRevision ?? rawIdentity.source_revision ?? ''),
+            workspaceRevision: String(rawIdentity.workspaceRevision ?? rawIdentity.workspace_revision ?? ''),
+            namespace: String(rawIdentity.namespace ?? ''),
+          }
+        : undefined;
+      return {
+        id:        String(c.id ?? ''),
+        score:     Number(c.score ?? c.turbovec_score ?? 0),
+        clusterId: Number(c.cluster ?? c.cluster_id ?? 0),
+        ...(identity ? { identity } : {}),
+      };
+    }),
+    backend: `${hydrated.joined > 0 ? 'bridge:py+pg-lineage' : 'bridge:py'}${CANONICAL_ONLY ? '+canonical-only' : ''}`,
     indexed: Number(py?.indexed ?? 0),
   });
 }
@@ -268,7 +392,22 @@ const server = new grpc.Server({
   'grpc.max_send_message_length':    32 * 1024 * 1024,
 });
 
-server.addService(svcDef, {
+// Canonical split services. ANN provenance is optional derived metadata;
+// TurboVec remains an executor, not an identity owner.
+server.addService(annSvcDef, {
+  health,
+  search,
+  transform,
+  upsert,
+});
+server.addService(gpuSvcDef, {
+  batchCosine,
+  encodeLatent,
+  assignSom,
+});
+// Compatibility surface for older clients; do not add new fields or RPCs to
+// turbovec_cuda.proto.
+server.addService(legacySvcDef, {
   health,
   search,
   batchCosine,
@@ -283,7 +422,7 @@ server.bindAsync(`0.0.0.0:${PORT}`, grpc.ServerCredentials.createInsecure(), (er
     console.error('[bridge] bind failed:', err.message);
     process.exit(1);
   }
-  console.log(`[bridge] TurboVecCudaService listening on 0.0.0.0:${port}`);
+  console.log(`[bridge] TurboVecService + GpuBridgeService listening on 0.0.0.0:${port}`);
   console.log(`[bridge] python sidecar:    ${PYTHON_SIDECAR}`);
   console.log(`[bridge] addon cuda code:   ${addonCudaCode} (0=cpu, 1=cuda, 2=cuda+cudnn)`);
 });

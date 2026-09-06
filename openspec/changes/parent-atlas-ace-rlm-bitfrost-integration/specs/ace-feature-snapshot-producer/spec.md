@@ -2,6 +2,17 @@
 
 ## ADDED Requirements
 
+### Requirement: Query feature inputs use the existing ACE production bridge
+
+ACE MUST consume admitted query/candidate features through the existing feature-source
+adapter and ContextManifestV2, preserving ordinal, evidence, retrieval-policy and
+playbook revision bindings. A new feature MUST NOT create another context compiler.
+
+#### Scenario: A feature input lacks current lineage
+- **WHEN** query or candidate features cannot satisfy the existing snapshot admission
+- **THEN** the bridge rejects them or records unavailability without synthesizing revisions
+
+
 ### Requirement: Server-owned feature snapshots require complete lineage
 
 The ACE admission path MUST construct `CandidateFeatureSnapshotV1` only from a

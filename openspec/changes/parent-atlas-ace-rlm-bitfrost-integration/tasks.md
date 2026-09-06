@@ -1,5 +1,23 @@
 # Parent Atlas ACE/RLM/BitFrost bounded integration
 
+## Memory/agent feature-source alignment — 2026-09-05
+
+ACE-FEATURE-SOURCE-OWNER-01 remains the production bridge and remains open.
+Its acceptance includes SearchRuntime -> CandidateOrdinalMapV1 ->
+CandidateFeatureSnapshotV1 -> existing ContextManifestV2 -> ACE, with exact
+evidence/retrieval-policy/playbook revisions. Query/lexical features come from
+QUERY-FEATURE-01..06 in candidate-feature execution fabric; unavailable features
+must remain unavailable, never caller-invented lineage.
+
+- [ ] ACE-FEATURE-SOURCE-QUERY-01 after the production bridge and feature contracts
+  pass, consume query/candidate features through that same adapter and replay
+  manifest identity, ordinal membership, and missing/stale input rejection.
+  Do not create another SearchRuntime, feature store, or ContextManifest compiler.
+
+Exact prompt/cache proofs belong to ace-bitfrost-cache-correctness. Completed
+BitFrost invalidation evidence is not reopened; this addendum does not authorize
+live warming or advance lineage/cohort admission.
+
 This change reuses existing owners. It does not create a second SearchRuntime,
 RRF implementation, vector store, identity resolver, or ContextManifest owner.
 

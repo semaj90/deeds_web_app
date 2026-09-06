@@ -1,3 +1,19 @@
+## Memory/agent ownership update — 2026-09-05
+
+This updates the existing ace-rlm-bitfrost-integration owner; no new OpenSpec change or control plane.
+The accompanying design addendum and spec scenarios govern the new tasks; historical
+findings below remain dated evidence, not a competing current execution queue.
+
+The query-feature addition is an input to the existing ACE-FEATURE-SOURCE-OWNER-01
+bridge, not a new compiler. Preserve ContextManifestV2 evidence, policy, and playbook
+revisions and CandidateFeatureSnapshot admission. Query features must carry their
+producer/corpus revisions; missing data cannot supply synthetic lineage.
+Live wiring remains distinct from fixture validation. Exact prompt caches are owned
+by the narrower cache-correctness change.
+
+Impact: planning/spec/task reconciliation only. Runtime implementation and datastore
+mutation are not performed by this update. See tasks.md for pending proof gates.
+
 ## Why
 
 ACE and BitFrost now have revisioned cache contracts and test-proven adapters,

@@ -38,6 +38,7 @@ function canonicalAstSourceRef(value) {
 }
 
 const readJsonl = async (file) => (await fs.readFile(file, 'utf8')).split(/\r?\n/).filter(Boolean).map(JSON.parse);
+const comparableRevision = (value) => String(value ?? '').replace(/^sha256:/, '');
 const normalizeResolution = (row) => ({
   ...row,
   status: row.status ?? (row.registryResolution === 'EXACT_CANONICAL_KEY' ? 'CANONICAL' : null),
@@ -51,11 +52,26 @@ const writeReport = async (report) => {
 
 async function main() {
   if (APPLY && !LIMIT) throw new Error('--apply requires an explicit --limit=N');
-  const [nominations, resolutions, astSnapshot] = await Promise.all([
+  const [nominations, resolutions, rawAstSnapshot] = await Promise.all([
     readJsonl(inputPath),
     readJsonl(resolutionPath),
     readJsonl(astSnapshotPath),
   ]);
+  // Accept the existing structural-resolution artifact as an adapter input:
+  // its exact AST bindings are nested under astCandidates and carry the
+  // sha256: revision prefix, while the materializer nomination contract uses
+  // flat rows and the legacy unprefixed source revision. No identity is
+  // derived here; only existing exact observations are normalized.
+  const astSnapshot = rawAstSnapshot.flatMap((node) => {
+    if (!Array.isArray(node.astCandidates) || node.astCandidates.length === 0) return [node];
+    return node.astCandidates.map((candidate) => ({
+      ...node,
+      ...candidate,
+      // The outer resolution row carries the nomination/source revision;
+      // candidate.sourceRevision is the content-hash evidence revision.
+      graphifySourceRevision: node.graphifySourceRevision ?? node.sourceRevision,
+    }));
+  });
   const resolutionByNomination = new Map(resolutions.map((row) => [row.nomination_id ?? row.nominationId, normalizeResolution(row)]));
   const candidates = nominations.filter((row) => {
     const resolution = resolutionByNomination.get(row.nomination_id);
@@ -87,6 +103,20 @@ async function main() {
     databaseWrites: false,
     sample: selectedRows.slice(0, 10).map((row) => ({ nominationId: row.nomination_id, kind: row.kind, qualifiedName: row.qualified_name, sourceRef: row.source_ref })),
   };
+  const bridgeOutcomeFor = (row) => {
+    const snapshotNodes = astSnapshot.filter((node) =>
+      canonicalAstSourceRef(node.sourceRef) === canonicalAstSourceRef(row.source_ref)
+      && comparableRevision(node.graphifySourceRevision) === comparableRevision(row.source_revision)
+      && Number(node.startByte) === Number(row.byte_start)
+      && Number(node.endByte) === Number(row.byte_end)
+      && (!row.upstream_node_id || String(node.upstreamNodeId ?? '') === String(row.upstream_node_id)),
+    );
+    return snapshotNodes.length === 0 ? 'UNRESOLVED' : snapshotNodes.length === 1 ? 'RESOLVED' : 'AMBIGUOUS';
+  };
+  if (!APPLY) {
+    report.identityBridgeOutcomes = { RESOLVED: 0, UNRESOLVED: 0, AMBIGUOUS: 0 };
+    for (const row of selectedRows) report.identityBridgeOutcomes[bridgeOutcomeFor(row)]++;
+  }
   console.log(JSON.stringify(report, null, 2));
   if (!APPLY) { await writeReport(report); return; }
 
@@ -148,7 +178,7 @@ async function main() {
       // candidate is correct).
       const snapshotNodes = astSnapshot.filter((node) =>
         canonicalAstSourceRef(node.sourceRef) === canonicalAstSourceRef(row.source_ref)
-        && String(node.graphifySourceRevision ?? '') === String(row.source_revision ?? '')
+        && comparableRevision(node.graphifySourceRevision) === comparableRevision(row.source_revision)
         && Number(node.startByte) === Number(row.byte_start)
         && Number(node.endByte) === Number(row.byte_end)
         && (!row.upstream_node_id || String(node.upstreamNodeId ?? '') === String(row.upstream_node_id)),

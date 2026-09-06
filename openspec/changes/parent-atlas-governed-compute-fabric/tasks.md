@@ -1,5 +1,36 @@
 # Tasks — Parent Atlas Governed Compute Fabric
 
+## Memory/agent ownership clarification — 2026-09-05
+
+Persistent IPython/Jupyter work remains in 4.1..4.8. AtlasKernelWorker is a bounded
+compute/evaluation worker (word statistics, Recall@K/MRR, vector/graph parity,
+KMeans/SOM experiments), not a prime agent, memory store, workflow identity owner,
+or canonical writer. Keep the authenticated host.request bridge and skill admission.
+
+Transport roles: ACP editor <-> coding agent; OpenCode subagents internal child
+sessions; MCP agent <-> tools/resources; A2A independent agent <-> independent agent.
+Mastra/LangGraph are alternative orchestration/checkpoint backends behind existing
+WorkflowExecutionCoordinatesV1 and WorkflowActionEventV1, not new authorities.
+
+Current-tree correction: atlas-mastra-adapter.ts contains a local createTool shim,
+explicitly not the actual Mastra agent runtime. Root/frontend package manifests do
+not declare @mastra/core. Existing Mastra-oriented files do not prove durability.
+
+- [ ] COMPUTE-BACKEND-RECONCILE-01 inventory admitted backend implementations and map
+  real execution/transport/checkpoint behavior to existing coordinate enums; prove
+  pause/resume/retry and authorization preservation before claiming backend durability.
+- [x] COMPUTE-DEEP-AGENTS-DECISION-01 record LANGCHAIN_DEEP_AGENTS = NOT_ADOPTED
+  by operator direction: duplicates OpenCode hierarchy, Atlas DAG/workflow identity,
+  ContextManifest/ACE, kernel tools and persistence. No framework installation.
+- [x] COMPUTE-NESTED-OWNER-01 classify the nested wire-agentic-workflows-e2e-test
+  ledger REFERENCE_ONLY. Its proposed direct datastore telemetry and sum-score
+  result merging cannot override root mutation/fusion owners. Individual compatible
+  test ideas may be reconciled into root tasks, not executed as a parallel queue.
+
+Parent Atlas Studio/Hermes-style Kanban and Paperclip-style agent coordination
+remain UI/backend design references only. No copied controller, status authority,
+framework install or new task ledger is implied by this reconciliation.
+
 This is a long-horizon coordination change for the integration seams between the
 TypeScript Parent Atlas host, persistent Python composition, Python-backed skills,
 MCP/ACP/A2A actions, revisioned evidence/artifacts, and native GPU backends.

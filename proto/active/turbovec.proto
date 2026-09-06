@@ -44,10 +44,24 @@ message TurboSearchResponse {
     string id = 1;
     float score = 2;
     int32 cluster_id = 3;
+    // Optional provenance copied from the indexed canonical projection.
+    // TurboVec remains a derived ANN executor; these fields do not make it an
+    // identity owner.
+    CandidateIdentity identity = 4;
   }
   repeated Candidate candidates = 1;
   string backend = 2;
   int32 indexed = 3;
+}
+
+message CandidateIdentity {
+  string symbol_version_id = 1;
+  string packet_key = 2;
+  string source_ref = 3;
+  string content_hash = 4;
+  string source_revision = 5;
+  string workspace_revision = 6;
+  string namespace = 7;
 }
 
 // ── Upsert ────────────────────────────────────────────────────────────────────

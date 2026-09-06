@@ -32,7 +32,13 @@ if (!apply || !authorized) {
   throw new Error('EXPLICIT_QDRANT_LINEAGE_APPLY_REQUIRED: use --apply and ATLAS_AUTHORIZE_QDRANT_LINEAGE_RECONCILIATION=1');
 }
 const dry = JSON.parse(fs.readFileSync(dryPath, 'utf8'));
-if (dry.verdict !== 'READY_FOR_FULL_RECONCILIATION_APPLY') throw new Error(`DRY_RECON_NOT_READY:${dry.verdict}`);
+// 2026-09-05 fix: audit-bridge-recon-dry-04-v1.mjs's verdict vocabulary was corrected to
+// STOP_NO_APPLY / READY_FOR_AUTHORIZED_APPLY / NO_PATCHES_MISSING_POINTS_REMAIN (see this file's
+// RETRIEVAL-01L notes on the prior "READY_FOR_FULL_RECONCILIATION_APPLY" wording overstating
+// readiness) but this gate check was never updated to match -- it would reject every dry report
+// the audit script could actually ever produce. `!replay` since --replay intentionally consumes a
+// dry report that already shows 0 remaining patches (nothing left to gate on for that mode).
+if (!replay && dry.verdict !== 'READY_FOR_AUTHORIZED_APPLY') throw new Error(`DRY_RECON_NOT_READY:${dry.verdict}`);
 if (dry.collection !== collection || dry.vectorName !== vectorName) throw new Error('DRY_RECON_OWNER_MISMATCH');
 let patches = dry.proposedPatches ?? [];
 let reconstructedReplay = false;

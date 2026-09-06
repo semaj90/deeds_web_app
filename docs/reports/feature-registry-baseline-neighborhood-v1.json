@@ -1,0 +1,326 @@
+{
+  "schema": "atlas.feature-registry-baseline-neighborhood.v1",
+  "status": "READ_ONLY_CENSUS_COMPLETE",
+  "startedAt": "2026-09-06T00:14:24.756Z",
+  "completedAt": "2026-09-06T00:14:24.844Z",
+  "safety": {
+    "transactionMode": "READ ONLY",
+    "databaseMutationAttempted": false,
+    "migrationLedgerMutationAttempted": false,
+    "ddlExecuted": false,
+    "dmlExecuted": false
+  },
+  "database": {
+    "database_name": "legal_ai_db",
+    "server_version": "18.4 (Debian 18.4-1.pgdg12+1)",
+    "database_user": "legal_admin"
+  },
+  "sources": {
+    "migration0024": "sveltekit-frontend/drizzle/0024_nebulous_mongoose.sql",
+    "migration0024Sha256": "03db1687887dc2bfe2256f29e3636ca2739b7db2f35d8a5e68674336f29ce17e",
+    "migration0025": "sveltekit-frontend/drizzle/0025_yellow_tony_stark.sql",
+    "migration0025Sha256": "f6733d1fc9a7f1f670992cc110935fd022399fff4333dca5dbc142d89e6d17e7",
+    "currentOwner": "sveltekit-frontend/src/lib/server/db/schema/feature-registry.ts"
+  },
+  "migrationNeighborhood": {
+    "journaledTables": [
+      "evidence_board_edges",
+      "saved_citation_annotations",
+      "agent_progress_log",
+      "feature_registry",
+      "feature_tasks"
+    ],
+    "journaledIndexes": [
+      "evidence_board_edges_citation_idx",
+      "evidence_board_edges_annotation_idx",
+      "evidence_board_edges_board_idx",
+      "saved_citation_annotations_citation_idx",
+      "saved_citation_annotations_user_idx",
+      "saved_citation_annotations_created_idx"
+    ],
+    "tables": [
+      {
+        "tableName": "evidence_board_edges",
+        "exists": false,
+        "expectedColumns": [
+          "id",
+          "board_id",
+          "from_node_id",
+          "to_node_id",
+          "relation_type",
+          "citation_id",
+          "annotation_id",
+          "confidence",
+          "metadata",
+          "created_at"
+        ],
+        "actualColumns": [],
+        "missingColumns": [
+          "id",
+          "board_id",
+          "from_node_id",
+          "to_node_id",
+          "relation_type",
+          "citation_id",
+          "annotation_id",
+          "confidence",
+          "metadata",
+          "created_at"
+        ],
+        "extraColumns": [],
+        "rowEstimate": null,
+        "classification": "ABSENT"
+      },
+      {
+        "tableName": "saved_citation_annotations",
+        "exists": false,
+        "expectedColumns": [
+          "id",
+          "citation_id",
+          "user_id",
+          "annotation_type",
+          "body",
+          "logic",
+          "source_refs",
+          "chunk_ids",
+          "llm_output",
+          "token_map",
+          "metadata",
+          "created_at",
+          "updated_at"
+        ],
+        "actualColumns": [],
+        "missingColumns": [
+          "id",
+          "citation_id",
+          "user_id",
+          "annotation_type",
+          "body",
+          "logic",
+          "source_refs",
+          "chunk_ids",
+          "llm_output",
+          "token_map",
+          "metadata",
+          "created_at",
+          "updated_at"
+        ],
+        "extraColumns": [],
+        "rowEstimate": null,
+        "classification": "ABSENT"
+      },
+      {
+        "tableName": "agent_progress_log",
+        "exists": false,
+        "expectedColumns": [
+          "id",
+          "run_id",
+          "feature_key",
+          "query",
+          "attempted_fix",
+          "result",
+          "error_signature",
+          "commands_run",
+          "files_changed",
+          "retry_query",
+          "created_at"
+        ],
+        "actualColumns": [],
+        "missingColumns": [
+          "id",
+          "run_id",
+          "feature_key",
+          "query",
+          "attempted_fix",
+          "result",
+          "error_signature",
+          "commands_run",
+          "files_changed",
+          "retry_query",
+          "created_at"
+        ],
+        "extraColumns": [],
+        "rowEstimate": null,
+        "classification": "ABSENT"
+      },
+      {
+        "tableName": "feature_registry",
+        "exists": false,
+        "expectedColumns": [
+          "id",
+          "feature_key",
+          "title",
+          "description",
+          "status",
+          "summary",
+          "source_refs",
+          "chunk_ids",
+          "tags",
+          "code_refs",
+          "test_refs",
+          "retry_queries",
+          "cluster_id",
+          "trust_tier",
+          "last_verified_at"
+        ],
+        "actualColumns": [],
+        "missingColumns": [
+          "id",
+          "feature_key",
+          "title",
+          "description",
+          "status",
+          "summary",
+          "source_refs",
+          "chunk_ids",
+          "tags",
+          "code_refs",
+          "test_refs",
+          "retry_queries",
+          "cluster_id",
+          "trust_tier",
+          "last_verified_at"
+        ],
+        "extraColumns": [],
+        "rowEstimate": null,
+        "classification": "ABSENT"
+      },
+      {
+        "tableName": "feature_tasks",
+        "exists": false,
+        "expectedColumns": [
+          "id",
+          "feature_key",
+          "checkbox_text",
+          "source_ref",
+          "status",
+          "priority",
+          "suggested_command",
+          "created_at"
+        ],
+        "actualColumns": [],
+        "missingColumns": [
+          "id",
+          "feature_key",
+          "checkbox_text",
+          "source_ref",
+          "status",
+          "priority",
+          "suggested_command",
+          "created_at"
+        ],
+        "extraColumns": [],
+        "rowEstimate": null,
+        "classification": "ABSENT"
+      }
+    ],
+    "indexes": [
+      {
+        "indexName": "evidence_board_edges_citation_idx",
+        "exists": false,
+        "indexdef": null
+      },
+      {
+        "indexName": "evidence_board_edges_annotation_idx",
+        "exists": false,
+        "indexdef": null
+      },
+      {
+        "indexName": "evidence_board_edges_board_idx",
+        "exists": false,
+        "indexdef": null
+      },
+      {
+        "indexName": "saved_citation_annotations_citation_idx",
+        "exists": false,
+        "indexdef": null
+      },
+      {
+        "indexName": "saved_citation_annotations_user_idx",
+        "exists": false,
+        "indexdef": null
+      },
+      {
+        "indexName": "saved_citation_annotations_created_idx",
+        "exists": false,
+        "indexdef": null
+      }
+    ],
+    "ledgers": [
+      {
+        "qualifiedName": "drizzle.__drizzle_migrations",
+        "exists": true,
+        "count": 0
+      },
+      {
+        "qualifiedName": "public.__drizzle_migrations",
+        "exists": false,
+        "count": null
+      },
+      {
+        "qualifiedName": "public.drizzle_migrations",
+        "exists": false,
+        "count": null
+      }
+    ],
+    "classification": {
+      "classification": "NOT_APPLIED_CANDIDATE",
+      "confidence": "MEDIUM",
+      "reason": "None of the tables created by 0024 are present under their journaled names. This cannot prove they were never applied and later removed, so the result remains a candidate classification."
+    }
+  },
+  "featureRegistry": {
+    "tableName": "feature_registry",
+    "exists": false,
+    "expectedColumns": [
+      "id",
+      "feature_key",
+      "title",
+      "description",
+      "status",
+      "summary",
+      "source_refs",
+      "chunk_ids",
+      "tags",
+      "code_refs",
+      "test_refs",
+      "retry_queries",
+      "cluster_id",
+      "trust_tier",
+      "last_verified_at"
+    ],
+    "actualColumns": [],
+    "missingColumns": [
+      "id",
+      "feature_key",
+      "title",
+      "description",
+      "status",
+      "summary",
+      "source_refs",
+      "chunk_ids",
+      "tags",
+      "code_refs",
+      "test_refs",
+      "retry_queries",
+      "cluster_id",
+      "trust_tier",
+      "last_verified_at"
+    ],
+    "extraColumns": [],
+    "rowEstimate": null,
+    "classification": "ABSENT",
+    "shapeOwnerReconciled": true,
+    "historicalChain": [
+      "0024_nebulous_mongoose",
+      "0025_yellow_tony_stark"
+    ]
+  },
+  "decisions": {
+    "authorizeGlobalDrizzleMigrate": false,
+    "authorizeLedgerRepair": false,
+    "authorizeLiveFeatureRegistryApply": false,
+    "authorizeNewCompetingFeatureRegistryMigration": false,
+    "nextGate": "Use this census plus the disposable PostgreSQL proof to produce an explicit scoped baseline-admission decision. Do not infer historical causality from catalog parity alone."
+  }
+}

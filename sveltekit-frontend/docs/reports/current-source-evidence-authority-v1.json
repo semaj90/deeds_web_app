@@ -1,0 +1,163 @@
+{
+  "schema": "atlas.current-source-evidence-authority.v1",
+  "gate": "SOURCE-EVIDENCE-AUTHORITY-01",
+  "generatedAt": "2026-09-05T22:50:47.794Z",
+  "mode": "READ_ONLY",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "status": "NO_CURRENT_COMPLETED_BOUND_SOURCE_OWNER",
+  "currentWorkspace": {
+    "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+    "workspaceRevision": "sha256:bdc0db5fa691f6c82560cb2dcb2665894d121ea73755425fcdee8d981bacdfba",
+    "sourceManifestDigest": "bdc0db5fa691f6c82560cb2dcb2665894d121ea73755425fcdee8d981bacdfba",
+    "sourceCount": 15857,
+    "repositoryId": "semaj90/deeds_web_app",
+    "baseCommitOid": "b05e25b18ec817b9c21aafdf39196465e206179e",
+    "dirty": true
+  },
+  "runCounts": {
+    "totalRuns": 13,
+    "completed": 8,
+    "running": 5,
+    "completedBound": 2,
+    "completedUnbound": 6,
+    "runningBound": 2,
+    "runningUnbound": 3
+  },
+  "ambiguityCount": 0,
+  "rejectedRuns": [
+    {
+      "runId": "55888921-5f7e-4047-9ec4-96912659c2f7",
+      "runStatus": "COMPLETED",
+      "bindingStatus": "BOUND",
+      "reasons": [
+        "STALE_WORKSPACE_REVISION",
+        "SOURCE_MANIFEST_DIGEST_MISMATCH"
+      ]
+    },
+    {
+      "runId": "ddf92de5-bc56-43c2-a646-7b3c4f79e1a9",
+      "runStatus": "COMPLETED",
+      "bindingStatus": "UNBOUND",
+      "reasons": [
+        "UNBOUND_NEVER_SOURCE_AUTHORITY",
+        "STALE_WORKSPACE_REVISION",
+        "SOURCE_MANIFEST_DIGEST_MISMATCH"
+      ]
+    },
+    {
+      "runId": "9816c4d0-d2ad-42ca-8da9-f9d4393277b0",
+      "runStatus": "COMPLETED",
+      "bindingStatus": "UNBOUND",
+      "reasons": [
+        "UNBOUND_NEVER_SOURCE_AUTHORITY",
+        "STALE_WORKSPACE_REVISION",
+        "SOURCE_MANIFEST_DIGEST_MISMATCH"
+      ]
+    },
+    {
+      "runId": "78818366-2410-4643-8e5d-e995c75a2ad5",
+      "runStatus": "COMPLETED",
+      "bindingStatus": "UNBOUND",
+      "reasons": [
+        "UNBOUND_NEVER_SOURCE_AUTHORITY",
+        "STALE_WORKSPACE_REVISION",
+        "SOURCE_MANIFEST_DIGEST_MISMATCH"
+      ]
+    },
+    {
+      "runId": "9716c798-bb17-45c7-afb0-1c58955889bf",
+      "runStatus": "COMPLETED",
+      "bindingStatus": "UNBOUND",
+      "reasons": [
+        "UNBOUND_NEVER_SOURCE_AUTHORITY",
+        "STALE_WORKSPACE_REVISION",
+        "SOURCE_MANIFEST_DIGEST_MISMATCH"
+      ]
+    },
+    {
+      "runId": "862b952b-7623-434e-818e-407c1531abaf",
+      "runStatus": "COMPLETED",
+      "bindingStatus": "UNBOUND",
+      "reasons": [
+        "UNBOUND_NEVER_SOURCE_AUTHORITY",
+        "STALE_WORKSPACE_REVISION",
+        "SOURCE_MANIFEST_DIGEST_MISMATCH"
+      ]
+    },
+    {
+      "runId": "5b2e18fc-86e6-4fc2-932f-4887d5c14853",
+      "runStatus": "COMPLETED",
+      "bindingStatus": "UNBOUND",
+      "reasons": [
+        "UNBOUND_NEVER_SOURCE_AUTHORITY",
+        "STALE_WORKSPACE_REVISION",
+        "SOURCE_MANIFEST_DIGEST_MISMATCH"
+      ]
+    },
+    {
+      "runId": "369e4270-7689-4536-8816-4ec4a5517b3e",
+      "runStatus": "COMPLETED",
+      "bindingStatus": "BOUND",
+      "reasons": [
+        "STALE_WORKSPACE_REVISION",
+        "SOURCE_MANIFEST_DIGEST_MISMATCH"
+      ]
+    },
+    {
+      "runId": "14643371-f6f2-4131-906b-235a5c06619a",
+      "runStatus": "RUNNING",
+      "bindingStatus": "UNBOUND",
+      "reasons": [
+        "RUNNING_NEVER_SOURCE_AUTHORITY",
+        "UNBOUND_NEVER_SOURCE_AUTHORITY",
+        "STALE_WORKSPACE_REVISION",
+        "SOURCE_MANIFEST_DIGEST_MISMATCH"
+      ]
+    },
+    {
+      "runId": "b1a103ac-c717-430b-9643-a8c9818064ae",
+      "runStatus": "RUNNING",
+      "bindingStatus": "BOUND",
+      "reasons": [
+        "RUNNING_NEVER_SOURCE_AUTHORITY",
+        "STALE_WORKSPACE_REVISION",
+        "SOURCE_MANIFEST_DIGEST_MISMATCH"
+      ]
+    },
+    {
+      "runId": "b3a5b14e-0065-41bb-bfe0-96e1062d1e07",
+      "runStatus": "RUNNING",
+      "bindingStatus": "BOUND",
+      "reasons": [
+        "RUNNING_NEVER_SOURCE_AUTHORITY",
+        "STALE_WORKSPACE_REVISION",
+        "SOURCE_MANIFEST_DIGEST_MISMATCH"
+      ]
+    },
+    {
+      "runId": "a7377c07-acb2-4d68-bf83-19d8eca586d4",
+      "runStatus": "RUNNING",
+      "bindingStatus": "UNBOUND",
+      "reasons": [
+        "RUNNING_NEVER_SOURCE_AUTHORITY",
+        "UNBOUND_NEVER_SOURCE_AUTHORITY",
+        "STALE_WORKSPACE_REVISION",
+        "SOURCE_MANIFEST_DIGEST_MISMATCH"
+      ]
+    },
+    {
+      "runId": "3f13703e-5944-487c-a5a9-10dcecc00124",
+      "runStatus": "RUNNING",
+      "bindingStatus": "UNBOUND",
+      "reasons": [
+        "RUNNING_NEVER_SOURCE_AUTHORITY",
+        "UNBOUND_NEVER_SOURCE_AUTHORITY",
+        "STALE_WORKSPACE_REVISION",
+        "SOURCE_MANIFEST_DIGEST_MISMATCH"
+      ]
+    }
+  ],
+  "selection": null,
+  "databaseError": null
+}

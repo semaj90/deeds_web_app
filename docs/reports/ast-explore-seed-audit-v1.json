@@ -1,6 +1,6 @@
 {
   "schema": "atlas.ast-explore-seed-audit.v1",
-  "generatedAt": "2026-09-05T15:51:13.331Z",
+  "generatedAt": "2026-09-05T21:41:46.243Z",
   "input": {
     "path": "sveltekit-frontend/memory/index/symbols.jsonl",
     "byteLength": 8970176,

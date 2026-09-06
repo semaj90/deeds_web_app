@@ -1,0 +1,201 @@
+{
+  "schema": "atlas.current-source-evidence-authority.v1",
+  "gate": "SOURCE-EVIDENCE-AUTHORITY-01",
+  "generatedAt": "2026-09-06T00:23:38.073Z",
+  "mode": "READ_ONLY",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "status": "NO_CURRENT_COMPLETED_BOUND_SOURCE_OWNER",
+  "toleranceWindow": {
+    "toleranceMs": 300000,
+    "nowMs": 1788654183644,
+    "checkedAt": "2026-09-06T00:23:03.644Z"
+  },
+  "currentWorkspace": {
+    "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+    "workspaceRevision": "sha256:bba7efe6f7e008931b499fd60bfad2aedaa07f10b67e92b5ded8625f4c610b5b",
+    "sourceManifestDigest": "bba7efe6f7e008931b499fd60bfad2aedaa07f10b67e92b5ded8625f4c610b5b",
+    "sourceCount": 23766,
+    "repositoryId": "semaj90/deeds_web_app",
+    "baseCommitOid": "b05e25b18ec817b9c21aafdf39196465e206179e",
+    "dirty": true
+  },
+  "runCounts": {
+    "totalRuns": 15,
+    "completed": 10,
+    "running": 5,
+    "completedBound": 4,
+    "completedUnbound": 6,
+    "runningBound": 2,
+    "runningUnbound": 3
+  },
+  "ambiguityCount": 0,
+  "rejectedRuns": [
+    {
+      "runId": "48485685-e773-4433-a1f8-00f5524cca44",
+      "runStatus": "COMPLETED",
+      "bindingStatus": "BOUND",
+      "reasons": [
+        "STALE_WORKSPACE_REVISION",
+        "SOURCE_MANIFEST_DIGEST_MISMATCH"
+      ],
+      "ageMsAtCheck": 4564644
+    },
+    {
+      "runId": "d8bb84bd-b4ba-4f85-a5b9-fad16327b5fe",
+      "runStatus": "COMPLETED",
+      "bindingStatus": "BOUND",
+      "reasons": [
+        "STALE_WORKSPACE_REVISION",
+        "SOURCE_MANIFEST_DIGEST_MISMATCH"
+      ],
+      "ageMsAtCheck": 5246644
+    },
+    {
+      "runId": "55888921-5f7e-4047-9ec4-96912659c2f7",
+      "runStatus": "COMPLETED",
+      "bindingStatus": "BOUND",
+      "reasons": [
+        "STALE_WORKSPACE_REVISION",
+        "SOURCE_MANIFEST_DIGEST_MISMATCH"
+      ],
+      "ageMsAtCheck": 5558644
+    },
+    {
+      "runId": "ddf92de5-bc56-43c2-a646-7b3c4f79e1a9",
+      "runStatus": "COMPLETED",
+      "bindingStatus": "UNBOUND",
+      "reasons": [
+        "UNBOUND_NEVER_SOURCE_AUTHORITY",
+        "STALE_WORKSPACE_REVISION",
+        "SOURCE_MANIFEST_DIGEST_MISMATCH"
+      ],
+      "ageMsAtCheck": 5864644
+    },
+    {
+      "runId": "9816c4d0-d2ad-42ca-8da9-f9d4393277b0",
+      "runStatus": "COMPLETED",
+      "bindingStatus": "UNBOUND",
+      "reasons": [
+        "UNBOUND_NEVER_SOURCE_AUTHORITY",
+        "STALE_WORKSPACE_REVISION",
+        "SOURCE_MANIFEST_DIGEST_MISMATCH"
+      ],
+      "ageMsAtCheck": 115434644
+    },
+    {
+      "runId": "78818366-2410-4643-8e5d-e995c75a2ad5",
+      "runStatus": "COMPLETED",
+      "bindingStatus": "UNBOUND",
+      "reasons": [
+        "UNBOUND_NEVER_SOURCE_AUTHORITY",
+        "STALE_WORKSPACE_REVISION",
+        "SOURCE_MANIFEST_DIGEST_MISMATCH"
+      ],
+      "ageMsAtCheck": 183665644
+    },
+    {
+      "runId": "9716c798-bb17-45c7-afb0-1c58955889bf",
+      "runStatus": "COMPLETED",
+      "bindingStatus": "UNBOUND",
+      "reasons": [
+        "UNBOUND_NEVER_SOURCE_AUTHORITY",
+        "STALE_WORKSPACE_REVISION",
+        "SOURCE_MANIFEST_DIGEST_MISMATCH"
+      ],
+      "ageMsAtCheck": 186616644
+    },
+    {
+      "runId": "862b952b-7623-434e-818e-407c1531abaf",
+      "runStatus": "COMPLETED",
+      "bindingStatus": "UNBOUND",
+      "reasons": [
+        "UNBOUND_NEVER_SOURCE_AUTHORITY",
+        "STALE_WORKSPACE_REVISION",
+        "SOURCE_MANIFEST_DIGEST_MISMATCH"
+      ],
+      "ageMsAtCheck": 242927644
+    },
+    {
+      "runId": "5b2e18fc-86e6-4fc2-932f-4887d5c14853",
+      "runStatus": "COMPLETED",
+      "bindingStatus": "UNBOUND",
+      "reasons": [
+        "UNBOUND_NEVER_SOURCE_AUTHORITY",
+        "STALE_WORKSPACE_REVISION",
+        "SOURCE_MANIFEST_DIGEST_MISMATCH"
+      ],
+      "ageMsAtCheck": 243897644
+    },
+    {
+      "runId": "369e4270-7689-4536-8816-4ec4a5517b3e",
+      "runStatus": "COMPLETED",
+      "bindingStatus": "BOUND",
+      "reasons": [
+        "STALE_WORKSPACE_REVISION",
+        "SOURCE_MANIFEST_DIGEST_MISMATCH"
+      ],
+      "ageMsAtCheck": 257232644
+    },
+    {
+      "runId": "14643371-f6f2-4131-906b-235a5c06619a",
+      "runStatus": "RUNNING",
+      "bindingStatus": "UNBOUND",
+      "reasons": [
+        "RUNNING_NEVER_SOURCE_AUTHORITY",
+        "UNBOUND_NEVER_SOURCE_AUTHORITY",
+        "STALE_WORKSPACE_REVISION",
+        "SOURCE_MANIFEST_DIGEST_MISMATCH"
+      ],
+      "ageMsAtCheck": null
+    },
+    {
+      "runId": "b1a103ac-c717-430b-9643-a8c9818064ae",
+      "runStatus": "RUNNING",
+      "bindingStatus": "BOUND",
+      "reasons": [
+        "RUNNING_NEVER_SOURCE_AUTHORITY",
+        "STALE_WORKSPACE_REVISION",
+        "SOURCE_MANIFEST_DIGEST_MISMATCH"
+      ],
+      "ageMsAtCheck": null
+    },
+    {
+      "runId": "b3a5b14e-0065-41bb-bfe0-96e1062d1e07",
+      "runStatus": "RUNNING",
+      "bindingStatus": "BOUND",
+      "reasons": [
+        "RUNNING_NEVER_SOURCE_AUTHORITY",
+        "STALE_WORKSPACE_REVISION",
+        "SOURCE_MANIFEST_DIGEST_MISMATCH"
+      ],
+      "ageMsAtCheck": null
+    },
+    {
+      "runId": "a7377c07-acb2-4d68-bf83-19d8eca586d4",
+      "runStatus": "RUNNING",
+      "bindingStatus": "UNBOUND",
+      "reasons": [
+        "RUNNING_NEVER_SOURCE_AUTHORITY",
+        "UNBOUND_NEVER_SOURCE_AUTHORITY",
+        "STALE_WORKSPACE_REVISION",
+        "SOURCE_MANIFEST_DIGEST_MISMATCH"
+      ],
+      "ageMsAtCheck": null
+    },
+    {
+      "runId": "3f13703e-5944-487c-a5a9-10dcecc00124",
+      "runStatus": "RUNNING",
+      "bindingStatus": "UNBOUND",
+      "reasons": [
+        "RUNNING_NEVER_SOURCE_AUTHORITY",
+        "UNBOUND_NEVER_SOURCE_AUTHORITY",
+        "STALE_WORKSPACE_REVISION",
+        "SOURCE_MANIFEST_DIGEST_MISMATCH"
+      ],
+      "ageMsAtCheck": null
+    }
+  ],
+  "selection": null,
+  "databaseError": null
+}

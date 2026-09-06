@@ -1,5 +1,21 @@
 # OpenSpec: KV-Cache Compression + QLoRA Adaptation Research — bounded first slice
 
+## Ornith runtime cache boundary — 2026-09-05
+
+- [ ] ORNITH-CACHE-01 verify the active model/build metadata and classify attention KV,
+  recurrent/SSM state, and server prompt/prefix cache separately. All are runtime
+  execution state, never Parent Atlas canonical knowledge.
+- [ ] ORNITH-CACHE-02 measure only server-managed prefix reuse against PrefixIdentityV1:
+  SHA256 of a versioned canonical object containing modelRevision, chatTemplateRevision,
+  toolSchemaRevision, systemPromptRevision, ContextManifestV2.identityChecksum and
+  exact rendered prefix checksum. Identical identity can permit reuse, not guarantee
+  a hit; changed identity must not reuse the application's old descriptor.
+  Record build/configuration, eligible prefix tokens and observed reuse separately.
+
+No hidden-state database, external recurrent-state serialization/restoration, or
+new launcher flags are part of this addendum. Existing Stage A/trainable-checkpoint
+prerequisites still govern adaptation research; measurement is not model promotion.
+
 ## KV-cache compression (Stage 1–2 only)
 
 - [ ] Define `KvCompressionBackend` interface (`formatId`, `quantizeNewKv`, `attend`, `exportMetrics`) — interface only, `FP16` passthrough implementation as the only working backend initially.

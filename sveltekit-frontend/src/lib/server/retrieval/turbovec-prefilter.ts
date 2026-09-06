@@ -5,7 +5,7 @@
  */
 
 import { ENV } from '$lib/server/env.server.js';
-import { turbovecGrpcSearch } from '$lib/server/grpc/turbovec-cuda-client.js';
+import { turbovecGrpcSearch, type TurboVecCandidateIdentity } from '$lib/server/grpc/turbovec-cuda-client.js';
 
 export interface TurboVecPrefilterResult {
   clusterIds: number[];
@@ -15,7 +15,13 @@ export interface TurboVecPrefilterResult {
 }
 
 export interface TurboVecSearchResult {
-  candidates: Array<{ id: string; score: number; cluster: number }>;
+  candidates: Array<{
+    id: string;
+    score: number;
+    cluster: number;
+    /** Provenance only; absent means this executor result is not promotion-eligible. */
+    identity?: TurboVecCandidateIdentity;
+  }>;
   backend: 'python' | 'js' | 'offline';
   durationMs: number;
 }
@@ -90,6 +96,7 @@ export async function turbovecSearch(
             id: c.id,
             score: c.score,
             cluster: c.clusterId,
+            ...(c.identity ? { identity: c.identity } : {}),
           })),
           backend: (grpcResult.backend ?? 'grpc') as any,
           durationMs: Date.now() - t0,
@@ -114,7 +121,16 @@ export async function turbovecSearch(
     if (!res.ok) return EMPTY_SEARCH;
     const data = await res.json();
     return {
-      candidates: data.candidates ?? [],
+      candidates: Array.isArray(data.candidates)
+        ? data.candidates.map((candidate: Record<string, unknown>) => ({
+            id: String(candidate.id ?? ''),
+            score: Number(candidate.score ?? 0),
+            cluster: Number(candidate.cluster ?? 0),
+            ...(candidate.identity && typeof candidate.identity === 'object'
+              ? { identity: candidate.identity as TurboVecCandidateIdentity }
+              : {}),
+          }))
+        : [],
       backend: data.backend ?? 'js',
       durationMs: Date.now() - t0,
     };

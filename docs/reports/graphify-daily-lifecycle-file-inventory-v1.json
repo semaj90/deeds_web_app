@@ -1,0 +1,25 @@
+{
+  "schema": "atlas.graphify-daily-lifecycle-file-inventory.v1",
+  "runId": "48485685-e773-4433-a1f8-00f5524cca44",
+  "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+  "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+  "sourceCount": 23758,
+  "writtenSourceCount": 23758,
+  "readbackVerified": true,
+  "status": "COMPLETED",
+  "completedAt": "Sat Sep 05 2026 16:06:59 GMT-0700 (Pacific Daylight Time)",
+  "timingMs": {
+    "materialize": 14466,
+    "write": 47867,
+    "total": 62506
+  },
+  "writesPerformed": {
+    "postgres": true,
+    "qdrant": false,
+    "neo4j": false,
+    "valkey": false,
+    "chunking": false,
+    "ast": false,
+    "embedding": false
+  }
+}

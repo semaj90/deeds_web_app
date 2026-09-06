@@ -14,11 +14,11 @@
   },
   "chunkInventory": {
     "chunk_rows": 55853,
-    "chunks_with_source_ref": 53064,
+    "chunks_with_source_ref": 53498,
     "chunks_with_relative_path": 55853,
     "chunks_with_content_hash": 55816,
     "indexed_relative_paths": 4746,
-    "indexed_source_refs": 4549
+    "indexed_source_refs": 4599
   },
   "pathCoverage": {
     "binding_sources": 111,

@@ -833,13 +833,27 @@ export async function multiLaneRetrievalWithRRF(
 
     const turbovecHits: ContextHit[] =
       turbovecResults.status === 'fulfilled'
-        ? turbovecResults.value.candidates.map((hit) => ({
-            id: hit.id,
-            source: 'turbovec_ann' as const,
-            score: hit.score,
-            text: hit.id,
-            metadata: { turbovec_candidate_id: hit.id, turbovec_cluster: hit.cluster },
-          }))
+        ? turbovecResults.value.candidates.map((hit) => {
+            const identity = hit.identity ?? {};
+            return {
+              id: hit.id,
+              source: 'turbovec_ann' as const,
+              score: hit.score,
+              text: hit.id,
+              metadata: {
+                turbovec_candidate_id: hit.id,
+                turbovec_cluster: hit.cluster,
+                packet_key: identity.packetKey ?? null,
+                source_ref: identity.sourceRef ?? null,
+                content_hash: identity.contentHash ?? null,
+                symbol_version_id: identity.symbolVersionId ?? null,
+                source_revision: identity.sourceRevision ?? null,
+                workspace_revision: identity.workspaceRevision ?? null,
+                namespace: identity.namespace ?? null,
+                turbovec_identity_provenance: identity,
+              },
+            };
+          })
         : [];
 
     const neoHits: ContextHit[] =

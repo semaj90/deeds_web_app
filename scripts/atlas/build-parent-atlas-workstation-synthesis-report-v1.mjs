@@ -21,6 +21,15 @@ const sourceAlignment = read('docs/reports/source-selection-authority-alignment-
 const lifecycleOwner = read('docs/reports/graphify-lifecycle-owner-v1.json');
 const runBinding = read('docs/reports/graphify-run-file-binding-v1.json');
 const lifecycleEntrypoint = read('docs/reports/graphify-lifecycle-entrypoint-v1.json');
+const readOptional = (relative) => {
+  try {
+    return read(relative);
+  } catch {
+    return null;
+  }
+};
+const ornithFixtureProof = readOptional('docs/reports/parent-atlas-workstation-ornith-synthesis-fixture-proof-v1.json');
+const residencyProof = readOptional('docs/reports/parent-atlas-workstation-residency-proof-v1.json');
 const sha256 = (value) => `sha256:${crypto.createHash('sha256').update(value, 'utf8').digest('hex')}`;
 const reportBody = {
   schema: 'atlas.parent-atlas-workstation-synthesis-report.v1',
@@ -58,6 +67,25 @@ const reportBody = {
     requiredAction: 'REPAIR_SOURCE_SELECTION_AUTHORITY_BEFORE_PROMOTION',
   },
   mutationScope: 'NONE_UNTIL_EXPLICIT_AUTHORIZATION',
+  liveCapabilityProofs: {
+    gate: 'WORKSTATION-LIVE-CAPABILITY-PROOF-01',
+    ornith: {
+      gate: 'WORKSTATION-ORNITH-LIVE-FIXTURE-01',
+      status: ornithFixtureProof?.status ?? 'NOT_RUN',
+      loadedModel: ornithFixtureProof?.loadedModel ?? null,
+      dryRunReceiptUntouched: ornithFixtureProof?.isolation?.dryRunReceiptUntouched ?? null,
+    },
+    bitfrost: {
+      gate: 'WORKSTATION-BITFROST-LIVE-READ-01',
+      status: residencyProof?.status ?? 'NOT_RUN',
+      probeMode: residency.probeMode ?? 'REFERENCE_ONLY',
+      cacheDecision: residency.cacheDecision ?? 'NOT_EXECUTED_REFERENCE_ONLY',
+      cacheWritesPerformed: false,
+      canonicalWritesPerformed: false,
+    },
+    productionAdoption: 'BLOCKED_CURRENT_LINEAGE',
+    note: 'Live-capability proofs only; they do not select an executable task or affect nextGate/blockedActions.',
+  },
   writes: planOnly.writes,
   provenance: {
     workboard: 'docs/reports/parent-atlas-workstation-openspec-workboard-v2.json',

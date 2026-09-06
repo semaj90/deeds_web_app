@@ -1,0 +1,25 @@
+{
+  "schema": "atlas.pkt-lineage-08a.namespace-enrichment-apply.v1",
+  "generatedAt": "2026-09-05T20:24:50.954Z",
+  "status": "ALREADY_APPLIED_EXACT",
+  "authorizationPath": "docs/reports/pkt-lineage-08a-namespace-enrichment-authorization-v1.json",
+  "proposalPath": "docs/reports/pkt-lineage-08a-namespace-enrichment-plan-v1.json",
+  "proposalChecksum": "sha256:27a2405f472ecf6c4cb2577647a42631608feaeb9c7d87d0c1acc8a01fb20cdb",
+  "targetSourceSetChecksum": "sha256:9ecefaf496c73c0a630d0d7214cd5bdbc864f8a75c796e88ef0360e5567048c7",
+  "sourceCountApplied": 50,
+  "expectedRowCount": 434,
+  "chunkRowsUpdated": 0,
+  "chunkRowsAlreadyApplied": 434,
+  "chunkRowsReadBack": 434,
+  "mutation": "codebase_chunk_index.source_ref NULL -> relative_path after exact current binding proposal",
+  "wholeSourceHashComparedToChunkHash": false,
+  "aceEvidenceAuthority": false,
+  "writesPerformed": {
+    "postgres": true,
+    "qdrant": false,
+    "neo4j": false,
+    "valkey": false
+  },
+  "readbackSourceRefs": 50,
+  "rollbackRequired": true
+}

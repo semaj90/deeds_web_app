@@ -43,3 +43,87 @@
 - [x] 7.1 Add a workstation synthesis report with status, checksums, selected action, blocked actions, and write flags. `scripts/atlas/build-parent-atlas-workstation-synthesis-report-v1.mjs` emits `docs/reports/parent-atlas-workstation-synthesis-report-v1.json` with no selected action while `PKT-LINEAGE-08` remains blocked.
 - [x] 7.2 Update the authoritative workstation/convergence handoff with linked evidence and the next bounded gate. The report links the current workboard, ACE context, Ornith dry-run, residency, and plan-only receipts; the convergence ledger remains authoritative for `PKT-LINEAGE-08` and its fresh lineage audits.
 - [x] 7.3 Run focused tests, JSON parsing, `git diff --check`, and strict OpenSpec validation. The residency proof, plan-only proof, JSON parsing, and strict validation pass; no datastore or model writes occurred.
+
+## 8. Live-capability follow-up (2026-09-05, addendum to a closed change — no checkbox above was reopened)
+
+This change proved fail-closed rejection paths for Ornith generation (5.1/5.4) and BitFrost
+residency (5.3), but neither ever executed the thing it describes: 5.1's dry-run script has no
+`/v1/chat/completions` call anywhere in it (unreachable while `context.status` stays
+`NO_EXECUTABLE_CANDIDATE`), and 5.3's descriptor never opens a Valkey connection
+(`cacheDecision: 'NOT_EXECUTED_REFERENCE_ONLY'` always). Per this repo's own AGENT_EXECUTION_INTEGRITY
+rule, a proof of rejection is not a proof of function. This addendum closes that specific gap —
+it does not touch `PKT-LINEAGE-08`, does not build the deferred mutation executor, and does not
+reopen any task above.
+
+- [x] 8.1 (`WORKSTATION-BITFROST-LIVE-READ-01`) Extend
+  `scripts/atlas/build-parent-atlas-workstation-residency-v1.mjs` with a real, read-only Valkey
+  `GET` against the exact computed `cacheKey` (ioredis, `lazyConnect`, `enableOfflineQueue: false`,
+  fail-soft to `CACHE_UNAVAILABLE` on connection failure — the same client pattern already used by
+  `scripts/atlas/prove-bitfrost-invalidation-owner-v1.mjs`). Classifies
+  `MISS | EXACT_HIT | STALE_REJECT | CACHE_UNAVAILABLE`. `writes.valkey`/`writes.redis` remain `0`
+  (a GET is not a write). Live-run result against the real running Valkey: `MISS`
+  (`docs/reports/parent-atlas-workstation-residency-v1.json`).
+- [x] 8.2 **Corrected same day, external review**: the first version of this task self-tested
+  `EXACT_HIT`/`STALE_REJECT` by performing a live `SET`/`DEL` against a disposable key. That is a
+  real Valkey write — reporting `writes.valkey: 0` / `cacheWritesPerformed: false` next to it would
+  have been false, even though the key was disposable and no canonical store was touched. Removed
+  entirely. `EXACT_HIT`/`STALE_REJECT` classification logic stays proven by the existing in-memory
+  fixture (`deterministicReplay`, `staleIdentityChanged`) in
+  `scripts/atlas/prove-parent-atlas-workstation-residency-v1.mjs`, which never touches real Valkey.
+  This gate (`WORKSTATION-BITFROST-LIVE-READ-01`) proves only a real connect → `GET` → classify
+  (`MISS | EXACT_HIT | STALE_REJECT`) against the exact production `cacheKey`, with no `SET`,
+  `DEL`, `SCAN`, or any other mutation. `CACHE_UNAVAILABLE` (Valkey unreachable) reports
+  `LIVE_RUNTIME_UNAVAILABLE` with a non-zero exit — never a passing result. Live-run result against
+  the real running Valkey: `LIVE_GET_PROVEN`, `cacheDecision: "MISS"`,
+  `cacheWritesPerformed: false`, `canonicalWritesPerformed: false`
+  (`docs/reports/parent-atlas-workstation-residency-proof-v1.json`). A future, separate mutation
+  fixture (`WORKSTATION-BITFROST-LIVE-VALUE-FIXTURE-01`) may prove real `EXACT_HIT`/`STALE_REJECT`
+  against an isolated namespace and must honestly report `cacheWritesPerformed: true` — not this
+  gate.
+- [x] 8.3 (`WORKSTATION-ORNITH-LIVE-FIXTURE-01`) Added
+  `scripts/atlas/lib/workstation-ornith-adapter.mjs` — a shared discovery/streaming adapter — and
+  refactored the existing dry-run discovery script to delegate to it, so the dry-run and fixture
+  paths share one model-resolver/SSE owner instead of two subtly different implementations. Added
+  `scripts/atlas/run-parent-atlas-workstation-ornith-synthesis-fixture-v1.mjs`: a real
+  `POST :8090/v1/chat/completions` call (`stream: true`, SSE assembly, per this repo's canonical
+  Gemma4/Ornith llama-server rule) using a small hardcoded, non-production fixture prompt — never
+  the real `parent-atlas-workstation-ace-context-v1.json` backlog content. Writes its own separate
+  receipt, `docs/reports/parent-atlas-workstation-ornith-synthesis-fixture-v1.json`, with
+  `canonicalAuthority: false`, `productionPlanPath: false`, `requestChecksum`, `responseChecksum`,
+  `finishReason`, and `streamed: true` (the output content itself is execution evidence, not a
+  cross-run determinism requirement). Live-run result: `LIVE_FIXTURE_PROVEN`, `modelCalls: 1`,
+  `loadedModel: "ornith-1.5-9b"`, real assembled output `"ORNITH_FIXTURE_OK"`,
+  `finishReason: "stop"`.
+- [x] 8.4 Added `scripts/atlas/prove-parent-atlas-workstation-ornith-synthesis-fixture-v1.mjs`: this
+  proof harness itself hashes `docs/reports/parent-atlas-workstation-ornith-synthesis-dry-v1.json`
+  and `...-proof-v1.json` *before* invoking the fixture runner (not a separately-run before/after
+  command pair — the atomicity of the preimage comes from the harness owning both the hash and the
+  invocation), then re-hashes after, asserting byte-identical. Runtime-unavailable is reported as
+  `LIVE_RUNTIME_UNAVAILABLE` with a non-zero exit, never as a passing/skippable result. Proven live:
+  `status: "PROVEN"`, `dryRunReceiptUntouched: true`, `dryRunProofUntouched: true`,
+  `productionAdoption: "BLOCKED_CURRENT_LINEAGE"`
+  (`docs/reports/parent-atlas-workstation-ornith-synthesis-fixture-proof-v1.json`).
+- [x] 8.5 Verified no regression: re-ran the original, unmodified
+  `prove-parent-atlas-workstation-ornith-synthesis-dry-v1.mjs` and
+  `prove-parent-atlas-workstation-plan-only-v1.mjs` after 8.1–8.4 — both still report `PROVEN`
+  with `noModelCalls: true` / `modelCalls: 0` on the production path, exactly as before this
+  addendum. All 7 scripts in the full chain (8.1–8.6 plus the two regression checks and the
+  rollup) exit `0` — one exact count, not two overlapping ones.
+- [x] 8.6 Added `liveCapabilityProofs` (informational only, `{ gate, ornith: {...}, bitfrost:
+  {...}, productionAdoption: "BLOCKED_CURRENT_LINEAGE" }`) to
+  `scripts/atlas/build-parent-atlas-workstation-synthesis-report-v1.mjs`'s rollup. Confirmed
+  `status`, `nextGate` (`SOURCE-SELECTION-AUTHORITY-01`), and `blockedActions` (still includes
+  `PKT-LINEAGE-08`) are unchanged from before this addendum — this work does not select an
+  executable task or advance the upstream lineage blocker. This closed change's own `nextGate`
+  wording is left as historical record, not rewritten — the current, more precise implementation
+  gate name lives in the active convergence authority (see cross-reference below), not here.
+
+**Final state, `WORKSTATION-LIVE-CAPABILITY-PROOF-01`** (two child gates,
+`WORKSTATION-ORNITH-LIVE-FIXTURE-01` + `WORKSTATION-BITFROST-LIVE-READ-01`): both `*_PROVEN`,
+canonical writes `0`, cache writes `0` for this gate, production plan-only path model calls `0`,
+isolated fixture-path model calls exactly `1`. This is capability evidence only, not production
+Workstation adoption. No mutation executor was built. No Postgres/Qdrant/Neo4j write occurred. No
+package dependency was added (`ioredis` was already a repo dependency). `PKT-LINEAGE-08` remains
+exactly as blocked as before — this addendum only proves the previously-untested plumbing around
+it actually functions. See `parent-atlas-retrieval-lineage-dag-convergence/tasks.md` for the
+current-authority cross-reference and the active next gate.

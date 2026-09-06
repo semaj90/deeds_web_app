@@ -1,0 +1,81 @@
+{
+  "schema": "atlas.retrieval-01l-08a-cuvs-exact.v1",
+  "gate": "RETRIEVAL-01L-06",
+  "cuvsVersion": "26.06.00",
+  "populationSize": 434,
+  "topK": 10,
+  "cuvsTopK": [
+    {
+      "chunkRowId": "c4f48a02-0d14-40fd-914e-2f55eb8fa863",
+      "distance": 0.41188693046569824
+    },
+    {
+      "chunkRowId": "f627715a-240f-4d8c-9844-ff2df1d4792a",
+      "distance": 0.4237639904022217
+    },
+    {
+      "chunkRowId": "ecfb1cf6-0a31-4031-9e7d-64e77a39b854",
+      "distance": 0.43425899744033813
+    },
+    {
+      "chunkRowId": "e9a2a1ff-9d92-49ec-8d16-406f3fd13e7e",
+      "distance": 0.44767308235168457
+    },
+    {
+      "chunkRowId": "43a5be3e-5419-43cb-b47c-6d7ce2ae768a",
+      "distance": 0.45533424615859985
+    },
+    {
+      "chunkRowId": "c1cccc45-4c87-4817-a5b1-173aaef49b25",
+      "distance": 0.45907294750213623
+    },
+    {
+      "chunkRowId": "df60dcac-e0ed-423b-9999-5cf6abd5f210",
+      "distance": 0.4601193070411682
+    },
+    {
+      "chunkRowId": "a08906f9-f66c-4fcd-bce2-8ecb630bf965",
+      "distance": 0.4604983925819397
+    },
+    {
+      "chunkRowId": "1bbdb165-ba6f-4123-9473-d532be251895",
+      "distance": 0.4663735032081604
+    },
+    {
+      "chunkRowId": "99994935-85b5-444f-b79c-5ab7f98f54a5",
+      "distance": 0.47046101093292236
+    }
+  ],
+  "postgresTopK": [
+    "c4f48a02-0d14-40fd-914e-2f55eb8fa863",
+    "f627715a-240f-4d8c-9844-ff2df1d4792a",
+    "ecfb1cf6-0a31-4031-9e7d-64e77a39b854",
+    "e9a2a1ff-9d92-49ec-8d16-406f3fd13e7e",
+    "43a5be3e-5419-43cb-b47c-6d7ce2ae768a",
+    "c1cccc45-4c87-4817-a5b1-173aaef49b25",
+    "df60dcac-e0ed-423b-9999-5cf6abd5f210",
+    "a08906f9-f66c-4fcd-bce2-8ecb630bf965",
+    "1bbdb165-ba6f-4123-9473-d532be251895",
+    "99994935-85b5-444f-b79c-5ab7f98f54a5"
+  ],
+  "cpuOracleTopK": [
+    "c4f48a02-0d14-40fd-914e-2f55eb8fa863",
+    "f627715a-240f-4d8c-9844-ff2df1d4792a",
+    "ecfb1cf6-0a31-4031-9e7d-64e77a39b854",
+    "e9a2a1ff-9d92-49ec-8d16-406f3fd13e7e",
+    "43a5be3e-5419-43cb-b47c-6d7ce2ae768a",
+    "c1cccc45-4c87-4817-a5b1-173aaef49b25",
+    "df60dcac-e0ed-423b-9999-5cf6abd5f210",
+    "a08906f9-f66c-4fcd-bce2-8ecb630bf965",
+    "1bbdb165-ba6f-4123-9473-d532be251895",
+    "99994935-85b5-444f-b79c-5ab7f98f54a5"
+  ],
+  "cuvsVsPostgresExactSetParity": true,
+  "cuvsVsPostgresRankParity": true,
+  "cuvsVsCpuOracleExactSetParity": true,
+  "cuvsVsCpuOracleRankParity": true,
+  "maxScoreDeltaCuvsVsCpu": 1.1920928955078125e-07,
+  "status": "CUVS_POSTGRES_CPU_TRIPLE_EXACT_PARITY",
+  "canonicalProductionDataTouched": false,
+  "writesPerformed": false
+}

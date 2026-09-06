@@ -48,6 +48,7 @@ const payload = {
   eligibleIdentityFailures: failures.length,
   materializer: {
     mode: materializer.mode,
+    candidateCount: Number(materializer.selectedCandidates ?? materializer.revisionQualifiedCandidates ?? 0),
     rowsAttempted: materializer.rowsAttempted,
     rowsInserted: materializer.rowsInserted,
     rowsAlreadyPresent: materializer.rowsAlreadyPresent,
@@ -59,10 +60,19 @@ const payload = {
   failures,
 };
 const canonical = JSON.stringify(payload);
+const materializerCandidateCount = payload.materializer.candidateCount;
+const bridgeResolved = Number(payload.materializer.identityBridgeOutcomes?.RESOLVED ?? 0);
+const dryRunCountsValid = payload.materializer.mode === 'DRY_RUN'
+  ? payload.materializer.rowsAttempted === 0
+    && payload.materializer.rowsInserted === 0
+    && payload.materializer.rowsAlreadyPresent === 0
+    && Number(materializer.projectionRowsUpserted ?? 0) === 0
+  : payload.materializer.rowsInserted === 0
+    && payload.materializer.rowsAlreadyPresent === materializerCandidateCount;
 const report = {
   ...payload,
   replayChecksum: digest(canonical),
-  status: eligible.length > 0 && failures.length === 0 && materializer.identityBridgeOutcomes?.RESOLVED === eligible.length && materializer.identityBridgeOutcomes?.UNRESOLVED === 0 && materializer.identityBridgeOutcomes?.AMBIGUOUS === 0 && materializer.rowsInserted === 0 && materializer.rowsAlreadyPresent === eligible.length ? 'READ_ONLY_PRODUCER_REPLAY_PROVEN' : 'READ_ONLY_PRODUCER_REPLAY_INCOMPLETE',
+  status: materializerCandidateCount > 0 && failures.length === 0 && bridgeResolved === materializerCandidateCount && materializer.identityBridgeOutcomes?.UNRESOLVED === 0 && materializer.identityBridgeOutcomes?.AMBIGUOUS === 0 && dryRunCountsValid ? 'READ_ONLY_PRODUCER_REPLAY_PROVEN' : 'READ_ONLY_PRODUCER_REPLAY_INCOMPLETE',
   readOnly: true,
   nextGate: 'GRAPH-RESOLVE-06B.4_REPLAY_SECOND_RUN_AND_EDGE_ADMISSION_SEPARATE',
 };

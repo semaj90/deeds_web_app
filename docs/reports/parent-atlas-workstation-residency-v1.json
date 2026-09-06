@@ -1,5 +1,6 @@
 {
   "schema": "atlas.parent-atlas-workstation-residency.v1",
+  "gate": "WORKSTATION-BITFROST-LIVE-READ-01",
   "status": "REFERENCE_ONLY",
   "authority": "BITFROST_VALKEY_RESIDENCY_ONLY",
   "cacheKey": "bitfrost:workstation:context:v1:f7b20c9b0d4ecc27bf7135ec459388f41596dbc101dc7ef1accc2f868283bfd1",
@@ -29,7 +30,13 @@
     "residencyClass": "WORKSTATION_CONTEXT_REFERENCE",
     "canonicalAuthority": false
   },
-  "cacheDecision": "NOT_EXECUTED_REFERENCE_ONLY",
+  "probeMode": "READ_ONLY_GET",
+  "cacheDecision": "MISS",
+  "storedIdentityChecksum": null,
+  "probeError": null,
+  "canonicalWritesPerformed": false,
+  "cacheWritesPerformed": false,
+  "productionAdoption": "BLOCKED_CURRENT_LINEAGE",
   "writes": {
     "valkey": 0,
     "redis": 0,
@@ -40,8 +47,9 @@
     "modelCalls": 0
   },
   "notes": [
-    "No Valkey/Redis connection is opened by this script.",
+    "This script performs a real read-only GET against the computed cacheKey; it never SETs it.",
     "A future reader must compare the complete identity object, not TTL or key suffix alone.",
-    "Any identity mismatch is a stale rejection and must not fall back to a latest key."
+    "Any identity mismatch is a stale rejection (STALE_REJECT) and must not fall back to a latest key.",
+    "CACHE_UNAVAILABLE means Valkey could not be reached -- fail-soft, not a hit."
   ]
 }

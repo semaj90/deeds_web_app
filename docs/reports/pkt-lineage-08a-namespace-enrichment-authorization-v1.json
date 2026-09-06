@@ -1,0 +1,40 @@
+{
+  "schema": "atlas.pkt-lineage-08a.namespace-enrichment-authorization.v1",
+  "status": "AUTHORIZED_BOUNDED_APPLY",
+  "authorizationId": "pkt-lineage-08a-source-ref-enrichment-2026-09-05",
+  "operation": "PKT-LINEAGE-08A-CHUNK_SOURCE_REF_BINDING",
+  "authorizedBy": "user",
+  "authorizationBasis": "Explicit user authorization in the active task conversation",
+  "scope": "PKT-LINEAGE-08A-01",
+  "proposalPath": "docs/reports/pkt-lineage-08a-namespace-enrichment-plan-v1.json",
+  "proposalChecksum": "sha256:27a2405f472ecf6c4cb2577647a42631608feaeb9c7d87d0c1acc8a01fb20cdb",
+  "targetSourceSetChecksum": "sha256:9ecefaf496c73c0a630d0d7214cd5bdbc864f8a75c796e88ef0360e5567048c7",
+  "targetCount": 50,
+  "targetRowCount": 434,
+  "mutation": {
+    "table": "public.codebase_chunk_index",
+    "column": "source_ref",
+    "allowInsert": false,
+    "allowDelete": false,
+    "allowOtherColumns": false,
+    "allowAdditionalRows": false,
+    "allowedTransition": "NULL -> exact current WorkspaceSourceBindingV1.sourceRef",
+    "whereConstraint": "relative_path equals proposed sourceRef and source_ref IS NULL",
+    "wholeSourceHashComparedToChunkHash": false
+  },
+  "aceEvidenceAllowed": true,
+  "aceEvidenceAuthority": false,
+  "authority": "HUMAN",
+  "evidenceRefs": [
+    "docs/reports/pkt-lineage-08a-namespace-enrichment-plan-v1.json",
+    "docs/reports/pkt-lineage-08-bounded-snapshot-v1.json"
+  ],
+  "acePacketRefs": [],
+  "qdrantWrites": false,
+  "neo4jWrites": false,
+  "valkeyWrites": false,
+  "broadGraphify": false,
+  "rollbackRequired": true,
+  "readbackRequired": true,
+  "replayRequired": true
+}

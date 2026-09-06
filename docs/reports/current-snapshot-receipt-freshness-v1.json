@@ -1,0 +1,27 @@
+{
+  "schema": "atlas.current-snapshot-receipt-freshness.v1",
+  "status": "RECEIPT_NOT_PROVEN",
+  "readOnly": true,
+  "writesPerformed": false,
+  "receiptPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\current-source-selection-input-v1.json",
+  "receiptExecutionId": null,
+  "receiptWorkspaceRevision": "sha256:1ef727dde376f01e5c90be5779c31f1c5a2a55e2b7e96072aae1e838b0c1a4d9",
+  "currentWorkspaceRevision": "sha256:0344f0e7d1b1028d84743dd46bb9e10a89a757b3183b61bef527b2a8d550c5c0",
+  "receiptWorkspaceRevisionRecordChecksum": "4a2910d44996e86dcd402aba63b14d7fbd1db68834ac4ac1db982cbafb96b7ac",
+  "currentWorkspaceRevisionRecordChecksum": "8cab7f35a03288bfa204bdd0db960054a337f945f20cdefb8812ca9ae4816696",
+  "receiptWorkspaceOriginRuntimeRevision": "atlas.workspace-revision-origin-runtime.2026-08-21.v1",
+  "currentWorkspaceOriginRuntimeRevision": "atlas.workspace-revision-origin-runtime.2026-08-21.v1",
+  "currentSourceCount": 23709,
+  "checks": {
+    "schema": true,
+    "status": false,
+    "executionId": false,
+    "workspaceRevision": false,
+    "workspaceRevisionRecordChecksum": false,
+    "workspaceOriginRuntimeRevision": true,
+    "sourceSelectionChecksum": false,
+    "sourceSelectionMatchesCurrentWorkspace": false
+  },
+  "producerRevision": "atlas.current-snapshot-receipt-freshness.v1",
+  "observedAt": "2026-09-05T17:16:32.876Z"
+}

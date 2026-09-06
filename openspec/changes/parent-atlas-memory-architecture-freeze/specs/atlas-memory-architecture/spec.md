@@ -1,5 +1,25 @@
 ## ADDED Requirements
 
+### Requirement: Evidence packet projections preserve the existing context owner
+
+Evidence-type packets MUST layer onto or project from ContextCandidate/ContextLane.
+They MUST NOT replace that model or establish a second ContextManifest compiler.
+
+#### Scenario: An evidence-type packet is proposed
+- **WHEN** a structural or source evidence packet is added by its implementation owner
+- **THEN** it preserves the admitted candidate and manifest identity of the existing model
+
+### Requirement: Memory classes and new axes remain distinct
+
+New axes MUST use evidenceDepth and residencyTier rather than a fourth LOD meaning.
+Model execution state, exact cache, ACE control, retrieval evidence, statistical
+features, external observations, and durable outcomes MUST retain their own owners.
+
+#### Scenario: Cache or model state is available
+- **WHEN** a consumer assembles context or records a workflow outcome
+- **THEN** runtime state and cache presence do not confer evidence authority
+
+
 ### Requirement: Structural evidence authority SHALL follow the regex → ripgrep → ast-grep → Tree-sitter → Graphify → model ordering
 A model/RLM/NLP classifier SHALL NOT be treated as authoritative for structural facts (is this a
 function, is this the caller, is this the parent). It MAY propose candidates; ast-grep/Tree-sitter/
@@ -27,11 +47,12 @@ encoding for numeric matrix payloads.
 - **THEN** it is added as an alternate encoding of the same logical schema already used for JSON,
   not a new schema, and it is not applied to numeric matrix data
 
-## Explicitly not specified here (undecided, see proposal.md and tasks.md 2.3/2.4)
+## Historical undecided designs (2.3/2.4 resolved 2026-09-05)
 
-The following are described in `proposal.md` as proposed designs but are **not** committed
-requirements in this spec, pending an explicit operator `CANONICAL_OWNER` decision per
-`CLAUDE.md`'s Duplication Prevention section:
+The first two questions below are retained as historical context and resolved by the
+requirements above: evidence packets layer/project from existing context types and
+new axes use evidenceDepth/residencyTier. Their implementation remains delegated.
+The remaining algorithm, bitmap and staging questions are still unimplemented here:
 
 - Whether `IntentPacket`/`SourceEvidencePacket`/`AstEvidencePacket`/`GraphEvidencePacket`/
   `HyperedgePacket`/`DiagnosticPacket`/`ExecutionReceiptPacket`/`ConstraintPacket` become the

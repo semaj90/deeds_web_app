@@ -1,18 +1,15 @@
 # TurboVec ANN gRPC Proof
 
-Status: PASS
-Qdrant collection: codebase_chunks_768
-Usable candidates: 1000
-HTTP indexed: 1000
-gRPC candidates: 10
+Status: FAIL
+Qdrant collection: codebase_chunks_768_v2
+Usable candidates: 0
+HTTP indexed: 0
+gRPC candidates: 0
 
 ## Gates
 
 | Gate | Result |
 |---|---:|
-| qdrant_vectors | PASS |
-| http_indexed | PASS |
-| grpc_ok | PASS |
-| grpc_search_nonempty | PASS |
-| identity_preserved | PASS |
-| pass | PASS |
+| qdrant_vectors | FAIL |
+| qdrant_identity_qualified | FAIL |
+| pass | FAIL |

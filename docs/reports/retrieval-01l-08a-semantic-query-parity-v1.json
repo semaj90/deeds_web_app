@@ -1,0 +1,121 @@
+{
+  "schema": "atlas.retrieval-01l-08a-semantic-query-parity.v1",
+  "gate": "RETRIEVAL-01L-04/05",
+  "scope": "PKT_LINEAGE_08A_COHORT_ONLY",
+  "generatedAt": "2026-09-05T21:53:30.458Z",
+  "mode": "READ_ONLY",
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "queryFixture": {
+    "queryText": "vector similarity search and embedding retrieval architecture for codebase indexing",
+    "embedModel": "embeddinggemma:latest",
+    "queryEmbeddingChecksum": "sha256:e7f445d984d3ef290617aa43924c65402e0ec63403ed80b47da9d8397033b70f",
+    "dimension": 768
+  },
+  "populationChecksum": "sha256:e29aa936955837a333f589e77ddfa561219d28e1205a6796eb28250ebc4dda3c",
+  "populationSize": 434,
+  "topK": 10,
+  "laneOwnership": "ONE logical semantic lane, TWO executors (postgres-exact oracle, qdrant HNSW). No RRF fusion performed here; no second semantic vote created.",
+  "postgres": {
+    "executor": "pgvector exact cosine (<=>), no ANN index -- exact by construction",
+    "topK": [
+      {
+        "chunkRowId": "c4f48a02-0d14-40fd-914e-2f55eb8fa863",
+        "distance": 0.4118952876898484
+      },
+      {
+        "chunkRowId": "f627715a-240f-4d8c-9844-ff2df1d4792a",
+        "distance": 0.4237661702201071
+      },
+      {
+        "chunkRowId": "ecfb1cf6-0a31-4031-9e7d-64e77a39b854",
+        "distance": 0.4342600515187005
+      },
+      {
+        "chunkRowId": "e9a2a1ff-9d92-49ec-8d16-406f3fd13e7e",
+        "distance": 0.44767474639966276
+      },
+      {
+        "chunkRowId": "43a5be3e-5419-43cb-b47c-6d7ce2ae768a",
+        "distance": 0.4553340513424019
+      },
+      {
+        "chunkRowId": "c1cccc45-4c87-4817-a5b1-173aaef49b25",
+        "distance": 0.4590680548120768
+      },
+      {
+        "chunkRowId": "df60dcac-e0ed-423b-9999-5cf6abd5f210",
+        "distance": 0.46012589024564976
+      },
+      {
+        "chunkRowId": "a08906f9-f66c-4fcd-bce2-8ecb630bf965",
+        "distance": 0.4605093787240263
+      },
+      {
+        "chunkRowId": "1bbdb165-ba6f-4123-9473-d532be251895",
+        "distance": 0.4663742415136938
+      },
+      {
+        "chunkRowId": "99994935-85b5-444f-b79c-5ab7f98f54a5",
+        "distance": 0.4704637689691272
+      }
+    ],
+    "latencyMs": 43,
+    "error": null
+  },
+  "qdrant": {
+    "executor": "HNSW, has_id-filtered to the identical 434-point cohort population",
+    "topK": [
+      {
+        "chunkRowId": "c4f48a02-0d14-40fd-914e-2f55eb8fa863",
+        "score": 0.58811307
+      },
+      {
+        "chunkRowId": "f627715a-240f-4d8c-9844-ff2df1d4792a",
+        "score": 0.57623607
+      },
+      {
+        "chunkRowId": "ecfb1cf6-0a31-4031-9e7d-64e77a39b854",
+        "score": 0.5657411
+      },
+      {
+        "chunkRowId": "e9a2a1ff-9d92-49ec-8d16-406f3fd13e7e",
+        "score": 0.552327
+      },
+      {
+        "chunkRowId": "43a5be3e-5419-43cb-b47c-6d7ce2ae768a",
+        "score": 0.5446658
+      },
+      {
+        "chunkRowId": "c1cccc45-4c87-4817-a5b1-173aaef49b25",
+        "score": 0.54092705
+      },
+      {
+        "chunkRowId": "df60dcac-e0ed-423b-9999-5cf6abd5f210",
+        "score": 0.53988075
+      },
+      {
+        "chunkRowId": "a08906f9-f66c-4fcd-bce2-8ecb630bf965",
+        "score": 0.5395018
+      },
+      {
+        "chunkRowId": "1bbdb165-ba6f-4123-9473-d532be251895",
+        "score": 0.53362656
+      },
+      {
+        "chunkRowId": "99994935-85b5-444f-b79c-5ab7f98f54a5",
+        "score": 0.52953905
+      }
+    ],
+    "latencyMs": 50,
+    "error": null
+  },
+  "metrics": {
+    "recallAtK": 1,
+    "exactSetParity": true,
+    "rankParity": true,
+    "mrr": 0.2929,
+    "intersectionCount": 10
+  },
+  "status": "EXACT_SET_PARITY"
+}

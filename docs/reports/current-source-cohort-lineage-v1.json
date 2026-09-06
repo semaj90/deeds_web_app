@@ -1,6 +1,6 @@
 {
   "schema": "atlas.current-source-cohort-lineage.v1",
-  "generatedAt": "2026-09-05T16:20:42.036Z",
+  "generatedAt": "2026-09-05T17:13:47.755Z",
   "mode": "READ_ONLY_LINEAGE_AUDIT",
   "inputs": {
     "cohortChecksum": "fd88703ca428261206575d95204c31795f956645dd46dc4607a2b3048d464151",
@@ -600,5 +600,5 @@
   "qdrantWrites": false,
   "status": "SOURCE_LINEAGE_COHORT_FOUND_WORKSPACE_MISMATCH",
   "nextGate": "SOURCE_PROJECTION_EXACT_BYTES_ADMISSION_REVIEW",
-  "reportChecksum": "b89f004971bc0a912cac08dd0443fb439a8174258d513105c22b61cc424defc1"
+  "reportChecksum": "ce0a53850da64c24c17bdd6e7b0f684b1e41e85e7cf50ae0573fc6e09b6f7bc3"
 }

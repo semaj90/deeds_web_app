@@ -70,6 +70,7 @@
     "./core/retrieval-action-receipt": "./dist/core/retrieval-action-receipt.js",
     "./core/evidence-entity-backfill": "./dist/core/evidence-entity-backfill.js",
     "./core/feature-intelligence-repository": "./dist/core/feature-intelligence-repository.js",
+    "./core/feature-ontology-projection-v1": "./dist/core/feature-ontology-projection-v1.js",
     "./core/relationship-kernel": "./dist/core/relationship-kernel.js",
     "./core/feature-matrix": "./dist/core/feature-matrix.js",
     "./core/feature-matrix-materializer": "./dist/core/feature-matrix-materializer.js",

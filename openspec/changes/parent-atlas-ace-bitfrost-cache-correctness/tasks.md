@@ -1,5 +1,23 @@
 # Tasks: parent-atlas-ace-bitfrost-cache-correctness
 
+## Exact prompt cache follow-up — 2026-09-05
+
+- [ ] CACHE-PREFILL-01 audit the existing Ornith query-synthesis/prompt-build path,
+  then bind its exact cache identity to ContextManifestV2.identityChecksum,
+  modelRevision, chatTemplateRevision, toolSchemaRevision, promptTemplateRevision.
+  Include exact rendered request/prompt and generation parameters where output reuse
+  depends on them; a manifest alone does not cover a changed user question.
+  Use canonical structured serialization, not ambiguous string concatenation.
+- [ ] CACHE-PREFILL-02 fixture-prove identical complete identity -> HIT and changing
+  any identity field -> MISS/STALE_REJECT; missing revisions fail cache admission.
+  Include altered question, tool schema, rendered bytes, and output-affecting controls.
+- [ ] CACHE-PREFILL-03 after caller ownership is verified, run a separately scoped
+  live read proof; cache SET/DEL fixtures need explicit cache-write effect accounting.
+
+These tasks extend the open T3 prompt-build audit; they do not close token accounting,
+unsorted selection, MCP parallelism, search-router or multi-lane-retrieval findings.
+BitFrost remains exact and derived; runtime prefix reuse has a separate research owner.
+
 ## Context
 
 A background fork investigated the ACE → BitFrost → MCP path for verifiable optimizations this

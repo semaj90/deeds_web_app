@@ -1,3 +1,12 @@
+## Memory/agent reconciliation design — 2026-09-05
+
+The query-feature addition is an input to the existing ACE-FEATURE-SOURCE-OWNER-01
+bridge, not a new compiler. Preserve ContextManifestV2 evidence, policy, and playbook
+revisions and CandidateFeatureSnapshot admission. Query features must carry their
+producer/corpus revisions; missing data cannot supply synthetic lineage.
+Live wiring remains distinct from fixture validation. Exact prompt caches are owned
+by the narrower cache-correctness change.
+
 ## Context
 
 The repository already contains the revisioned ACE/BitFrost cache identity,

@@ -8,7 +8,7 @@
     "current-packet-chunk-join",
     "source-selection-authority"
   ],
-  "taskPopulationChecksum": "sha256:cf9fdd8c8208d977ae704de33f672f9b15a049412403a21872cd0241e0d6a243",
+  "taskPopulationChecksum": "sha256:0e46d539e446835ebb56516ab2475427dbca4d1ddf930729162667afeadce30b",
   "planChecksum": "sha256:6a437ac81d774f5e7cf093940fdd62018dc03cd765d0996fdf16919426761598",
   "contextChecksum": "sha256:cc93a4aa501ae9e2a13422a7f73c108214105e5df69e8db1333ffa867c3fcbb6",
   "residencyIdentityChecksum": "sha256:f7b20c9b0d4ecc27bf7135ec459388f41596dbc101dc7ef1accc2f868283bfd1",
@@ -20,8 +20,8 @@
   ],
   "nextGate": "SOURCE-SELECTION-AUTHORITY-01",
   "upstreamAuthority": {
-    "graphifySourceRevisionStatus": "SOURCE_AUTHORITY_UNAVAILABLE",
-    "graphifySourceRevisionRows": 0,
+    "graphifySourceRevisionStatus": "SOURCE_BYTES_NOT_PROVEN",
+    "graphifySourceRevisionRows": 25258,
     "workspaceNamespaceStatus": "WORKSPACE_SOURCE_NAMESPACE_PROVEN",
     "sourceRegistryStatus": "REGISTRY_CONTRACT_AUDITED",
     "selectedSourceCount": 0,
@@ -39,12 +39,31 @@
       "RUNNING_BOUND_NOT_TERMINAL": 2
     },
     "lifecycleEntrypointStatus": "READY_FOR_INJECTED_WIRING",
-    "lifecycleEntrypointWorkspaceRevision": "sha256:c12f11e18de137c63d0fceebeabaa3f23e0c1aad6e37d1fda0a9540b52fe77a6",
-    "lifecycleEntrypointBindingCount": 23684,
+    "lifecycleEntrypointWorkspaceRevision": "sha256:9302fdc4b778d0db2d31a2e2e42f68d907335c72fc78320fdf62f756ea07f8f8",
+    "lifecycleEntrypointBindingCount": 23694,
     "lifecycleEntrypointWrites": false,
     "requiredAction": "REPAIR_SOURCE_SELECTION_AUTHORITY_BEFORE_PROMOTION"
   },
   "mutationScope": "NONE_UNTIL_EXPLICIT_AUTHORIZATION",
+  "liveCapabilityProofs": {
+    "gate": "WORKSTATION-LIVE-CAPABILITY-PROOF-01",
+    "ornith": {
+      "gate": "WORKSTATION-ORNITH-LIVE-FIXTURE-01",
+      "status": "PROVEN",
+      "loadedModel": "ornith-1.5-9b",
+      "dryRunReceiptUntouched": true
+    },
+    "bitfrost": {
+      "gate": "WORKSTATION-BITFROST-LIVE-READ-01",
+      "status": "LIVE_GET_PROVEN",
+      "probeMode": "READ_ONLY_GET",
+      "cacheDecision": "MISS",
+      "cacheWritesPerformed": false,
+      "canonicalWritesPerformed": false
+    },
+    "productionAdoption": "BLOCKED_CURRENT_LINEAGE",
+    "note": "Live-capability proofs only; they do not select an executable task or affect nextGate/blockedActions."
+  },
   "writes": {
     "taskLedgers": 0,
     "sourceFiles": 0,
@@ -71,5 +90,5 @@
     "runBinding": "docs/reports/graphify-run-file-binding-v1.json",
     "lifecycleEntrypoint": "docs/reports/graphify-lifecycle-entrypoint-v1.json"
   },
-  "reportChecksum": "sha256:c213309821ce649f39587d5de1506b7174b7147229af7383cc36832beb8147d7"
+  "reportChecksum": "sha256:28933c7748778717d4c66e1964850247cc714745cf116a96c83e241c7f1636a7"
 }

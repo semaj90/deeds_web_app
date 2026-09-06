@@ -432,6 +432,7 @@ export async function retrieveQdrant(query: string): Promise<Candidate[]> {
             representationId: pickNullableString(hit.payload?.representation_id, hit.payload?.representationId),
             representationRevision: pickNumber(hit.payload?.representation_revision, hit.payload?.representationRevision),
             qdrantPointId: String(hit.id),
+            retrievalExecutor: 'qdrant',
             ...deriveIdentity({
               symbolVersionId: hit.payload?.symbol_version_id,
               packetKey: hit.payload?.packet_key,
@@ -487,6 +488,7 @@ export async function retrieveQdrant(query: string): Promise<Candidate[]> {
       representationId: pickNullableString(hit.payload?.representation_id, hit.payload?.representationId),
       representationRevision: pickNumber(hit.payload?.representation_revision, hit.payload?.representationRevision),
       qdrantPointId: String(hit.id),
+      retrievalExecutor: 'qdrant',
       ...deriveIdentity({
         symbolVersionId: hit.payload?.symbol_version_id,
         packetKey: hit.payload?.packet_key,

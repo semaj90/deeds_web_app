@@ -1,0 +1,3504 @@
+{
+  "schema": "atlas.retrieval-01l-08a-qdrant-projection-apply.v1",
+  "task": "RETRIEVAL-01L-08A-QDRANT-PROJECTION-REPLAY",
+  "generatedAt": "2026-09-05T21:46:51.618Z",
+  "consumedProposalChecksum": "sha256:137bce94832a8a94fa5eeb74923e02f44204d1d6cedab926a3297ec2253676cd",
+  "consumedTargetPointSetChecksum": "sha256:e29aa936955837a333f589e77ddfa561219d28e1205a6796eb28250ebc4dda3c",
+  "collection": "codebase_chunks_768_v2",
+  "vectorName": "content",
+  "cohortSize": 434,
+  "writesToNonQdrantStores": {
+    "postgres": false,
+    "neo4j": false,
+    "valkey": false
+  },
+  "preimageUnexpectedExisting": 0,
+  "vectorFetchFailures": 0,
+  "pointsUpserted": 434,
+  "readbackExact": 434,
+  "readbackMismatch": 0,
+  "replayEffectiveChanges": 0,
+  "rollbackArtifact": {
+    "action": "DELETE_BY_EXACT_POINT_ID_LIST",
+    "collection": "codebase_chunks_768_v2",
+    "pointIds": [
+      "44323000-991b-4c0c-885c-e5bb0dddf759",
+      "da3ef140-a26c-462b-9a91-3a5eb92ebea9",
+      "d5a127c5-50e8-43ff-9e73-20daf9c7d74f",
+      "bf592df3-d614-4010-a46d-b73552d67c2c",
+      "acf26812-90f9-4557-89ba-02e22eff5859",
+      "b3613106-8888-4b0f-a339-27a512dd3ec7",
+      "6a0a2687-50e0-4452-ac49-db6f09f8e295",
+      "339c99a3-e2bd-4dc4-8b4b-1ed15ba2cac0",
+      "cbe694c9-a3c7-4ada-836c-1de67da13f3b",
+      "628571a4-1692-4845-b066-f5c7c7e262e2",
+      "0dd01d6b-72f4-427f-9fac-3fa07bda28ef",
+      "c170888f-9ee2-43b3-b046-19c847dd882b",
+      "dd86f630-afbf-44c5-9796-de1a5ae5b5b5",
+      "735da89e-8076-42d5-80ba-b862b09cc3d0",
+      "c60f516c-fecb-4cfc-981d-657c4ffbbba7",
+      "6491253c-39a7-4b9f-a2ea-88fabab4c40b",
+      "e8e1c989-6892-4ceb-a394-7e52dfd78f9a",
+      "77793c1c-76dc-4361-b8fe-32a2ba12e5b3",
+      "f26e3e18-f4f9-4520-ab02-f079d50b3445",
+      "157b2529-9acb-4d88-92c1-a8c6ded6af3d",
+      "8eff36ed-1533-4f8b-a283-aa64bba998be",
+      "cad7e75e-0bb3-471a-9d6e-61741256b60b",
+      "2ff5df80-a600-434b-a448-b8561e9d40b1",
+      "f871819b-6b78-40ec-9ee4-d4ff2ab8e6e9",
+      "7639cc53-6b27-4234-84fb-b1ed0dc6ddec",
+      "66016bb3-8881-49ef-acc9-e4930b838eea",
+      "9fe44aaf-2bbb-4ffc-9ad8-811bd9e807c0",
+      "dd9f92c7-e3c8-477b-8fb4-8bf17fa9f166",
+      "443b5c6b-23f6-4c3f-a2f5-9d0ab4377c47",
+      "7b9802cb-7fb9-4c38-a423-8cbf88215e77",
+      "5a0ba200-c129-46c0-aa46-e89ec852fe1b",
+      "8e242775-05f5-48c5-ad60-35298e4a736e",
+      "ae3a5d9e-1f07-457b-bda0-184eb50a0c49",
+      "32b7e7a0-6a13-4ad5-8505-218bfb79edb1",
+      "81b3ee97-c3cf-49a5-9a68-754f2e8d5a8b",
+      "3d2f9e8d-45ae-4ad0-8b72-06c6d91c45fb",
+      "d61b76c2-84b1-44c6-a656-f09a9cadb042",
+      "e5941b5d-eb7f-4933-9ab5-8a53f992b19f",
+      "e033a553-722e-472f-852c-be1ca022c1ea",
+      "fae89108-06e3-47b3-ae71-c0e8ab74b406",
+      "06fa3310-0d50-47f5-bd37-3a2f0bcd6e58",
+      "e32459d0-e3db-4c40-88b3-df120be2e658",
+      "fdb3f639-ace8-40a8-b0a1-0c7d87610778",
+      "dff2cdc8-6b94-4dee-a7c8-9b0c8b008882",
+      "ad3466fd-7c6a-4e3f-b0a4-b9892908ffb3",
+      "a814001b-21f4-42b9-9fc0-569347cd0570",
+      "88fbda5b-9264-46a5-9123-38272f27c8ea",
+      "869cab81-9008-4b6a-8094-22d92e3dcf82",
+      "bf7a03ba-949b-4663-a6cd-05273b422b6b",
+      "9188e79d-be50-43c8-8477-88798bd6c664",
+      "3e062df3-c29a-41f4-92ea-60bb2c90410d",
+      "1c76c109-caa5-4c70-a406-3d78ab4bfc6c",
+      "979af765-dc32-4b9e-a632-d182fcc89415",
+      "e7e9f532-95c3-4f47-8f52-08ce968e57cf",
+      "2b5e379a-23ca-4ed6-b854-8214acf48025",
+      "0511c854-a3c6-4d93-adc4-74038ec47e59",
+      "518df7da-014b-4142-96d3-748dea341719",
+      "fa7e8910-7286-49b4-a1fe-f7017a24ca83",
+      "4dc6e086-2783-407f-8042-e40229ff3614",
+      "21ca4c15-7907-4d04-8129-0303d3303586",
+      "d9f76dc5-b1a5-4e0f-89d1-a6a3753af3dc",
+      "89b387f9-1fec-49e3-9c92-4a77a5da77c8",
+      "6f2ecefd-efe8-426f-b89f-c0f5aca32d32",
+      "11581ea0-6272-4ccd-afb8-858f936e4149",
+      "438ab84e-de4b-4b44-9e41-8b31fd4238ed",
+      "c707cfe0-88cb-421b-9115-b085255f8737",
+      "b53c8375-c9d5-4bdc-aaf1-f2229c263f75",
+      "91bd1d2e-aaf7-4001-93db-79bd0b14a5f0",
+      "0803c6a6-9f75-4376-b5b0-67909de1144b",
+      "d647da1d-76a0-4aaa-80f1-dae85eea0c76",
+      "2918dce4-fcd1-4ae3-8472-9a19fe4ded0b",
+      "fae2d121-03a2-426b-ad0d-735a093ccca1",
+      "6d570520-23be-44a8-89ce-31e5ef75feed",
+      "6ece0d13-e686-45ba-ad59-d22cf4396587",
+      "49f8505a-fb87-49ce-b431-f01591f05edd",
+      "98399073-5443-4261-b6bc-ba9951a9b895",
+      "1ebddc93-1877-4a42-b798-0ff15b2ddf6c",
+      "db1182be-2576-49e2-ab0e-8d75e673b5e5",
+      "3fec84fe-cdf0-435b-a67d-e4f4eab23b1c",
+      "f06e28f5-5ea1-4266-8e9f-16ccc35569ac",
+      "3d822379-9600-41db-adaf-b9f6a5b87892",
+      "e3a21b94-1e68-4c9c-a854-cb548264b437",
+      "d0d0486a-c24f-48d4-9fc0-0d4074d92e0d",
+      "3235732c-56df-4d72-9d43-4e43ad7efc99",
+      "207b6a4e-f74e-4567-994d-dd9e007231eb",
+      "dd2858bf-9052-4d8d-8050-31178ead325d",
+      "acb0d002-74f9-4da3-95ed-eaf88c1df83a",
+      "5a722f16-3f1b-44ff-b9be-909ec117e920",
+      "3ea83c8e-269d-4507-a856-0638be5fdb69",
+      "1468542a-e7c0-416c-a6f5-2847f19dfb3b",
+      "2a9f2faf-2f82-4bde-9463-25483665b43d",
+      "280b0188-c2ed-4c2a-a476-110379f1ebf0",
+      "e2c11003-3170-420c-a179-2a9ada211915",
+      "ca5cc057-8d20-44f1-9c36-b53ebd5cf212",
+      "86f92bf0-0a11-4001-9fc2-ae3aabc1cc31",
+      "7d5be9c4-b58b-443f-80f6-097a27455624",
+      "a18d787c-4b99-45f9-a06d-aa40bf5ea63f",
+      "c9ea5616-474d-4f52-a8e7-eda1a2022b70",
+      "2da3f96a-27bc-4543-a224-539a92f99754",
+      "81283621-08b9-4868-a710-c72b8d4b1699",
+      "6d9b2e94-5dd6-49fe-a1ff-336fc8478b67",
+      "cd847e35-2052-466a-8e8d-efb04356e1f3",
+      "42862028-93a9-4eef-9866-f1670fd53016",
+      "679ab1cc-daa8-42c7-9f6b-baaebde2bb4e",
+      "06b52ebd-35a0-4bc6-9b83-0284298748e9",
+      "ba77fba6-8ff0-4659-abca-39bf3deb5689",
+      "b26a50cf-a027-45d0-8e89-d532b7439026",
+      "b45b64f3-1e07-47af-87e3-393e08840645",
+      "9a50e2c5-6bb2-4a97-90be-ad51b3b6ceb6",
+      "1370f559-7f69-4ef0-9284-41497c32a3be",
+      "b25a861a-6471-4da7-a63a-66eda0eb2a09",
+      "71bf1943-82ca-4170-805c-703ab754bea4",
+      "9876252c-59f2-45e9-b77e-7f2cdd02cd73",
+      "1a6eb334-17ea-429a-a55c-fcb40b80e3f6",
+      "356b1594-1df1-47f7-93b6-1065e6a04ed8",
+      "289b492f-f719-418e-9838-d2f6ed41c817",
+      "97a6ae50-c6d0-41f2-a73a-fbae075aa8c5",
+      "c9693bd6-56d5-4cd0-8847-c3aa921483e7",
+      "6775afaf-6904-4ace-8fed-3f6c6ddc3268",
+      "afe6f147-94f1-4128-b97a-3a4800779352",
+      "7d94411a-c2ca-4ab3-84fe-41794edcb592",
+      "c085ec2e-4674-4223-ac4b-b1adef46dd72",
+      "826aa0b5-219c-4231-84c8-1a2f1ad18acf",
+      "3c6419d5-d1ce-4035-9f48-4be15e9738d3",
+      "f887a2a9-ba6a-4398-a7af-14ad4eecadd9",
+      "6101728d-08e3-4c62-89d1-0070ca358c46",
+      "fc78a462-fe1f-4717-91d3-4c88ea4a8499",
+      "aac4cf7a-f509-43f5-8aa4-43f5e6f3e1ad",
+      "f7403845-2795-438c-a50a-557ddac4faf2",
+      "277d8725-9bdf-4ad6-a1ab-8c2907ffb194",
+      "16a4d43c-3a2f-42b4-9d58-3eaa5d430f3c",
+      "95a93ade-5a95-433e-95ba-58619f9f3a11",
+      "311fd5ee-ea47-4e2e-b17d-0dec9f0bc98f",
+      "c97525ee-7dd4-4fcb-8398-b13b2e9b848b",
+      "c1df0ebd-f486-464d-99fe-aaf5971f7b3d",
+      "2d2c327c-33c8-4a7b-b6a5-c4aced292141",
+      "7643d2c0-6392-4593-a04a-10e4c987806c",
+      "3d664a95-762b-4450-a3d7-e2e902fcf3b0",
+      "b3c0d18d-c7cb-4b56-ac2e-8a98bdf36f8a",
+      "5b437424-3214-4f1b-938a-8ca763a99bfd",
+      "00fb0ef7-b5ca-4ead-9d07-e2391ae2f84c",
+      "2d67a756-eb45-44fd-9cb5-55546830b20a",
+      "00efbb8a-a481-4171-a415-67ab912afa9f",
+      "8593016b-3b59-4454-8ae9-018fef581963",
+      "8935cfc2-5c50-427a-aaa9-6433e1337579",
+      "17abab33-f4ae-43a9-9640-668f4e1a831a",
+      "f1dacd98-2f44-4e5a-a8ef-cdded67ce891",
+      "80f41a0b-53dc-40c1-b853-f97ac7673b10",
+      "e88584f8-ff89-476b-97b2-76f38f8244be",
+      "d4e0edb4-2cc2-45b0-a927-9fa789a1c85f",
+      "d2768b96-febf-4d5f-ab2c-22a93a618b1a",
+      "91cc1fc2-23d1-460f-aab6-05aabb75f8ef",
+      "47ec904c-8888-4bd3-9fde-7ff19c4eef11",
+      "93c1d11b-00b1-4baf-b6fb-9f7001502675",
+      "478c6abe-d4e5-4aca-b593-3649212b2e7f",
+      "9faf46b6-c00e-4a0d-9c0b-c5bd251308e1",
+      "dc2d1bba-5d0b-4041-acf6-0d4654f8b863",
+      "3535b7e3-91ec-4e24-b984-24bea407e9cf",
+      "c7bdd96a-cb4e-4c97-9799-c0e4ed665df1",
+      "78adc099-85a6-4c7a-8e1d-12d635d1d675",
+      "3e9e27d0-9012-457d-8fb7-2061ca6b68c4",
+      "40688bc3-fa59-4493-b65c-3b9d0769ead2",
+      "285c8edd-bd92-48a0-8cd9-7fcc669ad20b",
+      "8924237c-679d-4322-b1cc-d8e9ea81929a",
+      "bce08126-a55a-4cb1-9663-16401700e090",
+      "056bc946-56dd-463b-865a-a56bec4c4eb9",
+      "6abf5449-9806-4aa7-b8c0-0e70a656a06c",
+      "96181162-2325-479b-bcd6-e02789913e4d",
+      "49da4732-2209-4142-9ad7-dfc8bbeb8a8c",
+      "79af6dee-f794-4d17-890a-04cc74c4063a",
+      "4ba616ac-db93-4245-80e0-10f357dad2e9",
+      "d26d0e6e-2dfb-4196-ae66-994316b16e0d",
+      "4c3435c4-0420-45f7-9d3e-75a14b8cf52d",
+      "928f92ce-39e6-479c-bc90-b2dfe7a1b922",
+      "67fb38d7-c8dd-4fbf-8e58-443b26ff8e55",
+      "359eec67-69e0-478c-ba52-d249da14fd46",
+      "1dcc4ab2-332f-492b-b57f-2a4ec5b7fd73",
+      "4e79a7a0-fbfb-48c1-bfb5-5ab3f0eb3e90",
+      "92596aca-5d08-4c17-aa49-dbf057d52deb",
+      "b2c20d79-1294-464a-b166-ffa4b4316451",
+      "439b1c5d-2c3e-45ad-9acd-df7512b78919",
+      "0153b6ef-7674-4ca6-b0c2-95de8092a1d7",
+      "be026a9c-3e9d-4042-914c-e252a137feaf",
+      "4566158a-18b2-4bed-a402-f3313c54a137",
+      "135f11ad-8ec7-4306-8750-d35b324e1650",
+      "0b12fd22-54ff-45ed-bbbe-e2571ae99364",
+      "8021c74f-4620-40b8-bd70-52e5741293e9",
+      "94f82d8b-c132-459a-a5e1-8ab3ed201d68",
+      "fbf2dc58-2616-4b3b-884a-c0f81c7b7816",
+      "774fbd8d-9c2c-468f-add3-7d2d0e7af8a7",
+      "4c34f208-6bff-4321-ae5a-875f6bc30b23",
+      "782c2015-65b9-4ebd-9080-1a7f66e10fa0",
+      "327aba19-87d5-4542-be82-54293579cfba",
+      "5e5e9e12-47ca-4a62-a01c-cdc7b2806df3",
+      "b641335e-255d-42e7-81da-7cfa6859370f",
+      "50cdc617-a984-4b9f-95cd-c7d96a2906db",
+      "2a41f4d8-2522-415c-8ca0-55c772bd97b1",
+      "225fec51-6fe0-41d7-a03a-de428e57907d",
+      "84073045-581d-406f-8940-11d8eadad253",
+      "c5f94f99-2305-4b29-b6fc-2761a70dc132",
+      "49b8fe96-3c95-42cd-af00-f74cf5644741",
+      "affdb999-3dc5-47fb-836f-2735c034cb03",
+      "9aadb0f2-90a4-4896-9dcf-581171219db3",
+      "13e494ff-e069-4baf-9c6f-f1b6d4c1a5fa",
+      "1bc13394-6c14-4d05-9414-6cc0e62ab607",
+      "a49c9392-87b5-4392-8a6a-99c687307773",
+      "c955f9e4-c355-44e2-8175-0adf181bc7ed",
+      "5d9787b2-0cb6-43da-a104-1c8ad2fa13f0",
+      "4a55ab25-019f-4dd2-a43c-26332ed03aaf",
+      "68fe795b-1286-4beb-9cdc-01d952e7291c",
+      "040dade7-2766-457c-936e-59f106b001ec",
+      "35df0a68-c331-4bf6-a20f-4a208cdec520",
+      "0a3b0ebf-076b-45b6-8716-89ab60e34944",
+      "80f2726c-c113-4672-bc6c-78188984b787",
+      "091d96e9-b75f-4def-bfe0-f5ea39b91124",
+      "0c4ce76f-dd76-4a5b-86a9-bcbf18d7c889",
+      "1e38ef89-70b8-49f0-930e-721c3e11c1fe",
+      "0ce6985f-8836-4ce1-8fc1-271e67f3d85e",
+      "4df5aaf0-e98b-433c-bcc5-5df1ca1fb761",
+      "299f4c50-15fe-4680-a343-dea0c0d16dc4",
+      "107ae17c-dc48-471a-8443-020e308146bc",
+      "04b0402b-4778-40a2-a718-f224c893c9f5",
+      "4880d61d-f244-4371-a6dd-be15d3dbf1b8",
+      "a7d191a0-87c6-4292-9b0e-56407c68cf35",
+      "0d8341d7-4998-472a-af1b-08d4368c4cba",
+      "5994cd99-8c30-409d-b01f-33bf24c70791",
+      "5cfce0a4-2fcb-491f-aba7-ffdd2667dead",
+      "c46f3636-d6f6-4ced-ad2c-9da5ad39e741",
+      "4a3a1169-ef46-4f59-b12b-b3983a62c922",
+      "5055777e-ff38-44a3-9037-b82bc5ea597a",
+      "b98b4daa-7f5a-4c4c-9d63-45d646d25cfa",
+      "45f80175-a2cd-4f3c-9931-f48ae00f918d",
+      "31450ab6-662b-40e1-97c8-f7eec4ce08bf",
+      "d3085458-9635-4e57-b17d-846561a93e9b",
+      "486c6507-2aeb-4059-b602-dbea1ce5985f",
+      "610199fc-5dc9-49cf-9c1b-6fad0f36d021",
+      "3eeb8dea-2271-46f4-85ee-844fdd683e87",
+      "5d7cf645-6865-4fa8-bce3-78c9f2cf79c2",
+      "a08906f9-f66c-4fcd-bce2-8ecb630bf965",
+      "0d8e5620-b876-4044-ac8a-a37852619f11",
+      "8ff0b4f7-6aee-4c0b-92e1-40e39b3ebd08",
+      "f99d72ee-77cf-4330-aa4d-eb9c03f3d212",
+      "e92b48fa-cc25-46a2-b87e-557b168870f2",
+      "c14255de-3614-4b1c-8924-ee73f002dcb4",
+      "8c9b48ad-8486-4b49-ad23-e15eeb334a83",
+      "d4c64038-1fa2-40a6-a0e0-1dcc189d7e62",
+      "855564ce-fc5e-40c1-911b-f6fc42cbfb7b",
+      "5f04696e-18dc-45bb-9741-42368236a83a",
+      "b1eb5923-21c2-4455-b119-59e9dffeb0e1",
+      "888c50d2-6345-4da3-b6fd-a706e7a37210",
+      "bf0977e3-a9a4-44eb-904b-ff27c5e27815",
+      "442d443b-c86f-42b5-94f4-a9ec836fa76c",
+      "061dfec2-fe66-4321-b036-79e91abc3764",
+      "6c095b24-3f58-4103-b6de-460947230dd3",
+      "596bc102-c3e6-4956-b0bb-9dc251173712",
+      "82c02069-d20a-4687-afb8-2a745498d51f",
+      "3c584f71-716d-4ec6-ac81-c8015d641993",
+      "8c05e4d1-40a4-4a22-bbd5-a40d31f2cbc6",
+      "b7594e70-07d2-4afc-901c-e6d7463b2654",
+      "46a418e5-16a2-4a38-951a-ede3c3cdadb4",
+      "2a91f197-96d2-4db7-8d29-22f7c690a43e",
+      "abaa361f-c767-4890-866b-428e3865e300",
+      "6c07e738-4ef6-4008-84ea-22a56a42390c",
+      "d6e82e64-8486-4a82-a359-ab708eeebe93",
+      "5191a3ef-8a60-437c-9384-c8ba450fa5a8",
+      "8af390fd-c4ef-4f5e-84f8-21128b0aac29",
+      "b67500e0-ac7e-4cd2-8e4e-0668f678b986",
+      "1f4397e6-196c-4164-9964-6f84ebd7658e",
+      "d184603d-24e6-43aa-9995-6e5501a3e07d",
+      "9eadd17f-ffe1-4db3-b1ec-738264792ae9",
+      "360e89b7-4a62-49b8-8dca-c686523df30e",
+      "26ee445e-b4a4-44a4-a263-6fd0faa24c81",
+      "d7763eea-cf80-47f4-b843-b43dabf4d0d0",
+      "e37b64d1-5f4c-4107-8709-08e21b42c410",
+      "85c40464-38f7-4cfd-8ffc-b4f47c0fcbab",
+      "6e0078bc-61cd-444d-9f1f-14ed2716fb9c",
+      "0f668a3f-2fd5-4ec2-a13d-83e0cdccfe12",
+      "46b608dc-7494-427e-ab10-96a17742e48f",
+      "7ede3f2d-2d9c-49ab-9b96-2876eebc224f",
+      "0aac3ec6-55fa-44a2-bc20-6668b834eb7d",
+      "7f05829b-ef4a-4bb1-bfd6-f15df1a69150",
+      "826db758-375d-432f-9740-4f30faafb0f8",
+      "1c25d967-5b66-424f-8078-c1858bee3578",
+      "ee9f7727-1a6c-4ace-bec3-13c0b8e960a9",
+      "ecb96298-3a2d-4b24-a910-a5288c8d5860",
+      "61422c2f-357b-420a-b971-c32451269283",
+      "130330f0-1331-467f-9f2b-bb0701002c2b",
+      "2e1c5a0d-fa3a-469c-962b-2a3893a24279",
+      "587d61c8-0fce-4fa5-bc86-3c02fbb7141c",
+      "ad8d04f8-8e2d-4c61-a564-5942f55710df",
+      "c5137bd4-6ada-4315-9b85-398cbab75352",
+      "8083652e-4e7b-4897-9eb8-7531e2ce0deb",
+      "b78fa05a-6f27-44bd-a05d-b6d8e7c9b659",
+      "bcff2b68-a4b4-4f2b-9b45-b4ee2dd3801f",
+      "97bdcea1-2ee3-4598-9854-125b69ba3e3d",
+      "a7d5a49c-5f74-47e2-af35-eeb629bfdd7c",
+      "9ae71a90-4649-48ce-b84f-3cc4ae122b67",
+      "82b01eb2-e991-4b35-b79f-be9c3d6077ec",
+      "9e86cf93-8c05-477d-9236-d6c18834f72b",
+      "eb503353-79d2-434e-b272-832b3895d3f2",
+      "51be239b-d8ec-4f60-8676-e48e0a28f281",
+      "2d1796ea-fe4b-49fc-a3b0-8bb3d145c8d2",
+      "f0d48fec-867d-448f-99dc-9b640509bb20",
+      "43a5be3e-5419-43cb-b47c-6d7ce2ae768a",
+      "20bbe23e-7c09-40d0-b0b4-996e75cdf88d",
+      "fdef3426-8291-434d-8bfd-fa20bb1bf346",
+      "1cd0bbe3-ae58-4e7f-bfe5-3e3aee5692a8",
+      "4470e3a2-c9e9-47d3-a509-95e25701899b",
+      "d36fb5c3-d8d7-4025-addc-a4a76faa4a70",
+      "72766165-9015-4b67-ae3c-970619a3c808",
+      "8cb94fad-cdc7-48ed-ac31-b8e49288ccd8",
+      "298af4c5-d59b-4111-b3e6-ec04f23f4f93",
+      "8c057ca8-a976-480e-b09e-65eb2c3d71d8",
+      "3dae02e4-5c82-4c29-a6a9-05b280af0f0b",
+      "62892bdf-f711-49f2-898f-4e301a8c7275",
+      "04ac0079-33fc-4063-9b8d-02640cc9010b",
+      "71d569bb-4d03-4153-8ae7-d4f59659cafe",
+      "1bbdb165-ba6f-4123-9473-d532be251895",
+      "f627715a-240f-4d8c-9844-ff2df1d4792a",
+      "8e0ee350-660c-4b2a-a82a-0e36496c0a72",
+      "d22e86db-3cc3-4f6a-9d93-e5a04682ab39",
+      "bc869f62-a7f0-4940-ac59-efb2a1a21738",
+      "9e21bfd0-98ab-4e3a-9cca-c951156bef1f",
+      "d943ebf3-fb9b-4e49-805a-7e87f527abc6",
+      "b436f02e-ccce-463c-9ed9-1ee497a10ac5",
+      "fa1281f6-6772-4717-b22b-4f37247593c4",
+      "c9122e67-0478-4177-b3d2-028766bb5d56",
+      "fdcc166a-8ef0-418f-9b59-1e8581fe5f56",
+      "99994935-85b5-444f-b79c-5ab7f98f54a5",
+      "aa6e5608-2518-46b2-be60-cbe95bee2f4a",
+      "4f6c2804-38a2-4e20-a176-68b4f12df4e4",
+      "3f0f12e4-2376-4539-89f1-aa3f461a4f32",
+      "25efc8ee-dbc2-485a-9e74-2ba3fa96401a",
+      "88ecf955-2bd3-4a0e-8c9d-4fc63e4926da",
+      "df60dcac-e0ed-423b-9999-5cf6abd5f210",
+      "6eaebe41-c5b4-4091-8068-c442cbf1a3e0",
+      "9f264333-98bc-4774-8936-835e26591028",
+      "fa3a8176-b2f1-483c-a1f2-66bb7318579d",
+      "41583b45-bf00-4bf1-9e1f-34c103672333",
+      "37a25e46-2dd3-4c1f-8e79-01d93fc186d7",
+      "d79957bc-a33d-435d-8cec-00729d0d37da",
+      "92020340-2a29-4c0b-99a5-81d011ffc04b",
+      "241046ee-9b27-43f3-9d4d-aa35865953e5",
+      "e7a085bb-1dfa-4201-9a58-0a3051c8b416",
+      "395aacbf-f84d-47f7-835a-0e4543d3b406",
+      "983223c5-4d1a-4673-92f5-bd0e6980f485",
+      "bfdedbec-d480-4f99-9252-d86405f13427",
+      "0ea92f66-1fab-424b-a24c-9b31d79b7d17",
+      "294281a3-59c8-4556-919d-43976b23fe8c",
+      "d2877bac-25aa-4336-a4a9-6464b1976e96",
+      "0715ba72-1cd2-4eed-8241-5ebceef7680d",
+      "dd08419b-0cc3-4880-b466-15f8e6959894",
+      "8eca72d5-f767-475b-b3f8-c4c7111eb431",
+      "294e7aa5-c066-4f18-aaf8-d1908e9540d8",
+      "14f8df8e-ece2-4520-8f6e-2c14e0edb839",
+      "6e297a65-6e20-4e58-8af5-61a8af813aaf",
+      "27954e7c-be40-4a36-940d-547434fc392a",
+      "590fb4c4-e423-4804-81af-4c5753c8d374",
+      "6a84fcb7-53e3-479d-bfb2-5166a6eaac05",
+      "c6f2b981-c125-4176-9090-68d3560f5a72",
+      "87eaa850-25f0-492e-901b-427e16ffb6e6",
+      "fc95b548-3800-45a5-80ec-9622a3fce106",
+      "2792909b-26c3-4cf5-913e-fc2ce4583f43",
+      "4e290325-d3a0-4d29-bc0e-34165b67dd49",
+      "cd612571-6e64-4497-8fa8-759670540b0d",
+      "1070b1f1-d88c-43b7-9e8e-395a4ef23b22",
+      "d1acfc91-52d5-471b-affb-ea12b95933de",
+      "4dbeb721-5153-485c-a42f-6e3685d38f7d",
+      "781fa1d4-46c2-42cf-a5e1-a4d5741bc322",
+      "056b8161-5d25-43a2-a59f-e0c07842e16b",
+      "5a58a8f4-071c-4500-8939-9766f4209946",
+      "0e303f62-73bc-4b4c-b9e3-90df16b90a16",
+      "04595e9f-a68c-4a60-9688-c38eaae65c41",
+      "d0c14215-b50e-4f6f-b73e-3affa95f2161",
+      "2c120928-6d6c-42a1-b30e-238bead1589d",
+      "a3a4d3f7-106a-4c00-8ee5-c0d4d99c9982",
+      "7c5fa0d5-2901-473e-9cc8-38fd126a813e",
+      "9260a766-a2d8-4a2e-9b26-79e167737906",
+      "e19399f1-c304-41bf-8629-fac55ce5d9d8",
+      "1f120955-ef28-47d1-99f1-7466da9dba71",
+      "7310223f-5818-422a-99b0-9f3f9ff893cf",
+      "23d591fd-3eac-41f8-8426-df4f04cfb22a",
+      "007414fa-396f-46e3-bd38-d6c8ac13d4ef",
+      "800093ea-9e83-477f-82d9-0b4d5e403df1",
+      "c57fc232-273d-42a3-8f60-b567a5c46a0c",
+      "6cc2ee3f-d349-4b5d-926c-b30da2579b1f",
+      "7f6db952-6d0e-4306-83ac-497ee16b9d04",
+      "5b55985f-93c1-43e1-a42f-c8957d7d7926",
+      "9f0628c1-f8b8-4bd9-91f5-d90675389e36",
+      "f141e77f-fa7a-4af6-96dc-7a2bc54fb3f6",
+      "a0190aef-34e1-495f-8fae-8d864dc6b89c",
+      "e9a2a1ff-9d92-49ec-8d16-406f3fd13e7e",
+      "086b9fa6-e06d-47d4-a4db-eb8f25c4df61",
+      "67567f34-45af-4a51-8b5e-57bd32722261",
+      "f4466b80-6545-4b19-95a4-408625449ee0",
+      "3880d705-7e01-44d9-984f-c8dd726f044c",
+      "f1736101-6961-4bd8-815f-d046f7097c37",
+      "73613a5a-4e07-492d-81c1-5657d322d094",
+      "bc875509-9e37-4c70-8773-6c5021579456",
+      "0726d622-cf01-4daa-b96c-20b651302b28",
+      "ff2ee26d-7413-41c5-8275-054460b2cf38",
+      "3cbb8415-fd45-4a11-919d-07ca9f3fb410",
+      "1b346fd4-440e-4016-bbde-fcf7ae75e0c0",
+      "6eca848c-f5fa-4793-8be3-cad34d05c677",
+      "c1cccc45-4c87-4817-a5b1-173aaef49b25",
+      "663996c4-fa3c-49ac-a784-e830d1acb429",
+      "46cb7a2c-234d-458d-bd77-389d6d01b515",
+      "ecfb1cf6-0a31-4031-9e7d-64e77a39b854",
+      "c4f48a02-0d14-40fd-914e-2f55eb8fa863",
+      "51ee3a7f-96b6-4475-a690-06ddaae82e5e",
+      "5c8fc9c4-9b0e-4103-94e9-3e1b79561377",
+      "3f452b59-a2da-442f-9bd2-bed8d5d4a1be",
+      "a022183e-04c6-45ec-baab-2d9e50047361",
+      "c38e1783-7595-4cea-8f6f-1af1a113715f",
+      "a66868f9-8b99-4bd8-b04b-11627af45802",
+      "a95eee2f-a765-425b-8e93-c61bbb11937a",
+      "a275c586-3d24-4bab-a30a-e681e8cd0d79",
+      "05eac371-8f4a-497b-8089-6cac24293ae6",
+      "025c5847-e3c7-4328-bf43-719d5bc99ae5",
+      "f8a6ccbe-56ef-47f4-aee3-7a0a97783d64",
+      "4195007b-bbcf-4d5a-8d41-7fee22af242e",
+      "e5f74002-f572-4f83-abf1-6c54d041efd1",
+      "4f630d9e-6913-4143-9f0b-3940b2d71ada",
+      "42b4e93a-fe6a-437c-bc91-add66af7143a",
+      "9f2f68c5-9e9b-434c-b0ba-cc7d935f3a6d",
+      "ab7348ed-b3a9-4ebf-84de-7470734ee981",
+      "ec51fe48-b544-43d0-8f81-50ce2b0f9aa9",
+      "569dbab6-315f-401e-bda0-829c7556172a",
+      "a0491184-f223-4648-9c5d-24b3fdd460ea",
+      "e72a3747-b02d-4321-9170-356c3801975b",
+      "d70654e9-eeb3-412a-ba32-0b738e216553",
+      "f09c3357-02e7-47c2-938f-66c3d459b846",
+      "44637e2f-fd36-473c-a85c-aab4806229de",
+      "50b88f57-5dc7-49e4-a08f-9a24901829c5"
+    ],
+    "entryCount": 434,
+    "checksum": "sha256:e29aa936955837a333f589e77ddfa561219d28e1205a6796eb28250ebc4dda3c"
+  },
+  "verdict": "REPLAY_IDEMPOTENT_PROVEN",
+  "results": [
+    {
+      "proposedPointId": "44323000-991b-4c0c-885c-e5bb0dddf759",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "da3ef140-a26c-462b-9a91-3a5eb92ebea9",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "d5a127c5-50e8-43ff-9e73-20daf9c7d74f",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "bf592df3-d614-4010-a46d-b73552d67c2c",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "acf26812-90f9-4557-89ba-02e22eff5859",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "b3613106-8888-4b0f-a339-27a512dd3ec7",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "6a0a2687-50e0-4452-ac49-db6f09f8e295",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "339c99a3-e2bd-4dc4-8b4b-1ed15ba2cac0",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "cbe694c9-a3c7-4ada-836c-1de67da13f3b",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "628571a4-1692-4845-b066-f5c7c7e262e2",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "0dd01d6b-72f4-427f-9fac-3fa07bda28ef",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "c170888f-9ee2-43b3-b046-19c847dd882b",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "dd86f630-afbf-44c5-9796-de1a5ae5b5b5",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "735da89e-8076-42d5-80ba-b862b09cc3d0",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "c60f516c-fecb-4cfc-981d-657c4ffbbba7",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "6491253c-39a7-4b9f-a2ea-88fabab4c40b",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "e8e1c989-6892-4ceb-a394-7e52dfd78f9a",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "77793c1c-76dc-4361-b8fe-32a2ba12e5b3",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "f26e3e18-f4f9-4520-ab02-f079d50b3445",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "157b2529-9acb-4d88-92c1-a8c6ded6af3d",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "8eff36ed-1533-4f8b-a283-aa64bba998be",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "cad7e75e-0bb3-471a-9d6e-61741256b60b",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "2ff5df80-a600-434b-a448-b8561e9d40b1",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "f871819b-6b78-40ec-9ee4-d4ff2ab8e6e9",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "7639cc53-6b27-4234-84fb-b1ed0dc6ddec",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "66016bb3-8881-49ef-acc9-e4930b838eea",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "9fe44aaf-2bbb-4ffc-9ad8-811bd9e807c0",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "dd9f92c7-e3c8-477b-8fb4-8bf17fa9f166",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "443b5c6b-23f6-4c3f-a2f5-9d0ab4377c47",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "7b9802cb-7fb9-4c38-a423-8cbf88215e77",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "5a0ba200-c129-46c0-aa46-e89ec852fe1b",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "8e242775-05f5-48c5-ad60-35298e4a736e",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "ae3a5d9e-1f07-457b-bda0-184eb50a0c49",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "32b7e7a0-6a13-4ad5-8505-218bfb79edb1",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "81b3ee97-c3cf-49a5-9a68-754f2e8d5a8b",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "3d2f9e8d-45ae-4ad0-8b72-06c6d91c45fb",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "d61b76c2-84b1-44c6-a656-f09a9cadb042",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "e5941b5d-eb7f-4933-9ab5-8a53f992b19f",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "e033a553-722e-472f-852c-be1ca022c1ea",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "fae89108-06e3-47b3-ae71-c0e8ab74b406",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "06fa3310-0d50-47f5-bd37-3a2f0bcd6e58",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "e32459d0-e3db-4c40-88b3-df120be2e658",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "fdb3f639-ace8-40a8-b0a1-0c7d87610778",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "dff2cdc8-6b94-4dee-a7c8-9b0c8b008882",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "ad3466fd-7c6a-4e3f-b0a4-b9892908ffb3",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "a814001b-21f4-42b9-9fc0-569347cd0570",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "88fbda5b-9264-46a5-9123-38272f27c8ea",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "869cab81-9008-4b6a-8094-22d92e3dcf82",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "bf7a03ba-949b-4663-a6cd-05273b422b6b",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "9188e79d-be50-43c8-8477-88798bd6c664",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "3e062df3-c29a-41f4-92ea-60bb2c90410d",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "1c76c109-caa5-4c70-a406-3d78ab4bfc6c",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "979af765-dc32-4b9e-a632-d182fcc89415",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "e7e9f532-95c3-4f47-8f52-08ce968e57cf",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "2b5e379a-23ca-4ed6-b854-8214acf48025",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "0511c854-a3c6-4d93-adc4-74038ec47e59",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "518df7da-014b-4142-96d3-748dea341719",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "fa7e8910-7286-49b4-a1fe-f7017a24ca83",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "4dc6e086-2783-407f-8042-e40229ff3614",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "21ca4c15-7907-4d04-8129-0303d3303586",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "d9f76dc5-b1a5-4e0f-89d1-a6a3753af3dc",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "89b387f9-1fec-49e3-9c92-4a77a5da77c8",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "6f2ecefd-efe8-426f-b89f-c0f5aca32d32",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "11581ea0-6272-4ccd-afb8-858f936e4149",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "438ab84e-de4b-4b44-9e41-8b31fd4238ed",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "c707cfe0-88cb-421b-9115-b085255f8737",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "b53c8375-c9d5-4bdc-aaf1-f2229c263f75",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "91bd1d2e-aaf7-4001-93db-79bd0b14a5f0",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "0803c6a6-9f75-4376-b5b0-67909de1144b",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "d647da1d-76a0-4aaa-80f1-dae85eea0c76",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "2918dce4-fcd1-4ae3-8472-9a19fe4ded0b",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "fae2d121-03a2-426b-ad0d-735a093ccca1",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "6d570520-23be-44a8-89ce-31e5ef75feed",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "6ece0d13-e686-45ba-ad59-d22cf4396587",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "49f8505a-fb87-49ce-b431-f01591f05edd",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "98399073-5443-4261-b6bc-ba9951a9b895",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "1ebddc93-1877-4a42-b798-0ff15b2ddf6c",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "db1182be-2576-49e2-ab0e-8d75e673b5e5",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "3fec84fe-cdf0-435b-a67d-e4f4eab23b1c",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "f06e28f5-5ea1-4266-8e9f-16ccc35569ac",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "3d822379-9600-41db-adaf-b9f6a5b87892",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "e3a21b94-1e68-4c9c-a854-cb548264b437",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "d0d0486a-c24f-48d4-9fc0-0d4074d92e0d",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "3235732c-56df-4d72-9d43-4e43ad7efc99",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "207b6a4e-f74e-4567-994d-dd9e007231eb",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "dd2858bf-9052-4d8d-8050-31178ead325d",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "acb0d002-74f9-4da3-95ed-eaf88c1df83a",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "5a722f16-3f1b-44ff-b9be-909ec117e920",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "3ea83c8e-269d-4507-a856-0638be5fdb69",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "1468542a-e7c0-416c-a6f5-2847f19dfb3b",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "2a9f2faf-2f82-4bde-9463-25483665b43d",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "280b0188-c2ed-4c2a-a476-110379f1ebf0",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "e2c11003-3170-420c-a179-2a9ada211915",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "ca5cc057-8d20-44f1-9c36-b53ebd5cf212",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "86f92bf0-0a11-4001-9fc2-ae3aabc1cc31",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "7d5be9c4-b58b-443f-80f6-097a27455624",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "a18d787c-4b99-45f9-a06d-aa40bf5ea63f",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "c9ea5616-474d-4f52-a8e7-eda1a2022b70",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "2da3f96a-27bc-4543-a224-539a92f99754",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "81283621-08b9-4868-a710-c72b8d4b1699",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "6d9b2e94-5dd6-49fe-a1ff-336fc8478b67",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "cd847e35-2052-466a-8e8d-efb04356e1f3",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "42862028-93a9-4eef-9866-f1670fd53016",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "679ab1cc-daa8-42c7-9f6b-baaebde2bb4e",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "06b52ebd-35a0-4bc6-9b83-0284298748e9",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "ba77fba6-8ff0-4659-abca-39bf3deb5689",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "b26a50cf-a027-45d0-8e89-d532b7439026",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "b45b64f3-1e07-47af-87e3-393e08840645",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "9a50e2c5-6bb2-4a97-90be-ad51b3b6ceb6",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "1370f559-7f69-4ef0-9284-41497c32a3be",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "b25a861a-6471-4da7-a63a-66eda0eb2a09",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "71bf1943-82ca-4170-805c-703ab754bea4",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "9876252c-59f2-45e9-b77e-7f2cdd02cd73",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "1a6eb334-17ea-429a-a55c-fcb40b80e3f6",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "356b1594-1df1-47f7-93b6-1065e6a04ed8",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "289b492f-f719-418e-9838-d2f6ed41c817",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "97a6ae50-c6d0-41f2-a73a-fbae075aa8c5",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "c9693bd6-56d5-4cd0-8847-c3aa921483e7",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "6775afaf-6904-4ace-8fed-3f6c6ddc3268",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "afe6f147-94f1-4128-b97a-3a4800779352",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "7d94411a-c2ca-4ab3-84fe-41794edcb592",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "c085ec2e-4674-4223-ac4b-b1adef46dd72",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "826aa0b5-219c-4231-84c8-1a2f1ad18acf",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "3c6419d5-d1ce-4035-9f48-4be15e9738d3",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "f887a2a9-ba6a-4398-a7af-14ad4eecadd9",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "6101728d-08e3-4c62-89d1-0070ca358c46",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "fc78a462-fe1f-4717-91d3-4c88ea4a8499",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "aac4cf7a-f509-43f5-8aa4-43f5e6f3e1ad",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "f7403845-2795-438c-a50a-557ddac4faf2",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "277d8725-9bdf-4ad6-a1ab-8c2907ffb194",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "16a4d43c-3a2f-42b4-9d58-3eaa5d430f3c",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "95a93ade-5a95-433e-95ba-58619f9f3a11",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "311fd5ee-ea47-4e2e-b17d-0dec9f0bc98f",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "c97525ee-7dd4-4fcb-8398-b13b2e9b848b",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "c1df0ebd-f486-464d-99fe-aaf5971f7b3d",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "2d2c327c-33c8-4a7b-b6a5-c4aced292141",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "7643d2c0-6392-4593-a04a-10e4c987806c",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "3d664a95-762b-4450-a3d7-e2e902fcf3b0",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "b3c0d18d-c7cb-4b56-ac2e-8a98bdf36f8a",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "5b437424-3214-4f1b-938a-8ca763a99bfd",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "00fb0ef7-b5ca-4ead-9d07-e2391ae2f84c",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "2d67a756-eb45-44fd-9cb5-55546830b20a",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "00efbb8a-a481-4171-a415-67ab912afa9f",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "8593016b-3b59-4454-8ae9-018fef581963",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "8935cfc2-5c50-427a-aaa9-6433e1337579",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "17abab33-f4ae-43a9-9640-668f4e1a831a",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "f1dacd98-2f44-4e5a-a8ef-cdded67ce891",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "80f41a0b-53dc-40c1-b853-f97ac7673b10",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "e88584f8-ff89-476b-97b2-76f38f8244be",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "d4e0edb4-2cc2-45b0-a927-9fa789a1c85f",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "d2768b96-febf-4d5f-ab2c-22a93a618b1a",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "91cc1fc2-23d1-460f-aab6-05aabb75f8ef",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "47ec904c-8888-4bd3-9fde-7ff19c4eef11",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "93c1d11b-00b1-4baf-b6fb-9f7001502675",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "478c6abe-d4e5-4aca-b593-3649212b2e7f",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "9faf46b6-c00e-4a0d-9c0b-c5bd251308e1",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "dc2d1bba-5d0b-4041-acf6-0d4654f8b863",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "3535b7e3-91ec-4e24-b984-24bea407e9cf",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "c7bdd96a-cb4e-4c97-9799-c0e4ed665df1",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "78adc099-85a6-4c7a-8e1d-12d635d1d675",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "3e9e27d0-9012-457d-8fb7-2061ca6b68c4",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "40688bc3-fa59-4493-b65c-3b9d0769ead2",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "285c8edd-bd92-48a0-8cd9-7fcc669ad20b",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "8924237c-679d-4322-b1cc-d8e9ea81929a",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "bce08126-a55a-4cb1-9663-16401700e090",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "056bc946-56dd-463b-865a-a56bec4c4eb9",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "6abf5449-9806-4aa7-b8c0-0e70a656a06c",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "96181162-2325-479b-bcd6-e02789913e4d",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "49da4732-2209-4142-9ad7-dfc8bbeb8a8c",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "79af6dee-f794-4d17-890a-04cc74c4063a",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "4ba616ac-db93-4245-80e0-10f357dad2e9",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "d26d0e6e-2dfb-4196-ae66-994316b16e0d",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "4c3435c4-0420-45f7-9d3e-75a14b8cf52d",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "928f92ce-39e6-479c-bc90-b2dfe7a1b922",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "67fb38d7-c8dd-4fbf-8e58-443b26ff8e55",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "359eec67-69e0-478c-ba52-d249da14fd46",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "1dcc4ab2-332f-492b-b57f-2a4ec5b7fd73",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "4e79a7a0-fbfb-48c1-bfb5-5ab3f0eb3e90",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "92596aca-5d08-4c17-aa49-dbf057d52deb",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "b2c20d79-1294-464a-b166-ffa4b4316451",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "439b1c5d-2c3e-45ad-9acd-df7512b78919",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "0153b6ef-7674-4ca6-b0c2-95de8092a1d7",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "be026a9c-3e9d-4042-914c-e252a137feaf",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "4566158a-18b2-4bed-a402-f3313c54a137",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "135f11ad-8ec7-4306-8750-d35b324e1650",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "0b12fd22-54ff-45ed-bbbe-e2571ae99364",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "8021c74f-4620-40b8-bd70-52e5741293e9",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "94f82d8b-c132-459a-a5e1-8ab3ed201d68",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "fbf2dc58-2616-4b3b-884a-c0f81c7b7816",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "774fbd8d-9c2c-468f-add3-7d2d0e7af8a7",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "4c34f208-6bff-4321-ae5a-875f6bc30b23",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "782c2015-65b9-4ebd-9080-1a7f66e10fa0",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "327aba19-87d5-4542-be82-54293579cfba",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "5e5e9e12-47ca-4a62-a01c-cdc7b2806df3",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "b641335e-255d-42e7-81da-7cfa6859370f",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "50cdc617-a984-4b9f-95cd-c7d96a2906db",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "2a41f4d8-2522-415c-8ca0-55c772bd97b1",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "225fec51-6fe0-41d7-a03a-de428e57907d",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "84073045-581d-406f-8940-11d8eadad253",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "c5f94f99-2305-4b29-b6fc-2761a70dc132",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "49b8fe96-3c95-42cd-af00-f74cf5644741",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "affdb999-3dc5-47fb-836f-2735c034cb03",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "9aadb0f2-90a4-4896-9dcf-581171219db3",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "13e494ff-e069-4baf-9c6f-f1b6d4c1a5fa",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "1bc13394-6c14-4d05-9414-6cc0e62ab607",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "a49c9392-87b5-4392-8a6a-99c687307773",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "c955f9e4-c355-44e2-8175-0adf181bc7ed",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "5d9787b2-0cb6-43da-a104-1c8ad2fa13f0",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "4a55ab25-019f-4dd2-a43c-26332ed03aaf",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "68fe795b-1286-4beb-9cdc-01d952e7291c",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "040dade7-2766-457c-936e-59f106b001ec",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "35df0a68-c331-4bf6-a20f-4a208cdec520",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "0a3b0ebf-076b-45b6-8716-89ab60e34944",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "80f2726c-c113-4672-bc6c-78188984b787",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "091d96e9-b75f-4def-bfe0-f5ea39b91124",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "0c4ce76f-dd76-4a5b-86a9-bcbf18d7c889",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "1e38ef89-70b8-49f0-930e-721c3e11c1fe",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "0ce6985f-8836-4ce1-8fc1-271e67f3d85e",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "4df5aaf0-e98b-433c-bcc5-5df1ca1fb761",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "299f4c50-15fe-4680-a343-dea0c0d16dc4",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "107ae17c-dc48-471a-8443-020e308146bc",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "04b0402b-4778-40a2-a718-f224c893c9f5",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "4880d61d-f244-4371-a6dd-be15d3dbf1b8",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "a7d191a0-87c6-4292-9b0e-56407c68cf35",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "0d8341d7-4998-472a-af1b-08d4368c4cba",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "5994cd99-8c30-409d-b01f-33bf24c70791",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "5cfce0a4-2fcb-491f-aba7-ffdd2667dead",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "c46f3636-d6f6-4ced-ad2c-9da5ad39e741",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "4a3a1169-ef46-4f59-b12b-b3983a62c922",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "5055777e-ff38-44a3-9037-b82bc5ea597a",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "b98b4daa-7f5a-4c4c-9d63-45d646d25cfa",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "45f80175-a2cd-4f3c-9931-f48ae00f918d",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "31450ab6-662b-40e1-97c8-f7eec4ce08bf",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "d3085458-9635-4e57-b17d-846561a93e9b",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "486c6507-2aeb-4059-b602-dbea1ce5985f",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "610199fc-5dc9-49cf-9c1b-6fad0f36d021",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "3eeb8dea-2271-46f4-85ee-844fdd683e87",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "5d7cf645-6865-4fa8-bce3-78c9f2cf79c2",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "a08906f9-f66c-4fcd-bce2-8ecb630bf965",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "0d8e5620-b876-4044-ac8a-a37852619f11",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "8ff0b4f7-6aee-4c0b-92e1-40e39b3ebd08",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "f99d72ee-77cf-4330-aa4d-eb9c03f3d212",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "e92b48fa-cc25-46a2-b87e-557b168870f2",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "c14255de-3614-4b1c-8924-ee73f002dcb4",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "8c9b48ad-8486-4b49-ad23-e15eeb334a83",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "d4c64038-1fa2-40a6-a0e0-1dcc189d7e62",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "855564ce-fc5e-40c1-911b-f6fc42cbfb7b",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "5f04696e-18dc-45bb-9741-42368236a83a",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "b1eb5923-21c2-4455-b119-59e9dffeb0e1",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "888c50d2-6345-4da3-b6fd-a706e7a37210",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "bf0977e3-a9a4-44eb-904b-ff27c5e27815",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "442d443b-c86f-42b5-94f4-a9ec836fa76c",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "061dfec2-fe66-4321-b036-79e91abc3764",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "6c095b24-3f58-4103-b6de-460947230dd3",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "596bc102-c3e6-4956-b0bb-9dc251173712",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "82c02069-d20a-4687-afb8-2a745498d51f",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "3c584f71-716d-4ec6-ac81-c8015d641993",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "8c05e4d1-40a4-4a22-bbd5-a40d31f2cbc6",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "b7594e70-07d2-4afc-901c-e6d7463b2654",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "46a418e5-16a2-4a38-951a-ede3c3cdadb4",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "2a91f197-96d2-4db7-8d29-22f7c690a43e",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "abaa361f-c767-4890-866b-428e3865e300",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "6c07e738-4ef6-4008-84ea-22a56a42390c",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "d6e82e64-8486-4a82-a359-ab708eeebe93",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "5191a3ef-8a60-437c-9384-c8ba450fa5a8",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "8af390fd-c4ef-4f5e-84f8-21128b0aac29",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "b67500e0-ac7e-4cd2-8e4e-0668f678b986",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "1f4397e6-196c-4164-9964-6f84ebd7658e",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "d184603d-24e6-43aa-9995-6e5501a3e07d",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "9eadd17f-ffe1-4db3-b1ec-738264792ae9",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "360e89b7-4a62-49b8-8dca-c686523df30e",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "26ee445e-b4a4-44a4-a263-6fd0faa24c81",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "d7763eea-cf80-47f4-b843-b43dabf4d0d0",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "e37b64d1-5f4c-4107-8709-08e21b42c410",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "85c40464-38f7-4cfd-8ffc-b4f47c0fcbab",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "6e0078bc-61cd-444d-9f1f-14ed2716fb9c",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "0f668a3f-2fd5-4ec2-a13d-83e0cdccfe12",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "46b608dc-7494-427e-ab10-96a17742e48f",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "7ede3f2d-2d9c-49ab-9b96-2876eebc224f",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "0aac3ec6-55fa-44a2-bc20-6668b834eb7d",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "7f05829b-ef4a-4bb1-bfd6-f15df1a69150",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "826db758-375d-432f-9740-4f30faafb0f8",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "1c25d967-5b66-424f-8078-c1858bee3578",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "ee9f7727-1a6c-4ace-bec3-13c0b8e960a9",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "ecb96298-3a2d-4b24-a910-a5288c8d5860",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "61422c2f-357b-420a-b971-c32451269283",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "130330f0-1331-467f-9f2b-bb0701002c2b",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "2e1c5a0d-fa3a-469c-962b-2a3893a24279",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "587d61c8-0fce-4fa5-bc86-3c02fbb7141c",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "ad8d04f8-8e2d-4c61-a564-5942f55710df",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "c5137bd4-6ada-4315-9b85-398cbab75352",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "8083652e-4e7b-4897-9eb8-7531e2ce0deb",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "b78fa05a-6f27-44bd-a05d-b6d8e7c9b659",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "bcff2b68-a4b4-4f2b-9b45-b4ee2dd3801f",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "97bdcea1-2ee3-4598-9854-125b69ba3e3d",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "a7d5a49c-5f74-47e2-af35-eeb629bfdd7c",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "9ae71a90-4649-48ce-b84f-3cc4ae122b67",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "82b01eb2-e991-4b35-b79f-be9c3d6077ec",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "9e86cf93-8c05-477d-9236-d6c18834f72b",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "eb503353-79d2-434e-b272-832b3895d3f2",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "51be239b-d8ec-4f60-8676-e48e0a28f281",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "2d1796ea-fe4b-49fc-a3b0-8bb3d145c8d2",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "f0d48fec-867d-448f-99dc-9b640509bb20",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "43a5be3e-5419-43cb-b47c-6d7ce2ae768a",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "20bbe23e-7c09-40d0-b0b4-996e75cdf88d",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "fdef3426-8291-434d-8bfd-fa20bb1bf346",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "1cd0bbe3-ae58-4e7f-bfe5-3e3aee5692a8",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "4470e3a2-c9e9-47d3-a509-95e25701899b",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "d36fb5c3-d8d7-4025-addc-a4a76faa4a70",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "72766165-9015-4b67-ae3c-970619a3c808",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "8cb94fad-cdc7-48ed-ac31-b8e49288ccd8",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "298af4c5-d59b-4111-b3e6-ec04f23f4f93",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "8c057ca8-a976-480e-b09e-65eb2c3d71d8",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "3dae02e4-5c82-4c29-a6a9-05b280af0f0b",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "62892bdf-f711-49f2-898f-4e301a8c7275",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "04ac0079-33fc-4063-9b8d-02640cc9010b",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "71d569bb-4d03-4153-8ae7-d4f59659cafe",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "1bbdb165-ba6f-4123-9473-d532be251895",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "f627715a-240f-4d8c-9844-ff2df1d4792a",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "8e0ee350-660c-4b2a-a82a-0e36496c0a72",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "d22e86db-3cc3-4f6a-9d93-e5a04682ab39",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "bc869f62-a7f0-4940-ac59-efb2a1a21738",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "9e21bfd0-98ab-4e3a-9cca-c951156bef1f",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "d943ebf3-fb9b-4e49-805a-7e87f527abc6",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "b436f02e-ccce-463c-9ed9-1ee497a10ac5",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "fa1281f6-6772-4717-b22b-4f37247593c4",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "c9122e67-0478-4177-b3d2-028766bb5d56",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "fdcc166a-8ef0-418f-9b59-1e8581fe5f56",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "99994935-85b5-444f-b79c-5ab7f98f54a5",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "aa6e5608-2518-46b2-be60-cbe95bee2f4a",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "4f6c2804-38a2-4e20-a176-68b4f12df4e4",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "3f0f12e4-2376-4539-89f1-aa3f461a4f32",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "25efc8ee-dbc2-485a-9e74-2ba3fa96401a",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "88ecf955-2bd3-4a0e-8c9d-4fc63e4926da",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "df60dcac-e0ed-423b-9999-5cf6abd5f210",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "6eaebe41-c5b4-4091-8068-c442cbf1a3e0",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "9f264333-98bc-4774-8936-835e26591028",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "fa3a8176-b2f1-483c-a1f2-66bb7318579d",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "41583b45-bf00-4bf1-9e1f-34c103672333",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "37a25e46-2dd3-4c1f-8e79-01d93fc186d7",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "d79957bc-a33d-435d-8cec-00729d0d37da",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "92020340-2a29-4c0b-99a5-81d011ffc04b",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "241046ee-9b27-43f3-9d4d-aa35865953e5",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "e7a085bb-1dfa-4201-9a58-0a3051c8b416",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "395aacbf-f84d-47f7-835a-0e4543d3b406",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "983223c5-4d1a-4673-92f5-bd0e6980f485",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "bfdedbec-d480-4f99-9252-d86405f13427",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "0ea92f66-1fab-424b-a24c-9b31d79b7d17",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "294281a3-59c8-4556-919d-43976b23fe8c",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "d2877bac-25aa-4336-a4a9-6464b1976e96",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "0715ba72-1cd2-4eed-8241-5ebceef7680d",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "dd08419b-0cc3-4880-b466-15f8e6959894",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "8eca72d5-f767-475b-b3f8-c4c7111eb431",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "294e7aa5-c066-4f18-aaf8-d1908e9540d8",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "14f8df8e-ece2-4520-8f6e-2c14e0edb839",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "6e297a65-6e20-4e58-8af5-61a8af813aaf",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "27954e7c-be40-4a36-940d-547434fc392a",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "590fb4c4-e423-4804-81af-4c5753c8d374",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "6a84fcb7-53e3-479d-bfb2-5166a6eaac05",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "c6f2b981-c125-4176-9090-68d3560f5a72",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "87eaa850-25f0-492e-901b-427e16ffb6e6",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "fc95b548-3800-45a5-80ec-9622a3fce106",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "2792909b-26c3-4cf5-913e-fc2ce4583f43",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "4e290325-d3a0-4d29-bc0e-34165b67dd49",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "cd612571-6e64-4497-8fa8-759670540b0d",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "1070b1f1-d88c-43b7-9e8e-395a4ef23b22",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "d1acfc91-52d5-471b-affb-ea12b95933de",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "4dbeb721-5153-485c-a42f-6e3685d38f7d",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "781fa1d4-46c2-42cf-a5e1-a4d5741bc322",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "056b8161-5d25-43a2-a59f-e0c07842e16b",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "5a58a8f4-071c-4500-8939-9766f4209946",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "0e303f62-73bc-4b4c-b9e3-90df16b90a16",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "04595e9f-a68c-4a60-9688-c38eaae65c41",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "d0c14215-b50e-4f6f-b73e-3affa95f2161",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "2c120928-6d6c-42a1-b30e-238bead1589d",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "a3a4d3f7-106a-4c00-8ee5-c0d4d99c9982",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "7c5fa0d5-2901-473e-9cc8-38fd126a813e",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "9260a766-a2d8-4a2e-9b26-79e167737906",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "e19399f1-c304-41bf-8629-fac55ce5d9d8",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "1f120955-ef28-47d1-99f1-7466da9dba71",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "7310223f-5818-422a-99b0-9f3f9ff893cf",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "23d591fd-3eac-41f8-8426-df4f04cfb22a",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "007414fa-396f-46e3-bd38-d6c8ac13d4ef",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "800093ea-9e83-477f-82d9-0b4d5e403df1",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "c57fc232-273d-42a3-8f60-b567a5c46a0c",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "6cc2ee3f-d349-4b5d-926c-b30da2579b1f",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "7f6db952-6d0e-4306-83ac-497ee16b9d04",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "5b55985f-93c1-43e1-a42f-c8957d7d7926",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "9f0628c1-f8b8-4bd9-91f5-d90675389e36",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "f141e77f-fa7a-4af6-96dc-7a2bc54fb3f6",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "a0190aef-34e1-495f-8fae-8d864dc6b89c",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "e9a2a1ff-9d92-49ec-8d16-406f3fd13e7e",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "086b9fa6-e06d-47d4-a4db-eb8f25c4df61",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "67567f34-45af-4a51-8b5e-57bd32722261",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "f4466b80-6545-4b19-95a4-408625449ee0",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "3880d705-7e01-44d9-984f-c8dd726f044c",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "f1736101-6961-4bd8-815f-d046f7097c37",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "73613a5a-4e07-492d-81c1-5657d322d094",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "bc875509-9e37-4c70-8773-6c5021579456",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "0726d622-cf01-4daa-b96c-20b651302b28",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "ff2ee26d-7413-41c5-8275-054460b2cf38",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "3cbb8415-fd45-4a11-919d-07ca9f3fb410",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "1b346fd4-440e-4016-bbde-fcf7ae75e0c0",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "6eca848c-f5fa-4793-8be3-cad34d05c677",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "c1cccc45-4c87-4817-a5b1-173aaef49b25",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "663996c4-fa3c-49ac-a784-e830d1acb429",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "46cb7a2c-234d-458d-bd77-389d6d01b515",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "ecfb1cf6-0a31-4031-9e7d-64e77a39b854",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "c4f48a02-0d14-40fd-914e-2f55eb8fa863",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "51ee3a7f-96b6-4475-a690-06ddaae82e5e",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "5c8fc9c4-9b0e-4103-94e9-3e1b79561377",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "3f452b59-a2da-442f-9bd2-bed8d5d4a1be",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "a022183e-04c6-45ec-baab-2d9e50047361",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "c38e1783-7595-4cea-8f6f-1af1a113715f",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "a66868f9-8b99-4bd8-b04b-11627af45802",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "a95eee2f-a765-425b-8e93-c61bbb11937a",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "a275c586-3d24-4bab-a30a-e681e8cd0d79",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "05eac371-8f4a-497b-8089-6cac24293ae6",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "025c5847-e3c7-4328-bf43-719d5bc99ae5",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "f8a6ccbe-56ef-47f4-aee3-7a0a97783d64",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "4195007b-bbcf-4d5a-8d41-7fee22af242e",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "e5f74002-f572-4f83-abf1-6c54d041efd1",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "4f630d9e-6913-4143-9f0b-3940b2d71ada",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "42b4e93a-fe6a-437c-bc91-add66af7143a",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "9f2f68c5-9e9b-434c-b0ba-cc7d935f3a6d",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "ab7348ed-b3a9-4ebf-84de-7470734ee981",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "ec51fe48-b544-43d0-8f81-50ce2b0f9aa9",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "569dbab6-315f-401e-bda0-829c7556172a",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "a0491184-f223-4648-9c5d-24b3fdd460ea",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "e72a3747-b02d-4321-9170-356c3801975b",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "d70654e9-eeb3-412a-ba32-0b738e216553",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "f09c3357-02e7-47c2-938f-66c3d459b846",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "44637e2f-fd36-473c-a85c-aab4806229de",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    },
+    {
+      "proposedPointId": "50b88f57-5dc7-49e4-a08f-9a24901829c5",
+      "outcome": "WRITTEN_AND_VERIFIED",
+      "idExact": true,
+      "dimensionExact": true,
+      "payloadExact": true
+    }
+  ]
+}

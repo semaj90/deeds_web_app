@@ -1,0 +1,48 @@
+{
+  "schema": "atlas.parent-atlas-workstation-ornith-synthesis-fixture-receipt.v1",
+  "gate": "WORKSTATION-ORNITH-LIVE-FIXTURE-01",
+  "status": "LIVE_FIXTURE_PROVEN",
+  "purpose": "LIVE_GENERATION_BOUNDARY_PROOF_ONLY",
+  "dryRun": false,
+  "generated": true,
+  "modelCalls": 1,
+  "endpoint": "http://127.0.0.1:8090",
+  "modelId": "ornith-1.5-9b",
+  "loadedModel": "ornith-1.5-9b",
+  "observedModelIds": [
+    "ornith-1.5-9b"
+  ],
+  "runtimeSelectionPolicy": "EXISTING_LLAMA_SERVER_MODEL_RESOLVER; ORNITH_1_5_ALLOWLIST; FAIL_CLOSED",
+  "fixture": {
+    "taskRef": "FIXTURE-TASK-DO-NOT-PROMOTE",
+    "evidenceRefs": [
+      "docs/reports/parent-atlas-workstation-openspec-workboard-v2.json"
+    ],
+    "systemPrompt": "Reply with exactly one line: ORNITH_FIXTURE_OK",
+    "userPrompt": "Confirm the workstation synthesis boundary is live."
+  },
+  "fixtureChecksum": "sha256:f95b1910563f07aa7a6e3a4c4e556ac14921163c1e74631048247628a32006d2",
+  "promptTemplateRevision": "atlas.workstation-ornith-fixture-prompt.v1",
+  "streamed": true,
+  "requestChecksum": "sha256:800ed7bbefc520b9bfea38a67c54f1cb96880a2920a62f0a14b4fd430df0bfaa",
+  "responseChecksum": "sha256:442e16738d5b764ff4b9a3e1200ea138b517494dcabb2ac182599cfbbb757412",
+  "finishReason": "stop",
+  "outputPreview": "ORNITH_FIXTURE_OK",
+  "outputChecksum": "sha256:8c4ac7f663cabe36741654b23ab5584ca6001e99d152200b7a6e9a04a1c93422",
+  "startedAt": "2026-09-05T20:46:53.503Z",
+  "completedAt": "2026-09-05T20:46:53.783Z",
+  "error": null,
+  "canonicalAuthority": false,
+  "productionPlanPath": false,
+  "note": "Capability evidence only. Isolated from the production dry-run/plan-only path. Selects no real task and mutates no ledger. Does not unblock PKT-LINEAGE-08 / production Workstation synthesis.",
+  "receiptChecksum": "sha256:4b9f889ddcc7620f5982022fcce705c83a4a686fda90c0e2a77f33029f8574c4",
+  "writes": {
+    "taskLedgers": 0,
+    "sourceFiles": 0,
+    "databases": 0,
+    "qdrant": 0,
+    "neo4j": 0,
+    "cache": 0,
+    "modelCalls": 1
+  }
+}

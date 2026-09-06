@@ -8,8 +8,8 @@
   "missingWorkspaceRevision": 0,
   "excludedVariables": 0,
   "skip": 0,
-  "limit": 5,
-  "selectedCandidates": 5,
+  "limit": 90,
+  "selectedCandidates": 90,
   "rowsAttempted": 0,
   "rowsInserted": 0,
   "rowsAlreadyPresent": 0,
@@ -45,6 +45,41 @@
       "kind": "method",
       "qualifiedName": "export_statement::class_declaration::method_definition::synthesizeFix",
       "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/FixSynthesizer.ts"
+    },
+    {
+      "nominationId": "treesitter-chunker:1661ba078501181276108f64e3c4f41d37fb683f:anchor:content:18e3bfd572b94a4cf8489303a13d25581bc2a5dc9282ef6a40f370a16e2a0124",
+      "kind": "function",
+      "qualifiedName": "function_declaration::readPostgresContextCache",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/llm-context-cache.ts"
+    },
+    {
+      "nominationId": "treesitter-chunker:1663b392791a958495cb72b584574da2010ed2ff:anchor:content:de9b9390076e6dd35e2591db6aadae5722a15032491ad8246e607eb46e706c71",
+      "kind": "method",
+      "qualifiedName": "export_statement::class_declaration::method_definition::getTicketsByStatus",
+      "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/EscalationService.ts"
+    },
+    {
+      "nominationId": "treesitter-chunker:18280693c578f68252cd479d7d7093d66363a140:anchor:content:efd35051d50fc241012b1f17d043199974294dd6aadfbd87409056aa5a599444",
+      "kind": "method",
+      "qualifiedName": "export_statement::class_declaration::method_definition::addError",
+      "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/ErrorClustering.ts"
+    },
+    {
+      "nominationId": "treesitter-chunker:1df57faedba5b9d5a80cea36ea82ad43d6bf3f79:anchor:content:18e3bfd572b94a4cf8489303a13d25581bc2a5dc9282ef6a40f370a16e2a0124",
+      "kind": "type",
+      "qualifiedName": "type_alias_declaration::NamedLookupSource",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/llm-context-cache.ts"
+    },
+    {
+      "nominationId": "treesitter-chunker:1e15d6b7d5fac08e7814bbb808498563ffa912b9:anchor:content:de9b9390076e6dd35e2591db6aadae5722a15032491ad8246e607eb46e706c71",
+      "kind": "method",
+      "qualifiedName": "export_statement::class_declaration::method_definition::extractPattern",
+      "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/EscalationService.ts"
     }
-  ]
+  ],
+  "identityBridgeOutcomes": {
+    "RESOLVED": 90,
+    "UNRESOLVED": 0,
+    "AMBIGUOUS": 0
+  }
 }

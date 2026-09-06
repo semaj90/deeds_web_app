@@ -20,7 +20,7 @@ const urlArg       = args.find(a => a.startsWith('--url='));
 const timeoutArg   = args.find(a => a.startsWith('--timeout='));
 const GRPC_URL     = urlArg     ? urlArg.split('=', 2)[1]     : (process.env.TURBOVEC_SIDECAR_GRPC_URL ?? '127.0.0.1:50062');
 const TIMEOUT_MS   = Number(timeoutArg ? timeoutArg.split('=', 2)[1] : 5000) || 5000;
-const PROTO_PATH   = path.resolve(__dirname, '../../proto/active/turbovec_cuda.proto');
+const PROTO_PATH   = path.resolve(__dirname, '../../proto/active/turbovec.proto');
 
 // Candidate node_modules roots — script may be called from repo root or sveltekit-frontend
 const CANDIDATE_ROOTS = [
@@ -69,7 +69,7 @@ async function main() {
   });
   const descriptor = grpc.loadPackageDefinition(packageDef);
   const pkg        = descriptor.turbovec;
-  const client     = new pkg.TurboVecCudaService(
+  const client     = new pkg.TurboVecService(
     GRPC_URL,
     grpc.credentials.createInsecure()
   );

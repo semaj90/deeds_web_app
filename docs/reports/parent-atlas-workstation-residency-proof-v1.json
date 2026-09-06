@@ -1,6 +1,8 @@
 {
   "schema": "atlas.parent-atlas-workstation-residency-proof.v1",
-  "status": "PROVEN",
+  "gate": "WORKSTATION-BITFROST-LIVE-READ-01",
+  "status": "LIVE_GET_PROVEN",
+  "proofPassed": true,
   "descriptorStatus": "REFERENCE_ONLY",
   "deterministicReplay": true,
   "exactHit": "EXACT_HIT",
@@ -18,10 +20,18 @@
     "sourceFiles": 0,
     "modelCalls": 0
   },
+  "liveReadProbe": {
+    "probeMode": "READ_ONLY_GET",
+    "cacheDecision": "MISS",
+    "classificationValid": true,
+    "canonicalWritesPerformed": false,
+    "cacheWritesPerformed": false
+  },
+  "productionAdoption": "BLOCKED_CURRENT_LINEAGE",
   "evidence": [
     "scripts/atlas/build-parent-atlas-workstation-residency-v1.mjs",
     "docs/reports/parent-atlas-workstation-ace-context-v1.json",
     "docs/reports/parent-atlas-workstation-ornith-synthesis-dry-v1.json"
   ],
-  "proofChecksum": "sha256:67201478bc83b40516f2afd70f0261acf25a0e0cb9dd4e6555a6f7c468d137c3"
+  "proofChecksum": "sha256:0a150a486a834c6285fd1ba38f5377d06ad579c0bc0d590a530fe71fb05585ac"
 }

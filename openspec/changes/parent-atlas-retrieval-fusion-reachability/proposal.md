@@ -1,3 +1,24 @@
+## Memory/agent ownership update — 2026-09-05
+
+This updates the existing retrieval-fusion-reachability owner; no new OpenSpec change or control plane.
+The accompanying design addendum and spec scenarios govern the new tasks; historical
+findings below remain dated evidence, not a competing current execution queue.
+
+SearchRuntime retains normalization and fusion ownership. A logical dense lane
+can have multiple executors; executor identity is provenance, not voting identity.
+The current combineViaRRF same-name map cannot enforce this until callers normalize
+executor results under the chosen owner boundary. Decide delegation before changing
+weights or arithmetic. Preserve distinct canonical chunks, reject unqualified identity,
+and retain best-rank/executor evidence without another vote.
+
+The evaluation route and conditional Go multi-vector path are separate consumers.
+Do not infer an edge from a comment pointing at a recommended production facade.
+Tests must distinguish same-name duplicates from alternative-executor duplicates.
+No runtime migration is included in this planning pass.
+
+Impact: planning/spec/task reconciliation only. Runtime implementation and datastore
+mutation are not performed by this update. See tasks.md for pending proof gates.
+
 ## Why
 
 A candidate fix landed in `rrf-integration.ts` (`normalizeCanonicalIdentity`/`resolveCanonicalCandidateId`,

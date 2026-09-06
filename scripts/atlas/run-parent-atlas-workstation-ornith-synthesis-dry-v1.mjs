@@ -9,6 +9,7 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { discoverOrnithModel } from './lib/workstation-ornith-adapter.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const contextPath = path.join(root, 'docs', 'reports', 'parent-atlas-workstation-ace-context-v1.json');
@@ -26,14 +27,9 @@ let loadedModel = null;
 let modelIds = [];
 let error = null;
 try {
-  const response = await fetch(`${endpoint}/v1/models`, { signal: AbortSignal.timeout(5000) });
-  if (!response.ok) throw new Error(`MODEL_DISCOVERY_HTTP_${response.status}`);
-  const body = await response.json();
-  modelIds = Array.isArray(body?.data) ? body.data.map((item) => String(item?.id ?? '')).filter(Boolean) : [];
-  const allowed = modelIds.filter((id) => /^ornith-1\.5(?:-|$)/i.test(id));
-  if (modelIds.length === 0) throw new Error('NO_LOADED_MODEL');
-  if (allowed.length !== 1) throw new Error(allowed.length === 0 ? `ORNITH_MODEL_NOT_LOADED:${modelIds.join(',')}` : `AMBIGUOUS_ORNITH_MODELS:${allowed.join(',')}`);
-  loadedModel = allowed[0];
+  const discovery = await discoverOrnithModel(endpoint);
+  modelIds = discovery.modelIds;
+  loadedModel = discovery.loadedModel;
   status = context.status === 'NO_EXECUTABLE_CANDIDATE' ? 'SKIPPED_NO_EXECUTABLE_CANDIDATE' : 'DRY_RUN_READY_NO_GENERATION';
 } catch (cause) {
   error = cause instanceof Error ? cause.message : String(cause);

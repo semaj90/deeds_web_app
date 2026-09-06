@@ -1,16 +1,19 @@
 #!/usr/bin/env node
 
 /**
- * Build a reference-only BitFrost/Valkey residency descriptor.
+ * Build a BitFrost/Valkey residency descriptor and perform a real read-only
+ * GET probe against the computed cache key.
  *
  * This is deliberately not a cache writer.  PostgreSQL remains authoritative;
  * this descriptor only proves the identity that a future residency adapter
- * would have to verify before accepting a hit.
+ * would have to verify before accepting a hit. The probe never SETs a key --
+ * it fails soft to CACHE_UNAVAILABLE if Valkey is unreachable.
  */
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import Redis from 'ioredis';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const contextPath = path.join(root, 'docs', 'reports', 'parent-atlas-workstation-ace-context-v1.json');
@@ -35,11 +38,60 @@ const identity = {
 };
 
 const identityChecksum = sha256(JSON.stringify(identity));
+const cacheKey = `bitfrost:workstation:context:v1:${identityChecksum.slice('sha256:'.length)}`;
+
+/**
+ * Read-only Valkey probe. Never SETs the real cacheKey -- this descriptor is
+ * still not a cache writer. GET-only, fail-soft on connection failure so a
+ * down/absent Valkey never crashes this script or blocks the plan-only path.
+ */
+async function probeCache(key) {
+  const redis = new Redis({
+    host: process.env.REDIS_HOST || '127.0.0.1',
+    port: Number(process.env.REDIS_PORT || 6379),
+    password: process.env.REDIS_PASSWORD || 'redis',
+    lazyConnect: true,
+    enableOfflineQueue: false,
+    retryStrategy: () => null,
+    connectTimeout: 1500,
+  });
+  redis.on('error', () => {});
+  try {
+    await redis.connect();
+    await redis.ping();
+    const stored = await redis.get(key);
+    if (stored === null) return { probeMode: 'READ_ONLY_GET', cacheDecision: 'MISS' };
+    let storedIdentityChecksum = null;
+    try {
+      storedIdentityChecksum = JSON.parse(stored)?.identityChecksum ?? null;
+    } catch {
+      storedIdentityChecksum = null;
+    }
+    const cacheDecision = storedIdentityChecksum === identityChecksum ? 'EXACT_HIT' : 'STALE_REJECT';
+    return { probeMode: 'READ_ONLY_GET', cacheDecision, storedIdentityChecksum };
+  } catch (cause) {
+    return {
+      probeMode: 'READ_ONLY_GET',
+      cacheDecision: 'CACHE_UNAVAILABLE',
+      probeError: cause instanceof Error ? cause.message : String(cause),
+    };
+  } finally {
+    try {
+      await redis.quit();
+    } catch {
+      redis.disconnect();
+    }
+  }
+}
+
+const probe = await probeCache(cacheKey);
+
 const report = {
   schema: 'atlas.parent-atlas-workstation-residency.v1',
+  gate: 'WORKSTATION-BITFROST-LIVE-READ-01',
   status: 'REFERENCE_ONLY',
   authority: 'BITFROST_VALKEY_RESIDENCY_ONLY',
-  cacheKey: `bitfrost:workstation:context:v1:${identityChecksum.slice('sha256:'.length)}`,
+  cacheKey,
   identity,
   identityChecksum,
   descriptor: {
@@ -49,7 +101,13 @@ const report = {
     residencyClass: 'WORKSTATION_CONTEXT_REFERENCE',
     canonicalAuthority: false,
   },
-  cacheDecision: 'NOT_EXECUTED_REFERENCE_ONLY',
+  probeMode: probe.probeMode,
+  cacheDecision: probe.cacheDecision,
+  storedIdentityChecksum: probe.storedIdentityChecksum ?? null,
+  probeError: probe.probeError ?? null,
+  canonicalWritesPerformed: false,
+  cacheWritesPerformed: false,
+  productionAdoption: 'BLOCKED_CURRENT_LINEAGE',
   writes: {
     valkey: 0,
     redis: 0,
@@ -60,9 +118,10 @@ const report = {
     modelCalls: 0,
   },
   notes: [
-    'No Valkey/Redis connection is opened by this script.',
+    'This script performs a real read-only GET against the computed cacheKey; it never SETs it.',
     'A future reader must compare the complete identity object, not TTL or key suffix alone.',
-    'Any identity mismatch is a stale rejection and must not fall back to a latest key.',
+    'Any identity mismatch is a stale rejection (STALE_REJECT) and must not fall back to a latest key.',
+    'CACHE_UNAVAILABLE means Valkey could not be reached -- fail-soft, not a hit.',
   ],
 };
 
@@ -72,6 +131,7 @@ console.log(JSON.stringify({
   status: report.status,
   cacheKey: report.cacheKey,
   identityChecksum: report.identityChecksum,
+  probeMode: report.probeMode,
   cacheDecision: report.cacheDecision,
   writes: report.writes,
   out: outPath,

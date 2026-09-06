@@ -1,5 +1,13 @@
 ## 1. Telemetry Instrumentation in Dispatcher (Session 119a)
 
+> Ownership reconciliation 2026-09-05: REFERENCE_ONLY historical nested ledger.
+> Root parent-atlas-governed-compute-fabric owns backend/transport integration;
+> parent-atlas-agentic-run-receipt-binding owns WorkflowActionEventV1 receipt binding;
+> parent-atlas-retrieval-fusion-reachability owns fusion convergence. The old direct
+> Redis/Postgres telemetry and sum-score merge proposals below are not authorization
+> and cannot override root boundaries. Compatible E2E cases must be adopted under
+> those root tasks with focused proof. No historical checkbox is closed by this note.
+
 - [ ] 1.1 Create `src/lib/server/telemetry/dispatcher-telemetry-wrapper.ts` with telemetry emission logic
 - [ ] 1.2 Add `emitDispatcherTelemetry()` function: Redis write (sync) + Postgres write (deferred via queueMicrotask)
 - [ ] 1.3 Wrap all 9 dispatcher node handlers in telemetry collector (identity, cache, topology, etc.)
@@ -126,4 +134,3 @@
 - ✅ Documentation complete: runbook with patterns, supervision strategies, telemetry interpretation, troubleshooting
 - ✅ No regressions: full test suite passes, no new TypeScript errors
 - ✅ All code committed with clear messages and docstrings
-

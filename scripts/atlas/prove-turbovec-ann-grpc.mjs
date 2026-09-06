@@ -4,7 +4,7 @@
  *
  * Flow:
  *   Qdrant codebase_chunks_768 -> Python TurboVec /build (:8791)
- *   -> gRPC TurboVecCudaService.Search (:50062)
+ *   -> gRPC TurboVecService.Search (:50062)
  *   -> docs/reports/turbovec-ann-grpc-proof.json
  *
  * This is a mirror/accelerator proof. It does not mutate Postgres truth,
@@ -12,6 +12,7 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
+import crypto from 'node:crypto';
 import { createRequire } from 'node:module';
 import { pathToFileURL } from 'node:url';
 import { loadRepoEnv, REPO_ROOT } from './connection-config.mjs';
@@ -63,6 +64,11 @@ function identityFromPoint(point) {
     id: String(point.id),
     packet_key: payload.packet_key ?? payload.packetKey ?? null,
     source_ref: payload.source_ref ?? payload.sourceRef ?? payload.canonical_source_ref ?? payload.canonicalSourceRef ?? payload.file_path ?? null,
+    content_hash: payload.content_hash ?? payload.contentHash ?? payload.sha256 ?? null,
+    symbol_version_id: payload.symbol_version_id ?? payload.symbolVersionId ?? null,
+    source_revision: payload.source_revision ?? payload.sourceRevision ?? null,
+    workspace_revision: payload.workspace_revision ?? payload.workspaceRevision ?? null,
+    namespace: payload.namespace ?? payload.source_namespace ?? payload.sourceNamespace ?? null,
     feature_id: payload.feature_id ?? payload.featureId ?? null,
     community_id: payload.community_id ?? payload.communityId ?? payload.cluster_id ?? 0,
   };
@@ -71,7 +77,31 @@ function identityFromPoint(point) {
 function candidateOk(point) {
   const vector = vectorFromPoint(point);
   const id = identityFromPoint(point);
-  return vector?.length === 768 && id.packet_key && id.source_ref && id.feature_id;
+  // RF6's envelope owns packet/source identity plus revision provenance;
+  // feature_id is optional projection metadata and must not gate a valid
+  // candidate or be reconstructed from a backend-local identifier.
+  return vector?.length === 768 && id.packet_key && id.source_ref && id.content_hash;
+}
+
+const REQUIRED_IDENTITY_FIELDS = ['packet_key', 'source_ref', 'content_hash', 'source_revision', 'workspace_revision', 'namespace'];
+
+function hasQualifiedPointIdentity(identity) {
+  const revision = String(identity?.source_revision ?? '').trim();
+  const workspaceRevision = String(identity?.workspace_revision ?? '').trim();
+  const contentHash = String(identity?.content_hash ?? '').trim();
+  return REQUIRED_IDENTITY_FIELDS.every((field) => String(identity?.[field] ?? '').trim().length > 0)
+    && /^sha256:[a-f0-9]{64}$/i.test(revision)
+    && /^sha256:[a-f0-9]{64}$/i.test(workspaceRevision)
+    && /^(?:sha256:)?[a-f0-9]{64}$/i.test(contentHash);
+}
+
+function identitySetChecksum(identities) {
+  const normalized = identities
+    .map((identity) => REQUIRED_IDENTITY_FIELDS.map((field) => String(identity?.[field] ?? '').trim()))
+    .sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b)));
+  return normalized.length > 0 && normalized.every((identity) => identity.every(Boolean))
+    ? `sha256:${crypto.createHash('sha256').update(JSON.stringify(normalized), 'utf8').digest('hex')}`
+    : null;
 }
 
 async function qdrantScroll(offset = null) {
@@ -108,6 +138,15 @@ async function collectCandidates(dim = 768) {
         id: identity.packet_key || identity.id,
         vector: projectVector(vector, dim),
         cluster: Number(identity.community_id ?? 0) || 0,
+        identity: {
+          packetKey: identity.packet_key,
+          sourceRef: identity.source_ref,
+          contentHash: identity.content_hash,
+          symbolVersionId: identity.symbol_version_id,
+          sourceRevision: identity.source_revision,
+          workspaceRevision: identity.workspace_revision,
+          namespace: identity.namespace,
+        },
       });
       if (sampleIdentity.length < 5) sampleIdentity.push(identity);
       if (candidates.length >= LIMIT) break;
@@ -162,7 +201,7 @@ function loadGrpc() {
 
 function grpcClient() {
   const { grpc, protoLoader } = loadGrpc();
-  const protoPath = path.resolve(REPO_ROOT, 'proto/active/turbovec_cuda.proto');
+  const protoPath = path.resolve(REPO_ROOT, 'proto/active/turbovec.proto');
   const def = protoLoader.loadSync(protoPath, {
     keepCase: false,
     longs: Number,
@@ -173,7 +212,7 @@ function grpcClient() {
   const descriptor = grpc.loadPackageDefinition(def);
   return {
     grpc,
-    client: new descriptor.turbovec.TurboVecCudaService(GRPC_URL, grpc.credentials.createInsecure()),
+    client: new descriptor.turbovec.TurboVecService(GRPC_URL, grpc.credentials.createInsecure()),
   };
 }
 
@@ -206,8 +245,27 @@ async function main() {
     report.qdrant.scanned = collected.scanned;
     report.qdrant.skipped = collected.skipped;
     report.qdrant.usable_candidates = collected.candidates.length;
+    report.qdrant.qualified_identity_candidates = collected.candidates.filter((candidate) => hasQualifiedPointIdentity({
+      packet_key: candidate.identity.packetKey,
+      source_ref: candidate.identity.sourceRef,
+      content_hash: candidate.identity.contentHash,
+      source_revision: candidate.identity.sourceRevision,
+      workspace_revision: candidate.identity.workspaceRevision,
+      namespace: candidate.identity.namespace,
+    })).length;
+    report.qdrant.identity_set_checksum = identitySetChecksum(collected.candidates.map((candidate) => ({
+      packet_key: candidate.identity.packetKey,
+      source_ref: candidate.identity.sourceRef,
+      content_hash: candidate.identity.contentHash,
+      source_revision: candidate.identity.sourceRevision,
+      workspace_revision: candidate.identity.workspaceRevision,
+      namespace: candidate.identity.namespace,
+    })));
     report.qdrant.sample_identity = collected.sampleIdentity;
     report.gates.qdrant_vectors = collected.candidates.length > 0;
+    report.gates.qdrant_identity_qualified = collected.candidates.length > 0
+      && report.qdrant.qualified_identity_candidates === collected.candidates.length
+      && Boolean(report.qdrant.identity_set_checksum);
 
     if (!collected.candidates.length) throw new Error('No usable 768d Qdrant candidates with packet_key/source_ref/feature_id');
 
@@ -223,22 +281,56 @@ async function main() {
       const grpcHealth = await grpcCall(client, 'health', {}, 5000);
       const queryVector = collected.candidates[0].vector;
       const search = await grpcCall(client, 'search', { queryVector, topK: 10 }, 10000);
+      const grpcCandidates = search.candidates ?? [];
+      const hasQualifiedIdentity = (candidate) => {
+        const identity = candidate?.identity;
+        return Boolean(identity && REQUIRED_IDENTITY_FIELDS.every((field) => {
+          const camel = field.replace(/_([a-z])/g, (_match, letter) => letter.toUpperCase());
+          return String(identity[camel] ?? '').trim().length > 0;
+        }));
+      };
+      const identityFields = ['packetKey', 'sourceRef', 'contentHash', 'sourceRevision', 'workspaceRevision', 'namespace'];
+      const missingIdentityFields = Object.fromEntries(identityFields.map((field) => [
+        field,
+        grpcCandidates.filter((candidate) => !String(candidate?.identity?.[field] ?? '').trim()).length,
+      ]));
       report.grpc_health = grpcHealth;
       report.grpc_search = {
         backend: search.backend,
+        canonical_only: String(search.backend ?? '').includes('+canonical-only'),
         indexed: search.indexed,
-        candidates: (search.candidates ?? []).slice(0, 10),
-        candidate_count: (search.candidates ?? []).length,
+        candidates: grpcCandidates.slice(0, 10),
+        candidate_count: grpcCandidates.length,
+        identity_count: grpcCandidates.filter(hasQualifiedIdentity).length,
+        required_identity_fields: identityFields,
+        missing_identity_fields: missingIdentityFields,
+        identity_set_checksum: identitySetChecksum(grpcCandidates.map((candidate) => ({
+          packet_key: candidate?.identity?.packetKey,
+          source_ref: candidate?.identity?.sourceRef,
+          content_hash: candidate?.identity?.contentHash,
+          source_revision: candidate?.identity?.sourceRevision,
+          workspace_revision: candidate?.identity?.workspaceRevision,
+          namespace: candidate?.identity?.namespace,
+        }))),
       };
       report.gates.grpc_ok = Boolean(grpcHealth.ok);
-      report.gates.grpc_search_nonempty = (search.candidates ?? []).length > 0;
+      report.gates.grpc_search_nonempty = grpcCandidates.length > 0;
+      report.gates.grpc_canonical_only = report.grpc_search.canonical_only;
+      report.gates.grpc_identity_preserved = grpcCandidates.length > 0 && grpcCandidates.every(hasQualifiedIdentity);
     } finally {
       client.close();
     }
 
-    report.gates.identity_preserved = collected.sampleIdentity.every((row) => row.packet_key && row.source_ref && row.feature_id);
-    report.gates.pass = Object.values(report.gates).every(Boolean);
-    report.status = report.gates.pass ? 'PASS' : 'WARN';
+    report.gates.identity_preserved = collected.sampleIdentity.every((row) => row.packet_key && row.source_ref && row.content_hash);
+    // `qdrant_identity_qualified` is diagnostic when the bridge performs an
+    // explicit canonical read-only join. Admission is decided by the gRPC
+    // response envelope, not by trusting raw projection payloads.
+    report.gates.pass = Object.entries(report.gates)
+      .filter(([key]) => key !== 'qdrant_identity_qualified')
+      .every(([, value]) => value);
+    // This is an admission precondition, not a best-effort health probe:
+    // missing identity/revision metadata must fail closed.
+    report.status = report.gates.pass ? 'PASS' : 'FAIL';
   } catch (error) {
     report.error = error.message;
     report.gates.pass = false;
