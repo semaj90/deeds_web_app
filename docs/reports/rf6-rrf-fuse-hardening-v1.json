@@ -1,0 +1,90 @@
+{
+  "schema": "atlas.rf6-rrf-fuse-hardening-report.v1",
+  "status": "IMPLEMENTED_UNPROVEN",
+  "date": "2026-09-05",
+  "owner": "parent-atlas-retrieval-fusion-reachability",
+  "operation": "RF6-RRF-FUSE-HARDEN-01",
+  "canonicalFusionOwner": "SearchRuntime.fuseSearchRuntimeCandidates",
+  "modifiedFiles": [
+    "sveltekit-frontend/src/lib/server/retrieval/rrf-contract.ts",
+    "sveltekit-frontend/src/lib/server/retrieval/rrf-fuse.ts",
+    "sveltekit-frontend/src/lib/server/retrieval/__tests__/rf6-live-replay-01.test.ts"
+  ],
+  "commits": [
+    "5c089e511a62a6175fb7b4ab179de23b6a33831b",
+    "3d884a71b3ea69164f077ecf1b2cd85c351d6c7c",
+    "71ae03ec6d767cdeb2dbef895655b3f49f206bc5",
+    "66914cc41aea1bdc7f801e1f2e973761c72b2ee9",
+    "68696970f35f891b17a764f3759da5ee3fda06f7"
+  ],
+  "invariantsImplemented": {
+    "oneLogicalLaneOneVote": true,
+    "semanticExecutorCollapse": {
+      "logicalLane": "dense",
+      "executorAliases": [
+        "dense",
+        "dense_384",
+        "dense_768",
+        "qdrant",
+        "qdrant_vector",
+        "qdrant_768",
+        "turbovec",
+        "turbovec_ann",
+        "cuvs",
+        "cagra"
+      ],
+      "selection": "MAX_WEIGHTED_RRF_CONTRIBUTION",
+      "alternateExecutorHits": "PROVENANCE_ONLY"
+    },
+    "canonicalChunkSeparation": true,
+    "canonicalChunkIdConsumedOnly": true,
+    "identityStatusObservable": true,
+    "noncanonicalIdentityCrossLaneMerge": false,
+    "legacyWeightCompatibilityPreserved": true
+  },
+  "tests": {
+    "testFile": "sveltekit-frontend/src/lib/server/retrieval/__tests__/rf6-live-replay-01.test.ts",
+    "cases": [
+      "multiple physical ids same canonical entity",
+      "same-lane duplicate vote suppression",
+      "Qdrant/TurboVec semantic executor collapse",
+      "same packet distinct canonical chunks",
+      "source-group local-id scoping",
+      "projection-exact status observability",
+      "degraded identity observability"
+    ],
+    "written": true,
+    "executedInThisConnectorSession": false
+  },
+  "proofBoundary": {
+    "sourceReviewed": true,
+    "upstreamQdrantRrfCapabilityVerified": true,
+    "typescriptCompileExecuted": false,
+    "vitestExecuted": false,
+    "openspecValidationExecuted": false,
+    "liveRetrievalReplayExecuted": false,
+    "datastoreWritesPerformed": false,
+    "qdrantWritesPerformed": false,
+    "valkeyWritesPerformed": false,
+    "neo4jWritesPerformed": false
+  },
+  "notClaimed": [
+    "RF7 complete",
+    "service.ts migrated",
+    "all RRF owners consolidated",
+    "shared weight ownership consolidated",
+    "live route parity proven",
+    "production deployment proven"
+  ],
+  "next": [
+    "Run the focused RF6 regression test and TypeScript check on the workstation.",
+    "If green, record the proof in parent-atlas-retrieval-fusion-reachability/tasks.md without claiming full RF7 completion.",
+    "Then extract the SearchRuntime fusion core into a dependency-light canonical module and migrate rrf-fuse.ts through a compatibility adapter.",
+    "After that, tackle service.ts::rrfFusion as the next DELEGATE_TO_CANONICAL owner.",
+    "Keep rrf-fusion.ts admin/eval RETAIN_INDEPENDENT until its role changes."
+  ],
+  "upstreamReferences": [
+    "https://qdrant.tech/documentation/search/hybrid-queries/",
+    "https://openspec.dev/docs/schemas/spec-driven"
+  ]
+}
