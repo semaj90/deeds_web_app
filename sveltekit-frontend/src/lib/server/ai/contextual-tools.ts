@@ -581,6 +581,7 @@ export async function executeContextualTool(
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             query: csEmb.vectors[0],
+            using: 'description',
             limit: Number(args.limit ?? 5),
             with_payload: true,
             score_threshold: 0.3,

@@ -235,7 +235,7 @@ canonical retrieval truth, or new owner boundaries.
 - Stage 3B: community_id propagation and AST symbol extraction.
 - Stage 3C: SOM 20×20 as a separate 400-cell topology experiment over `semantic_768`.
 - Stage 3D: reranker feature preparation from packet evidence.
-
+latent_256
 `latent_64` is legacy routing compatibility only. Any future latent compression work should be a
 separately revisioned experiment, with `latent_128` the more plausible candidate if one is needed.
 The phrase `kmeans 20x20` is not the correct terminology; KMeans uses `K ∈ {64, 128, 256}` and SOM

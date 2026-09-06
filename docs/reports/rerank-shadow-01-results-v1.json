@@ -1,0 +1,177 @@
+{
+  "summary": [
+    {
+      "method": "EmbeddingGemma (bi-encoder cosine)",
+      "n": 3,
+      "top1Agreement": 1,
+      "mrrAvg": 1,
+      "recallAt3Avg": 1
+    },
+    {
+      "method": "mxbai-rerank-base-v2 (cross-encoder)",
+      "n": 3,
+      "top1Agreement": 0.3333333333333333,
+      "mrrAvg": 0.5,
+      "recallAt3Avg": 0.3333333333333333
+    },
+    {
+      "method": "Ornith-1.5-9b (LLM judge, 0-100 score)",
+      "n": 3,
+      "top1Agreement": 1,
+      "mrrAvg": 1,
+      "recallAt3Avg": 1
+    }
+  ],
+  "detail": {
+    "embeddingGemma": [
+      {
+        "query": "Which function sums duplicate-identity RRF scores instead of discarding them?",
+        "ranked": [
+          "service-merge",
+          "helper-card",
+          "lane-aliases",
+          "rrf-tologicallane",
+          "model-resolution"
+        ],
+        "metrics": {
+          "top1Correct": 1,
+          "mrr": 1,
+          "recallAt3": 1
+        }
+      },
+      {
+        "query": "Which contract enforces that batch extraction never runs on the full corpus, only a bounded candidate subset?",
+        "ranked": [
+          "evidence-card",
+          "relevance-scores",
+          "firecrawl-provider",
+          "fusion-contribution",
+          "helper-card-2"
+        ],
+        "metrics": {
+          "top1Correct": 1,
+          "mrr": 1,
+          "recallAt3": 1
+        }
+      },
+      {
+        "query": "Which module centralizes the optional dynamic import of the Firecrawl SDK behind one documented type-check exception?",
+        "ranked": [
+          "firecrawl-provider-2",
+          "youtube-transcript",
+          "model-resolution-2",
+          "candidate-evidence-2",
+          "retrieval-lane-2"
+        ],
+        "metrics": {
+          "top1Correct": 1,
+          "mrr": 1,
+          "recallAt3": 1
+        }
+      }
+    ],
+    "mxbai": [
+      {
+        "query": "Which function sums duplicate-identity RRF scores instead of discarding them?",
+        "ranked": [
+          "lane-aliases",
+          "helper-card",
+          "model-resolution",
+          "service-merge",
+          "rrf-tologicallane"
+        ],
+        "latencyMs": 263.32410000000004,
+        "vramPeakMb": 973.94189453125,
+        "metrics": {
+          "top1Correct": 0,
+          "mrr": 0.25,
+          "recallAt3": 0
+        }
+      },
+      {
+        "query": "Which contract enforces that batch extraction never runs on the full corpus, only a bounded candidate subset?",
+        "ranked": [
+          "helper-card-2",
+          "relevance-scores",
+          "fusion-contribution",
+          "evidence-card",
+          "firecrawl-provider"
+        ],
+        "latencyMs": 1308.4852999999994,
+        "vramPeakMb": 974.6923828125,
+        "metrics": {
+          "top1Correct": 0,
+          "mrr": 0.25,
+          "recallAt3": 0
+        }
+      },
+      {
+        "query": "Which module centralizes the optional dynamic import of the Firecrawl SDK behind one documented type-check exception?",
+        "ranked": [
+          "firecrawl-provider-2",
+          "youtube-transcript",
+          "candidate-evidence-2",
+          "model-resolution-2",
+          "retrieval-lane-2"
+        ],
+        "latencyMs": 718.2255999999998,
+        "vramPeakMb": 979.70361328125,
+        "metrics": {
+          "top1Correct": 1,
+          "mrr": 1,
+          "recallAt3": 1
+        }
+      }
+    ],
+    "ornith": [
+      {
+        "query": "Which function sums duplicate-identity RRF scores instead of discarding them?",
+        "ranked": [
+          "service-merge",
+          "lane-aliases",
+          "rrf-tologicallane",
+          "model-resolution",
+          "helper-card"
+        ],
+        "latencyMsTotal": 5322.029100000001,
+        "metrics": {
+          "top1Correct": 1,
+          "mrr": 1,
+          "recallAt3": 1
+        }
+      },
+      {
+        "query": "Which contract enforces that batch extraction never runs on the full corpus, only a bounded candidate subset?",
+        "ranked": [
+          "evidence-card",
+          "firecrawl-provider",
+          "relevance-scores",
+          "helper-card-2",
+          "fusion-contribution"
+        ],
+        "latencyMsTotal": 4140.593099999998,
+        "metrics": {
+          "top1Correct": 1,
+          "mrr": 1,
+          "recallAt3": 1
+        }
+      },
+      {
+        "query": "Which module centralizes the optional dynamic import of the Firecrawl SDK behind one documented type-check exception?",
+        "ranked": [
+          "firecrawl-provider-2",
+          "youtube-transcript",
+          "candidate-evidence-2",
+          "retrieval-lane-2",
+          "model-resolution-2"
+        ],
+        "latencyMsTotal": 3236.269400000003,
+        "metrics": {
+          "top1Correct": 1,
+          "mrr": 1,
+          "recallAt3": 1
+        }
+      }
+    ]
+  }
+}

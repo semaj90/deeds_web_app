@@ -10056,6 +10056,7 @@ server.registerTool(
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           query: new Array(768).fill(0.1),
+          using: 'content',
           limit: 1,
           with_payload: true,
         }),

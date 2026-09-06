@@ -5,18 +5,18 @@
   "readOnly": true,
   "writesPerformed": false,
   "callersModified": false,
-  "generatedAt": "2026-09-02T00:04:41.585Z",
+  "generatedAt": "2026-09-06T17:24:23.034Z",
   "method": "Textual scan of every tracked .ts file under sveltekit-frontend/src/lib/server (excluding *.spec.ts, *.d.ts) for a call of the shape <identifier(.client)?>.query(...) or .search(...) where the receiver name contains \"qdrant\" (case-insensitive) or is exactly \"q\"/\"client\". Bare \"client.query(...)\" calls whose window contains SQL keywords (SELECT / INSERT INTO / UPDATE / DELETE FROM / CREATE TABLE|EXTENSION|INDEX / ALTER TABLE / LISTEN / NOTIFY / information_schema) in the window, or a first-argument transaction-control string (BEGIN/COMMIT/ROLLBACK/LISTEN/NOTIFY/UNLISTEN/SET/CREATE EXTENSION), are excluded as Postgres pg.Pool calls, not Qdrant -- found live during this pass across several files (context-assembler.ts:311, pagerank-schema-audit.ts:69, analysis/worker.ts:528, and multiple graph-adapter ROLLBACK calls were all false positives before these exclusions were added; comment/JSDoc lines were also excluded after unified/legal-ai-service.ts:8 and hypergraph-4d.ts:791 were found matching inside documentation examples, not real code). For each remaining match, the following 15 lines are checked for EITHER of two valid named-vector selector shapes seen in this codebase: the newer top-level \"using: 'name'\" (Query API), or the older \"vector: { name: 'name', vector: [...] }\" shape (also found live during this pass, e.g. ai/llm-cache.ts:106, which would have been a false negative under a using-only check). This is still a HEURISTIC, not a type-checked AST analysis -- a call whose request object is constructed elsewhere and spread in, or whose selector falls outside the line window, would be misclassified. Each finding below is reported individually with its own code snippet so a human can verify, not just a trusted aggregate count.",
   "summary": {
-    "totalCallSitesFound": 32,
-    "distinctFiles": 25,
+    "totalCallSitesFound": 31,
+    "distinctFiles": 24,
     "byClassification": {
-      "NAMED_VECTOR_REQUIRED_MISSING": 3,
+      "NAMED_VECTOR_REQUIRED_MISSING": 0,
       "DEFAULT_VECTOR_VALID": 1,
-      "EXPLICIT_NAMED_VECTOR_VALID": 12,
+      "EXPLICIT_NAMED_VECTOR_VALID": 14,
       "COLLECTION_SCHEMA_UNKNOWN": 16
     },
-    "provenDefectCount": 3
+    "provenDefectCount": 0
   },
   "interpretationNote": "v2 (2026-09-01): classification is schema-aware, not a flat using-present/using-absent split. Only NAMED_VECTOR_REQUIRED_MISSING is a proven defect -- it requires the target collection to be a live, resolvable literal name AND its live Qdrant vector config to be confirmed NAMED_VECTORS. DEFAULT_VECTOR_VALID sites (e.g. document_tags, live-confirmed SINGLE_DEFAULT_VECTOR) are correct code, not defects, despite having no `using:` -- v1 of this census would have wrongly flagged them. COLLECTION_SCHEMA_UNKNOWN sites (unresolvable variable/constant collection expressions, or a live lookup returning \"collection does not exist\") are NEVER counted as proven defects -- absence of proof is not proof of a defect. RETRIEVAL-02 is explicitly audit-only (\"do not mass-edit callers\") -- findings below are not remediated here, only NAMED_VECTOR_REQUIRED_MISSING sites should be treated as an actionable backlog.",
   "liveSchemaLookups": {
@@ -161,21 +161,14 @@
       "receiver": "client",
       "method": "query",
       "collectionExpr": "QDRANT_SEMANTIC_COLLECTION",
-      "hasExplicitUsingInWindow": false,
+      "hasExplicitUsingInWindow": true,
       "hasNamedVectorShapeInWindow": false,
-      "hasExplicitSelection": false,
+      "hasExplicitSelection": true,
       "uncertainReceiver": false,
       "windowLines": 15,
-      "codeSnippet": "  const response = (await client.query(QDRANT_SEMANTIC_COLLECTION, {\n    query: Array.from(embedding.vector),\n    filter: {\n      must: [{ key: 'packet_key', match: { any: uniquePacketKeys } }],",
-      "resolvedCollectionName": "codebase_chunks_768_v2",
-      "liveVectorSchemaType": "NAMED_VECTORS",
-      "liveVectorNames": [
-        "content",
-        "error",
-        "signature"
-      ],
-      "rf2Classification": "NAMED_VECTOR_REQUIRED_MISSING",
-      "classificationReason": "\"codebase_chunks_768_v2\" is live-confirmed NAMED_VECTORS (content/error/signature) and this call has no using/named-vector selector -- proven defect"
+      "codeSnippet": "  const response = (await client.query(QDRANT_SEMANTIC_COLLECTION, {\n    query: Array.from(embedding.vector),\n    using: QDRANT_SEMANTIC_VECTOR_NAME,\n    filter: {",
+      "rf2Classification": "EXPLICIT_NAMED_VECTOR_VALID",
+      "classificationReason": "call already specifies using: or vector:{name,...}"
     },
     {
       "file": "sveltekit-frontend/src/lib/server/db/qdrant-integration.ts",
@@ -299,28 +292,6 @@
       "classificationReason": "call already specifies using: or vector:{name,...}"
     },
     {
-      "file": "sveltekit-frontend/src/lib/server/retrieval/go-retrieval-orchestrator.ts",
-      "line": 203,
-      "receiver": "qdrant",
-      "method": "search",
-      "collectionExpr": "codebase_chunks_768",
-      "hasExplicitUsingInWindow": false,
-      "hasNamedVectorShapeInWindow": false,
-      "hasExplicitSelection": false,
-      "uncertainReceiver": false,
-      "windowLines": 15,
-      "codeSnippet": "      const results = await qdrant.search('codebase_chunks_768', {\n        vector: embedding,\n        limit: topK,\n        with_payload: true,",
-      "resolvedCollectionName": "codebase_chunks_768",
-      "liveVectorSchemaType": "NAMED_VECTORS",
-      "liveVectorNames": [
-        "content",
-        "error",
-        "signature"
-      ],
-      "rf2Classification": "NAMED_VECTOR_REQUIRED_MISSING",
-      "classificationReason": "\"codebase_chunks_768\" is live-confirmed NAMED_VECTORS (content/error/signature) and this call has no using/named-vector selector -- proven defect"
-    },
-    {
       "file": "sveltekit-frontend/src/lib/server/retrieval/multi-vector-orchestrator.ts",
       "line": 98,
       "receiver": "qdrant",
@@ -371,21 +342,14 @@
       "receiver": "qdrant",
       "method": "query",
       "collectionExpr": "codebase_chunks_768",
-      "hasExplicitUsingInWindow": false,
+      "hasExplicitUsingInWindow": true,
       "hasNamedVectorShapeInWindow": false,
-      "hasExplicitSelection": false,
+      "hasExplicitSelection": true,
       "uncertainReceiver": false,
       "windowLines": 15,
-      "codeSnippet": "    const searchRes = await qdrant.query('codebase_chunks_768', {\n\t      query: Array.from(vector),\n      limit,\n      with_payload: true,",
-      "resolvedCollectionName": "codebase_chunks_768",
-      "liveVectorSchemaType": "NAMED_VECTORS",
-      "liveVectorNames": [
-        "content",
-        "error",
-        "signature"
-      ],
-      "rf2Classification": "NAMED_VECTOR_REQUIRED_MISSING",
-      "classificationReason": "\"codebase_chunks_768\" is live-confirmed NAMED_VECTORS (content/error/signature) and this call has no using/named-vector selector -- proven defect"
+      "codeSnippet": "    const searchRes = await qdrant.query('codebase_chunks_768', {\n\t      query: Array.from(vector),\n      using: 'content',\n      limit,",
+      "rf2Classification": "EXPLICIT_NAMED_VECTOR_VALID",
+      "classificationReason": "call already specifies using: or vector:{name,...}"
     },
     {
       "file": "sveltekit-frontend/src/lib/server/retrieval/soft-routing-orchestrator.ts",

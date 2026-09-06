@@ -63,7 +63,13 @@ const searchCodebase: Gemma4Tool = {
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ query: vector, limit: topK, with_payload: true, ...(filter ? { filter } : {}) }),
+          body: JSON.stringify({
+            query: vector,
+            using: 'content',
+            limit: topK,
+            with_payload: true,
+            ...(filter ? { filter } : {}),
+          }),
           signal: AbortSignal.timeout(10_000),
         },
       );

@@ -163,6 +163,7 @@ async function searchQdrant(
     const signal = AbortSignal.timeout(timeout);
     const searchRes = await qdrant.query('codebase_chunks_768', {
 	      query: Array.from(vector),
+      using: 'content',
       limit,
       with_payload: true,
       with_vector: false,

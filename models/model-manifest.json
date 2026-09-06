@@ -9,6 +9,41 @@
     "somColumns": 20,
     "_note": "Project canonical is native EmbeddingGemma semantic_768. Truncated 512/256/128 lanes are derived routing/retrieval projections; latent64 is derived routing only, never canonical ANN."
   },
+  "visionProfiles": [
+    {
+      "id": "ORNITH_VISION_PRODUCTION",
+      "modelFamily": "ornith-1.5",
+      "modelId": "hforf-gguf",
+      "modelAlias": "ornith-1.5-9b",
+      "projectorFamily": "ornith-1.5",
+      "projectorId": "ornith-1.5-mmproj",
+      "projectorSha256": "626f9f90627402a6bf4a999111d0fbd69b5fcca7aa8ba089d69e5f10e8858e1d",
+      "launcherProfile": "ornith-1.5-vlm",
+      "compatibility": "EXACT_FAMILY_ONLY",
+      "status": "PRODUCTION_PROFILE"
+    },
+    {
+      "id": "GEMMA_VISION_PRODUCTION",
+      "modelFamily": "gemma4",
+      "modelId": "gemma4-rotorquant:latest",
+      "projectorFamily": "gemma4",
+      "projectorId": "gemma4-mmproj",
+      "projectorSha256": "4b3bf6e16b19d7f85fe4dd4ab2f8c8037ec14e656f8017fcfb42b30c3db26f67",
+      "launcherProfile": "gemma4-direct",
+      "compatibility": "EXACT_FAMILY_ONLY",
+      "status": "PRODUCTION_PROFILE"
+    },
+    {
+      "id": "ORNITH_MODEL_GEMMA_PROJECTOR",
+      "modelFamily": "ornith-1.5",
+      "projectorFamily": "gemma4",
+      "modelId": "hforf-gguf",
+      "projectorId": "gemma4-mmproj",
+      "compatibility": "COMPATIBILITY_EXPERIMENT_ONLY",
+      "status": "NON_PRODUCTION",
+      "loadAllowed": false
+    }
+  ],
   "models": [
     {
       "id": "hforf-gguf",
@@ -18,6 +53,8 @@
       "pathEnv": "HFORF_MODEL_PATH",
       "localPath": "models/ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf",
       "filename": "hforf.gguf",
+      "modelFamily": "ornith-1.5",
+      "productionProfiles": ["ORNITH_VISION_PRODUCTION"],
       "notes": "Verified by GET /v1/models and /props on 2026-09-03. Active runtime reports vision=false and audio=false; no projector is attached. See docs/reports/synthesis-model-identity-audit-v1.json.",
       "embeddingDim": null,
       "port": 8090,
@@ -35,6 +72,8 @@
       "runtime": "llama-server",
       "pathEnv": "TURBO_MODEL_PATH",
       "filename": null,
+      "modelFamily": "gemma4",
+      "productionProfiles": ["GEMMA_VISION_PRODUCTION"],
       "notes": "Stored as Ollama blob at %USERPROFILE%\\.ollama\\blobs\\sha256-a79de882... Set TURBO_MODEL_PATH to the blob path or a converted GGUF. 5.3 GB on disk. Requires TURBO_NGL=99 on RTX 3060 Ti.",
       "embeddingDim": null,
       "port": 8090,
@@ -57,6 +96,10 @@
       "contextLen": null,
       "quantization": "bf16",
       "modelFamily": "gemma4",
+      "projectorFamily": "gemma4",
+      "artifactSha256": "4b3bf6e16b19d7f85fe4dd4ab2f8c8037ec14e656f8017fcfb42b30c3db26f67",
+      "artifactSizeBytes": 990372800,
+      "verifiedAt": "2026-09-06",
       "compatibleModelIds": ["gemma4-rotorquant:latest", "gemma4-legal-iq4xs-direct", "gemma4-rotorquant-iq4xs-base"],
       "tags": ["vlm", "sidecar", "vision"]
     },
@@ -72,14 +115,15 @@
       "artifactSha256": "626f9f90627402a6bf4a999111d0fbd69b5fcca7aa8ba089d69e5f10e8858e1d",
       "artifactSizeBytes": 921704672,
       "verifiedAt": "2026-09-05",
-      "notes": "Downloaded and sha256-verified byte-identical to the HF-published ETag (626f9f90...). Not yet wired into launch-turboquant.ps1 or proven live via /props — see ORNITH-VLM-MMPROJ-01 tasks 4.2-4.9 in openspec/changes/parent-atlas-analysis-pass-ornith-adapter/tasks.md. Adds ~922MB VRAM when loaded on the RTX 3060 Ti 8GB — use a separate ornith-1.5-vlm profile, never load unconditionally alongside the default ornith-1.5-text profile.",
+      "notes": "Downloaded and sha256-verified byte-identical to the HF-published ETag (626f9f90...). Wired to the separate ornith-1.5-vlm launcher profile and live-proven by ORNITH-VLM-MMPROJ-01; the default ornith-1.5 text profile remains projector-free. Adds ~922MB VRAM when loaded on the RTX 3060 Ti 8GB. Never load against a gemma4-family model.",
       "embeddingDim": null,
       "port": null,
       "contextLen": null,
       "quantization": "bf16",
       "modelFamily": "ornith-1.5",
+      "projectorFamily": "ornith-1.5",
       "compatibleModelIds": ["hforf-gguf"],
-      "tags": ["vlm", "sidecar", "vision", "ornith-1.5", "not-yet-wired"]
+      "tags": ["vlm", "sidecar", "vision", "ornith-1.5", "production-profile"]
     },
     {
       "id": "embeddinggemma-300m-768d",

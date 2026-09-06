@@ -431,13 +431,20 @@ function main() {
     throw new Error(`CURRENT_AUTHORITY_COUNT_INVALID: expected exactly 1, found ${authorityCount}`);
   }
 
-  // Read-only finding, not corrected here: a second, smaller OpenSpec root
-  // exists at sveltekit-frontend/openspec/changes/ (separate from the
-  // repo-root one this report classifies). Two of its entries share a name
-  // with a repo-root change (parent-atlas-graph-retrieval-proof,
-  // parent-atlas-ace-radix-residency) -- unknown yet whether these are stale
-  // duplicates, forks, or intentionally-scoped sub-changes. Recorded so it
-  // isn't silently missed; not resolved by this script.
+  // Read-only finding, RESOLVED 2026-09-06: a second, smaller OpenSpec root exists at
+  // sveltekit-frontend/openspec/changes/ (separate from the repo-root one this report
+  // classifies). This comment previously flagged two suspected name collisions with
+  // repo-root changes -- checked both live:
+  //   - 'parent-atlas-graph-retrieval-proof': REAL collision, confirmed via diff -- the
+  //     two directories had genuinely different proposal/design/tasks content (root:
+  //     tree_node_id graph-identity lineage, 284 tasks, touched 2026-08-31; sveltekit-
+  //     frontend: trace_search Qdrant->Postgres join-back proof, 59 tasks, stale since
+  //     2026-08-10). Not duplicates of the same work -- an accidental name collision.
+  //     Renamed the stale/smaller one to 'parent-atlas-trace-search-joinback-proof' to
+  //     match what it actually covers; root version unchanged.
+  //   - 'parent-atlas-ace-radix-residency': FALSE ALARM -- this name only exists in the
+  //     sveltekit-frontend tree; no repo-root change with this name exists. Not a
+  //     collision at all.
   let secondaryRootFinding = null;
   try {
     const secondaryEntries = readdirSync(SECONDARY_CHANGES_DIR, { withFileTypes: true })

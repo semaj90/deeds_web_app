@@ -1,0 +1,14 @@
+{
+  "timestamp": "2026-09-06T16:54:30.059Z",
+  "mode": "dry-run",
+  "dryRun": true,
+  "stages": {},
+  "errors": [
+    "Another orchestrator is running (pid 68500, lock age: 10s). Wait for completion or delete C:\\Users\\james\\Videos\\deeds-web-app\\.graphify-pipeline-lock."
+  ],
+  "summary": {
+    "success": false,
+    "message": "",
+    "elapsed_ms": 7
+  }
+}

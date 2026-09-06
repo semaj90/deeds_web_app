@@ -1,0 +1,101 @@
+{
+  "summary": {
+    "method": "mxbai-rerank-base-v2 (SOURCE/SYMBOL/KIND-formatted candidates)",
+    "n": 3,
+    "top1Agreement": 0,
+    "mrrAvg": 0.20000000000000004,
+    "recallAt3Avg": 0
+  },
+  "perQuery": [
+    {
+      "query": "Which function sums duplicate-identity RRF scores instead of discarding them?",
+      "ranked": [
+        {
+          "packet_key": "lane-aliases",
+          "score": 0.91845703125
+        },
+        {
+          "packet_key": "model-resolution",
+          "score": 0.015899658203125
+        },
+        {
+          "packet_key": "rrf-tologicallane",
+          "score": 0.01483917236328125
+        },
+        {
+          "packet_key": "helper-card",
+          "score": 0.00963592529296875
+        },
+        {
+          "packet_key": "service-merge",
+          "score": 0.00653839111328125
+        }
+      ],
+      "metrics": {
+        "top1Correct": 0,
+        "mrr": 0.2,
+        "recallAt3": 0
+      }
+    },
+    {
+      "query": "Which contract enforces that batch extraction never runs on the full corpus, only a bounded candidate subset?",
+      "ranked": [
+        {
+          "packet_key": "helper-card-2",
+          "score": 0.66845703125
+        },
+        {
+          "packet_key": "relevance-scores",
+          "score": 0.0302734375
+        },
+        {
+          "packet_key": "firecrawl-provider",
+          "score": 0.017181396484375
+        },
+        {
+          "packet_key": "fusion-contribution",
+          "score": 0.0150146484375
+        },
+        {
+          "packet_key": "evidence-card",
+          "score": 0.010009765625
+        }
+      ],
+      "metrics": {
+        "top1Correct": 0,
+        "mrr": 0.2,
+        "recallAt3": 0
+      }
+    },
+    {
+      "query": "Which module centralizes the optional dynamic import of the Firecrawl SDK behind one documented type-check exception?",
+      "ranked": [
+        {
+          "packet_key": "retrieval-lane-2",
+          "score": 0.9638671875
+        },
+        {
+          "packet_key": "youtube-transcript",
+          "score": 0.03460693359375
+        },
+        {
+          "packet_key": "model-resolution-2",
+          "score": 0.018585205078125
+        },
+        {
+          "packet_key": "candidate-evidence-2",
+          "score": 0.0169219970703125
+        },
+        {
+          "packet_key": "firecrawl-provider-2",
+          "score": 0.0097808837890625
+        }
+      ],
+      "metrics": {
+        "top1Correct": 0,
+        "mrr": 0.2,
+        "recallAt3": 0
+      }
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 {
   "schema": "atlas.source-chunk-materialization-binding-cohort.v1",
   "gate": "SOURCE-CHUNK-MATERIALIZATION-BINDING-01",
-  "generatedAt": "2026-09-05T23:35:35.090Z",
+  "generatedAt": "2026-09-06T18:39:44.149Z",
   "mode": "READ_ONLY",
   "canonicalAuthority": false,
   "writesPerformed": false,
@@ -7497,5 +7497,5 @@
     "docs/reports/source-registry-owner-join-v1.json"
   ],
   "databaseError": null,
-  "receiptChecksum": "sha256:95697a8d139aec36607612b09b81bf2bfea99b9c6ac6a4af6d186fa1afc11309"
+  "receiptChecksum": "sha256:a83225fa5898df1e8d0cfe34576c592c39df3737050cbd9e72c940ac7a9b48e0"
 }

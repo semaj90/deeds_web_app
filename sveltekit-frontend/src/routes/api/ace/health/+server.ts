@@ -82,7 +82,7 @@ export const GET: RequestHandler = async ({ locals }) => {
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ query: vec, limit: 1, with_payload: false }),
+            body: JSON.stringify({ query: vec, using: 'content', limit: 1, with_payload: false }),
             signal: T(8000),
           },
         );

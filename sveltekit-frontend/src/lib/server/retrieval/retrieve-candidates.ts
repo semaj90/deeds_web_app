@@ -19,6 +19,7 @@ import type { Candidate } from './search-runtime.js';
 import { createBm42SparseRetriever } from './adapters/bm42-sparse-retriever.js';
 import { embedQueryForLane } from './embedding-service.js';
 import { VECTOR_INDEX_REGISTRY } from '$lib/server/vector/vector-index-registry.js';
+import { QDRANT_DENSE_VECTOR_NAME } from '$lib/server/vector/retrieval-semantics.js';
 import { RETRIEVAL_LIMITS, identifierVariants, tokenizeKeywordSurface } from './search-contract.js';
 import { resolveCanonicalIdentity } from './identity-resolution.js';
 import { resolveProjectionsBatch } from '$lib/server/atlas/retrieval/projection-registry-v1.js';
@@ -411,10 +412,14 @@ export async function retrieveQdrant(query: string): Promise<Candidate[]> {
   try {
     for (const collection of collections) {
       try {
-        const results = await qdrant.hybridSearch({
+        // Keep dense retrieval as a raw logical lane. The BM42 adapter is a
+        // separate lane and SearchRuntime is the sole production fusion owner;
+        // Qdrant must not fuse dense+sparse here before SearchRuntime sees them.
+        const results = await qdrant.denseSearch({
           collection,
           query,
-          queryEmbedding: Array.from(embedding),
+          queryVector: Array.from(embedding),
+          vectorName: QDRANT_DENSE_VECTOR_NAME,
           limit: QDRANT_LIMIT,
         });
 
@@ -468,10 +473,11 @@ export async function retrieveQdrant(query: string): Promise<Candidate[]> {
 
   // Fallback: dense-only v2 collection
   try {
-    const results = await qdrant.hybridSearch({
+    const results = await qdrant.denseSearch({
       collection: VECTOR_INDEX_REGISTRY.qdrantSource768V2.collection ?? 'codebase_chunks_768_v2',
       query,
-      queryEmbedding: Array.from(embedding),
+      queryVector: Array.from(embedding),
+      vectorName: QDRANT_DENSE_VECTOR_NAME,
       limit: QDRANT_LIMIT,
     });
 

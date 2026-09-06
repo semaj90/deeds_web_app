@@ -497,14 +497,25 @@ Return ONLY valid JSON: { "events": [...] }`;
         const searchRes = await fetch(`${qdrantUrl}/collections/evidence_items/points/query`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ query: vector, limit: topK + 1, filter, with_payload: true, score_threshold: 0.5 }),
+          body: JSON.stringify({
+            query: vector,
+            using: 'content',
+            limit: topK + 1,
+            filter,
+            with_payload: true,
+            score_threshold: 0.5,
+          }),
           signal: AbortSignal.timeout(10_000),
         });
         if (!searchRes.ok) {
           return { content: [{ type: 'text', text: JSON.stringify({ error: `Qdrant search ${searchRes.status}` }) }] };
         }
 
-        const hits = ((await searchRes.json() as { points?: Array<{ id: string; score: number; payload?: Record<string, unknown> }> }).points ?? [])
+        const searchData = await searchRes.json() as {
+          result?: { points?: Array<{ id: string; score: number; payload?: Record<string, unknown> }> };
+          points?: Array<{ id: string; score: number; payload?: Record<string, unknown> }>;
+        };
+        const hits = (searchData.result?.points ?? searchData.points ?? [])
           .filter((h) => String(h.id) !== String(evidenceId))
           .slice(0, topK)
           .map((h) => ({
@@ -613,12 +624,23 @@ Return JSON with exactly these fields:
             const searchRes = await fetch(`${qdrantUrl}/collections/legal_documents/points/query`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ query: embedding, limit, filter, with_payload: true, score_threshold: 0.45 }),
+              body: JSON.stringify({
+                query: embedding,
+                using: 'content',
+                limit,
+                filter,
+                with_payload: true,
+                score_threshold: 0.45,
+              }),
               signal: AbortSignal.timeout(10_000),
             });
 
             if (searchRes.ok) {
-              const hits = ((await searchRes.json() as { points?: Array<{ score: number; payload?: Record<string, unknown> }> }).points ?? [])
+              const searchData = await searchRes.json() as {
+                result?: { points?: Array<{ score: number; payload?: Record<string, unknown> }> };
+                points?: Array<{ score: number; payload?: Record<string, unknown> }>;
+              };
+              const hits = (searchData.result?.points ?? searchData.points ?? [])
                 .map((h) => ({
                   citation:   h.payload?.citation ?? h.payload?.title,
                   outcome:    String(h.payload?.outcome ?? h.payload?.summary ?? '').slice(0, 200),

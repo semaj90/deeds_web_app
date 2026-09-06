@@ -318,6 +318,12 @@
       hysteresis. This is a pure contract/fixture proof only: no SearchRuntime,
       Postgres, Qdrant, Valkey, GPU, or model calls are wired by this task.
 - [ ] T5 Valkey/BitFrost revision-qualified metadata keys + invalidation policy proven.
+      **Partial fixture evidence 2026-09-06:** `BifrostCacheManager.buildRetrievalCacheKeyV2()` now
+      has focused coverage proving deterministic replay and distinct keys for query, workspace,
+      candidate-snapshot, ordinal-map, representation, retrieval-policy, context-policy, and graph
+      revisions (`packages/parent-atlas-retrieval/tests/bifrost/cache-identity-v2.spec.ts`, 10/10
+      focused tests across the BitFrost residency/key suite). This does not prove live Valkey
+      invalidation or cache readback; T5 remains open.
 - [x] T6 cuVS brute-force same-matrix parity proven. (Same live run as T3 above —
       `cuvs.neighbors.brute_force` on the real WSL2 GPU matched the CPU-exact oracle exactly.)
 - [x] T6b-e CAGRA_EPHEMERAL_ENDPOINT: recall and latency measured against brute-force.

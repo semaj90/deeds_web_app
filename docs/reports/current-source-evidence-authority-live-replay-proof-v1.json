@@ -5,31 +5,77 @@
   "bothSucceeded": {
     "schema": "atlas.current-source-evidence-authority.v1",
     "gate": "SOURCE-EVIDENCE-AUTHORITY-01",
-    "generatedAt": "2026-09-05T20:47:38.773Z",
+    "generatedAt": "2026-09-06T18:47:34.325Z",
     "mode": "READ_ONLY",
     "canonicalAuthority": false,
     "writesPerformed": false,
     "status": "NO_CURRENT_COMPLETED_BOUND_SOURCE_OWNER",
+    "toleranceWindow": {
+      "toleranceMs": 300000,
+      "nowMs": 1788720437884,
+      "checkedAt": "2026-09-06T18:47:17.884Z"
+    },
     "currentWorkspace": {
       "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
-      "workspaceRevision": "sha256:f65fef53261f3263646b785ae54771856190e15f17899cdd5115d6340d247a53",
-      "sourceManifestDigest": "f65fef53261f3263646b785ae54771856190e15f17899cdd5115d6340d247a53",
-      "sourceCount": 23726,
+      "workspaceRevision": "sha256:cc8b2a35212f6a025bc6efc8aaffb5cc3ce8f0e5b925f368c3c64b723e6086f3",
+      "sourceManifestDigest": "cc8b2a35212f6a025bc6efc8aaffb5cc3ce8f0e5b925f368c3c64b723e6086f3",
+      "sourceCount": 23873,
       "repositoryId": "semaj90/deeds_web_app",
-      "baseCommitOid": "b05e25b18ec817b9c21aafdf39196465e206179e",
+      "baseCommitOid": "732c66f6bb556e0b8b4b40a832b8e5e655aacad5",
       "dirty": true
     },
     "runCounts": {
-      "totalRuns": 11,
-      "completed": 6,
+      "totalRuns": 15,
+      "completed": 10,
       "running": 5,
-      "completedBound": 1,
-      "completedUnbound": 5,
+      "completedBound": 4,
+      "completedUnbound": 6,
       "runningBound": 2,
       "runningUnbound": 3
     },
     "ambiguityCount": 0,
     "rejectedRuns": [
+      {
+        "runId": "48485685-e773-4433-a1f8-00f5524cca44",
+        "runStatus": "COMPLETED",
+        "bindingStatus": "BOUND",
+        "reasons": [
+          "STALE_WORKSPACE_REVISION",
+          "SOURCE_MANIFEST_DIGEST_MISMATCH"
+        ],
+        "ageMsAtCheck": 70818884
+      },
+      {
+        "runId": "d8bb84bd-b4ba-4f85-a5b9-fad16327b5fe",
+        "runStatus": "COMPLETED",
+        "bindingStatus": "BOUND",
+        "reasons": [
+          "STALE_WORKSPACE_REVISION",
+          "SOURCE_MANIFEST_DIGEST_MISMATCH"
+        ],
+        "ageMsAtCheck": 71500884
+      },
+      {
+        "runId": "55888921-5f7e-4047-9ec4-96912659c2f7",
+        "runStatus": "COMPLETED",
+        "bindingStatus": "BOUND",
+        "reasons": [
+          "STALE_WORKSPACE_REVISION",
+          "SOURCE_MANIFEST_DIGEST_MISMATCH"
+        ],
+        "ageMsAtCheck": 71812884
+      },
+      {
+        "runId": "ddf92de5-bc56-43c2-a646-7b3c4f79e1a9",
+        "runStatus": "COMPLETED",
+        "bindingStatus": "UNBOUND",
+        "reasons": [
+          "UNBOUND_NEVER_SOURCE_AUTHORITY",
+          "STALE_WORKSPACE_REVISION",
+          "SOURCE_MANIFEST_DIGEST_MISMATCH"
+        ],
+        "ageMsAtCheck": 72118884
+      },
       {
         "runId": "9816c4d0-d2ad-42ca-8da9-f9d4393277b0",
         "runStatus": "COMPLETED",
@@ -38,7 +84,8 @@
           "UNBOUND_NEVER_SOURCE_AUTHORITY",
           "STALE_WORKSPACE_REVISION",
           "SOURCE_MANIFEST_DIGEST_MISMATCH"
-        ]
+        ],
+        "ageMsAtCheck": 181688884
       },
       {
         "runId": "78818366-2410-4643-8e5d-e995c75a2ad5",
@@ -48,7 +95,8 @@
           "UNBOUND_NEVER_SOURCE_AUTHORITY",
           "STALE_WORKSPACE_REVISION",
           "SOURCE_MANIFEST_DIGEST_MISMATCH"
-        ]
+        ],
+        "ageMsAtCheck": 249919884
       },
       {
         "runId": "9716c798-bb17-45c7-afb0-1c58955889bf",
@@ -58,7 +106,8 @@
           "UNBOUND_NEVER_SOURCE_AUTHORITY",
           "STALE_WORKSPACE_REVISION",
           "SOURCE_MANIFEST_DIGEST_MISMATCH"
-        ]
+        ],
+        "ageMsAtCheck": 252870884
       },
       {
         "runId": "862b952b-7623-434e-818e-407c1531abaf",
@@ -68,7 +117,8 @@
           "UNBOUND_NEVER_SOURCE_AUTHORITY",
           "STALE_WORKSPACE_REVISION",
           "SOURCE_MANIFEST_DIGEST_MISMATCH"
-        ]
+        ],
+        "ageMsAtCheck": 309181884
       },
       {
         "runId": "5b2e18fc-86e6-4fc2-932f-4887d5c14853",
@@ -78,7 +128,8 @@
           "UNBOUND_NEVER_SOURCE_AUTHORITY",
           "STALE_WORKSPACE_REVISION",
           "SOURCE_MANIFEST_DIGEST_MISMATCH"
-        ]
+        ],
+        "ageMsAtCheck": 310151884
       },
       {
         "runId": "369e4270-7689-4536-8816-4ec4a5517b3e",
@@ -87,7 +138,8 @@
         "reasons": [
           "STALE_WORKSPACE_REVISION",
           "SOURCE_MANIFEST_DIGEST_MISMATCH"
-        ]
+        ],
+        "ageMsAtCheck": 323486884
       },
       {
         "runId": "14643371-f6f2-4131-906b-235a5c06619a",
@@ -98,7 +150,8 @@
           "UNBOUND_NEVER_SOURCE_AUTHORITY",
           "STALE_WORKSPACE_REVISION",
           "SOURCE_MANIFEST_DIGEST_MISMATCH"
-        ]
+        ],
+        "ageMsAtCheck": null
       },
       {
         "runId": "b1a103ac-c717-430b-9643-a8c9818064ae",
@@ -108,7 +161,8 @@
           "RUNNING_NEVER_SOURCE_AUTHORITY",
           "STALE_WORKSPACE_REVISION",
           "SOURCE_MANIFEST_DIGEST_MISMATCH"
-        ]
+        ],
+        "ageMsAtCheck": null
       },
       {
         "runId": "b3a5b14e-0065-41bb-bfe0-96e1062d1e07",
@@ -118,7 +172,8 @@
           "RUNNING_NEVER_SOURCE_AUTHORITY",
           "STALE_WORKSPACE_REVISION",
           "SOURCE_MANIFEST_DIGEST_MISMATCH"
-        ]
+        ],
+        "ageMsAtCheck": null
       },
       {
         "runId": "a7377c07-acb2-4d68-bf83-19d8eca586d4",
@@ -129,7 +184,8 @@
           "UNBOUND_NEVER_SOURCE_AUTHORITY",
           "STALE_WORKSPACE_REVISION",
           "SOURCE_MANIFEST_DIGEST_MISMATCH"
-        ]
+        ],
+        "ageMsAtCheck": null
       },
       {
         "runId": "3f13703e-5944-487c-a5a9-10dcecc00124",
@@ -140,7 +196,8 @@
           "UNBOUND_NEVER_SOURCE_AUTHORITY",
           "STALE_WORKSPACE_REVISION",
           "SOURCE_MANIFEST_DIGEST_MISMATCH"
-        ]
+        ],
+        "ageMsAtCheck": null
       }
     ],
     "selection": null,
@@ -152,13 +209,13 @@
   "secondStatus": "NO_CURRENT_COMPLETED_BOUND_SOURCE_OWNER",
   "selectedRunId": null,
   "ambiguityCount": 0,
-  "currentWorkspaceRevision": "sha256:f65fef53261f3263646b785ae54771856190e15f17899cdd5115d6340d247a53",
+  "currentWorkspaceRevision": "sha256:cc8b2a35212f6a025bc6efc8aaffb5cc3ce8f0e5b925f368c3c64b723e6086f3",
   "runCounts": {
-    "totalRuns": 11,
-    "completed": 6,
+    "totalRuns": 15,
+    "completed": 10,
     "running": 5,
-    "completedBound": 1,
-    "completedUnbound": 5,
+    "completedBound": 4,
+    "completedUnbound": 6,
     "runningBound": 2,
     "runningUnbound": 3
   },
@@ -169,5 +226,5 @@
     "scripts/atlas/select-current-source-evidence-authority-v1.mts",
     "docs/reports/current-source-evidence-authority-v1.json"
   ],
-  "proofChecksum": "sha256:def5bb483248bf700bc2ac917bcb068bf9ed3ba05ec262cfe32f67ef9ff592bf"
+  "proofChecksum": "sha256:29ce025474526e36a44ede94162e36e9453d1ae5fd70bf422cc211089a32c27c"
 }

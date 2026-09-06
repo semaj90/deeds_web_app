@@ -1,0 +1,4 @@
+# Optional accelerator for python/atlas_unified_snapshot_projection_v1.py.
+# The script remains usable with the Python standard library when this is not
+# installed; use --decoder=simdjson only after installing this environment.
+pysimdjson==7.0.2

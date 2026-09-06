@@ -109,10 +109,11 @@ export class QdrantApiWrapper {
     }
 
     async search(collectionName: string, options: {
-	vector: number[]; limit?: number; offset?: number; score_threshold?: number; with_payload?: boolean; with_vector?: boolean; filter?: any }) {
+	vector: number[]; vectorName?: string; limit?: number; offset?: number; score_threshold?: number; with_payload?: boolean; with_vector?: boolean; filter?: any }) {
         try {
             const response = await this.client.query(collectionName, {
                 query: options.vector,
+                ...(options.vectorName ? { using: options.vectorName } : {}),
                 limit: options.limit,
                 offset: options.offset,
                 score_threshold: options.score_threshold,

@@ -10,6 +10,7 @@
  */
 
 import { ENV } from '$lib/server/env.server.js';
+import { loadFirecrawl } from './optional-firecrawl-provider.js';
 
 export interface YouTubeTranscriptResult {
   videoId: string;
@@ -93,9 +94,12 @@ async function fetchViaFirecrawlMarkdown(videoId: string): Promise<{
   if (!apiKey) return null;
 
   try {
-    const FirecrawlModule = await import('@mendable/firecrawl-js');
-    const FirecrawlCtor = (FirecrawlModule as any).default ?? FirecrawlModule;
-    const app = new FirecrawlCtor({ apiKey });
+    const firecrawl = await loadFirecrawl();
+    if (firecrawl.status === 'UNAVAILABLE') {
+      console.warn(`[youtube] Firecrawl unavailable: ${firecrawl.reason}`);
+      return null;
+    }
+    const app = new firecrawl.FirecrawlCtor({ apiKey });
 
     const result = await app.scrapeUrl(canonicalUrl(videoId), {
       formats: ['markdown'],

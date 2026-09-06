@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { ENV } from '$lib/server/env.server.js';
+import { getNamedVectorName } from '$lib/server/config/vector-config.js';
 
 interface KAGHit {
   path: string | null;
@@ -26,14 +27,24 @@ async function embedQuery(text: string): Promise<number[]> {
 
 async function qdrantSearch(vector: number[], collection: string, limit: number): Promise<KAGHit[]> {
   const base = ENV.QDRANT_URL;
+  const vectorName = getNamedVectorName(collection);
   const res = await fetch(`${base}/collections/${collection}/points/query`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ query: vector, limit, with_payload: true }),
+    body: JSON.stringify({
+      query: vector,
+      ...(vectorName ? { using: vectorName } : {}),
+      limit,
+      with_payload: true,
+    }),
     signal: AbortSignal.timeout(8_000),
   });
   if (!res.ok) return [];
-  const { points } = await res.json() as { points: Array<{ id: unknown; score: number; payload: Record<string, unknown> }> };
+  const data = await res.json() as {
+    result?: { points?: Array<{ id: unknown; score: number; payload: Record<string, unknown> }> };
+    points?: Array<{ id: unknown; score: number; payload: Record<string, unknown> }>;
+  };
+  const points = data.result?.points ?? data.points ?? [];
   return (points ?? []).map(h => ({
     path: (h.payload?.path ?? h.payload?.relative_path ?? null) as string | null,
     score: h.score,

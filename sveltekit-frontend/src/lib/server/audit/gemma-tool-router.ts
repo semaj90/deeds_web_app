@@ -319,6 +319,7 @@ export async function executeAuditTool(
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               query: queryVec,
+              using: 'content',
               limit,
               with_payload: true,
               score_threshold: 0.3,

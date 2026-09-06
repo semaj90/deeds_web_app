@@ -106,7 +106,7 @@ describe('POST /api/retrieval/canonical-rerank smoke', () => {
       }),
     });
 
-    const response = await POST({ request } as never);
+    const response = await POST({ request, locals: { user: { id: 'test-user' } } } as never);
     const payload = await response.json();
 
     expect(response.status).toBe(200);

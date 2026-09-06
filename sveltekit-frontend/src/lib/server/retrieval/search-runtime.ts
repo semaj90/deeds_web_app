@@ -26,6 +26,7 @@ import { budgetFor } from '../atlas/policy/execution-budget.js';
 import { routePolicy } from '../atlas/policy/policy-router.js';
 import { appendSearchRuntimeTrainingRow } from '../atlas/policy/policy-training.js';
 import { CANONICAL_EMBEDDING_DIMENSION } from '../vector/embedding-dimension-guard.js';
+import { normalizeRetrievalLane } from './retrieval-lane-aliases.js';
 const EMBEDDING_HEALTH_CACHE_MS = 60_000;
 
 let embeddingHealthCache:
@@ -1231,16 +1232,22 @@ function getFusionBackendIdentityKey(candidate: Candidate): string {
   );
 }
 
+/**
+ * RF7-LANE-ALIAS-CONVERGENCE-01: dense/lexical alias recognition now consults the same shared
+ * table as `rrf-fuse.ts`'s `toLogicalLaneName()` (`retrieval-lane-aliases.ts`) instead of a
+ * second, independently hand-maintained alias list. `Candidate.scoreSource`'s closed union only
+ * ever produces 'qdrant'/'qdrant_768'/'postgres_trigram' out of that table's broader set today,
+ * so this is a zero-behavior-change substitution -- verified against every value `scoreSource`
+ * can currently take.
+ */
 function getFusionLogicalLane(candidate: Candidate): LogicalRetrievalLane {
   if (candidate.embeddingLane === 'bm42') return 'bm42';
   if (candidate.embeddingLane === 'dense_768') return 'dense';
 
+  const aliasLane = normalizeRetrievalLane(candidate.scoreSource);
+  if (aliasLane === 'dense' || aliasLane === 'lexical') return aliasLane;
+
   switch (candidate.scoreSource) {
-    case 'postgres_trigram':
-      return 'lexical';
-    case 'qdrant':
-    case 'qdrant_768':
-      return 'dense';
     case 'exact_symbol':
       return 'exact';
     case 'ast_tree':

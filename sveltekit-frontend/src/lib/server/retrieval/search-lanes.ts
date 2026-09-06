@@ -19,6 +19,7 @@ import { RETRIEVAL_LIMITS } from './search-contract.js';
 import { VECTOR_LANES } from '../vector/lane-registry.js';
 import { VECTOR_LANES as VECTOR_CONFIG_LANES, getVectorLaneMetadata } from '../config/vector-config.js';
 import { CANONICAL_EMBEDDING_DIMENSION } from '../atlas/contracts/canonical-chunk-contract.js';
+import { QDRANT_DENSE_VECTOR_NAME } from '../vector/retrieval-semantics.js';
 import { sql, type SQL } from 'drizzle-orm';
 
 import { ENV } from '$lib/server/env.server.js';
@@ -378,8 +379,10 @@ export class QdrantLane extends SearchLaneBase {
 
     const body: Record<string, unknown> = {
       query: Array.from(queryVector),
+      using: QDRANT_DENSE_VECTOR_NAME,
       limit,
       with_payload: true,
+      with_vector: false,
     };
     if (qdrantFilter) body.filter = qdrantFilter;
 

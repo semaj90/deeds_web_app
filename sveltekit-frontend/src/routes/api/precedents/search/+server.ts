@@ -73,6 +73,7 @@ async function searchQdrantCases(
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
 				query: vector,
+				using: 'description',
 				limit,
 				with_payload: true,
 				score_threshold: 0.30,

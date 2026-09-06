@@ -1,0 +1,57 @@
+{
+  "schema": "atlas.evidence-card-01-native-extract-probe.v1",
+  "readOnly": true,
+  "extractorTested": "src/lib/server/langextract/native.ts::extractDocumentNative (legal-domain regex: citation/statute/case_name/court/monetary/date/person/organization)",
+  "targetSchema": "CandidateEvidenceCardV1.extracted (symbols/apis/tests/constraints/groundedFacts)",
+  "results": [
+    {
+      "id": "service-merge",
+      "rawWordCount": 21,
+      "latencyMs": 1.826,
+      "entityCount": 0,
+      "entities": [],
+      "sectionCount": 1,
+      "mapsToSymbols": false,
+      "mapsToApis": false,
+      "mapsToTests": false,
+      "mapsToConstraints": false
+    },
+    {
+      "id": "rrf-tologicallane",
+      "rawWordCount": 14,
+      "latencyMs": 0.846,
+      "entityCount": 0,
+      "entities": [],
+      "sectionCount": 1,
+      "mapsToSymbols": false,
+      "mapsToApis": false,
+      "mapsToTests": false,
+      "mapsToConstraints": false
+    },
+    {
+      "id": "evidence-card",
+      "rawWordCount": 15,
+      "latencyMs": 0.036,
+      "entityCount": 0,
+      "entities": [],
+      "sectionCount": 1,
+      "mapsToSymbols": false,
+      "mapsToApis": false,
+      "mapsToTests": false,
+      "mapsToConstraints": false
+    },
+    {
+      "id": "firecrawl-provider",
+      "rawWordCount": 41,
+      "latencyMs": 0.022,
+      "entityCount": 0,
+      "entities": [],
+      "sectionCount": 1,
+      "mapsToSymbols": false,
+      "mapsToApis": false,
+      "mapsToTests": false,
+      "mapsToConstraints": false
+    }
+  ],
+  "totalEntitiesAcrossAllCandidates": 0
+}

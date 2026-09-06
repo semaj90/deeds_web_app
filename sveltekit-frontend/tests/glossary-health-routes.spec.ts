@@ -9,6 +9,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 const mockOllamaFetch = vi.fn();
 const mockDbExecute = vi.fn();
 const mockPoolQuery = vi.fn();
+const mockDbUpdate = vi.fn(() => ({
+  set: vi.fn(() => ({
+    where: vi.fn(async () => undefined),
+  })),
+}));
 
 vi.mock('$lib/server/middleware/cache-headers.js', () => ({
   cacheControl: { private: {}, public: {} },
@@ -52,6 +57,7 @@ vi.mock('$lib/server/db/client', () => ({
   pgRows: (r) => (Array.isArray(r) ? r : (r?.rows ?? [])),
   db: {
     execute: mockDbExecute,
+    update: mockDbUpdate,
   },
   pool: {
     query: mockPoolQuery,

@@ -1,0 +1,633 @@
+{
+  "canonicalAuthority": false,
+  "checkpointDir": ".tmp\\google-gemma4-e4b-assistant",
+  "configInvariants": {
+    "bidirectionalEncoding": true,
+    "cacheDisabled": true,
+    "derivedRankerType": true,
+    "kvSharingDisabled": true,
+    "orderedEmbeddingRelabelingNotClaimed": true
+  },
+  "configPath": ".tmp\\google-gemma4-e4b-assistant\\config.json",
+  "cudaGemmAlignment": {
+    "alignmentMultiple": 8,
+    "cudaAllocated": false,
+    "gemmExecuted": false,
+    "matrices": [
+      {
+        "alignmentMultiple": 8,
+        "dimensionsAligned": true,
+        "shape": [
+          262144,
+          256
+        ],
+        "tensor": "model.embed_tokens.weight"
+      },
+      {
+        "alignmentMultiple": 8,
+        "dimensionsAligned": true,
+        "shape": [
+          256,
+          2048
+        ],
+        "tensor": "model.layers.0.mlp.down_proj.weight"
+      },
+      {
+        "alignmentMultiple": 8,
+        "dimensionsAligned": true,
+        "shape": [
+          2048,
+          256
+        ],
+        "tensor": "model.layers.0.mlp.gate_proj.weight"
+      },
+      {
+        "alignmentMultiple": 8,
+        "dimensionsAligned": true,
+        "shape": [
+          2048,
+          256
+        ],
+        "tensor": "model.layers.0.mlp.up_proj.weight"
+      },
+      {
+        "alignmentMultiple": 8,
+        "dimensionsAligned": true,
+        "shape": [
+          256,
+          1024
+        ],
+        "tensor": "model.layers.0.self_attn.o_proj.weight"
+      },
+      {
+        "alignmentMultiple": 8,
+        "dimensionsAligned": true,
+        "shape": [
+          1024,
+          256
+        ],
+        "tensor": "model.layers.0.self_attn.q_proj.weight"
+      },
+      {
+        "alignmentMultiple": 8,
+        "dimensionsAligned": true,
+        "shape": [
+          256,
+          2048
+        ],
+        "tensor": "model.layers.1.mlp.down_proj.weight"
+      },
+      {
+        "alignmentMultiple": 8,
+        "dimensionsAligned": true,
+        "shape": [
+          2048,
+          256
+        ],
+        "tensor": "model.layers.1.mlp.gate_proj.weight"
+      },
+      {
+        "alignmentMultiple": 8,
+        "dimensionsAligned": true,
+        "shape": [
+          2048,
+          256
+        ],
+        "tensor": "model.layers.1.mlp.up_proj.weight"
+      },
+      {
+        "alignmentMultiple": 8,
+        "dimensionsAligned": true,
+        "shape": [
+          256,
+          1024
+        ],
+        "tensor": "model.layers.1.self_attn.o_proj.weight"
+      },
+      {
+        "alignmentMultiple": 8,
+        "dimensionsAligned": true,
+        "shape": [
+          1024,
+          256
+        ],
+        "tensor": "model.layers.1.self_attn.q_proj.weight"
+      },
+      {
+        "alignmentMultiple": 8,
+        "dimensionsAligned": true,
+        "shape": [
+          256,
+          2048
+        ],
+        "tensor": "model.layers.2.mlp.down_proj.weight"
+      },
+      {
+        "alignmentMultiple": 8,
+        "dimensionsAligned": true,
+        "shape": [
+          2048,
+          256
+        ],
+        "tensor": "model.layers.2.mlp.gate_proj.weight"
+      },
+      {
+        "alignmentMultiple": 8,
+        "dimensionsAligned": true,
+        "shape": [
+          2048,
+          256
+        ],
+        "tensor": "model.layers.2.mlp.up_proj.weight"
+      },
+      {
+        "alignmentMultiple": 8,
+        "dimensionsAligned": true,
+        "shape": [
+          256,
+          1024
+        ],
+        "tensor": "model.layers.2.self_attn.o_proj.weight"
+      },
+      {
+        "alignmentMultiple": 8,
+        "dimensionsAligned": true,
+        "shape": [
+          1024,
+          256
+        ],
+        "tensor": "model.layers.2.self_attn.q_proj.weight"
+      },
+      {
+        "alignmentMultiple": 8,
+        "dimensionsAligned": true,
+        "shape": [
+          256,
+          2048
+        ],
+        "tensor": "model.layers.3.mlp.down_proj.weight"
+      },
+      {
+        "alignmentMultiple": 8,
+        "dimensionsAligned": true,
+        "shape": [
+          2048,
+          256
+        ],
+        "tensor": "model.layers.3.mlp.gate_proj.weight"
+      },
+      {
+        "alignmentMultiple": 8,
+        "dimensionsAligned": true,
+        "shape": [
+          2048,
+          256
+        ],
+        "tensor": "model.layers.3.mlp.up_proj.weight"
+      },
+      {
+        "alignmentMultiple": 8,
+        "dimensionsAligned": true,
+        "shape": [
+          256,
+          2048
+        ],
+        "tensor": "model.layers.3.self_attn.o_proj.weight"
+      },
+      {
+        "alignmentMultiple": 8,
+        "dimensionsAligned": true,
+        "shape": [
+          2048,
+          256
+        ],
+        "tensor": "model.layers.3.self_attn.q_proj.weight"
+      }
+    ],
+    "matrixCount": 21
+  },
+  "excludedTargetCoupledTensorNames": [
+    "masked_embedding.centroids.weight",
+    "masked_embedding.token_ordering",
+    "post_projection.weight",
+    "pre_projection.weight"
+  ],
+  "inheritedTensorCount": 46,
+  "inheritedTensorMapping": [
+    {
+      "action": "INHERIT_READ_ONLY",
+      "sourceTensor": "model.embed_tokens.weight",
+      "targetTensor": "model.embed_tokens.weight"
+    },
+    {
+      "action": "INHERIT_READ_ONLY",
+      "sourceTensor": "model.layers.0.input_layernorm.weight",
+      "targetTensor": "model.layers.0.input_layernorm.weight"
+    },
+    {
+      "action": "INHERIT_READ_ONLY",
+      "sourceTensor": "model.layers.0.layer_scalar",
+      "targetTensor": "model.layers.0.layer_scalar"
+    },
+    {
+      "action": "INHERIT_READ_ONLY",
+      "sourceTensor": "model.layers.0.mlp.down_proj.weight",
+      "targetTensor": "model.layers.0.mlp.down_proj.weight"
+    },
+    {
+      "action": "INHERIT_READ_ONLY",
+      "sourceTensor": "model.layers.0.mlp.gate_proj.weight",
+      "targetTensor": "model.layers.0.mlp.gate_proj.weight"
+    },
+    {
+      "action": "INHERIT_READ_ONLY",
+      "sourceTensor": "model.layers.0.mlp.up_proj.weight",
+      "targetTensor": "model.layers.0.mlp.up_proj.weight"
+    },
+    {
+      "action": "INHERIT_READ_ONLY",
+      "sourceTensor": "model.layers.0.post_attention_layernorm.weight",
+      "targetTensor": "model.layers.0.post_attention_layernorm.weight"
+    },
+    {
+      "action": "INHERIT_READ_ONLY",
+      "sourceTensor": "model.layers.0.post_feedforward_layernorm.weight",
+      "targetTensor": "model.layers.0.post_feedforward_layernorm.weight"
+    },
+    {
+      "action": "INHERIT_READ_ONLY",
+      "sourceTensor": "model.layers.0.pre_feedforward_layernorm.weight",
+      "targetTensor": "model.layers.0.pre_feedforward_layernorm.weight"
+    },
+    {
+      "action": "INHERIT_READ_ONLY",
+      "sourceTensor": "model.layers.0.self_attn.o_proj.weight",
+      "targetTensor": "model.layers.0.self_attn.o_proj.weight"
+    },
+    {
+      "action": "INHERIT_READ_ONLY",
+      "sourceTensor": "model.layers.0.self_attn.q_norm.weight",
+      "targetTensor": "model.layers.0.self_attn.q_norm.weight"
+    },
+    {
+      "action": "INHERIT_READ_ONLY",
+      "sourceTensor": "model.layers.0.self_attn.q_proj.weight",
+      "targetTensor": "model.layers.0.self_attn.q_proj.weight"
+    },
+    {
+      "action": "INHERIT_READ_ONLY",
+      "sourceTensor": "model.layers.1.input_layernorm.weight",
+      "targetTensor": "model.layers.1.input_layernorm.weight"
+    },
+    {
+      "action": "INHERIT_READ_ONLY",
+      "sourceTensor": "model.layers.1.layer_scalar",
+      "targetTensor": "model.layers.1.layer_scalar"
+    },
+    {
+      "action": "INHERIT_READ_ONLY",
+      "sourceTensor": "model.layers.1.mlp.down_proj.weight",
+      "targetTensor": "model.layers.1.mlp.down_proj.weight"
+    },
+    {
+      "action": "INHERIT_READ_ONLY",
+      "sourceTensor": "model.layers.1.mlp.gate_proj.weight",
+      "targetTensor": "model.layers.1.mlp.gate_proj.weight"
+    },
+    {
+      "action": "INHERIT_READ_ONLY",
+      "sourceTensor": "model.layers.1.mlp.up_proj.weight",
+      "targetTensor": "model.layers.1.mlp.up_proj.weight"
+    },
+    {
+      "action": "INHERIT_READ_ONLY",
+      "sourceTensor": "model.layers.1.post_attention_layernorm.weight",
+      "targetTensor": "model.layers.1.post_attention_layernorm.weight"
+    },
+    {
+      "action": "INHERIT_READ_ONLY",
+      "sourceTensor": "model.layers.1.post_feedforward_layernorm.weight",
+      "targetTensor": "model.layers.1.post_feedforward_layernorm.weight"
+    },
+    {
+      "action": "INHERIT_READ_ONLY",
+      "sourceTensor": "model.layers.1.pre_feedforward_layernorm.weight",
+      "targetTensor": "model.layers.1.pre_feedforward_layernorm.weight"
+    },
+    {
+      "action": "INHERIT_READ_ONLY",
+      "sourceTensor": "model.layers.1.self_attn.o_proj.weight",
+      "targetTensor": "model.layers.1.self_attn.o_proj.weight"
+    },
+    {
+      "action": "INHERIT_READ_ONLY",
+      "sourceTensor": "model.layers.1.self_attn.q_norm.weight",
+      "targetTensor": "model.layers.1.self_attn.q_norm.weight"
+    },
+    {
+      "action": "INHERIT_READ_ONLY",
+      "sourceTensor": "model.layers.1.self_attn.q_proj.weight",
+      "targetTensor": "model.layers.1.self_attn.q_proj.weight"
+    },
+    {
+      "action": "INHERIT_READ_ONLY",
+      "sourceTensor": "model.layers.2.input_layernorm.weight",
+      "targetTensor": "model.layers.2.input_layernorm.weight"
+    },
+    {
+      "action": "INHERIT_READ_ONLY",
+      "sourceTensor": "model.layers.2.layer_scalar",
+      "targetTensor": "model.layers.2.layer_scalar"
+    },
+    {
+      "action": "INHERIT_READ_ONLY",
+      "sourceTensor": "model.layers.2.mlp.down_proj.weight",
+      "targetTensor": "model.layers.2.mlp.down_proj.weight"
+    },
+    {
+      "action": "INHERIT_READ_ONLY",
+      "sourceTensor": "model.layers.2.mlp.gate_proj.weight",
+      "targetTensor": "model.layers.2.mlp.gate_proj.weight"
+    },
+    {
+      "action": "INHERIT_READ_ONLY",
+      "sourceTensor": "model.layers.2.mlp.up_proj.weight",
+      "targetTensor": "model.layers.2.mlp.up_proj.weight"
+    },
+    {
+      "action": "INHERIT_READ_ONLY",
+      "sourceTensor": "model.layers.2.post_attention_layernorm.weight",
+      "targetTensor": "model.layers.2.post_attention_layernorm.weight"
+    },
+    {
+      "action": "INHERIT_READ_ONLY",
+      "sourceTensor": "model.layers.2.post_feedforward_layernorm.weight",
+      "targetTensor": "model.layers.2.post_feedforward_layernorm.weight"
+    },
+    {
+      "action": "INHERIT_READ_ONLY",
+      "sourceTensor": "model.layers.2.pre_feedforward_layernorm.weight",
+      "targetTensor": "model.layers.2.pre_feedforward_layernorm.weight"
+    },
+    {
+      "action": "INHERIT_READ_ONLY",
+      "sourceTensor": "model.layers.2.self_attn.o_proj.weight",
+      "targetTensor": "model.layers.2.self_attn.o_proj.weight"
+    },
+    {
+      "action": "INHERIT_READ_ONLY",
+      "sourceTensor": "model.layers.2.self_attn.q_norm.weight",
+      "targetTensor": "model.layers.2.self_attn.q_norm.weight"
+    },
+    {
+      "action": "INHERIT_READ_ONLY",
+      "sourceTensor": "model.layers.2.self_attn.q_proj.weight",
+      "targetTensor": "model.layers.2.self_attn.q_proj.weight"
+    },
+    {
+      "action": "INHERIT_READ_ONLY",
+      "sourceTensor": "model.layers.3.input_layernorm.weight",
+      "targetTensor": "model.layers.3.input_layernorm.weight"
+    },
+    {
+      "action": "INHERIT_READ_ONLY",
+      "sourceTensor": "model.layers.3.layer_scalar",
+      "targetTensor": "model.layers.3.layer_scalar"
+    },
+    {
+      "action": "INHERIT_READ_ONLY",
+      "sourceTensor": "model.layers.3.mlp.down_proj.weight",
+      "targetTensor": "model.layers.3.mlp.down_proj.weight"
+    },
+    {
+      "action": "INHERIT_READ_ONLY",
+      "sourceTensor": "model.layers.3.mlp.gate_proj.weight",
+      "targetTensor": "model.layers.3.mlp.gate_proj.weight"
+    },
+    {
+      "action": "INHERIT_READ_ONLY",
+      "sourceTensor": "model.layers.3.mlp.up_proj.weight",
+      "targetTensor": "model.layers.3.mlp.up_proj.weight"
+    },
+    {
+      "action": "INHERIT_READ_ONLY",
+      "sourceTensor": "model.layers.3.post_attention_layernorm.weight",
+      "targetTensor": "model.layers.3.post_attention_layernorm.weight"
+    },
+    {
+      "action": "INHERIT_READ_ONLY",
+      "sourceTensor": "model.layers.3.post_feedforward_layernorm.weight",
+      "targetTensor": "model.layers.3.post_feedforward_layernorm.weight"
+    },
+    {
+      "action": "INHERIT_READ_ONLY",
+      "sourceTensor": "model.layers.3.pre_feedforward_layernorm.weight",
+      "targetTensor": "model.layers.3.pre_feedforward_layernorm.weight"
+    },
+    {
+      "action": "INHERIT_READ_ONLY",
+      "sourceTensor": "model.layers.3.self_attn.o_proj.weight",
+      "targetTensor": "model.layers.3.self_attn.o_proj.weight"
+    },
+    {
+      "action": "INHERIT_READ_ONLY",
+      "sourceTensor": "model.layers.3.self_attn.q_norm.weight",
+      "targetTensor": "model.layers.3.self_attn.q_norm.weight"
+    },
+    {
+      "action": "INHERIT_READ_ONLY",
+      "sourceTensor": "model.layers.3.self_attn.q_proj.weight",
+      "targetTensor": "model.layers.3.self_attn.q_proj.weight"
+    },
+    {
+      "action": "INHERIT_READ_ONLY",
+      "sourceTensor": "model.norm.weight",
+      "targetTensor": "model.norm.weight"
+    }
+  ],
+  "inheritedTensorNames": [
+    "model.embed_tokens.weight",
+    "model.layers.0.input_layernorm.weight",
+    "model.layers.0.layer_scalar",
+    "model.layers.0.mlp.down_proj.weight",
+    "model.layers.0.mlp.gate_proj.weight",
+    "model.layers.0.mlp.up_proj.weight",
+    "model.layers.0.post_attention_layernorm.weight",
+    "model.layers.0.post_feedforward_layernorm.weight",
+    "model.layers.0.pre_feedforward_layernorm.weight",
+    "model.layers.0.self_attn.o_proj.weight",
+    "model.layers.0.self_attn.q_norm.weight",
+    "model.layers.0.self_attn.q_proj.weight",
+    "model.layers.1.input_layernorm.weight",
+    "model.layers.1.layer_scalar",
+    "model.layers.1.mlp.down_proj.weight",
+    "model.layers.1.mlp.gate_proj.weight",
+    "model.layers.1.mlp.up_proj.weight",
+    "model.layers.1.post_attention_layernorm.weight",
+    "model.layers.1.post_feedforward_layernorm.weight",
+    "model.layers.1.pre_feedforward_layernorm.weight",
+    "model.layers.1.self_attn.o_proj.weight",
+    "model.layers.1.self_attn.q_norm.weight",
+    "model.layers.1.self_attn.q_proj.weight",
+    "model.layers.2.input_layernorm.weight",
+    "model.layers.2.layer_scalar",
+    "model.layers.2.mlp.down_proj.weight",
+    "model.layers.2.mlp.gate_proj.weight",
+    "model.layers.2.mlp.up_proj.weight",
+    "model.layers.2.post_attention_layernorm.weight",
+    "model.layers.2.post_feedforward_layernorm.weight",
+    "model.layers.2.pre_feedforward_layernorm.weight",
+    "model.layers.2.self_attn.o_proj.weight",
+    "model.layers.2.self_attn.q_norm.weight",
+    "model.layers.2.self_attn.q_proj.weight",
+    "model.layers.3.input_layernorm.weight",
+    "model.layers.3.layer_scalar",
+    "model.layers.3.mlp.down_proj.weight",
+    "model.layers.3.mlp.gate_proj.weight",
+    "model.layers.3.mlp.up_proj.weight",
+    "model.layers.3.post_attention_layernorm.weight",
+    "model.layers.3.post_feedforward_layernorm.weight",
+    "model.layers.3.pre_feedforward_layernorm.weight",
+    "model.layers.3.self_attn.o_proj.weight",
+    "model.layers.3.self_attn.q_norm.weight",
+    "model.layers.3.self_attn.q_proj.weight",
+    "model.norm.weight"
+  ],
+  "missingInheritedTensorNames": [],
+  "newAttentionInitializationPlan": [
+    {
+      "initializer": "NOT_APPLIED",
+      "shape": [
+        512,
+        256
+      ],
+      "tensor": "model.layers.0.self_attn.k_proj.weight"
+    },
+    {
+      "initializer": "NOT_APPLIED",
+      "shape": [
+        512,
+        256
+      ],
+      "tensor": "model.layers.0.self_attn.v_proj.weight"
+    },
+    {
+      "initializer": "NOT_APPLIED",
+      "shape": [
+        256
+      ],
+      "tensor": "model.layers.0.self_attn.k_norm.weight"
+    },
+    {
+      "initializer": "NOT_APPLIED",
+      "shape": [
+        512,
+        256
+      ],
+      "tensor": "model.layers.1.self_attn.k_proj.weight"
+    },
+    {
+      "initializer": "NOT_APPLIED",
+      "shape": [
+        512,
+        256
+      ],
+      "tensor": "model.layers.1.self_attn.v_proj.weight"
+    },
+    {
+      "initializer": "NOT_APPLIED",
+      "shape": [
+        256
+      ],
+      "tensor": "model.layers.1.self_attn.k_norm.weight"
+    },
+    {
+      "initializer": "NOT_APPLIED",
+      "shape": [
+        512,
+        256
+      ],
+      "tensor": "model.layers.2.self_attn.k_proj.weight"
+    },
+    {
+      "initializer": "NOT_APPLIED",
+      "shape": [
+        512,
+        256
+      ],
+      "tensor": "model.layers.2.self_attn.v_proj.weight"
+    },
+    {
+      "initializer": "NOT_APPLIED",
+      "shape": [
+        256
+      ],
+      "tensor": "model.layers.2.self_attn.k_norm.weight"
+    },
+    {
+      "initializer": "NOT_APPLIED",
+      "shape": [
+        1024,
+        256
+      ],
+      "tensor": "model.layers.3.self_attn.k_proj.weight"
+    },
+    {
+      "initializer": "NOT_APPLIED",
+      "shape": [
+        1024,
+        256
+      ],
+      "tensor": "model.layers.3.self_attn.v_proj.weight"
+    },
+    {
+      "initializer": "NOT_APPLIED",
+      "shape": [
+        512
+      ],
+      "tensor": "model.layers.3.self_attn.k_norm.weight"
+    }
+  ],
+  "observedAt": "2026-09-06T20:50:15.272126+00:00",
+  "rankHeadInitializationPlan": [
+    {
+      "initializer": "NOT_APPLIED",
+      "shape": [
+        1,
+        256
+      ],
+      "tensor": "atlas.rank_head.weight"
+    },
+    {
+      "initializer": "NOT_APPLIED",
+      "shape": [
+        1
+      ],
+      "tensor": "atlas.rank_head.bias"
+    }
+  ],
+  "receiptChecksum": "sha256:b6f1c2a49d621844cd6bf499871c731313086848346c5d41da2ccaf918665af6",
+  "rerankerScoreContract": {
+    "normalization": "sigmoid_once",
+    "normalizedRange": [
+      0,
+      1
+    ],
+    "owner": "scripts/reranker-sidecar.py",
+    "promotionAttempted": false,
+    "rawScoreKind": "mxbai_ranking_logit"
+  },
+  "schema": "atlas.gemma-rank-tensor-alignment-proof.v1",
+  "shapeMismatches": [],
+  "sourceDtypes": [
+    "BF16",
+    "I64"
+  ],
+  "status": "INHERITED_TENSOR_ALIGNMENT_PROVEN",
+  "tensorCount": 50,
+  "unexpectedNewAttentionTensorsPresent": [],
+  "unexpectedTensorNames": [],
+  "weightsChecksum": "sha256:12875062fc25c51e8fa9b62abd2de7ad48b7d63f8559d5d604fbd5a3d6bcff16",
+  "weightsMutated": false,
+  "weightsPath": ".tmp\\google-gemma4-e4b-assistant\\model.safetensors"
+}

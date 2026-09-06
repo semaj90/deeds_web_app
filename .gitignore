@@ -699,6 +699,7 @@ vectors/*.feather
 !CHANGELOG*.txt
 !CONTRIBUTING*.txt
 !python-services/phase46_adapter/requirements.txt
+!python/requirements-atlas-unified-projection.txt
 !sveltekit-frontend/src/routes/.well-known/llms.txt/+server.ts
 !sveltekit-frontend/src/routes/.well-known/llms-full.txt/+server.ts
 

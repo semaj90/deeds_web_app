@@ -1,7 +1,8 @@
 {
   "schema": "atlas.rf6-rrf-fuse-hardening-report.v1",
-  "status": "IMPLEMENTED_UNPROVEN",
+  "status": "PROVEN_SOURCE_AND_TEST",
   "date": "2026-09-05",
+  "verifiedDate": "2026-09-06",
   "owner": "parent-atlas-retrieval-fusion-reachability",
   "operation": "RF6-RRF-FUSE-HARDEN-01",
   "canonicalFusionOwner": "SearchRuntime.fuseSearchRuntimeCandidates",
@@ -54,14 +55,19 @@
       "degraded identity observability"
     ],
     "written": true,
-    "executedInThisConnectorSession": false
+    "executedInThisConnectorSession": true,
+    "executedAt": "2026-09-06",
+    "result": "31/31 passed (0 failed, 0 skipped) across rf6-live-replay-01.test.ts (7), search-runtime-fusion.test.ts (21), rrf-split.test.ts (3)"
   },
   "proofBoundary": {
     "sourceReviewed": true,
     "upstreamQdrantRrfCapabilityVerified": true,
-    "typescriptCompileExecuted": false,
-    "vitestExecuted": false,
-    "openspecValidationExecuted": false,
+    "typescriptCompileExecuted": true,
+    "typescriptCompileResult": "77 pre-existing errors repo-wide (missing optional packages: piper-wasm, fastmcp, nodejs-whisper, @playwright/test, @mendable/firecrawl-js; plus unrelated drift in search-runtime-ace-resolver-v1.ts/search-runtime-feature-bundle-provider-v1.ts/live-structural-lane-provider.ts) -- zero errors in rrf-fuse.ts, rrf-contract.ts, or any of the 3 RF6 test files touched by this gate",
+    "vitestExecuted": true,
+    "vitestResult": "3 files / 31 tests passed, 0 failed",
+    "openspecValidationExecuted": true,
+    "openspecValidationResult": "npx openspec validate parent-atlas-retrieval-fusion-reachability --strict -> valid",
     "liveRetrievalReplayExecuted": false,
     "datastoreWritesPerformed": false,
     "qdrantWritesPerformed": false,

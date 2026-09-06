@@ -1,24 +1,36 @@
-import FirecrawlApp from '@mendable/firecrawl-js';
 import { ENV } from '$lib/server/env.server.js';
 import type { WebResearchChunk } from './web-research-ingester.js';
 import { sha256Hex } from './research-utils.js';
+import { loadFirecrawl, type FirecrawlClient } from '$lib/server/retrieval/optional-firecrawl-provider.js';
 
 /**
  * fastcrawl.ts — High-speed web page fetch and normalization.
  * Uses Firecrawl for clean markdown/HTML extraction.
+ *
+ * `@mendable/firecrawl-js` is not installed by default (see
+ * `optional-firecrawl-provider.ts`'s docstring) — this file previously had a bare static
+ * `import FirecrawlApp from '@mendable/firecrawl-js'`, which throws at module load time (not just
+ * a type error) for anything that transitively imports this file, since Node's ESM loader
+ * resolves static imports eagerly. Routed through the shared optional-dependency loader instead.
  */
 
-let _firecrawl: any = null;
+let _firecrawl: FirecrawlClient | null = null;
 
-function getFirecrawl() {
-  if (!_firecrawl && ENV.FIRECRAWL_API_KEY) {
-    _firecrawl = new (FirecrawlApp as any)(ENV.FIRECRAWL_API_KEY);
+async function getFirecrawl(): Promise<FirecrawlClient | null> {
+  if (_firecrawl) return _firecrawl;
+  if (!ENV.FIRECRAWL_API_KEY) return null;
+
+  const result = await loadFirecrawl();
+  if (result.status === 'UNAVAILABLE') {
+    console.warn(`[fastcrawl] Firecrawl unavailable: ${result.reason}`);
+    return null;
   }
+  _firecrawl = new result.FirecrawlCtor({ apiKey: ENV.FIRECRAWL_API_KEY });
   return _firecrawl;
 }
 
 export async function fastCrawl(url: string): Promise<WebResearchChunk | null> {
-  const firecrawl = getFirecrawl();
+  const firecrawl = await getFirecrawl();
   if (!firecrawl) {
     console.warn('[fastcrawl] FIRECRAWL_API_KEY missing, falling back to basic fetch');
     return basicFetch(url);

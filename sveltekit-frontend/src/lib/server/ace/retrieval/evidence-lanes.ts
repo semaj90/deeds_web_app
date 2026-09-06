@@ -133,6 +133,7 @@ export class QdrantDenseLane {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         query: embedding,
+        using: 'content',
         limit,
         with_payload: true,
         with_vector: false

@@ -373,3 +373,152 @@ Tasks 1-3 above, then: `QUERY-EVIDENCE-POLICY-01` → `EXTERNAL-EVIDENCE-V1` →
 `CONCEPT-RECOGNITION-01` (cross-reference `parent-atlas-ontology-kernel`'s concept fabric work —
 `entity-concept-taxonomy-v1.ts` — before starting; do not build a third concept-recognition owner)
 → `BEST-FIT-FEATURE-V1` → `BEST-FIT-CALIBRATION-01`.
+
+## 6. ORNITH-CROSS-RANKER-CHALLENGER-01 (EVALUATION-ONLY DECISION, 2026-09-06)
+
+This is an additive evaluation decision under the existing best-fit/rerank owner. It does not
+create a second reranker, fusion owner, semantic lane, cache identity, or model-serving profile.
+
+- [x] Owner and role classified. EmbeddingGemma remains the canonical first-stage bi-encoder and
+      `semantic_768` producer. `MixedbreadCanonicalReranker`/the configured dedicated CrossEncoder
+      remains the current second-stage production reranker. SearchRuntime remains the sole fusion
+      owner and physical semantic executors remain one logical semantic lane/one vote.
+- [x] Ornith runtime identity verified read-only through the local `/v1/models` endpoint as
+      `ornith-1.5-9b`. No live completion, model installation, cache write, or serving-profile
+      change was performed for this decision.
+- [x] Legacy boundary checked. `sveltekit-frontend/src/lib/server/retrieval/cross-ranker.ts`
+      exposes a separate `executeUnifiedCrossRanking()` implementation that directly persists to
+      `semantic_top_k`/`retrieval_decision_log`; no current source call sites were found. It is not
+      a production SearchRuntime owner and must not receive Ornith wiring or become a second fusion
+      path. Any retirement or archival decision belongs to the retrieval-fusion owner.
+- [x] Fixture-only comparison contract implemented in
+      `sveltekit-frontend/src/lib/server/retrieval/rerank-shadow-evaluation-v1.ts` with focused
+      tests in `rerank-shadow-evaluation-v1.spec.ts`. It validates a shared bounded candidate
+      population, canonical identity/source revisions, deterministic candidate/order checksums,
+      served-order integrity, optional reviewed-label NDCG@10/MRR@10, top-K overlap, rank
+      displacement, and resource deltas. It has no model, network, cache, or datastore dependency.
+- [x] Mixedbread sidecar contract hardened on 2026-09-06. The request now binds the selected
+      model ID, the response must echo that exact model ID and contain one finite normalized score
+      for every requested position, and malformed/duplicate/unknown rows fail closed instead of
+      becoming implicit zero scores. `scripts/reranker-sidecar.py` applies sigmoid once to the
+      mxbai ranking logits so the HTTP score contract is bounded `[0,1]`; the TypeScript adapter
+      and focused tests cover order restoration and request identity. This proves the adapter
+      contract only; it does not prove that the live sidecar is loaded or production-authorized.
+- [ ] Freeze a read-only shadow comparison over the same revision-qualified post-fusion candidate
+      set (bounded to at most 12 candidates), preserving `CandidateOrdinal`/canonical identity,
+      source revisions, and the candidate-set checksum for every arm: current dedicated
+      CrossEncoder baseline, any dedicated reranker challenger, and Ornith judge/challenger.
+-     **Live fixture observation 2026-09-06:** `scripts/atlas/rerank-shadow-01-harness.mjs`
+      reached the mxbai sidecar (`mixedbread-ai/mxbai-rerank-base-v2`, CUDA-loaded) and
+      emitted `docs/reports/rerank-shadow-01-live-fixture-v1.json`. On the three-query,
+      hand-labeled fixture, mxbai measured top-1 agreement `1/3`, MRR `0.50`, and Recall@3
+      `1/3`; this is fixture evidence only because candidates are not yet a
+      revision-qualified post-fusion cohort.
+- [ ] Compare Recall@K/MRR/NDCG@10, top-1 agreement, top-K overlap, rank displacement, latency,
+      token use, GPU memory, failures, and evidence-identity preservation. Emit an evaluation
+      receipt; do not change served order, SearchRuntime fusion, cache keys, or promotion state.
+- [x] Promotion boundary frozen: do not promote Ornith to the canonical reranker based on model
+      family, Qwen lineage, or a single qualitative result. If a purpose-trained reranker is
+      required, evaluate it first as a dedicated challenger; Ornith remains an optional expensive
+      judge/listwise shadow lane.
+
+Gate prerequisites: the RF6 live replay/candidate identity bridge and an explicit bounded live
+evaluation authorization. Until both exist, this is `UNVERIFIED`, not production reranker
+readiness. No new OpenSpec change is warranted.
+
+## 7. AtlasGemmaMicro / REAP research boundary (2026-09-06)
+
+The proposed `AtlasGemmaMicro` is a future model-research artifact, not a
+current production reranker or a new fusion owner. The repository currently
+contains MTP assistant configuration (`MTP_DRAFT_MODEL`) but no proven
+standalone Gemma-derived checkpoint, detached token-embedding forward path,
+multi-head output contract, teacher corpus, or real REAP expert-pruning run.
+The configured assistant must therefore remain target-activation/KV-coupled
+compatibility machinery until its forward contract is independently verified.
+
+- [x] Ownership boundary recorded: EmbeddingGemma remains the canonical
+      `semantic_768` producer; mxbai/Mixedbread remains the dedicated
+      CrossEncoder owner; SearchRuntime remains the single fusion owner;
+      Ornith remains synthesis/judge-only; any future micro-model is a
+      revisioned challenger behind this change.
+- [x] MICRO-01 Freeze a standalone-vs-target-coupled checkpoint receipt,
+      including model/config/tokenizer/template revisions and a checksum. The
+      read-only inventory `python/atlas_gemma_rank_checkpoint_inventory_v1.py`
+      inspected `.tmp/google-gemma4-e4b-assistant` and emitted
+      `docs/reports/atlas-gemma-rank-checkpoint-inventory-v1.json` with
+      `tensorCount=50`, `status=BLOCKED_TARGET_COUPLED_ASSISTANT`,
+      `num_kv_shared_layers=4`, `use_bidirectional_attention=null`, and twelve
+      missing standalone attention tensors: eight K/V projection weights plus
+      four trainable KNorm weights. The config-derived plan is three sliding
+      layers with K/V `[512,256]` and KNorm `[256]`, followed by one full layer
+      with K/V `[1024,256]` and KNorm `[512]`; no shape mismatches were observed.
+      The refreshed receipt checksum is
+      `sha256:07043690893f46b09bda55ff5aec579edcf5609082b4885f685d5e599f4b01a6`.
+      A target-activation assistant cannot be relabeled as a standalone model.
+- [x] AGMR-02 Derive and validate the no-training standalone shape contract without
+      using `Gemma4AssistantConfig` or mutating the upstream `config.json`.
+      `python/atlas_gemma_rank_standalone_shape_proof_v1.py` emits
+      `docs/reports/atlas-gemma-rank-standalone-shape-proof-v1.json` with custom
+      `model_type=atlas_gemma_rank`, `num_kv_shared_layers=0`,
+      `use_bidirectional_attention=all`, `use_cache=false`, a scalar rank head,
+      and config-derived K/V/KNorm shapes. The test fixture has six expected
+      attention tensors and the real four-layer checkpoint has twelve expected
+      new attention tensors; no training, CUDA allocation, or weight mutation is
+      performed. This proves the derived shape/config contract, not forward-pass
+      compatibility or embedding-row alignment.
+- [x] AGMR-03 Define the exact inherited-tensor allow-list and alignment plan without
+      initializing weights or allocating CUDA memory. `python/atlas_gemma_rank_tensor_alignment_proof_v1.py`
+      verifies the real checkpoint's 46 inherited tensors, excludes the four
+      target-coupled projection/centroid tensors, derives all matrix shapes from
+      the layer configuration, records BF16 source dtype, checks conservative
+      8-wide GEMM dimension alignment, and records the existing mxbai
+      `sigmoid_once` score contract. The receipt explicitly reports
+      `cudaAllocated=false`, `gemmExecuted=false`, and `weightsMutated=false`.
+      This proves tensor/shape alignment only; it does not prove a forward pass,
+      ordered-embedding alignment, or RTX runtime performance.
+      A separate bounded CUDA smoke on 2026-09-06 verified only that the host can
+      execute a finite FP16 `[1024,256] @ [256,1]` GEMM on an NVIDIA GeForce RTX
+      3060 Ti (compute capability 8.6, Torch CUDA 12.8); it did not load the
+      checkpoint or claim model-forward compatibility.
+- [x] AGMR-03A Record the precision boundary for the existing runtime. The live
+      `:8090` Ornith process is a separate GGUF inference profile using CUDA
+      offload, Flash Attention, and `q8_0/q8_0` KV-cache types; `-ctk`/`-ctv`
+      select KV-cache storage and do not convert model weights to INT8. The
+      live `:8081` EmbeddingGemma process remains the separate FP16 embedding
+      lane. The mxbai `:8099` sidecar loads its CUDA model in FP16 and exposes
+      the already-frozen `sigmoid_once(raw_ranking_logit)` score contract;
+      its health response now reports `model_dtype`, score semantics, and
+      score range explicitly. Upstream stock llama-server names are `-fa` /
+      `--flash-attn`, `-ctk` / `--cache-type-k`, `-ctv` / `--cache-type-v`,
+      `-ngl` / `--n-gpu-layers`, `-b` / `--batch-size`, `-ub` /
+      `--ubatch-size`, `--cache-prompt`, and `--cache-reuse`.
+      This is a contract/documentation proof only; no live process was
+      restarted and no model, cache, datastore, or projection was changed.
+- [ ] AGMR-03B Run a separate FP16-versus-INT8 precision parity benchmark
+      before any INT8 promotion. A valid INT8 candidate must be an explicit
+      quantized model or supported quantized execution artifact, not merely
+      `-ctk q8_0`/`-ctv q8_0`. Compare finite scores, top-K overlap, NDCG/MRR
+      where labels exist, latency, peak VRAM, and CUDA GEMM/forward stability
+      on the same revision-qualified fixture. Keep FP16 as the reference
+      path; do not alter the canonical mxbai or Ornith runtime profile from
+      this task.
+- [ ] MICRO-02 Define and validate a bounded `CandidateFeatureMatrixV1` input
+      projection for rank/span/route/utility heads. Features remain derived
+      observations; the model cannot mint source identity, revisions,
+      CandidateOrdinal, ontology tuples, or retrieval votes.
+- [ ] MICRO-03 Build teacher/evaluation receipts from the existing mxbai,
+      LangExtract, ACE, and workflow-outcome owners before distillation. No
+      hidden thoughts, KV state, or tensors may enter durable memory.
+- [ ] MICRO-04 Evaluate the micro-model as a read-only shadow on frozen,
+      revision-qualified candidates for rank quality, grounded-span parity,
+      routing lift, utility prediction, latency, and VRAM. Do not alter served
+      order or cache identity.
+- [ ] MICRO-05 Only after V1 shadow evidence exists may a separate, explicitly
+      scoped MoE/REAP experiment evaluate expert pruning. Dense Gemma E2B is
+      not an MoE target for REAP, and no expert-pruning claim may be inferred
+      from layer/channel surgery.
+
+Safe order remains: finish the current bounded mxbai/CrossEncoder shadow gate,
+close candidate identity and feature-matrix receipts, then evaluate a
+standalone micro-model challenger. This section adds no runtime model, cache,
+GPU, datastore, or OpenSpec ownership.

@@ -204,45 +204,17 @@ export async function executeMultiVectorRetrieval(
     titleMs = performance.now() - performance.now();
   }
 
-  // ── Lane 4: Keywords Lexical (Qdrant payload filter + lexical fallback) ────
+  // ── Lane 4: Keywords Lexical ──────────────────────────────────────────────
+  // Qdrant's Query Points API accepts vector/query objects here, not raw
+  // natural-language text. The live 768 collections expose only the dense
+  // named vectors content/error/signature and no keywords vector or BM25
+  // payload index. Keep lexical ownership in the PostgreSQL FTS/BM25 lane;
+  // this lane remains an explicit empty compatibility slot until a real sparse
+  // Qdrant vector contract is provisioned and receipted.
   let keywordResults: QdrantSearchResult[] = [];
   let keywordsMs = 0;
   try {
     const keywordsStart = performance.now();
-
-    // Lexical retrieval via Qdrant full-text search on keywords payload
-    // (Note: requires BM25 indexing to be enabled on 'keywords' field)
-    try {
-      const keywordResponse = await (qdrant as any).query(collection, {
-        query: request.query, // Natural language query for BM25
-        using: 'keywords', // Vector name or payload field name
-        limit: config.topK,
-        with_payload: true,
-      });
-
-        keywordResults = keywordResponse.points
-          .map((point: any) => {
-            const payload = (point.payload ?? {}) as Record<string, any>;
-            const packetKey = payload['packet_key'] ?? payload['symbol_version_id'];
-            const sourceRef = payload['source_ref'];
-            if (typeof packetKey !== 'string' || packetKey.length === 0) return null;
-            if (typeof sourceRef !== 'string' || sourceRef.length === 0) return null;
-            return {
-              id: String(point.id),
-              score: point.score,
-              payload,
-              packetKey,
-              sourceRef,
-              symbolVersionId: typeof payload['symbol_version_id'] === 'string' ? payload['symbol_version_id'] : undefined,
-              qdrantPointId: String(point.id),
-            };
-          })
-          .filter((point: QdrantSearchResult | null): point is QdrantSearchResult => point !== null);
-    } catch {
-      // Fallback: If BM25 not available, use empty results (non-blocking)
-      keywordResults = [];
-    }
-
     keywordsMs = performance.now() - keywordsStart;
   } catch (err) {
     console.warn('[multi-vector] keywords lane failed:', err);

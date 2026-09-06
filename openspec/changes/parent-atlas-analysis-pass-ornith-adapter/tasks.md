@@ -323,3 +323,13 @@ vision-capable; `ornith-ai/Ornith-1.5-9B-GGUF` on Hugging Face ships
       decisions), both explicitly requiring an operator decision this change does not make on its
       own, per this repo's Agent Execution Integrity rules.
 - [x] 5.3 `npx openspec validate parent-atlas-analysis-pass-ornith-adapter --strict` — passes.
+- [x] 5.4 **Vision projector ownership registry freeze (2026-09-06).** Updated
+      `models/model-manifest.json` with explicit `ORNITH_VISION_PRODUCTION` and
+      `GEMMA_VISION_PRODUCTION` profiles, family-matched projector IDs and checksums, and the
+      non-production `ORNITH_MODEL_GEMMA_PROJECTOR` compatibility profile. Ornith's projector
+      checksum is frozen as
+      `626f9f90627402a6bf4a999111d0fbd69b5fcca7aa8ba089d69e5f10e8858e1d`; the locally measured
+      Gemma projector checksum is recorded separately. Cross-family loading is not permitted,
+      and the default `ornith-1.5` text profile remains projector-free. This is registry/provenance
+      work only; it does not claim a live cross-family compatibility proof or retire the existing
+      Gemma4 evidence pipeline.

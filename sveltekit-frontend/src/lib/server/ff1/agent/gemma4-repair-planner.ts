@@ -71,7 +71,13 @@ async function qdrantContext(query: string): Promise<string> {
     const sRes = await fetch(`${QDRANT_URL}/collections/codebase_chunks_768/points/query`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ query: embedding, limit: 3, with_payload: true, score_threshold: 0.5 }),
+      body: JSON.stringify({
+        query: embedding,
+        using: 'content',
+        limit: 3,
+        with_payload: true,
+        score_threshold: 0.5,
+      }),
       signal: AbortSignal.timeout(8_000),
     });
     if (!sRes.ok) return '';

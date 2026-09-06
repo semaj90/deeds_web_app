@@ -27,7 +27,10 @@ exists, loads the official Ornith-specific projector (`mmproj-Ornith-1.5-9B-BF16
 tool-call, JSON-structured-output, and real image-understanding smoke tests. **This proof alone
 does not migrate the existing document-vision call sites** — that is a separate, later decision
 (distinct throughput/prompt-format/pipeline-integration factors may still favor the existing model
-for those specific call sites) and is explicitly out of this requirement's scope.
+for those specific call sites) and is explicitly out of this requirement's scope. The canonical
+family/projector ownership and compatibility profiles are recorded in `models/model-manifest.json`:
+`ORNITH_VISION_PRODUCTION` and `GEMMA_VISION_PRODUCTION` are exact-family profiles, while
+`ORNITH_MODEL_GEMMA_PROJECTOR` is a non-production compatibility experiment and is load-disabled.
 
 #### Scenario: Text-only profile has no vision
 - **WHEN** a caller queries `GET :8090/props` while the `ornith-1.5` (no-mmproj) profile is running

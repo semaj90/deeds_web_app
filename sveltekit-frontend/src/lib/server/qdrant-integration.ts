@@ -55,6 +55,7 @@ export async function searchVectors(searchRequest: SearchRequest): Promise<Searc
             },
             body: JSON.stringify({
                 query: searchRequest.vector,
+                using: 'content',
                 limit: searchRequest.limit,
                 filter: searchRequest.filter,
                 with_payload: searchRequest.with_payload,

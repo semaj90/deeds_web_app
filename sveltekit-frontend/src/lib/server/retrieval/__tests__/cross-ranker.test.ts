@@ -53,7 +53,7 @@ describe('Cross-Ranker: Semantic Score Normalization', () => {
     const normalized = CrossRankerTestHelpers.normalizeSemanticScores(candidates);
 
     expect(normalized.get('p1')).toBe(1.0); // max
-    expect(normalized.get('p2')).toBe(0.5); // mid
+    expect(normalized.get('p2')).toBe(0.4); // (0.5 - 0.3) / (0.8 - 0.3) = 0.4, not the arithmetic midpoint
     expect(normalized.get('p3')).toBe(0.0); // min
   });
 
@@ -146,8 +146,11 @@ describe('Cross-Ranker: Topology / PageRank Scoring', () => {
   it('should fetch topology scores from Postgres view', async () => {
     const mockQueryResult = {
       rows: [
-        { packet_key: 'p1', page_rank_score: 5.0 },
-        { packet_key: 'p2', page_rank_score: 3.0 }
+        // pagerank_l1 is the query's own COALESCE(...) output alias (cross-ranker.ts:226) —
+        // a mocked db.query() never runs the real SQL, so the fixture must match the alias,
+        // not the raw source column name.
+        { packet_key: 'p1', pagerank_l1: 5.0 },
+        { packet_key: 'p2', pagerank_l1: 3.0 }
       ]
     };
 
@@ -281,8 +284,8 @@ describe('Cross-Ranker: Score Blending', () => {
     const result = blended.get('p1');
     expect(result).toBeDefined();
     if (result) {
-      // 0.5 * 0.8 + 0.2 * 0.2 + 0.2 * 0.5 + 0.1 * 0.6 = 0.56
-      expect(result.score).toBeCloseTo(0.56, 2);
+      // 0.5 * 0.8 + 0.2 * 0.2 + 0.2 * 0.5 + 0.1 * 0.6 = 0.4 + 0.04 + 0.1 + 0.06 = 0.60
+      expect(result.score).toBeCloseTo(0.6, 2);
     }
   });
 

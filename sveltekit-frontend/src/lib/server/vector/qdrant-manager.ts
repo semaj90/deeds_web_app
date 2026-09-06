@@ -719,7 +719,7 @@ export class QdrantManager {
       queries: [
         {
           vector: params.queryEmbedding,
-          vectorName: 'default',
+          vectorName: QDRANT_DENSE_VECTOR_NAME,
           limit: params.limit ?? 20,
           weight: 1.0,
           filter: params.filters,

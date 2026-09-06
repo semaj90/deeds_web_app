@@ -1,0 +1,205 @@
+{
+  "attentionShapePlan": [
+    {
+      "kNormShape": [
+        256
+      ],
+      "kProjShape": [
+        512,
+        256
+      ],
+      "layer": 0,
+      "layerType": "sliding_attention",
+      "numKeyValueHeads": 2,
+      "perHeadDim": 256,
+      "vProjShape": [
+        512,
+        256
+      ]
+    },
+    {
+      "kNormShape": [
+        256
+      ],
+      "kProjShape": [
+        512,
+        256
+      ],
+      "layer": 1,
+      "layerType": "sliding_attention",
+      "numKeyValueHeads": 2,
+      "perHeadDim": 256,
+      "vProjShape": [
+        512,
+        256
+      ]
+    },
+    {
+      "kNormShape": [
+        256
+      ],
+      "kProjShape": [
+        512,
+        256
+      ],
+      "layer": 2,
+      "layerType": "sliding_attention",
+      "numKeyValueHeads": 2,
+      "perHeadDim": 256,
+      "vProjShape": [
+        512,
+        256
+      ]
+    },
+    {
+      "kNormShape": [
+        512
+      ],
+      "kProjShape": [
+        1024,
+        256
+      ],
+      "layer": 3,
+      "layerType": "full_attention",
+      "numKeyValueHeads": 2,
+      "perHeadDim": 512,
+      "vProjShape": [
+        1024,
+        256
+      ]
+    }
+  ],
+  "canonicalAuthority": false,
+  "checkpointDir": ".tmp\\google-gemma4-e4b-assistant",
+  "configInvariants": {
+    "bidirectionalEncoding": true,
+    "cacheDisabledForCrossRank": true,
+    "customModelType": true,
+    "kvSharingDisabled": true,
+    "rankHeadScalar": true,
+    "upstreamOrderedEmbeddingNotRelabeled": true
+  },
+  "configPath": ".tmp\\google-gemma4-e4b-assistant\\config.json",
+  "derivedConfig": {
+    "architectures": [
+      "AtlasGemmaRankForPairwiseScoring"
+    ],
+    "global_head_dim": 512,
+    "head_dim": 256,
+    "hidden_size": 256,
+    "intermediate_size": 2048,
+    "layer_types": [
+      "sliding_attention",
+      "sliding_attention",
+      "sliding_attention",
+      "full_attention"
+    ],
+    "model_type": "atlas_gemma_rank",
+    "num_attention_heads": 4,
+    "num_hidden_layers": 4,
+    "num_key_value_heads": 2,
+    "num_kv_shared_layers": 0,
+    "rankHead": {
+      "bias": true,
+      "inFeatures": 256,
+      "outFeatures": 1
+    },
+    "sourceArchitecture": "Gemma4AssistantForCausalLM",
+    "sourceModel": "gemma4_assistant",
+    "task": "pairwise_relevance_score",
+    "use_bidirectional_attention": "all",
+    "use_cache": false,
+    "use_ordered_embeddings": false
+  },
+  "derivedConfigChecksum": "sha256:1e326b75fbe062b7819b9ad485196548b3c943858fde5dcd601aaabb41fc4969",
+  "expectedNewTrainableAttentionTensors": {
+    "model.layers.0.self_attn.k_norm.weight": [
+      256
+    ],
+    "model.layers.0.self_attn.k_proj.weight": [
+      512,
+      256
+    ],
+    "model.layers.0.self_attn.v_proj.weight": [
+      512,
+      256
+    ],
+    "model.layers.1.self_attn.k_norm.weight": [
+      256
+    ],
+    "model.layers.1.self_attn.k_proj.weight": [
+      512,
+      256
+    ],
+    "model.layers.1.self_attn.v_proj.weight": [
+      512,
+      256
+    ],
+    "model.layers.2.self_attn.k_norm.weight": [
+      256
+    ],
+    "model.layers.2.self_attn.k_proj.weight": [
+      512,
+      256
+    ],
+    "model.layers.2.self_attn.v_proj.weight": [
+      512,
+      256
+    ],
+    "model.layers.3.self_attn.k_norm.weight": [
+      512
+    ],
+    "model.layers.3.self_attn.k_proj.weight": [
+      1024,
+      256
+    ],
+    "model.layers.3.self_attn.v_proj.weight": [
+      1024,
+      256
+    ]
+  },
+  "missingNewTrainableAttentionTensors": [
+    "model.layers.0.self_attn.k_norm.weight",
+    "model.layers.0.self_attn.k_proj.weight",
+    "model.layers.0.self_attn.v_proj.weight",
+    "model.layers.1.self_attn.k_norm.weight",
+    "model.layers.1.self_attn.k_proj.weight",
+    "model.layers.1.self_attn.v_proj.weight",
+    "model.layers.2.self_attn.k_norm.weight",
+    "model.layers.2.self_attn.k_proj.weight",
+    "model.layers.2.self_attn.v_proj.weight",
+    "model.layers.3.self_attn.k_norm.weight",
+    "model.layers.3.self_attn.k_proj.weight",
+    "model.layers.3.self_attn.v_proj.weight"
+  ],
+  "newTrainableAttentionState": "UNINITIALIZED_REQUIRED",
+  "observedAt": "2026-09-06T20:45:47.280438+00:00",
+  "presentNewTrainableAttentionTensors": [],
+  "rankHeadPlan": [
+    {
+      "shape": [
+        1,
+        256
+      ],
+      "tensor": "atlas.rank_head.weight"
+    },
+    {
+      "shape": [
+        1
+      ],
+      "tensor": "atlas.rank_head.bias"
+    }
+  ],
+  "receiptChecksum": "sha256:a0e18d77175ebf323aefa75dfaf8aa4f395421453e15bde6495635a29fed415e",
+  "runtimeInstantiation": "NOT_ATTEMPTED_CUSTOM_ARCHITECTURE",
+  "schema": "atlas.gemma-rank-standalone-shape-proof.v1",
+  "shapeMismatches": [],
+  "status": "STANDALONE_SHAPE_CONTRACT_PROVEN",
+  "tensorCount": 50,
+  "trainingPerformed": false,
+  "upstreamConfigType": "gemma4_assistant",
+  "upstreamOrderedEmbeddings": true,
+  "upstreamWeightsChecksum": "sha256:12875062fc25c51e8fa9b62abd2de7ad48b7d63f8559d5d604fbd5a3d6bcff16",
+  "weightsMutated": false,
+  "weightsPath": ".tmp\\google-gemma4-e4b-assistant\\model.safetensors"
+}

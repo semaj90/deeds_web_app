@@ -5,6 +5,7 @@
 
 import { ENV } from '$lib/server/env.server.js';
 import { getQdrantClient } from '$lib/server/vector/qdrant-singleton.js';
+import { getNamedVectorName } from '$lib/server/config/vector-config.js';
 
 const qdrantClient = {
   async search(params: {
@@ -16,6 +17,9 @@ const qdrantClient = {
     try {
       const { points: results } = await getQdrantClient().query(params.collectionName, {
         query: params.vector,
+        ...(getNamedVectorName(params.collectionName)
+          ? { using: getNamedVectorName(params.collectionName) }
+          : {}),
         limit: params.limit ?? 10,
         filter: params.filter as any,
         with_payload: true,

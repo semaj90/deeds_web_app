@@ -264,31 +264,38 @@ async function queryQdrantVectorSignal(
       const cleanedSeeds = [...new Set(seedRefs.map((ref) => String(ref ?? '').trim()).filter(Boolean))];
       if (cleanedSeeds.length > 0) {
         const seededVector = buildVectorPayload(collections[0], truncateEmbeddingForCollection(embedding, collections[0]));
-        const seededRes = await fetch(`${process.env.QDRANT_URL ?? 'http://127.0.0.1:6333'}/collections/${collections[0]}/points/query`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            query: Array.isArray(seededVector) ? seededVector : seededVector.vector,
-            ...(Array.isArray(seededVector) ? {} : { using: seededVector.name }),
-            limit: denseLimit,
-            score_threshold: 0.001,
-            with_payload: true,
-            filter: {
-              should: [
-                { key: 'source_ref', match: { any: cleanedSeeds } },
-                { key: 'sourceRef', match: { any: cleanedSeeds } },
-                { key: 'canonicalSourceRef', match: { any: cleanedSeeds } },
-                { key: 'file_path', match: { any: cleanedSeeds } },
-                { key: 'filePath', match: { any: cleanedSeeds } },
-                { key: 'stable_key', match: { any: cleanedSeeds } },
-                { key: 'packet_key', match: { any: cleanedSeeds } },
-              ],
-            },
-          }),
-          signal: AbortSignal.timeout(5000),
-        });
+        let seededRes: Response | null = null;
+        try {
+          seededRes = await fetch(`${process.env.QDRANT_URL ?? 'http://127.0.0.1:6333'}/collections/${collections[0]}/points/query`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              query: Array.isArray(seededVector) ? seededVector : seededVector.vector,
+              ...(Array.isArray(seededVector) ? {} : { using: seededVector.name }),
+              limit: denseLimit,
+              score_threshold: 0.001,
+              with_payload: true,
+              filter: {
+                should: [
+                  { key: 'source_ref', match: { any: cleanedSeeds } },
+                  { key: 'sourceRef', match: { any: cleanedSeeds } },
+                  { key: 'canonicalSourceRef', match: { any: cleanedSeeds } },
+                  { key: 'file_path', match: { any: cleanedSeeds } },
+                  { key: 'filePath', match: { any: cleanedSeeds } },
+                  { key: 'stable_key', match: { any: cleanedSeeds } },
+                  { key: 'packet_key', match: { any: cleanedSeeds } },
+                ],
+              },
+            }),
+            signal: AbortSignal.timeout(5000),
+          });
+        } catch (error) {
+          // Seed references are a precision hint. A slow/unavailable filtered
+          // query must not suppress the canonical semantic_768 ANN fallback.
+          console.warn('[rrf] seeded Qdrant query failed; falling through to unfiltered ANN:', error);
+        }
 
-        if (seededRes.ok) {
+        if (seededRes?.ok) {
           const seededData = await seededRes.json();
           const seeded = (seededData as {
             result?: { points?: Array<{ id: string | number; score: number; payload?: Record<string, unknown> }> };

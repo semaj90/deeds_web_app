@@ -2,9 +2,9 @@
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { mockEmbedQueryForLane, mockHybridSearch } = vi.hoisted(() => ({
+const { mockEmbedQueryForLane, mockDenseSearch } = vi.hoisted(() => ({
   mockEmbedQueryForLane: vi.fn(),
-  mockHybridSearch: vi.fn(),
+  mockDenseSearch: vi.fn(),
 }));
 
 vi.mock('./embedding-service.js', () => ({
@@ -13,7 +13,7 @@ vi.mock('./embedding-service.js', () => ({
 
 vi.mock('$lib/server/vector/qdrant-manager.js', () => ({
   getQdrantManager: async () => ({
-    hybridSearch: mockHybridSearch,
+    denseSearch: mockDenseSearch,
   }),
 }));
 
@@ -22,7 +22,7 @@ import { retrieveQdrant } from './retrieve-candidates.js';
 describe('retrieveQdrant', () => {
   beforeEach(() => {
     mockEmbedQueryForLane.mockReset();
-    mockHybridSearch.mockReset();
+    mockDenseSearch.mockReset();
   });
 
   it('queries the clean v2 collection with the content vector contract', async () => {
@@ -33,7 +33,7 @@ describe('retrieveQdrant', () => {
       cached: false,
       exec_ms: 1,
     });
-    mockHybridSearch.mockResolvedValue({
+    mockDenseSearch.mockResolvedValue({
       results: [
         {
           id: '11111111-1111-4111-8111-111111111111',
@@ -51,13 +51,14 @@ describe('retrieveQdrant', () => {
     const results = await retrieveQdrant('exact symbol proof');
 
     expect(mockEmbedQueryForLane).toHaveBeenCalledWith('exact symbol proof', 'dense_768');
-    expect(mockHybridSearch).toHaveBeenCalledTimes(1);
-    expect(mockHybridSearch).toHaveBeenCalledWith(
+    expect(mockDenseSearch).toHaveBeenCalledTimes(1);
+    expect(mockDenseSearch).toHaveBeenCalledWith(
       expect.objectContaining({
         collection: 'codebase_chunks_768_v2',
         limit: expect.any(Number),
         query: 'exact symbol proof',
-        queryEmbedding: expect.any(Array),
+        queryVector: expect.any(Array),
+        vectorName: 'content',
       }),
     );
     expect(results).toHaveLength(1);

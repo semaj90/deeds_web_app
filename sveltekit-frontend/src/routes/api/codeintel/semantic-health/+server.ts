@@ -235,6 +235,7 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 							headers: { 'Content-Type': 'application/json' },
 							body: JSON.stringify({
 								query: vector,
+								using: 'content',
 								limit: 3,
 								with_payload: false,
 								score_threshold: 0.0,

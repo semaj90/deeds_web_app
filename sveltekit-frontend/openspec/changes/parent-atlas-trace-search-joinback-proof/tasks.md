@@ -1,9 +1,16 @@
-> **Cross-reference (2026-08-10)**: the canonical packet→chunk→topology tree-link gate
-> (`atlas_topology_index`, `scripts/atlas/backfill-topology-index.mjs`, idempotency proof) is
-> tracked in the **root** `openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md`'s
-> `TOPOLOGY-GATE (2026-08-10)` section, not here — this repo has two separate OpenSpec roots with
-> a same-named change folder (see the root file's own `GS1.23` finding, which documents this
-> exact collision). Not duplicated here to avoid deepening that ambiguity.
+> **Cross-reference (2026-08-10, updated 2026-09-06)**: the canonical packet→chunk→topology
+> tree-link gate (`atlas_topology_index`, `scripts/atlas/backfill-topology-index.mjs`, idempotency
+> proof) is tracked in the **root** `openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md`'s
+> `TOPOLOGY-GATE (2026-08-10)` section, not here.
+>
+> **Resolved 2026-09-06**: the same-named-folder collision this note originally flagged (see the
+> root file's own `GS1.23` finding, which first documented it on 2026-08-10) has been fixed — this
+> folder was renamed from `parent-atlas-graph-retrieval-proof` to
+> `parent-atlas-trace-search-joinback-proof`, matching what it actually covers (the `trace_search`
+> Qdrant→Postgres join-back proof, not the root file's `tree_node_id` graph-identity lineage work).
+> The two changes were never duplicates of each other — they addressed genuinely different
+> problems that happened to share a name — so this was a rename, not a merge. No content was
+> changed beyond this note and the directory path.
 
 ## 1. Canonical trace_search join-back
 

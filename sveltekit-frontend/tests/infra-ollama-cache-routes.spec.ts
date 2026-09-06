@@ -474,7 +474,12 @@ describe('/api/ollama/pull (GET/POST)', () => {
     const data = await res.json();
     expect(res.status).toBe(200);
     expect(data.service).toBe('ollama');
-    expect(data.model).toBe('gemma4-rotorquant:latest');
+    // /api/ollama/pull is Ollama-scoped, and Ollama is embeddings-only per this repo's hard rule
+    // (root CLAUDE.md, "Ollama vs llama-server Boundary") — the route correctly reports the
+    // embedding model here, never a chat/generation model name. This was a stale hardcoded
+    // 'gemma4-rotorquant:latest' assertion until 2026-09-06 (parent-atlas-retrieval-staging-planes,
+    // OPENAI-FACADE-02) — the route never changed, only this test's expectation was wrong.
+    expect(data.model).toBe('embeddinggemma:latest');
     expect(data.url).toBe('http://ollama.test');
   });
 

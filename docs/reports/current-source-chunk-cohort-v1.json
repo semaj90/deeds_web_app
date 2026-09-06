@@ -1,0 +1,46 @@
+{
+  "schema": "atlas.current-source-chunk-cohort-export.v1",
+  "generatedAt": "2026-09-06T18:35:16.646Z",
+  "status": "BOUNDED_CURRENT_SOURCE_CHUNK_COHORT_PROVEN",
+  "readOnly": true,
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "databaseWrites": 0,
+  "selection": {
+    "workspaceRevision": null,
+    "sourceRefs": null,
+    "limit": 128,
+    "qualifiedRowsBeforeLimit": 675,
+    "qualifiedSourcesBeforeLimit": 69,
+    "exportedRows": 128,
+    "exportedSources": 14,
+    "qualifiedWorkspaceRevisionsBeforeLimit": 1,
+    "truncated": true
+  },
+  "hashGrain": {
+    "sourceContentDigest": "whole-source-bytes",
+    "chunkContentHash": "one-chunk-content",
+    "comparedDirectly": false
+  },
+  "checksums": {
+    "sourceSetChecksum": "sha256:03a83168efb0c85a76b302de492f2f5609d246230a4b40034bd0cd8dcad0d004",
+    "chunkSetChecksum": "sha256:e2cfec64f22193746363f9148f605e4ef8148700b4ddbfe72ddec6e89c70c3dc",
+    "ndjsonChecksum": "sha256:8c3aeeb09478652b58b2fd0c61adc738a0ec0bcced570dfeb04db6eea57de61b"
+  },
+  "validation": {
+    "violations": [],
+    "sourceRevisionJoin": "PASS",
+    "physicalChunkRowJoin": "PASS",
+    "chunkIdentity": "PASS",
+    "revisionStatus": "PASS",
+    "workspaceRevisionParity": "PASS"
+  },
+  "outputPath": ".tmp/atlas/current-source-chunk-cohort-v1.ndjson",
+  "sourceTables": [
+    "atlas_workspace_source_bindings",
+    "atlas_packet_chunk_lineage",
+    "codebase_chunk_index"
+  ],
+  "downstream": "DuckDB/NDJSON offline analysis only; no online retrieval or projection admission",
+  "nextGate": "SOURCE_CHUNK_MATERIALIZATION_BINDING_REVIEW"
+}

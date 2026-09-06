@@ -18,11 +18,13 @@ Candidate text format (matches Atlas canonical shape):
   <first 300 chars of chunk content>
 
 Endpoint: POST /rerank
-  { query: str, candidates: [{packet_key, text}], batch_size?: int }
-  → { ranked: [{packet_key, score}], latency_ms, vram_peak_mb, ... }
+  { query: str, candidates: [{packet_key, text}], batch_size?: int, model?: str }
+  → { ranked: [{packet_key, score}], model_id, latency_ms, vram_peak_mb, ... }
+  Scores are sigmoid-normalized to [0, 1]; the model field is an optional
+  exact identity assertion and mismatches are rejected.
 
 Endpoint: GET /health
-  → { status, model_loaded, device, model_id }
+  → { status, model_loaded, device, model_dtype, score_semantics, score_range, model_id }
 """
 
 from __future__ import annotations
@@ -42,6 +44,9 @@ app = FastAPI(title="Mixedbread CrossEncoder Reranker", version="2.0.0")
 MODEL_ID = os.getenv("RERANKER_MODEL", "mixedbread-ai/mxbai-rerank-base-v2")
 MAX_LENGTH = int(os.getenv("RERANKER_MAX_LENGTH", "512"))
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+# This is model-compute precision, not GGUF weight quantization and not the
+# llama-server KV-cache type. Keep it explicit in health/readiness evidence.
+MODEL_DTYPE = "float16" if DEVICE == "cuda" else "float32"
 
 _model: Optional[CrossEncoder] = None
 _model_loaded = False
@@ -61,8 +66,9 @@ def load_model() -> CrossEncoder:
         MODEL_ID,
         max_length=MAX_LENGTH,
         device=DEVICE,
-        automodel_args={"torch_dtype": torch.float16 if DEVICE == "cuda" else torch.float32},
+        automodel_args={"torch_dtype": torch.float16 if MODEL_DTYPE == "float16" else torch.float32},
         tokenizer_args={"use_fast": True},
+        activation_fn=torch.nn.Sigmoid(),
     )
 
     _model_loaded = True
@@ -98,6 +104,7 @@ class RerankRequest(BaseModel):
     query: str = Field(..., min_length=1)
     candidates: Annotated[list[Candidate], Field(min_length=1, max_length=1024)]
     batch_size: Annotated[int, Field(ge=1, le=64)] = 8
+    model: Optional[str] = Field(default=None, min_length=1)
 
 
 class RankedResult(BaseModel):
@@ -107,6 +114,7 @@ class RankedResult(BaseModel):
 
 class RerankResponse(BaseModel):
     ranked: list[RankedResult]
+    model_id: str
     latency_ms: float
     vram_peak_mb: float
     vram_current_mb: float
@@ -119,6 +127,9 @@ class RerankResponse(BaseModel):
 @app.post("/rerank", response_model=RerankResponse)
 async def rerank(req: RerankRequest) -> RerankResponse:
     """Score and rank candidates against the query using CrossEncoder."""
+    if req.model is not None and req.model != MODEL_ID:
+        raise HTTPException(status_code=409, detail=f"requested model does not match configured model: {MODEL_ID}")
+
     if not _model_loaded or _model is None:
         try:
             load_model()
@@ -142,7 +153,8 @@ async def rerank(req: RerankRequest) -> RerankResponse:
         # CrossEncoder expects list of [query, document] string pairs
         pairs = [[req.query, c.text] for c in batch]
 
-        # model.predict() returns a numpy array or list of floats
+        # mxbai emits ranking logits. Sigmoid is applied once in the model
+        # wrapper so the HTTP contract exposes a bounded relevance score.
         raw_scores = model.predict(pairs, show_progress_bar=False)
 
         for candidate, score in zip(batch, raw_scores, strict=True):
@@ -167,6 +179,7 @@ async def rerank(req: RerankRequest) -> RerankResponse:
 
     return RerankResponse(
         ranked=ranked,
+        model_id=MODEL_ID,
         latency_ms=elapsed_ms,
         vram_peak_mb=peak_mb,
         vram_current_mb=current_mb,
@@ -184,6 +197,9 @@ async def health() -> dict:
         "status": "healthy" if _model_loaded else "loading",
         "model_loaded": _model_loaded,
         "device": DEVICE,
+        "model_dtype": MODEL_DTYPE,
+        "score_semantics": "sigmoid_once(raw_ranking_logit)",
+        "score_range": "[0,1]",
         "model_id": MODEL_ID,
         "max_length": MAX_LENGTH,
         "vram_current_mb": vram_mb,

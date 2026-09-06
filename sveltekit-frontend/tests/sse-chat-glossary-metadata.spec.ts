@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { makeLlamaStreamResponse, matchLlamaChatCompletions } from './helpers/mock-llama-server-chat.js';
 
 const originalAceChatSelfEvalEnabled = process.env.ACE_CHAT_SELF_EVAL_ENABLED;
 
@@ -356,6 +357,7 @@ describe('/api/sse/chat glossary metadata', () => {
       body: JSON.stringify({
         message: 'Explain probable cause for this case.',
         conversationId: 'conversation-glossary-metadata',
+        model: 'gemma4-rotorquant:latest',
       }),
     });
 
@@ -405,13 +407,6 @@ describe('/api/sse/chat glossary metadata', () => {
       { role: 'user', content: 'Explain probable cause for this case.' },
     ]);
     mockOllamaFetch.mockImplementation(async (url: string) => {
-      if (url.endsWith('/api/chat')) {
-        return makeStreamingResponse([
-          JSON.stringify({ message: { content: 'Probable ' } }),
-          JSON.stringify({ message: { content: 'cause applies.' } }),
-        ]);
-      }
-
       if (url.endsWith('/api/embeddings')) {
         return makeJsonResponse({
           embedding: MOCK_EMBEDDING_768,
@@ -422,12 +417,24 @@ describe('/api/sse/chat glossary metadata', () => {
       return makeJsonResponse({}, false);
     });
 
+    // LLAMA-TEST-BOUNDARY-01: generation now goes through llama-server's streaming
+    // /chat/completions, not Ollama's /api/chat -- without this, the real global fetch would
+    // hit whatever llama-server happens to be running (confirmed live during this migration).
+    vi.stubGlobal('fetch', vi.fn(async (input: string | URL) => {
+      const url = String(input);
+      if (matchLlamaChatCompletions(url)) {
+        return makeLlamaStreamResponse(['Probable ', 'cause applies.']);
+      }
+      throw new Error(`Unexpected fetch: ${url}`);
+    }));
+
     const request = new Request('http://localhost/api/sse/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         message: 'Explain probable cause for this case.',
         conversationId: 'conversation-glossary-live',
+        model: 'gemma4-rotorquant:latest',
       }),
     });
 
@@ -499,15 +506,7 @@ describe('/api/sse/chat glossary metadata', () => {
       { role: 'assistant', content: 'Earlier assistant synthesis.' },
       { role: 'user', content: 'Earlier facts from the file.' },
     ]);
-    mockOllamaFetch.mockImplementation(async (url: string, init?: RequestInit) => {
-      if (url.endsWith('/api/chat')) {
-        chatRequestBody = JSON.parse(String(init?.body ?? '{}'));
-
-        return makeStreamingResponse([
-          JSON.stringify({ message: { content: 'Multi-turn answer.' } }),
-        ]);
-      }
-
+    mockOllamaFetch.mockImplementation(async (url: string) => {
       if (url.endsWith('/api/embeddings')) {
         return makeJsonResponse({
           embedding: MOCK_EMBEDDING_768,
@@ -517,6 +516,15 @@ describe('/api/sse/chat glossary metadata', () => {
 
       return makeJsonResponse({}, false);
     });
+
+    vi.stubGlobal('fetch', vi.fn(async (input: string | URL, init?: RequestInit) => {
+      const url = String(input);
+      if (matchLlamaChatCompletions(url)) {
+        chatRequestBody = JSON.parse(String(init?.body ?? '{}'));
+        return makeLlamaStreamResponse(['Multi-turn answer.']);
+      }
+      throw new Error(`Unexpected fetch: ${url}`);
+    }));
 
     const request = new Request('http://localhost/api/sse/chat', {
       method: 'POST',
@@ -548,8 +556,23 @@ describe('/api/sse/chat glossary metadata', () => {
     const { POST } = await import('../src/routes/api/sse/chat/+server.js');
 
     const chatBodies: Array<{ messages?: Array<{ role: string; content: string }> }> = [];
-    const fetchMock = vi.fn(async (input: string | URL) => {
+    const fetchMock = vi.fn(async (input: string | URL, init?: RequestInit) => {
       const url = String(input);
+      if (matchLlamaChatCompletions(url)) {
+        const body = JSON.parse(String(init?.body ?? '{}')) as {
+          messages?: Array<{ role: string; content: string }>;
+        };
+        chatBodies.push(body);
+
+        if (chatBodies.length === 1) {
+          return makeLlamaStreamResponse([
+            'Initial legal draft that lacks cited support but is long enough to trigger retry review.',
+          ]);
+        }
+
+        return makeLlamaStreamResponse(['Improved legal answer with explicit support [Source 1].']);
+      }
+
       if (url.startsWith('http://qdrant.test/collections/') && url.endsWith('/points/query')) {
             const collection = url.split('/collections/')[1]?.split('/')[0];
             if (collection !== 'legal_documents') {
@@ -601,33 +624,7 @@ describe('/api/sse/chat glossary metadata', () => {
     });
     mockGenerateCorrectionPrompt.mockReturnValue('Revise with explicit source support.');
 
-    mockOllamaFetch.mockImplementation(async (url: string, init?: RequestInit) => {
-      if (url.endsWith('/api/chat')) {
-        const body = JSON.parse(String(init?.body ?? '{}')) as {
-          messages?: Array<{ role: string; content: string }>;
-        };
-        chatBodies.push(body);
-
-        if (chatBodies.length === 1) {
-          return makeStreamingResponse([
-            JSON.stringify({
-              message: {
-                content:
-                  'Initial legal draft that lacks cited support but is long enough to trigger retry review.',
-              },
-            }),
-          ]);
-        }
-
-        return makeStreamingResponse([
-          JSON.stringify({
-            message: {
-              content: 'Improved legal answer with explicit support [Source 1].',
-            },
-          }),
-        ]);
-      }
-
+    mockOllamaFetch.mockImplementation(async (url: string) => {
       if (url.endsWith('/api/embeddings')) {
         return makeJsonResponse({
           embedding: MOCK_EMBEDDING_768,
@@ -644,6 +641,7 @@ describe('/api/sse/chat glossary metadata', () => {
       body: JSON.stringify({
         message: 'Explain the legal grounding for this issue.',
         conversationId: 'conversation-non-attachment-retry',
+        model: 'gemma4-rotorquant:latest',
       }),
     });
 
@@ -744,6 +742,12 @@ describe('/api/sse/chat glossary metadata', () => {
 
     const fetchMock = vi.fn(async (input: string | URL) => {
       const url = String(input);
+      if (matchLlamaChatCompletions(url)) {
+        return makeLlamaStreamResponse([
+          'High-quality legal answer with explicit support [Source 1] and sufficient detail for evaluation.',
+        ]);
+      }
+
       if (url.startsWith('http://qdrant.test/collections/') && url.endsWith('/points/query')) {
             const collection = url.split('/collections/')[1]?.split('/')[0];
             if (collection !== 'legal_documents') {
@@ -780,17 +784,6 @@ describe('/api/sse/chat glossary metadata', () => {
     vi.stubGlobal('fetch', fetchMock);
 
     mockOllamaFetch.mockImplementation(async (url: string) => {
-      if (url.endsWith('/api/chat')) {
-        return makeStreamingResponse([
-          JSON.stringify({
-            message: {
-              content:
-                'High-quality legal answer with explicit support [Source 1] and sufficient detail for evaluation.',
-            },
-          }),
-        ]);
-      }
-
       if (url.endsWith('/api/embeddings')) {
         return makeJsonResponse({
           embedding: MOCK_EMBEDDING_768,
@@ -807,6 +800,7 @@ describe('/api/sse/chat glossary metadata', () => {
       body: JSON.stringify({
         message: 'Provide the supporting legal analysis.',
         conversationId: 'conversation-high-quality-live',
+        model: 'gemma4-rotorquant:latest',
       }),
     });
 
@@ -916,6 +910,12 @@ describe('/api/sse/chat glossary metadata', () => {
 
     const fetchMock = vi.fn(async (input: string | URL) => {
       const url = String(input);
+      if (matchLlamaChatCompletions(url)) {
+        return makeLlamaStreamResponse([
+          'High-quality code-aware legal answer with explicit support [Source 1] and route analysis.',
+        ]);
+      }
+
       if (url.startsWith('http://qdrant.test/collections/') && url.endsWith('/points/query')) {
             const collection = url.split('/collections/')[1]?.split('/')[0];
             if (collection !== 'legal_documents') {
@@ -952,17 +952,6 @@ describe('/api/sse/chat glossary metadata', () => {
     vi.stubGlobal('fetch', fetchMock);
 
     mockOllamaFetch.mockImplementation(async (url: string) => {
-      if (url.endsWith('/api/chat')) {
-        return makeStreamingResponse([
-          JSON.stringify({
-            message: {
-              content:
-                'High-quality code-aware legal answer with explicit support [Source 1] and route analysis.',
-            },
-          }),
-        ]);
-      }
-
       if (url.endsWith('/api/embeddings')) {
         return makeJsonResponse({
           embedding: MOCK_EMBEDDING_768,
@@ -979,6 +968,7 @@ describe('/api/sse/chat glossary metadata', () => {
       body: JSON.stringify({
         message: 'Explain this route handler in this repo with supporting legal context.',
         conversationId: 'conversation-code-kag-high-quality',
+        model: 'gemma4-rotorquant:latest',
       }),
     });
 
@@ -1085,6 +1075,12 @@ describe('/api/sse/chat glossary metadata', () => {
 
     const fetchMock = vi.fn(async (input: string | URL) => {
       const url = String(input);
+      if (matchLlamaChatCompletions(url)) {
+        return makeLlamaStreamResponse([
+          'High-quality graph-aware legal answer with explicit support [Source 1] and linked evidence analysis.',
+        ]);
+      }
+
       if (url.startsWith('http://qdrant.test/collections/') && url.endsWith('/points/query')) {
             const collection = url.split('/collections/')[1]?.split('/')[0];
             if (collection !== 'legal_documents') {
@@ -1120,17 +1116,6 @@ describe('/api/sse/chat glossary metadata', () => {
     vi.stubGlobal('fetch', fetchMock);
 
     mockOllamaFetch.mockImplementation(async (url: string) => {
-      if (url.endsWith('/api/chat')) {
-        return makeStreamingResponse([
-          JSON.stringify({
-            message: {
-              content:
-                'High-quality graph-aware legal answer with explicit support [Source 1] and linked evidence analysis.',
-            },
-          }),
-        ]);
-      }
-
       if (url.endsWith('/api/embeddings')) {
         return makeJsonResponse({
           embedding: MOCK_EMBEDDING_768,
@@ -1147,6 +1132,7 @@ describe('/api/sse/chat glossary metadata', () => {
       body: JSON.stringify({
         message: 'Explain this legal relationship with graph-backed support.',
         conversationId: 'conversation-kag-only-high-quality',
+        model: 'gemma4-rotorquant:latest',
       }),
     });
 
@@ -1306,6 +1292,7 @@ describe('/api/sse/chat glossary metadata', () => {
       body: JSON.stringify({
         message: 'Explain this endpoint in this repo with legal support.',
         conversationId: 'conversation-code-aware-cached',
+        model: 'gemma4-rotorquant:latest',
       }),
     });
 
@@ -1454,6 +1441,7 @@ describe('/api/sse/chat glossary metadata', () => {
       body: JSON.stringify({
         message: 'Explain this legal relationship with graph-backed support.',
         conversationId: 'conversation-kag-aware-cached',
+        model: 'gemma4-rotorquant:latest',
       }),
     });
 
@@ -1618,6 +1606,7 @@ describe('/api/sse/chat glossary metadata', () => {
       body: JSON.stringify({
         message: 'Explain this route handler in this repo with supporting legal context.',
         conversationId: 'conversation-code-kag-cached',
+        model: 'gemma4-rotorquant:latest',
       }),
     });
 
@@ -1721,6 +1710,12 @@ describe('/api/sse/chat glossary metadata', () => {
 
     const fetchMock = vi.fn(async (input: string | URL) => {
       const url = String(input);
+      if (matchLlamaChatCompletions(url)) {
+        return makeLlamaStreamResponse([
+          'High-quality legal cache context parity answer with explicit support [Source 1] and endpoint analysis.',
+        ]);
+      }
+
       if (url.startsWith('http://qdrant.test/collections/') && url.endsWith('/points/query')) {
             const collection = url.split('/collections/')[1]?.split('/')[0];
             if (collection !== 'legal_documents') {
@@ -1757,17 +1752,6 @@ describe('/api/sse/chat glossary metadata', () => {
     vi.stubGlobal('fetch', fetchMock);
 
     mockOllamaFetch.mockImplementation(async (url: string) => {
-      if (url.endsWith('/api/chat')) {
-        return makeStreamingResponse([
-          JSON.stringify({
-            message: {
-              content:
-                'High-quality legal cache context parity answer with explicit support [Source 1] and endpoint analysis.',
-            },
-          }),
-        ]);
-      }
-
       if (url.endsWith('/api/embeddings')) {
         return makeJsonResponse({
           embedding: MOCK_EMBEDDING_768,
@@ -1784,6 +1768,7 @@ describe('/api/sse/chat glossary metadata', () => {
       body: JSON.stringify({
         message: 'Explain this endpoint in this repo with legal support.',
         conversationId: 'conversation-context-parity-live',
+        model: 'gemma4-rotorquant:latest',
       }),
     });
 
@@ -1825,6 +1810,10 @@ describe('/api/sse/chat glossary metadata', () => {
 
     const fetchMock = vi.fn(async (input: string | URL) => {
       const url = String(input);
+      if (matchLlamaChatCompletions(url)) {
+        return makeLlamaStreamResponse([longResponse]);
+      }
+
       if (url.startsWith('http://qdrant.test/collections/') && url.endsWith('/points/query')) {
             const collection = url.split('/collections/')[1]?.split('/')[0];
             if (collection !== 'legal_documents') {
@@ -1861,10 +1850,6 @@ describe('/api/sse/chat glossary metadata', () => {
     vi.stubGlobal('fetch', fetchMock);
 
     mockOllamaFetch.mockImplementation(async (url: string) => {
-      if (url.endsWith('/api/chat')) {
-        return makeStreamingResponse([JSON.stringify({ message: { content: longResponse } })]);
-      }
-
       if (url.endsWith('/api/embeddings')) {
         return makeJsonResponse({
           embedding: MOCK_EMBEDDING_768,
@@ -1881,6 +1866,7 @@ describe('/api/sse/chat glossary metadata', () => {
       body: JSON.stringify({
         message: 'Provide a very long legal answer with source support.',
         conversationId: 'conversation-queue-truncate-live',
+        model: 'gemma4-rotorquant:latest',
       }),
     });
 
@@ -1950,6 +1936,12 @@ describe('/api/sse/chat glossary metadata', () => {
 
     const fetchMock = vi.fn(async (input: string | URL) => {
       const url = String(input);
+      if (matchLlamaChatCompletions(url)) {
+        return makeLlamaStreamResponse([
+          'High-quality codebase-aware legal answer with explicit support [Source 1] and endpoint analysis.',
+        ]);
+      }
+
       if (url.startsWith('http://qdrant.test/collections/') && url.endsWith('/points/query')) {
             const collection = url.split('/collections/')[1]?.split('/')[0];
             if (collection !== 'legal_documents') {
@@ -1986,17 +1978,6 @@ describe('/api/sse/chat glossary metadata', () => {
     vi.stubGlobal('fetch', fetchMock);
 
     mockOllamaFetch.mockImplementation(async (url: string) => {
-      if (url.endsWith('/api/chat')) {
-        return makeStreamingResponse([
-          JSON.stringify({
-            message: {
-              content:
-                'High-quality codebase-aware legal answer with explicit support [Source 1] and endpoint analysis.',
-            },
-          }),
-        ]);
-      }
-
       if (url.endsWith('/api/embeddings')) {
         return makeJsonResponse({
           embedding: MOCK_EMBEDDING_768,
@@ -2013,6 +1994,7 @@ describe('/api/sse/chat glossary metadata', () => {
       body: JSON.stringify({
         message: 'Explain this endpoint in this repo with legal support.',
         conversationId: 'conversation-code-only-high-quality',
+        model: 'gemma4-rotorquant:latest',
       }),
     });
 

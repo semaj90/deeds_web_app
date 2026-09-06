@@ -247,16 +247,12 @@ export async function unifiedSearch(req: SearchRequest): Promise<SearchResponse>
     combinedResults = rrfFusion(combinedResults, lanesSucceeded);
   }
 
-  // Deduplicate by symbol_version_id first, then packet_key as the fallback join key.
-  const seen = new Set<string>();
-  const deduped: SearchResult[] = [];
-  for (const r of combinedResults) {
-    const key = r.symbol_version_id ?? r.packet_key ?? r.id;
-    if (!seen.has(key)) {
-      seen.add(key);
-      deduped.push(r);
-    }
-  }
+  // Deduplicate by symbol_version_id first, then packet_key as the fallback join key,
+  // merging duplicate scores rather than discarding them (RF7 fix-in-place decision,
+  // see parent-atlas-retrieval-fusion-reachability/tasks.md's `service.ts::rrfFusion`
+  // entry: two different backend-local `result.id`s that resolve to the same canonical
+  // identity are exactly what RRF fusion is meant to sum, not silently drop one of).
+  const deduped = mergeDuplicateIdentityScores(combinedResults);
 
   // Truncate to k
   const candidates = deduped.slice(0, finalTopK).map((r, idx) => ({ ...r, rank: idx }));
@@ -472,6 +468,31 @@ function rrfFusion(results: SearchResult[], lanesSucceeded: string[]): SearchRes
   rescored.sort((a, b) => b.score - a.score);
 
   return rescored;
+}
+
+/**
+ * Merge duplicate identity groups after RRF fusion, summing scores instead of discarding the
+ * loser. `rrfFusion` scores by raw `result.id`, so two backend-local result entries that turn
+ * out to resolve to the same canonical identity (`symbol_version_id ?? packet_key`) still carry
+ * two independent RRF contributions at this point -- summing them is correct RRF fusion
+ * semantics (the same "one canonical identity, sum lane contributions" pattern
+ * `SearchRuntime.fuseSearchRuntimeCandidates` already uses), not a merge across the SAME logical
+ * lane, which is a different, already-handled invariant upstream in `rrfFusion`/lane grouping.
+ * Exported for direct unit testing without needing live Postgres/Qdrant/lane-registry setup.
+ */
+export function mergeDuplicateIdentityScores(results: SearchResult[]): SearchResult[] {
+  const merged = new Map<string, SearchResult>();
+  for (const r of results) {
+    const key = r.symbol_version_id ?? r.packet_key ?? r.id;
+    const existing = merged.get(key);
+    if (!existing) {
+      merged.set(key, r);
+      continue;
+    }
+    const representative = r.score > existing.score ? r : existing;
+    merged.set(key, { ...representative, score: existing.score + r.score });
+  }
+  return Array.from(merged.values()).sort((a, b) => b.score - a.score);
 }
 
 /**

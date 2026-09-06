@@ -77,7 +77,14 @@ export const ff1Tools = {
       const sRes = await fetch(`${QDRANT_URL}/collections/codebase_chunks_768/points/query`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: embedding, limit: k, with_payload: true, filter, score_threshold: 0.4 }),
+        body: JSON.stringify({
+          query: embedding,
+          using: 'content',
+          limit: k,
+          with_payload: true,
+          filter,
+          score_threshold: 0.4,
+        }),
         signal: AbortSignal.timeout(8_000),
       });
       const { result } = await sRes.json() as {

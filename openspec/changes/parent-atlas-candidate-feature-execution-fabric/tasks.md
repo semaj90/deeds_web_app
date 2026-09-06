@@ -815,7 +815,20 @@ by this reconciliation.
   `107,796` matched points, `1,299` ambiguous points, `681` unmatched points,
   and `5,634` duplicate PostgreSQL mappings. Qdrant is therefore not safe for
   promotion yet; repair must be based on exact identity/revision evidence, not
-  broad payload copying.
+  broad payload copying. **2026-09-06 auditor correction:**
+  `scripts/atlas/audit-turbovec-ordinal-bridge-v1.mjs` now accepts the
+  canonical ordinal-map wrapper, requires explicit `candidateOrdinal`, treats
+  repeated `sourceRef` values as source-level ambiguity rather than a fatal
+  map error, and reports exact chunk-identity matches separately from
+  packet/source overlap. A read-only run against
+  `docs/reports/candidate-ordinal-corpus-v1.json` and the live
+  `codebase_chunks_768` collection sampled 1,000 points: 408 source-level
+  overlaps, 1 packet-level overlap, **0 exact chunk-identity matches**, and
+  `status=BLOCKED_NO_EXACT_CHUNK_IDENTITY`. The live sidecar remains empty
+  (`indexed=0`); this does not authorize loading it. The remaining bridge must
+  bind a real chunk identity plus source/workspace revisions to each Qdrant
+  point and CandidateOrdinal; do not derive ordinals from `sourceRef`, packet
+  key, Qdrant point order, or array position.
 - [x] **GRAPHIFY-READ-ONLY-DRY-RUN-READY** — the required daily Graphify script
   inventory is complete and the native structural path defaults to non-authoritative
   dry-run behavior. The ordinary `graphify:daily` family still contains

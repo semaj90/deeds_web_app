@@ -59,6 +59,30 @@ These are separate paths, not one proven nested call chain. The route checks
   `docs/reports/rf6-semantic-live-readonly-replay-v1.json`. Focused regressions
   (`rrf-canonical-identity.test.ts`, `rf6-live-replay-01.test.ts`) also pass 17/17.
 
+  **Current rerun note 2026-09-06:** the intended SvelteKit/`tsx` launcher reached
+  the live path, but this attempt returned Qdrant=1 and TurboVec=0 because the
+  configured TurboVec gRPC lane was unavailable. The receipt therefore remains
+  `RF6_SEMANTIC_REPLAY_NOT_PROVEN` for this attempt; the earlier successful
+  read-only receipt above is retained as historical evidence. A seeded Qdrant
+  timeout was also corrected to fall through to the unfiltered canonical
+  `semantic_768` query instead of suppressing the entire dense lane.
+
+  **Runtime diagnosis 2026-09-06:** the TurboVec gRPC health probe itself is
+  reachable, but reports `indexed=0` and `dim=64`. The current semantic replay
+  requires a populated 768-dimensional EmbeddingGemma executor. The existing
+  read-only loader defaults to the unavailable `codebase_chunks_encoded64`
+  collection and its contract is explicitly 64-dimensional, so it must not be
+  redirected to the 768 collection without a separate representation/index
+  owner decision. RF6 remains blocked on upstream TurboVec 768 index readiness;
+  no loader apply or projection write was run.
+
+  **768 build preflight 2026-09-06:** `npx tsx scripts/atlas/build-turbovec-768-4bit.mts
+  --dry-run --limit=100` read 100 valid 768-dimensional points from
+  `codebase_chunks_768`, but reported `candidateOrdinalCoverage=0/100` and
+  `candidateOrdinalBridgeStatus=MISSING`. The build is therefore correctly
+  blocked before sidecar upload. The next owner is the revision-qualified
+  CandidateOrdinal/Qdrant projection bridge, not the RF6 combiner.
+
 No endpoint invocation, datastore projection, or RF7 closure is authorized by this addendum.
 The bounded SearchRuntime fusion correction above is the explicitly scoped RF6 runtime change.
 
@@ -78,6 +102,30 @@ The bounded SearchRuntime fusion correction above is the explicitly scoped RF6 r
 most one semantic vote per revision-qualified candidate. This decision supersedes only
 conflicting future interpretation of the earlier five-owner matrix; it does not claim
 that runtime delegation or RF6 semantic replay is complete.
+
+### Qdrant executor boundary audit — 2026-09-06
+
+The canonical `SearchRuntime` retrieval path previously called
+`retrieve-candidates.ts::retrieveQdrant`, which invoked `QdrantManager.hybridSearch`.
+That allowed Qdrant's dense+sparse Universal Query fusion to run before the separate
+BM42 sparse adapter and before `SearchRuntime::fuseSearchRuntimeCandidates`, creating
+an implicit second fusion boundary. The canonical adapter now calls Qdrant's named
+vector `denseSearch` for the raw `semantic_768`/`content` lane; BM42 remains a separate
+raw lane, and SearchRuntime remains the only production RRF owner. Qdrant prefetch,
+named-vector selection, and server-side fusion remain available to explicitly scoped
+evaluation or non-canonical collection paths, but are not admitted as canonical
+cross-lane fusion here.
+
+The audit also found remaining non-canonical Qdrant-fusion callers:
+`vector/agentic-search.ts::AgenticSearchService.search` is still used by
+`/api/search` for the legal-canon/agentic path, and `vector/hypergraph-service.ts`
+has legacy `hybridSearch` calls. These paths are not evidence that the canonical
+SearchRuntime adapter should re-enable Qdrant fusion. They remain follow-up owner
+reconciliation items; no production promotion or silent migration was performed
+for them in this bounded fix.
+
+Focused retrieval regression and strict OpenSpec validation are required evidence for
+this boundary; no Qdrant data or projection writes are part of the change.
 
 ### RF6-SEMANTIC-VOTE-PRECONDITIONS-01 — 2026-09-05
 
@@ -244,6 +292,75 @@ that runtime delegation or RF6 semantic replay is complete.
       `buildRrfLaneMap()` therefore receives a backend-local TurboVec identity and
       `rankCandidates()` can construct a complete envelope only for Qdrant-backed hits. The
       `combineRRFLanes` owner remains open pending a revision-qualified cross-executor envelope.
+
+      **`combineRRFLanes` itself audited 2026-09-06, deeper root-cause found for the TurboVec
+      gap — precision upgrade, decision recorded, no fix attempted.** `combineRRFLanes`
+      (`rrf-combiner-utils.ts`) does NOT have the RF6 same-lane double-vote bug — its
+      per-lane-per-id `existingLaneIndex` check already keeps only the strongest contribution per
+      lane, correctly. The real, live gap is exactly what's diagnosed above: a candidate found by
+      BOTH Qdrant and TurboVec never merges into one result row, because `combineRRFLanes` groups
+      strictly by raw string `id`, and Qdrant's `id` (its own point UUID) and TurboVec's `id` are
+      drawn from genuinely different id spaces with no join between them in this file today.
+
+      Traced TurboVec's id space to its actual source, not assumed: TurboVec's `/build`/`/search`
+      API treats `id` as caller-supplied at index-build time (confirmed via
+      `docs/turbovec-grpc-integration-audit.md`'s own documented request/response shapes — the
+      caller supplies `{id, vector, cluster}` at `/build`). `scripts/atlas/build-turbovec-768-4bit.mts`
+      is the actual build script for this repo's TurboVec index: it initially carries the source
+      Qdrant point's `id` (line ~124) but then **overwrites it with `entry.candidateOrdinal`**
+      immediately before upload (line ~194: `{ ...entry, id: entry.candidateOrdinal }`) — so
+      TurboVec's returned `id` in this repo is a `candidateOrdinal` integer, not an opaque index
+      and not the Qdrant point id.
+
+      A `candidateOrdinal -> packet_key/source_ref` resolver format already exists
+      (`loadOrdinalMap()` in the same build script, consuming an externally-supplied
+      `--ordinal-map=<path>` file shaped like `CandidateOrdinalMapV1`: `{identityAuthority: false,
+      candidates: [{candidateOrdinal, sourceRef, packetKey}, ...]}`), but it is a **build-time-only,
+      optional CLI input** — read once from a file path during index construction, never persisted
+      anywhere a live request-serving module could query, and not currently loaded by
+      `unified-orchestrator.ts` at all. Closing this gap for real means wiring a live ordinal-map
+      resolver into the request path: locating/persisting the exact ordinal map used for the
+      *currently-served* TurboVec index build, loading and caching it in the server process, and
+      checking its `candidateSnapshotRevision`/`ordinalMapChecksum` against the live TurboVec
+      index's own revision before trusting a lookup (an ordinal map built against a stale index
+      generation would silently misattribute identity — worse than the current, honestly-absent
+      state). That is a real feature addition with its own staleness/revision-binding failure mode,
+      not a like-for-like in-place correction comparable to the `service.ts::rrfFusion` fix above.
+
+      **Decision recorded**: `combineRRFLanes`/TurboVec-identity gap stays `fix-in-place-independently,
+      NOT_YET_BUILT` (not `delegate-to-canonical-owner` — no canonical owner for cross-executor
+      ordinal resolution exists yet either) rather than attempting a rushed live join in this pass.
+
+      **Follow-up live check (2026-09-06, same pass) — the initially hoped-for simple path is
+      closed, and a bigger uncertainty was found instead of a smaller one.**
+      `build-turbovec-768-4bit.mts`'s `candidateOrdinal` resolution prefers reading it directly
+      from `point.payload?.candidateOrdinal`/`candidate_ordinal` before falling back to the
+      external `--ordinal-map=` file — which raised the possibility that a live resolver could
+      skip the map file entirely and just request that payload field from Qdrant. Checked the
+      *actual* live collection directly (`POST /collections/codebase_chunks_768_v2/points/scroll`,
+      read-only): its real payload schema is `postgres_id, chunk_id, source_ref, content_hash,
+      representation_name, representation_id, embedding_model, model_revision,
+      model_revision_state, qdrant_point_id, projection_revision, indexed_at` — **no
+      `candidateOrdinal` field exists on live points at all.** Combined with the earlier finding
+      that the npm script (`atlas:turbovec:768:4bit:build`) never passes `--ordinal-map=`, running
+      this build script against the current live collection would hit `candidateOrdinal: null` for
+      every point and **throw `CANDIDATE_ORDINAL_BRIDGE_REQUIRED_BEFORE_TURBOVEC_UPLOAD`** before
+      any non-dry-run upload could complete.
+
+      This means whichever TurboVec index is actually being served today either predates this
+      ordinal-bridge gate, was built through a different, undiscovered path, or was built with an
+      `--ordinal-map=` file that is no longer present in this repo — **the true id provenance of
+      the currently-live TurboVec index is now an open question, not a known `candidateOrdinal`
+      as first assumed.** This makes the gap strictly harder than originally framed: a live
+      resolver cannot be safely built against an assumed id scheme without first confirming, live,
+      what id space the currently-served TurboVec index actually uses (e.g. via
+      `GET /health` or an index-metadata endpoint on the TurboVec sidecar itself, not inferred from
+      the build script's intended design).
+
+      Concrete next step, not started: query the live TurboVec sidecar directly for whatever
+      build/index metadata it exposes (generation timestamp, source manifest reference) before
+      assuming its `id` field means anything in particular. No files modified, no writes
+      performed — this was a read-only Qdrant scroll query only.
 - [x] **AUDITED 2026-09-06 — separate representation-lane owner retained.**
       `multi-vector-orchestrator.ts` rejects hits without packet/source identity and preserves the
       Qdrant point ID, then fuses content, summary, title, and keyword representation lanes via
@@ -594,9 +711,45 @@ identity path and the standalone RRF implementations (`search-runtime-fusion.tes
       endpoint, so classify it as `IDENTITY_METADATA_INSUFFICIENT` until a canonicalized request
       envelope or explicit legacy retirement decision is adopted. Do not infer identity from
       caller IDs or content paths. Audited 2026-09-01; no route contract change performed.
-- [ ] `service.ts::rrfFusion` (`/api/atlas/studio/search`, `/api/atlas/search`) — two-stage
-      identity handling is the most architecturally confused of the four; decide whether to
-      collapse to one stage in place or replace with a call into the canonical boundary once it exists.
+- [x] `service.ts::rrfFusion` (`/api/atlas/studio/search`, `/api/atlas/search`) — **decision
+      recorded and applied 2026-09-06: `fix-in-place-independently`.** `delegate-to-canonical-owner`
+      remains unavailable (RF5 is only partially landed — canonical spine only, per its own section
+      above); this function is live on 2 real routes, not scheduled for retirement, so leaving the
+      diagnosed bug unfixed pending a still-blocked architecture decision was the wrong default.
+      Scope was deliberately narrow: the bug was NOT in `rrfFusion` itself (its per-`result.id`
+      RRF summation is standard and correct), it was in the **post-fusion dedup step immediately
+      after it** — `symbol_version_id ?? packet_key ?? id`-keyed dedup picked the first-sorted
+      duplicate and silently discarded the other's score, exactly as this section's own earlier
+      audit diagnosed ("first-wins, discards losing duplicates' scores instead of merging them").
+      When two backend-local `result.id`s (e.g. a Qdrant hit and a TurboVec hit for the same
+      underlying chunk that `rrfFusion` scored independently because they never shared an `id`)
+      resolve to the same canonical identity, summing their already-fused RRF scores is correct
+      RRF semantics — the same "one canonical identity, sum contributions" pattern
+      `SearchRuntime.fuseSearchRuntimeCandidates` already uses — not a second instance of the
+      same-logical-lane double-vote bug RF6 fixed elsewhere (that invariant is enforced upstream,
+      inside `rrfFusion`'s own lane grouping, before this step ever runs).
+
+      Extracted the dedup step into a new exported, pure, directly-unit-testable function,
+      `mergeDuplicateIdentityScores()` (`service.ts`) — no live Postgres/Qdrant/lane-registry setup
+      needed to test it, unlike the rest of `unifiedSearch()`. Wired it in at the exact call site
+      that previously had the inline discard-based dedup loop. Added 4 new unit tests to
+      `service.spec.ts` covering: sum-on-symbol_version_id-collision, fallback to packet_key,
+      fallback to raw id (correctly stays unmerged when no shared identity exists), and stable
+      descending-score ordering with no false merge across genuinely distinct identities.
+
+      **Verified, not assumed**: `npx vitest run service.spec.ts rf6-live-replay-01.test.ts
+      rrf-split.test.ts search-runtime-fusion.test.ts` → **4 files / 36 tests passed** (31
+      pre-existing + 5 new — `service.spec.ts` grew from 1 test to 5). `npx tsgo --noEmit` → still
+      exactly 77 pre-existing repo-wide errors, zero in `service.ts` or `service.spec.ts` (the one
+      substring match for "service.ts" is the unrelated `push-service.ts`). No database/Qdrant/
+      Valkey/Neo4j writes — this is a pure in-memory ranking-array transform, no I/O.
+
+      **Not claimed**: `service.ts::rrfFusion`'s own architecture is not otherwise touched (its
+      per-lane RRF scoring, `laneConfig.weight` lookup, and `getSearchLaneRegistry()` usage are
+      unchanged); this does not migrate `service.ts` onto `SearchRuntime`/`rrf-fuse.ts` or resolve
+      the broader "most architecturally confused of the four" framing — it fixes the one concretely
+      diagnosed correctness bug (score-discarding on identity collision) without waiting for the
+      still-blocked canonical-delegation path.
 - [ ] `unified-orchestrator.ts`/`rrf-combiner-utils.ts::combineRRFLanes` (`/api/admin/retrieval/stream`,
       transitively `/api/retrieval/go`, `/api/retrieval/multi-vector`) — highest usage breadth
       alongside `rrf-fuse.ts` (6+ call sites incl. an MCP tool); weigh fix priority accordingly.
@@ -725,6 +878,265 @@ confirmed via `git log`/`git status` to predate this session; not touched, out o
 **Next**: migrating `service.ts`/`rrf-fuse.ts` to the canonical owner remains explicitly
 un-started, pending further authorization. `RF7` remains `BLOCKED`.
 
+## RF6-RRF-FUSE-HARDEN-01 — `PROVEN_SOURCE_AND_TEST` (2026-09-06, gate executed and verified)
+
+Following `RF6-LIVE-REPLAY-01`'s confirmed divergence above, `rrf-fuse.ts` (the legacy
+high-breadth compatibility owner, per `RF6-OWNER-MATRIX-01`'s `DELEGATE_TO_CANONICAL`
+classification) was hardened to enforce the two invariants that divergence exposed: (1) at most
+one RRF contribution per canonical identity within a logical lane (same-lane duplicate hits no
+longer cast multiple votes), and (2) semantic-executor collapse — `dense`/`dense_384`/`dense_768`/
+`qdrant`/`qdrant_vector`/`qdrant_768`/`turbovec`/`turbovec_ann`/`cuvs`/`cagra` are different
+executor names but one logical `dense` lane; a candidate hit through multiple of them retains only
+its strongest weighted contribution as the vote, with the rest preserved as provenance, never
+summed into extra votes. `canonicalChunkId` remains consume-only (never fabricated from
+`packetKey`, paths, hashes, or local IDs). Full invariant/commit/proof-boundary detail:
+`docs/reports/rf6-rrf-fuse-hardening-v1.json` (originally filed 2026-09-05 as
+`IMPLEMENTED_UNPROVEN` with tests written but not executed).
+
+**This session ran the exact gate the report's own `next` field specified, rather than accepting
+the unexecuted claim.** Results, all real:
+- `npx vitest run rf6-live-replay-01.test.ts rrf-split.test.ts search-runtime-fusion.test.ts` →
+  **3 files / 31 tests passed, 0 failed.**
+- `npx tsgo --noEmit` (full repo) → 77 pre-existing errors, **zero in `rrf-fuse.ts`,
+  `rrf-contract.ts`, or any of the 3 RF6 test files** — the 77 are unrelated missing-optional-
+  package errors (`piper-wasm`, `fastmcp`, `nodejs-whisper`, `@playwright/test`,
+  `@mendable/firecrawl-js`) and pre-existing drift in unrelated files
+  (`search-runtime-ace-resolver-v1.ts`, `search-runtime-feature-bundle-provider-v1.ts`,
+  `live-structural-lane-provider.ts`), consistent with this file's own established pattern of not
+  folding unrelated repo-wide typecheck noise into a gate's pass/fail.
+- `npx openspec validate parent-atlas-retrieval-fusion-reachability --strict` → **valid.**
+
+`docs/reports/rf6-rrf-fuse-hardening-v1.json` updated in place: `status` →
+`PROVEN_SOURCE_AND_TEST`, `tests.executedInThisConnectorSession` → `true` with the real pass
+count, `proofBoundary.{typescriptCompileExecuted,vitestExecuted,openspecValidationExecuted}` →
+`true` with their real results recorded. **Still explicitly NOT claimed** (matches the report's own
+`notClaimed` list, unchanged): RF7 complete, `service.ts` migrated, all RRF owners consolidated,
+live route parity proven, production deployment proven. No database/Qdrant/Valkey/Neo4j writes
+occurred during this verification pass.
+
+**Next** (per the report's own sequencing at the time this was written — superseded by the corrected,
+more granular `RF7-01` through `RF7-09` plan under `RF7-LANE-ALIAS-CONVERGENCE-01` below, which
+splits this into a parity-contract proof (`RF7-CONTRACT-PARITY-01`) BEFORE any shared-module
+extraction, per external review — do not jump straight to extraction): originally, extract
+`SearchRuntime.fuseSearchRuntimeCandidates`'s canonical fusion core into a dependency-light shared
+module, have `rrf-fuse.ts`'s compatibility adapter delegate to it, then migrate `service.ts::rrfFusion`
+next. `RF7` remains `BLOCKED` until that shared-module extraction is actually done — this gate
+proves the interim hardening is real, not that RF7's convergence work has started.
+
+## RF7-LANE-ALIAS-CONVERGENCE-01 — `PROVEN_ZERO_BEHAVIOR_CHANGE` (2026-09-06, renamed from
+`RF7-CANONICAL-FUSION-MODULE-01` per external review — see correction below)
+
+**Correction to this milestone's own name** (external review, 2026-09-06): the original name,
+`RF7-CANONICAL-FUSION-MODULE-01, first slice`, overstated what was actually done — it implied
+progress toward the canonical fusion *module* (the aggregation core), when what was actually proven
+is narrower and doesn't require that claim: two independently-maintained lane-alias equivalence
+tables were converged into one, with a live-verified zero-behavior-change proof. Renamed to
+`RF7-LANE-ALIAS-CONVERGENCE-01` to name exactly what was proven, no more. The canonical fusion core
+itself remains split between `SearchRuntime` and `rrf-fuse.ts` and is NOT claimed complete anywhere
+in this entry.
+
+**Did not attempt the full canonical fusion module in one pass.** `fuseSearchRuntimeCandidates`
+(`search-runtime.ts`, typed `Candidate[]` in / `FusedCandidate[]` out, closed 7-lane
+`LogicalRetrievalLane` union) and `reciprocalRankFusion` (`rrf-fuse.ts`, generic weighted
+`lanes: Array<{lane, hits}>` in / `FusedHit[]` out, open legacy vocabulary including
+`topology`/`authority`/`dispatcher`) have genuinely different input/output shapes and lane
+vocabularies — forcing them onto one shared aggregation core right now would be exactly the
+"premature shared-helper extraction risks centralizing the wrong abstraction" failure this
+change's own governance section already warns about. Not done.
+
+**Why the alias collapse is semantically right, not just tidy** (external review): RRF treats each
+input ranking as an independent contribution and sums rank-derived contributions for documents
+appearing across those rankings — this is exactly how Qdrant's own RRF implementation works,
+including optional per-ranking weights, and Qdrant's own guidance treats RRF as fusion of
+*genuinely distinct* retrieval signals (e.g. dense vs. sparse), not a mechanism for multiplying
+equivalent implementations of the same signal. So: Qdrant/TurboVec/cuVS/CAGRA all being one logical
+dense-lane vote (not four independent RRF votes) isn't an implementation convenience, it's the
+correct application of RRF's own semantics. This is the invariant `RF7-LANE-ALIAS-CONVERGENCE-01`
+encodes.
+
+**What was genuinely, safely extractable**: both files independently hand-maintained the same
+dense/lexical executor-alias equivalence-class list (`dense`/`dense_384`/`dense_768`/`qdrant`/
+`qdrant_vector`/`qdrant_768`/`turbovec`/`turbovec_ann`/`cuvs`/`cagra` → one logical `dense` vote;
+`bm25`/`postgres_trigram`/`lexical` → one logical `lexical` vote) — two independently-maintained
+copies of the same data that could silently drift apart on a future edit to only one file, exactly
+the duplication-prevention failure mode root CLAUDE.md documents. Extracted this alias data (not
+the aggregation algorithm) into `src/lib/server/retrieval/retrieval-lane-aliases.ts`.
+
+**Renamed 2026-09-06 (same day, follow-on cleanup)**: the file was originally called
+`dense-lane-aliases.ts` and exported two boolean helpers (`isDenseLaneAlias()`,
+`isLexicalLaneAlias()`). Per the review: that name became misleading once the file also carried
+lexical aliases, and continuing that pattern would slowly recreate per-caller `isXAlias()` helpers
+scattered everywhere — exactly the duplication this module exists to prevent. Renamed to
+`retrieval-lane-aliases.ts` and replaced the two boolean helpers with one semantic contract:
+`export type CanonicalFusionLane = 'dense' | 'lexical' | 'exact' | 'ast' | 'bm42' | 'graph' | 'other'`
+and `export function normalizeRetrievalLane(value: string): CanonicalFusionLane | undefined`. Note
+the type is a forward-declared superset of every logical fusion lane this repo will eventually need
+to name; the function itself only actually classifies `dense`/`lexical` today (the two lanes with
+real alias data) and returns `undefined` for everything else — callers keep their own remaining
+lane-classification logic (`exact_symbol`, `ast_tree`, `bm42`, topology/authority/dispatcher, etc.)
+exactly as before. `rrf-fuse.ts::toLogicalLaneName()` and `search-runtime.ts::getFusionLogicalLane()`
+both updated to the new import and API. The old `dense-lane-aliases.ts` file (never committed to
+git) was deleted after confirming via `grep -rln "dense-lane-aliases" src tests scripts` that no
+other reference remained.
+
+**Verified, not assumed (both the original extraction and the rename)**: reran the same 3-file RF6
+regression suite (`src/lib/server/retrieval/__tests__/{rf6-live-replay-01,rrf-split,search-runtime-
+fusion}.test.ts`) after both changes — still 31/31 pass, zero change. `npx tsgo --noEmit` — 75
+pre-existing errors both before and after the rename (77 at the original extraction, since 2 were
+independently fixed by the Firecrawl work earlier in this session), zero new ones, none in
+`retrieval-lane-aliases.ts`, `rrf-fuse.ts`, or `search-runtime.ts`. No database/Qdrant/Valkey/Neo4j
+writes.
+
+**Explicitly NOT claimed**: full RF7 canonical fusion module, `rrf-fuse.ts` delegating its
+aggregation logic to `SearchRuntime`, `service.ts::rrfFusion` migration, RF7 complete. This is one
+narrow, verified DRY fix on shared *data*, not the aggregation-core consolidation RF7 actually
+requires — that remains open, and per this change's own governance should not be attempted as a
+single large refactor given how much the two callers' shapes actually diverge.
+
+### RF7 next step is a parity contract, not extraction (external review, 2026-09-06 — planned, not started)
+
+Before extracting a shared fusion kernel, define the smallest neutral input representation both
+existing implementations can project into **without changing their public APIs**:
+
+```typescript
+interface FusionContributionV1 {
+  canonicalId: string;
+  logicalLane: CanonicalFusionLane;
+  rank: number;
+  weight: number;
+  executorId: string;
+  provenanceRefs: string[];
+}
+```
+
+`SearchRuntime`'s `Candidate` shape gets an adapter-only projection into `FusionContributionV1[]`;
+`rrf-fuse.ts`'s weighted lane arrays get their own adapter-only projection. **Neither
+implementation executes through this type yet** — it exists first for differential proofs.
+
+**`RF7-CONTRACT-PARITY-01`** (planned, not started): build fixtures covering (1) the same canonical
+ID returned by two different dense executors, (2) the same canonical ID appearing twice within one
+lexical lane, (3) a dense+lexical hit for the same candidate, (4) a candidate appearing in only one
+lane, (5) missing canonical identity, (6) weighted lanes, (7) tied ranks, (8) executor provenance.
+Compare `SearchRuntime`'s current output vs. the normalized-contribution-model projection, and
+`rrf-fuse.ts`'s current output vs. its own normalized-contribution-model projection. Measure:
+canonical identity set, logical lane set, vote count, rank ordering, provenance retention.
+**Observation only** — if both current owners reduce cleanly to the same semantics, that's evidence
+extraction is safe; if they don't, that's the exact remaining RF7 incompatibility, discovered before
+touching production behavior.
+
+**Only after that parity proof passes** would `retrieval-fusion-core-v1.ts` be created, with a
+deliberately tiny responsibility: `fuseCanonicalContributions(contributions: readonly
+FusionContributionV1[], options: FusionOptionsV1): FusedContributionV1[]` — no Qdrant/Postgres/
+SearchRuntime/CandidateFeatureSnapshot/ACE/SvelteKit/database/HTTP imports. It knows only: canonical
+identity, logical lane, rank, weight, same-lane dedup, RRF contribution, provenance. Migration order
+after that: `FusionCoreV1` → `SearchRuntime` adapter → `rrf-fuse.ts` adapter →
+`service.ts::rrfFusion` migration → bounded live replay.
+
+**Hard invariant — do not change the RRF constant during this convergence work**: Qdrant's own RRF
+uses a parameterizable constant, defaulting to `k=2` — different from the `k=60` often cited from
+the original literature. Whatever `k`, rank-indexing convention, and tie-handling this repo's
+existing implementations currently use MUST be preserved through extraction, never silently switched
+to a different default. Record it explicitly in a receipt:
+```
+fusionMethod: RRF
+rankBase: <current>
+k: <current>
+weightSemantics: <current>
+sameLaneDedup: strongest_contribution
+crossLaneFusion: sum
+```
+This makes a future "does Qdrant's own server-side RRF actually match ours" comparison testable
+rather than assumed.
+
+**Architectural conclusion (not a task, a boundary statement)**: Qdrant's Query API can now perform
+RRF (including weighted RRF and hybrid dense/sparse prefetch) natively — but Parent Atlas fusion
+ownership should NOT migrate into Qdrant, because this repo fuses signals Qdrant doesn't own
+(lexical, AST, exact-symbol, graph, semantic, and eventually an ontology receipt) — Qdrant itself
+says it doesn't aim to provide built-in ontologies or knowledge graphs. Qdrant's RRF is a possible
+**executor-local optimization**; `SearchRuntime`/`FusionCore` remains the canonical cross-lane
+fusion-semantics owner.
+
+**Planned execution order**:
+```
+RF7-01  rename/generalize lane-alias module     DONE (this entry)
+RF7-02  FusionContributionV1                    DONE (2026-09-06)
+RF7-03  adapters for both existing owners        DONE (2026-09-06)
+RF7-04  differential parity fixtures             DONE, 9/9 observed (2026-09-06)
+RF7-05  extract pure fusion core                 not started (blocked on RF7-04's findings, below)
+RF7-06  rrf-fuse.ts delegates                     not started
+RF7-07  SearchRuntime delegates                   not started
+RF7-08  service.ts migration                      not started
+RF7-09  bounded live replay                       not started
+```
+
+### RF7-02/03/04 results (2026-09-06) — real findings, extraction NOT yet authorized
+
+**Correction to the reviewer's own proposed `CanonicalFusionLane` type before building on it**: the
+review proposed `'dense'|'lexical'|'exact'|'ast'|'bm42'|'graph'|'other'` without reading the actual
+two callers' code. Checked against real code first: `search-runtime.ts`'s `LogicalRetrievalLane` is
+`'dense'|'lexical'|'exact'|'ast'|'schema'|'rg'|'bm42'` (no `graph`); `rrf-fuse.ts`/`rrf-contract.ts`'s
+raw `RrfLaneName` is `'bm42'|'rg'|'dense_384'|'dense_768'|'turbovec'|'topology'|'authority'|
+'dispatcher'` (also no `graph`). Widened `CanonicalFusionLane` in `retrieval-lane-aliases.ts` to the
+real superset (added `schema`/`rg`, dropped the invented `graph`) before using it in
+`FusionContributionV1` — building against an unverified externally-proposed type would have made the
+parity fixtures compare against a lane vocabulary that can't represent either caller's real output.
+
+**RF7-02**: `src/lib/server/retrieval/fusion-contribution-v1.ts` — the neutral
+`FusionContributionV1` interface (`canonicalId`, `logicalLane`, `rank`, `weight`, `executorId`,
+`provenanceRefs`), consumed only by adapters/tests, never by production code.
+
+**RF7-03**: `src/lib/server/retrieval/fusion-contribution-adapters.ts` —
+`projectSearchRuntimeCandidatesToContributions()` and `projectRrfLanesToContributions()`. Verified
+against real code, not guessed: `SearchRuntime.fuseSearchRuntimeCandidates` has NO per-lane
+weighting (uniform weight 1 for every contribution); `rrf-fuse.ts::reciprocalRankFusion` DOES
+support per-lane weighting and defaults `k = 60` (the literature-standard RRF constant, confirmed
+via its function signature default parameter — NOT Qdrant's own `k = 2` default). This `k = 60`
+default is the concrete value the "don't change the RRF constant during RF7" invariant above
+protects. `canonicalId` in both adapters uses a deliberately SIMPLIFIED identity extraction
+(`symbolVersionId ?? packetKey ?? canonicalChunkId ?? id`), not a reproduction of
+`search-runtime.ts`'s private (unexported) `getRevisionQualifiedFusionIdentityKey`/
+`getFusionBackendIdentityKey` canonical/degraded scheme — documented as an intentional
+simplification in the adapter's own file header, not an oversight.
+
+**RF7-04**: `src/lib/server/retrieval/__tests__/rf7-contract-parity-01.test.ts` — 8 scenarios per
+the review's own list, plus 1 cross-check. **9/9 pass, but "pass" here means each scenario's
+observation matched what was predicted from reading the real code, not that the two callers are
+semantically identical** — several real, confirmed divergences were found and are asserted
+explicitly, not glossed over:
+- **SearchRuntime has no weighting; rrf-fuse.ts does** (Scenario 6) — confirmed via
+  `fuseSearchRuntimeCandidates`'s source (no `weight` parameter anywhere) vs.
+  `reciprocalRankFusion`'s signature (`lanes[].weight`, or a weight map). A shared core cannot
+  default SearchRuntime's contributions to any weight but 1 without changing its behavior.
+- **A caught bug in the adapter itself, not either caller**: the first test run found
+  `ast_tree` was not being normalized to `ast` — my adapter's lane-fallback only consulted
+  `normalizeRetrievalLane()` (dense/lexical alias data only) and returned the raw `scoreSource`
+  string for anything else, missing `search-runtime.ts::getFusionLogicalLane()`'s own
+  `exact_symbol -> exact`, `ast_tree -> ast`, `schema -> schema`, `rg_keyword -> rg` switch
+  statement. Fixed by adding `fallbackScoreSourceToLane()`, which replicates that switch verbatim
+  (verified against the real function's source at `search-runtime.ts` lines ~1250-1260).
+- **Real caller behavior gap, not a bug**: `fuseSearchRuntimeCandidates()` filters out candidates
+  with empty `packetKey`/`sourceRef` before bucketing (a `valid = candidates.filter(...)` guard);
+  the simplified adapter does not replicate this validation step, since RF7-CONTRACT-PARITY-01 is
+  scoped to lane/rank/vote semantics, not input validation. Confirmed via a real call to
+  `fuseSearchRuntimeCandidates()` in Scenario 5's test — it returns `[]` for the malformed input
+  while the adapter still produces one (empty-canonicalId) contribution. Documented, not silently
+  reconciled.
+- **Real caller behavior gap, not a bug**: tie-breaking on equal scores. The adapter breaks ties by
+  input array order (stable sort); the real `fuseSearchRuntimeCandidates()` breaks ties via a
+  private `compareIdentityKeys()` function the adapter does not replicate (Scenario 7).
+
+**Conclusion — matches the plan's own gating language, not overclaimed**: this is observation
+evidence toward whether extraction is safe, not itself a passing parity proof. The confirmed
+weighting-model divergence (SearchRuntime uniform vs. rrf-fuse.ts weighted) is real and must be
+designed for explicitly in any future `FusionCoreV1`, not silently defaulted away. `RF7-05`
+(extracting the pure fusion core) remains **not started** and **not authorized by this entry** —
+per the plan's own governance, a design decision about how a shared core should represent
+"a caller with no native weighting" is needed first, not automatic from this test passing.
+
+**Verified**: `npx tsgo --noEmit` — 75 pre-existing errors (unchanged), zero in
+`fusion-contribution-v1.ts`, `fusion-contribution-adapters.ts`, or the new test file. RF6 regression
+suite re-run after all of this — still 31/31 pass. No database/Qdrant/Valkey/Neo4j writes.
+
 ## RF7 - Long-term convergence (explicitly deferred, do not start before RF4-RF6)
 
 - [ ] Extract `SearchRuntime.fuseCandidates`'s semantics into a shared, importable canonical
@@ -754,3 +1166,204 @@ future directions (see session discussion) but are correctly sequenced after RF4
   status is tracked and decided independently until RF7's convergence work is scoped separately.
 - The `rrf-integration.ts` fix from earlier in this session remains in place, untouched, and is
   referenced as the proven precedence pattern other fixes should match, not duplicated ad hoc.
+
+## LLAMA-TEST-BOUNDARY-01 (2026-09-06) — `PARTIAL_PROVEN`, corrected proof matrix, not `RETIRED`
+
+A parallel handoff this session proposed retiring stale Ollama-era test mocks in favor of a shared
+llama-server chat fixture, with a closing `OLLAMA_TEST_BOUNDARY_RETIRED` proof asserting
+`productionDirectOllamaCallers = 0`. That specific field is **false at full-repo scope** and is
+corrected here rather than left standing — checked live via `rg -l "ollamaFetch" src --type ts`
+(excluding tests): **80+ production files still call `ollamaFetch`**, most plausibly legitimate
+per this repo's own hard rule (Ollama is embeddings-only; chat/generation goes through
+llama-server) but **not audited file-by-file in this pass** — `productionDirectOllamaCallers = 0`
+was an aspirational target, not a verified fact, and root CLAUDE.md's own July 30 "Ollama vs
+llama-server Boundary" sweep already names ~20 of these files as still needing conversion from an
+earlier pass whose completion status isn't re-verified here either.
+
+**What was actually done and verified, real evidence**:
+- Root cause confirmed live, not assumed: `tests/ace-summarize-route.spec.ts` and
+  `tests/sse-chat-glossary-metadata.spec.ts` mocked `$lib/server/ollama.js`'s `ollamaFetch` for
+  chat/generation, but both routes' real chat calls go through `fetch()` directly against
+  llama-server's OpenAI-compatible `/chat/completions` (non-streaming for `/api/ace/summarize`,
+  streaming SSE for `/api/sse/chat`). The stale mock never intercepted anything — confirmed by a
+  real failure surfacing an actual live-generated LLM response instead of the mocked text, proving
+  these "unit" tests were silently making real network calls to whatever llama-server happened to
+  be running.
+- Built the shared canonical seam the handoff proposed:
+  `tests/helpers/mock-llama-server-chat.ts` (`makeLlamaChatCompletionResponse`,
+  `makeLlamaStreamResponse`, `matchLlamaChatCompletions`) — covers both call shapes this repo's
+  routes actually use.
+- `tests/ace-summarize-route.spec.ts`: migrated fully. **4/4 pass** (was 2/4 failing).
+- `tests/sse-chat-glossary-metadata.spec.ts`: migrated onto the shared fixture, plus found and
+  fixed a second, distinct drift along the way — `model` in persisted metadata now comes straight
+  from the request body (`model ?? 'LLM_MODEL_ID'`) with no Ollama-config-derived default, so tests
+  that never passed `model` in the body got the literal placeholder string.
+  **Corrected 2026-09-06 (re-verification pass)**: this file was concurrently edited by another
+  session after the migration above was recorded (`git log` shows commit `732c66f6bb`, "/16
+  passing...", landed on top of this work) — the file now has **13 total tests**, not 17. A live
+  re-run confirms **12/13 pass**. The originally-recorded "16/17" figure was accurate for the file
+  state at the time it was measured but is now stale; recording the current live number instead of
+  leaving the stale one standing.
+- 1 test (`emits glossary matches in the final SSE metadata payload`) left failing, explicitly
+  **not** forced: `mockInsert` called 5 times instead of 2 (re-confirmed live 2026-09-06, same
+  assertion still fails the same way), confirmed via a direct test (adding the `model` field did
+  not fix it) to be unrelated to the Ollama/llama-server migration — some other drift, not
+  diagnosed. Matches this handoff's own "leave alone — unrelated failing test" bucket.
+
+**Corrected `OLLAMA_TEST_BOUNDARY_RETIRED` fields** (real, not the aspirational originals):
+```
+productionDirectOllamaCallers   = 2 CONFIRMED_LIVE_VIOLATIONS (detective/analyze,
+                                   detective/connections — real Ollama :11434 chat calls, no
+                                   llama-server routing, unconditional) + 6 CONDITIONALLY_SAFE
+                                   (currently routed to llama-server via TurboQuant intercept,
+                                   verified live 2026-09-06, but silently fall back to real Ollama
+                                   if that intercept's health check or config flag ever flips) out
+                                   of 81 files classified by call-site endpoint (see "80-file
+                                   ollamaFetch production audit" above; the remaining ~73 files'
+                                   ollamaFetch calls target /api/embeddings, /api/embed, or
+                                   /api/tags, or go through the safe $lib/server/ollama.js
+                                   getOllama*Endpoint() resolvers — not individually re-verified
+                                   past the call-site grep classification) — was previously
+                                   NOT_AUDITED
+llamaServerChatFixtureConsumers = 2 (ace-summarize-route.spec.ts, sse-chat-glossary-metadata.spec.ts)
+migratedTestsPassed             = 16/17 (4/4 + 12/13, re-verified live 2026-09-06; corrects an
+                                   earlier "20/21" figure that was accurate when first measured but
+                                   went stale after a concurrent session's commit changed
+                                   sse-chat-glossary-metadata.spec.ts's test count from 17 to 13)
+productionCodeChangedForTests   = false for the LLM-boundary migration itself (test files + 1
+                                   shared test helper only); separately, 1 production file
+                                   (youtube-transcript.ts) was changed for the unrelated Firecrawl
+                                   type-safety fix below — not a test-driven change
+```
+
+**Done (2026-09-06) — Firecrawl optional-provider centralization**:
+- Built `src/lib/server/retrieval/optional-firecrawl-provider.ts` exactly as proposed:
+  `loadFirecrawl()` -> dynamic `import('@mendable/firecrawl-js')` (one documented
+  `@ts-expect-error`, cached after first call) -> `{status: 'AVAILABLE', FirecrawlCtor}` or
+  `{status: 'UNAVAILABLE', reason}`.
+- `src/lib/server/retrieval/youtube-transcript.ts` now calls `loadFirecrawl()` instead of its own
+  inline dynamic import + `as any` cast; on `UNAVAILABLE` it logs and returns `null` (same runtime
+  fallback behavior as before — this call site already had try/catch degradation, so no behavior
+  change, only a real type fix).
+- Verified via real `tsgo --noEmit`: error count dropped from the established 77-error baseline to
+  **76**, and a direct grep of the full error log for `youtube-transcript`/`optional-firecrawl`
+  returned zero matches — confirming the target file's `TS2307: Cannot find module` error is gone
+  and the new file introduced no new errors.
+- **Explicit scope boundary — not claimed**: only this one call site was migrated. The
+  `@ts-expect-error` pattern is not swept to any other optional-dependency import elsewhere in the
+  repo, and no other file was touched.
+
+**Done (2026-09-06, second instance) — `src/lib/server/research/fastcrawl.ts`**: a full `rg -l
+"firecrawl-js" src tests --type ts -i` sweep (prompted by a concurrent-session commit message,
+`732c66f6bb`, describing a fix to "a real production bug: literal @mendable/firecrawl-js import
+crashing module load" for `ace-context-glossary.spec.ts`) found this file still had a **bare static
+`import FirecrawlApp from '@mendable/firecrawl-js'`** at line 1 — worse than the `youtube-transcript.ts`
+case above, since a static import throws at Node's ESM module-load time (not just a type error) for
+*anything* that transitively imports this file, not only when the Firecrawl code path is actually
+invoked. Live-checked: `src/lib/server/tools/handlers/research.ts` imports this file, so any test or
+route exercising that handler would have crashed. `ace-context-glossary.spec.ts` currently passes
+(2/2, re-verified live) without touching this file — the concurrent commit's fix must have been to a
+different crash site, not this one; this bug was still live and undiscovered until this sweep.
+- Migrated to the same `loadFirecrawl()` provider, converting `getFirecrawl()` to async and fixing a
+  second, smaller bug found along the way: the old code called
+  `new (FirecrawlApp as any)(ENV.FIRECRAWL_API_KEY)` (bare string constructor arg) where the real
+  Firecrawl SDK — confirmed via the other live call site in `youtube-transcript.ts` — takes
+  `{ apiKey: string }`. Fixed to match.
+- Widened `optional-firecrawl-provider.ts`'s shared `FirecrawlClient`/`FirecrawlScrapeResult` types
+  (added `onlyMainContent?: boolean` to scrape options, `error?: string` to the result, made
+  `timeout` optional) since this call site's real usage needed fields the first call site didn't
+  exercise — both call sites now share one canonical type, not two divergent ad-hoc ones.
+- Verified via real `tsgo --noEmit`: 76 -> **75** errors, zero remaining matches for
+  `fastcrawl`/`youtube-transcript`/`optional-firecrawl` in the full error log.
+- **Not verified by a test** — no test in `tests/` imports `fastcrawl.ts` or
+  `tools/handlers/research.ts` directly (checked via `rg -l`), so this fix's correctness rests on
+  the `tsgo` clean pass and matching the sibling call site's real usage, not an executed test.
+
+**Done (2026-09-06) — 80-file `ollamaFetch` production audit, against the CLAUDE.md "Ollama vs
+llama-server Boundary" hard rule (Ollama is embeddings-only; all chat/generation must go through
+llama-server)**:
+
+Ran `rg -l "ollamaFetch" src --type ts` → 81 files (80 production + 1 test file already counted
+elsewhere). Classified by which endpoint each call actually hits, verified live where it mattered
+(not just read statically):
+
+```
+/api/embeddings or /api/embed  : 36 call sites  -> LEGITIMATE (embeddings-only rule satisfied)
+/api/tags                       : 13 call sites  -> BENIGN (Ollama health/model-list probe, not
+                                                     covered by the chat/embed boundary rule)
+/api/generate or /api/chat, via
+  getOllama{Chat,Generation}Endpoint()
+  imported from $lib/server/ollama.js  : 16 call sites -> SAFE. Verified `CHAT_BASE_URL` in that
+                                                     file resolves `LLAMA_SERVER_URL ??
+                                                     TURBOQUANT_URL ?? TURBOQUANT_BASE_URL ??
+                                                     'http://127.0.0.1:8090'` — never falls back to
+                                                     real Ollama. Function names say "Ollama" but
+                                                     the actual URL is always llama-server. Naming
+                                                     is misleading but not a functional violation.
+1 call site via getOllamaEndpoint()
+  imported from $lib/server/utils/
+  ollama-endpoint.js                    : re-exports the same safe $lib/server/ollama.js-style
+                                                     resolution chain — also safe.
+```
+
+**Confirmed live, unmitigated violations (2 files) — real bug, not naming confusion**:
+- `src/routes/api/detective/analyze/+server.ts` and
+  `src/routes/api/detective/connections/+server.ts` build `${OLLAMA_URL}/api/generate` where
+  `OLLAMA_URL = ENV.OLLAMA_BASE_URL`, verified live in `.env` to be `http://127.0.0.1:11434` (real
+  Ollama, not llama-server). Both pass `stream: true`.
+- `ollamaFetch()`'s own shared TurboQuant-intercept logic (`src/lib/server/ollama.ts:365`,
+  `tryTurboQuantIntercept()`) has a documented, deliberate gate: `if (ollamaBody.stream !== false)
+  return null;` — its own comment reads *"Only intercepts non-streaming requests (stream: false).
+  Streaming stays on Ollama since TurboQuant SSE -> Ollama ndjson conversion is non-trivial."* This
+  is an acknowledged design tradeoff by whoever wrote it, not an oversight — but it means these two
+  files send real chat-generation requests (`model: LLM_MODEL_ID`, i.e. the canonical chat model
+  like `ornith-1.5-9b`) straight to Ollama's `/api/generate`, unconditionally, with no fallback
+  check. Per this repo's own "No Ollama model pulls" rule, chat models are never registered in
+  Ollama's model store — so this is likely also a **live functional bug** (the request would 404 or
+  error against Ollama, not just a policy violation), not verified end-to-end this session (would
+  require exercising the live route), but the code path itself is unambiguous.
+- **Not fixed this session** — SSE-format translation (Ollama ndjson -> OpenAI-SSE or vice versa)
+  is real engineering work the original author already flagged as "non-trivial" in their own
+  comment, not a one-line change. Recording rather than rushing a fix into two live streaming
+  user-facing endpoints.
+
+**Conditionally-fragile (6 files) — currently safe in practice, verified live, but silently
+degrade to real Ollama if a config flag or health check flips**:
+- `src/routes/api/summarize/synthesize/+server.ts`, `summarize/analyze/+server.ts`,
+  `knowledge/lint/+server.ts`, `generate-cluster-summaries/+server.ts`, `analyze-tag/+server.ts`,
+  `analyze-file/+server.ts` — all build `${OLLAMA_URL}/api/generate` or `/api/chat` directly
+  (literal `ENV.OLLAMA_BASE_URL`, i.e. `:11434`) but pass `stream: false`, which the
+  `tryTurboQuantIntercept()` gate above DOES cover — verified live: `TURBOQUANT_INTERCEPT` env var
+  unset (defaults `'true'`), `TURBOQUANT_URL=http://127.0.0.1:8090` configured, and a live
+  `curl http://127.0.0.1:8090/health` returned `{"status":"ok"}` at time of audit. So today, these
+  6 are actually routed to llama-server via the intercept.
+- **The fragility**: if TurboQuant/llama-server ever goes down (the health check is cached 5s) or
+  `TURBOQUANT_INTERCEPT=false` is ever set, `tryTurboQuantIntercept()` returns `null` and
+  `ollamaFetch()` falls through to the raw `url` argument — real Ollama `:11434` — with the
+  **canonical chat model name** in the request body, not an embedding model. This is a silent
+  degradation path with no logged warning distinguishing "routed to llama-server" from "fell back
+  to Ollama," making a future real-Ollama-chat incident hard to detect from logs alone. Flagged,
+  not fixed — hardening this (e.g., logging which path was taken, or hard-failing instead of
+  silently hitting Ollama) is a separate, smaller follow-up from the 2 confirmed-broken streaming
+  files above.
+
+**Separate structural finding — duplicate endpoint-resolution helpers (11+ definitions)**:
+`grep -rn "export function getOllamaEndpoint\|getOllamaChatEndpoint\|getOllamaGenerationEndpoint"`
+found the same-named functions independently defined in at least 11 files: `lib/ai/ollama-config.ts`,
+`lib/utils/ollama.ts`, `lib/utils/ollama-endpoint.ts`, `lib/utils/endpoints.ts`,
+`lib/utils/api-endpoints.ts`, `lib/server/utils/ollama-endpoint.ts`,
+`lib/server/services/error-analysis/OllamaService.ts`, `lib/server/ollama.ts` (the one actually
+used by the 16 safe call sites above), `lib/server/config/endpoints.ts`,
+`lib/server/clients/ollama.ts`, `lib/server/env/endpoints.ts`. At least 2 of these
+(`lib/utils/endpoints.ts`, `lib/utils/api-endpoints.ts`) fall back to real Ollama `:11434` /
+`http://ollama:11434` if no `TURBOQUANT_URL`/`LLAMA_SERVER_URL` env is set — **not verified this
+session whether anything currently imports these two specific risky variants** (the 18
+`ollamaFetch`-adjacent call sites checked all resolved to the safe `lib/server/ollama.ts` or
+`lib/server/utils/ollama-endpoint.ts` versions). This matches CLAUDE.md's own "Duplication
+Prevention" rule almost exactly (N competing owners of one capability) — recorded here as a new,
+previously-undocumented instance of that pattern, not remediated (consolidating 11 files down to
+one canonical owner is a change with a much larger blast radius than this session's scope).
+
+**Not done** — the ~85-file broader test sweep the original handoff described (auditing
+`ollamaFetch` mocks inside test files, as opposed to production call sites) was not attempted this
+session; scoped out in favor of the production-code audit above.

@@ -20,7 +20,7 @@
 
 import fetch from 'node-fetch';
 import { db } from '../db/client.js';
-import { qdrant } from '../vector/qdrant-manager.js';
+import { getQdrantClient } from '../vector/qdrant-singleton.js';
 import { codebase_chunk_index, feature_statistics } from '../db/schema-postgres.js';
 import { mergeRRF, type RRFResult } from './multi-vector-rrf.js';
 import { getSourceRef, parseFeatureId } from './feature-identity.js';
@@ -200,18 +200,26 @@ export class GoRetrievalOrchestrator {
     const start = Date.now();
 
     try {
-      const results = await qdrant.search('codebase_chunks_768', {
-        vector: embedding,
+      const response = await getQdrantClient().query('codebase_chunks_768', {
+        query: embedding,
+        using: 'content',
         limit: topK,
         with_payload: true,
         with_vector: true,
         score_threshold: 0.5
       });
 
+      const points = response.points ?? [];
+
       return {
-        ids: results.map((r: any) => r.id),
-        embeddings: results.map((r: any) => r.vector),
-        ranked: results.map((r: any, idx: number) => ({
+        ids: points.map((r: any) => r.id),
+        embeddings: points.map((r: any) => {
+          const vector = r.vector;
+          if (Array.isArray(vector)) return vector;
+          if (vector && typeof vector === 'object' && Array.isArray(vector.content)) return vector.content;
+          return [];
+        }),
+        ranked: points.map((r: any, idx: number) => ({
           id: r.id,
           score: r.score || 0,
           rank: idx

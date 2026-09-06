@@ -1,4 +1,5 @@
 import type { FusedHit, RankedLaneHit, RrfIdentityStatus, RrfLaneName } from './rrf-contract.js';
+import { normalizeRetrievalLane } from './retrieval-lane-aliases.js';
 
 const KNOWN_LANE_NAMES: readonly RrfLaneName[] = [
   'bm42',
@@ -23,20 +24,7 @@ function toRrfLaneName(value: string): RrfLaneName {
  */
 function toLogicalLaneName(value: string): string {
   const normalized = value.trim().toLowerCase();
-  if (
-    normalized === 'dense' ||
-    normalized === 'dense_384' ||
-    normalized === 'dense_768' ||
-    normalized === 'qdrant' ||
-    normalized === 'qdrant_vector' ||
-    normalized === 'qdrant_768' ||
-    normalized === 'turbovec' ||
-    normalized === 'turbovec_ann' ||
-    normalized === 'cuvs' ||
-    normalized === 'cagra'
-  ) return 'dense';
-  if (normalized === 'bm25' || normalized === 'postgres_trigram' || normalized === 'lexical') return 'lexical';
-  return normalized || 'dispatcher';
+  return normalizeRetrievalLane(normalized) ?? (normalized || 'dispatcher');
 }
 
 function identityStatusForHit(hit: {

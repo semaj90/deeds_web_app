@@ -59,19 +59,17 @@ if ($Detached) {
     $stdoutLog = Join-Path $LogDir 'reranker-stdout.log'
     $stderrLog = Join-Path $LogDir 'reranker-stderr.log'
 
-    # Build PATH string to pass explicitly as env to Start-Process
-    $newPath = "$CudaBin;$CudnnLib;$env:PATH"
-
+    # Start-Process has no -EnvironmentVariables parameter (that's a .NET
+    # ProcessStartInfo member, not a cmdlet param — a real bug, not a style choice).
+    # $env:PATH and $env:RERANKER_PORT are already set on this process above, and
+    # Start-Process children inherit the parent process's environment by default,
+    # so no explicit env-passing is needed here.
     $startArgs = @{
         FilePath               = 'python'
         ArgumentList           = @($SidecarPath)
         WindowStyle            = 'Hidden'
         RedirectStandardOutput = $stdoutLog
         RedirectStandardError  = $stderrLog
-        EnvironmentVariables   = @{
-            PATH          = $newPath
-            RERANKER_PORT = "$Port"
-        }
     }
 
     $proc = Start-Process @startArgs -PassThru

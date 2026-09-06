@@ -486,7 +486,20 @@ to test its success branch against.
   identity readback and no legacy point deletion, exactly as this task required. Do not rerun
   this canary. See the `PKT-LINEAGE-11`/`RECON-CANARY-01` evidence earlier in this file and
   `docs/reports/bridge-recon-replay-v1.json`.
-- [ ] RETRIEVAL-01L — **`OPEN`** (2026-09-02, status confirmed — subtle, not simply "blocked").
+- [x] RETRIEVAL-01L — **`DONE / PROTOCOL_FROZEN`** (2026-09-06). Governance closeout
+  satisfied: `design.md`'s new "Qdrant projection reconciliation protocol (frozen —
+  RETRIEVAL-01L, 2026-09-06)" section generalizes the exact 7-step
+  audit→proposal→preimage→apply→readback→replay→re-audit chain the 08A canary already
+  proved live (immutable proposal + `proposalChecksum`/`targetPointSetChecksum`, apply
+  receipts carrying `consumedProposalChecksum`, exact readback counts, replay-idempotence
+  proof) into the durable protocol this task required, distinguishing payload
+  reconciliation from projection creation as two never-conflated operations. This closes
+  the governance/documentation gap only — it does NOT authorize applying either operation
+  to the remaining ~1,109 `QDRANT_POINT_MISSING` population; that stays a separate,
+  explicitly-authorized future proposal cycle per the freeze's own closing paragraph. No
+  Postgres/Qdrant/Neo4j/Valkey writes were made by this closing pass.
+
+- [x] ~~RETRIEVAL-01L (superseded entry, kept for history)~~ — **`OPEN`** (2026-09-02, status confirmed — subtle, not simply "blocked").
   The final live state is good: 6,312 present canonical projections reconciled, 0 exact patches
   remaining, 0 blocking conflicts, 675 policy-ineligible missing points correctly left
   untouched (`FINAL_STATE_IDEMPOTENCY_PROVEN`). But the exact original 6,306-entry consumed
@@ -855,6 +868,43 @@ to test its success branch against.
   audit evidence for a future, separate remediation decision. See
   `docs/reports/retrieval-02-qdrant-named-vector-census-v1.json` and
   `scripts/atlas/retrieval-02-qdrant-named-vector-census.mjs`.
+
+**RETRIEVAL-02 remediation follow-up (2026-09-06):** The audit itself remains
+read-only, but a separate bounded repair pass applied the proven API fixes it
+identified. Live Qdrant `GET /collections/{name}` confirms both active 768
+collections are named-vector collections exposing `content`, `error`, and
+`signature` (no unnamed default). The shared `QdrantLane`, the parallel
+orchestrator, and the Go Retrieval Qdrant call now use Query Points with
+`using: 'content'`; the Go path also now uses the actual singleton client's
+`query()` method rather than a non-existent manager `search()` method. The
+manager's dense+sparse fallback now names the dense lane `content` instead of
+`default`. Fixed-collection and generic wrappers now pass the configured named
+vector where known. The multi-vector keywords lane no longer sends raw natural
+language text as a vector query against a non-existent `keywords` vector; the
+live lexical owner remains PostgreSQL FTS/BM25 until a real sparse Qdrant
+contract is provisioned. Re-ran the census after repair: **31 call sites across
+24 files, 0 `NAMED_VECTOR_REQUIRED_MISSING`, 1 `DEFAULT_VECTOR_VALID`, 14
+`EXPLICIT_NAMED_VECTOR_VALID`, and 16 `COLLECTION_SCHEMA_UNKNOWN`**. The
+unknown sites remain unpromoted findings because their collection identity is
+not statically resolvable. Read-only live probes returned one point from each
+active 768 collection using the named `content` vector. No Qdrant, Postgres,
+cache, or projection writes were performed by this repair pass. Updated source
+files and the new regression test are listed in the working-tree diff; the
+original audit receipt remains authoritative for the census method and result.
+
+**RETRIEVAL-02 raw HTTP follow-up (2026-09-06):** A second read-only review covered
+raw `fetch(.../points/query)` callers that the method-call census does not parse.
+The live named-vector contracts were applied to the current callers: `content` for
+`codebase_chunks_768`/`codebase_chunks_768_v2`, `description` for `legal_cases`,
+and `content` for `evidence_items`, `legal_documents`, and `audio_segments`.
+The same pass corrected several consumers that were reading Qdrant Query API
+responses from top-level `points` instead of the authoritative `result.points`
+envelope, while retaining a compatibility fallback for older fixtures. The
+dynamic `research_summaries` fallback remains unclaimed because that collection
+is absent from the live Qdrant instance; `code_llm_outputs` remains valid as an
+unnamed single-vector collection. No collection schema, point, payload, or
+projection writes were performed. This is API-contract remediation only; it does
+not promote any collection to canonical evidence authority.
 - [x] RF-IDENTITY-SEMANTICS-02 — Preserve the existing dedup precedence while
   distinguishing canonical Atlas identity from projection and grouping
   evidence: `content_hash` is `projection_exact`, `source_ref` is
@@ -1004,6 +1054,15 @@ residency/early-stop proof) -> **only if the lower LODs prove genuinely useful**
 explicitly **deferred** until `NESTED-REP-01` produces real evidence — do not build policy machinery
 around `latent_64` merely because it is cheaper; the residency proof below is what would actually
 justify it.
+
+**Correction (2026-09-06): `NESTED-TRAIN-02` is NOT independently unblocked by the `latent_64`
+slice finding above.** It still requires the immutable, lineage-qualified source snapshot that
+`LINEAGE-01`/`PKT-LINEAGE-08B` are still establishing (see the "Current live recheck — 2026-09-06"
+section elsewhere in this file: `NO_CURRENT_COMPLETED_BOUND_SOURCE_OWNER`, current workspace dirty
+and drifting under genuine concurrent multi-session editing). The `latent_64`-is-a-slice finding
+only removed a separate retraining-invalidation concern; it did not supply the snapshot
+prerequisite. A prior status summary in this session stated `NESTED-TRAIN-02`/`NESTED-REP-01` were
+"now unblocked" — that was wrong and is retracted here rather than left standing.
 
 - [ ] NESTED-TRAIN-02 — Retrain the nested AE from an immutable source snapshot,
   grouped train/eval split, frozen seeds, CUDA receipt, and new checkpoint hash.
@@ -2645,6 +2704,36 @@ authorize cleanup, eligibility changes, or Qdrant projection.
   manually spot-checked). Not resolved this pass — resolving it means either finding/adding the
   actual evidence reference for each of the 11, or downgrading them to `[ ]` if no evidence can be
   recovered. Left for the deliberate final pass this validation item is scoped for.
+
+  **Recheck 2026-09-06 (read-only, the specific 11 named items only, not the broader 26-item
+  set)**: re-read each of the 11 named blocks (`RETRIEVAL-01A` through `01E`, `DAG-RUNTIME-01D.1`,
+  `PKT-LINEAGE-02`, `PKT-LINEAGE-03`, `PKT-LINEAGE-04`, `PKT-LINEAGE-11`) directly in this file and
+  found all 11 now carry explicit `docs/reports/*.json` evidence citations in their own bullet
+  text. Verified each of the 8 distinct cited report files exists on disk (not just referenced):
+  `writer-root-01-representation-owner-01-results.json`, `qdrant-reader-shadow-02-results.json`,
+  `qdrant-reader-fix-02-canary-results.json`, `retrieval-02-qdrant-named-vector-census-v1.json`,
+  `packet-chunk-lineage-contract-01a-results.json`,
+  `lineage-01-source-namespace-revision-authority-v1.json`,
+  `packet-chunk-lineage-backfill-scope-01-results.json`,
+  `packet-chunk-lineage-backfill-dry-01-results.json`, `kernel-bound-dag-executor-v1.json`,
+  `kernel-dag-owner-trace-v2.json`, `pkt-lineage-11-recon-canary-01-replay-v1.json`, and
+  `pkt-lineage-11-recon-canary-01-apply-v1.json` — all 12 files present. This resolves the specific
+  11-item finding from the 2026-09-02 spot-check (the evidence citations were added to the file
+  after that audit ran, and the spot-check itself was never updated to reflect it). **This does
+  NOT close this validation item as a whole** — the broader `task-ID-aware` checker's finding of
+  "26 still need evidence review" (out of 108 real checkbox blocks) covers a different, larger
+  population not reviewed in this pass. Re-ran `scripts/atlas/audit-tasks-md-evidence-links-v1.mjs`
+  fresh against the current file (`totalCheckedItems: 168`, `itemsWithEvidenceReference: 93`). Its
+  `itemsWithoutEvidenceReference` list is dominated by the exact parser false-positive class this
+  validation item already documents (generic verbs like "Classify"/"Keep"/"Review"/"Add" and bare
+  numbers "01"-"12" misparsed as task IDs, not real item identifiers) — confirms the checker still
+  needs the task-ID-aware rewrite this item calls for, not that 75 more items are actually
+  unevidenced. The one genuine task-ID hit in its output is `RETRIEVAL-01L` (closed this session,
+  evidenced by the `design.md` protocol-freeze section rather than a `docs/reports/*.json` path —
+  a legitimate evidence shape for a documentation-closure task the checker's pattern doesn't
+  recognize, not a real gap). A full close of this validation item still needs either a corrected
+  checker or a manual pass over the remaining real (non-false-positive) checkbox blocks — not
+  attempted this pass.
 - [ ] No database, Qdrant, graph, cache, or production mutation occurs during
   read-only gates.
   **Interim spot-check run 2026-09-02**: this evidence-synchronization pass itself performed zero
@@ -3864,6 +3953,37 @@ The direct WSL2/Miniforge `atlas-rapids-cu13` path is preferred for algorithm pa
 deployment is a separate service-readiness gate and must not be treated as proof that cuGraph is
 unavailable.
 
+#### 2026-09-06 API/runtime reconciliation (read-only)
+
+The upstream API contract matches the existing dedicated RAPIDS owner: NetworkX
+`pagerank(G, alpha, personalization, max_iter, tol, weight)` returns a node-to-score mapping,
+while cuGraph `pagerank(G, ...)` returns a GPU dataframe of vertex/score rows. cuGraph normally
+renumbers vertices, so the parity consumer must preserve the external vertex map and reattach
+scores before returning candidate or packet identity. The existing
+`python/atlas_rapids_graph_runtime.py` does this and validates `graphRevision`, artifact checksum,
+graph-ordinal checksum, and candidate-snapshot revision before execution. The older
+`services/topology-gpu/graph_paths.py` path does **not** execute GPU PageRank: its cuGraph branch
+only prepares a cuDF edge frame and `_pagerank_with_seeds()` still calls NetworkX. Do not cite
+that path as RTX/cuGraph PageRank proof or route production PageRank through it until it has a
+separate same-snapshot executor contract.
+
+The bounded receipt `docs/reports/current-structural-graph-cpu-gpu-parity-v1.json` is valid
+read-only evidence (`networkx` vs `cugraph.pagerank`, same ordering, maximum absolute error
+`4.1680224759088613e-7`, 23 nodes, 12 edges, writes false). It does **not** close
+`GRAPH-PAGERANK-PARITY-01`: that checkbox requires a fresh `StructuralGraphSnapshotV1` bound to
+the latest completed Graphify execution. The next safe action is to materialize or locate that
+exact Graphify-bound snapshot, then run the existing NetworkX/cuGraph parity oracles with
+identical graph, vertex-map, edge-set, and workspace revisions. Do not install `nx-cugraph`,
+refresh the whole workspace, or relabel the bounded receipt as full-corpus proof.
+
+**Implementation correction 2026-09-06:** `services/topology-gpu/graph_paths.py` was reporting
+`cugraph+networkx` after merely constructing an unused cuDF edge frame, while its actual
+personalized PageRank implementation called `networkx.pagerank`. Removed that misleading
+optional-import/label path; this service now truthfully reports `networkx`. The dedicated
+`python/atlas_rapids_graph_runtime.py` remains the sole PageRank implementation allowed to
+report `cugraph.pagerank`. Read-only validation passed: Python syntax check and a two-node
+semantic-path smoke returned `backend=networkx` with paths; no datastore or projection writes.
+
 ### GRAPH-LINK-TOPOLOGY-01 (PROVEN_BOUNDED — direct executor challenger)
 
 The bounded CPU primitive `bounded_incidence_jaccard()` now keeps the shared `NARY_INCIDENCE`
@@ -3968,6 +4088,25 @@ Unknown tools, missing registry identity, permission mismatch, and write-capable
 closed. Selection is a proposal, not execution. See
 `docs/reports/mcp-tool-routing-ace-bitfrost-viterbi-gap-v1.json`. This audit made no datastore
 changes.
+
+#### 2026-09-06 NLP/API reconciliation (read-only)
+
+The live `8095` receipt `docs/reports/acp-nlp-tool-review-v1.json` proves the three registered
+NLP tools (`nlp:capabilities`, `nlp:analyze`, `nlp:ast-chunk`) are reachable and read-only, with
+Tree-sitter/ast-grep/LangExtract provenance visible. The local lineage contract in
+`sveltekit-frontend/src/lib/server/nlp/nlp-observation-lineage-v1.ts` requires non-empty
+`sourceRef`, `workspaceRevision`, `sourceRevision`, `providerRevision`, and `producerRevision`,
+and incorporates byte offsets into the deterministic evidence key. Focused local contracts pass
+26/26, including lineage and revisioned Viterbi proposal tests.
+
+This is observation readiness, not canonical structural promotion. The existing
+`docs/reports/ast-node-8095-parity.json` remains `DEGRADED_COMPATIBILITY_GAP` with span and edge
+differences; typed-edge, native-provenance, and canonical-identity parity are still deferred.
+The next safe action is to feed real, lineage-qualified 8095 observations into the revisioned MCP
+registry adapter and retain proposal-only execution. Unknown tools, stale registry revisions,
+missing source revisions, and write-capable tools must continue to fail closed. Do not promote
+NLP names or byte spans directly to symbol identity, and do not create a second ACE/registry
+owner.
 
 ### WORKSPACE-REVISION-AWARE-GRAPHIFY-OPEN-05 (2026-09-03, DRY-RUN ADAPTER CONTRACT — PROVEN)
 
@@ -4493,6 +4632,111 @@ Implementation references and current gaps:
 - PostgreSQL read-only enrichment shows the semantic snapshot has `chunk_id` and `content_hash` for all 55,169 rows, `source_ref` for 52,380, and `repo_id` for 38,969. Define `SEMANTIC_CANDIDATE_COHORT_V1` from this owner and reject the 2,789 rows without authoritative `source_ref`; never map them through packet IDs or synthetic fallbacks.
 - Semantic cohort audit: `scripts/atlas/audit-semantic-candidate-cohort-v1.mjs` → `docs/reports/semantic-candidate-cohort-v1.json`. Admission also requires an authoritative source revision; missing `source_revision` cannot be replaced with `indexed_at`, workspace ID, or current wall-clock time.
 - The cohort auditor now checks `atlas_workspace_source_bindings` by exact `repo_id`, `canonical_source_ref`, and `content_digest == content_hash`. Current authoritative binding coverage is zero, so no semantic candidate ordinal map may be materialized from this snapshot yet.
+
+#### 2026-09-06 unified snapshot projection reconciliation (read-only)
+
+Added `python/atlas_unified_snapshot_projection_v1.py` as a bounded interchange
+coordinator for the existing large JSON snapshot. It streams top-level `nodes`
+and `edges` members with the standard-library decoder, emits identity-reduced
+`nodes.ndjson`, `edges.ndjson`, and `topology.ndjson`, and seals the projection
+with an ordinal-map/checksum manifest. The coordinator reuses existing node
+domain labels and vector metadata as observations only; it does not invoke a
+new classifier, mint ontology IDs, or admit `OntologyLinkedTupleV1` rows.
+
+The coordinator now also supports `--decoder=auto|stdlib|simdjson`. `auto`
+selects the optional `pysimdjson` record decoder when installed and otherwise
+falls back safely to the standard library; explicit `simdjson` fails closed if
+the optional package is absent. `python/requirements-atlas-unified-projection.txt`
+declares the optional pinned accelerator. `--hash-input` adds a full input
+SHA-256 when a receipt needs byte-level sealing; it is opt-in because it reads
+the 486 MB source a second time. No dependency was installed or network
+service was changed in this pass.
+
+Follow-up runtime proof: `pysimdjson==7.0.2` installed successfully for the
+active CPython 3.13 environment, and a bounded real-snapshot run with
+`--decoder=simdjson` parsed 1,000 nodes and the bounded edge scan without
+decoder errors. The output remains diagnostic `BLOCKED_STALE_SNAPSHOT` and
+does not change the current-Graphify, semantic-cohort, KMeans, or SOM gates.
+
+After adding explicit coverage counters, a fresh bounded replay over the same
+file with `maxNodes=1000` observed all `108,156` valid edge records and retained
+`0` because every edge endpoint lay outside the capped node prefix. This is a
+bounded-scope effect, not evidence that the snapshot has no edges; complete
+PageRank/parity requires a complete node/edge snapshot or an endpoint-closed
+bounded subgraph.
+
+The real diagnostic run against `graphify/frozen-graph-snapshot-v2.json`
+(`snapshotId=382c8dc6-a115-40d9-a3a5-034fa44d2e71`, 486,654,818 bytes) streamed
+162,234 nodes and a bounded 4,000-edge prefix with zero malformed records.
+NetworkX PageRank completed over that bounded edge projection, but the receipt
+is correctly `BLOCKED_STALE_SNAPSHOT` because the file was last modified
+2026-08-09 and is not bound to the latest completed Graphify execution. The
+run observed 54,078 rows carrying 768-dimensional vector metadata; the JSON
+contains no canonical vector matrix, so embedding, KMeans, and SOM were not
+executed. OAKlib tuple admission and cuGraph parity were also not executed;
+`writesPerformed=false` and `canonicalAuthority=false`.
+
+This establishes the safe unified order without creating a second owner:
+
+```text
+fresh Graphify-bound snapshot
+  → streamed identity/edge projection
+  → CandidateOrdinalMapV1 admission
+  → canonical PostgreSQL semantic_768 matrix
+  → exact KNN / KMeans / SOM 20x20 (same frozen population)
+  → NetworkX CPU oracle / cuGraph GPU parity
+  → existing OAKlib OntologyLinkedTupleV1 projection
+```
+
+Do not embed source-path summaries from this graph JSON, treat existing
+`domainClass` as newly proven classification, or use stale `som`/centroid
+metadata as current topology. The next safe action is to locate or materialize
+a fresh Graphify-bound snapshot, then run the existing graph parity and
+semantic-cohort gates against that exact revision. The new stream coordinator
+is diagnostic/projection-only and does not close `GRAPH-PAGERANK-PARITY-01`,
+`SEMANTIC-CANDIDATE-COHORT-IMPLEMENTATION-SLICE-01` items 13–15, or
+`SOM-AE-KNN-KMEANS-ALIGNMENT-01`.
+
+#### 2026-09-06 unified pipeline scaffold/gap matrix (read-only)
+
+The current repository already has a usable bounded pipeline scaffold. The
+remaining work is to connect existing producers with revision-qualified
+admission receipts; do not add another vector store, graph owner, classifier,
+ontology store, or topology change for this matrix.
+
+| Stage | Existing scaffold | Current classification | Completion gate / safe next action |
+|---|---|---|---|
+| Large JSON/NDJSON ingestion | `python/atlas_unified_snapshot_projection_v1.py`, optional `pysimdjson==7.0.2`, stdlib fallback | `PROVEN_BOUNDED_DIAGNOSTIC` | Use `--decoder=auto` for normal runs; use `--hash-input` only when byte-level sealing is required. A bounded node prefix is not a complete graph; record endpoint coverage before interpreting retained-edge counts. |
+| Fresh source snapshot | Graphify coordinator and production structural snapshot builders | `BLOCKED_STALE_INPUT` | Materialize a fresh Graphify-bound `StructuralGraphSnapshotV1` with exact workspace/graph/edge checksums. Do not relabel `graphify/frozen-graph-snapshot-v2.json` as current. |
+| Canonical semantic matrix | PostgreSQL `content_embedding_768` / `semantic_768`; `export-semantic-cohort-ndjson-v1.mjs` | `BLOCKED_UPSTREAM` | Admit a non-empty source/revision-qualified cohort and bind it to `CandidateOrdinalMapV1`; graph JSON vector metadata is not an embedding matrix. |
+| Candidate ordinals | `projection_ordinal_map.py` and existing CandidateOrdinal fixtures | `BLOCKED_IDENTITY_JOIN` | Reconcile exact candidate IDs, source refs, source revisions, and population checksum before KNN. Never use sorted JSON order, Qdrant point order, or array position as canonical identity. |
+| NetworkX graph oracle | `parent_atlas_ontology/networkx_snapshot.py` and streamed projection PageRank | `PROVEN_BOUNDED_ONLY` | Re-run on the same fresh graph snapshot used by the GPU lane; retain the NetworkX result as the CPU oracle and seal graph/vertex/edge checksums. |
+| cuGraph GPU parity | `graph_snapshot_parity_cugraph_oracle.py`, RAPIDS/cu13 capability record | `BLOCKED_SAME_SNAPSHOT` | Use the same edge set and explicit ordinal map; if cuGraph renumbers vertices, unrenumber and sort the result back to canonical ordinals before comparison. |
+| Domain/NLP classification | 8095 structural/NLP receipts, `domain_tuple_bridge.py` | `PROVEN_OBSERVATION_ONLY` | Require source namespace, source revision, classifier/mapping/ontology revisions, and evidence refs before producing an ontology-linked projection. Existing `domainClass` metadata is not fresh proof by itself. |
+| OAKlib concepts/tuples | `oak_validation_lane_v1.py`, `networkx_snapshot.py` | `CONCEPT_RESOLUTION_ONLY` | Resolve CURIE labels read-only; relationship validation and `OntologyLinkedTupleV1` admission remain separate gates. Preserve N-ary relations as hyperedges/reified relations; do not clique-expand. |
+| KMeans | `atlas_compute/cluster_softmax.py`, `aligned_snapshot_experiment_v2.py` | `BLOCKED_COHORT_RECEIPT` | Run only after one frozen semantic matrix and ordinal map are admitted. Cluster IDs are derived routing metadata, never identity or a retrieval lane. |
+| SOM 20x20 / topology | `atlas_compute/som.py` and aligned snapshot experiment | `BLOCKED_ALIGNMENT_RECEIPT` | Run deterministic 20x20 SOM from the exact matrix used by KNN/KMeans; record codebook, assignment, population, and parent checksums. Treat coordinates as locality hints, not canonical relevance. |
+| 4D topology features | bounded PageRank/in-degree/out-degree/degree vector in `topology.ndjson` | `DIAGNOSTIC_FEATURE_ONLY` | Do not call the current four-value vector a manifold or SOM result. Promote only a revision-bound topology artifact after graph parity and identity reattachment. |
+| Embedding/projection output | PostgreSQL semantic export plus existing Qdrant/GPU projection owners | `BLOCKED_NO_MATRIX_IN_GRAPH_JSON` | Read canonical vectors from PostgreSQL, validate 768 dimensions/finiteness, then project to Qdrant/GPU with independent readback. No bulk backfill in this pass. |
+
+The completion order is therefore:
+
+```text
+fresh Graphify-bound source snapshot
+  → exact source/revision/candidate admission
+  → CandidateOrdinalMapV1
+  → PostgreSQL semantic_768 matrix export
+  → exact KNN receipt
+  → KMeans receipt
+  → deterministic SOM 20x20 receipt
+  → same-snapshot NetworkX/cuGraph parity
+  → OAKlib concept and tuple projection
+```
+
+The optional `pysimdjson` accelerator changes only parsing throughput. It does
+not change identity, source authority, vector ownership, graph parity, or
+canonical status. This matrix is a planning/proof projection and performs no
+datastore, Qdrant, Neo4j, Valkey, GPU-projection, or ontology writes.
 
 ### SEMANTIC-CANDIDATE-COHORT-IMPLEMENTATION-SLICE-01 (15 narrow tasks)
 
@@ -8918,3 +9162,37 @@ population; no repair, Graphify run, or downstream projection is authorized by t
 `docs/reports/current-source-evidence-authority-selector-proof-v1.json`,
 `docs/reports/source-selection-authority-alignment-v1.json`, and
 `docs/reports/live-source-lineage-table-audit.json`.
+
+**Fresh bounded recheck — 2026-09-06.** The existing
+`prove-source-chunk-materialization-binding-v1.mts --all` proof still reports
+`50/50` sources and `434/434` physical chunks proven, with stable registry
+namespace authority intentionally unresolved. The current source-authority
+selector, rerun from the repository root, reports
+`NO_CURRENT_COMPLETED_BOUND_SOURCE_OWNER` for workspace revision
+`sha256:381d023e72f9d05cf5dfdf1c27263fa98dde19879d706835925973880a4b8344`,
+`sourceCount=23873`, and `ambiguityCount=0`. This is current-workspace drift,
+not selector ambiguity. Receipts:
+`docs/reports/source-chunk-materialization-binding-cohort-v1.json` and
+`docs/reports/current-source-evidence-authority-v1.json`. No Graphify run,
+historical-row rewrite, lineage write, or downstream projection is authorized
+by this recheck.
+
+**Bounded offline source/chunk projection — 2026-09-06 (read-only).** The existing
+materialization proof remains the authority for the 50-source/434-chunk bounded
+cohort. For downstream NDJSON/DuckDB analysis only, the new
+`scripts/atlas/export-current-source-chunk-cohort-v1.mjs` emits a repeatable
+projection from `atlas_workspace_source_bindings` →
+`atlas_packet_chunk_lineage` → `codebase_chunk_index`. The live read-only
+selection found `675` qualified rows across `69` sources before a bounded
+`128`-row export; all selected rows had exact source/revision joins, real
+physical chunk IDs, non-empty canonical chunk IDs, and `PROVEN` revision status.
+Receipt: `docs/reports/current-source-chunk-cohort-v1.json`, status
+`BOUNDED_CURRENT_SOURCE_CHUNK_COHORT_PROVEN`, `readOnly=true`,
+`writesPerformed=false`, `databaseWrites=0`. Whole-source
+`sourceContentDigest` and per-chunk `chunkContentHash` remain separate hash
+grains and are not compared directly. A second read-only replay produced the
+same NDJSON checksum
+(`sha256:8c3aeeb09478652b58b2fd0c61adc738a0ec0bcced570dfeb04db6eea57de61b`).
+This artifact is a derived offline input and does not reopen 08A, establish
+stable registry namespace authority, authorize lineage writes, or authorize
+Qdrant/CandidateOrdinal promotion.
