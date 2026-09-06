@@ -35,10 +35,23 @@ export interface RRFOptions {
 export interface RRFScore {
   hitId: string;
   laneName: RetrievalLaneName;
+  /** Logical lane used for vote arithmetic; executor aliases remain in laneName. */
+  logicalLaneName?: string;
   laneRank: number;
   laneScore: number;
   rrfComponent: number;
   metadata?: Record<string, unknown>;
+}
+
+/** Executor names are evidence sources, not independent semantic lanes. */
+function toLogicalLaneName(laneName: RetrievalLaneName): string {
+  switch (laneName) {
+    case 'qdrant_vector':
+    case 'turbovec_ann':
+      return 'semantic';
+    default:
+      return laneName;
+  }
 }
 
 export interface RRFResult {
@@ -91,11 +104,15 @@ export function combineViaRRF(
 ): RRFResult[] {
   const { k = 60, weights = {}, deduplicateBy = 'id' } = options;
 
-  // Map: hitKey → laneName → best score from that lane.
+  // Map: hitKey → logical lane → best score from that logical lane.
   // A lane may surface the same canonical id multiple times (e.g. two Qdrant
   // projections of the same packet). Those repeated projections must not
-  // cast multiple independent votes for the same candidate.
-  const hitScores = new Map<string, Map<RetrievalLaneName, RRFScore>>();
+  // cast multiple independent votes for the same candidate. Qdrant and
+  // TurboVec are also executor aliases of one logical semantic lane.
+  const hitScores = new Map<string, Map<string, RRFScore>>();
+  // Keep one best score per physical lane as provenance/support, even when
+  // multiple physical lanes collapse into one logical vote.
+  const laneSupport = new Map<string, Map<RetrievalLaneName, RRFScore>>();
 
   // Populate scores from each lane
   lanes.forEach((hits, laneIndex) => {
@@ -105,33 +122,42 @@ export function combineViaRRF(
     hits.forEach((hit, rank) => {
       const hitKey = deduplicateBy === 'text' ? hit.text || hit.id : hit.id;
       const rrfComponent = laneWeight / (k + (rank + 1)); // 1-indexed
+      const logicalLaneName = toLogicalLaneName(laneName);
 
       if (!hitScores.has(hitKey)) {
-        hitScores.set(hitKey, new Map());
+        hitScores.set(hitKey, new Map<string, RRFScore>());
+        laneSupport.set(hitKey, new Map<RetrievalLaneName, RRFScore>());
       }
 
-      const perLane = hitScores.get(hitKey)!;
-      const existing = perLane.get(laneName);
       const candidateScore: RRFScore = {
         hitId: hit.id,
         laneName,
+        logicalLaneName,
         laneRank: rank + 1,
         laneScore: hit.score,
         rrfComponent,
         metadata: hit.metadata,
       };
-      if (!existing || candidateScore.rrfComponent > existing.rrfComponent) {
-        perLane.set(laneName, candidateScore);
+      const perLogicalLane = hitScores.get(hitKey)!;
+      const existingLogical = perLogicalLane.get(logicalLaneName);
+      if (!existingLogical || candidateScore.rrfComponent > existingLogical.rrfComponent) {
+        perLogicalLane.set(logicalLaneName, candidateScore);
+      }
+      const perPhysicalLane = laneSupport.get(hitKey)!;
+      const existingPhysical = perPhysicalLane.get(laneName);
+      if (!existingPhysical || candidateScore.rrfComponent > existingPhysical.rrfComponent) {
+        perPhysicalLane.set(laneName, candidateScore);
       }
     });
   });
 
   // Combine scores and sort
   const results: RRFResult[] = [];
-  for (const [hitKey, perLane] of hitScores) {
-    const scores = [...perLane.values()];
+  for (const [hitKey, perLogicalLane] of hitScores) {
+    const scores = [...perLogicalLane.values()];
+    const supportScores = [...laneSupport.get(hitKey)!.values()];
     const combinedScore = scores.reduce((sum, s) => sum + s.rrfComponent, 0);
-    const primaryHit = scores[0]; // Use identity (id/source) from first lane
+    const primaryHit = scores[0]!; // Use identity (id/source) from best logical lane
     // Field-level metadata merge across every lane that reported this hit — NOT "first lane
     // with a non-empty object". A lane's metadata object can carry a full identity-field shape
     // (packet_key/source_ref/content_hash/tree_node_id/workspace_revision) with every value
@@ -141,16 +167,18 @@ export function combineViaRRF(
     // qdrant_vector hit's real tree_node_id for the same deduplicated id. Merge key-by-key
     // instead, keeping the first non-null/non-undefined value seen for each key across lanes
     // in their original order.
-    const metadata = mergeLaneMetadata(scores) ?? primaryHit.metadata;
+    const metadata = mergeLaneMetadata(supportScores) ?? primaryHit.metadata;
 
     results.push({
       id: primaryHit.hitId,
       combinedScore,
       source: primaryHit.laneName,
-      sources: [...new Set(scores.map((s) => s.laneName))],
+      sources: [...new Set(supportScores.map((s) => s.laneName))],
       text: hitKey,
       metadata,
-      breakdown: scores,
+      // Breakdown retains physical-lane support, while combinedScore uses one
+      // representative per logical lane. Consumers must not sum breakdown.
+      breakdown: supportScores,
     });
   }
 

@@ -33,6 +33,23 @@ describe('ArtifactAddressV1', () => {
   it('rejects short checksums', () => {
     expect(() => artifactAddressSchema.parse({ ...artifact, checksum: 'bad' })).toThrow();
   });
+
+  it('accepts a SeaweedFS S3 artifact address without making it canonical', () => {
+    const parsed = artifactAddressSchema.parse({
+      ...artifact,
+      locator: {
+        storage: 'SEAWEEDFS_S3',
+        bucket: 'atlas-artifacts',
+        objectKey: 'semantic/semantic_768/sha256/example.arrow',
+        contentType: 'application/vnd.apache.arrow.file',
+        byteLength: 4096,
+        etag: null,
+      },
+    });
+
+    expect(parsed.locator.storage).toBe('SEAWEEDFS_S3');
+    expect(parsed.revisions.workspace).toBe('workspace-v1');
+  });
 });
 
 describe('ActionWorkItemV1', () => {

@@ -2,7 +2,7 @@
   "status": "WARN",
   "mode": "apply",
   "collection": "codebase_chunks_768",
-  "started_at": "2026-09-05T22:25:44.187Z",
+  "started_at": "2026-09-06T00:34:38.064Z",
   "packets_loaded": 55353,
   "all_packets_loaded": 61718,
   "already_linked_seen": 5000,
@@ -69,5 +69,5 @@
   "errors": [
     "Bounded scan found no missing-link updates. Scanned points were already linked or had path-drifted Qdrant payloads."
   ],
-  "finished_at": "2026-09-05T22:26:05.827Z"
+  "finished_at": "2026-09-06T00:35:19.039Z"
 }

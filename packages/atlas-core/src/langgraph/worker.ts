@@ -26,7 +26,7 @@
  * Key principle: LangGraph is the loop controller, not the datastore.
  */
 
-import { Annotation, StateGraph } from '@langchain/langgraph';
+import { Annotation, StateGraph, START, END } from '@langchain/langgraph';
 import { AtlasTaskEnvelope, SUBJECTS } from '../events/subjects.js';
 import { ACP_TOOLS, validateToolResult, type ValidateTruthParams, type HybridSearchParams, type SchemaMatchParams, type WriteTraceEventParams } from '../tools/acp-tool-contracts.js';
 import type { Pool } from 'pg';
@@ -41,6 +41,7 @@ import {
   type BitFrostCachedResult,
 } from './clients.js';
 import { getNatsClient, type TraceCheckpointEvent } from '../nats/nats-client.js';
+import { runOrnithSynthesisNodeV1 } from './ornith-synthesis-node.js';
 
 /**
  * LangGraph Agent State — checkpoint all decision points here
@@ -69,6 +70,9 @@ export const AgentState = Annotation.Root({
   scores: Annotation({ value: (x?: number[], y?: number[]) => y ?? x }),
 
   // LLM generation
+  /** Optional compiled Atlas prompt input; content remains ephemeral state. */
+  prompt_plan: Annotation<unknown>({ value: (x?: unknown, y?: unknown) => y ?? x }),
+  prompt_segment_content: Annotation({ value: (x: unknown[] = [], y: unknown[] = []) => y ?? x }),
   synthesis: Annotation({ value: (x?: string, y?: string) => y ?? x }),
   trace_events: Annotation({ value: (x: unknown[], y: unknown[]) => [...(x ?? []), ...(y ?? [])] }),
 
@@ -370,7 +374,18 @@ function makePacketTruthValidate(services: AgentServices) {
  */
 function makeGemma4Synthesis() {
   return async (state: AgentStateType): Promise<Partial<AgentStateType>> => {
-    const { reranked_results, kag_neighbors, trace_id } = state;
+    const { reranked_results, kag_neighbors, trace_id, prompt_plan, prompt_segment_content } = state;
+
+    // A caller that has already compiled ContextManifest -> PromptPlan may opt
+    // into the real Ornith path. The adapter validates the plan and performs
+    // model discovery before POST; it never persists prompt content or state.
+    if (prompt_plan && Array.isArray(prompt_segment_content)) {
+      return runOrnithSynthesisNodeV1({
+        prompt_plan,
+        prompt_segment_content,
+        step: state.step,
+      });
+    }
 
     // Build prompt from retrieval results + KAG context
     const rag_context = reranked_results
@@ -545,7 +560,7 @@ export function buildAgentGraph(
     .addNode('packet_truth_validate', makePacketTruthValidate(services))
     .addNode('gemma4_synthesis', makeGemma4Synthesis())
     .addNode('write_trace_event', makeWriteTraceEvent(services))
-    .addEdge('start', 'load_trace_state')
+    .addEdge(START, 'load_trace_state')
     .addEdge('load_trace_state', 'packet_registry_lookup')
     .addEdge('packet_registry_lookup', 'bitfrost_cache_check')
     .addEdge('bitfrost_cache_check', 'hybrid_retrieval')
@@ -553,10 +568,10 @@ export function buildAgentGraph(
     .addEdge('optional_gpu_rerank', 'packet_truth_validate')
     .addConditionalEdges('packet_truth_validate', routeOnError, {
       continue: 'gemma4_synthesis',
-      error: 'end',
+      error: END,
     })
     .addEdge('gemma4_synthesis', 'write_trace_event')
-    .addEdge('write_trace_event', 'end');
+    .addEdge('write_trace_event', END);
 
   return graph.compile();
 }
@@ -571,6 +586,15 @@ export async function runAgent(
   agent: ReturnType<typeof buildAgentGraph>,
   envelope: AtlasTaskEnvelope
 ): Promise<AgentStateType> {
+  const payload = envelope.payload;
+  const promptPlan = typeof payload === 'object' && payload !== null
+    ? (payload as { promptPlan?: unknown }).promptPlan
+    : undefined;
+  const promptSegmentContent = typeof payload === 'object' && payload !== null &&
+    Array.isArray((payload as { segmentContent?: unknown }).segmentContent)
+    ? (payload as { segmentContent: unknown[] }).segmentContent
+    : undefined;
+
   const result = await agent.invoke({
     trace_id: envelope.trace_id,
     packet_key: envelope.packet_key,
@@ -579,6 +603,8 @@ export async function runAgent(
     strategy: envelope.strategy,
     step: 0,
     trace_events: [],
+    prompt_plan: promptPlan,
+    prompt_segment_content: promptSegmentContent ?? [],
   });
 
   return result;

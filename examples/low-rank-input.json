@@ -1,0 +1,63 @@
+{
+  "artifactRevision": "example-r1",
+  "rank": 3,
+  "trainingReceiptRefs": [
+    "receipt:example"
+  ],
+  "rows": [
+    {
+      "taskFamily": "analyze",
+      "helperId": "RG",
+      "utility": 0.92,
+      "successRate": 0.96,
+      "validationRate": 0.93,
+      "medianLatencyMs": 15,
+      "medianContextTokens": 60
+    },
+    {
+      "taskFamily": "analyze",
+      "helperId": "AST_GREP",
+      "utility": 0.95,
+      "successRate": 0.95,
+      "validationRate": 0.94,
+      "medianLatencyMs": 24,
+      "medianContextTokens": 80
+    },
+    {
+      "taskFamily": "analyze",
+      "helperId": "GRAPH",
+      "utility": 0.72,
+      "successRate": 0.85,
+      "validationRate": 0.86,
+      "medianLatencyMs": 180,
+      "medianContextTokens": 400
+    },
+    {
+      "taskFamily": "repair",
+      "helperId": "RG",
+      "utility": 0.7,
+      "successRate": 0.88,
+      "validationRate": 0.82,
+      "medianLatencyMs": 15,
+      "medianContextTokens": 60
+    },
+    {
+      "taskFamily": "repair",
+      "helperId": "AST_GREP",
+      "utility": 0.91,
+      "successRate": 0.93,
+      "validationRate": 0.92,
+      "medianLatencyMs": 24,
+      "medianContextTokens": 80
+    },
+    {
+      "taskFamily": "repair",
+      "helperId": "TS_MORPH",
+      "utility": 0.96,
+      "successRate": 0.95,
+      "validationRate": 0.97,
+      "medianLatencyMs": 130,
+      "medianContextTokens": 180
+    }
+  ]
+}

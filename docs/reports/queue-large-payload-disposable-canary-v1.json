@@ -1,0 +1,30 @@
+{
+  "schema": "atlas.queue-large-payload-disposable-canary.v1",
+  "status": "QUEUE05_DISPOSABLE_PUBLISHER_CANARY_PROVEN",
+  "canaryExchange": "atlas.queue05.canary.10920.1788674310752",
+  "queueBound": false,
+  "consumerStarted": false,
+  "deletedExchange": true,
+  "samples": [
+    {
+      "routingKey": "document.embed",
+      "payloadKind": "LEGACY_DOCUMENT_EMBED",
+      "payloadBytes": 65682,
+      "published": true
+    },
+    {
+      "routingKey": "vector.index.document",
+      "payloadKind": "LEGACY_VECTOR_INDEX",
+      "dimension": 768,
+      "payloadBytes": 15076,
+      "published": true
+    }
+  ],
+  "langfuseFlushRequested": true,
+  "canonicalWritesPerformed": false,
+  "postgresWritesPerformed": false,
+  "qdrantWritesPerformed": false,
+  "valkeyWritesPerformed": false,
+  "note": "This proves real channel serialization and trace emission through an unbound disposable exchange. It is not production traffic and does not authorize legacy publisher migration.",
+  "nextGate": "QUEUE-05-LIVE-PUBLISHER-PROFILE-01"
+}

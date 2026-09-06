@@ -58,6 +58,32 @@ export async function runLocalDeepResearch(
   const startTime = Date.now();
   const mergedConfig = { ...DEFAULT_CONFIG, ...config };
 
+  // mergedConfig.timeout was previously accepted but never applied anywhere
+  // in the pipeline — a caller passing a short timeout still waited for the
+  // full real search+extract+synthesis duration. Race the whole pipeline
+  // against it so the option actually bounds wall-clock time, returning the
+  // same no-throw LDRResult shape every other failure path already uses.
+  const timeoutPromise = new Promise<LDRResult>((resolve) => {
+    setTimeout(() => {
+      resolve({
+        synthesis: `Local Deep Research timed out after ${mergedConfig.timeout}ms for: "${query}"`,
+        sources: [],
+        confidence: 0.0,
+        durationMs: Date.now() - startTime,
+        stage: 'search',
+        error: 'Pipeline timeout'
+      });
+    }, mergedConfig.timeout);
+  });
+
+  return Promise.race([runLocalDeepResearchPipeline(query, mergedConfig, startTime), timeoutPromise]);
+}
+
+async function runLocalDeepResearchPipeline(
+  query: string,
+  mergedConfig: Required<LDRConfig>,
+  startTime: number
+): Promise<LDRResult> {
   try {
     // Stage 1: Web Search
     console.log(`[LDR] Starting web search for query: "${query}"`);
@@ -178,6 +204,13 @@ async function callGemma4Synthesis(
   const model = LLM_MODEL_ID;
 
   try {
+    // stream: true is required, not optional — with stream: false the model's
+    // thinking/reasoning block fills the response first and a fixed max_tokens
+    // budget can be exhausted by thinking before any content token appears,
+    // silently returning empty content with finish_reason: "length". See
+    // CLAUDE.md "llama-server :8090 — always stream: true". AbortSignal.timeout
+    // bounds the call — the model may take up to ~30s to finish thinking
+    // before the first content token arrives.
     const res = await fetch(`${llmUrl}/chat/completions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -189,25 +222,55 @@ async function callGemma4Synthesis(
         ],
         temperature,
         max_tokens: 1024,
-        stream: false
-      })
+        stream: true
+      }),
+      signal: AbortSignal.timeout(90_000)
     });
 
     if (!res.ok) {
       throw new Error(`Gemma4 request failed: ${res.status} ${await res.text()}`);
     }
 
-    const data = await res.json() as {
-      choices?: Array<{ message?: { content?: string } }>;
-      usage?: { completion_tokens?: number };
-    };
+    let rawText = '';
+    let completionTokens = 0;
+    if (res.body) {
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buf = '';
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
 
-    const rawText = data.choices?.[0]?.message?.content || '';
-    const text = stripReasoningTags(rawText);
-    const completionTokens = data.usage?.completion_tokens || 512;
+        buf += decoder.decode(value, { stream: true });
+        const lines = buf.split('\n');
+        buf = lines.pop() ?? '';
+
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (!trimmed.startsWith('data:')) continue;
+
+          const payload = trimmed.slice(5).trim();
+          if (payload === '[DONE]') continue;
+
+          try {
+            const parsed = JSON.parse(payload) as {
+              choices?: Array<{ delta?: { content?: string } }>;
+              usage?: { completion_tokens?: number };
+            };
+            const content = parsed.choices?.[0]?.delta?.content;
+            if (content) rawText += content;
+            if (parsed.usage?.completion_tokens) completionTokens = parsed.usage.completion_tokens;
+          } catch {
+            // skip malformed SSE line
+          }
+        }
+      }
+    }
+
+    const text = stripReasoningTags(rawText.trim());
 
     // Estimate confidence based on response quality
-    const confidence = estimateConfidence(text, completionTokens);
+    const confidence = estimateConfidence(text, completionTokens || 512);
 
     return { text, confidence };
   } catch (err) {
@@ -323,7 +386,10 @@ export async function streamLocalDeepResearchSynthesis(
         temperature: mergedConfig.temperature,
         max_tokens: 1024,
         stream: true
-      })
+      }),
+      // Model may take up to ~30s to finish thinking before the first content
+      // token arrives (CLAUDE.md's documented llama-server streaming timeout).
+      signal: AbortSignal.timeout(90_000)
     });
 
     if (!res.ok) {

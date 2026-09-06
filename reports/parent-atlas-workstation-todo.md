@@ -1,5 +1,5 @@
 # Parent Atlas Workstation TODO Evidence Report
-
+still working on 9-5-26
 > **Historical evidence report.** This file is retained as an archival snapshot.
 > The current Workstation dependency projection is
 > `docs/parent-atlas-workstation-todo.md`; OpenSpec task ledgers remain the
@@ -262,7 +262,7 @@ This is vocabulary and sequencing only. It does not add a new implementation own
 - L1 feature tensor: `FeatureTensor[4,6]` with softcapped policy axes.
 - L2 tabular router: logistic regression → XGBoost.
 - L3 semantic: `semantic_768`, Qdrant, cuVS.
-- L4 structural: Tree-sitter, Graphify.
+- L4 structural: Tree-sitter, Graphify. treesitter-chunker, ts-morph, ast-grep
 - L5 graph: PageRank / HITS / communities.
 - L6 cache routing: KMeans centroid hints, SOM 20×20, `Topology4`, Hilbert2D.
 - L7 ACE: prefetch / pin / resident / evict.
@@ -272,7 +272,6 @@ This is vocabulary and sequencing only. It does not add a new implementation own
   Packet-level NLP can proceed now; document-root / tree-dependent promotion
   stays blocked until duplicate-root / idempotency closure in the tree
   lineage work.
-y
 
 ## Conservative phase status
 

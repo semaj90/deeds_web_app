@@ -29,6 +29,13 @@ vi.mock('$lib/server/grpc/embedding-client.js', () => ({
 
 vi.mock('$lib/server/vector/qdrant-manager.js', () => ({
   qdrant: {
+    // Production calls qdrant.upsert({ collection, wait, points }) directly
+    // (QdrantManager's own top-level method, qdrant-manager.ts:1377) — the
+    // mock previously only stubbed the lower-level qdrant.client.upsert(),
+    // which the route never actually calls, so real ingest requests threw
+    // "qdrant.upsert is not a function". Same spy backs both call shapes
+    // since no test asserts on the exact call signature.
+    upsert: mockQdrantUpsert,
     client: {
       upsert: mockQdrantUpsert,
     },

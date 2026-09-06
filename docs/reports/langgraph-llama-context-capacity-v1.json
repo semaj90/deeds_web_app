@@ -1,0 +1,35 @@
+{
+  "schema": "atlas.langgraph-llama-context-capacity-proof.v1",
+  "gate": "LANGGRAPH-LLAMA-CONTEXT-01",
+  "generatedAt": "2026-09-06T01:30:22.450Z",
+  "endpoint": "http://127.0.0.1:8090",
+  "expectedContextTokens": 65536,
+  "expectedModel": "ornith-1.5-9b",
+  "readOnly": true,
+  "canonicalWrites": false,
+  "datastoreWrites": false,
+  "modelCalls": false,
+  "status": "LIVE_CONTEXT_CAPACITY_PROVEN",
+  "slots": [
+    {
+      "id": 0,
+      "n_ctx": 65536,
+      "is_processing": false
+    }
+  ],
+  "models": [
+    {
+      "id": "ornith-1.5-9b",
+      "ownedBy": "llamacpp"
+    }
+  ],
+  "checks": {
+    "serverReachable": true,
+    "expectedModelLoaded": true,
+    "oneSlotForInitialProof": true,
+    "everySlotMeetsExpectedContext": true,
+    "noGenerationRequestSent": true
+  },
+  "blockers": [],
+  "reportChecksum": "sha256:b20234b77af6e6bc4b7d0eec61f2bacb2f8550d7e48a585c2f502174b2b49497"
+}

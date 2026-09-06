@@ -31,12 +31,13 @@
 .PARAMETER StartupProfile
   One of: gemma4-direct (default tool-calling profile), ornith (legacy Ornith 9B,
   embedded chat template, no override), ornith-1.5 (Ornith 1.5 9B,
-  local template, reasoning off), gemma4-thinking (reasoning on,
-  budget 2048). Bundles model + chat-template-file + reasoning mode so you
-  pick ONE coherent config. When omitted (and -SelectProfile isn't passed
-  either), the launcher falls back to legacy env-var resolution
-  (ROTORQUANT_MODEL_PATH / TURBO_MODEL_PATH / auto-discovery) so automated
-  callers like dev-gpu-runtime.mjs are unaffected.
+  local template, reasoning off, TEXT/TOOL ONLY - no mmproj), ornith-1.5-vlm
+  (identical to ornith-1.5 but loads the official Ornith 1.5 mmproj for vision -
+  adds ~922MB VRAM), gemma4-thinking (reasoning on, budget 2048). Bundles
+  model + chat-template-file + reasoning mode so you pick ONE coherent config.
+  When omitted (and -SelectProfile isn't passed either), the launcher falls
+  back to legacy env-var resolution (ROTORQUANT_MODEL_PATH / TURBO_MODEL_PATH /
+  auto-discovery) so automated callers like dev-gpu-runtime.mjs are unaffected.
 
 .PARAMETER SelectProfile
   Show an arrow-key picker (Up/Down + Enter, Esc cancels) over the three
@@ -51,6 +52,10 @@
                            When set, overrides TURBO_MODEL_PATH. Weight-quantised; runs on the
                            stock llama-server.exe without any TurboQuant binary.
   TURBO_MMPROJ_PATH    default: models\mmproj-BF16.gguf (repo-local; see models/model-manifest.json)
+                         Gemma4-family projector only. NEVER resolved for an ornith-1.5* profile -
+                         see ORNITH_MMPROJ_PATH below and the family-keyed resolution note further down.
+  ORNITH_MMPROJ_PATH   default: models\mmproj-Ornith-1.5-9B-BF16.gguf (repo-local; see model-manifest.json
+                         id "ornith-1.5-mmproj"). Only consulted for the ornith-1.5-vlm profile.
   TURBO_PORT           default: 8090
   TURBO_PROFILE        default: stock
                          stock           K=q8_0  V=q8_0   (works on stock llama.cpp)
@@ -86,7 +91,7 @@ param(
   [switch] $TextOnly,
   [switch] $NoEvict,
   [switch] $StatusOnly,
-  [ValidateSet('gemma4-direct', 'ornith', 'ornith-1.5', 'gemma4-thinking')]
+  [ValidateSet('gemma4-direct', 'ornith', 'ornith-1.5', 'ornith-1.5-vlm', 'gemma4-thinking')]
   [string] $StartupProfile,
   [switch] $SelectProfile
 )
@@ -138,6 +143,8 @@ function Get-TurboStartupProfiles {
       Reasoning = 'off'
       ReasoningBudget = 0
       SpecType = 'none'
+      ModelFamily = 'gemma4'
+      WantsVision = $false
     },
     [pscustomobject]@{
       Id = 'ornith'
@@ -152,10 +159,16 @@ function Get-TurboStartupProfiles {
       ReasoningBudget = 0
       ContextLength = 65536
       SpecType = 'none'
+      # Ornith 1.0 has no known/acquired projector in this repo. ModelFamily
+      # 'ornith-1.0' resolves to an empty mmproj candidate list (see $mmproj
+      # resolution below) rather than falling through to the gemma4 family -
+      # never silently substitute a Gemma-family projector for any Ornith model.
+      ModelFamily = 'ornith-1.0'
+      WantsVision = $false
     },
     [pscustomobject]@{
       Id = 'ornith-1.5'
-      DisplayName = 'Ornith 1.5 9B - Candidate Template'
+      DisplayName = 'Ornith 1.5 9B - Text/Tools (no mmproj)'
       Model = Join-Path $modelRoot 'ornith-1_5-9b-ad-q5_k-q4_k\hforf.gguf'
       Alias = 'ornith-1.5-9b'
       TemplateFile = Join-Path $modelRoot 'ornith-1_5-9b-ad-q5_k-q4_k\chat_template.jinja'
@@ -163,6 +176,27 @@ function Get-TurboStartupProfiles {
       ReasoningBudget = 0
       ContextLength = 65536
       SpecType = 'none'
+      ModelFamily = 'ornith-1.5'
+      # Deliberately false: preserves full context/throughput headroom by
+      # default. Use -StartupProfile ornith-1.5-vlm for the vision-enabled
+      # sibling profile (same model, same template, +mmproj).
+      WantsVision = $false
+    },
+    [pscustomobject]@{
+      Id = 'ornith-1.5-vlm'
+      DisplayName = 'Ornith 1.5 9B - Vision (official mmproj)'
+      Model = Join-Path $modelRoot 'ornith-1_5-9b-ad-q5_k-q4_k\hforf.gguf'
+      Alias = 'ornith-1.5-9b'
+      TemplateFile = Join-Path $modelRoot 'ornith-1_5-9b-ad-q5_k-q4_k\chat_template.jinja'
+      Reasoning = 'off'
+      ReasoningBudget = 0
+      ContextLength = 65536
+      SpecType = 'none'
+      ModelFamily = 'ornith-1.5'
+      # Required: this profile exists specifically to load the vision
+      # projector. If it can't be resolved, the launcher throws rather than
+      # silently starting a text-only server under a "-vlm" name.
+      WantsVision = $true
     },
     [pscustomobject]@{
       Id = 'gemma4-thinking'
@@ -173,6 +207,8 @@ function Get-TurboStartupProfiles {
       Reasoning = 'on'
       ReasoningBudget = 2048
       SpecType = 'none'
+      ModelFamily = 'gemma4'
+      WantsVision = $false
     }
   )
 }
@@ -480,16 +516,61 @@ $modelResolutionSource = if ($activeTurboProfile) {
 } else {
     'auto-discovery'
 }
-$mmproj = if ($env:TURBO_MMPROJ_PATH) {
-    $env:TURBO_MMPROJ_PATH
+# -- Multimodal projector resolution: keyed on model FAMILY, never a single
+# global pointer. ORNITH-VLM-MMPROJ-01 (see
+# openspec/changes/parent-atlas-analysis-pass-ornith-adapter/tasks.md) - a
+# Gemma-family projector must never be silently loaded against an Ornith
+# model, or vice versa. $modelFamily comes from the active profile;
+# no-profile legacy callers (auto-discovery / ROTORQUANT_MODEL_PATH /
+# TURBO_MODEL_PATH) default to 'gemma4', matching this launcher's
+# pre-existing behavior before family-keying was introduced.
+$modelFamily = if ($activeTurboProfile -and $activeTurboProfile.ModelFamily) { $activeTurboProfile.ModelFamily } else { 'gemma4' }
+$wantsVision = [bool]($activeTurboProfile -and $activeTurboProfile.WantsVision)
+
+function Resolve-FamilyMmprojCandidates {
+  param([Parameter(Mandatory)][string]$Family)
+  switch ($Family) {
+    'gemma4' {
+      @(
+        (Join-Path $PSScriptRoot "..\models\mmproj-F16.gguf"),
+        (Join-Path $PSScriptRoot "..\vendor\models\mmproj-gemma4.gguf"),
+        (Join-Path $PSScriptRoot "..\models\mmproj-BF16.gguf")
+      )
+    }
+    'ornith-1.5' {
+      @(
+        (Join-Path $PSScriptRoot "..\models\mmproj-Ornith-1.5-9B-BF16.gguf")
+      )
+    }
+    default { @() }  # e.g. 'ornith-1.0' - no known projector, never fall through to gemma4's
+  }
+}
+
+# Family-scoped env override name, e.g. ORNITH_MMPROJ_PATH for 'ornith-1.5'.
+# Falls back to the legacy global TURBO_MMPROJ_PATH ONLY for the 'gemma4'
+# family (that variable's pre-existing meaning) - it is never treated as a
+# valid override for a non-gemma4 family, closing the exact silent
+# cross-family substitution path this gate exists to prevent.
+$familyEnvVarName = switch ($modelFamily) {
+  'ornith-1.5' { 'ORNITH_MMPROJ_PATH' }
+  default      { $null }
+}
+$familyEnvOverride = if ($familyEnvVarName -and (Get-Item "env:$familyEnvVarName" -ErrorAction SilentlyContinue)) {
+  (Get-Item "env:$familyEnvVarName").Value
+} elseif ($modelFamily -eq 'gemma4' -and $env:TURBO_MMPROJ_PATH) {
+  $env:TURBO_MMPROJ_PATH
 } else {
-    $localMmproj = Join-Path $PSScriptRoot "..\models\mmproj-F16.gguf"
-    $vendorMmproj = Join-Path $PSScriptRoot "..\vendor\models\mmproj-gemma4.gguf"
-    $legacyMmproj = Join-Path $PSScriptRoot "..\models\mmproj-BF16.gguf"
-    if (Test-Path $localMmproj) { $localMmproj }
-    elseif (Test-Path $vendorMmproj) { $vendorMmproj }
-    elseif (Test-Path $legacyMmproj) { $legacyMmproj }
-    else { $null }  # no fallback - set TURBO_MMPROJ_PATH or place a mmproj file in one of the known locations
+  $null
+}
+
+$mmproj = if ($familyEnvOverride) {
+  $familyEnvOverride
+} else {
+  (Resolve-FamilyMmprojCandidates -Family $modelFamily) | Where-Object { Test-Path $_ } | Select-Object -First 1
+}
+
+if ($wantsVision -and -not $mmproj) {
+  throw "StartupProfile '$($activeTurboProfile.Id)' requires vision (WantsVision) but no mmproj could be resolved for model family '$modelFamily'. Expected one of: $((Resolve-FamilyMmprojCandidates -Family $modelFamily) -join ', ')$(if ($familyEnvVarName) { " (or `$env:$familyEnvVarName)" })."
 }
 $port    = if ($env:TURBO_PORT)        { $env:TURBO_PORT }        else { '8090' }
 $ctxLenRequested = if ($env:LLM_CONTEXT_SIZE)  { $env:LLM_CONTEXT_SIZE }
@@ -1046,11 +1127,19 @@ if ($TurboDraftModel -and -not $draftRequiresAtomicBot) {
   }
 }
 
-$skipCandidateMmproj = $activeTurboProfile -and $activeTurboProfile.Id -eq 'ornith-1.5'
-if ($skipCandidateMmproj) {
-  Write-Host 'Multimodal projector: skipped for Ornith 1.5 candidate (text/tool-calling profile)' -ForegroundColor Cyan
+# Attempt mmproj loading when: the active profile explicitly requires vision
+# (WantsVision, already fail-closed above if unresolved), OR the resolved
+# family is 'gemma4' (that family's mmproj has always been best-effort/
+# opportunistic, matching this launcher's pre-existing default-profile
+# behavior). Any other family (e.g. 'ornith-1.5' text profile, 'ornith-1.0')
+# never opportunistically loads a projector - closing the cross-family
+# substitution risk instead of only special-casing 'ornith-1.5' by name.
+$shouldAttemptMmproj = $wantsVision -or ($modelFamily -eq 'gemma4')
+if (-not $shouldAttemptMmproj) {
+  Write-Host "Multimodal projector: not attempted for model family '$modelFamily' (profile '$($activeTurboProfile.Id)' does not request vision)" -ForegroundColor Cyan
 }
-if (-not $TextOnly -and -not $skipCandidateMmproj -and (Test-Path $mmproj)) {
+if (-not $TextOnly -and $shouldAttemptMmproj -and $mmproj -and (Test-Path $mmproj)) {
+  Write-Host "Multimodal projector: loading $mmproj (family '$modelFamily', wantsVision=$wantsVision)" -ForegroundColor Cyan
   $baseArgs = @('-m', $model, '--mmproj', $mmproj) + $baseArgs[2..($baseArgs.Length - 1)]
 }
 
@@ -1403,7 +1492,13 @@ while ($launchAttempt -lt 2) {
   throw ("TurboQuant failed to become healthy on :$port - see $errPath (status: $statusPath)")
 }
 
-$variant = if ($TextOnly) { 'text-only' } else { 'with VLM' }
+# Reflects whether a projector was actually loaded this launch, not merely
+# whether -TextOnly was passed - a profile with WantsVision=$false (or a
+# family with no resolvable projector) is text-only in practice even without
+# the -TextOnly switch. Pre-existing bug found while adding ornith-1.5-vlm:
+# this used to say "with VLM" for every launch that didn't pass -TextOnly,
+# even when no --mmproj flag was ever added to $baseArgs.
+$variant = if ($TextOnly -or -not $shouldAttemptMmproj -or -not $mmproj -or -not (Test-Path $mmproj)) { 'text-only' } else { 'with VLM' }
 Write-Host ("TurboQuant ready ($variant, kv=$kvK/$kvV) on http://127.0.0.1:$port (PID $($proc.Id))") -ForegroundColor Green
 Write-Host ("  stderr: $errPath") -ForegroundColor DarkGray
 $statusPath = Write-TurboLaunchStatus ([ordered]@{

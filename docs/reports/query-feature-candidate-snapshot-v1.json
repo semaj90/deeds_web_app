@@ -1,0 +1,31 @@
+{
+  "schema": "parent-atlas.query-feature-candidate-snapshot.v1",
+  "status": "QUERY_FEATURE_SNAPSHOT_JOIN_FIXTURE_PROVEN",
+  "scope": "FIXTURE_READ_ONLY",
+  "productionClaim": false,
+  "queryFingerprintContract": "parent-atlas.query-fingerprint.v1",
+  "lexicalFingerprintContract": "parent-atlas.lexical-fingerprint.v1",
+  "targetContract": "atlas.candidate-feature-snapshot.v1",
+  "candidateOrdinalsBefore": [0, 1],
+  "candidateOrdinalsAfter": [0, 1],
+  "candidateMembershipUnchanged": true,
+  "semanticRepresentation": "semantic_768",
+  "logicalSemanticLaneCount": 1,
+  "queryAndLexicalEvidenceBoundByChecksum": true,
+  "missingFeatureRejected": true,
+  "staleSourceRevisionRejected": true,
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "rrfOwnerChanged": false,
+  "evidenceRefs": [
+    "sveltekit-frontend/src/lib/server/atlas/features/query-feature-to-candidate-feature-snapshot-v1.ts",
+    "sveltekit-frontend/src/lib/server/atlas/features/query-feature-to-candidate-feature-snapshot-v1.spec.ts",
+    "sveltekit-frontend/src/lib/server/atlas/features/candidate-feature-snapshot-v1.ts",
+    "sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/retrieval-plan.spec.ts",
+    "sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/search-runtime-taxonomy-shadow.spec.ts"
+  ],
+  "validationCommand": "npx vitest run --config vitest.lane-contracts.config.ts src/lib/server/atlas/features/query-feature-to-candidate-feature-snapshot-v1.spec.ts src/lib/server/atlas/features/candidate-feature-snapshot-v1.spec.ts src/lib/server/atlas/features/retrieval-router-to-candidate-feature-snapshot-v1.spec.ts src/lib/server/atlas/agentic-file-compiler/query-fingerprint-v1.spec.ts src/lib/server/atlas/agentic-file-compiler/lexical-fingerprint-v1.spec.ts src/lib/server/atlas/agentic-file-compiler/retrieval-plan.spec.ts src/lib/server/atlas/agentic-file-compiler/search-runtime-taxonomy-shadow.spec.ts src/lib/server/atlas/rlm/rlm-search-adapter.spec.ts",
+  "testsPassed": 25,
+  "nextGate": "LIVE_CANDIDATE_FEATURE_PRODUCER_ALIGNMENT",
+  "createdAt": "2026-09-06"
+}

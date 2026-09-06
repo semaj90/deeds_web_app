@@ -1,0 +1,86 @@
+{
+  "schema": "atlas.queue-large-payload-profile.v1",
+  "policy": {
+    "artifactEnvelopeLimitBytes": 65536,
+    "referenceEnvelopeBytes": 743,
+    "source": "deterministic_representative_payloads",
+    "liveCapture": false,
+    "migrationAuthorized": false
+  },
+  "rawDocumentCases": [
+    {
+      "kind": "LEGACY_DOCUMENT_EMBED",
+      "targetBytes": 1024,
+      "actualBytes": 1215,
+      "exceedsArtifactEnvelopeLimit": false,
+      "amplificationRatioAgainstReference": null
+    },
+    {
+      "kind": "LEGACY_DOCUMENT_EMBED",
+      "targetBytes": 16384,
+      "actualBytes": 16595,
+      "exceedsArtifactEnvelopeLimit": false,
+      "amplificationRatioAgainstReference": null
+    },
+    {
+      "kind": "LEGACY_DOCUMENT_EMBED",
+      "targetBytes": 65536,
+      "actualBytes": 65699,
+      "exceedsArtifactEnvelopeLimit": true,
+      "amplificationRatioAgainstReference": null
+    },
+    {
+      "kind": "LEGACY_DOCUMENT_EMBED",
+      "targetBytes": 262144,
+      "actualBytes": 262315,
+      "exceedsArtifactEnvelopeLimit": true,
+      "amplificationRatioAgainstReference": null
+    }
+  ],
+  "rawVectorCases": [
+    {
+      "kind": "LEGACY_VECTOR_INDEX",
+      "dimension": 128,
+      "actualBytes": 2651,
+      "exceedsArtifactEnvelopeLimit": false,
+      "amplificationRatioAgainstReference": 3.568
+    },
+    {
+      "kind": "LEGACY_VECTOR_INDEX",
+      "dimension": 256,
+      "actualBytes": 5144,
+      "exceedsArtifactEnvelopeLimit": false,
+      "amplificationRatioAgainstReference": 6.923
+    },
+    {
+      "kind": "LEGACY_VECTOR_INDEX",
+      "dimension": 384,
+      "actualBytes": 7639,
+      "exceedsArtifactEnvelopeLimit": false,
+      "amplificationRatioAgainstReference": 10.281
+    },
+    {
+      "kind": "LEGACY_VECTOR_INDEX",
+      "dimension": 512,
+      "actualBytes": 10115,
+      "exceedsArtifactEnvelopeLimit": false,
+      "amplificationRatioAgainstReference": 13.614
+    },
+    {
+      "kind": "LEGACY_VECTOR_INDEX",
+      "dimension": 768,
+      "actualBytes": 15097,
+      "exceedsArtifactEnvelopeLimit": false,
+      "amplificationRatioAgainstReference": 20.319
+    }
+  ],
+  "capturedAt": "2026-09-06T05:35:58.911Z",
+  "profileChecksum": "sha256:8b973b6a807eb4c2124eb9dabd21095faab3b37e9bf045d45a6b5d31d9ccc70c",
+  "status": "QUEUE05_PAYLOAD_PROFILE_REPRESENTATIVE_ONLY",
+  "livePublisherDistribution": "NOT_MEASURED",
+  "legacyPublishersChanged": false,
+  "canonicalWritesPerformed": false,
+  "qdrantMutationAttempted": false,
+  "nextGate": "QUEUE-05-LIVE-PUBLISHER-PROFILE-01",
+  "note": "This profile exercises existing serialization and reference-envelope helpers with fixed representative payloads. It is not runtime publisher telemetry and does not authorize redirecting legacy publishers."
+}

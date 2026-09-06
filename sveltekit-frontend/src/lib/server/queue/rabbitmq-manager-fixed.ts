@@ -1710,7 +1710,13 @@ export class RabbitMQManager extends EventEmitter {
       return;
     }
     const message = Buffer.from(JSON.stringify(data));
-    this.channel.publish('', queue, message, { persistent: true });
+    await traceQueue('publish', queue, {
+      exchange: '',
+      payloadBytes: message.byteLength,
+      payloadEncoding: 'json-utf8',
+    }, async () => {
+      this.channel!.publish('', queue, message, { persistent: true });
+    });
   }
 
   private async publish(exchange: string, routingKey: string, data: any): Promise<void> {
@@ -1718,9 +1724,13 @@ export class RabbitMQManager extends EventEmitter {
       console.warn(`[RabbitMQ] Publish skipped — no channel (${exchange}/${routingKey})`);
       return;
     }
-    return traceQueue('publish', routingKey, { exchange }, async () => {
+    const message = Buffer.from(JSON.stringify(data));
+    return traceQueue('publish', routingKey, {
+      exchange,
+      payloadBytes: message.byteLength,
+      payloadEncoding: 'json-utf8',
+    }, async () => {
       try {
-        const message = Buffer.from(JSON.stringify(data));
         this.channel!.publish(exchange, routingKey, message, { persistent: true });
       } catch (error) {
         console.error(

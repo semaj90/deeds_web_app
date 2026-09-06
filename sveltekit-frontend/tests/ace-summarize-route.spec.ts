@@ -15,6 +15,7 @@ vi.mock('$lib/server/ace/context-assembler.js', () => ({
 vi.mock('$lib/server/env.server.js', () => ({
   ENV: {
     OLLAMA_BASE_URL: 'http://ollama.test',
+    ROTORQUANT_MODEL_PATH: process.env.ROTORQUANT_MODEL_PATH ?? process.env.TURBO_MODEL_PATH,
   },
 }));
 

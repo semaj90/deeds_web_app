@@ -13,6 +13,9 @@ describe('embedQueryForLane — fail-closed dimension guard (dense_768)', () => 
 
   beforeEach(() => {
     vi.resetModules();
+    // Keep these compatibility tests on the Ollama path even when the
+    // workstation's .env enables the strict llama-server lane globally.
+    process.env.ATLAS_CANONICAL_EMBEDDING_STRICT = 'false';
     fetchSpy = vi.spyOn(globalThis, 'fetch');
   });
 
@@ -48,5 +51,45 @@ describe('embedQueryForLane — fail-closed dimension guard (dense_768)', () => 
     await expect(embedQueryForLane('test query', 'dense_384')).rejects.toThrow(
       /EMBEDDING_LANE_RETIRED:dense_384/,
     );
+  });
+
+  it('does not send an Ollama-shaped request to LLAMA_SERVER_URL when it is the only llama setting', async () => {
+    const keys = [
+      'EMBEDDING_BASE_URL',
+      'EMBEDDING_PROVIDER',
+      'ATLAS_CANONICAL_EMBEDDING_STRICT',
+      'EMBEDDING_SERVER_MODEL',
+      'OLLAMA_BASE_URL',
+      'OLLAMA_URL',
+      'LLAMA_SERVER_URL',
+    ] as const;
+    const previous = Object.fromEntries(keys.map((key) => [key, process.env[key]]));
+
+    try {
+      delete process.env.EMBEDDING_BASE_URL;
+      delete process.env.EMBEDDING_PROVIDER;
+      delete process.env.ATLAS_CANONICAL_EMBEDDING_STRICT;
+      delete process.env.EMBEDDING_SERVER_MODEL;
+      process.env.LLAMA_SERVER_URL = 'http://127.0.0.1:8090';
+      delete process.env.OLLAMA_BASE_URL;
+      delete process.env.OLLAMA_URL;
+
+      vi.resetModules();
+      fetchSpy.mockResolvedValue(mockOllamaResponse(768));
+      const { embedQueryForLane } = await import('../embedding-service.js');
+
+      await embedQueryForLane('test query', 'dense_768');
+
+      const requestUrls = fetchSpy.mock.calls.map(([input]) => String(input));
+      expect(requestUrls).toContain('http://127.0.0.1:11434/api/embeddings');
+      expect(requestUrls.some((url) => url.startsWith('http://127.0.0.1:8090/'))).toBe(false);
+      expect(requestUrls.some((url) => url.endsWith('/api/embed') || url.endsWith('/api/embeddings'))).toBe(true);
+    } finally {
+      for (const key of keys) {
+        const value = previous[key];
+        if (value === undefined) delete process.env[key];
+        else process.env[key] = value;
+      }
+    }
   });
 });

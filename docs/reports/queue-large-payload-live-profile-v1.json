@@ -1,0 +1,38 @@
+{
+  "schema": "atlas.queue-large-payload-live-profile.v1",
+  "queriedAt": "2026-09-06T06:00:07.369Z",
+  "readOnly": true,
+  "externalWritesPerformed": false,
+  "publisherChangesPerformed": false,
+  "traceBackend": "http://localhost:3030",
+  "query": {
+    "endpoint": "/api/public/traces",
+    "limit": 100,
+    "queueTracePrefix": "queue:publish:"
+  },
+  "status": "LIVE_PUBLISHER_PROFILE_SAMPLES_AVAILABLE",
+  "fetchedTraceCount": 100,
+  "queuePublishTraceCount": 57,
+  "measuredPayloadTraceCount": 4,
+  "measuredPayloadCoverage": 0.07017543859649122,
+  "routingKeyCounts": {
+    "queue:publish:vector.index.document": 2,
+    "queue:publish:document.embed": 2,
+    "queue:publish:error.embed": 53
+  },
+  "measuredByRoutingKey": {
+    "queue:publish:vector.index.document": {
+      "count": 2,
+      "minBytes": 15076,
+      "maxBytes": 15076
+    },
+    "queue:publish:document.embed": {
+      "count": 2,
+      "minBytes": 65682,
+      "maxBytes": 65682
+    }
+  },
+  "latestTraceTimestamp": "2026-09-06T05:58:31.114Z",
+  "nextGate": "QUEUE-05-AMPLIFICATION-DECISION-01",
+  "note": "Measured payload bytes came from existing queue trace metadata; no publisher migration is authorized by this report."
+}

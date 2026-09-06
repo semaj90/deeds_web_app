@@ -17,13 +17,12 @@ import {
 	END,
 	START,
 } from '@langchain/langgraph';
-import { ChatOpenAI } from '@langchain/openai';
+import type { ChatOpenAI } from '@langchain/openai';
 import { HumanMessage, SystemMessage } from '@langchain/core/messages';
 import type { DynamicStructuredTool } from '@langchain/core/tools';
-import { ENV } from '$lib/server/env.server.js';
-import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 import { buildLangGraphConfig, getLangGraphCheckpointer } from '$lib/server/langgraph/checkpointer.js';
 import { recordOutcome } from '$lib/server/telemetry/tool-call-recorder.js';
+import { createLocalLlamaChatModel } from './local-llama-chat-model.js';
 import {
 	createSubagent,
 	classifyIntent,
@@ -98,12 +97,7 @@ export class SupervisorAgent {
 		this.allTools = allTools;
 		this.config = config;
 
-		this.routerLlm = new ChatOpenAI({
-			apiKey: 'local',
-			configuration: { baseURL: `${ENV.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090'}/v1` },
-			model: LLM_MODEL_ID,
-			temperature: 0, // deterministic routing
-		});
+		this.routerLlm = createLocalLlamaChatModel(0); // deterministic routing
 
 		this.initializeSubagents();
 		this.graphPromise = this.buildGraph();

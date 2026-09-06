@@ -157,8 +157,8 @@ root_schema:
 
             dimension:
               type: integer
-              enum: [512, 768, 384, 64]
-              description: "512-dim MRL (primary), 768-dim dense (fallback), 384-dim routing, 64-dim topology"
+              enum: [768, 512, 256, 128, 64, 384]
+              description: "768-dim EmbeddingGemma semantic authority; 512/256/128 MRL prefix views; latent_256/128/64 nested-autoencoder views; 384 legacy only"
 
             vector:
               type: array
@@ -354,11 +354,10 @@ storage_mapping:
 
   redis:
     hashes:
-      - "corpus:centroids" → "domain → 512-dim centroid vector"
-      - "corpus:concepts" → "feature:domain → OKFOntologyEntry JSON"
-    purpose: "Hot cache for domain classification + concept lookup"
+      - "corpus:centroids → domain → revision-qualified semantic_768-derived centroid vector"
+      - "corpus:concepts → feature:domain → OKFOntologyEntry JSON"
+    purpose: "Hot cache for domain classification, concept lookup, directory metadata, and OKF concept metadata"
 
     keys:
-      - "okf:directory:{path}" → "DirectoryScopeEntry JSON (24h TTL)"
-      - "okf:concepts:index" → "concept name → pattern JSONB"
-    purpose: "Fast access to OKF directory and concept metadata"
+      - "okf:directory:{path} → DirectoryScopeEntry JSON (24h TTL)"
+      - "okf:concepts:index → concept name → pattern JSONB"

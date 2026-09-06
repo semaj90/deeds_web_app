@@ -12,7 +12,7 @@
  *   const result = await agent.investigate("Find all Svelte 4 patterns");
  */
 
-import { ChatOpenAI } from '@langchain/openai';
+import type { ChatOpenAI } from '@langchain/openai';
 import { createReactAgent } from '@langchain/langgraph/prebuilt';
 import { HumanMessage } from '@langchain/core/messages';
 import { DynamicStructuredTool } from '@langchain/core/tools';
@@ -27,6 +27,7 @@ import { ENV } from '$lib/server/env.server.js';
 import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 import { createSearchRuntime } from '$lib/server/retrieval/search-runtime.js';
 import { resolve } from 'path';
+import { createLocalLlamaChatModel } from './local-llama-chat-model.js';
 
 const AGENT_API_BASE = () => `${ENV.PUBLIC_API_URL}/api`;
 const AGENT_ALLOWED_ROOT = resolve(process.cwd());
@@ -110,13 +111,8 @@ export class AutonomousAgent {
       ...config,
     };
 
-    // Initialize the OpenAI-compatible llama-server boundary.
-    this.llm = new ChatOpenAI({
-      apiKey: 'local',
-      configuration: { baseURL: `${ENV.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090'}/v1` },
-      model: LLM_MODEL_ID,
-      temperature: this.config.temperature,
-    });
+    // Initialize the shared OpenAI-compatible llama-server boundary.
+    this.llm = createLocalLlamaChatModel(this.config.temperature);
 
     // Initialize FastMCP tools
     this.tools = this.initializeTools();

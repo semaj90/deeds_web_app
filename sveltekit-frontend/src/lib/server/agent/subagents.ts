@@ -12,16 +12,14 @@
  *   - validation
  */
 
-import { ChatOpenAI } from '@langchain/openai';
 import { createReactAgent } from '@langchain/langgraph/prebuilt';
 import type { DynamicStructuredTool } from '@langchain/core/tools';
-import { ENV } from '$lib/server/env.server.js';
-import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 import {
   SPECIALIST_AGENT_NAMES,
   SPECIALIST_AGENT_PROFILES,
   type SpecialistAgentName,
 } from './specialist-team.js';
+import { createLocalLlamaChatModel } from './local-llama-chat-model.js';
 
 export type LegacySubagentName = 'audio' | 'document' | 'case' | 'codebase' | 'general';
 export type SubagentName = LegacySubagentName | SpecialistAgentName;
@@ -160,12 +158,7 @@ export function createSubagent(
 	const scopedTools = allTools.filter((t) => toolNames.includes(t.name));
 	const prompt = SUBAGENT_PROMPTS[name];
 
-	const llm = new ChatOpenAI({
-		apiKey: 'local',
-		configuration: { baseURL: `${ENV.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090'}/v1` },
-		model: LLM_MODEL_ID,
-		temperature: options.temperature ?? 0.3,
-	});
+	const llm = createLocalLlamaChatModel(options.temperature ?? 0.3);
 
 	const agent = createReactAgent({
 		llm,

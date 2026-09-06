@@ -1,28 +1,84 @@
 # Tasks — Parent Atlas Candidate Feature Execution Fabric
 
+## Taxonomy-scoped retrieval planning — 2026-09-06
+
+These are additive, deterministic request artifacts. They do not create a taxonomy
+owner, query-expansion store, retrieval executor, or additional semantic vote.
+
+- [x] CFF-TAXONOMY-01 — added `TaxonomyScopeV1` beside the existing agentic-file
+  compiler. It derives only from the existing `QueryClassificationV1` and explicitly
+  admitted feature/API descriptors; taxonomy and ontology revisions are required and
+  the result is derived (`canonicalAuthority` is not implied).
+- [x] CFF-EXPANSION-01 — added `QueryExpansionBundleV1` with immutable
+  `USER_LITERAL` terms and provenance-tagged derived terms. Literal terms are never
+  replaced by the expansion lane.
+- [x] CFF-PLAN-01 — extended the existing `RetrievalPlanV1` additively with taxonomy,
+  expansion, query-fingerprint, reduction, token, topic, forest, and context-policy
+  references. Query fingerprints are bound by checksum/reference only; the semantic
+  lane remains exactly one `semantic_768` lane and no executor becomes a new vote.
+- [x] CFF-RLM-CACHE-01 — taxonomy and ontology revisions now participate in the
+  existing RLM retrieval request hash, so a taxonomy change cannot reuse an older
+  request cache entry. This is a narrow RLM proof only; the broader
+  `CACHE-PREFILL-01/02` ContextManifest/prompt identity gate remains open in its
+  owning change.
+- [x] CFF-QUERY-SHADOW-01 — bounded SearchRuntime shadow comparison proven for
+  literal-only versus taxonomy-expanded retrieval. The actual `SearchRuntime` was
+  constructed with one sparse and one dense retriever, `readOnly: true`, and the
+  expanded query preserved the literal `TurboVec double vote` lane while adding
+  the evidence-qualified `SearchRuntime` symbol term. Both calls reported
+  `promotionAttempted: false`; promotion-outbox and policy-training exporters
+  were not invoked. This is fixture/read-only proof, not live corpus quality or
+  production model evidence. Report:
+  `docs/reports/taxonomy-expansion-searchruntime-shadow-v1.json`.
+
+Evidence: `sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/`,
+`sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts`, and
+`sveltekit-frontend/src/lib/server/atlas/rlm/rlm-search-adapter.spec.ts` (16 focused
+tests pass). Query-owner audit: `docs/reports/query-feature-owner-audit-v1.json`;
+QueryFingerprint contract/tests: `query-fingerprint-v1.ts` and
+`query-fingerprint-v1.spec.ts`; LexicalFingerprint contract/tests:
+`lexical-fingerprint-v1.ts` and `lexical-fingerprint-v1.spec.ts`.
+
 ## Query and lexical features — owner reconciliation (2026-09-05)
 
 All items below are planned, read-only or fixture-scoped until separately admitted.
 Reuse existing lexical retrieval and CandidateFeatureSnapshotV1, not a feature store.
 
-- [ ] QUERY-FEATURE-01 audit query normalization, FTS, pg_trgm, corpus scope, and
-  existing statistics owners; establish a bounded evaluation and reuse policy.
-- [ ] QUERY-FEATURE-02 define derived QueryFingerprintV1 with queryChecksum,
-  normalizedLexemes[], rareLexemes[], trigramFingerprint, observedAt, and normalizer
-  revision; recency is not identity, and missing rare-term statistics are unavailable.
-- [ ] QUERY-FEATURE-03 define derived LexicalFingerprintV1 referencing existing
-  candidate/document identity and revision, topLexemes[], documentFrequency,
-  corpusFrequency, lexicalFeatureRevision, corpus snapshot checksum, and definitions
-  of term/document counts; no identity from lexical similarity.
-- [ ] QUERY-FEATURE-04 use existing PostgreSQL FTS/ts_stat in a bounded read-only
-  snapshot to derive statistics; replay normalization/counts and checksum the same corpus.
-  No SQL view/table creation or materialized-view refresh is implied by "materialize".
+- [x] QUERY-FEATURE-01 audited query normalization, PostgreSQL FTS/`pg_trgm`,
+  corpus scope, and statistics ownership. Live PostgreSQL reports `pg_search 0.25.1`,
+  `pg_trgm 1.6`, `vector 0.8.3`, an existing `search_vector` GIN index, and a
+  separate pg_search BM25 index. The canonical SearchRuntime path remains the
+  existing `retrieveBM25` tsvector executor with an ILIKE fallback; no executor
+  switch, table, index, or write was added. The audit also records 2,392 blank
+  `source_ref` rows and the current filter-scope limitation. Report:
+  `docs/reports/query-feature-owner-audit-v1.json`.
+- [x] QUERY-FEATURE-02 added derived `QueryFingerprintV1` with queryChecksum,
+  normalizedLexemes[], explicit rareLexemes availability, trigramFingerprint,
+  observedAt, and normalizer/corpus revisions. `observedAt` and requestId are
+  excluded from the deterministic checksum; unavailable rare-term statistics are
+  never represented as fabricated values. Focused contract tests pass.
+- [x] QUERY-FEATURE-03 added derived `LexicalFingerprintV1` referencing an existing
+  candidate/source identity and both source/workspace revisions. It carries bounded
+  `topLexemes[]` term/document/corpus frequencies, explicit statistics availability,
+  lexical-feature revision, and corpus snapshot checksum. It is non-authoritative and
+  cannot create identity from lexical similarity; focused contract tests pass.
+- [x] QUERY-FEATURE-04 added a bounded read-only `ts_stat` proof over the existing
+  `codebase_chunk_index.search_vector` source. It replays corpus counts and frozen
+  term statistics in one `BEGIN READ ONLY` transaction with stable checksum
+  `c5e21f419737a441542fbbfbea307c4cbe9d9e97b75fe014d3c479326d656416`; status is
+  `QUERY_LEXICAL_STATS_READ_ONLY_PROVEN`, with no view/table/index creation or
+  materialized-view refresh. Report:
+  `docs/reports/query-lexical-stats-v1.json`.
 - [ ] QUERY-FEATURE-05 only after baseline value is established, evaluate lexical
   KMeans as a routing challenger; freeze corpus, seed, metric, and recall baseline.
   clusterId never grants eligibility or another retrieval vote.
-- [ ] QUERY-FEATURE-06 join validated features through CandidateFeatureSnapshotV1
-  using its existing candidate ordinals and revisions; prove missing/stale-feature
-  rejection and unchanged candidate membership and RRF vote count.
+- [x] QUERY-FEATURE-06 joined validated query/lexical features through the existing
+  `CandidateFeatureSnapshotV1` adapter using its CandidateOrdinal and source/workspace
+  revisions. The fixture preserves candidate membership (`[0, 1]`), rejects missing
+  lexical features and source-revision drift, binds evidence by checksum, keeps the
+  single logical `semantic_768` lane, and changes no RRF owner or canonical state.
+  This is fixture/contract-proven only; live producer alignment remains a separate
+  gate. Report: `docs/reports/query-feature-candidate-snapshot-v1.json`.
 
 Workflow separation already exists in
 `packages/parent-atlas/src/core/workflow-execution-coordinates-v1.ts`.
@@ -41,16 +97,23 @@ wire values). Backend resume proof belongs to governed-compute and receipt bindi
 ## P0 — queue / artifact transport
 
 - [x] QUEUE-00 Audit existing transport ownership: Postgres transactional outbox → RabbitMQ task/event exchanges; Redis list is UI/SSE progress only.
-- [x] QUEUE-01 Add `ArtifactAddressV1` for MMAP/Arrow IPC/Postgres/Qdrant/Valkey/GPU-resident immutable artifacts.
+- [x] QUEUE-01 Add `ArtifactAddressV1` for MMAP/Arrow IPC/SeaweedFS S3/Postgres/Qdrant/Valkey/GPU-resident immutable artifacts. SeaweedFS is durable artifact storage; Postgres remains metadata and checksum authority.
+- [ ] QUEUE-01A Reconcile object-storage callers against the SeaweedFS owner. **IMPLEMENTED_UNPROVEN / convergence open** — fresh read-only audit on 2026-09-06 reports 9 candidate adapter surfaces, 5 legacy-named adapter surfaces, 1 local-disk fallback, 47 configuration/artifact-surface files, and no object-store writes. The direct caller census is now recorded: the Parent Atlas cold adapter is used by `firecrawl-v2-capture.ts`; the SeaweedFS transport is used by the file routes, `minio-service.ts`, and the cold adapter; the compatibility `seaweed-client.ts` is used by acquisition, evidence, upload, indexing, and legal-corpus paths; legacy `minio-client.ts`, `minio.ts`, `src/minio.ts`, and `MinioKnowledgeStore.ts` still have active callers. `sveltekit-frontend/src/lib/server/minio/client.ts` retains a `.local_storage` fallback. Blockers remain caller convergence, undeclared local-disk authority risk, and legacy URI compatibility classification. Read-only audit: `scripts/atlas/audit-parent-atlas-object-storage-owner-v1.mjs`; report: `docs/reports/parent-atlas-object-storage-owner-v1.json` (`generatedAt=2026-09-06T05:17:53.935Z`). Do not rename, delete, or remove fallback behavior until runtime migration authorization and per-caller cutover proof are complete.
 - [x] QUEUE-02 Add `ActionWorkItemV1` so queue payloads carry artifact refs, revision-set hash, ordinal selection, budget and executor class instead of dense tensors.
 - [x] QUEUE-03 Route artifact work through `enqueueTask()` transactional outbox via `enqueueArtifactWorkItem()`.
 - [x] QUEUE-04 Fix event-fabric projection worker type ownership imports (`integration-events.ts` owns code-evidence; `event-fabric.ts` owns the control-loop event types).
-- [ ] QUEUE-05 Replace remaining large vector/tensor RabbitMQ payloads (for example legacy `document.embed` / `vector.index`) with artifact references where profiling shows payload amplification. **OPEN** — compatibility publishers still exist; do a call-site + payload-size census before removing or redirecting them.
-- [ ] QUEUE-06 Add explicit `artifact.materialized` / `artifact.failed` integration events and non-noop event-fabric handlers. **IMPLEMENTED_UNPROVEN** — schemas, outbox writers, durable lifecycle projection, and storage-aware materialization verification are present; run focused tests + lifecycle proof before checking off.
-- [ ] QUEUE-07 Add single-flight lease/fencing token keyed by ActionKey so duplicate at-least-once deliveries cannot compute the same expensive artifact concurrently. **IMPLEMENTED_UNPROVEN** — `action-single-flight-v1.ts` owns leases, fencing and immutable receipts; focused tests exist.
-- [ ] QUEUE-08 Add consumer idempotency proof: duplicate command delivery returns the same immutable output artifact or an existing receipt. **IMPLEMENTED_UNPROVEN** — unit proof covers existing receipt reuse, duplicate completion race and stale fencing; lifecycle proof additionally checks duplicate event projection is one row.
-- [ ] QUEUE-09 Prove publisher-confirm outbox path is the only authoritative durable task publisher; generic publish helper remains convenience/non-authoritative. **IMPLEMENTED_UNPROVEN** — `rabbitmq-client.ts` explicitly rejects direct publish to `atlas.tasks.v1`; outbox remains the documented authoritative durable publisher. Run the boundary spec and startup confirm-channel proof before checking off.
-- [ ] QUEUE-10 Add message-size telemetry and fail/redirect when a task envelope exceeds the artifact-reference policy limit. **IMPLEMENTED_UNPROVEN** — 64 KiB artifact-reference policy, in-process telemetry counters and oversize rejection are wired through `enqueueArtifactWorkItem()` with focused tests.
+- [ ] QUEUE-05 Replace remaining large vector/tensor RabbitMQ payloads (for example legacy `document.embed` / `vector.index`) with artifact references where profiling shows payload amplification. **OPEN / REPRESENTATIVE PROFILE COMPLETE, LIVE CAPTURE INSTRUMENTED, DISTRIBUTION UNMEASURED** — the read-only caller census found direct compatibility publishers in `rabbitmq-client.ts` (lines 128, 144) and manager-owned publishers in `rabbitmq-manager-fixed.ts` (lines 547, 616, 1091, 1101, 2261) carrying opaque text/vector data without the artifact-reference envelope; `dispatch-inline.ts` is an in-process fallback, not a RabbitMQ publisher. The deterministic representative profile measured the existing serializers and reference-only envelope: a 768-value raw vector was 15,097 bytes versus a 743-byte reference envelope (20.319×), and the 64 KiB document boundary exceeded the policy at 65,699 bytes. Actual serialization points now attach `payloadBytes` and `payloadEncoding=json-utf8` to existing queue traces in `rabbitmq-client.ts` and `rabbitmq-manager-fixed.ts`; this is observability only, not a migration. A read-only Langfuse query found 62 historical queue-publish traces but 0 traces with `payloadBytes`, so live publisher distribution and amplification ratios remain unmeasured; no publisher was redirected or removed. Reports: `docs/reports/queue-large-payload-census-v1.json`, `docs/reports/queue-large-payload-profile-v1.json`, `docs/reports/queue-large-payload-live-profile-v1.json`; harnesses: `scripts/atlas/profile-queue05-large-payloads-v1.mts`, `scripts/atlas/audit-queue05-live-publisher-profile-v1.mts`. Next gate: `QUEUE-05-LIVE-PUBLISHER-PROFILE-01`; requires current instrumented traffic and explicit migration authorization.
+- [x] QUEUE-06 Add explicit `artifact.materialized` / `artifact.failed` integration events and non-noop event-fabric handlers. **CLOSED 2026-09-06 —** focused queue coverage passed `21/21` across artifact verification, lifecycle processing, event-fabric parsing, and dispatch. The live lifecycle proof against canonical Postgres produced `QUEUE_ARTIFACT_LIFECYCLE_PROVEN`: materialized event inserted, identical replay deduplicated to one durable row, equal-length checksum-corrupt replay rejected with `CHECKSUM_MISMATCH`, and `artifact.failed` read back as one durable row. Proof receipt: `docs/reports/queue-artifact-lifecycle-proof-v1.json`. The proof runner now closes both database pools before exit. This closes the event/handler gate; queue payload migration and consumer/outbox gates remain separate.
+- [x] QUEUE-07 Add single-flight lease/fencing token keyed by ActionKey so duplicate at-least-once deliveries cannot compute the same expensive artifact concurrently. **CLOSED 2026-09-06 —** focused unit coverage passed `6/6` for existing receipt reuse, lease acquisition, current-fence completion, stale-fence rejection, and database-clock expiry. The bounded live proof selected one worker, returned `busy` to the contending worker, replaced an expired lease with a higher fencing token, rejected stale completion, and accepted the fresh fenced completion. Receipt: `docs/reports/action-single-flight-live-proof-v1.json`.
+- [x] QUEUE-08 Add consumer idempotency proof: duplicate command delivery returns the same immutable output artifact or an existing receipt. **CLOSED 2026-09-06 —** the bounded live proof completed one ActionKey, replayed the command through a different worker, returned the existing receipt with the same artifact address/fence, and independently read back exactly one `workflow_action_receipts` row. The existing lifecycle proof separately establishes one-row duplicate event projection. Receipt: `docs/reports/action-single-flight-live-proof-v1.json`.
+- [x] QUEUE-09 Prove publisher-confirm outbox path is the only authoritative durable task publisher; generic publish helper remains convenience/non-authoritative. **CLOSED 2026-09-06 —** the bounded live `atlas.tasks.v1` proof persisted exactly one disposable task/outbox pair, confirmed that the generic publisher rejects direct task-exchange delivery, published through a real RabbitMQ confirm channel, marked `delivered_at` only after broker confirmation, and received/acknowledged the exact action on a private queue. Preflight found exactly one pending outbox row, with no unrelated pending work. Receipt: `docs/reports/task-outbox-confirm-channel-proof-v1.json`; harness: `src/lib/server/queue/task-outbox-confirm-channel-live.spec.ts`. This closes the authoritative publisher boundary; `QUEUE-01A` object-storage reconciliation and `QUEUE-05` legacy payload migration remain open.
+- [x] QUEUE-10 Add message-size telemetry and fail/redirect when a task envelope exceeds the artifact-reference policy limit. **CLOSED 2026-09-06 —** the 64 KiB UTF-8 JSON policy is wired through `enqueueArtifactWorkItem()`, records checked/accepted/rejected/largest-byte telemetry, and fails closed with `ARTIFACT_ENVELOPE_TOO_LARGE` for inlined vector/tensor payloads. Focused coverage passed `2/2`; the policy is deterministic and does not imply that legacy compatibility publishers have all been migrated. Receipt: `docs/reports/artifact-reference-envelope-policy-v1.json`.
+
+### QUEUE-05 current canary addendum (2026-09-06)
+
+- **Disposable canary proven:** `scripts/atlas/prove-queue05-disposable-publisher-canary-v1.mts` used the real `publishMessage()` serialization path for one `document.embed` payload (65,682 bytes) and one `vector.index.document` 768-value payload (15,076 bytes) on a unique unbound temporary exchange. The exchange was deleted and the connection closed; no consumer, Postgres, Qdrant, Valkey, or canonical application write was involved.
+- **Trace readback proven:** `scripts/atlas/audit-queue05-live-publisher-profile-v1.mts` found four measured traces in Langfuse (`4/57` queue-publish traces, `7.02%` coverage): two `document.embed` samples at 65,682 bytes and two `vector.index.document` samples at 15,076 bytes. This proves trace metadata delivery and canary replay, not production traffic distribution.
+- **Decision:** keep QUEUE-05 open. Do not redirect legacy publishers until naturally occurring production-shaped traffic is measured and a separate migration authorization identifies the exact callers.
 
 ### Mandatory spine versus implementation lanes (2026-08-29)
 
@@ -104,13 +167,34 @@ File-backed `MMAP` / `ARROW_IPC` materialization must prove:
 - [x] FEAT-01 Add `CandidateFeatureSnapshotV1` materializer with one row per CandidateOrdinal. **Fixture-proven; live lane join remains open.**
 - [x] FEAT-02 Join semantic/lexical/AST/graph/domain/execution/memory features by ordinal and fail on revision mismatch. **Fixture-proven; live producer alignment remains open.**
 - [ ] FEAT-03 Add CPU reference materializer and GPU gather/scatter/sort/compact challenger.
+  - [x] **FEAT-03-CPU-COLUMNAR-REFERENCE** — the existing
+    `materializeCandidateFeatureColumnar()` path is the revision-bound CPU
+    reference over `CandidateFeatureSnapshotV1`; its current ABI is 12 scalar
+    features and its checksum/ordinal invariants are covered by the feature
+    suite.
+  - [x] **FEAT-03-GPU-PACK-GATHER-REFERENCE** — the existing GPU pack/gather
+    reference preserves dense `CandidateOrdinal` rows, masks padded rows, and
+    carries the feature/identity checksums into the bounded GPU proof.
+  - [x] **FEAT-03-SCATTER-SORT-COMPACT-CHALLENGER** — closed as a bounded
+    CPU/reference challenger on 2026-09-06. `runCandidateFeatureScatterSortCompactChallenger()`
+    validates the existing columnar snapshot, scatters a selected ordinal mask,
+    sorts by one feature with presence-first and ordinal tie-break semantics,
+    and compacts a deterministic top-K buffer. Replay is stable and duplicate or
+    out-of-range ordinals fail before transformation. Focused suite:
+    `candidate-feature-scatter-sort-compact-v1.spec.ts` (3/3). The artifact is
+    non-authoritative (`identityAuthority=false`, `canonicalWritesAttempted=false`)
+    and does not prove native CUDA/GPU performance, production-scale residency,
+    or live producer alignment; those remain separate gates.
+    Receipt: `docs/reports/candidate-feature-scatter-sort-compact-challenger-v1.json`.
 - [x] FEAT-04 Require CPU↔GPU ordinal and feature parity receipt; bounded RTX proof passed, production residency and fanout remain separate gates.
-- [ ] FEAT-03E Add the revision-bound CPU feature-head GEMM oracle and checksum receipt; focused TypeScript proof passes, native CUDA/LibTorch parity remains open.
+- [x] FEAT-03E Add the revision-bound CPU feature-head GEMM oracle and checksum receipt. **Closed 2026-09-06 —** `candidate-feature-gemm-v1.ts` consumes the existing revision-bound columnar snapshot, emits float32 scores keyed by `CandidateOrdinal`, and includes input/score checksums with `identityAuthority=false`, `canonicalOwnerChanged=false`, and `canonicalWritesAttempted=false`. The focused oracle suite passes `3/3`; the fixture width now follows the current 12-scalar ABI after the latent-slot correction. Native CUDA/LibTorch parity, production residency, and live producer alignment remain open. Receipt/report: `docs/reports/candidate-feature-gemm-current-proof-v1.json`.
 
-Current checkout reconciliation: snapshot/columnar focused tests pass `10/10`.
-Arrow readback is blocked by the Vitest import boundary for the root `.mjs`
-helper, and FEAT-03/04 remain unproven until the supported readback and actual
-GPU parity receipts pass. No executor or canonical-store promotion is implied.
+Current checkout reconciliation: the feature-fabric suite passes `52/52` across
+12 files, including Arrow IPC write/readback, the revision-bound CPU GEMM oracle,
+and the bounded scatter/sort/compact challenger. The root Arrow helper now
+follows the current 12-scalar ABI; FEAT-03/04 remain open only for native
+GPU parity/residency, production fanout, and live producer alignment. No executor
+or canonical-store promotion is implied.
 
 ## P1 — manifold4 / SOM derived projection
 
@@ -118,7 +202,7 @@ GPU parity receipts pass. No executor or canonical-store promotion is implied.
 - [x] MAN4-02 Canonicalize antipodal q/-q representations deterministically.
 - [x] MAN4-03 Add antipodal-aware similarity and angular-distance helpers.
 - [x] MAN4-04 Add tests for unit norm and q/-q equivalence.
-- [ ] MAN4-05 Wire existing SOM/manifold producer through this schema and record producer/feature revisions.
+- [ ] MAN4-05 Wire existing SOM/manifold producer through this schema and record producer/feature revisions. **BLOCKED / producer alignment audit 2026-09-06:** `models/som/som_assignments.json` is packet-keyed (`32310` assignments in the recorded artifact) and contains only `row`, `col`, and `distance`; it has no `CandidateOrdinal`, `canonicalId`, source/workspace/feature revision, or evidence fields required by `Manifold4OrientationV1`. The existing SOM trainer and centroid path are write-capable, while `project-codebase-topology.mjs` includes synthetic manifold generation. No producer was invoked, no datastore was touched, and no identity was promoted. Report: `scripts/atlas/audit-manifold4-producer-alignment-v1.mjs` → `docs/reports/manifold4-producer-alignment-audit-v1.json`. Next: provide a revision-qualified producer receipt or an explicitly bounded adapter input with exact CandidateOrdinal/source joins; do not wire the packet-keyed or synthetic path directly.
 - [ ] MAN4-06 Add Qdrant payload migration/validation for manifold4 fields without changing `semantic_768` vector ownership.
 - [ ] MAN4-07 Add retrieval ablation: semantic-only vs semantic+SOM vs semantic+manifold4.
 
@@ -166,7 +250,11 @@ GPU parity receipts pass. No executor or canonical-store promotion is implied.
 - [x] REV-OWNER-CODE-02F Prove the Graphify revision-authority v2 migration in a rollback-only transaction; durable application and row population remain gated.
 - [x] REV-OWNER-CODE-03 Add `GraphifyWorkspaceManifestReceiptV1`; require complete expected/persisted source counts and exact revision/digest agreement before Graphify consumers can treat the manifest as complete.
 - [x] REV-OWNER-GRAPH-04A Prove the snapshot revision-owner migration in a rollback-only transaction; durable application and manifest backfill remain gated.
-- [ ] FANOUT-02 Enforce one logical semantic-lane vote across Qdrant/cuVS/CAGRA executors.
+- [x] FANOUT-02 Enforce one logical semantic-lane vote across Qdrant/cuVS/CAGRA executors.
+  **Closed by the retrieval-fusion owner on 2026-09-06:** `combineViaRRF` now
+  collapses Qdrant/TurboVec semantic executor aliases to one arithmetic vote while
+  retaining physical-lane provenance. Native cuVS/CAGRA integration and live producer
+  alignment remain separate gates. See `openspec/changes/parent-atlas-retrieval-fusion-reachability/tasks.md`.
 - [ ] FANOUT-03 Add OKF soft-domain filter plan with indexed payload fields and broad-search fallback when confidence is low.
 - [ ] FANOUT-04 Cache query-hash + semantic-snapshot-revision + filter-hash + K + executor-revision result artifacts.
 
@@ -690,12 +778,23 @@ by this reconciliation.
 - [x] **SEMANTIC-DIMENSION-LIVE-AUDIT** — live schema confirms the canonical
   `codebase_chunk_index.content_embedding` lane is `halfvec(768)` with `55,169`
   populated rows out of `55,853`. The migration is operationally live for the
-  canonical path. `embedding_dimension` remains stale (`3,451` rows tagged `768`
-  and `52,402` tagged `384`) and must not be used as the dimensionality authority.
-- [ ] **SEMANTIC-METADATA-RECONCILIATION** — prepare an exact, independently
+  canonical path. A historical census recorded `3,451` rows tagged `768` and
+  `52,402` tagged `384`; the current read-only receipt observes `37` legacy
+  `384` tags and zero populated canonical-vector metadata mismatches. The
+  `embedding_dimension` metadata remains non-authoritative for vector shape.
+  Representation policy is frozen in `packages/semantic-contracts/src/vector-manifest.ts`:
+  EmbeddingGemma `semantic_768` is canonical; `semantic_mrl_512`,
+  `semantic_mrl_256`, and `semantic_mrl_128` are derived MRL prefix views; and
+  `latent_256` → `latent_128` → `latent_64` is a separate nested-autoencoder
+  family. No new `384` writer is permitted.
+- [x] **SEMANTIC-METADATA-RECONCILIATION** — prepared an exact, independently
   read-back-verified metadata correction plan. Do not update or drop the legacy
   `content_embedding_384` column until the owner, rollback, and migration receipt
-  are explicitly authorized.
+  are explicitly authorized. The prepared sidecar changes only the
+  `embedding_dimension` default to `768` and adds a `NOT VALID` future-write
+  guard for canonical `content_embedding halfvec(768)` (including a non-null
+  `embedding_dimension` requirement); it performs no row or
+  vector rewrite. Read-only receipt: `docs/reports/semantic-metadata-reconciliation-v1.json`.
 - [ ] **QDRANT-768-PROJECTION-OWNER** — two 768-dimensional collections remain
   present, but the live census now distinguishes their roles: `codebase_chunks_768`
   is the active retrieval projection (`109,776` points with rich payloads), while
@@ -949,6 +1048,17 @@ Evidence: `scripts/atlas/materialize-ast-symbol-versions.mjs` and
   ontology/latent producer integration is not yet proven. This canary validates
   the existing matrix/ordinal/mask contract, not corpus-scale feature coverage.
 
+  - [x] **LIVE-FEATURE-JOIN-01-ADAPTER-BOUNDARY** — `searchWithAceManifest()` now
+    returns the exact derived `CandidateFeatureSnapshotV1` used for ACE admission;
+    the additive adapter proof passes without canonical/cache writes. This does
+    not close the full live producer requirement below.
+
+  The runtime boundary is now wired additively: `searchWithAceManifest()` returns
+  the exact `CandidateFeatureSnapshotV1` used to build the ACE admission, so a
+  downstream caller does not rematerialize from raw SearchRuntime packets. This
+  is a fixture/adapter-boundary proof only; it does not close the live AST,
+  compiler, ontology, or latent producer requirement.
+
 Evidence: `scripts/atlas/prove-current-candidate-feature-matrix-manifest-v1.mts`
   and `docs/reports/current-candidate-feature-matrix-manifest-v1.json`.
 
@@ -1010,11 +1120,13 @@ and the focused feature fixtures.
   consumers unaffected (additive-only). 8/8 tests passing
   (`ace-context-manifest.spec.ts`).
 - [ ] **CFF-LATENT-05-ROW-PRODUCER-JOIN** — not started: no live producer yet
-  populates `latentLocalityScore`/`latent256Available` on real
-  `CandidateFeatureRowV1` rows from `codebase_chunk_index.latent_256`. The
-  row slot and derive-at-query-time math (`retrieval/latent-derive.ts`,
-  tested against real production data, 4/4 passing) both exist; the join
-  between them does not yet.
+  joins `codebase_chunk_index.latent_256` into real
+  `CandidateFeatureRowV1` rows. The current row/columnar ABI is intentionally
+  12-wide; the former `latentLocalityScore`/`latent256Available` slot was
+  removed by `FEATURE-ABI-12-CORRECTION`. The existing latent hydration and
+  derive-at-query-time math are separate, tested artifacts; they do not yet
+  provide a live candidate-row producer, latent retrieval vote, or production
+  ranking activation.
 - [ ] **CFF-CONTEXTMANIFEST-02-DEEP-PRESENCE** — `deriveFeaturePresenceFromACE`
   is a request-level heuristic over `ACEContext` array presence, not a
   true per-candidate propagation from `CandidateFeatureRowV1.laneMask`/
@@ -1056,6 +1168,12 @@ two changes. Both were checked against the live repo before acting on either.
   slot exists and is test-green, but nothing populates it from real data yet.
   Whoever picks this up next should decide: build the join (keep 13), or
   revert to 12 until a producer is designed. Do not do neither silently.
+
+  **Current reconciliation 2026-09-06:** that deferred decision is now closed
+  by the later `FEATURE-ABI-12-CORRECTION`; the canonical feature fabric is
+  12-wide and the latent row slot is not present. `CFF-LATENT-05-ROW-PRODUCER-JOIN`
+  remains open only for a future explicit producer design and must not be read
+  as a request to restore a thirteenth scalar.
 - **Claim: the committed Graphify embedding writer
   (`scripts/atlas/backfill-graphify-file-embeddings-768.mjs`) writes to
   `content_embedding_768` instead of canonical `content_embedding`, and

@@ -26,6 +26,8 @@ function requestHash(request: RlmSearchRequest): string {
 			topK: request.topK ?? 20,
 			workspaceRevision: request.workspaceRevision,
 			policyRevision: request.policyRevision,
+			taxonomyRevision: request.taxonomyRevision ?? null,
+			ontologyRevision: request.ontologyRevision ?? null,
 			environment: request.environment
 				? {
 					contextArtifactId: request.environment.contextArtifactId,

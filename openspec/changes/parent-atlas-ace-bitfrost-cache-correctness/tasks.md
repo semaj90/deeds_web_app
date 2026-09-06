@@ -1,5 +1,14 @@
 # Tasks: parent-atlas-ace-bitfrost-cache-correctness
 
+## Taxonomy-aware RLM cache handoff — 2026-09-06
+
+- [x] Narrow request-cache handoff proven: `RlmSearchRequest.taxonomyRevision` and
+  `ontologyRevision` are included in the existing structured RLM request hash, so
+  changing either revision produces a different cache key. Focused adapter coverage
+  passes.
+- [ ] `CACHE-PREFILL-01/02/03` remain open. The narrow RLM request-key change does not
+  prove the full `ContextManifestV2`/prompt-prefix identity or live cache read proof.
+
 ## Exact prompt cache follow-up — 2026-09-05
 
 - [ ] CACHE-PREFILL-01 audit the existing Ornith query-synthesis/prompt-build path,

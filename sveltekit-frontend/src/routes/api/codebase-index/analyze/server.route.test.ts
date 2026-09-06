@@ -19,6 +19,7 @@ vi.mock('$lib/server/env.server.js', () => ({
     BIFROST_ENABLED: false,
     QDRANT_URL: 'http://127.0.0.1:6333',
     MINIFORGE_SIDECAR_URL: 'http://127.0.0.1:8095',
+    ROTORQUANT_MODEL_PATH: process.env.ROTORQUANT_MODEL_PATH ?? process.env.TURBO_MODEL_PATH,
   },
 }));
 

@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
-import { materializeCandidateFeatureColumnar } from './candidate-feature-columnar-v1.js';
+import {
+  CANDIDATE_SCALAR_FEATURES,
+  materializeCandidateFeatureColumnar,
+} from './candidate-feature-columnar-v1.js';
 import { materializeCandidateFeatureSnapshot } from './candidate-feature-snapshot-v1.js';
 import { materializeCandidateOrdinalMap } from './canonical-candidate-v1.js';
 import { assertCandidateFeatureGemmParity, scoreCandidateFeatureHeadsCpu } from './candidate-feature-gemm-v1.js';
@@ -50,14 +53,15 @@ function fixture() {
 
 describe('candidate feature CPU GEMM reference', () => {
   it('scores dense feature rows with stable ordinals and a checksum receipt', () => {
+    const featureCount = CANDIDATE_SCALAR_FEATURES.length;
     const receipt = scoreCandidateFeatureHeadsCpu({
       columnar: fixture(),
       head: {
         headId: 'head:graph-aware:v1',
         featureRevision: 'feature:test:v1',
-        featureCount: 13,
+        featureCount,
         headCount: 2,
-        weights: [new Array(13).fill(1), new Array(13).fill(0.5)],
+        weights: [new Array(featureCount).fill(1), new Array(featureCount).fill(0.5)],
         bias: [0, 1],
       },
       producerRevision: 'gemm:test:v1',
@@ -71,9 +75,10 @@ describe('candidate feature CPU GEMM reference', () => {
 
   it('accepts native-like output within tolerance and rejects drift', () => {
     const columnar = fixture();
+    const featureCount = CANDIDATE_SCALAR_FEATURES.length;
     const receipt = scoreCandidateFeatureHeadsCpu({
       columnar,
-      head: { headId: 'head:test:v1', featureRevision: 'feature:test:v1', featureCount: 13, headCount: 1, weights: [new Array(13).fill(0.25)], bias: [0.1] },
+      head: { headId: 'head:test:v1', featureRevision: 'feature:test:v1', featureCount, headCount: 1, weights: [new Array(featureCount).fill(0.25)], bias: [0.1] },
       producerRevision: 'gemm:test:v1',
     });
     assertCandidateFeatureGemmParity({ expected: receipt, actualScores: receipt.scores.map((row) => row.map((score) => score + 1e-7)) });
@@ -83,7 +88,7 @@ describe('candidate feature CPU GEMM reference', () => {
   it('fails closed when a head belongs to another feature revision', () => {
     expect(() => scoreCandidateFeatureHeadsCpu({
       columnar: fixture(),
-      head: { headId: 'head:wrong:v1', featureRevision: 'feature:wrong:v1', featureCount: 13, headCount: 1, weights: [new Array(13).fill(1)], bias: [0] },
+      head: { headId: 'head:wrong:v1', featureRevision: 'feature:wrong:v1', featureCount: CANDIDATE_SCALAR_FEATURES.length, headCount: 1, weights: [new Array(CANDIDATE_SCALAR_FEATURES.length).fill(1)], bias: [0] },
       producerRevision: 'gemm:test:v1',
     })).toThrow('GEMM_FEATURE_REVISION_MISMATCH');
   });

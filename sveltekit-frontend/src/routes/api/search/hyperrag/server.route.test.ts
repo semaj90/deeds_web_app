@@ -18,6 +18,13 @@ vi.mock('$lib/server/ollama.js', () => ({
   VLM_MODELS: { legal: 'gemma4-legal-iq4xs-direct.gguf' },
 }));
 
+// The repository-root Vitest runner does not install SvelteKit's `$lib`
+// alias. Bridge this route import to the real classifier for the test.
+vi.mock('$lib/server/atlas/agentic-file-compiler/query-classifier.js', async () =>
+  import('../../../../lib/server/atlas/agentic-file-compiler/query-classifier.js'));
+vi.mock('$lib/server/atlas/agentic-file-compiler/retrieval-plan.js', async () =>
+  import('../../../../lib/server/atlas/agentic-file-compiler/retrieval-plan.js'));
+
 describe('/api/search/hyperrag', () => {
   const baseResult = {
     metadata: { query: 'graph retrieval', candidatesRetrieved: 2, candidatesFused: 2, candidatesReranked: 2, durationMs: 12, stages: { retrieve: 1, fuse: 1, hydrate: 1, rerank: 1 } },
@@ -100,6 +107,12 @@ describe('/api/search/hyperrag', () => {
 
     const body = await response.json();
     expect(body.query).toBe('graph retrieval');
+    expect(body.classification).toEqual(expect.objectContaining({
+      schema: 'atlas.query-classification.v1',
+      operation: 'INSPECT',
+      producerRevision: 'hyperrag-front-door-v1',
+    }));
+    expect(body.retrievalPlan).toBeNull();
     expect(Array.isArray(body.variants)).toBe(true);
     expect(Array.isArray(body.hits)).toBe(true);
     expect(Array.isArray(body.graphPaths)).toBe(true);
@@ -116,6 +129,27 @@ describe('/api/search/hyperrag', () => {
     expect(body.provenance).toEqual(expect.objectContaining({ qdrant: true, neo4j: true, redis: true, turbovec: false, ace: false }));
     expect(body.synthesis).toBeNull();
     expect(mocks.bifrostChat).not.toHaveBeenCalled();
+  });
+
+  it('compiles a revision-qualified retrieval plan and applies its candidate budget', async () => {
+    const { POST } = await import('./+server.js');
+    const request = new Request('http://localhost/api/search/hyperrag', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-request-id': 'req-plan-1' },
+      body: JSON.stringify({ query: 'graph retrieval', workspaceRevision: 'sha256:workspace-1', topK: 7 }),
+    });
+
+    const response = await POST({ request, url: new URL(request.url), locals: { user: { id: 'u1' } } } as any);
+    expect(response.status).toBe(200);
+    const body = await response.json();
+    expect(body.retrievalPlan).toEqual(expect.objectContaining({
+      schema: 'atlas.retrieval-plan.v1',
+      requestId: 'req-plan-1',
+      workspaceRevision: 'sha256:workspace-1',
+      candidateBudget: 7,
+      semanticRepresentation: 'semantic_768',
+    }));
+    expect(mocks.search).toHaveBeenCalledWith(expect.objectContaining({ topK: 7 }));
   });
 
   it('fails open when synthesis is requested but Gemma4/Bifrost is unavailable', async () => {

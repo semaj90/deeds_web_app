@@ -108,7 +108,9 @@ export const subjects = {
 } as const;
 
 export type SubjectNamespace = typeof subjects;
-export type SubjectValue = SubjectNamespace[keyof SubjectNamespace][string];
+export type SubjectValue = {
+  [K in keyof SubjectNamespace]: SubjectNamespace[K][keyof SubjectNamespace[K]];
+}[keyof SubjectNamespace];
 
 // ---------------------------------------------------------------------------
 // Legacy flat registry (kept for backward compatibility — do not extend)

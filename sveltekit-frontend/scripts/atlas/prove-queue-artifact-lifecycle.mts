@@ -8,7 +8,7 @@ import { loadAtlasEnv } from './load-atlas-env.mjs';
 
 loadAtlasEnv();
 
-const { db } = await import('../../src/lib/server/db/client.js');
+const { db, closeConnections } = await import('../../src/lib/server/db/client.js');
 const {
   artifactFailedEventSchema,
   artifactMaterializedEventSchema,
@@ -157,4 +157,5 @@ try {
   if (!proven) process.exitCode = 1;
 } finally {
   await rm(root, { recursive: true, force: true });
+  await closeConnections();
 }

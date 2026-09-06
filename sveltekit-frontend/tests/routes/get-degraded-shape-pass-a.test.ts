@@ -177,6 +177,7 @@ vi.mock('$lib/server/env.server.js', () => ({
 	ENV: {
 		OLLAMA_BASE_URL: 'http://localhost:11434',
 		QDRANT_URL: 'http://localhost:6333',
+		ROTORQUANT_MODEL_PATH: process.env.ROTORQUANT_MODEL_PATH ?? process.env.TURBO_MODEL_PATH,
 		EMBEDDING_QUIC_ENABLED: false,
 		NATS_URL: '',
 		TENSORRT_URL: 'http://localhost:8099',

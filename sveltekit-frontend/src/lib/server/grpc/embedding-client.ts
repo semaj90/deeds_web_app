@@ -1017,8 +1017,11 @@ export async function generateEmbeddings(
 /**
  * Generate a single embedding (convenience wrapper).
  */
-export async function generateSingleEmbedding(text: string): Promise<number[]> {
-  const result = await generateEmbeddings([text]);
+export async function generateSingleEmbedding(
+  text: string,
+  options: EmbeddingOptions = {},
+): Promise<number[]> {
+  const result = await generateEmbeddings([text], options);
   return result.vectors[0];
 }
 

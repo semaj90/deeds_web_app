@@ -11,7 +11,7 @@ This guide aligns the deeds-web-app codebase with Google's **OpenWiki Knowledge 
 - **Code Intelligence:** AST extraction, domain classification, concept detection
 - **Architectural Hints:** Directory-level cards, feature responsibility mapping
 - **Audit Gates:** Validation checkpoints (G1-G47+) for quality assurance
-- **Semantic Embeddings:** 512-dim MRL vectors with fallback hierarchy (768d, 384d, 64d)
+- **Semantic Embeddings:** canonical EmbeddingGemma `semantic_768`, with derived MRL prefix views (`512/256/128`) and a separate nested latent family (`latent_256/128/64`); `384` is legacy only
 
 ## Architecture
 
@@ -78,7 +78,7 @@ This guide aligns the deeds-web-app codebase with Google's **OpenWiki Knowledge 
 **Domain Centroid (Redis corpus:centroids)**
 ```typescript
 {
-  AUTH: [0.12, 0.45, -0.33, ...], // 512-dim MRL vector
+  AUTH: [0.12, 0.45, -0.33, ...], // revision-qualified semantic_768-derived centroid
   DATA: [0.08, 0.22, 0.61, ...],
   API: [0.41, 0.19, -0.28, ...],
   UI: [-0.15, 0.52, 0.33, ...]
@@ -94,7 +94,7 @@ The `code-intel-service.ts` now:
 3. **Indexes Ontology** via OKF KV pairs (feature:domain → responsibility)
 4. **Classifies Domains** using semantic + lexical ensemble (0.3·keyword + 0.7·embedding)
 5. **Assigns 4D Coordinates** (temporal, structural, semantic, authority)
-6. **Generates Embeddings** via embeddinggemma (512-dim MRL)
+6. **Generates Embeddings** via EmbeddingGemma (`semantic_768`), then derives optional MRL prefix views (`512/256/128`) and nested latent views (`latent_256/128/64`) under their own revisions
 7. **Materializes to Stores** (Postgres truth, Qdrant search, Redis cache)
 
 **Pipeline Output:**
@@ -195,11 +195,11 @@ const context = formatOKFContext(entries);
 ```typescript
 import { getOKFDomainCentroids } from '$lib/server/agents/agents-context-source';
 
-// Fetch 512-dim MRL centroids
+// Fetch revision-qualified semantic_768-derived centroids
 const centroids = await getOKFDomainCentroids();
 
 // Use for semantic similarity scoring
-const authCentroid = centroids.AUTH; // 512-dim vector
+const authCentroid = centroids.AUTH; // canonical 768-dim-derived vector
 const similarity = cosineSimilarity(queryEmbedding, authCentroid);
 ```
 
@@ -245,9 +245,10 @@ npm run corpus:rebuild -- --limit 50
 Output:
 ```
 [code-intel] Found 285 TS/JS files, starting enhanced corpus derivation...
-[code-intel] Embedding 1847 nodes via embeddinggemma (512-dim MRL)...
-[code-intel] Ingesting 1847 nodes into Qdrant code_intel_corpus (512-dim MRL)...
-[code-intel] Computing domain centroids (512-dim)...
+[code-intel] Embedding 1847 nodes via EmbeddingGemma (semantic_768)...
+[code-intel] Ingesting 1847 nodes into Qdrant codebase_chunks_768 (768-dim semantic authority)...
+[code-intel] Deriving optional MRL prefix views (512/256/128) and nested latent views (256/128/64)...
+[code-intel] Computing revision-qualified domain centroids from semantic_768...
 [code-intel] Materializing 892 ontology entries to Redis...
 [code-intel] Corpus rebuild complete in 45218ms: 285 files, 1847 facts, 1847 nodes, 4290 concepts, 892 ontology entries, 3 errors
 
@@ -260,10 +261,11 @@ The OKF spec enforces a strict embedding dimension hierarchy:
 
 | Dimension | Model | Use Case | Fallback |
 |-----------|-------|----------|----------|
-| **512-dim** | embeddinggemma (MRL) | **PRIMARY**: Semantic search + domain classification | → 768d |
-| **768-dim** | embeddinggemma native | Fallback when 512d unavailable | → 384d |
-| **384-dim** | embedding routing | Fast re-ranking + Redis cache (optional) | → 64d |
-| **64-dim** | Autoencoder latent | Topology-only (reference, not search) | N/A |
+| **768-dim** | EmbeddingGemma native | **CANONICAL** semantic search and source-qualified domain classification | → MRL 512/256/128; nested latent 256 |
+| **512/256/128-dim** | EmbeddingGemma MRL prefix + L2 renormalization | Derived evaluation/routing views; never a new identity or fusion vote | → semantic_768 |
+| **latent_256** | Nested semantic autoencoder | Physical learned bottleneck; reference-only until its owner gate promotes it | → latent_128/64 |
+| **latent_128/64** | Nested prefix views | Derived topology/routing views; not interchangeable with MRL 128/256 | N/A |
+| **384-dim** | Legacy compatibility | Historical replay only; no new writer | N/A |
 
 **Hard stops:**
 - ❌ Never mix 512d + 768d in same operation

@@ -219,6 +219,10 @@ export async function embedQueryForLane(
     if (ENV.ATLAS_CANONICAL_EMBEDDING_STRICT) {
       return embedViaCanonicalRuntime(query, ENV.EMBEDDING_SERVER_MODEL ?? model, start);
     }
+    // Keep the chat-only llama-server URL out of this compatibility path. The
+    // Ollama-shaped endpoint below is selected only from OLLAMA_BASE_URL; a
+    // LLAMA_SERVER_URL-only environment must not turn into
+    // `${llamaServer}/api/embeddings`.
     return embedViaOllama(query, 768, model, start, true);
   }
 

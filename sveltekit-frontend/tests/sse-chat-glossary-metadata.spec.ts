@@ -38,6 +38,7 @@ vi.mock('$lib/server/env.server.js', () => ({
   ENV: {
     OLLAMA_BASE_URL: 'http://ollama.test',
     QDRANT_URL: 'http://qdrant.test',
+    ROTORQUANT_MODEL_PATH: process.env.ROTORQUANT_MODEL_PATH ?? process.env.TURBO_MODEL_PATH,
   },
 }));
 
@@ -549,10 +550,18 @@ describe('/api/sse/chat glossary metadata', () => {
     const chatBodies: Array<{ messages?: Array<{ role: string; content: string }> }> = [];
     const fetchMock = vi.fn(async (input: string | URL) => {
       const url = String(input);
-      if (url === 'http://qdrant.test/collections/legal_documents/points/search') {
+      if (url.startsWith('http://qdrant.test/collections/') && url.endsWith('/points/query')) {
+            const collection = url.split('/collections/')[1]?.split('/')[0];
+            if (collection !== 'legal_documents') {
+              return new Response(JSON.stringify({ result: { points: [] } }), {
+                status: 200,
+                headers: { 'Content-Type': 'application/json' },
+              });
+            }
         return new Response(
           JSON.stringify({
-            result: [
+            result: {
+              points: [
               {
                 id: 'legal-doc-retry-1',
                 score: 0.86,
@@ -563,6 +572,7 @@ describe('/api/sse/chat glossary metadata', () => {
                 },
               },
             ],
+            },
           }),
           {
             status: 200,
@@ -734,10 +744,18 @@ describe('/api/sse/chat glossary metadata', () => {
 
     const fetchMock = vi.fn(async (input: string | URL) => {
       const url = String(input);
-      if (url === 'http://qdrant.test/collections/legal_documents/points/search') {
+      if (url.startsWith('http://qdrant.test/collections/') && url.endsWith('/points/query')) {
+            const collection = url.split('/collections/')[1]?.split('/')[0];
+            if (collection !== 'legal_documents') {
+              return new Response(JSON.stringify({ result: { points: [] } }), {
+                status: 200,
+                headers: { 'Content-Type': 'application/json' },
+              });
+            }
         return new Response(
           JSON.stringify({
-            result: [
+            result: {
+              points: [
               {
                 id: 'legal-doc-high-quality-1',
                 score: 0.86,
@@ -748,6 +766,7 @@ describe('/api/sse/chat glossary metadata', () => {
                 },
               },
             ],
+            },
           }),
           {
             status: 200,
@@ -897,10 +916,18 @@ describe('/api/sse/chat glossary metadata', () => {
 
     const fetchMock = vi.fn(async (input: string | URL) => {
       const url = String(input);
-      if (url === 'http://qdrant.test/collections/legal_documents/points/search') {
+      if (url.startsWith('http://qdrant.test/collections/') && url.endsWith('/points/query')) {
+            const collection = url.split('/collections/')[1]?.split('/')[0];
+            if (collection !== 'legal_documents') {
+              return new Response(JSON.stringify({ result: { points: [] } }), {
+                status: 200,
+                headers: { 'Content-Type': 'application/json' },
+              });
+            }
         return new Response(
           JSON.stringify({
-            result: [
+            result: {
+              points: [
               {
                 id: 'legal-doc-code-kag-1',
                 score: 0.86,
@@ -911,6 +938,7 @@ describe('/api/sse/chat glossary metadata', () => {
                 },
               },
             ],
+            },
           }),
           {
             status: 200,
@@ -1057,10 +1085,18 @@ describe('/api/sse/chat glossary metadata', () => {
 
     const fetchMock = vi.fn(async (input: string | URL) => {
       const url = String(input);
-      if (url === 'http://qdrant.test/collections/legal_documents/points/search') {
+      if (url.startsWith('http://qdrant.test/collections/') && url.endsWith('/points/query')) {
+            const collection = url.split('/collections/')[1]?.split('/')[0];
+            if (collection !== 'legal_documents') {
+              return new Response(JSON.stringify({ result: { points: [] } }), {
+                status: 200,
+                headers: { 'Content-Type': 'application/json' },
+              });
+            }
         return new Response(
           JSON.stringify({
-            result: [
+            result: {
+              points: [
               {
                 id: 'legal-doc-kag-only-1',
                 score: 0.86,
@@ -1070,6 +1106,7 @@ describe('/api/sse/chat glossary metadata', () => {
                 },
               },
             ],
+            },
           }),
           {
             status: 200,
@@ -1229,10 +1266,18 @@ describe('/api/sse/chat glossary metadata', () => {
 
     const fetchMock = vi.fn(async (input: string | URL) => {
       const url = String(input);
-      if (url === 'http://qdrant.test/collections/legal_documents/points/search') {
+      if (url.startsWith('http://qdrant.test/collections/') && url.endsWith('/points/query')) {
+            const collection = url.split('/collections/')[1]?.split('/')[0];
+            if (collection !== 'legal_documents') {
+              return new Response(JSON.stringify({ result: { points: [] } }), {
+                status: 200,
+                headers: { 'Content-Type': 'application/json' },
+              });
+            }
         return new Response(
           JSON.stringify({
-            result: [
+            result: {
+              points: [
               {
                 id: 'legal-doc-code-cache-1',
                 score: 0.86,
@@ -1242,6 +1287,7 @@ describe('/api/sse/chat glossary metadata', () => {
                 },
               },
             ],
+            },
           }),
           {
             status: 200,
@@ -1368,10 +1414,18 @@ describe('/api/sse/chat glossary metadata', () => {
 
     const fetchMock = vi.fn(async (input: string | URL) => {
       const url = String(input);
-      if (url === 'http://qdrant.test/collections/legal_documents/points/search') {
+      if (url.startsWith('http://qdrant.test/collections/') && url.endsWith('/points/query')) {
+            const collection = url.split('/collections/')[1]?.split('/')[0];
+            if (collection !== 'legal_documents') {
+              return new Response(JSON.stringify({ result: { points: [] } }), {
+                status: 200,
+                headers: { 'Content-Type': 'application/json' },
+              });
+            }
         return new Response(
           JSON.stringify({
-            result: [
+            result: {
+              points: [
               {
                 id: 'legal-doc-kag-cache-1',
                 score: 0.86,
@@ -1381,6 +1435,7 @@ describe('/api/sse/chat glossary metadata', () => {
                 },
               },
             ],
+            },
           }),
           {
             status: 200,
@@ -1522,10 +1577,18 @@ describe('/api/sse/chat glossary metadata', () => {
 
     const fetchMock = vi.fn(async (input: string | URL) => {
       const url = String(input);
-      if (url === 'http://qdrant.test/collections/legal_documents/points/search') {
+      if (url.startsWith('http://qdrant.test/collections/') && url.endsWith('/points/query')) {
+            const collection = url.split('/collections/')[1]?.split('/')[0];
+            if (collection !== 'legal_documents') {
+              return new Response(JSON.stringify({ result: { points: [] } }), {
+                status: 200,
+                headers: { 'Content-Type': 'application/json' },
+              });
+            }
         return new Response(
           JSON.stringify({
-            result: [
+            result: {
+              points: [
               {
                 id: 'legal-doc-code-kag-cache-1',
                 score: 0.86,
@@ -1536,6 +1599,7 @@ describe('/api/sse/chat glossary metadata', () => {
                 },
               },
             ],
+            },
           }),
           {
             status: 200,
@@ -1657,10 +1721,18 @@ describe('/api/sse/chat glossary metadata', () => {
 
     const fetchMock = vi.fn(async (input: string | URL) => {
       const url = String(input);
-      if (url === 'http://qdrant.test/collections/legal_documents/points/search') {
+      if (url.startsWith('http://qdrant.test/collections/') && url.endsWith('/points/query')) {
+            const collection = url.split('/collections/')[1]?.split('/')[0];
+            if (collection !== 'legal_documents') {
+              return new Response(JSON.stringify({ result: { points: [] } }), {
+                status: 200,
+                headers: { 'Content-Type': 'application/json' },
+              });
+            }
         return new Response(
           JSON.stringify({
-            result: [
+            result: {
+              points: [
               {
                 id: 'legal-doc-context-parity-1',
                 score: 0.86,
@@ -1671,6 +1743,7 @@ describe('/api/sse/chat glossary metadata', () => {
                 },
               },
             ],
+            },
           }),
           {
             status: 200,
@@ -1752,10 +1825,18 @@ describe('/api/sse/chat glossary metadata', () => {
 
     const fetchMock = vi.fn(async (input: string | URL) => {
       const url = String(input);
-      if (url === 'http://qdrant.test/collections/legal_documents/points/search') {
+      if (url.startsWith('http://qdrant.test/collections/') && url.endsWith('/points/query')) {
+            const collection = url.split('/collections/')[1]?.split('/')[0];
+            if (collection !== 'legal_documents') {
+              return new Response(JSON.stringify({ result: { points: [] } }), {
+                status: 200,
+                headers: { 'Content-Type': 'application/json' },
+              });
+            }
         return new Response(
           JSON.stringify({
-            result: [
+            result: {
+              points: [
               {
                 id: 'legal-doc-queue-truncate-1',
                 score: 0.86,
@@ -1766,6 +1847,7 @@ describe('/api/sse/chat glossary metadata', () => {
                 },
               },
             ],
+            },
           }),
           {
             status: 200,
@@ -1868,10 +1950,18 @@ describe('/api/sse/chat glossary metadata', () => {
 
     const fetchMock = vi.fn(async (input: string | URL) => {
       const url = String(input);
-      if (url === 'http://qdrant.test/collections/legal_documents/points/search') {
+      if (url.startsWith('http://qdrant.test/collections/') && url.endsWith('/points/query')) {
+            const collection = url.split('/collections/')[1]?.split('/')[0];
+            if (collection !== 'legal_documents') {
+              return new Response(JSON.stringify({ result: { points: [] } }), {
+                status: 200,
+                headers: { 'Content-Type': 'application/json' },
+              });
+            }
         return new Response(
           JSON.stringify({
-            result: [
+            result: {
+              points: [
               {
                 id: 'legal-doc-code-only-1',
                 score: 0.86,
@@ -1882,6 +1972,7 @@ describe('/api/sse/chat glossary metadata', () => {
                 },
               },
             ],
+            },
           }),
           {
             status: 200,

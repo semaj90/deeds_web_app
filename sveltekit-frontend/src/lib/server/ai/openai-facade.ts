@@ -117,7 +117,8 @@ function resolveInternalModel(requested: string): string {
   // Drop any trailing `:latest` to normalise comparisons
   const m = requested.toLowerCase().replace(/:latest$/, '');
   if (m === 'yorha-ldr') return 'yorha-ldr';
-  if (m === 'gemma4-rotorquant:latest') return LLM_MODEL_ID;
+  // `m` has already had a trailing `:latest` removed above.
+  if (m === 'gemma4-rotorquant') return LLM_MODEL_ID;
   if (m.startsWith('yorha') || m.startsWith('legal') || m.includes('vlm')) {
     return LLM_MODEL_ID;
   }
@@ -849,31 +850,15 @@ export async function runChatCompletion(
       );
     }
 
-    let text: string;
+    // Raw/model-layer benchmarking intentionally uses the standard Bifrost
+    // backend directly. It must not enter the LDR research route, and it
+    // must report the same lane that actually performed the generation.
     const selectedLane = 'bifrost';
-    if (selectedLane === 'bifrost') {
-      text = await runLdrChat(mappedMsgs, requestedMaxTokens, req.temperature);
-    } else if (canUseTurboQuantNow) {
-      try {
-        const result = await turboQuantChat(mappedMsgs, internalModel, {
-          temperature: req.temperature,
-          maxTokens: requestedMaxTokens,
-        });
-        text = extractAssistantText(result);
-      } catch {
-        const result = await bifrostChat(mappedMsgs, internalModel, {
-          temperature: req.temperature,
-          maxTokens: requestedMaxTokens,
-        });
-        text = extractAssistantText(result);
-      }
-    } else {
-      const result = await bifrostChat(mappedMsgs, internalModel, {
-        temperature: req.temperature,
-        maxTokens: requestedMaxTokens,
-      });
-      text = extractAssistantText(result);
-    }
+    const result = await bifrostChat(mappedMsgs, internalModel, {
+      temperature: req.temperature,
+      maxTokens: requestedMaxTokens,
+    });
+    let text = extractAssistantText(result);
     text = text.trim() || '[No assistant content returned by model]';
     void persistEngramChatMemory({
       userId: opts.userId,
@@ -888,6 +873,7 @@ export async function runChatCompletion(
       model: rawModel,
       durationMs: Date.now() - startMs,
       inferenceLane: rawInferenceLane,
+      selectedLane,
       runtimeProfile: runtime.profile,
       runtimeAvailable: runtime.runtimeAvailable,
       turboQuantEnabled: runtime.turboQuant,

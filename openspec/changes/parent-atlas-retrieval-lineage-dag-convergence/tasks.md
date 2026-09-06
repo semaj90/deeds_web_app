@@ -8889,9 +8889,32 @@ source-to-chunk materialization proven for all 50 sources, while deliberately re
 `docs/reports/pkt-lineage-08a-chunk-preimage-proof-v1.json`, and
 `docs/reports/source-chunk-materialization-binding-cohort-v1.json`.
 
+**Independent lineage-audit consistency check — 2026-09-06 (read-only).** The two current
+workspace audits were found to use different revision authorities: the cohort-lineage audit
+was reading the checked-in observation artifact `docs/reports/workspace-source-binding-observation.json`
+(`sha256:927ed...`), while the packet/chunk join audit reads live
+`atlas_workspace_source_bindings` (`sha256:55ed...`). The cohort audit now compares those values
+against live Postgres and fails closed as `WORKSPACE_REVISION_SOURCE_MISMATCH` when they differ;
+it no longer presents the stale observation as current authority. This is a provenance/input
+reconciliation blocker, not evidence that either revision should be selected, and it does not
+authorize Graphify, lineage, Qdrant, graph, cache, or embedding writes. Receipt:
+`docs/reports/current-source-cohort-lineage-v1.json`.
+
 This does not reopen 08A and does not authorize a new writer. It restores the accurate current
 queue: keep the 08A bounded cohort closed; keep 08B full-current-workspace coverage
 `BLOCKED_CURRENT_WORKSPACE_DRIFT`; do not reuse the old 50-source allowlist, rewrite historical
 Graphify rows, run `graphify:daily`, or promote Qdrant/graph/latent representations. The next
 safe action is either an explicitly authorized fresh source-authority cycle on a held-stable
 worktree or a separately scoped read-only downstream governance closeout.
+
+**Follow-up read-only checks — 2026-09-06.** The pure source-authority selector proof passes
+`27/27` cases (`SELECTOR_PROVEN`), including rejection of running, unbound, stale, empty, and
+ambiguous candidates. The live selector still reports `NO_CURRENT_COMPLETED_BOUND_SOURCE_OWNER`
+for the current dirty workspace. The cross-artifact source-selection audit reports
+`BLOCKED_AUTHORITY_ALIGNMENT` (`3` shared references, `3` workspace-revision mismatches, `0`
+registry rows), while the live lineage table audit reports `SOURCE_LINEAGE_OWNER_SCHEMA_READY`.
+These results distinguish a proven selector and present schema from an eligible current source
+population; no repair, Graphify run, or downstream projection is authorized by them. Receipts:
+`docs/reports/current-source-evidence-authority-selector-proof-v1.json`,
+`docs/reports/source-selection-authority-alignment-v1.json`, and
+`docs/reports/live-source-lineage-table-audit.json`.

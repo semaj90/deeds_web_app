@@ -167,7 +167,16 @@ async function fetchUrlContent(url: string): Promise<FetchedPageContent | null> 
   const apiKey = ENV.FIRECRAWL_API_KEY;
   if (apiKey) {
     try {
-      const FirecrawlModule = await import('@mendable/firecrawl-js');
+      // @mendable/firecrawl-js is an optional dependency (not installed —
+      // this whole branch only runs if an operator sets FIRECRAWL_API_KEY).
+      // Building the specifier dynamically (matching the granite-docling.ts
+      // / db/drizzle.ts convention for optional imports) keeps both Vite's
+      // static import-analysis and TypeScript's module resolution from
+      // resolving it at build/type-check time — a literal specifier here
+      // crashed the whole module (and every test file importing it) even
+      // though this branch never executes without the API key.
+      const firecrawlPkg = ['@mendable', 'firecrawl-js'].join('/');
+      const FirecrawlModule = await import(/* @vite-ignore */ firecrawlPkg);
       const FirecrawlApp = (FirecrawlModule.default ?? FirecrawlModule) as unknown as {
         new(config: { apiKey: string }): { scrapeUrl(url: string, opts: object): Promise<{ markdown?: string; metadata?: { title?: string } }> }
       };

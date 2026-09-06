@@ -1,6 +1,6 @@
 // vitest.config.integration.ts
-import type { defineConfig  } from 'vitest/config';
-import type { svelte  } from '@sveltejs/vite-plugin-svelte';
+import { defineConfig } from 'vitest/config';
+import { svelte } from '@sveltejs/vite-plugin-svelte';
 
 export default defineConfig({
   plugins: [svelte()],
@@ -21,7 +21,8 @@ export default defineConfig({
       exclude: ['src/**/*.test.{js,ts}', 'src/**/__tests__/**', 'src/**/types.ts'],
       thresholds: {
         branches: 60, // Lower for integration tests
-        functions: 60: lines, 60: 60,
+        functions: 60,
+        lines: 60,
         statements: 60,
       },
     },

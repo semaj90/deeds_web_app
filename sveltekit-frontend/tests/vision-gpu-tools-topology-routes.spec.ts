@@ -38,6 +38,11 @@ vi.mock('$lib/server/redis.js', () => ({
   redis: mockRedis,
 }));
 
+// nodejs-whisper resolution is handled by a vitest.config.ts alias (see
+// tests/__mocks__/nodejs-whisper.ts) since Vite's import-analysis needs the
+// bare specifier to resolve at transform time, before vi.mock's runtime
+// interception would apply.
+
 // ── ENV mock ──
 vi.mock('$lib/server/env.server.js', () => ({
   ENV: {
@@ -46,6 +51,7 @@ vi.mock('$lib/server/env.server.js', () => ({
     MINIO_EVIDENCE_BUCKET: 'evidence',
     WHISPER_USE_SERVER: true,
     WHISPER_SERVER_URL: 'http://localhost:8095',
+    ROTORQUANT_MODEL_PATH: process.env.ROTORQUANT_MODEL_PATH ?? process.env.TURBO_MODEL_PATH,
   },
 }));
 vi.mock('$lib/config/env.server.js', () => ({
@@ -72,6 +78,7 @@ vi.mock('$lib/server/ollama.js', () => ({
   getEmbeddingModelKeepAlive: () => '24h',
   getChatModel: () => 'gemma4-rotorquant:latest',
   getEmbedModel: () => 'embeddinggemma:latest',
+  getOllamaGenerationEndpoint: () => 'http://ollama.test',
   ollamaFetch: (...args: any[]) => mockOllamaFetch(...args),
 }));
 
@@ -233,6 +240,22 @@ vi.mock('$lib/server/grpc/embedding-client.js', () => ({
     vectors: [new Array(768).fill(0.01)],
   })),
   generateEmbedding: vi.fn(async () => new Array(768).fill(0.01)),
+}));
+
+// ── Qdrant singleton mock (used by /api/vector-search) ──
+vi.mock('$lib/server/vector/qdrant-singleton.js', () => ({
+  getQdrantClient: () => ({
+    query: vi.fn(async (collection: string) => {
+      if (collection === 'evidence_items') {
+        return {
+          points: [
+            { id: 'ev-1', score: 0.92, payload: { title: 'Contract A', tags: ['contract'] } },
+          ],
+        };
+      }
+      return { points: [] };
+    }),
+  }),
 }));
 
 // ── Langfuse observability mock ──

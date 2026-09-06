@@ -3,6 +3,9 @@ import { z } from 'zod';
 import { canonicalEncodeV1, sha256HexSchema } from './canonical-hash-v1.js';
 
 const revision = z.string().min(1);
+export const LLAMA_SERVER_CONTEXT_LIMIT_TOKENS = 65_536;
+export const DEFAULT_RESERVED_OUTPUT_TOKENS = 8_192;
+export const DEFAULT_MAX_INPUT_TOKENS = LLAMA_SERVER_CONTEXT_LIMIT_TOKENS - DEFAULT_RESERVED_OUTPUT_TOKENS;
 
 export const PromptPlanSegmentV1Schema = z.object({
   ordinal: z.number().int().nonnegative(),
@@ -24,12 +27,32 @@ export const PromptPlanV1Schema = z.object({
   instructionRevision: revision,
   segments: z.array(PromptPlanSegmentV1Schema).min(1),
   totalTokens: z.number().int().nonnegative(),
+  contextLimitTokens: z.number().int().positive().default(LLAMA_SERVER_CONTEXT_LIMIT_TOKENS),
+  reservedOutputTokens: z.number().int().nonnegative().default(DEFAULT_RESERVED_OUTPUT_TOKENS),
+  maxInputTokens: z.number().int().nonnegative().default(DEFAULT_MAX_INPUT_TOKENS),
   checksumSha256: sha256HexSchema,
-}).strict();
+}).strict().superRefine((value, ctx) => {
+  if (value.reservedOutputTokens + value.maxInputTokens > value.contextLimitTokens) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['maxInputTokens'],
+      message: 'maxInputTokens plus reservedOutputTokens must fit within contextLimitTokens',
+    });
+  }
+  if (value.totalTokens > value.maxInputTokens) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['totalTokens'],
+      message: 'PromptPlanV1 totalTokens exceeds its admitted input budget',
+    });
+  }
+});
 
 export type PromptPlanV1 = z.infer<typeof PromptPlanV1Schema>;
 
-export function buildPromptPlanV1(input: Omit<PromptPlanV1, 'schema' | 'totalTokens' | 'checksumSha256'>): PromptPlanV1 {
+type PromptPlanV1BuildInput = Omit<z.input<typeof PromptPlanV1Schema>, 'schema' | 'totalTokens' | 'checksumSha256'>;
+
+export function buildPromptPlanV1(input: PromptPlanV1BuildInput): PromptPlanV1 {
   const segments = input.segments
     .map((segment) => PromptPlanSegmentV1Schema.parse(segment))
     .sort((a, b) => a.ordinal - b.ordinal);
@@ -41,6 +64,15 @@ export function buildPromptPlanV1(input: Omit<PromptPlanV1, 'schema' | 'totalTok
   }
 
   const totalTokens = segments.reduce((sum, segment) => sum + segment.tokenCount, 0);
+  const contextLimitTokens = input.contextLimitTokens ?? LLAMA_SERVER_CONTEXT_LIMIT_TOKENS;
+  const reservedOutputTokens = input.reservedOutputTokens ?? DEFAULT_RESERVED_OUTPUT_TOKENS;
+  const maxInputTokens = input.maxInputTokens ?? contextLimitTokens - reservedOutputTokens;
+  if (reservedOutputTokens + maxInputTokens > contextLimitTokens) {
+    throw new Error('PromptPlanV1 budget exceeds contextLimitTokens');
+  }
+  if (totalTokens > maxInputTokens) {
+    throw new Error(`PromptPlanV1 totalTokens ${totalTokens} exceeds maxInputTokens ${maxInputTokens}`);
+  }
   const payload = {
     schema: 'atlas.prompt-plan.v1' as const,
     requestId: input.requestId,
@@ -50,6 +82,9 @@ export function buildPromptPlanV1(input: Omit<PromptPlanV1, 'schema' | 'totalTok
     instructionRevision: input.instructionRevision,
     segments,
     totalTokens,
+    contextLimitTokens,
+    reservedOutputTokens,
+    maxInputTokens,
   };
   const checksumSha256 = createHash('sha256').update(canonicalEncodeV1(payload), 'utf8').digest('hex');
   return PromptPlanV1Schema.parse({ ...payload, checksumSha256 });

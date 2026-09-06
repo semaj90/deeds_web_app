@@ -154,6 +154,17 @@ export function validatePacketIdentity(packet: {
 export function validateSchemaReferences(text: string): string[] {
   const violations: string[] = [];
 
+  // This function is called on the full assembled ACE prompt (system + user
+  // + context), which is ordinary natural-language text, not SQL, for the
+  // overwhelming majority of requests. Without this guard, any sentence
+  // containing "from the ..." (e.g. "hearsay from the common law") matches
+  // the FROM/table regex below and "the" gets flagged as a nonexistent
+  // table. Only attempt SQL table-reference extraction when the text
+  // actually looks like it contains a SQL statement.
+  if (!/\b(SELECT|INSERT|UPDATE|DELETE)\b/i.test(text)) {
+    return violations;
+  }
+
   // Extract potential table references (words followed by . or in SELECT/INSERT/UPDATE)
   const tableMatches = text.match(/(?:FROM|INTO|UPDATE|JOIN|LEFT JOIN|RIGHT JOIN|INNER JOIN)\s+(\w+)/gi) ?? [];
 

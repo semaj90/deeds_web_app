@@ -126,6 +126,9 @@ describe('compiled prefill identity', () => {
 
     expect(physicalA.contentIdentityChecksum).toBe(physicalB.contentIdentityChecksum);
     expect(physicalA.checksumSha256).not.toBe(physicalB.checksumSha256);
+    expect(plan.contextLimitTokens).toBe(65_536);
+    expect(plan.reservedOutputTokens).toBe(8_192);
+    expect(plan.maxInputTokens).toBe(57_344);
 
     const receipt = buildPrefillReceiptV1({
       requestId: 'req-1',
@@ -184,5 +187,37 @@ describe('compiled prefill identity', () => {
     expect(complete.bitfrostRevision).toBe('bitfrost:r2');
     expect(complete.residencyPlanChecksum).toBe(H('residency-plan-2'));
     expect(complete.gpuExecutionIdentity).toBe('gpu:rtx3060ti:cuda12.1');
+  });
+
+  it('rejects a prompt plan that exceeds the reserved-output budget', () => {
+    expect(() => buildPromptPlanV1({
+      requestId: 'req-budget',
+      contextManifestChecksum: H('manifest-budget'),
+      tokenizerRevision: 'tok:r1',
+      promptTemplateRevision: 'prompt:r1',
+      instructionRevision: 'instruction:r1',
+      contextLimitTokens: 1_024,
+      reservedOutputTokens: 256,
+      maxInputTokens: 768,
+      segments: [
+        { ordinal: 0, kind: 'SYSTEM', packetKey: null, evidenceRefs: [], contentChecksum: H('system-budget'), tokenCount: 769 },
+      ],
+    })).toThrow(/exceeds maxInputTokens/);
+  });
+
+  it('rejects a budget whose input and output reservations exceed the context limit', () => {
+    expect(() => buildPromptPlanV1({
+      requestId: 'req-invalid-budget',
+      contextManifestChecksum: H('manifest-invalid-budget'),
+      tokenizerRevision: 'tok:r1',
+      promptTemplateRevision: 'prompt:r1',
+      instructionRevision: 'instruction:r1',
+      contextLimitTokens: 1_024,
+      reservedOutputTokens: 512,
+      maxInputTokens: 513,
+      segments: [
+        { ordinal: 0, kind: 'SYSTEM', packetKey: null, evidenceRefs: [], contentChecksum: H('system-invalid-budget'), tokenCount: 1 },
+      ],
+    })).toThrow(/exceeds contextLimitTokens/);
   });
 });

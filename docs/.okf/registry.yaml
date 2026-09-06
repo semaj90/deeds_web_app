@@ -55,8 +55,8 @@ contracts:
     owner: sveltekit-frontend/src/lib/server/atlas/contracts/external-doc-projection-v1.ts
     role: ORF-3 target payload/index contract for one programming-doc evidence family
     notes:
-      - external_programming_docs_hybrid_512_v1
-      - semantic_512
+      - external_programming_docs_hybrid_512_v1 (legacy/reference projection)
+      - semantic_768 canonical; MRL 512/256/128 are derived views
       - flattened_key_value_tags
       - kmeans_cluster_id
       - community_id
@@ -65,7 +65,10 @@ contracts:
     owner: sveltekit-frontend/src/lib/server/atlas/contracts/cluster-feature-projection-v1.ts
     role: ORF-4 rebuildable KMeans/SOM/community routing projection
     notes:
-      - semantic_512
+      - semantic_768-derived routing features
+      - semantic_mrl_512
+      - semantic_mrl_256
+      - semantic_mrl_128
       - latent_64
       - kmeans
       - som
@@ -75,7 +78,10 @@ contracts:
     owner: sveltekit-frontend/src/lib/server/atlas/contracts/retrieval-router-feature-row-v1.ts
     role: ORF-5 representation-explicit router feature row
     notes:
-      - semantic_512
+      - semantic_768
+      - semantic_mrl_512
+      - semantic_mrl_256
+      - semantic_mrl_128
       - latent_64
       - bm25_score
       - bm42_challenger_score

@@ -1,0 +1,52 @@
+{
+  "gate": "ORNITH-VLM-MMPROJ-01",
+  "openSpecChange": "parent-atlas-analysis-pass-ornith-adapter",
+  "runAt": "2026-09-06T02:17:00Z",
+  "projector": {
+    "sourceUrl": "https://huggingface.co/ornith-ai/Ornith-1.5-9B-GGUF/resolve/main/mmproj-Ornith-1.5-9B-BF16.gguf",
+    "localPath": "models/mmproj-Ornith-1.5-9B-BF16.gguf",
+    "artifactSizeBytes": 921704672,
+    "artifactSha256": "626f9f90627402a6bf4a999111d0fbd69b5fcca7aa8ba089d69e5f10e8858e1d",
+    "shaMatchesHfEtag": true
+  },
+  "manifest": {
+    "file": "models/model-manifest.json",
+    "addedEntryId": "ornith-1.5-mmproj",
+    "modelFamily": "ornith-1.5",
+    "compatibleModelIds": ["hforf-gguf"]
+  },
+  "launcher": {
+    "file": "scripts/launch-turboquant.ps1",
+    "change": "family-keyed multimodal projector resolution ($modelFamily / $wantsVision per profile), fail-closed when a vision-requiring profile cannot resolve its family's projector, no cross-family opportunistic substitution",
+    "newProfile": "ornith-1.5-vlm",
+    "existingProfileUnchanged": "ornith-1.5 (text-only, WantsVision=false, confirmed no mmproj attempted post-change)",
+    "incidentalFix": "TurboQuant ready banner's 'text-only'/'with VLM' label previously derived only from -TextOnly switch, always printing 'with VLM' for any non-TextOnly launch regardless of whether --mmproj was actually added; now derived from actual mmproj-loaded state"
+  },
+  "binary": "C:\\Users\\james\\Desktop\\llama-server-cuda\\llama-server.exe",
+  "liveProof": {
+    "propsBeforeSwitch": { "model_alias": "ornith-1.5-9b", "modalities": { "vision": false, "audio": false } },
+    "propsAfterOrnith15Vlm": { "model_alias": "ornith-1.5-9b", "modalities": { "vision": true, "audio": false } },
+    "propsAfterRevertToOrnith15Text": { "model_alias": "ornith-1.5-9b", "modalities": { "vision": false, "audio": false } },
+    "smokeTests": [
+      { "name": "text_completion", "request": "Reply with exactly: SMOKE_TEXT_OK", "result": "SMOKE_TEXT_OK", "pass": true },
+      { "name": "tool_call", "request": "get_weather(Boston) tool offered", "result": "finish_reason=tool_calls, function=get_weather, arguments={\"city\":\"Boston\"}", "pass": true },
+      { "name": "json_structured_output", "request": "JSON object {name,count}", "result": "{\"name\":\"test\",\"count\":3}", "pass": true },
+      { "name": "image_understanding", "request": "describe sveltekit-frontend/static/yorha-celestial.png (3.1MB PNG, no prior context)", "result": "A collection of 16 celestial-themed logos featuring white wings, golden halos, and stars arranged in a grid against a starry night sky.", "pass": true, "note": "semantically accurate description, not a generic hallucinated fallback" }
+    ],
+    "noFallbackToGemma4": true,
+    "modelIdentityStableAcrossAllCalls": "ornith-1.5-9b / system_fingerprint b8757-a29e4c0b7"
+  },
+  "vram": {
+    "gpu": "RTX 3060 Ti 8GB",
+    "beforeOrnith15Vlm": { "usedMiB": 7578, "freeMiB": 447 },
+    "afterOrnith15Vlm": { "usedMiB": 7421, "freeMiB": 604 },
+    "note": "Measured, not assumed. Did not match the expected ~922MB delta from the projector alone - other GPU-resident processes and/or prior KV-cache accumulation in the replaced process likely account for the difference. No OOM occurred despite only 447MiB free headroom going in."
+  },
+  "revertedToDefaultTextProfileAfterProof": true,
+  "otherProcessesUntouched": "embedding server on :8081 (PID 61608, embeddinggemma-300m-f16.gguf) was never stopped or restarted",
+  "gateStatus": "LIVE_GET_PROVEN",
+  "notCompletedThisPass": [
+    "4.7 regression fixture reuse against a pre-existing named text/tool test suite (no such committed fixture file was found; the smoke tests above cover the same functional surface ad hoc)",
+    "ORNITH-GEMMA-MMPROJ-COMPAT-01 (optional bounded incompatibility probe suggested by the operator) - skipped per operator's own stated fallback: 'if you want the empirical receipt... otherwise... install the real projector and move forward' - the real projector path was chosen directly"
+  ]
+}

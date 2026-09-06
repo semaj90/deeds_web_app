@@ -1,0 +1,26 @@
+{
+  "schema": "atlas.action-single-flight-live-proof.v1",
+  "proofId": "a40f2436-5dfb-477f-96c1-34b43092f615",
+  "status": "ACTION_SINGLE_FLIGHT_PROVEN",
+  "observedAt": "2026-09-06",
+  "database": "PostgreSQL",
+  "contention": {
+    "firstClaim": "lease",
+    "secondClaim": "busy",
+    "busyOwnerPrevented": true
+  },
+  "receipt": {
+    "completed": true,
+    "replayReturnedReceipt": true,
+    "sameArtifact": true,
+    "durableRowCount": 1
+  },
+  "staleFence": {
+    "replacementClaimed": true,
+    "staleCompletionRejected": true,
+    "freshCompletionSucceeded": true
+  },
+  "canonicalAuthority": false,
+  "canonicalProjectionWrites": false,
+  "writeScope": "bounded disposable workflow lease and receipt proof rows only"
+}

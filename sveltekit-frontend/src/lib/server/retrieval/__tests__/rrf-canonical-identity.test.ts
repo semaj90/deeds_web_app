@@ -129,6 +129,8 @@ describe('canonical identity closes the multi-projection double-vote bug', () =>
     // Negative assertion: the fused candidate's id must never equal either raw Qdrant point id.
     expect(withNormalization[0]!.id).not.toBe('qdrant-point-1');
     expect(withNormalization[0]!.id).not.toBe('qdrant-point-2');
+    expect(withNormalization[0]!.combinedScore).toBeCloseTo(1 / 61, 10);
+    expect(withNormalization[0]!.combinedScore).not.toBeCloseTo(2 / 61, 10);
   });
 
   it('deduplicates repeated hits from one lane into one vote', () => {

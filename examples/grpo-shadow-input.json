@@ -1,0 +1,25 @@
+{
+  "groups": [
+    {
+      "taskRef": "task:example-1",
+      "candidates": [
+        {
+          "policyId": "exact-ast-first",
+          "taskSucceeded": true,
+          "validationScore": 1.0,
+          "tokenSavings01": 0.7,
+          "latencyPenalty01": 0.1,
+          "failedActionPenalty01": 0.0
+        },
+        {
+          "policyId": "semantic-first",
+          "taskSucceeded": true,
+          "validationScore": 0.9,
+          "tokenSavings01": 0.2,
+          "latencyPenalty01": 0.5,
+          "failedActionPenalty01": 0.1
+        }
+      ]
+    }
+  ]
+}

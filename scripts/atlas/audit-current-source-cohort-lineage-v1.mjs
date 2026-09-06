@@ -26,8 +26,15 @@ const refs = rows.map((row) => String(row.relativePath ?? '').trim()).filter(Boo
 const prefixedRefs = refs.map((ref) => ref.startsWith('sveltekit-frontend/') ? ref : `sveltekit-frontend/${ref}`);
 const pool = new Pool({ connectionString: resolveDatabaseUrl(loadRepoEnv()), max: 1, statement_timeout: 120000 });
 let graphifyRows = [];
+let liveBindingWorkspaceRevisions = [];
 let error = null;
 try {
+  liveBindingWorkspaceRevisions = (await pool.query(
+    `select distinct workspace_revision::text as workspace_revision
+     from public.atlas_workspace_source_bindings
+     where repo_id = 'deeds-web-app'
+     order by workspace_revision::text`,
+  )).rows.map((row) => String(row.workspace_revision ?? '').trim()).filter(Boolean);
   graphifyRows = (await pool.query(
     `select source_ref, content_hash, workspace_revision, code_source_revision, source_revision
      from public.graphify_files
@@ -85,6 +92,9 @@ const resultRows = rows.map((row) => {
 const counts = {
   cohortRows: resultRows.length,
   currentWorkspaceRevision,
+  liveBindingWorkspaceRevisions,
+  workspaceRevisionSourceAligned: liveBindingWorkspaceRevisions.length === 1
+    && liveBindingWorkspaceRevisions[0] === currentWorkspaceRevision,
   graphifyMatched: resultRows.filter((row) => row.graphifyRows > 0).length,
   currentWorkspaceMatched: resultRows.filter((row) => row.currentWorkspaceRows > 0).length,
   sourceRevisionQualified: resultRows.filter((row) => row.sourceRevisionQualifiedRows > 0).length,
@@ -98,7 +108,11 @@ const report = {
   schema: 'atlas.current-source-cohort-lineage.v1',
   generatedAt: new Date().toISOString(),
   mode: 'READ_ONLY_LINEAGE_AUDIT',
-  inputs: { cohortChecksum: cohort.cohortChecksum ?? null, observationPath: path.relative(root, observationPath).replaceAll('\\', '/') },
+  inputs: {
+    cohortChecksum: cohort.cohortChecksum ?? null,
+    observationPath: path.relative(root, observationPath).replaceAll('\\', '/'),
+    workspaceRevisionSource: 'observation-artifact-compared-with-live-postgres-bindings',
+  },
   counts,
   rows: resultRows,
   databaseError: error,
@@ -109,12 +123,18 @@ const report = {
   qdrantWrites: false,
   status: error
     ? 'LINEAGE_AUDIT_ERROR'
+    : !counts.workspaceRevisionSourceAligned
+      ? 'WORKSPACE_REVISION_SOURCE_MISMATCH'
     : counts.revisionQualified > 0
       ? 'CURRENT_LINEAGE_COHORT_FOUND'
       : counts.sourceRevisionQualified > 0
         ? 'SOURCE_LINEAGE_COHORT_FOUND_WORKSPACE_MISMATCH'
         : 'CURRENT_LINEAGE_COHORT_EMPTY',
-  nextGate: counts.sourceRevisionQualified > 0 ? 'SOURCE_PROJECTION_EXACT_BYTES_ADMISSION_REVIEW' : 'GRAPHIFY_REVISION_RECONCILIATION_REQUIRED',
+  nextGate: !counts.workspaceRevisionSourceAligned
+    ? 'WORKSPACE_REVISION_SOURCE_RECONCILIATION_REQUIRED'
+    : counts.sourceRevisionQualified > 0
+      ? 'SOURCE_PROJECTION_EXACT_BYTES_ADMISSION_REVIEW'
+      : 'GRAPHIFY_REVISION_RECONCILIATION_REQUIRED',
 };
 report.reportChecksum = crypto.createHash('sha256').update(JSON.stringify(report)).digest('hex');
 fs.mkdirSync(path.dirname(reportPath), { recursive: true });

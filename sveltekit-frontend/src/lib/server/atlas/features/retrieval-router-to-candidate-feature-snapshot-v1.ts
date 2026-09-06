@@ -7,6 +7,7 @@ import {
 } from './canonical-candidate-v1.js';
 import {
   materializeCandidateFeatureSnapshot,
+  type CandidateFeatureRowV1,
   type CandidateFeatureSnapshotV1,
 } from './candidate-feature-snapshot-v1.js';
 import {
@@ -41,7 +42,7 @@ export function materializeCandidateFeatureSnapshotFromRetrievalRowsV1(input: {
   }
 
   const seen = new Set<number>();
-  const featureRows = rows.map((row): Record<string, unknown> => {
+  const featureRows = rows.map((row): CandidateFeatureRowV1 => {
     if (seen.has(row.candidateOrdinal)) throw new Error(`ACE_FEATURE_ROW_DUPLICATE_ORDINAL:${row.candidateOrdinal}`);
     seen.add(row.candidateOrdinal);
     const candidate = ordinalMap.candidates[row.candidateOrdinal];

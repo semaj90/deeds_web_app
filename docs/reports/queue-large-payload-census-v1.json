@@ -1,0 +1,53 @@
+{
+  "schema": "atlas.queue-large-payload-census.v1",
+  "status": "CALLER_CENSUS_COMPLETE_PAYLOAD_AMPLIFICATION_UNMEASURED",
+  "generatedAt": "2026-09-06",
+  "readOnly": true,
+  "writesPerformed": false,
+  "canonicalDurableTaskPath": {
+    "owner": "enqueueArtifactWorkItem -> enqueueTask -> workflow_outbox",
+    "exchange": "atlas.tasks.v1",
+    "policy": "64KiB UTF-8 artifact-reference envelope",
+    "status": "PROVEN_SEPARATELY"
+  },
+  "legacyPublishers": [
+    {
+      "path": "sveltekit-frontend/src/lib/server/queue/rabbitmq-client.ts",
+      "lines": [128, 144],
+      "routingKeys": ["document.embed", "vector.index.document"],
+      "payloadShape": "raw document text or numeric vector passed through opaque data",
+      "artifactReferenceRequired": false,
+      "status": "ACTIVE_COMPATIBILITY"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/queue/rabbitmq-manager-fixed.ts",
+      "lines": [547, 616, 1091, 1101, 2261],
+      "routingKeys": ["document.embed", "vector.index.document"],
+      "payloadShape": "inline text, generated numeric embedding, metadata, or transcription text",
+      "artifactReferenceRequired": false,
+      "status": "ACTIVE_COMPATIBILITY"
+    }
+  ],
+  "nonBrokerCompatibility": [
+    {
+      "path": "sveltekit-frontend/src/lib/server/queue/dispatch-inline.ts",
+      "lines": [113, 121, 160, 164],
+      "routingKeys": ["document.embed", "vector.index"],
+      "payloadShape": "in-process fallback dispatch",
+      "status": "NOT_RABBITMQ_PUBLISHER"
+    }
+  ],
+  "measurements": {
+    "livePayloadByteDistribution": "NOT_MEASURED",
+    "vectorAmplificationRatio": "NOT_MEASURED",
+    "textAmplificationRatio": "NOT_MEASURED",
+    "reason": "static read-only census identifies call sites but does not capture or replay production payloads"
+  },
+  "blockers": [
+    "LEGACY_PUBLISHER_CALLERS_ACTIVE",
+    "LIVE_PAYLOAD_SIZE_PROFILE_REQUIRED",
+    "MIGRATION_AUTHORIZATION_REQUIRED"
+  ],
+  "nextGate": "QUEUE-05-PAYLOAD-PROFILE-01",
+  "validationCommand": "rg -n -i 'document.embed|vector.index|publishMessage|this.publish' sveltekit-frontend/src/lib/server/queue"
+}

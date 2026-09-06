@@ -103,7 +103,7 @@ export function admitSearchRuntimeQasToAceManifestV1(input: {
     producerRevision: input.producerRevision,
     laneMaskByCanonicalId: input.laneMaskByCanonicalId,
   });
-  return buildAceContextManifestAdmissionV1({
+  const admission = buildAceContextManifestAdmissionV1({
     snapshot,
     requestId: input.projection.requestId,
     selectedOrdinals: snapshot.rows.map((row) => row.candidateOrdinal),
@@ -116,6 +116,10 @@ export function admitSearchRuntimeQasToAceManifestV1(input: {
     promptTemplateRevision: input.promptTemplateRevision,
     graphRevision: input.graphRevision,
   });
+  // Expose the exact snapshot that was admitted into the manifest boundary.
+  // Callers must consume this value rather than rematerializing from raw
+  // SearchRuntime packets. The snapshot remains derived/read-only.
+  return { ...admission, snapshot };
 }
 
 /**
@@ -302,7 +306,7 @@ export function createAtlasSearchAdapter(config?: {
       options: AtlasSearchAceManifestOptions,
     ) {
       const result = await this.searchWithQas(req, options);
-      const admission = admitSearchRuntimeQasToAceManifestV1({
+      const ace = admitSearchRuntimeQasToAceManifestV1({
         projection: result.qas,
         candidateSnapshotRevision: options.candidateSnapshotRevision,
         retrievalPolicyRevision: options.retrievalPolicyRevision,
@@ -316,7 +320,13 @@ export function createAtlasSearchAdapter(config?: {
         modelRevision: options.modelRevision,
         promptTemplateRevision: options.promptTemplateRevision,
       });
-      return { ...result, admission, writesPerformed: false as const, canonicalAuthority: false as const };
+      return {
+        ...result,
+        snapshot: ace.snapshot,
+        admission: ace,
+        writesPerformed: false as const,
+        canonicalAuthority: false as const,
+      };
     },
   };
 }

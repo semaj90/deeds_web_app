@@ -2,10 +2,88 @@
   "schemaVersion": "atlas.graphify-bm25-index-plan.v1",
   "readOnly": true,
   "canonicalWriteAttempted": false,
-  "generatedAt": "2026-09-05T22:25:39.794Z",
+  "generatedAt": "2026-09-06T00:34:34.512Z",
   "limit": 10,
   "status": "BM25_INDEX_PLAN_READY",
   "candidates": [
+    {
+      "graphifyRunId": "48485685-e773-4433-a1f8-00f5524cca44",
+      "workflowId": "graphify-default",
+      "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+      "sourceManifestDigest": "e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+      "sourceManifestSourceCount": 23758,
+      "repositoryRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
+      "parameters": {
+        "dirty": true,
+        "wrapper": "scripts/atlas/graphify-daily-lifecycle-file-inventory-v1.mjs",
+        "gitHeadRef": "refs/heads/main",
+        "baseTreeOid": "8cfc7d4886aeb110e6f641943f1e3f8a4414c86f",
+        "sourceCount": 23758,
+        "repositoryId": "deeds-web-app",
+        "writerRevision": "atlas.graphify-source-inventory-writer.v2",
+        "workspaceRevisionRecordChecksum": "d62d419d8ac43b409b03da517c8e7cabd6c8905b756758f34ad26a01d4e88c2b"
+      },
+      "graphifyCompletedAt": "2026-09-05T23:06:59.988Z",
+      "idempotencyKey": "graphify-default:postgres_tsvector_english:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+      "nextAction": "CREATE_INDEX_RUN_ULID_THEN_CLAIM_LEASE"
+    },
+    {
+      "graphifyRunId": "d8bb84bd-b4ba-4f85-a5b9-fad16327b5fe",
+      "workflowId": "graphify-default",
+      "workspaceRevision": "sha256:db4d688bf34a4207ad9ba9cadf4dcc64b3b27d8809472bf51007d32bfa9e122c",
+      "sourceManifestDigest": "db4d688bf34a4207ad9ba9cadf4dcc64b3b27d8809472bf51007d32bfa9e122c",
+      "sourceManifestSourceCount": 23757,
+      "repositoryRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
+      "parameters": {
+        "dirty": true,
+        "wrapper": "scripts/atlas/graphify-daily-lifecycle-file-inventory-v1.mjs",
+        "gitHeadRef": "refs/heads/main",
+        "baseTreeOid": "8cfc7d4886aeb110e6f641943f1e3f8a4414c86f",
+        "sourceCount": 23757,
+        "repositoryId": "deeds-web-app",
+        "writerRevision": "atlas.graphify-source-inventory-writer.v2",
+        "workspaceRevisionRecordChecksum": "55e95f015d4385f6027d8c14e3f759f47f217d49ab2c6e66bfa0c170fe32ba73"
+      },
+      "graphifyCompletedAt": "2026-09-05T22:55:37.505Z",
+      "idempotencyKey": "graphify-default:postgres_tsvector_english:db4d688bf34a4207ad9ba9cadf4dcc64b3b27d8809472bf51007d32bfa9e122c",
+      "nextAction": "CREATE_INDEX_RUN_ULID_THEN_CLAIM_LEASE"
+    },
+    {
+      "graphifyRunId": "55888921-5f7e-4047-9ec4-96912659c2f7",
+      "workflowId": "graphify-default",
+      "workspaceRevision": "sha256:3097d43973a39310034724c60036120e9877816ff6833259cd5b97277fe442e1",
+      "sourceManifestDigest": "3097d43973a39310034724c60036120e9877816ff6833259cd5b97277fe442e1",
+      "sourceManifestSourceCount": 23757,
+      "repositoryRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
+      "parameters": {
+        "dirty": true,
+        "wrapper": "scripts/atlas/graphify-daily-lifecycle-file-inventory-v1.mjs",
+        "gitHeadRef": "refs/heads/main",
+        "baseTreeOid": "8cfc7d4886aeb110e6f641943f1e3f8a4414c86f",
+        "sourceCount": 23757,
+        "repositoryId": "deeds-web-app",
+        "writerRevision": "atlas.graphify-source-inventory-writer.v2",
+        "workspaceRevisionRecordChecksum": "9c6265e157408df3c33d219b0ee8f42f772b47e911b4b49dad48f400a91c2d8d"
+      },
+      "graphifyCompletedAt": "2026-09-05T22:50:25.967Z",
+      "idempotencyKey": "graphify-default:postgres_tsvector_english:3097d43973a39310034724c60036120e9877816ff6833259cd5b97277fe442e1",
+      "nextAction": "CREATE_INDEX_RUN_ULID_THEN_CLAIM_LEASE"
+    },
+    {
+      "graphifyRunId": "ddf92de5-bc56-43c2-a646-7b3c4f79e1a9",
+      "workflowId": "graphify-default",
+      "workspaceRevision": "sha256:bd04c28ea06a4426b2228195b5f14fae2187f6718259c08cfec05f74105a6969",
+      "sourceManifestDigest": "bd04c28ea06a4426b2228195b5f14fae2187f6718259c08cfec05f74105a6969",
+      "sourceManifestSourceCount": 23755,
+      "repositoryRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
+      "parameters": {
+        "wrapper": "scripts/startup/run-graphify-daily-startup.mjs",
+        "writerRevision": "atlas.graphify-run-open.v1"
+      },
+      "graphifyCompletedAt": "2026-09-05T22:45:19.998Z",
+      "idempotencyKey": "graphify-default:postgres_tsvector_english:bd04c28ea06a4426b2228195b5f14fae2187f6718259c08cfec05f74105a6969",
+      "nextAction": "CREATE_INDEX_RUN_ULID_THEN_CLAIM_LEASE"
+    },
     {
       "graphifyRunId": "9816c4d0-d2ad-42ca-8da9-f9d4393277b0",
       "workflowId": "graphify-default",

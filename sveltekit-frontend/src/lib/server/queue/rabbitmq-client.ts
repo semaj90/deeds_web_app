@@ -8,6 +8,7 @@
  */
 
 import type { z } from 'zod';
+import { traceQueue } from '$lib/server/observability/langfuse.js';
 import { EXCHANGES } from './topology.js';
 
 export interface PublishOptions {
@@ -158,10 +159,16 @@ async function publishViaManager(
 	} | null;
 
 	if (channel) {
-		channel.publish(exchange, routingKey, message, {
-			persistent,
-			...(options?.headers ? { headers: options.headers } : {}),
-			...(options?.expiration ? { expiration: options.expiration } : {}),
+		await traceQueue('publish', routingKey, {
+			exchange,
+			payloadBytes: message.byteLength,
+			payloadEncoding: 'json-utf8',
+		}, async () => {
+			channel.publish(exchange, routingKey, message, {
+				persistent,
+				...(options?.headers ? { headers: options.headers } : {}),
+				...(options?.expiration ? { expiration: options.expiration } : {}),
+			});
 		});
 		return;
 	}

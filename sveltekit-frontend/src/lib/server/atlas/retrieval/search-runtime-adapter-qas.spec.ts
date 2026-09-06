@@ -68,6 +68,9 @@ describe('SearchRuntime QAS projection boundary', () => {
       },
     });
     expect(manifestResult.admission.manifest.v1.snapshotId).toBe('snapshot:search:r1');
+    expect(manifestResult.snapshot.rowCount).toBe(1);
+    expect(manifestResult.snapshot.rows[0]?.canonicalId).toBe('symbol:one');
+    expect(manifestResult.snapshot.identityAuthority).toBe(false);
     expect(manifestResult.writesPerformed).toBe(false);
 
     const admission = admitSearchRuntimeQasToAceManifestV1({

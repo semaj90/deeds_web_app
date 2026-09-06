@@ -82,4 +82,18 @@ describe('RLM SearchRuntime adapter', () => {
 		await adapter.search({ ...request, environment: { ...environment, candidateSnapshotRevision: 'candidates-r2' } });
 		expect(keys[0]).not.toBe(keys[1]);
 	});
+
+	it('does not reuse a cached result across taxonomy revisions', async () => {
+		const keys: string[] = [];
+		const adapter = createRlmSearchAdapter({
+			cache: {
+				get: async (key) => { keys.push(key); return null; },
+				set: async () => undefined,
+			},
+			search: async () => response,
+		});
+		await adapter.search({ ...request, taxonomyRevision: 'taxonomy-r1', ontologyRevision: 'ontology-r1' });
+		await adapter.search({ ...request, taxonomyRevision: 'taxonomy-r2', ontologyRevision: 'ontology-r1' });
+		expect(keys[0]).not.toBe(keys[1]);
+	});
 });

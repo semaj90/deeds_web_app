@@ -642,3 +642,46 @@ just under different names/architecture than it assumed.
 - No re-run of the RF2 13-implementation census.
 - No attempt to unblock the graph identity split.
 - No OKF concept-file registration until `PARENT_ATLAS_KNOWLEDGE_GAP_AUDIT_V1` lands.
+
+## Reduction taxonomy reconciliation — 2026-09-06
+
+- [x] Reconciled the DeepSeek/MLA/TurboQuant analogy as a taxonomy of reductions, not an
+      equivalence claim. Parent Atlas keeps the full authoritative source/graph/`semantic_768`
+      state separate from derived `latent_256`/`latent_128`/`latent_64`, neighborhood, partition,
+      sampling, abstraction, residency, and token-admission projections. Every projection still
+      requires its parent revision and checksum.
+- [x] Confirmed no new `ReductionTaxonomyV1` owner is needed. The existing
+      `algorithm-execution-manifest.ts` owns algorithm class/kind/backend/geometry metadata, and
+      `contextual-prefill-fabric.ts` owns the validated derived-recipe contract. These already
+      classify KNN, PageRank/PPR, KMeans, SOM, and `RANDOM_FOREST` as derived, non-canonical work.
+- [x] Confirmed the existing `TaxonomyOrdinalMapV1` remains the ordinal projection owner and that
+      graph results must continue to reattach through canonical graph identity before export or
+      cache. GPU/CUDA is an executor dimension, not a new Atlas identity or logical retrieval lane.
+- [ ] Forest reduction remains `NOT_PROVEN`: the contract accepts `RANDOM_FOREST` only through
+      `CUML` or `CPU_REFERENCE` with a recorded seed, but this audit found no promotion-grade
+      forest sampling surface. Any future implementation must consume an admitted feature matrix,
+      emit a deterministic routing-only receipt, compare against an exact baseline, and never
+      create candidate identity, an RRF vote, or canonical evidence.
+- [x] Kept `semantic_768` as the canonical dense lane; `latent_256` is the physical learned
+      reduction, and `latent_128`/`latent_64` remain nested derived views. Legacy 384 paths are
+      compatibility/archival only and are not reactivated by this reconciliation.
+
+This entry is a status reconciliation only. It does not authorize GPU work, forest sampling,
+Qdrant/Neo4j/Valkey writes, or a new cross-cutting OpenSpec change. The next executable LOD work
+remains the existing QAS live feature/compiler and exact-baseline gates after identity and
+SearchRuntime prerequisites are satisfied.
+
+## Reduction router implementation — 2026-09-06
+
+- [x] Added the read-only `REDUCTION-ROUTER-01` bridge at
+      `sveltekit-frontend/src/lib/server/atlas/classification/reduction-router-v1.ts`.
+      It consumes the existing `QueryClassificationV2` plus an existing taxonomy scope and emits
+      a checksum-bound reduction plan for exact filtering, optional taxonomy filtering, the single
+      `semantic_768` KNN lane, optional graph/hyperedge expansion, and ACE context cards.
+- [x] Wired the reduction plan into `compileQueryRouterControlPlaneV2()` as an additive derived
+      result. It does not execute retrieval, call a provider, add an RRF vote, or authorize writes.
+- [x] Explicitly deferred `RANDOM_FOREST` because the existing LOD contract has no promotion-grade
+      forest surface. `semantic_768` remains canonical; `latent_256/128/64` remain downstream
+      derived representations and legacy 384 is not reactivated.
+- [x] Focused proof covers deterministic replay, graph fail-closed behavior, one semantic lane,
+      non-canonical/non-voting steps, and absence of any `DEEPSEEK_API_KEY` dependency.

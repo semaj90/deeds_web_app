@@ -1,0 +1,46 @@
+{
+  "schema": "atlas.search-runtime-feature-snapshot-boundary.v1",
+  "status": "SEARCH_RUNTIME_FEATURE_SNAPSHOT_BOUNDARY_PROVEN",
+  "scope": "FIXTURE_READ_ONLY",
+  "productionClaim": false,
+  "owner": "SearchRuntime",
+  "change": "parent-atlas-candidate-feature-execution-fabric",
+  "boundary": {
+    "input": "canonical SearchRuntime response plus revision-qualified feature owners",
+    "path": [
+      "SearchRuntime",
+      "SearchRuntimeQasProjection",
+      "CandidateFeatureSnapshotV1",
+      "ACE ContextManifest admission"
+    ],
+    "snapshotReturnedByRuntimeAdapter": true,
+    "rawPacketRematerializationRequired": false,
+    "logicalSemanticLaneCount": 1,
+    "semanticRepresentation": "semantic_768"
+  },
+  "proof": {
+    "candidateCount": 1,
+    "snapshotRowCount": 1,
+    "canonicalIdPreserved": true,
+    "ordinalMembershipPreserved": true,
+    "identityAuthority": false,
+    "canonicalAuthority": false,
+    "writesPerformed": false,
+    "cacheWritesPerformed": false,
+    "modelCalls": 0,
+    "replayStable": true
+  },
+  "validation": {
+    "command": "npx vitest run --config vitest.lane-contracts.config.ts src/lib/server/atlas/retrieval/search-runtime-adapter-qas.spec.ts src/lib/server/atlas/retrieval/search-runtime-qas-feature-resolver.spec.ts src/lib/server/atlas/features/retrieval-router-to-candidate-feature-snapshot-v1.spec.ts",
+    "testsPassed": 10,
+    "testsFailed": 0,
+    "openspecStrictValidation": "PASSED"
+  },
+  "notProven": [
+    "live AST/compiler producer alignment",
+    "live ontology producer alignment",
+    "live latent producer alignment",
+    "corpus-scale CandidateFeatureSnapshot admission"
+  ],
+  "nextGate": "LIVE-FEATURE-JOIN-01-LIVE-PRODUCER-JOIN"
+}

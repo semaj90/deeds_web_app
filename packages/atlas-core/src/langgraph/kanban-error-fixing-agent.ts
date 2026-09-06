@@ -329,26 +329,23 @@ async function updateKanbanStatus(
  * Build the error-fixing state graph
  */
 export function buildErrorFixingGraph() {
-  const workflow = new StateGraph(ErrorFixingState);
-
-  // Add nodes
-  workflow.addNode('load_packets', loadErrorFixingPackets);
-  workflow.addNode('classify_tasks', classifyErrorFixingTasks);
-  workflow.addNode('create_kanban', createKanbanTasks);
-  workflow.addNode('score_policy', scoreWithPolicyModel);
-  workflow.addNode('synthesize_fixes', synthesizeErrorFixes);
-  workflow.addNode('update_kanban', updateKanbanStatus);
-
-  // Add edges
-  workflow.addEdge(START, 'load_packets');
-  workflow.addEdge('load_packets', 'classify_tasks');
-  workflow.addEdge('classify_tasks', 'create_kanban');
-  workflow.addEdge('create_kanban', 'score_policy');
-  workflow.addEdge('score_policy', 'synthesize_fixes');
-  workflow.addEdge('synthesize_fixes', 'update_kanban');
-  workflow.addEdge('update_kanban', END);
-
-  return workflow.compile();
+  // Keep node registration chained so LangGraph retains the typed node-name
+  // union for the subsequent edge declarations.
+  return new StateGraph(ErrorFixingState)
+    .addNode('load_packets', loadErrorFixingPackets)
+    .addNode('classify_tasks', classifyErrorFixingTasks)
+    .addNode('create_kanban', createKanbanTasks)
+    .addNode('score_policy', scoreWithPolicyModel)
+    .addNode('synthesize_fixes', synthesizeErrorFixes)
+    .addNode('update_kanban', updateKanbanStatus)
+    .addEdge(START, 'load_packets')
+    .addEdge('load_packets', 'classify_tasks')
+    .addEdge('classify_tasks', 'create_kanban')
+    .addEdge('create_kanban', 'score_policy')
+    .addEdge('score_policy', 'synthesize_fixes')
+    .addEdge('synthesize_fixes', 'update_kanban')
+    .addEdge('update_kanban', END)
+    .compile();
 }
 
 export default {

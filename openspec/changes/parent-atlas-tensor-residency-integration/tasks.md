@@ -307,6 +307,16 @@
       said "same live run as T3 above"; renamed to point at T3a specifically now that T3 has
       been split. Do not re-run this as a separate experiment — T3a already is the T6 proof.)
 - [ ] T4 ACE state transitions proven with deterministic eviction ordering.
+- [x] T4a Added the bounded `ResidencySchedulerPlanV1` composition contract and
+      pure decision proof in `packages/parent-atlas-retrieval/src/bifrost/
+      residency-scheduler.ts`. It binds `workspaceRevision`, `sourceRevision`,
+      and `candidateSnapshotChecksum`, caps one query at three unique evidence
+      branches, keeps `semantic_768` as the only query-executable
+      representation, and treats MRL `512/256/128` plus nested latent
+      `256/128/64` views as non-authoritative residency hints. GPU admission is
+      headroom-gated and hot residency uses `0.75` promote / `0.45` release
+      hysteresis. This is a pure contract/fixture proof only: no SearchRuntime,
+      Postgres, Qdrant, Valkey, GPU, or model calls are wired by this task.
 - [ ] T5 Valkey/BitFrost revision-qualified metadata keys + invalidation policy proven.
 - [x] T6 cuVS brute-force same-matrix parity proven. (Same live run as T3 above —
       `cuvs.neighbors.brute_force` on the real WSL2 GPU matched the CPU-exact oracle exactly.)

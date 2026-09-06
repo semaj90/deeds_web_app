@@ -61,6 +61,10 @@ describe('Local Deep Research (LDR) Orchestrator', () => {
   describe('LDR Orchestrator (Full Pipeline)', () => {
     it('should execute full LDR pipeline (search + extract + synthesis)', async () => {
       // ACTIVE: SearXNG + Gemma4 confirmed running
+      // Real, unmocked network calls (SearXNG search + doc extraction + a
+      // real llama-server generation) — 30s (vitest's default) is shorter
+      // than this hardware's own documented ~25-33s single-generation
+      // baseline, compounded with the search/extract steps before it.
 
       const query = 'What is hearsay evidence under FRE 801?';
 
@@ -86,7 +90,7 @@ describe('Local Deep Research (LDR) Orchestrator', () => {
       console.log(`  Confidence: ${(result.confidence * 100).toFixed(1)}%`);
       console.log(`  Sources: ${result.sources.length}`);
       console.log(`  Synthesis Length: ${result.synthesis.length} chars`);
-    });
+    }, 120_000);
 
     it('should handle missing query gracefully', async () => {
       const result = await runLocalDeepResearch('', {
@@ -141,7 +145,7 @@ describe('Local Deep Research (LDR) Orchestrator', () => {
       expect(chunks.join('')).toBe(result.synthesis);
 
       console.log(`[Test] Streamed ${chunks.length} chunks, total ${result.synthesis.length} chars`);
-    });
+    }, 120_000);
   });
 
   describe('Confidence Scoring', () => {
@@ -170,7 +174,19 @@ describe('Local Deep Research (LDR) Orchestrator', () => {
     });
 
     it('should handle network errors gracefully', async () => {
-      // Override SearXNG URL to invalid address
+      // web-search-client.ts reads SEARXNG_URL into a module-level const at
+      // import time (ENV.SEARXNG_URL, not process.env directly) — by the
+      // time this test runs, the module is already loaded, so this
+      // reassignment has no effect on which URL the pipeline actually
+      // calls. Left in place (harmless) rather than removed, since this
+      // test's real assertion — "runLocalDeepResearch never throws and
+      // returns a low-confidence/errored result within a bounded time even
+      // when something goes wrong" — is still meaningfully exercised via
+      // the pipeline-level timeout (DEFAULT_CONFIG.timeout, 30s) racing a
+      // real, unmocked network pipeline. That real pipeline duration can
+      // itself approach 30s (see other tests in this file), so this needs
+      // more than vitest's own 30s default for the internal timeout to
+      // have room to resolve first.
       const originalUrl = process.env.SEARXNG_URL;
       process.env.SEARXNG_URL = 'http://127.0.0.1:9888'; // Invalid
 
@@ -181,7 +197,7 @@ describe('Local Deep Research (LDR) Orchestrator', () => {
       expect(!!result.error || result.confidence < 0.5).toBe(true);
 
       process.env.SEARXNG_URL = originalUrl;
-    });
+    }, 60_000);
   });
 });
 

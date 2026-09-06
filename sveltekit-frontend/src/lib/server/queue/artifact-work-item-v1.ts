@@ -9,6 +9,7 @@ import { taskTypeSchema, type TaskType } from './commands.js';
 export const artifactStorageSchema = z.enum([
   'MMAP',
   'ARROW_IPC',
+  'SEAWEEDFS_S3',
   'POSTGRES',
   'QDRANT',
   'VALKEY',
@@ -36,6 +37,15 @@ export const artifactLocatorSchema = z.discriminatedUnion('storage', [
     storage: z.literal('ARROW_IPC'),
     path: z.string().min(1),
     recordBatch: z.number().int().min(0).optional(),
+  }),
+  z.object({
+    /** SeaweedFS S3 is durable artifact storage; Postgres remains metadata authority. */
+    storage: z.literal('SEAWEEDFS_S3'),
+    bucket: z.string().min(1),
+    objectKey: z.string().min(1),
+    contentType: z.string().min(1).optional(),
+    byteLength: z.number().int().nonnegative().optional(),
+    etag: z.string().min(1).nullable().optional(),
   }),
   z.object({
     storage: z.literal('POSTGRES'),

@@ -50,6 +50,7 @@ vi.mock('$lib/server/env.server.js', () => ({
 		OLLAMA_BASE_URL: 'http://localhost:11434',
 		QDRANT_URL: 'http://localhost:6333',
 		MINIO_ENDPOINT: 'localhost:9000',
+		ROTORQUANT_MODEL_PATH: process.env.ROTORQUANT_MODEL_PATH ?? process.env.TURBO_MODEL_PATH,
 	},
 }));
 

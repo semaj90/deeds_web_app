@@ -1,0 +1,43 @@
+{
+  "schema": "parent-atlas.taxonomy-expansion-searchruntime-shadow.v1",
+  "status": "TAXONOMY_EXPANSION_RETRIEVAL_SHADOW_PROVEN",
+  "scope": "FIXTURE_READ_ONLY",
+  "productionClaim": false,
+  "query": "TurboVec double vote",
+  "expandedQuery": "TurboVec double vote SearchRuntime",
+  "classificationChecksum": "9f8036c828ceefcaafc2aecab4e1bd57860c55f0ede39602a699d1b4e42a14f9",
+  "taxonomyScopeChecksum": "59441d2c84c7d424dbd63f7e34d41ed6a2045ec80a13a79d8b4565fd0e92d8ee",
+  "queryExpansionChecksum": "6a7796562b9222fc09ac12dcab83f713787369d0ceb214477a871e3567f50a1f",
+  "literalTerms": [
+    "double",
+    "TurboVec",
+    "vote"
+  ],
+  "derivedExpansions": [
+    {
+      "term": "SearchRuntime",
+      "source": "SYMBOL",
+      "evidenceRef": "symbol:SearchRuntime",
+      "sourceRevision": "source:shadow-1",
+      "confidence": 0.96
+    }
+  ],
+  "logicalLanes": [
+    "sparse",
+    "dense"
+  ],
+  "semanticLaneCount": 1,
+  "literalLanePreserved": true,
+  "expandedLaneObserved": true,
+  "canonicalWritesPerformed": false,
+  "promotionAttempted": false,
+  "policyTrainingExportAttempted": false,
+  "modelCalls": 0,
+  "evidenceRefs": [
+    "sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/search-runtime-taxonomy-shadow.spec.ts",
+    "sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts"
+  ],
+  "validationCommand": "npx vitest run --config vitest.lane-contracts.config.ts src/lib/server/atlas/agentic-file-compiler/query-fingerprint-v1.spec.ts src/lib/server/atlas/agentic-file-compiler/lexical-fingerprint-v1.spec.ts src/lib/server/atlas/agentic-file-compiler/taxonomy-expansion.spec.ts src/lib/server/atlas/agentic-file-compiler/retrieval-plan.spec.ts src/lib/server/atlas/agentic-file-compiler/search-runtime-taxonomy-shadow.spec.ts src/lib/server/atlas/rlm/rlm-search-adapter.spec.ts",
+  "testsPassed": 16,
+  "createdAt": "2026-09-06"
+}

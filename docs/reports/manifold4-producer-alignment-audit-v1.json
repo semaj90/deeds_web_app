@@ -1,0 +1,71 @@
+{
+  "schema": "atlas.manifold4-producer-alignment-audit.v1",
+  "status": "MAN4_PRODUCER_ALIGNMENT_BLOCKED",
+  "observedAt": "2026-09-06T06:15:20.648Z",
+  "owner": "parent-atlas-candidate-feature-execution-fabric",
+  "contract": "sveltekit-frontend/src/lib/server/atlas/features/manifold4-orientation-v1.ts",
+  "sourceArtifact": {
+    "path": "models/som/som_assignments.json",
+    "present": true,
+    "timestamp": "2026-07-28T23:55:37.851Z",
+    "declaredPacketCount": 32310,
+    "assignmentCount": 32310,
+    "assignmentFields": [
+      "col",
+      "distance",
+      "row"
+    ],
+    "requiredRevisionQualifiedFieldsMissing": [
+      "candidateOrdinal",
+      "canonicalId",
+      "workspaceRevision",
+      "sourceRevision",
+      "featureRevision",
+      "producerRevision",
+      "quaternion",
+      "evidenceRefs"
+    ],
+    "keyShapeCounts": {
+      "uuid-shaped": 32310
+    }
+  },
+  "producerFindings": [
+    {
+      "path": "scripts/atlas/train-som-20x20.mjs",
+      "present": true,
+      "writesPostgres": true,
+      "writesValkey": false,
+      "syntheticProjection": false,
+      "mentionsRevision": false
+    },
+    {
+      "path": "scripts/atlas/compute-som-centroids.mjs",
+      "present": true,
+      "writesPostgres": false,
+      "writesValkey": true,
+      "syntheticProjection": false,
+      "mentionsRevision": false
+    },
+    {
+      "path": "scripts/atlas/project-codebase-topology.mjs",
+      "present": true,
+      "writesPostgres": false,
+      "writesValkey": false,
+      "syntheticProjection": true,
+      "mentionsRevision": false
+    }
+  ],
+  "decision": {
+    "safeToWireExistingProducer": false,
+    "reasonCodes": [
+      "SOM_ASSIGNMENTS_PACKET_KEYED_NOT_CANDIDATE_ORDINAL_KEYED",
+      "SOM_ASSIGNMENTS_MISSING_REVISION_AND_EVIDENCE_FIELDS",
+      "EXISTING_PRODUCERS_INCLUDE_WRITE_CAPABLE_PATHS",
+      "TOPOLOGY_PROJECTOR_INCLUDES_SYNTHETIC_MANIFOLD4"
+    ],
+    "noDatastoreWritesAttempted": true,
+    "noIdentityPromotionAttempted": true
+  },
+  "nextGate": "MAN4-05 requires a revision-qualified producer receipt or an explicitly bounded adapter input with exact CandidateOrdinal/source joins.",
+  "productionClaim": false
+}

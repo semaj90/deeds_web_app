@@ -14,6 +14,16 @@ const mockQdrantUpsert = vi.fn();
 const mockDeterministicPointId = vi.fn((v: string) => `point-${v}`);
 const mockCallOllamaChat = vi.fn();
 const mockOllamaFetch = vi.fn();
+
+// LLM_MODEL_ID (runtime-contract.ts) is basename(ROTORQUANT_MODEL_PATH) with no
+// LLAMA_SERVER_MODEL override in this file's env.server.js mock — compute the
+// real value rather than hardcoding a model name that goes stale when the
+// configured model changes.
+const EXPECTED_LLM_MODEL_ID = (() => {
+	const modelPath = process.env.ROTORQUANT_MODEL_PATH ?? process.env.TURBO_MODEL_PATH ?? '';
+	const base = modelPath.split(/[\\/]/).pop();
+	return base && base.length > 0 ? base : 'unknown-model';
+})();
 const mockSetCache = vi.fn();
 const mockCognitiveCache = { get: vi.fn(), set: vi.fn(), getJsonbDocument: vi.fn() };
 const mockSearchSimilarErrors = vi.fn();
@@ -37,6 +47,7 @@ vi.mock('$lib/server/env.server.js', () => ({
 	ENV: {
 		OLLAMA_BASE_URL: 'http://ollama.test',
 		QDRANT_URL: 'http://qdrant.test',
+		ROTORQUANT_MODEL_PATH: process.env.ROTORQUANT_MODEL_PATH ?? process.env.TURBO_MODEL_PATH,
 	},
 }));
 
@@ -60,6 +71,7 @@ vi.mock('$lib/server/ollama.js', () => ({
 	getEmbeddingModelKeepAlive: () => '24h',
 	getChatModel: () => 'gemma4-rotorquant:latest',
 	getEmbedModel: () => 'embeddinggemma:latest',
+	getOllamaGenerationEndpoint: () => 'http://ollama.test',
 	callOllamaChat: mockCallOllamaChat,
 	ollamaFetch: mockOllamaFetch,
 }));
@@ -280,7 +292,7 @@ describe('POST /api/error-brain/generate-fix', () => {
 		expect(body.fix).toBeDefined();
 		expect(body.fix.fixedCode).toBeTruthy();
 		expect(body.metadata).toBeDefined();
-		expect(body.metadata.model).toBe('gemma4-rotorquant:latest');
+		expect(body.metadata.model).toBe(EXPECTED_LLM_MODEL_ID);
 	});
 
 	it('handles Ollama failure gracefully', async () => {

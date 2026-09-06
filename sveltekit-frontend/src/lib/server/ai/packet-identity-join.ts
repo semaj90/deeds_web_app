@@ -20,12 +20,14 @@ function uniqueStrings(values: Array<string | null | undefined>): string[] {
   ];
 }
 
-export function readPacketKey(candidate: PacketIdentityJoinCandidate): string | null {
+export function readPacketKey(candidate: PacketIdentityJoinCandidate | null | undefined): string | null {
+  if (!candidate) return null;
   const value = candidate.packetKey ?? candidate.packet_key ?? null;
   return typeof value === 'string' && value.trim().length > 0 ? value.trim() : null;
 }
 
-export function readSourceRef(candidate: PacketIdentityJoinCandidate): string | null {
+export function readSourceRef(candidate: PacketIdentityJoinCandidate | null | undefined): string | null {
+  if (!candidate) return null;
   const value =
     candidate.sourceRef ?? candidate.source_ref ?? candidate.filePath ?? candidate.stableKey ?? null;
   return typeof value === 'string' && value.trim().length > 0 ? value.trim() : null;

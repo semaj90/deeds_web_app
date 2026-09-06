@@ -183,6 +183,7 @@
     "atlas:ast:incremental:proof": "tsx ../scripts/atlas/prove-ast-incremental-extraction.mts",
     "atlas:graphify:structural:batch:proof": "tsx scripts/atlas/prove-graphify-structural-batch-integration.mts",
     "atlas:graphify:ast:owner:proof": "tsx ../scripts/atlas/prove-graphify-ast-owner.mts",
+    "atlas:rf6:semantic:live:readonly": "npx tsx ../scripts/atlas/prove-rf6-semantic-live-readonly-v1.mjs",
     "atlas:graphify:qas:proof": "tsx ../scripts/atlas/prove-query-adaptive-sampling.mts --fixture",
     "atlas:graphify:qas:daily": "tsx ../scripts/atlas/prove-query-adaptive-sampling.mts --daily",
     "atlas:graphify:qas:input:adapt": "tsx ../scripts/atlas/adapt-qas-candidate-input.mts",
@@ -1605,6 +1606,7 @@
   },
   "devDependencies": {
     "@ast-grep/cli": "0.42.3",
+    "@sveltejs/adapter-node": "5.4.0",
     "@sveltejs/kit": "^2.0.0",
     "@sveltejs/vite-plugin-svelte": "5.1.1",
     "@tailwindcss/language-server": "0.14.29",

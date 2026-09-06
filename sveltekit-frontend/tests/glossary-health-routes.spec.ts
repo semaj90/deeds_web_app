@@ -30,6 +30,7 @@ vi.mock('$lib/server/env.server.js', () => ({
     GO_SEARCH_GRPC_URL: 'localhost:50051',
     RABBITMQ_URL: 'amqp://localhost:5672',
     DATABASE_URL: 'postgresql://localhost:5432/test',
+    ROTORQUANT_MODEL_PATH: process.env.ROTORQUANT_MODEL_PATH ?? process.env.TURBO_MODEL_PATH,
     COUCHDB_URL: 'http://admin:pass@localhost:5984',
     NEO4J_URI: 'bolt://localhost:7687',
     MINIO_ENDPOINT: 'localhost',
@@ -352,16 +353,31 @@ describe('GET /api/health', () => {
 	});
 
 	it('handles degraded state when services are down', async () => {
+		// getParentAtlasRuntimeProfileManifest() resolves the 'ci_fixture'
+		// profile whenever NODE_ENV==='test' (vitest's default) — and every
+		// service is 'optional' under that profile by design, so a required
+		// service being down never flips coreOk to false. Force 'development'
+		// (ollama + postgres 'required') so this test can actually exercise
+		// the degraded branch; runtime-profile.ts's own manifest picks it up
+		// via process.env at call time (no module mock needed).
+		const savedProfile = process.env.PARENT_ATLAS_RUNTIME_PROFILE;
+		process.env.PARENT_ATLAS_RUNTIME_PROFILE = 'development';
+
 		// Mock fetch to fail (services unreachable)
 		vi.stubGlobal('fetch', vi.fn(async () => {
 			throw new Error('Connection refused');
 		}));
 
-		const event = makeRequest('GET', undefined, {}, new URLSearchParams());
-		event.url = new URL('http://localhost:5173/api/health');
-		const res = await GET(event);
-		expect(res.status).toBe(200);
-		const body = await res.json();
-		expect(body.status).toBe('degraded');
+		try {
+			const event = makeRequest('GET', undefined, {}, new URLSearchParams());
+			event.url = new URL('http://localhost:5173/api/health');
+			const res = await GET(event);
+			expect(res.status).toBe(200);
+			const body = await res.json();
+			expect(body.status).toBe('degraded');
+		} finally {
+			if (savedProfile === undefined) delete process.env.PARENT_ATLAS_RUNTIME_PROFILE;
+			else process.env.PARENT_ATLAS_RUNTIME_PROFILE = savedProfile;
+		}
 	});
 });

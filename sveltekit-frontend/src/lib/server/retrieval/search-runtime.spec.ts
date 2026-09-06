@@ -20,6 +20,10 @@ const { mockRecordPromotionIntent } = vi.hoisted(() => ({
   mockRecordPromotionIntent: vi.fn(),
 }));
 
+const { mockAppendSearchRuntimeTrainingRow } = vi.hoisted(() => ({
+  mockAppendSearchRuntimeTrainingRow: vi.fn(),
+}));
+
 const { mockReadKagHypergraphNeighborsV1 } = vi.hoisted(() => ({
   mockReadKagHypergraphNeighborsV1: vi.fn(),
 }));
@@ -41,12 +45,19 @@ vi.mock('./promote-results-outbox.js', () => ({
   recordPromotionIntent: mockRecordPromotionIntent,
 }));
 
+vi.mock('../atlas/policy/policy-training.js', () => ({
+  appendSearchRuntimeTrainingRow: mockAppendSearchRuntimeTrainingRow,
+}));
+
 vi.mock('../atlas/integration/kag-hypergraph-reader-v1.js', () => ({
   readKagHypergraphNeighborsV1: mockReadKagHypergraphNeighborsV1,
 }));
 
 import { createSearchRuntime } from './search-runtime.js';
 import type { SearchResult } from './search-runtime.js';
+import { classifyAtlasQuery } from '../atlas/agentic-file-compiler/query-classifier.js';
+import { compileTaxonomyScopeV1 } from '../atlas/agentic-file-compiler/taxonomy-scope-v1.js';
+import { buildQueryExpansionBundleV1 } from '../atlas/agentic-file-compiler/query-expansion-v1.js';
 
 describe('search runtime bridge', () => {
   beforeEach(() => {
@@ -59,6 +70,8 @@ describe('search runtime bridge', () => {
     mockHydrateCandidates.mockReset();
     mockHydrateCandidatesWithProof.mockReset();
     mockRecordPromotionIntent.mockReset();
+    mockAppendSearchRuntimeTrainingRow.mockReset();
+    mockAppendSearchRuntimeTrainingRow.mockResolvedValue({});
     mockReadKagHypergraphNeighborsV1.mockReset();
     mockReadKagHypergraphNeighborsV1.mockResolvedValue({
       requestedCanonicalIds: 0,
@@ -443,6 +456,144 @@ describe('search runtime bridge', () => {
         { includeVectorLanes: true }
       );
     }
+  });
+
+  it('runs a read-only literal-versus-taxonomy shadow with one semantic lane', async () => {
+    const query = 'TurboVec double vote';
+    const classification = classifyAtlasQuery({ requestId: 'shadow-1', query });
+    const scope = compileTaxonomyScopeV1({
+      classification,
+      workspaceRevision: 'workspace:shadow-1',
+      taxonomyRevision: 'taxonomy:shadow-1',
+      ontologyRevision: 'ontology:shadow-1',
+      knownFeatures: [{ id: 'retrieval.semantic', aliases: ['semantic'] }],
+    });
+    const expansion = buildQueryExpansionBundleV1({
+      scope,
+      literalTerms: query.split(/\s+/),
+      candidates: [{
+        term: 'SearchRuntime',
+        normalized: '',
+        source: 'SYMBOL',
+        evidenceRef: 'symbol:SearchRuntime',
+        sourceRevision: 'source:shadow-1',
+        confidence: 0.96,
+      }],
+    });
+    const expandedQuery = [query, ...expansion.expansions.map((term) => term.term)].join(' ');
+    const observedQueries: string[] = [];
+
+    mockRecordPromotionIntent.mockReset();
+    mockAppendSearchRuntimeTrainingRow.mockReset();
+    mockReadKagHypergraphNeighborsV1.mockReset();
+    mockReadKagHypergraphNeighborsV1.mockResolvedValue({
+      requestedCanonicalIds: 0,
+      matchedTuples: 0,
+      matchedHyperedges: 0,
+      neighbors: [],
+    });
+    mockHydrateCandidatesWithProof.mockImplementation(async (candidates: any[]) => {
+      const envelopes = candidates.map((candidate) => ({
+        packet_key: candidate.packetKey,
+        chunk_id: candidate.packetKey,
+        source_ref: candidate.sourceRef,
+        relative_path: candidate.sourceRef,
+        summary: `summary:${candidate.packetKey}`,
+        content: `content:${candidate.packetKey}`,
+        dense: { score: candidate.score },
+        metadata: { score: candidate.score },
+      }));
+      return {
+        envelopes,
+        proof: {
+          canonicalJoinedCount: envelopes.length,
+          canonicalJoinMissingCount: 0,
+          workspaceRejectedCount: 0,
+          workspaceRevisionRejectedCount: 0,
+          sourceRevisionRejectedCount: 0,
+          representationRejectedCount: 0,
+          representationRevisionRejectedCount: 0,
+          graphScoreAttachedCount: 0,
+          graphScoreMissingCount: envelopes.length,
+          summaryResolvedCount: envelopes.length,
+          summaryStaleRejectedCount: 0,
+          validationReasons: {},
+        },
+      };
+    });
+    mockRerankCanonicalFeatureEnvelopes.mockImplementation(async (_text: string, envelopes: any[]) => ({
+      results: envelopes.map((envelope, index) => ({
+        ...envelope,
+        model_version: 'shadow-reranker',
+        blended_score: 1 - index / 100,
+      })),
+      provenance: {
+        cacheStatus: 'miss',
+        cacheKey: 'shadow-rerank-v1',
+        modelVersion: 'shadow-reranker',
+        rendererVersion: 'search-runtime-v1',
+        authScope: 'shadow',
+        topK: envelopes.length,
+        maxLength: 2048,
+        crossEncoderAttempted: false,
+        crossEncoderUsed: false,
+        fallbackUsed: true,
+        latencyMs: 0,
+      },
+    }));
+
+    const makeRetriever = (lane: 'sparse' | 'dense') => ({
+      lane,
+      async retrieve(input: { query: string; limit: number; filters?: Record<string, unknown> }) {
+        observedQueries.push(`${lane}:${input.query}`);
+        const candidates = [{
+          packetKey: `${lane}-shared`,
+          sourceRef: `src/${lane}-shared.ts`,
+          rank: 1,
+          score: 0.9,
+          lane,
+          metadata: { summary: `${lane} summary`, content: `${lane} content` },
+        }];
+        if (lane === 'dense' && input.query.includes('SearchRuntime')) {
+          candidates.push({
+            packetKey: 'dense-expanded',
+            sourceRef: 'src/search-runtime.ts',
+            rank: 2,
+            score: 0.8,
+            lane,
+            metadata: { summary: 'expanded summary', content: 'expanded content' },
+          });
+        }
+        return candidates;
+      },
+    });
+
+    const runtime = createSearchRuntime({
+      userId: 'shadow-user',
+      readOnly: true,
+      retrievers: [makeRetriever('sparse'), makeRetriever('dense')],
+    });
+    const baseRequest = {
+      topK: 5,
+      workspaceId: 'workspace-shadow',
+      workspaceRevision: 'sha256:' + '1'.repeat(64),
+      representationId: 'semantic_768',
+      representationRevision: 1,
+    };
+    const literalResult = await runtime.search({ ...baseRequest, text: query });
+    const expandedResult = await runtime.search({ ...baseRequest, text: expandedQuery });
+
+    expect(expansion.literalTerms).toContain('TurboVec');
+    expect(observedQueries.filter((value) => value.startsWith('dense:'))).toHaveLength(2);
+    expect(observedQueries.some((value) => value === `sparse:${query}`)).toBe(true);
+    expect(observedQueries.some((value) => value === `dense:${expandedQuery}`)).toBe(true);
+    expect(literalResult.provenance.readOnly).toBe(true);
+    expect(expandedResult.provenance.readOnly).toBe(true);
+    expect(literalResult.provenance.promotionAttempted).toBe(false);
+    expect(expandedResult.provenance.promotionAttempted).toBe(false);
+    expect(mockRecordPromotionIntent).not.toHaveBeenCalled();
+    expect(mockAppendSearchRuntimeTrainingRow).not.toHaveBeenCalled();
+    expect(expandedResult.packets.some((packet: any) => packet.packet_key === 'dense-expanded')).toBe(true);
   });
 });
 

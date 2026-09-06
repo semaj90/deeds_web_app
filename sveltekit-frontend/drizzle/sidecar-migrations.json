@@ -2,6 +2,24 @@
   "_comment": "Manual sidecar SQL migrations applied outside drizzle-kit _journal.json. Listed here so audit-contract-map.mjs treats them as documented_sidecar (WARN) rather than unknown_unjournaled_sql (FAIL).",
   "sidecars": [
     {
+      "file": "manual/20260906_ai_observability_contract_repair.sql",
+      "status": "applied",
+      "reason": "Additive repair for the facade's intent evaluation table and missing llm_synthesis_events routing_hints column. No drops, rewrites, or global Drizzle ledger repair.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-09-06",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -P pager=off -c \"SELECT table_name,column_name FROM information_schema.columns WHERE table_schema='public' AND table_name IN ('intent_eval_runs','llm_synthesis_events') ORDER BY table_name,ordinal_position;\""
+    },
+    {
+      "file": "manual/20260906_semantic_768_metadata_reconciliation.sql",
+      "status": "planned_sidecar",
+      "reason": "Corrects the stale codebase_chunk_index embedding_dimension default from 384 to 768 and adds a NOT VALID future-write guard for the canonical content_embedding halfvec(768) lane. No row rewrite, vector backfill, legacy-column drop, or projection mutation. Apply only after the read-only preflight receipt and migration authorization.",
+      "appliedBy": null,
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "validationCommand": "node scripts/atlas/prove-semantic-768-metadata-reconciliation-v1.mjs"
+    },
+    {
       "file": "manual/20260903_graphify_execution_ledger_v1.sql",
       "status": "applied",
       "reason": "Additive Graphify execution identity, immutable execution-source membership, and stage lifecycle ledger. Historical graphify_runs remains compatibility state; apply only for the bounded coordinator canary before any broad run.",

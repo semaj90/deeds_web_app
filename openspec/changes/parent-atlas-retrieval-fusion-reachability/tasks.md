@@ -43,8 +43,21 @@ These are separate paths, not one proven nested call chain. The route checks
   RRF contribution regardless of Qdrant/TurboVec executor count. Distinct hydrated
   chunks and source revisions remain separate; equal-score executor ties replay
   deterministically. No datastore, cache, model, or endpoint writes occurred.
-- [ ] RF6-SEMANTIC-REPLAY-01 run a bounded read-only production-spine replay with
+- [x] RF6-SEMANTIC-REPLAY-01 run a bounded read-only production-spine replay with
   both semantic executors; no promotion, exposure, ledger, cache, or model writes.
+  **PROVEN 2026-09-06** by the direct-owner replay
+  `scripts/atlas/prove-rf6-semantic-live-readonly-v1.mjs`, which deliberately
+  bypasses `/api/search/rrf` because that route writes `rrf:query_counts` and
+  `rrf:query:{hash}` analytics. The real
+  `rrf-integration.ts::multiLaneRetrievalWithRRF` path returned Qdrant=1 and
+  TurboVec=7 live candidates. Three returned candidates carried semantic support;
+  all reconstructed to exactly one logical semantic RRF contribution, with zero
+  vote violations. Read-only mode suppresses embedding-cache writeback and skips
+  the optional Gemma/Bifrost concept-enrichment branch. PostgreSQL tuple-write
+  stats were unchanged; relevant Valkey key/type/value fingerprints were
+  unchanged; Qdrant, Neo4j, and model writes were not performed. Receipt:
+  `docs/reports/rf6-semantic-live-readonly-replay-v1.json`. Focused regressions
+  (`rrf-canonical-identity.test.ts`, `rf6-live-replay-01.test.ts`) also pass 17/17.
 
 No endpoint invocation, datastore projection, or RF7 closure is authorized by this addendum.
 The bounded SearchRuntime fusion correction above is the explicitly scoped RF6 runtime change.
@@ -218,17 +231,31 @@ that runtime delegation or RF6 semantic replay is complete.
       was added by completing this inventory. Per the agreed sequencing, this clears the way to
       begin RF4 (shared identity resolver extraction) without risk of a 6th live pipeline
       surfacing mid-extraction.
-- [ ] Trace `search-lanes.ts` lane implementations' own identity-assignment code — where
-      `service.ts`'s candidates get `symbol_version_id`/`packet_key`/`id` set, before they reach
-      `service.ts::rrfFusion`. (Still open — separate from RTO1, tracks the `service.ts` pipeline
-      specifically, not blocking RF4 since RF4 targets the canonical spine first.)
-- [ ] Read `unified-orchestrator.ts::qdrantSearch()`/`turbovecSearch()` internals (lines
-      ~653-670+, not read in the route census pass) — confirm identity origin before
-      `buildRrfLaneMap` receives hits.
-- [ ] Read `multi-vector-orchestrator.ts` and `cache-layers-orchestrator.ts` — referenced by type
-      import in `go-retrieval-facade.ts`, never opened.
-- [ ] Read the exact `SearchMetadataFilter -> SearchFilter` conversion code inside
-      `go-retrieval-facade.ts::executeGoRetrievalSearch` (lines 446-572) line-by-line.
+- [x] **AUDITED 2026-09-06 — identity gap retained as an open delegation finding.** `search-lanes.ts`
+      assigns Qdrant packet/source/revision fields from payload, but `GpuCuvSLane` returns only a
+      backend-local index and the lexical/BM25 lanes omit a complete revision-qualified identity.
+      `service.ts::joinPostgres` enriches some Qdrant results after fetch, while
+      `service.ts::rrfFusion` still scores by `result.id` and final dedup falls back through
+      `symbol_version_id ?? packet_key ?? id`. This confirms the service path needs a canonical
+      envelope/delegation decision; no lane-name heuristic was applied.
+- [x] **AUDITED 2026-09-06 — identity gap retained as an open delegation finding.**
+      `unified-orchestrator.ts::qdrantSearch()` requests packet/source/source-revision/workspace
+      payload fields, but `turboVecPrefilter()` returns only `id`, `score`, and `rank`.
+      `buildRrfLaneMap()` therefore receives a backend-local TurboVec identity and
+      `rankCandidates()` can construct a complete envelope only for Qdrant-backed hits. The
+      `combineRRFLanes` owner remains open pending a revision-qualified cross-executor envelope.
+- [x] **AUDITED 2026-09-06 — separate representation-lane owner retained.**
+      `multi-vector-orchestrator.ts` rejects hits without packet/source identity and preserves the
+      Qdrant point ID, then fuses content, summary, title, and keyword representation lanes via
+      `rrf-multi-vector.ts`. `cache-layers-orchestrator.ts` measures direct/adapter/exact/semantic
+      cache decisions; its telemetry writer is a separate cache-observation path, not a canonical
+      fusion owner. No delegation or lane collapse was claimed from this read-only trace.
+- [x] **AUDITED 2026-09-06 — conversion behavior recorded.**
+      `go-retrieval-facade.ts::normalizeRequest()` maps the first source/path/language/domain
+      filter values into `SearchFilter`, retains the broader arrays in `jsonb_contains`, keeps lane
+      selection outside filters, and assigns the per-lane limit. It does not add source or
+      workspace revision authority; the downstream unified orchestrator remains responsible for
+      canonical identity validation. No schema or filter-owner change was made here.
 - [x] Validation commands run:
   - `rg -n "from '\.\./retrieval/fuse-candidates|from '\./fuse-candidates|from.*multi-signal-retriever|multiSignalRetriever|MultiSignalRetriever|from.*retrieval-fusion-rrf|rrfMergeMultipleLanes|rrfMergeDenseQdrant" sveltekit-frontend/src`
     → confirmed only `hydrate-candidates.ts`'s type-only import; no functional callers for any of the 3 files.`
@@ -294,19 +321,29 @@ This is the highest-value fix: it protects real production traffic through
       guard keeps the first (best, since `sourceCards` sorts best-first) occurrence's rank.
       Proven in `search-runtime-fusion.test.ts` — asserts the fused score matches the best-rank
       RRF component (`1/(60+1)`), not the worst-rank one (`1/(60+2)`).
-  - Note: `combineViaRRF` (`rrf-combiner.ts`, the `/api/search/rrf` pipeline) has the OPPOSITE,
-    more severe bug — it doesn't dedupe within a lane at all, it sums every occurrence's
-    `rrfComponent` unconditionally (documented, not yet fixed, in
-    `rrf-canonical-identity.test.ts`'s "ONE lane produces two votes" test). These are two
-    different bugs in two different pipelines; fixing one does not fix the other.
+  - Note: `combineViaRRF` (`rrf-combiner.ts`, the `/api/search/rrf` pipeline) had the
+    corresponding repeated-projection and cross-executor vote-inflation defect. It is now
+    covered by the 2026-09-06 RF6 fix below: one best contribution per logical lane, with
+    physical executor support retained as provenance. These remain separate bugs in two
+    different pipelines; fixing one does not fix the other.
 - [x] `laneEvidence` retention — **PROVEN 2026-09-05** as part of
       `RF6-SEMANTIC-VOTE-01`. Each fused logical lane records `bestRank`, `bestScore`,
       `supportingHitCount`, `supportingBackendIds`, `executorIds`, and contributing
       score sources. The lane contributes exactly once; executor multiplicity remains
       evidence only. Report: `docs/reports/rf6-semantic-vote-proof-v1.json`.
-- [ ] `combineViaRRF`'s cross-lane, same-lane-double-vote bug (distinct from the within-lane
-      ranking bug just fixed) — not yet fixed. Tracked under RF6 for the `/api/search/rrf` pipeline.
+- [x] `combineViaRRF`'s cross-executor, same-logical-lane double-vote bug (distinct from the
+      within-lane ranking bug just fixed) — **fixed 2026-09-06**. `qdrant_vector` and
+      `turbovec_ann` now collapse to one `semantic` vote per identity while retaining both
+      physical lanes in `sources`/`breakdown` as provenance. Regression coverage asserts the
+      score is the stronger single contribution, not the sum. Focused RF6 tests pass; this does
+      not change the separate `unified-orchestrator.ts::combineRRFLanes` owner. No datastore or
+      projection writes were performed.
 - [ ] Apply the equivalent fix to `unified-orchestrator.ts`'s `combineRRFLanes` — NOT started (RF6).
+      **Pending contract/owner work:** its current `rrf-combiner-utils.ts` input is a plain
+      `Map<string, hits>` with caller-provided IDs and lane names, without the revision-qualified
+      canonical identity envelope required to distinguish executor aliases from distinct entities.
+      Existing compatibility coverage still passes `7/7` (`unified-orchestrator.spec.ts` and
+      `rrf-split.test.ts`) on 2026-09-06; that is not evidence to apply a lane-name heuristic here.
 - [x] **RF5 live trace attempted (2026-08-08) — surfaced a real bug in the RF4 fix itself, not
       yet corrected.** Traced `codebase_chunk_index.id = 8a56e975-ae96-4102-813c-894de6d8975a`
       (`source_ref = src/routes/api/reports/generate/+server.ts`, canonical

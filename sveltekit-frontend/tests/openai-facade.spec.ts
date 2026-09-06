@@ -2,6 +2,21 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import type { AceHmmMeta, RetrievalTrace } from '$lib/server/ai/openai-types.js';
 
+// This file doesn't mock $lib/server/env.server.js, so LLM_MODEL_ID
+// (runtime-contract.ts) resolves from the real .env: ENV.LLAMA_SERVER_MODEL
+// if set, else basename(ROTORQUANT_MODEL_PATH). 'yorha-legal'/'yorha-*'
+// requests resolve to this same value via resolveInternalModel() in
+// openai-facade.ts. Compute it the same way rather than hardcoding the old
+// Ollama-era 'gemma4-rotorquant:latest' string, which goes stale whenever
+// the configured model changes (as it already has — this repo is on Ornith
+// 1.5 now, not Gemma4, per CLAUDE.md's Ollama Phase-Out section).
+const EXPECTED_INTERNAL_MODEL = (() => {
+  if (process.env.LLAMA_SERVER_MODEL) return process.env.LLAMA_SERVER_MODEL;
+  const modelPath = process.env.ROTORQUANT_MODEL_PATH ?? process.env.TURBO_MODEL_PATH ?? '';
+  const base = modelPath.split(/[\\/]/).pop();
+  return base && base.length > 0 ? base : 'unknown-model';
+})();
+
 // Mock the heavy deps so this is a unit test on the facade orchestration,
 // not a full integration test (the route handler test covers wiring).
 const mocks = vi.hoisted(() => ({
@@ -36,8 +51,14 @@ vi.mock('$lib/server/cache-keys.js', () => ({
     // Replicate the real logic: replace ace:packet: with ace:completion: and append query hash
     return packetKey.replace('ace:packet:', 'ace:completion:') + `:${queryHash}`;
   },
-  buildAcePacketCacheKey: (input: any) => 'ace:packet:mock',
-  hashStr: (input: string) => 'hash_mock',
+  // Input-sensitive stubs — several tests assert that the completion cache
+  // key VARIES when history/context/routing labels change (it must, so
+  // different conversations don't collide on one cached answer). A flat
+  // 'ace:packet:mock' / 'hash_mock' constant defeated that on purpose for
+  // every other test's convenience, but silently made those variance
+  // assertions untestable (same key in, same key out, always).
+  buildAcePacketCacheKey: (input: any) => `ace:packet:mock:${JSON.stringify(input)}`,
+  hashStr: (input: string) => `hash_mock:${String(input)}`,
   generateCacheKey: (input: string) => 'cache:key:mock',
   TTL: { ACE_PROMPT: 86400 },
 }));
@@ -151,12 +172,12 @@ describe('openai-facade — runChatCompletion', () => {
     expect(res.choices).toHaveLength(1);
     expect(res.choices[0].message.content).toBe('Test response');
     expect(res.choices[0].finish_reason).toBe('stop');
-    expect(res.model).toBe('gemma4-rotorquant:latest'); // mapped from yorha-legal
+    expect(res.model).toBe(EXPECTED_INTERNAL_MODEL); // mapped from yorha-legal
     expect(mocks.setExactMatchCache).toHaveBeenCalledWith(
       expect.stringMatching(/^ace:completion:/),
       expect.objectContaining({
         content: 'Test response',
-        model: 'gemma4-rotorquant:latest',
+        model: EXPECTED_INTERNAL_MODEL,
         backend: 'openai-facade',
       }),
       86400
@@ -267,6 +288,8 @@ describe('openai-facade — runChatCompletion', () => {
     expect(res.choices[0].message.content).toBe('Raw response');
     expect(mocks.assembleACEContext).not.toHaveBeenCalled();
     expect(res.yorha?.aceUsed).toBe(false);
+    expect(res.yorha?.selectedLane).toBe('bifrost');
+    expect(res.yorha?.inferenceLane).toBe('bifrost');
   });
 
   it('calls ace.compact_search via MCP and injects compact hits into ACE context when use_mcp is true', async () => {
@@ -466,6 +489,7 @@ describe('openai-facade — runChatCompletion', () => {
 
     expect(res.yorha?.codeLlmHit).toBe(true);
     expect(res.yorha?.cacheHit).toBe('prior-answer');
+    expect(res.model).toBe(EXPECTED_INTERNAL_MODEL);
   });
 
   it('routes coding prompts through the agent path and populates yorha.toolsUsed', async () => {
@@ -604,6 +628,15 @@ describe('openai-facade — POST /api/v1/chat/completions handler', () => {
     mocks.buildDevContextPlan.mockResolvedValue(undefined);
     mocks.isCodingPrompt.mockReturnValue(false);
     mocks.turboQuantChat.mockRejectedValue(new Error('TurboQuant unavailable'));
+    // This describe block must not depend on the sibling "runChatCompletion"
+    // describe block's beforeEach having already configured these — that
+    // cross-describe mock-state leakage broke as soon as vitest's actual
+    // run order/isolation changed and produced "Cannot read properties of
+    // undefined (reading 'catch')" from the unconfigured storeScenario().
+    mocks.lookupScenario.mockReset();
+    mocks.lookupScenario.mockResolvedValue(null);
+    mocks.storeScenario.mockReset();
+    mocks.storeScenario.mockResolvedValue(undefined);
   });
 
   it('returns 401 without locals.user', async () => {

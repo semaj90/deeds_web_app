@@ -1,0 +1,45 @@
+{
+  "schema": "atlas.candidate-feature-gemm-current-proof.v1",
+  "status": "CPU_GEMM_REFERENCE_PROVEN",
+  "observedAt": "2026-09-06",
+  "owner": "parent-atlas-candidate-feature-execution-fabric",
+  "implementation": "sveltekit-frontend/src/lib/server/atlas/features/candidate-feature-gemm-v1.ts",
+  "test": "sveltekit-frontend/src/lib/server/atlas/features/candidate-feature-gemm-v1.spec.ts",
+  "featureCount": 12,
+  "featureWidthAuthority": "CANDIDATE_SCALAR_FEATURES",
+  "ordinalKey": "CandidateOrdinal",
+  "revisionBoundInputs": [
+    "candidateSnapshotRevision",
+    "ordinalMapChecksum",
+    "featureSnapshotChecksum",
+    "workspaceRevision",
+    "featureRevision"
+  ],
+  "receiptFields": [
+    "inputChecksum",
+    "scoreChecksum",
+    "producerRevision"
+  ],
+  "canonicalAuthority": false,
+  "canonicalOwnerChanged": false,
+  "canonicalWritesAttempted": false,
+  "focusedTests": {
+    "command": "npx vitest run --config vitest.lane-contracts.config.ts src/lib/server/atlas/features",
+    "testFiles": 11,
+    "testFilesPassed": 11,
+    "testsPassed": 49,
+    "testsFailed": 0
+  },
+  "abiAlignment": {
+    "arrowSerializer": "scripts/atlas/write-candidate-feature-arrow.mjs",
+    "featureWidth": 12,
+    "staleWidthRemoved": 13
+  },
+  "notProven": [
+    "native CUDA/LibTorch/cuBLAS GEMM parity",
+    "production GPU residency",
+    "live AST/compiler/ontology/latent producer alignment",
+    "corpus-scale feature coverage"
+  ],
+  "productionClaim": false
+}

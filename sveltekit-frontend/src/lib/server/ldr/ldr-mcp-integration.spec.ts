@@ -70,7 +70,7 @@ describe('LDR MCP Tool Integration', () => {
       expect(output.metadata).toHaveProperty('executedAt');
       expect(output.metadata).toHaveProperty('durationMs');
       expect(typeof output.metadata.durationMs).toBe('number');
-    });
+    }, 120_000);
 
     it('should handle missing query gracefully', async () => {
       const input: LDRToolInput = { query: '' };
@@ -96,7 +96,7 @@ describe('LDR MCP Tool Integration', () => {
         expect(formatted).toContain('**Query Duration**');
         expect(formatted).toContain('**Confidence**');
       }
-    });
+    }, 120_000);
 
     it('should include error message when research fails', async () => {
       const input: LDRToolInput = { query: '' };
@@ -128,7 +128,7 @@ describe('LDR MCP Tool Integration', () => {
       expect(mcpResponse.content[0].type).toBe('text');
       expect(typeof mcpResponse.content[0].text).toBe('string');
       expect(typeof mcpResponse.isError).toBe('boolean');
-    });
+    }, 120_000);
 
     it('should set isError flag correctly on success', async () => {
       const input: LDRToolInput = {
@@ -145,7 +145,7 @@ describe('LDR MCP Tool Integration', () => {
       if (output.success) {
         expect(mcpResponse.isError).toBe(false);
       }
-    });
+    }, 120_000);
 
     it('should set isError flag correctly on failure', async () => {
       const input: LDRToolInput = { query: '' };

@@ -1,0 +1,81 @@
+{
+  "schema": "parent-atlas.query-feature-owner-audit.v1",
+  "status": "QUERY_FEATURE_OWNER_AUDIT_PROVEN",
+  "scope": "READ_ONLY_LIVE_SCHEMA_AND_STATIC_CALLER_AUDIT",
+  "observedAt": "2026-09-06",
+  "owners": {
+    "queryNormalization": [
+      {
+        "owner": "sveltekit-frontend/src/lib/server/ace/ace-query-packet.ts::normalizeQueryText",
+        "behavior": "trim, lowercase, collapse whitespace",
+        "authority": "derived query/hash compatibility helper"
+      },
+      {
+        "owner": "sveltekit-frontend/src/lib/server/retrieval/retrieve-candidates.ts::retrieveBM25",
+        "behavior": "sanitize Boolean tsquery punctuation and join terms with AND",
+        "authority": "lexical executor-local preprocessing"
+      },
+      {
+        "owner": "sveltekit-frontend/src/lib/server/retrieval/retrieve-candidates.ts::retrieveBM25Trigram",
+        "behavior": "lowercase, split non-word characters, keep terms longer than two characters",
+        "authority": "fallback executor-local preprocessing"
+      }
+    ],
+    "canonicalLexicalExecutor": {
+      "owner": "sveltekit-frontend/src/lib/server/retrieval/retrieve-candidates.ts::retrieveBM25",
+      "primary": "codebase_chunk_index.search_vector with English to_tsquery and GIN index",
+      "fallback": "ILIKE over summary/content/source_ref",
+      "reportedScoreSource": "postgres_trigram",
+      "finding": "reported scoreSource is misleading for the primary tsvector path and should be split in a later retrieval-owner change"
+    },
+    "postgresExtensions": {
+      "pg_search": "0.25.1",
+      "pg_trgm": "1.6",
+      "vector": "0.8.3"
+    },
+    "pgSearchProjection": {
+      "index": "idx_codebase_chunk_pgsearch_bm25",
+      "definition": "USING bm25 (id, content, relative_path) WITH (key_field=id)",
+      "canonicalRuntimeUse": false,
+      "decision": "keep as an evaluated/alternate owner candidate; do not switch the SearchRuntime path in this feature contract"
+    }
+  },
+  "liveCorpus": {
+    "table": "public.codebase_chunk_index",
+    "rowCount": 55853,
+    "searchVectorNonNull": 55853,
+    "contentNonEmpty": 55816,
+    "sourceRefNonEmpty": 53461,
+    "sourceRefBlankOrNull": 2392,
+    "distinctNonEmptySourceRefs": 4598,
+    "typedWorkspaceRevisionColumn": false,
+    "typedSourceRevisionColumn": false
+  },
+  "scopeFindings": [
+    "retrieveAllCandidates passes only sourceRefs and pathPrefixes into its executor-local filter; includeGenerated/includeLegacy and broader metadata filters are not applied in its SQL path",
+    "blank source_ref rows are not eligible identity anchors and must remain unavailable to identity-qualified lexical features",
+    "pg_trgm is installed, but the fallback currently uses escaped ILIKE rather than a similarity operator or observed trigram index",
+    "no current ts_stat producer was found in the canonical retrieval path"
+  ],
+  "reusePolicy": {
+    "queryFingerprint": "derived request artifact only",
+    "lexicalFingerprint": "derived candidate feature only",
+    "candidateIdentity": "sourceRef/sourceRevision/packet identity owners remain authoritative",
+    "fusion": "SearchRuntime remains the only cross-lane fusion owner",
+    "writes": false,
+    "newTables": false,
+    "newIndexes": false
+  },
+  "evidenceRefs": [
+    "sveltekit-frontend/src/lib/server/retrieval/retrieve-candidates.ts",
+    "sveltekit-frontend/src/lib/server/retrieval/search-contract.ts",
+    "sveltekit-frontend/src/lib/server/ace/ace-query-packet.ts",
+    "sveltekit-frontend/drizzle/0019_bm25_search_vector.sql",
+    "sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts"
+  ],
+  "validationCommands": [
+    "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -X -A -F '|' -t -c '<read-only extension/index/corpus queries>'",
+    "rg -n -C 8 'retrieveBM25|retrieveBM25Trigram|retrieveAllCandidates' sveltekit-frontend/src/lib/server/retrieval/retrieve-candidates.ts"
+  ],
+  "nextSafeAction": "Define QueryFingerprintV1 from the existing normalizer as a derived request artifact; do not switch lexical executors or add persistence."
+}

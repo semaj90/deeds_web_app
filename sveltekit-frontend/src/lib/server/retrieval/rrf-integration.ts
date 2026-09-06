@@ -177,6 +177,12 @@ export interface RRFIntegrationOptions {
   topK?: number; // results to return (default 20)
   minScore?: number; // filter results below this RRF score (default 0.001)
   deduplicateBy?: 'id' | 'text'; // default 'id'
+  /**
+   * Read-only replay mode. Suppresses optional model/cache enrichment so a
+   * bounded proof can exercise the real retrieval executors without writes.
+   * Defaults to false for backwards compatibility with existing callers.
+   */
+  readOnly?: boolean;
   dispatcherResult?: DispatcherOrchestrationResult; // Optional dispatcher result for topology signal integration (Session 117)
 }
 
@@ -592,6 +598,7 @@ export async function multiLaneRetrievalWithRRF(
     minScore = 0.001,
     deduplicateBy = 'id',
     weights = {},
+    readOnly = false,
     dispatcherResult,
   } = opts;
 
@@ -628,16 +635,18 @@ export async function multiLaneRetrievalWithRRF(
     // Generate embedding once for all vector lanes
     const tEmbedStart = performance.now();
     const { generateSingleEmbedding } = await import('$lib/server/grpc/embedding-client.js');
-    const embedding = await generateSingleEmbedding(query).catch(() => null);
+    const embedding = await generateSingleEmbedding(query, { skipCacheWrite: readOnly }).catch(() => null);
     pgvectorMs = performance.now() - tEmbedStart;
 
     // Extract concepts from query via Gemma4
     const tGemmaStart = performance.now();
-    const conceptExtractionResult = await extractQueryConceptsViaGemma({
-      query,
-      maxConcepts: 5,
-      minConfidence: 0.7,
-    }).catch(() => ({ conceptIds: [], extracted: [], durationMs: 0 }));
+    const conceptExtractionResult = readOnly
+      ? { conceptIds: [], extracted: [], durationMs: 0 }
+      : await extractQueryConceptsViaGemma({
+          query,
+          maxConcepts: 5,
+          minConfidence: 0.7,
+        }).catch(() => ({ conceptIds: [], extracted: [], durationMs: 0 }));
     gemma4Ms = performance.now() - tGemmaStart;
 
     const graphConceptSeeds = deriveGraphConceptSeeds(query, conceptExtractionResult.extracted);

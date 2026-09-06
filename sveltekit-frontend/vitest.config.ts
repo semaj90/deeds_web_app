@@ -350,6 +350,13 @@ export default defineConfig({
         './tests/__mocks__/huggingface-transformers.ts'
       ),
       'onnxruntime-web': path.resolve(__dirname, './tests/__mocks__/onnxruntime-web.ts'),
+      // nodejs-whisper is an optional native package (whisper.cpp binary +
+      // model download) not installed in this environment. It's only
+      // dynamically imported by the whisper/transcribe route's in-process
+      // fallback tier; alias it to a stub so Vite's import-analysis can
+      // resolve the specifier at transform time even when that branch
+      // never actually executes.
+      'nodejs-whisper': path.resolve(__dirname, './tests/__mocks__/nodejs-whisper.ts'),
     },
     // Coverage settings
     coverage: {

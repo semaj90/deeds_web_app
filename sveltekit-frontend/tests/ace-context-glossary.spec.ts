@@ -155,8 +155,14 @@ describe('assembleACEContext glossary reuse', () => {
   });
 
   it('includes saved concepts and glossary matches in the built ACE prompt', async () => {
+    // buildACEPrompt is the raw (uncached) prompt builder — it's a real,
+    // callable export of the implementation module, but the facade at
+    // $lib/server/ace/context-assembler.js only re-exports the top-level
+    // entry points (assembleACEContext, buildACEPromptCached, etc.), per
+    // CLAUDE.md's documented facade boundary. Import the raw function from
+    // its real home rather than widening the facade's public surface.
     const { assembleACEContext, buildACEPrompt } = await import(
-      '$lib/server/ace/context-assembler.js'
+      '$lib/server/features/ai/ace/context-assembler.js'
     );
 
     const context = await assembleACEContext({

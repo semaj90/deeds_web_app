@@ -69,7 +69,7 @@ describe('tagAceHits', () => {
 
     expect(mockQdrantSetPayload).toHaveBeenCalledOnce();
     const [collection, arg] = mockQdrantSetPayload.mock.calls[0] as [string, { payload: Record<string, unknown>; filter: { should: unknown[] } }];
-    expect(collection).toBe('codebase_chunks_768');
+    expect(collection).toBe('codebase_chunks_768_v2');
     expect(arg.payload.llm_synthesis_used).toBe(true);
     expect(arg.filter.should).toHaveLength(2); // 2 unique paths
   });

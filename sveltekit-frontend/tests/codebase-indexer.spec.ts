@@ -69,7 +69,7 @@ const mockCouchdb = {
   get: vi.fn(),
   allDocs: vi.fn(),
 };
-vi.mock('$lib/services/couchdb-client.js', () => ({
+vi.mock('$lib/server/services/couchdb-client.js', () => ({
   couchdb: mockCouchdb,
 }));
 

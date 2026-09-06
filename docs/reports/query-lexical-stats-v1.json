@@ -1,0 +1,123 @@
+{
+  "schema": "parent-atlas.query-lexical-stats.v1",
+  "status": "QUERY_LEXICAL_STATS_READ_ONLY_PROVEN",
+  "generatedAt": "2026-09-06T03:36:01.490Z",
+  "readOnly": true,
+  "writesPerformed": false,
+  "source": "public.codebase_chunk_index.search_vector",
+  "statisticOwner": "PostgreSQL ts_stat",
+  "terms": [
+    "search",
+    "runtime",
+    "semantic",
+    "qdrant",
+    "retrieval",
+    "workspace"
+  ],
+  "firstSnapshot": {
+    "terms": [
+      "search",
+      "runtime",
+      "semantic",
+      "qdrant",
+      "retrieval",
+      "workspace"
+    ],
+    "corpus": {
+      "row_count": 55853,
+      "search_vector_count": 55853,
+      "source_ref_count": 53461,
+      "source_ref_distinct_count": 4598
+    },
+    "termStats": [
+      {
+        "word": "qdrant",
+        "document_frequency": 6603,
+        "corpus_frequency": 11752
+      },
+      {
+        "word": "retrieval",
+        "document_frequency": 267,
+        "corpus_frequency": 540
+      },
+      {
+        "word": "runtime",
+        "document_frequency": 234,
+        "corpus_frequency": 234
+      },
+      {
+        "word": "search",
+        "document_frequency": 9099,
+        "corpus_frequency": 18751
+      },
+      {
+        "word": "semantic",
+        "document_frequency": 331,
+        "corpus_frequency": 334
+      },
+      {
+        "word": "workspace",
+        "document_frequency": 45,
+        "corpus_frequency": 90
+      }
+    ],
+    "snapshotChecksum": "c5e21f419737a441542fbbfbea307c4cbe9d9e97b75fe014d3c479326d656416"
+  },
+  "replaySnapshot": {
+    "terms": [
+      "search",
+      "runtime",
+      "semantic",
+      "qdrant",
+      "retrieval",
+      "workspace"
+    ],
+    "corpus": {
+      "row_count": 55853,
+      "search_vector_count": 55853,
+      "source_ref_count": 53461,
+      "source_ref_distinct_count": 4598
+    },
+    "termStats": [
+      {
+        "word": "qdrant",
+        "document_frequency": 6603,
+        "corpus_frequency": 11752
+      },
+      {
+        "word": "retrieval",
+        "document_frequency": 267,
+        "corpus_frequency": 540
+      },
+      {
+        "word": "runtime",
+        "document_frequency": 234,
+        "corpus_frequency": 234
+      },
+      {
+        "word": "search",
+        "document_frequency": 9099,
+        "corpus_frequency": 18751
+      },
+      {
+        "word": "semantic",
+        "document_frequency": 331,
+        "corpus_frequency": 334
+      },
+      {
+        "word": "workspace",
+        "document_frequency": 45,
+        "corpus_frequency": 90
+      }
+    ],
+    "snapshotChecksum": "c5e21f419737a441542fbbfbea307c4cbe9d9e97b75fe014d3c479326d656416"
+  },
+  "replayStable": true,
+  "corpusSnapshotChecksum": "c5e21f419737a441542fbbfbea307c4cbe9d9e97b75fe014d3c479326d656416",
+  "evidenceRefs": [
+    "sveltekit-frontend/src/lib/server/retrieval/retrieve-candidates.ts",
+    "sveltekit-frontend/drizzle/0019_bm25_search_vector.sql",
+    "sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/lexical-fingerprint-v1.ts"
+  ],
+  "nextAction": "Join these statistics to an existing revision-qualified CandidateFeatureSnapshotV1; do not persist ts_stat output yet."
+}

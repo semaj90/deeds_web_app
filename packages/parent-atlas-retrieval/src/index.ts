@@ -5,6 +5,22 @@
 export { bifrost } from './bifrost/bifrost-provider.js';
 export { recordBifrostTrace } from './bifrost/bifrost-trace.js';
 export type { BifrostTraceInput, BifrostTraceRecord } from './bifrost/bifrost-trace.js';
+export {
+  ExecutionHeadroomV1Schema,
+  ResidencyHintV1Schema,
+  ResidencySchedulerPlanV1Schema,
+  SemanticRepresentationV1Schema,
+  chooseResidencyTierV1,
+  planResidencySchedulerV1,
+} from './bifrost/residency-scheduler.js';
+export type {
+  ExecutionHeadroomV1,
+  ResidencyHintV1,
+  ResidencySchedulerPlanV1,
+  SemanticRepresentationV1,
+  ResidencyTierV1,
+  RetrievalBranchV1,
+} from './bifrost/residency-scheduler.js';
 
 // TurboVec cluster-aware prefilter + 4-signal reranking
 export { turbovecPrefilter } from './turbovec/turbovec-prefilter.js';

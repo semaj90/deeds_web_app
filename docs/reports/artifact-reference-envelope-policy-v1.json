@@ -1,0 +1,19 @@
+{
+  "schema": "atlas.artifact-reference-envelope-policy-proof.v1",
+  "status": "ARTIFACT_REFERENCE_ENVELOPE_POLICY_PROVEN",
+  "observedAt": "2026-09-06",
+  "limitBytes": 65536,
+  "focusedTests": {
+    "file": "sveltekit-frontend/src/lib/server/queue/message-size-policy-v1.spec.ts",
+    "tests": 2,
+    "failures": 0,
+    "result": "PASS"
+  },
+  "acceptedReferenceEnvelope": true,
+  "oversizedInlineVectorRejected": true,
+  "rejectionCode": "ARTIFACT_ENVELOPE_TOO_LARGE",
+  "telemetry": ["checked", "accepted", "rejected", "largestBytes", "lastRejectedBytes"],
+  "canonicalAuthority": false,
+  "canonicalWritesPerformed": false,
+  "legacyPublisherMigration": "NOT_PROVEN_BY_THIS_RECEIPT"
+}

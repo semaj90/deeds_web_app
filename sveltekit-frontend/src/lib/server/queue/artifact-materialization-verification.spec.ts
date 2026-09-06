@@ -117,4 +117,28 @@ describe('verifyArtifactMaterialization', () => {
     expect(result.reason).toBe('STORAGE_VERIFIER_NOT_IMPLEMENTED:QDRANT');
     expect(result.gates.STORAGE_VERIFIER_AVAILABLE).toBe(false);
   });
+
+  it('fails closed for SeaweedFS until a storage verifier is explicitly wired', async () => {
+    const result = await verifyArtifactMaterialization({
+      actionKey: 'action:0123456789abcdef',
+      producerRevision: 'producer:v1',
+      artifact: {
+        schema: 'atlas.artifact-address.v1',
+        artifactId: 'artifact:seaweed:test',
+        artifactHash: 'artifact-hash:0123456789abcdef',
+        schemaId: 'atlas.test-artifact.v1',
+        checksum: 'checksum:0123456789abcdef',
+        revisionSetHash: 'revision-set:0123456789abcdef',
+        revisions: { workspace: 'workspace:test' },
+        locator: {
+          storage: 'SEAWEEDFS_S3',
+          bucket: 'atlas-artifacts',
+          objectKey: 'test/artifact.bin',
+        },
+      },
+    });
+
+    expect(result.status).toBe('NOT_PROVEN');
+    expect(result.reason).toBe('STORAGE_VERIFIER_NOT_IMPLEMENTED:SEAWEEDFS_S3');
+  });
 });

@@ -1,12 +1,26 @@
 ## 1. Highest severity — fix first
 
-- [ ] 1.1 `embedding-service.ts:221` — fix the `dense_768` lane's provider/baseUrl default mismatch. Either default `provider` based on which URL env var is actually set (not unconditionally `'ollama'`), or require `EMBEDDING_PROVIDER` to be explicit when `LLAMA_SERVER_URL` is the only URL present. Add a test asserting the dense_768 lane never builds an Ollama-shaped path against a llama-server baseUrl.
+- [x] 1.1 **CLOSED 2026-09-06 — current implementation is safe and regression-tested.** The live
+  `embedQueryForLane()` implementation no longer carries the stale unconditional provider/baseUrl
+  shape described by the original finding. In strict canonical mode it uses the OpenAI-compatible
+  `/v1/embeddings` path; otherwise its compatibility path derives the Ollama-shaped URL only from
+  `OLLAMA_BASE_URL`. It does not read `LLAMA_SERVER_URL`, so a llama-server-only configuration
+  cannot produce `${LLAMA_SERVER_URL}/api/embeddings`. Added the focused regression in
+  `sveltekit-frontend/src/lib/server/retrieval/__tests__/embedding-service.test.ts`; it sets only
+  the llama-server URL plus the explicit Ollama compatibility URL, verifies the request goes to
+  `127.0.0.1:11434/api/embeddings`, and verifies no request reaches `127.0.0.1:8090`. Focused
+  validation: 4/4 tests passed. The current code comment documents the intentional boundary.
 
 ## 2. Regression in this session's own prior fix — fix second
 
 - [x] 2.1 **STALE, verified against live current source 2026-08-23 — no code change needed today.** `fetchStreamedChatCompletion()` no longer exists anywhere in `sveltekit-frontend/src/` (`rg fetchStreamedChatCompletion` — zero matches) — this file/function has been superseded since the finding was written. `src/lib/server/ollama.ts` today has 3 non-streaming `reasoning_content` fallback sites (lines 458, 635, 908 — one more than the doc's 2, all correctly `choice?.content ?? choice?.reasoning_content ?? ''`), but genuinely contains **no streaming implementation at all** (no `stream: true`, no `ReadableStream`/`for await` chunk assembly anywhere in its 1732 lines). The real, current canonical streaming path lives in `src/lib/server/inference/inference-router.ts` (per this same change's own task 5.6c classification: `inference-router.ts` = CANONICAL_OWNER, 6 live callers, composes with `bifrostChat`) — and its streaming loop at line 1026 **already has the exact fix requested**: `` const chunk = delta?.content ?? delta?.reasoning_content ?? '' `` with an inline comment (`// llama-server b8757: streaming thinking in delta.reasoning_content, answer in delta.content`) that states precisely the failure mode this task described. No action needed — the fix already exists in the file that actually matters today.
 
 ## 3. Telemetry correctness
+
+**Current disposition (2026-09-06):** The live raw path now intentionally calls `bifrostChat`
+directly and reports `selectedLane`/`inferenceLane` as `bifrost`. The prior LDR routing was
+removed; the root `CLAUDE.md` documentation and `tests/openai-facade.spec.ts` now match this
+behavior. The historical review narrative below is retained for audit context.
 
 - [x] 3.1 **WORSE than originally described — verified live 2026-08-23, new finding recorded.** The original finding assumed a reachable TurboQuant branch with a telemetry mislabel. The actual current code (`req.raw` passthrough block, ~line 797-875) is worse: `const selectedLane = 'bifrost';` (line 852) is a **hardcoded string literal, not a variable** — the `else if (canUseTurboQuantNow) { turboQuantChat(...) }` and final `else { bifrostChat(...) }` branches at lines 855-874 are **dead code, unreachable under any input**, since `selectedLane === 'bifrost'` is always true by construction. This directly contradicts this repo's own `CLAUDE.md` documentation of the `raw: true` request flag ("tries TurboQuant first then bifrostChat fallback") — in reality, every raw-passthrough request calls `runLdrChat()` (line 854) unconditionally, which is the LDR last-resort fallback lane (see task 5.8's Bug 4 elsewhere in this change: `runLdrChat` degrades to an honest "all backends unavailable" string when its own `/api/start_research` dependency 404s, since that route doesn't exist). **This live-reproduced in this same review session**: a real `raw`-adjacent ACE request through `/api/v1/chat/completions` returned `"selectedLane":"bifrost"` in its telemetry while `"inferenceLane":"ldr"` was the actual value used — the exact mislabel this task predicted, now confirmed with a live example, not just static reading. Fix needs to be broader than "reassign a variable": either genuinely wire `selectedLane` to reflect which branch runs (turn the `const` into a real `let` driven by actual branch selection), or if `runLdrChat`-always is the intended behavior now, update the `raw: true` documentation in `CLAUDE.md` to match reality instead of the stale "tries TurboQuant first" claim. Not fixed here — flagging as a decision point (intended behavior vs. bug) rather than guessing which one it should be.
 
@@ -24,8 +38,15 @@
 
 ## 7. Duplication cleanup (lower priority, do last)
 
-- [ ] 7.1 `ollama.ts:1417` — collapse the Bifrost-gateway branch's hand-rolled SSE loop into `fetchStreamedChatCompletion()`, adding `bifrostCacheDebug` capture as an optional callback/field on the shared helper.
-- [ ] 7.2 `supervisor.ts:115` + `subagents.ts` + `autonomous-agent.ts` — extract the shared `initializeXxxLlm()` pattern into one `createLocalLlamaChatModel(temperature)` helper, per `sveltekit-frontend/CLAUDE.md`'s own documented canonical `ChatOpenAI`/`getLlamaSessionDescriptor()` pattern.
+- [x] 7.1 **NOT APPLICABLE to the current source.** The proposed `fetchStreamedChatCompletion()` helper and
+  the original Bifrost SSE loop no longer exist in `src/lib/server/ollama.ts`; the current streaming
+  owner is `src/lib/server/inference/inference-router.ts`, already covered by item 2.1. No obsolete
+  helper was recreated.
+- [x] 7.2 **CLOSED 2026-09-06.** Added `src/lib/server/agent/local-llama-chat-model.ts` with the
+  shared `createLocalLlamaChatModel(temperature)` factory. `supervisor.ts`, `subagents.ts`, and
+  `autonomous-agent.ts` now use that one OpenAI-compatible llama-server boundary for endpoint,
+  local auth, model identity, and temperature selection. Focused validation:
+  `supervisor.integration.test.ts` passed 1/1.
 
 ## 8. Investigated, no code change needed
 
@@ -34,15 +55,17 @@
 
 ## Re-verification pass (2026-09-05, read-only)
 
-- **1.1 — likely superseded, not confirmed fixed as originally described.** The real file is
+- **1.1 — closed by current evidence (2026-09-06).** The real file is
   `src/lib/server/retrieval/embedding-service.ts` (path drifted from the bare `embedding-service.ts`
   this item names). Its current `embedQueryForLane()` `dense_768` branch has no `provider` field at
   all anymore — it now gates on `ENV.ATLAS_CANONICAL_EMBEDDING_STRICT` between
   `embedViaCanonicalRuntime()` and `embedViaOllama()`, a materially different shape than the
   described "unconditional `provider: 'ollama'`" bug. This looks like the file was substantially
   rewritten since 2026-08-22, consistent with items 2.1/5.1/6.1's own findings that this whole
-  session's audited files kept moving. Not confirmed as a deliberate fix for this specific finding
-  (no git-blame trace run) — flagging as likely-moot rather than closing it outright.
+  session's audited files kept moving. A git-blame trace is unnecessary for the current acceptance
+  property — the focused regression now proves the relevant safety property
+  directly: a llama-server-only configuration cannot be used to construct an Ollama-shaped
+  request. See the closure note above.
 - **7.1 — target already moot, per this file's own item 2.1.** `fetchStreamedChatCompletion()` (the
   shared helper 7.1 proposes collapsing the SSE loop into) was already confirmed to no longer exist
   anywhere in `src/` by item 2.1 (2026-08-23). Re-confirmed `bifrostCacheDebug` and any
@@ -51,9 +74,9 @@
   original form; if this duplication still matters, it needs to be re-scoped against the current
   streaming owner (`src/lib/server/inference/inference-router.ts`, per item 2.1), not against the
   original two named sites.
-- **7.2 — confirmed still genuinely open, unchanged.** All 3 files
+- **7.2 — closed by current implementation (2026-09-06).** All 3 files
   (`src/lib/server/agent/{supervisor,subagents,autonomous-agent}.ts` — paths also drifted from the
-  bare filenames this item names, all now under `agent/`) still construct their own
-  `new ChatOpenAI({...})` independently; no `createLocalLlamaChatModel`/`getLlamaSessionDescriptor`
-  helper exists anywhere in `src/lib/server/agent/`. This is the one item in this section still
-  accurately describing live code.
+  bare filenames this item names, all now under `agent/`) previously constructed their own
+  `new ChatOpenAI({...})` independently; they now delegate to
+  `src/lib/server/agent/local-llama-chat-model.ts`. The Supervisor integration test passed 1/1
+  after the consolidation.

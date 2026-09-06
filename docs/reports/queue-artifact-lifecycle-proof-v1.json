@@ -1,0 +1,35 @@
+{
+  "schema": "atlas.queue-artifact-lifecycle-proof.v1",
+  "proofId": "0a422613-1aca-4599-81a9-0ee2dbe801f2",
+  "status": "QUEUE_ARTIFACT_LIFECYCLE_PROVEN",
+  "observedAt": "2026-09-06",
+  "database": "PostgreSQL",
+  "focusedTests": {
+    "files": 4,
+    "tests": 21,
+    "failures": 0,
+    "result": "PASS"
+  },
+  "materializedEvent": {
+    "inserted": true,
+    "eventType": "artifact.materialized"
+  },
+  "identicalReplay": {
+    "inserted": false,
+    "durableRowCount": 1
+  },
+  "corruptReplay": {
+    "rejected": true,
+    "reason": "CHECKSUM_MISMATCH"
+  },
+  "failedEvent": {
+    "inserted": true,
+    "eventType": "artifact.failed",
+    "durableRowCount": 1
+  },
+  "canonicalAuthority": false,
+  "writesPerformed": true,
+  "writeScope": "bounded disposable lifecycle proof rows only",
+  "productionPromotion": false,
+  "runnerCleanup": "database pools closed before process exit"
+}

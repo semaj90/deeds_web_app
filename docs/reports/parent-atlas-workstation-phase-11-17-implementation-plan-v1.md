@@ -54,6 +54,121 @@ Implementation sequence:
 
 Gate: `ORNITH-ANALYSIS-ADAPTER-01` → `ANALYSIS-PASS-CURRENT-SELECTION-01`.
 
+**Step 1 caller census, completed 2026-09-05 (same day, via targeted rg, no writes)**: neither
+named gate above has an owning OpenSpec change yet (`grep -rli "ornith.*analysis\|ORNITH-ANALYSIS"
+openspec/changes/` returns zero hits) — this plan document is currently unowned by any tracked
+change, contrary to its own "Role" statement that an owning change remains authoritative.
+
+Real files found under `sveltekit-frontend/src/lib/server/analysis/`:
+- **`analysis_pass_results`/`AnalysisPassResult` touchpoints (16 files)**: canonical trio appears
+  to be `analysis-pass-results.ts` (writer), `analysis-pass-current.ts` (current-pass selector),
+  `analysis-pass-boundary.ts` (caller boundary) — plus `worker.ts`, `nlp-feature-compiler.ts`,
+  `source-pos-concept-packet.ts`, `code-evidence-readback.ts`, `code-feature-registry-enqueue.ts`,
+  `../nlp/miniforge-nlp-sidecar.ts`, and matching `.spec.ts` files. Not independently verified
+  which of these three is actually canonical vs. a duplicate this pass — read before extending.
+- **Files still referencing `gemma4`/`ollama`/`llama-server`/model ports directly (12 files)**:
+  `worker.ts`, `summarizer.ts`, `holistic-synthesizer.ts`, `entity-extractor-unified.ts`,
+  `gemma4-nlp-reranker.ts`, `ast-langextract-bridge.ts`, `vlm-evidence-analyzer.ts`,
+  `granite-docling.ts`, `evidence-analysis-pipeline.ts`, `agentic-fix-proposal.ts`,
+  `hmm-error-classifier.ts`, `batch-error-analysis.ts`.
+
+**CORRECTION (2026-09-05, same day, later pass) — the "11 of 12 are real Step 2 rerouting
+candidates" conclusion above was wrong, reached from grep-level string matching without reading
+the actual call sites.** Read each of the 12 files' actual model-call code before concluding
+anything, per this repo's own "grep first, but a name/mention is not evidence — check real
+callers" rule. Corrected finding: **zero of the 12 files need functional rerouting.**
+
+- `summarizer.ts`, `holistic-synthesizer.ts`, `entity-extractor-unified.ts`,
+  `gemma4-nlp-reranker.ts` — all four already call `resolveLlamaInferenceTarget()`
+  (`sveltekit-frontend/src/lib/server/llm/runtime-contract.ts`, the actual canonical live-discovery
+  resolver — `GET /v1/models` authoritative, launcher config only a preference) and send
+  `target.model` dynamically. Already correct; only the filename `gemma4-nlp-reranker.ts` and a
+  cosmetic trace label (`modelSource: 'llama-server-8090'`, an error tag `gemma4-error-${status}`)
+  are stale, with zero effect on what model is actually called.
+- `worker.ts` and `ast-langextract-bridge.ts` only dynamically `import('./gemma4-nlp-reranker.js')`
+  — they delegate to an already-correct file, nothing to reroute directly.
+- `batch-error-analysis.ts` imports `runGemma4Agent` from `$lib/server/ai/gemma4-agent.js`, a
+  one-line re-export barrel (`export * from '../features/ai/ai/gemma4-agent.js'`) pointing to the
+  real 2,300+-line implementation, whose `PLANNER_MODEL = VLM_MODELS.legal`. Checked
+  `VLM_MODELS.legal` at its source (`sveltekit-frontend/src/lib/server/ollama.ts:24`): already
+  `'ornith-1.5-9b'`, with an explicit comment confirming the migration
+  ("Legal text reasoning / chat / agentic tool-calling (llama-server :8090, TurboQuant canonical)").
+  Already correct — only the on-disk filename `gemma4-agent.ts` is stale.
+- `agentic-fix-proposal.ts`'s hit was a false positive: `/gemma|tool-calling|.../ .test(haystack)` —
+  a regex classifying *text content*, not a model call at all.
+- `vlm-evidence-analyzer.ts`, `granite-docling.ts`, and `evidence-analysis-pipeline.ts`'s
+  `synthesizeWithLLM()` all correctly use the **separate VLM lane** (`LOCAL_VLM_MODEL`/
+  Granite-Docling document-vision model on the `:8085`/mmproj path). **CORRECTED same day
+  (web-verified)**: this was written as a permanent architectural boundary ("Ornith cannot do
+  vision") — that's wrong. Ornith 1.5 9B is upstream vision-capable
+  (`ornith-ai/Ornith-1.5-9B-GGUF` on Hugging Face ships a real `mmproj-Ornith-1.5-9B-BF16.gguf`
+  projector); the local `:8090` deployment simply has never loaded it (`GET :8090/props` →
+  `modalities: {vision: false}` describes the current text-only profile, not a model limit).
+  Rerouting these files to Ornith today would still be premature (no local Ornith-VLM profile is
+  proven yet), but the reason is "unproven locally," not "impossible." See the new
+  `ORNITH-VLM-MMPROJ-01` gate opened in `openspec/changes/parent-atlas-analysis-pass-ornith-adapter/`
+  to acquire the real projector and prove a working local vision profile — only after that proof
+  should any retirement of the old Gemma4 VLM path be considered.
+- `hmm-error-classifier.ts` has one genuinely stale item, but it's cosmetic only: a hardcoded
+  human-readable suggestion string ("Increase AbortSignal.timeout; check Gemma4 :8090 health...")
+  inside an error-remediation-hint table — never executed as a model call, just displayed text. Low
+  priority to fix, zero functional impact either way.
+
+**Revised Phase 11 step 2 conclusion**: the "route active synthesis/NLP fallback calls through the
+shared Ornith resolver" work is **already effectively done** across every real call site checked in
+`sveltekit-frontend/src/lib/server/analysis/` — the shared resolver already exists
+(`resolveLlamaInferenceTarget`) and every synthesis call site in this directory already uses either
+it or the correctly-separate VLM lane. What remains is purely cosmetic (stale filenames/labels/one
+error string) — not a blocking gate. This session did not check call sites outside
+`src/lib/server/analysis/` (e.g. `src/mcp/`, other server directories referenced in root
+`CLAUDE.md`'s "Ollama vs llama-server Boundary" 20-file sweep list) — that list may still contain
+real gaps and was not re-audited this pass.
+
+**Adjacent finding, not part of Phase 11's own scope but relevant caution**: `docs/
+LANGGRAPH-KANBAN-ERROR-FIXING-INTEGRATION.md` (June 28, 2026) claims a separate "agentic error
+fixing" LangGraph workflow is "✅ FULLY IMPLEMENTED — Ready for production." Verified `DORMANT_BUT_
+INTACT`: the code exists (`packages/atlas-core/src/langgraph/kanban-error-fixing-agent.ts`) but has
+zero real callers (only a manual npm script), never writes to the real `kanban_tasks` Postgres
+table despite that table existing, and its "synthesis" node is a hardcoded placeholder string,
+never calling any model. The June 28 "production-ready" claim was inaccurate even at the time it
+was written. Cited here as a concrete cautionary precedent for Phase 11's own step 4 ("prove
+replay... before any supersession operation") — don't let this phase repeat that pattern.
+
+**Closed out (2026-09-06)** via `openspec/changes/parent-atlas-analysis-pass-ornith-adapter/`
+(29/29 tasks done, `openspec validate --strict` passes):
+- `ORNITH-ANALYSIS-ADAPTER-01`: `ALREADY_SATISFIED` — all 12 `analysis/` files plus 16 more from
+  CLAUDE.md's wider 20-file sweep list were read in full. 13 of the 16 needed nothing; 2 needed
+  nothing beyond a pre-existing shim already covering them (`whisper/transcribe/+server.ts`, saved
+  by `ollamaFetch()`'s own TurboQuant intercept for non-streaming calls); **1 was a genuine live
+  bug, now fixed**: `src/routes/(app)/chat/[id]/+page.server.ts`'s message-send action called
+  Ollama's native `/api/generate` with `stream: true` and a llama-server model identifier as the
+  Ollama model name — that streaming call bypassed the intercept (which only covers non-streaming
+  requests) and had no safety net. Rewritten to call `resolveLlamaInferenceTarget()` +
+  llama-server's `/v1/chat/completions` directly with real SSE parsing.
+- `ANALYSIS-PASS-CURRENT-SELECTION-01`: the `DISTINCT ON` selection logic itself is proven correct
+  via live replay (two real scenarios, both passed) — but a real, separate finding surfaced along
+  the way: the **deployed** `analysis_pass_current` view does not match its own source file
+  (`drizzle/manual/analysis_pass_current.sql`) — different status-literal filter (`'success'` live
+  vs `'succeeded'` in the file) and a missing `id DESC` tiebreak, meaning ~99.8% of the table
+  (rows written under the older `'success'` convention) are the only ones currently visible as
+  "current," while the 19 rows written under the current typed contract (`'succeeded'`) are
+  entirely invisible to it. Not fixed — reconciling the two status conventions needs an explicit
+  operator decision, not a same-pass `CREATE OR REPLACE VIEW`. Full receipt:
+  `docs/reports/parent-atlas/analysis-pass-current-selection-v1.json`.
+- Engram ingestion "deferred" was investigated, not assumed: the read side
+  (`LocalEngramMemoryAdapterImpl.getRoutingHints()`) is genuinely wired to 2 live callers. What's
+  actually deferred is a producer for `recordWorkflowMemory()` (zero callers anywhere — the
+  intended "validated lesson" ingestion path was fully built but nothing ever calls it), plus a
+  **three-way duplication finding**: a second, independently-coded bigram writer
+  (`search/engram-bigram.ts`, the one actually in live use) and a third, fully separate write path
+  in a standalone script (`scripts/atlas/sync-engram-memory.mjs`) both share the `ace:engram:`
+  prefix with the unused adapter but were never reconciled. Left open pending an operator decision
+  on which bigram writer is canonical and what should trigger a workflow-lesson write.
+- `ORNITH-VLM-MMPROJ-01` also closed in the same change (see the VLM correction note above this
+  one): the real Ornith-specific mmproj was acquired, sha256-verified, wired into
+  `launch-turboquant.ps1` behind family-keyed resolution, and live-proven (`modalities.vision:
+  true`, 4/4 smoke tests including a real, semantically accurate image description).
+
 ### Phase 12 — Parent Atlas codebase index
 
 Status: `PARTIAL`

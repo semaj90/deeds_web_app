@@ -31,6 +31,7 @@ vi.mock('$lib/server/env.server.js', () => ({
     NEO4J_URI: 'bolt://127.0.0.1:7687',
     NEO4J_USER: 'neo4j',
     NEO4J_PASSWORD: 'legal_ai_pass',
+    ROTORQUANT_MODEL_PATH: process.env.ROTORQUANT_MODEL_PATH ?? process.env.TURBO_MODEL_PATH,
   },
 }));
 
@@ -76,12 +77,27 @@ describe('agents_md quick hit resolution', () => {
   });
 
   it('falls back to the frontend root AGENTS.md when no nearer directory file exists', async () => {
+    // Uses a synthetic, guaranteed-nonexistent directory chain rather than a
+    // real repo path: buildLookupDirs/readAgentsMarkdown do pure string/path
+    // walks with no directory-existence check, so a fabricated path exercises
+    // the "no nearer file anywhere in the chain" case deterministically. A
+    // previously-used real path (scripts/tests/nes-arch/...) stopped testing
+    // this once sveltekit-frontend/scripts/AGENTS.md was added to the repo —
+    // that intermediate file made the walk stop early, which is correct
+    // resolver behavior but no longer exercised the root-fallback case this
+    // test is named for.
     const { resolveAgentsMdQuickHit } = await import('../../src/lib/server/graph/community-graph.ts');
-    const hit = await resolveAgentsMdQuickHit('scripts/tests/nes-arch/inspect-agents-md.mjs');
+    const hit = await resolveAgentsMdQuickHit('zzz-synthetic-no-agents-md-anywhere/deeply/nested/foo.ts');
 
     expect(hit?.source).toBe('disk');
     expect(hit?.resolvedPath).toBe('sveltekit-frontend/AGENTS.md');
-    expect(hit?.markdown).toContain('## Directory tree map');
+    // Root AGENTS.md was rewritten 2026-09-05 to replace a stale 1.16MB
+    // generated index (moved to docs/reports/sveltekit-frontend-full-
+    // repository-index-v1.md per this repo's archive-not-delete convention)
+    // with a short hand-written file — the old '## Directory tree map'
+    // heading no longer exists. Assert on the file's own stable title line
+    // rather than content that's expected to keep evolving.
+    expect(hit?.markdown).toContain('# AGENTS.md — sveltekit-frontend');
   });
 });
 

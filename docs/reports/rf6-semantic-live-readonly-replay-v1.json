@@ -1,0 +1,66 @@
+{
+  "schema": "atlas.rf6-semantic-live-readonly-replay.v1",
+  "gate": "RF6-SEMANTIC-REPLAY-01",
+  "status": "RF6_SEMANTIC_REPLAY_PROVEN",
+  "proofKind": "LIVE_DIRECT_MULTI_LANE_READ_ONLY_REPLAY",
+  "executedAt": "2026-09-06T06:54:07.973Z",
+  "query": "semantic retrieval qdrant turbovec logical lane",
+  "owner": "rrf-integration.ts::multiLaneRetrievalWithRRF",
+  "routeExcluded": "/api/search/rrf writes rrf:query_counts and rrf:query:{hash}; it was not invoked",
+  "options": {
+    "topK": 5,
+    "minScore": 0,
+    "readOnly": true
+  },
+  "executorEvidence": {
+    "qdrantCount": 1,
+    "turbovecCount": 7,
+    "bothSemanticExecutorsReturned": true,
+    "resultCount": 5,
+    "semanticResultCount": 3,
+    "semanticVoteViolations": 0,
+    "oneLogicalSemanticVote": true,
+    "identitySetChecksum": "994b69eb3555c073158cbffab3431d2a46ab96032d3f6577b80faded68c5d384"
+  },
+  "effects": {
+    "postgresWrites": false,
+    "valkeyWrites": false,
+    "noDatastoreWrites": true,
+    "noCacheWrites": true,
+    "qdrantWrites": false,
+    "neo4jWrites": false,
+    "modelWrites": false,
+    "embeddingCacheWriteSuppressed": true,
+    "conceptModelAndBifrostEnrichmentSkipped": true
+  },
+  "writeReadback": {
+    "postgresWriteDiff": [],
+    "beforeValkey": {
+      "dbSize": 166,
+      "keyCount": 28,
+      "namespaceChecksum": "98d5f3c6fcc4debd86b0ddb51dc0d1e833ec804586bbb48fe05523e233c8fd76"
+    },
+    "afterValkey": {
+      "dbSize": 162,
+      "keyCount": 28,
+      "namespaceChecksum": "98d5f3c6fcc4debd86b0ddb51dc0d1e833ec804586bbb48fe05523e233c8fd76"
+    },
+    "ambientDbSizeChanged": true,
+    "valkeyUnchanged": true
+  },
+  "timings": {
+    "bm25_ms": 52.21230000000014,
+    "qdrant_ms": 2127.1993999999995,
+    "turbovec_ms": 279.22460000000046,
+    "neo4j_ms": 1127.4334,
+    "redis_ms": 0,
+    "gemma4_ms": 0.004799999999704596,
+    "rrf_ms": 0.780800000000454,
+    "pgvector_ms": 3025.0743,
+    "concept_overlap_ms": 0.06040000000029977,
+    "topology_ms": 0,
+    "dispatcher_signal_ms": 0
+  },
+  "durationMs": 5458,
+  "nextGate": "RF7_SHARED_FUSION_CONSOLIDATION"
+}

@@ -1,0 +1,55 @@
+{
+  "schema": "atlas.semantic-metadata-reconciliation.v1",
+  "migration": "sveltekit-frontend/drizzle/manual/20260906_semantic_768_metadata_reconciliation.sql",
+  "generatedAt": "2026-09-06T02:49:07.549Z",
+  "readOnly": true,
+  "databaseWrites": false,
+  "vectorWrites": false,
+  "qdrantWrites": false,
+  "checks": {
+    "tablePresent": true,
+    "canonicalTypeIsHalfvec768": true,
+    "populatedRowsHave768Metadata": true,
+    "migrationChangesOnlyDefaultAndGuard": true,
+    "alternateColumnUntouched": true,
+    "guardAlreadyPresent": false,
+    "defaultNeedsCorrection": true,
+    "live": {
+      "columns": {
+        "content_embedding": {
+          "column_name": "content_embedding",
+          "sql_type": "halfvec(768)",
+          "column_default": null,
+          "is_nullable": "YES"
+        },
+        "embedding_dimension": {
+          "column_name": "embedding_dimension",
+          "sql_type": "integer",
+          "column_default": "384",
+          "is_nullable": "YES"
+        },
+        "content_embedding_768": {
+          "column_name": "content_embedding_768",
+          "sql_type": "vector(768)",
+          "column_default": null,
+          "is_nullable": "YES"
+        }
+      },
+      "counts": {
+        "total_rows": 55853,
+        "canonical_vector_rows": 55169,
+        "populated_metadata_mismatches": 0,
+        "alternate_vector_rows": 1386,
+        "legacy_dimension_tags": 37
+      },
+      "existingGuard": false
+    },
+    "expectedAfterApply": {
+      "embeddingDimensionDefault": "768",
+      "canonicalVectorColumn": "content_embedding halfvec(768)",
+      "guard": "content_embedding IS NULL OR (embedding_dimension IS NOT NULL AND embedding_dimension = 768)",
+      "rowRewrite": false
+    }
+  },
+  "status": "PREPARED_UNAPPLIED"
+}

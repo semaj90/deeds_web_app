@@ -209,6 +209,7 @@ export async function verifyArtifactMaterialization(input: {
       });
     case 'POSTGRES':
       return verifyPostgresArtifact({ ...input, artifact });
+    case 'SEAWEEDFS_S3':
     case 'QDRANT':
     case 'VALKEY':
     case 'GPU_RESIDENT': {

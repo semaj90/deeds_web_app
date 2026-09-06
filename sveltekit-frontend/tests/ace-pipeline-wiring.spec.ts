@@ -30,12 +30,14 @@ vi.mock('$lib/server/env.server.js', () => ({
     QDRANT_URL: 'http://127.0.0.1:6333',
     BIFROST_ENABLED: false,
     ACE_ENCODED_PREFILTER_MODE: 'off',
+    ROTORQUANT_MODEL_PATH: process.env.ROTORQUANT_MODEL_PATH ?? process.env.TURBO_MODEL_PATH,
   },
 }));
 vi.mock('$lib/config/env.server.js', () => ({
   ENV: {
     OLLAMA_BASE_URL: 'http://127.0.0.1:11434',
     QDRANT_URL: 'http://127.0.0.1:6333',
+    ROTORQUANT_MODEL_PATH: process.env.ROTORQUANT_MODEL_PATH ?? process.env.TURBO_MODEL_PATH,
   },
 }));
 
@@ -240,7 +242,8 @@ describe('ACE pipeline wiring', () => {
         delete process.env.LLAMA_CTX_SIZE;
         vi.resetModules();
 
-        const { getAdaptiveTopK } = await import('$lib/server/ace/context-assembler.js');
+        // Not re-exported by the facade — same reasoning as buildACEPrompt above.
+        const { getAdaptiveTopK } = await import('$lib/server/features/ai/ace/context-assembler.js');
         expect(getAdaptiveTopK()).toBe(8);
         expect(getAdaptiveTopK(32768)).toBe(5);
         expect(getAdaptiveTopK(49152)).toBe(8);
@@ -394,7 +397,11 @@ describe('ACE pipeline wiring', () => {
   // ── 3. buildACEPrompt codebase section ───────────────────────────────────
   describe('buildACEPrompt', () => {
     it('includes codebase context section when codebaseContext is populated', async () => {
-      const { buildACEPrompt } = await import('$lib/server/ace/context-assembler.js');
+      // buildACEPrompt is not re-exported by the facade at
+      // $lib/server/ace/context-assembler.js (only the top-level entry
+      // points are, per CLAUDE.md's documented facade boundary) — import
+      // the raw function from its real implementation module instead.
+      const { buildACEPrompt } = await import('$lib/server/features/ai/ace/context-assembler.js');
       const ctx = makeCtx({
         codebaseContext: [
           {
@@ -421,7 +428,11 @@ describe('ACE pipeline wiring', () => {
     });
 
     it('omits codebase section when codebaseContext is null', async () => {
-      const { buildACEPrompt } = await import('$lib/server/ace/context-assembler.js');
+      // buildACEPrompt is not re-exported by the facade at
+      // $lib/server/ace/context-assembler.js (only the top-level entry
+      // points are, per CLAUDE.md's documented facade boundary) — import
+      // the raw function from its real implementation module instead.
+      const { buildACEPrompt } = await import('$lib/server/features/ai/ace/context-assembler.js');
       const prompt = buildACEPrompt(makeCtx() as any, 'test');
 
       expect(prompt.systemPrompt).not.toContain('## Codebase Context');

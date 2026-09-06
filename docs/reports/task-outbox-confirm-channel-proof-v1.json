@@ -1,0 +1,35 @@
+{
+  "schema": "atlas.task-outbox-confirm-channel-proof.v1",
+  "proofId": "f63c0702-9a9f-4be0-a3cc-c2e23d571934",
+  "runId": "2fc947bd-7510-4227-839a-9a6ef049f890",
+  "actionKey": "queue09-proof:f63c0702-9a9f-4be0-a3cc-c2e23d571934",
+  "status": "TASK_OUTBOX_CONFIRM_CHANNEL_PROVEN",
+  "taskExchange": "atlas.tasks.v1",
+  "routingKey": "atlas.work.retrieval.materialize",
+  "directTaskPublishRejected": true,
+  "outboxTask": {
+    "taskId": "353f2205-89bc-4391-8108-163f25ce7244",
+    "outboxId": "451dd758-409f-4af4-854b-86f11ba7c5b9",
+    "pendingBeforePublish": 1,
+    "confirmedPublish": true,
+    "deliveredAfterConfirm": true
+  },
+  "consumed": {
+    "received": true,
+    "acknowledged": true,
+    "actionKeyMatched": true,
+    "routingKeyMatched": true
+  },
+  "writesPerformed": {
+    "workflowRun": true,
+    "workflowTask": true,
+    "workflowOutbox": true,
+    "deliveredAtSetOnlyAfterConfirm": true,
+    "applicationCanonicalData": false,
+    "qdrant": false,
+    "valkey": false,
+    "neo4j": false
+  },
+  "validatedBy": "npx vitest run --config vitest.config.ts src/lib/server/queue/task-outbox-confirm-channel-live.spec.ts",
+  "productionClaim": false
+}

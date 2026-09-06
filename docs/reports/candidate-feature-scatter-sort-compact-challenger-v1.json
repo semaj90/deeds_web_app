@@ -1,0 +1,32 @@
+{
+  "schema": "atlas.candidate-feature-scatter-sort-compact-challenger-proof.v1",
+  "status": "CPU_SCATTER_SORT_COMPACT_REFERENCE_PROVEN",
+  "observedAt": "2026-09-06",
+  "owner": "parent-atlas-candidate-feature-execution-fabric",
+  "implementation": "sveltekit-frontend/src/lib/server/atlas/features/candidate-feature-scatter-sort-compact-v1.ts",
+  "test": "sveltekit-frontend/src/lib/server/atlas/features/candidate-feature-scatter-sort-compact-v1.spec.ts",
+  "operation": "scatter selected CandidateOrdinal rows, stable feature sort, deterministic top-K compaction",
+  "featureWidth": 12,
+  "ordinalKey": "CandidateOrdinal",
+  "determinism": {
+    "identicalReplay": true,
+    "presenceMaskPreserved": true,
+    "tieBreak": "ordinal-ascending",
+    "missingSortValues": "after-present-values"
+  },
+  "focusedTests": {
+    "command": "npx vitest run src/lib/server/atlas/features/candidate-feature-scatter-sort-compact-v1.spec.ts",
+    "testsPassed": 3,
+    "testsFailed": 0
+  },
+  "canonicalAuthority": false,
+  "canonicalOwnerChanged": false,
+  "canonicalWritesAttempted": false,
+  "externalWritesAttempted": false,
+  "notProven": [
+    "native CUDA scatter/sort/compact parity",
+    "production-scale residency or fanout",
+    "live feature producer alignment"
+  ],
+  "productionClaim": false
+}

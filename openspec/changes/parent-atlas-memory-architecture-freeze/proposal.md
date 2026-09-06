@@ -1021,3 +1021,104 @@ before this freeze document's sixth addendum existed. Any future work on gate 8 
 `parent-atlas-compute-rank-cache-eval-dspy-gepa`, not a new change.
 
 No code written this pass; both corrections are ownership-record fixes only.
+
+## Addendum 9 (2026-09-06): "Query is the camera, packets stream at progressive LOD" — reviewed, partially verified, not built
+
+The operator proposed a design frame (Pokémon/Game Boy cartridge-ROM-vs-VRAM analogy) for how
+retrieval, residency, and context assembly should relate, plus 7 corrections to an earlier
+GPU/pre-LLM design pass whose code this document could not fully locate this session (see
+verification note below). Recording the review honestly rather than either implementing the
+8-gate proof sequence proposed (`QUERY-VIEWPORT-01` → ... → `PREFILL-STREAM-01`) or silently
+agreeing with claims that weren't independently checked.
+
+**What was verified real, quickly, before reviewing the idea on its merits** (spot-checks, not
+exhaustive): `CandidateOrdinalMapV1` and the `SEED_NOT_IDENTITY_READY` status genuinely exist
+across a real, substantial retrieval/features codebase (`sveltekit-frontend/src/lib/server/atlas/
+{features,retrieval,evidence,graph,context}/`) — the operator's "don't texture-stream
+symbols.jsonl directly, it's not identity-ready" caution is grounded in real repo state, not
+invented. A real `oak-dag-*` family of files exists under `atlas/policy/` (execution-adapter,
+runtime-registry, context-manifest-handler, kag-neighbor-handler, semantic-qdrant-handler, neural/
+latent-candidate handlers) — so "OAK" is real infrastructure, not a fictional example. `LodPromotionDecisionV1`
+(cited earlier in this document, Addendum 7) is confirmed the closest existing residency-tier
+owner. **Not independently verified**: the specific 7 corrections themselves (a `LowRankHelperRecommenderV1`
+that zero-fills missing observations, an OAK gate mis-named as validating relationships when it
+only proves concept resolution via `adapter.label(curie)`, a `requiresMutation` field obtained via
+TS cast, a PageRank parity check hardcoded to `1e-6`, a `predictedRemainingMs = criticalPathMs -
+elapsedMs` DAG estimate). A targeted grep for `adapter.label(curie)` and `requiresMutation` +
+`LowRankHelperRecommender` found no matches in `sveltekit-frontend/src` — either this code lives
+outside that tree (Python sidecar, a different session's uncommitted work, WSL2 RAPIDS scripts) or
+it was proposed-but-never-built design language from an earlier design message rather than
+committed code. **Do not treat those 7 corrections as applied against real code without first
+locating the actual files** — record them as corrections-in-waiting, gated on finding the real
+target files first.
+
+**Review of the camera/LOD idea itself, on its merits** — this part holds up well and is worth
+freezing as a framing, not just a metaphor:
+
+- The core distinction — *durable identity ≠ resident representation*, and *prefetched ≠
+  admitted* — is the same principle this document's own gate-4 material (BitFrost/ACE residency)
+  and the GPU-MINI-FABRIC-01 LOD-ladder notes elsewhere in this repo already converge on
+  independently. Naming it explicitly (rather than leaving it implicit across several documents)
+  is a real improvement, not new scope.
+- `QueryViewportV1` as a **transient, derived** artifact sitting between `QueryClassificationV1`/
+  `RetrievalPlanV1` and the retrieval/ACE fabric is architecturally sound *precisely because* it's
+  explicitly non-canonical (never stored as identity, never a second `RetrievalPlanV1`-competing
+  owner) — this matches the repo's own "One Canonical Runtime Owner Per Capability" rule (root
+  `CLAUDE.md`) rather than fighting it. The proposed field list (`candidateOrdinalMapChecksum`,
+  `workspaceRevision`/`graphRevision` pinning, an explicit `lodBudget`) is consistent with every
+  other `*V1` contract already in this repo — nothing about the shape looks foreign to the
+  codebase's existing conventions.
+- The LOD0–LOD5 ladder (identity → display glyph → card → evidence → source spans → full
+  artifact) is a reasonable generalization of the LOD ladder GPU-MINI-FABRIC-01 already documents
+  informally — formalizing it as a named, numbered ladder is useful mainly because it gives every
+  future "how much of a packet should this consumer actually receive" decision a shared
+  vocabulary, not because the specific 6 tiers are load-bearing as written.
+- The UTF-8-as-truth / HarfBuzz-as-derived-projection split is correct and matches this repo's own
+  existing "canonical text = UTF-8, display is always a derived projection" instinct (see the
+  Wire Format Layering Rule in root `CLAUDE.md` — JSON/text for logical envelopes, binary/typed
+  formats for bulk numeric data; glyph IDs are exactly the kind of derived, font-revision-scoped
+  artifact that rule already anticipates). The explicit warning "glyph ID is not identity" is the
+  single most important sentence in this whole proposal — it's the same discipline this document's
+  entire structural-identity thread already enforces for `projectionOrdinal`/`gpuNodeId`/SOM cells,
+  applied to one more axis (rendering) that hadn't been named yet.
+- The compression-by-payload-type table (never-compress IDs/revisions, TOAST/Zstd for text/JSONB,
+  Arrow/raw typed for vectors, nvCOMP only as a shadow-benchmarked GPU option, never "GPU decompress
+  everything") is consistent with this repo's existing GPU/CPU boundary rule (root `CLAUDE.md`:
+  GPU accelerates tensor math, not JSON/CRUD/parsing) and its own hard-won ENOBUFS lesson about
+  never JSON-serializing bulk vectors.
+- The cuTile placement — "later, for a small number of genuinely fusable Parent-Atlas-specific
+  kernels (residency-ranking, not CAGRA/PageRank/SVD/decompression, which vendor libraries already
+  own)" — matches this repo's own GPU-primitive-LEVEL discipline (LEVEL 1 vendor primitives prove
+  architecture, LEVEL 2 simple custom kernels prove a fusion opportunity, LEVEL 3 cuTile only fuses
+  what LEVEL 2 already proved worth fusing) and its explicit ACE-vs-NVIDIA-ACE naming-collision
+  caution from the same document. No new rule needed here — the idea already fits the existing one.
+
+**Where I'd push back or flag as unresolved, rather than just agree:**
+
+- The proof-sequence order given (`QUERY-VIEWPORT-01` → `PACKET-LOD-01` → `GLYPH-PROJECTION-01` →
+  `RESIDENCY-QUEUE-01` → `PREFETCH-PREDICTION-01` → `COMPRESSED-TILE-01` → `GPU-RESIDENCY-01` →
+  `PREFILL-STREAM-01`) is presented as the "next" sequence, but this document's own Non-Goals and
+  the sibling `parent-atlas-retrieval-lod-algorithm-taxonomy` change already have 4 of these
+  concepts (`BF-LOD-03`–`06`) as *open, unfinished* tasks under an existing owner. Opening 8 new
+  gate names here risks exactly the "no named owner yet" mistake Addendum 8 just corrected for
+  gate 8 — the residency-queue and LOD-promotion halves of this sequence likely belong inside
+  `parent-atlas-retrieval-lod-algorithm-taxonomy`, not as a fresh 8-gate ladder with new names.
+  Recommend checking that change's `tasks.md` before opening any of the 8 gates.
+- "Predict what to stream before it's requested" (ActionGram-driven prefetch) is a real, useful
+  idea, but its scoring formula as given (`priority = queryRelevance + predictedNextActionProbability
+  + expectedReuse + estimatedLatencySaved - byteCost - decompressionCost - GPUTransferCost`) is
+  unweighted/unnormalized — before this becomes a gate, it needs the same treatment this repo
+  already gave the Karpathy authority blend (explicit, justified weights, not just a formula
+  shape) or it will suffer the same "flat scores, no discriminating signal" failure this repo's
+  own autoencoder-bypass note already documents for an analogous case.
+- The Ewin Tang citation correction (arXiv:1807.04271, "A quantum-inspired classical algorithm for
+  recommendation systems") is worth recording precisely because a wrong citation was reportedly
+  made and now corrected — but neither citation was checked against arXiv directly this pass; flag
+  as operator-asserted, not independently verified.
+
+**Disposition**: freeze the *framing* (durable-identity-vs-residency, LOD ladder, UTF-8-as-truth,
+compression-by-type, cuTile-later) as consistent with and additive to this document's existing
+material — no conflict found. Do NOT open the 8 named proof gates yet; check
+`parent-atlas-retrieval-lod-algorithm-taxonomy`'s existing `BF-LOD-*` tasks first, and locate the
+actual files behind the 7 "previous patch" corrections before treating them as applied. No code
+written this pass.

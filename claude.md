@@ -4368,7 +4368,7 @@ Available models: `yorha-legal`, `yorha-fast`, `gemma4-rotorquant:latest`, `gemm
 **YorHA-only request extensions** (ignored by stock OpenAI clients):
 - `file_path` — triggers nes-arch AGENTS.md preflight + same-dir rerank boost
 - `case_id` — case-scoped RAG retrieval
-- `raw: true` — skip ACE entirely (model-layer benchmarking; tries TurboQuant first then bifrostChat fallback)
+- `raw: true` — skip ACE entirely and call the standard Bifrost model path directly (model-layer benchmarking)
 
 **Response includes a `yorha` block alongside `choices`** — transparency about which caches and sources fed the answer:
 ```json

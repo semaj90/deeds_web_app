@@ -413,11 +413,11 @@ export interface SearchRuntimeConfig {
    */
   dislikedPacketKeys?: ReadonlySet<string>;
   /**
-   * When true, `search()` skips its two fire-and-forget write side effects
-   * (`recordPromotionIntent()` to the promotion outbox, `logExposureEvents()`
-   * to the recommendation ledger) entirely -- not just their errors. Every
-   * other stage (retrieve/fuse/score/hydrate/rerank/postProcess/hypergraph
-   * lookup) is already read-only and is unaffected.
+   * When true, `search()` skips all known write side effects entirely -- not
+   * just their errors: promotion-outbox enqueue, recommendation-ledger
+   * exposure logging, and policy-training JSONL export. Every other stage
+   * (retrieve/fuse/score/hydrate/rerank/postProcess/hypergraph lookup) is
+   * read-only and is unaffected.
    *
    * Added for the SearchRuntime zero-write read-only execution boundary gate
    * (ACE-FEATURE-SOURCE-OWNER-01 finding, parent-atlas-retrieval-lineage-dag-convergence
@@ -1032,51 +1032,53 @@ export class SearchRuntime {
       }));
     }
 
-    void appendSearchRuntimeTrainingRow({
-      traceId: query.spanContext?.traceId ?? createHash('sha256').update(query.text).digest('hex').slice(0, 16),
-      query: query.text,
-      queryHash: createHash('sha256').update(query.text.toLowerCase()).digest('hex').slice(0, 16),
-      policyState,
-      policyDecision,
-      rerankProvenance: result.provenance,
-      revisions: {
-        workspaceRevision: query.workspaceRevision ?? 'unknown',
-        sourceRevision: query.sourceRevision ?? 'unknown',
-        representationRevision: String(query.representationRevision ?? 'unknown'),
-        featureRevision: policyState.featureRevision,
-      },
-      labelProvenance: {
-        source: result.provenance.crossEncoderUsed ? 'EXECUTION' : 'REPLAY',
-        sourceRevision: result.provenance.modelVersion,
-        sourceRefs: result.results.slice(0, 3).map((entry) => String(
-          (entry as any).source_ref ??
-          (entry as any).sourceRef ??
+    if (!this.readOnly) {
+      void appendSearchRuntimeTrainingRow({
+        traceId: query.spanContext?.traceId ?? createHash('sha256').update(query.text).digest('hex').slice(0, 16),
+        query: query.text,
+        queryHash: createHash('sha256').update(query.text.toLowerCase()).digest('hex').slice(0, 16),
+        policyState,
+        policyDecision,
+        rerankProvenance: result.provenance,
+        revisions: {
+          workspaceRevision: query.workspaceRevision ?? 'unknown',
+          sourceRevision: query.sourceRevision ?? 'unknown',
+          representationRevision: String(query.representationRevision ?? 'unknown'),
+          featureRevision: policyState.featureRevision,
+        },
+        labelProvenance: {
+          source: result.provenance.crossEncoderUsed ? 'EXECUTION' : 'REPLAY',
+          sourceRevision: result.provenance.modelVersion,
+          sourceRefs: result.results.slice(0, 3).map((entry) => String(
+            (entry as any).source_ref ??
+            (entry as any).sourceRef ??
+            (entry as any).packet_key ??
+            (entry as any).packetKey ??
+            (entry as any).feature_id ??
+            (entry as any).featureId ??
+            ''
+          )).filter((value) => value.length > 0),
+        },
+        candidatePacketKeys: result.results.slice(0, 10).map((entry) => String(
           (entry as any).packet_key ??
           (entry as any).packetKey ??
           (entry as any).feature_id ??
           (entry as any).featureId ??
           ''
         )).filter((value) => value.length > 0),
-      },
-      candidatePacketKeys: result.results.slice(0, 10).map((entry) => String(
-        (entry as any).packet_key ??
-        (entry as any).packetKey ??
-        (entry as any).feature_id ??
-        (entry as any).featureId ??
-        ''
-      )).filter((value) => value.length > 0),
-      sourceRefs: result.results.slice(0, 5).map((entry) => String(
-        (entry as any).source_ref ??
-        (entry as any).sourceRef ??
-        (entry as any).packet_key ??
-        (entry as any).packetKey ??
-        ''
-      )).filter((value) => value.length > 0),
-      executionId: result.provenance.cacheKey ?? undefined,
-      labelConfidence: result.results.length > 0 ? 1 : 0.5,
-    }).catch((error) => {
-      console.warn('[stage:rerank] policy training export skipped:', error);
-    });
+        sourceRefs: result.results.slice(0, 5).map((entry) => String(
+          (entry as any).source_ref ??
+          (entry as any).sourceRef ??
+          (entry as any).packet_key ??
+          (entry as any).packetKey ??
+          ''
+        )).filter((value) => value.length > 0),
+        executionId: result.provenance.cacheKey ?? undefined,
+        labelConfidence: result.results.length > 0 ? 1 : 0.5,
+      }).catch((error) => {
+        console.warn('[stage:rerank] policy training export skipped:', error);
+      });
+    }
 
     return result.results;
   }

@@ -3,6 +3,9 @@ import { z } from 'zod';
 import type { RequestHandler } from './$types';
 import { createSearchRuntime, type SearchResult } from '$lib/server/retrieval/search-runtime.js';
 import { bifrostChat, VLM_MODELS } from '$lib/server/ollama.js';
+import { randomUUID } from 'node:crypto';
+import { classifyAtlasQuery, type QueryClassificationV1 } from '$lib/server/atlas/agentic-file-compiler/query-classifier.js';
+import { buildRetrievalPlan, type RetrievalPlanV1 } from '$lib/server/atlas/agentic-file-compiler/retrieval-plan.js';
 
 const requestSchema = z.object({
   query: z.string().trim().min(1, 'Query string is required').max(1024, 'Query string is too long'),
@@ -28,6 +31,8 @@ function emptyResult(error: string, status: number) {
       graphPaths: [],
       synthesis: null,
       proof: null,
+      classification: null,
+      retrievalPlan: null,
       error,
       provenance: { qdrant: false, turbovec: false, redis: false, neo4j: false, ace: false },
     },
@@ -81,10 +86,24 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     }
 
     const input = parsed.data;
+    const requestId = request.headers.get('x-request-id')?.trim() || `hyperrag:${randomUUID()}`;
+    const classification: QueryClassificationV1 = classifyAtlasQuery({
+      requestId,
+      query: input.query,
+      producerRevision: 'hyperrag-front-door-v1',
+    });
+    const retrievalPlan: RetrievalPlanV1 | null = input.workspaceRevision
+      ? buildRetrievalPlan({
+          classification,
+          workspaceRevision: input.workspaceRevision,
+          candidateBudget: input.topK ?? 15,
+          producerRevision: 'hyperrag-retrieval-plan-v1',
+        })
+      : null;
     const runtime = createSearchRuntime({ userId: locals.user.id });
     const result = await runtime.search({
       text: input.query,
-      topK: input.topK ?? 15,
+      topK: retrievalPlan?.candidateBudget ?? input.topK ?? 15,
       workspaceId: input.workspaceId,
       workspaceRevision: input.workspaceRevision,
       sourceRevision: input.sourceRevision,
@@ -123,6 +142,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       graphPaths: [],
       synthesis,
       proof: result.proof ?? null,
+      classification,
+      retrievalPlan,
       provenance: {
         qdrant: result.provenance.retrievalSources.includes('qdrant'),
         turbovec: false,

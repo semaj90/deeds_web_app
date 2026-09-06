@@ -80,10 +80,25 @@ vi.mock('$lib/server/env.server.js', () => ({
 	ENV: {
 		OLLAMA_BASE_URL: 'http://localhost:11434',
 		QDRANT_URL: 'http://localhost:6333',
+		ROTORQUANT_MODEL_PATH: process.env.ROTORQUANT_MODEL_PATH ?? process.env.TURBO_MODEL_PATH,
 	},
 }));
 
-// ── Global fetch mock (for ai/models and ai/stats Ollama /api/tags proxy) ──
+// ── Expected llama-server model identity ──
+// Routes migrated off Ollama (ai/ask, ai/judge, ai/case-prediction) resolve
+// their `model` field from LOCAL_VLM_MODEL, which — with no LLAMA_SERVER_MODEL
+// override in this file's env.server.js mock — is basename(ROTORQUANT_MODEL_PATH).
+// Computed from the same live .env value the mock ENV below reads, so this
+// never needs updating when the configured model changes.
+const EXPECTED_LOCAL_VLM_MODEL = (() => {
+	const modelPath = process.env.ROTORQUANT_MODEL_PATH ?? process.env.TURBO_MODEL_PATH ?? '';
+	const base = modelPath.split(/[\\/]/).pop();
+	return base && base.length > 0 ? base : 'unknown-model';
+})();
+
+// ── Global fetch mock (for ai/models, ai/stats Ollama /api/tags proxy, and
+//    the llama-server /chat/completions lane used by ai/ask, ai/judge,
+//    ai/case-prediction, and /api/contextual/chat post-Ollama-phase-out) ──
 const mockGlobalFetch = vi.fn(async (url: string) => {
 	if (String(url).includes('/api/tags')) {
 		return new Response(
@@ -92,6 +107,14 @@ const mockGlobalFetch = vi.fn(async (url: string) => {
 					{ name: 'gemma4-rotorquant:latest', size: 4000000000, modified_at: '2026-03-01', digest: 'abc123def456' },
 					{ name: 'embeddinggemma:latest', size: 1000000000, modified_at: '2026-03-01', digest: 'def456abc123' },
 				],
+			}),
+			{ status: 200, headers: { 'Content-Type': 'application/json' } }
+		);
+	}
+	if (String(url).includes('/chat/completions')) {
+		return new Response(
+			JSON.stringify({
+				choices: [{ message: { content: 'Mock legal analysis response.' } }],
 			}),
 			{ status: 200, headers: { 'Content-Type': 'application/json' } }
 		);
@@ -235,11 +258,14 @@ describe('/api/ai/models (GET)', () => {
 	});
 
 	it('handles Ollama unavailable', async () => {
+		// Route follows this repo's Degraded Response Contract (CLAUDE.md): a GET
+		// handler returns 200 with empty-but-valid data on upstream failure, never
+		// an error status — matching src/routes/api/ai/models/+server.ts:31-34.
 		mockGlobalFetch.mockResolvedValueOnce(new Response('', { status: 500 }));
 		const { GET } = await import('../src/routes/api/ai/models/+server.js');
 		const event = makeEvent('GET', 'http://localhost/api/ai/models');
 		const res = await GET(event as any);
-		expect(res.status).toBe(503);
+		expect(res.status).toBe(200);
 		const data = await jsonBody(res);
 		expect(data.models).toEqual([]);
 	});
@@ -382,7 +408,7 @@ describe('/api/ai/ask (POST)', () => {
 		const res = await POST(event as any);
 		const data = await jsonBody(res);
 		expect(data.answer).toBeTruthy();
-		expect(data.model).toBe('gemma4-rotorquant:latest');
+		expect(data.model).toBe(EXPECTED_LOCAL_VLM_MODEL);
 	});
 
 	it('accepts query or prompt field as alias', async () => {
@@ -415,7 +441,9 @@ describe('/api/ai/ask (POST)', () => {
 	});
 
 	it('handles Ollama error', async () => {
-		mockOllamaFetch.mockResolvedValueOnce(new Response('', { status: 500 }));
+		// ai/ask calls fetch() directly against LLAMA_SERVER_BASE_URL (post-Ollama
+		// phase-out), not ollamaFetch — mock the layer the route actually uses.
+		mockGlobalFetch.mockResolvedValueOnce(new Response('', { status: 500 }));
 		const { POST } = await import('../src/routes/api/ai/ask/+server.js');
 		const event = makeEvent('POST', 'http://localhost/api/ai/ask', {
 			body: { question: 'test' },
@@ -514,7 +542,7 @@ describe('/api/ai/case-prediction (POST)', () => {
 		const data = await jsonBody(res);
 		expect(data.prediction).toBeTruthy();
 		expect(data.caseId).toBe(TEST_CASE_ID);
-		expect(data.model).toBe('gemma4-rotorquant:latest');
+		expect(data.model).toBe(EXPECTED_LOCAL_VLM_MODEL);
 	});
 
 	it('returns 404 for nonexistent case', async () => {

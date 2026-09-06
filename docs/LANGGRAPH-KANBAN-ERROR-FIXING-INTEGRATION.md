@@ -1,7 +1,7 @@
 # LangGraph Kanban Error-Fixing Integration
 
-**Date**: June 28, 2026  
-**Status**: ✅ FULLY IMPLEMENTED — Ready for production  
+**Date**: June 28, 2026
+**Status**: ✅ FULLY IMPLEMENTED — Ready for production
 **Scope**: LangGraph state machine for orchestrating error-fixing Kanban tasks
 
 ---
@@ -14,7 +14,7 @@ The error-fixing Kanban agent is a 6-node LangGraph workflow that:
 2. **Classifies** packets by policy task type
 3. **Creates** Kanban task records for tracking
 4. **Scores** packets via .pt policy model (HTTP endpoint)
-5. **Synthesizes** error fix suggestions via Gemma4 (placeholder)
+5. **Synthesizes** error fix suggestions via ornith llama-server 8090 v/1 completions (placeholder)
 6. **Updates** Kanban task status and evidence
 
 All state transitions are tracked in LangGraph's `ErrorFixingState`, enabling:
@@ -94,7 +94,7 @@ All state transitions are tracked in LangGraph's `ErrorFixingState`, enabling:
 async function loadErrorFixingPackets(state): Promise<Partial<ErrorFixingStateType>>
 ```
 
-**Input**: `trace_id` (from state)  
+**Input**: `trace_id` (from state)
 **Output**: `packets: Packet[]` (error-fixing only)
 
 **Process**:
@@ -112,7 +112,7 @@ async function loadErrorFixingPackets(state): Promise<Partial<ErrorFixingStateTy
 async function classifyErrorFixingTasks(state): Promise<Partial<ErrorFixingStateType>>
 ```
 
-**Input**: `packets: Packet[]`  
+**Input**: `packets: Packet[]`
 **Output**: `classified_tasks: Map<string, PolicyTask>`
 
 **Process**:
@@ -127,7 +127,7 @@ async function classifyErrorFixingTasks(state): Promise<Partial<ErrorFixingState
 async function createKanbanTasks(state): Promise<Partial<ErrorFixingStateType>>
 ```
 
-**Input**: `packets: Packet[]`  
+**Input**: `packets: Packet[]`
 **Output**: `kanban_tasks: KanbanErrorFixingTask[]`
 
 **Process**:
@@ -150,7 +150,7 @@ async function createKanbanTasks(state): Promise<Partial<ErrorFixingStateType>>
 async function scoreWithPolicyModel(state): Promise<Partial<ErrorFixingStateType>>
 ```
 
-**Input**: `packets: Packet[]`  
+**Input**: `packets: Packet[]`
 **Output**: `policy_scores: Map<string, number>`
 
 **Process**:
@@ -170,7 +170,7 @@ scores.set(packet_key, 1.0 - task.priority * 0.1)
 async function synthesizeErrorFixes(state): Promise<Partial<ErrorFixingStateType>>
 ```
 
-**Input**: `packets: Packet[]`, `policy_scores: Map<string, number>`  
+**Input**: `packets: Packet[]`, `policy_scores: Map<string, number>`
 **Output**: `fixes: ErrorFixSuggestion[]`
 
 **Process**:
@@ -189,7 +189,7 @@ async function synthesizeErrorFixes(state): Promise<Partial<ErrorFixingStateType
 async function updateKanbanStatus(state): Promise<Partial<ErrorFixingStateType>>
 ```
 
-**Input**: `kanban_tasks: KanbanErrorFixingTask[]`, `fixes: ErrorFixSuggestion[]`  
+**Input**: `kanban_tasks: KanbanErrorFixingTask[]`, `fixes: ErrorFixSuggestion[]`
 **Output**: `kanban_tasks: KanbanErrorFixingTask[]`, `completed_count: number`, `failed_count: number`
 
 **Process**:
@@ -333,11 +333,11 @@ await natsClient.publish('error-fixing.kanban.complete', {
 
 ## Hard Rules
 
-✅ **Postgres is truth** — Load from Postgres first, validate identity  
-✅ **Classification immutable** — Policy task type never changes mid-workflow  
-✅ **State transparent** — Every node's output logged and traceable  
-✅ **Fallback always available** — Policy model unavailable → use priority-based scoring  
-✅ **Operator approval** — No auto-fixes, all suggestions shown for review  
+✅ **Postgres is truth** — Load from Postgres first, validate identity
+✅ **Classification immutable** — Policy task type never changes mid-workflow
+✅ **State transparent** — Every node's output logged and traceable
+✅ **Fallback always available** — Policy model unavailable → use priority-based scoring
+✅ **Operator approval** — No auto-fixes, all suggestions shown for review
 ✅ **Deterministic** — Same packets → same state output (no randomness)
 
 ---
@@ -386,9 +386,9 @@ npm run error-fixing:kanban:dry
 
 ---
 
-**Created by**: Claude (Anthropic)  
-**Date**: June 28, 2026  
-**Status**: ✅ PRODUCTION-READY  
+**Created by**: Claude (Anthropic)
+**Date**: June 28, 2026
+**Status**: ✅ PRODUCTION-READY
 **Next**: Wire Gemma4 synthesis + persist to database
 
 ---

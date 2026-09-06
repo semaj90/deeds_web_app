@@ -66,6 +66,7 @@ vi.mock('$lib/server/env.server.js', () => ({
     LANGEXTRACT_URL: 'http://localhost:8095',
     LANGEXTRACT_ENABLED: 'true',
     MINIO_EVIDENCE_BUCKET: 'evidence',
+    ROTORQUANT_MODEL_PATH: process.env.ROTORQUANT_MODEL_PATH ?? process.env.TURBO_MODEL_PATH,
   },
 }));
 vi.mock('$lib/config/env.server.js', () => ({
@@ -155,15 +156,16 @@ const mockSearcher = {
 	})),
 	getDocument: vi.fn(async () => null),
 };
-vi.mock('$lib/services/knowledge-search/KnowledgeSearcher.js', () => ({
+vi.mock('$lib/server/services/knowledge-search/KnowledgeSearcher.js', () => ({
 	getKnowledgeSearcher: () => mockSearcher,
 }));
 
 // ── Web search mock ──
+const mockWebSearch = vi.hoisted(() => vi.fn(async () => ({
+	results: [{ title: 'Legal News', url: 'https://example.com', snippet: 'Case update' }],
+})));
 vi.mock('$lib/server/retrieval/web-search.js', () => ({
-	webSearch: vi.fn(async () => ({
-		results: [{ title: 'Legal News', url: 'https://example.com', snippet: 'Case update' }],
-	})),
+	webSearch: mockWebSearch,
 }));
 
 // ── Observability mock ──
@@ -289,7 +291,13 @@ describe('/api/contextual/chat (POST)', () => {
 	});
 
 	it('returns 502 when Ollama is unavailable', async () => {
-		mockOllamaFetch.mockResolvedValueOnce(new Response('', { status: 500 }));
+		// contextual/chat calls fetch() directly against LLAMA_SERVER_BASE_URL
+		// (post-Ollama phase-out), not ollamaFetch — mock the layer it actually
+		// uses. mockGlobalFetch's default branch delegates to the real fetch for
+		// unmatched URLs, so without this override the test would silently hit
+		// the actually-running local llama-server instead of exercising the
+		// error path.
+		mockGlobalFetch.mockResolvedValueOnce(new Response('', { status: 500 }));
 		const { POST } = await import('../src/routes/api/contextual/chat/+server.js');
 		const event = makeEvent('POST', 'http://localhost/api/contextual/chat', {
 			body: { message: 'test message' },
@@ -569,7 +577,12 @@ describe('/api/websearch (POST)', () => {
 	});
 
 	it('returns fallback when SearXNG is down', async () => {
-		mockGlobalFetch.mockRejectedValueOnce(new Error('Connection refused'));
+		// /api/websearch calls the fully-mocked webSearch() (this file mocks
+		// $lib/server/retrieval/web-search.js wholesale, so its internal
+		// SearXNG/DuckDuckGo fetch chain never runs in this test — overriding
+		// mockGlobalFetch here would be a no-op). The route's "unavailable"
+		// error message is only reached when webSearch() itself throws.
+		mockWebSearch.mockRejectedValueOnce(new Error('All search providers unavailable'));
 		const { POST } = await import('../src/routes/api/websearch/+server.js');
 		const event = makeEvent('POST', 'http://localhost/api/websearch', {
 			body: { query: 'test' },
@@ -651,7 +664,14 @@ describe('/api/web/crawl (POST)', () => {
 	});
 
 	it('returns 502 when langextract fails', async () => {
-		mockLangextractFetch.mockRejectedValueOnce(new Error('ECONNREFUSED'));
+		// extractWebDocument() falls back langextract -> beautifulsoup -> raw
+		// fetch; both langextract and beautifulsoup go through langextractFetch,
+		// so a single rejection only fails the first tier and beautifulsoup
+		// silently succeeds via the mock's default response. All three tiers
+		// must fail to actually reach the 502 path.
+		mockLangextractFetch.mockRejectedValueOnce(new Error('ECONNREFUSED')); // crawlViaLangextract
+		mockLangextractFetch.mockRejectedValueOnce(new Error('ECONNREFUSED')); // crawlViaBeautifulSoup
+		mockGlobalFetch.mockResolvedValueOnce(new Response('', { status: 500 })); // crawlFallback's raw fetch(url)
 		const { POST } = await import('../src/routes/api/web/crawl/+server.js');
 		const event = makeEvent('POST', 'http://localhost/api/web/crawl', {
 			body: { url: 'https://example.com/page' },

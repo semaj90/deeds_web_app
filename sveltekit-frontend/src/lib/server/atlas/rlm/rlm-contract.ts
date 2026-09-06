@@ -38,6 +38,8 @@ export interface RlmSearchRequest {
 	requestId: string;
 	workspaceRevision: string;
 	policyRevision: string;
+	taxonomyRevision?: string;
+	ontologyRevision?: string;
 	query: string;
 	filters?: Record<string, unknown>;
 	topK?: number;

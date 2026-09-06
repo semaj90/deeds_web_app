@@ -1,18 +1,21 @@
 /**
  * Phase 76: Chat Route Server
- * Enhanced with direct Ollama integration and Redis pub/sub for SSE
+ * Streams chat completions from llama-server (:8090, live-resolved model
+ * identity) and publishes deltas via Redis pub/sub for SSE.
+ *
+ * FIXED 2026-09-06 (found during the Ollama-vs-llama-server boundary sweep,
+ * openspec/changes/parent-atlas-analysis-pass-ornith-adapter task 1.5): this
+ * route previously sent chat requests to Ollama's native /api/generate using
+ * LLM_MODEL_ID — a llama-server GGUF/alias identifier (e.g. "hforf.gguf" or
+ * "ornith-1.5-9b"), never an Ollama-pulled model tag. Ollama has no model
+ * under that name, so this send action was broken in practice, not merely a
+ * stale-doc violation of the "Ollama is ONLY for embeddings" hard rule.
  */
 
 import { fail } from '@sveltejs/kit';
-import type { Redis } from 'ioredis';
 import { getRedis } from '$lib/server/redis';
-import { getOllamaUrl } from '$lib/config/env.server.js';
 import type { Actions, PageServerLoad } from './$types';
-import { ollamaFetch } from '$lib/server/ollama.js';
-import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
-
-const OLLAMA_URL = getOllamaUrl();
-const OLLAMA_MODEL = LLM_MODEL_ID;
+import { resolveLlamaInferenceTarget } from '$lib/server/llm/runtime-contract.js';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
 	let history: any[] = [];
@@ -72,8 +75,8 @@ export const actions: Actions = {
 			// Publish start event
 			await redis.publish(channel, JSON.stringify({ type: 'start' }));
 
-			// Generate AI response via Ollama (streaming)
-			const aiResponse = await streamOllamaResponse(userMessage.trim(), channel, redis);
+			// Generate AI response via llama-server (streaming)
+			const aiResponse = await streamLlamaServerResponse(userMessage.trim(), channel, redis);
 
 			// Save to Redis history
 			try {
@@ -147,9 +150,9 @@ export const actions: Actions = {
 };
 
 /**
- * Stream response from Ollama and publish deltas to Redis
+ * Stream response from llama-server and publish deltas to Redis
  */
-async function streamOllamaResponse(
+async function streamLlamaServerResponse(
   message: string,
   channel: string,
   redis: import('ioredis').Redis
@@ -157,31 +160,37 @@ async function streamOllamaResponse(
   let fullContent = '';
 
   try {
-    const response = await ollamaFetch(`${OLLAMA_URL}/api/generate`, {
+    const target = await resolveLlamaInferenceTarget();
+    const response = await fetch(`${target.baseUrl}/v1/chat/completions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: OLLAMA_MODEL,
-        prompt: `You are a legal AI assistant. Answer the following question professionally and accurately:\n\n${message}`,
+        model: target.model,
+        messages: [
+          {
+            role: 'user',
+            content: `You are a legal AI assistant. Answer the following question professionally and accurately:\n\n${message}`,
+          },
+        ],
         stream: true,
-        options: {
-          temperature: 0.7,
-          top_p: 0.9,
-        },
+        temperature: 0.7,
+        top_p: 0.9,
       }),
+      signal: AbortSignal.timeout(90_000),
     });
 
     if (!response.ok) {
-      throw new Error(`Ollama API error: ${response.status}`);
+      throw new Error(`llama-server API error: ${response.status}`);
     }
 
     if (!response.body) {
-      throw new Error('No response body from Ollama');
+      throw new Error('No response body from llama-server');
     }
 
     const reader = response.body.getReader();
     const decoder = new TextDecoder();
 
+    let buf = '';
     let streamDone = false;
     while (!streamDone) {
       const { done, value } = await reader.read();
@@ -190,15 +199,22 @@ async function streamOllamaResponse(
         continue;
       }
 
-      const chunk = decoder.decode(value, { stream: true });
+      buf += decoder.decode(value, { stream: true });
+      const lines = buf.split('\n');
+      buf = lines.pop() ?? '';
 
-      // Ollama streams JSONL lines
-      for (const line of chunk.split('\n')) {
-        if (!line.trim()) continue;
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed.startsWith('data:')) continue;
+        const payload = trimmed.slice(5).trim();
+        if (payload === '[DONE]') {
+          await redis.publish(channel, JSON.stringify({ type: 'done' }));
+          continue;
+        }
 
         try {
-          const obj = JSON.parse(line);
-          const delta = obj.response ?? '';
+          const obj = JSON.parse(payload);
+          const delta: string = obj.choices?.[0]?.delta?.content ?? '';
 
           if (delta) {
             fullContent += delta;
@@ -212,13 +228,8 @@ async function streamOllamaResponse(
               })
             );
           }
-
-          if (obj.done) {
-            // Publish done event
-            await redis.publish(channel, JSON.stringify({ type: 'done' }));
-          }
         } catch {
-          // Skip malformed JSON lines
+          // Skip malformed SSE line
         }
       }
     }
@@ -236,7 +247,7 @@ async function streamOllamaResponse(
       warnings,
     };
   } catch (error) {
-    console.error('Ollama streaming failed:', error);
+    console.error('llama-server streaming failed:', error);
 
     // Publish error and done
     await redis.publish(channel, JSON.stringify({ type: 'error', error: String(error) }));

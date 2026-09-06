@@ -1,0 +1,40 @@
+{
+  "schema": "parent-atlas.residency-proof-fixture.v1",
+  "query": "why isn't CAGRA selected?",
+  "expected": {
+    "HOT": [
+      "source:selector"
+    ],
+    "WARM": [
+      "card:caller-metadata",
+      "card:cagra-capability",
+      "card:focused-test-names"
+    ],
+    "COLD": [
+      "source:all-callers",
+      "graph:two-hop-cagra"
+    ]
+  },
+  "nextActionProbabilities": [
+    {
+      "action": "inspect_executor_selection",
+      "probability": 0.96
+    },
+    {
+      "action": "inspect_callers",
+      "probability": 0.84
+    },
+    {
+      "action": "inspect_config_capabilities",
+      "probability": 0.78
+    },
+    {
+      "action": "run_focused_validation",
+      "probability": 0.67
+    },
+    {
+      "action": "broad_graph_expansion",
+      "probability": 0.21
+    }
+  ]
+}
