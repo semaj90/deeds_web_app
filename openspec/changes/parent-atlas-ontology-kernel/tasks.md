@@ -3637,3 +3637,32 @@ this section's own findings were safe, additive, non-database edits, so both wer
    `APPLY_EXISTING_SQL`); `feature_registry` correctly still reports `APPLY_EXISTING_SQL`
    (genuinely missing table); no other table's `repairClass` changed. Script-only edit — no
    Postgres table, index, or data was touched by fixing the audit script itself.
+
+## Session handoff (2026-09-08, for tomorrow)
+
+**Closed today**: TRACE MCP tool-count self-contradiction (176 live confirmed authoritative, 120
+static registerTool() count is a different, correct measurement — doc fixed);
+`HYPERGRAPH-NARY-EVIDENCE-SOURCE-SURVEY-01` (found `atlas_relationships` already implements the
+OKF ternary-capable contract; built `PRODUCE-AUTHORIZED-RESOURCE-MUTATION-01`, DRY_RUN_PROVEN, no
+writes); `OKF-REGISTRY-REFERENCE-PARITY-01` (16/16 owner paths exist, fixed the one real naming
+mismatch); `audit-postgres-contract-mirrors.mjs`'s `repairClass` bug (no longer says
+`APPLY_EXISTING_SQL` for tables that already exist live); `TASK-SEMANTIC-PACKET-COMPATIBILITY-01`
+step 2 verified + given its real test coverage (the provided smoke test tested an unrelated
+module). All committed and pushed to `main` (`df9fed6ce0`).
+
+**Open for tomorrow**:
+- `TASK-SEMANTIC-PACKET-COMPATIBILITY-01` steps 1/3/4/5 (DATABASE_URL capture, disposable-fixture
+  run, apply-vs-narrow decision on `20260606_task_semantic_packets_live_alignment.sql`,
+  independent Qdrant/Postgres identity readback).
+- **New, unresolved, found just after the push**: a concurrent session's edit to
+  `sveltekit-frontend/src/lib/server/tasks/semantic-packets.ts` introduced real TypeScript compile
+  errors at lines ~193/537/654 — `eq(taskSemanticPackets.id, packetId)` where `packetId` is typed
+  `number | string` but the column is UUID-only. Not investigated or fixed yet — check first
+  whether this is already being actively worked by whoever is editing that file live.
+- `atlas_packets.source_revision` — still correctly gated behind
+  `CURRENT-SOURCE-EVIDENCE-HYDRATION-01`'s unresolved 235-mismatch/7-unavailable lineage question;
+  do not apply.
+- Cross-schema Python/Pydantic↔TS/Zod↔SearXNG↔Go fixture (`OKF-PYTHON-SEARXNG-GO-ALIGNMENT-01` in
+  the sibling `parent-atlas-ace-rlm-bitfrost-integration` change) — still open, not started.
+- Historical table/view drift classification for `parent_atlas_documents` (view, TS schema module
+  wrongly models it as a table — not corrected yet) and `route_runtime_packets`.
