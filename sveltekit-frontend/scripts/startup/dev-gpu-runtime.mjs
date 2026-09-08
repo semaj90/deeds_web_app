@@ -353,13 +353,20 @@ async function verifyLlamaServerModelLoaded(targetModelPath, port = 8090, opts =
 }
 
 /**
- * Write a plain-text diagnostic summary to openspec/changes/ on verification
+ * Write a plain-text diagnostic summary to logs/startup/ on verification
  * failure, then STOP (caller must exit — this function never retries or
  * loops). Per-run file (timestamped), not an append-forever log, so each
  * failure is independently readable and old ones don't need pruning.
+ *
+ * Was previously written to REPO_ROOT/openspec/changes/ (fixed 2026-09-08) --
+ * openspec/changes/ is reserved for real change-proposal directories, and 5
+ * of these diagnostic .txt files had accumulated there directly, polluting a
+ * cross-tree OpenSpec duplication sweep with non-change clutter. logs/startup/
+ * is already gitignored (see .gitignore) and matches this repo's existing
+ * "Bounded Output for VS Code Chat" convention for diagnostic artifacts.
  */
 function writeStartupFailureReport(details) {
-  const dir = path.join(REPO_ROOT, 'openspec', 'changes');
+  const dir = path.join(FRONTEND_ROOT, 'logs', 'startup');
   mkdirSync(dir, { recursive: true });
   const reportPath = path.join(dir, `gpu-startup-failure-${Date.now()}.txt`);
 
