@@ -1,6 +1,6 @@
 {
   "schema": "atlas.graphify-lifecycle-owner.v1",
-  "generatedAt": "2026-09-05T06:52:59.871Z",
+  "generatedAt": "2026-09-08T19:50:47.265Z",
   "mode": "READ_ONLY_LIFECYCLE_OWNER_AUDIT",
   "databaseError": null,
   "lifecycleOwner": null,
@@ -22,6 +22,21 @@
       "mutationSignals": []
     },
     {
+      "path": "scripts/atlas/audit-graphify-workspace-owner-v1.mjs",
+      "classification": "READ_ONLY_AUDITOR",
+      "mutationSignals": []
+    },
+    {
+      "path": "scripts/atlas/audit-graphify-stale-run-reconciliation-v1.mjs",
+      "classification": "READ_ONLY_AUDITOR",
+      "mutationSignals": []
+    },
+    {
+      "path": "scripts/atlas/audit-graphify-run-file-binding-v1.mjs",
+      "classification": "READ_ONLY_AUDITOR",
+      "mutationSignals": []
+    },
+    {
       "path": "scripts/atlas/audit-graphify-lifecycle-owner-v1.mjs",
       "classification": "READ_ONLY_AUDITOR",
       "mutationSignals": []
@@ -32,17 +47,12 @@
       "mutationSignals": []
     },
     {
-      "path": "scripts/atlas/audit-graphify-run-file-binding-v1.mjs",
+      "path": "scripts/atlas/audit-graphify-completed-legacy-coverage-v1.mjs",
       "classification": "READ_ONLY_AUDITOR",
       "mutationSignals": []
     },
     {
-      "path": "scripts/atlas/audit-graphify-workspace-owner-v1.mjs",
-      "classification": "READ_ONLY_AUDITOR",
-      "mutationSignals": []
-    },
-    {
-      "path": "scripts/atlas/audit-graphify-stale-run-reconciliation-v1.mjs",
+      "path": "scripts/atlas/audit-graphify-completed-differential-replay-v1.mjs",
       "classification": "READ_ONLY_AUDITOR",
       "mutationSignals": []
     },
@@ -62,7 +72,27 @@
       "mutationSignals": []
     },
     {
+      "path": "scripts/atlas/graphify-daily-lifecycle-file-inventory-v1.mjs",
+      "classification": "UNKNOWN",
+      "mutationSignals": []
+    },
+    {
+      "path": "scripts/atlas/lib/graphify-source-evidence.mjs",
+      "classification": "UNKNOWN",
+      "mutationSignals": []
+    },
+    {
+      "path": "scripts/atlas/inspect-graphify-schema-v1.mjs",
+      "classification": "UNKNOWN",
+      "mutationSignals": []
+    },
+    {
       "path": "scripts/atlas/plan-current-structural-edge-resolution-v1.mjs",
+      "classification": "PLANNER_ONLY",
+      "mutationSignals": []
+    },
+    {
+      "path": "scripts/atlas/plan-current-source-authority-repair-v1.mts",
       "classification": "PLANNER_ONLY",
       "mutationSignals": []
     },
@@ -72,22 +102,37 @@
       "mutationSignals": []
     },
     {
+      "path": "scripts/atlas/plan-packet-chunk-lineage-promotion-v1.mjs",
+      "classification": "PLANNER_ONLY",
+      "mutationSignals": []
+    },
+    {
       "path": "scripts/atlas/prove-code-source-revision-packet-live-dry-run.mts",
       "classification": "UNKNOWN",
       "mutationSignals": []
     },
     {
-      "path": "scripts/atlas/prove-graphify-open-bind-complete-lifecycle-v1.mjs",
-      "classification": "UNKNOWN",
-      "mutationSignals": []
+      "path": "sveltekit-frontend/src/lib/server/atlas/indexing/graphify-source-inventory-writer-v2.ts",
+      "classification": "LEGACY_WRITER",
+      "mutationSignals": [
+        "INSERT INTO public.graphify_runs",
+        "UPDATE public.graphify_runs",
+        "INSERT INTO public.graphify_runs",
+        "UPDATE public.graphify_runs"
+      ]
     },
     {
-      "path": "scripts/atlas/prove-exact-promotion-live-dry-run.mts",
-      "classification": "UNKNOWN",
-      "mutationSignals": []
+      "path": "sveltekit-frontend/src/lib/server/atlas/indexing/graphify-source-inventory-writer-v2.spec.ts",
+      "classification": "LEGACY_WRITER",
+      "mutationSignals": [
+        "INSERT INTO public.graphify_runs",
+        "UPDATE public.graphify_runs",
+        "INSERT INTO public.graphify_runs",
+        "UPDATE public.graphify_runs"
+      ]
     },
     {
-      "path": "scripts/atlas/prove-graphify-run-completion-primitive-v1.mjs",
+      "path": "sveltekit-frontend/src/lib/server/atlas/indexing/graphify-daily-coordinator-v1.ts",
       "classification": "UNKNOWN",
       "mutationSignals": []
     },
@@ -107,36 +152,36 @@
       "mutationSignals": []
     },
     {
-      "path": "sveltekit-frontend/src/lib/server/atlas/indexing/graphify-source-inventory-writer-v2.spec.ts",
-      "classification": "LEGACY_WRITER",
-      "mutationSignals": [
-        "INSERT INTO public.graphify_runs",
-        "UPDATE public.graphify_runs",
-        "INSERT INTO public.graphify_runs",
-        "UPDATE public.graphify_runs"
-      ]
+      "path": "scripts/atlas/prove-graphify-run-completion-primitive-v1.mjs",
+      "classification": "UNKNOWN",
+      "mutationSignals": []
     },
     {
-      "path": "sveltekit-frontend/src/lib/server/atlas/indexing/graphify-source-inventory-writer-v2.ts",
-      "classification": "LEGACY_WRITER",
-      "mutationSignals": [
-        "INSERT INTO public.graphify_runs",
-        "UPDATE public.graphify_runs",
-        "INSERT INTO public.graphify_runs",
-        "UPDATE public.graphify_runs"
-      ]
+      "path": "scripts/atlas/prove-graphify-open-bind-complete-lifecycle-v1.mjs",
+      "classification": "UNKNOWN",
+      "mutationSignals": []
     },
     {
-      "path": "sveltekit-frontend/src/lib/server/atlas/indexing/graphify-daily-coordinator-v1.ts",
+      "path": "scripts/atlas/prove-exact-promotion-live-dry-run.mts",
+      "classification": "UNKNOWN",
+      "mutationSignals": []
+    },
+    {
+      "path": "scripts/atlas/register-orphaned-chunks.mjs",
+      "classification": "LEGACY_WRITER",
+      "mutationSignals": []
+    },
+    {
+      "path": "scripts/atlas/select-current-source-evidence-authority-v1.mts",
       "classification": "UNKNOWN",
       "mutationSignals": []
     }
   ],
-  "runningRunCount": 5,
-  "staleRunCount": 5,
-  "currentRunCount": 0,
-  "repositoryHeadRevision": "0de34853f42dbd57cd84dbdca8e19caa6cf4e374",
+  "runningRunCount": 7,
+  "staleRunCount": 6,
+  "currentRunCount": 1,
+  "repositoryHeadRevision": "ec2f544a2bfa26a825de69d9af9ce846647fc3da",
   "writesPerformed": false,
   "canonicalAuthority": false,
-  "reportChecksum": "sha256:0a8d3686dcc3acaff5b47d8f42925eb5ef0827c674b726429c2a7041f914671b"
+  "reportChecksum": "sha256:04984532b91931cbfa2e2ab189bcbd8889519ecbfa1b8a585a754550eb7fd656"
 }

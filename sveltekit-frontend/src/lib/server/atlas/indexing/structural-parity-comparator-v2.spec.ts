@@ -73,4 +73,25 @@ describe('compareStructuralObservationsV2', () => {
     expect(result.pairs[0]?.startByteDelta).toBe(2);
     expect(result.pairs[0]?.endByteDelta).toBe(2);
   });
+
+  it('classifies unmatched nested observations without treating them as top-level drift', () => {
+    const result = compareStructuralObservationsV2(
+      [row({ name: 'callback', startByte: 10, endByte: 20, parentRoute: ['program', 'function_declaration', 'arguments'] })],
+      [],
+    );
+
+    expect(result.unmatchedScopeCounts.left.NESTED_DECLARATION).toBe(1);
+    expect(result.unmatchedScopeCounts.right).toEqual({});
+  });
+
+  it('does not count an export wrapper as a second symbol', () => {
+    const result = compareStructuralObservationsV2(
+      [row({ name: 'db', rawNodeType: 'variable_declarator' }), row({ name: 'db', rawNodeType: 'export_statement', rawKind: 'EXPORT', symbolKind: 'UNKNOWN' })],
+      [row({ name: 'db', rawNodeType: 'variable_declarator' })],
+    );
+
+    expect(result.gates.namedSymbolCoverage).toBe(true);
+    expect(result.leftNamedCount).toBe(1);
+    expect(result.pairedCount).toBe(1);
+  });
 });

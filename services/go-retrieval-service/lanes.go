@@ -94,8 +94,8 @@ type LaneService struct {
 // Search runs all requested lanes in parallel and collects results.
 // Timeout: 1500 ms total (per architecture contract).
 func (s *LaneService) Search(ctx context.Context, req LaneRequest) (LaneResponse, error) {
-	if req.Query == "" {
-		return LaneResponse{}, fmt.Errorf("empty query")
+	if err := validateLaneRequest(ctx, req, s.Cache != nil); err != nil {
+		return LaneResponse{}, err
 	}
 	if req.LimitPerLane <= 0 {
 		req.LimitPerLane = 40
@@ -157,6 +157,28 @@ func (s *LaneService) Search(ctx context.Context, req LaneRequest) (LaneResponse
 	}
 	resp.Duration = time.Since(started)
 	return resp, nil
+}
+
+// validateLaneRequest keeps the cache namespace revision-qualified. An empty
+// workspace or corpus version is acceptable for uncached fixture execution,
+// but must fail closed when a cache is enabled because both values participate
+// in the cache identity contract.
+func validateLaneRequest(ctx context.Context, req LaneRequest, cacheEnabled bool) error {
+	if ctx == nil {
+		return fmt.Errorf("nil context")
+	}
+	if strings.TrimSpace(req.Query) == "" {
+		return fmt.Errorf("empty query")
+	}
+	if cacheEnabled {
+		if strings.TrimSpace(req.WorkspaceID) == "" {
+			return fmt.Errorf("workspace_id required when cache is enabled")
+		}
+		if strings.TrimSpace(req.CorpusVersion) == "" {
+			return fmt.Errorf("corpus_version required when cache is enabled")
+		}
+	}
+	return nil
 }
 
 func (s *LaneService) searchWithCache(

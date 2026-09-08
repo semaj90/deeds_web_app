@@ -1429,6 +1429,12 @@ open exactly as items 1/2/4 above describe.
 - [ ] After the source-byte join is proven, run a read-only query/cohort score comparison between
   PostgreSQL `ts_rank_cd` and Go Retrieval, then add guarded canary write plus independent readback.
 
+Current source-revision audit refresh 2026-09-08: `audit-current-graphify-source-revision-v1.mjs`
+reports `SOURCE_BYTES_NOT_PROVEN` across 23,758 rows: 23,469 `CONTENT_MATCH`, 282
+`CONTENT_MISMATCH`, and 7 `SOURCE_UNAVAILABLE`. This newer receipt supersedes the earlier
+23,516/235 snapshot for current planning; mismatched and unavailable rows remain excluded from
+promotion and no source or projection rows were changed.
+
 Feeds the *same* `TaxonomyAssignmentCandidateV1` shape from established
 evidence owners — this is explicitly not a new "fusion service": no new
 service, no new orchestrator, just more producers writing into the
@@ -2977,3 +2983,921 @@ is correct or authorize applying it to `legal_ai_db`.
   requires explicit migration authorization and post-commit readback.
 
 Evidence: `docs/reports/task-semantic-packet-disposable-compatibility-v1.json`.
+
+### TASK-SEMANTIC-PACKET-COMPATIBILITY-01 — live type/default audit 2026-09-08
+
+- [x] Read the live PostgreSQL catalog without mutation. `task_semantic_packets` remains a
+  16-column legacy table with zero live rows.
+- [x] Recorded non-column drift: live `id` is `uuid DEFAULT gen_random_uuid()` while the current
+  Drizzle owner declares a serial-style primary key; live legacy score fields are `real NOT NULL`,
+  and `semantic_vector` is an extra pgvector column outside the active writer contract.
+- [x] Refreshed `npm run audit:drizzle` from the repository root; it completed successfully and
+  regenerated `docs/reports/postgres-contract-mirrors-report.json` and its Markdown companion.
+- [ ] Do not alter the live primary-key or legacy vector/score columns in this additive migration;
+  resolve that separate owner/type drift before claiming full Drizzle parity.
+
+### TASK-SEMANTIC-PACKET-WRITER-CENSUS-02 — initial read-only findings 2026-09-08
+
+- [x] Confirmed additional direct writers beyond the MCP/API lifecycle: `ingest-packets.mjs`,
+  `scripts/atlas/batch-offline-ingest.mjs`, `scripts/atlas/create-agent-pickup-packets.mjs`,
+  `scripts/atlas/generate-feature-todos.mjs`, `scripts/atlas/generate-recovery-template-from-packet.mjs`,
+  and the Phase 17 feature extractor.
+- [x] Classified the first compatibility hazards: legacy writers reference `som_cluster`,
+  `task_title`, `task_type`, and `task_status`, which are not part of the current Drizzle owner or
+  the repaired additive migration; the batch/offline and agent-pickup writers use UUID-compatible
+  IDs and overlapping current fields.
+- [ ] Classify each writer as production, MCP/API, offline, bounded migration, legacy, or dead before
+  expanding the live migration or changing write order.
+
+Evidence boundary: this is a source census only; no writer was executed and no store was mutated.
+
+Writer classification from the initial census:
+
+| Writer | Classification | Apply behavior | Current status |
+|---|---|---|---|
+| `src/lib/server/tasks/semantic-packets.ts` | PRODUCTION_MCP / PRODUCTION_API | always writes when invoked | guarded; Qdrant-before-Postgres remains open |
+| `src/routes/api/tasks/packets/+server.ts` | PRODUCTION_API | direct Drizzle insert | current-field subset; migration required |
+| `scripts/atlas/batch-offline-ingest.mjs` | OFFLINE_INGEST | explicit `--apply` | references current fields plus legacy `id`/projection shape |
+| `scripts/atlas/create-agent-pickup-packets.mjs` | LEGACY_PICKUP | apply by default unless `--dry-run` | blocked when legacy prerequisites are absent |
+| `scripts/atlas/generate-feature-todos.mjs` | LEGACY | explicit `--apply` | references obsolete `task_title`/`task_type`/`task_status` |
+| `scripts/atlas/generate-recovery-template-from-packet.mjs` | LEGACY | explicit `--apply` | references obsolete task fields |
+| `ingest-packets.mjs` | LEGACY / UNKNOWN | writes immediately on launch | references obsolete `som_cluster`; not executed |
+
+This matrix is a review result, not an authorization to run any `--apply` path.
+
+### TASK-SEMANTIC-PACKET-ATOMICITY-01 — canonical-first ordering 2026-09-08
+
+- [x] Changed the active MCP/API lifecycle to insert the canonical PostgreSQL packet before the
+  rebuildable Qdrant projection.
+- [x] Confirmed source ordering: `db_mirror_created` precedes `qdrantManager.upsert()` and the
+  `qdrant_upsert` receipt.
+- [x] Focused semantic-packet tests pass 3/3.
+- [ ] Add a durable projection/outbox receipt or reconciliation path for the inverse failure mode:
+  PostgreSQL succeeds but Qdrant publication fails.
+
+This is an ordering repair only; it does not apply the pending schema migration or execute a live
+packet workflow.
+
+Existing outbox review: `outbox_events` and `outbox-worker.ts` are real and transactional, but the
+current `encode.embedding.succeeded` handler publishes to `agent_memory_observations`, not the
+`codebase_chunks` projection used by task semantic packets. No semantic-packet event was added;
+reusing that handler would misroute data. A dedicated projection adapter or explicit reconciliation
+job remains required.
+
+### TASK-SEMANTIC-PROJECTION-INTENT-01 — reference-only contract 2026-09-08
+
+- [x] Added `TaskSemanticProjectionIntentV1` with UUID packet/projection identities, semantic_768
+  representation lineage, source/workspace revisions, input checksum, and immutable `artifactRef`.
+- [x] Added focused tests proving deterministic checksums and rejecting inline embedding payloads;
+  tests pass 2/2.
+- [ ] Produce or identify the canonical task-summary embedding artifact before wiring an outbox
+  event; the current task packet stores only `qdrant_point_id`.
+
+This contract is intentionally unconnected to `outbox_events` until a replayable artifact owner and
+task-specific Qdrant handler exist.
+
+Artifact-owner audit: `atlas_vector_registry` is the closest existing owner because it already
+contains packet identity, model/representation metadata, content checksum, artifact URI, and Qdrant
+pointer fields. Its current `vector_name` constraint still calls the relevant 768 form
+`dense_768_legacy`, so it cannot yet be silently reused as the current `semantic_768` owner.
+The historical `semantic_embedding_cache_v2` migration describes a cache-only `semantic_768` store,
+but a live read-only check returned `to_regclass = NULL`: the table is not present in the current
+PostgreSQL database. Therefore it cannot provide a replay artifact, task identity, or projection
+receipt. No cache table was created and no historical cache migration was applied.
+
+Drizzle reconciliation rerun 2026-09-08 confirms the live `task_semantic_packets` relation still has
+the legacy 16-column shape and zero rows. The active MCP writer currently requires 23 additional
+columns, including `qdrant_point_id`, lifecycle fields, lineage fields, and JSONB relationship fields.
+The broad Drizzle/manual definition contains those fields plus additional future enrichment columns
+and indexes, so `ADD_DRIZZLE_MIRROR` is not authorization to apply that entire surface. A minimal
+writer-only migration must be extracted and reviewed separately before deployment; no live migration
+has been applied.
+
+### TASK-SEMANTIC-PACKET-MINIMAL-MIGRATION-01 — identified, not applied (2026-09-08)
+
+- [x] Derived `sveltekit-frontend/drizzle/manual/20260908_task_semantic_packets_writer_columns_only.sql`
+  from the exact active insert allow-list; it contains only the 23 absent writer columns.
+- [x] Disposable PostgreSQL 18 proof passes: baseline 16 columns, 23 migration columns,
+  zero missing writer columns after alignment, `writesPerformed=false`.
+- [x] Disposable representative insert/readback passes with UUID primary key, JSONB fields,
+  lifecycle defaults, and `productionWritesPerformed=false`.
+- [x] Extended the disposable proof to apply the reviewed production-index candidate after the
+  column set; all three expected indexes are present and the insert/readback still passes.
+- [ ] Confirm no legacy writer requires incompatible types or defaults.
+- [ ] Apply only after explicit authorization through the normal Drizzle migration path.
+
+The proof report is `docs/reports/task-semantic-packet-disposable-compatibility-v1.json`. The
+minimal SQL remains an unapplied candidate; the broader `20260606_task_semantic_packets_live_alignment.sql`
+is not used by this proof and remains unsuitable as an automatic live migration.
+
+Writer compatibility review also found and fixed three workflow API lookups that still coerced
+`task_semantic_packets.id` UUIDs through `Number(...)`. They now pass the queue packet UUID directly;
+task/workspace numeric IDs remain unchanged.
+
+Legacy writer review 2026-09-08: `create-agent-pickup-packets.mjs` uses the text value `idle` and
+stores a source reference without a task-packet `qdrant_point_id`; it is not compatible with the
+active packet lifecycle semantics and remains legacy-gated. `batch-offline-ingest.mjs` is explicitly
+apply-gated but uses a projection-derived UUID and file path in projection fields, so it remains an
+offline migration candidate rather than an active writer. `phase17-feature-extractor.ts` currently
+logs its raw SQL intention instead of executing it. No legacy writer was enabled or modified.
+
+Safety repair 2026-09-08: `create-agent-pickup-packets.mjs` now defaults to dry-run and requires
+explicit `--apply`; passing both mode flags fails closed. Syntax validation passes and the conflicting
+mode guard was exercised without opening a database or Redis connection.
+
+Lifecycle alignment 2026-09-08: the legacy pickup insert now uses packet status `todo` instead of
+the unsupported `idle` value. The script remains legacy-gated and default dry-run.
+
+Bounded dry-run replay 2026-09-08 loaded 10 recommendation records and emitted only `[DRY] would
+enqueue` plans. It performed no database or Redis connection/write; the final counter is a plan count,
+not a persisted-packet count.
+
+Offline-ingester compatibility repair 2026-09-08: `batch-offline-ingest.mjs` now uses a deterministic
+UUID for the PostgreSQL packet primary key while retaining its separate numeric Qdrant projection ID.
+This resolves the live UUID/type mismatch without promoting the legacy ingester or changing its
+explicit `--apply` gate.
+
+Type-boundary repair 2026-09-08: `updatePacketRow()` now accepts only string packet IDs, matching
+the UUID Drizzle owner. Full workspace TypeScript still reports unrelated pre-existing errors, but
+the changed task-packet module and workflow lookup produced no diagnostics in the focused compiler
+filter; focused tests remain 5/5.
+
+### TASK-SEMANTIC-PACKET-WRITER-MATRIX-03 — read-only matrix 2026-09-08
+
+- [x] Added `scripts/atlas/audit-task-semantic-packet-writer-matrix-v1.mjs` and the root
+  `atlas:task-semantic-packet:matrix` command.
+- [x] Enumerated nine relevant surfaces: the guarded MCP lifecycle, API route, two offline-ingest
+  branches, agent-pickup writer, legacy packet ingester, feature-todo writer, recovery-template
+  writer, and the Phase 17 intent-only SQL path.
+- [x] Queried the live `public.task_semantic_packets` metadata through the Docker Postgres fallback;
+  live schema status is proven, with 16 columns and no live rows changed.
+- [x] Generated `docs/reports/task-semantic-packet-writer-column-matrix-v1.json` containing each
+  writer's required columns, live-column comparison, missing columns, mode, and compatibility class.
+- [x] Matrix confirms zero currently compatible active writers against the live 16-column table;
+  the guarded MCP writer and API route remain blocked until their required additive columns exist.
+- [x] Matrix confirms the Phase 17 SQL is intent-only, while legacy writers reference obsolete or
+  non-current fields and must not be revived by applying the broad mirror migration.
+- [ ] Use this artifact to review the production target and migration minset before any authorized
+  live `ALTER TABLE`; this report itself performs no database, Qdrant, or cache writes.
+
+Evidence: `docs/reports/task-semantic-packet-writer-column-matrix-v1.json`.
+
+### TASK-SEMANTIC-PACKET-PRODUCTION-TARGET-01 — read-only target/minset plan 2026-09-08
+
+- [x] Added `scripts/atlas/plan-task-semantic-packet-production-target-v1.mjs` and the root
+  `atlas:task-semantic-packet:target` command.
+- [x] Resolved the production target to the guarded MCP lifecycle plus the current API route.
+  Offline, legacy, and intent-only writers remain excluded from production admission.
+- [x] The earlier 23-column minimum-set result is retained as historical planning evidence only.
+  A fresh live catalog audit now finds `task_semantic_packets` present with 39 columns and 2 rows;
+  it is not currently a 16-column table. The reviewed SQL must therefore be re-preflighted against
+  the current target before any apply decision.
+- [x] Refreshed the writer matrix and production-target planner. The two admitted production writers
+  (`mcp-create-task-semantic-packet`, `api-post-task-semantic-packet`) require **zero** additional
+  live columns. Seven missing fields belong to excluded/blocked or intent-only writers:
+  `community_id`, `som_cluster`, `som_col`, `som_row`, `task_status`, `task_title`, `task_type`.
+- [x] Proved the reviewed `20260908_task_semantic_packets_writer_columns_only.sql` is additive and
+  contains no data backfill; it is **not applicable** to the current production target and remains
+  unapplied.
+- [x] Recorded `applyAuthorized=false`; the planner performs no database, Qdrant, cache, or service
+  restart operation.
+- [ ] Obtain explicit authorization before applying the reviewed additive migration through the
+  normal Drizzle/sidecar migration path.
+
+Evidence: `docs/reports/task-semantic-packet-production-target-v1.json`.
+
+### TASK-SEMANTIC-PACKET-INDEX-PLAN-01 — additive index candidate 2026-09-08
+
+- [x] Confirmed no new table is required: `public.task_semantic_packets` exists and is the live
+  runtime owner. The current audit reports 39 live columns and 2 rows; the older 16-column/zero-row
+  description is stale and must not authorize a migration.
+- [x] Refreshed the live writer matrix: production-target migration minimum set is empty; the seven
+  missing fields are not grounds for a production migration because their writers are excluded or
+  blocked.
+- [x] Confirmed existing primary-key, packet-key, source-ref, feature-id, alias-id, and metadata
+  indexes through live `pg_indexes` readback.
+- [x] Added unapplied `manual/20260908_task_semantic_packets_production_indexes.sql` with only
+  three production-path indexes: `(workspace_task_id, created_at DESC)`, `(status, feature_id)`,
+  and `agent_pickup_ready`.
+- [x] Registered the index candidate as `planned_sidecar`, dependent on the writer-column migration.
+- [ ] Run EXPLAIN validation after the columns exist; do not add indexes merely to mirror every
+  historical Drizzle declaration.
+- [ ] Recompute index definitions only if a currently admitted production query needs them; do not
+  apply the column sidecar migration. Any future migration must name a newly admitted writer and pass
+  a fresh checksum-bound preflight.
+
+This is an additive plan only. No table, column, index, row, projection, or cache was changed.
+
+### TASK-SEMANTIC-QDRANT-IDENTITY-01 — semantic_768 input guard 2026-09-08
+
+- [x] Added `assertCanonicalSemantic768Vector()` to the active task-packet lifecycle.
+- [x] The guard rejects missing, non-finite, legacy 384-dimensional, and any non-768 vector before
+  either the canonical Postgres insert or Qdrant publication.
+- [x] Focused task-packet tests pass 5/5.
+- [ ] Add live Postgres/Qdrant independent readback after the migration canary; this guard proves
+  input shape only and does not prove projection parity.
+
+No database, Qdrant, or cache writes were performed by this change.
+
+Qdrant identity alignment 2026-09-08: the active task-packet writer now resolves both the
+collection and vector payload through `qdrantManager.collections.codebase_chunks`, which is the
+configured `codebase_chunks_768_v2` canonical dense projection, instead of hardcoding the legacy
+`codebase_chunks_768` collection/payload selector. The environment override remains available for
+explicit test profiles. Focused task-packet tests pass 5/5; live Postgres↔Qdrant readback remains
+open until the migration canary is authorized.
+
+### TASK-SEMANTIC-PACKET-APPLY-CANARY-01 — infrastructure preflight and receipt reconciliation 2026-09-08
+
+- [x] Ran `scripts/atlas/preflight-task-semantic-packet-apply-canary-v1.mjs` read-only.
+- [x] Live `public.task_semantic_packets` metadata is readable with zero missing required production
+  columns; the current admitted production writer minimum set is empty.
+- [x] Qdrant shape is proven for `codebase_chunks_768_v2`, vector `content`, dimension `768`, and
+  cosine distance.
+- [x] Reconciled the preflight with the existing authorized canary receipt rather than treating the
+  canary as pending. `docs/reports/task-semantic-packet-apply-canary-v1.json` reports
+  `status=PROVEN`, `identityParity=true`, and completed Postgres/Qdrant readbacks.
+- [ ] Keep the two explicitly tagged canary fixtures out of production retrieval populations through
+  the normal archival/fixture policy. Do not delete them or rerun the canary merely to generate a
+  third row.
+
+Evidence: `docs/reports/task-semantic-packet-apply-canary-preflight-v1.json`.
+
+### TASK-SEMANTIC-PACKET-APPLY-CANARY-01 — preflight only 2026-09-08
+
+- [x] Added `scripts/atlas/preflight-task-semantic-packet-apply-canary-v1.mjs` and the root
+  `atlas:task-semantic-packet:canary:preflight` command.
+- [x] Live Qdrant canonical collection inspection is reachable for `codebase_chunks_768_v2`.
+- [x] Live Postgres metadata is readable, but all 23 reviewed migration columns remain absent;
+  `applyCanaryEligible=false` and `applyAuthorized=false`.
+- [x] Preflight writes only `docs/reports/task-semantic-packet-apply-canary-preflight-v1.json`;
+  it does not apply SQL, insert packets, upsert Qdrant, or restart services.
+- [ ] Apply the reviewed column migration only after explicit authorization, then rerun this
+  preflight before the canary.
+
+Preflight refinement 2026-09-08: the check now reads the live Qdrant collection configuration rather
+than treating HTTP 200 as sufficient. `codebase_chunks_768_v2` reports vector name `content`,
+dimension `768`, and cosine distance, so the Qdrant shape gate is proven. The canary remains blocked
+solely by the 23 absent Postgres columns and `applyAuthorized=false`.
+
+### TASK-SEMANTIC-PACKET-MIGRATION-RUNNER-01 — guarded dry-run 2026-09-08
+
+- [x] Added `scripts/atlas/apply-task-semantic-packet-migration-v1.mjs` and the root
+  `atlas:task-semantic-packet:migration` command.
+- [x] Default execution validates both reviewed SQL files and reports an additive-only plan.
+- [x] Live execution requires both `--apply` and
+  `ATLAS_AUTHORIZE_TASK_SEMANTIC_PACKET_MIGRATION=1`; the apply path was not run.
+- [x] Dry-run completed with `additiveOnly=true`, `executed=false`, and
+  `productionWritesPerformed=false`.
+
+Authorized live apply 2026-09-08: the reviewed column and index SQL was executed through the guarded
+runner after explicit authorization. Independent Postgres readback reports 39 columns on
+`task_semantic_packets` and all three approved production indexes. The transaction inserted or
+updated no packet rows; Qdrant and services were not touched. The packet apply canary remains a
+separate step.
+
+Migration runner hardening 2026-09-08: after review of PostgreSQL 18 locking semantics, the runner
+was corrected so Phase A columns use bounded `lock_timeout`/`statement_timeout` inside a transaction,
+while Phase B indexes are checked by live `pg_indexes` definition and created with
+`CREATE INDEX CONCURRENTLY` outside a transaction. The current live definitions are exact matches,
+so a fresh dry-run reports `SKIP_EXACT_MATCH` for all three and performs no writes.
+
+Post-migration mirror audit 2026-09-08: `npm run audit:drizzle` confirms the live table is reachable
+and the writer migration is present. Its remaining `COLUMN_MISMATCH` is caused by 17 live historical/
+future columns (`canonical`, community/SOM/lineage fields, and related enrichment fields) absent from
+the current Drizzle owner. This is separate schema drift; it does not invalidate the 23-column writer
+minimum or the proven canary. The live table contains two explicitly tagged canary rows.
+
+### TASK-SEMANTIC-PACKET-APPLY-CANARY-01 — proven 2026-09-08
+
+- [x] Added and ran the explicitly authorized one-packet Postgres→Qdrant canary.
+- [x] Postgres insert, Qdrant upsert, Postgres readback, and Qdrant readback all completed.
+- [x] Identity parity is proven for the successful canary: packet UUID, packet key, Qdrant point
+  UUID, source reference, and `semantic_768` representation agree across both stores.
+- [x] The first attempt exposed a harness parsing bug (`INSERT 0 1` appended to the returned UUID);
+  it failed before readback, and its single canary payload was corrected and independently verified.
+- [x] Live census now reports two explicitly tagged canary rows; no unrelated rows were changed.
+- [ ] Keep canary artifacts out of production retrieval populations or mark them through the normal
+  archival/fixture policy before broader packet admission.
+
+### TASK-SEMANTIC-PACKET-LIFECYCLE-ORDER-01 — source-order proof 2026-09-08
+
+- [x] Added the read-only audit `scripts/atlas/audit-task-semantic-packet-lifecycle-order-v1.mjs`.
+- [x] Proven in the active `createTaskSemanticPacket()` source that the 768-vector guard runs before
+  the canonical PostgreSQL insert, and the PostgreSQL insert runs before the Qdrant upsert.
+- [x] Proven that the Qdrant path uses the canonical collection constant and named `content` vector
+  payload builder.
+- [x] Report written to `docs/reports/task-semantic-packet-lifecycle-order-v1.json` with
+  `status=PROVEN_SOURCE_ORDER`, `readOnly=true`, and `productionWritesPerformed=false`.
+- [ ] Full model-driven MCP lifecycle replay remains a separate gate; this task proves source order,
+  not a new live packet creation.
+
+Bounded dry-run replay processed 10 files, produced 10 nodes and 0 edges, and reported
+`APPLY MODE: DRY-RUN`; no output files, PostgreSQL rows, Qdrant points, or Redis keys were written.
+
+Post-registration `npm run audit:drizzle` completed its report generation but returned exit code 1
+because the repository still has pre-existing mirror blockers: `task_semantic_packets` live/static
+column drift, `atlas_packets` drift, missing live `feature_registry`, and unrelated
+`parent_atlas_documents`/`route_runtime_packets` classifications. This is not evidence that the new
+writer-only sidecar was applied; live `task_semantic_packets` remains unchanged.
+
+The full contract-map audit was rerun without its report-suppressing dry-run flag. It now recognizes
+`0099_atlas_svg_glyphs.sql` as an intentional documented sidecar and reports 64 total findings
+(63 medium historical migration/contract findings, 1 informational sidecar finding, 0 high). The
+remaining numbered SQL files were not bulk-registered because their live ownership and apply state
+are not proven.
+
+Relevant migration triage: `0019_bm25_search_vector.sql` includes a live-table backfill, trigger,
+and `CREATE INDEX CONCURRENTLY`; `0020_fix_packet_feature_metrics_schema.sql` includes `DROP COLUMN`
+statements; and `0019_atlas_packet_indexes_gin.sql` adds several indexes. These are not safe to
+classify as writer-only sidecars from filename presence alone. Live objects exist for the packet
+tables, but no apply or ownership decision was made.
+
+Command-alignment repair 2026-09-08: added the documented root script `audit:contracts`, mapped to
+the existing read-only contract-map auditor. `npm run audit:contracts` now executes successfully and
+refreshes the report; current findings remain 0 high, 63 medium, and 1 informational.
+
+Added focused command alias `npm run atlas:task-semantic-packet:proof`. It reruns the disposable
+PostgreSQL 18 column plus representative insert/readback proof without contacting the live database.
+
+### PROJECTION-LIFECYCLE-PRIORITY-01 — cache audit alignment (2026-09-08)
+
+The cache audit changes the next priority from cache modeling to durable projection lifecycle. The
+current low/mostly-cold cache population is useful evidence: correctness can be established before a
+large hot state exists.
+
+- [x] Defined and tested pure `ProjectionChangeV1` payload validation with event identity,
+  workspace/source/graph/representation/feature revisions, stage receipt checksum, changed packet
+  keys, candidate ordinals, and affected projection families.
+- [ ] Emit it as a durable outbox event in the same PostgreSQL transaction as a future canonical
+  mutation.
+- [ ] Define idempotent consumer keys as `(eventId, targetProjection, targetRevision)`.
+- [ ] Keep Qdrant, Neo4j, centroid artifacts, and Valkey as rebuildable consumers; none becomes
+  canonical authority.
+- [ ] Add lifecycle states for canonical commit, invalidation, projection pending, projected,
+  readback-proven, and optional prewarm.
+
+### VALKEY-REVISION-QUALIFICATION-01 — design gate (2026-09-08)
+
+- [ ] Require revision-qualified keys for ACE, BitFrost, centroid, artifact, and candidate-set state.
+- [ ] Treat keyspace notifications as best-effort observability only; durable outbox events carry
+  invalidation intent.
+- [ ] Distinguish hard invalidation, soft retirement, and selected prewarm. TTL/LRU is cleanup and
+  performance policy, never currentness or validity.
+- [ ] Add bounded single-flight protection for lazy reconstruction; cache miss must not trigger
+  unbounded duplicate recomputation.
+
+### CENTROID-DURABLE-ARTIFACT-01 — design gate (2026-09-08)
+
+- [ ] Define durable `CentroidArtifactV1` with workspace/representation/clustering revisions,
+  dimensions, vector checksum, member-set checksum, and artifact reference.
+- [ ] Treat Valkey centroid loss as `CACHE_MISS`, not `CENTROID_LOST`; rebuild from the durable
+  artifact or sealed semantic population.
+
+The live cache census remains a baseline only; no new cache schema, invalidation consumer, centroid
+artifact, or projection write was created in this pass.
+
+Outbox reliability repair 2026-09-08: `outbox-worker.ts` now unpublishes an event when any expected
+handler fails, including partial fanout failures. Previously, one successful handler could leave
+`published_at` set while another failed projection was never retried. No outbox cycle was run.
+
+Live registry readback adds a separate drift finding: `public.atlas_vector_registry` exists with
+4,480 rows, all `embedding_dim=768`, but its live 12-column shape has no `vector_name`,
+`representation`, `model_revision`, `workspace_revision`, `artifact_uri`, or `qdrant_point_id`
+population. The historical `0500_atlas_semantic_contracts.sql` definition is therefore not the
+live owner contract. It must not be treated as a ready replay-artifact store without a dedicated
+read-only reconciliation and lineage decision.
+
+### GO-RETRIEVAL-CACHE-CONTEXT-VALIDATION-01 — implemented 2026-09-08
+
+- [x] Added `validateLaneRequest()` to the Go lane coordinator.
+- [x] Cached requests now fail closed when `workspace_id` or `corpus_version` is absent; uncached
+  fixture calls retain the existing revision-optional behavior.
+- [x] Nil contexts and whitespace-only queries are rejected before timeout setup or lane fanout.
+- [x] Focused service validation passes with `go test ./...`.
+- [ ] Cross-runtime TypeScript/Go request-envelope parity remains a separate gate.
+
+### GO-RETRIEVAL-HELPER-RECONCILE-01 — audit result 2026-09-08
+
+- [x] Searched the active repository for `buildContextFromGoHttp`,
+  `validatePacketFromGoHttp`, `/context/build`, and the proposed `/validate` route.
+- [x] No live helper implementation or matching Go HTTP endpoint was found.
+- [x] No endpoint was added: the names remain unowned compatibility expectations, not proven
+  capabilities. Context assembly belongs behind ACE/ContextManifest; packet validation belongs to
+  the existing typed validation contracts until a concrete caller and protocol are identified.
+- [x] Current caller review supersedes the earlier stale note: `buildContextFromGo()` and
+  `validatePacketFromGo()` are real callers from `routes/api/atlas/runtime-retrieve/+server.ts`
+  and `atlas-mastra-workflow.ts`; their fallbacks now use canonical Postgres directly, with no
+  new Go route. The gated Postgres integration proof covers PASS/FAIL packet validation and
+  bounded context assembly. No datastore writes occur in these helper paths.
+- [ ] Keep the separate TypeScript↔Go gRPC envelope/codegen parity gate open; it does not block
+  the already-proven Postgres-direct helper fallback.
+
+### SOM-KMEANS-FIXTURE-01 — live readiness audit 2026-09-08
+
+- [x] Ran the existing read-only SOM audit against the live packet population.
+- [x] Corrected the audit's PostgreSQL bigint handling and replaced its stale hardcoded packet
+  denominator with a live `COUNT(*)`.
+- [x] Current readback: 61,718 packets; 61,660 assigned; 342/400 SOM cells populated; 2,964
+  adjacency edges; 7,522 `latent_64` rows.
+- [x] Audit now reports 2/7 gates passed: assignment coverage and adjacency edges. It no longer
+  reports `Infinity`, `NaN`, or coverage above 100%.
+- [ ] Topology promotion remains blocked: cell coverage, distribution, latent coverage, and ACE
+  retrieval-speedup gates are not proven. No SOM/KMeans write or training run occurred.
+
+### LATENT-768-LADDER-READINESS-01 — definition 2026-09-08
+
+- [x] Clarified that `latent_256`, `latent_128`, and `latent_64` must all derive from the same
+  current `EmbeddingGemma → semantic_768` cohort and immutable ordinal map.
+- [x] Clarified that Qdrant and Neo4j are downstream projections/fanout consumers, not latent
+  training authorities or sources for filling missing rows.
+- [ ] Freeze the current source-qualified semantic cohort and `RepresentationArtifactV1` input
+  manifest.
+- [ ] Produce deterministic 768→256→128→64 artifacts with model/revision/checksum metadata.
+- [ ] Compare each width with the exact cosine/top-k oracle and prove reload row alignment.
+- [ ] Seal and atomically publish derived artifacts before any Qdrant/Neo4j/Valkey fanout.
+- [ ] Keep `latent_64` cache-hint-only until its coverage and retrieval-quality gates pass.
+
+Static contract audit 2026-09-08: `python scripts/atlas/audit-fetch-latent-derived-views-v2.py`
+returned `PROVEN_STATIC_CONTRACT`. Existing owners are `latent256-candidate-provider.ts` for
+persisted `latent_256`, `latent-derive.ts` for virtual `latent_128`, and the existing physical
+`latent_64` storage. The audit proves contract shape only; live current-cohort coverage,
+CandidateOrdinal parity, derived checksums, and query-time promotion remain unproven.
+
+### AST-GREP-OUTLINE-SYMBOL-POPULATION-01 — capability audit 2026-09-08
+
+- [x] Refreshed both workspace installations and verified the pinned `ast-grep` CLI as 0.45.3.
+- [x] Added a read-only audit and report command for the bounded structural paths used by the
+  retrieval and Parent Atlas packages.
+- [x] Confirmed the refreshed installed executable exposes the documented `outline` subcommand;
+  no regex substitution is used for this audit.
+- [x] Verified pinned `@ast-grep/cli@0.45.3` exposes `outline` and captured a bounded
+  `--items structure --view digest` output for the retrieval and Parent Atlas source paths.
+- [x] JSON readback contains 526 files, 5,705 top-level items, and 3,974 direct members across
+  the bounded TypeScript, Go, and Python owner surfaces.
+- [x] Refreshed the local dependency installation and reran the bounded digest; reconcile it next
+  with 8095 Tree-sitter spans and the revision-qualified symbol resolver.
+- [ ] Do not promote outline names, signatures, paths, or line ranges directly to
+  `symbol_version_id`, CandidateOrdinal, Postgres, Qdrant, Neo4j, or Valkey.
+
+Read-only reconciliation replay 2026-09-08: `ATLAS_AST_PARITY_CORPUS_LIMIT=66 npx tsx
+scripts/atlas/prove-node-tree-sitter-corpus-parity-v2.mts` completed with runtime and source
+span self-validity `66/66`, named-symbol coverage `53/66`, exact span parity `53/66`, and full
+parity `50/66`. The remaining classes are `NAMED_SYMBOL_MISSING_RIGHT: 37` and
+`SEMANTIC_KIND_UNKNOWN_BOTH: 4`; this is a real parity gap, not a CLI installation problem.
+The comparator now records unmatched observation scope (`TOP_LEVEL_DECLARATION`,
+`NESTED_DECLARATION`, `AMBIENT_DECLARATION`, or `OTHER`) for diagnosis, while preserving its
+existing provider-tolerant pairing behavior. No identities were promoted and no database,
+Qdrant, Neo4j, or Valkey writes occurred.
+The comparator now excludes export-statement wrappers from symbol counts because the underlying
+declaration is the symbol and the export is a relationship observation. The remaining 37
+unmatched left observations are nested callback observations; no unmatched top-level declaration
+remains in this replay.
+
+### TS-GO-REQUEST-ENVELOPE-PARITY-01 — boundary audit 2026-09-08
+
+- [x] Confirmed the active proto authority is `proto/active/retrieval.proto` and uses
+  `CodebaseSearchRequest.representation_id` as field 10.
+- [x] Fixed the TypeScript gRPC client to forward `representationId` for unary and streaming
+  `SearchCodebase` calls; focused package build and five transport tests pass.
+- [x] Confirmed `workspace_id`, `corpus_version`, and cache policy are not fields in the active
+  retrieval proto. They remain internal Go lane/cache qualifiers and must not be fabricated at
+  the wire boundary.
+- [ ] If those qualifiers are required over gRPC, propose a reviewed proto revision and regenerate
+  both TypeScript loader fixtures and Go bindings before adding parity assertions.
+- [ ] After that, prove cached/uncached acceptance and rejection matrices plus independent cache-key
+  parity. No cache promotion is implied by the current transport test.
+- [x] Added a read-only proto-to-TypeScript forwarding census so future proto changes cannot be
+  mistaken for client parity; report path is `docs/reports/retrieval-grpc-envelope-parity-v1.json`.
+
+### IDENTITY-MODEL-FREEZE-01 — tree/symbol/packet separation 2026-09-08
+
+- [x] Freeze `tree_node_id` as a revision-bound parse occurrence/provenance coordinate. It is
+  not a stable symbol identity and must not be reused as `symbol_id`, `symbol_version_id`,
+  `chunk_id`, `packet_key`, or `graph_node_key`.
+- [x] Freeze the identity chain as:
+  `source_ref → source_revision → parse_node_id/tree_node_id → symbol_id → symbol_version_id →
+  chunk_id → packet_key → graph_node_key`.
+- [x] Freeze ownership: Tree-sitter/AST-grep may emit structural observations; compiler/LSP/
+  Graphify may resolve symbols; PostgreSQL admits canonical packet and lineage rows; Neo4j,
+  NetworkX, cuGraph, Qdrant, cuVS, Valkey, and model classifiers consume derived identities.
+- [ ] Add or reconcile a live `parse_node_id` field without relaxing the existing tree-node
+  uniqueness constraint.
+- [ ] Prove `symbol_id` stability across two source revisions and `symbol_version_id` changes
+  only when the symbol's revision-bound definition changes.
+- [ ] Rebuild downstream packet/chunk/graph joins from the frozen lineage map before any
+  structural reindex or topology promotion.
+
+### MULTILANE-REINDEX-ORDER-01 — structural, graph, GPU, and ontology lanes 2026-09-08
+
+- [x] Freeze the execution order: Tree-sitter CST → AST-grep outline/patterns → LSP/Graphify
+  symbol resolution → deterministic domain signals → grounded ontology observations →
+  `OntologyLinkedTupleV1` proposals → canonical PostgreSQL admission.
+- [x] Freeze the graph rule: NetworkX is the CPU/reference oracle; Neo4j is a projection/fanout
+  executor; the Python sidecar may delegate read-only graph calculations; cuGraph is the WSL2
+  RAPIDS GPU executor. None may mint identity or canonical facts.
+- [x] Freeze the routing rule: contextual sparse trees, sampling forests, ExtraTrees, and
+  classifier outputs are bounded derived features/cache hints. They may choose candidate budgets
+  but cannot create a retrieval vote, ontology identity, or packet admission.
+- [x] Freeze the vector rule: EmbeddingGemma `semantic_768` is the canonical dense source;
+  cuVS/CAGRA, Qdrant, and TurboVec are executors/projections. `latent_256/128/64` must be
+  revisioned artifacts derived from the same source cohort and ordinal map.
+- [ ] Produce one current source-qualified reindex manifest containing the frozen identity map,
+  domain signals, ontology tuple candidates, graph edges, and representation revisions.
+- [ ] Run only bounded read-only parity first: Tree-sitter/AST-grep symbols, NetworkX/Neo4j
+  graph counts, then RAPIDS/cuGraph/cuVS executor parity. Fanout to Qdrant/Neo4j/Valkey remains
+  blocked until the manifest is sealed and independently read back.
+
+### REINDEX-MANIFEST-CROSS-SCHEMA-01 — read-only planner 2026-09-08
+
+- [x] Added `scripts/atlas/plan-reindex-manifest-cross-schema-v1.mjs` and the root command
+  `npm run atlas:reindex:manifest:plan`.
+- [x] Live read-only run inventories seven PostgreSQL source/projection tables and records row
+  counts, available columns/types, identity fields, domain signals, ontology tuple state, and
+  representation metadata.
+- [x] Emits a deterministic bounded `CandidateOrdinalMap` sample with packet/source/tree/symbol
+  identities, source/workspace revisions, content hashes, and representation revisions.
+- [x] Records intended PostgreSQL/Qdrant/Neo4j/Valkey operations as blocked proposals only;
+  `writesPerformed=false` and `safeToApply=false` are part of the manifest contract.
+- [x] Live receipt: 1,252 `semantic_768`-eligible rows, 25 bounded sample rows; report is
+  `docs/reports/reindex-cross-schema-admission-v1.json`.
+- [x] Enhanced the report with an implementation plan covering source lineage, structural symbol
+  reconciliation, packet joins, snapshot sealing, bounded canary, projection fanout, and ACE
+  promotion; every stage records owner, prerequisite, action, status, and promotion condition.
+- [ ] Resolve incomplete source/revision lineage and prove the full current cohort before any
+  reindex upsert or projection fanout.
+
+  Narrow live follow-up (2026-09-08): the planner reports `atlas_packets=61,718`,
+  `codebase_chunk_index=55,853`, `graphify_files=26,014`, `feature_domain_facts=91,658`,
+  `graphify_symbols=0`, `graphify_edges=0`, and `atlas_ontology_linked_tuples=0`.
+  The semantic cohort has only `1,252` rows currently eligible for `semantic_768`; source
+  references are present on `53,461`, but source/workspace revisions are present on only
+  `10,924`, and current packet/tree/symbol bindings are absent from that cohort. Domain
+  signals are present (`91,658` rows / `40` classes) but none are source-revision-bound;
+  ontology tuples and graph symbols/edges are empty. All prerequisite table/column checks
+  pass, but `sampleHasCurrentLineage=true` is only a bounded sample result; the manifest
+  correctly remains `safeToApply=false`, `writesPerformed=false`, with next gate
+  `REINDEX-MANIFEST-LIVE-LINEAGE-AND-ORDINAL-PROOF`. No PostgreSQL, Qdrant, Neo4j, or
+  Valkey writes were performed.
+
+  **Eligibility clarification:** `semantic768Eligible` is intentionally narrower than the
+  structural census. The planner currently tests `source_ref IS NOT NULL` together with
+  `content_embedding_768 IS NOT NULL`; it does not count Tree-sitter, CST, AST-grep, LSP,
+  or RPC observations as semantic-vector eligibility. The live `content_embedding_768`
+  transition column is sparse, while the separate halfvec `content_embedding` population is
+  much larger; these owners must be reconciled before changing the predicate.
+
+  **Provider ownership clarification:** Tree-sitter owns exact CST/byte spans; AST-grep
+  provides syntax-aware outline/pattern observations; ts-morph/LSP/Graphify resolves
+  compiler symbols and references; the existing adapters are present, but `graphify_symbols`
+  and `graphify_edges` are currently empty. The neural decoder is a numerical
+  `semantic_768 -> latent_256/128/64` projection service, not an NLP classifier, ontology
+  writer, or llama prefill/KV owner. Domain signals exist but are not source-revision-bound;
+  the ontology tuple table is empty. Therefore the missing implementation is a
+  revision-qualified observation-to-symbol/packet adapter and ordinal-map proof, followed
+  by ontology/graph proposals—not another parser, vector store, or decoder.
+
+Read-only symbol materializer proof (2026-09-08): the default 42,398-row nomination artifact
+and its older 440-row resolution artifact are not the same cohort, producing zero candidates
+when combined. Re-running with the matching current artifacts
+(`current-graphify-symbol-nominations-v1.jsonl`,
+`tree-bound-symbol-registry-resolution-v1.ndjson`, and
+`current-structural-symbol-resolution-v1.ndjson`) produced 90 exact canonical declaration
+candidates, all with source/workspace revisions, and `identityBridgeOutcomes.RESOLVED=90`,
+with zero unresolved or ambiguous rows. The result is still `DRY_RUN`, with zero symbol,
+callable-search, PostgreSQL, Qdrant, Neo4j, or Valkey writes. This proves the current
+  observation-to-symbol bridge for a bounded cohort; it does not yet populate the empty
+  `graphify_symbols` table or authorize a production materialization.
+
+The five live-version misses in that proof are not unresolved structural rows: they are
+revision-qualified declarations in `FixSynthesizer.ts` (`createBackup`, `rollbackFix`,
+`validateAST`, `applyFix`, and `FixSynthesizerConfig`) with exact canonical registry bindings
+but no pre-existing `atlas_symbol_versions` row. Treat them as deterministic new-version
+insert candidates after a bounded authorization/readback gate; do not treat the absence of
+an old version row as permission to repair the registry or to synthesize a symbol identity.
+
+### ATLAS-CANONICAL-PROJECTION-FABRIC-01 — architecture alignment (2026-09-08)
+
+The canonical fabric is now defined as one revision-qualified evidence/ordinal seam feeding
+all rebuildable projections. The existing cross-schema planner remains the pre-seal owner;
+no second `.okf` compiler, vector authority, graph authority, or cache authority is being
+introduced. The intended lowering is:
+
+`source bytes -> CST/AST + AST-grep observations + LSP/ts-morph observations ->
+SymbolObservation/SymbolVersion -> packet/chunk/concept candidates -> sealed ordinal map ->
+representation, graph, and cache projection manifests -> bounded ACE ContextManifest`.
+
+The current live planner is **not yet sealable**: `graphify_symbols=0`, `graphify_edges=0`,
+ontology tuples are empty, domain signals are not source-revision-bound, and only 1,252 rows
+pass the current sparse `content_embedding_768` predicate. The neural decoder is correctly
+kept as a derived `semantic_768 -> latent_256/128/64` numerical projection; it is not an NLP,
+ontology, identity, or llama-KV owner. NetworkX, Neo4j, cuGraph/cuVS, Qdrant, and Valkey
+remain consumers of a future sealed manifest rather than independent knowledge builders.
+
+Next implementation gate: extend the existing planner with a read-only projection-readiness
+receipt covering `SymbolObservationV1`, `SymbolVersionV1`, `RepresentationManifestV1`,
+`GraphProjectionManifestV1`, latent widths, domain/ontology candidates, and projection
+checksums. Do not seal ordinals, emit `.okf`/Arrow/MsgPack artifacts, fan out to Qdrant or
+Neo4j, warm Valkey, or run ACE promotion until exact current source/packet/symbol joins and
+the semantic representation owner are proven.
+
+Projection-readiness extension completed read-only (2026-09-08): the existing planner now
+records live representation populations and local structural-artifact evidence in the same
+manifest. Current counts are `content_embedding_768=1,386`, `content_embedding=55,169`,
+`latent_256=55,169`, `latent_64=1,703`, `summary_embedding=1,160`, and no `latent_128`
+column. Local evidence records 440 current nominations, 353 exact tree-bound resolutions,
+90 exact registry bindings, 85 existing symbol versions, and 5 deterministic new-version
+candidates. This confirms the 1,252 semantic count is a sparse transition-column predicate,
+not a total AST/CST/symbol-fabric population. `writesPerformed=false` and `safeToApply=false`
+remain enforced; no projection artifact or cache was emitted.
+
+### SEMANTIC-REPRESENTATION-OWNER-01 — read-only owner audit (2026-09-08)
+
+The live semantic owner decision remains open. Both `content_embedding` and
+`content_embedding_768` are 768-dimensional representations, but they are not proven
+interchangeable by column name or dimension. The grouped census shows `content_embedding`
+populated across the large `embeddinggemma:latest:eg-task-prefix-v1` / `qdrant-backfill-v1`
+cohort, while `content_embedding_768` is only partially populated across mixed
+embedding-version groups. The larger column cannot be promoted merely because it has more
+rows, and the sparse transition column cannot be called complete merely because its type is
+`vector(768)`.
+
+Before changing the canonical predicate, compare model/tokenization/pooling, normalization,
+source content hash, encoder/representation revision, vector values, and Qdrant payload
+lineage on a bounded exact join. Until that receipt exists, the planner retains
+`content_embedding_768` as the reviewed transition predicate, records `content_embedding` as
+an unpromoted candidate, and leaves reindex/fanout writes blocked.
+
+Bounded live comparison (2026-09-08): 739 rows contain both vector columns; exact vector
+equality is `0/739`, mean cosine distance is approximately `0.099843`, and maximum cosine
+distance is approximately `0.274282`. Grouped means are approximately `0.103471` for
+`embeddinggemma:latest:eg-task-prefix-v1` (576 rows) and `0.0870239` for
+`embeddinggemma:latest` (163 rows). This proves the columns are not interchangeable mirrors;
+changing the canonical owner would change retrieval geometry. No vector or index writes were
+performed.
+
+Upstream representation-owner audit (2026-09-08): `node scripts/atlas/audit-emb3a-upstream-revision-owner.mjs`
+remains `REVISION_OWNER_NOT_PROVEN`. Live `atlas_packets` has 61,718 packet/source rows and
+workspace/representation columns, but lacks `source_revision` and `representation_id`; all
+61,718 workspace revisions are zero and only one representation revision is nonzero.
+`atlas_source_revisions` contains two rows but has no packet-key or source-ref bridge.
+`atlas_ast_nodes` has 11,067 rows but zero populated source revisions, and
+`atlas_representation_records` is empty. This is the authoritative blocker for semantic-owner
+promotion: no schema repair, vector rewrite, or lineage backfill is inferred from these
+read-only findings.
+
+Provenance follow-up (2026-09-08): the first audit query referenced non-existent live columns
+(`encoder_revision`, `source_revision`) and was corrected from `information_schema` before
+drawing conclusions. The corrected census shows all 739 overlapping rows have content hashes,
+Qdrant IDs, embedding versions, and `embedding_normalized=true`; however, 647 of the 1,386
+`content_embedding_768` rows have no `embedding_version`, while only 739 have both columns
+for direct comparison. The field is dimension-valid but not provenance-complete. This is why
+semantic-owner promotion remains blocked rather than being decided by population size.
+
+Read-only dependency proof (2026-09-08): `audit-current-workspace-packet-chunk-join-v1.mjs`
+found one current workspace revision with 111 binding rows but zero exact Graphify source joins
+and zero packet/chunk content matches. `audit-current-source-evidence-hydration-v1.mjs` found
+52 exact revision matches but only 9 content-hydrated rows; 43 lack a canonical chunk owner.
+The separate `audit-chunk-bridge-v1.mjs` found 100 exact chunk identities in its 353-row cohort,
+but 179 rows remain revision-unproven. These are distinct cohorts and must not be combined.
+No reindex or projection write is authorized from these results.
+
+The audit was tightened to normalize slash direction, leading `./`, and case, and to accept
+Graphify's authoritative `code_source_revision` with a `source_revision` fallback. The live result
+remains zero exact Graphify joins, zero binding/chunk content matches, and zero packet/chunk exact
+matches. Therefore this is not a simple path-formatting defect; current source-binding ownership
+or content-hash correspondence must be repaired/proven before any heuristic join is considered.
+
+Follow-up diagnostic: all 111 bindings now match Graphify by normalized source reference,
+source revision, and content hash; 0 match the current workspace revision and all 111 are classified
+as `workspace_mismatch_rows`. The next repair is therefore workspace-revision ownership/selection,
+not path normalization or content rehydration. No rows were promoted.
+
+Currentness owner audit (2026-09-08): `audit-current-graphify-run-owner-v1.mjs` reports one
+Graphify run still `RUNNING` with no completed owner. The source-cohort audit reports 52 source-
+revision-qualified rows under workspace revision `sha256:927ed411...`, while live workspace
+bindings use `sha256:55edaaad...`; 52/52 are therefore workspace-mismatched. Do not relabel,
+backfill, or promote either revision until the Graphify run completes and its owner is independently
+read back.
+
+Lifecycle-owner replay 2026-09-08: `audit-graphify-stale-run-reconciliation-v1.mjs` classified
+the portfolio as `CONFLICTING_EVIDENCE`; no process owner was present and promotion/readiness
+replay remained disallowed. `audit-graphify-lifecycle-owner-v1.mjs` found 7 running records,
+6 stale records, and 1 current record, with `LIFECYCLE_OWNER_UNPROVEN`,
+`STALE_RUNS_NOT_RECONCILED`, and `REPOSITORY_REVISION_NOT_CURRENT` blockers. A fresh Graphify
+run is not eligible yet. The audits were read-only and performed zero writes.
+
+Completion-plan replay 2026-09-08: `plan-graphify-run-completion-v1.mjs` remains
+`COMPLETION_PLAN_BLOCKED` with blockers `CANONICAL_GRAPHIFY_RUN_NOT_COMPLETED`,
+`SOURCE_SELECTION_NOT_COMPLETE`, and `STRUCTURAL_RESOLUTION_RECEIPT_INCOMPLETE`.
+No graph revision was emitted and no Postgres, Qdrant, Neo4j, or Valkey mutation is authorized.
+
+Current-run detail replay 2026-09-08: the selected run is
+`14643371-f6f2-4131-906b-235a5c06619a`, bound to workspace
+`sha256:55edaaad...`, with a 24,192-source manifest and status `RUNNING` since
+2026-08-28. It has no `completed_at`, no recorded `graph_revision`, and no persisted
+per-edge structural outcome detail. The reconciliation classification is
+`CONFLICTING_EVIDENCE`; this run must not be completed or promoted without an explicit
+owner decision and completion/readback proof.
+
+Follow-up hydration replay 2026-09-08: `audit-current-source-evidence-hydration-v1.mjs` remains
+`SOURCE_EVIDENCE_HYDRATION_BLOCKED`: 52 exact source-revision matches, only 9 content-hydrated,
+0 authoritative namespaces, 0 evidence-span-ready, and 0 classifier-ready. The 43 remaining
+rows lack a canonical chunk owner; the 9 hydrated rows have content but no source revision.
+The separate `audit-chunk-bridge-v1.mjs` cohort remains distinct: 353 examined, 100 exact chunk
+identities, 74 source-only ambiguous, and 179 revision-unproven. Its `promotionEligible` result
+does not authorize combining it with the blocked hydration cohort or writing projections.
+No writes occurred.
+
+Current batch planning replay 2026-09-08: `plan-current-source-graphify-batch-v1.mjs` selected
+52 rows but classified 0 as `currentGraphifyExact` and all 52 as
+`graphifyRevisionOrContentMismatch`. The selection checksum is
+`0c4ff5b9107a9f2eb0dee9ddfac3b4393941e4dcfc3dc146fe776cb7026acaf3`.
+The result is `CURRENT_GRAPHIFY_BATCH_PLAN_BLOCKED_REVIEW`; no current-source canary is eligible.
+
+Source-reference resolution replay 2026-09-08: `audit-graphify-source-ref-resolution-v1.mjs`
+examined 61,717 packet references against 25,643 Graphify references. It found 17,307 raw
+exact matches, 3,003 normalized matches, 215 unique-basename matches, 5,155 ambiguous-basename
+matches, and 36,037 unresolved references. Only raw exact matches with independent content and
+revision proof are promotion-eligible; normalized and basename matches remain diagnostic, and
+ambiguous/unresolved references are rejected. The audit reported 100 exact packet/chunk/Graphify
+bridges but does not authorize combining cohorts or performing projection writes.
+
+Git source-authority replay 2026-09-08: `audit-graphify-git-source-authority-v1.mjs` selected
+run `14643371-f6f2-4131-906b-235a5c06619a` but found 0 authoritative Graphify rows against
+25,365 repository tree entries. `gitAuthorityProven=false`; therefore the existing run cannot
+serve as the canonical source manifest. Exact path matches remain observations only until a
+completed owner-controlled source manifest is produced.
+
+Scope reconciliation replay 2026-09-08: `source-scope-reconciliation-v1.mjs` found an active
+indexable manifest of 16,629 distinct references (16,568 admitted), while PostgreSQL contains
+55,853 `codebase_chunk_index` rows and only 1,386 rows with `semantic_768` vectors. The live
+Qdrant target is `codebase_chunks_768` with 109,776 points, three 768-dimensional named vectors,
+and green/healthy optimizer state; it is not the previously referenced `_768_v2` target. Exact
+manifest-to-Postgres, manifest-to-Graphify, and manifest-to-Qdrant coverage all remain false.
+This is a read-only scope/alignment result and does not authorize reconciliation or upsert.
+
+Qdrant collection-owner census 2026-09-08: repository-wide targeted search shows
+`codebase_chunks_768` is the operational collection used by retrieval, restore, validation,
+embedding, ACE, and topology paths. `codebase_chunks_768_v2` is confined to isolated canary/
+sparse-experiment paths. This resolves the configuration ambiguity for future planning, but
+does not prove current identity/revision parity for the operational collection; that still
+requires an independent Postgres-to-Qdrant census and bounded readback.
+
+Live store-parity census 2026-09-08: `node scripts/atlas/verify-store-parity.mjs --store=qdrant`
+read 61,718 PostgreSQL packets (6,451 with `qdrant_point_id`), 109,776 Qdrant points, and
+59,692 Neo4j packet nodes. A 100-point Qdrant sample carried `packet_key`, `source_ref`, and
+`feature_id`; Neo4j reported 0 packet nodes with Qdrant IDs; Valkey reported 0 BitFrost packet
+and 0 centroid directory keys. The existing report's negative "Qdrant missing" arithmetic is
+not a valid coverage metric because the Qdrant and PostgreSQL populations are not one-to-one.
+This is read-only evidence; no repair or projection write was performed.
+
+Bounded identity replay 2026-09-08: `node scripts/atlas/qdrant-postgres-identity-audit.mjs
+--dry-run --limit=1000` classified all 1,000 audited Qdrant points as
+`EXACT_ATLAS_PACKET_KEY`, with 0 ambiguous and 0 unknown identities. The broader PostgreSQL
+join remains incomplete: 6,451 of 61,718 `atlas_packets` rows have `qdrant_point_id`, while
+all 55,853 `codebase_chunk_index` rows have `qdrant_id`. This proves a bounded identity path,
+not full population parity; the generated ledger is diagnostic and no Qdrant/Postgres repair
+was applied.
+
+Full-census attempt 2026-09-08: the same audit without `--limit` began traversing the operational
+collection but exited before producing a final summary/receipt; the existing ledger remains the
+prior 1,000-row bounded ledger. No full-census counts are accepted. The audit now supports
+checkpointed NDJSON pages via `--checkpoint=...` and `--resume`; a fresh bounded replay of 200
+points wrote `auditedPoints=200`, `next_page_offset=201`, and exactly 200 ledger rows, then resumed
+to 300 points with exactly 300 ledger rows and `next_page_offset=301`. This proves bounded resume
+cursor/ledger consistency only; no full-census counts are accepted and no Qdrant/Postgres repair
+was applied. A subsequent resumed extension to 1,000 points classified all 1,000 as
+`EXACT_ATLAS_PACKET_KEY`, with 0 ambiguous and 0 unknown identities; the checkpoint and ledger
+both report 1,000 audited rows and `next_page_offset=1002`. Full operational-collection parity
+remains unproven. The same checkpoint was then extended to 5,000 unique points: all 5,000 were
+`EXACT_ATLAS_PACKET_KEY`, with 0 ambiguous and 0 unknown identities; checkpoint and ledger both
+report 5,000 rows and `next_page_offset=5002`. This strengthens the bounded identity evidence but
+does not authorize repair or establish full collection parity. The same checkpoint was then
+extended to 20,000 unique points: all 20,000 were `EXACT_ATLAS_PACKET_KEY`, with 0 ambiguous and
+0 unknown identities; checkpoint and ledger both report 20,000 rows and `next_page_offset=20002`.
+This remains bounded read-only evidence and does not establish full operational-collection parity
+or authorize repair.
+The completed resumable scan reached the end of `codebase_chunks_768`: 109,676 unique points,
+with checkpoint and ledger counts equal and `completed=true`. Classification was 106,237
+`EXACT_ATLAS_PACKET_KEY`, 3,436 `EXACT_CHUNK_QDRANT_ID`, 2 `SOURCE_REF_ONLY` ambiguous, and 1
+`UNKNOWN_IDENTITY`. This closes the census itself, not parity or repair: the ambiguous/unknown
+rows and the chunk-vs-packet population split require a separate review before any backlink or
+projection mutation.
+Review of the three exceptional rows found that the two `SOURCE_REF_ONLY` classifications were
+too permissive: each source had one packet row but multiple chunk rows. The audit classifier now
+counts packet and chunk matches together and returns `AMBIGUOUS_SOURCE_REF` whenever the combined
+source population exceeds one. The remaining unknown point carries a non-matching hash-like
+payload packet key and is retained as `UNKNOWN_IDENTITY`. The regenerated final ledger contains
+109,776 points: 106,337 `EXACT_ATLAS_PACKET_KEY`, 3,436 `EXACT_CHUNK_QDRANT_ID`, 2
+`AMBIGUOUS_SOURCE_REF`, and 1 `UNKNOWN_IDENTITY`. This is an audit-classification result only;
+no repair, backlink, or projection mutation is authorized.
+The manifest now includes the live packet/chunk relationship census: 6,440 distinct packet
+Qdrant IDs, 55,853 distinct chunk Qdrant IDs, 1,280 exact ID overlaps, 5,171 packet-only IDs,
+54,576 chunk-only IDs, and 11 duplicate packet backlink rows. Reconciliation policy is to keep
+packet and chunk identities separate and reconcile only through exact revision-qualified lineage;
+collection counts must not be used as a one-to-one parity denominator.
+Live pgvector census 2026-09-08: `codebase_chunk_index` has 55,853 rows and complete FTS coverage.
+`content_embedding` is populated for 55,169 rows at dimension 768 using `halfvec`, while the
+separate `content_embedding_768` vector column contains only 1,386 rows at dimension 768. Other
+representations are partial: `latent_256` 55,169, `latent_64` 1,703, `summary_embedding` 1,160,
+`signature_embedding` 533, and `error_embedding` 0. Metadata still exposes three EmbeddingGemma
+labels and historical dimensions `{384,768}`. pgvector is therefore substantially built out, but
+the canonical dense-column owner and representation revision still require explicit reconciliation;
+no rewrite or index mutation was performed.
+Duplicate-backlink review 2026-09-08: all 11 duplicate `atlas_packets.qdrant_point_id` rows are
+cross-source collisions (11 groups, each with two distinct packet keys), involving mirrored roots,
+backup folders, or duplicate repository paths. They are not same-packet revision duplicates and
+must not be auto-deduplicated. The parity manifest now records the duplicate-group count and keeps
+these rows outside any repair scope.
+The corrected projection-owner report shows the broader legacy-generation issue: 4,351 duplicate
+packet-key groups across Qdrant points, with mixed `SMALL_INTEGER` and `UUID` point-ID generations;
+the largest packet-key group contains 755 points. This is not safe to collapse in place. Any future
+repair must use a new revision-qualified projection collection and reviewed alias/cutover plan,
+not winner selection inside `codebase_chunks_768`.
+Live Qdrant cutover inventory 2026-09-08: no aliases exist. `codebase_chunks_768` is green with
+109,776 points and named vectors `content`, `error`, and `signature`, each 768-dimensional;
+`codebase_chunks_768_v2` is a separate green 52,816-point collection, and latent collections are
+separate as well. A future migration must build and validate a new revision-qualified collection,
+then perform a reviewed alias cutover; it must not rename, delete, or repair the operational
+collection in place.
+The dedicated projection-ID owner audit also had a reporting defect: source-path comparison was
+counting every candidate chunk, not each Qdrant point. It now counts at most once per point. The
+corrected read-only report shows 4,011 exact source-path chunk bridge matches and 105,750
+point-level source-path mismatches, within the 109,776-point population. This fixes observability
+only; it does not make mismatched projection IDs repairable.
+The duplicate-row detail confirms the root mechanism: `source_ref_key` is reused across distinct
+repositories/workspaces, while the sampled rows carry `workspace_revision=0`,
+`representation_revision=0`, and empty `content_hash`. Therefore a future projection identity
+must be qualified by repository/workspace plus packet or chunk identity and revision; no repair may
+deduplicate on `source_ref_key` or Qdrant point ID alone.
+Exception review 2026-09-08: live payload inspection confirmed the two ambiguous points are
+document projection points for a source with six chunk rows, while the unknown point is a
+`process_packet` projection carrying a non-canonical hash-like key and no matching packet/chunk
+row. The parity manifest now records explicit dispositions
+`RETAIN_UNRESOLVED_CROSS_TABLE_SOURCE` and `RETAIN_UNRESOLVED_NONCANONICAL_PROJECTION`, both with
+`safeToRepair=false`; manifest checksum was regenerated. These are retained for provenance review,
+not deleted or repaired.
+The checkpoint restore path now also rejects any ledger/checkpoint row-count mismatch rather than
+silently resuming from an unsafe cursor. The checkpointed audit was extended to 50,000 unique
+points; the ledger and checkpoint agree at 50,000 rows with `next_page_offset=50102`, and the
+bounded result remains 100% `EXACT_ATLAS_PACKET_KEY` with 0 ambiguous and 0 unknown identities.
+
+Process-owner check 2026-09-08: the Windows process census found no live Graphify worker,
+`daily-graphify`, or source-inventory process. The selected `RUNNING` database record is
+therefore an orphaned status row rather than a currently resumable worker. No process was
+stopped and no database status was changed.
+
+### ATLAS-COMPILED-SNAPSHOT-BOUNDARY-01 — architecture update 2026-09-08
+
+- [x] Treat the cross-schema reindex manifest as a read-only admission input to a future
+  `AtlasCompiledSnapshotV1`, not as canonical state and not as a monolithic binary/vector index.
+- [x] Freeze snapshot metadata as revision-qualified references and sealed artifact digests for
+  workspace, graph, semantic, ontology, classifier, packet-set, ordinal maps, lexical/AST/CST,
+  graph/hypergraph, domain, latent, semantic_768, glyph, and receipt artifacts.
+- [x] Freeze compiler lowering: PostgreSQL/source evidence → Graphify IR → deterministic ordinals,
+  CSR/COO, incidence, bitsets, and feature columns → derived PostgreSQL search, Qdrant, TurboVec,
+  cuVS, Neo4j/cuGraph, and `.okf`/ByteTile artifacts.
+- [x] Freeze executor ownership: NetworkX is the CPU graph oracle; Neo4j and cuGraph are graph
+  executors/projections; Qdrant, cuVS, and TurboVec are semantic executors; cuTile/WebGPU are
+  challengers. None owns identity or meaning.
+- [x] Freeze ACE/BitFrost as residency/context policy. Agents receive revision-qualified
+  ContextManifests, not raw database contents or unqualified binary sections.
+- [ ] Extend the current planner into a sealed snapshot only after exact source, parse, symbol,
+  packet, and representation joins are proven.
+- [ ] Build Arrow/MsgPack/`.okf` sections only from that sealed snapshot; no section may mint or
+  replace canonical IDs.
+
+### REGISTRY-WRITER-OWNERSHIP-02 — live parity and writer reachability audit 2026-09-08
+
+- [x] Added the read-only `scripts/atlas/audit-registry-writer-ownership-v2.mjs` audit and
+  root command `npm run atlas:packet-registry:writer-ownership`.
+- [x] Live parity confirms `atlas_packets=61,718` and `atlas_packet_registry=61,718`, with
+  zero missing packet keys, orphan registry rows, duplicate registry keys, and 61,718 packets
+  complete for packet/source/feature identity.
+- [x] Classified six known surfaces without executing them: HyperRAG is `UNRESOLVED` because
+  no production entrypoint was proven; the root addressable materializer is an
+  `ACTIVE_SECONDARY_WRITER` for file/manifest output; the SvelteKit duplicate is `UNRESOLVED`;
+  one backfill is `MANUAL_MIGRATION_ONLY`; one Week 1 script is `BROKEN_LEGACY`; and the
+  remaining Week 1 script is `MANUAL_MIGRATION_ONLY`.
+- [x] Recorded HyperRAG's real risk: it can create/alter the registry and uses
+  `ON CONFLICT (packet_key) DO UPDATE`, but the audited writer has no source/workspace/graph
+  revision references or transaction markers.
+- [x] Follow-up source review found HyperRAG calls `ensureHotTable()` before its dry-run branch;
+  therefore its advertised dry-run is not write-free because it can execute registry DDL.
+- [x] Corrected HyperRAG dry-run behavior: schema admission now runs only under `--apply`, and
+  `upsertRegistry()` is no longer called during dry-run. A bounded `--dry-run --limit=1` replay
+  completed with one planned row, zero database upserts, and no runtime errors.
+- [x] Added three source-level regression tests covering apply-only schema admission, apply-only
+  registry upsert, and explicit dry-run planning markers; all pass without service access.
+- [ ] Keep HyperRAG apply blocked until its writer is revision-qualified, transaction-safe, and
+  explicitly selected as the canonical registry owner.
+- [ ] Decide whether HyperRAG becomes the single canonical registry writer or remains
+  archived/unresolved; do not run it or any registry backfill until that decision is made.
+- [ ] Review `materialize-addressable-packets.mjs` separately as a non-registry artifact
+  producer and reconcile its `--apply` file publication semantics before promotion.
+`REINDEX-MANIFEST-CROSS-SCHEMA-01` parity precursor 2026-09-08: generated the read-only
+`docs/reports/qdrant-postgres-parity-manifest-v1.json` from the corrected completed ledger and
+live PostgreSQL population counts. It records 109,776 audited Qdrant points, 109,773 exact
+identity classifications, and 3 exceptional identities. The manifest explicitly sets
+`promotion.eligible=false` and `writesPerformed=false`; no backlink, repair, or projection write
+was performed. This closes manifest generation, not identity remediation or promotion.

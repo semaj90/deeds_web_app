@@ -1,8 +1,12 @@
 /**
- * src/lib/server/retrieval/cold-storage-retrieval-service.ts
- * 
+ * src/lib/server/features/rag/cold-storage-retrieval-service.ts
+ *
  * 4D Topology Backend for Cold Storage Cosine Retrieval.
  * Provides a Postgres-based retrieval lane using pgvector.
+ *
+ * Canonical implementation. `src/lib/server/retrieval/cold-storage-retrieval-service.ts`
+ * is a thin `export *` re-export of this file — real callers (hyperrag-fusion-service.ts)
+ * import via that retrieval/ path, so keep both files present; do not duplicate this body.
  */
 
 import { pool } from '$lib/server/db/client';

@@ -1,0 +1,904 @@
+{
+  "schema": "atlas.ast-grep-outline-symbol-population.v1",
+  "generatedAt": "2026-09-08T19:16:38.741Z",
+  "mode": "READ_ONLY",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "provider": {
+    "executable": "ast-grep.cmd",
+    "executionMode": "PATH_RESOLUTION",
+    "version": "ast-grep 0.45.3",
+    "outlineSupported": true,
+    "upstreamContract": "ast-grep outline --items structure --view digest"
+  },
+  "requestedPaths": [
+    "sveltekit-frontend/src/lib/server/retrieval",
+    "packages/parent-atlas/src",
+    "services/go-retrieval-service",
+    "python/miniforge_nlp_sidecar_v2.py"
+  ],
+  "structuralOwnership": {
+    "outline": "bounded structural discovery/index candidate",
+    "treeSitter8095": "exact CST/AST spans and source-bound evidence",
+    "lspTsMorph": "compiler-semantic symbols, types, and references",
+    "canonicalPromotion": "revision-qualified resolver plus independent readback"
+  },
+  "population": {
+    "rawOutputChecksum": "f5f58fde3686d52ce0536f0da42b62487692bf244931a4a2c551aa66c07fa847",
+    "rawOutputBytes": 2817067,
+    "fileCount": 526,
+    "fileLanguages": {
+      "Go": 9,
+      "Markdown": 4,
+      "Python": 1,
+      "TypeScript": 512
+    },
+    "itemCount": 5705,
+    "memberCount": 3974,
+    "exportedItemCount": 4029,
+    "itemTypes": {
+      "class": 40,
+      "constant": 1605,
+      "enum": 2,
+      "function": 1945,
+      "interface": 501,
+      "method": 523,
+      "module": 287,
+      "struct": 780,
+      "typeParameter": 1,
+      "variable": 21
+    },
+    "memberTypes": {
+      "constructor": 19,
+      "enumMember": 9,
+      "field": 3704,
+      "method": 242
+    },
+    "sample": [
+      {
+        "name": "AstEvidenceChunkV2",
+        "symbolType": "class",
+        "signature": "class AstEvidenceChunkV2(BaseModel):",
+        "astKind": "class_definition",
+        "range": {
+          "byteOffset": {
+            "start": 1412,
+            "end": 2079
+          },
+          "start": {
+            "line": 43,
+            "column": 0
+          },
+          "end": {
+            "line": 61,
+            "column": 52
+          }
+        },
+        "isExported": true
+      },
+      {
+        "name": "AstEvidenceResponseV2",
+        "symbolType": "class",
+        "signature": "class AstEvidenceResponseV2(BaseModel):",
+        "astKind": "class_definition",
+        "range": {
+          "byteOffset": {
+            "start": 2085,
+            "end": 2602
+          },
+          "start": {
+            "line": 64,
+            "column": 0
+          },
+          "end": {
+            "line": 75,
+            "column": 70
+          }
+        },
+        "isExported": true
+      },
+      {
+        "name": "WebEvidenceRequestV1",
+        "symbolType": "class",
+        "signature": "class WebEvidenceRequestV1(BaseModel):",
+        "astKind": "class_definition",
+        "range": {
+          "byteOffset": {
+            "start": 2608,
+            "end": 3060
+          },
+          "start": {
+            "line": 78,
+            "column": 0
+          },
+          "end": {
+            "line": 85,
+            "column": 56
+          }
+        },
+        "isExported": true
+      },
+      {
+        "name": "WebEvidenceResponseV1",
+        "symbolType": "class",
+        "signature": "class WebEvidenceResponseV1(BaseModel):",
+        "astKind": "class_definition",
+        "range": {
+          "byteOffset": {
+            "start": 3066,
+            "end": 3418
+          },
+          "start": {
+            "line": 88,
+            "column": 0
+          },
+          "end": {
+            "line": 98,
+            "column": 44
+          }
+        },
+        "isExported": true
+      },
+      {
+        "name": "app",
+        "symbolType": "variable",
+        "signature": "app = FastAPI(",
+        "astKind": "assignment",
+        "range": {
+          "byteOffset": {
+            "start": 3424,
+            "end": 3604
+          },
+          "start": {
+            "line": 101,
+            "column": 0
+          },
+          "end": {
+            "line": 105,
+            "column": 1
+          }
+        },
+        "isExported": true
+      },
+      {
+        "name": "request_timer",
+        "symbolType": "function",
+        "signature": "async def request_timer(request: Request, call_next):",
+        "astKind": "function_definition",
+        "range": {
+          "byteOffset": {
+            "start": 3758,
+            "end": 4192
+          },
+          "start": {
+            "line": 115,
+            "column": 0
+          },
+          "end": {
+            "line": 122,
+            "column": 19
+          }
+        },
+        "isExported": true
+      },
+      {
+        "name": "_native_grounded_extractions",
+        "symbolType": "function",
+        "signature": "def _native_grounded_extractions(text: str, model_id: Optional[str] = None) -> list[dict[str, Any]]:",
+        "astKind": "function_definition",
+        "range": {
+          "byteOffset": {
+            "start": 4198,
+            "end": 10757
+          },
+          "start": {
+            "line": 125,
+            "column": 0
+          },
+          "end": {
+            "line": 246,
+            "column": 20
+          }
+        },
+        "isExported": true
+      },
+      {
+        "name": "_DOCUMENTATION_FACT_PROMPT",
+        "symbolType": "constant",
+        "signature": "_DOCUMENTATION_FACT_PROMPT = (",
+        "astKind": "assignment",
+        "range": {
+          "byteOffset": {
+            "start": 11827,
+            "end": 12915
+          },
+          "start": {
+            "line": 263,
+            "column": 0
+          },
+          "end": {
+            "line": 275,
+            "column": 1
+          }
+        },
+        "isExported": true
+      },
+      {
+        "name": "_documentation_fact_output_schema",
+        "symbolType": "function",
+        "signature": "def _documentation_fact_output_schema() -> dict[str, Any]:",
+        "astKind": "function_definition",
+        "range": {
+          "byteOffset": {
+            "start": 12921,
+            "end": 13540
+          },
+          "start": {
+            "line": 278,
+            "column": 0
+          },
+          "end": {
+            "line": 290,
+            "column": 126
+          }
+        },
+        "isExported": true
+      },
+      {
+        "name": "_documentation_output_schema",
+        "symbolType": "function",
+        "signature": "def _documentation_output_schema() -> dict[str, Any]:",
+        "astKind": "function_definition",
+        "range": {
+          "byteOffset": {
+            "start": 13545,
+            "end": 14724
+          },
+          "start": {
+            "line": 293,
+            "column": 0
+          },
+          "end": {
+            "line": 320,
+            "column": 125
+          }
+        },
+        "isExported": true
+      },
+      {
+        "name": "_native_documentation_facts",
+        "symbolType": "function",
+        "signature": "def _native_documentation_facts(text: str, model_id: Optional[str] = None) -> list[dict[str, Any]]:",
+        "astKind": "function_definition",
+        "range": {
+          "byteOffset": {
+            "start": 14729,
+            "end": 23734
+          },
+          "start": {
+            "line": 323,
+            "column": 0
+          },
+          "end": {
+            "line": 485,
+            "column": 20
+          }
+        },
+        "isExported": true
+      },
+      {
+        "name": "DocumentationFactRequestV1",
+        "symbolType": "class",
+        "signature": "class DocumentationFactRequestV1(BaseModel):",
+        "astKind": "class_definition",
+        "range": {
+          "byteOffset": {
+            "start": 23740,
+            "end": 24331
+          },
+          "start": {
+            "line": 488,
+            "column": 0
+          },
+          "end": {
+            "line": 498,
+            "column": 45
+          }
+        },
+        "isExported": true
+      },
+      {
+        "name": "DocumentationFactV1",
+        "symbolType": "class",
+        "signature": "class DocumentationFactV1(BaseModel):",
+        "astKind": "class_definition",
+        "range": {
+          "byteOffset": {
+            "start": 24337,
+            "end": 25456
+          },
+          "start": {
+            "line": 501,
+            "column": 0
+          },
+          "end": {
+            "line": 524,
+            "column": 45
+          }
+        },
+        "isExported": true
+      },
+      {
+        "name": "ApiRuleV1",
+        "symbolType": "class",
+        "signature": "class ApiRuleV1(BaseModel):",
+        "astKind": "class_definition",
+        "range": {
+          "byteOffset": {
+            "start": 25462,
+            "end": 26198
+          },
+          "start": {
+            "line": 527,
+            "column": 0
+          },
+          "end": {
+            "line": 541,
+            "column": 45
+          }
+        },
+        "isExported": true
+      },
+      {
+        "name": "DocumentationFactResponseV1",
+        "symbolType": "class",
+        "signature": "class DocumentationFactResponseV1(BaseModel):",
+        "astKind": "class_definition",
+        "range": {
+          "byteOffset": {
+            "start": 26204,
+            "end": 27030
+          },
+          "start": {
+            "line": 544,
+            "column": 0
+          },
+          "end": {
+            "line": 557,
+            "column": 45
+          }
+        },
+        "isExported": true
+      },
+      {
+        "name": "_utf8_span",
+        "symbolType": "function",
+        "signature": "def _utf8_span(source: str, start_char: int, end_char: int) -> tuple[int, int] | None:",
+        "astKind": "function_definition",
+        "range": {
+          "byteOffset": {
+            "start": 27036,
+            "end": 27598
+          },
+          "start": {
+            "line": 560,
+            "column": 0
+          },
+          "end": {
+            "line": 570,
+            "column": 31
+          }
+        },
+        "isExported": true
+      },
+      {
+        "name": "_source_revision_is_consistent",
+        "symbolType": "function",
+        "signature": "def _source_revision_is_consistent(source: str, source_revision: str) -> bool:",
+        "astKind": "function_definition",
+        "range": {
+          "byteOffset": {
+            "start": 27604,
+            "end": 28115
+          },
+          "start": {
+            "line": 573,
+            "column": 0
+          },
+          "end": {
+            "line": 582,
+            "column": 40
+          }
+        },
+        "isExported": true
+      },
+      {
+        "name": "_line_span_to_utf8_byte_offsets",
+        "symbolType": "function",
+        "signature": "def _line_span_to_utf8_byte_offsets(source: str, start_line: int, end_line: int) -> tuple[int, int]:",
+        "astKind": "function_definition",
+        "range": {
+          "byteOffset": {
+            "start": 28121,
+            "end": 28511
+          },
+          "start": {
+            "line": 585,
+            "column": 0
+          },
+          "end": {
+            "line": 592,
+            "column": 5
+          }
+        },
+        "isExported": true
+      },
+      {
+        "name": "_structural_symbol_name",
+        "symbolType": "function",
+        "signature": "def _structural_symbol_name(value: Any) -> str | None:",
+        "astKind": "function_definition",
+        "range": {
+          "byteOffset": {
+            "start": 28517,
+            "end": 28959
+          },
+          "start": {
+            "line": 595,
+            "column": 0
+          },
+          "end": {
+            "line": 607,
+            "column": 15
+          }
+        },
+        "isExported": true
+      },
+      {
+        "name": "_FUNCTION_INITIALIZER_RE",
+        "symbolType": "constant",
+        "signature": "_FUNCTION_INITIALIZER_RE = re.compile(",
+        "astKind": "assignment",
+        "range": {
+          "byteOffset": {
+            "start": 29546,
+            "end": 29694
+          },
+          "start": {
+            "line": 618,
+            "column": 0
+          },
+          "end": {
+            "line": 620,
+            "column": 1
+          }
+        },
+        "isExported": true
+      },
+      {
+        "name": "_DECLARATOR_NODE_TYPES",
+        "symbolType": "constant",
+        "signature": "_DECLARATOR_NODE_TYPES = frozenset({\"variable_declarator\", \"lexical_declaration\", \"variable_declaration\"})",
+        "astKind": "assignment",
+        "range": {
+          "byteOffset": {
+            "start": 29696,
+            "end": 29802
+          },
+          "start": {
+            "line": 621,
+            "column": 0
+          },
+          "end": {
+            "line": 621,
+            "column": 106
+          }
+        },
+        "isExported": true
+      },
+      {
+        "name": "_declarator_kind_override",
+        "symbolType": "function",
+        "signature": "def _declarator_kind_override(node_type: str, span_text: str) -> str | None:",
+        "astKind": "function_definition",
+        "range": {
+          "byteOffset": {
+            "start": 29808,
+            "end": 30415
+          },
+          "start": {
+            "line": 624,
+            "column": 0
+          },
+          "end": {
+            "line": 635,
+            "column": 15
+          }
+        },
+        "isExported": true
+      },
+      {
+        "name": "_raw_chunk_file",
+        "symbolType": "function",
+        "signature": "def _raw_chunk_file(source: str, language: str, file_path: str) -> tuple[list[Any], bool]:",
+        "astKind": "function_definition",
+        "range": {
+          "byteOffset": {
+            "start": 30421,
+            "end": 32747
+          },
+          "start": {
+            "line": 638,
+            "column": 0
+          },
+          "end": {
+            "line": 694,
+            "column": 51
+          }
+        },
+        "isExported": true
+      },
+      {
+        "name": "_raw_chunk_content_bytes",
+        "symbolType": "function",
+        "signature": "def _raw_chunk_content_bytes(raw: Any) -> bytes | None:",
+        "astKind": "function_definition",
+        "range": {
+          "byteOffset": {
+            "start": 32753,
+            "end": 33387
+          },
+          "start": {
+            "line": 697,
+            "column": 0
+          },
+          "end": {
+            "line": 709,
+            "column": 15
+          }
+        },
+        "isExported": true
+      },
+      {
+        "name": "_span_line_range",
+        "symbolType": "function",
+        "signature": "def _span_line_range(source_bytes: bytes, start: int, end: int) -> tuple[int, int]:",
+        "astKind": "function_definition",
+        "range": {
+          "byteOffset": {
+            "start": 33393,
+            "end": 33639
+          },
+          "start": {
+            "line": 712,
+            "column": 0
+          },
+          "end": {
+            "line": 715,
+            "column": 53
+          }
+        },
+        "isExported": true
+      },
+      {
+        "name": "_span_matches_original",
+        "symbolType": "function",
+        "signature": "def _span_matches_original(",
+        "astKind": "function_definition",
+        "range": {
+          "byteOffset": {
+            "start": 33645,
+            "end": 34653
+          },
+          "start": {
+            "line": 718,
+            "column": 0
+          },
+          "end": {
+            "line": 742,
+            "column": 15
+          }
+        },
+        "isExported": true
+      },
+      {
+        "name": "_lf_boundary_to_original_map",
+        "symbolType": "function",
+        "signature": "def _lf_boundary_to_original_map(source_bytes: bytes) -> list[int]:",
+        "astKind": "function_definition",
+        "range": {
+          "byteOffset": {
+            "start": 34659,
+            "end": 35111
+          },
+          "start": {
+            "line": 745,
+            "column": 0
+          },
+          "end": {
+            "line": 756,
+            "column": 18
+          }
+        },
+        "isExported": true
+      },
+      {
+        "name": "_resolve_original_chunk_span",
+        "symbolType": "function",
+        "signature": "def _resolve_original_chunk_span(",
+        "astKind": "function_definition",
+        "range": {
+          "byteOffset": {
+            "start": 35117,
+            "end": 37297
+          },
+          "start": {
+            "line": 759,
+            "column": 0
+          },
+          "end": {
+            "line": 816,
+            "column": 70
+          }
+        },
+        "isExported": true
+      },
+      {
+        "name": "_diagnostics_have_errors",
+        "symbolType": "function",
+        "signature": "def _diagnostics_have_errors(diagnostics: list[str]) -> bool:",
+        "astKind": "function_definition",
+        "range": {
+          "byteOffset": {
+            "start": 37303,
+            "end": 37457
+          },
+          "start": {
+            "line": 819,
+            "column": 0
+          },
+          "end": {
+            "line": 820,
+            "column": 91
+          }
+        },
+        "isExported": true
+      },
+      {
+        "name": "_native_ast_evidence",
+        "symbolType": "function",
+        "signature": "def _native_ast_evidence(req: legacy.AstChunkRequest) -> AstEvidenceResponseV2:",
+        "astKind": "function_definition",
+        "range": {
+          "byteOffset": {
+            "start": 37463,
+            "end": 48991
+          },
+          "start": {
+            "line": 823,
+            "column": 0
+          },
+          "end": {
+            "line": 1048,
+            "column": 5
+          }
+        },
+        "isExported": true
+      },
+      {
+        "name": "health",
+        "symbolType": "function",
+        "signature": "def health() -> dict[str, Any]:",
+        "astKind": "function_definition",
+        "range": {
+          "byteOffset": {
+            "start": 49018,
+            "end": 49146
+          },
+          "start": {
+            "line": 1052,
+            "column": 0
+          },
+          "end": {
+            "line": 1055,
+            "column": 17
+          }
+        },
+        "isExported": true
+      },
+      {
+        "name": "capabilities",
+        "symbolType": "function",
+        "signature": "def capabilities() -> dict[str, Any]:",
+        "astKind": "function_definition",
+        "range": {
+          "byteOffset": {
+            "start": 49179,
+            "end": 49547
+          },
+          "start": {
+            "line": 1059,
+            "column": 0
+          },
+          "end": {
+            "line": 1068,
+            "column": 17
+          }
+        },
+        "isExported": true
+      },
+      {
+        "name": "ast_chunk",
+        "symbolType": "function",
+        "signature": "def ast_chunk(req: legacy.AstChunkRequest) -> AstEvidenceResponseV2:",
+        "astKind": "function_definition",
+        "range": {
+          "byteOffset": {
+            "start": 49616,
+            "end": 49722
+          },
+          "start": {
+            "line": 1072,
+            "column": 0
+          },
+          "end": {
+            "line": 1073,
+            "column": 36
+          }
+        },
+        "isExported": true
+      },
+      {
+        "name": "analyze",
+        "symbolType": "function",
+        "signature": "def analyze(req: legacy.AnalyzeRequest) -> legacy.AnalyzeResponse:",
+        "astKind": "function_definition",
+        "range": {
+          "byteOffset": {
+            "start": 49790,
+            "end": 49889
+          },
+          "start": {
+            "line": 1077,
+            "column": 0
+          },
+          "end": {
+            "line": 1078,
+            "column": 31
+          }
+        },
+        "isExported": true
+      },
+      {
+        "name": "extract",
+        "symbolType": "function",
+        "signature": "def extract(req: legacy.AnalyzeRequest) -> legacy.ExtractResponse:",
+        "astKind": "function_definition",
+        "range": {
+          "byteOffset": {
+            "start": 49957,
+            "end": 50056
+          },
+          "start": {
+            "line": 1082,
+            "column": 0
+          },
+          "end": {
+            "line": 1083,
+            "column": 31
+          }
+        },
+        "isExported": true
+      },
+      {
+        "name": "extract_documentation_facts",
+        "symbolType": "function",
+        "signature": "def extract_documentation_facts(req: DocumentationFactRequestV1) -> DocumentationFactResponseV1:",
+        "astKind": "function_definition",
+        "range": {
+          "byteOffset": {
+            "start": 50149,
+            "end": 53884
+          },
+          "start": {
+            "line": 1087,
+            "column": 0
+          },
+          "end": {
+            "line": 1158,
+            "column": 5
+          }
+        },
+        "isExported": true
+      },
+      {
+        "name": "extract_file",
+        "symbolType": "function",
+        "signature": "def extract_file() -> dict[str, Any]:",
+        "astKind": "function_definition",
+        "range": {
+          "byteOffset": {
+            "start": 53918,
+            "end": 53989
+          },
+          "start": {
+            "line": 1162,
+            "column": 0
+          },
+          "end": {
+            "line": 1163,
+            "column": 32
+          }
+        },
+        "isExported": true
+      },
+      {
+        "name": "extract_web",
+        "symbolType": "function",
+        "signature": "def extract_web(req: dict[str, Any]) -> dict[str, Any]:",
+        "astKind": "function_definition",
+        "range": {
+          "byteOffset": {
+            "start": 54022,
+            "end": 54113
+          },
+          "start": {
+            "line": 1167,
+            "column": 0
+          },
+          "end": {
+            "line": 1168,
+            "column": 34
+          }
+        },
+        "isExported": true
+      },
+      {
+        "name": "web_evidence",
+        "symbolType": "function",
+        "signature": "def web_evidence(req: WebEvidenceRequestV1) -> WebEvidenceResponseV1:",
+        "astKind": "function_definition",
+        "range": {
+          "byteOffset": {
+            "start": 54185,
+            "end": 56269
+          },
+          "start": {
+            "line": 1172,
+            "column": 0
+          },
+          "end": {
+            "line": 1219,
+            "column": 92
+          }
+        },
+        "isExported": true
+      },
+      {
+        "name": "main",
+        "symbolType": "function",
+        "signature": "def main() -> None:",
+        "astKind": "function_definition",
+        "range": {
+          "byteOffset": {
+            "start": 56275,
+            "end": 56532
+          },
+          "start": {
+            "line": 1222,
+            "column": 0
+          },
+          "end": {
+            "line": 1227,
+            "column": 92
+          }
+        },
+        "isExported": true
+      }
+    ],
+    "note": "Outline output is a bounded structural observation; it is not a canonical symbol index."
+  },
+  "diagnostics": [],
+  "nextGate": "AST_GREP_OUTLINE_TREE_SITTER_PARITY",
+  "status": "OUTLINE_STRUCTURAL_DISCOVERY_PROVEN"
+}

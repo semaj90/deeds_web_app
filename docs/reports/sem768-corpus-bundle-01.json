@@ -1,6 +1,6 @@
 {
   "schema": "atlas.semantic-corpus-bundle-01.report.v1",
-  "generatedAt": "2026-09-08T00:46:15.324Z",
+  "generatedAt": "2026-09-08T05:13:51.491Z",
   "mode": "READ_ONLY",
   "writesPerformed": false,
   "producerEvidence": {
@@ -15,7 +15,7 @@
     "workspaceHasEvidence": true,
     "sourceHasEvidence": true,
     "workspaceOwnerProven": false,
-    "sourceByteMatchCount": 23532,
+    "sourceByteMatchCount": 23516,
     "note": "Real partial evidence exists (workspace value present but revisionOwnerProven=false; source audit shows real per-source byte matches but no corpus-wide source-set revision) -- neither reaches admission. Not forced to UNPROVEN (there is real evidence) or PROVEN (nothing is admitted)."
   },
   "bundle": {

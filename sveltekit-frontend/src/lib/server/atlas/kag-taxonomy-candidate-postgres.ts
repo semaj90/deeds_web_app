@@ -5,6 +5,9 @@ import {
   type TaxonomyAssignmentCandidateV1,
 } from './taxonomy/entity-concept-taxonomy-v1.js';
 import { persistHyperedges } from './kag-hyperedge-postgres.js';
+import { hyperedgeToRelationshipKernel } from '$lib/server/graph/hyperedge-contract.js';
+import { projectRelationshipKernelsToNeo4j } from './graph/relationship-kernel-neo4j-projector-v1.js';
+import { getNeo4jDriver } from '$lib/server/neo4j-driver.js';
 
 /**
  * KAG taxonomy-assignment review surface (roadmap step 2).
@@ -159,7 +162,7 @@ export async function listPendingTaxonomyAssignmentCandidates(limit = 50): Promi
 
 export type TaxonomyCandidateDecisionV1 =
   | { outcome: 'rejected'; candidateId: string }
-  | { outcome: 'promoted'; candidateId: string; hyperedgeId: string }
+  | { outcome: 'promoted'; candidateId: string; hyperedgeId: string; neo4jMirrored: boolean; neo4jMirrorError: string | null }
   | { outcome: 'promoted_degraded'; candidateId: string; hyperedgeError: string };
 
 /**
@@ -229,7 +232,33 @@ export async function decideTaxonomyAssignmentCandidateV1(input: {
       `UPDATE atlas_taxonomy_assignment_candidates SET promoted_hyperedge_id = $2, updated_at = now() WHERE candidate_id = $1`,
       [input.candidateId, edge.hyperedgeId]
     );
-    return { outcome: 'promoted', candidateId: input.candidateId, hyperedgeId: edge.hyperedgeId };
+
+    // Postgres (atlas_hyperedges) is truth and is already committed above; this Neo4j write is a
+    // best-effort MIRROR only, matching the repo's Postgres-truth/Neo4j-mirror rule. A failure
+    // here must never roll back or hide the Postgres promotion -- report it honestly instead.
+    let neo4jMirrored = false;
+    let neo4jMirrorError: string | null = null;
+    try {
+      const kernel = hyperedgeToRelationshipKernel(edge);
+      const session = getNeo4jDriver().session({ database: 'neo4j' });
+      try {
+        const result = await projectRelationshipKernelsToNeo4j(session, [kernel]);
+        neo4jMirrored = result.skipped.length === 0 && (result.binaryEdgesWritten + result.hubNodesWritten) > 0;
+        if (result.skipped.length > 0) neo4jMirrorError = result.skipped[0]!.reason;
+      } finally {
+        await session.close();
+      }
+    } catch (err) {
+      neo4jMirrorError = (err as Error)?.message ?? String(err);
+    }
+
+    return {
+      outcome: 'promoted',
+      candidateId: input.candidateId,
+      hyperedgeId: edge.hyperedgeId,
+      neo4jMirrored,
+      neo4jMirrorError,
+    };
   }
 
   // Degraded but honest: candidate IS 'promoted' in Postgres; the hyperedge

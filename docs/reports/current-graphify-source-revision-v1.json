@@ -1,6 +1,6 @@
 {
   "schema": "atlas.current-graphify-source-revision.v1",
-  "generatedAt": "2026-09-08T03:09:53.207Z",
+  "generatedAt": "2026-09-08T19:58:58.078Z",
   "mode": "READ_ONLY_SOURCE_BYTES_AUDIT",
   "runId": "48485685-e773-4433-a1f8-00f5524cca44",
   "runSelection": "COMPLETED_BOUND_OWNER_BY_FILE_COUNT",
@@ -14,8 +14,8 @@
   "canonicalAuthority": false,
   "rowCount": 23758,
   "counts": {
-    "CONTENT_MATCH": 23516,
-    "CONTENT_MISMATCH": 235,
+    "CONTENT_MATCH": 23469,
+    "CONTENT_MISMATCH": 282,
     "SOURCE_UNAVAILABLE": 7
   },
   "sourceRevisionPresent": 23758,
@@ -665,7 +665,7 @@
       "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "22b15d31c396f25981aa1cec2ba4c33433db51b98fc1000c6d825558b5bd3170",
-      "actualContentHash": "sha256:babaeeef5d7fbe087e7dfb86ce6b953b719e14b7cae10f761dd7ce15849e505e",
+      "actualContentHash": "sha256:80e5b30d277ad55d84eae3247d5da677efacdce4ba213801af9fbda490c99b38",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -742,10 +742,10 @@
     },
     {
       "sourceRef": ".claude/settings.json",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "9d679a8b60b352ffbd65e830963d91275801cd8a338c03ed6fa5a43fd2b93370",
-      "actualContentHash": "sha256:9d679a8b60b352ffbd65e830963d91275801cd8a338c03ed6fa5a43fd2b93370",
+      "actualContentHash": "sha256:1d6bac968abfb68db993c7aebab7de81fd939a909a24ac59eeb7aae257e05dc2",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -2953,7 +2953,7 @@
       "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "a19fcdca1ef69a1e78ad19afa9b02ac2152afc4596b2752f0dff3cbc4c123000",
-      "actualContentHash": "sha256:c651fb32343e82f6342f6fbfc8e6b729ab7dc6c7c15b5f3930dc1e800c85a804",
+      "actualContentHash": "sha256:fc514dd77d6f9916bbfab9dc3c609a99d602574182206b26a1c4236bf69acacb",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -4694,10 +4694,10 @@
     },
     {
       "sourceRef": "docs/graph/contract-error-map.json",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "ac00c218200903ccd3948a59d88c7466bc613619aad156e0b06efc91b5c5a0d4",
-      "actualContentHash": "sha256:ac00c218200903ccd3948a59d88c7466bc613619aad156e0b06efc91b5c5a0d4",
+      "actualContentHash": "sha256:4f1fef5a7237855cd4749eff205dd8c7358aa823f3f4f96cea1a559b2924fce7",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -6033,7 +6033,7 @@
       "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "6bcf47207d4677aa08854c16ad3af9809555855af73785e7cf18033b1fff9ad5",
-      "actualContentHash": "sha256:12299742b2f28e85f5a374f6951e75e467eaa0672cdafaa04be566c6b0c8c367",
+      "actualContentHash": "sha256:ef5a993eb7bfe7549b4fcea57e0fd32ba66c15301952cc075744c1c65887da91",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -6041,7 +6041,7 @@
       "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "56d8de80e0866489f059542055d492253657f3059fbba1ac9df7efd07a79e8ca",
-      "actualContentHash": "sha256:dd4fb98b2640bac4ae710506030ec75447659570fcdd46351c0c51236f4a22fa",
+      "actualContentHash": "sha256:457513d7a00b426fb39f5a544c6e450f4157d54ddfcec1da9d6eec7ac21f194e",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -12918,10 +12918,10 @@
     },
     {
       "sourceRef": ".mcp.json",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "d93f190a37b27f5a2cb4adf7b1f5938993add435d232e366d1fcd42defedfae7",
-      "actualContentHash": "sha256:d93f190a37b27f5a2cb4adf7b1f5938993add435d232e366d1fcd42defedfae7",
+      "actualContentHash": "sha256:9305941ce4ce8759a60d5e064b67d77787c9c35586d832a6121be441926e93d6",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -13694,10 +13694,10 @@
     },
     {
       "sourceRef": "memory/packets/hyperrag-packets.manifest.json",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "e3be774f8df68fcb433fa2761551ec64f75f5364ffa0e219ca053068e12655c0",
-      "actualContentHash": "sha256:e3be774f8df68fcb433fa2761551ec64f75f5364ffa0e219ca053068e12655c0",
+      "actualContentHash": "sha256:868d1469bba074b9eabf94310eafcb9c89cceae964d4cdc647c895562b6f3c30",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -17153,7 +17153,7 @@
       "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "dcfabc8a968f03434779dea3e2259d76bf5a45ec747764c58b8404a19b5f0559",
-      "actualContentHash": "sha256:03b87b297e0c57657cfd507b3f24e28ddb071ee514842f4e9bafee80798e2f4f",
+      "actualContentHash": "sha256:780161406360c527632192a68e9a7e7386063ff35809a2b1edcee21b05a6f7d2",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -17353,7 +17353,7 @@
       "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "8ab08c76816cfddd193627c60d951e60e5f09878bfdfe05211833ad4b8601e30",
-      "actualContentHash": "sha256:6c43e3862cc3f1337e991f01948fefa4f6f450be4330c68f6a7239d889ac2fa7",
+      "actualContentHash": "sha256:abc5bc12e8771f7fddbfaaa128c4ad91cce77b41bd1ba3a6e797db15750a28c5",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -18473,7 +18473,7 @@
       "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "d01c467f6a2fa2a7245a3a9b6085a42d72b05fc6e80ac3962671a780344cc501",
-      "actualContentHash": "sha256:02c0fd2327ed761e698257fd85c7259221e9bbb6d990b7e69e3180dce38c4dd1",
+      "actualContentHash": "sha256:558e77beb4c8b78073fd5ef74e8e676663a1ca07264e327b5d3ace575c115212",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -19857,7 +19857,7 @@
       "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "f8a57b6e4a7d8595b2308bd800fb6579fe00420a780e2db3a369dc865b7079dd",
-      "actualContentHash": "sha256:80ef0d18799ae637bc5042a6020d72bd59216be2a7eff0a57c6463cb805466b8",
+      "actualContentHash": "sha256:88d5017073df18e625d5a85887df280212bfd0886d50167dca673d49f1be08c2",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -20694,10 +20694,10 @@
     },
     {
       "sourceRef": "packages/parent-atlas-client/src/grpc/client.ts",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "17500f461c60d5aaf890cdbc7002f899c25f3978786e45cc46ebb5b93dce1c22",
-      "actualContentHash": "sha256:17500f461c60d5aaf890cdbc7002f899c25f3978786e45cc46ebb5b93dce1c22",
+      "actualContentHash": "sha256:6f1745a57ec60ed440d31859b40e8609ef95be2c97d6a81507860a4fbe1b8ac0",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -20726,10 +20726,10 @@
     },
     {
       "sourceRef": "packages/parent-atlas-client/test/grpc-client.test.mjs",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "f415b09480caeda1ca6a54b6c64d029cdcf8054b6a8203051b5effd4ba8bbcb6",
-      "actualContentHash": "sha256:f415b09480caeda1ca6a54b6c64d029cdcf8054b6a8203051b5effd4ba8bbcb6",
+      "actualContentHash": "sha256:20916c4a58fa862519b2202cc0bc5914bd0ea67f77741769c9b4a1444c4b3157",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -20769,7 +20769,7 @@
       "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "d85aee72161d2bbfef1c1c907c5ffb5fa400087c0857632f151db49fae3b8326",
-      "actualContentHash": "sha256:176ac23d9950e8fa8d226c596722cfdcc5108ea045480789569141b614cb23ba",
+      "actualContentHash": "sha256:0e1724b93b9390b7a24b54f8bdf36e8e66808e80297aa9e9f10c6ad5cfcd7018",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -20777,7 +20777,7 @@
       "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "c03e550c42a707fc97e5da5a68e093ba2dc0bb8197012c0316fe4f9c461a5292",
-      "actualContentHash": "sha256:e0e33b76ae6f512d44fa80bab8d07a978159c05f20bbfbc91c6e631e6a839ee9",
+      "actualContentHash": "sha256:408ccffdce1d0300c42d7dfe8309496b22ec98d998398a5de8e96a2fcb018ced",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -21430,26 +21430,26 @@
     },
     {
       "sourceRef": "packages/parent-atlas-runtime/src/adapters/postgres-bm25.adapter.ts",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "fda19d1b41e4773f91aa376aa8f239684b121f1538a8f31bf52355c31ca996cb",
-      "actualContentHash": "sha256:fda19d1b41e4773f91aa376aa8f239684b121f1538a8f31bf52355c31ca996cb",
+      "actualContentHash": "sha256:efbe1d15d7a57ecd579e0874e187b1163cfec5c26f8a8abfb1ae12ad214cf9d4",
       "parseStatus": "UNPROCESSED"
     },
     {
       "sourceRef": "packages/parent-atlas-runtime/src/adapters/postgres-fts.adapter.test.ts",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "ebe14b04bdafaa0d0c2e784989737270b88bf0e475b5679303aef8125e1dcaf0",
-      "actualContentHash": "sha256:ebe14b04bdafaa0d0c2e784989737270b88bf0e475b5679303aef8125e1dcaf0",
+      "actualContentHash": "sha256:8e90d11c670badc0001a6e07e19b3a8d91ac42579aa1b35e0ea285b7959f42c0",
       "parseStatus": "UNPROCESSED"
     },
     {
       "sourceRef": "packages/parent-atlas-runtime/src/adapters/postgres-fts.adapter.ts",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "2878e2a8fbd019cbdd533d0da3615b9b2fd47008a10272f19b969c372655886f",
-      "actualContentHash": "sha256:2878e2a8fbd019cbdd533d0da3615b9b2fd47008a10272f19b969c372655886f",
+      "actualContentHash": "sha256:b5f7d6967bf227265bf6fc508549dc3de5d9b68328dcc4ccea8155d3b12ee8dd",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -26537,7 +26537,7 @@
       "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "23aba86014f25579c8b81a442c90b565a279a62d7796e863e25c024fabc4f465",
-      "actualContentHash": "sha256:08f38cd2b766899e293bb4387af1ed5cc13fe1ad5842236987c0d05e0b3cf629",
+      "actualContentHash": "sha256:453672d501b201ba26ea27630ec65c43f53ee17c65c1e9072ae114bd686d0c5d",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -31678,10 +31678,10 @@
     },
     {
       "sourceRef": "scripts/atlas/audit-current-workspace-packet-chunk-join-v1.mjs",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "be1ec34081830582aa496dffc3b571a1b77c42319fd84e8dbb0e391161a38c07",
-      "actualContentHash": "sha256:be1ec34081830582aa496dffc3b571a1b77c42319fd84e8dbb0e391161a38c07",
+      "actualContentHash": "sha256:2bd716c06f6bc305e6a6d372a4f5be2a070179b9f760fa3546c50b96d8ce8ec9",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -32814,10 +32814,10 @@
     },
     {
       "sourceRef": "scripts/atlas/audit-postgres-contract-mirrors.mjs",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "417a822c670b3aabadf44a85aa88493681b5bd3a609b026d767250428891b8d6",
-      "actualContentHash": "sha256:417a822c670b3aabadf44a85aa88493681b5bd3a609b026d767250428891b8d6",
+      "actualContentHash": "sha256:67e95a37f5f688ad8ae0d442514a4ed49dfd43ede4cbdffed9d2406a13be61fb",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -33582,10 +33582,10 @@
     },
     {
       "sourceRef": "scripts/atlas/backfill-entity-lexical-prefill.mjs",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "0d59c3db6dde68689d1e3de1215e0eff77cbb6424d25f4f47e873a636278f3e8",
-      "actualContentHash": "sha256:0d59c3db6dde68689d1e3de1215e0eff77cbb6424d25f4f47e873a636278f3e8",
+      "actualContentHash": "sha256:f72d9329bcb0317bcea4f6a32d8295124a7529ad4e1a34ad07753ffd03b26e82",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -33966,10 +33966,10 @@
     },
     {
       "sourceRef": "scripts/atlas/backfill-summary-layers-from-chunks.mjs",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "403e4b2afd5f95145b4143b4e05ef9f6e43e927768ef2869efd68e6e22b04372",
-      "actualContentHash": "sha256:403e4b2afd5f95145b4143b4e05ef9f6e43e927768ef2869efd68e6e22b04372",
+      "actualContentHash": "sha256:f4eea54ec8e0efcada88ab22135174a6447dded2e6a885aea698614436f6a63c",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -34046,10 +34046,10 @@
     },
     {
       "sourceRef": "scripts/atlas/batch-offline-ingest.mjs",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "83f3d23b6f058d60cb1bcf2fcd53a7591a814206d16f5d391dad4b0f00d7ffea",
-      "actualContentHash": "sha256:83f3d23b6f058d60cb1bcf2fcd53a7591a814206d16f5d391dad4b0f00d7ffea",
+      "actualContentHash": "sha256:52ee20d1f675a281b11a557c488f299ce03b40509bcc3af7a8afff9132350300",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -35342,10 +35342,10 @@
     },
     {
       "sourceRef": "scripts/atlas/create-agent-pickup-packets.mjs",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "e4a73b5f100eb3925b620b9f419a5d260047efdc2f9b1cc1316e797feac1ca69",
-      "actualContentHash": "sha256:e4a73b5f100eb3925b620b9f419a5d260047efdc2f9b1cc1316e797feac1ca69",
+      "actualContentHash": "sha256:37a38599c20a4ca803f7c8da732299a1b6ac31d688a4fa485126d229e779da43",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -37454,10 +37454,10 @@
     },
     {
       "sourceRef": "scripts/atlas/hyperrag-packet-materializer.mjs",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "c4a20a9df08f728002f605bdd9a9ad8284ebc80ec7f2f888f6451281bc5caa3d",
-      "actualContentHash": "sha256:c4a20a9df08f728002f605bdd9a9ad8284ebc80ec7f2f888f6451281bc5caa3d",
+      "actualContentHash": "sha256:0f22135d8ffaff004fc90009ae7de0c02f342baaebea9a7917ab89a6a482d002",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -38198,10 +38198,10 @@
     },
     {
       "sourceRef": "scripts/atlas/lib/ast-grep-symbol-extraction.mjs",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "5130d8b7ddfaec911a04aa607a4c49213cf894ab8d9eab98ac4723f38a56f8ce",
-      "actualContentHash": "sha256:5130d8b7ddfaec911a04aa607a4c49213cf894ab8d9eab98ac4723f38a56f8ce",
+      "actualContentHash": "sha256:7c6e08cfb5d7113eeef7ba8dbf7ac9952c8f909906b20906d6e9f9eabee9660e",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -43734,26 +43734,26 @@
     },
     {
       "sourceRef": "scripts/atlas/qdrant-parity-repair-core.mjs",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "4c4a11a463adedd30b61df93076dd275c016007113fb38d2dc2171da321e9ae9",
-      "actualContentHash": "sha256:4c4a11a463adedd30b61df93076dd275c016007113fb38d2dc2171da321e9ae9",
+      "actualContentHash": "sha256:1f65e0359fcbcbd8b4354102b505723d3532496fc08c1cae0a82f08e3ae4d7a8",
       "parseStatus": "UNPROCESSED"
     },
     {
       "sourceRef": "scripts/atlas/qdrant-parity-repair.mjs",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "c172aaeaf061576726dac7af0261dca5c8591c430535007b46c95f8835909657",
-      "actualContentHash": "sha256:c172aaeaf061576726dac7af0261dca5c8591c430535007b46c95f8835909657",
+      "actualContentHash": "sha256:7be585824da13599fa8a0036836a9be6b35039f283c33c94e5e9a89a1b92d6aa",
       "parseStatus": "UNPROCESSED"
     },
     {
       "sourceRef": "scripts/atlas/qdrant-parity-repair.test.mjs",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "498de9054dec155af71a3829d82d512fc9e84c631658628eeae32371d3b0b006",
-      "actualContentHash": "sha256:498de9054dec155af71a3829d82d512fc9e84c631658628eeae32371d3b0b006",
+      "actualContentHash": "sha256:ef31857bf816bd9171c73c6c5f064f02ede03fb46d4d90af51651dc6444a91af",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -46894,10 +46894,10 @@
     },
     {
       "sourceRef": "scripts/atlas/validate-som-20x20-topology.mjs",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "f3a576634c4e138c24a3f212a2b86397b1287bf85118b8e0447a3b749ac051e2",
-      "actualContentHash": "sha256:f3a576634c4e138c24a3f212a2b86397b1287bf85118b8e0447a3b749ac051e2",
+      "actualContentHash": "sha256:1c6e7e667675d765c8b5aa1c1fc993f9c91232450b91d377352bc223927c4238",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -49950,10 +49950,10 @@
     },
     {
       "sourceRef": "scripts/launch-embed-server.ps1",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "f5f821de58415213b135ff608c16b0a33d02e9ed2ac323e01b4535abb02e4651",
-      "actualContentHash": "sha256:f5f821de58415213b135ff608c16b0a33d02e9ed2ac323e01b4535abb02e4651",
+      "actualContentHash": "sha256:3b8614f5d1814b82f34f3c7f0f816829789d2c5098df09c5694627acdd12cbaa",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -50526,10 +50526,10 @@
     },
     {
       "sourceRef": "scripts/opencode/alias-card-mapper.mjs",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "b345bbe39b987376ae750c10785378f1707ed32975369e5dc04c76441a45070f",
-      "actualContentHash": "sha256:b345bbe39b987376ae750c10785378f1707ed32975369e5dc04c76441a45070f",
+      "actualContentHash": "sha256:b65442c32a3bf86cb92abc31e8b305e73a38b61d506bafebe47ca1427f35324c",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -51142,10 +51142,10 @@
     },
     {
       "sourceRef": "scripts/opencode/validation-gate.mjs",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "09fd495b210515e6cd71d6e9c43a93222b7c39c1a350b0399fe8a3a82baa708b",
-      "actualContentHash": "sha256:09fd495b210515e6cd71d6e9c43a93222b7c39c1a350b0399fe8a3a82baa708b",
+      "actualContentHash": "sha256:2ec8e400ef0dc9b5c12d2270211226892c1bbd3f6a8b1b756fdf901b2596085c",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -55958,18 +55958,18 @@
     },
     {
       "sourceRef": "services/go-retrieval-service/lanes.go",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "dda534d861d402f9887f46871fdaf448abbb4084477a9bafda0135a4dcb2ddcc",
-      "actualContentHash": "sha256:dda534d861d402f9887f46871fdaf448abbb4084477a9bafda0135a4dcb2ddcc",
+      "actualContentHash": "sha256:3bcffddac6c47776697ac2105b4efc005831cfa12a7abc31d46044cfe7db7fdd",
       "parseStatus": "UNPROCESSED"
     },
     {
       "sourceRef": "services/go-retrieval-service/lanes_test.go",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "88181d086671737e3d8c0eff52e236a66bc97c37ada0fec0276599946aef2b42",
-      "actualContentHash": "sha256:88181d086671737e3d8c0eff52e236a66bc97c37ada0fec0276599946aef2b42",
+      "actualContentHash": "sha256:9cca4569de932d90545b2145144929606a412dbe9e3b716c56f3500d359453bb",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -55982,10 +55982,10 @@
     },
     {
       "sourceRef": "services/go-retrieval-service/main.go",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "5db5258693b3ba8c0605edb36be29f04b5a0b39e68b395d0a0e660f66feb7410",
-      "actualContentHash": "sha256:5db5258693b3ba8c0605edb36be29f04b5a0b39e68b395d0a0e660f66feb7410",
+      "actualContentHash": "sha256:f8e60beccc0a7b7ce5c5132ce6ac473217de3fb3493bd2c4755fe99376950030",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -57665,7 +57665,7 @@
       "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "fa3ce1eb0b69c607f074f044a55051a33f62ec13b3401ef7c9bd5b2e13750076",
-      "actualContentHash": "sha256:961d9e0c79683e0bac522e99ca588b05b2ae777405266f08e14c4ce314adf128",
+      "actualContentHash": "sha256:4a1a1717816118c3a6b6ccd88345b5504bf30f12b0efd4eda34b9920bc9b5100",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -96265,7 +96265,7 @@
       "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "78269a37d7cb8d38da1b89a8c21407cebd8f6f617af271750edae9e6370cc684",
-      "actualContentHash": "sha256:a50708b18916b32349631eb42047d2b0f309198af21f73f47a54c15a92b8fe52",
+      "actualContentHash": "sha256:8ecbeb54c1ca74005285c7d8b7a07ec2bac85f21eeab4c8b9fd7bec096cd9b6d",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -100558,10 +100558,10 @@
     },
     {
       "sourceRef": "sveltekit-frontend/drizzle/manual/20260606_task_semantic_packets_live_alignment.sql",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "3eb398a55810a665db9d6d72b60d8289ee4a77992d2537c2a54f2c2b4c33dc9d",
-      "actualContentHash": "sha256:3eb398a55810a665db9d6d72b60d8289ee4a77992d2537c2a54f2c2b4c33dc9d",
+      "actualContentHash": "sha256:ce69797d511795638ecb4f4a7797c1a87a621f1c94ea1bb4469fe8e4a051f318",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -102105,7 +102105,7 @@
       "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "80ee42b1bf7db12349ce60c1999ad4b895bba325cc30d7d6d0fce4ec04af538b",
-      "actualContentHash": "sha256:e610391d2271c3fa720c948597e739f7287a162682a7218283b47549616de76b",
+      "actualContentHash": "sha256:f9786a376be53e9e1f3fc374696693ec074b578a50140e50bb9289da0ed6b4b3",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -110935,7 +110935,7 @@
       "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "9a40ad31c1e20b832c77dc83b370f7a84193e5469c0e2ad5f825dfdfc67ff0f7",
-      "actualContentHash": "sha256:bebae1ef12a706239af97532bb0e48290b3cdc9953fbb9e18988838f6a3514fa",
+      "actualContentHash": "sha256:b0d51d837c5239ea4e033af0979ee893976b0d16412287691c3e130426117038",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -138418,10 +138418,10 @@
     },
     {
       "sourceRef": "sveltekit-frontend/src/lib/server/ace/multihop-contextual-tree.ts",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "12c52b71fa2eb66dfc3d9062eb5690e5cf4050b18ecfd60ffe4ff7fe0b83f816",
-      "actualContentHash": "sha256:12c52b71fa2eb66dfc3d9062eb5690e5cf4050b18ecfd60ffe4ff7fe0b83f816",
+      "actualContentHash": "sha256:5b7f86e5c4c7d4b09b81f6c732d7e1f69487af85646110bcbb0e5b5dcd792674",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -139194,10 +139194,10 @@
     },
     {
       "sourceRef": "sveltekit-frontend/src/lib/server/agent/outbox-worker.ts",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "210b624a2007294c5aabf5dea9792a281f80267a699508150cc2bc059d2f9b37",
-      "actualContentHash": "sha256:210b624a2007294c5aabf5dea9792a281f80267a699508150cc2bc059d2f9b37",
+      "actualContentHash": "sha256:d7dbec8add2949ecfd8bd02a1fc5e231734f6a8757caaab5618df11c33d390b9",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -143810,10 +143810,10 @@
     },
     {
       "sourceRef": "sveltekit-frontend/src/lib/server/atlas/go-retrieval-grpc-client.ts",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "696c84d16296264e84ed0da6f51df1c62646c5ffddd26f45f087fa84823dc3c2",
-      "actualContentHash": "sha256:696c84d16296264e84ed0da6f51df1c62646c5ffddd26f45f087fa84823dc3c2",
+      "actualContentHash": "sha256:46960d94384064368325a97b5f7a9ae66a6fa4b0056ff3a9ea328bc4b40cb08f",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -145040,18 +145040,18 @@
     },
     {
       "sourceRef": "sveltekit-frontend/src/lib/server/atlas/indexing/structural-parity-comparator-v2.spec.ts",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "a2592bd58387a38df26e369ba1a25ea8e1d9d98e12d60fd4ecec4230b2ad6d8d",
-      "actualContentHash": "sha256:a2592bd58387a38df26e369ba1a25ea8e1d9d98e12d60fd4ecec4230b2ad6d8d",
+      "actualContentHash": "sha256:54891ff069d421367168ab196ac52f8b28527dda24143bf02c6685cfe66a6714",
       "parseStatus": "UNPROCESSED"
     },
     {
       "sourceRef": "sveltekit-frontend/src/lib/server/atlas/indexing/structural-parity-comparator-v2.ts",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "8dee1255ad90aa2792d6bd7bca4dbdb3304abce99da7082b2f53edf7812d2307",
-      "actualContentHash": "sha256:8dee1255ad90aa2792d6bd7bca4dbdb3304abce99da7082b2f53edf7812d2307",
+      "actualContentHash": "sha256:9024b3f2c6336e0997c32bf8a76b2d0f809e1230d2c79197106e9904e225be28",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -145208,18 +145208,18 @@
     },
     {
       "sourceRef": "sveltekit-frontend/src/lib/server/atlas/kag-taxonomy-candidate-postgres.spec.ts",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "c70edd1f605c4fd266b5f186a1fd0595e13570e8932f14c7b4856ce24b183697",
-      "actualContentHash": "sha256:c70edd1f605c4fd266b5f186a1fd0595e13570e8932f14c7b4856ce24b183697",
+      "actualContentHash": "sha256:0e8b95b1b7c1c8d77583af2400705f433856db54a47e512b81fe9b3b503b8632",
       "parseStatus": "UNPROCESSED"
     },
     {
       "sourceRef": "sveltekit-frontend/src/lib/server/atlas/kag-taxonomy-candidate-postgres.ts",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "99426ce6a2d1f56040c3b92d8bc1924bcfa18acaefee2fd1d30e39e6bc1937c7",
-      "actualContentHash": "sha256:99426ce6a2d1f56040c3b92d8bc1924bcfa18acaefee2fd1d30e39e6bc1937c7",
+      "actualContentHash": "sha256:6830ed9528b56d5a51b02a64d3a6e3f4bf659b7eba3779df0dbb4eb392860e7b",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -145360,10 +145360,10 @@
     },
     {
       "sourceRef": "sveltekit-frontend/src/lib/server/atlas/language/ast-grep-structural-topk.ts",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "cbe25ffa55735a6ac34904e8c67ddd4e5109094784b8919b4e09a7c0ee1be894",
-      "actualContentHash": "sha256:cbe25ffa55735a6ac34904e8c67ddd4e5109094784b8919b4e09a7c0ee1be894",
+      "actualContentHash": "sha256:2ffae13bbd2386cd115729a22e05ec963d5ebd017f46e3f155f7e95d88640a07",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -145376,10 +145376,10 @@
     },
     {
       "sourceRef": "sveltekit-frontend/src/lib/server/atlas/language/ast-query-rule-compiler.ts",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "0caef3ca8fd15d9a73e5fc4cfcf6e996bb1ef8a775264f05580d4479e6ee606d",
-      "actualContentHash": "sha256:0caef3ca8fd15d9a73e5fc4cfcf6e996bb1ef8a775264f05580d4479e6ee606d",
+      "actualContentHash": "sha256:0c3bf936c6137b83b4dbf15d051d6a4b7556c2fcde2f5f74a4a46a8ea4b1aed2",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -145424,10 +145424,10 @@
     },
     {
       "sourceRef": "sveltekit-frontend/src/lib/server/atlas/language/compiled-ast-query-executor.ts",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "94dc48a2197ba1a9109be87e33205ad2de20037b54fbec01956702b7e9fda353",
-      "actualContentHash": "sha256:94dc48a2197ba1a9109be87e33205ad2de20037b54fbec01956702b7e9fda353",
+      "actualContentHash": "sha256:498f1d1f99782b5ebc7b11ff65abe4b4fb1615068aff3bd6ea1bc18f63f73a5e",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -150440,10 +150440,10 @@
     },
     {
       "sourceRef": "sveltekit-frontend/src/lib/server/db/schema/atlas-packets.ts",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "0967301883bf5c2717ca5483c4b50fa3cdaaf7ef799efff6b2c6d703fa84987e",
-      "actualContentHash": "sha256:0967301883bf5c2717ca5483c4b50fa3cdaaf7ef799efff6b2c6d703fa84987e",
+      "actualContentHash": "sha256:030dffd82ab7a0b5d75322e23d3a01dff39145089a6493a90727923872bb21bd",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -151376,10 +151376,10 @@
     },
     {
       "sourceRef": "sveltekit-frontend/src/lib/server/db/schema/tasks.ts",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "28e084624f0fd9f44f2428baae19bfed731458f4be99cdbe902c0363b12cd84d",
-      "actualContentHash": "sha256:28e084624f0fd9f44f2428baae19bfed731458f4be99cdbe902c0363b12cd84d",
+      "actualContentHash": "sha256:c1746f4ae37727a328bf3510e85222989a7c9dd1f3c7083afb9ce411308b07b1",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -153032,10 +153032,10 @@
     },
     {
       "sourceRef": "sveltekit-frontend/src/lib/server/features/rag/cold-storage-retrieval-service.ts",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "7f9ad5c868c82ea42be132b940a2deb9682d6975cc2ab3b9e0cfac580871f3c1",
-      "actualContentHash": "sha256:7f9ad5c868c82ea42be132b940a2deb9682d6975cc2ab3b9e0cfac580871f3c1",
+      "actualContentHash": "sha256:d9cbd3d8c4db1119b15a8d8e2ecff9a954978e240a403a7350893f3a70977aca",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -153736,10 +153736,10 @@
     },
     {
       "sourceRef": "sveltekit-frontend/src/lib/server/graph/graph-analytics-service.ts",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "a61074032cd3c5d987b8fd71ad56f77ec6863b43ea471cbe2c52a406b8266153",
-      "actualContentHash": "sha256:a61074032cd3c5d987b8fd71ad56f77ec6863b43ea471cbe2c52a406b8266153",
+      "actualContentHash": "sha256:329301c388a17b218e9262b8f5ac214febe9d5dff5f0e909823d9e2e00f2fafe",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -153824,18 +153824,18 @@
     },
     {
       "sourceRef": "sveltekit-frontend/src/lib/server/graph/graph-projection-manifest.spec.ts",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "90c70bc1e2eda53a42bd3ae0031dc5330c351077174d9a7c1dd77b1101b45520",
-      "actualContentHash": "sha256:90c70bc1e2eda53a42bd3ae0031dc5330c351077174d9a7c1dd77b1101b45520",
+      "actualContentHash": "sha256:0b041121e60bba12e9e37f39b291b6c517723721e3a45f1ee25d0e81a972e8fb",
       "parseStatus": "UNPROCESSED"
     },
     {
       "sourceRef": "sveltekit-frontend/src/lib/server/graph/graph-projection-manifest.ts",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "f8fc5838c5acbbd7c97419b3d75646b08911bc18d3a070640598eb8ba10acbd5",
-      "actualContentHash": "sha256:f8fc5838c5acbbd7c97419b3d75646b08911bc18d3a070640598eb8ba10acbd5",
+      "actualContentHash": "sha256:5afa364542c2ba79ce08a68ebb3af341f8ee1a6058821c516e880905e7045604",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -153968,10 +153968,10 @@
     },
     {
       "sourceRef": "sveltekit-frontend/src/lib/server/graph/neo4j-gds-client.ts",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "ec7a1fe2debbe8e4871f3279f9486074df891658dccf2dfc52c165e9800210c0",
-      "actualContentHash": "sha256:ec7a1fe2debbe8e4871f3279f9486074df891658dccf2dfc52c165e9800210c0",
+      "actualContentHash": "sha256:01b392a4e955e77cc9827f067d729b13a6b1a0817b64f9fe68df5489f18eee44",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -160312,10 +160312,10 @@
     },
     {
       "sourceRef": "sveltekit-frontend/src/lib/server/tasks/semantic-packets.ts",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "75b08a738b402250cb6b8e9e87089153cdf8a705ce65a9e894776aa8c5de9bf1",
-      "actualContentHash": "sha256:75b08a738b402250cb6b8e9e87089153cdf8a705ce65a9e894776aa8c5de9bf1",
+      "actualContentHash": "sha256:870053c1393a1e5eb75367d294625b82cebfd9457fa95fbc95a2b82f83d61062",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -170496,10 +170496,10 @@
     },
     {
       "sourceRef": "sveltekit-frontend/src/routes/api/tasks/packets/workflow/+server.ts",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "405cae21791463422182aee234143645e4101ac0189e3b9d564455e42d2427ef",
-      "actualContentHash": "sha256:405cae21791463422182aee234143645e4101ac0189e3b9d564455e42d2427ef",
+      "actualContentHash": "sha256:4cf235ae3f8f7180b742f5217d565f3c7d33a75ac360ffe739af7b4373999845",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -188979,7 +188979,7 @@
       "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "751c663654f780ae5f3cde777ddb578ea255b29453b5279c7eaa95798f07af84",
-      "actualContentHash": "sha256:725dcd237b7a63e4061b0f41005c357b4486c37001d4579a1e229af398698e61",
+      "actualContentHash": "sha256:60bb7fff3283a467b310dec5ef91d7842fe389d1dfdca957f3e2451762cfd2e4",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -189675,7 +189675,7 @@
       "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "324c633436947d8fe14e7c8cfc4c6fa2c8416ed18974f1023d376fae8a3cf774",
-      "actualContentHash": "sha256:bda7a39c5c4cc71af871e411cb9bd58a35ab58fc27c6c51ab6aab97fbeab989f",
+      "actualContentHash": "sha256:430acfd82a356aa11d8f658f3484993889a6ff8754c034181ba41ec7363483e8",
       "parseStatus": "UNPROCESSED"
     },
     {

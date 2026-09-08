@@ -1,6 +1,6 @@
 {
   "schema": "atlas.chunk-bridge-v1",
-  "generatedAt": "2026-09-05T05:53:13.510Z",
+  "generatedAt": "2026-09-08T19:49:03.929Z",
   "readOnly": true,
   "postgresWrites": false,
   "selection": {
@@ -8,10 +8,10 @@
     "source": "atlas_packets exact source_ref + content_hash against codebase_chunk_index"
   },
   "summary": {
-    "examined": 332,
-    "eligibleExactChunkIdentity": 79,
+    "examined": 353,
+    "eligibleExactChunkIdentity": 100,
     "counts": {
-      "EXACT_CHUNK_IDENTITY": 79,
+      "EXACT_CHUNK_IDENTITY": 100,
       "SOURCE_ONLY_AMBIGUOUS": 74,
       "MISSING_ORDINAL": 0,
       "REVISION_UNPROVEN": 179,

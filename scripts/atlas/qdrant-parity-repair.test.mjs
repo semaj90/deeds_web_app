@@ -197,6 +197,16 @@ describe('classifyParity — missing_point', () => {
     assert.equal(row.required_complete, undefined);
     assert.equal(row.optional_complete, undefined);
   });
+
+  it('missing_point still carries the Postgres row identity (real bug found + fixed 2026-09-08, WS1.6)', () => {
+    // Before the fix, the missing_point early return only carried payload*-prefixed identity
+    // fields (necessarily empty, since point is null) -- callers reporting a missing point had
+    // no Postgres-side identity to print, producing literal "undefined  undefined" output.
+    const row = classifyParity(basePgRow, null, CONTRACT);
+    assert.equal(row.rowPacketKey, basePgRow.packet_key);
+    assert.equal(row.rowQdrantPointId, basePgRow.qdrant_point_id);
+    assert.equal(row.rowSourceRef, basePgRow.source_ref);
+  });
 });
 
 describe('classifyParity — identity_contradiction', () => {
@@ -326,10 +336,34 @@ describe('generateRepairEvents', () => {
     assert.equal(events.length, 1);
     const [ev] = events;
     assert.equal(ev.event_type, 'full_projection');
-    assert.equal(ev.packet_key, null);
+    // Real bug found + fixed 2026-09-08 (WS1.6): this used to assert `ev.packet_key === null`,
+    // encoding a real production bug as "correct shape" -- pushRepair() could never resolve a
+    // classifyParity() result's identity fields (only rowPacketKey/payloadPacketKey exist, never
+    // a plain packet_key), so every real repair/quarantine event emitted null identity. Now that
+    // pushRepair() prefers the real Postgres row's identity when available, the emitted event
+    // must carry the real packet_key, not null.
+    assert.equal(ev.packet_key, basePgRow.packet_key);
+    assert.equal(ev.qdrant_point_id, basePgRow.qdrant_point_id);
     assert.equal(ev.collection, COLLECTION);
     assert.equal(ev.payload.packet_key, basePgRow.packet_key);
     assert.equal(ev.payload.source_ref, basePgRow.source_ref);
+  });
+
+  it('emits distinct events per packet_key when generating events for multiple rows (no dedup collision)', () => {
+    // Regression proof for the collision half of the WS1.6 bug: before the fix, pushRepair()'s
+    // dedup key always resolved to the constant 'n/a|<kind>' for every classifyParity row, so a
+    // batch of N distinct missing/stale packets would silently collapse into a single event.
+    const pgRowA = { ...basePgRow, packet_key: 'ace:packet:auth:001', qdrant_point_id: 'qdrant-001' };
+    const pgRowB = { ...basePgRow, packet_key: 'ace:packet:auth:002', qdrant_point_id: 'qdrant-002' };
+    const rowA = classifyParity(pgRowA, null, CONTRACT);
+    const rowB = classifyParity(pgRowB, null, CONTRACT);
+
+    const eventsA = generateRepairEvents(rowA, pgRowA, COLLECTION);
+    const eventsB = generateRepairEvents(rowB, pgRowB, COLLECTION);
+
+    assert.equal(eventsA[0].packet_key, 'ace:packet:auth:001');
+    assert.equal(eventsB[0].packet_key, 'ace:packet:auth:002');
+    assert.notEqual(eventsA[0].packet_key, eventsB[0].packet_key);
   });
 
   it('full_projection event is never a payload_repair event', () => {

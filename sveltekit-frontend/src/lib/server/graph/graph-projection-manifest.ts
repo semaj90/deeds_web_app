@@ -205,6 +205,68 @@ export function expandLegacyOrientation(
  * `parent-atlas-gpu-graph-vector-substrate` change's `TEST_IMPACT` topology
  * program (defined once here to avoid two possibly-inconsistent definitions).
  */
+/**
+ * GDS1.9 — revisioned named projection naming (parent-atlas-trace-search-joinback-proof/tasks.md).
+ *
+ * Additive only: this does NOT change what `PROJECTION_NAME`/`codeTopology` in
+ * `neo4j-gds-client.ts` resolves to, and no production caller is switched over to a revisioned
+ * name by this change. `codeTopology` remains the live default for every existing caller listed
+ * above (`pagerank-analysis-adapter.ts`, `kcore-analysis-adapter.ts`, `betweenness-analysis-adapter.ts`,
+ * `cheirank-analysis-adapter.ts`, `graph-analysis-runner.ts`) — deciding whether/how to migrate
+ * those callers to a revisioned projection name is a separate, larger decision (which workspace
+ * value to use, when to roll the revision, how stale projections get dropped) explicitly left
+ * open here, the same way GS1.10 elsewhere in this file reserves the `tree_node_id` identity
+ * redesign for a human decision rather than an agent picking one unilaterally.
+ *
+ * Sanitizes `workspace`/`graphRevision` to Neo4j-graph-name-safe characters (`[A-Za-z0-9_]`) —
+ * GDS graph names are opaque strings with no hard character restriction documented, but keeping
+ * them predictable avoids surprises if either input ever contains a slash, colon, or dot (e.g. a
+ * git SHA prefix or a workspace path).
+ */
+export function buildRevisionedProjectionName(workspace: string, graphRevision: string): string {
+	const sanitize = (s: string) => {
+		const cleaned = s.replace(/[^A-Za-z0-9_]/g, '_');
+		// Reject not just an empty string but also an all-punctuation input (e.g. "///" -> "___"),
+		// which would otherwise silently produce a syntactically valid but semantically empty
+		// graph-name segment.
+		if (!/[A-Za-z0-9]/.test(cleaned)) {
+			throw new Error(`buildRevisionedProjectionName: input has no alphanumeric content (raw: ${JSON.stringify(s)})`);
+		}
+		return cleaned;
+	};
+	return `atlas_code_graph__${sanitize(workspace)}__${sanitize(graphRevision)}`;
+}
+
+/**
+ * Assembles a `GraphProjectionManifest` from a completed `ensureProjectionClient()` result plus
+ * the relationship-projection map that produced it. Pure/additive — does not read or write
+ * anything; the manifest schema's own docstring already notes zero live persisters exist, and
+ * this function does not change that. A caller that wants durable manifests still needs to decide
+ * where to store them (a new Postgres table, most likely, per this repo's Postgres-is-truth
+ * convention) — out of scope here.
+ */
+export function buildProjectionManifest(input: {
+	projectionName: string;
+	graphRevision: string;
+	nodeLabels: readonly string[];
+	relationships: Readonly<Record<string, GraphRelationshipProjection>>;
+	nodeCount: number;
+	relationshipCount: number;
+}): GraphProjectionManifest {
+	return GraphProjectionManifestSchema.parse({
+		projectionRevision: computeRelationshipProjectionHash(input.relationships),
+		graphRevision: input.graphRevision,
+		projectionName: input.projectionName,
+		nodeLabels: input.nodeLabels,
+		relationships: input.relationships,
+		relationshipProjectionHash: computeRelationshipProjectionHash(input.relationships),
+		relationshipWeights: {},
+		nodeCount: input.nodeCount,
+		relationshipCount: input.relationshipCount,
+		createdAt: new Date().toISOString(),
+	});
+}
+
 export const NAMED_PROJECTION_CANDIDATES = {
 	atlas_dependency_v1: ['IMPORTS'],
 	atlas_execution_v1: ['CALLS'],

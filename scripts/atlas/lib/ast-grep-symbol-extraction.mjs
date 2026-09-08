@@ -6,9 +6,9 @@
  * (`phase1-ast-grep-extraction.mjs`'s `extractSymbolsViaRegex`) with real
  * ast-grep structural extraction where the source language is supported.
  *
- * Scoped to TypeScript/JavaScript only. The `ast-grep` CLI installed in this
- * environment (0.42.3) has no `outline` subcommand, so this uses
- * `ast-grep run --pattern ... --stdin --json=compact` (one child process per
+ * Scoped to TypeScript/JavaScript only. The canonical repository CLI is pinned
+ * to 0.45.3 and supports `outline`; this lower-level adapter intentionally
+ * keeps `ast-grep run --pattern ... --stdin --json=compact` (one child process per
  * pattern, content piped via stdin — no temp files, no filesystem writes).
  * Python/Go remain on the existing regex fallback, clearly labeled as such
  * by the caller; this module does not claim to cover them.

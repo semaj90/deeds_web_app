@@ -1,17 +1,17 @@
 # HyperRAG Packet Materializer
 
-Generated: 2026-07-10T20:52:39.428Z
+Generated: 2026-09-08T18:57:15.525Z
 Mode: dry-run
-Limit: 20
-Batch size: 10
+Limit: 1
+Batch size: 1
 
 ## Summary
 
-- rows read: 20
-- validated: 20
+- rows read: 1
+- validated: 1
 - rejected: 0
-- registry writes: 20
-- msgpack bytes: 27168
+- registry writes: 1
+- msgpack bytes: 0
 - mmap file: memory/packets/hyperrag-packets.msgpack
 - manifest: memory/packets/hyperrag-packets.manifest.json
 

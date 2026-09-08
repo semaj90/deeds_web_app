@@ -1,6 +1,6 @@
 {
   "schema": "atlas.graphify-stale-run-reconciliation.v1",
-  "generatedAt": "2026-09-04T17:47:51.184Z",
+  "generatedAt": "2026-09-08T19:50:35.409Z",
   "mode": "READ_ONLY_STALE_RUN_RECONCILIATION",
   "expectedWorkspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
   "staleAfterMs": 21600000,
@@ -8,8 +8,8 @@
   "transaction": {
     "isolation_level": "repeatable read",
     "read_only": "on",
-    "snapshot": "6127183:6127183:",
-    "audit_pid": 4017
+    "snapshot": "6129483:6129483:",
+    "audit_pid": 8261
   },
   "graphifyRunColumns": [
     "run_id",
@@ -45,9 +45,9 @@
   "classification": "CONFLICTING_EVIDENCE",
   "executionOwnership": {
     "processOwnerPresent": false,
-    "startupLockPresent": false,
-    "startupLockParsed": false,
-    "startupLockPid": null,
+    "startupLockPresent": true,
+    "startupLockParsed": true,
+    "startupLockPid": 9152,
     "startupLockPidAlive": false,
     "startupLockBoundToRun": false,
     "postgresBackendPresent": false,
@@ -56,7 +56,7 @@
     "anyGraphifyRelationLockPresent": true,
     "runtimeOwnerEvidenceAbsent": false,
     "staleByAge": true,
-    "currentAgeMs": 654388183,
+    "currentAgeMs": 1007352408,
     "exactRunBoundBackends": [],
     "exactRunBoundLocks": []
   },
@@ -118,17 +118,21 @@
   "processEvidence": {
     "startupLock": {
       "path": "C:\\Users\\james\\Videos\\deeds-web-app\\.graphify-daily-start.lock",
-      "present": false,
-      "parsed": false,
-      "pid": null,
+      "present": true,
+      "parsed": true,
+      "pid": 9152,
       "pidAlive": false,
-      "metadata": null,
+      "metadata": {
+        "pid": 9152,
+        "startedAt": "2026-09-08T05:25:14.606Z",
+        "script": "run-graphify-daily-startup.mjs"
+      },
       "error": null
     },
     "activity": [],
     "locks": [
       {
-        "pid": 4017,
+        "pid": 8261,
         "mode": "AccessShareLock",
         "granted": true,
         "relname": "graphify_runs"

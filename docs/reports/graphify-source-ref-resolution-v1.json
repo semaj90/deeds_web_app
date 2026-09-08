@@ -1,6 +1,6 @@
 {
   "schema": "atlas.graphify-source-ref-resolution-v1",
-  "generatedAt": "2026-09-05T05:57:48.254Z",
+  "generatedAt": "2026-09-08T20:00:08.897Z",
   "readOnly": true,
   "postgresWrites": false,
   "matchingPolicy": {
@@ -12,15 +12,15 @@
     "crossDomainHashEqualityUsed": false
   },
   "counts": {
-    "packetSourceRefs": 61714,
-    "graphifySourceRefs": 25258,
-    "exactPacketChunkGraphifyBridges": 79,
+    "packetSourceRefs": 61717,
+    "graphifySourceRefs": 25643,
+    "exactPacketChunkGraphifyBridges": 100,
     "RAW_EXACT": 17307,
     "NORMALIZED_EXACT": 3003,
     "BASENAME_UNIQUE": 215,
     "BASENAME_AMBIGUOUS": 5155,
-    "UNRESOLVED": 36034,
-    "sourceRefs": 61714
+    "UNRESOLVED": 36037,
+    "sourceRefs": 61717
   },
   "samples": {
     "NORMALIZED_EXACT": [
@@ -343,7 +343,7 @@
           "docs/open-lanes/README.md",
           "docs/openspec/README.md"
         ],
-        "candidateCount": 96,
+        "candidateCount": 97,
         "rowCount": 1
       },
       {
@@ -371,7 +371,7 @@
           "docs/open-lanes/README.md",
           "docs/openspec/README.md"
         ],
-        "candidateCount": 96,
+        "candidateCount": 97,
         "rowCount": 1
       },
       {
@@ -409,15 +409,15 @@
           ".claude/skills/bits-ui-svelte5/SKILL.md",
           ".claude/skills/drizzle-schema-review/SKILL.md",
           ".claude/skills/metadata-context-analysis/SKILL.md",
+          ".claude/skills/openspec-apply-change/SKILL.md",
+          ".claude/skills/openspec-archive-change/SKILL.md",
+          ".claude/skills/openspec-explore/SKILL.md",
+          ".claude/skills/openspec-propose/SKILL.md",
+          ".claude/skills/openspec-sync-specs/SKILL.md",
           ".claude/skills/trace-mcp-tooling/SKILL.md",
-          ".claude/skills/uno-css-design-system/SKILL.md",
-          ".opencode/skills/mcp-toolchain/SKILL.md",
-          ".opencode/skills/metadata-context-analysis/SKILL.md",
-          ".opencode/skills/rg-atlas/SKILL.md",
-          ".opencode/skills/trace-mcp-tooling/SKILL.md",
-          "packages/parent-atlas-opencode/skills/atlas-analyze/SKILL.md"
+          ".claude/skills/uno-css-design-system/SKILL.md"
         ],
-        "candidateCount": 21,
+        "candidateCount": 41,
         "rowCount": 1
       },
       {
@@ -427,15 +427,15 @@
           ".claude/skills/bits-ui-svelte5/SKILL.md",
           ".claude/skills/drizzle-schema-review/SKILL.md",
           ".claude/skills/metadata-context-analysis/SKILL.md",
+          ".claude/skills/openspec-apply-change/SKILL.md",
+          ".claude/skills/openspec-archive-change/SKILL.md",
+          ".claude/skills/openspec-explore/SKILL.md",
+          ".claude/skills/openspec-propose/SKILL.md",
+          ".claude/skills/openspec-sync-specs/SKILL.md",
           ".claude/skills/trace-mcp-tooling/SKILL.md",
-          ".claude/skills/uno-css-design-system/SKILL.md",
-          ".opencode/skills/mcp-toolchain/SKILL.md",
-          ".opencode/skills/metadata-context-analysis/SKILL.md",
-          ".opencode/skills/rg-atlas/SKILL.md",
-          ".opencode/skills/trace-mcp-tooling/SKILL.md",
-          "packages/parent-atlas-opencode/skills/atlas-analyze/SKILL.md"
+          ".claude/skills/uno-css-design-system/SKILL.md"
         ],
-        "candidateCount": 21,
+        "candidateCount": 41,
         "rowCount": 1
       },
       {
@@ -445,15 +445,15 @@
           ".claude/skills/bits-ui-svelte5/SKILL.md",
           ".claude/skills/drizzle-schema-review/SKILL.md",
           ".claude/skills/metadata-context-analysis/SKILL.md",
+          ".claude/skills/openspec-apply-change/SKILL.md",
+          ".claude/skills/openspec-archive-change/SKILL.md",
+          ".claude/skills/openspec-explore/SKILL.md",
+          ".claude/skills/openspec-propose/SKILL.md",
+          ".claude/skills/openspec-sync-specs/SKILL.md",
           ".claude/skills/trace-mcp-tooling/SKILL.md",
-          ".claude/skills/uno-css-design-system/SKILL.md",
-          ".opencode/skills/mcp-toolchain/SKILL.md",
-          ".opencode/skills/metadata-context-analysis/SKILL.md",
-          ".opencode/skills/rg-atlas/SKILL.md",
-          ".opencode/skills/trace-mcp-tooling/SKILL.md",
-          "packages/parent-atlas-opencode/skills/atlas-analyze/SKILL.md"
+          ".claude/skills/uno-css-design-system/SKILL.md"
         ],
-        "candidateCount": 21,
+        "candidateCount": 41,
         "rowCount": 1
       },
       {
@@ -545,15 +545,15 @@
           ".claude/skills/bits-ui-svelte5/SKILL.md",
           ".claude/skills/drizzle-schema-review/SKILL.md",
           ".claude/skills/metadata-context-analysis/SKILL.md",
+          ".claude/skills/openspec-apply-change/SKILL.md",
+          ".claude/skills/openspec-archive-change/SKILL.md",
+          ".claude/skills/openspec-explore/SKILL.md",
+          ".claude/skills/openspec-propose/SKILL.md",
+          ".claude/skills/openspec-sync-specs/SKILL.md",
           ".claude/skills/trace-mcp-tooling/SKILL.md",
-          ".claude/skills/uno-css-design-system/SKILL.md",
-          ".opencode/skills/mcp-toolchain/SKILL.md",
-          ".opencode/skills/metadata-context-analysis/SKILL.md",
-          ".opencode/skills/rg-atlas/SKILL.md",
-          ".opencode/skills/trace-mcp-tooling/SKILL.md",
-          "packages/parent-atlas-opencode/skills/atlas-analyze/SKILL.md"
+          ".claude/skills/uno-css-design-system/SKILL.md"
         ],
-        "candidateCount": 21,
+        "candidateCount": 41,
         "rowCount": 1
       },
       {
@@ -563,15 +563,15 @@
           ".claude/skills/bits-ui-svelte5/SKILL.md",
           ".claude/skills/drizzle-schema-review/SKILL.md",
           ".claude/skills/metadata-context-analysis/SKILL.md",
+          ".claude/skills/openspec-apply-change/SKILL.md",
+          ".claude/skills/openspec-archive-change/SKILL.md",
+          ".claude/skills/openspec-explore/SKILL.md",
+          ".claude/skills/openspec-propose/SKILL.md",
+          ".claude/skills/openspec-sync-specs/SKILL.md",
           ".claude/skills/trace-mcp-tooling/SKILL.md",
-          ".claude/skills/uno-css-design-system/SKILL.md",
-          ".opencode/skills/mcp-toolchain/SKILL.md",
-          ".opencode/skills/metadata-context-analysis/SKILL.md",
-          ".opencode/skills/rg-atlas/SKILL.md",
-          ".opencode/skills/trace-mcp-tooling/SKILL.md",
-          "packages/parent-atlas-opencode/skills/atlas-analyze/SKILL.md"
+          ".claude/skills/uno-css-design-system/SKILL.md"
         ],
-        "candidateCount": 21,
+        "candidateCount": 41,
         "rowCount": 1
       },
       {
@@ -581,15 +581,15 @@
           ".claude/skills/bits-ui-svelte5/SKILL.md",
           ".claude/skills/drizzle-schema-review/SKILL.md",
           ".claude/skills/metadata-context-analysis/SKILL.md",
+          ".claude/skills/openspec-apply-change/SKILL.md",
+          ".claude/skills/openspec-archive-change/SKILL.md",
+          ".claude/skills/openspec-explore/SKILL.md",
+          ".claude/skills/openspec-propose/SKILL.md",
+          ".claude/skills/openspec-sync-specs/SKILL.md",
           ".claude/skills/trace-mcp-tooling/SKILL.md",
-          ".claude/skills/uno-css-design-system/SKILL.md",
-          ".opencode/skills/mcp-toolchain/SKILL.md",
-          ".opencode/skills/metadata-context-analysis/SKILL.md",
-          ".opencode/skills/rg-atlas/SKILL.md",
-          ".opencode/skills/trace-mcp-tooling/SKILL.md",
-          "packages/parent-atlas-opencode/skills/atlas-analyze/SKILL.md"
+          ".claude/skills/uno-css-design-system/SKILL.md"
         ],
-        "candidateCount": 21,
+        "candidateCount": 41,
         "rowCount": 1
       },
       {
@@ -599,15 +599,15 @@
           ".claude/skills/bits-ui-svelte5/SKILL.md",
           ".claude/skills/drizzle-schema-review/SKILL.md",
           ".claude/skills/metadata-context-analysis/SKILL.md",
+          ".claude/skills/openspec-apply-change/SKILL.md",
+          ".claude/skills/openspec-archive-change/SKILL.md",
+          ".claude/skills/openspec-explore/SKILL.md",
+          ".claude/skills/openspec-propose/SKILL.md",
+          ".claude/skills/openspec-sync-specs/SKILL.md",
           ".claude/skills/trace-mcp-tooling/SKILL.md",
-          ".claude/skills/uno-css-design-system/SKILL.md",
-          ".opencode/skills/mcp-toolchain/SKILL.md",
-          ".opencode/skills/metadata-context-analysis/SKILL.md",
-          ".opencode/skills/rg-atlas/SKILL.md",
-          ".opencode/skills/trace-mcp-tooling/SKILL.md",
-          "packages/parent-atlas-opencode/skills/atlas-analyze/SKILL.md"
+          ".claude/skills/uno-css-design-system/SKILL.md"
         ],
-        "candidateCount": 21,
+        "candidateCount": 41,
         "rowCount": 1
       },
       {
@@ -617,15 +617,15 @@
           ".claude/skills/bits-ui-svelte5/SKILL.md",
           ".claude/skills/drizzle-schema-review/SKILL.md",
           ".claude/skills/metadata-context-analysis/SKILL.md",
+          ".claude/skills/openspec-apply-change/SKILL.md",
+          ".claude/skills/openspec-archive-change/SKILL.md",
+          ".claude/skills/openspec-explore/SKILL.md",
+          ".claude/skills/openspec-propose/SKILL.md",
+          ".claude/skills/openspec-sync-specs/SKILL.md",
           ".claude/skills/trace-mcp-tooling/SKILL.md",
-          ".claude/skills/uno-css-design-system/SKILL.md",
-          ".opencode/skills/mcp-toolchain/SKILL.md",
-          ".opencode/skills/metadata-context-analysis/SKILL.md",
-          ".opencode/skills/rg-atlas/SKILL.md",
-          ".opencode/skills/trace-mcp-tooling/SKILL.md",
-          "packages/parent-atlas-opencode/skills/atlas-analyze/SKILL.md"
+          ".claude/skills/uno-css-design-system/SKILL.md"
         ],
-        "candidateCount": 21,
+        "candidateCount": 41,
         "rowCount": 1
       },
       {
@@ -635,15 +635,15 @@
           ".claude/skills/bits-ui-svelte5/SKILL.md",
           ".claude/skills/drizzle-schema-review/SKILL.md",
           ".claude/skills/metadata-context-analysis/SKILL.md",
+          ".claude/skills/openspec-apply-change/SKILL.md",
+          ".claude/skills/openspec-archive-change/SKILL.md",
+          ".claude/skills/openspec-explore/SKILL.md",
+          ".claude/skills/openspec-propose/SKILL.md",
+          ".claude/skills/openspec-sync-specs/SKILL.md",
           ".claude/skills/trace-mcp-tooling/SKILL.md",
-          ".claude/skills/uno-css-design-system/SKILL.md",
-          ".opencode/skills/mcp-toolchain/SKILL.md",
-          ".opencode/skills/metadata-context-analysis/SKILL.md",
-          ".opencode/skills/rg-atlas/SKILL.md",
-          ".opencode/skills/trace-mcp-tooling/SKILL.md",
-          "packages/parent-atlas-opencode/skills/atlas-analyze/SKILL.md"
+          ".claude/skills/uno-css-design-system/SKILL.md"
         ],
-        "candidateCount": 21,
+        "candidateCount": 41,
         "rowCount": 1
       },
       {
@@ -653,15 +653,15 @@
           ".claude/skills/bits-ui-svelte5/SKILL.md",
           ".claude/skills/drizzle-schema-review/SKILL.md",
           ".claude/skills/metadata-context-analysis/SKILL.md",
+          ".claude/skills/openspec-apply-change/SKILL.md",
+          ".claude/skills/openspec-archive-change/SKILL.md",
+          ".claude/skills/openspec-explore/SKILL.md",
+          ".claude/skills/openspec-propose/SKILL.md",
+          ".claude/skills/openspec-sync-specs/SKILL.md",
           ".claude/skills/trace-mcp-tooling/SKILL.md",
-          ".claude/skills/uno-css-design-system/SKILL.md",
-          ".opencode/skills/mcp-toolchain/SKILL.md",
-          ".opencode/skills/metadata-context-analysis/SKILL.md",
-          ".opencode/skills/rg-atlas/SKILL.md",
-          ".opencode/skills/trace-mcp-tooling/SKILL.md",
-          "packages/parent-atlas-opencode/skills/atlas-analyze/SKILL.md"
+          ".claude/skills/uno-css-design-system/SKILL.md"
         ],
-        "candidateCount": 21,
+        "candidateCount": 41,
         "rowCount": 1
       },
       {
@@ -671,15 +671,15 @@
           ".claude/skills/bits-ui-svelte5/SKILL.md",
           ".claude/skills/drizzle-schema-review/SKILL.md",
           ".claude/skills/metadata-context-analysis/SKILL.md",
+          ".claude/skills/openspec-apply-change/SKILL.md",
+          ".claude/skills/openspec-archive-change/SKILL.md",
+          ".claude/skills/openspec-explore/SKILL.md",
+          ".claude/skills/openspec-propose/SKILL.md",
+          ".claude/skills/openspec-sync-specs/SKILL.md",
           ".claude/skills/trace-mcp-tooling/SKILL.md",
-          ".claude/skills/uno-css-design-system/SKILL.md",
-          ".opencode/skills/mcp-toolchain/SKILL.md",
-          ".opencode/skills/metadata-context-analysis/SKILL.md",
-          ".opencode/skills/rg-atlas/SKILL.md",
-          ".opencode/skills/trace-mcp-tooling/SKILL.md",
-          "packages/parent-atlas-opencode/skills/atlas-analyze/SKILL.md"
+          ".claude/skills/uno-css-design-system/SKILL.md"
         ],
-        "candidateCount": 21,
+        "candidateCount": 41,
         "rowCount": 1
       },
       {
@@ -689,15 +689,15 @@
           ".claude/skills/bits-ui-svelte5/SKILL.md",
           ".claude/skills/drizzle-schema-review/SKILL.md",
           ".claude/skills/metadata-context-analysis/SKILL.md",
+          ".claude/skills/openspec-apply-change/SKILL.md",
+          ".claude/skills/openspec-archive-change/SKILL.md",
+          ".claude/skills/openspec-explore/SKILL.md",
+          ".claude/skills/openspec-propose/SKILL.md",
+          ".claude/skills/openspec-sync-specs/SKILL.md",
           ".claude/skills/trace-mcp-tooling/SKILL.md",
-          ".claude/skills/uno-css-design-system/SKILL.md",
-          ".opencode/skills/mcp-toolchain/SKILL.md",
-          ".opencode/skills/metadata-context-analysis/SKILL.md",
-          ".opencode/skills/rg-atlas/SKILL.md",
-          ".opencode/skills/trace-mcp-tooling/SKILL.md",
-          "packages/parent-atlas-opencode/skills/atlas-analyze/SKILL.md"
+          ".claude/skills/uno-css-design-system/SKILL.md"
         ],
-        "candidateCount": 21,
+        "candidateCount": 41,
         "rowCount": 1
       },
       {
@@ -707,15 +707,15 @@
           ".claude/skills/bits-ui-svelte5/SKILL.md",
           ".claude/skills/drizzle-schema-review/SKILL.md",
           ".claude/skills/metadata-context-analysis/SKILL.md",
+          ".claude/skills/openspec-apply-change/SKILL.md",
+          ".claude/skills/openspec-archive-change/SKILL.md",
+          ".claude/skills/openspec-explore/SKILL.md",
+          ".claude/skills/openspec-propose/SKILL.md",
+          ".claude/skills/openspec-sync-specs/SKILL.md",
           ".claude/skills/trace-mcp-tooling/SKILL.md",
-          ".claude/skills/uno-css-design-system/SKILL.md",
-          ".opencode/skills/mcp-toolchain/SKILL.md",
-          ".opencode/skills/metadata-context-analysis/SKILL.md",
-          ".opencode/skills/rg-atlas/SKILL.md",
-          ".opencode/skills/trace-mcp-tooling/SKILL.md",
-          "packages/parent-atlas-opencode/skills/atlas-analyze/SKILL.md"
+          ".claude/skills/uno-css-design-system/SKILL.md"
         ],
-        "candidateCount": 21,
+        "candidateCount": 41,
         "rowCount": 1
       },
       {
@@ -725,15 +725,15 @@
           ".claude/skills/bits-ui-svelte5/SKILL.md",
           ".claude/skills/drizzle-schema-review/SKILL.md",
           ".claude/skills/metadata-context-analysis/SKILL.md",
+          ".claude/skills/openspec-apply-change/SKILL.md",
+          ".claude/skills/openspec-archive-change/SKILL.md",
+          ".claude/skills/openspec-explore/SKILL.md",
+          ".claude/skills/openspec-propose/SKILL.md",
+          ".claude/skills/openspec-sync-specs/SKILL.md",
           ".claude/skills/trace-mcp-tooling/SKILL.md",
-          ".claude/skills/uno-css-design-system/SKILL.md",
-          ".opencode/skills/mcp-toolchain/SKILL.md",
-          ".opencode/skills/metadata-context-analysis/SKILL.md",
-          ".opencode/skills/rg-atlas/SKILL.md",
-          ".opencode/skills/trace-mcp-tooling/SKILL.md",
-          "packages/parent-atlas-opencode/skills/atlas-analyze/SKILL.md"
+          ".claude/skills/uno-css-design-system/SKILL.md"
         ],
-        "candidateCount": 21,
+        "candidateCount": 41,
         "rowCount": 1
       },
       {
@@ -743,15 +743,15 @@
           ".claude/skills/bits-ui-svelte5/SKILL.md",
           ".claude/skills/drizzle-schema-review/SKILL.md",
           ".claude/skills/metadata-context-analysis/SKILL.md",
+          ".claude/skills/openspec-apply-change/SKILL.md",
+          ".claude/skills/openspec-archive-change/SKILL.md",
+          ".claude/skills/openspec-explore/SKILL.md",
+          ".claude/skills/openspec-propose/SKILL.md",
+          ".claude/skills/openspec-sync-specs/SKILL.md",
           ".claude/skills/trace-mcp-tooling/SKILL.md",
-          ".claude/skills/uno-css-design-system/SKILL.md",
-          ".opencode/skills/mcp-toolchain/SKILL.md",
-          ".opencode/skills/metadata-context-analysis/SKILL.md",
-          ".opencode/skills/rg-atlas/SKILL.md",
-          ".opencode/skills/trace-mcp-tooling/SKILL.md",
-          "packages/parent-atlas-opencode/skills/atlas-analyze/SKILL.md"
+          ".claude/skills/uno-css-design-system/SKILL.md"
         ],
-        "candidateCount": 21,
+        "candidateCount": 41,
         "rowCount": 1
       }
     ],
@@ -1713,6 +1713,11 @@
   },
   "packetChunkGraphifyBridgeSamples": [
     {
+      "packet_key": "packet:00848415f727",
+      "packet_ref": "sveltekit-frontend/src/routes/(app)/yorha-home/+page.server.ts",
+      "chunk_ref": "sveltekit-frontend/src/routes/(app)/yorha-home/+page.server.ts"
+    },
+    {
       "packet_key": "packet:043fc2302d50",
       "packet_ref": "packages/parent-atlas/src/gates/types.ts",
       "chunk_ref": "packages/parent-atlas/src/gates/types.ts"
@@ -1746,6 +1751,11 @@
       "packet_key": "packet:0c91f688b736",
       "packet_ref": "simd-bridge/cpp/build-x64-cuda-cuvs/CMakeFiles/CheckCUDA/CMakeFiles/InstallScripts.json",
       "chunk_ref": "simd-bridge/cpp/build-x64-cuda-cuvs/CMakeFiles/CheckCUDA/CMakeFiles/InstallScripts.json"
+    },
+    {
+      "packet_key": "packet:0d409679f7ec",
+      "packet_ref": "sveltekit-frontend/src/routes/(app)/evidence/analyze/+page.server.ts",
+      "chunk_ref": "sveltekit-frontend/src/routes/(app)/evidence/analyze/+page.server.ts"
     },
     {
       "packet_key": "packet:0d8b345ee26f",
@@ -1818,24 +1828,14 @@
       "chunk_ref": "docs/codebase_atlas/karpathy_llmwiki.md"
     },
     {
+      "packet_key": "packet:2a702bac35ce",
+      "packet_ref": "sveltekit-frontend/docs/architecture/TOKEN_REMAP_LATENT_PROJECTION.md",
+      "chunk_ref": "sveltekit-frontend/docs/architecture/TOKEN_REMAP_LATENT_PROJECTION.md"
+    },
+    {
       "packet_key": "packet:35ab184c7b93",
       "packet_ref": "docs/graph/repo-import-map.md",
       "chunk_ref": "docs/graph/repo-import-map.md"
-    },
-    {
-      "packet_key": "packet:386b2c1e2307",
-      "packet_ref": "docs/codebase_atlas/index.md",
-      "chunk_ref": "docs/codebase_atlas/index.md"
-    },
-    {
-      "packet_key": "packet:41aaad7c7e65",
-      "packet_ref": "crates/atlas_packet_parser/Cargo.toml",
-      "chunk_ref": "crates/atlas_packet_parser/Cargo.toml"
-    },
-    {
-      "packet_key": "packet:4212b46a7842",
-      "packet_ref": "docs/graph/repo-engram-memory-report.md",
-      "chunk_ref": "docs/graph/repo-engram-memory-report.md"
     }
   ],
   "nextGate": "DESIGN_CANONICAL_SOURCE_REF_BRIDGE"

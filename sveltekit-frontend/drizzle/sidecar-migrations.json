@@ -57,6 +57,33 @@
       "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_schema='public' AND table_name='semantic_embedding_cache_v2';\""
     },
     {
+      "file": "manual/20260908_task_semantic_packets_writer_columns_only.sql",
+      "status": "applied",
+      "reason": "Minimal additive prerequisite for the active task-packet writer. Disposable PostgreSQL 18 column and insert/readback proof passes; unapplied pending explicit operator authorization.",
+      "appliedBy": "operator-authorized-run",
+      "appliedAt": "2026-09-08",
+      "requiresJournalEntry": false,
+      "validationCommand": "node scripts/atlas/prove-task-semantic-packet-disposable-compatibility-v1.mjs"
+    },
+    {
+      "file": "manual/20260908_task_semantic_packets_production_indexes.sql",
+      "status": "applied",
+      "reason": "Small additive indexes for the admitted MCP/API read paths. Depends on the writer-column migration; unapplied pending EXPLAIN validation and explicit operator authorization.",
+      "appliedBy": "operator-authorized-run",
+      "appliedAt": "2026-09-08",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -P pager=off -c \"SELECT indexname,indexdef FROM pg_indexes WHERE schemaname='public' AND tablename='task_semantic_packets' AND indexname IN ('idx_task_semantic_packets_workspace_task_created','idx_task_semantic_packets_status_feature','idx_task_semantic_packets_agent_pickup_ready');\""
+    },
+    {
+      "file": "0099_atlas_svg_glyphs.sql",
+      "status": "applied",
+      "reason": "Existing additive atlas_svg_glyphs table and lookup indexes were found live but were not registered in the sidecar manifest. Applied date is not inferred from current evidence.",
+      "appliedBy": "operator",
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -P pager=off -c \"SELECT to_regclass('public.atlas_svg_glyphs');\""
+    },
+    {
       "file": "0999_fix-grpc-proto-alignment.sql",
       "status": "manual_sidecar",
       "reason": "Adds missing gRPC proto alignment indexes and metadata columns. The route_runtime_packets branch is guarded because the table is not present in the live schema.",

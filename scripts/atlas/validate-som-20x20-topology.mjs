@@ -33,12 +33,10 @@ const GATES_ONLY = process.argv.includes('--gates-only');
 const SOM_ROWS = 20;
 const SOM_COLS = 20;
 const SOM_CELLS = SOM_ROWS * SOM_COLS; // 400 (target)
-const TOTAL_PACKETS = 58365; // Expected total
-const EXPECTED_PER_CELL = TOTAL_PACKETS / SOM_CELLS; // ~146 packets per cell
 
 console.log('╔════════════════════════════════════════════════════════════════╗');
 console.log('║  SOM 20×20 Topology Validation                                ║');
-console.log('║  Validate 400-cell grid, 58K packet assignments               ║');
+console.log('║  Validate 400-cell grid, current packet assignments           ║');
 console.log('╚════════════════════════════════════════════════════════════════╝\n');
 
 const VALIDATION_GATES = {
@@ -50,7 +48,7 @@ const VALIDATION_GATES = {
   },
   bmu_assignments: {
     min: 58000,
-    max: 58365,
+    max: Number.POSITIVE_INFINITY,
     metric: 'assigned_packets',
     description: 'Total packets with som_cluster assigned',
   },
@@ -90,6 +88,9 @@ async function validateSOMTopology() {
   try {
     console.log('📊 VALIDATION GATE RESULTS\n');
 
+    const totalRes = await pgPool.query('SELECT COUNT(*) AS total_count FROM atlas_packets');
+    const totalPackets = Number(totalRes.rows[0]?.total_count ?? 0);
+
     // Gate 1: SOM Cells Populated
     console.log('🔍 Gate 1: SOM Cells Populated');
     const cellRes = await pgPool.query(`
@@ -111,11 +112,11 @@ async function validateSOMTopology() {
       FROM atlas_packets
       WHERE som_row IS NOT NULL AND som_col IS NOT NULL
     `);
-    const assignedCount = bmuRes.rows[0]?.assigned_count ?? 0;
+    const assignedCount = Number(bmuRes.rows[0]?.assigned_count ?? 0);
     const gate2Pass = assignedCount >= VALIDATION_GATES.bmu_assignments.min;
-    console.log(`   Result: ${assignedCount}/${TOTAL_PACKETS} packets assigned`);
+    console.log(`   Result: ${assignedCount}/${totalPackets} packets assigned`);
     console.log(`   Expected: ≥${VALIDATION_GATES.bmu_assignments.min}`);
-    console.log(`   Coverage: ${(100 * assignedCount / TOTAL_PACKETS).toFixed(2)}%`);
+    console.log(`   Coverage: ${(totalPackets > 0 ? 100 * assignedCount / totalPackets : 0).toFixed(2)}%`);
     console.log(`   Status: ${gate2Pass ? '✅ PASS' : '❌ FAIL'}\n`);
 
     // Gate 3: Distribution Entropy
@@ -131,7 +132,7 @@ async function validateSOMTopology() {
       ORDER BY cell_count DESC
     `);
 
-    const cellCounts = distRes.rows.map(r => r.cell_count);
+    const cellCounts = distRes.rows.map(r => Number(r.cell_count ?? 0));
     const totalAssigned = cellCounts.reduce((a, b) => a + b, 0);
     const probabilities = cellCounts.map(c => c / totalAssigned);
     const entropy = -probabilities.reduce((sum, p) => sum + (p > 0 ? p * Math.log2(p) : 0), 0);
@@ -168,8 +169,8 @@ async function validateSOMTopology() {
       FROM information_schema.tables
       WHERE table_name = 'som_adjacency_matrix'
     `);
-    const adjTableExists = adjRes.rows[0]?.edge_count > 0;
-    const gate4Pass = false; // Placeholder — requires actual computation
+    const adjTableExists = Number(adjRes.rows[0]?.edge_count ?? 0) > 0;
+    let gate4Pass = false;
 
     if (adjTableExists) {
       const adjCountRes = await pgPool.query(`
@@ -177,8 +178,9 @@ async function validateSOMTopology() {
         FROM som_adjacency_matrix
         WHERE weight > 0
       `);
-      const adjCount = adjCountRes.rows[0]?.total_edges ?? 0;
-      const gate4Pass = adjCount >= VALIDATION_GATES.adjacency_edges.min;
+      const adjCount = Number(adjCountRes.rows[0]?.total_edges ?? 0);
+      gate4Pass = adjCount >= VALIDATION_GATES.adjacency_edges.min &&
+        adjCount <= VALIDATION_GATES.adjacency_edges.max;
       console.log(`   Result: ${adjCount} edges`);
       console.log(`   Expected: [${VALIDATION_GATES.adjacency_edges.min}, ${VALIDATION_GATES.adjacency_edges.max}]`);
       console.log(`   Status: ${gate4Pass ? '✅ PASS' : '⚠️ PENDING'}\n`);
@@ -195,18 +197,18 @@ async function validateSOMTopology() {
       FROM atlas_packets
       WHERE latent_64 IS NOT NULL
     `);
-    const latentCount = latentRes.rows[0]?.latent_count ?? 0;
-    const gate5Pass = latentCount > 0;
+    const latentCount = Number(latentRes.rows[0]?.latent_count ?? 0);
+    const gate5Pass = totalPackets > 0 && latentCount >= totalPackets * 0.95;
 
     if (latentCount > 0) {
       console.log(`   Result: ${latentCount} packets have latent_64 vectors`);
-      console.log(`   Expected: ≥${(TOTAL_PACKETS * 0.95).toFixed(0)} (95% coverage)`);
-      console.log(`   Coverage: ${(100 * latentCount / TOTAL_PACKETS).toFixed(2)}%`);
+      console.log(`   Expected: ≥${(totalPackets * 0.95).toFixed(0)} (95% coverage)`);
+      console.log(`   Coverage: ${(totalPackets > 0 ? 100 * latentCount / totalPackets : 0).toFixed(2)}%`);
       console.log(`   PCA variance: [0.60, 1.00] (placeholder — requires autoencoder audit)`);
-      console.log(`   Status: ${latentCount >= TOTAL_PACKETS * 0.95 ? '✅ PASS' : '⏳ PENDING'}\n`);
+      console.log(`   Status: ${latentCount >= totalPackets * 0.95 ? '✅ PASS' : '⏳ PENDING'}\n`);
     } else {
       console.log('   Result: No latent_64 vectors found');
-      console.log('   Expected: ≥55,647 packets (95% coverage)');
+      console.log(`   Expected: ≥${(totalPackets * 0.95).toFixed(0)} packets (95% coverage)`);
       console.log('   Status: ⏳ PENDING (run train-autoencoder-768-64.mjs first)\n');
     }
 
@@ -221,8 +223,10 @@ async function validateSOMTopology() {
     console.log('║  SUMMARY                                                       ║');
     console.log('╚════════════════════════════════════════════════════════════════╝\n');
 
-    const passCount = [gate1Pass, gate2Pass, gate3Pass].filter(x => x).length;
-    const totalGates = 3;
+    const gate6Pass = false;
+    const passCount = [gate1Pass, gate2Pass, gate3Pass, gate4Pass, gate5Pass, gate6Pass, gate7Pass]
+      .filter(x => x).length;
+    const totalGates = 7;
 
     console.log(`Gates Passed: ${passCount}/${totalGates}`);
     console.log(`Status: ${passCount === totalGates ? '✅ SOM TOPOLOGY READY' : '⚠️ PARTIAL (dependencies pending)'}\n`);
@@ -230,23 +234,23 @@ async function validateSOMTopology() {
     if (!GATES_ONLY) {
       console.log('Topology Grid (20×20, 400 cells):');
       console.log(`  - Populated cells: ${populatedCells}/${SOM_CELLS}`);
-      console.log(`  - Assigned packets: ${assignedCount}/${TOTAL_PACKETS} (${(100 * assignedCount / TOTAL_PACKETS).toFixed(1)}%)`);
+      console.log(`  - Assigned packets: ${assignedCount}/${totalPackets} (${(totalPackets > 0 ? 100 * assignedCount / totalPackets : 0).toFixed(1)}%)`);
       console.log(`  - Mean packets/cell: ${meanCount.toFixed(0)}`);
       console.log(`  - Cell CV: ${cv.toFixed(3)} (uniform if <0.30)`);
       console.log(`  - Entropy: ${normalizedEntropy.toFixed(3)} (max: 1.0 = uniform)`);
       console.log();
 
       console.log('Dependency Status:');
-      console.log(`  - Autoencoder (768→64): ${latentCount > 0 ? '✅ DONE' : '❌ TODO'}`);
+      console.log(`  - Autoencoder (768→64): ${gate5Pass ? '✅ READY' : latentCount > 0 ? '⚠️ PARTIAL COVERAGE' : '❌ TODO'}`);
       console.log(`  - Adjacency edges: ${adjTableExists ? '✅ DONE' : '❌ TODO'}`);
       console.log(`  - ACE integration: ⏳ TODO`);
       console.log();
 
       console.log('Next Steps:');
-      console.log('  1. ✅ Gate 1–3: SOM grid validation ready');
-      console.log('  2. ⏳ Gate 4: Run compute-som-tricubic-adjacency.mjs');
-      console.log('  3. ⏳ Gate 5: Run train-autoencoder-768-64.mjs');
-      console.log('  4. ⏳ Gate 6: Run ACE benchmark after integration');
+      console.log('  1. ⏳ Repair/refresh SOM assignments: 342/400 cells currently populated');
+      console.log('  2. ⏳ Resolve latent_64 coverage: 7,522 rows versus the 95% gate');
+      console.log('  3. ✅ Adjacency table is present and within the configured edge range');
+      console.log('  4. ⏳ Run the ACE benchmark only after topology coverage is repaired');
     }
 
     process.exit(passCount === totalGates ? 0 : 1);

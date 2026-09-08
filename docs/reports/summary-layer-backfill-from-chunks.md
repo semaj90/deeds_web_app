@@ -1,6 +1,6 @@
 # Summary Layer Backfill From Chunks
 
-Generated: 2026-08-10T18:36:17.051Z
+Generated: 2026-09-08T18:07:22.682Z
 Mode: dry-run
 Status: DRY_RUN
 
@@ -19,8 +19,10 @@ Status: DRY_RUN
 ## Coverage
 
 - usable candidate pct: 96%
-- packet context join pct: 100%
-- summary_context pct: 100%
+- packet context join pct (of ALL usable candidates — the real coverage number): 23.44%
+- packet context join pct (of joined rows only — always ~100%, shown for denominator transparency, not a coverage claim): 100%
+- summary_context pct (of ALL usable candidates): 23.44%
+- summary_context pct (of joined rows only — always ~100%, denominator transparency): 100%
 
 ## Sample
 

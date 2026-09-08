@@ -260,6 +260,16 @@ function classifyParity(arg1, arg2, arg3) {
       payloadSourceRef,
       payloadQdrantPointId,
       payloadFeatureId,
+      // Real bug found + fixed 2026-09-08 (WS1.6, parent-atlas-trace-search-joinback-proof/tasks.md):
+      // this branch previously returned only the (necessarily empty, since point is null)
+      // payload-side identity fields -- callers reporting a missing point (e.g.
+      // qdrant-parity-repair.mjs's "Missing points" / "Quarantined" console output) had no
+      // Postgres-side identity to print at all, producing literal "undefined  undefined" output.
+      // Mirror the non-missing branch's row* field names below.
+      rowPacketId,
+      rowPacketKey,
+      rowSourceRef,
+      rowQdrantPointId,
     };
   }
 
@@ -408,16 +418,31 @@ function generateRepairEvents(arg1, arg2, arg3) {
   const repairRequests = [];
 
   const pushRepair = (row, kind, reason, pgRow = null) => {
-    const key = `${row.packet_id ?? row.packet_key ?? row.qdrant_point_id ?? 'n/a'}|${kind}`;
+    // Real bug found + fixed 2026-09-08 (WS1.6): `row` here is a classifyParity() result, which
+    // never carries a plain `packet_id`/`packet_key`/`qdrant_point_id` field -- only
+    // `rowPacketId`/`rowPacketKey`/`rowQdrantPointId` (from the Postgres row) and
+    // `payloadPacketId`/etc (from the Qdrant payload). This lookup previously always missed,
+    // so every emitted repair/quarantine event carried `packet_id`/`packet_key`/`qdrant_point_id`
+    // all `null`, AND every event's dedup key collapsed to the constant `'n/a|<kind>'` -- in a
+    // hypothetical batch call (multiple classifiedRows in one generateRepairEvents call) this
+    // would silently drop all but the first event per kind, since they'd all map to the same Map
+    // key. Prefer the authoritative Postgres row's real identity when available (the case for
+    // every current real caller), falling back to the classifyParity row's own row*-prefixed
+    // fields, then its legacy plain-field names for backward compatibility with any caller that
+    // already passes a raw row-shaped object as `row`.
+    const packetId = pgRow?.packet_id ?? row.rowPacketId ?? row.packet_id ?? null;
+    const packetKey = pgRow?.packet_key ?? row.rowPacketKey ?? row.packet_key ?? null;
+    const qdrantPointId = pgRow?.qdrant_point_id ?? row.rowQdrantPointId ?? row.qdrant_point_id ?? null;
+    const key = `${packetId ?? packetKey ?? qdrantPointId ?? 'n/a'}|${kind}`;
     const existing = repairIndex.get(key);
     if (existing) {
       if (!existing.reasons.includes(reason)) existing.reasons.push(reason);
       return;
     }
     const entry = {
-      packet_id: row.packet_id ?? null,
-      packet_key: row.packet_key ?? null,
-      qdrant_point_id: row.qdrant_point_id ?? null,
+      packet_id: packetId,
+      packet_key: packetKey,
+      qdrant_point_id: qdrantPointId,
       kind,
       action: kind === 'quarantine' ? 'quarantine' : 'repair',
       reasons: [reason],

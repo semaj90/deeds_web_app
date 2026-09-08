@@ -644,7 +644,9 @@ async function main() {
 
   const client = await pool.connect();
   try {
-    await ensureHotTable(client);
+    // Dry-run must be genuinely read-only. Schema admission belongs to the
+    // reviewed migration path, and registry writes belong only to --apply.
+    if (APPLY) await ensureHotTable(client);
     const rows = await fetchRows(LIMIT);
     const accepted = [];
     const rejected = [];
@@ -686,7 +688,7 @@ async function main() {
 
         accepted.push(ledgerRow);
 
-        const packed = await upsertRegistry(client, {
+        const registryPacket = {
           ...row,
           ...materialized,
           validation_status: 'valid',
@@ -697,21 +699,26 @@ async function main() {
             row.feature_id && row.community_id != null ? `HAS_COMMUNITY:${row.feature_id}->${row.community_id}` : null,
             row.feature_id && row.som_row != null && row.som_col != null ? `HAS_SOM:${row.feature_id}->${row.som_row},${row.som_col}` : null,
           ].filter(Boolean),
-        });
-
+        };
+        // The previous implementation called upsertRegistry() unconditionally,
+        // making --dry-run mutate the live registry. Keep planning metadata in
+        // the report, but reserve the database call for explicit --apply.
+        const packed = APPLY ? await upsertRegistry(client, registryPacket) : null;
+        const plannedTraceId = makeTraceId(row.packet_key, row.source_ref);
         registryWrites.push({
           packet_key: row.packet_key,
           qdrant_point_id: row.qdrant_point_id,
-          trace_id: packed.traceId,
-          checksum_sha256: packed.checksum,
-          msgpack_bytes: packed.msgpackBytes.length,
-          registry_path: packed.registryPath,
-          valkey_cache_key: packed.valkeyKey,
+          trace_id: packed?.traceId ?? plannedTraceId,
+          checksum_sha256: packed?.checksum ?? null,
+          msgpack_bytes: packed?.msgpackBytes.length ?? 0,
+          registry_path: packed?.registryPath ?? null,
+          valkey_cache_key: packed?.valkeyKey ?? null,
+          planned: !APPLY,
         });
-        msgpackChunks.push(Buffer.from(packed.msgpackBytes));
+        if (packed) msgpackChunks.push(Buffer.from(packed.msgpackBytes));
         manifestEntries.push({
           packet_key: row.packet_key,
-          trace_id: packed.traceId,
+          trace_id: packed?.traceId ?? plannedTraceId,
           qdrant_point_id: row.qdrant_point_id,
           source_ref: row.source_ref,
           feature_id: row.feature_id,
@@ -719,9 +726,10 @@ async function main() {
           hmm_state: hmmState,
           repair_lane: repairLane,
           offset: msgpackChunks.slice(0, -1).reduce((sum, chunk) => sum + chunk.length, 0),
-          length: packed.msgpackBytes.length,
-          checksum_sha256: packed.checksum,
-          valkey_cache_key: packed.valkeyKey,
+          length: packed?.msgpackBytes.length ?? 0,
+          checksum_sha256: packed?.checksum ?? null,
+          valkey_cache_key: packed?.valkeyKey ?? null,
+          planned: !APPLY,
         });
       }
     }

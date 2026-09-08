@@ -22,6 +22,10 @@
         "ATLAS_TOOLS_MOCK": "0"
       }
     },
+    "gemma4-offload": {
+      "command": "node",
+      "args": ["./sveltekit-frontend/scripts/mcp/gemma4-offload-mcp.mjs"]
+    },
     "socraticode": {
       "command": "node",
       "args": ["C:/Users/james/AppData/Local/npm-cache/_npx/39052607b6e520af/node_modules/socraticode/dist/index.js", "mcp"],

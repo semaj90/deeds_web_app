@@ -1,6 +1,6 @@
 {
   "schema": "atlas.source-scope-reconciliation.v1",
-  "generatedAt": "2026-09-05T16:08:10.702Z",
+  "generatedAt": "2026-09-08T20:03:13.685Z",
   "readOnly": true,
   "writesPerformed": false,
   "denominator": {
@@ -33,11 +33,11 @@
         "projectionOnlyRefs": 3710
       },
       "graphifyFiles": {
-        "projectionDistinctRefs": 25258,
-        "admittedManifestExactMatches": 15614,
+        "projectionDistinctRefs": 25643,
+        "admittedManifestExactMatches": 15680,
         "admittedManifestApprovedAliasMatches": 0,
-        "admittedManifestMissing": 954,
-        "projectionOnlyRefs": 9644
+        "admittedManifestMissing": 888,
+        "projectionOnlyRefs": 9963
       },
       "qdrant": {
         "projectionDistinctRefs": 6882,
@@ -110,16 +110,16 @@
         "qdrantids": 55853
       },
       "graphify": {
-        "total": 25317,
-        "distinctrefs": 25258,
-        "currentworkspace": 25273,
-        "contenthashes": 25317
+        "total": 26014,
+        "distinctrefs": 25643,
+        "currentworkspace": 25970,
+        "contenthashes": 26014
       },
       "packets": {
-        "total": 61715,
-        "domainclass": 61715,
+        "total": 61718,
+        "domainclass": 61718,
         "primarydomain": 0,
-        "taxonomylevel": 61715
+        "taxonomylevel": 61718
       },
       "domainFacts": {
         "total": 91658,
@@ -157,7 +157,7 @@
       "readiness_state": "READY_FULL",
       "redisConnected": true,
       "status": "healthy",
-      "timestamp": 1788624479795
+      "timestamp": 1788897785300
     }
   },
   "qdrant": {
@@ -167,7 +167,7 @@
       "result": {
         "status": "green",
         "optimizer_status": "ok",
-        "indexed_vectors_count": 112841,
+        "indexed_vectors_count": 112951,
         "points_count": 109776,
         "segments_count": 4,
         "config": {
@@ -223,9 +223,45 @@
           }
         },
         "payload_schema": {
-          "feature_id": {
+          "semantic_path": {
             "data_type": "keyword",
-            "points": 109760
+            "points": 0
+          },
+          "path": {
+            "data_type": "keyword",
+            "points": 109726
+          },
+          "source_ref": {
+            "data_type": "keyword",
+            "points": 109776
+          },
+          "topo_class": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "parent_centroid_id": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "workspace_id": {
+            "data_type": "keyword",
+            "points": 52366
+          },
+          "workspace_task_id": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "point_kind": {
+            "data_type": "keyword",
+            "points": 1
+          },
+          "agent_pickup_ready": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "language": {
+            "data_type": "keyword",
+            "points": 3463
           },
           "error_id": {
             "data_type": "keyword",
@@ -235,79 +271,31 @@
             "data_type": "keyword",
             "points": 10471
           },
-          "workspace_task_id": {
+          "repo": {
             "data_type": "keyword",
-            "points": 0
+            "points": 3438
           },
-          "som_cluster": {
-            "data_type": "integer",
-            "points": 106223
-          },
-          "summary_hash": {
+          "file_path": {
             "data_type": "keyword",
-            "points": 0
+            "points": 109727
           },
-          "language": {
+          "feature_id": {
             "data_type": "keyword",
-            "points": 3463
-          },
-          "symbol_name": {
-            "data_type": "keyword",
-            "points": 0
+            "points": 109760
           },
           "updated_at": {
             "data_type": "integer",
             "points": 0
           },
-          "semantic_path": {
-            "data_type": "keyword",
-            "points": 0
-          },
-          "source_ref": {
-            "data_type": "keyword",
-            "points": 109776
-          },
-          "path": {
-            "data_type": "keyword",
-            "points": 109726
-          },
           "cluster_id": {
             "data_type": "keyword",
             "points": 0
-          },
-          "point_kind": {
-            "data_type": "keyword",
-            "points": 1
           },
           "cluster_key": {
             "data_type": "keyword",
             "points": 20926
           },
-          "agent_pickup_ready": {
-            "data_type": "keyword",
-            "points": 0
-          },
-          "topo_class": {
-            "data_type": "keyword",
-            "points": 0
-          },
-          "sourceRefs": {
-            "data_type": "keyword",
-            "points": 106289
-          },
-          "repo": {
-            "data_type": "keyword",
-            "points": 3438
-          },
-          "centroid_id": {
-            "data_type": "keyword",
-            "points": 0
-          },
-          "tags": {
-            "data_type": "keyword",
-            "points": 106322
-          },
-          "status": {
+          "next_action": {
             "data_type": "keyword",
             "points": 0
           },
@@ -315,21 +303,33 @@
             "data_type": "keyword",
             "points": 0
           },
-          "next_action": {
+          "status": {
             "data_type": "keyword",
             "points": 0
           },
-          "workspace_id": {
-            "data_type": "keyword",
-            "points": 52366
+          "som_cluster": {
+            "data_type": "integer",
+            "points": 106223
           },
-          "file_path": {
+          "tags": {
             "data_type": "keyword",
-            "points": 109727
+            "points": 106322
           },
-          "parent_centroid_id": {
+          "centroid_id": {
             "data_type": "keyword",
             "points": 0
+          },
+          "symbol_name": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "summary_hash": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "sourceRefs": {
+            "data_type": "keyword",
+            "points": 106289
           }
         },
         "update_queue": {
@@ -337,7 +337,7 @@
         }
       },
       "status": "ok",
-      "time": 0.029580991
+      "time": 0.073112395
     },
     "sampleReachable": true,
     "samplePoints": 100,

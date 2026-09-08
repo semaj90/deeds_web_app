@@ -1,6 +1,6 @@
 {
   "schema": "atlas.emb3a.upstream.revision.owner.audit.v1",
-  "generatedAt": "2026-08-29T06:07:40.581Z",
+  "generatedAt": "2026-09-08T21:24:54.408Z",
   "readOnly": true,
   "tables": [
     {
@@ -18,12 +18,12 @@
       ],
       "status": "PARTIAL_SCHEMA",
       "coverage": {
-        "total_rows": 61660,
-        "packet_key_present": 61660,
-        "source_ref_present": 61660,
+        "total_rows": 61718,
+        "packet_key_present": 61718,
+        "source_ref_present": 61718,
         "sha256_present": 4715,
-        "workspace_revision_present": 61660,
-        "representation_revision_present": 61660,
+        "workspace_revision_present": 61718,
+        "representation_revision_present": 61718,
         "workspace_revision_nonzero": 0,
         "representation_revision_nonzero": 1
       }

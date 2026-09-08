@@ -54,8 +54,8 @@ describe('assertTaskSemanticPacketSchemaCompatible', () => {
   });
 
   it('throws TASK_SEMANTIC_PACKET_SCHEMA_INCOMPATIBLE naming every missing column, before any write', async () => {
-    // Matches the live 16-column task_semantic_packets census from this session's audit --
-    // none of the columns the real INSERT needs are present.
+    // Deliberately uses a minimal legacy-shaped fixture; it must not encode the current
+    // production catalog's column count. None of the columns the real INSERT needs are present.
     const liveColumns = [
       'id', 'packet_key', 'source_ref', 'feature_id', 'feature_label', 'alias_id',
       'qdrant_score', 'cluster_score', 'topological_score', 'fusion_score', 'metadata',
@@ -79,5 +79,18 @@ describe('assertTaskSemanticPacketSchemaCompatible', () => {
     // Only the schema-compatibility SELECT should have run -- no task-row load, no Qdrant
     // upsert, no INSERT attempt reached.
     expect(mockExecute).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('assertCanonicalSemantic768Vector', () => {
+  it('accepts exactly 768 finite values', async () => {
+    const { assertCanonicalSemantic768Vector } = await import('./semantic-packets.js');
+    expect(() => assertCanonicalSemantic768Vector(new Array(768).fill(0.25))).not.toThrow();
+  });
+
+  it('rejects legacy dimensions and non-finite values', async () => {
+    const { assertCanonicalSemantic768Vector } = await import('./semantic-packets.js');
+    expect(() => assertCanonicalSemantic768Vector(new Array(384).fill(0))).toThrow(/semantic_768/);
+    expect(() => assertCanonicalSemantic768Vector([...new Array(767).fill(0), Number.NaN])).toThrow(/semantic_768/);
   });
 });

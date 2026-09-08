@@ -1,5 +1,138 @@
 # Parent Atlas Workstation TODO
 
+## Operator card — current promotion state (2026-09-08)
+
+Use this card first. Detailed historical notes below are evidence and context; OpenSpec `tasks.md`
+files remain authoritative for completion status.
+
+| State | Lanes |
+|---|---|
+| PROVEN | task-semantic schema/index/canary, lifecycle source order, Go cached-request isolation, semantic_768 Qdrant shape, current packet-registry parity |
+| WIRED / NOT PROMOTED | structural observations, dense live joins, SOM/KMeans, ontology concepts, n-ary KAG, feature matrix, AtlasGemmaRank |
+| BLOCKED | current source hydration, live parse/symbol lineage migration, current graph owner, Python↔Zod↔Go envelope parity |
+| PROMOTION-READY | none |
+
+### Next actions, in order
+
+1. Run the isolated SOM/KMeans fixture and emit a deterministic receipt; do not touch shared state.
+2. Apply the frozen identity model: `tree_node_id` = parse occurrence; `symbol_id` = stable logical symbol;
+   `symbol_version_id` = revision-bound symbol; `chunk_id`, `packet_key`, and `graph_node_key` remain separate.
+3. Run the read-only cross-schema reindex manifest and resolve its excluded lineage rows before any
+   PostgreSQL/Qdrant/Neo4j/Valkey reindex fanout.
+4. Treat that manifest as input to `AtlasCompiledSnapshotV1`; compile ordinals/artifacts only after
+   source and symbol lineage is proven.
+5. Reconcile Python/Pydantic, TypeScript/Zod, SearXNG, and Go retrieval envelopes.
+6. Materialize only revision-qualified feature rows with presence masks; preserve missing values as `null`.
+7. Prove ACE grounding and ContextManifest admission, then request explicit bounded promotion.
+
+### Safe verification commands
+
+```text
+npm run atlas:som:audit
+go test ./services/go-retrieval-service/...
+npx openspec validate parent-atlas-ace-rlm-bitfrost-integration --type change --strict --json
+```
+
+`promotion_ready=[]` is intentional: the queue is visible, but no lane currently satisfies every
+identity, currentness, receipt, bounded-execution, authorization, and independent-readback gate.
+
+### WS1.4 — current packet-registry census 2026-09-08
+
+The live read-only census reports `atlas_packets=61,718` and `atlas_packet_registry=61,718` with
+zero missing registry keys, zero duplicate missing keys, zero orphan registry rows, and complete
+`packet_key`/`source_ref`/`feature_id` source coverage. The older 3,394-row gap is not current
+live state. Registry backfill remains disabled; competing writer ownership is still recorded in
+`docs/reports/atlas-packet-registry-gap-ws1.4.json`.
+
+### REGISTRY-WRITER-OWNERSHIP-02 — current receipt
+
+The read-only ownership receipt is `docs/reports/atlas-registry-writer-ownership-v2.json`.
+It confirms current 61,718/61,718 parity but does not authorize a writer. HyperRAG has registry
+DDL plus an upsert path but no proven production entrypoint, no revision-qualified inputs, and
+no transaction markers, so it remains `UNRESOLVED`. The root addressable packet materializer is
+an `ACTIVE_SECONDARY_WRITER` for file/manifest output; the SvelteKit duplicate is unresolved.
+Week 1 registry scripts remain `MANUAL_MIGRATION_ONLY` or `BROKEN_LEGACY` and must not be
+executed. Next gate: choose one canonical registry writer and prove identity, revision, conflict,
+and transaction semantics before any registry backfill.
+
+### AST-GREP-OUTLINE-SYMBOL-POPULATION-01 — capability audit 2026-09-08
+
+- `ast-grep outline` is the bounded structural discovery input for symbol navigation; it is not a
+  language server, cross-file resolver, or canonical symbol registry.
+- The repository CLI now resolves the pinned `ast-grep` 0.45.3 and exposes the documented
+  `outline` subcommand. Run `npm run atlas:ast-grep:outline:audit` to repeat the read-only
+  capability census.
+- Once available, outline output must be reconciled against 8095 Tree-sitter byte spans and the
+  existing revision-qualified symbol resolver before any `symbol_version_id` promotion.
+- The pinned proof path remains available through `npm run atlas:ast-grep:outline:audit:pinned`;
+  both modes are diagnostic and perform no database or projection writes.
+- The bounded Tree-sitter reconciliation remains open: the latest 66-file replay is
+  `53/66` named-symbol and exact-span parity, `50/66` full parity, with 37 unmatched nested
+  callback observations and 4 unknown-kind pairs. Export wrappers are excluded from symbol
+  counts but retained as relationship evidence. This is not a reason to add another parser;
+  resolve the existing coordinate/identity mapping before promotion.
+
+### Latent representation ladder — promotion prerequisites
+
+The former 384/MiniLM path is migration evidence only. The new ladder must be derived from the
+same frozen `EmbeddingGemma → semantic_768` matrix; Neo4j and Qdrant are consumers, not training
+authorities.
+
+```text
+Postgres-qualified semantic_768 matrix
+  → immutable artifact + row/packet ordinal map
+  → deterministic 768→256 projection
+  → deterministic 256→128 projection
+  → deterministic 128→64 projection
+  → exact reconstruction / retrieval evaluation
+  → sealed latent artifacts
+  → Qdrant/Neo4j/Valkey derived fanout
+```
+
+Required gates for each latent width:
+
+| Width | Meaning | Must prove before promotion |
+|---|---|---|
+| `latent_256` | first compressed semantic representation | input checksum, model/revision, finite values, row alignment, reconstruction and retrieval metrics |
+| `latent_128` | compact routing representation | same proof plus comparison against `latent_256` and exact semantic oracle |
+| `latent_64` | smallest routing/topology representation | same proof plus explicit cache-hint-only classification unless quality gates pass |
+
+The missing work is not “train another decoder” in isolation. It is:
+
+1. Freeze a current, revision-qualified `semantic_768` source cohort and ordinal map.
+2. Build a deterministic CPU/BF16 reference projection or autoencoder baseline.
+3. Emit `RepresentationArtifactV1` manifests for 256/128/64 with checksums and metrics.
+4. Compare every width against the same exact cosine/top-k oracle; do not compare only against
+   Qdrant or Neo4j fanout.
+5. Prove packet identity and row order on reload, then publish projections atomically.
+6. Run bounded Qdrant→Neo4j fanout only after the artifact is sealed and the identity join passes.
+
+The current SOM audit is therefore a downstream symptom: `latent_64` has 7,522 rows, but the
+source cohort and coverage are not yet sufficient for promotion. Existing 384/MiniLM data must
+not be used to fill missing 768-derived rows.
+
+### Latent ladder audit result — 2026-09-08
+
+The repository already contains a static contract for the three widths. Do not create a second
+decoder or representation owner:
+
+| Representation | Existing contract | Current proof |
+|---|---|---|
+| `latent_256` | learned, persisted, derived from `semantic_768`; `PostgresLatent256CandidateProvider` | static contract proven; live coverage/readback open |
+| `latent_128` | virtual `PREFIX_L2` view of `latent_256`; `latent-derive.ts` | static contract proven; no independent storage required |
+| `latent_64` | learned, persisted physical legacy/routing representation | static binding proven; live coverage is only 7,522 rows |
+
+Static audit: `python scripts/atlas/audit-fetch-latent-derived-views-v2.py` returned
+`PROVEN_STATIC_CONTRACT`, with no writes and `canonicalAuthority=false`.
+
+The promotion work is now narrowed to:
+
+1. Run `latent_256` provider readback on a current, revision-qualified `semantic_768` cohort.
+2. Prove `CandidateOrdinal` and packet identity parity after reload.
+3. Emit checksums and metrics for the persisted 256 artifact and virtual 128/64 views.
+4. Compare all widths against the exact semantic oracle, not only Qdrant/Neo4j fanout.
+5. Seal the artifact, then run bounded projection fanout and independent readback.
+
 > **Historical/superseded projection.** The current Workstation dependency spine is
 > `docs/parent-atlas-workstation-todo.md`. This file is retained for history and
 > does not own OpenSpec tasks or authorize implementation.
@@ -819,8 +952,9 @@ canonical retrieval truth, or new owner boundaries.
 - Stage 3C: SOM 20×20 as a separate 400-cell topology experiment over `semantic_768`.
 - Stage 3D: reranker feature preparation from packet evidence.
 
-`latent_64` is legacy routing compatibility only. Any future latent compression work should be a
-separately revisioned experiment, with `latent_128` the more plausible candidate if one is needed.
+Existing `latent_64` rows are legacy/incomplete routing evidence, not a canonical representation.
+Future `latent_256`, `latent_128`, and `latent_64` artifacts must be separately revisioned and
+derived from the current `semantic_768` matrix, with quality gates before any promotion.
 The phrase `kmeans 20x20` is not the correct terminology; KMeans uses `K ∈ {64, 128, 256}` and SOM
 is the separate 20×20 topology experiment.
 
@@ -2063,7 +2197,7 @@ Operating split:
 - [ ] Snapshot-aware bounded traversal contract remains unproven.
 - [ ] Closed error-resolution loop remains partial.
 - [ ] Frozen repair replay corpus remains absent.
-- [ ] `latent_128` byte-contract proof remains absent.
+- [ ] `latent_256` / `latent_128` / `latent_64` byte-contract and exact-oracle proofs remain absent.
 - [ ] OpenWiki source lane is empty and needs content.
 - [ ] Library-module source auto-discovery remains manual.
 - [ ] DB-backed canonical registry for the library-module index does not exist yet.
@@ -4329,3 +4463,56 @@ P7 + P8
 
 No phase in this index authorizes a durable mutation by itself. Each write still requires an
 explicit promotion queue, schema validation, bounded apply, and independent readback.
+
+### Promotion readiness view — 2026-09-08
+
+This is a view of the existing OpenSpec queues, not a second task authority. Empty arrays are
+intentional: they mean no item has met that lane's promotion criteria yet.
+
+```json
+{
+  "proven": [
+    "task-semantic-packet-schema-and-index-minset",
+    "task-semantic-packet-postgres-qdrant-canary",
+    "task-semantic-packet-source-order",
+    "go-retrieval-cache-context-validation",
+    "semantic_768_qdrant_shape"
+  ],
+  "wired_not_promoted": [
+    "task-semantic-packet-model-driven-lifecycle",
+    "som-kmeans-topology",
+    "candidate-feature-matrix",
+    "atlas-gemma-rank-v1",
+    "ontology-linked-tuples",
+    "n-ary-hypergraph"
+  ],
+  "promotion_ready": [],
+  "blocked": [
+    "current-source-evidence-hydration",
+    "tree-node-id-identity-model",
+    "current-graph-revision-owner",
+    "full-python-typescript-go-envelope-parity"
+  ],
+  "next_gates": [
+    "SOM-KMEANS-FIXTURE-01",
+    "CURRENT-SOURCE-EVIDENCE-HYDRATION-01",
+    "CANDIDATE-FEATURE-MATRIX-RECONVERGENCE-01",
+    "ACE-GROUNDING-FAILCLOSED-01",
+    "MCP-TASK-SEMANTIC-FULL-LIFECYCLE-01"
+  ],
+  "promotion_rule": "A lane moves to promotion_ready only after current identity, revision, deterministic receipt, bounded execution, and independent readback are proven."
+}
+```
+
+The immediate promotion path is therefore:
+
+```text
+SOM-KMEANS-FIXTURE-01
+  → isolated receipt and cleanup
+  → current source/revision join
+  → CandidateFeatureMatrix presence-mask proof
+  → ACE grounding/admission proof
+  → explicit promotion authorization
+  → bounded projection write
+  → independent readback
+```

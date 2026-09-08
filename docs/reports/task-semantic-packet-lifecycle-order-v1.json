@@ -1,0 +1,37 @@
+{
+  "schema": "atlas.task-semantic-packet-lifecycle-order.v1",
+  "generatedAt": "2026-09-08T17:34:48.314Z",
+  "sourcePath": "sveltekit-frontend/src/lib/server/tasks/semantic-packets.ts",
+  "readOnly": true,
+  "productionWritesPerformed": false,
+  "markers": {
+    "vectorGuard": {
+      "marker": "assertCanonicalSemantic768Vector(embedding)",
+      "offset": 987
+    },
+    "postgresInsert": {
+      "marker": ".insert(taskSemanticPackets)",
+      "offset": 2278
+    },
+    "qdrantUpsert": {
+      "marker": "await qdrantManager.upsert({",
+      "offset": 3493
+    },
+    "qdrantCollection": {
+      "marker": "collection: TASK_COLLECTION_NAME",
+      "offset": 3526
+    },
+    "qdrantVectorPayload": {
+      "marker": "buildVectorPayload(TASK_COLLECTION_NAME, embedding)",
+      "offset": 3625
+    }
+  },
+  "checks": {
+    "allMarkersPresent": true,
+    "vectorGuardBeforePostgresInsert": true,
+    "postgresCanonicalInsertBeforeQdrantUpsert": true,
+    "qdrantUsesCanonicalCollectionConstant": true,
+    "qdrantUsesNamedSemanticPayload": true
+  },
+  "status": "PROVEN_SOURCE_ORDER"
+}

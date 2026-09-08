@@ -65,6 +65,7 @@ export interface GrpcCodebaseSearchRequest {
   pathPrefixes?: string[];
   includeDebug?: boolean;
   packetKeys?: string[];
+  representationId?: string;
 }
 
 export interface GrpcCodebaseChunk {
@@ -91,6 +92,8 @@ export interface GrpcCodebaseSearchResponse {
   chunks?: GrpcCodebaseChunk[];
   totalMs?: number;
   debugJson?: string;
+  representationUsed?: string;
+  representationFallbackReason?: string;
 };
 
 function endpoint(config: GrpcClientConfig): string {
@@ -253,6 +256,7 @@ export class GrpcRetrievalClient implements RetrievalFacade {
         pathPrefixes: request.pathPrefixes ?? [],
         includeDebug: request.includeDebug ?? false,
         packetKeys: request.packetKeys ?? [],
+        representationId: request.representationId ?? '',
       }, deadline) as GrpcCodebaseSearchResponse;
     } catch (error) {
       throw new GrpcTransportError(error instanceof Error ? error.message : 'gRPC SearchCodebase failed',
@@ -298,6 +302,7 @@ export class GrpcRetrievalClient implements RetrievalFacade {
         pathPrefixes: request.pathPrefixes ?? [],
         includeDebug: request.includeDebug ?? false,
         packetKeys: request.packetKeys ?? [],
+        representationId: request.representationId ?? '',
       }, deadline));
     } catch (error) {
       throw new GrpcTransportError(error instanceof Error ? error.message : 'gRPC StreamCodebase failed', undefined, error);

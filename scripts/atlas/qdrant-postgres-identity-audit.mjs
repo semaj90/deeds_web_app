@@ -35,7 +35,7 @@
  *   - UNKNOWN_IDENTITY: no match across all strategies
  */
 
-import { createReadStream } from 'node:fs';
+import { appendFileSync, createReadStream, existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { createWriteStream } from 'node:fs';
 import { createInterface } from 'node:readline';
 import * as path from 'node:path';
@@ -48,6 +48,8 @@ import pg from 'pg';
 
 const argv = process.argv.slice(2);
 const outputLedger = argv.find(a => a.startsWith('--ledger='))?.split('=')[1] || 'qdrant-alignment-ledger.ndjson';
+const checkpointPath = argv.find(a => a.startsWith('--checkpoint='))?.split('=')[1] || null;
+const resume = argv.includes('--resume');
 const limitArg = argv.find(a => a.startsWith('--limit='))?.split('=')[1];
 const auditLimit = limitArg ? parseInt(limitArg, 10) : null; // null = no limit, otherwise stop after N points
 const isDryRun = argv.includes('--dry-run');
@@ -72,6 +74,53 @@ class QdrantPostgresAudit {
       codebase_chunk_with_qdrant_id: 0,
     };
     this.ledger = [];
+    this.incrementalLedger = Boolean(checkpointPath);
+  }
+
+  restoreIncrementalState() {
+    if (!this.incrementalLedger || !resume) return { offset: undefined, seenPointIds: new Set() };
+    if (!existsSync(checkpointPath) || !existsSync(outputLedger)) {
+      throw new Error('RESUME_REQUIRES_EXISTING_CHECKPOINT_AND_LEDGER');
+    }
+    const checkpoint = JSON.parse(readFileSync(checkpointPath, 'utf8'));
+    if (checkpoint.completed === true) {
+      throw new Error('RESUME_REFUSES_COMPLETED_AUDIT');
+    }
+    const entries = readFileSync(outputLedger, 'utf8')
+      .split(/\r?\n/)
+      .filter(Boolean)
+      .map(line => JSON.parse(line));
+    if (Number.isInteger(checkpoint.auditedPoints) && entries.length !== checkpoint.auditedPoints) {
+      throw new Error(`RESUME_LEDGER_CHECKPOINT_MISMATCH:ledger=${entries.length}:checkpoint=${checkpoint.auditedPoints}`);
+    }
+    const seenPointIds = new Set();
+    for (const entry of entries) {
+      const pointKey = String(entry.qdrant_point_id);
+      if (seenPointIds.has(pointKey)) throw new Error(`RESUME_DUPLICATE_LEDGER_POINT:${pointKey}`);
+      seenPointIds.add(pointKey);
+      this.ledger.push(entry);
+      this.stats.total_points++;
+      this.stats.by_lane[entry.classification_lane] = (this.stats.by_lane[entry.classification_lane] || 0) + 1;
+      if (Number(entry.confidence) >= 0.9) this.stats.exact_matches++;
+      else if (Number(entry.confidence) >= 0.3) this.stats.ambiguous_matches++;
+      else this.stats.unknown_identities++;
+    }
+    return { offset: checkpoint.next_page_offset, seenPointIds };
+  }
+
+  appendBatch(entries) {
+    if (!this.incrementalLedger || entries.length === 0) return;
+    appendFileSync(outputLedger, entries.map(entry => JSON.stringify(entry) + '\n').join(''), 'utf8');
+  }
+
+  writeCheckpoint(value) {
+    if (!this.incrementalLedger) return;
+    writeFileSync(checkpointPath, `${JSON.stringify({
+      schema: 'atlas.qdrant-postgres-identity-audit-checkpoint.v1',
+      collection: 'codebase_chunks_768',
+      ledger: outputLedger,
+      ...value,
+    }, null, 2)}\n`, 'utf8');
   }
 
   async loadPostgresData() {
@@ -232,6 +281,20 @@ class QdrantPostgresAudit {
       const atlasMatches = this.atlasBySourceRef.get(payload.source_ref) || [];
       const chunkMatches = this.chunksBySourceRef.get(payload.source_ref) || [];
 
+      const totalSourceMatches = atlasMatches.length + chunkMatches.length;
+      if (totalSourceMatches > 1) {
+        return {
+          lane: 'AMBIGUOUS_SOURCE_REF',
+          confidence: 0.2,
+          match_type: 'source_ref_cross_table_multiple',
+          evidence: {
+            source_ref: payload.source_ref,
+            atlas_packet_matches: atlasMatches.length,
+            chunk_matches: chunkMatches.length,
+          },
+        };
+      }
+
       if (atlasMatches.length === 1) {
         return {
           lane: 'SOURCE_REF_ONLY',
@@ -241,16 +304,6 @@ class QdrantPostgresAudit {
             source_ref: payload.source_ref,
             matching_rows: 1,
             postgres_table: 'atlas_packets',
-          },
-        };
-      } else if (atlasMatches.length > 1) {
-        return {
-          lane: 'AMBIGUOUS_SOURCE_REF',
-          confidence: 0.2,
-          match_type: 'source_ref_multiple',
-          evidence: {
-            source_ref: payload.source_ref,
-            matching_rows: atlasMatches.length,
           },
         };
       }
@@ -264,16 +317,6 @@ class QdrantPostgresAudit {
             source_ref: payload.source_ref,
             matching_rows: 1,
             postgres_table: 'codebase_chunk_index',
-          },
-        };
-      } else if (chunkMatches.length > 1) {
-        return {
-          lane: 'AMBIGUOUS_SOURCE_REF',
-          confidence: 0.2,
-          match_type: 'source_ref_chunk_multiple',
-          evidence: {
-            source_ref: payload.source_ref,
-            matching_rows: chunkMatches.length,
           },
         };
       }
@@ -296,9 +339,10 @@ class QdrantPostgresAudit {
 
     // Iterate through collection via scroll (paginated)
     // Qdrant scroll API: offset is carried in next_page_offset (numeric)
-    let offset = undefined;
+    const restored = this.restoreIncrementalState();
+    let offset = restored.offset;
     let batchCount = 0;
-    const seenPointIds = new Set();
+    const seenPointIds = restored.seenPointIds;
 
     // Safety ceiling: do not scan more than expected + 10%
     const collectionInfo = await this.qdrantClient.getCollection('codebase_chunks_768');
@@ -318,6 +362,7 @@ class QdrantPostgresAudit {
       batchCount++;
       console.log(`   Batch ${batchCount}: processing ${scrollResult.points.length} points`);
 
+      const batchEntries = [];
       for (const point of scrollResult.points) {
         // LIMIT CHECK: Stop after N points if --limit specified
         if (auditLimit && seenPointIds.size >= auditLimit) {
@@ -356,7 +401,7 @@ class QdrantPostgresAudit {
         }
 
         // Append to ledger
-        this.ledger.push({
+        const entry = {
           qdrant_point_id: point.id,
           id_type: typeof point.id,
           payload_packet_key: point.payload?.packet_key,
@@ -365,20 +410,34 @@ class QdrantPostgresAudit {
           confidence: classification.confidence,
           match_type: classification.match_type,
           evidence: classification.evidence,
-        });
+        };
+        this.ledger.push(entry);
+        batchEntries.push(entry);
       }
+
+      this.appendBatch(batchEntries);
 
       // LIMIT CHECK: Break outer loop if limit reached
       if (auditLimit && seenPointIds.size >= auditLimit) {
+        // Persist the cursor after the completed bounded batch. Without this,
+        // the ledger could contain the batch while the checkpoint still
+        // pointed at its previous page, making resume replay rows.
+        this.writeCheckpoint({
+          completed: false,
+          auditedPoints: seenPointIds.size,
+          next_page_offset: scrollResult.next_page_offset ?? null,
+        });
         break;
       }
 
       // Advance pagination: next_page_offset is numeric or null/undefined
       // Explicit null/undefined check to avoid falsey 0
       if (scrollResult.next_page_offset === null || scrollResult.next_page_offset === undefined) {
+        this.writeCheckpoint({ completed: true, auditedPoints: seenPointIds.size, next_page_offset: null });
         break;
       }
       offset = scrollResult.next_page_offset;
+      this.writeCheckpoint({ completed: false, auditedPoints: seenPointIds.size, next_page_offset: offset });
     }
 
     console.log(`   ✅ Audited ${this.stats.total_points} unique points (scanned ${seenPointIds.size} total)\n`);
@@ -444,7 +503,7 @@ class QdrantPostgresAudit {
 
       await this.loadPostgresData();
       await this.auditAllPoints();
-      await this.writeLedger();
+      if (!this.incrementalLedger) await this.writeLedger();
       this.reportStats();
 
       console.log('✅ Audit complete.');

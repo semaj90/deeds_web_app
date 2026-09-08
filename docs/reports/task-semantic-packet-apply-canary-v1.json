@@ -1,0 +1,50 @@
+{
+  "schema": "atlas.task-semantic-packet-apply-canary.v1",
+  "generatedAt": "2026-09-08T17:25:29.444Z",
+  "authorized": true,
+  "productionWritesPerformed": true,
+  "collection": "codebase_chunks_768_v2",
+  "packetKey": "canary:task-semantic:20260908172529",
+  "qdrantPointId": "a6fb6894-f969-4832-8e21-a31883bc2941",
+  "vectorDimensions": 768,
+  "steps": [
+    {
+      "step": "postgres_insert",
+      "status": "proven",
+      "packetId": "83339bb3-e2a3-41e8-89cd-25a3fbe67712"
+    },
+    {
+      "step": "qdrant_upsert",
+      "status": "proven",
+      "response": {
+        "operation_id": 13314,
+        "status": "completed"
+      }
+    },
+    {
+      "step": "postgres_readback",
+      "status": "proven",
+      "row": [
+        "83339bb3-e2a3-41e8-89cd-25a3fbe67712",
+        "canary:task-semantic:20260908172529",
+        "a6fb6894-f969-4832-8e21-a31883bc2941",
+        "todo",
+        "f"
+      ]
+    },
+    {
+      "step": "qdrant_readback",
+      "status": "proven",
+      "pointId": "a6fb6894-f969-4832-8e21-a31883bc2941",
+      "payload": {
+        "packet_id": "83339bb3-e2a3-41e8-89cd-25a3fbe67712",
+        "packet_key": "canary:task-semantic:20260908172529",
+        "source_ref": "canary://task-semantic",
+        "representation_id": "semantic_768",
+        "canary": true
+      }
+    }
+  ],
+  "status": "PROVEN",
+  "identityParity": true
+}

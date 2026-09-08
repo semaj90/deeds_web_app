@@ -287,6 +287,11 @@ export default defineConfig({
       'tests/session-115-116-integration.spec.ts',
       // Session 117+ — ACP/gRPC/QUIC integration (proto wiring, A2A discovery, QUIC transport)
       'tests/acp-grpc-quic-integration.spec.ts',
+      // parent-atlas-trace-search-joinback-proof — Repository-first search inventory runtime
+      // proofs (RUN_LIVE_INTEGRATION=1, need live trace-mcp-server :8788 + Valkey/SearXNG)
+      'tests/atlas-phase109a-signal-history.integration.spec.ts',
+      'tests/atlas-engram-hot-cache.integration.spec.ts',
+      'tests/atlas-ldr-research.integration.spec.ts',
       // Session 118 — Dispatcher signal integration (topology RRF blend, SOM fallback)
       'tests/dispatcher-signal-integration.spec.ts',
       // Phase 1 scorer integration tests (vector, graph, telemetry)

@@ -1,13 +1,13 @@
 {
-  "generatedAt": "2026-06-19T05:26:46.776Z",
-  "totalFindings": 1,
+  "generatedAt": "2026-09-08T16:35:12.670Z",
+  "totalFindings": 63,
   "nodes": [
     {
       "id": "contract:schema_mismatch",
       "label": "Schema Mismatch",
       "state": "schema_mismatch",
       "severity": "medium",
-      "findingCount": 1,
+      "findingCount": 63,
       "rootCauseScore": 0.2,
       "fixOrder": 5
     }

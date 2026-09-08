@@ -409,5 +409,30 @@
     "archived": "2026-09-07T20:54:00Z",
     "archivedTo": "deeds_labs/archive/2026-09-07/qdrant-volume-exports-2026-04-01.tar.gz",
     "reason": "BACKUP-RETENTION-01, user-approved: ~5-month-old Qdrant volume export, same retention policy as the atlas-2026-05-17 entry above."
+  },
+  {
+    "path": "scripts/atlas/week1-backfill-packet-registry.mjs",
+    "archive_path": "deeds_labs/archive/2026-09-08/week1-backfill-packet-registry.mjs.bak",
+    "sha256": "a43141694cbf21ed8241054d6136b275512a6aa236396ee914c342686d12b413",
+    "archived": "2026-09-08T00:00:00Z",
+    "reason": "Confirmed genuinely broken via live execution (not just static inspection): `import { createPool } from 'pg'` throws immediately at module load (`pg` has no such export, only `Pool`) -- `node scripts/atlas/week1-backfill-packet-registry.mjs --dry-run` produces `SyntaxError: The requested module 'pg' does not provide an export named 'createPool'` before the process even reaches its DB query. Separately, the query it would have run targets `atlas_codebase_packets`, confirmed live via `\\dt` against the real Postgres instance to not exist as a table at all. Zero callers anywhere in the repo (grep across src/, scripts/, package.json, sveltekit-frontend/package.json, .vscode/tasks.json -- only self-reference was this OpenSpec task file's own flag). A working canonical replacement already exists and does the same job correctly: `scripts/atlas/backfill-packet-registry.mjs` (real `atlas_packets`/`atlas_packet_registry` tables, verified-correct INSERT...SELECT with `ON CONFLICT DO NOTHING`). Found via `parent-atlas-trace-search-joinback-proof/tasks.md`'s SOM/GDS1.8 audit thread (flagged, not fixed, on 2026-09-08); resolved same day in a later continuation by actually running the script rather than trusting the flag's characterization alone, per this repo's Agent Execution Integrity rules."
+  },
+  {
+    "path": "scripts/atlas/week1-packet-registry-backfill.mjs",
+    "archive_path": "deeds_labs/archive/2026-09-08/week1-packet-registry-backfill.mjs.bak",
+    "sha256": "7e8a3e3d2b4fdf62b016f912af03b209fedc61fd0f43e3b7959abab1d206e28e",
+    "archived": "2026-09-08T00:00:00Z",
+    "reason": "Confirmed genuinely broken via live execution (not just static inspection) -- but the original flag's stated reason (\"references the nonexistent nes_chrom_packets table\") was itself WRONG, corrected here rather than repeated: `nes_chrom_packets` is a real, live table (confirmed via `\\d nes_chrom_packets` against the real Postgres instance) with every column this script's query references (`packet_key`, `source_ref`, `feature_id`, `feature_label`, `summary`, `embedding`, `qdrant_point_id`, `confidence_score`, `payload`, `created_at`, `updated_at`) genuinely present. The real, distinct bug: `node scripts/atlas/week1-packet-registry-backfill.mjs --dry-run` connects successfully then fails with `error: UNION types text[] and text cannot be matched` -- its `nes_base` CTE selects a bare untyped `NULL as tags` (Postgres infers `text`) to UNION against `atlas_base`'s real `tags` column, which is `text[]` on the live `atlas_packets` table (confirmed via `\\d atlas_packets`), not the type the script's author assumed. Fixable with a `NULL::text[] as tags` cast, but not worth fixing: zero callers anywhere in the repo (same grep sweep as the sibling entry above), and the working canonical `scripts/atlas/backfill-packet-registry.mjs` already covers this capability correctly. Same audit thread and resolution methodology as the sibling entry above."
+  },
+  {
+    "path": "openspec/changes/phase-2f1-real-evaluation-corpus/",
+    "archive_path": "deeds_labs/archive/2026-09-08/phase-2f1-real-evaluation-corpus-root-duplicate/",
+    "sha256": {
+      "proposal.md": "c60aa667e381f13abc2567a6efcabc0fc35345e2fce99a7eed3a3323a1d4d9e3",
+      "specs/phase-2f1-real-evaluation-corpus/spec.md": "59410f40bd33097b2a0db18efaf07f81c8e01d728b05082fcef960455020f4c0",
+      ".openspec.yaml": "a930f0a8718817146fcdd2b6ad34c3b36b3336a6f5bc0f99ff7fc07ffd517bfd"
+    },
+    "archived": "2026-09-08T00:00:00Z",
+    "reason": "Root-tree duplicate of sveltekit-frontend/openspec/changes/phase-2f1-real-evaluation-corpus/ -- the same cross-tree duplication pattern already recorded elsewhere in this manifest (audit-openspec-portfolio-v1.mjs entry above), found this time via a directory-name diff between the two OpenSpec portfolios (root: 92 change dirs, sveltekit-frontend: 14; exactly 2 exact-name overlaps, this one and the inert `archive/` directory). Both copies' `.openspec.yaml` share an identical `created: 2026-07-12` timestamp, meaning this root copy originated as a fork/copy of the sveltekit-frontend original rather than an independently-conceived duplicate. The sveltekit-frontend copy is the real, actively-implemented one: `stage: implementing`, `status: in_progress` (status.json), a 300+ line tasks.md with 6 completed task groups including real Drizzle migrations (0055_evaluation_results.sql among others) and real data population (33,398 evidence items: 23,415 AST + 5,592 routes + 3,810 tests + 581 schemas; 52 evaluation_queries; verified live against real Postgres, not just claimed), plus design.md, evidence/, and 4 separate capability spec files (deterministic-judgments, feature-envelope-contract, real-evaluation-corpus, rrf-ablations). This root copy has NO tasks.md at all (`npx openspec list` reports it as \"No tasks\"), no evidence/, no design.md, and only a single combined spec.md -- its proposal.md was edited once more on 2026-08-08 (nearly a month after the shared creation date) with substantially the same problem statement and solution shape as the sveltekit-frontend original (diffed directly, not assumed), reworded/restructured but not meaningfully advanced, and never actioned into any task file. Archived as the redundant, un-implemented duplicate; the sveltekit-frontend copy remains the canonical, in-progress change -- continue any future work there, not here."
   }
 ]

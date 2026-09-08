@@ -24,7 +24,11 @@ const fromIdx = args.indexOf('--from');
 if (fromIdx !== -1 && args[fromIdx + 1]) {
   fromFile = path.resolve(REPO_ROOT, args[fromIdx + 1]);
 }
-const DRY_RUN = args.includes('--dry-run');
+const APPLY = args.includes('--apply');
+const DRY_RUN = !APPLY;
+if (APPLY && args.includes('--dry-run')) {
+  throw new Error('Choose exactly one mode: --apply or --dry-run (default is dry-run)');
+}
 const limitIdx = args.indexOf('--limit');
 const LIMIT = limitIdx !== -1 ? Math.max(0, parseInt(args[limitIdx + 1] ?? '0', 10) || 0) : null;
 
@@ -130,7 +134,7 @@ async function main() {
         const tspInsert = await pool.query(
           `INSERT INTO task_semantic_packets (
              workspace_task_id, workspace_id, feature_id, source_ref, summary_model, summary_hash, confidence, status, agent_pickup_ready, deleted, created_at, updated_at
-           ) VALUES ($1, $2, $3, $4, $5, $6, 0.95, 'idle', true, false, now(), now()) RETURNING id`,
+           ) VALUES ($1, $2, $3, $4, $5, $6, 0.95, 'todo', true, false, now(), now()) RETURNING id`,
           [taskId, workspaceId, featureId, sourceRef, 'gemma4', summaryHash]
         );
         packetId = tspInsert.rows[0].id;

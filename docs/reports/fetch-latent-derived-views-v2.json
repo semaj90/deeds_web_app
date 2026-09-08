@@ -46,7 +46,7 @@
     "provider": "sveltekit-frontend/src/lib/server/retrieval/latent256-candidate-provider.ts",
     "candidate_fixture": "sveltekit-frontend/src/lib/server/atlas/features/candidate-feature-snapshot-v1.spec.ts"
   },
-  "contractChecksum": "sha256:a81a638cdb1f42bbbe9c187e3e88d76b39859fcc3024a316b700fce8c4efff81",
+  "contractChecksum": "sha256:422df88880abbe06ab73c72eb9580906df51f5436a1d8e4b3f3dfcb082f03669",
   "liveDatabaseReplay": "UNPROVEN",
   "candidateOrdinalParity": "UNPROVEN",
   "derivedChecksums": "UNPROVEN",

@@ -11,7 +11,9 @@ export const workspaceTasks = pgTable('workspace_tasks', {
 });
 
 export const taskSemanticPackets = pgTable('task_semantic_packets', {
-  id: serial('id').primaryKey().notNull(),
+  // Live PostgreSQL uses UUID/gen_random_uuid(); keeping this owner aligned
+  // prevents returned packet IDs from being coerced through Number(...).
+  id: uuid('id').primaryKey().notNull().defaultRandom(),
   point_kind: text('point_kind').notNull().default('task_summary'),
   packet_key: text('packet_key'),
   qdrant_point_id: text('qdrant_point_id'),

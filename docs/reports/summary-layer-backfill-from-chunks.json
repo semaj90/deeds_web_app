@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-10T18:36:17.051Z",
+  "generated_at": "2026-09-08T18:07:22.682Z",
   "mode": "dry-run",
   "status": "DRY_RUN",
   "source_table": "codebase_chunk_index",
@@ -20,8 +20,10 @@
   },
   "coverage": {
     "usable_candidate_pct": 96,
-    "packet_context_join_pct": 100,
-    "summary_context_pct": 100
+    "packet_context_join_pct": 23.44,
+    "packet_context_join_pct_of_joined_rows": 100,
+    "summary_context_pct": 23.44,
+    "summary_context_pct_of_joined_rows": 100
   },
   "sample": [
     {

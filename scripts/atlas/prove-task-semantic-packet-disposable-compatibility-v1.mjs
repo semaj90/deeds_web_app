@@ -16,7 +16,8 @@ import { fileURLToPath } from 'node:url';
 const here = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(here, '..', '..');
 const sourcePath = resolve(repoRoot, 'sveltekit-frontend', 'src/lib/server/tasks/semantic-packets.ts');
-const alignmentPath = resolve(repoRoot, 'sveltekit-frontend', 'drizzle/manual/20260606_task_semantic_packets_live_alignment.sql');
+const alignmentPath = resolve(repoRoot, 'sveltekit-frontend', 'drizzle/manual/20260908_task_semantic_packets_writer_columns_only.sql');
+const indexPath = resolve(repoRoot, 'sveltekit-frontend', 'drizzle/manual/20260908_task_semantic_packets_production_indexes.sql');
 const reportPath = resolve(repoRoot, 'docs/reports/task-semantic-packet-disposable-compatibility-v1.json');
 const suffix = `${process.pid}-${Date.now().toString(36)}`;
 const containerName = `atlas-task-semantic-packet-proof-${suffix}`;
@@ -65,9 +66,14 @@ function parseAlignmentColumns() {
   return [...sql.matchAll(/ADD COLUMN IF NOT EXISTS\s+([a-z_]+)/gi)].map((entry) => entry[1]);
 }
 
+function parseIndexNames() {
+  const sql = readFileSync(indexPath, 'utf8');
+  return [...sql.matchAll(/CREATE INDEX IF NOT EXISTS\s+([a-z_]+)/gi)].map((entry) => entry[1]);
+}
+
 const baselineSql = `
 CREATE TABLE public.task_semantic_packets (
-  id serial PRIMARY KEY,
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   packet_key text,
   source_ref text,
   feature_id text,
@@ -88,6 +94,7 @@ CREATE TABLE public.task_semantic_packets (
 
 const writerColumns = parseWriterColumns();
 const alignmentColumns = parseAlignmentColumns();
+const expectedIndexNames = parseIndexNames();
 let containerStarted = false;
 let report;
 
@@ -103,6 +110,7 @@ try {
 
   psql(baselineSql);
   psql(readFileSync(alignmentPath, 'utf8'));
+  psql(readFileSync(indexPath, 'utf8'));
   const columns = psql(`SELECT column_name FROM information_schema.columns WHERE table_schema='public' AND table_name='task_semantic_packets' ORDER BY ordinal_position;`)
     .split('\n').map((value) => value.trim()).filter(Boolean);
   const present = new Set(columns);
@@ -110,10 +118,35 @@ try {
   const migrationCoverageGap = writerColumns.filter((column) => !alignmentColumns.includes(column) && ![
     'id', 'packet_key', 'source_ref', 'feature_id', 'feature_label', 'alias_id', 'created_at', 'updated_at',
   ].includes(column));
+  const indexNames = psql(`SELECT indexname FROM pg_indexes WHERE schemaname='public' AND tablename='task_semantic_packets' ORDER BY indexname;`)
+    .split('\n').map((value) => value.trim()).filter(Boolean);
+  const missingExpectedIndexes = expectedIndexNames.filter((name) => !indexNames.includes(name));
+
+  const probeId = psql(`
+    INSERT INTO public.task_semantic_packets (
+      packet_key, source_ref, feature_id, feature_label, alias_id,
+      point_kind, qdrant_point_id, workspace_id, workspace_task_id,
+      file_path, semantic_path, related_feature_ids, related_task_ids,
+      related_file_paths, cluster_id, centroid_id, parent_centroid_id,
+      summary_llm, summary_model, next_action, summary_hash, confidence,
+      status, agent_pickup_ready, deleted
+    ) VALUES (
+      'proof:packet:1', 'proof:source:1', 'proof-feature', 'Proof feature', 'proof-alias',
+      'task_summary', 'proof-qdrant-point', 'proof-workspace', NULL,
+      'proof.ts', '[]'::jsonb, '[]'::jsonb, '[]'::jsonb, '[]'::jsonb,
+      NULL, NULL, NULL, 'proof summary', 'proof-model', 'verify',
+      '${sha256('proof summary')}', '0.9000', 'todo', false, false
+    ) RETURNING id;
+  `);
+  const readback = psql(`
+    SELECT id::text, packet_key, point_kind, status, agent_pickup_ready, deleted
+    FROM public.task_semantic_packets
+    WHERE id = '${probeId}';
+  `);
 
   report = {
     schema: 'atlas.task-semantic-packet-disposable-compatibility.v1',
-    status: missingAfterAlignment.length === 0 ? 'PROVEN' : 'BLOCKED_MIGRATION_INCOMPLETE',
+    status: missingAfterAlignment.length === 0 && missingExpectedIndexes.length === 0 ? 'PROVEN' : 'BLOCKED_MIGRATION_INCOMPLETE',
     writesPerformed: false,
     disposableContainer: true,
     baselineColumnCount: 16,
@@ -123,9 +156,20 @@ try {
     columnsAfterAlignment: columns,
     missingAfterAlignment,
     migrationCoverageGap,
+    expectedIndexNames,
+    indexesAfterAlignment: indexNames,
+    missingExpectedIndexes,
+    disposableInsertReadback: {
+      performed: true,
+      rowCount: readback ? 1 : 0,
+      returnedId: probeId,
+      row: readback ? readback.split('|') : [],
+      productionWritesPerformed: false,
+    },
     sourceChecksums: {
       writerSource: sha256(readFileSync(sourcePath, 'utf8')),
       alignmentSql: sha256(readFileSync(alignmentPath, 'utf8')),
+      indexSql: sha256(readFileSync(indexPath, 'utf8')),
     },
     reportPath,
   };

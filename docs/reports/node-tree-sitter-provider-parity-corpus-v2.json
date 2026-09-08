@@ -1,16 +1,16 @@
 {
   "schema": "atlas.node-tree-sitter-corpus-parity.v2",
-  "generatedAt": "2026-09-08T04:00:50.559Z",
+  "generatedAt": "2026-09-08T19:25:34.839Z",
   "mode": "READ_ONLY_NO_PERSISTENCE",
   "status": "CORPUS_PARITY_MISMATCH",
   "git": {
-    "head": "a55904a75e944ad85d1db449bbbde2d3bfbc8e74",
+    "head": "ec2f544a2bfa26a825de69d9af9ce846647fc3da",
     "providerPath": "sveltekit-frontend/src/lib/server/atlas/indexing/node-tree-sitter-ast-provider.ts",
     "providerBlobSha": "3a0e758956f2aa6371a2f0b9b03867ca0ca1e6bb",
     "sidecarPath": "python/miniforge_nlp_sidecar_v2.py",
     "sidecarBlobSha": "7330acce0d140a832951382aa6bffa476b7dfc13",
     "comparatorPath": "sveltekit-frontend/src/lib/server/atlas/indexing/structural-parity-comparator-v2.ts",
-    "comparatorBlobSha": "3e63746e2aedff7f8837cf3a72b8231827a19039"
+    "comparatorBlobSha": "8143dac83bff2ebe772de8fa95d5c5a65a50b5dd"
   },
   "corpus": {
     "root": "sveltekit-frontend/src",
@@ -23,14 +23,14 @@
     "sourceBytesFrozen": "66/66",
     "nodeSpanSelfValid": "66/66",
     "sidecarSpanSelfValid": "66/66",
-    "namedSymbolCoverage": "50/66",
-    "semanticKindParity": "47/66",
-    "exactSpanParity": "50/66",
-    "fullParity": "47/66"
+    "namedSymbolCoverage": "53/66",
+    "semanticKindParity": "50/66",
+    "exactSpanParity": "53/66",
+    "fullParity": "50/66"
   },
   "mismatchCounts": {
     "SEMANTIC_KIND_UNKNOWN_BOTH": 4,
-    "NAMED_SYMBOL_MISSING_RIGHT": 43
+    "NAMED_SYMBOL_MISSING_RIGHT": 37
   },
   "interpretation": {
     "fragmentIsNotVariable": true,
@@ -220,6 +220,10 @@
         ],
         "mismatchCounts": {
           "SEMANTIC_KIND_UNKNOWN_BOTH": 1
+        },
+        "unmatchedScopeCounts": {
+          "left": {},
+          "right": {}
         },
         "gates": {
           "leftSpanSelfValid": true,
@@ -849,6 +853,10 @@
         ],
         "mismatchCounts": {
           "SEMANTIC_KIND_UNKNOWN_BOTH": 2
+        },
+        "unmatchedScopeCounts": {
+          "left": {},
+          "right": {}
         },
         "gates": {
           "leftSpanSelfValid": true,
@@ -2175,6 +2183,10 @@
           }
         ],
         "mismatchCounts": {},
+        "unmatchedScopeCounts": {
+          "left": {},
+          "right": {}
+        },
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
@@ -2236,68 +2248,10 @@
       },
       "comparison": {
         "schema": "atlas.structural-parity-comparison.v2",
-        "leftNamedCount": 6,
+        "leftNamedCount": 3,
         "rightNamedCount": 3,
         "pairedCount": 3,
-        "unmatchedLeft": [
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "export_statement",
-            "rawKind": "EXPORT",
-            "symbolKind": "UNKNOWN",
-            "name": "mod",
-            "startByte": 177,
-            "endByte": 196,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "ambient_declaration",
-              "module",
-              "statement_block"
-            ],
-            "parentContext": "statement_block"
-          },
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "export_statement",
-            "rawKind": "EXPORT",
-            "symbolKind": "UNKNOWN",
-            "name": "mod",
-            "startByte": 267,
-            "endByte": 286,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "ambient_declaration",
-              "module",
-              "statement_block"
-            ],
-            "parentContext": "statement_block"
-          },
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "export_statement",
-            "rawKind": "EXPORT",
-            "symbolKind": "UNKNOWN",
-            "name": "value",
-            "startByte": 343,
-            "endByte": 364,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "ambient_declaration",
-              "module",
-              "statement_block"
-            ],
-            "parentContext": "statement_block"
-          }
-        ],
+        "unmatchedLeft": [],
         "unmatchedRight": [],
         "pairs": [
           {
@@ -2439,15 +2393,17 @@
             "mismatchClasses": []
           }
         ],
-        "mismatchCounts": {
-          "NAMED_SYMBOL_MISSING_RIGHT": 3
+        "mismatchCounts": {},
+        "unmatchedScopeCounts": {
+          "left": {},
+          "right": {}
         },
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
-          "namedSymbolCoverage": false,
-          "semanticKindParity": false,
-          "exactSpanParity": false
+          "namedSymbolCoverage": true,
+          "semanticKindParity": true,
+          "exactSpanParity": true
         }
       },
       "gates": {
@@ -2455,11 +2411,11 @@
         "sourceBytesFrozen": true,
         "nodeSpanSelfValid": true,
         "sidecarSpanSelfValid": true,
-        "namedSymbolCoverage": false,
-        "semanticKindParity": false,
-        "exactSpanParity": false
+        "namedSymbolCoverage": true,
+        "semanticKindParity": true,
+        "exactSpanParity": true
       },
-      "fullParity": false
+      "fullParity": true
     },
     {
       "sourceRef": "sveltekit-frontend/src/env.d.ts",
@@ -2583,6 +2539,10 @@
           }
         ],
         "mismatchCounts": {},
+        "unmatchedScopeCounts": {
+          "left": {},
+          "right": {}
+        },
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
@@ -2705,49 +2665,10 @@
       },
       "comparison": {
         "schema": "atlas.structural-parity-comparison.v2",
-        "leftNamedCount": 19,
+        "leftNamedCount": 17,
         "rightNamedCount": 17,
         "pairedCount": 17,
-        "unmatchedLeft": [
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "export_statement",
-            "rawKind": "EXPORT",
-            "symbolKind": "UNKNOWN",
-            "name": "component",
-            "startByte": 2429,
-            "endByte": 2454,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "ambient_declaration",
-              "module",
-              "statement_block"
-            ],
-            "parentContext": "statement_block"
-          },
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "export_statement",
-            "rawKind": "EXPORT",
-            "symbolKind": "UNKNOWN",
-            "name": "content",
-            "startByte": 1150,
-            "endByte": 1167,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "ambient_declaration",
-              "module",
-              "statement_block"
-            ],
-            "parentContext": "statement_block"
-          }
-        ],
+        "unmatchedLeft": [],
         "unmatchedRight": [],
         "pairs": [
           {
@@ -3537,15 +3458,17 @@
             "mismatchClasses": []
           }
         ],
-        "mismatchCounts": {
-          "NAMED_SYMBOL_MISSING_RIGHT": 2
+        "mismatchCounts": {},
+        "unmatchedScopeCounts": {
+          "left": {},
+          "right": {}
         },
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
-          "namedSymbolCoverage": false,
-          "semanticKindParity": false,
-          "exactSpanParity": false
+          "namedSymbolCoverage": true,
+          "semanticKindParity": true,
+          "exactSpanParity": true
         }
       },
       "gates": {
@@ -3553,11 +3476,11 @@
         "sourceBytesFrozen": true,
         "nodeSpanSelfValid": true,
         "sidecarSpanSelfValid": true,
-        "namedSymbolCoverage": false,
-        "semanticKindParity": false,
-        "exactSpanParity": false
+        "namedSymbolCoverage": true,
+        "semanticKindParity": true,
+        "exactSpanParity": true
       },
-      "fullParity": false
+      "fullParity": true
     },
     {
       "sourceRef": "sveltekit-frontend/src/hooks.client.ts",
@@ -4227,6 +4150,10 @@
           }
         ],
         "mismatchCounts": {},
+        "unmatchedScopeCounts": {
+          "left": {},
+          "right": {}
+        },
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
@@ -9087,6 +9014,13 @@
         "mismatchCounts": {
           "NAMED_SYMBOL_MISSING_RIGHT": 2
         },
+        "unmatchedScopeCounts": {
+          "left": {
+            "OTHER": 1,
+            "NESTED_DECLARATION": 1
+          },
+          "right": {}
+        },
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
@@ -9345,6 +9279,10 @@
           }
         ],
         "mismatchCounts": {},
+        "unmatchedScopeCounts": {
+          "left": {},
+          "right": {}
+        },
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
@@ -9969,6 +9907,10 @@
           }
         ],
         "mismatchCounts": {},
+        "unmatchedScopeCounts": {
+          "left": {},
+          "right": {}
+        },
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
@@ -10024,6 +9966,10 @@
         "unmatchedRight": [],
         "pairs": [],
         "mismatchCounts": {},
+        "unmatchedScopeCounts": {
+          "left": {},
+          "right": {}
+        },
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
@@ -11373,6 +11319,10 @@
           }
         ],
         "mismatchCounts": {},
+        "unmatchedScopeCounts": {
+          "left": {},
+          "right": {}
+        },
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
@@ -12141,6 +12091,10 @@
           }
         ],
         "mismatchCounts": {},
+        "unmatchedScopeCounts": {
+          "left": {},
+          "right": {}
+        },
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
@@ -12284,6 +12238,10 @@
           }
         ],
         "mismatchCounts": {},
+        "unmatchedScopeCounts": {
+          "left": {},
+          "right": {}
+        },
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
@@ -12781,6 +12739,10 @@
           }
         ],
         "mismatchCounts": {},
+        "unmatchedScopeCounts": {
+          "left": {},
+          "right": {}
+        },
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
@@ -13317,6 +13279,10 @@
           }
         ],
         "mismatchCounts": {},
+        "unmatchedScopeCounts": {
+          "left": {},
+          "right": {}
+        },
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
@@ -13433,6 +13399,10 @@
           }
         ],
         "mismatchCounts": {},
+        "unmatchedScopeCounts": {
+          "left": {},
+          "right": {}
+        },
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
@@ -13751,6 +13721,10 @@
           }
         ],
         "mismatchCounts": {},
+        "unmatchedScopeCounts": {
+          "left": {},
+          "right": {}
+        },
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
@@ -14527,6 +14501,10 @@
           }
         ],
         "mismatchCounts": {},
+        "unmatchedScopeCounts": {
+          "left": {},
+          "right": {}
+        },
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
@@ -14850,6 +14828,12 @@
         ],
         "mismatchCounts": {
           "NAMED_SYMBOL_MISSING_RIGHT": 1
+        },
+        "unmatchedScopeCounts": {
+          "left": {
+            "NESTED_DECLARATION": 1
+          },
+          "right": {}
         },
         "gates": {
           "leftSpanSelfValid": true,
@@ -15301,6 +15285,12 @@
         "mismatchCounts": {
           "NAMED_SYMBOL_MISSING_RIGHT": 1
         },
+        "unmatchedScopeCounts": {
+          "left": {
+            "NESTED_DECLARATION": 1
+          },
+          "right": {}
+        },
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
@@ -15751,6 +15741,10 @@
           }
         ],
         "mismatchCounts": {},
+        "unmatchedScopeCounts": {
+          "left": {},
+          "right": {}
+        },
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
@@ -16222,6 +16216,10 @@
           }
         ],
         "mismatchCounts": {},
+        "unmatchedScopeCounts": {
+          "left": {},
+          "right": {}
+        },
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
@@ -16707,6 +16705,10 @@
           }
         ],
         "mismatchCounts": {},
+        "unmatchedScopeCounts": {
+          "left": {},
+          "right": {}
+        },
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
@@ -20861,6 +20863,10 @@
           }
         ],
         "mismatchCounts": {},
+        "unmatchedScopeCounts": {
+          "left": {},
+          "right": {}
+        },
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
@@ -20971,6 +20977,10 @@
           }
         ],
         "mismatchCounts": {},
+        "unmatchedScopeCounts": {
+          "left": {},
+          "right": {}
+        },
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
@@ -21156,6 +21166,10 @@
           }
         ],
         "mismatchCounts": {},
+        "unmatchedScopeCounts": {
+          "left": {},
+          "right": {}
+        },
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
@@ -25134,6 +25148,12 @@
         ],
         "mismatchCounts": {
           "NAMED_SYMBOL_MISSING_RIGHT": 4
+        },
+        "unmatchedScopeCounts": {
+          "left": {
+            "NESTED_DECLARATION": 4
+          },
+          "right": {}
         },
         "gates": {
           "leftSpanSelfValid": true,
@@ -29293,6 +29313,10 @@
           }
         ],
         "mismatchCounts": {},
+        "unmatchedScopeCounts": {
+          "left": {},
+          "right": {}
+        },
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
@@ -32419,6 +32443,12 @@
         "mismatchCounts": {
           "NAMED_SYMBOL_MISSING_RIGHT": 3
         },
+        "unmatchedScopeCounts": {
+          "left": {
+            "NESTED_DECLARATION": 3
+          },
+          "right": {}
+        },
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
@@ -33336,6 +33366,10 @@
           }
         ],
         "mismatchCounts": {},
+        "unmatchedScopeCounts": {
+          "left": {},
+          "right": {}
+        },
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
@@ -35552,6 +35586,12 @@
         ],
         "mismatchCounts": {
           "NAMED_SYMBOL_MISSING_RIGHT": 5
+        },
+        "unmatchedScopeCounts": {
+          "left": {
+            "NESTED_DECLARATION": 5
+          },
+          "right": {}
         },
         "gates": {
           "leftSpanSelfValid": true,
@@ -38906,6 +38946,13 @@
         "mismatchCounts": {
           "NAMED_SYMBOL_MISSING_RIGHT": 13
         },
+        "unmatchedScopeCounts": {
+          "left": {
+            "NESTED_DECLARATION": 12,
+            "OTHER": 1
+          },
+          "right": {}
+        },
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
@@ -40180,6 +40227,10 @@
           }
         ],
         "mismatchCounts": {},
+        "unmatchedScopeCounts": {
+          "left": {},
+          "right": {}
+        },
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
@@ -41581,6 +41632,10 @@
           }
         ],
         "mismatchCounts": {},
+        "unmatchedScopeCounts": {
+          "left": {},
+          "right": {}
+        },
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
@@ -43295,6 +43350,10 @@
           }
         ],
         "mismatchCounts": {},
+        "unmatchedScopeCounts": {
+          "left": {},
+          "right": {}
+        },
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
@@ -45544,6 +45603,10 @@
           }
         ],
         "mismatchCounts": {},
+        "unmatchedScopeCounts": {
+          "left": {},
+          "right": {}
+        },
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
@@ -46414,6 +46477,12 @@
         ],
         "mismatchCounts": {
           "NAMED_SYMBOL_MISSING_RIGHT": 1
+        },
+        "unmatchedScopeCounts": {
+          "left": {
+            "NESTED_DECLARATION": 1
+          },
+          "right": {}
         },
         "gates": {
           "leftSpanSelfValid": true,
@@ -48768,6 +48837,10 @@
           }
         ],
         "mismatchCounts": {},
+        "unmatchedScopeCounts": {
+          "left": {},
+          "right": {}
+        },
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
@@ -49198,6 +49271,10 @@
           }
         ],
         "mismatchCounts": {},
+        "unmatchedScopeCounts": {
+          "left": {},
+          "right": {}
+        },
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
@@ -49616,6 +49693,10 @@
           }
         ],
         "mismatchCounts": {},
+        "unmatchedScopeCounts": {
+          "left": {},
+          "right": {}
+        },
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
@@ -52576,6 +52657,10 @@
           }
         ],
         "mismatchCounts": {},
+        "unmatchedScopeCounts": {
+          "left": {},
+          "right": {}
+        },
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
@@ -54334,6 +54419,10 @@
           }
         ],
         "mismatchCounts": {},
+        "unmatchedScopeCounts": {
+          "left": {},
+          "right": {}
+        },
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
@@ -55311,6 +55400,10 @@
           }
         ],
         "mismatchCounts": {},
+        "unmatchedScopeCounts": {
+          "left": {},
+          "right": {}
+        },
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
@@ -55504,6 +55597,10 @@
           }
         ],
         "mismatchCounts": {},
+        "unmatchedScopeCounts": {
+          "left": {},
+          "right": {}
+        },
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
@@ -57870,6 +57967,10 @@
           }
         ],
         "mismatchCounts": {},
+        "unmatchedScopeCounts": {
+          "left": {},
+          "right": {}
+        },
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
@@ -58019,6 +58120,10 @@
         ],
         "mismatchCounts": {
           "SEMANTIC_KIND_UNKNOWN_BOTH": 1
+        },
+        "unmatchedScopeCounts": {
+          "left": {},
+          "right": {}
         },
         "gates": {
           "leftSpanSelfValid": true,
@@ -59878,6 +59983,12 @@
         "mismatchCounts": {
           "NAMED_SYMBOL_MISSING_RIGHT": 1
         },
+        "unmatchedScopeCounts": {
+          "left": {
+            "NESTED_DECLARATION": 1
+          },
+          "right": {}
+        },
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
@@ -60225,6 +60336,10 @@
           }
         ],
         "mismatchCounts": {},
+        "unmatchedScopeCounts": {
+          "left": {},
+          "right": {}
+        },
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
@@ -61755,6 +61870,10 @@
           }
         ],
         "mismatchCounts": {},
+        "unmatchedScopeCounts": {
+          "left": {},
+          "right": {}
+        },
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
@@ -62962,6 +63081,12 @@
         ],
         "mismatchCounts": {
           "NAMED_SYMBOL_MISSING_RIGHT": 1
+        },
+        "unmatchedScopeCounts": {
+          "left": {
+            "NESTED_DECLARATION": 1
+          },
+          "right": {}
         },
         "gates": {
           "leftSpanSelfValid": true,
@@ -65113,6 +65238,12 @@
         "mismatchCounts": {
           "NAMED_SYMBOL_MISSING_RIGHT": 3
         },
+        "unmatchedScopeCounts": {
+          "left": {
+            "NESTED_DECLARATION": 3
+          },
+          "right": {}
+        },
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
@@ -65768,6 +65899,10 @@
           }
         ],
         "mismatchCounts": {},
+        "unmatchedScopeCounts": {
+          "left": {},
+          "right": {}
+        },
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
@@ -66008,6 +66143,10 @@
           }
         ],
         "mismatchCounts": {},
+        "unmatchedScopeCounts": {
+          "left": {},
+          "right": {}
+        },
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
@@ -66193,6 +66332,10 @@
           }
         ],
         "mismatchCounts": {},
+        "unmatchedScopeCounts": {
+          "left": {},
+          "right": {}
+        },
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
@@ -67932,6 +68075,12 @@
         "mismatchCounts": {
           "NAMED_SYMBOL_MISSING_RIGHT": 1
         },
+        "unmatchedScopeCounts": {
+          "left": {
+            "NESTED_DECLARATION": 1
+          },
+          "right": {}
+        },
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
@@ -67995,27 +68144,10 @@
       },
       "comparison": {
         "schema": "atlas.structural-parity-comparison.v2",
-        "leftNamedCount": 10,
+        "leftNamedCount": 9,
         "rightNamedCount": 9,
         "pairedCount": 9,
-        "unmatchedLeft": [
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "export_statement",
-            "rawKind": "EXPORT",
-            "symbolKind": "UNKNOWN",
-            "name": "db",
-            "startByte": 2261,
-            "endByte": 2279,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program"
-            ],
-            "parentContext": "program"
-          }
-        ],
+        "unmatchedLeft": [],
         "unmatchedRight": [],
         "pairs": [
           {
@@ -68413,15 +68545,17 @@
             "mismatchClasses": []
           }
         ],
-        "mismatchCounts": {
-          "NAMED_SYMBOL_MISSING_RIGHT": 1
+        "mismatchCounts": {},
+        "unmatchedScopeCounts": {
+          "left": {},
+          "right": {}
         },
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
-          "namedSymbolCoverage": false,
-          "semanticKindParity": false,
-          "exactSpanParity": false
+          "namedSymbolCoverage": true,
+          "semanticKindParity": true,
+          "exactSpanParity": true
         }
       },
       "gates": {
@@ -68429,11 +68563,11 @@
         "sourceBytesFrozen": true,
         "nodeSpanSelfValid": true,
         "sidecarSpanSelfValid": true,
-        "namedSymbolCoverage": false,
-        "semanticKindParity": false,
-        "exactSpanParity": false
+        "namedSymbolCoverage": true,
+        "semanticKindParity": true,
+        "exactSpanParity": true
       },
-      "fullParity": false
+      "fullParity": true
     },
     {
       "sourceRef": "sveltekit-frontend/src/lib/client/live-agent-visuals.svelte.ts",
@@ -69069,6 +69203,10 @@
           }
         ],
         "mismatchCounts": {},
+        "unmatchedScopeCounts": {
+          "left": {},
+          "right": {}
+        },
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
@@ -72233,6 +72371,10 @@
           }
         ],
         "mismatchCounts": {},
+        "unmatchedScopeCounts": {
+          "left": {},
+          "right": {}
+        },
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
@@ -72433,6 +72575,10 @@
           }
         ],
         "mismatchCounts": {},
+        "unmatchedScopeCounts": {
+          "left": {},
+          "right": {}
+        },
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
@@ -72583,6 +72729,10 @@
           }
         ],
         "mismatchCounts": {},
+        "unmatchedScopeCounts": {
+          "left": {},
+          "right": {}
+        },
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
@@ -73393,6 +73543,10 @@
           }
         ],
         "mismatchCounts": {},
+        "unmatchedScopeCounts": {
+          "left": {},
+          "right": {}
+        },
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
@@ -74235,6 +74389,10 @@
           }
         ],
         "mismatchCounts": {},
+        "unmatchedScopeCounts": {
+          "left": {},
+          "right": {}
+        },
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
@@ -74985,6 +75143,12 @@
         "mismatchCounts": {
           "NAMED_SYMBOL_MISSING_RIGHT": 1
         },
+        "unmatchedScopeCounts": {
+          "left": {
+            "NESTED_DECLARATION": 1
+          },
+          "right": {}
+        },
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
@@ -75471,6 +75635,10 @@
           }
         ],
         "mismatchCounts": {},
+        "unmatchedScopeCounts": {
+          "left": {},
+          "right": {}
+        },
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
@@ -76175,6 +76343,10 @@
           }
         ],
         "mismatchCounts": {},
+        "unmatchedScopeCounts": {
+          "left": {},
+          "right": {}
+        },
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,

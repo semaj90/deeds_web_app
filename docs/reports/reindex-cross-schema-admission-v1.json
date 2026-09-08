@@ -1,0 +1,2412 @@
+{
+  "schema": "atlas.reindex-cross-schema-admission.v1",
+  "generatedAt": "2026-09-08T21:16:02.447Z",
+  "mode": "READ_ONLY_PLAN",
+  "writesPerformed": false,
+  "authority": "PostgreSQL canonical metadata and source/revision joins",
+  "identityModel": {
+    "treeNodeId": "parse occurrence / provenance coordinate",
+    "symbolId": "stable logical symbol",
+    "symbolVersionId": "revision-bound symbol identity",
+    "chunkId": "retrieval chunk identity",
+    "packetKey": "canonical packet identity",
+    "graphNodeKey": "derived graph projection identity"
+  },
+  "admissionModel": {
+    "sources": [
+      {
+        "sourceRef": "crates/atlas_packet_parser/build.rs",
+        "sourceRevision": "sha256:aa7d2ac01ee024deb2df8891a498123bb7c15d9303fb767f6085a9aac92f0d4f",
+        "contentChecksum": "d28db26ef14292e8d2dbd6206545b551cd81862bdc55c38ef4bd0ad32f5937f6"
+      },
+      {
+        "sourceRef": "crates/atlas_packet_parser/Cargo.toml",
+        "sourceRevision": "sha256:fb7c517edecc838e066c2cd04b41e9e60975d0f4c915faef4ebe9d654334c068",
+        "contentChecksum": "c769e34fd7331e08982cd0341d5f583bfd19ed38c903c1fb60e4bb209b842594"
+      },
+      {
+        "sourceRef": "crates/atlas_packet_parser/index.d.ts",
+        "sourceRevision": "sha256:0e7602dfb459b9ac3c51f34542f7461bbd9d6fc073de96b106740680ec671733",
+        "contentChecksum": "102cc8a1f37c18650ee09e94d43f0781c6391f64477ff20e9ba80330991b2137"
+      },
+      {
+        "sourceRef": "crates/atlas_packet_parser/package.json",
+        "sourceRevision": "sha256:da4e8e5a20040ddec287d85c871667b6dee636df1a4dda2a3c81d70640300830",
+        "contentChecksum": "e50467d7037af4958606fc43664908b447a7158f4abc5a767dfcbd7672ef3b89"
+      },
+      {
+        "sourceRef": "crates/atlas_packet_parser/wrapper.d.ts",
+        "sourceRevision": "sha256:2821d678d3eb726b3a3fc3388d8907197db0e1a99e2cd70cf6c77d7782e38c50",
+        "contentChecksum": "ebe19262fdaeae74a73f5b23171ea7a669551a6fa5f1ab88d66f195b5f9cc457"
+      },
+      {
+        "sourceRef": "crates/atlas_packet_parser/wrapper.js",
+        "sourceRevision": "sha256:7d127f6ad38bf4fea345831f0afd0c4f7f5d2afdbebcc505b95191af6994f484",
+        "contentChecksum": "4dfc057b71ba76d7d7e384b4edb87e8639b36b23db070408f3b0ce88eeae6ae7"
+      },
+      {
+        "sourceRef": "crates/omni-bridge/build.rs",
+        "sourceRevision": "sha256:a6e6f76185b8d0bc2849c53c1af9f0bc16771dfc03c878797215c275f430acc9",
+        "contentChecksum": "0d97c70ef825aeb29c339669e4d5ae5db298efb23d1dbffd2e2b4fa4b72d344f"
+      },
+      {
+        "sourceRef": "crates/turbovec-napi/build.rs",
+        "sourceRevision": "sha256:aa7d2ac01ee024deb2df8891a498123bb7c15d9303fb767f6085a9aac92f0d4f",
+        "contentChecksum": "59469232b741939e8bcc63e04bbf9ed30f4822593d4b1c802f2425c490284534"
+      },
+      {
+        "sourceRef": "crates/turbovec-napi/package.json",
+        "sourceRevision": "sha256:fdca83ec264edd7f987c60bbe1993bbdfa0ef0d51ceb17873f9f54780dab3b5a",
+        "contentChecksum": "cf3c54b0804782245bd42a9dab54ceebbeffba3c2f4619b869c209df0d4d0691"
+      },
+      {
+        "sourceRef": "crates/turbovec-napi/wrapper.js",
+        "sourceRevision": "sha256:7eab75bf1fce68e8672b405ca64db4bb62159d5e4660b80e240f88c1f0435d56",
+        "contentChecksum": "6c7db5ed2cea58a79e091eb6084a96b0841a78ba1e82836c4cedf96988df90a1"
+      },
+      {
+        "sourceRef": "docs/ai-os/atlas-retry-index.json",
+        "sourceRevision": "sha256:7b0b603adcefed1df8ca784fb55c3ddf90439c4268aa841d9198751441a71628",
+        "contentChecksum": "48063b7e1d991eb9e9a3ee132d90b84ab5dbc989b776f5d78a670a4ceb721119"
+      },
+      {
+        "sourceRef": "docs/architecture/couchdb-mapreduce-atlas-ingestion.md",
+        "sourceRevision": "sha256:22428ba7391697f35336a1da8b71478a70f3fd8d36bdbdb6247306c1813b3d7e",
+        "contentChecksum": "cac374fc4a0ff7f70eebcd704d606de658f0ff29eaef9b4c32fd18bcd51813ba"
+      },
+      {
+        "sourceRef": "docs/architecture/neo4j-graphrag-parent-atlas.md",
+        "sourceRevision": "sha256:d9d704dd555a3163fe7fa68c84bcb3dbded2c9fdc561aaaa85db880365715cfe",
+        "contentChecksum": "8b3241aa03573fe1abcacd9338fa2964907ba69f72f7eb311cfedaf863ec3d3e"
+      },
+      {
+        "sourceRef": "docs/atlas/cluster-cards.json",
+        "sourceRevision": "sha256:dfedffa0dace728095fb8f1d30e2d0d84806feb0f820187f271b68f7dcd0beb6",
+        "contentChecksum": "800478665d96e762df3006ae1f1093db1285c46a1fef95ed506f9517e9e3cc1e"
+      },
+      {
+        "sourceRef": "docs/atlas/native-gemm-deferral.md",
+        "sourceRevision": "sha256:54bbcac440335b02c62a9af09888810b763bf3b3129eee31ea740a541979f384",
+        "contentChecksum": "d457dee771e63bf6169286606506988217bb909a49ac4afd97a60aedf9705334"
+      },
+      {
+        "sourceRef": "packages/atlas-core/src/cli.ts",
+        "sourceRevision": "sha256:496a7cc81264603ce3bfc5c1e4edc0ddad65718963ad31810fb4c632bfcd29b3",
+        "contentChecksum": "966f78e705b84e142211bc96447c8dff2652192cd18bfffb5ab3c7952cb91665"
+      },
+      {
+        "sourceRef": "packages/atlas-core/src/cli.ts",
+        "sourceRevision": "sha256:496a7cc81264603ce3bfc5c1e4edc0ddad65718963ad31810fb4c632bfcd29b3",
+        "contentChecksum": "042487e24ca81a7fbed8de0cd1907211e0e01823d73c1cedf7fa1610cf741e8f"
+      },
+      {
+        "sourceRef": "packages/atlas-core/src/cli.ts",
+        "sourceRevision": "sha256:496a7cc81264603ce3bfc5c1e4edc0ddad65718963ad31810fb4c632bfcd29b3",
+        "contentChecksum": "02ba74b57ac3b11a68da9b06d9bbbf326ca6c68b714f58eac9b18ed8275c7256"
+      },
+      {
+        "sourceRef": "packages/atlas-core/src/cli.ts",
+        "sourceRevision": "sha256:496a7cc81264603ce3bfc5c1e4edc0ddad65718963ad31810fb4c632bfcd29b3",
+        "contentChecksum": "f9de6a8a3daa3a0ed449363751f4f8cd3a9f839d94e88fcc5b133c43c5dbce36"
+      },
+      {
+        "sourceRef": "scripts/agent/startup-review.mjs",
+        "sourceRevision": "sha256:552073229503c8fa77c53358b815ba0f60fac1d87e55a2ba6b1ea50449a4a30d",
+        "contentChecksum": "57de5a29995433af576c5bc89819a578256b7256bb1959156d45a171f4e58efd"
+      },
+      {
+        "sourceRef": "scripts/agent/startup-review.mjs",
+        "sourceRevision": "sha256:552073229503c8fa77c53358b815ba0f60fac1d87e55a2ba6b1ea50449a4a30d",
+        "contentChecksum": "770300b3f24ce434e6bf02e077a36b6b084aab8e4316130f347cc07d37916bd7"
+      },
+      {
+        "sourceRef": "scripts/agent/startup-review.mjs",
+        "sourceRevision": "sha256:552073229503c8fa77c53358b815ba0f60fac1d87e55a2ba6b1ea50449a4a30d",
+        "contentChecksum": "25dbb4749e62b1119fcd1f40907fc03b2e43bed6764e1ca4bfab352ca695e823"
+      },
+      {
+        "sourceRef": "scripts/agent/startup-review.mjs",
+        "sourceRevision": "sha256:552073229503c8fa77c53358b815ba0f60fac1d87e55a2ba6b1ea50449a4a30d",
+        "contentChecksum": "b603054cf378c87ecb221e862b9f6b339a8b8c7dfac8e861b8efe3ecddc4213b"
+      },
+      {
+        "sourceRef": "scripts/agent/startup-review.mjs",
+        "sourceRevision": "sha256:552073229503c8fa77c53358b815ba0f60fac1d87e55a2ba6b1ea50449a4a30d",
+        "contentChecksum": "06536a6797c8def574a09bd986850029846b4c08c6fe483806ea5af7aa208ef8"
+      },
+      {
+        "sourceRef": "scripts/agent/startup-review.mjs",
+        "sourceRevision": "sha256:552073229503c8fa77c53358b815ba0f60fac1d87e55a2ba6b1ea50449a4a30d",
+        "contentChecksum": "7f975362ee3fa8b803d73c505eeae95e65a3510e2c36a486b523a536b8097c02"
+      }
+    ],
+    "parseNodes": [],
+    "symbols": [],
+    "packets": [],
+    "representations": [],
+    "domainSignals": {
+      "table": "feature_domain_facts",
+      "rowCount": 91658,
+      "sourceRevisionBound": 0,
+      "status": "UNQUALIFIED"
+    },
+    "ontologyTupleCandidates": {
+      "table": "atlas_ontology_linked_tuples",
+      "rowCount": 0,
+      "status": "EMPTY"
+    },
+    "graphEdgeCandidates": {
+      "table": "graphify_edges",
+      "rowCount": 0,
+      "status": "EMPTY"
+    },
+    "excluded": [
+      {
+        "reason": "missingSourceRef",
+        "count": 2392
+      },
+      {
+        "reason": "missingSourceRevision",
+        "count": 44929
+      },
+      {
+        "reason": "missingWorkspaceRevision",
+        "count": 44929
+      },
+      {
+        "reason": "missingTreeNodeId",
+        "count": 55853
+      },
+      {
+        "reason": "missingSymbolVersionId",
+        "count": 55853
+      },
+      {
+        "reason": "missingPacketKey",
+        "count": 55853
+      },
+      {
+        "reason": "semantic768Ineligible",
+        "count": 54601
+      }
+    ],
+    "ambiguous": []
+  },
+  "sourceTables": {
+    "atlas_ontology_linked_tuples": {
+      "present": true,
+      "rowCount": 0,
+      "columns": [
+        "tuple_id",
+        "schema_version",
+        "packet_key",
+        "source_ref",
+        "tree_node_id",
+        "document_id",
+        "title_id",
+        "surface_text",
+        "token_index",
+        "part_of_speech",
+        "label",
+        "label_kind",
+        "label_source",
+        "ontology_ids",
+        "concept_ids",
+        "participants",
+        "evidence_refs",
+        "relation_revision",
+        "evidence_span",
+        "confidence",
+        "evidence_state",
+        "lifecycle",
+        "provenance",
+        "producer_revision",
+        "created_at",
+        "updated_at"
+      ],
+      "columnTypes": {
+        "tuple_id": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "schema_version": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "packet_key": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "source_ref": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "tree_node_id": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "document_id": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "title_id": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "surface_text": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "token_index": {
+          "dataType": "integer",
+          "udtName": "int4"
+        },
+        "part_of_speech": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "label": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "label_kind": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "label_source": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "ontology_ids": {
+          "dataType": "ARRAY",
+          "udtName": "_text"
+        },
+        "concept_ids": {
+          "dataType": "ARRAY",
+          "udtName": "_text"
+        },
+        "participants": {
+          "dataType": "jsonb",
+          "udtName": "jsonb"
+        },
+        "evidence_refs": {
+          "dataType": "ARRAY",
+          "udtName": "_text"
+        },
+        "relation_revision": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "evidence_span": {
+          "dataType": "jsonb",
+          "udtName": "jsonb"
+        },
+        "confidence": {
+          "dataType": "real",
+          "udtName": "float4"
+        },
+        "evidence_state": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "lifecycle": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "provenance": {
+          "dataType": "jsonb",
+          "udtName": "jsonb"
+        },
+        "producer_revision": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "created_at": {
+          "dataType": "timestamp with time zone",
+          "udtName": "timestamptz"
+        },
+        "updated_at": {
+          "dataType": "timestamp with time zone",
+          "udtName": "timestamptz"
+        }
+      }
+    },
+    "atlas_packets": {
+      "present": true,
+      "rowCount": 61718,
+      "columns": [
+        "packet_id",
+        "artifact_id",
+        "packet_key",
+        "source_ref",
+        "source_ref_key",
+        "file_path",
+        "directory_path",
+        "feature_id",
+        "feature_label",
+        "community_id",
+        "concept_ids",
+        "cluster_id",
+        "embedding",
+        "payload",
+        "metadata",
+        "permissions",
+        "topology",
+        "vectors",
+        "summary",
+        "tags",
+        "byte_start",
+        "byte_end",
+        "sha256",
+        "source_kind",
+        "source_path",
+        "group_id",
+        "packet_universe",
+        "qdrant_point_id",
+        "qdrant_collection",
+        "qdrant_vector_dim",
+        "identity_lane",
+        "identity_confidence",
+        "som_cluster",
+        "som_row",
+        "som_col",
+        "som_index",
+        "kmeans_cluster",
+        "pagerank",
+        "betweenness",
+        "eigenvector",
+        "neo4j_node_id",
+        "redis_centroid_key",
+        "latent_64",
+        "reward_prior",
+        "created_at",
+        "updated_at",
+        "function_symbol",
+        "content_embedding_384",
+        "embedding_status",
+        "embedding_timestamp",
+        "extracted_entities",
+        "keywords",
+        "error_pattern",
+        "feature_group_id",
+        "domain_class",
+        "taxonomy_level",
+        "bm25_indexed_at",
+        "bm25_score",
+        "bm25_terms",
+        "packet_ulid",
+        "title_id",
+        "canonical_source_ref",
+        "page_rank_score",
+        "kmeans_cluster_id",
+        "tree_node_id",
+        "routing_hints",
+        "community_source",
+        "community_confidence",
+        "lineage_version",
+        "ledger_type",
+        "canonical",
+        "payload_backfilled_at",
+        "k_core",
+        "ngrams",
+        "trigrams",
+        "engrams",
+        "used_concepts",
+        "topolog_cluster",
+        "topolog_confidence",
+        "topolog_method",
+        "topolog_applied_at",
+        "repository_id",
+        "directory_id",
+        "file_id",
+        "module_id",
+        "symbol_id",
+        "chunk_id",
+        "recovery_lane",
+        "som_cluster_id",
+        "ontology",
+        "packet_type_test",
+        "packet_type",
+        "packet_ontology",
+        "parent_packet_key",
+        "related_packets",
+        "telemetry",
+        "embedding_eligible",
+        "summary_hash",
+        "embedding_version",
+        "embedding_claimed_at",
+        "embedding_claimed_by",
+        "feature_envelope",
+        "domain_confidence",
+        "title_generator_version",
+        "file_purpose",
+        "thoroughness",
+        "app_criticality",
+        "test_coverage_pct",
+        "file_understanding_computed_at",
+        "file_understanding_method",
+        "openspec_id",
+        "gsd_id",
+        "enrichment_updated_at",
+        "som_cell_x",
+        "som_cell_y",
+        "ast_score",
+        "community_boost",
+        "rerank_features",
+        "pagerank_score",
+        "som_distance",
+        "predicted_domain",
+        "classifier_kind",
+        "classifier_version",
+        "pagerank_raw",
+        "authority_score",
+        "workspace_id",
+        "semantic_anchor",
+        "ontology_version",
+        "content_hash",
+        "domain_memberships",
+        "primary_domain",
+        "workspace_revision",
+        "representation_revision",
+        "embedding_digest",
+        "source_representation_id",
+        "source_dimension",
+        "projection_representation_id",
+        "projection_dimension",
+        "encoder_revision",
+        "som_revision"
+      ],
+      "columnTypes": {
+        "packet_id": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "artifact_id": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "packet_key": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "source_ref": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "source_ref_key": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "file_path": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "directory_path": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "feature_id": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "feature_label": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "community_id": {
+          "dataType": "integer",
+          "udtName": "int4"
+        },
+        "concept_ids": {
+          "dataType": "ARRAY",
+          "udtName": "_text"
+        },
+        "cluster_id": {
+          "dataType": "integer",
+          "udtName": "int4"
+        },
+        "embedding": {
+          "dataType": "USER-DEFINED",
+          "udtName": "vector"
+        },
+        "payload": {
+          "dataType": "jsonb",
+          "udtName": "jsonb"
+        },
+        "metadata": {
+          "dataType": "jsonb",
+          "udtName": "jsonb"
+        },
+        "permissions": {
+          "dataType": "jsonb",
+          "udtName": "jsonb"
+        },
+        "topology": {
+          "dataType": "jsonb",
+          "udtName": "jsonb"
+        },
+        "vectors": {
+          "dataType": "jsonb",
+          "udtName": "jsonb"
+        },
+        "summary": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "tags": {
+          "dataType": "ARRAY",
+          "udtName": "_text"
+        },
+        "byte_start": {
+          "dataType": "bigint",
+          "udtName": "int8"
+        },
+        "byte_end": {
+          "dataType": "bigint",
+          "udtName": "int8"
+        },
+        "sha256": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "source_kind": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "source_path": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "group_id": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "packet_universe": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "qdrant_point_id": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "qdrant_collection": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "qdrant_vector_dim": {
+          "dataType": "integer",
+          "udtName": "int4"
+        },
+        "identity_lane": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "identity_confidence": {
+          "dataType": "double precision",
+          "udtName": "float8"
+        },
+        "som_cluster": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "som_row": {
+          "dataType": "integer",
+          "udtName": "int4"
+        },
+        "som_col": {
+          "dataType": "integer",
+          "udtName": "int4"
+        },
+        "som_index": {
+          "dataType": "integer",
+          "udtName": "int4"
+        },
+        "kmeans_cluster": {
+          "dataType": "integer",
+          "udtName": "int4"
+        },
+        "pagerank": {
+          "dataType": "real",
+          "udtName": "float4"
+        },
+        "betweenness": {
+          "dataType": "real",
+          "udtName": "float4"
+        },
+        "eigenvector": {
+          "dataType": "real",
+          "udtName": "float4"
+        },
+        "neo4j_node_id": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "redis_centroid_key": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "latent_64": {
+          "dataType": "bytea",
+          "udtName": "bytea"
+        },
+        "reward_prior": {
+          "dataType": "double precision",
+          "udtName": "float8"
+        },
+        "created_at": {
+          "dataType": "timestamp with time zone",
+          "udtName": "timestamptz"
+        },
+        "updated_at": {
+          "dataType": "timestamp with time zone",
+          "udtName": "timestamptz"
+        },
+        "function_symbol": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "content_embedding_384": {
+          "dataType": "USER-DEFINED",
+          "udtName": "vector"
+        },
+        "embedding_status": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "embedding_timestamp": {
+          "dataType": "timestamp with time zone",
+          "udtName": "timestamptz"
+        },
+        "extracted_entities": {
+          "dataType": "jsonb",
+          "udtName": "jsonb"
+        },
+        "keywords": {
+          "dataType": "ARRAY",
+          "udtName": "_text"
+        },
+        "error_pattern": {
+          "dataType": "character varying",
+          "udtName": "varchar"
+        },
+        "feature_group_id": {
+          "dataType": "character varying",
+          "udtName": "varchar"
+        },
+        "domain_class": {
+          "dataType": "character varying",
+          "udtName": "varchar"
+        },
+        "taxonomy_level": {
+          "dataType": "integer",
+          "udtName": "int4"
+        },
+        "bm25_indexed_at": {
+          "dataType": "timestamp with time zone",
+          "udtName": "timestamptz"
+        },
+        "bm25_score": {
+          "dataType": "real",
+          "udtName": "float4"
+        },
+        "bm25_terms": {
+          "dataType": "ARRAY",
+          "udtName": "_text"
+        },
+        "packet_ulid": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "title_id": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "canonical_source_ref": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "page_rank_score": {
+          "dataType": "real",
+          "udtName": "float4"
+        },
+        "kmeans_cluster_id": {
+          "dataType": "integer",
+          "udtName": "int4"
+        },
+        "tree_node_id": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "routing_hints": {
+          "dataType": "ARRAY",
+          "udtName": "_text"
+        },
+        "community_source": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "community_confidence": {
+          "dataType": "numeric",
+          "udtName": "numeric"
+        },
+        "lineage_version": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "ledger_type": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "canonical": {
+          "dataType": "boolean",
+          "udtName": "bool"
+        },
+        "payload_backfilled_at": {
+          "dataType": "timestamp with time zone",
+          "udtName": "timestamptz"
+        },
+        "k_core": {
+          "dataType": "integer",
+          "udtName": "int4"
+        },
+        "ngrams": {
+          "dataType": "ARRAY",
+          "udtName": "_text"
+        },
+        "trigrams": {
+          "dataType": "ARRAY",
+          "udtName": "_text"
+        },
+        "engrams": {
+          "dataType": "ARRAY",
+          "udtName": "_text"
+        },
+        "used_concepts": {
+          "dataType": "ARRAY",
+          "udtName": "_text"
+        },
+        "topolog_cluster": {
+          "dataType": "integer",
+          "udtName": "int4"
+        },
+        "topolog_confidence": {
+          "dataType": "real",
+          "udtName": "float4"
+        },
+        "topolog_method": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "topolog_applied_at": {
+          "dataType": "timestamp with time zone",
+          "udtName": "timestamptz"
+        },
+        "repository_id": {
+          "dataType": "uuid",
+          "udtName": "uuid"
+        },
+        "directory_id": {
+          "dataType": "uuid",
+          "udtName": "uuid"
+        },
+        "file_id": {
+          "dataType": "uuid",
+          "udtName": "uuid"
+        },
+        "module_id": {
+          "dataType": "uuid",
+          "udtName": "uuid"
+        },
+        "symbol_id": {
+          "dataType": "uuid",
+          "udtName": "uuid"
+        },
+        "chunk_id": {
+          "dataType": "uuid",
+          "udtName": "uuid"
+        },
+        "recovery_lane": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "som_cluster_id": {
+          "dataType": "integer",
+          "udtName": "int4"
+        },
+        "ontology": {
+          "dataType": "jsonb",
+          "udtName": "jsonb"
+        },
+        "packet_type_test": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "packet_type": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "packet_ontology": {
+          "dataType": "jsonb",
+          "udtName": "jsonb"
+        },
+        "parent_packet_key": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "related_packets": {
+          "dataType": "ARRAY",
+          "udtName": "_text"
+        },
+        "telemetry": {
+          "dataType": "jsonb",
+          "udtName": "jsonb"
+        },
+        "embedding_eligible": {
+          "dataType": "boolean",
+          "udtName": "bool"
+        },
+        "summary_hash": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "embedding_version": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "embedding_claimed_at": {
+          "dataType": "timestamp with time zone",
+          "udtName": "timestamptz"
+        },
+        "embedding_claimed_by": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "feature_envelope": {
+          "dataType": "jsonb",
+          "udtName": "jsonb"
+        },
+        "domain_confidence": {
+          "dataType": "double precision",
+          "udtName": "float8"
+        },
+        "title_generator_version": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "file_purpose": {
+          "dataType": "USER-DEFINED",
+          "udtName": "file_purpose_enum"
+        },
+        "thoroughness": {
+          "dataType": "USER-DEFINED",
+          "udtName": "thoroughness_enum"
+        },
+        "app_criticality": {
+          "dataType": "USER-DEFINED",
+          "udtName": "app_criticality_enum"
+        },
+        "test_coverage_pct": {
+          "dataType": "integer",
+          "udtName": "int4"
+        },
+        "file_understanding_computed_at": {
+          "dataType": "timestamp without time zone",
+          "udtName": "timestamp"
+        },
+        "file_understanding_method": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "openspec_id": {
+          "dataType": "uuid",
+          "udtName": "uuid"
+        },
+        "gsd_id": {
+          "dataType": "uuid",
+          "udtName": "uuid"
+        },
+        "enrichment_updated_at": {
+          "dataType": "timestamp without time zone",
+          "udtName": "timestamp"
+        },
+        "som_cell_x": {
+          "dataType": "integer",
+          "udtName": "int4"
+        },
+        "som_cell_y": {
+          "dataType": "integer",
+          "udtName": "int4"
+        },
+        "ast_score": {
+          "dataType": "real",
+          "udtName": "float4"
+        },
+        "community_boost": {
+          "dataType": "real",
+          "udtName": "float4"
+        },
+        "rerank_features": {
+          "dataType": "jsonb",
+          "udtName": "jsonb"
+        },
+        "pagerank_score": {
+          "dataType": "real",
+          "udtName": "float4"
+        },
+        "som_distance": {
+          "dataType": "real",
+          "udtName": "float4"
+        },
+        "predicted_domain": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "classifier_kind": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "classifier_version": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "pagerank_raw": {
+          "dataType": "real",
+          "udtName": "float4"
+        },
+        "authority_score": {
+          "dataType": "real",
+          "udtName": "float4"
+        },
+        "workspace_id": {
+          "dataType": "character varying",
+          "udtName": "varchar"
+        },
+        "semantic_anchor": {
+          "dataType": "character varying",
+          "udtName": "varchar"
+        },
+        "ontology_version": {
+          "dataType": "character varying",
+          "udtName": "varchar"
+        },
+        "content_hash": {
+          "dataType": "character varying",
+          "udtName": "varchar"
+        },
+        "domain_memberships": {
+          "dataType": "jsonb",
+          "udtName": "jsonb"
+        },
+        "primary_domain": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "workspace_revision": {
+          "dataType": "integer",
+          "udtName": "int4"
+        },
+        "representation_revision": {
+          "dataType": "integer",
+          "udtName": "int4"
+        },
+        "embedding_digest": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "source_representation_id": {
+          "dataType": "character varying",
+          "udtName": "varchar"
+        },
+        "source_dimension": {
+          "dataType": "integer",
+          "udtName": "int4"
+        },
+        "projection_representation_id": {
+          "dataType": "character varying",
+          "udtName": "varchar"
+        },
+        "projection_dimension": {
+          "dataType": "integer",
+          "udtName": "int4"
+        },
+        "encoder_revision": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "som_revision": {
+          "dataType": "text",
+          "udtName": "text"
+        }
+      }
+    },
+    "codebase_chunk_index": {
+      "present": true,
+      "rowCount": 55853,
+      "columns": [
+        "id",
+        "qdrant_id",
+        "relative_path",
+        "symbol",
+        "kind",
+        "line_start",
+        "line_end",
+        "content_embedding",
+        "gpu_cluster",
+        "som_cluster",
+        "page_rank_score",
+        "community_id",
+        "tags",
+        "neo4j_meta",
+        "indexed_at",
+        "enriched_at",
+        "updated_at",
+        "content",
+        "cluster_summary",
+        "summary_embedding",
+        "signature_embedding",
+        "domain",
+        "language",
+        "extension",
+        "embedding_model",
+        "summary_model",
+        "summary",
+        "metadata",
+        "semantic_tags",
+        "som_bmu_row",
+        "som_bmu_col",
+        "manifold4",
+        "chunk_id",
+        "repo_id",
+        "content_hash",
+        "token_count",
+        "neo4j_gpu_cluster",
+        "output_meta",
+        "summary_embedding_384",
+        "embedding_dimension",
+        "embedding_normalized",
+        "error_embedding",
+        "source_ref",
+        "latent_64",
+        "latent64_model",
+        "latent64_meta",
+        "latent64_validated_at",
+        "latent64_msgpack",
+        "embedding_eligible",
+        "summary_hash",
+        "embedding_version",
+        "embedding_dtype",
+        "embedding_created_at",
+        "encoder_id",
+        "latent_embedding_valid",
+        "latent_embedding_validated_at",
+        "search_vector",
+        "ast_symbols",
+        "ast_imports",
+        "ast_exports",
+        "ast_facts_at",
+        "kmeans_cluster",
+        "centroid_distance",
+        "second_cluster_id",
+        "second_distance",
+        "cluster_margin",
+        "kmeans_model_version",
+        "kmeans_assigned_at",
+        "kmeans_vector_contract",
+        "kmeans384_cluster",
+        "kmeans384_distance",
+        "kmeans384_second_id",
+        "kmeans384_second_dist",
+        "kmeans384_margin",
+        "kmeans384_model_version",
+        "kmeans384_assigned_at",
+        "kmeans_distance",
+        "content_embedding_768",
+        "centroid_id",
+        "reconstruction_error",
+        "routing_tier",
+        "latent_256",
+        "latent_256_checkpoint_revision"
+      ],
+      "columnTypes": {
+        "id": {
+          "dataType": "uuid",
+          "udtName": "uuid"
+        },
+        "qdrant_id": {
+          "dataType": "character varying",
+          "udtName": "varchar"
+        },
+        "relative_path": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "symbol": {
+          "dataType": "character varying",
+          "udtName": "varchar"
+        },
+        "kind": {
+          "dataType": "character varying",
+          "udtName": "varchar"
+        },
+        "line_start": {
+          "dataType": "integer",
+          "udtName": "int4"
+        },
+        "line_end": {
+          "dataType": "integer",
+          "udtName": "int4"
+        },
+        "content_embedding": {
+          "dataType": "USER-DEFINED",
+          "udtName": "halfvec"
+        },
+        "gpu_cluster": {
+          "dataType": "integer",
+          "udtName": "int4"
+        },
+        "som_cluster": {
+          "dataType": "integer",
+          "udtName": "int4"
+        },
+        "page_rank_score": {
+          "dataType": "real",
+          "udtName": "float4"
+        },
+        "community_id": {
+          "dataType": "integer",
+          "udtName": "int4"
+        },
+        "tags": {
+          "dataType": "jsonb",
+          "udtName": "jsonb"
+        },
+        "neo4j_meta": {
+          "dataType": "jsonb",
+          "udtName": "jsonb"
+        },
+        "indexed_at": {
+          "dataType": "timestamp with time zone",
+          "udtName": "timestamptz"
+        },
+        "enriched_at": {
+          "dataType": "timestamp with time zone",
+          "udtName": "timestamptz"
+        },
+        "updated_at": {
+          "dataType": "timestamp with time zone",
+          "udtName": "timestamptz"
+        },
+        "content": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "cluster_summary": {
+          "dataType": "jsonb",
+          "udtName": "jsonb"
+        },
+        "summary_embedding": {
+          "dataType": "USER-DEFINED",
+          "udtName": "halfvec"
+        },
+        "signature_embedding": {
+          "dataType": "USER-DEFINED",
+          "udtName": "halfvec"
+        },
+        "domain": {
+          "dataType": "character varying",
+          "udtName": "varchar"
+        },
+        "language": {
+          "dataType": "character varying",
+          "udtName": "varchar"
+        },
+        "extension": {
+          "dataType": "character varying",
+          "udtName": "varchar"
+        },
+        "embedding_model": {
+          "dataType": "character varying",
+          "udtName": "varchar"
+        },
+        "summary_model": {
+          "dataType": "character varying",
+          "udtName": "varchar"
+        },
+        "summary": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "metadata": {
+          "dataType": "jsonb",
+          "udtName": "jsonb"
+        },
+        "semantic_tags": {
+          "dataType": "ARRAY",
+          "udtName": "_text"
+        },
+        "som_bmu_row": {
+          "dataType": "integer",
+          "udtName": "int4"
+        },
+        "som_bmu_col": {
+          "dataType": "integer",
+          "udtName": "int4"
+        },
+        "manifold4": {
+          "dataType": "ARRAY",
+          "udtName": "_float4"
+        },
+        "chunk_id": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "repo_id": {
+          "dataType": "uuid",
+          "udtName": "uuid"
+        },
+        "content_hash": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "token_count": {
+          "dataType": "integer",
+          "udtName": "int4"
+        },
+        "neo4j_gpu_cluster": {
+          "dataType": "integer",
+          "udtName": "int4"
+        },
+        "output_meta": {
+          "dataType": "jsonb",
+          "udtName": "jsonb"
+        },
+        "summary_embedding_384": {
+          "dataType": "USER-DEFINED",
+          "udtName": "vector"
+        },
+        "embedding_dimension": {
+          "dataType": "integer",
+          "udtName": "int4"
+        },
+        "embedding_normalized": {
+          "dataType": "boolean",
+          "udtName": "bool"
+        },
+        "error_embedding": {
+          "dataType": "USER-DEFINED",
+          "udtName": "vector"
+        },
+        "source_ref": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "latent_64": {
+          "dataType": "USER-DEFINED",
+          "udtName": "vector"
+        },
+        "latent64_model": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "latent64_meta": {
+          "dataType": "jsonb",
+          "udtName": "jsonb"
+        },
+        "latent64_validated_at": {
+          "dataType": "timestamp with time zone",
+          "udtName": "timestamptz"
+        },
+        "latent64_msgpack": {
+          "dataType": "bytea",
+          "udtName": "bytea"
+        },
+        "embedding_eligible": {
+          "dataType": "boolean",
+          "udtName": "bool"
+        },
+        "summary_hash": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "embedding_version": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "embedding_dtype": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "embedding_created_at": {
+          "dataType": "timestamp with time zone",
+          "udtName": "timestamptz"
+        },
+        "encoder_id": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "latent_embedding_valid": {
+          "dataType": "boolean",
+          "udtName": "bool"
+        },
+        "latent_embedding_validated_at": {
+          "dataType": "timestamp with time zone",
+          "udtName": "timestamptz"
+        },
+        "search_vector": {
+          "dataType": "tsvector",
+          "udtName": "tsvector"
+        },
+        "ast_symbols": {
+          "dataType": "jsonb",
+          "udtName": "jsonb"
+        },
+        "ast_imports": {
+          "dataType": "ARRAY",
+          "udtName": "_text"
+        },
+        "ast_exports": {
+          "dataType": "ARRAY",
+          "udtName": "_text"
+        },
+        "ast_facts_at": {
+          "dataType": "timestamp with time zone",
+          "udtName": "timestamptz"
+        },
+        "kmeans_cluster": {
+          "dataType": "integer",
+          "udtName": "int4"
+        },
+        "centroid_distance": {
+          "dataType": "real",
+          "udtName": "float4"
+        },
+        "second_cluster_id": {
+          "dataType": "integer",
+          "udtName": "int4"
+        },
+        "second_distance": {
+          "dataType": "real",
+          "udtName": "float4"
+        },
+        "cluster_margin": {
+          "dataType": "real",
+          "udtName": "float4"
+        },
+        "kmeans_model_version": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "kmeans_assigned_at": {
+          "dataType": "timestamp with time zone",
+          "udtName": "timestamptz"
+        },
+        "kmeans_vector_contract": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "kmeans384_cluster": {
+          "dataType": "integer",
+          "udtName": "int4"
+        },
+        "kmeans384_distance": {
+          "dataType": "real",
+          "udtName": "float4"
+        },
+        "kmeans384_second_id": {
+          "dataType": "integer",
+          "udtName": "int4"
+        },
+        "kmeans384_second_dist": {
+          "dataType": "real",
+          "udtName": "float4"
+        },
+        "kmeans384_margin": {
+          "dataType": "real",
+          "udtName": "float4"
+        },
+        "kmeans384_model_version": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "kmeans384_assigned_at": {
+          "dataType": "timestamp with time zone",
+          "udtName": "timestamptz"
+        },
+        "kmeans_distance": {
+          "dataType": "real",
+          "udtName": "float4"
+        },
+        "content_embedding_768": {
+          "dataType": "USER-DEFINED",
+          "udtName": "vector"
+        },
+        "centroid_id": {
+          "dataType": "uuid",
+          "udtName": "uuid"
+        },
+        "reconstruction_error": {
+          "dataType": "real",
+          "udtName": "float4"
+        },
+        "routing_tier": {
+          "dataType": "character varying",
+          "udtName": "varchar"
+        },
+        "latent_256": {
+          "dataType": "USER-DEFINED",
+          "udtName": "halfvec"
+        },
+        "latent_256_checkpoint_revision": {
+          "dataType": "character varying",
+          "udtName": "varchar"
+        }
+      }
+    },
+    "feature_domain_facts": {
+      "present": true,
+      "rowCount": 91658,
+      "columns": [
+        "id",
+        "packet_key",
+        "source_ref",
+        "feature_key",
+        "domain_class",
+        "domain_confidence",
+        "domain_probabilities",
+        "classifier_kind",
+        "classifier_version",
+        "model_hash",
+        "feature_contract_version",
+        "content_hash",
+        "processing_pass_id",
+        "evidence",
+        "created_at"
+      ],
+      "columnTypes": {
+        "id": {
+          "dataType": "uuid",
+          "udtName": "uuid"
+        },
+        "packet_key": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "source_ref": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "feature_key": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "domain_class": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "domain_confidence": {
+          "dataType": "real",
+          "udtName": "float4"
+        },
+        "domain_probabilities": {
+          "dataType": "jsonb",
+          "udtName": "jsonb"
+        },
+        "classifier_kind": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "classifier_version": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "model_hash": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "feature_contract_version": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "content_hash": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "processing_pass_id": {
+          "dataType": "uuid",
+          "udtName": "uuid"
+        },
+        "evidence": {
+          "dataType": "jsonb",
+          "udtName": "jsonb"
+        },
+        "created_at": {
+          "dataType": "timestamp with time zone",
+          "udtName": "timestamptz"
+        }
+      }
+    },
+    "graphify_edges": {
+      "present": true,
+      "rowCount": 0,
+      "columns": [
+        "edge_id",
+        "workspace_id",
+        "subject_symbol_id",
+        "predicate",
+        "object_symbol_id",
+        "unresolved_target",
+        "evidence_kind",
+        "evidence_span",
+        "confidence",
+        "source_revision"
+      ],
+      "columnTypes": {
+        "edge_id": {
+          "dataType": "uuid",
+          "udtName": "uuid"
+        },
+        "workspace_id": {
+          "dataType": "uuid",
+          "udtName": "uuid"
+        },
+        "subject_symbol_id": {
+          "dataType": "uuid",
+          "udtName": "uuid"
+        },
+        "predicate": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "object_symbol_id": {
+          "dataType": "uuid",
+          "udtName": "uuid"
+        },
+        "unresolved_target": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "evidence_kind": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "evidence_span": {
+          "dataType": "jsonb",
+          "udtName": "jsonb"
+        },
+        "confidence": {
+          "dataType": "real",
+          "udtName": "float4"
+        },
+        "source_revision": {
+          "dataType": "text",
+          "udtName": "text"
+        }
+      }
+    },
+    "graphify_files": {
+      "present": true,
+      "rowCount": 26014,
+      "columns": [
+        "file_id",
+        "workspace_id",
+        "source_ref",
+        "source_revision",
+        "content_hash",
+        "byte_length",
+        "language",
+        "parser_name",
+        "parser_version",
+        "parse_status",
+        "parse_error",
+        "first_seen_run_id",
+        "last_seen_run_id",
+        "code_source_revision",
+        "workspace_revision",
+        "source_revision_authority",
+        "producer_revision",
+        "git_blob_oid",
+        "created_at",
+        "updated_at"
+      ],
+      "columnTypes": {
+        "file_id": {
+          "dataType": "uuid",
+          "udtName": "uuid"
+        },
+        "workspace_id": {
+          "dataType": "uuid",
+          "udtName": "uuid"
+        },
+        "source_ref": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "source_revision": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "content_hash": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "byte_length": {
+          "dataType": "bigint",
+          "udtName": "int8"
+        },
+        "language": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "parser_name": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "parser_version": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "parse_status": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "parse_error": {
+          "dataType": "jsonb",
+          "udtName": "jsonb"
+        },
+        "first_seen_run_id": {
+          "dataType": "uuid",
+          "udtName": "uuid"
+        },
+        "last_seen_run_id": {
+          "dataType": "uuid",
+          "udtName": "uuid"
+        },
+        "code_source_revision": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "workspace_revision": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "source_revision_authority": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "producer_revision": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "git_blob_oid": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "created_at": {
+          "dataType": "timestamp with time zone",
+          "udtName": "timestamptz"
+        },
+        "updated_at": {
+          "dataType": "timestamp with time zone",
+          "udtName": "timestamptz"
+        }
+      }
+    },
+    "graphify_symbols": {
+      "present": true,
+      "rowCount": 0,
+      "columns": [
+        "symbol_id",
+        "file_id",
+        "stable_symbol_key",
+        "symbol_kind",
+        "qualified_name",
+        "parent_symbol_id",
+        "start_byte",
+        "end_byte",
+        "start_row",
+        "end_row",
+        "signature_text",
+        "source_text_hash",
+        "ast_fingerprint",
+        "metadata"
+      ],
+      "columnTypes": {
+        "symbol_id": {
+          "dataType": "uuid",
+          "udtName": "uuid"
+        },
+        "file_id": {
+          "dataType": "uuid",
+          "udtName": "uuid"
+        },
+        "stable_symbol_key": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "symbol_kind": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "qualified_name": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "parent_symbol_id": {
+          "dataType": "uuid",
+          "udtName": "uuid"
+        },
+        "start_byte": {
+          "dataType": "bigint",
+          "udtName": "int8"
+        },
+        "end_byte": {
+          "dataType": "bigint",
+          "udtName": "int8"
+        },
+        "start_row": {
+          "dataType": "integer",
+          "udtName": "int4"
+        },
+        "end_row": {
+          "dataType": "integer",
+          "udtName": "int4"
+        },
+        "signature_text": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "source_text_hash": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "ast_fingerprint": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "metadata": {
+          "dataType": "jsonb",
+          "udtName": "jsonb"
+        }
+      }
+    }
+  },
+  "census": {
+    "rowCounts": {
+      "atlas_packets": 61718,
+      "codebase_chunk_index": 55853,
+      "graphify_files": 26014,
+      "graphify_symbols": 0,
+      "graphify_edges": 0,
+      "feature_domain_facts": 91658,
+      "atlas_ontology_linked_tuples": 0,
+      "atlas_representation_records": 0
+    },
+    "semanticCohort": {
+      "total": "55853",
+      "semantic_768_eligible": "1252",
+      "source_ref_present": "53461",
+      "source_revision_present": "10924",
+      "workspace_revision_present": "10924",
+      "tree_node_id_present": "0",
+      "symbol_version_id_present": "0",
+      "packet_key_present": "0"
+    },
+    "domainSignals": {
+      "rows": "91658",
+      "distinct_domain_classes": "40",
+      "source_revision_bound": "0"
+    },
+    "ontologyTuples": {
+      "rows": "0",
+      "source_revision_bound": "0",
+      "workspace_revision_bound": "0"
+    },
+    "representations": {
+      "semantic_768_transition": {
+        "column": "content_embedding_768",
+        "present": true,
+        "nonNullRows": 1386
+      },
+      "semantic_768_populated": {
+        "column": "content_embedding",
+        "present": true,
+        "nonNullRows": 55169
+      },
+      "latent_256": {
+        "column": "latent_256",
+        "present": true,
+        "nonNullRows": 55169
+      },
+      "latent_128": {
+        "column": "latent_128",
+        "present": false,
+        "nonNullRows": 0
+      },
+      "latent_64": {
+        "column": "latent_64",
+        "present": true,
+        "nonNullRows": 1703
+      },
+      "summary_768": {
+        "column": "summary_embedding",
+        "present": true,
+        "nonNullRows": 1160
+      }
+    },
+    "localArtifacts": {
+      "currentSymbolNominations": {
+        "present": true,
+        "rows": 440,
+        "counts": {}
+      },
+      "treeBoundResolution": {
+        "present": true,
+        "rows": 353,
+        "counts": {
+          "exactRegistry": 90,
+          "exactSymbolVersion": 85,
+          "missingSymbolVersion": 5
+        }
+      },
+      "currentStructuralAst": {
+        "present": true,
+        "rows": 440,
+        "counts": {
+          "exactTreeBound": 353
+        }
+      },
+      "symbolMaterializationDryRun": {
+        "schema": "atlas.ast-symbol-version-materialization.v1",
+        "mode": "DRY_RUN",
+        "inputNominations": 440,
+        "canonicalDeclarationCandidates": 90,
+        "revisionQualifiedCandidates": 90,
+        "missingSourceRevision": 0,
+        "missingWorkspaceRevision": 0,
+        "excludedVariables": 0,
+        "skip": 0,
+        "limit": null,
+        "selectedCandidates": 90,
+        "rowsAttempted": 0,
+        "rowsInserted": 0,
+        "rowsAlreadyPresent": 0,
+        "projectionRowsUpserted": 0,
+        "databaseWrites": false,
+        "sample": [
+          {
+            "nominationId": "treesitter-chunker:0855b32e8d8980671a4304973e02761319a77cb4:anchor:content:18e3bfd572b94a4cf8489303a13d25581bc2a5dc9282ef6a40f370a16e2a0124",
+            "kind": "function",
+            "qualifiedName": "export_statement::function_declaration::getContextCachePath",
+            "sourceRef": "sveltekit-frontend/src/lib/server/ace/llm-context-cache.ts"
+          },
+          {
+            "nominationId": "treesitter-chunker:0a39c9bfffbde4ee5c833910443576924d2f31a8:anchor:content:18e3bfd572b94a4cf8489303a13d25581bc2a5dc9282ef6a40f370a16e2a0124",
+            "kind": "function",
+            "qualifiedName": "function_declaration::writeRedisContextCache",
+            "sourceRef": "sveltekit-frontend/src/lib/server/ace/llm-context-cache.ts"
+          },
+          {
+            "nominationId": "treesitter-chunker:0c59f9bf0e9f07cbf4e5873bd3979086ebc5427d:anchor:content:de9b9390076e6dd35e2591db6aadae5722a15032491ad8246e607eb46e706c71",
+            "kind": "interface",
+            "qualifiedName": "export_statement::interface_declaration::EscalationAnalysis",
+            "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/EscalationService.ts"
+          },
+          {
+            "nominationId": "treesitter-chunker:0ebadf1cf86b9fd6af7c979686ec886930acb3eb:anchor:content:de9b9390076e6dd35e2591db6aadae5722a15032491ad8246e607eb46e706c71",
+            "kind": "function",
+            "qualifiedName": "export_statement::function_declaration::getEscalationService",
+            "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/EscalationService.ts"
+          },
+          {
+            "nominationId": "treesitter-chunker:147feb64560bb30f29a17cf6e29a1aede93eacde:anchor:content:1e76394c1194114e2178c6feb776269a013d1bd7e0b539982194de2cc0ea252c",
+            "kind": "method",
+            "qualifiedName": "export_statement::class_declaration::method_definition::synthesizeFix",
+            "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/FixSynthesizer.ts"
+          },
+          {
+            "nominationId": "treesitter-chunker:1661ba078501181276108f64e3c4f41d37fb683f:anchor:content:18e3bfd572b94a4cf8489303a13d25581bc2a5dc9282ef6a40f370a16e2a0124",
+            "kind": "function",
+            "qualifiedName": "function_declaration::readPostgresContextCache",
+            "sourceRef": "sveltekit-frontend/src/lib/server/ace/llm-context-cache.ts"
+          },
+          {
+            "nominationId": "treesitter-chunker:1663b392791a958495cb72b584574da2010ed2ff:anchor:content:de9b9390076e6dd35e2591db6aadae5722a15032491ad8246e607eb46e706c71",
+            "kind": "method",
+            "qualifiedName": "export_statement::class_declaration::method_definition::getTicketsByStatus",
+            "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/EscalationService.ts"
+          },
+          {
+            "nominationId": "treesitter-chunker:18280693c578f68252cd479d7d7093d66363a140:anchor:content:efd35051d50fc241012b1f17d043199974294dd6aadfbd87409056aa5a599444",
+            "kind": "method",
+            "qualifiedName": "export_statement::class_declaration::method_definition::addError",
+            "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/ErrorClustering.ts"
+          },
+          {
+            "nominationId": "treesitter-chunker:1df57faedba5b9d5a80cea36ea82ad43d6bf3f79:anchor:content:18e3bfd572b94a4cf8489303a13d25581bc2a5dc9282ef6a40f370a16e2a0124",
+            "kind": "type",
+            "qualifiedName": "type_alias_declaration::NamedLookupSource",
+            "sourceRef": "sveltekit-frontend/src/lib/server/ace/llm-context-cache.ts"
+          },
+          {
+            "nominationId": "treesitter-chunker:1e15d6b7d5fac08e7814bbb808498563ffa912b9:anchor:content:de9b9390076e6dd35e2591db6aadae5722a15032491ad8246e607eb46e706c71",
+            "kind": "method",
+            "qualifiedName": "export_statement::class_declaration::method_definition::extractPattern",
+            "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/EscalationService.ts"
+          }
+        ],
+        "identityBridgeOutcomes": {
+          "RESOLVED": 90,
+          "UNRESOLVED": 0,
+          "AMBIGUOUS": 0
+        }
+      }
+    }
+  },
+  "candidateOrdinalMap": {
+    "order": "source_ref UTF-8 ascending, then chunk identity ascending",
+    "sampleLimit": 25,
+    "sampleRows": [
+      {
+        "candidateOrdinal": 0,
+        "chunkIdentity": "fullrepo:crates/atlas_packet_parser/build.rs:0",
+        "sourceRef": "crates/atlas_packet_parser/build.rs",
+        "sourceRevision": "sha256:aa7d2ac01ee024deb2df8891a498123bb7c15d9303fb767f6085a9aac92f0d4f",
+        "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+        "packetKey": null,
+        "treeNodeId": null,
+        "symbolVersionId": null,
+        "contentHash": "d28db26ef14292e8d2dbd6206545b551cd81862bdc55c38ef4bd0ad32f5937f6",
+        "representationRevision": null,
+        "admission": "CANDIDATE_REQUIRES_LINEAGE_CONFIRMATION"
+      },
+      {
+        "candidateOrdinal": 1,
+        "chunkIdentity": "fullrepo:crates/atlas_packet_parser/Cargo.toml:0",
+        "sourceRef": "crates/atlas_packet_parser/Cargo.toml",
+        "sourceRevision": "sha256:fb7c517edecc838e066c2cd04b41e9e60975d0f4c915faef4ebe9d654334c068",
+        "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+        "packetKey": null,
+        "treeNodeId": null,
+        "symbolVersionId": null,
+        "contentHash": "c769e34fd7331e08982cd0341d5f583bfd19ed38c903c1fb60e4bb209b842594",
+        "representationRevision": null,
+        "admission": "CANDIDATE_REQUIRES_LINEAGE_CONFIRMATION"
+      },
+      {
+        "candidateOrdinal": 2,
+        "chunkIdentity": "fullrepo:crates/atlas_packet_parser/index.d.ts:0",
+        "sourceRef": "crates/atlas_packet_parser/index.d.ts",
+        "sourceRevision": "sha256:0e7602dfb459b9ac3c51f34542f7461bbd9d6fc073de96b106740680ec671733",
+        "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+        "packetKey": null,
+        "treeNodeId": null,
+        "symbolVersionId": null,
+        "contentHash": "102cc8a1f37c18650ee09e94d43f0781c6391f64477ff20e9ba80330991b2137",
+        "representationRevision": null,
+        "admission": "CANDIDATE_REQUIRES_LINEAGE_CONFIRMATION"
+      },
+      {
+        "candidateOrdinal": 3,
+        "chunkIdentity": "fullrepo:crates/atlas_packet_parser/package.json:0",
+        "sourceRef": "crates/atlas_packet_parser/package.json",
+        "sourceRevision": "sha256:da4e8e5a20040ddec287d85c871667b6dee636df1a4dda2a3c81d70640300830",
+        "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+        "packetKey": null,
+        "treeNodeId": null,
+        "symbolVersionId": null,
+        "contentHash": "e50467d7037af4958606fc43664908b447a7158f4abc5a767dfcbd7672ef3b89",
+        "representationRevision": null,
+        "admission": "CANDIDATE_REQUIRES_LINEAGE_CONFIRMATION"
+      },
+      {
+        "candidateOrdinal": 4,
+        "chunkIdentity": "fullrepo:crates/atlas_packet_parser/wrapper.d.ts:0",
+        "sourceRef": "crates/atlas_packet_parser/wrapper.d.ts",
+        "sourceRevision": "sha256:2821d678d3eb726b3a3fc3388d8907197db0e1a99e2cd70cf6c77d7782e38c50",
+        "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+        "packetKey": null,
+        "treeNodeId": null,
+        "symbolVersionId": null,
+        "contentHash": "ebe19262fdaeae74a73f5b23171ea7a669551a6fa5f1ab88d66f195b5f9cc457",
+        "representationRevision": null,
+        "admission": "CANDIDATE_REQUIRES_LINEAGE_CONFIRMATION"
+      },
+      {
+        "candidateOrdinal": 5,
+        "chunkIdentity": "fullrepo:crates/atlas_packet_parser/wrapper.js:0",
+        "sourceRef": "crates/atlas_packet_parser/wrapper.js",
+        "sourceRevision": "sha256:7d127f6ad38bf4fea345831f0afd0c4f7f5d2afdbebcc505b95191af6994f484",
+        "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+        "packetKey": null,
+        "treeNodeId": null,
+        "symbolVersionId": null,
+        "contentHash": "4dfc057b71ba76d7d7e384b4edb87e8639b36b23db070408f3b0ce88eeae6ae7",
+        "representationRevision": null,
+        "admission": "CANDIDATE_REQUIRES_LINEAGE_CONFIRMATION"
+      },
+      {
+        "candidateOrdinal": 6,
+        "chunkIdentity": "fullrepo:crates/omni-bridge/build.rs:0",
+        "sourceRef": "crates/omni-bridge/build.rs",
+        "sourceRevision": "sha256:a6e6f76185b8d0bc2849c53c1af9f0bc16771dfc03c878797215c275f430acc9",
+        "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+        "packetKey": null,
+        "treeNodeId": null,
+        "symbolVersionId": null,
+        "contentHash": "0d97c70ef825aeb29c339669e4d5ae5db298efb23d1dbffd2e2b4fa4b72d344f",
+        "representationRevision": null,
+        "admission": "CANDIDATE_REQUIRES_LINEAGE_CONFIRMATION"
+      },
+      {
+        "candidateOrdinal": 7,
+        "chunkIdentity": "fullrepo:crates/turbovec-napi/build.rs:0",
+        "sourceRef": "crates/turbovec-napi/build.rs",
+        "sourceRevision": "sha256:aa7d2ac01ee024deb2df8891a498123bb7c15d9303fb767f6085a9aac92f0d4f",
+        "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+        "packetKey": null,
+        "treeNodeId": null,
+        "symbolVersionId": null,
+        "contentHash": "59469232b741939e8bcc63e04bbf9ed30f4822593d4b1c802f2425c490284534",
+        "representationRevision": null,
+        "admission": "CANDIDATE_REQUIRES_LINEAGE_CONFIRMATION"
+      },
+      {
+        "candidateOrdinal": 8,
+        "chunkIdentity": "fullrepo:crates/turbovec-napi/package.json:0",
+        "sourceRef": "crates/turbovec-napi/package.json",
+        "sourceRevision": "sha256:fdca83ec264edd7f987c60bbe1993bbdfa0ef0d51ceb17873f9f54780dab3b5a",
+        "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+        "packetKey": null,
+        "treeNodeId": null,
+        "symbolVersionId": null,
+        "contentHash": "cf3c54b0804782245bd42a9dab54ceebbeffba3c2f4619b869c209df0d4d0691",
+        "representationRevision": null,
+        "admission": "CANDIDATE_REQUIRES_LINEAGE_CONFIRMATION"
+      },
+      {
+        "candidateOrdinal": 9,
+        "chunkIdentity": "fullrepo:crates/turbovec-napi/wrapper.js:0",
+        "sourceRef": "crates/turbovec-napi/wrapper.js",
+        "sourceRevision": "sha256:7eab75bf1fce68e8672b405ca64db4bb62159d5e4660b80e240f88c1f0435d56",
+        "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+        "packetKey": null,
+        "treeNodeId": null,
+        "symbolVersionId": null,
+        "contentHash": "6c7db5ed2cea58a79e091eb6084a96b0841a78ba1e82836c4cedf96988df90a1",
+        "representationRevision": null,
+        "admission": "CANDIDATE_REQUIRES_LINEAGE_CONFIRMATION"
+      },
+      {
+        "candidateOrdinal": 10,
+        "chunkIdentity": "fullrepo:docs/ai-os/atlas-retry-index.json:0",
+        "sourceRef": "docs/ai-os/atlas-retry-index.json",
+        "sourceRevision": "sha256:7b0b603adcefed1df8ca784fb55c3ddf90439c4268aa841d9198751441a71628",
+        "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+        "packetKey": null,
+        "treeNodeId": null,
+        "symbolVersionId": null,
+        "contentHash": "48063b7e1d991eb9e9a3ee132d90b84ab5dbc989b776f5d78a670a4ceb721119",
+        "representationRevision": null,
+        "admission": "CANDIDATE_REQUIRES_LINEAGE_CONFIRMATION"
+      },
+      {
+        "candidateOrdinal": 11,
+        "chunkIdentity": "fullrepo:docs/architecture/couchdb-mapreduce-atlas-ingestion.md:0",
+        "sourceRef": "docs/architecture/couchdb-mapreduce-atlas-ingestion.md",
+        "sourceRevision": "sha256:22428ba7391697f35336a1da8b71478a70f3fd8d36bdbdb6247306c1813b3d7e",
+        "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+        "packetKey": null,
+        "treeNodeId": null,
+        "symbolVersionId": null,
+        "contentHash": "cac374fc4a0ff7f70eebcd704d606de658f0ff29eaef9b4c32fd18bcd51813ba",
+        "representationRevision": null,
+        "admission": "CANDIDATE_REQUIRES_LINEAGE_CONFIRMATION"
+      },
+      {
+        "candidateOrdinal": 12,
+        "chunkIdentity": "fullrepo:docs/architecture/neo4j-graphrag-parent-atlas.md:0",
+        "sourceRef": "docs/architecture/neo4j-graphrag-parent-atlas.md",
+        "sourceRevision": "sha256:d9d704dd555a3163fe7fa68c84bcb3dbded2c9fdc561aaaa85db880365715cfe",
+        "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+        "packetKey": null,
+        "treeNodeId": null,
+        "symbolVersionId": null,
+        "contentHash": "8b3241aa03573fe1abcacd9338fa2964907ba69f72f7eb311cfedaf863ec3d3e",
+        "representationRevision": null,
+        "admission": "CANDIDATE_REQUIRES_LINEAGE_CONFIRMATION"
+      },
+      {
+        "candidateOrdinal": 13,
+        "chunkIdentity": "fullrepo:docs/atlas/cluster-cards.json:0",
+        "sourceRef": "docs/atlas/cluster-cards.json",
+        "sourceRevision": "sha256:dfedffa0dace728095fb8f1d30e2d0d84806feb0f820187f271b68f7dcd0beb6",
+        "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+        "packetKey": null,
+        "treeNodeId": null,
+        "symbolVersionId": null,
+        "contentHash": "800478665d96e762df3006ae1f1093db1285c46a1fef95ed506f9517e9e3cc1e",
+        "representationRevision": null,
+        "admission": "CANDIDATE_REQUIRES_LINEAGE_CONFIRMATION"
+      },
+      {
+        "candidateOrdinal": 14,
+        "chunkIdentity": "fullrepo:docs/atlas/native-gemm-deferral.md:0",
+        "sourceRef": "docs/atlas/native-gemm-deferral.md",
+        "sourceRevision": "sha256:54bbcac440335b02c62a9af09888810b763bf3b3129eee31ea740a541979f384",
+        "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+        "packetKey": null,
+        "treeNodeId": null,
+        "symbolVersionId": null,
+        "contentHash": "d457dee771e63bf6169286606506988217bb909a49ac4afd97a60aedf9705334",
+        "representationRevision": null,
+        "admission": "CANDIDATE_REQUIRES_LINEAGE_CONFIRMATION"
+      },
+      {
+        "candidateOrdinal": 15,
+        "chunkIdentity": "fullrepo:packages/atlas-core/src/cli.ts:0",
+        "sourceRef": "packages/atlas-core/src/cli.ts",
+        "sourceRevision": "sha256:496a7cc81264603ce3bfc5c1e4edc0ddad65718963ad31810fb4c632bfcd29b3",
+        "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+        "packetKey": null,
+        "treeNodeId": null,
+        "symbolVersionId": null,
+        "contentHash": "966f78e705b84e142211bc96447c8dff2652192cd18bfffb5ab3c7952cb91665",
+        "representationRevision": null,
+        "admission": "CANDIDATE_REQUIRES_LINEAGE_CONFIRMATION"
+      },
+      {
+        "candidateOrdinal": 16,
+        "chunkIdentity": "fullrepo:packages/atlas-core/src/cli.ts:1",
+        "sourceRef": "packages/atlas-core/src/cli.ts",
+        "sourceRevision": "sha256:496a7cc81264603ce3bfc5c1e4edc0ddad65718963ad31810fb4c632bfcd29b3",
+        "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+        "packetKey": null,
+        "treeNodeId": null,
+        "symbolVersionId": null,
+        "contentHash": "042487e24ca81a7fbed8de0cd1907211e0e01823d73c1cedf7fa1610cf741e8f",
+        "representationRevision": null,
+        "admission": "CANDIDATE_REQUIRES_LINEAGE_CONFIRMATION"
+      },
+      {
+        "candidateOrdinal": 17,
+        "chunkIdentity": "fullrepo:packages/atlas-core/src/cli.ts:2",
+        "sourceRef": "packages/atlas-core/src/cli.ts",
+        "sourceRevision": "sha256:496a7cc81264603ce3bfc5c1e4edc0ddad65718963ad31810fb4c632bfcd29b3",
+        "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+        "packetKey": null,
+        "treeNodeId": null,
+        "symbolVersionId": null,
+        "contentHash": "02ba74b57ac3b11a68da9b06d9bbbf326ca6c68b714f58eac9b18ed8275c7256",
+        "representationRevision": null,
+        "admission": "CANDIDATE_REQUIRES_LINEAGE_CONFIRMATION"
+      },
+      {
+        "candidateOrdinal": 18,
+        "chunkIdentity": "fullrepo:packages/atlas-core/src/cli.ts:3",
+        "sourceRef": "packages/atlas-core/src/cli.ts",
+        "sourceRevision": "sha256:496a7cc81264603ce3bfc5c1e4edc0ddad65718963ad31810fb4c632bfcd29b3",
+        "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+        "packetKey": null,
+        "treeNodeId": null,
+        "symbolVersionId": null,
+        "contentHash": "f9de6a8a3daa3a0ed449363751f4f8cd3a9f839d94e88fcc5b133c43c5dbce36",
+        "representationRevision": null,
+        "admission": "CANDIDATE_REQUIRES_LINEAGE_CONFIRMATION"
+      },
+      {
+        "candidateOrdinal": 19,
+        "chunkIdentity": "fullrepo:scripts/agent/startup-review.mjs:0",
+        "sourceRef": "scripts/agent/startup-review.mjs",
+        "sourceRevision": "sha256:552073229503c8fa77c53358b815ba0f60fac1d87e55a2ba6b1ea50449a4a30d",
+        "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+        "packetKey": null,
+        "treeNodeId": null,
+        "symbolVersionId": null,
+        "contentHash": "57de5a29995433af576c5bc89819a578256b7256bb1959156d45a171f4e58efd",
+        "representationRevision": null,
+        "admission": "CANDIDATE_REQUIRES_LINEAGE_CONFIRMATION"
+      },
+      {
+        "candidateOrdinal": 20,
+        "chunkIdentity": "fullrepo:scripts/agent/startup-review.mjs:1",
+        "sourceRef": "scripts/agent/startup-review.mjs",
+        "sourceRevision": "sha256:552073229503c8fa77c53358b815ba0f60fac1d87e55a2ba6b1ea50449a4a30d",
+        "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+        "packetKey": null,
+        "treeNodeId": null,
+        "symbolVersionId": null,
+        "contentHash": "770300b3f24ce434e6bf02e077a36b6b084aab8e4316130f347cc07d37916bd7",
+        "representationRevision": null,
+        "admission": "CANDIDATE_REQUIRES_LINEAGE_CONFIRMATION"
+      },
+      {
+        "candidateOrdinal": 21,
+        "chunkIdentity": "fullrepo:scripts/agent/startup-review.mjs:10",
+        "sourceRef": "scripts/agent/startup-review.mjs",
+        "sourceRevision": "sha256:552073229503c8fa77c53358b815ba0f60fac1d87e55a2ba6b1ea50449a4a30d",
+        "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+        "packetKey": null,
+        "treeNodeId": null,
+        "symbolVersionId": null,
+        "contentHash": "25dbb4749e62b1119fcd1f40907fc03b2e43bed6764e1ca4bfab352ca695e823",
+        "representationRevision": null,
+        "admission": "CANDIDATE_REQUIRES_LINEAGE_CONFIRMATION"
+      },
+      {
+        "candidateOrdinal": 22,
+        "chunkIdentity": "fullrepo:scripts/agent/startup-review.mjs:11",
+        "sourceRef": "scripts/agent/startup-review.mjs",
+        "sourceRevision": "sha256:552073229503c8fa77c53358b815ba0f60fac1d87e55a2ba6b1ea50449a4a30d",
+        "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+        "packetKey": null,
+        "treeNodeId": null,
+        "symbolVersionId": null,
+        "contentHash": "b603054cf378c87ecb221e862b9f6b339a8b8c7dfac8e861b8efe3ecddc4213b",
+        "representationRevision": null,
+        "admission": "CANDIDATE_REQUIRES_LINEAGE_CONFIRMATION"
+      },
+      {
+        "candidateOrdinal": 23,
+        "chunkIdentity": "fullrepo:scripts/agent/startup-review.mjs:12",
+        "sourceRef": "scripts/agent/startup-review.mjs",
+        "sourceRevision": "sha256:552073229503c8fa77c53358b815ba0f60fac1d87e55a2ba6b1ea50449a4a30d",
+        "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+        "packetKey": null,
+        "treeNodeId": null,
+        "symbolVersionId": null,
+        "contentHash": "06536a6797c8def574a09bd986850029846b4c08c6fe483806ea5af7aa208ef8",
+        "representationRevision": null,
+        "admission": "CANDIDATE_REQUIRES_LINEAGE_CONFIRMATION"
+      },
+      {
+        "candidateOrdinal": 24,
+        "chunkIdentity": "fullrepo:scripts/agent/startup-review.mjs:13",
+        "sourceRef": "scripts/agent/startup-review.mjs",
+        "sourceRevision": "sha256:552073229503c8fa77c53358b815ba0f60fac1d87e55a2ba6b1ea50449a4a30d",
+        "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+        "packetKey": null,
+        "treeNodeId": null,
+        "symbolVersionId": null,
+        "contentHash": "7f975362ee3fa8b803d73c505eeae95e65a3510e2c36a486b523a536b8097c02",
+        "representationRevision": null,
+        "admission": "CANDIDATE_REQUIRES_LINEAGE_CONFIRMATION"
+      }
+    ],
+    "sampleChecksum": "e2594768a21902219c84f3d9462f1eeb5cf249a6efb37f2c5e0de077b2c77143"
+  },
+  "intendedUpserts": {
+    "postgres": [
+      {
+        "target": "atlas_packets",
+        "operation": "GUARDED_INSERT_OR_RECONCILE",
+        "rows": 0,
+        "reason": "lineage manifest not yet sealed"
+      },
+      {
+        "target": "atlas_ontology_linked_tuples",
+        "operation": "PROPOSAL_ONLY",
+        "rows": 0,
+        "reason": "no broad ontology admission in read-only phase"
+      },
+      {
+        "target": "representation/artifact ledger",
+        "operation": "PROPOSAL_ONLY",
+        "rows": 0,
+        "reason": "representation revision must be proven per cohort"
+      }
+    ],
+    "qdrant": {
+      "operation": "BLOCKED_UNTIL_SEALED",
+      "rows": 0
+    },
+    "neo4j": {
+      "operation": "BLOCKED_UNTIL_SEALED",
+      "rows": 0
+    },
+    "valkey": {
+      "operation": "BLOCKED_UNTIL_SEALED",
+      "rows": 0
+    }
+  },
+  "implementationPlan": [
+    {
+      "stage": "SOURCE_LINEAGE_RECONCILIATION",
+      "owner": "Graphify/source-authority bridge",
+      "prerequisite": "current workspace binding and source-byte ownership",
+      "action": "read-only normalized source, revision, and content-hash join",
+      "status": "PARTIAL",
+      "promotionCondition": "every admitted source has one exact current source binding"
+    },
+    {
+      "stage": "STRUCTURAL_SYMBOL_RECONCILIATION",
+      "owner": "Tree-sitter, AST-grep, LSP/Graphify resolver",
+      "prerequisite": "source lineage reconciliation",
+      "action": "compare byte spans and resolve parse_node_id, symbol_id, symbol_version_id",
+      "status": "BLOCKED",
+      "promotionCondition": "ambiguous and revision-mismatched rows are zero"
+    },
+    {
+      "stage": "CANONICAL_PACKET_JOIN",
+      "owner": "PostgreSQL packet/lineage owner",
+      "prerequisite": "structural symbol reconciliation",
+      "action": "build guarded packet/chunk candidate rows; no synthetic IDs",
+      "status": "BLOCKED",
+      "promotionCondition": "packet_key and chunk_id join exactly for the current cohort"
+    },
+    {
+      "stage": "SNAPSHOT_SEAL",
+      "owner": "Graphify compiler/lowering",
+      "prerequisite": "exact packet, source, symbol, and representation joins",
+      "action": "seal ordinal maps and artifact digests",
+      "status": "BLOCKED",
+      "promotionCondition": "manifest checksum and all section checksums are reproducible"
+    },
+    {
+      "stage": "BOUNDED_CANARY",
+      "owner": "PostgreSQL guarded writer",
+      "prerequisite": "sealed snapshot and explicit authorization",
+      "action": "apply tiny guarded batch with independent readback",
+      "status": "BLOCKED",
+      "promotionCondition": "zero identity/revision/hash drift after commit"
+    },
+    {
+      "stage": "PROJECTION_FANOUT",
+      "owner": "Qdrant, Neo4j, cuVS/cuGraph, Valkey consumers",
+      "prerequisite": "successful canonical canary and receipt",
+      "action": "publish revision-qualified derived projections and invalidate stale cache",
+      "status": "BLOCKED",
+      "promotionCondition": "projection counts, identities, revisions, and checksums read back"
+    },
+    {
+      "stage": "ACE_PROMOTION",
+      "owner": "ACE/ContextManifest policy",
+      "prerequisite": "projection readback and evidence sufficiency",
+      "action": "admit bounded evidence handles to ContextManifest",
+      "status": "BLOCKED",
+      "promotionCondition": "grounding, relevance, and residency receipts pass"
+    }
+  ],
+  "excluded": {
+    "missingSourceRef": 2392,
+    "missingSourceRevision": 44929,
+    "missingWorkspaceRevision": 44929,
+    "missingTreeNodeId": 55853,
+    "missingSymbolVersionId": 55853,
+    "missingPacketKey": 55853,
+    "semantic768Ineligible": 54601
+  },
+  "gates": {
+    "postgresReachable": true,
+    "packetTablePresent": true,
+    "chunkTablePresent": true,
+    "semantic768ColumnPresent": true,
+    "domainSignalTablePresent": true,
+    "ontologyTupleTablePresent": true,
+    "graphInputsPresent": true,
+    "sampleHasCurrentLineage": true,
+    "writesPerformed": false,
+    "safeToApply": false
+  },
+  "manifestChecksum": "2cab742429cccfb7811fd56c309496852d2fb19d87761cb378f8517198837606",
+  "nextGate": "REINDEX-MANIFEST-LIVE-LINEAGE-AND-ORDINAL-PROOF"
+}

@@ -13,10 +13,13 @@ import {
   runPageRankClient,
   getTopPageRankClient,
   expandGraphClient,
+  breadthFirstSearchClient,
   type ProjectionResult,
   type PageRankMutateResult,
   type AuthorityNodeClient,
   type ExpandGraphNodeClient,
+  type BreadthFirstSearchRequest,
+  type BreadthFirstSearchResult,
 } from './neo4j-gds-client.js';
 
 export interface GraphProjectionRequest {
@@ -49,6 +52,8 @@ export interface GraphAnalyticsPort {
   runPageRank(input?: PageRankRequest): Promise<PageRankMutateResult>;
   getTopPageRank(input: PageRankQuery): Promise<AuthorityNodeClient[]>;
   expandGraph(input: GraphExpansionRequest): Promise<{ nodes: ExpandGraphNodeClient[]; apocUsed: boolean }>;
+  /** Bounded BFS with optional node-label / relationship-type allowlists (GDS1.8). */
+  breadthFirstSearch(input: BreadthFirstSearchRequest): Promise<BreadthFirstSearchResult>;
 }
 
 class Neo4jGraphAnalyticsService implements GraphAnalyticsPort {
@@ -78,6 +83,10 @@ class Neo4jGraphAnalyticsService implements GraphAnalyticsPort {
     input: GraphExpansionRequest,
   ): Promise<{ nodes: ExpandGraphNodeClient[]; apocUsed: boolean }> {
     return expandGraphClient(input.stableKey, input.maxDepth ?? 3, input.limit ?? 100);
+  }
+
+  async breadthFirstSearch(input: BreadthFirstSearchRequest): Promise<BreadthFirstSearchResult> {
+    return breadthFirstSearchClient(input);
   }
 }
 

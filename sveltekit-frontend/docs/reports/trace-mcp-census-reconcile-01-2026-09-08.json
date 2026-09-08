@@ -1,0 +1,453 @@
+{
+  "schema": "trace-mcp.tool-census.v1",
+  "capturedAt": "2026-09-08T16:54:41.630Z",
+  "serverRevision": null,
+  "serverHealth": "HEALTHY",
+  "static": {
+    "methodology": "REGISTER_TOOL_SOURCE_SCAN",
+    "sourceFile": "src/mcp/trace-mcp-server.ts",
+    "count": 120,
+    "namesChecksum": "046dfc856487a6fd48474cbe74a3466bad9e84f63708cf869d42f21d78dcb482"
+  },
+  "runtime": {
+    "methodology": "MCP_TOOLS_LIST",
+    "endpoint": "http://127.0.0.1:8788/mcp",
+    "count": 176,
+    "namesChecksum": "a4d3e0c16cfb9b7794353d58d19769ade1c787999b720beab44c63c9c33d2773"
+  },
+  "reconciliation": {
+    "sharedCount": 120,
+    "staticOnlyCount": 0,
+    "runtimeOnlyCount": 56,
+    "staticOnlyNames": [],
+    "runtimeOnlyTools": [
+      {
+        "name": "admin.log_event",
+        "classification": "DELEGATED_MODULE_REGISTRATION",
+        "sourceFiles": [
+          "src/mcp/admin_tools.ts"
+        ]
+      },
+      {
+        "name": "atlas.compact_context",
+        "classification": "DELEGATED_MODULE_REGISTRATION",
+        "sourceFiles": [
+          "src/mcp/new_tools.ts"
+        ]
+      },
+      {
+        "name": "atlas.embedding_all_tags",
+        "classification": "DELEGATED_MODULE_REGISTRATION",
+        "sourceFiles": [
+          "src/mcp/atlas_embedding_tools.ts"
+        ]
+      },
+      {
+        "name": "atlas.embedding_cluster_tags",
+        "classification": "DELEGATED_MODULE_REGISTRATION",
+        "sourceFiles": [
+          "src/mcp/atlas_embedding_tools.ts"
+        ]
+      },
+      {
+        "name": "atlas.embedding_keywords",
+        "classification": "DELEGATED_MODULE_REGISTRATION",
+        "sourceFiles": [
+          "src/mcp/atlas_embedding_tools.ts"
+        ]
+      },
+      {
+        "name": "atlas.embedding_neighbors",
+        "classification": "DELEGATED_MODULE_REGISTRATION",
+        "sourceFiles": [
+          "src/mcp/atlas_embedding_tools.ts",
+          "src/lib/server/atlas/atlas-fsm-policy.ts",
+          "src/lib/server/atlas/atlas-mastra-adapter.ts",
+          "src/lib/server/atlas/neural-routing/tool-implementation-profile.ts"
+        ]
+      },
+      {
+        "name": "atlas.explain_trace",
+        "classification": "DELEGATED_MODULE_REGISTRATION",
+        "sourceFiles": [
+          "src/mcp/new_tools.ts"
+        ]
+      },
+      {
+        "name": "atlas.get_chunk",
+        "classification": "DELEGATED_MODULE_REGISTRATION",
+        "sourceFiles": [
+          "src/mcp/new_tools.ts"
+        ]
+      },
+      {
+        "name": "atlas.query",
+        "classification": "DELEGATED_MODULE_REGISTRATION",
+        "sourceFiles": [
+          "src/mcp/new_tools.ts"
+        ]
+      },
+      {
+        "name": "atlas.source_refs",
+        "classification": "DELEGATED_MODULE_REGISTRATION",
+        "sourceFiles": [
+          "src/mcp/new_tools.ts"
+        ]
+      },
+      {
+        "name": "atlas.suggest_files",
+        "classification": "DELEGATED_MODULE_REGISTRATION",
+        "sourceFiles": [
+          "src/mcp/new_tools.ts"
+        ]
+      },
+      {
+        "name": "atlas_get_active_context",
+        "classification": "DELEGATED_MODULE_REGISTRATION",
+        "sourceFiles": [
+          "src/mcp/engram_tools.ts"
+        ]
+      },
+      {
+        "name": "db.schema_overview",
+        "classification": "DELEGATED_MODULE_REGISTRATION",
+        "sourceFiles": [
+          "src/mcp/db-inspection-tools.ts"
+        ]
+      },
+      {
+        "name": "db.table_inspect",
+        "classification": "DELEGATED_MODULE_REGISTRATION",
+        "sourceFiles": [
+          "src/mcp/db-inspection-tools.ts"
+        ]
+      },
+      {
+        "name": "engram.ace_packet_inject",
+        "classification": "DELEGATED_MODULE_REGISTRATION",
+        "sourceFiles": [
+          "src/mcp/engram_tools.ts",
+          "src/lib/server/ai/engram-registry.spec.ts",
+          "src/lib/server/ai/engram-registry.ts",
+          "src/lib/server/ai/toon.ts"
+        ]
+      },
+      {
+        "name": "engram.chat_memory_store",
+        "classification": "DELEGATED_MODULE_REGISTRATION",
+        "sourceFiles": [
+          "src/mcp/engram_tools.ts",
+          "src/lib/server/ai/engram-registry.spec.ts",
+          "src/lib/server/ai/engram-registry.ts",
+          "src/lib/server/ai/toon.ts"
+        ]
+      },
+      {
+        "name": "engram.redis_health",
+        "classification": "DELEGATED_MODULE_REGISTRATION",
+        "sourceFiles": [
+          "src/mcp/engram_tools.ts"
+        ]
+      },
+      {
+        "name": "kb.archive_synthesis",
+        "classification": "DELEGATED_MODULE_REGISTRATION",
+        "sourceFiles": [
+          "src/mcp/new_tools.ts"
+        ]
+      },
+      {
+        "name": "kb.extract_citations",
+        "classification": "DELEGATED_MODULE_REGISTRATION",
+        "sourceFiles": [
+          "src/mcp/new_tools.ts"
+        ]
+      },
+      {
+        "name": "kb.organize_messy_text",
+        "classification": "DELEGATED_MODULE_REGISTRATION",
+        "sourceFiles": [
+          "src/mcp/new_tools.ts"
+        ]
+      },
+      {
+        "name": "kb.trace_search",
+        "classification": "DELEGATED_MODULE_REGISTRATION",
+        "sourceFiles": [
+          "src/mcp/new_tools.ts",
+          "src/lib/server/atlas/policy/policy-training.spec.ts",
+          "src/lib/server/router/viterbi-router.test.ts"
+        ]
+      },
+      {
+        "name": "kb.wiki_note_lookup",
+        "classification": "DELEGATED_MODULE_REGISTRATION",
+        "sourceFiles": [
+          "src/mcp/new_tools.ts"
+        ]
+      },
+      {
+        "name": "ldr_research",
+        "classification": "DELEGATED_MODULE_REGISTRATION",
+        "sourceFiles": [
+          "src/mcp/ldr-research-tools.ts",
+          "src/mcp/tools/ldr-research.ts",
+          "src/lib/server/ldr/ldr-mcp-integration.spec.ts",
+          "src/lib/server/retrieval/mcp-handler-classification-v1.ts",
+          "src/lib/server/tools/handlers/ldrResearch.ts"
+        ]
+      },
+      {
+        "name": "legal.batch_ingest",
+        "classification": "DELEGATED_MODULE_REGISTRATION",
+        "sourceFiles": [
+          "src/mcp/tools/legal-skills.tool.ts"
+        ]
+      },
+      {
+        "name": "legal.build_timeline",
+        "classification": "DELEGATED_MODULE_REGISTRATION",
+        "sourceFiles": [
+          "src/mcp/tools/legal-skills.tool.ts"
+        ]
+      },
+      {
+        "name": "legal.check_services",
+        "classification": "DELEGATED_MODULE_REGISTRATION",
+        "sourceFiles": [
+          "src/mcp/tools/legal-skills.tool.ts"
+        ]
+      },
+      {
+        "name": "legal.cross_examine",
+        "classification": "DELEGATED_MODULE_REGISTRATION",
+        "sourceFiles": [
+          "src/mcp/tools/legal-skills.tool.ts"
+        ]
+      },
+      {
+        "name": "legal.cross_reference_evidence",
+        "classification": "DELEGATED_MODULE_REGISTRATION",
+        "sourceFiles": [
+          "src/mcp/tools/legal-skills.tool.ts"
+        ]
+      },
+      {
+        "name": "legal.find_precedents",
+        "classification": "DELEGATED_MODULE_REGISTRATION",
+        "sourceFiles": [
+          "src/mcp/tools/legal-skills.tool.ts"
+        ]
+      },
+      {
+        "name": "legal.find_similar_opinions",
+        "classification": "DELEGATED_MODULE_REGISTRATION",
+        "sourceFiles": [
+          "src/mcp/tools/legal-skills.tool.ts"
+        ]
+      },
+      {
+        "name": "legal.get_transcript",
+        "classification": "DELEGATED_MODULE_REGISTRATION",
+        "sourceFiles": [
+          "src/mcp/tools/legal-skills.tool.ts"
+        ]
+      },
+      {
+        "name": "legal.issue_spotter",
+        "classification": "DELEGATED_MODULE_REGISTRATION",
+        "sourceFiles": [
+          "src/mcp/tools/legal-skills.tool.ts"
+        ]
+      },
+      {
+        "name": "legal.mock_trial",
+        "classification": "DELEGATED_MODULE_REGISTRATION",
+        "sourceFiles": [
+          "src/mcp/tools/legal-skills.tool.ts"
+        ]
+      },
+      {
+        "name": "legal.score_case",
+        "classification": "DELEGATED_MODULE_REGISTRATION",
+        "sourceFiles": [
+          "src/mcp/tools/legal-skills.tool.ts"
+        ]
+      },
+      {
+        "name": "legal.search_recordings",
+        "classification": "DELEGATED_MODULE_REGISTRATION",
+        "sourceFiles": [
+          "src/mcp/tools/legal-skills.tool.ts"
+        ]
+      },
+      {
+        "name": "legal.similar_cases",
+        "classification": "DELEGATED_MODULE_REGISTRATION",
+        "sourceFiles": [
+          "src/mcp/tools/legal-skills.tool.ts"
+        ]
+      },
+      {
+        "name": "legal.transcribe_video",
+        "classification": "DELEGATED_MODULE_REGISTRATION",
+        "sourceFiles": [
+          "src/mcp/tools/legal-skills.tool.ts"
+        ]
+      },
+      {
+        "name": "legal.write_obsidian_note",
+        "classification": "DELEGATED_MODULE_REGISTRATION",
+        "sourceFiles": [
+          "src/mcp/tools/legal-skills.tool.ts"
+        ]
+      },
+      {
+        "name": "library.registry_fetch_tier",
+        "classification": "DELEGATED_MODULE_REGISTRATION",
+        "sourceFiles": [
+          "src/mcp/library-registry-tools.ts"
+        ]
+      },
+      {
+        "name": "library.registry_lookup",
+        "classification": "DELEGATED_MODULE_REGISTRATION",
+        "sourceFiles": [
+          "src/mcp/library-registry-tools.ts"
+        ]
+      },
+      {
+        "name": "library.registry_rescan",
+        "classification": "DELEGATED_MODULE_REGISTRATION",
+        "sourceFiles": [
+          "src/mcp/library-registry-tools.ts"
+        ]
+      },
+      {
+        "name": "library.registry_search",
+        "classification": "DELEGATED_MODULE_REGISTRATION",
+        "sourceFiles": [
+          "src/mcp/library-registry-tools.ts"
+        ]
+      },
+      {
+        "name": "ops.execute_graphify",
+        "classification": "DELEGATED_MODULE_REGISTRATION",
+        "sourceFiles": [
+          "src/mcp/admin_tools.ts"
+        ]
+      },
+      {
+        "name": "phase109a_archive_signal",
+        "classification": "DELEGATED_MODULE_REGISTRATION",
+        "sourceFiles": [
+          "src/mcp/server.ts",
+          "src/lib/server/mcp/phase109a-mcp-tools.ts",
+          "src/lib/server/retrieval/mcp-handler-classification-v1.spec.ts",
+          "src/lib/server/retrieval/mcp-handler-classification-v1.ts"
+        ]
+      },
+      {
+        "name": "phase109a_promote_recommendation",
+        "classification": "DELEGATED_MODULE_REGISTRATION",
+        "sourceFiles": [
+          "src/mcp/server.ts",
+          "src/lib/server/mcp/phase109a-mcp-tools.ts",
+          "src/lib/server/retrieval/mcp-handler-classification-v1.ts"
+        ]
+      },
+      {
+        "name": "phase109a_query_signal_history",
+        "classification": "DELEGATED_MODULE_REGISTRATION",
+        "sourceFiles": [
+          "src/mcp/server.ts",
+          "src/lib/server/mcp/phase109a-mcp-tools.ts",
+          "src/lib/server/retrieval/mcp-handler-classification-v1.ts"
+        ]
+      },
+      {
+        "name": "phase109a_supersede_recommendation",
+        "classification": "DELEGATED_MODULE_REGISTRATION",
+        "sourceFiles": [
+          "src/lib/server/mcp/phase109a-mcp-tools.ts"
+        ]
+      },
+      {
+        "name": "phase109a_supersede_signal",
+        "classification": "DELEGATED_MODULE_REGISTRATION",
+        "sourceFiles": [
+          "src/mcp/server.ts",
+          "src/lib/server/mcp/phase109a-mcp-tools.ts",
+          "src/lib/server/retrieval/mcp-handler-classification-v1.ts"
+        ]
+      },
+      {
+        "name": "phase109a_validate_state_transition",
+        "classification": "DELEGATED_MODULE_REGISTRATION",
+        "sourceFiles": [
+          "src/mcp/server.ts",
+          "src/lib/server/mcp/phase109a-mcp-tools.ts",
+          "src/lib/server/retrieval/mcp-handler-classification-v1.ts"
+        ]
+      },
+      {
+        "name": "skills.list",
+        "classification": "DELEGATED_MODULE_REGISTRATION",
+        "sourceFiles": [
+          "src/mcp/skill_tools.ts"
+        ]
+      },
+      {
+        "name": "skills.run_mission",
+        "classification": "DELEGATED_MODULE_REGISTRATION",
+        "sourceFiles": [
+          "src/mcp/skill_tools.ts"
+        ]
+      },
+      {
+        "name": "topology.hydration_status",
+        "classification": "DELEGATED_MODULE_REGISTRATION",
+        "sourceFiles": [
+          "src/mcp/topology_mgmt_tools.ts"
+        ]
+      },
+      {
+        "name": "topology.recompute_manifold_plan",
+        "classification": "DELEGATED_MODULE_REGISTRATION",
+        "sourceFiles": [
+          "src/mcp/topology_mgmt_tools.ts"
+        ]
+      },
+      {
+        "name": "trace_search",
+        "classification": "COMPATIBILITY_ALIAS",
+        "sourceFiles": [
+          "src/mcp/new_tools.ts",
+          "src/lib/server/features/ai/ai/gemma4-agent.ts"
+        ]
+      },
+      {
+        "name": "ui.analyze_view",
+        "classification": "DELEGATED_MODULE_REGISTRATION",
+        "sourceFiles": [
+          "src/mcp/admin_tools.ts"
+        ]
+      },
+      {
+        "name": "wiki_note_lookup",
+        "classification": "COMPATIBILITY_ALIAS",
+        "sourceFiles": [
+          "src/mcp/new_tools.ts",
+          "src/lib/server/features/ai/ai/gemma4-agent.ts"
+        ]
+      }
+    ],
+    "duplicateRuntimeToolNames": [],
+    "unexplainedRuntimeTools": []
+  },
+  "admission": {
+    "unexplainedRuntimeToolsIsZero": true,
+    "duplicateRuntimeToolNamesIsZero": true,
+    "verdict": "PASS"
+  }
+}

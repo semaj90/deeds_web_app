@@ -25,8 +25,8 @@ import { buildVectorPayload } from '$lib/server/config/vector-config.js';
 import { desc, eq, sql } from 'drizzle-orm';
 import { computePacketKey } from '$lib/server/atlas/identity/packet-key-builder.js';
 
-const TASK_COLLECTION = process.env.TASKS_QDRANT_COLLECTION || 'codebase_chunks_768';
 const TASK_COLLECTION_NAME = qdrantManager.collections.codebase_chunks;
+const TASK_COLLECTION = process.env.TASKS_QDRANT_COLLECTION || TASK_COLLECTION_NAME;
 const TASK_PACKET_MODEL = process.env.GEMMA4_MODEL || 'gemma4-rotorquant:latest';
 const TASK_PACKET_SEMANTIC_PATH = ['kanban', 'task_summary', 'agent_pickup'];
 const TASK_PACKET_CACHE_PREFIX = 'task:semantic-packet';
@@ -186,11 +186,11 @@ async function getLatestPacketRow(taskId: number) {
     .then((rows) => rows[0] ?? null);
 }
 
-async function updatePacketRow(packetId: number | string, patch: Record<string, unknown>) {
+async function updatePacketRow(packetId: string, patch: Record<string, unknown>) {
   await db
     .update(taskSemanticPackets)
     .set({ ...patch, updated_at: new Date() } as any)
-    .where(eq(taskSemanticPackets.id, Number(packetId)))
+    .where(eq(taskSemanticPackets.id, packetId))
     .execute();
 }
 
@@ -356,6 +356,13 @@ const TASK_SEMANTIC_PACKET_INSERT_COLUMNS = [
   'observed_at', 'valid_from', 'valid_to', 'created_at', 'updated_at', 'deleted',
 ] as const;
 
+export function assertCanonicalSemantic768Vector(vector: unknown): asserts vector is number[] {
+  if (!Array.isArray(vector) || vector.length !== 768 || vector.some((value) => typeof value !== 'number' || !Number.isFinite(value))) {
+    const length = Array.isArray(vector) ? vector.length : 0;
+    throw new Error(`TASK_SEMANTIC_PACKET_VECTOR_INCOMPATIBLE: expected finite semantic_768 vector, received length=${length}`);
+  }
+}
+
 /**
  * Read-only guard for the active MCP workflow. The Drizzle table definition
  * is ahead of some deployed databases; fail before Qdrant/DB work rather than
@@ -399,9 +406,7 @@ export async function createTaskSemanticPacket(taskId: number) {
   const summaryHash = createHash('sha256').update(`${workspaceId}:${taskId}:${summary}`).digest('hex');
   const embedding = (await generateEmbeddings([`${summary}\n\nNext action: ${nextAction}`])).vectors[0];
 
-  if (!embedding?.length) {
-    throw new Error(`Embedding generation failed for task ${taskId}`);
-  }
+  assertCanonicalSemantic768Vector(embedding);
 
   const qdrantPointId = sha256ToUuid(`${workspaceId}:task:${taskId}:${summaryHash}`);
 
@@ -436,24 +441,8 @@ export async function createTaskSemanticPacket(taskId: number) {
     deleted: false,
   };
 
-  await qdrantManager.upsert({
-    collection: 'codebase_chunks',
-    points: [
-      {
-        id: qdrantPointId,
-        vector: buildVectorPayload('codebase_chunks_768', embedding),
-        payload: packetRow,
-      },
-    ],
-    wait: true,
-  });
-
-  await traceTaskPacketLifecycle(taskId, 'qdrant_upsert', {
-    qdrantPointId,
-    summaryHash,
-    summaryModel,
-  });
-
+  // PostgreSQL is the canonical packet owner. Insert it before publishing the
+  // rebuildable Qdrant projection so a DB failure cannot leave an orphan point.
   const inserted = await db
     .insert(taskSemanticPackets)
     .values({
@@ -490,6 +479,25 @@ export async function createTaskSemanticPacket(taskId: number) {
 
   const packetId = String(inserted[0]?.id ?? '');
   await traceTaskPacketLifecycle(taskId, 'db_mirror_created', { packetId });
+
+  await qdrantManager.upsert({
+    collection: TASK_COLLECTION_NAME,
+    points: [
+      {
+        id: qdrantPointId,
+        vector: buildVectorPayload(TASK_COLLECTION_NAME, embedding),
+        payload: packetRow,
+      },
+    ],
+    wait: true,
+  });
+
+  await traceTaskPacketLifecycle(taskId, 'qdrant_upsert', {
+    qdrantPointId,
+    summaryHash,
+    summaryModel,
+  });
+
   const packetRowLike = {
     workspace_id: workspaceId,
     source_ref: sourceRef,
@@ -534,7 +542,7 @@ export async function attachRelevantFilesFromQdrant(taskId: number, packetId?: s
     ? await db
         .select()
         .from(taskSemanticPackets)
-        .where(eq(taskSemanticPackets.id, Number(packetId)))
+        .where(eq(taskSemanticPackets.id, packetId))
         .limit(1)
         .then((rows) => rows[0] ?? null)
     : await getLatestPacketRow(taskId);
@@ -651,7 +659,7 @@ export async function attachRelevantFilesFromQdrant(taskId: number, packetId?: s
       status: packetRow.status === 'blocked' ? 'blocked' : 'todo',
       updated_at: new Date(),
     } as any)
-    .where(eq(taskSemanticPackets.id, Number(packetRow.id)))
+        .where(eq(taskSemanticPackets.id, String(packetRow.id)))
     .execute();
 
   const fileRows = filePaths.map((filePath) => ({ workspace_task_id: taskId, file_path: filePath, created_at: new Date() }));
@@ -731,7 +739,7 @@ export async function enqueueAgentPickup(taskId: number, packetId?: string) {
     ? await db
         .select()
         .from(taskSemanticPackets)
-        .where(eq(taskSemanticPackets.id, Number(packetId)))
+    .where(eq(taskSemanticPackets.id, packetId))
         .limit(1)
         .then((rows) => rows[0] ?? null)
     : await getLatestPacketRow(taskId);
@@ -801,7 +809,7 @@ export async function enqueueAgentPickup(taskId: number, packetId?: string) {
       status: 'todo',
       updated_at: new Date(),
     } as any)
-    .where(eq(taskSemanticPackets.id, Number(packetRow.id)))
+    .where(eq(taskSemanticPackets.id, String(packetRow.id)))
     .execute();
 
   try {
@@ -904,7 +912,7 @@ export async function claimNextAgentPickupTask(lane = 'semantic_packet'): Promis
     await tx
       .update(taskSemanticPackets)
       .set({ status: 'doing', updated_at: new Date() } as any)
-      .where(eq(taskSemanticPackets.id, Number(queue.packet_id)))
+      .where(eq(taskSemanticPackets.id, String(queue.packet_id)))
       .execute();
 
     return [queue];
@@ -916,7 +924,7 @@ export async function claimNextAgentPickupTask(lane = 'semantic_packet'): Promis
   const packet = await db
     .select()
     .from(taskSemanticPackets)
-    .where(eq(taskSemanticPackets.id, Number(queue.packet_id)))
+      .where(eq(taskSemanticPackets.id, String(queue.packet_id)))
     .limit(1)
     .then((result) => result[0] ?? null);
   if (!packet) return null;
@@ -965,7 +973,7 @@ export async function hydrateAgentPickupTask(queueId: string): Promise<TaskSeman
   const packet = await db
     .select()
     .from(taskSemanticPackets)
-    .where(eq(taskSemanticPackets.id, Number(queue.packet_id)))
+      .where(eq(taskSemanticPackets.id, String(queue.packet_id)))
     .limit(1)
     .then((rows) => rows[0] ?? null);
   if (!packet) return null;

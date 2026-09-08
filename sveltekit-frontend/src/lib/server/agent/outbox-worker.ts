@@ -248,9 +248,10 @@ async function processRow(row: OutboxRow): Promise<FanoutResult> {
         }
     }
 
-    // If every handler that ran failed and at least one was expected,
-    // un-publish so the row is retried on the next poll.
-    if (errors.length > 0 && handlersRun.length === 0 && handlers.length > 0) {
+    // Any handler failure must reopen the event for retry. A partial fanout
+    // is not a durable projection state: otherwise one successful handler
+    // could leave published_at set while a failed projection is never retried.
+    if (errors.length > 0 && handlers.length > 0) {
         await unpublish(row.outboxId, errors[0]?.message).catch(() => {});
         return { outboxId: row.outboxId, eventType: row.eventType, handlersRun, errors, publishedAt: null };
     }

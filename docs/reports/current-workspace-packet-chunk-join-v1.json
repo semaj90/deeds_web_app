@@ -25,6 +25,17 @@
     "bindings_with_relative_path_chunks": 69,
     "bindings_with_source_ref_chunks": 68
   },
+  "mismatchDiagnostics": {
+    "binding_rows": 111,
+    "normalized_source_matches": 111,
+    "normalized_revision_matches": 111,
+    "normalized_content_matches": 111,
+    "normalized_workspace_matches": 0,
+    "workspace_mismatch_rows": 111,
+    "missing_source_rows": 0,
+    "revision_mismatch_rows": 0,
+    "content_mismatch_rows": 0
+  },
   "hashGrain": {
     "bindingContentDigest": "whole-source digest; exact Graphify file content hash",
     "graphifyContentHash": "whole-source digest",

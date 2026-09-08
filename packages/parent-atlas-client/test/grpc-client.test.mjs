@@ -38,6 +38,12 @@ test('maps typed SearchEvidence requests and preserves response fields', async (
   assert.equal(calls[0][1].limit, 3);
 });
 
+test('forwards the proto-defined representation selector', async () => {
+  const { client, calls } = createMockClient();
+  await client.searchCodebase({ query: 'latent routing', representationId: 'latent_256' });
+  assert.equal(calls[0][1].representationId, 'latent_256');
+});
+
 test('consumes streaming RPCs as async iterables', async () => {
   const { client } = createMockClient();
   const codebaseEvents = [];

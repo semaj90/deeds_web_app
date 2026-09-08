@@ -1,0 +1,97 @@
+{
+  "schema": "atlas.retrieval-grpc-envelope-parity.v1",
+  "generatedAt": "2026-09-08T18:12:26.811Z",
+  "mode": "READ_ONLY",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "proto": {
+    "path": "proto/active/retrieval.proto",
+    "message": "CodebaseSearchRequest",
+    "checksum": "sha256:d7789a698e4b81691f72dbb37c9ee5a3b35eb45a39a357e9b8eeebcb96f2cc59",
+    "fields": [
+      {
+        "type": "string",
+        "name": "query",
+        "number": 1,
+        "camelName": "query"
+      },
+      {
+        "type": "int32",
+        "name": "limit",
+        "number": 2,
+        "camelName": "limit"
+      },
+      {
+        "type": "float",
+        "name": "content_weight",
+        "number": 3,
+        "camelName": "contentWeight"
+      },
+      {
+        "type": "float",
+        "name": "signature_weight",
+        "number": 4,
+        "camelName": "signatureWeight"
+      },
+      {
+        "type": "string",
+        "name": "kinds",
+        "number": 5,
+        "camelName": "kinds"
+      },
+      {
+        "type": "string",
+        "name": "http_method",
+        "number": 6,
+        "camelName": "httpMethod"
+      },
+      {
+        "type": "string",
+        "name": "path_prefixes",
+        "number": 7,
+        "camelName": "pathPrefixes"
+      },
+      {
+        "type": "bool",
+        "name": "include_debug",
+        "number": 8,
+        "camelName": "includeDebug"
+      },
+      {
+        "type": "string",
+        "name": "packet_keys",
+        "number": 9,
+        "camelName": "packetKeys"
+      },
+      {
+        "type": "string",
+        "name": "representation_id",
+        "number": 10,
+        "camelName": "representationId"
+      }
+    ]
+  },
+  "typescript": {
+    "path": "packages/parent-atlas-client/src/grpc/client.ts",
+    "forwardedFields": [
+      "query",
+      "limit",
+      "content_weight",
+      "signature_weight",
+      "kinds",
+      "http_method",
+      "path_prefixes",
+      "include_debug",
+      "packet_keys",
+      "representation_id"
+    ],
+    "missingForwarders": []
+  },
+  "internalQualifiersNotOnWire": [
+    "workspace_id",
+    "corpus_version",
+    "cache_policy"
+  ],
+  "status": "PROTO_TS_FORWARDING_ALIGNED",
+  "nextGate": "GO_TS_REQUEST_SERIALIZATION_AND_CACHE_CONTEXT_PARITY"
+}

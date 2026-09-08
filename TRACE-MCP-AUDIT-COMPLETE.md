@@ -1,5 +1,48 @@
 # Trace MCP Tool Audit Complete — July 9, 2026
 
+> **2026-09-08 — TRACE-MCP-CENSUS-RECONCILE-01, name-level reconciliation (supersedes the
+> count-only reconciliation below as the current authoritative statement)**: the 2026-09-07 note
+> below correctly established that 120 (static) and 176 (runtime) are two different, non-competing
+> measurements, but left open whether the 56 runtime-only names were legitimate. That is now
+> proven, by name, not just by count:
+>
+> - **Static** (`REGISTER_TOOL_SOURCE_SCAN` — literal `registerTool('name', ...)` calls found
+>   directly inside `src/mcp/trace-mcp-server.ts`'s own source text): **120**.
+> - **Runtime** (`MCP_TOOLS_LIST` — a live `tools/list` call against the running `:8788` server):
+>   **176**.
+> - **Reconciliation**: all 120 static names are present in the runtime list (`staticOnlyCount: 0`).
+>   Of the 56 runtime-only names: **54 are `DELEGATED_MODULE_REGISTRATION`** (registered via an
+>   imported `registerXTools(server, ...)` call that `trace-mcp-server.ts` itself imports and
+>   invokes — e.g. `registerLdrResearchTools`, `registerPhase109aTools`, `registerLegalSkillsTools`
+>   — fully static and source-attributable, just not a literal string inside this one file, which
+>   is exactly what the static scan's single-file scope cannot see) and **2 are
+>   `COMPATIBILITY_ALIAS`** (`trace_search`, `wiki_note_lookup` — explicit bare-name
+>   backward-compatibility aliases for `kb.trace_search`/`kb.wiki_note_lookup`, gated by
+>   `MCP_LEGACY_ALIASES`, confirmed via their own `DEPRECATED bare-name alias for...` source
+>   comment). **`duplicateRuntimeToolNames: 0`, `unexplainedRuntimeTools: 0` — admission
+>   verdict: PASS.**
+> - The admission criterion is `unexplainedRuntimeTools.length === 0 AND
+>   duplicateRuntimeToolNames.length === 0` — **not** `staticCount === runtimeCount`. They are
+>   allowed, and expected, to differ; that is not evidence of a problem by itself.
+> - `domain.classify` specifically verified: registered once in source
+>   (`src/mcp/trace-mcp-server.ts`), appears exactly once in the live `tools/list` response, no
+>   duplicate registration. `STATIC: 1, RUNTIME_EXPOSURE: PROVEN` — no reason to revert or flag it.
+> - Full name-level receipt (every runtime-only name individually classified, both checksums, full
+>   diff): `docs/reports/trace-mcp-census-reconcile-01-<date>.json`, produced by
+>   `npm run trace:mcp:census-reconcile` (`sveltekit-frontend/scripts/trace-mcp-census-reconcile-01.mjs`),
+>   validated against `TraceMcpToolCensusV1`
+>   (`sveltekit-frontend/src/lib/server/atlas/contracts/trace-mcp-tool-census-v1.ts`). Re-run this
+>   command to get a fresh current snapshot rather than trusting either number as a permanent fact.
+> - **Distinct, non-competing effort worth knowing about**: `src/lib/server/retrieval/mcp-handler-classification-v1.ts`
+>   answers a different question — whether tool names also registered on the *older stdio*
+>   `src/mcp/server.ts` (`deeds-legal-server`) are canonical there or a deprecated alias relative to
+>   TRACE. That is a cross-server reconciliation; this note's reconciliation is within one server
+>   (trace-mcp-server.ts's own static scan vs. its own live discovery). Do not conflate the two —
+>   an early draft of this reconciliation script did exactly that (matched that file's `astHypothesis`
+>   field data as if it were evidence of an in-server alias) and had to be corrected to only trust
+>   an actual `registerTool(` call site as alias evidence, not any occurrence of a tool's name in
+>   any file that happens to mention "DEPRECATED".
+
 > **2026-09-07 correction**: this doc's "129 tools" is stale. Re-ran the same live audit
 > (`npm run trace:mcp:audit`, the wired `scripts/trace-mcp-tool-audit.mjs`) against the live
 > `:8788` server — **176 tools discovered, all 7 gates still pass** (health/discovery/provenance/

@@ -460,8 +460,10 @@ function writeReport(report) {
         '## Coverage',
         '',
         `- usable candidate pct: ${report.coverage.usable_candidate_pct}%`,
-        `- packet context join pct: ${report.coverage.packet_context_join_pct}%`,
-        `- summary_context pct: ${report.coverage.summary_context_pct}%`,
+        `- packet context join pct (of ALL usable candidates — the real coverage number): ${report.coverage.packet_context_join_pct}%`,
+        `- packet context join pct (of joined rows only — always ~100%, shown for denominator transparency, not a coverage claim): ${report.coverage.packet_context_join_pct_of_joined_rows}%`,
+        `- summary_context pct (of ALL usable candidates): ${report.coverage.summary_context_pct}%`,
+        `- summary_context pct (of joined rows only — always ~100%, denominator transparency): ${report.coverage.summary_context_pct_of_joined_rows}%`,
         '',
         '## Sample',
         '',
@@ -502,7 +504,9 @@ async function main() {
     coverage: {
       usable_candidate_pct: 0,
       packet_context_join_pct: 0,
+      packet_context_join_pct_of_joined_rows: 0,
       summary_context_pct: 0,
+      summary_context_pct_of_joined_rows: 0,
     },
     sample: [],
     notes: [
@@ -603,8 +607,22 @@ async function main() {
       return insertRow;
     }).filter(Boolean);
 
-    report.coverage.packet_context_join_pct = pct(report.counts.packet_context_found, summaryRows.length);
-    report.coverage.summary_context_pct = pct(report.counts.summary_context_found, summaryRows.length);
+    // Real bug found + fixed 2026-09-08 (WS1.5, parent-atlas-trace-search-joinback-proof/tasks.md):
+    // `summaryRows` is `prepared.map(...).filter(Boolean)` -- every row that failed the packet-
+    // context join was already mapped to `null` and removed by that filter (see the `if
+    // (!packetRow) { ...; return null; }` branch above), so `summaryRows.length` can only ever
+    // equal `packet_context_found` by construction. `pct(packet_context_found, summaryRows.length)`
+    // was therefore *always* 100%, regardless of how many usable candidates actually failed to
+    // join -- e.g. 18 joined out of 97 usable candidates reported "100% join coverage" instead of
+    // the real ~18.6%. Report BOTH numbers explicitly per WS1.5: the real, meaningful metric
+    // (coverage among ALL usable candidates, using `report.counts.usable_candidates` as the
+    // denominator -- computed before the join-failure filter ran) and the trivial one (coverage
+    // among rows that already made it past the join, which is definitionally always 100% and is
+    // kept only so the two denominators are visible side by side, not silently conflated).
+    report.coverage.packet_context_join_pct = pct(report.counts.packet_context_found, report.counts.usable_candidates);
+    report.coverage.packet_context_join_pct_of_joined_rows = pct(report.counts.packet_context_found, summaryRows.length);
+    report.coverage.summary_context_pct = pct(report.counts.summary_context_found, report.counts.usable_candidates);
+    report.coverage.summary_context_pct_of_joined_rows = pct(report.counts.summary_context_found, summaryRows.length);
 
     const applyRows = [...new Map(summaryRows.map((row) => [row.packet_key, row])).values()];
     report.counts.deduped_packet_rows = summaryRows.length - applyRows.length;

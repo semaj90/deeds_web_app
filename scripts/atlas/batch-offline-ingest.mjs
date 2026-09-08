@@ -562,7 +562,7 @@ async function main() {
                   created_at,
                   updated_at
                 ) VALUES (
-                  ${deterministicPointId(nodeId)},
+                  ${deterministicUuid(nodeId)},
                   ${file.rel},
                   null,
                   ${topFeature},
@@ -604,7 +604,7 @@ async function main() {
                   created_at,
                   updated_at
                 ) VALUES (
-                  ${deterministicPointId(nodeId)},
+                  ${deterministicUuid(nodeId)},
                   ${file.rel},
                   null,
                   ${topFeature},
@@ -671,6 +671,13 @@ async function main() {
     const hash = createHash('md5').update(key).digest();
     const raw = hash.readUInt32BE(0);
     return raw % 2147483648;
+  }
+
+  // PostgreSQL task_semantic_packets.id is UUID. Keep this distinct from the
+  // numeric Qdrant projection ID used by the legacy feature_maps path.
+  function deterministicUuid(key) {
+    const hex = createHash('sha256').update(`task-semantic-packet:${key}`).digest('hex').slice(0, 32);
+    return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-4${hex.slice(13, 16)}-${((parseInt(hex.slice(16, 18), 16) & 0x3f) | 0x80).toString(16).padStart(2, '0')}${hex.slice(18, 20)}-${hex.slice(20)}`;
   }
 
   if (APPLY) {

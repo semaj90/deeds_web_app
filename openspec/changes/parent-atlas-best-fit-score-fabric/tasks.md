@@ -931,10 +931,13 @@ by an actual binary/config contract and evaluated under the KV-cache owner.
       teacher revision, and label provenance. Exclude hidden thoughts, KV state,
       raw tensors, synthetic identity, and unreviewed claims.
 - [ ] FT-02 Emit `AdapterArtifactManifestV1` for every LoRA/QLoRA candidate:
-      base model checksum, tokenizer/template revisions, adapter method, target
+      standalone AtlasGemmaRank base checksum plus donor checkpoint checksum, tokenizer/template revisions, adapter method, target
       modules, rank/alpha/dropout, training dtype, quantization format, dataset
       checksum, seed, software/runtime revision, and held-out evaluation refs.
       The manifest is an artifact receipt, not promotion authority.
+-      The base checksum must identify the standalone derived architecture actually
+      loaded by training; the Google assistant donor is retained as separate lineage,
+      never substituted as the adapter base.
 - [ ] FT-03 Keep legal and code adaptation distinguishable. Start with separate
       `LEGAL_RERANKER` and `CODE_RERANKER` adapter revisions unless a mixed-domain
       dataset proves a single adapter is better. Domain selection is a routing
@@ -948,6 +951,19 @@ by an actual binary/config contract and evaluated under the KV-cache owner.
       artifacts. INT4 must identify the actual format/backend (for example GGUF
       weight-only or another explicitly supported executor); INT8 must identify
       its kernel/runtime path. Do not claim INT8 because KV cache is `q8_0`.
+- [ ] AGMR-TRAINABLE-TENSOR-POLICY-01 Freeze a trainability census before FT-02:
+      classify inherited donor tensors, standalone K/V/KNorm tensors, feature adapter,
+      and rank head as `FROZEN_BASE`, `LORA_TARGET`, `FULLY_TRAINABLE`,
+      `MODULE_TO_SAVE`, or `NON_TRAINABLE`. Evaluate QLoRA-QV-only, LoRA-all-linear,
+      and QLoRA-all-linear as distinct challengers.
+- [ ] AGMR-PRECISION-AXES-01 Record four independent precision axes in every training
+      and serving receipt: training compute dtype, base-weight storage, serving artifact
+      format, and runtime KV-cache dtype. QLoRA, INT4 serving, and q4 KV cache are not
+      interchangeable labels.
+- [ ] AGMR-QAT-LINEAGE-01 Keep Donor B labeled as an official QAT-derived Gemma4
+      assistant donor. An AtlasGemmaRank donor-B variant inherits QAT weights but is not
+      itself a QAT-trained model until its newly initialized standalone tensors are
+      trained and measured.
 - [x] FT-06 closed 2026-09-07. **Most of this was already satisfied by
       `TextRelevanceObservationV2Schema`** (section 11 above, closed 2026-09-06): per-observation
       non-finite rejection (`rawScore: z.number().finite()`), the `rawRankingLogit -> sigmoid_once

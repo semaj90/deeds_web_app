@@ -11,7 +11,7 @@
   "selectedSourceRefs": [],
   "exactPromotionRequired": true,
   "canonicalWrites": false,
-  "generatedAt": "2026-09-08T00:54:58.767Z",
+  "generatedAt": "2026-09-08T05:21:11.905Z",
   "mode": "daily",
   "inputPath": null,
   "algorithm": "query-conditioned weighted deterministic sketch; Tang-inspired routing only",

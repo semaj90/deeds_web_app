@@ -7,12 +7,30 @@
  *   - atlas_packets
  *   - glyph_records
  *   - codebase_chunk_index
+ *   - nes_chrom_packets
  *
- * nes_chrom_packets does not exist in the live schema (verified 2026-08-02:
- * `SELECT table_name FROM information_schema.tables` has no such relation).
- * Removed from TIER_1_TABLES rather than creating a placeholder table —
- * see project CLAUDE.md precedent for atlas_higher_hop_index /
- * atlas_codebase_packets / atlas_feature_packets (same failure class).
+ * nes_chrom_packets was excluded here from 2026-08-02 through 2026-09-08 on the
+ * premise that it did not exist live (`SELECT table_name FROM information_schema.tables`
+ * had no such relation at that time). Re-verified 2026-09-08 (same day, later
+ * continuation, found while auditing an unrelated OpenSpec task's flagged-but-unfixed
+ * items): the table now exists live (1,992 rows, confirmed via `information_schema.tables`
+ * AND `\d nes_chrom_packets` against the real Postgres instance), with real feature_id/
+ * feature_label/source_ref/metadata columns matching TABLE_COLUMN_MAP below exactly.
+ * Re-added to TIER_1_TABLES. `--apply` is SAFE for feature_id specifically: this
+ * script's backfillTable() computes `inferredFeatureId = currentFeatureId || identity.featureId`
+ * and only sets feature_id when it was previously null (verified by reading the code, not
+ * assumed) — nes_chrom_packets' real, fine-grained per-file feature_id values (e.g.
+ * "docs.NEXT-ACTIONS", already 1,992/1,992 populated by a different, unrelated NES/CHR97
+ * writer path) will never be overwritten. The one real caveat found: feature_label is
+ * currently NULL for all 1,992 rows and WOULD be filled in on --apply, but
+ * inferFeatureIdentity() computes its label from an independently re-derived candidate
+ * feature_id (via FEATURE_MAP prefix matching or a separate lookup table), not from the
+ * row's own real feature_id — so the label text could describe a coarser/different
+ * classification than what feature_id already says for that row. Not data loss (feature_id
+ * itself is untouched either way), but a possible label/id semantic mismatch worth a human
+ * spot-check before running --apply against this table for the first time. See
+ * openspec/changes/parent-atlas-trace-search-joinback-proof/tasks.md's WS1.3/WS1.4
+ * entries for the original (now-corrected) exclusion record.
  *
  * Usage:
  *   npm run atlas:feature-metadata:verify
@@ -37,6 +55,7 @@ const TIER_1_TABLES = [
   'atlas_packets',
   'glyph_records',
   'codebase_chunk_index',
+  'nes_chrom_packets',
 ];
 
 const FEATURE_MAP = {

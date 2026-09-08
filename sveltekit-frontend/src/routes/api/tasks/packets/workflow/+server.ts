@@ -134,7 +134,7 @@ async function buildWorkflowStatus(taskId?: number, queueId?: string, lane = 'se
 			packet = await db
 				.select()
 				.from(taskSemanticPackets)
-				.where(eq(taskSemanticPackets.id, Number(queue.packet_id)))
+				.where(eq(taskSemanticPackets.id, queue.packet_id))
 				.limit(1)
 				.then((rows) => rows[0] ?? null);
 		}
@@ -149,7 +149,7 @@ async function buildWorkflowStatus(taskId?: number, queueId?: string, lane = 'se
 			packet = await db
 				.select()
 				.from(taskSemanticPackets)
-				.where(eq(taskSemanticPackets.id, Number(queue.packet_id)))
+				.where(eq(taskSemanticPackets.id, queue.packet_id))
 				.limit(1)
 				.then((rows) => rows[0] ?? null);
 		}
@@ -166,7 +166,7 @@ async function buildWorkflowStatus(taskId?: number, queueId?: string, lane = 'se
 		? await db
 				.select()
 				.from(taskSemanticPackets)
-				.where(eq(taskSemanticPackets.id, Number(nextQueue.packet_id)))
+				.where(eq(taskSemanticPackets.id, nextQueue.packet_id))
 				.limit(1)
 				.then((rows) => rows[0] ?? null)
 		: null;

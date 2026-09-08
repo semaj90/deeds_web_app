@@ -195,11 +195,16 @@ async function main() {
 
       if (sourceRef) {
         const normalizedSource = sourceRef.replace(/^sveltekit-frontend\//, '');
-        const candidates = cciByPath.get(normalizedSource) ?? [];
-        for (const candidate of candidates) {
-          if (!candidate.qdrant_id) continue;
-          if (String(candidate.qdrant_id) === actualId) cciBridgeExactMatches += 1;
-          else cciBridgePresentButDifferent += 1;
+        const candidates = (cciByPath.get(normalizedSource) ?? [])
+          .filter((candidate) => candidate.qdrant_id);
+        // Count once per Qdrant point, not once per source-path candidate.
+        // A source path can legitimately map to many chunks; counting every
+        // nonmatching candidate inflated the mismatch total beyond the input
+        // population and made the report unusable for parity decisions.
+        if (candidates.some((candidate) => String(candidate.qdrant_id) === actualId)) {
+          cciBridgeExactMatches += 1;
+        } else if (candidates.length > 0) {
+          cciBridgePresentButDifferent += 1;
         }
       }
 
@@ -269,7 +274,7 @@ async function main() {
       pointIdGenerations: Object.fromEntries([...generationCounts.entries()].sort()),
       coordinateComparisons: {
         payloadQdrantPointIdPresent: payloadPointIdPresent,
-        payloadQdrantPointIdEqualsActual,
+        payloadQdrantPointIdEqualsActual: payloadPointIdEqualsActual,
         atlasPacketsQdrantPointIdEqualsActual: atlasPacketExactMatches,
         atlasPacketsQdrantPointIdPresentButDifferent: atlasPacketBridgePresentButDifferent,
         codebaseChunkIndexIdEqualsActualPointId: cciIdExactMatches,

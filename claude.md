@@ -1,6 +1,20 @@
 # Legal AI Platform — Claude Project Instructions
 
-> MCP/Atlas status note (2026-08-23, tool count refreshed 2026-09-07): The MCP and Atlas connection/tool-count statements in this document are historical snapshots. Current bounded evidence is in docs/reports/mcp-atlas-markdown-audit-2026-08-23.md. Live TRACE MCP (`:8788`) was re-verified 2026-09-07 via `npm run trace:mcp:audit` (the real, wired live-runtime audit, not a static source grep) — **176 tools discovered, all 7 gates pass** (health/discovery/provenance/breadth/concurrency/idempotency/domain-completeness). The prior "175 tools" figure was off by one, consistent with one tool added since 2026-08-23. A separate static source-regex count (`docs/TRACE-MCP-TOOLS-AUDIT.json`, scans `trace-mcp-server.ts`'s `registerTool(` calls only) reports 120 — lower by design, since it can't see tools injected at runtime, the same known undercounting pattern already documented above for the main `server.ts` (108 static vs more at runtime). Active project config wires trace plus local atlas-tools.
+> MCP/Atlas status note (2026-08-23, superseded 2026-09-08 by a name-level reconciliation, not just
+> a count refresh): TRACE MCP tool counts are runtime-derived and static-derived measurements of
+> two genuinely different populations — do not cite either as "the" tool count on its own, and do
+> not treat a future count change as churn requiring a doc rewrite. **Authoritative current
+> reference**: `TRACE-MCP-AUDIT-COMPLETE.md`'s 2026-09-08 `TRACE-MCP-CENSUS-RECONCILE-01` note, and
+> the receipt it points to (`docs/reports/trace-mcp-census-reconcile-01-<date>.json`, regenerate via
+> `npm run trace:mcp:census-reconcile` from `sveltekit-frontend/`) — it reconciles every runtime-only
+> tool name individually (`DELEGATED_MODULE_REGISTRATION` vs `COMPATIBILITY_ALIAS` vs
+> `UNEXPLAINED`), not just the two counts. As of that 2026-09-08 run: static (source-registered in
+> `trace-mcp-server.ts` itself) 120, runtime (live `tools/list`) 176, 0 unexplained, 0 duplicates —
+> PASS. Historical counts preserved for context, not current: "175 tools" (2026-08-23, off by one),
+> "129 tools" (2026-07-09, `TRACE-MCP-AUDIT-COMPLETE.md`'s original run) — do not cite either as
+> live. Current bounded evidence for the broader MCP/Atlas connection statements in this document
+> is in docs/reports/mcp-atlas-markdown-audit-2026-08-23.md. Active project config wires trace plus
+> local atlas-tools.
 
 ## 🔄 Ollama Phase-Out + Chat/Synthesis Model Switch (2026-09-03 — IN PROGRESS, not complete)
 

@@ -5,8 +5,7 @@
  * @module aliasCardMapper
  */
 
-const fs = require('fs');
-const path = require('path');
+import fs from 'node:fs';
 
 /**
  * @function loadAliasMap
@@ -95,3 +94,5 @@ async function main(mapPath, uuidList) {
 
 // Example usage structure (for external calls):
 // main('./path/to/uuid_aliases.json', ['021b14a2f39ec72e', 'another-uuid']);
+
+export { resolveAliases, loadAliasMap, main };

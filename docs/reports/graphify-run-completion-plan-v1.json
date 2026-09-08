@@ -1,6 +1,6 @@
 {
   "schema": "atlas.graphify-run-completion-plan.v1",
-  "generatedAt": "2026-09-03T00:53:01.633Z",
+  "generatedAt": "2026-09-08T19:51:39.590Z",
   "mode": "READ_ONLY_COMPLETION_PLAN",
   "canonicalAuthority": false,
   "writes": {
@@ -73,16 +73,16 @@
     "reportChecksum": "sha256:d841a3f80bcbe6b48ce8828b9f34ecde00d1702e1c0032cbccd896b646f5e4e5"
   },
   "sourceSelection": {
-    "status": "CURRENT_GRAPHIFY_BATCH_PLAN_READY",
-    "selectedSourceCount": 111,
+    "status": "CURRENT_GRAPHIFY_BATCH_PLAN_BLOCKED_REVIEW",
+    "selectedSourceCount": 3,
     "counts": {
-      "currentGraphifyExact": 111,
+      "currentGraphifyExact": 0,
       "missingGraphifySource": 0,
       "missingWorkspaceObservation": 0,
       "ambiguousGraphifySource": 0,
-      "graphifyRevisionOrContentMismatch": 0
+      "graphifyRevisionOrContentMismatch": 3
     },
-    "selectionChecksum": "1027c9671b2150da95e104c9933e80cf75cb99846fad89e2f290eb34ddd308d1"
+    "selectionChecksum": "89a6f50302bc2f52e703970aeee7f7736ff291991d72f5f5cbc6c9ee8064a084"
   },
   "checks": {
     "ownerAuditAvailable": true,
@@ -90,7 +90,7 @@
     "runCompleted": false,
     "workspaceOwnerPresent": true,
     "workspaceRevisionMatches": true,
-    "sourceSelectionComplete": true,
+    "sourceSelectionComplete": false,
     "structuralProcessingComplete": true,
     "structuralPlanReady": true,
     "unresolvedEdgesZero": false,
@@ -104,6 +104,7 @@
   },
   "blockers": [
     "CANONICAL_GRAPHIFY_RUN_NOT_COMPLETED",
+    "SOURCE_SELECTION_NOT_COMPLETE",
     "STRUCTURAL_RESOLUTION_RECEIPT_INCOMPLETE"
   ],
   "completionReceipt": {
@@ -113,5 +114,5 @@
     "reason": "Completion receipt cannot be admitted until all blockers are cleared."
   },
   "status": "COMPLETION_PLAN_BLOCKED",
-  "planChecksum": "sha256:fc4520ca3ec77d5ca04625f6be4f9a1b96650e1d1cc6093d74f81fcf8c9da62c"
+  "planChecksum": "sha256:42997be1e46f9187e30ea4e93e45993f0eb4d2f517b8a33a91d2e980f1c5c686"
 }

@@ -11,6 +11,12 @@ export type StructuralParityMismatchClassV2 =
   | 'SEMANTIC_KIND_MISMATCH'
   | 'EXACT_SPAN_MISMATCH';
 
+export type StructuralObservationScopeV1 =
+  | 'TOP_LEVEL_DECLARATION'
+  | 'NESTED_DECLARATION'
+  | 'AMBIENT_DECLARATION'
+  | 'OTHER';
+
 export interface StructuralParityPairV2 {
   name: string;
   left: StructuralObservationV1;
@@ -32,6 +38,10 @@ export interface StructuralParityComparisonV2 {
   unmatchedRight: StructuralObservationV1[];
   pairs: StructuralParityPairV2[];
   mismatchCounts: Partial<Record<StructuralParityMismatchClassV2, number>>;
+  unmatchedScopeCounts: {
+    left: Partial<Record<StructuralObservationScopeV1, number>>;
+    right: Partial<Record<StructuralObservationScopeV1, number>>;
+  };
   gates: {
     leftSpanSelfValid: boolean;
     rightSpanSelfValid: boolean;
@@ -51,12 +61,27 @@ type Candidate = {
 
 function named(rows: StructuralObservationV1[]): StructuralObservationV1[] {
   return rows
-    .filter((row) => Boolean(row.name?.trim()))
+    // Export statements are relationship/wrapper observations. The underlying
+    // declaration is the symbol; counting `export default db` as a second
+    // symbol creates false provider drift when the sidecar emits only `db`.
+    .filter((row) => Boolean(row.name?.trim()) && row.rawNodeType !== 'export_statement')
     .sort((a, b) =>
       (a.name ?? '').localeCompare(b.name ?? '')
       || a.startByte - b.startByte
       || a.endByte - b.endByte
       || a.symbolKind.localeCompare(b.symbolKind));
+}
+
+function scopeOf(row: StructuralObservationV1): StructuralObservationScopeV1 {
+  const route = row.parentRoute ?? [];
+  if (route.includes('ambient_declaration')) return 'AMBIENT_DECLARATION';
+  if (route.some((kind) => ['function_declaration', 'arrow_function', 'method_definition', 'class_body'].includes(kind))) {
+    return 'NESTED_DECLARATION';
+  }
+  if (route.length <= 2 || route.every((kind) => ['program', 'export_statement', 'module'].includes(kind))) {
+    return 'TOP_LEVEL_DECLARATION';
+  }
+  return 'OTHER';
 }
 
 function groupByName(rows: StructuralObservationV1[]): Map<string, StructuralObservationV1[]> {
@@ -162,6 +187,8 @@ export function compareStructuralObservationsV2(
   const unmatchedRight: StructuralObservationV1[] = [];
 
   for (const name of names) {
+    // Scope is diagnostic metadata only. Provider parent paths differ for
+    // equivalent observations, so scope must not become a pairing key.
     const matched = pairGroup(leftGroups.get(name) ?? [], rightGroups.get(name) ?? []);
     pairs.push(...matched.pairs.map(([left, right]) => classifyPair(left, right)));
     unmatchedLeft.push(...matched.unmatchedLeft);
@@ -175,6 +202,12 @@ export function compareStructuralObservationsV2(
   for (const pair of pairs) for (const kind of pair.mismatchClasses) add(kind);
   for (const _ of unmatchedLeft) add('NAMED_SYMBOL_MISSING_RIGHT');
   for (const _ of unmatchedRight) add('NAMED_SYMBOL_MISSING_LEFT');
+
+  const countScopes = (rows: StructuralObservationV1[]) => rows.reduce<Partial<Record<StructuralObservationScopeV1, number>>>((counts, row) => {
+    const scope = scopeOf(row);
+    counts[scope] = (counts[scope] ?? 0) + 1;
+    return counts;
+  }, {});
 
   const leftSpanSelfValid = leftRows.every((row) => row.spanValid && row.spanContainsName !== false);
   const rightSpanSelfValid = rightRows.every((row) => row.spanValid && row.spanContainsName !== false);
@@ -195,6 +228,7 @@ export function compareStructuralObservationsV2(
     unmatchedRight,
     pairs: pairs.sort((a, b) => a.name.localeCompare(b.name) || a.left.startByte - b.left.startByte),
     mismatchCounts,
+    unmatchedScopeCounts: { left: countScopes(unmatchedLeft), right: countScopes(unmatchedRight) },
     gates: {
       leftSpanSelfValid,
       rightSpanSelfValid,

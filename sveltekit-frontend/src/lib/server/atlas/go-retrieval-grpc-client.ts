@@ -6,6 +6,7 @@
 
 import { Channel, ChannelCredentials, Metadata } from '@grpc/grpc-js';
 import { AtlasRuntimeContext } from './atlas-runtime-context';
+import { pool } from '$lib/server/db/client.js';
 
 // TODO: Generate from .proto with protoc
 // For now, mock the client interface
@@ -190,12 +191,41 @@ export async function validatePacketFromGo(
 // HTTP/JSON Fallback
 // ─────────────────────────────────────────────────────────────────────────
 
+/**
+ * Real shape of `POST /search/codebase` on the live `legal-ai-go-retrieval` service (verified
+ * live 2026-09-08, not guessed from the .proto alone. This is the HTTP JSON
+ * representation emitted by the service; it is not evidence that the service
+ * uses the ProtoJSON runtime serializer. Its keys are snake_case, while
+ * canonical ProtoJSON defaults to lowerCamelCase. See `proto/active/retrieval.proto`
+ * (`CodebaseSearchResponse`/`CodebaseChunk`) for the source contract this mirrors.
+ */
+interface GoCodebaseChunkHttp {
+  chunk_id: string;
+  file_path: string;
+  score: number;
+  packet_key?: string;
+  source_ref?: string;
+  content_hash?: string;
+}
+interface GoCodebaseSearchResponseHttp {
+  chunks?: GoCodebaseChunkHttp[];
+  total_ms?: number;
+}
+
 async function retrieveFromGoHttp(
   runtime: AtlasRuntimeContext,
   query: string,
   options?: { topK?: number; lanes?: RetrievalLane[] }
 ): Promise<RetrieveResponse> {
-  const url = new URL(process.env.GO_RETRIEVAL_HTTP_URL || 'http://localhost:8100/retrieval/retrieve');
+  // NOTE: no real Go-service route exists for the original RetrieveRequest/RetrieveResponse
+  // gRPC contract (runId/threadId/lanes/tokenBudget) -- the .proto's actual HTTP surface only
+  // exposes /search/codebase, /search/evidence, /search/research, /search/bm25, /stats, /health
+  // (confirmed live against `services/go-retrieval-service/main.go`'s mux.HandleFunc calls).
+  // /search/codebase is the closest real match for a dense codebase-retrieval request; this
+  // fallback calls it directly rather than a fictional /retrieval/retrieve endpoint that has
+  // never existed on this service, and maps its real response shape into RetrieveResponse.
+  const base = process.env.GO_RETRIEVAL_HTTP_URL || 'http://localhost:8100';
+  const url = new URL('/search/codebase', base);
 
   const response = await fetch(url.toString(), {
     method: 'POST',
@@ -205,14 +235,8 @@ async function retrieveFromGoHttp(
       'run-id': runtime.runId,
     },
     body: JSON.stringify({
-      runId: runtime.runId,
-      threadId: runtime.threadId,
-      workspaceId: runtime.workspaceId,
-      workspaceRevision: runtime.workspaceRevision,
       query,
-      topK: options?.topK ?? 12,
-      lanes: options?.lanes ?? ['DENSE', 'SPARSE', 'GRAPH'],
-      tokenBudget: runtime.tokenBudget.maximumInput,
+      limit: options?.topK ?? 12,
     }),
   });
 
@@ -222,63 +246,114 @@ async function retrieveFromGoHttp(
     );
   }
 
-  return response.json();
+  const body: GoCodebaseSearchResponseHttp = await response.json();
+  const chunks = body.chunks ?? [];
+
+  return {
+    retrievalId: `go-http:${runtime.runId}:${Date.now()}`,
+    workspaceRevision: runtime.workspaceRevision,
+    evidence: chunks.map((c): EvidenceRef => ({
+      packetKey: c.packet_key ?? c.chunk_id,
+      sourceRef: c.source_ref ?? c.file_path,
+      contentHash: c.content_hash ?? '',
+      denseScore: c.score,
+    })),
+  };
 }
 
+/**
+ * Was a fictional Go-service HTTP route (`/context/build`) that never existed on the live
+ * `legal-ai-go-retrieval` service (confirmed 2026-09-08 against `services/go-retrieval-service/
+ * main.go`'s full route table: only `/search/{evidence,research,codebase,bm25}`, `/stats`,
+ * `/health`). No Go-side equivalent exists to redirect to. Per this repo's Postgres-is-truth
+ * architecture, "assemble a bounded prompt for a known set of packetKeys" is answerable directly
+ * against canonical Postgres without a cross-service hop, so this fallback now does that instead
+ * of calling out to a nonexistent route.
+ */
 async function buildContextFromGoHttp(
   runtime: AtlasRuntimeContext,
   packetKeys: string[],
   maxTokens?: number
 ): Promise<ContextPacket> {
-  const url = new URL(process.env.GO_RETRIEVAL_HTTP_URL || 'http://localhost:8100/context/build');
-
-  const response = await fetch(url.toString(), {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'workspace-revision': runtime.workspaceRevision,
-    },
-    body: JSON.stringify({
-      workspaceId: runtime.workspaceId,
-      packetKeys,
-      maxTokens: maxTokens ?? runtime.tokenBudget.maximumInput,
-    }),
-  });
-
-  if (!response.ok) {
-    throw new Error(
-      `Go Retrieval buildContext HTTP failed: ${response.status} ${await response.text()}`
-    );
+  const budget = maxTokens ?? runtime.tokenBudget.maximumInput;
+  if (packetKeys.length === 0) {
+    return { prompt: '', evidence: [], metadata: { workspaceId: runtime.workspaceId }, tokenCount: 0 };
   }
 
-  return response.json();
+  const { rows } = await pool.query<{
+    packet_key: string;
+    source_ref: string;
+    summary: string | null;
+  }>(
+    `SELECT packet_key, source_ref, summary FROM atlas_packets WHERE packet_key = ANY($1::text[])`,
+    [packetKeys]
+  );
+
+  // Rough token estimate (chars/4) since no tokenizer is wired at this layer; bounds the prompt
+  // conservatively rather than exactly.
+  const CHARS_PER_TOKEN = 4;
+  const maxChars = budget * CHARS_PER_TOKEN;
+
+  let assembled = '';
+  const evidence: Record<string, unknown>[] = [];
+  for (const key of packetKeys) {
+    const row = rows.find((r) => r.packet_key === key);
+    if (!row) continue;
+    const entry = `[${row.source_ref}]\n${row.summary ?? ''}`.trim();
+    if (assembled.length + entry.length > maxChars) break;
+    assembled += (assembled ? '\n\n' : '') + entry;
+    evidence.push({ packetKey: row.packet_key, sourceRef: row.source_ref });
+  }
+
+  return {
+    prompt: assembled,
+    evidence,
+    metadata: {
+      workspaceId: runtime.workspaceId,
+      source: 'postgres-direct',
+      requestedPacketKeys: packetKeys.length,
+      resolvedPacketKeys: evidence.length,
+    },
+    tokenCount: Math.ceil(assembled.length / CHARS_PER_TOKEN),
+  };
 }
 
+/**
+ * Was a fictional Go-service HTTP route (`/validate`) that never existed on the live
+ * `legal-ai-go-retrieval` service — same root cause as `buildContextFromGoHttp` above. "Validate
+ * a retrieved packet against Postgres canonical" (the VERIFY-state call site's own stated intent)
+ * is a direct existence + identity check against `atlas_packets`, not something that needs a
+ * second service.
+ */
 async function validatePacketFromGoHttp(
-  runtime: AtlasRuntimeContext,
+  _runtime: AtlasRuntimeContext,
   packetKey: string,
   proposedChange: Record<string, unknown>
 ): Promise<ValidationResult> {
-  const url = new URL(process.env.GO_RETRIEVAL_HTTP_URL || 'http://localhost:8100/validate');
+  const { rows } = await pool.query<{ packet_key: string; source_ref: string }>(
+    `SELECT packet_key, source_ref FROM atlas_packets WHERE packet_key = $1 LIMIT 1`,
+    [packetKey]
+  );
 
-  const response = await fetch(url.toString(), {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'workspace-revision': runtime.workspaceRevision,
-    },
-    body: JSON.stringify({
-      workspaceId: runtime.workspaceId,
-      packetKey,
-      proposedChange,
-    }),
-  });
-
-  if (!response.ok) {
-    throw new Error(
-      `Go Retrieval validate HTTP failed: ${response.status} ${await response.text()}`
-    );
+  const canonical = rows[0];
+  if (!canonical) {
+    return {
+      valid: false,
+      status: 'FAIL',
+      errors: [`packet_key not found in Postgres canonical: ${packetKey}`],
+    };
   }
 
-  return response.json();
+  const expectedSourceRef = typeof proposedChange.sourceRef === 'string' ? proposedChange.sourceRef : undefined;
+  if (expectedSourceRef && expectedSourceRef !== canonical.source_ref) {
+    return {
+      valid: false,
+      status: 'WARN',
+      errors: [
+        `source_ref mismatch: expected "${expectedSourceRef}", canonical is "${canonical.source_ref}"`,
+      ],
+    };
+  }
+
+  return { valid: true, status: 'PASS', errors: [] };
 }

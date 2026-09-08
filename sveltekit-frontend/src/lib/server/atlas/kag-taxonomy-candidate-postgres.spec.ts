@@ -3,8 +3,16 @@ import { createTaxonomyAssignmentCandidateV1 } from './taxonomy/entity-concept-t
 
 const queryMock = vi.fn();
 const persistHyperedgesMock = vi.fn();
+const projectRelationshipKernelsToNeo4jMock = vi.fn();
+const sessionCloseMock = vi.fn();
 vi.mock('$lib/server/db/client.js', () => ({ pool: { query: (...args: unknown[]) => queryMock(...args) } }));
 vi.mock('./kag-hyperedge-postgres.js', () => ({ persistHyperedges: (...args: unknown[]) => persistHyperedgesMock(...args) }));
+vi.mock('$lib/server/neo4j-driver.js', () => ({
+  getNeo4jDriver: () => ({ session: () => ({ close: sessionCloseMock }) }),
+}));
+vi.mock('./graph/relationship-kernel-neo4j-projector-v1.js', () => ({
+  projectRelationshipKernelsToNeo4j: (...args: unknown[]) => projectRelationshipKernelsToNeo4jMock(...args),
+}));
 
 function candidate(overrides: Partial<Parameters<typeof createTaxonomyAssignmentCandidateV1>[0]> = {}) {
   return createTaxonomyAssignmentCandidateV1({
@@ -134,11 +142,20 @@ describe('decideTaxonomyAssignmentCandidateV1', () => {
   it('promotion commits candidate status first, then persists the hyperedge and links it back', async () => {
     queryMock.mockClear();
     persistHyperedgesMock.mockClear();
+    projectRelationshipKernelsToNeo4jMock.mockClear();
+    sessionCloseMock.mockClear();
     const row = candidateRow();
     queryMock.mockResolvedValueOnce({ rows: [row] }); // SELECT
     queryMock.mockResolvedValueOnce({ rows: [] }); // UPDATE status='promoted'
     queryMock.mockResolvedValueOnce({ rows: [] }); // UPDATE promoted_hyperedge_id
     persistHyperedgesMock.mockResolvedValue({ attempted: 1, written: 1, errors: [] });
+    projectRelationshipKernelsToNeo4jMock.mockResolvedValue({
+      kernelsAttempted: 1,
+      binaryEdgesWritten: 1,
+      hubNodesWritten: 0,
+      incidentEdgesWritten: 0,
+      skipped: [],
+    });
     const { decideTaxonomyAssignmentCandidateV1 } = await import('./kag-taxonomy-candidate-postgres.js');
 
     const result = await decideTaxonomyAssignmentCandidateV1({
@@ -156,6 +173,38 @@ describe('decideTaxonomyAssignmentCandidateV1', () => {
     expect((queryMock.mock.calls[1][0] as string)).toContain("status = 'promoted'");
     expect(persistHyperedgesMock).toHaveBeenCalledTimes(1);
     expect((queryMock.mock.calls[2][0] as string)).toContain('promoted_hyperedge_id');
+    // Neo4j mirror: fires after the Postgres hyperedge write, never blocks/reverts it.
+    expect(projectRelationshipKernelsToNeo4jMock).toHaveBeenCalledTimes(1);
+    expect(sessionCloseMock).toHaveBeenCalledTimes(1);
+    expect(result).toMatchObject({ outcome: 'promoted', neo4jMirrored: true, neo4jMirrorError: null });
+  });
+
+  it('promotion stays "promoted" even when the Neo4j mirror write fails (mirror is best-effort, never blocking)', async () => {
+    queryMock.mockClear();
+    persistHyperedgesMock.mockClear();
+    projectRelationshipKernelsToNeo4jMock.mockClear();
+    sessionCloseMock.mockClear();
+    const row = candidateRow();
+    queryMock.mockResolvedValueOnce({ rows: [row] });
+    queryMock.mockResolvedValueOnce({ rows: [] });
+    queryMock.mockResolvedValueOnce({ rows: [] });
+    persistHyperedgesMock.mockResolvedValue({ attempted: 1, written: 1, errors: [] });
+    projectRelationshipKernelsToNeo4jMock.mockRejectedValue(new Error('ECONNREFUSED'));
+    const { decideTaxonomyAssignmentCandidateV1 } = await import('./kag-taxonomy-candidate-postgres.js');
+
+    const result = await decideTaxonomyAssignmentCandidateV1({
+      candidateId: row.candidate_id as string,
+      decision: 'promoted',
+      reviewedBy: 'reviewer-1',
+      workspaceRevision: 'workspace:1',
+      sourceRevision: 'source:1',
+      graphRevision: 'graph:1',
+      promotionEvidenceRefs: ['review:approved:1'],
+      producerRevision: 'review:1',
+    });
+
+    expect(result.outcome).toBe('promoted');
+    expect(result).toMatchObject({ neo4jMirrored: false, neo4jMirrorError: 'ECONNREFUSED' });
   });
 
   it('reports promoted_degraded (not a false success) when the hyperedge write fails after status commits', async () => {

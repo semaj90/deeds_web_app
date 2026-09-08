@@ -1,0 +1,37 @@
+{
+  "schema": "atlas.task-semantic-packet-migration-plan.v1",
+  "generatedAt": "2026-09-08T21:31:46.341Z",
+  "mode": "dry-run",
+  "applyAuthorized": false,
+  "productionWritesPerformed": false,
+  "migrationFiles": [
+    "sveltekit-frontend\\drizzle\\manual\\20260908_task_semantic_packets_writer_columns_only.sql",
+    "sveltekit-frontend\\drizzle\\manual\\20260908_task_semantic_packets_production_indexes.sql"
+  ],
+  "statements": 4,
+  "additiveOnly": true,
+  "executed": false,
+  "indexActions": [
+    {
+      "name": "idx_task_semantic_packets_workspace_task_created",
+      "signature": "(workspace_task_id, created_at DESC)",
+      "sql": "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_task_semantic_packets_workspace_task_created ON public.task_semantic_packets (workspace_task_id, created_at DESC);",
+      "action": "SKIP_EXACT_MATCH",
+      "existingDefinition": "CREATE INDEX idx_task_semantic_packets_workspace_task_created ON public.task_semantic_packets USING btree (workspace_task_id, created_at DESC)"
+    },
+    {
+      "name": "idx_task_semantic_packets_status_feature",
+      "signature": "(status, feature_id)",
+      "sql": "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_task_semantic_packets_status_feature ON public.task_semantic_packets (status, feature_id);",
+      "action": "SKIP_EXACT_MATCH",
+      "existingDefinition": "CREATE INDEX idx_task_semantic_packets_status_feature ON public.task_semantic_packets USING btree (status, feature_id)"
+    },
+    {
+      "name": "idx_task_semantic_packets_agent_pickup_ready",
+      "signature": "(agent_pickup_ready)",
+      "sql": "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_task_semantic_packets_agent_pickup_ready ON public.task_semantic_packets (agent_pickup_ready);",
+      "action": "SKIP_EXACT_MATCH",
+      "existingDefinition": "CREATE INDEX idx_task_semantic_packets_agent_pickup_ready ON public.task_semantic_packets USING btree (agent_pickup_ready)"
+    }
+  ]
+}

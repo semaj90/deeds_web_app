@@ -24,8 +24,9 @@
  *
  * This is also NOT NE-06: `ast_symbols` itself is still produced by
  * `phase1-ast-grep-extraction.mjs`'s regex fallback (`extractSymbolsViaRegex`),
- * not real ast-grep — the `ast-grep` CLI installed in this environment
- * (0.42.3) has no `outline` subcommand, so that swap remains open.
+ * not real ast-grep. The repository CLI now supports `outline` (0.45.3), but
+ * this legacy writer still uses the regex path until a separate, guarded
+ * migration replaces its source population.
  *
  * Usage:
  *   node scripts/atlas/backfill-entity-lexical-prefill.mjs                 # dry-run (default)

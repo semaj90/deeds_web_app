@@ -318,6 +318,24 @@ export interface ExpandGraphNodeClient {
   distance: number;
 }
 
+export interface BreadthFirstSearchRequest {
+  stableKey: string;
+  maxDepth?: number;
+  limit?: number;
+  /** Only traverse/return nodes carrying at least one of these labels. Omit for no label filter. */
+  nodeLabelAllowlist?: string[];
+  /** Only traverse relationships of these types. Omit for no relationship-type filter (any type). */
+  relationshipTypeAllowlist?: string[];
+}
+
+export interface BreadthFirstSearchResult {
+  nodes: ExpandGraphNodeClient[];
+  apocUsed: boolean;
+  /** Allowlist entries that were requested but don't exist live in Neo4j — silently dropped, not an error. */
+  ignoredRelationshipTypes: string[];
+  ignoredNodeLabels: string[];
+}
+
 /** Bounded k-hop neighborhood expansion from a seed node, via APOC when available. */
 export async function expandGraphClient(
   stableKey: string,
@@ -382,6 +400,122 @@ export async function expandGraphClient(
 
     return {
       apocUsed: false,
+      nodes: result.records.map((r) => ({
+        labels: r.get('labels') as string[],
+        stableKey: r.get('stableKey') as string,
+        path: r.get('path') as string | undefined,
+        distance: r.get('distance') as number,
+      })),
+    };
+  } finally {
+    await session.close();
+  }
+}
+
+/**
+ * Bounded breadth-first search from a seed node, with optional node-label and
+ * relationship-type allowlists — distinct from `expandGraphClient` above, which has no
+ * allowlist filtering. Requested allowlist entries that don't exist live in Neo4j are dropped
+ * silently (reported back in `ignoredRelationshipTypes`/`ignoredNodeLabels`) rather than
+ * throwing, since an allowlist is a filter, not an existence assertion. Relationship types are
+ * validated against `db.relationshipTypes()` before being interpolated into the pure-Cypher
+ * fallback's pattern (Cypher cannot parameterize relationship types in a MATCH pattern), the
+ * same defensive pattern `ensureProjectionClient` already uses for projection relationship
+ * types above.
+ */
+export async function breadthFirstSearchClient(
+  request: BreadthFirstSearchRequest,
+): Promise<BreadthFirstSearchResult> {
+  const { stableKey, maxDepth = 3, limit = 100, nodeLabelAllowlist, relationshipTypeAllowlist } = request;
+  const driver = getNeo4jDriver();
+  const session = driver.session();
+
+  try {
+    const schema = await loadProjectionSchema(session);
+    const validRelTypes = (relationshipTypeAllowlist ?? []).filter((t) => schema.relTypes.has(t));
+    const ignoredRelationshipTypes = (relationshipTypeAllowlist ?? []).filter((t) => !schema.relTypes.has(t));
+    const validNodeLabels = (nodeLabelAllowlist ?? []).filter((l) => schema.labels.has(l));
+    const ignoredNodeLabels = (nodeLabelAllowlist ?? []).filter((l) => !schema.labels.has(l));
+
+    const apocRes = await session.run(`RETURN apoc.version() AS v`).catch(() => null);
+    const apocAvailable = !!apocRes;
+
+    if (apocAvailable) {
+      // Undirected relationship filter (matches expandGraphClient's own undirected traversal);
+      // APOC treats a bare type name (no `>`/`<`) as undirected. Omit the option entirely when
+      // no allowlist was requested so an empty string doesn't accidentally mean "no relationships".
+      const relationshipFilter = validRelTypes.length > 0 ? validRelTypes.join('|') : undefined;
+      const labelFilter = validNodeLabels.length > 0 ? validNodeLabels.map((l) => `+${l}`).join('|') : undefined;
+
+      const result = await session.run(
+        `
+        MATCH (start {stableKey: $stableKey})
+        CALL apoc.path.subgraphNodes(start, {
+          maxLevel: $maxDepth,
+          limit: $limit,
+          bfs: true
+          ${relationshipFilter !== undefined ? ', relationshipFilter: $relationshipFilter' : ''}
+          ${labelFilter !== undefined ? ', labelFilter: $labelFilter' : ''}
+        })
+        YIELD node
+        WHERE node <> start AND node.stableKey IS NOT NULL
+        WITH node,
+             length(shortestPath((start)-[*]-(node))) AS distance
+        RETURN labels(node) AS labels,
+               node.stableKey   AS stableKey,
+               node.path        AS path,
+               distance
+        ORDER BY distance ASC
+        LIMIT $limit
+      `,
+        toNeo4jParams({
+          stableKey,
+          maxDepth,
+          limit,
+          ...(relationshipFilter !== undefined ? { relationshipFilter } : {}),
+          ...(labelFilter !== undefined ? { labelFilter } : {}),
+        }),
+      );
+
+      return {
+        apocUsed: true,
+        ignoredRelationshipTypes,
+        ignoredNodeLabels,
+        nodes: result.records.map((r) => ({
+          labels: r.get('labels') as string[],
+          stableKey: r.get('stableKey') as string,
+          path: r.get('path') as string | undefined,
+          distance: r.get('distance') as number,
+        })),
+      };
+    }
+
+    const relTypePattern = validRelTypes.length > 0 ? `:${validRelTypes.join('|')}` : '';
+    const labelPredicate =
+      validNodeLabels.length > 0
+        ? 'AND any(l IN labels(n) WHERE l IN $nodeLabelAllowlist)'
+        : '';
+
+    const result = await session.run(
+      `
+      MATCH (start {stableKey: $stableKey})
+      MATCH p = (start)-[${relTypePattern}*1..${maxDepth}]-(n)
+      WHERE n.stableKey IS NOT NULL AND n <> start ${labelPredicate}
+      WITH n, min(length(p)) AS distance
+      RETURN labels(n) AS labels,
+             n.stableKey AS stableKey,
+             n.path      AS path,
+             distance
+      ORDER BY distance ASC
+      LIMIT $limit
+    `,
+      toNeo4jParams({ stableKey, limit, nodeLabelAllowlist: validNodeLabels }),
+    );
+
+    return {
+      apocUsed: false,
+      ignoredRelationshipTypes,
+      ignoredNodeLabels,
       nodes: result.records.map((r) => ({
         labels: r.get('labels') as string[],
         stableKey: r.get('stableKey') as string,

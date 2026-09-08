@@ -6,12 +6,8 @@
  * @module validationGate
  */
 
-const fs = require('fs');
-const path = require('path');
-
 // --- DEPENDENCY IMPORT ---
-// Assuming the alias mapper is available in the path.
-const { resolveAliases } = require('./alias-card-mapper');
+import { resolveAliases } from './alias-card-mapper.mjs';
 
 /**
  * @function validateRecommendation

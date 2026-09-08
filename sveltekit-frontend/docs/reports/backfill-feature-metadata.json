@@ -1,13 +1,13 @@
 {
-  "timestamp": "2026-08-02T11:07:49.436Z",
+  "timestamp": "2026-09-08T21:11:09.634Z",
   "mode": "verify-only",
   "verification": [
     {
       "table": "atlas_packets",
-      "total": 61659,
+      "total": 61718,
       "missing": {
         "feature_id": 0,
-        "feature_label": 0,
+        "feature_label": 58,
         "source_ref": 0,
         "metadata": 0,
         "file_path": null
@@ -30,10 +30,23 @@
     },
     {
       "table": "codebase_chunk_index",
-      "total": 52417,
+      "total": 55853,
       "missing": {
         "feature_id": null,
         "feature_label": null,
+        "source_ref": 0,
+        "metadata": 0,
+        "file_path": null
+      },
+      "hasGinIndex": true,
+      "hasBtreeIndex": true
+    },
+    {
+      "table": "nes_chrom_packets",
+      "total": 1992,
+      "missing": {
+        "feature_id": 0,
+        "feature_label": 1992,
         "source_ref": 0,
         "metadata": 0,
         "file_path": null
@@ -44,8 +57,8 @@
   ],
   "backfill": null,
   "summary": {
-    "tablesChecked": 3,
-    "totalRows": 114076,
+    "tablesChecked": 4,
+    "totalRows": 119563,
     "totalMissingFeatureId": 0,
     "totalMissingMetadata": 0,
     "totalUpdated": 0,

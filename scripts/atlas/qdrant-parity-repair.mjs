@@ -474,7 +474,7 @@ async function main() {
     if (quarantined.length > 0) {
       console.log(`\n🚫 Quarantined (${quarantined.length} — persisted to atlas_projection_quarantine):`);
       for (const r of quarantined) {
-        console.log(`   ${r.packet_key}  ${r.qdrant_point_id}`);
+        console.log(`   ${r.rowPacketKey}  ${r.rowQdrantPointId}`);
         for (const reason of r.reasons) console.log(`     ${reason}`);
       }
       await persistQuarantine(quarantined, collectionName, runId, client);
@@ -488,13 +488,13 @@ async function main() {
         if (VERBOSE) {
           const rowByKey = new Map(rows.map(r => [r.packet_key, r]));
           for (const parityRow of missingRows.slice(0, 5)) {
-            const pgRow = rowByKey.get(parityRow.packet_key);
+            const pgRow = rowByKey.get(parityRow.rowPacketKey);
             const events = generateRepairEvents(parityRow, pgRow, collectionName);
             console.log('  ', JSON.stringify(events[0], null, 2));
           }
         } else {
           for (const r of missingRows.slice(0, 5)) {
-            console.log(`   ${r.packet_key}  ${r.qdrant_point_id}`);
+            console.log(`   ${r.rowPacketKey}  ${r.rowQdrantPointId}`);
           }
           if (missingRows.length > 5) console.log(`   … and ${missingRows.length - 5} more`);
         }
@@ -513,23 +513,30 @@ async function main() {
       const rowByKey = new Map(rows.map(r => [r.packet_key, r]));
 
       for (const parityRow of repairEligible) {
-        const pgRow = rowByKey.get(parityRow.packet_key);
+        // Real bug found + fixed 2026-09-08 (WS1.6): parityRow is a classifyParity() result,
+        // which never carries a literal `packet_key` field (only `rowPacketKey`/`payloadPacketKey`)
+        // -- this lookup previously always missed, so `pgRow` was always undefined and every
+        // repair-eligible row was silently skipped by the `if (!pgRow) continue` below. The
+        // payload-repair path has therefore never actually executed for any real row; every run
+        // would report "0 succeeded, 0 skipped, 0 failed", indistinguishable from "nothing needed
+        // repair".
+        const pgRow = rowByKey.get(parityRow.rowPacketKey);
         if (!pgRow) continue;
 
         const events = generateRepairEvents(parityRow, pgRow, collectionName).filter(
           e => e.event_type === 'payload_repair'
         );
-        const livePayload = qdrantPayloads.get(parityRow.packet_key) ?? {};
+        const livePayload = qdrantPayloads.get(parityRow.rowPacketKey) ?? {};
 
         for (const event of events) {
           const outcome = await applyPayloadRepair(event, livePayload, client, contract, collectionName);
           if (outcome.result === 'success') succeeded++;
           else if (outcome.result.startsWith('skipped')) {
             skipped++;
-            if (VERBOSE) console.log(`   ⏭  ${parityRow.packet_key}: ${outcome.result}`);
+            if (VERBOSE) console.log(`   ⏭  ${parityRow.rowPacketKey}: ${outcome.result}`);
           } else if (outcome.result.startsWith('error')) {
             failed++;
-            console.error(`   ❌ ${parityRow.packet_key}: ${outcome.result}`);
+            console.error(`   ❌ ${parityRow.rowPacketKey}: ${outcome.result}`);
           }
         }
       }

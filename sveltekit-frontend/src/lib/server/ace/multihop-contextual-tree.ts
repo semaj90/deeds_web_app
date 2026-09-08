@@ -182,7 +182,7 @@ export async function retrieveMultihopContext(opts: MultihopOpts): Promise<Multi
       const cypherQuery = `
         MATCH (f)
         WHERE (f.stableKey IN $refs OR f.sourceRef IN $refs OR f.id IN $refs)
-        MATCH p = (f)-[r:IMPORTS|CONTAINS|BELONGS_TO_CLUSTER|REFERENCES|EVIDENCE_FOR|DOCUMENTS|CONSULTED*1..${maxHops}]-(n)
+        MATCH p = (f)-[r:IMPORTS|CONTAINS|BELONGS_TO_CLUSTER|REFERENCES|EVIDENCE_FOR|DOCUMENTS|CONSULTED|ENTITY_CLASSIFIED_AS|CONCEPT_BROADER_THAN*1..${maxHops}]-(n)
         WHERE n.stableKey IS NOT NULL AND NOT n.stableKey STARTS WITH 'feature:'
         RETURN DISTINCT
           n.stableKey AS neighbor,

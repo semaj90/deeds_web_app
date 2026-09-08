@@ -1,10 +1,10 @@
 {
   "schema": "atlas.graphify-current-run-eligibility.v1",
-  "generatedAt": "2026-09-05T06:52:59.871Z",
+  "generatedAt": "2026-09-08T19:50:47.265Z",
   "mode": "READ_ONLY_CURRENT_RUN_ELIGIBILITY",
-  "runningRunCount": 5,
-  "staleRunCount": 5,
-  "currentRunCount": 0,
+  "runningRunCount": 7,
+  "staleRunCount": 6,
+  "currentRunCount": 1,
   "lifecycleOwner": null,
   "lifecycleOwnerProven": false,
   "supportedLifecycleStates": [
@@ -15,17 +15,16 @@
   "staleRunsReconciled": false,
   "namespaceOwner": "workspace-source-namespace-audit (authority unresolved)",
   "namespaceAuthorityStatus": "PROVEN",
-  "repositoryRevision": "0de34853f42dbd57cd84dbdca8e19caa6cf4e374",
+  "repositoryRevision": "ec2f544a2bfa26a825de69d9af9ce846647fc3da",
   "workspaceRevision": null,
   "inputSnapshotChecksum": null,
   "eligibleForFreshRun": false,
   "blockers": [
     "LIFECYCLE_OWNER_UNPROVEN",
     "STALE_RUNS_NOT_RECONCILED",
-    "CURRENT_RUN_NOT_ESTABLISHED",
     "REPOSITORY_REVISION_NOT_CURRENT"
   ],
   "writesPerformed": false,
   "canonicalAuthority": false,
-  "reportChecksum": "sha256:b79bd8d0cb38f9f0c72db6951beba174e2355945c707489efa9e49cb092cb393"
+  "reportChecksum": "sha256:243dcd07b49228f2307c31af45bafecb407e8c872cd00bae528b7b5aea051f8d"
 }

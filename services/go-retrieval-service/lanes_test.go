@@ -114,3 +114,29 @@ func TestLaneServiceSearchRejectsEmptyQuery(t *testing.T) {
 		t.Fatal("Search() error = nil, want empty-query error")
 	}
 }
+
+type testLaneCache struct{}
+
+func (testLaneCache) Get(context.Context, string, any) (bool, error)        { return false, nil }
+func (testLaneCache) Set(context.Context, string, any, time.Duration) error { return nil }
+func (testLaneCache) DeleteByPrefix(context.Context, string) error          { return nil }
+
+func TestLaneServiceSearchRejectsUnqualifiedCachedRequest(t *testing.T) {
+	service := &LaneService{
+		Searchers: map[Lane]Searcher{LaneBM25: &testSearcher{lane: LaneBM25}},
+		Cache:     testLaneCache{},
+	}
+
+	if _, err := service.Search(context.Background(), LaneRequest{
+		Query: "terms",
+		Lanes: []Lane{LaneBM25},
+	}); err == nil {
+		t.Fatal("Search() error = nil, want workspace/corpus cache-isolation error")
+	}
+}
+
+func TestValidateLaneRequestAllowsUncachedFixtureWithoutRevisions(t *testing.T) {
+	if err := validateLaneRequest(context.Background(), LaneRequest{Query: "fixture"}, false); err != nil {
+		t.Fatalf("validateLaneRequest() error = %v, want nil", err)
+	}
+}
