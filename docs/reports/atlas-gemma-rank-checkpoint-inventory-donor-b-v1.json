@@ -1,0 +1,50 @@
+{
+  "schema": "atlas.gemma-rank-checkpoint-inventory.v1",
+  "donorLabel": "donor_b_qat_unquantized_assistant",
+  "canonicalAuthority": false,
+  "checkpointDir": "models\\gemma4-e4b-qat-assistant-2026-07-20",
+  "checkpointMutated": false,
+  "hfRepo": "google/gemma-4-E4B-it-qat-q4_0-unquantized-assistant",
+  "hfRepoSha": "27f8d204f09f2be353d6ff0bf0d012792b13c79f",
+  "hfRepoLastModified": "2026-07-20T16:42:57.000Z",
+  "architecture": ["Gemma4AssistantForCausalLM"],
+  "modelType": "gemma4_assistant",
+  "verification": {
+    "downloadedThisSession": true,
+    "verifiedAgainstHfApiBlobs": true,
+    "localSha256MatchesHfLfsSha256": true,
+    "method": "Fetched HF API model listing with ?blobs=true BEFORE downloading (independent of the reporting conversation's claim), then downloaded via resolve/main/<file> URLs, then re-computed sha256sum locally and compared against both the HF API's reported LFS sha256 and the reporting conversation's claim. All three agree."
+  },
+  "files": {
+    "config": {
+      "bytes": 2356,
+      "path": "models\\gemma4-e4b-qat-assistant-2026-07-20\\config.json"
+    },
+    "weights": {
+      "bytes": 159138208,
+      "path": "models\\gemma4-e4b-qat-assistant-2026-07-20\\model.safetensors",
+      "sha256": "sha256:9d0e2053067590cae9a8f4fcc57eefbe20dff90599360458ebd451e5cb5c947d"
+    },
+    "tokenizer": {
+      "bytes": 32169440,
+      "path": "models\\gemma4-e4b-qat-assistant-2026-07-20\\tokenizer.json",
+      "sha256": "sha256:75a6583c1a418e2bbd79c60d95d28e0f5bf549ad3f2990b5bdb5238c6c2bf70c",
+      "note": "Byte-identical to donor A's tokenizer.json (same checksum recorded in atlas-rank-manifest.json's tokenizerChecksum) -- same tokenizer/vocab shared across both donor revisions, as expected for a QAT fine-tune of the same base model."
+    }
+  },
+  "tensorCount": 50,
+  "tensorShapesIdenticalToDonorA": true,
+  "tensorShapeComparisonMethod": "Manually parsed the safetensors binary header (8-byte little-endian length prefix + JSON header, no external dependency) and compared all 50 tensor names/shapes/dtypes against docs/reports/atlas-gemma-rank-checkpoint-inventory-v1.json (donor A). Every tensor name, shape, and dtype (BF16) matches exactly -- only the actual weight VALUES differ (different sha256), consistent with donor B being a QAT fine-tune of the identical architecture, not a structurally different model.",
+  "configDiffFromDonorA": {
+    "eos_token_id": "donor B declares [1, 106]; donor A's config.json does not declare this field explicitly at the same level (diffed directly)",
+    "transformers_version": "donor B: 5.10.0.dev0; donor A: 5.7.0.dev0 (newer transformers snapshot used to publish donor B, expected given the later HF lastModified date)"
+  },
+  "observedAt": "2026-09-07T00:00:00.000Z",
+  "status": "DOWNLOADED_AND_CHECKSUM_VERIFIED_NOT_YET_LOADED_OR_FORWARD_TESTED",
+  "weightsMutated": false,
+  "nextGates": [
+    "Load into the existing AGMR standalone-init pipeline (same code path used for donor A) and produce a sibling standalone-init-bf16 artifact + manifest for donor B -- not done in this pass",
+    "Run the existing forward-smoke / tensor-alignment proofs against donor B and compare against donor A's AGMR-01..06 results",
+    "Do not promote donor B over donor A until parity/quality comparison evidence exists"
+  ]
+}

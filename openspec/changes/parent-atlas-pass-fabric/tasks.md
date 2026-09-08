@@ -766,6 +766,69 @@ Cross-reference only.
 4. PF9: incremental eligibility (needs PF-G0 resolver wired in + PF4 writer first)
 5. PF10/PF11: NLP pass DAG + bounded Ornith
 6. PF12/PF13: tool executor + real graph multi-hop
+
+### title_id: the missing hash input to `computePacketKey()` (2026-09-07, connects directly to PF-G0)
+
+A separate Layer-2-backlog reconciliation this session (`parent-atlas-workstation-todo.md`)
+independently found that `title_id` — one of the three hash inputs to
+`packet-key-builder.ts::computePacketKey()` (`source_ref + tree_node_id + title_id`, see the
+PF-G0 section above) — has **zero real producers anywhere in the repo**. Every assignment
+site (`classification-envelope-v1.ts`, `feature-extraction-v1.ts`, `graphify-task-candidate.ts`,
+`ontology-linked-tuple-v1.ts`, `semantic-packet-v1.ts`, and the materializer in
+`enriched-tree-node-contract.ts`) is either a pass-through of an already-`undefined`/`null` value
+or, in the materializer's case, a hardcoded `const titleId: string | undefined = undefined;`
+(line 113). Its documented meaning (`packet-canonical.ts:25`) is a semantic grouping slug
+(`auth.session.validation`, `session-management`), not identity material — so `computePacketKey()`
+hashing it as an identity input was already a design question per PF-G0's own framing
+(`CURRENT_LIVE_IDENTITY` vs `FINAL_PACKET_IDENTITY_V2 — NOT_YET_PROVEN`), but this adds a second,
+more basic blocker: **even if that node-scoped identity scheme is chosen, it cannot run today**,
+because one of its three inputs is never populated. `computeTreeNodeId()` (the standalone
+`tree-node-id-extractor.ts` implementation, distinct from the live `TreeNodeIdentityAuthoritySchema`
+that `enriched-tree-node-contract.ts` actually reads `tree_node_id` from) is also a dead orphan —
+zero callers anywhere in `src/` — and should be marked `DEAD_SUPERSEDED`/archived rather than wired
+in, per this file's own Duplication Prevention rule, so a future agent doesn't accidentally treat
+it as the tree-node-id authority.
+
+**Do not open a new OpenSpec change for this** — it's the same `packet_key`/identity surface PF-G0
+already owns. Bounded next step, once PF-G0's file-scoped/node-scoped grain question is actually
+decided (not before): write a real `titleId` derivation (deterministic slug from summary/
+classification, not a hash/UUID) and wire it into `materializeLinkedTupleDraftsFromEnrichedTreeNode()`.
+
+### LEXICAL-PASS-WRITER-01 — first slice landed and independently re-verified (2026-09-07)
+
+A pure, deterministic `lexical` pass writer landed this session, matching the design discussed
+above and independently re-checked line-by-line (not accepted from a self-report):
+
+- `sveltekit-frontend/src/lib/server/analysis/lexical-feature-registry-v1.ts` —
+  `runLexicalFeatureRegistryV1()`, a pure function (no I/O, no DB) producing
+  `identifiers`/`literals`/`normalizedTerms`/`symbolTerms`/`tokenStats` from raw source content via
+  a hand-written comment/string-aware scanner. Explicitly `canonicalAuthority: false`,
+  `writesPerformed: false` in its own output schema — matches its stated non-goal (no AST, no NLP,
+  no embeddings, no DeepSeek).
+- `sveltekit-frontend/src/lib/server/analysis/lexical-pass-ledger-adapter-v1.ts` — converts a
+  registry result into the existing `AnalysisPassLedgerInput` shape, throws
+  `LEXICAL_PASS_PACKET_KEY_REQUIRED` if `packetKey` is missing (no unqualified rows possible), and
+  `proveLexicalPassAdmissionV1()` runs the adapter twice and byte-compares the stable-stringified
+  output to prove determinism — still zero DB writes.
+- `sveltekit-frontend/src/lib/server/db/schema/analysis-pass-results.ts` — correctly **extended**,
+  not duplicated: `git diff` shows exactly one line added
+  (`lexical_features: 'deterministic_idempotent'` in the existing `KNOWN_PASS_EXECUTION_SEMANTICS`
+  map from the PF4/Session-198 `executionSemantics` correction above). No parallel schema created.
+
+**Independently re-verified, not taken on the report's word**:
+- `npx vitest run` on both spec files: **12/12 pass** (6 + 6), confirmed live — matches the claim.
+- `npx tsgo --noEmit`: zero errors reference any of the three files.
+- `npx openspec validate --strict parent-atlas-pass-fabric`: `Change 'parent-atlas-pass-fabric' is valid`.
+- **One real discrepancy found**: `docs/reports/lexical-pass-writer-v1.json`'s own
+  `focusedTests: {"passed": 11, "failed": 0}` undercounts by one — actual is 12/12. Minor, but
+  flagging it per this repo's evidence-integrity rule (a report claiming test counts is itself a
+  claim that should be checked, not just trusted because it looks like a receipt).
+
+**Still open, not yet done** (per the report's own `openGates` and the adapter's own doc comment):
+`LEXICAL-PASS-WRITER-01D` — actually calling `recordAnalysisPassResult()` against an explicitly
+authorized fixture and reading it back to confirm duplicate delivery reuses the same logical pass
+(no live DB write has happened yet, by design) — and `TITLE-ID-SEMANTIC-GROUPING-WRITER-01` above,
+unchanged.
 7. PF14: tricubic quarantine (low priority, do whenever)
 
 **Goal**: Idempotency + incremental eligibility.
@@ -943,6 +1006,22 @@ shouldRunOrnith(packet) {
 
 ---
 
+### Cross-reference (2026-09-07): a live, simpler tool executor already exists elsewhere and must
+### be reconciled with this PF12 design before PF12 is built, not left as a second peer owner
+
+`sveltekit-frontend/src/lib/server/ai/acp-rpc-loop.ts::executeToolCallsInParallel()` is real, live,
+and already runs same-turn MCP tool calls concurrently today (`Promise.all`, no `maxParallel` cap,
+no `effect: 'read'|'write'` distinction, no `dependsOn` DAG) — a plain fork-join with no admission
+policy at all. PF12 below specs a DAG-aware, effect-flagged executor for a different call path
+("agent queries"). Per this repo's Duplication Prevention rule: before implementing PF12's
+`executeToolBatch()`, check whether it should *replace* `executeToolCallsInParallel()`'s call site
+in `acp-rpc-loop.ts` (one canonical tool-executor owner) rather than becoming a second, parallel
+implementation of "run several tool calls with some concurrency bound." Neither one currently has a
+`resourceKey`-based keyed-write-serialization concept (PF12's `effect: 'read'|'write'` is coarser
+than that) — flagged as an open correctness gap on both paths, not just the ACP RPC one: no MCP tool
+registered in this repo mutates shared state today, so there is no live incident forcing this yet,
+but the eventual real fix is one shared executor with a per-tool concurrency policy, not two.
+
 ## PF12: executeToolBatch(maxParallel=3) (1.5h)
 
 **Goal**: Fork-join tool executor for agent queries.
@@ -1033,3 +1112,114 @@ Expects:
 - 58K packets → all passes complete
 - Re-run same corpus → 99% skip (incremental eligibility)
 - Total time reduced 2-4× vs baseline
+
+---
+
+## Lexical pass writer (2026-09-07)
+
+The first lexical slice is a pure, read-only derivation under the existing
+analysis owner. It does not write `feature_lexical_facts`, register a worker,
+or promote taxonomy/domain meaning. The existing DB extractors remain outside
+this slice until their input identity and pass-receipt adapter are proven.
+
+- [x] LEXICAL-PASS-WRITER-01A — add `LexicalFeatureRegistryV1` with exact
+  `sourceRef`, `sourceRevision`, `workspaceRevision`, content checksum, and
+  extractor revision; emit identifiers, literals, normalized terms, symbol
+  terms, and token statistics without datastore/queue access.
+- [x] LEXICAL-PASS-WRITER-01B — prove deterministic ordering, UTF-8 content
+  hashing, comment exclusion, literal capture, empty input, and revision
+  changes with focused tests.
+- [x] LEXICAL-PASS-WRITER-01C — add a pure pass-fabric adapter that maps the pure
+  result to the existing `analysis_pass_results` receipt contract; require
+  packet identity and both source/pass revisions before any future write.
+- [ ] LEXICAL-PASS-WRITER-01D — run bounded live readback/idempotency proof
+  before enabling the opt-in worker or admitting `feature_lexical_facts` materialization.
+- [x] LEXICAL-PASS-WRITER-01D-PRECHECK — prove repeated adapter construction
+  produces the same ledger identity and payload without a database write.
+- [x] LEXICAL-PASS-WRITER-01C-IDEMPOTENCY — register `lexical_features` as a
+  deterministic pass so the existing ledger can reuse the logical result on
+  duplicate delivery once live admission is authorized.
+
+### Lexical worker integration — 2026-09-07
+
+- [x] Add `lexical-pass-executor-v1.ts`: resolve packet aliases using the existing
+  canonical resolver, independently load `atlas_packets`, require the exact
+  source path, content checksum, and numeric workspace revision, then extract.
+- [x] Harden the pure adapter: verify its payload checksum and identity strings;
+  include workspace, source, language, and extractor revision in the input hash.
+- [x] Wire `lexical_feature_registry` into the existing job worker behind
+  `ATLAS_LEXICAL_PASS_ENABLED=true` (read at worker module startup). Persist only
+  through `recordAnalysisPassResult`, independently read the row by ID, and skip
+  the worker's generic second ledger write. The existing `enqueueJob` accepts
+  `jobType: 'lexical_feature_registry'` and the source fields in `result`.
+- [x] Test the persisted queue-envelope handoff, canonical alias resolution,
+  sequential fixture reuse, cross-workspace identity separation, corrupt
+  payload/readback, missing ledger, and UTF-8 input bounds.
+- [ ] Replay a bounded whole-source JS/TS fixture against the actual PostgreSQL
+  writer and worker; independently verify job completion and ledger reuse before
+  enabling this stage for production jobs. No worker was started or job enqueued
+  by this implementation turn.
+- [ ] Prove concurrent duplicate delivery separately: the generic ledger currently
+  does select-then-insert, and per-process concurrency 1 is not a global uniqueness
+  guarantee. Sequential in-memory fixture reuse does not close this gate.
+- [ ] Add authoritative source adapters for chunk/git-revision formats and broader
+  language coverage before accepting those jobs. This first executor accepts at
+  most 256 KiB UTF-8, JS/TS, `sourceRevision: sha256:<content hash>`, and the stored
+  numeric workspace revision serialized as a string. Its heuristic lexical terms
+  are derived observations, not AST facts, BM25 relevance, ontology promotion,
+  a new retrieval vote, or an embedding input policy.
+
+Report: `docs/reports/lexical-pass-writer-v1.json`. Live PostgreSQL replay,
+downstream lexical materialization, and ACE admission remain open; no migration,
+Qdrant projection, model call, or cache write was performed.
+
+Validation: 24/24 tests across extractor (6), adapter (8), executor (10).
+Root OpenSpec strict validation and targeted diff checks pass. Compiler analysis
+of the five implementation entrypoints reports zero diagnostics in those files;
+one dependency error remains in `cache-keys.ts:663` (`admission.reason`, TS2339).
+This is not a repository-wide typecheck pass. The worker gate type now uses the
+existing `entityGate` type rather than an unavailable `p-limit.default` type export.
+
+Related blockers remain separate: the repository currently has conflicting
+`title_id` generator/regex contracts, so `TITLE-ID-SEMANTIC-GROUPING-WRITER-01`
+requires its own reconciliation and is not closed by the lexical writer.
+
+### GRAPH-CPU-GPU-PARITY: nx-cugraph added as an execution mode, not a new harness (2026-09-07)
+
+Cross-reference, not part of this change's own scope — recorded here only because it directly
+answers a duplication-prevention question raised against this file's PageRank/NetworkX↔cuGraph
+material above. A separate conversation proposed building new `GRAPH-CPU-GPU-PARITY-01/02/03`
+gates around NetworkX-vs-cuGraph parity for BFS/PageRank/Louvain. That parity oracle **already
+exists and is already proven** in this repo two ways: `python/atlas_compute/gpu_mini_fabric/`
+(small synthetic fixture, `GRAPH-PAGERANK-01/02`, `rankCorrelation: 0.99992`) and
+`python/graph_snapshot_parity_networkx_oracle.py` / `graph_snapshot_parity_cugraph_oracle.py`
+(production-scale, 162,234 nodes, `pagerankCorrelation: 1`, `louvainCommunityAgreement: 1`, see
+CLAUDE.md's "NetworkX vs. Neo4j" correction). Building a third harness would have been a real
+duplicate-owner violation per this repo's Duplication Prevention rule.
+
+What's genuinely new and additive: `nx-cugraph` (RAPIDS' zero-code-change NetworkX GPU backend,
+confirmed GA, `NX_CUGRAPH_AUTOCONFIG`/`backend=` dispatch) is architecturally a different
+mechanism from both existing oracles — it runs the *same NetworkX API calls*, GPU-dispatched,
+rather than either backend's own hand-written CPU or direct-cuDF/cuGraph implementation. Added
+as an **optional `--backend cugraph` flag** to `python/graph_snapshot_parity_networkx_oracle.py`
+(NOT to `graph_snapshot_parity_cugraph_oracle.py`, which already bypasses NetworkX entirely for
+resident-VRAM performance and doesn't need this) — default behavior (`--backend networkx`)
+completely unchanged. Confirmed `nx_cugraph` is already installed in the existing
+`atlas-rapids-cu13` WSL2 env at version `26.06.00` (matches the rest of the RAPIDS stack — no
+upgrade performed or needed, consistent with this repo's rule against bumping past 26.06 without
+a justified capability gap).
+
+**Bounded-fixture proof run** (synthetic 500-node/1495-edge graph, `random.seed(42)`, real WSL2
+`atlas-rapids-cu13` execution, not simulated): connected-components match exactly (1 == 1);
+PageRank matches to floating-point noise (`maxAbsoluteDelta: 4.3e-18`, top-10 overlap 10/10);
+Louvain community count/modularity differ between runs (13 vs 21 communities) — but this matches
+the oracle script's own pre-existing comment that NetworkX's Louvain is unseeded and
+order/randomness-sensitive on **both** backends (re-running the CPU-only path twice in this same
+session already produced 14 then 13 communities on identical input). Full receipt:
+`docs/reports/nx-cugraph-backend-dispatch-parity-v1.json`.
+
+**Still open**: this proves the mechanism works on a small synthetic fixture, not that nx-cugraph
+matches at production scale — that needs a run against the real frozen corpus underlying
+`docs/reports/graph-snapshot-parity/receipt.json`, plus proper ARI/NMI comparison for Louvain
+specifically (not raw community-count diffing, which this repo already knows is the wrong metric
+for community-detection parity).

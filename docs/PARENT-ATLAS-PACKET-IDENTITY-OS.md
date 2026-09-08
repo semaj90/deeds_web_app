@@ -425,7 +425,10 @@ Use Protocol Buffers or MessagePack:
 
 ## Ingestion Queue
 
-### RabbitMQ / BullMQ Pipeline
+### RabbitMQ Pipeline
+
+Parent Atlas uses RabbitMQ/AMQP for durable dispatch. BullMQ belongs only to
+the isolated `claude-mem` runtime and is not part of this pipeline.
 
 ```
 ingest.raw

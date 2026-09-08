@@ -224,7 +224,7 @@ async function runAceCacheLane(redis: Redis, queryHash: string): Promise<LaneRes
 	}
 }
 
-async function runSymbolLane(redis: Redis, query: MultiLaneQuery): Promise<LaneResult> {
+export async function runSymbolLane(redis: Redis, query: MultiLaneQuery): Promise<LaneResult> {
 	const t0 = Date.now();
 	const symbols = extractSymbols(query.text).slice(0, 5);
 
@@ -267,6 +267,13 @@ async function runSymbolLane(redis: Redis, query: MultiLaneQuery): Promise<LaneR
 			hits.push(r.value);
 		}
 	}
+
+	// mergeAndRank() assumes every lane returns hits in best-first order (it
+	// derives an RRF rank from array position, not from `score`). This lane's
+	// score varies with `directFanIn` but `Promise.allSettled` preserves the
+	// caller's symbol order, not score order — sort explicitly, matching the
+	// pattern already used correctly by the topology/wiki/cartridge lanes below.
+	hits.sort((a, b) => b.score - a.score);
 
 	return { lane: 'symbol', hits, latencyMs: Date.now() - t0, cacheHit: hits.length > 0 };
 }
@@ -383,7 +390,7 @@ const LANE_WEIGHT: Record<string, number> = {
  */
 const RRF_K = 60;
 
-function mergeAndRank(lanes: LaneResult[]): MultiLaneHit[] {
+export function mergeAndRank(lanes: LaneResult[]): MultiLaneHit[] {
 	const scoreAcc = new Map<string, number>();
 	const best = new Map<string, MultiLaneHit>();
 

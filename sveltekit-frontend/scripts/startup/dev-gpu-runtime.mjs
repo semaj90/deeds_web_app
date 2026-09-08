@@ -3,8 +3,16 @@
  * Start the local GPU developer runtime, then run Vite in the foreground.
  *
  * Responsibilities:
- * - Gemma4 chat summaries: llama-server on :8090, 64K context, detached.
- * - EmbeddingGemma embeddings: ONNX/OpenAI-compatible server on :8081, detached.
+ * - Chat/synthesis: llama-server on :8090, 64K context, detached. Corrected
+ *   2026-09-07 (was stale since the model switch): currently serves Ornith
+ *   1.5 9B, not Gemma4 — verify live via GET :8090/props rather than trusting
+ *   this comment or any hardcoded model name.
+ * - Embeddings: defaults to Ollama on :11434 (no eager VRAM reservation).
+ *   The dedicated ONNX/OpenAI-compatible server on :8081 is opt-in only
+ *   (EMBEDDING_BACKEND=llama_cpp_gguf) — see the embedding-backend-selector
+ *   comment below for the full enum and the onnx_directml in-process
+ *   alternative. This header previously implied :8081 was always started;
+ *   it is not.
  * - SvelteKit: Vite dev in the current terminal.
  *
  * The servers are intentionally helpers, not truth stores. Postgres remains the
@@ -37,10 +45,25 @@ const envFromFiles = loadRepoEnv(process.env);
 //                   server itself (onnx-server.ts), using the DirectML (D3D12)
 //                   execution provider. No separate port/process — the model
 //                   loads into the same Node process serving Vite. DirectML
-//                   runs through a driver/allocator path separate from CUDA,
-//                   so it doesn't compete with TurboQuant's CUDA context for
-//                   the same VRAM heap. Windows only; falls back to 'ollama'
-//                   elsewhere. Requires onnxruntime-node (package.json).
+//                   runs through a driver/allocator/API path separate from
+//                   CUDA's own runtime/context, so it doesn't compete for the
+//                   same allocator or CUDA context slot as TurboQuant. It
+//                   still allocates real physical VRAM on the same RTX card,
+//                   though (corrected 2026-09-07 — a prior version of this
+//                   comment implied no VRAM contention at all, which is
+//                   false): CUDA context isolation from DirectML/D3D12 is an
+//                   API/driver-path distinction, not proof of a separate
+//                   physical memory pool. On an 8GB card, Ornith's CUDA
+//                   context + a DirectML session absolutely compete for
+//                   overall board memory. Also note: to actually reach this
+//                   code path at request time, EMBEDDING_PROVIDER=onnx_directml
+//                   must ALSO be set — this EMBEDDING_BACKEND value alone only
+//                   controls this launcher's own process orchestration and
+//                   onnx-server.ts's internal strict-fallback behavior, not
+//                   which code path /api/embed actually calls (verified live
+//                   2026-09-07; see parent-atlas-workstation-todo.md).
+//                   Windows only; falls back to 'ollama' elsewhere. Requires
+//                   onnxruntime-node (package.json).
 //
 // DEV_GPU_EMBED_SERVER=onnx is a deprecated alias for 'llama_cpp_gguf' — it
 // never meant ONNX Runtime; it started the GGUF embed server. Kept only for

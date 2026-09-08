@@ -4,6 +4,36 @@ Scope is the first bounded slice only (see proposal.md "What Changes"). Do not
 start concept/hyperedge modeling, the synthesis-mapping ledger, the full
 recommendation engine, or Deep Agents integration under this task list.
 
+## ⚠️ "OKF" acronym collision — worse than one pair, found 2026-09-07, unresolved
+
+This change's own "OKF" (Google's Open Knowledge Format — Markdown + YAML frontmatter, v0.2
+provenance/trust/lifecycle fields, verified real via `GoogleCloudPlatform/open-knowledge-format`)
+is not the only "OKF" live in this repo. A same-day cross-check (prompted by a separate
+markdown-wiki-migration proposal from outside this repo that assumed "OKF" meant only Google's
+format) found **at least three other, unrelated meanings already in production code**:
+
+1. `docs/okf/MASTRA-OKF-SCHEMA.md` / `src/lib/server/okf/mastra-okf-loader.ts` — "OKF" =
+   "OpenCode Knowledge Framework," a Mastra workflow-template/tool-binding/execution-planning
+   schema (`apiVersion: okf.atlas.ai/v1`). Nothing to do with markdown concept pages.
+2. `src/lib/server/atlas/graph/okf-schema.ts` — `OkfGraphManifestSchema`/`OkfLanguageSpecSchema`,
+   a graph-relationship + PageRank-projection policy config (`pagerank_edges`, `max_hops`,
+   `auth_guards`, etc.). Also unrelated to knowledge interchange.
+3. `src/lib/server/atlas/policy/policy-types.ts`'s `PolicyStateInput.okf` — `naiveBayesScore`,
+   `logisticRegressionScore`, `fitMargin`, `decision` — "okf" here reads as a goodness-of-fit
+   classifier score for the HMM repair-policy state machine. A fourth, unrelated meaning.
+
+This proposal's own `.okf/manifest.yaml` + `.okf/domains/*.yaml` files (referenced in "Slice 1"
+below) already sit at the collision point between meaning #2 above and Google's OKF — the
+manifest/domain-schema shape resembles the Mastra/graph-policy style more than Google's
+frontmatter-concept-page style, but is being validated against "OKF v0.2" (Google's) provenance/
+trust/lifecycle fields regardless. **This proposal has not yet picked a collision-safe name.**
+Per this repo's own precedent for exactly this failure mode (the "ACE naming collision with
+NVIDIA's own ACE" note in root `CLAUDE.md`: keep both, but never let a bare acronym stand for
+either — name the newcomer distinctly), recommend renaming this proposal's usage before any
+further slice lands — e.g. `GOKF`/`gokf-bundle`/spelled out `open-knowledge-format` — rather than
+adding a fifth or sixth thing called "OKF" to the repo. Not fixed in this pass; flagged per the
+Duplication Prevention rule ("record what you found, even when you don't fix it").
+
 ## Implementation evidence — 2026-08-14
 
 - [x] Added the read-only ownership scanner
@@ -310,6 +340,26 @@ any library, database feature, model, or accelerator into a canonical owner.
 - Domain classification, tuple lifecycle, feature mapping, and
   recommendation schemas do not prove semantic embedding, sparse BM42,
   TurboVec/CAGRA, PageRank, or agent execution behavior.
+
+## Slice 7 — Karpathy wiki to OKF bundle bridge (2026-09-07)
+
+- [x] **OKF-WIKI-01** Establish `karpathy-wiki/` as the portable OKF-facing
+  bundle with a progressive-disclosure `index.md` and reserved `log.md`.
+  This is a documentation packaging boundary; it does not replace `.okf/`
+  registries or Parent Atlas taxonomy ownership.
+- [x] **OKF-WIKI-02** Add parseable OKF frontmatter to the existing canonical
+  Karpathy project pages without rewriting their bodies or inventing domain,
+  capability, or feature identifiers.
+- [x] **OKF-WIKI-03** Keep `llm/` as a compatibility/context hub and add a
+  pointer to the OKF bundle instead of duplicating or moving its history.
+- [x] **OKF-WIKI-04** Run a read-only bundle audit proving UTF-8 encoding,
+  non-empty `type`, resolvable internal links, reserved filename handling,
+  and preservation of legacy-page references before migrating more `llm/`
+  pages. The 2026-09-07 audit found 5 Markdown files, 3 concept files, and
+  zero errors; receipt: `docs/reports/okf-wiki-migration-v1.json`.
+- [x] **OKF-WIKI-05** Add a curated retrieval-navigation concept derived from
+  the legacy Karpathy master page. Keep the legacy page as a compatibility
+  source and preserve the existing Atlas registry as the taxonomy owner.
 
 ## Explicitly deferred (do not start)
 

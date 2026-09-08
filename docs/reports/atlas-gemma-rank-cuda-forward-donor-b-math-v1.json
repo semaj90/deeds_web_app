@@ -1,0 +1,115 @@
+{
+  "attentionBackend": "math",
+  "canonicalAuthority": false,
+  "checkpointDir": "/mnt/c/Users/james/Videos/deeds-web-app/models/gemma4-e4b-qat-assistant-2026-07-20",
+  "checkpointMutated": false,
+  "cudaPeakMiB": 156.621,
+  "derivedConfig": {
+    "dtype": "bfloat16",
+    "hiddenSize": 256,
+    "numAttentionHeads": 4,
+    "numHiddenLayers": 4,
+    "numKeyValueHeads": 2,
+    "numKvSharedLayers": 0,
+    "useBidirectionalAttention": "all"
+  },
+  "fixture": {
+    "absoluteMaxDelta": 1.0,
+    "bf16MaxAllowedDelta": 0.5,
+    "bf16UlpParity": false,
+    "cpuFinite": true,
+    "cpuRepeatExact": true,
+    "cpuScore": [
+      [
+        26.0
+      ],
+      [
+        7.5
+      ],
+      [
+        4.40625
+      ]
+    ],
+    "gpuFinite": true,
+    "gpuRepeatExact": true,
+    "gpuScore": [
+      [
+        25.875
+      ],
+      [
+        8.5
+      ],
+      [
+        4.25
+      ]
+    ],
+    "inputIds": [
+      [
+        2,
+        100,
+        101,
+        102,
+        1
+      ],
+      [
+        2,
+        103,
+        104,
+        105,
+        1
+      ],
+      [
+        2,
+        106,
+        107,
+        108,
+        1
+      ]
+    ],
+    "numericalParityProven": false,
+    "outputShape": [
+      3,
+      1
+    ],
+    "rankingOrderAgreement": true,
+    "relativeMaxDelta": 0.13333334028720856
+  },
+  "hardware": {
+    "computeCapability": [
+      8,
+      6
+    ],
+    "gpu": "NVIDIA GeForce RTX 3060 Ti",
+    "torch": "2.14.0+cu132",
+    "torchCuda": "13.2"
+  },
+  "inventory": {
+    "initializedStandaloneAttentionTensorCount": 12,
+    "loadedInheritedTensorCount": 46,
+    "shapeMismatches": []
+  },
+  "observedAt": "2026-09-07T21:05:05.744530+00:00",
+  "rankingQualityProven": false,
+  "receiptChecksum": "sha256:d7242944027277d763b272d50c8561f1abf7df01d8858bdc3f9a349a0afcaaf9",
+  "runtimeClass": "Gemma4ForCausalLM.text_backbone",
+  "schema": "atlas.gemma-rank-cuda-forward-probe.v1",
+  "sourceWeightsChecksumAfter": "sha256:9d0e2053067590cae9a8f4fcc57eefbe20dff90599360458ebd451e5cb5c947d",
+  "sourceWeightsChecksumBefore": "sha256:9d0e2053067590cae9a8f4fcc57eefbe20dff90599360458ebd451e5cb5c947d",
+  "status": "CUDA_BF16_FORWARD_FINITE_ORDER_PROVEN_PARITY_OPEN",
+  "timing": {
+    "cpuMeanMs": 16.876680001587374,
+    "cpuMs": [
+      25.268474000768038,
+      13.846819001628319,
+      11.514747002365766
+    ],
+    "gpuMeanMs": 9.902534334590504,
+    "gpuMs": [
+      10.964443001284963,
+      9.393227002874482,
+      9.349932999612065
+    ],
+    "repeats": 3
+  },
+  "trainingPerformed": false
+}

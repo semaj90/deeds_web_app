@@ -1,15 +1,15 @@
 {
   "schema": "atlas.postgres-fts-canonical-coverage.v2",
-  "generatedAt": "2026-08-28T18:18:58.846Z",
+  "generatedAt": "2026-09-08T02:11:41.625Z",
   "readOnly": true,
   "databaseWrites": false,
   "baseCoverage": {
-    "chunks_with_ref_and_hash": 52380,
-    "exact_source_ref_content_hash_matches": 408,
-    "source_ref_only_matches_no_hash_agreement": 51972,
+    "chunks_with_ref_and_hash": 53461,
+    "exact_source_ref_content_hash_matches": 429,
+    "source_ref_only_matches_no_hash_agreement": 53032,
     "unmatched_no_source_ref_at_all": 0,
-    "atlas_packets_content_hash_populated": 332,
-    "atlas_packets_total": 61660,
+    "atlas_packets_content_hash_populated": 353,
+    "atlas_packets_total": 61718,
     "ambiguous_source_ref_groups": 0,
     "ambiguous_source_ref_packet_rows": 0
   },
@@ -109,7 +109,7 @@
       "overlapBetweenLanes": 0,
       "deduplicatedCanonicalHits": 9,
       "ambiguousRejected": 0,
-      "unresolvedRejected": 92,
+      "unresolvedRejected": 91,
       "bindRate": 0.09
     },
     {
@@ -125,8 +125,8 @@
     }
   ],
   "summary": {
-    "exactJoinCoverageOfChunks": 0.007789232531500573,
-    "atlasPacketsContentHashPopulationRate": 0.005384365877392151,
+    "exactJoinCoverageOfChunks": 0.008024541254372346,
+    "atlasPacketsContentHashPopulationRate": 0.005719563174438575,
     "successfulFrozenQueries": 8,
     "timedOutOrFailedFrozenQueries": 0,
     "rawLexicalHits": 374,
@@ -135,7 +135,7 @@
     "overlapBetweenLanes": 0,
     "deduplicatedCanonicalHits": 21,
     "ambiguousRejected": 1,
-    "unresolvedRejected": 354,
+    "unresolvedRejected": 353,
     "overallBindRate": 0.05614973262032086
   },
   "recommendation": "CONTINUE_REVIEW: hash-exact and exact-canonical bridge are alternative identity lanes in one lexical result set; do not count them as separate relevance votes.",
@@ -143,6 +143,6 @@
     "bridge_rows": 105762,
     "exact_bridge_rows": 4517,
     "eligible_chunks_with_packet_bridge": 3013,
-    "eligible_chunks": 52380
+    "eligible_chunks": 53461
   }
 }

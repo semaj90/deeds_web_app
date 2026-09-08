@@ -1,11 +1,11 @@
 # TurboVec Kanban Consolidation Report
 
-Generated: 2026-09-05T21:20:13.580Z
+Generated: 2026-09-07T15:32:20.090Z
 Board tasks: 123
 Mass inputs: 6889
 Unique records: 6747
 Embedded records: 6725
-TurboVec backend mix: search-derived=5, offline=6720
+TurboVec backend mix: search-derived=6, offline=6719
 simdjson parses: 3957402 bytes
 
 ## Consolidation groups
@@ -33,9 +33,9 @@ simdjson parses: 3957402 bytes
 - **todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:79**: 5 records, 5 open, clusters=79, 96, 110, families=todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
   - Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links.
   - top: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md | Document the WSL2 GPU override as optional deployment flavor only; default to host-side CUDA inference when it is already available. | Track 5C–5E: Model/GGUF cleanup | Unsloth + PyTorch install and validation
-- **lib:cluster:none**: 4 records, 4 open, clusters=none, families=lib
+- **lib:cluster:0**: 4 records, 4 open, clusters=0, families=lib
   - Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links.
-  - top: lib › icons | lib › shims | lib › agent | lib › shared
+  - top: lib › icons | lib › shims | lib › agent | lib › schemas
 - **todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:48**: 4 records, 4 open, clusters=48, 65, 79, families=todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
   - Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links.
   - top: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md | `som_topology_stats` — delegate to `gpu:som_topology` for Redis SOM grid / centroid stats | Clustering quality cleanup (deferred)

@@ -12,8 +12,12 @@
 
 import { ONNX_EXECUTION_PROVIDERS } from '../model-ids.js';
 
-// Lazy-loaded onnxruntime-web (only imported in browser)
-let ort: typeof import('onnxruntime-web') | null = null;
+// Lazy-loaded onnxruntime-web (only imported in browser). Keep separate module
+// handles because the official WebGPU entrypoint selects the WebGPU bundle,
+// while the base entrypoint is the portable WASM/CPU fallback.
+type OrtRuntime = typeof import('onnxruntime-web');
+let ort: OrtRuntime | null = null;
+let ortWebGpu: OrtRuntime | null = null;
 
 /** Which execution provider was actually used for each session */
 const providerMap = new Map<string, string>();
@@ -83,8 +87,9 @@ export function invalidateGPUDevice(): void {
  * WASM binaries are served from /ort/ in static/ — copy them there
  * from node_modules/onnxruntime-web/dist/ if missing.
  */
-async function ensureOrt(): Promise<typeof import('onnxruntime-web')> {
-	if (ort) return ort;
+async function ensureOrt(useWebGpu = false): Promise<OrtRuntime> {
+	if (useWebGpu && ortWebGpu) return ortWebGpu;
+	if (!useWebGpu && ort) return ort;
 
 	// Provide global require polyfill for onnxruntime-web's CJS compatibility code.
 	// ORT's minified bundle checks `typeof require<"u"` — if require is undefined it
@@ -101,30 +106,38 @@ async function ensureOrt(): Promise<typeof import('onnxruntime-web')> {
 		(globalThis as any).require = (id: string) => shims[id] || {};
 	}
 
-	ort = await import('onnxruntime-web');
+	const runtime = useWebGpu
+		? await import('onnxruntime-web/webgpu')
+		: await import('onnxruntime-web');
 	// Point WASM loader at static/ort/ so it finds .wasm files
-	ort.env.wasm.wasmPaths = '/ort/';
+	runtime.env.wasm.wasmPaths = '/ort/';
 	// Force single-threaded WASM to avoid SharedArrayBuffer issues in headless browsers
-	ort.env.wasm.numThreads = 1;
-	return ort;
+	runtime.env.wasm.numThreads = 1;
+	if (useWebGpu) ortWebGpu = runtime;
+	else ort = runtime;
+	return runtime;
 }
 
 /**
  * Determine which execution providers are available in this browser.
- * Returns them in priority order: WebGPU (Dawn) → WASM → CPU.
+ * Returns them in priority order: WebGPU (Dawn) → WASM.
+ *
+ * ONNX Runtime Web has no distinct 'cpu' execution provider -- CPU execution
+ * IS the WASM backend (single-threaded, non-SIMD path within the same 'wasm'
+ * EP). A prior version of this function pushed a literal 'cpu' string as a
+ * fallback, which ORT Web does not recognize as a valid EP name (fixed
+ * 2026-09-07, see ONNX_EXECUTION_PROVIDERS in model-ids.ts).
  */
-function getAvailableProviders(): string[] {
+export function getAvailableProviders(): string[] {
 	const available: string[] = [];
 	for (const ep of ONNX_EXECUTION_PROVIDERS) {
 		if (ep === 'webgpu' && typeof navigator !== 'undefined' && navigator.gpu != null) {
 			available.push('webgpu');
 		} else if (ep === 'wasm') {
 			available.push('wasm');
-		} else if (ep === 'cpu') {
-			available.push('cpu');
 		}
 	}
-	return available.length > 0 ? available : ['cpu'];
+	return available.length > 0 ? available : ['wasm'];
 }
 
 /**
@@ -184,8 +197,10 @@ async function warmupSession(session: any, runtime: typeof import('onnxruntime-w
 }
 
 async function _createSession(modelUrl: string, preferredEps?: string[]): Promise<any> {
-	const runtime = await ensureOrt();
 	const eps = preferredEps ?? getAvailableProviders();
+	// The WebGPU entrypoint is required for ORT Web's browser GPU bundle. If
+	// WebGPU fails, this same runtime can still try the portable fallbacks.
+	const runtime = await ensureOrt(eps.includes('webgpu'));
 
 	console.info(`[ONNX] Loading model: ${modelUrl}`);
 	console.info(`[ONNX] Trying providers: ${eps.join(' → ')}`);
@@ -209,8 +224,27 @@ async function _createSession(modelUrl: string, preferredEps?: string[]): Promis
 	// ── WebGPU device pre-warm ────────────────────────────────────────────────
 	// Pre-request the GPU device before InferenceSession.create() so ORT reuses
 	// the existing device rather than allocating a second pipeline compilation.
+	//
+	// UNVERIFIED (2026-09-07): assigning `runtime.env.webgpu.device` is ORT's
+	// documented mechanism for this (see onnxruntime.ai/docs/api/js/interfaces/
+	// Env.WebGpuFlags.html — "only has effect before the first WebGPU inference
+	// session is created"), but a live, still-open upstream report says it may
+	// not actually be honored: microsoft/onnxruntime#26107, "The `device`
+	// specified in `ort.env.webgpu` will not be used at runtime" -- reports
+	// that ORT's WebGPU backend creates its own internal device regardless of
+	// this assignment. This assignment is therefore done per the documented
+	// API, but its real effect on THIS installed onnxruntime-web version
+	// (1.29.0) has not been proven in an actual browser here -- no browser
+	// testing tool was available this session. Do not cite this as a verified
+	// fix for the "ORT ignores the pre-warmed device" gap until it's actually
+	// observed to matter (e.g. session-creation latency measurably drops, or a
+	// WebGPU buffer-device-mismatch validation error like the one in #26107
+	// does NOT occur) in a real browser.
 	if (eps.includes('webgpu')) {
-		await getWebGPUDevice(); // populates _gpuDevice singleton
+		const device = await getWebGPUDevice(); // populates _gpuDevice singleton
+		if (device) {
+			runtime.env.webgpu.device = device;
+		}
 	}
 
 	// Try each provider in order

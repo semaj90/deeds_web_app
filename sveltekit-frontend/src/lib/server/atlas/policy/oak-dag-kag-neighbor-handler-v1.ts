@@ -17,10 +17,15 @@ export function createOakDagKagNeighborHandlerV1(): OakDagActionHandlerV1 {
     outputContract: 'output:oak_kag_neighbor_receipt',
     run: async ({ binding }: { binding: KernelDagExecutionBindingV1 }) => {
       const args = oakKagNeighborInputV1Schema.parse(binding.boundArguments);
-      const result = await readKagHypergraphNeighborsStrictV1(args.canonicalIds);
+      const result = await readKagHypergraphNeighborsStrictV1(args.canonicalIds, {
+        workspaceRevision: args.workspaceRevision,
+        graphRevision: args.graphRevision,
+      });
       return oakKagNeighborReceiptV1Schema.parse({
         schema: 'atlas.oak-kag-neighbor-receipt.v1',
         implementationRef: OAK_KAG_NEIGHBOR_READ_STRICT_V1,
+        workspaceRevision: args.workspaceRevision,
+        graphRevision: args.graphRevision,
         ...result,
         writesPerformed: false,
         canonicalAuthority: false,

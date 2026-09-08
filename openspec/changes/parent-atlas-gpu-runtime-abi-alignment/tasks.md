@@ -154,3 +154,74 @@ cases. AST proof ordering stays: byte-offset coordinate parity → span
 self-validity → named-symbol coverage → semantic-kind parity → exact span
 parity (Tree-sitter's `startIndex`/`endIndex` are explicitly byte offsets,
 not character offsets).
+
+## Current live runtime re-census (2026-09-06, read-only)
+
+- [x] Record the current hardware and provider split in
+  `docs/reports/atlas-gpu-inference-stack-readiness-v1.json`: RTX 3060 Ti / SM86 / driver
+  580.88; Windows CUDA toolkits 13.0 and 12.8; WSL `atlas-rapids-cu13` with PyTorch CUDA
+  13.0 and cuDF 26.06.01, cuGraph 26.06.00, cuVS 26.06.00.
+- [x] Preserve the distinction between CUDA runtime/toolkit/library versions. The current
+  direct probe did **not** observe a CUDA 13.2 toolkit, cuTile import, Triton server, or native
+  C ABI receipt. Existing reports that mention CUDA runtime 13.2 are historical or from a
+  different checkout and must not be substituted for this current recensus.
+- [x] Confirm that SIMT is the existing CUDA execution model used by the CUDA libraries and
+  simple kernel probes, not a separately installed service. cuTile remains a separate tile
+  execution lane; do not mix SIMT and cuTile inside one kernel or promote either from a fixture.
+- [x] Check current package availability without installing: the WSL package index reports
+  PyTorch `2.14.0+cu132` and `cuda-tile 1.5.0` as available candidates, while the proven
+  `atlas-rapids-cu13` environment remains on PyTorch `2.13.0+cu130` with no cuTile import.
+  Availability is not installation or compatibility proof; a CUDA 13.2 trial must use a cloned
+  environment so the working cuDF/cuGraph/cuVS lane remains reproducible.
+- [x] Create the isolated WSL environment `/home/james/.venvs/atlas-cutile-cu132` and install
+  PyTorch `2.14.0+cu132`, cuTile `1.5.0`, tileiras `13.2.78`, NumPy, and CuPy. The original
+  `atlas-rapids-cu13` environment was not changed.
+- [x] Run the file-backed cuTile/SIMT smoke probe in
+  `docs/reports/atlas-cuda132-cutile-simt-probe-v1.json`: cuTile vector-add was correct and
+  PyTorch CUDA 13.2 FP16 GEMM was finite on SM86. This is runtime smoke evidence only; it does
+  not prove cuTile GEMM parity or AtlasGemma forward compatibility.
+- [x] Run the same-input cuTile-versus-PyTorch SIMT FP16 GEMM probe using
+  `python/atlas_cuda_cutile_simt_gemm_probe_v1.py`. Receipt:
+  `docs/reports/atlas-cuda132-cutile-simt-gemm-probe-v1.json`. The aligned 256x256x256
+  multiplication was finite with maximum absolute and relative delta `0`; warm means were
+  0.165ms for cuTile and 0.078ms for PyTorch SIMT. This proves numerical kernel parity for the
+  bounded shape only; cuTile performance and AtlasGemma integration remain open.
+- [x] Repeat the same-input parity probe at `512x512x512`:
+  `docs/reports/atlas-cuda132-cutile-simt-gemm-512-probe-v1.json`. Both outputs remained finite
+  with maximum absolute and relative delta `0`; warm means were 0.417ms for cuTile and 0.149ms
+  for PyTorch SIMT. Correctness now holds for two aligned sizes, while production performance
+  selection and AtlasGemma integration remain open.
+- [x] Run a bounded temporary SIMT GEMM probe in the proven WSL environment. Receipt:
+  `docs/reports/gpu-simt-gemm-sm86-readiness-v1.json`. FP16 and BF16 aligned matrix shapes
+  produced finite outputs on the RTX 3060 Ti with PyTorch CUDA 13.0 and 12.38 MiB peak
+  allocation. This proves the current SIMT/PyTorch dtype path only; it is not an AtlasGemma
+  forward, cuTile proof, TensorRT proof, or CUDA 13.2 proof.
+- [x] Capture a real AtlasGemma CUDA/BF16 forward receipt in the isolated CUDA 13.2/cuTile
+  environment: `docs/reports/atlas-gemma-rank-cuda132-forward-probe-v1.json`. The model forward
+  is finite and order-stable across CPU/GPU for the bounded fixture, but numeric BF16 parity is
+  still open (`absoluteMaxDelta=0.3125`); this is not yet a cuTile GEMM or production-ranker proof.
+- [x] Isolate the precision behavior with
+      `docs/reports/atlas-gemma-rank-cuda132-precision-diagnostic-v1.json`: the same real-token
+      inputs in FP32 matched within `0.000406`, while BF16 reached `3.8125` maximum CPU/GPU drift
+      and `8.843043` GPU-BF16/GPU-FP32 drift. Both were deterministic and order-stable. This
+      confirms the environment and checkpoint are aligned enough for FP32 reference work, but
+      BF16 numerical parity remains a promotion blocker.
+- [x] Run a separate GPU FP16 control with
+      `docs/reports/atlas-gemma-rank-cuda132-fp16-control-v1.json`. The same three real-token
+      inputs were finite and repeat-deterministic, but FP16 versus GPU FP32 reached `1.955785`
+      maximum absolute delta and failed ordering agreement. This confirms half-precision
+      execution is not yet a safe ranking reference for the derived model; no deployment or
+      promotion decision follows from this fixture.
+- [x] Repeat the GPU FP16 control at twelve real-token inputs with
+      `docs/reports/atlas-gemma-rank-cuda132-fp16-control-12-v1.json`. The maximum FP16/GPU-FP32
+      delta remained `1.955785` and ordering agreement remained false, while finite output and
+      repeat determinism held. This confirms the half-precision issue is not limited to the
+      three-item control fixture.
+- [ ] Capture the first real AtlasGemma CUDA/GEMM receipt on the RTX 3060 Ti with model,
+  adapter, tensor dtype, shapes, alignment, peak VRAM, kernel/provider, and CPU parity. This
+  must run only after GPU contention is controlled and must not be inferred from Ornith or the
+  existing simple weighted-row kernels.
+- [ ] Only after the CUDA reference receipt exists, evaluate the matching ONNX Runtime CUDA /
+  TensorRT provider, TensorRT-LLM/Triton engine, and WebGPU projection as separate derived
+  deployment artifacts. No current evidence authorizes installing CUDA 13.2/cuTile or claiming
+  TensorRT-LLM readiness.

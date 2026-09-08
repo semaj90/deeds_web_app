@@ -284,7 +284,7 @@ const ANALYSIS_WORKER_REVISION = 'analysis-worker-v1';
 const ANALYSIS_WORKER_PRODUCER_ID = 'parent-atlas-analysis-worker';
 
 type AnalysisStageConfig = {
-	gate: ReturnType<typeof import('p-limit').default>;
+	gate: typeof entityGate;
 	concurrency: number;
 	family: 'structural' | 'lexical' | 'linguistic' | 'semantic' | 'sequence' | 'rerank' | 'grounded';
 	passName: string;
@@ -292,7 +292,7 @@ type AnalysisStageConfig = {
 	backend: 'native-ts' | 'rust' | 'python-sidecar' | 'gpu-sidecar' | 'offline';
 	backendVersion: string;
 	device: 'cpu' | 'cuda' | 'external';
-	run: (evidenceId: string, meta: Record<string, unknown>) => Promise<Record<string, unknown>>;
+	run: (evidenceId: string, meta: Record<string, unknown>, analysisJobId: string) => Promise<Record<string, unknown>>;
 };
 
 const stageConfig: Record<string, AnalysisStageConfig> = {
@@ -355,6 +355,20 @@ const stageConfig: Record<string, AnalysisStageConfig> = {
 
 // --- Worker loop ---
 
+// Opt-in until the live source/ledger replay gate is closed. The executor
+// performs its own ledger write and readback; the generic writer must not run twice.
+if (process.env.ATLAS_LEXICAL_PASS_ENABLED === 'true') {
+	stageConfig.lexical_feature_registry = {
+		gate: entityGate, concurrency: 1, family: 'lexical',
+		passName: 'lexical_features', passRevision: 'lexical-worker-v2',
+		backend: 'native-ts', backendVersion: 'lexical-registry-extractor-v1', device: 'cpu',
+		run: async (evidenceId, metadata, id) => {
+			const { executeLexicalPassV1 } = await import('./lexical-pass-executor-v1.js');
+			return executeLexicalPassV1({ id, evidenceId, metadata });
+		},
+	};
+}
+
 let workerInterval: ReturnType<typeof setInterval> | null = null;
 let notificationClient: Client | null = null;
 let polling = false;
@@ -391,7 +405,11 @@ async function pollOnce(): Promise<void> {
 					try {
 						await updateAnalysisJob(job.id, { progress: '10' });
 						const jobResult = job.result as Record<string, unknown>;
-						const result = await cfg.run(job.evidenceId, job.result);
+						const result = await cfg.run(job.evidenceId, job.result, job.id);
+						if (jobType === 'lexical_feature_registry') {
+							await completeAnalysisJob(job.id, { ...result, durationMs: Date.now() - t0 });
+							return;
+						}
 						const passResult = result as Record<string, unknown>;
 						const finishedAt = new Date();
 						let ledgerInput: AnalysisPassLedgerInput = {

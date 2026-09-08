@@ -10,17 +10,17 @@ describe('oak KAG neighbor DAG handler', () => {
     read.mockResolvedValueOnce({ requestedCanonicalIds: 1, matchedTuples: 1, matchedHyperedges: 1, neighbors: [{ canonicalId: 'canonical:1', hyperedgeIds: ['edge:1'] }] });
     const { createOakDagKagNeighborHandlerV1 } = await import('./oak-dag-kag-neighbor-handler-v1.js');
     const handler = createOakDagKagNeighborHandlerV1();
-    const result = await handler.run({ action: {} as never, parentResults: [], binding: { boundArguments: { canonicalIds: ['canonical:1'] }, action: {} } as never });
+    const result = await handler.run({ action: {} as never, parentResults: [], binding: { boundArguments: { canonicalIds: ['canonical:1'], workspaceRevision: 'ws-1', graphRevision: 'graph-1' }, action: {} } as never });
 
     expect(handler.implementationRef).toBe('parent-atlas.kag.neighbor-read.strict.v1');
     expect(result).toMatchObject({ requestedCanonicalIds: 1, writesPerformed: false, canonicalAuthority: false });
-    expect(read).toHaveBeenCalledWith(['canonical:1']);
+    expect(read).toHaveBeenCalledWith(['canonical:1'], { workspaceRevision: 'ws-1', graphRevision: 'graph-1' });
   });
 
   it('rejects empty or over-bounded canonical ID input', async () => {
     const { createOakDagKagNeighborHandlerV1 } = await import('./oak-dag-kag-neighbor-handler-v1.js');
     const handler = createOakDagKagNeighborHandlerV1();
-    await expect(handler.run({ action: {} as never, parentResults: [], binding: { boundArguments: { canonicalIds: [] }, action: {} } as never })).rejects.toThrow();
+    await expect(handler.run({ action: {} as never, parentResults: [], binding: { boundArguments: { canonicalIds: [], workspaceRevision: 'ws-1', graphRevision: 'graph-1' }, action: {} } as never })).rejects.toThrow();
     expect(read).not.toHaveBeenCalled();
   });
 });

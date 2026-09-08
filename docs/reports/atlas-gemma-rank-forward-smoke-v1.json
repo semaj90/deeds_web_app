@@ -1,0 +1,83 @@
+{
+  "canonicalAuthority": false,
+  "checkpointDir": "models\\gemma4_assistant_huggingface_7_3_26",
+  "checkpointMutated": false,
+  "checkpointOnlyTensorNames": [
+    "masked_embedding.centroids.weight",
+    "masked_embedding.token_ordering",
+    "post_projection.weight",
+    "pre_projection.weight"
+  ],
+  "checkpointTensorCount": 50,
+  "cudaAllocated": false,
+  "derivedConfig": {
+    "dtype": "bfloat16",
+    "hiddenSize": 256,
+    "numAttentionHeads": 4,
+    "numHiddenLayers": 4,
+    "numKeyValueHeads": 2,
+    "numKvSharedLayers": 0,
+    "useBidirectionalAttention": "all",
+    "useCache": false
+  },
+  "deterministicCpuForwardProven": true,
+  "fixture": {
+    "attentionMask": [
+      [
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    ],
+    "hiddenDtype": "torch.bfloat16",
+    "hiddenFinite": true,
+    "hiddenShape": [
+      1,
+      5,
+      256
+    ],
+    "inputIds": [
+      [
+        2,
+        100,
+        101,
+        102,
+        1
+      ]
+    ],
+    "repeatForwardExact": true,
+    "repeatHiddenShape": [
+      1,
+      5,
+      256
+    ],
+    "repeatScoreShape": [
+      1,
+      1
+    ],
+    "scoreDtype": "torch.bfloat16",
+    "scoreFinite": true,
+    "scoreShape": [
+      1,
+      1
+    ],
+    "synthetic": true
+  },
+  "forwardExecuted": true,
+  "initializedStandaloneAttentionTensorCount": 12,
+  "loadedInheritedTensorCount": 46,
+  "observedAt": "2026-09-07T00:41:28.833927+00:00",
+  "rankingQualityProven": false,
+  "receiptChecksum": "sha256:29df0c7e77f9d16841fbfcc553fd8872bca40fa275c8f3f9f36dab1b418256c2",
+  "runtimeClass": "Gemma4ForCausalLM.text_backbone",
+  "runtimeInstantiation": "IN_MEMORY_ONLY",
+  "schema": "atlas.gemma-rank-forward-smoke.v1",
+  "shapeMismatches": [],
+  "sourceWeightsChecksumAfter": "sha256:12875062fc25c51e8fa9b62abd2de7ad48b7d63f8559d5d604fbd5a3d6bcff16",
+  "sourceWeightsChecksumBefore": "sha256:12875062fc25c51e8fa9b62abd2de7ad48b7d63f8559d5d604fbd5a3d6bcff16",
+  "status": "FORWARD_SHAPE_FINITE_PROVEN",
+  "trainingPerformed": false,
+  "weightsMutated": false
+}

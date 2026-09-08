@@ -38,6 +38,7 @@ export default defineConfig({
       'tests/ace-policy.spec.ts',
       'tests/okf-loader.spec.ts',
       'tests/code-llm-index.spec.ts',
+      'tests/cache-keys.spec.ts',
       'tests/openai-facade.spec.ts',
       'tests/intent-ranker.spec.ts',
       'tests/gemma4-tool-controller.spec.ts',
@@ -187,6 +188,8 @@ export default defineConfig({
       // multi-lane spine regression guards: skipVectorLane, aceTopkKey, gap checks
       // Multi-lane RRF replacement + cross-encoder gate (Action #2 + #3 from 2026-05-11 audit)
       'tests/multi-lane-rrf-and-rerank.spec.ts',
+      // runSymbolLane best-first ordering fix (parent-atlas-ace-bitfrost-cache-correctness T3, 2026-09-07)
+      'tests/multi-lane-symbol-lane-ordering.spec.ts',
       // AGENTS directory-card index store + ACE context source (P1 batch — 2026-05-11)
       'tests/agents-index.spec.ts',
       // GraphRAG flag contract for build-agents-index.mjs (Neo4j sync + dry-run + skip flags)

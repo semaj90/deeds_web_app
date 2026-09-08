@@ -57,20 +57,68 @@ export interface ACEPacket {
   source_revision?: number;
 }
 
+/**
+ * Sorts candidates by `final_score` descending (highest-scoring first) before any
+ * truncation. Extracted as a pure function so it is unit-testable without the
+ * class's live Postgres/Redis connections.
+ *
+ * Bug context (parent-atlas-ace-bitfrost-cache-correctness, T2 item 3): `assemble()`
+ * previously called `candidates.slice(0, 50)` directly on caller-supplied order with
+ * no sort in between. The one live caller (`phase110-end-to-end-retrieval-flow.ts`)
+ * passes `extracted_facts` filtered but never sorted by score, so a truncation past
+ * index 50 silently dropped whichever candidates happened to land after index 50 in
+ * upstream extraction order -- not the lowest-scoring ones. `Array.prototype.sort` is
+ * stable in Node/V8, so candidates with equal `final_score` keep their relative
+ * input order.
+ */
+export function selectTopCandidatesV1<T extends { final_score: number }>(
+  candidates: readonly T[],
+  limit: number
+): T[] {
+  return [...candidates].sort((a, b) => b.final_score - a.final_score).slice(0, limit);
+}
+
+/**
+ * Conservative content-token estimate used only for ACE accounting. The
+ * assembler does not own a model tokenizer, so this deliberately reports an
+ * estimate from UTF-8 byte length rather than pretending identifiers are
+ * evidence content.
+ */
+export function estimateContentTokensV1(content: string): number {
+  return Math.ceil(Buffer.byteLength(content, 'utf8') / 4);
+}
+
 export class ACEContextAssembler {
   private pgPool: pg.Pool;
   private redis: ReturnType<typeof getValkeyClient>;
+  // Whether `this.redis` is a connection this instance owns (and must `.quit()`
+  // itself) versus the shared app-wide singleton from `getValkeyClient()`, which
+  // must never be quit by one caller — see `close()` below.
+  private ownsRedisConnection: boolean;
 
   constructor(pgUrl?: string, redisHost?: string, redisPort?: number, redisPassword?: string) {
     this.pgPool = new pg.Pool({
       connectionString: pgUrl || process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db',
     });
 
-    this.redis = getValkeyClient().duplicate({
-      host: redisHost || process.env.REDIS_HOST || '127.0.0.1',
-      port: redisPort || parseInt(process.env.REDIS_PORT || '6379'),
-      password: redisPassword || process.env.REDIS_PASSWORD || 'redis',
-    });
+    // T2 item 1 fix (parent-atlas-ace-bitfrost-cache-correctness): previously this
+    // always called `.duplicate()`, opening a second persistent Redis connection
+    // even when no caller ever overrides the connection settings (confirmed live:
+    // both real callers construct with zero args). Reuse the shared
+    // `getValkeyClient()` singleton in that common case; only duplicate when an
+    // explicit override is actually supplied, so a caller that legitimately wants
+    // a distinct connection still gets one.
+    if (redisHost || redisPort !== undefined || redisPassword) {
+      this.redis = getValkeyClient().duplicate({
+        host: redisHost || process.env.REDIS_HOST || '127.0.0.1',
+        port: redisPort || parseInt(process.env.REDIS_PORT || '6379'),
+        password: redisPassword || process.env.REDIS_PASSWORD || 'redis',
+      });
+      this.ownsRedisConnection = true;
+    } else {
+      this.redis = getValkeyClient();
+      this.ownsRedisConnection = false;
+    }
   }
 
   async assemble(
@@ -81,6 +129,8 @@ export class ACEContextAssembler {
       source_ref: string;
       feature_id: string;
       domain_class?: string;
+      /** Evidence text used for token accounting; not copied into the packet identity list. */
+      content: string;
       final_score: number;
       retrieval_trace: RetrievalTraceEntry[];
     }>,
@@ -98,7 +148,7 @@ export class ACEContextAssembler {
       for (const trace of candidate.retrieval_trace) {
         lanesUsed.add(trace.lane);
       }
-      totalTokens += Math.ceil(candidate.packet_key.length / 4) + Math.ceil(candidate.source_ref.length / 4);
+      totalTokens += estimateContentTokensV1(candidate.content);
     }
 
     const compressedTokens = Math.min(totalTokens, 4800);
@@ -109,7 +159,7 @@ export class ACEContextAssembler {
       query_text: queryText,
       query_embedding: queryEmbedding,
       retrieved_at: retrievedAt,
-      candidates: candidates.slice(0, 50).map((c) => ({
+      candidates: selectTopCandidatesV1(candidates, 50).map((c) => ({
         packet_key: c.packet_key,
         source_ref: c.source_ref,
         feature_id: c.feature_id,
@@ -340,7 +390,12 @@ export class ACEContextAssembler {
 
   async close(): Promise<void> {
     await this.pgPool.end();
-    await this.redis.quit();
+    // Only quit a connection this instance actually opened. The shared
+    // `getValkeyClient()` singleton is used by the rest of the app and must
+    // outlive any single ACEContextAssembler instance's lifecycle.
+    if (this.ownsRedisConnection) {
+      await this.redis.quit();
+    }
   }
 }
 

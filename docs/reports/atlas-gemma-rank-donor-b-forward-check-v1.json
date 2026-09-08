@@ -1,0 +1,28 @@
+{
+  "artifactDir": "/mnt/c/Users/james/Videos/deeds-web-app/models/atlas-gemma-rank-v1-donor-b/standalone-init-bf16",
+  "artifactTensorCount": 60,
+  "artifactWeightsChecksum": "sha256:06a26a9a36a591d7b284cff59d0c27f0ac0a2db192d6f743a2f574ad0d435bce",
+  "canonicalAuthority": false,
+  "checkpointMutated": false,
+  "hiddenDtype": "torch.float32",
+  "hiddenFinite": true,
+  "hiddenShape": [
+    1,
+    5,
+    256
+  ],
+  "inputTokenCount": 5,
+  "loadedModelTensorCount": 58,
+  "missingKeys": [],
+  "modelStateTensorCount": 58,
+  "observedAt": "2026-09-08T00:00:38.902767+00:00",
+  "rankHeadPresent": true,
+  "receiptChecksum": "sha256:91fbaef5b27e17033b00b7fa5b33ba14372dfb7904bdf7717cb65e59e2050ca9",
+  "runtimeClass": "Gemma4ForCausalLM",
+  "schema": "atlas.gemma-rank-standalone-artifact-forward-check.v1",
+  "score": 8.375,
+  "scoreFinite": true,
+  "status": "EXPORTED_STANDALONE_FORWARD_FINITE_PROVEN",
+  "trainingPerformed": false,
+  "unexpectedKeys": []
+}

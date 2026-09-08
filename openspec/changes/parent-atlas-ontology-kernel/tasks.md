@@ -2051,25 +2051,22 @@ and `python/tests/test_atlas_rapids_graph_runtime.py` (5/5 retained).
 > progress there, not here.
 
 
-- [ ] Reconcile the live classifier taxonomy emitted by
-  `scripts/atlas/classify-domain-ontology.mjs` (including labels such as
-  `agent_orchestration`, `rag_retrieval`, and `graph_topology`) with an
-  explicit, revisioned `DomainOntologyMappingV1` catalog.
+- [x] Reconcile the classifier taxonomy emitted by
+  `scripts/atlas/classify-domain-ontology.mjs` (15 labels, including
+  `agent_orchestration`, `rag_retrieval`, and `graph_topology`) with the
+  explicit, revisioned `DomainOntologyMappingV1` catalog. The current audit
+  reports 15 admitted and 0 unresolved labels with mapping revision
+  `sha256:b1fe99ea1b85f0ad0deecbe359f6565a28f1dd435008f260e0d52d2f03595a0e`.
 - [ ] Keep unmapped labels fail-closed; do not treat 100% `domain_class`
   population in the readiness audit as ontology admission.
 - [x] Prove one read-only classifier-label → admitted ontology-class →
   `OntologyLinkedTupleV1` fixture path before any graph materialization.
 
-Progress: the classifier taxonomy aliases that map unambiguously to existing
-broad classes are now admitted and covered by `python/test_domain_mapping.py`
-(7 passed) plus the admission proof. The classifier-to-tuple fixture now passes
-via `scripts/atlas/prove-domain-ontology-tuple-wire-v1.py`; labels without an
-existing class owner, including `mcp_agents`, remain fail-closed and open.
-The current classifier taxonomy audit leaves these labels unresolved:
-`auth_login_register`, `case_management`, `evidence_upload_storage`,
-`document_processing`, `cache_layer`, `memory_optimization`,
-`citation_engine`, and `legal_reports`. No broad-class assignment is inferred
-for them.
+Progress: all 15 current classifier labels now map unambiguously to existing
+broad classes and are covered by the read-only taxonomy audit. This is mapping
+coverage only: it does not make classifier labels ontology IDs, populate the
+ontology registry, or authorize tuple/graph/cache writes. Any future label
+without an explicit mapping remains fail-closed.
 The strict fixture signal path now also records `classificationRevision`,
 `mappingRevision`, `sourceNamespace`, `sourceRevision`, and zero direct
 classifier bypass counters. Live classifier-producer adoption remains open.
@@ -2128,8 +2125,10 @@ Current owner search found classifier/runtime references but no authoritative
 this contract is approved.
 
 Repeatable audit: `scripts/atlas/audit-domain-ontology-taxonomy-v1.py` writes
-`docs/reports/domain-ontology-taxonomy-audit-v1.json` and intentionally reports
-`DOMAIN_ONTOLOGY_TAXONOMY_PARTIAL` while unresolved labels remain.
+`docs/reports/domain-ontology-taxonomy-audit-v1.json` and currently reports
+`DOMAIN_ONTOLOGY_TAXONOMY_PROVEN` for mapping coverage only. ONTO-PY-DOMAIN-03,
+live source-lineage qualification, ontology-registry ownership, and canonical
+tuple promotion remain blocked and must not be inferred from this audit.
 
 ### ONTO-PY-GPU-02 — shared incidence algorithm parity — 2026-09-01
 
@@ -2715,3 +2714,926 @@ reverts to the 128 default and the fixed failure mode returns.
   datastore write was performed.
 - [ ] Live Firecrawl acquisition, concept admission, and retrieval execution
   remain separate gates.
+
+## HYPERGRAPH-ARITY-CENSUS-01 (2026-09-07, read-only, live production DB)
+
+A separate conversation proposed a `HYPERGRAPH_NARY_MATERIALIZE_01` gate on the premise that the
+live `atlas_hyperedges`/`atlas_hyperedge_members` corpus is "mostly binary taxonomy material
+wrapped in a hyperedge schema" rather than genuine n-ary HyperGraphRAG facts. Ran the census
+against live production Postgres before accepting that premise — it's not just directionally
+right, it's exact:
+
+```sql
+SELECT arity, count(*) FROM (
+  SELECT hyperedge_id, count(*) AS arity FROM atlas_hyperedge_members GROUP BY hyperedge_id
+) t GROUP BY arity;
+-- arity=2: 62,802 hyperedges (100% — zero rows at arity 3+)
+```
+
+- `atlas_hyperedges`: 62,802 rows. `atlas_hyperedge_members`: 125,604 rows (exactly 2 per
+  hyperedge, confirming the row counts cited in the proposing conversation were accurate, not
+  approximated).
+- `relation_type` breakdown: `CONCEPT_PART_OF` (57,751), `CONCEPT_BROADER_THAN` (5,051) — a
+  binary taxonomy shape, not the cited `IS_A`/`INHERITS_FROM`/`PART_OF` exact labels, but the
+  same taxonomic concept.
+- `atlas_ontology_tuples`: 0 rows — confirms the "tuple materialization was empty" claim exactly.
+- Real index/schema shape also confirmed exactly as cited:
+  `symbol_resolver` has `feature_id`/`packet_key`/`source_ref` with indexes
+  `idx_symbol_resolver_feature_id`, `idx_symbol_resolver_packet_key`,
+  `idx_symbol_resolver_source_ref`; `atlas_hyperedge_members`'s PK is
+  `(hyperedge_id, member_id, member_role)` with `idx_ahem_member_id` on `member_id` and
+  `idx_ahem_member_type_role` on `(member_type, member_role)` — matches the proposing
+  conversation's cited index names verbatim.
+
+**Conclusion**: this repo's populated hypergraph corpus is currently, precisely, **100% binary**
+— every stored hyperedge has exactly 2 members. `HYPERGRAPH_NARY_MATERIALIZE_01` (turning
+role-labelled n-ary facts — e.g. one `EVENT` hyperedge with `actor`/`action`/`object`/`tool`/
+`requirement`/`evidence` participants — into real stored hyperedges, rather than only binary
+taxonomy edges) is a genuine, verified gap, not a speculative one.
+
+**One correction to the proposing conversation's framing**: it characterized
+`src/routes/api/admin/atlas/hyperrag/+server.ts` as "an older HyperRAG implementation" calling
+embed/cluster/Qdrant/CouchDB/wiki-enrichment/CUDA-synthesis. Read the actual file — its own
+docstring says otherwise: *"Legacy HyperRAG compatibility wrapper. The route keeps the old admin
+surface alive, but retrieval and fusion now come from the canonical packet RPC / SearchRuntime
+spine."* It already calls `hyperragPacketRpc()` (the canonical spine), not an old
+embed/cluster/Qdrant/CouchDB pipeline — the backend has already been modernized. What's actually
+stale is the **frontend**: `src/routes/(app)/admin/atlas/+page.svelte`'s `HyperRAGResult` type
+still declares `phaseLatency: { embed, cluster, qdrant, couchdb }` and renders those specific
+phase-timing fields in its HyperRAG tab — fields the modernized backend route doesn't populate
+with real values from the new pipeline. So the alignment gap is real, but it's a **frontend
+display artifact showing a defunct phase model**, not a backend architecture problem — a
+narrower, more precise fix than "replace an old HyperRAG implementation."
+
+Not built in this pass: `HYPERGRAPH_NARY_MATERIALIZE_01` itself, the bounded incidence-lookup
+traversal, or the Studio tab rewrite. This is a census + one correction only.
+
+## HYPERGRAPH_NARY_MATERIALIZE_01 — first bounded slice, fixture-proven (2026-09-07)
+
+Investigated what this gate would actually need before writing anything, per this repo's
+Duplication Prevention rule. Two genuinely good findings, neither anticipated going in:
+
+1. **The contract and schema are already n-ary capable — nothing to build there.**
+   `HyperedgeV1Schema` (`sveltekit-frontend/src/lib/server/graph/hyperedge-contract.ts`) declares
+   `participants: z.array(HyperedgeParticipantV1Schema).min(2)` — no maximum — and its own
+   docstring already says *"Build a deterministic role-aware n-ary fact/event."*
+   `createHyperedgeV1()` already throws only on fewer than 2 participants, never on more. Checked
+   the live Postgres schema directly (`pg_constraint` on `atlas_hyperedges`/
+   `atlas_hyperedge_members`): only `NOT NULL`, a `lifecycle` enum check, a checksum-format check,
+   and FK constraints exist — **zero arity-limiting constraints anywhere**. The 100%-binary
+   population found in `HYPERGRAPH-ARITY-CENSUS-01` above is purely a fact about what's been
+   *written* (`populate-hyperedges-from-taxonomy-edges-v1.mts`, which only ever derives from
+   binary `taxonomy_edges` rows), not a limitation of the contract or the database.
+2. **A genuinely n-ary evidence source already exists, unwired.**
+   `ApiContractObservationV1` (`src/lib/server/atlas/language/api-contract-observation-v1.ts`) —
+   already schema'd, already spec-tested — naturally carries `route` + `handlerSymbol` +
+   `inputSchemaRefs[]` + `outputSchemaRefs[]` + `authRequirements[]` per observation, i.e. a
+   single API-route fact already has 3-6+ distinct role-labelled participants. Its own fields
+   `requiresCanonicalPromotion: true` / `canonicalWritesAllowed: false` show it was explicitly
+   designed as an evidence input awaiting a promotion step — exactly this gate. Checked its
+   producer, `sveltekit-api-contract-observer-v1.ts`: real, schema-valid, spec-tested, but **zero
+   live callers anywhere in `src/` or `scripts/`** (confirmed via grep) — an unwired-but-real
+   scaffold per [[feedback_no_delete_unwired_scaffolds]], not dead code.
+
+**Built and fixture-proven**: `sveltekit-frontend/src/lib/server/atlas/graph/
+hypergraph-nary-materialize-v1.ts` — `materializeApiContractObservationAsHyperedgeV1()` converts
+one `ApiContractObservationV1` into a genuine `HyperedgeV1` (roles: `route`, `handler`,
+`inputSchema`, `outputSchema`, `authRequirement`), reusing `createHyperedgeV1()` completely
+unchanged. Fails closed (returns `null`, does not fabricate a binary fact) for non-HTTP
+transports with no route, and for routes with only route+handler known (arity would be 2, which
+defeats this gate's whole point). 5/5 tests pass (deterministic identical-input replay, arity
+verification, both fail-closed paths, schema-validation pass-through), zero compiler diagnostics
+on the two new files. Full receipt: `docs/reports/hypergraph-nary-materialize-v1.json`.
+
+**Zero writes, zero schema changes, zero contract changes** — this is a pure fixture-input
+conversion function. Explicitly NOT done in this slice: wiring the observer to a real scanning
+caller (so `ApiContractObservationV1` rows come from live source, not only test fixtures), and a
+Postgres write path for the resulting `HyperedgeV1` (the only existing writer precedent,
+`populate-hyperedges-from-taxonomy-edges-v1.mts`, only ever writes arity-2 facts and would need
+extending or a sibling script). Both are real, separate, un-started next gates.
+
+## DEFINITION-LINEAGE-AUDIT-01 (2026-09-07, read-only)
+
+The complete cross-plane review is recorded in
+`docs/reports/parent-atlas-lineage-definition-audit-v1.json`. It confirms that the OKF/YAML
+definitions, TypeScript/Python ontology contracts, 8095 providers, Postgres FTS/GIN boundary,
+and hypergraph schemas exist, but their live admission chain is not closed.
+
+- [x] Domain taxonomy mapping proof: 15/15 labels admitted, zero unresolved labels, no writes.
+- [x] Hypergraph currentness census: 62,802 live hyperedges, 125,604 members, all arity 2;
+      `atlas_ontology_tuples` remains empty.
+- [x] Classifier lineage audit: 3,352 rows, only 148 revision-qualified Graphify joins,
+      zero declared Graphify source namespaces, and 3,204 missing Graphify joins.
+- [x] Current source cohort audit: 52/52 source-revision matches, 0/52 current workspace
+      revision matches.
+- [ ] Resolve Graphify source namespace and revision-qualified classifier coverage before
+      ontology tuple admission.
+- [ ] Reconcile current source cohort with `atlas_workspace_source_bindings` and the latest
+      completed Graphify run.
+- [ ] Complete 8095 observation → revisioned registry → Viterbi/ACE → CandidateFeatureMatrix
+      replay with exact UTF-8 span readback.
+- [ ] Materialize current grounded `OntologyLinkedTupleV1` facts under the existing promotion
+      gate; taxonomy mapping alone is not tuple materialization.
+- [ ] Wire the existing n-ary API-contract materializer to a real observer and explicit writer;
+      do not replace the existing hyperedge schema or create a second graph store.
+- [ ] Capture a production-shaped read-only Postgres FTS/GIN `EXPLAIN (ANALYZE, BUFFERS,
+      SETTINGS)` receipt. PostgreSQL 18 AIO/bitmap behavior remains planner telemetry, not an
+      application contract.
+- [ ] Demonstrate one validated, canonical-serialized, checksummed `.okf`/YAML artifact
+      flowing into each consuming boundary; registry navigation alone does not prove admission.
+
+No schema, datastore, projection, or canonical ontology writes were performed by this audit.
+
+### LEXICAL-IDENTITY-REPLAY-01 (2026-09-07, read-only)
+
+The existing PostgreSQL FTS/GIN owner was replayed through its canonical identity audit. The
+receipt is `docs/reports/postgres-fts-canonical-coverage-v2.json`.
+
+- [x] Native `tsvector`/GIN candidate retrieval and `ts_rank_cd` executed for 8 frozen queries.
+- [x] No query timed out; no database writes occurred.
+- [x] 53,461 chunks have both `source_ref` and `content_hash`, but only 408 exact hash-qualified
+      joins bind to `atlas_packets`.
+- [x] The existing exact-canonical bridge recovered 18 additional replay hits; 353 were
+      unresolved and 1 was ambiguous.
+- [ ] Resolve packet/content-hash lineage before promoting the lexical result set to canonical
+      ontology or ACE evidence.
+- [ ] Capture the bounded query plan with `EXPLAIN (ANALYZE, BUFFERS, SETTINGS)`; PostgreSQL 18
+      AIO/bitmap behavior remains performance telemetry, not an application identity contract.
+
+The hash join and exact-canonical bridge are alternative identity-resolution paths inside one
+lexical lane. They must not be counted as separate retrieval votes.
+
+### PACKET-HASH-BACKFILL-PREFLIGHT-01 (2026-09-07, read-only)
+
+- [x] Re-ran `scripts/atlas/atlas-packets-content-hash-backfill-v1.mjs --dry-run`.
+- [x] The selector found 21 uniquely eligible pending packet rows; selected 21, updated 0,
+      and performed no Postgres/Qdrant/Neo4j/Valkey writes.
+- [x] Obtain explicit authorization before `--apply-bounded`; authorization was supplied for
+      the local non-production database. Readback passed; replay checksum parity remains open.
+- [ ] Do not treat the bounded 21-row repair as closure: the current workspace packet/chunk
+      audit still reports 111 binding rows and 0 exact joins.
+
+#### Apply result (2026-09-07)
+
+- [x] Explicit authorization was supplied for the local non-production database.
+- [x] `--apply-bounded` updated 21 rows; independent readback matched all 21 expected hashes.
+- [x] Follow-up replay attempted a second pass and changed 0 rows.
+- [ ] Replay checksum parity remains open: the replay selector excludes already-populated rows,
+      so its empty-selection checksum cannot be compared to the original frozen selection.
+- [ ] Re-run the current workspace packet/chunk audit and resolve the remaining 111 binding-row
+      mismatch before claiming full lineage closure.
+
+### GRAPHIFY-CURRENT-OWNER-RECHECK-01 (2026-09-07, read-only)
+
+- [x] Workspace-bound Graphify owner audit: the only current row is `RUNNING`, with no completed
+      owner and no completion timestamp.
+- [x] Previous completed run readback: 23,758 source rows; 23,532 content matches, 220 content
+      mismatches, and 6 unavailable sources.
+- [ ] Wait for or produce a completed Graphify-bound run, then re-run packet/chunk and classifier
+      lineage against that exact workspace revision.
+- [ ] Keep the previous run diagnostic-only; it is not a valid current source snapshot for
+ontology tuple, n-ary hyperedge, semantic, or ACE promotion.
+
+### NLP-SIDECAR-DIRECT-HEALTH-01 (2026-09-07, read-only)
+
+- [x] Direct `:8095/health` returned `status: ok` and reported Tree-sitter, ast-grep, LangExtract,
+      and NetworkX capabilities.
+- [x] Direct `:8095/analyze` returned structured provider revision, text hash, and paragraph
+      evidence without canonical writes.
+- [x] Direct `:8095/ast/chunk` returned `atlas.ast.evidence.v1` with byte spans and the supplied
+      source revision.
+- [ ] Complete the higher-level ACP proof; its prior run connected to Postgres but exceeded the
+      command window before producing a final receipt.
+
+### INFRA-OBSERVABILITY-SWEEP-01 (2026-09-07, mixed read-only + applied fixes — session handoff)
+
+Context: a disk-full incident (`C:` drive 931GB/931GB used, 0 bytes free) blocked `graphify:daily`
+mid-run (`ENOSPC` in `materialize-addressable-packets.mjs`). Chasing that down surfaced a chain of
+real, independently-verified infra/observability findings, several already fixed. Recording all of
+it here for handoff — this thread does not cleanly belong to any single existing openspec change,
+so it's parked here alongside the day's other ontology/OKF findings rather than left undocumented.
+
+**Disk space — resolved.**
+- [x] Root cause: `C:` drive genuinely full (931G/931G, 0 avail). Not a repo-local issue — verified
+      via `df -h` and a full `AppData`/home-directory breakdown (PowerShell `Get-ChildItem -Recurse`,
+      faster than bash `du` over NTFS in this environment).
+- [x] Cleared confirmed-safe, pure-cache/duplicate items only (no experiments, no `.tmp/` scratch
+      touched per explicit user correction — see feedback memory
+      `feedback_dont_equate_blocked_status_with_abandoned`): npm-cache (5.45GB→0.04GB, `_npx` +
+      `_cacache`), ~438 stale Windows Temp items (7.78GB, mostly empty MSIX installer-extraction
+      leftovers from repeated app updates), WSL `~/.cache/pip` (8GB→8.7MB via `pip cache purge`),
+      and two redundant WSL LiteRT-LM model copies (HF cache + `~/.litert-lm`, 6.4GB combined —
+      confirmed duplicate of `models/gemma4-e2b-rotorquant-iq4xs/*.gguf` already in the project,
+      from an abandoned LiteRT-LM-JS exploration 5 months stale).
+- [x] Compacted the WSL `ext4.vhdx` via `wsl --shutdown` + `diskpart compact vdisk` — freed ~6GB on
+      the Windows side despite the VHDX's logical size not changing (sparse-file behavior).
+- [x] Net result: 0 bytes → ~29-32GB free (fluctuates with active pipeline writes).
+- [ ] NOT done: Docker's own 153GB VHDX was never pruned/compacted — user explicitly declined
+      `docker system prune` mid-session ("don't prune right now") after a broad "yes continue" had
+      been given for the surrounding thread. Saved as feedback
+      (`feedback_verify_before_disk_cleanup`'s existing point, reconfirmed live). Do not re-attempt
+      without a fresh, specific confirmation for that exact command.
+- [ ] `.tmp/atlas-gemma-rank-onnx` (2.4GB, the AGMR ONNX export attempt CLAUDE.md documents as "not
+      usable yet") was flagged then explicitly protected — user confirmed these are active
+      implementation artifacts, not abandoned. Do not flag CLAUDE.md's "not proven"/"blocked"
+      status language as a deletion signal for any `.tmp` content going forward.
+
+**Docker Desktop backend — resolved, side-effect of the WSL compaction above.**
+- [x] `wsl --shutdown` (run for the VHDX compaction) also stopped Docker Desktop's own backend WSL
+      VM (`docker-desktop`), which did not auto-recover — `docker ps` hung indefinitely, Postgres
+      (`:5434`) became unreachable, breaking `graphify:daily`'s lifecycle-open step.
+- [x] Fixed via a full process kill (`Get-Process docker*,Docker Desktop | Stop-Process -Force`,
+      not just the tray app) + relaunch of `Docker Desktop.exe`. All 24 containers came back
+      healthy within ~2 minutes. Verified `docker-desktop` WSL state = Running, Postgres reachable
+      both via `docker exec ... psql` and a raw TCP check on `:5434`.
+- [ ] Lesson not yet applied anywhere durable: any future WSL-shutdown-based compaction procedure
+      for this repo should explicitly warn that it also takes down Docker Desktop's backend, and
+      that a full process kill (not just quitting the tray icon) may be needed to recover it.
+
+**`graphify:daily` — now runs clean end-to-end after the above two fixes.**
+- [x] Third attempt (first two failed on `ENOSPC` then `ECONNREFUSED`) completed with exit code 0.
+      Full 11-step `phase8-fanout` chain ran (langextract → summary-index-rank → summary-envelopes
+      → envelope-queue → feature-envelopes → phase16 latent/SOM/GDS → bitfrost-warm →
+      centroids-warm → graphify-draft), plus downstream embedding-plan/adaptive-sampling steps
+      (some correctly `DEFERRED_*`, not errors).
+- [x] Real, live-verified side effects: Redis/Valkey keyspace 276→10,570 keys; `bitfrost:*` keys
+      0→**4,827** (exact match to CLAUDE.md's own documented figure, confirming the doc was
+      correct, just describing a cache that had gone cold); `centroid:*` keys 0→66 (real
+      population — CLAUDE.md's "centroid:* pattern returns zero matches, aspirational" caveat is
+      now stale in the *other* direction and should be revised next time that section is touched).
+      `gpu:karpathy:*` stayed 0 — expected, that's the separate manual `npm run karpathy:gpu` step,
+      not part of this chain.
+- [x] Real, incidentally-surfaced finding (not new, cross-references existing work): 58/61,718
+      packets were quarantined during `summary-envelopes:build` for `title_id: required but
+      missing or empty` — live confirmation that the already-tracked title_id stub gap
+      (`parent-atlas-pass-fabric/tasks.md`) actually rejects real production packets.
+- [ ] `npm run karpathy:gpu` (or equivalent) still needs a manual run if fresh Karpathy attention
+      scores are wanted — not part of `graphify:daily`.
+
+**Valkey/Redis config — corrected (not just diagnosed).**
+- [x] Live-verified before touching anything: `maxmemory` = 2GB (matches docs), `maxmemory-policy`
+      was `noeviction` (does NOT match CLAUDE.md's own documented `allkeys-lru` recommendation).
+      TTL on a fresh `bitfrost:*` key: 603,740s ≈ 6.99 days (effectively the documented 7-day TTL).
+- [x] First correction: set `allkeys-lru` (matching the stale docs) — but this was **itself wrong**
+      and caught before it mattered: a live Lua `SCAN`+`TTL` sweep (single round-trip, not 10K
+      individual `docker exec` calls — much faster) found **exactly 170 real non-expiring keys**
+      (`bull:*` keys from the isolated `claude-mem` BullMQ runtime, plus `drizzle:tbl:*`/`drizzle:ct:*`
+      schema cache) that `allkeys-lru` could evict under memory pressure since it evicts *any* key
+      regardless of TTL.
+- [x] Final, correct fix applied and persisted: `maxmemory-policy` = **`volatile-lru`** (only
+      evicts TTL'd keys, never the 170 non-expiring ones), both live via `CONFIG SET` and durably
+      in `docker/docker-compose.gpu.yml`'s `valkey` service (`command: ["valkey-server",
+      "--maxmemory", "2gb", "--maxmemory-policy", "volatile-lru"]` — previously no `command:`
+      override existed at all, so this policy was coming from the image default and was silently
+      lost on every container recreate).
+- [ ] `used_memory` is only ~21MB of the 2GB cap right now — this fix has no observable effect yet,
+      it's a correctness fix for future memory pressure, not an active bug today.
+
+**671MB `logs/embed-server/launch-2026-09-02T10-40-30.err` — real bug, root cause corrected.**
+- [x] Confirmed NOT an error log: 7.4M lines of llama-server's default-verbosity per-request
+      slot-cache debug output (`srv update: - prompt ... tokens, checkpoints...`), not failures.
+- [x] Read `scripts/launch-embed-server.ps1` directly: it passes **zero** verbosity flags
+      (`-m --host --port -ngl --embedding --pooling -c -b -ub -t`, optionally
+      `--embd-normalize`) — so "remove `--verbose`" (an externally-suggested fix) does not apply,
+      there is nothing to remove.
+- [x] It also already writes a **new timestamped `.err` file per launch** (`launch-$stamp.err`),
+      so "add rotation across launches" doesn't describe the real problem either.
+- [x] Real cause, confirmed by the filename timestamp: **one single llama-server process has been
+      running continuously since 2026-09-02** (5 days — this matches the EG-GGUF proof server
+      noted in prior-session memory as "left running on :8081"), logging default verbosity the
+      whole time with no way to reduce it since no `--log-verbosity`-style flag was ever set.
+- [x] Identified via live `--help`: `-lv, --verbosity, --log-verbosity N` (env
+      `LLAMA_LOG_VERBOSITY`), values `0=generic output, 1=error, 2=warning, 3=info` (threshold —
+      higher-verbosity messages above N are ignored). Applied `--log-verbosity 0` to
+      `scripts/launch-embed-server.ps1`'s arg list (after `-t $threads`), parse-checked via
+      PowerShell's tokenizer (no execution). Not yet re-launched/tested live this session.
+- [x] **Fully closed, live-verified.** Corrected an earlier assumption: `:8081`'s process
+      (`PID 9168`) had actually started that same morning (2026-09-07 08:29), not 5 days earlier —
+      the 671MB file was an orphaned leftover from an already-exited prior instance, not something
+      the live process was actively appending to. Also corrected an earlier note calling this a
+      "throwaway proof server" — `src/lib/server/embedding/canonical-embed.ts` and
+      `embedding-provider-v1.ts` both default `EMBED_SERVER_URL`/`baseUrl` to
+      `http://127.0.0.1:8081`, i.e. this is the real canonical embedding server, load-bearing.
+      Verified `Get-Process -Id 9168` was genuinely `llama-server` before touching it, killed it
+      cleanly, relaunched via the now-fixed `scripts/launch-embed-server.ps1 -Detached` (healthy,
+      new PID, fresh log at `logs/embed-server/launch-2026-09-07T20-45-22.err`), sent a real
+      `POST /v1/embeddings` request (HTTP 200), and confirmed the new log has **5 lines total**
+      (startup only, zero per-request spam) versus 7.4M lines/671MB before. Deleted the old
+      orphaned 671MB file. Net: root cause found, fix applied, restarted, verified with a real
+      request, cleanup done — nothing deferred on this thread anymore.
+
+**Graph-freshness `UserPromptSubmit` hook — confirmed broken as a Graphify-currentness proxy.**
+- [x] The hook (`.claude/settings.json`'s `UserPromptSubmit` command) checks the mtime of
+      `sveltekit-frontend/docs/graph/codebase-graph.json` specifically (NOT the repo-root
+      `docs/graph/codebase-graph.json` — those are two different paths; an earlier check in this
+      same session against the wrong one was a real self-caught mistake, corrected before
+      reporting).
+- [x] That file is real and genuinely last modified 2026-08-30 — the reported "11891min stale" is
+      arithmetically correct for that file. But today's successful, thorough `graphify:daily` run
+      (see above) never touches it — confirmed via 10+ files that reference this path, none of
+      which were in the executed chain.
+- [x] **Fully closed — no new receipt needed, one already existed.** Before building a new
+      `CurrentGraphSnapshotV1` from scratch, checked whether `graphify:daily` already produces
+      something equivalent (Duplication Prevention rule) — it does:
+      `docs/reports/graphify-daily-lifecycle-v1.json` already carries `runId`, `repositoryRevision`
+      (git SHA), `workspaceRevision` (sha256), `status: COMPLETED`, `completedAt` — everything the
+      proposed receipt needed, and it was freshly written by this session's own
+      `graphify:daily` run. Edited `.claude/settings.json`'s `UserPromptSubmit` hook (item 2 of its
+      3-part check) to read this file's `completedAt`/`status`/`runId` instead of
+      `sveltekit-frontend/docs/graph/codebase-graph.json`'s raw mtime, with a >24h staleness
+      threshold (vs. the old 2h threshold, appropriate for a full daily pipeline vs. a quick index
+      refresh). Verified `.claude/settings.json` is still valid JSON, then ran the **entire**
+      embedded hook script standalone (all 3 checks: audit gates, graphify currentness, service
+      health) exactly as it will fire on the next prompt — real output:
+      `"graphify:daily: completed 174min ago (run 6c9d9642) | Services UP: turbo, bifrost, mcp |
+      Services DOWN: sveltekit"`. Genuinely fixed and live-verified, not just diagnosed.
+
+**Triton duplication follow-up — corrected, real mistake caught and retracted same-session.** A
+later pass concluded `triton-trt-llm/model-repositories/` (2.9GB) was "orphaned" (no script in
+`scripts/atlas/` writes to it) and proposed archiving it. That was wrong: `triton-trt-llm/` is a
+**self-contained workspace** (its own `README.md`, `MANIFEST.json`, `scripts/`, `models/`,
+`reports/` — including local copies of `materialize-gemma4-onnx-triton-repo.mjs` and
+`start-gemma4-onnx-triton.ps1` distinct from the same-named files in `scripts/atlas/`), and its own
+README already explicitly labels it `Status: scaffolded / experimental` (ONNX lane) /
+`Status: future lane` (TensorRT-LLM). Same failure mode as the AGMR-ONNX mistake earlier this
+session (see `feedback_dont_equate_blocked_status_with_abandoned`) — "no caller found in one
+directory" was treated as "orphaned" without checking whether the target directory is itself a
+scoped sub-project with its own callers. **Not archived. Do not revisit this specific 2.9GB as a
+cleanup target without first re-reading `triton-trt-llm/README.md`.**
+
+**Follow-up, now decisively resolved**: `triton-trt-llm/README.md`'s own documented command
+(`npm run atlas:gemma4:onnx:triton:repo`) was traced to `sveltekit-frontend/package.json:626` →
+`node ../scripts/atlas/materialize-gemma4-onnx-triton-repo.mjs --apply` — the **root-level**
+script (writes to `triton-model-repository/`), NOT the nested
+`triton-trt-llm/scripts/materialize-gemma4-onnx-triton-repo.mjs` copy. So the workspace's own
+official tooling bypasses its nested materializer entirely. Final classification:
+- `sveltekit-frontend/static/gemma4_e2b_onnx/` = ACTIVE_EXECUTOR (browser/client ONNX, keep)
+- `triton-model-repository/` (repo root) = CANONICAL_ARTIFACT_OWNER (what the documented command
+  and `scripts/start-gemma4-onnx-triton.ps1` actually use, keep)
+- `triton-trt-llm/model-repositories/gemma4-onnx-q4f16/` (2.9GB) = **SUPERSEDED** — its would-be
+  producer isn't in the workspace's own call path. Safe to archive **only this specific
+  model-repository subdirectory**, not the `triton-trt-llm/` workspace itself (which stays — real,
+  active, experimental, per its own README). Not yet archived this session — next actual step if
+  picked up.
+
+**Triton-on-Windows deprecation — new blocker for the whole Triton lane, found via live web
+search, not yet checked against this repo's actual Triton version.** NVIDIA dropped Windows
+support for Triton Inference Server entirely in a recent 2026 release ("dropped the Windows server
+build and removed Windows from the core build and documentation" — `rel-26-06` release notes).
+This machine is Windows 10 Home.
+
+**Resolved, non-issue for this repo**: `grep`-confirmed the actual pinned image is
+`nvcr.io/nvidia/tritonserver:24.11-py3` (`start-gemma4-onnx-triton.ps1`) and
+`:24.11-trtllm-python-py3` (`start-triton-trtllm-engine.sh`), launched via `docker run` — a Linux
+container image, never a native Windows binary. NVIDIA's Windows-support removal only affects
+native-Windows Triton binaries; Docker Desktop's Linux container runtime is what actually executes
+this image, same as every other service in this stack. The 24.11 pin (Nov 2024) also predates the
+deprecation. Nothing to fix here. (The SUPERSEDED-directory archival was executed separately and
+successfully — see the follow-up entry above; not gated on this check after all.)
+
+CUDA version note (same search pass, for context, not an action item): 13.4.0 is a Developer
+Preview (July 2026, bleeding edge); 13.3.1 is the current mainstream stable (June 2026); 12.9.x is
+an older still-patched line. This repo's three CUDA environments (native Windows cu128, WSL2
+RAPIDS at 13.0, WSL2 cuTile at 13.2) are all intentionally below latest — consistent with, not a
+violation of, this file's own `DEPENDENCY-CAPABILITY-GUARD-01` no-version-chasing rule.
+
+**ACE-GROUNDING-FAILCLOSED-01 (new P0, root cause located and independently verified in code).**
+Follow-up to the ACE-staleness finding below: the root defect is now pinpointed, not just
+observed as bad output. In `sveltekit-frontend/scripts/mcp/atlas-tools-mcp.mjs`,
+`buildAgenticRagContext()` computes `admissionStatus` (line 475: `revisionStatus === 'PRESENT' &&
+freshnessStatus !== 'EXPIRED'`) but **returns `promptPacket` unconditionally regardless of that
+status** (line 480) — independently confirmed via direct grep, not just asserted. Downstream,
+`agentic-recommendation-workflow.mjs`'s L6 synthesis stage unconditionally injects
+`aceContext.promptPacket` into the model prompt with no admission check at all, and the model's
+resulting invented explanation then flows into `buildRecommendation()`'s `likely_cause` field
+without being checked against the evidence it's supposedly grounded in. Chain: unrelated cached
+ACE cards -> model invents explanation -> explanation becomes `errorSummary` ->
+`build_recommendation()` -> `likely_cause` -> unrelated evidence attached beside it -> appears
+grounded. This is a precise, code-verified instance of the evidence-laundering pattern this file's
+own AGENT EXECUTION INTEGRITY section warns against, located inside `atlas-tools-mcp.mjs` itself.
+**Proposed fix (not yet implemented — real engineering work, correctly deferred)**: gate
+`promptPacket`/cards behind a real `ADMITTED_FOR_QUERY` state (query-checksum match + current
+workspaceRevision + evidence-revision admissibility + relevance threshold + supported-evidence
+count > 0), add an `EvidenceAdmissionV1` abstention state before any Ornith call
+(`INSUFFICIENT_RELEVANT_EVIDENCE` etc. -> `{status:"ABSTAINED"}`, no LLM call), and apply the same
+query-binding requirement to the separate `activeContext`/`atlas_get_active_context` path, which
+has the identical unbound-ambient-context problem. Patch targets: `atlas-tools-mcp.mjs`,
+`agentic-recommendation-workflow.mjs`. Smoke test to add: an ACE fixture where every cached card is
+unrelated to the query, asserting zero admitted cards and zero LLM calls.
+
+**Revised priority queue (supersedes any earlier informal ordering in this file)**:
+P0 `ACE-GROUNDING-FAILCLOSED-01` (above) | P0 `CURRENT-SOURCE-EVIDENCE-HYDRATION-01` (the existing
+235-mismatch/7-unavailable source-byte audit — classify mismatches by cause, e.g.
+CRLF/worktree-vs-git-blob, encoding, stale revision — before assuming corruption; never rewrite
+hashes just to go green) | P0/P1 `ACE-CONTEXT-QUERY-BINDING-01` | P1 `GRAPH-CONTEXT-CURRENTNESS-01`
+(already closed above) | P1 `LEXICAL-APPLY-CANARY-01` (gated behind the source-evidence audit, not
+independent) | P1 `ONTOLOGY-TUPLE-MATERIALIZE-01` / `NARY-MATERIALIZE-CANARY-01` (infra proven,
+zero live data — do not build more hypergraph infrastructure, populate the infra that exists) |
+P2 `CENTROID-REVISION-PUBLISH-01`, `NLP-SIDECAR-OWNER-01` (resolve the base/_v2/_oak 3-way split
+found in the earlier subsystem sweep), `OKF-SCHEMA-PARITY-01`, `XGBOOST-OBJECTIVE-COMPARE-01` |
+P3 topology-4D/AE/RLM harness (derived optimization, after the truth path is trustworthy).
+Lexical scorer semantics (PG `ts_rank_cd`, correctly NOT literal BM25 per Postgres's own docs) are
+CLOSED locally — leave `/search/bm25`/`Bm25ObservationV1` names as compatibility debt, not a
+correctness bug. Next concrete local action if picked up:
+`node scripts/atlas/audit-current-source-evidence-hydration-v1.mjs` (read-only) run in parallel
+with building the zero-write ACE fail-closed smoke test described above.
+
+**ACE-packet synthesis pipeline — demonstrated unreliable for fresh/novel queries, evidence-laundering
+pattern caught live.** Ran `scripts/atlas/agentic-recommendation-workflow.mjs --query "..."` (the
+real, wired ACE-packet-builder + recommendation pipeline established earlier this session) with a
+query about today's actual findings (binary-only hyperedges, empty `atlas_ontology_linked_tuples`,
+stale Karpathy scores). Result: `build_agentic_rag_context` returned a **stale cached packet
+entirely unrelated to the query** (`.opencode/ace-packet.json`'s cached `PACKET_IDENTITY`/
+`OKF_SOURCE`/`TOPOLOGY_ROUTING` reconciliation snapshot from an unconnected earlier investigation —
+the tool does keyword-overlap scoring against whatever's cached, it does not re-derive fresh
+evidence per query). The synthesis stage then **fabricated a plausible-sounding bridge** between
+that irrelevant evidence and the actual query: `"likely_cause": "AtlasGraphCanvas.svelte renders
+the Atlas knowledge-graph visualization surface..."` with justification "...so it is where the
+binary-only corpus, empty ontology_linked_tuples, and stale Karpathy scores would surface as
+visible rendering gaps" — zero real grounding, a confident hallucinated connection. This is a live
+instance of the exact `AUDIT_STATUS_FORCED_WITHOUT_EVIDENCE`/evidence-laundering pattern this
+file's own "AGENT EXECUTION INTEGRITY" rules warn against, occurring inside the tool itself, not
+just something an LLM agent might do on top of it. **Do not trust this pipeline's
+`structured_recommendation.likely_cause`/`proposed_fix` fields for novel queries without
+independently verifying every cited sourceRef actually relates to the query** — treat its output as
+a starting search hint at best, never as grounded synthesis, until `.opencode/ace-packet.json` is
+confirmed regenerated fresh per-query rather than served from a stale cache.
+
+**8-item subsystem breadth sweep (domain classification / OKF / Mastra / XGBoost / ontology tuples
+/ neural decoder / PCA-SVD) — see the parallel `parent-atlas-best-fit-score-fabric` and this file's
+existing OKF-collision entries for detail; not re-duplicated here. One new fact from that sweep
+worth recording in this file specifically: `atlas_ontology_linked_tuples` (the real, live-code
+table — distinct from the also-empty `atlas_ontology_tuples`) has a reader module
+(`ontology-linked-tuple-postgres.ts`) and a `search-runtime.ts` comment referencing it as a future
+read path, but zero live executing queries actually read it into a classifier — confirmed
+write-target-only, same category as the hyperedge n-ary gap already tracked above.**
+
+**Not independently re-verified this session** (surfaced via an externally-pasted technical
+review, partially checked): XGBoost's exact CUDA-version/UBJSON-default claims, Zod's precise
+JSON-Schema-experimental status, Mastra's specific workflow-graph feature set, PyTorch's exact
+custom-op/`opcheck` authoring guidance. One related claim (llama.cpp `cache_prompt` correctness
+risk) found real, adjacent support via a live web search — GitHub issue `ggml-org/llama.cpp#4902`,
+"Cache and system prompt on server makes output non-deterministic" — supports the general point
+even though the original phrasing ("alters logprobs") wasn't a verbatim match to that issue.
+
+## HYPERGRAPH-NARY-EVIDENCE-SOURCE-SURVEY-01 (2026-09-07, read-only, live production DB)
+
+Follow-up to `HYPERGRAPH-ARITY-CENSUS-01`/`HYPERGRAPH_NARY_MATERIALIZE_01` above, prompted by a
+steer toward checking graphify-run identity (`runId`/timestamp/`workspaceId`) and domain-
+classification/`.okf` schema as alternative n-ary evidence sources, rather than only the
+`ApiContractObservationV1` path those two entries already cover. Revision-bound the arity census
+first (`ATLAS_EXPECTED_GRAPH_REVISION=taxonomy-edges-v1-2026-05-08
+ATLAS_EXPECTED_WORKSPACE_REVISION=git:0084288f26 node
+scripts/atlas/audit-hypergraph-current-arity-census-v1.mjs`) — fresh receipt now reports
+`currentBindingProven: true`, same 100%-binary arity numbers as before (this only proves the
+existing census ran against the revision it claims to describe; it changes no data).
+
+Surveyed six additional table families live (row counts, schema, and populated-predicate
+diversity — not just existence) to see whether any already holds real, populated, naturally
+3+-participant facts:
+
+| Table | Rows | Shape found |
+|---|---|---|
+| `graphify_executions` / `graphify_execution_files` | 9 / 27 | **Real, genuinely multi-role** (`execution_id` × `workspace_id`/`workspace_revision` × `source_ref` × `code_source_revision` × `content_hash` co-occur per row), but canary-scale only — every row's `trigger_kind = 'BOUNDED_COMMITTED_CANARY'`, matching the migration's own stated proof-gate step, not production traffic. Migration file (`drizzle/manual/20260903_graphify_execution_ledger_v1.sql`) says explicitly not yet promoted to a production coordinator. |
+| `ontology_domain_tuples` | 61,659 | SPO-shaped (`subject`/`predicate`/`object` + `domain_class` + `packet_key`), but **degenerate**: 100% of rows use the single predicate `classified_as` (`packet:X classified_as domain:Y`) — isomorphic to a flat 2-column table wearing a triple-store schema. |
+| `feature_domain_facts` | 91,658 | Flat packet→domain classification fact (`packet_key`, `source_ref`, `domain_class`, jsonb `evidence`/`domain_probabilities`), 100% `classifier_kind='legacy-backfill'` — real and richer metadata than `ontology_domain_tuples`, but still one participant (packet) per row, not a multi-entity relationship. |
+| `atlas_relationships` / `atlas_relationship_members` | 603 / 1,206 | **Schema is fully ternary/nary-capable** (`relationship_degree_kind` CHECK constraint literally includes `'ternary'`/`'nary'`, plus `participant_count`/`relationship_degree`/`source_revision`/`producer_revision` columns) — but populated data is 100% `binary` degree, single `relationship_type = 'USES_CONCEPT'`, exactly 2 members every row (1206/603). |
+| `atlas_feature_relationships` | 4,097 | Plain old binary edge table (`source_feature_id`/`target_feature_id`), no hyperedge shape at all. 4 relationship types (`sibling` 3,890, `related_by_error` 98, `child` 57, `parent` 52). |
+| `atlas_relationship_cardinality` / `atlas_relationship_embeddings` / `concept_records` | 0 / 0 / 0 | Empty. `concept_records` being 0 rows is itself a correction to `.okf/concepts/concept-edge-ledger-gap.yaml`'s own evidence note (below) which claims "concept_records exists... nodes exist" — that claim is stale/wrong as of today. |
+
+**The real finding is in `.okf/` (repo root), not previously connected to this thread.** It's a
+genuine, substantial directory — "OpenSpec Knowledge Framework (OKF)", `manifest.yaml` version 2,
+`concepts/domains/indexes/languages/pipelines/predicates/runbooks/systems/tools` subdirs. Two
+things in it directly bear on the n-ary gap:
+
+1. **`.okf/predicates/feature-relationships.yaml`** is a versioned, active (`status: active`)
+   predicate registry that already defines exactly the `canonical_relationship` contract
+   `atlas_relationships` implements (`required_fields: relationship_id, relationship_type,
+   participants, participant_count, relationship_degree, relationship_degree_kind, source_ref,
+   source_revision, relationship_revision, producer_revision` — matches the live table schema
+   field-for-field), including an explicit `degree_semantics` block (`unary:1, binary:2,
+   ternary:3, nary:">=4"`) and a predicate, **`authorized_resource_mutation`**, whose
+   `allowed_degree` is `[ternary, nary]` ONLY (not binary) with `required_entity_types: [feature,
+   route, database_policy]` and `recommended_entity_types: [service, table, column, test]`.
+   **Zero producers reference this predicate anywhere** (`git grep -l
+   "authorized_resource_mutation" -- 'scripts/*'` → no matches; `atlas_relationship_members` is
+   referenced by exactly 3 scripts, all of which only ever write the binary `USES_CONCEPT` fact).
+2. `manifest.yaml` declares `predicates/ontology.yaml` as a schema but the file **does not exist**
+   on disk (only `feature-relationships.yaml` is present in that dir) — a manifest-vs-reality
+   drift, separate from the n-ary gap itself, flagged not fixed.
+3. `manifest.yaml`'s own `index_policy.semantic_lane.executors` already lists `pgvector_ivfflat`
+   explicitly (alongside `pgvector_exact`, `pgvector_hnsw`, `qdrant`, `cuvs_cagra`) — this directly
+   answers the "is IVFFlat relevant here" question from earlier in this thread: **yes, it's
+   already a declared semantic-search-lane executor**, but it has nothing to do with the
+   relationship/hyperedge structural-membership problem — GIN (`atlas_relationships` already has
+   `atlas_relationships_metadata_gin_idx gin(metadata jsonb_path_ops)`) is the real existing
+   pattern for that. This also corroborates, rather than duplicates, `LEXICAL-IDENTITY-REPLAY-01`
+   and `DEFINITION-LINEAGE-AUDIT-01` above, which already concluded "PostgreSQL 18 AIO/bitmap
+   behavior remains planner telemetry, not an application contract" — nothing found in this survey
+   contradicts that; AIO/bitmap simply never came up as relevant to relationship storage.
+
+**Conclusion — a narrower, lower-effort next gate than the `ApiContractObservationV1` path.**
+That path (`HYPERGRAPH_NARY_MATERIALIZE_01` above) already has a fixture-proven converter but
+still needs BOTH a live observer wired to a real scanning caller AND a new Postgres write path.
+By contrast, `atlas_relationships`/`atlas_relationship_members` **already has its writable schema
+and contract in production** (proven by the 603 real `USES_CONCEPT` rows) — the only missing piece
+for a first real ternary fact is a producer that emits `authorized_resource_mutation` relationships
+(3 participants: a `feature`, a `route`, a `database_policy`) from data this repo already has
+elsewhere (route→feature mapping exists per `src/lib/server/atlas/route-feature-map.ts` referenced
+in project CLAUDE.md; auth/route-guard metadata exists per the G4/G5 audit findings in the root
+CLAUDE.md). **Not built in this pass** — this is a survey, per the bounding plan for this step; the
+producer itself is real, separate, unstarted work, and should reuse the existing
+`atlas_relationships`/`atlas_relationship_members` schema and `feature-relationships.yaml`
+`quality_gates` (`reject_declared_degree_mismatch`, `reject_duplicate_cardinality_role`,
+`reject_unknown_cardinality_role`, `require_revision_qualified_source`,
+`require_relationship_id_on_pairwise_projection`) rather than inventing new validation rules.
+
+### PostgreSQL 18 AIO / "bitmap" follow-up — is either actually a table/index migration? (2026-09-07)
+
+Direct follow-up: does this repo's AIO/bitmap story involve any real `CREATE`/`ALTER TABLE`
+migration, and if so has it been applied? Checked live, not assumed from the `.okf` spec text
+alone.
+
+**AIO is genuinely live on this Postgres instance** — `SHOW io_method` → `worker` (PG18's async-IO
+backend; `io_workers=3`, `io_max_concurrency=64`, `io_combine_limit=16` [128KB]), confirmed on
+`legal-ai-postgres` right now. This is a real, active PG18 feature, not just a version-number bump.
+**But it is correctly modeled as non-migratable**: `.okf/domains/parent-atlas-execution.yaml`
+(`storage.postgres18.aio_role`) and `.okf/indexes/feature-intelligence.yaml`
+(`bitmap_planner`/`postgres18_aio`, both explicitly `canonical_index_type: false`) already state
+AIO and Postgres's automatic bitmap-heap/index-scan are transparent storage-engine execution
+optimizations — there is nothing to `ALTER TABLE` for either one, and no migration in this repo
+attempts to. This corroborates (does not duplicate) the "planner telemetry, not an application
+contract" conclusion already recorded in `LEXICAL-IDENTITY-REPLAY-01`/`DEFINITION-LINEAGE-AUDIT-01`
+above.
+
+**A separate, unrelated "bitmap" DOES involve real migrations**: two sibling manual migrations
+model an application-level explicit `bit(16)` flag column (a caller-defined compact filter mask,
+nothing to do with Postgres's planner-level bitmap scan):
+- `drizzle/manual/20260824_graphify_file_search_bitmap_v1.sql` (file-level) — **not applied**
+  (table doesn't exist live); `sidecar-migrations.json` correctly tracks this as `manual_sidecar`,
+  "unapplied until export, schema, and rollback proofs pass." Its own sibling migration's header
+  comment explains why: a `GENERATED ALWAYS AS ... STORED` column calls `array_to_string()`, which
+  Postgres marks `STABLE` not `IMMUTABLE` — "generation expression is not immutable," confirmed
+  live against PG18.4 — a real blocking bug, not just caution.
+- `drizzle/manual/20260826_atlas_class_search_index_v1.sql` (class-level) — **applied and live**:
+  `atlas_class_search_index_v1` exists with 3,675 real rows (AST-grep class-node extraction). It
+  deliberately fixes the sibling's bug via an `IMMUTABLE` wrapper function
+  (`atlas_immutable_array_to_string`) before reusing the same generated-tsvector pattern. Its own
+  `class_bitmap bit(16)` column is 100% still the default `B'0000000000000000'` across all 3,675
+  rows — **by design, not a defect**: the file's own header comment says it's "reserved for future
+  caller-defined flags; no meaning assigned yet."
+
+**One real, small hygiene gap found**: despite being applied and live, `20260826_atlas_class_search_
+index_v1.sql` has **zero entry anywhere in `drizzle/sidecar-migrations.json`** — its sibling
+(`20260824`) is correctly tracked there as unapplied, but the one that actually ran is simply
+absent from the tracking manifest (verified via direct `git grep` for both the exact filename and
+the table name — no match either way; a naive substring check on the whole JSON blob for the date
+`20260826` alone false-positives against two unrelated same-day migrations,
+`20260826_restore_nes_chrom_packets_v1.sql` and `20260826_atlas_hyperedges_gate_alignment_v1.sql`
+— worth remembering as its own small lesson: substring-matching a date prefix across a JSON blob is
+not equivalent to confirming a specific migration is tracked). Not a data-safety issue (the
+migration is additive/`IF NOT EXISTS` per the Drizzle Safety Rule, and the table is real and
+correct) — just a documentation-tracking omission, flagged not fixed.
+
+**Net answer to "table add/alter/indexing migrated? updated?"**: AIO — nothing to migrate, already
+live via Postgres config, correctly documented as non-canonical. Bitmap-as-planner-behavior —
+same, nothing to migrate. Bitmap-as-stored-column — one sibling migration applied and live (table
++ column exist, column intentionally unpopulated placeholder), one sibling still blocked on a real
+immutability bug and correctly marked unapplied; the applied one is just missing from the tracking
+manifest. No further action taken — this is a status resolution, not a new build.
+
+### Schema-validation deep audit: are the 5 named `.okf` quality_gates actually enforced? (2026-09-07)
+
+Direct follow-up to `feature-relationships.yaml`'s five named `quality_gates`
+(`reject_declared_degree_mismatch`, `reject_duplicate_cardinality_role`,
+`reject_unknown_cardinality_role`, `require_revision_qualified_source`,
+`require_relationship_id_on_pairwise_projection`). First check: do any of these 5 exact identifiers
+(or an obvious camelCase form) appear anywhere in application code? **Zero matches**, either form,
+across `sveltekit-frontend/src` and `scripts` (`git grep`, both spellings). Read that as "nothing
+enforces these" and it would have been **wrong** — checked further and found real enforcement,
+just under different names:
+
+- **`reject_declared_degree_mismatch` — genuinely enforced, live, correctly implementing a subtle
+  spec detail.** `atlas_validate_relationship(p_relationship_id)` is a real Postgres function
+  (confirmed via `pg_proc.prosrc`) that checks, per relationship: `participant_count = COUNT(*) of
+  members`, `relationship_degree = COUNT(DISTINCT entity_type)`, and `relationship_degree_kind`
+  matches the unary/binary/ternary/nary mapping of that same distinct-entity-type count. This
+  exactly implements `feature-relationships.yaml`'s own `degree_semantics` block
+  (`participant_count_is_degree: false` — degree is distinct-entity-TYPE count, not raw
+  participant count) — a correct, non-obvious implementation detail that's easy to get wrong, and
+  it's right. It's called from `packages/parent-atlas/src/core/feature-intelligence-repository.ts`
+  inside `persistRelationship()` (`SELECT atlas_validate_relationship($1) AS valid` — throws on
+  `false`), live-proven end-to-end by
+  `scripts/atlas/rel-fi-01-feature-relationship-persistence-live-proof-v1.mts`. **Caveat**: this is
+  an application-invoked function, not a database trigger/constraint — it protects callers that go
+  through `persistRelationship()`, not a hypothetical direct-SQL writer bypassing that repository
+  method (confirmed zero triggers exist on `atlas_relationships`/`atlas_relationship_members` —
+  `information_schema.triggers` returned 0 rows for both tables).
+- **`reject_duplicate_cardinality_role` — partially enforced by an incidental constraint.**
+  `atlas_relationship_members_relationship_id_role_entity_type_key` (a plain composite UNIQUE
+  constraint on `(relationship_id, role, entity_type, entity_id)`) prevents the exact-duplicate
+  case, but it exists as an ordinary uniqueness key, not because it was designed to satisfy this
+  named gate — and it wouldn't catch a role-level cardinality violation across two *different*
+  `entity_id`s in the same role (e.g., a role the cardinality registry marks max-1 being violated
+  by two distinct entities). That finer check depends on the next item.
+- **`reject_unknown_cardinality_role` — real, wired, currently unexercised (not broken).**
+  `atlas_relationship_cardinality` (0 rows, flagged empty above) is not dead — `persistRelationship()`
+  genuinely writes to it (`INSERT INTO atlas_relationship_cardinality ...` for each entry in a
+  caller-supplied `relationship.cardinality` array) and reads it back (`findRelationshipsForEntities`
+  joins it in). Zero rows simply means all 603 real `USES_CONCEPT` writes supplied an empty
+  cardinality array — an unused *input*, not a broken feature. Confirmed via direct source read of
+  `feature-intelligence-repository.ts`.
+- **`require_revision_qualified_source` — enforced, plainly.** `atlas_relationships.source_revision`
+  is a real `NOT NULL` column (confirmed via `\d atlas_relationships` — no `.okf`-referencing
+  comment ties it to this gate name, but the effect is the same).
+- **`require_relationship_id_on_pairwise_projection` — not yet applicable, not violated.** No
+  pairwise graph-edge projection of `atlas_relationships` data exists yet anywhere in this repo
+  (matches the earlier finding that only 3 scripts touch `atlas_relationship_members`, all
+  persistence-proof/replay scripts, none a graph-projection step) — the gate is vacuously satisfied
+  because its precondition (a projection exists) hasn't happened yet, not because it was checked
+  and passed.
+
+**Correction to how I was framing this pattern earlier in this thread**: the `authorized_resource_
+mutation` predicate genuinely has zero producers (confirmed, real gap). It would have been wrong
+to generalize that into "the whole `.okf` quality-gate layer is declarative-only" — this specific
+audit shows real, correct, live enforcement for 3 of the 5 gates (one exact, two by-incidental
+constraint/effect), one genuinely unexercised-but-wired, and one not-yet-applicable. Predicate-
+vocabulary diversity (which predicates get used) and degree/cardinality validation (whether a used
+predicate's shape is internally consistent) are two independent problems in this schema — this
+repo has solved the second one correctly while the first remains open.
+
+**Addendum**: `featureRelationshipSchema`'s own Zod `.superRefine` (`packages/parent-atlas/src/
+core/feature-intelligence.ts` lines 96-143) independently re-implements `reject_declared_degree_
+mismatch` AND `reject_duplicate_cardinality_role`/`reject_unknown_cardinality_role`
+(`cardinality role ${role} is not a relationship participant` / `is duplicated`) client-side, on
+top of the Postgres-side `atlas_validate_relationship()` function — genuine defense-in-depth, not
+duplication; the TS layer rejects before a write is attempted, the Postgres layer catches anything
+that bypasses `persistRelationship()`.
+
+## PRODUCE-AUTHORIZED-RESOURCE-MUTATION-01 — first real producer, DRY_RUN_PROVEN (2026-09-07)
+
+Direct implementation follow-up to the two survey/audit sections above: built the producer that was
+missing (`scripts/atlas/produce-authorized-resource-mutation-relationships-v1.mjs`) rather than
+leaving the gap as record-only. Evidence source is reused, not re-derived: the 19 real
+authenticated-mutating-route findings already in root CLAUDE.md's "G5 open finding" section
+(2026-09-01 `/deep-audit`, each row already citing a live-grepped auth-guard literal) — per this
+repo's Duplication Prevention rule, this session did not re-scan the route tree (a first attempt
+to source `feature`/`route` participants from `route-feature-map.ts` was abandoned immediately —
+that auto-generated file has zero auth/service data, every entry literally `service: 'unknown'`).
+
+For each of the 19 routes, built a ternary `authorized_resource_mutation` candidate with
+participants `{role: feature}` / `{role: route}` / `{role: database_policy}` (the OKF spec's exact
+`required_entity_types`), the `database_policy` entity_id classified from the literal auth-guard
+string (`requireAdmin`/`role !== 'admin'` → `policy:admin-only`; guards including
+`DEV_BYPASS_AUTH` → `policy:authenticated-user-dev-bypass`; plain `locals.user` → `policy:
+authenticated-user`), via `buildFeatureRelationship()` (auto-derives `relationship_degree`/
+`relationship_degree_kind` from distinct participant entity types — reused unchanged, not
+reimplemented).
+
+**Result**: `docs/reports/authorized-resource-mutation-dry-run-v1.json` —
+`status: "DRY_RUN_PROVEN"`, 19/19 candidates Zod-valid, 19/19 correctly classified `ternary`
+(3 participants, 3 distinct entity types), `postgresWritesPerformed: false`. **No Postgres
+connection was made** — validation is entirely client-side (mirrors, does not invoke,
+`atlas_validate_relationship()`'s semantics), consistent with this repo's DRY_RUN_PROVEN-before-
+APPLY_PROVEN status-language convention.
+
+**Not done in this pass, deliberately**: a `--apply` path that actually calls `persistRelationship()`
+and writes real rows to `atlas_relationships`/`atlas_relationship_members`. This would be the first
+ternary fact ever written to production for this table family (currently 100% binary, 603 rows) —
+that's a real state change warranting its own explicit authorization step, not something to fold
+into a dry-run producer's first pass. When authorized: reuse `persistRelationship()` unchanged
+(same function the 603 real binary rows already went through), and re-verify against
+`atlas_validate_relationship()` live post-write, not just the client-side Zod pass already proven
+here.
+
+### Documentation fix: `20260826_atlas_class_search_index_v1.sql` sidecar-tracking gap (2026-09-07)
+
+Closed the small hygiene gap found in the AIO/bitmap follow-up above: added the missing entry to
+`sveltekit-frontend/drizzle/sidecar-migrations.json` for this migration (applied and live, 3,675
+rows, previously untracked) — additive JSON-only edit, re-validated as well-formed JSON after the
+edit, no schema or data touched.
+
+## Read-only combined owner census: semantic_768 / feature_registry / task_semantic_packets / views (2026-09-07)
+
+Per a specific steer to run a bounded, read-only census across five objects before any new
+migration — **no migration was applied, no table was altered, no data was written**. Every finding
+below is from live `\d`/`information_schema`/`pg_views` queries or direct source reads.
+
+### 1. SEMANTIC768 PHYSICAL OWNER — resolved, not a new contradiction
+
+```
+content_embedding      halfvec(768)  55,169 populated rows  HNSW (halfvec_cosine_ops)
+content_embedding_768   vector(768)   1,386 populated rows  HNSW (vector_cosine_ops)
+```
+
+This is not a fresh ambiguity — it's an exact re-confirmation of this same file's (CLAUDE.md)
+already-published Embedding Dimensions Policy resolution, which explicitly names
+`content_embedding_768` as "a much smaller, separate column — do not confuse the two" and
+`content_embedding` (55,169 rows) as canonical. Live numbers today match that doc exactly.
+**Freeze**: `content_embedding` is the physical owner of `semantic_768`. `content_embedding_768`
+is LEGACY/minority — real, indexed, but not canonical, not touched by this census.
+
+### 2. FEATURE REGISTRY OWNER — table absent, two dormant (not actively-run) writers found
+
+`feature_registry` does not exist in `information_schema.tables` — confirmed absent, matching the
+premise. Bounded search (4 real hits, not a broad grep) found:
+- `scripts/atlas/prove-feature-registry-disposable-postgres.mjs` — already did exactly the right
+  thing: proves the historical `0024_nebulous_mongoose.sql` + `0025_yellow_tony_stark.sql` DDL is
+  internally valid inside an **isolated, disposable** Postgres container (never touches
+  `legal_ai_db`), and its own `remainingBlocker` field explicitly says: *"Live migration-ledger/
+  baseline reconciliation remains required before any local feature_registry apply. This proof
+  does not authorize drizzle-kit migrate."* — i.e., someone already reached the same conclusion
+  this census was asked to reach, and correctly stopped short of applying it.
+- `scripts/atlas/extract-md-checkbox-features.ts` and `scripts/atlas/rlm-condense-index.ts` — both
+  contain real `INSERT INTO feature_registry (...)` statements that **would fail** against this
+  live database (table doesn't exist). Checked whether either is an active dependency: **neither
+  appears in `package.json` (root or `sveltekit-frontend/`) or `.vscode/tasks.json`** — they are
+  standalone, unwired scripts, not part of any automated pipeline. Classification: **not
+  `BROKEN_DEPENDENCY` in the sense of something currently running and failing** — closer to
+  dormant/orphaned writer code that would break only if someone manually ran it. Do not resurrect
+  the table to "fix" these; if anything, they're candidates for the same archive-or-fix review as
+  other dormant scripts found earlier this session.
+
+### 3. TASK SEMANTIC PACKET WRITER CENSUS — real drift found, in both directions, plus one serious open question
+
+Live table (`\d task_semantic_packets`) has exactly the 16 columns the steer predicted: `id,
+packet_key, source_ref, feature_id, feature_label, alias_id, qdrant_score, cluster_score,
+topological_score, fusion_score, metadata, semantic_vector, validation_status, error_message,
+created_at, updated_at`.
+
+The Drizzle schema (`sveltekit-frontend/src/lib/server/db/schema/tasks.ts`,
+`taskSemanticPackets`) declares **40+ columns** — `point_kind, qdrant_point_id, workspace_id,
+workspace_task_id, canonical_source_ref, source_ref_hash, file_path, semantic_path,
+related_feature_ids, related_task_ids, related_file_paths, cluster_id, centroid_id,
+parent_centroid_id, community_id, community_source, community_confidence, tags, summary,
+summary_llm, summary_model, next_action, summary_hash, confidence, lineage_version, ledger_type,
+canonical, payload_backfilled_at, domain_class, som_row, som_col, som_index, kmeans_cluster,
+status, agent_pickup_ready, observed_at, valid_from, valid_to, deleted`, etc. — **none of which
+exist on the live table** — confirming the predicted "static schema accumulated a superset" pattern
+exactly.
+
+**But it goes further than a harmless static superset.** `sveltekit-frontend/src/lib/server/
+tasks/semantic-packets.ts` (the real repository module, not a stale reference) contains an active
+`db.insert(taskSemanticPackets).values({ point_kind: 'task_summary', qdrant_point_id, workspace_id,
+workspace_task_id, ... })` call (lines 425-457) that explicitly writes to columns absent from the
+live table. **Found the matching migration**: `drizzle/manual/20260606_task_semantic_packets_live_
+alignment.sql` (`ADD COLUMN IF NOT EXISTS` for every one of those fields) — despite its name
+implying it aligns the table *to* live reality, it actually proposes the opposite: bringing the
+live table up to the Drizzle/code's expectation. **This migration is untracked in
+`sidecar-migrations.json`** (no entry found, same class of gap as the `20260826_atlas_class_search_
+index_v1.sql` one fixed above) and **not applied** to this live database (confirmed by the 16-column
+`\d` output).
+
+**Resolved, same session**: option (c) — **this is a live, currently-broken write path, not dead
+code.** Traced the call chain: `createTaskSemanticPacket()` is only called from
+`runTaskSemanticPacketLifecycle()` (same file, line 815), which is reachable from two real,
+live-wired call sites — `src/routes/api/tasks/packets/workflow/+server.ts` (a real API route,
+`POST` handler, `runTaskSemanticPacketLifecycle(parsed.data.taskId)` at line 267) and
+`src/lib/server/ai/mcp-tool-dispatch.ts` (an MCP tool handler, line 934). Both wrap the call in a
+real `try/catch` that logs and returns HTTP 500 on failure — **not a silent swallow**.
+`runTaskSemanticPacketLifecycle()` itself has no cache-check short-circuit before calling
+`createTaskSemanticPacket()` — every invocation of either call site hits the broken INSERT.
+**Conclusion**: `POST /api/tasks/packets/workflow` (with `dryRun` false and no prior cached
+record) and the equivalent MCP tool call would fail with HTTP 500 today against this live
+database. This is the same severity class as this repo's own "UI bugs are HOT — never deferred"
+rule (a reachable, currently-broken path), just in an API/MCP surface rather than a UI button.
+**Not fixed in this pass** — per the standing "no new migration yet" instruction — but this
+specific case is a stronger candidate for the unapplied `20260606_task_semantic_packets_live_
+alignment.sql` migration than ordinary speculative schema drift: the need is now *proven* by a
+live broken reachable path, not merely inferred from a Drizzle/live column mismatch.
+
+### 4. VIEW OWNER RECONCILIATION — one correction to the object classification
+
+```sql
+SELECT table_schema, table_name, table_type FROM information_schema.tables
+WHERE table_name IN ('feature_registry','task_semantic_packets','parent_atlas_documents','route_runtime_packets');
+-- route_runtime_packets   BASE TABLE
+-- task_semantic_packets   BASE TABLE
+-- parent_atlas_documents  VIEW
+-- feature_registry        (absent)
+```
+
+**Correction**: only `parent_atlas_documents` is actually a view. `route_runtime_packets` is a
+real `BASE TABLE`, not a view — it must not be routed through `CREATE OR REPLACE VIEW`
+reconciliation; any drift there is ordinary table-schema reconciliation. Captured
+`parent_atlas_documents`'s live `pg_get_viewdef`-equivalent definition (`pg_views.definition`): it
+projects `packet_key AS id`, `directory_path AS rel_path`, several `payload->>'...'` JSONB
+extractions (`line_count`, `is_route`, `is_svelte_comp`, `has_zod`, `has_auth`), several
+`jsonb_array_elements_text` unnests (`drizzle_refs`, `imports`, `exports`, `related_feature_ids`,
+`route_handlers`), `kmeans_cluster AS cluster_id`, `som_cluster AS centroid_id`, all `FROM
+atlas_packets WHERE source_ref IS NOT NULL` — i.e., it's a pure read-projection over the already-
+canonical `atlas_packets` table, no separate storage. Any drift here should be resolved by
+comparing this definition against its TypeScript consumer contract and, if needed, a
+`CREATE OR REPLACE VIEW` (which must preserve existing output column names/order/types) — never an
+`ALTER TABLE`. Not attempted in this pass — this was the object-classification proof only.
+
+**Net**: no migration applied, no table altered. Two concrete follow-ups are now correctly scoped
+rather than guessed at: (1) whether `semantic-packets.ts`'s insert path is live/dead/misdirected
+before deciding on the unapplied `20260606` migration, and (2) whether `parent_atlas_documents`'s
+view definition still matches its TypeScript consumer's expected shape.
+
+**Follow-up, same session — item 3's open question resolved**: traced the call chain.
+`createTaskSemanticPacket()` is only invoked from `runTaskSemanticPacketLifecycle()` (no
+cache-check short-circuit), which is reachable from two real, live-wired call sites —
+`POST /api/tasks/packets/workflow` (`+server.ts` line 267, real `try/catch` → HTTP 500, not a
+silent swallow) and an MCP tool dispatch handler (`mcp-tool-dispatch.ts` line 934). **This is a
+live, currently-broken write path**, not dead code — the same severity class as this repo's own
+"UI bugs are HOT" rule, just on an API/MCP surface. Not fixed here (no new migration yet, per
+standing instruction), but this specific case is a stronger candidate for the unapplied
+`20260606_task_semantic_packets_live_alignment.sql` migration than ordinary speculative drift: the
+need is now *proven* by a live broken reachable path, not inferred from a column diff.
+
+### `npm run audit:drizzle` re-run — confirms, sharpens, and finds two stale `repairClass` values
+
+Re-ran the existing `scripts/atlas/audit-postgres-contract-mirrors.mjs` (queue item 8) rather than
+re-deriving everything by hand. Fresh result: **identical top-line split to the 2026-08-31 run**
+(8 tables checked, 3 static-aligned, 3 live-aligned, 1 live-missing, 0 live-unavailable) — state has
+not drifted since. Full report: `docs/reports/postgres-contract-mirrors-report.json`.
+
+- **`atlas_packets`**: the schema-vs-live `columnDiffs.onlyInA` (declared but missing live) is
+  **exactly one column: `source_revision`** — everything else Drizzle declares already exists live,
+  and live has ~80 additional real columns Drizzle doesn't know about (a one-directional superset,
+  not two-way drift). This sharply confirms the queue's own framing: `atlas_packets.source_revision`
+  is a single, isolated, well-understood gap — correctly gated behind `CURRENT-SOURCE-EVIDENCE-
+  HYDRATION-01`'s unresolved 235-mismatch/7-unavailable lineage question, not something to apply
+  just because the column is "only" one field away. `repairClass` here already correctly reports
+  `NEEDS_REVIEW` (not an auto-apply suggestion) — the script's own heuristic gets this one right.
+- **`parent_atlas_documents`**: confirms something worse than a column mismatch. The Drizzle schema
+  module (`src/lib/server/db/schema/parent-atlas-documents.ts`) models it as if it were an
+  ordinary **table** with its own `id`, `created_at`, `updated_at`, `payload`, `alias_id`,
+  `centroid_id`, etc. columns — but live reality (confirmed earlier this session via
+  `pg_views.definition`) is a pure **view**: `SELECT packet_key AS id, source_ref, directory_path
+  AS rel_path, ... FROM atlas_packets WHERE source_ref IS NOT NULL`, no independent storage at all.
+  The Drizzle file's mental model is wrong, not just its column list. `repairClass` here also
+  correctly reports `NEEDS_REVIEW` — good, matches the queue's explicit warning not to route this
+  through `ALTER TABLE`. The real fix (not attempted here) is correcting the TypeScript schema
+  module to model this as a view-backed read projection, then reconciling via
+  `CREATE OR REPLACE VIEW` only if the view's own query needs to change.
+- **Two stale `repairClass` values found, exactly matching the queue's warning about "the old
+  connected snapshot's generated report had repair_class APPLY_EXISTING_SQL"**: `feature_registry`
+  and, more surprisingly, **`route_runtime_packets`** both still report `repairClass:
+  "APPLY_EXISTING_SQL"`. For `feature_registry` this is the already-known-stale prescription (this
+  file's own 2026-08-31 notes plus today's disposable-container re-proof both say don't apply it
+  yet). For `route_runtime_packets` the label makes even less sense: it's a real, existing, live
+  base table (confirmed via `information_schema.tables` — `BASE TABLE`, not a view or absence) with
+  its own rich real column set (`som_row`, `community_id`, `domain_class`, etc.) — "apply existing
+  SQL" as a repair suggestion for a table that already exists and already has data is a genuine
+  script defect, not just a stale value. **Not fixed in this pass** — flagging the script's
+  `repairClass` heuristic itself (likely treats any live column-diff mismatch as "needs a CREATE/
+  ALTER applied" without first checking whether the object already fully exists) as a real, small,
+  separate bug worth a future fix, distinct from any table's own data/schema state.
+
+## OKF-REGISTRY-REFERENCE-PARITY-01 (2026-09-08, read-only)
+
+Located "the registry" referenced earlier in this thread: `docs/.okf/registry.yaml` (+ sibling
+`docs/.okf/schema.yaml`). Confirmed this is a **genuinely different, non-duplicative** directory
+from the root `.okf/` (concepts/domains/predicates knowledge base explored earlier this session) —
+`docs/.okf/README.md` states explicitly it's a pure navigation layer ("points at the live owners
+without moving or duplicating them"), and `schema.yaml`'s own header already self-corrects a past
+fabrication (an earlier version cited a nonexistent external OKF spec repo, confirmed 404 at the
+time; the real Google Cloud OKF spec and this repo's own root `.okf/` are both named correctly now).
+Two `.okf` directories existing is not itself a problem here — they serve different, already-
+documented purposes.
+
+**Validated `registry.yaml`'s reference parity, live:**
+- **16/16 `contracts[].owner` file paths exist on disk** — zero missing (checked every one
+  directly, not sampled).
+- **7/7 `fabric.owners` type identifiers resolve to a real, live contract** — `structural:
+  StructuralObservationV2`, `tensors: RepresentationArtifactV1`, `features:
+  CandidateFeatureMatrixV1`, `graph: StructuralGraphSnapshotV1` all match exactly.
+  `semantic: semantic-packet-v2` and `vectors: vector-manifest-v1` resolve to real artifacts
+  (`packages/semantic-contracts/schemas/semantic-packet.schema.json`, titled "Semantic Packet
+  v2.0.0"; `packages/semantic-contracts/src/vector-manifest.ts`, exporting `VectorManifest`/
+  `VectorManifestSchema`) with reasonable naming correspondence, not an exact string match — fine.
+  **One real naming mismatch found**: `identity: CanonicalEnvelopeV1` — no file or export anywhere
+  in the repo is literally named `CanonicalEnvelopeV1`. The real, live owner is
+  `sveltekit-frontend/src/lib/server/db/canonical-feature-envelope.ts`, exporting
+  `CanonicalFeatureEnvelopeSchema`/`CanonicalFeatureEnvelope`/`buildCanonicalFeatureEnvelope()`/
+  `validateCanonicalEnvelope()` — a real, live, correct owner, just under a different name than the
+  registry declares. Small, precise doc-drift, not a missing-contract problem.
+- **Provider spot-check**: `sidecar: treesitter-chunker-8095` — confirmed real, matches the
+  already-documented `:8095` NLP sidecar (`NLP-SIDECAR-DIRECT-HEALTH-01` above: live `/health` and
+  `/ast/chunk` checks, Tree-sitter/ast-grep/LangExtract/NetworkX capabilities). Not a stale
+  reference.
+- **No circular authority**: the 7 `fabric.owners` (identity/structural/semantic/vectors/tensors/
+  features/graph) each name one distinct, non-overlapping real contract file — no owner's contract
+  references another owner's contract as its own authority.
+
+**Fixed, same session** (user asked to continue with actual fixes, not just flag them): both of
+this section's own findings were safe, additive, non-database edits, so both were applied:
+
+1. `docs/.okf/registry.yaml`'s `identity` owner corrected from the nonexistent
+   `CanonicalEnvelopeV1` to the real, live `CanonicalFeatureEnvelope` (with a dated comment
+   explaining why) — re-parsed the YAML afterward to confirm it's still valid.
+2. `scripts/atlas/audit-postgres-contract-mirrors.mjs`'s `repairClassForTable()` no longer returns
+   `APPLY_EXISTING_SQL` for a table that already exists live with declared-but-missing columns —
+   that label is now reserved for the genuine `LIVE_TABLE_MISSING` case (e.g. `feature_registry`,
+   confirmed still correct after the fix). A table that exists but is missing some declared
+   columns/indexes now gets `ADD_MISSING_COLUMNS_VERIFY_WRITERS` /
+   `ADD_MISSING_INDEXES_VERIFY_QUERIES` instead — names chosen to force a writer-check step (the
+   same lesson this session already learned the hard way on `task_semantic_packets`) rather than
+   implying a blind column add. Re-ran `npm run audit:drizzle` after the fix to confirm: `route_
+   runtime_packets` now correctly reports `ADD_MISSING_COLUMNS_VERIFY_WRITERS` (was wrongly
+   `APPLY_EXISTING_SQL`); `feature_registry` correctly still reports `APPLY_EXISTING_SQL`
+   (genuinely missing table); no other table's `repairClass` changed. Script-only edit — no
+   Postgres table, index, or data was touched by fixing the audit script itself.

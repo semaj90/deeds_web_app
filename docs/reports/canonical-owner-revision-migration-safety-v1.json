@@ -1,0 +1,32 @@
+{
+  "schema": "atlas.canonical-owner-revision-migration-safety.v1",
+  "generatedAt": "2026-09-07T22:59:18.022Z",
+  "mode": "READ_ONLY_MIGRATION_SAFETY_AUDIT",
+  "migration": "manual/20260907_canonical_owner_revision_axes_v1.sql",
+  "sqlChecks": {
+    "additiveOnly": true,
+    "forbiddenTokens": [],
+    "usesIfNotExists": true
+  },
+  "databaseError": null,
+  "liveColumns": [],
+  "expectedColumns": [
+    [
+      "atlas_packets",
+      "source_revision"
+    ],
+    [
+      "atlas_ontology_concepts",
+      "definition_revision"
+    ]
+  ],
+  "migrationApplied": false,
+  "writes": {
+    "postgres": false,
+    "qdrant": false,
+    "neo4j": false,
+    "valkey": false
+  },
+  "promotionAllowed": false,
+  "reason": "Migration remains unapplied; schema safety does not authorize application or backfill."
+}

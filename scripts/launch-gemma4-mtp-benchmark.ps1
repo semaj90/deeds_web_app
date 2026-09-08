@@ -16,7 +16,7 @@ $mainModel = if ($env:ROTORQUANT_MODEL_PATH) {
 $draftModel = if ($env:MTP_DRAFT_MODEL) {
     $env:MTP_DRAFT_MODEL
 } else {
-    Join-Path $repoRoot '.tmp\google-gemma4-e4b-assistant\gemma-e4b-assistant-mtp-f16.gguf'
+    Join-Path $repoRoot 'models\atlas-gemma4-e4b-assistant\mtp-f16\atlas-gemma4-e4b-assistant-mtp-f16.gguf'
 }
 $mmproj = if ($env:TURBO_MMPROJ_PATH) {
     $env:TURBO_MMPROJ_PATH

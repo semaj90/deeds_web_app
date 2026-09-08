@@ -58,6 +58,9 @@ export interface PostgresFtsCandidate extends CandidateForIdentityResolution {
   retrieved_via: 'postgres_fts';
   indexKind: typeof POSTGRES_FTS_INDEX_KIND;
   retrieval_algorithm: 'postgres_fts_ts_rank_cd';
+  score_type?: 'PG_TS_RANK_CD';
+  scorer_revision?: 'postgres-18-ts-rank-cd-v1';
+  text_search_config?: 'english';
   identity_resolution_source: PostgresFtsIdentityResolutionSource;
   title?: string;
   snippet?: string;
@@ -228,6 +231,9 @@ export async function searchPostgresFts(
     retrieved_via: 'postgres_fts' as const,
     indexKind: POSTGRES_FTS_INDEX_KIND,
     retrieval_algorithm: 'postgres_fts_ts_rank_cd' as const,
+    score_type: 'PG_TS_RANK_CD' as const,
+    scorer_revision: 'postgres-18-ts-rank-cd-v1' as const,
+    text_search_config: 'english' as const,
     identity_resolution_source: (
       row.identity_resolution_source === 'chunk_packet_identity_link_exact_canonical'
         ? 'chunk_packet_identity_link_exact_canonical'

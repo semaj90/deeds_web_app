@@ -160,7 +160,7 @@ container_log_correlation:
   pipeline:
     - step: parse_container_log
       input: raw log line (stdout/stderr from docker logs)
-      output: {error_message, stack_frames[], container_name, timestamp}
+      output: {error_message, "stack_frames[]", container_name, timestamp}
     - step: extract_source_refs
       method: regex on known path patterns (src/, scripts/, packages/)
     - step: agentic_search

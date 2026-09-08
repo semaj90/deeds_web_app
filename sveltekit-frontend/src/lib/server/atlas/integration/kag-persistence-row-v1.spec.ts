@@ -37,7 +37,7 @@ describe('KAG persistence row mapping', () => {
       label: 'CALLS',
       labelKind: 'ontology',
       labelSource: 'semantic_tagger',
-      ontologyIds: ['ontology:calls'],
+      ontologyIds: ['évidence', 'zeta'],
       conceptIds: ['concept:call'],
       participants: [{ entityId: 'symbol:a', entityKind: 'ast_symbol', role: 'actor' }],
       evidenceRefs: ['src/a.ts#1'],
@@ -59,6 +59,6 @@ describe('KAG persistence row mapping', () => {
     expect(row.packetKey).toBe('packet:p');
     expect(row.sourceRef).toBe('src/a.ts');
     expect(row.provenance.sourceRevision).toBe('source:1');
-    expect(row.ontologyIds).toEqual(['ontology:calls']);
+    expect(row.ontologyIds).toEqual(['zeta', 'évidence']);
   });
 });

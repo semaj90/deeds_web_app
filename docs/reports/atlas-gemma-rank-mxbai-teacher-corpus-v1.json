@@ -1,0 +1,290 @@
+{
+  "schema": "atlas.gemma-rank-mxbai-teacher-corpus.v1",
+  "generatedAt": "2026-09-07T02:33:53.016185+00:00",
+  "sourceCohort": "python/atlas_gemma_rank_shadow_04_v1.py",
+  "endpoint": "http://127.0.0.1:8099/rerank",
+  "modelId": "mixedbread-ai/mxbai-rerank-base-v2",
+  "cohortWorkspaceRevision": "atlas-gemma-shadow-04-cohort-v1",
+  "queryCount": 3,
+  "candidateCount": 15,
+  "candidateIdentityQualified": false,
+  "canonicalOrdinalMapProven": false,
+  "rawLogitsAvailable": false,
+  "scoreSemantics": "sigmoid_once_normalized",
+  "distillationEligible": false,
+  "distillationIneligibleReason": "LIVE_MXBAI_NORMALIZED_SCORES_CAPTURED_BUT_CANONICAL_ORDINAL_MAP_AND_RAW_LOGITS_REMAIN_UNPROVEN",
+  "requestChecksums": [
+    "sha256:f203e1cc5b7ba0373a624badd990878d040bb1ea5459bcbdc86d4177db8a86fa",
+    "sha256:d5a172b765c7d8808667d3466b4b0b4c6cf76e31dcc3316a19ff35dedbf2fb89",
+    "sha256:2cf70b8d19ed31c3b586c48734414c39dd44235fe5c12c99c2255f260c576308"
+  ],
+  "responseChecksums": [
+    "sha256:694eb4a93509fc9cdcebe7a405729862b1077d961f52c894db75d9c132113b4f",
+    "sha256:a4dd9d151fad21187dbbd48eda1c2b5c3292ecfac2fc5355d76bb4a8eea14277",
+    "sha256:231051aeaf8c6b33acc212aed338ebe7fd11b0b01e40d684576a88012e54915e"
+  ],
+  "queries": [
+    {
+      "query": "Which function sums duplicate-identity RRF scores instead of discarding them?",
+      "queryChecksum": "sha256:8b112944dab51ef7a141fbdb21b316c7652b1645a88c354afeb9501648817bd4",
+      "requestChecksum": "sha256:f203e1cc5b7ba0373a624badd990878d040bb1ea5459bcbdc86d4177db8a86fa",
+      "responseChecksum": "sha256:694eb4a93509fc9cdcebe7a405729862b1077d961f52c894db75d9c132113b4f",
+      "transportLatencyMs": 204.695,
+      "sidecar": {
+        "rows": [
+          {
+            "candidateId": "lane-aliases",
+            "rank": 0,
+            "score": 0.94677734375
+          },
+          {
+            "candidateId": "helper-card",
+            "rank": 1,
+            "score": 0.0706787109375
+          },
+          {
+            "candidateId": "model-resolution",
+            "rank": 2,
+            "score": 0.0546875
+          },
+          {
+            "candidateId": "service-merge",
+            "rank": 3,
+            "score": 0.023101806640625
+          },
+          {
+            "candidateId": "rrf-tologicallane",
+            "rank": 4,
+            "score": 0.0210418701171875
+          }
+        ],
+        "batchCount": 1,
+        "latencyMs": 167.96510014683008,
+        "vramPeakMb": 973.94189453125,
+        "vramCurrentMb": 958.2939453125
+      },
+      "observations": [
+        {
+          "candidateId": "lane-aliases",
+          "sourceRevision": "sha256:5b6c27cd067fc1428b9e30f486b39788d16f3b20b166d4f1efc3976939a696d6",
+          "workspaceRevision": "atlas-gemma-shadow-04-cohort-v1",
+          "candidateText": "export function normalizeRetrievalLane(value) { if (DENSE_LANE_ALIAS_SET.has(normalized)) return \"dense\"; if (LEXICAL_LANE_ALIAS_SET.has(normalized)) return \"lexical\"; return undefined; }",
+          "rank": 0,
+          "score": 0.94677734375,
+          "scoreSemantics": "sigmoid_once_normalized"
+        },
+        {
+          "candidateId": "helper-card",
+          "sourceRevision": "sha256:0c1b01b890da2ff5ea870f25d162fdf597a4f8da6d85e58c71e550335915cd3b",
+          "workspaceRevision": "atlas-gemma-shadow-04-cohort-v1",
+          "candidateText": "export function canDispatchDirectly(candidate) { return candidate.rank === 0 && candidate.similarity >= HELPER_ROUTING_DIRECT_DISPATCH_THRESHOLD; }",
+          "rank": 1,
+          "score": 0.0706787109375,
+          "scoreSemantics": "sigmoid_once_normalized"
+        },
+        {
+          "candidateId": "model-resolution",
+          "sourceRevision": "sha256:8dcbd160a024bfca4eb74407b45cb4b5ea9d1d0fdc81c7eff4fd411800b529a0",
+          "workspaceRevision": "atlas-gemma-shadow-04-cohort-v1",
+          "candidateText": "export function assertRuntimeIdentityIsMocked(resolution, expectedMockedId) { if (!resolution.runtimeDiscovered) throw new Error(); }",
+          "rank": 2,
+          "score": 0.0546875,
+          "scoreSemantics": "sigmoid_once_normalized"
+        },
+        {
+          "candidateId": "service-merge",
+          "sourceRevision": "sha256:9ff6a21d0c32df509689e4ee12340a88f7e087648636b7cc5aa4d4f9c050b2f9",
+          "workspaceRevision": "atlas-gemma-shadow-04-cohort-v1",
+          "candidateText": "export function mergeDuplicateIdentityScores(results) { const key = r.symbol_version_id ?? r.packet_key ?? r.id; merged.set(key, { ...representative, score: existing.score + r.score }); }",
+          "rank": 3,
+          "score": 0.023101806640625,
+          "scoreSemantics": "sigmoid_once_normalized"
+        },
+        {
+          "candidateId": "rrf-tologicallane",
+          "sourceRevision": "sha256:364a2002dea3ba41f76027f566809cea8a3f33bbdd1066130795b4d826cf23ed",
+          "workspaceRevision": "atlas-gemma-shadow-04-cohort-v1",
+          "candidateText": "function toLogicalLaneName(value) { const normalized = value.trim().toLowerCase(); return normalizeRetrievalLane(normalized) ?? (normalized || \"dispatcher\"); }",
+          "rank": 4,
+          "score": 0.0210418701171875,
+          "scoreSemantics": "sigmoid_once_normalized"
+        }
+      ]
+    },
+    {
+      "query": "Which contract enforces that batch extraction never runs on the full corpus, only a bounded candidate subset?",
+      "queryChecksum": "sha256:be28c5120fe5add47104c51a1f2d53ad71cceb4e3a47dc659cef4caf4a3fa90f",
+      "requestChecksum": "sha256:d5a172b765c7d8808667d3466b4b0b4c6cf76e31dcc3316a19ff35dedbf2fb89",
+      "responseChecksum": "sha256:a4dd9d151fad21187dbbd48eda1c2b5c3292ecfac2fc5355d76bb4a8eea14277",
+      "transportLatencyMs": 137.843,
+      "sidecar": {
+        "rows": [
+          {
+            "candidateId": "evidence-card",
+            "rank": 0,
+            "score": 0.86376953125
+          },
+          {
+            "candidateId": "fusion-contribution",
+            "rank": 1,
+            "score": 0.042236328125
+          },
+          {
+            "candidateId": "relevance-scores",
+            "rank": 2,
+            "score": 0.017242431640625
+          },
+          {
+            "candidateId": "helper-card-2",
+            "rank": 3,
+            "score": 0.012969970703125
+          },
+          {
+            "candidateId": "firecrawl-provider",
+            "rank": 4,
+            "score": 0.01111602783203125
+          }
+        ],
+        "batchCount": 1,
+        "latencyMs": 135.97070006653666,
+        "vramPeakMb": 973.4619140625,
+        "vramCurrentMb": 958.2939453125
+      },
+      "observations": [
+        {
+          "candidateId": "evidence-card",
+          "sourceRevision": "sha256:3e8293c08edafc206f4205a6ce0bed55dd0e152997cefbae6563b2c9c1d3ca16",
+          "workspaceRevision": "atlas-gemma-shadow-04-cohort-v1",
+          "candidateText": "export function assertExtractionBatchBounded(candidateCount) { if (candidateCount > CANDIDATE_EVIDENCE_EXTRACTION_MAX_BATCH) throw new Error(); }",
+          "rank": 0,
+          "score": 0.86376953125,
+          "scoreSemantics": "sigmoid_once_normalized"
+        },
+        {
+          "candidateId": "fusion-contribution",
+          "sourceRevision": "sha256:04bc9da2e4b3346699f944e6d89586042dc146c386331b60750b3560fc986b75",
+          "workspaceRevision": "atlas-gemma-shadow-04-cohort-v1",
+          "candidateText": "export interface FusionContributionV1 { canonicalId: string; logicalLane: string; rank: number; weight: number; }",
+          "rank": 1,
+          "score": 0.042236328125,
+          "scoreSemantics": "sigmoid_once_normalized"
+        },
+        {
+          "candidateId": "relevance-scores",
+          "sourceRevision": "sha256:dd0de4aa240b8dbd4f8086e2ebb25af4b32c0ecb4db1de1d65a709ce03d92c69",
+          "workspaceRevision": "atlas-gemma-shadow-04-cohort-v1",
+          "candidateText": "export function shouldEscalateToTextRelevance(cheapScoresDescending) { if (cheapScoresDescending.length < 2) return false; }",
+          "rank": 2,
+          "score": 0.017242431640625,
+          "scoreSemantics": "sigmoid_once_normalized"
+        },
+        {
+          "candidateId": "helper-card-2",
+          "sourceRevision": "sha256:869bba5b550929c75afa0db792a2fffde82f6a7e36b695cd46e7b23c313f3b06",
+          "workspaceRevision": "atlas-gemma-shadow-04-cohort-v1",
+          "candidateText": "export const HelperCardV1Schema = z.object({ helperId: id, capabilities: z.string().min(1) }).strict();",
+          "rank": 3,
+          "score": 0.012969970703125,
+          "scoreSemantics": "sigmoid_once_normalized"
+        },
+        {
+          "candidateId": "firecrawl-provider",
+          "sourceRevision": "sha256:f5f11358dc6940104f33968552dd8c93a1e3ce2802b416db111eb3b8816dffa1",
+          "workspaceRevision": "atlas-gemma-shadow-04-cohort-v1",
+          "candidateText": "export async function loadFirecrawl() { if (cached) return cached; const mod = await import(\"@mendable/firecrawl-js\"); }",
+          "rank": 4,
+          "score": 0.01111602783203125,
+          "scoreSemantics": "sigmoid_once_normalized"
+        }
+      ]
+    },
+    {
+      "query": "Which module centralizes the optional dynamic import of the Firecrawl SDK behind one documented type-check exception?",
+      "queryChecksum": "sha256:e4b619bd139f22942dc5cb49549e5a65e70c6491ff09d370cada07f3766f812a",
+      "requestChecksum": "sha256:2cf70b8d19ed31c3b586c48734414c39dd44235fe5c12c99c2255f260c576308",
+      "responseChecksum": "sha256:231051aeaf8c6b33acc212aed338ebe7fd11b0b01e40d684576a88012e54915e",
+      "transportLatencyMs": 63.147,
+      "sidecar": {
+        "rows": [
+          {
+            "candidateId": "firecrawl-provider-2",
+            "rank": 0,
+            "score": 0.62255859375
+          },
+          {
+            "candidateId": "model-resolution-2",
+            "rank": 1,
+            "score": 0.023284912109375
+          },
+          {
+            "candidateId": "retrieval-lane-2",
+            "rank": 2,
+            "score": 0.0101318359375
+          },
+          {
+            "candidateId": "youtube-transcript",
+            "rank": 3,
+            "score": 0.0068511962890625
+          },
+          {
+            "candidateId": "candidate-evidence-2",
+            "rank": 4,
+            "score": 0.00464630126953125
+          }
+        ],
+        "batchCount": 1,
+        "latencyMs": 41.14710004068911,
+        "vramPeakMb": 974.39697265625,
+        "vramCurrentMb": 958.2939453125
+      },
+      "observations": [
+        {
+          "candidateId": "firecrawl-provider-2",
+          "sourceRevision": "sha256:57a66b08c5e8621d8690f8b8786ea4b99f7fce15ef7137257a287182b7dfe7a8",
+          "workspaceRevision": "atlas-gemma-shadow-04-cohort-v1",
+          "candidateText": "export async function loadFirecrawl() { try { const mod = await import(\"@mendable/firecrawl-js\"); } catch (err) { cached = { status: \"UNAVAILABLE\" }; } return cached; }",
+          "rank": 0,
+          "score": 0.62255859375,
+          "scoreSemantics": "sigmoid_once_normalized"
+        },
+        {
+          "candidateId": "model-resolution-2",
+          "sourceRevision": "sha256:28f1a5b1dab74126333c531d1636ff9da6c45ecf994fdd3df54916f3927943f3",
+          "workspaceRevision": "atlas-gemma-shadow-04-cohort-v1",
+          "candidateText": "export const MODEL_RESOLUTION_SOURCE_VALUES = [\"REQUEST_ALIAS\", \"CONFIG\", \"LLAMA_V1_MODELS\", \"LLAMA_PROPS\"];",
+          "rank": 1,
+          "score": 0.023284912109375,
+          "scoreSemantics": "sigmoid_once_normalized"
+        },
+        {
+          "candidateId": "retrieval-lane-2",
+          "sourceRevision": "sha256:da94266088cbe44b7ba1b18dc7fa9e0e4c3b6c6c7f6de6be56d03e3e0a9045c4",
+          "workspaceRevision": "atlas-gemma-shadow-04-cohort-v1",
+          "candidateText": "const DENSE_LANE_ALIASES = [\"dense\", \"dense_384\", \"dense_768\", \"qdrant\", \"qdrant_vector\"];",
+          "rank": 2,
+          "score": 0.0101318359375,
+          "scoreSemantics": "sigmoid_once_normalized"
+        },
+        {
+          "candidateId": "youtube-transcript",
+          "sourceRevision": "sha256:a8350a7e812eb356756793bfbc07aa6c1d78d7d2dc8f5d1d195479297de253a6",
+          "workspaceRevision": "atlas-gemma-shadow-04-cohort-v1",
+          "candidateText": "async function fetchViaFirecrawlMarkdown(videoId) { const apiKey = ENV.FIRECRAWL_API_KEY; if (!apiKey) return null; const firecrawl = await loadFirecrawl(); }",
+          "rank": 3,
+          "score": 0.0068511962890625,
+          "scoreSemantics": "sigmoid_once_normalized"
+        },
+        {
+          "candidateId": "candidate-evidence-2",
+          "sourceRevision": "sha256:7b5b06abde912ddd86135805bd1f44bc523a364b65c6e97aff77caaa2bc6c2ba",
+          "workspaceRevision": "atlas-gemma-shadow-04-cohort-v1",
+          "candidateText": "export const CandidateEvidenceCardV1Schema = z.object({ canonicalId: id, packetKey: id, sourceRef: z.string().min(1) }).strict();",
+          "rank": 4,
+          "score": 0.00464630126953125,
+          "scoreSemantics": "sigmoid_once_normalized"
+        }
+      ]
+    }
+  ],
+  "receiptChecksum": "sha256:173563be8db207d078bcda212f359f2fd82e104557cde53dec93e042bd1417aa"
+}

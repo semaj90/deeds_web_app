@@ -2504,8 +2504,9 @@ func (s *retrievalServer) httpSearchCodebase(w http.ResponseWriter, r *http.Requ
 
 // httpSearchBM25 retains the historical route name while exposing the
 // PostgreSQL native FTS lane separately from dense Qdrant retrieval. Fusion
-// remains in the TypeScript retrieval runtime. This is not canonical BM25:
-// true_bm25 stays false until a term-statistics/IDF implementation is proven.
+// remains in the TypeScript retrieval runtime. This is PostgreSQL cover-density
+// ranking, not BM25; true_bm25 stays false until a term-statistics/IDF
+// implementation is proven.
 func (s *retrievalServer) httpSearchBM25(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	if r.Method != http.MethodPost {
@@ -2524,6 +2525,7 @@ func (s *retrievalServer) httpSearchBM25(w http.ResponseWriter, r *http.Request)
 		body.Limit = 20
 	}
 	started := time.Now()
+	queryChecksum := fmt.Sprintf("sha256:%x", sha256.Sum256([]byte(strings.TrimSpace(body.Query))))
 	rows, err := s.pool.Query(r.Context(), `
 		SELECT id::text AS id,
 		       COALESCE(chunk_id, relative_path) AS source_ref,
@@ -2537,7 +2539,7 @@ func (s *retrievalServer) httpSearchBM25(w http.ResponseWriter, r *http.Request)
 		ORDER BY score DESC, indexed_at DESC NULLS LAST
 		LIMIT $2`, body.Query, body.Limit)
 	if err != nil {
-		json.NewEncoder(w).Encode(map[string]any{"results": []any{}, "error": "bm25 unavailable", "detail": err.Error()})
+		json.NewEncoder(w).Encode(map[string]any{"results": []any{}, "error": "postgres fts unavailable", "detail": err.Error()})
 		return
 	}
 	defer rows.Close()
@@ -2548,14 +2550,22 @@ func (s *retrievalServer) httpSearchBM25(w http.ResponseWriter, r *http.Request)
 		if err := rows.Scan(&id, &sourceRef, &filePath, &summary, &score, &snippet); err != nil {
 			continue
 		}
-		results = append(results, map[string]any{"id": id, "source_ref": sourceRef, "file_path": filePath, "summary": summary, "snippet": snippet, "score": score})
+		results = append(results, map[string]any{"id": id, "source_ref": sourceRef, "file_path": filePath, "summary": summary, "snippet": snippet, "score": score, "score_type": "PG_TS_RANK_CD", "scorer_revision": "postgres-18-ts-rank-cd-v1", "text_search_config": "english", "rank": len(results) + 1})
+	}
+	for _, result := range results {
+		result["candidate_count"] = len(results)
 	}
 	json.NewEncoder(w).Encode(map[string]any{
-		"results":     results,
-		"lane":        "postgres_fts",
-		"legacy_lane": "bm25",
-		"read_only":   true,
-		"total_ms":    time.Since(started).Milliseconds(),
+		"results":            results,
+		"lane":               "postgres_fts",
+		"legacy_lane":        "bm25",
+		"query_checksum":     queryChecksum,
+		"candidate_count":    len(results),
+		"score_type":         "PG_TS_RANK_CD",
+		"scorer_revision":    "postgres-18-ts-rank-cd-v1",
+		"text_search_config": "english",
+		"read_only":          true,
+		"total_ms":           time.Since(started).Milliseconds(),
 		"capability": map[string]any{
 			"schema":             "atlas.indexed-rpc-capability.v1",
 			"capabilityId":       "go-retrieval:postgres-fts:v1",
@@ -2563,6 +2573,7 @@ func (s *retrievalServer) httpSearchBM25(w http.ResponseWriter, r *http.Request)
 			"executor":           "GO_RETRIEVAL",
 			"proofState":         "PROVEN",
 			"trueBm25":           false,
+			"scoreType":          "PG_TS_RANK_CD",
 			"canonicalAuthority": false,
 		},
 	})

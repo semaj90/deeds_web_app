@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-01T18:42:56.960Z",
+  "generatedAt": "2026-09-08T04:57:19.166Z",
   "liveReachable": true,
   "liveError": null,
   "summary": {
@@ -783,6 +783,7 @@
         "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\drizzle\\manual\\0999_fix-grpc-proto-alignment.sql",
         "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\drizzle\\manual\\20260611_atlas_packets_schema.sql",
         "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\drizzle\\manual\\20260612_packet_payload_expression_indexes.sql",
+        "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\drizzle\\manual\\20260907_canonical_owner_revision_axes_v1.sql",
         "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\drizzle\\manual\\file-understanding-labels.sql",
         "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\drizzle\\manual\\phase-b-enrichment-schema.sql"
       ],
@@ -859,6 +860,7 @@
           "source_ref",
           "source_ref_key",
           "source_representation_id",
+          "source_revision",
           "summary",
           "tags",
           "taxonomy_level",
@@ -929,6 +931,7 @@
           "idx_atlas_packets_source_kind",
           "idx_atlas_packets_source_ref",
           "idx_atlas_packets_source_ref_key",
+          "idx_atlas_packets_source_revision",
           "idx_atlas_packets_summary_fts",
           "idx_atlas_packets_summary_trgm",
           "idx_atlas_packets_taxonomy_level",
@@ -1012,6 +1015,7 @@
           "source_ref",
           "source_ref_key",
           "source_representation_id",
+          "source_revision",
           "summary",
           "tags",
           "title_id",
@@ -1058,6 +1062,7 @@
           "source_path",
           "source_ref",
           "source_ref_key",
+          "source_revision",
           "summary",
           "taxonomy_level",
           "test_coverage_pct",
@@ -1088,6 +1093,7 @@
           "idx_atlas_packets_representation_revision",
           "idx_atlas_packets_reward_prior",
           "idx_atlas_packets_source_feature",
+          "idx_atlas_packets_source_revision",
           "idx_atlas_packets_title_id",
           "idx_atlas_packets_topology_gin",
           "idx_atlas_packets_tree_node_id",
@@ -1139,6 +1145,7 @@
           "idx_atlas_packets_source_kind",
           "idx_atlas_packets_source_ref",
           "idx_atlas_packets_source_ref_key",
+          "idx_atlas_packets_source_revision",
           "idx_atlas_packets_summary_fts",
           "idx_atlas_packets_summary_trgm",
           "idx_atlas_packets_taxonomy_level",
@@ -1530,9 +1537,11 @@
           "idx_packets_source_feature_multi_hop",
           "idx_packets_used_concepts_gin"
         ],
-        "rowCount": 61660,
+        "rowCount": 61718,
         "columnDiffs": {
-          "onlyInA": [],
+          "onlyInA": [
+            "source_revision"
+          ],
           "onlyInB": [
             "ast_score",
             "authority_score",
@@ -1624,6 +1633,7 @@
             "idx_atlas_packets_qdrant_point",
             "idx_atlas_packets_recovery_lane",
             "idx_atlas_packets_reward_prior",
+            "idx_atlas_packets_source_revision",
             "idx_atlas_packets_summary_trgm",
             "idx_atlas_packets_test_coverage",
             "idx_atlas_packets_thoroughness",
@@ -2527,7 +2537,7 @@
           "updated_at"
         ],
         "indexes": [],
-        "rowCount": 61660,
+        "rowCount": 61718,
         "columnDiffs": {
           "onlyInA": [
             "alias_id",
@@ -2996,7 +3006,7 @@
         }
       },
       "classification": "COLUMN_MISMATCH",
-      "repairClass": "APPLY_EXISTING_SQL",
+      "repairClass": "ADD_MISSING_COLUMNS_VERIFY_WRITERS",
       "identityFields": [
         "packet_uuid",
         "source_ref",

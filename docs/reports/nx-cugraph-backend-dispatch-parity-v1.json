@@ -1,0 +1,38 @@
+{
+  "schema": "parent-atlas.nx-cugraph-backend-dispatch-parity-report.v1",
+  "generatedAt": "2026-09-07T00:00:00.000Z",
+  "status": "BOUNDED_FIXTURE_PROVEN",
+  "purpose": "Prove the additive --backend cugraph flag on graph_snapshot_parity_networkx_oracle.py actually dispatches through nx-cugraph and produces plausible results, before treating it as a usable comparison axis alongside the existing direct-cuGraph oracle.",
+  "environment": {
+    "host": "WSL2 Ubuntu, atlas-rapids-cu13 conda env",
+    "networkxVersion": "3.6.1",
+    "nxCugraphVersion": "26.06.00",
+    "gpu": "RTX 3060 Ti (same env GPU-MINI-FABRIC-01 already uses)"
+  },
+  "fixture": {
+    "kind": "synthetic, deterministic (random.seed(42), not a production artifact)",
+    "nodeCount": 500,
+    "edgeCount": 1495,
+    "note": "Real frozen production fixtures already exist at docs/reports/current-structural-graph-artifact-v2/{nodes,edges}.parquet; this bounded check deliberately used a small synthetic fixture instead, matching the GPU-MINI-FABRIC-01 convention of proving the mechanism cheaply before running it against production-scale data."
+  },
+  "results": {
+    "connectedComponents": { "cpu": 1, "nxCugraphDispatch": 1, "match": true },
+    "pagerank": {
+      "maxAbsoluteDelta": 4.336808689942018e-18,
+      "top10Overlap": "10/10",
+      "verdict": "effectively exact match (floating-point noise only)"
+    },
+    "louvain": {
+      "cpuCommunityCount": 13,
+      "nxCugraphDispatchCommunityCount": 21,
+      "cpuModularity": 0.3903759465777788,
+      "nxCugraphDispatchModularity": 0.3771763179382781,
+      "verdict": "differs, but consistent with this script's own pre-existing, documented non-determinism note (\"NetworkX's own Louvain is order/randomness sensitive\" -- no seed is fixed on either backend). Re-running the CPU-only path twice in this same session already produced 14 then 13 communities on identical input, confirming the variance is inherent to unseeded Louvain, not introduced by the GPU dispatch path. Not treated as a pass/fail signal here -- proper comparison requires ARI/NMI, per this repo's own already-established rule for Louvain parity, not raw community-count/modularity comparison."
+    }
+  },
+  "conclusion": "The --backend cugraph flag genuinely dispatches through nx-cugraph (confirmed via successful execution + real numeric output, not merely 'did not error'). PageRank and connected-components -- the two deterministic algorithms -- agree with the CPU NetworkX reference to floating-point precision on this fixture. This is evidence the mechanism works, not a claim that production-scale parity is proven -- that would need a run against the real frozen 162K-node corpus this repo already has, joined by node ID, with the existing ARI/NMI methodology applied to Louvain specifically.",
+  "openGates": [
+    "Run against the real production-scale corpus (docs/reports/graph-snapshot-parity/receipt.json's underlying data), not just this 500-node synthetic fixture, before citing nx-cugraph dispatch as validated at production scale",
+    "Apply ARI/NMI comparison to Louvain output specifically, per this repo's existing Louvain-parity methodology, rather than raw community-count/modularity diffing"
+  ]
+}

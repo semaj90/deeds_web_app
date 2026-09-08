@@ -275,6 +275,7 @@ export async function executePhase110EndToEnd(
           source_ref: f.source_ref,
           feature_id: '',
           domain_class: 'fact',
+          content: f.fact_text,
           final_score: f.confidence,
           retrieval_trace: [{ lane: 'neo4j', rank: 1, score: f.confidence, returned_at_ms: 0 }]
         }))

@@ -45,7 +45,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       console.log(`[API] Starting Pipeline Job for Doc: ${targetDocId}`);
 
       // Run Pipeline (Synchronous for now, or fire-and-forget)
-      // In production, push to Queue (BullMQ) and return Job ID immediately.
+      // In production, publish to the Parent Atlas RabbitMQ queue and return a job ID immediately.
       // Here, await result to ensure it works.
       const result = await pipelineOrchestrator.processDocument(targetDocId, content, {
         case_id: targetCaseId,

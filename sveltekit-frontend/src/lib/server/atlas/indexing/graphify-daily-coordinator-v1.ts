@@ -350,6 +350,52 @@ export async function recordStructuralStage(
   return parsed;
 }
 
+const downstreamExecutionStageSchema = z.enum(['SEMANTIC_ENRICH', 'GRAPH_BUILD', 'PROJECT', 'VALIDATE']);
+export type DownstreamExecutionStageV1 = z.infer<typeof downstreamExecutionStageSchema>;
+
+/**
+ * Binds a completed receipt to one of the four downstream ledger stages
+ * (SEMANTIC_ENRICH, GRAPH_BUILD, PROJECT, VALIDATE). This is a ledger-side seam only,
+ * structurally identical to recordInventoryStage/recordStructuralStage -- it does NOT imply
+ * that a production owner has been wired for any of these four stages. Per the
+ * GRAPHIFY-DAILY-COORDINATOR-01 downstream-stage-owner audit
+ * (parent-atlas-retrieval-lineage-dag-convergence/tasks.md), no safe coordinator owner exists yet
+ * for SEMANTIC_ENRICH (the real content_embedding writer, scripts/atlas/graphify-incremental.mjs,
+ * is a monolithic script with interleaved embedding writes, cluster assignment, Qdrant projection,
+ * and BitFrost invalidation -- it has no callable stage interface and isolating one is a separate,
+ * not-yet-authorized refactor of a live production writer) or for GRAPH_BUILD/PROJECT/VALIDATE.
+ * Calling this function against a real execution before a genuine owner is bound would be exactly
+ * the "caller-invented lineage" this repo's conventions warn against -- do not call it from
+ * production code paths until a specific owner audit closes for the stage being recorded.
+ */
+export async function recordDownstreamStage(
+  client: GraphifyCoordinatorSqlClientV1,
+  executionId: string,
+  stage: DownstreamExecutionStageV1,
+  receipt: ExecutionStageReceiptV1,
+): Promise<ExecutionStageReceiptV1> {
+  uuid.parse(executionId);
+  const parsedStage = downstreamExecutionStageSchema.parse(stage);
+  const parsed = executionStageReceiptV1Schema.parse(receipt);
+  await client.query(
+    `INSERT INTO public.graphify_execution_stages (execution_id, stage, status, started_at,
+       input_checksum)
+     VALUES ($1, $2, 'RUNNING', now(), $3)`,
+    [executionId, parsedStage, parsed.inputChecksum],
+  );
+  const update = await client.query(
+    `UPDATE public.graphify_execution_stages
+        SET status = 'COMPLETED', completed_at = now(), output_checksum = $3, receipt_ref = $4
+      WHERE execution_id = $1 AND stage = $2 AND status = 'RUNNING'
+      RETURNING execution_id`,
+    [executionId, parsedStage, parsed.outputChecksum, parsed.receiptRef ?? null],
+  );
+  if ((update.rowCount ?? 0) !== 1) {
+    throw new Error(`GRAPHIFY_COORDINATOR_${parsedStage}_STAGE_READBACK_FAILED`);
+  }
+  return parsed;
+}
+
 /** Updates last_heartbeat_at. No-ops (rowCount 0) rather than throwing when the execution is no
  * longer RUNNING -- a heartbeat racing a terminal transition is expected, not an error. */
 export async function heartbeat(

@@ -20,7 +20,7 @@ required:
 fields:
   feature_id:
     type: string
-    description: Stable feature identity. Format: "feature:<sha256-prefix>"
+    description: 'Stable feature identity. Format: "feature:<sha256-prefix>"'
 
   tree_node_id:
     type: string
@@ -44,7 +44,7 @@ fields:
   feature_namespace:
     type: string
     optional: true
-    description: Domain namespace. Example: "atlas.code", "atlas.legal"
+    description: 'Domain namespace. Example: "atlas.code", "atlas.legal"'
 
   extractor_version:
     type: string

@@ -21,6 +21,10 @@ import type { ToolCall } from './tool-call-parser.js';
 import { parseToolCalls, hasToolCalls } from './tool-call-parser.js';
 import type { PermissionGrant } from '$lib/server/ace/atlas-tool-registry';
 import { checkToolAccess, validateToolName } from '$lib/server/auth/tool-authorization';
+import {
+  buildLlamaPromptCacheOptionsV1,
+  recordLlamaPromptCacheTelemetry,
+} from './context-prompt-streamer.js';
 
 export interface AcpRpcLoopConfig {
   llamaBaseUrl: string;
@@ -29,7 +33,8 @@ export interface AcpRpcLoopConfig {
   maxTokens: number;
   maxToolRounds: number;
   useKvCache: boolean;
-  kvCacheTtl: number;
+  /** llama.cpp cache_reuse token threshold; this is not a TTL. */
+  cacheReuseMinChunk?: number;
   mcpPort?: number;
   permissionGrant?: PermissionGrant;
 }
@@ -77,6 +82,40 @@ export async function executeMcpTool(
 }
 
 /**
+ * Execute a batch of tool calls concurrently and return their results in the
+ * SAME order as `toolCalls`, regardless of which one actually finishes first
+ * (`Promise.all` resolves in input-array order). `executor` never rejects the
+ * overall batch on a single failure -- each call has its own try/catch, so a
+ * failing tool call yields a `{ error }` JSON payload for that one
+ * `tool_call_id` instead of aborting its siblings.
+ *
+ * Extracted as an injectable-executor pure function (parent-atlas-ace-bitfrost-
+ * cache-correctness, T3 "MCP tool-call parallelism") so the concurrency
+ * property is directly unit-testable without a live llama-server, MCP
+ * connection, or `executeMcpTool`'s auth/mock dispatch.
+ */
+export async function executeToolCallsInParallel(
+  toolCalls: ToolCall[],
+  executor: (name: string, args: Record<string, any>) => Promise<string>
+): Promise<Array<{ role: 'tool'; tool_call_id: string; content: string }>> {
+  return Promise.all(
+    toolCalls.map(async (toolCall) => {
+      try {
+        const args = JSON.parse(toolCall.function.arguments);
+        const result = await executor(toolCall.function.name, args);
+        return { role: 'tool' as const, tool_call_id: toolCall.id, content: result };
+      } catch (err) {
+        return {
+          role: 'tool' as const,
+          tool_call_id: toolCall.id,
+          content: JSON.stringify({ error: err instanceof Error ? err.message : 'Unknown error' }),
+        };
+      }
+    })
+  );
+}
+
+/**
  * Single turn of the ACP RPC loop
  */
 export async function* apcRpcLoopTurn(
@@ -99,8 +138,11 @@ export async function* apcRpcLoopTurn(
       temperature: config.temperature,
       max_tokens: config.maxTokens,
       stream: true,
-      cache_prompt: config.useKvCache,
-      cache_reuse: config.kvCacheTtl,
+      stream_options: { include_usage: true },
+      ...buildLlamaPromptCacheOptionsV1({
+        cachePrompt: config.useKvCache,
+        cacheReuseMinChunk: config.cacheReuseMinChunk,
+      }),
     }),
   });
 
@@ -130,6 +172,9 @@ export async function* apcRpcLoopTurn(
           if (data !== '[DONE]') {
             try {
               const parsed = JSON.parse(data);
+              if (config.useKvCache) {
+                recordLlamaPromptCacheTelemetry(config.model, parsed, 'acp');
+              }
               const content = parsed.choices?.[0]?.delta?.content ?? '';
               if (content) {
                 fullContent += content;
@@ -159,32 +204,20 @@ export async function* apcRpcLoopTurn(
 
     yield { content: '', toolCalls: parsed.toolCalls, done: false };
 
-    // Execute tools and add results
-    const toolResults: Array<{ role: 'tool'; tool_call_id: string; content: string }> = [];
-
-    for (const toolCall of parsed.toolCalls) {
+    // Execute tools concurrently, not serially. NOTE: multiple tool_calls in one
+    // model turn is only a concurrency *allowance*, not a semantic-independence
+    // guarantee -- the model can legitimately emit calls that touch the same
+    // resource. This still runs them via Promise.all today (no per-tool admission
+    // policy yet); results correlate back via `tool_call_id`, not array/completion
+    // order (see `executeToolCallsInParallel`). A future ToolExecutionPolicyV1
+    // (per-tool concurrency class + keyed-write serialization) should gate this
+    // instead of assuming every same-turn batch is safe to run fully concurrently.
+    const toolResults = await executeToolCallsInParallel(parsed.toolCalls, async (name, args) => {
       const startMs = Date.now();
-      try {
-        const args = JSON.parse(toolCall.function.arguments);
-        const result = await executeMcpTool(toolCall.function.name, args, config.permissionGrant);
-
-        toolResults.push({
-          role: 'tool',
-          tool_call_id: toolCall.id,
-          content: result,
-        });
-
-        console.log(
-          `[ACP RPC] Tool executed: ${toolCall.function.name} (${Date.now() - startMs}ms)`
-        );
-      } catch (err) {
-        toolResults.push({
-          role: 'tool',
-          tool_call_id: toolCall.id,
-          content: JSON.stringify({ error: err instanceof Error ? err.message : 'Unknown error' }),
-        });
-      }
-    }
+      const result = await executeMcpTool(name, args, config.permissionGrant);
+      console.log(`[ACP RPC] Tool executed: ${name} (${Date.now() - startMs}ms)`);
+      return result;
+    });
 
     // Add tool results to messages
     messages.push(...(toolResults as any[]));

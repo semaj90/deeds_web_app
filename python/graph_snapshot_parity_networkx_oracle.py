@@ -12,6 +12,31 @@ side of the parity contract. Cross-backend fields (pagerankTopKOverlap,
 pagerankCorrelation, pagerankMaxDelta, louvainCommunityAgreement) are left
 for the caller to fill in once both backends have run — reporting them here
 would fabricate a comparison that never happened.
+
+Optional --backend cugraph (2026-09-07): dispatches the SAME NetworkX API
+calls above (number_weakly_connected_components, pagerank,
+louvain_communities — all three confirmed in RAPIDS' nx-cugraph
+supported-algorithms list) through the nx-cugraph GPU backend via
+NetworkX's own backend= kwarg, instead of writing a third parity harness.
+This is a genuinely different comparison axis than
+graph_snapshot_parity_cugraph_oracle.py: that script hand-builds a
+cuDF-native cugraph.Graph directly (production-path performance, resident
+VRAM reuse across algorithms); this flag instead proves "the exact same
+NetworkX-API script, zero code changes, backend-swapped" — nx-cugraph's own
+stated value proposition. Requires the RAPIDS WSL2 env (same
+atlas-rapids-cu13 environment the cuGraph oracle needs) — plain NetworkX
+has no nx-cugraph installed and --backend cugraph will raise ImportError
+from NetworkX's backend dispatcher, not silently fall back to CPU.
+IMPORTANT CAVEAT: NetworkX's backend dispatch mechanism does not expose a
+reliable "did this actually run on GPU" signal from inside the call site —
+this script can prove the call SUCCEEDED with backend='cugraph' requested,
+not that a GPU kernel executed rather than a CPU fallback path inside the
+backend package. Treat `dispatchBackend` in the output as "requested and
+did not error", not as independent proof of GPU execution — the
+already-existing graph_snapshot_parity_cugraph_oracle.py (which prints
+cudf/cugraph object types and V RAM residency by construction) remains the
+authoritative proof that GPU execution occurred, this flag is a convenience
+comparison, not a replacement oracle.
 """
 
 from __future__ import annotations
@@ -47,9 +72,20 @@ def compute_edge_projection_diagnostics(edges_table) -> dict:
     }
 
 
-def run(nodes_path: Path, edges_path: Path, scores_out: Path | None, louvain_out: Path | None) -> dict:
+def run(
+    nodes_path: Path,
+    edges_path: Path,
+    scores_out: Path | None,
+    louvain_out: Path | None,
+    backend: str = "networkx",
+) -> dict:
     nodes_table = pq.read_table(nodes_path).to_pylist()
     edges_table = pq.read_table(edges_path).to_pylist()
+
+    # backend_kwargs is empty for the default 'networkx' path — CPU behavior
+    # is completely unchanged from before this flag existed. Only populated
+    # when the caller explicitly opts into --backend cugraph.
+    backend_kwargs = {"backend": "cugraph"} if backend == "cugraph" else {}
 
     graph = nx.DiGraph()
     for node in nodes_table:
@@ -57,10 +93,12 @@ def run(nodes_path: Path, edges_path: Path, scores_out: Path | None, louvain_out
     for edge in edges_table:
         graph.add_edge(edge["src_gpu_node_id"], edge["dst_gpu_node_id"], weight=edge["weight"])
 
-    component_count = nx.number_weakly_connected_components(graph) if graph.number_of_nodes() > 0 else 0
+    component_count = (
+        nx.number_weakly_connected_components(graph, **backend_kwargs) if graph.number_of_nodes() > 0 else 0
+    )
 
     if graph.number_of_nodes() > 0:
-        scores = nx.pagerank(graph, alpha=0.85, max_iter=100, tol=1e-8, weight="weight")
+        scores = nx.pagerank(graph, alpha=0.85, max_iter=100, tol=1e-8, weight="weight", **backend_kwargs)
         if scores_out is not None:
             # Written as NDJSON to a file rather than embedded in stdout JSON:
             # for a 162k-node graph the full ranking is several MB, and this
@@ -94,7 +132,7 @@ def run(nodes_path: Path, edges_path: Path, scores_out: Path | None, louvain_out
                 undirected.add_edge(u, v, weight=weight)
 
         communities = nx.community.louvain_communities(
-            undirected, weight="weight", resolution=1.0, threshold=1e-7, max_level=100
+            undirected, weight="weight", resolution=1.0, threshold=1e-7, max_level=100, **backend_kwargs
         )
         community_count = len(communities)
         modularity = nx.community.modularity(undirected, communities, weight="weight", resolution=1.0)
@@ -106,7 +144,14 @@ def run(nodes_path: Path, edges_path: Path, scores_out: Path | None, louvain_out
     edge_projection_diagnostics = compute_edge_projection_diagnostics(edges_table)
 
     return {
+        # 'backend' names this oracle script's identity in the parity contract
+        # (unchanged meaning from before this flag existed — callers already
+        # key off "networkx" here). 'dispatchBackend' is the new, separate
+        # field naming which NetworkX backend actually serviced the calls
+        # above — see the CAVEAT in this file's module docstring before
+        # treating dispatchBackend == 'cugraph' as proof of GPU execution.
         "backend": "networkx",
+        "dispatchBackend": backend,
         # "EXECUTED", not "PROVEN" — same governance rule as the cuGraph
         # oracle: this only proves NETWORKX_LOUVAIN_EXECUTED. Cross-backend
         # partition parity (ARI/NMI) is decided by the caller, never by a
@@ -128,13 +173,21 @@ def main() -> int:
     parser.add_argument("--edges", type=Path, required=True)
     parser.add_argument("--scores-out", type=Path, default=None)
     parser.add_argument("--louvain-out", type=Path, default=None)
+    parser.add_argument(
+        "--backend",
+        choices=["networkx", "cugraph"],
+        default="networkx",
+        help="'networkx' (default, unchanged CPU behavior) or 'cugraph' "
+        "(dispatch the same NetworkX API calls through nx-cugraph; requires "
+        "the RAPIDS WSL2 env with nx-cugraph installed).",
+    )
     args = parser.parse_args()
 
     if not args.nodes.exists() or not args.edges.exists():
         print(json.dumps({"status": "UNAVAILABLE", "reason": "nodes.parquet or edges.parquet not found"}))
         return 2
 
-    print(json.dumps(run(args.nodes, args.edges, args.scores_out, args.louvain_out), sort_keys=True))
+    print(json.dumps(run(args.nodes, args.edges, args.scores_out, args.louvain_out, args.backend), sort_keys=True))
     return 0
 
 

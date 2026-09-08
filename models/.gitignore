@@ -10,6 +10,16 @@
 *.tq
 *.tvim
 
+# Gemma assistant package: keep local weights and loader metadata out of Git.
+# Use `rg --no-ignore` when auditing the package; models/model-manifest.json is
+# the tracked discoverability index.
+/atlas-gemma4-e4b-assistant/
+/gemma4_assistant_huggingface_7_3_26/
+# AGMR donor B candidate (2026-09-07): google/gemma-4-E4B-it-qat-q4_0-unquantized-assistant,
+# downloaded and checksum-verified against HF's own LFS metadata. Distinct donor revision from
+# donor A above -- do not merge directories. See docs/reports/atlas-gemma-rank-checkpoint-inventory-donor-b-v1.json.
+/gemma4-e4b-qat-assistant-2026-07-20/
+
 # Compiled inference servers — platform-specific
 *.exe
 *.so

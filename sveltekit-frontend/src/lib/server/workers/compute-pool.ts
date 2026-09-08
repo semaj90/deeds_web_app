@@ -44,6 +44,18 @@ interface WorkerEntry {
 	busy: boolean;
 }
 
+/**
+ * Default worker-pool size: bounded at 4 regardless of host CPU count, and
+ * reduced to 1 in cluster-worker mode (to avoid N-cluster-workers *
+ * M-threads-per-worker thread explosion). Extracted as a pure function so
+ * this bound is independently testable without spawning real worker_threads
+ * (see compute-pool.spec.ts).
+ */
+export function computeDefaultComputePoolSize(cpuCount: number, isClusterWorker: boolean): number {
+	if (isClusterWorker) return 1;
+	return Math.max(1, Math.min(cpuCount - 2, 4));
+}
+
 // ── FNV-1a 32-bit for sticky routing ─────────────────────────────────────────
 // Fast, deterministic, no crypto import. Maps routingKey → worker index.
 // Same key on every call: no locking, no shared state needed.
@@ -66,7 +78,7 @@ export class ComputePool {
 	constructor(private poolSize?: number) {
 		// In cluster mode, reduce pool size to avoid thread explosion (N workers * M threads)
 		const isClusterWorker = process.env.CLUSTER_WORKERS && parseInt(process.env.CLUSTER_WORKERS) > 1;
-		this.poolSize = poolSize ?? (isClusterWorker ? 1 : Math.max(1, Math.min(os.cpus().length - 2, 4)));
+		this.poolSize = poolSize ?? computeDefaultComputePoolSize(os.cpus().length, Boolean(isClusterWorker));
 		this.initWorkers();
 	}
 

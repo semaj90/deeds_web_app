@@ -19,7 +19,13 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
-import { streamDirectToLlamaServer, wrapLlamaStreamAsSSE, kvCacheMonitor } from '$lib/server/ai/context-prompt-streamer.js';
+import {
+  buildLlamaPromptCacheOptionsV1,
+  recordLlamaPromptCacheTelemetry,
+  streamDirectToLlamaServer,
+  wrapLlamaStreamAsSSE,
+  kvCacheMonitor,
+} from '$lib/server/ai/context-prompt-streamer.js';
 
 const LLAMA_BASE_URL = process.env.LLAMA_SERVER_URL || 'http://127.0.0.1:8090';
 
@@ -65,8 +71,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
           temperature,
           max_tokens,
           stream: false,
-          cache_prompt: use_kv_cache,
-          cache_reuse: 256,
+          stream_options: { include_usage: true },
+          ...buildLlamaPromptCacheOptionsV1({
+            cachePrompt: use_kv_cache,
+          }),
         }),
       });
 
@@ -78,12 +86,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
       // Record cache stats if available
       if (data.usage && use_kv_cache) {
-        kvCacheMonitor.recordCacheHit(
-          model,
-          data.usage.prompt_tokens || 0,
-          data.usage.prompt_tokens_cached || 0,
-          data.usage.completion_tokens || 0
-        );
+        recordLlamaPromptCacheTelemetry(model, data, 'cline');
       }
 
       return json(data);
@@ -101,7 +104,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
               temperature,
               maxTokens: max_tokens,
               cachePrompt: use_kv_cache,
-              kvCacheTtl: 256,
+              cacheReuseMinChunk: 256,
+              telemetrySource: 'cline',
             },
             messages,
             use_kv_cache

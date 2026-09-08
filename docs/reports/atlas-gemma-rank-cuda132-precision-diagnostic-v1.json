@@ -1,0 +1,62 @@
+{
+  "canonicalAuthority": false,
+  "checkpointDir": "/mnt/c/Users/james/Videos/deeds-web-app/models/gemma4_assistant_huggingface_7_3_26",
+  "checkpointMutated": false,
+  "fixture": {
+    "batchSize": 3,
+    "bf16MaxAbsoluteDelta": 3.8125,
+    "bf16OrderAgreement": true,
+    "fp32MaxAbsoluteDelta": 0.0004062652587890625,
+    "fp32OrderAgreement": true,
+    "gpuBf16VsFp32MaxAbsoluteDelta": 8.843043327331543,
+    "maxLength": 128,
+    "observations": [
+      {
+        "bf16AbsoluteDelta": 2.359375,
+        "bf16Cpu": -2.171875,
+        "bf16Gpu": -4.53125,
+        "fp32AbsoluteDelta": 1.704692840576172e-05,
+        "fp32Cpu": -1.8739179372787476,
+        "fp32Gpu": -1.8739008903503418,
+        "gpuBf16VsFp32AbsoluteDelta": 2.657349109649658,
+        "index": 0,
+        "tokenCount": 14
+      },
+      {
+        "bf16AbsoluteDelta": 2.6875,
+        "bf16Cpu": 0.515625,
+        "bf16Gpu": -2.171875,
+        "fp32AbsoluteDelta": 0.0004062652587890625,
+        "fp32Cpu": 3.034581184387207,
+        "fp32Gpu": 3.034174919128418,
+        "gpuBf16VsFp32AbsoluteDelta": 5.206049919128418,
+        "index": 1,
+        "tokenCount": 35
+      },
+      {
+        "bf16AbsoluteDelta": 3.8125,
+        "bf16Cpu": -14.9375,
+        "bf16Gpu": -11.125,
+        "fp32AbsoluteDelta": 0.00012254714965820312,
+        "fp32Cpu": -2.2820794582366943,
+        "fp32Gpu": -2.281956911087036,
+        "gpuBf16VsFp32AbsoluteDelta": 8.843043327331543,
+        "index": 2,
+        "tokenCount": 9
+      }
+    ]
+  },
+  "hardware": {
+    "computeCapability": [
+      8,
+      6
+    ],
+    "gpu": "NVIDIA GeForce RTX 3060 Ti",
+    "torch": "2.14.0+cu132",
+    "torchCuda": "13.2"
+  },
+  "rankingQualityProven": false,
+  "schema": "atlas.gemma-rank-cuda-precision-diagnostic.v1",
+  "status": "FP32_PARITY_PROVEN_BF16_DRIFT_ISOLATED",
+  "trainingPerformed": false
+}

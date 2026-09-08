@@ -1,0 +1,75 @@
+{
+  "schema": "parent-atlas.lexical-pass-writer-report.v1",
+  "updatedOn": "2026-09-07",
+  "status": "WORKER_WIRED_OPT_IN_FIXTURE_TESTED",
+  "implementation": "sveltekit-frontend/src/lib/server/analysis/lexical-feature-registry-v1.ts",
+  "test": "sveltekit-frontend/src/lib/server/analysis/lexical-feature-registry-v1.spec.ts",
+  "extractorRevision": "lexical-registry-extractor-v1",
+  "executor": "sveltekit-frontend/src/lib/server/analysis/lexical-pass-executor-v1.ts",
+  "executorTest": "sveltekit-frontend/src/lib/server/analysis/lexical-pass-executor-v1.spec.ts",
+  "passRevision": "lexical-worker-v2",
+  "outputs": [
+    "identifiers",
+    "literals",
+    "normalizedTerms",
+    "symbolTerms",
+    "tokenStats"
+  ],
+  "identity": [
+    "packetKey",
+    "sourceRef",
+    "sourceRevision",
+    "workspaceRevision",
+    "inputChecksum",
+    "checksum"
+  ],
+  "canonicalAuthority": false,
+  "productionWritesPerformed": false,
+  "reportArtifactWritten": true,
+  "workerIntegration": {
+    "stagePresent": true,
+    "jobType": "lexical_feature_registry",
+    "featureFlag": "ATLAS_LEXICAL_PASS_ENABLED=true",
+    "flagReadAt": "worker module startup",
+    "enabledByThisRun": false,
+    "workerStartedByThisRun": false,
+    "jobsEnqueuedByThisRun": 0,
+    "ledgerOwner": "recordAnalysisPassResult",
+    "independentReadbackImplemented": true,
+    "genericDuplicateLedgerWriteBypassed": true
+  },
+  "sourceAdmission": {
+    "languages": ["javascript", "typescript"],
+    "maxUtf8Bytes": 262144,
+    "scope": "whole-source packets only",
+    "sourceRevision": "sha256 of exact input bytes, matched to atlas_packets.content_hash",
+    "workspaceRevision": "exact string serialization of stored numeric workspace revision",
+    "extractionAuthority": "heuristic lexical observations, not AST facts or BM25 relevance"
+  },
+  "focusedTests": {
+    "passed": 24,
+    "failed": 0,
+    "files": 3,
+    "scope": "extractor, adapter, injected executor dependencies and real queue envelope",
+    "notProven": "actual worker lifecycle, PostgreSQL writer/readback and concurrent duplicate delivery"
+  },
+  "deterministicAdmissionPrecheck": {
+    "status": "SEQUENTIAL_FIXTURE_REUSE_ONLY",
+    "executionSemantics": "deterministic_idempotent",
+    "databaseWritePerformed": false,
+    "crossWorkspaceIdentitySeparationTested": true,
+    "concurrentReuseProven": false
+  },
+  "validation": {
+    "openspecStrict": "passed",
+    "targetedDiffCheck": "passed",
+    "targetedImplementationCompilerDiagnostics": 0,
+    "dependencyCompilerDiagnostics": 1,
+    "dependencyDiagnostic": "src/lib/server/cache-keys.ts:663 TS2339 admission.reason",
+    "repositoryWideTypecheck": "not claimed"
+  },
+  "openGates": [
+    "LEXICAL-PASS-WRITER-01D",
+    "TITLE-ID-SEMANTIC-GROUPING-WRITER-01"
+  ]
+}

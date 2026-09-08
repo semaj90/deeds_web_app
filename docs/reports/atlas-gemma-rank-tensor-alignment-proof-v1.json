@@ -1,6 +1,6 @@
 {
   "canonicalAuthority": false,
-  "checkpointDir": ".tmp\\google-gemma4-e4b-assistant",
+  "checkpointDir": "models\\gemma4_assistant_huggingface_7_3_26",
   "configInvariants": {
     "bidirectionalEncoding": true,
     "cacheDisabled": true,
@@ -8,7 +8,7 @@
     "kvSharingDisabled": true,
     "orderedEmbeddingRelabelingNotClaimed": true
   },
-  "configPath": ".tmp\\google-gemma4-e4b-assistant\\config.json",
+  "configPath": "models\\gemma4_assistant_huggingface_7_3_26\\config.json",
   "cudaGemmAlignment": {
     "alignmentMultiple": 8,
     "cudaAllocated": false,
@@ -588,7 +588,7 @@
       "tensor": "model.layers.3.self_attn.k_norm.weight"
     }
   ],
-  "observedAt": "2026-09-06T20:50:15.272126+00:00",
+  "observedAt": "2026-09-06T23:54:16.865858+00:00",
   "rankHeadInitializationPlan": [
     {
       "initializer": "NOT_APPLIED",
@@ -606,7 +606,7 @@
       "tensor": "atlas.rank_head.bias"
     }
   ],
-  "receiptChecksum": "sha256:b6f1c2a49d621844cd6bf499871c731313086848346c5d41da2ccaf918665af6",
+  "receiptChecksum": "sha256:e8ba317f3fa4d3885da1b854b0fd1005553fc11ca9b22eade0e96d1b1d23a719",
   "rerankerScoreContract": {
     "normalization": "sigmoid_once",
     "normalizedRange": [
@@ -629,5 +629,5 @@
   "unexpectedTensorNames": [],
   "weightsChecksum": "sha256:12875062fc25c51e8fa9b62abd2de7ad48b7d63f8559d5d604fbd5a3d6bcff16",
   "weightsMutated": false,
-  "weightsPath": ".tmp\\google-gemma4-e4b-assistant\\model.safetensors"
+  "weightsPath": "models\\gemma4_assistant_huggingface_7_3_26\\model.safetensors"
 }

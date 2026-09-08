@@ -547,9 +547,11 @@ treated as proof here.
 
 ---
 
-## Current near-term TODO snapshot — 2026-08-12
+## Historical near-term TODO snapshot — 2026-08-12
 
-This snapshot keeps the user-facing board short and separates created/wired from proven.
+This dated snapshot is retained as evidence. It is not the current execution
+queue; use the 2026-09-07 canonical phase index above for new work. It keeps
+created/wired separate from proven.
 
 ### High Priority
 
@@ -679,6 +681,59 @@ Ownership boundaries:
 - Retrieval / approximation owns low-rank sampling experiments.
 - Neither HyperLogLog nor low-rank sampling may rewrite canonical packet identity or semantic truth.
 
+### Definition-to-lineage audit — 2026-09-07
+
+The definitions are present, but the live producer-to-consumer chain is not closed. The
+read-only audit is recorded in `docs/reports/parent-atlas-lineage-definition-audit-v1.json`.
+
+| Boundary | State | Evidence / next gate |
+|---|---|---|
+| `.okf` schema and registry → runtime navigation | PROVEN | `.okf/manifest.yaml`, `docs/.okf/schema.yaml`, `docs/.okf/registry.yaml`; require validated, canonical-serialized, checksummed artifact admission per consumer |
+| domain classifier → Graphify/source lineage | BLOCKED | 3,352 classifier rows; only 148 revision-qualified joins; 0 declared Graphify source namespaces; resolve namespace ownership |
+| current source cohort → workspace revision | BLOCKED | 52/52 source-revision matches but 0/52 current workspace matches; reconcile `atlas_workspace_source_bindings` and latest Graphify run |
+| 8095 AST/NLP → registry → Viterbi/ACE | PARTIAL | provider and contracts exist; bounded live observation-to-ACE replay and exact span readback remain open |
+| taxonomy mapping → ontology tuples | PARTIAL | 15/15 labels admitted in read-only mapping proof; live tuple owner remains empty (0 rows) |
+| hypergraph contract → live n-ary facts | PARTIAL | schema/materializer fixture supports n-ary facts; live population is 62,802 arity-2 edges and 0 arity-3+ edges |
+| Postgres FTS/GIN → bounded retrieval | CREATED/WIRED | native FTS/GIN owns lexical retrieval; capture a read-only `EXPLAIN (ANALYZE, BUFFERS, SETTINGS)` receipt; AIO/bitmap remains planner behavior |
+| canonical features → ACE/SearchRuntime | PARTIAL | feature and retrieval contracts exist; current full source/revision join and NLP/ontology joins are prerequisites to promotion |
+
+Do not add another taxonomy table, ontology service, AIO abstraction, or vector lane to close
+these gaps. The missing work is currentness, revision-qualified joins, validated artifact admission,
+and one end-to-end receipt.
+
+The latest lexical identity replay adds an important quantitative blocker:
+`docs/reports/postgres-fts-canonical-coverage-v2.json` found 53,461 chunks with both
+`source_ref` and `content_hash`, but only 408 exact `(source_ref, content_hash)` joins to
+`atlas_packets`. The existing exact-canonical bridge recovered 18 additional hits in the
+eight-query replay, while 353 hits were unresolved and 1 was ambiguous. Therefore the native
+FTS/GIN retrieval owner is working, but canonical packet admission is not yet production-ready.
+The bridge and hash join remain identity alternatives inside one lexical result set, never
+additional relevance votes.
+
+The existing bounded content-hash repair was also rechecked without applying it:
+`atlas-packets-content-hash-backfill-v1.mjs --dry-run` selected 21 uniquely eligible pending
+packets, with 0 updates and `postgresWrites: false`. A separate live join audit reports 111
+workspace bindings but zero exact packet/chunk joins, so this small repair can improve hash
+coverage but cannot by itself close workspace/source lineage. Applying it remains a separate
+authorized database gate.
+
+The explicitly authorized apply then completed successfully: 21 `atlas_packets.content_hash`
+values were updated and all 21 independently read back to the expected single chunk hash.
+The follow-up replay changed 0 rows, but its selection-checksum comparison is not treated as
+proof because the current selector excludes rows already populated by the apply. A future replay
+repair should persist the frozen selected key/hash set or reconstruct it from an immutable receipt.
+
+The next currentness audit confirms why the remaining joins cannot yet be repaired from existing
+metadata: the workspace-bound Graphify run is still `RUNNING` with no completed owner. The prior
+completed run has 23,758 rows, including 23,532 content matches, 220 content mismatches, and 6
+unavailable sources. It is therefore diagnostic evidence only; do not relabel it as the current
+source snapshot or use it to admit ontology tuples, semantic cohorts, or graph projections.
+
+The 8095 sidecar itself is healthy: direct read-only probes returned `status: ok`, Tree-sitter
+AST evidence with byte spans, and the expected provenance-v2 capability payload. The higher-level
+ACP live proof still exceeded its command window after connecting to Postgres, so sidecar health
+and endpoint behavior are proven, but the complete ACP registry-to-sidecar receipt remains open.
+
 ### Current Proven Stop State — 2026-08-10
 
 This is the durable sequencing record. T6c is complete as an experiment and must not be reopened
@@ -782,6 +837,141 @@ This workstream is design-only until explicitly opened as its own task.
 - If this lane is ever opened, it should start from evidence of a real producer / consumer gap,
   not from the KMeans or SOM evaluation path.
 
+## Phase and lane ownership reconciliation — 2026-09-07
+
+This document contains historical planning notes as well as the current
+workstation projection. The table below is the current sorting index for new
+work. OpenSpec changes and their `tasks.md` files remain authoritative for task
+status; this table does not create a second control plane.
+
+### Canonical phase index
+
+| Canonical phase | Current lane | Existing owner(s) | Status / boundary |
+|---|---|---|---|
+| P11 | Experience and memory wiring | `parent-atlas-agentic-run-receipt-binding`, `parent-atlas-ace-rlm-bitfrost-integration`, `parent-atlas-kv-cache-adaptation-research` | Partial. OpenCode observations, workflow receipts, ACE admission, and model runtime cache remain separate; no hidden state becomes knowledge. |
+| P12 | Source, revision, and chunk authority | `parent-atlas-retrieval-lineage-dag-convergence` | Partial. Fresh source authority, exact chunk materialization, and revision-qualified joins precede all derived projections. |
+| P13 | Feature registry and capability classification | `parent-atlas-candidate-feature-execution-fabric` plus the existing registry owner | Partial. Taxonomy/classification is descriptive; feature identity is not source identity. |
+| P14 | Exact context cache and residency | `parent-atlas-ace-bitfrost-cache-correctness`, `parent-atlas-ace-rlm-bitfrost-integration` | Implemented contracts, live wiring/measurement still gated. BitFrost/Valkey is derived cache state only. |
+| P15 | Semantic retrieval and single fusion owner | `parent-atlas-retrieval-fusion-reachability` | SearchRuntime owns lane normalization, deduplication, and production RRF. Qdrant, TurboVec, cuVS, and CAGRA are executors/projections. |
+| P16 | Graph, KAG, ontology, and bounded expansion | `parent-atlas-retrieval-lineage-dag-convergence`, `parent-atlas-retrieval-lod-algorithm-taxonomy` | Partial. NetworkX is the CPU oracle; Neo4j/cuGraph are derived execution lanes; graph expansion cannot mint identity or votes. |
+| P17 | NLP, structural facts, and numeric feature assembly | `parent-atlas-governed-compute-fabric`, `parent-atlas-candidate-feature-execution-fabric`, GPU ABI owners | Partial. 8095, Arrow/NDJSON, Python, and GPU sidecars produce revisioned observations and feature inputs. |
+| P18 | Learned reranking evaluation | `parent-atlas-best-fit-score-fabric` | Partial/evaluation surface. mxbai remains the dedicated reranker; XGBoost and AtlasGemma are challengers until frozen parity and promotion evidence exist. |
+| P19 | Deterministic policy baseline | `parent-atlas-candidate-feature-execution-fabric`, `parent-atlas-governed-compute-fabric` | Partial. HMM/linear policy work consumes qualified features and receipts; it is not a retrieval or identity owner. |
+| P20 | Program/workflow contracts | `parent-atlas-governed-compute-fabric` | Planned. DSPy is an optional program contract behind bounded tools and workflow receipts. |
+| P21 | Reflective program optimization | `parent-atlas-governed-compute-fabric` | Planned. GEPA remains an evaluation lane over RouteTrace/eval receipts. |
+| P22 | RL and later learned-policy experiments | `parent-atlas-best-fit-score-fabric`, `parent-atlas-governed-compute-fabric` | Experimental only. XGBoost evaluation belongs to P18; P22 is not a second XGBoost owner. |
+| P23 | Transport validation | existing transport/MCP/ACP/A2A owners | Separate transport lane. QUIC/UDP/gRPC labels must not be confused with the model-training P23 label retained in older notes. |
+| P24 | GPU/vector residency experiments | `parent-atlas-gpu-graph-vector-substrate`, `parent-atlas-gpu-runtime-abi-alignment` | Derived execution lane. CUDA/cuGraph/cuVS/TensorRT/WebGPU do not replace Postgres or SearchRuntime authority. |
+| P25 | PPO or other model-policy training | `parent-atlas-best-fit-score-fabric` | Eval-only and not graded. No training or promotion is implied by the phase label. |
+| P27–P30 | OKF/HMM, hierarchy, routing geometry, and hypergraph experiments | existing retrieval LOD / governed-compute owners | Separate analytical lanes; SOM, KMeans, manifold, and hypergraph outputs remain routing/evidence hints. |
+
+### Duplicate labels found and disposition
+
+- The old optional list reused **Phase 11–17** for cuVS, CUDA streams, graph
+  synthesis, DuckDB/LangGraph, feature labeling, missing-feature work, and
+  LangChain. Those are now treated as historical labels under the canonical
+  P11–P17 lanes above; they are not new owners.
+- **Phase 18** appeared both for WebGPU/LibTorch work and for XGBoost. WebGPU
+  is now P24's GPU execution lane; learned reranking remains P18.
+- **Phase 22** named both XGBoost and reinforcement learning. XGBoost stays
+  P18; later RL/policy experiments stay P22.
+- **Phase 23** named both QUIC transport and QLoRA/SFT. Transport is P23;
+  QLoRA/SFT is a model-training sublane of P25 and remains eval-only.
+- **Phase 24** named both RTX embeddings and DPO. RTX/vector residency is
+  P24; DPO is a model-training sublane of P25 and remains eval-only.
+- “KMeans 20×20” is a terminology collision. KMeans uses `K ∈ {64,128,256}`;
+  SOM is a separate 20×20 topology experiment. Neither is canonical identity.
+- Qdrant/native fusion and SearchRuntime fusion are not co-owners. Qdrant may
+  perform bounded projection-side prefetch/fusion, but production RRF and
+  logical-lane vote counting belong to SearchRuntime.
+- EmbeddingGemma, mxbai, AtlasGemma, and Ornith are distinct model roles:
+  canonical `semantic_768` embedding, dedicated reranker, derived reranker
+  challenger, and synthesis/tool-use model respectively.
+- Postgres/Qdrant/Neo4j/Valkey are not duplicate truth stores: Postgres owns
+  canonical identity and receipts; the others are rebuildable projections or
+  caches. NetworkX and cuGraph are oracle/executor counterparts, not duplicate
+  graph authorities.
+
+### Current execution order
+
+```text
+P12 source/revision/chunk authority
+  → P13 feature and structural observations
+  → P15 SearchRuntime candidate cohort and one fusion owner
+  → P16 graph/ontology derived features
+  → P17 CandidateFeatureMatrix
+  → P18 bounded reranker evaluation
+  → P14 ACE/BitFrost context and residency admission
+  → P20/P21 bounded workflow/program helpers
+  → P11/P25 promotion, durable outcome, and model-policy learning
+```
+
+Do not advance a later phase from a fixture-only result. A phase can be
+created, wired, executed, or proven independently; promotion still requires
+the owning OpenSpec gate and explicit authorization.
+
+### PostgreSQL 768 index and metadata readback — 2026-09-07
+
+Read-only live readback confirms the physical vector/index layer is already
+present, but the metadata sidecar migration is still pending:
+
+| Check | Current result |
+|---|---|
+| `public.codebase_chunk_index` | Present; 55,853 rows |
+| Primary `content_embedding` | `halfvec(768)`; 55,169 populated; HNSW index `codebase_chunk_index_content_hnsw` present |
+| `content_embedding_768` | `vector(768)`; 1,386 populated; HNSW index `idx_codebase_chunk_content_embedding_768_hnsw` present |
+| `embedding_dimension` default | Still `384` in the live database; Drizzle schema is now aligned to intended `768` |
+| `codebase_chunk_index_semantic_768_metadata_ck` | Absent; the planned `NOT VALID` guard has not been applied |
+| `20260906_semantic_768_metadata_reconciliation.sql` | `planned_sidecar`, `appliedAt=null`; no Drizzle journal row |
+| destructive operation in that migration | None: it only performs `ALTER COLUMN ... SET DEFAULT 768` and adds a `NOT VALID` check |
+
+Conclusion: the 768 HNSW indexes are migrated/present, but the metadata
+default/guard migration is not applied. Existing 384-related or legacy
+columns/indexes were not deleted or rewritten. Applying the two-statement
+sidecar remains a separate authorized migration gate; do not run it from the
+workstation TODO document.
+
+## Qdrant named-vector retrieval correction — 2026-09-07
+
+The live retrieval audit found a concrete request/schema mismatch. The
+`summary_lenses_768` collection is configured with the named dense vector
+`summary`, but `QdrantManager.hybridSearch` previously forced the global
+`content` vector name on its dense fallback. The resulting Qdrant response was
+`Wrong input: Not existing vector name: content`.
+
+Corrected in the shared manager and vector contract:
+
+- `hybridSearch` resolves the configured primary vector from
+  `VECTOR_CONFIG.COLLECTION_VECTORS`, with an explicit override available.
+- `summary` and `synthesis` are now represented as valid 768-dim named spaces
+  in `vector-contracts.ts`.
+- Both dense fallback and native multi-query preparation use the resolved name.
+- The regression test proves `summary_lenses_768` sends `using: "summary"`.
+
+Validation: focused named-vector, multi-lane spine, retrieval, and RRF suites
+pass `9/9`; no Qdrant, Postgres, cache, model, or projection writes occurred.
+
+Live read-only readback then confirmed `summary_lenses_768` exposes exactly
+`summary: {size: 768, distance: Cosine}`, with no sparse vectors and zero
+points/indexed vectors. This closes the deployed summary-schema check. A
+deployed `synthesis` collection was not present in this readback and remains
+unclaimed. Do not recreate collections or add an ANN index for this correction.
+SearchRuntime remains the sole production fusion owner.
+
+## ACE token-accounting correction — 2026-09-07
+
+`ACEContextAssembler` previously calculated `total_tokens` from packet and
+source identifiers, so its compression ratio did not describe the evidence
+being assembled. The input contract now requires caller-provided evidence
+`content`; the live Phase 110 path supplies `fact_text`, and accounting uses a
+conservative UTF-8-byte estimate. The pure estimator has 10/10 focused test
+coverage with the existing assembler tests.
+
+This is an accounting correction only. The assembler does not own a model
+tokenizer, so the value remains an estimate and is not a claim of exact
+llama-server token usage. No database, cache, model, or projection writes were
+performed.
+
 ## Sequencing and Gate Order
 
 ### P2 transport and ingestion gates
@@ -831,7 +1021,7 @@ This workstream is design-only until explicitly opened as its own task.
 6. `som-20x20`: separate 400-cell cache-hint topology experiment, not KMeans.
 7. `glyph-animation`: NES / CHR97 / sprite visualization lane; never the canonical retrieval lane.
 
-### Optional downstream phases
+### Historical optional downstream phases (legacy labels; use the canonical index above)
 
 1. Phase 10B TurboVec + Qdrant optimization.
 2. Phase 11 cuVS / CUDA sidecar benchmark.
@@ -850,11 +1040,11 @@ This workstream is design-only until explicitly opened as its own task.
 15. Phase 24 DPO.
 16. Phase 25 PPO only if still justified.
 
-Phase 18 and Phase 22 overlap conceptually for boosting-based work; treat Phase 18 as the current
-evaluation surface and Phase 22 as any later learned-policy experimentation, or you create two
-owners for the same capability.
+The historical Phase 18 and Phase 22 labels overlapped for boosting-based
+work. The canonical index resolves that collision: P18 owns reranker
+evaluation, while P22 owns only later learned-policy experiments.
 
-### Conservative phase-status snapshot
+### Historical phase-status snapshot (superseded by the reconciliation above)
 
 | Phase | Status |
 |---|---|
@@ -869,9 +1059,9 @@ owners for the same capability.
 | Phase 19 deterministic HMM + linear policy baseline | partial |
 | Phase 20 DSPy program contract | planned |
 | Phase 21 GEPA reflective program optimization | planned |
-| Phase 22 XGBoost / gradient boosting / reinforcement-learning experiments | later experimental lane |
-| Phase 23 QLoRA / SFT | eval-only |
-| Phase 24 DPO | eval-only |
+| Phase 22 later learned-policy experiments (XGBoost remains P18) | later experimental lane |
+| Phase 23 QLoRA / SFT (model sublane; transport is P23) | eval-only |
+| Phase 24 DPO (model sublane; GPU residency is P24) | eval-only |
 | Phase 25 PPO | eval-only / not yet graded |
 
 ### Evidence artifacts
@@ -2431,11 +2621,35 @@ work need redoing.
   - Louvain verify command: `atlas:louvain:resolution:verify`
 
 - Retrieval lane
-  - one-vote-per-lane receipt
-  - live fusion-owner matrix
-  - frozen replay
+  - one-vote-per-lane receipt — **RECONCILED 2026-09-07 (stale-ledger check, this backlog
+    predates the implementation): already built, wired, and passing.** Re-verified live rather
+    than trusting this line's "open" status:
+    `sveltekit-frontend/src/lib/server/retrieval/rrf-proof.ts` exports
+    `getRetrievalRrfProofSnapshot()`, a Zod-validated (`RetrievalRrfProofSnapshotSchema`) receipt
+    proving `combineViaRRF()` produces exactly one vote per lane keyed on canonical
+    `packet_key` identity (not per-candidate-per-lane double-counting), served live from
+    `src/routes/api/admin/atlas/retrieval/proof/+server.ts`. Ran both existing test files fresh:
+    `rrf-canonical-identity.test.ts` (10/10) and `proof-route.spec.ts` (2/2) — 12/12 total,
+    genuinely passing, not asserted from memory. Do not re-open or duplicate this gate.
+  - live fusion-owner matrix — **not re-verified as a distinct artifact this pass.** Substantial
+    related infrastructure exists (`SearchRuntime` is this repo's established canonical fusion
+    owner across multiple files — `search-runtime-adapter.ts`,
+    `search-runtime-ace-production-source-adapter-v1.ts`,
+    `search-runtime-feature-bundle-provider-v1.ts`, `retrieve-candidates.ts`), but no file
+    matching "fusion-owner matrix" by name was found, and whether the *specific* artifact this
+    backlog line originally meant already exists under different naming, or genuinely doesn't
+    exist yet, was not resolved — left open rather than guessed at either way.
+  - frozen replay — **not found under this name or an obvious synonym; left open.** No claim
+    either way about whether this is done under different naming — would need the original
+    author's intent to disambiguate before concluding it's missing.
 
-- Rust worker
+- Rust worker — **RECONCILED 2026-09-07 (opposite direction from the retrieval-lane check
+  above: this one is genuinely, cleanly not-started).** Confirmed via `Glob('**/Cargo.toml')`
+  across the whole repo: zero matches. There is no Rust crate anywhere in this repo — not a
+  stub, not a scaffold, nothing to check parity/idempotency/replay-receipts against. Matches the
+  root `CLAUDE.md`'s own P0–P7 roadmap, which lists "P2 Rust parser N-API" as a distinct,
+  not-yet-reached future phase. Do not attempt to build this from scratch as a drive-by — it is
+  a genuinely large, unscoped new-capability build, not a bounded fix or reconciliation.
   - parity
   - idempotency
   - replay receipts
@@ -2448,27 +2662,194 @@ work need redoing.
     - `docs/reports/task-candidate-replay-receipt.json`
 
 - Layer 2 compiler output
-  - ast-grep canonical join
+  - ast-grep canonical join — **RECONCILED 2026-09-07: done, real, live.** Read
+    `sveltekit-frontend/src/lib/server/analysis/worker.ts`'s actual `stageConfig` registry
+    directly (not guessed at by name): the `code_feature_registry` stage
+    (`family: 'structural'`, `passRevision: 'ast-grep-feature-registry-v1'`, runs
+    `runCodeFeatureRegistry`) is this pass, live and wired.
   - stable AST / chunk identity writer proof (`source_ref`, `source_revision`, `tree_node_id`, `title_id`)
-  - JSONL parsed-evidence batch lane and provenance receipt
-  - lexical writer
-  - entity writer
-  - POS tagger writer + ontology-linked domain classification writer
-  - source-to-packet adapter now wired through `analysis/source-pos-concept-packet.ts` and `code_feature_registry`; live receipt proof remains open
-  - remaining extractor coverage
+    — **RECONCILED 2026-09-07: mixed, now precisely so (3 of 4 fields real, 1 confirmed a stub).**
+    Located the real source files (the earlier pass's "exact source file wasn't located" is now
+    resolved):
+    - `source_ref` + `source_revision`: real, live, well-formed.
+      `sveltekit-frontend/src/lib/server/atlas/graph/graph-snapshot-source-revision-binding-v1.ts`
+      (`bindGraphSnapshotNodeSourceRevisionsV1()`) binds graph-snapshot nodes to
+      `WorkspaceSourceBindingV1` records, enforces workspace-revision agreement, throws on a
+      binding-map collision with a mismatched `sourceRevision` for the same ref, and emits a
+      `graphSnapshotSourceBindingReceiptV1Schema`-shaped receipt (`.strict()` Zod, sha256
+      `bindingChecksum` over canonicalized payload, `completeCoverage`/`applyAllowed` gates). This
+      is a genuine identity-contract mechanism, not a stub.
+    - `tree_node_id`: real identity field, but two competing implementations exist, one dead.
+      `sveltekit-frontend/src/lib/schemas/tree_node_identity_schema.js`'s
+      `TreeNodeIdentityAuthoritySchema` is the one actually consumed (via
+      `enriched-tree-node-contract.ts`'s `EnrichedTreeNodeSchema.identity`, which every live
+      `treeNodeId` reference in that file reads from — `input.node.identity.tree_node_id`).
+      Separately, `sveltekit-frontend/src/lib/server/atlas/identity/tree-node-id-extractor.ts`
+      exports its own `computeTreeNodeId()`/`parseTreeNodeId()`/`isSameStructuralLocation()` — a
+      **different** derivation (`file_path:line:col:node_type`, unhashed, colon-joined) with **zero
+      callers anywhere in `src/`** (checked via `grep -rl "computeTreeNodeId\b"` — only the
+      defining file itself matches). This is a genuine orphan per the Duplication Prevention rule:
+      a file existing is not evidence it's live. Flagged, not deleted or reconciled this pass.
+    - `title_id`: **confirmed genuinely unimplemented, not just ambiguously named.** The one real
+      materializer that declares it —
+      `enriched-tree-node-contract.ts::materializeLinkedTupleDraftsFromEnrichedTreeNode()` — has
+      `const titleId: string | undefined = undefined;` (line 113) hardcoded as a literal stub, then
+      threads that `undefined` through into the tuple hash input and the emitted draft's `titleId`
+      field. Every produced `EnrichedTreeNodeLinkedTupleDraft` therefore carries `titleId:
+      undefined` today. Accurately open — this is the one sub-item of the original 4-field claim
+      that is genuinely not done.
+  - JSONL parsed-evidence batch lane and provenance receipt — **RECONCILED 2026-09-07: real,
+    tested, but genuinely unwired (not a false-negative this time).**
+    `sveltekit-frontend/src/lib/server/atlas/indexing/simdjson-typed-evidence-bridge.ts`'s
+    `parseNdjsonTypedEvidence()` is exactly this lane: splits NDJSON artifact bytes line-by-line,
+    parses each line through `fastJsonParse` (simdjson addon when available, V8 fallback
+    otherwise — same dual-path as the rest of the repo's simdjson bridge), then runs each parsed
+    record through `adaptSimdjsonTypedEvidence()` from `@deeds/parent-atlas` against a
+    caller-supplied Zod `payloadSchema`, producing a `NdjsonTypedEvidenceReport` with
+    `accepted`/`rejected` arrays and per-line sha256 `rawInputChecksums`. Its own header comment
+    cites `DAG-XJSON-01` from `openspec/changes/parent-atlas-adaptive-dag-fabric/spec.md` as the
+    design source, but that OpenSpec change directory no longer exists in the repo (checked via
+    `find` — zero matches), so it's presumably already closed/archived; the code itself is what's
+    live, not that doc. Has a real spec file (4 tests). **But it has zero callers anywhere in
+    `src/` or `scripts/` outside its own spec** (`grep -rl "parseNdjsonTypedEvidence"` matches only
+    the defining file + its spec) — this is a genuine unwired scaffold per
+    [[feedback_no_delete_unwired_scaffolds]] (shared types + a real producer function + a real
+    validator/adapter + tests, just no live production consumer yet), not dead code to archive.
+    No "provenance receipt" JSON artifact exists for it (nothing under `docs/reports/` references
+    this adapter revision `simdjson-typed-evidence-bridge:v1`). Accurately still open for the
+    receipt/wiring half; the parsing-lane half is done.
+  - lexical writer — **UPDATED 2026-09-07: implemented and wired, opt-in; live proof open.**
+    `analysis/lexical-pass-executor-v1.ts` resolves canonical packet identity, verifies stored
+    source path/content hash/workspace revision, extracts bounded JS/TS terms, calls the
+    existing pass ledger, and independently reads the result before success. `worker.ts`
+    registers `lexical_feature_registry` only with `ATLAS_LEXICAL_PASS_ENABLED=true` at startup;
+    its generic second write is bypassed. No worker was enabled or job enqueued this turn.
+    Queue-envelope and executor fixtures are tested; real PostgreSQL sequential/concurrent
+    replay, chunk/git-revision adapters, downstream materialization, and ACE admission remain
+    open. Owner: `parent-atlas-pass-fabric/tasks.md`, `LEXICAL-PASS-WRITER-01D`.
+  - hypergraph currentness — **CENSUSED 2026-09-07: read-only live census complete.**
+    `scripts/atlas/audit-hypergraph-current-arity-census-v1.mjs` found 62,802 binary
+    hyperedges and 125,604 members, with zero ontology tuples and zero integrity
+    defects in the tested fields. The population is entirely the historical
+    `taxonomy-edges-v1-2026-05-08` / `git:0084288f26` binding. Currentness is not
+    proven; supply the current completed Graphify/source-manifest revisions before
+    admitting quick-hop traversal or ACE promotion. Report:
+    `docs/reports/atlas-hypergraph-current-arity-census-v1.json`.
+    Latest completed Graphify authority was read as run
+    `48485685-e773-4433-a1f8-00f5524cca44` with revision
+    `sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb`;
+    the census explicitly mismatched the stored hyperedges, so rematerialization
+    is required before traversal admission.
+  - taxonomy/ontology alignment — **RECONCILED 2026-09-07: mapping coverage proven,
+    promotion still blocked.** `scripts/atlas/audit-domain-ontology-taxonomy-v1.py`
+    reports all 15 classifier labels admitted to the explicit `DomainOntologyMappingV1`
+    catalog with zero unresolved labels, mapping revision
+    `sha256:b1fe99ea1b85f0ad0deecbe359f6565a28f1dd435008f260e0d52d2f03595a0e`.
+    Existing TypeScript domain adapter tests pass 4/4 and Python mapping/tuple bridge
+    tests pass 11/11. This proves label-to-broad-class mapping only; the classifier
+    producer still lacks complete source namespace/revision qualification, the live
+    ontology registry is empty, and no `OntologyLinkedTupleV1` or graph promotion is
+    authorized. Owners: `parent-atlas-ontology-kernel/tasks.md` and the superseding
+    search-classifier change.
+  - entity writer — **RECONCILED 2026-09-07: done, real, live.** `worker.ts`'s `entity_extraction`
+    stage (`family: 'linguistic'`, `passRevision: 'entity-extraction-v1'`, runs
+    `runEntityExtraction`) is this pass.
+  - POS tagger writer + ontology-linked domain classification writer — **RECONCILED 2026-09-07:
+    done, real, live route.** `sveltekit-frontend/src/lib/server/atlas/pos-concept-tagging-lane.ts`
+    (925 lines) has real production callers including a live route
+    (`src/routes/api/atlas/concept-tagging/+server.ts`) and is consumed by
+    `source-pos-concept-packet.ts` (see the line directly below).
+  - source-to-packet adapter now wired through `analysis/source-pos-concept-packet.ts` and
+    `code_feature_registry`; live receipt proof remains open — **unchanged, already accurate**
+    (re-ran its spec earlier this session: 1/1 pass, fixture-level only, not a live-data receipt
+    — see the earlier reconciliation note for this exact item).
+  - remaining extractor coverage — not re-verified this pass (open-ended by nature; "remaining"
+    coverage isn't a single checkable artifact).
 
 - Layer 3 metrics / topology
-  - immutable graph snapshot proof
-  - bounded traversal proof
-  - PageRank / Louvain / KMeans receipts
+  - immutable graph snapshot proof — **RECONCILED 2026-09-07: done, real receipt exists.**
+    `sveltekit-frontend/docs/reports/graph-snapshot-parity/receipt.json` (dated 2026-08-12, the
+    day after this backlog line was written) freezes a real 162,234-node/108,156-edge graph
+    snapshot (`nodeTableHash`/`edgeTableHash` recorded, `graphRevision` pinned) with matching
+    parquet artifacts. This is the same receipt CLAUDE.md's own "Neo4j is a topology mirror"
+    correction cites as authoritative.
+  - bounded traversal proof — **not independently re-verified this pass**; the receipt above
+    proves snapshot immutability/identity, not a bounded-traversal-specific gate. Left open
+    rather than assumed satisfied by the same artifact.
+  - PageRank / Louvain / KMeans receipts — **RECONCILED 2026-09-07: mixed, not uniformly done.**
+    PageRank and Louvain are genuinely proven in the same receipt above:
+    `pagerankCorrelation: 1`, `pagerankTopKOverlap: 1`, `pagerankMaxDelta: 4.89e-9`,
+    `louvainCommunityAgreement: 1` (ARI/NMI both exactly 1.0), both computed live from real
+    NetworkX and cuGraph backends agreeing exactly on node/edge/component counts. **KMeans has
+    no equivalent receipt** — real KMeans columns exist and are populated live in
+    `codebase_chunk_index` (`kmeans_cluster`, `kmeans384_cluster`, etc., confirmed via schema
+    grep), but no parity/quality artifact analogous to the PageRank/Louvain one was found.
+    Consistent with this repo's own recorded finding elsewhere (GPU-MINI-FABRIC-01) that no
+    tested KMeans configuration preserved perfect Recall@10, so KMeans is classified
+    `CACHE_HINT_ONLY`, not a claim this backlog line's "receipt" bar was ever met for it. Do not
+    mark this line fully done — 2 of 3 algorithms proven, not 3.
 
 - Layer 4 runtime / training
-  - `FeatureMatrixSetupV1` / `feature_matrix_5` / `candidate_feature_matrix` convergence
-  - ANN candidate generation vs rerank separation
-  - GPU sidecar adapter proof for cuVS / cuGraph parity and batch synthesis
-  - feature-row convergence
-  - ranker shadow gates
-  - replay corpus proof
+  - `FeatureMatrixSetupV1` / `feature_matrix_5` / `candidate_feature_matrix` convergence —
+    **RECONCILED 2026-09-07: confirmed accurately still open (not stale — this is the third
+    outcome type in this reconciliation pass: correctly-labeled-open, same as the two Layer 3
+    items above).** Traced the specific claim precisely: `execution_utility` (dimension 4 of 5 in
+    `feature-vector-5.ts`, which already correctly encodes "missing" via `presence_mask[4] = 0`
+    rather than defaulting to 0.0 — the no-fabrication rule is respected in the contract code).
+    `compileExecutionUtility()` (`trace-execution-utility-compiler.ts`) is a real, correctly-
+    designed pure compiler, but has **zero production callers** (grepped: only its own spec file
+    calls it). Checked the live Postgres table it depends on: `trace_packet_events` genuinely
+    exists (real migrated schema — `packet_key`, `event_type`, `compile_pass`, `test_pass`,
+    `latency_ms`, `token_cost`, etc.) but has **0 rows** (verified via `SELECT count(*)`). Bonus
+    finding while here: the TypeScript contract's expected shape
+    (`TracePacketEvent.event_kind: 'execution_success'|'execution_failure'|'retrieval_hit'|
+    'cache_miss'`, `utility_score`, `recorded_at`) does not match the live table's actual columns
+    (`event_type` as untyped `text`, no `utility_score` column at all, `created_at` not
+    `recorded_at`) — so wiring this up isn't just "start writing rows," it needs a schema
+    reconciliation pass first. Recording this so whoever picks it up next doesn't discover the
+    mismatch from scratch.
+  - ANN candidate generation vs rerank separation — **RECONCILED 2026-09-07: real in practice,
+    not formally proven.** `sveltekit-frontend/src/lib/server/retrieval/canonical-rerank-executor.ts`
+    (the established canonical reranker owner) takes `RerankCandidate[]` as input and has zero
+    Qdrant/ANN imports — candidate generation and reranking are architecturally separate files
+    with no direct coupling, confirmed by inspection. But there is no automated
+    architecture-fitness test asserting this boundary (e.g. a guard that fails if the reranker
+    ever imports a Qdrant/ANN client) — the separation currently holds by convention, not by an
+    enforced gate. Leave open in the sense the backlog line asks for a "proof," not just current
+    behavior.
+  - GPU sidecar adapter proof for cuVS / cuGraph parity and batch synthesis — **RECONCILED
+    2026-09-07: real, but PARTIAL, not fully done.** Read the actual receipt directly (not
+    trusted from a prior doc summary — an earlier pass in this same check wrongly concluded via
+    a search-scope mistake that none of this existed at all; corrected before writing anything,
+    see below):
+    `docs/reports/gpu-mini-fabric-01-semantic-exact-parity-01.json` (repo root, not under
+    `sveltekit-frontend/`) is a genuine, live-run GPU proof — PyTorch CUDA exact GEMM+top-k vs
+    cuVS brute-force KNN on a 16,384-node/64-dim frozen fixture, `recall_at_k: 1.0`,
+    `rank1_match_rate: 1.0`, `max_top1_score_delta: 3e-7`, `gate.RESULT: "PASS"`. The full
+    `python/atlas_compute/gpu_mini_fabric/` script tree (18 files) backing this and several
+    related phases (graph ANN/CAGRA, BFS, PageRank-parity) also genuinely exists and is
+    git-tracked (`git log` confirms real commits, not fabricated). **But this is Phase A of a
+    staged, multi-phase plan — later phases (BitFrost/LOD residency simulation, SOM-vs-graph
+    cache tournament, cuTile challenger) are explicitly staged-not-built per this repo's own
+    records.** Do not mark this backlog line fully satisfied — the cuVS/cuGraph *semantic exact*
+    parity proof is real and PASS; "batch synthesis" and the fuller staged roadmap are not.
+    **Process note**: my own first pass at checking this used `Glob` scoped incorrectly (relative
+    search behavior differed from where `python/` and `docs/reports/` actually live relative to
+    this doc's location) and wrongly concluded zero matches for all of it — caught via `git log`
+    showing real tracked commits for these exact paths, then re-verified directly on disk before
+    writing this note. Flagging so a future check doesn't repeat the same search-scope mistake.
+  - feature-row convergence — **checked 2026-09-07, no exact-name match found; left open,
+    not guessed at.** No file/symbol matching "feature-row convergence" or an obvious synonym.
+    Could plausibly be satisfied by existing `FeatureVector5`/`CandidateFeatureMatrixV1` work
+    under different terminology, but disambiguating that would need the original author's
+    intent, not another guess.
+  - ranker shadow gates — **RECONCILED 2026-09-07: confirmed accurately still open.**
+    `openspec/changes/parent-atlas-best-fit-score-fabric/tasks.md` consistently states across
+    multiple sections that a real `MICRO-04` shadow evaluation has not yet run (mxbai remains the
+    served reranker; AtlasGemma scores are shadow-recorded only, never served) — matches this
+    backlog line exactly, not stale.
+  - replay corpus proof — **checked 2026-09-07, no exact-name match found; left open, not
+    guessed at.** Same caveat as feature-row convergence above.
 
 **Immediate next session action**: prove alias replay on one live writer and record the receipt.
 
@@ -3524,3 +3905,427 @@ deliberately, and the new evidence changes the *kind* of gap more than it change
 other rows in the same table, or the overall gate percentages — that's a deliberate call for
 whoever next reconciles this table, not something to silently recompute from one AST-focused
 audit pass.
+
+### Drizzle, pgvector, and ONNX Runtime alignment — 2026-09-07
+
+The package/runtime audit is now recorded against the existing reranker owner:
+
+| Boundary | Current state | Meaning |
+|---|---|---|
+| Drizzle ORM | `drizzle-orm 0.45.2`, `drizzle-kit 0.31.10` | schema and migration tooling; not a datastore authority |
+| PostgreSQL vector schema | `content_embedding_768 vector(768)` plus cosine HNSW declaration | canonical `semantic_768` lane; no new vector lane added |
+| Live PostgreSQL readback | HNSW indexes present; 768 metadata default/guard sidecar still pending | no live migration was applied in this audit |
+| `IVQT` | no matching official pgvector index/operator terminology found | unresolved label; do not create an IVQT index |
+| `npm run dev:gpu` | starts the Vite/llama-server development runtime | not a browser WebGPU proof |
+| Browser ONNX | direct pinned `onnxruntime-web 1.29.0`; WebGPU export exists | provider-selection alignment is fixed; live browser execution remains open |
+| ONNX Node | direct `onnxruntime-node 1.29.0` | separate native Node lane; no CUDA/TensorRT provider claim follows |
+
+The browser session factory now loads `onnxruntime-web/webgpu` for the WebGPU attempt and
+retains the base package for WASM/CPU fallback. Focused browser consumers pass 10/10. A real
+browser fixture still must prove provider selection, finite output, checksum, and fallback.
+The untrained AtlasGemmaRank ONNX artifact remains blocked by its recorded multi-token parity
+failure and approximately 310 MB graph-plus-external-data size; it is not wired as a production
+reranker. mxbai remains the dedicated second-stage reranker and SearchRuntime remains the sole
+fusion owner.
+
+Official terminology used for this alignment: [Drizzle pg_vector extensions](https://orm.drizzle.team/docs/extensions),
+[pgvector](https://github.com/pgvector/pgvector/blob/master/README.md?plain=1),
+[ONNX Runtime WebGPU](https://onnxruntime.ai/docs/execution-providers/WebGPU-ExecutionProvider.html),
+and [ONNX Runtime Web browser setup](https://onnxruntime.ai/docs/tutorials/web/ep-webgpu.html).
+
+Next gates:
+
+1. Run a checked-in small ONNX browser fixture and capture actual WebGPU/WASM provider evidence.
+2. Keep `ONNX-EXPORT-01` blocked until multi-token PyTorch↔ONNX parity is repaired.
+3. If ANN tuning is authorized, benchmark existing PostgreSQL filtered cohorts before adding
+   HNSW/IVFFlat variants; do not interpret `IVQT` as a PostgreSQL capability.
+
+### Follow-up closures — 2026-09-07 (same day, independently re-verified before acting)
+
+Every claim in this section's own table above was re-verified live before anything was touched
+(per this repo's evidence discipline — a prior audit's claim is not itself evidence). All checks
+matched exactly; two items were then closed, one flagged low-severity, one fixed with an explicit
+"unverified" caveat rather than a false confidence claim.
+
+- **`SEM768-METADATA-APPLY-01` — APPLIED.** The prepared sidecar migration
+  (`sveltekit-frontend/drizzle/manual/20260906_semantic_768_metadata_reconciliation.sql`) was
+  re-verified against live `codebase_chunk_index` (default was `384`, guard absent, 55,169/1,386/
+  55,853 row counts matching the migration's own read-only proof script exactly), then applied via
+  `docker exec legal-ai-postgres psql`. Post-apply readback confirms `embedding_dimension` default
+  is now `768`, constraint `codebase_chunk_index_semantic_768_metadata_ck` exists with
+  `convalidated=false` (`NOT VALID`, as designed), and all three row counts are byte-for-byte
+  unchanged — no rewrite, backfill, or drop occurred. `sveltekit-frontend/drizzle/
+  sidecar-migrations.json` updated to `status: "applied"`. The follow-up
+  `SEM768-METADATA-VALIDATE-01` (validating the 37 legacy-tagged rows and flipping the constraint
+  to `VALID`) remains separate, unauthorized, not attempted.
+- **`ORT-WASM-BUNDLE-PARITY-01` — FIXED.** Confirmed the exact concern this table's "Browser ONNX"
+  row didn't call out: all 6 files under `sveltekit-frontend/static/ort/` (3 `.wasm` + 3 `.mjs`)
+  were stale — dated Feb 2026, checksums not matching the installed `onnxruntime-web@1.29.0`
+  package's `dist/` output at all. Re-copied all 6 from
+  `node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded{,.asyncify,.jsep}.{wasm,mjs}`; all now
+  checksum-match the installed package exactly. This is the exact failure mode ORT's own docs warn
+  about (JS bundle and WASM binary must come from the same build, since minified internal function
+  names can differ) and matches this repo's own documented post-clone step in `CLAUDE.md` ("ORT
+  WASM: Git vs Local Differences") that had evidently not been re-run since the 1.29.0 pin.
+- **`'cpu'` as a literal ORT Web execution-provider name — FIXED 2026-09-07 (follow-up, same
+  day).** Was: found, NOT fixed (low severity, flagged). `sveltekit-frontend/src/lib/ai/model-ids.ts`'s
+  `ONNX_EXECUTION_PROVIDERS = ['webgpu', 'wasm', 'cpu']` passes `'cpu'` directly as an
+  `executionProviders` entry to `InferenceSession.create()` in `session.ts`. ORT Web's real browser
+  EP identifiers are `webgpu`/`wasm`/`webnn`/`webgl` — there is no separate `'cpu'` EP; CPU
+  execution *is* the WASM backend. Practical impact is low: the loop in `_createSession` only
+  reaches `'cpu'` after `'wasm'` has already failed, at which point the end state (all providers
+  exhausted) is the same either way — this is a mislabeling, not a functional regression.
+  **Fixed**: dropped `'cpu'` from `ONNX_EXECUTION_PROVIDERS` (now `['webgpu', 'wasm']`), removed
+  the now-dead `else if (ep === 'cpu')` branch in `getAvailableProviders()` (TypeScript itself
+  flagged this branch as unreachable the moment the tuple type narrowed — `This comparison
+  appears to be unintentional because the types '"webgpu"' and '"cpu"' have no overlap`, direct
+  compiler confirmation the fix is correct), and changed the empty-fallback default from `['cpu']`
+  to `['wasm']`. Exported `getAvailableProviders` for testability. **No automated test added**:
+  attempted one, but this file's `await import('onnxruntime-web/webgpu')` fails Vite's static
+  import-analysis in the vitest/jsdom test environment regardless of which export is under test
+  (a pre-existing structural limitation of testing this specific file at all, not something this
+  fix introduced or could reasonably work around by mocking — `vi.mock` doesn't intervene early
+  enough to stop Vite's own transform-time resolution error). Correctness here rests on the
+  compiler's own unreachable-branch diagnostic plus manual code reading, not a runtime test.
+  `tsgo --noEmit` clean on both changed files.
+- **WebGPU device reuse — fixed, EXPLICITLY UNVERIFIED.** `session.ts`'s `_createSession()`
+  pre-warmed a `GPUDevice` singleton (`getWebGPUDevice()`) but never actually handed it to ORT —
+  `runtime.env.webgpu.device` was never assigned, so ORT's WebGPU EP was silently creating its own
+  separate internal device every session, making the pre-warm a no-op for its stated purpose (the
+  comment claimed "~200ms" saved by reuse; nothing was actually being reused). Added
+  `runtime.env.webgpu.device = device` immediately after `getWebGPUDevice()` resolves, matching
+  ORT's documented API (`onnxruntime.ai/docs/api/js/interfaces/Env.WebGpuFlags.html` — "only has
+  effect before the first WebGPU inference session is created"). **This fix's real effect is not
+  proven** — a live, still-open upstream report,
+  [microsoft/onnxruntime#26107](https://github.com/microsoft/onnxruntime/issues/26107) ("The
+  `device` specified in `ort.env.webgpu` will not be used at runtime", opened Sept 2025), says
+  ORT's WebGPU backend may create its own internal device regardless of this assignment. No
+  browser-testing tool was available this session to observe whether session-creation latency
+  actually drops or whether a device-mismatch validation error (the exact symptom in #26107)
+  occurs instead. The code comment at the assignment site records this caveat explicitly — do not
+  cite this as a proven fix for the device-reuse gap until it's actually observed working (or
+  failing) in a real Chromium browser. `svelte-check`/`tsgo --noEmit` both pass clean on the
+  change; that only proves it type-checks, not that it behaves as intended at runtime.
+
+### `onnx_directml` server-side backend — RUNTIME_SMOKE_PROVEN (2026-09-07, same day)
+
+Answers this file's own earlier open question ("did we install GPU ONNX runtime for `dev:gpu`
+integration?") with a real run, not just a package-manifest check. Verified via web search first
+that this installed version's actual DirectML EP name is `'dml'` (checked against the shipped
+`onnxruntime-common` type declarations directly — `readonly name: 'dml'` in
+`node_modules/onnxruntime-node/node_modules/onnxruntime-common/dist/esm/inference-session.d.ts` —
+not just trusted a search snippet that used a different spelling from an unrelated doc variant).
+`sveltekit-frontend/src/lib/server/ai/onnx-server.ts` already uses `'dml'` correctly; no bug there
+(the earlier `'cpu'`-as-browser-EP finding was specific to `onnxruntime-web`, not this Node-side
+file).
+
+Then ran a real, isolated session-creation probe — not the full `dev:gpu` stack (that starts
+llama-server/Vite/other services; this probe only exercises the ONNX/DirectML piece) — importing
+the real installed `onnxruntime-node@1.29.0`, reading the real 305MB
+`static/embeddinggemma_300m_onnx/model.onnx`, and calling `InferenceSession.create()` with
+`executionProviders: ['dml']` plus the DirectML-required `enableMemPattern: false` /
+`executionMode: 'sequential'` options this repo's own code already sets. Result: **succeeded**,
+`SESSION_CREATED ok in 5168ms`, `inputNames: ['input_ids', 'attention_mask']`,
+`outputNames: ['last_hidden_state']` — a real, correctly-shaped embeddinggemma session on this
+machine's actual GPU via DirectML. (ORT logged two informational warnings about shape-related ops
+being assigned to CPU internally — expected/documented ORT behavior, not a failure.) Probe script
+was a temporary file, deleted after the run; not committed.
+
+This proves the `onnx_directml` embedding backend is genuinely installed AND functional end-to-end
+on this host — not just "packages present." It remains **opt-in, not the default**:
+`EMBEDDING_BACKEND` defaults to `'ollama'` in `scripts/startup/dev-gpu-runtime.mjs`; a plain
+`npm run dev:gpu` does not exercise this path unless run as
+`EMBEDDING_BACKEND=onnx_directml npm run dev:gpu`. Not yet proven: an actual embedding *inference*
+call (this probe only proves session creation, not `session.run()` producing a correct embedding
+vector) and behavior inside the full `dev-gpu-runtime.mjs` orchestration (port/process lifecycle,
+concurrent use alongside a CUDA llama-server on the same GPU).
+- **Fixed 2026-09-07 (follow-up, same day)**: both remaining comment-drift items from the line
+  above are now corrected in `scripts/startup/dev-gpu-runtime.mjs` — the file header no longer
+  says "Gemma4 :8090 / EmbeddingGemma ONNX :8081" (now correctly says chat/synthesis is Ornith
+  1.5 9B per live `/props`, verify-don't-trust; embeddings default to Ollama, :8081 is opt-in
+  only), and the `onnx_directml` enum comment no longer implies DirectML avoids VRAM contention
+  with CUDA (corrected: API/driver-path isolation ≠ separate physical memory pool — both compete
+  for the same 8GB of board VRAM). The same comment also now states the `EMBEDDING_PROVIDER` vs
+  `EMBEDDING_BACKEND` two-gate finding from the section above, so a reader hits it at the exact
+  point they'd reach for `EMBEDDING_BACKEND=onnx_directml` and wonder why nothing changed.
+  Comment-only changes; `node --check` confirms the file still parses.
+
+### `onnx_directml` real end-to-end inference — RUNTIME_SMOKE_PROVEN, plus a correction to the note above (2026-09-07, same day)
+
+The previous note's "Not yet proven: an actual embedding *inference* call" is now closed, **and**
+it surfaced a real gap in how that path is actually invoked — corrected here rather than left
+standing alongside the fix.
+
+- **Real inference proven.** Called the actual production function,
+  `runEmbedding()` in `sveltekit-frontend/src/lib/server/ai/onnx-server.ts`, directly (not a
+  hand-rolled dummy tensor) with real text. Result: `dims=768`, all values finite, L2-normalized
+  (`norm=1.000000`), loaded with `DirectML (GPU)` in 7864ms, full call (session load + real
+  tokenization + real `session.run()`) in 12225ms. This is the same function reachable in
+  production via `POST /api/embed` when the embedding-gemma branch selects it.
+- **Corrected: `EMBEDDING_BACKEND` alone does NOT route real embedding requests through
+  DirectML — this note's own prior sentence ("does not exercise this path unless run as
+  `EMBEDDING_BACKEND=onnx_directml npm run dev:gpu`") was incomplete.** There are two distinct,
+  separately-read env vars:
+  - `EMBEDDING_BACKEND` — read only by `scripts/startup/dev-gpu-runtime.mjs` (launcher
+    orchestration: whether to start the :8081 GGUF server) and, separately, inside
+    `onnx-server.ts`'s `_createServerSession()` (whether a DirectML failure may fall back to CPU
+    within that one call — "strict DirectML" mode).
+  - `EMBEDDING_PROVIDER` — read by `resolveEmbeddingProviderV1()`
+    (`src/lib/server/embedding/embedding-provider-v1.ts`), which is the ONLY thing
+    `src/routes/api/embed/+server.ts` actually checks (`EMBEDDING_PROVIDER_V1.provider ===
+    'onnx_directml'`) to decide whether to call `runEmbedding()` at all.
+  - Verified live: `dev-gpu-runtime.mjs` never sets or bridges `EMBEDDING_PROVIDER` from
+    `EMBEDDING_BACKEND` anywhere (grepped the whole file). So running
+    `EMBEDDING_BACKEND=onnx_directml npm run dev:gpu` alone — exactly what the prior note and the
+    launcher's own console messages imply is sufficient — only affects the dev launcher's process
+    orchestration and logging; the live `/api/embed` route still falls through to the default
+    `embedText()` cascade unless `EMBEDDING_PROVIDER=onnx_directml` is ALSO set. **Correct
+    invocation for the real path: `EMBEDDING_PROVIDER=onnx_directml EMBEDDING_BACKEND=onnx_directml
+    npm run dev:gpu`** (both — the first to actually select the code path, the second so a
+    DirectML failure doesn't silently and successfully fall back to CPU inside the same call).
+  - This directly answers "why isn't this in `package.json`": no dedicated npm script exists to
+    test/run this path (unlike `embed:onnx:start:detached` for the `llama_cpp_gguf` backend)
+    partly because the two-env-var gating was never documented in one place until now — a single
+    "run with the right env vars" script would need to know about both.
+- **Also corrected a stale code comment while here**: `+server.ts`'s comment claimed
+  `runOnnxDirectMLEmbedding` "uses a codepoint-level fallback tokenizer, not the model's real
+  SentencePiece tokenizer." Read `onnx-server.ts` directly — false as of this check:
+  `ensureEmbeddingTokenizer()` calls the same `@huggingface/transformers`
+  `AutoTokenizer.from_pretrained()` that the always-live `onnx-embed.ts` CPU path uses; there is
+  no codepoint fallback anywhere in the file. Updated the comment in place to state what's
+  actually verified (real tokenizer, real 768-dim/finite/normalized output) and what remains
+  genuinely open (embedding *quality/correctness* against a known-good reference — never
+  checked, by anyone, this session or before).
+- Test scripts were temporary files (`.tmp-probe-*.mjs` inside `sveltekit-frontend/`), deleted
+  after each run; nothing committed. `tsgo --noEmit` clean on the one real code change (the
+  comment fix).
+
+### Prompt-cache request-shape correction — 2026-09-07
+
+The shared llama-server request path had named `cache_reuse` as `kvCacheTtl` and sent it
+even when `cache_prompt` was disabled. That conflated a token threshold with a time-to-live
+and made the request semantics dependent on a misleading field name. Corrected the context
+streamer, ACP loop, ACP route, Cline route, and evaluation contract to use
+`cacheReuseMinChunk`; the shared builder now omits `cache_reuse` when prompt caching is off,
+defaults enabled requests to 256 tokens, and rejects non-integer/negative thresholds.
+
+Focused tests pass 15/15. This is request-shape proof only. Exact
+`ContextManifestV2`/prefix identity binding, host-cache isolation, and live llama-server
+reuse remain open under `CACHE-PREFILL-01/02/03`.
+
+The active OpenAI facade preflight cache was also audited and corrected: its former key
+was only `sha256(query + pipeline)`, so unrelated model, tool, repository, or selected
+evidence changes could reuse the same preflight packet. The new derived key binds those
+available inputs and canonicalizes evidence collections. This closes the collision-class
+fix only; complete `ContextManifestV2` prompt identity and live cache isolation remain
+separate gates.
+
+Focused cache-key plus facade tests pass 18/18.
+
+The exact-answer packet key was then tightened with a generation-controls signature
+(temperature, bounded max tokens, top-p, presence/frequency penalties, and tool choice).
+Focused cache-key tests pass 7/7 and the facade suite passes 14/14. This prevents reuse
+across materially different output controls, but full `ContextManifestV2` admission,
+rendered-prompt identity, and live cache isolation remain open.
+
+The same packet key now includes a canonical checksum of the exact ordered messages
+assembled for the model after ACE/KV/history/token-budget processing. This prevents
+prompt ordering or rendered-content changes from reusing an exact answer under the
+compact legacy signatures. Focused cache-key coverage passes 10/10 and the combined
+cache/facade regression passes 24/24. Full V2 admission and live isolation remain open.
+
+Added a pure fail-closed exact-answer admission contract. It rejects legacy/incomplete
+ACE manifests and requires complete ContextManifestV2 evidence revisions plus model,
+chat-template, tool-schema, prompt-template, rendered-request, and generation-control
+identity. The contract is covered by the combined 28/28 cache/facade tests. The active
+facade remains legacy until an authoritative V2 manifest producer is connected.
+
+`runChatCompletion` now exposes an explicit optional V2 caller seam. A caller with a
+validated `ContextManifestV2` and runtime/template/tool revisions gets the strict V2
+completion key; existing callers remain on the legacy path. The handoff type is exported
+as `RevisionedExactAnswerCacheOptionsV1`, and the complete facade options contract is
+exported as `RunChatCompletionOptionsV1` for future producers. No route opts in yet, so
+this is wiring readiness, not live cache promotion. The seam regression now passes 15/15,
+and the combined cache-key/facade coverage passes 29/29.
+
+Added the read-only `OrnithCacheCapabilityV1` report contract. It keeps prompt caching,
+KV-shift reuse, recurrent checkpoints, host-RAM cache, idle-slot cache, and slot
+persistence as separate `PROVEN_TRUE`/`PROVEN_FALSE`/`UNPROVEN` states, with observed
+settings separate from capability claims. Contract tests pass 3/3. The live exact-build
+behavioral capability proof remains open; no runtime flags or cache state were changed.
+
+The live metadata probe is now wired and executed read-only through the same contract. It
+queried `/health`, `/props`, and `/v1/models` and resolved the running model as
+`ornith-1.5-9b` with build revision `b8757-a29e4c0b7`. The report is captured at
+`docs/reports/ornith-cache-capability-v1.json`. All six behavioral cache capabilities
+remain `UNPROVEN`: metadata proves runtime identity/readiness, not actual prefix reuse,
+checkpoint restore, host-cache isolation, or slot persistence. The focused suite passes
+22/22; no runtime flags, cache state, or datastore state changed.
+
+Added `OrnithCacheBehaviorProofV1`, a checksum-only receipt for the next behavioral gate.
+It derives reuse, cold/warm output parity, tool-shape parity, and A↔B isolation verdicts
+only from observed telemetry and output checksums. It rejects same-identity isolation
+comparisons and never stores raw prompts, token sequences, tool arguments, or KV state.
+Contract tests pass 5/5. The live behavioral probe remains intentionally unrun because it
+would change llama-server runtime cache state and requires separate authorization.
+
+### Fable WebGPU kernel candidate — SHADOW ONLY (2026-09-07)
+
+The current browser execution boundary is unchanged: Gemma 4 generation uses the local
+ONNX/Transformers.js helper, EmbeddingGemma remains the `semantic_768` ONNX helper, and
+`npm run dev:gpu` launches the server-side Ornith/Vite stack rather than a browser WebGPU
+test. The `webml-community/gemma-4-webgpu-kernels` Space is recorded as a separate
+`FABLE_WEBGPU_RAW` experimental executor using custom WGSL/Fable kernels. It must not be
+treated as ORT WebGPU, a reranker, a retrieval lane, or a canonical model authority.
+
+The Space's QAT mobile artifact is also separate from the small BF16 E2B assistant seed:
+it is a multi-gigabyte model repository, so no asset was copied into `models/`, vendored,
+installed, or selected by the browser model policy. Existing `KernelPerfReceiptV1` is the
+receipt owner; do not add a competing kernel-performance schema.
+
+Open gate: `FABLE-WEBGPU-RTX3060TI-01` requires a pinned Space commit, engine/model/shader
+checksums, real adapter/device evidence on the RTX 3060 Ti, finite outputs, valid token IDs,
+determinism, trusted-reference parity, and TTFT/prefill/decode/VRAM/RAM/context measurements.
+`FABLE-WEBGPU-PARITY-02` then compares the shadow with the existing ONNX browser helper and
+server reference on frozen prompts. Until those receipts exist, Fable remains an experiment
+and cannot replace mxbai or alter SearchRuntime ownership.
+
+### Layer 2 ordering + naming corrections + open correctness gaps (2026-09-07, 3-part correction round)
+
+Three corrections applied to the Layer 2 reconciliation and the OKF-migration proposal above,
+all verified before recording (not accepted on say-so):
+
+1. **`TITLE-ID-OWNER-01` renamed to `TITLE-ID-SEMANTIC-GROUPING-WRITER-01`.** The original name
+   implied an identity authority; the repo evidence (this session's own grep of every `titleId`
+   assignment) shows it's documented as a semantic grouping key
+   (`packet-canonical.ts:25`: `.describe('Derived semantic grouping key from summary meaning')`,
+   examples `auth.session.validation`, `session-management`) with zero real producers — every
+   assignment is a pass-through or `undefined`. Constraint for the eventual writer: the visible
+   `titleId` value must stay a deterministic semantic slug — no UUID, no hash, no
+   `sourceRevision` folded in. Those belong in a separate derivation receipt
+   (`TitleIdentityV1`-shaped: `titleId`, `sourceRef`, `sourceRevision`, `titleTextChecksum`,
+   `authority`, `derivationRevision`), not in the grouping key itself.
+
+2. **MCP parallel-tool-call fix: comment corrected, but the underlying correctness gap is still
+   open, not just a wording problem.** Fixed this session in
+   `sveltekit-frontend/src/lib/server/ai/acp-rpc-loop.ts` (~line 207): the false invariant
+   ("same turn implies independent calls") is gone, replaced with an accurate one ("same turn
+   permits concurrency, doesn't guarantee it's safe"). But `executeToolCallsInParallel()` still
+   runs every same-turn tool call under unconditional `Promise.all()` — for read-only tools this
+   is fine, but for any future mutating MCP tool (writes to Postgres/Redis/files) this is a real,
+   unclosed correctness gap, not merely a stale comment. Recorded, not built: a
+   `ToolExecutionPolicyV1` classifying each tool as `READ_ONLY_PARALLEL` /
+   `KEYED_WRITE_SERIAL` / `GLOBAL_WRITE_SERIAL` / `EXCLUSIVE` / `UNKNOWN_FAIL_CLOSED`, keyed by
+   `resourceKey = datastore + namespace + canonicalId`, would close this — but every MCP tool
+   currently registered is read-only in this repo, so there is no live production incident yet.
+   Do not build this ahead of an actual mutating tool needing it; do treat it as a known gap, not
+   a closed one.
+
+3. **LiteRT-LM-JS factual correction, verified via the actual Google docs page (not a summary
+   site).** Fetched `https://developers.google.com/edge/litert-lm/js` directly. Confirms:
+   package is `@litert-lm/core` (`npm i --save @litert-lm/core`), explicitly labeled "an early
+   preview," supports exactly two models today — Gemma 4 E2B and E4B from the
+   `litert-community` Hugging Face org — text-in/text-out over WebGPU, with the team stating
+   they're "working on expanding this to cover general `.litertlm` model files" (i.e. current
+   model support is deliberately narrow, not a general-purpose runtime yet). The specific
+   cross-model tok/s benchmark numbers floated earlier in this thread (M4 Max 160, RTX 4090 143)
+   were **not** corroborated by this fetch and remain unverified — do not cite them as settled.
+
+4. **Naming collision recorded, not yet resolved**: this repo already has an unrelated "OKF" =
+   "OpenCode Knowledge Framework" (Mastra workflow/tool-binding schema, `docs/okf/MASTRA-OKF-SCHEMA.md`,
+   `src/lib/server/atlas/okf-schema.ts`, 25+ files) that predates and is unrelated to Google's
+   "Open Knowledge Format" (markdown-wiki interchange spec, verified real via
+   `GoogleCloudPlatform/open-knowledge-format` on GitHub, v0.1 June 2026 → v0.2 July 2026 adding
+   provenance/trust fields). Any adoption of Google's OKF in this repo must use a
+   collision-safe name (not a bare "OKF") — same pattern as this file's existing "ACE naming
+   collision with NVIDIA's own ACE" precedent. No `knowledge/` bundle, OpenSpec change, or file
+   has been created for this yet — proposal only, pending a naming decision.
+
+## Valkey / centroid alignment — 2026-09-08
+
+- Persisted Valkey policy is `volatile-lru` with a 2 GiB cap; non-expiring application
+  control/schema keys remain protected while TTL-bearing BitFrost/ACE/centroid entries remain
+  rebuildable cache state. Parent Atlas durable job dispatch is RabbitMQ-owned; BullMQ is
+  limited to the separate `claude-mem` stack.
+- The legacy `centroid:kmeans:{cluster_id}` warmer currently refreshes existing IDs and its
+  index, but lacks pass/revision identity, atomic publication, and active orphan supersession.
+- Keep centroid keys as routing/cache hints only. Before CRUD/supersession is enabled, add a
+  revision-qualified manifest/pointer, mixed-pass rejection, owned-namespace cleanup, and
+  interrupted-write readback. Do not use TTL as currentness or delete unrelated Valkey keys.
+
+## SearXNG / Python / Go retrieval alignment — 2026-09-08
+
+- SearXNG is external discovery only; normalize its JSON results into evidence candidates.
+- Python/FastAPI owns bounded AST/NLP/enrichment observations with Pydantic validation.
+- Go retrieval owns executor/progressive delivery; it does not become canonical identity or
+  fusion owner.
+- Add one `.okf`/YAML → Pydantic → Zod → Go envelope parity fixture before indexing or caching
+  discovery results. Preserve `sourceRef`, URL, provider, content checksum, revisions, and
+  retrieval time as separate fields.
+
+## RabbitMQ queue ownership — 2026-09-08
+
+- Parent Atlas durable dispatch is RabbitMQ/AMQP-owned. BullMQ is isolated to `claude-mem` and is
+  not a compatible Parent Atlas implementation.
+- `/api/batch-summary/hints` remains acknowledgement-only until a consumer-owned
+  `synthesis.generate`-compatible or dedicated batch-summary envelope is specified.
+- `docker/omni-worker/langgraph_sidecar.py` remains unqueued until its task envelope, retry/ack,
+  and durable receipt contract are defined.
+- Do not treat successful RabbitMQ publication as processing proof; require consumer receipt and
+  independent readback.
+
+## Parent Atlas phase/lane execution index — 2026-09-08
+
+This index is the workstation execution map. It connects existing helpers without creating a
+second router, feature owner, ontology registry, vector store, or queue system. A lane may be
+created or fixture-proven while its live promotion gate remains open.
+
+| Phase | Lane | Existing owners/helpers | Current state | Required promotion gate |
+|---|---|---|---|---|
+| P0 | Source and identity | Graphify, `CanonicalEnvelopeV1`, acquisition/source registry, packet identity | Partial | Current workspace/source revision and exact source-byte readback |
+| P1 | Structural observation | 8095 FastAPI, Tree-sitter, AST-grep, LSP | Partial | Cross-runtime span/edge parity receipt and revision-qualified observations |
+| P2 | Lexical retrieval | PostgreSQL `search_vector`/GIN, `ts_rank_cd`, Go Retrieval `:8100`, SearchRuntime | Source wired; apply gated | `LexicalInputProofV1`, scorer metadata, identity parity, guarded canary/readback |
+| P3 | Dense retrieval | EmbeddingGemma `:8097`, PostgreSQL `semantic_768`, Qdrant, cuVS/TurboVec | Fixture parity proven; live joins partial | Same candidate population, revision, dimension, metric, and identity |
+| P4 | Domain/NLP concepts | Python observations, Zod/Pydantic contracts, domain classifier, `ConceptDefinitionV1` | Read-only/proposal stage | Current source lineage, concept admission, and ontology-linked tuple cohort |
+| P5 | Graph and n-ary KAG | NetworkX, cuGraph `:8098`, `HyperedgeV1`, `KagQuickHopReaderV1` | Reader/proposal fixtures proven | Current Graphify binding, admitted n-ary facts, bounded traversal receipt |
+| P6 | Feature matrix | lexical, semantic, PageRank, AST, domain, NLP, ontology, graph signals | Contract/fixture stage | `CandidateFeatureMatrixV1` with no fabricated zeros and complete lineage |
+| P7 | Fusion and policy | SearchRuntime, RRF, ACE, LOD, ContextManifest, BitFrost | Wired in parts | One vote per logical lane, revision-qualified cache, replay/readback |
+| P8 | Learned challenger | XGBoost baseline, PyTorch/ATen challenger, AtlasGemmaRank | Evaluation not promotion | Query-qualified labels, mxbai shadow parity, held-out ranking metrics |
+| P9 | Deployment backends | Go/PyTorch CUDA, ONNX Runtime, TensorRT-RTX, WebGPU, llama-server | Separate executor experiments | BF16 reference parity before INT8/Q4/WebGPU promotion |
+| P10 | Durable execution | RabbitMQ, bounded workers, receipts, Kanban/task surface | Queue ownership defined | Consumer ack, durable receipt, independent readback, retry policy |
+
+### Lane dependency order
+
+```text
+P0 source/identity
+  ├── P1 structural observations
+  ├── P2 lexical retrieval
+  ├── P3 dense retrieval
+  └── P4 domain/NLP observations
+        └── ontology admission
+              └── P5 n-ary KAG
+P1 + P2 + P3 + P4 + P5
+        └── P6 CandidateFeatureMatrixV1
+              └── P7 SearchRuntime/ACE policy
+                    └── P8 learned challenger
+                          └── P9 deployment quantization
+P7 + P8
+        └── P10 durable execution integration
+```
+
+### Immediate phase gates
+
+- [ ] P0: reconcile the 235 Graphify content mismatches and 7 unavailable source files before
+  treating the current source cohort as promotable.
+- [ ] P2: rebuild `legal-ai-go-retrieval` on `:8100` and verify live
+  `score_type=PG_TS_RANK_CD`; do not call this endpoint BM25 until a true Okapi scorer exists.
+- [ ] P4/P5: produce a current `OntologyLinkedTupleV1` cohort before any n-ary Postgres canary;
+  literals remain evidence, never synthesized canonical participants.
+- [ ] P6: join only revision-qualified signals into `CandidateFeatureMatrixV1`; missing evidence
+  remains `null`, not `0`.
+- [ ] P8/P9: keep AtlasGemmaRank as a challenger and mxbai as teacher/oracle until held-out
+  ranking parity is proven. Quantization follows BF16 correctness, not the reverse.
+- [ ] P10: keep Parent Atlas jobs on RabbitMQ; BullMQ remains confined to `claude-mem`.
+
+No phase in this index authorizes a durable mutation by itself. Each write still requires an
+explicit promotion queue, schema validation, bounded apply, and independent readback.

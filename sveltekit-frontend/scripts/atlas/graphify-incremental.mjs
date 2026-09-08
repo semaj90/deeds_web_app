@@ -190,7 +190,7 @@ const client = await pool.connect();
 let existingChunks;
 try {
   const { rows } = await client.query(`
-    SELECT id, source_ref, content_hash, content_embedding IS NOT NULL AS has_embedding,
+    SELECT id, source_ref, content, content_hash, content_embedding IS NOT NULL AS has_embedding,
            kmeans_cluster, kmeans_model_version
     FROM codebase_chunk_index
     WHERE source_ref = ANY($1)
@@ -219,6 +219,7 @@ console.log('[ 4/8 ] Identifying chunks needing embedding...');
 
 // Chunks without embeddings, or whose file content changed (detect via hash)
 const chunksNeedingEmbed = [];
+let skippedNoContentCount = 0;
 for (const [ref, chunks] of chunksByRef) {
   const absPath = filesByRef.get(ref);
   let fileContent = '';
@@ -227,11 +228,23 @@ for (const [ref, chunks] of chunksByRef) {
 
   for (const c of chunks) {
     const needsEmbed = !c.has_embedding || (c.content_hash && !c.content_hash.startsWith(fileHash.slice(0, 8)));
-    if (needsEmbed) chunksNeedingEmbed.push(c);
+    if (!needsEmbed) continue;
+    // A chunk with no stored content cannot be embedded meaningfully -- previously this fell
+    // through to embedding content_hash/id (a hash/UUID string, not source text), silently
+    // writing a garbage vector into the canonical content_embedding column. Skip and count
+    // instead of embedding a non-content string.
+    if (!c.content || c.content.trim().length === 0) {
+      skippedNoContentCount++;
+      continue;
+    }
+    chunksNeedingEmbed.push(c);
   }
 }
 
 console.log(`  ${chunksNeedingEmbed.length} chunks need embedding`);
+if (skippedNoContentCount > 0) {
+  console.log(`  ${skippedNoContentCount} chunks skipped — no stored content to embed (not a hash/id fallback)`);
+}
 if (DRY_RUN && chunksNeedingEmbed.length > 0) {
   console.log(`  [DRY-RUN] Would embed ${chunksNeedingEmbed.length} chunks`);
 }
@@ -250,7 +263,7 @@ if (!DRY_RUN && chunksNeedingEmbed.length > 0) {
     const embedRes = await fetch(`${OLLAMA_URL}/api/embed`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: EMBED_MODEL, input: batch.map(c => c.content_hash ?? c.id) }),
+      body: JSON.stringify({ model: EMBED_MODEL, input: batch.map(c => c.content) }),
       signal: AbortSignal.timeout(60_000),
     });
 

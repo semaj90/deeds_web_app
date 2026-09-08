@@ -131,7 +131,11 @@ const GENERIC_QUERY_WORDS = new Set([
 ]);
 
 function normalizeQuery(queryText: string): string {
-  return queryText.trim().replace(/\s+/g, ' ').toLowerCase();
+  // Preserve identifier casing until identifierTokens() can split camelCase
+  // names. Matching itself is case-insensitive there; lowercasing here would
+  // turn `scoreCandidate` into one unsplittable token and reject the exact
+  // candidate during the compiler post-filter.
+  return queryText.trim().replace(/\s+/g, ' ');
 }
 
 function hasWord(query: string, word: string): boolean {

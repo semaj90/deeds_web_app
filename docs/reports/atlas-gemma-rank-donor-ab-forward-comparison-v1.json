@@ -1,0 +1,91 @@
+{
+  "bothExecuted": true,
+  "bothFinite": true,
+  "canonicalAuthority": false,
+  "crossDonorComparison": {
+    "cpuAbsMaxDelta": 18.0,
+    "gpuAbsMaxDelta": 18.21875,
+    "note": "Different (both untrained/random rank-head-init) weights -- equality is NOT expected or meaningful here.",
+    "rankingOrderSameAcrossDonorsCpu": false,
+    "rankingOrderSameAcrossDonorsGpu": false
+  },
+  "donorA": {
+    "checkpointDir": "/mnt/c/Users/james/Videos/deeds-web-app/models/gemma4_assistant_huggingface_7_3_26",
+    "cpuOrder": [
+      1,
+      0,
+      2
+    ],
+    "cpuScore": [
+      [
+        7.875
+      ],
+      [
+        8.25
+      ],
+      [
+        3.28125
+      ]
+    ],
+    "gpuOrder": [
+      1,
+      0,
+      2
+    ],
+    "gpuScore": [
+      [
+        7.65625
+      ],
+      [
+        8.5625
+      ],
+      [
+        3.34375
+      ]
+    ],
+    "weightsChecksum": "sha256:12875062fc25c51e8fa9b62abd2de7ad48b7d63f8559d5d604fbd5a3d6bcff16"
+  },
+  "donorB": {
+    "checkpointDir": "/mnt/c/Users/james/Videos/deeds-web-app/models/gemma4-e4b-qat-assistant-2026-07-20",
+    "cpuOrder": [
+      0,
+      1,
+      2
+    ],
+    "cpuScore": [
+      [
+        25.875
+      ],
+      [
+        7.65625
+      ],
+      [
+        4.5625
+      ]
+    ],
+    "gpuOrder": [
+      0,
+      1,
+      2
+    ],
+    "gpuScore": [
+      [
+        25.875
+      ],
+      [
+        7.25
+      ],
+      [
+        4.3125
+      ]
+    ],
+    "weightsChecksum": "sha256:9d0e2053067590cae9a8f4fcc57eefbe20dff90599360458ebd451e5cb5c947d"
+  },
+  "inputIdsMatch": true,
+  "outputShapeMatch": true,
+  "promotionDecision": "NONE -- data point only",
+  "purpose": "Direct output-value comparison between donor A and donor B on the IDENTICAL fixture (same seed=17, same input_ids, same tensor geometry). NOT an equality test -- different (both untrained) weights are expected to produce different scores. Checks: both execute, same output shape, both finite, geometry match, and records ranking-order divergence as a data point, not a pass/fail.",
+  "rankingQualityProven": false,
+  "sameTensorGeometry": true,
+  "schema": "atlas.gemma-rank-donor-ab-forward-comparison.v1"
+}

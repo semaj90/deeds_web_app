@@ -18,6 +18,7 @@
  */
 
 import { createHash } from 'node:crypto';
+import { canonicalSha256V1 } from '$lib/server/atlas/prefill/canonical-hash-v1.js';
 import type {
   OpenAIChatCompletionRequest,
   OpenAIChatCompletionResponse,
@@ -31,7 +32,11 @@ import {
   hashStr,
   buildAcePacketCacheKey,
   buildAceCompletionCacheKey,
+  buildAcePromptPreflightCacheKeyV1,
+  buildAceGenerationControlsSignatureV1,
+  buildAceRevisionedExactAnswerCacheKeyV1,
 } from '$lib/server/cache-keys.js';
+import type { ContextManifestV2 } from '$lib/server/atlas/graph/context-manifest-v2.js';
 import {
   collectPacketIdentityJoinMeta,
   type PacketIdentityJoinCandidate,
@@ -101,10 +106,20 @@ export class BudgetExceededError extends Error {
   }
 }
 
-interface RunOpts {
+export interface RevisionedExactAnswerCacheOptionsV1 {
+  manifest: ContextManifestV2;
+  modelRevision: string;
+  chatTemplateRevision: string;
+  toolSchemaRevision: string;
+  promptTemplateRevision: string;
+}
+
+export interface RunChatCompletionOptionsV1 {
   /** Authenticated user id (from locals.user) — used for ACE personalization */
   userId?: string;
   useMcp?: boolean;
+  /** Optional strict V2 cache handoff from a revision-qualified SearchRuntime caller. */
+  revisionedExactAnswerCache?: RevisionedExactAnswerCacheOptionsV1;
 }
 
 /**
@@ -721,7 +736,7 @@ function collectResponseContextMeta(aceCtx: ACEContext): {
  */
 export async function runChatCompletion(
   req: OpenAIChatCompletionRequest,
-  opts: RunOpts = {}
+  opts: RunChatCompletionOptionsV1 = {}
 ): Promise<OpenAIChatCompletionResponse> {
   const startMs = Date.now();
   const internalModel = resolveInternalModel(req.model);
@@ -1161,7 +1176,29 @@ export async function runChatCompletion(
   // Build ACE preflight packet (compact prompt mapping + selected cards)
   let acePreflight: AcePromptPreflightResult | undefined;
   const pipeline = 'ace';
-  const ctxCacheKey = `ace:ctx:${createHash('sha256').update(query + pipeline).digest('hex')}`;
+  const preflightContextMeta = collectResponseContextMeta(aceCtx);
+  const repositoryRevision = process.env.GIT_SHA ?? process.env.VERCEL_GIT_COMMIT_SHA ?? 'unknown';
+  const systemPromptHash = createHash('sha256')
+    .update(systemPreamble ?? 'SYSTEM_YORHA_LEGAL')
+    .digest('hex');
+  const toolDefinitionsHash = createHash('sha256')
+    .update(JSON.stringify(req.tools ?? []))
+    .digest('hex');
+  const ctxCacheKey = buildAcePromptPreflightCacheKeyV1({
+    query,
+    pipeline,
+    modelRevision: internalModel,
+    systemPromptHash,
+    toolDefinitionsHash,
+    repositoryRevision,
+    backend: canUseTurboQuantNow ? 'turboquant' : 'bifrost',
+    caseId: req.case_id,
+    filePath: req.file_path,
+    sourceRefs: preflightContextMeta.sourceRefs,
+    chunkIds: preflightContextMeta.chunkIds,
+    packetKeys: preflightContextMeta.packetKeys,
+    contextManifestIdentity: aceCtx.contextManifest?.identity ?? null,
+  });
   const redisClientForAce = getRedis();
   let acePreflightCacheHit = false;
 
@@ -1413,6 +1450,19 @@ export async function runChatCompletion(
     stablePrefixHash = hashStr(sysFull);
   }
   const userQueryHash = hashStr(query);
+  const generationControlsSignature = buildAceGenerationControlsSignatureV1({
+    temperature: req.temperature ?? 0.3,
+    maxTokens: requestedMaxTokens,
+    topP: req.top_p,
+    presencePenalty: req.presence_penalty,
+    frequencyPenalty: req.frequency_penalty,
+    toolChoice: req.tool_choice,
+  });
+  const renderedRequestChecksum = canonicalSha256V1({
+    schema: 'atlas.ace-rendered-request.v1',
+    model: finalModelUsed,
+    messages,
+  });
 
   const packetKey = buildAcePacketCacheKey({
     model: finalModelUsed,
@@ -1420,9 +1470,23 @@ export async function runChatCompletion(
     userIntent: query,
     routingSignature: labelsSignature(routingLabels),
     dynamicContextSignature: promptContextSignature,
+    generationControlsSignature,
+    renderedRequestChecksum,
+    contextManifestIdentity: aceCtx.contextManifest?.identity ?? null,
   });
 
-  const completionKey = buildAceCompletionCacheKey(packetKey, userQueryHash);
+  const completionKey = opts.revisionedExactAnswerCache
+    ? buildAceRevisionedExactAnswerCacheKeyV1({
+        contextManifestV2: opts.revisionedExactAnswerCache.manifest,
+        userQueryHash,
+        modelRevision: opts.revisionedExactAnswerCache.modelRevision,
+        chatTemplateRevision: opts.revisionedExactAnswerCache.chatTemplateRevision,
+        toolSchemaRevision: opts.revisionedExactAnswerCache.toolSchemaRevision,
+        promptTemplateRevision: opts.revisionedExactAnswerCache.promptTemplateRevision,
+        renderedRequestChecksum,
+        generationControlsSignature,
+      })
+    : buildAceCompletionCacheKey(packetKey, userQueryHash);
   const redisLookupStartMs = Date.now();
   const cachedPrompt = await getExactMatchCache(completionKey);
   redisMs = Date.now() - redisLookupStartMs;

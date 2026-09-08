@@ -343,8 +343,16 @@ export const QDRANT_COLLECTIONS = {
 } as const;
 
 // ── ONNX Runtime execution providers (priority order) ────────────────────
+//
+// Fixed 2026-09-07: dropped 'cpu' as a distinct entry. ONNX Runtime Web's
+// real browser execution-provider identifiers are 'webgpu' / 'wasm' / 'webnn'
+// / 'webgl' -- there is no separate 'cpu' EP; CPU execution IS the WASM
+// backend. Passing the literal string 'cpu' to InferenceSession.create's
+// executionProviders was a mislabeling (low practical impact, since it only
+// mattered after 'wasm' had already failed -- the end state, "all providers
+// exhausted", was the same either way), not something ORT Web recognizes.
 
-export const ONNX_EXECUTION_PROVIDERS = ['webgpu', 'wasm', 'cpu'] as const;
+export const ONNX_EXECUTION_PROVIDERS = ['webgpu', 'wasm'] as const;
 
 
 // ── Quantization Runtime Configuration ──────────────────────────────────

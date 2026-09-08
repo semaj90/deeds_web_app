@@ -2,6 +2,15 @@
   "_comment": "Manual sidecar SQL migrations applied outside drizzle-kit _journal.json. Listed here so audit-contract-map.mjs treats them as documented_sidecar (WARN) rather than unknown_unjournaled_sql (FAIL).",
   "sidecars": [
     {
+      "file": "manual/20260907_canonical_owner_revision_axes_v1.sql",
+      "status": "manual_sidecar",
+      "reason": "Additive packet source-content and concept definition revision fields for two-axis owner lineage. Unapplied; requires reviewed backfill, Graphify currentness, and independent readback before promotion.",
+      "appliedBy": "operator",
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "validationCommand": "node scripts/atlas/audit-canonical-owner-schema-reconciliation-v1.mjs"
+    },
+    {
       "file": "manual/20260906_ai_observability_contract_repair.sql",
       "status": "applied",
       "reason": "Additive repair for the facade's intent evaluation table and missing llm_synthesis_events routing_hints column. No drops, rewrites, or global Drizzle ledger repair.",
@@ -12,12 +21,13 @@
     },
     {
       "file": "manual/20260906_semantic_768_metadata_reconciliation.sql",
-      "status": "planned_sidecar",
-      "reason": "Corrects the stale codebase_chunk_index embedding_dimension default from 384 to 768 and adds a NOT VALID future-write guard for the canonical content_embedding halfvec(768) lane. No row rewrite, vector backfill, legacy-column drop, or projection mutation. Apply only after the read-only preflight receipt and migration authorization.",
-      "appliedBy": null,
-      "appliedAt": null,
+      "status": "applied",
+      "reason": "Corrects the stale codebase_chunk_index embedding_dimension default from 384 to 768 and adds a NOT VALID future-write guard for the canonical content_embedding halfvec(768) lane. No row rewrite, vector backfill, legacy-column drop, or projection mutation.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-09-07",
       "requiresJournalEntry": false,
-      "validationCommand": "node scripts/atlas/prove-semantic-768-metadata-reconciliation-v1.mjs"
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -P pager=off -c \"SELECT column_name, column_default FROM information_schema.columns WHERE table_name='codebase_chunk_index' AND column_name='embedding_dimension';\"",
+      "postApplyVerification": "column_default now '768' (was '384'); constraint codebase_chunk_index_semantic_768_metadata_ck present with convalidated=false (NOT VALID, as intended); row counts unchanged (content_embedding populated=55169, content_embedding_768 populated=1386, total=55853, all matching pre-apply exactly)."
     },
     {
       "file": "manual/20260903_graphify_execution_ledger_v1.sql",
@@ -343,6 +353,15 @@
       "appliedAt": null,
       "requiresJournalEntry": false,
       "validationCommand": "node scripts/atlas/export-graphify-file-index-v1.mjs --limit=100 && node scripts/atlas/audit-atlas-indexing-surfaces.mjs"
+    },
+    {
+      "file": "manual/20260826_atlas_class_search_index_v1.sql",
+      "status": "applied",
+      "reason": "Class-level sibling of 20260824_graphify_file_search_bitmap_v1.sql, sourced from AST-grep class-node extraction (atlas_ast_nodes WHERE node_kind='class', 3,675 rows at authoring time). Deliberately fixes the sibling's latent bug (array_to_string() is STABLE not IMMUTABLE, so it cannot appear in a GENERATED ALWAYS AS ... STORED expression -- confirmed live against PostgreSQL 18.4) via a thin atlas_immutable_array_to_string() IMMUTABLE wrapper before reusing the same generated-tsvector pattern. Found applied and live (3,675 real rows) but absent from this tracking file during the 2026-09-07 HYPERGRAPH-NARY-EVIDENCE-SOURCE-SURVEY-01 / schema-validation deep audit (openspec/changes/parent-atlas-ontology-kernel/tasks.md) -- added retroactively to close that tracking gap; no schema or data change made by this entry.",
+      "appliedBy": "unknown (retroactively tracked 2026-09-07 by claude)",
+      "appliedAt": "2026-08-26",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT count(*), count(*) FILTER (WHERE class_bitmap <> B'0000000000000000') FROM atlas_class_search_index_v1;\""
     },
     {
       "file": "manual/20260824_atlas_callable_search_v1.sql",

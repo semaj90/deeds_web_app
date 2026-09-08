@@ -1,12 +1,12 @@
 {
   "schema": "atlas.parent-atlas-concept-fabric-audit.v1",
-  "generatedAt": "2026-09-04T21:14:55.524Z",
+  "generatedAt": "2026-09-08T04:26:49.057Z",
   "scope": "repository-owner-and-contract-inventory",
   "writesPerformed": false,
   "datastoreWritesPerformed": false,
   "externalNetworkCallsPerformed": false,
-  "inventoryChecksum": "sha256:9fce044f497e0058fb56917520a2b4338cd3705a9d68bc4e9b66adce3cb9aac8",
-  "inventoryFileCount": 320508,
+  "inventoryChecksum": "sha256:74eacf6bb7df2f400c3310826c1946a76c0b1ed9445a21ac053d1dfc83963925",
+  "inventoryFileCount": 321266,
   "canonicalOwnerSummary": {
     "sourceAndIdentity": "PostgreSQL packet/chunk/source-revision tables",
     "observations": "8095 Tree-sitter, AST-grep, bounded NLP/LangExtract adapters",
@@ -74,13 +74,16 @@
       ]
     },
     "externalDocsAndEvidence": {
-      "matchedFileCount": 2111,
+      "matchedFileCount": 2115,
       "files": [
         "7_24_26_todo_enhance_recommendations_firecrawl.txt",
         "docker/langgraph-synthesis/.venv/Lib/site-packages/langchain_community/document_loaders/__pycache__/firecrawl.cpython-313.pyc",
         "docker/langgraph-synthesis/.venv/Lib/site-packages/langchain_community/document_loaders/firecrawl.py",
         "docs/.okf/dev/raw/firecrawl/docs-firecrawl-dev-api-reference-introduction-introduction.json",
         "docs/.okf/dev/raw/firecrawl/docs-firecrawl-dev-api-reference-introduction-introduction.md",
+        "docs/reports/parent-atlas/doc-03-firecrawl-bounded-owner-v1.json",
+        "scripts/atlas/__pycache__/validate-okf-beautifulsoup-pydantic-v1.cpython-313.pyc",
+        "scripts/atlas/audit-doc-03-firecrawl-bounded-owner-v1.mjs",
         "scripts/atlas/validate-okf-beautifulsoup-pydantic-v1.py",
         "scripts/docs-atlas/__pycache__/fetch-beautifulsoup.cpython-313.pyc",
         "scripts/docs-atlas/fetch-beautifulsoup.py",
@@ -90,6 +93,7 @@
         "sveltekit-frontend/src/lib/server/atlas/docs/firecrawl-v2-capture.ts",
         "sveltekit-frontend/src/lib/server/atlas/docs/qdrant-external-docs-hybrid.ts",
         "sveltekit-frontend/src/lib/server/ingest/crawl4ai-client.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/optional-firecrawl-provider.ts",
         "tools/agentic-research/.venv/Lib/site-packages/beautifulsoup4-4.15.0.dist-info/INSTALLER",
         "tools/agentic-research/.venv/Lib/site-packages/beautifulsoup4-4.15.0.dist-info/METADATA",
         "tools/agentic-research/.venv/Lib/site-packages/beautifulsoup4-4.15.0.dist-info/RECORD",
@@ -151,15 +155,11 @@
         "tools/agentic-research/.venv/Lib/site-packages/crawl4ai/async_database.py",
         "tools/agentic-research/.venv/Lib/site-packages/crawl4ai/async_dispatcher.py",
         "tools/agentic-research/.venv/Lib/site-packages/crawl4ai/async_logger.py",
-        "tools/agentic-research/.venv/Lib/site-packages/crawl4ai/async_url_seeder.py",
-        "tools/agentic-research/.venv/Lib/site-packages/crawl4ai/async_webcrawler.py",
-        "tools/agentic-research/.venv/Lib/site-packages/crawl4ai/browser_adapter.py",
-        "tools/agentic-research/.venv/Lib/site-packages/crawl4ai/browser_manager.py",
-        "tools/agentic-research/.venv/Lib/site-packages/crawl4ai/browser_profiler.py"
+        "tools/agentic-research/.venv/Lib/site-packages/crawl4ai/async_url_seeder.py"
       ]
     },
     "retrievalAndSearch": {
-      "matchedFileCount": 143,
+      "matchedFileCount": 144,
       "files": [
         "7-19_qdrantgpu_hnsw_ivfft_bm25_bm42_mcp_toolcalling_hmm.txt",
         "claude-mem/src/services/worker/search/SearchOrchestrator.ts",
@@ -208,6 +208,7 @@
         "services/go-retrieval-service/go.sum",
         "services/go-retrieval-service/lanes.go",
         "services/go-retrieval-service/lanes_test.go",
+        "services/go-retrieval-service/lexical_response_test.go",
         "services/go-retrieval-service/main.go",
         "services/go-retrieval-service/proto/retrieval/retrieval.pb.go",
         "services/go-retrieval-service/proto/retrieval/retrieval_grpc.pb.go",
@@ -239,12 +240,11 @@
         "sveltekit-frontend/scripts/phase104-backups/src/lib/services/nodejs-orchestrator.ts",
         "sveltekit-frontend/scripts/phase104-backups/src/lib/services/recommendation-orchestrator.ts",
         "sveltekit-frontend/scripts/phase104-backups/src/lib/services/redis-orchestrator.ts",
-        "sveltekit-frontend/scripts/phase104-backups/src/lib/services/unified-legal-cache-orchestrator.ts",
-        "sveltekit-frontend/scripts/phase104-backups/src/lib/services/unified-wasm-gpu-orchestrator.ts"
+        "sveltekit-frontend/scripts/phase104-backups/src/lib/services/unified-legal-cache-orchestrator.ts"
       ]
     },
     "graphAndTuples": {
-      "matchedFileCount": 5957,
+      "matchedFileCount": 5961,
       "files": [
         ".venv-cu130/Lib/site-packages/networkx-3.6.1.dist-info/INSTALLER",
         ".venv-cu130/Lib/site-packages/networkx-3.6.1.dist-info/METADATA",
@@ -329,7 +329,7 @@
       ]
     },
     "aceAndPrefill": {
-      "matchedFileCount": 77,
+      "matchedFileCount": 84,
       "files": [
         ".okf/pipelines/ast-entity-prefill.yaml",
         ".venv-cu130/Lib/site-packages/torch/include/ATen/native/mps/kernels/PrefillAttention.h",
@@ -399,19 +399,22 @@
         "sveltekit-frontend/src/lib/server/atlas/neural/ace-prefill-packet-reference-v1.ts",
         "sveltekit-frontend/src/lib/server/atlas/packet-lod-manifest.ts",
         "sveltekit-frontend/src/lib/server/atlas/prefill/canonical-hash-v1.ts",
+        "sveltekit-frontend/src/lib/server/atlas/prefill/context-prefix-identity-v1.ts",
         "sveltekit-frontend/src/lib/server/atlas/prefill/decoder-qualified-prefill-identity-v1.spec.ts",
         "sveltekit-frontend/src/lib/server/atlas/prefill/decoder-qualified-prefill-identity-v1.ts",
+        "sveltekit-frontend/src/lib/server/atlas/prefill/llama-prompt-cache-telemetry-v1.spec.ts",
+        "sveltekit-frontend/src/lib/server/atlas/prefill/llama-prompt-cache-telemetry-v1.ts",
         "sveltekit-frontend/src/lib/server/atlas/prefill/ordinal-registry-v1.ts",
+        "sveltekit-frontend/src/lib/server/atlas/prefill/ornith-cache-behavior-proof-v1.spec.ts",
+        "sveltekit-frontend/src/lib/server/atlas/prefill/ornith-cache-behavior-proof-v1.ts",
+        "sveltekit-frontend/src/lib/server/atlas/prefill/ornith-cache-capability-v1.spec.ts",
+        "sveltekit-frontend/src/lib/server/atlas/prefill/ornith-cache-capability-v1.ts",
         "sveltekit-frontend/src/lib/server/atlas/prefill/prefill-contracts-v1.spec.ts",
-        "sveltekit-frontend/src/lib/server/atlas/prefill/prefill-contracts-v1.ts",
-        "sveltekit-frontend/src/lib/server/atlas/prefill/prompt-plan-v1.ts",
-        "sveltekit-frontend/src/lib/server/atlas/prefill/smart-rpc-packet-v1.ts",
-        "sveltekit-frontend/src/lib/server/cache/ace-packet-cache.ts",
-        "tools/agentic-research/.venv/Lib/site-packages/torch/include/ATen/native/mps/kernels/PrefillAttention.h"
+        "sveltekit-frontend/src/lib/server/atlas/prefill/prefill-contracts-v1.ts"
       ]
     },
     "cacheAndResidency": {
-      "matchedFileCount": 189,
+      "matchedFileCount": 199,
       "files": [
         ".tmp/atlas-cluster-assignments.centroids.json",
         ".tmp/qdrant-som-centroid-backfill-report.json",
@@ -447,6 +450,11 @@
         "docs/reports/mcp-tool-routing-ace-bitfrost-viterbi-gap-v1.json",
         "docs/reports/ne28-centroid-prefill-projection.json",
         "docs/reports/packet-centroid-materialization.json",
+        "docs/reports/parent-atlas-bitfrost-invalidation-owner-v1.json",
+        "docs/reports/parent-atlas-bitfrost-key-semantics-owner-v1-stage2.json",
+        "docs/reports/parent-atlas-bitfrost-key-semantics-owner-v1.json",
+        "docs/reports/parent-atlas-bitfrost-producer-census-v1.json",
+        "docs/reports/parent-atlas-bitfrost-producer-convergence-v1.json",
         "docs/reports/redis-centroid-mirror-wiring.json",
         "docs/reports/redis-centroid-mirror-wiring.md",
         "docs/reports/retrieval-rerank-ace-centroid-smoke-2026-08-04.json",
@@ -457,6 +465,8 @@
         "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/proposal.md",
         "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/specs/agent-branch-verification/spec.md",
         "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md",
+        "openspec/changes/parent-atlas-ace-bitfrost-cache-correctness/design.md",
+        "openspec/changes/parent-atlas-ace-bitfrost-cache-correctness/proposal.md",
         "openspec/changes/parent-atlas-ace-bitfrost-cache-correctness/specs/ace-bitfrost-cache-correctness/spec.md",
         "openspec/changes/parent-atlas-ace-bitfrost-cache-correctness/tasks.md",
         "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/design.md",
@@ -485,14 +495,7 @@
         "openspec/drafts/2026-08-21_bitfrost-semantic-7.md",
         "openspec/drafts/2026-08-21_bitfrost-semantic-8.md",
         "openspec/drafts/2026-08-21_bitfrost-semantic-9.md",
-        "openspec/drafts/2026-08-21_bitfrost-semantic.md",
-        "openspec/drafts/2026-08-22_bitfrost-semantic-2.md",
-        "openspec/drafts/2026-08-22_bitfrost-semantic-3.md",
-        "openspec/drafts/2026-08-22_bitfrost-semantic-4.md",
-        "openspec/drafts/2026-08-22_bitfrost-semantic-5.md",
-        "openspec/drafts/2026-08-22_bitfrost-semantic-6.md",
-        "openspec/drafts/2026-08-22_bitfrost-semantic.md",
-        "openspec/drafts/2026-08-23_bitfrost-semantic-2.md"
+        "openspec/drafts/2026-08-21_bitfrost-semantic.md"
       ]
     },
     "dagAndSynthesis": {
@@ -510,7 +513,7 @@
       ]
     },
     "languageResolution": {
-      "matchedFileCount": 64,
+      "matchedFileCount": 66,
       "files": [
         ".venv-cu130/Lib/site-packages/sympy/polys/matrices/tests/__pycache__/test_nullspace.cpython-314.pyc",
         ".venv-cu130/Lib/site-packages/sympy/polys/matrices/tests/test_nullspace.py",
@@ -525,6 +528,7 @@
         "docs/reports/lsp-semantic-observation-v1.json",
         "docs/reports/node-tree-sitter-provider-parity-corpus-v2.json",
         "docs/reports/node-tree-sitter-provider-parity-corpus-v2.md",
+        "docs/reports/parent-atlas/doc-23-ast-grep-repair-planner-v1.json",
         "docs/reports/phase2a-ast-grep-caller-chain-receipt.json",
         "docs/reports/phase2a-ast-grep-canonical-join-receipt.json",
         "docs/reports/typescript-lsp-readonly-proof-v1.json",
@@ -543,6 +547,7 @@
         "scripts/atlas/phase1-ast-grep-extraction.mjs",
         "scripts/atlas/phase2a-ast-grep-synthetic-key-fix.mjs",
         "scripts/atlas/prove-byte-offset-to-lsp-position-readonly.mjs",
+        "scripts/atlas/prove-doc-23-ast-grep-repair-planner-v1.mjs",
         "scripts/atlas/prove-lsp-cross-file-target-alignment-readonly.mjs",
         "scripts/atlas/prove-typescript-lsp-readonly.mjs",
         "simd-bridge/rust/hmm-repair/target/x86_64-pc-windows-msvc/debug/incremental/hmm_repair-0dpicsu2ibpb7/s-hih7xg89n7-1uy4jhs-barfjfdto00lna31h0kctzafb/0lspufbkcikf0phm9hajm74m0.o",

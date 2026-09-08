@@ -12,6 +12,12 @@ export class UnorderedChunkAssembler {
   push(chunk: ChunkEnvelope): Uint8Array | null {
     if (chunk.sequenceNumber < 0 || chunk.sequenceNumber >= chunk.chunkCount) throw new Error('invalid sequence number');
     const stream = this.streams.get(chunk.streamId) ?? new Map<number, ChunkEnvelope>();
+    const existing = stream.values().next().value as ChunkEnvelope | undefined;
+    if (existing && existing.chunkCount !== chunk.chunkCount) {
+      throw new Error(
+        `chunkCount mismatch for stream ${chunk.streamId}: expected ${existing.chunkCount}, got ${chunk.chunkCount}`,
+      );
+    }
     stream.set(chunk.sequenceNumber, chunk);
     this.streams.set(chunk.streamId, stream);
     if (stream.size !== chunk.chunkCount) return null;

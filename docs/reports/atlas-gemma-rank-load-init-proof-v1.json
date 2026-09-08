@@ -1,0 +1,206 @@
+{
+  "canonicalAuthority": false,
+  "checkpointDir": "models\\gemma4_assistant_huggingface_7_3_26",
+  "checkpointMutated": false,
+  "checkpointOnlyTensorNames": [
+    "masked_embedding.centroids.weight",
+    "masked_embedding.token_ordering",
+    "post_projection.weight",
+    "pre_projection.weight"
+  ],
+  "checkpointTensorCount": 50,
+  "configPath": "models\\gemma4_assistant_huggingface_7_3_26\\config.json",
+  "cudaAllocated": false,
+  "derivedConfig": {
+    "dtype": "bfloat16",
+    "hiddenSize": 256,
+    "numAttentionHeads": 4,
+    "numHiddenLayers": 4,
+    "numKeyValueHeads": 2,
+    "numKvSharedLayers": 0,
+    "useBidirectionalAttention": "all",
+    "useCache": false
+  },
+  "forwardExecuted": false,
+  "initializedStandaloneAttention": [
+    {
+      "finite": true,
+      "initializer": "ONES",
+      "shape": [
+        256
+      ],
+      "tensor": "model.layers.0.self_attn.k_norm.weight"
+    },
+    {
+      "finite": true,
+      "initializer": "XAVIER_UNIFORM",
+      "shape": [
+        512,
+        256
+      ],
+      "tensor": "model.layers.0.self_attn.k_proj.weight"
+    },
+    {
+      "finite": true,
+      "initializer": "XAVIER_UNIFORM",
+      "shape": [
+        512,
+        256
+      ],
+      "tensor": "model.layers.0.self_attn.v_proj.weight"
+    },
+    {
+      "finite": true,
+      "initializer": "ONES",
+      "shape": [
+        256
+      ],
+      "tensor": "model.layers.1.self_attn.k_norm.weight"
+    },
+    {
+      "finite": true,
+      "initializer": "XAVIER_UNIFORM",
+      "shape": [
+        512,
+        256
+      ],
+      "tensor": "model.layers.1.self_attn.k_proj.weight"
+    },
+    {
+      "finite": true,
+      "initializer": "XAVIER_UNIFORM",
+      "shape": [
+        512,
+        256
+      ],
+      "tensor": "model.layers.1.self_attn.v_proj.weight"
+    },
+    {
+      "finite": true,
+      "initializer": "ONES",
+      "shape": [
+        256
+      ],
+      "tensor": "model.layers.2.self_attn.k_norm.weight"
+    },
+    {
+      "finite": true,
+      "initializer": "XAVIER_UNIFORM",
+      "shape": [
+        512,
+        256
+      ],
+      "tensor": "model.layers.2.self_attn.k_proj.weight"
+    },
+    {
+      "finite": true,
+      "initializer": "XAVIER_UNIFORM",
+      "shape": [
+        512,
+        256
+      ],
+      "tensor": "model.layers.2.self_attn.v_proj.weight"
+    },
+    {
+      "finite": true,
+      "initializer": "ONES",
+      "shape": [
+        512
+      ],
+      "tensor": "model.layers.3.self_attn.k_norm.weight"
+    },
+    {
+      "finite": true,
+      "initializer": "XAVIER_UNIFORM",
+      "shape": [
+        1024,
+        256
+      ],
+      "tensor": "model.layers.3.self_attn.k_proj.weight"
+    },
+    {
+      "finite": true,
+      "initializer": "XAVIER_UNIFORM",
+      "shape": [
+        1024,
+        256
+      ],
+      "tensor": "model.layers.3.self_attn.v_proj.weight"
+    }
+  ],
+  "initializedStandaloneAttentionTensorCount": 12,
+  "loadedInheritedTensorCount": 46,
+  "loadedInheritedTensorNames": [
+    "model.embed_tokens.weight",
+    "model.layers.0.input_layernorm.weight",
+    "model.layers.0.layer_scalar",
+    "model.layers.0.mlp.down_proj.weight",
+    "model.layers.0.mlp.gate_proj.weight",
+    "model.layers.0.mlp.up_proj.weight",
+    "model.layers.0.post_attention_layernorm.weight",
+    "model.layers.0.post_feedforward_layernorm.weight",
+    "model.layers.0.pre_feedforward_layernorm.weight",
+    "model.layers.0.self_attn.o_proj.weight",
+    "model.layers.0.self_attn.q_norm.weight",
+    "model.layers.0.self_attn.q_proj.weight",
+    "model.layers.1.input_layernorm.weight",
+    "model.layers.1.layer_scalar",
+    "model.layers.1.mlp.down_proj.weight",
+    "model.layers.1.mlp.gate_proj.weight",
+    "model.layers.1.mlp.up_proj.weight",
+    "model.layers.1.post_attention_layernorm.weight",
+    "model.layers.1.post_feedforward_layernorm.weight",
+    "model.layers.1.pre_feedforward_layernorm.weight",
+    "model.layers.1.self_attn.o_proj.weight",
+    "model.layers.1.self_attn.q_norm.weight",
+    "model.layers.1.self_attn.q_proj.weight",
+    "model.layers.2.input_layernorm.weight",
+    "model.layers.2.layer_scalar",
+    "model.layers.2.mlp.down_proj.weight",
+    "model.layers.2.mlp.gate_proj.weight",
+    "model.layers.2.mlp.up_proj.weight",
+    "model.layers.2.post_attention_layernorm.weight",
+    "model.layers.2.post_feedforward_layernorm.weight",
+    "model.layers.2.pre_feedforward_layernorm.weight",
+    "model.layers.2.self_attn.o_proj.weight",
+    "model.layers.2.self_attn.q_norm.weight",
+    "model.layers.2.self_attn.q_proj.weight",
+    "model.layers.3.input_layernorm.weight",
+    "model.layers.3.layer_scalar",
+    "model.layers.3.mlp.down_proj.weight",
+    "model.layers.3.mlp.gate_proj.weight",
+    "model.layers.3.mlp.up_proj.weight",
+    "model.layers.3.post_attention_layernorm.weight",
+    "model.layers.3.post_feedforward_layernorm.weight",
+    "model.layers.3.pre_feedforward_layernorm.weight",
+    "model.layers.3.self_attn.o_proj.weight",
+    "model.layers.3.self_attn.q_norm.weight",
+    "model.layers.3.self_attn.q_proj.weight",
+    "model.norm.weight"
+  ],
+  "observedAt": "2026-09-07T00:04:46.847692+00:00",
+  "rankHead": {
+    "biasShape": [
+      1
+    ],
+    "finite": true,
+    "initializers": {
+      "bias": "ZEROS",
+      "weight": "XAVIER_UNIFORM"
+    },
+    "weightShape": [
+      1,
+      256
+    ]
+  },
+  "receiptChecksum": "sha256:b760d2648d76ecf857af7cd1437230455d7ae13195f1fef9e66dcc3579ba8ff7",
+  "runtimeClass": "Gemma4ForCausalLM",
+  "runtimeInstantiation": "IN_MEMORY_ONLY",
+  "schema": "atlas.gemma-rank-load-init-proof.v1",
+  "shapeMismatches": [],
+  "sourceWeightsChecksumAfter": "sha256:12875062fc25c51e8fa9b62abd2de7ad48b7d63f8559d5d604fbd5a3d6bcff16",
+  "sourceWeightsChecksumBefore": "sha256:12875062fc25c51e8fa9b62abd2de7ad48b7d63f8559d5d604fbd5a3d6bcff16",
+  "status": "LOAD_INIT_IN_MEMORY_PROVEN",
+  "trainingPerformed": false,
+  "weightsMutated": false
+}

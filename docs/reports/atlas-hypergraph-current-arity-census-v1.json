@@ -1,0 +1,85 @@
+{
+  "schema": "atlas.hypergraph-current-arity-census.v1",
+  "mode": "READ_ONLY",
+  "status": "CURRENT_BINDING_PROVEN",
+  "population": {
+    "hyperedges": 62802,
+    "members": 125604,
+    "ontologyTuples": 0
+  },
+  "revisions": {
+    "graphRevisionCounts": [
+      {
+        "graph_revision": "taxonomy-edges-v1-2026-05-08",
+        "workspace_revision": "git:0084288f26",
+        "hyperedge_count": "62802",
+        "source_revision_present": "62802"
+      }
+    ],
+    "workspaceRevisionCounts": [
+      {
+        "workspaceRevision": "git:0084288f26"
+      }
+    ],
+    "sourceRevisionPresent": 62802,
+    "expectedGraphRevision": "taxonomy-edges-v1-2026-05-08",
+    "expectedWorkspaceRevision": "git:0084288f26",
+    "currentBindingProven": true
+  },
+  "arity": {
+    "zero": 0,
+    "one": 0,
+    "two": 62802,
+    "three": 0,
+    "fourPlus": 0,
+    "max": 2,
+    "avg": 2
+  },
+  "roles": [
+    {
+      "relation_type": "CONCEPT_PART_OF",
+      "member_role": "part",
+      "member_type": "canonical_id",
+      "occurrences": "57751"
+    },
+    {
+      "relation_type": "CONCEPT_PART_OF",
+      "member_role": "whole",
+      "member_type": "canonical_id",
+      "occurrences": "57751"
+    },
+    {
+      "relation_type": "CONCEPT_BROADER_THAN",
+      "member_role": "broader",
+      "member_type": "canonical_id",
+      "occurrences": "5051"
+    },
+    {
+      "relation_type": "CONCEPT_BROADER_THAN",
+      "member_role": "narrower",
+      "member_type": "canonical_id",
+      "occurrences": "5051"
+    }
+  ],
+  "relationTypes": [
+    "CONCEPT_BROADER_THAN",
+    "CONCEPT_PART_OF"
+  ],
+  "integrity": {
+    "orphanMembers": 0,
+    "duplicateRoleMembers": 0,
+    "missingContractHyperedgeId": 0,
+    "missingChecksum": 0
+  },
+  "tablesPresent": [
+    "atlas_hyperedge_members",
+    "atlas_hyperedges",
+    "atlas_ontology_tuples"
+  ],
+  "missingColumns": {
+    "atlas_hyperedges": [],
+    "atlas_hyperedge_members": [],
+    "atlas_ontology_tuples": []
+  },
+  "writesPerformed": false
+}

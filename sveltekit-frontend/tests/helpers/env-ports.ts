@@ -43,8 +43,8 @@ function detectAppBaseURL(): string {
 		if (isPortListening(String(port))) return `http://127.0.0.1:${port}`;
 	}
 
-	if (isPortListening('5178')) return 'http://127.0.0.1:5178';
-
+	// 5178 is reserved for the QUIC/Caddy proxy, not the SvelteKit app.
+	// Never select it as the Playwright application base URL.
 	return 'http://127.0.0.1:5173';
 }
 

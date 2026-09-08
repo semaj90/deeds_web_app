@@ -200,6 +200,11 @@ try {
 # --embedding   enables /v1/embeddings and /embeddings endpoints
 # --pooling mean  mean-pool token embeddings (768-dim output matching embeddinggemma)
 # --embd-normalize 2  L2-normalize output vectors (cosine-search ready)
+# --log-verbosity 0  quietest tier ("generic output") -- without this, no verbosity flag was ever
+# set, so a long-running instance logs per-request slot-cache debug chatter
+# (`srv update: - prompt ... checkpoints...`) at whatever this binary's unset default is, which
+# silently grew one .err file to 671MB over 5 days of continuous runtime (found 2026-09-07). This
+# is a dedicated, narrow embedding daemon -- no need for anything above the lowest tier.
 # No KV-cache flags, no mmproj, no LoRA, no speculative decoding — embed only.
 $args = @(
   '-m',             $model,
@@ -211,7 +216,8 @@ $args = @(
   '-c',             $ctxLen,
   '-b',             $batchSize,
   '-ub',            $ubatchSize,
-  '-t',             $threads
+  '-t',             $threads,
+  '--log-verbosity', '0'
 )
 
 if (Test-LlamaFlag $llama '--embd-normalize') {

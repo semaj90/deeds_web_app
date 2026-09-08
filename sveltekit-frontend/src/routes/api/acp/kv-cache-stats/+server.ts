@@ -40,7 +40,7 @@ export const GET: RequestHandler = async ({ locals }) => {
     },
     recommendation:
       total.averageCacheHitRate > 0.5
-        ? 'KV cache is effective. Consider increasing cache_reuse window.'
+        ? 'KV cache is effective. Consider increasing the cache_reuse minimum token chunk.'
         : 'KV cache hit rate is low. Verify cache_prompt is enabled and multi-turn patterns are consistent.',
   });
 };

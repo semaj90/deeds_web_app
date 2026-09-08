@@ -27,6 +27,8 @@
  */
 
 import { createHash } from 'node:crypto';
+import type { ContextPrefixIdentityV1 } from '$lib/server/atlas/prefill/context-prefix-identity-v1.js';
+import { canonicalSha256V1 } from '$lib/server/atlas/prefill/canonical-hash-v1.js';
 
 // ── Hashing ────────────────────────────────────────────────────────────────
 
@@ -481,6 +483,7 @@ export function generateCacheKey(params: {
 export function generatePromptCacheKey(params: {
   model: string;
   stablePrefix: string;
+  contextPrefixIdentity?: Pick<ContextPrefixIdentityV1, 'checksum'>;
   userIntent: string;
   dayBucket?: string;
   routingSignature?: string;
@@ -489,6 +492,7 @@ export function generatePromptCacheKey(params: {
   const normalized = {
     model: params.model,
     stablePrefix: params.stablePrefix,
+    contextPrefixIdentityChecksum: params.contextPrefixIdentity?.checksum ?? '',
     userIntent: params.userIntent,
     dayBucket: params.dayBucket ?? new Date().toISOString().slice(0, 10),
     routingSignature: params.routingSignature ?? '',
@@ -509,6 +513,12 @@ export function buildAcePacketCacheKey(input: {
   userIntent?: string;
   routingSignature?: string;
   dynamicContextSignature?: string;
+  /** Hash of output-affecting generation controls for exact-answer reuse. */
+  generationControlsSignature?: string;
+  /** Canonical hash of the exact ordered messages sent to the model. */
+  renderedRequestChecksum?: string;
+  /** Available manifest identity; omitted only for legacy/degraded contexts. */
+  contextManifestIdentity?: unknown;
   dayBucket?: string;
 }) {
   const raw = [
@@ -517,10 +527,152 @@ export function buildAcePacketCacheKey(input: {
     input.userIntent ?? 'unknown',
     input.routingSignature ?? 'none',
     input.dynamicContextSignature ?? 'none',
+    input.generationControlsSignature ?? 'none',
+    input.renderedRequestChecksum ?? 'none',
+    input.contextManifestIdentity == null
+      ? 'none'
+      : canonicalSha256V1({ schema: 'atlas.ace-context-manifest-identity.v1', value: input.contextManifestIdentity }),
     input.dayBucket ?? new Date().toISOString().slice(0, 10),
   ].join('|');
 
   return `ace:packet:${hashStr(raw)}`;
+}
+
+/**
+ * Canonicalize output-affecting generation controls before binding them to an
+ * exact-answer packet key. Nested tool-choice objects are sorted by the shared
+ * Parent Atlas serializer, so equivalent objects cannot diverge by property order.
+ */
+export function buildAceGenerationControlsSignatureV1(input: {
+  temperature: number;
+  maxTokens: number;
+  topP?: number | null;
+  presencePenalty?: number | null;
+  frequencyPenalty?: number | null;
+  toolChoice?: unknown;
+}): string {
+  return canonicalSha256V1({
+    schema: 'atlas.ace-generation-controls.v1',
+    temperature: input.temperature,
+    maxTokens: input.maxTokens,
+    topP: input.topP ?? null,
+    presencePenalty: input.presencePenalty ?? null,
+    frequencyPenalty: input.frequencyPenalty ?? null,
+    toolChoice: input.toolChoice ?? null,
+  });
+}
+
+export type AceExactAnswerCacheAdmissionV1 =
+  | { admitted: true; manifestIdentityChecksum: string }
+  | { admitted: false; reason: string };
+
+/**
+ * Fail-closed admission for exact answer reuse. The legacy ACE manifest and
+ * compact packet key are intentionally insufficient for this decision: an
+ * answer may be reused only when the complete V2 evidence/runtime identity
+ * and the exact rendered request are available.
+ */
+export function assessAceExactAnswerCacheAdmissionV1(input: {
+  contextManifestV2?: unknown;
+  modelRevision?: string | null;
+  chatTemplateRevision?: string | null;
+  toolSchemaRevision?: string | null;
+  promptTemplateRevision?: string | null;
+  renderedRequestChecksum?: string | null;
+  generationControlsSignature?: string | null;
+}): AceExactAnswerCacheAdmissionV1 {
+  const manifest = input.contextManifestV2;
+  if (!manifest || typeof manifest !== 'object') {
+    return { admitted: false, reason: 'MISSING_CONTEXT_MANIFEST_V2' };
+  }
+
+  const value = manifest as Record<string, unknown>;
+  if (
+    value.schema !== 'atlas.context-manifest.v2' ||
+    typeof value.identityChecksum !== 'string' ||
+    !/^[a-f0-9]{64}$/i.test(value.identityChecksum)
+  ) {
+    return { admitted: false, reason: 'INVALID_CONTEXT_MANIFEST_V2' };
+  }
+
+  const identityInput = value.identityInput;
+  const evidenceRevisions =
+    identityInput && typeof identityInput === 'object'
+      ? (identityInput as Record<string, unknown>).evidenceRevisions
+      : null;
+  if (!evidenceRevisions || typeof evidenceRevisions !== 'object') {
+    return { admitted: false, reason: 'MISSING_EVIDENCE_REVISIONS' };
+  }
+
+  for (const revisionName of [
+    'sourceRevision',
+    'representationRevision',
+    'featureRevision',
+    'ontologyRevision',
+    'modelRevision',
+    'promptTemplateRevision',
+  ]) {
+    const revision = (evidenceRevisions as Record<string, unknown>)[revisionName];
+    if (typeof revision !== 'string' || revision.trim().length === 0) {
+      const reasonName = revisionName.replace(/[A-Z]/g, (letter) => `_${letter}`).toUpperCase();
+      return { admitted: false, reason: `MISSING_${reasonName}` };
+    }
+  }
+
+  if (input.modelRevision !== (evidenceRevisions as Record<string, unknown>).modelRevision) {
+    return { admitted: false, reason: 'MODEL_REVISION_MISMATCH' };
+  }
+  if (input.promptTemplateRevision !== (evidenceRevisions as Record<string, unknown>).promptTemplateRevision) {
+    return { admitted: false, reason: 'PROMPT_TEMPLATE_REVISION_MISMATCH' };
+  }
+
+  const requiredRuntimeFields: Array<[string, unknown]> = [
+    ['modelRevision', input.modelRevision],
+    ['chatTemplateRevision', input.chatTemplateRevision],
+    ['toolSchemaRevision', input.toolSchemaRevision],
+    ['promptTemplateRevision', input.promptTemplateRevision],
+    ['renderedRequestChecksum', input.renderedRequestChecksum],
+    ['generationControlsSignature', input.generationControlsSignature],
+  ];
+  for (const [name, valueToCheck] of requiredRuntimeFields) {
+    if (typeof valueToCheck !== 'string' || valueToCheck.trim().length === 0) {
+      return { admitted: false, reason: `MISSING_${name.replace(/[A-Z]/g, (letter) => `_${letter}`).toUpperCase()}` };
+    }
+  }
+
+  return { admitted: true, manifestIdentityChecksum: value.identityChecksum };
+}
+
+/**
+ * Builds the completion key for a caller that has passed strict V2 admission.
+ * Throwing on failed admission is intentional: a V2 caller must rebuild from
+ * canonical evidence instead of silently falling back to a legacy key.
+ */
+export function buildAceRevisionedExactAnswerCacheKeyV1(input: {
+  contextManifestV2?: unknown;
+  userQueryHash: string;
+  modelRevision?: string | null;
+  chatTemplateRevision?: string | null;
+  toolSchemaRevision?: string | null;
+  promptTemplateRevision?: string | null;
+  renderedRequestChecksum?: string | null;
+  generationControlsSignature?: string | null;
+}): string {
+  const admission = assessAceExactAnswerCacheAdmissionV1(input);
+  if (!admission.admitted) {
+    throw new Error(`ACE_EXACT_CACHE_NOT_ADMISSIBLE:${admission.reason}`);
+  }
+  return `ace:completion:v2:${canonicalSha256V1({
+    schema: 'atlas.ace-revisioned-exact-answer-key.v1',
+    manifestIdentityChecksum: admission.manifestIdentityChecksum,
+    userQueryHash: input.userQueryHash,
+    modelRevision: input.modelRevision,
+    chatTemplateRevision: input.chatTemplateRevision,
+    toolSchemaRevision: input.toolSchemaRevision,
+    promptTemplateRevision: input.promptTemplateRevision,
+    renderedRequestChecksum: input.renderedRequestChecksum,
+    generationControlsSignature: input.generationControlsSignature,
+  })}`;
 }
 
 /**
@@ -529,6 +681,45 @@ export function buildAcePacketCacheKey(input: {
  */
 export function buildAceCompletionCacheKey(packetKey: string, userQueryHash: string) {
   return packetKey.replace('ace:packet:', 'ace:completion:') + `:${userQueryHash}`;
+}
+
+/**
+ * Build the ACE preflight cache key from every input that can change the
+ * selected preflight cards. This is still a derived preflight cache key; it
+ * is not a substitute for the complete ContextManifestV2 prompt identity.
+ */
+export function buildAcePromptPreflightCacheKeyV1(input: {
+  query: string;
+  pipeline: string;
+  modelRevision: string;
+  systemPromptHash: string;
+  toolDefinitionsHash: string;
+  repositoryRevision: string;
+  backend: string;
+  caseId?: string;
+  filePath?: string;
+  sourceRefs?: readonly string[];
+  chunkIds?: readonly string[];
+  packetKeys?: readonly string[];
+  contextManifestIdentity?: unknown;
+}): string {
+  const normalized = {
+    schema: 'atlas.ace-prompt-preflight-cache-key.v1',
+    query: input.query,
+    pipeline: input.pipeline,
+    modelRevision: input.modelRevision,
+    systemPromptHash: input.systemPromptHash,
+    toolDefinitionsHash: input.toolDefinitionsHash,
+    repositoryRevision: input.repositoryRevision,
+    backend: input.backend,
+    caseId: input.caseId ?? null,
+    filePath: input.filePath ?? null,
+    sourceRefs: [...new Set(input.sourceRefs ?? [])].sort(),
+    chunkIds: [...new Set(input.chunkIds ?? [])].sort(),
+    packetKeys: [...new Set(input.packetKeys ?? [])].sort(),
+    contextManifestIdentity: input.contextManifestIdentity ?? null,
+  };
+  return `ace:ctx:${hashStr(JSON.stringify(normalized))}`;
 }
 
 /**

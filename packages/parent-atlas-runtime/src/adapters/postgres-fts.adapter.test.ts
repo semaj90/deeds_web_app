@@ -20,6 +20,17 @@ describe('searchPostgresFts', () => {
     expect(execute).not.toHaveBeenCalled();
   });
 
+  it('preserves explicit PostgreSQL scorer metadata', async () => {
+    const { db } = fakeDb([{
+      id: '1', packet_key: 'p1', source_ref: 'src/a.ts', feature_id: 'f1', content_hash: 'h1',
+      lexical_score: 0.5, title: 'a', snippet: 'snip', identity_resolution_source: 'source_ref_content_hash_exact',
+    }]);
+    const [candidate] = await searchPostgresFts({ db, query: 'find a', limit: 1 });
+    expect(candidate?.score_type).toBe('PG_TS_RANK_CD');
+    expect(candidate?.scorer_revision).toBe('postgres-18-ts-rank-cd-v1');
+    expect(candidate?.text_search_config).toBe('english');
+  });
+
   it('tags exact-lane rows with source_ref_content_hash_exact', async () => {
     const { db } = fakeDb([{
       id: 'p1', packet_key: 'packet:1', source_ref: 'src/a.ts', feature_id: 'feature:a',

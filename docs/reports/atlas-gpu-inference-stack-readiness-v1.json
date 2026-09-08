@@ -1,0 +1,94 @@
+{
+  "schema": "atlas.gpu-inference-stack-readiness.v1",
+  "observedAt": "2026-09-06",
+  "status": "WORKING_BASE_LANES_WITH_EXPORT_AND_TOOLCHAIN_GAPS",
+  "hardware": {
+    "gpu": "NVIDIA GeForce RTX 3060 Ti",
+    "computeCapability": "8.6",
+    "driver": "580.88",
+    "vramMiB": 8192
+  },
+  "windows": {
+    "cudaToolkitsObserved": ["13.0", "12.8"],
+    "cudaPath": "13.0",
+    "torch": "2.8.0+cu128",
+    "torchCudaRuntime": "12.8",
+    "onnxruntime": "1.27.0",
+    "onnxruntimeProviders": ["AzureExecutionProvider", "CPUExecutionProvider"],
+    "tensorrt": "10.13.3.9",
+    "tritonWindows": "3.2.0.post17",
+    "cuTile": false
+  },
+  "wslRapids": {
+    "environment": "atlas-rapids-cu13",
+    "torch": "2.13.0+cu130",
+    "torchCudaRuntime": "13.0",
+    "cudaAvailable": true,
+    "gpu": "NVIDIA GeForce RTX 3060 Ti",
+    "cudf": "26.06.01",
+    "cugraph": "26.06.00",
+    "cuvs": "26.06.00",
+    "cuTile": false,
+    "systemNvcc": "not observed",
+    "latestCu132TorchAvailable": "2.14.0+cu132",
+    "latestCudaTileAvailable": "1.5.0",
+    "cu132WheelInstalled": false,
+    "cudaTilePackageInstalled": false
+  },
+  "isolatedCu132": {
+    "environment": "/home/james/.venvs/atlas-cutile-cu132",
+    "torch": "2.14.0+cu132",
+    "torchCudaRuntime": "13.2",
+    "cudaTile": "1.5.0",
+    "tileCompiler": "13.2.78",
+    "sm86Smoke": "passed",
+    "cutileSimtGemmParity": "passed for 256x256x256 and 512x512x512 FP16 probes",
+    "purpose": "isolated SIMT/cuTile alignment experiment"
+  },
+  "llamaServer": {
+    "port": 8090,
+    "health": "ok",
+    "model": "ornith-1.5-9b",
+    "role": "production synthesis and tool use",
+    "mtpDraftActive": false,
+    "atlasGemmaRankLoaded": false
+  },
+  "atlasGemmaRank": {
+    "checkpoint": "models/gemma4_assistant_huggingface_7_3_26/model.safetensors",
+    "cpuForward": "proven bounded finite batch",
+    "rankHeadTrained": false,
+    "cudaForward": "finite/order proven; numerical parity open",
+    "cudaForwardProbe": "docs/reports/atlas-gemma-rank-cuda132-forward-probe-v1.json",
+    "onnxExport": false,
+    "webgpuArtifact": false,
+    "canonicalSemanticLane": "semantic_768"
+  },
+  "onnxWebGpu": {
+    "transformers": "4.2.0",
+    "onnxruntimeNode": "1.29.0",
+    "browserAssets": "sveltekit-frontend/static/gemma4_e2b_onnx/onnx",
+    "role": "existing Gemma4 generation/embedding helper, not AtlasGemmaRank",
+    "gpuAdapterProof": "previously unavailable",
+    "dependencyAlignment": "conflicted workspace versions; isolated service exists"
+  },
+  "triton": {
+    "onnxModelRepository": true,
+    "backend": "ONNX Runtime scaffold",
+    "dockerDaemon": "unavailable",
+    "serverLive": false,
+    "tensorrtLlmEngine": false,
+    "textDecodeLoop": false
+  },
+  "promotionGates": [
+    "standalone BF16 forward on CUDA with uncontended RTX receipt",
+    "mxbai teacher versus AtlasGemma ranking parity",
+    "ONNX export and BF16/INT8 parity",
+    "Q4/Q4F16 quality and latency comparison",
+    "WebGPU provider and adapter availability proof",
+    "Triton or TensorRT-LLM engine only after a real exported ranker exists",
+    "cuTile SM86 proof requires a separately measured CUDA 13.2 toolkit lane",
+    "if upgrading, clone the WSL environment first; do not replace the proven RAPIDS environment in place"
+  ],
+  "noWrites": true,
+  "canonicalAuthority": false
+}

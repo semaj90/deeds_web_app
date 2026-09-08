@@ -374,5 +374,40 @@
     "archived": "2026-09-05T17:02:18.018Z",
     "archivedTo": "deeds_labs/archive/2026-09-05/audit-current-graphify-snapshot-authority-v1.sveltekit-side-variant.mts.bak",
     "reason": "Duplicate-owner collision (CURRENT-SOURCE-SNAPSHOT-RESOLVE-01): a concurrent session independently wrote scripts/atlas/audit-current-graphify-snapshot-authority-v1.mts (repo root) with the same producerRevision, same output paths, and near-identical qualification logic. The repo-root version was kept as canonical (portable relative import, explicit workspace_id resolution) and enhanced with this file's independent live-git-tree checksum cross-check plus a nonzero exit code on non-proven status. See openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md for the full merge record."
+  },
+  {
+    "path": "sveltekit-frontend/src/lib/server/atlas/identity/tree-node-id-extractor.ts",
+    "sha256": "069f0e35112a3fc79726589d741dcb5a998ded3b04bd91a4887e5ecc33da89e8",
+    "archived": "2026-09-07",
+    "archivedTo": "deeds_labs/archive/2026-09-07/tree-node-id-extractor.ts.dead-orphan.bak",
+    "reason": "TREE-NODE-ID-OWNER-RECONCILE-01: confirmed dead orphan, zero callers anywhere in src/ (grep -rl \"computeTreeNodeId\b\" matched only this defining file). Its own derivation (file_path:line:col:node_type, unhashed) is a different, competing scheme from the live tree_node_id authority actually consumed by production code (TreeNodeIdentityAuthoritySchema in src/lib/schemas/tree_node_identity_schema.js, read via enriched-tree-node-contract.ts). Archived to prevent a future agent from wiring this dead implementation in as if it were the tree_node_id producer. See openspec/changes/parent-atlas-pass-fabric/tasks.md (title_id / computePacketKey cross-reference, 2026-09-07) for the full trace."
+  },
+  {
+    "path": "sveltekit-frontend/scripts/smoke-trace-mcp-tools.mjs",
+    "sha256": "5eccb8f009f2f1c8534ecdd33216194e137850d2036b6c236205d60528730847",
+    "archived": "2026-09-07",
+    "archivedTo": "deeds_labs/archive/2026-09-07/smoke-trace-mcp-tools.mjs.dead-superseded.bak",
+    "reason": "TRACE-MCP-TOOLING-DEDUP-01: confirmed zero callers anywhere in the repo (checked npm scripts, other scripts, docs, CI -- no hits beyond its own self-reference). Superseded by sveltekit-frontend/scripts/trace-mcp-tool-audit.mjs, which is actively wired (npm run trace:mcp:audit / :verbose), more recent (last touched 2026-07-21 vs this file's 2026-05-08 git history), and does 4 real gates (provenance/breadth/concurrency/idempotency) against the same live :8788/mcp endpoint this file also targeted with a simpler PASS/FAIL/SKIP per tool. Archived to prevent a future agent from re-wiring the superseded, less-capable duplicate."
+  },
+  {
+    "path": "triton-trt-llm/model-repositories/gemma4-onnx-q4f16/",
+    "sha256": "c8b79784c70978315f73cc8515b2ec9a9910c908d0e11170bb5e88d0a8727335",
+    "archived": "2026-09-07T20:35:00Z",
+    "archivedTo": "deeds_labs/archive/2026-09-07/triton-trt-llm-model-repositories-gemma4-onnx-q4f16.tar.gz",
+    "reason": "TRITON-MODEL-REPO-DEDUP-01: 2.9GB directory holding embed_tokens_q4f16.onnx_data + decoder_model_merged_q4f16.onnx_data, confirmed superseded, not orphaned. Traced triton-trt-llm/README.md's own documented command (npm run atlas:gemma4:onnx:triton:repo) to sveltekit-frontend/package.json:626 -> node ../scripts/atlas/materialize-gemma4-onnx-triton-repo.mjs --apply -- the root-level script, which writes to triton-model-repository/ (repo root), never to this nested path. The would-be nested producer (triton-trt-llm/scripts/materialize-gemma4-onnx-triton-repo.mjs) exists but is not in the workspace's own official call path. Two other copies of the same underlying model remain live and untouched: triton-model-repository/ (CANONICAL_ARTIFACT_OWNER, what the documented command actually produces) and sveltekit-frontend/static/gemma4_e2b_onnx/ (ACTIVE_EXECUTOR, browser/client ONNX path via gemma4-e2b-session.ts). The triton-trt-llm/ workspace itself was NOT archived or altered -- its own README explicitly labels it Status: scaffolded / experimental, real active work, not abandoned; only this specific superseded model-repository subdirectory was archived. Compressed archive is 2.79GB (tar.gz barely reduces dense binary ONNX weights). See openspec/changes/parent-atlas-ontology-kernel/tasks.md INFRA-OBSERVABILITY-SWEEP-01 for the full multi-step trace (including a same-session self-correction where this was first wrongly called orphaned, then wrongly called not-provably-safe, before being definitively resolved)."
+  },
+  {
+    "path": "backups/atlas-2026-05-17T21-21-53-987Z/",
+    "sha256": "3c555efb388dfe90e87d976b3cab54b96c9d3e96a7819b4458881cc672290271",
+    "archived": "2026-09-07T20:54:00Z",
+    "archivedTo": "deeds_labs/archive/2026-09-07/backups-atlas-2026-05-17.tar.gz",
+    "reason": "BACKUP-RETENTION-01, user-approved: ~4-month-old Postgres/Qdrant/Neo4j backup superseded by the more recent backups/qdrant-upgrade-20260825-211412/ and legal_ai_db_20260825_112807.dump (kept, untouched). Retention policy: keep most recent backup per category + one older known-good fallback; this predates the Aug 25 backups by ~3 months with nothing pointing to it as the intended fallback."
+  },
+  {
+    "path": "artifacts/qdrant-volume-exports-2026-04-01/",
+    "sha256": "846f3c1d390c17e383c00db6c1a945ba72a5c443a92cd2884bd41200023b866e",
+    "archived": "2026-09-07T20:54:00Z",
+    "archivedTo": "deeds_labs/archive/2026-09-07/qdrant-volume-exports-2026-04-01.tar.gz",
+    "reason": "BACKUP-RETENTION-01, user-approved: ~5-month-old Qdrant volume export, same retention policy as the atlas-2026-05-17 entry above."
   }
 ]

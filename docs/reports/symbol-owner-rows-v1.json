@@ -1,0 +1,34 @@
+{
+  "schema": "atlas.symbol-owner-rows.v1",
+  "generatedAt": "2026-09-07T22:32:22.477Z",
+  "mode": "READ_ONLY_ROW_AUDIT",
+  "writes": {
+    "postgres": false,
+    "qdrant": false,
+    "neo4j": false,
+    "valkey": false
+  },
+  "databaseError": null,
+  "summary": {
+    "totalRows": 285,
+    "distinctSymbolVersionIds": 285,
+    "duplicateSymbolVersionIds": 0,
+    "missingRevisionRows": 0,
+    "missingSourceRows": 0,
+    "workspaceRevisionCounts": [
+      {
+        "workspace_revision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+        "row_count": 85
+      },
+      {
+        "workspace_revision": "workspace:0",
+        "row_count": 200
+      }
+    ],
+    "expectedWorkspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+    "expectedWorkspaceRows": 85
+  },
+  "ownerRowsStructurallyEligible": true,
+  "promotionAllowed": false,
+  "reason": "Row integrity does not prove current Graphify lineage or authorize durable proposal admission."
+}

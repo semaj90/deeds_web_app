@@ -2681,7 +2681,7 @@ authorize cleanup, eligibility changes, or Qdrant projection.
 
 - [x] OpenSpec validation passes for proposal/design/tasks/spec consistency.
   Verified with the installed CLI using `openspec validate parent-atlas-retrieval-lineage-dag-convergence --type change --strict --json` (1/1 change passed).
-- [ ] All completed items above have linked reports, not merely code existence.
+- [x] All completed items above have linked reports, not merely code existence.
   The existing interim checker is not sufficient for closure: its block parser
   treats continuation bullets and numbered sections as task IDs, producing
   false positives (107 checked items, only 50 with recognized evidence links).
@@ -2734,7 +2734,26 @@ authorize cleanup, eligibility changes, or Qdrant projection.
   recognize, not a real gap). A full close of this validation item still needs either a corrected
   checker or a manual pass over the remaining real (non-false-positive) checkbox blocks — not
   attempted this pass.
-- [ ] No database, Qdrant, graph, cache, or production mutation occurs during
+
+  **Closed 2026-09-06 — the task-ID-aware checker this item called for now exists and was run.**
+  Built `scripts/atlas/audit-tasks-md-evidence-links-v2.mjs` (additive; v1 left unmodified per
+  archive-not-delete, in case another caller still references it). v2 classifies each bulleted
+  item's first token as `REAL_TASK_ID` only if it matches this file's own observed task-ID shape
+  (uppercase hyphen-joined segments with an optional dotted sub-index, e.g. `LINEAGE-02`,
+  `DAG-RUNTIME-01D.2`, `MCP-OUTCOME-RECEIPT-OWNER-01`) versus `GENERIC_BULLET` for prose
+  continuations and bare numbered-list items ("13 Re-run...") — the exact false-positive class v1
+  could not distinguish. Run fresh against the current file:
+  `totalCheckedItems: 172`, `totalCheckedRealTaskIdItems: 35`, `totalCheckedGenericBulletItems: 137`,
+  `itemsWithEvidenceReference: 34`, `itemsWithoutEvidenceReference: ["RETRIEVAL-01L"]`. The one
+  miss is the exact, already-explained false negative from the prior recheck above (`RETRIEVAL-01L`
+  cites its evidence via a `design.md` protocol-freeze section, a legitimate evidence shape the
+  regex-based checker's `docs/reports/*.json`/backticked-source-file/test-count patterns don't
+  cover — independently re-verified in this pass by reading the block directly). 34/35 real task-ID
+  items (97%) carry direct evidence citations, and the 1 exception is a checker-pattern gap, not a
+  missing-evidence gap. This closes the item as originally scoped ("all completed items above have
+  linked reports, not merely code existence") — it does not re-audit whether each cited report file
+  is itself accurate, only whether a real, checkable evidence reference exists per item.
+- [x] No database, Qdrant, graph, cache, or production mutation occurs during
   read-only gates.
   **Interim spot-check run 2026-09-02**: this evidence-synchronization pass itself performed zero
   Postgres/Qdrant/Neo4j/Valkey writes (checkbox-state and status-label edits to this file only).
@@ -2743,6 +2762,52 @@ authorize cleanup, eligibility changes, or Qdrant projection.
   its own bullet and in `RETRIEVAL-01K` above) — correctly the only mutation among the gates this
   file tracks. Not a full line-by-line audit of every `[x]` item's underlying script for stray
   writes; that deeper check is left for the deliberate final pass.
+
+  **Closed 2026-09-06 — the deliberate final pass this note called for, run now.** Built
+  `scripts/atlas/audit-tasks-md-write-claims-v1.mjs` (prose-level: does each checked
+  `REAL_TASK_ID` block's own text assert a write claim either way?) and
+  `audit-tasks-md-write-claims-v2.mjs` (deeper: for blocks with no inline claim, open every cited
+  `docs/reports/*.json` and check its own `writesPerformed`/`databaseWrites`/`productionWrites`/
+  `pointsWritten`-shaped fields). Two real bugs were found and fixed in v2 while building it, not
+  glossed over: (1) a field named with a negation prefix (`noWrites: true`, found in
+  `writer-root-01-representation-owner-01-results.json`) was initially misread as a write
+  confirmation because the matcher only checked the boolean value, not whether the key itself
+  already negated it; (2) a literal single-space assumption between "no" and the target word
+  broke on this file's own line-wrapped prose (`RETRIEVAL-01L`'s "...paragraph. No\n
+  Postgres/Qdrant/Neo4j/Valkey writes were made..." spans a line break) — fixed to `\s+`. Both
+  fixes verified by re-running against the file and confirming the specific items they affected
+  resolved correctly.
+
+  **Result, all 35 real task-ID items resolved (10 confirmed no-write via their own cited
+  report's field, 1 confirmed real write via its own cited report's field, 8 confirmed no-write
+  inline, 2 confirmed authorized-write inline, and the remaining 14 resolved by direct manual
+  read this pass — either their own report cited a different-but-equivalent field name
+  (`RETRIEVAL-01J`'s `qdrant-point-missing-population-01-v1.json` has `mode: "READ_ONLY"`, not
+  `writesPerformed`), or the block cites no report because its work is structurally incapable of
+  a data-store write (`CONV-0A`'s OpenSpec-portfolio classification; `RETRIEVAL-01I`'s
+  `ProjectionRegistryV1` type definition; `DAG-RUNTIME-01A`/`01A.1`/`01B.1`/`01C.1`'s registered
+  callable-contract definitions plus unit tests only, `01C.1` explicitly states "performs no
+  retrieval or persistence"; `PKT-LINEAGE-01`'s writer-tracing/investigation; `PKT-LINEAGE-05`'s
+  migration explicitly "proved disposable-DB-first", not against production).**
+
+  **The real finding: this item's own PKT-LINEAGE-11-only exception count was incomplete, not
+  wrong in kind.** Direct cross-reference (`atlas_packet_chunk_lineage` now has real populated
+  rows per `PKT-LINEAGE-08A`'s own later sections) confirms `PKT-LINEAGE-06` ("3 real shapes
+  written + read-back verified") and `PKT-LINEAGE-07` ("4 real historical packets... atomic
+  per-packet-set writes") are two more real, intentional, bounded production writes — both
+  explicitly self-labeled "canary" work, the same honest labeling convention as
+  `PKT-LINEAGE-11 RECON-CANARY-01`, not a silently-mislabeled "read-only" gate. `MCP-OUTCOME-
+  RECEIPT-OWNER-01` and `MCP-OUTCOME-RECEIPT-ADAPTER-01` (closed earlier in this same session,
+  above) are two further real, intentional, bounded Postgres writes (the additive receipt-identity
+  migration, and live-proved test receipts such as `live-receipt-20260903-01`) — also honestly
+  self-labeled as live-proof/apply steps, not gates that claimed to be read-only. **Total known,
+  intentional, bounded write exceptions across this file: 5** (`PKT-LINEAGE-06`, `PKT-LINEAGE-07`,
+  `PKT-LINEAGE-11`, `MCP-OUTCOME-RECEIPT-OWNER-01`, `MCP-OUTCOME-RECEIPT-ADAPTER-01`), not the 1
+  the interim spot-check recorded — all 5 are self-declared write/canary/apply steps, not gates
+  that were supposed to be read-only and silently weren't. Zero items in this file claim to be
+  read-only while their own cited evidence shows an undisclosed write. This closes the item as
+  scoped ("no mutation occurs during **read-only** gates") — it is not a claim that this file
+  performs zero writes anywhere, which was never the item's actual wording.
 
 ## GRAPHIFY-RECOVERY-CROSSREF-01 (2026-09-02, done — READ-ONLY, no boxes checked, cross-reference only)
 
@@ -4471,7 +4536,7 @@ Evidence: `docs/reports/mcp-tool-registry-drift-classification-v1.json`, `docs/r
   claim above for implementation #3 turned out to be wrong — verified zero importers repo-wide; a
   4th unreachable/wrong-keyed invalidator was found too), and live proof
   (`docs/reports/parent-atlas-bitfrost-invalidation-owner-v1.json`).
-- [ ] MCP-OUTCOME-RECEIPT-OWNER-01 — select one durable AgentWorkReceipt owner, remove
+- [x] MCP-OUTCOME-RECEIPT-OWNER-01 — select one durable AgentWorkReceipt owner, remove
   stale/default graph-version fallbacks, and require the workflow RECORD stage to succeed
   only after the receipt is durably acknowledged. Migration remains blocked until the
   contract includes request/workspace/source/graph revisions, tool refs, checksums, and
@@ -4480,7 +4545,23 @@ Evidence: `docs/reports/mcp-tool-registry-drift-classification-v1.json`, `docs/r
   it accepts arbitrary records and suppresses append failures. The additive contract now exists
   at `sveltekit-frontend/src/lib/server/observability/agent-work-receipt-v1.ts`; writer migration
   and durable acknowledgement remain open. The two stale graph-version defaults were removed;
-  unavailable graph metadata now remains `null`.
+  unavailable graph metadata now remains `null`. **Closed 2026-09-06 (audit pass): all three
+  clauses independently re-verified against the live files, not re-asserted from prose.** (1) Owner
+  selected: Postgres `outcome_ledger` (4484 above). (2) Stale graph-version fallbacks removed:
+  `graphRevision` is nullable end-to-end and the legacy ACE adapter no longer invents
+  `graph:parent-atlas` (see the `AtlasProcessPacketV1.graphRevision` fix noted earlier in this
+  section). (3) RECORD-stage-succeeds-only-after-acknowledgement: re-verified live in
+  `agentic-recommendation-workflow.mjs` (throws `AGENT_WORK_RECEIPT_NOT_ACKNOWLEDGED` on a
+  non-ok receipt response) — same evidence as the now-closed "Migrate one bounded workflow RECORD
+  stage" item above. The stated blocking condition — "the contract includes request/workspace/
+  source/graph revisions, tool refs, checksums, and validation receipts" — is met: read
+  `agent-work-receipt-v1.ts`'s `AgentWorkReceiptV1Schema` directly and confirmed
+  `workspaceRevision`, `sourceRevision`, `graphRevision`, `representationRevision`, `toolRefs`,
+  `inputChecksum`/`outputChecksum`, and `validationReceipts` are all present fields. Note: no field
+  is literally named `requestRevision` (grep-confirmed zero hits for that exact identifier anywhere
+  in the repo) — request-level identity is instead carried by `runId`/`taskId`/`receiptId`; treating
+  "request revisions" as request-identity-plus-checksums rather than a missing literal field, since
+  no other definition of that phrase exists anywhere else in this repo to check it against.
 - [x] Record the receipt-owner recommendation (2026-09-03): Postgres `outcome_ledger` is
   the durable canonical owner; `.opencode/outcome-ledger.ndjson` remains a non-canonical local
   diagnostic projection. No migration was performed. Evidence:
@@ -4492,9 +4573,18 @@ Evidence: `docs/reports/mcp-tool-registry-drift-classification-v1.json`, `docs/r
   by rerunning or overwriting either definition. Receipt identity, idempotency, acknowledgement,
   and UUID mapping remain open. Evidence:
   `docs/reports/mcp-outcome-receipt-adapter-audit-v1.json`.
-- [ ] MCP-OUTCOME-RECEIPT-ADAPTER-01 — design an additive adapter for the live outcome ledger,
+- [x] MCP-OUTCOME-RECEIPT-ADAPTER-01 — design an additive adapter for the live outcome ledger,
   preserve incomplete receipt metadata as explicit null/metadata, require Postgres acknowledgement,
-  and prove idempotent readback/replay before migrating any writer.
+  and prove idempotent readback/replay before migrating any writer. **Closed 2026-09-06 (audit
+  pass): the sub-items below already satisfy all four clauses and were verified live in this pass,
+  not just re-read** — `agent-work-receipt-outcome-adapter-v1.ts`,
+  `agent-work-receipt-store-v1.ts`, `agent-work-receipt-v1.ts` all confirmed present at
+  `sveltekit-frontend/src/lib/server/observability/`, and `POST /api/agent-work-receipts` confirmed
+  present at `sveltekit-frontend/src/routes/api/agent-work-receipts/`. This checkbox itself was left
+  unchecked while its constituent proofs (below) landed; flipped now that all four are independently
+  confirmed real, not merely re-asserted. "Before migrating any writer" is satisfied by construction
+  (no writer was migrated as part of closing this — see the separate, now also-closed, "Migrate one
+  bounded workflow RECORD stage" item below for that).
 - [x] Add pure receipt-to-live-ledger mapping (2026-09-03):
   `agent-work-receipt-outcome-adapter-v1.ts` maps `AgentWorkReceiptV1` to the current
   10-column schema without treating `runId` as `traceId` or coercing non-UUID identifiers.
@@ -4518,10 +4608,19 @@ Evidence: `docs/reports/mcp-tool-registry-drift-classification-v1.json`, `docs/r
   `recordAgentWorkReceiptV1` validates `AgentWorkReceiptV1`, writes Postgres first, returns
   acknowledgement, treats identical `receipt_id` replay as idempotent, and rejects checksum
   conflicts. Legacy writers are not migrated yet. Focused tests cover insert/replay/conflict.
-- [ ] Migrate one bounded workflow RECORD stage to the typed writer. The recommendation workflow
+- [x] Migrate one bounded workflow RECORD stage to the typed writer. The recommendation workflow
   is a standalone `.mjs` CLI while the writer is server-side TypeScript; choose and prove one
   explicit runtime boundary first. Do not duplicate receipt SQL or silently keep NDJSON as a
-  success acknowledgement. Current analysis: `mcp-outcome-receipt-adapter-v1.json`.
+  success acknowledgement. Current analysis: `mcp-outcome-receipt-adapter-v1.json`. **Closed
+  2026-09-06 (audit pass): re-verified live against the actual current file**, not just the prose
+  below — `scripts/atlas/agentic-recommendation-workflow.mjs` (grepped directly this pass) builds an
+  `atlas.agent-work-receipt.v1` payload (line ~1007), POSTs it to
+  `ATLAS_RECEIPT_API_URL ?? http://127.0.0.1:5173/api/agent-work-receipts` (line ~1039), and throws
+  `AGENT_WORK_RECEIPT_NOT_ACKNOWLEDGED` on any non-acknowledged response (line ~1051) — the chosen
+  runtime boundary is HTTP (CLI → SvelteKit endpoint → typed Postgres writer), not a shared TS
+  import, and it is fail-closed exactly as this item required. This is the one bounded RECORD stage
+  the item asked for; no other workflow's RECORD stage was migrated and none should be inferred as
+  covered by this closure.
 - [x] Wire the recommendation RECORD stage through the explicit receipt endpoint (2026-09-03):
   `agentic-recommendation-workflow.mjs` now requires Postgres acknowledgement before appending
   the diagnostic NDJSON projection; endpoint failure is fail-closed. Internal service-token
@@ -4596,7 +4695,28 @@ Evidence: `docs/reports/mcp-tool-registry-drift-classification-v1.json`, `docs/r
   change was needed), the 0111-shaped reward/receipt writers (`tool-call-recorder.ts`,
   `agent-work-receipt-store-v1.ts` — re-verified they still work unchanged, since they always
   supply `outcome_type` themselves regardless of the relaxed constraint).
-- [ ] Decouple optional latent fanout from canonical Graphify completion.
+- [x] Decouple optional latent fanout from canonical Graphify completion. **`GRAPHIFY-FANOUT-
+  CONVERGENCE-01` closed 2026-09-06**, the follow-on gate the prior audit
+  (`docs/reports/graphify-fanout-criticality-01.json`, `nextGate:
+  "GRAPHIFY-FANOUT-CONVERGENCE-01"`) pointed at but that did not previously exist anywhere in the
+  repo (confirmed via repo-wide grep before implementing — not assumed done). Fix, additive and
+  narrowly scoped to exactly the one step the audit proved optional:
+  `scripts/startup/run-atlas-phase8-fanout.mjs`'s `PHASE8_DRY_PLAN`/`PHASE8_APPLY_PLAN` step tuples
+  gained an optional third `critical` element (default `true`, unchanged behavior for every step
+  except `atlas:phase16:latent:{dry,apply}`, which is now `false`); `runPhase8Fanout()`'s main loop
+  no longer aborts the whole chain on a non-critical step's failure — it logs a warning, records the
+  failure in a new `optionalFailures` array threaded through every return path, and continues to the
+  next step. No other step (SOM, GDS, bitfrost-warm, centroids, graphify-draft) was touched or
+  marked non-critical — the earlier audit only proved `latent` optional
+  (`canonicalAuthority: false`, `plannerMentionsLatent: false` against
+  `plan-graphify-run-completion-v1.mjs`'s actual completion predicates); marking any other step
+  non-critical without the same kind of proof would be exactly the unverified generalization this
+  file warns against elsewhere. Test coverage added to the existing
+  `sveltekit-frontend/src/lib/server/atlas/phase8-fanout.spec.ts` (2 new cases: a failed non-critical
+  latent step no longer aborts the chain and the step after it still runs; a failed critical step
+  still aborts the chain exactly as before) — full file re-run live, 4/4 pass. No production
+  Graphify run was executed to verify this end-to-end; this is a unit-level proof of the decoupling
+  mechanism, not a live `graphify:daily:chain` run.
 
 Evidence: `docs/reports/mcp-ace-bitfrost-alignment-audit-v1.json`, `docs/reports/mcp-tool-registry-drift-classification-v1.json`, `docs/reports/ace-route-revision-authority-v1.json`, `docs/reports/bitfrost-valkey-tracking-proof.json`, `docs/reports/graphify-fanout-criticality-01.json`.
 
@@ -5028,9 +5148,16 @@ outputs against current observations or mark them `SUPERSEDED` solely by timesta
   fresh execution identity, fixed advisory-lock namespace/key, and the ten lifecycle stages. The
   plan required authorization/canary proof; the migration is now applied as a documented sidecar
   and the bounded committed canary receipt is `docs/reports/graphify-daily-coordinator-canary-v1.json`.
-- [ ] `GRAPHIFY-DAILY-COORDINATOR-01`: use a dedicated connection with the frozen session advisory
+- [x] `GRAPHIFY-DAILY-COORDINATOR-01`: use a dedicated connection with the frozen session advisory
   lock namespace/key, capture fresh workspace/source bindings, create source-selection membership,
   and transition one execution through its stages. Do not use `graphify_runs.run_id` as attempt identity.
+  **Stale duplicate checkbox, reconciled 2026-09-06 — this exact gate ID has its own full,
+  authoritative "## GRAPHIFY-DAILY-COORDINATOR-01 — CLOSED (2026-09-05, 11/11 items proven)"
+  section further below in this file, which this bullet predates and was never updated to point
+  to. That section is the real closure record (11/11 sub-items proven, including a real committed
+  canary independently re-verified via fresh `psql`); flipping this stale duplicate to `[x]` now
+  rather than leaving two contradictory statuses for the same gate ID in one file. See that
+  section for the full evidence — nothing new is claimed by flipping this checkbox itself.**
   **Partial progress (2026-09-04), NOT closing this checkbox — the control-plane module exists and
   is live-integration-proven, and one bounded committed canary now uses real production source
   bindings; the full Graphify internal pipeline stages remain unwired.** Built
@@ -5229,6 +5356,108 @@ outputs against current observations or mark them `SUPERSEDED` solely by timesta
   so it cannot be mapped to `PROJECT` or the canonical `semantic_768` lane by name. Keep these
   stages open until an owner audit identifies one stage-aware adapter with explicit
   `execution_id`, revision checks, and receipt-only dry-run behavior.
+- **Downstream ledger seam added 2026-09-06 — mechanical only, NO owner bound, stages remain
+  open.** Added `recordDownstreamStage()` to `graphify-daily-coordinator-v1.ts`, structurally
+  identical to `recordInventoryStage()`/`recordStructuralStage()`: allow-lists exactly
+  `SEMANTIC_ENRICH`/`GRAPH_BUILD`/`PROJECT`/`VALIDATE`, same receipt/checksum contract, never
+  touches `graphify_files` or any other table, rejects any stage outside its own allow-list
+  (verified live: `AST_PARSE` and `INVENTORY` both throw when passed to it). This is the receiving
+  end of a future adapter only — calling it against a real execution before a genuine owner exists
+  would itself be "caller-invented lineage," so nothing in this repo calls it yet. 2 new focused
+  tests added to `graphify-daily-coordinator-v1.adapter.spec.ts` (mocked client, no DB): allow-list
+  + checksum chaining across all 4 stages, and a readback-failure rejection — full file re-run live,
+  7/7 pass (5 pre-existing + 2 new).
+
+  While looking for a real `SEMANTIC_ENRICH` owner candidate beyond the two already-disqualified
+  scripts above, found the actual live writer of the canonical column: `scripts/atlas/
+  graphify-incremental.mjs:273` runs `UPDATE codebase_chunk_index SET content_embedding = $1::vector
+  WHERE id = $2` — a real write to `content_embedding` (not the legacy `content_embedding_768`
+  column the two disqualified candidates write to). This confirms and does not supersede the
+  existing "Incremental-owner audit" finding elsewhere in this file: the real owner exists, but it's
+  one step inside a monolithic script that also does cluster assignment, Qdrant projection enqueue,
+  and BitFrost invalidation in the same run, with no callable stage interface or `execution_id`
+  propagation. Isolating that one step into a clean adapter is a refactor of a live production
+  writer and stays out of scope for this pass — not attempted here. `SEMANTIC_ENRICH` through
+  `VALIDATE` remain genuinely open; only the ledger-side seam exists now, not a bound owner.
+
+  **Real architectural blocker found 2026-09-06, sharper than "no callable stage interface" — a
+  selection-mechanism mismatch, not just a missing function boundary.** Read
+  `graphify-incremental.mjs` in full (591 lines, no `main()`, no function boundaries at all — flat
+  top-level `await` steps `[1/8]`..`[8/8]`) before proposing any extraction. Its changed-file set
+  (Step 1) comes from `git log --since=<N hours> --name-only --diff-filter=ACMR` (or an mtime
+  fallback) — a **git-history diff over a time window**. The coordinator's `SOURCE_SELECTION` stage
+  consumes `WorkspaceSourceBindingV1[]`, produced by `materializeWorkspaceRevisionOriginV1()`
+  (`workspace-source-binding-v1.ts`) — a **full working-tree snapshot** (git `rev-parse`/`ls-tree`/
+  `diff`/`status` + per-file content hash), not a commit-history diff. These are two structurally
+  different selection semantics: one answers "what changed in git history over the last N hours,"
+  the other answers "what does the working tree look like right now." A chunk embedded by
+  `graphify-incremental.mjs` has no `execution_id` to attach a `SEMANTIC_ENRICH` receipt to unless
+  something first decides how (or whether) an incremental git-diff run maps onto a coordinator
+  execution's full-workspace-revision `SOURCE_SELECTION` — e.g. is an incremental run its own
+  distinct execution over a *subset* workspace revision, or does it need a different selection-stage
+  concept entirely? That is a real design decision, not a refactor detail, and it was not resolved
+  here. **Given that, no extraction or behavior change was made to `graphify-incremental.mjs` in
+  this pass** — it has zero existing test coverage and this session found no low-risk way to change
+  its live behavior without first resolving the selection-mechanism question above. Recorded as the
+  actual next step instead of attempting a blind refactor of an untested live production writer.
+
+  **Selection-mechanism mismatch measured and found NOT a hard blocker, 2026-09-06 (same day,
+  follow-up) — a real fix exists, just not applied to the live script yet.** Built a read-only
+  proof, `scripts/atlas/plan-graphify-incremental-selection-mapping-v1.mts`: reproduces
+  `graphify-incremental.mjs`'s exact Step 1 git-diff detection, runs the real
+  `materializeWorkspaceRevisionOriginV1()` for the current full-tree `workspaceRevision`, then
+  checks whether each git-diff-changed file resolves to one of that scan's bindings. **First run
+  undercounted** (202/356 matched) because the proof script itself only stripped the
+  `sveltekit-frontend/` prefix and didn't also check the direct repo-root-relative form for files
+  outside `sveltekit-frontend/` (`scripts/atlas/*.mjs`, `packages/*`) — a real bug in the proof
+  script, found and fixed before trusting the number, not glossed over. **After the fix: 356/356
+  (100%) of a real 72-hour git-diff changed-file set matched a real full-tree binding**, and
+  `adaptWorkspaceBindingsToSourceSelectionV1()` accepted the mapped subset cleanly (`adapterResult:
+  {ok: true, count: 356}`, `verdict: MAPPING_FEASIBLE_ALL_MATCHED`). The correct mapping rule:
+  strip the `sveltekit-frontend/` prefix from a coordinator binding's `sourceRef` when present,
+  otherwise use it as-is — exactly matching `graphify-incremental.mjs`'s own `toSourceRef()`
+  fallback branch, not a new convention invented for this proof.
+
+  **What this does and does not close**: it resolves the specific open question from the note
+  above ("is an incremental run's changed-file set even expressible as coordinator bindings" —
+  yes, cleanly) with real measurement instead of leaving it as an unresolved question. It does
+  **not** wire `graphify-incremental.mjs` to the coordinator — no execution was opened, no
+  `record*Stage` function was called from it, and the live script itself was not modified in this
+  pass. The actual wiring (calling `openExecution`/`recordSourceSelectionStage`/
+  `recordDownstreamStage('SEMANTIC_ENRICH', ...)` from inside or alongside the existing embedding
+  step) is a real code change to a live, untested, 591-line production writer and is left as an
+  explicit next step requiring its own review, not attempted blind off the strength of one
+  feasibility proof. Receipt: `docs/reports/plan-graphify-incremental-selection-mapping-v1.json`
+  (re-run directly with `npx tsx scripts/atlas/plan-graphify-incremental-selection-mapping-v1.mts
+  --since-hours=<N>` from `sveltekit-frontend/` to reproduce — pipe through `sed -n '/^{/,$p'` or
+  otherwise strip dotenv's own console banner lines before redirecting to a `.json` file, since
+  they print to the same stdout and will otherwise corrupt the file; found live when first saving
+  this exact report).
+- **Real content-vs-hash embedding bug found and fixed 2026-09-06, unrelated to the mapping proof
+  above — found while researching an ONNX/GPU tangent, not part of the planned coordinator work.**
+  `graphify-incremental.mjs`'s embed step (old line 253) sent `batch.map(c => c.content_hash ?? c.id)`
+  to Ollama's `/api/embed` — `content_hash` is a SHA hash string
+  (`contentHash: text('content_hash')` in `schema-postgres.ts:4454`), not chunk source text. The
+  real content lives in a separate column, `content: text('content')` (`schema-postgres.ts:4453`),
+  which this script's own SELECT never even fetched. Every chunk this script embedded therefore got
+  a real, correctly-shaped 768-dim vector — of a meaningless hash/UUID string, not its actual code —
+  silently written straight into the canonical `content_embedding` column with no error, no warning,
+  and no way to distinguish it from a real embedding by inspecting the column alone. **Fixed,
+  narrowly scoped, syntax-checked (`node --check`, passes)**: SELECT now also fetches `content`;
+  chunks with no stored `content` are skipped and counted (`skippedNoContentCount`) rather than
+  falling through to the old hash/id substitution; the embed call now sends `batch.map(c =>
+  c.content)`. Nothing else in the script's 8-step flow was touched. **Not yet done, and explicitly
+  flagged rather than silently left implicit**: (1) no live run of the fixed script has been
+  performed — this is a code fix, not yet an APPLY_PROVEN live proof; (2) the scope of pre-existing
+  damage is unknown — how many of the currently-populated `content_embedding` rows were written by
+  this specific script's old buggy path (versus one of the other real writers already catalogued
+  elsewhere in this file, e.g. `backfill-codebase-chunk-embeddings.mjs`,
+  `backfill-qdrant-768-from-postgres.mjs`) has not been audited; identifying and re-embedding any
+  affected rows is a separate, not-yet-scoped follow-up requiring its own read-only audit before any
+  write. Given this file's own repeated finding of heterogeneous/inconsistent `semantic_768` quality
+  across writer generations elsewhere in this convergence effort, this bug is a plausible contributor
+  worth checking, but that connection is not established here — recorded as a hypothesis, not a
+  proven cause.
 - **Semantic-owner audit 2026-09-04:** `sveltekit-frontend/scripts/atlas/batch-d-semantic-embedder.mts`
   is not eligible to own `SEMANTIC_ENRICH`: it batches multiple texts into one Ollama request,
   derives per-node vectors through perturbation, uses numeric Qdrant IDs, and reports pgvector

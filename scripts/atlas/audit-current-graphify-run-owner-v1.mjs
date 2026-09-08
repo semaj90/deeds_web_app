@@ -75,7 +75,14 @@ const report = {
   status: databaseError ? 'GRAPHIFY_RUN_OWNER_AUDIT_FAILED' : completed.length === 1 ? 'GRAPHIFY_RUN_OWNER_COMPLETE' : 'GRAPHIFY_RUN_OWNER_BLOCKED',
 };
 mkdirSync(dirname(REPORT), { recursive: true });
-writeFileSync(REPORT, `${JSON.stringify(report, null, 2)}\n`);
+let reportWriteError = null;
+try {
+  writeFileSync(REPORT, `${JSON.stringify(report, null, 2)}\n`);
+} catch (error) {
+  // The database audit is read-only and remains valid even if another process
+  // temporarily locks the report artifact. Preserve the result on stdout.
+  reportWriteError = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
+}
 console.log(JSON.stringify({
   schema: report.schema,
   status: report.status,
@@ -86,5 +93,6 @@ console.log(JSON.stringify({
   workspaceRowCount: report.workspaceRowCount,
   currentStatus: current?.status ?? null,
   currentCompletedAt: current?.completed_at ?? null,
+  reportWriteError,
   report: REPORT,
 }, null, 2));

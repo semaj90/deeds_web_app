@@ -7,6 +7,89 @@ rules:
   - Do not relocate live artifacts just to satisfy directory layout.
   - Treat this registry as the navigation layer for OKF contracts.
   - Prefer the live owner in the referenced path over any copied summary.
+
+# Cross-layer fabric alignment. These are references and admission rules only;
+# they do not create a second packet schema or grant canonical authority.
+fabric:
+  schema: atlas.okf.fabric-registry.v1
+  canonicalAuthority: false
+  owners:
+    # 2026-09-08 OKF-REGISTRY-REFERENCE-PARITY-01 correction: "CanonicalEnvelopeV1" does not exist
+    # anywhere in the repo. The real, live owner is CanonicalFeatureEnvelope/
+    # CanonicalFeatureEnvelopeSchema in sveltekit-frontend/src/lib/server/db/canonical-feature-envelope.ts.
+    identity: CanonicalFeatureEnvelope
+    structural: StructuralObservationV2
+    semantic: semantic-packet-v2
+    vectors: vector-manifest-v1
+    tensors: RepresentationArtifactV1
+    features: CandidateFeatureMatrixV1
+    graph: StructuralGraphSnapshotV1
+  providers:
+    cst: node-tree-sitter
+    structuralQuery: ast-grep
+    compilerSemantic: ts-morph-or-lsp
+    sidecar: treesitter-chunker-8095
+    embedding: EmbeddingGemma
+    classifier: XGBoost-baseline
+    gpuClassifier: PyTorch-challenger
+    clustering: cuML-KMeans
+    graphReference: NetworkX
+    graphProjection: Neo4j-GDS
+    graphGpu: cuGraph
+  join:
+    required:
+      - packetKey
+      - sourceRef
+      - sourceRevision
+      - workspaceRevision
+      - contentHash
+    structural:
+      - startByte
+      - endByte
+      - treeNodeId
+      - symbolVersionId
+    vector:
+      representationId: semantic_768
+      dimensions: 768
+      ordinalMapRevision: required
+  transport:
+    control: JSONL
+    bulk: ArrowIPC
+    randomAccess: mmap
+    rpc: protobuf-or-typed-json
+    publication: checksum-then-seal-then-atomic-publish
+  promotion:
+    sourceHashMatch: required
+    revisionMatch: required
+    canonicalJoin: required
+    artifactState: SEALED
+    fabricatedValues: forbidden
+  evidence:
+    source_acquisition:
+      providers: [BeautifulSoup, Firecrawl, SearXNG]
+      required: [sourceRef, url, contentHash, retrievalTimestamp, provider]
+      authority: evidence-candidate
+    structural:
+      providers: [Tree-sitter, ast-grep, LSP, ts-morph]
+      required: [sourceRef, sourceRevision, startByte, endByte, providerRevision]
+      authority: observation
+    semantic:
+      providers: [EmbeddingGemma, Python-Pydantic-sidecar]
+      required: [packetKey, sourceRevision, workspaceRevision, representationRevision]
+      representation: semantic_768
+      authority: derived-until-canonical-join
+    transport:
+      providers: [Go-Retrieval, protobuf, typed-json, msgpack, ArrowIPC, mmap]
+      required: [schemaVersion, checksum, revisionBinding]
+      authority: transport-only
+    analysis:
+      providers: [DuckDB, NetworkX, cuGraph, cuML-KMeans, XGBoost, PyTorch]
+      required: [inputChecksum, executionId, producerRevision, outputChecksum]
+      authority: derived
+    control:
+      providers: [ACE, BitFrost, RabbitMQ, Ornith]
+      required: [packetKey, sourceRef, workspaceRevision, evidenceRefs]
+      hiddenReasoningPersistence: forbidden
 contracts:
   - name: parent-atlas-code-exploration-index-v1
     owner: .okf/indexes/code-exploration.yaml

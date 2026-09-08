@@ -23,7 +23,7 @@ fields:
 
   source_ref_key:
     type: string
-    description: Location anchor. Format: "relative/path.ts#Symbol"
+    description: 'Location anchor. Format: "relative/path.ts#Symbol"'
 
   tree_node_id:
     type: [string, null]
@@ -39,11 +39,11 @@ fields:
 
   symbol_kind:
     type: [string, null]
-    description: AST node kind. Example: function, class, interface.
+    description: 'AST node kind. Example: function, class, interface.'
 
   domain_class:
     type: [string, null]
-    description: Classified domain. Example: retrieval, auth, data-transform.
+    description: 'Classified domain. Example: retrieval, auth, data-transform.'
 
   concepts:
     type: array

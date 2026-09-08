@@ -82,6 +82,24 @@ ALTER TABLE public.task_semantic_packets
   ADD COLUMN IF NOT EXISTS summary_llm text;
 
 ALTER TABLE public.task_semantic_packets
+  ADD COLUMN IF NOT EXISTS summary_model text;
+
+ALTER TABLE public.task_semantic_packets
+  ADD COLUMN IF NOT EXISTS summary_hash text;
+
+ALTER TABLE public.task_semantic_packets
+  ADD COLUMN IF NOT EXISTS confidence text;
+
+ALTER TABLE public.task_semantic_packets
+  ADD COLUMN IF NOT EXISTS status text NOT NULL DEFAULT 'todo';
+
+ALTER TABLE public.task_semantic_packets
+  ADD COLUMN IF NOT EXISTS agent_pickup_ready boolean NOT NULL DEFAULT false;
+
+ALTER TABLE public.task_semantic_packets
+  ADD COLUMN IF NOT EXISTS deleted boolean NOT NULL DEFAULT false;
+
+ALTER TABLE public.task_semantic_packets
   ADD COLUMN IF NOT EXISTS qdrant_point_id text;
 
 ALTER TABLE public.task_semantic_packets

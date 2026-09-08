@@ -9,6 +9,42 @@ export const aceTopkKey = (
 	dim = 768
 ): string => `ace:topk:${queryHash}:${model}:${dim}`;
 
+/**
+ * Revision-qualified identity for reusable retrieval results. This extends
+ * the existing ACE top-K key owner; it does not make Redis/Valkey canonical.
+ * Every field is required because an omitted revision silently turns stale
+ * retrieval data into a false cache hit.
+ */
+export interface RetrievalCacheIdentityV1 {
+	queryHash: string;
+	model: string;
+	dim: number;
+	workspaceRevision: string;
+	candidateSnapshotRevision: string;
+	ordinalMapChecksum: string;
+	representationRevision: string;
+	retrievalPolicyRevision: string;
+	contextPolicyRevision: string;
+	graphRevision?: string | null;
+}
+
+export const aceTopkRevisionedKeyV1 = (identity: RetrievalCacheIdentityV1): string => {
+	const canonical = JSON.stringify({
+		queryHash: identity.queryHash,
+		model: identity.model,
+		dim: identity.dim,
+		workspaceRevision: identity.workspaceRevision,
+		candidateSnapshotRevision: identity.candidateSnapshotRevision,
+		ordinalMapChecksum: identity.ordinalMapChecksum,
+		representationRevision: identity.representationRevision,
+		retrievalPolicyRevision: identity.retrievalPolicyRevision,
+		contextPolicyRevision: identity.contextPolicyRevision,
+		graphRevision: identity.graphRevision ?? null,
+	});
+	const digest = createHash('sha256').update(canonical).digest('hex');
+	return `ace:topk:v1:${digest}`;
+};
+
 // Gemma4 agentic hit cache — 24hr TTL, keyed by query+limit hash.
 // Written by trace-mcp-server.ts `trace.kag_search` handler; read on
 // subsequent Gemma4 tool calls to avoid re-running the retrieval pipeline.

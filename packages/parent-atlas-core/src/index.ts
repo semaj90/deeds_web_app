@@ -12,7 +12,7 @@
  */
 
 // Retrieval facade and contracts
-export type { RetrievalFacade, RetrievalRequest, RetrievalResult, RetrievalUseCase, RetrievalPolicy, PolicyRegistry, RankedCandidate } from './contracts/retrieval.js';
+export type { RetrievalFacade, RetrievalRequest, RetrievalResult, RetrievalUseCase, RetrievalPolicy, PolicyRegistry, RankedCandidate, LexicalRelevanceObservationV1, Bm25ObservationV1 } from './contracts/retrieval.js';
 export { DEFAULT_POLICIES, DefaultPolicyRegistry, getPolicyRegistry, setPolicyRegistry } from './contracts/policy-registry.js';
 
 // Identity contract (frozen lineage chain)

@@ -223,6 +223,7 @@ export type PassExecutionSemantics = 'deterministic_idempotent' | 'stochastic_hi
  */
 export const KNOWN_PASS_EXECUTION_SEMANTICS: Record<string, PassExecutionSemantics> = {
 	ast_symbols: 'deterministic_idempotent',
+	lexical_features: 'deterministic_idempotent',
 	pos_tagging: 'deterministic_idempotent',
 	'pos-concept-tagging-lane.v1': 'deterministic_idempotent',
 	summarization: 'stochastic_history',

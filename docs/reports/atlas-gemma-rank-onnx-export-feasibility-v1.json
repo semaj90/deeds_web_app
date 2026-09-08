@@ -1,0 +1,42 @@
+{
+  "schema": "atlas.gemma-rank-onnx-export-feasibility.v1",
+  "probeText": "Which function computes the canonical packet checksum for a candidate ordinal map?",
+  "checkpointDir": "..\\models\\atlas-gemma-rank-v1\\standalone-init-bf16",
+  "sourceWeightsChecksum": "sha256:afcce712ce00e6a74068995d7dca831c15eb3647fa690e8ffcc506b69e4206f4",
+  "checkpointMutated": false,
+  "trainingPerformed": false,
+  "rankHeadTrained": false,
+  "cudaAllocated": false,
+  "canonicalAuthority": false,
+  "clientWiringPerformed": false,
+  "exportAttempts": [
+    {
+      "method": "dynamo_static_shape",
+      "ok": true,
+      "error": null
+    }
+  ],
+  "exportSucceeded": true,
+  "exportMethod": "dynamo_static_shape",
+  "pytorchScore": [
+    [
+      12.268278121948242
+    ]
+  ],
+  "onnxCheckerPassed": true,
+  "onnxScore": [
+    [
+      16.65458106994629
+    ]
+  ],
+  "maxAbsDeltaPytorchVsOnnx": 4.386302947998047,
+  "parityWithinTolerance": false,
+  "onnxGraphFileBytes": 1216441,
+  "onnxExternalDataFileBytes": 309657600,
+  "onnxTotalBytes": 310874041,
+  "onnxFilePath": "..\\.tmp\\atlas-gemma-rank-onnx\\atlas_gemma_rank_v1_feasibility.onnx",
+  "browserSizeFeasible": false,
+  "status": "ONNX_EXPORT_PARITY_FAILED",
+  "observedAt": "2026-09-07T03:47:03.849572+00:00",
+  "receiptChecksum": "sha256:1516ec8c247e9ef14a77b4ea7cd7c779e3093bed580fe863559625076cfb61c4"
+}

@@ -347,7 +347,39 @@ async function fileLinksTableExists(): Promise<boolean> {
   return taskFileLinksTableExists;
 }
 
+const TASK_SEMANTIC_PACKET_INSERT_COLUMNS = [
+  'point_kind', 'qdrant_point_id', 'workspace_id', 'workspace_task_id',
+  'feature_id', 'alias_id', 'source_ref', 'file_path', 'semantic_path',
+  'related_feature_ids', 'related_task_ids', 'related_file_paths', 'cluster_id',
+  'centroid_id', 'parent_centroid_id', 'summary_llm', 'summary_model',
+  'next_action', 'summary_hash', 'confidence', 'status', 'agent_pickup_ready',
+  'observed_at', 'valid_from', 'valid_to', 'created_at', 'updated_at', 'deleted',
+] as const;
+
+/**
+ * Read-only guard for the active MCP workflow. The Drizzle table definition
+ * is ahead of some deployed databases; fail before Qdrant/DB work rather than
+ * creating a partial mirror or surfacing a low-level INSERT error afterward.
+ */
+export async function assertTaskSemanticPacketSchemaCompatible(): Promise<void> {
+  const rows = await db.execute(sql`
+    SELECT column_name
+    FROM information_schema.columns
+    WHERE table_schema = 'public'
+      AND table_name = 'task_semantic_packets'
+  `);
+  const present = new Set(pgRows<{ column_name: string }>(rows).map((row) => row.column_name));
+  const missing = TASK_SEMANTIC_PACKET_INSERT_COLUMNS.filter((column) => !present.has(column));
+  if (missing.length > 0) {
+    throw new Error(
+      `TASK_SEMANTIC_PACKET_SCHEMA_INCOMPATIBLE: missing=${missing.join(',')}; `
+      + 'workflow blocked before Qdrant or PostgreSQL writes',
+    );
+  }
+}
+
 export async function createTaskSemanticPacket(taskId: number) {
+  await assertTaskSemanticPacketSchemaCompatible();
   await traceTaskPacketLifecycle(taskId, 'start');
 
   const task = await loadTaskRow(taskId);

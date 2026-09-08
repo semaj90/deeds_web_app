@@ -308,7 +308,19 @@ function filterImplicitLiveIndexes(indexDiff) {
   };
 }
 
-function repairClassForTable({ staticColumnDiff, staticIndexDiff, liveColumnDiff, liveIndexDiff }) {
+// OKF-REGISTRY-REFERENCE-PARITY-01 finding (2026-09-08): this function previously returned
+// APPLY_EXISTING_SQL for `liveColumnDiff.onlyInA` (declared-but-missing-live columns) regardless
+// of whether the table already exists live. For a table that already exists with real rows
+// (e.g. route_runtime_packets: tableExists=true, live rowCount>0, 12 declared-but-missing
+// columns), "apply existing SQL" wrongly implies re-running a CREATE-TABLE-shaped migration file
+// -- the correct action is a narrow ALTER TABLE ADD COLUMN for exactly those columns, gated on
+// first checking whether any real writer actually needs them (this repo's own session found a
+// near-identical case on task_semantic_packets where blindly adding declared-but-missing columns
+// would have been the wrong instinct without checking for a live writer first). APPLY_EXISTING_SQL
+// is now reserved for the LIVE_TABLE_MISSING case only (nothing exists yet, a full CREATE is
+// actually the right action); an existing table with declared-but-missing columns gets the new,
+// more precise ADD_MISSING_COLUMNS_VERIFY_WRITERS label instead.
+function repairClassForTable({ staticColumnDiff, staticIndexDiff, liveColumnDiff, liveIndexDiff, tableExists }) {
   if (staticColumnDiff.onlyInA.length && !staticColumnDiff.onlyInB.length) {
     return 'APPLY_EXISTING_SQL';
   }
@@ -330,7 +342,7 @@ function repairClassForTable({ staticColumnDiff, staticIndexDiff, liveColumnDiff
   }
 
   if (liveColumnDiff.onlyInA.length && !liveColumnDiff.onlyInB.length) {
-    return 'APPLY_EXISTING_SQL';
+    return tableExists ? 'ADD_MISSING_COLUMNS_VERIFY_WRITERS' : 'APPLY_EXISTING_SQL';
   }
   if (liveColumnDiff.onlyInB.length && !liveColumnDiff.onlyInA.length) {
     return 'ADD_DRIZZLE_MIRROR';
@@ -340,7 +352,7 @@ function repairClassForTable({ staticColumnDiff, staticIndexDiff, liveColumnDiff
   }
 
   if (liveIndexDiff.onlyInA.length && !liveIndexDiff.onlyInB.length) {
-    return 'APPLY_EXISTING_SQL';
+    return tableExists ? 'ADD_MISSING_INDEXES_VERIFY_QUERIES' : 'APPLY_EXISTING_SQL';
   }
   if (liveIndexDiff.onlyInB.length && !liveIndexDiff.onlyInA.length) {
     const nonImplicit = liveIndexDiff.onlyInB.filter((indexName) => !isImplicitIndexName(indexName));
@@ -428,6 +440,7 @@ function classifyTable({ schema, manual, live, tableName, staticIdentityFields }
       staticIndexDiff: schemaManualIndexDiff,
       liveColumnDiff,
       liveIndexDiff,
+      tableExists,
     });
 
   return {

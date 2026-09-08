@@ -28,8 +28,10 @@ import Redis from 'ioredis';
 
 const { Pool } = pg;
 
-const DRY_RUN = process.argv.includes('--dry-run');
 const APPLY = process.argv.includes('--apply');
+// Never write by default. A real BM25 score is query/candidate-specific;
+// this legacy pass only has packet summaries and cannot safely assign one.
+const DRY_RUN = !APPLY;
 const VERBOSE = process.argv.includes('--verbose');
 const BATCH_SIZE = parseInt(process.argv.find(arg => arg.startsWith('--batch='))?.split('=')[1] || '100');
 
@@ -189,6 +191,14 @@ async function main() {
   console.log('╚════════════════════════════════════════════════════════════════╝\n');
 
   if (DRY_RUN) console.log('⚠️  DRY-RUN MODE\n');
+
+  if (APPLY) {
+    console.error('⛔ APPLY BLOCKED: phase-b5 has no real query/candidate BM25 score materializer.');
+    console.error('   It must not write the historical placeholder score 0.5 or promote Redis cache terms.');
+    console.error('   Build and prove a query-qualified score/readback path before enabling --apply.');
+    process.exitCode = 2;
+    return;
+  }
 
   const startTime = Date.now();
 

@@ -9,6 +9,7 @@
  */
 
 import { resolveLlamaInferenceTarget } from './runtime-contract.js';
+import { recordLlamaPromptCacheTelemetry } from '../ai/context-prompt-streamer.js';
 
 interface SummarizeRequest {
   prompt: string;
@@ -85,6 +86,7 @@ export async function summarizeWithGemma4(req: SummarizeRequest): Promise<Summar
           { role: 'user', content: buildStableSummaryPrompt(prompt) }
         ],
         stream: false,
+        stream_options: { include_usage: true },
         max_tokens: maxTokens,
         temperature,
         cache_prompt: true,
@@ -98,6 +100,7 @@ export async function summarizeWithGemma4(req: SummarizeRequest): Promise<Summar
     }
 
     const data = (await response.json()) as any;
+    recordLlamaPromptCacheTelemetry(target.model, data, 'summary');
     let content = data.choices?.[0]?.message?.content || '';
 
     // Strip thought blocks
@@ -143,6 +146,7 @@ async function summarizeWithLlamaServerFallback(req: SummarizeRequest): Promise<
       ],
       stream: false,
       temperature,
+      stream_options: { include_usage: true },
       max_tokens: maxTokens
     })
   });
@@ -152,6 +156,7 @@ async function summarizeWithLlamaServerFallback(req: SummarizeRequest): Promise<
   }
 
   const data = (await response.json()) as any;
+  recordLlamaPromptCacheTelemetry(target.model, data, 'summary');
   return {
     summary: data.choices?.[0]?.message?.content || '',
     model: target.model,

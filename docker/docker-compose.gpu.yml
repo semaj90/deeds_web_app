@@ -77,6 +77,41 @@ services:
     restart: unless-stopped
 
   # ========================================================================
+  # AtlasGemmaRank reranker service (GEMMA-RANK-FASTAPI-01, numerical scoring
+  # only, no text synthesis, no canonical writes, rank head UNTRAINED --
+  # scores are not meaningful relevance signals yet). See
+  # openspec/changes/parent-atlas-best-fit-score-fabric/tasks.md.
+  # UNBUILT/UNVERIFIED as of 2026-09-06 -- Docker was not running on the dev
+  # host when this entry was written; do not treat it as proven until a real
+  # `docker compose build` + live /health + /v1/gemma-rank/score check pass.
+  # ========================================================================
+  atlas-gemma-rank:
+    profiles: ["atlas-gpu"]
+    build:
+      context: ..
+      dockerfile: docker/atlas-gemma-rank/Dockerfile
+    image: atlas-gemma-rank:torch2.13.0-cu132
+    container_name: atlas-gemma-rank
+    environment:
+      ATLAS_GEMMA_RANK_PORT: "8122"
+      ATLAS_GEMMA_RANK_DEVICE: "cpu"
+      PYTHONUNBUFFERED: "1"
+    volumes:
+      # Read-only checkpoint mount. Matches the service's absolute default path exactly.
+      - ../models/atlas-gemma-rank-v1/standalone-init-bf16:/models/atlas-gemma-rank-v1/standalone-init-bf16:ro
+    ports:
+      - "8122:8122"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8122/health', timeout=3).status == 200 else 1)"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - legal-ai-network
+    restart: unless-stopped
+
+  # ========================================================================
   # Legal AI GPU Service (Main Application)
   # ========================================================================
   legal-ai-gpu:
@@ -233,6 +268,11 @@ services:
   valkey:
     image: valkey/valkey:8-alpine
     container_name: legal-ai-valkey
+    # volatile-lru (not allkeys-lru): 170 live db0 keys carry no TTL (application control/schema
+    # state, including legacy/isolated stack keys) — allkeys-lru could evict those under memory
+    # pressure; volatile-lru only evicts TTL'd cache keys (bitfrost/centroid/ace/etc). RabbitMQ
+    # owns Parent Atlas durable job dispatch; Valkey is not the queue owner here.
+    command: ["valkey-server", "--maxmemory", "2gb", "--maxmemory-policy", "volatile-lru"]
     volumes:
       - redis_data:/data
     ports:

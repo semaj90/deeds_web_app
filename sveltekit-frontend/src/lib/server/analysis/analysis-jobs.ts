@@ -14,7 +14,7 @@ import {
 import { eq, sql } from 'drizzle-orm';
 import { postgresErrorDetails } from '$lib/server/db/postgres-error-details.js';
 
-export type JobType = 'upload_pipeline' | 'entity_extraction' | 'forensics' | 'summarization' | 'code_feature_registry';
+export type JobType = 'upload_pipeline' | 'entity_extraction' | 'forensics' | 'summarization' | 'code_feature_registry' | 'lexical_feature_registry';
 export type JobStatus = 'queued' | 'running' | 'completed' | 'failed';
 
 export const ANALYSIS_JOBS_NOTIFY_CHANNEL = 'atlas_analysis_jobs';

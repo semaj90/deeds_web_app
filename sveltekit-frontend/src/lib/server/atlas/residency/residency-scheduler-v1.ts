@@ -1,5 +1,6 @@
 import type { ExecutionHeadroomV1, HeadroomUsageV1 } from '../orchestration/execution-headroom-v1.js';
 import { remainingHeadroomV1 } from '../orchestration/execution-headroom-v1.js';
+import { compareUtf8 } from '../features/canonical-candidate-v1.js';
 import type { PacketLodV1, ResidencyStateV1 } from './packet-lod-v1.js';
 
 export const RESIDENCY_SCHEDULER_V1_SCHEMA = 'parent-atlas.residency-scheduler.v1' as const;
@@ -225,5 +226,5 @@ export function scheduleResidencyV1(input: {
         reason: 'LOW_MARGINAL_UTILITY'
       };
     })
-    .sort((a, b) => b.priority - a.priority || a.resourceRef.localeCompare(b.resourceRef));
+    .sort((a, b) => b.priority - a.priority || compareUtf8(a.resourceRef, b.resourceRef));
 }

@@ -4,11 +4,15 @@ export const OAK_KAG_NEIGHBOR_READ_STRICT_V1 = 'parent-atlas.kag.neighbor-read.s
 
 export const oakKagNeighborInputV1Schema = z.object({
   canonicalIds: z.array(z.string().min(1)).min(1).max(256),
+  workspaceRevision: z.string().min(1),
+  graphRevision: z.string().min(1),
 }).strict();
 
 export const oakKagNeighborReceiptV1Schema = z.object({
   schema: z.literal('atlas.oak-kag-neighbor-receipt.v1'),
   implementationRef: z.literal(OAK_KAG_NEIGHBOR_READ_STRICT_V1),
+  workspaceRevision: z.string().min(1),
+  graphRevision: z.string().min(1),
   requestedCanonicalIds: z.number().int().nonnegative(),
   matchedTuples: z.number().int().nonnegative(),
   matchedHyperedges: z.number().int().nonnegative(),

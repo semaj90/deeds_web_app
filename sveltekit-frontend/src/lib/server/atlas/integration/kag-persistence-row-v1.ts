@@ -1,5 +1,6 @@
 import type { HyperedgeV1 } from '../../graph/hyperedge-contract.js';
 import type { OntologyLinkedTupleV1 } from '../contracts/ontology-linked-tuple-v1.js';
+import { compareUtf8 } from '../features/canonical-candidate-v1.js';
 
 export interface AtlasHyperedgePersistenceRowV1 {
   contractHyperedgeId: string;
@@ -58,7 +59,7 @@ export interface AtlasOntologyTuplePersistenceRowV1 {
 }
 
 function uniqueSorted(values: readonly string[]): string[] {
-  return [...new Set(values.map((value) => value.trim()).filter(Boolean))].sort();
+  return [...new Set(values.map((value) => value.trim()).filter(Boolean))].sort(compareUtf8);
 }
 
 export function toAtlasHyperedgePersistenceRowsV1(edge: HyperedgeV1): {
@@ -75,7 +76,7 @@ export function toAtlasHyperedgePersistenceRowsV1(edge: HyperedgeV1): {
       memberRole: participant.role,
       ordinal: participant.ordinal ?? index,
     }))
-    .sort((left, right) => left.ordinal - right.ordinal || left.memberId.localeCompare(right.memberId));
+    .sort((left, right) => left.ordinal - right.ordinal || compareUtf8(left.memberId, right.memberId));
 
   return {
     hyperedge: {

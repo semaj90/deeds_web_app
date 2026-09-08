@@ -1,0 +1,94 @@
+{
+  "schema": "atlas.parent-atlas-lineage-definition-audit.v1",
+  "generatedAt": "2026-09-07",
+  "mode": "READ_ONLY_AUDIT",
+  "status": "BLOCKED_AT_ADMISSION_BOUNDARIES",
+  "owners": {
+    "okfNavigation": "docs/.okf/registry.yaml",
+    "okfSchema": "docs/.okf/schema.yaml",
+    "canonicalIdentity": "PostgreSQL atlas_packets and revision-qualified bindings",
+    "structuralEvidence": "8095 Tree-sitter/AST-grep and Graphify observations",
+    "domainOntology": "scripts/atlas/classify-domain-ontology.mjs + parent_atlas_ontology",
+    "lexical": "PostgreSQL native FTS/GIN with ts_rank_cd",
+    "semantic": "PostgreSQL content_embedding_768 / semantic_768",
+    "graph": "PostgreSQL hyperedge incidence with NetworkX oracle and cuGraph executor",
+    "fusion": "SearchRuntime"
+  },
+  "proven": [
+    "OKF manifest, domain/index/pipeline definitions and registry navigation exist",
+    "Domain taxonomy mapping admits 15/15 labels with zero unresolved labels",
+    "Ontology and hyperedge contracts are n-ary capable and have fixture parity coverage",
+    "PostgreSQL native FTS/GIN is the lexical owner; AIO/bitmap remains planner behavior",
+    "NLP/AST providers and revisioned observation contracts exist",
+    "Hypergraph tables and incidence indexes exist"
+  ],
+  "liveEvidence": {
+    "classifierRows": 3352,
+    "classifierSourceRefs": 3351,
+    "classifierRevisionAvailable": 148,
+    "classifierRevisionQualifiedJoin": 148,
+    "classifierMissingGraphifyJoin": 3204,
+    "classifierSourceNamespaceAvailable": 0,
+    "sourceCohortRows": 52,
+    "sourceCohortCurrentWorkspaceMatches": 0,
+    "sourceCohortSourceRevisionMatches": 52,
+    "hyperedges": 62802,
+    "hyperedgeMembers": 125604,
+    "hyperedgeArityTwo": 62802,
+    "hyperedgeArityThreePlus": 0,
+    "ontologyTuples": 0
+  },
+  "missingHandoffs": [
+    {
+      "id": "LINEAGE-SOURCE-NAMESPACE-01",
+      "status": "OPEN",
+      "gap": "Classifier observations lack a declared Graphify source namespace and only 148 rows have a revision-qualified source join",
+      "next": "Resolve source namespace ownership, then rerun domain-classifier-lineage-v1.mjs before tuple admission"
+    },
+    {
+      "id": "LINEAGE-WORKSPACE-REVISION-01",
+      "status": "OPEN",
+      "gap": "The 52-row current source cohort matches source revisions but zero rows match the live workspace binding revision",
+      "next": "Reconcile the cohort observation with atlas_workspace_source_bindings and the latest completed Graphify run"
+    },
+    {
+      "id": "NLP-REGISTRY-ACE-01",
+      "status": "OPEN",
+      "gap": "8095 observations are available, but complete revisioned registry to Viterbi/ACE to CandidateFeatureMatrix promotion is not proven",
+      "next": "Run the bounded observation-to-Viterbi/ACE replay with exact UTF-8 span readback"
+    },
+    {
+      "id": "ONTOLOGY-TUPLE-MATERIALIZE-01",
+      "status": "OPEN",
+      "gap": "The live ontology tuple owner is empty; taxonomy mapping proof is not tuple materialization proof",
+      "next": "Admit only current, revision-qualified grounded observations into OntologyLinkedTupleV1"
+    },
+    {
+      "id": "HYPERGRAPH-NARY-LIVE-WIRE-01",
+      "status": "OPEN",
+      "gap": "All 62,802 live hyperedges have arity two; the n-ary converter is fixture-proven but its observer and writer are not live-wired",
+      "next": "Wire ApiContractObservationV1 or equivalent grounded facts through the existing materializer under an explicit write gate"
+    },
+    {
+      "id": "POSTGRES-FTS-PLAN-RECEIPT-01",
+      "status": "OPEN",
+      "gap": "FTS/GIN ownership is defined, but a current production-shaped EXPLAIN receipt for the bounded metadata-plus-lexical query is not part of this audit",
+      "next": "Capture EXPLAIN (ANALYZE, BUFFERS, SETTINGS) in a read-only transaction; do not create an application AIO abstraction"
+    },
+    {
+      "id": "DEFINITION-CONSUMER-ADMISSION-01",
+      "status": "OPEN",
+      "gap": "OKF/YAML definitions are navigable and schema-described, but every artifact does not yet have one demonstrated validated, canonical-serialized, checksummed consumer handoff",
+      "next": "Build a definition-to-consumer matrix and require artifact checksum plus revision fields at each admission boundary"
+    }
+  ],
+  "reports": [
+    "docs/reports/domain-classifier-lineage-v1.json",
+    "docs/reports/current-source-cohort-lineage-v1.json",
+    "docs/reports/atlas-domain-ontology-taxonomy-audit-v1.json",
+    "docs/reports/atlas-hypergraph-current-arity-census-v1.json",
+    "docs/reports/hypergraph-nary-materialize-v1.json"
+  ],
+  "writesPerformed": false,
+  "canonicalPromotion": false
+}

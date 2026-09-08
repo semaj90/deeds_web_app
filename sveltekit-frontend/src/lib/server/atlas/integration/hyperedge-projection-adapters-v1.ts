@@ -1,4 +1,5 @@
 import type { HyperedgeV1 } from '../../graph/hyperedge-contract.js';
+import { compareUtf8 } from '../features/canonical-candidate-v1.js';
 import { projectNaryRelationForRanking, type NaryRelationV1 } from '../../graph/nary-ranking-projection.js';
 import {
   buildIncidenceProjectionV1,
@@ -14,7 +15,7 @@ function orderedParticipants(edge: HyperedgeV1) {
       role: participant.role,
       ordinal: participant.ordinal ?? index,
     }))
-    .sort((a, b) => a.ordinal - b.ordinal || a.role.localeCompare(b.role) || a.canonicalId.localeCompare(b.canonicalId));
+    .sort((a, b) => a.ordinal - b.ordinal || compareUtf8(a.role, b.role) || compareUtf8(a.canonicalId, b.canonicalId));
 }
 
 /** Compatibility view only. HyperedgeV1 remains the canonical n-ary truth. */

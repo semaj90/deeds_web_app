@@ -135,4 +135,92 @@ describe('phase8 fanout wrapper', () => {
     expect(audit.some((event) => event.state === 'STARTING')).toBe(true);
     expect(audit.some((event) => event.state === 'SUCCEEDED')).toBe(true);
   });
+
+  it('does not abort the fanout when the non-critical latent step fails (GRAPHIFY-FANOUT-CONVERGENCE-01)', async () => {
+    // Mirrors the real PHASE8_APPLY_PLAN shape: latent is index 5 (critical=false), everything
+    // else defaults to critical=true. Only the latent step is made to fail here.
+    const stepPlan: Array<[string, string] | [string, string, boolean]> = [
+      ['atlas:phase8:step3:langextract:apply', 'apply'],
+      ['atlas:phase16:latent:apply', 'apply', false],
+      ['atlas:phase16:som:apply', 'apply'],
+    ];
+
+    const spawnImpl = vi.fn((_command: string, args: string[]) => {
+      const child = new EventEmitter() as EventEmitter & {
+        stdout: PassThrough;
+        stderr: PassThrough;
+        kill: (signal?: NodeJS.Signals) => void;
+      };
+      child.stdout = new PassThrough();
+      child.stderr = new PassThrough();
+      child.kill = vi.fn();
+
+      const script = args[1];
+      const exitCode = script === 'atlas:phase16:latent:apply' ? 1 : 0;
+      queueMicrotask(() => child.emit('close', exitCode));
+      return child;
+    });
+
+    const tracker = new Phase8ProgressTracker('phase8-optional-failure');
+    const result = await runPhase8Fanout({
+      dryRun: false,
+      runId: 'phase8-optional-failure',
+      tracker,
+      spawnImpl: spawnImpl as never,
+      logger: () => {},
+      heartbeatMs: 0,
+      stepTimeoutMs: 50,
+      overallTimeoutMs: 1_000,
+      stepPlan: stepPlan as never,
+    });
+
+    // The whole chain must still succeed and must have run every step, including the one
+    // after the failed non-critical latent step -- that's the actual decoupling behavior.
+    expect(result.ok).toBe(true);
+    expect(spawnImpl).toHaveBeenCalledTimes(3);
+    expect(result.optionalFailures).toEqual([
+      expect.objectContaining({ script: 'atlas:phase16:latent:apply', reason: 'step-failed' }),
+    ]);
+  });
+
+  it('still aborts the fanout when a critical step fails', async () => {
+    const stepPlan: Array<[string, string] | [string, string, boolean]> = [
+      ['atlas:phase8:step3:langextract:apply', 'apply'],
+      ['atlas:summary:index:rank:apply', 'apply'],
+      ['atlas:phase16:som:apply', 'apply'],
+    ];
+
+    const spawnImpl = vi.fn((_command: string, args: string[]) => {
+      const child = new EventEmitter() as EventEmitter & {
+        stdout: PassThrough;
+        stderr: PassThrough;
+        kill: (signal?: NodeJS.Signals) => void;
+      };
+      child.stdout = new PassThrough();
+      child.stderr = new PassThrough();
+      child.kill = vi.fn();
+
+      const script = args[1];
+      const exitCode = script === 'atlas:summary:index:rank:apply' ? 1 : 0;
+      queueMicrotask(() => child.emit('close', exitCode));
+      return child;
+    });
+
+    const tracker = new Phase8ProgressTracker('phase8-critical-failure');
+    const result = await runPhase8Fanout({
+      dryRun: false,
+      runId: 'phase8-critical-failure',
+      tracker,
+      spawnImpl: spawnImpl as never,
+      logger: () => {},
+      heartbeatMs: 0,
+      stepTimeoutMs: 50,
+      overallTimeoutMs: 1_000,
+      stepPlan: stepPlan as never,
+    });
+
+    expect(result.ok).toBe(false);
+    // Aborted before the third step -- unchanged behavior for critical steps.
+    expect(spawnImpl).toHaveBeenCalledTimes(2);
+  });
 });

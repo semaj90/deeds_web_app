@@ -14,6 +14,32 @@ version: "1.0.0"
 spec_name: "OpenWiki Knowledge Format"
 description: "Unified semantic representation for code intelligence, domain classification, and architectural context"
 
+# Cross-layer contract registry. This references the existing owners; it is not
+# a replacement packet envelope and does not grant canonical authority.
+fabric_registry:
+  schema: "atlas.okf.fabric-registry.v1"
+  owner: "docs/.okf/registry.yaml"
+  canonical_authority: false
+  required_join:
+    - packet_key
+    - source_ref
+    - source_revision
+    - workspace_revision
+    - content_hash
+  structural_fields:
+    - start_byte
+    - end_byte
+    - tree_node_id
+    - symbol_version_id
+  semantic_vector:
+    representation_id: "semantic_768"
+    dimensions: 768
+    ordinal_map_revision: required
+  publication:
+    bulk: "ArrowIPC"
+    random_access: "mmap"
+    state: "SEALED"
+
 # ─── Top-level ontology structure ───────────────────────────────────────────
 
 root_schema:
@@ -335,10 +361,13 @@ storage_mapping:
   postgres:
     table: "atlas_packets"
     columns:
-      - id: "id (PK UUID)"
-      - spec: "spec (JSONB)"
+      - packet_key: "packet_key (canonical packet identity)"
+      - source_ref: "source_ref (canonical provenance)"
+      - source_revision: "source_revision (exact source-content revision)"
+      - workspace_revision: "workspace_revision (workspace binding)"
+      - content_hash: "content_hash (source-content checksum)"
       - metadata: "metadata (JSONB)"
-      - embedding: "embedding (vector(512|768|384))"
+      - embedding: "embedding (vector(768), legacy rows require review)"
     purpose: "Canonical truth for all OKF entries"
 
   qdrant:

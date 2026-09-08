@@ -1,11 +1,43 @@
 # Trace MCP Tool Audit Complete — July 9, 2026
 
-**Status**: ✅ **AUDIT_PROVEN** — All 7 gates pass
+> **2026-09-07 correction**: this doc's "129 tools" is stale. Re-ran the same live audit
+> (`npm run trace:mcp:audit`, the wired `scripts/trace-mcp-tool-audit.mjs`) against the live
+> `:8788` server — **176 tools discovered, all 7 gates still pass** (health/discovery/provenance/
+> breadth/concurrency/idempotency/domain-completeness). This nearly matches CLAUDE.md's own
+> 2026-08-23 top-of-file note ("TRACE currently exposes 175 tools", off by one — consistent with
+> one tool added since). The rest of this doc is a historical snapshot of the July 9 run and its
+> per-domain breakdown is not re-verified here — treat only the tool count as corrected.
+> Separately, `docs/TRACE-MCP-TOOLS-AUDIT.json` (a *different*, static source-regex audit of
+> `trace-mcp-server.ts`'s `registerTool(` calls, not a live server call) reports **120** — lower
+> than the live 176 by design, since it can't see tools injected at runtime beyond static
+> registration, the same known limitation already documented for the main `server.ts` (108 static
+> vs more at runtime). Both numbers are now real and current as of today; they measure different
+> things and are not in conflict.
 
-**Audit Date**: 2026-07-09 23:45 UTC  
+> **2026-09-07 re-verification (2nd pass, same day)**: re-ran `npm run trace:mcp:audit` fresh a
+> second time this session to check for further drift. **Still 176 tools, still all 7 gates pass**
+> — figure is stable, not moving. Domain breakdown from this fresh run:
+> core-retrieval 9/9, vector-search 5/5, graph-traversal 6/6, schema-meta 5/5,
+> entity-intelligence 5/5, code-structure 7/7, memory-context 5/5, topology-clustering 4/5 (80%),
+> knowledge-base 8/8, legal-domain 14/14, operations-inference 13/13, search-ranking 2/2,
+> skills 2/2, shell 1/1, runtime 3/3, evidence-imaging 6/6, tracing-diagnostics 6/6, hypergraph
+> 4/4, taxonomy 2/2, source-refs 1/1 — structurally almost identical to the July 9 domain table
+> below (same 20 domains, same topology-clustering 80% gap), so the per-domain breakdown below
+> remains a reasonably accurate navigational reference even though its **totals are stale**.
+>
+> **Every numeric tool-count figure from this point through "Performance Baselines" below —
+> "129 tools", "110/111", "124 known tools" — is the original 2026-07-09 snapshot value,
+> superseded by the 176 figure above. Do not cite any count from the body below as current.**
+> Tool *names* (in the Tier A–G lists and domain tables) remain a useful navigational reference
+> since the domain structure hasn't materially changed.
+
+**Status**: ✅ **AUDIT_PROVEN** (2026-07-09 run) — All 7 gates pass. Re-confirmed structurally
+current via a fresh 2026-09-07 re-run (176 tools, all 7 gates pass) — see correction notes above.
+
+**Audit Date**: 2026-07-09 23:45 UTC (historical; see 2026-09-07 correction above for current state)  
 **Execution Time**: 262ms  
-**Tool Registry Version**: 129 tools  
-**Codebase Semantic Intelligence**: 82% → 99% (audit verified)
+**Tool Registry Version**: 129 tools — **STALE, historical only; current live count is 176**  
+**Codebase Semantic Intelligence**: 82% → 99% (audit verified, historical)
 
 ---
 

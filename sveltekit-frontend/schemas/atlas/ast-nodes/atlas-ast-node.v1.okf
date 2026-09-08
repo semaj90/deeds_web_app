@@ -40,7 +40,7 @@ tree_node_id_formula:
     - name: node_kind
       note: one of the minimum_ast_kinds below
     - name: qualified_symbol
-      note: "ClassName.methodName" or bare name; empty string for anonymous
+      note: '"ClassName.methodName" or bare name; empty string for anonymous'
     - name: structural_parent_key
       note: tree_node_id of parent node, or literal "ROOT" for top-level
     - name: normalized_signature

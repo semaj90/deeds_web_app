@@ -1,0 +1,75 @@
+{
+  "schema": "atlas.agent-runtime-integration-audit.v1",
+  "date": "2026-09-08",
+  "scope": "claude-mem, OpenCode, Supermemory, RLM, IPython, Mastra, Paperclip, Hermes, Kanban, Graphify, Ewin-Tang-style low-rank work, and dev:gpu",
+  "findings": {
+    "claudeMem": {
+      "status": "PRESENT_ISOLATED",
+      "role": "memory and observation runtime",
+      "queue": "BullMQ over Valkey",
+      "note": "Not the Parent Atlas durable dispatch owner"
+    },
+    "openCode": {
+      "status": "PRESENT",
+      "role": "MCP/plugin and agent client control surface",
+      "supermemoryPlugin": "NOT_FOUND_IN_PROJECT_CONFIG"
+    },
+    "supermemory": {
+      "status": "NOT_INSTALLED_OR_CONFIGURED_LOCALLY",
+      "note": "Third-party OpenCode plugin is possible, but not part of the current Parent Atlas runtime"
+    },
+    "rlm": {
+      "status": "LOCAL_POLICY_AND_CONTRACTS",
+      "role": "bounded recursive evidence decomposition",
+      "note": "No separate external RLM runtime was found"
+    },
+    "ipython": {
+      "status": "RESEARCH_ENVIRONMENT_ONLY",
+      "role": "interactive notebooks and experiments",
+      "note": "Not a production Parent Atlas control plane"
+    },
+    "mastra": {
+      "status": "SHIM_OR_DOCUMENTATION_ONLY",
+      "role": "optional orchestration concept",
+      "note": "No @mastra/core dependency; adapter comments identify a compatibility shim"
+    },
+    "paperclip": {
+      "status": "NOT_PRESENT_LOCALLY",
+      "role": "external agent workforce/control-plane candidate"
+    },
+    "hermes": {
+      "status": "CONFIG_AND_SMOKE_SURFACE",
+      "role": "optional external agent/runtime endpoint",
+      "note": "Environment variables and smoke script exist; active runtime ownership remains unproven"
+    },
+    "kanban": {
+      "status": "PRESENT",
+      "role": "Parent Atlas task/recommendation execution surface",
+      "authority": "task state and receipts, not canonical source truth"
+    },
+    "graphify": {
+      "status": "PRESENT",
+      "role": "daily evidence/recommendation producer",
+      "devGpu": "separate startup launcher; graph freshness must come from a completed run receipt"
+    },
+    "ewinTang": {
+      "status": "INSPIRED_IMPLEMENTATION",
+      "role": "low-rank approximation and routing diagnostics",
+      "authority": "not canonical retrieval or identity"
+    },
+    "devGpu": {
+      "status": "PRESENT",
+      "entrypoint": "sveltekit-frontend/package.json -> scripts/startup/dev-gpu-runtime.mjs",
+      "note": "Launcher integration is distinct from model, graph, and agent memory ownership"
+    }
+  },
+  "webVerification": [
+    "https://docs.claude-mem.ai/platform-integration",
+    "https://opencode.ai/v2/docs/plugins",
+    "https://mastra.ai/",
+    "https://paperclip.inc/docs/guides/agent-developer/how-agents-work",
+    "https://hermes-agent.nousresearch.com/docs/",
+    "https://arxiv.org/abs/2512.24601"
+  ],
+  "boundary": "Postgres remains canonical; SearchRuntime owns retrieval fusion; RabbitMQ owns Parent Atlas durable dispatch; Valkey is derived cache; external agent frameworks remain optional control-plane adapters."
+}

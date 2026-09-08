@@ -1,15 +1,35 @@
 {
   "schema": "atlas.domain-ontology-taxonomy-audit-receipt.v1",
-  "status": "DOMAIN_ONTOLOGY_TAXONOMY_PARTIAL",
+  "status": "DOMAIN_ONTOLOGY_TAXONOMY_PROVEN",
   "classifierPath": "scripts/atlas/classify-domain-ontology.mjs",
   "classifierLabelCount": 15,
-  "admittedLabelCount": 7,
-  "unresolvedLabelCount": 8,
-  "mappingRevision": "sha256:e6039ff04c33b48deeb179aecd69c17a2ad7f84e91dbcf120d61289732120fc2",
+  "admittedLabelCount": 15,
+  "unresolvedLabelCount": 0,
+  "mappingRevision": "sha256:b1fe99ea1b85f0ad0deecbe359f6565a28f1dd435008f260e0d52d2f03595a0e",
   "admitted": [
     {
       "domainLabel": "agent_orchestration",
       "classId": "atlas:WorkflowDomain",
+      "status": "ADMITTED"
+    },
+    {
+      "domainLabel": "auth_login_register",
+      "classId": "atlas:WorkflowDomain",
+      "status": "ADMITTED"
+    },
+    {
+      "domainLabel": "cache_layer",
+      "classId": "atlas:DatabaseDomain",
+      "status": "ADMITTED"
+    },
+    {
+      "domainLabel": "case_management",
+      "classId": "atlas:WorkflowDomain",
+      "status": "ADMITTED"
+    },
+    {
+      "domainLabel": "citation_engine",
+      "classId": "atlas:DocumentationDomain",
       "status": "ADMITTED"
     },
     {
@@ -18,13 +38,33 @@
       "status": "ADMITTED"
     },
     {
+      "domainLabel": "document_processing",
+      "classId": "atlas:DocumentationDomain",
+      "status": "ADMITTED"
+    },
+    {
       "domainLabel": "embedding_indexing",
       "classId": "atlas:ModelDomain",
       "status": "ADMITTED"
     },
     {
+      "domainLabel": "evidence_upload_storage",
+      "classId": "atlas:DatabaseDomain",
+      "status": "ADMITTED"
+    },
+    {
       "domainLabel": "graph_topology",
       "classId": "atlas:GraphDomain",
+      "status": "ADMITTED"
+    },
+    {
+      "domainLabel": "legal_reports",
+      "classId": "atlas:DocumentationDomain",
+      "status": "ADMITTED"
+    },
+    {
+      "domainLabel": "memory_optimization",
+      "classId": "atlas:DatabaseDomain",
       "status": "ADMITTED"
     },
     {
@@ -43,40 +83,7 @@
       "status": "ADMITTED"
     }
   ],
-  "unresolved": [
-    {
-      "domainLabel": "auth_login_register",
-      "status": "UNMAPPED"
-    },
-    {
-      "domainLabel": "cache_layer",
-      "status": "UNMAPPED"
-    },
-    {
-      "domainLabel": "case_management",
-      "status": "UNMAPPED"
-    },
-    {
-      "domainLabel": "citation_engine",
-      "status": "UNMAPPED"
-    },
-    {
-      "domainLabel": "document_processing",
-      "status": "UNMAPPED"
-    },
-    {
-      "domainLabel": "evidence_upload_storage",
-      "status": "UNMAPPED"
-    },
-    {
-      "domainLabel": "legal_reports",
-      "status": "UNMAPPED"
-    },
-    {
-      "domainLabel": "memory_optimization",
-      "status": "UNMAPPED"
-    }
-  ],
+  "unresolved": [],
   "writesPerformed": false,
   "canonicalAuthority": false
 }

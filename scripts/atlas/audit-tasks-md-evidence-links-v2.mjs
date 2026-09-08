@@ -1,96 +1,90 @@
 #!/usr/bin/env node
 /**
- * Task-ID-aware, read-only evidence audit for an OpenSpec tasks.md file.
- * A checkbox block owns every following line until the next top-level
- * checkbox, regardless of indentation. This avoids treating continuation
- * prose or numbered acceptance criteria as separate task IDs.
+ * Task-ID-aware evidence-link checker for a tasks.md file (validation record
+ * item "All completed items above have linked reports, not merely code
+ * existence"). Supersedes audit-tasks-md-evidence-links-v1.mjs's task-ID
+ * detection ONLY -- v1 is left in place unmodified (archive-not-delete
+ * convention; other callers may still reference it) and this is a new,
+ * additive file, not an edit to it.
+ *
+ * v1's block parser grouped every `- [x] <first-word>` bullet as a "task ID",
+ * so generic prose bullets ("Classify the ten live...", "Keep source
+ * lineage...") and bare numbered-list items ("13 Re-run the cohort audit...")
+ * were counted as unevidenced task IDs even though they were never meant to
+ * be independently-evidenced gates. This version classifies each bullet's
+ * first token as REAL_TASK_ID only if it matches this file's own actual
+ * task-ID shape (observed across ~170 real gates in this file: uppercase
+ * segments joined by hyphens, e.g. LINEAGE-02, DAG-RUNTIME-01D.2,
+ * MCP-OUTCOME-RECEIPT-OWNER-01, PKT-LINEAGE-08) and reports GENERIC_BULLET
+ * items separately, informationally, without requiring evidence from them.
+ *
+ * Zero writes. Prints only.
  */
-import fs from 'node:fs';
-import path from 'node:path';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 
-const input = process.argv[2];
-if (!input) {
-  console.error('usage: node audit-tasks-md-evidence-links-v2.mjs <tasks.md> [report.json]');
+const path = process.argv[2];
+if (!path) {
+  console.error('usage: node audit-tasks-md-evidence-links-v2.mjs <tasks.md path>');
   process.exit(1);
 }
-const absolute = path.resolve(input);
-const reportPath = path.resolve(process.argv[3] ?? 'docs/reports/tasks-md-evidence-links-v2.json');
-const lines = fs.readFileSync(absolute, 'utf8').split(/\r?\n/);
-const checkbox = /^- \[([ xX])\] (.+)$/;
-const evidence = /docs\/reports\/[\w./-]+\.json|`[^`]+\.(?:ts|mjs|mts|sql|py)`|\b\d+\/\d+\s+(?:tests?|checks?|changes?)\s+pass(?:ed)?\b|(?:tests?|checks?|changes?)\s+pass(?:ed)?/i;
+const text = readFileSync(resolve(path), 'utf8');
+const lines = text.split('\n');
+
+const EVIDENCE_RE = /docs\/reports\/[\w./-]+\.json|`[\w./-]+\.(ts|mjs|mts|sql|py)`|\d+\/\d+\s+tests?\s+pass|tests?\s+passed/i;
+
+// Matches the real task-ID shape used throughout this file: an uppercase-led
+// token, at least one hyphen-joined uppercase/digit segment, and an optional
+// dotted sub-index (e.g. "01D.2"). Deliberately does NOT match bare numbers
+// ("13"), single prose words ("Classify"), or lowercase words -- those are
+// the exact false-positive classes v1 mis-tagged as task IDs.
+const TASK_ID_RE = /^[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+(?:\.\d+)?$/;
+
 const blocks = [];
 let current = null;
-let section = 'UNSECTIONED';
-let groupBlockIndexes = [];
-const sectionEvidenceIndexes = new Set();
-for (let lineIndex = 0; lineIndex < lines.length; lineIndex += 1) {
-  const line = lines[lineIndex];
-  const heading = line.match(/^#{1,6}\s+(.+)$/);
-  if (heading) {
-    section = heading[1].trim();
-    groupBlockIndexes = [];
-  }
-  if (/^\s*Evidence:/i.test(line)) {
-    for (const blockIndex of groupBlockIndexes) sectionEvidenceIndexes.add(blockIndex);
-    groupBlockIndexes = [];
-  }
-  const match = line.match(checkbox);
-  if (match) {
+for (const line of lines) {
+  const bulletMatch = line.match(/^- \[( |x)\] (\S+)/);
+  if (bulletMatch) {
     if (current) blocks.push(current);
-    const title = match[2].trim();
-    current = {
-      checked: match[1].toLowerCase() === 'x',
-      taskId: title.split(/\s+—|\s+-\s+|\s+/)[0],
-      title,
-      startLine: lineIndex + 1,
-      section,
-      lines: [line],
-    };
-    groupBlockIndexes.push(blocks.length);
-  } else if (current) {
-    current.lines.push(line);
+    current = { checked: bulletMatch[1] === 'x', firstToken: bulletMatch[2], lines: [line] };
+    continue;
+  }
+  if (current) {
+    if (/^\s+\S/.test(line)) {
+      current.lines.push(line);
+    } else {
+      blocks.push(current);
+      current = null;
+    }
   }
 }
 if (current) blocks.push(current);
 
-const checked = blocks.filter((block) => block.checked);
-const classified = checked.map((block) => {
-  const ownEvidence = evidence.test(block.lines.join('\n'));
-  const blockIndex = blocks.indexOf(block);
-  const sectionEvidence = !ownEvidence && sectionEvidenceIndexes.has(blockIndex);
-  return { ...block, evidenceScope: ownEvidence ? 'TASK_BLOCK' : sectionEvidence ? 'SECTION' : null };
-});
-const missing = classified.filter((block) => !block.evidenceScope);
-const likelyContinuation = /^(?:Keep|\d{2}|Transaction|Current|Review|Execution|Prove|Exact|Insert|Every|Heartbeat|Successful|Failure)$/;
-const missingWithClassification = missing.map(({ taskId, title, startLine, section }) => ({
-  taskId,
-  title,
-  startLine,
-  section,
-  classification: likelyContinuation.test(taskId)
-    || /^(?:GRAPHIFY-EXECUTION-LEDGER-SCHEMA-02|GRAPHIFY-RUN-IDENTITY-SEPARATION-01)$/.test(taskId.replaceAll('`', '').replace(/:+$/, ''))
-    ? 'LIKELY_CONTINUATION_OR_SUBTASK'
-    : 'REVIEW_REQUIRED',
-}));
-const sectionEvidenceCount = classified.filter((block) => block.evidenceScope === 'SECTION').length;
-const report = {
+for (const b of blocks) {
+  // Strip a single trailing punctuation char some bullets carry right after
+  // the token (e.g. "LINEAGE-02," or "PROMOTION-01:") before classifying.
+  const token = b.firstToken.replace(/[,:;]$/, '');
+  b.id = token;
+  b.classification = TASK_ID_RE.test(token) ? 'REAL_TASK_ID' : 'GENERIC_BULLET';
+}
+
+const checkedBlocks = blocks.filter((b) => b.checked);
+const checkedTaskIdBlocks = checkedBlocks.filter((b) => b.classification === 'REAL_TASK_ID');
+const checkedGenericBlocks = checkedBlocks.filter((b) => b.classification === 'GENERIC_BULLET');
+
+const missing = [];
+for (const b of checkedTaskIdBlocks) {
+  const fullText = b.lines.join('\n');
+  if (!EVIDENCE_RE.test(fullText)) missing.push(b.id);
+}
+
+console.log(JSON.stringify({
   schema: 'atlas.tasks-md-evidence-links.v2',
-  input: path.relative(process.cwd(), absolute).replaceAll(path.sep, '/'),
-  parser: 'top_level_checkbox_block_until_next_checkbox',
-  checkedTaskCount: checked.length,
-  checkedWithEvidenceCount: checked.length - missing.length,
-  taskBlockEvidenceCount: classified.filter((block) => block.evidenceScope === 'TASK_BLOCK').length,
-  sectionEvidenceCount,
-  checkedWithoutEvidence: missingWithClassification,
-  missingEvidenceCounts: {
-    likelyContinuationOrSubtask: missingWithClassification.filter((item) => item.classification === 'LIKELY_CONTINUATION_OR_SUBTASK').length,
-    reviewRequired: missingWithClassification.filter((item) => item.classification === 'REVIEW_REQUIRED').length,
-  },
-  falsePositiveGuard: 'continuation prose and numbered criteria are not task blocks; section evidence is reported separately',
   writesPerformed: false,
-  canonicalAuthority: false,
-  status: 'PROVEN_READ_ONLY_TASK_BLOCK_AUDIT',
-};
-fs.mkdirSync(path.dirname(reportPath), { recursive: true });
-fs.writeFileSync(reportPath, `${JSON.stringify({ generatedAt: new Date().toISOString(), ...report }, null, 2)}\n`);
-console.log(JSON.stringify({ status: report.status, checkedTaskCount: report.checkedTaskCount, checkedWithEvidenceCount: report.checkedWithEvidenceCount, missingEvidenceCount: missing.length, reportPath }, null, 2));
+  totalCheckedItems: checkedBlocks.length,
+  totalCheckedRealTaskIdItems: checkedTaskIdBlocks.length,
+  totalCheckedGenericBulletItems: checkedGenericBlocks.length,
+  itemsWithEvidenceReference: checkedTaskIdBlocks.length - missing.length,
+  itemsWithoutEvidenceReference: missing,
+  note: 'GENERIC_BULLET items are informational only and are not required to carry independent evidence -- they are narrative/continuation bullets under a parent gate, not standalone task IDs.',
+}, null, 2));

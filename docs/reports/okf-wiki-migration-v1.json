@@ -1,0 +1,26 @@
+{
+  "schema": "atlas.okf-wiki-audit.v1",
+  "bundleRoot": "karpathy-wiki",
+  "auditRevision": "2026-09-07",
+  "markdownFiles": 5,
+  "conceptFiles": 3,
+  "reservedFiles": [
+    "index.md",
+    "log.md"
+  ],
+  "frontmatterRequired": true,
+  "conceptsWithNonEmptyType": 3,
+  "brokenInternalLinks": 0,
+  "utf8ReadErrors": 0,
+  "legacyHubPreserved": true,
+  "atlasRegistryPreserved": true,
+  "writesPerformed": [
+    "karpathy-wiki/index.md",
+    "karpathy-wiki/log.md",
+    "karpathy-wiki/project/trace-kag-web-development-guide.md",
+    "karpathy-wiki/project/atlas-retrieval-navigation.md",
+    "llm/llm.md"
+  ],
+  "runtimeDataChanged": false,
+  "valid": true
+}

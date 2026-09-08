@@ -21,7 +21,15 @@ import { CANONICAL_EMBEDDING_DIMENSION } from '../atlas/contracts/canonical-chun
  * Keep the canonical 768 source lane separate from any legacy projections
  * or compact routing lanes, with explicit lineage and score fusion downstream.
  */
-export type CodebaseVectorName = 'semantic_embedding' | 'topology_embedding' | 'latent_embedding' | 'content' | 'error' | 'signature';
+export type CodebaseVectorName =
+  | 'semantic_embedding'
+  | 'topology_embedding'
+  | 'latent_embedding'
+  | 'content'
+  | 'summary'
+  | 'synthesis'
+  | 'error'
+  | 'signature';
 
 /**
  * Authoritative vector dimensions
@@ -32,6 +40,8 @@ export const VECTOR_DIMENSIONS: Record<CodebaseVectorName, number> = {
   topology_embedding: 128,
   latent_embedding: 64,
   content: CANONICAL_EMBEDDING_DIMENSION,        // Native/source Qdrant named vector
+  summary: CANONICAL_EMBEDDING_DIMENSION,        // KAG/ACE summary-lens projection
+  synthesis: CANONICAL_EMBEDDING_DIMENSION,     // Synthesis-memory projection
   error: CANONICAL_EMBEDDING_DIMENSION,          // Native/source Qdrant named vector
   signature: CANONICAL_EMBEDDING_DIMENSION,      // Native/source Qdrant named vector
 };
@@ -70,6 +80,18 @@ export const VECTOR_STRATEGIES: Record<
     dimension: CANONICAL_EMBEDDING_DIMENSION,
     distance_metric: 'Cosine',
     use_case: 'Native source-lane full-context content vector for dense retrieval',
+    score_threshold: 0.3,
+  },
+  summary: {
+    dimension: CANONICAL_EMBEDDING_DIMENSION,
+    distance_metric: 'Cosine',
+    use_case: 'KAG/ACE summary-lens similarity',
+    score_threshold: 0.3,
+  },
+  synthesis: {
+    dimension: CANONICAL_EMBEDDING_DIMENSION,
+    distance_metric: 'Cosine',
+    use_case: 'Synthesis-memory similarity',
     score_threshold: 0.3,
   },
   error: {

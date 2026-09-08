@@ -293,6 +293,11 @@ const QUERY_STOP_WORDS = new Set([
   'a', 'an', 'and', 'the', 'find', 'show', 'locate', 'function', 'functions',
   'variable', 'variables', 'method', 'methods', 'class', 'classes', 'symbol',
   'symbols', 'definition', 'definitions', 'code', 'named', 'called', 'for', 'of',
+  'export', 'exported', 'async', 'asynchronous', 'arrow', 'inside', 'within',
+  'in', 'containing', 'contains', 'contain', 'has', 'with', 'after', 'following',
+  'follows', 'before', 'preceding', 'precedes', 'await', 'call', 'calls', 'return',
+  'returns', 'import', 'imports', 'decorator', 'decorators', 'catch', 'try', 'loop',
+  'loops', 'anywhere', 'that', 'which', 'where', 'get', 'list', 'search', 'me',
 ]);
 
 export function identifierTokens(value: string): string[] {

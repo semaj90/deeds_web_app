@@ -68,12 +68,27 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 		switch (model) {
 			case 'embeddinggemma': {
-				// EMBED-PROVIDER-CONVERGENCE-01: provider comes from the one
-				// resolver, not an independent process.env.EMBEDDING_BACKEND check.
-				// onnx_directml known limitation: runOnnxDirectMLEmbedding uses a
-				// codepoint-level fallback tokenizer, not the model's real
-				// SentencePiece tokenizer — embeddings from this path are not yet
-				// production-quality. Falls back to the standard embedText() cascade
+				// EMBED-PROVIDER-CONVERGENCE-01: whether this branch even runs comes
+				// from the one resolver (EMBEDDING_PROVIDER_V1.provider, driven by
+				// EMBEDDING_PROVIDER), not an independent process.env.EMBEDDING_BACKEND
+				// check here. Note EMBEDDING_BACKEND is a DIFFERENT env var, read
+				// separately inside onnx-server.ts's getServerOnnxSession() to decide
+				// whether a DirectML failure may fall back to CPU within that one call
+				// — setting only EMBEDDING_BACKEND=onnx_directml (e.g. via
+				// `npm run dev:gpu`) does NOT make this branch execute; EMBEDDING_PROVIDER
+				// must also be set to 'onnx_directml' for that (verified live 2026-09-07).
+				// Corrected 2026-09-07: this comment previously claimed
+				// runOnnxDirectMLEmbedding used a "codepoint-level fallback tokenizer,
+				// not the model's real SentencePiece tokenizer" — that was stale.
+				// Read directly: onnx-server.ts's ensureEmbeddingTokenizer() calls the
+				// same @huggingface/transformers AutoTokenizer.from_pretrained() that
+				// onnx-embed.ts's always-live CPU path uses; there is no codepoint
+				// fallback anywhere in this file. Live-tested end to end (real
+				// DirectML session + real tokenizer + real inference, not a mocked
+				// tensor): 768-dim, all-finite, L2-normalized (norm=1.0) output. What
+				// remains genuinely unverified is embedding *quality/correctness*
+				// against a known-good reference — not the tokenizer mechanism.
+				// Falls back to the standard embedText() cascade
 				// (ONNX Tier-0 -> llama_cpp_gguf Tier-1 -> gRPC -> Ollama) on null.
 				let embedding: number[] | null = null;
 				if (EMBEDDING_PROVIDER_V1.provider === 'onnx_directml') {

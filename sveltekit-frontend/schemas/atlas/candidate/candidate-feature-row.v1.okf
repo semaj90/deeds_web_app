@@ -13,7 +13,6 @@ fields:
   candidateOrdinal: { type: integer, minimum: 0 }
   canonicalId: { type: string, required: true }
   packetKey: { type: string, nullable: true }
-  sourceRef: { type: string, nullable: true }
   sourceRef: { type: string, required: true }
   semanticSimilarity: { type: number, minimum: 0, maximum: 1 }
   lexicalScore: { type: number, minimum: 0, maximum: 1 }

@@ -1,0 +1,122 @@
+{
+  "canonicalAuthority": false,
+  "checkpointDir": "/mnt/c/Users/james/Videos/deeds-web-app/models/gemma4_assistant_huggingface_7_3_26",
+  "checkpointMutated": false,
+  "fixture": {
+    "batchSize": 12,
+    "fp16GpuVsFp32MaxAbsoluteDelta": 1.9557850360870361,
+    "fp16OrderAgreement": false,
+    "maxLength": 128,
+    "observations": [
+      {
+        "fp16Gpu": -1.8935546875,
+        "fp16RepeatAbsoluteDelta": 0.0,
+        "fp16VsFp32AbsoluteDelta": 0.019653797149658203,
+        "fp32Gpu": -1.8739008903503418,
+        "index": 0,
+        "tokenCount": 14
+      },
+      {
+        "fp16Gpu": 2.8359375,
+        "fp16RepeatAbsoluteDelta": 0.0,
+        "fp16VsFp32AbsoluteDelta": 0.19823741912841797,
+        "fp32Gpu": 3.034174919128418,
+        "index": 1,
+        "tokenCount": 35
+      },
+      {
+        "fp16Gpu": -0.326171875,
+        "fp16RepeatAbsoluteDelta": 0.0,
+        "fp16VsFp32AbsoluteDelta": 1.9557850360870361,
+        "fp32Gpu": -2.281956911087036,
+        "index": 2,
+        "tokenCount": 9
+      },
+      {
+        "fp16Gpu": -11.5234375,
+        "fp16RepeatAbsoluteDelta": 0.0,
+        "fp16VsFp32AbsoluteDelta": 0.2201671600341797,
+        "fp32Gpu": -11.30327033996582,
+        "index": 3,
+        "tokenCount": 13
+      },
+      {
+        "fp16Gpu": -3.0625,
+        "fp16RepeatAbsoluteDelta": 0.0,
+        "fp16VsFp32AbsoluteDelta": 0.2314138412475586,
+        "fp32Gpu": -3.2939138412475586,
+        "index": 4,
+        "tokenCount": 8
+      },
+      {
+        "fp16Gpu": 0.94287109375,
+        "fp16RepeatAbsoluteDelta": 0.0,
+        "fp16VsFp32AbsoluteDelta": 0.011546134948730469,
+        "fp32Gpu": 0.9313249588012695,
+        "index": 5,
+        "tokenCount": 13
+      },
+      {
+        "fp16Gpu": -7.77734375,
+        "fp16RepeatAbsoluteDelta": 0.0,
+        "fp16VsFp32AbsoluteDelta": 1.3112239837646484,
+        "fp32Gpu": -6.466119766235352,
+        "index": 6,
+        "tokenCount": 13
+      },
+      {
+        "fp16Gpu": -13.4609375,
+        "fp16RepeatAbsoluteDelta": 0.0,
+        "fp16VsFp32AbsoluteDelta": 0.010974884033203125,
+        "fp32Gpu": -13.449962615966797,
+        "index": 7,
+        "tokenCount": 16
+      },
+      {
+        "fp16Gpu": -6.9296875,
+        "fp16RepeatAbsoluteDelta": 0.0,
+        "fp16VsFp32AbsoluteDelta": 0.25968170166015625,
+        "fp32Gpu": -6.670005798339844,
+        "index": 8,
+        "tokenCount": 38
+      },
+      {
+        "fp16Gpu": -10.59375,
+        "fp16RepeatAbsoluteDelta": 0.0,
+        "fp16VsFp32AbsoluteDelta": 0.945709228515625,
+        "fp32Gpu": -9.648040771484375,
+        "index": 9,
+        "tokenCount": 29
+      },
+      {
+        "fp16Gpu": -16.265625,
+        "fp16RepeatAbsoluteDelta": 0.0,
+        "fp16VsFp32AbsoluteDelta": 0.012104034423828125,
+        "fp32Gpu": -16.277729034423828,
+        "index": 10,
+        "tokenCount": 13
+      },
+      {
+        "fp16Gpu": -0.521484375,
+        "fp16RepeatAbsoluteDelta": 0.0,
+        "fp16VsFp32AbsoluteDelta": 0.5807273387908936,
+        "fp32Gpu": 0.059242963790893555,
+        "index": 11,
+        "tokenCount": 13
+      }
+    ]
+  },
+  "hardware": {
+    "computeCapability": [
+      8,
+      6
+    ],
+    "gpu": "NVIDIA GeForce RTX 3060 Ti",
+    "torch": "2.14.0+cu132",
+    "torchCuda": "13.2"
+  },
+  "rankingQualityProven": false,
+  "schema": "atlas.gemma-rank-cuda-fp16-control.v1",
+  "status": "FP16_GPU_CONTROL_FINITE_ORDER_PROVEN_PARITY_OPEN",
+  "trainingPerformed": false
+}

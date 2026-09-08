@@ -1,6 +1,12 @@
 import { createHash } from 'node:crypto';
 import { z } from 'zod';
 import { canonicalEncodeV1, sha256HexSchema } from './canonical-hash-v1.js';
+import {
+  buildContextPrefixIdentityV1,
+  ContextPrefixIdentityV1Schema,
+  ContextPrefixReuseObservationV1Schema,
+  type ContextPrefixIdentityV1,
+} from './context-prefix-identity-v1.js';
 
 const revision = z.string().min(1);
 
@@ -44,6 +50,10 @@ export const PrefillReceiptV1Schema = z.object({
   workflowId: z.string().min(1).nullable(),
   dagNodeId: z.string().min(1).nullable(),
   contentIdentity: PrefillContentIdentityV1Schema,
+  /** Optional read-only observation of the stable prefix used by the request. */
+  contextPrefixIdentity: ContextPrefixIdentityV1Schema.nullable().optional(),
+  /** Optional measured reuse data; never implies that KV state is persisted by Atlas. */
+  contextPrefixReuseObservation: ContextPrefixReuseObservationV1Schema.nullable().optional(),
   physicalArtifact: PrefillArtifactIdentityV1Schema.nullable(),
   selectedPacketKeys: z.array(z.string().min(1)),
   evidenceRefs: z.array(z.string().min(1)),
@@ -71,6 +81,27 @@ export function buildPrefillContentIdentityV1(input: Omit<PrefillContentIdentity
   return PrefillContentIdentityV1Schema.parse({ ...payload, checksumSha256: hashPayload(payload) });
 }
 
+/**
+ * Compose the stable-prefix identity from the existing logical prefill
+ * identity. Tool and system-policy revisions remain explicit inputs because
+ * they are not owned by the content identity contract.
+ */
+export function buildContextPrefixIdentityFromPrefillContentV1(input: {
+  contentIdentity: PrefillContentIdentityV1;
+  stablePrefix: string;
+  toolSchemaRevision: string;
+  systemPolicyRevision: string;
+}): ContextPrefixIdentityV1 {
+  return buildContextPrefixIdentityV1({
+    modelRevision: input.contentIdentity.modelRevision,
+    templateRevision: input.contentIdentity.promptTemplateRevision,
+    toolSchemaRevision: input.toolSchemaRevision,
+    systemPolicyRevision: input.systemPolicyRevision,
+    stableEvidenceRevision: input.contentIdentity.evidenceRevisionSetHash,
+    stablePrefix: input.stablePrefix,
+  });
+}
+
 export function buildPrefillArtifactIdentityV1(input: Omit<PrefillArtifactIdentityV1, 'schema' | 'checksumSha256'>): PrefillArtifactIdentityV1 {
   const tensorArtifactChecksums = [...new Set(input.tensorArtifactChecksums)].sort();
   const payload = {
@@ -82,6 +113,22 @@ export function buildPrefillArtifactIdentityV1(input: Omit<PrefillArtifactIdenti
 }
 
 export function buildPrefillReceiptV1(input: Omit<PrefillReceiptV1, 'schema' | 'checksumSha256'>): PrefillReceiptV1 {
+  if (input.contextPrefixIdentity) {
+    if (input.contextPrefixIdentity.modelRevision !== input.contentIdentity.modelRevision) {
+      throw new Error('prefill context prefix model revision does not match content identity');
+    }
+    if (input.contextPrefixIdentity.templateRevision !== input.contentIdentity.promptTemplateRevision) {
+      throw new Error('prefill context prefix template revision does not match content identity');
+    }
+  }
+  if (input.contextPrefixReuseObservation) {
+    if (!input.contextPrefixIdentity) {
+      throw new Error('prefill context prefix reuse observation requires context prefix identity');
+    }
+    if (input.contextPrefixReuseObservation.contextPrefixIdentityChecksum !== input.contextPrefixIdentity.checksum) {
+      throw new Error('prefill context prefix reuse observation identity mismatch');
+    }
+  }
   if (
     input.physicalArtifact &&
     input.physicalArtifact.contentIdentityChecksum !== input.contentIdentity.checksumSha256

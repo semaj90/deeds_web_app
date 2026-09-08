@@ -37,6 +37,9 @@ export type Postgres25TextSearchOptions = PostgresFtsSearchOptions;
 export interface BM25Candidate extends CandidateForIdentityResolution {
   retrieved_via: 'bm25';
   retrieval_algorithm: 'postgres_fts_ts_rank_cd';
+  score_type?: 'PG_TS_RANK_CD';
+  scorer_revision?: 'postgres-18-ts-rank-cd-v1';
+  text_search_config?: 'english';
   identity_resolution_source: 'source_ref_content_hash_exact';
   title?: string;
   snippet?: string;
@@ -55,6 +58,9 @@ function toBm25Shape(candidates: PostgresFtsCandidate[]): BM25Candidate[] {
     snippet: c.snippet,
     retrieved_via: 'bm25',
     retrieval_algorithm: 'postgres_fts_ts_rank_cd',
+    score_type: 'PG_TS_RANK_CD',
+    scorer_revision: 'postgres-18-ts-rank-cd-v1',
+    text_search_config: 'english',
     identity_resolution_source: 'source_ref_content_hash_exact',
   }));
 }
@@ -72,6 +78,9 @@ function toFtsShape(candidates: BM25Candidate[]): PostgresFtsCandidate[] {
     retrieved_via: 'postgres_fts',
     indexKind: 'postgres_tsvector_english',
     retrieval_algorithm: 'postgres_fts_ts_rank_cd',
+    score_type: 'PG_TS_RANK_CD',
+    scorer_revision: 'postgres-18-ts-rank-cd-v1',
+    text_search_config: 'english',
     identity_resolution_source: 'source_ref_content_hash_exact',
   }));
 }

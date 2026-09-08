@@ -1,6 +1,6 @@
 {
   "schema": "atlas.graphify-file-embedding-backfill.v2",
-  "generatedAt": "2026-09-04T16:19:10.625Z",
+  "generatedAt": "2026-09-08T00:54:44.061Z",
   "apply": false,
   "requireEmbedServer": false,
   "scope": {
@@ -47,5 +47,5 @@
   "inputLineageSample": [],
   "errors": [],
   "sample": [],
-  "elapsedMs": 321
+  "elapsedMs": 807
 }

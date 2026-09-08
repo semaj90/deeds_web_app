@@ -1,0 +1,69 @@
+{
+  "canonicalAuthority": false,
+  "canonicalTargetAlignmentProven": false,
+  "canonicalTargetEmbeddingAvailable": false,
+  "checkpointDir": "models\\gemma4_assistant_huggingface_7_3_26",
+  "configPath": "models\\gemma4_assistant_huggingface_7_3_26\\config.json",
+  "configUseOrderedEmbeddings": true,
+  "embeddingMatrixLoaded": false,
+  "embeddingShape": [
+    262144,
+    256
+  ],
+  "observedAt": "2026-09-07T00:44:42.824725+00:00",
+  "permutationRoundTrip": true,
+  "receiptChecksum": "sha256:963de5a858e15e161cecd2e289ee9db10557a1fc952480d1f16b0bb3026e59ae",
+  "sampleMappings": [
+    {
+      "canonicalTokenId": 0,
+      "orderedPosition": 181760,
+      "roundTripCanonicalTokenId": 0
+    },
+    {
+      "canonicalTokenId": 1,
+      "orderedPosition": 8448,
+      "roundTripCanonicalTokenId": 1
+    },
+    {
+      "canonicalTokenId": 2,
+      "orderedPosition": 62720,
+      "roundTripCanonicalTokenId": 2
+    },
+    {
+      "canonicalTokenId": 3,
+      "orderedPosition": 182144,
+      "roundTripCanonicalTokenId": 3
+    },
+    {
+      "canonicalTokenId": 4,
+      "orderedPosition": 141824,
+      "roundTripCanonicalTokenId": 4
+    },
+    {
+      "canonicalTokenId": 262143,
+      "orderedPosition": 184191,
+      "roundTripCanonicalTokenId": 262143
+    }
+  ],
+  "schema": "atlas.gemma-rank-ordered-embedding-alignment-proof.v1",
+  "specialTokenIds": {
+    "<bos>": 2,
+    "<eos>": 1,
+    "<mask>": 4,
+    "<pad>": 0,
+    "<unk>": 3
+  },
+  "specialTokenIdsInBounds": true,
+  "status": "ORDERED_EMBEDDING_PERMUTATION_PROVEN_TARGET_ALIGNMENT_OPEN",
+  "targetAlignmentNote": "The local ordered-row permutation is proven; a canonical Gemma4 target embedding table or verified upstream relabeling fixture is still required.",
+  "tokenOrderingDirection": "ordered_position_to_canonical_token_id",
+  "tokenOrderingIsPermutation": true,
+  "tokenOrderingLength": 262144,
+  "tokenizerIdCount": 262144,
+  "tokenizerIdsInBounds": true,
+  "tokenizerPath": "models\\gemma4_assistant_huggingface_7_3_26\\tokenizer.json",
+  "vocabSize": 262144,
+  "weightsChecksum": "sha256:12875062fc25c51e8fa9b62abd2de7ad48b7d63f8559d5d604fbd5a3d6bcff16",
+  "weightsMutated": false,
+  "weightsPath": "models\\gemma4_assistant_huggingface_7_3_26\\model.safetensors"
+}

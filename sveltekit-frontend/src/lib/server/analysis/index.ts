@@ -16,3 +16,5 @@ export * from './experiment-analysis-sidecar.js';
 export * from './experiment-analysis-service.js';
 export * from './representation-analysis-service.js';
 export * from './event-hypergraph-contract.js';
+export * from './lexical-feature-registry-v1.js';
+export * from './lexical-pass-ledger-adapter-v1.js';

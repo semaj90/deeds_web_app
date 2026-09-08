@@ -1,6 +1,6 @@
 {
   "schema": "atlas.source-lineage-model.v1",
-  "generatedAt": "2026-09-05T16:18:14.337Z",
+  "generatedAt": "2026-09-08T03:00:02.181Z",
   "readOnly": true,
   "postgresWrites": false,
   "observation": {
@@ -27,25 +27,25 @@
     "source_refs": 22604
   },
   "sourceVersionObservation": {
-    "rows": 25317,
-    "source_refs": 25258,
-    "content_hash_present": 25317,
-    "source_revision_present": 25317,
-    "workspace_revision_present": 25273
+    "rows": 26014,
+    "source_refs": 25643,
+    "content_hash_present": 26014,
+    "source_revision_present": 26014,
+    "workspace_revision_present": 25970
   },
   "stableIdentityCoverage": {
-    "graphify_source_refs": 25258,
+    "graphify_source_refs": 25643,
     "graphify_refs_in_registry": 117,
-    "graphify_refs_missing_registry": 25141
+    "graphify_refs_missing_registry": 25526
   },
   "currentProjection": {
-    "packet_rows": 61715,
-    "packet_source_refs": 61714,
+    "packet_rows": 61718,
+    "packet_source_refs": 61717,
     "exact_current_projection": 17307,
     "source_revision_joined": 17307,
     "current_workspace_joined": 0
   },
-  "projectionChecksum": "eaeeba14a1569508d3108b7225088544bf5397f2a97e66e8d4827b3bbe20846a",
+  "projectionChecksum": "90dcf88c578d421d44ea614cb02f8a0910e1a4271add0778327ba5f5e76daa08",
   "policy": {
     "sourceRef": "locator_only",
     "canonicalSource": "stable_identity",

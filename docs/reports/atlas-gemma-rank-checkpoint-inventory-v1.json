@@ -10,15 +10,15 @@
     "ORDERED_EMBEDDING_ROW_ALIGNMENT_REQUIRES_EXPLICIT_PROOF"
   ],
   "canonicalAuthority": false,
-  "checkpointDir": ".tmp\\google-gemma4-e4b-assistant",
+  "checkpointDir": "models\\gemma4_assistant_huggingface_7_3_26",
   "files": {
     "config": {
       "bytes": 2315,
-      "path": ".tmp\\google-gemma4-e4b-assistant\\config.json"
+      "path": "models\\gemma4_assistant_huggingface_7_3_26\\config.json"
     },
     "weights": {
       "bytes": 159138208,
-      "path": ".tmp\\google-gemma4-e4b-assistant\\model.safetensors",
+      "path": "models\\gemma4_assistant_huggingface_7_3_26\\model.safetensors",
       "sha256": "sha256:12875062fc25c51e8fa9b62abd2de7ad48b7d63f8559d5d604fbd5a3d6bcff16"
     }
   },
@@ -78,8 +78,8 @@
     "atlas.rank_head.weight",
     "atlas.rank_head.bias"
   ],
-  "observedAt": "2026-09-06T20:42:44.449839+00:00",
-  "receiptChecksum": "sha256:07043690893f46b09bda55ff5aec579edcf5609082b4885f685d5e599f4b01a6",
+  "observedAt": "2026-09-06T23:54:16.414570+00:00",
+  "receiptChecksum": "sha256:ccc2590741d93d101cbb00f7e61d1963f012d0f8a024cb731bbb51e81ce231b5",
   "safetensorsAvailable": true,
   "schema": "atlas.gemma-rank-checkpoint-inventory.v1",
   "standaloneAttentionShapeMismatches": [],

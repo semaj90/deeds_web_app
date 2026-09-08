@@ -1,0 +1,46 @@
+{
+  "schema": "atlas.gemma-rank-onnx-layer-localization.v1",
+  "checkpointDir": "models\\atlas-gemma-rank-v1-donor-b\\standalone-init-bf16",
+  "sourceWeightsChecksum": "sha256:06a26a9a36a591d7b284cff59d0c27f0ac0a2db192d6f743a2f574ad0d435bce",
+  "probeText": "Which function computes the canonical packet checksum for a candidate ordinal map?",
+  "inputTokenIdsChecksum": "sha256:c9262647768dd929ed1559b9835c132da934a1a9d29ae4636078b0d22e7117aa",
+  "layerResults": [
+    {
+      "layerCount": 1,
+      "layerType": "sliding_attention",
+      "status": "PARITY_PASS",
+      "maxAbsDelta": 2.872943878173828e-05,
+      "referenceFinite": true,
+      "onnxFinite": true
+    },
+    {
+      "layerCount": 2,
+      "layerType": "sliding_attention",
+      "status": "PARITY_FAILED",
+      "maxAbsDelta": 35.857757568359375,
+      "referenceFinite": true,
+      "onnxFinite": true
+    },
+    {
+      "layerCount": 3,
+      "layerType": "sliding_attention",
+      "status": "PARITY_FAILED",
+      "maxAbsDelta": 35.76685333251953,
+      "referenceFinite": true,
+      "onnxFinite": true
+    },
+    {
+      "layerCount": 4,
+      "layerType": "full_attention",
+      "status": "PARITY_FAILED",
+      "maxAbsDelta": 38.06773376464844,
+      "referenceFinite": true,
+      "onnxFinite": true
+    }
+  ],
+  "checkpointMutated": false,
+  "trainingPerformed": false,
+  "canonicalAuthority": false,
+  "clientWiringPerformed": false,
+  "status": "LOCALIZATION_PROVEN"
+}

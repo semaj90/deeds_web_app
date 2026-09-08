@@ -7,6 +7,8 @@ import {
 	compareAgainstExactOracle,
 	compileOntologyEventTuples,
 	judgeRecommendation,
+	sortAtlasEvents,
+	type AtlasEvent,
 } from './event-hypergraph-contract.js';
 
 describe('event-hypergraph contract', () => {
@@ -137,5 +139,114 @@ describe('event-hypergraph contract', () => {
 		expect(oracle.precisionAtK).toBeCloseTo(1 / 3, 5);
 		expect(oracle.falseExclusions).toContain('c');
 		expect(oracle.falseInclusions).toContain('x');
+	});
+});
+
+describe('event ordering, idempotency, and replay stability (Lane A)', () => {
+	function makeInput(overrides: Partial<Omit<AtlasEvent, 'eventId'>> = {}): Omit<AtlasEvent, 'eventId'> {
+		return {
+			schemaVersion: 'atlas.event.hypergraph.v1',
+			eventType: 'call_execution',
+			sourceRef: 'src/lib/server/retrieval/canonical-rerank-executor.ts',
+			packetKey: 'packet:1',
+			treeNodeId: 'tree:1',
+			workspaceRevision: 'workspace-v1',
+			sourceRevision: 'source-v1',
+			representationRevision: 'semantic-768-v1',
+			producerId: 'ast-event-compiler',
+			producerRevision: 'compiler-v1',
+			canonicalizerRevision: 'canonicalizer-v1',
+			compilerRevision: 'compiler-v1',
+			observedAt: '2026-08-11T00:00:00.000Z',
+			evidenceRefs: ['evidence:1'],
+			participants: [
+				{ entityId: 'function:rerankCandidates', entityKind: 'symbol', role: 'actor' },
+				{ entityId: 'tool:semantic-card', entityKind: 'tool', role: 'tool' },
+			],
+			metadata: {},
+			...overrides,
+		};
+	}
+
+	it('replaying the same source revision twice produces identical event IDs and participant sets', () => {
+		// Two independent "runs" over the same frozen source revision — nothing
+		// but object identity differs between the two builds.
+		const runOne = [
+			buildAtlasEvent(makeInput({ observedAt: '2026-08-11T00:00:00.000Z' })),
+			buildAtlasEvent(
+				makeInput({
+					eventType: 'test_execution',
+					observedAt: '2026-08-11T00:00:01.000Z',
+					participants: [
+						{ entityId: 'function:rerankCandidates', entityKind: 'symbol', role: 'actor' },
+						{ entityId: 'test:rerankCandidates.spec.ts', entityKind: 'test', role: 'result' },
+					],
+				}),
+			),
+		];
+		const runTwo = [
+			buildAtlasEvent(makeInput({ observedAt: '2026-08-11T00:00:00.000Z' })),
+			buildAtlasEvent(
+				makeInput({
+					eventType: 'test_execution',
+					observedAt: '2026-08-11T00:00:01.000Z',
+					participants: [
+						{ entityId: 'function:rerankCandidates', entityKind: 'symbol', role: 'actor' },
+						{ entityId: 'test:rerankCandidates.spec.ts', entityKind: 'test', role: 'result' },
+					],
+				}),
+			),
+		];
+
+		expect(runTwo.map((event) => event.eventId)).toEqual(runOne.map((event) => event.eventId));
+		expect(runTwo.map((event) => event.participants)).toEqual(runOne.map((event) => event.participants));
+	});
+
+	it('builds the same event ID from the same input regardless of how many times it is built', () => {
+		const input = makeInput();
+		const ids = Array.from({ length: 5 }, () => buildAtlasEvent(input).eventId);
+		expect(new Set(ids).size).toBe(1);
+	});
+
+	it('sorting is idempotent — sorting an already-sorted list is a no-op', () => {
+		const events = [
+			buildAtlasEvent(makeInput({ eventType: 'call_execution', observedAt: '2026-08-11T00:00:00.000Z' })),
+			buildAtlasEvent(makeInput({ eventType: 'call_execution', observedAt: '2026-08-11T00:00:01.000Z' })),
+			buildAtlasEvent(makeInput({ eventType: 'test_execution', observedAt: '2026-08-11T00:00:00.000Z' })),
+		];
+		const once = sortAtlasEvents(events);
+		const twice = sortAtlasEvents(once);
+		expect(twice.map((event) => event.eventId)).toEqual(once.map((event) => event.eventId));
+	});
+
+	it('sort order is stable regardless of arrival order (replay from a different transport order)', () => {
+		const events = [
+			buildAtlasEvent(makeInput({ eventType: 'call_execution', observedAt: '2026-08-11T00:00:00.000Z' })),
+			buildAtlasEvent(makeInput({ eventType: 'call_execution', observedAt: '2026-08-11T00:00:01.000Z' })),
+			buildAtlasEvent(makeInput({ eventType: 'test_execution', observedAt: '2026-08-11T00:00:00.000Z' })),
+			buildAtlasEvent(makeInput({ eventType: 'reference_link', observedAt: '2026-08-11T00:00:02.000Z' })),
+		];
+
+		const forward = sortAtlasEvents(events).map((event) => event.eventId);
+		const reversed = sortAtlasEvents([...events].reverse()).map((event) => event.eventId);
+
+		// Deterministic shuffles of arrival order — mulberry32-free, just fixed permutations.
+		const permutations = [
+			[2, 0, 3, 1],
+			[3, 1, 0, 2],
+			[1, 3, 2, 0],
+		];
+
+		for (const permutation of permutations) {
+			const shuffled = permutation.map((index) => events[index]!);
+			expect(sortAtlasEvents(shuffled).map((event) => event.eventId)).toEqual(forward);
+		}
+		expect(reversed).toEqual(forward);
+	});
+
+	it('a different source revision never collides with a prior revision event ID', () => {
+		const revisionOne = buildAtlasEvent(makeInput({ sourceRevision: 'source-v1' }));
+		const revisionTwo = buildAtlasEvent(makeInput({ sourceRevision: 'source-v2' }));
+		expect(revisionOne.eventId).not.toBe(revisionTwo.eventId);
 	});
 });

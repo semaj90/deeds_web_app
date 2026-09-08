@@ -1,6 +1,6 @@
 # Legal AI Platform — Claude Project Instructions
 
-> MCP/Atlas status note (2026-08-23): The MCP and Atlas connection/tool-count statements in this document are historical snapshots. Current bounded evidence is in docs/reports/mcp-atlas-markdown-audit-2026-08-23.md. Live TRACE currently exposes 175 tools; active project config wires trace plus local atlas-tools.
+> MCP/Atlas status note (2026-08-23, tool count refreshed 2026-09-07): The MCP and Atlas connection/tool-count statements in this document are historical snapshots. Current bounded evidence is in docs/reports/mcp-atlas-markdown-audit-2026-08-23.md. Live TRACE MCP (`:8788`) was re-verified 2026-09-07 via `npm run trace:mcp:audit` (the real, wired live-runtime audit, not a static source grep) — **176 tools discovered, all 7 gates pass** (health/discovery/provenance/breadth/concurrency/idempotency/domain-completeness). The prior "175 tools" figure was off by one, consistent with one tool added since 2026-08-23. A separate static source-regex count (`docs/TRACE-MCP-TOOLS-AUDIT.json`, scans `trace-mcp-server.ts`'s `registerTool(` calls only) reports 120 — lower by design, since it can't see tools injected at runtime, the same known undercounting pattern already documented above for the main `server.ts` (108 static vs more at runtime). Active project config wires trace plus local atlas-tools.
 
 ## 🔄 Ollama Phase-Out + Chat/Synthesis Model Switch (2026-09-03 — IN PROGRESS, not complete)
 
@@ -45,6 +45,65 @@ picked, update this section with which backend won, the parity proof that justif
 migration status of every embeddings call site — the same evidentiary bar this file already
 requires (see e.g. the Embedding Dimensions Policy section's own history of undocumented
 re-decisions and what it cost to unwind them).
+
+## 🧭 Client Model Direction: Gemma3-270m → Gemma4-Assistant Family (2026-09-06 — DIRECTION ONLY, not started)
+
+**Stated operator direction, not a completed or even started migration — do not treat any part of
+this as done.** The plan is to eventually move the client-side local-inference lane off
+`gemma3_270m_onnx` onto a model from the Gemma4-assistant family. As of this note:
+
+- **`gemma3_270m_onnx` is still the live, unchanged, real client model** — `CLIENT_LLM_ONNX_PATH`/
+  `CLIENT_LLM_QUANTIZED_PATH`/`CLIENT_LLM_TOKENIZER_PATH` in `src/lib/ai/model-ids.ts` and the
+  WebGPU→WASM→CPU session code in `src/lib/ai/onnx/{inference,session}.ts` all still point at
+  `/gemma3_270m_onnx/*` (verified live 2026-09-06, not stale). Nothing has been removed or rewired.
+- **First real ONNX export attempt made 2026-09-06 — mechanically succeeds, numerically wrong,
+  NOT usable yet.** `python/atlas_gemma_rank_onnx_export_feasibility_v1.py` exports the
+  already-materialized standalone artifact (`models/atlas-gemma-rank-v1/standalone-init-bf16/`)
+  via `torch.onnx.export(..., dynamo=True)` (needed installing `onnxscript`, not previously in
+  this repo). The export completes and `onnx.checker.check_model` passes, but PyTorch-vs-ONNX
+  output differs by `4.386` (tolerance `1e-3`) — ruled out `dynamic_axes` as the cause (a
+  fixed-shape re-export gave the same delta). An initial "exported file is suspiciously small"
+  theory was checked and retracted same-session: the small `.onnx` file (1.2MB) has its large
+  tensors in a sibling `.onnx.data` file (standard ONNX external-data convention, 309.6MB) —
+  total 310.9MB, roughly matching the 154MB bf16 source doubled to fp32, not anomalous. That
+  310MB total IS its own separate blocker for browser delivery regardless of the parity bug.
+  Gemma4's non-standard per-layer `layer_scalar`/sliding-window attention structure remains the
+  leading suspect for the numerical divergence, not yet root-caused. Full trail:
+  `openspec/changes/parent-atlas-best-fit-score-fabric/tasks.md` (`ONNX-EXPORT-01`), receipt at
+  `docs/reports/atlas-gemma-rank-onnx-export-feasibility-v1.json`. **Do not treat ONNX export as
+  viable for this model yet** — it is not wired into `client-router.ts` or any client lane, has no
+  browser/WebGPU proof, and both the parity gap and the 310MB size must be resolved before either
+  is meaningful. Converting it for real client use remains new, unstarted work beyond this probe.
+  A working, live-tested alternative already exists for server-side use: `GEMMA-RANK-FASTAPI-01`
+  (same tasks.md) serves the real PyTorch model directly over FastAPI, sidestepping the ONNX bug
+  entirely — proven with real requests/responses, though the rank head is still untrained so scores
+  aren't meaningful yet either.
+- **The real, current Gemma4 work is `AtlasGemmaRankV1`**, a from-scratch reranker built by
+  stripping the target-activation/KV-coupling from Google's tiny Gemma4-E4B "assistant" checkpoint
+  (4 layers, hidden_size 256, ~158MB safetensors) and adding independent K/V projections + a scalar
+  `RankHead`. Tracked in `openspec/changes/parent-atlas-best-fit-score-fabric/tasks.md` (search
+  `AGMR-`/`MICRO-`). Current state (2026-09-06, verify against that file before citing further —
+  it changes often):
+  - `AGMR-01..06`: checkpoint/shape/tensor-alignment/load-init/forward-smoke/breadth-50 proof
+    ladder — all done, all CPU-only.
+  - `MICRO-02/03/04` + `MICRO-04-TRAIN-SMOKE`: feature-input contract, teacher receipts, shadow
+    structural proof, and a bounded training-loop mechanical proof (loss 5.49→0.0 on 10
+    self-identification pairs) — done, but explicitly **not** a ranking-quality or production
+    training result; the rank head is still Xavier-random outside that one toy proof.
+  - `MICRO-05-CUDA-*`: a real first GPU step — genuine CUDA forward passes on this host's RTX
+    3060 Ti (`PyTorch 2.14.0+cu132`, isolated WSL environment), finite and repeat-deterministic.
+    **BF16/FP16 vs. FP32 numerical parity is NOT resolved** (BF16 max delta 3.8, FP16 max delta
+    ~1.96, FP16 does not even preserve candidate ordering) — FP32 is the only trusted numerical
+    reference right now. No ranking quality, training, or promotion claim follows from these probes.
+  - `MICRO-05` (the actual MoE/REAP expert-pruning gate) remains untouched, gated behind real V1
+    shadow evidence that doesn't exist yet.
+- **Do not**: claim `gemma3_270m_onnx` has been replaced, claim `AtlasGemmaRankV1` is
+  production-ready or GPU-parity-proven, or assume MTP/speculative-decoding work elsewhere in this
+  repo is the same effort as this reranker transplant — they are architecturally distinct (see the
+  MTP-vs-AtlasGemmaRank distinction already recorded in that same tasks.md file).
+- **When this direction actually starts moving** (an ONNX export attempt, a client wiring change,
+  or a decision to promote the reranker), update this section with real evidence — same bar as
+  every other "direction only" note in this file — rather than letting it go stale in place.
 
 ## ❄️ CANONICAL LLAMA-SERVER STARTUP CONTRACT (FROZEN — Session 188C, Aug 4 2026)
 

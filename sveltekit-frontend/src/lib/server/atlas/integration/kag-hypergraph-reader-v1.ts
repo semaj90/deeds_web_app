@@ -20,6 +20,11 @@ import type { OntologyLinkedTupleV1 } from '../contracts/ontology-linked-tuple-v
 
 const MAX_CANONICAL_IDS = 256;
 
+export interface KagTraversalSnapshotV1 {
+  workspaceRevision: string;
+  graphRevision: string;
+}
+
 export interface KagHypergraphNeighborV1 {
   canonicalId: string;
   hyperedgeIds: string[];
@@ -141,12 +146,20 @@ function rowsToHyperedgeV1(contractHyperedgeId: string, rows: HyperedgeMemberRow
  */
 export async function readKagHypergraphNeighborsV1(
   canonicalIds: readonly string[],
-  options: { strict?: boolean } = {},
+  options: { strict?: boolean; snapshot?: KagTraversalSnapshotV1 } = {},
 ): Promise<KagHypergraphNeighborsReceiptV1> {
   const uniqueIds = [...new Set(canonicalIds.filter(Boolean))].slice(0, MAX_CANONICAL_IDS);
   if (uniqueIds.length === 0) return EMPTY_RECEIPT;
 
   try {
+    const snapshot = options.snapshot;
+    if (options.strict && (!snapshot?.workspaceRevision?.trim() || !snapshot?.graphRevision?.trim())) {
+      throw new Error('KAG_TRAVERSAL_SNAPSHOT_REQUIRED');
+    }
+    const hyperedgeRevisionFilter = snapshot
+      ? `\n            AND h.workspace_revision = $2\n            AND h.graph_revision = $3`
+      : '';
+    const hyperedgeParams = snapshot ? [uniqueIds, snapshot.workspaceRevision, snapshot.graphRevision] : [uniqueIds];
     const [tupleResult, memberResult] = await Promise.all([
       pool.query<OntologyLinkedTupleRow>(
         `
@@ -170,9 +183,9 @@ export async function readKagHypergraphNeighborsV1(
           WHERE h.contract_hyperedge_id IS NOT NULL
             AND h.hyperedge_id IN (
               SELECT DISTINCT hyperedge_id FROM atlas_hyperedge_members WHERE member_id = ANY($1::text[])
-            )
+            )${hyperedgeRevisionFilter}
         `,
-        [uniqueIds],
+        hyperedgeParams,
       ),
     ]);
 
@@ -215,6 +228,42 @@ export async function readKagHypergraphNeighborsV1(
  * failures for receipts instead of converting them into empty success. */
 export async function readKagHypergraphNeighborsStrictV1(
   canonicalIds: readonly string[],
+  snapshot: KagTraversalSnapshotV1,
 ): Promise<KagHypergraphNeighborsReceiptV1> {
-  return readKagHypergraphNeighborsV1(canonicalIds, { strict: true });
+  return readKagHypergraphNeighborsV1(canonicalIds, { strict: true, snapshot });
+}
+
+/** Strict role-preserving read for the bounded traversal coordinator. This is
+ * deliberately separate from the compact OAK neighbor receipt so traversal
+ * never has to reconstruct an n-ary fact from IDs alone. */
+export async function readKagHyperedgesStrictV1(
+  canonicalIds: readonly string[],
+  snapshot: KagTraversalSnapshotV1,
+): Promise<HyperedgeV1[]> {
+  const uniqueIds = [...new Set(canonicalIds.filter(Boolean))].slice(0, MAX_CANONICAL_IDS);
+  if (uniqueIds.length === 0) return [];
+  if (!snapshot.workspaceRevision.trim() || !snapshot.graphRevision.trim()) {
+    throw new Error('KAG_TRAVERSAL_SNAPSHOT_REQUIRED');
+  }
+  const result = await pool.query<HyperedgeMemberRow>(
+    `
+      SELECT h.hyperedge_id, h.contract_hyperedge_id, h.relation_type, h.workspace_revision,
+             h.source_revision, h.graph_revision, h.producer_revision, h.evidence_refs,
+             h.checksum, m.member_id, m.member_role, m.ordinal
+      FROM atlas_hyperedges h
+      JOIN atlas_hyperedge_members m ON m.hyperedge_id = h.hyperedge_id
+      WHERE h.contract_hyperedge_id IS NOT NULL
+        AND h.workspace_revision = $2
+        AND h.graph_revision = $3
+        AND h.hyperedge_id IN (
+          SELECT DISTINCT hyperedge_id FROM atlas_hyperedge_members WHERE member_id = ANY($1::text[])
+        )
+    `,
+    [uniqueIds, snapshot.workspaceRevision, snapshot.graphRevision],
+  );
+  const grouped = new Map<string, HyperedgeMemberRow[]>();
+  for (const row of result.rows) grouped.set(row.contract_hyperedge_id, [...(grouped.get(row.contract_hyperedge_id) ?? []), row]);
+  return [...grouped.entries()]
+    .map(([id, rows]) => rowsToHyperedgeV1(id, rows))
+    .filter((edge): edge is HyperedgeV1 => edge !== null);
 }

@@ -1,0 +1,186 @@
+{
+  "schema": "atlas.code-langextract-01-probe.v1",
+  "generatedAt": "2026-09-06T21:19:07.493Z",
+  "readOnly": true,
+  "productionWritesPerformed": false,
+  "sidecarEndpointUsed": false,
+  "modelBackend": "http://127.0.0.1:8090/v1/chat/completions (ornith-1.5-9b)",
+  "gate": "CODE-LANGEXTRACT-01",
+  "passCriteria": "extractionCount > 0 on >= 3 of 4 language fixtures AND 100% byte-span round-trip AND 100% identity preservation",
+  "languagesWithNonZeroExtraction": 3,
+  "totalFixtures": 4,
+  "allGroundedEntriesRoundtrip": true,
+  "allIdentityPreserved": true,
+  "verdict": "PASS",
+  "results": [
+    {
+      "fixtureId": "ts-assert-structural-facts",
+      "language": "typescript",
+      "latencyMs": 6683.5,
+      "rawExtractionCount": 4,
+      "groundedExtractionCount": 2,
+      "rejectedCount": 2,
+      "rejected": [
+        {
+          "reason": "exactText not found verbatim in sourceText",
+          "raw": {
+            "class": "FAILURE_MODE",
+            "exactText": "throw new Error(`CodeExtractionRequestV1 for candidate=${request.candidateId} has non-trivial sourceText ` + `(${request.sourceText.length} chars) but no astFacts/symbolFacts. The extraction call must ` + `never be asked to rediscover structural facts Tree-sitter/ast-grep already produce — run ` + `structural extraction first and attach its output before dispatching this request.`);",
+            "confidence": 0.95
+          }
+        },
+        {
+          "reason": "exactText not found verbatim in sourceText",
+          "raw": {
+            "class": "REQUIREMENT",
+            "exactText": "The extraction call must never be asked to rediscover structural facts Tree-sitter/ast-grep already produce — run structural extraction first and attach its output before dispatching this request.",
+            "confidence": 0.95
+          }
+        }
+      ],
+      "grounded": [
+        {
+          "class": "INVARIANT",
+          "exactText": "if (request.sourceText.length <= CODE_EXTRACTION_TRIVIAL_TEXT_LENGTH) return;",
+          "startByte": 92,
+          "endByte": 169,
+          "confidence": 0.9,
+          "attributes": {}
+        },
+        {
+          "class": "FAILURE_MODE",
+          "exactText": "if (request.astFacts.length === 0 && request.symbolFacts.length === 0) {",
+          "startByte": 172,
+          "endByte": 244,
+          "confidence": 0.9,
+          "attributes": {}
+        }
+      ],
+      "schemaValid": true,
+      "schemaError": null,
+      "roundtripValid": true,
+      "roundtripError": null,
+      "expectedClassHint": "INVARIANT",
+      "expectedPhraseSubstring": "never be asked to rediscover structural facts",
+      "hasExtractionNearHandLabeledPhrase": false
+    },
+    {
+      "fixtureId": "svelte-status-default",
+      "language": "svelte",
+      "latencyMs": 1156.3,
+      "rawExtractionCount": 1,
+      "groundedExtractionCount": 0,
+      "rejectedCount": 1,
+      "rejected": [
+        {
+          "reason": "exactText not found verbatim in sourceText",
+          "raw": {
+            "class": "INVARIANT",
+            "exactText": "statusClasses is a derived value computed from the status field, defaulting to 'offline' when status is null or undefined.",
+            "confidence": 0.8
+          }
+        }
+      ],
+      "grounded": [],
+      "schemaValid": true,
+      "schemaError": null,
+      "roundtripValid": true,
+      "roundtripError": null,
+      "expectedClassHint": "CONSTRAINT",
+      "expectedPhraseSubstring": "status ?? 'offline'",
+      "hasExtractionNearHandLabeledPhrase": false
+    },
+    {
+      "fixtureId": "python-positive-int",
+      "language": "python",
+      "latencyMs": 2553.2,
+      "rawExtractionCount": 4,
+      "groundedExtractionCount": 4,
+      "rejectedCount": 0,
+      "rejected": [],
+      "grounded": [
+        {
+          "class": "INVARIANT",
+          "exactText": "value < minimum",
+          "startByte": 160,
+          "endByte": 175,
+          "confidence": 0.9,
+          "attributes": {}
+        },
+        {
+          "class": "FAILURE_MODE",
+          "exactText": "raise ValueError(f\"{name} must be >= {minimum}\")",
+          "startByte": 185,
+          "endByte": 233,
+          "confidence": 0.9,
+          "attributes": {}
+        },
+        {
+          "class": "INVARIANT",
+          "exactText": "minimum: int = 1",
+          "startByte": 84,
+          "endByte": 100,
+          "confidence": 0.7,
+          "attributes": {}
+        },
+        {
+          "class": "DATA_FLOW",
+          "exactText": "value = int(params.get(name, default))",
+          "startByte": 114,
+          "endByte": 152,
+          "confidence": 0.8,
+          "attributes": {}
+        }
+      ],
+      "schemaValid": true,
+      "schemaError": null,
+      "roundtripValid": true,
+      "roundtripError": null,
+      "expectedClassHint": "CONSTRAINT",
+      "expectedPhraseSubstring": "value < minimum",
+      "hasExtractionNearHandLabeledPhrase": true
+    },
+    {
+      "fixtureId": "go-clamp-lane-limit",
+      "language": "go",
+      "latencyMs": 2513.2,
+      "rawExtractionCount": 3,
+      "groundedExtractionCount": 3,
+      "rejectedCount": 0,
+      "rejected": [],
+      "grounded": [
+        {
+          "class": "INVARIANT",
+          "exactText": "if n <= 0 {\n\t\treturn 40\n\t}",
+          "startByte": 34,
+          "endByte": 60,
+          "confidence": 0.9,
+          "attributes": {}
+        },
+        {
+          "class": "INVARIANT",
+          "exactText": "if n > 200 {\n\t\treturn 200\n\t}",
+          "startByte": 62,
+          "endByte": 90,
+          "confidence": 0.9,
+          "attributes": {}
+        },
+        {
+          "class": "INVARIANT",
+          "exactText": "return n",
+          "startByte": 92,
+          "endByte": 100,
+          "confidence": 0.8,
+          "attributes": {}
+        }
+      ],
+      "schemaValid": true,
+      "schemaError": null,
+      "roundtripValid": true,
+      "roundtripError": null,
+      "expectedClassHint": "INVARIANT",
+      "expectedPhraseSubstring": "n > 200",
+      "hasExtractionNearHandLabeledPhrase": true
+    }
+  ]
+}

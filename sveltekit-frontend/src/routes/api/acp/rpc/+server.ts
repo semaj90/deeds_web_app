@@ -79,7 +79,7 @@ export const POST: RequestHandler = async (event) => {
               maxTokens: 2048,
               maxToolRounds: max_tool_rounds,
               useKvCache: use_kv_cache,
-              kvCacheTtl: 256,
+              cacheReuseMinChunk: 256,
               mcpPort: 8788,
               permissionGrant,
             },

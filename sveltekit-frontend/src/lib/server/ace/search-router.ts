@@ -9,7 +9,18 @@
  * Also orchestrates multi-lane search with fallback chain:
  * Qdrant → Postgres → BM25 → TurboVec rerank
  *
- * Used by Stage A0 in context-assembler.ts for ACE retrieval.
+ * NOT currently wired into Stage A0 or any other production path (verified
+ * 2026-09-07 via repo-wide static + dynamic import grep — the only reference
+ * anywhere is a dynamic `import()` from a standalone test script,
+ * `scripts/atlas/test-p4-summary-indexing.mjs`). Stage A0's actual live
+ * routing owner is `QueryRouter4x4`
+ * (`sveltekit-frontend/src/lib/server/routing/query-router-4x4.js`), an
+ * adaptive Hebbian-style router already wired into
+ * `src/lib/server/features/ai/ace/context-assembler.ts`. Do not wire this
+ * file in as a second routing owner for the same job without an explicit
+ * decision to replace or merge with `QueryRouter4x4` first — see
+ * `openspec/changes/parent-atlas-ace-bitfrost-cache-correctness/tasks.md`
+ * (T3, `search-router.ts` entry) for the finding.
  */
 
 export interface SearchStrategy {

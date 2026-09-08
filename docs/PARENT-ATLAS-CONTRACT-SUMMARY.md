@@ -165,7 +165,11 @@ glyph_type     → 'text' | 'symbol' | 'icon' | 'diagram'
 
 ---
 
-## Ingestion Queue (RabbitMQ / BullMQ)
+## Ingestion Queue (RabbitMQ)
+
+Parent Atlas durable ingestion and worker dispatch use RabbitMQ/AMQP. BullMQ is
+owned by the separate `claude-mem` stack and is not an interchangeable Parent
+Atlas queue implementation.
 
 ```
 ingest.raw

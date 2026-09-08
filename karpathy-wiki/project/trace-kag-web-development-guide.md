@@ -1,3 +1,15 @@
+---
+type: guide
+title: TRACE/Karpathy Web Development Guide
+description: Development and retrieval flow for the TRACE/KAG stack.
+tags:
+  - parent-atlas
+  - trace
+  - kag
+  - retrieval
+  - web-development
+---
+
 # TRACE/Karpathy Web Development Guide
 
 ## 1. Goals

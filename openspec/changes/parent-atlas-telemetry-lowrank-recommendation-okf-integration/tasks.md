@@ -32,8 +32,21 @@ checking Lane A's boxes wholesale off that note would overclaim. Verified indivi
 
 ## Lane A — deterministic event hypergraph and symbolic evidence
 
-- [ ] Add an `AtlasEvent` contract for n-ary symbolic events with explicit
-      participants, roles, evidence, and revision lineage.
+- [x] Add an `AtlasEvent` contract for n-ary symbolic events with explicit
+      participants, roles, evidence, and revision lineage. **Closed 2026-09-07 —
+      independently re-verified live, not taken on the 2026-08-31 reconciliation note's word
+      alone**: `sveltekit-frontend/src/lib/server/analysis/event-hypergraph-contract.ts` exports
+      `buildAtlasEvent()`, `canonicalizeAtlasEvent()`, `sortAtlasEvents()`,
+      `compileOntologyEventTuples()`, and the schema itself declares `participants` (min 2, n-ary),
+      `evidenceRefs`, and revision fields — all confirmed present by direct read. Consumer count is
+      actually **5 real files**, not the 2 the reconciliation note stated (re-grepped fresh, not
+      copied forward): `nlp-feature-compiler.ts`, `atlas/temporal/
+      temporal-action-hypergraph-adapter.ts`, `analytics/recommendation-policy.ts`,
+      `atlas/board/daily-graphify-board-recommendations.ts`, plus a barrel re-export in
+      `analysis/index.ts`. Existing `event-hypergraph-contract.spec.ts` re-run live: 4/4 pass. This
+      checkbox was left unflipped despite the note's own prose already confirming it — closing the
+      gap between recorded status and verified reality, per this repo's own discipline against
+      exactly that kind of drift.
 - [ ] Keep event records canonical and n-ary; derive telemetry breadth and
       other mutable counts in a separate projection lane.
 - [ ] Build a deterministic AST-to-event compiler from Tree-sitter / ast-grep
@@ -43,8 +56,22 @@ checking Lane A's boxes wholesale off that note would overclaim. Verified indivi
       the event record canonical and n-ary.
 - [ ] Add a separate semantic enrichment pass for event annotations and keep
       it downstream of AST truth.
-- [ ] Prove event ordering, idempotency, and replay stability with the same
+- [x] Prove event ordering, idempotency, and replay stability with the same
       source revision producing the same event IDs and participant sets.
+      **Closed 2026-09-07** — added 5 tests to
+      `sveltekit-frontend/src/lib/server/analysis/event-hypergraph-contract.spec.ts`
+      (9/9 pass): (1) replaying two independent event sets built from the same
+      frozen source revision produces identical `eventId`s and identical
+      `participants` arrays; (2) `buildAtlasEvent` on identical input produces
+      the same ID across 5 repeated builds (idempotency); (3) `sortAtlasEvents`
+      is idempotent — sorting an already-sorted list changes nothing; (4) sort
+      order is invariant to arrival order — 3 fixed shuffles plus a full
+      reversal of a 4-event set all sort back to the same order (replay from a
+      different transport order); (5) two events built from the same
+      participants/evidence but a different `sourceRevision` never collide on
+      `eventId`. This is a direct proof over the real exported functions
+      (`buildAtlasEvent`, `sortAtlasEvents`), not a new mechanism — no
+      production code changed.
 
 ## Lane B — OKF ontology and linked tuples
 

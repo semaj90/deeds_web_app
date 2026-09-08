@@ -1,0 +1,57 @@
+{
+  "schema": "atlas.queue-boundary-audit.v1",
+  "date": "2026-09-08",
+  "parentAtlas": {
+    "queueOwner": "RABBITMQ",
+    "client": "amqplib",
+    "status": "ALIGNED",
+    "bullmqRuntime": false
+  },
+  "claudeMem": {
+    "queueOwner": "BULLMQ",
+    "backend": "Valkey",
+    "status": "ISOLATED_AND_PRESERVED"
+  },
+  "checks": {
+    "parentAtlasBullmqImports": 0,
+    "parentAtlasBullmqRuntimeDependencies": 0,
+    "rabbitmqReferences": "present",
+    "fakeBullmqTypeShimRemoved": true,
+    "archivedBackupsModified": false,
+    "unownedRabbitMqPlaceholders": [
+      {
+        "file": "sveltekit-frontend/src/routes/api/batch-summary/hints/+server.ts",
+        "status": "ACK_ONLY",
+        "reason": "No matching RabbitMQ consumer/queue contract was found"
+      },
+      {
+        "file": "docker/omni-worker/langgraph_sidecar.py",
+        "status": "NOT_WIRED",
+        "reason": "RabbitMQ consumer loop remains explicitly TODO"
+      }
+    ]
+  },
+  "validation": {
+    "openspec": "passed",
+    "focusedVitest": {
+      "files": 2,
+      "tests": 7,
+      "status": "passed"
+    },
+    "gitDiffCheck": "passed",
+      "rabbitmqBroker": {
+      "ping": "succeeded",
+      "consumersObserved": 0,
+      "messagesReadyObserved": {
+        "atlas.q.code.events": 2,
+        "atlas.q.retrieval.work": 2
+      },
+      "consumerOwnerStatus": {
+        "svelteKit": "NOT_RUNNING_IN_CURRENT_DOCKER_COMPOSE_PS",
+        "rabbitmqConsumers": "NONE_OBSERVED",
+        "interpretation": "Broker healthy; consumer absence is runtime startup state, not proof that queue handlers are missing"
+      }
+    }
+  },
+  "canonicalBoundary": "Parent Atlas durable dispatch uses RabbitMQ; Valkey remains cache/coordination only; BullMQ remains confined to claude-mem."
+}

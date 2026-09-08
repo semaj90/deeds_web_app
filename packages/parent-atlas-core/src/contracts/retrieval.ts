@@ -68,6 +68,34 @@ export interface RankedCandidate extends RankedPacket {
   };
 }
 
+/** Query-qualified, scorer-qualified observation for the logical lexical lane. */
+export interface LexicalRelevanceObservationV1 {
+  schema: 'atlas.lexical.relevance-observation.v1';
+  requestId: string;
+  queryId: string;
+  canonicalId: string;
+  packetKey: string;
+  candidateOrdinal: number;
+  workspaceRevision: string;
+  sourceRevision: string;
+  retrievalRevision: string;
+  logicalLane: 'LEXICAL';
+  executor: 'POSTGRES_FTS' | 'GO_RETRIEVAL';
+  scoreType: 'PG_TS_RANK' | 'PG_TS_RANK_CD' | 'BM25';
+  rawScore: number;
+  normalizedScore: number | null;
+  rank: number;
+  candidateCount: number;
+  queryChecksum: string;
+  searchVectorRevision?: string;
+  scorerRevision?: string;
+  textSearchConfig?: string;
+  evidenceRefs: string[];
+}
+
+/** @deprecated Use LexicalRelevanceObservationV1; PostgreSQL FTS is not BM25. */
+export type Bm25ObservationV1 = LexicalRelevanceObservationV1;
+
 /**
  * Assembled context — policy-specific output
  */

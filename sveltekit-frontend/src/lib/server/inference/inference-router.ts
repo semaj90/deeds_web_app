@@ -56,6 +56,7 @@ import { db } from '$lib/server/db/client';
 import { contextTimeline } from '$lib/server/db/schema-postgres.js';
 import { getRedis } from '$lib/server/redis.js';
 import { getVlmState, switchVlmMode, VlmMode } from './vlm-lifecycle.js';
+import { recordLlamaPromptCacheTelemetry } from '$lib/server/ai/context-prompt-streamer.js';
 
 // Record turbo3/4 activation once per process lifetime (avoids DB spam)
 let _turboActivationRecorded = false;
@@ -433,6 +434,7 @@ async function tryTurboQuant(request: InferenceRequest, startTime: number): Prom
         max_tokens: request.maxTokens ?? 2048,
         temperature: request.temperature ?? 0.7,
         stream: false,
+        stream_options: { include_usage: true },
         cache_prompt: true,
       }),
       signal: AbortSignal.timeout(120_000),
@@ -441,6 +443,7 @@ async function tryTurboQuant(request: InferenceRequest, startTime: number): Prom
     if (!res.ok) return null;
 
     const data = await res.json();
+    recordLlamaPromptCacheTelemetry(TURBOQUANT_MODEL, data, 'turboquant');
     const msg = data.choices?.[0]?.message;
     const content = msg?.content ?? '';
     const reasoning = msg?.reasoning_content ?? '';
@@ -880,7 +883,8 @@ async function ollamaInference(request: InferenceRequest, startTime: number): Pr
 					messages: [{ role: 'user', content: prompt }],
 					stream: false,
 					max_tokens: request.maxTokens ?? 2048,
-					temperature: request.temperature ?? 0.7
+					temperature: request.temperature ?? 0.7,
+					stream_options: { include_usage: true },
 				}),
 				signal: AbortSignal.timeout(120_000)
 			});
@@ -897,6 +901,7 @@ async function ollamaInference(request: InferenceRequest, startTime: number): Pr
 			}
 
 			const data = await res.json();
+			recordLlamaPromptCacheTelemetry(model, data, 'inference-router');
 			const content = data.choices?.[0]?.message?.content ?? '';
 			gen.end({ output: content.slice(0, 1000), usage: { promptTokens: data.usage?.prompt_tokens, completionTokens: data.usage?.completion_tokens } });
 			return {
@@ -1014,6 +1019,7 @@ export async function* routeStreamingInference(
 					max_tokens: request.maxTokens ?? 2048,
 					temperature: request.temperature ?? 0.7,
 					stream: true,
+					stream_options: { include_usage: true },
 				}),
 				signal: AbortSignal.timeout(120_000),
 			});
@@ -1029,6 +1035,7 @@ export async function* routeStreamingInference(
 						if (payload === '[DONE]') break;
 						try {
 							const parsed = JSON.parse(payload);
+							recordLlamaPromptCacheTelemetry(TURBOQUANT_MODEL, parsed, 'turboquant');
 							const delta = parsed.choices?.[0]?.delta;
 							// llama-server b8757: streaming thinking in delta.reasoning_content, answer in delta.content
 							const chunk = delta?.content ?? delta?.reasoning_content ?? '';
@@ -1090,7 +1097,7 @@ export async function* routeStreamingInference(
 	const res = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({ model, messages, stream: true, max_tokens: request.maxTokens ?? 2048, temperature: request.temperature ?? 0.7 }),
+	body: JSON.stringify({ model, messages, stream: true, stream_options: { include_usage: true }, max_tokens: request.maxTokens ?? 2048, temperature: request.temperature ?? 0.7 }),
 		signal: AbortSignal.timeout(120_000),
 	});
 
@@ -1111,6 +1118,7 @@ export async function* routeStreamingInference(
 				const payload = line.startsWith('data:') ? line.slice(5).trim() : line;
 				if (payload === '[DONE]') continue;
 				const parsed = JSON.parse(payload);
+				recordLlamaPromptCacheTelemetry(model, parsed, 'inference-router');
 				const chunk = parsed.choices?.[0]?.delta?.content ?? '';
 				if (chunk) yield { content: chunk, done: false, backend: 'llama-server' };
 			} catch {

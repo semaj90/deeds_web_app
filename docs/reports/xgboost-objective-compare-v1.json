@@ -1,0 +1,101 @@
+{
+  "schema": "parent-atlas-xgboost-objective-comparison-v1",
+  "status": "BLOCKED_NON_IDENTICAL_VALIDATION_COHORT",
+  "promotionAllowed": false,
+  "writesPerformed": false,
+  "comparisonBasis": "same frozen validation trace cohort, not aggregate metrics alone",
+  "checks": {
+    "objectivesPresent": true,
+    "datasetRevisionMatched": true,
+    "featureSchemaRevisionMatched": true,
+    "validationTraceSetMatched": false,
+    "validationRowCountMatched": false,
+    "perTraceCandidateCountsMatched": true,
+    "finiteAggregateMetrics": true,
+    "finitePerTraceMetrics": true
+  },
+  "regression": {
+    "objective": "reg:squarederror",
+    "dataset_revision": "f40d36559bfcd65b",
+    "feature_schema_revision": null,
+    "model_revision": "6fa8f826aebfc58f",
+    "model_path": "C:\\Users\\james\\Videos\\deeds-web-app\\models\\xgboost-candidates\\reg-squarederror-f40d36559bfcd65b-6fa8f826aebfc58f.ubj",
+    "model_sha256": "6fa8f826aebfc58f6be38f119b7645d22d1424caaf089af6c44dd96769f07628",
+    "train_rows": 81864,
+    "val_rows": 19844,
+    "val_traces": 186,
+    "metrics": {
+      "ndcg_at_5": 0.9516,
+      "ndcg_at_10": 0.9516,
+      "mrr_at_10": 0.9516
+    }
+  },
+  "rankNdcg": {
+    "objective": "rank:ndcg",
+    "dataset_revision": "f40d36559bfcd65b",
+    "feature_schema_revision": null,
+    "model_revision": "daff459cf758aa0f",
+    "model_path": "C:\\Users\\james\\Videos\\deeds-web-app\\models\\xgboost-candidates\\rank-ndcg-f40d36559bfcd65b-daff459cf758aa0f.ubj",
+    "model_sha256": "daff459cf758aa0f2b71c127af001744165c2c109c25872a31afc6ff414025aa",
+    "train_rows": 81509,
+    "val_rows": 20199,
+    "val_traces": 186,
+    "metrics": {
+      "ndcg_at_5": 0.9516,
+      "ndcg_at_10": 0.9516,
+      "mrr_at_10": 0.9516
+    }
+  },
+  "validationTraceCounts": {
+    "regression": 186,
+    "rankNdcg": 186,
+    "common": 42,
+    "onlyRegression": 144,
+    "onlyRankNdcg": 144
+  },
+  "overlapDiagnostics": {
+    "traceCount": 42,
+    "regression": {
+      "ndcg_at_5": 0.9523809523809523,
+      "ndcg_at_10": 0.9523809523809523,
+      "mrr_at_10": 0.9523809523809523
+    },
+    "rankNdcg": {
+      "ndcg_at_5": 0.9523809523809523,
+      "ndcg_at_10": 0.9523809523809523,
+      "mrr_at_10": 0.9523809523809523
+    },
+    "deltaRankMinusRegression": {
+      "ndcg_at_5": 0.0,
+      "ndcg_at_10": 0.0,
+      "mrr_at_10": 0.0
+    }
+  },
+  "nonComparableTraceExamples": {
+    "onlyRegression": [
+      "042ebe21-e4c6-49ed-86c1-789f0074a8b4",
+      "051abe38-40f3-4410-99f3-96eefb2567ca",
+      "0a40884a-ea8b-4fcd-b3bc-44c81b8324c3",
+      "0aa7c19e-40bf-45d5-84f7-02f761d6022b",
+      "0fe7fa9f-0242-4054-af1e-7b685cd512ad",
+      "109c442d-c729-4d86-b20e-657583990a62",
+      "13d6eef5-9552-4fc3-94fa-72174241c51f",
+      "143af382-4ed5-475c-bf1f-dd2975a548d8",
+      "15f48a75-6bf5-40aa-bf9b-5bc1b6621e22",
+      "1808adc2-97f0-430e-baf2-4200d2d19aa3"
+    ],
+    "onlyRankNdcg": [
+      "0269a483-aaea-40d3-bd5a-13a431665e93",
+      "032ab8e5-5bf3-433a-a2ba-a3999f237217",
+      "04b7f98a-a826-413d-b31b-6a7b2aad3805",
+      "06294988-c1db-4cfe-b94e-f4741e55e279",
+      "0689b894-a253-468b-9ff4-0189f6d46b5c",
+      "098b048b-5f25-4071-ab1f-24ddf5abd5c8",
+      "0ab22ce0-d195-40eb-abe7-861aa9af3f1c",
+      "0e129ce8-f37f-4c73-82f3-f905149066ee",
+      "0f90eaf4-cd29-4642-a745-1d64cb5651ab",
+      "11dcd750-6c09-4062-84ac-310932d96797"
+    ]
+  },
+  "nextGate": "rerun both objectives with one persisted frozen split/validation cohort, then compare"
+}

@@ -20,7 +20,6 @@ import pg from 'pg';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import crypto from 'crypto';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -89,8 +88,10 @@ function extractSummaryWords(summary) {
 function extractIdentifiers(sourceRef) {
   const identifiers = [];
 
-  // camelCase: function names, class names
-  const camelMatches = sourceRef.match(/[a-z][a-zA-Z0-9]*(?=[A-Z]|[^a-zA-Z0-9])/g) || [];
+  // Identifier tokens: preserve the complete token before normalizing case.
+  // The former lookahead pattern could backtrack at end-of-string and drop
+  // the first character (for example, `retrievalservice` -> `etrievalservice`).
+  const camelMatches = sourceRef.match(/\b[A-Za-z][A-Za-z0-9]*\b/g) || [];
   identifiers.push(...camelMatches.map(m => m.toLowerCase()));
 
   // snake_case: constants, variables
@@ -118,14 +119,33 @@ function buildLexicalSummary(keywords, identifiers, symbols) {
 async function fetchPacketsForExtraction() {
   console.log('\n📚 Fetching packets for lexical extraction...');
 
+  const census = await pool.query(`
+    SELECT
+      COUNT(*)::int AS total_packets,
+      COUNT(*) FILTER (
+        WHERE packet_key IS NOT NULL
+          AND source_ref IS NOT NULL
+          AND content_hash IS NOT NULL
+      )::int AS hash_qualified_packets
+    FROM atlas_packets
+  `);
+  const totalPackets = census.rows[0]?.total_packets ?? 0;
+  const eligiblePackets = census.rows[0]?.hash_qualified_packets ?? 0;
+  console.log(`   Provenance gate: ${eligiblePackets}/${totalPackets} packets hash-qualified`);
+  console.log(`   Excluded before extraction: ${totalPackets - eligiblePackets} packets without source content hash`);
+
   const res = await pool.query(`
     SELECT
       ap.packet_key,
       ap.source_ref,
-      COALESCE(ap.summary, '') as summary
+      COALESCE(ap.summary, '') as summary,
+      ap.content_hash as source_content_hash,
+      ap.workspace_revision,
+      ap.canonical
     FROM atlas_packets ap
     WHERE ap.packet_key IS NOT NULL
       AND ap.source_ref IS NOT NULL
+      AND ap.content_hash IS NOT NULL
     ORDER BY ap.packet_key
     LIMIT $1
   `, [limit]);
@@ -178,10 +198,9 @@ async function materializeLexicalFeatures(packets) {
         const keywords = [...new Set([...pathTokens, ...summaryWords])];
         const symbols = pathTokens;  // symbols from path structure
 
-        const contentHash = crypto
-          .createHash('sha256')
-          .update(packet.summary || '')
-          .digest('hex');
+        // Use the canonical source-content hash, never a derived summary hash.
+        // This keeps lexical rows reconcilable with source revisions.
+        const contentHash = packet.source_content_hash;
 
         const lexicalSummary = buildLexicalSummary(keywords, identifiers, symbols);
 
@@ -207,7 +226,13 @@ async function materializeLexicalFeatures(packets) {
             lexicalSummary,
             contentHash,
             'deterministic-v1',
-            { extracted_at: new Date().toISOString(), path_based: true }
+            {
+              extracted_at: new Date().toISOString(),
+              path_based: true,
+              source_content_hash: packet.source_content_hash,
+              workspace_revision: packet.workspace_revision,
+              source_canonical: packet.canonical === true,
+            }
           ]
         );
 

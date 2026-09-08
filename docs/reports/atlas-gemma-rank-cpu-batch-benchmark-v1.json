@@ -1,0 +1,131 @@
+{
+  "schema": "atlas.gemma-rank-cpu-batch-benchmark.v1",
+  "status": "CPU_BATCH_SHAPE_FINITE_PROVEN",
+  "checkpointDir": "models\\gemma4_assistant_huggingface_7_3_26",
+  "batchSize": 15,
+  "inputFormat": "[QUERY] query [DOCUMENT] candidate; candidate identity remains outside model text",
+  "repeatCount": 3,
+  "tokenizerPadding": "explicit_id_0_masked_no_tokenizer_mutation",
+  "maxLength": 512,
+  "paddedTokenCount": 78,
+  "rankHeadTrained": false,
+  "rankingQualityProven": false,
+  "cudaAllocated": false,
+  "trainingPerformed": false,
+  "checkpointMutated": false,
+  "allFinite": true,
+  "modelLoadMs": 2348.135,
+  "forwardBatchLatencyMs": {
+    "min": 194.773,
+    "max": 232.752,
+    "mean": 218.474,
+    "perCandidateMean": 14.565
+  },
+  "mxbaiLiveFixturePerRequestLatencyMs": {
+    "min": 236.576,
+    "max": 556.472,
+    "mean": 419.618,
+    "unit": "one HTTP request containing five candidates; CUDA sidecar"
+  },
+  "comparisonLimits": [
+    "Gemma values are an untrained structural seed and cannot be compared for ranking quality.",
+    "Gemma timings are in-process CPU batch forward only; model load is reported separately.",
+    "mxbai timings are existing live HTTP+GPU per-request timings, not a CPU/GPU kernel benchmark.",
+    "No AtlasGemma ONNX/WebGPU artifact exists yet, so no WebGPU timing is reported."
+  ],
+  "rows": [
+    {
+      "query": "Which function sums duplicate-identity RRF scores instead of discarding them?",
+      "canonicalId": "service-merge",
+      "sourceRevision": "sha256:9ff6a21d0c32df509689e4ee12340a88f7e087648636b7cc5aa4d4f9c050b2f9",
+      "workspaceRevision": "atlas-gemma-shadow-04-cohort-v1"
+    },
+    {
+      "query": "Which function sums duplicate-identity RRF scores instead of discarding them?",
+      "canonicalId": "rrf-tologicallane",
+      "sourceRevision": "sha256:364a2002dea3ba41f76027f566809cea8a3f33bbdd1066130795b4d826cf23ed",
+      "workspaceRevision": "atlas-gemma-shadow-04-cohort-v1"
+    },
+    {
+      "query": "Which function sums duplicate-identity RRF scores instead of discarding them?",
+      "canonicalId": "lane-aliases",
+      "sourceRevision": "sha256:5b6c27cd067fc1428b9e30f486b39788d16f3b20b166d4f1efc3976939a696d6",
+      "workspaceRevision": "atlas-gemma-shadow-04-cohort-v1"
+    },
+    {
+      "query": "Which function sums duplicate-identity RRF scores instead of discarding them?",
+      "canonicalId": "model-resolution",
+      "sourceRevision": "sha256:8dcbd160a024bfca4eb74407b45cb4b5ea9d1d0fdc81c7eff4fd411800b529a0",
+      "workspaceRevision": "atlas-gemma-shadow-04-cohort-v1"
+    },
+    {
+      "query": "Which function sums duplicate-identity RRF scores instead of discarding them?",
+      "canonicalId": "helper-card",
+      "sourceRevision": "sha256:0c1b01b890da2ff5ea870f25d162fdf597a4f8da6d85e58c71e550335915cd3b",
+      "workspaceRevision": "atlas-gemma-shadow-04-cohort-v1"
+    },
+    {
+      "query": "Which contract enforces that batch extraction never runs on the full corpus, only a bounded candidate subset?",
+      "canonicalId": "evidence-card",
+      "sourceRevision": "sha256:3e8293c08edafc206f4205a6ce0bed55dd0e152997cefbae6563b2c9c1d3ca16",
+      "workspaceRevision": "atlas-gemma-shadow-04-cohort-v1"
+    },
+    {
+      "query": "Which contract enforces that batch extraction never runs on the full corpus, only a bounded candidate subset?",
+      "canonicalId": "firecrawl-provider",
+      "sourceRevision": "sha256:f5f11358dc6940104f33968552dd8c93a1e3ce2802b416db111eb3b8816dffa1",
+      "workspaceRevision": "atlas-gemma-shadow-04-cohort-v1"
+    },
+    {
+      "query": "Which contract enforces that batch extraction never runs on the full corpus, only a bounded candidate subset?",
+      "canonicalId": "relevance-scores",
+      "sourceRevision": "sha256:dd0de4aa240b8dbd4f8086e2ebb25af4b32c0ecb4db1de1d65a709ce03d92c69",
+      "workspaceRevision": "atlas-gemma-shadow-04-cohort-v1"
+    },
+    {
+      "query": "Which contract enforces that batch extraction never runs on the full corpus, only a bounded candidate subset?",
+      "canonicalId": "fusion-contribution",
+      "sourceRevision": "sha256:04bc9da2e4b3346699f944e6d89586042dc146c386331b60750b3560fc986b75",
+      "workspaceRevision": "atlas-gemma-shadow-04-cohort-v1"
+    },
+    {
+      "query": "Which contract enforces that batch extraction never runs on the full corpus, only a bounded candidate subset?",
+      "canonicalId": "helper-card-2",
+      "sourceRevision": "sha256:869bba5b550929c75afa0db792a2fffde82f6a7e36b695cd46e7b23c313f3b06",
+      "workspaceRevision": "atlas-gemma-shadow-04-cohort-v1"
+    },
+    {
+      "query": "Which module centralizes the optional dynamic import of the Firecrawl SDK behind one documented type-check exception?",
+      "canonicalId": "firecrawl-provider-2",
+      "sourceRevision": "sha256:57a66b08c5e8621d8690f8b8786ea4b99f7fce15ef7137257a287182b7dfe7a8",
+      "workspaceRevision": "atlas-gemma-shadow-04-cohort-v1"
+    },
+    {
+      "query": "Which module centralizes the optional dynamic import of the Firecrawl SDK behind one documented type-check exception?",
+      "canonicalId": "youtube-transcript",
+      "sourceRevision": "sha256:a8350a7e812eb356756793bfbc07aa6c1d78d7d2dc8f5d1d195479297de253a6",
+      "workspaceRevision": "atlas-gemma-shadow-04-cohort-v1"
+    },
+    {
+      "query": "Which module centralizes the optional dynamic import of the Firecrawl SDK behind one documented type-check exception?",
+      "canonicalId": "candidate-evidence-2",
+      "sourceRevision": "sha256:7b5b06abde912ddd86135805bd1f44bc523a364b65c6e97aff77caaa2bc6c2ba",
+      "workspaceRevision": "atlas-gemma-shadow-04-cohort-v1"
+    },
+    {
+      "query": "Which module centralizes the optional dynamic import of the Firecrawl SDK behind one documented type-check exception?",
+      "canonicalId": "model-resolution-2",
+      "sourceRevision": "sha256:28f1a5b1dab74126333c531d1636ff9da6c45ecf994fdd3df54916f3927943f3",
+      "workspaceRevision": "atlas-gemma-shadow-04-cohort-v1"
+    },
+    {
+      "query": "Which module centralizes the optional dynamic import of the Firecrawl SDK behind one documented type-check exception?",
+      "canonicalId": "retrieval-lane-2",
+      "sourceRevision": "sha256:da94266088cbe44b7ba1b18dc7fa9e0e4c3b6c6c7f6de6be56d03e3e0a9045c4",
+      "workspaceRevision": "atlas-gemma-shadow-04-cohort-v1"
+    }
+  ],
+  "sourceWeightsChecksum": "sha256:12875062fc25c51e8fa9b62abd2de7ad48b7d63f8559d5d604fbd5a3d6bcff16",
+  "observedAt": "2026-09-07T01:19:35.571311+00:00",
+  "receiptChecksum": "sha256:a5071824536cb409c6874c4407c90f547facafbedc3ccde956a677be3a5a94e8"
+}

@@ -1,6 +1,6 @@
 {
   "schema": "atlas.graphify-rff-embedding-backfill.v1",
-  "generatedAt": "2026-09-04T16:19:11.093Z",
+  "generatedAt": "2026-09-08T00:54:45.080Z",
   "apply": false,
   "signatureOnly": true,
   "model": "embeddinggemma:latest",

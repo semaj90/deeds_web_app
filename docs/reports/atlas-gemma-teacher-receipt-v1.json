@@ -1,0 +1,371 @@
+{
+  "schema": "atlas.atlas-gemma-teacher-receipt.v1",
+  "sourceReport": "docs/reports/rerank-shadow-01-live-fixture-v1.json",
+  "generatedAt": "2026-09-06T20:40:05.914Z",
+  "candidateIdentityQualified": false,
+  "observations": [
+    {
+      "query": "Which function sums duplicate-identity RRF scores instead of discarding them?",
+      "candidateId": "service-merge",
+      "teacherModel": "EMBEDDINGGEMMA_COSINE",
+      "rawScore": 1,
+      "rank": 0,
+      "relevantGroundTruth": null
+    },
+    {
+      "query": "Which function sums duplicate-identity RRF scores instead of discarding them?",
+      "candidateId": "helper-card",
+      "teacherModel": "EMBEDDINGGEMMA_COSINE",
+      "rawScore": 0.5,
+      "rank": 1,
+      "relevantGroundTruth": null
+    },
+    {
+      "query": "Which function sums duplicate-identity RRF scores instead of discarding them?",
+      "candidateId": "lane-aliases",
+      "teacherModel": "EMBEDDINGGEMMA_COSINE",
+      "rawScore": 0.3333333333333333,
+      "rank": 2,
+      "relevantGroundTruth": null
+    },
+    {
+      "query": "Which function sums duplicate-identity RRF scores instead of discarding them?",
+      "candidateId": "rrf-tologicallane",
+      "teacherModel": "EMBEDDINGGEMMA_COSINE",
+      "rawScore": 0.25,
+      "rank": 3,
+      "relevantGroundTruth": null
+    },
+    {
+      "query": "Which function sums duplicate-identity RRF scores instead of discarding them?",
+      "candidateId": "model-resolution",
+      "teacherModel": "EMBEDDINGGEMMA_COSINE",
+      "rawScore": 0.2,
+      "rank": 4,
+      "relevantGroundTruth": null
+    },
+    {
+      "query": "Which contract enforces that batch extraction never runs on the full corpus, only a bounded candidate subset?",
+      "candidateId": "evidence-card",
+      "teacherModel": "EMBEDDINGGEMMA_COSINE",
+      "rawScore": 1,
+      "rank": 0,
+      "relevantGroundTruth": null
+    },
+    {
+      "query": "Which contract enforces that batch extraction never runs on the full corpus, only a bounded candidate subset?",
+      "candidateId": "relevance-scores",
+      "teacherModel": "EMBEDDINGGEMMA_COSINE",
+      "rawScore": 0.5,
+      "rank": 1,
+      "relevantGroundTruth": null
+    },
+    {
+      "query": "Which contract enforces that batch extraction never runs on the full corpus, only a bounded candidate subset?",
+      "candidateId": "firecrawl-provider",
+      "teacherModel": "EMBEDDINGGEMMA_COSINE",
+      "rawScore": 0.3333333333333333,
+      "rank": 2,
+      "relevantGroundTruth": null
+    },
+    {
+      "query": "Which contract enforces that batch extraction never runs on the full corpus, only a bounded candidate subset?",
+      "candidateId": "fusion-contribution",
+      "teacherModel": "EMBEDDINGGEMMA_COSINE",
+      "rawScore": 0.25,
+      "rank": 3,
+      "relevantGroundTruth": null
+    },
+    {
+      "query": "Which contract enforces that batch extraction never runs on the full corpus, only a bounded candidate subset?",
+      "candidateId": "helper-card-2",
+      "teacherModel": "EMBEDDINGGEMMA_COSINE",
+      "rawScore": 0.2,
+      "rank": 4,
+      "relevantGroundTruth": null
+    },
+    {
+      "query": "Which module centralizes the optional dynamic import of the Firecrawl SDK behind one documented type-check exception?",
+      "candidateId": "firecrawl-provider-2",
+      "teacherModel": "EMBEDDINGGEMMA_COSINE",
+      "rawScore": 1,
+      "rank": 0,
+      "relevantGroundTruth": null
+    },
+    {
+      "query": "Which module centralizes the optional dynamic import of the Firecrawl SDK behind one documented type-check exception?",
+      "candidateId": "youtube-transcript",
+      "teacherModel": "EMBEDDINGGEMMA_COSINE",
+      "rawScore": 0.5,
+      "rank": 1,
+      "relevantGroundTruth": null
+    },
+    {
+      "query": "Which module centralizes the optional dynamic import of the Firecrawl SDK behind one documented type-check exception?",
+      "candidateId": "model-resolution-2",
+      "teacherModel": "EMBEDDINGGEMMA_COSINE",
+      "rawScore": 0.3333333333333333,
+      "rank": 2,
+      "relevantGroundTruth": null
+    },
+    {
+      "query": "Which module centralizes the optional dynamic import of the Firecrawl SDK behind one documented type-check exception?",
+      "candidateId": "candidate-evidence-2",
+      "teacherModel": "EMBEDDINGGEMMA_COSINE",
+      "rawScore": 0.25,
+      "rank": 3,
+      "relevantGroundTruth": null
+    },
+    {
+      "query": "Which module centralizes the optional dynamic import of the Firecrawl SDK behind one documented type-check exception?",
+      "candidateId": "retrieval-lane-2",
+      "teacherModel": "EMBEDDINGGEMMA_COSINE",
+      "rawScore": 0.2,
+      "rank": 4,
+      "relevantGroundTruth": null
+    },
+    {
+      "query": "Which function sums duplicate-identity RRF scores instead of discarding them?",
+      "candidateId": "lane-aliases",
+      "teacherModel": "MXBAI_RERANK_BASE_V2",
+      "rawScore": 1,
+      "rank": 0,
+      "relevantGroundTruth": null
+    },
+    {
+      "query": "Which function sums duplicate-identity RRF scores instead of discarding them?",
+      "candidateId": "helper-card",
+      "teacherModel": "MXBAI_RERANK_BASE_V2",
+      "rawScore": 0.5,
+      "rank": 1,
+      "relevantGroundTruth": null
+    },
+    {
+      "query": "Which function sums duplicate-identity RRF scores instead of discarding them?",
+      "candidateId": "model-resolution",
+      "teacherModel": "MXBAI_RERANK_BASE_V2",
+      "rawScore": 0.3333333333333333,
+      "rank": 2,
+      "relevantGroundTruth": null
+    },
+    {
+      "query": "Which function sums duplicate-identity RRF scores instead of discarding them?",
+      "candidateId": "service-merge",
+      "teacherModel": "MXBAI_RERANK_BASE_V2",
+      "rawScore": 0.25,
+      "rank": 3,
+      "relevantGroundTruth": null
+    },
+    {
+      "query": "Which function sums duplicate-identity RRF scores instead of discarding them?",
+      "candidateId": "rrf-tologicallane",
+      "teacherModel": "MXBAI_RERANK_BASE_V2",
+      "rawScore": 0.2,
+      "rank": 4,
+      "relevantGroundTruth": null
+    },
+    {
+      "query": "Which contract enforces that batch extraction never runs on the full corpus, only a bounded candidate subset?",
+      "candidateId": "helper-card-2",
+      "teacherModel": "MXBAI_RERANK_BASE_V2",
+      "rawScore": 1,
+      "rank": 0,
+      "relevantGroundTruth": null
+    },
+    {
+      "query": "Which contract enforces that batch extraction never runs on the full corpus, only a bounded candidate subset?",
+      "candidateId": "relevance-scores",
+      "teacherModel": "MXBAI_RERANK_BASE_V2",
+      "rawScore": 0.5,
+      "rank": 1,
+      "relevantGroundTruth": null
+    },
+    {
+      "query": "Which contract enforces that batch extraction never runs on the full corpus, only a bounded candidate subset?",
+      "candidateId": "fusion-contribution",
+      "teacherModel": "MXBAI_RERANK_BASE_V2",
+      "rawScore": 0.3333333333333333,
+      "rank": 2,
+      "relevantGroundTruth": null
+    },
+    {
+      "query": "Which contract enforces that batch extraction never runs on the full corpus, only a bounded candidate subset?",
+      "candidateId": "evidence-card",
+      "teacherModel": "MXBAI_RERANK_BASE_V2",
+      "rawScore": 0.25,
+      "rank": 3,
+      "relevantGroundTruth": null
+    },
+    {
+      "query": "Which contract enforces that batch extraction never runs on the full corpus, only a bounded candidate subset?",
+      "candidateId": "firecrawl-provider",
+      "teacherModel": "MXBAI_RERANK_BASE_V2",
+      "rawScore": 0.2,
+      "rank": 4,
+      "relevantGroundTruth": null
+    },
+    {
+      "query": "Which module centralizes the optional dynamic import of the Firecrawl SDK behind one documented type-check exception?",
+      "candidateId": "firecrawl-provider-2",
+      "teacherModel": "MXBAI_RERANK_BASE_V2",
+      "rawScore": 1,
+      "rank": 0,
+      "relevantGroundTruth": null
+    },
+    {
+      "query": "Which module centralizes the optional dynamic import of the Firecrawl SDK behind one documented type-check exception?",
+      "candidateId": "youtube-transcript",
+      "teacherModel": "MXBAI_RERANK_BASE_V2",
+      "rawScore": 0.5,
+      "rank": 1,
+      "relevantGroundTruth": null
+    },
+    {
+      "query": "Which module centralizes the optional dynamic import of the Firecrawl SDK behind one documented type-check exception?",
+      "candidateId": "candidate-evidence-2",
+      "teacherModel": "MXBAI_RERANK_BASE_V2",
+      "rawScore": 0.3333333333333333,
+      "rank": 2,
+      "relevantGroundTruth": null
+    },
+    {
+      "query": "Which module centralizes the optional dynamic import of the Firecrawl SDK behind one documented type-check exception?",
+      "candidateId": "model-resolution-2",
+      "teacherModel": "MXBAI_RERANK_BASE_V2",
+      "rawScore": 0.25,
+      "rank": 3,
+      "relevantGroundTruth": null
+    },
+    {
+      "query": "Which module centralizes the optional dynamic import of the Firecrawl SDK behind one documented type-check exception?",
+      "candidateId": "retrieval-lane-2",
+      "teacherModel": "MXBAI_RERANK_BASE_V2",
+      "rawScore": 0.2,
+      "rank": 4,
+      "relevantGroundTruth": null
+    },
+    {
+      "query": "Which function sums duplicate-identity RRF scores instead of discarding them?",
+      "candidateId": "service-merge",
+      "teacherModel": "ORNITH_JUDGE",
+      "rawScore": 1,
+      "rank": 0,
+      "relevantGroundTruth": null
+    },
+    {
+      "query": "Which function sums duplicate-identity RRF scores instead of discarding them?",
+      "candidateId": "lane-aliases",
+      "teacherModel": "ORNITH_JUDGE",
+      "rawScore": 0.5,
+      "rank": 1,
+      "relevantGroundTruth": null
+    },
+    {
+      "query": "Which function sums duplicate-identity RRF scores instead of discarding them?",
+      "candidateId": "rrf-tologicallane",
+      "teacherModel": "ORNITH_JUDGE",
+      "rawScore": 0.3333333333333333,
+      "rank": 2,
+      "relevantGroundTruth": null
+    },
+    {
+      "query": "Which function sums duplicate-identity RRF scores instead of discarding them?",
+      "candidateId": "model-resolution",
+      "teacherModel": "ORNITH_JUDGE",
+      "rawScore": 0.25,
+      "rank": 3,
+      "relevantGroundTruth": null
+    },
+    {
+      "query": "Which function sums duplicate-identity RRF scores instead of discarding them?",
+      "candidateId": "helper-card",
+      "teacherModel": "ORNITH_JUDGE",
+      "rawScore": 0.2,
+      "rank": 4,
+      "relevantGroundTruth": null
+    },
+    {
+      "query": "Which contract enforces that batch extraction never runs on the full corpus, only a bounded candidate subset?",
+      "candidateId": "evidence-card",
+      "teacherModel": "ORNITH_JUDGE",
+      "rawScore": 1,
+      "rank": 0,
+      "relevantGroundTruth": null
+    },
+    {
+      "query": "Which contract enforces that batch extraction never runs on the full corpus, only a bounded candidate subset?",
+      "candidateId": "firecrawl-provider",
+      "teacherModel": "ORNITH_JUDGE",
+      "rawScore": 0.5,
+      "rank": 1,
+      "relevantGroundTruth": null
+    },
+    {
+      "query": "Which contract enforces that batch extraction never runs on the full corpus, only a bounded candidate subset?",
+      "candidateId": "relevance-scores",
+      "teacherModel": "ORNITH_JUDGE",
+      "rawScore": 0.3333333333333333,
+      "rank": 2,
+      "relevantGroundTruth": null
+    },
+    {
+      "query": "Which contract enforces that batch extraction never runs on the full corpus, only a bounded candidate subset?",
+      "candidateId": "helper-card-2",
+      "teacherModel": "ORNITH_JUDGE",
+      "rawScore": 0.25,
+      "rank": 3,
+      "relevantGroundTruth": null
+    },
+    {
+      "query": "Which contract enforces that batch extraction never runs on the full corpus, only a bounded candidate subset?",
+      "candidateId": "fusion-contribution",
+      "teacherModel": "ORNITH_JUDGE",
+      "rawScore": 0.2,
+      "rank": 4,
+      "relevantGroundTruth": null
+    },
+    {
+      "query": "Which module centralizes the optional dynamic import of the Firecrawl SDK behind one documented type-check exception?",
+      "candidateId": "firecrawl-provider-2",
+      "teacherModel": "ORNITH_JUDGE",
+      "rawScore": 1,
+      "rank": 0,
+      "relevantGroundTruth": null
+    },
+    {
+      "query": "Which module centralizes the optional dynamic import of the Firecrawl SDK behind one documented type-check exception?",
+      "candidateId": "youtube-transcript",
+      "teacherModel": "ORNITH_JUDGE",
+      "rawScore": 0.5,
+      "rank": 1,
+      "relevantGroundTruth": null
+    },
+    {
+      "query": "Which module centralizes the optional dynamic import of the Firecrawl SDK behind one documented type-check exception?",
+      "candidateId": "candidate-evidence-2",
+      "teacherModel": "ORNITH_JUDGE",
+      "rawScore": 0.3333333333333333,
+      "rank": 2,
+      "relevantGroundTruth": null
+    },
+    {
+      "query": "Which module centralizes the optional dynamic import of the Firecrawl SDK behind one documented type-check exception?",
+      "candidateId": "retrieval-lane-2",
+      "teacherModel": "ORNITH_JUDGE",
+      "rawScore": 0.25,
+      "rank": 3,
+      "relevantGroundTruth": null
+    },
+    {
+      "query": "Which module centralizes the optional dynamic import of the Firecrawl SDK behind one documented type-check exception?",
+      "candidateId": "model-resolution-2",
+      "teacherModel": "ORNITH_JUDGE",
+      "rawScore": 0.2,
+      "rank": 4,
+      "relevantGroundTruth": null
+    }
+  ],
+  "queryCount": 3,
+  "distillationEligible": false,
+  "distillationIneligibleReason": "candidateIdentityQualified=false in the source fixture (rerank-shadow-01 is a hand-labeled, non-revision-qualified 3-query fixture, not a frozen post-RRF candidate cohort per MICRO-04's bar)"
+}

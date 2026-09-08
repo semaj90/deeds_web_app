@@ -35,6 +35,7 @@ const mocks = vi.hoisted(() => ({
   runTurbovecPreIngestion: vi.fn(),
   lookupScenario: vi.fn(),
   storeScenario: vi.fn(),
+  buildAceRevisionedExactAnswerCacheKeyV1: vi.fn(),
 }));
 
 vi.mock('$lib/server/ai/turbovec-ingest-sidecar.js', () => ({
@@ -58,6 +59,10 @@ vi.mock('$lib/server/cache-keys.js', () => ({
   // every other test's convenience, but silently made those variance
   // assertions untestable (same key in, same key out, always).
   buildAcePacketCacheKey: (input: any) => `ace:packet:mock:${JSON.stringify(input)}`,
+  buildAcePromptPreflightCacheKeyV1: (input: any) => `ace:ctx:mock:${JSON.stringify(input)}`,
+  buildAceGenerationControlsSignatureV1: (input: any) =>
+    `generation-controls:mock:${JSON.stringify(input)}`,
+  buildAceRevisionedExactAnswerCacheKeyV1: mocks.buildAceRevisionedExactAnswerCacheKeyV1,
   hashStr: (input: string) => `hash_mock:${String(input)}`,
   generateCacheKey: (input: string) => 'cache:key:mock',
   TTL: { ACE_PROMPT: 86400 },
@@ -122,6 +127,7 @@ describe('openai-facade — runChatCompletion', () => {
     mocks.turboQuantChat.mockReset();
     mocks.runGemma4Agent.mockReset();
     mocks.runTurbovecPreIngestion.mockReset();
+    mocks.buildAceRevisionedExactAnswerCacheKeyV1.mockReset();
     mocks.recordRagAnswer.mockResolvedValue(undefined);
     mocks.buildDevContextPlan.mockResolvedValue(undefined);
     // Default: non-coding prompts; tests that want coding override this
@@ -137,6 +143,9 @@ describe('openai-facade — runChatCompletion', () => {
     // Default: scenario cache returns null (tests that want a hit override this)
     mocks.lookupScenario.mockResolvedValue(null);
     mocks.storeScenario.mockResolvedValue(undefined);
+    mocks.buildAceRevisionedExactAnswerCacheKeyV1.mockImplementation(
+      (input: any) => `ace:completion:v2:mock:${JSON.stringify(input)}`,
+    );
   });
 
   it('extracts last user message as query, earlier messages as history', async () => {
@@ -229,6 +238,68 @@ describe('openai-facade — runChatCompletion', () => {
     expect(mocks.bifrostChat).not.toHaveBeenCalled();
     expect(mocks.turboQuantChat).not.toHaveBeenCalled();
     expect(mocks.setExactMatchCache).not.toHaveBeenCalled();
+  });
+
+  it('uses the strict V2 completion key when a revisioned manifest is supplied', async () => {
+    mocks.assembleACEContext.mockResolvedValue({
+      ragChunks: [],
+      kbChunks: [],
+      caseChunks: [],
+      chatHistory: [],
+      agentsMd: null,
+      codeLlmHit: null,
+    });
+    mocks.buildACEPromptCached.mockResolvedValue({ systemPrompt: 'sys', contextWindow: '' });
+    mocks.bifrostChat.mockResolvedValue('V2 response');
+    mocks.buildAceRevisionedExactAnswerCacheKeyV1.mockReturnValue(
+      'ace:completion:v2:strict-seam-test',
+    );
+
+    const manifest = {
+      schema: 'atlas.context-manifest.v2',
+      v1: {},
+      identityInput: { evidenceRevisions: {} },
+      identityChecksum: 'a'.repeat(64),
+    } as any;
+    const { runChatCompletion } = await import('$lib/server/ai/openai-facade.js');
+
+    const res = await runChatCompletion(
+      {
+        model: 'yorha-legal',
+        messages: [{ role: 'user', content: 'what is hearsay?' }],
+        raw: false,
+        stream: false,
+        temperature: 0.3,
+      },
+      {
+        revisionedExactAnswerCache: {
+          manifest,
+          modelRevision: 'model:r1',
+          chatTemplateRevision: 'chat:r1',
+          toolSchemaRevision: 'tools:r1',
+          promptTemplateRevision: 'prompt:r1',
+        },
+      },
+    );
+
+    expect(res.choices[0].message.content).toBe('V2 response');
+    expect(mocks.buildAceRevisionedExactAnswerCacheKeyV1).toHaveBeenCalledWith(
+      expect.objectContaining({
+        contextManifestV2: manifest,
+        modelRevision: 'model:r1',
+        chatTemplateRevision: 'chat:r1',
+        toolSchemaRevision: 'tools:r1',
+        promptTemplateRevision: 'prompt:r1',
+        renderedRequestChecksum: expect.stringMatching(/^[0-9a-f]{64}$/),
+        generationControlsSignature: expect.stringContaining('generation-controls'),
+      }),
+    );
+    expect(mocks.getExactMatchCache).toHaveBeenCalledWith('ace:completion:v2:strict-seam-test');
+    expect(mocks.setExactMatchCache).toHaveBeenCalledWith(
+      'ace:completion:v2:strict-seam-test',
+      expect.objectContaining({ content: 'V2 response' }),
+      86400,
+    );
   });
 
   it('includes dynamic history and KV context in the prompt-cache key', async () => {

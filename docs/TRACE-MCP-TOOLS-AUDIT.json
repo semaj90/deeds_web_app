@@ -1,5 +1,5 @@
 {
-  "totalTools": 119,
+  "totalTools": 120,
   "gemma4MaxTools": 3,
   "toolSetCount": 40,
   "namespaces": [
@@ -32,6 +32,7 @@
     "research",
     "service_workers",
     "miniforge",
+    "domain",
     "shell"
   ],
   "categories": {
@@ -180,6 +181,7 @@
       "service_workers.status",
       "service_workers.result",
       "miniforge.health",
+      "domain.classify",
       "miniforge.extract",
       "shell.run"
     ]
@@ -302,6 +304,7 @@
     "service_workers.result",
     "miniforge.health",
     "miniforge.analyze",
+    "domain.classify",
     "miniforge.extract",
     "shell.run"
   ],
@@ -660,10 +663,11 @@
     {
       "set": "Set 40",
       "tools": [
+        "domain.classify",
         "miniforge.extract",
         "shell.run"
       ],
-      "count": 2
+      "count": 3
     }
   ]
 }

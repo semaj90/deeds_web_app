@@ -21,8 +21,10 @@ import pg from 'pg';
 import {
   Binary,
   Bool,
+  Field,
   Float32,
   Int32,
+  List,
   Table,
   Utf8,
   tableToIPC,
@@ -98,10 +100,6 @@ function floatsToBytes(values) {
 function bufferToUint8Array(value) {
   if (!Buffer.isBuffer(value) || value.length === 0) return null;
   return new Uint8Array(value.buffer, value.byteOffset, value.byteLength);
-}
-
-function arrayJson(value) {
-  return JSON.stringify(uniqueStrings(value));
 }
 
 function semanticInput(row) {
@@ -284,6 +282,7 @@ function makeTable(rows) {
   const floats = (name) => vectorFromArray(rows.map((row) => Number.isFinite(Number(row[name])) ? Number(row[name]) : null), new Float32());
   const bools = (map) => vectorFromArray(rows.map(map), new Bool());
   const binaries = (map) => vectorFromArray(rows.map(map), new Binary());
+  const stringLists = (map) => vectorFromArray(rows.map(map), new List(new Field('item', new Utf8(), true)));
 
   return new Table({
     packet_key: strings('packet_key'),
@@ -309,13 +308,13 @@ function makeTable(rows) {
     semantic_input: strings('semantic_input'),
     semantic_target: strings('semantic_target'),
     supervision_source: strings('supervision_source', () => 'canonical_postgres_labels'),
-    keywords_json: strings('keywords_json', (row) => arrayJson(row.keywords)),
-    ngrams_json: strings('ngrams_json', (row) => arrayJson(row.ngrams)),
-    trigrams_json: strings('trigrams_json', (row) => arrayJson(row.trigrams)),
-    used_concepts_json: strings('used_concepts_json', (row) => arrayJson(row.used_concepts)),
-    lexical_features_json: strings('lexical_features_json', (row) => arrayJson(row.lexical_features)),
-    ast_symbols_json: strings('ast_symbols_json', (row) => arrayJson(row.ast_symbols)),
-    entities_json: strings('entities_json', (row) => arrayJson(row.entities)),
+    keywords_list: stringLists((row) => row.keywords),
+    ngrams_list: stringLists((row) => row.ngrams),
+    trigrams_list: stringLists((row) => row.trigrams),
+    used_concepts_list: stringLists((row) => row.used_concepts),
+    lexical_features_list: stringLists((row) => row.lexical_features),
+    ast_symbols_list: stringLists((row) => row.ast_symbols),
+    entities_list: stringLists((row) => row.entities),
     community_id: ints('community_id'),
     som_row: ints('som_row'),
     som_col: ints('som_col'),

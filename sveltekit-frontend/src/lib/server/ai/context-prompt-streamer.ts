@@ -18,6 +18,15 @@
 import { PassThrough, Readable } from 'node:stream';
 import type { ACEContext } from '$lib/server/ace/types.js';
 import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
+import {
+  extractLlamaPromptCacheTelemetryV1,
+  type LlamaPromptCacheTelemetryV1,
+} from '$lib/server/atlas/prefill/llama-prompt-cache-telemetry-v1.js';
+import {
+  buildContextPrefixReuseObservationV1,
+  type ContextPrefixIdentityV1,
+  type ContextPrefixReuseObservationV1,
+} from '$lib/server/atlas/prefill/context-prefix-identity-v1.js';
 
 export interface ContextStreamConfig {
   llamaBaseUrl: string;
@@ -25,14 +34,109 @@ export interface ContextStreamConfig {
   temperature: number;
   maxTokens: number;
   topP?: number;
-  cachePrompt?: boolean;  // Enable KV cache reuse
-  kvCacheTtl?: number;     // TurboQuant KV cache TTL (seconds)
+  cachePrompt?: boolean;  // Enable prompt/KV cache reuse
+  /** llama.cpp cache_reuse: minimum token chunk eligible for KV shifting. */
+  cacheReuseMinChunk?: number;
+  telemetrySource?: KvCacheTelemetrySource;
+  /** Optional verified identity; absent means telemetry remains model-level only. */
+  contextPrefixIdentity?: ContextPrefixIdentityV1;
+  previousStablePrefix?: string;
+  onContextPrefixReuseObservation?: (observation: ContextPrefixReuseObservationV1) => void;
 }
+
+export const DEFAULT_CACHE_REUSE_MIN_CHUNK = 256;
+
+/**
+ * Build the llama.cpp prompt-cache controls.
+ *
+ * `cache_reuse` is a token threshold, not a TTL. Keep it disabled when
+ * prompt caching is disabled so a caller cannot accidentally request reuse
+ * while opting out of the cache.
+ */
+export function buildLlamaPromptCacheOptionsV1(input: {
+  cachePrompt?: boolean;
+  cacheReuseMinChunk?: number;
+}): { cache_prompt: boolean; cache_reuse?: number } {
+  const cachePrompt = input.cachePrompt ?? false;
+  if (!cachePrompt) return { cache_prompt: false };
+
+  const minChunk = input.cacheReuseMinChunk ?? DEFAULT_CACHE_REUSE_MIN_CHUNK;
+  if (!Number.isInteger(minChunk) || minChunk < 0) {
+    throw new Error('cacheReuseMinChunk must be a non-negative integer');
+  }
+
+  return { cache_prompt: true, cache_reuse: minChunk };
+}
+
+export type KvCacheTelemetrySource =
+  | 'cline'
+  | 'acp'
+  | 'context-stream'
+  | 'summary'
+  | 'turboquant'
+  | 'inference-router'
+  | 'unknown';
 
 export interface StreamedMessage {
   role: 'system' | 'user' | 'assistant';
   content: string;
   cache_control?: { type: 'ephemeral' };
+}
+
+/**
+ * Record observed llama-server prompt-cache usage without persisting KV state.
+ * A missing cache field remains unavailable and is deliberately not treated as
+ * a cache miss or hit.
+ */
+export function recordLlamaPromptCacheTelemetry(
+  modelId: string,
+  response: unknown,
+  source: KvCacheTelemetrySource = 'unknown',
+): LlamaPromptCacheTelemetryV1 | null {
+  const telemetry = extractLlamaPromptCacheTelemetryV1(response);
+  if (!telemetry.cacheTelemetryAvailable) return null;
+
+  kvCacheMonitor.recordCacheHit(
+    modelId,
+    telemetry.promptTokens,
+    telemetry.cachedPrefillTokens,
+    telemetry.newPrefillTokens,
+    source,
+  );
+  return telemetry;
+}
+
+function parseSsePayload(line: string): unknown | null {
+  const trimmed = line.trim();
+  if (!trimmed.startsWith('data:')) return null;
+  const data = trimmed.slice(5).trim();
+  if (!data || data === '[DONE]') return null;
+  try {
+    return JSON.parse(data);
+  } catch {
+    return null;
+  }
+}
+
+function emitContextPrefixReuseObservation(
+  config: ContextStreamConfig,
+  stablePrefix: string,
+  telemetry: LlamaPromptCacheTelemetryV1 | null,
+): void {
+  if (!config.contextPrefixIdentity || !telemetry?.cacheTelemetryAvailable) return;
+
+  try {
+    const observation = buildContextPrefixReuseObservationV1({
+      identity: config.contextPrefixIdentity,
+      stablePrefix,
+      previousStablePrefix: config.previousStablePrefix,
+      cachedPrefillTokens: telemetry.cachedPrefillTokens,
+      newPrefillTokens: telemetry.newPrefillTokens,
+    });
+    config.onContextPrefixReuseObservation?.(observation);
+  } catch {
+    // Identity mismatch is a caller contract failure; do not infer or emit data.
+  }
 }
 
 /**
@@ -88,8 +192,8 @@ export async function* streamContextPromptToKvCache(
       max_tokens: config.maxTokens,
       top_p: config.topP ?? 0.9,
       stream: true,
-      cache_prompt: config.cachePrompt ?? false,  // Enable KV cache prefilling
-      cache_reuse: config.kvCacheTtl ?? 256,      // Reuse window (seconds)
+      stream_options: { include_usage: true },
+      ...buildLlamaPromptCacheOptionsV1(config),
     }),
   });
 
@@ -105,6 +209,7 @@ export async function* streamContextPromptToKvCache(
 
   const decoder = new TextDecoder();
   let buffer = '';
+  let lastTelemetry: LlamaPromptCacheTelemetryV1 | null = null;
 
   try {
     while (true) {
@@ -123,6 +228,11 @@ export async function* streamContextPromptToKvCache(
           } else {
             try {
               const parsed = JSON.parse(data);
+              lastTelemetry = recordLlamaPromptCacheTelemetry(
+                config.model,
+                parsed,
+                config.telemetrySource ?? 'context-stream',
+              ) ?? lastTelemetry;
               if (parsed.choices?.[0]?.delta?.content) {
                 yield `data: ${JSON.stringify(parsed)}\n\n`;
               }
@@ -134,10 +244,19 @@ export async function* streamContextPromptToKvCache(
       }
     }
 
-    // Flush remaining buffer
-    if (buffer.trim()) {
-      yield `data: ${buffer}\n\n`;
+    // Parse an unterminated final SSE line so usage-only telemetry is not lost.
+    const trailing = parseSsePayload(buffer);
+    if (trailing) {
+      lastTelemetry = recordLlamaPromptCacheTelemetry(
+        config.model,
+        trailing,
+        config.telemetrySource ?? 'context-stream',
+      ) ?? lastTelemetry;
+      if ((trailing as { choices?: Array<{ delta?: { content?: string } }> }).choices?.[0]?.delta?.content) {
+        yield `data: ${JSON.stringify(trailing)}\n\n`;
+      }
     }
+    emitContextPrefixReuseObservation(config, systemPrompt, lastTelemetry);
   } finally {
     reader.releaseLock();
   }
@@ -172,8 +291,11 @@ export async function* streamDirectToLlamaServer(
       temperature: config.temperature,
       max_tokens: config.maxTokens,
       stream: true,
-      cache_prompt: useKvCache,
-      cache_reuse: 256,
+      stream_options: { include_usage: true },
+      ...buildLlamaPromptCacheOptionsV1({
+        cachePrompt: useKvCache,
+        cacheReuseMinChunk: config.cacheReuseMinChunk,
+      }),
     }),
   });
 
@@ -186,6 +308,7 @@ export async function* streamDirectToLlamaServer(
 
   const decoder = new TextDecoder();
   let buffer = '';
+  let lastTelemetry: LlamaPromptCacheTelemetryV1 | null = null;
 
   try {
     while (true) {
@@ -201,7 +324,13 @@ export async function* streamDirectToLlamaServer(
           const data = line.slice(6);
           if (data !== '[DONE]') {
             try {
-              yield JSON.parse(data);
+              const parsed = JSON.parse(data);
+              lastTelemetry = recordLlamaPromptCacheTelemetry(
+                config.model,
+                parsed,
+                config.telemetrySource ?? 'unknown',
+              ) ?? lastTelemetry;
+              yield parsed;
             } catch {
               /* skip */
             }
@@ -209,6 +338,17 @@ export async function* streamDirectToLlamaServer(
         }
       }
     }
+    const trailing = parseSsePayload(buffer);
+    if (trailing) {
+      lastTelemetry = recordLlamaPromptCacheTelemetry(
+        config.model,
+        trailing,
+        config.telemetrySource ?? 'unknown',
+      ) ?? lastTelemetry;
+      yield trailing as { id: string; object: string; choices: Array<{ delta: { content?: string } }> };
+    }
+    const stablePrefix = userMessages.find((message) => message.role === 'system')?.content;
+    if (stablePrefix) emitContextPrefixReuseObservation(config, stablePrefix, lastTelemetry);
   } finally {
     reader.releaseLock();
   }
@@ -265,6 +405,7 @@ export interface KvCacheStats {
   generatedTokens: number;
   cacheHitRate: number;
   totalRequests: number;
+  consumerCounts: Record<KvCacheTelemetrySource, number>;
   lastCacheReuse?: string; // ISO timestamp
 }
 
@@ -274,7 +415,13 @@ export interface KvCacheStats {
 export class KvCacheMonitor {
   private stats: Map<string, KvCacheStats> = new Map();
 
-  recordCacheHit(modelId: string, contextTokens: number, cachedTokens: number, newTokens: number) {
+  recordCacheHit(
+    modelId: string,
+    contextTokens: number,
+    cachedTokens: number,
+    newTokens: number,
+    source: KvCacheTelemetrySource = 'unknown',
+  ) {
     const stat = this.stats.get(modelId) || {
       modelId,
       contextTokens: 0,
@@ -283,7 +430,18 @@ export class KvCacheMonitor {
       generatedTokens: 0,
       cacheHitRate: 0,
       totalRequests: 0,
+      consumerCounts: {
+        cline: 0,
+        acp: 0,
+        'context-stream': 0,
+        summary: 0,
+        turboquant: 0,
+        'inference-router': 0,
+        unknown: 0,
+      },
     };
+
+    stat.consumerCounts[source] = (stat.consumerCounts[source] ?? 0) + 1;
 
     stat.contextTokens += contextTokens;
     stat.cachedTokens += cachedTokens;

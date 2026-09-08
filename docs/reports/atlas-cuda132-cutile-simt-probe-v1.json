@@ -1,0 +1,40 @@
+{
+  "schema": "atlas.cuda-cutile-simt-probe.v1",
+  "observedAt": "2026-09-06",
+  "status": "CUTILE_SIMT_SMOKE_PROVEN_ATLASGEMMA_OPEN",
+  "environment": {
+    "host": "WSL2 Ubuntu",
+    "pythonEnvironment": "/home/james/.venvs/atlas-cutile-cu132",
+    "torch": "2.14.0+cu132",
+    "torchCuda": "13.2",
+    "cuTile": "1.5.0",
+    "tileCompiler": "13.2.78"
+  },
+  "hardware": {
+    "gpu": "NVIDIA GeForce RTX 3060 Ti",
+    "computeCapability": "8.6",
+    "driver": "580.88",
+    "peakTorchMiB": 9.38
+  },
+  "cutileVectorAdd": {
+    "shape": [1024],
+    "finiteAndCorrect": true,
+    "latencyMs": 423.292
+  },
+  "simtTorchFp16Gemm": {
+    "shape": [512, 256, 256],
+    "finite": true,
+    "latencyMs": 95.063
+  },
+  "interpretation": {
+    "cuda132Runtime": true,
+    "sm86Execution": true,
+    "simtPath": true,
+    "cutilePath": true,
+    "atlasGemmaForward": false,
+    "cutileGemmParity": false,
+    "canonicalAuthority": false,
+    "writes": false
+  },
+  "nextGate": "ATLASGEMMA_CUDA_BF16_FORWARD_AND_SIMT_PARITY"
+}

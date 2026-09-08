@@ -1,0 +1,542 @@
+{
+  "schema": "atlas.gemma-rank-breadth-50.v1",
+  "status": "BREADTH_STABILITY_PROVEN",
+  "checkpointDir": "..\\models\\gemma4_assistant_huggingface_7_3_26",
+  "queryCount": 51,
+  "allFinite": true,
+  "loadedInheritedTensorCount": 46,
+  "rankHeadTrained": false,
+  "rankingQualityProven": false,
+  "trainingPerformed": false,
+  "cudaAllocated": false,
+  "checkpointMutated": false,
+  "weightsMutated": false,
+  "canonicalAuthority": false,
+  "scoreDistribution": {
+    "min": -25.0,
+    "max": 29.75,
+    "mean": 5.4069967830882355
+  },
+  "latencyMsDistribution": {
+    "min": 6.828,
+    "max": 29.883,
+    "mean": 10.832666666666666
+  },
+  "perQuery": [
+    {
+      "index": 0,
+      "tokenCount": 14,
+      "textLength": 77,
+      "hiddenFinite": true,
+      "scoreFinite": true,
+      "finite": true,
+      "rawScore": 0.61328125,
+      "latencyMs": 29.883
+    },
+    {
+      "index": 1,
+      "tokenCount": 35,
+      "textLength": 145,
+      "hiddenFinite": true,
+      "scoreFinite": true,
+      "finite": true,
+      "rawScore": 6.125,
+      "latencyMs": 18.098
+    },
+    {
+      "index": 2,
+      "tokenCount": 9,
+      "textLength": 52,
+      "hiddenFinite": true,
+      "scoreFinite": true,
+      "finite": true,
+      "rawScore": -10.875,
+      "latencyMs": 7.66
+    },
+    {
+      "index": 3,
+      "tokenCount": 13,
+      "textLength": 69,
+      "hiddenFinite": true,
+      "scoreFinite": true,
+      "finite": true,
+      "rawScore": 1.203125,
+      "latencyMs": 8.273
+    },
+    {
+      "index": 4,
+      "tokenCount": 8,
+      "textLength": 47,
+      "hiddenFinite": true,
+      "scoreFinite": true,
+      "finite": true,
+      "rawScore": -3.59375,
+      "latencyMs": 8.328
+    },
+    {
+      "index": 5,
+      "tokenCount": 13,
+      "textLength": 46,
+      "hiddenFinite": true,
+      "scoreFinite": true,
+      "finite": true,
+      "rawScore": 7.4375,
+      "latencyMs": 8.608
+    },
+    {
+      "index": 6,
+      "tokenCount": 13,
+      "textLength": 63,
+      "hiddenFinite": true,
+      "scoreFinite": true,
+      "finite": true,
+      "rawScore": 16.0,
+      "latencyMs": 9.019
+    },
+    {
+      "index": 7,
+      "tokenCount": 16,
+      "textLength": 40,
+      "hiddenFinite": true,
+      "scoreFinite": true,
+      "finite": true,
+      "rawScore": -7.21875,
+      "latencyMs": 12.791
+    },
+    {
+      "index": 8,
+      "tokenCount": 38,
+      "textLength": 97,
+      "hiddenFinite": true,
+      "scoreFinite": true,
+      "finite": true,
+      "rawScore": 16.125,
+      "latencyMs": 17.179
+    },
+    {
+      "index": 9,
+      "tokenCount": 29,
+      "textLength": 94,
+      "hiddenFinite": true,
+      "scoreFinite": true,
+      "finite": true,
+      "rawScore": -13.6875,
+      "latencyMs": 15.692
+    },
+    {
+      "index": 10,
+      "tokenCount": 13,
+      "textLength": 75,
+      "hiddenFinite": true,
+      "scoreFinite": true,
+      "finite": true,
+      "rawScore": 9.0,
+      "latencyMs": 8.436
+    },
+    {
+      "index": 11,
+      "tokenCount": 13,
+      "textLength": 77,
+      "hiddenFinite": true,
+      "scoreFinite": true,
+      "finite": true,
+      "rawScore": -1.046875,
+      "latencyMs": 9.472
+    },
+    {
+      "index": 12,
+      "tokenCount": 13,
+      "textLength": 75,
+      "hiddenFinite": true,
+      "scoreFinite": true,
+      "finite": true,
+      "rawScore": -2.015625,
+      "latencyMs": 9.082
+    },
+    {
+      "index": 13,
+      "tokenCount": 11,
+      "textLength": 65,
+      "hiddenFinite": true,
+      "scoreFinite": true,
+      "finite": true,
+      "rawScore": 5.5,
+      "latencyMs": 8.963
+    },
+    {
+      "index": 14,
+      "tokenCount": 13,
+      "textLength": 72,
+      "hiddenFinite": true,
+      "scoreFinite": true,
+      "finite": true,
+      "rawScore": 4.5625,
+      "latencyMs": 9.261
+    },
+    {
+      "index": 15,
+      "tokenCount": 14,
+      "textLength": 65,
+      "hiddenFinite": true,
+      "scoreFinite": true,
+      "finite": true,
+      "rawScore": 8.5625,
+      "latencyMs": 9.793
+    },
+    {
+      "index": 16,
+      "tokenCount": 17,
+      "textLength": 66,
+      "hiddenFinite": true,
+      "scoreFinite": true,
+      "finite": true,
+      "rawScore": 29.75,
+      "latencyMs": 12.694
+    },
+    {
+      "index": 17,
+      "tokenCount": 12,
+      "textLength": 66,
+      "hiddenFinite": true,
+      "scoreFinite": true,
+      "finite": true,
+      "rawScore": 15.875,
+      "latencyMs": 9.611
+    },
+    {
+      "index": 18,
+      "tokenCount": 15,
+      "textLength": 83,
+      "hiddenFinite": true,
+      "scoreFinite": true,
+      "finite": true,
+      "rawScore": -7.34375,
+      "latencyMs": 11.098
+    },
+    {
+      "index": 19,
+      "tokenCount": 15,
+      "textLength": 80,
+      "hiddenFinite": true,
+      "scoreFinite": true,
+      "finite": true,
+      "rawScore": -19.875,
+      "latencyMs": 9.466
+    },
+    {
+      "index": 20,
+      "tokenCount": 16,
+      "textLength": 70,
+      "hiddenFinite": true,
+      "scoreFinite": true,
+      "finite": true,
+      "rawScore": -25.0,
+      "latencyMs": 11.84
+    },
+    {
+      "index": 21,
+      "tokenCount": 22,
+      "textLength": 89,
+      "hiddenFinite": true,
+      "scoreFinite": true,
+      "finite": true,
+      "rawScore": 6.1875,
+      "latencyMs": 13.271
+    },
+    {
+      "index": 22,
+      "tokenCount": 17,
+      "textLength": 76,
+      "hiddenFinite": true,
+      "scoreFinite": true,
+      "finite": true,
+      "rawScore": 19.0,
+      "latencyMs": 9.857
+    },
+    {
+      "index": 23,
+      "tokenCount": 16,
+      "textLength": 87,
+      "hiddenFinite": true,
+      "scoreFinite": true,
+      "finite": true,
+      "rawScore": 11.5625,
+      "latencyMs": 11.012
+    },
+    {
+      "index": 24,
+      "tokenCount": 16,
+      "textLength": 76,
+      "hiddenFinite": true,
+      "scoreFinite": true,
+      "finite": true,
+      "rawScore": -2.578125,
+      "latencyMs": 10.033
+    },
+    {
+      "index": 25,
+      "tokenCount": 26,
+      "textLength": 57,
+      "hiddenFinite": true,
+      "scoreFinite": true,
+      "finite": true,
+      "rawScore": 8.375,
+      "latencyMs": 13.288
+    },
+    {
+      "index": 26,
+      "tokenCount": 15,
+      "textLength": 88,
+      "hiddenFinite": true,
+      "scoreFinite": true,
+      "finite": true,
+      "rawScore": 18.875,
+      "latencyMs": 7.5
+    },
+    {
+      "index": 27,
+      "tokenCount": 16,
+      "textLength": 96,
+      "hiddenFinite": true,
+      "scoreFinite": true,
+      "finite": true,
+      "rawScore": 0.51953125,
+      "latencyMs": 10.973
+    },
+    {
+      "index": 28,
+      "tokenCount": 17,
+      "textLength": 57,
+      "hiddenFinite": true,
+      "scoreFinite": true,
+      "finite": true,
+      "rawScore": 16.375,
+      "latencyMs": 9.81
+    },
+    {
+      "index": 29,
+      "tokenCount": 21,
+      "textLength": 89,
+      "hiddenFinite": true,
+      "scoreFinite": true,
+      "finite": true,
+      "rawScore": 5.96875,
+      "latencyMs": 11.586
+    },
+    {
+      "index": 30,
+      "tokenCount": 30,
+      "textLength": 76,
+      "hiddenFinite": true,
+      "scoreFinite": true,
+      "finite": true,
+      "rawScore": -5.6875,
+      "latencyMs": 14.675
+    },
+    {
+      "index": 31,
+      "tokenCount": 20,
+      "textLength": 72,
+      "hiddenFinite": true,
+      "scoreFinite": true,
+      "finite": true,
+      "rawScore": 9.125,
+      "latencyMs": 12.207
+    },
+    {
+      "index": 32,
+      "tokenCount": 24,
+      "textLength": 72,
+      "hiddenFinite": true,
+      "scoreFinite": true,
+      "finite": true,
+      "rawScore": 17.75,
+      "latencyMs": 12.969
+    },
+    {
+      "index": 33,
+      "tokenCount": 11,
+      "textLength": 74,
+      "hiddenFinite": true,
+      "scoreFinite": true,
+      "finite": true,
+      "rawScore": 4.28125,
+      "latencyMs": 6.828
+    },
+    {
+      "index": 34,
+      "tokenCount": 18,
+      "textLength": 81,
+      "hiddenFinite": true,
+      "scoreFinite": true,
+      "finite": true,
+      "rawScore": 0.28125,
+      "latencyMs": 9.956
+    },
+    {
+      "index": 35,
+      "tokenCount": 15,
+      "textLength": 64,
+      "hiddenFinite": true,
+      "scoreFinite": true,
+      "finite": true,
+      "rawScore": 11.3125,
+      "latencyMs": 8.255
+    },
+    {
+      "index": 36,
+      "tokenCount": 16,
+      "textLength": 97,
+      "hiddenFinite": true,
+      "scoreFinite": true,
+      "finite": true,
+      "rawScore": 3.921875,
+      "latencyMs": 10.549
+    },
+    {
+      "index": 37,
+      "tokenCount": 17,
+      "textLength": 88,
+      "hiddenFinite": true,
+      "scoreFinite": true,
+      "finite": true,
+      "rawScore": 7.125,
+      "latencyMs": 8.629
+    },
+    {
+      "index": 38,
+      "tokenCount": 14,
+      "textLength": 83,
+      "hiddenFinite": true,
+      "scoreFinite": true,
+      "finite": true,
+      "rawScore": 9.3125,
+      "latencyMs": 8.32
+    },
+    {
+      "index": 39,
+      "tokenCount": 13,
+      "textLength": 87,
+      "hiddenFinite": true,
+      "scoreFinite": true,
+      "finite": true,
+      "rawScore": 12.6875,
+      "latencyMs": 7.872
+    },
+    {
+      "index": 40,
+      "tokenCount": 13,
+      "textLength": 93,
+      "hiddenFinite": true,
+      "scoreFinite": true,
+      "finite": true,
+      "rawScore": 6.5,
+      "latencyMs": 8.127
+    },
+    {
+      "index": 41,
+      "tokenCount": 18,
+      "textLength": 84,
+      "hiddenFinite": true,
+      "scoreFinite": true,
+      "finite": true,
+      "rawScore": 3.609375,
+      "latencyMs": 9.984
+    },
+    {
+      "index": 42,
+      "tokenCount": 20,
+      "textLength": 80,
+      "hiddenFinite": true,
+      "scoreFinite": true,
+      "finite": true,
+      "rawScore": 5.34375,
+      "latencyMs": 10.082
+    },
+    {
+      "index": 43,
+      "tokenCount": 23,
+      "textLength": 74,
+      "hiddenFinite": true,
+      "scoreFinite": true,
+      "finite": true,
+      "rawScore": 17.25,
+      "latencyMs": 13.025
+    },
+    {
+      "index": 44,
+      "tokenCount": 15,
+      "textLength": 86,
+      "hiddenFinite": true,
+      "scoreFinite": true,
+      "finite": true,
+      "rawScore": 18.0,
+      "latencyMs": 8.715
+    },
+    {
+      "index": 45,
+      "tokenCount": 24,
+      "textLength": 97,
+      "hiddenFinite": true,
+      "scoreFinite": true,
+      "finite": true,
+      "rawScore": -7.78125,
+      "latencyMs": 12.499
+    },
+    {
+      "index": 46,
+      "tokenCount": 17,
+      "textLength": 78,
+      "hiddenFinite": true,
+      "scoreFinite": true,
+      "finite": true,
+      "rawScore": -0.1259765625,
+      "latencyMs": 9.783
+    },
+    {
+      "index": 47,
+      "tokenCount": 14,
+      "textLength": 85,
+      "hiddenFinite": true,
+      "scoreFinite": true,
+      "finite": true,
+      "rawScore": 5.96875,
+      "latencyMs": 9.025
+    },
+    {
+      "index": 48,
+      "tokenCount": 15,
+      "textLength": 70,
+      "hiddenFinite": true,
+      "scoreFinite": true,
+      "finite": true,
+      "rawScore": 4.875,
+      "latencyMs": 9.472
+    },
+    {
+      "index": 49,
+      "tokenCount": 17,
+      "textLength": 78,
+      "hiddenFinite": true,
+      "scoreFinite": true,
+      "finite": true,
+      "rawScore": 21.5,
+      "latencyMs": 10.999
+    },
+    {
+      "index": 50,
+      "tokenCount": 11,
+      "textLength": 73,
+      "hiddenFinite": true,
+      "scoreFinite": true,
+      "finite": true,
+      "rawScore": 16.125,
+      "latencyMs": 7.918
+    }
+  ],
+  "sourceWeightsChecksumBefore": "sha256:12875062fc25c51e8fa9b62abd2de7ad48b7d63f8559d5d604fbd5a3d6bcff16",
+  "sourceWeightsChecksumAfter": "sha256:12875062fc25c51e8fa9b62abd2de7ad48b7d63f8559d5d604fbd5a3d6bcff16",
+  "runtimeInstantiation": "IN_MEMORY_ONLY",
+  "observedAt": "2026-09-07T00:44:35.748597+00:00",
+  "receiptChecksum": "sha256:944bb2e9de4fa743649a0832bacdd3a50a95c9fd4fe1c83349e815e8ea48e011"
+}

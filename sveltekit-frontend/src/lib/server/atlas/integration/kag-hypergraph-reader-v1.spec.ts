@@ -107,7 +107,36 @@ describe('KAG next-steps item 1: readKagHypergraphNeighborsV1', () => {
     queryMock.mockRejectedValue(new Error('connection refused'));
 
     const { readKagHypergraphNeighborsStrictV1 } = await import('./kag-hypergraph-reader-v1.js');
-    await expect(readKagHypergraphNeighborsStrictV1(['packet:a'])).rejects.toThrow('connection refused');
+    await expect(readKagHypergraphNeighborsStrictV1(['packet:a'], { workspaceRevision: 'ws-1', graphRevision: 'graph-1' })).rejects.toThrow('connection refused');
+  });
+
+  it('strict seam requires and binds both traversal revisions', async () => {
+    queryMock.mockClear();
+    queryMock.mockResolvedValue({ rows: [] });
+
+    const { readKagHypergraphNeighborsStrictV1 } = await import('./kag-hypergraph-reader-v1.js');
+    await readKagHypergraphNeighborsStrictV1(['packet:a'], { workspaceRevision: 'ws-1', graphRevision: 'graph-1' });
+    const hyperedgeCall = queryMock.mock.calls.find(([sql]) => String(sql).includes('atlas_hyperedges'));
+    expect(hyperedgeCall?.[0]).toContain('h.workspace_revision = $2');
+    expect(hyperedgeCall?.[0]).toContain('h.graph_revision = $3');
+    expect(hyperedgeCall?.[1]).toEqual([['packet:a'], 'ws-1', 'graph-1']);
+  });
+
+  it('strict seam rejects an incomplete traversal snapshot before querying', async () => {
+    queryMock.mockClear();
+    const { readKagHypergraphNeighborsStrictV1 } = await import('./kag-hypergraph-reader-v1.js');
+    await expect(readKagHypergraphNeighborsStrictV1(['packet:a'], { workspaceRevision: '', graphRevision: 'graph-1' }))
+      .rejects.toThrow('KAG_TRAVERSAL_SNAPSHOT_REQUIRED');
+    expect(queryMock).not.toHaveBeenCalled();
+  });
+
+  it('strict hyperedge read returns role-preserving records with revision parameters', async () => {
+    queryMock.mockClear();
+    queryMock.mockResolvedValue({ rows: hyperedgeMemberRows() });
+    const { readKagHyperedgesStrictV1 } = await import('./kag-hypergraph-reader-v1.js');
+    const result = await readKagHyperedgesStrictV1(['packet:a'], { workspaceRevision: 'ws-1', graphRevision: 'graph-1' });
+    expect(result[0].participants.map((participant) => participant.role)).toEqual(['actor', 'target']);
+    expect(queryMock.mock.calls[0][1]).toEqual([['packet:a'], 'ws-1', 'graph-1']);
   });
 
   it('dedupes and caps the requested canonicalIds before querying', async () => {

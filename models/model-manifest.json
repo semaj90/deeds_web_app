@@ -74,7 +74,7 @@
       "filename": null,
       "modelFamily": "gemma4",
       "productionProfiles": ["GEMMA_VISION_PRODUCTION"],
-      "notes": "Stored as Ollama blob at %USERPROFILE%\\.ollama\\blobs\\sha256-a79de882... Set TURBO_MODEL_PATH to the blob path or a converted GGUF. 5.3 GB on disk. Requires TURBO_NGL=99 on RTX 3060 Ti.",
+      "notes": "STALE NOTE CORRECTED 2026-09-06: this used to be stored as an Ollama blob at %USERPROFILE%\\.ollama\\blobs\\sha256-a79de882..., but that blob no longer exists on disk and the tag no longer appears in `ollama list` (verified live 2026-09-06 — only embeddinggemma:latest, ibm/granite-docling:258m, and nomic-embed-text:latest are currently pulled). This model must be sourced from a converted GGUF (see productionProfiles/GEMMA_VISION_PRODUCTION and models/gemma4-legal-iq4xs-direct.gguf) via TURBO_MODEL_PATH, not from an Ollama blob. Requires TURBO_NGL=99 on RTX 3060 Ti.",
       "embeddingDim": null,
       "port": 8090,
       "contextLen": 64000,
@@ -291,21 +291,39 @@
       "runtime": "llama-server",
       "pathEnv": "MTP_DRAFT_MODEL",
       "draftMode": "C",
-      "artifact": ".tmp/atomic-mtp/gemma-4-E4B-it-assistant.Q4_K_M.gguf",
+      "artifact": "C:/Users/james/Desktop/archived-from-tmp-20260825/atomic-mtp/gemma-4-E4B-it-assistant.Q4_K_M.gguf",
       "filename": "gemma-4-E4B-it-assistant.Q4_K_M.gguf",
       "source": "https://huggingface.co/google/gemma-4-E4B-it-assistant",
       "siblingArtifacts": {
-        "f16": ".tmp/google-gemma4-e4b-assistant/gemma-e4b-assistant-mtp-f16.gguf",
-        "e4b-base-q4km": ".tmp/atomic-mtp/gemma-4-E4B-it-Q4_K_M.gguf",
-        "unsloth-q4km": ".tmp/atomic-mtp-unsloth/gemma-4-E4B-it-Q4_K_M.gguf"
+        "f16": "models/atlas-gemma4-e4b-assistant/mtp-f16/atlas-gemma4-e4b-assistant-mtp-f16.gguf",
+        "e4b-base-q4km": "C:/Users/james/Desktop/archived-from-tmp-20260825/atomic-mtp/gemma-4-E4B-it-Q4_K_M.gguf",
+        "unsloth-q4km": "C:/Users/james/Desktop/archived-from-tmp-20260825/atomic-mtp-unsloth/gemma-4-E4B-it-Q4_K_M.gguf"
       },
-      "notes": "75 MB on disk. Pair with --draft-model flag on a TurboQuant-capable llama-server binary. Use ENABLE_MTP_DRAFTER=1 + MTP_DRAFT_MODEL=<artifact path>. The 164 MB F16 sibling in .tmp/google-gemma4-e4b-assistant/ is available for higher-quality drafting at ~2× size cost. NOT a standalone chat model — assistant/MTP architecture only.",
+      "notes": "STALE PATHS CORRECTED 2026-09-06: the primary artifact and both non-f16 siblings previously pointed at .tmp/atomic-mtp(-unsloth)/ paths that no longer exist — that directory was archived on 2026-08-25 per this repo's archive-not-delete convention. Verified live: all 3 files exist at the corrected Desktop archive paths above (75MB assistant Q4_K_M, ~5GB base Q4_K_M, ~5GB unsloth Q4_K_M variant respectively). CORRECTION 2026-09-06, SAME DAY — the '--draft-model + TurboQuant-capable llama-server binary' claim below was NOT verified and does not hold up: checked both real llama-server.exe builds on this machine (Desktop/llama-server-cuda, v8757 mainline; Desktop/llama-turboquant-gemma4's custom Gemma4 fork) via --help, and NEITHER advertises support for Gemma4's actual MTP-assistant architecture. Only generic --model-draft/-md speculative decoding exists (mainline build), which assumes two fully independent models each running their own complete forward pass. The real Gemma4 assistant checkpoint is target-activation/KV-coupled (per AGMR-01's own findings: pre_projection/post_projection tensors, expects to share the target model's hidden states/KV cache directly) — architecturally incompatible with generic --model-draft wiring. Pointing --model-draft at this raw GGUF would likely fail to load correctly or silently misbehave, not work as this note previously implied. The ENABLE_MTP_DRAFTER=1 / MTP_DRAFT_MODEL env vars are this repo's own naming, not a real llama-server.exe flag on any binary found — unverified whether any launcher script translates them into working flags for this specific architecture. AS OF THIS CHECK: there is no proven, working MTP-drafting path for Gemma4 on this machine. The only real, working handling of this coupled architecture is the Python/PyTorch transplant (AGMR-01..06, python/atlas_gemma_rank_*.py), which explicitly STRIPS the target-coupling to run standalone — and that path is being built as a reranker (AtlasGemmaRankV1), not reintegrated as an llama-server drafter. Do not attempt to wire this artifact into MTP_DRAFT_MODEL/--model-draft without first getting a real, verified load+forward-pass proof — treat as NOT_PROVEN, not WIRED. The 163.81 MiB F16 sibling in models/atlas-gemma4-e4b-assistant/mtp-f16/ is available for higher-quality drafting at ~2× size cost IF a working drafting path is ever proven. The upstream BF16 safetensors seed and tokenizer/config live under models/gemma4_assistant_huggingface_7_3_26/. NOT a standalone chat model — assistant/MTP architecture only. NOT compatible as an MTP drafter for Ornith 1.5 (currently loaded on :8090) — vocab size mismatch (Gemma4 262144 vs Ornith 1.5's live 248320, verified via :8090/v1/models) makes token-level speculative decoding structurally incompatible between the two families.",
       "embeddingDim": null,
       "port": null,
       "contextLen": null,
       "quantization": "q4_K_M",
       "canonical": false,
       "tags": ["draft", "mtp", "speculative", "assistant", "e4b", "mode-c", "75mb"]
+    },
+    {
+      "id": "gemma4-e4b-qat-assistant-donor-b",
+      "displayName": "Gemma 4 E4B QAT Unquantized Assistant (AGMR donor B candidate)",
+      "description": "AGMR (AtlasGemmaRankV1) donor B candidate -- a distinct revision from the primary donor A checkpoint (gemma4_assistant_huggingface_7_3_26 / gemma4-e4b-assistant-mtp-q4km above). Downloaded and checksum-verified 2026-09-07 against Hugging Face's own API/LFS metadata (not just the reporting conversation's claim). Same architecture (Gemma4AssistantForCausalLM), same 50 tensors/shapes/dtypes as donor A, same tokenizer -- only actual weight values differ (QAT fine-tune of the same base), hence a different safetensors sha256.",
+      "role": "agmr-donor-candidate",
+      "runtime": "python-pytorch-only",
+      "localPath": "models/gemma4-e4b-qat-assistant-2026-07-20/model.safetensors",
+      "filename": "model.safetensors",
+      "source": "https://huggingface.co/google/gemma-4-E4B-it-qat-q4_0-unquantized-assistant",
+      "modelType": "gemma4_assistant",
+      "notes": "NOT loaded, NOT forward-tested, NOT promoted over donor A. Only downloaded + checksum-verified so far -- see docs/reports/atlas-gemma-rank-checkpoint-inventory-donor-b-v1.json for the full inventory. Directory is gitignored (models/.gitignore) like donor A's; use `rg --no-ignore` to audit its contents, this manifest entry is the tracked discoverability index. Do not overwrite or merge with donor A's directory (models/gemma4_assistant_huggingface_7_3_26/).",
+      "embeddingDim": null,
+      "port": null,
+      "contextLen": null,
+      "quantization": "bf16-unquantized-qat",
+      "canonical": false,
+      "tags": ["agmr", "donor-candidate", "assistant", "e4b", "qat", "unverified-forward-pass"]
     }
   ],
   "retrieval": {

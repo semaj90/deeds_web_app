@@ -88,9 +88,15 @@ export type CandidateRepresentationBindingV1 = z.infer<typeof candidateRepresent
 const revision = z.string().min(1);
 const nullableId = z.string().min(1).nullable();
 
+/**
+ * Physical uint32 boundary for Arrow/GPU consumers. Zod's plain `int().nonnegative()` does not
+ * prove uint32 compatibility on its own — JS's safe-integer range is far larger than 2^32-1.
+ */
+export const CANDIDATE_ORDINAL_MAX_UINT32 = 4_294_967_295;
+
 const canonicalCandidateV1BaseSchema = z.object({
   schema: z.literal(CANONICAL_CANDIDATE_SCHEMA),
-  candidateOrdinal: z.number().int().nonnegative(),
+  candidateOrdinal: z.number().int().nonnegative().max(CANDIDATE_ORDINAL_MAX_UINT32),
   canonicalId: z.string().min(1),
   packetKey: nullableId,
   sourceRef: nullableId.default(null),
@@ -178,12 +184,22 @@ export const candidateOrdinalMapV1Schema = z.object({
 }).strict();
 export type CandidateOrdinalMapV1 = z.infer<typeof candidateOrdinalMapV1Schema>;
 
+/**
+ * Deterministic, locale-independent binary string comparator. `String.prototype.localeCompare()`
+ * is ICU-driven and NOT guaranteed identical across Node builds (full-icu vs small-icu), default
+ * locales, or ICU data versions — unacceptable for anything feeding a checksum meant to replay
+ * identically across machines. UTF-8 byte comparison is deterministic on every platform/runtime.
+ */
+export function compareUtf8(a: string, b: string): number {
+  return Buffer.compare(Buffer.from(a, 'utf8'), Buffer.from(b, 'utf8'));
+}
+
 function canonicalJson(value: unknown): string {
   if (value === null || typeof value !== 'object') return JSON.stringify(value);
   if (Array.isArray(value)) return `[${value.map(canonicalJson).join(',')}]`;
   const entries = Object.entries(value as Record<string, unknown>)
     .filter(([, v]) => v !== undefined)
-    .sort(([a], [b]) => a.localeCompare(b));
+    .sort(([a], [b]) => compareUtf8(a, b));
   return `{${entries.map(([k, v]) => `${JSON.stringify(k)}:${canonicalJson(v)}`).join(',')}}`;
 }
 
@@ -225,11 +241,11 @@ export function materializeCandidateOrdinalMap(input: {
   }
 
   const ordered = [...parsed].sort((a, b) => {
-    const canonical = a.canonicalId.localeCompare(b.canonicalId);
+    const canonical = compareUtf8(a.canonicalId, b.canonicalId);
     if (canonical !== 0) return canonical;
-    const source = a.sourceRevision.localeCompare(b.sourceRevision);
+    const source = compareUtf8(a.sourceRevision, b.sourceRevision);
     if (source !== 0) return source;
-    return (a.packetKey ?? '').localeCompare(b.packetKey ?? '');
+    return compareUtf8(a.packetKey ?? '', b.packetKey ?? '');
   });
 
   const candidates = ordered.map((candidate, candidateOrdinal) => canonicalCandidateV1Schema.parse({
@@ -245,7 +261,7 @@ export function materializeCandidateOrdinalMap(input: {
     candidates,
   };
 
-  return candidateOrdinalMapV1Schema.parse({
+  const map = candidateOrdinalMapV1Schema.parse({
     schema: CANDIDATE_ORDINAL_MAP_SCHEMA,
     candidateSnapshotRevision: input.candidateSnapshotRevision,
     workspaceRevision: input.workspaceRevision,
@@ -255,6 +271,57 @@ export function materializeCandidateOrdinalMap(input: {
     identityAuthority: false,
     producerRevision: input.producerRevision,
   });
+
+  // Never admit a map this constructor itself did not prove sound — every Arrow/GPU
+  // materializer downstream relies on this invariant already holding by the time it receives one.
+  assertCandidateOrdinalMapIntegrityV1(map);
+
+  return map;
+}
+
+/**
+ * Proves a `CandidateOrdinalMapV1` is internally consistent — NOT just schema-valid. A map can
+ * pass `candidateOrdinalMapV1Schema.parse()` (every field individually well-typed) while still
+ * being corrupt as a whole (wrong row count, misordered ordinals, mixed revisions, a stale
+ * checksum). Every consumer that admits a map from an untrusted source (deserialized from Arrow,
+ * read from cache, received over RPC) MUST call this before trusting `candidateOrdinal` as a dense
+ * execution coordinate.
+ */
+export function assertCandidateOrdinalMapIntegrityV1(map: CandidateOrdinalMapV1): void {
+  if (map.rowCount !== map.candidates.length) {
+    throw new Error(
+      `CANDIDATE_ORDINAL_MAP_ROW_COUNT_MISMATCH:declared=${map.rowCount}:actual=${map.candidates.length}`
+    );
+  }
+
+  map.candidates.forEach((candidate, index) => {
+    if (candidate.candidateOrdinal !== index) {
+      throw new Error(
+        `CANDIDATE_ORDINAL_MAP_ORDINAL_SEQUENCE_BROKEN:index=${index}:candidateOrdinal=${candidate.candidateOrdinal}`
+      );
+    }
+    if (candidate.workspaceRevision !== map.workspaceRevision) {
+      throw new Error(
+        `CANDIDATE_ORDINAL_MAP_WORKSPACE_REVISION_MISMATCH:candidateOrdinal=${index}:candidate=${candidate.workspaceRevision}:map=${map.workspaceRevision}`
+      );
+    }
+    if (candidate.candidateSnapshotRevision !== map.candidateSnapshotRevision) {
+      throw new Error(
+        `CANDIDATE_ORDINAL_MAP_SNAPSHOT_REVISION_MISMATCH:candidateOrdinal=${index}:candidate=${candidate.candidateSnapshotRevision}:map=${map.candidateSnapshotRevision}`
+      );
+    }
+  });
+
+  const recomputedChecksum = candidateOrdinalMapChecksum({
+    candidateSnapshotRevision: map.candidateSnapshotRevision,
+    workspaceRevision: map.workspaceRevision,
+    candidates: map.candidates,
+  });
+  if (recomputedChecksum !== map.ordinalMapChecksum) {
+    throw new Error(
+      `CANDIDATE_ORDINAL_MAP_CHECKSUM_MISMATCH:declared=${map.ordinalMapChecksum}:recomputed=${recomputedChecksum}`
+    );
+  }
 }
 
 export function resolveCanonicalCandidateByOrdinal(

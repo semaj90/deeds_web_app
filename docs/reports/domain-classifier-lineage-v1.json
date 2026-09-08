@@ -1,6 +1,6 @@
 {
   "schema": "atlas.domain-classifier-lineage.v1",
-  "generatedAt": "2026-09-02T19:00:14.621Z",
+  "generatedAt": "2026-09-07T21:13:02.005Z",
   "readOnly": true,
   "postgresWrites": false,
   "tupleWrites": false,
@@ -13,14 +13,14 @@
     "namespaceCandidate": "graphify_files.workspace_id (candidate only; semantic namespace proof required)"
   },
   "summary": {
-    "classifier_rows": 3295,
-    "source_ref_present": 3294,
-    "source_revision_available": 78,
-    "workspace_revision_available": 3295,
+    "classifier_rows": 3352,
+    "source_ref_present": 3351,
+    "source_revision_available": 148,
+    "workspace_revision_available": 3352,
     "source_namespace_available": 0,
-    "workspace_id_namespace_candidate": 78,
-    "revision_qualified_join": 78,
-    "missing_graphify_join": 3217
+    "workspace_id_namespace_candidate": 148,
+    "revision_qualified_join": 148,
+    "missing_graphify_join": 3204
   },
   "sample": [
     {
@@ -43,7 +43,7 @@
       "packet_key": "ace:packet:0051e908c9be",
       "source_ref": "docs/architecture/phase8-query-optimization-taxonomy.md",
       "source_revision": "sha256:3ca5d3c6d57114328d4347f8a4141bb5231bab3ccef86da45bd73f461a127b9c",
-      "workspace_revision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "workspace_revision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
       "source_namespace": null,
       "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80"
     },

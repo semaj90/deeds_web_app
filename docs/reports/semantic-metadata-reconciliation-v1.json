@@ -1,7 +1,7 @@
 {
   "schema": "atlas.semantic-metadata-reconciliation.v1",
   "migration": "sveltekit-frontend/drizzle/manual/20260906_semantic_768_metadata_reconciliation.sql",
-  "generatedAt": "2026-09-06T02:49:07.549Z",
+  "generatedAt": "2026-09-07T17:28:48.746Z",
   "readOnly": true,
   "databaseWrites": false,
   "vectorWrites": false,

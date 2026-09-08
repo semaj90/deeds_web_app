@@ -71,6 +71,9 @@ export const atlasPackets = pgTable('atlas_packets', {
   // Canonical chunk/file hash used for exact lexical identity joins.
   // This is distinct from sha256, which is a legacy Qdrant payload hash.
   contentHash: text('content_hash'),
+  // Exact source-content revision when proven; distinct from repository/workspace revisions.
+  // Applied by the additive canonical-owner revision-axes sidecar migration.
+  sourceRevision: text('source_revision'),
 
   // Scoring
   rewardPrior: doublePrecision('reward_prior').default(0),
@@ -160,6 +163,9 @@ export const atlasPackets = pgTable('atlas_packets', {
   rewardPriorIdx: index('idx_atlas_packets_reward_prior').on(sql`${table.rewardPrior} DESC`),
   communityConfIdx: index('idx_atlas_packets_community_confidence').on(sql`${table.communityConfidence} DESC`),
   workspaceRevisionIdx: index('idx_atlas_packets_workspace_revision').on(table.workspaceRevision),
+  sourceRevisionIdx: index('idx_atlas_packets_source_revision')
+    .on(table.sourceRevision)
+    .where(sql`${table.sourceRevision} IS NOT NULL`),
   representationRevisionIdx: index('idx_atlas_packets_representation_revision').on(table.representationRevision),
   embeddingDigestIdx: index('idx_atlas_packets_embedding_digest').on(table.embeddingDigest),
   updatedAtIdx: index('idx_atlas_packets_updated_at').on(sql`${table.updatedAt} DESC`),

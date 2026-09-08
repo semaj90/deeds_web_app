@@ -85,7 +85,8 @@ async function main() {
     console.log(`\n  Trainable rows (bm25 + domain): ${trainable} (${(trainable / total * 100).toFixed(1)}%)`);
     if (trainable < 100) {
       console.log('  ⚠️  Too few trainable rows — complete bm25_score backfill first');
-      console.log('     node scripts/atlas/backfill-bm25-scores.mjs --apply');
+      console.log('     node scripts/atlas/phase-b5-bm25-indexing.mjs --dry-run');
+      console.log('     After review: node scripts/atlas/phase-b5-bm25-indexing.mjs --apply');
     }
 
     // Sample feature row

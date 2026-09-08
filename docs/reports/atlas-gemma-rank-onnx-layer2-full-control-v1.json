@@ -1,0 +1,21 @@
+{
+  "schema": "atlas.gemma-rank-onnx-layer2-full-control.v1",
+  "sourceWeightsChecksum": "sha256:06a26a9a36a591d7b284cff59d0c27f0ac0a2db192d6f743a2f574ad0d435bce",
+  "originalLayerTypes": [
+    "sliding_attention",
+    "sliding_attention",
+    "sliding_attention",
+    "full_attention"
+  ],
+  "controlLayerTypes": [
+    "sliding_attention",
+    "full_attention",
+    "sliding_attention",
+    "full_attention"
+  ],
+  "status": "CONTROL_INCONCLUSIVE_INVALID_LAYER_GEOMETRY",
+  "error": "Layer 2 inherited sliding-attention geometry (256) is incompatible with full-attention rotary geometry (512); the in-memory control failed before ONNX export.",
+  "checkpointMutated": false,
+  "trainingPerformed": false,
+  "canonicalAuthority": false
+}

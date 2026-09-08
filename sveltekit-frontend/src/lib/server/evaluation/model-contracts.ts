@@ -26,7 +26,8 @@ export interface ClinetIntegrationContract {
   streaming: boolean;
   toolCalling: boolean;
   kvCache: boolean;
-  kvCacheTtl?: number;
+  /** llama.cpp cache_reuse token threshold; this is not a TTL. */
+  cacheReuseMinChunk?: number;
   temperature: number;
   maxTokens: number;
   systemPromptSize?: number;
@@ -100,7 +101,7 @@ export function createClinetContract(model: ModelIdentifier): ClinetIntegrationC
     streaming: caps.supportsStreaming,
     toolCalling: caps.supportsToolCalls,
     kvCache: caps.nativeKvCacheSupport,
-    kvCacheTtl: caps.nativeKvCacheSupport ? 256 : undefined,
+    cacheReuseMinChunk: caps.nativeKvCacheSupport ? 256 : undefined,
     temperature: 0.3, // Conservative for code generation
     maxTokens: Math.min(4096, caps.maxOutputTokens),
   };

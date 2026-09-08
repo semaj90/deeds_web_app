@@ -1,0 +1,69 @@
+{
+  "canonicalAuthority": false,
+  "canonicalTargetAlignmentProven": false,
+  "canonicalTargetEmbeddingAvailable": false,
+  "checkpointDir": "/mnt/c/Users/james/Videos/deeds-web-app/models/gemma4-e4b-qat-assistant-2026-07-20",
+  "configPath": "/mnt/c/Users/james/Videos/deeds-web-app/models/gemma4-e4b-qat-assistant-2026-07-20/config.json",
+  "configUseOrderedEmbeddings": true,
+  "embeddingMatrixLoaded": false,
+  "embeddingShape": [
+    262144,
+    256
+  ],
+  "observedAt": "2026-09-07T21:07:18.459005+00:00",
+  "permutationRoundTrip": true,
+  "receiptChecksum": "sha256:12d215180ce822af49ea06c8b8c60650fd14e738b156c1b46355e7802c8054c7",
+  "sampleMappings": [
+    {
+      "canonicalTokenId": 0,
+      "orderedPosition": 181760,
+      "roundTripCanonicalTokenId": 0
+    },
+    {
+      "canonicalTokenId": 1,
+      "orderedPosition": 8448,
+      "roundTripCanonicalTokenId": 1
+    },
+    {
+      "canonicalTokenId": 2,
+      "orderedPosition": 62720,
+      "roundTripCanonicalTokenId": 2
+    },
+    {
+      "canonicalTokenId": 3,
+      "orderedPosition": 182144,
+      "roundTripCanonicalTokenId": 3
+    },
+    {
+      "canonicalTokenId": 4,
+      "orderedPosition": 141824,
+      "roundTripCanonicalTokenId": 4
+    },
+    {
+      "canonicalTokenId": 262143,
+      "orderedPosition": 184191,
+      "roundTripCanonicalTokenId": 262143
+    }
+  ],
+  "schema": "atlas.gemma-rank-ordered-embedding-alignment-proof.v1",
+  "specialTokenIds": {
+    "<bos>": 2,
+    "<eos>": 1,
+    "<mask>": 4,
+    "<pad>": 0,
+    "<unk>": 3
+  },
+  "specialTokenIdsInBounds": true,
+  "status": "ORDERED_EMBEDDING_PERMUTATION_PROVEN_TARGET_ALIGNMENT_OPEN",
+  "targetAlignmentNote": "The local ordered-row permutation is proven; a canonical Gemma4 target embedding table or verified upstream relabeling fixture is still required.",
+  "tokenOrderingDirection": "ordered_position_to_canonical_token_id",
+  "tokenOrderingIsPermutation": true,
+  "tokenOrderingLength": 262144,
+  "tokenizerIdCount": 262144,
+  "tokenizerIdsInBounds": true,
+  "tokenizerPath": "/mnt/c/Users/james/Videos/deeds-web-app/models/gemma4-e4b-qat-assistant-2026-07-20/tokenizer.json",
+  "vocabSize": 262144,
+  "weightsChecksum": "sha256:9d0e2053067590cae9a8f4fcc57eefbe20dff90599360458ebd451e5cb5c947d",
+  "weightsMutated": false,
+  "weightsPath": "/mnt/c/Users/james/Videos/deeds-web-app/models/gemma4-e4b-qat-assistant-2026-07-20/model.safetensors"
+}

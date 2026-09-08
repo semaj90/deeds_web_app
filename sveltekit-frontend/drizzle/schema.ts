@@ -736,6 +736,7 @@ export const atlasFeatureRecommendationIndex = pgTable("atlas_feature_recommenda
 	treeNodeId: text("tree_node_id"),
 	packetKey: text("packet_key"),
 	sourceRef: text("source_ref"),
+	sourceRevision: text("source_revision"),
 	updatedAt: timestamp("updated_at", { withTimezone: true, mode: 'string' }).defaultNow(),
 	qdrantKeyedCount: integer("qdrant_keyed_count").default(0).notNull(),
 }, (table) => [
@@ -1312,7 +1313,9 @@ export const codebaseChunkIndex = pgTable("codebase_chunk_index", {
 	outputMeta: jsonb("output_meta").default({}).notNull(),
 	contentEmbedding384: vector("content_embedding_384", { dimensions: 384 }),
 	summaryEmbedding384: vector("summary_embedding_384", { dimensions: 384 }),
-	embeddingDimension: integer("embedding_dimension").default(384),
+	// Canonical dense lane is semantic_768; the manual sidecar migration changes
+	// the live database default to the same value without rewriting existing rows.
+	embeddingDimension: integer("embedding_dimension").default(768),
 	embeddingNormalized: boolean("embedding_normalized").default(true),
 	errorEmbedding: vector("error_embedding", { dimensions: 384 }),
 	sourceRef: text("source_ref"),
@@ -6176,6 +6179,7 @@ export const atlasOntologyConcepts = pgTable("atlas_ontology_concepts", {
 	conceptId: text("concept_id").primaryKey().notNull(),
 	canonicalLabel: text("canonical_label").notNull(),
 	conceptType: text("concept_type").notNull(),
+	definitionRevision: text("definition_revision"),
 	description: text(),
 	aliases: text().array().default([""]).notNull(),
 	namespace: text().default('general').notNull(),

@@ -1,0 +1,136 @@
+{
+  "canonicalAuthority": false,
+  "checkpointDir": "/mnt/c/Users/james/Videos/deeds-web-app/models/gemma4_assistant_huggingface_7_3_26",
+  "checkpointMutated": false,
+  "cudaPeakMiB": 168.97,
+  "fixture": {
+    "batchSize": 12,
+    "cpuFinite": true,
+    "cpuRepeatExact": true,
+    "cpuScores": [
+      [
+        -0.07470703125
+      ],
+      [
+        -2.703125
+      ],
+      [
+        10.125
+      ],
+      [
+        -3.953125
+      ],
+      [
+        -8.75
+      ],
+      [
+        -2.671875
+      ],
+      [
+        -11.3125
+      ],
+      [
+        -1.15625
+      ],
+      [
+        -11.875
+      ],
+      [
+        11.3125
+      ],
+      [
+        9.1875
+      ],
+      [
+        11.375
+      ]
+    ],
+    "gpuFinite": true,
+    "gpuRepeatExact": true,
+    "gpuScores": [
+      [
+        -1.125
+      ],
+      [
+        -2.671875
+      ],
+      [
+        10.4375
+      ],
+      [
+        -4.0
+      ],
+      [
+        -8.5625
+      ],
+      [
+        -3.4375
+      ],
+      [
+        -11.25
+      ],
+      [
+        -2.296875
+      ],
+      [
+        -6.625
+      ],
+      [
+        11.3125
+      ],
+      [
+        1.2421875
+      ],
+      [
+        11.8125
+      ]
+    ],
+    "maxAbsoluteDelta": 7.9453125,
+    "maxLength": 128,
+    "maxRelativeDelta": 14.058823585510254,
+    "paddedTokenCount": 38,
+    "rankingOrderAgreement": false,
+    "tokenCounts": [
+      14,
+      35,
+      9,
+      13,
+      8,
+      13,
+      13,
+      16,
+      38,
+      29,
+      13,
+      13
+    ]
+  },
+  "hardware": {
+    "computeCapability": [
+      8,
+      6
+    ],
+    "gpu": "NVIDIA GeForce RTX 3060 Ti",
+    "torch": "2.14.0+cu132",
+    "torchCuda": "13.2"
+  },
+  "rankingQualityProven": false,
+  "schema": "atlas.gemma-rank-cuda-real-batch-probe.v1",
+  "status": "BLOCKED_CUDA_REAL_BATCH_FORWARD",
+  "timing": {
+    "cpuMeanMs": 153.66064799794307,
+    "cpuMs": [
+      171.829175997118,
+      138.79204299882986,
+      150.36072499788133
+    ],
+    "gpuMeanMs": 11.733117666153703,
+    "gpuMs": [
+      16.715399993699975,
+      9.267785004340112,
+      9.216168000421021
+    ],
+    "repeats": 3
+  },
+  "trainingPerformed": false
+}

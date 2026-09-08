@@ -3,6 +3,7 @@ import {
   adaptWorkspaceBindingsToSourceSelectionV1,
   recordInventoryStage,
   recordStructuralStage,
+  recordDownstreamStage,
 } from './graphify-daily-coordinator-v1.js';
 
 const revision = `sha256:${'a'.repeat(64)}`;
@@ -97,5 +98,51 @@ describe('adaptWorkspaceBindingsToSourceSelectionV1', () => {
       'GRAPH_BUILD' as never,
       { inputChecksum: revision, outputChecksum: content },
     )).rejects.toThrow();
+  });
+
+  it('allow-lists the four downstream stages and chains their receipt checksums (seam only -- no owner bound)', async () => {
+    const queries: string[] = [];
+    const client = {
+      query: async (text: string) => {
+        queries.push(text);
+        return { rowCount: text.startsWith('UPDATE') ? 1 : 0, rows: [] };
+      },
+    };
+    for (const stage of ['SEMANTIC_ENRICH', 'GRAPH_BUILD', 'PROJECT', 'VALIDATE'] as const) {
+      queries.length = 0;
+      const receipt = await recordDownstreamStage(
+        client,
+        '00000000-0000-4000-8000-000000000001',
+        stage,
+        { inputChecksum: revision, outputChecksum: content },
+      );
+      expect(receipt.inputChecksum).toBe(revision);
+      expect(queries).toHaveLength(2);
+      expect(queries.join('\n')).not.toContain('graphify_files');
+    }
+    await expect(recordDownstreamStage(
+      client,
+      '00000000-0000-4000-8000-000000000001',
+      'AST_PARSE' as never,
+      { inputChecksum: revision, outputChecksum: content },
+    )).rejects.toThrow();
+    await expect(recordDownstreamStage(
+      client,
+      '00000000-0000-4000-8000-000000000001',
+      'INVENTORY' as never,
+      { inputChecksum: revision, outputChecksum: content },
+    )).rejects.toThrow();
+  });
+
+  it('rejects a downstream-stage readback that finds no matching RUNNING row', async () => {
+    const client = {
+      query: async (text: string) => ({ rowCount: text.startsWith('UPDATE') ? 0 : 1, rows: [] }),
+    };
+    await expect(recordDownstreamStage(
+      client,
+      '00000000-0000-4000-8000-000000000001',
+      'VALIDATE',
+      { inputChecksum: revision, outputChecksum: content },
+    )).rejects.toThrow('GRAPHIFY_COORDINATOR_VALIDATE_STAGE_READBACK_FAILED');
   });
 });

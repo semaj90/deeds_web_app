@@ -68,16 +68,6 @@ declare module '@huggingface/inference' {
 	}
 }
 
-declare module 'bullmq' {
-	export class RabbitMQQueue {
-		constructor(name: string, options?: unknown);
-		add(name: string, data: unknown, options?: unknown): Promise<unknown>;
-	}
-	export class RabbitMQWorker {
-		constructor(name: string, processor: unknown, options?: unknown);
-	}
-}
-
 declare module '@tensorflow/tfjs-node' {
 	export * from '@tensorflow/tfjs';
 }

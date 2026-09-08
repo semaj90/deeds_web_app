@@ -1,0 +1,32 @@
+{
+  "schema": "atlas.ornith-cache-capability.v1",
+  "capabilityRevision": "ornith-cache-capability:probe-v1",
+  "runtimeRevision": "b8757-a29e4c0b7",
+  "modelRevision": "ornith-1.5-9b",
+  "modelSha256": null,
+  "checkedAt": "2026-09-07T19:14:36.396Z",
+  "probeMode": "LIVE_READ_ONLY",
+  "capabilities": {
+    "promptCacheSupported": "UNPROVEN",
+    "cacheReuseKvShiftSupported": "UNPROVEN",
+    "recurrentCheckpointSupported": "UNPROVEN",
+    "hostRamPromptCacheSupported": "UNPROVEN",
+    "idleSlotCacheSupported": "UNPROVEN",
+    "slotPersistenceSupported": "UNPROVEN"
+  },
+  "observedSettings": {
+    "cachePrompt": null,
+    "cacheReuseMinChunk": null,
+    "checkpointCount": null,
+    "checkpointMinStep": null,
+    "cacheRamMiB": null,
+    "cacheIdleSlots": null,
+    "slotPersistenceConfigured": null
+  },
+  "evidenceRefs": [
+    "http://127.0.0.1:8090/health",
+    "http://127.0.0.1:8090/props",
+    "http://127.0.0.1:8090/v1/models"
+  ],
+  "checksumSha256": "8b015370aeeca95d1118abbc656ad686c3bd8dd55c7ed94f333af42e46115be4"
+}

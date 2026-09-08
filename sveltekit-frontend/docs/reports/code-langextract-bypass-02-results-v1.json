@@ -1,0 +1,222 @@
+{
+  "schema": "atlas.code-langextract-bypass-02.v1",
+  "generatedAt": "2026-09-06T21:20:44.934Z",
+  "readOnly": true,
+  "productionPromotionAttempted": false,
+  "sampleSizeCaveat": "N=3 queries — far too small for statistical significance; this is an illustrative proof-of-mechanism, not a production benchmark. Do not cite these numbers as representative recall/latency figures.",
+  "routerDescription": "Hand-specified threshold rule (unique top exact-keyword-match scorer with score > 0) — NOT a trained XGBoost/logistic model, per tasks.md BYPASS-02a scope.",
+  "summary": {
+    "baseline_RRF_then_mxbai": {
+      "label": "RRF -> mxbai (baseline)",
+      "n": 3,
+      "mxbaiCallsAvoidedPct": 0,
+      "top1Agreement": 0.3333333333333333,
+      "mrrAvg": 0.5,
+      "recallAt5Avg": 1,
+      "ndcg10Avg": 0.6204510387155954,
+      "latencyMsAvg": 569.6392
+    },
+    "proposed_evidence_conditional_mxbai": {
+      "label": "RRF -> evidence features -> conditional mxbai",
+      "n": 3,
+      "mxbaiCallsAvoidedPct": 100,
+      "top1Agreement": 1,
+      "mrrAvg": 1,
+      "recallAt5Avg": 1,
+      "ndcg10Avg": 1,
+      "latencyMsAvg": 0
+    }
+  },
+  "detail": {
+    "baselineRuns": [
+      {
+        "query": "Which function sums duplicate-identity RRF scores instead of discarding them?",
+        "rankedIds": [
+          "lane-aliases",
+          "helper-card",
+          "model-resolution",
+          "service-merge",
+          "rrf-tologicallane"
+        ],
+        "latencyMs": 1480.9146,
+        "mxbaiCalled": true,
+        "metrics": {
+          "top1Correct": 0,
+          "mrr": 0.25,
+          "recallAt3": 0,
+          "recallAt5": 1,
+          "ndcg10": 0.43067655807339306,
+          "firstHitRank": 4
+        }
+      },
+      {
+        "query": "Which contract enforces that batch extraction never runs on the full corpus, only a bounded candidate subset?",
+        "rankedIds": [
+          "helper-card-2",
+          "relevance-scores",
+          "fusion-contribution",
+          "evidence-card",
+          "firecrawl-provider"
+        ],
+        "latencyMs": 120.48990000000003,
+        "mxbaiCalled": true,
+        "metrics": {
+          "top1Correct": 0,
+          "mrr": 0.25,
+          "recallAt3": 0,
+          "recallAt5": 1,
+          "ndcg10": 0.43067655807339306,
+          "firstHitRank": 4
+        }
+      },
+      {
+        "query": "Which module centralizes the optional dynamic import of the Firecrawl SDK behind one documented type-check exception?",
+        "rankedIds": [
+          "firecrawl-provider-2",
+          "youtube-transcript",
+          "candidate-evidence-2",
+          "model-resolution-2",
+          "retrieval-lane-2"
+        ],
+        "latencyMs": 107.5130999999999,
+        "mxbaiCalled": true,
+        "metrics": {
+          "top1Correct": 1,
+          "mrr": 1,
+          "recallAt3": 1,
+          "recallAt5": 1,
+          "ndcg10": 1,
+          "firstHitRank": 1
+        }
+      }
+    ],
+    "evidenceRuns": [
+      {
+        "query": "Which function sums duplicate-identity RRF scores instead of discarding them?",
+        "rankedIds": [
+          "service-merge",
+          "model-resolution",
+          "rrf-tologicallane",
+          "lane-aliases",
+          "helper-card"
+        ],
+        "latencyMs": 0,
+        "mxbaiCalled": false,
+        "routerScores": [
+          {
+            "id": "service-merge",
+            "score": 4
+          },
+          {
+            "id": "rrf-tologicallane",
+            "score": 1
+          },
+          {
+            "id": "lane-aliases",
+            "score": 1
+          },
+          {
+            "id": "model-resolution",
+            "score": 2
+          },
+          {
+            "id": "helper-card",
+            "score": 1
+          }
+        ],
+        "metrics": {
+          "top1Correct": 1,
+          "mrr": 1,
+          "recallAt3": 1,
+          "recallAt5": 1,
+          "ndcg10": 1,
+          "firstHitRank": 1
+        }
+      },
+      {
+        "query": "Which contract enforces that batch extraction never runs on the full corpus, only a bounded candidate subset?",
+        "rankedIds": [
+          "evidence-card",
+          "firecrawl-provider",
+          "relevance-scores",
+          "fusion-contribution",
+          "helper-card-2"
+        ],
+        "latencyMs": 0,
+        "mxbaiCalled": false,
+        "routerScores": [
+          {
+            "id": "evidence-card",
+            "score": 4
+          },
+          {
+            "id": "firecrawl-provider",
+            "score": 0
+          },
+          {
+            "id": "relevance-scores",
+            "score": 0
+          },
+          {
+            "id": "fusion-contribution",
+            "score": 0
+          },
+          {
+            "id": "helper-card-2",
+            "score": 0
+          }
+        ],
+        "metrics": {
+          "top1Correct": 1,
+          "mrr": 1,
+          "recallAt3": 1,
+          "recallAt5": 1,
+          "ndcg10": 1,
+          "firstHitRank": 1
+        }
+      },
+      {
+        "query": "Which module centralizes the optional dynamic import of the Firecrawl SDK behind one documented type-check exception?",
+        "rankedIds": [
+          "firecrawl-provider-2",
+          "youtube-transcript",
+          "candidate-evidence-2",
+          "model-resolution-2",
+          "retrieval-lane-2"
+        ],
+        "latencyMs": 0,
+        "mxbaiCalled": false,
+        "routerScores": [
+          {
+            "id": "firecrawl-provider-2",
+            "score": 2
+          },
+          {
+            "id": "youtube-transcript",
+            "score": 1
+          },
+          {
+            "id": "candidate-evidence-2",
+            "score": 0
+          },
+          {
+            "id": "model-resolution-2",
+            "score": 0
+          },
+          {
+            "id": "retrieval-lane-2",
+            "score": 0
+          }
+        ],
+        "metrics": {
+          "top1Correct": 1,
+          "mrr": 1,
+          "recallAt3": 1,
+          "recallAt5": 1,
+          "ndcg10": 1,
+          "firstHitRank": 1
+        }
+      }
+    ]
+  }
+}

@@ -154,8 +154,20 @@ function containsAllTokens(text: string, required: readonly string[]): boolean {
 }
 
 function ancestorNames(node: SgNode): string[] {
+  const namedKinds = new Set([
+    'function_declaration',
+    'method_definition',
+    'class_declaration',
+    'interface_declaration',
+    'type_alias_declaration',
+    'enum_declaration',
+  ]);
   const names: string[] = [];
   for (const ancestor of node.ancestors()) {
+    // Only inspect declaration ancestors. Calling nodeName() on a block or
+    // the program root searches arbitrary descendants and can leak a name
+    // from a sibling declaration into the relation filter.
+    if (!namedKinds.has(ancestor.kind())) continue;
     const name = nodeName(ancestor);
     if (name) names.push(name);
   }

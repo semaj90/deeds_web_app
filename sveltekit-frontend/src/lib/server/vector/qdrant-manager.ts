@@ -8,6 +8,7 @@ import {
   VECTOR_CONFIG,
   buildVectorPayload,
   getCollectionDimension,
+  getNamedVectorName,
 } from '$lib/server/config/vector-config.js';
 import {
   QDRANT_DENSE_VECTOR_NAME,
@@ -690,11 +691,19 @@ export class QdrantManager {
     query: string;
     queryEmbedding: number[];
     collection: string;
+    /** Override the collection's configured primary dense vector when needed. */
+    vectorName?: string;
     filters?: any;
     limit?: number;
     scoreThreshold?: number;
     skipCache?: boolean;
   }): Promise<QdrantSearchResult> {
+    // Named-vector collections cannot use the global `content` default. Resolve
+    // from the canonical collection registry so summary/synthesis lanes keep
+    // their vector space while ordinary collections retain the legacy default.
+    const denseVectorName = (
+      params.vectorName ?? getNamedVectorName(params.collection) ?? QDRANT_DENSE_VECTOR_NAME
+    ) as CodebaseVectorName;
     const sparseAvailable = await this.getSparseSupport(params.collection, QDRANT_SPARSE_VECTOR_NAME);
 
     if (!sparseAvailable) {
@@ -703,7 +712,7 @@ export class QdrantManager {
       return this._denseSearch({
         query: params.query,
         queryVector: params.queryEmbedding,
-        vectorName: QDRANT_DENSE_VECTOR_NAME,
+        vectorName: denseVectorName,
         collection: params.collection,
         limit: params.limit,
         scoreThreshold: params.scoreThreshold,
@@ -719,7 +728,7 @@ export class QdrantManager {
       queries: [
         {
           vector: params.queryEmbedding,
-          vectorName: QDRANT_DENSE_VECTOR_NAME,
+          vectorName: denseVectorName,
           limit: params.limit ?? 20,
           weight: 1.0,
           filter: params.filters,

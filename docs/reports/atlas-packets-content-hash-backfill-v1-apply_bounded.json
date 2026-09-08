@@ -1,9 +1,9 @@
 {
   "schema": "atlas.atlas-packets-content-hash-backfill.v1",
-  "generatedAt": "2026-08-25T15:05:22.407Z",
+  "generatedAt": "2026-09-07T21:10:03.505Z",
   "mode": "APPLY_BOUNDED",
   "limit": 1000,
-  "status": "BLOCKED",
+  "status": "PASS",
   "gates": {
     "CH_BF_01": {
       "name": "DATABASE_CONTEXT_PROVEN",
@@ -16,29 +16,27 @@
     },
     "CH_BF_02": {
       "name": "UNAMBIGUOUS_SELECTION_DETERMINISTIC",
-      "proven": false,
+      "proven": true,
       "orderBy": [
         "packet_key"
       ],
-      "selectedCount": 0,
+      "selectedCount": 21,
       "requestedLimit": 1000,
-      "selectionChecksum": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "selectionChecksum": "e7ce569fb05d463bd0ff8f6938a92810ffeb237adcd6cfadfb14406339fdad05",
       "joinDefinition": "atlas_packets.source_ref = codebase_chunk_index.source_ref, count(DISTINCT codebase_chunk_index.content_hash) = 1, atlas_packets.content_hash IS NULL"
     },
     "CH_BF_03": {
       "name": "UPDATE_ONLY_APPLY_PROVEN",
-      "proven": false,
-      "attempted": false,
-      "reason": "BLOCKED_BY_PRIOR_GATE",
-      "blockingGates": [
-        "CH_BF_02"
-      ]
+      "proven": true,
+      "updated": 21,
+      "alreadyPopulated": 0
     },
     "CH_BF_04": {
       "name": "INDEPENDENT_READBACK_PROVEN",
-      "proven": false,
-      "attempted": false,
-      "reason": "BLOCKED_BY_PRIOR_GATE"
+      "proven": true,
+      "expected": 21,
+      "actual": 21,
+      "mismatches": []
     },
     "CH_BF_05": {
       "name": "IDEMPOTENT_REPLAY_PROVEN",
@@ -47,19 +45,19 @@
       "reason": "SKIPPED_APPLY_BOUNDED"
     }
   },
-  "selectionChecksum": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "selectionChecksum": "e7ce569fb05d463bd0ff8f6938a92810ffeb237adcd6cfadfb14406339fdad05",
   "counts": {
-    "selected": 0,
-    "updated": 0,
+    "selected": 21,
+    "updated": 21,
     "alreadyPopulated": 0,
-    "readbackMatched": 0
+    "readbackMatched": 21
   },
   "replay": {
     "attempted": false,
     "selectionChecksumMatch": null,
     "secondApplyChangedRows": null
   },
-  "postgresWrites": false,
+  "postgresWrites": true,
   "qdrantWrites": false,
   "neo4jWrites": false,
   "valkeyWrites": false

@@ -4,9 +4,11 @@ import { buildOrdinalRegistryV1 } from './ordinal-registry-v1.js';
 import { buildPromptPlanV1 } from './prompt-plan-v1.js';
 import {
   buildPrefillArtifactIdentityV1,
+  buildContextPrefixIdentityFromPrefillContentV1,
   buildPrefillContentIdentityV1,
   buildPrefillReceiptV1,
 } from './prefill-contracts-v1.js';
+import { buildContextPrefixIdentityV1, buildContextPrefixReuseObservationV1 } from './context-prefix-identity-v1.js';
 
 const H = (value: string) => canonicalSha256V1(value);
 
@@ -123,6 +125,28 @@ describe('compiled prefill identity', () => {
       ropeConfigRevision: 'rope:r1',
       tensorArtifactChecksums: [H('kv-b')],
     });
+    const contextPrefixIdentity = buildContextPrefixIdentityV1({
+      modelRevision: 'model:r7',
+      templateRevision: 'prompt:r2',
+      toolSchemaRevision: 'tools:r1',
+      systemPolicyRevision: 'policy:r1',
+      stableEvidenceRevision: 'evidence:r1',
+      stablePrefix: 'stable system policy and tool contract',
+    });
+    const composedContextPrefixIdentity = buildContextPrefixIdentityFromPrefillContentV1({
+      contentIdentity: logical,
+      stablePrefix: 'stable system policy and tool contract',
+      toolSchemaRevision: 'tools:r1',
+      systemPolicyRevision: 'policy:r1',
+    });
+    const contextPrefixReuseObservation = buildContextPrefixReuseObservationV1({
+      identity: contextPrefixIdentity,
+      stablePrefix: 'stable system policy and tool contract',
+      previousStablePrefix: 'stable system policy and tool contract\nold suffix',
+      cachedPrefillTokens: 80,
+      newPrefillTokens: 20,
+      observedAt: '2026-09-06T20:00:00.000Z',
+    });
 
     expect(physicalA.contentIdentityChecksum).toBe(physicalB.contentIdentityChecksum);
     expect(physicalA.checksumSha256).not.toBe(physicalB.checksumSha256);
@@ -135,6 +159,8 @@ describe('compiled prefill identity', () => {
       workflowId: 'wf-1',
       dagNodeId: 'prefill-1',
       contentIdentity: logical,
+      contextPrefixIdentity,
+      contextPrefixReuseObservation,
       physicalArtifact: physicalA,
       selectedPacketKeys: ['packet:a'],
       evidenceRefs: ['ev:1'],
@@ -148,6 +174,57 @@ describe('compiled prefill identity', () => {
     });
 
     expect(receipt.contentIdentity.checksumSha256).toBe(logical.checksumSha256);
+    expect(receipt.contextPrefixIdentity?.checksum).toBe(contextPrefixIdentity.checksum);
+    expect(composedContextPrefixIdentity.modelRevision).toBe(logical.modelRevision);
+    expect(composedContextPrefixIdentity.templateRevision).toBe(logical.promptTemplateRevision);
+    expect(composedContextPrefixIdentity.stableEvidenceRevision).toBe(logical.evidenceRevisionSetHash);
+    expect(receipt.contextPrefixReuseObservation?.prefixReuseRatio).toBe(0.8);
+
+    const mismatchedPrefixIdentity = buildContextPrefixIdentityV1({
+      modelRevision: 'different-model',
+      templateRevision: 'prompt:r2',
+      toolSchemaRevision: 'tools:r1',
+      systemPolicyRevision: 'policy:r1',
+      stableEvidenceRevision: 'evidence:r1',
+      stablePrefix: 'stable system policy and tool contract',
+    });
+    expect(() => buildPrefillReceiptV1({
+      requestId: 'req-1',
+      workflowId: 'wf-1',
+      dagNodeId: 'prefill-1',
+      contentIdentity: logical,
+      contextPrefixIdentity: mismatchedPrefixIdentity,
+      contextPrefixReuseObservation: null,
+      physicalArtifact: physicalA,
+      selectedPacketKeys: ['packet:a'],
+      evidenceRefs: ['ev:1'],
+      ordinalRegistryChecksum: H('ordinal-registry'),
+      promptTokenCount: 42,
+      cacheStatus: 'MISS_COMPILED',
+      deterministicContextConstruction: true,
+      numericalParityMode: 'TOLERANCE_CROSS_ENV',
+      producerRevision: 'prefill-compiler:r1',
+      emittedAt: '2026-08-21T15:40:00.000Z',
+    })).toThrow('prefill context prefix model revision does not match content identity');
+
+    expect(() => buildPrefillReceiptV1({
+      requestId: 'req-1',
+      workflowId: 'wf-1',
+      dagNodeId: 'prefill-1',
+      contentIdentity: logical,
+      contextPrefixIdentity: null,
+      contextPrefixReuseObservation,
+      physicalArtifact: physicalA,
+      selectedPacketKeys: ['packet:a'],
+      evidenceRefs: ['ev:1'],
+      ordinalRegistryChecksum: H('ordinal-registry'),
+      promptTokenCount: 42,
+      cacheStatus: 'MISS_COMPILED',
+      deterministicContextConstruction: true,
+      numericalParityMode: 'TOLERANCE_CROSS_ENV',
+      producerRevision: 'prefill-compiler:r1',
+      emittedAt: '2026-08-21T15:40:00.000Z',
+    })).toThrow('prefill context prefix reuse observation requires context prefix identity');
   });
 
   it('rejects prefill content identity missing the ACE/BitFrost boundary fields', () => {

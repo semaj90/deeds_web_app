@@ -1,0 +1,182 @@
+{
+  "schema": "atlas.produce-authorized-resource-mutation-relationships.v1",
+  "status": "DRY_RUN_PROVEN",
+  "candidateCount": 19,
+  "allZodValid": true,
+  "allTernary": true,
+  "postgresWritesPerformed": false,
+  "note": "Zod-validated only (client-side, mirrors atlas_validate_relationship() semantics). No Postgres connection made. --apply is a separate, not-yet-built, explicitly-authorized follow-up.",
+  "results": [
+    {
+      "route": "/api/admin/atlas/taxonomy-candidates",
+      "relationship_id": "rel:authorized_resource_mutation:/api/admin/atlas/taxonomy-candidates",
+      "participant_count": 3,
+      "relationship_degree": 3,
+      "relationship_degree_kind": "ternary",
+      "zodValid": true,
+      "zodErrors": []
+    },
+    {
+      "route": "/api/admin/citations/discover",
+      "relationship_id": "rel:authorized_resource_mutation:/api/admin/citations/discover",
+      "participant_count": 3,
+      "relationship_degree": 3,
+      "relationship_degree_kind": "ternary",
+      "zodValid": true,
+      "zodErrors": []
+    },
+    {
+      "route": "/api/admin/packets/enrich-labels",
+      "relationship_id": "rel:authorized_resource_mutation:/api/admin/packets/enrich-labels",
+      "participant_count": 3,
+      "relationship_degree": 3,
+      "relationship_degree_kind": "ternary",
+      "zodValid": true,
+      "zodErrors": []
+    },
+    {
+      "route": "/api/analytics/research-summaries/[id]",
+      "relationship_id": "rel:authorized_resource_mutation:/api/analytics/research-summaries/[id]",
+      "participant_count": 3,
+      "relationship_degree": 3,
+      "relationship_degree_kind": "ternary",
+      "zodValid": true,
+      "zodErrors": []
+    },
+    {
+      "route": "/api/cases/[id]/export/pdf",
+      "relationship_id": "rel:authorized_resource_mutation:/api/cases/[id]/export/pdf",
+      "participant_count": 3,
+      "relationship_degree": 3,
+      "relationship_degree_kind": "ternary",
+      "zodValid": true,
+      "zodErrors": []
+    },
+    {
+      "route": "/api/codebase-index/cluster-assign",
+      "relationship_id": "rel:authorized_resource_mutation:/api/codebase-index/cluster-assign",
+      "participant_count": 3,
+      "relationship_degree": 3,
+      "relationship_degree_kind": "ternary",
+      "zodValid": true,
+      "zodErrors": []
+    },
+    {
+      "route": "/api/codebase-index/couchdb-pagerank",
+      "relationship_id": "rel:authorized_resource_mutation:/api/codebase-index/couchdb-pagerank",
+      "participant_count": 3,
+      "relationship_degree": 3,
+      "relationship_degree_kind": "ternary",
+      "zodValid": true,
+      "zodErrors": []
+    },
+    {
+      "route": "/api/codebase-index/index-stream",
+      "relationship_id": "rel:authorized_resource_mutation:/api/codebase-index/index-stream",
+      "participant_count": 3,
+      "relationship_degree": 3,
+      "relationship_degree_kind": "ternary",
+      "zodValid": true,
+      "zodErrors": []
+    },
+    {
+      "route": "/api/evidence/analyze",
+      "relationship_id": "rel:authorized_resource_mutation:/api/evidence/analyze",
+      "participant_count": 3,
+      "relationship_degree": 3,
+      "relationship_degree_kind": "ternary",
+      "zodValid": true,
+      "zodErrors": []
+    },
+    {
+      "route": "/api/evidence/[id]/gpu-analysis",
+      "relationship_id": "rel:authorized_resource_mutation:/api/evidence/[id]/gpu-analysis",
+      "participant_count": 3,
+      "relationship_degree": 3,
+      "relationship_degree_kind": "ternary",
+      "zodValid": true,
+      "zodErrors": []
+    },
+    {
+      "route": "/api/evidence/[id]/suggest-summary",
+      "relationship_id": "rel:authorized_resource_mutation:/api/evidence/[id]/suggest-summary",
+      "participant_count": 3,
+      "relationship_degree": 3,
+      "relationship_degree_kind": "ternary",
+      "zodValid": true,
+      "zodErrors": []
+    },
+    {
+      "route": "/api/files/[id]",
+      "relationship_id": "rel:authorized_resource_mutation:/api/files/[id]",
+      "participant_count": 3,
+      "relationship_degree": 3,
+      "relationship_degree_kind": "ternary",
+      "zodValid": true,
+      "zodErrors": []
+    },
+    {
+      "route": "/api/library/ingest-codebase-docs",
+      "relationship_id": "rel:authorized_resource_mutation:/api/library/ingest-codebase-docs",
+      "participant_count": 3,
+      "relationship_degree": 3,
+      "relationship_degree_kind": "ternary",
+      "zodValid": true,
+      "zodErrors": []
+    },
+    {
+      "route": "/api/persons-of-interest/[id]/associates/[associateId]",
+      "relationship_id": "rel:authorized_resource_mutation:/api/persons-of-interest/[id]/associates/[associateId]",
+      "participant_count": 3,
+      "relationship_degree": 3,
+      "relationship_degree_kind": "ternary",
+      "zodValid": true,
+      "zodErrors": []
+    },
+    {
+      "route": "/api/persons-of-interest/[id]/gpu-analyze",
+      "relationship_id": "rel:authorized_resource_mutation:/api/persons-of-interest/[id]/gpu-analyze",
+      "participant_count": 3,
+      "relationship_degree": 3,
+      "relationship_degree_kind": "ternary",
+      "zodValid": true,
+      "zodErrors": []
+    },
+    {
+      "route": "/api/phase89/analysis",
+      "relationship_id": "rel:authorized_resource_mutation:/api/phase89/analysis",
+      "participant_count": 3,
+      "relationship_degree": 3,
+      "relationship_degree_kind": "ternary",
+      "zodValid": true,
+      "zodErrors": []
+    },
+    {
+      "route": "/api/phase89/reindex",
+      "relationship_id": "rel:authorized_resource_mutation:/api/phase89/reindex",
+      "participant_count": 3,
+      "relationship_degree": 3,
+      "relationship_degree_kind": "ternary",
+      "zodValid": true,
+      "zodErrors": []
+    },
+    {
+      "route": "/api/reports/[id]/publish",
+      "relationship_id": "rel:authorized_resource_mutation:/api/reports/[id]/publish",
+      "participant_count": 3,
+      "relationship_degree": 3,
+      "relationship_degree_kind": "ternary",
+      "zodValid": true,
+      "zodErrors": []
+    },
+    {
+      "route": "/api/wiki/watch",
+      "relationship_id": "rel:authorized_resource_mutation:/api/wiki/watch",
+      "participant_count": 3,
+      "relationship_degree": 3,
+      "relationship_degree_kind": "ternary",
+      "zodValid": true,
+      "zodErrors": []
+    }
+  ]
+}

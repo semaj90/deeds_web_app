@@ -1,0 +1,31 @@
+{
+  "schema": "parent-atlas.hypergraph-nary-materialize-report.v1",
+  "generatedAt": "2026-09-07T00:00:00.000Z",
+  "status": "FIXTURE_PROVEN_SHAPE_ONLY",
+  "gate": "HYPERGRAPH_NARY_MATERIALIZE_01 (first bounded slice)",
+  "implementation": "sveltekit-frontend/src/lib/server/atlas/graph/hypergraph-nary-materialize-v1.ts",
+  "test": "sveltekit-frontend/src/lib/server/atlas/graph/hypergraph-nary-materialize-v1.spec.ts",
+  "keyFinding": "The HyperedgeV1 contract (src/lib/server/graph/hyperedge-contract.ts) and the atlas_hyperedges/atlas_hyperedge_members Postgres schema are ALREADY n-ary capable -- participants: z.array(...).min(2) with no maximum, and no arity-limiting CHECK constraint exists in the live schema (verified via pg_constraint). The gap this closes is purely 'no producer has ever emitted arity >= 3', not a contract or schema limitation.",
+  "producerUsed": "ApiContractObservationV1 (src/lib/server/atlas/language/api-contract-observation-v1.ts) -- chosen because a single API-route observation already naturally carries route + handler + input schema(s) + output schema(s) + auth requirement(s) as distinct role-labelled participants.",
+  "producerCaveat": "ApiContractObservationV1's own scanner (sveltekit-api-contract-observer-v1.ts) is a real, schema-valid, spec-tested module with ZERO live production callers (confirmed via grep across src/ and scripts/) -- it is an unwired-but-real scaffold, not dead code. This materializer does not wire that scanner up; it only proves that IF an observation exists, it converts to a genuine n-ary HyperedgeV1 deterministically.",
+  "testResults": {
+    "passed": 5,
+    "failed": 0,
+    "coverage": [
+      "produces arity >= 3 with 5 distinct roles (route, handler, inputSchema, outputSchema, authRequirement)",
+      "deterministic: identical input -> identical hyperedgeId and checksum",
+      "fails closed (null) for non-HTTP transports with no route",
+      "fails closed (null) rather than emitting a binary fact when only route+handler are known",
+      "output passes the existing unchanged HyperedgeV1Schema validation"
+    ]
+  },
+  "writesPerformed": false,
+  "databaseSchemaChanged": false,
+  "hyperedgeContractChanged": false,
+  "liveScannerWired": false,
+  "openGates": [
+    "Wire sveltekit-api-contract-observer-v1.ts to a real route-scanning caller (e.g. a Graphify pass or a bounded CLI script) so ApiContractObservationV1 rows are actually produced from live source, not only fixtures",
+    "Persist the resulting HyperedgeV1 through the existing atlas_hyperedges/atlas_hyperedge_members writer path (populate-hyperedges-from-taxonomy-edges-v1.mts is the only existing precedent, and it only ever writes arity-2 facts -- a new write path is needed, reusing the same tables)",
+    "Extend to other natural n-ary evidence sources (OpenSpec requirement -> source -> symbol -> test -> tool -> evidence span) once this first slice's write path is proven"
+  ]
+}

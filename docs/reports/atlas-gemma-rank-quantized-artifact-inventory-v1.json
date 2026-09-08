@@ -1,0 +1,69 @@
+{
+  "schema": "atlas.gemma-rank-quantized-artifact-inventory.v1",
+  "observedAt": "2026-09-06",
+  "status": "NO_STANDALONE_ATLAS_GEMMA_INT8_ARTIFACT",
+  "canonicalAuthority": false,
+  "artifacts": [
+    {
+      "path": "models/gemma4_assistant_huggingface_7_3_26/model.safetensors",
+      "role": "gemma4_assistant_huggingface_seed",
+      "format": "safetensors_bf16",
+      "bytes": 159138208,
+      "lastWriteTime": "2026-07-03T15:26:18.0852753-07:00",
+      "sha256": "12875062fc25c51e8fa9b62abd2de7ad48b7d63f8559d5d604fbd5a3d6bcff16",
+      "standaloneAtlasGemmaRank": false
+    },
+    {
+      "path": "models/atlas-gemma4-e4b-assistant/mtp-f16/atlas-gemma4-e4b-assistant-mtp-f16.gguf",
+      "role": "gemma4_e4b_mtp_assistant",
+      "format": "gguf_f16",
+      "bytes": 171766880,
+      "lastWriteTime": "2026-07-03T15:33:42.3364229-07:00",
+      "sha256": "54b197fafa44b9312a5754b7ebd1f875c4c57403d691ea531ab273ace8ea98a9",
+      "standaloneAtlasGemmaRank": false
+    },
+    {
+      "path": "models/gemma4-e2b-rotorquant-iq4xs/gemma-4-E2B-it-RotorQuant-IQ4_XS.gguf",
+      "role": "gemma4_e2b_generation_runtime",
+      "format": "gguf_iq4_xs",
+      "bytes": 3309810720,
+      "lastWriteTime": "2026-07-01T10:38:49.4402777-07:00",
+      "sha256": "ab142a46f21655433ff7b3b28ebc2fa45d251f01ca4278a377029d86937138c8",
+      "standaloneAtlasGemmaRank": false
+    },
+    {
+      "path": "models/gemma4-legal-iq4xs-direct.gguf",
+      "role": "gemma4_legal_generation_runtime",
+      "format": "gguf_iq4_xs",
+      "bytes": 5091434336,
+      "lastWriteTime": "2026-05-12T11:14:55.5702990-07:00",
+      "sha256": "6cebcbb1d1f6c109adcea80bbf5cdb3df406f7e181c714e917408e0799974038",
+      "standaloneAtlasGemmaRank": false
+    },
+    {
+      "path": "models/embeddinggemma-300m-q8_0.gguf",
+      "role": "embeddinggemma_runtime",
+      "format": "gguf_q8_0",
+      "bytes": 333590880,
+      "lastWriteTime": "2026-06-03T06:57:51.0550018-07:00",
+      "sha256": "4a2f0fe92d9326ed8cc69e543f997d748d806a2c534d48974350afa5a292d4bf",
+      "standaloneAtlasGemmaRank": false
+    },
+    {
+      "path": "sveltekit-frontend/static/gemma4_e2b_onnx/onnx/decoder_model_merged_q4f16.onnx",
+      "role": "gemma4_browser_generation_asset",
+      "format": "onnx_q4f16",
+      "bytes": 673231,
+      "lastWriteTime": "2026-07-02T07:35:47.6353064-07:00",
+      "sha256": "73c0f1fe04f9a3a048fb3319c0671b6cf0346bf33a3a8624c853bcffe01c24a4",
+      "standaloneAtlasGemmaRank": false
+    }
+  ],
+  "trainingPerformed": false,
+  "promotionPerformed": false,
+  "notes": [
+    "The Hugging Face seed and MTP F16 artifact are from 2026-07-03 by filesystem timestamp; no artifact in this inventory was downloaded on 2026-09-06.",
+    "No standalone AtlasGemmaRank BF16/FP16 checkpoint or INT8/INT4 ranker artifact exists in the inventoried paths.",
+    "KV-cache q8_0 and browser generation q4f16 assets are not model-weight evidence for AtlasGemmaRank INT8."
+  ]
+}

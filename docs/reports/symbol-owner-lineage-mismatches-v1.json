@@ -1,0 +1,356 @@
+{
+  "schema": "atlas.symbol-owner-lineage-mismatches.v1",
+  "generatedAt": "2026-09-07T22:46:48.542Z",
+  "mode": "READ_ONLY_REVISION_AXIS_AUDIT",
+  "writes": {
+    "postgres": false,
+    "qdrant": false,
+    "neo4j": false,
+    "valkey": false
+  },
+  "databaseError": null,
+  "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+  "revisionAxes": {
+    "symbolRevision": "repository/compiler lineage",
+    "bindingRevision": "exact source-content lineage",
+    "symbolRevisionAuthority": "REPOSITORY_REVISION_V1",
+    "bindingRevisionAuthority": "SOURCE_BYTES_SHA256_V1",
+    "crossAxisComparison": "NOT_SEMANTICALLY_COMPARABLE"
+  },
+  "mismatchPairs": [
+    {
+      "symbol_source_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "binding_source_revision": "sha256:18e3bfd572b94a4cf8489303a13d25581bc2a5dc9282ef6a40f370a16e2a0124",
+      "row_count": 23
+    },
+    {
+      "symbol_source_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "binding_source_revision": "sha256:de9b9390076e6dd35e2591db6aadae5722a15032491ad8246e607eb46e706c71",
+      "row_count": 20
+    },
+    {
+      "symbol_source_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "binding_source_revision": "sha256:2d7d06c611884fa4675bcdd284733a2f76ebf73f32faf1667ad5c9439551233f",
+      "row_count": 16
+    },
+    {
+      "symbol_source_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "binding_source_revision": "sha256:1e76394c1194114e2178c6feb776269a013d1bd7e0b539982194de2cc0ea252c",
+      "row_count": 10
+    },
+    {
+      "symbol_source_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "binding_source_revision": "sha256:7105c941cdb7163f36bd5340be9dec298db584070f73cec2bd397d0e3ebebd56",
+      "row_count": 8
+    },
+    {
+      "symbol_source_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "binding_source_revision": "sha256:efd35051d50fc241012b1f17d043199974294dd6aadfbd87409056aa5a599444",
+      "row_count": 8
+    }
+  ],
+  "sampleRefs": [
+    {
+      "symbol_version_id": "symbol-version:0211824b9f676a3c1b52db76a98253686cbc85afb918b352c70665f6fd452469",
+      "source_ref": "sveltekit-frontend/src/lib/server/ace/llm-context-cache.ts",
+      "symbol_source_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "binding_source_revision": "sha256:18e3bfd572b94a4cf8489303a13d25581bc2a5dc9282ef6a40f370a16e2a0124"
+    },
+    {
+      "symbol_version_id": "symbol-version:15ffc7d3b6267b9d62f547a3accfe622c741f5663fc6445cfb33f9970148238d",
+      "source_ref": "sveltekit-frontend/src/lib/server/ace/llm-context-cache.ts",
+      "symbol_source_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "binding_source_revision": "sha256:18e3bfd572b94a4cf8489303a13d25581bc2a5dc9282ef6a40f370a16e2a0124"
+    },
+    {
+      "symbol_version_id": "symbol-version:1ca5b30b2bafcbabbdffbca2302ef5d6ca1682766765e5052e94c7ff16475d9b",
+      "source_ref": "sveltekit-frontend/src/lib/server/ace/llm-context-cache.ts",
+      "symbol_source_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "binding_source_revision": "sha256:18e3bfd572b94a4cf8489303a13d25581bc2a5dc9282ef6a40f370a16e2a0124"
+    },
+    {
+      "symbol_version_id": "symbol-version:211d43f2534d21e5bd0d28358eab5c62c314e97ffded6033b972b80888a2ef1a",
+      "source_ref": "sveltekit-frontend/src/lib/server/ace/llm-context-cache.ts",
+      "symbol_source_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "binding_source_revision": "sha256:18e3bfd572b94a4cf8489303a13d25581bc2a5dc9282ef6a40f370a16e2a0124"
+    },
+    {
+      "symbol_version_id": "symbol-version:2b57f7bb4e7ef4a7563317eb629c042cef7f1bdb714d2ae86a6df4d20dcb3ba7",
+      "source_ref": "sveltekit-frontend/src/lib/server/ace/llm-context-cache.ts",
+      "symbol_source_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "binding_source_revision": "sha256:18e3bfd572b94a4cf8489303a13d25581bc2a5dc9282ef6a40f370a16e2a0124"
+    },
+    {
+      "symbol_version_id": "symbol-version:313b8a46177f8224f8b832084e63d709340c335153a619acbc95837d0fcc234a",
+      "source_ref": "sveltekit-frontend/src/lib/server/ace/llm-context-cache.ts",
+      "symbol_source_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "binding_source_revision": "sha256:18e3bfd572b94a4cf8489303a13d25581bc2a5dc9282ef6a40f370a16e2a0124"
+    },
+    {
+      "symbol_version_id": "symbol-version:42942fb3bee0fc652bee8b1fa1555897ea16d3fe508c7b313eaa6ed0a7ef8282",
+      "source_ref": "sveltekit-frontend/src/lib/server/ace/llm-context-cache.ts",
+      "symbol_source_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "binding_source_revision": "sha256:18e3bfd572b94a4cf8489303a13d25581bc2a5dc9282ef6a40f370a16e2a0124"
+    },
+    {
+      "symbol_version_id": "symbol-version:47f4cde8966fc598ee80992a87f4d9b4c4c44d1a8548a8146abad7b0b4f77df9",
+      "source_ref": "sveltekit-frontend/src/lib/server/ace/llm-context-cache.ts",
+      "symbol_source_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "binding_source_revision": "sha256:18e3bfd572b94a4cf8489303a13d25581bc2a5dc9282ef6a40f370a16e2a0124"
+    },
+    {
+      "symbol_version_id": "symbol-version:64b6e29f8523131349bd6563b3dbb75d810bd71ed8c6adb17964f43357f4859d",
+      "source_ref": "sveltekit-frontend/src/lib/server/ace/llm-context-cache.ts",
+      "symbol_source_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "binding_source_revision": "sha256:18e3bfd572b94a4cf8489303a13d25581bc2a5dc9282ef6a40f370a16e2a0124"
+    },
+    {
+      "symbol_version_id": "symbol-version:6790cc755726bb7678af4516ad1ecbfe3bdc99e79cde92f64d548332ea6c9ec8",
+      "source_ref": "sveltekit-frontend/src/lib/server/ace/llm-context-cache.ts",
+      "symbol_source_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "binding_source_revision": "sha256:18e3bfd572b94a4cf8489303a13d25581bc2a5dc9282ef6a40f370a16e2a0124"
+    },
+    {
+      "symbol_version_id": "symbol-version:696ff6d63dd3b8b42c3b4df5b72e774fcf67d61bf9c7d0e708597205f5b34b8e",
+      "source_ref": "sveltekit-frontend/src/lib/server/ace/llm-context-cache.ts",
+      "symbol_source_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "binding_source_revision": "sha256:18e3bfd572b94a4cf8489303a13d25581bc2a5dc9282ef6a40f370a16e2a0124"
+    },
+    {
+      "symbol_version_id": "symbol-version:6ecd3d925f57989c3b253f38180bfc5008c1c7130a9966f940641f21bf37ab8f",
+      "source_ref": "sveltekit-frontend/src/lib/server/ace/llm-context-cache.ts",
+      "symbol_source_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "binding_source_revision": "sha256:18e3bfd572b94a4cf8489303a13d25581bc2a5dc9282ef6a40f370a16e2a0124"
+    },
+    {
+      "symbol_version_id": "symbol-version:766b4bec118e740e223f01a81860df892c7a8f2d2f4cf25eccb8788e41c1946f",
+      "source_ref": "sveltekit-frontend/src/lib/server/ace/llm-context-cache.ts",
+      "symbol_source_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "binding_source_revision": "sha256:18e3bfd572b94a4cf8489303a13d25581bc2a5dc9282ef6a40f370a16e2a0124"
+    },
+    {
+      "symbol_version_id": "symbol-version:8040b646a02b850979c9b3bc697b089456362b652829e39e67f9024602d244fe",
+      "source_ref": "sveltekit-frontend/src/lib/server/ace/llm-context-cache.ts",
+      "symbol_source_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "binding_source_revision": "sha256:18e3bfd572b94a4cf8489303a13d25581bc2a5dc9282ef6a40f370a16e2a0124"
+    },
+    {
+      "symbol_version_id": "symbol-version:82b1aa1dda815a8dc50d410c04d202b8b9a6a88e8e75cae0616dd0386a6bed83",
+      "source_ref": "sveltekit-frontend/src/lib/server/ace/llm-context-cache.ts",
+      "symbol_source_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "binding_source_revision": "sha256:18e3bfd572b94a4cf8489303a13d25581bc2a5dc9282ef6a40f370a16e2a0124"
+    },
+    {
+      "symbol_version_id": "symbol-version:9f4917c37a006b83918a526773c0163c91b40bcb8bcc2e518974c55e5242fa37",
+      "source_ref": "sveltekit-frontend/src/lib/server/ace/llm-context-cache.ts",
+      "symbol_source_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "binding_source_revision": "sha256:18e3bfd572b94a4cf8489303a13d25581bc2a5dc9282ef6a40f370a16e2a0124"
+    },
+    {
+      "symbol_version_id": "symbol-version:a9029462c99adf0cc00c5242116fd0b638953b7d784da0282dca9d8874f5e030",
+      "source_ref": "sveltekit-frontend/src/lib/server/ace/llm-context-cache.ts",
+      "symbol_source_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "binding_source_revision": "sha256:18e3bfd572b94a4cf8489303a13d25581bc2a5dc9282ef6a40f370a16e2a0124"
+    },
+    {
+      "symbol_version_id": "symbol-version:ba661305ec9099167cd58129d5ac21372137a45e3dd6b3b1f36f68680e7cdbc0",
+      "source_ref": "sveltekit-frontend/src/lib/server/ace/llm-context-cache.ts",
+      "symbol_source_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "binding_source_revision": "sha256:18e3bfd572b94a4cf8489303a13d25581bc2a5dc9282ef6a40f370a16e2a0124"
+    },
+    {
+      "symbol_version_id": "symbol-version:c12d47e4857923be309f5f28e20438031614fbc3707e3ce188729fa86b3a0961",
+      "source_ref": "sveltekit-frontend/src/lib/server/ace/llm-context-cache.ts",
+      "symbol_source_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "binding_source_revision": "sha256:18e3bfd572b94a4cf8489303a13d25581bc2a5dc9282ef6a40f370a16e2a0124"
+    },
+    {
+      "symbol_version_id": "symbol-version:c7df5c82f562beaca2858ea8254b654075504929e5996685038ecc67a41956cb",
+      "source_ref": "sveltekit-frontend/src/lib/server/ace/llm-context-cache.ts",
+      "symbol_source_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "binding_source_revision": "sha256:18e3bfd572b94a4cf8489303a13d25581bc2a5dc9282ef6a40f370a16e2a0124"
+    },
+    {
+      "symbol_version_id": "symbol-version:d212d5b24fbee3bd7db978b7b54657f5ce66c7beb4f81e2b7a52694600aca7bf",
+      "source_ref": "sveltekit-frontend/src/lib/server/ace/llm-context-cache.ts",
+      "symbol_source_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "binding_source_revision": "sha256:18e3bfd572b94a4cf8489303a13d25581bc2a5dc9282ef6a40f370a16e2a0124"
+    },
+    {
+      "symbol_version_id": "symbol-version:ebebc37920bb09110eb9efb13c4c599f8e9b2a7c7e553ba59c940aa080d1eb37",
+      "source_ref": "sveltekit-frontend/src/lib/server/ace/llm-context-cache.ts",
+      "symbol_source_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "binding_source_revision": "sha256:18e3bfd572b94a4cf8489303a13d25581bc2a5dc9282ef6a40f370a16e2a0124"
+    },
+    {
+      "symbol_version_id": "symbol-version:fede66e8f0239724f3cfc7a07ed0dc7d952af3068b636c184fd305e7376d5ae0",
+      "source_ref": "sveltekit-frontend/src/lib/server/ace/llm-context-cache.ts",
+      "symbol_source_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "binding_source_revision": "sha256:18e3bfd572b94a4cf8489303a13d25581bc2a5dc9282ef6a40f370a16e2a0124"
+    },
+    {
+      "symbol_version_id": "symbol-version:12a9d423f2ccd482d3151518b9e3473134af355cffcb669d00e8fed3b4862fb1",
+      "source_ref": "sveltekit-frontend/src/lib/server/services/error-analysis/CacheService.ts",
+      "symbol_source_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "binding_source_revision": "sha256:7105c941cdb7163f36bd5340be9dec298db584070f73cec2bd397d0e3ebebd56"
+    },
+    {
+      "symbol_version_id": "symbol-version:189c5669e923523bae963c6f9a4404cd1d5845b441e64dfc1165070a6a0209ff",
+      "source_ref": "sveltekit-frontend/src/lib/server/services/error-analysis/CacheService.ts",
+      "symbol_source_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "binding_source_revision": "sha256:7105c941cdb7163f36bd5340be9dec298db584070f73cec2bd397d0e3ebebd56"
+    },
+    {
+      "symbol_version_id": "symbol-version:1e3c127d9a9bd5ce324a683c42a00397bbc106381081985227ab5c55cd923e34",
+      "source_ref": "sveltekit-frontend/src/lib/server/services/error-analysis/CacheService.ts",
+      "symbol_source_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "binding_source_revision": "sha256:7105c941cdb7163f36bd5340be9dec298db584070f73cec2bd397d0e3ebebd56"
+    },
+    {
+      "symbol_version_id": "symbol-version:205817f15cfae5ba4984b17adc4f653a5c51785dcc80b1ee79344ebc4fce5932",
+      "source_ref": "sveltekit-frontend/src/lib/server/services/error-analysis/CacheService.ts",
+      "symbol_source_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "binding_source_revision": "sha256:7105c941cdb7163f36bd5340be9dec298db584070f73cec2bd397d0e3ebebd56"
+    },
+    {
+      "symbol_version_id": "symbol-version:71c46c6ae787b4333dd363cd43ff442e416fd16922be50e674061cf0f5a32242",
+      "source_ref": "sveltekit-frontend/src/lib/server/services/error-analysis/CacheService.ts",
+      "symbol_source_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "binding_source_revision": "sha256:7105c941cdb7163f36bd5340be9dec298db584070f73cec2bd397d0e3ebebd56"
+    },
+    {
+      "symbol_version_id": "symbol-version:af2cfac24ccd08db754d044385372af0427ffdcac56d4cac4b139cea168d4eb3",
+      "source_ref": "sveltekit-frontend/src/lib/server/services/error-analysis/CacheService.ts",
+      "symbol_source_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "binding_source_revision": "sha256:7105c941cdb7163f36bd5340be9dec298db584070f73cec2bd397d0e3ebebd56"
+    },
+    {
+      "symbol_version_id": "symbol-version:af4ca7a2cab0047031c3a035eea0f9fd39500ae04e440adfd141727e1eca2fd8",
+      "source_ref": "sveltekit-frontend/src/lib/server/services/error-analysis/CacheService.ts",
+      "symbol_source_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "binding_source_revision": "sha256:7105c941cdb7163f36bd5340be9dec298db584070f73cec2bd397d0e3ebebd56"
+    },
+    {
+      "symbol_version_id": "symbol-version:af68107ce4af17ce38ddacfcc260a567a8bcc14d1e91e5a3c1dec23f370152f5",
+      "source_ref": "sveltekit-frontend/src/lib/server/services/error-analysis/CacheService.ts",
+      "symbol_source_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "binding_source_revision": "sha256:7105c941cdb7163f36bd5340be9dec298db584070f73cec2bd397d0e3ebebd56"
+    },
+    {
+      "symbol_version_id": "symbol-version:03f64d797f5787ed1ee6de9c83f11d224190edb0e187111bbc68954ec23edbe1",
+      "source_ref": "sveltekit-frontend/src/lib/server/services/error-analysis/DecisionEngine.ts",
+      "symbol_source_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "binding_source_revision": "sha256:2d7d06c611884fa4675bcdd284733a2f76ebf73f32faf1667ad5c9439551233f"
+    },
+    {
+      "symbol_version_id": "symbol-version:04eb77e37efc2adf59b16231ce28998aa6a0f11d142f81ba097f791d2deaf48e",
+      "source_ref": "sveltekit-frontend/src/lib/server/services/error-analysis/DecisionEngine.ts",
+      "symbol_source_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "binding_source_revision": "sha256:2d7d06c611884fa4675bcdd284733a2f76ebf73f32faf1667ad5c9439551233f"
+    },
+    {
+      "symbol_version_id": "symbol-version:228ca1f689f0a7b309003c4abc4a4279202d00bc5d10c129b31d5d8b5455e31e",
+      "source_ref": "sveltekit-frontend/src/lib/server/services/error-analysis/DecisionEngine.ts",
+      "symbol_source_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "binding_source_revision": "sha256:2d7d06c611884fa4675bcdd284733a2f76ebf73f32faf1667ad5c9439551233f"
+    },
+    {
+      "symbol_version_id": "symbol-version:3495247c54abc90a00d4666c809ba7057ef00e4a0ee469f5f45c11ec799c71a7",
+      "source_ref": "sveltekit-frontend/src/lib/server/services/error-analysis/DecisionEngine.ts",
+      "symbol_source_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "binding_source_revision": "sha256:2d7d06c611884fa4675bcdd284733a2f76ebf73f32faf1667ad5c9439551233f"
+    },
+    {
+      "symbol_version_id": "symbol-version:4a4fc7ffff6a5ed66878fda7a355ab18d9255fc26d165701adeeb651c507aa9d",
+      "source_ref": "sveltekit-frontend/src/lib/server/services/error-analysis/DecisionEngine.ts",
+      "symbol_source_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "binding_source_revision": "sha256:2d7d06c611884fa4675bcdd284733a2f76ebf73f32faf1667ad5c9439551233f"
+    },
+    {
+      "symbol_version_id": "symbol-version:64530ff6796c7f858d65ef5650b0b120a0f6a16ec10bf0b657cb2a8d81d62316",
+      "source_ref": "sveltekit-frontend/src/lib/server/services/error-analysis/DecisionEngine.ts",
+      "symbol_source_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "binding_source_revision": "sha256:2d7d06c611884fa4675bcdd284733a2f76ebf73f32faf1667ad5c9439551233f"
+    },
+    {
+      "symbol_version_id": "symbol-version:6f17b41c925480fc64c8d32c4dbfaea852a95f7bfd36a64167d5980277b356af",
+      "source_ref": "sveltekit-frontend/src/lib/server/services/error-analysis/DecisionEngine.ts",
+      "symbol_source_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "binding_source_revision": "sha256:2d7d06c611884fa4675bcdd284733a2f76ebf73f32faf1667ad5c9439551233f"
+    },
+    {
+      "symbol_version_id": "symbol-version:767fc0c48dc1cd3d0aa3566985b7f44c7d0c52503c1c5588dc03ecf5215b0032",
+      "source_ref": "sveltekit-frontend/src/lib/server/services/error-analysis/DecisionEngine.ts",
+      "symbol_source_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "binding_source_revision": "sha256:2d7d06c611884fa4675bcdd284733a2f76ebf73f32faf1667ad5c9439551233f"
+    },
+    {
+      "symbol_version_id": "symbol-version:7c8006f7072f6f17007b71cde5060640021cebe5996006815e149f7363fa7de4",
+      "source_ref": "sveltekit-frontend/src/lib/server/services/error-analysis/DecisionEngine.ts",
+      "symbol_source_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "binding_source_revision": "sha256:2d7d06c611884fa4675bcdd284733a2f76ebf73f32faf1667ad5c9439551233f"
+    },
+    {
+      "symbol_version_id": "symbol-version:944492356ac526f7281e803d82deedafbf56d033548e198d281399b459db4606",
+      "source_ref": "sveltekit-frontend/src/lib/server/services/error-analysis/DecisionEngine.ts",
+      "symbol_source_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "binding_source_revision": "sha256:2d7d06c611884fa4675bcdd284733a2f76ebf73f32faf1667ad5c9439551233f"
+    },
+    {
+      "symbol_version_id": "symbol-version:c6c9f3b73ad18d140e91972ab9f52dc5425d9dd92b14e6b8ff48bdd55fbcb0d0",
+      "source_ref": "sveltekit-frontend/src/lib/server/services/error-analysis/DecisionEngine.ts",
+      "symbol_source_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "binding_source_revision": "sha256:2d7d06c611884fa4675bcdd284733a2f76ebf73f32faf1667ad5c9439551233f"
+    },
+    {
+      "symbol_version_id": "symbol-version:de04e96a8b2d9834422f30990dacbb8239fdc6fed5318aca88b0b6a3ad10a1ad",
+      "source_ref": "sveltekit-frontend/src/lib/server/services/error-analysis/DecisionEngine.ts",
+      "symbol_source_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "binding_source_revision": "sha256:2d7d06c611884fa4675bcdd284733a2f76ebf73f32faf1667ad5c9439551233f"
+    },
+    {
+      "symbol_version_id": "symbol-version:e583d5d0e9546af8e92cd7ba132935095b4eee3d02398f9301200f3518e19213",
+      "source_ref": "sveltekit-frontend/src/lib/server/services/error-analysis/DecisionEngine.ts",
+      "symbol_source_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "binding_source_revision": "sha256:2d7d06c611884fa4675bcdd284733a2f76ebf73f32faf1667ad5c9439551233f"
+    },
+    {
+      "symbol_version_id": "symbol-version:eb7ec7d5a9f0ac0dbc854ad2e9a6b5f9e52f3660cb74e2c4237f2d94d70878f7",
+      "source_ref": "sveltekit-frontend/src/lib/server/services/error-analysis/DecisionEngine.ts",
+      "symbol_source_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "binding_source_revision": "sha256:2d7d06c611884fa4675bcdd284733a2f76ebf73f32faf1667ad5c9439551233f"
+    },
+    {
+      "symbol_version_id": "symbol-version:f3dddb6299c5c0a77e164114ba36b98e2b724f4ef0a81364cef8776cc7c3de04",
+      "source_ref": "sveltekit-frontend/src/lib/server/services/error-analysis/DecisionEngine.ts",
+      "symbol_source_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "binding_source_revision": "sha256:2d7d06c611884fa4675bcdd284733a2f76ebf73f32faf1667ad5c9439551233f"
+    },
+    {
+      "symbol_version_id": "symbol-version:f6a566e3a4ce6b0cce7130f3c4b2987451bbd32a220fccb105b02988a815d594",
+      "source_ref": "sveltekit-frontend/src/lib/server/services/error-analysis/DecisionEngine.ts",
+      "symbol_source_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "binding_source_revision": "sha256:2d7d06c611884fa4675bcdd284733a2f76ebf73f32faf1667ad5c9439551233f"
+    },
+    {
+      "symbol_version_id": "symbol-version:0c6919c323dfd1c95920a33679764d0b32f19a645c1ec2198ebbc773294781c7",
+      "source_ref": "sveltekit-frontend/src/lib/server/services/error-analysis/ErrorClustering.ts",
+      "symbol_source_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "binding_source_revision": "sha256:efd35051d50fc241012b1f17d043199974294dd6aadfbd87409056aa5a599444"
+    },
+    {
+      "symbol_version_id": "symbol-version:0e1aa2cf2d65b365388ca7eb960eb371a1563266a91e3bc9493b2a1fa61704bd",
+      "source_ref": "sveltekit-frontend/src/lib/server/services/error-analysis/ErrorClustering.ts",
+      "symbol_source_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "binding_source_revision": "sha256:efd35051d50fc241012b1f17d043199974294dd6aadfbd87409056aa5a599444"
+    },
+    {
+      "symbol_version_id": "symbol-version:2c15165d10fc86bf1fad1febe51aa9104df9031ff9aa9813e07cd2630458e600",
+      "source_ref": "sveltekit-frontend/src/lib/server/services/error-analysis/ErrorClustering.ts",
+      "symbol_source_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "binding_source_revision": "sha256:efd35051d50fc241012b1f17d043199974294dd6aadfbd87409056aa5a599444"
+    }
+  ],
+  "repairAllowed": false,
+  "reason": "Observed cross-axis value differences are retained for review; this report does not select an authority or rewrite revisions."
+}

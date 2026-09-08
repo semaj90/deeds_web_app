@@ -21,6 +21,12 @@ Treat this as the repo's `llms.txt`-style context entrypoint for ingestion, ACE 
 - `repo_root_map.md` — workspace-root path map for Docker, services, bridges, workflows, and configs
 - `docs/codebase_atlas/` — docs-facing atlas view of the same maps
 
+## OKF bundle bridge
+
+The portable OKF-facing wiki bundle is [karpathy-wiki/index.md](../karpathy-wiki/index.md).
+Use it for curated concepts and guides. Keep this directory as the compatibility
+and repository-orientation hub; do not duplicate the OKF bundle's pages here.
+
 ## Rules
 
 - Do not erase prior history; append new entries.

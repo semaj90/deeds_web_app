@@ -1,0 +1,18 @@
+{
+  "schema": "atlas.plan-graphify-incremental-selection-mapping.v1",
+  "writesPerformed": false,
+  "sinceHours": 72,
+  "incrementalChangedFileCount": 356,
+  "fullWorkspaceBindingCount": 23960,
+  "workspaceRevision": "sha256:4dbffefbe7d938d95d59e8409226e0df0927f81d0a7509eb330ba46c086d791e",
+  "prefixMappingRequired": "coordinator bindings are repo-root-relative (sveltekit-frontend/...); graphify-incremental refs are sveltekit-frontend-relative -- confirmed real, not hypothetical",
+  "matchedCount": 356,
+  "unmatchedCount": 0,
+  "unmatchedSample": [],
+  "adapterResult": {
+    "ok": true,
+    "count": 356
+  },
+  "verdict": "MAPPING_FEASIBLE_ALL_MATCHED",
+  "note": "Read-only. No coordinator execution was opened, no record*Stage function was called, and graphify-incremental.mjs was not modified. This only measures feasibility of the mapping."
+}

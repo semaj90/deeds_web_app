@@ -655,6 +655,11 @@ exists). No existing test broke.
   canonical `atlas_ontology_linked_tuples` table returned to zero rows.
 - [ ] Run the materializer against a reviewed Graphify/AST producer export;
   no producer export is currently selected as canonical KAG input.
+- [x] Audited the available `.tmp/atlas/graphify-file-index-v1` export as a candidate input.
+  It is explicitly `read_only`, contains 1,000 packets, reports `source_revision=workspace:0`,
+  resolves zero symbol-registry owners, and has no `semantic_768` vectors. Its AST/domain rows
+  remain `CANDIDATE_ONLY`/`canonical_writes=false`; it is useful for observation testing but is
+  not a current, revision-qualified KAG producer export and is not admitted to materialization.
 - [x] Populate `SearchResult.provenance.hypergraphNeighbors` from persisted
   rows. See `## KAG-06` below — this does not yet "prove identity/revision
   parity" against a live corpus (both source tables are still empty in
@@ -1373,6 +1378,56 @@ open exactly as items 1/2/4 above describe.
 **Proven contract slice 2026-09-01:** added `atlas.taxonomy-signal-evidence.v1` with normalized score, evidence references, producer/workspace lineage, explicit source/graph revision axes, and deterministic checksum. Focused tests pass 2/2. This does not mark KAG-07 complete: live signal joins and materialization remain open. Report: `docs/reports/kag-signal-provenance-contract-v1.json`.
 
 **Lexical identity bridge census 2026-09-01:** `atlas_packets.source_ref` matched `codebase_chunk_index.source_ref` for 4,549 packet references, but 4,282 were one-to-many; exact `atlas_packets.tree_node_id` to `codebase_chunk_index.chunk_id` matched 0 rows. Keep lexical enrichment blocked until an exact packet/chunk identity bridge is proven; do not score ambiguous source-reference joins.
+
+### LEXICAL-PREAPPLY-01 — source-byte and query-score gate updated 2026-09-08
+
+- [x] Added `LexicalInputProofV1` and focused fixtures. The proof binds the exact UTF-8
+  derivation bytes, declared/computed content hash, source/workspace revisions, tokenizer and
+  lexical derivation revisions, and explicit `pg_catalog.simple` FTS configuration.
+- [x] Corrected the legacy BM25 path so no flags means dry-run and `--apply` fails closed; it no
+  longer writes the historical constant `bm25_score = 0.5` or promotes Redis term caches as
+  canonical relevance.
+- [x] Added `Bm25ObservationV1` for query/candidate-qualified scores. BM25 is an observation keyed
+  by query, candidate ordinal, packet/source identity, retrieval revision, and executor; it is not
+  static packet metadata.
+- [x] Corrected the shared contract to `LexicalRelevanceObservationV1` with explicit scorer
+  semantics: PostgreSQL emits `PG_TS_RANK_CD`; Go emits `BM25` only after an Okapi scorer census.
+  `Bm25ObservationV1` remains a deprecated compatibility alias.
+- [x] Audited Go Retrieval: `/search/bm25` is a read-only PostgreSQL `ts_rank_cd` proxy, not a
+  BM25 implementation. Its response now exposes `score_type=PG_TS_RANK_CD`, scorer revision, and
+  text-search configuration; the historical route name remains compatibility-only.
+- [x] Propagated the same scorer metadata through the TypeScript PostgreSQL FTS candidate shape;
+  compatibility exports retain their old names but now report `PG_TS_RANK_CD` explicitly.
+- [x] Extended the Go lexical response envelope with query checksum, one-based rank, candidate
+  count, and explicit cover-density scorer metadata; added focused Go and TypeScript coverage.
+- [ ] Deploy/restart the Go Retrieval binary containing the corrected response metadata before
+  claiming live scorer-contract proof. Port `8096` is `legal-ai-go-search` and its 404 on
+  `/search/bm25` is expected. The actual Go Retrieval service is `legal-ai-go-retrieval` on
+  `:8100`; its health is `READY_FULL`, and its read-only `/search/bm25` request succeeds, but the
+  running response still lacks the newly added `score_type`/scorer metadata, so the container
+  predates the source change.
+- [ ] Implement `GO-LEXICAL-SCORER-CENSUS-01` before labeling any Go result `BM25`; prove term
+  statistics, document frequency, document-length normalization, and frozen corpus statistics.
+- [x] Read-only source-authority audit confirms acquisition owns raw-byte `contentDigest` and
+  `storageUri` in `atlas_source_revisions`, while `codebase_chunk_index.content_hash` is a derived
+  per-chunk hash and `atlas_packets` has no proven source-revision link to acquisition.
+- [x] Read-only bridge check found 353 packet/chunk source references with content present but zero
+  rows where `sha256(codebase_chunk_index.content)` equals the packet `content_hash`; the chunk hash
+  therefore cannot be treated as the raw source-byte proof.
+- [ ] Keep lexical materialization and BM25 `--apply` blocked until an exact packet-to-source-byte
+  owner link is established, or a reviewed packet/chunk derivation contract explicitly proves the
+  bytes and hash scope. Do not use `summary`, legacy `sha256`, ambiguous source-reference joins,
+  or Redis terms as substitutes.
+- [x] Rechecked current source lineage read-only: 52 source-qualified cohort rows matched Graphify
+  source revisions, but all 52 disagreed with the live workspace binding revision; current-workspace
+  eligibility is therefore 0. The source-registry audit found 22,604 registry rows but no selected
+  current source bindings for this proof.
+- [x] Re-ran the Graphify source-revision audit successfully for completed run
+  `48485685-e773-4433-a1f8-00f5524cca44`: 23,758 rows were inspected, with 23,516
+  `CONTENT_MATCH`, 235 `CONTENT_MISMATCH`, and 7 `SOURCE_UNAVAILABLE`. The receipt is
+  `SOURCE_BYTES_NOT_PROVEN`; mismatched/unavailable source bytes remain excluded from apply.
+- [ ] After the source-byte join is proven, run a read-only query/cohort score comparison between
+  PostgreSQL `ts_rank_cd` and Go Retrieval, then add guarded canary write plus independent readback.
 
 Feeds the *same* `TaxonomyAssignmentCandidateV1` shape from established
 evidence owners — this is explicitly not a new "fusion service": no new
@@ -2454,3 +2509,471 @@ canonical chunk-owner rows); (4) only then return to DOC-13/14 once that lane se
   narrower defects the prior BitFrost convergence audit carried forward (identity
   collision / value-contract mismatch, both zero live callers today) — those remain
   exactly as scoped in the paragraph above this task, unchanged.
+
+### Revision-qualified KAG read seam — 2026-09-07
+
+- [x] Extend the governed OAK KAG neighbor input/receipt with required
+  `workspaceRevision` and `graphRevision` fields.
+- [x] Bind both revisions in the existing `atlas_hyperedges` lookup and retain
+  the legacy fail-open reader for informational enrichment callers.
+- [x] Add focused tests for required revisions, SQL parameter binding, and receipt
+  propagation. Tests: 10/10 reader/handler cases passed.
+- [ ] Supply the current completed Graphify/source-manifest revisions and run a
+  bounded strict read against that cohort. Do not use the historical
+  `taxonomy-edges-v1-2026-05-08` / `git:0084288f26` pair as current evidence.
+- [x] Resolve the latest completed Graphify authority read-only: run
+  `48485685-e773-4433-a1f8-00f5524cca44`, completed `2026-09-05`, with
+  workspace/source-manifest digest
+  `sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb`.
+  Re-running the census with that explicit expected pair confirms
+  `currentBindingProven: false`; no historical hyperedge rows match it.
+- [ ] Implement the bounded 3-hop traversal only after the strict current-binding
+  read passes; preserve role-aware hyperedges and do not clique-expand them.
+
+### Bounded quick-hop implementation — 2026-09-07
+
+- [x] Add pure `kag-quick-hop-v1.ts` over the existing `HyperedgeV1` contract.
+  It preserves n-ary participant roles, filters by both supplied revisions,
+  tracks visited canonical/member and hyperedge IDs, bounds depth/frontier/
+  hyperedges/evidence refs, and emits a checksum-qualified ID/evidence receipt.
+- [x] Prove a three-participant fact remains one hyperedge while producing only
+  bounded incidence paths; prove stale revisions are excluded and missing
+  revision authority is rejected. Focused KAG reader/handler/quick-hop tests:
+  13/13 passed.
+- [ ] Connect the pure traversal to the strict PostgreSQL reader only after the
+  current Graphify binding is supplied and passes the census. Source hydration,
+  CandidateOrdinal mapping, ACE promotion, and ContextManifest generation are
+  intentionally not part of this implementation.
+- [x] Add the injected `KagQuickHopReaderV1` coordinator seam. It requests
+  bounded incidence pages, carries the required revision pair, rejects stale
+  reader results, and delegates path/checksum semantics to the pure engine.
+  Focused KAG tests now pass 15/15.
+- [x] Add `createPostgresKagQuickHopReaderV1()` as the production composition
+  point. Construction is side-effect free and delegates only to the strict
+  revision-qualified Postgres hyperedge reader.
+- [ ] Bind the coordinator to `readKagHyperedgesStrictV1` only after current
+  Graphify binding is supplied and passes the census; this live composition gate
+  remains open by design.
+
+### Hypergraph currentness bridge — 2026-09-07
+
+- [x] Add `scripts/atlas/audit-hypergraph-current-arity-census-v1.mjs` under the
+  existing KAG audit owner. It performs read-only schema discovery, hyperedge/member
+  population counts, arity distribution, revision grouping, role/relation shape, and
+  orphan/duplicate/checksum integrity checks.
+- [x] Fail closed when the three KAG tables or required columns are absent. The
+  report distinguishes `CENSUS_COMPLETE_CURRENTNESS_UNPROVEN` from
+  `CURRENT_BINDING_PROVEN`; expected graph/workspace revisions must be supplied
+  explicitly through environment inputs and are never inferred from timestamps.
+- [x] Run the census against the live PostgreSQL instance and preserve
+  `docs/reports/atlas-hypergraph-current-arity-census-v1.json`. It found 62,802
+  hyperedges, 125,604 members, 0 ontology tuples, and exactly arity-2 for every
+  hyperedge (max/average 2). It found no orphan members, duplicate role members,
+  missing contract IDs, or missing checksums. All rows are bound to the single
+  historical pair `taxonomy-edges-v1-2026-05-08` / `git:0084288f26`; current
+  binding is intentionally **not** proven because the current Graphify/source
+  manifest revisions were not supplied and must not be inferred.
+- [ ] Only after current binding is proven, implement the bounded quick-hop traversal
+  proof. Use the existing indexed member lookup and preserve hyperedges as N-ary
+  records; do not clique-expand them or create another graph store/fusion owner.
+
+### HYPEREDGE-CANONICAL-DETERMINISM-01 — completed 2026-09-07
+
+- [x] Reused the existing `compareUtf8` comparator for KAG persistence-row normalization
+  and hyperedge projection ordering. These paths no longer depend on ICU/default-locale
+  `localeCompare()` behavior for canonical evidence ordering.
+- [x] Added a non-ASCII ordering regression through the ontology tuple persistence mapper.
+- [x] Focused KAG validation: 3 test files, 12 tests passed; OpenSpec strict validation passed.
+- [ ] This closes ordering determinism only. It does not prove current Graphify binding,
+  live n-ary source facts, or authorize a Postgres materialization canary.
+
+### KAG currentness recheck — 2026-09-07
+
+- [x] Re-ran the current Graphify owner audit: the expected workspace revision still has one
+  `RUNNING` row, zero completed owners, and no completion timestamp.
+- [x] Re-ran the live read-only hypergraph census: 62,802 hyperedges, 125,604 members, zero
+  ontology tuples, all binary (`max=2`, `avg=2`), with zero integrity violations.
+- [x] Confirmed every stored relation remains bound to historical
+  `taxonomy-edges-v1-2026-05-08` / `git:0084288f26`; no current binding was inferred.
+- [ ] Keep strict quick-hop composition and production traversal gated until a completed
+  Graphify/source-manifest revision pair is supplied and independently reconciled.
+
+### NARY-FACT-PROPOSAL-01 — proposal boundary implemented 2026-09-07
+
+- [x] Added `nary-fact-proposal-v1.ts` with Zod validation for revision-qualified,
+  role-labelled proposals containing at least three participants.
+- [x] Added deterministic participant/evidence normalization using `compareUtf8`, duplicate
+  role-labelled identity rejection, checksum construction, and checksum verification.
+- [x] Added fixture coverage for deterministic ordering, non-canonical authority, and duplicate
+  participant rejection; focused proposal/materializer/persistence tests pass 9/9.
+- [x] ParticipantResolver, owner-registry, and pure admission seams now exist separately: this
+  contract still does not invent identities, perform durable concept admission, write
+  `atlas_hyperedges`, or enable live quick-hop traversal.
+
+### NARY-PARTICIPANT-RESOLUTION-01 — pure canonical-owner seam implemented 2026-09-07
+
+- [x] Added `participant-resolver-v1.ts` as a pure resolver between observations and
+  `NaryFactProposalV1`; it requires an explicit canonical-owner registry.
+- [x] Resolved participants carry entity type, optional entity/source revisions, and
+  deterministically normalized evidence references.
+- [x] Missing canonical IDs remain `UNRESOLVED`; literal route/method/path values are retained
+  only as evidence/attributes and are never synthesized into canonical identities.
+- [x] Unknown owners and owner attribute mismatches are rejected; duplicate registry ownership
+  is ambiguous; a mixed batch returns no admissible participants.
+- [x] Focused resolver, proposal, and materializer tests pass; no database, ontology, or
+  hyperedge writes were performed.
+- [x] Pure owner adapters now cover existing candidate packet/symbol identities and canonical
+  `ConceptDefinitionV1` identities.
+- [ ] Wire a real revision-qualified owner registry from live packet/symbol/concept authorities,
+  then feed only fully resolved participants into proposal admission. Current Graphify/workspace
+  binding and ontology-tuple population remain blocked.
+
+### NARY-PARTICIPANT-OWNER-REGISTRY-01 — pure registry combiner implemented 2026-09-07
+
+- [x] Added a read-only combiner for explicit packet, symbol, and concept owner inputs.
+- [x] Registry output is deterministic and exposes duplicate canonical IDs instead of choosing
+  an owner by source order; no source name or literal is converted into an identity.
+- [x] Focused registry/resolver/proposal/materializer tests pass; no registry lookup or durable
+  write is wired yet.
+- [ ] Supply real revision-qualified owner arrays from the existing canonical authorities and
+  independently verify collisions before any `NaryFactProposalV1` can be admitted.
+
+### NARY-FACT-ADMISSION-01 — pure proposal admission gate implemented 2026-09-07
+
+- [x] Added checksum, proposal-state, workspace-revision, graph-revision, evidence, and
+  participant-owner admission checks.
+- [x] Admission returns `ADMITTED` only after every participant resolves through explicit owners;
+  it does not call `createHyperedgeV1()` or persist anything.
+- [x] Focused admission tests cover successful admission and revision drift rejection.
+- [x] Admission now requires an explicit `GRAPHIFY_RUN_OWNER_COMPLETE` proof whose workspace
+  and graph revisions match the expected values; arbitrary caller-supplied revisions cannot pass.
+- [ ] Connect the gate to a current Graphify owner and authorized Postgres canary with independent
+  readback; historical KAG rows remain excluded.
+
+### NARY-PROPOSAL-HYPEREDGE-MATERIALIZER-01 — admitted-only conversion implemented 2026-09-07
+
+- [x] Added a pure conversion from an `ADMITTED` `NaryFactProposalV1` to the existing
+  `HyperedgeV1` contract.
+- [x] Conversion rechecks proposal checksum and preserves role-labelled participant IDs,
+  source/workspace/graph revisions, producer revision, and evidence references.
+- [x] Unadmitted proposals fail closed; no Postgres, ontology, or hyperedge persistence write is
+  performed.
+- [ ] Add the authorized current-revision writer/readback canary only after Graphify currentness,
+  participant collisions, and ontology tuple population are proven.
+
+### ONTOLOGY-TUPLE-NARY-PROPOSAL-01 — verified tuple adapter implemented 2026-09-07
+
+- [x] Added a pure adapter from `OntologyLinkedTupleV1` to `NaryFactProposalV1`.
+- [x] Requires `ACTIVE_VERIFIED`, packet identity, source revision, matching graph revision, and
+  at least three explicitly owned participants.
+- [x] Requires workspace revision from the caller because the tuple contract does not carry it;
+  degraded tuples and incomplete lineage fail closed.
+- [x] Focused verified/degraded tuple tests pass; no ontology or hyperedge persistence was done.
+- [ ] Populate a real current `OntologyLinkedTupleV1` cohort and independently reconcile its
+  owner registry before admission or Postgres canary work.
+
+### CANONICAL-OWNER-SCHEMA-RECONCILIATION-01 — read-only audit implemented 2026-09-07
+
+- [x] Added `scripts/atlas/audit-canonical-owner-schema-reconciliation-v1.mjs` to compare the
+  existing packet, symbol-version, and concept tables against the owner fields required by the
+  proposal admission boundary.
+- [x] The audit writes only a report artifact and never mutates Postgres, Qdrant, Neo4j, or Valkey;
+  schema presence is explicitly not treated as row currentness or promotion authority.
+- [x] Ran the audit against the live database: symbol owner schema is complete, while packet and
+  concept owner schemas are incomplete for the proposed registry fields.
+- [ ] Separately prove owner uniqueness, current revisions, and completed Graphify lineage before
+  wiring a durable owner reader.
+
+### CANONICAL-OWNER-REVISION-AXES-01 — additive schema proposal implemented 2026-09-07
+
+- [x] Added the unapplied sidecar migration
+  `manual/20260907_canonical_owner_revision_axes_v1.sql` with nullable packet
+  `source_revision` and concept `definition_revision` fields.
+- [x] Updated the Drizzle schema and sidecar registry; the migration performs no backfill,
+  rewrite, delete, or live application.
+- [ ] Review field semantics and run an authorized migration/readback canary only after Graphify
+  currentness and source-content lineage are proven.
+- [x] Added a read-only migration safety audit; it checks additive SQL and reports whether the
+  new columns are already present without applying the migration.
+
+### CANONICAL-OWNER-ROW-ADAPTERS-01 — fail-closed row adapters implemented 2026-09-07
+
+- [x] Added packet and concept row adapters that require the dedicated source-content or
+  definition revision field before producing a participant owner.
+- [x] Missing keys return no owner; missing lineage fields throw explicit fail-closed errors.
+- [x] Focused registry and two-axis lineage tests pass (9/9 combined); live registry wiring and
+  migration application remain blocked.
+- [x] Added a pure registry composition function for packet, concept, and symbol-owner inputs;
+  incomplete packet/concept lineage fails closed rather than producing a partial registry.
+- [x] Added the symbol-row adapter with explicit repository/compiler revision semantics, keeping
+  the symbol axis distinct from packet source-content and concept definition revisions.
+
+### RAPIDS-RUNTIME-SMOKE-01 — WSL GPU fixture replay refreshed 2026-09-07
+
+- [x] Started the existing Ubuntu WSL2 environment and verified PyTorch 2.13.0+cu130 sees the
+  RTX 3060 Ti; cuGraph 26.06.00, cuDF 26.06.01, CuPy 14.1.1, and nx-cugraph import successfully.
+- [x] Replayed the existing 10,000-node/50,000-edge read-only PageRank fixture with the correct
+  repository Python package root: vertex identity exact, directed semantics exact, rank
+  correlation `0.99991506`, top-k overlap `0.98`, gate `PASS`.
+- [ ] This remains bounded fixture evidence; it does not promote the live 162K Graphify snapshot
+  or authorize graph/database writes.
+
+### GPU-ENVIRONMENT-OWNERSHIP-01 — three-lane inventory refreshed 2026-09-07
+
+- [x] Keep native Windows PyTorch CUDA as the general native-inference lane; no consolidation
+  with Linux analytics environments was attempted.
+- [x] Keep WSL2 `atlas-rapids-cu13` as the RAPIDS/cuVS/cuGraph/cuDF executor lane:
+  11G on disk, PyTorch `2.13.0+cu130`, cuGraph `26.06.00`, cuDF `26.06.01`, CuPy `14.1.1`.
+- [x] Keep WSL2 `atlas-cutile-cu132` as the AGMR/cuTile lane: 6.0G on disk, PyTorch
+  `2.14.0+cu132`, Transformers `5.5.0`.
+- [x] Read-only WSL inventory reports 927G available on the 1,007G filesystem and 36M in
+  `/home/james/.cache`; no package install, environment merge, or VHDX compaction was done.
+- [ ] Treat native TensorRT-RTX and native Windows cuTile as future parity experiments, not
+  installed or promoted runtimes.
+
+### AGMR-DONOR-B-FORWARD-01 — standalone finite forward refreshed 2026-09-07
+
+- [x] Ran the existing donor-B standalone artifact check in WSL2 `atlas-cutile-cu132` using
+  `models/atlas-gemma-rank-v1-donor-b/standalone-init-bf16`.
+- [x] Artifact loaded with hidden shape `[1, 5, 256]`, rank score finite, and status
+  `EXPORTED_STANDALONE_FORWARD_FINITE_PROVEN`.
+- [ ] This proves finite artifact loading/inference only; it does not prove ranking quality,
+  teacher parity, quantization parity, or production promotion.
+
+### AGMR-MXBAI-SHADOW-01 — donor-B structural comparison refreshed 2026-09-07
+
+- [x] Compared donor-B against the existing frozen mxbai teacher receipt: 3 queries and 15
+  candidates, with all student scores finite and CPU elapsed time `524.916ms`.
+- [x] Receipt records mxbai `mixedbread-ai/mxbai-rerank-base-v2` as teacher and the student as
+  an untrained raw rank-head logit; sigmoid-once teacher semantics are preserved.
+- [x] Structural baseline recorded: mean top-3 overlap `0.6667`, mean Spearman `-0.1667`,
+  top-1 agreement `0/3`.
+- [ ] Quality/parity remains unproven because candidate identity and canonical ordinal proof are
+  false and the student rank head is untrained; no promotion decision follows.
+
+### SYMBOL-OWNER-ROW-AUDIT-01 — read-only integrity audit implemented 2026-09-07
+
+- [x] Added `scripts/atlas/audit-symbol-owner-rows-v1.mjs` for symbol-version uniqueness,
+  source/revision completeness, and workspace distribution.
+- [x] The audit reports structural eligibility separately from promotion authority and performs
+  no database or projection writes.
+- [x] Live replay found 285 unique symbol-version rows with complete source/revision fields;
+  85 match the explicitly supplied current workspace revision and 200 remain on legacy
+  `workspace:0`. This is coverage evidence, not Graphify completion proof.
+- [x] Ran the audit with the current workspace revision and reconciled current symbol rows against
+  source/workspace bindings; uniqueness and field coverage passed.
+- [ ] Reconcile the rows against a completed Graphify owner before using them in live proposal
+  admission.
+
+### SYMBOL-OWNER-LINEAGE-RECONCILIATION-01 — read-only source-binding join implemented 2026-09-07
+
+- [x] Added `scripts/atlas/audit-symbol-owner-lineage-v1.mjs` to reconcile current symbol rows
+  against `atlas_workspace_source_bindings` using exact source/workspace revisions.
+- [x] The audit distinguishes missing bindings and revision mismatches from structural symbol-row
+  validity; it never treats a partial join as promotion authority.
+- [x] Run with `ATLAS_WORKSPACE_REVISION` set to the active revision: 85/85 current symbol rows
+  have exact source/workspace binding coverage and zero workspace-axis mismatches.
+- [ ] Require completed Graphify ownership and a separate content-lineage proof before live
+  proposal admission.
+
+Live replay 2026-09-07: 85 current symbol rows matched 85 source-binding rows with zero missing
+bindings or workspace-axis mismatches. Repository revision and source-content revision are now
+reported as separate axes; `lineageReady` is a coverage signal only and promotion remains false.
+No repair or write was attempted.
+
+### SYMBOL-OWNER-LINEAGE-MISMATCH-DETAIL-01 — read-only revision-axis detail audit implemented 2026-09-07
+
+- [x] Added `scripts/atlas/audit-symbol-owner-lineage-mismatches-v1.mjs` to retain observed
+  repository-revision versus source-content-revision pairs and bounded source-reference samples.
+- [x] The report deliberately does not choose an authority or rewrite either revision field.
+- [ ] Review the mismatch pairs against the completed Graphify/source-binding owner before any
+  lineage repair or proposal promotion.
+
+Live detail replay 2026-09-07 found six observed axis pairs across 50 sampled rows: symbol rows
+use repository revision `1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf`, while source bindings use
+distinct per-file `sha256:...` content revisions. The report labels this cross-axis comparison
+non-semantic; neither value should be overwritten.
+
+### SOURCE-LINEAGE-AXES-01 — explicit two-axis reconciliation implemented 2026-09-07
+
+- [x] Added `source-lineage-axes-v1.ts` with separate `repositoryRevision` and
+  `sourceContentRevision` fields and explicit authority labels.
+- [x] Reconciliation requires exact `sourceRef` and `workspaceRevision` agreement, reports
+  `MATCHED`, `MISSING_BINDING`, or `CONFLICT`, and never chooses an authority or rewrites a claim.
+- [x] Missing or malformed source bindings remain fail-closed and non-canonical; checksums cover
+  the complete observation envelope.
+- [x] Focused lineage, participant-resolution, and admission tests pass (11/11 combined).
+- [ ] Review the resulting two-axis records against the completed Graphify/source-binding owner;
+  do not promote until currentness and live owner-registry coverage are proven.
+
+### GRAPHIFY-RUN-AUDIT-REPORT-ROBUSTNESS-01 — completed 2026-09-07
+
+- [x] Hardened the read-only current Graphify owner audit so a transient report-file lock does
+  not discard the database result; output now includes `reportWriteError` when artifact writing
+  fails.
+- [x] Current readback remains `GRAPHIFY_RUN_OWNER_BLOCKED`: one bound run is `RUNNING`, with
+  zero completed owners and no completion timestamp.
+- [ ] Do not treat this reporting repair as Graphify completion; a completed receipt-bound run is
+  still required before graph or n-ary persistence promotion.
+
+### GRAPHIFY-CURRENTNESS-RECHECK-02 — unchanged 2026-09-08
+
+- [x] Re-ran the read-only owner audit. The expected workspace revision still has one bound
+  `RUNNING` row, `completedOwnerCount=0`, and `currentCompletedAt=null`.
+- [x] The audit returned the database state on stdout despite a transient report-artifact write
+  warning; this does not change the currentness result.
+- [ ] Keep historical KAG rows and the mxbai teacher fixture excluded from current production
+  admission until the Graphify run reaches `COMPLETED` with an independently readable receipt.
+
+### GRAPHIFY-RUN-STALE-OBSERVATION-01 — operator recovery required 2026-09-08
+
+- [x] The bound run `14643371-f6f2-4131-906b-235a5c06619a` reports `started_at=2026-08-28T04:01:23Z`,
+  remains `RUNNING`, and has `completed_at=null`; this is an 11-day stale-running observation,
+  not evidence of successful current Graphify output.
+- [ ] An authorized Graphify owner/operator must inspect or recover the stale run and produce a
+  receipt-bound terminal state. Do not mark it `COMPLETED`, relabel historical graph revisions, or
+  start a replacement run from this read-only audit.
+
+### CONCEPT-OWNER-ADAPTER-01 — existing canonical concept alignment implemented 2026-09-07
+
+- [x] Added an adapter from `ConceptDefinitionV1` to the participant-owner shape, preserving
+  `conceptId` as identity and `definitionRevision` as the entity revision.
+- [x] Concept recognitions, classifier labels, and aliases remain observations or resolution
+  evidence; they are not promoted into owner records by this adapter.
+- [x] Added an equivalent adapter for existing candidate `packetKey` and `symbolVersionId`
+  fields; candidate ordinals, paths, and projection IDs are never used as owner identities.
+- [x] Focused owner-registry tests pass; live concept-table population and admission remain
+  unproven because the current ontology tuple count is zero.
+
+### VALKEY-CACHE-POLICY-01 — persisted policy reconciled 2026-09-08
+
+- [x] Verified the live Valkey policy was changed to `volatile-lru` and persisted in
+  `docker/docker-compose.gpu.yml` with a 2 GiB `maxmemory` limit.
+- [x] Keep non-expiring application control/schema keys protected; only TTL-bearing derived
+  cache entries are eligible for memory-pressure eviction. Parent Atlas durable job dispatch
+  is RabbitMQ-owned; BullMQ references belong only to the separate `claude-mem` stack.
+- [x] Treat TTL and eviction as cleanup/residency behavior only. Neither establishes
+  currentness nor overrides workspace, graph, representation, or model revisions.
+- [ ] Re-check the live container after the next authorized compose recreation and record
+  `CONFIG GET maxmemory`, `CONFIG GET maxmemory-policy`, and bounded eviction telemetry.
+
+### CENTROID-CACHE-REVISION-ISOLATION-01 — gap recorded 2026-09-08
+
+- [x] Audited `scripts/atlas/warm-centroid-cache.mjs`: cluster keys are overwritten with a
+  24-hour TTL, the index is replaced, and no active orphan pruning or pass/revision identity
+  exists in the value or index.
+- [x] Confirmed no current application reader was found for the legacy
+  `centroid:kmeans:{cluster_id}` contract; do not change its format without a compatibility
+  receipt.
+- [ ] Add a revision-qualified centroid manifest/pointer and pass identity before enabling
+  supersession. Readers must reject a mixed pass and accept only the manifest's listed IDs.
+- [ ] Add owned-namespace pruning or archival of superseded centroid keys; never scan/delete
+  unrelated Valkey keys and never use TTL as a substitute for supersession.
+- [ ] Prove atomic publication (`prepare → checksum → publish pointer`) and readback under
+  a simulated interrupted rewrite before marking `CENTROID-BITFROST-01` complete.
+
+Evidence boundary: current centroid data is a rebuildable Valkey projection of the Postgres
+centroid source. Cluster IDs, SOM cells, topology coordinates, and Valkey keys are not canonical
+identity. Existing legacy readers remain unchanged pending the new manifest contract.
+
+### RABBITMQ-PARENT-ATLAS-BOUNDARY-01 — queue ownership review 2026-09-08
+
+- [x] Confirmed Parent Atlas durable dispatch uses RabbitMQ/AMQP and the existing publisher,
+  consumer, exchange, and queue registry; BullMQ is not a Parent Atlas dependency or runtime.
+- [x] Preserve BullMQ only inside the isolated `claude-mem` stack, which owns its own Valkey-backed
+  observation queue.
+- [x] Removed the misleading Parent Atlas BullMQ type shim and documentation references.
+- [ ] Define and implement a consumer-owned contract for browser batch-summary hints before
+  publishing them to RabbitMQ. The current endpoint is validation/acknowledgement only.
+- [ ] Wire the Omni worker RabbitMQ loop only after its task envelope, retry, acknowledgement, and
+  durable receipt owners are specified. Do not enqueue unowned messages.
+
+Evidence boundary: queue reachability or a successful publish does not prove a consumer processed
+the message. Parent Atlas remains PostgreSQL-first for durable receipts; RabbitMQ is dispatch only.
+
+### OKF-PYTHON-SEARXNG-GO-ALIGNMENT-01 — boundary review 2026-09-08
+
+- [x] Confirmed SearXNG is an external discovery provider: its `/search` or `/` endpoint
+  accepts GET/POST parameters and requires an enabled response format such as `format=json`.
+  SearXNG results must remain evidence candidates, not canonical source or RRF ownership.
+- [x] Confirmed the existing Python/FastAPI sidecars are observation and enrichment producers;
+  Pydantic validation remains the runtime boundary and does not mint canonical identities.
+- [x] Confirmed Go retrieval is an executor/progressive-delivery lane. It may consume Postgres,
+  Qdrant, Valkey, and embedding services, but SearchRuntime retains normalization, deduplication,
+  and production fusion ownership.
+- [ ] Add one versioned cross-schema fixture that round-trips the selected `.okf`/YAML artifact
+  through Python/Pydantic, TypeScript/Zod, SearXNG result normalization, and the Go retrieval
+  envelope. Require `sourceRef`, URL, content checksum, workspace/source revisions, provider,
+  and retrieval timestamp to remain distinct fields.
+- [ ] Do not introduce a new `.okf` taxonomy owner or direct SearXNG-to-Valkey indexing path.
+  Discovery results must pass canonicalization, bounded scoring, and ACE admission before any
+  revision-qualified cache projection.
+
+### TASK-SEMANTIC-PACKET-COMPATIBILITY-01 — step 2 done, verified with corrections (2026-09-08)
+
+Step 2 (read-only schema-compatibility guard) was already implemented this session in
+`sveltekit-frontend/src/lib/server/tasks/semantic-packets.ts` before this entry was written:
+`assertTaskSemanticPacketSchemaCompatible()` queries `information_schema.columns` for
+`task_semantic_packets`, diffs against the exact 27 columns `createTaskSemanticPacket()`'s INSERT
+needs, and throws `TASK_SEMANTIC_PACKET_SCHEMA_INCOMPATIBLE: missing=...` before any task-row load,
+embedding, Qdrant upsert, or Postgres write — the call happens as the very first line of
+`createTaskSemanticPacket()`. Independently verified, not just trusted:
+
+- [x] Confirmed the diff is real (`git diff`, not just claimed) and reuses this file's existing
+  `db`/`pgRows`/`sql` imports — no new dependency.
+- [x] Ran the given `safe_next_command`
+  (`npx openspec validate parent-atlas-ace-rlm-bitfrost-integration --type change --strict --json`)
+  — passes clean.
+- [x] Ran the given `smoke_command`
+  (`npx vitest run src/lib/server/embedding/semantic-packet-writer.spec.ts`) — **passes (4/4), but
+  it does not test this guard**. That spec file exercises a different, unrelated function
+  (`persistCanonicalSemanticPacketEmbedding`, which writes `semantic_768` lineage into
+  `atlas_packets`) that happens to share a similarly-named directory. A green result here is real
+  but provides zero evidence about `assertTaskSemanticPacketSchemaCompatible()`'s correctness —
+  flagging this rather than letting a passing-but-irrelevant test stand in for real coverage.
+- [x] **Closed that gap directly**: added `sveltekit-frontend/src/lib/server/tasks/
+  semantic-packets.spec.ts` (new file) with 3 focused tests against a mocked
+  `information_schema.columns` result — (1) resolves cleanly when all 27 required columns are
+  present, (2) throws `TASK_SEMANTIC_PACKET_SCHEMA_INCOMPATIBLE` naming the missing columns when
+  given the exact live 16-column shape this session's own audit found, (3)
+  `createTaskSemanticPacket()` rejects before any other DB call (`mockExecute` called exactly once)
+  when schema is incompatible. Exported `assertTaskSemanticPacketSchemaCompatible` (was
+  module-private) so it could be tested directly rather than only indirectly through the full
+  lifecycle function. **Live-run, not just written**: `npx vitest run
+  src/lib/server/tasks/semantic-packets.spec.ts` → 3/3 pass.
+
+**Remaining TASK-SEMANTIC-PACKET-COMPATIBILITY-01 steps, not started**: (1) capture the exact
+production `DATABASE_URL` target — not done, still open; (3) run the writer against a disposable
+database fixture; (4) decide whether to apply the additive
+`20260606_task_semantic_packets_live_alignment.sql` migration or narrow/archive the writer — still
+correctly blocked, no migration applied; (5) independent Qdrant/Postgres identity readback. None of
+these were attempted in this pass — step 2's verification plus closing its real test-coverage gap
+was the bounded scope of this entry.
+
+### TASK-SEMANTIC-PACKET-COMPATIBILITY-01 — active MCP writer guard 2026-09-08
+
+- [x] Confirmed `task.run_semantic_packet_workflow` reaches
+  `runTaskSemanticPacketLifecycle()` through the live MCP dispatch table.
+- [x] Added a read-only required-column preflight before embedding, Qdrant, or PostgreSQL work;
+  incompatible live schemas fail closed with the missing-column list.
+- [x] Confirmed focused semantic-packet writer tests pass 4/4 and OpenSpec strict validation passes.
+- [x] Reconcile the live 16-column `task_semantic_packets` table with the broader Drizzle/writer
+  contract, using a disposable compatibility test before considering an additive migration.
+
+Evidence boundary: the preflight prevents partial writes but does not prove the unapplied migration
+is correct or authorize applying it to `legal_ai_db`.
+
+### TASK-SEMANTIC-PACKET-COMPATIBILITY-01 — disposable proof result 2026-09-08
+
+- [x] Ran `scripts/atlas/prove-task-semantic-packet-disposable-compatibility-v1.mjs` against an
+  ephemeral PostgreSQL 18 container initialized with the observed 16-column live shape.
+- [x] Confirmed the proposed alignment SQL parses and applies in isolation without touching the
+  live database; the proof container was removed and `writesPerformed=false`.
+- [x] Confirmed the alignment SQL adds 39 columns but leaves six active-writer columns absent:
+  `summary_model`, `summary_hash`, `confidence`, `status`, `agent_pickup_ready`, and `deleted`.
+- [x] Extended the unapplied sidecar with the six writer-required columns and reran the disposable
+  proof; the active writer contract is now covered in isolation.
+- [ ] Do not apply `20260606_task_semantic_packets_live_alignment.sql` yet; live application still
+  requires explicit migration authorization and post-commit readback.
+
+Evidence: `docs/reports/task-semantic-packet-disposable-compatibility-v1.json`.

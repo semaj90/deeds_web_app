@@ -70,7 +70,7 @@
     }
   ],
   "canonicalAuthority": false,
-  "checkpointDir": ".tmp\\google-gemma4-e4b-assistant",
+  "checkpointDir": "models\\gemma4_assistant_huggingface_7_3_26",
   "configInvariants": {
     "bidirectionalEncoding": true,
     "cacheDisabledForCrossRank": true,
@@ -79,7 +79,7 @@
     "rankHeadScalar": true,
     "upstreamOrderedEmbeddingNotRelabeled": true
   },
-  "configPath": ".tmp\\google-gemma4-e4b-assistant\\config.json",
+  "configPath": "models\\gemma4_assistant_huggingface_7_3_26\\config.json",
   "derivedConfig": {
     "architectures": [
       "AtlasGemmaRankForPairwiseScoring"
@@ -173,7 +173,7 @@
     "model.layers.3.self_attn.v_proj.weight"
   ],
   "newTrainableAttentionState": "UNINITIALIZED_REQUIRED",
-  "observedAt": "2026-09-06T20:45:47.280438+00:00",
+  "observedAt": "2026-09-06T23:54:16.620620+00:00",
   "presentNewTrainableAttentionTensors": [],
   "rankHeadPlan": [
     {
@@ -190,7 +190,7 @@
       "tensor": "atlas.rank_head.bias"
     }
   ],
-  "receiptChecksum": "sha256:a0e18d77175ebf323aefa75dfaf8aa4f395421453e15bde6495635a29fed415e",
+  "receiptChecksum": "sha256:1b8cefbeb8575cff8a29790d901b067114c154b4e62ba83189ab039456786f9d",
   "runtimeInstantiation": "NOT_ATTEMPTED_CUSTOM_ARCHITECTURE",
   "schema": "atlas.gemma-rank-standalone-shape-proof.v1",
   "shapeMismatches": [],
@@ -201,5 +201,5 @@
   "upstreamOrderedEmbeddings": true,
   "upstreamWeightsChecksum": "sha256:12875062fc25c51e8fa9b62abd2de7ad48b7d63f8559d5d604fbd5a3d6bcff16",
   "weightsMutated": false,
-  "weightsPath": ".tmp\\google-gemma4-e4b-assistant\\model.safetensors"
+  "weightsPath": "models\\gemma4_assistant_huggingface_7_3_26\\model.safetensors"
 }

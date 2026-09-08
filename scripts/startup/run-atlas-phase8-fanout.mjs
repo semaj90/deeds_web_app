@@ -32,13 +32,21 @@ function log(message) {
   console.log(`[phase8-fanout] ${message}`);
 }
 
+// Third element `critical` (default true when omitted) marks whether a step's failure
+// aborts the whole fanout chain. Only `atlas:phase16:latent:*` is `false` here, per the
+// GRAPHIFY-FANOUT-CONVERGENCE-01 finding (docs/reports/graphify-fanout-criticality-01.json):
+// it is an OPTIONAL_DERIVED_REPRESENTATION (canonicalAuthority=false, not referenced by
+// scripts/atlas/plan-graphify-run-completion-v1.mjs's completion predicates), so a failure
+// there must not block SOM/GDS/bitfrost-warm/centroids/graphify-draft or mark the overall
+// daily chain as failed. No other step's criticality has an equivalent audit yet — do not
+// mark SOM/GDS/anything else non-critical without the same kind of proof first.
 const PHASE8_DRY_PLAN = [
   ['atlas:phase8:step3:langextract:gate', 'gate'],
   ['atlas:summary:index:rank', 'dry'],
   ['atlas:summary:envelopes:build:dry', 'dry'],
   ['atlas:summary:envelopes:queue:dry', 'dry'],
   ['atlas:materialize:feature-envelopes:dry', 'dry'],
-  ['atlas:phase16:latent:dry', 'dry'],
+  ['atlas:phase16:latent:dry', 'dry', false],
   ['atlas:phase16:som:dry', 'dry'],
   ['atlas:phase16:gds:dry', 'dry'],
   ['atlas:bitfrost-semantic-cache:warm', 'dry'],
@@ -52,7 +60,7 @@ const PHASE8_APPLY_PLAN = [
   ['atlas:summary:envelopes:build:apply', 'apply'],
   ['atlas:summary:envelopes:queue:apply', 'apply'],
   ['atlas:materialize:feature-envelopes:apply', 'apply'],
-  ['atlas:phase16:latent:apply', 'apply'],
+  ['atlas:phase16:latent:apply', 'apply', false],
   ['atlas:phase16:som:apply', 'apply'],
   ['atlas:phase16:gds:apply', 'apply'],
   ['atlas:bitfrost-semantic-cache:warm:apply', 'apply'],
@@ -190,13 +198,15 @@ export async function runPhase8Fanout({
   stepPlan = buildPhase8StepPlan(dryRun, applyThrough),
 } = {}) {
   const overallStartedAt = Date.now();
-  const stepStates = stepPlan.map(([script], i) => ({
+  const stepStates = stepPlan.map(([script, , critical = true], i) => ({
     id: `step${i + 1}`,
     step_index: i + 1,
     script,
     completed: 0,
     total: 1,
+    critical,
   }));
+  const optionalFailures = [];
 
   logger(`starting [dry-run=${dryRun}] [apply-through=${applyThrough}] [step-timeout=${stepTimeoutMs}ms] [overall-timeout=${overallTimeoutMs}ms] [run-id=${runId}]`);
   tracker.writeEvent(createStepSnapshot(tracker, runId, stepStates, 1, stepStates.length, 'STARTING', overallStartedAt, 'phase8', stepPlan[0]?.[0] ?? 'phase8'));
@@ -210,7 +220,7 @@ export async function runPhase8Fanout({
       stepState.completed = 0;
       tracker.writeEvent(createStepSnapshot(tracker, runId, stepStates, i + 1, stepStates.length, 'TIMED_OUT', overallStartedAt, 'phase8', script));
       process.exitCode = 1;
-      return { ok: false, reason: 'overall-timeout', runId };
+      return { ok: false, reason: 'overall-timeout', runId, optionalFailures };
     }
 
     const elapsed = ((Date.now() - overallStartedAt) / 1000).toFixed(1);
@@ -219,9 +229,18 @@ export async function runPhase8Fanout({
     const result = await runStep(script, stepStates, i + 1, overallStartedAt, 'phase8', runId, tracker, spawnImpl, heartbeatMs, stepTimeoutMs);
 
     if (!result.ok) {
+      if (stepState.critical === false) {
+        logger(
+          `[${i + 1}/${stepPlan.length}] ⚠ ${script} failed after ${result.elapsed}s but is ` +
+          `non-critical (optional derived representation, not a canonical completion predicate ` +
+          `— see docs/reports/graphify-fanout-criticality-01.json); continuing fanout`,
+        );
+        optionalFailures.push({ script, reason: result.timedOut ? 'step-timeout' : 'step-failed', elapsed: result.elapsed });
+        continue;
+      }
       logger(`[${i + 1}/${stepPlan.length}] ✗ ${script} failed after ${result.elapsed}s`);
       process.exitCode = result.timedOut ? 124 : 1;
-      return { ok: false, reason: result.timedOut ? 'step-timeout' : 'step-failed', runId };
+      return { ok: false, reason: result.timedOut ? 'step-timeout' : 'step-failed', runId, optionalFailures };
     }
 
     if (verbose) {
@@ -233,8 +252,12 @@ export async function runPhase8Fanout({
   }
 
   const elapsedSec = ((Date.now() - overallStartedAt) / 1000).toFixed(1);
-  logger(`complete in ${elapsedSec}s`);
-  return { ok: true, runId };
+  if (optionalFailures.length > 0) {
+    logger(`complete in ${elapsedSec}s WITH ${optionalFailures.length} non-critical step failure(s): ${optionalFailures.map((f) => f.script).join(', ')}`);
+  } else {
+    logger(`complete in ${elapsedSec}s`);
+  }
+  return { ok: true, runId, optionalFailures };
 }
 
 const isMain = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
