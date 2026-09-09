@@ -196,32 +196,61 @@ async function computeCommunityCentroids(pgPool, communityMembers) {
 }
 
 /**
- * Mirrors leiden_community_id into Qdrant codebase_chunks_768 payloads. Originally modeled on
- * writeAuthorityScoresToQdrant()'s (src/lib/server/graph/neo4j-gds.ts) scroll+patch pattern and
- * its `stable_key` payload field -- but a live payload inspection (2026-09-09, after a first
- * --apply run matched 0/59692 points) found `codebase_chunks_768`'s current live payload shape
- * has NO `stable_key` field at all (verified via a real scroll: fields present are `source_ref`,
- * `path`, `relative_path`, `file_path`, none named `stable_key`). This is a real payload-schema
- * drift from what that function assumed, not a bug in this new sync -- flagged here rather than
- * silently worked around, since `writeAuthorityScoresToQdrant()` itself is likely equally
- * affected and worth a separate audit. This sync instead matches on whichever of `path`,
- * `relative_path`, or `file_path` is present (bare paths, matching Neo4j's own `n.path`), plus
- * `source_ref`/`sourceRef` with the `sveltekit-frontend/` prefix stripped, since sample payloads
- * showed both bare and prefixed forms coexisting across points.
+ * Mirrors leiden_community_id into Qdrant codebase_chunks_768 payloads.
+ *
+ * LEIDEN-QDRANT-IDENTITY-JOIN-01 (2026-09-09): the original version of this function joined on
+ * bare file `path` alone (`path`/`relative_path`/`file_path`/`source_ref`/`sourceRef`), modeled on
+ * writeAuthorityScoresToQdrant()'s (src/lib/server/graph/neo4j-gds.ts) scroll+patch pattern. A
+ * live read-only census run AFTER that version had already applied (79,768/109,774 Qdrant points
+ * patched) found this was WRONG, not just imprecise: 96.2% of paths (3,129/3,254) mapped to more
+ * than one Leiden community (avg 18.2, max 505 communities per path). Root cause, verified live in
+ * Neo4j: Leiden clusters at SYMBOL granularity, not FILE granularity -- a single file can back
+ * hundreds of separate `:Packet` nodes (one per type/const/function/table-def/etc.), each with its
+ * OWN independent `leiden_community_id`. Path-only matching therefore picked one arbitrary
+ * symbol's community (whichever the JS build loop wrote last for that path) and stamped it onto
+ * EVERY Qdrant chunk for that file -- wrong for ~239/240 chunks on a typical multi-symbol file.
+ *
+ * **Prevention note for future syncs of this shape**: when mirroring a graph-computed property
+ * from Neo4j into a chunk-level store like Qdrant, verify the two sides' identity GRANULARITY
+ * matches before assuming a shared field (like `path`) is a safe join key -- do not assume a
+ * cardinality of 1:1 just because a field exists on both sides with the same name. A cheap way to
+ * check up front: `MATCH (n:Label) WITH n.<candidateKey> AS k, count(*) AS n RETURN max(n)` -- if
+ * that returns > 1, the candidate key is not a valid identity for a per-node property.
+ *
+ * **The fix**: join on the composite `(path, symbol)` instead. Verified collision-free live
+ * (0/7,477 (path, symbol) pairs collide across the whole graph, vs 96.2% for path alone). Real
+ * trade-off, not free: only 13,424/109,776 (12.2%) of Qdrant points carry a populated `symbol`
+ * payload field (most chunks are coarser than symbol-level, e.g. whole-file or paragraph chunks),
+ * so this join necessarily covers far fewer points than the flawed path-only version did. That is
+ * the correct outcome -- correctness over coverage. Points with no `symbol` field are left
+ * unmirrored (no leiden_community_id at all) rather than guessed. This is still explicitly a
+ * coverage-limited stopgap, not the "sealed" final identity join this repo's governance calls
+ * for (a real shared packet_key/chunk_id/symbol_version_id would give both correctness AND full
+ * coverage) -- flagged as follow-up work, not solved here.
+ *
+ * **Cleanup of the prior wrong run**: this function now ALSO clears `leiden_community_id` from any
+ * point that currently has it set but does not resolve under the new (path, symbol) join --
+ * otherwise the 79,768 wrongly-patched points from the flawed run would remain silently wrong
+ * forever. Every scanned point is therefore either set to its correct value, left untouched (never
+ * had the field, still doesn't match), or explicitly cleared (had it, doesn't match the correct
+ * join) -- never left with a stale incorrect value.
  */
-async function syncLeidenToQdrant(pathToCommunity) {
+async function syncLeidenToQdrant(pathSymbolToCommunity) {
   let mirrored = 0;
+  let cleared = 0;
   let errors = 0;
   let offset = null;
   const BATCH = 100;
-  const PAYLOAD_FIELDS = ['path', 'relative_path', 'file_path', 'source_ref', 'sourceRef'];
 
   function resolveCommunityId(payload) {
-    for (const field of PAYLOAD_FIELDS) {
-      const raw = payload?.[field];
+    const symbol = payload?.symbol;
+    if (!symbol) return undefined;
+    for (const pathField of ['path', 'relative_path', 'file_path']) {
+      const raw = payload?.[pathField];
       if (!raw) continue;
       const bare = String(raw).replace(/^sveltekit-frontend\//, '');
-      if (bare in pathToCommunity) return pathToCommunity[bare];
+      const key = `${bare}::${symbol}`;
+      if (key in pathSymbolToCommunity) return pathSymbolToCommunity[key];
     }
     return undefined;
   }
@@ -229,7 +258,7 @@ async function syncLeidenToQdrant(pathToCommunity) {
   while (true) {
     const scrollBody = JSON.stringify({
       limit: BATCH,
-      with_payload: PAYLOAD_FIELDS,
+      with_payload: ['path', 'relative_path', 'file_path', 'symbol', 'leiden_community_id'],
       with_vector: false,
       ...(offset ? { offset } : {}),
     });
@@ -247,19 +276,30 @@ async function syncLeidenToQdrant(pathToCommunity) {
 
     for (const pt of pts) {
       const communityId = resolveCommunityId(pt.payload);
-      if (communityId === undefined) continue;
-      const patchRes = await fetch(`${QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/payload`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          payload: { leiden_community_id: communityId },
-          points: [pt.id],
-        }),
-      }).catch(() => null);
-      if (patchRes?.ok) {
-        mirrored++;
-      } else {
-        errors++;
+      const hadStaleValue = pt.payload?.leiden_community_id !== undefined && pt.payload?.leiden_community_id !== null;
+
+      if (communityId !== undefined) {
+        const patchRes = await fetch(`${QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/payload`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            payload: { leiden_community_id: communityId },
+            points: [pt.id],
+          }),
+        }).catch(() => null);
+        if (patchRes?.ok) mirrored++; else errors++;
+      } else if (hadStaleValue) {
+        // Had a value from the flawed path-only run but doesn't resolve under the correct
+        // (path, symbol) join -- clear it rather than leave a known-wrong value in place.
+        const deleteRes = await fetch(`${QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/payload/delete`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            keys: ['leiden_community_id'],
+            points: [pt.id],
+          }),
+        }).catch(() => null);
+        if (deleteRes?.ok) cleared++; else errors++;
       }
     }
 
@@ -267,7 +307,7 @@ async function syncLeidenToQdrant(pathToCommunity) {
     if (!offset) break;
   }
 
-  return { mirrored, errors };
+  return { mirrored, cleared, errors };
 }
 
 async function ensureProjectionDropped(session) {
@@ -372,7 +412,7 @@ async function computeLeiden() {
       const allRes = await session.run(`
         MATCH (n:Packet)
         WHERE n.leiden_community_id IS NOT NULL AND n.path IS NOT NULL
-        RETURN n.path as path, n.leiden_community_id as community_id
+        RETURN n.path as path, n.symbol as symbol, n.leiden_community_id as community_id
       `);
 
       const recordCount = allRes.records.length;
@@ -381,14 +421,19 @@ async function computeLeiden() {
       // Build canonical Leiden community records after the sync pass.
       const communityStats = {};
       const communityMembers = {};
-      const pathToCommunity = {}; // raw n.path (matches Qdrant stable_key/source_ref), for Qdrant sync below
+      // LEIDEN-QDRANT-IDENTITY-JOIN-01: keyed by "path::symbol", NOT path alone -- Leiden clusters
+      // at symbol granularity (many :Packet nodes per file), so path alone is not a valid identity
+      // join key (verified live: 96.2% collision rate). See syncLeidenToQdrant()'s header comment
+      // for the full finding. Nodes with no symbol are excluded from this map (and therefore from
+      // the Qdrant mirror) rather than guessed.
+      const pathSymbolToCommunity = {};
       for (const record of allRes.records) {
-        const { path, community_id } = record.toObject();
+        const { path, symbol, community_id } = record.toObject();
         const idNum = community_id.toNumber ? community_id.toNumber() : parseInt(community_id);
         communityStats[idNum] = (communityStats[idNum] || 0) + 1;
         if (!communityMembers[idNum]) communityMembers[idNum] = [];
         communityMembers[idNum].push(`sveltekit-frontend/${path}`);
-        pathToCommunity[path] = idNum;
+        if (symbol) pathSymbolToCommunity[`${path}::${symbol}`] = idNum;
       }
 
       console.log('📐 Step 3a: Compute per-community cohesion (intra-community edge density)\n');
@@ -449,11 +494,12 @@ async function computeLeiden() {
       const withCohesion = commIds.filter((id) => (cohesionByCommunity[Number(id)] ?? 0) > 0).length;
       console.log(`   (${withEmbedding}/${commIds.length} with a computed embedding centroid, ${withCohesion}/${commIds.length} with cohesion_score > 0)\n`);
 
-      console.log('🔗 Step 3c: Mirror leiden_community_id into Qdrant payloads\n');
-      const qdrantSyncResult = await syncLeidenToQdrant(pathToCommunity);
-      console.log(`   ✅ Mirrored leiden_community_id onto ${qdrantSyncResult.mirrored} Qdrant points`);
+      console.log('🔗 Step 3c: Mirror leiden_community_id into Qdrant payloads (path+symbol join)\n');
+      const qdrantSyncResult = await syncLeidenToQdrant(pathSymbolToCommunity);
+      console.log(`   ✅ Mirrored leiden_community_id onto ${qdrantSyncResult.mirrored} Qdrant points (correct path+symbol match)`);
+      console.log(`   🧹 Cleared leiden_community_id from ${qdrantSyncResult.cleared} points that had a stale/incorrect value from the prior path-only sync`);
       if (qdrantSyncResult.errors > 0) {
-        console.warn(`   ⚠️  ${qdrantSyncResult.errors} points failed to patch (non-fatal, logged only)\n`);
+        console.warn(`   ⚠️  ${qdrantSyncResult.errors} points failed to patch/clear (non-fatal, logged only)\n`);
       } else {
         console.log('');
       }

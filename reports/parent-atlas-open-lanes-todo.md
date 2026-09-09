@@ -138,17 +138,32 @@ section for the full item-by-item mapping before acting on the list below.
     where most communities are singletons) and real (not always-NULL) `embedding` centroids
     (3,003/38,700 — mean-pool of member packets' `content_embedding`, computed via one
     batched bulk query rather than one query per community). `leiden_community_id` is now
-    also mirrored into Qdrant `codebase_chunks_768` payloads (79,768/109,774 points,
-    73% — same scroll+patch pattern as `writeAuthorityScoresToQdrant`), closing the
-    "Leiden membership invisible to retrieval" gap.
-  - **Real bug found and fixed during this**: the first Qdrant-sync attempt matched 0/59,692
-    points — it assumed a `stable_key` payload field (copied from
-    `writeAuthorityScoresToQdrant`'s convention) that a live payload inspection showed does
-    not exist on this collection's current payload shape at all. Fixed to match on
-    `path`/`relative_path`/`file_path`/`source_ref`/`sourceRef` instead, verified against
-    real payloads before re-running. `writeAuthorityScoresToQdrant` itself is likely
-    equally affected by the same drift — flagged, not fixed here (out of this Leiden-scoped
-    pass).
+    also mirrored into Qdrant `codebase_chunks_768` payloads.
+  - **LEIDEN-QDRANT-IDENTITY-JOIN-01 (2026-09-09, closed)**: the first Qdrant-sync attempt
+    matched 0/59,692 points on a `stable_key` field that doesn't exist on this collection's
+    live payload shape; fixed to match on bare `path` and applied live (79,768/109,774
+    points, 73%). A read-only census AFTER that apply then found path alone is NOT a valid
+    identity join: 96.2% of paths (3,129/3,254) mapped to more than one Leiden community
+    (avg 18.2, max 505/path) — root cause, verified in Neo4j: Leiden clusters at SYMBOL
+    granularity (up to 240 separate `:Packet` nodes share one file path), so path-only
+    matching stamped one arbitrary symbol's community onto every chunk of that file. Fixed
+    by joining on `(path, symbol)` instead — verified collision-free live (0/7,477 pairs).
+    Re-ran the full apply with the corrected join: **13,417/109,774 Qdrant points correctly
+    mirrored** (99.9% of the 13,424 points that carry a `symbol` payload field — coverage is
+    necessarily much lower than the flawed 73%, since most chunks aren't symbol-level;
+    correctness over coverage) and **66,351 points had their stale/wrong path-only value
+    explicitly cleared** (13,417 + 66,351 = 79,768, exactly accounting for every previously
+    -patched point). Cross-store readback (`LEIDEN-CROSS-STORE-READBACK-01`) sampled 21
+    distinct (path, symbol) pairs from the corrected Qdrant mirror and confirmed all 21
+    agree exactly with Neo4j's live `leiden_community_id` — 0 mismatches. Full root-cause
+    writeup and the general prevention rule (verify identity GRANULARITY, not just field
+    name, before any cross-store ID sync) are in root `CLAUDE.md`'s Key Lessons section.
+    `writeAuthorityScoresToQdrant()` (PageRank/Louvain → Qdrant) has NOT been re-audited for
+    the same risk — flagged, not checked.
+  - Still coverage-limited, not the final "sealed" identity join this repo's governance
+    calls for — a real shared `packet_key`/`chunk_id`/`symbol_version_id` present on both
+    Neo4j and every Qdrant chunk (not just symbol-level ones) would give correctness AND
+    full coverage. Tracked as follow-up, not solved here.
   - **Not fixed, flagged**: `community_reports_leiden` has no cleanup between runs — a
     community_id from a prior run that no longer exists in a later run's assignment stays
     as a stale row forever (`ON CONFLICT DO UPDATE` only touches community_ids present in
