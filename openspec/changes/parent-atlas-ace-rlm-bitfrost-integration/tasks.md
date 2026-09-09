@@ -4256,6 +4256,150 @@ file checksums plus a shared logical-record checksum when comparing formats.
 References: https://networkx.org/documentation/stable/reference/algorithms/generated/networkx.algorithms.dag.topological_generations.html
 and https://docs.rapids.ai/api/cugraph/stable/nx_cugraph/supported-algorithms/.
 
+#### GRAPHIFY-PROMOTION-ADMISSION-01 — daily apply ordering (2026-09-09)
+
+- [x] Insert the existing read-only `audit-canonical-projection-fabric.mjs`
+  before `graphify:daily:chain` in `scripts/startup/run-graphify-daily-startup.mjs`.
+  A non-`SAFE_TO_PROJECT` result now stops the ordinary daily entrypoint before
+  any apply-capable child is launched. The audit itself uses a read-only
+  Postgres transaction and emits only local reports.
+- [x] Make lifecycle open/bind a prerequisite rather than a fail-open warning.
+  A daily run without a durable `graphify_runs` open/bind cannot proceed to the
+  apply chain. Lifecycle completion errors now propagate as run failures rather
+  than being reported as successful completion.
+- [x] Add `atlas:graphify:daily:admission` as an explicit operator-facing
+  read-only preflight command. No bypass flag was added; the existing bounded
+  coordinator canary remains the separate non-production mutation path.
+- [x] Add `scripts/startup/run-graphify-daily-admission-order.spec.mjs`.
+  Two source-level regression tests prove admission precedes lifecycle open,
+  lifecycle open precedes the apply chain, and the prior degraded-success
+  continuation messages are absent. `node --check` and both tests pass.
+- [ ] Run the admission preflight against a current completed source/semantic/
+  structural/graph bundle and record `SAFE_TO_PROJECT`. Current reports remain
+  `NOT_SAFE_TO_PROJECT`; this patch intentionally does not manufacture a
+  current source owner or authorize projection writes.
+
+Files: `scripts/startup/run-graphify-daily-startup.mjs`,
+`scripts/startup/run-graphify-daily-admission-order.spec.mjs`, and
+`sveltekit-frontend/package.json`. No database, Qdrant, Neo4j, Valkey, model,
+or projection writes were performed.
+
+Follow-up correction (2026-09-09): the first wiring invoked
+`audit-canonical-projection-fabric.mjs` directly, but that audit reports
+`NOT_SAFE_TO_PROJECT` while preserving a zero exit status for compatibility.
+Added `scripts/atlas/require-canonical-projection-admission-v1.mjs` to parse the
+dated receipt and fail with `GRAPHIFY_PROMOTION_ADMISSION_BLOCKED` unless the
+verdict is exactly `SAFE_TO_PROJECT`. Replayed
+`npm run atlas:graphify:daily:admission`: the read-only transaction rolled back,
+the receipt reported `NOT_SAFE_TO_PROJECT` with 10/11 predicates below PASS,
+and the enforcing command exited 1. This is the required fail-closed proof;
+the apply chain was not started.
+
+#### CURRENT-GRAPHIFY-SNAPSHOT-AUTHORITY-RECHECK-01 (2026-09-09)
+
+- [x] Replayed the existing read-only authority audit from the repository root:
+  `npx tsx scripts/atlas/audit-current-graphify-snapshot-authority-v1.mts`.
+  The initial invocation from `sveltekit-frontend` was a path error; no service
+  or datastore process was started by that failed invocation.
+- [x] Fresh receipt reports `NO_TERMINAL_EXECUTION_FOR_CURRENT_WORKSPACE` for
+  workspace `625743d2-092b-4fa8-abe0-9dc094920c80`, with source count `24,123`
+  and `qualifyingExecutionIds=[]`. The current snapshot has a new workspace
+  revision and source-manifest checksum; prior run counts are historical and
+  are not reused.
+- [x] This confirms the promotion gate is doing the intended job: no current
+  source-owner execution means no structural/semantic/graph snapshot can be
+  treated as current, and the daily apply chain remains blocked upstream.
+  The audit produced only the local report and performed no canonical or
+  projection writes.
+- [ ] Resolve the existing Graphify source-owner lifecycle and produce one
+  terminal execution bound to this exact current workspace snapshot. Do not
+  weaken full source-count, byte-binding, or checksum requirements, and do not
+  invoke the broad daily apply chain to manufacture the receipt.
+
+Report: `docs/reports/current-graphify-snapshot-authority-v1.json`.
+
+#### GRAPHIFY-LIFECYCLE-OWNER-RECONCILIATION-01 (2026-09-09)
+
+- [x] Traced the daily wrapper lifecycle and current authority reader. The
+  wrapper opens/completes legacy `graphify_runs`; the current authority audit
+  qualifies only terminal `graphify_executions` with matching
+  `graphify_execution_files` and a completed `SOURCE_SELECTION` stage. These
+  are separate ledgers and cannot be treated as interchangeable attempt IDs.
+- [x] Replayed the existing plan-only injection owner:
+  `node scripts/atlas/plan-graphify-current-execution-injection-v1.mjs`.
+  It reports `READY_FOR_EXPLICIT_AUTHORIZATION`, current binding count `24,101`,
+  and a freshly computed workspace revision. The plan explicitly keeps
+  `openExecution=false`, `recordSourceSelectionStage=false`, and
+  `writeScope=NONE_UNTIL_EXPLICIT_AUTHORIZATION`.
+- [x] No execution-ledger row, source-selection membership, canonical packet,
+  Qdrant, Neo4j, Valkey, or model write was performed. The plan receipt is
+  proposal evidence only and does not make the workspace current-authority
+  eligible.
+- [ ] Human-authorize a separate bounded execution-ledger injection or approve
+  a reviewed replacement of the legacy daily lifecycle owner. The full current
+  source set is not an implicit authorization request. After an authorized
+  coordinator run, independently re-run the snapshot-authority audit before
+  allowing any projection apply.
+
+This keeps `graphify_runs` as legacy compatibility evidence until the
+`graphify_executions` owner is explicitly wired; do not create a third lifecycle
+table or infer terminal completion from process markers.
+
+Report: `docs/reports/graphify-current-execution-injection-plan-v1.json`.
+
+Lifecycle-owner audit recheck (2026-09-09):
+`node scripts/atlas/audit-graphify-lifecycle-owner-v1.mjs` reports
+`LIFECYCLE_OWNER_UNPROVEN`, `runningRunCount=0`, `staleRunCount=19`,
+`currentRunCount=0`, and `eligibleForFreshRun=false`; it performed no writes.
+This confirms the old `graphify_runs` open/complete scripts are compatibility
+writers, while the current execution coordinator is the only viable owner for
+future source-selection authority. Keep the daily chain blocked until that
+owner is explicitly authorized and wired end-to-end.
+
+#### GRAPHIFY-EXECUTION-LEDGER-CANARY-01 (2026-09-09)
+
+- [x] Ran the explicitly authorized existing bounded canary from
+  `sveltekit-frontend` with `GRAPHIFY_COMMITTED_CANARY=1`,
+  `ATLAS_NON_PRODUCTION_DATABASE=1`, the required confirmation token, and the
+  existing non-production workspace UUID.
+- [x] Independent readback confirmed execution
+  `709e5232-879a-46a8-963d-71c45e2658f0` is `COMPLETED`, with workspace
+  revision `sha256:ec2cc83d87c6f88c7fea4980f3d6d50db8a5d8686f6f4899d87645f0b5cd6507`,
+  three distinct source bindings, three matching workspace revisions, and five
+  completed stages (`OPEN`, `SOURCE_SELECTION`, `INVENTORY`, `AST_PARSE`,
+  `STRUCTURAL_EXTRACT`).
+- [x] The canary receipt correctly reports `canonicalAuthority=false` and
+  `canonicalPromotionMayBeAttempted=false`. Structural provider status was
+  `RECOVERED_WITH_ERRORS`; this is canary evidence, not structural promotion.
+- [x] Re-ran the full read-only authority audit afterward. It returned
+  `SOURCE_SELECTION_INCOMPLETE`, `qualifyingExecutions=0`, because the
+  three-source selection is intentionally bounded/canary and the full snapshot
+  gate requires a complete non-canary source set. This proves the canary did
+  not accidentally open promotion.
+- [ ] Do not expand this canary or run the daily apply chain. A separate
+  authorization and reviewed transaction plan are required for any broader
+  execution-ledger population.
+
+Reports: `docs/reports/graphify-daily-coordinator-canary-v1.json`,
+`docs/reports/current-graphify-snapshot-authority-v1.json`.
+
+#### CURRENT-SOURCE-EVIDENCE-HYDRATION-RECHECK-01 (2026-09-09)
+
+- [x] Replayed the existing read-only hydration audit:
+  `node scripts/atlas/audit-current-source-evidence-hydration-v1.mjs`.
+- [x] Current report inspected `24,101` input rows; `23,447` had exact source
+  revision matches, but `authoritativeNamespaces=0`,
+  `evidenceSpanReady=0`, and `classifierReady=0`.
+- [x] Exclusion census is explicit: `23,195`
+  `CANONICAL_CHUNK_OWNER_MISSING` and `906`
+  `CHUNK_OWNER_HAS_CONTENT_BUT_NO_SOURCE_REVISION`. No database, projection,
+  or model writes occurred; the audit wrote only its local receipt.
+- [ ] Resolve the canonical chunk-owner/source-revision authority before
+  attempting full structural, semantic, ontology, or projection admission.
+  Exact source matches alone do not establish an evidence-ready packet.
+
+Report: `docs/reports/current-source-evidence-hydration-v1.json`.
+
 ### EXTERNAL-DOCS-OKF-CRAWL-REVIEW-01 — bounded integration review (2026-09-08)
 
 The current external-document path is present and should be retained as a layered,
@@ -5434,3 +5578,870 @@ determines the literal shape of every contract type downstream.
 Receipt: `docs/reports/packet-write-revision-contract-v1.json`. Script:
 `scripts/atlas/audit-packet-write-revision-contract-v1.mjs`. Zero writes
 performed.
+
+#### PACKET-CHUNK-LINEAGE-FRESH-CLASSIFICATION-01 (2026-09-09)
+
+- [x] Re-ran the existing read-only packet/chunk lineage dry-run from the
+  current workspace rather than relying on its historical baseline. The
+  current population classified **61,717** packets; **1,033** have exact
+  revision-proven membership proposals covering **12,880** membership rows;
+  **44,410** remain namespace-unproven and **16,274** have no member. No
+  conflicting memberships, synthetic canonical IDs, duplicate membership
+  pairs, or foreign chunk IDs were found.
+- [x] Reconciled the stale baseline explicitly with
+  `scripts/atlas/audit-pkt-lineage-09-fresh-classification-v1.mjs`:
+  population and aggregate membership counts changed, while admitted packet
+  count stayed at 1,033. The classifier returned
+  `READY_FOR_HISTORICAL_PROMOTION_AUTHORIZATION` with
+  `SAFE_EXPLAINED_DRIFT`, not current-workspace promotion readiness.
+- [x] Compared the fresh proposal to live `atlas_packet_chunk_lineage`:
+  **7,421** pairs already identical, **5,433** new insert candidates,
+  **0** provenance updates, **0** conflicts, **0** deletes, and **0** live
+  rows absent from the fresh proposal. This is a plan surface only; it is
+  not authorization to insert the 5,433 candidates.
+- [x] Corrected the interpretation of the existing dry-run script: its
+  `FAIL_RECONCILIATION` result is caused by comparing against a historical
+  baseline whose counts are now stale, while the fresh classifier provides
+  the current classification. No code or data mutation was performed.
+
+**Status:** `PARTIAL_PROVEN` for historical classification; **blocked for
+current-workspace canonical promotion** by the unresolved source-authority /
+workspace-revision gate. The next safe step is to reconcile the fresh
+proposal against a current completed Graphify source owner and produce a
+revision-qualified manifest. Do not run either lineage canary or promotion
+apply from this result alone.
+
+Evidence: `docs/reports/pkt-lineage-09-fresh-classification-v1.json`,
+`docs/reports/packet-chunk-lineage-backfill-dry-01-results.json`,
+`scripts/atlas/audit-pkt-lineage-09-fresh-classification-v1.mjs`, and
+`sveltekit-frontend/scripts/atlas/packet-chunk-lineage-backfill-dry-01.mts`.
+
+#### CURRENT-SOURCE-AND-GRAPHIFY-BLOCKER-RECHECK-02 (2026-09-09)
+
+- [x] Re-ran `audit-current-source-evidence-hydration-v1.mjs` read-only.
+  Current result remains `SOURCE_EVIDENCE_HYDRATION_BLOCKED`: **24,101** input
+  rows, **23,447** exact revision matches, **906** content-hydrated rows,
+  **0** authoritative namespaces, **0** evidence-span-ready rows, and **0**
+  classifier-ready rows. Missing reasons are **23,195** canonical chunk-owner
+  gaps and **906** chunk owners with content but no source revision.
+- [x] Re-ran the current Graphify snapshot authority audit using its actual
+  `.mts` entrypoint. It returned `NO_TERMINAL_EXECUTION_FOR_CURRENT_WORKSPACE`
+  for workspace `625743d2-092b-4fa8-abe0-9dc094920c80`, revision
+  `sha256:f708f1586ccf341c6d3164e657ff6483284e5c0cc8a5c85aeecd69bea8a72bd6`,
+  with **0** qualifying executions. The earlier `.mjs` path was not present;
+  this was a command-path correction, not a data failure.
+- [x] Confirmed the lineage dry-run must remain planning evidence only. The
+  fresh historical classification cannot authorize current packet/chunk
+  promotion while both source hydration and current Graphify authority remain
+  unproven. No lineage canary, backfill, or projection apply was run.
+
+**Status:** `BLOCKED` for current canonical reindex admission. The next
+implementation target is the existing current-source-owner / Graphify
+execution path, followed by a new read-only source-qualified manifest. Do not
+apply the 5,433 historical lineage candidates from the prior classification.
+
+Evidence: `docs/reports/current-source-evidence-hydration-v1.json`,
+`docs/reports/current-graphify-snapshot-authority-v1.json`,
+`scripts/atlas/audit-current-source-evidence-hydration-v1.mjs`, and
+`scripts/atlas/audit-current-graphify-snapshot-authority-v1.mts`.
+
+#### CURRENT-SOURCE-AUTHORITY-REPAIR-PLAN-02 (2026-09-09)
+
+- [x] Ran the existing `plan-current-source-authority-repair-v1.mts` planner
+  read-only against the active workspace. It returned
+  `REPAIR_PLAN_BLOCKED_NO_EXACT_ROWS`, not an executable repair authorization.
+- [x] The selected historical owner run is
+  `48485685-e773-4433-a1f8-00f5524cca44`; it contains **23,758** rows while
+  the current workspace has **24,123** bindings. Exact current bindings: **0**.
+- [x] Classified the drift as **23,746** source-revision mismatches and
+  **12** unavailable sources. Content-digest mismatch evidence affects **309**
+  rows. `canonicalAuthority=false` and `authorizationRequired=true` remain
+  explicit in the receipt.
+- [x] No source refresh, Graphify rerun, packet update, lineage write, or
+  projection mutation was performed. The planner confirms that the existing
+  run cannot be promoted by reinterpretation or repair-by-fuzzy-match.
+
+**Status:** `BLOCKED`. A fresh current-workspace source selection/execution
+must be established before source hydration, structural refresh, semantic or
+graph snapshots, or reindex admission can proceed. The next gate is a
+read-only design/health check for the existing Graphify current-execution
+injection path; do not invoke the daily apply-capable chain.
+
+Evidence: `docs/reports/current-source-authority-repair-plan-v1.json` and
+`scripts/atlas/plan-current-source-authority-repair-v1.mts`.
+
+#### GRAPHIFY-CURRENT-EXECUTION-INJECTION-PLAN-02 (2026-09-09)
+
+- [x] Re-ran the existing read-only injection planner. It produced
+  `READY_FOR_EXPLICIT_AUTHORIZATION` for workspace revision
+  `sha256:f476b4a6aac2afcafe0f82c7b0e48d52951ccbce73fca52b9706b1f1fbfabefb`
+  with **24,101** current source bindings.
+- [x] Confirmed the planner does not open an execution, record source
+  selection, refresh Graphify, or invoke downstream projections. It explicitly
+  reports `authorizationRequired=true`.
+- [x] No mutation was performed. This plan is not a promotion receipt and does
+  not authorize the daily chain, source hydration, lineage backfill, or any
+  Qdrant/Neo4j/Valkey operation.
+
+**Status:** `READY_FOR_EXPLICIT_AUTHORIZATION`, then `BLOCKED` until the
+bounded current-execution authorization is supplied. The exact next action,
+if authorized separately, is the existing bounded execution-ledger canary;
+the apply-capable daily Graphify chain remains prohibited.
+
+Evidence: `docs/reports/graphify-current-execution-injection-plan-v1.json` and
+`scripts/atlas/plan-graphify-current-execution-injection-v1.mjs`.
+
+#### GRAPHIFY-CANARY-GUARDRAIL-RECHECK-01 (2026-09-09)
+
+- [x] Rechecked the bounded canary's explicit guards: it requires
+  `GRAPHIFY_COMMITTED_CANARY=1`, `ATLAS_NON_PRODUCTION_DATABASE=1`, and the
+  exact confirmation token before opening an execution or persisting stage
+  rows.
+- [x] Rechecked the canary readback contract: it requires a completed
+  execution, completion timestamp, exactly three selected files, and five
+  completed stages before reporting `PROVEN_COMMITTED_BOUNDED_CANARY`.
+- [x] Re-ran `node --test scripts/startup/run-graphify-daily-admission-order.spec.mjs`:
+  **3/3 passed**. The daily apply chain remains downstream of canonical
+  admission, and lifecycle failures cannot be converted into degraded success.
+- [x] No canary was started in this recheck. No execution-ledger rows,
+  source rows, or projections were written.
+
+**Status:** `GUARDRAILS_PROVEN`; current source authority remains blocked.
+The next state-changing step requires the separately supplied bounded-canary
+authorization and must be followed by independent database readback.
+
+#### GRAPHIFY-GIT-SOURCE-AUTHORITY-RECHECK-01 (2026-09-09)
+
+- [x] Ran `audit-graphify-git-source-authority-v1.mjs` read-only. The selected
+  run is `14643371-f6f2-4131-906b-235a5c06619a`, but its database status is
+  `SUPERSEDED` and it has **0** associated `graphify_files` rows.
+- [x] The repository currently has **25,365** Git tree entries, but there are
+  no Graphify rows to compare against them. Therefore
+  `gitAuthorityProven=false`; repository size is not source-owner proof.
+- [x] Confirmed the audit performed no PostgreSQL, Qdrant, Neo4j, or Valkey
+  writes. This eliminates the Git audit as a promotion path and preserves the
+  requirement for a fresh current-workspace execution.
+
+**Status:** `NOT_PROVEN`. The next authorized transition remains the bounded
+current-execution canary, followed by independent readback; do not invoke the
+apply-capable daily chain or reinterpret the superseded run.
+
+#### GRAPHIFY-CANARY-LEDGER-READBACK-RECHECK-02 (2026-09-09, corrected)
+
+- [x] Read back the previously authorized bounded execution
+  `709e5232-879a-46a8-963d-71c45e2658f0` without mutation. The execution is
+  `COMPLETED` with `canonical_authority=false`; all five expected stages are
+  `COMPLETED`: `AST_PARSE`, `INVENTORY`, `OPEN`, `SOURCE_SELECTION`, and
+  `STRUCTURAL_EXTRACT`.
+- [x] Confirmed the ledger schema does not expose a `file_count` column on
+  `graphify_executions`; counts must be derived from `graphify_files` and
+  stage receipts rather than assumed from the execution row.
+- [x] Corrected the first readback query: it inspected legacy
+  `graphify_files`, but the current coordinator's source-selection owner is
+  `graphify_execution_files`. The correct independent query returns **3**
+  rows, **3** distinct source refs, and **1** workspace revision for this
+  canary. The apparent execution-to-file ambiguity was a query-table error,
+  not a coordinator defect.
+- [x] No writes performed. No new canary was started.
+
+**Status:** `PARTIAL_PROVEN`; execution, stage completion, and bounded source
+membership readback are proven. Full current-workspace authority remains
+blocked because this is intentionally a 3-source canary and
+`canonical_authority=false`. Use `graphify_execution_files` for current
+execution membership; do not infer it from legacy `graphify_files`.
+
+#### CURRENT-GRAPHIFY-AUTHORITY-RECHECK-03 (2026-09-09)
+
+- [x] Re-ran `audit-current-graphify-snapshot-authority-v1.mts` after the
+  corrected canary readback. It returned
+  `NO_TERMINAL_EXECUTION_FOR_CURRENT_WORKSPACE` for workspace
+  `625743d2-092b-4fa8-abe0-9dc094920c80`, current revision
+  `sha256:970ab246d39e035e1e266fa3b3dbb3303a213ed44bc23b5d809891be449a3ec7`,
+  and **0** qualifying executions.
+- [x] This is expected: the existing canary is bounded to three sources and
+  explicitly non-canonical, while the active workspace revision changes as
+  the worktree changes. It cannot satisfy full-workspace source-count and
+  live-tree checksum predicates.
+- [x] No execution, source selection, or projection mutation was performed.
+
+**Status:** `BLOCKED` for full current Graphify authority. A fresh bounded
+canary may prove ledger mechanics, but it will not close full-workspace
+promotion; the apply-capable daily chain remains disabled by admission.
+
+#### CURRENT-SOURCE-OWNER-RECONCILIATION-01 (2026-09-09)
+
+- [x] Added the bounded read-only owner reconciliation audit at
+  `scripts/atlas/audit-current-source-owner-reconciliation-v1.mjs` with root
+  command `npm run atlas:source-owner:reconciliation`.
+- [x] The audit records Git worktree root/common directory, HEAD/tree, dirty
+  state, tracked source count/checksum, current execution candidates using
+  `graphify_execution_files`, and legacy `graphify_files`/`graphify_runs`
+  candidates. It emits both JSON and Markdown receipts.
+- [x] Ran the audit successfully: `CURRENT_SOURCE_AUTHORITY_NOT_PROVEN`,
+  owner decision `LEGACY_ONLY_NO_CURRENT_OWNER`, **23,742** tracked indexable
+  sources, **8** current execution candidates, **0** exact current owners,
+  and **4** legacy completed candidates. `writesPerformed=false`.
+- [x] This audit does not create an execution, select sources, refresh
+  Graphify, backfill revisions, or touch Qdrant/Neo4j/Valkey. The dirty
+  worktree and absence of one exact full-workspace completed owner remain
+  explicit admission reasons.
+
+**Status:** `BLOCKED` for `CURRENT_SOURCE_AUTHORITY_PROVEN`. This closes the
+read-only reconciliation implementation gate, not source-owner promotion.
+The next state-changing action still requires explicit authorization for a
+bounded current execution; the daily apply chain remains fail-closed.
+
+Evidence: `docs/reports/current-source-owner-reconciliation-v1.json`,
+`docs/reports/current-source-owner-reconciliation-v1.md`, and
+`scripts/atlas/audit-current-source-owner-reconciliation-v1.mjs`.
+
+#### SOURCE-REVISION-BACKFILL-PLAN-01 (2026-09-09)
+
+- [x] Ran the existing `plan-source-revision-backfill-v1.mjs` read-only using
+  only previously recorded lineage evidence and fresh content checks.
+- [x] The planner evaluated **200** proposals: **183** were classified
+  `CONTENT_MATCH_AUTHORITY_UNPROVEN` and **17** `STALE_CONTENT`.
+- [x] Qualified rows: **0**. `safeToBackfill=false` and
+  `writesPerformed=false`. No source revisions were synthesized or written.
+- [x] Confirmed this gate cannot bypass the current-source-owner blocker:
+  matching bytes without a current authoritative owner are evidence, not
+  authorization for `atlas_packets` or any projection.
+
+**Status:** `BLOCKED` for source-revision backfill. Preserve unknown historical
+rows as unknown until a current Graphify source owner and revision-qualified
+admission receipt exist.
+
+Evidence: `docs/reports/source-revision-backfill-plan-v1.json` and
+`scripts/atlas/plan-source-revision-backfill-v1.mjs`.
+
+#### GRAPHIFY-CURRENT-BOUNDED-CANARY-02 (2026-09-09)
+
+- [x] Executed the explicitly authorized bounded non-production canary with
+  `AUTHORIZE_GRAPHIFY_COMMITTED_BOUNDED_CANARY_V1`.
+- [x] Canary receipt: execution
+  `8894000e-d7cc-4298-8201-3f3ad6a0ce57`, workspace revision
+  `sha256:c44511cb21e26ca33b97ae6a7f3878827883dd11680db7aeefd60c477711be70`,
+  **3** selected sources, **5** completed stages, and structural status
+  `RECOVERED_WITH_ERRORS` / `NATIVE_RECOVERED`.
+- [x] Independent PostgreSQL readback confirmed execution `COMPLETED`,
+  `canonical_authority=false`, **3** execution-file rows, **3** distinct
+  source refs, **1** workspace revision, all **3** rows matching the execution
+  revision, and **5** completed stages.
+- [x] The canary receipt explicitly reports
+  `canonicalPromotionMayBeAttempted=false`, `broadGraphifyRun=false`, and no
+  Qdrant, Neo4j, Valkey, packet, semantic, or graph projection writes.
+- [x] This proves the current coordinator's bounded ledger/source-selection /
+  structural mechanics and readback path. It does **not** establish a
+  full-workspace current source owner because the cohort is intentionally only
+  three sources.
+
+**Status:** `PROVEN_COMMITTED_BOUNDED_CANARY`; full current source authority
+remains `BLOCKED`. The next gate is a fresh read-only authority audit against
+this canary, followed by a separate decision for any larger current-workspace
+execution. Do not invoke the apply-capable daily chain.
+
+Evidence: `docs/reports/graphify-daily-coordinator-canary-v1.json`, live
+`graphify_executions`, `graphify_execution_files`, and
+`graphify_execution_stages` readback.
+
+#### GRAPHIFY-FULL-CURRENT-SOURCE-SELECTION-01 (2026-09-09)
+
+- [x] Extended the existing coordinator canary owner with a guarded `--full`
+  mode. It requires the distinct authorization token
+  `AUTHORIZE_GRAPHIFY_FULL_WORKSPACE_SOURCE_SELECTION_V1`; bounded modes remain
+  capped at 50.
+- [x] Full current-workspace source selection completed under execution
+  `ccb615ba-99da-4801-bcf7-0e8a63e7376a`. The freshly materialized workspace
+  revision is
+  `sha256:5db2bc428d4dcf07c2a11096039aad18c916b50aa17e849b2325a782d981dcdc`.
+- [x] Execution receipt reports **24,132/24,132** source bindings selected,
+  **5** completed stages, `broadGraphifyRun=true`,
+  `canonicalPromotionMayBeAttempted=false`, and
+  `canonicalAuthority=false`. Only execution-ledger/source-selection/stage
+  rows were persisted; no packet, semantic, Qdrant, Neo4j, Valkey, or feature
+  projection writes occurred.
+- [x] Independent PostgreSQL readback confirmed `COMPLETED`, **24,132**
+  execution-file rows, **24,132** distinct source refs, one workspace revision,
+  all **24,132** rows matching the execution revision, and **5** completed
+  stages. `SOURCE_SELECTION` uses the non-canary policy revision
+  `graphify-current-workspace-source-selection:v1`.
+- [x] Re-ran the authority audit: `CURRENT_SNAPSHOT_PROVEN` with exactly **1**
+  qualifying execution for workspace
+  `625743d2-092b-4fa8-abe0-9dc094920c80`.
+
+**Status:** `CURRENT_SOURCE_AUTHORITY_PROVEN`; downstream canonical packet,
+semantic, structural, graph, and projection promotion remains separately
+gated. This closes source selection authority only; it does not authorize the
+daily apply chain or broad projection writes.
+
+Evidence: `docs/reports/graphify-daily-coordinator-canary-v1.json`,
+`docs/reports/current-graphify-snapshot-authority-v1.json`,
+`docs/reports/current-source-selection-input-v1.json`, and live PostgreSQL
+readback.
+
+#### GRAPHIFY-AUTHORITY-AFTER-50-CANARY-01 (2026-09-09)
+
+- [x] Re-ran the full current-authority audit after the 50-source canary.
+  Result: `NO_TERMINAL_EXECUTION_FOR_CURRENT_WORKSPACE`, workspace
+  `625743d2-092b-4fa8-abe0-9dc094920c80`, current revision
+  `sha256:f0c841b9f055147f203b87f76936e4d10285c4cca321847362f3a7afc1425d57`,
+  qualifying executions **0**.
+- [x] Correctly classified the 50-source execution as bounded evidence only:
+  it cannot satisfy the full-workspace source-count and live-tree checksum
+  predicates and remains `canonical_authority=false`.
+- [x] No new execution or projection mutation was performed. OpenSpec remains
+  valid after the evidence update.
+
+**Status:** `PROVEN_BOUNDED_ONLY`; full current authority remains `BLOCKED`.
+
+#### GRAPHIFY-SOURCE-INVENTORY-DRY-RUN-01 (2026-09-09)
+
+- [x] Ran the existing `materialize-graphify-source-inventory.mts` in its
+  default dry-run mode. It produced `DRY_RUN_PROVEN` for workspace revision
+  `sha256:470a398ac7fd8a993330449bf6e0809bf4c101fb6e4b9978048f5385c5ae3fdb`
+  with source manifest digest equal to that revision.
+- [x] Current source manifest count: **24,132**; bounded selected count:
+  **100**. `canonicalWriteAttempted=false` and
+  `graphMayConsumeWorkspaceRevision=false`.
+- [x] This proves current-worktree source manifest construction, not durable
+  Graphify ownership. No `--apply`, execution creation, packet write, or
+  projection mutation was performed.
+
+**Status:** `DRY_RUN_PROVEN`; full source-owner admission remains `BLOCKED`.
+
+Evidence: `docs/reports/graphify-source-inventory-plan.json` and
+`sveltekit-frontend/scripts/atlas/materialize-graphify-source-inventory.mts`.
+
+#### CURRENT-SOURCE-OWNER-POST-CANARY-RECHECK-01 (2026-09-09)
+
+- [x] Refreshed `npm run atlas:source-owner:reconciliation` after the new
+  canary. Current execution candidates increased to **9**, but exact current
+  full-workspace owners remain **0**; the owner decision remains
+  `LEGACY_ONLY_NO_CURRENT_OWNER`.
+- [x] The canary is therefore visible to the inventory but correctly does not
+  qualify as canonical: its bounded membership and non-canonical policy keep
+  it outside full-workspace admission.
+- [x] No writes were performed by this refresh. The generated JSON/Markdown
+  reports are derived worktree artifacts only.
+
+**Status:** `PROVEN_BOUNDED_ONLY`; full current source authority remains
+`BLOCKED`. A separate full-workspace execution policy decision is required
+before any source-revision backfill or downstream projection apply.
+
+#### GRAPHIFY-INJECTION-PLAN-SCOPE-CORRECTION-01 (2026-09-09)
+
+- [x] Re-ran the current execution injection planner: **24,101** bindings,
+  status `READY_FOR_EXPLICIT_AUTHORIZATION`, intended stages `OPEN` and
+  `SOURCE_SELECTION`, and write scope `NONE_UNTIL_EXPLICIT_AUTHORIZATION`.
+- [x] Corrected its stale hard-coded note claiming a “25,701-source set.” The
+  plan now refers to the dynamic current-workspace source set, preventing an
+  authorization scope mismatch.
+- [x] Syntax validation and strict OpenSpec validation pass. The planner
+  remains plan-only and opens no database connection.
+
+**Status:** `PLAN_SCOPE_PROVEN`; no execution or source-selection mutation was
+performed. Any future full-workspace run requires a separately bounded scope
+and explicit authorization.
+
+#### GRAPHIFY-50-SOURCE-CANARY-01 (2026-09-09)
+
+- [x] Extended the existing bounded coordinator canary to accept
+  `--limit=N`, constrained to **1–50**, with dynamic source-count validation
+  and scope-specific authorization for the 50-source run.
+- [x] Focused guard tests passed **5/5** across the canary-limit and daily
+  admission-order suites. The failed `tsx --noEmit` attempt was a tooling
+  misuse only; it did not run the canary or write state.
+- [x] Ran the explicitly authorized 50-source canary with
+  `AUTHORIZE_GRAPHIFY_50_SOURCE_CANARY_V1`. Receipt execution:
+  `45938370-7d17-4b25-a118-363997035e40`; workspace revision
+  `sha256:5d4ee74f53ea47ba80d4835494856fd0cfbc9ae532cabf8db1a17277d937510f`;
+  source count **50**; completed stages **5**.
+- [x] Independent PostgreSQL readback confirmed `COMPLETED`,
+  `canonical_authority=false`, **50** execution-file rows, **50** distinct
+  refs, one workspace revision, all **50** rows matching the execution
+  revision, and five completed stages.
+- [x] The receipt reports `canonicalPromotionMayBeAttempted=false` and
+  `broadGraphifyRun=false`. No packet, semantic, Qdrant, Neo4j, Valkey, or
+  feature-projection writes occurred; only bounded execution-ledger/source
+  selection/stage records were persisted.
+
+**Status:** `PROVEN_COMMITTED_BOUNDED_CANARY`; full-workspace current source
+authority remains `BLOCKED`. This proves a larger bounded ledger path, not
+full 24k-source promotion and not authorization for the legacy full-manifest
+writer.
+
+Evidence: `docs/reports/graphify-daily-coordinator-canary-v1.json`, live
+`graphify_executions`, `graphify_execution_files`, and
+`graphify_execution_stages` readback.
+
+#### CURRENT-SOURCE-OWNER-RECONCILIATION-CORRECTION-02 (2026-09-09)
+
+- [x] Re-ran the current source-owner reconciliation after the authorized full
+  selection. It now identifies exactly one `CURRENT_EXECUTION_OWNER_CANDIDATE`
+  for execution `24719bbd-3d33-4daf-bdec-f65277c6b149`, rather than incorrectly
+  classifying the full execution as ownerless.
+- [x] Corrected the audit to use the already-proven
+  `current-graphify-snapshot-authority-v1.json` workspace-revision manifest for
+  owner matching. The static Git inventory remains a separate diagnostic:
+  **23,742** tracked indexable files versus **24,132** revision-qualified
+  workspace bindings.
+- [x] The owner candidate is not promotion-ready: the worktree is dirty and
+  the static inventory differs from the workspace manifest, so the audit keeps
+  `CURRENT_SOURCE_AUTHORITY_NOT_PROVEN` and `safeToPromote=false`. This is a
+  deliberate snapshot-policy guard, not evidence that the full ledger selection
+  failed.
+- [x] Read-only rechecks still report
+  `SOURCE_EVIDENCE_HYDRATION_BLOCKED`: **23,195** canonical chunk owners are
+  missing and **906** chunk owners have content but no source revision. No
+  source, packet, semantic, Qdrant, Neo4j, Valkey, or feature projection writes
+  were performed in this audit tranche.
+
+**Status:** `PARTIAL_PROVEN`: current full source-selection owner candidate is
+identified and independently reconciled; canonical packet/structural/semantic/
+graph admission remains blocked by snapshot policy and source hydration.
+
+Evidence: `docs/reports/current-source-owner-reconciliation-v1.json`,
+`docs/reports/current-source-owner-reconciliation-v1.md`,
+`docs/reports/current-graphify-snapshot-authority-v1.json`, and
+`docs/reports/current-source-evidence-hydration-v1.json`.
+
+#### REINDEX-MANIFEST-CROSS-SCHEMA-02 (2026-09-09)
+
+- [x] Ran the existing read-only cross-schema manifest planner through
+  `npm run atlas:reindex:manifest:plan` and generated checksum
+  `2cab742429cccfb7811fd56c309496852d2fb19d87761cb378f8517198837606`.
+- [x] The live census records **1,252** rows with the sparse
+  `content_embedding_768` column present, but this is not a promotion count:
+  the sample has no resolved parse nodes, symbols, packets, or representations;
+  domain facts have **0** source-revision-bound rows; ontology tuples and graph
+  edge inputs are empty; and **54,601** rows are excluded from the semantic
+  cohort.
+- [x] The planner emits explicit intended-upsert plans with zero rows and keeps
+  PostgreSQL, Qdrant, Neo4j, Valkey, and feature-map mutation blocked. No
+  production data was changed.
+
+**Status:** `NOT_PROVEN`: the reindex manifest exists and is checksum-bound, but
+current source, chunk, symbol, packet, representation, domain, and graph joins
+are not yet sealed. The next gate is a source-qualified chunk/symbol lineage
+reconciliation; do not apply the manifest or interpret `1,252` as usable
+semantic coverage.
+
+Evidence: `docs/reports/reindex-cross-schema-admission-v1.json`,
+`scripts/atlas/plan-reindex-manifest-cross-schema-v1.mjs`, and
+`docs/reports/current-source-evidence-hydration-v1.json`.
+
+#### CURRENT-CHUNK-SYMBOL-LINEAGE-RECHECK-01 (2026-09-09)
+
+- [x] Ran `audit-current-source-cohort-lineage-v1.mjs` read-only. The existing
+  52-row cohort is source-revision-qualified for all **52** rows, but matches
+  **0** rows to the current workspace revision; all **52** are therefore
+  classified `SOURCE_REVISION_QUALIFIED_WORKSPACE_MISMATCH`.
+- [x] Ran `audit-current-tree-bound-symbol-registry-input-v1.mjs` read-only.
+  The input contains **353** rows with all required fields, valid spans/kinds,
+  and no duplicate canonical keys or proposed stable symbol IDs. Its sole
+  workspace revision is the historical
+  `sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9`,
+  which does not equal the current full-selection revision
+  `sha256:5320597bf4e26adc0d71dabd34faf3eec74a5f2b10f57d92c33771f2b7691f82`.
+- [x] No symbol registry, packet, lineage, vector, graph, or projection writes
+  were performed. The symbol input is structurally valid review evidence, not
+  current-workspace admission evidence.
+
+**Status:** `PARTIAL_PROVEN`: structural symbol input shape is proven, but its
+workspace lineage is stale. Regenerate or rebind the 353-row symbol input from
+the current source owner before any symbol or packet promotion.
+
+Evidence: `docs/reports/current-source-cohort-lineage-v1.json`,
+`docs/reports/current-tree-bound-symbol-registry-input-audit-v1.json`,
+`.tmp/atlas/current-tree-bound-symbol-registry-input-v1.ndjson`, and
+`docs/reports/current-graphify-snapshot-authority-v1.json`.
+
+#### CURRENT-TREE-BOUND-SYMBOL-REVISION-GUARD-02 (2026-09-09)
+
+- [x] Corrected `plan-current-tree-bound-symbol-registry-input-v1.mjs` to
+  compare nomination `workspace_revision` values with the current Graphify
+  authority receipt before classifying review input.
+- [x] Replayed the planner read-only: all **353** rows are now explicitly
+  `STALE_WORKSPACE_REVISION_REVIEW_ONLY`; current authority is
+  `sha256:5320597bf4e26adc0d71dabd34faf3eec74a5f2b10f57d92c33771f2b7691f82`.
+  The historical input revision is not relabeled or silently repaired.
+- [x] Syntax validation and strict OpenSpec validation pass. Canonical writes,
+  alias writes, symbol-version writes, and database writes remain **0**.
+
+**Status:** `PROVEN_FAIL_CLOSED`: stale structural input is detected and blocked;
+current symbol regeneration from the full source owner remains required before
+symbol, packet, or projection admission.
+
+Evidence: `docs/reports/current-tree-bound-symbol-registry-input-v1.json`,
+`.tmp/atlas/current-tree-bound-symbol-registry-input-v1.ndjson`,
+`scripts/atlas/plan-current-tree-bound-symbol-registry-input-v1.mjs`.
+
+#### TREE-BOUND-SYMBOL-REGISTRY-RECONCILIATION-03 (2026-09-09)
+
+- [x] Ran the existing read-only reconciliation planner. It read **10,260**
+  registry rows and classified the 353 tree-bound candidates as **90**
+  `EXACT_CURRENT` and **263** `UNRESOLVED`; there were **0** namespace-exact
+  legacy matches, conflicts, or ambiguous matches.
+- [x] The plan preserves the no-fuzzy/no-alias policy and emits checksum
+  `sha256:51000ffd4727294f83b6c9e914c55d1b722f430cbdc9b34598d72512b0321de3`.
+  It proposes **0** canonical or database writes.
+- [x] The 90 exact matches are review evidence only until their source and
+  workspace revisions are reconciled against the current full Graphify owner;
+  the 263 unresolved rows remain excluded from promotion.
+
+**Status:** `PARTIAL_PROVEN`: registry reconciliation mechanics are proven,
+but current symbol-version admission is not. The next implementation gate is
+to regenerate structural resolutions from the current source owner, then rerun
+this reconciliation before any symbol canary.
+
+Evidence: `.tmp/atlas/tree-bound-symbol-registry-reconciliation-plan-v1.ndjson`,
+`scripts/atlas/plan-tree-bound-symbol-registry-reconciliation-v1.mjs`, and
+`docs/reports/current-graphify-snapshot-authority-v1.json`.
+
+#### TREE-BOUND-SYMBOL-RESOLUTION-PROOF-04 (2026-09-09)
+
+- [x] Ran the existing read-only resolver proof. It inspected **353** tree-bound
+  inputs and **10,260** registry rows: **90** exact canonical-key matches,
+  **85** symbol-version bindings, and **5** missing symbol versions.
+- [x] No exact metadata-revision matches, registry ambiguities, symbol-version
+  ambiguities, source-revision mismatches, or fuzzy matches were accepted.
+  Lookup remains exact-key and exact source/span/declaration-hash only.
+- [x] No canonical, symbol-version, packet, or database writes occurred.
+
+**Status:** `PARTIAL_PROVEN`: exact resolution mechanics are proven for the
+90 matched rows, but the 5 symbol-version gaps and stale workspace input still
+block promotion. The next gate is the existing live-producer replay under the
+current source owner.
+
+Evidence: `docs/reports/tree-bound-symbol-registry-resolution-v1.json`,
+`.tmp/atlas/tree-bound-symbol-registry-resolution-v1.ndjson`, and
+`scripts/atlas/prove-tree-bound-symbol-registry-resolution-v1.mjs`.
+
+#### CONTEXTUAL-TREE-FOREST-SAMPLING-AUDIT-01 (2026-09-09)
+
+- [x] Ran the existing read-only contextual-tree readiness audit. PostgreSQL,
+  Neo4j, Qdrant, and the structural surfaces are reachable; the overall result
+  is `DATA_ABSENT` because synthesized feature-map tables are empty, not because
+  a new graph store is missing.
+- [x] Fixed the integration direction: Tree-sitter remains the exact CST/AST
+  span authority; AST-grep and LSP/ts-morph remain structural observations;
+  NetworkX is the CPU/reference graph; cuGraph is a later derived accelerator;
+  Qdrant remains vector retrieval and filtering only.
+- [x] The future contextual forest contract is bounded and revision-qualified:
+  seed `packet_key`/`symbol_version_id`, deterministic seed, per-hop fanout,
+  edge-type/domain filters, deduplication, and explicit candidate ordinals.
+  Sampling output is a routing/context feature, never identity or a new RRF
+  lane. No graph, vector, cache, or database writes were performed.
+
+**Status:** `PARTIAL_PROVEN`: executor surfaces are present, but current
+feature-map materialization and source-qualified symbol lineage are absent.
+The next gate is a read-only forest-sampling fixture over a sealed small graph,
+with NetworkX output as the oracle before any cuGraph/RAPIDS execution.
+
+Evidence: `docs/reports/contextual-tree-readiness-report.json`,
+`scripts/atlas/audit-contextual-tree-readiness.mjs`, and official Tree-sitter,
+NetworkX, and RAPIDS/cuGraph sampling documentation.
+
+#### GRAPHIFY-FANOUT-OBSERVABILITY-02 (2026-09-09)
+
+- [x] Confirmed the Phase 8 wrapper keeps `latent_64` classified as an
+  optional derived representation; it remains non-canonical and does not add a
+  semantic retrieval vote or completion predicate.
+- [x] Added an explicit terminal progress state,
+  `SUCCEEDED_WITH_OPTIONAL_FAILURES`, when an optional derived step fails. The
+  receipt now preserves the degraded fanout state instead of presenting it as
+  an indistinguishable generic success.
+- [x] Made progress denominators derive from the actual step plan rather than
+  the stale hard-coded `/9` value. This covers the current 11-step plan and
+  bounded fixture plans without changing execution order.
+- [x] Focused wrapper tests pass **6/6**; the read-only criticality audit still
+  reports `OPTIONAL_DERIVED_REPRESENTATION`, `writesPerformed=false`, and
+  `canonicalAuthority=false`. No datastore or projection writes occurred.
+
+**Status:** `PROVEN`: optional fanout failure is observable and cannot be
+confused with full fanout success; canonical promotion remains separately
+blocked by current source/lineage admission.
+
+Evidence: `scripts/startup/run-atlas-phase8-fanout.mjs`,
+`scripts/atlas/lib/phase8_progress.mjs`,
+`sveltekit-frontend/src/lib/server/atlas/phase8-fanout.spec.ts`, and
+`docs/reports/graphify-fanout-criticality-01.json`.
+
+#### LATENT-REPRESENTATION-LEDGER-01 (2026-09-09)
+
+- [x] Re-ran the existing latent identity audit in a read-only transaction;
+  the transaction rolled back and confirmed zero production mutations.
+- [x] Sampled **1,000** `latent_64` rows and **250** Qdrant points. Packet and
+  representation IDs are present, but all sampled Qdrant points lack
+  `source_revision` and `workspace_revision`.
+- [x] Confirmed the representation ledger is absent: **0/1,000** rows joined to
+  `atlas_representation_records`; producer revision, input digest, and
+  parameter digest are unavailable.
+- [x] Confirmed source-version and symbol-version joins remain unproven:
+  `SOURCE_VERSION_JOINED=0`, `SYMBOL_VERSION_JOINED=0`, and
+  `FULL_LINEAGE_PROVEN=0`.
+
+**Status:** `BLOCKED`: `latent_256`, derived `latent_128`, and `latent_64`
+contracts exist, but latent promotion/backfill is not admissible until the
+representation ledger and current source/workspace binding exist. The latent
+writer's fallback lookup order must not be used as proof of revision identity.
+
+Evidence: `docs/reports/latent-representation-identity-audit-2026-09-09.json`,
+`docs/reports/latent-representation-identity-audit-2026-09-09.md`, and
+`scripts/atlas/audit-latent-representation-identity.mjs`.
+
+#### CANONICAL-PROJECTION-FABRIC-RECHECK-02 (2026-09-09)
+
+- [x] Re-ran the existing read-only fabric audit after the latent ledger
+  review. Overall verdict remains `NOT_SAFE_TO_PROJECT`; **10/11** promotion
+  predicates are below `PASS`.
+- [x] Confirmed the concrete blockers: no packet-side workspace revision join,
+  empty `graphify_symbols`, ambiguous 768-dimension physical owners, absent
+  representation ledger, absent sealed graph manifest, absent sealed ordinal
+  map, and no cross-projection checksum proof.
+- [x] Confirmed ontology tables are populated (**63,084** rows total), so the
+  ontology layer is not absent; however, that does not prove current source
+  lineage or projection admission.
+- [x] Confirmed no database, vector, graph, cache, or model writes occurred.
+
+**Status:** `BLOCKED`: the next repair is authority convergence—workspace
+revision binding, one semantic owner, representation ledger, graph manifest,
+and ordinal-map sealing. Do not enable latent, topology, or broad fanout apply
+until these predicates are independently proven.
+
+Evidence: `docs/reports/atlas-canonical-projection-fabric-audit-2026-09-09.json`,
+`docs/reports/atlas-canonical-projection-fabric-audit-2026-09-09.md`, and
+`scripts/atlas/audit-canonical-projection-fabric.mjs`.
+
+#### CONTEXT-FOREST-CPU-BASELINE-01 (2026-09-09)
+
+- [x] Added a bounded `ContextForestV1` contract and deterministic CPU sampler
+  under the existing graph owner. It consumes revision-qualified roots and
+  typed edges; it does not query or mutate a datastore.
+- [x] Enforced deterministic root/edge ordering, deduplication, maximum node
+  and edge counts, depth bounds, and token-cost bounds. The output carries the
+  workspace revision, graph revision, ordinal-map checksum, policy revision,
+  and deterministic checksum.
+- [x] Smoke-tested the sampler successfully. OpenSpec strict validation passes.
+  The Vitest runner did not return normal output in this shell, so no Vitest
+  pass is claimed; the direct TypeScript smoke reported
+  `CONTEXT_FOREST_SMOKE_PASS`.
+
+**Status:** `IMPLEMENTATION_PRESENT` / `PARTIAL_PROVEN`: the CPU baseline is
+implemented and bounded, but live current-source inputs, sealed ordinals,
+NetworkX parity, Neo4j parity, and cuGraph execution remain separate gates.
+
+Evidence: `sveltekit-frontend/src/lib/server/graph/context-forest.ts`,
+`sveltekit-frontend/src/lib/server/graph/context-forest.spec.ts`, and the direct
+TypeScript smoke check.
+
+#### SEMANTIC-768-OWNER-RECONCILIATION-01 (2026-09-09)
+
+- [x] Reconciled the live indexing census with the latent and canonical-fabric
+  auditors without changing data. The current active semantic candidate is
+  `codebase_chunk_index.content_embedding` (`halfvec(768)`, **55,169/55,853**
+  populated); `codebase_chunk_index.content_embedding_768` (**1,386**) is a
+  transition/legacy surface, and `atlas_packets.embedding` is a secondary
+  768-dimensional surface whose active writer remains unresolved.
+- [x] Corrected stale audit labels that called both `atlas_packets.embedding`
+  and `codebase_chunk_index.content_embedding_768` `CANONICAL_SOURCE`.
+- [x] Preserved the admission block: one active physical candidate is not
+  sufficient to prove canonical ownership. Writer census, revision-qualified
+  read-path proof, representation ledger, and independent Qdrant readback are
+  still required.
+- [x] Re-ran the read-only indexing and fabric audits. No PostgreSQL, Qdrant,
+  Neo4j, Valkey, or model writes occurred; the fabric remains
+  `NOT_SAFE_TO_PROJECT` with **10/11** predicates below `PASS`.
+- [x] Replayed `audit-latent-representation-identity.mjs` after the label
+  correction: read-only guard, packet identity, Qdrant join classification,
+  and report generation pass; source-version and symbol joins remain
+  `NOT_PROVEN`, and the representation ledger remains `NOT_PROVEN`.
+
+**Status:** `PARTIAL_PROVEN` / `BLOCKED`: physical semantic ownership is now
+classified consistently, but canonical ownership is not promoted until the
+active writer and revision-qualified projection path are proven.
+
+Evidence: `docs/reports/atlas-indexing-surfaces-v1.json`,
+`docs/reports/atlas-canonical-projection-fabric-audit-2026-09-09.json`,
+`scripts/atlas/audit-atlas-indexing-surfaces.mjs`,
+`scripts/atlas/audit-latent-representation-identity.mjs`, and
+`scripts/atlas/audit-canonical-projection-fabric.mjs`.
+
+#### SEMANTIC-768-WRITER-OWNERSHIP-01 (2026-09-09)
+
+- [x] Added a bounded, read-only writer census covering repository scripts,
+  packages, SvelteKit routes, and migration SQL. It classifies references to
+  `codebase_chunk_index.content_embedding`,
+  `codebase_chunk_index.content_embedding_768`, and `atlas_packets.embedding`;
+  it does not execute any writer.
+- [x] Live PostgreSQL census confirmed: `content_embedding` is `halfvec` with
+  **55,169/55,853** populated rows; `content_embedding_768` is `vector` with
+  **1,386/55,853**; `atlas_packets.embedding` is `vector` with
+  **61,659/61,718**.
+- [x] The receipt records **21** writer/reference surfaces and remains
+  `OWNER_NOT_PROVEN`; revision-qualified and guarded writer behavior is not
+  uniform, so no writer was promoted or invoked.
+
+**Status:** `PARTIAL_PROVEN` / `BLOCKED`: the active candidate and competing
+surfaces are now measurable, but canonical ownership still requires selecting
+one writer, proving its source/workspace revision guards, and reconciling its
+Qdrant read path.
+
+Evidence: `scripts/atlas/audit-semantic-768-writer-ownership-v1.mjs`,
+`docs/reports/semantic-768-writer-ownership-v1.json`, and the live PostgreSQL
+read-only census.
+
+Follow-up writer classification (same gate): the bounded receipt distinguishes
+`MUTATION_WRITER` from `READER_OR_DIAGNOSTIC` references and excludes the audit
+script itself. It records **19** remaining references, including unguarded
+mutation-capable paths for the active `content_embedding` surface and the
+legacy `content_embedding_768` surface, plus unresolved `atlas_packets.embedding`
+writers. This confirms that the next repair is writer consolidation and
+revision-guard hardening—not another embedding backfill.
+
+The operator-entrypoint census further identifies three reachable apply
+surfaces: the daily Graphify embedding apply path targets `content_embedding`,
+the full-repo index apply path targets legacy `content_embedding_768`, and the
+`/api/codebase-index/index-stream` route can write the same legacy surface.
+`selectedWriter=null` remains intentional until the first path has explicit
+source/workspace guards and an independent projection readback.
+
+The ownership comparison records a real split: historical corpus evidence
+names `scripts/atlas/reembed-corpus-document-prefix-v1.mjs` as the dominant
+producer, while the reachable daily operator path is
+`scripts/atlas/backfill-graphify-file-embeddings-768.mjs`. The receipt therefore
+sets `decision=UNRESOLVED_WRITER_SPLIT`; neither file is treated as canonical
+until one revision-qualified contract is selected and independently read back.
+
+Writer safety hardening (same gate): `backfill-graphify-file-embeddings-768.mjs`
+now refuses `--apply` unless an explicit workspace revision is supplied and
+`codebase_chunk_index` exposes both `source_revision` and `workspace_revision`.
+Its apply selection requires the expected workspace revision, and its update
+guard checks both source and workspace revisions in addition to the null-vector
+condition. A bounded dry-run still completes with `status=DRY_RUN`; no apply
+attempt was executed.
+
+#### CONTEXT-FOREST-MASTER-READINESS-01 (2026-09-09)
+
+- [x] Added `audit-context-forest-readiness-v1.mjs` as a read-only master
+  harness. It reconciles existing current receipts into a fixed gate matrix;
+  it does not execute Graphify, Qdrant, Neo4j, cuGraph, or ACE operations.
+- [x] The first blocking gate is reported as `Graphify source membership`, with
+  `nextGate=CURRENT-SOURCE-OWNER-RECONCILIATION-01` and
+  `fullWorkspaceSafe=false`. The CPU context forest remains
+  `FIXTURE_PROVEN`/partial only; no fixture or mock is promoted to live proof.
+- [x] Harness smoke and JavaScript syntax checks pass. No datastore,
+  projection, cache, model, or source writes occurred.
+- [x] Replayed the actual `.mts` Graphify authority auditor after correcting
+  the stale `.mjs` command path. It now reports `CURRENT_SNAPSHOT_PROVEN` for
+  the full **24,132-source** workspace selection; the readiness harness
+  recognizes that proof and advances the first blocker to `Semantic-768 owner`.
+
+**Status:** `IMPLEMENTATION_PRESENT` / `BLOCKED`: the consolidated readiness
+receipt exists, but current source authority, semantic ownership, symbol and
+representation lineage, sealed ordinals, graph parity, and cross-store
+readback remain incomplete.
+
+Evidence: `scripts/atlas/audit-context-forest-readiness-v1.mjs` and
+`docs/reports/parent-atlas-context-forest-readiness-v1.json`.
+
+### Current source-owner recheck (2026-09-09)
+
+- Replayed `scripts/atlas/audit-current-source-owner-reconciliation-v1.mjs`
+  read-only. It found 23,749 source records and 12 completed execution
+  candidates, but zero exact current canonical owners.
+- The latest full-workspace selection contains 24,132 members and has a
+  completed membership readback, but remains `canonical_authority=false`.
+- Result: `CURRENT_SOURCE_AUTHORITY_NOT_PROVEN` /
+  `LEGACY_ONLY_NO_CURRENT_OWNER`. Existing completed runs are historical or
+  bounded candidates, not a current Graphify source authority.
+- No source, database, Qdrant, Neo4j, Valkey, or model writes occurred.
+- This keeps semantic, graph, and projection promotion blocked until one
+  current owner is explicitly admitted.
+
+### Admission parameter bundle (2026-09-09)
+
+- Added `scripts/atlas/fetch-admission-parameters-v1.mjs`, a read-only receipt
+  assembler over the existing source-owner, Graphify snapshot, semantic-768,
+  Qdrant provenance, and Leiden canary receipts.
+- Receipt: `docs/reports/admission-parameters-v1.json`.
+- Current result: `PARAMETERS_BLOCKED`. The bundle carries the current workspace
+  revision and configured canonical collection, while reporting the unresolved
+  source authority, graph snapshot, semantic manifest admission, Qdrant lineage,
+  and judgment-set gates explicitly.
+- No datastore, projection, cache, or model writes occurred.
+
+### Authorized full-workspace source-selection canary (2026-09-09)
+
+- Executed `AUTHORIZE_GRAPHIFY_FULL_WORKSPACE_SOURCE_SELECTION_V1` through
+  `sveltekit-frontend/scripts/atlas/graphify-daily-coordinator-canary-v1.mts --full`
+  against the non-production workspace.
+- Readback succeeded for execution
+  `24719bbd-3d33-4daf-bdec-f65277c6b149`: 24,132 selected sources, five
+  completed stages, and workspace revision
+  `sha256:5320597bf4e26adc0d71dabd34faf3eec74a5f2b10f57d92c33771f2b7691f82`.
+- This proves the bounded source-selection ledger operation, not canonical
+  Graphify authority. A subsequent currentness audit found the live workspace
+  revision changed and the reconciliation population differed (23,751 versus
+  24,132), so the selection is retained as a candidate receipt only.
+- The consolidated `AdmissionParametersV1` receipt remains
+  `PARAMETERS_BLOCKED`; no Qdrant, Neo4j, Valkey, embedding, or model writes
+  occurred.
+
+### Current source-authority admission predicates (2026-09-09)
+
+- Replayed `scripts/atlas/audit-current-graphify-snapshot-authority-v1.mts`
+  read-only. Current result: `NO_TERMINAL_EXECUTION_FOR_CURRENT_WORKSPACE`.
+- Current workspace revision: `sha256:63f2609bbd54e7a2e03c337ffcea45218ba837907350383470a17f95e5eaa05e`.
+- Qualifying executions for that exact revision: `0`.
+- The source-owner reconciliation identifies the remaining reasons precisely:
+  `EXACT_CURRENT_COMPLETED_OWNER_COUNT_NOT_ONE`,
+  `WORKTREE_DIRTY_REQUIRES_SNAPSHOT_POLICY`, and
+  `STATIC_WORKTREE_INVENTORY_DIFFERS_FROM_WORKSPACE_REVISION_MANIFEST`.
+- Therefore prior 24,132-source selections and bounded canaries remain
+  historical/candidate evidence, not current canonical authority. No writes
+  occurred.
+
+### Source inventory reconciliation correction (2026-09-09)
+
+- Corrected `scripts/atlas/audit-current-source-owner-reconciliation-v1.mjs` to
+  use the same source population contract as
+  `workspace-revision-origin-runtime-v1.ts`: tracked plus non-ignored working
+  tree files, the full shared source-extension set, `docs/reports/` exclusion,
+  five MiB size admission, and UTF-8 validation.
+- The prior 23,751 count was a false comparison caused by tracked-only
+  enumeration and a narrower extension set. The aligned audit now reports
+  **24,186 candidates admitted**, **38 skipped** (30 oversized, 8 invalid
+  UTF-8), with explicit inventory policy metadata in the receipt.
+- A fresh graph snapshot audit still reports
+  `NO_TERMINAL_EXECUTION_FOR_CURRENT_WORKSPACE` at **24,140** sources. The
+  residual 46-row difference is therefore current dirty-worktree drift during
+  separate audit executions, not an extension/filter mismatch. No current
+  source owner is admitted.
+- Status remains `CURRENT_SOURCE_AUTHORITY_NOT_PROVEN`; semantic, graph, and
+  projection promotion remain blocked until a quiescent/revision-pinned source
+  snapshot and terminal Graphify execution agree exactly.
+
+Evidence: `docs/reports/current-source-owner-reconciliation-v1.json`,
+`docs/reports/current-graphify-snapshot-authority-v1.json`, and
+`sveltekit-frontend/src/lib/server/atlas/indexing/workspace-revision-origin-runtime-v1.ts`.
+No database, projection, cache, embedding, or model writes were performed by
+this reconciliation; only derived reports and this ledger entry changed.
+
+### Encoding and UUID identity clarification (2026-09-09)
+
+- `UTF-8` is the source-text encoding admission check. There is no `UTF-5`
+  encoding in this contract; invalid UTF-8 sources are excluded from the
+  workspace-origin manifest and reported explicitly.
+- `UUIDv5` is unrelated to text encoding. It may be used later for a
+  deterministic, namespace-qualified derived identity such as `symbol_id`,
+  only after its namespace and name preimage are frozen and tested.
+- `UUIDv7` remains the preferred canonical `packet_key` direction because it
+  provides time-ordered durable packet identity. `parse_node_id`, `chunk_id`,
+  `symbol_id`, `concept_id`, and `graph_node_key` remain separate identities;
+  none may be silently replaced by a UUIDv5 or projection ID.
+- This is a terminology/contract clarification only. No identity migration,
+  packet rewrite, or projection write was performed.
+
+Status: `RECORDED_CLARIFICATION`; UUIDv5 derived-symbol design remains
+`NOT_STARTED` and the broader current-source admission remains blocked.

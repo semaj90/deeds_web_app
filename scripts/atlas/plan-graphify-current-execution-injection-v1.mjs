@@ -33,7 +33,7 @@ const planBody = {
   notes: [
     'This is a plan-only artifact; it does not open a database connection.',
     'A future bounded apply must use one dedicated PostgreSQL connection and a fresh execution_id.',
-    'The full 25,701-source set is not an authorization request; scope must be explicitly chosen and bounded separately.',
+    'The full current-workspace source set is not an authorization request; scope must be explicitly chosen and bounded separately.',
   ],
 };
 const report = { ...planBody, planChecksum: sha256(JSON.stringify(planBody)) };

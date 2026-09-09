@@ -1,0 +1,426 @@
+{
+  "schema": "atlas.current-source-owner-reconciliation.v1",
+  "generatedAt": "2026-09-09T19:09:22.361Z",
+  "mode": "READ_ONLY",
+  "writesPerformed": false,
+  "databaseWrites": 0,
+  "graphifyMutations": 0,
+  "packetWrites": 0,
+  "projectionWrites": 0,
+  "workspace": {
+    "root": "C:\\Users\\james\\Videos\\deeds-web-app",
+    "gitRoot": "C:/Users/james/Videos/deeds-web-app",
+    "gitCommonDir": ".git",
+    "headCommit": "9d525dd2ae888a3b646c6915a86a3a45a67a3fee",
+    "headTree": "ce564df3d410d891e0e0f0469a93b2f157f8d2bd",
+    "hostname": "DESKTOP-Q18MPHM",
+    "dirty": true,
+    "sourceCount": 24186,
+    "sourceRefChecksum": "sha256:709ed87bc7ecf9d33ad09bf360b07bea4ecfe3d54390147273105c51996ac5e9",
+    "inventoryPolicy": {
+      "command": "git ls-files --cached --others --exclude-standard -z",
+      "trackedAtHeadCount": 27691,
+      "candidateCount": 24224,
+      "admittedCount": 24186,
+      "skippedCount": 38,
+      "maxSourceBytes": 5242880,
+      "generatedPrefixesExcluded": [
+        "docs/reports/"
+      ],
+      "sourceExtensions": [
+        ".bash",
+        ".c",
+        ".cc",
+        ".cjs",
+        ".cpp",
+        ".cs",
+        ".cts",
+        ".cxx",
+        ".go",
+        ".gql",
+        ".graphql",
+        ".h",
+        ".hh",
+        ".hpp",
+        ".java",
+        ".js",
+        ".json",
+        ".jsonl",
+        ".jsx",
+        ".kt",
+        ".kts",
+        ".md",
+        ".mdx",
+        ".mjs",
+        ".mts",
+        ".proto",
+        ".ps1",
+        ".psm1",
+        ".py",
+        ".rs",
+        ".sh",
+        ".sql",
+        ".svelte",
+        ".toml",
+        ".ts",
+        ".tsx",
+        ".yaml",
+        ".yml",
+        ".zsh"
+      ],
+      "skippedByReason": {
+        "SOURCE_TOO_LARGE": 30,
+        "NOT_VALID_UTF8_SOURCE": 8
+      }
+    },
+    "status": "PROVEN"
+  },
+  "currentExecutionCandidates": [
+    {
+      "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+      "workspace_revision": "sha256:0b5cb14bd9014009ea8debc779df62cb3f6e669f8de94c79ad98ca8b88ff5e24",
+      "execution_id": "8bd073a7-a8a9-43b7-b53a-778d33e3b524",
+      "status": "COMPLETED",
+      "canonical_authority": false,
+      "trigger_kind": "CURRENT_WORKSPACE_SOURCE_SELECTION",
+      "completed_at": "2026-09-09T19:03:46.923Z",
+      "memberCount": 24139,
+      "distinctSourceCount": 24139,
+      "workspaceRevisionCount": 1,
+      "sourceSelection": {
+        "status": "COMPLETED",
+        "output_checksum": "sha256:5fa4a0ef539ced4a7481b523e049cb1adf2c62435a664b900dd70593cbc153dd",
+        "receipt_ref": "graphify-current-workspace-source-selection:v1"
+      },
+      "sourceRefChecksum": "sha256:5fa4a0ef539ced4a7481b523e049cb1adf2c62435a664b900dd70593cbc153dd",
+      "selectionMembershipReadback": true,
+      "canonicalAuthority": false
+    },
+    {
+      "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+      "workspace_revision": "sha256:5320597bf4e26adc0d71dabd34faf3eec74a5f2b10f57d92c33771f2b7691f82",
+      "execution_id": "24719bbd-3d33-4daf-bdec-f65277c6b149",
+      "status": "COMPLETED",
+      "canonical_authority": false,
+      "trigger_kind": "CURRENT_WORKSPACE_SOURCE_SELECTION",
+      "completed_at": "2026-09-09T17:36:13.412Z",
+      "memberCount": 24132,
+      "distinctSourceCount": 24132,
+      "workspaceRevisionCount": 1,
+      "sourceSelection": {
+        "status": "COMPLETED",
+        "output_checksum": "sha256:2f65bb1dc2705f89e7400be2ca4707828939e03d7d4a2d30ae841ba453de19a6",
+        "receipt_ref": "graphify-current-workspace-source-selection:v1"
+      },
+      "sourceRefChecksum": "sha256:2f65bb1dc2705f89e7400be2ca4707828939e03d7d4a2d30ae841ba453de19a6",
+      "selectionMembershipReadback": true,
+      "canonicalAuthority": false
+    },
+    {
+      "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+      "workspace_revision": "sha256:5db2bc428d4dcf07c2a11096039aad18c916b50aa17e849b2325a782d981dcdc",
+      "execution_id": "ccb615ba-99da-4801-bcf7-0e8a63e7376a",
+      "status": "COMPLETED",
+      "canonical_authority": false,
+      "trigger_kind": "CURRENT_WORKSPACE_SOURCE_SELECTION",
+      "completed_at": "2026-09-09T17:30:35.026Z",
+      "memberCount": 24132,
+      "distinctSourceCount": 24132,
+      "workspaceRevisionCount": 1,
+      "sourceSelection": {
+        "status": "COMPLETED",
+        "output_checksum": "sha256:2f65bb1dc2705f89e7400be2ca4707828939e03d7d4a2d30ae841ba453de19a6",
+        "receipt_ref": "graphify-current-workspace-source-selection:v1"
+      },
+      "sourceRefChecksum": "sha256:2f65bb1dc2705f89e7400be2ca4707828939e03d7d4a2d30ae841ba453de19a6",
+      "selectionMembershipReadback": true,
+      "canonicalAuthority": false
+    },
+    {
+      "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+      "workspace_revision": "sha256:5d4ee74f53ea47ba80d4835494856fd0cfbc9ae532cabf8db1a17277d937510f",
+      "execution_id": "45938370-7d17-4b25-a118-363997035e40",
+      "status": "COMPLETED",
+      "canonical_authority": false,
+      "trigger_kind": "BOUNDED_COMMITTED_CANARY",
+      "completed_at": "2026-09-09T17:25:46.263Z",
+      "memberCount": 50,
+      "distinctSourceCount": 50,
+      "workspaceRevisionCount": 1,
+      "sourceSelection": {
+        "status": "COMPLETED",
+        "output_checksum": "sha256:97482736f84a82982481ac22daabd08d8ccde258ea3c66d2b1d2f9c3168b8e50",
+        "receipt_ref": "committed-canary-fresh-materialization-v1"
+      },
+      "sourceRefChecksum": "sha256:97482736f84a82982481ac22daabd08d8ccde258ea3c66d2b1d2f9c3168b8e50",
+      "selectionMembershipReadback": true,
+      "canonicalAuthority": false
+    },
+    {
+      "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+      "workspace_revision": "sha256:c44511cb21e26ca33b97ae6a7f3878827883dd11680db7aeefd60c477711be70",
+      "execution_id": "8894000e-d7cc-4298-8201-3f3ad6a0ce57",
+      "status": "COMPLETED",
+      "canonical_authority": false,
+      "trigger_kind": "BOUNDED_COMMITTED_CANARY",
+      "completed_at": "2026-09-09T17:11:56.196Z",
+      "memberCount": 3,
+      "distinctSourceCount": 3,
+      "workspaceRevisionCount": 1,
+      "sourceSelection": {
+        "status": "COMPLETED",
+        "output_checksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
+        "receipt_ref": "committed-canary-fresh-materialization-v1"
+      },
+      "sourceRefChecksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
+      "selectionMembershipReadback": true,
+      "canonicalAuthority": false
+    },
+    {
+      "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+      "workspace_revision": "sha256:ec2cc83d87c6f88c7fea4980f3d6d50db8a5d8686f6f4899d87645f0b5cd6507",
+      "execution_id": "709e5232-879a-46a8-963d-71c45e2658f0",
+      "status": "COMPLETED",
+      "canonical_authority": false,
+      "trigger_kind": "BOUNDED_COMMITTED_CANARY",
+      "completed_at": "2026-09-09T16:25:50.662Z",
+      "memberCount": 3,
+      "distinctSourceCount": 3,
+      "workspaceRevisionCount": 1,
+      "sourceSelection": {
+        "status": "COMPLETED",
+        "output_checksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
+        "receipt_ref": "committed-canary-fresh-materialization-v1"
+      },
+      "sourceRefChecksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
+      "selectionMembershipReadback": true,
+      "canonicalAuthority": false
+    },
+    {
+      "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+      "workspace_revision": "sha256:bc74ddc7e74af1e6fa9681182e2bc97fa4b2dc49d59c40c251fb505d22bf3ba1",
+      "execution_id": "5b219159-d033-4d09-8174-6f602789e89b",
+      "status": "COMPLETED",
+      "canonical_authority": false,
+      "trigger_kind": "BOUNDED_COMMITTED_CANARY",
+      "completed_at": "2026-09-05T07:03:28.110Z",
+      "memberCount": 3,
+      "distinctSourceCount": 3,
+      "workspaceRevisionCount": 1,
+      "sourceSelection": {
+        "status": "COMPLETED",
+        "output_checksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
+        "receipt_ref": "committed-canary-fresh-materialization-v1"
+      },
+      "sourceRefChecksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
+      "selectionMembershipReadback": true,
+      "canonicalAuthority": false
+    },
+    {
+      "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+      "workspace_revision": "sha256:817549d78646b52a0f34f8af96970ae95256b87e59125d1542611f8f386d69bb",
+      "execution_id": "680906bc-2bfd-48d5-b96e-5b9b4a4198d1",
+      "status": "COMPLETED",
+      "canonical_authority": false,
+      "trigger_kind": "BOUNDED_COMMITTED_CANARY",
+      "completed_at": "2026-09-05T06:58:05.409Z",
+      "memberCount": 3,
+      "distinctSourceCount": 3,
+      "workspaceRevisionCount": 1,
+      "sourceSelection": {
+        "status": "COMPLETED",
+        "output_checksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
+        "receipt_ref": "committed-canary-fresh-materialization-v1"
+      },
+      "sourceRefChecksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
+      "selectionMembershipReadback": true,
+      "canonicalAuthority": false
+    },
+    {
+      "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+      "workspace_revision": "sha256:c17c40c28da9c0ec831c4a5beb7390fb73a581c6b147cae95c8da79d3fcfb4d2",
+      "execution_id": "fe3dcfa6-da34-4a30-9281-e56d752f77ec",
+      "status": "COMPLETED",
+      "canonical_authority": false,
+      "trigger_kind": "BOUNDED_COMMITTED_CANARY",
+      "completed_at": "2026-09-05T05:49:24.161Z",
+      "memberCount": 3,
+      "distinctSourceCount": 3,
+      "workspaceRevisionCount": 1,
+      "sourceSelection": {
+        "status": "COMPLETED",
+        "output_checksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
+        "receipt_ref": "committed-canary-fresh-materialization-v1"
+      },
+      "sourceRefChecksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
+      "selectionMembershipReadback": true,
+      "canonicalAuthority": false
+    },
+    {
+      "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+      "workspace_revision": "sha256:fc051ccfc7e5627b480d369c84eeb3cc73e790b4d3a0ae2ee6da971585c05c11",
+      "execution_id": "f9115616-7747-4879-a98f-fc0e189f71d8",
+      "status": "COMPLETED",
+      "canonical_authority": false,
+      "trigger_kind": "BOUNDED_COMMITTED_CANARY",
+      "completed_at": "2026-09-04T19:06:10.134Z",
+      "memberCount": 3,
+      "distinctSourceCount": 3,
+      "workspaceRevisionCount": 1,
+      "sourceSelection": {
+        "status": "COMPLETED",
+        "output_checksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
+        "receipt_ref": null
+      },
+      "sourceRefChecksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
+      "selectionMembershipReadback": true,
+      "canonicalAuthority": false
+    },
+    {
+      "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+      "workspace_revision": "sha256:fc051ccfc7e5627b480d369c84eeb3cc73e790b4d3a0ae2ee6da971585c05c11",
+      "execution_id": "6e64486f-c195-4b31-9b9e-7fe8f194523b",
+      "status": "COMPLETED",
+      "canonical_authority": false,
+      "trigger_kind": "BOUNDED_COMMITTED_CANARY",
+      "completed_at": "2026-09-04T18:49:03.528Z",
+      "memberCount": 3,
+      "distinctSourceCount": 3,
+      "workspaceRevisionCount": 1,
+      "sourceSelection": {
+        "status": "COMPLETED",
+        "output_checksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
+        "receipt_ref": null
+      },
+      "sourceRefChecksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
+      "selectionMembershipReadback": true,
+      "canonicalAuthority": false
+    },
+    {
+      "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+      "workspace_revision": "sha256:fc051ccfc7e5627b480d369c84eeb3cc73e790b4d3a0ae2ee6da971585c05c11",
+      "execution_id": "bfc5739f-554a-44c9-86f6-d239cb9b842a",
+      "status": "COMPLETED",
+      "canonical_authority": false,
+      "trigger_kind": "BOUNDED_COMMITTED_CANARY",
+      "completed_at": "2026-09-04T18:31:35.096Z",
+      "memberCount": 3,
+      "distinctSourceCount": 3,
+      "workspaceRevisionCount": 1,
+      "sourceSelection": {
+        "status": "COMPLETED",
+        "output_checksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
+        "receipt_ref": null
+      },
+      "sourceRefChecksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
+      "selectionMembershipReadback": true,
+      "canonicalAuthority": false
+    },
+    {
+      "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+      "workspace_revision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "execution_id": "5dc82676-d8a5-470e-a3b9-e06a98fb3de5",
+      "status": "COMPLETED",
+      "canonical_authority": false,
+      "trigger_kind": "BOUNDED_COMMITTED_CANARY",
+      "completed_at": "2026-09-04T03:06:58.472Z",
+      "memberCount": 3,
+      "distinctSourceCount": 3,
+      "workspaceRevisionCount": 1,
+      "sourceSelection": {
+        "status": "COMPLETED",
+        "output_checksum": "sha256:91af4e42a1f1ec186c104f981e8264a333e16100351a1b7c671bfe8b196cae43",
+        "receipt_ref": null
+      },
+      "sourceRefChecksum": "sha256:91af4e42a1f1ec186c104f981e8264a333e16100351a1b7c671bfe8b196cae43",
+      "selectionMembershipReadback": true,
+      "canonicalAuthority": false
+    }
+  ],
+  "legacyGraphifyCandidates": [
+    {
+      "run_id": "b3a5b14e-0065-41bb-bfe0-96e1062d1e07",
+      "status": "SUPERSEDED",
+      "workspace_revision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "completed_at": "2026-09-08T23:38:12.571Z",
+      "file_count": 57
+    },
+    {
+      "run_id": "b1a103ac-c717-430b-9643-a8c9818064ae",
+      "status": "SUPERSEDED",
+      "workspace_revision": "sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70",
+      "completed_at": "2026-09-08T23:38:12.571Z",
+      "file_count": 2
+    },
+    {
+      "run_id": "48485685-e773-4433-a1f8-00f5524cca44",
+      "status": "COMPLETED",
+      "workspace_revision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+      "completed_at": "2026-09-05T23:06:59.988Z",
+      "file_count": 23758
+    },
+    {
+      "run_id": "d8bb84bd-b4ba-4f85-a5b9-fad16327b5fe",
+      "status": "COMPLETED",
+      "workspace_revision": "sha256:db4d688bf34a4207ad9ba9cadf4dcc64b3b27d8809472bf51007d32bfa9e122c",
+      "completed_at": "2026-09-05T22:55:37.505Z",
+      "file_count": 12
+    },
+    {
+      "run_id": "55888921-5f7e-4047-9ec4-96912659c2f7",
+      "status": "COMPLETED",
+      "workspace_revision": "sha256:3097d43973a39310034724c60036120e9877816ff6833259cd5b97277fe442e1",
+      "completed_at": "2026-09-05T22:50:25.967Z",
+      "file_count": 5
+    },
+    {
+      "run_id": "369e4270-7689-4536-8816-4ec4a5517b3e",
+      "status": "COMPLETED",
+      "workspace_revision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "completed_at": "2026-09-03T00:55:51.093Z",
+      "file_count": 2180
+    }
+  ],
+  "sourceAuthority": {
+    "schema": "atlas.current-graphify-snapshot-authority.v1",
+    "status": "NO_TERMINAL_EXECUTION_FOR_CURRENT_WORKSPACE",
+    "sourceSnapshot": {
+      "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+      "workspaceRevision": "sha256:c5d7efc34ccce388aaff25b178766b4a0ca2798b6c36e56139f79c1aafb1140d",
+      "sourceManifestDigest": "c5d7efc34ccce388aaff25b178766b4a0ca2798b6c36e56139f79c1aafb1140d",
+      "sourceCount": 24140,
+      "sourceManifestChecksum": "84fc74a4773cc4e0519343aa87c4f57cd5ff9a1cb9bdd558d1bb9d983285756e",
+      "workspaceRevisionRecordChecksum": "84fc74a4773cc4e0519343aa87c4f57cd5ff9a1cb9bdd558d1bb9d983285756e",
+      "workspaceOriginRuntimeRevision": "atlas.workspace-revision-origin-runtime.2026-08-21.v1",
+      "observedAt": "2026-09-09T19:08:58.649Z"
+    },
+    "qualifyingExecutionIds": [],
+    "candidates": [],
+    "graphSnapshot": {
+      "status": "GRAPH_CANONICAL_AUTHORITY_UNPROVEN",
+      "canonicalAuthorityTrueExecutions": 0
+    },
+    "canonicalAuthority": false,
+    "readOnly": true,
+    "writesPerformed": false,
+    "producerRevision": "atlas.current-graphify-snapshot-authority.v1"
+  },
+  "ownerDecision": "LEGACY_ONLY_NO_CURRENT_OWNER",
+  "admission": {
+    "canonicalAuthority": false,
+    "safeToPromote": false,
+    "reasons": [
+      "EXACT_CURRENT_COMPLETED_OWNER_COUNT_NOT_ONE",
+      "WORKTREE_DIRTY_REQUIRES_SNAPSHOT_POLICY",
+      "STATIC_WORKTREE_INVENTORY_DIFFERS_FROM_WORKSPACE_REVISION_MANIFEST"
+    ],
+    "status": "CURRENT_SOURCE_AUTHORITY_NOT_PROVEN"
+  },
+  "database": {
+    "connected": true,
+    "workspaceCandidates": [
+      "625743d2-092b-4fa8-abe0-9dc094920c80"
+    ]
+  },
+  "checksum": "sha256:b7b957d0422a1ab4b4a06ca42cb95208446a7afb73e37169697e2383c59109af"
+}

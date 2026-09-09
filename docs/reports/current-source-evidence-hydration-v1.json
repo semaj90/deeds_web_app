@@ -23,7 +23,7 @@
     },
     "atlas_packets": {
       "present": true,
-      "hasSourceRevision": false,
+      "hasSourceRevision": true,
       "hasContent": false,
       "hasContentHash": true,
       "hasEvidenceSpan": true,
@@ -74,5 +74,5 @@
   "canonicalAuthority": false,
   "status": "SOURCE_EVIDENCE_HYDRATION_BLOCKED",
   "nextGate": "RESOLVE_REVISION_BOUND_CONTENT_AND_SOURCE_NAMESPACE_AUTHORITY",
-  "reportChecksum": "eb986e4492984ab120822bb44b3de0c414f6aeba3b2d2401114507b3961b422a"
+  "reportChecksum": "80f9706ff819263be19fcc4fb866af7ab2652b5188dfa763fdd0fa155b268575"
 }

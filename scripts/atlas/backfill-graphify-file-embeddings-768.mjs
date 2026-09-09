@@ -48,6 +48,7 @@ const GGUF_SHA256 = String(args.get('gguf-sha256') ?? env.EMBEDDING_GGUF_SHA256 
 const LLAMA_CPP_REVISION = String(args.get('llama-cpp-revision') ?? env.LLAMA_CPP_REVISION ?? '').trim();
 const TOKENIZER_SHA256 = String(args.get('tokenizer-sha256') ?? env.EMBEDDING_TOKENIZER_SHA256 ?? '').trim().toLowerCase();
 const EXECUTION_PROFILE_REVISION = String(args.get('execution-profile-revision') ?? env.EMBEDDING_EXECUTION_PROFILE_REVISION ?? '').trim();
+const WORKSPACE_REVISION = String(args.get('workspace-revision') ?? env.ATLAS_WORKSPACE_REVISION ?? '').trim();
 
 function hash(value) {
   return crypto.createHash('sha256').update(value).digest('hex');
@@ -132,6 +133,25 @@ async function requireEmbedServer() {
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
   } catch (error) {
     throw new Error(`AUTHORITATIVE_EMBED_SERVER_REQUIRED:${error.message}`);
+  }
+}
+
+async function requireRevisionQualifiedSchema(pool) {
+  if (!APPLY) return;
+  if (!WORKSPACE_REVISION) {
+    throw new Error('REVISION_QUALIFIED_APPLY_REQUIRES_WORKSPACE_REVISION');
+  }
+  const { rows } = await pool.query(`
+    SELECT column_name
+    FROM information_schema.columns
+    WHERE table_schema = 'public'
+      AND table_name = 'codebase_chunk_index'
+      AND column_name IN ('source_revision', 'workspace_revision')
+  `);
+  const present = new Set(rows.map((row) => row.column_name));
+  const missing = ['source_revision', 'workspace_revision'].filter((column) => !present.has(column));
+  if (missing.length > 0) {
+    throw new Error(`REVISION_QUALIFIED_APPLY_SCHEMA_REQUIRED:${missing.join(',')}`);
   }
 }
 
@@ -239,6 +259,7 @@ async function main() {
       physicalType: PHYSICAL_TYPE,
       sinceHours: SINCE_HOURS,
       limit: LIMIT,
+      workspaceRevision: WORKSPACE_REVISION || null,
     },
     binding,
     bindingChecksum,
@@ -260,6 +281,7 @@ async function main() {
   };
 
   try {
+    await requireRevisionQualifiedSchema(pool);
     const schema = await pool.query(`
       SELECT format_type(a.atttypid, a.atttypmod) AS declared_type
       FROM pg_attribute a
@@ -276,16 +298,18 @@ async function main() {
     }
     report.scope.declaredType = schema.rows[0].declared_type;
 
+    const revisionSelect = APPLY ? ', source_revision::text, workspace_revision::text' : '';
     const result = await pool.query(`
-      SELECT id::text, relative_path, symbol, kind, summary, content, source_ref, content_hash, ast_symbols
+      SELECT id::text, relative_path, symbol, kind, summary, content, source_ref, content_hash, ast_symbols${revisionSelect}
       FROM codebase_chunk_index
       WHERE content_embedding IS NULL
         AND embedding_eligible = true
+        ${APPLY ? "AND source_revision IS NOT NULL AND workspace_revision = $3" : ''}
         AND updated_at >= NOW() - ($1 * INTERVAL '1 hour')
         AND COALESCE(content, summary, relative_path, source_ref, '') <> ''
       ORDER BY updated_at DESC, id
       LIMIT $2
-    `, [SINCE_HOURS, LIMIT]);
+    `, APPLY ? [SINCE_HOURS, LIMIT, WORKSPACE_REVISION] : [SINCE_HOURS, LIMIT]);
 
     report.selected = result.rows.length;
     report.sample = result.rows.slice(0, 5).map((row) => ({
@@ -331,7 +355,9 @@ async function main() {
                   updated_at = NOW()
               WHERE id = $4::uuid
                 AND content_embedding IS NULL
-            `, [vectorLiteral(vectors[index]), UPSTREAM_MODEL_ID, version, row.id]);
+                AND source_revision::text = $5
+                AND workspace_revision::text = $6
+            `, [vectorLiteral(vectors[index]), UPSTREAM_MODEL_ID, version, row.id, row.source_revision, WORKSPACE_REVISION]);
             if (update.rowCount === 1) report.written += 1;
             else report.skipped += 1;
           }

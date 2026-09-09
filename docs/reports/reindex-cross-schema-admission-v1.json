@@ -1,6 +1,6 @@
 {
   "schema": "atlas.reindex-cross-schema-admission.v1",
-  "generatedAt": "2026-09-08T21:16:02.447Z",
+  "generatedAt": "2026-09-09T17:46:40.273Z",
   "mode": "READ_ONLY_PLAN",
   "writesPerformed": false,
   "authority": "PostgreSQL canonical metadata and source/revision joins",
@@ -474,7 +474,8 @@
         "projection_representation_id",
         "projection_dimension",
         "encoder_revision",
-        "som_revision"
+        "som_revision",
+        "source_revision"
       ],
       "columnTypes": {
         "packet_id": {
@@ -1034,6 +1035,10 @@
           "udtName": "text"
         },
         "som_revision": {
+          "dataType": "text",
+          "udtName": "text"
+        },
+        "source_revision": {
           "dataType": "text",
           "udtName": "text"
         }

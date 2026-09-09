@@ -1,6 +1,6 @@
 {
   "schema": "atlas.rf6-semantic-vote-proof.v1",
-  "generatedAt": "2026-09-05T23:59:00.560Z",
+  "generatedAt": "2026-09-09T18:42:25.774Z",
   "status": "RF6_SEMANTIC_VOTE_PROVEN",
   "proofKind": "READ_ONLY_FOCUSED_FUSION_REGRESSION",
   "owner": "SearchRuntime::fuseSearchRuntimeCandidates",
@@ -20,13 +20,13 @@
     "command": "npx vitest run src/lib/server/retrieval/__tests__/search-runtime-fusion.test.ts src/lib/server/retrieval/__tests__/rf6-live-replay-01.test.ts --reporter=dot",
     "exitCode": 0,
     "signal": null,
-    "outputTail": "\n RUN  v3.2.4 C:/Users/james/Videos/deeds-web-app/sveltekit-frontend\n\nstdout | src/lib/server/retrieval/__tests__/search-runtime-fusion.test.ts\n🧪 Property-based testing environment initialized\n   Fast-check version: 4.4.0\n   Default numRuns: 100\n\nstdout | src/lib/server/retrieval/__tests__/rf6-live-replay-01.test.ts\n🧪 Property-based testing environment initialized\n   Fast-check version: 4.4.0\n   Default numRuns: 100\n\nstdout | src/lib/server/retrieval/__tests__/rf6-live-replay-01.test.ts\n🧪 Property-based testing environment cleaned up\n\n······stdout | src/lib/server/retrieval/__tests__/search-runtime-fusion.test.ts\n🧪 Property-based testing environment cleaned up\n\n·····················\n\n Test Files  2 passed (2)\n      Tests  27 passed (27)\n   Start at  16:58:35\n   Duration  24.72s (transform 4.00s, setup 9.06s, collect 1.18s, tests 33ms, environment 21.93s, prepare 8.32s)\n\n",
+    "outputTail": "\n RUN  v3.2.7 C:/Users/james/Videos/deeds-web-app/sveltekit-frontend\n\nstdout | src/lib/server/retrieval/__tests__/search-runtime-fusion.test.ts\n🧪 Property-based testing environment initialized\n   Fast-check version: 4.4.0\n   Default numRuns: 100\n\nstdout | src/lib/server/retrieval/__tests__/rf6-live-replay-01.test.ts\n🧪 Property-based testing environment initialized\n   Fast-check version: 4.4.0\n   Default numRuns: 100\n\nstdout | src/lib/server/retrieval/__tests__/rf6-live-replay-01.test.ts\n🧪 Property-based testing environment cleaned up\n\n·······stdout | src/lib/server/retrieval/__tests__/search-runtime-fusion.test.ts\n🧪 Property-based testing environment cleaned up\n\n·····················\n\n Test Files  2 passed (2)\n      Tests  28 passed (28)\n   Start at  11:41:39\n   Duration  45.71s (transform 645ms, setup 15.27s, collect 1.71s, tests 76ms, environment 38.94s, prepare 924ms)\n\n",
     "errorTail": ""
   },
   "source": {
     "searchRuntime": {
       "path": "sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts",
-      "checksum": "sha256:59aac12b653fff0afe22847f97742b60f2fbea579648ff7c50a552e27a43b3f2"
+      "checksum": "sha256:4238e049776868400d6b6d346ffa053371a5f133900c880631855a824a40b3f8"
     },
     "tests": {
       "path": "sveltekit-frontend/src/lib/server/retrieval/__tests__/search-runtime-fusion.test.ts",

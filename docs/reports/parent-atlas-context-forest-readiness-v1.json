@@ -1,0 +1,167 @@
+{
+  "schema": "atlas.parent-atlas-context-forest-readiness.v1",
+  "generatedAt": "2026-09-09T18:39:56.578Z",
+  "mode": "READ_ONLY_RECEIPT_RECONCILIATION",
+  "gates": [
+    {
+      "gate": "Leiden projection incident",
+      "status": "NOT_PROVEN",
+      "proofLevel": "NOT_RUN",
+      "blocking": true,
+      "writesProven": false,
+      "evidence": "No current bounded Leiden projection receipt supplied"
+    },
+    {
+      "gate": "Semantic-768 owner",
+      "status": "OWNER_NOT_PROVEN",
+      "proofLevel": "PARTIAL_PROVEN",
+      "blocking": true,
+      "writesProven": false,
+      "evidence": "docs/reports/semantic-768-writer-ownership-v1.json"
+    },
+    {
+      "gate": "Graphify source membership",
+      "status": "NO_TERMINAL_EXECUTION_FOR_CURRENT_WORKSPACE",
+      "proofLevel": "LIVE_PROVEN",
+      "blocking": true,
+      "writesProven": false,
+      "evidence": "docs/reports/current-graphify-snapshot-authority-v1.json"
+    },
+    {
+      "gate": "Packet/chunk/symbol identity",
+      "status": "NOT_PROVEN",
+      "proofLevel": "PARTIAL_PROVEN",
+      "blocking": true,
+      "writesProven": false,
+      "evidence": "docs/reports/atlas-canonical-projection-fabric-audit-2026-09-09.json"
+    },
+    {
+      "gate": "Representation ledger",
+      "status": "NOT_PROVEN",
+      "proofLevel": "READ_ONLY_AUDIT",
+      "blocking": true,
+      "writesProven": false,
+      "evidence": "docs/reports/latent-representation-identity-audit-2026-09-09.json"
+    },
+    {
+      "gate": "Projection identity",
+      "status": "NOT_PROVEN",
+      "proofLevel": "NOT_PROVEN",
+      "blocking": true,
+      "writesProven": false,
+      "evidence": "docs/reports/atlas-canonical-projection-fabric-audit-2026-09-09.json"
+    },
+    {
+      "gate": "Qdrant payload",
+      "status": "NOT_PROVEN",
+      "proofLevel": "PARTIAL_PROVEN",
+      "blocking": true,
+      "writesProven": false,
+      "evidence": "docs/reports/latent-representation-identity-audit-2026-09-09.json"
+    },
+    {
+      "gate": "Neo4j identity",
+      "status": "NOT_PROVEN",
+      "proofLevel": "NOT_RUN",
+      "blocking": true,
+      "writesProven": false,
+      "evidence": "No current cross-store identity receipt supplied"
+    },
+    {
+      "gate": "RRF owner",
+      "status": "CONTRACT_PROVEN",
+      "proofLevel": "CONTRACT_PROVEN",
+      "blocking": false,
+      "writesProven": false,
+      "evidence": "SearchRuntime ownership contract"
+    },
+    {
+      "gate": "Ordinal/graph manifest",
+      "status": "ABSENT",
+      "proofLevel": "NOT_PROVEN",
+      "blocking": true,
+      "writesProven": false,
+      "evidence": "docs/reports/atlas-canonical-projection-fabric-audit-2026-09-09.json"
+    },
+    {
+      "gate": "Hypergraph incidence",
+      "status": "NOT_PROVEN",
+      "proofLevel": "NOT_RUN",
+      "blocking": true,
+      "writesProven": false,
+      "evidence": "No current revision-qualified incidence receipt supplied"
+    },
+    {
+      "gate": "NetworkX context forest",
+      "status": "PARTIAL_PROVEN",
+      "proofLevel": "FIXTURE_PROVEN",
+      "blocking": true,
+      "writesProven": false,
+      "evidence": "ContextForestV1 implementation and direct smoke only"
+    },
+    {
+      "gate": "cuGraph parity",
+      "status": "NOT_PROVEN",
+      "proofLevel": "NOT_RUN",
+      "blocking": true,
+      "writesProven": false,
+      "evidence": "No live WSL2/RAPIDS parity receipt supplied"
+    },
+    {
+      "gate": "Sparse tensor",
+      "status": "NOT_PROVEN",
+      "proofLevel": "NOT_RUN",
+      "blocking": true,
+      "writesProven": false,
+      "evidence": "No sealed sparse tensor receipt supplied"
+    },
+    {
+      "gate": "Leiden Qdrant canary",
+      "status": "NOT_PROVEN",
+      "proofLevel": "NOT_RUN",
+      "blocking": true,
+      "writesProven": false,
+      "evidence": "No authorized canary receipt supplied"
+    },
+    {
+      "gate": "Cross-store canary",
+      "status": "NOT_PROVEN",
+      "proofLevel": "NOT_RUN",
+      "blocking": true,
+      "writesProven": false,
+      "evidence": "Independent current Postgres/Qdrant/graph readback absent"
+    },
+    {
+      "gate": "Postgres/pgvector performance",
+      "status": "NOT_PROVEN",
+      "proofLevel": "NOT_RUN",
+      "blocking": false,
+      "writesProven": false,
+      "evidence": "docs/reports/atlas-indexing-surfaces-v1.json"
+    }
+  ],
+  "authorities": {
+    "canonicalAuthority": "PostgreSQL_UNPROVEN_FOR_CURRENT_WORKSPACE",
+    "semanticAuthority": null,
+    "sourceAuthority": "SOURCE_EVIDENCE_HYDRATION_BLOCKED",
+    "symbolAuthority": "NOT_PROVEN",
+    "representationAuthority": "NOT_PROVEN",
+    "graphAuthority": "NO_TERMINAL_EXECUTION_FOR_CURRENT_WORKSPACE",
+    "projectionIdentityAuthority": "NOT_PROVEN"
+  },
+  "forestRuntimeReady": "PARTIAL_PROVEN",
+  "aceAdmissionReady": false,
+  "fullWorkspaceSafe": false,
+  "firstBlockingGate": "Graphify source membership",
+  "nextGate": "CURRENT-SOURCE-OWNER-RECONCILIATION-01",
+  "safeNextCommand": "node scripts/atlas/audit-current-graphify-snapshot-authority-v1.mts",
+  "writesPerformed": false,
+  "sources": {
+    "semanticOwner": "docs/reports/semantic-768-writer-ownership-v1.json",
+    "fabric": "docs/reports/atlas-canonical-projection-fabric-audit-2026-09-09.json",
+    "latent": "docs/reports/latent-representation-identity-audit-2026-09-09.json",
+    "sourceHydration": "docs/reports/current-source-evidence-hydration-v1.json",
+    "graphifyAuthority": "docs/reports/current-graphify-snapshot-authority-v1.json",
+    "indexing": "docs/reports/atlas-indexing-surfaces-v1.json"
+  }
+}

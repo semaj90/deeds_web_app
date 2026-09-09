@@ -132,7 +132,7 @@ export class Phase8ProgressTracker {
         step && step.total > 0
           ? `${step.completed}/${step.total} ${Math.round((step.completed / step.total) * 100)}%`
           : 'PENDING';
-      return `Phase 8 ${i + 1}/9 ${s.id} ${state} ${progress}`;
+      return `Phase 8 ${i + 1}/${steps.length} ${s.id} ${state} ${progress}`;
     });
 
     return {

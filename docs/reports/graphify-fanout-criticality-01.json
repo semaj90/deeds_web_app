@@ -1,6 +1,6 @@
 {
   "schema": "atlas.graphify-fanout-criticality-01.v1",
-  "generatedAt": "2026-09-03T02:05:11.350Z",
+  "generatedAt": "2026-09-09T18:02:10.024Z",
   "status": "AUDIT_COMPLETE",
   "classification": "OPTIONAL_DERIVED_REPRESENTATION",
   "question": "Is atlas:phase16:latent:apply required for canonical Graphify completion?",
@@ -26,7 +26,7 @@
   },
   "orchestration": {
     "packageInvokesLatent": false,
-    "phase8InvokesLatent": true,
+    "phase8InvokesLatent": false,
     "dailyChainInvokesPhase8": true,
     "coupledToDailyExit": false
   },
@@ -64,12 +64,12 @@
     {
       "file": "sveltekit-frontend/package.json",
       "exists": true,
-      "checksum": "sha256:ebd9e69d693172c51313d759d010542836e3e2111c2971ebd5401e161db247d7"
+      "checksum": "sha256:325761ecffbf37346cd345eb058d787cb4db7dc4a35611f372b79c6c95d14210"
     },
     {
       "file": "scripts/startup/run-atlas-phase8-fanout.mjs",
       "exists": true,
-      "checksum": "sha256:3a843838c1290703d157ce4d8c96ed060d5d865dbb42403a0d22444d4ae98f53"
+      "checksum": "sha256:5760cd57939e45b8194d4efa1472c629c821f9c404da5bd0daa441cf88de9656"
     },
     {
       "file": "scripts/atlas/backfill-latent-vectors.mjs",
@@ -91,5 +91,5 @@
   "canonicalAuthority": false,
   "nextGate": "GRAPHIFY-FANOUT-CONVERGENCE-01",
   "safeNextCommand": "node scripts/atlas/audit-graphify-fanout-criticality-01.mjs",
-  "reportChecksum": "sha256:09d7a581e475bcd26a6952d6aba2f96fea847176b3df700435b704056c6aef0f"
+  "reportChecksum": "sha256:0c2cc5ee8bea0741f7baeff5a3e7ec40f9362119c2446594c835230ef575b794"
 }

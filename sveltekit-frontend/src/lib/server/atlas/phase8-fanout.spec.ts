@@ -77,7 +77,7 @@ describe('phase8 progress tracker', () => {
     ]);
 
     expect(weighted.percent).toBeGreaterThan(0);
-    expect(weighted.description).toContain('Phase 8 1/9 langextract SUCCEEDED 1/1 100%');
+    expect(weighted.description).toContain('Phase 8 1/2 langextract SUCCEEDED 1/1 100%');
 
     const latest = JSON.parse(fs.readFileSync(path.join('.tmp', 'phase8', 'progress.json'), 'utf8'));
     expect(latest.run_id).toBe('phase8-test');
@@ -208,6 +208,14 @@ describe('phase8 fanout wrapper', () => {
     expect(result.optionalFailures).toEqual([
       expect.objectContaining({ script: 'atlas:phase16:latent:apply', reason: 'step-failed' }),
     ]);
+
+    const audit = fs
+      .readFileSync(path.join('.tmp', 'phase8', 'progress.jsonl'), 'utf8')
+      .trim()
+      .split(/\n+/)
+      .map((line) => JSON.parse(line));
+    expect(audit.at(-1)?.state).toBe('SUCCEEDED_WITH_OPTIONAL_FAILURES');
+    expect(audit.at(-1)?.phase_detail).toContain('atlas:phase16:latent:apply');
   });
 
   it('still aborts the fanout when a critical step fails', async () => {

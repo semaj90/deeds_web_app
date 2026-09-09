@@ -10045,3 +10045,40 @@ Files: `atlas-uuid-namespaces-v1.ts` (new),
 `packet-write-transaction-v1.ts` (updated), `prove-uuidv5-parity-v1.mts`
 (new), migration `20260909_uuidv5_identity_contract.sql`. Zero production
 packet_keys touched; zero source_revision backfill performed.
+
+## PACKET-WRITER-SOURCE-REVISION-PRESERVATION-01 (2026-09-09, unit-proven only, not live-proven)
+
+Fixed the NULL-clobber bug `semantic-packet-writer.ts` had flagged in its
+own code comment since the earlier `PACKET_WRITE_REVISION_CONTRACT_01`
+work: on conflict, `source_revision` is now wrapped in
+`COALESCE(new_value, atlas_packets.source_revision)` via Drizzle's `sql`
+template, instead of unconditionally overwriting.
+
+- [x] `sourceRevision` in the `onConflictDoUpdate` `set` clause replaced
+  with `conflictSourceRevision = sql\`COALESCE(${sourceRevision},
+  ${atlasPackets.sourceRevision})\`` -- a revision-blind caller (the only
+  one that exists today) can no longer silently erase a previously-proven
+  value if a second caller with real evidence is ever added.
+- [x] Updated the 2 existing unit tests that asserted the field was a
+  plain literal/`null` -- a first attempt to inspect the Drizzle SQL
+  fragment's internal `queryChunks` structure was WRONG (caught by a real
+  test failure, not assumed correct); fixed to the simpler, correct
+  assertion that the field is now a SQL fragment object rather than a bare
+  value. All 6 tests pass.
+
+**Not done, given critical context budget**: no live Postgres round-trip
+proof (unlike every other packet-write gate this session, which were all
+live-proven) -- a future
+`scripts/atlas/prove-source-revision-preservation-v1.mts` should seed a
+real row with a proven `source_revision`, call
+`persistCanonicalSemanticPacketEmbedding` again with it omitted, and
+confirm via independent readback that the original value survived. This
+fix also only covers the NULL-preservation half of the operator's 5-row
+matrix (`existing=A, incoming=NULL -> preserve A`) -- the
+`existing=A, incoming=B -> SOURCE_REVISION_CONFLICT, do not overwrite`
+half still requires full wiring through
+`decidePacketWrite`/`executePacketWriteTransaction`
+(`PACKET-WRITE-LIVE-WIRING-01`, unchanged, still queued, not started).
+
+File: `semantic-packet-writer.ts` (+ its `.spec.ts`). Zero production
+packet_keys touched.

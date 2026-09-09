@@ -1,12 +1,12 @@
 # ATLAS-CANONICAL-PROJECTION-FABRIC-01 Admission Gate — 2026-09-09
 
-**Read-only. Zero production mutations.** Repository commit: `8fdbcb53619b5ef5551c097948906ebdd6b01188`. Database: `127.0.0.1:5434`.
+**Read-only. Zero production mutations.** Repository commit: `9d525dd2ae888a3b646c6915a86a3a45a67a3fee`. Database: `127.0.0.1:5434`.
 
 Source proposal: ATLAS-CANONICAL-PROJECTION-FABRIC-01 (external architecture review, recorded 2026-09-08)
 
 ## Overall verdict: **NOT_SAFE_TO_PROJECT**
 
-10/11 predicates below PASS: IDENTITY_ALIGNED=PARTIAL_PROVEN, REVISION_QUALIFIED=NOT_PROVEN, SYMBOLS_RESOLVED=NOT_PROVEN, SEMANTIC_OWNER_PROVEN=AMBIGUOUS_OWNER, LATENT_FAMILY_PROVEN=NOT_PROVEN, GRAPH_MANIFEST_SEALED=ABSENT, ORDINAL_MAP_SEALED=ABSENT, PROJECTIONS_CHECKSUM_ALIGNED=NOT_PROVEN, BITFROST_KEYS_DERIVABLE=NOT_PROVEN, ACE_EVIDENCE_GROUNDED=NOT_PROVEN
+10/11 predicates below PASS: IDENTITY_ALIGNED=PARTIAL_PROVEN, REVISION_QUALIFIED=NOT_PROVEN, SYMBOLS_RESOLVED=NOT_PROVEN, SEMANTIC_OWNER_PROVEN=PARTIAL_PROVEN, LATENT_FAMILY_PROVEN=NOT_PROVEN, GRAPH_MANIFEST_SEALED=ABSENT, ORDINAL_MAP_SEALED=ABSENT, PROJECTIONS_CHECKSUM_ALIGNED=NOT_PROVEN, BITFROST_KEYS_DERIVABLE=NOT_PROVEN, ACE_EVIDENCE_GROUNDED=NOT_PROVEN
 
 ## Predicates
 
@@ -25,9 +25,10 @@ Source proposal: ATLAS-CANONICAL-PROJECTION-FABRIC-01 (external architecture rev
 - `graphify_symbols_exists`: true
 - `graphify_symbols_row_count`: 0
 
-### `SEMANTIC_OWNER_PROVEN`: **AMBIGUOUS_OWNER**
-> Two independently-populated tables both carry a 768-dim vector column that this repo has previously labeled CANONICAL_SOURCE (atlas_packets.embedding AND codebase_chunk_index.content_embedding_768). Per CLAUDE.md this is a known, tracked split (two coexisting Qdrant 768 collections mirror it) — not resolved by this audit. semantic_768 does not have one proven physical owner yet.
-- `candidate_768_columns_present`: ["atlas_packets.embedding","codebase_chunk_index.content_embedding_768"]
+### `SEMANTIC_OWNER_PROVEN`: **PARTIAL_PROVEN**
+> The current indexing census identifies codebase_chunk_index.content_embedding as the active semantic_768 physical candidate. This predicate remains PARTIAL_PROVEN until the active writer, revision-qualified read path, and Qdrant readback independently prove ownership; atlas_packets.embedding and codebase_chunk_index.content_embedding_768 remain secondary/transition surfaces.
+- `active_candidate_768_columns_present`: ["codebase_chunk_index.content_embedding"]
+- `legacy_or_unresolved_768_surfaces_present`: ["atlas_packets.embedding","codebase_chunk_index.content_embedding_768"]
 
 ### `LATENT_FAMILY_PROVEN`: **NOT_PROVEN**
 > Per the 2026-09-08 identity audit, atlas_representation_records does not exist — there is no producer_id/encoder_revision/input_digest record tying latent_64 (the only populated lane) to a shared-derivation family with any latent_256/latent_128 sibling. Cannot prove a single-input, non-cascaded projection family without it.

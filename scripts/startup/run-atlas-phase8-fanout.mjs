@@ -252,6 +252,21 @@ export async function runPhase8Fanout({
   }
 
   const elapsedSec = ((Date.now() - overallStartedAt) / 1000).toFixed(1);
+  const finalState = optionalFailures.length > 0 ? 'SUCCEEDED_WITH_OPTIONAL_FAILURES' : 'SUCCEEDED';
+  tracker.writeEvent(createStepSnapshot(
+    tracker,
+    runId,
+    stepStates,
+    stepStates.length,
+    stepStates.length,
+    finalState,
+    overallStartedAt,
+    'phase8',
+    optionalFailures.length > 0
+      ? `optional-derived failures: ${optionalFailures.map((failure) => failure.script).join(', ')}`
+      : 'fanout complete',
+  ));
+
   if (optionalFailures.length > 0) {
     logger(`complete in ${elapsedSec}s WITH ${optionalFailures.length} non-critical step failure(s): ${optionalFailures.map((f) => f.script).join(', ')}`);
   } else {

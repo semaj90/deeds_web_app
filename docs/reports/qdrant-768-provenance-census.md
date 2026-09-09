@@ -6,7 +6,7 @@ This is a read-only PROV 00-02 census. It requested payloads but no vector bytes
 
 ## Collections
 
-- `codebase_chunks_768_v2`: points=52380, vectors=[{"vector_name":"content","size":768,"distance":"Cosine","datatype":null,"on_disk":null},{"vector_name":"error","size":768,"distance":"Cosine","datatype":null,"on_disk":null},{"vector_name":"signature","size":768,"distance":"Cosine","datatype":null,"on_disk":null}]
+- `codebase_chunks_768_v2`: points=52816, vectors=[{"vector_name":"content","size":768,"distance":"Cosine","datatype":null,"on_disk":null},{"vector_name":"error","size":768,"distance":"Cosine","datatype":null,"on_disk":null},{"vector_name":"signature","size":768,"distance":"Cosine","datatype":null,"on_disk":null}]
 - `codebase_chunks_768`: points=109776, vectors=[{"vector_name":"content","size":768,"distance":"Cosine","datatype":null,"on_disk":null},{"vector_name":"error","size":768,"distance":"Cosine","datatype":null,"on_disk":null},{"vector_name":"signature","size":768,"distance":"Cosine","datatype":null,"on_disk":null}]
 
 ## Payload cohort status

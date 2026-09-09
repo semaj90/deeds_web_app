@@ -196,17 +196,23 @@ async function main() {
        WHERE udt_name IN ('vector','halfvec','sparsevec')
        ORDER BY table_name, column_name;`,
     );
-    const KNOWN_768_CANONICAL_CANDIDATES = ['atlas_packets.embedding', 'codebase_chunk_index.content_embedding_768'];
-    const canonical768Present = vectorCols
-      .map((r) => `${r.table_name}.${r.column_name}`)
-      .filter((k) => KNOWN_768_CANONICAL_CANDIDATES.includes(k));
+    const ACTIVE_768_CANDIDATE = 'codebase_chunk_index.content_embedding';
+    const LEGACY_OR_UNRESOLVED_768_SURFACES = [
+      'atlas_packets.embedding',
+      'codebase_chunk_index.content_embedding_768',
+    ];
+    const vectorSurfaceNames = vectorCols.map((r) => `${r.table_name}.${r.column_name}`);
+    const active768Present = vectorSurfaceNames.filter((k) => k === ACTIVE_768_CANDIDATE);
+    const legacyOrUnresolved768Present = vectorSurfaceNames.filter((k) =>
+      LEGACY_OR_UNRESOLVED_768_SURFACES.includes(k),
+    );
     const semanticOwnerProven = {
-      candidate_768_columns_present: canonical768Present,
-      verdict: canonical768Present.length === 1 ? 'PASS' : canonical768Present.length > 1 ? 'AMBIGUOUS_OWNER' : 'NOT_PROVEN',
-      note:
-        canonical768Present.length > 1
-          ? 'Two independently-populated tables both carry a 768-dim vector column that this repo has previously labeled CANONICAL_SOURCE (atlas_packets.embedding AND codebase_chunk_index.content_embedding_768). Per CLAUDE.md this is a known, tracked split (two coexisting Qdrant 768 collections mirror it) — not resolved by this audit. semantic_768 does not have one proven physical owner yet.'
-          : 'See vector_store_inventory for full column list.',
+      active_candidate_768_columns_present: active768Present,
+      legacy_or_unresolved_768_surfaces_present: legacyOrUnresolved768Present,
+      verdict: active768Present.length === 1 ? 'PARTIAL_PROVEN' : 'NOT_PROVEN',
+      note: active768Present.length === 1
+        ? 'The current indexing census identifies codebase_chunk_index.content_embedding as the active semantic_768 physical candidate. This predicate remains PARTIAL_PROVEN until the active writer, revision-qualified read path, and Qdrant readback independently prove ownership; atlas_packets.embedding and codebase_chunk_index.content_embedding_768 remain secondary/transition surfaces.'
+        : 'No active semantic_768 candidate was found in the live vector-column census; see vector_store_inventory for full column list.',
     };
 
     // ── Predicate 5: LATENT_FAMILY_PROVEN ──

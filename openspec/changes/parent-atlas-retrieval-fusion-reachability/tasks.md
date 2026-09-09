@@ -1415,3 +1415,18 @@ one canonical owner is a change with a much larger blast radius than this sessio
 **Not done** — the ~85-file broader test sweep the original handoff described (auditing
 `ollamaFetch` mocks inside test files, as opposed to production call sites) was not attempted this
 session; scoped out in favor of the production-code audit above.
+
+**Current RF6 recheck 2026-09-09:** the existing precondition audit reports
+`RF6_SEMANTIC_VOTE_PRECONDITIONS_READY`. Direct execution of the focused
+SearchRuntime fusion and RF6 replay suites passed **28/28** tests under Vitest
+3.2.7. This confirms the one-vote and revision-qualified grouping contract is
+still current; it does not authorize broad Qdrant repair or semantic
+promotion. No datastore, cache, model, or endpoint writes occurred.
+
+**Retrieval responsibility freeze (2026-09-09):** exact identifiers and
+revision-qualified symbols remain the exact lexical authority; PostgreSQL FTS /
+`ts_rank_cd` and any BM25 challenger remain ranking evidence, not identity.
+Semantic executors such as Qdrant, cuVS, CAGRA, and TurboVec must normalize
+inside one logical semantic lane before RRF. RRF combines ranks, not unrelated
+raw score scales, and no new BM25 index or retrieval owner is introduced by
+this design note.

@@ -637,6 +637,7 @@
     "trace"
   ],
   "disabledMcpjsonServers": [
-    "atlas-task-kernel"
+    "atlas-task-kernel",
+    "gemma4-offload"
   ]
 }

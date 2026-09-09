@@ -1,6 +1,6 @@
 {
   "schema": "atlas.graphify-lifecycle-owner.v1",
-  "generatedAt": "2026-09-09T02:14:52.938Z",
+  "generatedAt": "2026-09-09T16:21:37.081Z",
   "mode": "READ_ONLY_LIFECYCLE_OWNER_AUDIT",
   "databaseError": null,
   "lifecycleOwner": null,
@@ -30,11 +30,6 @@
       "mutationSignals": []
     },
     {
-      "path": "scripts/atlas/audit-graphify-completed-differential-replay-v1.mjs",
-      "classification": "READ_ONLY_AUDITOR",
-      "mutationSignals": []
-    },
-    {
       "path": "scripts/atlas/audit-graphify-lifecycle-owner-v1.mjs",
       "classification": "READ_ONLY_AUDITOR",
       "mutationSignals": []
@@ -45,17 +40,22 @@
       "mutationSignals": []
     },
     {
+      "path": "scripts/atlas/audit-graphify-completed-legacy-coverage-v1.mjs",
+      "classification": "READ_ONLY_AUDITOR",
+      "mutationSignals": []
+    },
+    {
+      "path": "scripts/atlas/audit-graphify-completed-differential-replay-v1.mjs",
+      "classification": "READ_ONLY_AUDITOR",
+      "mutationSignals": []
+    },
+    {
       "path": "scripts/atlas/audit-graphify-workspace-owner-v1.mjs",
       "classification": "READ_ONLY_AUDITOR",
       "mutationSignals": []
     },
     {
       "path": "scripts/atlas/audit-graphify-stale-run-reconciliation-v1.mjs",
-      "classification": "READ_ONLY_AUDITOR",
-      "mutationSignals": []
-    },
-    {
-      "path": "scripts/atlas/audit-graphify-completed-legacy-coverage-v1.mjs",
       "classification": "READ_ONLY_AUDITOR",
       "mutationSignals": []
     },
@@ -95,6 +95,11 @@
       "mutationSignals": []
     },
     {
+      "path": "scripts/atlas/plan-packet-chunk-lineage-promotion-v1.mjs",
+      "classification": "PLANNER_ONLY",
+      "mutationSignals": []
+    },
+    {
       "path": "scripts/atlas/plan-graphify-run-completion-v1.mjs",
       "classification": "PLANNER_ONLY",
       "mutationSignals": []
@@ -106,11 +111,6 @@
     },
     {
       "path": "scripts/atlas/plan-current-source-authority-repair-v1.mts",
-      "classification": "PLANNER_ONLY",
-      "mutationSignals": []
-    },
-    {
-      "path": "scripts/atlas/plan-packet-chunk-lineage-promotion-v1.mjs",
       "classification": "PLANNER_ONLY",
       "mutationSignals": []
     },
@@ -135,32 +135,17 @@
       "mutationSignals": []
     },
     {
-      "path": "scripts/atlas/reconcile-openspec-portfolio-v2.mjs",
-      "classification": "UNKNOWN",
-      "mutationSignals": []
-    },
-    {
       "path": "scripts/atlas/register-orphaned-chunks.mjs",
       "classification": "LEGACY_WRITER",
       "mutationSignals": []
     },
     {
+      "path": "scripts/atlas/reconcile-openspec-portfolio-v2.mjs",
+      "classification": "UNKNOWN",
+      "mutationSignals": []
+    },
+    {
       "path": "scripts/atlas/select-current-source-evidence-authority-v1.mts",
-      "classification": "UNKNOWN",
-      "mutationSignals": []
-    },
-    {
-      "path": "sveltekit-frontend/src/lib/server/atlas/embedding/source-namespace-v1.ts",
-      "classification": "UNKNOWN",
-      "mutationSignals": []
-    },
-    {
-      "path": "sveltekit-frontend/src/lib/server/atlas/board/graphify-current-workspace-revision.ts",
-      "classification": "UNKNOWN",
-      "mutationSignals": []
-    },
-    {
-      "path": "sveltekit-frontend/src/lib/server/atlas/board/daily-graphify-board-recommendations.ts",
       "classification": "UNKNOWN",
       "mutationSignals": []
     },
@@ -178,13 +163,28 @@
       "path": "sveltekit-frontend/src/lib/server/atlas/indexing/graphify-daily-coordinator-v1.ts",
       "classification": "UNKNOWN",
       "mutationSignals": []
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/embedding/source-namespace-v1.ts",
+      "classification": "UNKNOWN",
+      "mutationSignals": []
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/board/graphify-current-workspace-revision.ts",
+      "classification": "UNKNOWN",
+      "mutationSignals": []
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/board/daily-graphify-board-recommendations.ts",
+      "classification": "UNKNOWN",
+      "mutationSignals": []
     }
   ],
   "runningRunCount": 0,
   "staleRunCount": 19,
   "currentRunCount": 0,
-  "repositoryHeadRevision": "8fdbcb53619b5ef5551c097948906ebdd6b01188",
+  "repositoryHeadRevision": "a7e262ccf0682090c19ea0247bd4236be2272a6a",
   "writesPerformed": false,
   "canonicalAuthority": false,
-  "reportChecksum": "sha256:3f5619d96f226510f5a776362d768633ac72db7d7578102711b87926210b2afe"
+  "reportChecksum": "sha256:1840f8814cc864985b0c9c13d9ee8c1efa85a5c9c9fa98deabe3fa7bf55f7fc2"
 }

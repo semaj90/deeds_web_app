@@ -1,6 +1,6 @@
 {
   "schema": "atlas.graphify-git-source-authority.v1",
-  "generatedAt": "2026-09-09T01:17:54.514Z",
+  "generatedAt": "2026-09-09T16:51:46.463Z",
   "mode": "READ_ONLY_GIT_BLOB_AUTHORITY_AUDIT",
   "runId": "14643371-f6f2-4131-906b-235a5c06619a",
   "run": {
@@ -24,5 +24,5 @@
   "gitAuthorityProven": false,
   "repositoryContentHashMatchCount": 0,
   "rows": [],
-  "auditChecksum": "sha256:01f4d4500bcae56692be1bb37a565367a364de80ff9093b99be9afb5ef81b253"
+  "auditChecksum": "sha256:b14be75e0671bcc55cc44fd010fb63a93dc736fe9181dc3b75a5d095bde50723"
 }

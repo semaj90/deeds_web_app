@@ -23,8 +23,18 @@ import { materializeWorkspaceRevisionOriginV1 } from '../../src/lib/server/atlas
 loadAtlasEnv();
 const DATABASE_URL = process.env.DATABASE_URL?.trim();
 const WORKSPACE_ID = process.env.ATLAS_GRAPHIFY_CANARY_WORKSPACE_ID?.trim() ?? '';
-const CONFIRMATION = 'AUTHORIZE_GRAPHIFY_COMMITTED_BOUNDED_CANARY_V1';
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const fullMode = process.argv.includes('--full');
+const limitArg = process.argv.find((arg) => arg.startsWith('--limit='))?.slice('--limit='.length);
+const requestedLimit = Number(limitArg ?? process.env.GRAPHIFY_CANARY_SOURCE_LIMIT ?? '3');
+if (!fullMode && (!Number.isInteger(requestedLimit) || requestedLimit < 1 || requestedLimit > 50)) {
+  throw new Error('GRAPHIFY_COORDINATOR_CANARY_LIMIT_MUST_BE_AN_INTEGER_FROM_1_TO_50');
+}
+const confirmation = fullMode
+  ? 'AUTHORIZE_GRAPHIFY_FULL_WORKSPACE_SOURCE_SELECTION_V1'
+  : requestedLimit === 50
+  ? 'AUTHORIZE_GRAPHIFY_50_SOURCE_CANARY_V1'
+  : 'AUTHORIZE_GRAPHIFY_COMMITTED_BOUNDED_CANARY_V1';
 
 if (process.env.GRAPHIFY_COMMITTED_CANARY !== '1') {
   throw new Error('GRAPHIFY_COMMITTED_CANARY=1 is required for the bounded committed canary');
@@ -32,8 +42,8 @@ if (process.env.GRAPHIFY_COMMITTED_CANARY !== '1') {
 if (process.env.ATLAS_NON_PRODUCTION_DATABASE !== '1') {
   throw new Error('ATLAS_NON_PRODUCTION_DATABASE=1 is required for the bounded committed canary');
 }
-if (process.env.GRAPHIFY_COMMITTED_CANARY_CONFIRM !== CONFIRMATION) {
-  throw new Error(`GRAPHIFY_COMMITTED_CANARY_CONFIRM=${CONFIRMATION} is required for the bounded committed canary`);
+if (process.env.GRAPHIFY_COMMITTED_CANARY_CONFIRM !== confirmation) {
+  throw new Error(`GRAPHIFY_COMMITTED_CANARY_CONFIRM=${confirmation} is required for the bounded committed canary`);
 }
 if (!DATABASE_URL) throw new Error('DATABASE_URL is required for the bounded committed canary');
 if (!UUID_RE.test(WORKSPACE_ID)) throw new Error('ATLAS_GRAPHIFY_CANARY_WORKSPACE_ID must be an existing non-production workspace UUID');
@@ -64,9 +74,10 @@ try {
   if (expectedWorkspaceRevision && expectedWorkspaceRevision !== workspaceRevision) {
     throw new Error(`GRAPHIFY_COORDINATOR_CANARY_WORKSPACE_REVISION_MISMATCH:expected=${expectedWorkspaceRevision}:actual=${workspaceRevision}`);
   }
-  const selectedBindings = origin.bindings.slice(0, 3);
-  if (selectedBindings.length !== 3) {
-    throw new Error(`Expected 3 qualified source bindings from fresh materialization, got ${selectedBindings.length}`);
+  const selectedBindings = fullMode ? origin.bindings : origin.bindings.slice(0, requestedLimit);
+  const expectedCount = fullMode ? origin.bindings.length : requestedLimit;
+  if (selectedBindings.length !== expectedCount) {
+    throw new Error(`Expected ${expectedCount} qualified source bindings from fresh materialization, got ${selectedBindings.length}`);
   }
   const bindings = adaptWorkspaceBindingsToSourceSelectionV1(workspaceRevision, selectedBindings);
 
@@ -80,13 +91,13 @@ try {
     parserContractVersion: 'graphify.parser.v1',
     extractionContractVersion: 'graphify.extraction.v1',
     graphAlgorithmRevision: 'graphify.graph.v1',
-    triggerKind: 'BOUNDED_COMMITTED_CANARY',
+    triggerKind: fullMode ? 'CURRENT_WORKSPACE_SOURCE_SELECTION' : 'BOUNDED_COMMITTED_CANARY',
     schedulerRevision: 'atlas.graphify-daily-coordinator.v1',
     environmentRevision: 'operator-authorized-canary',
   });
   executionId = opened.executionId;
   const selection = await recordSourceSelectionStage(client, executionId, workspaceRevision, bindings, {
-    selectionPolicyRevision: 'committed-canary-fresh-materialization-v1',
+    selectionPolicyRevision: fullMode ? 'graphify-current-workspace-source-selection:v1' : 'committed-canary-fresh-materialization-v1',
   });
   const orderedInventoryBindings = [...bindings].sort((a, b) => a.sourceRef.localeCompare(b.sourceRef));
   const inventoryOutputChecksum = `sha256:${createHash('sha256')
@@ -155,7 +166,7 @@ try {
   const row = readback.rows[0];
   const report = {
     gate: 'GRAPHIFY-DAILY-COORDINATOR-01',
-    status: row?.status === 'COMPLETED' && row?.completed_at && Number(row.file_count) === 3 && Number(row.completed_stage_count) === 5 ? 'PROVEN_COMMITTED_BOUNDED_CANARY' : 'READBACK_FAILED',
+    status: row?.status === 'COMPLETED' && row?.completed_at && Number(row.file_count) === expectedCount && Number(row.completed_stage_count) === 5 ? (fullMode ? 'PROVEN_CURRENT_WORKSPACE_SOURCE_SELECTION' : 'PROVEN_COMMITTED_BOUNDED_CANARY') : 'READBACK_FAILED',
     executionId,
     workspaceRevision: row?.workspace_revision ?? null,
     workspaceRevisionSource: 'materializeWorkspaceRevisionOriginV1',
@@ -167,12 +178,12 @@ try {
     structuralSourceRef: structuralBinding.sourceRef,
     structuralProviderStatus: materialization.status,
     structuralProvenanceStatus: materialization.provenanceReadiness.status,
-    canonicalPromotionMayBeAttempted: structuralResult.receipt.canonicalPromotionMayBeAttempted,
+    canonicalPromotionMayBeAttempted: false,
     fileCount: Number(row?.file_count ?? 0),
     completedStageCount: Number(row?.completed_stage_count ?? 0),
     completedAt: row?.completed_at ?? null,
     historicalGraphifyRunsChanged: false,
-    broadGraphifyRun: false,
+    broadGraphifyRun: fullMode,
     canonicalAuthority: false,
     writesPerformed: true,
   };

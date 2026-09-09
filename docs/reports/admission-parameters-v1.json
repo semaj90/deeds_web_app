@@ -1,0 +1,84 @@
+{
+  "schema": "atlas.admission-parameters.v1",
+  "status": "PARAMETERS_BLOCKED",
+  "canonicalAuthority": false,
+  "workspace": {
+    "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+    "workspaceRevision": "sha256:c5d7efc34ccce388aaff25b178766b4a0ca2798b6c36e56139f79c1aafb1140d",
+    "sourceSelectionExecutionId": "8bd073a7-a8a9-43b7-b53a-778d33e3b524",
+    "sourceCount": 24186,
+    "sourceAuthorityStatus": "CURRENT_SOURCE_AUTHORITY_NOT_PROVEN"
+  },
+  "graph": {
+    "graphRevision": null,
+    "projectionName": null,
+    "nodeCount": null,
+    "edgeCount": null,
+    "authorityStatus": "NO_TERMINAL_EXECUTION_FOR_CURRENT_WORKSPACE"
+  },
+  "semantic": {
+    "representationId": "semantic_768",
+    "dimension": 768,
+    "embeddingModel": "embeddinggemma:latest",
+    "representationRevision": "current-workstation-contract",
+    "canonicalCollection": "codebase_chunks_768_v2",
+    "sourceCollection": "codebase_chunks_768",
+    "corpusVersion": "semantic768-128791b7a14d",
+    "sourceCohortChecksum": "sha256:3f3fade5bb160a90c95458acac46e5b27b7e14d76629ef6fe34f3c63349a52d9",
+    "judgmentSetHash": "pending",
+    "currentManifestAdmitted": false
+  },
+  "qdrant": {
+    "canonicalCollection": "codebase_chunks_768_v2",
+    "sourceCollection": "codebase_chunks_768",
+    "vectorName": "content",
+    "dimension": 768,
+    "distance": "Cosine",
+    "pointCount": 52816,
+    "provenanceStatus": "PARTIAL",
+    "lineageStatus": "CANARY_QDRANT_IDENTITY_BLOCKED"
+  },
+  "leiden": {
+    "status": "CANARY_QDRANT_IDENTITY_BLOCKED",
+    "candidateCount": 15,
+    "exactMatches": 0,
+    "mismatches": 15,
+    "missing": 15,
+    "duplicateMatches": 0
+  },
+  "blockers": [
+    "CURRENT_SOURCE_AUTHORITY_NOT_PROVEN",
+    "CURRENT_GRAPH_SNAPSHOT_NOT_PROVEN",
+    "SEMANTIC_768_CURRENT_MANIFEST_NOT_ADMITTED",
+    "QDRANT_V2_IDENTITY_LINEAGE_NOT_PROVEN",
+    "JUDGMENT_SET_NOT_REVIEWED"
+  ],
+  "sourceReceipts": {
+    "sourceOwner": {
+      "path": "docs/reports/current-source-owner-reconciliation-v1.json",
+      "present": true,
+      "checksum": "sha256:41969df2aadac460e0602bf9045438c3e70d0c5b419c29c42187019411e35a86"
+    },
+    "graphAuthority": {
+      "path": "docs/reports/current-graphify-snapshot-authority-v1.json",
+      "present": true,
+      "checksum": "sha256:a698961cc024f05b89e95e99510b1497086cd9f9e92367d80531e29b35327fb1"
+    },
+    "semanticManifest": {
+      "path": "docs/reports/current-semantic768-corpus-manifest-plan-v1.json",
+      "present": true,
+      "checksum": "sha256:8fc91d986177615b1648dc87c26ce1fc3717e81a877095884a52b76e83b2050b"
+    },
+    "qdrantProvenance": {
+      "path": "docs/reports/qdrant-768-provenance-census.json",
+      "present": true,
+      "checksum": "sha256:0d93e2b86a2b74a653a13bce52df162dd75c8d951e0bde4c10296ab809ba4938"
+    },
+    "leidenCanary": {
+      "path": "docs/reports/lineage-qdrant-semantic-canary-v1.json",
+      "present": true,
+      "checksum": "sha256:2493dfbe05ba0fd79832253d8547461772988786c3218e2548a4b9ee6dfcbc91"
+    }
+  },
+  "writesPerformed": false
+}

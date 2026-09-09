@@ -1,6 +1,6 @@
 {
   "schema": "atlas.indexing-surfaces.v1",
-  "generatedAt": "2026-09-05T15:47:55.917Z",
+  "generatedAt": "2026-09-09T18:24:59.232Z",
   "readOnly": true,
   "canonicalAuthority": "postgres",
   "ast": {
@@ -48,7 +48,7 @@
     "tables": {
       "atlas_packets": {
         "exists": true,
-        "count": 61715
+        "count": 61718
       },
       "codebase_chunk_index": {
         "exists": true,
@@ -220,7 +220,8 @@
         "projection_representation_id",
         "projection_dimension",
         "encoder_revision",
-        "som_revision"
+        "som_revision",
+        "source_revision"
       ],
       "codebase_chunk_index": [
         "id",
@@ -1624,7 +1625,7 @@
           "size": 768,
           "distance": "Cosine"
         },
-        "points": 5,
+        "points": 9,
         "indexedVectors": 0,
         "status": "green"
       },
@@ -1757,7 +1758,7 @@
           }
         },
         "points": 109776,
-        "indexedVectors": 112841,
+        "indexedVectors": 109552,
         "status": "green"
       },
       {
@@ -1776,7 +1777,7 @@
             "distance": "Cosine"
           }
         },
-        "points": 52380,
+        "points": 52816,
         "indexedVectors": 56419,
         "status": "green"
       },
@@ -1888,7 +1889,7 @@
             "distance": "Cosine"
           }
         },
-        "points": 12,
+        "points": 13,
         "indexedVectors": 0,
         "status": "green"
       },
@@ -2081,7 +2082,7 @@
           }
         },
         "points": 1025,
-        "indexedVectors": 1028,
+        "indexedVectors": 1025,
         "status": "green"
       },
       {
@@ -2142,8 +2143,8 @@
   },
   "drizzle": {
     "journalEntries": 41,
-    "manualSqlFiles": 272,
-    "declaredSidecars": 54,
+    "manualSqlFiles": 283,
+    "declaredSidecars": 61,
     "untrackedManualFiles": [
       "0009_hybrid_graph_indexes.sql",
       "0010_distilled_table_store.sql",

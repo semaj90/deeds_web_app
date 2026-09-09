@@ -161,6 +161,7 @@
     "atlas:index:code:768": "node scripts/atlas/index-code-768.mjs",
     "atlas:deep-review": "node scripts/atlas/run-deep-review.mjs",
     "atlas:graphify:daily:readiness": "node scripts/atlas/verify-graphify-daily-readiness.mjs",
+    "atlas:graphify:daily:admission": "node ../scripts/atlas/require-canonical-projection-admission-v1.mjs",
     "atlas:graph:quality:read": "node ../scripts/atlas/audit-graph-structural-quality.mjs",
     "atlas:indexing:surfaces:read": "node ../scripts/atlas/audit-atlas-indexing-surfaces.mjs",
     "atlas:kag:persistence:audit": "node ../scripts/atlas/audit-kag-persistence-v1.mjs",

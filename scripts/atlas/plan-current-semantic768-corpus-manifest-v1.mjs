@@ -11,6 +11,8 @@ const queuePath = path.resolve(root, '.tmp/atlas/golden-relevance-review-pool-bo
 const reportPath = path.resolve(root, 'docs/reports/current-semantic768-corpus-manifest-plan-v1.json');
 const dbUrl = process.env.ATLAS_DATABASE_URL ?? 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
 const qdrantUrl = process.env.ATLAS_QDRANT_URL ?? 'http://127.0.0.1:6333';
+const configuredCanonicalCollection = 'codebase_chunks_768_v2';
+const configuredSourceCollection = 'codebase_chunks_768';
 const digest = (value) => `sha256:${crypto.createHash('sha256').update(value).digest('hex')}`;
 
 const queue = fs.readFileSync(queuePath, 'utf8').split(/\r?\n/).filter(Boolean).map(JSON.parse);
@@ -33,14 +35,26 @@ try {
   await pool.end();
 }
 
-let qdrant = { reachable: false, pointCount: null, collection: 'codebase_chunks_768' };
-try {
-  const response = await fetch(`${qdrantUrl}/collections/codebase_chunks_768`, { signal: AbortSignal.timeout(3000) });
-  if (response.ok) {
-    const payload = await response.json();
-    qdrant = { reachable: true, pointCount: payload.result?.points_count ?? null, collection: 'codebase_chunks_768' };
-  }
-} catch {}
+const qdrantCollections = [];
+for (const collection of ['codebase_chunks_768', 'codebase_chunks_768_v2']) {
+  try {
+    const response = await fetch(`${qdrantUrl}/collections/${collection}`, { signal: AbortSignal.timeout(3000) });
+    if (response.ok) {
+      const payload = await response.json();
+      qdrantCollections.push({
+        collection,
+        pointCount: payload.result?.points_count ?? null,
+        vectors: payload.result?.config?.params?.vectors ?? null,
+      });
+    }
+  } catch {}
+}
+const qdrant = {
+  reachable: qdrantCollections.length > 0,
+  pointCount: qdrantCollections.length === 1 ? qdrantCollections[0].pointCount : null,
+  collection: qdrantCollections.length === 1 ? qdrantCollections[0].collection : 'UNRESOLVED_MULTIPLE_768_COLLECTIONS',
+  collections: qdrantCollections,
+};
 
 const manifest = {
   schema: 'atlas.evaluation-corpus-manifest-v1',
@@ -52,6 +66,12 @@ const manifest = {
   postgresChunkCount,
   qdrantCollection: qdrant.collection,
   qdrantPointCount: qdrant.pointCount,
+  qdrantCollections: qdrant.collections,
+  qdrantCollectionRoles: {
+    configuredCanonical: configuredCanonicalCollection,
+    configuredSourceLane: configuredSourceCollection,
+    liveCorpusSelection: qdrant.collection,
+  },
   embeddingModel: 'embeddinggemma:latest',
   embeddingDimension: 768,
   embeddingModelVersion: 'current-workstation-contract',
@@ -61,7 +81,9 @@ const manifest = {
   qdrantMetadataReachable: qdrant.reachable,
   databaseWrites: false,
   importAllowed: false,
-  nextRequiredStep: 'Complete reviewed grades and compute judgmentSetHash before registering this manifest.',
+  nextRequiredStep: qdrantCollections.length > 1
+    ? 'Verify codebase_chunks_768_v2 as the configured canonical projection, classify codebase_chunks_768 as a separate source lane, and complete reviewed grades before registering this manifest.'
+    : 'Complete reviewed grades and compute judgmentSetHash before registering this manifest.',
 };
 fs.mkdirSync(path.dirname(reportPath), { recursive: true });
 fs.writeFileSync(reportPath, `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');

@@ -211,6 +211,21 @@ Louvain vs. Leiden on coverage/modularity/singleton-ratio/community-size distrib
 explicitly attribute the high community count to one of the 6 candidate causes above.
 **Apply-mode succeeding is not evidence of taxonomy usefulness — keep those two proofs separate.**
 
+### Leiden follow-up recheck (2026-09-09)
+
+- The existing `scripts/atlas/audit-som-identity-cross-store.mjs` is not a
+  valid Leiden promotion receipt: it inspects `som_cluster`, uses a legacy
+  Qdrant GET path, and does not prove `leiden_community_id` identity.
+- Its live Neo4j observation found 59,692 `Packet` nodes, 19,308 with
+  `packet_key`, 18,937 with `source_ref`, and 0 with `som_cluster`; Qdrant
+  inspection failed with an empty response. These results are diagnostic only.
+- Keep GR5 at `PARTIAL_PROVEN`. The next valid gate is a read-only Leiden
+  identity join using packet/chunk/symbol lineage first, with path matching
+  retained only as a fallback diagnostic. Then perform independent final
+  Neo4j/PostgreSQL/Qdrant readback and a same-projection Leiden-vs-Louvain
+  quality comparison.
+- No graph, vector, database, cache, or model writes occurred in this recheck.
+
 ## Re-verification pass (2026-09-05, read-only)
 
 - Confirmed `neo4j/01-required-indexes.cypher` still does **not** exist in the canonical

@@ -20,6 +20,7 @@ const ROOT = path.resolve(__dirname, '../..');
 const FRONTEND = path.resolve(ROOT, 'sveltekit-frontend');
 const PARENT_ATLAS = path.resolve(ROOT, 'packages/parent-atlas');
 const DAILY_CHAIN_SCRIPT = 'npm run graphify:daily:chain';
+const PROMOTION_ADMISSION_SCRIPT = 'node scripts/atlas/require-canonical-projection-admission-v1.mjs';
 const FALLBACK_SCRIPT = 'npm run startup:graphify-complete:no-consumer -- --skip-audit';
 const STARTUP_LOCK_FILE = path.resolve(ROOT, '.graphify-daily-start.lock');
 
@@ -339,26 +340,31 @@ try {
     process.exit(0);
   }
 
+  // GRAPHIFY-PROMOTION-ADMISSION-01: the ordinary daily entrypoint must not
+  // reach its apply-capable chain until the existing read-only fabric audit
+  // proves SAFE_TO_PROJECT. The audit writes only a local receipt and exits
+  // non-zero for NOT_SAFE_TO_PROJECT; no datastore or projection mutation is
+  // authorized by this gate.
+  if (!quiet) console.log('[graphify:daily] Checking canonical projection admission...');
+  execSync(PROMOTION_ADMISSION_SCRIPT, {
+    cwd: ROOT,
+    stdio: quiet ? 'ignore' : 'inherit',
+    timeout: 10 * 60 * 1000,
+    shell: true,
+  });
+
   // GRAPHIFY-OPEN-CLOSE-LIVE-WIRING-01 (2026-09-03): opens a real graphify_runs row and binds a
   // real, materialized WorkspaceRevisionRecordV1 to it before the actual indexing chain runs.
-  // Uses the same proven openGraphifyRunV1/bindWorkspaceRevisionV1 primitives already
-  // live-proved standalone (scripts/atlas/prove-graphify-open-bind-complete-lifecycle-v1.mjs) --
-  // no new SQL here, just wiring the existing primitive into the real entrypoint for the first
-  // time. Deliberately non-fatal: lifecycle bookkeeping must never block the real indexing work
-  // it is trying to observe, so a failure here is logged and the chain proceeds regardless.
-  let lifecycleOpened = false;
-  try {
-    if (!quiet) console.log('[graphify:daily] Opening graphify_runs lifecycle row...');
-    execSync('npx tsx scripts/atlas/graphify-daily-lifecycle-open-v1.mjs', {
-      cwd: ROOT,
-      stdio: quiet ? 'ignore' : 'inherit',
-      timeout: 5 * 60 * 1000,
-      shell: true,
-    });
-    lifecycleOpened = true;
-  } catch (lifecycleOpenError) {
-    console.warn(`[graphify:daily] Lifecycle open/bind degraded; continuing daily chain without it: ${lifecycleOpenError.message}`);
-  }
+  // A canonical run without a durable open/bind record cannot be promoted.
+  // Fail closed before any apply-capable child is started.
+  if (!quiet) console.log('[graphify:daily] Opening graphify_runs lifecycle row...');
+  execSync('npx tsx scripts/atlas/graphify-daily-lifecycle-open-v1.mjs', {
+    cwd: ROOT,
+    stdio: quiet ? 'ignore' : 'inherit',
+    timeout: 5 * 60 * 1000,
+    shell: true,
+  });
+  const lifecycleOpened = true;
 
   // Run from sveltekit-frontend directory to resolve npm scripts
   //
@@ -376,22 +382,16 @@ try {
     timeout: 3 * 60 * 60 * 1000 // 3 hour timeout
   });
 
-  // Close the lifecycle row opened above, only if it was actually opened. A failure here is
-  // also non-fatal for the same reason as the open step -- the real indexing work above already
-  // succeeded by this point, and a bookkeeping-close failure must not turn that into a reported
-  // daily-run failure.
+  // Close the lifecycle row opened above. A close failure is a failed daily
+  // run: the caller must not interpret process completion as a terminal receipt.
   if (lifecycleOpened) {
-    try {
-      if (!quiet) console.log('[graphify:daily] Completing graphify_runs lifecycle row...');
-      execSync('npx tsx scripts/atlas/graphify-daily-lifecycle-complete-v1.mjs', {
-        cwd: ROOT,
-        stdio: quiet ? 'ignore' : 'inherit',
-        timeout: 60 * 1000,
-        shell: true,
-      });
-    } catch (lifecycleCompleteError) {
-      console.warn(`[graphify:daily] Lifecycle completion degraded; daily chain already succeeded: ${lifecycleCompleteError.message}`);
-    }
+    if (!quiet) console.log('[graphify:daily] Completing graphify_runs lifecycle row...');
+    execSync('npx tsx scripts/atlas/graphify-daily-lifecycle-complete-v1.mjs', {
+      cwd: ROOT,
+      stdio: quiet ? 'ignore' : 'inherit',
+      timeout: 60 * 1000,
+      shell: true,
+    });
   }
 
   // NES/CHROM is a derived packet projection over the refreshed feature map.

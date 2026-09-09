@@ -14182,3 +14182,56 @@ Receipt: `docs/reports/semantic-b-c1-d-status-v1.json`.
   action receipts.
 
 Receipt: `docs/reports/kernel-dag-operator-owner-reconciliation-v1.json`.
+
+### Current semantic 768 manifest recheck (2026-09-09)
+
+- Replayed `scripts/atlas/plan-current-semantic768-corpus-manifest-v1.mjs` read-only.
+- The planner now probes both live Qdrant collections instead of silently selecting one:
+  `codebase_chunks_768` has 109,776 points and `codebase_chunks_768_v2` has 52,816;
+  both expose named `content`, `error`, and `signature` vectors at 768 dimensions.
+- The receipt reports `UNRESOLVED_MULTIPLE_768_COLLECTIONS`,
+  `canonicalAuthority=false`, PostgreSQL canonical chunk count 55,169,
+  `judgmentSetHash=pending`, and `importAllowed=false`.
+- No PostgreSQL, Qdrant, Neo4j, Valkey, or model writes occurred.
+- Status: **BLOCKED** until the canonical Qdrant collection owner and reviewed
+  judgment set are resolved.
+
+### Collection-role clarification (2026-09-09)
+
+- The live application registry already identifies `codebase_chunks_768_v2` as
+  the configured canonical production retrieval projection and
+  `codebase_chunks_768` as a separate native/source lane.
+- The planner now records those configured roles explicitly while retaining
+  `liveCorpusSelection=UNRESOLVED_MULTIPLE_768_COLLECTIONS`; this is a
+  corpus/admission ambiguity, not permission to merge or rewrite either collection.
+- Canonical promotion remains blocked until the v2 identity/revision readback,
+  source-lane classification, and reviewed judgment set are complete.
+
+### Qdrant 768 provenance recheck (2026-09-09)
+
+- Replayed the existing read-only owner
+  `sveltekit-frontend/scripts/atlas/audit-qdrant-768-provenance.mts` across
+  both collections; receipt: `docs/reports/qdrant-768-provenance-census.json`.
+- `codebase_chunks_768_v2` is green with 52,816 points and named 768D
+  `content`, `error`, and `signature` vectors. Its sampled payload cohort is
+  `PARTIAL`: it identifies `semantic_768` and `projection_revision=v2_uuid_clean`,
+  but does not provide exact packet lineage or a representation revision.
+- `codebase_chunks_768` is green with 109,776 points and the same vector widths,
+  but its payload cohort is `MIXED_HISTORY` with operational tags and multiple
+  identity generations. It is not interchangeable with v2.
+- Proven: collection contract, writer census, and payload census. Not proven:
+  exact packet lineage, generation-cohort promotion, and numerical corroboration.
+- No vector bytes were requested and no PostgreSQL, Qdrant, Neo4j, Valkey, or
+  model writes occurred. Promotion remains blocked.
+
+### v2 current-lineage canary recheck (2026-09-09)
+
+- Replayed the existing bounded read-only canary against the configured
+  canonical collection with `ATLAS_QDRANT_COLLECTION=codebase_chunks_768_v2`.
+- Result: `CANARY_QDRANT_IDENTITY_BLOCKED`; 15 candidates inspected, 0 exact
+  matches, 15 mismatches, 15 missing current joins, and 0 duplicate matches.
+- Observed failure classes: `WORKSPACE_REVISION_MISMATCH`,
+  `REPRESENTATION_ID_MISMATCH`, `EMBEDDING_DIMENSION_MISMATCH`, and
+  `REPRESENTATION_REVISION_MISSING`.
+- This proves the collection shape is 768D but does not prove current semantic
+  lineage. No Qdrant, PostgreSQL, Neo4j, Valkey, or model writes occurred.

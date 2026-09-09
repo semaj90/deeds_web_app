@@ -2,12 +2,55 @@
   "schema": "atlas.evaluation-corpus-manifest-v1",
   "status": "CURRENT_SEMANTIC768_MANIFEST_PLANNED",
   "canonicalAuthority": false,
-  "corpusVersion": "semantic768-8033a99e2462",
-  "gitCommit": "8033a99e246242b327b2823ea119e53563992ce3",
+  "corpusVersion": "semantic768-128791b7a14d",
+  "gitCommit": "128791b7a14d336e4073f18c8c7f1a6ab40b8a72",
   "postgresPacketCount": null,
   "postgresChunkCount": 55169,
-  "qdrantCollection": "codebase_chunks_768",
-  "qdrantPointCount": 109776,
+  "qdrantCollection": "UNRESOLVED_MULTIPLE_768_COLLECTIONS",
+  "qdrantPointCount": null,
+  "qdrantCollections": [
+    {
+      "collection": "codebase_chunks_768",
+      "pointCount": 109776,
+      "vectors": {
+        "content": {
+          "size": 768,
+          "distance": "Cosine"
+        },
+        "error": {
+          "size": 768,
+          "distance": "Cosine"
+        },
+        "signature": {
+          "size": 768,
+          "distance": "Cosine"
+        }
+      }
+    },
+    {
+      "collection": "codebase_chunks_768_v2",
+      "pointCount": 52816,
+      "vectors": {
+        "content": {
+          "size": 768,
+          "distance": "Cosine"
+        },
+        "error": {
+          "size": 768,
+          "distance": "Cosine"
+        },
+        "signature": {
+          "size": 768,
+          "distance": "Cosine"
+        }
+      }
+    }
+  ],
+  "qdrantCollectionRoles": {
+    "configuredCanonical": "codebase_chunks_768_v2",
+    "configuredSourceLane": "codebase_chunks_768",
+    "liveCorpusSelection": "UNRESOLVED_MULTIPLE_768_COLLECTIONS"
+  },
   "embeddingModel": "embeddinggemma:latest",
   "embeddingDimension": 768,
   "embeddingModelVersion": "current-workstation-contract",
@@ -17,5 +60,5 @@
   "qdrantMetadataReachable": true,
   "databaseWrites": false,
   "importAllowed": false,
-  "nextRequiredStep": "Complete reviewed grades and compute judgmentSetHash before registering this manifest."
+  "nextRequiredStep": "Verify codebase_chunks_768_v2 as the configured canonical projection, classify codebase_chunks_768 as a separate source lane, and complete reviewed grades before registering this manifest."
 }

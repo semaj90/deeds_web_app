@@ -141,10 +141,17 @@ async function main() {
     // Only classify what's directly evidence-backed by prior sessions' live checks; everything
     // else stays UNKNOWN rather than inferred from naming, per the audit's own rule.
     const KNOWN_CLASSIFICATION = {
-      'atlas_packets.embedding': 'CANONICAL_SOURCE', // verified live 2026-08-03: vector(768), 61,659/61,659 non-null
-      'codebase_chunk_index.content_embedding_768': 'CANONICAL_SOURCE',
-      'codebase_chunk_index.content_embedding': 'DERIVED_PROJECTION', // halfvec mirror of the above
-      'atlas_packets.content_embedding_384': 'LEGACY', // per repo's own retirement note on the 384-dim lane
+      // The current indexing census identifies this populated halfvec(768)
+      // surface as the active semantic candidate.  Writer/read-path proof is
+      // still required before the identity audit may call it canonical.
+      'codebase_chunk_index.content_embedding': 'ACTIVE_CANONICAL_CANDIDATE',
+      // Smaller transition surface; do not let historical labels promote it.
+      'codebase_chunk_index.content_embedding_768': 'LEGACY_OR_TRANSITIONAL',
+      // Populated 768 surface retained for compatibility; ownership remains
+      // unresolved until its active writer and revision-qualified read path
+      // are independently proven.
+      'atlas_packets.embedding': 'SECONDARY_768_SURFACE_UNRESOLVED',
+      'atlas_packets.content_embedding_384': 'LEGACY', // retired 384-dim lane
     };
     const vectorStoreInventory = vectorCols.map((r) => ({
       table: r.table_name,

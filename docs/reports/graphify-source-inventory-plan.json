@@ -4,12 +4,12 @@
   "readOnly": true,
   "canonicalWriteAttempted": false,
   "durableOwnerBound": false,
-  "workspaceRevision": "sha256:0d907b35235fe20a86199e689b6e8ab499de700762494a7d62483ceeff5ef068",
-  "sourceManifestDigest": "0d907b35235fe20a86199e689b6e8ab499de700762494a7d62483ceeff5ef068",
-  "sourceManifestSourceCount": 24465,
-  "repositoryRevision": "1e1b2930a14afcf88552117ee2f53ab551eff87d",
+  "workspaceRevision": "sha256:5320597bf4e26adc0d71dabd34faf3eec74a5f2b10f57d92c33771f2b7691f82",
+  "sourceManifestDigest": "5320597bf4e26adc0d71dabd34faf3eec74a5f2b10f57d92c33771f2b7691f82",
+  "sourceManifestSourceCount": 24132,
+  "repositoryRevision": "a7e262ccf0682090c19ea0247bd4236be2272a6a",
   "selectedWriteCount": 100,
-  "skippedSourceCount": 98,
+  "skippedSourceCount": 84,
   "records": [
     {
       "sourceRef": "__tests__/data-hashing.spec.ts",
@@ -110,6 +110,41 @@
       "gitBlobOid": "f6e7646ad097f49052f18646627f98eeab956651"
     },
     {
+      "sourceRef": ".claude/commands/opsx/apply.md",
+      "codeSourceRevision": "sha256:89d7cee95f269936adfa3b38e19acca09dc1780d6b448968e3315fc87f5222f4",
+      "contentHash": "89d7cee95f269936adfa3b38e19acca09dc1780d6b448968e3315fc87f5222f4",
+      "byteLength": 5287,
+      "gitBlobOid": "c6cb9b6d77f73b26028e88e619a171f23b5aeee5"
+    },
+    {
+      "sourceRef": ".claude/commands/opsx/archive.md",
+      "codeSourceRevision": "sha256:fd18d7258de6002efbed97ab32e9ce61f2b7d899e3be6843dd64f6f2b5d88108",
+      "contentHash": "fd18d7258de6002efbed97ab32e9ce61f2b7d899e3be6843dd64f6f2b5d88108",
+      "byteLength": 5916,
+      "gitBlobOid": "df8a2f2d9eaab9caf4bcdf334cc38a1f1c3a0c14"
+    },
+    {
+      "sourceRef": ".claude/commands/opsx/explore.md",
+      "codeSourceRevision": "sha256:8ed0cb6e9933a71f676ef94a5b865e5681155b04ceafbe0171160791673da156",
+      "contentHash": "8ed0cb6e9933a71f676ef94a5b865e5681155b04ceafbe0171160791673da156",
+      "byteLength": 7450,
+      "gitBlobOid": "7558a6319d67dbf0878463a458dbf21a7399967f"
+    },
+    {
+      "sourceRef": ".claude/commands/opsx/propose.md",
+      "codeSourceRevision": "sha256:b6f40402553e7348172fae8e154aa65284f49308a90d79209d2bdaae35059023",
+      "contentHash": "b6f40402553e7348172fae8e154aa65284f49308a90d79209d2bdaae35059023",
+      "byteLength": 5237,
+      "gitBlobOid": "8d99588fc7bbf28284ad8c4c9d8f04d3167b1250"
+    },
+    {
+      "sourceRef": ".claude/commands/opsx/sync.md",
+      "codeSourceRevision": "sha256:df2c3ba5ad9bc4d6ecc8b35427285ad6355fc12fe1574cbca7bed165396075b1",
+      "contentHash": "df2c3ba5ad9bc4d6ecc8b35427285ad6355fc12fe1574cbca7bed165396075b1",
+      "byteLength": 5058,
+      "gitBlobOid": "a3550cf488552c5339a214462c6118f1ebcd8b9c"
+    },
+    {
       "sourceRef": ".claude/commands/prune-codebase.md",
       "codeSourceRevision": "sha256:47e6a73cd047b00416a19b212b8378d67220d377640c065c0a6e2074e4095a68",
       "contentHash": "47e6a73cd047b00416a19b212b8378d67220d377640c065c0a6e2074e4095a68",
@@ -167,9 +202,9 @@
     },
     {
       "sourceRef": ".claude/hooks/pretooluse-deny.mjs",
-      "codeSourceRevision": "sha256:b3ad0907595e524f14d6954bead502c077ab72253b86cbfa468b2147568f81cc",
-      "contentHash": "b3ad0907595e524f14d6954bead502c077ab72253b86cbfa468b2147568f81cc",
-      "byteLength": 6150,
+      "codeSourceRevision": "sha256:09f8a67945e52bfa12c82a0b4a90016cfee4680863c9ffcd5ff0358b0bcd399c",
+      "contentHash": "09f8a67945e52bfa12c82a0b4a90016cfee4680863c9ffcd5ff0358b0bcd399c",
+      "byteLength": 6258,
       "gitBlobOid": "566d2fa16f1927283f63ef327301076b32920796"
     },
     {
@@ -251,17 +286,24 @@
     },
     {
       "sourceRef": ".claude/settings.json",
-      "codeSourceRevision": "sha256:9d679a8b60b352ffbd65e830963d91275801cd8a338c03ed6fa5a43fd2b93370",
-      "contentHash": "9d679a8b60b352ffbd65e830963d91275801cd8a338c03ed6fa5a43fd2b93370",
-      "byteLength": 8697,
-      "gitBlobOid": "7b6bd068215115294f3bc5f030da926d54c734d9"
+      "codeSourceRevision": "sha256:1d6bac968abfb68db993c7aebab7de81fd939a909a24ac59eeb7aae257e05dc2",
+      "contentHash": "1d6bac968abfb68db993c7aebab7de81fd939a909a24ac59eeb7aae257e05dc2",
+      "byteLength": 9450,
+      "gitBlobOid": "a603d32363583c4764071b250dcc0a13bf52c8d5"
     },
     {
       "sourceRef": ".claude/settings.local.json",
-      "codeSourceRevision": "sha256:d6ed2c0dc6e798242638abe9222ef178155c07e6dd2d4f234693c4ff6981facc",
-      "contentHash": "d6ed2c0dc6e798242638abe9222ef178155c07e6dd2d4f234693c4ff6981facc",
-      "byteLength": 45832,
-      "gitBlobOid": "5d6ca5a6fe8bdf3c73b203dae90af1795a67a238"
+      "codeSourceRevision": "sha256:32fed5fa33dd50cb46383382fb7ddd27ede23ccff49b4738df2d1ad0a9c11e2c",
+      "contentHash": "32fed5fa33dd50cb46383382fb7ddd27ede23ccff49b4738df2d1ad0a9c11e2c",
+      "byteLength": 46173,
+      "gitBlobOid": "6c0d1739e30c8c0f1cc79ca189ad3f6c12893d1b"
+    },
+    {
+      "sourceRef": ".claude/skills/atlas-tools-mcp/SKILL.md",
+      "codeSourceRevision": "sha256:671d6513d83a3cc915edd67cd8c85d5a8932a0a8bf7cab9d9b556cc13c2fbe11",
+      "contentHash": "671d6513d83a3cc915edd67cd8c85d5a8932a0a8bf7cab9d9b556cc13c2fbe11",
+      "byteLength": 6675,
+      "gitBlobOid": "8569c4d3c3457dfdcbe81c836180650aeeebb937"
     },
     {
       "sourceRef": ".claude/skills/bits-ui-svelte5/SKILL.md",
@@ -272,9 +314,9 @@
     },
     {
       "sourceRef": ".claude/skills/codebase-indexing-agentic-error-fixing.md",
-      "codeSourceRevision": "sha256:3e528f3f7c2eff99db3ac71e9c91b92255acb3f0478f02fd8d36f45d591bb76d",
-      "contentHash": "3e528f3f7c2eff99db3ac71e9c91b92255acb3f0478f02fd8d36f45d591bb76d",
-      "byteLength": 7347,
+      "codeSourceRevision": "sha256:3224764997eb483b3784685fa8adc9379e46338b7b28e06badf3923c3dfcf392",
+      "contentHash": "3224764997eb483b3784685fa8adc9379e46338b7b28e06badf3923c3dfcf392",
+      "byteLength": 7529,
       "gitBlobOid": "6f0c54ee8db9d1198ceaa428db266b06dfb81a94"
     },
     {
@@ -300,17 +342,52 @@
     },
     {
       "sourceRef": ".claude/skills/metadata-context-analysis/SKILL.md",
-      "codeSourceRevision": "sha256:d0d2cb0c16e4eb203339c602b68cd425a189d74b2eeebcf50e465142e2caa03f",
-      "contentHash": "d0d2cb0c16e4eb203339c602b68cd425a189d74b2eeebcf50e465142e2caa03f",
-      "byteLength": 2061,
-      "gitBlobOid": "0cb4963a5ee052d0a6005cf522feb115ea0d6392"
+      "codeSourceRevision": "sha256:19e7ba3b8bb880ce4f4b0c3ab9d876384a351062fd70050060dac7dd6d7aea80",
+      "contentHash": "19e7ba3b8bb880ce4f4b0c3ab9d876384a351062fd70050060dac7dd6d7aea80",
+      "byteLength": 2098,
+      "gitBlobOid": "68e554d5883463d666c8a578471cf2505208525b"
+    },
+    {
+      "sourceRef": ".claude/skills/openspec-apply-change/SKILL.md",
+      "codeSourceRevision": "sha256:83e0d2d4c47674e312fc9d29297d91e5c018a5507e6961829ee623600e2cf2ff",
+      "contentHash": "83e0d2d4c47674e312fc9d29297d91e5c018a5507e6961829ee623600e2cf2ff",
+      "byteLength": 5465,
+      "gitBlobOid": "1375861c3ecb0efd5c0e5b22f8d7c0b2431ea4d1"
+    },
+    {
+      "sourceRef": ".claude/skills/openspec-archive-change/SKILL.md",
+      "codeSourceRevision": "sha256:85c8764715a18fbd11d16ca04bd9e15d8644bf5e4203176ad34eee192b546472",
+      "contentHash": "85c8764715a18fbd11d16ca04bd9e15d8644bf5e4203176ad34eee192b546472",
+      "byteLength": 4965,
+      "gitBlobOid": "c0c169d14f0ebf1c098b2046718b4f6e0c974fe6"
+    },
+    {
+      "sourceRef": ".claude/skills/openspec-explore/SKILL.md",
+      "codeSourceRevision": "sha256:79249f798ad0d69bf95f08f3c7a29d44d982e4c1645f1a12a21dfcd488f4ba0d",
+      "contentHash": "79249f798ad0d69bf95f08f3c7a29d44d982e4c1645f1a12a21dfcd488f4ba0d",
+      "byteLength": 11428,
+      "gitBlobOid": "771271a8fdbdb4b15ea285e533f1a2a61bc6bc27"
+    },
+    {
+      "sourceRef": ".claude/skills/openspec-propose/SKILL.md",
+      "codeSourceRevision": "sha256:a666b2381a7d5e982d8e32183484020f518da2b795c0f387c5ff4b3cb47be0fd",
+      "contentHash": "a666b2381a7d5e982d8e32183484020f518da2b795c0f387c5ff4b3cb47be0fd",
+      "byteLength": 5465,
+      "gitBlobOid": "716d2d3d39acdbe006a86da81d578987d8f64d7b"
+    },
+    {
+      "sourceRef": ".claude/skills/openspec-sync-specs/SKILL.md",
+      "codeSourceRevision": "sha256:420e5815eee33ebd642b9d038f0a5307b176923a5c1a837c4873e51de085aae3",
+      "contentHash": "420e5815eee33ebd642b9d038f0a5307b176923a5c1a837c4873e51de085aae3",
+      "byteLength": 5187,
+      "gitBlobOid": "b6aad67abff5a9d495e7400769860b3058cfa297"
     },
     {
       "sourceRef": ".claude/skills/trace-mcp-tooling/SKILL.md",
-      "codeSourceRevision": "sha256:d1b7adb9e3fa120478d129f1a48494c650b72c1646376c37deda4fe900db2318",
-      "contentHash": "d1b7adb9e3fa120478d129f1a48494c650b72c1646376c37deda4fe900db2318",
-      "byteLength": 3624,
-      "gitBlobOid": "927e5b071d933da9da8f70c32b8017840c0b73ec"
+      "codeSourceRevision": "sha256:7407473d0dcd2fe07746b3bdd7dfee8d3acdebaac513172bcea1f05835f887c5",
+      "contentHash": "7407473d0dcd2fe07746b3bdd7dfee8d3acdebaac513172bcea1f05835f887c5",
+      "byteLength": 3968,
+      "gitBlobOid": "1cdc114767e6840d83a3c9ebcf8e5f0b5b43f156"
     },
     {
       "sourceRef": ".claude/skills/uno-css-design-system/SKILL.md",
@@ -377,9 +454,9 @@
     },
     {
       "sourceRef": ".cline/rules/10-architecture.md",
-      "codeSourceRevision": "sha256:01e0adabf4537779105a26dda0f4e0b79eb6d13ccd685e399d0bbacbd074a327",
-      "contentHash": "01e0adabf4537779105a26dda0f4e0b79eb6d13ccd685e399d0bbacbd074a327",
-      "byteLength": 1580,
+      "codeSourceRevision": "sha256:4bc1d531a8a7b2240d81cc4544487803242ea95d557d470738b0d03a080c71d2",
+      "contentHash": "4bc1d531a8a7b2240d81cc4544487803242ea95d557d470738b0d03a080c71d2",
+      "byteLength": 1622,
       "gitBlobOid": "179cf29ab26c64c61e865802710a93c76ef148ec"
     },
     {
@@ -404,6 +481,41 @@
       "gitBlobOid": "4053814c9b2e8dbfa19bed7ab85142ecd2e3e046"
     },
     {
+      "sourceRef": ".cline/skills/openspec-apply-change/SKILL.md",
+      "codeSourceRevision": "sha256:83e0d2d4c47674e312fc9d29297d91e5c018a5507e6961829ee623600e2cf2ff",
+      "contentHash": "83e0d2d4c47674e312fc9d29297d91e5c018a5507e6961829ee623600e2cf2ff",
+      "byteLength": 5465,
+      "gitBlobOid": "1375861c3ecb0efd5c0e5b22f8d7c0b2431ea4d1"
+    },
+    {
+      "sourceRef": ".cline/skills/openspec-archive-change/SKILL.md",
+      "codeSourceRevision": "sha256:85c8764715a18fbd11d16ca04bd9e15d8644bf5e4203176ad34eee192b546472",
+      "contentHash": "85c8764715a18fbd11d16ca04bd9e15d8644bf5e4203176ad34eee192b546472",
+      "byteLength": 4965,
+      "gitBlobOid": "c0c169d14f0ebf1c098b2046718b4f6e0c974fe6"
+    },
+    {
+      "sourceRef": ".cline/skills/openspec-explore/SKILL.md",
+      "codeSourceRevision": "sha256:79249f798ad0d69bf95f08f3c7a29d44d982e4c1645f1a12a21dfcd488f4ba0d",
+      "contentHash": "79249f798ad0d69bf95f08f3c7a29d44d982e4c1645f1a12a21dfcd488f4ba0d",
+      "byteLength": 11428,
+      "gitBlobOid": "771271a8fdbdb4b15ea285e533f1a2a61bc6bc27"
+    },
+    {
+      "sourceRef": ".cline/skills/openspec-propose/SKILL.md",
+      "codeSourceRevision": "sha256:a666b2381a7d5e982d8e32183484020f518da2b795c0f387c5ff4b3cb47be0fd",
+      "contentHash": "a666b2381a7d5e982d8e32183484020f518da2b795c0f387c5ff4b3cb47be0fd",
+      "byteLength": 5465,
+      "gitBlobOid": "716d2d3d39acdbe006a86da81d578987d8f64d7b"
+    },
+    {
+      "sourceRef": ".cline/skills/openspec-sync-specs/SKILL.md",
+      "codeSourceRevision": "sha256:420e5815eee33ebd642b9d038f0a5307b176923a5c1a837c4873e51de085aae3",
+      "contentHash": "420e5815eee33ebd642b9d038f0a5307b176923a5c1a837c4873e51de085aae3",
+      "byteLength": 5187,
+      "gitBlobOid": "b6aad67abff5a9d495e7400769860b3058cfa297"
+    },
+    {
       "sourceRef": ".clinerules/00-project-contract.md",
       "codeSourceRevision": "sha256:857cdc93695eb13ec0530bc1e9b86c2b7ee35cc1b4d543989992c0c571c737e2",
       "contentHash": "857cdc93695eb13ec0530bc1e9b86c2b7ee35cc1b4d543989992c0c571c737e2",
@@ -412,16 +524,16 @@
     },
     {
       "sourceRef": ".clinerules/10-architecture.md",
-      "codeSourceRevision": "sha256:01e0adabf4537779105a26dda0f4e0b79eb6d13ccd685e399d0bbacbd074a327",
-      "contentHash": "01e0adabf4537779105a26dda0f4e0b79eb6d13ccd685e399d0bbacbd074a327",
-      "byteLength": 1580,
+      "codeSourceRevision": "sha256:4bc1d531a8a7b2240d81cc4544487803242ea95d557d470738b0d03a080c71d2",
+      "contentHash": "4bc1d531a8a7b2240d81cc4544487803242ea95d557d470738b0d03a080c71d2",
+      "byteLength": 1622,
       "gitBlobOid": "179cf29ab26c64c61e865802710a93c76ef148ec"
     },
     {
       "sourceRef": ".clinerules/10-backend-retrieval.md",
-      "codeSourceRevision": "sha256:50b1d55fb7ebd98daa5dc2f48308daf0c4a3d588beca30cc3aa496edbe9b777b",
-      "contentHash": "50b1d55fb7ebd98daa5dc2f48308daf0c4a3d588beca30cc3aa496edbe9b777b",
-      "byteLength": 3488,
+      "codeSourceRevision": "sha256:8a3e7d5674a9fedc847cefca7265b4b0328d84226a1082d68df3a39bc7ffb346",
+      "contentHash": "8a3e7d5674a9fedc847cefca7265b4b0328d84226a1082d68df3a39bc7ffb346",
+      "byteLength": 3566,
       "gitBlobOid": "c12982c271b148619c2fd5e6b3ba3f3dc1762284"
     },
     {
@@ -437,6 +549,76 @@
       "contentHash": "7e54f06a0dc00327c7516373d011b2a7266fc4702ffc787c922c1980118b8150",
       "byteLength": 2618,
       "gitBlobOid": "90fa92ad9f9ee65c024fa5fe238714fb37d97f37"
+    },
+    {
+      "sourceRef": ".clinerules/workflows/opsx-apply.md",
+      "codeSourceRevision": "sha256:55528112d2cc94fe447912d288fea41173ec5a46fcaf91f329553239580d86b3",
+      "contentHash": "55528112d2cc94fe447912d288fea41173ec5a46fcaf91f329553239580d86b3",
+      "byteLength": 5168,
+      "gitBlobOid": "a0a4a77030b16fa5a0bf1a14c817186e4db75d5e"
+    },
+    {
+      "sourceRef": ".clinerules/workflows/opsx-archive.md",
+      "codeSourceRevision": "sha256:9f05d6bc80f2ef5bb997cd09204fbbcce1a91d9997e8d037bb05d47cd62546bf",
+      "contentHash": "9f05d6bc80f2ef5bb997cd09204fbbcce1a91d9997e8d037bb05d47cd62546bf",
+      "byteLength": 5799,
+      "gitBlobOid": "78fb15f96d89765250ef02f4a4153718944cfcea"
+    },
+    {
+      "sourceRef": ".clinerules/workflows/opsx-explore.md",
+      "codeSourceRevision": "sha256:f08b7e27c97cc10ac71557f185a22231aebca2c810f2a4bfdfa770e3b0fc87bb",
+      "contentHash": "f08b7e27c97cc10ac71557f185a22231aebca2c810f2a4bfdfa770e3b0fc87bb",
+      "byteLength": 7321,
+      "gitBlobOid": "4c654fa61ec33847b31d2c9b0b34017f18a20a91"
+    },
+    {
+      "sourceRef": ".clinerules/workflows/opsx-propose.md",
+      "codeSourceRevision": "sha256:59366239b5418dbc8c6abb6279c955d84599c1dc4107b4c3074810589f4ee1f5",
+      "contentHash": "59366239b5418dbc8c6abb6279c955d84599c1dc4107b4c3074810589f4ee1f5",
+      "byteLength": 5118,
+      "gitBlobOid": "365b7da9016fd8670967063f1acb90bc4d1d5f94"
+    },
+    {
+      "sourceRef": ".clinerules/workflows/opsx-sync.md",
+      "codeSourceRevision": "sha256:1dd1468adc5545513f9e86edfcf554092467f65274a57eb958d563529c28aba6",
+      "contentHash": "1dd1468adc5545513f9e86edfcf554092467f65274a57eb958d563529c28aba6",
+      "byteLength": 4943,
+      "gitBlobOid": "91429598f44a6c981a351948ac82d2d8fa2a9522"
+    },
+    {
+      "sourceRef": ".codex/skills/openspec-apply-change/SKILL.md",
+      "codeSourceRevision": "sha256:83e0d2d4c47674e312fc9d29297d91e5c018a5507e6961829ee623600e2cf2ff",
+      "contentHash": "83e0d2d4c47674e312fc9d29297d91e5c018a5507e6961829ee623600e2cf2ff",
+      "byteLength": 5465,
+      "gitBlobOid": "1375861c3ecb0efd5c0e5b22f8d7c0b2431ea4d1"
+    },
+    {
+      "sourceRef": ".codex/skills/openspec-archive-change/SKILL.md",
+      "codeSourceRevision": "sha256:85c8764715a18fbd11d16ca04bd9e15d8644bf5e4203176ad34eee192b546472",
+      "contentHash": "85c8764715a18fbd11d16ca04bd9e15d8644bf5e4203176ad34eee192b546472",
+      "byteLength": 4965,
+      "gitBlobOid": "c0c169d14f0ebf1c098b2046718b4f6e0c974fe6"
+    },
+    {
+      "sourceRef": ".codex/skills/openspec-explore/SKILL.md",
+      "codeSourceRevision": "sha256:79249f798ad0d69bf95f08f3c7a29d44d982e4c1645f1a12a21dfcd488f4ba0d",
+      "contentHash": "79249f798ad0d69bf95f08f3c7a29d44d982e4c1645f1a12a21dfcd488f4ba0d",
+      "byteLength": 11428,
+      "gitBlobOid": "771271a8fdbdb4b15ea285e533f1a2a61bc6bc27"
+    },
+    {
+      "sourceRef": ".codex/skills/openspec-propose/SKILL.md",
+      "codeSourceRevision": "sha256:a666b2381a7d5e982d8e32183484020f518da2b795c0f387c5ff4b3cb47be0fd",
+      "contentHash": "a666b2381a7d5e982d8e32183484020f518da2b795c0f387c5ff4b3cb47be0fd",
+      "byteLength": 5465,
+      "gitBlobOid": "716d2d3d39acdbe006a86da81d578987d8f64d7b"
+    },
+    {
+      "sourceRef": ".codex/skills/openspec-sync-specs/SKILL.md",
+      "codeSourceRevision": "sha256:420e5815eee33ebd642b9d038f0a5307b176923a5c1a837c4873e51de085aae3",
+      "contentHash": "420e5815eee33ebd642b9d038f0a5307b176923a5c1a837c4873e51de085aae3",
+      "byteLength": 5187,
+      "gitBlobOid": "b6aad67abff5a9d495e7400769860b3058cfa297"
     },
     {
       "sourceRef": ".couchdb-state-report-2026-05-29.md",
@@ -528,188 +710,6 @@
       "contentHash": "2e0038c0a6c6631e96f2f07441ec60b07b35963386f0b73ab7827b38ac735904",
       "byteLength": 2029,
       "gitBlobOid": "c15ff261b433b9fd443d66dbb41c8c6d53372b7e"
-    },
-    {
-      "sourceRef": ".github/agents/route-triage-engineer.agent.md",
-      "codeSourceRevision": "sha256:ec19ca32320c08f486bc1bd37f3079928d0bfa515e24bdbfaaef48d8d4bc702f",
-      "contentHash": "ec19ca32320c08f486bc1bd37f3079928d0bfa515e24bdbfaaef48d8d4bc702f",
-      "byteLength": 2108,
-      "gitBlobOid": "911057dcb1efaa675bcb5772e6b8dda9bbc787d9"
-    },
-    {
-      "sourceRef": ".github/agents/search-platform-engineer.agent.md",
-      "codeSourceRevision": "sha256:3fd320ecaa5772f6ec50d12c3a3b7a9a5de2beaa9b65d20b299cafdc83749339",
-      "contentHash": "3fd320ecaa5772f6ec50d12c3a3b7a9a5de2beaa9b65d20b299cafdc83749339",
-      "byteLength": 9573,
-      "gitBlobOid": "fbf6f0bf2894962bb66219c53e4ffa8f336107a6"
-    },
-    {
-      "sourceRef": ".github/agents/svelte5-migration-engineer.agent.md",
-      "codeSourceRevision": "sha256:f806d36db6eb16563a0ca33fefaced8be5d0a6ec508a4a2e595a4aacfa1f98f2",
-      "contentHash": "f806d36db6eb16563a0ca33fefaced8be5d0a6ec508a4a2e595a4aacfa1f98f2",
-      "byteLength": 1978,
-      "gitBlobOid": "cf7340bc9a71a3cbe6f634dc525b311655fa45ff"
-    },
-    {
-      "sourceRef": ".github/agents/trace-audit.agent.md",
-      "codeSourceRevision": "sha256:d1104cd948899b7aee8d9815fd0cda5e2856ee06c44be9eabd366955dba7e669",
-      "contentHash": "d1104cd948899b7aee8d9815fd0cda5e2856ee06c44be9eabd366955dba7e669",
-      "byteLength": 470,
-      "gitBlobOid": "282eef0122aff5608a6f3bf19875f374f14df190"
-    },
-    {
-      "sourceRef": ".github/agents/ui-polish-engineer.agent.md",
-      "codeSourceRevision": "sha256:e87e3f292c5b3739f14b81e7641e03a9093f4dc7e108e7fd9f43f83fcdc254ca",
-      "contentHash": "e87e3f292c5b3739f14b81e7641e03a9093f4dc7e108e7fd9f43f83fcdc254ca",
-      "byteLength": 1974,
-      "gitBlobOid": "6936c6dca1eb9c9c1626c89c1b0ddd2dca2f058a"
-    },
-    {
-      "sourceRef": ".github/copilot-instructions.md",
-      "codeSourceRevision": "sha256:48f96c459772a195e9ac4b99194115c8135b912ba2e3841953510fa13f725400",
-      "contentHash": "48f96c459772a195e9ac4b99194115c8135b912ba2e3841953510fa13f725400",
-      "byteLength": 719,
-      "gitBlobOid": "a6653fac2518150f82f3093d347b8c9c442605c5"
-    },
-    {
-      "sourceRef": ".github/instructions/opencode-context-prefetch.instructions.md",
-      "codeSourceRevision": "sha256:2db1fc1c354720534aeae49dc6e8e00302ec1649162af092645a7c7978ad2ded",
-      "contentHash": "2db1fc1c354720534aeae49dc6e8e00302ec1649162af092645a7c7978ad2ded",
-      "byteLength": 3287,
-      "gitBlobOid": "5001e57545f4bd3c26ef979fad2d9437b7c42ccd"
-    },
-    {
-      "sourceRef": ".gpu-rerank-11976-1782023627227.json",
-      "codeSourceRevision": "sha256:756a8012a018b48c7272e0e6f257414361ea2dd0bd588da8470df0e5645f01e3",
-      "contentHash": "756a8012a018b48c7272e0e6f257414361ea2dd0bd588da8470df0e5645f01e3",
-      "byteLength": 130411,
-      "gitBlobOid": "fb439b6794772cb18c81a094e1035bfbfa1a8d83"
-    },
-    {
-      "sourceRef": ".gpu-rerank-44384-1782059518577.json",
-      "codeSourceRevision": "sha256:756a8012a018b48c7272e0e6f257414361ea2dd0bd588da8470df0e5645f01e3",
-      "contentHash": "756a8012a018b48c7272e0e6f257414361ea2dd0bd588da8470df0e5645f01e3",
-      "byteLength": 130411,
-      "gitBlobOid": "fb439b6794772cb18c81a094e1035bfbfa1a8d83"
-    },
-    {
-      "sourceRef": ".headroom-memory.json",
-      "codeSourceRevision": "sha256:5d49c0ac9d2b8f01aa60b008b3dd831c1a79efa383a2a03a74c98875a48820ad",
-      "contentHash": "5d49c0ac9d2b8f01aa60b008b3dd831c1a79efa383a2a03a74c98875a48820ad",
-      "byteLength": 454,
-      "gitBlobOid": "66bc73235838c8312630862ba112a60a8be37b4c"
-    },
-    {
-      "sourceRef": ".mcp.json",
-      "codeSourceRevision": "sha256:0241858968e1c0107b31103ce056da53514fbd2de167fdf4fd093fe04d147deb",
-      "contentHash": "0241858968e1c0107b31103ce056da53514fbd2de167fdf4fd093fe04d147deb",
-      "byteLength": 1086,
-      "gitBlobOid": "c1fcb7967c2e91be97aa2be8bea103fbef345a2f"
-    },
-    {
-      "sourceRef": ".okf/concepts/cluster-run-lineage-gap.yaml",
-      "codeSourceRevision": "sha256:862f4a5c3fbb8cf484b69d7db829a29da012c7b294b09c38bfde4874eed91f8f",
-      "contentHash": "862f4a5c3fbb8cf484b69d7db829a29da012c7b294b09c38bfde4874eed91f8f",
-      "byteLength": 594,
-      "gitBlobOid": "8ca68337993dc377071ae0d62949a097f9eaddd0"
-    },
-    {
-      "sourceRef": ".okf/concepts/concept-edge-ledger-gap.yaml",
-      "codeSourceRevision": "sha256:2b145ce6b82214951087dbc9bb6e530b92b395c8a43dca9b6d8ad86c67a85bce",
-      "contentHash": "2b145ce6b82214951087dbc9bb6e530b92b395c8a43dca9b6d8ad86c67a85bce",
-      "byteLength": 562,
-      "gitBlobOid": "2355d00ea597cec03b805cb53bbfa52d190eb40b"
-    },
-    {
-      "sourceRef": ".okf/concepts/domain-lineage-gap.yaml",
-      "codeSourceRevision": "sha256:c0f7acdf23eabdd0ef12e4ff54c2aa33513e944548e2b999cc824544da5eacef",
-      "contentHash": "c0f7acdf23eabdd0ef12e4ff54c2aa33513e944548e2b999cc824544da5eacef",
-      "byteLength": 534,
-      "gitBlobOid": "7be5c2f51f385d0dacad97ae943ab02c742870db"
-    },
-    {
-      "sourceRef": ".okf/concepts/representation-fragmentation-gap.yaml",
-      "codeSourceRevision": "sha256:02858778b10ecd8ac5464d668dff530d8be1f90b1904e787386ef046855b538a",
-      "contentHash": "02858778b10ecd8ac5464d668dff530d8be1f90b1904e787386ef046855b538a",
-      "byteLength": 789,
-      "gitBlobOid": "4cfedb65573cef2a0f9a94cb4ceaabd97a7586bb"
-    },
-    {
-      "sourceRef": ".okf/concepts/som-run-lineage-gap.yaml",
-      "codeSourceRevision": "sha256:ba81c1421ae2fe88be3c47ddd2b8d3b8e3aa7de2c0f1ce67aa36c5614487cf8c",
-      "contentHash": "ba81c1421ae2fe88be3c47ddd2b8d3b8e3aa7de2c0f1ce67aa36c5614487cf8c",
-      "byteLength": 548,
-      "gitBlobOid": "ff52f231563742179633dc41c03de04fd254b32d"
-    },
-    {
-      "sourceRef": ".okf/concepts/topology-schema-drift-gap.yaml",
-      "codeSourceRevision": "sha256:b7be6697f7725a3273358966d746c1418b88c6559610c2b10337edee772d5ae1",
-      "contentHash": "b7be6697f7725a3273358966d746c1418b88c6559610c2b10337edee772d5ae1",
-      "byteLength": 625,
-      "gitBlobOid": "8fd1f9eb55bb8fb7d0d0ded4a3de227b33c78d77"
-    },
-    {
-      "sourceRef": ".okf/domains/feature-intelligence.yaml",
-      "codeSourceRevision": "sha256:e851fb9263f2ce513a578a870643c032283d70e3be7fa915aaffa0f2c67d9164",
-      "contentHash": "e851fb9263f2ce513a578a870643c032283d70e3be7fa915aaffa0f2c67d9164",
-      "byteLength": 3357,
-      "gitBlobOid": "92d35e8226ad675674d15cd2078e703de1fa4c87"
-    },
-    {
-      "sourceRef": ".okf/domains/parent-atlas-execution.yaml",
-      "codeSourceRevision": "sha256:91f3921558921db151ecd456bb6d00022265cd5ec3a69bc7aff10979758703ec",
-      "contentHash": "91f3921558921db151ecd456bb6d00022265cd5ec3a69bc7aff10979758703ec",
-      "byteLength": 5167,
-      "gitBlobOid": "10c8f32ad6ca1b94a7e83381a61813d0705f8277"
-    },
-    {
-      "sourceRef": ".okf/domains/structured-value.yaml",
-      "codeSourceRevision": "sha256:46f481bb2774088a87f0fdac1c986c2a8f7cdd39ae4c22ed8e2c898705817d01",
-      "contentHash": "46f481bb2774088a87f0fdac1c986c2a8f7cdd39ae4c22ed8e2c898705817d01",
-      "byteLength": 4516,
-      "gitBlobOid": "0b35b66513f1ebefef88f3c537a01b488f1b6418"
-    },
-    {
-      "sourceRef": ".okf/index.md",
-      "codeSourceRevision": "sha256:1edfbcd988a90c7c18a6604cf2a98d5a97e70cc6be159e4debd751ada4388062",
-      "contentHash": "1edfbcd988a90c7c18a6604cf2a98d5a97e70cc6be159e4debd751ada4388062",
-      "byteLength": 2296,
-      "gitBlobOid": "eb0604e191b13990c8e9ba1386a3313e36b04c64"
-    },
-    {
-      "sourceRef": ".okf/indexes/feature-intelligence.yaml",
-      "codeSourceRevision": "sha256:f5e74a352ffcf0015a004864af3bd6552488169a82a0ccc962c626ec2a74d684",
-      "contentHash": "f5e74a352ffcf0015a004864af3bd6552488169a82a0ccc962c626ec2a74d684",
-      "byteLength": 10199,
-      "gitBlobOid": "d05a4d9189f8962f172a8e7ecc25dec6ed952299"
-    },
-    {
-      "sourceRef": ".okf/languages/typescript.yaml",
-      "codeSourceRevision": "sha256:1e9d12307da1d4fe9a2c7d32ff89aea0e3e693de3f63c629f3f8fec452cea25a",
-      "contentHash": "1e9d12307da1d4fe9a2c7d32ff89aea0e3e693de3f63c629f3f8fec452cea25a",
-      "byteLength": 5398,
-      "gitBlobOid": "eae3952d8d754b60cb4527cc965db9fd3d0470b3"
-    },
-    {
-      "sourceRef": ".okf/manifest.yaml",
-      "codeSourceRevision": "sha256:09965014c694909e0769408f4ce5ef19fd7d115102a6c8471ef80cbc060e8778",
-      "contentHash": "09965014c694909e0769408f4ce5ef19fd7d115102a6c8471ef80cbc060e8778",
-      "byteLength": 5619,
-      "gitBlobOid": "22f296be786dc4e08286deea749a980de3154de8"
-    },
-    {
-      "sourceRef": ".okf/pipelines/ast-entity-prefill.yaml",
-      "codeSourceRevision": "sha256:e72e9a5ae78bd95deaf9df4b3e3a82d3f4edb8411f4b4479186a094c15e074fc",
-      "contentHash": "e72e9a5ae78bd95deaf9df4b3e3a82d3f4edb8411f4b4479186a094c15e074fc",
-      "byteLength": 1042,
-      "gitBlobOid": "b37226d91ffe8f75ec8c283d0a323c77b7fa8839"
-    },
-    {
-      "sourceRef": ".okf/pipelines/retrieval-ranking-synthesis.md",
-      "codeSourceRevision": "sha256:e516d3a943d9862898dc062bc96b1d13678fcb25a146ea8470c93d387ea4a8ad",
-      "contentHash": "e516d3a943d9862898dc062bc96b1d13678fcb25a146ea8470c93d387ea4a8ad",
-      "byteLength": 9357,
-      "gitBlobOid": "7838c9bf5ca950edf08b695b1a8d9a15c6480a63"
     }
   ],
   "authority": {

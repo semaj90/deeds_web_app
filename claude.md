@@ -4319,6 +4319,30 @@ NPM scripts: `agent:fix:batch:{quiet,summary}`, `audit:dirs:{quiet,summary}`, `a
 
 ## Key Lessons (Proven Patterns)
 
+- **Cross-store identity sync: verify GRANULARITY matches before trusting a shared field name as a
+  join key, not just that the field exists on both sides.** A field present in two stores under
+  the same name (e.g. `path`) does not mean it identifies the same UNIT of data in both. **Found
+  live 2026-09-09**: `scripts/atlas/compute-leiden-neo4j.mjs`'s first Qdrant-mirroring pass joined
+  Neo4j `leiden_community_id` → Qdrant `codebase_chunks_768` payloads on bare file `path` alone,
+  applied it live (79,768/109,774 points patched), and only THEN a read-only census
+  (`LEIDEN-QDRANT-IDENTITY-JOIN-01`) found 96.2% of paths (3,129/3,254) mapped to more than one
+  Leiden community (avg 18.2, max 505 per path). Root cause: Leiden clusters at SYMBOL granularity
+  in Neo4j (up to 240 separate `:Packet` nodes share one file `path`, one per type/const/function/
+  table-def), while `path` in Qdrant is a coarser, file-level field — so path-only matching picked
+  one arbitrary symbol's community per file and stamped it onto every chunk of that file, wrong for
+  the vast majority of them. The already-applied writes had to be identified and cleared (not just
+  the join fixed going forward) — see `syncLeidenToQdrant()`'s header comment for the correction
+  (joins on `(path, symbol)`, which is verified collision-free — 0/7,477 pairs — but only covers
+  ~12.2% of Qdrant points since most chunks don't carry a `symbol` field; correctness over coverage,
+  unmatched points are left unset rather than guessed). **Rule going forward**: before writing ANY
+  cross-store ID-mirroring script (a pattern this repo repeats often — PageRank/Louvain into
+  Qdrant via `writeAuthorityScoresToQdrant()`, other future syncs), run a cheap cardinality check
+  first: `MATCH (n:Label) WITH n.<candidateKey> AS k, count(*) AS n RETURN max(n)` (or the
+  equivalent on the other store) — if `max(n) > 1`, the candidate key is not a valid per-node
+  identity join, no matter how natural the shared field name looks. Do this BEFORE the first live
+  apply, not after — a read-only census is nearly free; unwinding a wrong mass-write is not.
+  `writeAuthorityScoresToQdrant()` itself (`src/lib/server/graph/neo4j-gds.ts`) has not been
+  re-audited for the same risk — flagged, not yet checked.
 - **`isMainModule` CLI guard — the standard `import.meta.url === \`file://${process.argv[1]}\`` pattern NEVER matches on Windows.** `process.argv[1]` is a raw backslash Windows path (`C:\Users\...\script.mts`); `import.meta.url` is a proper `file://` URL (`file:///C:/Users/.../script.mts`, forward slashes, triple-slash for the drive letter). Naive string concatenation never produces the real URL, so the comparison is always false — `main()` silently never runs, the process exits 0 with zero output, and it looks like the script "did nothing" rather than erroring. **Found live 2026-08-12** while testing two CLI scripts (`ace-domain-evidence-extractor.mts`, a new `parent-atlas-workstation-domain-classifier.ts`) that both exited cleanly but produced no output — confirmed via `git diff`-free direct testing, not assumed. Swept and fixed **35 files repo-wide** with this exact bug (`rg` pattern: `` import\.meta\.url\s*===\s*`file://\$\{process\.argv\[1\]\}` `` plus the equally-broken variant `process.argv[1] === import.meta.url.replace('file://', '')`, which leaves a stray leading slash + drive letter on Windows and also never matches). **Canonical fix** (matches the two files in the repo that already had it right before this sweep — `ensure-search-engine.mjs`, `agentic-recommendation-workflow.mjs`):
   ```typescript
   import { fileURLToPath } from 'node:url';
