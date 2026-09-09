@@ -1,0 +1,54 @@
+{
+  "schema": "atlas.current-source-authority.v1",
+  "gate": "CURRENT-SOURCE-OWNER-RECONCILIATION-01",
+  "generatedAt": "2026-09-09T04:16:57.660Z",
+  "mode": "READ_ONLY",
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "workspaceRevision": "sha256:ec542383b52ed4c597750d4273522239284fdb3d819619414df5f36333f85e1f",
+  "sourceSetRevision": "ec542383b52ed4c597750d4273522239284fdb3d819619414df5f36333f85e1f",
+  "selectedSourceSetId": "",
+  "selectedSourceCount": 0,
+  "bindingChecksum": "8cff5a225fa0b16cf9a6df7f137b8c83c4cd769c25f901399da077331393c93f",
+  "evidenceRefs": [
+    "docs/reports/current-source-evidence-authority-v1.json",
+    "docs/reports/current-graphify-run-owner-v1.json"
+  ],
+  "admission": "NO_CURRENT_SOURCE_SET",
+  "acceptance": {
+    "selectedAuthoritativeSourceSets": 0,
+    "ambiguousBindings": 0,
+    "mixedWorkspaceRevisions": 0,
+    "syntheticSourceAuthority": 0
+  },
+  "supportingEvidence": {
+    "currentWorkspace": {
+      "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+      "workspaceRevision": "sha256:ec542383b52ed4c597750d4273522239284fdb3d819619414df5f36333f85e1f",
+      "sourceManifestDigest": "ec542383b52ed4c597750d4273522239284fdb3d819619414df5f36333f85e1f",
+      "sourceCount": 24109,
+      "repositoryId": "semaj90/deeds_web_app",
+      "baseCommitOid": "8fdbcb53619b5ef5551c097948906ebdd6b01188",
+      "dirty": true
+    },
+    "runCounts": {
+      "totalRuns": 19,
+      "completed": 12,
+      "running": 0,
+      "completedBound": 4,
+      "completedUnbound": 8,
+      "runningBound": 0,
+      "runningUnbound": 0
+    },
+    "selectorStatus": "NO_CURRENT_COMPLETED_BOUND_SOURCE_OWNER",
+    "toleranceWindow": {
+      "toleranceMs": 300000,
+      "nowMs": 1788927317747,
+      "checkedAt": "2026-09-09T04:15:17.747Z"
+    },
+    "workspaceDirty": true,
+    "runOwnerStatus": "GRAPHIFY_RUN_OWNER_BLOCKED",
+    "note": "currentWorkspace.dirty=true -- the live git working tree has uncommitted changes at the moment this was sealed, so no historical completed Graphify run can structurally match the current source-manifest digest by design (the digest incorporates working-tree state, not just HEAD). This is not a script defect; it is the real, honest reason CURRENT_SOURCE_AUTHORITY_PROVEN cannot be reached right now. A CURRENT_SOURCE_AUTHORITY_PROVEN result requires either a clean working tree at the time of the next Graphify run, or committing pending changes first."
+  },
+  "nextAction": "Do not backfill any packet revision, promote any packet cohort, or run a new Graphify batch based on assumed authority. Re-run this seal after either (a) committing pending workspace changes and running a fresh bound Graphify pass, or (b) the underlying selector finds a run that clears the tolerance window against a clean workspace."
+}

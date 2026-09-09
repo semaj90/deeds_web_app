@@ -1,12 +1,12 @@
 {
   "schema": "atlas.ast-grep-outline-symbol-population.v1",
-  "generatedAt": "2026-09-08T19:16:38.741Z",
+  "generatedAt": "2026-09-09T00:00:30.209Z",
   "mode": "READ_ONLY",
   "canonicalAuthority": false,
   "writesPerformed": false,
   "provider": {
     "executable": "ast-grep.cmd",
-    "executionMode": "PATH_RESOLUTION",
+    "executionMode": "NPX_PINNED_0.45.3",
     "version": "ast-grep 0.45.3",
     "outlineSupported": true,
     "upstreamContract": "ast-grep outline --items structure --view digest"
@@ -24,7 +24,7 @@
     "canonicalPromotion": "revision-qualified resolver plus independent readback"
   },
   "population": {
-    "rawOutputChecksum": "f5f58fde3686d52ce0536f0da42b62487692bf244931a4a2c551aa66c07fa847",
+    "rawOutputChecksum": "570271727a6591b54c2625c2abeba390adcbf5fa371258cf292bb922e1e8db68",
     "rawOutputBytes": 2817067,
     "fileCount": 526,
     "fileLanguages": {

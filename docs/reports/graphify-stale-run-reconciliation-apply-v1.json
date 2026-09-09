@@ -1,0 +1,95 @@
+{
+  "schema": "atlas.graphify-stale-run-reconciliation-apply.v1",
+  "generatedAt": "2026-09-08T23:38:11.909Z",
+  "mode": "APPLY",
+  "repositoryHeadRevision": "8fdbcb53619b5ef5551c097948906ebdd6b01188",
+  "writesPerformed": true,
+  "canonicalAuthority": false,
+  "evaluatedRunCount": 7,
+  "evaluated": [
+    {
+      "runId": "3f13703e-5944-487c-a5a9-10dcecc00124",
+      "repositoryRevision": "53e0d6375385e6f85d6d86e3216d5de1bb15fd90",
+      "workspaceRevision": "sha256:2c9f63df1ac60860756143caf4ce52da7d96a5f0169d21a69568c6f5301c52b1",
+      "startedAt": "2026-08-27T16:35:34.281Z",
+      "commitsBehindHead": 407,
+      "isCurrentHead": false,
+      "eligibleForSupersede": true
+    },
+    {
+      "runId": "a7377c07-acb2-4d68-bf83-19d8eca586d4",
+      "repositoryRevision": "880b69baf405e49850a3ab88f98cefb720e8fdb1",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "startedAt": "2026-08-27T16:45:38.584Z",
+      "commitsBehindHead": 406,
+      "isCurrentHead": false,
+      "eligibleForSupersede": true
+    },
+    {
+      "runId": "b3a5b14e-0065-41bb-bfe0-96e1062d1e07",
+      "repositoryRevision": "880b69baf405e49850a3ab88f98cefb720e8fdb1",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "startedAt": "2026-08-27T16:53:01.074Z",
+      "commitsBehindHead": 406,
+      "isCurrentHead": false,
+      "eligibleForSupersede": true
+    },
+    {
+      "runId": "b1a103ac-c717-430b-9643-a8c9818064ae",
+      "repositoryRevision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "workspaceRevision": "sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70",
+      "startedAt": "2026-08-28T00:16:13.803Z",
+      "commitsBehindHead": 405,
+      "isCurrentHead": false,
+      "eligibleForSupersede": true
+    },
+    {
+      "runId": "14643371-f6f2-4131-906b-235a5c06619a",
+      "repositoryRevision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "startedAt": "2026-08-28T04:01:23.454Z",
+      "commitsBehindHead": 405,
+      "isCurrentHead": false,
+      "eligibleForSupersede": true
+    },
+    {
+      "runId": "575d5428-0154-43e7-a353-307b2443cbba",
+      "repositoryRevision": "a55904a75e944ad85d1db449bbbde2d3bfbc8e74",
+      "workspaceRevision": "sha256:d20f1488b76463633272b5cf8544516f3c495927eb974d68697b97aab00e775f",
+      "startedAt": "2026-09-07T22:17:44.228Z",
+      "commitsBehindHead": 4,
+      "isCurrentHead": false,
+      "eligibleForSupersede": true
+    },
+    {
+      "runId": "6daa5fc9-6b76-4774-a376-013a1bb8190e",
+      "repositoryRevision": "ec2f544a2bfa26a825de69d9af9ce846647fc3da",
+      "workspaceRevision": "sha256:fcfb242c043ad90f3108cbf74ae27a6c73f776e4f18c7f63137211873551573d",
+      "startedAt": "2026-09-08T05:27:52.415Z",
+      "commitsBehindHead": 2,
+      "isCurrentHead": false,
+      "eligibleForSupersede": true
+    }
+  ],
+  "eligibleRunIds": [
+    "3f13703e-5944-487c-a5a9-10dcecc00124",
+    "a7377c07-acb2-4d68-bf83-19d8eca586d4",
+    "b3a5b14e-0065-41bb-bfe0-96e1062d1e07",
+    "b1a103ac-c717-430b-9643-a8c9818064ae",
+    "14643371-f6f2-4131-906b-235a5c06619a",
+    "575d5428-0154-43e7-a353-307b2443cbba",
+    "6daa5fc9-6b76-4774-a376-013a1bb8190e"
+  ],
+  "liveProcessCensus": [],
+  "censusClean": true,
+  "result": "SUPERSEDED",
+  "supersededRunIds": [
+    "6daa5fc9-6b76-4774-a376-013a1bb8190e",
+    "575d5428-0154-43e7-a353-307b2443cbba",
+    "14643371-f6f2-4131-906b-235a5c06619a",
+    "b1a103ac-c717-430b-9643-a8c9818064ae",
+    "b3a5b14e-0065-41bb-bfe0-96e1062d1e07",
+    "a7377c07-acb2-4d68-bf83-19d8eca586d4",
+    "3f13703e-5944-487c-a5a9-10dcecc00124"
+  ]
+}

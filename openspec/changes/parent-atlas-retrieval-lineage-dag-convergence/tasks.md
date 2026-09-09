@@ -9425,3 +9425,623 @@ same NDJSON checksum
 This artifact is a derived offline input and does not reopen 08A, establish
 stable registry namespace authority, authorize lineage writes, or authorize
 Qdrant/CandidateOrdinal promotion.
+
+**ATLAS-CANONICAL-PROJECTION-FABRIC-01 admission gate — 2026-09-08 (read-only, first run).**
+An external architecture review proposed a "canonical projection fabric" — one sealed
+manifest of parse-node/symbol/chunk/packet/concept identity that every downstream
+representation (semantic_768, latent_256/128/64, topology_4d), every graph projection
+(NetworkX/nx-cugraph/Neo4j/cuGraph), and every retrieval executor (pgvector/Qdrant/cuVS)
+would consume rather than independently build. Before writing any of that, this session
+built `scripts/atlas/audit-canonical-projection-fabric.mjs` — a bounded, read-only
+measurement of the review's own proposed 11 admission predicates
+(`IDENTITY_ALIGNED`, `REVISION_QUALIFIED`, `SYMBOLS_RESOLVED`, `SEMANTIC_OWNER_PROVEN`,
+`LATENT_FAMILY_PROVEN`, `GRAPH_MANIFEST_SEALED`, `ONTOLOGY_COHORT_NONEMPTY`,
+`ORDINAL_MAP_SEALED`, `PROJECTIONS_CHECKSUM_ALIGNED`, `BITFROST_KEYS_DERIVABLE`,
+`ACE_EVIDENCE_GROUNDED`) against live schema/data, reusing the same sample and
+query shape as `audit-latent-representation-identity.mjs` (2026-09-08) rather than
+re-deriving it. Result: **`NOT_SAFE_TO_PROJECT`**, 10/11 predicates below `PASS`:
+`IDENTITY_ALIGNED=PARTIAL_PROVEN`, `REVISION_QUALIFIED=NOT_PROVEN`,
+`SYMBOLS_RESOLVED=NOT_PROVEN`, `SEMANTIC_OWNER_PROVEN=AMBIGUOUS_OWNER`,
+`LATENT_FAMILY_PROVEN=NOT_PROVEN`, `GRAPH_MANIFEST_SEALED=ABSENT`,
+`ONTOLOGY_COHORT_NONEMPTY=PASS` (63,084 rows across
+`atlas_ontology_concepts`/`atlas_ontology_tuples`/`hypergraph_edges`/`atlas_hyperedges`
+— the one predicate that already clears), `ORDINAL_MAP_SEALED=ABSENT`,
+`PROJECTIONS_CHECKSUM_ALIGNED=NOT_PROVEN`, `BITFROST_KEYS_DERIVABLE=NOT_PROVEN`,
+`ACE_EVIDENCE_GROUNDED=NOT_PROVEN`.
+
+Two real findings surfaced by this pass, neither previously recorded:
+(1) **`SEMANTIC_OWNER_PROVEN=AMBIGUOUS_OWNER`** — `atlas_packets.embedding` and
+`codebase_chunk_index.content_embedding_768` are both live 768-dim vector columns this
+repo has independently labeled `CANONICAL_SOURCE` in the 2026-09-08 identity audit; no
+single proven physical owner of `semantic_768` exists yet, consistent with (and now
+independently confirmed alongside) CLAUDE.md's already-tracked
+`codebase_chunks_768`-vs-`_768_v2` split. (2) **`graphify_symbols` exists live but is
+empty (0 rows)** — corrects the same-day identity audit, which reported the table
+absent; it is real schema (columns: `symbol_id`, `file_id`, `stable_symbol_key`,
+`symbol_kind`, `qualified_name`, `parent_symbol_id`, byte/row spans, `signature_text`,
+`source_text_hash`, `ast_fingerprint`, `metadata` — a real `SymbolVersionV1`-shaped
+target) with zero rows written by any producer. Receipts:
+`docs/reports/atlas-canonical-projection-fabric-audit-2026-09-08.json` and `.md`.
+
+This gate makes no writes, mints no missing contract, and does not authorize building
+any of the fabric's proposed new tables (`atlas_representation_records`,
+`atlas_graph_projection_manifest`, `atlas_candidate_ordinals`, or a `SymbolVersionV1`
+writer for the now-confirmed-empty `graphify_symbols`). It exists so a future session
+can re-run it after real progress and see the verdict move, rather than re-deriving
+this measurement from scratch.
+
+## Cross-reference: PACKET_REGISTRY_WRITER_OWNERSHIP_01/01B + PACKET_WRITE_REVISION_CONTRACT_01 (2026-09-08, recorded elsewhere, pointed to from here)
+
+This lane (`parent-atlas-retrieval-lineage-dag-convergence`) is the
+portfolio's `CURRENT_AUTHORITY` classification and, per
+`docs/parent-atlas-workstation-todo.md`'s ownership table, the declared owner
+of "Current source/revision authority." The detailed evidence trail for a
+directly relevant closed question -- who is allowed to write canonical
+`atlas_packets` identity, and can two live writers produce contradictory
+identity state -- was recorded in
+`openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md`
+(appended there because that change already held the prior writer-ownership
+audit this session reopened and corrected). A same-day portfolio
+reclassification pass
+(`docs/reports/openspec-portfolio-inventory-v2.json`, generated
+2026-09-08T23:27Z) marked that change `status: REFERENCE_OR_RETIRED` --
+which does not match the fact that genuinely new, load-bearing findings were
+added to it hours earlier the same day. Rather than move ~400 lines of
+hand-verified audit trail out of a file with its own internal history
+(archive-not-delete is this repo's standing convention), this entry is a
+pointer from the actual current-authority lane so the findings are
+discoverable from the right place.
+
+**Summary of what was proven** (full detail, including three rounds of
+self-correction and the exact verification method for each claim, is in the
+ACE/BitFrost file under `PACKET-REGISTRY-WRITER-OWNERSHIP-01`,
+`PACKET-REGISTRY-WRITER-OWNERSHIP-01 — CORRECTION`,
+`PACKET-REGISTRY-WRITER-OWNERSHIP-01 — SECOND CORRECTION`,
+`PACKET_REGISTRY_WRITER_OWNERSHIP_01B`, and
+`PACKET_WRITE_REVISION_CONTRACT_01`):
+
+- **Exactly one live, production-wired writer creates new `atlas_packets`
+  identity**: `sveltekit-frontend/src/lib/server/embedding/semantic-packet-writer.ts
+  ::persistCanonicalSemanticPacketEmbedding`, called from
+  `api/admin/batch-embeddings/embed/+server.ts`. Writes `packet_key`,
+  `source_ref`, `feature_id`, `feature_label`, `directory_path`.
+- **5 live, disjoint, non-identity metadata writers coexist safely**:
+  `packet-summary-pipeline.ts::runPacketSummaryPipeline` (`summary` only)
+  and 4 MCP-tool-wired functions in `mcp-tool-implementations.ts`
+  (`toolIdentityRecover`, `toolEnvelopeValidate`, `toolMirrorSyncQdrant`,
+  `toolMirrorSyncNeo4j` -- collectively touch only `identity_lane`,
+  `identity_confidence`, `qdrant_point_id`, `updated_at`; never
+  `source_ref`/`feature_id`/`packet_key`). No column overlap with the
+  identity writer.
+- **8 fully-built writers confirmed dormant repo-wide** (including
+  `--no-ignore --hidden` search across `scripts/`, `.tmp/`, gitignored
+  paths): `canonical-id-hierarchy.ts`, `packet-materializer-pipeline.ts`,
+  `promotion-executor.ts`, `identity-worker.ts`,
+  `feature-label-enricher.ts`, `summary-freshness-checker.ts`,
+  `hyperrag-packet-pipeline.ts::materializePackets`, and
+  `mcp-tool-implementations.ts`'s unused `toolIdentityQuarantine`.
+- **`PACKET_WRITE_REVISION_CONTRACT_01` (the direct follow-up question --
+  can the identity writer and the live metadata mutators contradict each
+  other): NO, not currently** -- zero column overlap, verified by AST
+  extraction plus hand-read of both functions' actual write bodies.
+- **The load-bearing open item that DOES belong to this lane's mandate**:
+  `atlas_packets.source_revision` is declared in the Drizzle schema file
+  but **does not exist in the live database** (confirmed via a direct
+  `information_schema.columns` query, not the schema file). This is the
+  concrete mechanism behind this lane's own already-tracked
+  `CURRENT-SOURCE-OWNER-RECONCILIATION-01` blocker -- there is currently no
+  column anywhere on the canonical packet table that could hold a proven
+  per-write source revision, which is exactly why "0 qualified packet
+  candidates" keeps appearing across this lane's other gates. Also found:
+  `workspace_revision` exists and is `NOT NULL`, but all 61,718 live rows
+  share the identical value (`0`, the schema default) -- it has never
+  actually been incremented by any writer. `content_hash` exists but is
+  99.4% NULL.
+
+**Decision still needed from the operator, not resolved here**: add
+`source_revision` via migration, or formally redefine this lane's revision-
+qualification contract onto `workspace_revision` + `content_hash` (both
+real, live columns) instead. That decision determines the literal shape of
+any `CanonicalPacketWriteV1`/`PacketWriteDecisionV1` type this lane or the
+ACE/BitFrost change writes next, and should be made once, here, rather than
+independently guessed at by whichever change happens to touch it next.
+
+Receipts: `docs/reports/packet-registry-writer-ownership-v1.json`,
+`docs/reports/packet-registry-writer-ownership-01b-mutation-census-v1.json`,
+`docs/reports/packet-write-revision-contract-v1.json`. Zero writes
+performed by any of the underlying audits.
+
+## Migration applied: atlas_packets.source_revision (2026-09-09)
+
+Operator decision on the fork raised by `PACKET_WRITE_REVISION_CONTRACT_01`
+(migrate vs. redefine onto `workspace_revision`+`content_hash`): **migrate**.
+
+- [x] Added `sveltekit-frontend/drizzle/manual/20260909_atlas_packets_source_revision.sql`:
+  `ALTER TABLE atlas_packets ADD COLUMN IF NOT EXISTS source_revision text;`
+  plus the partial index the Drizzle schema file already declared
+  (`sourceRevisionIdx`, `atlas-packets.ts:166`) but which didn't exist live
+  either — `CREATE INDEX CONCURRENTLY IF NOT EXISTS
+  idx_atlas_packets_source_revision ON atlas_packets (source_revision)
+  WHERE source_revision IS NOT NULL`.
+- [x] Applied directly (`docker exec -i legal-ai-postgres psql ... <
+  20260909_atlas_packets_source_revision.sql`), both statements succeeded.
+- [x] **Independently re-verified via a fresh `information_schema.columns` +
+  `pg_indexes` query** (not trusting the apply output alone): column exists
+  (`text`, `is_nullable: YES`, `column_default: null`), index exists with
+  the exact expected definition, and a live census confirms all 61,718 rows
+  are `source_revision IS NULL` — purely additive, zero synthetic values
+  written, zero existing data touched.
+- [x] This closes the schema half of the `PACKET_WRITE_REVISION_CONTRACT_01`
+  finding. Drizzle schema file and live database now agree on this column
+  for the first time.
+
+**Deliberately not done in this pass**: no backfill of real `source_revision`
+values for the 61,718 existing rows. Doing so requires resolving
+`CURRENT-SOURCE-OWNER-RECONCILIATION-01` first (still open, unrelated to
+this migration) — synthesizing revision values now to make rows look
+qualified would be exactly the kind of fabricated lineage this workstation's
+own hard rules forbid. `semantic-packet-writer.ts` (the confirmed canonical
+writer) also does not yet write `source_revision` on new INSERTs — that is
+the next real code change once a source-of-truth for the value exists, not
+attempted here since this pass was scoped to the schema decision only.
+
+Migration file: `sveltekit-frontend/drizzle/manual/20260909_atlas_packets_source_revision.sql`.
+One write performed (the migration itself); zero data rows mutated.
+
+## semantic-packet-writer.ts wired to accept sourceRevision (2026-09-09)
+
+Follow-up to the `atlas_packets.source_revision` migration above.
+`persistCanonicalSemanticPacketEmbedding` now accepts an optional
+`sourceRevision?: string | null` input field and writes it to the new
+column on both INSERT and the `onConflictDoUpdate` branch. Never fabricated:
+`input.sourceRevision?.trim() || null` -- NULL whenever the caller has no
+real revision evidence, matching this column's `STAGEABLE` convention.
+
+- [x] Added the field to `PersistCanonicalSemanticPacketEmbeddingInput` with
+  a doc comment recording a known limitation for later: on conflict this
+  currently unconditionally overwrites any previously-stored
+  `source_revision`, including with `NULL`, if a call doesn't supply one --
+  not a live risk today (exactly one caller exists and it never supplies
+  a value), but flagged so a future second revision-aware caller doesn't
+  get silently clobbered by a revision-blind one without a `COALESCE`-style
+  guard being added first.
+- [x] `api/admin/batch-embeddings/embed/+server.ts` (the only current
+  caller) was deliberately left unchanged -- verified it has no content
+  hash, git SHA, or any other revision evidence available at all (it only
+  receives raw request `text`), so there is nothing honest to supply yet.
+- [x] Added 2 new tests to `semantic-packet-writer.spec.ts`: writes the
+  supplied value on both INSERT and UPDATE branches when given, and
+  confirms NULL (never a fabricated placeholder) when not supplied. Full
+  suite re-run: 6/6 pass (4 pre-existing + 2 new).
+
+This closes the code-side half of `PACKET_WRITE_REVISION_CONTRACT_01`'s
+open item. The schema now exists, the canonical writer can persist real
+values, and no fabricated data was introduced anywhere in the process.
+Still open, unchanged by this entry: backfilling real revision values for
+the 61,718 existing rows, which remains blocked on
+`CURRENT-SOURCE-OWNER-RECONCILIATION-01`.
+
+## CURRENT-SOURCE-OWNER-RECONCILIATION-01 sealed + CURRENT-GRAPHIFY-RUN-OWNER-01 (2026-09-09)
+
+Operator directive: produce one sealed `CurrentSourceAuthorityV1` artifact
+before any packet-revision backfill, using existing owner scripts rather
+than re-deriving evidence. Found 18 pre-existing scripts already built for
+this exact question (`scripts/atlas/*current-source*`,
+`*current-graphify-run*`) -- ran the two most relevant live instead of
+building anything new for the evidence-gathering step:
+
+- [x] `select-current-source-evidence-authority-v1.mts` (the tolerance-
+  window-aware selector, the more sophisticated of the two candidates) run
+  live from repo root: `NO_CURRENT_COMPLETED_BOUND_SOURCE_OWNER`,
+  `ambiguityCount: 0` (genuinely zero eligible, not an unresolved tie),
+  `completedBound: 4` / `completedUnbound: 8` / `running: 0` out of 19
+  total runs, `selectedRunId: null`, `sourceCount: 0`.
+- [x] `audit-current-graphify-run-owner-v1.mjs` also run live -- initially
+  looked broken (`runCount: 0` against a real 19-row table), traced to its
+  own known caveat: it filters on an `expectedWorkspaceRevision` sourced
+  from a stale reference file (`docs/reports/graphify-lifecycle-entrypoint-v1.json`),
+  not the live-recomputed one. Confirmed via direct `docker exec psql`
+  against `graphify_runs` that all 19 rows are real (12 COMPLETED, 7
+  SUPERSEDED, matching this session's earlier reconciliation work) with
+  real `workspace_revision`/`repository_revision` values -- `repository_revision`
+  values are real git commit SHAs, several matching this session's own
+  commits (`ec2f544a2b`, `df9fed6ce0`, `a55904a75e` -- all present in the
+  actual git log). Not a script bug in the destructive sense; the stale
+  reference file is a real, separate finding, but the tolerance-window
+  selector above is the authoritative one and doesn't share this issue
+  (it recomputes the current workspace state live on every run).
+- [x] **Root cause identified precisely, not just re-confirmed as blocked**:
+  the live-recomputed current workspace has `dirty: true` -- the git
+  working tree has uncommitted changes at evidence-collection time (matches
+  every `git status` this session has shown: dozens of modified/untracked
+  files never committed). Since the source-manifest digest incorporates
+  working-tree state, not just `HEAD`, **no historical completed Graphify
+  run can structurally match "current" while the tree stays dirty, by
+  design** -- this is not a bug to fix, it's the actual mechanism, and it
+  explains every prior "0 qualified candidates" / "no completed Graphify
+  execution matches the current workspace revision" finding recorded
+  earlier in `docs/parent-atlas-workstation-todo.md`.
+- [x] Built `scripts/atlas/seal-current-source-authority-v1.mjs` (read-only,
+  assembles evidence from the two receipts above into the operator's exact
+  `CurrentSourceAuthorityV1` shape -- does not re-derive or guess at any
+  field). Sealed artifact: `docs/reports/current-source-authority-v1.json`.
+  **`admission: "NO_CURRENT_SOURCE_SET"`**. `selectedAuthoritativeSourceSets:
+  0`, `ambiguousBindings: 0`, `mixedWorkspaceRevisions: 0`,
+  `syntheticSourceAuthority: 0` -- the acceptance criteria the operator
+  specified for a PASS are not met, honestly reported as such rather than
+  forced.
+- [x] **`CURRENT-GRAPHIFY-RUN-OWNER-01`, the operator's second gate,
+  answered by the same evidence without needing a separate script**: the
+  required predicate chain starts with `graphify_runs.status == RUNNING AND
+  live owning process exists`. `running: 0` in the live run-count census --
+  there is no row anywhere in `RUNNING` status, so the chain is
+  unsatisfiable before reaching any of the revision-match checks. Result:
+  **`NOT_AUTHORITATIVE`**. Per the operator's own explicit instruction, this
+  does NOT authorize starting a new Graphify run -- a stale-looking graph
+  artifact is not permission to launch one; that remains a separate,
+  explicit operator decision.
+
+**Not done, deliberately**: no Graphify run triggered, no packet-revision
+backfill attempted, no source set selected by judgment call. The gate
+result is what it is -- `NO_CURRENT_SOURCE_SET` -- and per the operator's
+own rule ("Do not backfill any packet revision before this passes"),
+`SOURCE-REVISION-BACKFILL-PLAN-01` (the next gate in the operator's
+ordering) cannot proceed to writing any `SourceRevisionProposalV1` row with
+`status: PROVEN` until either the workspace is committed clean and a fresh
+bound Graphify run completes, or this gate is re-sealed and clears.
+
+Scripts: `scripts/atlas/seal-current-source-authority-v1.mjs` (new).
+Receipts: `docs/reports/current-source-authority-v1.json` (new, the sealed
+artifact), `docs/reports/current-source-evidence-authority-v1.json` and
+`docs/reports/current-graphify-run-owner-v1.json` (re-generated by existing
+scripts, not new). Zero writes to Postgres/Qdrant/Neo4j/Valkey; zero
+Graphify runs started.
+
+## SOURCE-REVISION-BACKFILL-PLAN-01 (2026-09-09, read-only proposal, not an apply)
+
+Per the operator's own ordering, this gate is read-only and does not require
+`CURRENT-SOURCE-OWNER-RECONCILIATION-01` to pass first -- only the actual
+*backfill write* is blocked on that. Found a major piece of pre-existing,
+already-applied infrastructure before building anything: `atlas_packet_chunk_lineage`
+(a table this session hadn't examined until now) already holds **7,421 rows
+across 4 producers, all `revision_status = 'PROVEN'` with real, populated,
+content-digest `source_revision` values**. The bulk (6,898 rows / 571 sources)
+came from a `PKT-LINEAGE-09-HISTORICAL-PROMOTION-01` apply run on
+2026-09-02 (`docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json`:
+`verdict: HISTORICAL_LINEAGE_PROMOTION_PROVEN`, 0 conflicts, 0 rollbacks, 0
+synthetic IDs).
+
+- [x] **Did not trust `PROVEN` at face value.** Spot-checked 2 rows by
+  independently recomputing `sha256` of the live on-disk file content and
+  comparing to the stored `source_revision` -- both matched exactly,
+  confirming the underlying mechanism is real and correctly implemented,
+  not just self-reported.
+- [x] Built `scripts/atlas/plan-source-revision-backfill-v1.mjs` (read-only,
+  bounded to 200 rows via `SOURCE_REVISION_PLAN_LIMIT`, not the full
+  corpus): joins `atlas_packet_chunk_lineage` (dedup'd to one row per
+  distinct `packet_key`+`source_ref`) against live `atlas_packets` (for
+  `exactPacketBinding`), then **re-verifies freshness for every single
+  proposed row** by recomputing the current on-disk sha256 and comparing --
+  because the 2026-09-02 write date is a full week before this session's
+  own dirty-workspace finding, so a `PROVEN` label from that date is not
+  proof the file hasn't changed since.
+- [x] **Real result, not assumed**: 183/200 (91.5%) still current — the
+  stored digest matches live file content right now, classified `PROVEN`.
+  **17/200 (8.5%) genuinely stale** — the source file has changed since
+  2026-09-02, correctly caught and classified `SOURCE_NOT_CURRENT`, not
+  silently treated as still valid.
+  `docs/reports/source-revision-backfill-plan-v1.json`.
+- [x] `workspaceRevision` deliberately left `null` on every proposal row --
+  `CURRENT-SOURCE-OWNER-RECONCILIATION-01` sealed `NO_CURRENT_SOURCE_SET`
+  the same session, so there is no authoritative workspace revision to bind
+  these per-source proposals to yet. Recorded as an explicit
+  `upstreamGateStatus` block in the receipt rather than guessed or left
+  implicit.
+
+**Not done, per the operator's explicit rule** ("P1 must pass before
+source_revision backfill, not before this plan"): none of these 200
+proposals were written into `atlas_packets.source_revision`. This is a
+proposal only. The next real write (a bounded revision-qualified canary,
+not a corpus backfill, per the operator's own stated sequencing) remains
+blocked on `CURRENT-SOURCE-OWNER-RECONCILIATION-01`'s open fork (commit +
+fresh Graphify run, vs. accepting the standing blocked state) -- that
+decision has not been made and was not assumed here.
+
+Script: `scripts/atlas/plan-source-revision-backfill-v1.mjs`. Receipt:
+`docs/reports/source-revision-backfill-plan-v1.json`. Zero writes to
+`atlas_packets`, `atlas_packet_chunk_lineage`, or any other table.
+
+## PACKET_WRITE_CONFLICT_SEMANTICS_01 -- scaffolded and tested (2026-09-09, SCAFFOLDING ONLY, not wired)
+
+Built the pure decision layer the operator specified: "Do not let ON
+CONFLICT itself decide which semantic operation occurred." Checked for
+duplication first -- `code-source-revision-v1.ts` (derives a sourceRevision
+from bytes) and `revision-authority-envelope-v1.ts` (workspace-level
+authority sealing across many sources) both exist in the same
+`identity/` folder but are complementary, not duplicative; confirmed via
+repo-wide grep that no `PacketWriteDecisionV1`/`decidePacketWrite`/
+`IDEMPOTENT_REPLAY` names existed anywhere before this.
+
+- [x] `sveltekit-frontend/src/lib/server/atlas/identity/packet-write-decision-v1.ts`
+  -- a pure, DB-free, fully deterministic `decidePacketWrite(current, request)`
+  function. No I/O, no database client, no fetch, no fs access -- every
+  field it needs is supplied by the caller, who owns reading current
+  canonical state first (inside the same transaction that will apply the
+  write, per `PACKET_WRITE_TRANSACTION_CONTRACT_01`'s future design).
+- [x] Covers all 8 required outcomes exactly as specified: `INSERT_NEW`,
+  `IDEMPOTENT_REPLAY`, `ADVANCE_SOURCE_REVISION`, `SOURCE_REVISION_CONFLICT`,
+  `WORKSPACE_REVISION_CONFLICT`, `CONTENT_CONFLICT`, `IDENTITY_CONFLICT`,
+  `REVISION_UNPROVEN` -- with a documented, deliberate precedence order
+  (identity checked before revision, revision before content, content
+  before workspace) so an ambiguous case never silently falls through to
+  the wrong outcome.
+- [x] `packet-write-decision-v1.spec.ts` -- 12 tests, **12/12 pass**, one
+  per outcome plus a precedence-ordering test (identity conflict takes
+  priority even when revision is also missing) and a purity test
+  (identical inputs always produce identical decisions).
+
+**This is scaffolding only.** `decidePacketWrite()` is not called from
+`semantic-packet-writer.ts` or any other writer yet -- wiring it in is
+separate, deliberately deferred work. That file is the one confirmed-live
+canonical writer this session spent three self-correction rounds
+establishing (`PACKET-REGISTRY-WRITER-OWNERSHIP-01` through `01B`); actually
+routing its `ON CONFLICT DO UPDATE` through this decision layer changes its
+real runtime behavior and needs its own careful, separately-tested pass,
+not a rushed follow-on to a scaffolding commit. No row in
+`docs/parent-atlas-workstation-todo.md`'s readiness matrix currently
+corresponds to this specific sub-item; not added speculatively -- a row
+belongs there once wiring (not just scaffolding) exists to describe.
+
+Files: `packet-write-decision-v1.ts`, `packet-write-decision-v1.spec.ts`.
+Zero writers touched, zero database writes, zero schema changes.
+
+## PACKET_WRITE_TRANSACTION_CONTRACT_01 -- scaffolded, live-proven against real Postgres (2026-09-09, SCAFFOLDING ONLY, not wired)
+
+Two new additive tables created and independently verified live:
+
+- [x] `atlas_projection_outbox` -- closes a gap flagged in
+  `hyperrag-packet-pipeline.ts`'s own comment ("Deferred: requires
+  atlas_projection_outbox table (ATLAS-BUILD-002)") that had referenced a
+  table which never actually existed. Holds `ProjectionChangeV1` events
+  (the schema already existed, `contracts/projection-change-v1.ts`, unused
+  by any caller before this) for async downstream consumption strictly
+  after Postgres commit.
+- [x] `atlas_packet_write_receipts` -- one durable, checksummed row per
+  `decidePacketWrite()` outcome, including rejected/conflict outcomes, not
+  only successful mutations.
+
+Migration: `sveltekit-frontend/drizzle/manual/20260909_atlas_packet_write_transaction_outbox.sql`.
+Both confirmed live via a fresh `pg_tables` query, not just apply-output.
+
+- [x] Built `sveltekit-frontend/src/lib/server/atlas/identity/packet-write-transaction-v1.ts`
+  -- `executePacketWriteTransaction()` wraps `decidePacketWrite()` in the
+  operator's frozen shape: read current canonical row -> decide -> guarded
+  mutation -> outbox insert -> receipt insert, all on a caller-supplied
+  transaction. **Deliberately does not handle `INSERT_NEW`** -- only
+  `ADVANCE_SOURCE_REVISION`'s guarded `UPDATE ... WHERE source_revision IS
+  NOT DISTINCT FROM $expected` -- to avoid duplicating the identity-creation
+  INSERT logic already proven live in `semantic-packet-writer.ts`. The
+  canonical Postgres transaction is structurally separate from Qdrant/
+  Neo4j/Valkey: the module holds no client for any of those at all, so the
+  boundary is enforced by construction, not just convention.
+- [x] **A real bug found and fixed by the live proof, not caught by review**:
+  the first version conflated `aggregate_id` (a UUID, per the pre-existing
+  `ProjectionChangeV1` contract's `aggregateId: z.string().uuid()`) with
+  `packet_key` (a text identifier like `packet:abc123`). Running the proof
+  against a disposable test packet_key immediately raised a real Postgres
+  `invalid input syntax for type uuid` error -- caught on the first live
+  run, not shipped silently. Fixed by generating a fresh UUID for
+  `aggregateId` and keeping `packet_key` only in the already-string-typed
+  `changedPacketKeys` array; the proof script's own cleanup/count queries
+  had the same latent bug (filtering `atlas_projection_outbox` by
+  `aggregate_id = packetKey`) and were fixed to filter by
+  `$1 = ANY(changed_packet_keys)` instead.
+- [x] **Live proof, `scripts/atlas/prove-packet-write-transaction-v1.mts`,
+  real Postgres, disposable `packet:test:transaction-contract:<uuid>` data
+  only, cleaned up in a `finally` regardless of outcome — all 4 steps
+  PASSED**:
+  1. `ADVANCE_SOURCE_REVISION` inside one real transaction, committed.
+  2. Independent readback from a genuinely separate pool connection
+     confirmed the committed `source_revision` value.
+  3. Exact replay correctly returned `IDEMPOTENT_REPLAY`,
+     `mutationApplied: false`.
+  4. A stale `expectedCurrentSourceRevision` was correctly rejected as
+     `SOURCE_REVISION_CONFLICT`, `mutationApplied: false`.
+  Final count check: 3 receipts (one per attempt, including the two
+  non-mutating ones), 1 outbox row (mutation only) -- exactly as designed.
+
+**This remains scaffolding only.** `executePacketWriteTransaction()` is not
+called from `semantic-packet-writer.ts` or any real write path. Wiring it
+in -- and deciding how `INSERT_NEW` should route through this same
+outbox/receipt mechanism -- is separate, deliberately deferred work.
+
+Files: `packet-write-transaction-v1.ts`,
+`prove-packet-write-transaction-v1.mts`, the migration above. Zero
+production packet_keys touched at any point; all test data disposed of in
+cleanup.
+
+## DORMANT-PACKET-WRITER-ADMISSION-01 (2026-09-09, read-only gate, baseline established)
+
+Built `scripts/atlas/audit-dormant-writer-admission-v1.mjs` per the operator's
+directive: any of the 8 confirmed-dormant `atlas_packets` writers
+(`PACKET_REGISTRY_WRITER_OWNERSHIP_01B`'s dormant list) that later gains a
+real production caller must, in the same change, prove it routes through
+`decidePacketWrite()` and/or `executePacketWriteTransaction()` -- otherwise
+this gate fails. Re-checks both reachability and contract-compliance live
+on every run rather than trusting the frozen 01B census.
+
+- [x] **First run produced 2 false-positive violations**, not real ones --
+  `packet-materializer-pipeline.ts` and `hyperrag-packet-pipeline.ts` both
+  flagged `hasRealCaller: true` via the same bare-function-name grep
+  (`materializePacket`/`materializePackets`) that produced a name-collision
+  false positive twice already this session in `01B`. Traced the exact same
+  root cause: `ace-materializer.ts` and `packet-parser.ts` each define
+  their OWN unrelated function of that name, not a call into either
+  dormant file.
+- [x] **Fixed the gate's own methodology before trusting its result** --
+  added `candidateReallyImportsFile()`, which requires an actual `from
+  '...<basename>'`-style import statement in the candidate caller before
+  counting it as a real caller, not just a bare-name text match. This is
+  the identical fix `01B`'s manual hand-verification already needed;
+  baking it into this gate directly prevents the same class of false
+  positive from recurring a third time.
+- [x] **Re-run after the fix: `overallResult: PASS`, `violationCount: 0`,
+  `stillDormantCount: 8/8`** -- consistent with everything already
+  independently established this session. `docs/reports/dormant-writer-admission-v1.json`.
+
+This gate is now a real, reusable baseline check -- re-run it (or wire it
+into CI) whenever any of the 8 dormant files, or any new writer discovered
+later, might have gained a caller, to catch the exact "today's dormant
+capability becomes tomorrow's silent second owner" failure mode before it
+ships.
+
+Script: `scripts/atlas/audit-dormant-writer-admission-v1.mjs`. Zero writes
+performed; zero writer files executed or modified.
+
+## OUTBOX-IDENTITY-CONTRACT-01 resolved + INSERT_NEW added to transaction executor (2026-09-09)
+
+Operator review caught a real semantic bug in `PACKET_WRITE_TRANSACTION_CONTRACT_01`'s
+first version before wiring proceeded: it generated a fresh random UUID per
+outbox event and called it `aggregateId`. Wrong -- `event_id` already covers
+per-event identity; `aggregate_id` is supposed to mean "stable identity of
+the thing that changed", not "identity of this event". A second random UUID
+alongside `event_id` was redundant and, worse, silently defined a second
+identity concept the operator's own directive explicitly warned against.
+
+- [x] **Fix**: `deterministicAggregateIdFromPacketKey()` in
+  `packet-write-transaction-v1.ts` derives a UUID deterministically
+  (SHA-256 of `atlas_packets:<packet_key>`, UUIDv5-style version/variant
+  bits forced) from `packet_key` -- the same packet always produces the
+  same `aggregate_id` across separate write events, while `packet_key`
+  itself remains the sole real canonical identity, unchanged, still
+  carried verbatim in `changedPacketKeys`. Chosen over the operator's two
+  alternatives: reusing a real stable UUID column (doesn't exist --
+  `atlas_packets.packet_id`/`packet_key` are both `text`) or adding a new
+  `aggregate_key TEXT` column (assessed as unnecessary complexity for this
+  scaffold; can still be added later if a real need appears).
+- [x] **`INSERT_NEW` added to `executePacketWriteTransaction()`** -- a
+  minimal identity-bearing `INSERT` (`packet_key`, `packet_id`,
+  `source_ref`, `source_revision`, `workspace_revision` only), deliberately
+  narrower than `semantic-packet-writer.ts`'s real INSERT (which also
+  writes `embedding`/`topology`/`vectors`/representation columns).
+  Extracting one shared canonical-write path (`CanonicalPacketRepository`,
+  per the operator's proposed design) that both would route through is
+  separate, larger work -- **not done in this pass**.
+- [x] **Live proof extended and re-run, real Postgres, all green**: added
+  Step 0 (`INSERT_NEW`, real commit) ahead of the existing 4 steps, plus a
+  final determinism check. Result: `receiptCount: 4`, `outboxCount: 2`
+  (insert + advance are the only mutating decisions),
+  `aggregateIdDeterminismCheck: { outboxRowCount: 2, distinctAggregateIdCount: 1,
+  allSameAggregateId: true }` -- two outbox rows from two separate
+  transactions for the same test packet share the exact same
+  `aggregate_id`, proving the fix works as designed, not just in theory.
+
+**This remains scaffolding only.** Still not called from
+`semantic-packet-writer.ts` or any real write path.
+
+**Explicitly NOT done in this pass, given context budget** -- queued, not
+attempted: `CanonicalPacketRepository` extraction, actual live wiring into
+`semantic-packet-writer.ts`, the `IDEMPOTENT_REPLAY` duplicate-prevention
+idempotency-key design, `PACKET_WRITER_SOURCE_REVISION_PRESERVATION_01`
+(the NULL-revision-clobber gate), `PACKET_WRITE_TRANSACTION_ROLLBACK_01`
+(forced-failure atomicity proof), and `PACKET_WRITE_LIVE_CANARY_01`. All
+remain correctly ordered prerequisites before live wiring per the
+operator's own revised sequencing -- none were skipped by assumption, they
+were deliberately not started this session.
+
+Files: `packet-write-transaction-v1.ts`,
+`prove-packet-write-transaction-v1.mts` (both updated in place). Zero
+production packet_keys touched; all test data disposed of in cleanup.
+
+## PACKET-WRITE-CONVERGENCE-01, items A+B closed (2026-09-09, second review round)
+
+Operator's second review round rejected the first `aggregate_id` fix too
+(a deterministic SHA-256-derived UUID) as still "letting a UUID column
+accepted the value define the architecture." Resolved properly this time:
+
+**A. OUTBOX-IDENTITY-CONTRACT-01**: `aggregate_id` (UUID) is now honestly
+set equal to `event_id` for this scaffold -- redundant, documented as such,
+not derived from anything (option A of the operator's three-way
+classification). A new, real `aggregate_key` (`text`) column was added to
+`atlas_projection_outbox` (migration
+`20260909_atlas_projection_outbox_aggregate_key.sql`, confirmed live),
+populated directly from `packet_key` with zero hashing or derivation --
+that's the actual, load-bearing identity going forward. Live proof re-run
+after the fix, all green: `receiptCount: 4`, `outboxCount: 2`,
+`aggregateKeyDeterminismCheck: { distinctAggregateKeyCount: 1,
+allSameAggregateKey: true }` -- two outbox rows from two separate
+transactions on the same test packet carry the identical `aggregate_key`.
+
+**B. SOURCE-BACKFILL-STATUS-CORRECTION-01**: `plan-source-revision-backfill-v1.mjs`
+now emits `contentMatchProven` and `sourceAuthorityProven` as two
+independent booleans (was one conflated `PROVEN`/`SOURCE_NOT_CURRENT`
+status), with `admission: QUALIFIED` requiring both true. Re-run, verified
+on disk (not just console output): `admissionCounts: {
+CONTENT_MATCH_AUTHORITY_UNPROVEN: 183, STALE_CONTENT: 17 }`,
+`qualifiedCount: 0`, `acceptance.safeToBackfill: false` -- 183/200 rows are
+still genuinely `contentMatchProven`, but none are authority-qualified,
+because `sourceAuthorityProven` is false for every row until
+`CURRENT-SOURCE-OWNER-RECONCILIATION-01` (still sealed
+`NO_CURRENT_SOURCE_SET`) actually admits a source set. A downstream tool
+can no longer mistake "content matches on disk" for "safe to backfill".
+
+**Explicitly NOT started, per the operator's own `PACKET-WRITE-CONVERGENCE-01`
+ordering (items C-G)** -- queued, not attempted, given context budget:
+`PACKET-WRITER-SOURCE-REVISION-PRESERVATION-01` (NULL-preservation matrix),
+`PACKET-WRITE-TRANSACTION-ROLLBACK-01` (forced-failure atomicity proof),
+`PACKET-WRITE-LIVE-WIRING-01` (routing `semantic-packet-writer.ts` through
+`CanonicalPacketRepository`), `PACKET-WRITE-LIVE-CANARY-01`, and
+`CURRENT-WORKTREE-SNAPSHOT-AUTHORITY-01`. `CHUNK-PACKET-LINEAGE-01` (Gate 8)
+was explicitly not started either, per direct operator instruction.
+
+Files: `packet-write-transaction-v1.ts`,
+`prove-packet-write-transaction-v1.mts`, `plan-source-revision-backfill-v1.mjs`,
+migration `20260909_atlas_projection_outbox_aggregate_key.sql`. Zero
+production packet_keys touched; zero source_revision backfill performed.
+
+## UUIDV5-IDENTITY-CONTRACT-01 (2026-09-09, real UUIDv5, replaces two prior approximations)
+
+- [x] `uuid-ossp` extension created live (`CREATE EXTENSION IF NOT EXISTS
+  "uuid-ossp"`), plus `atlas_projection_outbox_aggregate_idx` on
+  `(aggregate_type, aggregate_id)`. Migration:
+  `20260909_uuidv5_identity_contract.sql`.
+- [x] Three frozen UUID namespace constants generated ONCE and hardcoded in
+  `sveltekit-frontend/src/lib/server/atlas/identity/atlas-uuid-namespaces-v1.ts`:
+  `ATLAS_ROOT_NAMESPACE_V1`, `PACKET_AGGREGATE_NAMESPACE_V1`,
+  `TITLE_NAMESPACE_V1` (reserved for future title_id work, unused this
+  pass). Documented as never-to-be-regenerated -- doing so would silently
+  reassign every existing deterministic UUID.
+- [x] `packet-write-transaction-v1.ts`'s `aggregate_id` now computed via
+  REAL `uuidv5(packetKey, PACKET_AGGREGATE_NAMESPACE_V1)` (npm `uuid`
+  package's `v5()`), replacing both prior approximations: round 1
+  (SHA-256 with forced version bits -- not real UUIDv5) and round 2
+  (`aggregate_id = event_id`, honestly redundant but not what was asked
+  for). `aggregate_key` (plain text = `packet_key`) is KEPT alongside it,
+  not removed -- it remains the hash-free ground truth, `aggregate_id` is
+  a verifiably-standard UUID projection of the same value, never an
+  independent identity.
+- [x] **`UUIDV5-PARITY-01`, `scripts/atlas/prove-uuidv5-parity-v1.mts`,
+  100 real `packet_key` values sampled from live `atlas_packets` (not
+  synthetic strings): 100/100 exact match between Node's `uuidv5()` and
+  Postgres's `uuid_generate_v5()`, 100/100 confirmed genuine version 5 via
+  `uuid_extract_version()`, 20/20 deterministic replay, 0 collisions.
+  `PASS`.** This is exactly the check that would have caught round 1's
+  "looks like a UUID but is version 4" mistake immediately.
+- [x] Full transaction proof re-run after wiring real UUIDv5 in --
+  `PACKET_WRITE_TRANSACTION_PROOF_PASSED`, all 5 steps green, no
+  regressions (`aggregateKeyDeterminismCheck.allSameAggregateKey: true`
+  unaffected by the `aggregate_id` change, as expected since `aggregate_key`
+  is the value actually being checked for determinism there).
+
+**Not started this pass**: `TITLE-ID-CENSUS-01` and
+`TITLE-ID-UUIDV5-MIGRATION-01` -- `TITLE_NAMESPACE_V1` exists as a frozen
+constant only, unused, reserved for that future work. Also still not
+started, unchanged from before: `PACKET-WRITER-SOURCE-REVISION-PRESERVATION-01`,
+`PACKET-WRITE-TRANSACTION-ROLLBACK-01`, `PACKET-WRITE-LIVE-WIRING-01`,
+`PACKET-WRITE-LIVE-CANARY-01`, `CURRENT-WORKTREE-SNAPSHOT-AUTHORITY-01`.
+Gate 8 (`CHUNK-PACKET-LINEAGE-01`) not started, per direct instruction.
+
+Files: `atlas-uuid-namespaces-v1.ts` (new),
+`packet-write-transaction-v1.ts` (updated), `prove-uuidv5-parity-v1.mts`
+(new), migration `20260909_uuidv5_identity_contract.sql`. Zero production
+packet_keys touched; zero source_revision backfill performed.

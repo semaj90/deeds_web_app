@@ -2,9 +2,11 @@
 /**
  * atlas-parent-indexing.mjs
  *
- * Map-reduce style joins for parent-atlas canonical tables.
+ * Map-reduce style joins for a disposable Parent Atlas derived export.
  * Ingest atlas cards + outcomes into parent lookup tables (in-memory join).
- * Export to CSV for Bitfrost cache warmup and offline analysis.
+ * Export CSV/JSON for offline analysis. These files are not canonical tables,
+ * are not uploaded to SeaweedFS, and must not be promoted without a separate
+ * revision-qualified admission path.
  *
  * Usage:
  *   node scripts/atlas-parent-indexing.mjs --dry-run
@@ -160,8 +162,8 @@ async function main() {
   console.log(`  ✅ Built parent atlas index (${parentAtlas.length} entries)`);
   console.log(`  ✅ Computed cluster summary (${Object.keys(clusterSummary).length} clusters)`);
 
-  // Step 4: Export to CSV
-  console.log('  Step 4: Export canonical tables to CSV...');
+  // Step 4: Export derived artifacts
+  console.log('  Step 4: Export disposable derived CSV/JSON artifacts...');
 
   if (!DRY_RUN) {
     fs.mkdirSync(EXPORT_DIR, { recursive: true });
@@ -209,12 +211,19 @@ async function main() {
       parent_atlas_entries: parentAtlas.length,
       cluster_summaries: Object.keys(clusterSummary).length,
     },
-    status: 'Parent atlas indexing complete, canonical tables ready for Bitfrost cache',
+    status: 'Disposable Parent Atlas derived export complete; canonical state unchanged',
+    artifactClass: 'DISPOSABLE_DERIVED_EXPORT',
+    canonicalAuthority: false,
+    sourceAuthority: 'local .opencode cards and outcome ledger',
+    objectStore: 'NOT_USED',
+    postgresWrites: false,
+    seaweedfsWrites: false,
+    couchdbWrites: false,
+    cacheWrites: false,
     nextSteps: [
-      '1. Load parent_atlas_index.csv into Redis cache for semantic reranking',
-      '2. Use cluster_summary.csv for SOM topology-aware recommendations',
-      '3. Archive parent_atlas_index.json to CouchDB for durability',
-      '4. Proceed to Postgres 18 compatibility check',
+      '1. Regenerate from current canonical inputs when a fresh analysis snapshot is needed',
+      '2. Validate source/workspace revisions before any downstream adapter consumes it',
+      '3. Keep CSV/JSON as offline or fixture inputs; do not treat them as canonical state',
     ],
   };
 
@@ -235,10 +244,10 @@ async function main() {
     console.log('\n[DRY-RUN] Parent indexing preview complete. Use --apply to export.');
   } else {
     console.log('\n✅ Parent atlas indexing complete!');
-    console.log(`\nExports ready in: ${EXPORT_DIR}/`);
-    console.log('  - parent_atlas_index.csv (for Bitfrost cache warmup)');
-    console.log('  - parent_atlas_index.json (for Redis cache)');
-    console.log('  - cluster_summary.csv (for SOM topology analysis)');
+    console.log(`\nDisposable derived exports ready in: ${EXPORT_DIR}/`);
+    console.log('  - parent_atlas_index.csv (offline analysis input)');
+    console.log('  - parent_atlas_index.json (offline/fixture input)');
+    console.log('  - cluster_summary.csv (offline topology analysis input)');
   }
 
   process.exit(0);

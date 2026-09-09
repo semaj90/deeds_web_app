@@ -1,6 +1,6 @@
 {
   "schema": "atlas.graphify-run-completion-plan.v1",
-  "generatedAt": "2026-09-08T19:51:39.590Z",
+  "generatedAt": "2026-09-08T23:50:20.474Z",
   "mode": "READ_ONLY_COMPLETION_PLAN",
   "canonicalAuthority": false,
   "writes": {
@@ -21,8 +21,8 @@
     "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
     "sourceManifestDigest": "55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
     "sourceManifestSourceCount": 24192,
-    "status": "RUNNING",
-    "completedAt": null,
+    "status": "SUPERSEDED",
+    "completedAt": "2026-09-08T23:38:12.571Z",
     "workspaceRowPresent": true
   },
   "structuralArtifact": {
@@ -74,15 +74,15 @@
   },
   "sourceSelection": {
     "status": "CURRENT_GRAPHIFY_BATCH_PLAN_BLOCKED_REVIEW",
-    "selectedSourceCount": 3,
+    "selectedSourceCount": 52,
     "counts": {
       "currentGraphifyExact": 0,
       "missingGraphifySource": 0,
       "missingWorkspaceObservation": 0,
       "ambiguousGraphifySource": 0,
-      "graphifyRevisionOrContentMismatch": 3
+      "graphifyRevisionOrContentMismatch": 52
     },
-    "selectionChecksum": "89a6f50302bc2f52e703970aeee7f7736ff291991d72f5f5cbc6c9ee8064a084"
+    "selectionChecksum": "0c4ff5b9107a9f2eb0dee9ddfac3b4393941e4dcfc3dc146fe776bc7026acaf3"
   },
   "checks": {
     "ownerAuditAvailable": true,
@@ -114,5 +114,5 @@
     "reason": "Completion receipt cannot be admitted until all blockers are cleared."
   },
   "status": "COMPLETION_PLAN_BLOCKED",
-  "planChecksum": "sha256:42997be1e46f9187e30ea4e93e45993f0eb4d2f517b8a33a91d2e980f1c5c686"
+  "planChecksum": "sha256:471bd7a98bccc3d339aa76bddb8054f170b4dccba11ed2e9eebbcf1be284c980"
 }

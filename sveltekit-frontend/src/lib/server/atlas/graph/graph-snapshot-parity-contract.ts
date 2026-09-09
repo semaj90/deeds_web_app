@@ -100,10 +100,16 @@ export function deriveGraphSnapshotParityStatus(input: {
 		return 'PARTIAL';
 	}
 
-	const diagnostics = input.edgeProjectionDiagnostics;
+	// Either backend can expose a lossy simple-graph projection. A clean
+	// caller summary must never hide warnings retained in a backend receipt.
+	const diagnostics = [
+		input.edgeProjectionDiagnostics,
+		input.networkx.edgeProjectionDiagnostics,
+		input.cugraph.edgeProjectionDiagnostics
+	];
 	if (
-		diagnostics &&
-		(diagnostics.orderedDuplicateEdges > 0 || diagnostics.reciprocalEdgePairs > 0 || diagnostics.duplicateUnorderedPairs > 0)
+		diagnostics.some((entry) => entry &&
+			(entry.orderedDuplicateEdges > 0 || entry.reciprocalEdgePairs > 0 || entry.duplicateUnorderedPairs > 0))
 	) {
 		return 'PARTIAL';
 	}

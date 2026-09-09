@@ -13,26 +13,54 @@
     "candidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
     "ordinalMapChecksum": "86fee5d38619d3065d8710942068f26fb5b0d3c09992b1b523083ae0a593d297"
   },
-  "requiredArtifact": {
-    "schema": "atlas.representation-artifact.v1",
-    "inputRepresentationId": "semantic_768",
-    "outputRepresentationId": "ae_latent_64",
-    "dimensions": 64,
-    "exactChunkBindingRequired": true,
-    "modelRevisionRequired": true,
-    "producerRevisionRequired": true,
-    "parametersDigestRequired": true,
-    "inputDigestRequired": true,
-    "outputDigestRequired": true,
-    "atomicReadbackRequired": true
-  },
+  "requiredArtifacts": [
+    {
+      "schema": "atlas.representation-artifact.v1",
+      "inputRepresentationId": "semantic_768",
+      "outputRepresentationId": "latent_256",
+      "dimensions": 256,
+      "exactChunkBindingRequired": true,
+      "modelRevisionRequired": true,
+      "producerRevisionRequired": true,
+      "parametersDigestRequired": true,
+      "inputDigestRequired": true,
+      "outputDigestRequired": true,
+      "atomicReadbackRequired": true
+    },
+    {
+      "schema": "atlas.representation-artifact.v1",
+      "inputRepresentationId": "semantic_768",
+      "outputRepresentationId": "latent_128",
+      "dimensions": 128,
+      "exactChunkBindingRequired": true,
+      "modelRevisionRequired": true,
+      "producerRevisionRequired": true,
+      "parametersDigestRequired": true,
+      "inputDigestRequired": true,
+      "outputDigestRequired": true,
+      "atomicReadbackRequired": true
+    },
+    {
+      "schema": "atlas.representation-artifact.v1",
+      "inputRepresentationId": "semantic_768",
+      "outputRepresentationId": "latent_64",
+      "dimensions": 64,
+      "exactChunkBindingRequired": true,
+      "modelRevisionRequired": true,
+      "producerRevisionRequired": true,
+      "parametersDigestRequired": true,
+      "inputDigestRequired": true,
+      "outputDigestRequired": true,
+      "atomicReadbackRequired": true
+    }
+  ],
   "latentAudit": {
     "candidateCount": 15,
     "rowsFound": 15,
     "counts": {
-      "LEGACY_LATENT_IDENTITY_UNPROVEN": 15
+      "LATENT256_CURRENT_COHORT_CANDIDATE": 15
     },
-    "promotionEligible": false
+    "promotionEligible": true
   },
   "candidates": [
     {
@@ -42,7 +70,11 @@
       "sourceRevision": "sha256:7b0b603adcefed1df8ca784fb55c3ddf90439c4268aa841d9198751441a71628",
       "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
       "inputRepresentationId": "semantic_768",
-      "outputRepresentationId": "ae_latent_64",
+      "outputRepresentationIds": [
+        "latent_256",
+        "latent_128",
+        "latent_64"
+      ],
       "status": "PLAN_ONLY"
     },
     {
@@ -52,7 +84,11 @@
       "sourceRevision": "sha256:7d127f6ad38bf4fea345831f0afd0c4f7f5d2afdbebcc505b95191af6994f484",
       "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
       "inputRepresentationId": "semantic_768",
-      "outputRepresentationId": "ae_latent_64",
+      "outputRepresentationIds": [
+        "latent_256",
+        "latent_128",
+        "latent_64"
+      ],
       "status": "PLAN_ONLY"
     },
     {
@@ -62,7 +98,11 @@
       "sourceRevision": "sha256:0e7602dfb459b9ac3c51f34542f7461bbd9d6fc073de96b106740680ec671733",
       "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
       "inputRepresentationId": "semantic_768",
-      "outputRepresentationId": "ae_latent_64",
+      "outputRepresentationIds": [
+        "latent_256",
+        "latent_128",
+        "latent_64"
+      ],
       "status": "PLAN_ONLY"
     },
     {
@@ -72,7 +112,11 @@
       "sourceRevision": "sha256:da4e8e5a20040ddec287d85c871667b6dee636df1a4dda2a3c81d70640300830",
       "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
       "inputRepresentationId": "semantic_768",
-      "outputRepresentationId": "ae_latent_64",
+      "outputRepresentationIds": [
+        "latent_256",
+        "latent_128",
+        "latent_64"
+      ],
       "status": "PLAN_ONLY"
     },
     {
@@ -82,7 +126,11 @@
       "sourceRevision": "sha256:fb7c517edecc838e066c2cd04b41e9e60975d0f4c915faef4ebe9d654334c068",
       "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
       "inputRepresentationId": "semantic_768",
-      "outputRepresentationId": "ae_latent_64",
+      "outputRepresentationIds": [
+        "latent_256",
+        "latent_128",
+        "latent_64"
+      ],
       "status": "PLAN_ONLY"
     },
     {
@@ -92,7 +140,11 @@
       "sourceRevision": "sha256:d9d704dd555a3163fe7fa68c84bcb3dbded2c9fdc561aaaa85db880365715cfe",
       "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
       "inputRepresentationId": "semantic_768",
-      "outputRepresentationId": "ae_latent_64",
+      "outputRepresentationIds": [
+        "latent_256",
+        "latent_128",
+        "latent_64"
+      ],
       "status": "PLAN_ONLY"
     },
     {
@@ -102,7 +154,11 @@
       "sourceRevision": "sha256:22428ba7391697f35336a1da8b71478a70f3fd8d36bdbdb6247306c1813b3d7e",
       "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
       "inputRepresentationId": "semantic_768",
-      "outputRepresentationId": "ae_latent_64",
+      "outputRepresentationIds": [
+        "latent_256",
+        "latent_128",
+        "latent_64"
+      ],
       "status": "PLAN_ONLY"
     },
     {
@@ -112,7 +168,11 @@
       "sourceRevision": "sha256:a6e6f76185b8d0bc2849c53c1af9f0bc16771dfc03c878797215c275f430acc9",
       "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
       "inputRepresentationId": "semantic_768",
-      "outputRepresentationId": "ae_latent_64",
+      "outputRepresentationIds": [
+        "latent_256",
+        "latent_128",
+        "latent_64"
+      ],
       "status": "PLAN_ONLY"
     },
     {
@@ -122,7 +182,11 @@
       "sourceRevision": "sha256:7eab75bf1fce68e8672b405ca64db4bb62159d5e4660b80e240f88c1f0435d56",
       "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
       "inputRepresentationId": "semantic_768",
-      "outputRepresentationId": "ae_latent_64",
+      "outputRepresentationIds": [
+        "latent_256",
+        "latent_128",
+        "latent_64"
+      ],
       "status": "PLAN_ONLY"
     },
     {
@@ -132,7 +196,11 @@
       "sourceRevision": "sha256:dfedffa0dace728095fb8f1d30e2d0d84806feb0f820187f271b68f7dcd0beb6",
       "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
       "inputRepresentationId": "semantic_768",
-      "outputRepresentationId": "ae_latent_64",
+      "outputRepresentationIds": [
+        "latent_256",
+        "latent_128",
+        "latent_64"
+      ],
       "status": "PLAN_ONLY"
     },
     {
@@ -142,7 +210,11 @@
       "sourceRevision": "sha256:aa7d2ac01ee024deb2df8891a498123bb7c15d9303fb767f6085a9aac92f0d4f",
       "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
       "inputRepresentationId": "semantic_768",
-      "outputRepresentationId": "ae_latent_64",
+      "outputRepresentationIds": [
+        "latent_256",
+        "latent_128",
+        "latent_64"
+      ],
       "status": "PLAN_ONLY"
     },
     {
@@ -152,7 +224,11 @@
       "sourceRevision": "sha256:fdca83ec264edd7f987c60bbe1993bbdfa0ef0d51ceb17873f9f54780dab3b5a",
       "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
       "inputRepresentationId": "semantic_768",
-      "outputRepresentationId": "ae_latent_64",
+      "outputRepresentationIds": [
+        "latent_256",
+        "latent_128",
+        "latent_64"
+      ],
       "status": "PLAN_ONLY"
     },
     {
@@ -162,7 +238,11 @@
       "sourceRevision": "sha256:2821d678d3eb726b3a3fc3388d8907197db0e1a99e2cd70cf6c77d7782e38c50",
       "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
       "inputRepresentationId": "semantic_768",
-      "outputRepresentationId": "ae_latent_64",
+      "outputRepresentationIds": [
+        "latent_256",
+        "latent_128",
+        "latent_64"
+      ],
       "status": "PLAN_ONLY"
     },
     {
@@ -172,7 +252,11 @@
       "sourceRevision": "sha256:54bbcac440335b02c62a9af09888810b763bf3b3129eee31ea740a541979f384",
       "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
       "inputRepresentationId": "semantic_768",
-      "outputRepresentationId": "ae_latent_64",
+      "outputRepresentationIds": [
+        "latent_256",
+        "latent_128",
+        "latent_64"
+      ],
       "status": "PLAN_ONLY"
     },
     {
@@ -182,10 +266,14 @@
       "sourceRevision": "sha256:aa7d2ac01ee024deb2df8891a498123bb7c15d9303fb767f6085a9aac92f0d4f",
       "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
       "inputRepresentationId": "semantic_768",
-      "outputRepresentationId": "ae_latent_64",
+      "outputRepresentationIds": [
+        "latent_256",
+        "latent_128",
+        "latent_64"
+      ],
       "status": "PLAN_ONLY"
     }
   ],
-  "status": "BLOCKED_LEGACY_LATENT_PROVENANCE",
+  "status": "READY_FOR_EXPLICIT_PRODUCER_REVIEW",
   "nextGate": "REPAIR_LATENT_PRODUCER_BEFORE_ANY_APPLY"
 }

@@ -1,0 +1,3432 @@
+{
+  "schema": "atlas.source-revision-backfill-plan.v2",
+  "gate": "SOURCE-REVISION-BACKFILL-PLAN-01",
+  "generatedAt": "2026-09-09T04:46:44.951Z",
+  "mode": "READ_ONLY",
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "sampleLimit": 200,
+  "sourceEvidence": "atlas_packet_chunk_lineage (revision_status=PROVEN rows only), cross-checked against atlas_packets.source_revision (all NULL as of this session's migration) and freshly recomputed on-disk sha256 content digests -- never trusted at face value.",
+  "correction_2026_09_09": "Supersedes this receipt's prior v1 schema, which called 183/200 rows \"PROVEN\" -- that conflated two independent facts. A matching on-disk content digest (contentMatchProven) proves the FILE has not changed since the value was recorded; it does NOT prove the packet belongs to an admitted CurrentSourceAuthorityV1 (sourceAuthorityProven), which is separately sealed NO_CURRENT_SOURCE_SET. Renamed status -> admission with QUALIFIED requiring BOTH booleans true.",
+  "upstreamGateStatus": {
+    "gate": "CURRENT-SOURCE-OWNER-RECONCILIATION-01",
+    "admission": "NO_CURRENT_SOURCE_SET",
+    "implication": "No authoritative source set exists to qualify ANY row against yet. sourceAuthorityProven is false for every proposal in this receipt, regardless of contentMatchProven. workspaceRevision is left null on every row rather than filled with a guessed or stale value."
+  },
+  "admissionCounts": {
+    "CONTENT_MATCH_AUTHORITY_UNPROVEN": 183,
+    "STALE_CONTENT": 17
+  },
+  "qualifiedCount": 0,
+  "proposalCount": 200,
+  "proposals": [
+    {
+      "packetKey": "ace:packet:0051e908c9be",
+      "sourceRef": "docs/architecture/phase8-query-optimization-taxonomy.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:3ca5d3c6d57114328d4347f8a4141bb5231bab3ccef86da45bd73f461a127b9c",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: packet-chunk-lineage-backfill-dry-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:02dae66923a3",
+      "sourceRef": "docs/LANGGRAPH-KANBAN-ERROR-FIXING-INTEGRATION.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:b07d9637572f5fefd13dcfa2b2fe28b1c8ac295ef8356adae1c2eaf6c2ddfea6",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": false,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": false,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "STALE_CONTENT"
+    },
+    {
+      "packetKey": "ace:packet:04518e5714ed",
+      "sourceRef": "docs/GEMMA4-POLICY-ORCHESTRATOR-ARCHITECTURE.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:8933811f02a6f5eb02eea3ff69e488f83f837428a560b8e172dff484b5ec05d8",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:06568f01c146",
+      "sourceRef": "docs/PHASE-85-P9-LANGEXTRACT-AGENTIC-INTEGRATION.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:6010023eba4ff62e4deb1eadcabfdd34ba30a70d6c94f79792179dff6d0bac9b",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:07b76f513d2a",
+      "sourceRef": "docs/PHASE-B-P3-DEPENDENCY-CLARIFICATION.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:f26b83c5b1520bee1e02725fbab853742cc6f8d3cb7f1030e91f6c4c94966cdb",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:09e9df686b49",
+      "sourceRef": "docs/architecture/CUVS-DOCKER-IMPLEMENTATION-CHECKLIST.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:382cf91ac16b36a2e8f0aac8502f647a599866e95a54b101cda8bc4d5a7c1fa3",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:0b0880099613",
+      "sourceRef": "docs/CONSOLIDATION-IMPLEMENTATION-SUMMARY.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:2519b94f76fa79f47a10d303190600452dc42714ba6675bca409be32c5f60d46",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:10a4bc9ff0ca",
+      "sourceRef": "docs/OPENSPEC-READY-FOR-SESSION-95.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:0ca7ec4fac686690420ed1a103929a6c720e9c0950936ebbf481aadbafc754cc",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:1239c6bf4b94",
+      "sourceRef": "docs/architecture/CANONICAL-PACKET-WIRING-BLUEPRINT.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:27a6ea080dc297438d02c67f5c3829273940a932c5e7758ec2ac70f73d1554d9",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": false,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": false,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "STALE_CONTENT"
+    },
+    {
+      "packetKey": "ace:packet:13546470cbff",
+      "sourceRef": "docs/EMBEDDING-GPU-ACCELERATION-OPTIONS.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:bfb39347a564c4125312df44af0ec0cd84b9bf483dbdf31d6411b5818f1bf5d7",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:1fd059b964c4",
+      "sourceRef": "docs/PHASE-B-FINAL-SUMMARY.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:7c575a1e1fbbd47aa2ba8e3827474a1c5ced906ec27e64e4d3c988806e6f0207",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": false,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": false,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "STALE_CONTENT"
+    },
+    {
+      "packetKey": "ace:packet:204c22772b31",
+      "sourceRef": "docs/OPENSPEC-INSTALLATION-GUIDE.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:abe29e1fe79e40a9bea65d621c3365385493c3191308aa3f047779dfe8ba0d8f",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:23e126e572e4",
+      "sourceRef": "docs/PHASE-B-OPERATOR-APPROVAL.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:13fdb25d9a2e56239afa5ff1cc22e8ec7e10ad36674233c245ba8db5f53b37a8",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": false,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": false,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "STALE_CONTENT"
+    },
+    {
+      "packetKey": "ace:packet:2572e5b7b70b",
+      "sourceRef": "docs/parent-atlas/CONSOLIDATION-CANONICAL-ENVELOPES.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:9ce5970dd06a394c61a593277a1a11e558705a1783f2225c42fc701685635aeb",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:257db5ab2252",
+      "sourceRef": "docs/PHASE-102-NOUN-RERANKER-OBSERVABILITY.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:18d8938483f7321356f1c979797d6a9b8591ed50894d01cbb50ba1105f8e0d9e",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:283add11ce14",
+      "sourceRef": "docs/CONSOLIDATION-GEMMA4-PLAN.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:ecebac3e2a21b8f19c1525652a03ba7445e4726ed666e4d6580c19ff8bb78899",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:2e6990ddd2d1",
+      "sourceRef": "docs/PHASE_B_COMPLETE_EXECUTION_PLAN.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:d3e4769104df6bda38e4aeac45b88bd6b9ed3477532c6bbc389cb0a077220d55",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:3117d490ac75",
+      "sourceRef": "docs/PHASE-85-UNIFIED-REINDEX-STRATEGY.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:7ad92afe79cd0c862c26a2c99dd75105a0f4001eb8b98a6e3d3000e298dec3e8",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:35ceae98dfcf",
+      "sourceRef": "docs/PHASE-85-P5-P9-WORKSTATION-ORCHESTRATION.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:32e2bfd4397b687f4b2c648b4b0caa0c22545c0da46e1357ef81d2780f368a05",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:360423cb4077",
+      "sourceRef": "docs/OPENSPEC-INTEGRATION-PLAN.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:29123ebf24aec1b213394750d9f4cdee0a97d35bfa13fdfd6160f989395c69ac",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:3899241de0d3",
+      "sourceRef": "docs/phase-102-packet-architecture-summary.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:411d058e05ceb8a4a93a9e2a7a5fdec70dee915de44998296843da1a83d6b838",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:39dce9a1a745",
+      "sourceRef": "docs/PHASE_B_MULTI_PASS_ENRICHMENT.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:a5273ae256001c13fe39bbac1e5e7c49db16455ec6aa163fcc94ecd28938cab7",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:408a9022581d",
+      "sourceRef": "docs/PHASE_A_STATUS.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:cc97dd7d087861cb4700dbf9ae9be5f9db6d28173095ff0ccb1a5c3849941171",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:46bddf1fe040",
+      "sourceRef": "docs/PHASE-B-EXECUTION-READY.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:86bcae4944433942d912ef4ebf8c312913f0144c2dc50e8facf4042a6b110718",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": false,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": false,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "STALE_CONTENT"
+    },
+    {
+      "packetKey": "ace:packet:485f75957c36",
+      "sourceRef": "docs/ARCHITECTURE-DIAGRAM-COMPLETE.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:55ebb6ed5fa2fa2b5de43f404b4c1ffb68a95545378459b2687dcf9c13859813",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:4b24a801409e",
+      "sourceRef": "docs/PHASE-C-OPTION-B-EXECUTION-READINESS-SESSION-98.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:603fc639db2d90c762b1210a3f8b0c24cc9e3d51f77a17e0dac94285e0b3a783",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": false,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": false,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "STALE_CONTENT"
+    },
+    {
+      "packetKey": "ace:packet:4e59892cff5f",
+      "sourceRef": "docs/BATCH-SUMMARIZATION-DUAL-LANE.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:d18719f8d59fd275a6314e62e1a6b4f9781f8b15d417b46315d3c600426b946c",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:4ef011ed4fed",
+      "sourceRef": "docs/PHASE-B-RABBITMQ-ASYNC-PIPELINE.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:6a2cf4bcd1a51b9579f4764901141f6185bbd484d295b30261e976c2b3420d4d",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:55166ef6771b",
+      "sourceRef": "docs/architecture/AGENTIC-ERROR-FIXING-ARCHITECTURE.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:98ff2572232867ec9c8b750a849d4b0f5731da4d799e97c875bc5b27104a4a91",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:5ac5cffbb447",
+      "sourceRef": "docs/OFFLINE-SUMMARY-OPTIMIZATION-GUIDE.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:9a9be58aa7932556601e69ab244ba26a101ddf0de6283b2e77ce8f9f76ae8885",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": false,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": false,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "STALE_CONTENT"
+    },
+    {
+      "packetKey": "ace:packet:60249a7e81c4",
+      "sourceRef": "docs/PHASE-85-COMPLETE.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:a93b579fb86dabe920b24bacbaca9064bc1867ce4fcd6295f2a855401b75ad2f",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:61197986b19a",
+      "sourceRef": "docs/architecture/grpc-binary-memory-registry-master-todo.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:5a17e3aa53d72b74066fff0adbad7ced2d1ce9438883825a1cdea8c6a45a4ae8",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:616a5fa9aaa0",
+      "sourceRef": "docs/PHASE-85-P5-P9-INTEGRATION-SUMMARY.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:fc6a8611a63ea074478a16101f54bd7dfd2828be33b27baeb4181782324314d2",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:64bd1e11fae3",
+      "sourceRef": "docs/architecture/PHASE-C-OPTION-B-ARCHITECTURE-DECISION.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:30dbcd69f0ca12f5fbad8e35afd3801b5715659d92d20ebc2424bc024cd13656",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:65ed3efa90ea",
+      "sourceRef": "docs/PHASE-102-UNIFIED-RETRIEVAL-STACK.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:49dda95190fa2fed6b7eaeb916791a8f7e87e55bf5840fe9a4072c3b93457cd8",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:6b505fe3c351",
+      "sourceRef": "docs/NATS-WORKER-DIAGNOSTICS.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:f8471132929163bad4b8862c0888e3f14129d404d3602565d10d5255cf502161",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:6b7d98056ed5",
+      "sourceRef": "docs/architecture/CUVS-QUICK-REFERENCE.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:9811dd16585b42748fe252377639fa8e34255d751761ccc02f81001fa34fbf1b",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:6d5f0cc38f60",
+      "sourceRef": "docs/AGENTIC-TRACKING-LOOP-ARCHITECTURE.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:543647fc42f4bdc2dd3391836d3cfdaacbfc37265f47b33d791bd1b50c4c0538",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:6f5d55a7519c",
+      "sourceRef": "docs/architecture/CUVS-RESEARCH-SUMMARY.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:4ec62c5bfc4f96e7693045e971aac565f72c1b621fae4a114b6e78da270dcfe5",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:71c81854d1ef",
+      "sourceRef": "docs/OPENSPEC-CHEATSHEET.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:35a12c99210bb9f7173f76902ca6e0be4e22116dfaf6466429b21491c331e906",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:727118f352ce",
+      "sourceRef": "docs/parent-atlas/ingestion/INDEX.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:8404981bbd55d0039c93593a9a357875ba9c5133f2c88d19bec3908eeea93cec",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:730a165aeabf",
+      "sourceRef": "docs/PHASE-C-OPTION-B-FINAL-DECISION-MATRIX.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:4d54d3bdb81e6881662ac230e09450bdc9cef07b3c6cac8eb8bd6a01da861398",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:7802b2572378",
+      "sourceRef": "docs/atlas/package-boundary-registry.json",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:8dbbb7d8db03b5a99c52259eddb1061ef05bec7c73722df468d25e3d163bcba7",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: packet-chunk-lineage-backfill-dry-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:79e231a258ae",
+      "sourceRef": "docs/PHASE-85-CUDA-KERNEL-CACHING-QUICKSTART.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:b4ca5707088f5147391c197a188fa77cff015a45c04b44238adba9b8e24fc2a6",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:7e0e0c200411",
+      "sourceRef": "docs/PHASE-5-AGENT-OS-WIRED.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:988dc7b78b446d82336173b307626724079e8b19c71f9cfead72eab9d3e24e92",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:80ff8115ce0f",
+      "sourceRef": "docs/PHASE-5-EXTENDED-EVENT-SOURCING-ARCHITECTURE.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:06ec12b69f20aed8486af2b8312251b85a3db98eda87fae03d7948e857efb9b6",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:854bdefb7ef4",
+      "sourceRef": "docs/EMBEDDING-DIMENSION-AUDIT-2026-06-28.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:024240c1e6ed0a7100f59d200a1f412d9960146e98e9c75678c6fc251edc3a8e",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:929fe628aae2",
+      "sourceRef": "docs/PG18-INDEXING-AUDIT-2026-06-28.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:b07ce4f95537178098142fe54c8df2b45318fc4d0e10d9ba164384f9df3d803b",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:9909926b2c1f",
+      "sourceRef": "docs/architecture/grpc-binary-memory-registry-plan.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:e4c4e0c9f2288f9f3826c6e740734d8ae8d5c85f14226736e73f69b62f3d7c75",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:99afef6c935f",
+      "sourceRef": "docs/architecture/DAG-ACP-OPEN-MEMORY-WIRING.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:cfac70249fc7bfa62c161c249072186a7811b2ab3735e1ceb3413a902ac50792",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:a16ef22e6044",
+      "sourceRef": "docs/CONSOLIDATION-DOCKER-HARDENING.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:360d204bb2fc09a2f905ce81b77ba477431698675ff76a543b86fbd14508d728",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:a34c33df5806",
+      "sourceRef": "docs/PRODUCTION-HARDENING-SUMMARY.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:eff61217455131e8a4f1663a863a67b67553ae032b0c700ed438194ac2ba0b8a",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:b09dedb60456",
+      "sourceRef": "docs/architecture/CORRECTED-embedding-dimension-policy.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:fc3aa870abfa8eda0fccba26685236779494c5e94c51da428bdee1b97206a162",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:b391a4a948a9",
+      "sourceRef": "docs/PHASE_A_COMMANDS.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:33764777465353bc6e70326d39dfce05e6d33280a994b374ff4ce6e0c0106b89",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:b398c198ec10",
+      "sourceRef": "docs/HANDLER-TODO-INTEGRATION.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:31dd8b49d7607c85287a62bd6be9550c3c22cdb57808f11d78345f7f2cd116e3",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:bb37e38434d1",
+      "sourceRef": "docs/ENGRAM-ACE-MEMORY-SYSTEM-ARCHITECTURE.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:a72630a1b869416f6c938f21f0b6842926b01a31d98cb85c2eeca035138c3579",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:bb9dc8d490e6",
+      "sourceRef": "docs/PHASE-7-GEMMA4-CONFIGURATION.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:f2e499239581d4aedd9f975ab8ba3c033112d6cc5e2088164406b8cf050604d8",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": false,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": false,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "STALE_CONTENT"
+    },
+    {
+      "packetKey": "ace:packet:c0703cbf80b0",
+      "sourceRef": "docs/PHASE85-RFF-INFRASTRUCTURE-WIRED.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:b3390ba461a26608531013ac088f16ba7842321daafac6af398fce6beec99f4d",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:c2477e7e8d18",
+      "sourceRef": "docs/PRODUCTION-HARDENING-CLAUDE-PROMPT.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:58aa0417114c3ed916da878ac1ee85c8155aa59e8bbe790656b49570c667da12",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:c33c76811286",
+      "sourceRef": "docs/PHASE85-RFF-REINDEXING-EXECUTION.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:a981efeded40d063c22e33b3668574800daca65357fc6f45639cd5b4bdc3fc35",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:c4c9e6e5cf95",
+      "sourceRef": "docs/PHASE-B-BLOCKERS-DEPENDENCY-MAP.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:768a38af5f7747e6abc48554b0787ce06bee9edb59dbc803e0dc1d33b242f0de",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": false,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": false,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "STALE_CONTENT"
+    },
+    {
+      "packetKey": "ace:packet:ca644844ad79",
+      "sourceRef": "docs/NATS-HANDLER-CONTRACT.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:b381a3a9a84265ffe64ff076302a402e29690f700fca4d2db1990bbbef1b4131",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:d0e3bfcb4cd6",
+      "sourceRef": "docs/PHASE-B-DUPLICATE-HANDLING.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:8b04083f091e0d41251d4718137bd40fe48f0e4b495b10dfe786acb9a6cca9a8",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:d2e6dc82c601",
+      "sourceRef": "docs/architecture/ACP-TELEMETRY-DAILY-GRAPHIFY-FLOW.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:31cf62e86db4d94bd70e0251dde3ec1c19cdd69392ec8ce5e788ee6eb004002f",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:d88cc571ec17",
+      "sourceRef": "docs/PHASE-85-P9-LANGEXTRACT-GPU-INTEGRATION.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:9e9e21c8740a77d079e6f460b9b5b70ef358fd191a3e3e9edd20be29afa0c7cd",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:da511f437327",
+      "sourceRef": "docs/GEMMA4-ACCELERATION-STRATEGIES.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:6ffcfc8926d1c74093d28ec251548b9c5b4ce3740cafd8426323d3d6adc0af8a",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:df0cdb252240",
+      "sourceRef": "docs/GO-RETRIEVAL-FACADE-WIRING.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:8afc76a113da826ed5c178e737e8278d2a6ece512d0060eda60a326249f102d3",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:df90896af5b1",
+      "sourceRef": "docs/INFRASTRUCTURE-GAPS-AUDIT-FIXES.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:f6aacadca72ff5b946f4c90fd796de32af30fd0bd93bfde14db503272a21312e",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:dfa3e1dad971",
+      "sourceRef": "docs/GEMMA4-ROTORQUANT-PRODUCTION-SETUP.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:e61c5ddf511f11f429fdc4298846b987766058b60e62af861e5850c82bfbbdec",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:e28eb8e009b0",
+      "sourceRef": "docs/PHASE-85-JSONB-METADATA-SPEC.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:8c5b3ccf28b45f387c7eeee723752b7c1401a621a4278ce0bd30b442c6b9a735",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:e5c128787e15",
+      "sourceRef": "docs/architecture/CUVS-INSTALLATION-WINDOWS-RESEARCH.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:6a80c18fc745bccbf8c00c86767ad5eb1cd8716c776ce10277a9cb8f2d05274e",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:f18963de7168",
+      "sourceRef": "docs/CUVS-RESEARCH-INDEX.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:077ec56d2c55fce9ea99a031b7b438f24454a367b5ba9b1be17d0eb35a2e25aa",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:f2abe2843be8",
+      "sourceRef": "docs/ACE-MATERIALIZER-QUICK-START.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:45373b39035348bc12d5302fbd6a1c2e207c35c1cef708e90f9f207c8ee1cbc6",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:f86164e9aeeb",
+      "sourceRef": "docs/ENGRAM-FILES-INDEX.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:b6a6a4a0735c8e361cc199142ac37d0fe770aed48598fba2144d4640d6e67814",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:f861cf0d18d4",
+      "sourceRef": "docs/PHASE-C-OPTION-B-PRE-EXEC-CHECKLIST.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:2903d09df4f66733cf251f6c38bd6900353954933bbc16a19fbdcb890c641afa",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:f9c9a5d29402",
+      "sourceRef": "docs/dimension-policy.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:c8a289664bad8e561037bee800c6300de33f91a1fa7cb57e1560a486b0656d14",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "ace:packet:fa21a386ef5d",
+      "sourceRef": "docs/PHASE-B-MULTI-PASS-ENRICHMENT-COMPLETE.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:29ca4314940f96c2253f81371f75a9f3378287a3a6a053153717d2519d8f4918",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": false,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": false,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "STALE_CONTENT"
+    },
+    {
+      "packetKey": "ace:packet:fe85a846a424",
+      "sourceRef": "docs/PHASE-85-P9-LANGGRAPH-GPU-INTEGRATION.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:29d7cfa9c4b32f29b9f980af94bd81c23cdc7e6463dcc25c14b78083d9591008",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:0004f849be72",
+      "sourceRef": "sveltekit-frontend/tests/sprint5-6-monitoring.spec.ts",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:3392b96b6392dce3d6f9495f37ff1fa4c42ca3a648687c79a7a5e1aba3ed58e0",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:001007058f4a",
+      "sourceRef": "scripts/atlas/generate-concept-temperature-report.mjs",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:b4b02492df5c3ad9317fa682da3c047ac153fe463e68a7ef2c9a761850b7ca0e",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:0017ebe58f96",
+      "sourceRef": "scripts/run-migration.mjs",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:89b20a2b4512d1e1f084880eb01dafd20b719af3544521cc4339e4d9017888b1",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:001f13a6f8f0",
+      "sourceRef": "scripts/packets/load-packets-postgres.mjs",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:8ff5b5e82b951394c31e643a9368ff03b83fc84d49e85162e0f3161f914c8b19",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:0046c7db4fb2",
+      "sourceRef": "sveltekit-frontend/src/lib/server/features/ai/index.ts",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:4b93aee30149eaa7ab54b465db9694de597d12feadadb0351544cc0b35f73c7f",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:0055a733c702",
+      "sourceRef": "sveltekit-frontend/docs/design/2026-05-11_agents-directory-card-regen.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:57a4837b0c7a57ee8c790abbf9d11c5b08801c1952e2d6cee9e0ec80dc83022b",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:0057df284547",
+      "sourceRef": "scripts/atlas/test-p4-nats-wiring.mts",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:bc40de642906f5b31fb2345f27082c20cc0cdf6e08fdf439d70488a0f28cc629",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:00581022d8d5",
+      "sourceRef": "sveltekit-frontend/src/routes/(app)/code-intel/wiki/LLMS.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:7485d11e10600f3517f91b26ee759d1972548ab47000f621829d70c227aa4786",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:0058e67db61b",
+      "sourceRef": "scripts/tests/test-warmup-import.mjs",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:45a119320791a315e42b06d5d06b3a7f11675490891099474b23e98b89b90c62",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:0059ae33a823",
+      "sourceRef": "scripts/atlas/audit-som-canonical-location.mjs",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:a73390beef021ba869bd9b682fbf568ad8a0455e7c9325de03f0aff90feba278",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:005b17476a9e",
+      "sourceRef": "sveltekit-frontend/tests/routes/auto/api/codebase/auto-research.test.ts",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:3a34fc83c0e12e8398bd6107784bee40e1e330a22208660bc2b16bf7e705799e",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:005ed82af776",
+      "sourceRef": "sveltekit-frontend/scripts/tests/test-reports.mjs",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:9b20b2c536e645277f7ae0e4ad741ee4be6834e99836409b58ccb1d91e32a97c",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:006c4ab14b4a",
+      "sourceRef": "scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:cbfb9d2e14a2b5f012090953aed43728ba4f7497e45d26d24167a283dd3e4a0d",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:006e24915b0e",
+      "sourceRef": "sveltekit-frontend/src/routes/(app)/citations/LLMS.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:be140bfdfe9ca892272b7d5522c304a2acbfe8555f8ee9533f15afd24b650683",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:00808610168a",
+      "sourceRef": "sveltekit-frontend/scripts/kb/graph-jsonl-to-cards.mjs",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:bd27239075a773df5693f7b57a8b2dc0c06cb73dd85f2abe671cd23f66a71ef9",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:008175dc0b39",
+      "sourceRef": "scripts/atlas/audit-supersedes-packet-aware.mjs",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:e99d40da4df68429e7cfe668c9bc1addf14c212fd1cb3bd785db4eff03e72aec",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:00848415f727",
+      "sourceRef": "sveltekit-frontend/src/routes/(app)/yorha-home/+page.server.ts",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:d866f6facd9f8375969a150a0a064df86349db40f0ce4fc57b015f2507897a3c",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: packet-chunk-lineage-backfill-dry-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:009b58d2b2ef",
+      "sourceRef": "scripts/atlas/append-dir-agents-llms.mjs",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:af01f3a4c92ad9f34f00ca55edcc00630c549628fd06d8bb70c36f3bc469c53d",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:00ab7c9f16af",
+      "sourceRef": "scripts/atlas/phase-16-h-glyph-bridge.mjs",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:b1a044cfac8444733d923d1af49c5e095ab2fd7f2057bfc1339fbbfecc0ad604",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:00ad5c0b94a1",
+      "sourceRef": "scripts/tests/test-citations-scroll.mjs",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:5c64f8b1c070b349db36a2ca2e971a7cf6fd1d6d7c70accc78fd53c05d9bfe96",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:00bacf58384b",
+      "sourceRef": "sveltekit-frontend/src/lib/server/couchdb/LLMS.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:4495780237c9e99869424f8b89f009063f8408161a6eb593109c3f9cf57ff8c7",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:00bfbc40630b",
+      "sourceRef": "scripts/unsloth-training/COLAB_PACKAGE/MEGA_DATASET_EXPANSION.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:92795352aef2c3b3693d70ea96956fdba85f5956b3f502adb07bc6cdd32a395a",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:00ce699acf88",
+      "sourceRef": "src/lib/server/valkey.ts",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:912d720a88dfe793c71e49f525793d656a0a0ba2d200343b7fb4bdfedc58c28f",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:00db1a335680",
+      "sourceRef": "sveltekit-frontend/tests/routes/auto/api/cases/__id/notes/__noteId/evidence.test.ts",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:df0c9019ee48aa0b380beb18d0b8c8dea7e544295481347af94d1a60e9332948",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:00e831088491",
+      "sourceRef": "sveltekit-frontend/tests/poi-citations-conversations-routes.spec.ts",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:e737c01c194819a1d8c719bae79ca017628a30561cefd2bb8d0c7e926eacf7f2",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:00ff5a242082",
+      "sourceRef": "sveltekit-frontend/scripts/atlas/codebase-ingester-unified.mjs",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:88f9530fce3ecb4339ace8c13162209b4e256cdcf84fd743312ccbe292de4a14",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:010b3769dbe1",
+      "sourceRef": "sveltekit-frontend/tests/intent/rank-intent.spec.ts",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:1d7dddaaf6d274088286a3c7838c1c7aa12984a8184360bcc0b89634f861e125",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:01131c7e6f00",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/llm-context-cache.ts",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:18e3bfd572b94a4cf8489303a13d25581bc2a5dc9282ef6a40f370a16e2a0124",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:01211014a27b",
+      "sourceRef": "simd-bridge/cpp/build_som_cache.sh",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:7b079f34efa19eb40575cf0fe6e2c5b67cc51944bc2267bf1f9eeca2a61bcf6a",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:012486a5d4de",
+      "sourceRef": "sveltekit-frontend/docs/session-2026-05-04-graphify-recovery.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:5771845968629cc36c3d6dd5b7e53e188489e18bd83f0e42953fdb676707b6d9",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:012d4ec32f58",
+      "sourceRef": "scripts/packets/load-packets-neo4j.mjs",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:ebcb4aea0137b099e2a822dc8e98e0b00cfb92735eb16bb903bbd9bcc2f59f64",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:0183916fb600",
+      "sourceRef": "sveltekit-frontend/docs/TODO-karpathy-gpu-features.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:3014afd64504605236e489c830a7a9940f405632d817b69021736c387d775309",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:01a94f99f678",
+      "sourceRef": "sveltekit-frontend/scripts/mapreduce/map-worker.mjs",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:b52986e1d4a2091124b9dc2d127c9a27a06e6f237fd2b9ed5072ba3c23f6ee5e",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:01b2c6ed8e86",
+      "sourceRef": "sveltekit-frontend/scripts/atlas/test-p4-summary-indexing.mjs",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:ce5f88afc031a6745840dfc29115e45c22e5f867178077f081d3745f1eb2c496",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:01b9e9c83754",
+      "sourceRef": "docs/engram-cache-architecture.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:e0074f7cc033e5ec9e48fbab06bb48b6cc74b9c2e67b1bd6c0a80c31be7d5a60",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:01bab3a9b1e8",
+      "sourceRef": "sveltekit-frontend/tests/evidence-view-modal.spec.ts",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:56ea8f2fd5603aa72769f9bfcc6dcebdb9db41deaa8938410303f66ac41ab77c",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:01bac3509eac",
+      "sourceRef": "sveltekit-frontend/tests/routes/auto/api/code-intel/graph/impact.test.ts",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:ccaabb1e6e9c8b7145e8b535208884ce163370d01335d43382bd1685d2a1fcc8",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:01bc245d433e",
+      "sourceRef": "sveltekit-frontend/scripts/seed-hypergraph-edges-lane-c.mjs",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:45f88002bdbf7603ce455435ec1af58442ab2849c21f66f9c4353e3ac35055f4",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:01c32b8afad8",
+      "sourceRef": "scripts/opencode/fill_empty_summaries.mjs",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:9c85c2950ff45654608bf1be8efb23f3ac6df1b513eb05a5f79a8041649f44fb",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:01c814243512",
+      "sourceRef": "docs/PHASE-17-RUNTIME-RECOVERY-CHECKLIST.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:de53c9441d3b3669148f185d7bf7182d66b2cf5f64476ed1dc506088d7a4e413",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": false,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": false,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "STALE_CONTENT"
+    },
+    {
+      "packetKey": "packet:0260260b50e6",
+      "sourceRef": "docs/phase100/feature-graph.json",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:e5937361a4a352bf82d101570af8273bd7654fbe5c780b8fa5c811a4da100d08",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:027a8a87b4d1",
+      "sourceRef": "docs/PHASE-14-15-IMPLEMENTATION-COMPLETE.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:0cb53d646a7518a84d8c675763ce306f1a7c0999d43ff950877e02e7682322c6",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:02acbc232ff9",
+      "sourceRef": "docs/AGENTIC-LOOP-FROZEN.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:eb91cf877bc7f2f876652db38ec71360fa855ce3c9ba5e9d4df80a10924e8c72",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:0319e7f8800c",
+      "sourceRef": "sveltekit-frontend/src/routes/api/v1/ai/cache-result/+server.ts",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:d51f49a9e2c378a1703aaf67810cd409d66e9761de7dfff4669f33cd88e61198",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:0329d6adfaa4",
+      "sourceRef": "docs/packets/rg-toc.json",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:a56bd198853651146a58ba9ed4eb1683c756575278e5094db3d149a669e080d1",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:03560d775f2d",
+      "sourceRef": "docs/DOCKER_STARTUP_GUIDE.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:30956384f37065e75e61ff53984b5382f60ec1304a36f041cbb0921d5dacf649",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:03645a68a1f7",
+      "sourceRef": "docs/PHASE-14-15-PRODUCTION-HARDENING.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:040037442f7e2a7141e7a9bd6bf0fface4112d413f9aa23c15ba987303b38a00",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:0382d8cc076d",
+      "sourceRef": "docs/P4-GRAPH-REFRESH-PLAN.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:513e744625d722501f26f57a6aeae0204af24a77ecd311d20e887ff65bf1921b",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:041141a64ead",
+      "sourceRef": "docs/P4-1-ALIGNMENT-AUDIT.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:3080720f6465b9865866c096d0e8a43f931c0734ce93b438f9929bc63dc09133",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:048340da85b2",
+      "sourceRef": "docs/P3G-CLASSIFICATION-REPORT.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:12bff2d5f082ee2dbd8cdd69a4f149bcaeed97fde3247e974957551b2139d0bb",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:05ee45d48cfa",
+      "sourceRef": "crates/atlas_packet_parser/src/lib.rs",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:4e8062284f40b6dc1cac0bd4f238ed2c69d00d924efc2b416913d9240268a599",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:0691ddb2e7b6",
+      "sourceRef": "docs/architecture/PHASE-85-ARTIFACT-REGISTRY-SPEC.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:cc1f4a08358bc8aee89a5f2176b878e2ae272551979b6309e45a2d3476baccc3",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:06de21082abe",
+      "sourceRef": "docs/atlas/parent-atlas-table-of-contents.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:d32458619b0b625c53094e2daf72021dccc50711bd1c2b0f9bb574a2fbfcf0e3",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": false,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": false,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "STALE_CONTENT"
+    },
+    {
+      "packetKey": "packet:06e86299ea9d",
+      "sourceRef": "docs/design/subgraph-instruction-programming-kag-ace-topology-todo.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:5950fa413dafdf075d5f25ede675ec162469bd33cae6846a147d0acefd3be8d4",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:07f4f59a4398",
+      "sourceRef": "docs/graph/atlas-write-scale-report.json",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:1e2aef29c11b7ea9eeea0080b1f8980ee23453476994ac7db1bc32838dd5e46a",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:08007d10d8a0",
+      "sourceRef": "docs/graph/repo-workspace-map.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:9ab6e3ddb707cf1f4b92e8389ea50d6352a301a174dee0999eaae4932dad9afb",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:080a1ec5ed80",
+      "sourceRef": "docs/profile-cards/data/docker_langgraph-synthesis_.venv_Lib_site-packages_plotly_package_data_plotly.min.js.json",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:1ec85671f9925a69e0fa237a37b509e40af49edecefd2b00c661d42ae5ed65fc",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:087220309988",
+      "sourceRef": "docs/graph/batch-gpu-analysis-report.json",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:302ce95d976520827cea924d543d626977eea4a589aa5655a639fa51554b4b3e",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:08b0bc4ef16f",
+      "sourceRef": "docs/compiler-landscape.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:dd6977ed575ae8b2848a44b965c58645fd7b99b1de591802736ff467c83e1360",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:09eca31afcae",
+      "sourceRef": "docs/atlas-runtime-intent-graph-architecture.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:74fd2444df79908fcfc6c05eb2428c0b697f82045bb4eb36a9f125f83158f91a",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:0a992d54bee1",
+      "sourceRef": "docs/P4-GAP-ANALYSIS-SUMMARY-INDEXING-SOM-AE.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:5278d46bf1c7ad8527d32074f274cb9266421898cfca32b14210c62f2efb01a1",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:0bc810b7ac82",
+      "sourceRef": "docs/graph/programming-docs-ingestion-report.json",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:64d99b652118c31450a10f15bb3db4cee270b32b3f01e1efb15527e4955740e0",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:0c30e88522e8",
+      "sourceRef": "docs/PHASE-85-IMPLEMENTATION-STATUS.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:1728a374e1d80693712e731f302abe70075b57dece3465167fce0a44964f8803",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:0d19d6938c03",
+      "sourceRef": "sveltekit-frontend/.codex_louvain_audit.mjs",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:810100c1c4e0aa5fcbbb6cdccd9f10c20295f5b6fe748ff6898d87df7b634bbb",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: register-orphaned-chunks:lineage-capture:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:0d409679f7ec",
+      "sourceRef": "sveltekit-frontend/src/routes/(app)/evidence/analyze/+page.server.ts",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:03c2f124ccaf960d3b993362233dc11b80ca7c4e49b4544463467f76fbd7a33f",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:0d70942ff524",
+      "sourceRef": "docs/PHASE-85-EXECUTION-PROGRESS.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:318e8f625031b222f853e1c29f077dfbe669644b2821f0b34cb59340ee5ae6ef",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:0dc9e83ee988",
+      "sourceRef": "docs/guides/TOOL_GATEWAY_DIAGNOSTICS.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:3bf4ebc677067728a0d0de4a03245fe297f114a7745d83bc8a79180352742b98",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:0dfb89856bcd",
+      "sourceRef": "sveltekit-frontend/docs/CROSS-RANKER-API.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:79b664112ccf2072f8d988547661b6da556bedbfb9991faf3dfa8a701d4d9e51",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: register-orphaned-chunks:lineage-capture:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:0e0f24eae000",
+      "sourceRef": "crates/turbovec-napi/index.js",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:8a3fe695801fb9faa9e784f53e03e387a093628f9fe914d8106f7962bc272d74",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:0e2bed113432",
+      "sourceRef": "docs/ARCHITECTURE_GUIDE_V1.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:05121ab5a714988b4619eb39c8bd433729c0ef88dc9ad91221cb971cdfe62fb3",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:0e9eba450d6b",
+      "sourceRef": "docs/PHASE-2-GEMMA4-ACP-COMPLETION.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:d55b4a68401a757f45bab71f262991e6884fabdea80078ecff1c64dffd13a49a",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:0ef4e5eff91e",
+      "sourceRef": "crates/atlas_packet_parser/index.js",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:5bb2826a27ba9434029c48b27ccf75dd1b08857d6b9ab110a14f0833cabc4769",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:0ff0bbf4d7bb",
+      "sourceRef": "docs/feedback-loops-a-b.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:40120c50980b7ba5ca8596f514ae3fa75f65174353a4ab142f69b9a92419d0e6",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:10251ac97d65",
+      "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/types.ts",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:3407000d65c3fb0efb852b504736a2bfc853764a995d6ff384aa5d27ec3b5add",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:10506464adfe",
+      "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/MetricsCollector.ts",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:dd9199251b932521d82ee4ecf193d5a6a3aab8ff2b639d0672764c0aa801b5b4",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:107ea0f68e14",
+      "sourceRef": "docs/legacy-reference/ingestion-phase66-README.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:04c5480cfdf449b50bf8c1b1d228a10fede5a5d705b458fd0cb15511ef15a183",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:10973bd3a7a0",
+      "sourceRef": "docs/atlas/LANE-1B-HIGHER-HOP-ENRICHMENT.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:29883600f1ba78c3a4924e56327390c21297970a2281bfa5619a0f68d84a2e7f",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:109f48d9c75a",
+      "sourceRef": "docs/P1-SESSION-86-FINAL-INTEGRATION.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:e20e9ce48d96ca0e18bc92d69c71a6baf09f36885c0018ceab91e3dda5504145",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:10e1acda7d60",
+      "sourceRef": "sveltekit-frontend/src/lib/server/services/knowledge-search/TagExtractor.ts",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:6d52859fe78a949c7f4ea7a75ad9c5fcdab970c8e5da6223015ca55d80824591",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:1294a4e335cd",
+      "sourceRef": "docs/open-lanes/lane-packet-contract.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:fa9d675600470ac092e99306c7eecd9b64c494ba8c03a729ff88af3c8ac4f471",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:133c9cc8a514",
+      "sourceRef": "docs/graph/repo-engram-memory-report.json",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:f57916b811330b2babafc97f338117d9403a278cb52497c7c98cebd1a9a198eb",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:137d4477a5e5",
+      "sourceRef": "docs/PHASE-1B-COMPLETION-REPORT.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:b164671b16b28a65db883fbdb4b1724ae52cb59b8335e5df9b5ca0262b662e22",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:13b209bbd348",
+      "sourceRef": "docs/CI_VENDOR_WHEELS.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:4267b6a6fe020b6d889678581a135223d8141f3bff8b7d10383c374e0b3d8ad7",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:13cc3ae38e9f",
+      "sourceRef": "docs/audit/synthesis-todo-execution-2026-06-23.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:649fc6533ee3bd5464cb66933565c5d8b7fcb384de75c0ce50b8cf35dcb0835d",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:16eedf7315a0",
+      "sourceRef": "docs/lane-12-2-rpc-search-integration.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:6a15d7f500bc354c176e55ceecd6c24c089166159907d57dd7d1cc944ba793f2",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:1753b2757ad3",
+      "sourceRef": "docs/PARENT-ATLAS-CONSOLIDATION-INVENTORY.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:6b88fc04af5b69ef9210e4773a55ca8a9c0d17675efbede6f9da0cc0a31355a5",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:1834d092a673",
+      "sourceRef": "docs/P1-AGENTIC-ERROR-FIXING-PLAN.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:e0b5de7274a06fb95fc561da19687c026d6ff2930c277976a2d7454d1e80db52",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:18eee38b5522",
+      "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/index.ts",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:a0965b330eb9b9a492da8baa285225cda63aa741ff7b6cf62cd992c09b008d1d",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:190960a6dc13",
+      "sourceRef": "docs/EMBEDDINGS-ONLY-OLLAMA-SETUP.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:5ab40d1fc9c4a5f0150db62d11a5c2e47e6c5a06d772442765db14a3d779107c",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": false,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": false,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "STALE_CONTENT"
+    },
+    {
+      "packetKey": "packet:1958cdda5c2e",
+      "sourceRef": "docs/AI-CHAT-GO-SERVICES-INTEGRATION-PLAN.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:91b68e93c54280b4a81b9681ccdd70c4c4398d5874e039e273162a201da659b1",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:196138c47be8",
+      "sourceRef": "docs/ai-os/atlas-retry-index.json",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:7b0b603adcefed1df8ca784fb55c3ddf90439c4268aa841d9198751441a71628",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:1a51ba13ee68",
+      "sourceRef": "docs/MULTIHOP-ENRICHMENT-EXECUTION-ORDER.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:f402f2edc6f69a0acb868d31c19302506be422046884e231fb266a9592fb737b",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:1ae718998d59",
+      "sourceRef": "docs/PREFLIGHT-AUDIT-REPORT-2026-06-23.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:88837ab2644a994021642b045be76b3dc1a1857b643d8cb6baf5be99ff1f7e46",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:1b7ba3c5d8aa",
+      "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/KAGTraverser.ts",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:1815f9906de592dfbf73778eeea35287537d7c064cbda47b2537f7a41c1e480a",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:1bc55059bc85",
+      "sourceRef": "docs/PARENT-ATLAS-CONTRACT-SUMMARY.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:664a4c27de2878ff4c36b3a4280469ff47209a747c321004a6fbbd9b6fddee10",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": false,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": false,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "STALE_CONTENT"
+    },
+    {
+      "packetKey": "packet:1c0c8f46acef",
+      "sourceRef": "docs/operator/RESILIENCE.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:5c545b27e959f7ec12fdc8c2b1bcf8d37269590ab77ca509bed7993d48e4fcf2",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:1c78a0c87d77",
+      "sourceRef": "docs/architecture/retrieval-boundary-and-langgraph.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:e6254421ff62d0f25cfa1ae1a8b052ade74f831badd2103bfcce9ba2825e38c1",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:1cb0e610104d",
+      "sourceRef": "docs/ai-os/opencode-context-window.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:d7a00ba187f21d0b63c72a4d19d16e48bd981da56bc04c92194c126367bebd9a",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": false,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": false,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "STALE_CONTENT"
+    },
+    {
+      "packetKey": "packet:1d20aac4ef26",
+      "sourceRef": "docs/P3G-BLOCKING-ISSUES-DECISION.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:60fc13c562ac9ec284595179293ddef3be8ad28bbe96dd3e89d3c47837f52386",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:1d5003d955ef",
+      "sourceRef": "docs/P1-IMPLEMENTATION-TASKS.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:9a15c0d4c109e1e32c9e0aa994353add5a06de335d0ab32ba1e509e2b47fb5e0",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:1d7785eb7556",
+      "sourceRef": "docs/graph/contract-error-map.json",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:4f1fef5a7237855cd4749eff205dd8c7358aa823f3f4f96cea1a559b2924fce7",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": false,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": false,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "STALE_CONTENT"
+    },
+    {
+      "packetKey": "packet:1daa458bdb73",
+      "sourceRef": "crates/atlas_packet_parser/wrapper.js",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:7d127f6ad38bf4fea345831f0afd0c4f7f5d2afdbebcc505b95191af6994f484",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:1db131c530a9",
+      "sourceRef": "docs/ATLAS-CONTRACT-LAYER-COMPLETE.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:362e0fe0ec053340fe5c004283091791ef31015903c56fbe8462068dc94202c9",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:1db2be9746be",
+      "sourceRef": "docs/P1-PRODUCTION-HARDENING-COMPLETE.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:50593cc86b9f54079371f24c72d6ea6fabf79aecfa542dba276c9cf33f96ece1",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:1dd070737f5f",
+      "sourceRef": "docs/architecture/consolidation-and-schema-alignment.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:b03cf089c2942c14f014dcbee75da50b9e9d83de57cb53dbe87fbddbaa0c5a42",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:1e2def163882",
+      "sourceRef": "docs/graph/directory-role-map.json",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:63c2286e9e5ad45870391c26a5a389d6bae31a0b195b4921057dcf6dbec5ce33",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:1ebdb8a733f1",
+      "sourceRef": "docs/archive/phase-4b-level-1-task-list.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:1f1056b1fde8ebd176c9416c9bb631ef2e06c378c946014e89bc0b717e452f43",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:1f0fd3bcfeef",
+      "sourceRef": "docs/FOUR-LANE-PROOF-SUMMARY.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:d03fc4caf0632b8cde5856bc2e3d82ac11705ba0882f7bd4ca7450d2d80c1313",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": false,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": false,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "STALE_CONTENT"
+    },
+    {
+      "packetKey": "packet:2044dad2032f",
+      "sourceRef": "sveltekit-frontend/data/atlas-tensor-proof/entropy_norm_coverage_r1.json",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:e02e6de362e1ae3d31f75d32ca55a75bffbf11cdedbcc2f01210244efeb53efb",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: register-orphaned-chunks:lineage-capture:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:204f7903bcdc",
+      "sourceRef": "docs/atlas/PHASE-3I-COMPLETION-SUMMARY.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:3da7948edf852bd0e4fba9b3084fe50291718ca3e102b4b9de62a450fa9fe0e3",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:2050c4a66791",
+      "sourceRef": "docs/operations/stack-audit-playbook.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:e0bfbbb7f331314dbd725ddfc884d00cb36c9d41325e9a3ca01503986f80d244",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:20bdb3209c4a",
+      "sourceRef": "docs/architecture/compressed-semantic-geometry.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:a1c4a94787cdf7a210d9a25348285862b6b43a1e6f16cac629c7fc5921e09688",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:225fa0b05a89",
+      "sourceRef": "crates/atlas_packet_parser/index.d.ts",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:0e7602dfb459b9ac3c51f34542f7461bbd9d6fc073de96b106740680ec671733",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:237e50f2f1e2",
+      "sourceRef": "docs/PHASE-3F-4B-ARCHITECTURE-SUMMARY.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:966dc4f61dff0667e30a963565fc8ec6a983be5a614ff3478c8c0070d3e96a5c",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:23f6f044392c",
+      "sourceRef": "docs/atlas/phase-1.5-atlas-feature-registry.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:a063865f397807af651472a201afb9994f88af0b2483dd4da200048b22078fa5",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:240b722fa8ef",
+      "sourceRef": "docs/mcp_tool_update_notice.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:11b8814216de7e1ca3676bd631b77fa4ee8a7e8ab92dc5d83ab95e42f8fb2c70",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:240ea7c3456e",
+      "sourceRef": "docs/architecture/scheduler-gpu-bridge-roadmap.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:ec0022481f776b88ff3e4f54f392d41ec19a503531178016daa9821c1785852d",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:24b1138befca",
+      "sourceRef": "docs/PHASE-85-STATUS-TRACKER.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:8f56bdd9b6af169534fd91d87444273704a536b6f6a00326270629cc370f8a6d",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:24b9c58ec14a",
+      "sourceRef": "docs/architecture/local-deep-research-boundary.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:bb44f6a8c4b85d30ed77bf98f2dfec2adbc00049f4d77d2944da58ecbb5f7d25",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:25356b841673",
+      "sourceRef": "docs/atlas/LANE-3-VALIDATION-STATUS.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:cc15a8dd944d07e49a088e12802af9c4c7012f8e587b0b037775fcf83076c914",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:2538e27909d9",
+      "sourceRef": "docs/atlas-contract-layer-integration.md",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:5077147e82363c3eacfa87599104c487349f301c5c86035a775a6164cc4d5486",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:25ac9148f9bf",
+      "sourceRef": "crates/atlas_packet_parser/package.json",
+      "workspaceRevision": null,
+      "proposedSourceRevision": "sha256:da4e8e5a20040ddec287d85c871667b6dee636df1a4dda2a3c81d70640300830",
+      "derivation": "CONTENT_DIGEST",
+      "contentMatchProven": true,
+      "sourceAuthorityProven": false,
+      "exactSourceBinding": true,
+      "exactPacketBinding": true,
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-historical-promotion-apply-v1.json",
+        "atlas_packet_chunk_lineage.source_revision (producer: PKT-LINEAGE-09-HISTORICAL-PROMOTION-01:v1)",
+        "docs/reports/current-source-authority-v1.json (sourceAuthorityProven=false for every row until this gate seals)"
+      ],
+      "admission": "CONTENT_MATCH_AUTHORITY_UNPROVEN"
+    }
+  ],
+  "acceptance": {
+    "derivationMethodDocumented": true,
+    "noSyntheticRevisions": true,
+    "noWorkspaceRevisionGuessed": true,
+    "readOnly": true,
+    "safeToBackfill": false
+  },
+  "nextAction": "safeToBackfill=false. Do not write ANY proposedSourceRevision value into atlas_packets.source_revision yet -- not even the content-match-proven rows -- until CURRENT-SOURCE-OWNER-RECONCILIATION-01 (or a successor like CURRENT-WORKTREE-SNAPSHOT-AUTHORITY-01) actually seals an admitted source set for sourceAuthorityProven to become true against."
+}

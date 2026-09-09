@@ -94,7 +94,8 @@ export interface QdrantCodeResult {
 }
 
 type QdrantFilter = {
-  must: Array<{ key: string; match: { value: boolean | string | number } }>;
+  must?: Array<{ key: string; match: { value: boolean | string | number } }>;
+  must_not?: Array<{ key: string; match: { value: boolean | string | number } }>;
 };
 
 /** Qdrant filter shape: scalar equality is expressed with match.value. */
@@ -103,13 +104,17 @@ export function buildCodebaseQdrantFilter(input: {
   topoClass?: string;
 }): QdrantFilter | undefined {
   const must: QdrantFilter['must'] = [];
+  const mustNot: QdrantFilter['must_not'] = [
+    { key: 'canary', match: { value: true } },
+    { key: 'source_ref', match: { value: 'canary://task-semantic' } },
+  ];
   if (input.collection === 'codebase_chunks_768') {
     must.push({ key: 'atlas_enriched', match: { value: true } });
   }
   if (input.topoClass) {
     must.push({ key: 'topo_class', match: { value: input.topoClass } });
   }
-  return must.length ? { must } : undefined;
+  return { ...(must.length ? { must } : {}), must_not: mustNot };
 }
 
 const quantizationCapabilityCache = new Map<string, boolean>();

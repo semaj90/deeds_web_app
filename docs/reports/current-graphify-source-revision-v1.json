@@ -1,6 +1,6 @@
 {
   "schema": "atlas.current-graphify-source-revision.v1",
-  "generatedAt": "2026-09-08T19:58:58.078Z",
+  "generatedAt": "2026-09-09T02:07:31.462Z",
   "mode": "READ_ONLY_SOURCE_BYTES_AUDIT",
   "runId": "48485685-e773-4433-a1f8-00f5524cca44",
   "runSelection": "COMPLETED_BOUND_OWNER_BY_FILE_COUNT",
@@ -14,9 +14,9 @@
   "canonicalAuthority": false,
   "rowCount": 23758,
   "counts": {
-    "CONTENT_MATCH": 23469,
-    "CONTENT_MISMATCH": 282,
-    "SOURCE_UNAVAILABLE": 7
+    "CONTENT_MATCH": 23443,
+    "CONTENT_MISMATCH": 303,
+    "SOURCE_UNAVAILABLE": 12
   },
   "sourceRevisionPresent": 23758,
   "rows": [
@@ -750,10 +750,10 @@
     },
     {
       "sourceRef": ".claude/settings.local.json",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "dd70c43d5103fa3c09f434456f553270a8858a047953de032c702ca2ff471c11",
-      "actualContentHash": "sha256:dd70c43d5103fa3c09f434456f553270a8858a047953de032c702ca2ff471c11",
+      "actualContentHash": "sha256:32fed5fa33dd50cb46383382fb7ddd27ede23ccff49b4738df2d1ad0a9c11e2c",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -2953,7 +2953,7 @@
       "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "a19fcdca1ef69a1e78ad19afa9b02ac2152afc4596b2752f0dff3cbc4c123000",
-      "actualContentHash": "sha256:fc514dd77d6f9916bbfab9dc3c609a99d602574182206b26a1c4236bf69acacb",
+      "actualContentHash": "sha256:2b96ef528de74b8367d4ee3762a552c4308b38b0c676065f27480282c8e11ac0",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -6942,10 +6942,10 @@
     },
     {
       "sourceRef": "docs/parent-atlas-workstation-todo.md",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "840ea249ca5970a0ecb99de95ce40d61b16bf8204af96fe01e09e9b5d4411dc4",
-      "actualContentHash": "sha256:840ea249ca5970a0ecb99de95ce40d61b16bf8204af96fe01e09e9b5d4411dc4",
+      "actualContentHash": "sha256:e77218650c7cf7d1b0a4fde7f1b61e1ac74eb58984c13e484a2be95d8090c58b",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -17153,7 +17153,7 @@
       "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "dcfabc8a968f03434779dea3e2259d76bf5a45ec747764c58b8404a19b5f0559",
-      "actualContentHash": "sha256:780161406360c527632192a68e9a7e7386063ff35809a2b1edcee21b05a6f7d2",
+      "actualContentHash": "sha256:61b5c5fda9ecba926e1736ebe9a46e55eeb9c1eadb3ca12516a67610fdc9c9f8",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -17353,7 +17353,7 @@
       "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "8ab08c76816cfddd193627c60d951e60e5f09878bfdfe05211833ad4b8601e30",
-      "actualContentHash": "sha256:abc5bc12e8771f7fddbfaaa128c4ad91cce77b41bd1ba3a6e797db15750a28c5",
+      "actualContentHash": "sha256:ff8ecc965f2527959ed94b25af7fa5a32b8991cffc74926bfa4e1a13824542fd",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -18006,10 +18006,10 @@
     },
     {
       "sourceRef": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "4a9f819f6ac879d44457096b3cd2a85cb510c829e2359be4d944d1ef73c77c44",
-      "actualContentHash": "sha256:4a9f819f6ac879d44457096b3cd2a85cb510c829e2359be4d944d1ef73c77c44",
+      "actualContentHash": "sha256:82e43f413d0c907c25ece6348270c2d457b3f2fa0cb4fbe6ffc7ff50d8e6c38d",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -18721,7 +18721,7 @@
       "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "f2b1130dba74ee54832e42725bc71946a34de45dc9375b856de7e83646571dc9",
-      "actualContentHash": "sha256:36360f06db8ead267a0150509c4a676ed8ce251966d2efb13d4bc736de3712f3",
+      "actualContentHash": "sha256:e69b18f4d10fc43f2c48d8ce7e0c72ce5ccf780a8a57e5190ca757236e0ca82f",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -19326,27 +19326,21 @@
     },
     {
       "sourceRef": "openspec/changes/phase-2f1-real-evaluation-corpus/.openspec.yaml",
-      "status": "CONTENT_MATCH",
+      "status": "SOURCE_UNAVAILABLE",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
-      "contentHash": "a930f0a8718817146fcdd2b6ad34c3b36b3336a6f5bc0f99ff7fc07ffd517bfd",
-      "actualContentHash": "sha256:a930f0a8718817146fcdd2b6ad34c3b36b3336a6f5bc0f99ff7fc07ffd517bfd",
-      "parseStatus": "UNPROCESSED"
+      "contentHash": "a930f0a8718817146fcdd2b6ad34c3b36b3336a6f5bc0f99ff7fc07ffd517bfd"
     },
     {
       "sourceRef": "openspec/changes/phase-2f1-real-evaluation-corpus/proposal.md",
-      "status": "CONTENT_MATCH",
+      "status": "SOURCE_UNAVAILABLE",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
-      "contentHash": "c60aa667e381f13abc2567a6efcabc0fc35345e2fce99a7eed3a3323a1d4d9e3",
-      "actualContentHash": "sha256:c60aa667e381f13abc2567a6efcabc0fc35345e2fce99a7eed3a3323a1d4d9e3",
-      "parseStatus": "UNPROCESSED"
+      "contentHash": "c60aa667e381f13abc2567a6efcabc0fc35345e2fce99a7eed3a3323a1d4d9e3"
     },
     {
       "sourceRef": "openspec/changes/phase-2f1-real-evaluation-corpus/specs/phase-2f1-real-evaluation-corpus/spec.md",
-      "status": "CONTENT_MATCH",
+      "status": "SOURCE_UNAVAILABLE",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
-      "contentHash": "59410f40bd33097b2a0db18efaf07f81c8e01d728b05082fcef960455020f4c0",
-      "actualContentHash": "sha256:59410f40bd33097b2a0db18efaf07f81c8e01d728b05082fcef960455020f4c0",
-      "parseStatus": "UNPROCESSED"
+      "contentHash": "59410f40bd33097b2a0db18efaf07f81c8e01d728b05082fcef960455020f4c0"
     },
     {
       "sourceRef": "openspec/changes/route-import-infra-isolation/proposal.md",
@@ -19857,7 +19851,7 @@
       "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "f8a57b6e4a7d8595b2308bd800fb6579fe00420a780e2db3a369dc865b7079dd",
-      "actualContentHash": "sha256:88d5017073df18e625d5a85887df280212bfd0886d50167dca673d49f1be08c2",
+      "actualContentHash": "sha256:63a978a6a2144467fdb3484c1a99a653f940f518b012942141417d7ea41c96e9",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -29958,10 +29952,10 @@
     },
     {
       "sourceRef": "reports/parent-atlas-open-lanes-todo.md",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "bd13fdd867043a8adc218ab3d5c62d3c6a2a795f1026668baba22269fa1cd973",
-      "actualContentHash": "sha256:bd13fdd867043a8adc218ab3d5c62d3c6a2a795f1026668baba22269fa1cd973",
+      "actualContentHash": "sha256:b3385cf9c88001ad712e2ace68d0097293ad5c327aa19c10b273cf72c6958901",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -31593,7 +31587,7 @@
       "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "0112ae5041d5b034c73b30a549c6acfd419eabef64e48b3d90aa9e3aa90a8ff4",
-      "actualContentHash": "sha256:5390c2e027242481c6f0f0fab325b933406572596b1f4907f3bdb02d7b1394ac",
+      "actualContentHash": "sha256:276b85e9d2b02e5cc8e21ea4133fc2669fbab86234b174c8326012c20a71b332",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -31646,10 +31640,10 @@
     },
     {
       "sourceRef": "scripts/atlas/audit-current-source-evidence-hydration-v1.mjs",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "4c23c8eaa26c50947f99c4d1b98b6fc3a95b4362f61ab495f5e821466e6926c3",
-      "actualContentHash": "sha256:4c23c8eaa26c50947f99c4d1b98b6fc3a95b4362f61ab495f5e821466e6926c3",
+      "actualContentHash": "sha256:1d14c9cc4de4a67c3ad9d5cde863883efaf987885acb40e1eacd9791b5ded132",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -32158,18 +32152,18 @@
     },
     {
       "sourceRef": "scripts/atlas/audit-graphify-lifecycle-entrypoint-v1.mts",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "c548976357db0f43fe129aad83c4c98e1837b7c1b89d1eb21e61612900c46d23",
-      "actualContentHash": "sha256:c548976357db0f43fe129aad83c4c98e1837b7c1b89d1eb21e61612900c46d23",
+      "actualContentHash": "sha256:63b2e80d56d606244f9971086a841569754198def2825e154e2b82898faedabc",
       "parseStatus": "UNPROCESSED"
     },
     {
       "sourceRef": "scripts/atlas/audit-graphify-lifecycle-owner-v1.mjs",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "f4d9cca7f0da97ddee9f174eb2c55c7d25c9a6479b5b0247f724bc1baab0b8c8",
-      "actualContentHash": "sha256:f4d9cca7f0da97ddee9f174eb2c55c7d25c9a6479b5b0247f724bc1baab0b8c8",
+      "actualContentHash": "sha256:6f631d1aa8be475651c4d5bcb76e11decf4d69e32dbf5b77a74e8d83f806e5d7",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -32934,10 +32928,10 @@
     },
     {
       "sourceRef": "scripts/atlas/audit-qdrant-projection-id-owner-v2.mjs",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "360f86090503e5b4060316ddc8044c67c32f7dd2b8dbad731efd684a0271c955",
-      "actualContentHash": "sha256:360f86090503e5b4060316ddc8044c67c32f7dd2b8dbad731efd684a0271c955",
+      "actualContentHash": "sha256:804b0aa67d1fff6ed05f563c5e685e78c1c2c2cd386956a47b4b28e961d38aa8",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -36366,10 +36360,10 @@
     },
     {
       "sourceRef": "scripts/atlas/export-xgboost-features.mjs",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "19a999a8b04e835bf07dfd9b66dfb9becb98dee05fd7e921a9ea9b3eae81e726",
-      "actualContentHash": "sha256:19a999a8b04e835bf07dfd9b66dfb9becb98dee05fd7e921a9ea9b3eae81e726",
+      "actualContentHash": "sha256:09b72e153109db552e15c16a241126c0592e3b3eafe1b2b5af0e1c6b2881d883",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -39870,10 +39864,10 @@
     },
     {
       "sourceRef": "scripts/atlas-parent-indexing.mjs",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "97a852c75989b5209096bc8d79e9bcd5b8df228cc505845de8e1ff2cf66a4516",
-      "actualContentHash": "sha256:97a852c75989b5209096bc8d79e9bcd5b8df228cc505845de8e1ff2cf66a4516",
+      "actualContentHash": "sha256:505638c7ae206443f45647980b2c905b100bfd4a89460525f63ea7df52ba09c6",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -41222,10 +41216,10 @@
     },
     {
       "sourceRef": "scripts/atlas/plan-current-source-graphify-batch-v1.mjs",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "69a420d2cc9c3a01ea55e312c60236dd47a23062e124862acdbd83b0a2ffa9ec",
-      "actualContentHash": "sha256:69a420d2cc9c3a01ea55e312c60236dd47a23062e124862acdbd83b0a2ffa9ec",
+      "actualContentHash": "sha256:df3c38aa6f62a0509cec57a1b6e2f3d3fe67a5f2f460191cd9c3c19a0d7b3033",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -41326,10 +41320,10 @@
     },
     {
       "sourceRef": "scripts/atlas/plan-fresh-origin-bounded-cohort-v1.mjs",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "e3ed6819822aa646178f27a4ff3d3bbb85d765d382c7a8accf47a1fead962520",
-      "actualContentHash": "sha256:e3ed6819822aa646178f27a4ff3d3bbb85d765d382c7a8accf47a1fead962520",
+      "actualContentHash": "sha256:32d53b1813825d1a2d5d4e0e48e9e40b938fdfa41b24b503a81fef560ab7b9df",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -41374,10 +41368,10 @@
     },
     {
       "sourceRef": "scripts/atlas/plan-lineage-qualified-latent-canary-v1.mjs",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "f03e75be2691ca8bceb60c05295ca658b30eaf1645d3c65eb3323cbe0620778e",
-      "actualContentHash": "sha256:f03e75be2691ca8bceb60c05295ca658b30eaf1645d3c65eb3323cbe0620778e",
+      "actualContentHash": "sha256:5310d1ded1ef6d7ebd0771a6dac9a103dc5adfeee79712a4884ecf066b3f2068",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -43798,10 +43792,10 @@
     },
     {
       "sourceRef": "scripts/atlas/qdrant-postgres-identity-audit.mjs",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "5595cedbc45e1ca4eb4fb8cfd71711f9339a3def162c65f5544b325589a72b49",
-      "actualContentHash": "sha256:5595cedbc45e1ca4eb4fb8cfd71711f9339a3def162c65f5544b325589a72b49",
+      "actualContentHash": "sha256:6a5bf16fdae65049d946ad978bafcd3f59a609cb1b40548c06380d233b085991",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -47342,19 +47336,15 @@
     },
     {
       "sourceRef": "scripts/atlas/week1-backfill-packet-registry.mjs",
-      "status": "CONTENT_MATCH",
+      "status": "SOURCE_UNAVAILABLE",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
-      "contentHash": "a43141694cbf21ed8241054d6136b275512a6aa236396ee914c342686d12b413",
-      "actualContentHash": "sha256:a43141694cbf21ed8241054d6136b275512a6aa236396ee914c342686d12b413",
-      "parseStatus": "UNPROCESSED"
+      "contentHash": "a43141694cbf21ed8241054d6136b275512a6aa236396ee914c342686d12b413"
     },
     {
       "sourceRef": "scripts/atlas/week1-packet-registry-backfill.mjs",
-      "status": "CONTENT_MATCH",
+      "status": "SOURCE_UNAVAILABLE",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
-      "contentHash": "7e8a3e3d2b4fdf62b016f912af03b209fedc61fd0f43e3b7959abab1d206e28e",
-      "actualContentHash": "sha256:7e8a3e3d2b4fdf62b016f912af03b209fedc61fd0f43e3b7959abab1d206e28e",
-      "parseStatus": "UNPROCESSED"
+      "contentHash": "7e8a3e3d2b4fdf62b016f912af03b209fedc61fd0f43e3b7959abab1d206e28e"
     },
     {
       "sourceRef": "scripts/atlas/wire-atlas-qdrant.mjs",
@@ -57665,7 +57655,7 @@
       "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "fa3ce1eb0b69c607f074f044a55051a33f62ec13b3401ef7c9bd5b2e13750076",
-      "actualContentHash": "sha256:4a1a1717816118c3a6b6ccd88345b5504bf30f12b0efd4eda34b9920bc9b5100",
+      "actualContentHash": "sha256:42e39093e5f996c1c4364b596d58066dd2668a2ed7d48c5f99a0a22c265de251",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -95734,10 +95724,10 @@
     },
     {
       "sourceRef": "sveltekit-frontend/docs/reports/backfill-feature-metadata.json",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "e08a995932546ebea05ed8f72bbc069399b51ed667f1d6cf4c9c6246578a1591",
-      "actualContentHash": "sha256:e08a995932546ebea05ed8f72bbc069399b51ed667f1d6cf4c9c6246578a1591",
+      "actualContentHash": "sha256:357f39bec6f42e5a889dc256ba3e530b2585fbfaddb25bab4ed7bddc2f8cc9d7",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -110406,10 +110396,10 @@
     },
     {
       "sourceRef": "sveltekit-frontend/openspec/changes/add-gemma4-retrieval-loop-hook-harness/tasks.md",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "168234c98e2d6d91b35ba3436e391e5578e7c56b569db4ac322e7cd2ab47e506",
-      "actualContentHash": "sha256:168234c98e2d6d91b35ba3436e391e5578e7c56b569db4ac322e7cd2ab47e506",
+      "actualContentHash": "sha256:bebb40c68518590968bdfcbb4af44e9946ac5aaf23fd038331d5fe642a81fd4f",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -110716,10 +110706,10 @@
     },
     {
       "sourceRef": "sveltekit-frontend/openspec/changes/phase1-rrf-semantic-fusion/tasks.md",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "a273b42a223795295a691d03975d0f13cab794a44cf5f2e77015b0f56b7bc814",
-      "actualContentHash": "sha256:a273b42a223795295a691d03975d0f13cab794a44cf5f2e77015b0f56b7bc814",
+      "actualContentHash": "sha256:a319461a2c73b662fbdf9f453927b05a944bcf26ded10e815e3d95acf166fa9b",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -110935,7 +110925,7 @@
       "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "9a40ad31c1e20b832c77dc83b370f7a84193e5469c0e2ad5f825dfdfc67ff0f7",
-      "actualContentHash": "sha256:b0d51d837c5239ea4e033af0979ee893976b0d16412287691c3e130426117038",
+      "actualContentHash": "sha256:17d7ad645462ec18d4b24484406408316e66ee5e918562f1228446f6a6bc38de",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -112740,10 +112730,10 @@
     },
     {
       "sourceRef": "sveltekit-frontend/scripts/atlas/backfill-feature-metadata.mjs",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "30fb8a08c5a5dc8329192a6d04ab125d105089cc315d6638ac4852391843a99f",
-      "actualContentHash": "sha256:30fb8a08c5a5dc8329192a6d04ab125d105089cc315d6638ac4852391843a99f",
+      "actualContentHash": "sha256:6171faac4fa7d390658d0acc469e7e62fdb68a0bd9c8eb81e5d83ea7c846db4b",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -114108,10 +114098,10 @@
     },
     {
       "sourceRef": "sveltekit-frontend/scripts/atlas/graphify-daily-coordinator-canary-v1.mts",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "a72645b1ae2fa56da2427b009c7a2f4d0dcba566754d095902ad9f100e31a126",
-      "actualContentHash": "sha256:a72645b1ae2fa56da2427b009c7a2f4d0dcba566754d095902ad9f100e31a126",
+      "actualContentHash": "sha256:c0e77b5fabfa458d96c22f230ad8fdc5b5a88d0f3e1e6acc4bd2bc7d43230014",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -127837,7 +127827,7 @@
       "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "93addfc7a2c37ae11590f9c256335986f1b7aa5bb3f23e04aefa404cccb72ce3",
-      "actualContentHash": "sha256:b0703e2bd4140c7e77230d756ac7cb8841a77ceccf1ea019e22952841f27912d",
+      "actualContentHash": "sha256:93568ad60f1391c732f6fc269e6389fa36ea0f5a70c825ee1b5f55bb5cf892d4",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -159720,10 +159710,10 @@
     },
     {
       "sourceRef": "sveltekit-frontend/src/lib/server/search/qdrant-search.ts",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "3792293df3f83bc907d3f12cafcac171db9da6ec1a82d7230c2b733110707108",
-      "actualContentHash": "sha256:3792293df3f83bc907d3f12cafcac171db9da6ec1a82d7230c2b733110707108",
+      "actualContentHash": "sha256:25cb36dbf77f3a18fddcab25e1292604ae5c62bbf1ebb3225da3fc9aaf7a496b",
       "parseStatus": "UNPROCESSED"
     },
     {
@@ -168248,10 +168238,10 @@
     },
     {
       "sourceRef": "sveltekit-frontend/src/routes/api/graph/traverse/+server.ts",
-      "status": "CONTENT_MATCH",
+      "status": "CONTENT_MISMATCH",
       "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
       "contentHash": "8acf65de13b6af0839dec0e5f0694bbd10d4a5ee83af5e98fdb305c59c661554",
-      "actualContentHash": "sha256:8acf65de13b6af0839dec0e5f0694bbd10d4a5ee83af5e98fdb305c59c661554",
+      "actualContentHash": "sha256:97c0289bf0bc214f427c682853fa7878cf0e5787d5f449d5366e54d5068cde08",
       "parseStatus": "UNPROCESSED"
     },
     {

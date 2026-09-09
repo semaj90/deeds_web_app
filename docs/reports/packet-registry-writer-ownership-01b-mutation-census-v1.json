@@ -1,0 +1,409 @@
+{
+  "schema": "atlas.packet-registry-writer-ownership.01b-mutation-census.v1",
+  "generatedAt": "2026-09-09T03:23:06.207Z",
+  "mode": "READ_ONLY",
+  "writesPerformed": false,
+  "scopeNote": "AST-verified (ts-morph) mutation-site census for the 13 production sveltekit-frontend/src candidate files this session identified via Drizzle-call grep. Standalone scripts/ one-shot writers are NOT re-audited at this granularity -- they remain classified by the earlier packet-registry-writer-ownership-v1.json receipt (file-reachability heuristic), which is defensible for CLI-only scripts with no route/dispatcher caller path.",
+  "candidateFilesScanned": [
+    "sveltekit-frontend/src/lib/server/topology/canonical-id-hierarchy.ts",
+    "sveltekit-frontend/src/lib/server/acp/packet-materializer-pipeline.ts",
+    "sveltekit-frontend/src/lib/server/unknown/promotion-executor.ts",
+    "sveltekit-frontend/src/lib/server/workers/identity-worker.ts",
+    "sveltekit-frontend/src/lib/server/embedding/semantic-packet-writer.ts",
+    "sveltekit-frontend/src/lib/server/generation/packet-summary-pipeline.ts",
+    "sveltekit-frontend/src/lib/server/dispatch/mcp-tool-implementations.ts",
+    "sveltekit-frontend/src/lib/server/hyperrag/hyperrag-packet-pipeline.ts",
+    "sveltekit-frontend/src/lib/server/indexer/feature-label-enricher.ts",
+    "sveltekit-frontend/src/lib/server/indexer/summary-freshness-checker.ts",
+    "sveltekit-frontend/src/lib/gpu/som-clustering.ts",
+    "sveltekit-frontend/src/lib/server/retrieval/promote-results.ts",
+    "sveltekit-frontend/src/lib/server/retrieval/promote-results-outbox.ts"
+  ],
+  "mutationSitesFound": 11,
+  "classificationCounts_asScriptReported": {
+    "TEST_ONLY_UNOWNED": 1,
+    "CANONICAL_WRITER": 2,
+    "REPRESENTATION_OR_METADATA_WRITER": 1,
+    "PRODUCTION_CAPABLE_UNOWNED": 7
+  },
+  "HAND_VERIFICATION_CORRECTION_2026-09-08": {
+    "why": "Two of the script's own automated classifications were checked by hand after generation and found wrong -- both caused by same-name-different-function collisions the script's rgFn(enclosingFunctionName, ...) search cannot disambiguate without an import-statement or method-call-on-known-instance check.",
+    "false_positive": {
+      "site": "hyperrag-packet-pipeline.ts:255 materializePackets, classified CANONICAL_WRITER",
+      "reality": "materializePackets is a common name reused, unrelated, in ace-materializer.ts (its own local batch wrapper) and packet-parser.ts (Rust N-API MessagePack chunker -- not a DB write at all). Neither imports hyperrag-packet-pipeline.ts. Confirmed by direct grep for import statements of 'hyperrag-packet-pipeline' repo-wide: only a metadata/catalog entry in runtime-registry.ts and this script's own candidate list reference the filename -- zero functional importers. This exact false-positive pattern was independently found and documented in an EARLIER session's script, scripts/atlas/prove-bitfrost-invalidation-owner-v1.mjs (lines 202, 234) -- a second, independent confirmation. Corrected classification: PRODUCTION_CAPABLE_UNOWNED."
+    },
+    "false_negative": {
+      "sites": "mcp-tool-implementations.ts lines 165, 265, 362, 459 (identity_lane/identity_confidence/qdrant_point_id/updated_at writes)",
+      "reality": "The script's caller search used each site's raw enclosing function name (toolIdentityRecoverImpl, toolEnvelopeValidateImpl, toolMirrorSyncQdrantImpl, toolMirrorSyncNeo4jImpl) to search for callers -- but these are internal implementation functions, never called directly. Each is wrapped via withMcpToolTelemetry(...) and exported under a DIFFERENT name (toolIdentityRecover, toolEnvelopeValidate, toolMirrorSyncQdrant, toolMirrorSyncNeo4j), and it is the WRAPPED name that src/mcp/server.ts actually imports and calls (verified: src/mcp/server.ts:18 imports all 5 wrapped names; real call sites at lines 2370, 2390, 2418, 2443 for the first four). These 4 sites are therefore genuinely LIVE, not PRODUCTION_CAPABLE_UNOWNED as the script reported. Corrected classification: REPRESENTATION_OR_METADATA_WRITER (live, disjoint columns from the identity writer)."
+    },
+    "confirmed_still_dormant": "mcp-tool-implementations.ts line 739 (toolIdentityQuarantineImpl, wrapped as toolIdentityQuarantine): imported at src/mcp/server.ts:18 but never actually called anywhere in that file (checked: zero 'toolIdentityQuarantine(' call sites). Genuinely dormant, unlike its 4 siblings -- an imported-but-unused tool registration, not wired to any MCP tool dispatch. Script's PRODUCTION_CAPABLE_UNOWNED classification for this one site was correct.",
+    "classificationCounts_corrected": {
+      "TEST_ONLY_UNOWNED": 1,
+      "CANONICAL_WRITER": 1,
+      "REPRESENTATION_OR_METADATA_WRITER": 5,
+      "PRODUCTION_CAPABLE_UNOWNED": 4
+    },
+    "correctedConclusion": "Exactly ONE verified live canonical identity-creating writer of atlas_packets exists: semantic-packet-writer.ts::persistCanonicalSemanticPacketEmbedding (caller: api/admin/batch-embeddings/embed/+server.ts). Five live, narrow, non-identity metadata/representation writers coexist with disjoint column scopes and no overlap with the identity writer's columns: packet-summary-pipeline.ts::runPacketSummaryPipeline (summary), and 4 MCP-tool-wired functions in mcp-tool-implementations.ts (identity_lane/identity_confidence/qdrant_point_id/updated_at only -- never source_ref/feature_id/packet_key creation). Four writers remain confirmed dormant: canonical-id-hierarchy.ts, packet-materializer-pipeline.ts, promotion-executor.ts, identity-worker.ts, feature-label-enricher.ts, summary-freshness-checker.ts, hyperrag-packet-pipeline.ts::materializePackets (7, not 4 -- see full dormant list in the underlying receipt), plus mcp-tool-implementations.ts's unused toolIdentityQuarantine. PACKET_REGISTRY_WRITER_OWNERSHIP_01B gate PASSES: canonicalIdentityRuntimeWriters=1, no competing identity derivation among the live writer set."
+  },
+  "canonicalWriterSites": [
+    {
+      "file": "sveltekit-frontend/src/lib/server/embedding/semantic-packet-writer.ts",
+      "line": 101,
+      "fn": "persistCanonicalSemanticPacketEmbedding",
+      "table": "atlas_packets",
+      "columns": [
+        "packetUlid",
+        "sourceKind",
+        "sourcePath",
+        "embedding",
+        "payload"
+      ],
+      "callers": [
+        "sveltekit-frontend/src/routes/api/admin/batch-embeddings/embed/+server.ts:115"
+      ]
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/hyperrag/hyperrag-packet-pipeline.ts",
+      "line": 255,
+      "fn": "materializePackets",
+      "table": "atlas_packets",
+      "columns": [],
+      "callers": [
+        "sveltekit-frontend/src/lib/server/ace/ace-materializer.ts:309",
+        "sveltekit-frontend/src/lib/server/atlas/packet-parser.ts:117",
+        "scripts/atlas/prove-bitfrost-invalidation-owner-v1.mjs:202",
+        "scripts/atlas/prove-bitfrost-invalidation-owner-v1.mjs:234"
+      ]
+    }
+  ],
+  "canonicalMetadataMutatorSites": [],
+  "productionCapableUnownedSites": [
+    {
+      "file": "sveltekit-frontend/src/lib/server/dispatch/mcp-tool-implementations.ts",
+      "line": 165,
+      "fn": "toolIdentityRecoverImpl",
+      "table": "atlas_packets",
+      "columns": [
+        "identity_lane",
+        "identity_confidence",
+        "updated_at"
+      ]
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/dispatch/mcp-tool-implementations.ts",
+      "line": 265,
+      "fn": "toolEnvelopeValidateImpl",
+      "table": "atlas_packets",
+      "columns": [
+        "identity_confidence",
+        "updated_at"
+      ]
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/dispatch/mcp-tool-implementations.ts",
+      "line": 362,
+      "fn": "toolMirrorSyncQdrantImpl",
+      "table": "atlas_packets",
+      "columns": [
+        "qdrant_point_id",
+        "updated_at"
+      ]
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/dispatch/mcp-tool-implementations.ts",
+      "line": 459,
+      "fn": "toolMirrorSyncNeo4jImpl",
+      "table": "atlas_packets",
+      "columns": [
+        "updated_at"
+      ]
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/dispatch/mcp-tool-implementations.ts",
+      "line": 739,
+      "fn": "toolIdentityQuarantineImpl",
+      "table": "atlas_packets",
+      "columns": [
+        "identity_lane",
+        "identity_confidence",
+        "updated_at"
+      ]
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/indexer/feature-label-enricher.ts",
+      "line": 212,
+      "fn": "enrichPacketWithLabels",
+      "table": "atlas_packets",
+      "columns": [
+        "metadata"
+      ]
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/indexer/summary-freshness-checker.ts",
+      "line": 144,
+      "fn": "recordSummaryGeneration",
+      "table": "atlas_packets",
+      "columns": [
+        "metadata",
+        "content_hash",
+        "summary_hash",
+        "last_summary_at"
+      ]
+    }
+  ],
+  "testOnlySites": [
+    {
+      "file": "sveltekit-frontend/src/lib/server/workers/identity-worker.ts",
+      "line": 240,
+      "fn": "processPacketIdentity"
+    }
+  ],
+  "allSites": [
+    {
+      "file": "sveltekit-frontend/src/lib/server/workers/identity-worker.ts",
+      "line": 240,
+      "enclosingFunction": "processPacketIdentity",
+      "operation": "UPDATE",
+      "targetTable": "atlas_packets",
+      "columnsWritten": [
+        "featureId",
+        "identityLane",
+        "identityConfidence",
+        "updatedAt"
+      ],
+      "hasOnConflictDoUpdate": false,
+      "wherePredicate": "eq(atlasPackets.packetKey, packetKey",
+      "writesIdentity": true,
+      "productionCallerCount": 0,
+      "productionCallers": [],
+      "testOnlyCallerCount": 4,
+      "reachableFromKnownRuntimeRootPattern": false,
+      "classification": "TEST_ONLY_UNOWNED"
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/embedding/semantic-packet-writer.ts",
+      "line": 101,
+      "enclosingFunction": "persistCanonicalSemanticPacketEmbedding",
+      "operation": "INSERT",
+      "targetTable": "atlas_packets",
+      "columnsWritten": [
+        "packetUlid",
+        "sourceKind",
+        "sourcePath",
+        "embedding",
+        "payload"
+      ],
+      "hasOnConflictDoUpdate": true,
+      "wherePredicate": null,
+      "writesIdentity": true,
+      "productionCallerCount": 1,
+      "productionCallers": [
+        "sveltekit-frontend/src/routes/api/admin/batch-embeddings/embed/+server.ts:115"
+      ],
+      "testOnlyCallerCount": 4,
+      "reachableFromKnownRuntimeRootPattern": true,
+      "classification": "CANONICAL_WRITER"
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/generation/packet-summary-pipeline.ts",
+      "line": 214,
+      "enclosingFunction": "runPacketSummaryPipeline",
+      "operation": "UPDATE",
+      "targetTable": "atlas_packets",
+      "columnsWritten": [
+        "summary",
+        "updatedAt"
+      ],
+      "hasOnConflictDoUpdate": false,
+      "wherePredicate": "eq(atlasPackets.packetKey, input.packet_key",
+      "writesIdentity": false,
+      "productionCallerCount": 5,
+      "productionCallers": [
+        "sveltekit-frontend/src/routes/api/atlas/summary/+server.ts:54",
+        "scripts/phase85/p4-summary-extraction-qa.mjs:6",
+        "scripts/phase85/p4-summary-extraction-qa.mjs:217",
+        "scripts/phase85/p4-summary-extraction-qa.mjs:247",
+        "scripts/phase85/p4-summary-extraction-qa.mjs:348"
+      ],
+      "testOnlyCallerCount": 0,
+      "reachableFromKnownRuntimeRootPattern": true,
+      "classification": "REPRESENTATION_OR_METADATA_WRITER"
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/dispatch/mcp-tool-implementations.ts",
+      "line": 165,
+      "enclosingFunction": "toolIdentityRecoverImpl",
+      "operation": "UPDATE",
+      "targetTable": "atlas_packets",
+      "columnsWritten": [
+        "identity_lane",
+        "identity_confidence",
+        "updated_at"
+      ],
+      "hasOnConflictDoUpdate": false,
+      "wherePredicate": "eq(atlasPackets.packetKey, canonical_packet_key",
+      "writesIdentity": false,
+      "productionCallerCount": 0,
+      "productionCallers": [],
+      "testOnlyCallerCount": 0,
+      "reachableFromKnownRuntimeRootPattern": false,
+      "classification": "PRODUCTION_CAPABLE_UNOWNED"
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/dispatch/mcp-tool-implementations.ts",
+      "line": 265,
+      "enclosingFunction": "toolEnvelopeValidateImpl",
+      "operation": "UPDATE",
+      "targetTable": "atlas_packets",
+      "columnsWritten": [
+        "identity_confidence",
+        "updated_at"
+      ],
+      "hasOnConflictDoUpdate": false,
+      "wherePredicate": "eq(atlas_packets.packet_key, input.packet_key",
+      "writesIdentity": false,
+      "productionCallerCount": 0,
+      "productionCallers": [],
+      "testOnlyCallerCount": 0,
+      "reachableFromKnownRuntimeRootPattern": false,
+      "classification": "PRODUCTION_CAPABLE_UNOWNED"
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/dispatch/mcp-tool-implementations.ts",
+      "line": 362,
+      "enclosingFunction": "toolMirrorSyncQdrantImpl",
+      "operation": "UPDATE",
+      "targetTable": "atlas_packets",
+      "columnsWritten": [
+        "qdrant_point_id",
+        "updated_at"
+      ],
+      "hasOnConflictDoUpdate": false,
+      "wherePredicate": "eq(atlas_packets.packet_key, input.packetKey",
+      "writesIdentity": false,
+      "productionCallerCount": 0,
+      "productionCallers": [],
+      "testOnlyCallerCount": 0,
+      "reachableFromKnownRuntimeRootPattern": false,
+      "classification": "PRODUCTION_CAPABLE_UNOWNED"
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/dispatch/mcp-tool-implementations.ts",
+      "line": 459,
+      "enclosingFunction": "toolMirrorSyncNeo4jImpl",
+      "operation": "UPDATE",
+      "targetTable": "atlas_packets",
+      "columnsWritten": [
+        "updated_at"
+      ],
+      "hasOnConflictDoUpdate": false,
+      "wherePredicate": "eq(atlas_packets.packet_key, input.packetKey",
+      "writesIdentity": false,
+      "productionCallerCount": 0,
+      "productionCallers": [],
+      "testOnlyCallerCount": 0,
+      "reachableFromKnownRuntimeRootPattern": false,
+      "classification": "PRODUCTION_CAPABLE_UNOWNED"
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/dispatch/mcp-tool-implementations.ts",
+      "line": 739,
+      "enclosingFunction": "toolIdentityQuarantineImpl",
+      "operation": "UPDATE",
+      "targetTable": "atlas_packets",
+      "columnsWritten": [
+        "identity_lane",
+        "identity_confidence",
+        "updated_at"
+      ],
+      "hasOnConflictDoUpdate": false,
+      "wherePredicate": "eq(atlas_packets.packet_key, input.packetKey",
+      "writesIdentity": false,
+      "productionCallerCount": 0,
+      "productionCallers": [],
+      "testOnlyCallerCount": 0,
+      "reachableFromKnownRuntimeRootPattern": false,
+      "classification": "PRODUCTION_CAPABLE_UNOWNED"
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/hyperrag/hyperrag-packet-pipeline.ts",
+      "line": 255,
+      "enclosingFunction": "materializePackets",
+      "operation": "INSERT",
+      "targetTable": "atlas_packets",
+      "columnsWritten": [],
+      "hasOnConflictDoUpdate": true,
+      "wherePredicate": null,
+      "writesIdentity": true,
+      "productionCallerCount": 4,
+      "productionCallers": [
+        "sveltekit-frontend/src/lib/server/ace/ace-materializer.ts:309",
+        "sveltekit-frontend/src/lib/server/atlas/packet-parser.ts:117",
+        "scripts/atlas/prove-bitfrost-invalidation-owner-v1.mjs:202",
+        "scripts/atlas/prove-bitfrost-invalidation-owner-v1.mjs:234"
+      ],
+      "testOnlyCallerCount": 0,
+      "reachableFromKnownRuntimeRootPattern": false,
+      "classification": "CANONICAL_WRITER"
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/indexer/feature-label-enricher.ts",
+      "line": 212,
+      "enclosingFunction": "enrichPacketWithLabels",
+      "operation": "UPDATE",
+      "targetTable": "atlas_packets",
+      "columnsWritten": [
+        "metadata"
+      ],
+      "hasOnConflictDoUpdate": false,
+      "wherePredicate": "sql`${atlasPackets.packetKey} = ${packetKey}`",
+      "writesIdentity": false,
+      "productionCallerCount": 0,
+      "productionCallers": [],
+      "testOnlyCallerCount": 0,
+      "reachableFromKnownRuntimeRootPattern": false,
+      "classification": "PRODUCTION_CAPABLE_UNOWNED"
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/indexer/summary-freshness-checker.ts",
+      "line": 144,
+      "enclosingFunction": "recordSummaryGeneration",
+      "operation": "UPDATE",
+      "targetTable": "atlas_packets",
+      "columnsWritten": [
+        "metadata",
+        "content_hash",
+        "summary_hash",
+        "last_summary_at"
+      ],
+      "hasOnConflictDoUpdate": false,
+      "wherePredicate": "eq(atlasPackets.packetKey, packetKey",
+      "writesIdentity": false,
+      "productionCallerCount": 0,
+      "productionCallers": [],
+      "testOnlyCallerCount": 0,
+      "reachableFromKnownRuntimeRootPattern": false,
+      "classification": "PRODUCTION_CAPABLE_UNOWNED"
+    }
+  ],
+  "gate": "PACKET_REGISTRY_WRITER_OWNERSHIP_01B",
+  "acceptance_asScriptReported": {
+    "canonicalIdentityRuntimeWriters": 2,
+    "exactlyOneCanonicalIdentityWriter": false,
+    "canonicalMetadataMutatorsClassified": 0,
+    "productionCapableUnownedCount": 7,
+    "unknownMutationSites": 0,
+    "NOTE": "These raw numbers are WRONG -- see HAND_VERIFICATION_CORRECTION_2026-09-08.acceptance_corrected below for the true gate result. Kept here unmodified (not silently edited) as the literal script output for audit-trail purposes."
+  },
+  "acceptance": {
+    "canonicalIdentityRuntimeWriters": 1,
+    "exactlyOneCanonicalIdentityWriter": true,
+    "canonicalMetadataMutatorsClassified": 5,
+    "productionCapableUnownedCount": 8,
+    "testOnlyCount": 2,
+    "unknownMutationSites": 0,
+    "correctedBy": "HAND_VERIFICATION_CORRECTION_2026-09-08 (materializePackets name-collision false positive removed from the canonical-writer count; 4 MCP-tool wrapper-indirection false negatives moved from unowned to live metadata mutators)"
+  },
+  "nextGate": "PACKET_WRITE_REVISION_CONTRACT_01",
+  "nextAction": "exactlyOneCanonicalIdentityWriter is true (semantic-packet-writer.ts::persistCanonicalSemanticPacketEmbedding). Proceed to revision-contract auditing scoped to that single writer plus its 5 live metadata mutators. Do not execute any writer."
+}

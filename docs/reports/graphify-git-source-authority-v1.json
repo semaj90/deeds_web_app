@@ -1,6 +1,6 @@
 {
   "schema": "atlas.graphify-git-source-authority.v1",
-  "generatedAt": "2026-09-08T20:01:51.529Z",
+  "generatedAt": "2026-09-09T01:17:54.514Z",
   "mode": "READ_ONLY_GIT_BLOB_AUTHORITY_AUDIT",
   "runId": "14643371-f6f2-4131-906b-235a5c06619a",
   "run": {
@@ -8,7 +8,7 @@
     "repository_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
     "workspace_revision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
     "source_manifest_digest": "55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-    "status": "RUNNING"
+    "status": "SUPERSEDED"
   },
   "databaseError": null,
   "writes": {
@@ -24,5 +24,5 @@
   "gitAuthorityProven": false,
   "repositoryContentHashMatchCount": 0,
   "rows": [],
-  "auditChecksum": "sha256:9a36dc064ba84385b0d6d8ac92fea7def2eedd36bd9223c5b581e1ad1ee254fd"
+  "auditChecksum": "sha256:01f4d4500bcae56692be1bb37a565367a364de80ff9093b99be9afb5ef81b253"
 }

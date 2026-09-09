@@ -3222,6 +3222,12 @@ open until the migration canary is authorized.
 
 Evidence: `docs/reports/task-semantic-packet-apply-canary-preflight-v1.json`.
 
+Canary fixture isolation audit 2026-09-08: the shared Qdrant filter contract currently excludes only
+`_atlas_system_record=true`; it does not universally exclude the two existing
+`canary://task-semantic` / `canary=true` fixtures. No fixture was deleted or changed in this audit.
+Before broader retrieval admission, add a reviewed read-path exclusion or archive classification that
+handles both the complete and partial historical canary payloads.
+
 ### TASK-SEMANTIC-PACKET-APPLY-CANARY-01 — preflight only 2026-09-08
 
 - [x] Added `scripts/atlas/preflight-task-semantic-packet-apply-canary-v1.mjs` and the root
@@ -3423,6 +3429,19 @@ persisted `latent_256`, `latent-derive.ts` for virtual `latent_128`, and the exi
 `latent_64` storage. The audit proves contract shape only; live current-cohort coverage,
 CandidateOrdinal parity, derived checksums, and query-time promotion remain unproven.
 
+Live latent identity audit 2026-09-08: `scripts/atlas/audit-latent-representation-identity.mjs`
+completed read-only with zero production mutations. The bounded sample selected 1,000 rows with
+`latent_64`; packet IDs and packet keys were unique, but 325 rows lacked `qdrant_point_id`. The
+Qdrant sample classified all 250 points as `MISSING_SOURCE_REVISION`; packet key, source ref, and
+`representation_id` were present, while source/workspace revisions were absent. Source-lineage
+joins were 0/1,000, symbol joins were 0/1,000, and representation-ledger joins were 0/1,000.
+The stored latent bytes are uniformly 256 bytes, consistent with 64 little-endian float32 values
+from the current writer source, but no producer revision/serialization field proves that contract
+in the live row. Status remains **NOT_PROVEN** for latent promotion; do not fan out or rebuild
+latent widths from this population.
+
+Evidence: `docs/reports/latent-representation-identity-audit-2026-09-08.json`.
+
 ### AST-GREP-OUTLINE-SYMBOL-POPULATION-01 — capability audit 2026-09-08
 
 - [x] Refreshed both workspace installations and verified the pinned `ast-grep` CLI as 0.45.3.
@@ -3609,6 +3628,27 @@ column. Local evidence records 440 current nominations, 353 exact tree-bound res
 candidates. This confirms the 1,252 semantic count is a sparse transition-column predicate,
 not a total AST/CST/symbol-fabric population. `writesPerformed=false` and `safeToApply=false`
 remain enforced; no projection artifact or cache was emitted.
+
+Read-only latent canary planning completed (2026-09-08):
+`node scripts/atlas/plan-lineage-qualified-latent-canary-v1.mjs` consumed the existing
+lineage-qualified candidate map and latent cohort audit without touching Postgres, Qdrant,
+Neo4j, Valkey, or model artifacts. The planner produced a 15-row candidate cohort with
+`workspaceRevision=sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc`,
+`candidateSnapshotRevision=lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15`, and
+`ordinalMapChecksum=86fee5d38619d3065d8710942068f26fb5b0d3c09992b1b523083ae0a593d297`.
+The cohort is source-revision-qualified and has no synthetic revision fallback, but the
+planner correctly remains `READY_FOR_EXPLICIT_PRODUCER_REVIEW` rather than promotion-ready:
+the required latent artifacts still lack proven producer/model/parameter/input/output checksums
+and atomic readback. `LATENT256_CURRENT_COHORT_CANDIDATE` is 15/15; `latent_128` is still absent
+as a physical column. Next gate remains
+`REPAIR_LATENT_PRODUCER_BEFORE_ANY_APPLY`.
+
+The planner contract was tightened in the same read-only pass: `plan-lineage-qualified-latent-
+canary-v1.mjs` now declares three independent required artifacts (`latent_256`, `latent_128`,
+and `latent_64`), each derived directly from `semantic_768` with its own dimension and the same
+binding/checksum/readback requirements. Candidate rows expose all three output representation
+IDs; no latent values are generated. This removes the previous mismatch where a `latent_256`
+cohort was paired with a single `ae_latent_64` output label.
 
 ### SEMANTIC-REPRESENTATION-OWNER-01 — read-only owner audit (2026-09-08)
 
@@ -3893,7 +3933,10 @@ stopped and no database status was changed.
   explicitly selected as the canonical registry owner.
 - [ ] Decide whether HyperRAG becomes the single canonical registry writer or remains
   archived/unresolved; do not run it or any registry backfill until that decision is made.
-- [ ] Review `materialize-addressable-packets.mjs` separately as a non-registry artifact
+- [x] Reviewed `materialize-addressable-packets.mjs` separately as a non-registry artifact;
+  the root copy is the discovered package entrypoint and publishes file/manifest artifacts
+  under `--apply`, while the SvelteKit-local copy is not a discovered package entrypoint.
+  See `docs/reports/addressable-packet-materializer-ownership-v1.json`; no writer was run.
   producer and reconcile its `--apply` file publication semantics before promotion.
 `REINDEX-MANIFEST-CROSS-SCHEMA-01` parity precursor 2026-09-08: generated the read-only
 `docs/reports/qdrant-postgres-parity-manifest-v1.json` from the corrected completed ledger and
@@ -3901,3 +3944,1493 @@ live PostgreSQL population counts. It records 109,776 audited Qdrant points, 109
 identity classifications, and 3 exceptional identities. The manifest explicitly sets
 `promotion.eligible=false` and `writesPerformed=false`; no backlink, repair, or projection write
 was performed. This closes manifest generation, not identity remediation or promotion.
+
+Source-authority drift follow-up 2026-09-08: `audit-graphify-workspace-owner-v1.mjs` confirms
+the workspace owner contract exists at `public.workspaces.id` with live counts
+`workspaces=1`, `graphify_runs=19`, and `graphify_files=26,014`. However,
+`audit-graphify-git-source-authority-v1.mjs` against the workspace-bound run
+`14643371-f6f2-4131-906b-235a5c06619a` returns `rowCount=0`, `repositoryTreeEntryCount=25,365`,
+and `gitAuthorityProven=false`. Thus the database ownership schema exists, but the selected run
+has no file rows to prove Git/source authority. Option 2 remains the correct frontier; do not
+start REL-01A or promote the projection fabric from this evidence.
+
+### AGENTIC-ERROR-FIXING-KANBAN-01 — consolidated recommendation board (2026-09-08)
+
+Refreshed the existing workstation board with
+`node scripts/atlas/build-parent-atlas-workstation-openspec-workboard-v2.mjs`. The board is
+recommendation-only and reads task authority from `openspec/changes/*/tasks.md`; it does not
+change task checkboxes or infer promotion from implementation presence. Current selected scope is
+48 tasks: `BLOCKED_UPSTREAM=2`, `UNVERIFIED=14`, `HUMAN_DECISION_REQUIRED=1`,
+`OWNED_BY_OTHER_CHANGE=12`, `GOVERNANCE_ONLY=4`, `NEGATIVE_CONSTRAINT=13`, and
+`SUPERSEDED=2`; `OPEN_ACTIONABLE=0`.
+
+Recommended Kanban order for collaborative error fixing:
+
+`BLOCKED` — resolve current Graphify/source-owner drift and the 52-row current-workspace mismatch;
+do not start REL-01A or projection fanout.
+
+`READY_FOR_REVIEW` — inspect the unverified candidate tasks for exact evidence and owner scope,
+especially CandidateFeatureMatrix, ordinal-map, exact-KNN, and SOM prerequisites.
+
+`HUMAN_GATE` — require explicit authorization before any lifecycle, database, Qdrant, Neo4j,
+Valkey, or model mutation.
+
+`IMPLEMENT` — only a task with a real owner, current input, bounded target, and safe dry-run path.
+
+`VERIFY` — run focused tests/readback and attach a report with exact counts/checksums.
+
+`DONE` — only when implementation is wired, replay/readback is proven, and the owning ledger
+accepts the evidence. Board reports are
+`docs/reports/parent-atlas-workstation-openspec-workboard-v2.json` and `.md`.
+
+### OPENSPEC-PORTFOLIO-RECONCILIATION-02 — deterministic read-only inventory (2026-09-08)
+
+Added `scripts/atlas/reconcile-openspec-portfolio-v2.mjs` to inventory both OpenSpec trees and
+emit relation candidates without archiving, renaming, merging, or changing task state. The live
+run found 94 active change directories (`ROOT=81`, `SVELTEKIT=13`; archived directories are
+excluded) and 6,137 checkbox tasks, of which 3,607 are checked. After filtering generic prose
+tokens and path/table fragments, it emitted 1,270 evidence-backed candidate relations and 98
+narrower owner collision candidates; all 1,270 relations have `mutationRecommended=false`. The result is a
+candidate graph, not a duplicate verdict: shared paths/tables/functions and explicit references
+must still be manually classified before any archival action. Reports:
+`docs/reports/openspec-portfolio-inventory-v2.json` and
+`docs/reports/openspec-portfolio-relations-v2.json`. Script syntax and the existing OpenSpec
+owner validate cleanly. Collision triage now separates 57 `P1_CANONICAL_TABLE_REVIEW`
+candidates and 41 `P2_SHARED_DERIVED_SURFACE` candidates. Archived directories are excluded
+from the active portfolio; no cross-tree P0 collision remains in this run.
+
+### ATLAS-CANONICAL-PROJECTION-FABRIC-01 — tracked next step, gated (2026-09-08)
+
+Record-only proposal: after the workspace-revision drift blocker is resolved, build a bounded
+read-only admission receipt for the canonical projection fabric. The intended evidence chain is
+`source revision -> CST/AST and AST-grep observations -> symbol versions -> packet/chunk/concept
+candidates -> sealed ordinal map -> semantic_768 and latent_256/128/64 manifests -> graph and
+cache projection plans -> ACE evidence-card plan`. The receipt must measure identity, revision,
+representation, symbol, graph, ontology, ordinal-map, checksum, and projection predicates and
+must report `NOT_PROVEN` or `BLOCKED` when any prerequisite is absent.
+
+This remains explicitly gated behind resolving `NO_CURRENT_COMPLETED_BOUND_SOURCE_OWNER` and
+the current workspace-revision drift. Do not create `.okf`/Arrow/MsgPack artifacts, generate
+latent values, fan out to Qdrant/Neo4j/Valkey, or promote ACE evidence from this proposal alone.
+This entry follows the repository's record-but-don't-fix convention; it is a tracked next step,
+not an implementation claim.
+
+Prerequisite replay 2026-09-08: `node scripts/atlas/audit-current-graphify-run-owner-v1.mjs`
+remains `GRAPHIFY_RUN_OWNER_BLOCKED`. The audit found one run for expected workspace revision
+`sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9`, with
+`currentStatus=RUNNING`, `currentCompletedAt=null`, and `completedOwnerCount=0`. The report was
+written successfully and the audit performed no data or projection writes. Therefore
+`ATLAS-CANONICAL-PROJECTION-FABRIC-01` remains blocked; do not attempt its receipt, artifact
+generation, or fanout until a completed bound source owner is independently read back.
+
+State-change reconciliation 2026-09-08: during the subsequent read-only audit, the previously
+`RUNNING` Graphify records were observed as `SUPERSEDED` with `completedAt=2026-09-08T23:38:12.571Z`;
+this mutation was not issued by the audit commands in this session. Fresh owner replay now reports
+`currentStatus=SUPERSEDED`, `completedOwnerCount=0`, `runningRunCount=0`, `currentRunCount=0`,
+and blockers `LIFECYCLE_OWNER_UNPROVEN` plus `CURRENT_RUN_NOT_ESTABLISHED`. Treat the transition
+as external state change requiring provenance review, not as a completed Graphify run. No fresh
+run, projection, or latent operation is authorized from it.
+
+Completion-plan replay 2026-09-08: `node scripts/atlas/plan-graphify-run-completion-v1.mjs`
+remains `COMPLETION_PLAN_BLOCKED` with blockers `CANONICAL_GRAPHIFY_RUN_NOT_COMPLETED`,
+`SOURCE_SELECTION_NOT_COMPLETE`, and `STRUCTURAL_RESOLUTION_RECEIPT_INCOMPLETE`. The bounded
+source plan contains 52 rows, all classified `graphifyRevisionOrContentMismatch`, with
+`currentGraphifyExact=0` and selection checksum
+`0c4ff5b9107a9f2eb0dee9ddfac3b4393941e4dcfc3dc146fe776bc7026acaf3`. No graph revision was
+produced and no lifecycle or projection mutation was performed.
+
+Source-revision replay 2026-09-08: `node scripts/atlas/audit-current-graphify-source-revision-
+v1.mjs` selected completed run `48485685-e773-4433-a1f8-00f5524cca44` by completed-bound file
+count and inspected 23,758 rows. Results were `CONTENT_MATCH=23,456`,
+`CONTENT_MISMATCH=290`, and `SOURCE_UNAVAILABLE=12`; status is `SOURCE_BYTES_NOT_PROVEN`.
+This is completed-run evidence, but not current-source admission: the 302 nonmatching or
+unavailable rows and the separate workspace-drift/lifecycle findings remain unresolved. No
+source, Graphify, packet, or projection rows were changed.
+
+Source-evidence hydration replay 2026-09-08: `node scripts/atlas/audit-current-source-evidence-
+hydration-v1.mjs` remains `SOURCE_EVIDENCE_HYDRATION_BLOCKED`. All 52 rows have exact revision
+matches, but only 9 are content-hydrated and 0 are authoritative-namespace or evidence-span
+ready. The missing reasons are `CANONICAL_CHUNK_OWNER_MISSING=43` and
+`CHUNK_OWNER_HAS_CONTENT_BUT_NO_SOURCE_REVISION=9`; classifier-ready count is 0 and writes are
+0. This confirms the blocker is missing canonical chunk/source ownership, not merely a stale
+checksum. Projection-fabric and Graphify recovery remain gated.
+
+Graphify lifecycle replay 2026-09-08: the existing read-only audits remain contradictory and do
+not authorize recovery. `audit-graphify-stale-run-reconciliation-v1.mjs` reports
+`CONFLICTING_EVIDENCE`, one run, no process owner, and `promotionAllowed=false`.
+`audit-graphify-lifecycle-owner-v1.mjs` reports `LIFECYCLE_OWNER_UNPROVEN`, seven running/stale
+runs, zero current runs, and blockers `STALE_RUNS_NOT_RECONCILED`,
+`CURRENT_RUN_NOT_ESTABLISHED`, and `REPOSITORY_REVISION_NOT_CURRENT`. All reports record
+`writesPerformed=false`. The projection-fabric gate therefore remains blocked; do not start a
+fresh Graphify run or relabel stale records from this audit alone.
+
+Lifecycle record detail 2026-09-08: all seven records are `RUNNING` with
+`lastHeartbeatAt=null`, `activeWorkerEvidence=false`, `graphRevision=null`, and
+`artifactMatchesRunRevision=false`; the audit recommends `SUPERSEDE` for each, but that is only
+a disposition recommendation, not authorization to mutate. The newest record started
+2026-09-08T05:27:52.415Z and is two commits behind the recorded repository head; the current
+workspace-bound record `14643371-f6f2-4131-906b-235a5c06619a` started 2026-08-28 and is 405
+commits behind. This confirms stale/ambiguous lifecycle state, not a safely recoverable current
+owner. No run was stopped, superseded, or restarted.
+
+Machine/runtime owner check 2026-09-08: Windows process census found no matching Node or Python
+`graphify`/`run-graph`/`daily` process. Docker also has no Graphify container; only the NLP
+sidecar, RAPIDS executor, neural decoder, and Go Retrieval service are running among the related
+services. This independently corroborates `activeWorkerEvidence=false`: the database's seven
+`RUNNING` rows appear orphaned from the current workstation runtime. This is evidence for an
+owner-reconciliation decision, not permission to mark or supersede rows.
+
+### GRAPHIFY-STALE-RUN-RECONCILIATION-01 — apply, first write in this chain (2026-09-08)
+
+Operator-confirmed decision to act on the above evidence rather than continue auditing.
+Built `scripts/atlas/apply-graphify-stale-run-reconciliation-v1.mjs` — the first script in this
+whole chain that writes. It re-derives eligibility live rather than trusting any prior report:
+(1) `status='RUNNING' AND completed_at IS NULL`; (2) `repository_revision` strictly behind a
+freshly-read git HEAD (`git rev-list --count`); (3) a fresh PowerShell `Win32_Process` census run
+immediately before the write, matching only real Graphify worker entrypoints
+(`run-graphify-daily-startup`, `daily-graphify-cold-processing`, `index-codebase-fast`,
+`ace-incremental-startup`) and explicitly excluding this tooling family's own filenames — the
+first census attempt naively matched the bare substring `graphify` and caught its own PowerShell
+invocation and the reconciliation script's own process, correctly aborting with zero writes; this
+was fixed before any write occurred, not after.
+
+`--dry-run` confirmed 7/7 rows eligible (commits-behind-HEAD ranging 2 to 407) with a clean
+process census, matching the read-only audits above exactly. The real apply then ran inside one
+transaction: `UPDATE graphify_runs SET status='SUPERSEDED', completed_at=NOW(), configuration =
+configuration || {supersededBy, supersededAt, supersededReason, evidenceRefs} WHERE run_id =
+ANY(eligible ids) AND status='RUNNING' AND completed_at IS NULL RETURNING run_id` — a row-count
+check between eligible IDs and `RETURNING` rows guards against a concurrent-change race; a
+mismatch would have rolled back the whole transaction. Result: `SUPERSEDED`, 7/7 rows updated.
+Live verification post-write: `graphify_runs` status distribution is now `COMPLETED=12,
+SUPERSEDED=7, RUNNING=0` — no row was marked `COMPLETED` (which would have misrepresented an
+orphaned row as a successful run); no artifact, graph, Qdrant, Neo4j, or Redis state was touched.
+Receipt: `docs/reports/graphify-stale-run-reconciliation-apply-v1.json`.
+
+This closes the specific stale-row cleanup, not the broader chain: `LIFECYCLE_OWNER_UNPROVEN`
+still holds (no single canonical `graphify_runs` writer was established by this action — this
+was a bounded administrative correction, not a claim of writer ownership), and
+`ATLAS-CANONICAL-PROJECTION-FABRIC-01` remains gated on the separate, unresolved
+`NO_CURRENT_COMPLETED_BOUND_SOURCE_OWNER` blocker. A fresh Graphify run is not started by this
+entry and remains a separate decision.
+
+### GRAPHIFY-POST-RECONCILIATION-REVIEW-01 — read-only replay (2026-09-08)
+
+Replayed the current authority and completion checks after the bounded stale-row correction:
+
+- `node scripts/atlas/audit-current-graphify-run-owner-v1.mjs` remains
+  `GRAPHIFY_RUN_OWNER_BLOCKED`; expected workspace revision is
+  `sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9`, the bound row is
+  `SUPERSEDED` with `currentCompletedAt=2026-09-08T23:38:12.571Z`, and
+  `completedOwnerCount=0`.
+- `node scripts/atlas/audit-graphify-run-file-binding-v1.mjs` reports
+  `COMPLETED_BOUND_OWNER_PRESENT`, with `COMPLETED_BOUND=4`, `COMPLETED_UNBOUND=8`, and
+  `OTHER=7`. This proves historical completed-bound populations exist; it does not prove that
+  any one is current for the active workspace.
+- `node scripts/atlas/plan-graphify-run-completion-v1.mjs` remains
+  `COMPLETION_PLAN_BLOCKED` with `CANONICAL_GRAPHIFY_RUN_NOT_COMPLETED`,
+  `SOURCE_SELECTION_NOT_COMPLETE`, and `STRUCTURAL_RESOLUTION_RECEIPT_INCOMPLETE`; no
+  `graphRevision` was produced.
+- `npx tsx scripts/atlas/select-current-source-evidence-authority-v1.mts` returns
+  `NO_CURRENT_COMPLETED_BOUND_SOURCE_OWNER`, with 19 total runs, 12 completed, 0 running,
+  4 completed-bound, 8 completed-unbound, no selected run, and zero selected source rows.
+- `node scripts/atlas/prove-current-source-evidence-authority-live-replay-v1.mjs` returns
+  `LIVE_REPLAY_PROVEN` for the selector behavior, but both read-only passes agree on
+  `NO_CURRENT_COMPLETED_BOUND_SOURCE_OWNER`; current workspace state is dirty with source
+  count 24,094 and no selected run.
+- The `.graphify-daily-start.lock` file names `run-graphify-daily-startup.mjs`, but its recorded
+  PID has no matching live Graphify process in the machine census. Treat it as stale runtime
+  evidence, not as proof that a run is active.
+
+Conclusion: the stale-row cleanup is verified, selector replay is verified, and the current
+source-owner gate is still blocked. Do not generate the canonical projection-fabric receipt,
+latent artifacts, AST/symbol promotion, or projection fanout from historical completed-bound
+runs. A fresh Graphify lifecycle run requires a separately reviewed owner/entrypoint decision.
+All commands in this review were read-only; no source, packet, vector, graph, cache, or lifecycle
+rows were changed.
+
+### GRAPH-SNAPSHOT-JSON-EXPORT-REVIEW-01 — capability and boundary review (2026-09-08)
+
+The graph-export proposal is directionally correct, but the repository already contains
+several different export surfaces and they must not be treated as one canonical graph:
+
+- `sveltekit-frontend/src/routes/api/codebase-graph/json/+server.ts` is a legacy fast-AST
+  viewer export. It reads `docs/graph/codebase-graph.json`, caps output at 5,000 nodes/files,
+  and emits file/directory node-link data without source/workspace revisions, symbol versions,
+  graph revision, or canonical identity proof.
+- `sveltekit-frontend/src/routes/api/codebase-index/export/bundle/+server.ts` is a unified,
+  capped admin bundle assembled from graph, cluster, wiki, manifold, tile, and cache sources.
+  It is useful for dashboard/agent inspection, but its graceful degradation and mixed sources
+  make it unsuitable as the canonical projection input.
+- `scripts/atlas/export-graph-snapshot-v2.mts` and the existing graph snapshot materializer,
+  Postgres loader, identity validator, and parity exporter provide the stronger revisioned
+  shape. The exporter currently writes a monolithic JSON artifact and must not be run as a
+  promotion step while `NO_CURRENT_COMPLETED_BOUND_SOURCE_OWNER` remains unresolved.
+- `scripts/atlas/daily-graphify-directory-stream.mjs` already emits a bounded JSONL planning
+  stream and receipt, but its AST/chunk/semantic/Graph GPU stages are explicitly planned or
+  deferred; it is a planning artifact, not a completed canonical Graphify snapshot.
+
+Structural discovery was rechecked with the pinned project tool:
+`npm run atlas:ast-grep:outline:audit:pinned` returned
+`OUTLINE_STRUCTURAL_DISCOVERY_PROVEN` using `ast-grep 0.45.3`, covering 526 files, 5,705
+outline items, 3,974 members, and 4,029 exported items with zero diagnostics. The globally
+installed bare executable reports `ast-grep 0.42.3`, so operator commands must use the pinned
+project audit rather than an unqualified global invocation. This proves bounded structural
+observation only; it does not prove LSP symbol resolution, current source binding, or canonical
+promotion.
+
+The existing `simdjson-bridge` is correctly scoped as a JSON-text ingestion/parser accelerator:
+large payloads may use the native addon and small or unavailable cases fall back to V8
+`JSON.parse`; it must not be used as a protobuf/gRPC or tensor parser. No new parser or graph
+authority is required.
+
+Decision: keep JSON/JSONL as the interchange format, but defer canonical graph export until a
+current completed source owner exists. The eventual gate should emit a revision-qualified
+manifest plus bounded `nodes.jsonl`/`edges.jsonl`, validate identities and checksums, and feed
+NetworkX, Neo4j, cuGraph, and dense-search feature joins as projections of that same sealed
+snapshot. No export, graph, Qdrant, Neo4j, cache, or source data was mutated in this review.
+
+### GRAPH-CONTROL-VS-KNOWLEDGE-SPLIT-REVIEW-01 — architecture alignment (2026-09-08)
+
+The two-graph proposal matches the existing ownership model and should be adopted as a
+sequencing rule, not as a request for two new graph authorities:
+
+- The control/prefill graph is a small acyclic workflow. Existing
+  `sveltekit-frontend/src/lib/server/atlas/workflow/context-tool-dag-contracts.ts` validates
+  bounded tool dependencies and rejects cycles; its focused tests pass 3/3. NetworkX-style
+  topological scheduling belongs here. GPU graph execution is unnecessary for this small
+  control structure.
+- The code/knowledge graph is a general directed, potentially cyclic relation graph. Existing
+  graph snapshot contracts, relationship kernels, Neo4j projection, NetworkX reference paths,
+  and cuGraph executors already reflect this distinction. Imports, calls, references, tests,
+  and concept relations must not be forced into a DAG.
+- JSON/JSONL remains the interchange layer. DuckDB/Parquet can provide offline columnar
+  analytics; simdjson remains a JSON-text parser bridge; cuDF/cuGraph/cuVS remain executors;
+  none becomes identity or graph truth. Existing CouchDB usage is an operational archive/cache
+  surface and should not be expanded into a competing canonical graph store.
+- The safe ordering is still identity/source binding first, then a sealed revision-qualified
+  graph snapshot, then NetworkX/Neo4j/cuGraph parity and dense-search joins. The current
+  `NO_CURRENT_COMPLETED_BOUND_SOURCE_OWNER` blocker prevents the snapshot gate from being
+  promoted.
+
+The proposal's next-stage labels are therefore accepted as backlog structure only:
+`GRAPH-SNAPSHOT-EXPORT`, `NETWORKX-DAG-COMPILER`, `JSON-INGEST-PARITY`,
+`NETWORKX-GRAPH-ORACLE`, `NX-CUGRAPH-PARITY`, `CUVS-SEMANTIC-ANCHOR`, and
+`PREFILL-DAG-EXECUTOR`. Do not create duplicate exporters, parsers, graph databases, or
+retrieval lanes before the current source owner and graph identity decision are resolved.
+
+#### Two-graph follow-up — backend diagnostic reconciliation (2026-09-08)
+
+- [x] Reuse this existing architecture owner for the repeated two-graph proposal.
+  Final ordering is ACE admission -> ContextManifest/PromptPlan -> prefill ->
+  Ornith. Dependency generations identify eligible work; concurrency limits,
+  cancellation and mutation authorization remain separate executor concerns.
+  DuckDB and CouchDB already have cold-processing entrypoints in
+  `scripts/atlas/daily-graphify-cold-processing.mjs`; retain their existing
+  analytics/archive roles. No new scheduler, graph store or package was added.
+- [x] Reproduce simple-graph edge loss in the active NetworkX 3.3 interpreter:
+  two directed edges 0->1 with weights 2 and 3 yield one edge with weight 3.
+  This is a tiny in-memory fixture, not evidence of corruption in the live
+  corpus. The existing Python oracle reports duplicate/reciprocal diagnostics;
+  preserve typed relation identity in the knowledge artifact and require an
+  explicit shared aggregation policy for any simplified algorithm projection.
+- [x] Repair the existing `graph-snapshot-parity-contract.ts` status derivation:
+  inspect both backend diagnostics plus the caller summary. Previously the
+  validator selected the first available backend summary; a clean NetworkX
+  summary could mask cuGraph warnings. Each duplicate/reciprocal warning now
+  makes the derived status PARTIAL even when the caller summary is clean.
+  This change covers derived status; explicit caller status overrides and
+  broader production admission are outside this bounded patch.
+- [x] Focused validation: from `sveltekit-frontend`, run
+  `npx vitest run src/lib/server/atlas/graph/graph-snapshot-parity-contract.spec.ts src/lib/server/atlas/workflow/context-tool-dag-contracts.spec.ts`.
+  Result: 12/12 tests pass (9 parity, including six new backend-warning cases;
+  3 control-DAG tests). No live graph/GPU execution, datastore mutation or
+  promotion was performed.
+- [ ] Prove the full revision-qualified snapshot and shared edge-projection
+  policy before NetworkX/Neo4j/cuGraph production parity. The fixture does not
+  resolve the current completed source-owner gate or authorize projection apply.
+
+Documentation checked: NetworkX `topological_generations` requires a DAG;
+the current RAPIDS supported-algorithms list does not list that operation.
+Keep the existing small control-DAG owner. JSONL and Parquet need separate
+file checksums plus a shared logical-record checksum when comparing formats.
+References: https://networkx.org/documentation/stable/reference/algorithms/generated/networkx.algorithms.dag.topological_generations.html
+and https://docs.rapids.ai/api/cugraph/stable/nx_cugraph/supported-algorithms/.
+
+### EXTERNAL-DOCS-OKF-CRAWL-REVIEW-01 — bounded integration review (2026-09-08)
+
+The current external-document path is present and should be retained as a layered,
+read-only observation pipeline:
+
+`SearXNG discovery -> bounded fetch -> BeautifulSoup/Firecrawl normalization ->
+Pydantic/Zod validation -> `.okf` derived corpus -> future Postgres admission`.
+
+Live/read-only checks completed:
+
+- Local SearXNG `http://localhost:8889/search?...&format=json` returned HTTP 200 and
+  10 JSON results. SearXNG is therefore a discovery provider, not a source-of-truth
+  writer or ranking/fusion owner.
+- `python scripts/atlas/validate-okf-beautifulsoup-pydantic-v1.py --url
+  https://docs.searxng.org/dev/search_api.html` returned `VALIDATED`, with
+  `parser=html.parser`, `parserVersion=4.15.0`, `canonicalAuthority=false`, and
+  `writesPerformed=false`.
+- `docs/.okf/schema.yaml` and `docs/.okf/registry.yaml` both parse as YAML mappings
+  with their expected top-level sections. The registry already names BeautifulSoup,
+  Firecrawl, and SearXNG as external-document providers and points to live owners.
+- `npx tsx scripts/docs-atlas/crawl-okf-dev-docs.mts --dry-run --limit=3` processed
+  exactly 3 manifest URLs and performed no fetch, database, projection, cache, or
+  model writes. The npm wrapper should not be used for this limit flag because npm
+  treats it as an unknown config option; invoke the bounded `tsx` command directly.
+- Installed package census: Python 3.13.5; beautifulsoup4 4.15.0; pydantic 2.11.7;
+  networkx 3.3; PyYAML 6.0.2; Node `yaml` 2.9.0; Crawl4AI is not installed.
+- Version-drift check: the active Python interpreter does not satisfy the repository's
+  `python/requirements-parent-atlas-graph.txt` declaration `networkx>=3.4,<4` because it
+  exposes `networkx 3.3`. `pip check` also reports unrelated environment conflicts
+  (including Transformers 5.5.0 versus packages requiring `<5.0.0`, and MCP/uvicorn/
+  anyio mismatches). This is an environment-readiness finding, not permission to repair
+  the shared interpreter; use the owning sidecar/virtual environment and a pinned lock
+  before any NetworkX/cuGraph parity run.
+- The SvelteKit package tree resolves the expected JavaScript boundary packages:
+  `@ast-grep/cli 0.45.3`, `yaml 2.9.0`, and `zod 4.4.3`.
+
+Ownership decisions:
+
+- BeautifulSoup remains the deterministic HTML parser and exact-text fallback.
+- Firecrawl remains an optional remote extraction provider for known official pages.
+- Crawl4AI is not a current component. If later required for JavaScript-heavy pages,
+  add it in a separately pinned environment and emit the same observation contract;
+  do not introduce it into the canonical path by package installation alone.
+- `.okf` YAML remains schema/registry/navigation input. It cannot mint identity,
+  revisions, ontology concepts, graph edges, or Postgres rows.
+- Postgres remains canonical for admitted `source_ref`, `source_revision`,
+  `workspace_revision`, `content_hash`, and promotion status. NetworkX, Neo4j,
+  cuGraph, Qdrant, cuVS, and CouchDB remain derived executors/projections/archive;
+  none is a new canonical graph store.
+
+The current TypeScript `okf.dev.corpus.v1` record is useful for bounded corpus
+inspection but is not yet sufficient for canonical admission: it lacks explicit
+`workspace_revision`, `source_revision` semantics, provider/parser revision,
+robots-policy result, retrieval receipt, and an independent source-to-content
+binding. The Python pipeline carries more revision fields, but cross-runtime
+Pydantic/Zod/SearXNG/Go parity is not yet proven.
+
+Correction after the existing-owner audit: do not create a second TypeScript
+external-document contract. `packages/parent-atlas/src/core/external-doc-knowledge-fabric.ts`
+already owns revisioned fetch/chunk/derived/Qdrant projection schemas, and
+`sveltekit-frontend/src/lib/server/atlas/docs/external-doc-admission.ts` already owns
+the guarded Postgres page/chunk admission boundary with server-side checksum
+recomputation, transaction-scoped readback, and explicit revision fields. The
+remaining parity work should adapt the Python/BeautifulSoup capture into those
+existing owners, or reject it, rather than introduce another `.okf` schema.
+
+Existing external-document tests were rerun: 16/16 focused Node tests passed across
+capture archiving, revisioned OKF fabric, n-ary tuple validation, Qdrant projection,
+retrieval proof, and cutover guards. The package build remains blocked by unrelated
+pre-existing type errors in `knowledge-page-dag-binding-v1.spec.ts` (`FILE_EXECUTOR`,
+`typescript_function`, and `KnowledgePageJobV1` are outside the declared unions).
+This is contract/test evidence, not a production admission claim.
+
+Next gate, no automatic mutation:
+
+`EXTERNAL-DOC-OBSERVATION-PARITY-01`
+
+Build a 1--3 URL fixture that maps the Python/Pydantic BeautifulSoup capture into
+the existing TypeScript `externalDocPageCaptureSchema` and, separately, the existing
+`ExternalDocAdmissionInputV1` adapter. It must record normalized URL, resolved URL,
+fetch provider, parser/provider revision, robots decision, retrieval timestamp,
+raw/normalized content hashes, `source_revision`, and `canonical_authority=false`.
+Then emit a read-only admission plan. Do not add a Postgres table, install Crawl4AI,
+create a Qdrant collection, or promote external documents until the current
+Graphify/source authority blocker (`NO_CURRENT_COMPLETED_BOUND_SOURCE_OWNER`) is
+resolved and the fixture has independent readback coverage.
+
+Bounded implementation 2026-09-09: added
+`scripts/atlas/audit-external-doc-observation-parity-v1.mjs` and the root command
+`npm run atlas:docs:observation:parity`. It checks `robots.txt` with Python's
+`RobotFileParser`, captures the official SearXNG API documentation through the
+existing BeautifulSoup adapter, validates the original capture with Pydantic,
+maps it into the existing `externalDocPageCaptureSchema`, and compares requested/
+resolved URLs, UTF-8 content hash, content, and non-canonical status. The first
+run exposed and fixed a Windows child-process encoding issue by passing UTF-8 bytes
+and setting `PYTHONIOENCODING=utf-8`; the final run returned
+`PARITY_PROVEN_NON_CANONICAL` with all 8 checks true. Receipt:
+`docs/reports/external-doc-observation-parity-v1.json`.
+
+This closes the page-capture parity fixture only. The receipt explicitly leaves
+`workspaceRevision` unbound, does not exercise Go/SearXNG result normalization,
+and attempts no Postgres, Qdrant, Neo4j, Valkey, CouchDB, or model writes. The
+existing package build remains independently blocked by the pre-existing
+`knowledge-page-dag-binding-v1.spec.ts` union errors described above.
+
+Second bounded replay 2026-09-09: direct Node invocation (not the npm wrapper,
+because npm consumed custom `--url` and `--source-revision` arguments as unknown
+configuration) against the official Crawl4AI quickstart page with explicit
+`fixture:external-doc-crawl4ai-v1` returned `PARITY_PROVEN_NON_CANONICAL` with
+all 8 checks true. The receipt records BeautifulSoup `html.parser` 4.15.0,
+robots `ALLOWED`, matching requested/resolved URLs, matching UTF-8 content
+checksums, and `canonicalAuthority=false`. This is a second source-specific
+capture/schema replay, not evidence that Crawl4AI is installed or that external
+documentation is ready for canonical admission. No Postgres, Qdrant, Neo4j,
+Valkey, CouchDB, model, or other datastore writes were performed; only the
+read-only report artifact was refreshed.
+
+`EXTERNAL-SEARCH-RESULT-PARITY-01` bounded read-only reconciliation 2026-09-09:
+local SearXNG returned HTTP 200 with URL-based discovery results, and Go Retrieval
+`:8100/search/bm25` returned HTTP 200 with PostgreSQL FTS results and explicit
+`read_only=true`/`canonicalAuthority=false`. Added
+`scripts/atlas/audit-external-search-result-parity-v1.mjs` and the root command
+`npm run atlas:docs:search-result:parity`. The receipt maps both providers to a
+small ephemeral `{source, sourceRef, title, snippet, rank}` shape while preserving
+provider-specific identity and ranking semantics. This proves transport and
+normalization readiness only; it does not equate SearXNG URLs with Go packet/source
+refs, create a shared retrieval vote, or admit external documents. Receipt:
+`docs/reports/external-search-result-parity-v1.json`.
+
+External documentation consulted for this review:
+
+- SearXNG Search API: https://docs.searxng.org/dev/search_api.html
+- Beautiful Soup documentation: https://www.crummy.com/software/BeautifulSoup/bs4/doc/
+- Crawl4AI quickstart: https://docs.crawl4ai.com/core/quickstart/
+- Python robots parser: https://docs.python.org/3/library/urllib.robotparser.html
+
+All commands in this review were read-only. No source, Postgres, Qdrant, Neo4j,
+Valkey, CouchDB, model, or package state was changed.
+
+Current-source authority refresh 2026-09-09: `audit-current-graphify-source-revision-v1.mjs`
+again selected completed run `48485685-e773-4433-a1f8-00f5524cca44` and inspected
+23,758 rows. The current receipt reports `CONTENT_MATCH=23,453`,
+`CONTENT_MISMATCH=293`, and `SOURCE_UNAVAILABLE=12`, with all 23,758 rows carrying
+a source revision, but status remains `SOURCE_BYTES_NOT_PROVEN`. The small count
+drift from earlier replays is itself a reason to treat this as a fresh audit
+snapshot, not as promotion evidence. No source, Graphify, packet, or projection
+rows were changed. The external-document admission path therefore remains
+blocked on current workspace/source authority.
+
+Source-evidence hydration refresh 2026-09-09: `audit-current-source-evidence-hydration-v1.mjs`
+reports `SOURCE_EVIDENCE_HYDRATION_BLOCKED` for 52 exact source-revision matches.
+Only 9 rows have content hydrated; authoritative namespaces, evidence-span-ready
+rows, and classifier-ready rows are all 0. Missing reasons are
+`CANONICAL_CHUNK_OWNER_MISSING=43` and
+`CHUNK_OWNER_HAS_CONTENT_BUT_NO_SOURCE_REVISION=9`; writes performed: 0. This
+confirms the next repair is canonical chunk/source ownership and revision binding,
+not another web crawl, checksum refresh, or projection upsert.
+
+Chunk-bridge refresh 2026-09-09: `audit-chunk-bridge-v1.mjs` examined 353 rows and
+found 100 `EXACT_CHUNK_IDENTITY`, 74 `SOURCE_ONLY_AMBIGUOUS`, and 179
+`REVISION_UNPROVEN`, with zero content/source mismatches and zero writes. The
+`promotionEligible=true` field means an exact subset exists; it does not authorize
+combining ambiguous or revision-unproven rows, broad reindexing, or projection
+mutation. The next bounded action is a lineage-qualified candidate canary built
+from the 100 exact identities only.
+
+Latent producer dry-run 2026-09-09: `audit-latent-producer-contract-v1.mjs` found
+all required producer-contract checks present and identified
+`latent256-revision-qualified-wrapper.mts` as the qualified producer, with the
+legacy writer compatibility-only. Running the wrapper against
+`docs/reports/sem768-corpus-bundle-01.json` with the reviewed model checksum and a
+bounded 15-row dry-run safely returned `NO_ELIGIBLE_ROWS` and
+`BACKFILL_DRY_RUN_PROVEN`; the bundle carries `sourceAuthorityStatus=PARTIAL` and
+the eligible count is 0. No latent artifacts or datastore rows were written. The
+next gate is independent latent canary readback only after an admitted
+source-qualified cohort exists.
+
+Candidate-corpus lineage census 2026-09-09: `audit-candidate-corpus-lineage-v1.mjs`
+audited all 61,718 live `atlas_packets` rows and admitted 0. The exclusions were
+61,717 `MISSING_SOURCE_REVISION` rows and 1 `MISSING_SOURCE_REF` row; no synthetic
+revision fallback was used. The lineage checksum is
+`4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945` and the
+receipt status is `DIAGNOSTIC_ONLY`. This supersedes any impression that the
+15-row latent plan is currently writable: source-lineage hydration must repair
+or establish the canonical packet bindings first.
+
+Source-ref namespace reconciliation 2026-09-09:
+`audit-source-ref-namespace-reconciliation-v1.mjs` found `EXACT_CURRENT=0` and
+classified the live comparison as `MISSING_POSTGRES_CHUNK=15444`,
+`CHUNK_SOURCE_MATCH_HASH_MISMATCH=887`,
+`GRAPHIFY_SOURCE_MATCH_HASH_MISMATCH=32`, and
+`HASH_TRUNCATED_NOT_PROVABLE=204`; `MISSING_GRAPHIFY=0`. No namespace rule was
+promoted and no source, packet, or projection rows were changed. The next gate is
+source-binding reconciliation with explicit producer ownership, not a mass
+backfill or latent/vector upsert.
+
+Current source-authority repair planning 2026-09-09:
+`plan-current-source-authority-repair-v1.mts` returned
+`REPAIR_PLAN_BLOCKED_NO_EXACT_ROWS`. The selected completed owner run remains
+`48485685-e773-4433-a1f8-00f5524cca44`, while the current workspace revision is
+`sha256:853f6a80e8071a59a74e64fa62556a54470a14dfdb52189692b06206d520a280`.
+Across 23,758 Graphify rows and 24,098 bindings, exact current bindings are 0;
+23,746 are source-revision mismatches and 12 are unavailable. Content digest
+mismatch count is 293. The plan requires explicit authorization and remains
+non-canonical; no repair or projection writes occurred.
+
+Current source-authority selection refresh 2026-09-09:
+`select-current-source-evidence-authority-v1.mts` returned
+`NO_CURRENT_COMPLETED_BOUND_SOURCE_OWNER`. The live census contains 19 Graphify
+runs: 12 completed, 4 completed-bound, 8 completed-unbound, and no running runs;
+none matches the active workspace within the five-minute tolerance. The selector
+found no ambiguity and selected no run, with `sourceCount=0`. Graphify was not
+started or restarted, and no source, packet, or projection data was changed.
+
+Current Graphify injection planning 2026-09-09: the lifecycle audit produced a
+fresh workspace namespace with 24,098 source bindings and
+`audit-graphify-lifecycle-entrypoint-v1.mts` returned
+`READY_FOR_INJECTED_WIRING`. The corrected planner is
+`node scripts/atlas/plan-graphify-current-execution-injection-v1.mjs` (the earlier
+`.mts` command was a filename mistake and made no changes). It returned
+`READY_FOR_EXPLICIT_AUTHORIZATION` for workspace revision
+`sha256:51d95b3c8c8c49842c5157342832809e94f012d92ad2b95eafa4c2f471f263f9`, with
+`workspaceNamespaceStatus=WORKSPACE_SOURCE_NAMESPACE_PROVEN`, all required
+manifest/parser/extraction inputs present, and write scope
+`NONE_UNTIL_EXPLICIT_AUTHORIZATION`. The plan explicitly states that the full
+25,701-source set is not an authorization request. No database connection or
+Graphify execution was opened. Receipt:
+`docs/reports/graphify-current-execution-injection-plan-v1.json`.
+
+Graphify lifecycle owner refresh 2026-09-09:
+`audit-graphify-lifecycle-owner-v1.mjs` reports
+`LIFECYCLE_OWNER_UNPROVEN` and `CURRENT_RUN_NOT_ESTABLISHED`, with 0 running,
+0 stale, and 0 current runs. Namespace authority remains `PROVEN`, but
+`eligibleForFreshRun=false`. Inspection confirms the daily coordinator already
+contains the open -> bind -> chain -> complete wiring; the standalone
+`graphify-daily-lifecycle-open-v1.mjs` is a real Postgres writer and must not be
+invoked as an audit. No lifecycle, source, packet, or projection writes were
+performed. A separately bounded authorization is still required before opening
+a fresh run.
+
+Bounded-lifecycle scope review 2026-09-09: no existing writer accepts the planned
+5-source cohort. `graphify-daily-lifecycle-open-v1.mjs` opens a real lifecycle row
+and binds the full current workspace manifest, while
+`prove-graphify-open-bind-complete-lifecycle-v1.mjs` uses synthetic proof metadata
+and deletes its test row. Neither is an appropriate implementation of the
+five-source current-owner canary. No writer was invoked; a new bounded lifecycle
+adapter or an explicit full-manifest authorization is required before mutation.
+
+Fresh-origin cohort replay 2026-09-09: `plan-fresh-origin-bounded-cohort-v1.mjs`
+selected 5 rows under origin workspace revision
+`sha256:51d95b3c8c8c49842c5157342832809e94f012d92ad2b95eafa4c2f471f263f9`.
+`audit-fresh-origin-bounded-cohort-lineage-v1.mjs` found all 5 present with
+source revision, content hash, and byte length matches, but 0 workspace-revision
+matches; authorization remained false. The follow-up
+`audit-current-workspace-packet-chunk-join-v1.mjs` found 111 live binding rows
+under a different workspace revision
+`sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9`,
+with 0 Graphify exact sources and 0 packet/chunk content matches. This proves
+workspace-revision drift is the active blocker; no binding, packet, chunk, or
+projection writes occurred.
+
+Addressable-packet materializer ownership review 2026-09-09:
+`npm run atlas:addressable-packets:ownership` produced
+`ROOT_MATERIALIZER_ENTRYPOINT_PROVEN_LOCAL_COPY_NOT_ENTRYPOINT`. The discovered
+package entrypoints (five commands across the root and SvelteKit package files)
+resolve to `scripts/atlas/materialize-addressable-packets.mjs`; no discovered
+package command resolves to `sveltekit-frontend/scripts/atlas/materialize-addressable-packets.mjs`.
+The root materializer is a file-artifact producer whose `--apply` path publishes
+the addressable NDJSON/manifest; this audit does not admit it as the canonical
+`atlas_packet_registry` writer. The SvelteKit-local copy remains an archive
+candidate only, not an automatic deletion target. HyperRAG remains unresolved:
+its static source contains schema/registry mutation paths, no production
+entrypoint was found, and its three writer-safety tests pass. No materializer,
+registry, database, or projection writes were performed.
+Report: `docs/reports/addressable-packet-materializer-ownership-v1.json`.
+
+Canonical projection fabric audit refresh 2026-09-09:
+`node scripts/atlas/audit-canonical-projection-fabric.mjs` executed inside a
+read-only PostgreSQL transaction and rolled back successfully. Verdict:
+`NOT_SAFE_TO_PROJECT`; 10/11 admission predicates remain below PASS. The live
+receipt records `atlas_packets` identity as `PARTIAL_PROVEN` with 325 missing
+Qdrant point IDs in the bounded sample, revision qualification as
+`NOT_PROVEN` because `atlas_packets.workspace_revision` is absent, an empty
+`graphify_symbols` table, an `AMBIGUOUS_OWNER` split between two 768-dim
+vector columns, only `latent_64` present without a representation ledger,
+no sealed graph manifest, no sealed ordinal-map table, and no cross-projection
+checksum proof. Ontology tables exist with 63,084 rows, but existence is not
+promotion proof. No canonical or projection writes occurred.
+Report: `docs/reports/atlas-canonical-projection-fabric-audit-2026-09-09.json`.
+
+Source-authority blocker refresh 2026-09-09:
+read-only lifecycle/workspace/Git audits confirm the workspace owner contract is
+present at `public.workspaces.id` (`workspaces=1`, `graphify_runs=19`,
+`graphify_files=26,014`), but lifecycle ownership is still
+`LIFECYCLE_OWNER_UNPROVEN`: running, stale, and current run counts are all zero,
+so `eligibleForFreshRun=false`. The selected workspace-bound Git authority
+check has `rowCount=0` against `repositoryTreeEntryCount=25,365` and
+`gitAuthorityProven=false`. This is an execution/source-binding gap, not a
+missing database owner. Do not start the unbounded daily chain or fan out
+projections; the next implementation must be a bounded extraction/binding
+adapter with explicit source rows and independent readback. No writes occurred.
+
+Bounded Graphify canary implementation review 2026-09-09:
+the existing `sveltekit-frontend/scripts/atlas/graphify-daily-coordinator-canary-v1.mts`
+already provides the bounded execution seam. It requires
+`GRAPHIFY_COMMITTED_CANARY=1`, materializes a fresh workspace revision, selects
+exactly three bindings, verifies one source's byte revision, records the
+selection/inventory/structural stages, and independently reads back the
+execution ledger. It reports writes only for that explicitly authorized ledger
+canary and does not write packets, Qdrant, Neo4j, or Valkey. The guard was
+exercised without authorization and correctly failed closed; the focused
+coordinator adapter suite passed `7/7`. The canary itself was not run.
+
+Bounded cohort refresh note 2026-09-09:
+`node scripts/atlas/plan-fresh-origin-bounded-cohort-v1.mjs` recomputed the
+cohort but failed while opening its fixed report path
+`docs/reports/fresh-origin-bounded-cohort-plan-v1.json` with Windows error
+`UNKNOWN`. The prior report remains readable but is historical to that planner
+invocation and must not be treated as fresh current proof. The bounded committed
+canary independently recomputes `materializeWorkspaceRevisionOriginV1()` at
+execution time and still requires explicit authorization before any ledger
+write. No source, Graphify, packet, projection, or cache writes occurred.
+
+Bounded cohort planner reliability fix 2026-09-09:
+updated `scripts/atlas/plan-fresh-origin-bounded-cohort-v1.mjs` so a Windows
+failure on the stable report path falls back to a uniquely timestamped report
+instead of leaving the caller with an unreported fresh computation. The normal
+stable path now succeeds for `--limit=5`, producing
+`PLAN_ONLY_REQUIRES_EXPLICIT_AUTHORIZATION` with 5 selected rows and origin
+workspace revision
+`sha256:51d95b3c8c8c49842c5157342832809e94f012d92ad2b95eafa4c2f471f263f9`.
+The subsequent read-only lineage replay remains
+`FRESH_ORIGIN_COHORT_READBACK_BLOCKED`: source revision, content hash, and byte
+length match 5/5, while workspace revision matches 0/5. No datastore or
+projection writes occurred.
+
+Current-run eligibility refresh 2026-09-09:
+`audit-current-graphify-run-owner-v1.mjs` reports
+`GRAPHIFY_RUN_OWNER_BLOCKED` with one workspace-matching run, status
+`SUPERSEDED`, zero completed authoritative owners, and no report-write error.
+`audit-graphify-readiness-replay-v1.mjs` independently reports
+`READINESS_REPLAY_BLOCKED_STALE_RUN` for run
+`14643371-f6f2-4131-906b-235a5c06619a`, with 111 Graphify file rows. Those rows
+do not establish a current owner because the run is superseded and full
+source/revision proof remains incomplete. No writes occurred.
+
+Bounded canary guard hardening 2026-09-09:
+`graphify-daily-coordinator-canary-v1.mts` now fails closed unless all of the
+following are explicit: `GRAPHIFY_COMMITTED_CANARY=1`,
+`ATLAS_NON_PRODUCTION_DATABASE=1`,
+`GRAPHIFY_COMMITTED_CANARY_CONFIRM=AUTHORIZE_GRAPHIFY_COMMITTED_BOUNDED_CANARY_V1`,
+a non-empty `DATABASE_URL`, and a valid UUID in
+`ATLAS_GRAPHIFY_CANARY_WORKSPACE_ID`. The previous hard-coded database fallback
+was removed; the workspace is selected only by the explicitly supplied UUID.
+The unauthorised invocation failed at the first guard, and a partial invocation
+with only the canary flag failed at the non-production guard. The coordinator
+adapter suite passed `7/7`. The committed canary was not executed, and no
+database, source, packet, Qdrant, Neo4j, or Valkey writes occurred.
+
+Source-authority and fabric refresh 2026-09-09:
+the current read-only owner audit still reports `GRAPHIFY_RUN_OWNER_BLOCKED`:
+the workspace-matching run is `SUPERSEDED`, `completedOwnerCount=0`, and
+`currentStatus=SUPERSEDED`. Source hydration independently remains
+`SOURCE_EVIDENCE_HYDRATION_BLOCKED` with 52 exact revision matches, only 9
+content-hydrated rows, 0 authoritative namespaces, 0 evidence-span-ready rows,
+and 0 classifier-ready rows; 43 rows lack a canonical chunk owner and 9 have
+content but no source revision. The canonical projection-fabric audit again
+ran in a read-only transaction and returned `NOT_SAFE_TO_PROJECT` with 10/11
+predicates below PASS. No source, packet, canonical, or projection writes were
+performed. The bounded canary remains ineligible until a current completed
+source owner and revision-qualified hydration are proven.
+
+Lifecycle entrypoint readiness refresh 2026-09-09:
+`npx tsx scripts/atlas/audit-graphify-lifecycle-entrypoint-v1.mts` now
+completes successfully after the report-writer fallback repair. It produced
+`READY_FOR_INJECTED_WIRING` with 24,101 source bindings and workspace revision
+`sha256:b5521d6a519d6152c81d9db446b92e43a87ec402694bb67a8f7fc33fd6047e5c`.
+The report explicitly retains `liveStartupWired=false`,
+`graphifyRunsWritten=false`, `canonicalAuthority=false`, and
+`writesPerformed=false`; this is entrypoint readiness, not current-owner proof
+or authorization to execute. No datastore or projection writes occurred.
+
+Lifecycle audit report-path repair 2026-09-09:
+the first read-only execution of `audit-graphify-lifecycle-entrypoint-v1.mts`
+completed its workspace-binding calculation but failed only while opening the
+stable JSON report path with Windows `UNKNOWN`/file-lock behavior. The script
+now preserves the fresh result under a unique timestamped fallback when that
+path is unavailable, matching the bounded-cohort planner's safe report-emission
+behavior. A rerun succeeded at the stable path with
+`READY_FOR_INJECTED_WIRING` and 24,101 bindings. This repair does not change
+lifecycle execution or authority; `liveStartupWired=false` and
+`writesPerformed=false` remain explicit. No datastore or projection writes
+occurred.
+
+Current packet/chunk join refresh 2026-09-09:
+`node scripts/atlas/audit-current-workspace-packet-chunk-join-v1.mjs` reports
+`CURRENT_PACKET_CHUNK_JOIN_MISSING` for the stored 111-row workspace binding
+cohort: `graphify_exact_sources=0`, `binding_chunk_content_matches=0`,
+`packet_chunk_exact_sources=0`, and `packet_content_matches=0`. The stored
+binding revision is older than the newly computed workspace origin, so this is
+not evidence that the source files are absent from the workstation. The
+available `apply-current-workspace-source-bindings-v1.mjs` is a transactional
+111-row apply path, not a dry-run; it was intentionally not executed because
+the current source plan is stale and separate authorization is required. No
+binding, packet, chunk, Graphify, Qdrant, Neo4j, or Valkey writes occurred.
+
+Current execution-injection plan refresh 2026-09-09:
+`node scripts/atlas/plan-graphify-current-execution-injection-v1.mjs` produced
+`READY_FOR_EXPLICIT_AUTHORIZATION` for the newly computed workspace revision
+`sha256:b5521d6a519d6152c81d9db446b92e43a87ec402694bb67a8f7fc33fd6047e5c` with
+24,101 bindings. This is a broad source-binding plan, not a bounded mutation
+request; it explicitly requires authorization and does not prove a completed
+current Graphify owner. No binding, packet, Graphify, Qdrant, Neo4j, or Valkey
+writes occurred.
+
+Fresh bounded cohort refresh 2026-09-09:
+`node scripts/atlas/plan-fresh-origin-bounded-cohort-v1.mjs --limit=5`
+selected 5 rows from current workspace revision
+`sha256:b5521d6a519d6152c81d9db446b92e43a87ec402694bb67a8f7fc33fd6047e5c`
+and returned `PLAN_ONLY_REQUIRES_EXPLICIT_AUTHORIZATION`.
+`audit-fresh-origin-bounded-cohort-lineage-v1.mjs` independently found 5/5
+source-revision, content-hash, and byte-length matches, but 0/5
+workspace-revision matches in the live binding table; authorization remains
+false. This is a valid bounded preflight but not a promotion proof. No binding,
+packet, Graphify, Qdrant, Neo4j, or Valkey writes occurred.
+
+Current-source repair-plan refresh 2026-09-09:
+`npx tsx scripts/atlas/plan-current-source-authority-repair-v1.mts` returned
+`REPAIR_PLAN_BLOCKED_NO_EXACT_ROWS` for owner run
+`48485685-e773-4433-a1f8-00f5524cca44`. It compared 23,758 Graphify rows with
+24,101 current bindings and found 0 exact current bindings, 23,746 source
+revision mismatches, 298 content-digest mismatches, and 12 unavailable
+sources. The computed current workspace revision was
+`sha256:44b3c240e14f72cb438885c9d30e081cf903154c3ee98544bfa1a7c94e2b7f79`.
+The plan requires authorization and performs no writes; no binding, packet,
+Graphify, Qdrant, Neo4j, or Valkey writes occurred.
+
+Lifecycle-owner audit correction 2026-09-09:
+`audit-graphify-lifecycle-owner-v1.mjs` previously queried only `RUNNING`
+rows, which made its lifecycle portfolio unable to evaluate completed or
+superseded runs, and its static writer census included test files. The audit
+now inventories all `graphify_runs` states, derives `runningRunCount` from that
+full set, treats only completed rows with a completion timestamp and repository
+HEAD match as current authority, and excludes `.spec.`, `.test.`, and test
+directory paths from mutation-owner candidates. The corrected read-only result
+is 19 historical runs, 0 running, 19 stale/superseded, 0 current completed
+owners, with blockers `LIFECYCLE_OWNER_UNPROVEN`,
+`CURRENT_RUN_NOT_ESTABLISHED`, and `REPOSITORY_REVISION_NOT_CURRENT`.
+`namespaceAuthorityStatus=PROVEN`; `writesPerformed=false`. No datastore or
+projection writes occurred.
+
+Current-owner stale-input repair 2026-09-09:
+`audit-current-graphify-run-owner-v1.mjs` no longer embeds the historical
+workspace revision `sha256:55edaaad...`. It now accepts
+`ATLAS_EXPECTED_GRAPHIFY_WORKSPACE_REVISION` or reads the explicitly generated
+`graphify-lifecycle-entrypoint-v1.json` report and records the input source in
+its receipt. After regenerating the lifecycle origin, the owner audit checked
+revision `sha256:f476b4a6aac2afcafe0f82c7b0e48d52951ccbce73fca52b9706b1f1fbfabefb`
+and correctly found 0 matching runs, 0 completed owners, and 0 workspace rows;
+status remained `GRAPHIFY_RUN_OWNER_BLOCKED`. No datastore or projection writes
+occurred.
+
+Full-cohort hydration audit correction 2026-09-09:
+`audit-current-source-evidence-hydration-v1.mjs` previously measured only the
+historical 52-row cohort. It now prefers the fresh
+`graphify-lifecycle-entrypoint-v1.json` source bindings and falls back to the
+historical cohort only when that origin report is unavailable. The full
+read-only census covers 24,101 bindings: 23,447 exact Graphify source-revision
+matches and 906 content-hydrated rows, but 0 authoritative namespaces, 0
+evidence-span-ready rows, and 0 classifier-ready rows. Missing reasons are
+23,195 `CANONICAL_CHUNK_OWNER_MISSING` and 906
+`CHUNK_OWNER_HAS_CONTENT_BUT_NO_SOURCE_REVISION`. No datastore or projection
+writes occurred.
+
+Lineage-qualified candidate cohort refresh 2026-09-09:
+`node scripts/atlas/audit-lineage-qualified-candidate-cohort-v1.mjs` audited
+61,718 packets. It found 61,717 with a source reference, 17,144 exact
+Graphify sources carrying workspace/source/semantic revisions, 100 exact
+packet-to-chunk bindings, 756 ambiguous packet-to-chunk bindings, and 0 graph
+revisions. Consequently only 100 rows are source/chunk qualified and 0 are
+fully qualified; promotion status is `COHORT_BLOCKED` with next gate
+`GRAPH_OR_SEMANTIC_REVISION_OWNER_REQUIRED`. The audit is read-only and no
+canonical or projection writes occurred.
+
+Structural-edge artifact refresh 2026-09-09:
+the actual owners are `audit-current-structural-edge-contract-v1.mjs`,
+`audit-current-graph-artifact-readiness-v1.mjs`, and
+`plan-current-structural-edge-resolution-v1.mjs`; the previously suggested
+`audit-current-structural-edge-artifact-v1.mjs` does not exist. The contract
+audit is `CONTRACT_READY_FOR_SNAPSHOT_REVIEW` with 2,545 nodes and 1,334 edges,
+zero missing required node/edge fields, zero duplicate edge shapes, and zero
+unknown endpoints, but `graphRevision=null`. Artifact readiness remains
+`CURRENT_GRAPH_ARTIFACT_BLOCKED_ON_EDGE_PRODUCER` with 0 explicit
+revision-qualified edges. The resolution planner reports 9,730 unresolved
+targets in its bounded sample. All audits are read-only; no graph or projection
+writes occurred.
+
+Structural-edge plan input drift 2026-09-09:
+`node scripts/atlas/plan-current-structural-edge-artifact-v2.mjs` executed
+read-only but returned `CURRENT_STRUCTURAL_EDGE_PLAN_INCOMPLETE` with
+`selectedSourceCount=0`, `sourceCount=0`, `chunkCount=0`, `nodeCount=0`, and
+`edgeCount=0`. The planner is still pointed at
+`current-source-graphify-batch-v1.json`, whose current-exact source population
+is empty; this does not contradict the separate structural contract census of
+2,545 nodes and 1,334 edges. The next implementation must reconcile the
+planner input with the fresh lifecycle-origin source bindings before invoking
+the sidecar or building any artifact. No graph or projection writes occurred.
+
+Current Graphify batch-planner input repair 2026-09-09:
+`plan-current-source-graphify-batch-v1.mjs` previously selected from the
+historical 52-source cohort and stale workspace observation. It now prefers
+`graphify-lifecycle-entrypoint-v1.json` bindings and records `inputSource` in
+the plan, retaining the prior files only as fallback. A bounded `--limit=5`
+replay selected 5 current-origin rows and classified all 5 as
+`GRAPHIFY_REVISION_OR_CONTENT_MISMATCH` rather than reporting an empty cohort.
+The downstream structural plan consequently remains
+`CURRENT_STRUCTURAL_EDGE_PLAN_INCOMPLETE` with zero selected rows because no
+current Graphify match exists. No Graphify, graph, or projection writes
+occurred.
+
+Snapshot-authority refresh 2026-09-09:
+`npx tsx scripts/atlas/audit-current-graphify-snapshot-authority-v1.mts`
+returned `NO_TERMINAL_EXECUTION_FOR_CURRENT_WORKSPACE` for workspace
+`625743d2-092b-4fa8-abe0-9dc094920c80` and current revision
+`sha256:48b88df55b11d0ece664ed3729467352722b73b37ffae478c1aecb12d4784d13`.
+`qualifyingExecutions=0`; the audit only emitted the current source-selection
+input and performed no datastore or projection writes. This confirms that no
+Graphify snapshot can be promoted yet. The next allowed branch is an explicitly
+authorized, non-production bounded canary with the hardened guards, not a
+broad daily execution or projection fan-out.
+
+Task-semantic fixture isolation repair 2026-09-09:
+the shared `buildCodebaseQdrantFilter()` now always excludes the two historical
+canary payload shapes with `must_not` clauses for `canary=true` and
+`source_ref=canary://task-semantic`, while preserving legacy collection and
+topology requirements. Added focused coverage in
+`sveltekit-frontend/src/lib/server/search/qdrant-search-filter.spec.ts`;
+both tests pass. The live task-semantic preflight still reports
+`missingColumnCount=0`, `qdrantStatus=proven`, and
+`applyCanaryEligible=true` with `applyAuthorized=false`. Fixtures were not
+deleted or modified; no database, Qdrant, Neo4j, or Valkey writes occurred.
+
+Source-hydration report reliability repair 2026-09-09:
+the read-only `audit-current-source-evidence-hydration-v1.mjs` previously
+failed after completing its database audit when Windows returned `UNKNOWN`
+while opening the stable report path. It now preserves the same fresh result
+under a timestamped fallback when the stable path is temporarily locked,
+matching the other currentness audits. A rerun completed successfully with
+`SOURCE_EVIDENCE_HYDRATION_BLOCKED`, 24,101 input bindings, 23,447 exact
+source-revision matches, 906 content-hydrated rows, 0 authoritative
+namespaces, 0 evidence-span-ready rows, and 0 classifier-ready rows. Missing
+reasons remain 23,195 `CANONICAL_CHUNK_OWNER_MISSING` and 906
+`CHUNK_OWNER_HAS_CONTENT_BUT_NO_SOURCE_REVISION`. `node --check` passed;
+the audit performed zero datastore or projection writes. This repairs
+observability only and does not close current Graphify ownership, source
+lineage, or projection-promotion gates.
+
+Parent Atlas export storage classification 2026-09-09:
+reviewed `scripts/atlas-parent-indexing.mjs` after the open-lanes handoff
+raised an unsigned object-store request. The script has no Postgres, SeaweedFS,
+S3, or CouchDB client path; it reads only `.opencode/cards` and the local
+outcome ledger and writes optional files under `memory/exports/parent-atlas/`.
+Its report/log wording previously called these “canonical tables” and
+recommended Redis/CouchDB promotion. That wording is now corrected to
+`DISPOSABLE_DERIVED_EXPORT`, `canonicalAuthority=false`,
+`objectStore=NOT_USED`, and explicit zero Postgres/SeaweedFS/CouchDB/cache
+writes. `node --check scripts/atlas-parent-indexing.mjs` and its bounded
+`--dry-run` passed; this checkout loaded 0 cards and 0 outcomes and performed
+no export writes. The unsigned S3 `AccessDenied` was therefore not a missing
+Parent Atlas artifact or a promotion blocker. No data was deleted or uploaded.
+
+External parity and source-authority comparison refresh 2026-09-09:
+the bounded external-document replay remains `PARITY_PROVEN_NON_CANONICAL`:
+8/8 checks pass (Python validation, TypeScript schema, normalized/content
+checksums, requested/resolved URL parity, robots approval, and
+`canonicalAuthority=false`). The SearXNG↔Go Retrieval replay separately
+remains `SEARCH_RESULT_NORMALIZATION_PROVEN_NON_CANONICAL`: all 9 checks pass,
+including both live HTTP responses, URL/source-ref shape, uniqueness, Go
+`read_only=true`, and `canonicalAuthority=false`. Neither replay writes to
+Postgres, Qdrant, Neo4j, Valkey, CouchDB, or models.
+
+The source-authority claim is not static: a fresh
+`audit-current-graphify-source-revision-v1.mjs` replay selected the same
+completed run `48485685-e773-4433-a1f8-00f5524cca44` but now reports 23,443
+`CONTENT_MATCH`, 303 `CONTENT_MISMATCH`, and 12 `SOURCE_UNAVAILABLE` rows out
+of 23,758, with all source revisions present. Therefore the earlier
+23,453/293 split is historical to that invocation and must not be reused as
+current promotion evidence. Status remains `SOURCE_BYTES_NOT_PROVEN`; current
+workspace/source ownership and canonical admission remain blocked.
+
+External-document handoff comparison refresh 2026-09-09:
+the earlier `EXTERNAL-DOC-OBSERVATION-PARITY-01` implementation is present,
+not merely proposed. A fresh `npm run atlas:docs:observation:parity` replay
+returned `PARITY_PROVEN_NON_CANONICAL` with all 8 checks true. A fresh
+`npm run atlas:docs:search-result:parity` replay returned
+`SEARCH_RESULT_NORMALIZATION_PROVEN_NON_CANONICAL` with all 9 checks true.
+The direct bounded `npx tsx scripts/docs-atlas/crawl-okf-dev-docs.mts
+--dry-run --limit=3` replay processed 3 manifest URLs with zero fetch,
+database, projection, cache, or model writes.
+
+Comparison correction: the handoff's parity and package observations remain
+aligned, but they prove only bounded non-canonical transport/capture behavior.
+`workspaceRevision` is still unbound for external observations; Go/SearXNG
+normalization is covered by a separate non-canonical receipt; Crawl4AI remains
+optional and uninstalled; active NetworkX remains 3.3 against the declared
+`>=3.4,<4` requirement. The current Graphify source replay is now
+23,443 matches, 303 mismatches, and 12 unavailable rows, so the earlier
+23,453/293 split is historical. Do not install packages, add tables, upload
+external pages, or promote them until current source/workspace authority and
+independent admission readback are proven.
+
+Graphify dry-chain safety correction 2026-09-09:
+the caller census found that `sveltekit-frontend/package.json` defined
+`graphify:daily:dry` with `graphify:materialize:apply`, despite the materializer
+having an existing dry/default entrypoint. This was a real command-boundary
+drift: a user selecting the dry chain could request addressable-packet writes
+before the later dry-run stages. The script now calls
+`graphify:materialize:dry`; the production `graphify:daily:chain` apply path was
+left unchanged. JSON parsing, an explicit command assertion, and `git diff
+--check` pass. The full daily chain was not run; no database, Qdrant, Neo4j,
+Valkey, object-store, or model writes occurred.
+
+Graphify dry-chain replay 2026-09-09:
+the corrected bounded command was executed through
+`node scripts/startup/run-atlas-phase8-fanout.mjs --dry-run --apply-through=3`
+and completed with exit code 0. Correction from the subsequent entrypoint review:
+this was a mixed apply/dry replay, because `--apply-through=3` selects the
+LangExtract, summary-ranker, and summary-envelope apply commands. The prior
+claim that the entire replay was read-only is withdrawn; zero counts from
+later stages do not prove that the first three stages performed no writes.
+Recorded output: 61,718
+packets were counted, 0 feature-envelope rows required refresh, the semantic
+bundle reported 576 input rows but `sourceAuthorityStatus=PARTIAL`, the latent
+wrapper reported 0 eligible and 0 written rows, SOM dry-run loaded 5,000 valid
+latent vectors without training, and the GDS density read passed against
+621,170 Neo4j nodes and 448,818 relationships. BitFrost applied writes were 0;
+centroid dry-run planned 64 keys plus index/meta but wrote none; Graphify draft
+skipped cleanly because llama-server was unavailable. The first replay exposed
+an `EPERM` progress-file replacement; a retry exposed that
+`atlas:phase16:gds:dry` was not passing a dry flag and targeted a shared report.
+`check-graph-density.mjs` now accepts `--dry-run` and uses a unique report path,
+and the package entrypoint passes that flag. Syntax, package JSON, direct GDS
+dry-run, and the full bounded fanout pass. Canonical promotion remains blocked
+by current Graphify/source-revision authority and source-evidence hydration.
+
+### GRAPHIFY-DRY-ENTRYPOINT-PARITY-01 — continuation 2026-09-08
+
+- [x] Route `graphify:daily:dry` through the fully dry Phase 8 alias and redirect
+  the misleading `atlas:phase8:fanout:dry:steps1-3` compatibility alias to it.
+  The explicit mixed-mode API is retained; it must not be described as read-only.
+- [x] Verify package routing and all eleven planned child commands through the
+  focused fanout test with intercepted child processes. This proves command
+  dispatch only; child implementation side effects require their own audit.
+  `npx vitest run src/lib/server/atlas/phase8-fanout.spec.ts` from the frontend
+  passed 6/6 tests. The first attempt hit Vitest's non-file `import.meta.url`;
+  loading the package JSON directly resolved that fixture setup issue.
+- [ ] Continue current-source owner admission using the existing bounded source
+  plan and lifecycle writer. A current source receipt, structural validation,
+  same-revision semantic/graph snapshots, executor parity, and independently
+  read-back bounded projection remain sequential promotion gates. Do not check
+  these off from package routing tests or a process completion marker.
+
+Source-owner follow-up: `node scripts/atlas/plan-current-source-graphify-batch-v1.mjs
+--limit=5` returned `CURRENT_GRAPHIFY_BATCH_PLAN_BLOCKED_REVIEW`: five selected
+sources, zero exact matches, five revision/content mismatches, no missing or
+ambiguous Graphify rows. This compares live database rows with the recorded
+lifecycle input bindings; it does not freshly validate those bindings' source
+bytes. Receipt: `docs/reports/current-source-graphify-batch-plan-v1.json`.
+The full-inventory lifecycle opener is a writer, not a bounded five-source
+repair. Existing coordinator canary is separately guarded and uses three
+sources; neither was invoked here.
+
+Audit limitation: `audit-graphify-lifecycle-owner-v1.mjs` emits a literal
+`transitionPrimitiveExists: false` and uses heuristic writer classification.
+That field does not establish missing implementation: `openGraphifyRunV1`
+and `bindWorkspaceRevisionV1` exist in the source-inventory writer. Current
+execution authority must be established using the snapshot selector and its
+database readback, not inferred from this static false value.
+
+### CURRENT-SOURCE-BINDING-DIAGNOSTICS-01 — 2026-09-08
+
+- [x] Extend the existing batch planner with per-field observed/expected binding
+  diagnostics. Count each mismatched field once per selected source; preserve
+  ambiguity rejection and require exact source references (case or namespace
+  aliases cannot establish exact identity). No new source owner was introduced.
+- [x] Reject invalid limits and empty cohorts; null database byte lengths cannot
+  match a zero-byte file. Eight pure Node tests pass via
+  `node --test scripts/atlas/graphify-source-binding-comparison-v1.test.mjs`.
+- [x] Replay `node scripts/atlas/plan-current-source-graphify-batch-v1.mjs --limit=5`:
+  five selected, zero exact, five mismatches, with `workspaceRevision=5` as the
+  only mismatched field. Source revision, content digest, byte length, and exact
+  source reference agree for all five rows with the recorded input bindings.
+  Report: `docs/reports/current-source-graphify-batch-plan-v1.json`.
+- [x] Independently hash those five source files using PowerShell
+  `Get-FileHash -LiteralPath <source> -Algorithm SHA256` and inspect file length:
+  all five current on-disk digests and lengths match the recorded cohort.
+  This is a bounded observation at audit time, not full-workspace authority.
+- [ ] Reconcile a current full source selection through the existing production
+  execution owner before whole-workspace admission. The snapshot selector
+  requires full source-count/binding/checksum parity and explicitly rejects
+  bounded/canary selection receipts. A three- or five-source canary may prove
+  writer behavior but cannot close this full-snapshot gate. Do not relabel it,
+  weaken selector coverage, overwrite workspace revisions on old rows, or
+  re-embed unchanged sources to manufacture admission.
+
+Implementation: `scripts/atlas/plan-current-source-graphify-batch-v1.mjs`, pure
+diagnostic helper `scripts/atlas/lib/graphify-source-binding-comparison-v1.mjs`,
+and `scripts/atlas/graphify-source-binding-comparison-v1.test.mjs`.
+The planner explicitly records `canonicalAuthority=false`,
+`sourceBytesRevalidated=false`, and `promotionAllowed=false`; its separately
+executed file-hash check above does not change those script guarantees.
+Syntax and targeted diff checks pass. Database/projection writes: zero.
+
+## PACKET-REGISTRY-WRITER-OWNERSHIP-01 (2026-09-08, read-only gate, first tranche of a larger canonical-spine plan)
+
+Operator directive (2026-09-08): Parent Atlas's remaining gaps are not another
+algorithm/reranker/cache/schema/GPU helper but three system-level invariants —
+canonical writer ownership, revision-qualified admission, and transaction
+semantics. This entry closes the first of those: which single runtime
+boundary is permitted to establish canonical `atlas_packets` identity.
+
+- [x] Built `scripts/atlas/audit-packet-registry-writer-ownership-v1.mjs`
+  (read-only; never executes a writer). Candidate discovery via
+  `rg -l -E '(INSERT INTO "?atlas_packets"?[^_]|UPDATE "?atlas_packets"?[^_]|
+  INSERT INTO "?atlas_packet_registry"?|UPDATE "?atlas_packet_registry"?)'`
+  across `scripts/`, `sveltekit-frontend/src/`, `sveltekit-frontend/scripts/`,
+  `packages/` — 107 candidate files. A narrower, stale, hand-picked 6-file
+  predecessor (`scripts/atlas/audit-registry-writer-ownership-v2.mjs`) already
+  existed but missed 101 of the real candidates, including the file that
+  turned out to be the only live-wired writer (`canonical-id-hierarchy.ts`)
+  — do not treat that v2 script's narrow WRITERS list as authoritative going
+  forward; this v1 gate supersedes it for ownership questions.
+- [x] Live parity is clean: `atlas_packets` = `atlas_packet_registry` = 61,718
+  rows, 0 missing-registry-row, 0 orphan-registry-row, 0 duplicate keys — the
+  registry population gap the operator's directive worried about does not
+  currently exist by count/key match (does not by itself prove the registry
+  is a correct projection, only that it is not currently diverged in size).
+- [x] First-pass automated classification (basename-cooccurrence heuristic)
+  found 4 `CANONICAL_WRITER_CANDIDATE`s, 2 `PRODUCTION_CAPABLE_UNOWNED`
+  runtime writers, 80 `PROJECTION_WRITER`, 21 `MIGRATION_ONLY`, 0 dead
+  orphans, 0 unresolved-identity-writers, 13 dry-run-reachable mutation paths
+  (scripts that can mutate `atlas_packets`/`atlas_packet_registry` on direct
+  invocation with no dry-run gate — listed in the receipt's
+  `dryRunReachableMutationPaths`, not executed).
+- [x] Manually verified the 4 "canonical candidates" against real import
+  statements (not basename cooccurrence) plus each file's actual write logic
+  — this found 2 false positives in the automated pass, recorded in the
+  receipt's `manualCallerVerification_2026-09-08` block:
+  - **`sveltekit-frontend/src/lib/server/topology/canonical-id-hierarchy.ts`
+    — REAL, the only verified live production writer.** 7 real callers
+    (`dispatcher-integration.ts`, `dynamic-dispatcher.ts`,
+    `go-retrieval-coordinator.ts`, `go-retrieval-facade.ts`,
+    `go-service-integration.ts`, `permission-manager.ts`,
+    `identity-worker.ts`) plus a live route
+    (`src/routes/api/retrieval/go/+server.ts`). Conflict policy is narrow:
+    `INSERT INTO atlas_packets ... ON CONFLICT (packet_key) DO UPDATE SET
+    updated_at = NOW()` (line 326) — never overwrites identity/content
+    columns on conflict. Also does separate `UPDATE atlas_packets` (lines
+    559, 607) and `DELETE FROM atlas_packets` (line 585).
+  - **`packages/atlas-core/src/validation/gan-deep-audit.ts` — FALSE
+    POSITIVE, not a writer at all.** Only reads `atlas_packets`; the
+    `UPDATE atlas_packets` regex match was a remediation-suggestion string
+    template (`remediation: 'UPDATE atlas_packets SET ganWarnings = NULL...'`),
+    never executed. Its live caller
+    (`src/routes/api/atlas/gan-audit/deep/+server.ts`) is a read-only
+    audit endpoint.
+  - **`promote-results.ts` / `promote-results-outbox.ts` — TEST_ONLY_UNOWNED.**
+    Each file's only reference anywhere in `sveltekit-frontend/src` is its
+    own `.spec.ts`. Zero production callers.
+  - **`packet-materializer-pipeline.ts` / `promotion-executor.ts` —
+    `PRODUCTION_CAPABLE_UNOWNED` confirmed, zero references anywhere.**
+    `packet-materializer-pipeline.ts` fully implements the 5-step canonical
+    truth flow (Postgres write -> Redis invalidate -> event emit) with a
+    correct `ON CONFLICT (packet_key) DO UPDATE SET <all columns> = ...`
+    (full-column overwrite) but nothing in the live app calls
+    `materializePacket()`/`materializePacketBatch()`.
+- [x] **Corrected conclusion**: exactly ONE verified live runtime canonical
+  writer exists — `canonical-id-hierarchy.ts`, reached via the Go retrieval
+  dispatch path. This satisfies "exactly one canonical owner" for identity
+  columns specifically. **But it is not a clean pass**: two fully-built,
+  production-capable, currently-unowned writers
+  (`packet-materializer-pipeline.ts`, `promotion-executor.ts`) exist with a
+  DIFFERENT conflict policy (full-column overwrite vs. `canonical-id-hierarchy.ts`'s
+  updated_at-only refresh) — if either is wired into a live caller later
+  without first reconciling conflict semantics against the file that is
+  actually canonical today, it would silently create the exact "competing
+  identity derivation" failure mode the operator's directive warned about.
+- [ ] Not done in this pass (deliberately, per "do not execute the registry
+  writer yet"): `PacketWriteDecisionV1` conflict-policy contract,
+  `CanonicalPacketWriteV1`/`RepresentationWriteV1` revision-qualified
+  admission types, the outbox/transaction-boundary design, and any decision
+  on whether `packet-materializer-pipeline.ts`/`promotion-executor.ts`
+  should be wired in (matching `canonical-id-hierarchy.ts`'s conflict
+  policy) or archived as superseded-but-never-adopted alternatives.
+- [ ] The other two 13-item dry-run-reachable-mutation-path scripts and the
+  21 `MIGRATION_ONLY` scripts were classified by heuristic (reachable via
+  package.json or a cron/startup/graphify chain reference) but not
+  individually read — this inventory is a starting point for
+  `PACKET-WRITE-REVISION-CONTRACT-01`, not a closed audit of each one.
+
+Report: `docs/reports/packet-registry-writer-ownership-v1.json`. Script:
+`scripts/atlas/audit-packet-registry-writer-ownership-v1.mjs`. Zero writes
+performed; zero writer scripts executed. Next gate per operator's own
+sequencing: `PACKET_WRITE_REVISION_CONTRACT_01` — do not execute a registry
+writer or backfill until that contract and the transaction/outbox design
+exist.
+
+## PACKET-REGISTRY-WRITER-OWNERSHIP-01 — CORRECTION (2026-09-08, same session, supersedes the "exactly one canonical writer" conclusion above)
+
+The entry above this one concluded `canonical-id-hierarchy.ts` was the one
+verified live canonical writer. **That conclusion was wrong**, caught by
+checking the actual write-function call sites (not module-level import
+cooccurrence) and by re-running discovery to also catch Drizzle-ORM writers,
+which the original grep-for-literal-SQL discovery command structurally
+cannot see.
+
+- [x] `canonical-id-hierarchy.ts`'s actual write functions
+  (`persistIDHierarchyToPostgres`, `softDeletePacket`,
+  `approveAndPermanentlyDelete`, `undeletePacket`) have **zero callers
+  anywhere in the repo** (checked with `rg --no-ignore --hidden` across the
+  whole tree, not just `sveltekit-frontend/src` — covers `scripts/`, `.tmp/`,
+  and gitignored paths per the operator's explicit ask this session). The 7
+  files credited as "callers" in the prior entry only import types, a Zod
+  schema, and the pure validator `validateCanonicalEnvelope()` — never the
+  write functions. Reclassified `PRODUCTION_CAPABLE_UNOWNED`, same bucket as
+  `packet-materializer-pipeline.ts` and `promotion-executor.ts`.
+- [x] The original candidate-discovery command (`rg` for literal `INSERT
+  INTO`/`UPDATE` SQL text) structurally cannot see Drizzle-ORM writers —
+  Drizzle generates SQL programmatically (`.insert(atlasPackets).values(...)`,
+  `.update(atlasPackets).set(...)`), no literal SQL string appears in source.
+  A follow-up grep for `\.(insert|update)\(atlasPackets\)` found 8 more
+  candidate files the v1 gate never classified: `som-clustering.ts`,
+  `mcp-tool-implementations.ts`, `semantic-packet-writer.ts`,
+  `packet-summary-pipeline.ts`, `hyperrag-packet-pipeline.ts`,
+  `feature-label-enricher.ts`, `summary-freshness-checker.ts`,
+  `workers/identity-worker.ts`. **This is a real gap in the gate's own
+  methodology**, not just a missed file — any future re-run of this gate
+  must discover candidates via both raw-SQL grep AND ORM-call-pattern grep
+  (or better, an AST-based import/call-graph pass), never raw-SQL grep alone.
+- [x] Verified 3 real, live, currently-wired writers of `atlas_packets`
+  (function-call-site checked, not basename cooccurrence):
+  - **`semantic-packet-writer.ts::persistCanonicalSemanticPacketEmbedding`**
+    — caller: `src/routes/api/admin/batch-embeddings/embed/+server.ts` (live
+    route). `INSERT ... .values({ packetKey, sourceRef, featureId,
+    sourcePath, ... })` — the only one of the three confirmed to create new
+    identity (`packet_key`/`source_ref`/`feature_id`) rather than only
+    update an existing row.
+  - **`packet-summary-pipeline.ts::runPacketSummaryPipeline` /
+    `runPacketSummaryPipelineBatch`** — caller:
+    `src/routes/api/atlas/summary/+server.ts` (live route). `UPDATE ...
+    WHERE packetKey = input.packet_key` — summary/content update on an
+    existing row only, not identity creation. Legitimate non-competing
+    projection writer.
+  - **`mcp-tool-implementations.ts::toolIdentityRecover`** — caller:
+    `src/mcp/server.ts` (live 108-tool MCP registry, agent-triggered).
+    `UPDATE ... WHERE packet_key = input.packet_key`, SETting
+    `source_ref`, `file_path`, `feature_id`, `feature_label`,
+    `domain_class`, `title_id`, `tree_node_id` — an identity-field REPAIR
+    path on an existing row. Real, but able to overwrite the same identity
+    columns `semantic-packet-writer.ts` establishes on create, with no
+    visible coordination between the two — this is the actual residual
+    "uncoordinated owner" risk, not a 4-way collision as first miscounted
+    and not a clean 1-writer pass as second miscounted.
+- [x] Checked whether the Parent Atlas Studio admin surface
+  (`sveltekit-frontend/src/routes/api/atlas/studio/{cards,cards/[id],
+  redis,search}/+server.ts`, real routes, confirmed to exist) calls any of
+  these writers — it does not reference `atlasPackets`/`atlas_packets`,
+  `canonical-id-hierarchy`, `semantic-packet-writer`,
+  `packet-summary-pipeline`, or `identity-worker` at all. Consistent with
+  the operator's own framing: Studio is still being built out, not yet
+  wired to packet mutation. Not a caller.
+- [x] Confirmed dormant, zero callers repo-wide (src + `--no-ignore
+  --hidden` full-tree check): `canonical-id-hierarchy.ts`,
+  `identity-worker.ts` (`processPacketIdentity`),
+  `feature-label-enricher.ts` (`enrichPacketWithLabels`),
+  `summary-freshness-checker.ts` (`recordSummaryGeneration`),
+  `hyperrag-packet-pipeline.ts` (`createHyperRAGPacketPipeline`,
+  `enqueuePacketProjectionRequests`), `som-clustering.ts`
+  (`findBMUBatch`, referenced once by `som-clustering-cuda.ts`, which
+  itself has zero callers), `packet-materializer-pipeline.ts`,
+  `promotion-executor.ts`.
+- [ ] Not resolved: whether `toolIdentityRecover`'s identity-field
+  overwrite and `semantic-packet-writer.ts`'s identity-creation logic can
+  disagree on derivation (e.g. different `feature_id`/`title_id`
+  derivation rules) for the same `packet_key`. This is the concrete,
+  narrowed version of `PACKET_WRITE_REVISION_CONTRACT_01`'s conflict-policy
+  work — resolve it there, not by guessing here.
+
+Receipt updated in place:
+`docs/reports/packet-registry-writer-ownership-v1.json`
+(`CORRECTION_2026-09-08` field). Zero writes performed; zero writer scripts
+executed in the course of this correction.
+
+## PACKET-REGISTRY-WRITER-OWNERSHIP-01 — SECOND CORRECTION (2026-09-08, same session, corrects the "toolIdentityRecover overwrites identity fields" claim in the CORRECTION entry directly above)
+
+The CORRECTION entry above this one claimed `toolIdentityRecover` writes
+`source_ref`, `file_path`, `feature_id`, `feature_label`, `domain_class`,
+`title_id`, `tree_node_id` on an existing row, and flagged that as an
+uncoordinated-owner risk against `semantic-packet-writer.ts`. **That claim
+was wrong** — caused by quoting the wrong function. A background-task prompt
+asked for `toolIdentityRecover`'s write scope, and the `sed`-extracted line
+range actually captured the tail of `toolIdentityRecoverImpl` plus the full
+body of the *next* function in the file, `toolEnvelopeValidateImpl` — and the
+`requiredFields` / `.set(...)` code quoted as evidence was
+`toolEnvelopeValidateImpl`'s, not `toolIdentityRecoverImpl`'s.
+
+- [x] Read `toolIdentityRecoverImpl` directly (lines 129-218 of
+  `mcp-tool-implementations.ts`, not the line range used in the mis-read).
+  It calls `resolveCanonicalPacketKey(input.packet_key)` — the same
+  canonical resolver `semantic-packet-writer.ts`'s
+  `resolvePersistedPacketKey()` also calls — then does `UPDATE ... SET {
+  identity_lane, identity_confidence, updated_at } WHERE packetKey =
+  canonical_packet_key`. It never writes `source_ref`, `feature_id`,
+  `feature_label`, `title_id`, `tree_node_id`, or `domain_class`. It is a
+  narrow confidence/lane annotator only.
+- [x] `toolEnvelopeValidateImpl` (the function actually quoted by mistake)
+  is a separate, 4th live writer, previously unlisted: caller is the same
+  live MCP registry (`src/mcp/server.ts`), writes only `{ identity_confidence,
+  updated_at }` — also narrow, also no identity-column overlap with
+  `semantic-packet-writer.ts`.
+- [x] Re-derived the real conclusion: there is **no identity-field write
+  overlap** between the 3 (now 4, counting `toolEnvelopeValidate`) live
+  writers. `semantic-packet-writer.ts` is the sole writer of
+  `source_ref`/`feature_id`/`feature_label`/`directoryPath`.
+  `packet-summary-pipeline.ts` only touches summary-related columns.
+  `toolIdentityRecover` and `toolEnvelopeValidate` only touch
+  `identity_lane`/`identity_confidence`/`updated_at`. The "uncoordinated
+  owner" risk asserted in the prior CORRECTION entry does not hold up.
+- [x] **Gate result, now grounded in verified code, not inference**:
+  `PACKET_REGISTRY_WRITER_OWNERSHIP_01` **passes** for the live writer set —
+  disjoint write scopes, and the two writers that do resolve `packet_key`
+  (`semantic-packet-writer.ts`, `toolIdentityRecover`) both route through the
+  same shared `resolveCanonicalPacketKey()` function rather than each
+  deriving it independently.
+- [ ] The real residual risk is unchanged in kind but now correctly scoped:
+  not a live conflict, but that 5 dormant, differently-designed writers
+  (`canonical-id-hierarchy.ts`, `packet-materializer-pipeline.ts`,
+  `promotion-executor.ts`, `identity-worker.ts`, and the
+  hyperrag/feature-label/summary-freshness/som-clustering group) could be
+  wired in later without reconciling conflict semantics against the live
+  set — `packet-materializer-pipeline.ts` in particular does a full-column
+  overwrite on conflict, unlike `semantic-packet-writer.ts`'s explicit,
+  narrow field list.
+
+**Process note for future sessions**: this is the second self-correction on
+the same underlying question in one sitting. Both times the fix was the
+same discipline — reading the actual function body at its real line range
+rather than trusting a background-task's own summarized quote of it. Treat
+any claim about what a specific function writes as unverified until the
+function's own source has been read directly in this context, not relayed
+through an intermediate description.
+
+Receipt updated in place:
+`docs/reports/packet-registry-writer-ownership-v1.json` (renamed the prior
+`correctedConclusion` field to `correctedConclusion_v2` with the corrected
+text, preserving the wrong version nowhere — the old field name no longer
+exists in the file, replaced in place). Zero writes performed.
+
+## PACKET_REGISTRY_WRITER_OWNERSHIP_01B — AST mutation-site census + hand verification (2026-09-08, same session, third and final round on this question)
+
+Operator directive: reopen P0 at function/mutation-site granularity, not
+module-import granularity, since two prior corrections in this same session
+(above) showed module-level and even function-name-cooccurrence checks
+produce false confidence. Built
+`scripts/atlas/audit-mutation-site-census-v1.mjs` using ts-morph (real AST,
+not regex) to extract every `.insert(atlasPackets)`/`.update(atlasPackets)`/
+registry-equivalent call, its exact enclosing function by AST ancestry, and
+the columns/conflict-policy/where-predicate it touches, across the 13
+production `sveltekit-frontend/src` files this session's writer sweeps
+surfaced. Standalone `scripts/` one-shot writers were left at the v1 gate's
+file-reachability granularity (defensible for CLI-only scripts).
+
+- [x] First AST run found a real bug in the script itself: the
+  enclosing-function walker stopped at the first `VariableDeclaration`
+  ancestor regardless of what it held, so `const updated = await
+  db.update(...)` inside `toolIdentityRecoverImpl` produced the fabricated
+  function name "updated" for 5 real mutation sites in
+  `mcp-tool-implementations.ts`. Searching for callers of "updated(" then
+  matched an unrelated `onupdated()` Svelte callback in
+  `CitationSearch.svelte:80` and reported it as a caller of a database
+  write it has nothing to do with -- verified false by reading the actual
+  line (a prop-callback invocation, no relation to Postgres). Fixed the
+  walker to only stop at a VariableDeclaration when its initializer is
+  actually a function/arrow value, not any local result binding -- re-ran,
+  the fabricated caller disappeared and the 5 sites resolved to their real
+  enclosing functions.
+- [x] Re-run surfaced a second, different false positive, not caught by
+  the walker fix: `hyperrag-packet-pipeline.ts::materializePackets` (a real
+  INSERT with onConflictDoUpdate(packetKey) writing packetKey, featureId,
+  sourceRef, canonicalSourceRef, titleId, featureLabel, directoryPath) was
+  classified CANONICAL_WRITER with 4 "callers" -- but ace-materializer.ts:309
+  and packet-parser.ts:117 each define their OWN unrelated function of the
+  same name (materializePackets), never importing this file. Verified by
+  direct read of both (one is a local batch wrapper, the other is a Rust
+  N-API MessagePack chunker -- not a DB write at all) and by a repo-wide
+  grep for actual import statements of 'hyperrag-packet-pipeline' (zero
+  functional importers -- only a metadata/catalog string in
+  runtime-registry.ts). This exact false-positive pattern was already found
+  and documented in an earlier, separate session's script
+  (`scripts/atlas/prove-bitfrost-invalidation-owner-v1.mjs` lines 202, 234)
+  -- independent confirmation this file's writer is genuinely dormant, not
+  a coincidence of this session's methodology.
+- [x] Checked the inverse risk too -- a false negative from wrapper
+  indirection. The 4 mcp-tool-implementations.ts sites the walker-fix
+  correctly renamed (toolIdentityRecoverImpl, toolEnvelopeValidateImpl,
+  toolMirrorSyncQdrantImpl, toolMirrorSyncNeo4jImpl) still showed zero
+  callers in the script's output -- because each is wrapped via
+  withMcpToolTelemetry(...) and exported under a DIFFERENT name
+  (toolIdentityRecover, toolEnvelopeValidate, toolMirrorSyncQdrant,
+  toolMirrorSyncNeo4j), and it's the wrapped name src/mcp/server.ts
+  actually imports and calls. Verified directly: server.ts:18 imports all
+  5 wrapped names; real call sites at lines 2370, 2390, 2418, 2443. These 4
+  are genuinely live. The 5th, toolIdentityQuarantine (wrapping
+  toolIdentityQuarantineImpl, line 739 site), is imported at the same
+  line 18 but never actually called anywhere in server.ts -- checked
+  directly, zero toolIdentityQuarantine( call sites. Confirmed dormant,
+  unlike its siblings.
+- [x] Final, hand-verified result (recorded in
+  `docs/reports/packet-registry-writer-ownership-01b-mutation-census-v1.json`'s
+  HAND_VERIFICATION_CORRECTION_2026-09-08 block, which corrects the raw
+  script output in place rather than replacing it):
+  - Exactly ONE live canonical identity-creating writer:
+    `semantic-packet-writer.ts::persistCanonicalSemanticPacketEmbedding`
+    (caller: `api/admin/batch-embeddings/embed/+server.ts`). Writes
+    packetKey/sourceRef/featureId/featureLabel/directoryPath.
+  - 5 live, narrow, non-identity metadata/representation writers, all
+    with disjoint column scopes and zero overlap with the identity
+    writer's columns: `packet-summary-pipeline.ts::runPacketSummaryPipeline`
+    (summary), and the 4 real MCP-tool-wired functions above
+    (identity_lane/identity_confidence/qdrant_point_id/updated_at
+    only -- never source_ref/feature_id/packet_key creation).
+  - 8 confirmed dormant (PRODUCTION_CAPABLE_UNOWNED):
+    `canonical-id-hierarchy.ts`, `packet-materializer-pipeline.ts`,
+    `promotion-executor.ts`, `identity-worker.ts::processPacketIdentity`,
+    `feature-label-enricher.ts::enrichPacketWithLabels`,
+    `summary-freshness-checker.ts::recordSummaryGeneration`,
+    `hyperrag-packet-pipeline.ts::materializePackets`, and
+    mcp-tool-implementations.ts's unused toolIdentityQuarantine.
+  - 2 test-only: `promote-results.ts`, `promote-results-outbox.ts`.
+  - Gate result: PACKET_REGISTRY_WRITER_OWNERSHIP_01B PASSES --
+    canonicalIdentityRuntimeWriters = 1, no competing identity derivation
+    among the live writer set, disjoint write scopes confirmed at the
+    column level (AST-extracted, not inferred).
+- [x] Fixed the script's own bugs where found (the VariableDeclaration
+  walker issue) but did not generalize the fix for the two remaining
+  known gaps -- bare function-name text matching still cannot by itself
+  distinguish same-named-different-file functions (the materializePackets
+  case) from a wrapped/re-exported call chain (the MCP-tool case). Both
+  were caught by hand-reading real call sites, not by the script. Flagged
+  as a known limitation for any future re-run of this gate: a correct
+  general fix needs either (a) requiring a real import statement resolving
+  to the specific file before crediting a caller, or (b) full ts-morph
+  project-wide reference resolution (findReferences()), not text-matching a
+  function name -- deferred, not attempted this session given the
+  4600+2600-file project load cost.
+
+Process note, worth keeping: this is the third self-correction round on
+the same underlying ownership question in one session -- module-level
+cooccurrence (wrong) -> function-level manual read (right, but one
+mis-attributed quote along the way, also caught and fixed) -> AST mutation
+census (two more false readings, both caught by hand-verification before
+being reported as final). Each round used a more rigorous method than the
+last, and each still needed direct verification of its output rather than
+being trusted on its own. That pattern -- new tooling raises confidence but
+does not replace reading the actual call site -- is the operationally
+important lesson for the rest of the canonical-spine work ahead (P1 revision
+contract, P2 transaction/outbox, P3+ chunk/symbol lineage), not just this
+one gate.
+
+Receipts: `docs/reports/packet-registry-writer-ownership-01b-mutation-census-v1.json`
+(script output + HAND_VERIFICATION_CORRECTION_2026-09-08 block).
+Script: `scripts/atlas/audit-mutation-site-census-v1.mjs` (fixed in place,
+one known bug remaining, documented above). Zero writes performed; zero
+writer scripts executed.
+
+## PACKET_WRITE_REVISION_CONTRACT_01 (2026-09-08, same session, read-only, answers the specific ownership-conflict question)
+
+Operator's specific question: can `semantic-packet-writer.ts::persistCanonicalSemanticPacketEmbedding`
+(the confirmed sole CANONICAL_WRITER) and `mcp-tool-implementations.ts::toolIdentityRecover`
+(a confirmed live metadata mutator) produce contradictory identity state for
+the same `packet_key`? Built `scripts/atlas/audit-packet-write-revision-contract-v1.mjs`
+(read-only, one live-schema query + one live-data census, zero writes) to
+answer with fresh evidence rather than extending the already-hand-verified
+column lists from the 01B gate by inference.
+
+- [x] **Direct answer: NO, not currently.** `toolIdentityRecover`'s actual
+  `UPDATE .set()` only ever touches `identity_lane`, `identity_confidence`,
+  `updated_at` — confirmed twice already this session by direct source
+  read. It accepts `source_ref` and `feature_id` as **required** Zod input
+  fields but never writes them anywhere. Zero column overlap with what
+  `semantic-packet-writer.ts` creates (`packetKey`, `sourceRef`,
+  `featureId`, `featureLabel`, `directoryPath`). `conflictPolicySafe: true`.
+- [x] **Correction to the operator's own premise** (carried over from an
+  externally-pasted log): the claim "toolIdentityRecover ... can overwrite
+  identity related fields on an existing packet_key" does not match the
+  verified code. Flagged this directly rather than silently building
+  conflict-resolution machinery around a conflict that doesn't exist in the
+  current implementation.
+- [x] **Real, different problem found instead**: `toolIdentityRecover`'s
+  Zod schema requires `source_ref`/`feature_id` as input but the function
+  silently discards them — dead input fields on a tool whose name promises
+  identity repair it doesn't perform. Two explanations, neither resolved
+  here: (a) genuinely incomplete implementation (should compare-and-repair
+  using those inputs but doesn't), or (b) intentionally required as
+  proof-of-caller-knowledge with no actual use — but no
+  read-compare-reject-if-mismatched logic exists either way. Left as an
+  open item, not guessed at.
+- [x] **Load-bearing schema finding**: queried live `information_schema.columns`
+  directly (not the Drizzle schema file) — **`source_revision` does not
+  exist in the live `atlas_packets` table**, despite the Drizzle schema
+  file declaring `sourceRevision: text('source_revision')`
+  (`schema/atlas-packets.ts:76`). This is schema/DB drift matching this
+  repo's own extensively documented history (root `CLAUDE.md`'s Drizzle
+  Safety Rule section). **Consequence**: the operator's entire
+  `CanonicalPacketWriteV1.sourceRevision` /
+  `expectedCurrentSourceRevision` / `STALE_REVISION` design cannot be
+  implemented as literally specified against the live table today. This
+  needs an explicit decision — (a) migrate to add `source_revision`, or (b)
+  formally redefine revision-qualification evidence onto
+  `workspace_revision` + `content_hash` (both of which DO exist live) and
+  document that redefinition — before writing any enforcement code.
+- [x] **Checked a real hypothesis and ruled it out with evidence**: does
+  `semantic-packet-writer.ts`'s `ON CONFLICT (packetId)` target (not
+  `packetKey`) risk silent duplicate-identity rows if a caller ever
+  supplies a distinct `packetId` for an existing `packetKey`? No —
+  `packet_key` carries its own live `UNIQUE` constraint
+  (`atlas_packets_packet_key_key`), independent of the `ON CONFLICT`
+  clause. Worst case is a raised `UNIQUE VIOLATION` error, not silent
+  corruption. Safe failure mode, confirmed via `pg_constraint`, not assumed.
+- [x] **Live data census** (61,718 rows): `distinct_workspace_revisions = 1`
+  — every row shares the exact same `workspace_revision` value (the schema
+  default, `0`). The column exists and is `NOT NULL`, but has never
+  actually been incremented in this dataset — a second dormant-mechanism
+  finding, same shape as the writer-ownership gaps already closed this
+  session. `content_hash` is 99.4% NULL (61,365/61,718) and
+  `lineage_version` is 99.997% NULL (61,716/61,718) — both exist as
+  columns but carry essentially no real data yet. None of the three live
+  revision-adjacent columns currently holds populated, exercised revision
+  evidence at scale.
+- [x] **`packetKeyIdentitySemantics` resolved from schema, not inferred**:
+  `LOGICAL_STABLE_ACROSS_REVISIONS_BY_NECESSITY` — with no `source_revision`
+  column and a live `UNIQUE(packet_key)` constraint, the schema permits at
+  most one row per `packet_key` regardless of how many times its source
+  content changes. There is no schema-level mechanism today for holding
+  multiple revision-qualified rows under the same logical `packet_key`.
+- [x] **Column classification** (operator's HARD_CANONICAL / STRUCTURAL_IDENTITY
+  / DERIVED_CLASSIFICATION buckets), checked against live columns:
+  `packet_key`/`source_ref`/`workspace_revision` exist under
+  HARD_CANONICAL, `source_revision` is the one missing member;
+  `tree_node_id` exists under STRUCTURAL_IDENTITY, `symbol_version_id`
+  does not exist yet (matches the operator's own P5
+  `SYMBOL_VERSION_RESOLUTION_01` being still-future work); all of
+  `feature_id`/`feature_label`/`title_id`/`domain_class` exist under
+  DERIVED_CLASSIFICATION.
+- [x] **Overall verdict: `PARTIAL_PROVEN`**, not `NOT_PROVEN` and not
+  `BLOCKED`. The specific ownership-conflict question this gate was
+  reopened to answer has a direct, evidence-backed answer
+  (`conflictPolicySafe = true`, `packetKeyIdentitySemanticsProven = true`
+  by necessity). But `revisionInputsProven`,
+  `allLiveCallersRevisionQualified`, and `mutationPathsRevisionGuarded`
+  are all `false` because the column the whole revision-qualification
+  design depends on doesn't exist live yet — these can't be `true` until
+  that schema gap is resolved one way or the other, which is a genuine
+  decision point, not something to resolve by assumption.
+
+**Not done this pass** (deliberately — this was scoped as read-only,
+per the operator's own "make this gate read only first"): no
+`PacketIdentityDecisionV1`/`PacketWriteDecisionV1`/`PacketIdentityRepairV1`
+TypeScript contracts written yet, no migration proposed, no code changed in
+`toolIdentityRecover` or `semantic-packet-writer.ts`. The next real step is
+the schema decision flagged above (add `source_revision`, or formally
+redefine revision evidence onto `workspace_revision`+`content_hash`) —
+that decision should come from the operator, not be assumed here, since it
+determines the literal shape of every contract type downstream.
+
+Receipt: `docs/reports/packet-write-revision-contract-v1.json`. Script:
+`scripts/atlas/audit-packet-write-revision-contract-v1.mjs`. Zero writes
+performed.

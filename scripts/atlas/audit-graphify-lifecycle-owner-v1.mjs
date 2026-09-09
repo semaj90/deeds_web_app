@@ -45,7 +45,7 @@ function findLifecyclePaths() {
   try {
     listing = execFileSync('rg', ['-l', 'graphify_runs', 'scripts/atlas', 'sveltekit-frontend/src', 'packages', '--glob', '!**/node_modules/**', '--glob', '!docs/**'], { cwd: root, encoding: 'utf8', maxBuffer: 8 * 1024 * 1024 });
   } catch { return []; }
-  return listing.split(/\r?\n/).filter(Boolean).map((relativePath) => {
+  return listing.split(/\r?\n/).filter(Boolean).filter((relativePath) => !/(?:\.spec\.|\.test\.|__tests__[\\/])/i.test(relativePath)).map((relativePath) => {
     const text = readFileSync(path.join(root, relativePath), 'utf8');
     return { path: relativePath.replaceAll('\\', '/'), classification: classifyLifecyclePath(relativePath, text), mutationSignals: [...text.matchAll(/(?:UPDATE|INSERT\s+INTO)\s+[^\n;]*graphify_runs/gi)].map((match) => match[0].slice(0, 180)) };
   }).filter((entry) => entry.classification);
@@ -64,7 +64,7 @@ try {
   columns = columnResult.rows.map((row) => row.column_name);
   const wanted = ['run_id', 'workspace_id', 'workspace_revision', 'repository_revision', 'graph_revision', 'source_manifest_digest', 'source_manifest_source_count', 'status', 'dry_run', 'started_at', 'last_heartbeat_at', 'completed_at'].filter((name) => columns.includes(name));
   if (wanted.length > 0) {
-    const result = await pool.query(`SELECT ${wanted.map((name) => `"${name}"`).join(', ')} FROM public.graphify_runs WHERE status = 'RUNNING' ORDER BY started_at ASC NULLS FIRST, run_id`);
+    const result = await pool.query(`SELECT ${wanted.map((name) => `"${name}"`).join(', ')} FROM public.graphify_runs ORDER BY started_at ASC NULLS FIRST, run_id`);
     runs = result.rows;
     const statuses = await pool.query(`SELECT DISTINCT status::text AS status FROM public.graphify_runs ORDER BY status::text`);
     statusValues = statuses.rows.map((row) => row.status);
@@ -78,11 +78,13 @@ try {
 const lifecyclePaths = findLifecyclePaths();
 const mutationOwners = lifecyclePaths.filter((entry) => entry.classification === 'LEGACY_WRITER');
 const owner = mutationOwners.length === 1 ? mutationOwners[0].path : null;
-const runningRunCount = runs.length;
+const runningRunCount = runs.filter((run) => run.status === 'RUNNING').length;
 const portfolio = runs.map((run) => {
   const distance = commitDistance(run.repository_revision, headRevision);
   const activeWorkerEvidence = false;
-  const currentAuthorityEvidence = Boolean(run.repository_revision && headRevision && run.repository_revision === headRevision);
+  const currentAuthorityEvidence = run.status === 'COMPLETED'
+    && Boolean(run.completed_at)
+    && Boolean(run.repository_revision && headRevision && run.repository_revision === headRevision);
   const namespaceStatus = namespaceReport?.status === 'WORKSPACE_SOURCE_NAMESPACE_PROVEN' ? 'PROVEN' : 'UNRESOLVED';
   return {
     runId: run.run_id,

@@ -1,0 +1,101 @@
+{
+  "schema": "atlas.addressable-packet-materializer-ownership.v1",
+  "generatedAt": "2026-09-09T00:56:34.459Z",
+  "readOnly": true,
+  "status": "ROOT_MATERIALIZER_ENTRYPOINT_PROVEN_LOCAL_COPY_NOT_ENTRYPOINT",
+  "canonicalArtifactOwner": "scripts/atlas/materialize-addressable-packets.mjs",
+  "candidates": [
+    {
+      "path": "scripts/atlas/materialize-addressable-packets.mjs",
+      "exists": true,
+      "sourceChecksum": "sha256:8003442ab52463b3c6ca1ad66c6f2fd1241b4d5e3e4eb7da1a9bebd40b3c6895",
+      "hasApplyFlag": true,
+      "hasDryRunBranch": true,
+      "readsDatabase": true,
+      "writesDatabase": false,
+      "writesFiles": true,
+      "hasTransactionMarkers": false,
+      "staticScope": "FILE_ARTIFACT_WRITER"
+    },
+    {
+      "path": "sveltekit-frontend/scripts/atlas/materialize-addressable-packets.mjs",
+      "exists": true,
+      "sourceChecksum": "sha256:d841e1862df41529166b941f8c7b51d6f11c72d0bd385f30d5ffccef2582a12d",
+      "hasApplyFlag": true,
+      "hasDryRunBranch": true,
+      "readsDatabase": true,
+      "writesDatabase": false,
+      "writesFiles": true,
+      "hasTransactionMarkers": false,
+      "staticScope": "FILE_ARTIFACT_WRITER"
+    }
+  ],
+  "packageEntrypoints": [
+    {
+      "package": "root",
+      "name": "atlas:addressable-packets:ownership",
+      "command": "node scripts/atlas/audit-addressable-packet-materializers-v1.mjs"
+    },
+    {
+      "package": "sveltekit-frontend",
+      "name": "atlas:addressable-packets:materialize",
+      "command": "node ../scripts/atlas/materialize-addressable-packets.mjs"
+    },
+    {
+      "package": "sveltekit-frontend",
+      "name": "atlas:addressable-packets:materialize:apply",
+      "command": "node ../scripts/atlas/materialize-addressable-packets.mjs --apply"
+    },
+    {
+      "package": "sveltekit-frontend",
+      "name": "graphify:materialize",
+      "command": "node ../scripts/atlas/materialize-addressable-packets.mjs"
+    },
+    {
+      "package": "sveltekit-frontend",
+      "name": "graphify:materialize:dry",
+      "command": "node ../scripts/atlas/materialize-addressable-packets.mjs"
+    },
+    {
+      "package": "sveltekit-frontend",
+      "name": "graphify:materialize:apply",
+      "command": "node ../scripts/atlas/materialize-addressable-packets.mjs --apply"
+    }
+  ],
+  "resolvedEntrypoints": {
+    "rootMaterializer": [
+      {
+        "package": "sveltekit-frontend",
+        "name": "atlas:addressable-packets:materialize",
+        "command": "node ../scripts/atlas/materialize-addressable-packets.mjs"
+      },
+      {
+        "package": "sveltekit-frontend",
+        "name": "atlas:addressable-packets:materialize:apply",
+        "command": "node ../scripts/atlas/materialize-addressable-packets.mjs --apply"
+      },
+      {
+        "package": "sveltekit-frontend",
+        "name": "graphify:materialize",
+        "command": "node ../scripts/atlas/materialize-addressable-packets.mjs"
+      },
+      {
+        "package": "sveltekit-frontend",
+        "name": "graphify:materialize:dry",
+        "command": "node ../scripts/atlas/materialize-addressable-packets.mjs"
+      },
+      {
+        "package": "sveltekit-frontend",
+        "name": "graphify:materialize:apply",
+        "command": "node ../scripts/atlas/materialize-addressable-packets.mjs --apply"
+      }
+    ],
+    "sveltekitLocalMaterializer": []
+  },
+  "interpretation": {
+    "root": "The root materializer is the package-referenced addressable packet artifact writer; its --apply path publishes NDJSON/manifest outputs and is not a registry SQL writer.",
+    "sveltekitLocal": "The SvelteKit-local copy is not referenced by the discovered package commands; retain as an audit candidate until a separate archive decision is made.",
+    "registryBoundary": "Neither addressable materializer is admitted as the canonical atlas_packet_registry writer by this audit."
+  },
+  "writesPerformed": false
+}

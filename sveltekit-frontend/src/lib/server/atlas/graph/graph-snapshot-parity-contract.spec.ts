@@ -107,4 +107,37 @@ describe('graph snapshot parity contract', () => {
 			})
 		).toThrow();
 	});
+
+	it.each([
+		['networkx', 'orderedDuplicateEdges'],
+		['networkx', 'reciprocalEdgePairs'],
+		['networkx', 'duplicateUnorderedPairs'],
+		['cugraph', 'orderedDuplicateEdges'],
+		['cugraph', 'reciprocalEdgePairs'],
+		['cugraph', 'duplicateUnorderedPairs']
+	] as const)('preserves %s %s warnings despite a clean caller summary', (backendName, field) => {
+		const clean = { orderedDuplicateEdges: 0, reciprocalEdgePairs: 0, duplicateUnorderedPairs: 0 };
+		const summaries = {
+			networkx: { ...backend, edgeProjectionDiagnostics: { ...clean } },
+			cugraph: { ...backend, backend: 'cugraph' as const, edgeProjectionDiagnostics: { ...clean } }
+		};
+		summaries[backendName].edgeProjectionDiagnostics[field] = 1;
+		const receipt = buildGraphSnapshotParityReceipt({
+			graphRevision: manifest.graphRevision,
+			artifactPaths,
+			manifest,
+			...summaries,
+			edgeProjectionDiagnostics: clean,
+			componentCount: 42,
+			pagerankTopKOverlap: 1,
+			pagerankCorrelation: 1,
+			pagerankMaxDelta: 0,
+			louvainCommunityAgreement: 1,
+			excludedNodeCount: 0,
+			excludedEdgeCount: 0,
+			unresolvedCount: 0
+		});
+		expect(receipt.status).toBe('PARTIAL');
+		expect(receipt[backendName].edgeProjectionDiagnostics?.[field]).toBe(1);
+	});
 });

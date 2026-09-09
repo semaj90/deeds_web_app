@@ -1,0 +1,64 @@
+{
+  "schema": "atlas.external-doc-observation-parity.v1",
+  "status": "PARITY_PROVEN_NON_CANONICAL",
+  "url": "https://docs.searxng.org/dev/search_api.html",
+  "sourceRevision": "fixture:external-doc-observation-parity-v1",
+  "sourceRevisionProvided": true,
+  "fetcher": "BEAUTIFULSOUP_HTTP",
+  "parser": "html.parser",
+  "parserVersion": "4.15.0",
+  "robots": {
+    "status": "ALLOWED",
+    "robotsUrl": "https://docs.searxng.org/robots.txt",
+    "crawlDelay": null,
+    "requestRate": null
+  },
+  "checks": {
+    "pythonValidation": true,
+    "tsSchema": true,
+    "normalizedChecksum": true,
+    "contentParity": true,
+    "requestedUrlParity": true,
+    "resolvedUrlParity": true,
+    "canonicalAuthorityFalse": true,
+    "robotsAllowed": true
+  },
+  "python": {
+    "schema": "atlas.okf-beautifulsoup-capture.v1",
+    "validationExitCode": 0,
+    "validationResponse": {
+      "schema": "atlas.okf-beautifulsoup-capture.v1",
+      "status": "VALIDATED",
+      "fetcher": "BEAUTIFULSOUP_HTTP",
+      "resolvedUrl": "https://docs.searxng.org/dev/search_api.html",
+      "contentChecksum": "5c1da614ce00254c0d06c9a2ba72f875c8ccad7a59c3dd910ae483dd7c2ecce9",
+      "parser": "html.parser",
+      "parserVersion": "4.15.0",
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    "normalizedChecksum": "5c1da614ce00254c0d06c9a2ba72f875c8ccad7a59c3dd910ae483dd7c2ecce9"
+  },
+  "typescript": {
+    "schema": "atlas.external-doc-page-capture.v1",
+    "captureId": "parity:5c1da614ce00254c0d06c9a2ba72f875",
+    "normalizedChecksum": "5c1da614ce00254c0d06c9a2ba72f875c8ccad7a59c3dd910ae483dd7c2ecce9"
+  },
+  "admission": {
+    "workspaceRevision": null,
+    "postgresAdmissionAttempted": false,
+    "qdrantProjectionAttempted": false,
+    "neo4jProjectionAttempted": false,
+    "valkeyProjectionAttempted": false,
+    "canonicalAuthority": false
+  },
+  "gaps": [
+    "workspaceRevision is not supplied by the Python capture and remains required before canonical admission",
+    "Go/SearXNG normalized-result parity is not exercised by this page-capture fixture",
+    "no Postgres or projection readback was attempted"
+  ],
+  "generatedAt": "2026-09-09T02:06:59.004Z",
+  "writesPerformed": false,
+  "databaseWritesPerformed": false,
+  "projectionWritesPerformed": false
+}

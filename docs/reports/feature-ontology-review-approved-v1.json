@@ -1,0 +1,2899 @@
+{
+  "schema": "atlas.feature-ontology-review-approved.v1",
+  "generatedAt": "2026-09-09T01:09:46.272Z",
+  "mode": "HUMAN_REVIEW_DECISION_RECORDED",
+  "postgresWrites": false,
+  "qdrantWrites": false,
+  "neo4jWrites": false,
+  "valkeyWrites": false,
+  "relationshipWrites": false,
+  "relationshipGraphRevision": null,
+  "rel01bAllowed": false,
+  "note": "canonicalAuthority remains false on every approved row. REL-01B (relationship materialization) is a separate, further-gated step not performed here.",
+  "inputTriagedCount": 253,
+  "approvedCount": 32,
+  "rejectedCount": 221,
+  "approved": [
+    {
+      "schema": "atlas.feature-ontology-fresh-candidate.v1",
+      "candidateId": "fresh-multilane:79c3bdcc62ce1b0ab32384f238bb9a57",
+      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
+      "subjectType": "SOURCE",
+      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "predicate": "USES_CONCEPT",
+      "objectType": "CONCEPT",
+      "objectId": "concept:const-min-join-coverage",
+      "objectValue": "const MIN_JOIN_COVERAGE",
+      "evidenceRefs": [
+        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:10",
+        "source-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
+        "structural-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:sha256:0cfce0793186a92ff40ca919b6cbec662f60687469eb2308a88e468afd6c36d7"
+      ],
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "extractorKinds": [
+        "python-enrichment-v1",
+        "treesitter-chunker-structural-v1"
+      ],
+      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
+      "crossLaneAgreement": 0,
+      "structuralEvidenceCoLocated": true,
+      "sourceSpanGrounded": false,
+      "sourceSpan": null,
+      "groundedExtractionCount": 1,
+      "confidence": 0.5,
+      "status": "APPROVED_FOR_REL01B_REVIEW",
+      "canonicalAuthority": false,
+      "reviewDecision": {
+        "decidedBy": "operator",
+        "decidedAt": "2026-09-09T01:09:46.272Z",
+        "rationale": "domain-meaningful concept, not a generic local variable or non-domain utility type"
+      }
+    },
+    {
+      "schema": "atlas.feature-ontology-fresh-candidate.v1",
+      "candidateId": "fresh-multilane:869d709e0d067b105857e76c69b24711",
+      "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "sourceRevision": "sha256:e2421bd70077b7b52c75d3a7ff706eec5227c3a2cd0719a34cd386ca2e4e6ada",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
+      "subjectType": "SOURCE",
+      "subjectId": "source:sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "predicate": "USES_CONCEPT",
+      "objectType": "CONCEPT",
+      "objectId": "concept:function-scoresectionrelevance",
+      "objectValue": "function scoreSectionRelevance",
+      "evidenceRefs": [
+        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts:33",
+        "source-observation:sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts:e2421bd70077b7b52c75d3a7ff706eec5227c3a2cd0719a34cd386ca2e4e6ada",
+        "structural-observation:sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts:sha256:a5ac5bb9abe761d24f12db0914aa2e8f7a06996c9b2f8f0398adf4f235d89801"
+      ],
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "extractorKinds": [
+        "python-enrichment-v1",
+        "treesitter-chunker-structural-v1"
+      ],
+      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
+      "crossLaneAgreement": 0,
+      "structuralEvidenceCoLocated": true,
+      "sourceSpanGrounded": false,
+      "sourceSpan": null,
+      "groundedExtractionCount": 0,
+      "confidence": 0.5,
+      "status": "APPROVED_FOR_REL01B_REVIEW",
+      "canonicalAuthority": false,
+      "reviewDecision": {
+        "decidedBy": "operator",
+        "decidedAt": "2026-09-09T01:09:46.272Z",
+        "rationale": "domain-meaningful concept, not a generic local variable or non-domain utility type"
+      }
+    },
+    {
+      "schema": "atlas.feature-ontology-fresh-candidate.v1",
+      "candidateId": "fresh-multilane:fc7325bed974e8b1d499bcab3c4bc675",
+      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "sourceRevision": "sha256:86d5275cfd5b097ff23e548af21bbe78e10b4815f173a798903f2b122f0ec896",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
+      "subjectType": "SOURCE",
+      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "predicate": "USES_CONCEPT",
+      "objectType": "CONCEPT",
+      "objectId": "concept:interface-binaryvectorartifactv1",
+      "objectValue": "interface BinaryVectorArtifactV1",
+      "evidenceRefs": [
+        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/langgraph-client.ts:26",
+        "source-observation:sveltekit-frontend/src/lib/server/ai/langgraph-client.ts:86d5275cfd5b097ff23e548af21bbe78e10b4815f173a798903f2b122f0ec896",
+        "structural-observation:sveltekit-frontend/src/lib/server/ai/langgraph-client.ts:sha256:6de42c0b1b9bf355a424cb90f41e2b0b5892a199d500343497500b78df61cd1a"
+      ],
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "extractorKinds": [
+        "python-enrichment-v1",
+        "treesitter-chunker-structural-v1"
+      ],
+      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
+      "crossLaneAgreement": 0,
+      "structuralEvidenceCoLocated": true,
+      "sourceSpanGrounded": false,
+      "sourceSpan": null,
+      "groundedExtractionCount": 2,
+      "confidence": 0.5,
+      "status": "APPROVED_FOR_REL01B_REVIEW",
+      "canonicalAuthority": false,
+      "reviewDecision": {
+        "decidedBy": "operator",
+        "decidedAt": "2026-09-09T01:09:46.272Z",
+        "rationale": "domain-meaningful concept, not a generic local variable or non-domain utility type"
+      }
+    },
+    {
+      "schema": "atlas.feature-ontology-fresh-candidate.v1",
+      "candidateId": "fresh-multilane:c8254f862e07956911bfa668976dbbb7",
+      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "sourceRevision": "sha256:73299f8bc02d95075697fb9df5f4faf56eac2ce97c4adb38de993e2c621f4b1a",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
+      "subjectType": "SOURCE",
+      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "predicate": "USES_CONCEPT",
+      "objectType": "CONCEPT",
+      "objectId": "concept:const-domain-path-hints",
+      "objectValue": "const DOMAIN_PATH_HINTS",
+      "evidenceRefs": [
+        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/langgraph-research.ts:22",
+        "source-observation:sveltekit-frontend/src/lib/server/ai/langgraph-research.ts:73299f8bc02d95075697fb9df5f4faf56eac2ce97c4adb38de993e2c621f4b1a",
+        "structural-observation:sveltekit-frontend/src/lib/server/ai/langgraph-research.ts:sha256:746407039fbab24ca2114383fd87366a09b4900e9e0f8e5044f95075f7b99bd4"
+      ],
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "extractorKinds": [
+        "python-enrichment-v1",
+        "treesitter-chunker-structural-v1"
+      ],
+      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
+      "crossLaneAgreement": 0,
+      "structuralEvidenceCoLocated": true,
+      "sourceSpanGrounded": false,
+      "sourceSpan": null,
+      "groundedExtractionCount": 2,
+      "confidence": 0.5,
+      "status": "APPROVED_FOR_REL01B_REVIEW",
+      "canonicalAuthority": false,
+      "reviewDecision": {
+        "decidedBy": "operator",
+        "decidedAt": "2026-09-09T01:09:46.272Z",
+        "rationale": "domain-meaningful concept, not a generic local variable or non-domain utility type"
+      }
+    },
+    {
+      "schema": "atlas.feature-ontology-fresh-candidate.v1",
+      "candidateId": "fresh-multilane:e7754e38d2c30e5360bce4a627a5fff1",
+      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "sourceRevision": "sha256:1840825b32ee43669794fb4f8647ca6468e2033304d39a3019a224b7dc49f215",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
+      "subjectType": "SOURCE",
+      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "predicate": "USES_CONCEPT",
+      "objectType": "CONCEPT",
+      "objectId": "concept:function-canonicaljson",
+      "objectValue": "function canonicalJson",
+      "evidenceRefs": [
+        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts:27",
+        "source-observation:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts:1840825b32ee43669794fb4f8647ca6468e2033304d39a3019a224b7dc49f215",
+        "structural-observation:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts:sha256:a71f7752b94aa4e5bf94ec161611f5914551e96f9cf781785625e231bb24c892"
+      ],
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "extractorKinds": [
+        "python-enrichment-v1",
+        "treesitter-chunker-structural-v1"
+      ],
+      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
+      "crossLaneAgreement": 0,
+      "structuralEvidenceCoLocated": true,
+      "sourceSpanGrounded": false,
+      "sourceSpan": null,
+      "groundedExtractionCount": 1,
+      "confidence": 0.5,
+      "status": "APPROVED_FOR_REL01B_REVIEW",
+      "canonicalAuthority": false,
+      "reviewDecision": {
+        "decidedBy": "operator",
+        "decidedAt": "2026-09-09T01:09:46.272Z",
+        "rationale": "domain-meaningful concept, not a generic local variable or non-domain utility type"
+      }
+    },
+    {
+      "schema": "atlas.feature-ontology-fresh-candidate.v1",
+      "candidateId": "fresh-multilane:31d88cadeec7fa1ee2e0e0063ce999ea",
+      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "sourceRevision": "sha256:73299f8bc02d95075697fb9df5f4faf56eac2ce97c4adb38de993e2c621f4b1a",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
+      "subjectType": "SOURCE",
+      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "predicate": "USES_CONCEPT",
+      "objectType": "CONCEPT",
+      "objectId": "concept:type-researchdomain",
+      "objectValue": "type ResearchDomain",
+      "evidenceRefs": [
+        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/langgraph-research.ts:45",
+        "source-observation:sveltekit-frontend/src/lib/server/ai/langgraph-research.ts:73299f8bc02d95075697fb9df5f4faf56eac2ce97c4adb38de993e2c621f4b1a",
+        "structural-observation:sveltekit-frontend/src/lib/server/ai/langgraph-research.ts:sha256:746407039fbab24ca2114383fd87366a09b4900e9e0f8e5044f95075f7b99bd4"
+      ],
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "extractorKinds": [
+        "python-enrichment-v1",
+        "treesitter-chunker-structural-v1"
+      ],
+      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
+      "crossLaneAgreement": 0,
+      "structuralEvidenceCoLocated": true,
+      "sourceSpanGrounded": false,
+      "sourceSpan": null,
+      "groundedExtractionCount": 2,
+      "confidence": 0.5,
+      "status": "APPROVED_FOR_REL01B_REVIEW",
+      "canonicalAuthority": false,
+      "reviewDecision": {
+        "decidedBy": "operator",
+        "decidedAt": "2026-09-09T01:09:46.272Z",
+        "rationale": "domain-meaningful concept, not a generic local variable or non-domain utility type"
+      }
+    },
+    {
+      "schema": "atlas.feature-ontology-fresh-candidate.v1",
+      "candidateId": "fresh-multilane:aec4fbb6a6e279db94757e402f5a91d8",
+      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
+      "subjectType": "SOURCE",
+      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "predicate": "USES_CONCEPT",
+      "objectType": "CONCEPT",
+      "objectId": "concept:type-canonicaltracerow",
+      "objectValue": "type CanonicalTraceRow",
+      "evidenceRefs": [
+        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:47",
+        "source-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
+        "structural-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:sha256:0cfce0793186a92ff40ca919b6cbec662f60687469eb2308a88e468afd6c36d7"
+      ],
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "extractorKinds": [
+        "python-enrichment-v1",
+        "treesitter-chunker-structural-v1"
+      ],
+      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
+      "crossLaneAgreement": 0,
+      "structuralEvidenceCoLocated": true,
+      "sourceSpanGrounded": false,
+      "sourceSpan": null,
+      "groundedExtractionCount": 1,
+      "confidence": 0.5,
+      "status": "APPROVED_FOR_REL01B_REVIEW",
+      "canonicalAuthority": false,
+      "reviewDecision": {
+        "decidedBy": "operator",
+        "decidedAt": "2026-09-09T01:09:46.272Z",
+        "rationale": "domain-meaningful concept, not a generic local variable or non-domain utility type"
+      }
+    },
+    {
+      "schema": "atlas.feature-ontology-fresh-candidate.v1",
+      "candidateId": "fresh-multilane:63e31e6c59f945d843f8069a72eb5304",
+      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "sourceRevision": "sha256:1840825b32ee43669794fb4f8647ca6468e2033304d39a3019a224b7dc49f215",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
+      "subjectType": "SOURCE",
+      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "predicate": "USES_CONCEPT",
+      "objectType": "CONCEPT",
+      "objectId": "concept:function-persisttemporalrecommendationoutcomeifenabled",
+      "objectValue": "function persistTemporalRecommendationOutcomeIfEnabled",
+      "evidenceRefs": [
+        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts:30",
+        "source-observation:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts:1840825b32ee43669794fb4f8647ca6468e2033304d39a3019a224b7dc49f215",
+        "structural-observation:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts:sha256:a71f7752b94aa4e5bf94ec161611f5914551e96f9cf781785625e231bb24c892"
+      ],
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "extractorKinds": [
+        "python-enrichment-v1",
+        "treesitter-chunker-structural-v1"
+      ],
+      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
+      "crossLaneAgreement": 0,
+      "structuralEvidenceCoLocated": true,
+      "sourceSpanGrounded": false,
+      "sourceSpan": null,
+      "groundedExtractionCount": 1,
+      "confidence": 0.5,
+      "status": "APPROVED_FOR_REL01B_REVIEW",
+      "canonicalAuthority": false,
+      "reviewDecision": {
+        "decidedBy": "operator",
+        "decidedAt": "2026-09-09T01:09:46.272Z",
+        "rationale": "domain-meaningful concept, not a generic local variable or non-domain utility type"
+      }
+    },
+    {
+      "schema": "atlas.feature-ontology-fresh-candidate.v1",
+      "candidateId": "fresh-multilane:718e7cefb00193c8a6c794e5acdcb088",
+      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "sourceRevision": "sha256:1840825b32ee43669794fb4f8647ca6468e2033304d39a3019a224b7dc49f215",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
+      "subjectType": "SOURCE",
+      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "predicate": "USES_CONCEPT",
+      "objectType": "CONCEPT",
+      "objectId": "concept:const-temporal-recommendation-outcome-producer",
+      "objectValue": "const TEMPORAL_RECOMMENDATION_OUTCOME_PRODUCER",
+      "evidenceRefs": [
+        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts:11",
+        "source-observation:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts:1840825b32ee43669794fb4f8647ca6468e2033304d39a3019a224b7dc49f215",
+        "structural-observation:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts:sha256:a71f7752b94aa4e5bf94ec161611f5914551e96f9cf781785625e231bb24c892"
+      ],
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "extractorKinds": [
+        "python-enrichment-v1",
+        "treesitter-chunker-structural-v1"
+      ],
+      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
+      "crossLaneAgreement": 0,
+      "structuralEvidenceCoLocated": true,
+      "sourceSpanGrounded": false,
+      "sourceSpan": null,
+      "groundedExtractionCount": 1,
+      "confidence": 0.5,
+      "status": "APPROVED_FOR_REL01B_REVIEW",
+      "canonicalAuthority": false,
+      "reviewDecision": {
+        "decidedBy": "operator",
+        "decidedAt": "2026-09-09T01:09:46.272Z",
+        "rationale": "domain-meaningful concept, not a generic local variable or non-domain utility type"
+      }
+    },
+    {
+      "schema": "atlas.feature-ontology-fresh-candidate.v1",
+      "candidateId": "fresh-multilane:4bda819d97cfa45871149e9c8fac38cd",
+      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "sourceRevision": "sha256:73299f8bc02d95075697fb9df5f4faf56eac2ce97c4adb38de993e2c621f4b1a",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
+      "subjectType": "SOURCE",
+      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "predicate": "USES_CONCEPT",
+      "objectType": "CONCEPT",
+      "objectId": "concept:const-domain-tags",
+      "objectValue": "const DOMAIN_TAGS",
+      "evidenceRefs": [
+        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/langgraph-research.ts:24",
+        "source-observation:sveltekit-frontend/src/lib/server/ai/langgraph-research.ts:73299f8bc02d95075697fb9df5f4faf56eac2ce97c4adb38de993e2c621f4b1a",
+        "structural-observation:sveltekit-frontend/src/lib/server/ai/langgraph-research.ts:sha256:746407039fbab24ca2114383fd87366a09b4900e9e0f8e5044f95075f7b99bd4"
+      ],
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "extractorKinds": [
+        "python-enrichment-v1",
+        "treesitter-chunker-structural-v1"
+      ],
+      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
+      "crossLaneAgreement": 0,
+      "structuralEvidenceCoLocated": true,
+      "sourceSpanGrounded": false,
+      "sourceSpan": null,
+      "groundedExtractionCount": 2,
+      "confidence": 0.5,
+      "status": "APPROVED_FOR_REL01B_REVIEW",
+      "canonicalAuthority": false,
+      "reviewDecision": {
+        "decidedBy": "operator",
+        "decidedAt": "2026-09-09T01:09:46.272Z",
+        "rationale": "domain-meaningful concept, not a generic local variable or non-domain utility type"
+      }
+    },
+    {
+      "schema": "atlas.feature-ontology-fresh-candidate.v1",
+      "candidateId": "fresh-multilane:4077fb78d776c1fe3b4015c9b0a13744",
+      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
+      "subjectType": "SOURCE",
+      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "predicate": "USES_CONCEPT",
+      "objectType": "CONCEPT",
+      "objectId": "concept:qdrant",
+      "objectValue": "qdrant",
+      "evidenceRefs": [
+        "langextract-grounded:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:135:141:cfc35d18e7332fde265d77541e0fc0165a811854f7158046053adb9674f9e866",
+        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:42",
+        "source-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
+        "structural-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:sha256:0cfce0793186a92ff40ca919b6cbec662f60687469eb2308a88e468afd6c36d7"
+      ],
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "extractorKinds": [
+        "python-enrichment-v1",
+        "treesitter-chunker-structural-v1"
+      ],
+      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
+      "crossLaneAgreement": 0,
+      "structuralEvidenceCoLocated": true,
+      "sourceSpanGrounded": true,
+      "sourceSpan": {
+        "startChar": 135,
+        "endChar": 141,
+        "text": "qdrant"
+      },
+      "groundedExtractionCount": 1,
+      "confidence": 0.5,
+      "status": "APPROVED_FOR_REL01B_REVIEW",
+      "canonicalAuthority": false,
+      "reviewDecision": {
+        "decidedBy": "operator",
+        "decidedAt": "2026-09-09T01:09:46.272Z",
+        "rationale": "domain-meaningful concept, not a generic local variable or non-domain utility type"
+      }
+    },
+    {
+      "schema": "atlas.feature-ontology-fresh-candidate.v1",
+      "candidateId": "fresh-multilane:3581590d12c239c931222f8af66be047",
+      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
+      "subjectType": "SOURCE",
+      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "predicate": "USES_CONCEPT",
+      "objectType": "CONCEPT",
+      "objectId": "concept:const-canonical-collection",
+      "objectValue": "const CANONICAL_COLLECTION",
+      "evidenceRefs": [
+        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:9",
+        "source-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
+        "structural-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:sha256:0cfce0793186a92ff40ca919b6cbec662f60687469eb2308a88e468afd6c36d7"
+      ],
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "extractorKinds": [
+        "python-enrichment-v1",
+        "treesitter-chunker-structural-v1"
+      ],
+      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
+      "crossLaneAgreement": 0,
+      "structuralEvidenceCoLocated": true,
+      "sourceSpanGrounded": false,
+      "sourceSpan": null,
+      "groundedExtractionCount": 1,
+      "confidence": 0.5,
+      "status": "APPROVED_FOR_REL01B_REVIEW",
+      "canonicalAuthority": false,
+      "reviewDecision": {
+        "decidedBy": "operator",
+        "decidedAt": "2026-09-09T01:09:46.272Z",
+        "rationale": "domain-meaningful concept, not a generic local variable or non-domain utility type"
+      }
+    },
+    {
+      "schema": "atlas.feature-ontology-fresh-candidate.v1",
+      "candidateId": "fresh-multilane:2d8a52c5048819653e88fb07650702b9",
+      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "sourceRevision": "sha256:73299f8bc02d95075697fb9df5f4faf56eac2ce97c4adb38de993e2c621f4b1a",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
+      "subjectType": "SOURCE",
+      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "predicate": "USES_CONCEPT",
+      "objectType": "CONCEPT",
+      "objectId": "concept:type-inferenceruntimeconfig",
+      "objectValue": "type InferenceRuntimeConfig",
+      "evidenceRefs": [
+        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/langgraph-research.ts:44",
+        "source-observation:sveltekit-frontend/src/lib/server/ai/langgraph-research.ts:73299f8bc02d95075697fb9df5f4faf56eac2ce97c4adb38de993e2c621f4b1a",
+        "structural-observation:sveltekit-frontend/src/lib/server/ai/langgraph-research.ts:sha256:746407039fbab24ca2114383fd87366a09b4900e9e0f8e5044f95075f7b99bd4"
+      ],
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "extractorKinds": [
+        "python-enrichment-v1",
+        "treesitter-chunker-structural-v1"
+      ],
+      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
+      "crossLaneAgreement": 0,
+      "structuralEvidenceCoLocated": true,
+      "sourceSpanGrounded": false,
+      "sourceSpan": null,
+      "groundedExtractionCount": 2,
+      "confidence": 0.5,
+      "status": "APPROVED_FOR_REL01B_REVIEW",
+      "canonicalAuthority": false,
+      "reviewDecision": {
+        "decidedBy": "operator",
+        "decidedAt": "2026-09-09T01:09:46.272Z",
+        "rationale": "domain-meaningful concept, not a generic local variable or non-domain utility type"
+      }
+    },
+    {
+      "schema": "atlas.feature-ontology-fresh-candidate.v1",
+      "candidateId": "fresh-multilane:c52a0758d4e10d27ad834b7d927f28ee",
+      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "sourceRevision": "sha256:1840825b32ee43669794fb4f8647ca6468e2033304d39a3019a224b7dc49f215",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
+      "subjectType": "SOURCE",
+      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "predicate": "USES_CONCEPT",
+      "objectType": "CONCEPT",
+      "objectId": "concept:function-hashcontent",
+      "objectValue": "function hashContent",
+      "evidenceRefs": [
+        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts:29",
+        "source-observation:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts:1840825b32ee43669794fb4f8647ca6468e2033304d39a3019a224b7dc49f215",
+        "structural-observation:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts:sha256:a71f7752b94aa4e5bf94ec161611f5914551e96f9cf781785625e231bb24c892"
+      ],
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "extractorKinds": [
+        "python-enrichment-v1",
+        "treesitter-chunker-structural-v1"
+      ],
+      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
+      "crossLaneAgreement": 0,
+      "structuralEvidenceCoLocated": true,
+      "sourceSpanGrounded": false,
+      "sourceSpan": null,
+      "groundedExtractionCount": 1,
+      "confidence": 0.5,
+      "status": "APPROVED_FOR_REL01B_REVIEW",
+      "canonicalAuthority": false,
+      "reviewDecision": {
+        "decidedBy": "operator",
+        "decidedAt": "2026-09-09T01:09:46.272Z",
+        "rationale": "domain-meaningful concept, not a generic local variable or non-domain utility type"
+      }
+    },
+    {
+      "schema": "atlas.feature-ontology-fresh-candidate.v1",
+      "candidateId": "fresh-multilane:13ad63c8f0f9258842a4abe50066768e",
+      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
+      "subjectType": "SOURCE",
+      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "predicate": "USES_CONCEPT",
+      "objectType": "CONCEPT",
+      "objectId": "concept:function-tracererank",
+      "objectValue": "function traceRerank",
+      "evidenceRefs": [
+        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:29",
+        "source-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
+        "structural-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:sha256:0cfce0793186a92ff40ca919b6cbec662f60687469eb2308a88e468afd6c36d7"
+      ],
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "extractorKinds": [
+        "python-enrichment-v1",
+        "treesitter-chunker-structural-v1"
+      ],
+      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
+      "crossLaneAgreement": 0,
+      "structuralEvidenceCoLocated": true,
+      "sourceSpanGrounded": false,
+      "sourceSpan": null,
+      "groundedExtractionCount": 1,
+      "confidence": 0.5,
+      "status": "APPROVED_FOR_REL01B_REVIEW",
+      "canonicalAuthority": false,
+      "reviewDecision": {
+        "decidedBy": "operator",
+        "decidedAt": "2026-09-09T01:09:46.272Z",
+        "rationale": "domain-meaningful concept, not a generic local variable or non-domain utility type"
+      }
+    },
+    {
+      "schema": "atlas.feature-ontology-fresh-candidate.v1",
+      "candidateId": "fresh-multilane:096befc02dc66a618b68b5a5904c63b7",
+      "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "sourceRevision": "sha256:e2421bd70077b7b52c75d3a7ff706eec5227c3a2cd0719a34cd386ca2e4e6ada",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
+      "subjectType": "SOURCE",
+      "subjectId": "source:sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "predicate": "USES_CONCEPT",
+      "objectType": "CONCEPT",
+      "objectId": "concept:interface-grporerankresult",
+      "objectValue": "interface GRPORerankResult",
+      "evidenceRefs": [
+        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts:35",
+        "source-observation:sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts:e2421bd70077b7b52c75d3a7ff706eec5227c3a2cd0719a34cd386ca2e4e6ada",
+        "structural-observation:sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts:sha256:a5ac5bb9abe761d24f12db0914aa2e8f7a06996c9b2f8f0398adf4f235d89801"
+      ],
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "extractorKinds": [
+        "python-enrichment-v1",
+        "treesitter-chunker-structural-v1"
+      ],
+      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
+      "crossLaneAgreement": 0,
+      "structuralEvidenceCoLocated": true,
+      "sourceSpanGrounded": false,
+      "sourceSpan": null,
+      "groundedExtractionCount": 0,
+      "confidence": 0.5,
+      "status": "APPROVED_FOR_REL01B_REVIEW",
+      "canonicalAuthority": false,
+      "reviewDecision": {
+        "decidedBy": "operator",
+        "decidedAt": "2026-09-09T01:09:46.272Z",
+        "rationale": "domain-meaningful concept, not a generic local variable or non-domain utility type"
+      }
+    },
+    {
+      "schema": "atlas.feature-ontology-fresh-candidate.v1",
+      "candidateId": "fresh-multilane:935569b96ba0a8f205b167f1db0fadc6",
+      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "sourceRevision": "sha256:73299f8bc02d95075697fb9df5f4faf56eac2ce97c4adb38de993e2c621f4b1a",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
+      "subjectType": "SOURCE",
+      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "predicate": "USES_CONCEPT",
+      "objectType": "CONCEPT",
+      "objectId": "concept:database",
+      "objectValue": "PostgreSQL",
+      "evidenceRefs": [
+        "langextract-grounded:sveltekit-frontend/src/lib/server/ai/langgraph-research.ts:3170:3180:cc52d03280b7034c8e3653d2748ebd489a873ef4bbc89cb187fbfcabfbbf6873",
+        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/langgraph-research.ts:48",
+        "source-observation:sveltekit-frontend/src/lib/server/ai/langgraph-research.ts:73299f8bc02d95075697fb9df5f4faf56eac2ce97c4adb38de993e2c621f4b1a",
+        "structural-observation:sveltekit-frontend/src/lib/server/ai/langgraph-research.ts:sha256:746407039fbab24ca2114383fd87366a09b4900e9e0f8e5044f95075f7b99bd4"
+      ],
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "extractorKinds": [
+        "python-enrichment-v1",
+        "treesitter-chunker-structural-v1"
+      ],
+      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
+      "crossLaneAgreement": 0,
+      "structuralEvidenceCoLocated": true,
+      "sourceSpanGrounded": true,
+      "sourceSpan": {
+        "startChar": 3170,
+        "endChar": 3180,
+        "text": "PostgreSQL"
+      },
+      "groundedExtractionCount": 2,
+      "confidence": 0.5,
+      "status": "APPROVED_FOR_REL01B_REVIEW",
+      "canonicalAuthority": false,
+      "reviewDecision": {
+        "decidedBy": "operator",
+        "decidedAt": "2026-09-09T01:09:46.272Z",
+        "rationale": "domain-meaningful concept, not a generic local variable or non-domain utility type"
+      }
+    },
+    {
+      "schema": "atlas.feature-ontology-fresh-candidate.v1",
+      "candidateId": "fresh-multilane:79284473a4deab5331b4e6763be6a7b4",
+      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "sourceRevision": "sha256:1840825b32ee43669794fb4f8647ca6468e2033304d39a3019a224b7dc49f215",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
+      "subjectType": "SOURCE",
+      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "predicate": "USES_CONCEPT",
+      "objectType": "CONCEPT",
+      "objectId": "concept:function-preventloop",
+      "objectValue": "function preventLoop",
+      "evidenceRefs": [
+        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts:31",
+        "source-observation:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts:1840825b32ee43669794fb4f8647ca6468e2033304d39a3019a224b7dc49f215",
+        "structural-observation:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts:sha256:a71f7752b94aa4e5bf94ec161611f5914551e96f9cf781785625e231bb24c892"
+      ],
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "extractorKinds": [
+        "python-enrichment-v1",
+        "treesitter-chunker-structural-v1"
+      ],
+      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
+      "crossLaneAgreement": 0,
+      "structuralEvidenceCoLocated": true,
+      "sourceSpanGrounded": false,
+      "sourceSpan": null,
+      "groundedExtractionCount": 1,
+      "confidence": 0.5,
+      "status": "APPROVED_FOR_REL01B_REVIEW",
+      "canonicalAuthority": false,
+      "reviewDecision": {
+        "decidedBy": "operator",
+        "decidedAt": "2026-09-09T01:09:46.272Z",
+        "rationale": "domain-meaningful concept, not a generic local variable or non-domain utility type"
+      }
+    },
+    {
+      "schema": "atlas.feature-ontology-fresh-candidate.v1",
+      "candidateId": "fresh-multilane:48fa522884a33418a096765b845ea401",
+      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "sourceRevision": "sha256:86d5275cfd5b097ff23e548af21bbe78e10b4815f173a798903f2b122f0ec896",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
+      "subjectType": "SOURCE",
+      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "predicate": "USES_CONCEPT",
+      "objectType": "CONCEPT",
+      "objectId": "concept:database",
+      "objectValue": "Neo4j",
+      "evidenceRefs": [
+        "langextract-grounded:sveltekit-frontend/src/lib/server/ai/langgraph-client.ts:2188:2193:981d202c653a291b8ce80ed05b458083dca6ee90ba8d0c187188a319e715134c",
+        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/langgraph-client.ts:50",
+        "source-observation:sveltekit-frontend/src/lib/server/ai/langgraph-client.ts:86d5275cfd5b097ff23e548af21bbe78e10b4815f173a798903f2b122f0ec896",
+        "structural-observation:sveltekit-frontend/src/lib/server/ai/langgraph-client.ts:sha256:6de42c0b1b9bf355a424cb90f41e2b0b5892a199d500343497500b78df61cd1a"
+      ],
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "extractorKinds": [
+        "python-enrichment-v1",
+        "treesitter-chunker-structural-v1"
+      ],
+      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
+      "crossLaneAgreement": 0,
+      "structuralEvidenceCoLocated": true,
+      "sourceSpanGrounded": true,
+      "sourceSpan": {
+        "startChar": 2188,
+        "endChar": 2193,
+        "text": "Neo4j"
+      },
+      "groundedExtractionCount": 2,
+      "confidence": 0.5,
+      "status": "APPROVED_FOR_REL01B_REVIEW",
+      "canonicalAuthority": false,
+      "reviewDecision": {
+        "decidedBy": "operator",
+        "decidedAt": "2026-09-09T01:09:46.272Z",
+        "rationale": "domain-meaningful concept, not a generic local variable or non-domain utility type"
+      }
+    },
+    {
+      "schema": "atlas.feature-ontology-fresh-candidate.v1",
+      "candidateId": "fresh-multilane:bef6249a0fe60f4a784d867493b8daf0",
+      "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "sourceRevision": "sha256:e2421bd70077b7b52c75d3a7ff706eec5227c3a2cd0719a34cd386ca2e4e6ada",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
+      "subjectType": "SOURCE",
+      "subjectId": "source:sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "predicate": "USES_CONCEPT",
+      "objectType": "CONCEPT",
+      "objectId": "concept:interface-rerankablechunk",
+      "objectValue": "interface RerankableChunk",
+      "evidenceRefs": [
+        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts:36",
+        "source-observation:sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts:e2421bd70077b7b52c75d3a7ff706eec5227c3a2cd0719a34cd386ca2e4e6ada",
+        "structural-observation:sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts:sha256:a5ac5bb9abe761d24f12db0914aa2e8f7a06996c9b2f8f0398adf4f235d89801"
+      ],
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "extractorKinds": [
+        "python-enrichment-v1",
+        "treesitter-chunker-structural-v1"
+      ],
+      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
+      "crossLaneAgreement": 0,
+      "structuralEvidenceCoLocated": true,
+      "sourceSpanGrounded": false,
+      "sourceSpan": null,
+      "groundedExtractionCount": 0,
+      "confidence": 0.5,
+      "status": "APPROVED_FOR_REL01B_REVIEW",
+      "canonicalAuthority": false,
+      "reviewDecision": {
+        "decidedBy": "operator",
+        "decidedAt": "2026-09-09T01:09:46.272Z",
+        "rationale": "domain-meaningful concept, not a generic local variable or non-domain utility type"
+      }
+    },
+    {
+      "schema": "atlas.feature-ontology-fresh-candidate.v1",
+      "candidateId": "fresh-multilane:7ccc1ec61b2706a25e45a612fed8f769",
+      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "sourceRevision": "sha256:86d5275cfd5b097ff23e548af21bbe78e10b4815f173a798903f2b122f0ec896",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
+      "subjectType": "SOURCE",
+      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "predicate": "USES_CONCEPT",
+      "objectType": "CONCEPT",
+      "objectId": "concept:interface-topologyprojectionv1",
+      "objectValue": "interface TopologyProjectionV1",
+      "evidenceRefs": [
+        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/langgraph-client.ts:30",
+        "source-observation:sveltekit-frontend/src/lib/server/ai/langgraph-client.ts:86d5275cfd5b097ff23e548af21bbe78e10b4815f173a798903f2b122f0ec896",
+        "structural-observation:sveltekit-frontend/src/lib/server/ai/langgraph-client.ts:sha256:6de42c0b1b9bf355a424cb90f41e2b0b5892a199d500343497500b78df61cd1a"
+      ],
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "extractorKinds": [
+        "python-enrichment-v1",
+        "treesitter-chunker-structural-v1"
+      ],
+      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
+      "crossLaneAgreement": 0,
+      "structuralEvidenceCoLocated": true,
+      "sourceSpanGrounded": false,
+      "sourceSpan": null,
+      "groundedExtractionCount": 2,
+      "confidence": 0.5,
+      "status": "APPROVED_FOR_REL01B_REVIEW",
+      "canonicalAuthority": false,
+      "reviewDecision": {
+        "decidedBy": "operator",
+        "decidedAt": "2026-09-09T01:09:46.272Z",
+        "rationale": "domain-meaningful concept, not a generic local variable or non-domain utility type"
+      }
+    },
+    {
+      "schema": "atlas.feature-ontology-fresh-candidate.v1",
+      "candidateId": "fresh-multilane:8f4f66528a1702998ea78df4ca8a5125",
+      "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "sourceRevision": "sha256:e2421bd70077b7b52c75d3a7ff706eec5227c3a2cd0719a34cd386ca2e4e6ada",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
+      "subjectType": "SOURCE",
+      "subjectId": "source:sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "predicate": "USES_CONCEPT",
+      "objectType": "CONCEPT",
+      "objectId": "concept:function-scoreentityoverlap",
+      "objectValue": "function scoreEntityOverlap",
+      "evidenceRefs": [
+        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts:32",
+        "source-observation:sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts:e2421bd70077b7b52c75d3a7ff706eec5227c3a2cd0719a34cd386ca2e4e6ada",
+        "structural-observation:sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts:sha256:a5ac5bb9abe761d24f12db0914aa2e8f7a06996c9b2f8f0398adf4f235d89801"
+      ],
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "extractorKinds": [
+        "python-enrichment-v1",
+        "treesitter-chunker-structural-v1"
+      ],
+      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
+      "crossLaneAgreement": 0,
+      "structuralEvidenceCoLocated": true,
+      "sourceSpanGrounded": false,
+      "sourceSpan": null,
+      "groundedExtractionCount": 0,
+      "confidence": 0.5,
+      "status": "APPROVED_FOR_REL01B_REVIEW",
+      "canonicalAuthority": false,
+      "reviewDecision": {
+        "decidedBy": "operator",
+        "decidedAt": "2026-09-09T01:09:46.272Z",
+        "rationale": "domain-meaningful concept, not a generic local variable or non-domain utility type"
+      }
+    },
+    {
+      "schema": "atlas.feature-ontology-fresh-candidate.v1",
+      "candidateId": "fresh-multilane:34a66c0f7f16434f636f3dc992f9a248",
+      "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "sourceRevision": "sha256:e2421bd70077b7b52c75d3a7ff706eec5227c3a2cd0719a34cd386ca2e4e6ada",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
+      "subjectType": "SOURCE",
+      "subjectId": "source:sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "predicate": "USES_CONCEPT",
+      "objectType": "CONCEPT",
+      "objectId": "concept:const-section-relevance",
+      "objectValue": "const SECTION_RELEVANCE",
+      "evidenceRefs": [
+        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts:17",
+        "source-observation:sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts:e2421bd70077b7b52c75d3a7ff706eec5227c3a2cd0719a34cd386ca2e4e6ada",
+        "structural-observation:sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts:sha256:a5ac5bb9abe761d24f12db0914aa2e8f7a06996c9b2f8f0398adf4f235d89801"
+      ],
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "extractorKinds": [
+        "python-enrichment-v1",
+        "treesitter-chunker-structural-v1"
+      ],
+      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
+      "crossLaneAgreement": 0,
+      "structuralEvidenceCoLocated": true,
+      "sourceSpanGrounded": false,
+      "sourceSpan": null,
+      "groundedExtractionCount": 0,
+      "confidence": 0.5,
+      "status": "APPROVED_FOR_REL01B_REVIEW",
+      "canonicalAuthority": false,
+      "reviewDecision": {
+        "decidedBy": "operator",
+        "decidedAt": "2026-09-09T01:09:46.272Z",
+        "rationale": "domain-meaningful concept, not a generic local variable or non-domain utility type"
+      }
+    },
+    {
+      "schema": "atlas.feature-ontology-fresh-candidate.v1",
+      "candidateId": "fresh-multilane:7735e0ede34c738051138c7fa50fd408",
+      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
+      "subjectType": "SOURCE",
+      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "predicate": "USES_CONCEPT",
+      "objectType": "CONCEPT",
+      "objectId": "concept:type-tracererankresult",
+      "objectValue": "type TraceRerankResult",
+      "evidenceRefs": [
+        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:48",
+        "source-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
+        "structural-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:sha256:0cfce0793186a92ff40ca919b6cbec662f60687469eb2308a88e468afd6c36d7"
+      ],
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "extractorKinds": [
+        "python-enrichment-v1",
+        "treesitter-chunker-structural-v1"
+      ],
+      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
+      "crossLaneAgreement": 0,
+      "structuralEvidenceCoLocated": true,
+      "sourceSpanGrounded": false,
+      "sourceSpan": null,
+      "groundedExtractionCount": 1,
+      "confidence": 0.5,
+      "status": "APPROVED_FOR_REL01B_REVIEW",
+      "canonicalAuthority": false,
+      "reviewDecision": {
+        "decidedBy": "operator",
+        "decidedAt": "2026-09-09T01:09:46.272Z",
+        "rationale": "domain-meaningful concept, not a generic local variable or non-domain utility type"
+      }
+    },
+    {
+      "schema": "atlas.feature-ontology-fresh-candidate.v1",
+      "candidateId": "fresh-multilane:5260c743a4207bac74a6160f35441d99",
+      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "sourceRevision": "sha256:86d5275cfd5b097ff23e548af21bbe78e10b4815f173a798903f2b122f0ec896",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
+      "subjectType": "SOURCE",
+      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "predicate": "USES_CONCEPT",
+      "objectType": "CONCEPT",
+      "objectId": "concept:interface-ontologyobservationv1",
+      "objectValue": "interface OntologyObservationV1",
+      "evidenceRefs": [
+        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/langgraph-client.ts:28",
+        "source-observation:sveltekit-frontend/src/lib/server/ai/langgraph-client.ts:86d5275cfd5b097ff23e548af21bbe78e10b4815f173a798903f2b122f0ec896",
+        "structural-observation:sveltekit-frontend/src/lib/server/ai/langgraph-client.ts:sha256:6de42c0b1b9bf355a424cb90f41e2b0b5892a199d500343497500b78df61cd1a"
+      ],
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "extractorKinds": [
+        "python-enrichment-v1",
+        "treesitter-chunker-structural-v1"
+      ],
+      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
+      "crossLaneAgreement": 0,
+      "structuralEvidenceCoLocated": true,
+      "sourceSpanGrounded": false,
+      "sourceSpan": null,
+      "groundedExtractionCount": 2,
+      "confidence": 0.5,
+      "status": "APPROVED_FOR_REL01B_REVIEW",
+      "canonicalAuthority": false,
+      "reviewDecision": {
+        "decidedBy": "operator",
+        "decidedAt": "2026-09-09T01:09:46.272Z",
+        "rationale": "domain-meaningful concept, not a generic local variable or non-domain utility type"
+      }
+    },
+    {
+      "schema": "atlas.feature-ontology-fresh-candidate.v1",
+      "candidateId": "fresh-multilane:eaa143e6c78b3911f2f8d1a7068091b1",
+      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "sourceRevision": "sha256:86d5275cfd5b097ff23e548af21bbe78e10b4815f173a798903f2b122f0ec896",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
+      "subjectType": "SOURCE",
+      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "predicate": "USES_CONCEPT",
+      "objectType": "CONCEPT",
+      "objectId": "concept:interface-langgraphdomainclassificationrequest",
+      "objectValue": "interface LangGraphDomainClassificationRequest",
+      "evidenceRefs": [
+        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/langgraph-client.ts:27",
+        "source-observation:sveltekit-frontend/src/lib/server/ai/langgraph-client.ts:86d5275cfd5b097ff23e548af21bbe78e10b4815f173a798903f2b122f0ec896",
+        "structural-observation:sveltekit-frontend/src/lib/server/ai/langgraph-client.ts:sha256:6de42c0b1b9bf355a424cb90f41e2b0b5892a199d500343497500b78df61cd1a"
+      ],
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "extractorKinds": [
+        "python-enrichment-v1",
+        "treesitter-chunker-structural-v1"
+      ],
+      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
+      "crossLaneAgreement": 0,
+      "structuralEvidenceCoLocated": true,
+      "sourceSpanGrounded": false,
+      "sourceSpan": null,
+      "groundedExtractionCount": 2,
+      "confidence": 0.5,
+      "status": "APPROVED_FOR_REL01B_REVIEW",
+      "canonicalAuthority": false,
+      "reviewDecision": {
+        "decidedBy": "operator",
+        "decidedAt": "2026-09-09T01:09:46.272Z",
+        "rationale": "domain-meaningful concept, not a generic local variable or non-domain utility type"
+      }
+    },
+    {
+      "schema": "atlas.feature-ontology-fresh-candidate.v1",
+      "candidateId": "fresh-multilane:6b244b2e60a79288a4b7958d63b25578",
+      "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "sourceRevision": "sha256:e2421bd70077b7b52c75d3a7ff706eec5227c3a2cd0719a34cd386ca2e4e6ada",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
+      "subjectType": "SOURCE",
+      "subjectId": "source:sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "predicate": "USES_CONCEPT",
+      "objectType": "CONCEPT",
+      "objectId": "concept:function-extractqueryentities",
+      "objectValue": "function extractQueryEntities",
+      "evidenceRefs": [
+        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts:31",
+        "source-observation:sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts:e2421bd70077b7b52c75d3a7ff706eec5227c3a2cd0719a34cd386ca2e4e6ada",
+        "structural-observation:sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts:sha256:a5ac5bb9abe761d24f12db0914aa2e8f7a06996c9b2f8f0398adf4f235d89801"
+      ],
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "extractorKinds": [
+        "python-enrichment-v1",
+        "treesitter-chunker-structural-v1"
+      ],
+      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
+      "crossLaneAgreement": 0,
+      "structuralEvidenceCoLocated": true,
+      "sourceSpanGrounded": false,
+      "sourceSpan": null,
+      "groundedExtractionCount": 0,
+      "confidence": 0.5,
+      "status": "APPROVED_FOR_REL01B_REVIEW",
+      "canonicalAuthority": false,
+      "reviewDecision": {
+        "decidedBy": "operator",
+        "decidedAt": "2026-09-09T01:09:46.272Z",
+        "rationale": "domain-meaningful concept, not a generic local variable or non-domain utility type"
+      }
+    },
+    {
+      "schema": "atlas.feature-ontology-fresh-candidate.v1",
+      "candidateId": "fresh-multilane:7f6980f00a954afdcee187c84a417114",
+      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "sourceRevision": "sha256:1840825b32ee43669794fb4f8647ca6468e2033304d39a3019a224b7dc49f215",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
+      "subjectType": "SOURCE",
+      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "predicate": "USES_CONCEPT",
+      "objectType": "CONCEPT",
+      "objectId": "concept:function-explicittemporalalternativetoolsuccess",
+      "objectValue": "function explicitTemporalAlternativeToolSuccess",
+      "evidenceRefs": [
+        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts:28",
+        "source-observation:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts:1840825b32ee43669794fb4f8647ca6468e2033304d39a3019a224b7dc49f215",
+        "structural-observation:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts:sha256:a71f7752b94aa4e5bf94ec161611f5914551e96f9cf781785625e231bb24c892"
+      ],
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "extractorKinds": [
+        "python-enrichment-v1",
+        "treesitter-chunker-structural-v1"
+      ],
+      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
+      "crossLaneAgreement": 0,
+      "structuralEvidenceCoLocated": true,
+      "sourceSpanGrounded": false,
+      "sourceSpan": null,
+      "groundedExtractionCount": 1,
+      "confidence": 0.5,
+      "status": "APPROVED_FOR_REL01B_REVIEW",
+      "canonicalAuthority": false,
+      "reviewDecision": {
+        "decidedBy": "operator",
+        "decidedAt": "2026-09-09T01:09:46.272Z",
+        "rationale": "domain-meaningful concept, not a generic local variable or non-domain utility type"
+      }
+    },
+    {
+      "schema": "atlas.feature-ontology-fresh-candidate.v1",
+      "candidateId": "fresh-multilane:5e147eaa41bf32f28e570ff776429ec9",
+      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "sourceRevision": "sha256:1840825b32ee43669794fb4f8647ca6468e2033304d39a3019a224b7dc49f215",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
+      "subjectType": "SOURCE",
+      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "predicate": "USES_CONCEPT",
+      "objectType": "CONCEPT",
+      "objectId": "concept:type-agentstate",
+      "objectValue": "type AgentState",
+      "evidenceRefs": [
+        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts:49",
+        "source-observation:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts:1840825b32ee43669794fb4f8647ca6468e2033304d39a3019a224b7dc49f215",
+        "structural-observation:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts:sha256:a71f7752b94aa4e5bf94ec161611f5914551e96f9cf781785625e231bb24c892"
+      ],
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "extractorKinds": [
+        "python-enrichment-v1",
+        "treesitter-chunker-structural-v1"
+      ],
+      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
+      "crossLaneAgreement": 0,
+      "structuralEvidenceCoLocated": true,
+      "sourceSpanGrounded": false,
+      "sourceSpan": null,
+      "groundedExtractionCount": 1,
+      "confidence": 0.5,
+      "status": "APPROVED_FOR_REL01B_REVIEW",
+      "canonicalAuthority": false,
+      "reviewDecision": {
+        "decidedBy": "operator",
+        "decidedAt": "2026-09-09T01:09:46.272Z",
+        "rationale": "domain-meaningful concept, not a generic local variable or non-domain utility type"
+      }
+    },
+    {
+      "schema": "atlas.feature-ontology-fresh-candidate.v1",
+      "candidateId": "fresh-multilane:f8816b1d0b8831b5a8fe3eeb0984539c",
+      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "sourceRevision": "sha256:1840825b32ee43669794fb4f8647ca6468e2033304d39a3019a224b7dc49f215",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
+      "subjectType": "SOURCE",
+      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "predicate": "USES_CONCEPT",
+      "objectType": "CONCEPT",
+      "objectId": "concept:langgraph-state-graph",
+      "objectValue": "StateGraph",
+      "evidenceRefs": [
+        "langextract-grounded:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts:9:19:9a8c54b132b1685c798d5531e2c259bdcd2e43d457fa825542d7fe8d39a16dd2",
+        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts:50",
+        "source-observation:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts:1840825b32ee43669794fb4f8647ca6468e2033304d39a3019a224b7dc49f215",
+        "structural-observation:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts:sha256:a71f7752b94aa4e5bf94ec161611f5914551e96f9cf781785625e231bb24c892"
+      ],
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "extractorKinds": [
+        "python-enrichment-v1",
+        "treesitter-chunker-structural-v1"
+      ],
+      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
+      "crossLaneAgreement": 0,
+      "structuralEvidenceCoLocated": true,
+      "sourceSpanGrounded": true,
+      "sourceSpan": {
+        "startChar": 9,
+        "endChar": 19,
+        "text": "StateGraph"
+      },
+      "groundedExtractionCount": 1,
+      "confidence": 0.5,
+      "status": "APPROVED_FOR_REL01B_REVIEW",
+      "canonicalAuthority": false,
+      "reviewDecision": {
+        "decidedBy": "operator",
+        "decidedAt": "2026-09-09T01:09:46.272Z",
+        "rationale": "domain-meaningful concept, not a generic local variable or non-domain utility type"
+      }
+    },
+    {
+      "schema": "atlas.feature-ontology-fresh-candidate.v1",
+      "candidateId": "fresh-multilane:3a533f14fc2e79476f65fa62cea9e3c7",
+      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "sourceRevision": "sha256:86d5275cfd5b097ff23e548af21bbe78e10b4815f173a798903f2b122f0ec896",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
+      "subjectType": "SOURCE",
+      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "predicate": "USES_CONCEPT",
+      "objectType": "CONCEPT",
+      "objectId": "concept:interface-packetidentityv1",
+      "objectValue": "interface PacketIdentityV1",
+      "evidenceRefs": [
+        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/langgraph-client.ts:29",
+        "source-observation:sveltekit-frontend/src/lib/server/ai/langgraph-client.ts:86d5275cfd5b097ff23e548af21bbe78e10b4815f173a798903f2b122f0ec896",
+        "structural-observation:sveltekit-frontend/src/lib/server/ai/langgraph-client.ts:sha256:6de42c0b1b9bf355a424cb90f41e2b0b5892a199d500343497500b78df61cd1a"
+      ],
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "extractorKinds": [
+        "python-enrichment-v1",
+        "treesitter-chunker-structural-v1"
+      ],
+      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
+      "crossLaneAgreement": 0,
+      "structuralEvidenceCoLocated": true,
+      "sourceSpanGrounded": false,
+      "sourceSpan": null,
+      "groundedExtractionCount": 2,
+      "confidence": 0.5,
+      "status": "APPROVED_FOR_REL01B_REVIEW",
+      "canonicalAuthority": false,
+      "reviewDecision": {
+        "decidedBy": "operator",
+        "decidedAt": "2026-09-09T01:09:46.272Z",
+        "rationale": "domain-meaningful concept, not a generic local variable or non-domain utility type"
+      }
+    },
+    {
+      "schema": "atlas.feature-ontology-fresh-candidate.v1",
+      "candidateId": "fresh-multilane:93144687b7d74a2503b7bf70b777b402",
+      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "sourceRevision": "sha256:73299f8bc02d95075697fb9df5f4faf56eac2ce97c4adb38de993e2c621f4b1a",
+      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
+      "subjectType": "SOURCE",
+      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "predicate": "USES_CONCEPT",
+      "objectType": "CONCEPT",
+      "objectId": "concept:const-domain-query-prefix",
+      "objectValue": "const DOMAIN_QUERY_PREFIX",
+      "evidenceRefs": [
+        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/langgraph-research.ts:23",
+        "source-observation:sveltekit-frontend/src/lib/server/ai/langgraph-research.ts:73299f8bc02d95075697fb9df5f4faf56eac2ce97c4adb38de993e2c621f4b1a",
+        "structural-observation:sveltekit-frontend/src/lib/server/ai/langgraph-research.ts:sha256:746407039fbab24ca2114383fd87366a09b4900e9e0f8e5044f95075f7b99bd4"
+      ],
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "extractorKinds": [
+        "python-enrichment-v1",
+        "treesitter-chunker-structural-v1"
+      ],
+      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
+      "crossLaneAgreement": 0,
+      "structuralEvidenceCoLocated": true,
+      "sourceSpanGrounded": false,
+      "sourceSpan": null,
+      "groundedExtractionCount": 2,
+      "confidence": 0.5,
+      "status": "APPROVED_FOR_REL01B_REVIEW",
+      "canonicalAuthority": false,
+      "reviewDecision": {
+        "decidedBy": "operator",
+        "decidedAt": "2026-09-09T01:09:46.272Z",
+        "rationale": "domain-meaningful concept, not a generic local variable or non-domain utility type"
+      }
+    }
+  ],
+  "rejected": [
+    {
+      "candidateId": "fresh-multilane:684352d43f5a45e8f9f9c783e2c87897",
+      "objectValue": "into",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "bucket": "LIKELY_NOISE",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:844c90e91e33bb6f56b7f7ee2ed48bed",
+      "objectValue": "reranking",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:4b7b02eda76b3c1295f9eb566dfe2272",
+      "objectValue": "langgraph",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:0993db56534c29bdc009c8867fa9e612",
+      "objectValue": "Parent",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:5acebbf88be57fae26fc7dee798c30fa",
+      "objectValue": "retrieval",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:77d320da0e9b7054568ea776264932bd",
+      "objectValue": "limit",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "bucket": "LIKELY_NOISE",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:d4b70295da8633daa0dd501d61791666",
+      "objectValue": "W_SECTION",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:ab9f38b3f55cd9dd75d1dec82b576745",
+      "objectValue": "const matched",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "bucket": "LIKELY_SYMBOL",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:9eaa199665812fa6115bada9a6683a61",
+      "objectValue": "Graph",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:87e7c419c0f5c1beb3fdc7ea407fee8d",
+      "objectValue": "START",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "bucket": "LIKELY_NOISE",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:b8ec0be9957e97c9eae5118081f5907b",
+      "objectValue": "const ent",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "bucket": "LIKELY_SYMBOL",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:47f000a54338e53d836c35395ead46f3",
+      "objectValue": "optional",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "bucket": "LIKELY_NOISE",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:5afb3dddf1ea5e9c6bd85ebbeb475ecf",
+      "objectValue": "const ENTITY_CACHE_TTL",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "bucket": "LIKELY_SYMBOL",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:71493cc757cc90cf82bd833f3843fe1d",
+      "objectValue": "chunkHits",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:027a4dad748f69145e7d7185bdfaf710",
+      "objectValue": "registry",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:0a15d6895d969742bcf2cff5ca81c39b",
+      "objectValue": "via",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "bucket": "LIKELY_NOISE",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:11411c92d6431a2ac1eea17aa6625411",
+      "objectValue": "from",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "bucket": "LIKELY_NOISE",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:ab7e9fcdfa2a1e65c5e94be7073f8e5e",
+      "objectValue": "Capabilities",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:07399e7c8fc6b607b135fdfa4a0922e3",
+      "objectValue": "<anonymous>",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "bucket": "LIKELY_NOISE",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:d96773a292047a32bb5923ada4729056",
+      "objectValue": "const W_ENTITY",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "bucket": "LIKELY_SYMBOL",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:f44da95f2d4df0b0fabed3c0dfb77ece",
+      "objectValue": "const needle",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "bucket": "LIKELY_SYMBOL",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:c5a300bb70faed4c77908159eee032b4",
+      "objectValue": "suggestFix",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:fa1774c3feff9ed3c7fca8740b1a6371",
+      "objectValue": "CanonicalTraceRow",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:4e0f60ce49587411d46b206ecfe0d1d2",
+      "objectValue": "const persisted",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "bucket": "LIKELY_SYMBOL",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:a84a1832e1dd0dce22a17d3f38b3b104",
+      "objectValue": "DAG",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:de30cb41faffa52137da3a708312a1d8",
+      "objectValue": "const canonicalRow",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "bucket": "LIKELY_SYMBOL",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:3f6c8019f73a5edfb6ee6f0caff9fec8",
+      "objectValue": "run",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "bucket": "LIKELY_NOISE",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:762ccae35ebe226868e608f8d35be390",
+      "objectValue": "through",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:6c1c0d27da2534ee50b1354f936138cd",
+      "objectValue": "const associatedLenses",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "bucket": "LIKELY_SYMBOL",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:d7d1a3a806dbea8c30ee128aab2da0bf",
+      "objectValue": "LangGraph",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:3425cbe7ad63b02ceb57513ef354eb23",
+      "objectValue": "ACE",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:b8f9895f952e425d94217999468392ab",
+      "objectValue": "ace",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "bucket": "LIKELY_NOISE",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:bbdc54716d90bb0ad0424e8d33c39860",
+      "objectValue": "lensHits",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:445ca5c4390447908d8fc9a5b965555d",
+      "objectValue": "DOMAIN_TAGS",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:281c04699543dbf7138d8fd5f35aabf3",
+      "objectValue": "LangExtract",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:e3cda71d34f909807b40002beb16852e",
+      "objectValue": "Implements",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:e14c7308e32c522fd057aaf8fde41701",
+      "objectValue": "Promise",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:41c301c1465a6e00bb935d328290ebea",
+      "objectValue": "neighbor",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:42d3cc792909bf80486651cc1bca518a",
+      "objectValue": "parallel",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:a873158c0949dd6b43401a5dc699da75",
+      "objectValue": "W_ENTITY",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:c1007ae3a23ab051b4ba8597bd727b2c",
+      "objectValue": "const chunkHits",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "bucket": "LIKELY_SYMBOL",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:91e8e2d7a5df866044fea1030c4b6430",
+      "objectValue": "PacketIdentityV1",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:6e2d380709d42ad4b267346b175d6ac8",
+      "objectValue": "synthesizer",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:9f09f066da1e5c97974404f2362c3028",
+      "objectValue": "const canonicalRowByRef",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "bucket": "LIKELY_SYMBOL",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:3cf262fab7fd6b9675b9e23b8364ba63",
+      "objectValue": "executeTool",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:358e3e6e10d0c7cf66c0759c1f50256d",
+      "objectValue": "parseToolCall",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:68c3ead0e88a9d1f8068f4064ed2f799",
+      "objectValue": "rerank",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:d9c0cea0720844f9fa34e581e7c2f5a3",
+      "objectValue": "DAG",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:cd5abcc457bab4b8b3ef5804dac1d517",
+      "objectValue": "cache",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:093641a5f29f6e9971173e692898adf2",
+      "objectValue": "const str",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "bucket": "LIKELY_SYMBOL",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:fe7ab164a8b7b5b5ca02d6aa570fb722",
+      "objectValue": "lensesToRetrieve",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:f7650044f2143a28cd8b9ff3c25e8011",
+      "objectValue": "lane",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:6743d2813703a991626660b595d794b3",
+      "objectValue": "server",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:2116509a795e255a2bde4fb92a89ed3e",
+      "objectValue": "END",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:1b30029aaff5296c412a010d42b0a5cf",
+      "objectValue": "are",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "bucket": "LIKELY_NOISE",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:f88dde2cfc36cd39a50c686d0684ce21",
+      "objectValue": "lib",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "bucket": "LIKELY_NOISE",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:5bec85c798ed9c214bf584d048bbf2c6",
+      "objectValue": "plan",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:91f4d1a15d8670fd93b2af803a9d892f",
+      "objectValue": "classifies",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:a58796f6b7dda0cc43628a5426442925",
+      "objectValue": "merge",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:23f8d6ca9c945d10bc121befa1c27f03",
+      "objectValue": "const value",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "bucket": "LIKELY_SYMBOL",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:62a31f0fb090514166a72ee56dfc0971",
+      "objectValue": "canonicalJson",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:00f4d00edea6cdfc28fbdc80022beb18",
+      "objectValue": "matched",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:ea9843d461210c5287ccf7763238fcb3",
+      "objectValue": "Qdrant",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "bucket": "GROUNDED",
+      "reason": "non-domain-meaningful (e.g. TS utility type)"
+    },
+    {
+      "candidateId": "fresh-multilane:4c2c0847566e0b70d39a22d23f2de45f",
+      "objectValue": "extension",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:cb08818b61897a1239decc44e8bc98f7",
+      "objectValue": "tool",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:8eda6587c284e4b1957a7cf0d0a98183",
+      "objectValue": "result",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:70feb5214fbbc7bc051e4e8893d23753",
+      "objectValue": "allSettled",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:539f3fe4290192f9bc776a13fc0ec8f2",
+      "objectValue": "concurrently",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:945a608e354a2d9fee6b02096d944305",
+      "objectValue": "shared",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:cb77cf13b2ffb26194696a946edbfc39",
+      "objectValue": "const keys",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "bucket": "LIKELY_SYMBOL",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:7fdce3f0b327e2cf99f59d30b6b8380a",
+      "objectValue": "hashContent",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:68233c793ddddd7a5bc7fb4641477af6",
+      "objectValue": "the",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "bucket": "LIKELY_NOISE",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:d8317e3536f1182a6c43f15e1fb3cae5",
+      "objectValue": "learning",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:f1bb8e2218cddb2972e8ee583a1c3136",
+      "objectValue": "workers",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:304be6fffe5199528030927d9afc72c5",
+      "objectValue": "path",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:ae66f6da6eb822037163a7252eca0513",
+      "objectValue": "orm",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "bucket": "LIKELY_NOISE",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:3460a99dde43e02a4d7dd41678df1a0c",
+      "objectValue": "const row",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "bucket": "LIKELY_SYMBOL",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:76e8a260679c73ce173ee02f2b709b2a",
+      "objectValue": "const canonicalRows",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "bucket": "LIKELY_SYMBOL",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:6b5385cdc7a326305b7270c6fd7362bb",
+      "objectValue": "vector",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:eb18c0c0d331c63f2d5d9742ee0a9cc6",
+      "objectValue": "redis",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:38c20b67f460ad52fc19e4b8aae42b4e",
+      "objectValue": "Aware",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:f1ec95a08b1d334ba3bdc4c7c5b1fc11",
+      "objectValue": "final",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:90a85bf0a67461ed3c1aa899133d17b9",
+      "objectValue": "Research",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:078d6cbad4eeb130297576f44a2445d0",
+      "objectValue": "pattern",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:4b6b4e8f3d6e58518ba0661b1910a28b",
+      "objectValue": "function adjustStrategy",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "bucket": "LIKELY_SYMBOL",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:f9fe4a1b6a8b30c6ff1a027144feb39b",
+      "objectValue": "const lensHits",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "bucket": "LIKELY_SYMBOL",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:93ec53125b1e515f3f38b3681a6f08ef",
+      "objectValue": "Orchestrator",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:04ebc9b397a791a4050be5b6ada09472",
+      "objectValue": "const memoryHits",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "bucket": "LIKELY_SYMBOL",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:7f9dff77b2f6adcf0e08468fdbed9a9c",
+      "objectValue": "shim",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:a97f98b8a68230840086b7d3902a5348",
+      "objectValue": "Entity",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:ebf9717d2cd8cd25a57425638eb4b732",
+      "objectValue": "AgentState",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:aa30f7039ef891d06b0df643c255a4e9",
+      "objectValue": "with",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "bucket": "LIKELY_NOISE",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:26016716d1c5b4b07c642e0440ec0b13",
+      "objectValue": "query",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:05c06c5e7b42719740d4d4d2e47075ed",
+      "objectValue": "score",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:181707fc111598e117b9273896f5abe1",
+      "objectValue": "Valkey",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:8de890b56fd6833198b64076b035bf42",
+      "objectValue": "const key",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "bucket": "LIKELY_SYMBOL",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:630e4310ab00108d7204ea1a0f7743c3",
+      "objectValue": "Atlas",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:aeb45b4c44949702160672ca96fbf23a",
+      "objectValue": "provided",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:1fbf7257e9e2d0a2bba242564643ba0f",
+      "objectValue": "const sortedObj",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "bucket": "LIKELY_SYMBOL",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:c3f67b5067ee6d59a24cecb7a2439e78",
+      "objectValue": "<anonymous>",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "bucket": "LIKELY_NOISE",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:4c33f60a5d6f42f3496873fb30655326",
+      "objectValue": "const authoritativeOutcome",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "bucket": "LIKELY_SYMBOL",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:2474db429dca9072ddcfc51bff09e577",
+      "objectValue": "const result",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "bucket": "LIKELY_SYMBOL",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:9e7aeab3dfd4ab705f8df63c31ba98ef",
+      "objectValue": "concurrent_research",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:4f09b2ea7e851216e2456450a3d36854",
+      "objectValue": "Python",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:8882d940ebe855788225fcce921f0153",
+      "objectValue": "topology",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:fab7278719eea6189b81f347422aba83",
+      "objectValue": "client",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:3af5ac44b30217dfe8e615df4b6fd9a7",
+      "objectValue": "inspired",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:eb997b9d57f1c0d2fe86f1b0a436ab20",
+      "objectValue": "bounded",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:94ddcc97163064350199321a1ba0dbc6",
+      "objectValue": "const W_SECTION",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "bucket": "LIKELY_SYMBOL",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:981106b034697773a89fd46f7103d452",
+      "objectValue": "for",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "bucket": "LIKELY_NOISE",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:fca491ad25539dd70b6bd7ca67bf3c35",
+      "objectValue": "Multi",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:1e317f769abb75bc7d422e0ae6ab6a21",
+      "objectValue": "verification",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:1d69341989e0b474f3c442b7ea331c9e",
+      "objectValue": "from",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "bucket": "LIKELY_NOISE",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:fdd8664a6ae04126b158a44686b2b6a5",
+      "objectValue": "service",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:64adc5f9107f784ad972a7925ea0e053",
+      "objectValue": "const contentLower",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "bucket": "LIKELY_SYMBOL",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:295411680bd656e97cb62228e789e9ec",
+      "objectValue": "injectACETableCache",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:92991150f6f922c1c89a9654786345a6",
+      "objectValue": "BinaryVectorArtifactV1",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:b0f5bd1d6b5f9052b61235062ae973e5",
+      "objectValue": "const researchHits",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "bucket": "LIKELY_SYMBOL",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:8a907eb298a416cad3e808867ef0eb9a",
+      "objectValue": "const limit",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "bucket": "LIKELY_SYMBOL",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:031269aab2879786f3bb8b65a673a4ea",
+      "objectValue": "const seenToolCalls",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "bucket": "LIKELY_SYMBOL",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:b9859503de7aeccb869e4f3fd368e15e",
+      "objectValue": "NLP",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:6bfa0d77c154f47196a72e30f921bf53",
+      "objectValue": "import",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:4271372871cdaa514d14d290bdfaf593",
+      "objectValue": "GRPO",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:ed53e38c17769be61e9c13573bb03ecd",
+      "objectValue": "not",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "bucket": "LIKELY_NOISE",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:0b090c434b2734055a228783423d4fbf",
+      "objectValue": "recordExecutionOutcome",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:f18de72cf527ffdcd8713230b1fddc47",
+      "objectValue": "let intentBoost",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "bucket": "LIKELY_SYMBOL",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:52ab25e74bbea798488b90e270f287aa",
+      "objectValue": "synthesis",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:c98bed6412deb32b2807abd893f4ac3d",
+      "objectValue": "Codebase",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:246b8a705058a3020e0af24e5369f2c6",
+      "objectValue": "extractQueryEntities",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:c9904d747851c50467d8f62002429f6b",
+      "objectValue": "LangGraphDomainClassificationRequest",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:8a1455d5f9c8d750017d7bba709a88fa",
+      "objectValue": "Designed",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:b80110f3295400637f28011b6604866a",
+      "objectValue": "RerankableChunk",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:40d66fd79e8f0363f954980e3994b7ba",
+      "objectValue": "getQdrantManager",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:98a122a5ee38191a5d2ec650a70e32a4",
+      "objectValue": "MCP",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:48cc43091f59eb9a0143d114dab96c87",
+      "objectValue": "GRPORerankResult",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:fdec4b8fe5fc19e4f135415730fe207a",
+      "objectValue": "const sourceRef",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "bucket": "LIKELY_SYMBOL",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:f173fb948172b2c28a06484d8e6146f6",
+      "objectValue": "deep",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:9e6c26db1edaf9f1aac7e8c73efdd823",
+      "objectValue": "str",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "bucket": "LIKELY_NOISE",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:bc2d526ad23976f92a941e6851afc01b",
+      "objectValue": "const lensesToRetrieve",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "bucket": "LIKELY_SYMBOL",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:426db436badb96761b48bcfc6a38d322",
+      "objectValue": "adjustStrategy",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:c7cd747ceb119c76a9236e8c6369d3f3",
+      "objectValue": "canonicalRows",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:4ec8d3b63d41fa0d1105a598a10e8481",
+      "objectValue": "const W_RETRIEVAL",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "bucket": "LIKELY_SYMBOL",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:ab3617b97f15bded038db23a48fb1b33",
+      "objectValue": "SECTION_RELEVANCE",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:7012efb75490e2283396953459a295e4",
+      "objectValue": "auto",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:5eb8e89a3c6b75a7e5d31a2f4fab7712",
+      "objectValue": "const joinCoverage",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "bucket": "LIKELY_SYMBOL",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:d3a22e74b0d1b078c8ddbb403fc73aa0",
+      "objectValue": "const plan",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "bucket": "LIKELY_SYMBOL",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:f1d50c8822db2dba6cde170d4b9f0b66",
+      "objectValue": "based",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:b44e2b040ab04f44cf766f10d1d6145d",
+      "objectValue": "MIN_JOIN_COVERAGE",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:a9cd7afefb39721e4798fb843cc825c5",
+      "objectValue": "Reranker",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:907f447d5051501b75b0d6cecbb30eb1",
+      "objectValue": "function shouldUseTool",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "bucket": "LIKELY_SYMBOL",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:cc8ea4e1a47c8ad9a61005c0ab54ffc8",
+      "objectValue": "<anonymous>",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "bucket": "LIKELY_NOISE",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:d339e122157a4d593fa56fed45027849",
+      "objectValue": "aggregates",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:4e10b532e6d1d0d6645d213ba9cc64c2",
+      "objectValue": "sortedObj",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:fa2db3c5ce93cbb24776af6662d4bb3a",
+      "objectValue": "that",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "bucket": "LIKELY_NOISE",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:35eccaae9f730c17055081deb9b31192",
+      "objectValue": "type relevance",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "bucket": "LIKELY_SYMBOL",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:39f796fb28f26294529964bc6324badc",
+      "objectValue": "LangGraph",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:269ed01ad05f03e6bbaebd6950789821",
+      "objectValue": "const lensKey",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "bucket": "LIKELY_SYMBOL",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:c96791a542ac2505ef49ec475014e02b",
+      "objectValue": "face",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:2d8e6c17458f8600b545b73859d0cae1",
+      "objectValue": "const score",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "bucket": "LIKELY_SYMBOL",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:ed1e8ecfd42c909953562268ead13cf9",
+      "objectValue": "const selection",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "bucket": "LIKELY_SYMBOL",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:97d99e704041a82116c982b8b5083c5c",
+      "objectValue": "ENTITY_CACHE_PREFIX",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:ca32f8bc6a59bf242c4fb92a0eb26134",
+      "objectValue": "KAG",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:6f50e3946f348706513e4af8d0bd422d",
+      "objectValue": "researchHits",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:2d28b09aceae2907957a973d84a05f1c",
+      "objectValue": "fix",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "bucket": "LIKELY_NOISE",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:fb3d5743187ddcaaacfc63b7ab616b75",
+      "objectValue": "manager",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:d7653122a2d536ddfe9bd1268c5236bd",
+      "objectValue": "orchestration",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:f05551f381865fc45f76426574659f47",
+      "objectValue": "adapters",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:339da3ca2d69c72aaf5dd1499250253c",
+      "objectValue": "available",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:48cb05012bce30998b86810806ffe686",
+      "objectValue": "type alignment",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "bucket": "LIKELY_SYMBOL",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:d91d4f01dcbf966588f3526522d17f2e",
+      "objectValue": "const redis",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "bucket": "LIKELY_SYMBOL",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:81618ecb72672c93effd42c18ccb8079",
+      "objectValue": "the",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "bucket": "LIKELY_NOISE",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:141474723f4f0d2aedc12e0aa690a948",
+      "objectValue": "the",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "bucket": "LIKELY_NOISE",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:5b427212492e792c75fc1451af1296e8",
+      "objectValue": "Code",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:92ef741fc08b1f34f8dbdbcb96033060",
+      "objectValue": "ENTITY_CACHE_TTL",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:97d1852bf5406f0eb6149dd00742eca4",
+      "objectValue": "Concurrent",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:d09fc0825ed95f44ff3a645e39cf246f",
+      "objectValue": "import",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:bb994fe195511de5f42119af532d7e89",
+      "objectValue": "drizzle",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:ecb7e4f7123c379fffd2a79d07798f5d",
+      "objectValue": "process",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:daee8eccd9b9891a58905686fb28655b",
+      "objectValue": "const sectionType",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "bucket": "LIKELY_SYMBOL",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:6336ddea4abd4a85de8900b9ba0b0410",
+      "objectValue": "Record",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "bucket": "GROUNDED",
+      "reason": "non-domain-meaningful (e.g. TS utility type)"
+    },
+    {
+      "candidateId": "fresh-multilane:498bf1e56f798365b2ce8d68710b29dc",
+      "objectValue": "DOMAIN_QUERY_PREFIX",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:01ec186f5feb809f8d382107c5e1a224",
+      "objectValue": "const qdrant",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "bucket": "LIKELY_SYMBOL",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:0c9700d03132478233aff505aff9c618",
+      "objectValue": "style",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:d1bb54202ad578f4c5bc6b41ed41ba07",
+      "objectValue": "builder",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:ff5ca018c2e2237450faa0d4eb1a1cd1",
+      "objectValue": "needle",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:408aa7a69026a569490127163f5d08f0",
+      "objectValue": "explicit",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:e9363da5168f01bed18b51a3981f3ef6",
+      "objectValue": "buildACEPacket",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:2c75c5bcea32996b82ed85dd72b69599",
+      "objectValue": "Resumable",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:fa5cd2c3821d0cc334308f68c04f6554",
+      "objectValue": "contentLower",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:adb3398d3f66d1e6936a8a1f13ca310c",
+      "objectValue": "langchain",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:b3dd596deab3851a25d7e72ae3ce255e",
+      "objectValue": "stages",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:02d531c7d6b0483837afd0ab01b83852",
+      "objectValue": "and",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "bucket": "LIKELY_NOISE",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:ed86b2555af3bc82014445ef9cd18464",
+      "objectValue": "TraceRerankResult",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:313e506453d5c253b78371b40c2cd80d",
+      "objectValue": "ResearchDomain",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:4bb6b301fd6ac0ef08917a1a91d19610",
+      "objectValue": "getActiveSemanticVectorLane",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:7194be7822db7eb63d88a04dde0b6aa1",
+      "objectValue": "TypeScript",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:e1ce2af0121e8c3fe5aa1ea7b65211a3",
+      "objectValue": "tool",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:5b20a6cc9db4cfb7d15b66a0ea58143f",
+      "objectValue": "ontology",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:641590e11412ed8d2bae831310e1f224",
+      "objectValue": "keys",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:361ce59f4ab25916f46ee119d0662139",
+      "objectValue": "scoreEntityOverlap",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:e8c7f98f91b340f9cf18e56c0519db6e",
+      "objectValue": "CANONICAL_COLLECTION",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:0b5ef4a5f245534978d55714b55176e2",
+      "objectValue": "OntologyObservationV1",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:f74dedc007e9309d0f82959fc55a3775",
+      "objectValue": "supervisor",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:f8c477afd3af8d28f48a5d0aaa621012",
+      "objectValue": "const ENTITY_CACHE_PREFIX",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "bucket": "LIKELY_SYMBOL",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:c35493edf8a406744adee3472c6cc0c7",
+      "objectValue": "ingested",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:efd09795506870ae732ff92336607988",
+      "objectValue": "TopologyProjectionV1",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:aaf69138dc66637f437742c3bf8f45ff",
+      "objectValue": "domains",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:b7bbbdcc5dfc53931fc41a0a1e4911ee",
+      "objectValue": "sql",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "bucket": "LIKELY_NOISE",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:5216ac235ffc6c272b65b42fa01d2d5b",
+      "objectValue": "TEMPORAL_RECOMMENDATION_OUTCOME_PRODUCER",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:4b0766e8eb44ee033b8026c8bf1b16e3",
+      "objectValue": "canonicalRowByRef",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:f8816b1d0b8831b5a8fe3eeb0984539c",
+      "objectValue": "StateGraph",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "bucket": "GROUNDED",
+      "reason": "duplicate of an already-approved (objectValue, sourceRef) pair"
+    },
+    {
+      "candidateId": "fresh-multilane:c1dbfd837b311287db7ca3bcba229526",
+      "objectValue": "W_RETRIEVAL",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:daeb8ce2c4583f21a4305402a75c49b6",
+      "objectValue": "caching",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:a2f2df3735488fc5e3ab6f77bdd17eda",
+      "objectValue": "model",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:0fd19b7e66b64e5c6fd41c1b2a63331e",
+      "objectValue": "overlap",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:a4e30aaf96c2107d3dae5aa91fde7df2",
+      "objectValue": "pass",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:7ca5e3e37532d133cf5956e345957072",
+      "objectValue": "mutatePromptWithLearnings",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:c302b305a1b37f61022b74ba20094c44",
+      "objectValue": "findings",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:b51a026db2ada2513a614162ea81dacc",
+      "objectValue": "Claude",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:6a34fa348c8d8dd54c8d3d72513256fc",
+      "objectValue": "memoryHits",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "bucket": "UNCERTAIN",
+      "reason": "generic local variable / low ontology value"
+    },
+    {
+      "candidateId": "fresh-multilane:de96ea0aa9de78b9c937920700373763",
+      "objectValue": "const results",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "bucket": "LIKELY_SYMBOL",
+      "reason": "generic local variable / low ontology value"
+    }
+  ]
+}

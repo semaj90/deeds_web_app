@@ -1,0 +1,57 @@
+{
+  "schema": "atlas.uuidv5-parity.v1",
+  "gate": "UUIDV5-PARITY-01",
+  "generatedAt": "2026-09-09T04:51:16.186Z",
+  "mode": "READ_ONLY",
+  "writesPerformed": false,
+  "namespace": "b8186da8-3b20-509f-84ea-2440f93ff22f",
+  "sampleSize": 100,
+  "exactMatchCount": 100,
+  "version5Count": 100,
+  "replayMismatches": 0,
+  "collisionCount": 0,
+  "overallResult": "PASS",
+  "sampleResults": [
+    {
+      "packetKey": "0ba2345cd9c542fa",
+      "nodeUuid": "f461f4cf-2c30-5237-927a-1d49d18d763f",
+      "pgUuid": "f461f4cf-2c30-5237-927a-1d49d18d763f",
+      "exactMatch": true,
+      "pgVersion": 5
+    },
+    {
+      "packetKey": "0bffe0382a0d44bb",
+      "nodeUuid": "4de9a9ec-b05f-50f4-8b6d-2d39a15d3a19",
+      "pgUuid": "4de9a9ec-b05f-50f4-8b6d-2d39a15d3a19",
+      "exactMatch": true,
+      "pgVersion": 5
+    },
+    {
+      "packetKey": "0ee918abc8c53e8d",
+      "nodeUuid": "bdbdbfb4-c781-5322-ae78-56a1e786c7c7",
+      "pgUuid": "bdbdbfb4-c781-5322-ae78-56a1e786c7c7",
+      "exactMatch": true,
+      "pgVersion": 5
+    },
+    {
+      "packetKey": "1703d9c005252a62",
+      "nodeUuid": "11cbc702-74eb-5e8e-a3f3-34e2480dae31",
+      "pgUuid": "11cbc702-74eb-5e8e-a3f3-34e2480dae31",
+      "exactMatch": true,
+      "pgVersion": 5
+    },
+    {
+      "packetKey": "175066b8a4ceee3c",
+      "nodeUuid": "21a0b479-f3eb-5bb8-b8eb-3be490cf452f",
+      "pgUuid": "21a0b479-f3eb-5bb8-b8eb-3be490cf452f",
+      "exactMatch": true,
+      "pgVersion": 5
+    }
+  ],
+  "acceptance": {
+    "exactMatch": "100/100",
+    "version5": "100/100",
+    "deterministicReplay": "20/20",
+    "collisionCount": 0
+  }
+}

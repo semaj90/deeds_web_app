@@ -1,0 +1,120 @@
+{
+  "schema": "atlas.external-search-result-parity.v1",
+  "status": "SEARCH_RESULT_NORMALIZATION_PROVEN_NON_CANONICAL",
+  "query": "ast-grep tree-sitter",
+  "queryChecksum": "sha256:08117cb70cf81e5a4c1200d753159c18631abadfcbea5205f838cf5475817781",
+  "limits": {
+    "requested": 5,
+    "searxng": 5,
+    "go": 1
+  },
+  "providers": {
+    "searxng": {
+      "endpoint": "http://127.0.0.1:8889/search?q=ast-grep+tree-sitter&format=json&categories=general",
+      "httpStatus": 200,
+      "rawResultFields": [
+        "category",
+        "content",
+        "engine",
+        "engines",
+        "img_src",
+        "parsed_url",
+        "positions",
+        "priority",
+        "publishedDate",
+        "score",
+        "template",
+        "thumbnail",
+        "title",
+        "url"
+      ],
+      "normalizedResults": [
+        {
+          "source": "searxng",
+          "sourceRef": "https://www.medicalnewstoday.com/articles/320982",
+          "title": "AST (SGOT) blood test: What the results mean and what happens next",
+          "snippet": "Apr 14, 2025 · An AST blood test, or SGOT test, checks how much AST, a liver enzyme, is present in the blood. High levels of AST in …",
+          "rank": 1
+        },
+        {
+          "source": "searxng",
+          "sourceRef": "https://www.ast.org/",
+          "title": "AST",
+          "snippet": "The Association of Surgical Technologists (AST) was established in 1969 with the mission of ensuring quality patient care. Today, …",
+          "rank": 2
+        },
+        {
+          "source": "searxng",
+          "sourceRef": "https://my.clevelandclinic.org/health/diagnostics/22147-aspartate-transferase-ast",
+          "title": "Aspartate Transferase (AST) - Cleveland Clinic",
+          "snippet": "Aspartate transferase (AST) is an enzyme that’s found in your liver, heart, muscles and other bodily tissues. An AST blood test is …",
+          "rank": 3
+        },
+        {
+          "source": "searxng",
+          "sourceRef": "https://aminoacidsguide.com/Asp.html",
+          "title": "Aspartic Acid (Asp) and Aspartate Transaminase (AST ...",
+          "snippet": "May 18, 2026 · Aspartate transaminase (AST), also known as aspartate aminotransferase, is an enzyme found in high concentrations …",
+          "rank": 4
+        },
+        {
+          "source": "searxng",
+          "sourceRef": "https://www.preventivemedicinedaily.com/diseases-conditions/digestive-system/liver/what-happens-if-my-ast-is-high-causes-signs-next-steps/",
+          "title": "What Happens If My AST Is High? Causes, Signs & Next Steps",
+          "snippet": "May 9, 2026 · AST, or aspartate aminotransferase, is an enzyme that helps the body process amino acids. Under normal conditions, …",
+          "rank": 5
+        }
+      ],
+      "role": "discovery_only"
+    },
+    "goRetrieval": {
+      "endpoint": "http://127.0.0.1:8100/search/bm25",
+      "httpStatus": 200,
+      "lane": "postgres_fts",
+      "scoreType": null,
+      "normalizedResults": [
+        {
+          "source": "postgres_fts",
+          "sourceRef": "fullrepo:docs/architecture/phase8-query-optimization-taxonomy.md:13",
+          "title": "",
+          "snippet": "functions, methods, imports, exports, symbols\ndata       -> rows, payloads, vectors, jsonb, tuples, envelopes\nfunctions  -> <b>AST</b>-<b>grep</b> / <b>tree</b>-<b>sitter</b> function nodes\nreranker   -> cross-encoder, TurboVec, Triton, XGBoost, policy rankers\nsemantics  -> title",
+          "rank": 1
+        }
+      ],
+      "role": "read_only_postgres_fts_executor",
+      "readOnly": true,
+      "canonicalAuthority": false
+    }
+  },
+  "checks": {
+    "searxngHttpOk": true,
+    "searxngResultsArray": true,
+    "searxngResultsHaveHttpRefs": true,
+    "searxngRefsUnique": true,
+    "goHttpOk": true,
+    "goResultsArray": true,
+    "goResultsHaveSourceRefs": true,
+    "goReadOnly": true,
+    "goCanonicalAuthorityFalse": true
+  },
+  "interpretation": {
+    "commonEphemeralEnvelope": "source + sourceRef + title + snippet + rank",
+    "identityPolicy": "SearXNG URL refs and Go source refs remain provider-specific; no cross-provider identity is inferred",
+    "fusionOwner": "SearchRuntime",
+    "canonicalAdmission": false
+  },
+  "writes": {
+    "postgres": false,
+    "qdrant": false,
+    "neo4j": false,
+    "valkey": false,
+    "couchdb": false,
+    "models": false
+  },
+  "gaps": [
+    "SearXNG discovery results are not source-revision-bound documents",
+    "Go Retrieval and SearXNG do not share candidate identity or ranking semantics",
+    "No external-document Postgres admission or projection readback was attempted"
+  ],
+  "generatedAt": "2026-09-09T02:07:05.620Z"
+}

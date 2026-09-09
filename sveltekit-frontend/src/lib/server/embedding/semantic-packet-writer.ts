@@ -13,6 +13,14 @@ export interface PersistCanonicalSemanticPacketEmbeddingInput {
 	packetId?: string;
 	packetKey: string;
 	sourceRef: string;
+	/**
+	 * Revision of the source content this embedding was computed from (e.g. a
+	 * content hash or git blob SHA). Optional and left NULL when the caller has
+	 * no real revision evidence -- never synthesize a value here. Added
+	 * 2026-09-09 alongside the atlas_packets.source_revision column migration;
+	 * no current caller supplies it yet (see PACKET_WRITE_REVISION_CONTRACT_01).
+	 */
+	sourceRevision?: string | null;
 	treeNodeId?: string | null;
 	titleId?: string | null;
 	vector: readonly number[] | Float32Array;
@@ -97,6 +105,17 @@ export async function persistCanonicalSemanticPacketEmbedding(
 	const featureLabel = input.featureLabel?.trim() || lineage.representationId;
 	const sourceRepresentationId = input.sourceRepresentationId ?? lineage.representationId;
 	const sourceDimension = input.sourceDimension ?? lineage.dimension;
+	// Never synthesized: NULL when the caller has no real revision evidence.
+	// KNOWN LIMITATION: on conflict this unconditionally overwrites any
+	// previously-stored source_revision, including with NULL, if the calling
+	// site doesn't supply one. Not a live risk today (this is the only caller
+	// of this function, and it never supplies sourceRevision), but if a second
+	// call site is ever added that DOES supply real revision evidence, this
+	// must switch to only overwriting when input.sourceRevision !== undefined
+	// (e.g. via COALESCE(EXCLUDED.source_revision, atlas_packets.source_revision))
+	// so a revision-aware caller can never be silently clobbered by a
+	// revision-blind one.
+	const sourceRevision = input.sourceRevision?.trim() || null;
 
 	await database
 		.insert(atlasPackets)
@@ -104,6 +123,7 @@ export async function persistCanonicalSemanticPacketEmbedding(
 			packetId,
 			packetKey,
 			sourceRef,
+			sourceRevision,
 			directoryPath,
 			featureId,
 			featureLabel,
@@ -133,6 +153,7 @@ export async function persistCanonicalSemanticPacketEmbedding(
 			set: {
 				packetKey,
 				sourceRef,
+				sourceRevision,
 				directoryPath,
 				featureId,
 				featureLabel,

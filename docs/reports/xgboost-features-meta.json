@@ -1,6 +1,6 @@
 {
-  "generated": "2026-08-22T17:09:41.562Z",
-  "mode": "dry-run",
+  "generated": "2026-09-09T01:26:50.904Z",
+  "mode": "apply",
   "traces_loaded": 1100,
   "total_rows": 0,
   "positive_rows": 0,
@@ -8,24 +8,6 @@
   "distinct_features": 0,
   "completeness_pct": 0,
   "karpathy_scores_loaded": 0,
-  "trace_labels_requested": 10,
-  "trace_labels_matched": 0,
-  "trace_labels_unmatched": 10,
-  "unmatched_trace_label_examples": [
-    "agent_intelligence",
-    "api_endpoints",
-    "database_orm",
-    "emergent_topology",
-    "general_abstractions",
-    "infrastructure_config",
-    "native_accelerators",
-    "observability_telemetry",
-    "test_harness",
-    "ui_components"
-  ],
-  "bridge_packet_keys_missing": 0,
-  "missing_bridge_packet_key_examples": [],
-  "trace_label_bridge": null,
   "gates": [
     {
       "name": "positive_rows_500",

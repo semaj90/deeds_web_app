@@ -1,0 +1,3311 @@
+{
+  "schema": "atlas.feature-ontology-review-triage.v1",
+  "generatedAt": "2026-09-09T00:57:59.099Z",
+  "mode": "READ_ONLY_MECHANICAL_TRIAGE",
+  "postgresWrites": false,
+  "qdrantWrites": false,
+  "neo4jWrites": false,
+  "valkeyWrites": false,
+  "relationshipWrites": false,
+  "note": "Purely mechanical lexical triage — confidence field carries zero signal (uniformly 0.5 across all candidates), so this does not use it. Sorts the review pile; grants no canonical authority.",
+  "inputCandidateCount": 304,
+  "excludedStaleSourceCount": 51,
+  "triagedCount": 253,
+  "bucketCounts": {
+    "LIKELY_NOISE": 26,
+    "UNCERTAIN": 148,
+    "LIKELY_SYMBOL": 72,
+    "GROUNDED": 7
+  },
+  "rows": [
+    {
+      "candidateId": "fresh-multilane:684352d43f5a45e8f9f9c783e2c87897",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "objectValue": "into",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_NOISE",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:844c90e91e33bb6f56b7f7ee2ed48bed",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "objectValue": "reranking",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:4b7b02eda76b3c1295f9eb566dfe2272",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "objectValue": "langgraph",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:0993db56534c29bdc009c8867fa9e612",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "objectValue": "Parent",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:5acebbf88be57fae26fc7dee798c30fa",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "objectValue": "retrieval",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:79c3bdcc62ce1b0ab32384f238bb9a57",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "objectValue": "const MIN_JOIN_COVERAGE",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:869d709e0d067b105857e76c69b24711",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "objectValue": "function scoreSectionRelevance",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:fc7325bed974e8b1d499bcab3c4bc675",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "objectValue": "interface BinaryVectorArtifactV1",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:c8254f862e07956911bfa668976dbbb7",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "objectValue": "const DOMAIN_PATH_HINTS",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:77d320da0e9b7054568ea776264932bd",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "objectValue": "limit",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_NOISE",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:d4b70295da8633daa0dd501d61791666",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "objectValue": "W_SECTION",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:ab9f38b3f55cd9dd75d1dec82b576745",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "objectValue": "const matched",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:9eaa199665812fa6115bada9a6683a61",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "objectValue": "Graph",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:e7754e38d2c30e5360bce4a627a5fff1",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "objectValue": "function canonicalJson",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:87e7c419c0f5c1beb3fdc7ea407fee8d",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "objectValue": "START",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_NOISE",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:b8ec0be9957e97c9eae5118081f5907b",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "objectValue": "const ent",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:47f000a54338e53d836c35395ead46f3",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "objectValue": "optional",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_NOISE",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:31d88cadeec7fa1ee2e0e0063ce999ea",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "objectValue": "type ResearchDomain",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:5afb3dddf1ea5e9c6bd85ebbeb475ecf",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "objectValue": "const ENTITY_CACHE_TTL",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:aec4fbb6a6e279db94757e402f5a91d8",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "objectValue": "type CanonicalTraceRow",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:71493cc757cc90cf82bd833f3843fe1d",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "objectValue": "chunkHits",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:027a4dad748f69145e7d7185bdfaf710",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "objectValue": "registry",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:0a15d6895d969742bcf2cff5ca81c39b",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "objectValue": "via",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_NOISE",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:11411c92d6431a2ac1eea17aa6625411",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "objectValue": "from",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_NOISE",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:ab7e9fcdfa2a1e65c5e94be7073f8e5e",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "objectValue": "Capabilities",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:07399e7c8fc6b607b135fdfa4a0922e3",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "objectValue": "<anonymous>",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_NOISE",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:d96773a292047a32bb5923ada4729056",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "objectValue": "const W_ENTITY",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:f44da95f2d4df0b0fabed3c0dfb77ece",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "objectValue": "const needle",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:c5a300bb70faed4c77908159eee032b4",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "objectValue": "suggestFix",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:63e31e6c59f945d843f8069a72eb5304",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "objectValue": "function persistTemporalRecommendationOutcomeIfEnabled",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:fa1774c3feff9ed3c7fca8740b1a6371",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "objectValue": "CanonicalTraceRow",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:4e0f60ce49587411d46b206ecfe0d1d2",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "objectValue": "const persisted",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:718e7cefb00193c8a6c794e5acdcb088",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "objectValue": "const TEMPORAL_RECOMMENDATION_OUTCOME_PRODUCER",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:a84a1832e1dd0dce22a17d3f38b3b104",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "objectValue": "DAG",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:4bda819d97cfa45871149e9c8fac38cd",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "objectValue": "const DOMAIN_TAGS",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:de30cb41faffa52137da3a708312a1d8",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "objectValue": "const canonicalRow",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:3f6c8019f73a5edfb6ee6f0caff9fec8",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "objectValue": "run",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_NOISE",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:762ccae35ebe226868e608f8d35be390",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "objectValue": "through",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:6c1c0d27da2534ee50b1354f936138cd",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "objectValue": "const associatedLenses",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:d7d1a3a806dbea8c30ee128aab2da0bf",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "objectValue": "LangGraph",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:3425cbe7ad63b02ceb57513ef354eb23",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "objectValue": "ACE",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:b8f9895f952e425d94217999468392ab",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "objectValue": "ace",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_NOISE",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:bbdc54716d90bb0ad0424e8d33c39860",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "objectValue": "lensHits",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:445ca5c4390447908d8fc9a5b965555d",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "objectValue": "DOMAIN_TAGS",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:281c04699543dbf7138d8fd5f35aabf3",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "objectValue": "LangExtract",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:e3cda71d34f909807b40002beb16852e",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "objectValue": "Implements",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:e14c7308e32c522fd057aaf8fde41701",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "objectValue": "Promise",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:41c301c1465a6e00bb935d328290ebea",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "objectValue": "neighbor",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:42d3cc792909bf80486651cc1bca518a",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "objectValue": "parallel",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:a873158c0949dd6b43401a5dc699da75",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "objectValue": "W_ENTITY",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:c1007ae3a23ab051b4ba8597bd727b2c",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "objectValue": "const chunkHits",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:91e8e2d7a5df866044fea1030c4b6430",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "objectValue": "PacketIdentityV1",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:6e2d380709d42ad4b267346b175d6ac8",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "objectValue": "synthesizer",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:9f09f066da1e5c97974404f2362c3028",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "objectValue": "const canonicalRowByRef",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:3cf262fab7fd6b9675b9e23b8364ba63",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "objectValue": "executeTool",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:358e3e6e10d0c7cf66c0759c1f50256d",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "objectValue": "parseToolCall",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:68c3ead0e88a9d1f8068f4064ed2f799",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "objectValue": "rerank",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:d9c0cea0720844f9fa34e581e7c2f5a3",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "objectValue": "DAG",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:cd5abcc457bab4b8b3ef5804dac1d517",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "objectValue": "cache",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:4077fb78d776c1fe3b4015c9b0a13744",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "objectValue": "qdrant",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": true,
+      "bucket": "GROUNDED",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:093641a5f29f6e9971173e692898adf2",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "objectValue": "const str",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:fe7ab164a8b7b5b5ca02d6aa570fb722",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "objectValue": "lensesToRetrieve",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:f7650044f2143a28cd8b9ff3c25e8011",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "objectValue": "lane",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:3581590d12c239c931222f8af66be047",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "objectValue": "const CANONICAL_COLLECTION",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:6743d2813703a991626660b595d794b3",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "objectValue": "server",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:2116509a795e255a2bde4fb92a89ed3e",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "objectValue": "END",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:1b30029aaff5296c412a010d42b0a5cf",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "objectValue": "are",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_NOISE",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:2d8a52c5048819653e88fb07650702b9",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "objectValue": "type InferenceRuntimeConfig",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:f88dde2cfc36cd39a50c686d0684ce21",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "objectValue": "lib",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_NOISE",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:5bec85c798ed9c214bf584d048bbf2c6",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "objectValue": "plan",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:91f4d1a15d8670fd93b2af803a9d892f",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "objectValue": "classifies",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:a58796f6b7dda0cc43628a5426442925",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "objectValue": "merge",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:23f8d6ca9c945d10bc121befa1c27f03",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "objectValue": "const value",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:62a31f0fb090514166a72ee56dfc0971",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "objectValue": "canonicalJson",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:00f4d00edea6cdfc28fbdc80022beb18",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "objectValue": "matched",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:ea9843d461210c5287ccf7763238fcb3",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "objectValue": "Qdrant",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": true,
+      "bucket": "GROUNDED",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:4c2c0847566e0b70d39a22d23f2de45f",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "objectValue": "extension",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:cb08818b61897a1239decc44e8bc98f7",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "objectValue": "tool",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:8eda6587c284e4b1957a7cf0d0a98183",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "objectValue": "result",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:70feb5214fbbc7bc051e4e8893d23753",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "objectValue": "allSettled",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:539f3fe4290192f9bc776a13fc0ec8f2",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "objectValue": "concurrently",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:945a608e354a2d9fee6b02096d944305",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "objectValue": "shared",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:cb77cf13b2ffb26194696a946edbfc39",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "objectValue": "const keys",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:7fdce3f0b327e2cf99f59d30b6b8380a",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "objectValue": "hashContent",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:68233c793ddddd7a5bc7fb4641477af6",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "objectValue": "the",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_NOISE",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:d8317e3536f1182a6c43f15e1fb3cae5",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "objectValue": "learning",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:f1bb8e2218cddb2972e8ee583a1c3136",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "objectValue": "workers",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:304be6fffe5199528030927d9afc72c5",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "objectValue": "path",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:ae66f6da6eb822037163a7252eca0513",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "objectValue": "orm",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_NOISE",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:3460a99dde43e02a4d7dd41678df1a0c",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "objectValue": "const row",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:76e8a260679c73ce173ee02f2b709b2a",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "objectValue": "const canonicalRows",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:6b5385cdc7a326305b7270c6fd7362bb",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "objectValue": "vector",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:eb18c0c0d331c63f2d5d9742ee0a9cc6",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "objectValue": "redis",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:38c20b67f460ad52fc19e4b8aae42b4e",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "objectValue": "Aware",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:f1ec95a08b1d334ba3bdc4c7c5b1fc11",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "objectValue": "final",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:90a85bf0a67461ed3c1aa899133d17b9",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "objectValue": "Research",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:078d6cbad4eeb130297576f44a2445d0",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "objectValue": "pattern",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:c52a0758d4e10d27ad834b7d927f28ee",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "objectValue": "function hashContent",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:4b6b4e8f3d6e58518ba0661b1910a28b",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "objectValue": "function adjustStrategy",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:f9fe4a1b6a8b30c6ff1a027144feb39b",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "objectValue": "const lensHits",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:13ad63c8f0f9258842a4abe50066768e",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "objectValue": "function traceRerank",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:93ec53125b1e515f3f38b3681a6f08ef",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "objectValue": "Orchestrator",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:04ebc9b397a791a4050be5b6ada09472",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "objectValue": "const memoryHits",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:7f9dff77b2f6adcf0e08468fdbed9a9c",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "objectValue": "shim",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:a97f98b8a68230840086b7d3902a5348",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "objectValue": "Entity",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:ebf9717d2cd8cd25a57425638eb4b732",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "objectValue": "AgentState",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:aa30f7039ef891d06b0df643c255a4e9",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "objectValue": "with",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_NOISE",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:26016716d1c5b4b07c642e0440ec0b13",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "objectValue": "query",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:05c06c5e7b42719740d4d4d2e47075ed",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "objectValue": "score",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:181707fc111598e117b9273896f5abe1",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "objectValue": "Valkey",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:8de890b56fd6833198b64076b035bf42",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "objectValue": "const key",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:630e4310ab00108d7204ea1a0f7743c3",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "objectValue": "Atlas",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:096befc02dc66a618b68b5a5904c63b7",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "objectValue": "interface GRPORerankResult",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:aeb45b4c44949702160672ca96fbf23a",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "objectValue": "provided",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:935569b96ba0a8f205b167f1db0fadc6",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "objectValue": "PostgreSQL",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": true,
+      "bucket": "GROUNDED",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:1fbf7257e9e2d0a2bba242564643ba0f",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "objectValue": "const sortedObj",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:79284473a4deab5331b4e6763be6a7b4",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "objectValue": "function preventLoop",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:c3f67b5067ee6d59a24cecb7a2439e78",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "objectValue": "<anonymous>",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_NOISE",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:4c33f60a5d6f42f3496873fb30655326",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "objectValue": "const authoritativeOutcome",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:2474db429dca9072ddcfc51bff09e577",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "objectValue": "const result",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:9e7aeab3dfd4ab705f8df63c31ba98ef",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "objectValue": "concurrent_research",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:48fa522884a33418a096765b845ea401",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "objectValue": "Neo4j",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": true,
+      "bucket": "GROUNDED",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:4f09b2ea7e851216e2456450a3d36854",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "objectValue": "Python",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:8882d940ebe855788225fcce921f0153",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "objectValue": "topology",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:fab7278719eea6189b81f347422aba83",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "objectValue": "client",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:3af5ac44b30217dfe8e615df4b6fd9a7",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "objectValue": "inspired",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:eb997b9d57f1c0d2fe86f1b0a436ab20",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "objectValue": "bounded",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:94ddcc97163064350199321a1ba0dbc6",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "objectValue": "const W_SECTION",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:981106b034697773a89fd46f7103d452",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "objectValue": "for",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_NOISE",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:fca491ad25539dd70b6bd7ca67bf3c35",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "objectValue": "Multi",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:bef6249a0fe60f4a784d867493b8daf0",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "objectValue": "interface RerankableChunk",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:1e317f769abb75bc7d422e0ae6ab6a21",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "objectValue": "verification",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:1d69341989e0b474f3c442b7ea331c9e",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "objectValue": "from",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_NOISE",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:fdd8664a6ae04126b158a44686b2b6a5",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "objectValue": "service",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:64adc5f9107f784ad972a7925ea0e053",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "objectValue": "const contentLower",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:295411680bd656e97cb62228e789e9ec",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "objectValue": "injectACETableCache",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:92991150f6f922c1c89a9654786345a6",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "objectValue": "BinaryVectorArtifactV1",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:b0f5bd1d6b5f9052b61235062ae973e5",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "objectValue": "const researchHits",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:8a907eb298a416cad3e808867ef0eb9a",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "objectValue": "const limit",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:031269aab2879786f3bb8b65a673a4ea",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "objectValue": "const seenToolCalls",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:b9859503de7aeccb869e4f3fd368e15e",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "objectValue": "NLP",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:6bfa0d77c154f47196a72e30f921bf53",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "objectValue": "import",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:4271372871cdaa514d14d290bdfaf593",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "objectValue": "GRPO",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:ed53e38c17769be61e9c13573bb03ecd",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "objectValue": "not",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_NOISE",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:0b090c434b2734055a228783423d4fbf",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "objectValue": "recordExecutionOutcome",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:f18de72cf527ffdcd8713230b1fddc47",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "objectValue": "let intentBoost",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:52ab25e74bbea798488b90e270f287aa",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "objectValue": "synthesis",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:7ccc1ec61b2706a25e45a612fed8f769",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "objectValue": "interface TopologyProjectionV1",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:8f4f66528a1702998ea78df4ca8a5125",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "objectValue": "function scoreEntityOverlap",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:c98bed6412deb32b2807abd893f4ac3d",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "objectValue": "Codebase",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:246b8a705058a3020e0af24e5369f2c6",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "objectValue": "extractQueryEntities",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:c9904d747851c50467d8f62002429f6b",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "objectValue": "LangGraphDomainClassificationRequest",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:8a1455d5f9c8d750017d7bba709a88fa",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "objectValue": "Designed",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:b80110f3295400637f28011b6604866a",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "objectValue": "RerankableChunk",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:40d66fd79e8f0363f954980e3994b7ba",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "objectValue": "getQdrantManager",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:98a122a5ee38191a5d2ec650a70e32a4",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "objectValue": "MCP",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:48cc43091f59eb9a0143d114dab96c87",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "objectValue": "GRPORerankResult",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:fdec4b8fe5fc19e4f135415730fe207a",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "objectValue": "const sourceRef",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:f173fb948172b2c28a06484d8e6146f6",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "objectValue": "deep",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:9e6c26db1edaf9f1aac7e8c73efdd823",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "objectValue": "str",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_NOISE",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:34a66c0f7f16434f636f3dc992f9a248",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "objectValue": "const SECTION_RELEVANCE",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:bc2d526ad23976f92a941e6851afc01b",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "objectValue": "const lensesToRetrieve",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:426db436badb96761b48bcfc6a38d322",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "objectValue": "adjustStrategy",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:c7cd747ceb119c76a9236e8c6369d3f3",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "objectValue": "canonicalRows",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:4ec8d3b63d41fa0d1105a598a10e8481",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "objectValue": "const W_RETRIEVAL",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:ab3617b97f15bded038db23a48fb1b33",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "objectValue": "SECTION_RELEVANCE",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:7012efb75490e2283396953459a295e4",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "objectValue": "auto",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:5eb8e89a3c6b75a7e5d31a2f4fab7712",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "objectValue": "const joinCoverage",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:d3a22e74b0d1b078c8ddbb403fc73aa0",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "objectValue": "const plan",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:f1d50c8822db2dba6cde170d4b9f0b66",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "objectValue": "based",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:b44e2b040ab04f44cf766f10d1d6145d",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "objectValue": "MIN_JOIN_COVERAGE",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:a9cd7afefb39721e4798fb843cc825c5",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "objectValue": "Reranker",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:907f447d5051501b75b0d6cecbb30eb1",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "objectValue": "function shouldUseTool",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:cc8ea4e1a47c8ad9a61005c0ab54ffc8",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "objectValue": "<anonymous>",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_NOISE",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:d339e122157a4d593fa56fed45027849",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "objectValue": "aggregates",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:4e10b532e6d1d0d6645d213ba9cc64c2",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "objectValue": "sortedObj",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:fa2db3c5ce93cbb24776af6662d4bb3a",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "objectValue": "that",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_NOISE",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:35eccaae9f730c17055081deb9b31192",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "objectValue": "type relevance",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:7735e0ede34c738051138c7fa50fd408",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "objectValue": "type TraceRerankResult",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:39f796fb28f26294529964bc6324badc",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "objectValue": "LangGraph",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:269ed01ad05f03e6bbaebd6950789821",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "objectValue": "const lensKey",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:c96791a542ac2505ef49ec475014e02b",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "objectValue": "face",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:2d8e6c17458f8600b545b73859d0cae1",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "objectValue": "const score",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:ed1e8ecfd42c909953562268ead13cf9",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "objectValue": "const selection",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:97d99e704041a82116c982b8b5083c5c",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "objectValue": "ENTITY_CACHE_PREFIX",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:ca32f8bc6a59bf242c4fb92a0eb26134",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "objectValue": "KAG",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:6f50e3946f348706513e4af8d0bd422d",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "objectValue": "researchHits",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:2d28b09aceae2907957a973d84a05f1c",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "objectValue": "fix",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_NOISE",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:5260c743a4207bac74a6160f35441d99",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "objectValue": "interface OntologyObservationV1",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:fb3d5743187ddcaaacfc63b7ab616b75",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "objectValue": "manager",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:d7653122a2d536ddfe9bd1268c5236bd",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "objectValue": "orchestration",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:f05551f381865fc45f76426574659f47",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "objectValue": "adapters",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:339da3ca2d69c72aaf5dd1499250253c",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "objectValue": "available",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:48cb05012bce30998b86810806ffe686",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "objectValue": "type alignment",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:d91d4f01dcbf966588f3526522d17f2e",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "objectValue": "const redis",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:81618ecb72672c93effd42c18ccb8079",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "objectValue": "the",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_NOISE",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:141474723f4f0d2aedc12e0aa690a948",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "objectValue": "the",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_NOISE",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:5b427212492e792c75fc1451af1296e8",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "objectValue": "Code",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:92ef741fc08b1f34f8dbdbcb96033060",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "objectValue": "ENTITY_CACHE_TTL",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:97d1852bf5406f0eb6149dd00742eca4",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "objectValue": "Concurrent",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:eaa143e6c78b3911f2f8d1a7068091b1",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "objectValue": "interface LangGraphDomainClassificationRequest",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:d09fc0825ed95f44ff3a645e39cf246f",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "objectValue": "import",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:bb994fe195511de5f42119af532d7e89",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "objectValue": "drizzle",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:ecb7e4f7123c379fffd2a79d07798f5d",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "objectValue": "process",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:daee8eccd9b9891a58905686fb28655b",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "objectValue": "const sectionType",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:6336ddea4abd4a85de8900b9ba0b0410",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "objectValue": "Record",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": true,
+      "bucket": "GROUNDED",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:6b244b2e60a79288a4b7958d63b25578",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "objectValue": "function extractQueryEntities",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:498bf1e56f798365b2ce8d68710b29dc",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "objectValue": "DOMAIN_QUERY_PREFIX",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:01ec186f5feb809f8d382107c5e1a224",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "objectValue": "const qdrant",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:7f6980f00a954afdcee187c84a417114",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "objectValue": "function explicitTemporalAlternativeToolSuccess",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:0c9700d03132478233aff505aff9c618",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "objectValue": "style",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:d1bb54202ad578f4c5bc6b41ed41ba07",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "objectValue": "builder",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:ff5ca018c2e2237450faa0d4eb1a1cd1",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "objectValue": "needle",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:408aa7a69026a569490127163f5d08f0",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "objectValue": "explicit",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:e9363da5168f01bed18b51a3981f3ef6",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "objectValue": "buildACEPacket",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:2c75c5bcea32996b82ed85dd72b69599",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "objectValue": "Resumable",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:fa5cd2c3821d0cc334308f68c04f6554",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "objectValue": "contentLower",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:adb3398d3f66d1e6936a8a1f13ca310c",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "objectValue": "langchain",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:b3dd596deab3851a25d7e72ae3ce255e",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "objectValue": "stages",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:02d531c7d6b0483837afd0ab01b83852",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "objectValue": "and",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_NOISE",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:ed86b2555af3bc82014445ef9cd18464",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "objectValue": "TraceRerankResult",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:313e506453d5c253b78371b40c2cd80d",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "objectValue": "ResearchDomain",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:4bb6b301fd6ac0ef08917a1a91d19610",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "objectValue": "getActiveSemanticVectorLane",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:7194be7822db7eb63d88a04dde0b6aa1",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "objectValue": "TypeScript",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:e1ce2af0121e8c3fe5aa1ea7b65211a3",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "objectValue": "tool",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:5b20a6cc9db4cfb7d15b66a0ea58143f",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "objectValue": "ontology",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:641590e11412ed8d2bae831310e1f224",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "objectValue": "keys",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:361ce59f4ab25916f46ee119d0662139",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "objectValue": "scoreEntityOverlap",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:e8c7f98f91b340f9cf18e56c0519db6e",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "objectValue": "CANONICAL_COLLECTION",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:0b5ef4a5f245534978d55714b55176e2",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "objectValue": "OntologyObservationV1",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:f74dedc007e9309d0f82959fc55a3775",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "objectValue": "supervisor",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:f8c477afd3af8d28f48a5d0aaa621012",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "objectValue": "const ENTITY_CACHE_PREFIX",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:5e147eaa41bf32f28e570ff776429ec9",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "objectValue": "type AgentState",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:c35493edf8a406744adee3472c6cc0c7",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "objectValue": "ingested",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:efd09795506870ae732ff92336607988",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "objectValue": "TopologyProjectionV1",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:aaf69138dc66637f437742c3bf8f45ff",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "objectValue": "domains",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:b7bbbdcc5dfc53931fc41a0a1e4911ee",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "objectValue": "sql",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_NOISE",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:5216ac235ffc6c272b65b42fa01d2d5b",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "objectValue": "TEMPORAL_RECOMMENDATION_OUTCOME_PRODUCER",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:4b0766e8eb44ee033b8026c8bf1b16e3",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "objectValue": "canonicalRowByRef",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:ee81574abc1baea55b16956a1da1ccd1",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "objectValue": "StateGraph",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": true,
+      "bucket": "GROUNDED",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:f8816b1d0b8831b5a8fe3eeb0984539c",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "objectValue": "StateGraph",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": true,
+      "bucket": "GROUNDED",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:c1dbfd837b311287db7ca3bcba229526",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "objectValue": "W_RETRIEVAL",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:daeb8ce2c4583f21a4305402a75c49b6",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "objectValue": "caching",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:a2f2df3735488fc5e3ab6f77bdd17eda",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "objectValue": "model",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:0fd19b7e66b64e5c6fd41c1b2a63331e",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "objectValue": "overlap",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:3a533f14fc2e79476f65fa62cea9e3c7",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "objectValue": "interface PacketIdentityV1",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:a4e30aaf96c2107d3dae5aa91fde7df2",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "objectValue": "pass",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:7ca5e3e37532d133cf5956e345957072",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "objectValue": "mutatePromptWithLearnings",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:c302b305a1b37f61022b74ba20094c44",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "objectValue": "findings",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:93144687b7d74a2503b7bf70b777b402",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "objectValue": "const DOMAIN_QUERY_PREFIX",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:b51a026db2ada2513a614162ea81dacc",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "objectValue": "Claude",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:6a34fa348c8d8dd54c8d3d72513256fc",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "objectValue": "memoryHits",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "UNCERTAIN",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    },
+    {
+      "candidateId": "fresh-multilane:de96ea0aa9de78b9c937920700373763",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "objectValue": "const results",
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "sourceSpanGrounded": false,
+      "bucket": "LIKELY_SYMBOL",
+      "status": "REVIEW_REQUIRED",
+      "canonicalAuthority": false
+    }
+  ]
+}

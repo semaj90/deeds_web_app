@@ -1,0 +1,51 @@
+{
+  "schema": "atlas.neo4j-codebasefile-identity-audit.v1",
+  "generatedAt": "2026-09-08T23:53:36.922Z",
+  "mode": "READ_ONLY",
+  "writesPerformed": false,
+  "schemeCounts": [
+    {
+      "scheme": "CLEAN_RELATIVE_PATH",
+      "n": "58569"
+    },
+    {
+      "scheme": "STALE_WORKTREE_PATH",
+      "n": "6773"
+    },
+    {
+      "scheme": "ABSOLUTE_WINDOWS_PATH",
+      "n": "2404"
+    },
+    {
+      "scheme": "OTHER",
+      "n": "1263"
+    }
+  ],
+  "totalCodebaseFileNodes": 69009,
+  "labelCombinations": [
+    {
+      "labels": "[\"CodebaseFile",
+      "n": "ParentAtlasSource\"]"
+    },
+    {
+      "labels": "[\"CodebaseFile\"]",
+      "n": "3667"
+    }
+  ],
+  "staleWorktreeSiblingCheck": {
+    "staleCount": 6773,
+    "staleWithCleanSibling": 5410,
+    "staleUnstrippable": 1355
+  },
+  "absolutePathSiblingCheck": {
+    "absCount": 2404,
+    "absWithCleanSibling": 2257,
+    "absUnstrippable": 0
+  },
+  "stableKeyCoverageAcrossLabels": [
+    {
+      "labels": "[]",
+      "n": "2"
+    }
+  ]
+}

@@ -7,6 +7,23 @@ const MAP = path.join(ROOT, 'docs', 'reports', 'lineage-qualified-candidate-map-
 const LATENT_AUDIT = path.join(ROOT, 'docs', 'reports', 'lineage-latent-cohort-v1.json');
 const REPORT = path.join(ROOT, 'docs', 'reports', 'lineage-qualified-latent-canary-plan-v1.json');
 
+const REQUIRED_ARTIFACTS = [
+  { outputRepresentationId: 'latent_256', dimensions: 256 },
+  { outputRepresentationId: 'latent_128', dimensions: 128 },
+  { outputRepresentationId: 'latent_64', dimensions: 64 },
+].map((artifact) => ({
+  schema: 'atlas.representation-artifact.v1',
+  inputRepresentationId: 'semantic_768',
+  ...artifact,
+  exactChunkBindingRequired: true,
+  modelRevisionRequired: true,
+  producerRevisionRequired: true,
+  parametersDigestRequired: true,
+  inputDigestRequired: true,
+  outputDigestRequired: true,
+  atomicReadbackRequired: true,
+}));
+
 async function readJson(file) {
   return JSON.parse(await readFile(file, 'utf8'));
 }
@@ -21,7 +38,7 @@ async function main() {
     sourceRevision: candidate.sourceRevision,
     workspaceRevision: map.lineage?.workspaceRevision ?? null,
     inputRepresentationId: 'semantic_768',
-    outputRepresentationId: 'ae_latent_64',
+    outputRepresentationIds: REQUIRED_ARTIFACTS.map(({ outputRepresentationId }) => outputRepresentationId),
     status: 'PLAN_ONLY',
   }));
 
@@ -35,19 +52,7 @@ async function main() {
       candidateSnapshotRevision: map.map?.candidateSnapshotRevision ?? null,
       ordinalMapChecksum: map.map?.ordinalMapChecksum ?? null,
     },
-    requiredArtifact: {
-      schema: 'atlas.representation-artifact.v1',
-      inputRepresentationId: 'semantic_768',
-      outputRepresentationId: 'ae_latent_64',
-      dimensions: 64,
-      exactChunkBindingRequired: true,
-      modelRevisionRequired: true,
-      producerRevisionRequired: true,
-      parametersDigestRequired: true,
-      inputDigestRequired: true,
-      outputDigestRequired: true,
-      atomicReadbackRequired: true,
-    },
+    requiredArtifacts: REQUIRED_ARTIFACTS,
     latentAudit: {
       candidateCount: latent.candidateCount,
       rowsFound: latent.rowsFound,

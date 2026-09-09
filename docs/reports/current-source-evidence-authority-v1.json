@@ -1,36 +1,140 @@
 {
   "schema": "atlas.current-source-evidence-authority.v1",
   "gate": "SOURCE-EVIDENCE-AUTHORITY-01",
-  "generatedAt": "2026-09-06T18:47:34.325Z",
+  "generatedAt": "2026-09-09T04:15:51.097Z",
   "mode": "READ_ONLY",
   "canonicalAuthority": false,
   "writesPerformed": false,
   "status": "NO_CURRENT_COMPLETED_BOUND_SOURCE_OWNER",
   "toleranceWindow": {
     "toleranceMs": 300000,
-    "nowMs": 1788720437884,
-    "checkedAt": "2026-09-06T18:47:17.884Z"
+    "nowMs": 1788927317747,
+    "checkedAt": "2026-09-09T04:15:17.747Z"
   },
   "currentWorkspace": {
     "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
-    "workspaceRevision": "sha256:cc8b2a35212f6a025bc6efc8aaffb5cc3ce8f0e5b925f368c3c64b723e6086f3",
-    "sourceManifestDigest": "cc8b2a35212f6a025bc6efc8aaffb5cc3ce8f0e5b925f368c3c64b723e6086f3",
-    "sourceCount": 23873,
+    "workspaceRevision": "sha256:ec542383b52ed4c597750d4273522239284fdb3d819619414df5f36333f85e1f",
+    "sourceManifestDigest": "ec542383b52ed4c597750d4273522239284fdb3d819619414df5f36333f85e1f",
+    "sourceCount": 24109,
     "repositoryId": "semaj90/deeds_web_app",
-    "baseCommitOid": "732c66f6bb556e0b8b4b40a832b8e5e655aacad5",
+    "baseCommitOid": "8fdbcb53619b5ef5551c097948906ebdd6b01188",
     "dirty": true
   },
   "runCounts": {
-    "totalRuns": 15,
-    "completed": 10,
-    "running": 5,
+    "totalRuns": 19,
+    "completed": 12,
+    "running": 0,
     "completedBound": 4,
-    "completedUnbound": 6,
-    "runningBound": 2,
-    "runningUnbound": 3
+    "completedUnbound": 8,
+    "runningBound": 0,
+    "runningUnbound": 0
   },
   "ambiguityCount": 0,
   "rejectedRuns": [
+    {
+      "runId": "6daa5fc9-6b76-4774-a376-013a1bb8190e",
+      "runStatus": "SUPERSEDED",
+      "bindingStatus": "UNBOUND",
+      "reasons": [
+        "NON_TERMINAL_STATUS",
+        "UNBOUND_NEVER_SOURCE_AUTHORITY",
+        "STALE_WORKSPACE_REVISION",
+        "SOURCE_MANIFEST_DIGEST_MISMATCH"
+      ],
+      "ageMsAtCheck": 16625747
+    },
+    {
+      "runId": "575d5428-0154-43e7-a353-307b2443cbba",
+      "runStatus": "SUPERSEDED",
+      "bindingStatus": "UNBOUND",
+      "reasons": [
+        "NON_TERMINAL_STATUS",
+        "UNBOUND_NEVER_SOURCE_AUTHORITY",
+        "STALE_WORKSPACE_REVISION",
+        "SOURCE_MANIFEST_DIGEST_MISMATCH"
+      ],
+      "ageMsAtCheck": 16625747
+    },
+    {
+      "runId": "14643371-f6f2-4131-906b-235a5c06619a",
+      "runStatus": "SUPERSEDED",
+      "bindingStatus": "UNBOUND",
+      "reasons": [
+        "NON_TERMINAL_STATUS",
+        "UNBOUND_NEVER_SOURCE_AUTHORITY",
+        "STALE_WORKSPACE_REVISION",
+        "SOURCE_MANIFEST_DIGEST_MISMATCH"
+      ],
+      "ageMsAtCheck": 16625747
+    },
+    {
+      "runId": "b1a103ac-c717-430b-9643-a8c9818064ae",
+      "runStatus": "SUPERSEDED",
+      "bindingStatus": "BOUND",
+      "reasons": [
+        "NON_TERMINAL_STATUS",
+        "STALE_WORKSPACE_REVISION",
+        "SOURCE_MANIFEST_DIGEST_MISMATCH"
+      ],
+      "ageMsAtCheck": 16625747
+    },
+    {
+      "runId": "b3a5b14e-0065-41bb-bfe0-96e1062d1e07",
+      "runStatus": "SUPERSEDED",
+      "bindingStatus": "BOUND",
+      "reasons": [
+        "NON_TERMINAL_STATUS",
+        "STALE_WORKSPACE_REVISION",
+        "SOURCE_MANIFEST_DIGEST_MISMATCH"
+      ],
+      "ageMsAtCheck": 16625747
+    },
+    {
+      "runId": "a7377c07-acb2-4d68-bf83-19d8eca586d4",
+      "runStatus": "SUPERSEDED",
+      "bindingStatus": "UNBOUND",
+      "reasons": [
+        "NON_TERMINAL_STATUS",
+        "UNBOUND_NEVER_SOURCE_AUTHORITY",
+        "STALE_WORKSPACE_REVISION",
+        "SOURCE_MANIFEST_DIGEST_MISMATCH"
+      ],
+      "ageMsAtCheck": 16625747
+    },
+    {
+      "runId": "3f13703e-5944-487c-a5a9-10dcecc00124",
+      "runStatus": "SUPERSEDED",
+      "bindingStatus": "UNBOUND",
+      "reasons": [
+        "NON_TERMINAL_STATUS",
+        "UNBOUND_NEVER_SOURCE_AUTHORITY",
+        "STALE_WORKSPACE_REVISION",
+        "SOURCE_MANIFEST_DIGEST_MISMATCH"
+      ],
+      "ageMsAtCheck": 16625747
+    },
+    {
+      "runId": "e9b9c13d-8acb-4e9f-801f-58a78a5f5441",
+      "runStatus": "COMPLETED",
+      "bindingStatus": "UNBOUND",
+      "reasons": [
+        "UNBOUND_NEVER_SOURCE_AUTHORITY",
+        "STALE_WORKSPACE_REVISION",
+        "SOURCE_MANIFEST_DIGEST_MISMATCH"
+      ],
+      "ageMsAtCheck": 82456747
+    },
+    {
+      "runId": "6c9d9642-e572-4d00-91bf-bd8370b238f1",
+      "runStatus": "COMPLETED",
+      "bindingStatus": "UNBOUND",
+      "reasons": [
+        "UNBOUND_NEVER_SOURCE_AUTHORITY",
+        "STALE_WORKSPACE_REVISION",
+        "SOURCE_MANIFEST_DIGEST_MISMATCH"
+      ],
+      "ageMsAtCheck": 98436747
+    },
     {
       "runId": "48485685-e773-4433-a1f8-00f5524cca44",
       "runStatus": "COMPLETED",
@@ -39,7 +143,7 @@
         "STALE_WORKSPACE_REVISION",
         "SOURCE_MANIFEST_DIGEST_MISMATCH"
       ],
-      "ageMsAtCheck": 70818884
+      "ageMsAtCheck": 277698747
     },
     {
       "runId": "d8bb84bd-b4ba-4f85-a5b9-fad16327b5fe",
@@ -49,7 +153,7 @@
         "STALE_WORKSPACE_REVISION",
         "SOURCE_MANIFEST_DIGEST_MISMATCH"
       ],
-      "ageMsAtCheck": 71500884
+      "ageMsAtCheck": 278380747
     },
     {
       "runId": "55888921-5f7e-4047-9ec4-96912659c2f7",
@@ -59,7 +163,7 @@
         "STALE_WORKSPACE_REVISION",
         "SOURCE_MANIFEST_DIGEST_MISMATCH"
       ],
-      "ageMsAtCheck": 71812884
+      "ageMsAtCheck": 278692747
     },
     {
       "runId": "ddf92de5-bc56-43c2-a646-7b3c4f79e1a9",
@@ -70,7 +174,7 @@
         "STALE_WORKSPACE_REVISION",
         "SOURCE_MANIFEST_DIGEST_MISMATCH"
       ],
-      "ageMsAtCheck": 72118884
+      "ageMsAtCheck": 278998747
     },
     {
       "runId": "9816c4d0-d2ad-42ca-8da9-f9d4393277b0",
@@ -81,7 +185,7 @@
         "STALE_WORKSPACE_REVISION",
         "SOURCE_MANIFEST_DIGEST_MISMATCH"
       ],
-      "ageMsAtCheck": 181688884
+      "ageMsAtCheck": 388568747
     },
     {
       "runId": "78818366-2410-4643-8e5d-e995c75a2ad5",
@@ -92,7 +196,7 @@
         "STALE_WORKSPACE_REVISION",
         "SOURCE_MANIFEST_DIGEST_MISMATCH"
       ],
-      "ageMsAtCheck": 249919884
+      "ageMsAtCheck": 456799747
     },
     {
       "runId": "9716c798-bb17-45c7-afb0-1c58955889bf",
@@ -103,7 +207,7 @@
         "STALE_WORKSPACE_REVISION",
         "SOURCE_MANIFEST_DIGEST_MISMATCH"
       ],
-      "ageMsAtCheck": 252870884
+      "ageMsAtCheck": 459750747
     },
     {
       "runId": "862b952b-7623-434e-818e-407c1531abaf",
@@ -114,7 +218,7 @@
         "STALE_WORKSPACE_REVISION",
         "SOURCE_MANIFEST_DIGEST_MISMATCH"
       ],
-      "ageMsAtCheck": 309181884
+      "ageMsAtCheck": 516061747
     },
     {
       "runId": "5b2e18fc-86e6-4fc2-932f-4887d5c14853",
@@ -125,7 +229,7 @@
         "STALE_WORKSPACE_REVISION",
         "SOURCE_MANIFEST_DIGEST_MISMATCH"
       ],
-      "ageMsAtCheck": 310151884
+      "ageMsAtCheck": 517031747
     },
     {
       "runId": "369e4270-7689-4536-8816-4ec4a5517b3e",
@@ -135,65 +239,7 @@
         "STALE_WORKSPACE_REVISION",
         "SOURCE_MANIFEST_DIGEST_MISMATCH"
       ],
-      "ageMsAtCheck": 323486884
-    },
-    {
-      "runId": "14643371-f6f2-4131-906b-235a5c06619a",
-      "runStatus": "RUNNING",
-      "bindingStatus": "UNBOUND",
-      "reasons": [
-        "RUNNING_NEVER_SOURCE_AUTHORITY",
-        "UNBOUND_NEVER_SOURCE_AUTHORITY",
-        "STALE_WORKSPACE_REVISION",
-        "SOURCE_MANIFEST_DIGEST_MISMATCH"
-      ],
-      "ageMsAtCheck": null
-    },
-    {
-      "runId": "b1a103ac-c717-430b-9643-a8c9818064ae",
-      "runStatus": "RUNNING",
-      "bindingStatus": "BOUND",
-      "reasons": [
-        "RUNNING_NEVER_SOURCE_AUTHORITY",
-        "STALE_WORKSPACE_REVISION",
-        "SOURCE_MANIFEST_DIGEST_MISMATCH"
-      ],
-      "ageMsAtCheck": null
-    },
-    {
-      "runId": "b3a5b14e-0065-41bb-bfe0-96e1062d1e07",
-      "runStatus": "RUNNING",
-      "bindingStatus": "BOUND",
-      "reasons": [
-        "RUNNING_NEVER_SOURCE_AUTHORITY",
-        "STALE_WORKSPACE_REVISION",
-        "SOURCE_MANIFEST_DIGEST_MISMATCH"
-      ],
-      "ageMsAtCheck": null
-    },
-    {
-      "runId": "a7377c07-acb2-4d68-bf83-19d8eca586d4",
-      "runStatus": "RUNNING",
-      "bindingStatus": "UNBOUND",
-      "reasons": [
-        "RUNNING_NEVER_SOURCE_AUTHORITY",
-        "UNBOUND_NEVER_SOURCE_AUTHORITY",
-        "STALE_WORKSPACE_REVISION",
-        "SOURCE_MANIFEST_DIGEST_MISMATCH"
-      ],
-      "ageMsAtCheck": null
-    },
-    {
-      "runId": "3f13703e-5944-487c-a5a9-10dcecc00124",
-      "runStatus": "RUNNING",
-      "bindingStatus": "UNBOUND",
-      "reasons": [
-        "RUNNING_NEVER_SOURCE_AUTHORITY",
-        "UNBOUND_NEVER_SOURCE_AUTHORITY",
-        "STALE_WORKSPACE_REVISION",
-        "SOURCE_MANIFEST_DIGEST_MISMATCH"
-      ],
-      "ageMsAtCheck": null
+      "ageMsAtCheck": 530366747
     }
   ],
   "selection": null,

@@ -1,0 +1,19 @@
+{
+  "schema": "atlas.neo4j-codebasefile-stablekey-backfill-apply.v1",
+  "generatedAt": "2026-09-08T23:55:01.846Z",
+  "mode": "APPLY",
+  "writesPerformed": true,
+  "step1_stableKeyBackfill": {
+    "eligibleCount": 58569,
+    "written": 58569
+  },
+  "step2a_staleWorktreeTagging": {
+    "eligibleCount": 5405,
+    "written": 5405
+  },
+  "step2b_absolutePathTagging": {
+    "eligibleCount": 2257,
+    "written": 2257
+  },
+  "result": "APPLIED"
+}

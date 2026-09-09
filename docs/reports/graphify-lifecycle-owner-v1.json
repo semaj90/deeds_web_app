@@ -1,16 +1,24 @@
 {
   "schema": "atlas.graphify-lifecycle-owner.v1",
-  "generatedAt": "2026-09-08T19:50:47.265Z",
+  "generatedAt": "2026-09-09T02:14:52.938Z",
   "mode": "READ_ONLY_LIFECYCLE_OWNER_AUDIT",
   "databaseError": null,
   "lifecycleOwner": null,
   "lifecycleOwnerStatus": "LIFECYCLE_OWNER_UNPROVEN",
   "supportedLifecycleStates": [
     "COMPLETED",
-    "RUNNING"
+    "SUPERSEDED"
   ],
   "transitionPrimitiveExists": false,
   "lifecyclePaths": [
+    {
+      "path": "scripts/atlas/apply-graphify-stale-run-reconciliation-v1.mjs",
+      "classification": "LEGACY_WRITER",
+      "mutationSignals": [
+        "UPDATE graphify_runs",
+        "UPDATE graphify_runs"
+      ]
+    },
     {
       "path": "scripts/atlas/audit-current-graphify-source-revision-v1.mjs",
       "classification": "READ_ONLY_AUDITOR",
@@ -22,17 +30,7 @@
       "mutationSignals": []
     },
     {
-      "path": "scripts/atlas/audit-graphify-workspace-owner-v1.mjs",
-      "classification": "READ_ONLY_AUDITOR",
-      "mutationSignals": []
-    },
-    {
-      "path": "scripts/atlas/audit-graphify-stale-run-reconciliation-v1.mjs",
-      "classification": "READ_ONLY_AUDITOR",
-      "mutationSignals": []
-    },
-    {
-      "path": "scripts/atlas/audit-graphify-run-file-binding-v1.mjs",
+      "path": "scripts/atlas/audit-graphify-completed-differential-replay-v1.mjs",
       "classification": "READ_ONLY_AUDITOR",
       "mutationSignals": []
     },
@@ -47,12 +45,22 @@
       "mutationSignals": []
     },
     {
+      "path": "scripts/atlas/audit-graphify-workspace-owner-v1.mjs",
+      "classification": "READ_ONLY_AUDITOR",
+      "mutationSignals": []
+    },
+    {
+      "path": "scripts/atlas/audit-graphify-stale-run-reconciliation-v1.mjs",
+      "classification": "READ_ONLY_AUDITOR",
+      "mutationSignals": []
+    },
+    {
       "path": "scripts/atlas/audit-graphify-completed-legacy-coverage-v1.mjs",
       "classification": "READ_ONLY_AUDITOR",
       "mutationSignals": []
     },
     {
-      "path": "scripts/atlas/audit-graphify-completed-differential-replay-v1.mjs",
+      "path": "scripts/atlas/audit-graphify-run-file-binding-v1.mjs",
       "classification": "READ_ONLY_AUDITOR",
       "mutationSignals": []
     },
@@ -87,6 +95,11 @@
       "mutationSignals": []
     },
     {
+      "path": "scripts/atlas/plan-graphify-run-completion-v1.mjs",
+      "classification": "PLANNER_ONLY",
+      "mutationSignals": []
+    },
+    {
       "path": "scripts/atlas/plan-current-structural-edge-resolution-v1.mjs",
       "classification": "PLANNER_ONLY",
       "mutationSignals": []
@@ -97,57 +110,12 @@
       "mutationSignals": []
     },
     {
-      "path": "scripts/atlas/plan-graphify-run-completion-v1.mjs",
-      "classification": "PLANNER_ONLY",
-      "mutationSignals": []
-    },
-    {
       "path": "scripts/atlas/plan-packet-chunk-lineage-promotion-v1.mjs",
       "classification": "PLANNER_ONLY",
       "mutationSignals": []
     },
     {
       "path": "scripts/atlas/prove-code-source-revision-packet-live-dry-run.mts",
-      "classification": "UNKNOWN",
-      "mutationSignals": []
-    },
-    {
-      "path": "sveltekit-frontend/src/lib/server/atlas/indexing/graphify-source-inventory-writer-v2.ts",
-      "classification": "LEGACY_WRITER",
-      "mutationSignals": [
-        "INSERT INTO public.graphify_runs",
-        "UPDATE public.graphify_runs",
-        "INSERT INTO public.graphify_runs",
-        "UPDATE public.graphify_runs"
-      ]
-    },
-    {
-      "path": "sveltekit-frontend/src/lib/server/atlas/indexing/graphify-source-inventory-writer-v2.spec.ts",
-      "classification": "LEGACY_WRITER",
-      "mutationSignals": [
-        "INSERT INTO public.graphify_runs",
-        "UPDATE public.graphify_runs",
-        "INSERT INTO public.graphify_runs",
-        "UPDATE public.graphify_runs"
-      ]
-    },
-    {
-      "path": "sveltekit-frontend/src/lib/server/atlas/indexing/graphify-daily-coordinator-v1.ts",
-      "classification": "UNKNOWN",
-      "mutationSignals": []
-    },
-    {
-      "path": "sveltekit-frontend/src/lib/server/atlas/embedding/source-namespace-v1.ts",
-      "classification": "UNKNOWN",
-      "mutationSignals": []
-    },
-    {
-      "path": "sveltekit-frontend/src/lib/server/atlas/board/graphify-current-workspace-revision.ts",
-      "classification": "UNKNOWN",
-      "mutationSignals": []
-    },
-    {
-      "path": "sveltekit-frontend/src/lib/server/atlas/board/daily-graphify-board-recommendations.ts",
       "classification": "UNKNOWN",
       "mutationSignals": []
     },
@@ -167,6 +135,11 @@
       "mutationSignals": []
     },
     {
+      "path": "scripts/atlas/reconcile-openspec-portfolio-v2.mjs",
+      "classification": "UNKNOWN",
+      "mutationSignals": []
+    },
+    {
       "path": "scripts/atlas/register-orphaned-chunks.mjs",
       "classification": "LEGACY_WRITER",
       "mutationSignals": []
@@ -175,13 +148,43 @@
       "path": "scripts/atlas/select-current-source-evidence-authority-v1.mts",
       "classification": "UNKNOWN",
       "mutationSignals": []
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/embedding/source-namespace-v1.ts",
+      "classification": "UNKNOWN",
+      "mutationSignals": []
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/board/graphify-current-workspace-revision.ts",
+      "classification": "UNKNOWN",
+      "mutationSignals": []
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/board/daily-graphify-board-recommendations.ts",
+      "classification": "UNKNOWN",
+      "mutationSignals": []
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/indexing/graphify-source-inventory-writer-v2.ts",
+      "classification": "LEGACY_WRITER",
+      "mutationSignals": [
+        "INSERT INTO public.graphify_runs",
+        "UPDATE public.graphify_runs",
+        "INSERT INTO public.graphify_runs",
+        "UPDATE public.graphify_runs"
+      ]
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/indexing/graphify-daily-coordinator-v1.ts",
+      "classification": "UNKNOWN",
+      "mutationSignals": []
     }
   ],
-  "runningRunCount": 7,
-  "staleRunCount": 6,
-  "currentRunCount": 1,
-  "repositoryHeadRevision": "ec2f544a2bfa26a825de69d9af9ce846647fc3da",
+  "runningRunCount": 0,
+  "staleRunCount": 19,
+  "currentRunCount": 0,
+  "repositoryHeadRevision": "8fdbcb53619b5ef5551c097948906ebdd6b01188",
   "writesPerformed": false,
   "canonicalAuthority": false,
-  "reportChecksum": "sha256:04984532b91931cbfa2e2ab189bcbd8889519ecbfa1b8a585a754550eb7fd656"
+  "reportChecksum": "sha256:3f5619d96f226510f5a776362d768633ac72db7d7578102711b87926210b2afe"
 }

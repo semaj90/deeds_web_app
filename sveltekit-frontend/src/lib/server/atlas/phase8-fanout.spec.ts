@@ -3,9 +3,32 @@ import os from 'node:os';
 import path from 'node:path';
 import { EventEmitter } from 'node:events';
 import { PassThrough } from 'node:stream';
+import frontendPackage from '../../../../package.json';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Phase8ProgressTracker } from '../../../../../scripts/atlas/lib/phase8_progress.mjs';
 import { buildPhase8StepPlan, runPhase8Fanout } from '../../../../../scripts/startup/run-atlas-phase8-fanout.mjs';
+
+describe('Graphify dry entrypoint routing', () => {
+  const scripts = frontendPackage.scripts;
+
+  it('routes daily and compatibility dry commands to the fully dry fanout', () => {
+    const dailySteps = scripts['graphify:daily:dry'].split(/\s*&&\s*/);
+    expect(dailySteps).toContain('npm run atlas:phase8:fanout:dry');
+    expect(scripts['atlas:phase8:fanout:dry:steps1-3']).toBe('npm run atlas:phase8:fanout:dry');
+    expect(scripts['atlas:phase8:fanout:dry']).toBe(
+      'node ../scripts/startup/run-atlas-phase8-fanout.mjs --dry-run',
+    );
+    expect(dailySteps.some((step: string) => /--apply|:apply\b|--apply-through/.test(step))).toBe(false);
+    expect(scripts['graphify:materialize:dry']).not.toMatch(/--apply\b/);
+    expect(scripts['atlas:qdrant:feature-map-sync']).toContain('--dry-run');
+  });
+
+  it('exposes the mixed plan as apply-capable even when dryRun is true', () => {
+    expect(buildPhase8StepPlan(true, 3).slice(0, 3).map((step: string[]) => step[1]))
+      .toEqual(['apply', 'apply', 'apply']);
+    expect(buildPhase8StepPlan(true).every((step: string[]) => step[1] !== 'apply')).toBe(true);
+  });
+});
 
 describe('phase8 progress tracker', () => {
   const originalCwd = process.cwd();
@@ -115,11 +138,15 @@ describe('phase8 fanout wrapper', () => {
       heartbeatMs: 0,
       stepTimeoutMs: 50,
       overallTimeoutMs: 1_000,
-      stepPlan: buildPhase8StepPlan(true).slice(0, 2),
+      stepPlan: buildPhase8StepPlan(true),
     });
 
     expect(result.ok).toBe(true);
-    expect(spawnImpl).toHaveBeenCalledTimes(2);
+    expect(spawnImpl).toHaveBeenCalledTimes(buildPhase8StepPlan(true).length);
+    expect(spawned.map((child) => child.args)).toEqual(
+      buildPhase8StepPlan(true).map((step: string[]) => ['run', step[0]]),
+    );
+    expect(spawned.every((child) => !child.args.some((arg) => arg.includes(':apply')))).toBe(true);
     expect(spawned[0]?.command).toBe('npm');
     expect(spawned[0]?.args).toEqual(['run', 'atlas:phase8:step3:langextract:gate']);
 

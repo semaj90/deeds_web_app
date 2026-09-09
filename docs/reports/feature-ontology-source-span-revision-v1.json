@@ -1,0 +1,90 @@
+{
+  "schema": "atlas.feature-ontology-source-span-revision.v1",
+  "generatedAt": "2026-09-09T00:54:02.858Z",
+  "mode": "READ_ONLY_INDEPENDENT_VALIDATION",
+  "postgresWrites": false,
+  "qdrantWrites": false,
+  "neo4jWrites": false,
+  "valkeyWrites": false,
+  "relationshipWrites": false,
+  "gate": "REL_01A8_INDEPENDENT_SOURCE_SPAN_REVISION_VALIDATION",
+  "inputReceipt": "docs/reports/feature-ontology-fresh-extraction-multilane-v1.json",
+  "inputWorkspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
+  "repositoryHeadRevision": "8fdbcb53619b5ef5551c097948906ebdd6b01188",
+  "candidateCount": 304,
+  "sourceCount": 6,
+  "sourceRevisionResults": [
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "claimedSourceRevision": "sha256:73299f8bc02d95075697fb9df5f4faf56eac2ce97c4adb38de993e2c621f4b1a",
+      "claimedRevisionConsistentAcrossCandidates": true,
+      "fileExistsLive": true,
+      "liveSourceRevision": "sha256:73299f8bc02d95075697fb9df5f4faf56eac2ce97c4adb38de993e2c621f4b1a",
+      "revisionMatch": true,
+      "candidateCount": 50,
+      "verdict": "SOURCE_REVISION_CURRENT"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "claimedSourceRevision": "sha256:e2421bd70077b7b52c75d3a7ff706eec5227c3a2cd0719a34cd386ca2e4e6ada",
+      "claimedRevisionConsistentAcrossCandidates": true,
+      "fileExistsLive": true,
+      "liveSourceRevision": "sha256:e2421bd70077b7b52c75d3a7ff706eec5227c3a2cd0719a34cd386ca2e4e6ada",
+      "revisionMatch": true,
+      "candidateCount": 50,
+      "verdict": "SOURCE_REVISION_CURRENT"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "claimedSourceRevision": "sha256:1840825b32ee43669794fb4f8647ca6468e2033304d39a3019a224b7dc49f215",
+      "claimedRevisionConsistentAcrossCandidates": true,
+      "fileExistsLive": true,
+      "liveSourceRevision": "sha256:1840825b32ee43669794fb4f8647ca6468e2033304d39a3019a224b7dc49f215",
+      "revisionMatch": true,
+      "candidateCount": 51,
+      "verdict": "SOURCE_REVISION_CURRENT"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "claimedSourceRevision": "sha256:86d5275cfd5b097ff23e548af21bbe78e10b4815f173a798903f2b122f0ec896",
+      "claimedRevisionConsistentAcrossCandidates": true,
+      "fileExistsLive": true,
+      "liveSourceRevision": "sha256:86d5275cfd5b097ff23e548af21bbe78e10b4815f173a798903f2b122f0ec896",
+      "revisionMatch": true,
+      "candidateCount": 51,
+      "verdict": "SOURCE_REVISION_CURRENT"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
+      "claimedSourceRevision": "sha256:dd7aef6f31761d9827afde6a0bbbdec502f9b50917ed008f8ec17a434a35bcf1",
+      "claimedRevisionConsistentAcrossCandidates": true,
+      "fileExistsLive": true,
+      "liveSourceRevision": "sha256:642aefad40d76229964af139845601ed72e88ff26682d5cbbb97c0dfee44b404",
+      "revisionMatch": false,
+      "candidateCount": 51,
+      "verdict": "SOURCE_REVISION_STALE"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "claimedSourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
+      "claimedRevisionConsistentAcrossCandidates": true,
+      "fileExistsLive": true,
+      "liveSourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
+      "revisionMatch": true,
+      "candidateCount": 51,
+      "verdict": "SOURCE_REVISION_CURRENT"
+    }
+  ],
+  "sourceRevisionVerdictCounts": {
+    "SOURCE_REVISION_CURRENT": 5,
+    "SOURCE_REVISION_STALE": 1
+  },
+  "spanVerdictCounts": {
+    "NO_SPAN_CLAIMED": 295,
+    "SPAN_IN_BOUNDS": 9
+  },
+  "allSourcesCurrent": false,
+  "status": "SOURCE_REVISION_DRIFT_DETECTED",
+  "nextGate": "RE_EXTRACT_STALE_SOURCES_BEFORE_HUMAN_REVIEW",
+  "checksum": "sha256:cb882420ae3b36c268b2dcb58489f0cd416360ed67a964cc140983022029d198"
+}

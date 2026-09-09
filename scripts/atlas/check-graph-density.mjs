@@ -8,8 +8,12 @@ import { loadRepoEnv } from './connection-config.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '../..');
-const REPORT_JSON = path.join(REPO_ROOT, 'docs', 'reports', 'graph-density-check.json');
-const REPORT_MD = path.join(REPO_ROOT, 'docs', 'reports', 'graph-density-check.md');
+const DRY_RUN = process.argv.includes('--dry-run');
+const reportSuffix = DRY_RUN
+  ? `-${new Date().toISOString().replace(/[^0-9]/g, '').slice(0, 14)}-${process.pid}`
+  : '';
+const REPORT_JSON = path.join(REPO_ROOT, 'docs', 'reports', `graph-density-check${reportSuffix}.json`);
+const REPORT_MD = path.join(REPO_ROOT, 'docs', 'reports', `graph-density-check${reportSuffix}.md`);
 
 const env = loadRepoEnv(process.env);
 const uri = env.NEO4J_URI || 'bolt://127.0.0.1:7687';
@@ -25,6 +29,10 @@ function asNumber(value) {
 async function main() {
   const report = {
     generated_at: new Date().toISOString(),
+    mode: DRY_RUN ? 'DRY_RUN' : 'REPORT',
+    canonicalAuthority: false,
+    writesPerformed: false,
+    report_paths: { json: REPORT_JSON, markdown: REPORT_MD },
     status: 'FAIL',
     neo4j: { uri },
     counts: {},

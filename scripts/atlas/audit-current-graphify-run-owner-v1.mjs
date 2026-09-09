@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /** Read-only audit of the current Graphify run owner and completion state. */
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
@@ -9,7 +9,18 @@ import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const REPORT = resolve(ROOT, 'docs/reports/current-graphify-run-owner-v1.json');
-const workspaceRevision = 'sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9';
+const LIFECYCLE_REPORT = resolve(ROOT, 'docs/reports/graphify-lifecycle-entrypoint-v1.json');
+let workspaceRevision = process.env.ATLAS_EXPECTED_GRAPHIFY_WORKSPACE_REVISION?.trim() || null;
+let workspaceRevisionSource = workspaceRevision ? 'ATLAS_EXPECTED_GRAPHIFY_WORKSPACE_REVISION' : null;
+if (!workspaceRevision) {
+  try {
+    const lifecycleReport = JSON.parse(readFileSync(LIFECYCLE_REPORT, 'utf8'));
+    workspaceRevision = typeof lifecycleReport.workspaceRevision === 'string' ? lifecycleReport.workspaceRevision.trim() : null;
+    if (workspaceRevision) workspaceRevisionSource = 'docs/reports/graphify-lifecycle-entrypoint-v1.json';
+  } catch {
+    workspaceRevision = null;
+  }
+}
 const pool = new pg.Pool({ connectionString: resolveDatabaseUrl(loadRepoEnv(process.env)), max: 1, statement_timeout: 120000 });
 let databaseError = null;
 let runs = [];
@@ -48,6 +59,7 @@ const report = {
   readOnly: true,
   writes: { postgres: false, qdrant: false, neo4j: false, valkey: false },
   expectedWorkspaceRevision: workspaceRevision,
+  expectedWorkspaceRevisionSource: workspaceRevisionSource,
   databaseError,
   currentRun: current,
   runCount: runs.length,
@@ -88,6 +100,7 @@ console.log(JSON.stringify({
   status: report.status,
   readOnly: true,
   expectedWorkspaceRevision: workspaceRevision,
+  expectedWorkspaceRevisionSource: workspaceRevisionSource,
   runCount: report.runCount,
   completedOwnerCount: report.completedOwnerCount,
   workspaceRowCount: report.workspaceRowCount,

@@ -1,0 +1,216 @@
+{
+  "schema_version": "atlas-canonical-projection-fabric-audit-v1",
+  "generated_at": "2026-09-09T01:36:14.559Z",
+  "repository_commit": "8fdbcb53619b5ef5551c097948906ebdd6b01188",
+  "database_identity": "127.0.0.1:5434",
+  "source_proposal": "ATLAS-CANONICAL-PROJECTION-FABRIC-01 (external architecture review, recorded 2026-09-08)",
+  "limitations": [],
+  "query_digests": [
+    {
+      "digest": "7b8d78e10d424c10",
+      "sql": "SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name=$1;"
+    },
+    {
+      "digest": "7b8d78e10d424c10",
+      "sql": "SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name=$1;"
+    },
+    {
+      "digest": "7b8d78e10d424c10",
+      "sql": "SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name=$1;"
+    },
+    {
+      "digest": "7b8d78e10d424c10",
+      "sql": "SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name=$1;"
+    },
+    {
+      "digest": "7b8d78e10d424c10",
+      "sql": "SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name=$1;"
+    },
+    {
+      "digest": "7b8d78e10d424c10",
+      "sql": "SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name=$1;"
+    },
+    {
+      "digest": "7b8d78e10d424c10",
+      "sql": "SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name=$1;"
+    },
+    {
+      "digest": "7b8d78e10d424c10",
+      "sql": "SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name=$1;"
+    },
+    {
+      "digest": "7b8d78e10d424c10",
+      "sql": "SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name=$1;"
+    },
+    {
+      "digest": "7b8d78e10d424c10",
+      "sql": "SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name=$1;"
+    },
+    {
+      "digest": "7b8d78e10d424c10",
+      "sql": "SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name=$1;"
+    },
+    {
+      "digest": "7b8d78e10d424c10",
+      "sql": "SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name=$1;"
+    },
+    {
+      "digest": "7b8d78e10d424c10",
+      "sql": "SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name=$1;"
+    },
+    {
+      "digest": "7b8d78e10d424c10",
+      "sql": "SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name=$1;"
+    },
+    {
+      "digest": "7b8d78e10d424c10",
+      "sql": "SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name=$1;"
+    },
+    {
+      "digest": "7b8d78e10d424c10",
+      "sql": "SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name=$1;"
+    },
+    {
+      "digest": "7b8d78e10d424c10",
+      "sql": "SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name=$1;"
+    },
+    {
+      "digest": "7b8d78e10d424c10",
+      "sql": "SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name=$1;"
+    },
+    {
+      "digest": "d2115895a169e364",
+      "sql": "SELECT packet_id, packet_key, source_ref, qdrant_point_id, tree_node_id, latent_64 FROM atlas_packets WHERE latent_64 IS NOT NULL ORDER BY packet_id LIMIT $1;"
+    },
+    {
+      "digest": "651d6031589b11ce",
+      "sql": "SELECT source_ref_key, source_revision FROM atlas_ast_nodes WHERE source_ref_key = ANY($1::text[]);"
+    },
+    {
+      "digest": "88f68250d9206be0",
+      "sql": "SELECT COUNT(*)::int AS n FROM graphify_symbols;"
+    },
+    {
+      "digest": "3af765062b11b7b6",
+      "sql": "SELECT table_name, column_name, udt_name FROM information_schema.columns WHERE udt_name IN ('vector','halfvec','sparsevec') ORDER BY table_name, column_name;"
+    },
+    {
+      "digest": "353827f9042096a4",
+      "sql": "SELECT column_name FROM information_schema.columns WHERE table_schema='public' AND table_name='atlas_packets' AND column_name IN ('latent_256','latent_128','latent_64');"
+    },
+    {
+      "digest": "d10a4af4b554dc7f",
+      "sql": "SELECT COUNT(*)::int AS n FROM atlas_ontology_concepts;"
+    },
+    {
+      "digest": "e3f8b5f134d520a9",
+      "sql": "SELECT COUNT(*)::int AS n FROM atlas_ontology_tuples;"
+    },
+    {
+      "digest": "48cb29a6f1f265d6",
+      "sql": "SELECT COUNT(*)::int AS n FROM hypergraph_edges;"
+    },
+    {
+      "digest": "162b6a29a958cf33",
+      "sql": "SELECT COUNT(*)::int AS n FROM atlas_hyperedges;"
+    },
+    {
+      "digest": "35d2443b3e688999",
+      "sql": "SELECT COUNT(*)::int AS n FROM ace_context_sources;"
+    }
+  ],
+  "predicates": {
+    "IDENTITY_ALIGNED": {
+      "sample_size": 1000,
+      "duplicate_packet_key_count": 0,
+      "missing_qdrant_point_id_count": 325,
+      "verdict": "PARTIAL_PROVEN"
+    },
+    "REVISION_QUALIFIED": {
+      "source_ref_count": 1000,
+      "revision_joined_count": 0,
+      "verdict": "NOT_PROVEN",
+      "note": "No live atlas_packets.workspace_revision column exists — this predicate cannot reach PASS via source_revision alone even at 100% join."
+    },
+    "SYMBOLS_RESOLVED": {
+      "graphify_symbols_exists": true,
+      "graphify_symbols_row_count": 0,
+      "verdict": "NOT_PROVEN",
+      "note": "Table exists (columns: symbol_id, file_id, stable_symbol_key, symbol_kind, qualified_name, parent_symbol_id, start/end byte+row, signature_text, source_text_hash, ast_fingerprint, metadata) but is EMPTY (0 rows). Corrects the 2026-09-08 latent-representation-identity audit, which reported this table absent — it exists as schema but has never been populated by a writer; no canonical SymbolVersionV1 registry has real data yet either way."
+    },
+    "SEMANTIC_OWNER_PROVEN": {
+      "candidate_768_columns_present": [
+        "atlas_packets.embedding",
+        "codebase_chunk_index.content_embedding_768"
+      ],
+      "verdict": "AMBIGUOUS_OWNER",
+      "note": "Two independently-populated tables both carry a 768-dim vector column that this repo has previously labeled CANONICAL_SOURCE (atlas_packets.embedding AND codebase_chunk_index.content_embedding_768). Per CLAUDE.md this is a known, tracked split (two coexisting Qdrant 768 collections mirror it) — not resolved by this audit. semantic_768 does not have one proven physical owner yet."
+    },
+    "LATENT_FAMILY_PROVEN": {
+      "latent_columns_present": [
+        "latent_64"
+      ],
+      "representation_ledger_exists": false,
+      "verdict": "NOT_PROVEN",
+      "note": "Per the 2026-09-08 identity audit, atlas_representation_records does not exist — there is no producer_id/encoder_revision/input_digest record tying latent_64 (the only populated lane) to a shared-derivation family with any latent_256/latent_128 sibling. Cannot prove a single-input, non-cascaded projection family without it."
+    },
+    "GRAPH_MANIFEST_SEALED": {
+      "manifest_table_exists": false,
+      "verdict": "ABSENT",
+      "note": "No GraphProjectionManifestV1-shaped table found. NetworkX/cuGraph/Neo4j currently each run their own graph construction (per CLAUDE.md's NetworkX↔cuGraph parity pipeline) rather than consuming one sealed node/edge manifest."
+    },
+    "ONTOLOGY_COHORT_NONEMPTY": {
+      "ontology_tables_found": [
+        "atlas_ontology_concepts",
+        "atlas_ontology_tuples",
+        "hypergraph_edges",
+        "atlas_hyperedges"
+      ],
+      "total_row_count": 63084,
+      "verdict": "PASS"
+    },
+    "ORDINAL_MAP_SEALED": {
+      "ordinal_table_exists": false,
+      "verdict": "ABSENT",
+      "note": "No dedicated CandidateOrdinal sealed-map table found. CLAUDE.md documents CandidateOrdinal normalization as a design intent (parent-atlas identity/retrieval alignment section), not yet a table-backed sealed artifact."
+    },
+    "PROJECTIONS_CHECKSUM_ALIGNED": {
+      "depends_on": "LATENT_FAMILY_PROVEN + GRAPH_MANIFEST_SEALED",
+      "verdict": "NOT_PROVEN",
+      "note": "Cannot be proven while atlas_representation_records is absent — there is no checksum field anywhere recording input_checksum/ordinal_map_checksum for cross-projection alignment."
+    },
+    "BITFROST_KEYS_DERIVABLE": {
+      "sample_key_count": 0,
+      "verdict": "NOT_PROVEN",
+      "note": "Presence of bitfrost:packet:* keys does not by itself prove a derivable domain+cluster+topology+symbol-neighborhood BitFrost key scheme — only that the existing summary cache namespace is populated."
+    },
+    "ACE_EVIDENCE_GROUNDED": {
+      "table_exists": true,
+      "row_count": 0,
+      "verdict": "NOT_PROVEN",
+      "note": "ace_context_sources existing and populated proves an audit trail exists; it does not by itself prove every ACE card cites source spans/symbols/tuples rather than rehydrated raw JSON (ACECardV1 from the proposal) — not checked this pass."
+    }
+  },
+  "table_existence": {
+    "atlas_packets": true,
+    "atlas_representation_records": false,
+    "atlas_ast_nodes": true,
+    "atlas_tree_nodes": true,
+    "graphify_symbols": true,
+    "graphify_files": true,
+    "codebase_chunk_index": true,
+    "atlas_topology_index": true,
+    "atlas_ontology_concepts": true,
+    "atlas_ontology_tuples": true,
+    "hypergraph_edges": true,
+    "atlas_hyperedges": true,
+    "atlas_candidate_ordinals": false,
+    "atlas_graph_projection_manifest": false,
+    "atlas_workspace_source_bindings": true,
+    "ace_context_sources": true,
+    "agent_context_files": true,
+    "directory_context_bindings": true
+  },
+  "overall_verdict": "NOT_SAFE_TO_PROJECT",
+  "overall_verdict_reason": "10/11 predicates below PASS: IDENTITY_ALIGNED=PARTIAL_PROVEN, REVISION_QUALIFIED=NOT_PROVEN, SYMBOLS_RESOLVED=NOT_PROVEN, SEMANTIC_OWNER_PROVEN=AMBIGUOUS_OWNER, LATENT_FAMILY_PROVEN=NOT_PROVEN, GRAPH_MANIFEST_SEALED=ABSENT, ORDINAL_MAP_SEALED=ABSENT, PROJECTIONS_CHECKSUM_ALIGNED=NOT_PROVEN, BITFROST_KEYS_DERIVABLE=NOT_PROVEN, ACE_EVIDENCE_GROUNDED=NOT_PROVEN"
+}

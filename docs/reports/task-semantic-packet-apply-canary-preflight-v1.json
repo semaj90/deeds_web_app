@@ -1,6 +1,6 @@
 {
   "schema": "atlas.task-semantic-packet-apply-canary-preflight.v1",
-  "generatedAt": "2026-09-08T21:33:38.099Z",
+  "generatedAt": "2026-09-09T01:56:56.262Z",
   "readOnly": true,
   "productionWritesPerformed": false,
   "applyAuthorized": false,

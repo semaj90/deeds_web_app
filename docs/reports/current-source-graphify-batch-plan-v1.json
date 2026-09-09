@@ -1,8 +1,12 @@
 {
   "schema": "atlas.current-source-graphify-batch-plan.v1",
-  "generatedAt": "2026-09-08T19:57:02.217Z",
+  "generatedAt": "2026-09-09T02:43:40.576Z",
   "status": "CURRENT_GRAPHIFY_BATCH_PLAN_BLOCKED_REVIEW",
   "readOnly": true,
+  "canonicalAuthority": false,
+  "sourceBytesRevalidated": false,
+  "promotionAllowed": false,
+  "scope": "BOUNDED_RECORDED_BINDING_COMPARISON",
   "writes": {
     "postgres": false,
     "graphify": false,
@@ -10,592 +14,189 @@
     "neo4j": false,
     "valkey": false
   },
-  "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
+  "workspaceRevision": "sha256:f476b4a6aac2afcafe0f82c7b0e48d52951ccbce73fca52b9706b1f1fbfabefb",
+  "inputSource": "docs/reports/graphify-lifecycle-entrypoint-v1.json",
   "cohortReport": "docs/reports/current-source-projection-cohort-v1.json",
-  "cohortEligibleSources": 52,
-  "requestedLimit": 128,
-  "selectedSourceCount": 52,
-  "selectionChecksum": "0c4ff5b9107a9f2eb0dee9ddfac3b4393941e4dcfc3dc146fe776bc7026acaf3",
+  "cohortEligibleSources": 24101,
+  "requestedLimit": 5,
+  "selectedSourceCount": 5,
+  "selectionChecksum": "6e3df0dce6fab8c3577b30a3cc7a335828a708133a0172d9fcfaaf624d01c7c3",
   "counts": {
     "currentGraphifyExact": 0,
     "missingGraphifySource": 0,
     "missingWorkspaceObservation": 0,
     "ambiguousGraphifySource": 0,
-    "graphifyRevisionOrContentMismatch": 52
+    "graphifyRevisionOrContentMismatch": 5
   },
   "databaseError": null,
+  "mismatchFieldCounts": {
+    "workspaceRevision": 5
+  },
   "nextGate": "EXPLICIT_GRAPHIFY_BATCH_REVIEW",
   "records": [
     {
-      "sourceRef": "sveltekit-frontend/docs/design/2026-05-11_agents-directory-card-regen.md",
-      "sourceRevision": "sha256:57a4837b0c7a57ee8c790abbf9d11c5b08801c1952e2d6cee9e0ec80dc83022b",
-      "contentDigest": "57a4837b0c7a57ee8c790abbf9d11c5b08801c1952e2d6cee9e0ec80dc83022b",
-      "byteLength": 21455,
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
+      "sourceRef": "$lib/utils/file-reader.ts",
+      "sourceRevision": "sha256:c4a196813c7d8f4ea0e22645135cc5c8df9a36a547a494ebad502c060d7550f6",
+      "contentDigest": "c4a196813c7d8f4ea0e22645135cc5c8df9a36a547a494ebad502c060d7550f6",
+      "byteLength": 737,
+      "workspaceRevision": "sha256:f476b4a6aac2afcafe0f82c7b0e48d52951ccbce73fca52b9706b1f1fbfabefb",
       "bindingPresent": true,
       "graphifyRows": 1,
       "exactCurrentRows": 0,
+      "comparisons": [
+        {
+          "observed": {
+            "sourceRef": "$lib/utils/file-reader.ts",
+            "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+            "sourceRevision": "sha256:c4a196813c7d8f4ea0e22645135cc5c8df9a36a547a494ebad502c060d7550f6",
+            "contentDigest": "c4a196813c7d8f4ea0e22645135cc5c8df9a36a547a494ebad502c060d7550f6",
+            "byteLength": "737"
+          },
+          "matches": {
+            "sourceRef": true,
+            "workspaceRevision": false,
+            "sourceRevision": true,
+            "contentDigest": true,
+            "byteLength": true
+          },
+          "mismatchedFields": [
+            "workspaceRevision"
+          ],
+          "exact": false
+        }
+      ],
       "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     },
     {
-      "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/ToolInvoker.ts",
-      "sourceRevision": "sha256:ed076cdbcfa3d4542e62d750767a63a3770dbb5c1310b05476e849c7c673caa2",
-      "contentDigest": "ed076cdbcfa3d4542e62d750767a63a3770dbb5c1310b05476e849c7c673caa2",
-      "byteLength": 717,
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
+      "sourceRef": ".claude/AGENT_CONSTITUTION.md",
+      "sourceRevision": "sha256:2d3ee7fcce1beb28a75b8c53ea0e5417906dcd2d29fa4692475da6d7b14d0bdc",
+      "contentDigest": "2d3ee7fcce1beb28a75b8c53ea0e5417906dcd2d29fa4692475da6d7b14d0bdc",
+      "byteLength": 251,
+      "workspaceRevision": "sha256:f476b4a6aac2afcafe0f82c7b0e48d52951ccbce73fca52b9706b1f1fbfabefb",
       "bindingPresent": true,
       "graphifyRows": 1,
       "exactCurrentRows": 0,
+      "comparisons": [
+        {
+          "observed": {
+            "sourceRef": ".claude/AGENT_CONSTITUTION.md",
+            "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+            "sourceRevision": "sha256:2d3ee7fcce1beb28a75b8c53ea0e5417906dcd2d29fa4692475da6d7b14d0bdc",
+            "contentDigest": "2d3ee7fcce1beb28a75b8c53ea0e5417906dcd2d29fa4692475da6d7b14d0bdc",
+            "byteLength": "251"
+          },
+          "matches": {
+            "sourceRef": true,
+            "workspaceRevision": false,
+            "sourceRevision": true,
+            "contentDigest": true,
+            "byteLength": true
+          },
+          "mismatchedFields": [
+            "workspaceRevision"
+          ],
+          "exact": false
+        }
+      ],
       "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     },
     {
-      "sourceRef": "sveltekit-frontend/src/routes/(app)/admin/cache/+page.server.ts",
-      "sourceRevision": "sha256:e02678aef7c7579be7c1ba9441464b098a65d4eefe471e43250e9b4e474330e8",
-      "contentDigest": "e02678aef7c7579be7c1ba9441464b098a65d4eefe471e43250e9b4e474330e8",
-      "byteLength": 244,
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
+      "sourceRef": ".claude/AGENT_RECOMMENDATIONS.md",
+      "sourceRevision": "sha256:427724d93ed9949cbf21c0373ac711059097f6a1c16f0e4aebff7f6b46cc6072",
+      "contentDigest": "427724d93ed9949cbf21c0373ac711059097f6a1c16f0e4aebff7f6b46cc6072",
+      "byteLength": 507,
+      "workspaceRevision": "sha256:f476b4a6aac2afcafe0f82c7b0e48d52951ccbce73fca52b9706b1f1fbfabefb",
       "bindingPresent": true,
       "graphifyRows": 1,
       "exactCurrentRows": 0,
+      "comparisons": [
+        {
+          "observed": {
+            "sourceRef": ".claude/AGENT_RECOMMENDATIONS.md",
+            "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+            "sourceRevision": "sha256:427724d93ed9949cbf21c0373ac711059097f6a1c16f0e4aebff7f6b46cc6072",
+            "contentDigest": "427724d93ed9949cbf21c0373ac711059097f6a1c16f0e4aebff7f6b46cc6072",
+            "byteLength": "507"
+          },
+          "matches": {
+            "sourceRef": true,
+            "workspaceRevision": false,
+            "sourceRevision": true,
+            "contentDigest": true,
+            "byteLength": true
+          },
+          "mismatchedFields": [
+            "workspaceRevision"
+          ],
+          "exact": false
+        }
+      ],
       "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     },
     {
-      "sourceRef": "sveltekit-frontend/src/routes/(app)/admin/codebase-index/+page.ts",
-      "sourceRevision": "sha256:028a65cfda7baee19b14dfb3b8f9728612e4cb2d552faa0d23011bfb34c7e935",
-      "contentDigest": "028a65cfda7baee19b14dfb3b8f9728612e4cb2d552faa0d23011bfb34c7e935",
-      "byteLength": 94,
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
+      "sourceRef": ".claude/ATLAS-ENGINEERING-PROMPT.md",
+      "sourceRevision": "sha256:9048d3550bcd088cb2cd71fcdd799af686c3b305958406d523d8d939024038fb",
+      "contentDigest": "9048d3550bcd088cb2cd71fcdd799af686c3b305958406d523d8d939024038fb",
+      "byteLength": 28338,
+      "workspaceRevision": "sha256:f476b4a6aac2afcafe0f82c7b0e48d52951ccbce73fca52b9706b1f1fbfabefb",
       "bindingPresent": true,
       "graphifyRows": 1,
       "exactCurrentRows": 0,
+      "comparisons": [
+        {
+          "observed": {
+            "sourceRef": ".claude/ATLAS-ENGINEERING-PROMPT.md",
+            "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+            "sourceRevision": "sha256:9048d3550bcd088cb2cd71fcdd799af686c3b305958406d523d8d939024038fb",
+            "contentDigest": "9048d3550bcd088cb2cd71fcdd799af686c3b305958406d523d8d939024038fb",
+            "byteLength": "28338"
+          },
+          "matches": {
+            "sourceRef": true,
+            "workspaceRevision": false,
+            "sourceRevision": true,
+            "contentDigest": true,
+            "byteLength": true
+          },
+          "mismatchedFields": [
+            "workspaceRevision"
+          ],
+          "exact": false
+        }
+      ],
       "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     },
     {
-      "sourceRef": "sveltekit-frontend/src/routes/(app)/cases/[id]/chat/+page.server.ts",
-      "sourceRevision": "sha256:57c99034d0c22587fe18d6b595be5e3ca15745c825afc1ed5e46da3dc97c8e27",
-      "contentDigest": "57c99034d0c22587fe18d6b595be5e3ca15745c825afc1ed5e46da3dc97c8e27",
-      "byteLength": 346,
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
+      "sourceRef": ".claude/CLAUDE.md",
+      "sourceRevision": "sha256:13bc6179f4ade55522d13a16384ef9a9603f703048181ae6c820e8f48e706252",
+      "contentDigest": "13bc6179f4ade55522d13a16384ef9a9603f703048181ae6c820e8f48e706252",
+      "byteLength": 111,
+      "workspaceRevision": "sha256:f476b4a6aac2afcafe0f82c7b0e48d52951ccbce73fca52b9706b1f1fbfabefb",
       "bindingPresent": true,
       "graphifyRows": 1,
       "exactCurrentRows": 0,
-      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/routes/(app)/citations/+page.ts",
-      "sourceRevision": "sha256:3449a47c95f7647b70222aaea11253d323c34bbf4cd742b335a43bb7780bcc8d",
-      "contentDigest": "3449a47c95f7647b70222aaea11253d323c34bbf4cd742b335a43bb7780bcc8d",
-      "byteLength": 117,
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 0,
-      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/+page.ts",
-      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "byteLength": 27,
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 0,
-      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/agent-chat/+page.ts",
-      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "byteLength": 27,
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 0,
-      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/ai-assistant/+page.ts",
-      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "byteLength": 27,
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 0,
-      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/ai-chat-test/+page.ts",
-      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "byteLength": 27,
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 0,
-      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/ai-file-upload/+page.ts",
-      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "byteLength": 27,
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 0,
-      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/ask-ai/+page.ts",
-      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "byteLength": 27,
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 0,
-      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/cache/+page.ts",
-      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "byteLength": 27,
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 0,
-      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/case-form/+page.ts",
-      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "byteLength": 27,
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 0,
-      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/chat-messages/+page.ts",
-      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "byteLength": 27,
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 0,
-      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/citation-tools/+page.ts",
-      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "byteLength": 27,
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 0,
-      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/client-ai-chat/+page.ts",
-      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "byteLength": 27,
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 0,
-      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/client-inference/+page.ts",
-      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "byteLength": 27,
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 0,
-      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/collab-canvas/+page.ts",
-      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "byteLength": 27,
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 0,
-      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/context-menu/+page.ts",
-      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "byteLength": 27,
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 0,
-      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/contextual-chat/+page.ts",
-      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "byteLength": 27,
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 0,
-      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/courtroom-sim/+page.ts",
-      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "byteLength": 27,
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 0,
-      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/embedding-stream/+page.ts",
-      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "byteLength": 27,
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 0,
-      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/enhanced-upload/+page.ts",
-      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "byteLength": 27,
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 0,
-      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/evidence-dashboard/+page.ts",
-      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "byteLength": 27,
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 0,
-      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/hover-card/+page.ts",
-      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "byteLength": 27,
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 0,
-      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/keyboard-shortcuts/+page.ts",
-      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "byteLength": 27,
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 0,
-      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/legal-layout/+page.ts",
-      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "byteLength": 27,
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 0,
-      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/legal-spellbook/+page.ts",
-      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "byteLength": 27,
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 0,
-      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/modals/+page.ts",
-      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "byteLength": 27,
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 0,
-      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/modular-upload/+page.ts",
-      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "byteLength": 27,
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 0,
-      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/nes-toast/+page.ts",
-      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "byteLength": 27,
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 0,
-      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/notifications/+page.ts",
-      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "byteLength": 27,
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 0,
-      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/phantom-code-lab/+page.ts",
-      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "byteLength": 27,
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 0,
-      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/rich-text-editor/+page.ts",
-      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "byteLength": 27,
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 0,
-      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/search-tools/+page.ts",
-      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "byteLength": 27,
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 0,
-      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/source-drawer/+page.ts",
-      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "byteLength": 27,
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 0,
-      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/streaming/+page.ts",
-      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "byteLength": 27,
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 0,
-      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/synthesis-chat/+page.ts",
-      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "byteLength": 27,
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 0,
-      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/theory-board/+page.ts",
-      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "byteLength": 27,
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 0,
-      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/toc-reader/+page.ts",
-      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "byteLength": 27,
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 0,
-      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/ui-components/+page.ts",
-      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "byteLength": 27,
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 0,
-      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/webgpu-showcase/+page.ts",
-      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "byteLength": 27,
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 0,
-      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/yorha-assistant/+page.ts",
-      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "byteLength": 27,
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 0,
-      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/yorha-icons/+page.ts",
-      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "byteLength": 27,
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 0,
-      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/yorha-terminal/+page.ts",
-      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "byteLength": 27,
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 0,
-      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/routes/(app)/evidence/analyze/+page.server.ts",
-      "sourceRevision": "sha256:03c2f124ccaf960d3b993362233dc11b80ca7c4e49b4544463467f76fbd7a33f",
-      "contentDigest": "03c2f124ccaf960d3b993362233dc11b80ca7c4e49b4544463467f76fbd7a33f",
-      "byteLength": 348,
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 0,
-      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/routes/(app)/evidence/hash/+page.server.ts",
-      "sourceRevision": "sha256:03c2f124ccaf960d3b993362233dc11b80ca7c4e49b4544463467f76fbd7a33f",
-      "contentDigest": "03c2f124ccaf960d3b993362233dc11b80ca7c4e49b4544463467f76fbd7a33f",
-      "byteLength": 348,
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 0,
-      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/routes/(app)/global-search/+page.ts",
-      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "byteLength": 27,
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 0,
-      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/routes/(app)/persons-of-interest/[id]/+page.ts",
-      "sourceRevision": "sha256:90adca11bf6dc5c942620de748a8d5c92f2c4d08d7acc19d956af7482b8bb17a",
-      "contentDigest": "90adca11bf6dc5c942620de748a8d5c92f2c4d08d7acc19d956af7482b8bb17a",
-      "byteLength": 97,
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 0,
-      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/routes/(app)/terminal/+page.ts",
-      "sourceRevision": "sha256:7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "contentDigest": "7e9a3137b23fd7daf5baa560486e053ef924ba07cf6d3d4687281a4ed4578d04",
-      "byteLength": 27,
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 0,
-      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
-    },
-    {
-      "sourceRef": "sveltekit-frontend/src/routes/(app)/yorha-home/+page.server.ts",
-      "sourceRevision": "sha256:d866f6facd9f8375969a150a0a064df86349db40f0ce4fc57b015f2507897a3c",
-      "contentDigest": "d866f6facd9f8375969a150a0a064df86349db40f0ce4fc57b015f2507897a3c",
-      "byteLength": 211,
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 0,
+      "comparisons": [
+        {
+          "observed": {
+            "sourceRef": ".claude/CLAUDE.md",
+            "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+            "sourceRevision": "sha256:13bc6179f4ade55522d13a16384ef9a9603f703048181ae6c820e8f48e706252",
+            "contentDigest": "13bc6179f4ade55522d13a16384ef9a9603f703048181ae6c820e8f48e706252",
+            "byteLength": "111"
+          },
+          "matches": {
+            "sourceRef": true,
+            "workspaceRevision": false,
+            "sourceRevision": true,
+            "contentDigest": true,
+            "byteLength": true
+          },
+          "mismatchedFields": [
+            "workspaceRevision"
+          ],
+          "exact": false
+        }
+      ],
       "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
     }
   ]

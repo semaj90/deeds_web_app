@@ -20,13 +20,26 @@ import {
 import { GraphifyStructuralMaterializer, create8095AstProvider } from '../../src/lib/server/atlas/indexing/graphify-structural-materializer.js';
 import { materializeWorkspaceRevisionOriginV1 } from '../../src/lib/server/atlas/indexing/workspace-revision-origin-runtime-v1.js';
 
+loadAtlasEnv();
+const DATABASE_URL = process.env.DATABASE_URL?.trim();
+const WORKSPACE_ID = process.env.ATLAS_GRAPHIFY_CANARY_WORKSPACE_ID?.trim() ?? '';
+const CONFIRMATION = 'AUTHORIZE_GRAPHIFY_COMMITTED_BOUNDED_CANARY_V1';
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
 if (process.env.GRAPHIFY_COMMITTED_CANARY !== '1') {
   throw new Error('GRAPHIFY_COMMITTED_CANARY=1 is required for the bounded committed canary');
 }
+if (process.env.ATLAS_NON_PRODUCTION_DATABASE !== '1') {
+  throw new Error('ATLAS_NON_PRODUCTION_DATABASE=1 is required for the bounded committed canary');
+}
+if (process.env.GRAPHIFY_COMMITTED_CANARY_CONFIRM !== CONFIRMATION) {
+  throw new Error(`GRAPHIFY_COMMITTED_CANARY_CONFIRM=${CONFIRMATION} is required for the bounded committed canary`);
+}
+if (!DATABASE_URL) throw new Error('DATABASE_URL is required for the bounded committed canary');
+if (!UUID_RE.test(WORKSPACE_ID)) throw new Error('ATLAS_GRAPHIFY_CANARY_WORKSPACE_ID must be an existing non-production workspace UUID');
 
-loadAtlasEnv();
 const client = new Client({
-  connectionString: process.env.DATABASE_URL ?? 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db',
+  connectionString: DATABASE_URL,
 });
 const reportPath = resolve(process.cwd(), '..', 'docs', 'reports', 'graphify-daily-coordinator-canary-v1.json');
 const workspaceRoot = resolve(process.cwd(), '..');
@@ -57,9 +70,9 @@ try {
   }
   const bindings = adaptWorkspaceBindingsToSourceSelectionV1(workspaceRevision, selectedBindings);
 
-  const workspaceResult = await client.query('SELECT id FROM public.workspaces LIMIT 1');
+  const workspaceResult = await client.query('SELECT id FROM public.workspaces WHERE id = $1::uuid', [WORKSPACE_ID]);
   const workspaceId = workspaceResult.rows[0]?.id as string | undefined;
-  if (!workspaceId) throw new Error('GRAPHIFY_COORDINATOR_CANARY_NO_WORKSPACE');
+  if (!workspaceId) throw new Error('GRAPHIFY_COORDINATOR_CANARY_WORKSPACE_NOT_FOUND');
 
   const opened = await openExecution(client, {
     workspaceId,

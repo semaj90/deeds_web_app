@@ -15,6 +15,7 @@ const origin = materializeWorkspaceRevisionOriginV1({
 
 const report = {
   schema: 'atlas.graphify-lifecycle-entrypoint-audit.v1',
+  generatedAt: new Date().toISOString(),
   status: 'READY_FOR_INJECTED_WIRING',
   readOnly: true,
   workspaceRevision: origin.record.workspaceRevision,
@@ -37,5 +38,13 @@ const report = {
 };
 
 await mkdir(path.dirname(reportPath), { recursive: true });
-await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
-console.log(JSON.stringify({ status: report.status, workspaceRevision: report.workspaceRevision, bindingCount: report.bindingCount, report: reportPath }, null, 2));
+let actualReportPath = reportPath;
+try {
+  await writeFile(actualReportPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+} catch (error) {
+  const stamp = new Date().toISOString().replaceAll(':', '-').replaceAll('.', '-');
+  actualReportPath = path.resolve(root, 'docs/reports', `graphify-lifecycle-entrypoint-v1-${stamp}.json`);
+  await writeFile(actualReportPath, `${JSON.stringify({ ...report, stableReportWriteError: String(error?.message ?? error) }, null, 2)}\n`, 'utf8');
+  console.error(`[graphify-lifecycle-entrypoint] stable report path unavailable; wrote fallback ${path.relative(root, actualReportPath).replaceAll('\\', '/')}`);
+}
+console.log(JSON.stringify({ status: report.status, workspaceRevision: report.workspaceRevision, bindingCount: report.bindingCount, report: actualReportPath, stableReportPath: reportPath }, null, 2));

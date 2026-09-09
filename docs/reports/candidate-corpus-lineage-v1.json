@@ -3,17 +3,17 @@
   "status": "DIAGNOSTIC_ONLY",
   "promotionEligible": false,
   "syntheticRevisionFallbacksUsed": false,
-  "generatedAt": "2026-09-03T23:55:32.595Z",
-  "totalRowsAudited": 61715,
+  "generatedAt": "2026-09-09T00:37:55.154Z",
+  "totalRowsAudited": 61718,
   "admittedCount": 0,
-  "excludedCount": 61715,
+  "excludedCount": 61718,
   "admittedRatio": 0,
   "exclusions": {
-    "missingSourceRevision": 61714,
+    "missingSourceRevision": 61717,
     "missingSourceRef": 1,
     "ambiguous": 0,
     "breakdown": {
-      "MISSING_SOURCE_REVISION": 61714,
+      "MISSING_SOURCE_REVISION": 61717,
       "MISSING_SOURCE_REF": 1
     }
   },

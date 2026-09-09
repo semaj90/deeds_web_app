@@ -1681,3 +1681,141 @@ genuinely a merge/rename/partition judgment call, not touched here.
 Items 1-9 and 12+ in the NEXT STEPS list above all gate on operator design decisions (identity
 disambiguator shape, overwrite trust policy vocabulary, which lane is actually blocking a real
 consumer) that this session did not have standing to make unilaterally -- not attempted.
+
+## Neo4j CodebaseFile stableKey backfill + a second, unresolved tool bug (2026-09-08)
+
+Prompted by a request to build multi-hop graph analysis: before writing anything new, tested the
+existing live multi-hop tools (`mcp__trace__graph_expand_neighborhood`, `graph_shortest_path`,
+`graph_pagerank_top`) against real data, per this repo's audit-before-build rule. Found
+`graph_expand_neighborhood` returned zero nodes/edges for `sveltekit-frontend/src/lib/server/db/
+client.ts` — a heavily-referenced, definitely-indexed file, not an edge case.
+
+Root cause #1 (fixed): `stableKey` was `NULL` on all 69,009 live `CodebaseFile` nodes — not
+sparse, total absence. Read-only audit
+(`scripts/atlas/audit-neo4j-codebasefile-identity-v1.mjs`,
+`docs/reports/neo4j-codebasefile-identity-audit-v1.json`) additionally found three incompatible
+path-identity schemes coexisting on the same node label: 58,569 (85%) clean relative paths
+(`src/lib/server/...`, no `sveltekit-frontend/` prefix — this repo's known root-prefix-alias
+mismatch, previously found only in Postgres/REL-01A ontology tuples, now confirmed independently
+present in Neo4j too), 6,773 (10%) stale leftover paths from ephemeral agent worktrees never
+cleaned up (`.claude/worktrees/agent-*/sveltekit-frontend/...`), and 2,404 (3.5%) absolute
+Windows paths (`C:/Users/james/Videos/...`). Sibling-overlap check: 5,405/6,773 stale-worktree
+nodes and 2,257/2,404 absolute-path nodes have a genuine clean-relative-path duplicate; the
+remainder (1,368 nodes) have no identifiable sibling and were left untouched.
+
+Applied a bounded, additive-only fix
+(`scripts/atlas/apply-neo4j-codebasefile-stablekey-backfill-v1.mjs`, dry-run by default, `--apply`
+to write; receipt `docs/reports/neo4j-codebasefile-stablekey-backfill-apply-v1.json`): (1)
+`SET stableKey = 'file:' + path` on the 58,569 clean nodes — verified written count matches
+eligible count exactly; (2) tagged (never merged or deleted) the 5,405 + 2,257 confirmed duplicates
+with `dataQualityFlag` + `duplicateOfPath` pointing at their canonical sibling, so a future pass
+can decide whether/how to migrate relationships onto the canonical node. Verified live:
+`client.ts`'s node now has `stableKey: "file:src/lib/server/db/client.ts"` and genuinely owns 51
+real relationships (50 `IMPORTS` + 1 `BELONGS_TO_FEATURE`) — the underlying graph data was never
+the problem for this file.
+
+**Root cause #2 investigated further — the original write-up above was WRONG on the mechanism
+and is corrected here rather than left standing (2026-09-08, same session).** Read
+`sveltekit-frontend/src/mcp/trace-mcp-server.ts`'s actual `graph.expand_neighborhood` handler
+(~line 1307) instead of guessing from black-box output. It does not query Neo4j directly for
+traversal at all — it calls a SvelteKit HTTP API, `svelteGet('/api/graph/traverse?...')`
+(`sveltekit-frontend/src/routes/api/graph/traverse/+server.ts`), and swallows any fetch failure
+into `{nodes: [], edges: []}` via `.catch(() => ...)` with no error surfaced. Three real, distinct,
+stacked causes were found and separated, in the order that actually explains the symptom:
+
+1. **The SvelteKit dev server was simply not running** (`curl :5173` → connection refused,
+   confirmed live) — the swallowed fetch failure, not a logic bug, produced every empty result
+   this session saw before this point, including the very first `graph_expand_neighborhood` test
+   that motivated the whole Neo4j identity investigation. Started it (`npm run dev`) to continue
+   testing; confirmed real center-node data returns once it's up.
+2. **`/api/graph/traverse`'s core Cypher queries filter on `n.id`, a property that has ZERO
+   occurrence on any `CodebaseFile` node** — confirmed via direct query
+   (`MATCH (n:CodebaseFile) WHERE n.id IS NOT NULL RETURN count(n)` → `0`). `id` is a real,
+   populated property on entirely different node types (`Packet`: 40,754; `InteractiveSession`:
+   122; `Outcome`: 28; `SOMCluster`: 33) — this route was written against a `CodebaseFile` schema
+   convention that was never real, or has since drifted away from whatever wrote it, and nobody
+   updated the route. It cannot ever match a `CodebaseFile` node, independent of the stableKey
+   fix above, independent of dev-server state, independent of `mode` (`ego`/`bfs`/`cluster` all
+   use the same `{id: $id}` match pattern per the route source at lines 72/78/101).
+3. Confirmed the route also builds its own third, separate id convention for display
+   (`fileId = ('src/' + nodeId).replace(/[^a-zA-Z0-9/_.-]/g, '_')`, e.g.
+   `"src/file_src/lib/server/db/client.ts"` for input `src/lib/server/db/client.ts` — note the
+   literal string `file_` appearing mid-path is this sanitizer mangling the colon in
+   `file:src/...` when a `file:`-prefixed key reaches it) — a fourth incompatible key shape
+   layered on top of `stableKey`/`path`/`filePath`/`id`, used only for display, that happens to
+   produce a plausible-looking but fabricated "center" node in the MCP tool's response even
+   though the actual traversal (#2) can never return anything.
+
+**Net effect**: `graph_expand_neighborhood` (and by inheritance anything else calling
+`/api/graph/traverse`) cannot currently return real multi-hop neighbors for ANY `CodebaseFile`
+node, regardless of the identity backfill above — the backfill was still worth doing (it's a real,
+independent data-quality fix the identity-mirror rule requires, and unblocks any *other* consumer
+that queries by `stableKey` or `path` directly), but it does not fix this route. `graph_pagerank_top`
+was re-checked too: filtering `nodeType: "CodebaseFile"` returns real absolute-Windows-path
+`stableKey` values — these come from the stale legacy `CodebaseFile`-only-label node set (3,667
+nodes, the same set CLAUDE.md already documents as carrying pageRank scores from a superseded
+run), which genuinely does have non-null `stableKey` predating this session's fix; this is
+consistent with, not contradicted by, the audit's `HAS_STABLEKEY: 0` finding scoped to the CURRENT
+population at that time. Not a separate tool bug.
+
+**Fixed, same session (2026-09-08).** Rewrote
+`sveltekit-frontend/src/routes/api/graph/traverse/+server.ts` across all three modes
+(`ego`/`bfs`/`cluster`) to match `CodebaseFile.path` instead of the nonexistent `id` property,
+dropped the ad hoc `fileId` sanitizer/prefixer (replaced with a normalizer that only strips a
+`file:` prefix or a `sveltekit-frontend/` root-prefix, matching the real live `path` convention),
+and mapped the route's `cluster` display field to the real `communityId` property (`type` has no
+live equivalent and is left as an always-empty display field for response-shape compatibility;
+`communityId` vs `leidenCommunity` vs `louvainCommunity` — three coexisting community properties —
+is an open question, not resolved here, `communityId` picked only as the most generic name).
+
+Verified live end-to-end, not just unit-level: started the dev server (was down, see root cause
+#1 above), confirmed `GET /api/graph/traverse?nodeId=src/lib/server/db/client.ts&mode=ego&hops=1`
+now returns `total: 51, edges: 50` — exactly matching the 50 real `IMPORTS` relationships confirmed
+directly against Neo4j earlier in this investigation. `mode=bfs&hops=2` and `mode=cluster` both
+returned real, non-empty results too (`bfs`: 20/20 at the requested limit; `cluster`: 11 members,
+0 edges as expected since cluster mode returns co-members, not edges between them). Then re-ran
+the actual `mcp__trace__graph_expand_neighborhood` MCP tool (not just the underlying HTTP route) —
+it now returns real neighbor files (`src/hooks.server.ts`, `src/lib/server/mcp/tool-ranker.ts`,
+several `+server.ts` routes, etc.), real `RELATED_TO` edges, real non-uniform PageRank scores, and
+`confidence: 1` — a genuine change from the `nodes: [], edges: [], confidence: 0.45` result this
+whole investigation started from.
+
+Follow-up spot-check (2026-09-08, same session): `mcp__trace__graph_shortest_path` and
+`mcp__trace__hypergraph_search` were also tested live rather than left unverified.
+`graph_shortest_path` from `file:src/lib/server/db/client.ts` to `file:src/hooks.server.ts`
+returned a real 1-hop `IMPORTS` path — it does not depend on `/api/graph/traverse` and already
+benefited from the `stableKey` backfill alone, no code fix needed. `hypergraph_search` initially
+returned zero results for "database client connection pooling," which looked concerning until a
+broader query ("graph") returned real `cluster_context`/`shared_resource` edges with proper
+scores — the first result was a genuine semantic non-match, not a broken index.
+
+**`communityId`/`leidenCommunity`/`louvainCommunity` question resolved (2026-09-08, same
+session).** Compared live size distributions across all 69,009 `CodebaseFile` nodes:
+`communityId` is heavily degenerate — 65,774/66,461 communities (98.97%) are singletons, max size
+only 381. `leidenCommunity` and `louvainCommunity` are comparable to each other (max size 2,397
+both, ~90% singletons — plausible for a directed `IMPORTS` graph with many leaf/entry files, not
+necessarily a bug) but meaningfully healthier than `communityId`. Switched
+`/api/graph/traverse`'s `cluster` mode from `communityId` to `louvainCommunity` — it also matches
+the NetworkX/cuGraph Louvain pipeline this repo's CLAUDE.md documents as independently validated
+(ARI/NMI agreement 1.0 against the NetworkX CPU oracle). Verified live:
+`mode=cluster` for `src/lib/server/db/client.ts` now returns 20 co-members (up from 11 under the
+degenerate `communityId`). `communityId` itself was not touched, deleted, or investigated further
+as to why it's so degenerate — flagged, not fixed.
+
+**Follow-up (same session): found the precise cause of `communityId`'s degeneracy, not just its
+symptom.** Sampled its raw values directly: `"community:28115"`, `"community:28116"`,
+`"community:28117"`, `"community:28118"`, `"community:28119"` — sequentially incrementing, one per
+node. This is not a failed or coarse community-detection run; it's a **per-node placeholder ID
+formatted to look like a community label** — likely a default/fallback value assigned when no real
+community was computed. That fully explains the earlier 98.97%-singleton finding (each node
+effectively gets its own unique ID) and confirms `leidenCommunity`/`louvainCommunity` were the
+correct, real ones to prefer. `n.updatedAt` on these rows is a mix of `NULL` and real
+2026-08-09T08:45:42.3xx timestamps — consistent with a single bulk placeholder-assignment pass on
+that date, not per-node incremental writes. Not investigated further: which script wrote this, or
+whether it should be removed/renamed to stop looking like a real community property to a future
+reader — flagged, not fixed.
+
+Still not touched: the stale legacy `CodebaseFile`-only node set (3,667 nodes, superseded pageRank
+run) this route never touches either way. Multi-hop analysis on the current, live `CodebaseFile`
+population is now genuinely usable through the tools checked; building further on top of it is
+unblocked.

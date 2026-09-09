@@ -12,9 +12,27 @@ const require = createRequire(import.meta.url);
 const { Pool } = require('pg');
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const cohortPath = path.join(root, 'docs/reports/current-source-cohort-lineage-v1.json');
+const lifecyclePath = path.join(root, 'docs/reports/graphify-lifecycle-entrypoint-v1.json');
 const reportPath = path.join(root, 'docs/reports/current-source-evidence-hydration-v1.json');
 const cohort = JSON.parse(fs.readFileSync(cohortPath, 'utf8'));
-const bindings = (cohort.rows ?? []).filter((row) => row?.relativePath && row?.sourceRevision);
+let inputSource = 'docs/reports/current-source-cohort-lineage-v1.json';
+let inputRows = cohort.rows ?? [];
+try {
+  const lifecycle = JSON.parse(fs.readFileSync(lifecyclePath, 'utf8'));
+  if (Array.isArray(lifecycle.sourceBindings) && lifecycle.sourceBindings.length > 0) {
+    inputSource = 'docs/reports/graphify-lifecycle-entrypoint-v1.json';
+    inputRows = lifecycle.sourceBindings.map((row) => ({
+      relativePath: row.sourceRef,
+      sourceRevision: row.sourceRevision,
+      contentDigest: row.contentDigest,
+      byteLength: row.byteLength,
+      workspaceRevision: lifecycle.workspaceRevision,
+    }));
+  }
+} catch {
+  // Preserve the historical cohort fallback when no lifecycle-origin report exists.
+}
+const bindings = inputRows.filter((row) => row?.relativePath && row?.sourceRevision);
 const normalize = (value) => String(value ?? '').trim().replaceAll('\\', '/').replace(/^\.\//, '').toLowerCase();
 const refs = [...new Set(bindings.map((row) => normalize(row.relativePath)))];
 const prefixedRefs = refs.map((ref) => ref.startsWith('sveltekit-frontend/') ? ref : `sveltekit-frontend/${ref}`);
@@ -26,6 +44,7 @@ const pool = new Pool({ connectionString: resolveDatabaseUrl(loadRepoEnv()), max
 const report = {
   schema: 'atlas.current-source-evidence-hydration.v1',
   mode: 'READ_ONLY_SOURCE_EVIDENCE_OWNER_AUDIT',
+  inputSource,
   inputRows: bindings.length,
   exactRevisionMatches: 0,
   contentHydrated: 0,
@@ -153,7 +172,17 @@ try {
 
 report.reportChecksum = crypto.createHash('sha256').update(JSON.stringify(report)).digest('hex');
 fs.mkdirSync(path.dirname(reportPath), { recursive: true });
-fs.writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+let actualReportPath = reportPath;
+try {
+  fs.writeFileSync(actualReportPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+} catch (error) {
+  // Preserve a fresh read-only result when another Windows process temporarily
+  // holds the stable report path. Never leave the audit result unrecorded.
+  const stamp = new Date().toISOString().replaceAll(':', '-').replaceAll('.', '-');
+  actualReportPath = path.join(root, 'docs/reports', `current-source-evidence-hydration-v1-${stamp}.json`);
+  fs.writeFileSync(actualReportPath, `${JSON.stringify({ ...report, stableReportWriteError: String(error?.message ?? error) }, null, 2)}\n`, 'utf8');
+  console.error(`[source-hydration] stable report path unavailable; wrote fallback ${path.relative(root, actualReportPath).replaceAll('\\', '/')}`);
+}
 console.log(JSON.stringify({
   status: report.status,
   inputRows: report.inputRows,
@@ -164,5 +193,6 @@ console.log(JSON.stringify({
   classifierReady: report.classifierReady,
   missingByReason: report.missingByReason,
   writes: report.writes,
-  reportPath: 'docs/reports/current-source-evidence-hydration-v1.json',
+  reportPath: path.relative(root, actualReportPath).replaceAll('\\', '/'),
+  stableReportPath: 'docs/reports/current-source-evidence-hydration-v1.json',
 }, null, 2));

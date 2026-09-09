@@ -1,6 +1,6 @@
 {
   "schema": "atlas.graphify-stale-run-reconciliation.v1",
-  "generatedAt": "2026-09-08T19:50:35.409Z",
+  "generatedAt": "2026-09-08T23:28:53.488Z",
   "mode": "READ_ONLY_STALE_RUN_RECONCILIATION",
   "expectedWorkspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
   "staleAfterMs": 21600000,
@@ -8,8 +8,8 @@
   "transaction": {
     "isolation_level": "repeatable read",
     "read_only": "on",
-    "snapshot": "6129483:6129483:",
-    "audit_pid": 8261
+    "snapshot": "6129487:6129487:",
+    "audit_pid": 212
   },
   "graphifyRunColumns": [
     "run_id",
@@ -56,7 +56,7 @@
     "anyGraphifyRelationLockPresent": true,
     "runtimeOwnerEvidenceAbsent": false,
     "staleByAge": true,
-    "currentAgeMs": 1007352408,
+    "currentAgeMs": 1020450488,
     "exactRunBoundBackends": [],
     "exactRunBoundLocks": []
   },
@@ -132,7 +132,7 @@
     "activity": [],
     "locks": [
       {
-        "pid": 8261,
+        "pid": 212,
         "mode": "AccessShareLock",
         "granted": true,
         "relname": "graphify_runs"

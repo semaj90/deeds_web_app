@@ -40,11 +40,16 @@ export const GET: RequestHandler = async ({ url, locals }) => {
   const limit = Math.trunc(parsed.data.limit);
   const startMs = Date.now();
 
-  // Normalise to a stable Neo4j id (same convention as graph_neighbors in MCP)
-  const fileId = (nodeId.startsWith('src/') ? nodeId : `src/${nodeId}`).replace(
-    /[^a-zA-Z0-9/_.-]/g,
-    '_'
-  );
+  // Normalise to the real, live CodebaseFile.path convention. Found 2026-09-08: this route
+  // previously matched on a `CodebaseFile.id` property that has ZERO occurrences anywhere in
+  // Neo4j (confirmed directly) — `id` belongs to Packet/InteractiveSession/Outcome/SOMCluster
+  // nodes, never CodebaseFile. The real, populated identity property on CodebaseFile is `path`,
+  // a frontend-relative path (e.g. "src/lib/server/db/client.ts", no "sveltekit-frontend/"
+  // prefix) — matches this repo's known root-prefix-alias convention (see
+  // openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md for the full diagnosis).
+  const filePath = nodeId
+    .replace(/^file:/, '')
+    .replace(/^sveltekit-frontend\//, '');
 
   try {
     const { getNeo4jDriver } = await import('$lib/server/neo4j-driver.js');
@@ -64,51 +69,62 @@ export const GET: RequestHandler = async ({ url, locals }) => {
       }
     };
 
+    // CodebaseFile has no `type` property live; kept as an always-empty display field for
+    // response-shape compatibility with existing consumers, not a real filter/return value.
+    // `cluster` is mapped to `louvainCommunity` — chosen over the other two coexisting community
+    // properties (communityId, leidenCommunity) after comparing their live size distributions
+    // (2026-09-08): `communityId` is heavily degenerate (98.97% singleton communities, max size
+    // 381 across 69,009 nodes — essentially a near-noop clustering), while `leidenCommunity` and
+    // `louvainCommunity` are comparable to each other (max size 2,397, ~90% singletons — plausible
+    // for a directed IMPORTS graph with many leaf/entry files) and `louvainCommunity` matches the
+    // NetworkX/cuGraph Louvain pipeline this repo's CLAUDE.md documents as independently validated
+    // (ARI/NMI agreement 1.0 against the NetworkX oracle, see the "Correction (2026-08-26)" note
+    // in project-root CLAUDE.md's GPU/CPU boundary section).
     try {
       if (mode === 'ego') {
         // 1-hop both directions — run sequentially to avoid Neo4j session conflicts
         // (concurrent session.run() on the same session causes "open transaction" errors)
         const rOut = await session.run(
-          `MATCH (a:CodebaseFile {id: $id})-[:IMPORTS]->(b:CodebaseFile)
-           RETURN b.id AS id, b.filePath AS fp, b.type AS type, b.cluster AS cluster
+          `MATCH (a:CodebaseFile {path: $path})-[:IMPORTS]->(b:CodebaseFile)
+           RETURN b.path AS path, b.louvainCommunity AS cluster
            LIMIT toInteger($limit)`,
-          { id: fileId, limit }
+          { path: filePath, limit }
         );
         const rIn = await session.run(
-          `MATCH (a:CodebaseFile)-[:IMPORTS]->(b:CodebaseFile {id: $id})
-           RETURN a.id AS id, a.filePath AS fp, a.type AS type, a.cluster AS cluster
+          `MATCH (a:CodebaseFile)-[:IMPORTS]->(b:CodebaseFile {path: $path})
+           RETURN a.path AS path, a.louvainCommunity AS cluster
            LIMIT toInteger($limit)`,
-          { id: fileId, limit }
+          { path: filePath, limit }
         );
 
         for (const rec of rOut.records) {
-          const id = rec.get('id') as string;
-          if (id) {
-            nodeMap.set(id, { id, filePath: rec.get('fp') ?? id, type: rec.get('type') ?? '', cluster: rec.get('cluster')?.toNumber?.() ?? rec.get('cluster') ?? 0 });
-            addEdge(fileId, id);
+          const p = rec.get('path') as string;
+          if (p) {
+            nodeMap.set(p, { id: p, filePath: p, type: '', cluster: rec.get('cluster')?.toNumber?.() ?? rec.get('cluster') ?? 0 });
+            addEdge(filePath, p);
           }
         }
         for (const rec of rIn.records) {
-          const id = rec.get('id') as string;
-          if (id) {
-            nodeMap.set(id, { id, filePath: rec.get('fp') ?? id, type: rec.get('type') ?? '', cluster: rec.get('cluster')?.toNumber?.() ?? rec.get('cluster') ?? 0 });
-            addEdge(id, fileId);
+          const p = rec.get('path') as string;
+          if (p) {
+            nodeMap.set(p, { id: p, filePath: p, type: '', cluster: rec.get('cluster')?.toNumber?.() ?? rec.get('cluster') ?? 0 });
+            addEdge(p, filePath);
           }
         }
 
       } else if (mode === 'cluster') {
-        // All nodes in the same GPU cluster as the start node
+        // All nodes in the same community as the start node
         const r = await session.run(
-          `MATCH (a:CodebaseFile {id: $id})
-           MATCH (b:CodebaseFile) WHERE b.cluster = a.cluster AND b.id <> $id
-           RETURN b.id AS id, b.filePath AS fp, b.type AS type, b.cluster AS cluster
+          `MATCH (a:CodebaseFile {path: $path})
+           MATCH (b:CodebaseFile) WHERE b.louvainCommunity = a.louvainCommunity AND b.path <> $path
+           RETURN b.path AS path, b.louvainCommunity AS cluster
            LIMIT toInteger($limit)`,
-          { id: fileId, limit }
+          { path: filePath, limit }
         );
         for (const rec of r.records) {
-          const id = rec.get('id') as string;
-          if (id) {
-            nodeMap.set(id, { id, filePath: rec.get('fp') ?? id, type: rec.get('type') ?? '', cluster: rec.get('cluster')?.toNumber?.() ?? rec.get('cluster') ?? 0 });
+          const p = rec.get('path') as string;
+          if (p) {
+            nodeMap.set(p, { id: p, filePath: p, type: '', cluster: rec.get('cluster')?.toNumber?.() ?? rec.get('cluster') ?? 0 });
           }
         }
 
@@ -120,61 +136,61 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 
         if (direction === 'imports' || direction === 'both') {
           results.push(await session.run(
-            `MATCH (a:CodebaseFile {id: $id})-[:IMPORTS*${hopStr}]->(b:CodebaseFile)
+            `MATCH (a:CodebaseFile {path: $path})-[:IMPORTS*${hopStr}]->(b:CodebaseFile)
              WITH a, b
-             MATCH path=(a)-[:IMPORTS*${hopStr}]->(b)
-             UNWIND relationships(path) AS rel
-             WITH startNode(rel) AS src, endNode(rel) AS tgt, b
+             MATCH p=(a)-[:IMPORTS*${hopStr}]->(b)
+             UNWIND relationships(p) AS rel
+             WITH startNode(rel) AS src, endNode(rel) AS tgt
              RETURN DISTINCT
-               src.id AS srcId, src.filePath AS srcFp, src.type AS srcType, src.cluster AS srcCluster,
-               tgt.id AS tgtId, tgt.filePath AS tgtFp, tgt.type AS tgtType, tgt.cluster AS tgtCluster
+               src.path AS srcPath, src.louvainCommunity AS srcCluster,
+               tgt.path AS tgtPath, tgt.louvainCommunity AS tgtCluster
              LIMIT toInteger($limit)`,
-            { id: fileId, limit }
+            { path: filePath, limit }
           ));
         }
 
         if (direction === 'importedBy' || direction === 'both') {
           results.push(await session.run(
-            `MATCH (b:CodebaseFile)-[:IMPORTS*${hopStr}]->(a:CodebaseFile {id: $id})
+            `MATCH (b:CodebaseFile)-[:IMPORTS*${hopStr}]->(a:CodebaseFile {path: $path})
              WITH a, b
-             MATCH path=(b)-[:IMPORTS*${hopStr}]->(a)
-             UNWIND relationships(path) AS rel
-             WITH startNode(rel) AS src, endNode(rel) AS tgt, b
+             MATCH p=(b)-[:IMPORTS*${hopStr}]->(a)
+             UNWIND relationships(p) AS rel
+             WITH startNode(rel) AS src, endNode(rel) AS tgt
              RETURN DISTINCT
-               src.id AS srcId, src.filePath AS srcFp, src.type AS srcType, src.cluster AS srcCluster,
-               tgt.id AS tgtId, tgt.filePath AS tgtFp, tgt.type AS tgtType, tgt.cluster AS tgtCluster
+               src.path AS srcPath, src.louvainCommunity AS srcCluster,
+               tgt.path AS tgtPath, tgt.louvainCommunity AS tgtCluster
              LIMIT toInteger($limit)`,
-            { id: fileId, limit }
+            { path: filePath, limit }
           ));
         }
         for (const r of results) {
           for (const rec of (r as { records: unknown[] }).records) {
-            const srcId = (rec as { get: (k: string) => unknown }).get('srcId') as string;
-            const tgtId = (rec as { get: (k: string) => unknown }).get('tgtId') as string;
-            if (!srcId || !tgtId) continue;
+            const srcPath = (rec as { get: (k: string) => unknown }).get('srcPath') as string;
+            const tgtPath = (rec as { get: (k: string) => unknown }).get('tgtPath') as string;
+            if (!srcPath || !tgtPath) continue;
 
             const toNum = (v: unknown) =>
               v != null && typeof (v as { toNumber?: () => number }).toNumber === 'function'
                 ? (v as { toNumber: () => number }).toNumber()
                 : (v as number) ?? 0;
 
-            if (!nodeMap.has(srcId)) {
-              nodeMap.set(srcId, {
-                id: srcId,
-                filePath: (rec as { get: (k: string) => unknown }).get('srcFp') as string ?? srcId,
-                type: (rec as { get: (k: string) => unknown }).get('srcType') as string ?? '',
+            if (!nodeMap.has(srcPath)) {
+              nodeMap.set(srcPath, {
+                id: srcPath,
+                filePath: srcPath,
+                type: '',
                 cluster: toNum((rec as { get: (k: string) => unknown }).get('srcCluster')),
               });
             }
-            if (!nodeMap.has(tgtId)) {
-              nodeMap.set(tgtId, {
-                id: tgtId,
-                filePath: (rec as { get: (k: string) => unknown }).get('tgtFp') as string ?? tgtId,
-                type: (rec as { get: (k: string) => unknown }).get('tgtType') as string ?? '',
+            if (!nodeMap.has(tgtPath)) {
+              nodeMap.set(tgtPath, {
+                id: tgtPath,
+                filePath: tgtPath,
+                type: '',
                 cluster: toNum((rec as { get: (k: string) => unknown }).get('tgtCluster')),
               });
             }
-            addEdge(srcId, tgtId);
+            addEdge(srcPath, tgtPath);
           }
         }
       }
@@ -183,8 +199,8 @@ export const GET: RequestHandler = async ({ url, locals }) => {
     }
 
     // Always include the start node itself
-    if (!nodeMap.has(fileId)) {
-      nodeMap.set(fileId, { id: fileId, filePath: nodeId, type: '', cluster: 0 });
+    if (!nodeMap.has(filePath)) {
+      nodeMap.set(filePath, { id: filePath, filePath, type: '', cluster: 0 });
     }
 
     const rawNodes = Array.from(nodeMap.values());
@@ -216,7 +232,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
     const nodes = rawNodes.map((nd, i) => ({
       ...nd,
       label: nd.filePath || nd.id,
-      isCenter: nd.id === fileId,
+      isCenter: nd.id === filePath,
       pageRankScore: pageRankScores[i],
     }));
 

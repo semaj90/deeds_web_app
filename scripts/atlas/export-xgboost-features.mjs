@@ -304,9 +304,15 @@ async function main() {
           // TurboVec scalar score — stored in payload if available
           const annTurboVec     = p.ann_turbovec_score ? Number(p.ann_turbovec_score) : 0;
 
-          // Label: scale by hit_count proportion to reduce position bias
+          // Label: scale by hit_count proportion to reduce position bias.
+          // Found 2026-09-08: this previously also multiplied in Math.max(traceScore, 0.5) —
+          // undocumented in both this comment and the file's top docstring (which states the
+          // label as baseLabel * hit_count/n_retrieved only). That term made trace_score, one of
+          // this dataset's own FEATURE_COLS, a direct multiplicative component of the LABEL —
+          // real target leakage (trace_score/label Pearson correlation 0.926 on the resulting
+          // CSV), not a documented design choice. Removed to match the stated contract.
           const hitWeight = nRetrieved > 0 ? Math.min(1.0, hitCount / nRetrieved) : 0;
-          const rowLabel  = baseLabel * Math.max(traceScore, 0.5) * (0.5 + 0.5 * hitWeight);
+          const rowLabel  = baseLabel * (0.5 + 0.5 * hitWeight);
 
           if (rowLabel === 0) zeroLabelRows++;
 

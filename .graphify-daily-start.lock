@@ -1,0 +1,5 @@
+{
+  "pid": 9152,
+  "startedAt": "2026-09-08T05:25:14.606Z",
+  "script": "run-graphify-daily-startup.mjs"
+}

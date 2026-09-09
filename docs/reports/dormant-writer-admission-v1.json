@@ -1,0 +1,144 @@
+{
+  "schema": "atlas.dormant-writer-admission.v1",
+  "gate": "DORMANT-PACKET-WRITER-ADMISSION-01",
+  "generatedAt": "2026-09-09T04:40:56.744Z",
+  "mode": "READ_ONLY",
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "dormantWriterCount": 8,
+  "stillDormantCount": 8,
+  "violationCount": 0,
+  "overallResult": "PASS",
+  "results": [
+    {
+      "file": "sveltekit-frontend/src/lib/server/topology/canonical-id-hierarchy.ts",
+      "functionsChecked": [
+        "persistIDHierarchyToPostgres",
+        "softDeletePacket",
+        "approveAndPermanentlyDelete",
+        "undeletePacket"
+      ],
+      "candidatesFound": [],
+      "realCallersFound": [],
+      "hasRealCaller": false,
+      "fileExists": true,
+      "usesDecidePacketWrite": false,
+      "usesExecutePacketWriteTransaction": false,
+      "usesResolveCanonicalPacketKey": false,
+      "contractCompliant": false,
+      "admission": "PASS_STILL_DORMANT"
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/acp/packet-materializer-pipeline.ts",
+      "functionsChecked": [
+        "materializePacket",
+        "materializePacketBatch"
+      ],
+      "candidatesFound": [
+        "sveltekit-frontend/src/lib/server/ace/ace-materializer.ts"
+      ],
+      "realCallersFound": [],
+      "hasRealCaller": false,
+      "fileExists": true,
+      "usesDecidePacketWrite": false,
+      "usesExecutePacketWriteTransaction": false,
+      "usesResolveCanonicalPacketKey": false,
+      "contractCompliant": false,
+      "admission": "PASS_STILL_DORMANT"
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/unknown/promotion-executor.ts",
+      "functionsChecked": [],
+      "candidatesFound": [],
+      "realCallersFound": [],
+      "hasRealCaller": false,
+      "fileExists": true,
+      "usesDecidePacketWrite": false,
+      "usesExecutePacketWriteTransaction": false,
+      "usesResolveCanonicalPacketKey": false,
+      "contractCompliant": false,
+      "admission": "PASS_STILL_DORMANT"
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/workers/identity-worker.ts",
+      "functionsChecked": [
+        "processPacketIdentity"
+      ],
+      "candidatesFound": [],
+      "realCallersFound": [],
+      "hasRealCaller": false,
+      "fileExists": true,
+      "usesDecidePacketWrite": false,
+      "usesExecutePacketWriteTransaction": false,
+      "usesResolveCanonicalPacketKey": false,
+      "contractCompliant": false,
+      "admission": "PASS_STILL_DORMANT"
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/indexer/feature-label-enricher.ts",
+      "functionsChecked": [
+        "enrichPacketWithLabels"
+      ],
+      "candidatesFound": [],
+      "realCallersFound": [],
+      "hasRealCaller": false,
+      "fileExists": true,
+      "usesDecidePacketWrite": false,
+      "usesExecutePacketWriteTransaction": false,
+      "usesResolveCanonicalPacketKey": false,
+      "contractCompliant": false,
+      "admission": "PASS_STILL_DORMANT"
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/indexer/summary-freshness-checker.ts",
+      "functionsChecked": [
+        "recordSummaryGeneration"
+      ],
+      "candidatesFound": [],
+      "realCallersFound": [],
+      "hasRealCaller": false,
+      "fileExists": true,
+      "usesDecidePacketWrite": false,
+      "usesExecutePacketWriteTransaction": false,
+      "usesResolveCanonicalPacketKey": false,
+      "contractCompliant": false,
+      "admission": "PASS_STILL_DORMANT"
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/hyperrag/hyperrag-packet-pipeline.ts",
+      "functionsChecked": [
+        "materializePackets"
+      ],
+      "candidatesFound": [
+        "sveltekit-frontend/src/lib/server/ace/ace-materializer.ts",
+        "sveltekit-frontend/src/lib/server/atlas/packet-parser.ts"
+      ],
+      "realCallersFound": [],
+      "hasRealCaller": false,
+      "fileExists": true,
+      "usesDecidePacketWrite": false,
+      "usesExecutePacketWriteTransaction": false,
+      "usesResolveCanonicalPacketKey": false,
+      "contractCompliant": false,
+      "admission": "PASS_STILL_DORMANT"
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/dispatch/mcp-tool-implementations.ts",
+      "functionsChecked": [
+        "toolIdentityQuarantine"
+      ],
+      "candidatesFound": [],
+      "realCallersFound": [],
+      "hasRealCaller": false,
+      "fileExists": true,
+      "usesDecidePacketWrite": false,
+      "usesExecutePacketWriteTransaction": false,
+      "usesResolveCanonicalPacketKey": true,
+      "contractCompliant": false,
+      "admission": "PASS_STILL_DORMANT"
+    }
+  ],
+  "violations": [],
+  "invariant": "Any writer in DORMANT_WRITERS that gains a real production caller (reachability=true) MUST also import decidePacketWrite or executePacketWriteTransaction (contractCompliant=true) in the same change. A writer becoming reachable without also becoming compliant is a FAIL -- this is exactly the \"today's dormant capability becomes tomorrow's silent second owner\" failure mode the operator's directive warned about.",
+  "nextAction": "No violations. Re-run this script (or wire it into CI) whenever any file in DORMANT_WRITERS or its function list changes, or before promoting any of these files out of dormant status."
+}

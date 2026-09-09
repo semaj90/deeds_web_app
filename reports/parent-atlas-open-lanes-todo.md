@@ -444,7 +444,7 @@ Kanban:
 
 - [ ] Export existing embeddings from Qdrant/Postgres
 - [ ] Train/evaluate centroid compression
-- [ ] Compare 768 -> 386 -> 64 dims
+- [ ] Compare 768 -> (do a sweep to change to dense ast cst ? rpc not 386 ! only 512, 256, 128 -> 64 dims
 - [ ] Add ANN recall test
 - [ ] Add centroid drift report
 - [ ] Only then wire libtorch sidecar
@@ -549,7 +549,7 @@ P0 tasks #3 and #4 are now verified complete by `scripts/atlas/verify-feature-li
 4. SOM join audit: classify Qdrant ID, packet key, source ref, payload ID, and metadata ID mismatches. No retraining.
 5. Glyph coverage: map domain, ontology, and topology labels to UnoCSS glyphs.
 
-Dense retrieval remains `embedding_384 -> Qdrant`. `latent_128` is semantic
+Dense retrieval remains update this to 'embedding_768' `embedding_384 -> Qdrant`. `latent_128` is semantic
 compression; `latent_64` is a routing/topology/rerank feature; `som_cluster` is
 a neighborhood pointer. Neither latent vectors nor SOM replace packet identity
 or dense retrieval.
@@ -1016,7 +1016,7 @@ Return a bounded packet response with query, strategy, ranked packets, Qdrant ta
 - [x] locate app-side graph refresh manifest and refresh writer
 - [x] wire refresh-manifest invalidation to atlas truth promotion
 - [x] prevent graph refresh drift
-- [x] keep manifest promotion deterministic 
+- [x] keep manifest promotion deterministic
 
 ### 8. HyperRAG Dense Search / Cache Hit Lane
 - Status: active

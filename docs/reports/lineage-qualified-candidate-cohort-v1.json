@@ -1,6 +1,6 @@
 {
   "schema": "atlas.lineage-qualified-candidate-cohort-v1",
-  "generatedAt": "2026-09-05T05:53:34.774Z",
+  "generatedAt": "2026-09-09T01:50:42.374Z",
   "readOnly": true,
   "postgresWrites": false,
   "authority": {
@@ -17,23 +17,23 @@
     "semanticRevision": false
   },
   "counts": {
-    "total_packets": 61715,
-    "packets_with_source_ref": 61714,
-    "exact_graphify_source": 17261,
-    "workspace_revision_present": 17261,
-    "source_revision_present": 17261,
-    "packet_chunk_exact": 79,
-    "packet_chunk_ambiguous": 736,
+    "total_packets": 61718,
+    "packets_with_source_ref": 61717,
+    "exact_graphify_source": 17144,
+    "workspace_revision_present": 17144,
+    "source_revision_present": 17144,
+    "packet_chunk_exact": 100,
+    "packet_chunk_ambiguous": 756,
     "graph_revision_present": 0,
-    "semantic_revision_present": 17261,
-    "source_chunk_qualified": 79,
+    "semantic_revision_present": 17144,
+    "source_chunk_qualified": 100,
     "fully_qualified": 0
   },
   "sampleExactJoins": [
     {
       "packet_key": "packet:0003850e84ca",
       "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/tests__cases-sub-routes.spec.md",
-      "workspace_revision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "workspace_revision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
       "source_revision": "sha256:262fe09f9fdf919a68a916d551f70b6136dd1c5ec599255afaf36bfd4a3998ea",
       "graph_revision": null,
       "semantic_revision": "0"
@@ -41,7 +41,7 @@
     {
       "packet_key": "packet:0003ab694534",
       "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/tests__routes__auto__api__cache__metrics.test.md",
-      "workspace_revision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "workspace_revision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
       "source_revision": "sha256:2bbc964e88cac5b24299188ab8417f4d7b77d1bbc984d3140b99b52790ff523c",
       "graph_revision": null,
       "semantic_revision": "0"
@@ -49,7 +49,7 @@
     {
       "packet_key": "packet:0004f849be72",
       "source_ref": "sveltekit-frontend/tests/sprint5-6-monitoring.spec.ts",
-      "workspace_revision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "workspace_revision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
       "source_revision": "sha256:3392b96b6392dce3d6f9495f37ff1fa4c42ca3a648687c79a7a5e1aba3ed58e0",
       "graph_revision": null,
       "semantic_revision": "0"
@@ -57,7 +57,7 @@
     {
       "packet_key": "packet:000b2df0cfdf",
       "source_ref": "sveltekit-frontend/tests/phase76-acp-tools.property.test.ts",
-      "workspace_revision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "workspace_revision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
       "source_revision": "sha256:e52f4adc252c5fba4b87ca1ea64420e7766ffcced00caecb4c0d281760833a29",
       "graph_revision": null,
       "semantic_revision": "0"
@@ -65,7 +65,7 @@
     {
       "packet_key": "packet:000db15dc8ef",
       "source_ref": "sveltekit-frontend/src/lib/utils/keyboard-shortcuts.svelte.ts",
-      "workspace_revision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "workspace_revision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
       "source_revision": "sha256:838c841a80ea6846aa318b9c23ba08af82bde99af907631a70d9a985cde210c8",
       "graph_revision": null,
       "semantic_revision": "0"
@@ -73,7 +73,7 @@
     {
       "packet_key": "packet:000fde9311af",
       "source_ref": "sveltekit-frontend/src/routes/api/ai/bifrost/+server.ts",
-      "workspace_revision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "workspace_revision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
       "source_revision": "sha256:d261d3b4a891e3a9c2f9b038adf7a7b963f4957033225711fbf454e927c685b9",
       "graph_revision": null,
       "semantic_revision": "0"
@@ -81,7 +81,7 @@
     {
       "packet_key": "packet:001007058f4a",
       "source_ref": "scripts/atlas/generate-concept-temperature-report.mjs",
-      "workspace_revision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "workspace_revision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
       "source_revision": "sha256:b4b02492df5c3ad9317fa682da3c047ac153fe463e68a7ef2c9a761850b7ca0e",
       "graph_revision": null,
       "semantic_revision": "0"
@@ -89,7 +89,7 @@
     {
       "packet_key": "packet:001375b841d0",
       "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/tests__routes__auto__api__cases____id__connections.test.md",
-      "workspace_revision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "workspace_revision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
       "source_revision": "sha256:650c8bb19e401e02566332378456d00ecfe2eb50015baf5392389124e6a3d000",
       "graph_revision": null,
       "semantic_revision": "0"
@@ -97,7 +97,7 @@
     {
       "packet_key": "packet:0014d8ac7795",
       "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/src__routes__api__cases___id___persons___server.md",
-      "workspace_revision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "workspace_revision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
       "source_revision": "sha256:4e4ac39a92cdb90a37a8537ec873f51c6ab704503bf8058d6397577d774cac76",
       "graph_revision": null,
       "semantic_revision": "0"
@@ -105,7 +105,7 @@
     {
       "packet_key": "packet:0015b28db252",
       "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/scripts__phase104-backups__src__lib__services__concurrent-indexeddb-search.md",
-      "workspace_revision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "workspace_revision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
       "source_revision": "sha256:d797764b31ad11d1a923c07d55e1910c452ebea599a2a4e17ad505f79094842d",
       "graph_revision": null,
       "semantic_revision": "0"

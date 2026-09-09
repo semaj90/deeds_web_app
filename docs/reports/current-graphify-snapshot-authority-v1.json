@@ -3,13 +3,13 @@
   "status": "NO_TERMINAL_EXECUTION_FOR_CURRENT_WORKSPACE",
   "sourceSnapshot": {
     "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
-    "workspaceRevision": "sha256:1ef727dde376f01e5c90be5779c31f1c5a2a55e2b7e96072aae1e838b0c1a4d9",
-    "sourceManifestDigest": "1ef727dde376f01e5c90be5779c31f1c5a2a55e2b7e96072aae1e838b0c1a4d9",
-    "sourceCount": 23708,
-    "sourceManifestChecksum": "4a2910d44996e86dcd402aba63b14d7fbd1db68834ac4ac1db982cbafb96b7ac",
-    "workspaceRevisionRecordChecksum": "4a2910d44996e86dcd402aba63b14d7fbd1db68834ac4ac1db982cbafb96b7ac",
+    "workspaceRevision": "sha256:7d289aed573f2c3aa4bd4f39a728cf61b93a47a63e8d9652e6eb42552fd9fa39",
+    "sourceManifestDigest": "7d289aed573f2c3aa4bd4f39a728cf61b93a47a63e8d9652e6eb42552fd9fa39",
+    "sourceCount": 24103,
+    "sourceManifestChecksum": "4c214874234f8f759f658a0ecce223427e58df36496b2df59d2b3fdd2aa487d0",
+    "workspaceRevisionRecordChecksum": "4c214874234f8f759f658a0ecce223427e58df36496b2df59d2b3fdd2aa487d0",
     "workspaceOriginRuntimeRevision": "atlas.workspace-revision-origin-runtime.2026-08-21.v1",
-    "observedAt": "2026-09-05T17:12:02.726Z"
+    "observedAt": "2026-09-09T02:40:39.117Z"
   },
   "qualifyingExecutionIds": [],
   "candidates": [],

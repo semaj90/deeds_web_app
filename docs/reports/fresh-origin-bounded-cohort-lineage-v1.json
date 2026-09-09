@@ -1,7 +1,7 @@
 {
   "schema": "atlas.fresh-origin-bounded-cohort-lineage.v1",
   "plan": "docs/reports/fresh-origin-bounded-cohort-plan-v1.json",
-  "originWorkspaceRevision": "sha256:9302fdc4b778d0db2d31a2e2e42f68d907335c72fc78320fdf62f756ea07f8f8",
+  "originWorkspaceRevision": "sha256:b5521d6a519d6152c81d9db446b92e43a87ec402694bb67a8f7fc33fd6047e5c",
   "status": "FRESH_ORIGIN_COHORT_READBACK_BLOCKED",
   "counts": {
     "proposed": 5,

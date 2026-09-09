@@ -73,7 +73,7 @@ topology, and lineage owners remain active.
 | --- | --- | --- |
 | Graphify daily coordinator | `CLOSED_CURRENT_EVIDENCE` | Retrieval-lineage OpenSpec; bounded committed canary proven |
 | Tree-sitter / AST-grep structural observations | `PROVEN_BOUNDED` | Candidate-feature owner; full current promotion remains gated |
-| Current workspace source authority | `BLOCKED_NO_CURRENT_COMPLETED_BOUND_SOURCE_OWNER` | Retrieval-lineage owner; live selector replay rejects the stale completed Graphify owner; `docs/reports/current-source-evidence-authority-live-replay-proof-v1.json` |
+| Current workspace source authority | `BLOCKED_NO_CURRENT_COMPLETED_BOUND_SOURCE_OWNER` (sealed 2026-09-09) | Retrieval-lineage owner; sealed `CurrentSourceAuthorityV1` artifact: `admission=NO_CURRENT_SOURCE_SET`, `docs/reports/current-source-authority-v1.json`. **Root cause now identified precisely**: live workspace has `dirty=true` (uncommitted working-tree changes) — the source-manifest digest incorporates working-tree state, so no historical completed Graphify run can structurally match "current" while the tree stays dirty, by design. Not a bug; requires either committing pending changes then a fresh bound run, or accepting this gate stays open indefinitely during active development. `CURRENT-GRAPHIFY-RUN-OWNER-01` also checked: `running=0` live runs, so `NOT_AUTHORITATIVE` — per operator instruction this does NOT authorize starting a new Graphify run |
 | Packet/chunk lineage | `BOUNDED_SOURCE_CHUNK_PROVEN / PACKET_WRITER_BLOCKED` | `PKT-LINEAGE-08A`; 50 namespaces and 434 chunk preimages proven, packet preflight has 0 qualified candidates |
 | GraphOrdinalMapV1 | `PROVEN_FIXTURE` | Candidate-feature owner; current graph binding open |
 | NetworkX / cuGraph parity | `PARTIAL` | Candidate-feature/GPU substrate owners; same current graph snapshot required |
@@ -85,6 +85,8 @@ topology, and lineage owners remain active.
 | CandidateFeatureMatrix | `DOWNSTREAM_BLOCKED` | Candidate-feature owner; shared ordinal/revision set required |
 | DAG parameter materialization | `OPEN` | Adaptive-DAG owner; per-operator artifacts/checksums required |
 | ContextManifest / PromptPlan | `DOWNSTREAM` | ACE/DAG owners; requires admitted candidates and parameters |
+| Canonical `atlas_packets` writer ownership | `PROVEN` (2026-09-08) | Retrieval-lineage owner; exactly one live identity-creating writer (`semantic-packet-writer.ts::persistCanonicalSemanticPacketEmbedding`), 5 live disjoint metadata mutators, 8 confirmed-dormant writers. No competing identity derivation among live writers. See `parent-atlas-retrieval-lineage-dag-convergence/tasks.md`'s cross-reference entry and `parent-atlas-ace-rlm-bitfrost-integration/tasks.md`'s `PACKET-REGISTRY-WRITER-OWNERSHIP-01*`/`01B` entries for the full 3-round self-corrected evidence trail |
+| `atlas_packets.source_revision` column | `MIGRATED / UNPOPULATED` (2026-09-09) | Retrieval-lineage owner; operator decision resolved the migrate-vs-redefine fork in favor of migrating. Column now exists live (nullable text, partial index), verified via a fresh `information_schema.columns` query, all 61,718 existing rows correctly `NULL` — no synthetic backfill performed. Still blocks packet promotion until (a) `semantic-packet-writer.ts` is updated to write real values on new INSERTs and (b) `CURRENT-SOURCE-OWNER-RECONCILIATION-01` resolves what those values should be for backfilling existing rows. Migration: `sveltekit-frontend/drizzle/manual/20260909_atlas_packets_source_revision.sql` |
 
 ### Live capability proof (2026-09-05)
 
@@ -1994,3 +1996,123 @@ This is a contract boundary, not an extractor: no path-only concept inference,
 historical tuple rewrite, relationship materialization, or projection write is
 permitted. The next implementation decision is to select and review the actual
 fresh extractor producer before emitting candidate rows.
+
+REL-01A8 independent source-span/revision validation is now implemented as a
+read-only, filesystem-only check (no database/service dependency) at
+`scripts/atlas/audit-feature-ontology-source-span-revision-v1.mjs` — the exact
+gate `docs/reports/feature-ontology-fresh-extraction-multilane-v1.json` names
+as its own `nextGate`. It independently re-hashes each of the 6 approved
+source files as they exist on disk right now and compares against the
+`sourceRevision` every candidate for that file claims; separately, it checks
+every candidate for a grounded `sourceSpan` and would validate byte-range
+bounds if one existed.
+
+Live result: `SOURCE_REVISION_DRIFT_DETECTED`. Two of six sources have
+changed since the 2026-08-28 extraction run —
+`sveltekit-frontend/src/lib/server/ai/langgraph-research.ts` (48 candidates)
+and `sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts`
+(50 candidates) — 98 of 298 candidates total. The other four sources
+(`langextract-reranker.ts`, `langgraph-dag.ts`, `langgraph-client.ts`,
+`trace-reranker.ts`, 200 candidates) remain `SOURCE_REVISION_CURRENT`. All 298
+candidates report `NO_SPAN_CLAIMED`, confirming the merge receipt's own
+`groundedSources: 0` rather than assuming it. Receipt:
+`docs/reports/feature-ontology-source-span-revision-v1.json` and `.md`.
+`nextGate: RE_EXTRACT_STALE_SOURCES_BEFORE_HUMAN_REVIEW`.
+
+This does not perform any re-extraction, does not filter or rewrite the
+multilane candidate set, and does not advance `rel01bAllowed`. The concrete
+next decision is whether to (a) re-run REL-01A7's multilane extraction for
+just the 2 stale sources and re-validate, or (b) proceed to human review on
+only the 200 revision-current candidates while explicitly excluding the 98
+stale ones — both remain open, neither is authorized by this entry alone.
+
+## REL-01A8 follow-up: re-extraction resolved 1 of 2 stale sources; the other traces to the
+## already-known workspace-revision-drift blocker, not a re-extraction problem (2026-09-08)
+
+Attempted option (a) above: re-ran the extraction chain
+(`audit-feature-ontology-fresh-extraction-v1.mjs` → `...-multilane-v1.mjs` →
+`...-candidate-validation-v1.mjs` → REL-01A8's own revision check) twice. First run: 304 fresh
+candidates across all 6 sources (up from 298), 5 grounded sources (up from 0 — the sidecar
+returned real grounded spans this time, not just semantic-inferred ones), and staleness dropped
+from 2 sources to 1 (`langgraph-research.ts` and `cross-encoder-reranker.ts` → just
+`cross-encoder-reranker.ts`). A genuine bug was found and fixed in the process: REL-01A8's own
+span-bounds check read `sourceSpan.start`/`.end`, but the real grounded-span shape is
+`startChar`/`endChar` (plus a `text` field) — this false-flagged all 9 grounded spans as
+`SPAN_OUT_OF_BOUNDS` on the first re-run. Fixed in
+`scripts/atlas/audit-feature-ontology-source-span-revision-v1.mjs` (also now cross-checks the
+claimed span text against the live file slice, not just bounds); re-run confirmed all 9
+`SPAN_IN_BOUNDS`.
+
+Second full re-run: identical result — `cross-encoder-reranker.ts` stale again, unchanged
+candidate/grounding counts. This is NOT a re-extraction flakiness bug. Traced the actual cause:
+`audit-feature-ontology-fresh-extraction-v1.mjs` does not compute `sourceRevision` from the live
+file — it reads it from a frozen snapshot,
+`docs/reports/workspace-source-binding-observation.json` (`observation.bindings[].sourceRevision`,
+line 144 of that script). Confirmed directly: that frozen file's recorded revision for
+`cross-encoder-reranker.ts` is `sha256:dd7aef6f...`, while the live file's real SHA-256 right now
+is `sha256:642aefad...` — genuinely different. No number of extraction re-runs can fix this,
+because the extractor never re-reads the live file to compute the revision it stamps — it will
+keep copying forward the same stale value from that frozen observation snapshot indefinitely.
+
+This is the same root blocker already tracked at length in
+`openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md` under
+`NO_CURRENT_COMPLETED_BOUND_SOURCE_OWNER` / workspace-revision drift (that file documents the
+identical frozen-observation-vs-live-Postgres mismatch pattern for a different audit). This
+session does not re-trigger a fresh bound source-authority cycle to fix the frozen snapshot —
+that remains the same deliberately-gated action it has been throughout this investigation.
+
+**Current, honest state of the 304-candidate pool**: 253 candidates across 5 sources
+(`langgraph-client.ts`, `langgraph-dag.ts`, `langgraph-research.ts`, `trace-reranker.ts`,
+`langextract-reranker.ts`) are genuinely `SOURCE_REVISION_CURRENT`, span-checked, and ready for
+option (b) — human review, excluding the stale source. The remaining 51 candidates (all from
+`cross-encoder-reranker.ts`) stay `SOURCE_REVISION_STALE` and excluded from review until the
+frozen workspace-source-binding observation is refreshed — not until this file happens to get
+re-extracted again. Receipts: `docs/reports/feature-ontology-fresh-extraction-v1.json`,
+`docs/reports/feature-ontology-fresh-extraction-multilane-v1.json`,
+`docs/reports/feature-ontology-fresh-candidate-validation-v1.json`,
+`docs/reports/feature-ontology-source-span-revision-v1.json`. Zero Postgres/Qdrant/Neo4j/Valkey
+writes throughout.
+
+## Review triage built for the 253-candidate pool (2026-09-08)
+
+Confidence is uniformly `0.5` across every one of the 253 revision-current candidates — it
+carries zero discriminating signal, confirmed by inspecting the actual distribution rather than
+assumed. `objectValue` samples show heavy noise mixed with real signal: bare stopwords/prepositions
+("into", "from", "via", "optional") sit alongside genuinely plausible code symbols (`const
+MIN_JOIN_COVERAGE`, `interface BinaryVectorArtifactV1`, `type ResearchDomain`).
+
+Built `scripts/atlas/build-feature-ontology-review-triage-v1.mjs` — a purely mechanical, defensible
+lexical classifier (not a semantic quality score) that sorts the 253 candidates into four buckets
+without changing `status`/`canonicalAuthority` on any row (every row stays `REVIEW_REQUIRED` /
+`false`): `GROUNDED` (7 — real source-span evidence, review these first), `LIKELY_SYMBOL` (72 —
+matches a real `const`/`function`/`type`/`interface`/`class` declaration pattern), `LIKELY_NOISE`
+(26 — stopwords/short fragments), `UNCERTAIN` (148 — the bulk, genuinely needs a human look).
+Receipts: `docs/reports/feature-ontology-review-triage-v1.json` and `.md`. This makes the human
+review gate tractable; it does not perform the review itself, and grants no candidate canonical
+authority.
+
+## Human review decision recorded on the 253-candidate pool (2026-09-08)
+
+Operator reviewed the triage summary directly and made the actual approve/reject call. Recorded
+via `scripts/atlas/apply-feature-ontology-human-review-decision-v1.mjs` (explicit
+(objectValue, sourceRef) allowlist, not a re-derived heuristic — durable record of what was
+actually decided): **32 of 253 approved**, 221 rejected. Approved rows get
+`status: 'APPROVED_FOR_REL01B_REVIEW'`; `canonicalAuthority` stays `false` on every row, no
+Postgres/Qdrant/Neo4j/Valkey write occurred, and `rel01bAllowed` remains `false` — this is a
+review decision, not REL-01B (relationship materialization), which stays a separate, further-gated
+step.
+
+Approved (deduped: `qdrant`/`Qdrant` and `StateGraph`/`StateGraph` GROUNDED repeats collapsed to
+one row each; `Record` dropped as a non-domain TS utility type, not a real concept): 4 GROUNDED
+concepts (`qdrant`, `PostgreSQL`, `Neo4j`, `StateGraph`) + 28 `LIKELY_SYMBOL` rows judged
+domain-meaningful (real interfaces/types/constants/functions like `PacketIdentityV1`,
+`ResearchDomain`, `CanonicalTraceRow`, `traceRerank`, `GRPORerankResult`, `AgentState`,
+`hashContent`, etc.). Rejected: the remaining ~44 `LIKELY_SYMBOL` rows (generic locals — `const
+result`, `const key`, `const value`, `const row`, etc.) and all 26 `LIKELY_NOISE` rows, plus the 2
+duplicate GROUNDED rows and `Record`. Receipts: `docs/reports/feature-ontology-review-approved-v1.json`
+and `.md`.
+
+**Next gate (not started here)**: REL-01B itself — the actual `USES_CONCEPT` relationship
+materialization into Neo4j/Postgres for these 32 approved candidates — remains open, gated behind
+whatever REL-01B's own preconditions turn out to require (this session has not designed or
+attempted that write).

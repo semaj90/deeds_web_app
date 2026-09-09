@@ -1,6 +1,6 @@
 {
   "schema": "atlas.graphify-workspace-owner-v1",
-  "generatedAt": "2026-09-08T19:58:47.795Z",
+  "generatedAt": "2026-09-09T01:17:54.955Z",
   "readOnly": true,
   "canonicalWrites": false,
   "candidateOwner": "public.workspaces.id",

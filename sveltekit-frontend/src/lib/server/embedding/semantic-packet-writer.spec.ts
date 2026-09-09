@@ -128,4 +128,47 @@ describe('persistCanonicalSemanticPacketEmbedding', () => {
 		expect(values.mock.calls[0]?.[0].packetKey).toBe(canonicalPacketKey);
 		expect(mockResolveCanonicalPacketKey).toHaveBeenCalledWith('packet:legacy:alias');
 	});
+
+	it('writes sourceRevision when the caller supplies real revision evidence', async () => {
+		const onConflictDoUpdate = vi.fn().mockResolvedValue(undefined);
+		const values = vi.fn().mockReturnValue({ onConflictDoUpdate });
+		const insert = vi.fn().mockReturnValue({ values });
+		const database = { insert } as any;
+		const vector = Array.from({ length: 768 }, () => 0.1);
+
+		await persistCanonicalSemanticPacketEmbedding(
+			{
+				packetKey: 'packet:semantic:5',
+				sourceRef: 'src/lib/server/example-5.ts',
+				sourceRevision: 'sha256:abc123',
+				vector,
+			},
+			database,
+		);
+
+		expect(values.mock.calls[0]?.[0].sourceRevision).toBe('sha256:abc123');
+		const updateSet = onConflictDoUpdate.mock.calls[0]?.[0]?.set as Record<string, unknown>;
+		expect(updateSet.sourceRevision).toBe('sha256:abc123');
+	});
+
+	it('never fabricates sourceRevision -- leaves it null when the caller has no evidence', async () => {
+		const onConflictDoUpdate = vi.fn().mockResolvedValue(undefined);
+		const values = vi.fn().mockReturnValue({ onConflictDoUpdate });
+		const insert = vi.fn().mockReturnValue({ values });
+		const database = { insert } as any;
+		const vector = Array.from({ length: 768 }, () => 0.2);
+
+		await persistCanonicalSemanticPacketEmbedding(
+			{
+				packetKey: 'packet:semantic:6',
+				sourceRef: 'src/lib/server/example-6.ts',
+				vector,
+			},
+			database,
+		);
+
+		expect(values.mock.calls[0]?.[0].sourceRevision).toBeNull();
+		const updateSet = onConflictDoUpdate.mock.calls[0]?.[0]?.set as Record<string, unknown>;
+		expect(updateSet.sourceRevision).toBeNull();
+	});
 });

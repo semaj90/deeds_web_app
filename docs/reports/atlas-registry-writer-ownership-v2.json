@@ -1,6 +1,6 @@
 {
   "schema": "atlas.registry-writer-ownership.v2",
-  "generatedAt": "2026-09-08T18:55:20.552Z",
+  "generatedAt": "2026-09-09T00:54:47.288Z",
   "mode": "READ_ONLY",
   "writesPerformed": false,
   "safeToBackfill": false,
@@ -28,8 +28,9 @@
       "reachableReferences": [
         "scripts/atlas/audit-packet-registry-gap-ws1-4-v1.mjs",
         "scripts/atlas/audit-registry-writer-ownership-v2.mjs",
-        "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
-        "scripts/atlas/phase108d-select-and-prove-packet.mts"
+        "scripts/atlas/hyperrag-packet-materializer.test.mjs",
+        "scripts/atlas/phase108d-select-and-prove-packet.mts",
+        "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md"
       ],
       "entrypointReferences": [],
       "writeTargets": [
@@ -61,7 +62,7 @@
       "hasApply": true,
       "hasTransactionMarkers": false,
       "canMutateExistingRegistryIdentity": true,
-      "dryRunMutatesSchema": true,
+      "dryRunMutatesSchema": false,
       "writesFiles": true,
       "writesDatabase": true,
       "sourcePopulation": "atlas_packets"
@@ -119,15 +120,15 @@
       "classification": "UNRESOLVED",
       "reachableReferences": [
         "sveltekit-frontend/package.json",
+        "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md",
+        "openspec/changes/parent-atlas-768-dim-migration/SPEC.md",
         "openspec/changes/parent-atlas-ontology-kernel/tasks.md",
         "openspec/changes/parent-atlas-graphify-recovery-proof-ladder/tasks.md",
         "openspec/changes/parent-atlas-graphify-recovery-proof-ladder/proposal.md",
         "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md",
-        "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md",
-        "openspec/changes/parent-atlas-768-dim-migration/SPEC.md",
-        "scripts/atlas/backfill-gds-som-topology.mjs",
+        "scripts/atlas/audit-packet-registry-gap-ws1-4-v1.mjs",
         "scripts/atlas/audit-registry-writer-ownership-v2.mjs",
-        "scripts/atlas/audit-packet-registry-gap-ws1-4-v1.mjs"
+        "scripts/atlas/backfill-gds-som-topology.mjs"
       ],
       "entrypointReferences": [
         "sveltekit-frontend/package.json",
@@ -157,7 +158,11 @@
       "path": "scripts/atlas/backfill-packet-registry.mjs",
       "exists": true,
       "classification": "MANUAL_MIGRATION_ONLY",
-      "reachableReferences": [],
+      "reachableReferences": [
+        "scripts/atlas/audit-packet-registry-gap-ws1-4-v1.mjs",
+        "scripts/atlas/audit-registry-writer-ownership-v2.mjs",
+        "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md"
+      ],
       "entrypointReferences": [],
       "writeTargets": [
         "INSERT INTO atlas_packet_registry"
@@ -187,45 +192,7 @@
     },
     {
       "path": "scripts/atlas/week1-packet-registry-backfill.mjs",
-      "exists": true,
-      "classification": "BROKEN_LEGACY",
-      "reachableReferences": [],
-      "entrypointReferences": [],
-      "writeTargets": [
-        "INSERT INTO atlas_packet_registry",
-        "UPDATE SET"
-      ],
-      "conflictSemantics": [
-        "ON CONFLICT (packet_key) DO UPDATE SET updated_at = EXCLUDED.updated_at RETURNING packet_key `; const values = []; batch.forEach(p => {"
-      ],
-      "sourceTables": [
-        "from atlas_packets",
-        "from both",
-        "FROM atlas_packets",
-        "FROM nes_chrom_packets",
-        "FROM atlas_base",
-        "FROM nes_base",
-        "FROM combined"
-      ],
-      "revisionReferences": [],
-      "identityReferences": [
-        "packet_key",
-        "source_ref",
-        "feature_id",
-        "qdrant_point_id"
-      ],
-      "hasDryRun": true,
-      "hasApply": false,
-      "hasTransactionMarkers": false,
-      "canMutateExistingRegistryIdentity": true,
-      "dryRunMutatesSchema": false,
-      "writesFiles": false,
-      "writesDatabase": true,
-      "sourcePopulation": "atlas_packets"
-    },
-    {
-      "path": "scripts/atlas/week1-backfill-packet-registry.mjs",
-      "exists": true,
+      "exists": false,
       "classification": "MANUAL_MIGRATION_ONLY",
       "reachableReferences": [
         "scripts/atlas/audit-packet-registry-gap-ws1-4-v1.mjs",
@@ -233,36 +200,43 @@
         "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md"
       ],
       "entrypointReferences": [],
-      "writeTargets": [
-        "INSERT INTO atlas_packet_registry",
-        "UPDATE SET"
-      ],
-      "conflictSemantics": [
-        "ON CONFLICT (packet_key) DO UPDATE SET source_ref = EXCLUDED.source_ref, file_path = EXCLUDED.file_path, feature_id = EXCLUDED.feature_id,"
-      ],
-      "sourceTables": [
-        "from atlas_codebase_packets",
-        "from atlas_codebase_packets...",
-        "FROM atlas_codebase_packets",
-        "JOIN atlas_packets",
-        "FROM atlas_packet_registry",
-        "FROM v_packet_cache_audit"
-      ],
+      "writeTargets": [],
+      "conflictSemantics": [],
+      "sourceTables": [],
       "revisionReferences": [],
-      "identityReferences": [
-        "packet_key",
-        "source_ref",
-        "feature_id",
-        "qdrant_point_id"
-      ],
-      "hasDryRun": true,
-      "hasApply": true,
+      "identityReferences": [],
+      "hasDryRun": false,
+      "hasApply": false,
       "hasTransactionMarkers": false,
-      "canMutateExistingRegistryIdentity": true,
+      "canMutateExistingRegistryIdentity": false,
       "dryRunMutatesSchema": false,
       "writesFiles": false,
-      "writesDatabase": true,
-      "sourcePopulation": "atlas_packets"
+      "writesDatabase": false,
+      "sourcePopulation": "file/evidence inputs"
+    },
+    {
+      "path": "scripts/atlas/week1-backfill-packet-registry.mjs",
+      "exists": false,
+      "classification": "MANUAL_MIGRATION_ONLY",
+      "reachableReferences": [
+        "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+        "scripts/atlas/audit-packet-registry-gap-ws1-4-v1.mjs",
+        "scripts/atlas/audit-registry-writer-ownership-v2.mjs"
+      ],
+      "entrypointReferences": [],
+      "writeTargets": [],
+      "conflictSemantics": [],
+      "sourceTables": [],
+      "revisionReferences": [],
+      "identityReferences": [],
+      "hasDryRun": false,
+      "hasApply": false,
+      "hasTransactionMarkers": false,
+      "canMutateExistingRegistryIdentity": false,
+      "dryRunMutatesSchema": false,
+      "writesFiles": false,
+      "writesDatabase": false,
+      "sourcePopulation": "file/evidence inputs"
     }
   ],
   "ownershipGraph": [
@@ -272,8 +246,9 @@
       "referencesOnly": [
         "scripts/atlas/audit-packet-registry-gap-ws1-4-v1.mjs",
         "scripts/atlas/audit-registry-writer-ownership-v2.mjs",
-        "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
-        "scripts/atlas/phase108d-select-and-prove-packet.mts"
+        "scripts/atlas/hyperrag-packet-materializer.test.mjs",
+        "scripts/atlas/phase108d-select-and-prove-packet.mts",
+        "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md"
       ],
       "targets": [
         "CREATE TABLE IF",
@@ -312,13 +287,13 @@
         "openspec/changes/parent-atlas-graphify-recovery-proof-ladder/proposal.md"
       ],
       "referencesOnly": [
-        "openspec/changes/parent-atlas-ontology-kernel/tasks.md",
-        "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md",
         "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md",
         "openspec/changes/parent-atlas-768-dim-migration/SPEC.md",
-        "scripts/atlas/backfill-gds-som-topology.mjs",
+        "openspec/changes/parent-atlas-ontology-kernel/tasks.md",
+        "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md",
+        "scripts/atlas/audit-packet-registry-gap-ws1-4-v1.mjs",
         "scripts/atlas/audit-registry-writer-ownership-v2.mjs",
-        "scripts/atlas/audit-packet-registry-gap-ws1-4-v1.mjs"
+        "scripts/atlas/backfill-gds-som-topology.mjs"
       ],
       "targets": [],
       "sourcePopulation": "atlas_packets",
@@ -327,7 +302,11 @@
     {
       "writer": "scripts/atlas/backfill-packet-registry.mjs",
       "callers": [],
-      "referencesOnly": [],
+      "referencesOnly": [
+        "scripts/atlas/audit-packet-registry-gap-ws1-4-v1.mjs",
+        "scripts/atlas/audit-registry-writer-ownership-v2.mjs",
+        "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md"
+      ],
       "targets": [
         "INSERT INTO atlas_packet_registry"
       ],
@@ -337,35 +316,32 @@
     {
       "writer": "scripts/atlas/week1-packet-registry-backfill.mjs",
       "callers": [],
-      "referencesOnly": [],
-      "targets": [
-        "INSERT INTO atlas_packet_registry",
-        "UPDATE SET"
-      ],
-      "sourcePopulation": "atlas_packets",
-      "classification": "BROKEN_LEGACY"
-    },
-    {
-      "writer": "scripts/atlas/week1-backfill-packet-registry.mjs",
-      "callers": [],
       "referencesOnly": [
         "scripts/atlas/audit-packet-registry-gap-ws1-4-v1.mjs",
         "scripts/atlas/audit-registry-writer-ownership-v2.mjs",
         "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md"
       ],
-      "targets": [
-        "INSERT INTO atlas_packet_registry",
-        "UPDATE SET"
+      "targets": [],
+      "sourcePopulation": "file/evidence inputs",
+      "classification": "MANUAL_MIGRATION_ONLY"
+    },
+    {
+      "writer": "scripts/atlas/week1-backfill-packet-registry.mjs",
+      "callers": [],
+      "referencesOnly": [
+        "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+        "scripts/atlas/audit-packet-registry-gap-ws1-4-v1.mjs",
+        "scripts/atlas/audit-registry-writer-ownership-v2.mjs"
       ],
-      "sourcePopulation": "atlas_packets",
+      "targets": [],
+      "sourcePopulation": "file/evidence inputs",
       "classification": "MANUAL_MIGRATION_ONLY"
     }
   ],
   "classificationCounts": {
     "UNRESOLVED": 2,
     "ACTIVE_SECONDARY_WRITER": 1,
-    "MANUAL_MIGRATION_ONLY": 2,
-    "BROKEN_LEGACY": 1
+    "MANUAL_MIGRATION_ONLY": 3
   },
   "nextGate": "REGISTRY-WRITER-OWNERSHIP-02",
   "nextAction": "Review unresolved/secondary writer callers and conflict semantics; do not execute a writer or backfill."
