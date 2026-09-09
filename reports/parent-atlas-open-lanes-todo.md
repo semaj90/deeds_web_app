@@ -207,6 +207,34 @@ section for the full item-by-item mapping before acting on the list below.
   merge without that decision would silently change algorithm semantics that are currently
   undocumented, not obviously wrong.
 
+- **GRAPHIFY-EXECUTION-SOURCE-MEMBERSHIP-01 (2026-09-09, derived view built + verified live)**:
+  found this repo already has a mature, real execution ledger —
+  `graphify_executions`/`graphify_execution_files`
+  (`sveltekit-frontend/src/lib/server/atlas/indexing/graphify-daily-coordinator-v1.ts`, real
+  production caller: `graphify-structural-intelligence-adapter.ts`) — that is **immutable and
+  append-only**: both tables reject `UPDATE`/`DELETE` via
+  `graphify_execution_files_reject_mutation()` triggers. What was missing was a derived view
+  answering "is this source_ref still current" from that ledger without introducing a mutable
+  tombstone column (which would have broken the ledger's own immutability guarantee). Added
+  `graphify_current_source_membership_v1`
+  (`sveltekit-frontend/drizzle/manual/graphify_current_source_membership_v1.sql`): for every
+  `source_ref` ever selected by a `COMPLETED` execution, its most recent sighting plus an
+  `active` boolean (true only if that sighting is also the latest completed execution for its
+  workspace) — `SELECT * FROM graphify_current_source_membership_v1 WHERE NOT active` is the
+  tombstoned set, always derived, never mutated.
+  **Verified live**: 24,139 rows, currently 0 stale — confirmed this is NOT a bug (not an
+  empty/broken view) by checking the one workspace with real history (13 completed executions):
+  file counts grew monotonically (3 → 3 → … → 50 → 24,132 → 24,139), never shrinking yet, so
+  there's no real shrinkage case in the live data yet to exercise the "stale" branch. The
+  underlying query logic is proven correct via the same last-seen-vs-latest pattern already
+  proven live for `community_reports_leiden`'s `run_id`/`tombstoned_at` lifecycle
+  (`LEIDEN-STALE-ROW-LIFECYCLE-01`, above) — that lane genuinely caught 18,644 stale rows on a
+  real re-run, giving confidence this shape of query correctly detects shrinkage once it occurs.
+  **Not done**: `executionId`/`sourceManifestChecksum` binding into `GraphProjectionManifestV1`
+  (`GDS-PROJECTION-OWNER-01`, above) so a graph projection can declare exactly which Graphify
+  execution's source world it was built from — this view is the prerequisite for that, not the
+  full binding itself.
+
 Remaining open taxonomy work:
 
 - downstream selector choice (Louvain vs Leiden)
