@@ -84,6 +84,31 @@ async function ensureTable() {
       algorithm      TEXT      NOT NULL DEFAULT 'leiden'
     )
   `);
+  // LEIDEN-STALE-ROW-LIFECYCLE-01 (2026-09-09): a later Leiden run over a changed graph can stop
+  // emitting a community_id a prior run wrote -- the original ON CONFLICT upsert only ever
+  // touches community_ids present in the CURRENT run, so that row stays in the table forever,
+  // indistinguishable from a live one. Added via ALTER so this also heals a table created by an
+  // older version of this script (idempotent, matches this file's existing self-migration
+  // pattern for ensureTable()).
+  await pgPool.query(`ALTER TABLE ${PG_TABLE} ADD COLUMN IF NOT EXISTS run_id TEXT`);
+  await pgPool.query(`ALTER TABLE ${PG_TABLE} ADD COLUMN IF NOT EXISTS active BOOLEAN NOT NULL DEFAULT true`);
+  await pgPool.query(`ALTER TABLE ${PG_TABLE} ADD COLUMN IF NOT EXISTS tombstoned_at TIMESTAMPTZ`);
+  await pgPool.query(`CREATE INDEX IF NOT EXISTS ${PG_TABLE}_active_idx ON ${PG_TABLE} (active)`);
+}
+
+/**
+ * LEIDEN-STALE-ROW-LIFECYCLE-01: after every row this run touched has been upserted with the
+ * current run_id and active=true, mark any row that still carries an OLDER run_id (i.e. a
+ * community_id this run did not re-detect) as active=false/tombstoned_at=NOW(). Idempotent: a row
+ * already tombstoned in a prior run is left with its original tombstoned_at, not refreshed, since
+ * `AND active = true` only matches rows not yet tombstoned.
+ */
+async function tombstoneStaleRows(runId) {
+  const result = await pgPool.query(
+    `UPDATE ${PG_TABLE} SET active = false, tombstoned_at = NOW() WHERE run_id IS DISTINCT FROM $1 AND active = true`,
+    [runId],
+  );
+  return result.rowCount;
 }
 
 /**
@@ -442,6 +467,12 @@ async function computeLeiden() {
       console.log('🧬 Step 3b: Compute per-community embedding centroids from Postgres\n');
       const embeddingByCommunity = await computeCommunityCentroids(pgPool, communityMembers);
 
+      // LEIDEN-STALE-ROW-LIFECYCLE-01: one run_id per apply invocation, stamped onto every row
+      // this run touches. Used below (tombstoneStaleRows) to distinguish "still current" from
+      // "a prior run wrote this, this run no longer detects it" without needing wall-clock
+      // comparisons -- a row's absence from the current run_id is what makes it stale, not age.
+      const runId = `leiden:${new Date().toISOString()}:${crypto.randomUUID().slice(0, 8)}`;
+
       const commIds = Object.keys(communityStats);
       for (const commId of commIds) {
         const communityId = Number(commId);
@@ -464,8 +495,8 @@ async function computeLeiden() {
 
         await pgPool.query(`
           INSERT INTO ${PG_TABLE}
-            (community_id, member_paths, member_count, summary, purpose, tags, cohesion_score, embedding, built_at, algorithm)
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8::vector(768), $9, $10)
+            (community_id, member_paths, member_count, summary, purpose, tags, cohesion_score, embedding, built_at, algorithm, run_id, active, tombstoned_at)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8::vector(768), $9, $10, $11, true, NULL)
           ON CONFLICT (community_id) DO UPDATE SET
             member_paths   = EXCLUDED.member_paths,
             member_count   = EXCLUDED.member_count,
@@ -475,7 +506,10 @@ async function computeLeiden() {
             cohesion_score = EXCLUDED.cohesion_score,
             embedding      = EXCLUDED.embedding,
             built_at       = EXCLUDED.built_at,
-            algorithm      = EXCLUDED.algorithm
+            algorithm      = EXCLUDED.algorithm,
+            run_id         = EXCLUDED.run_id,
+            active         = true,
+            tombstoned_at  = NULL
         `, [
           record.community_id,
           record.member_paths,
@@ -487,9 +521,12 @@ async function computeLeiden() {
           record.embedding ? vectorLiteral(record.embedding) : null,
           record.built_at,
           record.algorithm,
+          runId,
         ]);
       }
       console.log(`   ✅ Synced ${commIds.length} Leiden community records to Postgres`);
+      const tombstonedCount = await tombstoneStaleRows(runId);
+      console.log(`   🧹 Tombstoned ${tombstonedCount} stale rows from prior runs (run_id=${runId})`);
       const withEmbedding = commIds.filter((id) => embeddingByCommunity[Number(id)]).length;
       const withCohesion = commIds.filter((id) => (cohesionByCommunity[Number(id)] ?? 0) > 0).length;
       console.log(`   (${withEmbedding}/${commIds.length} with a computed embedding centroid, ${withCohesion}/${commIds.length} with cohesion_score > 0)\n`);

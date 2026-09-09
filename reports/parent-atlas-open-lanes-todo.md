@@ -164,10 +164,19 @@ section for the full item-by-item mapping before acting on the list below.
     calls for — a real shared `packet_key`/`chunk_id`/`symbol_version_id` present on both
     Neo4j and every Qdrant chunk (not just symbol-level ones) would give correctness AND
     full coverage. Tracked as follow-up, not solved here.
-  - **Not fixed, flagged**: `community_reports_leiden` has no cleanup between runs — a
-    community_id from a prior run that no longer exists in a later run's assignment stays
-    as a stale row forever (`ON CONFLICT DO UPDATE` only touches community_ids present in
-    the current run). Pre-existing in the original script, not introduced by this pass.
+  - **LEIDEN-STALE-ROW-LIFECYCLE-01 (2026-09-09, closed)**: `community_reports_leiden` had
+    no cleanup between runs — a community_id from a prior run no longer detected by a later
+    run stayed indistinguishable from a current row forever. Added `run_id`/`active`/
+    `tombstoned_at` columns (`ALTER TABLE ADD COLUMN IF NOT EXISTS`, self-migrating like the
+    rest of this script's table management). Every apply run stamps a fresh `run_id` onto
+    every row it touches, then runs one `UPDATE ... WHERE run_id IS DISTINCT FROM
+    $currentRunId AND active = true` to tombstone anything left over. Proven two ways: (1) a
+    synthetic stale row directly confirmed both the tombstone write and idempotency (a
+    second pass leaves `tombstoned_at` unchanged, doesn't refresh it); (2) the very next live
+    apply run's own tombstone pass caught **18,644 genuinely stale rows** from real
+    graph drift between runs — 38,700 synced + 18,644 tombstoned = 57,344, exactly matching
+    the pre-run total. Consumers reading this table should filter `WHERE active = true`
+    going forward; that filter is not yet enforced at any read call site (none exist yet).
   - Downstream selector choice (which of Louvain vs Leiden a consumer should read) remains
     open — not decided by this pass.
 
