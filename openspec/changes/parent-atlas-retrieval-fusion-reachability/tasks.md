@@ -1191,7 +1191,7 @@ suite re-run after all of this — still 31/31 pass. No database/Qdrant/Valkey/N
 
 ## RF7 - Long-term convergence (explicitly deferred, do not start before RF4-RF6)
 
-- [ ] Extract `SearchRuntime.fuseCandidates`'s semantics into a shared, importable canonical
+- [x] Extract `SearchRuntime.fuseCandidates`'s semantics into a shared, importable canonical
       fusion module (identity-aware, within-lane dedup, one-vote-per-lane, RRF calculation,
       provenance merge) that specialized routes can call instead of reimplementing fusion.
 
@@ -1214,10 +1214,20 @@ suite re-run after all of this — still 31/31 pass. No database/Qdrant/Valkey/N
       self-consistent), enforces one-vote-per-lane, and explicitly asserts (rather than hides) the
       two confirmed RF7-04 divergences — weighting and tie-break — so a future migration designs
       for them at the call site instead of the core silently reconciling them.
-      **Explicitly NOT done**: `search-runtime.ts`/`rrf-fuse.ts` do not import or delegate to this
-      module in production. That migration (RF7-06/RF7-07) requires the bounded live replay proof
-      (RF7-09) this file's own governance requires before authorizing a production behavior change
-      on the live retrieval spine — building the core does not by itself authorize wiring it in.
+      **UPDATE 2026-09-09 — RF7-06 done for the 2 highest-breadth non-canonical owners, after
+      RF7-09's live replay authorized it.** `rrf-fuse.ts::reciprocalRankFusion()` (commit
+      `d1a0b5e7c4`) and `unified-orchestrator.ts`'s `rrf-combiner-utils.ts::combineRRFLanes()`
+      (commit `2474ce5678`) both now delegate their cross-lane RRF summation to
+      `fuseContributionsV1()`. In both cases the delegation is scoped to the arithmetic step only
+      — identity resolution, per-lane metadata/support tracking, and output shape are unchanged;
+      `IDENTITY_METADATA_INSUFFICIENT` remains the correct classification for both owners (see
+      their entries under RF6 above). `search-runtime.ts::fuseCandidates` itself is the canonical
+      reference this core's arithmetic was derived from — it does not need to migrate to itself.
+      **Still NOT done**: `service.ts::rrfFusion` was fixed in-place independently (RF6, decision
+      already recorded above) rather than migrated to this core, since RF5 (the precondition for
+      `delegate-to-canonical-owner`) is only partially landed; `/api/retrieval/rrf`
+      (`rrf-fusion.ts`) was explicitly retired as legacy/debug-only rather than migrated. Neither
+      needs further RF7-06 work under their recorded decisions.
 - [ ] Consolidate the 7+ diverged RRF weight tables into one shared config, once the fusion
       owners that would consume it are themselves converged.
 - [ ] Re-evaluate whether `service.ts`'s `SearchLaneRegistry` and `unified-orchestrator.ts`'s
