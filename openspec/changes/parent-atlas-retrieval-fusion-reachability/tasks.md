@@ -762,7 +762,7 @@ identity path and the standalone RRF implementations (`search-runtime-fusion.tes
       the broader "most architecturally confused of the four" framing — it fixes the one concretely
       diagnosed correctness bug (score-discarding on identity collision) without waiting for the
       still-blocked canonical-delegation path.
-- [ ] `unified-orchestrator.ts`/`rrf-combiner-utils.ts::combineRRFLanes` (`/api/admin/retrieval/stream`,
+- [x] `unified-orchestrator.ts`/`rrf-combiner-utils.ts::combineRRFLanes` (`/api/admin/retrieval/stream`,
       transitively `/api/retrieval/go`, `/api/retrieval/multi-vector`) — highest usage breadth
       alongside `rrf-fuse.ts` (6+ call sites incl. an MCP tool); weigh fix priority accordingly.
       The utility now suppresses repeated same-lane contributions and retains the strongest
@@ -780,15 +780,43 @@ identity path and the standalone RRF implementations (`search-runtime-fusion.tes
       general-purpose, not admin-only). This is real production breadth, not a narrow debug
       endpoint — "retire as legacy" does not fit. The identity fix instead requires migrating this
       owner to delegate to the new `FusionCoreV1` core (below), which itself needs a bounded live
-      replay proof (RF7-09) before that migration is authorized. Still open.
-- [ ] `rrf-fuse.ts` — most broadly-called fusion owner found in this whole audit (6+ callers).
+      replay proof (RF7-09) before that migration is authorized.
+      **DONE 2026-09-09 (RF6/RF7-06, arithmetic delegation only, identity gap NOT closed)**:
+      `combineRRFLanes` now delegates its cross-lane sum to `fuseContributionsV1()`. Since this
+      caller receives PRE-COMPUTED `rrfContribution` values (never raw rank+weight, unlike
+      `rrf-fuse.ts`), each hit's contribution is losslessly re-encoded as a `(weight, rank)` pair
+      via `weight := contribution * (COMBINER_PSEUDO_K + rank)` for an arbitrary constant
+      (`COMBINER_PSEUDO_K = 60`) — the algebra cancels for any chosen k, so `fuseContributionsV1`
+      recomputing `weight / (k + rank)` reproduces the original contribution bit-for-bit
+      regardless of what k the upstream caller actually used. Per-lane metadata/support tracking
+      (primary lane, metadata selection, `rrfBreakdown`, `sources`) is unchanged. Verified via a
+      new `rrf-combiner-utils-selftest.test.ts` running the module's own 6 built-in arithmetic
+      cases (exact sums 0.027/0.025/0.051, sort order, empty-lanes, metadata-from-highest-lane) —
+      all pass unchanged after delegation — plus `rrf-split.test.ts` (3 tests) and a clean
+      `tsc --noEmit` for the file. This closes the vote-arithmetic half of RF6 for this owner;
+      the identity-metadata gap (`buildRrfLaneMap`'s backend-local IDs, no revision-qualified
+      envelope) is UNCHANGED and remains open — do not read this as `CROSS_STORE_PROVEN` or as
+      resolving `IDENTITY_METADATA_INSUFFICIENT`.
+- [x] `rrf-fuse.ts` — most broadly-called fusion owner found in this whole audit (6+ callers).
       It currently keys its accumulator on `packetKey ?? id` and does not include a
       `symbol_version_id` tier or revision-qualified identity envelope. Keep this as a
       breadth-priority owner decision, not a completed parity fix; classify
       `IDENTITY_METADATA_INSUFFICIENT` pending caller census and canonical boundary selection.
       **RE-AUDITED 2026-09-09, retirement rejected**: same reasoning as the owner above — 6+ live
       callers including an MCP tool means this is not a narrow debug endpoint. Same path forward:
-      migrate to `FusionCoreV1` once RF7-09's live replay proof authorizes it. Still open.
+      migrate to `FusionCoreV1` once RF7-09's live replay proof authorizes it.
+      **DONE 2026-09-09 (RF6/RF7-06, arithmetic delegation only, identity gap NOT closed)**:
+      RF7-09's bounded live-replay proof (real Qdrant-sourced packetKey identities) passed, so
+      `reciprocalRankFusion()`'s cross-lane summation now delegates to `fuseContributionsV1()` too
+      (commit `d1a0b5e7c4`) — see `rf7-09-bounded-live-replay.test.ts` (2 tests, real Qdrant data),
+      `rf7-contract-parity-01.test.ts` (9), `fusion-core-v1.test.ts` (8), `rf6-live-replay-01.test.ts`
+      (7), `rrf-split.test.ts` (3), and the weighted-lane cases in the legacy `tests/rrf-fuse.spec.ts`
+      (7 passing, unrelated to that file's 11 pre-existing `rrfFuseDenseSparse` failures — see
+      `reports/parent-atlas-open-lanes-todo.md`'s "Known Issue" section). Identity resolution
+      (`fusionIdentityKey`, `packetKey ?? id` accumulator key, no `symbol_version_id`/revision
+      envelope) is entirely UNCHANGED — only the arithmetic step changed owners. This closes the
+      vote-arithmetic half of RF6/RF7-06 for this owner; `IDENTITY_METADATA_INSUFFICIENT` remains
+      the correct classification until a revision-qualified identity envelope is adopted.
 
 ### RF6-IDENTITY-AUDIT-01 — 2026-09-01 bounded caller review
 

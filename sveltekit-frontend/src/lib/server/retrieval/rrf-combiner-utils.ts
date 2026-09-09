@@ -8,6 +8,22 @@
  * 4. Use metadata from highest-contributing lane for each hit
  */
 
+import { fuseContributionsV1 } from './fusion-core-v1.js';
+import type { FusionContributionV1 } from './fusion-contribution-v1.js';
+
+/**
+ * RF6/RF7: `combineRRFLanes` receives PRE-COMPUTED `rrfContribution` values per hit (this
+ * caller, unlike rrf-fuse.ts, never sees raw rank+weight -- the contribution arithmetic already
+ * happened upstream). `fuseContributionsV1` instead recomputes `weight / (k + rank)` from a
+ * (weight, rank) pair internally. To delegate the cross-lane one-vote-per-lane + sum step to it
+ * without re-deriving upstream's original k (which this module never knew and does not need to),
+ * each hit's already-computed contribution is losslessly re-encoded as
+ * `weight := contribution * (k + rank)` for THIS constant -- the algebra cancels for any chosen
+ * k, so `fuseContributionsV1` recomputing `weight / (k + rank)` reproduces the original
+ * `rrfContribution` bit-for-bit regardless of what k upstream actually used.
+ */
+const COMBINER_PSEUDO_K = 60;
+
 export interface LaneContribution {
   lane: string;
   laneWeight: number;
@@ -47,15 +63,27 @@ export interface CombinedRRFResult {
 export function combineRRFLanes(
   lanedHits: Map<string, Array<{ id: string; rrfContribution: number; rank: number; metadata?: Record<string, unknown>; text?: string }>>
 ): CombinedRRFResult[] {
-  // Accumulate contributions per hit ID
+  // Accumulate per-lane support/metadata per hit ID (unchanged) -- only the cross-lane SUM
+  // arithmetic itself is delegated to FusionCoreV1 below, RF6/RF7.
   const hitAccumulator = new Map<string, HitWithContributions>();
+  const contributions: FusionContributionV1[] = [];
 
   lanedHits.forEach((hits, laneName) => {
     hits.forEach(hit => {
+      const clampedRank = Math.max(1, hit.rank);
+      contributions.push({
+        canonicalId: hit.id,
+        logicalLane: laneName,
+        rank: clampedRank,
+        weight: hit.rrfContribution * (COMBINER_PSEUDO_K + clampedRank),
+        executorId: laneName,
+        provenanceRefs: [laneName],
+      });
+
       if (!hitAccumulator.has(hit.id)) {
         hitAccumulator.set(hit.id, {
           id: hit.id,
-          finalScore: 0,
+          finalScore: 0, // filled in from fuseContributionsV1's result below
           contributions: [],
           primaryLane: laneName,
           primaryLaneContribution: hit.rrfContribution,
@@ -72,9 +100,10 @@ export function combineRRFLanes(
         const existingLane = accumulated.contributions[existingLaneIndex]!;
         // A repeated projection from one logical lane is one vote. Keep the
         // strongest contribution so a worse duplicate cannot inflate or
-        // replace the lane's evidence.
+        // replace the lane's evidence. (fuseContributionsV1 enforces the same
+        // invariant independently on `contributions` above -- this loop's own
+        // dedup is for the metadata/support bookkeeping it still owns.)
         if (hit.rrfContribution <= existingLane.rrfContribution) return;
-        accumulated.finalScore += hit.rrfContribution - existingLane.rrfContribution;
         accumulated.contributions[existingLaneIndex] = {
           lane: laneName,
           laneWeight: 1.0,
@@ -89,7 +118,6 @@ export function combineRRFLanes(
         return;
       }
 
-      accumulated.finalScore += hit.rrfContribution;
       accumulated.contributions.push({
         lane: laneName,
         laneWeight: 1.0, // Will be set by caller if needed
@@ -105,6 +133,13 @@ export function combineRRFLanes(
       }
     });
   });
+
+  const fusedFinalScoreById = new Map(
+    fuseContributionsV1(contributions, { k: COMBINER_PSEUDO_K }).map((c) => [c.canonicalId, c.fusionScore])
+  );
+  for (const hit of hitAccumulator.values()) {
+    hit.finalScore = fusedFinalScoreById.get(hit.id) ?? 0;
+  }
 
   // Sort by final score descending
   const sorted = Array.from(hitAccumulator.values()).sort(
