@@ -461,6 +461,10 @@ This is the highest-value fix: it protects real production traffic through
       canonical identity envelope required to distinguish executor aliases from distinct entities.
       Existing compatibility coverage still passes `7/7` (`unified-orchestrator.spec.ts` and
       `rrf-split.test.ts`) on 2026-09-06; that is not evidence to apply a lane-name heuristic here.
+      **2026-09-09 re-check**: confirmed retirement is not the right call for this owner either
+      (real production breadth — see the duplicate finding under RF6-IDENTITY-AUDIT-01 below). Not
+      started still applies; path forward is the same `FusionCoreV1`-delegation-after-live-replay
+      sequence as `rrf-fuse.ts`.
 - [x] **RF5 live trace attempted (2026-08-08) — surfaced a real bug in the RF4 fix itself, not
       yet corrected.** Traced `codebase_chunk_index.id = 8a56e975-ae96-4102-813c-894de6d8975a`
       (`source_ref = src/routes/api/reports/generate/+server.ts`, canonical
@@ -704,13 +708,21 @@ identity path and the standalone RRF implementations (`search-runtime-fusion.tes
       contribution for repeated projections. Identity normalization remains revision-aware
       and the focused regression covers repeated same-lane hits (`rrf-canonical-identity.test.ts`).
       Verified 2026-09-01; no production route migration was performed.
-- [ ] `rrf-fusion.ts` (`/api/retrieval/rrf`) — no identity resolution at all, trusts caller
+- [x] `rrf-fusion.ts` (`/api/retrieval/rrf`) — no identity resolution at all, trusts caller
       `candidate_id`. The request schema exposes only `candidate_id`, `source_ref`, and
       `content_hash`; it does not carry `symbol_version_id`, `packet_key`, `source_revision`,
       or `workspace_revision`. The route is admin-gated and documented as an evaluation/debug
       endpoint, so classify it as `IDENTITY_METADATA_INSUFFICIENT` until a canonicalized request
       envelope or explicit legacy retirement decision is adopted. Do not infer identity from
       caller IDs or content paths. Audited 2026-09-01; no route contract change performed.
+      **DECIDED 2026-09-09**: explicit legacy retirement — formalized as a permanent
+      evaluation/debug-only endpoint (see updated header comment in
+      `src/routes/api/retrieval/rrf/+server.ts`), not migrated to canonical identity resolution.
+      This is the one RF6 owner narrow enough (auth-gated, no production callers found) for
+      retirement to be an honest classification — confirmed by checking its route's auth guard and
+      grepping for callers before deciding, rather than assuming. Contrast with the two owners
+      below, which were checked the same way and found to have real production breadth, so
+      "retire" does not fit them.
 - [x] `service.ts::rrfFusion` (`/api/atlas/studio/search`, `/api/atlas/search`) — **decision
       recorded and applied 2026-09-06: `fix-in-place-independently`.** `delegate-to-canonical-owner`
       remains unavailable (RF5 is only partially landed — canonical spine only, per its own section
@@ -760,11 +772,23 @@ identity path and the standalone RRF implementations (`search-runtime-fusion.tes
       lane, and file:line IDs for lexical hits; Postgres enrichment happens after fusion. This
       is `PARTIAL_PROVEN` for vote arithmetic, but `IDENTITY_METADATA_INSUFFICIENT` for
       cross-lane canonical parity. Audited 2026-09-01; no identity fallback was added.
+      **RE-AUDITED 2026-09-09, retirement rejected**: checked live callers before deciding
+      (`grep` for `combineRRFLanes`/`rrf-combiner-utils` and for `unified-orchestrator` imports) —
+      `unified-orchestrator.ts` is imported by `go-retrieval-facade.ts` and `cross-ranker.ts`, and
+      its route `src/routes/api/admin/retrieval/stream/+server.ts` is one of 3 real consumers,
+      alongside `/api/retrieval/go` (`+server.ts`'s `GET` handler has no auth guard at all —
+      general-purpose, not admin-only). This is real production breadth, not a narrow debug
+      endpoint — "retire as legacy" does not fit. The identity fix instead requires migrating this
+      owner to delegate to the new `FusionCoreV1` core (below), which itself needs a bounded live
+      replay proof (RF7-09) before that migration is authorized. Still open.
 - [ ] `rrf-fuse.ts` — most broadly-called fusion owner found in this whole audit (6+ callers).
       It currently keys its accumulator on `packetKey ?? id` and does not include a
       `symbol_version_id` tier or revision-qualified identity envelope. Keep this as a
       breadth-priority owner decision, not a completed parity fix; classify
       `IDENTITY_METADATA_INSUFFICIENT` pending caller census and canonical boundary selection.
+      **RE-AUDITED 2026-09-09, retirement rejected**: same reasoning as the owner above — 6+ live
+      callers including an MCP tool means this is not a narrow debug endpoint. Same path forward:
+      migrate to `FusionCoreV1` once RF7-09's live replay proof authorizes it. Still open.
 
 ### RF6-IDENTITY-AUDIT-01 — 2026-09-01 bounded caller review
 
@@ -1142,6 +1166,30 @@ suite re-run after all of this — still 31/31 pass. No database/Qdrant/Valkey/N
 - [ ] Extract `SearchRuntime.fuseCandidates`'s semantics into a shared, importable canonical
       fusion module (identity-aware, within-lane dedup, one-vote-per-lane, RRF calculation,
       provenance merge) that specialized routes can call instead of reimplementing fusion.
+
+      **PARTIAL — RF7-05 core built and parity-tested, 2026-09-09; NOT wired into either
+      production caller yet.** `src/lib/server/retrieval/fusion-core-v1.ts`
+      (`fuseContributionsV1()`) is the shared aggregation core the RF7-04 findings called for: it
+      takes `FusionContributionV1[]`, enforces one-vote-per-lane (strongest contribution per
+      (canonicalId, logicalLane) wins, never summed), sums across lanes, and exposes both required
+      design hooks the parity findings identified as needed before extraction — an explicit
+      per-contribution `weight` (no invented default; SearchRuntime's uniform-1 stays uniform-1,
+      rrf-fuse.ts's real weights stay real) and an optional tie-break `comparator` (defaults to
+      score-desc/canonicalId-asc, matching rrf-fuse.ts's shape, since SearchRuntime's real
+      `compareIdentityKeys` is private and unexported — a caller migrating to this core must pass
+      its own comparator to preserve its exact historical tie-break, not rely on this default).
+      `k` defaults to `FUSION_CORE_RRF_K = 60`, the literature-standard constant both existing
+      callers already use — never silently overridable by a caller without an explicit `k` option.
+      Proven via `src/lib/server/retrieval/__tests__/fusion-core-v1.test.ts` (8 tests, all pass):
+      reproduces `rrf-fuse.ts`'s real `fusionScore` for single-lane and cross-lane-sum cases
+      (`toBeCloseTo` against the real `reciprocalRankFusion()` output, not just internally
+      self-consistent), enforces one-vote-per-lane, and explicitly asserts (rather than hides) the
+      two confirmed RF7-04 divergences — weighting and tie-break — so a future migration designs
+      for them at the call site instead of the core silently reconciling them.
+      **Explicitly NOT done**: `search-runtime.ts`/`rrf-fuse.ts` do not import or delegate to this
+      module in production. That migration (RF7-06/RF7-07) requires the bounded live replay proof
+      (RF7-09) this file's own governance requires before authorizing a production behavior change
+      on the live retrieval spine — building the core does not by itself authorize wiring it in.
 - [ ] Consolidate the 7+ diverged RRF weight tables into one shared config, once the fusion
       owners that would consume it are themselves converged.
 - [ ] Re-evaluate whether `service.ts`'s `SearchLaneRegistry` and `unified-orchestrator.ts`'s

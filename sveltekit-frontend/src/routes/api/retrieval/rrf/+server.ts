@@ -1,5 +1,5 @@
 /**
- * RRF Fusion Testing Endpoint
+ * RRF Fusion Testing Endpoint — LEGACY / EVALUATION-DEBUG ONLY (formalized 2026-09-09, RF6)
  *
  * POST /api/retrieval/rrf — Test the RRF fusion strategy independently
  *
@@ -8,6 +8,17 @@
  *
  * This endpoint is primarily for evaluation and debugging. Production code should use
  * the unified orchestrator (/api/retrieval/unified or go-retrieval-facade).
+ *
+ * RF6 classification (`openspec/changes/parent-atlas-retrieval-fusion-reachability/tasks.md`):
+ * `IDENTITY_METADATA_INSUFFICIENT` — its `RRFRequestSchema` exposes only `candidate_id`,
+ * `source_ref`, and `content_hash`, never `symbol_version_id`/`packet_key`/`source_revision`/
+ * `workspace_revision`, so it cannot participate in canonical identity resolution the way
+ * `SearchRuntime.fuseCandidates()` (the decided canonical fusion owner, see root
+ * `reports/parent-atlas-open-lanes-todo.md` item 5) does. Decision (2026-09-09): retained as a
+ * legacy evaluation/debug endpoint, NOT migrated to canonical identity resolution — its narrow,
+ * caller-supplied `candidate_id` scope is a legitimate testing/debugging contract, not a
+ * production identity gap worth widening. Do not add new production callers of this route; use
+ * the unified orchestrator instead.
  */
 
 import { json, type RequestHandler } from '@sveltejs/kit';
