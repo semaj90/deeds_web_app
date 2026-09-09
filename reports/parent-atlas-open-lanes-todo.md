@@ -116,23 +116,57 @@ section for the full item-by-item mapping before acting on the list below.
 
 ## Current proof state update
 
+> Note (2026-09-09): the GR1–GR4 PASS claims below are asserted narratively in this block without
+> an inline receipt path attached to each claim. Broader proof reports exist elsewhere in this doc
+> (e.g. `docs/reports/phase17-21-workstation-audit.md`) but aren't cited per-claim here — whoever
+> next touches this block should attach a receipt path per GR item rather than re-assert PASS
+> without one.
+
 - GR1 DuckDB / graphify:daily — PASS
   - offline-parent-atlas-mapreduce.sql now targets live columns only
 - GR2 / GR3 graph runtime — PASS
   - fresh projection smoke and graph enrichment both pass
 - GR4 PageRank promotion gate — PASS
   - live promoted run verified successfully
-- GR5 Louvain / Leiden taxonomy — PARTIAL
+- GR5 Louvain / Leiden taxonomy — PARTIAL, apply-mode now real (2026-09-09)
   - Louvain is wired
-  - Leiden now has an exact GDS lane in `scripts/atlas/compute-leiden-neo4j.mjs` and passes dry-run
-  - apply-mode persistence and downstream selector choice remain open
+  - Leiden's GDS lane (`scripts/atlas/compute-leiden-neo4j.mjs`) apply-mode is now
+    `APPLY_PROVEN`, run live 2026-09-09: 59,692 Neo4j `:Packet` nodes assigned
+    `leiden_community_id` (57,638 communities detected, `randomSeed: 42`), 38,700 Postgres
+    `community_reports_leiden` rows synced with real (not hardcoded) `cohesion_score`
+    (intra-community edge density — 156/38,700 communities > 0, matching a sparse graph
+    where most communities are singletons) and real (not always-NULL) `embedding` centroids
+    (3,003/38,700 — mean-pool of member packets' `content_embedding`, computed via one
+    batched bulk query rather than one query per community). `leiden_community_id` is now
+    also mirrored into Qdrant `codebase_chunks_768` payloads (79,768/109,774 points,
+    73% — same scroll+patch pattern as `writeAuthorityScoresToQdrant`), closing the
+    "Leiden membership invisible to retrieval" gap.
+  - **Real bug found and fixed during this**: the first Qdrant-sync attempt matched 0/59,692
+    points — it assumed a `stable_key` payload field (copied from
+    `writeAuthorityScoresToQdrant`'s convention) that a live payload inspection showed does
+    not exist on this collection's current payload shape at all. Fixed to match on
+    `path`/`relative_path`/`file_path`/`source_ref`/`sourceRef` instead, verified against
+    real payloads before re-running. `writeAuthorityScoresToQdrant` itself is likely
+    equally affected by the same drift — flagged, not fixed here (out of this Leiden-scoped
+    pass).
+  - **Not fixed, flagged**: `community_reports_leiden` has no cleanup between runs — a
+    community_id from a prior run that no longer exists in a later run's assignment stays
+    as a stale row forever (`ON CONFLICT DO UPDATE` only touches community_ids present in
+    the current run). Pre-existing in the original script, not introduced by this pass.
+  - Downstream selector choice (which of Louvain vs Leiden a consumer should read) remains
+    open — not decided by this pass.
 
 Remaining open taxonomy work:
 
-- exact Leiden lane apply/persistence and downstream selector choice
+- downstream selector choice (Louvain vs Leiden)
+- stale-row cleanup for `community_reports_leiden` across repeated apply runs
+- audit `writeAuthorityScoresToQdrant`'s own `stable_key` assumption for the same drift
 - canonical community taxonomy records
 - taxonomy-aware traversal with bounded fanout
 - replay corpus before any learned promotion
+- reconcile the 3 separate GDS projections (`codeTopology`, `retrievalAnalysis`,
+  `packetGraph_leiden`) with duplicated Louvain across the first two — not attempted here,
+  needs its own explicit decision per the "One Canonical Runtime Owner" rule
 
 **Relevant files**
 
