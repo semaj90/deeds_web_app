@@ -1,5 +1,7 @@
 import type { FusedHit, RankedLaneHit, RrfIdentityStatus, RrfLaneName } from './rrf-contract.js';
 import { normalizeRetrievalLane } from './retrieval-lane-aliases.js';
+import { fuseContributionsV1 } from './fusion-core-v1.js';
+import type { FusionContributionV1 } from './fusion-contribution-v1.js';
 
 const KNOWN_LANE_NAMES: readonly RrfLaneName[] = [
   'bm42',
@@ -87,6 +89,7 @@ interface LogicalLaneGroup {
   representative: InputHit;
   representativeLaneName: string;
   representativeRank: number;
+  representativeWeight: number;
   representativeContribution: number;
   support: Array<{ hit: InputHit; laneName: string; rank: number }>;
 }
@@ -147,6 +150,7 @@ export function reciprocalRankFusion(
           representative: hit,
           representativeLaneName: laneName,
           representativeRank: rank,
+          representativeWeight: laneWeight,
           representativeContribution: contribution,
           support: [{ hit, laneName, rank }],
         });
@@ -161,6 +165,7 @@ export function reciprocalRankFusion(
         existing.representative = hit;
         existing.representativeLaneName = laneName;
         existing.representativeRank = rank;
+        existing.representativeWeight = laneWeight;
         existing.representativeContribution = contribution;
       }
     }
@@ -169,12 +174,42 @@ export function reciprocalRankFusion(
   // Then sum exactly one contribution from each logical lane for a canonical
   // identity. Noncanonical identity keys intentionally include logical lane +
   // backend-local id, so they cannot cross-lane merge by accident.
+  //
+  // RF7-06: the cross-lane SUM itself is delegated to FusionCoreV1's fuseContributionsV1()
+  // rather than accumulated by hand here. Each logicalGroup is already exactly one
+  // (identityKey, logicalLaneName) winner (Phase 1 above resolved which executor hit
+  // represents that lane), so projecting one FusionContributionV1 per group and letting
+  // fuseContributionsV1 recompute `weight / (k + rank)` per group reproduces
+  // group.representativeContribution's own formula bit-for-bit (same k, same rank, same
+  // weight) before summing across lanes -- proven equivalent for the real-data case by
+  // RF7-09's live replay, and true by construction for the weighted/multi-lane cases RF7-09
+  // did not exercise, since fuseContributionsV1's "one vote per (canonicalId, logicalLane)"
+  // step is a no-op here (this loop never emits two contributions for the same
+  // (identityKey, logicalLaneName) pair -- Phase 1 already deduplicated that). Everything
+  // else (packetKey selection, sources/support, provenance, identityStatus) stays exactly
+  // as before -- only the arithmetic step changed owners.
+  const groupContributions: FusionContributionV1[] = [];
+  for (const group of logicalGroups.values()) {
+    groupContributions.push({
+      canonicalId: group.identityKey,
+      logicalLane: group.logicalLaneName,
+      rank: group.representativeRank,
+      weight: group.representativeWeight,
+      executorId: group.representativeLaneName,
+      provenanceRefs: [],
+    });
+  }
+  const fusedByIdentity = new Map(
+    fuseContributionsV1(groupContributions, { k }).map((candidate) => [candidate.canonicalId, candidate.fusionScore])
+  );
+
   for (const group of logicalGroups.values()) {
     const hit = group.representative;
     const packetKey = String(hit.packetKey ?? hit.id ?? '').trim();
     if (!packetKey) continue;
     const identityStatus = identityStatusForHit(hit);
     const aggregateKey = group.identityKey;
+    const fusionScore = fusedByIdentity.get(aggregateKey) ?? group.representativeContribution;
 
     const rankedSupport: RankedLaneHit[] = group.support.map(({ hit: supportHit, laneName, rank }) => ({
       ...supportHit,
@@ -187,9 +222,9 @@ export function reciprocalRankFusion(
 
     const current = byIdentity.get(aggregateKey);
     if (current) {
-      current.fusionScore += group.representativeContribution;
+      current.fusionScore = fusionScore;
       current.sources.push(...rankedSupport);
-      current.rrfScore = current.fusionScore;
+      current.rrfScore = fusionScore;
       if (includeProvenance) {
         current.provenance ??= {};
         current.provenance[group.logicalLaneName] = {
@@ -201,9 +236,9 @@ export function reciprocalRankFusion(
       byIdentity.set(aggregateKey, {
         packetKey,
         id: packetKey,
-        fusionScore: group.representativeContribution,
+        fusionScore,
         sources: rankedSupport,
-        rrfScore: group.representativeContribution,
+        rrfScore: fusionScore,
         symbolVersionId: hit.symbolVersionId,
         canonicalChunkId: hit.canonicalChunkId,
         identityStatus,
