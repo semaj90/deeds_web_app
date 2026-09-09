@@ -180,6 +180,33 @@ section for the full item-by-item mapping before acting on the list below.
   - Downstream selector choice (which of Louvain vs Leiden a consumer should read) remains
     open — not decided by this pass.
 
+- **GDS-PROJECTION-OWNER-01 (2026-09-09, infrastructure built + census run; unification NOT
+  applied, needs a decision)**: built `GraphProjectionManifestV1`
+  (`sveltekit-frontend/src/lib/server/graph/graph-projection-manifest-v1.ts`) — a comparable
+  snapshot contract (`sourceMembershipChecksum` + `ordinalMapChecksum` + declared node
+  labels/relationship types/edge count) any GDS projection can record, so two projections can
+  be checked for true equivalence instead of assumed from matching node counts alone. 5/5
+  unit tests pass, including a real bug this exercise caught in its own first draft: two
+  projections can share identical node membership/ordinal assignment while declaring
+  completely different relationship-type sets and edge counts — the original `identical`
+  check missed this; fixed to also require relationship-set and edge-count equality.
+  **Live census (direct Cypher against the source graph, not a transient in-memory
+  projection — none were held live at audit time)**: `codeTopology` (PageRank+Louvain) and
+  `packetGraph_leiden` (Leiden) share the exact same 59,692 `Packet` nodes, but
+  `codeTopology`'s relationship-type set (`SIMILAR_TOPOLOGY` + `IMPORTS`/`CALLS`/`CONTAINS`/
+  `HAS_CHUNK`/`BELONGS_TO_CLUSTER`/`REFERENCES`/`HAS_CENTROID`/`BELONGS_TO_FEATURE`) gives it
+  **358,289 edges vs. Leiden's 102,666** (3.5x) — Louvain and Leiden are provably running
+  over different graphs today, not just differently-named ones. `retrievalAnalysis` is a
+  fully separate domain (`Query`/`Concept`/`Feature`/`Packet`/`Task`/`Directory`/`Community`/
+  `Strategy` nodes, agent-strategy relationship types) and should NOT be merged with the
+  code-topology projections — flagged as legitimately distinct, not a duplication.
+  **Not done, needs a human decision**: whether Leiden should expand to the full
+  multi-relational graph, Louvain/PageRank should restrict to `SIMILAR_TOPOLOGY`-only to
+  match Leiden, or the two are legitimately meant to answer different questions and should
+  stay separate (with both recording a manifest for auditability regardless). Forcing a
+  merge without that decision would silently change algorithm semantics that are currently
+  undocumented, not obviously wrong.
+
 Remaining open taxonomy work:
 
 - downstream selector choice (Louvain vs Leiden)
