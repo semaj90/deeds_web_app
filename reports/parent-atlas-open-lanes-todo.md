@@ -85,10 +85,30 @@ section for the full item-by-item mapping before acting on the list below.
 2. Prove one real failing-test repair loop end to end.
 3. Replace JSON-only localization inputs with `trace_dynamic_context`.
 4. Keep semantic `768` canonical; treat `384` as legacy evidence only.
-5. Decide one canonical owner for RRF fusion before wiring anything else.
-6. Establish `FeatureRowV1` with a small, explicit field set.
+5. ~~Decide one canonical owner for RRF fusion before wiring anything else.~~
+   **DECIDED (2026-09-09)**: `SearchRuntime.fuseCandidates()` (→
+   `fuseSearchRuntimeCandidates()` in `search-runtime.ts`) is the canonical owner, per
+   `RF3`/`RF4`/`RF6-OWNER-MATRIX-01` in
+   `openspec/changes/parent-atlas-retrieval-fusion-reachability/`. That change found 13+
+   competing RRF implementations (`rrf-combiner.ts`, `rrf-fusion.ts`, `rrf-multi-vector.ts`,
+   `multi-vector-rrf.ts`, `fuse-candidates.ts`, `rrf-lane-ranker.ts`, `compute-rrf-score.ts`,
+   `retrieval-fusion-rrf.ts`, `hyperrag-fusion-service.ts`, and more) and is 40/54 tasks into
+   converging/retiring them (`RF6`/`RF7`). Continue that work there, not on this ladder.
+6. ~~Establish `FeatureRowV1` with a small, explicit field set.~~
+   **ALREADY EXISTS** — `sveltekit-frontend/src/lib/server/atlas/ranking/feature-row-v1.ts`, a
+   `.strict()` Zod schema with ~22 consumers. It takes `rrf` as an *input* field (does not compute
+   fusion itself). Remaining work is wiring more producers to emit real `rrf` values via the
+   now-decided canonical fusion owner (item 5), not creating the type.
 7. Add RFF only as an experimental projection with deterministic seed/revision.
 8. Keep RRF candidate fusion separate from RFF-derived geometry.
+
+   > Note (2026-09-09): "RFF" in items 7–8 refers to this repo's own error-fixing topology lane
+   > (`codebase_chunk_index.error_embedding`/`.signature_embedding`, backed by
+   > `scripts/atlas/phase3-neo4j-rff-topology.mjs`), **not** the Random Fourier Features ML
+   > kernel-approximation technique — confirmed no such technique exists or is proposed anywhere
+   > in this repo. See `openspec/changes/parent-atlas-error-embedding-768-migration/` (new,
+   > 2026-09-09) for the real blocker (`error_embedding` is still `vector(384)`, backfill script
+   > blocked) and its fix.
 9. Use PageRank authority as one normalized field with provenance.
 10. Run oracle parity in order: NetworkX → Neo4j GDS → cuGraph → cuVS.
 11. Defer cuGraph / cuVS promotion until parity and value are proven.

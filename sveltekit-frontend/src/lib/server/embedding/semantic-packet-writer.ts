@@ -1,4 +1,5 @@
 import path from 'node:path';
+import { sql } from 'drizzle-orm';
 import { db } from '$lib/server/db/client.js';
 import { atlasPackets } from '$lib/server/db/schema/atlas-packets.js';
 import { computePacketKey as computeCanonicalPacketKey } from '$lib/server/atlas/identity/packet-key-builder.js';
@@ -106,16 +107,29 @@ export async function persistCanonicalSemanticPacketEmbedding(
 	const sourceRepresentationId = input.sourceRepresentationId ?? lineage.representationId;
 	const sourceDimension = input.sourceDimension ?? lineage.dimension;
 	// Never synthesized: NULL when the caller has no real revision evidence.
-	// KNOWN LIMITATION: on conflict this unconditionally overwrites any
-	// previously-stored source_revision, including with NULL, if the calling
-	// site doesn't supply one. Not a live risk today (this is the only caller
-	// of this function, and it never supplies sourceRevision), but if a second
-	// call site is ever added that DOES supply real revision evidence, this
-	// must switch to only overwriting when input.sourceRevision !== undefined
-	// (e.g. via COALESCE(EXCLUDED.source_revision, atlas_packets.source_revision))
-	// so a revision-aware caller can never be silently clobbered by a
-	// revision-blind one.
 	const sourceRevision = input.sourceRevision?.trim() || null;
+	// PACKET-WRITER-SOURCE-REVISION-PRESERVATION-01 (2026-09-09): the conflict
+	// branch below never overwrites a previously-stored source_revision with
+	// NULL. If this call supplies a real value, it wins (matches "existing A,
+	// incoming B -> B" for the create-time INSERT path; full SOURCE_REVISION_CONFLICT
+	// semantics for a genuine A->B disagreement belong to decidePacketWrite/
+	// executePacketWriteTransaction, not this function, once it's wired
+	// through them). If this call supplies no value (undefined/null), any
+	// existing proven value is preserved via COALESCE rather than clobbered --
+	// closing the exact risk this file's prior comment flagged but did not fix.
+	const conflictSourceRevision = sql`COALESCE(${sourceRevision}, ${atlasPackets.sourceRevision})`;
+
+	// PACKET-WRITER-SUMMARY-FIELD-WIRING-01 (2026-09-09): input.summary was
+	// previously declared on PersistCanonicalSemanticPacketEmbeddingInput but
+	// never read anywhere in this function -- any caller passing it had the
+	// value silently dropped. Wired now using the same never-clobber pattern
+	// as source_revision above: a supplied summary is used, but an existing
+	// stored summary is never overwritten with NULL on conflict (real summary
+	// population is a separate later-pass concern -- see
+	// backfill-summary-layers-from-chunks.mjs / backfill-atlas-packet-summaries-from-layers.mjs
+	// -- this write path must not clobber that pass's output either).
+	const summary = input.summary?.trim() || null;
+	const conflictSummary = sql`COALESCE(${summary}, ${atlasPackets.summary})`;
 
 	await database
 		.insert(atlasPackets)
@@ -130,6 +144,7 @@ export async function persistCanonicalSemanticPacketEmbedding(
 			packetUlid: packetId,
 			sourceKind: input.sourceKind ?? 'codebase',
 			sourcePath: input.sourcePath ?? sourceRef,
+			summary,
 			embedding: Array.from(input.vector),
 			payload: input.metadata ?? {},
 			metadata: {
@@ -153,12 +168,13 @@ export async function persistCanonicalSemanticPacketEmbedding(
 			set: {
 				packetKey,
 				sourceRef,
-				sourceRevision,
+				sourceRevision: conflictSourceRevision,
 				directoryPath,
 				featureId,
 				featureLabel,
 				sourceKind: input.sourceKind ?? 'codebase',
 				sourcePath: input.sourcePath ?? sourceRef,
+				summary: conflictSummary,
 				embedding: Array.from(input.vector),
 				payload: input.metadata ?? {},
 				metadata: {

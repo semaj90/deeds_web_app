@@ -9429,7 +9429,8 @@ server.registerTool(
       'Phase 3I verification gate. Reports coverage metrics for the atlas_packets canonical warehouse: ' +
       'total packets, source_ref coverage %, feature_id coverage %, concept_ids coverage %, ' +
       'summary coverage %, embedding coverage %, and duplicate sha256 count. ' +
-      'Gate: source_ref >= 90% required before Phase 4A RRF ranking can start.',
+      'Gate: source_ref >= 90% is the ONLY value that gates phase4a_ready. feature_id and summary ' +
+      'coverage/gate fields are reported for visibility only and do not block phase4a_ready.',
     inputSchema: z.object({
       verbose: z.boolean().default(false).optional().describe('Include per-artifact_id breakdown'),
     }),
@@ -9460,6 +9461,14 @@ server.registerTool(
       `);
 
       const row = metrics.rows[0];
+      // Only source_ref_pct is an enforced gate for phase4a_ready. feature_id_ok
+      // and summary_ok are computed and reported below for visibility, but are
+      // NOT ANDed into phase4a_ready -- nothing in the live retrieval/ACE path
+      // (context-assembler.ts) depends on atlas_packets.summary coverage; it
+      // reads chunk-level summaries from a different table and degrades
+      // gracefully when absent. Do not add these to phase4a_ready without also
+      // updating the real gate consumer, or this becomes a second unenforced
+      // "gate" like this one used to be.
       const gate = {
         source_ref_ok: parseFloat(row.source_ref_pct) >= 90,
         feature_id_ok: parseFloat(row.feature_id_pct) >= 50,
@@ -9470,10 +9479,10 @@ server.registerTool(
       const result: Record<string, unknown> = {
         total_packets: parseInt(row.total),
         coverage: {
-          source_ref:  { count: parseInt(row.has_source_ref),  pct: parseFloat(row.source_ref_pct),  gate: '≥90%', ok: gate.source_ref_ok },
-          feature_id:  { count: parseInt(row.has_feature_id),  pct: parseFloat(row.feature_id_pct),  gate: '≥50%', ok: gate.feature_id_ok },
+          source_ref:  { count: parseInt(row.has_source_ref),  pct: parseFloat(row.source_ref_pct),  gate: '≥90% (enforced)', ok: gate.source_ref_ok },
+          feature_id:  { count: parseInt(row.has_feature_id),  pct: parseFloat(row.feature_id_pct),  gate: '≥50% (informational only -- not enforced)', ok: gate.feature_id_ok },
           concept_ids: { count: parseInt(row.has_concepts) },
-          summary:     { count: parseInt(row.has_summary),     pct: parseFloat(row.summary_pct),     gate: '≥50%', ok: gate.summary_ok },
+          summary:     { count: parseInt(row.has_summary),     pct: parseFloat(row.summary_pct),     gate: '≥50% (informational only -- not enforced)', ok: gate.summary_ok },
           embedding:   { count: parseInt(row.has_embedding),   pct: parseFloat(row.embedding_pct) },
           sha256:      { count: parseInt(row.has_sha256) },
         },
@@ -9481,7 +9490,7 @@ server.registerTool(
         gates: gate,
         phase4a_ready: gate.phase4a_ready,
         next_action: gate.phase4a_ready
-          ? 'Coverage gate PASSED — Phase 4A RRF ranking can start'
+          ? 'Coverage gate PASSED — Phase 4A RRF ranking can start (source_ref is the only enforced gate; feature_id/summary coverage above are informational only)'
           : `Coverage gate FAILED — need source_ref ≥ 90% (current: ${row.source_ref_pct}%). Run: node scripts/atlas/backfill-atlas-source-refs.mjs`,
       };
 

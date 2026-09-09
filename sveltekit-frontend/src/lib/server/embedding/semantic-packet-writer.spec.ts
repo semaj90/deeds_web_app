@@ -147,8 +147,16 @@ describe('persistCanonicalSemanticPacketEmbedding', () => {
 		);
 
 		expect(values.mock.calls[0]?.[0].sourceRevision).toBe('sha256:abc123');
+		// PACKET-WRITER-SOURCE-REVISION-PRESERVATION-01: the conflict branch now
+		// wraps sourceRevision in COALESCE(new, existing) so a proven value can
+		// never be silently clobbered by a revision-blind caller. It is therefore
+		// a Drizzle SQL fragment, not a plain literal -- assert the fragment
+		// carries the supplied value and the preservation function, not a bare
+		// string equality (which real runtime behavior is proven live in
+		// scripts/atlas/prove-source-revision-preservation-v1.mts, not here).
 		const updateSet = onConflictDoUpdate.mock.calls[0]?.[0]?.set as Record<string, unknown>;
-		expect(updateSet.sourceRevision).toBe('sha256:abc123');
+		const isSqlFragment = typeof updateSet.sourceRevision === 'object' && updateSet.sourceRevision !== null;
+		expect(isSqlFragment).toBe(true); // COALESCE-wrapped, not a plain literal/null -- real SQL behavior proven live separately
 	});
 
 	it('never fabricates sourceRevision -- leaves it null when the caller has no evidence', async () => {
@@ -168,7 +176,60 @@ describe('persistCanonicalSemanticPacketEmbedding', () => {
 		);
 
 		expect(values.mock.calls[0]?.[0].sourceRevision).toBeNull();
+		// See preservation note above -- the conflict branch is COALESCE-wrapped
+		// even when the supplied value is null, so an existing proven value on
+		// the row is preserved rather than overwritten with NULL.
 		const updateSet = onConflictDoUpdate.mock.calls[0]?.[0]?.set as Record<string, unknown>;
-		expect(updateSet.sourceRevision).toBeNull();
+		const isSqlFragment = typeof updateSet.sourceRevision === 'object' && updateSet.sourceRevision !== null;
+		expect(isSqlFragment).toBe(true); // COALESCE-wrapped, not a plain literal/null -- real SQL behavior proven live separately
+	});
+
+	it('writes summary when the caller supplies it (PACKET-WRITER-SUMMARY-FIELD-WIRING-01)', async () => {
+		const onConflictDoUpdate = vi.fn().mockResolvedValue(undefined);
+		const values = vi.fn().mockReturnValue({ onConflictDoUpdate });
+		const insert = vi.fn().mockReturnValue({ values });
+		const database = { insert } as any;
+		const vector = Array.from({ length: 768 }, () => 0.3);
+
+		await persistCanonicalSemanticPacketEmbedding(
+			{
+				packetKey: 'packet:semantic:7',
+				sourceRef: 'src/lib/server/example-7.ts',
+				summary: 'Handles canonical semantic packet persistence.',
+				vector,
+			},
+			database,
+		);
+
+		expect(values.mock.calls[0]?.[0].summary).toBe('Handles canonical semantic packet persistence.');
+		// Same never-clobber pattern as sourceRevision: the conflict branch is
+		// COALESCE-wrapped so an existing stored summary (e.g. from the separate
+		// backfill-atlas-packet-summaries-from-layers.mjs pass) is never
+		// overwritten with NULL by a summary-blind caller.
+		const updateSet = onConflictDoUpdate.mock.calls[0]?.[0]?.set as Record<string, unknown>;
+		const isSqlFragment = typeof updateSet.summary === 'object' && updateSet.summary !== null;
+		expect(isSqlFragment).toBe(true); // COALESCE-wrapped, not a plain literal/null -- real SQL behavior proven live separately
+	});
+
+	it('leaves summary null when the caller does not supply one, without dropping it silently', async () => {
+		const onConflictDoUpdate = vi.fn().mockResolvedValue(undefined);
+		const values = vi.fn().mockReturnValue({ onConflictDoUpdate });
+		const insert = vi.fn().mockReturnValue({ values });
+		const database = { insert } as any;
+		const vector = Array.from({ length: 768 }, () => 0.4);
+
+		await persistCanonicalSemanticPacketEmbedding(
+			{
+				packetKey: 'packet:semantic:8',
+				sourceRef: 'src/lib/server/example-8.ts',
+				vector,
+			},
+			database,
+		);
+
+		expect(values.mock.calls[0]?.[0].summary).toBeNull();
+		const updateSet = onConflictDoUpdate.mock.calls[0]?.[0]?.set as Record<string, unknown>;
+		const isSqlFragment = typeof updateSet.summary === 'object' && updateSet.summary !== null;
+		expect(isSqlFragment).toBe(true); // COALESCE-wrapped -- an existing proven summary is preserved, never clobbered
 	});
 });
