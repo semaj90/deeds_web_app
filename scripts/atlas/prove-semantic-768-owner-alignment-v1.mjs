@@ -18,6 +18,11 @@ const checks = [
     must: ["const CANONICAL_COLUMN = 'content_embedding'", "const PHYSICAL_TYPE = 'halfvec(768)'", 'embedding_dimension = 768'],
   },
   {
+    path: 'sveltekit-frontend/scripts/atlas/backfill-codebase-chunk-embeddings.mjs',
+    must: ['LEGACY_CONTENT_EMBEDDING_768_WRITER_RETIRED', "column: 'content_embedding'", "role: 'LEGACY_ALTERNATE_NONCANONICAL'"],
+    mustNot: ['SET content_embedding_768 ='],
+  },
+  {
     path: 'scripts/atlas/atlas-embedding-ranking-diagnostic-v1.mjs',
     must: ["const CANONICAL_VECTOR_COLUMN = 'content_embedding'", "const CANONICAL_VECTOR_TYPE = 'halfvec(768)'", "alternateVectorRole: 'LEGACY_ALTERNATE_NONCANONICAL'"],
     mustNot: ["const VECTOR_COLUMNS = ['content_embedding_768'"],
@@ -25,6 +30,10 @@ const checks = [
   {
     path: 'scripts/atlas/audit-lineage-semantic-768-cohort-v1.mjs',
     must: ["const CANONICAL_VECTOR_COLUMN = 'content_embedding'", "const CANONICAL_VECTOR_TYPE = 'halfvec(768)'"],
+  },
+  {
+    path: 'scripts/atlas/freeze-atlas-lexical-document-corpus-v1.mjs',
+    must: ["predicate: 'content_embedding IS NOT NULL AND content_hash IS NOT NULL'", "canonicalVectorColumn: 'content_embedding'"],
   },
   {
     path: 'packages/atlas-core/src/packet-reader.ts',
@@ -42,6 +51,11 @@ const checks = [
   {
     path: 'docs/VECTOR-STORAGE-CONTRACT.md',
     must: ['Postgres column   = content_embedding', 'physical type     = halfvec(768)', '384-dimensional lane remains explicit legacy/reference'],
+  },
+  {
+    path: 'sveltekit-frontend/docs/DOCKER-COMPOSE-CORRECTED-BASELINE.md',
+    must: ['EMBEDDING_REPRESENTATION: "semantic_768"', 'EMBEDDING_DIMENSION: "768"', 'It must not be labeled `semantic_768`.'],
+    mustNot: ['EMBEDDING_REPRESENTATION: "semantic_768"\n  EMBEDDING_DIMENSION: "384"'],
   },
 ];
 
