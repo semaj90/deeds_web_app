@@ -1230,6 +1230,85 @@ suite re-run after all of this — still 31/31 pass. No database/Qdrant/Valkey/N
       needs further RF7-06 work under their recorded decisions.
 - [ ] Consolidate the 7+ diverged RRF weight tables into one shared config, once the fusion
       owners that would consume it are themselves converged.
+- [x] **RWC-CENSUS-01 — Read-only weight/lane census.** Before any consolidation,
+      enumerate every weight source, consumer, raw lane name, application stage,
+      policy scope, semantic class, logical-lane mapping, and executor identity.
+      Emit `docs/reports/rrf-lane-weight-census-v1.json` with
+      `migrationAuthorized=false` unless all mappings are explicit, semantic
+      conflicts are zero, executor vote inflation is zero, and caller replay
+      evidence exists. No ranking or runtime fusion changes are authorized by
+      this census.
+- [ ] **RWC-CENSUS-02 — Contract-first admission.** Preserve the distinctions
+      `LOGICAL_LANE`, `EXECUTOR_NAME_NOT_LANE`, `RERANK_FEATURE_ONLY`,
+      `ROUTING_WEIGHT`, `LEGACY_ALIAS`, and `DIAGNOSTIC_ONLY`; a common numeric
+      type or name is not evidence of equivalent semantics.
+- [x] **RWC-CENSUS-02A — Caller baseline inventory.** Implemented
+      `scripts/atlas/audit-rrf-caller-baseline-v1.mjs` and
+      `npm run atlas:rrf:caller-baseline` as a production-source-only,
+      read-only caller census. The 2026-09-09 run found `callerCount=93`,
+      `fusionCallerCount=36`, `unmappedCount=90`, and
+      `executorAsLaneCount=2`; no baseline replays were claimed and
+      `migrationAuthorized=false`. Report:
+      `docs/reports/rrf-caller-baseline-v1.json`. This is evidence of the
+      remaining mapping/replay gap, not authorization to consolidate.
+- [x] **RWC-CENSUS-02B — Logical-lane alias map.** Implemented the read-only
+      `npm run atlas:rrf:alias-map` audit against the existing alias, contract,
+      and SearchRuntime vocabularies. The 2026-09-09 run found 15 raw lane
+      names mapped to 8 logical lanes, with 0 unmapped names and 2
+      executor-as-lane classifications (`postgres_trigram`, `turbovec`).
+      One vote per logical lane is retained, but caller replay is still
+      required; report: `docs/reports/rrf-logical-lane-alias-map-v1.json`.
+- [x] **RWC-CENSUS-03 — Bounded caller replay.** Replayed a deterministic
+      three-candidate fixture through the existing legacy compatibility owner
+      (`rrf-fuse.ts`) and `SearchRuntime`. Rank order matched, but the result
+      remains `FIXTURE_PROVEN` only: weighted arithmetic, live caller parity,
+      and identity-envelope parity were not claimed. Report:
+      `docs/reports/rrf-bounded-caller-replay-v1.json`. No runtime fusion or
+      ranking behavior changed.
+      The replay was extended on 2026-09-09 with a weighted `0.75/0.25`
+      compatibility fixture; `FusionCoreV1` matched `rrf-fuse.ts` arithmetic
+      to `1e-12`. This remains fixture evidence only and does not establish
+      live caller or identity-envelope parity.
+- [x] **RWC-CENSUS-04 — Real caller identity-envelope audit.** Queried 20
+      live points from Qdrant `codebase_chunks_768` read-only. Qdrant was
+      reachable, but `0/20` points carried the complete required envelope
+      (`packet_key`, `source_ref`, `source_revision`, `workspace_revision`,
+      `representation_id`, `representation_revision`). Status remains
+      `IDENTITY_ENVELOPE_PARTIAL`; `workspaceRevision` stays `null` and no
+      fallback identity is admitted. Report:
+      `docs/reports/rrf-real-caller-identity-envelope-v1.json`.
+- [x] **RWC-CENSUS-03A — Existing RF7-09 live replay cross-check.** Ran the
+      repository's real-Qdrant bounded replay together with the RF7 contract
+      parity suite: `11/11` tests passed. This proves the existing
+      `rrf-fuse.ts` and `FusionCoreV1` arithmetic for the covered real-data
+      unweighted/no-tie cases only. It does not prove weighted-policy parity,
+      tie-break parity, or authorize runtime consolidation.
+- [x] Implemented `scripts/atlas/audit-rrf-lane-weight-census-v1.mjs` and
+      `npm run atlas:rrf:lane-weight:census` as a static, read-only census.
+      It records source/line, numeric entries when locally parseable, semantic
+      class, application stage, policy scope, and executor-as-lane conflicts.
+      It never changes ranking or fusion behavior and always leaves
+      `migrationAuthorized=false` pending caller replay evidence.
+      Evidence from the 2026-09-09 run: `sourceCount=69`,
+      `rawLaneNameCount=3`, `canonicalLaneCount=59`, `unclassifiedCount=6`,
+      `executorAsLaneCount=1`, `semanticConflictCount=7`, status
+      `CENSUS_COMPLETE_MIGRATION_BLOCKED`; report:
+      `docs/reports/rrf-lane-weight-census-v1.json`. The next gate is
+      `RWC-CENSUS-02_CALLER_BASELINE_AND_EXPLICIT_LANE_MAPPING`.
+- [x] Re-ran `npm run atlas:rrf:lane-weight:census` after the design review.
+      Current result remains `CENSUS_COMPLETE_MIGRATION_BLOCKED`: `sourceCount=69`,
+      `unclassifiedCount=6`, and `executorAsLaneCount=1`. This confirms the
+      census artifact is the correct next read-only gate; it does not authorize
+      ranking changes or runtime consolidation.
+- [x] Re-ran `npm run atlas:rrf:caller-baseline` as the next read-only gate.
+      The current inventory contains `93` callers, `36` fusion callers,
+      `90` unmapped callers, and `2` executor-as-lane findings. No runtime
+      migration was attempted; `migrationAuthorized=false` remains required.
+- [x] Re-ran `npm run atlas:rrf:alias-map`. The current alias census maps
+      `15` raw names to `8` logical lanes with `0` unmapped names, but retains
+      `2` executor-as-lane findings. Status remains
+      `ALIAS_MAP_PARTIAL_MIGRATION_BLOCKED`; aliases do not authorize runtime
+      consolidation or create additional RRF votes.
 - [ ] Re-evaluate whether `service.ts`'s `SearchLaneRegistry` and `unified-orchestrator.ts`'s
       inline lane calls should eventually route through `retrieve-candidates.ts`'s lane set
       instead of maintaining 3 independent lane-execution mechanisms — explicitly not decided

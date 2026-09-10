@@ -1,0 +1,25 @@
+{
+  "schema": "atlas.temporal-bootstrap-plan.v1",
+  "generatedAt": "2026-09-09T20:39:08.927Z",
+  "mode": "READ_ONLY",
+  "authority": false,
+  "writesPerformed": false,
+  "eventAppendAuthorized": false,
+  "status": "BASELINE_PLAN_READY_NOT_ADMITTED",
+  "plan": {
+    "eventType": "BASELINE_OBSERVED",
+    "observationCount": 61718,
+    "logicalArtifactCount": 61718,
+    "versionArtifactCount": 61718,
+    "historicalCreationClaims": 0,
+    "supersessionClaims": 0,
+    "appendableEventCount": 0,
+    "requiresSecondOrderedSnapshot": true,
+    "workspaceRevision": null,
+    "canonicalAuthority": false
+  },
+  "evidence": {
+    "identity": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\temporal-logical-identity-v1.json",
+    "candidates": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\temporal-event-candidates-v1.json"
+  }
+}

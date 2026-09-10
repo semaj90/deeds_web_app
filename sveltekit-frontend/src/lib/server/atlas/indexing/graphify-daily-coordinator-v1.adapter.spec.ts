@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   adaptWorkspaceBindingsToSourceSelectionV1,
+  recordRepositoryQualifiedSourceMembershipV2,
   recordInventoryStage,
   recordStructuralStage,
   recordDownstreamStage,
@@ -32,6 +33,28 @@ function binding(sourceRef: string, sourceRevision = content) {
 }
 
 describe('adaptWorkspaceBindingsToSourceSelectionV1', () => {
+  it('writes repository-qualified membership through the v2 owner only', async () => {
+    const queries: string[] = [];
+    const client = { query: async (text: string) => { queries.push(text); return { rowCount: 1, rows: [] }; } };
+    const receipt = await recordRepositoryQualifiedSourceMembershipV2(
+      client,
+      '00000000-0000-4000-8000-000000000001',
+      revision,
+      [{
+        repositoryId: 'repo:turbovec',
+        repositoryRelativePath: 'src/index.ts',
+        sourceRef: 'src/index.ts',
+        codeSourceRevision: content,
+        contentHash: content.slice('sha256:'.length),
+        byteLength: 12,
+      }],
+    );
+    expect(receipt.sourceCount).toBe(1);
+    expect(queries).toHaveLength(1);
+    expect(queries[0]).toContain('graphify_execution_file_membership_v2');
+    expect(queries[0]).not.toContain('graphify_execution_files');
+  });
+
   it('maps exact workspace bindings without adding legacy identity', () => {
     expect(adaptWorkspaceBindingsToSourceSelectionV1(revision, [binding('src/a.ts')])).toEqual([
       {

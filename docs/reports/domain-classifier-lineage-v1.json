@@ -1,6 +1,6 @@
 {
   "schema": "atlas.domain-classifier-lineage.v1",
-  "generatedAt": "2026-09-07T21:13:02.005Z",
+  "generatedAt": "2026-09-09T22:56:22.430Z",
   "readOnly": true,
   "postgresWrites": false,
   "tupleWrites": false,

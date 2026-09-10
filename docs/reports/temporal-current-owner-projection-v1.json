@@ -1,0 +1,21 @@
+{
+  "schema": "atlas.temporal-current-owner-projection.v1",
+  "generatedAt": "2026-09-09T21:29:21.131Z",
+  "mode": "READ_ONLY",
+  "workspaceRevisionPolicy": "NULL_ALLOWED_UNTIL_SNAPSHOT_TOURNAMENT_ADMISSION",
+  "writesPerformed": false,
+  "sourceTable": "public.semantic_lifecycle_events",
+  "rows": [],
+  "summary": {
+    "eventCount": 0,
+    "entityCount": 0,
+    "activeCount": 0,
+    "supersededOrTerminalCount": 0,
+    "ambiguousActiveCount": 0,
+    "revisionBoundCount": 0,
+    "revisionUnboundCount": 0,
+    "nullWorkspaceRevisionAccepted": true
+  },
+  "status": "CURRENT_OWNER_NOT_PROVEN_NO_EVENTS",
+  "promotionAllowed": false
+}

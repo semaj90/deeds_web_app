@@ -1,0 +1,35 @@
+{
+  "schema": "atlas.graphify-tournament-admission.v1",
+  "generatedAt": "2026-09-10T00:46:17.364Z",
+  "mode": "READ_ONLY",
+  "status": "TOURNAMENT_ADMISSION_BOUNDARY_PROVEN",
+  "proofLevel": "CONTRACT_PROVEN",
+  "authority": false,
+  "workspaceRevision": null,
+  "workspaceRevisionCandidate": "sha256:b2b20ca198eb78bc14a98c5a401f2a4cda9ff090a5012492c0958adceee3c572",
+  "writesPerformed": false,
+  "datastoreWritesPerformed": false,
+  "sourceSelectionPlan": {
+    "path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\graphify-source-selection-plan-v1.json",
+    "status": "SOURCE_SELECTION_PLAN_READY_NOT_ADMITTED",
+    "snapshotRevision": "sha256:b2b20ca198eb78bc14a98c5a401f2a4cda9ff090a5012492c0958adceee3c572",
+    "sourceCount": 25265,
+    "sourceSelectionChecksum": "sha256:0625cffcba791e7c5180a67c3d6e0babe2d049d0e7489a270356fdd83b51ddda"
+  },
+  "tournamentContract": {
+    "tournamentOwner": "sveltekit-frontend/src/lib/server/agent/patch-tournament.ts",
+    "requiredRequestField": "workspaceRevision",
+    "requiredRequestType": "non-null string",
+    "autoApply": false,
+    "training": false
+  },
+  "compatibility": {
+    "planRevisionNull": true,
+    "tournamentCanAcceptPlan": false,
+    "reason": "Existing tournament request schema requires a non-null workspaceRevision; null is preserved until source-authority admission."
+  },
+  "blockers": [],
+  "firstBlockingInvariant": "TOURNAMENT_REQUIRES_BOUND_WORKSPACE_REVISION",
+  "nextGate": "WORKSPACE-REVISION-TOURNAMENT-SOURCE-AUTHORITY-01",
+  "safeNextCommand": "npm run atlas:graphify:source-selection:plan"
+}

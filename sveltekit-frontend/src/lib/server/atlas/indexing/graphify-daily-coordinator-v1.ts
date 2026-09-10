@@ -164,6 +164,82 @@ export const sourceSelectionBindingV1Schema = z.object({
 }).strict();
 export type SourceSelectionBindingV1 = z.infer<typeof sourceSelectionBindingV1Schema>;
 
+export const repositoryQualifiedSourceSelectionBindingV1Schema = z.object({
+  repositoryId: z.string().min(1),
+  repositoryRelativePath: z.string().min(1),
+  sourceRef: z.string().min(1),
+  codeSourceRevision: contentRevision,
+  contentHash: z.string().regex(/^(sha256:)?[a-f0-9]{64}$/),
+  byteLength: z.number().int().nonnegative(),
+}).strict();
+export type RepositoryQualifiedSourceSelectionBindingV1 = z.infer<
+  typeof repositoryQualifiedSourceSelectionBindingV1Schema
+>;
+
+/**
+ * Writes only the repository-qualified v2 membership owner. This is deliberately
+ * separate from recordSourceSelectionStage so legacy execution evidence remains
+ * untouched and callers must opt into the new namespace contract explicitly.
+ */
+export async function recordRepositoryQualifiedSourceMembershipV2(
+  client: GraphifyCoordinatorSqlClientV1,
+  executionId: string,
+  workspaceRevision: string,
+  bindings: readonly RepositoryQualifiedSourceSelectionBindingV1[],
+): Promise<{ sourceCount: number; sourceIdentityChecksum: string }> {
+  uuid.parse(executionId);
+  contentRevision.parse(workspaceRevision);
+  const parsedBindings = bindings.map((binding) => repositoryQualifiedSourceSelectionBindingV1Schema.parse(binding));
+  if (parsedBindings.length === 0) {
+    throw new Error('GRAPHIFY_COORDINATOR_V2_SOURCE_MEMBERSHIP_REQUIRES_AT_LEAST_ONE_BINDING');
+  }
+  const identities = new Set<string>();
+  for (const binding of parsedBindings) {
+    const identity = `${binding.repositoryId}:${binding.repositoryRelativePath}`;
+    if (identities.has(identity)) {
+      throw new Error(`GRAPHIFY_COORDINATOR_V2_DUPLICATE_SOURCE_IDENTITY:${identity}`);
+    }
+    identities.add(identity);
+    await client.query(
+      `INSERT INTO public.graphify_execution_file_membership_v2
+         (execution_id, repository_id, repository_relative_path, source_ref,
+          workspace_revision, code_source_revision, content_hash, byte_length)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+      [executionId, binding.repositoryId, binding.repositoryRelativePath, binding.sourceRef,
+        workspaceRevision, binding.codeSourceRevision, binding.contentHash, binding.byteLength],
+    );
+  }
+  return {
+    sourceCount: parsedBindings.length,
+    sourceIdentityChecksum: await computeSourceRefSetChecksum([...identities]),
+  };
+}
+
+/** Records SOURCE_SELECTION while using only the repository-qualified v2 owner. */
+export async function recordRepositoryQualifiedSourceSelectionStageV2(
+  client: GraphifyCoordinatorSqlClientV1,
+  executionId: string,
+  workspaceRevision: string,
+  bindings: readonly RepositoryQualifiedSourceSelectionBindingV1[],
+  options?: { selectionPolicyRevision?: string },
+): Promise<{ sourceCount: number; outputChecksum: string; selectionPolicyRevision: string | null }> {
+  const parsedPolicy = selectionPolicyRevisionSchema.parse(options?.selectionPolicyRevision) ?? null;
+  await client.query(
+    `INSERT INTO public.graphify_execution_stages (execution_id, stage, status, started_at)
+     VALUES ($1, 'SOURCE_SELECTION', 'RUNNING', now())`,
+    [executionId],
+  );
+  const membership = await recordRepositoryQualifiedSourceMembershipV2(client, executionId, workspaceRevision, bindings);
+  const outputChecksum = membership.sourceIdentityChecksum;
+  await client.query(
+    `UPDATE public.graphify_execution_stages
+        SET status = 'COMPLETED', completed_at = now(), output_checksum = $3, receipt_ref = $4
+      WHERE execution_id = $1 AND stage = $2 AND status = 'RUNNING'`,
+    [executionId, 'SOURCE_SELECTION', outputChecksum, parsedPolicy],
+  );
+  return { sourceCount: membership.sourceCount, outputChecksum, selectionPolicyRevision: parsedPolicy };
+}
+
 /**
  * Adapts the authoritative workspace-source binding into the execution-ledger input shape.
  * This is intentionally pure: it does not scan, hash, select, or write. Workspace identity is
@@ -182,10 +258,11 @@ export function adaptWorkspaceBindingsToSourceSelectionV1(
     if (binding.workspaceRevision !== parsedWorkspaceRevision) {
       throw new Error(`GRAPHIFY_COORDINATOR_ADAPTER_WORKSPACE_REVISION_MISMATCH:${binding.sourceRef}`);
     }
-    if (sourceRefs.has(binding.sourceRef)) {
-      throw new Error(`GRAPHIFY_COORDINATOR_ADAPTER_DUPLICATE_SOURCE_REF:${binding.sourceRef}`);
+    const sourceIdentityKey = binding.sourceRef;
+    if (sourceRefs.has(sourceIdentityKey)) {
+      throw new Error(`GRAPHIFY_COORDINATOR_ADAPTER_DUPLICATE_SOURCE_REF:${sourceIdentityKey}`);
     }
-    sourceRefs.add(binding.sourceRef);
+    sourceRefs.add(sourceIdentityKey);
     return sourceSelectionBindingV1Schema.parse({
       sourceRef: binding.sourceRef,
       codeSourceRevision: binding.sourceRevision,

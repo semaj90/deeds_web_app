@@ -9,18 +9,24 @@ import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const REPORT = resolve(ROOT, 'docs/reports/current-graphify-run-owner-v1.json');
-const LIFECYCLE_REPORT = resolve(ROOT, 'docs/reports/graphify-lifecycle-entrypoint-v1.json');
+const ADMISSION = resolve(ROOT, 'docs/reports/workspace-revision-tournament-admission-v1.json');
 let workspaceRevision = process.env.ATLAS_EXPECTED_GRAPHIFY_WORKSPACE_REVISION?.trim() || null;
 let workspaceRevisionSource = workspaceRevision ? 'ATLAS_EXPECTED_GRAPHIFY_WORKSPACE_REVISION' : null;
 if (!workspaceRevision) {
   try {
-    const lifecycleReport = JSON.parse(readFileSync(LIFECYCLE_REPORT, 'utf8'));
-    workspaceRevision = typeof lifecycleReport.workspaceRevision === 'string' ? lifecycleReport.workspaceRevision.trim() : null;
-    if (workspaceRevision) workspaceRevisionSource = 'docs/reports/graphify-lifecycle-entrypoint-v1.json';
+    const admission = JSON.parse(readFileSync(ADMISSION, 'utf8'));
+    if (admission.status === 'WORKSPACE_REVISION_TOURNAMENT_ADMITTED'
+      && admission.authority === true
+      && typeof admission.workspaceRevision === 'string') {
+      workspaceRevision = admission.workspaceRevision;
+      workspaceRevisionSource = 'WORKSPACE_REVISION_TOURNAMENT_ADMISSION_RECEIPT';
+    }
   } catch {
-    workspaceRevision = null;
+    // Missing or malformed admission remains a fail-closed null input.
   }
 }
+// Do not infer current authority from a historical lifecycle artifact. A
+// revision becomes eligible here only through an explicit, approved input.
 const pool = new pg.Pool({ connectionString: resolveDatabaseUrl(loadRepoEnv(process.env)), max: 1, statement_timeout: 120000 });
 let databaseError = null;
 let runs = [];

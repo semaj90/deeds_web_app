@@ -1,0 +1,24 @@
+{
+  "schema": "atlas.patch-tournament-replay.v1",
+  "generatedAt": "2026-09-09T23:37:27.213Z",
+  "mode": "READ_ONLY_FIXTURE_REPLAY",
+  "status": "TOURNAMENT_REPLAY_PROVEN_FIXTURE_ONLY",
+  "proofLevel": "FIXTURE_PROVEN",
+  "authority": false,
+  "workspaceRevision": null,
+  "fixtureWorkspaceRevision": "fixture-only-unbound-workspace-revision",
+  "writesPerformed": false,
+  "autoApply": false,
+  "training": false,
+  "candidateCount": 3,
+  "firstChecksum": "sha256:3250dadfdcbe11c85f5d3c26c8afb3bc51a61d9e2dc54b86ecfef2f10526c22e",
+  "secondChecksum": "sha256:3250dadfdcbe11c85f5d3c26c8afb3bc51a61d9e2dc54b86ecfef2f10526c22e",
+  "rankedCandidateIds": [
+    "candidate-a",
+    "candidate-b",
+    "candidate-c"
+  ],
+  "acePacketSchema": "atlas.ace.patch-tournament.v1",
+  "nextGate": "TOUR9_INTEGRATION_VALIDATION",
+  "safeNextCommand": "npm run atlas:tournament:replay"
+}

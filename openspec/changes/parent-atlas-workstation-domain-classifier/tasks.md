@@ -170,6 +170,20 @@ This change remains exactly what its own "Next session — pick up here" table s
 first real end-to-end proof run (tree-sitter → embedding → Qdrant → Redis, LLM summary as a second
 pass) before any live-wiring decision is worth making.
 
+## Read-only lineage recheck (2026-09-09)
+
+- [x] Ran `scripts/atlas/audit-domain-classifier-lineage-v1.mjs` against the
+  live PostgreSQL surfaces in a read-only transaction.
+- [x] Current result is `CLASSIFIER_LINEAGE_BLOCKED`: `classifier_rows=3,352`,
+  `source_ref_present=3,351`, `source_revision_available=148`,
+  `workspace_revision_available=3,352`, `source_namespace_available=0`,
+  `revision_qualified_join=148`, and `missing_graphify_join=3,204`.
+- [ ] Do not promote classifier/domain labels or wire them as canonical ontology
+  identity. Resolve the Graphify source namespace and current source/revision
+  join first; `workspace_revision` availability alone is not sufficient.
+
+Evidence: `docs/reports/domain-classifier-lineage-v1.json`.
+
 ## Reference
 
 See `proposal.md` for the full source-copy rationale, the 3 upgrades, and the namespace-separation

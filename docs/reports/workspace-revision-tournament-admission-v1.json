@@ -1,0 +1,24 @@
+{
+  "schema": "atlas.workspace-revision-tournament-admission.v1",
+  "generatedAt": "2026-09-10T01:07:10.094Z",
+  "mode": "EXPLICIT_BOUNDED_ADMISSION_RECEIPT",
+  "status": "WORKSPACE_REVISION_TOURNAMENT_ADMITTED",
+  "proofLevel": "BOUNDED_LIVE_PROVEN",
+  "authority": true,
+  "workspaceRevision": "sha256:6860119e757a1b84fd6109f7ab198435b7f31b2fe71352b4d6d98812632045e6",
+  "snapshotRevision": "sha256:6860119e757a1b84fd6109f7ab198435b7f31b2fe71352b4d6d98812632045e6",
+  "sourceCount": 25266,
+  "sourceSelectionChecksum": "sha256:a58be57ece623e8b3b47d96282eb1e437aec92a0ebe865e83996dccc3b8df32d",
+  "approval": {
+    "confirmation": "AUTHORIZE_WORKSPACE_REVISION_TOURNAMENT_ADMISSION_V1",
+    "scope": "TOURNAMENT_SOURCE_AUTHORITY_ONLY"
+  },
+  "graphifyExecutionAuthorized": false,
+  "projectionWritesAuthorized": false,
+  "autoApply": false,
+  "training": false,
+  "writesPerformed": false,
+  "datastoreWritesPerformed": false,
+  "preflightPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\workspace-revision-tournament-source-authority-v1.json",
+  "nextGate": "GRAPHIFY-BOUNDED-TOURNAMENT-CANARY-01"
+}

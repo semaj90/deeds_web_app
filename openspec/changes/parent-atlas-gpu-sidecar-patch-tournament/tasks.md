@@ -238,9 +238,31 @@ Neo4j PageRank is candidate evidence. No executor may add a second RRF vote.
 ## Part C — Patch Tournament (Phase 1: deterministic tournament only) — GS1.41 SEAM ACCEPTED
 
 - [x] `PatchTournament` / `PatchCandidate` / `CandidateValidationResult` schemas, one Postgres-backed tournament repository, exactly 3 candidates for one real compile error, 3 isolated Git worktrees with exact revision guards, static validation in parallel, focused tests on survivors, deterministic ranking, one `TournamentAcePacket`, top-3 Kanban card, manual approval gate, no auto-apply, no training — **all done, GS1.41's deliberately narrow first slice**.
-- [ ] Before expanding past this seam: search the repo for existing `PatchTournament`/`PatchCandidate`/candidate-repository/`git worktree`/isolated-workspace/recommendation-ranking/ACE-comparison/Kanban-recommendation owners to avoid parallel schemas.
+- [x] Before expanding past this seam: searched the repository for existing `PatchTournament`/`PatchCandidate`/candidate-repository/`git worktree`/isolated-workspace/recommendation-ranking/ACE-comparison/Kanban-recommendation owners. The canonical patch-tournament owner remains `sveltekit-frontend/src/lib/server/agent/patch-tournament.ts`; retrieval/DAG tournament utilities are separate concerns, so no parallel patch-tournament schema was added. Verified with focused tests and owner validation on 2026-09-09.
+- [x] Added a bounded read-only TOUR10 replay harness (`scripts/atlas/run-patch-tournament-replay-v1.mts`). It runs the existing three-candidate planner twice, compares canonical ACE/ranking output while excluding per-run UUIDs, and records `workspaceRevision=null`, `authority=false`, `autoApply=false`, and `training=false`.
+- [x] Replay result: `npm run atlas:tournament:replay` returned
+  `TOURNAMENT_REPLAY_PROVEN_FIXTURE_ONLY`, equal replay checksums, and exactly
+  3 candidates. This is fixture proof only; TOUR9 live integration and source
+  authority admission remain open.
 - [ ] Do not begin QLoRA/reranker training, multi-error campaigns, or auto-apply until explicitly requested.
 - [ ] Latest repository-facing status update (do not treat as a new proof): `PATCH_TOURNAMENT_SPEC: RECEIVED_NOT_STARTED`, `PATCH_TOURNAMENT_BOUNDED_SEAM: QUEUED`, `GRAPHIFY_RECOVERY_PROOF_LADDER: PASS`, `GRAPH_SNAPSHOT_FRESH: PASS`, `GRAPHIFY_DAILY_COMPLETED: NOT_PROVEN`, `DEEP_AUDIT: NOT_PROVEN`.
+
+### Tournament admission recheck (2026-09-09)
+
+- [x] Focused patch-tournament contract tests passed `3/3`.
+- [x] The existing read-only replay passed twice with `candidateCount=3`,
+  equal replay output, `authority=false`, `workspaceRevision=null`,
+  `autoApply=false`, and `training=false`.
+- [ ] Live source-authority admission remains open. Do not convert this fixture
+  proof into Graphify authority, automatic patch application, or training
+  eligibility.
+
+Evidence: `docs/reports/patch-tournament-replay-v1.json`.
+
+Fresh replay recheck: `npm run atlas:tournament:replay` returned
+`TOURNAMENT_REPLAY_PROVEN_FIXTURE_ONLY` with three candidates and equal replay
+output. It remains fixture-only: `workspaceRevision: null`, `authority: false`,
+`autoApply: false`, and `training: false`.
 
 ### Proof gates (Part C)
 

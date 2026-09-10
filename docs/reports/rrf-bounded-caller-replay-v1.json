@@ -1,0 +1,63 @@
+{
+  "schema": "atlas.rrf-bounded-caller-replay.v1",
+  "generatedAt": "2026-09-09T21:55:55.249Z",
+  "mode": "READ_ONLY",
+  "status": "CALLER_REPLAY_ORDER_MATCH_PARTIAL",
+  "proofLevel": "FIXTURE_PROVEN",
+  "authority": false,
+  "migrationAuthorized": false,
+  "writesPerformed": false,
+  "workspaceRevision": null,
+  "callers": [
+    {
+      "caller": "rrf-fuse.ts::reciprocalRankFusion",
+      "owner": "LEGACY_COMPATIBILITY",
+      "weightPolicy": "explicit unit weights",
+      "outputChecksum": "sha256:e66c6af0034435ad28cd2c96d805c8eca5fdc71576f94100c0a041be217b0fed",
+      "order": [
+        "packet-a",
+        "packet-b",
+        "packet-c"
+      ]
+    },
+    {
+      "caller": "search-runtime.ts::fuseSearchRuntimeCandidates",
+      "owner": "SearchRuntime",
+      "weightPolicy": "canonical unweighted RRF",
+      "outputChecksum": "sha256:e66c6af0034435ad28cd2c96d805c8eca5fdc71576f94100c0a041be217b0fed",
+      "order": [
+        "packet-a",
+        "packet-b",
+        "packet-c"
+      ]
+    }
+  ],
+  "fixture": {
+    "candidateCount": 3,
+    "logicalLanes": [
+      "dense",
+      "bm42"
+    ],
+    "executors": [
+      "qdrant",
+      "cuvs",
+      "postgres"
+    ],
+    "k": 60
+  },
+  "parity": {
+    "rankOrderEqual": true,
+    "weightedArithmeticEqual": true,
+    "legacyTop": "packet-a",
+    "runtimeTop": "packet-a",
+    "arithmeticComparable": true,
+    "identityEnvelopeComparable": false
+  },
+  "blockers": [
+    "FIXTURE_ONLY_NOT_LIVE",
+    "IDENTITY_ENVELOPE_PARITY_NOT_PROVEN",
+    "RUNTIME_CONSOLIDATION_NOT_AUTHORIZED"
+  ],
+  "nextGate": "RWC-CENSUS-04_REAL_CALLER_BASELINE_REPLAY",
+  "safeNextCommand": "npm run atlas:rrf:caller-replay"
+}

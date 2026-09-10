@@ -1,11 +1,11 @@
 {
   "schema": "phase17_21_workstation_audit.v1",
-  "generated_at": "2026-06-23T19:37:33.824Z",
+  "generated_at": "2026-09-09T19:47:41.599Z",
   "overall": "PARTIAL",
   "completion_pct": 67,
   "canonical_truth": "Postgres",
   "summary_lane": {
-    "status": "READY",
+    "status": "MIGRATION_PENDING",
     "batch_size": 500,
     "concurrency": 1,
     "chat_backend": "llama-server",
@@ -14,39 +14,28 @@
     "dry_command": "npm run atlas:summaries:gemma4:500:dry",
     "apply_command": "npm run atlas:summaries:gemma4:500:apply",
     "schema": {
-      "status": "READY",
-      "columns": [
+      "status": "MIGRATION_PENDING",
+      "columns": [],
+      "missing": [
         "summary",
-        "summary_backend",
-        "summary_generated_at",
         "summary_hash",
-        "summary_metadata",
         "summary_model",
-        "summary_version"
-      ],
-      "missing": []
+        "summary_backend",
+        "summary_version",
+        "summary_generated_at",
+        "summary_metadata"
+      ]
     },
     "coverage": {
-      "status": "READY",
-      "total": 5395,
-      "populated": 5395,
-      "missing": 0,
-      "coverage_pct": 100,
-      "provenance": {
-        "summary_hash": 5395,
-        "summary_model": 5395,
-        "summary_backend": 5395,
-        "summary_version": 5395,
-        "summary_generated_at": 5395
-      },
-      "channel_marker_rows": 0
+      "status": "DEGRADED",
+      "error": "ERROR:  column \"summary\" does not exist\nLINE 4:       COUNT(*) FILTER (WHERE summary IS NOT NULL AND btrim(s...\n                                     ^"
     }
   },
   "ndjson_contract": {
     "schema": "AddressablePacketSchema",
     "validator": "scripts/atlas/validate-addressable-packets.mjs",
     "validation": {
-      "generated_at": "2026-06-18T22:00:45.754Z",
+      "generated_at": "2026-08-09T00:00:00.000Z",
       "total_checked": 3251,
       "total_valid": 3251,
       "total_invalid": 0,
@@ -119,8 +108,8 @@
       "raw": {
         "path": ".tmp/addressable-packets.ndjson",
         "exists": true,
-        "bytes": 7424807,
-        "modified_at": "2026-06-21T05:24:55.514Z"
+        "bytes": 131229249,
+        "modified_at": "2026-09-08T05:28:58.152Z"
       },
       "validated": {
         "path": ".tmp/addressable-packets.validated.ndjson",
@@ -171,10 +160,10 @@
       "output": {
         "path": ".tmp/atlas-retrieval-loop.jsonl",
         "exists": true,
-        "bytes": 168878,
-        "modified_at": "2026-06-06T02:01:25.716Z"
+        "bytes": 171037,
+        "modified_at": "2026-09-08T21:30:52.403Z"
       },
-      "rows": 439
+      "rows": 443
     },
     "topology": {
       "ae_weights": {
@@ -198,8 +187,8 @@
       "som_20x20": {
         "path": "models/som/som_20x20_codebook.json",
         "exists": true,
-        "bytes": 797876,
-        "modified_at": "2026-06-19T19:28:51.952Z"
+        "bytes": 793877,
+        "modified_at": "2026-07-28T23:55:37.851Z"
       }
     }
   },
@@ -246,7 +235,7 @@
       "status": "OPERATIONAL",
       "completion_pct": 90,
       "have": [
-        "Append-only retrieval loop contains 439 rows.",
+        "Append-only retrieval loop contains 443 rows.",
         "Neo4j, Qdrant, and Valkey mirrors have dedicated operational lanes."
       ],
       "need": [
@@ -300,9 +289,9 @@
     }
   ],
   "aliases": {
-    "phase17": "node scripts/atlas/phase17-pytorch-feature-extractor.mjs --input ../memory/knowledge/schema-indexer-contract-cards.jsonl --out .tmp/phase17-pytorch-features.jsonl --report reports/phase17-pytorch-feature-summary.md",
-    "phase18": "node scripts/atlas/phase18-xgboost-reranker.mjs --input .tmp/phase17-pytorch-features.jsonl --out .tmp/phase18-xgboost-rerank.jsonl --report reports/phase18-xgboost-rerank-summary.md",
-    "phase19": "node scripts/atlas/phase19-retrieval-loop-seed.mjs",
+    "phase17": null,
+    "phase18": null,
+    "phase19": null,
     "summary500Dry": "node ../scripts/atlas/gemma4-parent-atlas-summaries.mjs --cache --limit=500 --concurrency=1",
     "summary500Apply": "node ../scripts/atlas/gemma4-parent-atlas-summaries.mjs --cache --apply --limit=500 --concurrency=1"
   }

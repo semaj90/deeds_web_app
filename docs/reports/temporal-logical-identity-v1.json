@@ -1,0 +1,22 @@
+{
+  "schema": "atlas.temporal-logical-identity.v1",
+  "generatedAt": "2026-09-09T21:02:51.480Z",
+  "mode": "READ_ONLY",
+  "authority": false,
+  "writesPerformed": false,
+  "status": "SINGLE_FRAME_NO_SUPERSESSION_POSSIBLE",
+  "observations": 61718,
+  "logicalArtifactCount": 61718,
+  "versionArtifactCount": 61718,
+  "logicalIdsWithMultipleVersions": 0,
+  "logicalIdsWithOneVersion": 61718,
+  "logicalIdentityIncludesRevisionMaterial": false,
+  "historyFramesObserved": 1,
+  "supersessionClaims": 0,
+  "databaseError": null,
+  "versionIdsWithMultipleLogicalIds": 0,
+  "distinctSourceRevisionCount": 0,
+  "distinctWorkspaceRevisionCount": 1,
+  "note": "packet_key is used as the proposed logical identity; source/workspace revisions are version coordinates and no historical creation or replacement is inferred from this frame.",
+  "identityChecksum": "d31b1613b9b6cd9f269caf161304c65871fb6c4610ec8d2c56e9c44799690cb0"
+}

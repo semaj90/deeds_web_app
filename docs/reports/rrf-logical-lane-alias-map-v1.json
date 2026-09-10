@@ -1,0 +1,183 @@
+{
+  "schema": "atlas.rrf-logical-lane-alias-map.v1",
+  "generatedAt": "2026-09-09T22:40:39.833Z",
+  "mode": "READ_ONLY",
+  "status": "ALIAS_MAP_PARTIAL_MIGRATION_BLOCKED",
+  "authority": false,
+  "migrationAuthorized": false,
+  "writesPerformed": false,
+  "workspaceRevision": null,
+  "sourceFiles": [
+    "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/retrieval/retrieval-lane-aliases.ts",
+    "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/retrieval/rrf-contract.ts",
+    "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts"
+  ],
+  "mappings": [
+    {
+      "rawLaneName": "ast",
+      "logicalLaneId": "ast",
+      "classification": "LOGICAL_LANE"
+    },
+    {
+      "rawLaneName": "authority",
+      "logicalLaneId": "other",
+      "classification": "DIAGNOSTIC_ONLY"
+    },
+    {
+      "rawLaneName": "bm25",
+      "logicalLaneId": "lexical",
+      "classification": "LEGACY_ALIAS"
+    },
+    {
+      "rawLaneName": "bm42",
+      "logicalLaneId": "bm42",
+      "classification": "LOGICAL_LANE"
+    },
+    {
+      "rawLaneName": "dense",
+      "logicalLaneId": "dense",
+      "classification": "LOGICAL_LANE"
+    },
+    {
+      "rawLaneName": "dense_384",
+      "logicalLaneId": "dense",
+      "classification": "LEGACY_ALIAS"
+    },
+    {
+      "rawLaneName": "dense_768",
+      "logicalLaneId": "dense",
+      "classification": "LOGICAL_LANE"
+    },
+    {
+      "rawLaneName": "dispatcher",
+      "logicalLaneId": "other",
+      "classification": "DIAGNOSTIC_ONLY"
+    },
+    {
+      "rawLaneName": "exact",
+      "logicalLaneId": "exact",
+      "classification": "LOGICAL_LANE"
+    },
+    {
+      "rawLaneName": "lexical",
+      "logicalLaneId": "lexical",
+      "classification": "LOGICAL_LANE"
+    },
+    {
+      "rawLaneName": "postgres_trigram",
+      "logicalLaneId": "lexical",
+      "classification": "EXECUTOR_NAME_NOT_LANE"
+    },
+    {
+      "rawLaneName": "rg",
+      "logicalLaneId": "rg",
+      "classification": "LOGICAL_LANE"
+    },
+    {
+      "rawLaneName": "schema",
+      "logicalLaneId": "schema",
+      "classification": "LOGICAL_LANE"
+    },
+    {
+      "rawLaneName": "topology",
+      "logicalLaneId": "other",
+      "classification": "DIAGNOSTIC_ONLY"
+    },
+    {
+      "rawLaneName": "turbovec",
+      "logicalLaneId": "dense",
+      "classification": "EXECUTOR_NAME_NOT_LANE"
+    }
+  ],
+  "logicalLanes": [
+    {
+      "logicalLaneId": "ast",
+      "aliases": [
+        "ast"
+      ],
+      "voteCount": 1
+    },
+    {
+      "logicalLaneId": "bm42",
+      "aliases": [
+        "bm42"
+      ],
+      "voteCount": 1
+    },
+    {
+      "logicalLaneId": "dense",
+      "aliases": [
+        "dense",
+        "dense_384",
+        "dense_768",
+        "turbovec"
+      ],
+      "voteCount": 1
+    },
+    {
+      "logicalLaneId": "exact",
+      "aliases": [
+        "exact"
+      ],
+      "voteCount": 1
+    },
+    {
+      "logicalLaneId": "lexical",
+      "aliases": [
+        "bm25",
+        "lexical",
+        "postgres_trigram"
+      ],
+      "voteCount": 1
+    },
+    {
+      "logicalLaneId": "other",
+      "aliases": [
+        "authority",
+        "dispatcher",
+        "topology"
+      ],
+      "voteCount": 1
+    },
+    {
+      "logicalLaneId": "rg",
+      "aliases": [
+        "rg"
+      ],
+      "voteCount": 1
+    },
+    {
+      "logicalLaneId": "schema",
+      "aliases": [
+        "schema"
+      ],
+      "voteCount": 1
+    }
+  ],
+  "conflicts": [
+    {
+      "type": "EXECUTOR_AS_LANE",
+      "rawLaneName": "postgres_trigram",
+      "logicalLaneId": "lexical"
+    },
+    {
+      "type": "EXECUTOR_AS_LANE",
+      "rawLaneName": "turbovec",
+      "logicalLaneId": "dense"
+    }
+  ],
+  "metrics": {
+    "rawLaneCount": 15,
+    "logicalLaneCount": 8,
+    "unmappedCount": 0,
+    "executorAsLaneCount": 2,
+    "oneVotePerLogicalLane": true
+  },
+  "blockers": [
+    "EXECUTOR_AS_LANE_REQUIRES_CALLER_REVIEW",
+    "CALLER_BASELINE_REPLAY_REQUIRED",
+    "RUNTIME_CONSOLIDATION_NOT_AUTHORIZED"
+  ],
+  "nextGate": "RWC-CENSUS-03_BOUNDED_CALLER_REPLAY",
+  "safeNextCommand": "npm run atlas:rrf:caller-baseline"
+}

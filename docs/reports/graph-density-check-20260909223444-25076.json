@@ -1,0 +1,26 @@
+{
+  "generated_at": "2026-09-09T22:34:44.750Z",
+  "mode": "DRY_RUN",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "report_paths": {
+    "json": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\graph-density-check-20260909223444-25076.json",
+    "markdown": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\graph-density-check-20260909223444-25076.md"
+  },
+  "status": "PASS",
+  "neo4j": {
+    "uri": "bolt://127.0.0.1:7687"
+  },
+  "counts": {
+    "nodes": 621170,
+    "relationships": 448818,
+    "packets": 59692,
+    "features": 13290,
+    "chrom97_contexts": 1
+  },
+  "density": {
+    "directed_density": 0.00000116,
+    "avg_relationships_per_node": 0.7225
+  },
+  "error": null
+}

@@ -23,7 +23,7 @@ export interface ObservationFeatureMaterializationReceiptV1 {
 export async function materializeObservationFeatureProjectionV1(
   projectionInput: ObservationFeatureProjectionV1,
   options: {
-    workspaceRevision?: number | null;
+    workspaceRevision?: string | null;
     cluster?: ClusterFeatureProjectionV1 | null;
   } = {},
 ): Promise<ObservationFeatureMaterializationReceiptV1> {

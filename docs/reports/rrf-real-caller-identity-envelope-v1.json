@@ -1,0 +1,51 @@
+{
+  "schema": "atlas.rrf-real-caller-identity-envelope.v1",
+  "generatedAt": "2026-09-09T21:59:32.957Z",
+  "mode": "READ_ONLY",
+  "status": "IDENTITY_ENVELOPE_PARTIAL",
+  "proofLevel": "PARTIAL_PROVEN",
+  "authority": false,
+  "migrationAuthorized": false,
+  "writesPerformed": false,
+  "workspaceRevision": null,
+  "source": {
+    "qdrantUrl": "http://127.0.0.1:6333",
+    "collection": "codebase_chunks_768",
+    "sampleCount": 20,
+    "reachable": true,
+    "error": null
+  },
+  "requiredFields": [
+    "packet_key",
+    "source_ref",
+    "source_revision",
+    "workspace_revision",
+    "representation_id",
+    "representation_revision"
+  ],
+  "fieldCoverage": {
+    "packet_key": 20,
+    "source_ref": 20,
+    "source_revision": 0,
+    "workspace_revision": 0,
+    "representation_id": 20,
+    "representation_revision": 0
+  },
+  "completeEnvelopeCount": 0,
+  "missingEnvelopeCount": 20,
+  "canonicalPreconditions": {
+    "uniqueCanonicalFusionOwner": true,
+    "oneLogicalSemanticLane": true,
+    "workspaceRevisionAdmitted": false,
+    "sourceRevisionCoverage": 0,
+    "representationRevisionCoverage": 0,
+    "identityFallbackAllowed": false
+  },
+  "blockers": [
+    "IDENTITY_REVISION_FIELDS_INCOMPLETE",
+    "WORKSPACE_REVISION_AUTHORITY_NOT_ADMITTED",
+    "RUNTIME_CONSOLIDATION_NOT_AUTHORIZED"
+  ],
+  "nextGate": "RWC-CENSUS-05_CALLER_MIGRATION_ADMISSION",
+  "safeNextCommand": "npm run atlas:rrf:real-identity-audit"
+}

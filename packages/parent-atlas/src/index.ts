@@ -115,6 +115,7 @@ export * from './core/temporal-action-postgres-repository.js';
 export * from './core/temporal-action-sequence-reservation.js';
 export * from './core/temporal-action-recommendation-runtime.js';
 export * from './core/temporal-action-alternative-runtime.js';
+export * from './core/temporal-supersession-fabric-v1.js';
 export * from './core/temporal-recommendation-outcome-runtime.js';
 export * from './core/temporal-recommendation-outcome-postgres-repository.js';
 export * from './core/temporal-recommendation-history-runtime.js';

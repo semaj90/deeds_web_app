@@ -36,6 +36,73 @@ The bounded physical chunk proof must not be read as proof of stable namespace
 authority. Any write remains behind its owning proposal, human authorization,
 exact preimage validation, transaction, and readback receipt.
 
+### Tournament / temporal supersession reconciliation (2026-09-09)
+
+The repository has tournament and supersession machinery, but not one live
+canonical supersession loop for neural-prefill, NLP, classifier, tensor, and
+agent-action observations. Keep the distinction explicit:
+
+| Surface | Current truth | Still missing |
+| --- | --- | --- |
+| Patch Tournament | `BOUNDED_SEAM_PROVEN` — one real compile error, three isolated worktrees, deterministic ranking, ACE packet, manual approval | `TOUR9`, `TOUR10`, `TOUR13`–`TOUR15`, `TOUR17`–`TOUR20`; auto-apply and training remain disabled |
+| Temporal Action Ledger | Event envelope, delta planner, action-candidate adapter, and fixture replay exist | Current source-bound producer and live durable readback; the agentic-error pipeline does not yet populate `atlas_agent_action_events` |
+| Recommendation supersession | Recommendation-level transaction and guards exist | Does not supersede feature, classifier, tensor, or NLP observations |
+| Document governance | Explicit `supersedes`/`supersededBy` links and receipt-only policy exist | Governs documents/instructions, not model outputs or feature rows |
+| Phase 17 / 18 | Feature extraction is diagnostic; Phase 18 is a partial XGBoost evaluation surface | Revision-qualified `FeatureRowV1`, temporal labels, held-out evaluation, and promotion receipt |
+| Neural prefill / latent family | Nested `semantic_768 → latent_256 → latent_128 → latent_64` contracts exist | Current representation lineage, artifact ledger, and replay-qualified producer |
+| Agentic error fixing | Redis cluster snapshot exists | Append-only `workflow_id` history, explicit supersession mapping, and repeated failure/recovery replay |
+
+The missing state transition is:
+
+`OBSERVE → PROPOSE → VERIFY → SUPERSEDE/RETAIN → PROMOTE`
+
+`SUPERSEDE` is allowed only after an exact replacement receipt proves same
+subject identity, newer compatible revision, source/content evidence, and
+successful validation. Timestamps, classifier scores, embedding similarity,
+or a newer tensor checkpoint alone must not supersede anything.
+
+#### Consolidated next gates
+
+1. `TOURNAMENT-DAG-STATE-TRANSITIONS-01` — exercise the existing tournament
+   state machine in an isolated fixture; no auto-apply.
+2. `TOURNAMENT-DURABLE-RECEIPTS-01` — bind it to the existing
+   `WorkflowActionEventV1` / Temporal Action Ledger owner.
+3. `TEMPORAL-OBSERVATION-SUPERSESSION-01` — define subject identity,
+   predecessor/replacement links, revision ordering, retain/reject reasons,
+   and tombstone behavior for NLP/classifier/tensor observations.
+4. `AGENTIC-ERROR-TIMELINE-READBACK-01` — prove repeated failure → proposal
+   → validation outcome events with a `workflow_id`; keep Redis/Valkey derived.
+5. `PHASE17-FEATURE-ROW-ADMISSION-01` — produce revision-qualified
+   `FeatureRowV1` values plus availability masks from a frozen cohort.
+6. `PHASE18-RERANKER-EVALUATION-01` — compare Phase 18 against the frozen
+   baseline; never use its fallback scorer as promotion evidence.
+7. `PREFILL-REPRESENTATION-REPLAY-01` — replay semantic/latent artifacts with
+   producer, checkpoint, input, output, and representation revisions.
+8. `TOURNAMENT-TRAINING-DATA-ELIGIBILITY-01` — export tuples only from
+   verified winners and reviewed outcomes; no training before this gate.
+
+Full-workspace promotion depends on current source/workspace authority.
+Isolated tournament, temporal state-machine and supersession fixtures can
+proceed with explicit frozen fixture inputs while workspaceRevision remains
+unbound for canonical admission. A tournament consumes source snapshots;
+it does not establish source authority. These tracks reuse existing owners:
+`parent-atlas-gpu-sidecar-patch-tournament`,
+`parent-atlas-neural-prefill-encoder`, `parent-atlas-agentic-run-receipt-binding`,
+`atlas-feature-intelligence`, and `parent-atlas-candidate-feature-execution-fabric`.
+
+Current conclusion: `MACHINERY_PRESENT / SUPERSESSION_AUTHORITY_NOT_PROVEN`.
+Do not label classifier, latent, tensor, or agent-action rows canonical or
+`SUPERSEDED` until temporal identity and replacement-receipt gates pass.
+
+Read-only audit evidence for this reconciliation: OpenSpec supersession scan
+reported `activeChangeCount=76`, `completeChangeCount=6`, and
+`explicitSupersessionCount=0`; the Phase 17–21 workstation audit reported
+`PARTIAL`, `completion_pct=67`, `phase17_rows=1`, `phase18_rows=1`, and
+`phase19_rows=443`. These counts demonstrate that the machinery and task
+descriptions exist, but do not establish live supersession or training
+authority. Reports: `docs/reports/openspec-supersession-audit-v1.json` and
+`docs/reports/phase17-21-workstation-audit.json`.
+
 ### Phase projection correction (2026-09-05)
 
 The historical Phase 11–17 table is retained in `reports/` and is not rewritten.

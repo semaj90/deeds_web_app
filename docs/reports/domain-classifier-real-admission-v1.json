@@ -9,7 +9,7 @@
   "classifierRevision": "atlas-domain-classifier:live-v1",
   "label": "database",
   "probability": 1.0,
-  "mappingRevision": "sha256:e6039ff04c33b48deeb179aecd69c17a2ad7f84e91dbcf120d61289732120fc2",
+  "mappingRevision": "sha256:b1fe99ea1b85f0ad0deecbe359f6565a28f1dd435008f260e0d52d2f03595a0e",
   "sourceNamespace": null,
   "rejectionCode": "SOURCE_NAMESPACE_UNPROVEN",
   "directClassifierToOntologyIdentityCount": 0,

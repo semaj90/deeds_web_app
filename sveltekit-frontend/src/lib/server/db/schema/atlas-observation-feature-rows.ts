@@ -23,7 +23,7 @@ export const atlasObservationFeatureRows = pgTable(
     featureRevision: text('feature_revision').notNull(),
     sourceRef: text('source_ref').notNull(),
     sourceVersionReceiptId: text('source_version_receipt_id'),
-    workspaceRevision: integer('workspace_revision'),
+    workspaceRevision: text('workspace_revision'),
     representationId: text('representation_id'),
     representationRevision: text('representation_revision'),
     treeNodeId: text('tree_node_id'),

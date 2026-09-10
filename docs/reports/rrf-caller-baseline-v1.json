@@ -1,0 +1,1610 @@
+{
+  "schema": "atlas.rrf-caller-baseline.v1",
+  "generatedAt": "2026-09-09T22:40:09.361Z",
+  "mode": "READ_ONLY",
+  "status": "CALLER_BASELINE_INCOMPLETE_MIGRATION_BLOCKED",
+  "authority": false,
+  "migrationAuthorized": false,
+  "writesPerformed": false,
+  "workspaceRevision": null,
+  "canonicalFusionOwner": "SearchRuntime",
+  "callers": [
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/atlas/kernel/governed-compute-progress.ts:44",
+      "file": "sveltekit-frontend/src/lib/server/atlas/kernel/governed-compute-progress.ts",
+      "line": 44,
+      "operation": "WEIGHT_REFERENCE",
+      "excerpt": "export const GovernedComputeLaneWeight: Record<GovernedComputeLaneId, number> = {",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/atlas/kernel/governed-compute-progress.ts:59",
+      "file": "sveltekit-frontend/src/lib/server/atlas/kernel/governed-compute-progress.ts",
+      "line": 59,
+      "operation": "WEIGHT_REFERENCE",
+      "excerpt": "const WEIGHT_SUM = Object.values(GovernedComputeLaneWeight).reduce((sum, value) => sum + value, 0);",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/atlas/kernel/governed-compute-progress.ts:162",
+      "file": "sveltekit-frontend/src/lib/server/atlas/kernel/governed-compute-progress.ts",
+      "line": 162,
+      "operation": "WEIGHT_REFERENCE",
+      "excerpt": "weight: GovernedComputeLaneWeight[parsed.laneId],",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/dispatcher/index.ts:55",
+      "file": "sveltekit-frontend/src/lib/server/dispatcher/index.ts",
+      "line": 55,
+      "operation": "WEIGHT_REFERENCE",
+      "excerpt": "getDispatcherSignalLaneWeight,",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts:1222",
+      "file": "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
+      "line": 1222,
+      "operation": "FUSION_CALL",
+      "excerpt": "const fused = allScored.length > 0 ? rrfFuse(allScored, fusionWeights).slice(0, limit) : [];",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/gpu/gpu-reranker.ts:54",
+      "file": "sveltekit-frontend/src/lib/server/gpu/gpu-reranker.ts",
+      "line": 54,
+      "operation": "FUSION_CALL",
+      "excerpt": "private computeRRFScore(candidate: RRFCandidate): number {",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/gpu/gpu-reranker.ts:97",
+      "file": "sveltekit-frontend/src/lib/server/gpu/gpu-reranker.ts",
+      "line": 97,
+      "operation": "FUSION_CALL",
+      "excerpt": "rrf_score: this.computeRRFScore(c),",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/gpu/gpu-reranker.ts:136",
+      "file": "sveltekit-frontend/src/lib/server/gpu/gpu-reranker.ts",
+      "line": 136,
+      "operation": "FUSION_CALL",
+      "excerpt": "rrf_score: this.computeRRFScore(c),",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/gpu/gpu-reranker.ts:137",
+      "file": "sveltekit-frontend/src/lib/server/gpu/gpu-reranker.ts",
+      "line": 137,
+      "operation": "FUSION_CALL",
+      "excerpt": "final_score: this.computeRRFScore(c),",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/compute-rrf-score.ts:19",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/compute-rrf-score.ts",
+      "line": 19,
+      "operation": "WEIGHT_REFERENCE",
+      "excerpt": "export const RRF_LANE_WEIGHTS = {",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/compute-rrf-score.ts:65",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/compute-rrf-score.ts",
+      "line": 65,
+      "operation": "WEIGHT_REFERENCE",
+      "excerpt": "for (const [laneName, laneWeight] of Object.entries(RRF_LANE_WEIGHTS)) {",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/compute-rrf-score.ts:74",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/compute-rrf-score.ts",
+      "line": 74,
+      "operation": "WEIGHT_REFERENCE",
+      "excerpt": "laneWeight,",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/compute-rrf-score.ts:127",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/compute-rrf-score.ts",
+      "line": 127,
+      "operation": "FUSION_CALL",
+      "excerpt": "const score = computeRRFScore(hit.id, hit.signals, lanedHitsMap);",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/compute-rrf-score.ts:153",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/compute-rrf-score.ts",
+      "line": 153,
+      "operation": "FUSION_CALL",
+      "excerpt": "const rrf = computeRRFScore('dummy', signals, allHitsInLanes).score;",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/compute-rrf-score.ts:185",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/compute-rrf-score.ts",
+      "line": 185,
+      "operation": "FUSION_CALL",
+      "excerpt": "const test1 = computeRRFScore('hit1', {",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/compute-rrf-score.ts:202",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/compute-rrf-score.ts",
+      "line": 202,
+      "operation": "FUSION_CALL",
+      "excerpt": "const test2 = computeRRFScore('hit2', {",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/compute-rrf-score.ts:219",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/compute-rrf-score.ts",
+      "line": 219,
+      "operation": "FUSION_CALL",
+      "excerpt": "const test3 = computeRRFScore('hit3', {",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/feature-envelope.ts:569",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/feature-envelope.ts",
+      "line": 569,
+      "operation": "FUSION_CALL",
+      "excerpt": "final_score = computeRRFScore(envelope, config);",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/hyperrag-fusion-service.ts:29",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/hyperrag-fusion-service.ts",
+      "line": 29,
+      "operation": "WEIGHT_REFERENCE",
+      "excerpt": "import { computeRRFScore, RRF_LANE_WEIGHTS, RRF_CONSTANT_K, type RRFScoreResult } from '$lib/server/retrieval/compute-rrf-score.js';",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/hyperrag-fusion-service.ts:519",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/hyperrag-fusion-service.ts",
+      "line": 519,
+      "operation": "FUSION_CALL",
+      "excerpt": "const rrfResult = computeRRFScore(id, signals, allHitsInLanes);",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/multi-vector-orchestrator.ts:226",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/multi-vector-orchestrator.ts",
+      "line": 226,
+      "operation": "FUSION_CALL",
+      "excerpt": "const fused = fuseLanesViaRrf(contentResults, summaryResults, titleResults, keywordResults, config);",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/retrieval-fusion-rrf.ts:52",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/retrieval-fusion-rrf.ts",
+      "line": 52,
+      "operation": "WEIGHT_REFERENCE",
+      "excerpt": "export const RRF_LANE_WEIGHTS: Record<RetrievalScoreSource, number> = {",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/retrieval-fusion-rrf.ts:73",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/retrieval-fusion-rrf.ts",
+      "line": 73,
+      "operation": "WEIGHT_REFERENCE",
+      "excerpt": "weights?: Partial<typeof RRF_LANE_WEIGHTS>",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/retrieval-fusion-rrf.ts:75",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/retrieval-fusion-rrf.ts",
+      "line": 75,
+      "operation": "WEIGHT_REFERENCE",
+      "excerpt": "const mergedWeights = { ...RRF_LANE_WEIGHTS, ...weights };",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/retrieval-fusion-rrf.ts:89",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/retrieval-fusion-rrf.ts",
+      "line": 89,
+      "operation": "WEIGHT_REFERENCE",
+      "excerpt": "const laneWeight = mergedWeights[input.lane] || 0;",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/retrieval-fusion-rrf.ts:90",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/retrieval-fusion-rrf.ts",
+      "line": 90,
+      "operation": "WEIGHT_REFERENCE",
+      "excerpt": "if (laneWeight === 0) continue;  // Skip lanes with zero weight",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/retrieval-fusion-rrf.ts:94",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/retrieval-fusion-rrf.ts",
+      "line": 94,
+      "operation": "WEIGHT_REFERENCE",
+      "excerpt": "const rrfComponent = computeRrfComponent(rank) * laneWeight;",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/router-matrix.ts:9",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/router-matrix.ts",
+      "line": 9,
+      "operation": "WEIGHT_REFERENCE",
+      "excerpt": "export type LaneWeight = {",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/router-matrix.ts:15",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/router-matrix.ts",
+      "line": 15,
+      "operation": "WEIGHT_REFERENCE",
+      "excerpt": "export const DEFAULT_ROUTER_MATRIX: Record<SignalType, Record<string, LaneWeight>> = {",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/router-matrix.ts:74",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/router-matrix.ts",
+      "line": 74,
+      "operation": "WEIGHT_REFERENCE",
+      "excerpt": "export function getSignalMatrix(signal: SignalType): { [key: string]: LaneWeight } | null {",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/rrf-combiner-utils.ts:29",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-combiner-utils.ts",
+      "line": 29,
+      "operation": "WEIGHT_REFERENCE",
+      "excerpt": "laneWeight: number;",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/rrf-combiner-utils.ts:109",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-combiner-utils.ts",
+      "line": 109,
+      "operation": "WEIGHT_REFERENCE",
+      "excerpt": "laneWeight: 1.0,",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/rrf-combiner-utils.ts:123",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-combiner-utils.ts",
+      "line": 123,
+      "operation": "WEIGHT_REFERENCE",
+      "excerpt": "laneWeight: 1.0, // Will be set by caller if needed",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/rrf-combiner-utils.ts:240",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-combiner-utils.ts",
+      "line": 240,
+      "operation": "FUSION_CALL",
+      "excerpt": "const test1Result = combineRRFLanes(test1Lanes);",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/rrf-combiner-utils.ts:253",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-combiner-utils.ts",
+      "line": 253,
+      "operation": "FUSION_CALL",
+      "excerpt": "const test2Result = combineRRFLanes(test2Lanes);",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/rrf-combiner-utils.ts:267",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-combiner-utils.ts",
+      "line": 267,
+      "operation": "FUSION_CALL",
+      "excerpt": "const test3Result = combineRRFLanes(test3Lanes);",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/rrf-combiner-utils.ts:283",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-combiner-utils.ts",
+      "line": 283,
+      "operation": "FUSION_CALL",
+      "excerpt": "const test4Result = combineRRFLanes(test4Lanes);",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/rrf-combiner-utils.ts:295",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-combiner-utils.ts",
+      "line": 295,
+      "operation": "FUSION_CALL",
+      "excerpt": "const test5Result = combineRRFLanes(test5Lanes);",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/rrf-combiner-utils.ts:306",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-combiner-utils.ts",
+      "line": 306,
+      "operation": "FUSION_CALL",
+      "excerpt": "const test6Result = combineRRFLanes(test6Lanes);",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/rrf-combiner.ts:120",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-combiner.ts",
+      "line": 120,
+      "operation": "WEIGHT_REFERENCE",
+      "excerpt": "const laneWeight = weights[laneName] ?? 1.0;",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/rrf-combiner.ts:124",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-combiner.ts",
+      "line": 124,
+      "operation": "WEIGHT_REFERENCE",
+      "excerpt": "const rrfComponent = laneWeight / (k + (rank + 1)); // 1-indexed",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/rrf-contract.ts:63",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-contract.ts",
+      "line": 63,
+      "operation": "WEIGHT_REFERENCE",
+      "excerpt": "export const RRF_DEFAULT_WEIGHTS = {",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/rrf-fuse.ts:120",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-fuse.ts",
+      "line": 120,
+      "operation": "WEIGHT_REFERENCE",
+      "excerpt": "weightsOrOptions: Record<string, number> | { topK?: number; includeProvenance?: boolean } = {},",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/rrf-fuse.ts:125",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-fuse.ts",
+      "line": 125,
+      "operation": "WEIGHT_REFERENCE",
+      "excerpt": "const isOptionsForm = typeof weightsOrOptions === 'object' && !Array.isArray(weightsOrOptions) && 'topK' in weightsOrOptions;",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/rrf-fuse.ts:126",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-fuse.ts",
+      "line": 126,
+      "operation": "WEIGHT_REFERENCE",
+      "excerpt": "const limitValue = isOptionsForm ? (weightsOrOptions.topK ?? limit) : limit;",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/rrf-fuse.ts:127",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-fuse.ts",
+      "line": 127,
+      "operation": "WEIGHT_REFERENCE",
+      "excerpt": "const includeProvenance = isOptionsForm ? (weightsOrOptions.includeProvenance ?? true) : true;",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/rrf-fuse.ts:128",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-fuse.ts",
+      "line": 128,
+      "operation": "WEIGHT_REFERENCE",
+      "excerpt": "const weights = isOptionsForm ? {} : (weightsOrOptions as Record<string, number>);",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/rrf-fuse.ts:137",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-fuse.ts",
+      "line": 137,
+      "operation": "WEIGHT_REFERENCE",
+      "excerpt": "const laneWeight = weights[laneName] ?? lane.weight ?? 1;",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/rrf-fuse.ts:143",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-fuse.ts",
+      "line": 143,
+      "operation": "WEIGHT_REFERENCE",
+      "excerpt": "const contribution = laneWeight / (k + rank);",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/rrf-fuse.ts:153",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-fuse.ts",
+      "line": 153,
+      "operation": "WEIGHT_REFERENCE",
+      "excerpt": "representativeWeight: laneWeight,",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/rrf-fuse.ts:168",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-fuse.ts",
+      "line": 168,
+      "operation": "WEIGHT_REFERENCE",
+      "excerpt": "existing.representativeWeight = laneWeight;",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/rrf-fusion.ts:67",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-fusion.ts",
+      "line": 67,
+      "operation": "WEIGHT_REFERENCE",
+      "excerpt": "export const FUSION_WEIGHTS = {",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/rrf-fusion.ts:77",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-fusion.ts",
+      "line": 77,
+      "operation": "WEIGHT_REFERENCE",
+      "excerpt": "const weightSum = Object.values(FUSION_WEIGHTS).reduce((a, b) => a + b, 0);",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/rrf-fusion.ts:185",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-fusion.ts",
+      "line": 185,
+      "operation": "WEIGHT_REFERENCE",
+      "excerpt": "FUSION_WEIGHTS.dense_content * normalized.dense_content +",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/rrf-fusion.ts:186",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-fusion.ts",
+      "line": 186,
+      "operation": "WEIGHT_REFERENCE",
+      "excerpt": "FUSION_WEIGHTS.dense_summary * normalized.dense_summary +",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/rrf-fusion.ts:187",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-fusion.ts",
+      "line": 187,
+      "operation": "WEIGHT_REFERENCE",
+      "excerpt": "FUSION_WEIGHTS.dense_signature * normalized.dense_signature +",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/rrf-fusion.ts:188",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-fusion.ts",
+      "line": 188,
+      "operation": "WEIGHT_REFERENCE",
+      "excerpt": "FUSION_WEIGHTS.topology_embedding * normalized.topology_embedding +",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/rrf-fusion.ts:189",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-fusion.ts",
+      "line": 189,
+      "operation": "WEIGHT_REFERENCE",
+      "excerpt": "FUSION_WEIGHTS.domain_classifier * normalized.domain_classifier +",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/rrf-fusion.ts:190",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-fusion.ts",
+      "line": 190,
+      "operation": "WEIGHT_REFERENCE",
+      "excerpt": "FUSION_WEIGHTS.freshness * normalized.freshness",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/rrf-fusion.ts:245",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-fusion.ts",
+      "line": 245,
+      "operation": "FUSION_CALL",
+      "excerpt": "const rrfScore = computeRRFScore(candidateId, laneScores);",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/rrf-fusion.ts:285",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-fusion.ts",
+      "line": 285,
+      "operation": "WEIGHT_REFERENCE",
+      "excerpt": "const weight = FUSION_WEIGHTS[laneName as keyof typeof FUSION_WEIGHTS] ?? 0.1;",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/rrf-fusion.ts:346",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-fusion.ts",
+      "line": 346,
+      "operation": "WEIGHT_REFERENCE",
+      "excerpt": "FUSION_WEIGHTS,",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/rrf-integration-tests.ts:69",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-integration-tests.ts",
+      "line": 69,
+      "operation": "FUSION_CALL",
+      "excerpt": "const test4 = testComputeRRFScore();",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/rrf-integration.ts:16",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-integration.ts",
+      "line": 16,
+      "operation": "WEIGHT_REFERENCE",
+      "excerpt": "import { RRF_DEFAULT_WEIGHTS } from './rrf-contract.js';",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/rrf-integration.ts:169",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-integration.ts",
+      "line": 169,
+      "operation": "WEIGHT_REFERENCE",
+      "excerpt": "getDispatcherSignalLaneWeight: dispatcherTopoModule.getDispatcherSignalLaneWeight,",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/rrf-integration.ts:612",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-integration.ts",
+      "line": 612,
+      "operation": "WEIGHT_REFERENCE",
+      "excerpt": "const finalWeights = { ...RRF_DEFAULT_WEIGHTS, ...weights };",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/rrf-integration.ts:628",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-integration.ts",
+      "line": 628,
+      "operation": "WEIGHT_REFERENCE",
+      "excerpt": "getDispatcherSignalLaneWeight,",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/rrf-integration.ts:985",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-integration.ts",
+      "line": 985,
+      "operation": "FUSION_CALL",
+      "excerpt": "const rrfResults = combineViaRRF(lanes, laneNames, {",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/rrf-lane-ranker.ts:41",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-lane-ranker.ts",
+      "line": 41,
+      "operation": "WEIGHT_REFERENCE",
+      "excerpt": "laneWeight: number = 1.0,",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/rrf-lane-ranker.ts:54",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-lane-ranker.ts",
+      "line": 54,
+      "operation": "WEIGHT_REFERENCE",
+      "excerpt": "rrfContribution: (laneWeight / (k + 1)),",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/rrf-lane-ranker.ts:75",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-lane-ranker.ts",
+      "line": 75,
+      "operation": "WEIGHT_REFERENCE",
+      "excerpt": "const rrfContribution = laneWeight / (k + rank);",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/rrf-lane-ranker.ts:94",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-lane-ranker.ts",
+      "line": 94,
+      "operation": "WEIGHT_REFERENCE",
+      "excerpt": "laneWeight: number = 1.0",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/rrf-lane-ranker.ts:103",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-lane-ranker.ts",
+      "line": 103,
+      "operation": "WEIGHT_REFERENCE",
+      "excerpt": "const rrfContribution = laneWeight / (k + 1);",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/rrf-lane-ranker.ts:126",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-lane-ranker.ts",
+      "line": 126,
+      "operation": "WEIGHT_REFERENCE",
+      "excerpt": "laneWeight: number,",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/rrf-lane-ranker.ts:138",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-lane-ranker.ts",
+      "line": 138,
+      "operation": "WEIGHT_REFERENCE",
+      "excerpt": "const expected = laneWeight / (k + rank);",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/rrf-local-testing.ts:204",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-local-testing.ts",
+      "line": 204,
+      "operation": "FUSION_CALL",
+      "excerpt": "const rrf = computeRRFScore(r.hitId, r.signals);",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/rrf-local-testing.ts:216",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-local-testing.ts",
+      "line": 216,
+      "operation": "FUSION_CALL",
+      "excerpt": "computeRRFScore(r.hitId, r.signals).rrfBreakdown",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/rrf-multi-vector.ts:291",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-multi-vector.ts",
+      "line": 291,
+      "operation": "FUSION_CALL",
+      "excerpt": "const fused = fuseLanesViaRrf(",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/rrf-proof.ts:66",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-proof.ts",
+      "line": 66,
+      "operation": "FUSION_CALL",
+      "excerpt": "const result = combineViaRRF(normalized, [...laneNames], { deduplicateBy: 'id' });",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts:935",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts",
+      "line": 935,
+      "operation": "FUSION_CALL",
+      "excerpt": "return fuseSearchRuntimeCandidates(candidates);",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts:1312",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts",
+      "line": 1312,
+      "operation": "FUSION_CALL",
+      "excerpt": "export function fuseSearchRuntimeCandidates(candidates: Candidate[]): FusedCandidate[] {",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/service.ts:455",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/service.ts",
+      "line": 455,
+      "operation": "WEIGHT_REFERENCE",
+      "excerpt": "const weighted = rrf * laneConfig.weight;",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/types.ts:20",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/types.ts",
+      "line": 20,
+      "operation": "WEIGHT_REFERENCE",
+      "excerpt": "export const RRF_WEIGHTS_BY_LANE_KIND: Record<LaneRegistryKind, number> = {",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.ts:190",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.ts",
+      "line": 190,
+      "operation": "WEIGHT_REFERENCE",
+      "excerpt": "const RRF_LANE_WEIGHTS = {",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.ts:535",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.ts",
+      "line": 535,
+      "operation": "WEIGHT_REFERENCE",
+      "excerpt": "return laneWeight / (RRF_CONSTANT_K + rank);",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.ts:550",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.ts",
+      "line": 550,
+      "operation": "FUSION_CALL",
+      "excerpt": "rrfContribution: laneContribution(idx + 1, RRF_LANE_WEIGHTS.dense_vector),",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.ts:565",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.ts",
+      "line": 565,
+      "operation": "FUSION_CALL",
+      "excerpt": "rrfContribution: laneContribution(hit.rank, RRF_LANE_WEIGHTS.turbovec),",
+      "mapping": {
+        "status": "REJECTED_EXECUTOR_AS_LANE",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.ts:575",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.ts",
+      "line": 575,
+      "operation": "FUSION_CALL",
+      "excerpt": "rrfContribution: laneContribution(hit.rank, RRF_LANE_WEIGHTS.lexical),",
+      "mapping": {
+        "status": "EXPLICIT_CANDIDATE",
+        "logicalLaneId": "lexical"
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.ts:591",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.ts",
+      "line": 591,
+      "operation": "FUSION_CALL",
+      "excerpt": "const combined = combineRRFLanes(buildRrfLaneMap(qdrantHits, turboVecHits, rgLexicalHits));",
+      "mapping": {
+        "status": "REJECTED_EXECUTOR_AS_LANE",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/mcp/tools/repair_tools.ts:554",
+      "file": "sveltekit-frontend/src/mcp/tools/repair_tools.ts",
+      "line": 554,
+      "operation": "FUSION_CALL",
+      "excerpt": "const fused = rrfFuse(",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/routes/api/admin/atlas/query/+server.ts:406",
+      "file": "sveltekit-frontend/src/routes/api/admin/atlas/query/+server.ts",
+      "line": 406,
+      "operation": "FUSION_CALL",
+      "excerpt": "rrfFuse([codebaseHits, wikiHits]);",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/routes/api/admin/parents-atlas/actions/+server.ts:105",
+      "file": "sveltekit-frontend/src/routes/api/admin/parents-atlas/actions/+server.ts",
+      "line": 105,
+      "operation": "FUSION_CALL",
+      "excerpt": "const fused = rrfFuse(resultSets);",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    },
+    {
+      "callerId": "sveltekit-frontend/src/routes/api/rag/search-fused/+server.ts:124",
+      "file": "sveltekit-frontend/src/routes/api/rag/search-fused/+server.ts",
+      "line": 124,
+      "operation": "FUSION_CALL",
+      "excerpt": "const fused = rrfFuse.reciprocalRankFusion(",
+      "mapping": {
+        "status": "UNMAPPED",
+        "logicalLaneId": null
+      },
+      "baseline": {
+        "captured": false,
+        "replayStatus": "NOT_RUN",
+        "outputChecksum": null
+      },
+      "runtimeMutation": false
+    }
+  ],
+  "metrics": {
+    "callerCount": 93,
+    "fusionCallerCount": 36,
+    "unmappedCount": 90,
+    "ambiguousMappingCount": 0,
+    "executorAsLaneCount": 2,
+    "baselineReplayCount": 0
+  },
+  "blockers": [
+    "UNMAPPED_LOGICAL_LANE",
+    "EXECUTOR_AS_LANE",
+    "CALLER_BASELINE_REPLAY_REQUIRED",
+    "RUNTIME_CONSOLIDATION_NOT_AUTHORIZED"
+  ],
+  "nextGate": "RWC-CENSUS-03_BOUNDED_CALLER_REPLAY",
+  "safeNextCommand": "npm run atlas:rrf:caller-baseline"
+}

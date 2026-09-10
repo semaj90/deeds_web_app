@@ -269,7 +269,9 @@ export const FeatureMatrixRowV1Schema = z.object({
   schema_version: z.literal('1.0').default('1.0'),
   created_at: z.string().datetime().default(() => new Date().toISOString()),
   updated_at: z.string().datetime().default(() => new Date().toISOString()),
-  workspace_revision: z.string().default('main').describe('git branch or deployment version'),
+  // A branch name is not a workspace snapshot. Keep this nullable until
+  // snapshot/tournament admission supplies a revision-qualified value.
+  workspace_revision: z.string().nullable().default(null).describe('sealed workspace snapshot revision when admitted'),
   lane_status: VectorLaneStatusSchema.optional().nullable(),
   evidence_state: EvidenceStateSchema.optional().nullable(),
   knowledge_resolution: KnowledgeResolutionSchema.optional().nullable(),
@@ -350,13 +352,13 @@ export function createFeatureRow(input: {
   runtime_evidence_refs?: string[];
   test_evidence_refs?: string[];
   secondary_domains?: string[];
-  workspace_revision?: string;
+  workspace_revision?: string | null;
 }): FeatureMatrixRowV1 {
   return {
     schema_version: '1.0',
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
-    workspace_revision: input.workspace_revision ?? 'main',
+    workspace_revision: input.workspace_revision ?? null,
     lane_status: input.lane_status ?? null,
     evidence_state: input.evidence_state ?? null,
     knowledge_resolution: input.knowledge_resolution ?? null,

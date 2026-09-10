@@ -6445,3 +6445,169 @@ this reconciliation; only derived reports and this ledger entry changed.
 
 Status: `RECORDED_CLARIFICATION`; UUIDv5 derived-symbol design remains
 `NOT_STARTED` and the broader current-source admission remains blocked.
+
+### Current admission refresh (2026-09-09)
+
+- Replayed `audit-current-graphify-snapshot-authority-v1.mts` read-only.
+- Current snapshot remains `NO_TERMINAL_EXECUTION_FOR_CURRENT_WORKSPACE` with
+  workspace revision `sha256:c5d7efc34ccce388aaff25b178766b4a0ca2798b6c36e56139f79c1aafb1140d`,
+  24,140 source entries, and zero qualifying terminal executions.
+- Refreshed `admission-parameters-v1.json`; status remains `PARAMETERS_BLOCKED`
+  for source authority, graph snapshot, semantic-768 admission, Qdrant v2
+  identity lineage, and judgment-set review.
+- No database, projection, cache, embedding, or model writes occurred.
+
+### Sequential source-authority refresh (2026-09-09)
+
+- Re-ran the Graphify snapshot audit and source-owner reconciliation
+  sequentially to remove parallel-audit interference.
+- The snapshot still has no qualifying terminal execution for the current
+  workspace. The sequential receipts report **24,141** snapshot sources and
+  **24,187** currently admitted source files, a **46-file** difference.
+- `git status` confirms the worktree is not quiescent: nested repositories
+  `claude-mem`, `models/embeddinggemma_300m`, and `turbovec` contain modified
+  content. This is now classified as workspace snapshot drift, not a UTF-8 or
+  extension-policy defect.
+- Status remains `CURRENT_SOURCE_AUTHORITY_NOT_PROVEN`; no promotion or
+  projection apply is authorized.
+
+### Git-tree-aware indexing CRUD gate (2026-09-09)
+
+- Existing `GraphDeltaV1` is only a partial foundation. It exposes added,
+  changed, and removed graph records, but its legacy numeric
+  `workspaceRevision`/`representationRevision` fields cannot serve as the
+  canonical Git-tree identity contract.
+- Add the next bounded gate as
+  `GIT-TREE-AWARE-SOURCE-DELTA-01`: derive a read-only delta between an exact
+  base Git tree and the current source snapshot, classifying each source as
+  `CREATE`, `READ_UNCHANGED`, `UPDATE`, `RENAME`, or `DELETE_TOMBSTONE`.
+- Each row must carry `sourceRef`, `sourceRevision`, `contentDigest`,
+  `baseCommitOid`, `baseTreeOid`, `workspaceRevision`, and evidence of whether
+  the file is tracked at the base/current tree. Git-tree identity remains
+  separate from `packet_key`, `chunk_id`, `tree_node_id`, and `symbol_id`.
+- CRUD means index-state reconciliation only: create/update/delete decisions
+  are emitted as an authorization-ready manifest. No packet, chunk, symbol,
+  PostgreSQL, Qdrant, Neo4j, Valkey, or Graphify projection mutation is
+  permitted until the source-owner and revision gates pass.
+- Required read-only acceptance counts: duplicate source refs `0`, synthetic
+  identities `0`, ambiguous renames `0`, invalid UTF-8 `0` among admitted rows,
+  base/current tree checksums reproducible, and delta replay deterministic.
+
+Status: `PLANNED_BLOCKED`; implementation should reuse the existing workspace
+origin runtime and Graphify delta contracts rather than creating another source
+inventory owner.
+
+### Git-tree source delta auditor (2026-09-09)
+
+- Added `scripts/atlas/audit-git-tree-source-delta-v1.mts`, a bounded read-only
+  reconciliation over the canonical workspace-origin runtime and the current
+  `HEAD` tree.
+- Receipt: `docs/reports/git-tree-source-delta-v1.json`.
+- The first report’s **85 `DELETE_TOMBSTONE` rows are not confirmed deletions**:
+  a bounded inspection found all sampled paths still present on disk, including
+  47 empty `HEAD` blobs. They represent `HEAD`/current-admission divergence
+  and must not drive destructive cleanup.
+- Correct classification is therefore: `DELETE_TOMBSTONE` only when the path is
+  absent from disk; `EXCLUDED_CURRENT_SOURCE` when it exists but is outside the
+  current admitted snapshot. The auditor now records `endHeadCommit` and
+  `headStableDuringRun` so branch changes invalidate the delta proof.
+- Status remains `PARTIAL_PROVEN`: no duplicate or synthetic identities were
+  emitted, but deleted-content hydration and deterministic rename detection
+  remain pending. No datastore or projection writes occurred.
+
+Evidence: `docs/reports/git-tree-source-delta-v1.json`; the 85-row inspection
+showed `exists=85`, `missing=0`, and `emptyHeadBlob=47`.
+
+### Tournament-gated workspace revision policy and promotion board (2026-09-09)
+
+- Until the tournament/source-authority layer is built out, the orchestration
+  parameter `workspaceRevision` is intentionally **null/unbound**. This is a
+  planning state, not a valid canonical revision. Any canonical writer or
+  projection gate receiving null must return `BLOCKED` and perform zero writes.
+- This policy does not weaken the existing source, packet, representation, or
+  projection schemas. It prevents provisional tournament context from being
+  mistaken for current workspace authority.
+- The consolidated Parent Atlas promotion board is now the following ten
+  blocking gates, in order:
+  1. `CURRENT-SOURCE-TERMINAL-EXECUTION-01`
+  2. `CURRENT-STRUCTURAL-LINEAGE-01`
+  3. `SEMANTIC-768-OWNER-RECONCILIATION-01`
+  4. `REPRESENTATION-LEDGER-01`
+  5. `QDRANT-V2-IDENTITY-LINEAGE-01`
+  6. `LEIDEN-EXACT-PROJECTION-IDENTITY-01`
+  7. `GRAPH-PROJECTION-MANIFEST-01`
+  8. `RRF-CURRENT-PRODUCTION-REPLAY-01`
+  9. `RETRIEVAL-JUDGMENT-SET-01`
+  10. `RETRIEVAL-PARITY-RECEIPT-01`
+- Gate outputs must distinguish `CONTRACT_PROVEN`, `FIXTURE_PROVEN`,
+  `BOUNDED_LIVE_PROVEN`, `LIVE_PROVEN`, `PARTIAL_PROVEN`, and `BLOCKED`.
+  Code presence, row counts, ANN shape, path joins, or process exit codes do
+  not satisfy authority proof.
+- Latent 256/128/64, RFF/topology, context forests, ontology enrichment,
+  sampling, GPU executors, and Leiden/Louvain quality remain derived,
+  non-blocking features until the ten-gate canonical spine is closed.
+- Admission closure is not allowed while `workspaceRevision` is null,
+  canonical semantic ownership is ambiguous, Qdrant identity is unresolved,
+  graph ordinals are unsealed, or the judgment set is unreviewed.
+
+Status: `BLOCKED_BY_DESIGN`; this records the tournament gate and promotion
+sequence only. No runtime, database, projection, cache, or model mutation was
+performed.
+
+### Lifecycle-seam review consolidation (2026-09-09)
+
+- The current deficiency is not another retrieval algorithm. The missing
+  layer is a reproducible execution fabric that binds source population,
+  lineage, representations, graph projections, caches, and retrieval receipts
+  to one revision-qualified snapshot.
+- `GIT-TREE-AWARE-SOURCE-DELTA-01` must remain a timeline/index-state audit.
+  `HEAD`-only paths are not automatically deletions: classify present-but-not-
+  admitted paths separately from true absent-path tombstones, and require
+  stable `HEAD`/tree identity before treating the delta as deterministic.
+- The remaining lifecycle gates are recorded in dependency order:
+  `SOURCE-POPULATION-DELTA-01`, `WORKSPACE-SNAPSHOT-POLICY-01`,
+  `CANONICAL-LINEAGE-DAG-01`, `REPRESENTATION-REGISTRY-01`,
+  `GRAPH-PROJECTION-MANIFEST-01`, `SOM-TOPOLOGY-LINEAGE-01`,
+  `DERIVED-SUMMARY-LIFECYCLE-01`, `ARTIFACT-INVALIDATION-DAG-01`,
+  `TOMBSTONE-LIFECYCLE-01`, `QUERY-ROUTING-CALIBRATION-01`,
+  `FEATURE-NORMALIZATION-MASK-01`, `RETRIEVAL-JUDGMENT-SET-01`, and
+  `PARENT-ATLAS-EXECUTION-RECEIPT-01`.
+- These gates do not authorize new tables, collections, graph stores, or
+  models. They define how existing Tree-sitter/AST-grep/LSP, PostgreSQL,
+  semantic-768, Qdrant, Neo4j, NetworkX/cuGraph, ACE/BitFrost, and Ornith
+  outputs become reproducible and invalidatable.
+- Canonical identity remains PostgreSQL/source lineage. Derived artifacts must
+  carry their producer/input/output revisions and ordinal-map checksum. Cache
+  entries require explicit invalidation dependencies; tombstones preserve audit
+  history instead of silently deleting evidence.
+- A future `ParentAtlasExecutionReceiptV1` should join source, lineage,
+  representation, graph, feature, query-classification, candidate, fusion,
+  context, model, and validation checksums. Until then, subsystem receipts do
+  not constitute whole-DAG reproducibility.
+
+Status: `RECORDED_GATED_BACKLOG`; no new search algorithm, data store, or
+promotion authority was introduced.
+
+### Git-tree delta correction — false deletion classification fixed (2026-09-09)
+
+- Re-ran `scripts/atlas/audit-git-tree-source-delta-v1.mts` after separating
+  paths absent from disk from paths present but excluded by the current source
+  admission policy.
+- Corrected result: **24,139** `READ_UNCHANGED`, **2** `UPDATE`, **1** `CREATE`,
+  and **85** `EXCLUDED_CURRENT_SOURCE`; there are no confirmed deletions in this
+  run. The 85 paths remain on disk and are not eligible for tombstone actions.
+- The receipt now records `endHeadCommit` and `headStableDuringRun`. This run
+  reports `READ_ONLY_DELTA_PROVEN` with a stable base tree and
+  `writesPerformed=false`.
+- Rename detection and historical digest hydration remain intentionally
+  deferred. No source, packet, database, graph, vector, cache, or model writes
+  were performed.
+### PARENT-ATLAS-PROMOTION-GATES-01 — ten-gate promotion board (2026-09-09)
+
+- [x] Added the read-only promotion board at `scripts/atlas/audit-parent-atlas-promotion-gates-v1.mjs` and root command `npm run atlas:promotion:gates`.
+- [x] The board records the ten blocking gates in dependency order and stops at the first blocker; it does not infer authority from code existence, row counts, fixture passes, or historical receipts.
+- [x] `workspaceRevision` is intentionally `null`/unbound under `UNBOUND_UNTIL_TOURNAMENT`. This is an admission blocker, not a schema relaxation: canonical writers and projections must remain fail-closed until the tournament/source-authority layer binds a revision.
+- [x] Existing receipts are referenced as evidence only. No source, database, Qdrant, Neo4j, cache, model, or index writes are performed.
+- [ ] Gate 1 remains blocked until exactly one terminal current-source execution is bound to a non-null workspace revision; gates 2–10 remain dependency-blocked and must not be represented as promoted.
+- Report: `docs/reports/parent-atlas-promotion-gates-v1.json`.
+- [x] Gate 1 read-only refresh completed with `npx tsx scripts/atlas/audit-current-graphify-snapshot-authority-v1.mts`: `NO_TERMINAL_EXECUTION_FOR_CURRENT_WORKSPACE`, `qualifyingExecutions=0`, current observed revision `sha256:a2c7cfc5a7d7ffe53a25418a734ad8c9d0d69ada1d7a5b605239c91f0ac17759`. The first blocker remains unchanged; no Graphify execution was launched.

@@ -1,6 +1,6 @@
 {
   "schema": "atlas.graphify-lifecycle-owner.v1",
-  "generatedAt": "2026-09-09T16:21:37.081Z",
+  "generatedAt": "2026-09-09T22:16:35.884Z",
   "mode": "READ_ONLY_LIFECYCLE_OWNER_AUDIT",
   "databaseError": null,
   "lifecycleOwner": null,
@@ -30,17 +30,7 @@
       "mutationSignals": []
     },
     {
-      "path": "scripts/atlas/audit-graphify-lifecycle-owner-v1.mjs",
-      "classification": "READ_ONLY_AUDITOR",
-      "mutationSignals": []
-    },
-    {
-      "path": "scripts/atlas/audit-graphify-git-source-authority-v1.mjs",
-      "classification": "READ_ONLY_AUDITOR",
-      "mutationSignals": []
-    },
-    {
-      "path": "scripts/atlas/audit-graphify-completed-legacy-coverage-v1.mjs",
+      "path": "scripts/atlas/audit-current-source-owner-reconciliation-v1.mjs",
       "classification": "READ_ONLY_AUDITOR",
       "mutationSignals": []
     },
@@ -50,7 +40,22 @@
       "mutationSignals": []
     },
     {
-      "path": "scripts/atlas/audit-graphify-workspace-owner-v1.mjs",
+      "path": "scripts/atlas/audit-graphify-completed-legacy-coverage-v1.mjs",
+      "classification": "READ_ONLY_AUDITOR",
+      "mutationSignals": []
+    },
+    {
+      "path": "scripts/atlas/audit-graphify-git-source-authority-v1.mjs",
+      "classification": "READ_ONLY_AUDITOR",
+      "mutationSignals": []
+    },
+    {
+      "path": "scripts/atlas/audit-graphify-lifecycle-owner-v1.mjs",
+      "classification": "READ_ONLY_AUDITOR",
+      "mutationSignals": []
+    },
+    {
+      "path": "scripts/atlas/audit-graphify-run-file-binding-v1.mjs",
       "classification": "READ_ONLY_AUDITOR",
       "mutationSignals": []
     },
@@ -60,7 +65,12 @@
       "mutationSignals": []
     },
     {
-      "path": "scripts/atlas/audit-graphify-run-file-binding-v1.mjs",
+      "path": "scripts/atlas/audit-graphify-workspace-owner-v1.mjs",
+      "classification": "READ_ONLY_AUDITOR",
+      "mutationSignals": []
+    },
+    {
+      "path": "scripts/atlas/audit-temporal-schema-surfaces-v1.mjs",
       "classification": "READ_ONLY_AUDITOR",
       "mutationSignals": []
     },
@@ -85,18 +95,13 @@
       "mutationSignals": []
     },
     {
-      "path": "scripts/atlas/lib/graphify-source-evidence.mjs",
-      "classification": "UNKNOWN",
-      "mutationSignals": []
-    },
-    {
       "path": "scripts/atlas/inspect-graphify-schema-v1.mjs",
       "classification": "UNKNOWN",
       "mutationSignals": []
     },
     {
-      "path": "scripts/atlas/plan-packet-chunk-lineage-promotion-v1.mjs",
-      "classification": "PLANNER_ONLY",
+      "path": "scripts/atlas/lib/graphify-source-evidence.mjs",
+      "classification": "UNKNOWN",
       "mutationSignals": []
     },
     {
@@ -115,7 +120,27 @@
       "mutationSignals": []
     },
     {
+      "path": "sveltekit-frontend/src/lib/server/atlas/board/graphify-current-workspace-revision.ts",
+      "classification": "UNKNOWN",
+      "mutationSignals": []
+    },
+    {
+      "path": "scripts/atlas/plan-packet-chunk-lineage-promotion-v1.mjs",
+      "classification": "PLANNER_ONLY",
+      "mutationSignals": []
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/board/daily-graphify-board-recommendations.ts",
+      "classification": "UNKNOWN",
+      "mutationSignals": []
+    },
+    {
       "path": "scripts/atlas/prove-code-source-revision-packet-live-dry-run.mts",
+      "classification": "UNKNOWN",
+      "mutationSignals": []
+    },
+    {
+      "path": "scripts/atlas/prove-exact-promotion-live-dry-run.mts",
       "classification": "UNKNOWN",
       "mutationSignals": []
     },
@@ -130,18 +155,13 @@
       "mutationSignals": []
     },
     {
-      "path": "scripts/atlas/prove-exact-promotion-live-dry-run.mts",
+      "path": "scripts/atlas/reconcile-openspec-portfolio-v2.mjs",
       "classification": "UNKNOWN",
       "mutationSignals": []
     },
     {
       "path": "scripts/atlas/register-orphaned-chunks.mjs",
       "classification": "LEGACY_WRITER",
-      "mutationSignals": []
-    },
-    {
-      "path": "scripts/atlas/reconcile-openspec-portfolio-v2.mjs",
-      "classification": "UNKNOWN",
       "mutationSignals": []
     },
     {
@@ -168,23 +188,13 @@
       "path": "sveltekit-frontend/src/lib/server/atlas/embedding/source-namespace-v1.ts",
       "classification": "UNKNOWN",
       "mutationSignals": []
-    },
-    {
-      "path": "sveltekit-frontend/src/lib/server/atlas/board/graphify-current-workspace-revision.ts",
-      "classification": "UNKNOWN",
-      "mutationSignals": []
-    },
-    {
-      "path": "sveltekit-frontend/src/lib/server/atlas/board/daily-graphify-board-recommendations.ts",
-      "classification": "UNKNOWN",
-      "mutationSignals": []
     }
   ],
   "runningRunCount": 0,
   "staleRunCount": 19,
   "currentRunCount": 0,
-  "repositoryHeadRevision": "a7e262ccf0682090c19ea0247bd4236be2272a6a",
+  "repositoryHeadRevision": "9119b12ee03c32ca3a1d4fcd18be49454e80f6e5",
   "writesPerformed": false,
   "canonicalAuthority": false,
-  "reportChecksum": "sha256:1840f8814cc864985b0c9c13d9ee8c1efa85a5c9c9fa98deabe3fa7bf55f7fc2"
+  "reportChecksum": "sha256:604f2f69d04f3090e852fb4ae5fd8def4e1799c2685d1a8fc5b7d17c9221b08b"
 }

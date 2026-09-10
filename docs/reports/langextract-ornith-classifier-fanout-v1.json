@@ -1,0 +1,70 @@
+{
+  "schema": "atlas.langextract-ornith-classifier-fanout.v1",
+  "generatedAt": "2026-09-09T23:04:26.979Z",
+  "mode": "READ_ONLY",
+  "status": "BOUNDARY_REACHABLE_LINEAGE_BLOCKED",
+  "proofLevel": "PARTIAL_PROVEN",
+  "authority": false,
+  "writesPerformed": false,
+  "endpoints": {
+    "llamaModels": "http://127.0.0.1:8090/v1/models",
+    "nlpHealth": "http://127.0.0.1:8095/health",
+    "analyze": "http://127.0.0.1:8095/analyze",
+    "oakHealth": "http://127.0.0.1:8095/oak/health"
+  },
+  "model": {
+    "configured": "ornith-1.5-9b",
+    "observed": "ornith-1.5-9b",
+    "artifact": "models/ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf"
+  },
+  "checks": {
+    "llamaModelsReachable": true,
+    "expectedModelObserved": true,
+    "nlpHealthReachable": true,
+    "langextractCapability": true,
+    "oakHealthReachable": true,
+    "analyzeReachable": true,
+    "classifySucceeded": true,
+    "classifierBackendObserved": true,
+    "classifierModelRevisionPresent": true,
+    "groundedPassPresent": true,
+    "sourceRevisionQualified": false,
+    "groundedEvidencePresent": false,
+    "okfInputsPresent": true
+  },
+  "observed": {
+    "providerRevision": "parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0",
+    "sourceRevision": [
+      "unknown",
+      "unknown"
+    ],
+    "classifierBackend": "sklearn-lr",
+    "classifierModelRevision": "domain-classifier-nblr-v1-1788454983",
+    "predictedLabel": "ui",
+    "oak": {
+      "schema": "atlas.oak.health.v1",
+      "available": true,
+      "oaklibVersion": "0.7.4",
+      "adapterConfigured": false,
+      "adapterType": null,
+      "adapterFingerprint": null,
+      "mode": "READ_ONLY_SHADOW",
+      "canonicalAuthority": false,
+      "paper": {
+        "name": "Ontology-as-a-Kernel",
+        "id": "arXiv:2608.22974"
+      },
+      "frozenFunctions": [
+        "lookup",
+        "search",
+        "ancestors",
+        "descendants"
+      ]
+    }
+  },
+  "blockers": [
+    "SOURCE_REVISION_UNKNOWN",
+    "NO_GROUNDED_ENTITY_FIXTURE"
+  ],
+  "nextGate": "CURRENT_SOURCE_LINEAGE-01"
+}

@@ -2,6 +2,15 @@
   "_comment": "Manual sidecar SQL migrations applied outside drizzle-kit _journal.json. Listed here so audit-contract-map.mjs treats them as documented_sidecar (WARN) rather than unknown_unjournaled_sql (FAIL).",
   "sidecars": [
     {
+      "file": "manual/20260909_router_feature_revision_indexes.sql",
+      "status": "applied",
+      "reason": "Aligns the active observation-feature owner with nullable text workspace revisions and adds bounded router lookup indexes. No row backfill or feature-matrix table is created.",
+      "appliedBy": "operator-authorized-run",
+      "appliedAt": "2026-09-09",
+      "requiresJournalEntry": false,
+      "validationCommand": "node scripts/atlas/audit-pipeline-router-matrix-surfaces-v1.mjs"
+    },
+    {
       "file": "manual/20260907_canonical_owner_revision_axes_v1.sql",
       "status": "manual_sidecar",
       "reason": "Additive packet source-content and concept definition revision fields for two-axis owner lineage. Unapplied; requires reviewed backfill, Graphify currentness, and independent readback before promotion.",
@@ -253,8 +262,7 @@
       "appliedAt": "2026-05-29",
       "requiresJournalEntry": false,
       "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_name='agent_observations';\""
-    }
-    ,
+    },
     {
       "file": "20260530_phase19b_join_keys.sql",
       "status": "manual_sidecar",
@@ -547,6 +555,24 @@
       "reason": "Incubation schema for stable source aliases and workspace-scoped source-version bindings. Not applied; owner and producer approval remain required.",
       "requiresJournalEntry": false,
       "validationCommand": "node scripts/atlas/validate-source-lineage-relations-v1.mjs"
+    },
+    {
+      "file": "manual/20260909_graphify_execution_file_membership_v2.sql",
+      "status": "applied",
+      "reason": "Additive namespace-qualified execution membership for nested repositories; preserves append-only legacy evidence. Applied with zero seed rows and no writer cutover.",
+      "appliedBy": "operator-authorized-run",
+      "appliedAt": "2026-09-09",
+      "requiresJournalEntry": false,
+      "validationCommand": "npm run atlas:graphify:source-population:delta"
+    },
+    {
+      "file": "manual/20260909_graphify_execution_file_membership_v2_immutability.sql",
+      "status": "applied",
+      "reason": "Enforces append-only UPDATE/DELETE rejection for repository-qualified execution membership v2.",
+      "appliedBy": "operator-authorized-run",
+      "appliedAt": "2026-09-09",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT tgname FROM pg_trigger WHERE tgrelid='public.graphify_execution_file_membership_v2'::regclass AND NOT tgisinternal ORDER BY tgname;\""
     }
   ]
 }

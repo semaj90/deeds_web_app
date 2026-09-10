@@ -1,0 +1,35 @@
+{
+  "schema": "atlas.graphify-atomic-publication-preflight.v1",
+  "generatedAt": "2026-09-09T22:30:14.219Z",
+  "mode": "READ_ONLY",
+  "status": "PUBLICATION_PREFLIGHT_BLOCKED",
+  "proofLevel": "PARTIAL_PROVEN",
+  "authority": false,
+  "writesPerformed": false,
+  "canonicalArtifact": {
+    "path": "docs/graph/codebase-graph.json",
+    "present": true,
+    "bytes": 25803530
+  },
+  "checks": {
+    "canonicalArtifactPresent": true,
+    "builderUsesRunScopedTemporaryPath": true,
+    "builderUsesAtomicRename": true,
+    "exportUsesTemporaryFallback": true,
+    "candidateValidationHookPresent": false,
+    "noDirectProgressiveCanonicalWriteProven": true
+  },
+  "admission": {
+    "candidateRunAllowed": false,
+    "canonicalPromotionAllowed": false,
+    "requiresSealedSnapshotBinding": true,
+    "requiresIndependentReceipt": true
+  },
+  "blockers": [
+    "SEALED_SNAPSHOT_BINDING_NOT_PROVEN",
+    "CANDIDATE_GRAPH_RECEIPT_NOT_PRESENT",
+    "CANONICAL_PROMOTION_NOT_AUTHORIZED"
+  ],
+  "nextGate": "GRAPHIFY-SNAPSHOT-BINDING-01",
+  "safeNextCommand": "npm run atlas:graphify:snapshot-binding:audit"
+}

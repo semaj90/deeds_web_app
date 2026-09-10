@@ -33,14 +33,29 @@ const POSTGRES_USER = process.env.PARENT_ATLAS_POSTGRES_USER || 'legal_admin';
 const POSTGRES_DB = process.env.PARENT_ATLAS_POSTGRES_DB || 'legal_ai_db';
 const POSTGRES_PASSWORD = process.env.PARENT_ATLAS_POSTGRES_PASSWORD || '123456';
 
-const LLAMA_SERVER_URL = process.env.LLAMA_SERVER_URL || 'http://127.0.0.1:8090';
+// Accept either the server root or an OpenAI-compatible `/v1` base URL. The
+// rest of this script owns the endpoint suffixes, so do not produce `/v1/v1`.
+const LLAMA_SERVER_BASE_URL = (process.env.LLAMA_SERVER_URL || 'http://127.0.0.1:8090')
+  .replace(/\/+$/, '')
+  .replace(/\/v1$/i, '');
+const LLAMA_MODELS_URL = `${LLAMA_SERVER_BASE_URL}/v1/models`;
+const LLAMA_CHAT_URL = `${LLAMA_SERVER_BASE_URL}/v1/chat/completions`;
 
 const args = process.argv.slice(2);
 const APPLY = args.includes('--apply');
 const DRY_RUN = !APPLY; // default: dry-run unless --apply is explicit
 const VERBOSE = args.includes('--verbose');
-const LIMIT = Number(args.find((a) => a.startsWith('--limit='))?.split('=')[1] ?? 8);
-const SINCE_HOURS = Number(args.find((a) => a.startsWith('--since-hours='))?.split('=')[1] ?? 48);
+function readNumericArg(name, fallback) {
+  const inline = args.find((a) => a.startsWith(`${name}=`));
+  if (inline) return Number(inline.slice(name.length + 1));
+  const index = args.indexOf(name);
+  return index >= 0 ? Number(args[index + 1]) : fallback;
+}
+
+const LIMIT = readNumericArg('--limit', 8);
+const SINCE_HOURS = readNumericArg('--since-hours', 48);
+if (!Number.isInteger(LIMIT) || LIMIT <= 0) throw new Error(`INVALID_LIMIT:${LIMIT}`);
+if (!Number.isFinite(SINCE_HOURS) || SINCE_HOURS <= 0) throw new Error(`INVALID_SINCE_HOURS:${SINCE_HOURS}`);
 
 const REPORT_DIRS = [
   path.join(REPO_ROOT, 'docs', 'reports'),
@@ -108,7 +123,7 @@ let cachedLlamaModel = null;
 
 async function getLlamaServerModel() {
   if (cachedLlamaModel) return cachedLlamaModel;
-  const response = await fetch(`${LLAMA_SERVER_URL}/v1/models`);
+  const response = await fetch(LLAMA_MODELS_URL);
   if (!response.ok) throw new Error(`llama-server /v1/models failed: ${response.status}`);
   const data = await response.json();
   const modelId = data.data?.[0]?.id;
@@ -120,7 +135,7 @@ async function getLlamaServerModel() {
 
 async function callLlamaServer(prompt) {
   const model = await getLlamaServerModel();
-  const response = await fetch(`${LLAMA_SERVER_URL}/v1/chat/completions`, {
+  const response = await fetch(LLAMA_CHAT_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -325,17 +340,21 @@ ${rec.confidence}
 
 async function probeLlamaServer() {
   try {
-    const response = await fetch(`${LLAMA_SERVER_URL}/v1/models`, { signal: AbortSignal.timeout(3000) });
+    const response = await fetch(LLAMA_MODELS_URL, { signal: AbortSignal.timeout(3000) });
     if (!response.ok) return false;
     const data = await response.json();
-    return Boolean(data.data?.[0]?.id);
+    const modelId = data.data?.[0]?.id;
+    if (!modelId) return false;
+    cachedLlamaModel = modelId;
+    log(`model boundary=LIVE_DISCOVERY endpoint=${LLAMA_MODELS_URL} model=${modelId}`);
+    return true;
   } catch {
     return false;
   }
 }
 
 async function main() {
-  log(`mode=${DRY_RUN ? 'DRY_RUN' : 'APPLY'} limit=${LIMIT} since-hours=${SINCE_HOURS}`);
+  log(`mode=${DRY_RUN ? 'DRY_RUN' : 'APPLY'} limit=${LIMIT} since-hours=${SINCE_HOURS} chatEndpoint=${LLAMA_CHAT_URL}`);
 
   // Fail-soft: this step is a nice-to-have on top of the daily chain, not a
   // hard gate. If llama-server isn't warm, skip silently (exit 0) rather than
@@ -343,7 +362,7 @@ async function main() {
   // "probes TurboQuant :8090 ... exits silently if GPU not warm" pattern
   // used elsewhere in this repo's startup lane.
   if (!(await probeLlamaServer())) {
-    log(`llama-server not reachable at ${LLAMA_SERVER_URL}, skipping (fail-soft).`);
+    log(`llama-server not reachable at ${LLAMA_MODELS_URL}, skipping (fail-soft).`);
     return;
   }
 

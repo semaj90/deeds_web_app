@@ -1,5 +1,28 @@
 # Tasks — Parent Atlas Search Classifier Sidecar
 
+### PIPELINE-ROUTER-MATRIX-SURFACES-01 (2026-09-09)
+
+Added a bounded read-only census for router ownership, feature-matrix contracts,
+and live PostgreSQL columns/indexes. It performs no migration, ALTER, index
+creation, or data write. `workspaceRevision` remains nullable by policy. The
+receipt records the executable `QueryRouter4x4` owner separately from the legacy
+`router-matrix.ts` vocabulary and the candidate feature matrix.
+
+Receipt: `docs/reports/pipeline-router-matrix-surfaces-v1.json`.
+
+Follow-up schema decision: `atlas_observation_feature_rows` remains the active
+feature-row owner. The historical `atlas_feature_matrix_rows` name is not a
+table target. The additive sidecar `sveltekit-frontend/drizzle/manual/20260909_router_feature_revision_indexes.sql`
+aligns nullable `workspace_revision` to text and adds feature/revision lookup
+indexes; it does not backfill rows or assign a workspace revision.
+
+Follow-up verification: `retrieval/router-matrix.ts` has no live imports in
+the application source and remains an unmerged compatibility vocabulary; the
+executable routing owner is `routing/query-router-4x4.ts`. `FeatureMatrixRowV1`
+now preserves `workspace_revision: null` rather than defaulting to the branch
+name `main`. Snapshot/tournament admission remains the only source of a real
+workspace revision.
+
 Cross-references: `parent-atlas-nlp-sidecar-feature-compiler/tasks.md` (task 11.1, ACP registration —
 this change adds one more tool alongside it, does not close it), `parent-atlas-ontology-kernel/tasks.md`
 (`ONTO-PY-DOMAIN-02` — this change supersedes it, see task 6), `parent-atlas-workstation-domain-classifier/`
@@ -495,3 +518,73 @@ need follow-up, either as a small task on this change or as their own change:
   (items 1-2) — both are narrative/forensic conclusions already reached through live proofs earlier
   in this file, not simple file-existence checks.
 7. Return to `PKT-LINEAGE-08` — **not started**, out of this change's scope regardless.
+
+## Learned-classifier receipt recheck (2026-09-09)
+
+- [x] Read-only checkpoint inspection found `models/domain-classifier/checkpoint.joblib`
+  (SHA-256 `707a8f6f40a339be531099e6c2eacc16ac57d49028dadbfeb81946560eb2b5b`).
+  The serialized object contains fitted `KMeans(n_clusters=15)` with centers
+  shaped `[15, 768]`, `MultinomialNB` with 6 classes, and
+  `LogisticRegression` with 6 classes and coefficients shaped `[6, 4]`.
+- [x] Direct read-only request to the live `:8095/analyze` sidecar with
+  `passes=["classify"]` returned `status=succeeded`, `backend=sklearn-lr`,
+  model revision `domain-classifier-nblr-v1-1788454983`, and finite NB/LR
+  probability features.
+- [ ] Keep the exact 300-file pipeline `PARTIAL_PROVEN`: the checkpoint does
+  not expose a 300-file manifest/training checksum, and this recheck did not
+  prove that the inspected checkpoint was produced by that exact corpus or
+  establish fresh TRACE↔ACP same-input parity. No retraining or checkpoint
+  replacement was performed.
+
+Evidence: `models/domain-classifier/checkpoint.joblib`,
+`docs/reports/domain-classifier-runtime-parity-01.json`, and the live sidecar
+classification response from `http://127.0.0.1:8095/analyze`.
+
+### Classifier lineage recheck (2026-09-09)
+
+- [x] Ran the existing read-only `audit-domain-classifier-lineage-v1.mjs`.
+- [x] The classifier table contains 3,352 rows; 3,351 have `source_ref`,
+  3,352 have a nullable workspace revision, and 148 have a revision-qualified
+  join.
+- [ ] The gate remains `CLASSIFIER_LINEAGE_BLOCKED`: no source namespace is
+  available, 3,204 rows lack a Graphify join, and only 148 rows are currently
+  revision-qualified. This is lineage evidence, not proof of the exact
+  300-file training corpus or production promotion.
+
+Evidence: `docs/reports/domain-classifier-lineage-v1.json`. Read-only audit;
+no retraining, checkpoint replacement, classifier-table mutation, or projection
+write was performed.
+
+### LangExtract + Ornith + classifier boundary recheck (2026-09-09)
+
+- [x] Live `GET http://127.0.0.1:8090/v1/models` reports the configured
+  synthesis model `ornith-1.5-9b`; the local artifact is
+  `models/ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf`.
+- [x] Live `GET http://127.0.0.1:8095/health` reports LangExtract `1.6.0`,
+  Tree-sitter, AST-grep, and the sidecar model `ornith-1.5-9b`.
+- [x] A bounded read-only `POST /analyze` with `passes=["classify"]` returned
+  `status=succeeded`, `backend=sklearn-lr`, finite NB/LR scores, and model
+  revision `domain-classifier-nblr-v1-1788454983`.
+- [ ] The probe returned `source_revision="unknown"` and no grounded entities;
+  therefore this proves service reachability and classifier execution only,
+  not current-source admission, ontology-tuple promotion, or GraphRAG/Qdrant
+  projection authority.
+
+### Integrated LangExtract/Ornith/classifier fanout audit (2026-09-09)
+
+- [x] Added the bounded read-only audit
+  `scripts/atlas/audit-langextract-ornith-classifier-fanout-v1.mjs` and root
+  command `npm run atlas:langextract:ornith:classifier:fanout:audit`.
+- [x] The receipt checks the live `:8090` model, `:8095` LangExtract health,
+  classifier response, Oak health, `.okf` inputs, and the no-write boundary in
+  one deterministic fixture run.
+- [x] Current result is `BOUNDARY_REACHABLE_LINEAGE_BLOCKED` with
+  `proofLevel=PARTIAL_PROVEN`; Ornith, LangExtract, sklearn NB/LR execution,
+  Oak endpoint reachability, and `.okf` input presence were observed.
+- [ ] Remaining blockers are explicit: `SOURCE_REVISION_UNKNOWN` and
+  `NO_GROUNDED_ENTITY_FIXTURE`. Do not promote ontology tuples, GraphRAG
+  records, or Qdrant projections until the source revision and grounded
+  evidence are supplied by a current admitted source.
+
+Evidence: `docs/reports/langextract-ornith-classifier-fanout-v1.json`. No
+Postgres, ontology, GraphRAG, Qdrant, cache, source, or model writes occurred.

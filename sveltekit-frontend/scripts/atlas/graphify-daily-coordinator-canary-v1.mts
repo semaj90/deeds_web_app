@@ -5,8 +5,8 @@ import { resolve } from 'node:path';
 import { loadAtlasEnv } from './load-atlas-env.mjs';
 import {
   adaptWorkspaceBindingsToSourceSelectionV1,
+  recordRepositoryQualifiedSourceSelectionStageV2,
   openExecution,
-  recordSourceSelectionStage,
   recordInventoryStage,
   recordStructuralStage,
   completeExecution,
@@ -18,7 +18,6 @@ import {
   compileGraphifyStructuralIntelligence,
 } from '../../src/lib/server/atlas/indexing/graphify-structural-intelligence-adapter.js';
 import { GraphifyStructuralMaterializer, create8095AstProvider } from '../../src/lib/server/atlas/indexing/graphify-structural-materializer.js';
-import { materializeWorkspaceRevisionOriginV1 } from '../../src/lib/server/atlas/indexing/workspace-revision-origin-runtime-v1.js';
 
 loadAtlasEnv();
 const DATABASE_URL = process.env.DATABASE_URL?.trim();
@@ -53,6 +52,23 @@ const client = new Client({
 });
 const reportPath = resolve(process.cwd(), '..', 'docs', 'reports', 'graphify-daily-coordinator-canary-v1.json');
 const workspaceRoot = resolve(process.cwd(), '..');
+const admissionPath = resolve(workspaceRoot, 'docs', 'reports', 'workspace-revision-tournament-admission-v1.json');
+const admission = JSON.parse(await readFile(admissionPath, 'utf8')) as {
+  status?: string; authority?: boolean; workspaceRevision?: string; snapshotRevision?: string;
+};
+if (admission.status !== 'WORKSPACE_REVISION_TOURNAMENT_ADMITTED' || admission.authority !== true
+  || typeof admission.workspaceRevision !== 'string') {
+  throw new Error('GRAPHIFY_COORDINATOR_CANARY_WORKSPACE_REVISION_ADMISSION_REQUIRED');
+}
+const snapshotPath = resolve(workspaceRoot, 'docs', 'reports', 'workspace-source-snapshots', `${admission.snapshotRevision?.replace(/^sha256:/, '')}.json`);
+const snapshot = JSON.parse(await readFile(snapshotPath, 'utf8')) as {
+  snapshotRevision?: string;
+  repositories?: Array<{ relativePath: string; head: string }>;
+  sources?: Array<{ repositoryId: string; repositoryRelativePath: string; sourceRef: string; sourceRevision: string; contentDigest: string; byteLength: number }>;
+};
+if (snapshot.snapshotRevision !== admission.snapshotRevision || !Array.isArray(snapshot.sources) || !Array.isArray(snapshot.repositories)) {
+  throw new Error('GRAPHIFY_COORDINATOR_CANARY_SEALED_SNAPSHOT_MISMATCH');
+}
 let locked = false;
 let executionId: string | undefined;
 
@@ -61,25 +77,45 @@ try {
   await acquireCoordinatorLock(client);
   locked = true;
 
-  // Freshly materialize the workspace revision from the real git+fs state of the working
-  // tree, rather than reading a stale static handoff artifact (closes GRAPHIFY-DAILY-COORDINATOR-01's
-  // last open item: "Fresh WorkspaceRevisionRecordV1 generated for this execution").
-  const origin = materializeWorkspaceRevisionOriginV1({
-    workspaceRoot,
-    repositoryId: 'semaj90/deeds_web_app',
-    producerRevision: 'graphify.committed-canary.v1',
-  });
-  const workspaceRevision = origin.record.workspaceRevision;
-  const expectedWorkspaceRevision = process.env.GRAPHIFY_EXPECTED_WORKSPACE_REVISION?.trim();
-  if (expectedWorkspaceRevision && expectedWorkspaceRevision !== workspaceRevision) {
-    throw new Error(`GRAPHIFY_COORDINATOR_CANARY_WORKSPACE_REVISION_MISMATCH:expected=${expectedWorkspaceRevision}:actual=${workspaceRevision}`);
-  }
-  const selectedBindings = fullMode ? origin.bindings : origin.bindings.slice(0, requestedLimit);
-  const expectedCount = fullMode ? origin.bindings.length : requestedLimit;
+const workspaceRevision = admission.workspaceRevision;
+const rootSources = snapshot.sources.filter((source) => source.repositoryId === 'repo:root');
+const rootRepositoryHead = snapshot.repositories.find((repository) => repository.relativePath === '')?.head;
+if (!rootRepositoryHead || !/^[0-9a-f]{40}$/i.test(rootRepositoryHead)) {
+  throw new Error('GRAPHIFY_COORDINATOR_CANARY_ROOT_REPOSITORY_HEAD_MISSING');
+}
+  const selectedSnapshotSources = fullMode ? rootSources : rootSources.slice(0, requestedLimit);
+  const expectedCount = selectedSnapshotSources.length;
+  if (expectedCount === 0) throw new Error('GRAPHIFY_COORDINATOR_CANARY_NO_ROOT_SNAPSHOT_SOURCES');
+  const selectedBindings = selectedSnapshotSources.map((source, index) => ({
+    schema: 'atlas.workspace-source-binding.v1' as const,
+    workspaceRevision,
+    sourceRef: source.sourceRef,
+    sourceRevision: source.sourceRevision,
+    contentDigest: source.contentDigest,
+    byteLength: source.byteLength,
+    gitObjectFormat: 'sha1' as const,
+    baseCommitOid: rootRepositoryHead,
+    gitBlobOid: null,
+    trackedAtBaseCommit: false,
+    dirtyRelativeToBaseCommit: true,
+    sourceManifestOrdinal: index,
+    readOnlyObservation: true as const,
+    canonicalAuthority: false as const,
+    producerRevision: 'workspace-snapshot.v1',
+    checksum: source.contentDigest,
+  }));
   if (selectedBindings.length !== expectedCount) {
     throw new Error(`Expected ${expectedCount} qualified source bindings from fresh materialization, got ${selectedBindings.length}`);
   }
   const bindings = adaptWorkspaceBindingsToSourceSelectionV1(workspaceRevision, selectedBindings);
+  const repositoryBindings = selectedSnapshotSources.map((source) => ({
+    repositoryId: source.repositoryId,
+    repositoryRelativePath: source.repositoryRelativePath,
+    sourceRef: source.sourceRef,
+    codeSourceRevision: source.sourceRevision,
+    contentHash: source.contentDigest,
+    byteLength: source.byteLength,
+  }));
 
   const workspaceResult = await client.query('SELECT id FROM public.workspaces WHERE id = $1::uuid', [WORKSPACE_ID]);
   const workspaceId = workspaceResult.rows[0]?.id as string | undefined;
@@ -96,7 +132,7 @@ try {
     environmentRevision: 'operator-authorized-canary',
   });
   executionId = opened.executionId;
-  const selection = await recordSourceSelectionStage(client, executionId, workspaceRevision, bindings, {
+  const selection = await recordRepositoryQualifiedSourceSelectionStageV2(client, executionId, workspaceRevision, repositoryBindings, {
     selectionPolicyRevision: fullMode ? 'graphify-current-workspace-source-selection:v1' : 'committed-canary-fresh-materialization-v1',
   });
   const orderedInventoryBindings = [...bindings].sort((a, b) => a.sourceRef.localeCompare(b.sourceRef));
@@ -169,8 +205,8 @@ try {
     status: row?.status === 'COMPLETED' && row?.completed_at && Number(row.file_count) === expectedCount && Number(row.completed_stage_count) === 5 ? (fullMode ? 'PROVEN_CURRENT_WORKSPACE_SOURCE_SELECTION' : 'PROVEN_COMMITTED_BOUNDED_CANARY') : 'READBACK_FAILED',
     executionId,
     workspaceRevision: row?.workspace_revision ?? null,
-    workspaceRevisionSource: 'materializeWorkspaceRevisionOriginV1',
-    workspaceRevisionSourceCount: origin.bindings.length,
+    workspaceRevisionSource: 'WORKSPACE_REVISION_TOURNAMENT_ADMISSION_RECEIPT',
+    workspaceRevisionSourceCount: rootSources.length,
     sourceCount: selection.sourceCount,
     sourceSelectionChecksum: selection.outputChecksum,
     inventoryInputChecksum: inventory.inputChecksum,

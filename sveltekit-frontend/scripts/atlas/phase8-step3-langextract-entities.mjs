@@ -29,8 +29,33 @@ const LANGEXTRACT_URL = process.env.LANGEXTRACT_URL || 'http://127.0.0.1:8095';
 const isDryRun = process.argv.includes('--dry-run') || process.argv.includes('dry') || (!process.argv.includes('--apply'));
 const isApply = process.argv.includes('--apply');
 const isFull = process.argv.includes('--full');
-const limitIdx = process.argv.indexOf('--limit');
-const limit = limitIdx !== -1 ? parseInt(process.argv[limitIdx + 1]) : 10000;
+const limitToken = process.argv.find((arg) => arg === '--limit' || arg.startsWith('--limit='));
+const limitValue = limitToken?.startsWith('--limit=')
+  ? limitToken.slice('--limit='.length)
+  : limitToken ? process.argv[process.argv.indexOf(limitToken) + 1] : '10000';
+const limit = Number.parseInt(limitValue, 10);
+if (!Number.isInteger(limit) || limit <= 0) throw new Error(`INVALID_LIMIT:${String(limitValue)}`);
+
+const ALLOWED_ENTITY_TYPES = new Set(['STATUTE', 'PERSON', 'ORG', 'AMOUNT', 'LOCATION']);
+const ENTITY_TYPE_ALIASES = new Map([['PARTY', 'PERSON'], ['MONEY', 'AMOUNT']]);
+
+function normalizeEntity(raw) {
+  const rawType = String(raw?.type ?? raw?.extraction_class ?? raw?.extractionClass ?? '').trim().toUpperCase();
+  const type = ENTITY_TYPE_ALIASES.get(rawType) ?? rawType;
+  const text = String(raw?.text ?? raw?.extraction_text ?? raw?.extractionText ?? '').trim();
+  if (!ALLOWED_ENTITY_TYPES.has(type) || !text) return null;
+  return {
+    type,
+    text,
+    ...(raw?.attributes && typeof raw.attributes === 'object' ? { attributes: raw.attributes } : {}),
+    ...(raw?.char_interval ? { char_interval: raw.char_interval } : {}),
+  };
+}
+
+function normalizeEntities(rawEntities) {
+  const raw = Array.isArray(rawEntities) ? rawEntities : [];
+  return { entities: raw.map(normalizeEntity).filter(Boolean), quarantined: raw.filter((item) => !normalizeEntity(item)).length };
+}
 
 console.log('╔════════════════════════════════════════════════════════════════╗');
 console.log('║  Phase 8 Step 3: LangExtract Entity Extraction                 ║');
@@ -60,7 +85,9 @@ async function extractViaLangExtract(text) {
     }
 
     const data = await response.json();
-    return data.entities || [];
+    const normalized = normalizeEntities(data.entities || data.extractions || data.items || []);
+    if (normalized.quarantined > 0) console.warn(`LangExtract quarantined ${normalized.quarantined} malformed/unknown entities`);
+    return normalized.entities;
   } catch (err) {
     console.warn(`LangExtract unavailable: ${err.message}`);
     return null;
@@ -186,6 +213,8 @@ async function extractEntities() {
         entities = extractViaRegex(p.summary);
         langExtractFails++;
       }
+
+      entities = normalizeEntities(entities).entities;
 
       // Deduplicate entities by text
       const uniqueEntities = [...new Map(entities.map((e) => [e.text, e])).values()];

@@ -1241,3 +1241,26 @@ Completed lanes (no further action needed):
 - Gemma4 receives narrowed `tools[]`, not a flat 300+ tool list.
 - No lane depends on hidden legacy Gemma4 forwarding.
 - All mutations remain behind bounded scripts with `--apply`.
+
+## Known Issue — Orphaned Test: `tests/rrf-fuse.spec.ts` (found 2026-09-09, not fixed)
+
+While running the baseline test suite alongside `rf7-09-bounded-live-replay.test.ts` (RF7-09,
+committed `2713b244d2`), found `sveltekit-frontend/tests/rrf-fuse.spec.ts` has **11 pre-existing
+failing tests**, all with the same root cause:
+
+```
+TypeError: (0, rrfFuseDenseSparse) is not a function
+```
+
+at line 145 of that spec file. `rrfFuseDenseSparse` is imported and called but **does not exist
+anywhere in the codebase** — confirmed via `grep -rln "rrfFuseDenseSparse"` across `src/` and
+`tests/`, which returns zero hits outside the spec file's own call site. This is unrelated to the
+RF6/RF7 RRF-convergence work tracked above (`SearchRuntime.fuseCandidates()` /
+`openspec/changes/parent-atlas-retrieval-fusion-reachability/`) — it predates this session's work
+and was not introduced by it.
+
+**Not yet fixed.** Whoever picks this up next: either (a) find/restore the intended
+`rrfFuseDenseSparse` export if one was meant to exist (check git history for the spec file and any
+sibling implementation that was removed), or (b) if the scenario it tests is now covered elsewhere
+(e.g. by `fusion-core-v1.test.ts` or `rf7-contract-parity-01.test.ts`), delete the orphaned spec
+file rather than leave a permanently-red suite.

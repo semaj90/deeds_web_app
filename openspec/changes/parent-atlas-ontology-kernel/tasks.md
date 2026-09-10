@@ -2498,6 +2498,14 @@ XGBoost/PyTorch classifier
   direct classifier-to-tuple counts remain zero, with no persistence or
   projection attempted. The real admission gate remains open pending an
   approved source-namespace owner.
+  Recheck 2026-09-09: the same read-only real-file admission probe again
+  classified `__tests__/data-hashing.spec.ts` as `database` and verified an
+  exact content-hash match to its bound `sourceRevision`. The producer again
+  rejected the signal with `SOURCE_NAMESPACE_UNPROVEN`; `sourceNamespace=null`,
+  direct classifier-to-ontology identity count `0`, direct classifier-to-tuple
+  count `0`, `writesPerformed=false`, and `canonicalAuthority=false`. This
+  confirms the fail-closed behavior, not canonical ontology admission.
+  Evidence: `docs/reports/domain-classifier-real-admission-v1.json`.
   Source-evidence hydration audit (2026-09-02): added
   `scripts/atlas/audit-current-source-evidence-hydration-v1.mjs` and
   `docs/reports/current-source-evidence-hydration-v1.json`. Across the 111

@@ -1,0 +1,43 @@
+{
+  "schema": "atlas.latent-phase16-scale-admission.v1",
+  "generatedAt": "2026-09-09T22:32:23.626Z",
+  "mode": "READ_ONLY",
+  "status": "SCALE_ADMISSION_BLOCKED_AUTHORITY_AND_CAPACITY",
+  "proofLevel": "PARTIAL_PROVEN",
+  "authority": false,
+  "writesPerformed": false,
+  "workspaceRevision": null,
+  "input": {
+    "corpusBundle": "docs/reports/sem768-corpus-bundle-01.json",
+    "corpusBundleChecksum": "sha256:f0b06ea73ba9cdd5898106bbaf2c3943a8ef794a3207c51555ddcdfa6f48ca71",
+    "representationRevision": "semantic_768:embeddinggemma:latest:eg-task-prefix-v1:sha256:a862f044e5f2fb4b9d1ba890fa7eb92fea93a329e43df0d513a05357d61dc9c4",
+    "sourceAuthorityStatus": "PARTIAL",
+    "admittedCohortCount": 576,
+    "admittedCohortChecksum": "sha256:3f92e67810027d04298c0998f485b4d42424cac681d73cf5334e958a49c7b87a"
+  },
+  "boundedCanary": {
+    "report": "docs/reports/latent-phase16-frozen-cohort-apply-replay-v1.json",
+    "proven": true,
+    "cohortSize": 128,
+    "sameFrozenCohort": true,
+    "idempotentReplay": true,
+    "outsideCohortMutations": null
+  },
+  "scalePredicates": {
+    "currentSourceAuthority": false,
+    "workspaceRevisionAdmitted": false,
+    "representationLedgerAdmitted": false,
+    "capacityReceiptPresent": false,
+    "restartRecoveryReceiptPresent": false,
+    "independentFullCohortReadbackPlanPresent": false,
+    "unboundedApplyAuthorized": false
+  },
+  "blockers": [
+    "WORKSPACE_REVISION_AUTHORITY_NOT_ADMITTED",
+    "SOURCE_AUTHORITY_STATUS_NOT_FULL",
+    "CAPACITY_AND_RECOVERY_RECEIPT_MISSING",
+    "UNBOUNDED_APPLY_REMAINS_BLOCKED"
+  ],
+  "nextGate": "GRAPHIFY-SNAPSHOT-BINDING-01",
+  "safeNextCommand": "npm run atlas:graphify:snapshot-binding:audit"
+}

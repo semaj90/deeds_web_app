@@ -28,3 +28,32 @@ Retrieval executors MUST return revision and identity metadata, while SearchRunt
 #### Scenario: An executor lacks canonical identity
 - **WHEN** a result has only a projection or degraded fallback identity
 - **THEN** the result remains observable as degraded and cannot silently become canonical identity.
+
+### Requirement: Weight semantics must be classified before consolidation
+RRF weights, routing priors, reranker features, hotness scores, and executor-local
+weights MUST remain distinct until their application stage and policy scope are
+explicitly identified. A shared numeric type or similar name MUST NOT establish
+shared semantic authority.
+
+#### Scenario: A raw weight has an unknown meaning
+- **WHEN** the census cannot identify the weight's semantic class, application stage,
+  or policy scope
+- **THEN** the entry is classified as `UNCLASSIFIED`
+- **AND** migration authorization remains false.
+
+#### Scenario: An executor is listed as a lane
+- **WHEN** Qdrant, cuVS, CAGRA, TurboVec, or another executor name appears as an
+  independent fusion lane
+- **THEN** the census records an `EXECUTOR_AS_LANE` conflict
+- **AND** the executor does not receive an independent logical-lane vote.
+
+#### Scenario: Equivalent logical lanes use different names
+- **WHEN** multiple weight sources map to one logical lane
+- **THEN** the mapping records all aliases and executors
+- **AND** the lane contributes at most one RRF vote before fusion.
+
+#### Scenario: Weight consolidation is proposed
+- **WHEN** the census has unclassified entries, semantic conflicts, unmapped voting
+  sources, or missing caller replay evidence
+- **THEN** `migrationAuthorized` is false
+- **AND** no ranking or runtime fusion implementation is changed.

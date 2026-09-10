@@ -483,6 +483,14 @@ described above (confirmed via direct `fileCount` read of the live file). The ne
 safety prevents *future* accidental overwrites but does not retroactively repair the already-
 corrupted canonical file — that requires an actual H13 canonical run, not yet performed.
 
+**2026-09-09 publication preflight correction:** the current checkout no longer contains a
+readable `docs/graph/codebase-graph.json`; the read-only preflight reports
+`PUBLICATION_PREFLIGHT_BLOCKED` with 4/6 safety checks present. The preflight confirms the
+run-scoped temporary path and atomic rename machinery, but canonical promotion remains
+blocked by missing sealed-snapshot binding, missing candidate receipt, and the absent
+canonical artifact. Report: `docs/reports/graphify-atomic-publication-preflight-v1.json`.
+This does not authorize a canonical Graphify run or direct artifact repair.
+
 **Not done** (per the addendum's B1/B3/B4, explicitly out of scope for this pass): the full
 `CodebaseGraphStageReceipt` structured JSON format (only inline console timing was added), no
 correction of any stale `npm run graphify:daily` documentation claims.

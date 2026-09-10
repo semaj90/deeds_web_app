@@ -1,0 +1,326 @@
+{
+  "schema": "atlas.workspace-snapshot-namespace-dedup.v1",
+  "generatedAt": "2026-09-10T00:04:57.621Z",
+  "mode": "READ_ONLY",
+  "workspaceId": "parent-atlas-local",
+  "canonicalAuthority": false,
+  "workspaceRevision": null,
+  "writesPerformed": false,
+  "status": "NAMESPACE_AUDIT_COMPLETE",
+  "counts": {
+    "totalFiles": 25263,
+    "repositoryCount": 7,
+    "sourceInputCount": 25204,
+    "generatedArtifactCount": 0,
+    "modelArtifactCount": 59,
+    "SOURCE_INPUT": 25204,
+    "SUBMODULE_SOURCE": 0,
+    "GENERATED_ARTIFACT": 0,
+    "VENDORED": 0,
+    "MODEL_ARTIFACT": 59,
+    "IGNORED": 0
+  },
+  "duplicateSourceKeys": 0,
+  "duplicateContentDigests": 469,
+  "uniqueContentDigestCount": 24401,
+  "largestContentDuplicateGroup": 60,
+  "contentDuplicateGroups": [
+    {
+      "contentDigest": "19e7ba3b8bb880ce4f4b0c3ab9d876384a351062fd70050060dac7dd6d7aea80",
+      "count": 2,
+      "sourceIdentityKeys": [
+        "repo:root:.claude/skills/metadata-context-analysis/SKILL.md",
+        "repo:root:.opencode/skills/metadata-context-analysis/SKILL.md"
+      ]
+    },
+    {
+      "contentDigest": "83e0d2d4c47674e312fc9d29297d91e5c018a5507e6961829ee623600e2cf2ff",
+      "count": 3,
+      "sourceIdentityKeys": [
+        "repo:root:.claude/skills/openspec-apply-change/SKILL.md",
+        "repo:root:.cline/skills/openspec-apply-change/SKILL.md",
+        "repo:root:.codex/skills/openspec-apply-change/SKILL.md"
+      ]
+    },
+    {
+      "contentDigest": "85c8764715a18fbd11d16ca04bd9e15d8644bf5e4203176ad34eee192b546472",
+      "count": 4,
+      "sourceIdentityKeys": [
+        "repo:root:.claude/skills/openspec-archive-change/SKILL.md",
+        "repo:root:.cline/skills/openspec-archive-change/SKILL.md",
+        "repo:root:.codex/skills/openspec-archive-change/SKILL.md",
+        "repo:root:.opencode/skills/openspec-archive-change/SKILL.md"
+      ]
+    },
+    {
+      "contentDigest": "79249f798ad0d69bf95f08f3c7a29d44d982e4c1645f1a12a21dfcd488f4ba0d",
+      "count": 3,
+      "sourceIdentityKeys": [
+        "repo:root:.claude/skills/openspec-explore/SKILL.md",
+        "repo:root:.cline/skills/openspec-explore/SKILL.md",
+        "repo:root:.codex/skills/openspec-explore/SKILL.md"
+      ]
+    },
+    {
+      "contentDigest": "a666b2381a7d5e982d8e32183484020f518da2b795c0f387c5ff4b3cb47be0fd",
+      "count": 3,
+      "sourceIdentityKeys": [
+        "repo:root:.claude/skills/openspec-propose/SKILL.md",
+        "repo:root:.cline/skills/openspec-propose/SKILL.md",
+        "repo:root:.codex/skills/openspec-propose/SKILL.md"
+      ]
+    },
+    {
+      "contentDigest": "420e5815eee33ebd642b9d038f0a5307b176923a5c1a837c4873e51de085aae3",
+      "count": 4,
+      "sourceIdentityKeys": [
+        "repo:root:.claude/skills/openspec-sync-specs/SKILL.md",
+        "repo:root:.cline/skills/openspec-sync-specs/SKILL.md",
+        "repo:root:.codex/skills/openspec-sync-specs/SKILL.md",
+        "repo:root:.opencode/skills/openspec-sync-specs/SKILL.md"
+      ]
+    },
+    {
+      "contentDigest": "7407473d0dcd2fe07746b3bdd7dfee8d3acdebaac513172bcea1f05835f887c5",
+      "count": 2,
+      "sourceIdentityKeys": [
+        "repo:root:.claude/skills/trace-mcp-tooling/SKILL.md",
+        "repo:root:.opencode/skills/trace-mcp-tooling/SKILL.md"
+      ]
+    },
+    {
+      "contentDigest": "4bc1d531a8a7b2240d81cc4544487803242ea95d557d470738b0d03a080c71d2",
+      "count": 2,
+      "sourceIdentityKeys": [
+        "repo:root:.cline/rules/10-architecture.md",
+        "repo:root:.clinerules/10-architecture.md"
+      ]
+    },
+    {
+      "contentDigest": "756a8012a018b48c7272e0e6f257414361ea2dd0bd588da8470df0e5645f01e3",
+      "count": 2,
+      "sourceIdentityKeys": [
+        "repo:root:.gpu-rerank-11976-1782023627227.json",
+        "repo:root:.gpu-rerank-44384-1782059518577.json"
+      ]
+    },
+    {
+      "contentDigest": "a4d9b4de2ea095d09e2e7f061e3909ade07ae65130d65121e4e88afb4af32455",
+      "count": 2,
+      "sourceIdentityKeys": [
+        "repo:root:COLAB-CLUSTER-ENRICHMENT-GUIDE.md",
+        "repo:root:scripts-data/COLAB-CLUSTER-ENRICHMENT-GUIDE.md"
+      ]
+    },
+    {
+      "contentDigest": "740cb7b9c3a76f3476121788b7c5e131c473eda0904352ca90de50be37d4e45a",
+      "count": 2,
+      "sourceIdentityKeys": [
+        "repo:root:ace-vector-selection-slice/src/lib/server/ace/vector/ace-packet-vector.ts",
+        "repo:root:sveltekit-frontend/src/lib/server/atlas/vector/ace-packet-vector.ts"
+      ]
+    },
+    {
+      "contentDigest": "690a3e47eccc58d0e4c5b7d88cf6f4df413f5b2f38199f4325a5a8821b674f47",
+      "count": 3,
+      "sourceIdentityKeys": [
+        "repo:claude-mem:.agent/rules/claude-mem-context.md",
+        "repo:claude-mem:.github/copilot-instructions.md",
+        "repo:claude-mem:WARP.md"
+      ]
+    },
+    {
+      "contentDigest": "876e5201758e3c04d24c0466e21b5e03f5d498d4fc22607e14d5942d654d2808",
+      "count": 2,
+      "sourceIdentityKeys": [
+        "repo:claude-mem:.claude-plugin/plugin.json",
+        "repo:claude-mem:plugin/.claude-plugin/plugin.json"
+      ]
+    },
+    {
+      "contentDigest": "725ef1489b04d8762d564f6b406a31b1292443f996d418fc87e02a18f5f99fdb",
+      "count": 2,
+      "sourceIdentityKeys": [
+        "repo:claude-mem:plugin/skills/how-it-works/onboarding-explainer.md",
+        "repo:claude-mem:src/services/worker/onboarding-explainer.md"
+      ]
+    },
+    {
+      "contentDigest": "aa7d2ac01ee024deb2df8891a498123bb7c15d9303fb767f6085a9aac92f0d4f",
+      "count": 2,
+      "sourceIdentityKeys": [
+        "repo:root:crates/atlas_packet_parser/build.rs",
+        "repo:root:crates/turbovec-napi/build.rs"
+      ]
+    },
+    {
+      "contentDigest": "8083f05dab5a7504ebc1cafcb474d18c1d07abc11611656912abfb8373591bf5",
+      "count": 2,
+      "sourceIdentityKeys": [
+        "repo:root:crates/omni-bridge/target/.rustc_info.json",
+        "repo:root:simd-bridge/rust-simdjson/target/.rustc_info.json"
+      ]
+    },
+    {
+      "contentDigest": "f11664b74071e332d32a87319790e6ed25965208416411b26dba2d3a7d852616",
+      "count": 2,
+      "sourceIdentityKeys": [
+        "repo:root:docker/docling-vlm/docling_analyze.py",
+        "repo:root:python/docling_analyze.py"
+      ]
+    },
+    {
+      "contentDigest": "bb9555c987f5617407b496633467a01f0b100fd13dd330a47af6abb5f9b93896",
+      "count": 2,
+      "sourceIdentityKeys": [
+        "repo:root:docs/atlas/AGENT-TASK-PACKAGES-2026-06-13.md",
+        "repo:root:packages/parent-atlas/docs/atlas/AGENT-TASK-PACKAGES-2026-06-13.md"
+      ]
+    },
+    {
+      "contentDigest": "c0f541212d548b025e957e543b17aaea5ece0e04fbc7def77edb163c1c3af69a",
+      "count": 2,
+      "sourceIdentityKeys": [
+        "repo:root:docs/atlas/ATLAS-1.0-BASELINE.md",
+        "repo:root:packages/parent-atlas/docs/atlas/ATLAS-1.0-BASELINE.md"
+      ]
+    },
+    {
+      "contentDigest": "6355dda32608db22f2a706cb0a3ed28fb5f1bb7f1c26e50f23b070c562407002",
+      "count": 2,
+      "sourceIdentityKeys": [
+        "repo:root:docs/atlas/ATLAS-2.0-PHASE-2-COMPLETION.md",
+        "repo:root:packages/parent-atlas/docs/atlas/ATLAS-2.0-PHASE-2-COMPLETION.md"
+      ]
+    },
+    {
+      "contentDigest": "f4872d9f5d316adbf85d3e7b2c25e06ab05a27d5ad0089ee606f9e30563b5d93",
+      "count": 2,
+      "sourceIdentityKeys": [
+        "repo:root:docs/atlas/ATLAS-3.0-HYPERRAG-RUNTIME.md",
+        "repo:root:packages/parent-atlas/docs/atlas/ATLAS-3.0-HYPERRAG-RUNTIME.md"
+      ]
+    },
+    {
+      "contentDigest": "29883600f1ba78c3a4924e56327390c21297970a2281bfa5619a0f68d84a2e7f",
+      "count": 2,
+      "sourceIdentityKeys": [
+        "repo:root:docs/atlas/LANE-1B-HIGHER-HOP-ENRICHMENT.md",
+        "repo:root:packages/parent-atlas/docs/atlas/LANE-1B-HIGHER-HOP-ENRICHMENT.md"
+      ]
+    },
+    {
+      "contentDigest": "96ea6fcfa9c7fef989554c4581d8b187a0b2a333dde4362d73f568bdc0a3751e",
+      "count": 2,
+      "sourceIdentityKeys": [
+        "repo:root:docs/atlas/OPEN-LANES-NEXT-STEPS-2026-06-13.md",
+        "repo:root:packages/parent-atlas/docs/atlas/OPEN-LANES-NEXT-STEPS-2026-06-13.md"
+      ]
+    },
+    {
+      "contentDigest": "01425f499dd8f348919554b35ce9e0a3eae0ca37d602304b0700b8065571fe9d",
+      "count": 2,
+      "sourceIdentityKeys": [
+        "repo:root:docs/atlas/OPENCODE-IMPLEMENTATION-CHECKLIST.md",
+        "repo:root:packages/parent-atlas/docs/atlas/OPENCODE-IMPLEMENTATION-CHECKLIST.md"
+      ]
+    },
+    {
+      "contentDigest": "40b3e86269f21b4039aed3b2adf37ea22c2c792c10353ddf44f5c8ec07877e5c",
+      "count": 2,
+      "sourceIdentityKeys": [
+        "repo:root:docs/atlas/QDRANT-POSTGRES-PAYLOAD-CONTRACT.md",
+        "repo:root:packages/parent-atlas/docs/atlas/QDRANT-POSTGRES-PAYLOAD-CONTRACT.md"
+      ]
+    }
+  ],
+  "generatedPathPolicy": {
+    "paths": [
+      "docs/reports/**",
+      ".tmp/**",
+      "coverage/**",
+      "dist/**",
+      "build/**"
+    ],
+    "participatesInWorkspaceRevision": false
+  },
+  "modelPathPolicy": {
+    "paths": [
+      "models/**",
+      "**/models/**",
+      "**/checkpoints/**"
+    ],
+    "participatesInWorkspaceRevision": false
+  },
+  "nestedRepositories": [
+    {
+      "repositoryId": "repo:root",
+      "rootPath": ".",
+      "repositoryRevision": "9119b12ee03c32ca3a1d4fcd18be49454e80f6e5",
+      "sourceCount": 24177,
+      "identityNamespaceIsolated": true
+    },
+    {
+      "repositoryId": "repo:claude-mem",
+      "rootPath": "claude-mem",
+      "repositoryRevision": "5f0a63fa508762632dcf72964a9fff4db6a016ae",
+      "sourceCount": 763,
+      "identityNamespaceIsolated": true
+    },
+    {
+      "repositoryId": "repo:granite-docling-258M",
+      "rootPath": "granite-docling-258M",
+      "repositoryRevision": "982fe3b40f2fa73c365bdb1bcacf6c81b7184bfe",
+      "sourceCount": 10,
+      "identityNamespaceIsolated": true
+    },
+    {
+      "repositoryId": "repo:mcp-server-mcp",
+      "rootPath": "mcp-server-mcp",
+      "repositoryRevision": "35b6a5a51ccfcfb228a317a8f8261dd91012d30b",
+      "sourceCount": 192,
+      "identityNamespaceIsolated": true
+    },
+    {
+      "repositoryId": "repo:models/embeddinggemma_300m",
+      "rootPath": "models/embeddinggemma_300m",
+      "repositoryRevision": "81e2a3b87eebf4bf78bbbedeb1c98dbe2522c3cd",
+      "sourceCount": 13,
+      "identityNamespaceIsolated": true
+    },
+    {
+      "repositoryId": "repo:sites/parent-atlas-gateboard",
+      "rootPath": "sites/parent-atlas-gateboard",
+      "repositoryRevision": "b77248ff61ac5238705b57ec4a83bb91a55a3257",
+      "sourceCount": 22,
+      "identityNamespaceIsolated": true
+    },
+    {
+      "repositoryId": "repo:turbovec",
+      "rootPath": "turbovec",
+      "repositoryRevision": "7351fc621368ea49797b710dff6448c9238605ca",
+      "sourceCount": 86,
+      "identityNamespaceIsolated": true
+    }
+  ],
+  "estimatedManifestBytes": {
+    "serializedMetadataBytes": 11138236,
+    "estimateRangeBytes": [
+      11138236,
+      20048825
+    ]
+  },
+  "sourceNamespace": {
+    "duplicateIdentityPolicy": "repositoryId + repositoryRelativePath",
+    "contentDuplicatesAllowed": true,
+    "sourceIdentityChecksum": "sha256:2765f99258362d17899e7e9acdcf7922ae2cee80da6965fd5d5e5695d4343d47"
+  },
+  "postgresSourceMembership": {
+    "reachable": true,
+    "relation": null,
+    "columns": [],
+    "requiredColumnsPresent": false
+  },
+  "violations": [],
+  "reportChecksum": "sha256:eef6e12ec3ff6e26ac677c3515bb288846b9bd797b54350cebc4abd564a6ec4f"
+}

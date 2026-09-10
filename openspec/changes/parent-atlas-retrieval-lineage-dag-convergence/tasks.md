@@ -3,6 +3,75 @@
 The remaining work is intentionally ordered by evidence dependency. Do not use
 checkbox completion percentage as permission to skip a blocker.
 
+**2026-09-09 snapshot handoff correction:** a valid sealed workspace snapshot is
+already present and is treated as S1. Do not recapture it merely to satisfy an
+older instruction. The next source-authority gate is consumption of S1 through
+the existing source-selection plan, exact-byte binding audit, and later bounded
+Graphify authorization. The binding auditor now points to
+`npm run atlas:graphify:source-selection:plan`; `workspaceRevision` remains
+`null` and no authority or mutation is implied until tournament/source-owner
+admission.
+
+The refreshed S1 binding audit is correctly fail-closed: snapshot readback
+matched `25,240/25,247` members and detected seven exact-byte drift failures in
+the current worktree (including `package.json`, the fusion and lineage ledgers,
+the tournament ledger, and the binding auditor itself). Result:
+`GRAPHIFY_SNAPSHOT_BINDING_BLOCKED_SNAPSHOT_READBACK`; this is `SOURCE_DRIFT`,
+not evidence that a new Graphify execution should be started. Graphify terminal
+execution matching remains `0/13`, with `workspaceRevision` still `null`.
+
+**2026-09-09 live recheck:** `npm run atlas:graphify:snapshot-binding:audit`
+reached PostgreSQL and found the three Graphify execution surfaces, but returned
+`GRAPHIFY_SNAPSHOT_BINDING_BLOCKED_SNAPSHOT_READBACK`; `terminalExecutionCount`
+was `13`, `matchingExecutions` was `0`, and `workspaceRevision` was `null`.
+This confirms the gate remains blocked by current snapshot readback. No
+Graphify execution was launched and no canonical revision was assigned.
+
+The prescribed read-only source-selection plan was then rerun. It produced
+`SOURCE_SELECTION_PLAN_BLOCKED` with `proofLevel: BLOCKED`, `authority: false`,
+`workspaceRevision: null`, `sourceCount: 25,256`, and selection checksum
+`sha256:148d75a62250bdf8942270fca206c07eb76346dc8cc2f7213f39364b35bf3376`.
+Receipt: `docs/reports/graphify-source-selection-plan-v1.json`.
+
+The new snapshot is stable and byte-readable (`25,260/25,260`, no capture
+violations), but tournament admission remains intentionally blocked:
+`TOURNAMENT_REQUIRES_BOUND_WORKSPACE_REVISION`. The tournament audit reports
+`tournamentCanAcceptPlan: false` and `workspaceRevision: null`; no plan was
+accepted and no Graphify execution was launched.
+
+The source-selection plan now exposes the sealed snapshot as a
+non-authoritative `workspaceRevisionCandidate` while retaining
+`workspaceRevision: null`. This documents the handoff value without allowing
+the planner to promote it or satisfy the tournament request contract early.
+
+Added the read-only `WORKSPACE-REVISION-TOURNAMENT-SOURCE-AUTHORITY-01`
+preflight: `npm run atlas:graphify:workspace-revision:preflight`. It validates
+snapshot byte readback, candidate identity, and membership checksum parity,
+while retaining `workspaceRevision: null`, `authority: false`, and requiring
+explicit approval for any future admission.
+
+Explicit admission was authorized with
+`AUTHORIZE_WORKSPACE_REVISION_TOURNAMENT_ADMISSION_V1`. The bounded admission
+receipt may bind the snapshot revision for the tournament control plane only;
+Graphify execution, projection writes, auto-apply, and training remain disabled.
+
+The current-run-owner audit also no longer imports a stale lifecycle report as
+an implicit expected revision. It remains unbound unless
+`ATLAS_EXPECTED_GRAPHIFY_WORKSPACE_REVISION` is explicitly supplied by an
+approved admission step.
+
+The source-selection planner checksum was corrected to hash the same
+repository-qualified `sourceIdentityKey` values sealed by `WorkspaceSnapshotV1`
+instead of path-only values. This closes the planner checksum-definition drift;
+it does not promote the snapshot or assign `workspaceRevision`.
+
+After a final stable recapture, the planner now returns
+`SOURCE_SELECTION_PLAN_READY_NOT_ADMITTED` for `25,260` sources with exact
+membership checksum parity (`sha256:5236650a0d836f08a7811eab01ca39c80cd9dd769717ea40106c412b70b977e6`).
+The tournament admission boundary is consequently `CONTRACT_PROVEN`, while
+`tournamentCanAcceptPlan: false` remains correct until explicit authority
+admission supplies the non-null revision.
+
 1. **Packet lineage:** `GRAPHIFY-DAILY-COORDINATOR-01` is CLOSED with committed
    execution-ledger proof. `PKT-LINEAGE-08A` is now `PROVEN_CANARY` for the recorded
    50-source/434-membership bounded cohort: direct readback and same-proposal replay
@@ -3311,6 +3380,14 @@ once (`writtenCount: 128`) and replayed with the identical cohort manifest (`eli
 `writtenCount: 0`). Evidence: `docs/reports/latent-phase16-frozen-cohort-apply-replay-v1.json`.
 This proves bounded idempotence for this cohort only; it does not authorize bulk repair or a
 `graphify:daily` rerun.
+
+**2026-09-09 scale-admission audit:** the attached handoff's claim that the next gate is the
+128-row replay is stale relative to the repository receipts; that replay is already proven.
+The new read-only audit `npm run atlas:phase16:scale-admission:audit` confirms
+`canaryProven=true` but keeps scale blocked: the current bundle exposes `576` admitted IDs,
+`workspaceRevision` authority is not admitted, source authority is not full, and capacity /
+restart-recovery / independent full-cohort readback receipts are absent. Report:
+`docs/reports/latent-phase16-scale-admission-v1.json`. No latent writer was invoked.
 
 **Additional blocker (2026-09-02): legacy `latent64_model` marker.** A read-only audit found
 `latent_64` rows carrying `packet-autoencoder-768-64`, while the new executor's eligibility
@@ -10082,3 +10159,424 @@ half still requires full wiring through
 
 File: `semantic-packet-writer.ts` (+ its `.spec.ts`). Zero production
 packet_keys touched.
+## CURRENT-WORKTREE-SNAPSHOT-AUTHORITY-01 — capture seam (2026-09-09)
+
+### Graphify binding audit (2026-09-09)
+
+- [x] Added the bounded, read-only Graphify-to-`WorkspaceSnapshotV1` binding
+  audit. It introspects the live execution-ledger schema, compares terminal
+  `graphify_executions` and `graphify_execution_files` membership/revisions to
+  an explicitly supplied sealed snapshot, and never assigns
+  `workspaceRevision` or admits a runtime owner.
+- [x] Added `npm run atlas:graphify:snapshot-binding:audit` and report
+  `docs/reports/graphify-workspace-snapshot-binding-v1.json`.
+- [ ] Current Graphify consumption remains unproven until a stable snapshot
+  passes independent byte readback and exactly one terminal execution matches
+  its source membership and content revisions. `workspaceRevision` remains
+  `null`, `authority=false`, and no downstream apply is permitted.
+
+Binding audit evidence (2026-09-09): `npx tsx
+scripts/atlas/audit-graphify-workspace-snapshot-binding-v1.mts` inspected the
+live schemas and 13 terminal executions. Against the fresh 25,246-source,
+7-repository snapshot, no execution matched the snapshot membership and
+content revisions; the largest completed populations were 24,139 and 24,132.
+The audit returned `GRAPHIFY_SNAPSHOT_BINDING_BLOCKED` with first blocking
+invariant `NO_TERMINAL_GRAPHIFY_EXECUTION_MATCHES_SNAPSHOT`, while preserving
+`workspaceRevision=null`, `authority=false`, and zero datastore writes.
+
+- [x] Added `plan-graphify-source-selection-from-snapshot-v1.mts`, a pure
+  adapter from the sealed snapshot to the coordinator's source-selection
+  binding shape. It emits an exact source-selection checksum and explicit
+  admission metadata, but refuses to call `recordSourceSelectionStage` while
+  `workspaceRevision` is null.
+- [ ] Graphify snapshot consumption is not admitted. The plan must remain
+  read-only until one tournament/source-authority decision supplies a bound
+  workspace revision and a separately authorized execution canary.
+
+- [x] Added `audit-graphify-tournament-admission-v1.mts` to prove the current
+  boundary is fail-closed: the existing tournament request requires a non-null
+  `workspaceRevision`, while the snapshot plan intentionally carries `null`.
+  The audit records this incompatibility without weakening either contract.
+- [ ] Tournament/source-authority admission remains open; no tournament,
+  Graphify execution, or source-selection ledger write is triggered by this
+  audit.
+
+- [x] Reuse workspace-revision-origin-runtime inventory and source digests in a two-scan capture adapter. Capture root and Git-discovered nested repositories, Git HEAD/index checksums, source membership and content checksums. Drift between scans blocks sealing.
+- [x] Store the capture in a checksum-addressed, create-only local report. Independent validation checks the manifest digest and every recorded source's bytes. Keep workspaceRevision null and canonicalAuthority false pending admission.
+- [x] Fixture: nested dirty content changes snapshot identity with unchanged Git HEAD; unchanged replay is stable; mid-capture drift, stale source bytes and manifest tampering are rejected.
+- [ ] Full-workspace nested-repository coverage and Graphify consumption remain unproven. Ignored nested repositories are explicitly outside the capture policy. This manifest does not retain source blobs, so consumers must verify bytes immediately before use; it is not an atomic filesystem snapshot.
+- [ ] Snapshot-pair deletion hydration, rename identity, terminal Graphify receipt and canonical admission remain open. Tournament fixture development can proceed independently of full-workspace promotion.
+
+Tracked nested-repository deletions are now classified explicitly: missing
+tracked files are retained as `deletedTracked` repository metadata and are not
+treated as unreadable current sources. The two `turbovec/.github/workflows`
+files found in the latest capture are confirmed tracked deletions. They still
+require base-snapshot hydration before a temporal tombstone can be admitted.
+
+Fresh full-workspace capture and independent readback then passed:
+`CAPTURE_VERIFIED_REQUIRES_PROCESSING_READBACK`, snapshot revision
+`sha256:fe8e848a7b2d75073f00f29d6996e773c7d9c29c865c309fb0aa86646c06f738`,
+25,245 exact source-byte matches, 7 repositories, 0 violations. This is a
+valid non-canonical snapshot artifact; `workspaceRevision` remains null until
+the tournament/source-authority admission gate consumes it.
+
+Files: scripts/atlas/lib/workspace-snapshot-capture-v1.mts,
+scripts/atlas/capture-workspace-source-snapshot-v1.mts,
+scripts/atlas/audit-workspace-source-snapshot-v1.mts,
+scripts/atlas/workspace-snapshot-capture-v1.test.mts.
+Verification: npx tsx --test scripts/atlas/workspace-snapshot-capture-v1.test.mts.
+
+### Full-workspace capture recheck (2026-09-09)
+
+- [x] Operator commands added: `npm run atlas:workspace:snapshot:capture` and
+  `npm run atlas:workspace:snapshot:audit`.
+- [x] Full capture remained fail-closed with `CAPTURE_BLOCKED`; the latest
+  checksum-addressed artifact recorded 7 Git repositories and two unreadable
+  nested-repository files: `turbovec/.github/workflows/release-crates.yml` and
+  `turbovec/.github/workflows/release-pypi.yml`.
+- [x] `workspaceRevision` remained `null`, `canonicalAuthority=false`, and no
+  database, Graphify, projection, cache, or model writes occurred.
+- [ ] Do not promote this observation. Resolve the nested-repository read
+  failure or capture a stable snapshot pair, then independently audit the exact
+  manifest before allowing Graphify consumption.
+
+Evidence: `docs/reports/workspace-source-snapshots/469b7615d848bc1636583ffbc60f6557a18f21b6cf0cac4f98e008ec07d6d72e.json`.
+
+Independent audit of that artifact returned `SNAPSHOT_READBACK_BLOCKED`:
+25,234/25,237 recorded bytes matched, while `openspec/changes/parent-atlas-
+retrieval-lineage-dag-convergence/tasks.md`, `package.json`, and the audit
+script itself had changed after capture. This is expected snapshot invalidation
+and confirms the capture is content-bound rather than a current-worktree claim.
+
+### Qdrant semantic identity canary recheck (2026-09-09)
+
+- [x] Re-ran the existing read-only semantic lineage canary against the approved
+  `codebase_chunks_768_v2` collection, using the existing 15-row
+  `lineage-qualified-candidate-map-v1.json`; no new writer or identity path was
+  introduced.
+- [x] The collection returned all 15 requested points, but `exactMatches=0` and
+  all 15 were blocked. Each sampled payload lacked `workspace_revision`,
+  `representation_id`, `embedding_dimension`, and `representation_revision`.
+- [ ] Keep `QDRANT_V2_IDENTITY_PROVEN` closed. Collection reachability, 768-D
+  shape, point count, or packet-key matching is not sufficient without the
+  current revision-qualified representation envelope. The v2 canary remains
+  `CANARY_QDRANT_IDENTITY_BLOCKED`, `canonicalAuthority=false`, and `writes=false`.
+
+Evidence: `docs/reports/lineage-qdrant-semantic-canary-v1.json`.
+Command: `$env:ATLAS_QDRANT_COLLECTION='codebase_chunks_768_v2'; node
+scripts/atlas/audit-lineage-qdrant-semantic-canary-v1.mjs`.
+Next gate: establish the admitted workspace snapshot and representation ledger,
+then regenerate a bounded candidate map from that same revision before any
+Qdrant payload repair or projection apply.
+
+### Workspace snapshot authority recheck (2026-09-09)
+
+- [x] Audited the existing sealed snapshot with the exact manifest path. The
+  result is `SNAPSHOT_READBACK_BLOCKED`: `25,236/25,245` recorded source bytes
+  matched the current checkout.
+- [x] Nine recorded sources no longer read back identically, including the
+  active Graphify/retrieval OpenSpec ledgers, `package.json`, and the temporal
+  supersession contract/test files. This is live worktree drift, not evidence
+  that the snapshot should be rewritten or promoted.
+- [ ] Keep `workspaceRevision=null` and `canonicalAuthority=false`. The
+  snapshot cannot authorize Graphify, semantic regeneration, Qdrant repair, or
+  projection apply until a stable exact-byte snapshot is admitted by the
+  tournament/source-authority gate.
+
+Evidence: the audit command returned `SNAPSHOT_READBACK_BLOCKED` with
+`datastoreWritesPerformed=false`; no canonical data was changed.
+
+### Tournament/source-selection admission recheck (2026-09-09)
+
+- [x] Ran the existing Graphify source-selection planner after the tournament
+  admission audit. It produced `SOURCE_SELECTION_PLAN_BLOCKED` for the sealed
+  snapshot: `sourceCount=25,247`,
+  `sourceSelectionChecksum=sha256:d4274841aa2c44139e3501ff653a5647d9e166af4123a7e73e9f534b59c1d7ef`,
+  `workspaceRevision=null`, and `authority=false`.
+- [ ] Do not trigger source-selection ledger writes or Graphify execution. The
+  tournament remains blocked until a source-authority decision supplies a
+  bound revision and the exact snapshot passes independent readback.
+
+Evidence: `docs/reports/graphify-source-selection-plan-v1.json` and
+`docs/reports/graphify-tournament-admission-v1.json`.
+
+### Current source-authority selector recheck (2026-09-09)
+
+- [x] Ran the existing tolerance-aware current-source selector from the
+  repository root. It found `19` total Graphify runs, `12` completed,
+  `4` completed-and-bound, `8` completed-but-unbound, `0` running, and
+  `ambiguityCount=0`.
+- [x] No bound completed run matches the current workspace, so the selector
+  returned `NO_CURRENT_COMPLETED_BOUND_SOURCE_OWNER`, `selectedRunId=null`, and
+  `sourceCount=0`. This is current-workspace drift, not an ownership tie.
+- [ ] Keep source-authority admission closed. The separate namespace audit is
+  proven, but it cannot substitute for a current terminal execution bound to
+  the exact admitted snapshot and membership checksum.
+
+Evidence: `docs/reports/current-source-evidence-authority-v1.json`.
+
+### Graphify lifecycle-owner recheck (2026-09-09)
+
+- [x] Ran the existing lifecycle-owner audit after the source-authority
+  selector. Namespace authority remains `PROVEN`, while lifecycle ownership is
+  `LIFECYCLE_OWNER_UNPROVEN`.
+- [x] Current counts: `runningRunCount=0`, `staleRunCount=19`,
+  `currentRunCount=0`; supported terminal states are `COMPLETED` and
+  `SUPERSEDED`.
+- [ ] Fresh execution remains ineligible because
+  `CURRENT_RUN_NOT_ESTABLISHED` and `REPOSITORY_REVISION_NOT_CURRENT` remain.
+  Do not start Graphify or promote a stale run as current.
+
+Evidence: `docs/reports/graphify-lifecycle-owner-v1.json`,
+`docs/reports/graphify-current-run-eligibility-v1.json`.
+
+### Workspace capture retry readback (2026-09-09)
+
+- [x] A subsequent snapshot capture failed closed with
+  `WORKSPACE_CHANGED_BETWEEN_SCANS`, producing the non-canonical artifact
+  `docs/reports/workspace-source-snapshots/44674c99b20939d51bef83293fbffb299aaaeb69291e8f18d0ee2ac703c9a390.json`.
+- [x] Independent readback returned `SNAPSHOT_READBACK_BLOCKED`: `25,255/25,256`
+  recorded bytes matched, with `CAPTURE_NOT_VERIFIED` and one later change to
+  this tasks ledger.
+- [ ] Keep `workspaceRevision=null` and do not feed this artifact to Graphify,
+  semantic generation, Qdrant repair, or projection apply. The failed capture
+  is evidence of active worktree churn, not an authority snapshot.
+
+### Repository-qualified source identity hardening (2026-09-09)
+
+- [x] Snapshot source records now emit `repositoryId`,
+  `repositoryRelativePath`, and a deterministic `sourceIdentityKey` in addition
+  to the existing workspace-relative `sourceRef`.
+- [x] Duplicate detection and manifest validation use the repository-qualified
+  identity. Identical content digests remain allowed across distinct source
+  occurrences, preserving provenance while permitting storage deduplication.
+- [x] Nested-repository fixture passed: root and nested sources receive distinct
+  qualified identities; dirty nested bytes still change snapshot identity and
+  replay/drift guards remain intact.
+- [ ] This hardening does not admit `workspaceRevision`, change source selection,
+  or authorize Graphify/projection writes.
+
+### Graphify snapshot-binding recheck (2026-09-09)
+
+- [x] Re-ran `npm run atlas:graphify:snapshot-binding:audit` read-only.
+- [x] The live schema surface is present for `graphify_executions`,
+  `graphify_execution_files`, and `graphify_execution_stages`.
+- [x] The audit found 13 terminal executions but `0` executions matching the
+  current snapshot authority because `workspaceRevision` remains `null`.
+- [ ] Snapshot binding remains blocked at `SNAPSHOT_READBACK_NOT_PROVEN`;
+  result: `GRAPHIFY_SNAPSHOT_BINDING_BLOCKED_SNAPSHOT_READBACK`,
+  `proofLevel=BLOCKED`, `authority=false`.
+- [ ] Do not launch foreground Graphify, source selection, or projection apply
+  from this result. The next gate is to establish a stable, independently
+  readable snapshot and then bind a future execution to it.
+
+Evidence: `docs/reports/graphify-workspace-snapshot-binding-v1.json`; live
+counts `terminalExecutionCount=13`, `matchingExecutions=0`,
+`workspaceRevision=null`. No database, projection, cache, source, or model
+writes were performed.
+
+### Fresh repository-qualified source-selection plan (2026-09-09)
+
+- [x] Captured a fresh stable seven-repository snapshot with `25,265` sources
+  after the v2 planner changes.
+- [x] Planner now emits repository-qualified bindings and returns
+  `SOURCE_SELECTION_PLAN_READY_NOT_ADMITTED`; `workspaceRevision` remains null.
+- [ ] Binding remains blocked: Graphify origin has `24,176` root sources while
+  the fresh snapshot has `1,086` nested sources plus `3` newly observed root
+  sources. No execution or projection apply is authorized from this plan.
+
+Evidence: `docs/reports/graphify-source-selection-plan-v1.json`,
+`docs/reports/graphify-source-population-delta-v1.json`.
+
+Evidence: `scripts/atlas/lib/workspace-snapshot-capture-v1.mts` and
+`scripts/atlas/workspace-snapshot-capture-v1.test.mts`.
+
+### Nested repository binding census (2026-09-09)
+
+- [x] Confirmed the snapshot namespace contains `7` isolated repositories:
+  root `24,177`, `claude-mem` `763`, `granite-docling-258M` `10`,
+  `mcp-server-mcp` `192`, `models/embeddinggemma_300m` `13`,
+  `sites/parent-atlas-gateboard` `22`, and `turbovec` `86` sources.
+- [x] Confirmed the namespace checksum is based on
+  `repositoryId + repositoryRelativePath`; content duplicates remain allowed
+  and are not collapsed into one identity.
+- [ ] Do not reuse the root-only Graphify origin for this snapshot. The origin
+  execution schema currently lacks an equivalent repository-qualified source
+  binding, so nested-origin support or an explicit root-only snapshot policy is
+  required before source authority can be admitted.
+
+Evidence: `docs/reports/workspace-snapshot-namespace-dedup-v1.json`,
+`docs/reports/graphify-source-population-delta-v1.json`.
+
+### Repository-qualified execution binding preflight (2026-09-09)
+
+- [x] Tested the proposed additive migration against the live schema. The
+  transaction rolled back safely because the existing append-only trigger
+  correctly rejected the attempted legacy-row backfill.
+- [x] Read-only legacy baseline: `72,486` execution-file rows across `15`
+  executions, `0` duplicate `(execution_id, source_ref)` pairs, and `0` empty
+  source references.
+- [ ] Do not apply a direct ALTER/backfill to `graphify_execution_files`. The
+  next design must preserve append-only evidence, likely with a new
+  repository-qualified membership relation or an explicitly reviewed migration
+  path that never updates historical rows.
+
+Evidence: live PostgreSQL preflight; the failed transaction was rolled back and
+no migration or data-store changes remain.
+
+### Append-only namespace membership design (2026-09-09)
+
+- [x] Added and applied `graphify_execution_file_membership_v2`, keyed by
+  `(execution_id, repository_id, repository_relative_path)` and carrying the
+  source/revision fields required for nested identity.
+- [x] Kept the legacy `graphify_execution_files` relation untouched; no direct
+  ALTER, UPDATE, DELETE, or backfill was applied. The v2 relation has zero
+  rows pending an explicitly authorized root seed/readback.
+- [x] Authorized and completed the root-row seed/readback: `72,486` legacy
+  rows copied as `repo:root`; independent comparison returned `0` missing,
+  `0` extra, and `0` duplicate namespace keys.
+- [x] Added and live-verified append-only UPDATE/DELETE triggers on v2. A
+  disposable INSERT succeeded, both mutation attempts were rejected, and the
+  transaction rolled back with `0` residual test rows.
+- [ ] Cut one bounded Graphify writer over to the v2 relation only after the
+  snapshot and origin populations are reconciled. Do not launch Graphify while
+  the populations remain mismatched.
+
+Evidence: `sveltekit-frontend/drizzle/manual/20260909_graphify_execution_file_membership_v2.sql`.
+
+### Workspace snapshot namespace/dedup audit (2026-09-09)
+
+- [x] Added and ran the bounded read-only namespace audit. The current
+  observation contains `25,257` file occurrences across `7` repositories,
+  with `duplicateSourceKeys=0` under the repository-qualified policy and
+  `469` content-duplicate groups. Content duplication is therefore preserved
+  as distinct source identity rather than collapsed.
+- [x] The audit reports `59` model-artifact paths separately and confirms the
+  generated-path policy for `docs/reports/**`, `.tmp/**`, `coverage/**`,
+  `dist/**`, and `build/**` is non-authoritative. The present observation had
+  `0` generated-artifact records because the existing source-origin selector
+  already excludes them.
+- [x] Serialized metadata size was measured from the actual records rather
+  than estimated from row count. The result is recorded in the report and is
+  not treated as a canonical manifest.
+- [x] PostgreSQL was checked read-only: no `public.workspace_source_membership`
+  relation currently exists with the required membership fields. This is an
+  explicit missing seam, not permission to create a table or write rows.
+- [ ] Keep `workspaceRevision=null`, `canonicalAuthority=false`, and source
+  admission closed. The audit proves namespace/dedup policy only; it does not
+  prove a stable snapshot, terminal Graphify execution, or PostgreSQL source
+  membership authority.
+
+Evidence: `docs/reports/workspace-snapshot-namespace-dedup-v1.json`.
+Command: `npm run atlas:workspace:snapshot:namespace-dedup:audit`.
+No database, source, Graphify, projection, or model writes were performed.
+
+### Graphify origin population reconciliation (2026-09-09)
+
+- [x] Corrected the reconciliation auditor to compare repository-qualified
+  `sourceIdentityKey` values and classify nested sources from the snapshot's
+  repository namespace, rather than treating every path containing `/` as
+  nested.
+- [x] Re-ran the read-only audit: snapshot `25,262`, Graphify origin `24,176`,
+  snapshot-only `1,086`, origin-only `0`, and all `1,086` missing origin keys
+  belong to nested repositories.
+- [ ] Keep Graphify/source admission blocked until the origin producer consumes
+  the same nested-repository population or the snapshot policy is explicitly
+  narrowed to the root repository. Do not launch the committed canary against
+  this mismatch.
+
+Evidence: `docs/reports/graphify-source-population-delta-v1.json`.
+Command: `npm run atlas:graphify:source-population:delta`.
+OpenSpec strict validation passed; no database, Graphify, projection, cache,
+model, or source-data writes were performed.
+
+### Phase-16 daily handoff preflight (2026-09-09)
+
+- [x] Confirmed the daily fanout's exact Phase-16 apply path is
+  `npm run atlas:phase16:latent:apply`, which resolves the shared semantic
+  bundle and invokes the revision-qualified wrapper with an explicit
+  `--limit 1000`. It is therefore `EXPLICIT_BOUNDED_LIMIT`, not unbounded.
+- [x] Independently ran `npm run atlas:phase16:latent:dry`: exit code `0`,
+  bundle status `ADMITTED_REPRESENTATION_INPUT_ONLY`, `eligibleCount=576`,
+  `sourceAuthorityStatus=PARTIAL`, valid model checksum, valid producer and
+  transform revisions, and `writtenCount=0` because no rows were eligible.
+- [ ] Handoff remains `PHASE16_DAILY_HANDOFF_BLOCKED`: the existing scale
+  admission audit reports `SCALE_ADMISSION_BLOCKED_AUTHORITY_AND_CAPACITY`
+  with `authority=false`. The bounded canary does not authorize a 1,000-row
+  daily apply or a full Graphify run.
+- [ ] Do not launch `graphify:daily` yet. A successful dry/no-op proves the
+  wrapper boundary, not current source authority or terminal Graphify
+  ownership.
+
+Evidence: `docs/reports/latent-phase16-scale-admission-v1.json`,
+`docs/reports/sem768-corpus-bundle-01.json`, and the independently executed
+Phase-16 dry-run receipt under `docs/reports/latent-phase16-representation-artifact-*.json`.
+No database, Qdrant, graph, cache, or model writes were performed.
+
+### Phase-8 dry-run contract recheck and model-boundary clarification (2026-09-09)
+
+- [x] Fixed Phase-8 Step 3 parsing of both `--limit=10` and `--limit 10`.
+  The fanout now reports the requested effective limit as `10`, rather than
+  silently falling back to `10,000`.
+- [x] Normalized LangExtract responses from `type`/`text` and
+  `extraction_class`/`extraction_text`; malformed or unknown records are
+  quarantined and never printed or persisted as an `undefined` entity class.
+  The current fixture quarantined one malformed response.
+- [x] Re-ran the complete Phase-8 dry fanout: all `11/11` stages completed,
+  exit code `0`. Summary processing retained `61,660` valid tuples and `58`
+  quarantined title-less tuples; Phase-16 remained a dry no-op with
+  `writtenCount=0` and `sourceAuthorityStatus=PARTIAL`.
+- [x] Confirmed model boundaries: Phase-8 itself does not use llama-server
+  `:8090` for the core fanout stages. Step 3 uses the LangExtract sidecar at
+  `:8095`; summary stages emit jobs labeled for a future Gemma4/Ornith worker;
+  the optional graphify-draft stage probes llama-server `:8090` and skipped
+  because it was unreachable. The configured local model artifact is the
+  gitignored `models/ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf`, visible only by
+  explicit hidden/unignored inspection.
+- [ ] Keep Phase-8 as `PHASE8_DRYRUN_PROVEN`, not production authority. Dry-run
+  report files and `.tmp` job artifacts are derived outputs and remain outside
+  `workspaceRevision`; no Graphify foreground lifecycle or apply path was run.
+
+Evidence: `sveltekit-frontend/scripts/atlas/phase8-step3-langextract-entities.mjs`,
+`sveltekit-frontend/package.json`, `scripts/startup/run-atlas-phase8-fanout.mjs`,
+and the 2026-09-09 foreground dry-fanout output. No datastore, projection, cache,
+source, or model writes were performed.
+
+### Live llama-server model recheck (2026-09-09)
+
+- [x] Read-only `GET http://127.0.0.1:8090/v1/models` currently reports the
+  loaded model as `ornith-1.5-9b`.
+- [x] This does not change the prior Phase-8 result: during the recorded dry
+  fanout, the optional `graphify-draft` probe found `:8090` unreachable and
+  skipped. The core fanout stages still do not invoke llama-server; they use
+  the `:8095` LangExtract sidecar and produce derived summary jobs.
+- [ ] Keep model execution separate from Phase-8 authority. A future draft
+  stage call may use the dynamically discovered Ornith model, but no model
+  call, summary persistence, or production promotion is implied by this
+  endpoint health check.
+
+Evidence: read-only `/v1/models` response and
+`scripts/atlas/graphify-report-to-openspec-draft.mjs` dynamic model discovery.
+
+### Optional graphify-draft model boundary wiring (2026-09-09)
+
+- [x] Normalized the optional draft worker's llama-server boundary so both
+  `LLAMA_SERVER_URL=http://127.0.0.1:8090` and a `/v1`-suffixed value resolve
+  to exactly `/v1/models` and `/v1/chat/completions`; the previous form could
+  produce a duplicated `/v1` path.
+- [x] Added support for both `--limit=1` and `--limit 1`, with fail-closed
+  validation for invalid limits and `since-hours` values.
+- [x] Model identity is discovered from the live `/v1/models` response and is
+  logged as `LIVE_DISCOVERY`; the bounded dry-run observed `ornith-1.5-9b` and
+  completed one chat-backed draft recommendation without writing a draft or
+  recommendation row.
+- [ ] Do not promote this optional model-backed draft step to a Phase-8
+  authority gate. Core Phase-8 ownership remains `:8095` LangExtract plus
+  non-model summary-job generation; full Graphify promotion remains blocked by
+  source/snapshot and canonical projection admission.
+
+Evidence: `scripts/atlas/graphify-report-to-openspec-draft.mjs`, bounded
+`--dry-run --limit 1 --since-hours 1` result, and live
+`GET http://127.0.0.1:8090/v1/models`. `writesPerformed=false` for database,
+projection, cache, source, and model state; dry-run report discovery remains a
+derived filesystem read path.

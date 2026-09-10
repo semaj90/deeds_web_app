@@ -1,0 +1,59 @@
+{
+  "schema": "atlas.graphify-source-population-delta.v1",
+  "generatedAt": "2026-09-10T00:35:29.796Z",
+  "mode": "READ_ONLY",
+  "status": "NESTED_REPOSITORY_BINDING_MISMATCH",
+  "proofLevel": "PARTIAL_PROVEN",
+  "authority": false,
+  "writesPerformed": false,
+  "datastoreWritesPerformed": false,
+  "snapshotPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\workspace-source-snapshots\\b2b20ca198eb78bc14a98c5a401f2a4cda9ff090a5012492c0958adceee3c572.json",
+  "originPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\graphify-lifecycle-entrypoint-v1.json",
+  "snapshotRevision": "sha256:b2b20ca198eb78bc14a98c5a401f2a4cda9ff090a5012492c0958adceee3c572",
+  "originWorkspaceRevision": "sha256:111014eef3418c67a4808aa5e0e1924fec1485a9cf0dafc0b5952f5fdb2fbea5",
+  "counts": {
+    "snapshot": 25265,
+    "origin": 24176,
+    "onlySnapshot": 1089,
+    "onlyOrigin": 0,
+    "nestedOnlySnapshot": 1086
+  },
+  "classification": {
+    "nestedRepositoryOnly": 1086,
+    "rootPolicyDifference": 3,
+    "unknown": 0
+  },
+  "samples": {
+    "onlySnapshot": [
+      "repo:claude-mem:.agent/rules/claude-mem-context.md",
+      "repo:claude-mem:.agents/plugins/marketplace.json",
+      "repo:claude-mem:.claude-plugin/marketplace.json",
+      "repo:claude-mem:.claude-plugin/plugin.json",
+      "repo:claude-mem:.claude/commands/anti-pattern-czar.md",
+      "repo:claude-mem:.claude/plans/animated-installer.md",
+      "repo:claude-mem:.claude/reports/test-audit-2026-01-05.md",
+      "repo:claude-mem:.claude/settings.json",
+      "repo:claude-mem:.codex-plugin/plugin.json",
+      "repo:claude-mem:.github/FUNDING.yml",
+      "repo:claude-mem:.github/ISSUE_TEMPLATE/bug_report.md",
+      "repo:claude-mem:.github/ISSUE_TEMPLATE/feature_request.md",
+      "repo:claude-mem:.github/copilot-instructions.md",
+      "repo:claude-mem:.markdownlint.json",
+      "repo:claude-mem:.plan/issue-2341-reliability-slice.md",
+      "repo:claude-mem:.plan/npx-distribution.md",
+      "repo:claude-mem:.plan/subagent-summary-disable-and-labeling.md",
+      "repo:claude-mem:.plan/worktree-adoption.md",
+      "repo:claude-mem:.translation-cache.json",
+      "repo:claude-mem:.windsurf/rules/claude-mem-context.md",
+      "repo:claude-mem:CHANGELOG.md",
+      "repo:claude-mem:CLAUDE.md",
+      "repo:claude-mem:README.md",
+      "repo:claude-mem:SECURITY.md",
+      "repo:claude-mem:WARP.md"
+    ],
+    "onlyOrigin": []
+  },
+  "firstBlockingInvariant": "GRAPHIFY_ORIGIN_DOES_NOT_COVER_SNAPSHOT_POPULATION",
+  "nextGate": "NESTED-REPOSITORY-SOURCE-BINDING-01",
+  "safeNextCommand": "npx tsx scripts/atlas/audit-graphify-lifecycle-entrypoint-v1.mts"
+}

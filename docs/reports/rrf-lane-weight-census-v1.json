@@ -1,0 +1,1253 @@
+{
+  "schema": "atlas.rrf-lane-weight-census.v1",
+  "generatedAt": "2026-09-09T22:38:34.561Z",
+  "mode": "READ_ONLY",
+  "status": "CENSUS_COMPLETE_MIGRATION_BLOCKED",
+  "authority": false,
+  "migrationAuthorized": false,
+  "writesPerformed": false,
+  "datastoreWritesPerformed": false,
+  "weightSources": [
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/atlas/kernel/governed-compute-progress.ts:44",
+      "file": "sveltekit-frontend/src/lib/server/atlas/kernel/governed-compute-progress.ts",
+      "symbol": "export const GovernedComputeLaneWeight: Record<GovernedComputeLaneId, number> = {",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "UNCLASSIFIED",
+      "semanticClass": "UNKNOWN",
+      "applicationStage": "UNKNOWN",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": null
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/atlas/kernel/governed-compute-progress.ts:59",
+      "file": "sveltekit-frontend/src/lib/server/atlas/kernel/governed-compute-progress.ts",
+      "symbol": "const WEIGHT_SUM = Object.values(GovernedComputeLaneWeight).reduce((sum, value) => sum + value, 0);",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "UNCLASSIFIED",
+      "semanticClass": "UNKNOWN",
+      "applicationStage": "UNKNOWN",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": null
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/atlas/kernel/governed-compute-progress.ts:162",
+      "file": "sveltekit-frontend/src/lib/server/atlas/kernel/governed-compute-progress.ts",
+      "symbol": "weight: GovernedComputeLaneWeight[parsed.laneId],",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "UNCLASSIFIED",
+      "semanticClass": "UNKNOWN",
+      "applicationStage": "UNKNOWN",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": null
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/dispatcher/dispatcher-topology-service.ts:138",
+      "file": "sveltekit-frontend/src/lib/server/dispatcher/dispatcher-topology-service.ts",
+      "symbol": "export function getDispatcherSignalLaneWeight(result: DispatcherOrchestrationResult): number {",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "UNCLASSIFIED",
+      "semanticClass": "UNKNOWN",
+      "applicationStage": "UNKNOWN",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": null
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/dispatcher/index.ts:55",
+      "file": "sveltekit-frontend/src/lib/server/dispatcher/index.ts",
+      "symbol": "getDispatcherSignalLaneWeight,",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "UNCLASSIFIED",
+      "semanticClass": "UNKNOWN",
+      "applicationStage": "UNKNOWN",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": null
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/compute-rrf-score.ts:19",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/compute-rrf-score.ts",
+      "symbol": "export const RRF_LANE_WEIGHTS = {",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/compute-rrf-score.ts:65",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/compute-rrf-score.ts",
+      "symbol": "for (const [laneName, laneWeight] of Object.entries(RRF_LANE_WEIGHTS)) {",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/compute-rrf-score.ts:74",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/compute-rrf-score.ts",
+      "symbol": "laneWeight,",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/hyperrag-fusion-service.ts:29",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/hyperrag-fusion-service.ts",
+      "symbol": "import { computeRRFScore, RRF_LANE_WEIGHTS, RRF_CONSTANT_K, type RRFScoreResult } from '$lib/server/retrieval/compute-rrf-score.js';",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/retrieval-fusion-rrf.ts:52",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/retrieval-fusion-rrf.ts",
+      "symbol": "export const RRF_LANE_WEIGHTS: Record<RetrievalScoreSource, number> = {",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/retrieval-fusion-rrf.ts:73",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/retrieval-fusion-rrf.ts",
+      "symbol": "weights?: Partial<typeof RRF_LANE_WEIGHTS>",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/retrieval-fusion-rrf.ts:75",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/retrieval-fusion-rrf.ts",
+      "symbol": "const mergedWeights = { ...RRF_LANE_WEIGHTS, ...weights };",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/retrieval-fusion-rrf.ts:89",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/retrieval-fusion-rrf.ts",
+      "symbol": "const laneWeight = mergedWeights[input.lane] || 0;",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/retrieval-fusion-rrf.ts:90",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/retrieval-fusion-rrf.ts",
+      "symbol": "if (laneWeight === 0) continue;  // Skip lanes with zero weight",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/retrieval-fusion-rrf.ts:94",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/retrieval-fusion-rrf.ts",
+      "symbol": "const rrfComponent = computeRrfComponent(rank) * laneWeight;",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/router-matrix.ts:9",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/router-matrix.ts",
+      "symbol": "export type LaneWeight = {",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "ROUTING_WEIGHT",
+      "semanticClass": "ROUTING_PRIOR",
+      "applicationStage": "LANE_ROUTING",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": null
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/router-matrix.ts:15",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/router-matrix.ts",
+      "symbol": "export const DEFAULT_ROUTER_MATRIX: Record<SignalType, Record<string, LaneWeight>> = {",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "ROUTING_WEIGHT",
+      "semanticClass": "ROUTING_PRIOR",
+      "applicationStage": "LANE_ROUTING",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": null
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/router-matrix.ts:74",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/router-matrix.ts",
+      "symbol": "export function getSignalMatrix(signal: SignalType): { [key: string]: LaneWeight } | null {",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "ROUTING_WEIGHT",
+      "semanticClass": "ROUTING_PRIOR",
+      "applicationStage": "LANE_ROUTING",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": null
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/rrf-combiner-utils.ts:29",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-combiner-utils.ts",
+      "symbol": "laneWeight: number;",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/rrf-combiner-utils.ts:109",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-combiner-utils.ts",
+      "symbol": "laneWeight: 1.0,",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "laneWeight",
+          "numericWeight": 1
+        }
+      ],
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/rrf-combiner-utils.ts:123",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-combiner-utils.ts",
+      "symbol": "laneWeight: 1.0, // Will be set by caller if needed",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "laneWeight",
+          "numericWeight": 1
+        }
+      ],
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/rrf-combiner.ts:120",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-combiner.ts",
+      "symbol": "const laneWeight = weights[laneName] ?? 1.0;",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/rrf-combiner.ts:124",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-combiner.ts",
+      "symbol": "const rrfComponent = laneWeight / (k + (rank + 1)); // 1-indexed",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/rrf-contract.ts:63",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-contract.ts",
+      "symbol": "export const RRF_DEFAULT_WEIGHTS = {",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/rrf-fuse.ts:120",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-fuse.ts",
+      "symbol": "weightsOrOptions: Record<string, number> | { topK?: number; includeProvenance?: boolean } = {},",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/rrf-fuse.ts:125",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-fuse.ts",
+      "symbol": "const isOptionsForm = typeof weightsOrOptions === 'object' && !Array.isArray(weightsOrOptions) && 'topK' in weightsOrOptions;",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/rrf-fuse.ts:126",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-fuse.ts",
+      "symbol": "const limitValue = isOptionsForm ? (weightsOrOptions.topK ?? limit) : limit;",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/rrf-fuse.ts:127",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-fuse.ts",
+      "symbol": "const includeProvenance = isOptionsForm ? (weightsOrOptions.includeProvenance ?? true) : true;",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/rrf-fuse.ts:128",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-fuse.ts",
+      "symbol": "const weights = isOptionsForm ? {} : (weightsOrOptions as Record<string, number>);",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/rrf-fuse.ts:137",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-fuse.ts",
+      "symbol": "const laneWeight = weights[laneName] ?? lane.weight ?? 1;",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/rrf-fuse.ts:143",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-fuse.ts",
+      "symbol": "const contribution = laneWeight / (k + rank);",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/rrf-fuse.ts:153",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-fuse.ts",
+      "symbol": "representativeWeight: laneWeight,",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/rrf-fuse.ts:168",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-fuse.ts",
+      "symbol": "existing.representativeWeight = laneWeight;",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/rrf-fusion.ts:67",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-fusion.ts",
+      "symbol": "export const FUSION_WEIGHTS = {",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/rrf-fusion.ts:77",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-fusion.ts",
+      "symbol": "const weightSum = Object.values(FUSION_WEIGHTS).reduce((a, b) => a + b, 0);",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/rrf-fusion.ts:185",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-fusion.ts",
+      "symbol": "FUSION_WEIGHTS.dense_content * normalized.dense_content +",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/rrf-fusion.ts:186",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-fusion.ts",
+      "symbol": "FUSION_WEIGHTS.dense_summary * normalized.dense_summary +",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/rrf-fusion.ts:187",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-fusion.ts",
+      "symbol": "FUSION_WEIGHTS.dense_signature * normalized.dense_signature +",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/rrf-fusion.ts:188",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-fusion.ts",
+      "symbol": "FUSION_WEIGHTS.topology_embedding * normalized.topology_embedding +",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/rrf-fusion.ts:189",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-fusion.ts",
+      "symbol": "FUSION_WEIGHTS.domain_classifier * normalized.domain_classifier +",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/rrf-fusion.ts:190",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-fusion.ts",
+      "symbol": "FUSION_WEIGHTS.freshness * normalized.freshness",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/rrf-fusion.ts:285",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-fusion.ts",
+      "symbol": "const weight = FUSION_WEIGHTS[laneName as keyof typeof FUSION_WEIGHTS] ?? 0.1;",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/rrf-fusion.ts:346",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-fusion.ts",
+      "symbol": "FUSION_WEIGHTS,",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/rrf-integration.ts:16",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-integration.ts",
+      "symbol": "import { RRF_DEFAULT_WEIGHTS } from './rrf-contract.js';",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/rrf-integration.ts:169",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-integration.ts",
+      "symbol": "getDispatcherSignalLaneWeight: dispatcherTopoModule.getDispatcherSignalLaneWeight,",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/rrf-integration.ts:612",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-integration.ts",
+      "symbol": "const finalWeights = { ...RRF_DEFAULT_WEIGHTS, ...weights };",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/rrf-integration.ts:628",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-integration.ts",
+      "symbol": "getDispatcherSignalLaneWeight,",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/rrf-lane-ranker.ts:35",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-lane-ranker.ts",
+      "symbol": "* @param laneWeight - Weight multiplier for this lane (default 1.0)",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/rrf-lane-ranker.ts:41",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-lane-ranker.ts",
+      "symbol": "laneWeight: number = 1.0,",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/rrf-lane-ranker.ts:54",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-lane-ranker.ts",
+      "symbol": "rrfContribution: (laneWeight / (k + 1)),",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/rrf-lane-ranker.ts:75",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-lane-ranker.ts",
+      "symbol": "const rrfContribution = laneWeight / (k + rank);",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/rrf-lane-ranker.ts:94",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-lane-ranker.ts",
+      "symbol": "laneWeight: number = 1.0",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/rrf-lane-ranker.ts:103",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-lane-ranker.ts",
+      "symbol": "const rrfContribution = laneWeight / (k + 1);",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/rrf-lane-ranker.ts:119",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-lane-ranker.ts",
+      "symbol": "* @param laneWeight - Weight used in computation",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/rrf-lane-ranker.ts:126",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-lane-ranker.ts",
+      "symbol": "laneWeight: number,",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/rrf-lane-ranker.ts:138",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-lane-ranker.ts",
+      "symbol": "const expected = laneWeight / (k + rank);",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/service.ts:455",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/service.ts",
+      "symbol": "const weighted = rrf * laneConfig.weight;",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/types.ts:20",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/types.ts",
+      "symbol": "export const RRF_WEIGHTS_BY_LANE_KIND: Record<LaneRegistryKind, number> = {",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.ts:190",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.ts",
+      "symbol": "const RRF_LANE_WEIGHTS = {",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.ts:534",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.ts",
+      "symbol": "function laneContribution(rank: number, laneWeight: number): number {",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "UNCLASSIFIED",
+      "semanticClass": "UNKNOWN",
+      "applicationStage": "UNKNOWN",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": null
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.ts:535",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.ts",
+      "symbol": "return laneWeight / (RRF_CONSTANT_K + rank);",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.ts:550",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.ts",
+      "symbol": "rrfContribution: laneContribution(idx + 1, RRF_LANE_WEIGHTS.dense_vector),",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.ts:565",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.ts",
+      "symbol": "rrfContribution: laneContribution(hit.rank, RRF_LANE_WEIGHTS.turbovec),",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "EXECUTOR_NAME_NOT_LANE",
+      "semanticClass": "EXECUTOR_LOCAL_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": null
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.ts:575",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.ts",
+      "symbol": "rrfContribution: laneContribution(hit.rank, RRF_LANE_WEIGHTS.lexical),",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/__tests__/rrf-fusion.test.ts:21",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/__tests__/rrf-fusion.test.ts",
+      "symbol": "FUSION_WEIGHTS,",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/__tests__/rrf-fusion.test.ts:381",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/__tests__/rrf-fusion.test.ts",
+      "symbol": "const sum = Object.values(FUSION_WEIGHTS).reduce((a, b) => a + b, 0);",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/__tests__/rrf-fusion.test.ts:386",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/__tests__/rrf-fusion.test.ts",
+      "symbol": "for (const weight of Object.values(FUSION_WEIGHTS)) {",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/__tests__/rrf-fusion.test.ts:392",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/__tests__/rrf-fusion.test.ts",
+      "symbol": "const weights = Object.entries(FUSION_WEIGHTS).sort(([, a], [, b]) => b - a);",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/routes/api/codebase-index/gpu-pipeline/+server.ts:360",
+      "file": "sveltekit-frontend/src/routes/api/codebase-index/gpu-pipeline/+server.ts",
+      "symbol": "rrfK: 60,",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "rrfK",
+          "numericWeight": 60
+        }
+      ],
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    }
+  ],
+  "logicalLanes": [],
+  "conflicts": [
+    {
+      "type": "EXECUTOR_AS_LANE",
+      "refs": [
+        "sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.ts:565"
+      ],
+      "evidence": "rrfContribution: laneContribution(hit.rank, RRF_LANE_WEIGHTS.turbovec),"
+    },
+    {
+      "type": "UNMAPPABLE",
+      "refs": [
+        "sveltekit-frontend/src/lib/server/atlas/kernel/governed-compute-progress.ts:44"
+      ],
+      "evidence": "export const GovernedComputeLaneWeight: Record<GovernedComputeLaneId, number> = {"
+    },
+    {
+      "type": "UNMAPPABLE",
+      "refs": [
+        "sveltekit-frontend/src/lib/server/atlas/kernel/governed-compute-progress.ts:59"
+      ],
+      "evidence": "const WEIGHT_SUM = Object.values(GovernedComputeLaneWeight).reduce((sum, value) => sum + value, 0);"
+    },
+    {
+      "type": "UNMAPPABLE",
+      "refs": [
+        "sveltekit-frontend/src/lib/server/atlas/kernel/governed-compute-progress.ts:162"
+      ],
+      "evidence": "weight: GovernedComputeLaneWeight[parsed.laneId],"
+    },
+    {
+      "type": "UNMAPPABLE",
+      "refs": [
+        "sveltekit-frontend/src/lib/server/dispatcher/dispatcher-topology-service.ts:138"
+      ],
+      "evidence": "export function getDispatcherSignalLaneWeight(result: DispatcherOrchestrationResult): number {"
+    },
+    {
+      "type": "UNMAPPABLE",
+      "refs": [
+        "sveltekit-frontend/src/lib/server/dispatcher/index.ts:55"
+      ],
+      "evidence": "getDispatcherSignalLaneWeight,"
+    },
+    {
+      "type": "UNMAPPABLE",
+      "refs": [
+        "sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.ts:534"
+      ],
+      "evidence": "function laneContribution(rank: number, laneWeight: number): number {"
+    }
+  ],
+  "metrics": {
+    "sourceCount": 69,
+    "rawLaneNameCount": 3,
+    "canonicalLaneCount": 59,
+    "unclassifiedCount": 6,
+    "executorAsLaneCount": 1,
+    "semanticConflictCount": 7
+  },
+  "blockers": [
+    "MIGRATION_REQUIRES_EXPLICIT_LOGICAL_LANE_MAPPING",
+    "EXECUTOR_AS_LANE",
+    "UNMAPPABLE",
+    "BASELINE_PARITY_REQUIRED_PER_CALLER"
+  ],
+  "nextGate": "RWC-CENSUS-02_CALLER_BASELINE_AND_EXPLICIT_LANE_MAPPING",
+  "safeNextCommand": "npm run atlas:rrf:lane-weight:census"
+}

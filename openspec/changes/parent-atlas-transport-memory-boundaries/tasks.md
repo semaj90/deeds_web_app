@@ -300,3 +300,106 @@ self-reported status headers were read; a future session picking this up should 
 (a) cross-link these into this file's own task list, (b) split them into their own OpenSpec change
 given they're a distinct workstream, or (c) confirm they're already superseded/subsumed elsewhere
 before doing either.
+
+## TEMPORAL-CANONICAL-SUPERSESSION-01 (2026-09-09)
+
+- [x] Contract seam added in `packages/parent-atlas/src/core/temporal-supersession-fabric-v1.ts`.
+  It separates logical artifact identity from version identity, validates lifecycle states and
+  supersession relations, and computes a deterministic current-owner decision.
+- [x] Fail-closed fixture proves one active version yields `PROVEN_CURRENT_OWNER` and two active
+  versions yield `AMBIGUOUS_CURRENT_OWNER`.
+- [ ] Git CRUD ingestion, append-only cross-domain event projection, agent-action linkage,
+  temporal query intent, prefill masks, cache invalidation, tournament winner lifecycle, and live
+  Postgres readback remain open. `workspaceRevision` is intentionally not synthesized here.
+
+Evidence: `packages/parent-atlas/test/temporal-supersession-fabric-v1.test.ts`.
+This is contract/fixture proof only; no canonical lifecycle rows were written.
+
+### TEMPORAL-SCHEMA-SURFACES-AUDIT-01 (2026-09-09)
+
+- [x] Added `scripts/atlas/audit-temporal-schema-surfaces-v1.mjs` and
+  `npm run atlas:temporal:schema:audit`.
+- [x] Read-only live inventory found all six required tables present and all
+  requested indexes present.
+- [x] Null workspace revisions are explicitly accepted by this audit while
+  snapshot/tournament admission remains unresolved.
+- [x] Corrected the audit against the live schema: `semantic_lifecycle_events`
+  uses `previous_state` and `new_state`, not a generic `lifecycle` column.
+  Recommendation status must not be silently substituted for those states.
+
+Evidence: `docs/reports/temporal-schema-surfaces-v1.json`.
+
+### TEMPORAL-CURRENT-OWNER-PROJECTION-01 (2026-09-09)
+
+- [x] Added the read-only event-to-current-owner projection audit over the
+  existing `semantic_lifecycle_events` table.
+- [x] The projection reports latest lifecycle, event count, active-event count,
+  latest event identity, revision binding, and ambiguity without writing a
+  materialized table.
+- [x] Live read-only result: `CURRENT_OWNER_NOT_PROVEN_NO_EVENTS`; the table is
+  reachable but contains 0 lifecycle events, so no current owner can be claimed.
+- [ ] This does not yet establish canonical supersession authority: event
+  provenance, explicit replacement targets, agent-action linkage, and current
+  workspace revision remain incomplete.
+
+Evidence: `docs/reports/temporal-current-owner-projection-v1.json`.
+
+Recheck (2026-09-09): `npm run atlas:promotion:gates`,
+`npm run atlas:temporal:schema:audit`, and
+`npm run atlas:temporal:current-owner:audit` remain read-only. The six temporal
+tables and required columns are present (`6/6`, zero missing), while the live
+ledger still has `0` events and `0` entities. Consolidated promotion remains
+`BLOCKED` at `CURRENT-SOURCE-TERMINAL-EXECUTION-01` with
+`WORKSPACE_REVISION_UNBOUND_UNTIL_TOURNAMENT`; no authority or writes claimed.
+
+### TEMPORAL-EVENT-CANDIDATE-COMPILER-01 (2026-09-09)
+
+- [x] Added a read-only bounded compiler from current `atlas_packets` revision
+  rows to deterministic `OBSERVED` event candidates.
+- [x] Candidate output preserves nullable workspace revisions and emits no
+  supersession claims; current rows alone cannot prove predecessor/replacement
+  history.
+- [ ] Do not append candidates yet. Historical snapshot pairing, source CRUD
+  deltas, agent-action linkage, and reviewed authority evidence remain required.
+
+Evidence: `docs/reports/temporal-event-candidates-v1.json`.
+
+### TEMP-IDENTITY-CARDINALITY-01 (2026-09-09)
+
+- [x] Added `scripts/atlas/audit-temporal-logical-identity-v1.mjs` and
+  `npm run atlas:temporal:identity:audit`.
+- [x] Live read-only result: 61,718 observations, 61,718 proposed logical
+  packet IDs, 61,718 version IDs, 0 logical IDs with multiple versions, and
+  exactly 1 visible history frame.
+- [x] Bootstrap event semantics now use `BASELINE_OBSERVED`; an initial
+  observation is not treated as a historically proven `CREATED` event.
+- [ ] Supersession remains uncomputable until two ordered workspace/source
+  snapshots are available. No lifecycle event was appended.
+
+Evidence: `docs/reports/temporal-logical-identity-v1.json`.
+
+### TEMP-PREDECESSOR-COMPILER-01 (2026-09-09)
+
+- [x] Added explicit base/target `WorkspaceSnapshotV1` comparison with
+  `CREATED`, `UPDATED`, `UNCHANGED`, and `TOMBSTONED` candidates.
+- [x] Both manifests are independently readback-validated before comparison;
+  blocked input produces no candidates and no authority claim.
+- [ ] Two valid ordered snapshots are not yet available. The compiler emits no
+  lifecycle events, supersession authority, or database writes.
+
+Evidence: `docs/reports/temporal-predecessor-candidates-v1.json`.
+Verification against the two existing checksum-addressed artifacts returned
+`BLOCKED_SNAPSHOT_READBACK` for both inputs, with zero candidates and zero
+supersession claims. The compiler therefore demonstrated fail-closed behavior;
+the artifacts are historical observations, not valid ordered frames.
+
+### TEMP-EVENT-BOOTSTRAP-PLAN-01 (2026-09-09)
+
+- [x] Added a read-only bootstrap plan that classifies the current one-frame
+  population as `BASELINE_OBSERVED` only.
+- [x] Live plan contains 61,718 observations, 0 historical creation claims,
+  0 supersession claims, and 0 appendable events.
+- [ ] Event append remains unauthorized until a second valid ordered snapshot
+  and predecessor evidence exist.
+
+Evidence: `docs/reports/temporal-bootstrap-plan-v1.json`.
