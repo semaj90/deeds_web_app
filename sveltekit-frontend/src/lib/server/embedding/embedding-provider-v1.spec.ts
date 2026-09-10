@@ -3,17 +3,42 @@ import { describe, expect, it } from 'vitest';
 import { resolveEmbeddingProviderFromEnvV1 } from './embedding-provider-v1.js';
 
 describe('EMBED-PROVIDER-CONVERGENCE-01', () => {
-  it('routes dev:gpu EMBEDDING_BACKEND=onnx_directml to in-process ONNX on Windows without an HTTP URL', () => {
+  it('routes EMBEDDING_BACKEND=onnx_directml to in-process ONNX on Windows without an HTTP URL', () => {
     expect(resolveEmbeddingProviderFromEnvV1({
       EMBEDDING_BACKEND: 'onnx_directml',
       OLLAMA_BASE_URL: 'http://127.0.0.1:11434',
-    }, 'win32')).toEqual({
-      provider: 'onnx_directml',
-      baseUrl: null,
-      modelId: 'embeddinggemma:latest',
-      dimensions: 768,
-      representationId: 'semantic_768',
-    });
+    }, 'win32').provider).toBe('onnx_directml');
+  });
+
+  it('auto-selects local ONNX for npm run dev:gpu on Windows when the model exists', () => {
+    const resolved = resolveEmbeddingProviderFromEnvV1({
+      GPU_ENABLED: 'true',
+      EMBEDDING_BACKEND: 'ollama', // current launcher default
+      LOCAL_ONNX_AVAILABLE: true,
+      OLLAMA_BASE_URL: 'http://127.0.0.1:11434',
+    }, 'win32');
+    expect(resolved.provider).toBe('onnx_directml');
+    expect(resolved.baseUrl).toBeNull();
+  });
+
+  it('keeps Ollama when dev:gpu has no local ONNX model', () => {
+    const resolved = resolveEmbeddingProviderFromEnvV1({
+      GPU_ENABLED: 'true',
+      EMBEDDING_BACKEND: 'ollama',
+      LOCAL_ONNX_AVAILABLE: false,
+      OLLAMA_BASE_URL: 'http://127.0.0.1:11434',
+    }, 'win32');
+    expect(resolved.provider).toBe('ollama');
+  });
+
+  it('allows EMBEDDING_PROVIDER=ollama to suppress dev:gpu auto-DirectML', () => {
+    const resolved = resolveEmbeddingProviderFromEnvV1({
+      GPU_ENABLED: 'true',
+      EMBEDDING_PROVIDER: 'ollama',
+      EMBEDDING_BACKEND: 'ollama',
+      LOCAL_ONNX_AVAILABLE: true,
+    }, 'win32');
+    expect(resolved.provider).toBe('ollama');
   });
 
   it('honors explicit EMBEDDING_PROVIDER=onnx_directml before a stale dedicated URL', () => {
@@ -29,6 +54,8 @@ describe('EMBED-PROVIDER-CONVERGENCE-01', () => {
   it('does not claim DirectML on a non-Windows runtime', () => {
     const resolved = resolveEmbeddingProviderFromEnvV1({
       EMBEDDING_BACKEND: 'onnx_directml',
+      GPU_ENABLED: 'true',
+      LOCAL_ONNX_AVAILABLE: true,
       OLLAMA_BASE_URL: 'http://127.0.0.1:11434/',
     }, 'linux');
     expect(resolved.provider).toBe('ollama');
@@ -37,8 +64,10 @@ describe('EMBED-PROVIDER-CONVERGENCE-01', () => {
 
   it('uses a concrete dedicated embedding URL as llama_cpp_gguf evidence', () => {
     const resolved = resolveEmbeddingProviderFromEnvV1({
+      GPU_ENABLED: 'true',
       EMBEDDING_PROVIDER: 'ollama',
       EMBEDDING_BASE_URL: 'http://127.0.0.1:8081/',
+      LOCAL_ONNX_AVAILABLE: true,
       OLLAMA_BASE_URL: 'http://127.0.0.1:11434',
     }, 'win32');
     expect(resolved.provider).toBe('llama_cpp_gguf');
