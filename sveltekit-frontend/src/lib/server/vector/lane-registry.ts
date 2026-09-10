@@ -1,14 +1,11 @@
-// NOTE: this registry's `source768` lane is explicitly the native 768-dim
-// EmbeddingGemma source lane on the general 'codebase_chunks_768' collection
-// (getActiveSemanticVectorLane() asserts dimension === 768 by invariant), not
-// the persisted canonical semantic_512 lane. Aliased to the native-dimension
-// constant to preserve this file's actual meaning.
-import { ATLAS_EMBEDDINGGEMMA_NATIVE_DIMENSION as SEMANTIC_DIMENSION } from '../atlas/retrieval/qdrant-semantic-projection.js';
+import { SEMANTIC_DIMENSION } from '../embedding/embedding-contract-768.js';
 
 /**
- * Semantic vectors and latent topology projections are different contracts.
- * Never share one dimension union between them — a 128/64-dim topology
- * projection is not a valid semantic embedding dimension and vice versa.
+ * Runtime vector-lane registry.
+ *
+ * semantic_768 is the single active semantic lane. Lower-dimensional vectors
+ * are separate topology/routing representations, never alternate semantic
+ * authorities. Legacy 384 replay lanes are intentionally absent here.
  */
 export type SemanticDimension = typeof SEMANTIC_DIMENSION;
 export type TopologyDimension = 128 | 64;
@@ -45,17 +42,17 @@ export interface VectorLaneContract {
 
 export const VECTOR_LANES = {
   source768: {
-    laneId: 'embeddinggemma-768d',
+    laneId: 'embeddinggemma-semantic-768',
     kind: 'semantic',
-    role: 'source',
+    role: 'canonical',
     modelId: 'embeddinggemma:latest',
     vectorName: 'content',
-    collection: 'codebase_chunks_768',
+    collection: 'codebase_chunks_768_v2',
     dimension: SEMANTIC_DIMENSION,
     projection: 'none',
     normalization: 'l2',
     status: 'active',
-    notes: 'Native EmbeddingGemma source lane for full-dimension embeddings.',
+    notes: 'Canonical native EmbeddingGemma semantic_768 lane. Qdrant is a rebuildable projection; PostgreSQL retains canonical identity/lineage authority.',
   },
   topology128: {
     laneId: 'atlas-topology128',
@@ -81,7 +78,7 @@ export const VECTOR_LANES = {
     projection: 'latent',
     normalization: 'l2',
     status: 'partial',
-    notes: 'Legacy trained topology representation for KMeans / SOM / TurboVec acceleration only; not interchangeable with nested latent_64.',
+    notes: 'Legacy trained topology representation for KMeans / SOM / TurboVec acceleration only; not interchangeable with nested latent_64 or semantic_768.',
   },
 } as const satisfies Record<string, VectorLaneContract>;
 
@@ -96,15 +93,18 @@ export function getVectorLaneByCollection(collection: string): VectorLaneContrac
 }
 
 /**
- * The single active semantic lane. Use this instead of indexing VECTOR_LANES
- * directly when the caller needs the canonical semantic embedding contract —
- * it fails loudly if the registry's active semantic lane ever changes shape
- * instead of silently returning whatever is at `source768`.
+ * The single active semantic lane. Fails loudly if the runtime registry drifts
+ * away from native semantic_768 or its admitted v2 projection contract.
  */
 export function getActiveSemanticVectorLane(): VectorLaneContract & { dimension: SemanticDimension } {
   const lane = VECTOR_LANES.source768;
-  if (lane.kind !== 'semantic' || lane.status !== 'active' || lane.dimension !== 768) {
-    throw new Error('SEMANTIC_768_LANE_INVARIANT_BROKEN: source768 is no longer the active 768-dim semantic lane');
+  if (
+    lane.kind !== 'semantic' ||
+    lane.status !== 'active' ||
+    lane.dimension !== SEMANTIC_DIMENSION ||
+    lane.collection !== 'codebase_chunks_768_v2'
+  ) {
+    throw new Error('SEMANTIC_768_LANE_INVARIANT_BROKEN: active semantic lane must be codebase_chunks_768_v2/content/768');
   }
   return lane as VectorLaneContract & { dimension: SemanticDimension };
 }
