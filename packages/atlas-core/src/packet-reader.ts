@@ -6,7 +6,9 @@
  * Yields packets with full context for downstream processing.
  *
  * Canonical truth: Postgres (never cache or Qdrant as source).
- * Output: Packet[] with identity + embeddings + policy classification.
+ * Canonical semantic representation: codebase_chunk_index.content_embedding
+ * as halfvec(768). content_embedding_768 is a legacy/alternate vector(768)
+ * surface and must not be selected implicitly.
  */
 
 import pkg from 'pg';
@@ -37,6 +39,21 @@ export interface PacketReaderOptions {
   };
 }
 
+const CANONICAL_EMBEDDING_DIMENSION = 768;
+
+function parseHalfvec(value: unknown): Float32Array | undefined {
+  if (value == null) return undefined;
+  const raw = Array.isArray(value)
+    ? value.map(Number)
+    : typeof value === 'string'
+      ? value.trim().replace(/^\[|\]$/g, '').split(',').filter(Boolean).map(Number)
+      : [];
+  if (raw.length !== CANONICAL_EMBEDDING_DIMENSION || raw.some((entry) => !Number.isFinite(entry))) {
+    return undefined;
+  }
+  return new Float32Array(raw);
+}
+
 export class PacketReader {
   private pool: PoolType;
 
@@ -48,12 +65,9 @@ export class PacketReader {
     });
   }
 
-  /**
-   * Read packets from canonical truth (Postgres)
-   * Joins atlas_packets + codebase_chunk_index for embeddings
-   */
+  /** Read packets from canonical truth (Postgres). */
   async readPackets(options: PacketReaderOptions = {}): Promise<Packet[]> {
-    const { batchSize = 256, limit = 10000, filters = {} } = options;
+    const { limit = 10000, filters = {} } = options;
 
     const whereConditions: string[] = ['ap.packet_key IS NOT NULL'];
     const params: unknown[] = [];
@@ -64,19 +78,16 @@ export class PacketReader {
       params.push(filters.source_ref);
       paramIndex++;
     }
-
     if (filters.feature_id) {
       whereConditions.push(`ap.feature_id = $${paramIndex}`);
       params.push(filters.feature_id);
       paramIndex++;
     }
-
     if (filters.directory_path) {
       whereConditions.push(`ap.directory_path LIKE $${paramIndex}`);
       params.push(`${filters.directory_path}%`);
       paramIndex++;
     }
-
     if (filters.som_cluster !== undefined) {
       whereConditions.push(`ap.som_cluster = $${paramIndex}`);
       params.push(filters.som_cluster);
@@ -96,8 +107,8 @@ export class PacketReader {
         ap.summary,
         ap.som_cluster,
         ap.metadata,
-        cci.content_embedding_768 AS content_embedding,
-        768 AS embedding_dimension
+        cci.content_embedding::text AS content_embedding,
+        CASE WHEN cci.content_embedding IS NULL THEN NULL ELSE 768 END AS embedding_dimension
       FROM atlas_packets ap
       LEFT JOIN codebase_chunk_index cci ON cci.source_ref = ap.source_ref
       WHERE ${whereClause}
@@ -106,69 +117,47 @@ export class PacketReader {
 
     try {
       const result: QueryResult = await this.pool.query(query, params);
-      const packets: Packet[] = result.rows.map((row: any) => ({
+      return result.rows.map((row: any) => ({
         packet_key: row.packet_key,
         source_ref: row.source_ref,
         feature_id: row.feature_id,
         feature_label: row.feature_label,
         directory_path: row.directory_path,
-        embedding: row.content_embedding
-          ? new Float32Array(row.content_embedding)
-          : undefined,
-        embedding_dim: row.embedding_dimension,
+        embedding: parseHalfvec(row.content_embedding),
+        embedding_dim: row.embedding_dimension == null ? undefined : Number(row.embedding_dimension),
         som_cluster: row.som_cluster,
         summary: row.summary,
         metadata: row.metadata || {}
       }));
-
-      return packets;
     } catch (err) {
       console.error('PacketReader: Failed to read packets:', err);
       throw err;
     }
   }
 
-  /**
-   * Stream packets in batches (memory-efficient for large datasets)
-   */
-  async *streamPackets(
-    options: PacketReaderOptions = {}
-  ): AsyncGenerator<Packet[]> {
+  async *streamPackets(options: PacketReaderOptions = {}): AsyncGenerator<Packet[]> {
     const { batchSize = 256, limit = 10000 } = options;
-
-    let offset = 0;
     let totalRead = 0;
 
     while (totalRead < limit) {
       const toRead = Math.min(batchSize, limit - totalRead);
-      const batch = await this.readPackets({
-        ...options,
-        limit: toRead
-      });
-
+      const batch = await this.readPackets({ ...options, limit: toRead });
       if (batch.length === 0) break;
       yield batch;
-
       totalRead += batch.length;
-      offset += batch.length;
     }
   }
 
-  /**
-   * Validate packet identity (hard fail if missing critical fields)
-   */
   validatePacket(packet: Packet): { valid: boolean; errors: string[] } {
     const errors: string[] = [];
-
     if (!packet.packet_key) errors.push('Missing packet_key (identity)');
     if (!packet.source_ref) errors.push('Missing source_ref (lineage)');
     if (!packet.feature_id) errors.push('Missing feature_id (clustering)');
     if (!packet.feature_label) errors.push('Missing feature_label (context)');
-
-    return {
-      valid: errors.length === 0,
-      errors
-    };
+    if (packet.embedding && packet.embedding.length !== CANONICAL_EMBEDDING_DIMENSION) {
+      errors.push(`Invalid semantic_768 embedding dimension: ${packet.embedding.length}`);
+    }
+    return { valid: errors.length === 0, errors };
   }
 
   async close(): Promise<void> {
