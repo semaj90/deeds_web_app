@@ -1,89 +1,89 @@
 {
   "schemaVersion": "atlas.graphify-daily-workflow-receipt.v1",
   "workflowId": "graphify:daily:v1",
-  "runId": "c0af0936-1c30-4b24-b76d-d99b4195e79d",
-  "repositoryRevision": "2474ce5678677387cf303dfe6bb3b3a1e94a324b",
-  "generatedAt": "2026-09-09T19:45:57.586Z",
+  "runId": "5fdfc3df-1364-4866-baaf-f744e0e5ee75",
+  "repositoryRevision": "5aab1eec351097fe6bda1bf1ab69c46f726c3fcc",
+  "generatedAt": "2026-09-10T04:31:50.431Z",
   "readOnly": true,
   "canonicalWriteAttempted": false,
   "stages": {
     "snapshot": {
       "status": "PROVEN",
-      "totalFiles": 34487,
-      "totalBytes": 386877682,
-      "currentRevision": "2474ce5678677387cf303dfe6bb3b3a1e94a324b",
-      "priorRevision": "9d525dd2ae888a3b646c6915a86a3a45a67a3fee"
+      "totalFiles": 25267,
+      "totalBytes": 470611121,
+      "currentRevision": "5aab1eec351097fe6bda1bf1ab69c46f726c3fcc",
+      "priorRevision": "5aab1eec351097fe6bda1bf1ab69c46f726c3fcc"
     },
     "inventory": {
       "status": "PROVEN",
-      "totalFiles": 34487,
-      "codeFiles": 16867,
-      "documentationFiles": 10333,
-      "configFiles": 2598,
-      "otherFiles": 4689,
+      "totalFiles": 25267,
+      "codeFiles": 14791,
+      "documentationFiles": 8068,
+      "configFiles": 1857,
+      "otherFiles": 551,
       "topExtensions": [
         {
           "extension": ".md",
-          "count": 10312
+          "count": 8068
         },
         {
           "extension": ".ts",
-          "count": 9300
+          "count": 7987
         },
         {
           "extension": ".mjs",
-          "count": 3743
+          "count": 3737
         },
         {
           "extension": ".json",
-          "count": 2473
-        },
-        {
-          "extension": ".py",
-          "count": 1407
+          "count": 1724
         },
         {
           "extension": ".svelte",
-          "count": 932
-        },
-        {
-          "extension": ".any-backup",
-          "count": 931
-        },
-        {
-          "extension": ".pyc",
-          "count": 851
-        },
-        {
-          "extension": ".disabled",
-          "count": 786
+          "count": 934
         },
         {
           "extension": ".sql",
-          "count": 648
+          "count": 651
+        },
+        {
+          "extension": ".py",
+          "count": 590
         },
         {
           "extension": ".mts",
-          "count": 515
+          "count": 528
         },
         {
-          "extension": ".batch1000-backup",
-          "count": 416
+          "extension": ".ps1",
+          "count": 300
+        },
+        {
+          "extension": ".js",
+          "count": 141
+        },
+        {
+          "extension": ".sh",
+          "count": 114
+        },
+        {
+          "extension": ".proto",
+          "count": 101
         }
       ]
     },
     "structural": {
       "status": "PROVEN",
-      "filesProcessed": 34487,
-      "filesWithStructure": 13191,
-      "factCount": 136233,
-      "functionCount": 49738,
-      "classCount": 1898,
-      "interfaceCount": 1907,
-      "methodCount": 6457,
-      "importCount": 40321,
-      "constCount": 8371,
-      "arrowCount": 27541,
+      "filesProcessed": 25267,
+      "filesWithStructure": 11986,
+      "factCount": 127540,
+      "functionCount": 47900,
+      "classCount": 1883,
+      "interfaceCount": 1585,
+      "methodCount": 6414,
+      "importCount": 36000,
+      "constCount": 7503,
+      "arrowCount": 26255,
       "samples": [
         {
           "filePath": "__tests__/data-hashing.spec.ts",
@@ -289,97 +289,97 @@
     },
     "identity": {
       "status": "PARTIAL",
-      "uniqueIds": 135752,
-      "duplicateIds": 481,
-      "reusedIds": 135717,
-      "supersededIds": 481
+      "uniqueIds": 127064,
+      "duplicateIds": 476,
+      "reusedIds": 127064,
+      "supersededIds": 476
     },
     "lexical": {
       "status": "PROVEN",
-      "filesProcessed": 34487,
-      "entries": 34487,
-      "totalTokens": 34647455,
-      "totalUniqueTokens": 10037738,
+      "filesProcessed": 25267,
+      "entries": 25267,
+      "totalTokens": 40850708,
+      "totalUniqueTokens": 8390379,
       "topGlobalTerms": [
         {
-          "term": "id",
-          "weight": 297762
+          "term": "count",
+          "weight": 675474
         },
         {
-          "term": "sveltekit",
-          "weight": 268266
-        },
-        {
-          "term": "frontend",
-          "weight": 263918
-        },
-        {
-          "term": "pagerank",
-          "weight": 245918
-        },
-        {
-          "term": "filepath",
-          "weight": 240523
-        },
-        {
-          "term": "unclassified",
-          "weight": 229651
-        },
-        {
-          "term": "communityid",
-          "weight": 227685
-        },
-        {
-          "term": "topoclass",
-          "weight": 227633
-        },
-        {
-          "term": "graphauthorityscore",
-          "weight": 227290
-        },
-        {
-          "term": "api",
-          "weight": 215022
-        },
-        {
-          "term": "if",
-          "weight": 208083
-        },
-        {
-          "term": "community",
-          "weight": 204278
-        },
-        {
-          "term": "name",
-          "weight": 200039
+          "term": "tag",
+          "weight": 623148
         },
         {
           "term": "routes",
-          "weight": 195749
+          "weight": 596679
+        },
+        {
+          "term": "api",
+          "weight": 500830
+        },
+        {
+          "term": "filepath",
+          "weight": 488427
+        },
+        {
+          "term": "topoclass",
+          "weight": 478537
+        },
+        {
+          "term": "id",
+          "weight": 451290
+        },
+        {
+          "term": "unclassified",
+          "weight": 428052
+        },
+        {
+          "term": "pagerank",
+          "weight": 393377
+        },
+        {
+          "term": "graphauthorityscore",
+          "weight": 387960
+        },
+        {
+          "term": "communityid",
+          "weight": 376485
+        },
+        {
+          "term": "gpu",
+          "weight": 353787
+        },
+        {
+          "term": "community",
+          "weight": 338533
         },
         {
           "term": "app",
-          "weight": 195563
+          "weight": 311756
         },
         {
-          "term": "//",
-          "weight": 188179
+          "term": "cluster",
+          "weight": 309529
         },
         {
-          "term": "string",
-          "weight": 168227
+          "term": "components",
+          "weight": 250763
         },
         {
-          "term": "0.15000000000000002",
-          "weight": 164933
+          "term": "clusterkey",
+          "weight": 234368
         },
         {
-          "term": "users",
-          "weight": 154170
+          "term": "clustersrc",
+          "weight": 232792
         },
         {
-          "term": "deeds",
-          "weight": 150439
+          "term": "kind",
+          "weight": 229386
+        },
+        {
+          "term": "server.ts",
+          "weight": 211426
         }
       ],
       "samples": [
@@ -518,278 +518,6 @@
             }
           ],
           "hash": "87fc37c742a2265c6cd13e4b7cd5f475680dca40641839e071ea97717de2c349"
-        },
-        {
-          "filePath": "--since 2h",
-          "tokenCount": 380,
-          "uniqueTokenCount": 311,
-          "topTerms": [
-            {
-              "term": "atlas",
-              "weight": 6
-            },
-            {
-              "term": "26",
-              "weight": 5
-            },
-            {
-              "term": "id",
-              "weight": 5
-            },
-            {
-              "term": "is",
-              "weight": 5
-            },
-            {
-              "term": "retrieval",
-              "weight": 4
-            },
-            {
-              "term": "service",
-              "weight": 4
-            },
-            {
-              "term": "to",
-              "weight": 4
-            },
-            {
-              "term": "as",
-              "weight": 3
-            },
-            {
-              "term": "docs",
-              "weight": 3
-            },
-            {
-              "term": "fix",
-              "weight": 3
-            },
-            {
-              "term": "graphify",
-              "weight": 3
-            },
-            {
-              "term": "model",
-              "weight": 3
-            },
-            {
-              "term": "of",
-              "weight": 3
-            },
-            {
-              "term": "one",
-              "weight": 3
-            },
-            {
-              "term": "qdrant",
-              "weight": 3
-            },
-            {
-              "term": "search",
-              "weight": 3
-            },
-            {
-              "term": "all",
-              "weight": 2
-            },
-            {
-              "term": "benchmark",
-              "weight": 2
-            },
-            {
-              "term": "chore",
-              "weight": 2
-            },
-            {
-              "term": "docker",
-              "weight": 2
-            },
-            {
-              "term": "encoding",
-              "weight": 2
-            },
-            {
-              "term": "feat",
-              "weight": 2
-            },
-            {
-              "term": "gds",
-              "weight": 2
-            },
-            {
-              "term": "glyph",
-              "weight": 2
-            },
-            {
-              "term": "go",
-              "weight": 2
-            },
-            {
-              "term": "go-retrieval-service",
-              "weight": 2
-            },
-            {
-              "term": "grpc",
-              "weight": 2
-            },
-            {
-              "term": "in",
-              "weight": 2
-            },
-            {
-              "term": "indexing",
-              "weight": 2
-            },
-            {
-              "term": "it",
-              "weight": 2
-            },
-            {
-              "term": "make",
-              "weight": 2
-            },
-            {
-              "term": "many",
-              "weight": 2
-            }
-          ],
-          "hash": "d734c10c3ee9b892021682835e3a88ef29f6f8608a697fd539125343da22343f"
-        },
-        {
-          "filePath": ".clangd",
-          "tokenCount": 77,
-          "uniqueTokenCount": 66,
-          "topTerms": [
-            {
-              "term": "yes",
-              "weight": 4
-            },
-            {
-              "term": "-i",
-              "weight": 2
-            },
-            {
-              "term": "/program",
-              "weight": 2
-            },
-            {
-              "term": "add",
-              "weight": 2
-            },
-            {
-              "term": "include",
-              "weight": 2
-            },
-            {
-              "term": "modernize",
-              "weight": 2
-            },
-            {
-              "term": "program",
-              "weight": 2
-            },
-            {
-              "term": "readability",
-              "weight": 2
-            },
-            {
-              "term": "remove",
-              "weight": 2
-            },
-            {
-              "term": "--expt-relaxed-constexpr",
-              "weight": 1
-            },
-            {
-              "term": "-d__cudacc__",
-              "weight": 1
-            },
-            {
-              "term": "-d__nvcc__",
-              "weight": 1
-            },
-            {
-              "term": "-dcuda_version",
-              "weight": 1
-            },
-            {
-              "term": "-fms-extensions",
-              "weight": 1
-            },
-            {
-              "term": "-std",
-              "weight": 1
-            },
-            {
-              "term": "-w",
-              "weight": 1
-            },
-            {
-              "term": ".clangd",
-              "weight": 1
-            },
-            {
-              "term": "12080",
-              "weight": 1
-            },
-            {
-              "term": "14",
-              "weight": 1
-            },
-            {
-              "term": "background",
-              "weight": 1
-            },
-            {
-              "term": "build",
-              "weight": 1
-            },
-            {
-              "term": "clang",
-              "weight": 1
-            },
-            {
-              "term": "clangtidy",
-              "weight": 1
-            },
-            {
-              "term": "compileflags",
-              "weight": 1
-            },
-            {
-              "term": "compiler",
-              "weight": 1
-            },
-            {
-              "term": "computing",
-              "weight": 1
-            },
-            {
-              "term": "constexpr",
-              "weight": 1
-            },
-            {
-              "term": "cuda",
-              "weight": 1
-            },
-            {
-              "term": "cudacc",
-              "weight": 1
-            },
-            {
-              "term": "dcuda",
-              "weight": 1
-            },
-            {
-              "term": "deducedtypes",
-              "weight": 1
-            },
-            {
-              "term": "diagnostics",
-              "weight": 1
-            }
-          ],
-          "hash": "78a36d6a2ee7b3389c7056932af9bbe18c36cb82858fd944db3c714516fdcab7"
         },
         {
           "filePath": ".claude/AGENT_CONSTITUTION.md",
@@ -1942,6 +1670,278 @@
             }
           ],
           "hash": "0d4f1dc47223ab8e4fc5c09784b3b3c0f09f58234cacbeeffd5987f7e65a3f52"
+        },
+        {
+          "filePath": ".claude/commands/audit-duplication.md",
+          "tokenCount": 754,
+          "uniqueTokenCount": 428,
+          "topTerms": [
+            {
+              "term": "one",
+              "weight": 13
+            },
+            {
+              "term": "canonical",
+              "weight": 11
+            },
+            {
+              "term": "not",
+              "weight": 11
+            },
+            {
+              "term": "owner",
+              "weight": 11
+            },
+            {
+              "term": "capability",
+              "weight": 9
+            },
+            {
+              "term": "of",
+              "weight": 9
+            },
+            {
+              "term": "or",
+              "weight": 9
+            },
+            {
+              "term": "sweep",
+              "weight": 8
+            },
+            {
+              "term": "to",
+              "weight": 8
+            },
+            {
+              "term": "---",
+              "weight": 7
+            },
+            {
+              "term": "an",
+              "weight": 7
+            },
+            {
+              "term": "if",
+              "weight": 7
+            },
+            {
+              "term": "in",
+              "weight": 7
+            },
+            {
+              "term": "vs",
+              "weight": 7
+            },
+            {
+              "term": "callers",
+              "weight": 6
+            },
+            {
+              "term": "it",
+              "weight": 6
+            },
+            {
+              "term": "outbox",
+              "weight": 6
+            },
+            {
+              "term": "table",
+              "weight": 6
+            },
+            {
+              "term": "each",
+              "weight": 5
+            },
+            {
+              "term": "found",
+              "weight": 5
+            },
+            {
+              "term": "implementation",
+              "weight": 5
+            },
+            {
+              "term": "is",
+              "weight": 5
+            },
+            {
+              "term": "tool",
+              "weight": 5
+            },
+            {
+              "term": "adapter",
+              "weight": 4
+            },
+            {
+              "term": "as",
+              "weight": 4
+            },
+            {
+              "term": "audit",
+              "weight": 4
+            },
+            {
+              "term": "backend",
+              "weight": 4
+            },
+            {
+              "term": "canonical_owner",
+              "weight": 4
+            },
+            {
+              "term": "claude.md",
+              "weight": 4
+            },
+            {
+              "term": "don",
+              "weight": 4
+            },
+            {
+              "term": "http",
+              "weight": 4
+            },
+            {
+              "term": "implementations",
+              "weight": 4
+            }
+          ],
+          "hash": "627b51b151de669a3c25ef15d29ae03acdbfe79381041f627c34854eb00fe6c1"
+        },
+        {
+          "filePath": ".claude/commands/deep-audit.md",
+          "tokenCount": 1447,
+          "uniqueTokenCount": 705,
+          "topTerms": [
+            {
+              "term": "audit",
+              "weight": 34
+            },
+            {
+              "term": "run",
+              "weight": 22
+            },
+            {
+              "term": "fix",
+              "weight": 19
+            },
+            {
+              "term": "d9",
+              "weight": 16
+            },
+            {
+              "term": "gate",
+              "weight": 15
+            },
+            {
+              "term": "deep",
+              "weight": 14
+            },
+            {
+              "term": "to",
+              "weight": 14
+            },
+            {
+              "term": "in",
+              "weight": 13
+            },
+            {
+              "term": "ace",
+              "weight": 12
+            },
+            {
+              "term": "gates",
+              "weight": 12
+            },
+            {
+              "term": "npm",
+              "weight": 12
+            },
+            {
+              "term": "all",
+              "weight": 10
+            },
+            {
+              "term": "codebase",
+              "weight": 10
+            },
+            {
+              "term": "graph",
+              "weight": 10
+            },
+            {
+              "term": "orphan",
+              "weight": 9
+            },
+            {
+              "term": "report",
+              "weight": 9
+            },
+            {
+              "term": "route",
+              "weight": 9
+            },
+            {
+              "term": "...",
+              "weight": 8
+            },
+            {
+              "term": "api",
+              "weight": 8
+            },
+            {
+              "term": "fanin",
+              "weight": 8
+            },
+            {
+              "term": "index",
+              "weight": 8
+            },
+            {
+              "term": "is",
+              "weight": 8
+            },
+            {
+              "term": "keep",
+              "weight": 8
+            },
+            {
+              "term": "mode",
+              "weight": 8
+            },
+            {
+              "term": "vs",
+              "weight": 8
+            },
+            {
+              "term": "/deep-audit",
+              "weight": 7
+            },
+            {
+              "term": "if",
+              "weight": 7
+            },
+            {
+              "term": "only",
+              "weight": 7
+            },
+            {
+              "term": "output",
+              "weight": 7
+            },
+            {
+              "term": "re",
+              "weight": 7
+            },
+            {
+              "term": "routes",
+              "weight": 7
+            },
+            {
+              "term": "som",
+              "weight": 7
+            }
+          ],
+          "hash": "c45cb77ca6eddcd812aab80271918aa8249c9c085d983aae069bea114dcf3b0c"
         }
       ]
     },
@@ -2064,88 +2064,103 @@
           "status": "EMBEDDED"
         },
         {
-          "filePath": ".venv-gemma4/Lib/site-packages/_distutils_hack/__init__.py",
-          "sourceRef": ".venv-gemma4/Lib/site-packages/_distutils_hack/__init__.py",
-          "contentHash": "4d27a48545b57dd137ae35376fcf326d2064271084a487960686f8704b94de4a",
+          "filePath": "$lib/utils/file-reader.ts",
+          "sourceRef": "$lib/utils/file-reader.ts",
+          "contentHash": "c4a196813c7d8f4ea0e22645135cc5c8df9a36a547a494ebad502c060d7550f6",
           "representationName": "semantic_768",
           "dimension": 768,
           "model": "deterministic-hash-embedder",
           "source": "deterministic",
-          "embeddingHash": "61f1da6995ad270b7a742a211ac576f65729ce85e8eba44a1917cddbdeb9dd03",
+          "embeddingHash": "bc3cd517a42742b999f96c06469c61859b3202f729c130ac221ce2714e7cb492",
           "labels": [],
-          "domain": "config",
+          "domain": "feature",
           "ontology": "utility",
           "tier": "feature",
           "status": "EMBEDDED"
         },
         {
-          "filePath": ".venv-gemma4/Lib/site-packages/_distutils_hack/override.py",
-          "sourceRef": ".venv-gemma4/Lib/site-packages/_distutils_hack/override.py",
-          "contentHash": "12efecf8d17a5486780aa774b5b6c0e70b56932d8864f35df1eb7a18bb759b3a",
+          "filePath": "ace-pipeline-audit.mjs",
+          "sourceRef": "ace-pipeline-audit.mjs",
+          "contentHash": "5cc3b8a9898183caf6737e76db62e752825c61b4a9cf6787da790753f8b29aae",
           "representationName": "semantic_768",
           "dimension": 768,
           "model": "deterministic-hash-embedder",
           "source": "deterministic",
-          "embeddingHash": "bc508721207fa5e8f3a76c1eabc40784b5025bdfdd0f354a10552bfd4a747964",
+          "embeddingHash": "78f494e9fa7a7439a53ce33d53b25496666e73dd7730e835287ccadf4138c907",
           "labels": [],
-          "domain": "config",
+          "domain": "feature",
           "ontology": "utility",
           "tier": "feature",
           "status": "EMBEDDED"
         },
         {
-          "filePath": ".venv-gemma4/Lib/site-packages/aiohappyeyeballs/__init__.py",
-          "sourceRef": ".venv-gemma4/Lib/site-packages/aiohappyeyeballs/__init__.py",
-          "contentHash": "01ff400d98f70562df19a03b2133853e52887a7877a3348d58bdf27b3499d89c",
+          "filePath": "ace-vector-selection-slice/src/lib/server/ace/ranking/packet-feature-matrix.test.ts",
+          "sourceRef": "ace-vector-selection-slice/src/lib/server/ace/ranking/packet-feature-matrix.test.ts",
+          "contentHash": "c0fc88df8ae64ca10552f7ed9c7fe092b628d54094e9bb94b030c7099d4fe206",
           "representationName": "semantic_768",
           "dimension": 768,
           "model": "deterministic-hash-embedder",
           "source": "deterministic",
-          "embeddingHash": "7e59ed92fc535d11964777dc515d75953b60f369473c933054a9311290cf5d34",
-          "labels": [],
-          "domain": "config",
+          "embeddingHash": "9c963d63deb214ab05c73f751130edb0a722bd8537a8e172f8325db1feb6ce97",
+          "labels": [
+            "vectors",
+            "testing",
+            "server-side",
+            "library"
+          ],
+          "domain": "retrieval",
           "ontology": "utility",
-          "tier": "feature",
+          "tier": "test",
           "status": "EMBEDDED"
         },
         {
-          "filePath": ".venv-gemma4/Lib/site-packages/aiohappyeyeballs/_staggered.py",
-          "sourceRef": ".venv-gemma4/Lib/site-packages/aiohappyeyeballs/_staggered.py",
-          "contentHash": "6a3ddc4b01c40d7f3c50c7cef5b51abbdb5fad102cce18e0f7d76910c8803863",
+          "filePath": "ace-vector-selection-slice/src/lib/server/ace/ranking/packet-feature-matrix.ts",
+          "sourceRef": "ace-vector-selection-slice/src/lib/server/ace/ranking/packet-feature-matrix.ts",
+          "contentHash": "baf50b8d924093f5c49093bd0e80510fad09c4375c62d64940050c7b557d9a8b",
           "representationName": "semantic_768",
           "dimension": 768,
           "model": "deterministic-hash-embedder",
           "source": "deterministic",
-          "embeddingHash": "a652f8b2bf1fa67102735096d09a832af74d5a584fc30d70b1931b44e8ae3a70",
-          "labels": [],
-          "domain": "config",
+          "embeddingHash": "d7427b232a99b9fc85326aa1279db9a56dcbcd9b19ed9aaa4fcc08b221734769",
+          "labels": [
+            "database",
+            "vectors",
+            "server-side",
+            "library"
+          ],
+          "domain": "retrieval",
           "ontology": "utility",
-          "tier": "feature",
+          "tier": "middleware",
           "status": "EMBEDDED"
         },
         {
-          "filePath": ".venv-gemma4/Lib/site-packages/aiohappyeyeballs/impl.py",
-          "sourceRef": ".venv-gemma4/Lib/site-packages/aiohappyeyeballs/impl.py",
-          "contentHash": "4c89002b8c5f002bca069d6cec300a4a86c779f513382d87184fa7d2d3ad8519",
+          "filePath": "ace-vector-selection-slice/src/lib/server/ace/vector/ace-packet-vector.test.ts",
+          "sourceRef": "ace-vector-selection-slice/src/lib/server/ace/vector/ace-packet-vector.test.ts",
+          "contentHash": "6a53014b0921708bef346d5ddf8e95e8a63625d65aa14fdcf7f2ddb0eecfb0b2",
           "representationName": "semantic_768",
           "dimension": 768,
           "model": "deterministic-hash-embedder",
           "source": "deterministic",
-          "embeddingHash": "890a456d54e45e5fc1729523d1296e0c2b5c0f59413f800fae0f854460eeeb3c",
-          "labels": [],
-          "domain": "config",
+          "embeddingHash": "08af6b739bbf4ce4d1855df00b32844d0d59c003df1f0ce162520a5eb89bba60",
+          "labels": [
+            "vectors",
+            "testing",
+            "server-side",
+            "library"
+          ],
+          "domain": "retrieval",
           "ontology": "utility",
-          "tier": "feature",
+          "tier": "test",
           "status": "EMBEDDED"
         }
       ]
     },
     "relationships": {
       "status": "PROVEN",
-      "entries": 312787,
-      "containsEdges": 136233,
-      "importEdges": 40321,
-      "declaresEdges": 136233,
+      "entries": 291080,
+      "containsEdges": 127540,
+      "importEdges": 36000,
+      "declaresEdges": 127540,
       "samples": [
         {
           "subjectId": "35000bc035cc20349f3415aa997469ea75b4256da31d0a23671a881753312c6c",
@@ -2351,37 +2366,36 @@
     },
     "labeling": {
       "status": "PROVEN",
-      "filesProcessed": 34487,
+      "filesProcessed": 25267,
       "domainCounts": {
-        "test": 1126,
-        "feature": 3594,
-        "config": 1874,
-        "graph": 1039,
-        "api": 6170,
-        "ai": 1119,
-        "ui": 7416,
-        "gpu": 1417,
-        "auth": 1743,
-        "retrieval": 4442,
-        "indexer": 1775,
-        "cache": 2696,
-        "vector": 76
+        "test": 801,
+        "feature": 2445,
+        "config": 926,
+        "graph": 763,
+        "api": 3509,
+        "ai": 180,
+        "ui": 7488,
+        "gpu": 1202,
+        "auth": 1309,
+        "retrieval": 3648,
+        "indexer": 1462,
+        "cache": 1482,
+        "vector": 52
       },
       "ontologyCounts": {
-        "utility": 24684,
-        "model": 4346,
-        "adapter": 1152,
-        "service": 1870,
-        "manager": 1882,
-        "handler": 412,
-        "client": 50,
-        "bridge": 91
+        "utility": 17740,
+        "model": 3593,
+        "adapter": 1153,
+        "handler": 356,
+        "bridge": 79,
+        "manager": 985,
+        "client": 33,
+        "service": 1328
       },
       "tierCounts": {
-        "test": 2795,
-        "feature": 28635,
-        "internal": 254,
-        "middleware": 2526,
+        "test": 2739,
+        "feature": 19728,
+        "middleware": 2523,
         "core": 277
       },
       "sampleLabels": [
@@ -2393,20 +2407,6 @@
           "labels": [
             "testing"
           ]
-        },
-        {
-          "filePath": "--since 2h",
-          "domain": "feature",
-          "ontology": "utility",
-          "tier": "feature",
-          "labels": []
-        },
-        {
-          "filePath": ".clangd",
-          "domain": "feature",
-          "ontology": "utility",
-          "tier": "feature",
-          "labels": []
         },
         {
           "filePath": ".claude/AGENT_CONSTITUTION.md",
@@ -2475,6 +2475,20 @@
           "ontology": "utility",
           "tier": "feature",
           "labels": []
+        },
+        {
+          "filePath": ".claude/commands/audit-duplication.md",
+          "domain": "feature",
+          "ontology": "utility",
+          "tier": "feature",
+          "labels": []
+        },
+        {
+          "filePath": ".claude/commands/deep-audit.md",
+          "domain": "feature",
+          "ontology": "utility",
+          "tier": "feature",
+          "labels": []
         }
       ]
     },
@@ -2486,10 +2500,10 @@
     },
     "projection": {
       "status": "PROVEN",
-      "postgresCanonicalRecords": 34487,
+      "postgresCanonicalRecords": 25267,
       "qdrantProjectionRecords": 24,
-      "neo4jProjectionRecords": 312787,
-      "redisProjectionRecords": 34487,
+      "neo4jProjectionRecords": 291080,
+      "redisProjectionRecords": 25267,
       "representationName": "semantic_768",
       "denseVectorName": "content",
       "collectionName": "codebase_chunks_768_v2"
@@ -2498,7 +2512,7 @@
       "status": "PROVEN",
       "missingHashes": 0,
       "malformedHashes": 0,
-      "duplicateFileHashes": 1978,
+      "duplicateFileHashes": 862,
       "missingStructuralIds": 0,
       "semanticDimensionMismatches": 0,
       "pass": true
@@ -2525,9 +2539,9 @@
     "incremental": {
       "status": "PROVEN",
       "priorReportFound": true,
-      "reusedFiles": 34467,
-      "invalidatedFiles": 20,
-      "reusedRatio": 0.9994200713312262
+      "reusedFiles": 25267,
+      "invalidatedFiles": 0,
+      "reusedRatio": 1
     }
   },
   "outputs": {
@@ -2554,7 +2568,7 @@
     "path": "docs/reports/workspace-source-binding-observation.json",
     "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
     "sourceManifestDigest": "927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-    "sourceCount": 25361,
+    "sourceCount": 25267,
     "boundSources": 25361,
     "skippedSources": 107
   },

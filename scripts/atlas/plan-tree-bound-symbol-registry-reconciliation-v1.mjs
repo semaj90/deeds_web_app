@@ -13,7 +13,8 @@ const resolve = path.resolve;
 dotenv.config({ path: path.resolve(root, 'sveltekit-frontend/.env') });
 dotenv.config({ path: resolve(root, 'sveltekit-frontend/.env.local'), override: true });
 const resolutionPath = resolve(root, '.tmp/atlas/current-structural-symbol-resolution-v1.ndjson');
-const nominationsPath = resolve(root, '.tmp/atlas/current-graphify-symbol-nominations-v1.jsonl');
+const nominationsToken = process.argv.find((arg) => arg.startsWith('--nominations='))?.slice('--nominations='.length);
+const nominationsPath = resolve(root, nominationsToken ?? '.tmp/atlas/graphify-file-index-v1/ast-symbol-nominations.jsonl');
 const reportPath = resolve(root, 'docs/reports/tree-bound-symbol-registry-reconciliation-plan-v1.json');
 const connectionString = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
 const digest = (value) => `sha256:${createHash('sha256').update(value, 'utf8').digest('hex')}`;
@@ -45,10 +46,49 @@ for (const row of registryRows) {
   list.push(row);
   byMetadata.set(key, list);
 }
-const counts = { treeBound: treeBound.length, exactCurrent: 0, legacyNamespaceExactReviewOnly: 0, ambiguous: 0, contentOrRevisionConflict: 0, unresolved: 0 };
+const classifyStoredRevision = (value, expected) => {
+  const actual = String(value ?? '').trim();
+  const wanted = String(expected ?? '').trim();
+  if (actual && wanted && actual === wanted) return 'CURRENT_CONTENT_REVISION';
+  if (!actual || actual === '0' || actual === 'workspace:0' || actual === 'unknown') return 'LEGACY_SYNTHETIC_REVISION';
+  return 'OTHER_UNPROVEN_REVISION';
+};
+const counts = {
+  treeBound: treeBound.length,
+  exactCurrent: 0,
+  legacyNamespaceExactReviewOnly: 0,
+  ambiguous: 0,
+  contentOrRevisionConflict: 0,
+  unresolved: 0,
+  candidateRevisionClasses: {
+    CURRENT_CONTENT_REVISION: 0,
+    LEGACY_SYNTHETIC_REVISION: 0,
+    OTHER_UNPROVEN_REVISION: 0,
+  },
+};
 const entries = [];
 for (const bound of treeBound) {
   const nomination = nominationById.get(bound.nominationId);
+  if (!nomination) {
+    counts.unresolved += 1;
+    entries.push({
+      schema: 'atlas.tree-bound-symbol-registry-reconciliation-entry.v1',
+      nominationId: bound.nominationId,
+      treeNodeId: bound.treeNodeId,
+      sourceRef: bound.sourceRef ?? null,
+      canonicalSourceRef: sourceRef(bound.sourceRef),
+      sourceRevision: bound.sourceRevision ?? null,
+      canonicalKeyAttempted: null,
+      classification: 'NOMINATION_RECORD_MISSING',
+    candidateStableSymbolIds: [],
+    candidateCanonicalKeys: [],
+      candidateSourceRefs: [],
+      candidateSourceRevisions: [],
+      canonicalAuthority: false,
+      writes: false,
+    });
+    continue;
+  }
   const keyMaterial = JSON.stringify({ sourceRef: sourceRef(nomination.source_ref), sourceRevision: nomination.source_revision, kind: nomination.kind, name: nomination.name, startByte: nomination.byte_start, endByte: nomination.byte_end });
   const canonicalKey = `symbol-key:${createHash('sha256').update(keyMaterial, 'utf8').digest('hex').slice(0, 40)}`;
   const keyRows = byKey.get(canonicalKey) ?? [];
@@ -61,6 +101,8 @@ for (const bound of treeBound) {
   else if (metadataRows.length > 1) { classification = 'AMBIGUOUS'; candidates = metadataRows; counts.ambiguous += 1; }
   else { classification = 'UNRESOLVED'; counts.unresolved += 1; }
   const revisionConflict = candidates.length > 0 && candidates.some((row) => String(row.created_from_source_revision ?? '') !== String(nomination.source_revision ?? ''));
+  const candidateRevisionClasses = candidates.map((row) => classifyStoredRevision(row.created_from_source_revision, nomination.source_revision));
+  for (const revisionClass of candidateRevisionClasses) counts.candidateRevisionClasses[revisionClass] += 1;
   if (revisionConflict && classification === 'LEGACY_NAMESPACE_EXACT_REVIEW_ONLY') { counts.legacyNamespaceExactReviewOnly -= 1; counts.contentOrRevisionConflict += 1; classification = 'CONTENT_OR_REVISION_CONFLICT'; }
   entries.push({
     schema: 'atlas.tree-bound-symbol-registry-reconciliation-entry.v1',
@@ -73,6 +115,10 @@ for (const bound of treeBound) {
     classification,
     candidateStableSymbolIds: candidates.map((row) => row.stable_symbol_id),
     candidateCanonicalKeys: candidates.map((row) => row.canonical_key),
+    candidateSourceRefs: candidates.map((row) => row.created_from_source_ref ?? null),
+    candidateSourceRevisions: candidates.map((row) => row.created_from_source_revision ?? null),
+    candidateRevisionClasses,
+    revisionConflict,
     canonicalAuthority: false,
     writes: false,
   });

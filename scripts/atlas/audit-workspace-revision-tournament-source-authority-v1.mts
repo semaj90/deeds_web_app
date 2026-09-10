@@ -46,6 +46,7 @@ const report = {
   manifestPath: derivation.snapshotPath,
   sourceCount: derivation.sourceCount ?? 0,
   sourceSelectionChecksum: derivation.sourceMembershipChecksum ?? null,
+  snapshotRevision: snapshot.snapshotRevision ?? null,
   snapshotMembershipChecksum: snapshot.sourceMembershipChecksum ?? null,
   checks,
   firstBlockingInvariant: ready ? null : Object.entries(checks).find(([, value]) => !value)?.[0] ?? 'UNKNOWN',

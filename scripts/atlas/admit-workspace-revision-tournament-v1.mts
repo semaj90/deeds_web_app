@@ -14,22 +14,48 @@ const confirm = process.argv.slice(2).find((value) => value.startsWith('--confir
 if (confirm !== REQUIRED) throw new Error(`EXPLICIT_CONFIRMATION_REQUIRED:${REQUIRED}`);
 const preflight = JSON.parse(await readFile(PREFLIGHT, 'utf8'));
 const workspaceRevision = process.argv.slice(2).find((value) => value.startsWith('--workspace-revision='))?.slice('--workspace-revision='.length) ?? null;
+const manifestPath = typeof preflight.manifestPath === 'string' ? resolve(ROOT, preflight.manifestPath) : null;
+let snapshot = null;
+let snapshotBindingError = null;
+if (!manifestPath) {
+  snapshotBindingError = 'PREFLIGHT_MANIFEST_PATH_MISSING';
+} else {
+  try {
+    snapshot = JSON.parse(await readFile(manifestPath, 'utf8'));
+  } catch {
+    snapshotBindingError = 'PREFLIGHT_MANIFEST_UNREADABLE';
+  }
+}
+const snapshotBindingValid = snapshotBindingError === null
+  && snapshot?.snapshotRevision === preflight.snapshotRevision
+  && Array.isArray(snapshot?.sources)
+  && snapshot.sources.length === preflight.sourceCount
+  && snapshot?.sourceMembershipChecksum === preflight.snapshotMembershipChecksum;
 const ready = preflight.status === 'CANDIDATE_READY_FOR_EXPLICIT_TOURNAMENT_ADMISSION'
   && preflight.authority === false
   && preflight.workspaceRevision === null
   && typeof preflight.workspaceRevisionCandidate === 'string'
   && typeof workspaceRevision === 'string'
   && /^sha256:[0-9a-f]{64}$/i.test(workspaceRevision)
+  && workspaceRevision === preflight.workspaceRevisionCandidate
+  && snapshotBindingValid
   && preflight.approvalRequired === true;
 if (!ready) {
+  const blocker = snapshotBindingError
+    ?? (workspaceRevision !== preflight.workspaceRevisionCandidate
+      ? 'WORKSPACE_REVISION_DOES_NOT_MATCH_PREFLIGHT_CANDIDATE'
+      : (!snapshotBindingValid ? 'PREFLIGHT_SNAPSHOT_BINDING_MISMATCH' : 'SNAPSHOT_REVISION_IS_NOT_WORKSPACE_REVISION'));
   const correction = {
     schema: 'atlas.workspace-revision-tournament-admission.v1', generatedAt: new Date().toISOString(),
     mode: 'EXPLICIT_BOUNDED_ADMISSION_RECEIPT', status: 'WORKSPACE_REVISION_TOURNAMENT_ADMISSION_BLOCKED_REVISION_KIND_MISMATCH',
     proofLevel: 'BLOCKED', authority: false, workspaceRevision: null,
-    snapshotRevision: preflight.workspaceRevisionCandidate ?? null,
+    snapshotRevision: preflight.snapshotRevision ?? null,
     workspaceRevisionCandidate: null, approvalRequired: true, autoApply: false, training: false,
     writesPerformed: false, datastoreWritesPerformed: false, preflightPath: PREFLIGHT,
-    blocker: 'SNAPSHOT_REVISION_IS_NOT_WORKSPACE_REVISION',
+    blocker,
+    suppliedWorkspaceRevision: workspaceRevision,
+    preflightWorkspaceRevisionCandidate: preflight.workspaceRevisionCandidate ?? null,
+    manifestPath,
     nextGate: 'WORKSPACE-REVISION-ORIGIN-RECONCILIATION-01',
   };
   await mkdir(dirname(REPORT), { recursive: true });
@@ -45,9 +71,11 @@ const report = {
   proofLevel: 'BOUNDED_LIVE_PROVEN',
   authority: true,
   workspaceRevision,
-  snapshotRevision: preflight.workspaceRevisionCandidate,
+  snapshotRevision: preflight.snapshotRevision,
   sourceCount: preflight.sourceCount,
   sourceSelectionChecksum: preflight.sourceSelectionChecksum,
+  snapshotMembershipChecksum: preflight.snapshotMembershipChecksum,
+  manifestPath,
   approval: { confirmation: REQUIRED, scope: 'TOURNAMENT_SOURCE_AUTHORITY_ONLY' },
   graphifyExecutionAuthorized: false,
   projectionWritesAuthorized: false,

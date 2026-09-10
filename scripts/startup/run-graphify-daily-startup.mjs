@@ -50,6 +50,26 @@ let derivedContextStatus = 'NOT_RUN';
 let dailyEmbeddingStatus = 'NOT_REQUESTED';
 let nesPacketStatus = 'NOT_REQUESTED';
 const provenanceScript = 'npm run atlas:phase109b:workflow:dry';
+const ADMISSION_REPORT = path.resolve(ROOT, 'docs/reports/workspace-revision-tournament-admission-v1.json');
+const ADMITTED_SNAPSHOT_DIR = path.resolve(ROOT, 'docs/reports/workspace-source-snapshots');
+
+function readAdmittedSnapshotBinding() {
+  if (!existsSync(ADMISSION_REPORT)) throw new Error('GRAPHIFY_ADMITTED_WORKSPACE_REVISION_MISSING');
+  const admission = JSON.parse(readFileSync(ADMISSION_REPORT, 'utf8'));
+  if (admission.status !== 'WORKSPACE_REVISION_TOURNAMENT_ADMITTED'
+    || admission.authority !== true
+    || typeof admission.workspaceRevision !== 'string'
+    || typeof admission.snapshotRevision !== 'string') {
+    throw new Error('GRAPHIFY_ADMITTED_WORKSPACE_REVISION_INVALID');
+  }
+  const snapshotPath = path.resolve(ADMITTED_SNAPSHOT_DIR, `${admission.snapshotRevision.replace(/^sha256:/, '')}.json`);
+  if (!existsSync(snapshotPath)) throw new Error('GRAPHIFY_ADMITTED_WORKSPACE_SNAPSHOT_MISSING');
+  const snapshot = JSON.parse(readFileSync(snapshotPath, 'utf8'));
+  if (snapshot.snapshotRevision !== admission.snapshotRevision || !Array.isArray(snapshot.sources) || snapshot.sources.length === 0) {
+    throw new Error('GRAPHIFY_ADMITTED_WORKSPACE_SNAPSHOT_INVALID');
+  }
+  return { admission, snapshot, snapshotPath };
+}
 
 function stable(value) {
   if (Array.isArray(value)) return `[${value.map(stable).join(',')}]`;
@@ -177,6 +197,17 @@ process.on('SIGTERM', () => {
 try {
   if (!quiet) console.log('[graphify:daily] Starting...');
 
+  const admittedSnapshotBinding = readAdmittedSnapshotBinding();
+  process.env.ATLAS_GRAPHIFY_EXPECTED_WORKSPACE_REVISION = admittedSnapshotBinding.admission.workspaceRevision;
+  process.env.ATLAS_GRAPHIFY_SOURCE_SNAPSHOT_PATH = admittedSnapshotBinding.snapshotPath;
+  execSync(`npx tsx scripts/atlas/materialize-workspace-source-snapshot-v1.mts --snapshot="${admittedSnapshotBinding.snapshotPath}"`, {
+    cwd: ROOT,
+    stdio: quiet ? 'ignore' : 'inherit',
+    timeout: 10 * 60 * 1000,
+  });
+  process.env.ATLAS_GRAPHIFY_SOURCE_SNAPSHOT_ROOT = path.resolve(ROOT, '.tmp', 'workspace-source-snapshots', admittedSnapshotBinding.snapshot.snapshotRevision.replace(/^sha256:/, ''));
+  if (!quiet) console.log(`[graphify:daily] Bound to admitted workspace snapshot (${admittedSnapshotBinding.snapshot.sources.length} sources)...`);
+
   if (!quiet) console.log('[graphify:daily] Running repository provenance dry-run...');
   execSync(provenanceScript, {
     cwd: FRONTEND,
@@ -192,6 +223,19 @@ try {
     stdio: quiet ? 'ignore' : 'inherit',
     timeout: 60 * 1000
   });
+
+  const workflowReceiptPath = path.resolve(ROOT, 'docs/reports/graphify-daily-workflow-receipt.json');
+  const workflowReceipt = JSON.parse(readFileSync(workflowReceiptPath, 'utf8'));
+  const observedSourceCount = Number(
+    workflowReceipt.sourceBindingObservation?.sourceCount
+      ?? workflowReceipt.stages?.snapshot?.totalFiles
+      ?? workflowReceipt.sourceCount
+      ?? 0,
+  );
+  const admittedSourceCount = admittedSnapshotBinding.snapshot.sources.length;
+  if (observedSourceCount !== admittedSourceCount) {
+    throw new Error(`GRAPHIFY_ADMITTED_SNAPSHOT_SOURCE_COUNT_MISMATCH:${observedSourceCount}:${admittedSourceCount}`);
+  }
 
   if (derivedContext) {
     if (!quiet) console.log('[graphify:daily] Running optional derived-context read lane...');

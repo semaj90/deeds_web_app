@@ -1,6 +1,6 @@
 {
   "schema": "atlas.symbol-owner-lineage.v1",
-  "generatedAt": "2026-09-07T22:44:32.188Z",
+  "generatedAt": "2026-09-10T01:56:33.168Z",
   "mode": "READ_ONLY_LINEAGE_RECONCILIATION",
   "writes": {
     "postgres": false,
@@ -10,12 +10,12 @@
   },
   "databaseError": null,
   "summary": {
-    "symbolRows": 85,
-    "sourceBindings": 85,
-    "sourceWorkspaceMatches": 85,
+    "symbolRows": 0,
+    "sourceBindings": 0,
+    "sourceWorkspaceMatches": 0,
     "missingBindings": 0,
     "workspaceRevisionMismatches": 0,
-    "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9"
+    "workspaceRevision": "sha256:e2e80507d1ad16c5d41d527a24c889c9062bd27c34f4bb6022beb7413cec9f57"
   },
   "revisionAxes": {
     "repositoryRevision": "atlas_symbol_versions.source_revision",
@@ -24,7 +24,7 @@
     "sourceContentRevisionAuthority": "SOURCE_BYTES_SHA256_V1",
     "comparisonPolicy": "DO_NOT_COMPARE_OR_OVERWRITE_CROSS_AXIS_VALUES"
   },
-  "lineageReady": true,
+  "lineageReady": false,
   "promotionAllowed": false,
   "reason": "Source/workspace coverage is reported separately from the two revision axes; Graphify ownership and content-lineage proof remain required."
 }

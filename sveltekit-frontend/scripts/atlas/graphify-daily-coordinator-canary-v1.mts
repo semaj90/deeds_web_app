@@ -83,7 +83,7 @@ const rootRepositoryHead = snapshot.repositories.find((repository) => repository
 if (!rootRepositoryHead || !/^[0-9a-f]{40}$/i.test(rootRepositoryHead)) {
   throw new Error('GRAPHIFY_COORDINATOR_CANARY_ROOT_REPOSITORY_HEAD_MISSING');
 }
-  const selectedSnapshotSources = fullMode ? rootSources : rootSources.slice(0, requestedLimit);
+const selectedSnapshotSources = fullMode ? snapshot.sources : rootSources.slice(0, requestedLimit);
   const expectedCount = selectedSnapshotSources.length;
   if (expectedCount === 0) throw new Error('GRAPHIFY_COORDINATOR_CANARY_NO_ROOT_SNAPSHOT_SOURCES');
   const selectedBindings = selectedSnapshotSources.map((source, index) => ({
@@ -150,7 +150,7 @@ if (!rootRepositoryHead || !/^[0-9a-f]{40}$/i.test(rootRepositoryHead)) {
     outputChecksum: inventoryOutputChecksum,
     receiptRef: 'docs/reports/graphify-daily-coordinator-canary-v1.json',
   });
-  const structuralBinding = bindings[0];
+  const structuralBinding = bindings.find((binding) => binding.sourceRef === rootSources[0]?.sourceRef) ?? bindings[0];
   const structuralSourcePath = resolve(process.cwd(), '..', structuralBinding.sourceRef);
   const structuralSourceBuffer = await readFile(structuralSourcePath);
   const structuralSource = structuralSourceBuffer.toString('utf8');
@@ -193,7 +193,7 @@ if (!rootRepositoryHead || !/^[0-9a-f]{40}$/i.test(rootRepositoryHead)) {
 
   const readback = await client.query(
     `SELECT e.execution_id, e.workspace_revision, e.status, e.completed_at,
-            (SELECT count(*)::int FROM public.graphify_execution_files f WHERE f.execution_id = e.execution_id) AS file_count,
+            (SELECT count(*)::int FROM public.graphify_execution_file_membership_v2 f WHERE f.execution_id = e.execution_id) AS file_count,
             (SELECT count(*)::int FROM public.graphify_execution_stages s WHERE s.execution_id = e.execution_id AND s.status = 'COMPLETED') AS completed_stage_count
        FROM public.graphify_executions e
       WHERE e.execution_id = $1`,

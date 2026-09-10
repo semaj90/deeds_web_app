@@ -6,9 +6,9 @@
     "batchPlan": {
       "path": "docs/reports/current-source-graphify-batch-plan-v1.json",
       "status": "CURRENT_GRAPHIFY_BATCH_PLAN_BLOCKED_REVIEW",
-      "selectedSourceCount": 3,
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "selectionChecksum": "89a6f50302bc2f52e703970aeee7f7736ff291991d72f5f5cbc6c9ee8064a084"
+      "selectedSourceCount": 5,
+      "workspaceRevision": "sha256:f476b4a6aac2afcafe0f82c7b0e48d52951ccbce73fca52b9706b1f1fbfabefb",
+      "selectionChecksum": "6e3df0dce6fab8c3577b30a3cc7a335828a708133a0172d9fcfaaf624d01c7c3"
     },
     "registryPlan": {
       "path": "docs/reports/current-source-registry-reconciliation-plan-v1.json",
@@ -30,11 +30,11 @@
     }
   },
   "comparison": {
-    "batchRows": 3,
+    "batchRows": 5,
     "registryRows": 0,
     "projectionRows": 52,
-    "sharedRefs": 3,
-    "workspaceRevisionMismatches": 3,
+    "sharedRefs": 0,
+    "workspaceRevisionMismatches": 0,
     "registryAdmissionReady": false
   },
   "decision": "DO_NOT_APPLY",
@@ -48,5 +48,5 @@
     "valkey": 0,
     "sourceFiles": 0
   },
-  "reportChecksum": "sha256:c016e4c29258e4fbb59e67cc58da7f0d07c0fc8e991fb9af85a809c91eab59c5"
+  "reportChecksum": "sha256:c75b8950c838c0b21573447f5ff5559cf82d4e3c0ca07e188616bb52960e4d4d"
 }

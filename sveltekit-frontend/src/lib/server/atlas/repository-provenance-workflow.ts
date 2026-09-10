@@ -16,7 +16,9 @@ export type SemanticEmbedder = (input: {
 
 export type RepositoryProvenanceWorkflowOptions = {
   repoRoot?: string;
+  sourceReadRoot?: string;
   outputDir?: string;
+  sourceSnapshotPath?: string;
   filePaths?: string[];
   semanticSampleLimit?: number;
   lexicalTokenLimit?: number;
@@ -303,7 +305,7 @@ const TIER_PATTERNS: Record<string, RegExp[]> = {
   internal: [/\/_internal\//i],
 };
 
-function sha256(input: string): string {
+function sha256(input: string | Buffer): string {
   return createHash('sha256').update(input).digest('hex');
 }
 
@@ -522,13 +524,14 @@ function listFiles(repoRoot: string, explicitFiles?: string[]): string[] {
   return discovered;
 }
 
-function fileSnapshot(repoRoot: string, relativePath: string): FileSnapshot | null {
+function fileSnapshot(repoRoot: string, relativePath: string, allowLargeFile = false): FileSnapshot | null {
   const absolutePath = path.join(repoRoot, relativePath);
   if (!fs.existsSync(absolutePath)) return null;
   const stat = fs.statSync(absolutePath);
   if (!stat.isFile()) return null;
-  if (stat.size > 1_500_000) return null;
-  const content = readTextFile(absolutePath);
+  if (!allowLargeFile && stat.size > 1_500_000) return null;
+  const bytes = fs.readFileSync(absolutePath);
+  const content = bytes.toString('utf8');
   return {
     entry: {
       relativePath: normalizePath(relativePath),
@@ -536,12 +539,28 @@ function fileSnapshot(repoRoot: string, relativePath: string): FileSnapshot | nu
       extension: path.extname(relativePath).toLowerCase(),
       language: languageForFile(relativePath),
       kind: classifyFile(relativePath),
-      sha256: sha256(content),
+      sha256: sha256(bytes),
       sizeBytes: stat.size,
       lineCount: content.split(/\r?\n/).length,
     },
     content,
   };
+}
+
+function loadSnapshotFilePaths(repoRoot: string, snapshotPath: string): string[] {
+  const snapshot = JSON.parse(fs.readFileSync(snapshotPath, 'utf8')) as {
+    sources?: Array<{ repositoryPath?: string; repositoryRelativePath?: string; sourceRef?: string }>;
+  };
+  if (!Array.isArray(snapshot.sources) || snapshot.sources.length === 0) {
+    throw new Error('GRAPHIFY_SOURCE_SNAPSHOT_INVALID');
+  }
+  return snapshot.sources.map((source) => {
+    const relative = source.repositoryPath
+      ? path.join(source.repositoryPath, source.repositoryRelativePath ?? source.sourceRef ?? '')
+      : (source.repositoryRelativePath ?? source.sourceRef ?? '');
+    if (!relative) throw new Error('GRAPHIFY_SOURCE_SNAPSHOT_SOURCE_REF_MISSING');
+    return normalizePath(path.relative(repoRoot, path.resolve(repoRoot, relative)));
+  });
 }
 
 function summarizeTopExtensions(files: RepositoryFileEntry[]): Array<{ extension: string; count: number }> {
@@ -917,13 +936,37 @@ export async function runRepositoryProvenanceWorkflow(
   })();
 
   throwIfAborted(options.signal);
-  const relativePaths = listFiles(repoRoot, options.filePaths);
+  const snapshotPath = options.sourceSnapshotPath;
+  const relativePaths = snapshotPath
+    ? loadSnapshotFilePaths(repoRoot, snapshotPath)
+    : listFiles(repoRoot, options.filePaths);
   const snapshots: FileSnapshot[] = [];
   for (const relativePath of relativePaths) {
     throwIfAborted(options.signal);
-    const snapshot = fileSnapshot(repoRoot, relativePath);
+    const snapshot = fileSnapshot(options.sourceReadRoot ?? repoRoot, relativePath, Boolean(snapshotPath));
     if (snapshot) {
       snapshots.push(snapshot);
+    }
+  }
+
+  if (snapshotPath) {
+    const expectedSnapshot = JSON.parse(fs.readFileSync(snapshotPath, 'utf8')) as {
+      sources?: Array<{ sourceRef?: string; repositoryPath?: string; repositoryRelativePath?: string; contentDigest?: string; byteLength?: number }>;
+    };
+    const expectedByPath = new Map((expectedSnapshot.sources ?? []).map((source) => {
+      const relative = normalizePath(source.repositoryPath
+        ? path.join(source.repositoryPath, source.repositoryRelativePath ?? source.sourceRef ?? '')
+        : (source.repositoryRelativePath ?? source.sourceRef ?? ''));
+      return [relative, source] as const;
+    }));
+    const mismatches = snapshots.filter((item) => {
+      const expected = expectedByPath.get(normalizePath(path.relative(options.sourceReadRoot ?? repoRoot, item.entry.absolutePath)));
+      return !expected
+        || expected.contentDigest !== item.entry.sha256
+        || Number(expected.byteLength) !== item.entry.sizeBytes;
+    });
+    if (mismatches.length > 0 || snapshots.length !== (expectedSnapshot.sources ?? []).length) {
+      throw new Error(`GRAPHIFY_SOURCE_SNAPSHOT_READBACK_MISMATCH:${mismatches.length}:${snapshots.length}:${(expectedSnapshot.sources ?? []).length}`);
     }
   }
 

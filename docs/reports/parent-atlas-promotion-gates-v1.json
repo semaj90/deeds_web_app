@@ -1,12 +1,19 @@
 {
   "schema": "atlas.parent-atlas-promotion-gates.v1",
-  "generatedAt": "2026-09-09T23:41:03.411Z",
+  "generatedAt": "2026-09-10T03:51:29.516Z",
   "mode": "READ_ONLY",
   "status": "BLOCKED",
   "proofLevel": "BLOCKED",
   "writesPerformed": false,
   "authority": false,
   "workspaceRevision": null,
+  "workspaceRevisionCandidate": "sha256:d521f7f10b4918a7c83b82cdc123cb31c039720d03df8e15348e9dcc1b0cdeb7",
+  "authorityInputConsistency": {
+    "derivationStatus": "WORKSPACE_REVISION_CANDIDATE_READY_FOR_ADMISSION",
+    "planStatus": "SOURCE_SELECTION_PLAN_READY_NOT_ADMITTED",
+    "derivationPlanSnapshotMatch": true,
+    "admissionMatchesCurrentCandidate": false
+  },
   "workspaceRevisionPolicy": "UNBOUND_UNTIL_TOURNAMENT",
   "counts": {
     "totalGates": 10,
@@ -16,7 +23,7 @@
     "workspaceRevision": null
   },
   "violations": [
-    "WORKSPACE_REVISION_UNBOUND_UNTIL_TOURNAMENT"
+    "WORKSPACE_SNAPSHOT_BINDING_UNPROVEN"
   ],
   "gates": [
     {
@@ -45,8 +52,7 @@
         }
       ],
       "violations": [
-        "workspaceRevision is intentionally null until tournament/source-authority is built",
-        "no current execution may be admitted without a bound workspace revision"
+        "WORKSPACE_SNAPSHOT_BINDING_UNPROVEN"
       ]
     },
     {
@@ -70,7 +76,7 @@
         }
       ],
       "violations": [
-        "WORKSPACE_REVISION_UNBOUND_UNTIL_TOURNAMENT"
+        "WORKSPACE_SNAPSHOT_BINDING_UNPROVEN"
       ]
     },
     {
@@ -89,7 +95,7 @@
         }
       ],
       "violations": [
-        "WORKSPACE_REVISION_UNBOUND_UNTIL_TOURNAMENT"
+        "WORKSPACE_SNAPSHOT_BINDING_UNPROVEN"
       ]
     },
     {
@@ -113,7 +119,7 @@
         }
       ],
       "violations": [
-        "WORKSPACE_REVISION_UNBOUND_UNTIL_TOURNAMENT"
+        "WORKSPACE_SNAPSHOT_BINDING_UNPROVEN"
       ]
     },
     {
@@ -137,7 +143,7 @@
         }
       ],
       "violations": [
-        "WORKSPACE_REVISION_UNBOUND_UNTIL_TOURNAMENT"
+        "WORKSPACE_SNAPSHOT_BINDING_UNPROVEN"
       ]
     },
     {
@@ -161,7 +167,7 @@
         }
       ],
       "violations": [
-        "WORKSPACE_REVISION_UNBOUND_UNTIL_TOURNAMENT"
+        "WORKSPACE_SNAPSHOT_BINDING_UNPROVEN"
       ]
     },
     {
@@ -180,7 +186,7 @@
         }
       ],
       "violations": [
-        "WORKSPACE_REVISION_UNBOUND_UNTIL_TOURNAMENT"
+        "WORKSPACE_SNAPSHOT_BINDING_UNPROVEN"
       ]
     },
     {
@@ -193,7 +199,7 @@
       "authority": false,
       "evidence": [],
       "violations": [
-        "WORKSPACE_REVISION_UNBOUND_UNTIL_TOURNAMENT"
+        "WORKSPACE_SNAPSHOT_BINDING_UNPROVEN"
       ]
     },
     {
@@ -212,7 +218,7 @@
         }
       ],
       "violations": [
-        "WORKSPACE_REVISION_UNBOUND_UNTIL_TOURNAMENT"
+        "WORKSPACE_SNAPSHOT_BINDING_UNPROVEN"
       ]
     },
     {
@@ -241,14 +247,14 @@
         }
       ],
       "violations": [
-        "WORKSPACE_REVISION_UNBOUND_UNTIL_TOURNAMENT"
+        "WORKSPACE_SNAPSHOT_BINDING_UNPROVEN"
       ]
     }
   ],
   "firstBlockingGate": "CURRENT-SOURCE-TERMINAL-EXECUTION-01",
-  "firstBlockingInvariant": "WORKSPACE_REVISION_UNBOUND_UNTIL_TOURNAMENT",
+  "firstBlockingInvariant": "WORKSPACE_SNAPSHOT_BINDING_UNPROVEN",
   "nextGate": "CURRENT-SOURCE-TERMINAL-EXECUTION-01",
-  "safeNextCommand": "npx tsx scripts/atlas/capture-workspace-source-snapshot-v1.mts --workspace-id 625743d2-092b-4fa8-abe0-9dc094920c80",
+  "safeNextCommand": "npx tsx scripts/atlas/audit-current-graphify-run-owner-v1.mjs",
   "reportPath": "docs/reports/parent-atlas-promotion-gates-v1.json",
   "evidence": {
     "sourceAuthority": {
@@ -284,7 +290,7 @@
       "exists": true,
       "value": {
         "schema": "atlas.current-source-owner-reconciliation.v1",
-        "generatedAt": "2026-09-09T19:43:39.319Z",
+        "generatedAt": "2026-09-10T03:10:10.082Z",
         "mode": "READ_ONLY",
         "writesPerformed": false,
         "databaseWrites": 0,
@@ -295,18 +301,18 @@
           "root": "C:\\Users\\james\\Videos\\deeds-web-app",
           "gitRoot": "C:/Users/james/Videos/deeds-web-app",
           "gitCommonDir": ".git",
-          "headCommit": "d1a0b5e7c4ebd30d44f4efc1aa861fd3faef4ca2",
-          "headTree": "67a96b48cf1eb5c5b3aac6cd549002459ba5c72c",
+          "headCommit": "5aab1eec351097fe6bda1bf1ab69c46f726c3fcc",
+          "headTree": "19a2afe6385e52d8d23a605e2d37c2d741fed751",
           "hostname": "DESKTOP-Q18MPHM",
           "dirty": true,
-          "sourceCount": 24189,
-          "sourceRefChecksum": "sha256:ac249f0ce016e3caf70e3d12e6c9a261737bd89a7a2ceb755f2c439114226aed",
+          "sourceCount": 24226,
+          "sourceRefChecksum": "sha256:e94570a811970c98e39c630f29172f8fefda6616f51871124d8ae7784eec63db",
           "inventoryPolicy": {
             "command": "git ls-files --cached --others --exclude-standard -z",
-            "trackedAtHeadCount": 27708,
-            "candidateCount": 24227,
-            "admittedCount": 24189,
-            "skippedCount": 38,
+            "trackedAtHeadCount": 27807,
+            "candidateCount": 24265,
+            "admittedCount": 24226,
+            "skippedCount": 39,
             "maxSourceBytes": 5242880,
             "generatedPrefixesExcluded": [
               "docs/reports/"
@@ -353,13 +359,193 @@
               ".zsh"
             ],
             "skippedByReason": {
-              "SOURCE_TOO_LARGE": 30,
+              "SOURCE_TOO_LARGE": 31,
               "NOT_VALID_UTF8_SOURCE": 8
             }
           },
           "status": "PROVEN"
         },
         "currentExecutionCandidates": [
+          {
+            "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+            "workspace_revision": "sha256:e2e80507d1ad16c5d41d527a24c889c9062bd27c34f4bb6022beb7413cec9f57",
+            "execution_id": "49681845-d45e-4e00-851a-31a28fb993ab",
+            "status": "COMPLETED",
+            "canonical_authority": false,
+            "trigger_kind": "CURRENT_WORKSPACE_SOURCE_SELECTION",
+            "completed_at": "2026-09-10T01:51:09.991Z",
+            "memberCount": 0,
+            "distinctSourceCount": 0,
+            "workspaceRevisionCount": 0,
+            "sourceSelection": {
+              "status": "COMPLETED",
+              "output_checksum": "sha256:a94f4e6aa4608eb411fe5254426e6366565ab136dddb751c624f6ae882fad249",
+              "receipt_ref": "graphify-current-workspace-source-selection:v1"
+            },
+            "sourceRefChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "selectionMembershipReadback": false,
+            "canonicalAuthority": false
+          },
+          {
+            "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+            "workspace_revision": "sha256:e2e80507d1ad16c5d41d527a24c889c9062bd27c34f4bb6022beb7413cec9f57",
+            "execution_id": "c418970d-b6d1-4258-a262-2ba3fb06f213",
+            "status": "COMPLETED",
+            "canonical_authority": false,
+            "trigger_kind": "CURRENT_WORKSPACE_SOURCE_SELECTION",
+            "completed_at": "2026-09-10T01:47:48.343Z",
+            "memberCount": 0,
+            "distinctSourceCount": 0,
+            "workspaceRevisionCount": 0,
+            "sourceSelection": {
+              "status": "COMPLETED",
+              "output_checksum": "sha256:a94f4e6aa4608eb411fe5254426e6366565ab136dddb751c624f6ae882fad249",
+              "receipt_ref": "graphify-current-workspace-source-selection:v1"
+            },
+            "sourceRefChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "selectionMembershipReadback": false,
+            "canonicalAuthority": false
+          },
+          {
+            "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+            "workspace_revision": "sha256:bf3acebd9e4140b8d77ee4fd8839a888b57c3401d26a74e06aeca7e4ae2579e2",
+            "execution_id": "98c5f3a0-290c-4ae6-a76a-a48d565b91b7",
+            "status": "COMPLETED",
+            "canonical_authority": false,
+            "trigger_kind": "CURRENT_WORKSPACE_SOURCE_SELECTION",
+            "completed_at": "2026-09-10T01:44:15.257Z",
+            "memberCount": 0,
+            "distinctSourceCount": 0,
+            "workspaceRevisionCount": 0,
+            "sourceSelection": {
+              "status": "COMPLETED",
+              "output_checksum": "sha256:a94f4e6aa4608eb411fe5254426e6366565ab136dddb751c624f6ae882fad249",
+              "receipt_ref": "graphify-current-workspace-source-selection:v1"
+            },
+            "sourceRefChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "selectionMembershipReadback": false,
+            "canonicalAuthority": false
+          },
+          {
+            "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+            "workspace_revision": "sha256:8ebe1fdd07b6e2c0c78d55e42c7fc9bf73ee21a6f87d31dbf2ca4032eb624669",
+            "execution_id": "945b3d60-784a-4669-a08a-82405bbb8133",
+            "status": "COMPLETED",
+            "canonical_authority": false,
+            "trigger_kind": "CURRENT_WORKSPACE_SOURCE_SELECTION",
+            "completed_at": "2026-09-10T01:36:37.458Z",
+            "memberCount": 0,
+            "distinctSourceCount": 0,
+            "workspaceRevisionCount": 0,
+            "sourceSelection": {
+              "status": "COMPLETED",
+              "output_checksum": "sha256:a94f4e6aa4608eb411fe5254426e6366565ab136dddb751c624f6ae882fad249",
+              "receipt_ref": "graphify-current-workspace-source-selection:v1"
+            },
+            "sourceRefChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "selectionMembershipReadback": false,
+            "canonicalAuthority": false
+          },
+          {
+            "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+            "workspace_revision": "sha256:578fc2602ee7ad6c29afea852f011cbff297b42ec0d4e8509e083e74f3d85500",
+            "execution_id": "956f03c2-d396-4e9e-9b68-69a8fb38cdb4",
+            "status": "COMPLETED",
+            "canonical_authority": false,
+            "trigger_kind": "CURRENT_WORKSPACE_SOURCE_SELECTION",
+            "completed_at": "2026-09-10T01:33:01.264Z",
+            "memberCount": 0,
+            "distinctSourceCount": 0,
+            "workspaceRevisionCount": 0,
+            "sourceSelection": {
+              "status": "COMPLETED",
+              "output_checksum": "sha256:a94f4e6aa4608eb411fe5254426e6366565ab136dddb751c624f6ae882fad249",
+              "receipt_ref": "graphify-current-workspace-source-selection:v1"
+            },
+            "sourceRefChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "selectionMembershipReadback": false,
+            "canonicalAuthority": false
+          },
+          {
+            "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+            "workspace_revision": "sha256:2978d34eaf82a1b5f01882fe61950a295256adf7253ca07777fbee31a4e97690",
+            "execution_id": "8c6891d3-27fe-4913-9f46-bd8f6cb129cf",
+            "status": "COMPLETED",
+            "canonical_authority": false,
+            "trigger_kind": "BOUNDED_COMMITTED_CANARY",
+            "completed_at": "2026-09-10T01:29:33.761Z",
+            "memberCount": 0,
+            "distinctSourceCount": 0,
+            "workspaceRevisionCount": 0,
+            "sourceSelection": {
+              "status": "COMPLETED",
+              "output_checksum": "sha256:f0f64e3d6831fe2ea1e3e2c29fb70f37b2b18fb287dedf26f24bf63cc88f1bd1",
+              "receipt_ref": "committed-canary-fresh-materialization-v1"
+            },
+            "sourceRefChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "selectionMembershipReadback": false,
+            "canonicalAuthority": false
+          },
+          {
+            "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+            "workspace_revision": "sha256:2978d34eaf82a1b5f01882fe61950a295256adf7253ca07777fbee31a4e97690",
+            "execution_id": "de2b1e77-9849-4449-98ca-96a729491f2e",
+            "status": "COMPLETED",
+            "canonical_authority": false,
+            "trigger_kind": "BOUNDED_COMMITTED_CANARY",
+            "completed_at": "2026-09-10T01:28:48.283Z",
+            "memberCount": 0,
+            "distinctSourceCount": 0,
+            "workspaceRevisionCount": 0,
+            "sourceSelection": {
+              "status": "COMPLETED",
+              "output_checksum": "sha256:ca82728c635983da5dcc33a05c1dc2c873bc0451332b89ae2df87fbdfaf0a1b2",
+              "receipt_ref": "committed-canary-fresh-materialization-v1"
+            },
+            "sourceRefChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "selectionMembershipReadback": false,
+            "canonicalAuthority": false
+          },
+          {
+            "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+            "workspace_revision": "sha256:c57775da8eb8320fbeae542e7e9ee608f35db56f19d76ed00363ed8c759fe1f0",
+            "execution_id": "24b32bc1-beca-4451-ad97-d71e7abe1af4",
+            "status": "COMPLETED",
+            "canonical_authority": false,
+            "trigger_kind": "BOUNDED_COMMITTED_CANARY",
+            "completed_at": "2026-09-10T01:19:52.474Z",
+            "memberCount": 0,
+            "distinctSourceCount": 0,
+            "workspaceRevisionCount": 0,
+            "sourceSelection": {
+              "status": "COMPLETED",
+              "output_checksum": "sha256:ca82728c635983da5dcc33a05c1dc2c873bc0451332b89ae2df87fbdfaf0a1b2",
+              "receipt_ref": "committed-canary-fresh-materialization-v1"
+            },
+            "sourceRefChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "selectionMembershipReadback": false,
+            "canonicalAuthority": false
+          },
+          {
+            "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+            "workspace_revision": "sha256:c57775da8eb8320fbeae542e7e9ee608f35db56f19d76ed00363ed8c759fe1f0",
+            "execution_id": "747d0c3d-f9a6-4376-8314-387ecdef9923",
+            "status": "COMPLETED",
+            "canonical_authority": false,
+            "trigger_kind": "BOUNDED_COMMITTED_CANARY",
+            "completed_at": "2026-09-10T01:18:59.683Z",
+            "memberCount": 0,
+            "distinctSourceCount": 0,
+            "workspaceRevisionCount": 0,
+            "sourceSelection": {
+              "status": "COMPLETED",
+              "output_checksum": "sha256:ca82728c635983da5dcc33a05c1dc2c873bc0451332b89ae2df87fbdfaf0a1b2",
+              "receipt_ref": "committed-canary-fresh-materialization-v1"
+            },
+            "sourceRefChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "selectionMembershipReadback": false,
+            "canonicalAuthority": false
+          },
           {
             "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
             "workspace_revision": "sha256:0b5cb14bd9014009ea8debc779df62cb3f6e669f8de94c79ad98ca8b88ff5e24",
@@ -706,7 +892,7 @@
             "625743d2-092b-4fa8-abe0-9dc094920c80"
           ]
         },
-        "checksum": "sha256:0c279fca0419808ee107dcfb4d98370567f84adfd4ef7ef12f20fe33085740a1"
+        "checksum": "sha256:14bb096fde36cbd3405f90708594b1d5f19d06d30d4ea1b5bb8aa4334c97280b"
       }
     },
     "sourceHydration": {
@@ -3569,5 +3755,5 @@
       "value": null
     }
   },
-  "checksum": "sha256:e414a87e608245c97b8f76792af77e0b2700d7c644b1f48df0fdd8ff39730787"
+  "checksum": "sha256:8ffb089fb6137eaa8afa67213fb989171f4276f067e92c65b04b369328f0c19c"
 }

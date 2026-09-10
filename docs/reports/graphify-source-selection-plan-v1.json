@@ -1,30 +1,30 @@
 {
   "schema": "atlas.graphify-source-selection-plan.v1",
-  "generatedAt": "2026-09-10T00:35:20.999Z",
+  "generatedAt": "2026-09-10T03:26:05.998Z",
   "mode": "READ_ONLY_PLAN",
   "status": "SOURCE_SELECTION_PLAN_READY_NOT_ADMITTED",
   "proofLevel": "PARTIAL_PROVEN",
   "authority": false,
   "workspaceRevision": null,
-  "workspaceRevisionCandidate": "sha256:b2b20ca198eb78bc14a98c5a401f2a4cda9ff090a5012492c0958adceee3c572",
+  "workspaceRevisionCandidate": "sha256:d521f7f10b4918a7c83b82cdc123cb31c039720d03df8e15348e9dcc1b0cdeb7",
   "writesPerformed": false,
   "datastoreWritesPerformed": false,
-  "manifestPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\workspace-source-snapshots\\b2b20ca198eb78bc14a98c5a401f2a4cda9ff090a5012492c0958adceee3c572.json",
-  "snapshotRevision": "sha256:b2b20ca198eb78bc14a98c5a401f2a4cda9ff090a5012492c0958adceee3c572",
+  "manifestPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\workspace-source-snapshots\\ea55977b06a465969fda405ee5ef1aa72396dd254a5176076b316e6ebaab01e4.json",
+  "snapshotRevision": "sha256:ea55977b06a465969fda405ee5ef1aa72396dd254a5176076b316e6ebaab01e4",
   "snapshotReadback": {
     "status": "SNAPSHOT_BYTES_READBACK_PROVEN",
-    "snapshotRevision": "sha256:b2b20ca198eb78bc14a98c5a401f2a4cda9ff090a5012492c0958adceee3c572",
-    "sourceCount": 25265,
-    "exactMatches": 25265,
+    "snapshotRevision": "sha256:ea55977b06a465969fda405ee5ef1aa72396dd254a5176076b316e6ebaab01e4",
+    "sourceCount": 25266,
+    "exactMatches": 25266,
     "violations": [],
     "canonicalAuthority": false,
     "datastoreWritesPerformed": false,
     "scope": "Recorded sources only; this does not assert current full-workspace membership or Graphify admission"
   },
   "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
-  "sourceCount": 25265,
-  "sourceSelectionChecksum": "sha256:0625cffcba791e7c5180a67c3d6e0babe2d049d0e7489a270356fdd83b51ddda",
-  "snapshotMembershipChecksum": "sha256:0625cffcba791e7c5180a67c3d6e0babe2d049d0e7489a270356fdd83b51ddda",
+  "sourceCount": 25266,
+  "sourceSelectionChecksum": "sha256:8f279291047a8ba9ccb47b0f499c04396481cca4f9f09ab1ca70874fb42dc1b7",
+  "snapshotMembershipChecksum": "sha256:8f279291047a8ba9ccb47b0f499c04396481cca4f9f09ab1ca70874fb42dc1b7",
   "duplicateRefs": [],
   "bindings": [
     {
@@ -29175,9 +29175,9 @@
       "repositoryId": "repo:root",
       "repositoryRelativePath": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
       "sourceRef": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
-      "codeSourceRevision": "sha256:002ca2c2f3e5697c83ed7a1eab1a932c7651724a3173d0885732c5cb4a076e36",
-      "contentHash": "002ca2c2f3e5697c83ed7a1eab1a932c7651724a3173d0885732c5cb4a076e36",
-      "byteLength": 822688
+      "codeSourceRevision": "sha256:19ce08d295bf9bbd431f9478362f4f17a8bc648c2868df637933e115654ce0db",
+      "contentHash": "19ce08d295bf9bbd431f9478362f4f17a8bc648c2868df637933e115654ce0db",
+      "byteLength": 833084
     },
     {
       "repositoryId": "repo:root",
@@ -30183,9 +30183,9 @@
       "repositoryId": "repo:root",
       "repositoryRelativePath": "package.json",
       "sourceRef": "package.json",
-      "codeSourceRevision": "sha256:7a1cd77b4398ddc8f6e4b83c9c05afb9e3ac9be5d3cbb2d9771699c1952e3938",
-      "contentHash": "7a1cd77b4398ddc8f6e4b83c9c05afb9e3ac9be5d3cbb2d9771699c1952e3938",
-      "byteLength": 24793
+      "codeSourceRevision": "sha256:4e13b36470ce57f2726ba09e110c349caf50f66c8f722d93c949df4160f1cf6d",
+      "contentHash": "4e13b36470ce57f2726ba09e110c349caf50f66c8f722d93c949df4160f1cf6d",
+      "byteLength": 24931
     },
     {
       "repositoryId": "repo:root",
@@ -41039,9 +41039,9 @@
       "repositoryId": "repo:root",
       "repositoryRelativePath": "scripts/atlas/admit-workspace-revision-tournament-v1.mts",
       "sourceRef": "scripts/atlas/admit-workspace-revision-tournament-v1.mts",
-      "codeSourceRevision": "sha256:fbdbd49f4bcd97618f6fdf1dd65cb89342f61c35a366a1202f38bc28d962bb3b",
-      "contentHash": "fbdbd49f4bcd97618f6fdf1dd65cb89342f61c35a366a1202f38bc28d962bb3b",
-      "byteLength": 3802
+      "codeSourceRevision": "sha256:10bf12abc949a8ad55e6f966326121d6b2ad158dff6d38cecbc0f1e584c0abfa",
+      "contentHash": "10bf12abc949a8ad55e6f966326121d6b2ad158dff6d38cecbc0f1e584c0abfa",
+      "byteLength": 3782
     },
     {
       "repositoryId": "repo:root",
@@ -41839,9 +41839,9 @@
       "repositoryId": "repo:root",
       "repositoryRelativePath": "scripts/atlas/audit-current-graphify-run-owner-v1.mjs",
       "sourceRef": "scripts/atlas/audit-current-graphify-run-owner-v1.mjs",
-      "codeSourceRevision": "sha256:39204fa1048fa405c46d699746057d8206aaca3934c3c6f330514f999d49f779",
-      "contentHash": "39204fa1048fa405c46d699746057d8206aaca3934c3c6f330514f999d49f779",
-      "byteLength": 4888
+      "codeSourceRevision": "sha256:c73161765c009459447945b40bc7559f2fa6c035ccdcd9fcdea83491477324fa",
+      "contentHash": "c73161765c009459447945b40bc7559f2fa6c035ccdcd9fcdea83491477324fa",
+      "byteLength": 7884
     },
     {
       "repositoryId": "repo:root",
@@ -41919,9 +41919,9 @@
       "repositoryId": "repo:root",
       "repositoryRelativePath": "scripts/atlas/audit-current-tree-bound-symbol-registry-input-v1.mjs",
       "sourceRef": "scripts/atlas/audit-current-tree-bound-symbol-registry-input-v1.mjs",
-      "codeSourceRevision": "sha256:af5637584600f426514687443edeab275c6564829624dcea992c83bda05db7d6",
-      "contentHash": "af5637584600f426514687443edeab275c6564829624dcea992c83bda05db7d6",
-      "byteLength": 2950
+      "codeSourceRevision": "sha256:22260e65ce7243263e7a4d5c4725395f347ea945a5edf7e52a5723091a9035fe",
+      "contentHash": "22260e65ce7243263e7a4d5c4725395f347ea945a5edf7e52a5723091a9035fe",
+      "byteLength": 3179
     },
     {
       "repositoryId": "repo:root",
@@ -42543,9 +42543,9 @@
       "repositoryId": "repo:root",
       "repositoryRelativePath": "scripts/atlas/audit-graphify-tournament-admission-v1.mts",
       "sourceRef": "scripts/atlas/audit-graphify-tournament-admission-v1.mts",
-      "codeSourceRevision": "sha256:74ac1e9bf9ff130557db57feffe399a09a68dbb69486cc024762bf62bf9486dc",
-      "contentHash": "74ac1e9bf9ff130557db57feffe399a09a68dbb69486cc024762bf62bf9486dc",
-      "byteLength": 3120
+      "codeSourceRevision": "sha256:66ecf1a4a3761dcb495db30b2fe165f402eea93ad00938e2067a900643aba32e",
+      "contentHash": "66ecf1a4a3761dcb495db30b2fe165f402eea93ad00938e2067a900643aba32e",
+      "byteLength": 4114
     },
     {
       "repositoryId": "repo:root",
@@ -42559,9 +42559,9 @@
       "repositoryId": "repo:root",
       "repositoryRelativePath": "scripts/atlas/audit-graphify-workspace-snapshot-binding-v1.mts",
       "sourceRef": "scripts/atlas/audit-graphify-workspace-snapshot-binding-v1.mts",
-      "codeSourceRevision": "sha256:ea487ef94b801a833a0c53ed98ed9aa86d6e022ca6e55cff462e160fbb62dd0a",
-      "contentHash": "ea487ef94b801a833a0c53ed98ed9aa86d6e022ca6e55cff462e160fbb62dd0a",
-      "byteLength": 10160
+      "codeSourceRevision": "sha256:657bc5212b99558aa11ac45c0a02253af40429b910999a24c954d07bdf79a0f2",
+      "contentHash": "657bc5212b99558aa11ac45c0a02253af40429b910999a24c954d07bdf79a0f2",
+      "byteLength": 11963
     },
     {
       "repositoryId": "repo:root",
@@ -43175,9 +43175,9 @@
       "repositoryId": "repo:root",
       "repositoryRelativePath": "scripts/atlas/audit-parent-atlas-promotion-gates-v1.mjs",
       "sourceRef": "scripts/atlas/audit-parent-atlas-promotion-gates-v1.mjs",
-      "codeSourceRevision": "sha256:1d403251ef79f944bc6fccf8309579b73b8a4fe38fc9309c005616c94b1e74de",
-      "contentHash": "1d403251ef79f944bc6fccf8309579b73b8a4fe38fc9309c005616c94b1e74de",
-      "byteLength": 5253
+      "codeSourceRevision": "sha256:d4aada50a7f7baff9a7147a795491c8bc56d9d368afd4c31e994b38fdbfee073",
+      "contentHash": "d4aada50a7f7baff9a7147a795491c8bc56d9d368afd4c31e994b38fdbfee073",
+      "byteLength": 7085
     },
     {
       "repositoryId": "repo:root",
@@ -43951,9 +43951,9 @@
       "repositoryId": "repo:root",
       "repositoryRelativePath": "scripts/atlas/audit-treesitter-structural-observation-v1.mjs",
       "sourceRef": "scripts/atlas/audit-treesitter-structural-observation-v1.mjs",
-      "codeSourceRevision": "sha256:c5bfbf550b5492864c213ef1eed6cb79b7a83e5b53eec31c9543e2ad05a451c8",
-      "contentHash": "c5bfbf550b5492864c213ef1eed6cb79b7a83e5b53eec31c9543e2ad05a451c8",
-      "byteLength": 8250
+      "codeSourceRevision": "sha256:34f7cdebf4b623812988cf22344a01fbe49446b50b8a9c7b2d982b59e2e45782",
+      "contentHash": "34f7cdebf4b623812988cf22344a01fbe49446b50b8a9c7b2d982b59e2e45782",
+      "byteLength": 11252
     },
     {
       "repositoryId": "repo:root",
@@ -43999,9 +43999,9 @@
       "repositoryId": "repo:root",
       "repositoryRelativePath": "scripts/atlas/audit-workspace-revision-tournament-source-authority-v1.mts",
       "sourceRef": "scripts/atlas/audit-workspace-revision-tournament-source-authority-v1.mts",
-      "codeSourceRevision": "sha256:210f642f413797a0141a7e9ea202b6c6501a22f6f711b27b417045fad09e24cb",
-      "contentHash": "210f642f413797a0141a7e9ea202b6c6501a22f6f711b27b417045fad09e24cb",
-      "byteLength": 3000
+      "codeSourceRevision": "sha256:1edbbf9ccc3f331a453447313a7fbe3dddf6ebcabe36cdbda9dbf2869be7ec1f",
+      "contentHash": "1edbbf9ccc3f331a453447313a7fbe3dddf6ebcabe36cdbda9dbf2869be7ec1f",
+      "byteLength": 3299
     },
     {
       "repositoryId": "repo:root",
@@ -45439,9 +45439,9 @@
       "repositoryId": "repo:root",
       "repositoryRelativePath": "scripts/atlas/capture-workspace-source-snapshot-v1.mts",
       "sourceRef": "scripts/atlas/capture-workspace-source-snapshot-v1.mts",
-      "codeSourceRevision": "sha256:ac303778fa54e0852b6ac3d3f977119725842c1dc0c1ef21c4e2ed80a5eb4e21",
-      "contentHash": "ac303778fa54e0852b6ac3d3f977119725842c1dc0c1ef21c4e2ed80a5eb4e21",
-      "byteLength": 1429
+      "codeSourceRevision": "sha256:058020d9fd9a64fd5f2067d9c5473a836db5f87dec29a88bc2c710aafaa84760",
+      "contentHash": "058020d9fd9a64fd5f2067d9c5473a836db5f87dec29a88bc2c710aafaa84760",
+      "byteLength": 1593
     },
     {
       "repositoryId": "repo:root",
@@ -46258,6 +46258,14 @@
       "codeSourceRevision": "sha256:23c462306e7dcccce137142305de04df2b92a990019b2c3fed3b5f77da27179a",
       "contentHash": "23c462306e7dcccce137142305de04df2b92a990019b2c3fed3b5f77da27179a",
       "byteLength": 12378
+    },
+    {
+      "repositoryId": "repo:root",
+      "repositoryRelativePath": "scripts/atlas/derive-workspace-revision-from-sealed-multi-repo-snapshot-v1.mts",
+      "sourceRef": "scripts/atlas/derive-workspace-revision-from-sealed-multi-repo-snapshot-v1.mts",
+      "codeSourceRevision": "sha256:a110845041c9cda8ccbb382587e47a608d364180157f340e7aaac2739825586a",
+      "contentHash": "a110845041c9cda8ccbb382587e47a608d364180157f340e7aaac2739825586a",
+      "byteLength": 4479
     },
     {
       "repositoryId": "repo:root",
@@ -47975,9 +47983,9 @@
       "repositoryId": "repo:root",
       "repositoryRelativePath": "scripts/atlas/graphify-daily-lifecycle-open-v1.mjs",
       "sourceRef": "scripts/atlas/graphify-daily-lifecycle-open-v1.mjs",
-      "codeSourceRevision": "sha256:ebe31b76ca1d7ffce7298c70acdf6d9b2c0824e12f8bfe90d2d8d0828d2755d3",
-      "contentHash": "ebe31b76ca1d7ffce7298c70acdf6d9b2c0824e12f8bfe90d2d8d0828d2755d3",
-      "byteLength": 5521
+      "codeSourceRevision": "sha256:6bb00537ef59f687890bbc655ac12b84f9d29cf8401cd89ebf4caaea19a11015",
+      "contentHash": "6bb00537ef59f687890bbc655ac12b84f9d29cf8401cd89ebf4caaea19a11015",
+      "byteLength": 5887
     },
     {
       "repositoryId": "repo:root",
@@ -49527,9 +49535,9 @@
       "repositoryId": "repo:root",
       "repositoryRelativePath": "scripts/atlas/lib/workspace-snapshot-capture-v1.mts",
       "sourceRef": "scripts/atlas/lib/workspace-snapshot-capture-v1.mts",
-      "codeSourceRevision": "sha256:9c20a6fab4f4bf3f6b92f9605cc616667170a9a75071f4c150782b96e318ade2",
-      "contentHash": "9c20a6fab4f4bf3f6b92f9605cc616667170a9a75071f4c150782b96e318ade2",
-      "byteLength": 9189
+      "codeSourceRevision": "sha256:c6ceb67dcd6de7367a4b368c4ce26585fa05d756c2843dd59ea12e4d2a4bf731",
+      "contentHash": "c6ceb67dcd6de7367a4b368c4ce26585fa05d756c2843dd59ea12e4d2a4bf731",
+      "byteLength": 9791
     },
     {
       "repositoryId": "repo:root",
@@ -50255,9 +50263,9 @@
       "repositoryId": "repo:root",
       "repositoryRelativePath": "scripts/atlas/nominate-ast-symbols-dry-run.mjs",
       "sourceRef": "scripts/atlas/nominate-ast-symbols-dry-run.mjs",
-      "codeSourceRevision": "sha256:81b3c12ceb7bc53889364dfa4747e3465b23489c44399f18e3e4aafe0ea8aeae",
-      "contentHash": "81b3c12ceb7bc53889364dfa4747e3465b23489c44399f18e3e4aafe0ea8aeae",
-      "byteLength": 4403
+      "codeSourceRevision": "sha256:453b9f59c446324f5df3c54d9289117d91c7012c441ce20fbc5d15ccf36fc01d",
+      "contentHash": "453b9f59c446324f5df3c54d9289117d91c7012c441ce20fbc5d15ccf36fc01d",
+      "byteLength": 6120
     },
     {
       "repositoryId": "repo:root",
@@ -51943,9 +51951,9 @@
       "repositoryId": "repo:root",
       "repositoryRelativePath": "scripts/atlas/plan-current-tree-bound-symbol-registry-input-v1.mjs",
       "sourceRef": "scripts/atlas/plan-current-tree-bound-symbol-registry-input-v1.mjs",
-      "codeSourceRevision": "sha256:bde3e8f2904cf1216528c4b03618035f99fcaf1bf07127daeccba4fe4c67bfeb",
-      "contentHash": "bde3e8f2904cf1216528c4b03618035f99fcaf1bf07127daeccba4fe4c67bfeb",
-      "byteLength": 5738
+      "codeSourceRevision": "sha256:65fcc09130841aee0bf4d85fbe381db19af7c4e3859dc794257e97c74ba9473c",
+      "contentHash": "65fcc09130841aee0bf4d85fbe381db19af7c4e3859dc794257e97c74ba9473c",
+      "byteLength": 6161
     },
     {
       "repositoryId": "repo:root",
@@ -52039,9 +52047,9 @@
       "repositoryId": "repo:root",
       "repositoryRelativePath": "scripts/atlas/plan-graphify-source-selection-from-snapshot-v1.mts",
       "sourceRef": "scripts/atlas/plan-graphify-source-selection-from-snapshot-v1.mts",
-      "codeSourceRevision": "sha256:42b8a8880bb975f56adab81a4c839f3a0508ce7e2b426619043d1a88a3ca12ff",
-      "contentHash": "42b8a8880bb975f56adab81a4c839f3a0508ce7e2b426619043d1a88a3ca12ff",
-      "byteLength": 4295
+      "codeSourceRevision": "sha256:03672dab9f34552ba6caae327d5edf261f87068df3cd7995408fc88ca221efbd",
+      "contentHash": "03672dab9f34552ba6caae327d5edf261f87068df3cd7995408fc88ca221efbd",
+      "byteLength": 5645
     },
     {
       "repositoryId": "repo:root",
@@ -52167,9 +52175,9 @@
       "repositoryId": "repo:root",
       "repositoryRelativePath": "scripts/atlas/plan-tree-bound-symbol-registry-reconciliation-v1.mjs",
       "sourceRef": "scripts/atlas/plan-tree-bound-symbol-registry-reconciliation-v1.mjs",
-      "codeSourceRevision": "sha256:83b112cfff5464298b831744b5ced189ce4da9754a936799d0ba893edaed4ff6",
-      "contentHash": "83b112cfff5464298b831744b5ced189ce4da9754a936799d0ba893edaed4ff6",
-      "byteLength": 6405
+      "codeSourceRevision": "sha256:f85acd0b67bab4bcc03b8c98139dc99ac4ce36b6fe3ec7e1604e8a85d59c71d0",
+      "contentHash": "f85acd0b67bab4bcc03b8c98139dc99ac4ce36b6fe3ec7e1604e8a85d59c71d0",
+      "byteLength": 8233
     },
     {
       "repositoryId": "repo:root",
@@ -53279,9 +53287,9 @@
       "repositoryId": "repo:root",
       "repositoryRelativePath": "scripts/atlas/prove-current-structural-symbol-resolution-v1.mjs",
       "sourceRef": "scripts/atlas/prove-current-structural-symbol-resolution-v1.mjs",
-      "codeSourceRevision": "sha256:30b344f13c5d8e5aee31a54e018f693f4891441867fe47d1d4269aae7d86193d",
-      "contentHash": "30b344f13c5d8e5aee31a54e018f693f4891441867fe47d1d4269aae7d86193d",
-      "byteLength": 7120
+      "codeSourceRevision": "sha256:75a937a5944081fb4cf411c92815524779f2be71df5b4a93618a4ab84d9631fe",
+      "contentHash": "75a937a5944081fb4cf411c92815524779f2be71df5b4a93618a4ab84d9631fe",
+      "byteLength": 8570
     },
     {
       "repositoryId": "repo:root",
@@ -63895,9 +63903,9 @@
       "repositoryId": "repo:root",
       "repositoryRelativePath": "scripts/startup/graphify-daily-coordinator-canary-limit.spec.mjs",
       "sourceRef": "scripts/startup/graphify-daily-coordinator-canary-limit.spec.mjs",
-      "codeSourceRevision": "sha256:40bfccfc97ea23f0213e70e6ac5c0d03de9b4a3674ab3a0611c02c0e44b8abf1",
-      "contentHash": "40bfccfc97ea23f0213e70e6ac5c0d03de9b4a3674ab3a0611c02c0e44b8abf1",
-      "byteLength": 1268
+      "codeSourceRevision": "sha256:33b75474384524de83d343c7d6d03d2e1213b9618acb6d30f04987415f4d6e9c",
+      "contentHash": "33b75474384524de83d343c7d6d03d2e1213b9618acb6d30f04987415f4d6e9c",
+      "byteLength": 1259
     },
     {
       "repositoryId": "repo:root",
@@ -64015,9 +64023,9 @@
       "repositoryId": "repo:root",
       "repositoryRelativePath": "scripts/startup/run-graphify-daily-startup.mjs",
       "sourceRef": "scripts/startup/run-graphify-daily-startup.mjs",
-      "codeSourceRevision": "sha256:0c5d5636b9d0a40f4e3a24427664c165381037ba05e8a484b2c49f3eb2049a64",
-      "contentHash": "0c5d5636b9d0a40f4e3a24427664c165381037ba05e8a484b2c49f3eb2049a64",
-      "byteLength": 27153
+      "codeSourceRevision": "sha256:da7ddb2d343f324f42705693ef24283c26b088d54bd68e8782edb5c805a96dfc",
+      "contentHash": "da7ddb2d343f324f42705693ef24283c26b088d54bd68e8782edb5c805a96dfc",
+      "byteLength": 29324
     },
     {
       "repositoryId": "repo:root",
@@ -121271,9 +121279,9 @@
       "repositoryId": "repo:root",
       "repositoryRelativePath": "sveltekit-frontend/package.json",
       "sourceRef": "sveltekit-frontend/package.json",
-      "codeSourceRevision": "sha256:325761ecffbf37346cd345eb058d787cb4db7dc4a35611f372b79c6c95d14210",
-      "contentHash": "325761ecffbf37346cd345eb058d787cb4db7dc4a35611f372b79c6c95d14210",
-      "byteLength": 175277
+      "codeSourceRevision": "sha256:b21cca773df357b125459f536f6b1564f44b96bd70513ca2995b9221f940aa4a",
+      "contentHash": "b21cca773df357b125459f536f6b1564f44b96bd70513ca2995b9221f940aa4a",
+      "byteLength": 175265
     },
     {
       "repositoryId": "repo:root",
@@ -124599,9 +124607,9 @@
       "repositoryId": "repo:root",
       "repositoryRelativePath": "sveltekit-frontend/scripts/atlas/graphify-daily-coordinator-canary-v1.mts",
       "sourceRef": "sveltekit-frontend/scripts/atlas/graphify-daily-coordinator-canary-v1.mts",
-      "codeSourceRevision": "sha256:5bf9637b329ac6d1820def9b4636cdf19d1511ea916c62ac59af33fe0bd61381",
-      "contentHash": "5bf9637b329ac6d1820def9b4636cdf19d1511ea916c62ac59af33fe0bd61381",
-      "byteLength": 10069
+      "codeSourceRevision": "sha256:fd445927e8f87615076447329f97ff453ff252bd084e4703fecb1b525b0c3ced",
+      "contentHash": "fd445927e8f87615076447329f97ff453ff252bd084e4703fecb1b525b0c3ced",
+      "byteLength": 11984
     },
     {
       "repositoryId": "repo:root",
@@ -155831,9 +155839,9 @@
       "repositoryId": "repo:root",
       "repositoryRelativePath": "sveltekit-frontend/src/lib/server/atlas/indexing/graphify-daily-coordinator-v1.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/atlas/indexing/graphify-daily-coordinator-v1.ts",
-      "codeSourceRevision": "sha256:d3d6d6708b8f2257e5961b95fb14a59e32d4664124aef6cf81cbc589a9465058",
-      "contentHash": "d3d6d6708b8f2257e5961b95fb14a59e32d4664124aef6cf81cbc589a9465058",
-      "byteLength": 24948
+      "codeSourceRevision": "sha256:0bc2d3e1735dfab5691c870503f495014a63f04d5f8a05c0c8f0724a654f58ca",
+      "contentHash": "0bc2d3e1735dfab5691c870503f495014a63f04d5f8a05c0c8f0724a654f58ca",
+      "byteLength": 26310
     },
     {
       "repositoryId": "repo:root",

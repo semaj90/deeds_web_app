@@ -1,14 +1,14 @@
 {
   "schema": "atlas.workspace-revision-tournament-admission.v1",
-  "generatedAt": "2026-09-10T01:07:10.094Z",
+  "generatedAt": "2026-09-10T04:10:59.072Z",
   "mode": "EXPLICIT_BOUNDED_ADMISSION_RECEIPT",
   "status": "WORKSPACE_REVISION_TOURNAMENT_ADMITTED",
   "proofLevel": "BOUNDED_LIVE_PROVEN",
   "authority": true,
-  "workspaceRevision": "sha256:6860119e757a1b84fd6109f7ab198435b7f31b2fe71352b4d6d98812632045e6",
-  "snapshotRevision": "sha256:6860119e757a1b84fd6109f7ab198435b7f31b2fe71352b4d6d98812632045e6",
-  "sourceCount": 25266,
-  "sourceSelectionChecksum": "sha256:a58be57ece623e8b3b47d96282eb1e437aec92a0ebe865e83996dccc3b8df32d",
+  "workspaceRevision": "sha256:d7f9563f5861b6890ac7e6d2c87df4ad6fa0eebb825f66387fba0e750ef91f2e",
+  "snapshotRevision": "sha256:c11d261f16a90ba80a8772f5ea10b24d0e2d28a27ef93afcee1f8398898c06ad",
+  "sourceCount": 25267,
+  "sourceSelectionChecksum": "sha256:5d524bf15be8ee0296d8f6b57f9edcc3f71c670dee5795b2ee6012064719798f",
   "approval": {
     "confirmation": "AUTHORIZE_WORKSPACE_REVISION_TOURNAMENT_ADMISSION_V1",
     "scope": "TOURNAMENT_SOURCE_AUTHORITY_ONLY"

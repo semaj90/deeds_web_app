@@ -1,5 +1,155 @@
 ## Remaining task dependency map (updated 2026-09-05)
 
+**2026-09-10 snapshot-binding recheck:** the read-only binding audit independently
+read back all `25,266/25,266` recorded snapshot sources with no byte or membership
+violations, but did not admit the snapshot because the current binding report keeps
+`workspaceRevision=null` and the admission receipt is control-plane-only. The
+source-selection planner therefore remains `SOURCE_SELECTION_PLAN_BLOCKED` with
+`authority=false`; no Graphify execution, source-selection write, or projection
+write was launched. Receipts: `docs/reports/graphify-workspace-snapshot-binding-v1.json`
+and `docs/reports/graphify-source-selection-plan-v1.json`. Next gate is the explicit
+`GRAPHIFY-SNAPSHOT-CONSUMPTION-AUTHORIZATION-01` boundary.
+
+The follow-up tournament-admission audit is also blocked as expected:
+`TOURNAMENT_ADMISSION_AUDIT_BLOCKED`, with candidate snapshot
+`sha256:ff9a6b7b27723c79596900b262993a5208e0e9b8853813b7218718af5f6d7694`,
+`SOURCE_SELECTION_PLAN_NOT_READY`, and
+`TOURNAMENT_REQUIRES_BOUND_WORKSPACE_REVISION`. The audit performed no
+Graphify, source-selection, registry, or projection writes. Receipt:
+`docs/reports/graphify-tournament-admission-v1.json`.
+
+**2026-09-10 fresh snapshot/planner repair:** the capture entrypoint was bound
+to the maintained `.mts` snapshot implementation, and the source-selection
+planner was corrected to hash repository-qualified membership keys in the same
+sorted order sealed by `WorkspaceSnapshotV1`. A fresh two-scan snapshot now
+reads back `25,266/25,266` sources exactly with zero violations; its selection
+checksum matches the sealed membership checksum. The plan is now
+`SOURCE_SELECTION_PLAN_READY_NOT_ADMITTED`, candidate revision
+`sha256:2536330c3453ce0c669f5b5bd94e9187445a1ff3d10026d5a69f0bbf9002648d`,
+and the read-only tournament audit reports
+`TOURNAMENT_ADMISSION_BOUNDARY_PROVEN`. `workspaceRevision` remains null and
+authority remains false until the separately authorized source-authority step.
+No Graphify, registry, or projection writes occurred. Receipts:
+`docs/reports/graphify-source-selection-plan-v1.json`,
+`docs/reports/graphify-tournament-admission-v1.json`, and the new snapshot
+under `docs/reports/workspace-source-snapshots/`.
+
+**2026-09-10 targeted structural observation:** the Tree-sitter auditor now
+accepts `--nominations=<path>` for a read-only nominated-source intersection.
+Against the current Graphify cohort and the snapshot-bound nomination file,
+`12` supported source files were selected and all `12` extracted successfully,
+producing `390` AST rows and `2,378` structural edges with zero failures. The
+nomination file contains `461` records across `20` source paths; all `20` are
+in the current cohort, `8` are unsupported by the structural provider, and the
+supported `12` matched `271` nominations exactly. This is corrected partial
+evidence, not full structural authority:
+stable-symbol and symbol-version resolution remain unattempted, and no
+canonical, structural, graph, or projection writes occurred. Receipt:
+`docs/reports/treesitter-structural-observation-v1.json` and
+`docs/reports/current-structural-symbol-resolution-v1.json`.
+Current-mode receipts bind `workspaceRevision` from the explicit tournament
+admission receipt rather than an unrelated observation candidate; authority
+remains false until the full Graphify owner and lineage gates close.
+
+The provider coverage correction was then re-run with `.mjs` mapped to the
+existing JavaScript parser. The nominated current cohort is now fully matched:
+`461/461` nominations have exact source/content/byte-span matches, all are
+tree-bound, and there are zero source-only, ambiguous, no-AST, source-revision,
+or workspace-revision mismatches. This closes the AST-to-nomination proof only;
+stable symbol and symbol-version ownership remain separate next gates. Receipt:
+`docs/reports/current-structural-symbol-resolution-v1.json`.
+
+The current tree-bound registry planner was then aligned to the current
+nomination file and explicit admitted revision instead of stale August inputs.
+It produced `461` review records: `123` promotable exact rows and `338` valid
+non-promotable variable rows. The input audit now accepts the latter as
+quarantined review-only evidence, and the bounded canary plan selects `5` of
+the `123` promotable rows. Promotion remains unauthorized; database, symbol
+version, and edge writes are all zero. Receipts:
+`docs/reports/current-tree-bound-symbol-registry-input-audit-v1.json` and
+`docs/reports/current-tree-bound-symbol-registry-canary-v1.json`.
+
+The live registry reconciliation was corrected to use the same current
+nomination file. Against `10,260` active registry rows and `461` exact tree-
+bound nominations, it found `0` ambiguities, `123` content/revision conflicts
+with existing registry rows, and `338` unresolved candidates. This is a
+read-only review result: no aliases, registry rewrites, symbol versions, or
+edges were created. Stable-symbol promotion remains blocked until the legacy
+revision conflicts are explicitly reviewed or a new current registry input is
+authorized. Receipt:
+`docs/reports/tree-bound-symbol-registry-reconciliation-plan-v1.json`.
+The corrected planner was verified live after the stale-input fix: it read
+`10,260` active registry rows and classified all `461` exact tree-bound
+records. The result is `0` ambiguous, `123` content/revision conflicts, and
+`338` unresolved; the five selected canary records are all in the conflict
+class and therefore remain review-only. No database writes occurred.
+The conflict detail confirms the existing rows carry `created_from_source_revision`
+=`workspace:0`, while the current nominations carry content-qualified SHA-256
+revisions. This is stale/unproven legacy metadata, not a harmless formatting
+difference; no automatic remapping is permitted. The reconciliation receipt now
+classifies the candidate revisions explicitly: `CURRENT_CONTENT_REVISION=0`,
+`LEGACY_SYNTHETIC_REVISION=123`, and `OTHER_UNPROVEN_REVISION=0`. This is still
+read-only evidence and does not authorize changing the registry or creating
+symbol versions. Next gate: review the 123 legacy rows or authorize a new
+current registry input; the 338 source/name candidates remain unresolved.
+
+**2026-09-10 execution-ledger reconciliation:** the sealed multi-repository
+snapshot and repository-qualified membership v2 now have one exact full
+workspace coordinator match: execution
+`49681845-d45e-4e00-851a-31a28fb993ab`, `25,266` sources, zero missing
+identities, zero source/content/workspace mismatches, and matching membership
+checksum. The owner audit now reads both the legacy `graphify_runs` surface and
+the newer `graphify_executions` surface, while keeping the five-stage
+coordinator canary distinct from a full Graphify lifecycle owner. Current
+status remains blocked for canonical owner admission because no completed
+`graphify_runs` owner exists for the admitted revision. No canonical projection
+promotion is implied.
+
+The current promotion admission recheck is explicit: the read-only fabric
+opened and rolled back its transaction with zero production mutations, and
+reported `NOT_SAFE_TO_PROJECT`. Ten predicates remain below PASS, led by
+`REVISION_QUALIFIED=NOT_PROVEN`, `SYMBOLS_RESOLVED=NOT_PROVEN`,
+`GRAPH_MANIFEST_SEALED=ABSENT`, and `ORDINAL_MAP_SEALED=ABSENT`. The next work
+is therefore the revision-qualified structural/graph authority chain, not a
+foreground apply attempt. Receipt:
+`docs/reports/atlas-canonical-projection-fabric-audit-2026-09-10.json`.
+
+The revision-qualified structural lineage audit was then run against the
+admitted revision. It reached PostgreSQL successfully but found
+`symbolRows=0`, `sourceBindings=0`, and `sourceWorkspaceMatches=0`; therefore
+symbol-level promotion remains closed. This does not invalidate file-level
+packet membership, and no structural or canonical rows were written. Receipt:
+`docs/reports/symbol-owner-lineage-v1.json`.
+
+The structural resolver was hardened to reject stale nominations rather than
+reporting an empty match set as proven. Against the admitted revision it now
+reports `440/440` nominations from an older workspace revision, `sourceOnly=440`,
+`workspaceRevisionMismatch=440`, and `stableSymbolResolution=NOT_ATTEMPTED`.
+This is the correct fail-closed result; the next input must be a fresh
+Tree-sitter/Graphify nomination snapshot bound to the admitted revision.
+Receipt: `docs/reports/current-structural-symbol-resolution-v1.json`.
+
+The AST-facts dry-run target had a stale relative path and was corrected to
+invoke the existing frontend-owned implementation. The repaired dry-run now
+processes `620` eligible chunks with `430` updates, `190` skips, and `0` errors;
+this is structural capability evidence only and does not authorize symbol or
+canonical writes.
+
+The full current Tree-sitter pass was stopped after prolonged execution because
+the auditor had no bound or request timeout. The auditor now supports
+`--limit=N` and a 15-second per-source timeout. A bounded current run of 100
+sources completed with `0` failures and `2` AST rows; 99 inputs were
+unsupported-language records and remain non-authoritative. This prevents an
+unbounded sidecar pass from being mistaken for a terminal proof.
+
+The nomination compiler now supports explicit `--bind-admitted-snapshot` mode.
+It quarantined `42,063` candidates outside the admitted snapshot and retained
+`461` snapshot-bound nominations. Resolver replay against the bounded current
+AST snapshot produced `271` exact span/tree-node matches, `190` source-only
+records, and zero ambiguous or revision-mismatched matches. Structural proof is
+therefore `PARTIAL_PROVEN`; stable-symbol and symbol-version resolution remain
+unattempted, and no canonical writes occurred.
+
 The remaining work is intentionally ordered by evidence dependency. Do not use
 checkbox completion percentage as permission to skip a blocker.
 

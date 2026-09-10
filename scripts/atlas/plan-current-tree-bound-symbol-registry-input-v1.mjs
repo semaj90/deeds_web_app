@@ -12,7 +12,8 @@ import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const resolutionPath = path.resolve(root, '.tmp/atlas/current-structural-symbol-resolution-v1.ndjson');
-const nominationsPath = path.resolve(root, '.tmp/atlas/current-graphify-symbol-nominations-v1.jsonl');
+const nominationsToken = process.argv.find((arg) => arg.startsWith('--nominations='))?.slice('--nominations='.length);
+const nominationsPath = path.resolve(root, nominationsToken ?? '.tmp/atlas/graphify-file-index-v1/ast-symbol-nominations.jsonl');
 const outputPath = path.resolve(root, '.tmp/atlas/current-tree-bound-symbol-registry-input-v1.ndjson');
 const reportPath = path.resolve(root, 'docs/reports/current-tree-bound-symbol-registry-input-v1.json');
 const authorityPath = path.resolve(root, 'docs/reports/current-graphify-snapshot-authority-v1.json');
@@ -22,14 +23,15 @@ const sha = (value) => createHash('sha256').update(value, 'utf8').digest('hex');
 const canonicalSourceRef = (value) => String(value ?? '').replaceAll('\\', '/').replace(/^sveltekit-frontend\//, '');
 
 const [resolutions, nominations] = await Promise.all([readJsonl(resolutionPath), readJsonl(nominationsPath)]);
-let currentWorkspaceRevision = null;
-try {
-  const authority = JSON.parse(await fs.readFile(authorityPath, 'utf8'));
-  currentWorkspaceRevision = authority.status === 'CURRENT_SNAPSHOT_PROVEN'
-    ? authority.sourceSnapshot?.workspaceRevision ?? null
-    : null;
-} catch {
-  currentWorkspaceRevision = null;
+const admittedRevisionToken = process.argv.find((arg) => arg.startsWith('--workspace-revision='))?.slice('--workspace-revision='.length);
+let currentWorkspaceRevision = admittedRevisionToken?.trim() || null;
+if (!currentWorkspaceRevision) {
+  try {
+    const admission = JSON.parse(await fs.readFile(path.resolve(root, 'docs/reports/workspace-revision-tournament-admission-v1.json'), 'utf8'));
+    currentWorkspaceRevision = admission.status === 'WORKSPACE_REVISION_TOURNAMENT_ADMITTED' ? admission.workspaceRevision ?? null : null;
+  } catch {
+    currentWorkspaceRevision = null;
+  }
 }
 const byId = new Map(nominations.map((row) => [row.nomination_id, row]));
 const treeBound = resolutions.filter((row) => row.resolution?.startsWith('EXACT') && row.treeNodeId);
@@ -87,7 +89,7 @@ const report = {
     ? 'REVIEW_ONLY_PLAN_READY'
     : treeBound.length ? 'CURRENT_WORKSPACE_REVISION_REQUIRED' : 'TREE_NODE_IDENTITY_REQUIRED',
   sourceResolutionPath: '.tmp/atlas/current-structural-symbol-resolution-v1.ndjson',
-  nominationsPath: '.tmp/atlas/current-graphify-symbol-nominations-v1.jsonl',
+  nominationsPath: path.relative(root, nominationsPath).replaceAll('\\', '/'),
   outputPath: '.tmp/atlas/current-tree-bound-symbol-registry-input-v1.ndjson',
   currentWorkspaceRevision,
   entryCount: entries.length,

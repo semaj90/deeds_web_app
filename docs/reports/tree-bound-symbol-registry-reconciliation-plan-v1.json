@@ -3,15 +3,20 @@
   "gate": "GRAPH-RESOLVE-06B.3",
   "status": "RECONCILIATION_REQUIRED",
   "resolutionPath": ".tmp/atlas/current-structural-symbol-resolution-v1.ndjson",
-  "nominationsPath": ".tmp/atlas/current-graphify-symbol-nominations-v1.jsonl",
+  "nominationsPath": ".tmp/atlas/graphify-file-index-v1/ast-symbol-nominations.jsonl",
   "registryRowsRead": 10260,
   "counts": {
-    "treeBound": 353,
-    "exactCurrent": 90,
+    "treeBound": 461,
+    "exactCurrent": 0,
     "legacyNamespaceExactReviewOnly": 0,
     "ambiguous": 0,
-    "contentOrRevisionConflict": 0,
-    "unresolved": 263
+    "contentOrRevisionConflict": 123,
+    "unresolved": 338,
+    "candidateRevisionClasses": {
+      "CURRENT_CONTENT_REVISION": 0,
+      "LEGACY_SYNTHETIC_REVISION": 123,
+      "OTHER_UNPROVEN_REVISION": 0
+    }
   },
   "policy": [
     "exact canonical key first",
@@ -20,10 +25,10 @@
     "source revision mismatch is not promotion",
     "no aliases or fuzzy matching"
   ],
-  "planChecksum": "sha256:51000ffd4727294f83b6c9e914c55d1b722f430cbdc9b34598d72512b0321de3",
+  "planChecksum": "sha256:48501c6f67883dde89fac82a71c50727dc2a4c18f2ce92c2f5b449796fdf434b",
   "outputPath": ".tmp/atlas/tree-bound-symbol-registry-reconciliation-plan-v1.ndjson",
   "canonicalWrites": 0,
   "databaseWrites": 0,
   "readOnly": true,
-  "nextGate": "SYMBOL_VERSION_EXACT_REVISION_REVIEW"
+  "nextGate": "REVIEW_LEGACY_NAMESPACE_OR_REBUILD_CURRENT_REGISTRY_INPUT"
 }

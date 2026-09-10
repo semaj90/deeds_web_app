@@ -10,7 +10,7 @@ const source = fs.readFileSync(path.join(here, '..', '..', 'sveltekit-frontend',
 test('bounded canary accepts an explicit limit and caps it at 50', () => {
   assert.match(source, /--limit=/);
   assert.match(source, /requestedLimit < 1 \|\| requestedLimit > 50/);
-  assert.match(source, /origin\.bindings\.slice\(0, requestedLimit\)/);
+  assert.match(source, /rootSources\.slice\(0, requestedLimit\)/);
 });
 
 test('bounded canary readback compares against the requested limit', () => {
@@ -20,7 +20,7 @@ test('bounded canary readback compares against the requested limit', () => {
 
 test('full mode requires its distinct authorization and selects the complete manifest', () => {
   assert.match(source, /AUTHORIZE_GRAPHIFY_FULL_WORKSPACE_SOURCE_SELECTION_V1/);
-  assert.match(source, /fullMode \? origin\.bindings : origin\.bindings\.slice/);
+  assert.match(source, /fullMode \? snapshot\.sources : rootSources\.slice/);
   assert.match(source, /fullMode \? 'graphify-current-workspace-source-selection:v1'/);
   assert.match(source, /canonicalPromotionMayBeAttempted: false/);
 });

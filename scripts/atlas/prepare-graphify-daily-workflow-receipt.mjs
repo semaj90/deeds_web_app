@@ -45,7 +45,10 @@ const receipt = {
         path: path.relative(ROOT, bindingReportPath).replaceAll('\\', '/'),
         workspaceRevision: bindingReport.record?.workspaceRevision ?? null,
         sourceManifestDigest: bindingReport.record?.sourceManifestDigest ?? null,
-        sourceCount: bindingReport.record?.sourceCount ?? bindingReport.counts?.boundSources ?? 0,
+        sourceCount: phaseReport.stages?.snapshot?.totalFiles
+          ?? bindingReport.record?.sourceCount
+          ?? bindingReport.counts?.boundSources
+          ?? 0,
         boundSources: bindingReport.counts?.boundSources ?? 0,
         skippedSources: bindingReport.counts?.skippedSources ?? 0,
       }

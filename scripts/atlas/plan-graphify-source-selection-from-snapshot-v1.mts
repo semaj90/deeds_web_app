@@ -10,6 +10,7 @@ import { validateSnapshot } from './lib/workspace-snapshot-capture-v1.mts';
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const REPORT = resolve(ROOT, 'docs/reports/graphify-source-selection-plan-v1.json');
 const hash = (value: string) => `sha256:${createHash('sha256').update(value, 'utf8').digest('hex')}`;
+const jsonHash = (value: unknown) => `sha256:${createHash('sha256').update(JSON.stringify(value), 'utf8').digest('hex')}`;
 const normalize = (value: unknown) => String(value ?? '').replaceAll('\\', '/').replace(/^\.\//, '').replace(/^\/+/, '').trim();
 // WorkspaceSnapshotV1 seals the already-canonical source order. Reordering
 // here would produce a different checksum for the same admitted membership.
@@ -38,12 +39,34 @@ const bindings = sources.map((source: any) => ({
 }));
 const sourceRefs = bindings.map((binding, index) => sources[index].sourceIdentityKey ?? `${sources[index].repositoryId}:${sources[index].repositoryRelativePath}`);
 const duplicateRefs = sourceRefs.filter((ref, index) => sourceRefs.indexOf(ref) !== index);
-const sourceSelectionChecksum = refsChecksum(sourceRefs);
+// WorkspaceSnapshotV1 seals membership over sorted repository-qualified keys.
+// Preserve the same canonical ordering here; source presentation order is not
+// an authority input and must not create a false selection mismatch.
+const sourceSelectionChecksum = refsChecksum([...sourceRefs].sort());
+const sourceManifest = sources.map((source: any) => ({
+  sourceIdentityKey: source.sourceIdentityKey ?? `${source.repositoryId}:${source.repositoryRelativePath}`,
+  sourceRevision: source.sourceRevision,
+  byteLength: source.byteLength,
+}));
+const repositoryManifest = (Array.isArray(snapshot.repositories) ? snapshot.repositories : []).map((repository: any) => ({
+  repositoryId: repository.relativePath ? `repo:${repository.relativePath}` : 'repo:root',
+  repositoryRevision: repository.head ?? null,
+  sourceMembershipChecksum: repository.sourceMembershipChecksum ?? null,
+  sourceContentChecksum: repository.sourceContentChecksum ?? null,
+}));
+const workspaceRevisionCandidate = jsonHash({
+  derivationPolicyRevision: 'atlas.workspace-revision-from-sealed-multi-repo-snapshot.v1',
+  snapshotPolicyRevision: snapshot.policy?.revision ?? null,
+  inventoryPolicyRevision: snapshot.policy?.inventoryPolicyRevision ?? null,
+  sourcePolicy: snapshot.policy?.sourcePolicy ?? null,
+  repositoryManifest,
+  sourceManifest,
+});
 const valid = snapshotReadback.status === 'SNAPSHOT_BYTES_READBACK_PROVEN' && bindings.length > 0 && duplicateRefs.length === 0 && sourceSelectionChecksum === snapshot.sourceMembershipChecksum;
 const report = {
   schema: 'atlas.graphify-source-selection-plan.v1', generatedAt: new Date().toISOString(), mode: 'READ_ONLY_PLAN',
   status: valid ? 'SOURCE_SELECTION_PLAN_READY_NOT_ADMITTED' : 'SOURCE_SELECTION_PLAN_BLOCKED', proofLevel: valid ? 'PARTIAL_PROVEN' : 'BLOCKED',
-  authority: false, workspaceRevision: null, workspaceRevisionCandidate: snapshot.snapshotRevision ?? null,
+  authority: false, workspaceRevision: null, workspaceRevisionCandidate,
   writesPerformed: false, datastoreWritesPerformed: false,
   manifestPath, snapshotRevision: snapshot.snapshotRevision ?? null, snapshotReadback, workspaceId: snapshot.workspaceId ?? null,
   sourceCount: bindings.length, sourceSelectionChecksum, snapshotMembershipChecksum: snapshot.sourceMembershipChecksum ?? null,

@@ -9,7 +9,8 @@ import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const inputPath = path.resolve(root, '.tmp/atlas/current-tree-bound-symbol-registry-input-v1.ndjson');
 const reportPath = path.resolve(root, 'docs/reports/current-tree-bound-symbol-registry-input-audit-v1.json');
-const allowedKinds = new Set(['function', 'method', 'class', 'interface', 'type', 'enum']);
+const promotableKinds = new Set(['function', 'method', 'class', 'interface', 'type', 'enum']);
+const allowedKinds = new Set([...promotableKinds, 'variable']);
 const rows = (await fs.readFile(inputPath, 'utf8')).split(/\r?\n/).filter(Boolean).map(JSON.parse);
 const required = ['nominationId', 'sourceRef', 'sourceRevision', 'workspaceRevision', 'sourceContentHash', 'byteStart', 'byteEnd', 'kind', 'canonicalKey', 'proposedStableSymbolId'];
 const missing = rows.flatMap((row) => required.filter((field) => row[field] === null || row[field] === undefined || row[field] === '').map((field) => ({ nominationId: row.nominationId, field })));
@@ -33,6 +34,8 @@ const report = {
   invalidKinds: invalidKinds.map((row) => ({ nominationId: row.nominationId, kind: row.kind })),
   duplicateCanonicalKeys: duplicateValues('canonicalKey'),
   duplicateProposedStableSymbolIds: duplicateValues('proposedStableSymbolId'),
+  promotableRowCount: rows.filter((row) => promotableKinds.has(row.kind)).length,
+  reviewOnlyRowCount: rows.filter((row) => !promotableKinds.has(row.kind)).length,
   outputChecksum,
   promotionAuthorized: false,
   canonicalWrites: 0,

@@ -84,7 +84,7 @@ describe('phase109b repository provenance workflow wrapper', () => {
           stages: {
             validation: { pass: true },
             semantic: {
-              status: 'PROVEN',
+              status: 'PARTIAL',
               embeddedFiles: 1,
               heuristicFiles: 0,
             },
@@ -107,7 +107,7 @@ describe('phase109b repository provenance workflow wrapper', () => {
         }),
         'production-projection',
       ),
-    ).toBe(false);
+    ).toBe(true);
     expect(
       mod.evaluateWorkflowSuccess(
         makeReport({

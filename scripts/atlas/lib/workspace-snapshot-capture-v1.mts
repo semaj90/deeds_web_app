@@ -104,7 +104,7 @@ export function sealSnapshot(first: ReturnType<typeof observeSnapshot>, second: 
   const violations = [...first.violations, ...second.violations];
   if (hash(first) !== hash(second)) violations.push('WORKSPACE_CHANGED_BETWEEN_SCANS');
   const body = { ...second, violations: [...new Set(violations)],
-    sourceMembershipChecksum: hash(second.sources.map(s => s.sourceIdentityKey ?? `${s.repositoryId}:${s.repositoryRelativePath}`)),
+    sourceMembershipChecksum: hash([...second.sources.map(s => s.sourceIdentityKey ?? `${s.repositoryId}:${s.repositoryRelativePath}`)].sort()),
     sourceContentChecksum: hash(second.sources.map(s => [s.sourceIdentityKey ?? `${s.repositoryId}:${s.repositoryRelativePath}`, s.sourceRevision, s.byteLength])) };
   return { schema: 'atlas.workspace-source-snapshot-capture.v1', ...body,
     snapshotRevision: hash(body), workspaceRevision: null,
@@ -118,14 +118,23 @@ export function validateSnapshot(snapshot: ReturnType<typeof sealSnapshot>) {
   if (schema !== 'atlas.workspace-source-snapshot-capture.v1' || hash(body) !== snapshotRevision) violations.push('MANIFEST_CHECKSUM_MISMATCH');
   if (workspaceRevision !== null || canonicalAuthority !== false || datastoreWritesPerformed !== false) violations.push('UNEXPECTED_AUTHORITY_CLAIM');
   if (status !== 'CAPTURE_VERIFIED_REQUIRES_PROCESSING_READBACK' || body.violations.length) violations.push('CAPTURE_NOT_VERIFIED');
-  if (body.sourceMembershipChecksum !== hash(body.sources.map(s => s.sourceIdentityKey ?? `${s.repositoryId}:${s.repositoryRelativePath}`)) || new Set(body.sources.map(s => s.sourceIdentityKey ?? `${s.repositoryPath}:${s.sourceRef}`)).size !== body.sources.length) violations.push('MEMBERSHIP_INVALID');
+  if (body.sourceMembershipChecksum !== hash([...body.sources.map(s => s.sourceIdentityKey ?? `${s.repositoryId}:${s.repositoryRelativePath}`)].sort()) || new Set(body.sources.map(s => s.sourceIdentityKey ?? `${s.repositoryPath}:${s.sourceRef}`)).size !== body.sources.length) violations.push('MEMBERSHIP_INVALID');
   if (body.sourceContentChecksum !== hash(body.sources.map(s => [s.sourceIdentityKey ?? `${s.repositoryId}:${s.repositoryRelativePath}`, s.sourceRevision, s.byteLength]))) violations.push('CONTENT_SET_INVALID');
   const root = realpathSync(body.repositoryRoot);
   let exactMatches = 0;
   for (const source of body.sources) {
-    const file = path.resolve(root, source.sourceRef);
+    // Nested-repository entries store a workspace-relative sourceRef for
+    // reporting, but the bytes live under repositoryPath. Resolve against
+    // that repository root so readback validates the sealed multi-repo
+    // snapshot rather than incorrectly treating every entry as root-owned.
+    const repositoryRoot = path.resolve(root, source.repositoryPath ?? '');
+    const relativeSource = source.repositoryRelativePath ?? source.sourceRef;
+    const file = path.resolve(repositoryRoot, relativeSource);
     try {
-      if (!file.startsWith(root + path.sep) || !realpathSync(file).startsWith(root + path.sep) || lstatSync(file).isSymbolicLink()) throw new Error('UNSAFE_PATH');
+      const resolvedRepositoryRoot = realpathSync(repositoryRoot);
+      if (!file.startsWith(resolvedRepositoryRoot + path.sep)
+        || !realpathSync(file).startsWith(resolvedRepositoryRoot + path.sep)
+        || lstatSync(file).isSymbolicLink()) throw new Error('UNSAFE_PATH');
       const bytes = readFileSync(file);
       const digest = createHash('sha256').update(bytes).digest('hex');
       if (digest !== source.contentDigest || source.sourceRevision !== `sha256:${digest}` || bytes.length !== source.byteLength) throw new Error('SOURCE_BYTES_CHANGED');

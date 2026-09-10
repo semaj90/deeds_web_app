@@ -1,7 +1,9 @@
 import { mkdirSync, writeFileSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
-import { observeSnapshot, sealSnapshot } from './lib/workspace-snapshot-capture-v1.mjs';
+// Keep the capture entrypoint bound to the maintained TypeScript implementation.
+// A stale JavaScript sibling must never silently become a second snapshot owner.
+import { observeSnapshot, sealSnapshot } from './lib/workspace-snapshot-capture-v1.mts';
 
 const { values } = parseArgs({ options: { root: { type: 'string' }, 'workspace-id': { type: 'string' } } });
 if (!values['workspace-id']) throw new Error('--workspace-id must be supplied; no identity is inferred');

@@ -13,9 +13,17 @@ import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const snapshotPath = path.resolve(root, '.tmp/atlas/current-source-ast-snapshot-v1.ndjson');
-const nominationsPath = path.resolve(root, '.tmp/atlas/current-graphify-symbol-nominations-v1.jsonl');
+const nominationsPath = path.resolve(root, process.argv.find((arg) => arg.startsWith('--nominations='))?.slice('--nominations='.length)
+  ?? '.tmp/atlas/graphify-file-index-v1/ast-symbol-nominations.jsonl');
 const outputPath = path.resolve(root, '.tmp/atlas/current-structural-symbol-resolution-v1.ndjson');
 const reportPath = path.resolve(root, 'docs/reports/current-structural-symbol-resolution-v1.json');
+const expectedWorkspaceRevision = process.env.ATLAS_WORKSPACE_REVISION?.trim()
+  || (() => {
+    try {
+      const admission = JSON.parse(fs.readFileSync(path.resolve(root, 'docs/reports/workspace-revision-tournament-admission-v1.json'), 'utf8'));
+      return admission.status === 'WORKSPACE_REVISION_TOURNAMENT_ADMITTED' ? admission.workspaceRevision : null;
+    } catch { return null; }
+  })();
 
 const readNdjson = (file) => fs.readFileSync(file, 'utf8').split(/\r?\n/).filter(Boolean)
   .map((line, index) => {
@@ -56,6 +64,7 @@ const counts = {
   ambiguousAstMatch: 0,
   noAstMatch: 0,
   sourceRevisionMismatch: 0,
+  workspaceRevisionMismatch: 0,
   unsupportedSource: 0,
   stableSymbolBound: 0,
   stableSymbolMissing: 0,
@@ -66,6 +75,7 @@ const counts = {
 const results = [];
 for (const nomination of nominations) {
   if (nomination.__invalid) continue;
+  if (expectedWorkspaceRevision && nomination.workspace_revision !== expectedWorkspaceRevision) counts.workspaceRevisionMismatch += 1;
   const sourceRef = canonicalSourceRef(nomination.source_ref);
   const contentHash = hash(nomination.source_content_hash ?? nomination.content_hash);
   const sourceRows = astBySource.get(`${sourceRef}|${contentHash}`) ?? [];
@@ -112,6 +122,8 @@ for (const nomination of nominations) {
     sourceRef: nomination.source_ref,
     canonicalSourceRef: sourceRef,
     sourceRevision: nomination.source_revision ?? null,
+    workspaceRevisionExpected: expectedWorkspaceRevision,
+    workspaceRevisionMatch: !expectedWorkspaceRevision || nomination.workspace_revision === expectedWorkspaceRevision,
     sourceContentHash: nomination.source_content_hash ?? null,
     treeNodeId: row?.treeNodeId ?? null,
     upstreamNodeId: nomination.upstream_node_id ?? null,
@@ -144,7 +156,9 @@ fs.mkdirSync(path.dirname(reportPath), { recursive: true });
 fs.writeFileSync(outputPath, resultText, 'utf8');
 const report = {
   schema: 'atlas.current-structural-symbol-resolution-proof.v1',
-  status: counts.ambiguousAstMatch === 0 && counts.invalidNominations === 0 ? 'READ_ONLY_PROVEN' : 'READ_ONLY_INCOMPLETE',
+  status: counts.ambiguousAstMatch === 0 && counts.invalidNominations === 0
+    && counts.workspaceRevisionMismatch === 0 && counts.sourceOnly === 0 && counts.noAstMatch === 0
+    ? 'READ_ONLY_PROVEN' : 'READ_ONLY_BLOCKED',
   graphResolveGate: 'GRAPH-RESOLVE-06B.2',
   snapshotPath: path.relative(root, snapshotPath).replaceAll('\\', '/'),
   nominationsPath: path.relative(root, nominationsPath).replaceAll('\\', '/'),
@@ -153,6 +167,18 @@ const report = {
   resolutionChecksum: checksum(resultText),
   namespaceRules,
   counts,
+  expectedWorkspaceRevision,
+  firstBlockingInvariant: counts.invalidNominations > 0
+    ? 'INVALID_NOMINATION_RECORD'
+    : counts.workspaceRevisionMismatch > 0
+      ? 'NOMINATIONS_NOT_BOUND_TO_ADMITTED_WORKSPACE_REVISION'
+      : counts.sourceOnly > 0
+        ? 'CURRENT_AST_SNAPSHOT_HAS_NO_NOMINATION_SOURCE_MATCH'
+        : counts.noAstMatch > 0
+          ? 'NOMINATION_BYTE_SPAN_NOT_IN_CURRENT_AST_SNAPSHOT'
+          : counts.ambiguousAstMatch > 0
+            ? 'AMBIGUOUS_AST_MATCH'
+            : null,
   stableSymbolResolution: 'NOT_ATTEMPTED',
   symbolVersionResolution: 'NOT_ATTEMPTED',
   canonicalWrites: 0,

@@ -3,9 +3,9 @@
  * Parent Atlas promotion-gate board.
  *
  * Read-only reconciliation over existing receipts. This is intentionally not
- * another source, graph, vector, or admission authority. During the tournament
- * build-out workspaceRevision is explicitly unbound (null); that must block
- * promotion rather than being replaced with a guessed or historical revision.
+ * another source, graph, vector, or admission authority. Tournament admission
+ * may bind a revision for control-plane comparison, but never promotes the
+ * canonical source or projection authority by itself.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -13,7 +13,6 @@ import crypto from 'node:crypto';
 
 const ROOT = path.resolve(import.meta.dirname, '..', '..');
 const REPORT_PATH = path.join(ROOT, 'docs', 'reports', 'parent-atlas-promotion-gates-v1.json');
-const workspaceRevision = null;
 
 const reportFiles = {
   sourceAuthority: 'docs/reports/current-graphify-snapshot-authority-v1.json',
@@ -36,6 +35,21 @@ function readJson(relative) {
     return { path: relative, exists: false, value: null };
   }
 }
+
+const admissionReceipt = readJson('docs/reports/workspace-revision-tournament-admission-v1.json');
+const derivationReceipt = readJson('docs/reports/workspace-revision-from-sealed-multi-repo-snapshot-v1.json');
+const selectionPlan = readJson('docs/reports/graphify-source-selection-plan-v1.json');
+const bindingReceipt = readJson('docs/reports/graphify-workspace-snapshot-binding-v1.json');
+const ownerReceipt = readJson('docs/reports/current-graphify-run-owner-v1.json');
+const currentCandidate = derivationReceipt.value?.status === 'WORKSPACE_REVISION_CANDIDATE_READY_FOR_ADMISSION'
+  && derivationReceipt.value?.snapshotRevision === selectionPlan.value?.snapshotRevision
+  && derivationReceipt.value?.workspaceRevisionCandidate === selectionPlan.value?.workspaceRevisionCandidate
+  ? derivationReceipt.value.workspaceRevisionCandidate : null;
+const admittedRevision = admissionReceipt.value?.status === 'WORKSPACE_REVISION_TOURNAMENT_ADMITTED'
+  && admissionReceipt.value?.authority === true
+  && admissionReceipt.value?.workspaceRevision === currentCandidate
+  ? admissionReceipt.value.workspaceRevision : null;
+const workspaceRevision = admittedRevision;
 
 function evidence(...keys) {
   return keys.map((key) => readJson(reportFiles[key])).map(({ path: report, exists, value }) => ({
@@ -60,16 +74,22 @@ function gate(id, name, status, proofLevel, blocking, evidenceItems, violations 
 }
 
 const gates = [];
-const firstBlockingInvariant = 'WORKSPACE_REVISION_UNBOUND_UNTIL_TOURNAMENT';
+const ownerProven = ownerReceipt.value?.status === 'GRAPHIFY_RUN_OWNER_COMPLETE';
+const bindingObserved = bindingReceipt.value?.status === 'GRAPHIFY_SNAPSHOT_BINDING_OBSERVED_NOT_ADMITTED';
+const firstBlockingInvariant = ownerProven
+  ? 'CURRENT_STRUCTURAL_LINEAGE_NOT_PROVEN'
+  : bindingObserved
+    ? 'CURRENT_GRAPHIFY_RUN_OWNER_UNPROVEN'
+    : 'WORKSPACE_SNAPSHOT_BINDING_UNPROVEN';
 
 gates.push(gate(
   'CURRENT-SOURCE-TERMINAL-EXECUTION-01',
   'Current source terminal execution',
-  'BLOCKED',
-  'BLOCKED',
+  ownerProven ? 'PROVEN' : 'BLOCKED',
+  ownerProven ? 'PARTIAL_PROVEN' : 'BLOCKED',
   true,
   evidence('sourceAuthority', 'sourceOwner', 'sourceHydration'),
-  ['workspaceRevision is intentionally null until tournament/source-authority is built', 'no current execution may be admitted without a bound workspace revision'],
+  ownerProven ? [] : [firstBlockingInvariant],
 ));
 
 const dependent = [
@@ -93,7 +113,7 @@ const counts = {
   evaluatedGates: 1,
   blockedGates: gates.length,
   provenGates: 0,
-  workspaceRevision: null,
+  workspaceRevision,
 };
 
 const canonicalPayload = JSON.stringify({
@@ -110,15 +130,26 @@ const report = {
   proofLevel: 'BLOCKED',
   writesPerformed: false,
   authority: false,
-  workspaceRevision: null,
-  workspaceRevisionPolicy: 'UNBOUND_UNTIL_TOURNAMENT',
+  workspaceRevision,
+  workspaceRevisionCandidate: currentCandidate,
+  authorityInputConsistency: {
+    derivationStatus: derivationReceipt.value?.status ?? null,
+    planStatus: selectionPlan.value?.status ?? null,
+    derivationPlanSnapshotMatch: Boolean(currentCandidate),
+    admissionMatchesCurrentCandidate: Boolean(admittedRevision),
+  },
+  workspaceRevisionPolicy: admittedRevision
+    ? 'TOURNAMENT_CONTROL_PLANE_ADMITTED_CANONICAL_OWNER_PENDING'
+    : 'UNBOUND_UNTIL_TOURNAMENT',
   counts,
-  violations: [firstBlockingInvariant],
+  violations: gates[0].violations,
   gates,
-  firstBlockingGate: gates[0].id,
+  firstBlockingGate: ownerProven ? gates[1].id : gates[0].id,
   firstBlockingInvariant,
-  nextGate: gates[0].id,
-  safeNextCommand: 'npx tsx scripts/atlas/capture-workspace-source-snapshot-v1.mts --workspace-id 625743d2-092b-4fa8-abe0-9dc094920c80',
+  nextGate: ownerProven ? gates[1].id : gates[0].id,
+  safeNextCommand: ownerProven
+    ? 'npx tsx scripts/atlas/audit-current-structural-lineage-v1.mjs'
+    : 'npx tsx scripts/atlas/audit-current-graphify-run-owner-v1.mjs',
   reportPath: 'docs/reports/parent-atlas-promotion-gates-v1.json',
   evidence: Object.fromEntries(Object.entries(reportFiles).map(([key, relative]) => [key, readJson(relative)])),
   checksum: `sha256:${crypto.createHash('sha256').update(canonicalPayload).digest('hex')}`,
@@ -131,7 +162,7 @@ console.log(JSON.stringify({
   firstBlockingGate: report.firstBlockingGate,
   firstBlockingInvariant: report.firstBlockingInvariant,
   nextGate: report.nextGate,
-  workspaceRevision: null,
+  workspaceRevision,
   writesPerformed: false,
   reportPath: report.reportPath,
 }, null, 2));

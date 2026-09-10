@@ -153,6 +153,8 @@ async function main(): Promise<void> {
       lexicalTokenLimit: options.lexicalTokenLimit,
       queryCorpusPath: options.queryCorpusPath ?? undefined,
       representationId: options.representationId ?? undefined,
+      sourceSnapshotPath: process.env.ATLAS_GRAPHIFY_SOURCE_SNAPSHOT_PATH ?? undefined,
+      sourceReadRoot: process.env.ATLAS_GRAPHIFY_SOURCE_SNAPSHOT_ROOT ?? undefined,
       signal: controller.signal,
     });
 

@@ -38,7 +38,16 @@ const workspaceId = arg('--workspace-id') ?? process.env.ATLAS_WORKSPACE_ID?.tri
 const snapshot = JSON.parse(await readFile(manifestPath, 'utf8'));
 const snapshotReadback = validateSnapshot(snapshot);
 const snapshotSources = Array.isArray(snapshot.sources) ? snapshot.sources : [];
-const snapshotByRef = new Map(snapshotSources.map((source: any) => [normalize(source.sourceRef), source]));
+const field = (value: any, camel: string, snake: string) => value?.[camel] ?? value?.[snake] ?? null;
+const identityKey = (value: any) => {
+  const repositoryId = field(value, 'repositoryId', 'repository_id');
+  const repositoryRelativePath = field(value, 'repositoryRelativePath', 'repository_relative_path');
+  const sourceRef = field(value, 'sourceRef', 'source_ref');
+  return repositoryId && repositoryRelativePath
+    ? `${normalize(repositoryId)}:${normalize(repositoryRelativePath)}`
+    : `repo:root:${normalize(sourceRef)}`;
+};
+const snapshotByRef = new Map(snapshotSources.map((source: any) => [identityKey(source), source]));
 
 const pool = new pg.Pool({ connectionString: resolveDatabaseUrl(loadRepoEnv(process.env)), max: 1, statement_timeout: 120000 });
 let databaseError: string | null = null;
@@ -48,7 +57,7 @@ let filesByExecution = new Map<string, any[]>();
 let stagesByExecution = new Map<string, any[]>();
 
 try {
-  const tableNames = ['graphify_executions', 'graphify_execution_files', 'graphify_execution_stages'];
+  const tableNames = ['graphify_executions', 'graphify_execution_files', 'graphify_execution_file_membership_v2', 'graphify_execution_stages'];
   const columns = await pool.query(
     `SELECT table_name, column_name FROM information_schema.columns
       WHERE table_schema = 'public' AND table_name = ANY($1::text[])
@@ -81,6 +90,17 @@ try {
       filesByExecution.set(key, list);
     }
   }
+  if (schema.graphify_execution_file_membership_v2?.length && schema.graphify_execution_file_membership_v2.includes('execution_id')) {
+    const v2Columns = ['execution_id', 'repository_id', 'repository_relative_path', 'source_ref', 'workspace_revision', 'code_source_revision', 'content_hash', 'byte_length']
+      .filter((name) => schema.graphify_execution_file_membership_v2.includes(name));
+    const result = await pool.query(`SELECT ${v2Columns.map((name) => `"${name}"`).join(', ')} FROM public.graphify_execution_file_membership_v2 WHERE execution_id = ANY($1::uuid[])`, [executions.map((row) => row.execution_id)]);
+    for (const row of result.rows) {
+      const key = String(row.execution_id);
+      const list = filesByExecution.get(key) ?? [];
+      list.push(row);
+      filesByExecution.set(key, list);
+    }
+  }
   if (schema.graphify_execution_stages?.length && schema.graphify_execution_stages.includes('execution_id')) {
     const stageColumns = ['execution_id', 'stage', 'status', 'output_checksum', 'receipt_ref']
       .filter((name) => schema.graphify_execution_stages.includes(name));
@@ -101,7 +121,7 @@ try {
 function compareExecution(execution: any) {
   const executionId = String(execution.execution_id);
   const rows = filesByExecution.get(executionId) ?? [];
-  const graphifyByRef = new Map(rows.map((row) => [normalize(row.source_ref), row]));
+  const graphifyByRef = new Map(rows.map((row) => [identityKey(row), row]));
   const missingInGraphify = [...snapshotByRef.keys()].filter((ref) => !graphifyByRef.has(ref));
   const missingInSnapshot = [...graphifyByRef.keys()].filter((ref) => !snapshotByRef.has(ref));
   const sourceRevisionMismatches: string[] = [];
@@ -110,11 +130,15 @@ function compareExecution(execution: any) {
   for (const [ref, source] of snapshotByRef) {
     const row = graphifyByRef.get(ref);
     if (!row) continue;
-    const graphifyRevision = row.code_source_revision ?? row.source_revision ?? null;
+    const graphifyRevision = field(row, 'codeSourceRevision', 'code_source_revision')
+      ?? field(row, 'sourceRevision', 'source_revision') ?? null;
     if (graphifyRevision && graphifyRevision !== source.sourceRevision) sourceRevisionMismatches.push(ref);
-    const graphifyDigest = row.content_hash ? String(row.content_hash).replace(/^sha256:/, '') : null;
+    const contentHash = field(row, 'contentHash', 'content_hash');
+    const graphifyDigest = contentHash ? String(contentHash).replace(/^sha256:/, '') : null;
     if (graphifyDigest && graphifyDigest !== source.contentDigest) contentDigestMismatches.push(ref);
-    if (row.workspace_revision !== null && row.workspace_revision !== undefined) workspaceRevisionMismatches.push(ref);
+    const rowWorkspaceRevision = field(row, 'workspaceRevision', 'workspace_revision');
+    if (rowWorkspaceRevision !== null && rowWorkspaceRevision !== undefined
+      && rowWorkspaceRevision !== execution.workspace_revision) workspaceRevisionMismatches.push(ref);
   }
   const refs = [...graphifyByRef.keys()];
   const stages = stagesByExecution.get(executionId) ?? [];
@@ -139,8 +163,10 @@ function compareExecution(execution: any) {
     sourceRevisionMismatches,
     contentDigestMismatches,
     workspaceRevisionMismatches,
-    sourceBytesComparable: rows.some((row) => row.content_hash || row.code_source_revision || row.source_revision),
-    eligibleWithoutAdmission: rows.length === snapshotSources.length && membershipMatches && sourceRevisionMismatches.length === 0 && contentDigestMismatches.length === 0,
+    sourceBytesComparable: rows.some((row) => field(row, 'contentHash', 'content_hash')
+      || field(row, 'codeSourceRevision', 'code_source_revision')
+      || field(row, 'sourceRevision', 'source_revision')),
+    eligibleWithoutAdmission: rows.length === snapshotSources.length && membershipMatches && sourceRevisionMismatches.length === 0 && contentDigestMismatches.length === 0 && workspaceRevisionMismatches.length === 0,
   };
 }
 

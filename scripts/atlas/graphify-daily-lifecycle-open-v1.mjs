@@ -47,6 +47,7 @@ async function main() {
 
     const wrappedClient = { query: (text, values) => client.query(text, values) };
     const repositoryRevision = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: ROOT, encoding: 'utf8' }).trim();
+    const expectedWorkspaceRevision = process.env.ATLAS_GRAPHIFY_EXPECTED_WORKSPACE_REVISION?.trim() || null;
 
     const opened = await openGraphifyRunV1({
       client: wrappedClient,
@@ -65,6 +66,9 @@ async function main() {
       repositoryId: CANONICAL_REPOSITORY_ID,
       producerRevision: PARSER_CONTRACT_VERSION,
     });
+    if (expectedWorkspaceRevision && materialized.record.workspaceRevision !== expectedWorkspaceRevision) {
+      throw new Error(`GRAPHIFY_ADMITTED_WORKSPACE_REVISION_MISMATCH:${materialized.record.workspaceRevision}:${expectedWorkspaceRevision}`);
+    }
     console.log(JSON.stringify({
       step: 'materialized',
       workspaceRevision: materialized.record.workspaceRevision,

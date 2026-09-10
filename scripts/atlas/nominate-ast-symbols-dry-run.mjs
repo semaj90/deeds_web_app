@@ -15,13 +15,31 @@ const input = path.resolve(root, process.argv.find((arg) => arg.startsWith('--in
   ?? '.tmp/atlas/graphify-file-index-v1/ast-entities.jsonl');
 const output = path.resolve(root, process.argv.find((arg) => arg.startsWith('--output='))?.slice(9)
   ?? '.tmp/atlas/graphify-file-index-v1/ast-symbol-nominations.jsonl');
-
 const hash = (value) => createHash('sha256').update(value).digest('hex');
 const normalize = (value) => String(value ?? '').replaceAll('\\', '/').normalize('NFC');
+const bindAdmittedSnapshot = process.argv.includes('--bind-admitted-snapshot');
+let snapshotBindings = new Map();
+let admittedWorkspaceRevision = null;
+if (bindAdmittedSnapshot) {
+  const admission = JSON.parse(await fs.readFile(path.join(root, 'docs/reports/workspace-revision-tournament-admission-v1.json'), 'utf8'));
+  if (admission.status !== 'WORKSPACE_REVISION_TOURNAMENT_ADMITTED' || admission.authority !== true) {
+    throw new Error('ADMITTED_WORKSPACE_REVISION_REQUIRED_FOR_SNAPSHOT_BINDING');
+  }
+  admittedWorkspaceRevision = admission.workspaceRevision;
+  const snapshotPath = path.join(root, 'docs/reports/workspace-source-snapshots', `${String(admission.snapshotRevision).replace(/^sha256:/, '')}.json`);
+  const snapshot = JSON.parse(await fs.readFile(snapshotPath, 'utf8'));
+  for (const source of snapshot.sources ?? []) {
+    snapshotBindings.set(normalize(source.sourceRef), source);
+    if (source.repositoryRelativePath) snapshotBindings.set(normalize(source.repositoryRelativePath), source);
+  }
+}
+
 const lines = (await fs.readFile(input, 'utf8')).split(/\r?\n/).filter(Boolean);
 const nominations = [];
 const seen = new Set();
 let invalid = 0;
+let unbound = 0;
+let snapshotBound = 0;
 
 for (const line of lines) {
   let candidate;
@@ -34,7 +52,14 @@ for (const line of lines) {
   const sourceRef = normalize(candidate.source_ref);
   const name = String(candidate.symbol_name ?? candidate.name ?? '').normalize('NFC');
   const kind = String(candidate.symbol_kind ?? candidate.entity_kind ?? '').toLowerCase();
-  const sourceRevision = String(candidate.source_revision ?? '').trim();
+  const observedSourceRevision = String(candidate.source_revision ?? '').trim();
+  const snapshotSource = bindAdmittedSnapshot ? snapshotBindings.get(sourceRef) : null;
+  if (bindAdmittedSnapshot && !snapshotSource) {
+    unbound += 1;
+    continue;
+  }
+  if (snapshotSource) snapshotBound += 1;
+  const sourceRevision = String(snapshotSource?.sourceRevision ?? observedSourceRevision).trim();
   const startByte = Number(candidate.start_byte);
   const endByte = Number(candidate.end_byte);
   if (!sourceRef || !name || !kind || !sourceRevision || !Number.isInteger(startByte) || !Number.isInteger(endByte) || endByte < startByte) {
@@ -59,7 +84,9 @@ for (const line of lines) {
     container_qualified_name: null,
     source_ref: sourceRef,
     source_revision: sourceRevision,
-    workspace_revision: sourceRevision,
+    workspace_revision: admittedWorkspaceRevision ?? sourceRevision,
+    source_revision_observed: observedSourceRevision,
+    source_content_hash: snapshotSource?.contentDigest ?? null,
     upstream_node_id: String(candidate.tree_node_id ?? `ast-span:${digest.slice(0, 32)}`),
     upstream_symbol_id: null,
     upstream_chunk_id: String(candidate.packet_key ?? `packet:${digest.slice(0, 32)}`),
@@ -92,6 +119,10 @@ const report = {
   nominations: nominations.length,
   duplicates_removed: lines.length - invalid - nominations.length,
   invalid_candidates: invalid,
+  unbound_candidates: unbound,
+  snapshot_bound: snapshotBound,
+  snapshot_binding: bindAdmittedSnapshot ? 'ADMITTED_WORKSPACE_SNAPSHOT' : 'NONE',
+  workspace_revision: admittedWorkspaceRevision,
   canonical_symbols_created: 0,
   symbol_versions_created: 0,
   database_writes: false,

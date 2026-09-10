@@ -1,26 +1,26 @@
 {
   "schema": "atlas.graphify-source-population-delta.v1",
-  "generatedAt": "2026-09-10T00:35:29.796Z",
+  "generatedAt": "2026-09-10T01:29:52.635Z",
   "mode": "READ_ONLY",
   "status": "NESTED_REPOSITORY_BINDING_MISMATCH",
   "proofLevel": "PARTIAL_PROVEN",
   "authority": false,
   "writesPerformed": false,
   "datastoreWritesPerformed": false,
-  "snapshotPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\workspace-source-snapshots\\b2b20ca198eb78bc14a98c5a401f2a4cda9ff090a5012492c0958adceee3c572.json",
+  "snapshotPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\workspace-source-snapshots\\1421a3e5d5285241fc3a849befc5189bf06a9ee72c81477ab2064628b52590e1.json",
   "originPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\graphify-lifecycle-entrypoint-v1.json",
-  "snapshotRevision": "sha256:b2b20ca198eb78bc14a98c5a401f2a4cda9ff090a5012492c0958adceee3c572",
+  "snapshotRevision": "sha256:1421a3e5d5285241fc3a849befc5189bf06a9ee72c81477ab2064628b52590e1",
   "originWorkspaceRevision": "sha256:111014eef3418c67a4808aa5e0e1924fec1485a9cf0dafc0b5952f5fdb2fbea5",
   "counts": {
-    "snapshot": 25265,
+    "snapshot": 25266,
     "origin": 24176,
-    "onlySnapshot": 1089,
+    "onlySnapshot": 1090,
     "onlyOrigin": 0,
     "nestedOnlySnapshot": 1086
   },
   "classification": {
     "nestedRepositoryOnly": 1086,
-    "rootPolicyDifference": 3,
+    "rootPolicyDifference": 4,
     "unknown": 0
   },
   "samples": {
