@@ -1,326 +1,37 @@
-# Full-Corpus Embedding Backfill: `backfill-codebase-chunk-embeddings.mjs`
+# Full-Corpus Embedding Backfill — Compatibility Notice
 
-**Purpose**: Backfill canonical 768-dim EmbeddingGemma embeddings (`content_embedding_768`) for eligible chunks in `codebase_chunk_index` that are missing canonical vectors (WHERE `content_embedding_768 IS NULL`). The generic `content_embedding` column is legacy compatibility storage and is not written by this tool.
+**Updated:** 2026-09-10
 
-**Status**: ✅ Production-ready. Handles 40K+ chunks with graceful failure recovery, atomic Postgres updates, and streaming progress logging.
+The historical `backfill-codebase-chunk-embeddings.mjs` implementation targeted
+`codebase_chunk_index.content_embedding_768 vector(768)`. That surface is no
+longer the canonical Parent Atlas semantic owner.
 
----
+Current contract:
 
-## Quick Start
-
-### Dry-Run (Preview what would be embedded)
-```bash
-npm run atlas:embed:full-corpus:dry
-npm run atlas:embed:full-corpus:dry --limit=1000  # Preview first 1000
+```text
+representation_id = semantic_768
+dimension         = 768
+canonical column  = codebase_chunk_index.content_embedding
+physical type     = halfvec(768)
 ```
 
-### Apply (Actually backfill embeddings)
-```bash
-npm run atlas:embed:full-corpus:apply            # Full corpus, batch_size=64
-npm run atlas:embed:full-corpus:apply:verbose    # Full corpus + detailed logging
-```
+The compatibility script now refuses `--apply`. This prevents an old operator
+command from recreating split semantic ownership.
 
----
-
-## Architecture
-
-### 5-Step Pipeline
-
-1. **Read from Postgres** (atomic query, no write lock)
-   - Selects eligible chunks WHERE `content_embedding_768 IS NULL`
-   - Filters out empty/null content (quality gate)
-   - Deterministic order (ID ASC) prevents re-processing
-   - Batch-friendly query structure
-
-2. **Batch into Groups** (32-64 per request, optimal for RTX 3060 Ti)
-   - `--batch-size=48` by default (configurable)
-   - Parallel embedding via HTTP/Ollama reduces per-item overhead
-   - Retry on timeout; individual failures don't block batch
-
-3. **Call EmbeddingGemma via HTTP** (embeddinggemma:latest, 768-dim)
-   - Protocol: `POST /api/embed` to Ollama at :11434
-   - Timeout: 30s per batch (configurable)
-   - Fallback: Single-text sequential embedding on batch failure
-   - Dimension validation: All vectors must be exactly 768-dim
-
-4. **Stream Results + Update Postgres** (atomic transaction per batch)
-   - Validates embedding dimension (768-dim)
-   - Atomic UPDATE: all-or-nothing per batch
-   - Sets `updated_at = now()` for audit trail
-   - Transactional rollback on any failure
-
-5. **Log Progress** (every 100 chunks by default)
-   - Throughput: chunks/sec
-   - ETA: minutes remaining
-   - Success rate: %
-   - Failure tracking: failed chunks logged for later inspection
-
----
-
-## Command-Line Flags
-
-| Flag | Default | Description |
-|------|---------|-------------|
-| `--dry-run` | true | Preview mode (no writes) |
-| `--apply` | false | Execute the backfill; also requires `ATLAS_AUTHORIZE_SEMANTIC_768_BACKFILL=1` |
-| `--batch-size=N` | 48 | Embeddings per HTTP request (1-128) |
-| `--limit=N` | 0 | Max chunks to process (0 = all) |
-| `--checkpoint=N` | 100 | Progress log every N chunks |
-| `--timeout=N` | 30000 | gRPC/HTTP timeout in milliseconds |
-| `--verbose` | false | Detailed logging (per-batch details) |
-
-### Examples
+Use the stricter revision-qualified writer instead:
 
 ```bash
-# Preview: dry-run the first 1000 chunks
-node scripts/atlas/backfill-codebase-chunk-embeddings.mjs --dry-run --limit=1000
-
-# Apply: full corpus, smaller batches for stability (explicit authorization required)
-ATLAS_AUTHORIZE_SEMANTIC_768_BACKFILL=1 node scripts/atlas/backfill-codebase-chunk-embeddings.mjs --apply --batch-size=32
-
-# Apply: full corpus with debugging output
-ATLAS_AUTHORIZE_SEMANTIC_768_BACKFILL=1 node scripts/atlas/backfill-codebase-chunk-embeddings.mjs --apply --verbose --checkpoint=50
-
-# Apply: custom timeout for slow Ollama
-ATLAS_AUTHORIZE_SEMANTIC_768_BACKFILL=1 node scripts/atlas/backfill-codebase-chunk-embeddings.mjs --apply --timeout=60000
-
-# Apply: limit to first 5000 for testing
-ATLAS_AUTHORIZE_SEMANTIC_768_BACKFILL=1 node scripts/atlas/backfill-codebase-chunk-embeddings.mjs --apply --limit=5000
+node ../scripts/atlas/backfill-graphify-file-embeddings-768.mjs
 ```
 
----
+Run it without `--apply` first. Its apply path requires explicit authorization,
+workspace/source revision qualification, immutable embedding runtime provenance,
+and exact readback.
 
-## Connection Pooling (ioredis Style)
+`content_embedding_768` remains inspectable as historical/alternate 768 storage.
+Do not delete or copy it automatically; reconciliation is a separate migration
+gate.
 
-```typescript
-const pool = new Pool({
-  connectionString: PG_URL,
-  max: 10,                          // Max connections
-  idleTimeoutMillis: 30_000,        // Release idle after 30s
-  connectionTimeoutMillis: 5000,    // Timeout on connect
-  statement_timeout: 60_000,        // Max query duration
-});
-```
-
-**Key behavior:**
-- Lazy connection (no connection until first query)
-- `maxRetries: 1` — single attempt, fail-fast
-- Transactional per-batch ensures atomicity
-- Graceful cleanup on error
-
----
-
-## Embedding Flow
-
-### HTTP/Ollama Request (Most Reliable)
-
-```http
-POST /api/embed
-{
-  "model": "embeddinggemma:latest",
-  "input": ["text1", "text2", ...]
-}
-```
-
-**Response:**
-```json
-{
-  "embeddings": [
-    [0.123, 0.456, ..., 0.789],  // 768-dim vector
-    ...
-  ]
-}
-```
-
-### Validation Gates
-
-1. **Dimension check**: All vectors must be exactly 768-dim
-2. **Count check**: Response must include one embedding per input text
-3. **Null-safety**: Gracefully skips null or malformed vectors
-4. **Transaction atomicity**: Single invalid vector rolls back entire batch
-
----
-
-## Error Handling
-
-### Graceful Degradation
-
-| Scenario | Behavior |
-|----------|----------|
-| **Single embedding fails** | Logged as failure, batch continues |
-| **Batch HTTP timeout** | Individual embeddings marked null, move to next batch |
-| **Postgres write fails** | Entire batch rolled back, skip to next batch |
-| **Postgres connection lost** | Fatal error, detailed message, clean exit |
-| **Dimension mismatch** | Logged as invalid, skipped, no write attempt |
-
-### Retry Logic
-
-- **No automatic retry** — single attempt per batch (fail-fast)
-- **Failed chunks logged** — rerun script to re-attempt
-- **Transaction rollback** — corrupted state prevented via atomic updates
-
----
-
-## Performance Characteristics
-
-### Baseline (RTX 3060 Ti, 768-dim)
-
-| Operation | Latency |
-|-----------|---------|
-| Embed 1 chunk | ~500ms |
-| Embed 48 chunks (batch) | ~1.2s |
-| Throughput | 40 chunks/sec |
-| Full corpus (40K chunks) | ~16 minutes |
-
-### Optimization Tips
-
-| Lever | Effect | Risk |
-|------|--------|------|
-| `--batch-size=64` | +5-10% throughput | Longer timeout needed if Ollama slow |
-| `--batch-size=32` | More stable | Slower, more overhead |
-| `--timeout=60000` | Handles slow Ollama | Delays failure detection |
-| `--checkpoint=50` | More frequent logging | Slightly more I/O |
-
----
-
-## Monitoring & Verification
-
-### During Backfill
-
-```bash
-# Terminal 1: Run backfill
-npm run atlas:embed:full-corpus:apply:verbose
-
-# Terminal 2: Monitor Ollama health
-watch -n 2 'curl -s http://127.0.0.1:11434/api/tags | jq ".models[] | .name"'
-
-# Terminal 3: Monitor Postgres
-docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \
-  "SELECT COUNT(*) total, COUNT(CASE WHEN content_embedding_768 IS NOT NULL AND embedding_dimension = 768 THEN 1 END) embedded FROM codebase_chunk_index; SELECT CURRENT_TIMESTAMP;"
-```
-
-### Post-Backfill Verification
-
-```bash
-# Check final coverage
-docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c "
-  SELECT
-    COUNT(*) total,
-    COUNT(CASE WHEN content_embedding_768 IS NOT NULL AND embedding_dimension = 768 THEN 1 END) populated,
-    ROUND(COUNT(CASE WHEN content_embedding_768 IS NOT NULL AND embedding_dimension = 768 THEN 1 END)::numeric / COUNT(*) * 100, 2) coverage_pct
-  FROM codebase_chunk_index;
-"
-
-# Check embedding dimension
-docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c "
-  SELECT
-    array_length(content_embedding_768, 1) dim,
-    COUNT(*) count
-  FROM codebase_chunk_index
-  WHERE content_embedding_768 IS NOT NULL
-  GROUP BY array_length(content_embedding_768, 1);
-"
-```
-
----
-
-## Database Schema
-
-### Input Table: `codebase_chunk_index`
-
-| Column | Type | Used In |
-|--------|------|---------|
-| `id` | INT | Primary key |
-| `content` | TEXT | Source text (read only) |
-| `content_embedding_768` | `vector(768)` | canonical pgvector write target |
-| `updated_at` | TIMESTAMP | Audit trail |
-
-### Query Plan
-
-```sql
-SELECT id, content FROM codebase_chunk_index
-WHERE content_embedding_768 IS NULL
-  AND content IS NOT NULL
-  AND LENGTH(TRIM(content)) > 0
-ORDER BY id ASC
-LIMIT :batch_size OFFSET :offset;
-```
-
-**Indexes used:** Primary key on `id`
-
-**Optimization:** Selects current eligible rows with missing canonical vectors; coverage is measured against the live corpus rather than a fixed row estimate.
-
----
-
-## Troubleshooting
-
-### Script Hangs on Startup
-**Cause**: Postgres connection timeout
-```bash
-# Check Postgres
-docker ps | grep legal-ai-postgres
-docker logs legal-ai-postgres | tail -20
-```
-
-### Low Throughput (<10 chunks/sec)
-**Cause**: Ollama slow or single-threaded
-```bash
-# Check Ollama health
-curl -s http://127.0.0.1:11434/api/tags | jq '.models[] | {name, size}'
-
-# Restart Ollama
-docker restart legal-ai-ollama
-```
-
-### Embedding Dimension Mismatch
-**Cause**: embeddinggemma:latest changed or wrong model loaded
-```bash
-# Verify model in Ollama
-curl -s http://127.0.0.1:11434/api/embed \
-  -d '{"model":"embeddinggemma:latest","input":"test"}' | jq '.embeddings[0] | length'
-# Expected: 768
-```
-
-### Postgres Transaction Timeout
-**Cause**: UPDATE statement blocked by long transaction
-```bash
-# Check active transactions
-docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c "
-  SELECT pid, usename, query, query_start FROM pg_stat_activity WHERE query NOT LIKE '%pg_stat%';
-"
-
-# Solution: Kill blocking transaction
-docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c "
-  SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE pid <> pg_backend_pid();
-"
-```
-
----
-
-## Related Documentation
-
-- **Embedding Client**: `src/lib/server/grpc/embedding-client.ts` (4-tier fallback chain)
-- **Database Schema**: `sveltekit-frontend/src/lib/server/db/schema-postgres.ts` (codebase_chunk_index table)
-- **Qdrant Integration**: `src/lib/server/vector/qdrant-manager.ts` (mirror indexing)
-- **Environment Variables**: `.env`, `.env.local` (OLLAMA_URL, DATABASE_URL)
-
----
-
-## Exit Codes
-
-| Code | Meaning |
-|------|---------|
-| 0 | Success (all chunks processed or no chunks needed) |
-| 1 | Failure (all chunks failed, or fatal error) |
-
----
-
-## License
-
-Same as project (Legal AI Platform)
-
----
-
-**Last Updated**: July 11, 2026  
-**Status**: ✅ Production-ready  
-**Maintained By**: Atlas Backfill Team
+The 384-dimensional lane remains legacy/reference-only. Current EmbeddingGemma
+native output is 768 dimensions; supported reduced MRL views are separately
+named representations rather than replacements for `semantic_768`.
