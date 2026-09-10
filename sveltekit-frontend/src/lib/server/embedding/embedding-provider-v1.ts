@@ -6,8 +6,8 @@ import { ENV } from '$lib/server/env.server.js';
  *
  * This module is the ONE place that interprets embedding provider routing.
  * Network endpoint variables are compatibility inputs; EMBEDDING_PROVIDER and
- * EMBEDDING_BACKEND may select the in-process ONNX lane, which deliberately
- * has no HTTP base URL.
+ * the dev-launcher-only EMBEDDING_BACKEND hint may select the in-process ONNX
+ * lane, which deliberately has no HTTP base URL.
  *
  * Network URL precedence:
  *   1. EMBEDDING_BASE_URL
@@ -17,8 +17,10 @@ import { ENV } from '$lib/server/env.server.js';
  *
  * In-process precedence:
  *   - EMBEDDING_PROVIDER=onnx_directml explicitly selects ONNX DirectML.
- *   - EMBEDDING_BACKEND=onnx_directml is the dev:gpu compatibility bridge.
- *     This is required because dev-gpu-runtime.mjs owns EMBEDDING_BACKEND.
+ *   - EMBEDDING_BACKEND=onnx_directml is a compatibility hint owned by
+ *     dev-gpu-runtime.mjs. It is read from process.env only here because the
+ *     frozen ENV object does not expose EMBEDDING_BACKEND; no other consumer
+ *     should interpret it independently.
  *   - ONNX DirectML is Windows-only; on other platforms routing falls through
  *     to the configured network provider/Ollama instead of claiming DirectML.
  *
@@ -109,7 +111,9 @@ export function resolveEmbeddingProviderFromEnvV1(
 export function resolveEmbeddingProviderV1(): EmbeddingProviderV1 {
   return resolveEmbeddingProviderFromEnvV1({
     EMBEDDING_PROVIDER: ENV.EMBEDDING_PROVIDER,
-    EMBEDDING_BACKEND: ENV.EMBEDDING_BACKEND,
+    // Compatibility bridge only. Keep interpretation centralized here rather
+    // than adding another routing decision to env.server.ts or call sites.
+    EMBEDDING_BACKEND: process.env.EMBEDDING_BACKEND,
     EMBEDDING_BASE_URL: ENV.EMBEDDING_BASE_URL,
     OLLAMA_EMBED_BASE_URL: ENV.OLLAMA_EMBED_BASE_URL,
     EMBED_SERVER_URL: ENV.EMBED_SERVER_URL,
