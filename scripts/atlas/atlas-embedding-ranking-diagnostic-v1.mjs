@@ -1,15 +1,8 @@
 #!/usr/bin/env node
 /**
  * Read-only EmbeddingGemma semantic_768 + retrieval-ranking diagnostic.
- *
- * Canonical Postgres owner:
- *   public.codebase_chunk_index.content_embedding halfvec(768)
- *
- * Non-canonical compatibility surface:
- *   public.codebase_chunk_index.content_embedding_768 vector(768)
- *
- * Qdrant remains a rebuildable projection. This script performs no Postgres,
- * Qdrant, cache, model, or projection writes.
+ * Canonical Postgres owner: codebase_chunk_index.content_embedding halfvec(768).
+ * content_embedding_768 vector(768) is a legacy/alternate compatibility surface.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -218,12 +211,8 @@ async function fetchPostgres(sourceRefs = [], pointIds = []) {
     params.push(LIMIT);
     const result = await pool.query(`SELECT ${select.join(', ')} FROM codebase_chunk_index WHERE ${CANONICAL_VECTOR_COLUMN} IS NOT NULL ${where} ORDER BY id LIMIT $${params.length}`, params);
     return {
-      table: 'codebase_chunk_index',
-      vectorColumn: CANONICAL_VECTOR_COLUMN,
-      declaredType,
-      vectorCounts: counts.rows[0] ?? {},
-      astColumn,
-      columns: [...columns],
+      table: 'codebase_chunk_index', vectorColumn: CANONICAL_VECTOR_COLUMN, declaredType,
+      vectorCounts: counts.rows[0] ?? {}, astColumn, columns: [...columns],
       rows: result.rows.map((row) => ({ ...row, vector: parseVector(row.vector_text), astSymbols: asStrings(row.ast_value) })).filter((row) => row.vector?.length === 768),
     };
   } finally { await pool.end(); }
@@ -239,17 +228,15 @@ async function fetchCanonicalPackets(sourceRefs = [], packetKeys = []) {
     if (keySet.length) { params.push(keySet); predicates.push(`packet_key=ANY($${params.length}::text[])`); }
     if (sourceSet.length) { params.push(sourceSet); predicates.push(`source_ref=ANY($${params.length}::text[])`); }
     if (!predicates.length) return { rows: [] };
-    const result = await pool.query(`SELECT packet_key,source_ref,content_hash,representation_revision::text,graph_revision,som_revision,topology FROM atlas_packets WHERE ${predicates.join(' OR ')} LIMIT ${LIMIT * 2}`, params);
+    const result = await pool.query(`SELECT packet_key,source_ref,content_hash,source_revision,representation_revision::text,NULL::text AS graph_revision,som_revision,topology FROM atlas_packets WHERE ${predicates.join(' OR ')} LIMIT ${LIMIT * 2}`, params);
     return { rows: result.rows };
   } finally { await pool.end(); }
 }
 
-async function turbovecProbe(rows) {
-  if (!WITH_TURBOVEC) return { enabled: false, status: 'SKIPPED', note: 'Read-only diagnostic does not build accelerator state unless explicitly requested.' };
-  try {
-    const health = await jsonFetch(`${TURBOVEC_URL}/health`, { timeoutMs: 5000 });
-    return { enabled: true, status: 'HEALTH_ONLY', health, note: 'No /build call performed; canonical diagnostic remains read-only.' };
-  } catch (error) { return { enabled: true, status: 'WARN', error: error.message }; }
+async function turbovecProbe() {
+  if (!WITH_TURBOVEC) return { enabled: false, status: 'SKIPPED', note: 'No accelerator mutation in default diagnostic.' };
+  try { return { enabled: true, status: 'HEALTH_ONLY', health: await jsonFetch(`${TURBOVEC_URL}/health`, { timeoutMs: 5000 }) }; }
+  catch (error) { return { enabled: true, status: 'WARN', error: error.message }; }
 }
 
 async function main() {
@@ -264,19 +251,13 @@ async function main() {
       embedQuery(),
     ]);
     report.postgres = {
-      table: postgres.table,
-      vectorColumn: postgres.vectorColumn,
-      vectorCounts: postgres.vectorCounts,
-      canonicalVectorColumn: CANONICAL_VECTOR_COLUMN,
-      canonicalVectorType: CANONICAL_VECTOR_TYPE,
+      table: postgres.table, vectorColumn: postgres.vectorColumn, vectorCounts: postgres.vectorCounts,
+      canonicalVectorColumn: CANONICAL_VECTOR_COLUMN, canonicalVectorType: CANONICAL_VECTOR_TYPE,
       observedCanonicalVectorType: postgres.declaredType,
       canonicalVectorPopulated: Number(postgres.vectorCounts?.[CANONICAL_VECTOR_COLUMN] ?? 0) > 0,
-      alternateVectorColumn: ALTERNATE_VECTOR_COLUMN,
-      alternateVectorRole: 'LEGACY_ALTERNATE_NONCANONICAL',
-      astColumn: postgres.astColumn,
-      rowsFetched: postgres.rows.length,
-      vectorDimension: postgres.rows[0]?.vector?.length ?? null,
-      columns: postgres.columns,
+      alternateVectorColumn: ALTERNATE_VECTOR_COLUMN, alternateVectorRole: 'LEGACY_ALTERNATE_NONCANONICAL',
+      astColumn: postgres.astColumn, rowsFetched: postgres.rows.length,
+      vectorDimension: postgres.rows[0]?.vector?.length ?? null, columns: postgres.columns,
     };
     report.qdrant.rowsFetched = qdrantRows.length;
     report.qdrant.vectorDimension = qdrantRows[0]?.vector?.length ?? null;
@@ -297,30 +278,24 @@ async function main() {
       const astScore = overlap(queryTokens, astValues);
       const lexicalScore = overlap(queryTokens, [row.packetKey, row.sourceRef, row.featureId, pg?.relative_path, pg?.symbol, pg?.kind].filter(Boolean));
       const blendedScore = (semantic ?? 0) * 0.60 + (pgSemantic ?? semantic ?? 0) * 0.10 + lexicalScore * 0.15 + astScore * 0.15;
-      const contentHash = firstValue(packet?.content_hash, pg?.content_hash, row.payload.content_hash, row.payload.contentHash);
-      const strongContentHashMatch = Boolean(packet?.content_hash && row.payload.content_hash && packet.content_hash === row.payload.content_hash);
+      const qdrantHash = firstValue(row.payload.content_hash, row.payload.contentHash);
+      const canonicalHash = firstValue(packet?.content_hash, pg?.content_hash);
+      const strongContentHashMatch = Boolean(canonicalHash && qdrantHash && canonicalHash === qdrantHash);
       const canonicalPacketMatch = Boolean(packet);
       const integrityScore = (row.sourceRef ? 0.25 : 0) + (pg?.relative_path || row.sourceRef ? 0.15 : 0) + (canonicalPacketMatch ? 0.20 : 0) + (strongContentHashMatch ? 0.40 : 0);
       const integrityStatus = canonicalPacketMatch && row.sourceRef && strongContentHashMatch ? 'INTEGRITY_VERIFIED' : integrityScore >= 0.55 ? 'INTEGRITY_PARTIAL' : 'INTEGRITY_UNVERIFIED';
-      const diagnosticScore = blendedScore * (0.70 + 0.30 * integrityScore);
       return {
-        pointId: row.pointId,
-        packetKey: row.packetKey ?? packet?.packet_key ?? null,
-        sourceRef: row.sourceRef ?? packet?.source_ref ?? null,
-        filePath: pg?.relative_path ?? row.sourceRef ?? null,
+        pointId: row.pointId, packetKey: row.packetKey ?? packet?.packet_key ?? null,
+        sourceRef: row.sourceRef ?? packet?.source_ref ?? null, filePath: pg?.relative_path ?? row.sourceRef ?? null,
         candidateText: String(pg?.content ?? pg?.summary ?? '').slice(0, 12000),
-        documentRevision: firstValue(row.payload.source_revision, row.payload.sourceRevision),
-        contentHash,
-        graphRevision: firstValue(packet?.graph_revision, row.payload.graph_revision, row.payload.graphRevision),
+        documentRevision: firstValue(packet?.source_revision, row.payload.source_revision, row.payload.sourceRevision),
+        contentHash: firstValue(canonicalHash, qdrantHash), graphRevision: firstValue(row.payload.graph_revision, row.payload.graphRevision),
         representationRevision: firstValue(packet?.representation_revision, row.payload.representation_revision, row.payload.representationRevision),
-        integrityScore: Number(integrityScore.toFixed(4)),
-        integrityStatus,
-        strongContentHashMatch,
+        integrityScore: Number(integrityScore.toFixed(4)), integrityStatus, strongContentHashMatch,
         representationIntegrity: row.vector.length === 768 ? 'VERIFIED' : 'MISMATCH',
-        postgresMatch: Boolean(pg), canonicalPacketMatch,
-        semanticScore: semantic, postgresSemanticScore: pgSemantic,
-        lexicalScore, astScore, astSymbols: astValues.slice(0, 32), blendedScore, diagnosticScore,
-        acePromotionEligible: integrityStatus === 'INTEGRITY_VERIFIED',
+        postgresMatch: Boolean(pg), canonicalPacketMatch, semanticScore: semantic, postgresSemanticScore: pgSemantic,
+        lexicalScore, astScore, astSymbols: astValues.slice(0, 32), blendedScore,
+        diagnosticScore: blendedScore * (0.70 + 0.30 * integrityScore), acePromotionEligible: integrityStatus === 'INTEGRITY_VERIFIED',
       };
     }).sort((a, b) => b.diagnosticScore - a.diagnosticScore || String(a.packetKey).localeCompare(String(b.packetKey)));
 
@@ -328,13 +303,12 @@ async function main() {
       diagnosticFormula: 'diagnosticScore = blendedScore * (0.70 + 0.30*documentIntegrityScore) -- DIAGNOSTIC ONLY',
       promotionGate: 'acePromotionEligible = documentIntegrity.status === INTEGRITY_VERIFIED',
       semanticFormula: '0.60*qdrantSemantic + 0.10*postgresSemantic + 0.15*lexical + 0.15*ast',
-      candidates: scored.slice(0, LIMIT),
-      joinedPostgres: scored.filter((row) => row.postgresMatch).length,
+      candidates: scored.slice(0, LIMIT), joinedPostgres: scored.filter((row) => row.postgresMatch).length,
       joinedCanonicalPackets: scored.filter((row) => row.canonicalPacketMatch).length,
       astAwareCandidates: scored.filter((row) => row.astScore > 0).length,
       mrlAgainst768: embedding.vector?.length === 768 ? benchmarkMrl(embedding.vector, qdrantRows) : [],
     };
-    report.turbovec = await turbovecProbe(qdrantRows);
+    report.turbovec = await turbovecProbe();
     report.gates = {
       qdrantVectors768: qdrantRows.length > 0 && report.qdrant.vectorDimension === 768,
       embeddinggemma768: embedding.vector?.length === 768,
