@@ -131,7 +131,7 @@ ACE cards → ContextManifest → bounded agent/DAG execution
 
 ### Ownership rules
 
-- **PostgreSQL 18** owns packet/chunk identity, source and workspace revisions, eligibility, evidence, feature metadata, FTS state, and canonical `content_embedding_768` rows.
+- **PostgreSQL 18** owns packet/chunk identity, source and workspace revisions, eligibility, evidence, feature metadata, FTS state, and canonical `codebase_chunk_index.content_embedding` rows (`halfvec(768)`, representation `semantic_768`). `content_embedding_768 vector(768)` is an alternate/legacy surface, not the current semantic owner.
 - **PostgreSQL AIO/bitmap scans** are execution-plan optimizations. Do not create an application “AIO bitmap” abstraction or require a particular scan type for correctness; record `EXPLAIN (ANALYZE, BUFFERS, SETTINGS)` when performance is being evaluated.
 - **8095** owns Tree-sitter CST/AST observations, AST-grep structural matches, bounded NLP/extraction observations, and exact source spans. It does not own CandidateOrdinal, canonical ontology promotion, or GPU execution.
 - **Go Retrieval** is a read-only retrieval executor. It may query PostgreSQL, pgvector, Qdrant, cache, and the embedding service, and it may stream raw evidence/chunks. It must return revision/identity metadata and must not become the canonical writer or final RRF owner.
@@ -181,7 +181,9 @@ exact source/chunk binding
   → Qdrant or GPU projection
 ```
 
-The canonical dense owner is `codebase_chunk_index.content_embedding_768` with `semantic_768`, 768 dimensions, and cosine distance. Qdrant and GPU vectors must be independently reconciled to that owner before promotion. Never fill a missing candidate with aliases, fuzzy paths, synthetic revisions, legacy 384 vectors, or an unrelated Qdrant point.
+The canonical dense owner is `codebase_chunk_index.content_embedding` (`halfvec(768)`) with representation `semantic_768`, 768 dimensions, L2 normalization, and cosine retrieval semantics. `content_embedding_768 vector(768)` is legacy/alternate storage and must never win owner selection by name or population order. Qdrant and GPU vectors must be independently reconciled to the canonical `content_embedding` owner before promotion. Never fill a missing candidate with aliases, fuzzy paths, synthetic revisions, legacy 384 vectors, or an unrelated Qdrant point.
+
+Embedding width and input sequence length are separate contracts. Native EmbeddingGemma semantic output is 768 dimensions; an ONNX export may independently impose a smaller maximum input token count (for example 512). Do not convert such an input limit into a 512- or 384-dimensional vector policy. Reduced 512/256/128 MRL views and learned latent projections require explicit representation IDs/revisions; 384 remains legacy/reference-only in the current Parent Atlas contract.
 
 Go Retrieval streaming is progressive delivery, not authority transfer:
 
