@@ -54,7 +54,7 @@ Reference URLs:
 - NetworkX backends: https://networkx.org/documentation/stable/backends.html
 - nx-cugraph: https://docs.rapids.ai/api/cugraph/stable/nx_cugraph/
 - cuGraph API: https://docs.rapids.ai/api/cugraph/stable/api_docs/
-- cuGraph PageRank: https://docs.rapids.ai/api/cugraysph/stable/api_docs/api/cugraph/cugraph.pagerank.html
+- cuGraph PageRank: https://docs.rapids.ai/api/cugraph/stable/api_docs/api/cugraph/cugraph.pagerank.html
 - cuVS CAGRA: https://docs.rapids.ai/api/cuvs/stable/python_api/neighbors_cagra.html
 - cuVS distance: https://docs.rapids.ai/api/cuvs/stable/python_api/distance.html
 
@@ -101,22 +101,41 @@ Each vector point SHALL carry canonical identity, projection revision, embedding
 
 ### Dense lane alignment contract
 
-The canonical dense content lane is 768-dimensional EmbeddingGemma output.
-PostgreSQL `codebase_chunk_index.content_embedding_768` is the canonical
-content vector, and Qdrant collection `codebase_chunks_768` named vector
-`content` is its rebuildable projection. A content projection SHALL reuse the
-existing `qdrant_id` and preserve `source_ref`; it SHALL NOT create a second
-point identity.
+The canonical dense content lane is native 768-dimensional EmbeddingGemma output
+identified as `semantic_768`. PostgreSQL
+`codebase_chunk_index.content_embedding` with physical type `halfvec(768)` is
+the canonical content-vector owner. The similarly named
+`codebase_chunk_index.content_embedding_768` (`vector(768)`) is an
+alternate/legacy storage surface and SHALL NOT be selected implicitly or receive
+new canonical writes.
+
+Qdrant's named vector `content` is a rebuildable 768-dimensional projection.
+`codebase_chunks_768` and `codebase_chunks_768_v2` SHALL remain explicitly
+role-qualified until projection convergence is independently proven; neither
+collection is canonical truth. A content projection SHALL preserve exact packet,
+chunk, source, workspace, representation, and content-revision lineage and
+SHALL NOT create a second canonical identity.
 
 The 768-dimensional `signature` vector is a separate structural/signature
 lane. It SHALL remain distinct from semantic content ranking even when both
-vectors are stored on the same Qdrant point. The legacy 384-dimensional lane
-is compatibility or routing-only and SHALL NOT replace `semantic_768`.
+vectors are stored on the same Qdrant point. The legacy 384-dimensional lane is
+compatibility/reference-only and SHALL NOT replace `semantic_768`.
+
+Embedding executor equality SHALL NOT be inferred from dimension equality.
+Ollama, ONNX Runtime (DirectML/CPU), and llama.cpp/GGUF outputs MAY participate
+only under explicit model/tokenizer/input-policy/normalization and representation
+revision lineage. A 768-dimensional vector from a different executor is not
+silently the same representation merely because its shape matches.
+
+Reduced EmbeddingGemma representations, when used, SHALL have distinct
+representation IDs and explicit projection lineage. The current supported MRL
+reference dimensions are 512, 256, and 128; 384 remains legacy rather than a
+canonical EmbeddingGemma MRL target in this project.
 
 TurboVec, cuVS/CAGRA, FAISS experiments, and GPU rerankers MAY accelerate
 candidate generation or exact rescoring, but SHALL remain behind the same
-retrieval backend boundary. Their indexes are projections and SHALL NOT
-become canonical identity or evidence stores.
+retrieval backend boundary. Their indexes are projections and SHALL NOT become
+canonical identity or evidence stores.
 
 ---
 
