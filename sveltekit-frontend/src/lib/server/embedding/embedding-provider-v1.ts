@@ -1,4 +1,6 @@
 import { createHash } from 'node:crypto';
+import { existsSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { ENV } from '$lib/server/env.server.js';
 
 /**
@@ -9,24 +11,19 @@ import { ENV } from '$lib/server/env.server.js';
  * the dev-launcher-only EMBEDDING_BACKEND hint may select the in-process ONNX
  * lane, which deliberately has no HTTP base URL.
  *
+ * dev:gpu integration:
+ *   dev-gpu-runtime.mjs already exports GPU_ENABLED=true. On Windows, when it
+ *   has not selected the dedicated llama_cpp_gguf :8081 backend and a local
+ *   embeddinggemma ONNX export exists, this resolver prefers onnx_directml.
+ *   That session is lazy: Vite startup itself does not load the model. Local
+ *   inference is DirectML -> CPU; the API caller retains Ollama as its outer
+ *   network fallback when local ONNX returns null.
+ *
  * Network URL precedence:
  *   1. EMBEDDING_BASE_URL
  *   2. OLLAMA_EMBED_BASE_URL
  *   3. EMBED_SERVER_URL
  *   4. OLLAMA_BASE_URL (Ollama fallback)
- *
- * In-process precedence:
- *   - EMBEDDING_PROVIDER=onnx_directml explicitly selects ONNX DirectML.
- *   - EMBEDDING_BACKEND=onnx_directml is a compatibility hint owned by
- *     dev-gpu-runtime.mjs. It is read from process.env only here because the
- *     frozen ENV object does not expose EMBEDDING_BACKEND; no other consumer
- *     should interpret it independently.
- *   - ONNX DirectML is Windows-only; on other platforms routing falls through
- *     to the configured network provider/Ollama instead of claiming DirectML.
- *
- * A dedicated :8081 URL still identifies llama_cpp_gguf unless the ONNX
- * in-process lane is explicitly selected. A stale EMBEDDING_PROVIDER=ollama
- * never overrides a concrete dedicated-server URL.
  */
 
 export const EMBEDDING_PROVIDER_NAMES = ['llama_cpp_gguf', 'ollama', 'onnx_directml'] as const;
@@ -47,6 +44,8 @@ export interface EmbeddingProviderEnvV1 {
   OLLAMA_EMBED_BASE_URL?: string | null;
   EMBED_SERVER_URL?: string | null;
   OLLAMA_BASE_URL?: string | null;
+  GPU_ENABLED?: string | null;
+  LOCAL_ONNX_AVAILABLE?: string | boolean | null;
 }
 
 function stripTrailingSlash(url: string): string {
@@ -57,6 +56,10 @@ function clean(value: string | null | undefined): string {
   return String(value ?? '').trim();
 }
 
+function enabled(value: unknown): boolean {
+  return ['1', 'true', 'yes', 'on'].includes(String(value ?? '').trim().toLowerCase());
+}
+
 /** Pure resolver used by tests and by the ENV-backed production wrapper. */
 export function resolveEmbeddingProviderFromEnvV1(
   input: EmbeddingProviderEnvV1,
@@ -65,15 +68,26 @@ export function resolveEmbeddingProviderFromEnvV1(
   const modelId = 'embeddinggemma:latest';
   const explicitProvider = clean(input.EMBEDDING_PROVIDER).toLowerCase();
   const backendHint = clean(input.EMBEDDING_BACKEND).toLowerCase();
-  const wantsOnnxDirectML =
-    explicitProvider === 'onnx_directml' || backendHint === 'onnx_directml';
+  const candidateUrl =
+    clean(input.EMBEDDING_BASE_URL) ||
+    clean(input.OLLAMA_EMBED_BASE_URL) ||
+    clean(input.EMBED_SERVER_URL) ||
+    null;
+
+  const explicitOnnx = explicitProvider === 'onnx_directml' || backendHint === 'onnx_directml';
+  const dedicatedLlamaCpp = backendHint === 'llama_cpp_gguf' || Boolean(candidateUrl);
+  const devGpuAutoOnnx =
+    platform === 'win32'
+    && enabled(input.GPU_ENABLED)
+    && enabled(input.LOCAL_ONNX_AVAILABLE)
+    && !dedicatedLlamaCpp
+    && explicitProvider !== 'ollama';
 
   // ONNX is in-process and therefore does NOT require or own an HTTP base URL.
-  // This check must happen before URL routing. The previous implementation only
-  // considered onnx_directml inside `if (candidateUrl)`, which made a correctly
-  // configured in-process backend fall through to Ollama whenever dev:gpu
-  // cleared the dedicated :8081 URLs.
-  if (wantsOnnxDirectML && platform === 'win32') {
+  // Explicit ONNX always wins on Windows; dev:gpu additionally auto-selects it
+  // when a local model has actually been discovered. EMBEDDING_PROVIDER=ollama
+  // is the hard escape hatch for operators who want to suppress auto-DirectML.
+  if ((explicitOnnx || devGpuAutoOnnx) && platform === 'win32') {
     return {
       provider: 'onnx_directml',
       baseUrl: null,
@@ -82,12 +96,6 @@ export function resolveEmbeddingProviderFromEnvV1(
       representationId: 'semantic_768',
     };
   }
-
-  const candidateUrl =
-    clean(input.EMBEDDING_BASE_URL) ||
-    clean(input.OLLAMA_EMBED_BASE_URL) ||
-    clean(input.EMBED_SERVER_URL) ||
-    null;
 
   if (candidateUrl) {
     return {
@@ -108,6 +116,17 @@ export function resolveEmbeddingProviderFromEnvV1(
   };
 }
 
+function localOnnxModelAvailable(): boolean {
+  const cwd = process.cwd();
+  const candidates = [
+    resolve(cwd, 'static', 'embeddinggemma_300m_onnx', 'model.onnx'),
+    resolve(cwd, 'static', 'models', 'embeddinggemma_300m_onnx', 'model.onnx'),
+    resolve(cwd, 'models', 'embeddinggemma_300m_onnx', 'model.onnx'),
+    resolve(cwd, '..', 'models', 'embeddinggemma_300m_onnx', 'model.onnx'),
+  ];
+  return candidates.some((candidate) => existsSync(candidate));
+}
+
 export function resolveEmbeddingProviderV1(): EmbeddingProviderV1 {
   return resolveEmbeddingProviderFromEnvV1({
     EMBEDDING_PROVIDER: ENV.EMBEDDING_PROVIDER,
@@ -118,6 +137,8 @@ export function resolveEmbeddingProviderV1(): EmbeddingProviderV1 {
     OLLAMA_EMBED_BASE_URL: ENV.OLLAMA_EMBED_BASE_URL,
     EMBED_SERVER_URL: ENV.EMBED_SERVER_URL,
     OLLAMA_BASE_URL: ENV.OLLAMA_BASE_URL,
+    GPU_ENABLED: process.env.GPU_ENABLED,
+    LOCAL_ONNX_AVAILABLE: localOnnxModelAvailable(),
   });
 }
 
