@@ -1,21 +1,17 @@
 #!/usr/bin/env node
-// GRAPHIFY-OPEN-CLOSE-LIVE-WIRING-01 (2026-09-03): opens a real graphify_runs row for the live
-// npm run graphify:daily entrypoint (scripts/startup/run-graphify-daily-startup.mjs), then binds
-// a real, materialized WorkspaceRevisionRecordV1 to it. This is the first half of the real
-// open->bind->complete lifecycle; scripts/atlas/graphify-daily-lifecycle-complete-v1.mjs is the
-// second half, invoked after the daily chain succeeds.
+// GRAPHIFY-OPEN-CLOSE-LIVE-WIRING-01 (2026-09-03): legacy live-origin lifecycle opener.
+//
+// SNAPSHOT-BOUND-GRAPHIFY-CONSUMPTION-01 (2026-09-10): this opener MUST NOT be used when an
+// admitted snapshot is supplied. Snapshot mode owns a frozen multi-repository membership and a
+// separately admitted workspaceRevision; rescanning ROOT or substituting current HEAD would break
+// that authority boundary. The guard below fails before opening a database connection or creating
+// graphify_runs rows. A separate snapshot-bound graphify_executions opener is required after
+// explicit execution authorization.
 //
 // Uses the proven primitives from graphify-source-inventory-writer-v2.ts
-// (openGraphifyRunV1 / bindWorkspaceRevisionV1) exactly as they were already live-proved in
-// scripts/atlas/prove-graphify-open-bind-complete-lifecycle-v1.mjs -- no new SQL, no new
-// primitive. Must be invoked via `npx tsx` (the writer module is .ts with no build step); a plain
-// `node` invocation cannot dynamic-import it on this repo's Node/toolchain setup (confirmed:
-// plain `node --eval "import('...graphify-source-inventory-writer-v2.ts')"` fails with
-// `Unknown file extension ".ts"`).
-//
-// Non-fatal by design at the call site (run-graphify-daily-startup.mjs wraps this in try/catch
-// and continues the real indexing chain on failure) -- lifecycle bookkeeping must never block the
-// actual daily indexing work it is trying to observe.
+// (openGraphifyRunV1 / bindWorkspaceRevisionV1) for LEGACY LIVE-ORIGIN mode only. Must be invoked
+// via `npx tsx` (the writer module is .ts with no build step); a plain node invocation cannot
+// dynamic-import it on this repo's current toolchain.
 import pg from 'pg';
 import { execFileSync } from 'node:child_process';
 import { mkdirSync, writeFileSync } from 'node:fs';
@@ -34,7 +30,28 @@ const RECEIPT_PATH = path.resolve(ROOT, 'docs/reports/graphify-daily-lifecycle-v
 
 const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
 
+function rejectAdmittedSnapshotModeOnLegacyOpener() {
+  const snapshotPath = process.env.ATLAS_GRAPHIFY_SOURCE_SNAPSHOT_PATH?.trim() || null;
+  const snapshotRoot = process.env.ATLAS_GRAPHIFY_SOURCE_SNAPSHOT_ROOT?.trim() || null;
+  if (snapshotPath || snapshotRoot) {
+    const error = new Error('GRAPHIFY_LEGACY_LIFECYCLE_OPENER_REJECTS_ADMITTED_SNAPSHOT_MODE');
+    error.cause = {
+      snapshotPathPresent: Boolean(snapshotPath),
+      snapshotRootPresent: Boolean(snapshotRoot),
+      requiredOwner: 'graphify_executions + graphify_execution_file_membership_v2',
+      requiredGate: 'GRAPHIFY-BOUND-SNAPSHOT-EXECUTION-AUTHORIZATION-01',
+      liveOriginInventoryAllowed: false,
+      currentHeadSubstitutionAllowed: false,
+    };
+    throw error;
+  }
+}
+
 async function main() {
+  // Must happen before pg.Pool construction: snapshot mode is not merely a later
+  // revision mismatch. This legacy opener is the wrong owner and may not touch DB.
+  rejectAdmittedSnapshotModeOnLegacyOpener();
+
   const pool = new pg.Pool({ connectionString: DATABASE_URL, max: 2 });
   const client = await pool.connect();
   try {
@@ -56,7 +73,7 @@ async function main() {
       parserContractVersion: PARSER_CONTRACT_VERSION,
       extractionContractVersion: EXTRACTION_CONTRACT_VERSION,
       dryRun: false,
-      configuration: { wrapper: 'scripts/startup/run-graphify-daily-startup.mjs' },
+      configuration: { wrapper: 'scripts/startup/run-graphify-daily-startup.mjs', mode: 'LEGACY_LIVE_ORIGIN' },
     });
     console.log(JSON.stringify({ step: 'opened', runId: opened.runId, workspaceId: opened.workspaceId, repositoryRevision: opened.repositoryRevision }));
 
@@ -89,6 +106,7 @@ async function main() {
     mkdirSync(path.dirname(RECEIPT_PATH), { recursive: true });
     writeFileSync(RECEIPT_PATH, JSON.stringify({
       schema: 'atlas.graphify-daily-lifecycle.v1',
+      mode: 'LEGACY_LIVE_ORIGIN',
       runId: opened.runId,
       workspaceId: CANONICAL_WORKSPACE_ID,
       repositoryRevision,
@@ -98,12 +116,13 @@ async function main() {
       bindingsCount: materialized.bindings.length,
       skippedCount: materialized.skipped.length,
       dirty: materialized.record.dirty,
+      snapshotRevision: null,
       status: 'RUNNING',
       openedAt,
       boundAt: new Date().toISOString(),
       completedAt: null,
     }, null, 2) + '\n');
-    console.log(JSON.stringify({ status: 'OPEN_BIND_COMPLETE', runId: opened.runId, receiptPath: RECEIPT_PATH }));
+    console.log(JSON.stringify({ status: 'OPEN_BIND_COMPLETE', mode: 'LEGACY_LIVE_ORIGIN', runId: opened.runId, receiptPath: RECEIPT_PATH }));
   } finally {
     client.release();
     await pool.end();
