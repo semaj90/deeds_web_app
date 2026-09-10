@@ -1,391 +1,156 @@
-# Vector Storage Contract: pgvector vs JSONB vs Qdrant Payload
+# Vector Storage Contract — Parent Atlas
 
-**Date**: July 20, 2026  
-**Principle**: Searchable vectors live in pgvector/Qdrant vectors. Metadata lives in JSONB/Qdrant payload.
+**Updated:** 2026-09-10
 
----
+## Authority boundary
 
-## The Hard Boundary
+PostgreSQL owns canonical packet/chunk identity, source/workspace revisions,
+eligibility, evidence metadata, and the canonical dense semantic representation.
+Qdrant, GPU indexes, SOM/centroids, and caches are rebuildable projections.
 
-| Storage | Use Case | Example |
-|---------|----------|---------|
-| **pgvector** | Searchable semantic embeddings (ANN) | `content_embedding_768 vector(768)` |
-| **Qdrant vector field** | Searchable semantic embeddings (ANN) | `named_vectors.content_768_dense` |
-| **JSONB** | Provenance, manifests, audit trails | `metadata JSONB` with manifest hash, model version, classifier outputs |
-| **Qdrant payload** | Filterable metadata, faceting, ranking hints | `payload` JSON with domain_class, title_id, som_cluster, tree_node_id |
+## Canonical dense representation
 
-**Never do**: Store searchable vectors as JSONB. This kills ANN performance.  
-**Never do**: Store metadata as vector dimensions. This wastes storage and computation.
+```text
+representation_id = semantic_768
+model family      = EmbeddingGemma
+vector dimension  = 768
+normalization     = L2
+Postgres table    = public.codebase_chunk_index
+Postgres column   = content_embedding
+physical type     = halfvec(768)
+```
 
----
+The similarly named `content_embedding_768 vector(768)` column is an older
+alternate storage surface. It is not the current semantic owner and must not be
+chosen simply because it contains `768` in the column name.
 
-## Postgres Schema (Canonical Truth)
+The old 384-dimensional lane remains explicit legacy/reference evidence. It is
+not the current EmbeddingGemma authority. Optional reduced representations must
+carry their own representation ID, projection method, revision, checksum, and
+normalization contract.
 
-### Core Table: `atlas_packets`
+## Postgres
+
+Current canonical shape:
 
 ```sql
-CREATE TABLE atlas_packets (
-  packet_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  packet_key VARCHAR(255) NOT NULL UNIQUE,
-  source_ref VARCHAR(512) NOT NULL,
-  
-  -- Identity
-  domain_class VARCHAR(50),  -- Determined by classifier sidecar
-  feature_id VARCHAR(255),
-  feature_label VARCHAR(255),
-  
-  -- Searchable vectors (pgvector, NOT JSONB)
-  content_embedding_768 vector(768),     -- Canonical 768-dim L2-normalized
-  content_embedding_256 vector(256),     -- Optional MRL (Phase 107+)
-  latent_embedding_64 halfvec,           -- Autoencoder routing (SOM/clustering only)
-  
-  -- Provenance & metadata (JSONB, NOT vectors)
-  metadata JSONB,  -- Opaque user metadata (title, labels, tags, etc.)
-  
-  -- Classifier outputs & audit (JSONB)
-  classifier_outputs JSONB,  -- {domain_class_score: 0.92, lexical_score: 0.8, ast_score: 0.75, version: "xgboost-v2"}
-  
-  -- Manifest & provenance (JSONB)
-  embedding_manifest JSONB,  -- {model_id: "embeddinggemma", model_revision: "20260720", dim: 768, norm: "L2", idempotency_key: "sha256...", timestamp: "2026-07-20T..."}
-  
-  -- Indexing
-  created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT NOW()
-);
-
--- Indexes: pgvector + JSONB
-CREATE INDEX idx_content_embedding_768_ivfflat ON atlas_packets USING ivfflat (content_embedding_768);
-CREATE INDEX idx_domain_class ON atlas_packets (domain_class);
-CREATE INDEX idx_classifier_domain ON atlas_packets USING gin (classifier_outputs);
-CREATE INDEX idx_embedding_model ON atlas_packets USING gin (embedding_manifest);
-```
-
-**Data Flow**:
-1. Postgres stores **searchable vectors** in pgvector columns (fast ANN via HNSW/IVF)
-2. Postgres stores **metadata** in JSONB columns (audit trail, filtering, faceting)
-3. No vector search happens on JSONB columns
-
----
-
-## Qdrant Schema (Derived Mirror)
-
-### Collection: `codebase_chunks_768`
-
-```python
-from qdrant_client.models import Distance, VectorParams, PointStruct
-
-# Collection creation
-client.recreate_collection(
-    collection_name="codebase_chunks_768",
-    vectors_config=VectorParams(
-        size=768,
-        distance=Distance.COSINE,
-        on_disk=False,  # Keep in memory for speed
-    ),
-    # Payload indexes (created BEFORE ingest for performance)
-    payload_schema_disable_infer=False,
-    payload_indexing_threshold=100,  # Auto-index after 100 points
-)
-
-# Point structure (what gets upserted)
-point = PointStruct(
-    id=packet_id_as_int,
-    vector=embedding_768,  # The searchable vector
-    payload={
-        # Identity (filterable, NOT searchable)
-        "packet_key": "ace:packet:...",
-        "source_ref": "src/lib/server/db.ts",
-        "domain_class": "code",
-        
-        # Ranking hints (used by reranker, NOT for ANN)
-        "title_id": "db-client",
-        "feature_label": "Database Client",
-        "som_cluster": 5,
-        "tree_node_id": "ast:file:db.ts:class:DbClient:0",
-        
-        # Audit (metadata only)
-        "embedding_model": "embeddinggemma/20260720",
-        "created_at": "2026-07-20T...",
-        
-        # Classifier outputs (for ranking, NOT for ANN)
-        "domain_score": 0.92,
-        "lexical_score": 0.8,
-        "ast_score": 0.75,
-    }
+-- existing table excerpt; illustrative, not a migration
+public.codebase_chunk_index (
+  id                  uuid,
+  source_ref          text,
+  content_hash        text,
+  content             text,
+  content_embedding   halfvec(768),
+  embedding_model     text,
+  embedding_dimension integer,
+  embedding_version   text,
+  encoder_id           text,
+  embedding_dtype      text,
+  embedding_normalized boolean,
+  embedding_created_at timestamptz
 )
 ```
 
-**Key Properties**:
-- ✅ `vector` = 768-dim L2-normalized embedding (ANN searchable)
-- ✅ `payload` = metadata for filtering, faceting, ranking hints
-- ✅ Named vectors (future): `content_768_dense`, `content_512_mrl`, `sparse_bm25`
-- ✅ Payload indexes on `domain_class`, `feature_label`, `som_cluster` for fast filtering
+The canonical ANN operator class is `halfvec_cosine_ops`. The existing canonical
+HNSW index should be reused; do not create another vector index merely because a
+legacy script references `content_embedding_768 vector_cosine_ops`.
 
-**Never do**: Put embedding vector inside payload JSON.
+## Qdrant
 
----
+The semantic Qdrant vector is named `content` and has size 768 with cosine
+distance. Qdrant point IDs are projection IDs, never packet/chunk identity.
 
-## Redis / Bitfrost Cache (Ephemeral)
+Two 768 collections may be present in this repository/runtime:
 
-### Cache Keys (L1 exact-match + L2 semantic)
-
-```typescript
-// L1: Exact-match cache (Redis strings)
-redis.set(
-  `embedding:cache:${queryHash}`,
-  JSON.stringify(cached_embedding),
-  'EX', 3600  // 1-hour TTL
-);
-
-// L2: Semantic cache (Qdrant via Bifrost)
-// Bifrost handles Qdrant query → similarity check → return cached result
-bifrost.search({
-  query_vector: query_embedding_768,
-  threshold: 0.85,
-  fetch_payload: true  // Get metadata for ranking
-});
-
-// Routing state (ephemeral, rebuilt from Postgres if lost)
-redis.set(
-  `routing:hot_centroid:${som_cluster_id}`,
-  JSON.stringify(centroid_64_dim),  // Latent embedding for routing
-  'EX', 300  // 5-min TTL
-);
-
-// HyperLogLog for cardinality (not for identity)
-redis.pfadd(
-  `hll:unique_source_refs:${date}`,
-  source_ref  // Approximate distinct count only
-);
+```text
+codebase_chunks_768
+codebase_chunks_768_v2
 ```
 
-**Never store vectors as searchable data in Redis.** Use it only for:
-- Hot caches (exact-match, semantic via Bifrost)
-- Routing state (latent centroids)
-- Cardinality approximation (HLL)
+They must be role-qualified in receipts until collection convergence is proven.
+Neither collection owns semantic truth; both must reconcile back to exact
+Postgres identity/revision and the canonical `content_embedding` owner.
 
----
+## Embedding executor contract
 
-## Python Sidecar: Classifier Input/Output
+Shape equality is not representation equality. Every executor must emit or be
+bound to immutable provenance sufficient to distinguish:
 
-### Input: Features (from tree-sitter, ast-grep, token count)
-
-```python
-from dataclasses import dataclass
-import numpy as np
-
-@dataclass
-class ClassifierInput:
-    """Input to domain classifier (Python sidecar)."""
-    packet_key: str
-    source_ref: str
-    chunk_text: str
-    
-    # Sparse lexical features (TF-IDF or token counts)
-    lexical_features: np.ndarray  # Shape (vocab_size,), sparse
-    
-    # Structural features (AST)
-    ast_features: np.ndarray  # Shape (n_ast_features,), binary or counts
-    
-    # Embedding (from embedding sidecar, used as feature input)
-    embedding_768: np.ndarray  # Shape (768,), L2-normalized
-    
-    # Path/file features
-    path_rule_score: float  # 0.0-1.0 heuristic from file extension
-    
-# Classifier processes ALL features → output decision
-classifier = LogisticRegression(C=1.0, max_iter=1000)
-domain_scores = classifier.predict_proba(X_features)
-# Output: {domain_class: "code", confidence: 0.92, lexical: 0.80, ast: 0.75, embedding: 0.95}
+```text
+model / upstream revision
+tokenizer revision
+input formatter + input-policy revision
+quantization/runtime revision
+pooling
+normalization
+vector dimension
+input checksum
+vector checksum
+representation revision
 ```
 
-### Output: Classification Decision
+Relevant executor families include:
 
-```python
-@dataclass
-class ClassifierOutput:
-    """Output from domain classifier."""
-    packet_key: str
-    domain_class: str  # "code", "legal", "documentation", etc.
-    confidence: float  # 0.0-1.0 from LogisticRegression
-    component_scores: dict  # {lexical: 0.80, ast: 0.75, embedding: 0.95, path: 0.60}
-    classifier_version: str  # "logistic-v2-20260720"
-    timestamp: str  # ISO 8601
-    
-# Stored in Postgres
-atlas_packets.classifier_outputs = {
-    'domain_class': 'code',
-    'confidence': 0.92,
-    'lexical_score': 0.80,
-    'ast_score': 0.75,
-    'embedding_score': 0.95,
-    'path_score': 0.60,
-    'version': 'logistic-v2-20260720'
-}
+- Ollama `embeddinggemma:latest`
+- ONNX Runtime local EmbeddingGemma (DirectML or CPU)
+- llama.cpp/GGUF dedicated embedding server
 
-# Mirrored to Qdrant payload
-qdrant_payload = {
-    'domain_class': 'code',
-    'domain_score': 0.92,
-    'lexical_score': 0.80,
-    'ast_score': 0.75
-}
+A 768-dimensional result from one executor must not silently overwrite/mix with
+a 768-dimensional result from another executor unless the representation-parity
+contract admits that equivalence.
+
+## Input length is separate from vector dimension
+
+Do not confuse sequence length with embedding width. The local ONNX artifact at
+`models/embeddinggemma_300m_onnx/model_info.json` reports:
+
+```text
+embedding_dimension = 768
+max_sequence_length = 512
 ```
 
-**Decision Gates**:
-```python
-def classify_decision_gate(confidence: float) -> str:
-    if confidence >= 0.80:
-        return 'auto_accept'  # Write to Postgres immediately
-    elif confidence >= 0.55:
-        return 'provisional_queue'  # Queue for Mastra review
-    else:
-        return 'manual_review'  # Mastra creates review task
+That 512 value is an executor/artifact input limit. It does not make the vector
+512-dimensional. Each executor must apply its own proven token limit and record
+its input policy in representation lineage.
+
+## Reduced representations
+
+Parent Atlas keeps native `semantic_768` as the canonical dense lane. Explicit
+reduced/reference representations may include 512, 256, and 128-dimensional
+EmbeddingGemma MRL projections, plus independently learned latent representations
+such as 256/128/64. They do not replace `semantic_768` and must not gain an extra
+RRF vote merely because they use another executor or physical index.
+
+The 384-dimensional corpus is legacy/reference-only unless a specifically named
+legacy contract is being evaluated.
+
+## Cache and topology
+
+Valkey/BitFrost may cache vectors/manifests for bounded reuse, but cache entries
+are never canonical storage. SOM/KMeans/latent vectors are routing evidence only.
+They must preserve the canonical candidate identity and representation revision
+that produced them.
+
+## Required promotion chain
+
+```text
+admitted workspace/source revision
+  -> exact source/chunk identity
+  -> canonical EmbeddingGemma semantic_768 input
+  -> EmbeddingReceipt/RepresentationManifest
+  -> Postgres content_embedding halfvec(768)
+  -> exact Qdrant/GPU projection readback
+  -> SearchRuntime normalization/fusion
+  -> ContextManifest / ACE
 ```
 
----
+## Forbidden shortcuts
 
-## Pipeline Lane Ordering (Dependency Graph)
-
-### Phase 106: Stage 4 (Embedding Only)
-```
-chunk_text
-    ↓ [Embedding Sidecar: EmbeddingGemma]
-embedding_768 (L2-normalized)
-    ↓ [Postgres Write]
-atlas_packets.content_embedding_768 (pgvector)
-    ↓ [Qdrant Mirror]
-codebase_chunks_768.vector (Qdrant)
-```
-
-### Phase 107+: Classifier Lane (Domain Classification)
-
-```
-chunk_text + embedding_768
-    ↓ [Tree-sitter / ast-grep]
-lexical_features, ast_features
-    ↓ [Python Sidecar: Classifier]
-domain_class, confidence, component_scores
-    ↓ [Postgres Write]
-atlas_packets.classifier_outputs (JSONB)
-    ↓ [Qdrant Mirror]
-codebase_chunks_768.payload.domain_class (Qdrant payload)
-```
-
-### Phase 107+: Topology Lane (PageRank + SOM)
-
-```
-content_embedding_768
-    ↓ [Autoencoder Sidecar]
-latent_embedding_64 (routing only, NOT retrieval)
-    ↓ [cuGraph PageRank]
-pagerank_score
-    ↓ [SOM Clustering]
-som_cluster_id, bmu_x, bmu_y
-    ↓ [Postgres Write]
-atlas_packets.latent_embedding_64, som_cluster
-    ↓ [Qdrant Mirror]
-codebase_chunks_768.payload.som_cluster
-```
-
-### Phase 107+: Optional POS Tagging (Token-Level Enrichment)
-
-```
-chunk_text
-    ↓ [PyTorch POS Tagger] (optional, after classifier is stable)
-pos_tags, token_boundaries
-    ↓ [Postgres Write]
-atlas_packets.metadata JSONB (NOT searchable)
-    ↓ [Qdrant Mirror]
-codebase_chunks_768.payload.pos_tags
-```
-
----
-
-## Qdrant Payload Schema (Complete)
-
-```json
-{
-  "packet_key": "ace:packet:auth:001",
-  "source_ref": "src/lib/server/auth.ts",
-  "domain_class": "code",
-  "title_id": "auth-sessions",
-  "feature_label": "Authentication Sessions",
-  "som_cluster": 5,
-  "tree_node_id": "ast:file:auth.ts:function:validateSession:0",
-  "embedding_model": "embeddinggemma/20260720",
-  "domain_score": 0.92,
-  "lexical_score": 0.80,
-  "ast_score": 0.75,
-  "created_at": "2026-07-20T22:30:45Z"
-}
-```
-
-**Indexed Fields** (for fast filtering):
-- `domain_class` (string index)
-- `som_cluster` (numeric index)
-- `feature_label` (text index)
-
-**Non-Indexed Fields** (metadata only):
-- `packet_key` (exact lookup in Postgres instead)
-- `embedding_model` (audit only)
-- `created_at` (timestamp)
-
----
-
-## Storage Decision Tree
-
-**Is it searchable via ANN?**
-- YES → Use pgvector column or Qdrant vector field
-- NO → Use JSONB or Qdrant payload
-
-**Is it used for filtering/faceting?**
-- YES → Use Qdrant payload with index, or Postgres JSONB with GIN
-- NO → Use JSONB for audit/provenance only
-
-**Is it required for retrieval ranking?**
-- YES → Include in Qdrant payload (lexical score, ast score, domain score)
-- NO → Store in Postgres JSONB only (model version, manifest, idempotency key)
-
-**Is it temporary routing state?**
-- YES → Use Redis (L1 cache) or Bitfrost semantic cache
-- NO → Use Postgres for durable storage
-
----
-
-## Implementation Checklist
-
-### Phase 106 (Embedding Only)
-- [x] Postgres: `content_embedding_768 vector(768)` column (pgvector)
-- [x] Qdrant: named vector `content_768_dense` (COSINE distance)
-- [x] Qdrant payload: `embedding_model`, `created_at` (metadata only)
-- [x] No JSONB vectors: metadata in JSONB, vectors in pgvector
-
-### Phase 107+ (Classifier)
-- [ ] Postgres: `classifier_outputs JSONB` column
-- [ ] Qdrant payload: `domain_class`, `domain_score`, `lexical_score`, `ast_score` (ranking hints)
-- [ ] Python sidecar: scikit-learn LogisticRegression (not neural)
-- [ ] Decision gate: 0.80 auto-accept, 0.55-0.80 provisional, <0.55 review
-
-### Phase 107+ (Topology)
-- [ ] Postgres: `latent_embedding_64 halfvec` column (routing only)
-- [ ] Qdrant payload: `som_cluster`, `tree_node_id`
-- [ ] cuGraph: PageRank from Neo4j topology (not from vectors)
-- [ ] SOM: 20×20 grid from latent embeddings
-
-### Phase 107+ (Optional POS Tagging)
-- [ ] Postgres: `metadata JSONB` with pos_tags (non-searchable)
-- [ ] Qdrant payload: `pos_tags` (ranking hints only)
-- [ ] PyTorch POS tagger (only after classifier is stable)
-
----
-
-## References
-
-- [Qdrant Payload Docs](https://qdrant.tech/documentation/concepts/payload/)
-- [Qdrant Named Vectors](https://qdrant.tech/documentation/concepts/vectors/#named-vectors)
-- [Qdrant Indexing](https://qdrant.tech/documentation/concepts/indexing/)
-- [pgvector Documentation](https://github.com/pgvector/pgvector)
-- [cuGraph PageRank](https://docs.rapids.ai/api/cugraph/stable/api_docs/algorithms.html#pagerank)
-- [scikit-learn LogisticRegression](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html)
-
+- Do not fall back from missing canonical vectors to a legacy 384 row.
+- Do not use `content_embedding_768` as canonical merely by name.
+- Do not use a Qdrant point/vector as Postgres authority.
+- Do not invent source/workspace/representation revisions.
+- Do not treat 768 dimensions alone as proof that two executor outputs are the
+  same representation revision.
+- Do not write vectors until the current workspace/source cohort is admitted and
+  the writer's authorization contract is satisfied.
