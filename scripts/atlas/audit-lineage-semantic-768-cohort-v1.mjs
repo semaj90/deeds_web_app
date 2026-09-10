@@ -13,6 +13,9 @@ const mapPath = path.resolve(process.env.ATLAS_CANDIDATE_MAP ?? path.join(ROOT, 
 const reportPath = path.resolve(process.env.ATLAS_SEMANTIC_COHORT_REPORT ?? path.join(ROOT, 'docs/reports/lineage-semantic-768-cohort-v1.json'));
 const clean = (value) => String(value ?? '').trim();
 const validRevision = (value) => /^sha256:[0-9a-f]{64}$/i.test(clean(value));
+const CANONICAL_VECTOR_COLUMN = 'content_embedding';
+const CANONICAL_VECTOR_TYPE = 'halfvec(768)';
+const ALTERNATE_VECTOR_COLUMN = 'content_embedding_768';
 
 function chunkHash(candidate) {
   const ref = (candidate.evidenceRefs ?? []).find((value) => String(value).startsWith('chunk:'));
@@ -29,7 +32,17 @@ async function main() {
     generatedAt: new Date().toISOString(),
     mode: 'READ_ONLY_EXACT_CHUNK_AUDIT',
     candidateMap: { path: path.relative(REPO_ROOT, mapPath), candidateSnapshotRevision: map.candidateSnapshotRevision ?? null, ordinalMapChecksum: map.ordinalMapChecksum ?? null, workspaceRevision: map.workspaceRevision ?? null, candidateCount: candidates.length },
-    contract: { representationId: 'semantic_768', dimensions: 768, projectionKind: 'NONE', canonicalVectorColumn: 'content_embedding_768', qdrantVectorName: 'content', canonicalAuthority: 'postgres' },
+    contract: {
+      representationId: 'semantic_768',
+      dimensions: 768,
+      projectionKind: 'NONE',
+      canonicalVectorColumn: CANONICAL_VECTOR_COLUMN,
+      canonicalVectorType: CANONICAL_VECTOR_TYPE,
+      alternateVectorColumn: ALTERNATE_VECTOR_COLUMN,
+      alternateVectorRole: 'LEGACY_ALTERNATE_NONCANONICAL',
+      qdrantVectorName: 'content',
+      canonicalAuthority: 'postgres',
+    },
     counts: { candidates: candidates.length, exactChunkRows: 0, missingChunkRows: 0, ambiguousChunkRows: 0, vectorsPresent: 0, producerMetadataPresent: 0, semanticQualified: 0 },
     candidates: [],
     writes: { postgresWrites: false, qdrantWrites: false, vectorGeneration: false },
@@ -39,21 +52,40 @@ async function main() {
   try {
     const schema = await pool.query(`SELECT column_name FROM information_schema.columns WHERE table_schema='public' AND table_name='codebase_chunk_index'`);
     const names = new Set(schema.rows.map((row) => row.column_name));
-    for (const required of ['source_ref', 'content_hash', 'content_embedding_768']) if (!names.has(required)) throw new Error(`SEMANTIC_COHORT_REQUIRED_COLUMN_MISSING:${required}`);
+    for (const required of ['source_ref', 'content_hash', CANONICAL_VECTOR_COLUMN]) if (!names.has(required)) throw new Error(`SEMANTIC_COHORT_REQUIRED_COLUMN_MISSING:${required}`);
+
+    const typeResult = await pool.query(`
+      SELECT format_type(a.atttypid, a.atttypmod) AS declared_type
+      FROM pg_attribute a
+      JOIN pg_class c ON c.oid = a.attrelid
+      JOIN pg_namespace n ON n.oid = c.relnamespace
+      WHERE n.nspname = 'public'
+        AND c.relname = 'codebase_chunk_index'
+        AND a.attname = $1
+        AND a.attnum > 0
+        AND NOT a.attisdropped
+    `, [CANONICAL_VECTOR_COLUMN]);
+    const declaredType = clean(typeResult.rows[0]?.declared_type);
+    report.contract.observedCanonicalVectorType = declaredType || null;
+    report.contract.canonicalVectorTypeMatches = declaredType === CANONICAL_VECTOR_TYPE;
+    if (declaredType !== CANONICAL_VECTOR_TYPE) {
+      throw new Error(`SEMANTIC_COHORT_CANONICAL_VECTOR_TYPE_MISMATCH:expected=${CANONICAL_VECTOR_TYPE}:observed=${declaredType || 'missing'}`);
+    }
+
     const optional = ['id', 'embedding_model', 'embedding_version', 'encoder_id', 'embedding_dimension', 'embedding_dtype', 'embedding_normalized', 'qdrant_id'];
     for (const candidate of candidates) {
       const sourceRef = clean(candidate.sourceRef);
       const hash = chunkHash(candidate);
-      const result = hash ? await pool.query(`SELECT ${['source_ref', 'content_hash', 'content_embedding_768', ...optional.filter((name) => names.has(name)).map((name) => name === 'id' ? 'id::text AS id' : `"${name}"`)].join(', ')} FROM public.codebase_chunk_index WHERE source_ref=$1 AND lower(content_hash)=lower($2) ORDER BY ${names.has('id') ? 'id' : 'source_ref'}`, [sourceRef, hash]) : { rows: [] };
+      const result = hash ? await pool.query(`SELECT ${['source_ref', 'content_hash', CANONICAL_VECTOR_COLUMN, ...optional.filter((name) => names.has(name)).map((name) => name === 'id' ? 'id::text AS id' : `"${name}"`)].join(', ')} FROM public.codebase_chunk_index WHERE source_ref=$1 AND lower(content_hash)=lower($2) ORDER BY ${names.has('id') ? 'id' : 'source_ref'}`, [sourceRef, hash]) : { rows: [] };
       const row = result.rows.length === 1 ? result.rows[0] : null;
       if (result.rows.length === 0) report.counts.missingChunkRows += 1;
       else if (result.rows.length !== 1) report.counts.ambiguousChunkRows += 1;
       else {
         report.counts.exactChunkRows += 1;
-        if (row.content_embedding_768 !== null && row.content_embedding_768 !== undefined) report.counts.vectorsPresent += 1;
+        if (row[CANONICAL_VECTOR_COLUMN] !== null && row[CANONICAL_VECTOR_COLUMN] !== undefined) report.counts.vectorsPresent += 1;
         if (clean(row.embedding_model) && clean(row.embedding_version) && clean(row.embedding_dimension) === '768') report.counts.producerMetadataPresent += 1;
       }
-      const vectorPresent = Boolean(row && row.content_embedding_768 !== null && row.content_embedding_768 !== undefined);
+      const vectorPresent = Boolean(row && row[CANONICAL_VECTOR_COLUMN] !== null && row[CANONICAL_VECTOR_COLUMN] !== undefined);
       const metadataPresent = Boolean(row && clean(row.embedding_model) && clean(row.embedding_version) && clean(row.embedding_dimension) === '768');
       report.candidates.push({ candidateOrdinal: candidate.candidateOrdinal, packetKey: candidate.packetKey, sourceRef, sourceRevision: candidate.sourceRevision ?? null, workspaceRevision: candidate.workspaceRevision ?? null, chunkContentHash: hash, codebaseChunkId: row?.id ?? null, vectorPresent, producerMetadataPresent: metadataPresent, semanticRevision: vectorPresent && metadataPresent ? `semantic_768:${row.embedding_model}:${row.embedding_version}:${row.encoder_id ?? 'encoder-unspecified'}` : null, classification: result.rows.length === 0 ? 'EXACT_CHUNK_ROW_MISSING' : result.rows.length !== 1 ? 'EXACT_CHUNK_ROW_AMBIGUOUS' : !vectorPresent ? 'SEMANTIC_VECTOR_MISSING' : !metadataPresent ? 'SEMANTIC_PRODUCER_METADATA_MISSING' : 'SEMANTIC_768_EXACT_READY' });
     }
