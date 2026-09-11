@@ -84,6 +84,11 @@ describe('WorkspaceRevisionRecordV1', () => {
     const b = entry('src/a.ts', 'two', BLOB_B);
     expect(() => build([a, b])).toThrow(/DUPLICATE_SOURCE_REF/);
   });
+
+  it('rejects Svelte import aliases as source identity', () => {
+    const source = entry('$lib/utils/file-reader.ts', 'export const reader = true;\n', BLOB_A);
+    expect(() => build([source])).toThrow(/physical repository path/);
+  });
 });
 
 describe('WorkspaceSourceBindingV1', () => {

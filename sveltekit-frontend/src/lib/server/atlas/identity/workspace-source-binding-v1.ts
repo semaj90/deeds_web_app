@@ -9,6 +9,9 @@ const sourceRef = z.string().min(1).superRefine((value, ctx) => {
   if (normalized.startsWith('/') || /^[A-Za-z]:\//.test(normalized) || normalized.split('/').includes('..')) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'sourceRef must be repository-relative and traversal-free' });
   }
+  if (/^(?:\$lib|\$app|@|~)\//.test(normalized)) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'sourceRef must be a physical repository path, not an import alias' });
+  }
 });
 const gitObjectFormatSchema = z.enum(['sha1', 'sha256']);
 
