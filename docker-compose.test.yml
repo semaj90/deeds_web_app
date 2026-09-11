@@ -93,7 +93,7 @@ services:
 
   # Valkey Cache
   valkey:
-    image: valkey/valkey:8-alpine
+    image: valkey/valkey:8-alpine@sha256:d2e18f3410b6f616de1417f570fa55261af2898b9c5b2cfb6781ce2373ea43d1
     container_name: deeds-valkey-prod
     restart: unless-stopped
     command: >

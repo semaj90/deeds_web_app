@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   adaptWorkspaceBindingsToSourceSelectionV1,
+  adaptSealedSnapshotSourcesToRepositoryQualifiedMembershipV2,
   recordRepositoryQualifiedSourceMembershipV2,
   recordInventoryStage,
   recordStructuralStage,
@@ -33,6 +34,22 @@ function binding(sourceRef: string, sourceRevision = content) {
 }
 
 describe('adaptWorkspaceBindingsToSourceSelectionV1', () => {
+  it('adapts sealed multi-repository sources without collapsing repository namespaces', () => {
+    const result = adaptSealedSnapshotSourcesToRepositoryQualifiedMembershipV2(revision, [
+      { repositoryId: 'repo:root', repositoryRelativePath: 'src/index.ts', sourceRef: 'repo:root:src/index.ts', sourceRevision: content, contentDigest: content, byteLength: 12, sourceIdentityKey: 'repo:root:src/index.ts', repositoryPath: '' },
+      { repositoryId: 'repo:nested', repositoryRelativePath: 'src/index.ts', sourceRef: 'repo:nested:src/index.ts', sourceRevision: content, contentDigest: content, byteLength: 12 },
+    ]);
+    expect(result.map((row) => `${row.repositoryId}:${row.repositoryRelativePath}`)).toEqual([
+      'repo:root:src/index.ts', 'repo:nested:src/index.ts',
+    ]);
+  });
+
+  it('rejects duplicate repository-qualified identities before a writer is called', () => {
+    const source = { repositoryId: 'repo:root', repositoryRelativePath: 'src/index.ts', sourceRef: 'src/index.ts', sourceRevision: content, contentDigest: content, byteLength: 12 };
+    expect(() => adaptSealedSnapshotSourcesToRepositoryQualifiedMembershipV2(revision, [source, source]))
+      .toThrow('GRAPHIFY_SNAPSHOT_V2_DUPLICATE_SOURCE_IDENTITY');
+  });
+
   it('writes repository-qualified membership through the v2 owner only', async () => {
     const queries: string[] = [];
     const client = { query: async (text: string) => { queries.push(text); return { rowCount: 1, rows: [] }; } };

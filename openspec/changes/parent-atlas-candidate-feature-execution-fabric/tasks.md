@@ -1418,3 +1418,19 @@ future session wants the specific test invariants migrated into `candidate-featu
 v1.spec.ts` for extra belt-and-suspenders coverage, that remains a legitimate, low-priority
 follow-up, not a blocker -- the underlying safety properties are still proven, just not
 double-proven in the canonical spec file.
+### QDRANT-PACKET-FANOUT-IDENTITY-01 recheck (2026-09-10)
+
+- [x] Ran the read-only packet fanout census against `codebase_chunks_768`.
+- [x] Confirmed `109,776` points, `9,964` packet keys, `4,351` multi-point
+      groups, and `104,163` points in fanout groups.
+- [x] Confirmed only `30` points carry source/workspace revisions and only
+      `677` carry representation revisions; `5,701` groups remain revision
+      unproven, with `1,616` conflicting-source groups and `2,630` exact
+      duplicate projection groups.
+- [ ] Keep Qdrant promotion blocked. No payload repair or projection write was
+      performed.
+
+Evidence: `docs/reports/qdrant-packet-fanout-v1.json`.
+Status: `IDENTITY_OR_REVISION_GAPS`; authority=false; writesPerformed=false.
+First blocker: `QDRANT_CANONICAL_IDENTITY_AND_REVISION_COVERAGE_UNPROVEN`.
+Next gate: current source/structural lineage before any bounded Qdrant canary.

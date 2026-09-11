@@ -1,6 +1,6 @@
 {
   "schema": "atlas.current-structural-edge-contract.v1",
-  "generatedAt": "2026-09-09T01:51:33.193Z",
+  "generatedAt": "2026-09-10T22:55:12.628Z",
   "mode": "READ_ONLY_CONTRACT_AUDIT",
   "canonicalAuthority": false,
   "writes": {
@@ -11,14 +11,14 @@
     "graphRevision": false
   },
   "input": "docs/reports/current-structural-edge-artifact-plan-v2.json",
-  "sourcePlanSelectionChecksum": "1027c9671b2150da95e104c9933e80cf75cb99846fad89e2f290eb34ddd308d1",
-  "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+  "sourcePlanSelectionChecksum": "6e3df0dce6fab8c3577b30a3cc7a335828a708133a0172d9fcfaaf624d01c7c3",
+  "workspaceRevision": "sha256:f476b4a6aac2afcafe0f82c7b0e48d52951ccbce73fca52b9706b1f1fbfabefb",
   "graphRevision": null,
   "graphRevisionStatus": "NOT_ASSIGNED",
-  "nodeCount": 2545,
-  "edgeCount": 1334,
+  "nodeCount": 0,
+  "edgeCount": 0,
   "nodeSetChecksum": null,
-  "edgeInputChecksum": "sha256:fd50734c46f66046a2afe17d60fe8af225d03c4b71dddba950a66fcad1a5db2a",
+  "edgeInputChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
   "missingNodeFields": {
     "graphNodeKey": 0,
     "sourceRef": 0,
@@ -63,7 +63,7 @@
     "stableEdgeIdentity": "edgeId must be derived from revision-bound endpoints/type/evidence",
     "evidenceRule": "evidenceRefs and evidenceChecksum must bind each edge to exact source evidence"
   },
-  "status": "CONTRACT_READY_FOR_SNAPSHOT_REVIEW",
+  "status": "CONTRACT_INCOMPLETE",
   "admission": {
     "graphSnapshotAllowed": false,
     "reason": "This audit does not assign graphRevision; incomplete producer/evidence fields keep snapshot admission closed."

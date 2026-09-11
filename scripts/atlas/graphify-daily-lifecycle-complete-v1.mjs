@@ -20,9 +20,43 @@ const FRONTEND = path.resolve(ROOT, 'sveltekit-frontend');
 const RECEIPT_PATH = path.resolve(ROOT, 'docs/reports/graphify-daily-lifecycle-v1.json');
 
 const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
+const TERMINAL_AUTHORIZATION = 'AUTHORIZE_GRAPHIFY_POST_PHASE16_TERMINAL_RUN_V1';
 
 async function main() {
   const receipt = JSON.parse(readFileSync(RECEIPT_PATH, 'utf8'));
+
+  // Snapshot-native opener receipts belong to graphify_executions and the
+  // repository-qualified membership_v2 owner. Keep this branch schema-gated
+  // so legacy graphify_runs receipts retain their existing completion path.
+  if (receipt.schema === 'atlas.graphify-daily-snapshot-native-open.v1') {
+    if (process.env.ATLAS_GRAPHIFY_TERMINAL_AUTHORIZATION !== TERMINAL_AUTHORIZATION) {
+      throw new Error(`GRAPHIFY_TERMINAL_AUTHORIZATION=${TERMINAL_AUTHORIZATION} is required`);
+    }
+    if (receipt.status !== 'SNAPSHOT_NATIVE_EXECUTION_OPENED' || !receipt.executionId) {
+      throw new Error(`GRAPHIFY_SNAPSHOT_NATIVE_RECEIPT_NOT_COMPLETABLE:${JSON.stringify({ status: receipt.status, executionId: receipt.executionId })}`);
+    }
+    const pool = new pg.Pool({ connectionString: DATABASE_URL, max: 2 });
+    const client = await pool.connect();
+    try {
+      const { completeExecution } = await import(
+        'file:///' + path.resolve(FRONTEND, 'src/lib/server/atlas/indexing/graphify-daily-coordinator-v1.ts').replace(/\\/g, '/')
+      );
+      await completeExecution({ query: (text, values) => client.query(text, values) }, receipt.executionId, { status: 'COMPLETED' });
+      const completedAt = new Date().toISOString();
+      writeFileSync(RECEIPT_PATH, JSON.stringify({
+        ...receipt,
+        status: 'SNAPSHOT_NATIVE_EXECUTION_COMPLETED',
+        terminalStatus: 'COMPLETED',
+        completedAt,
+      }, null, 2) + '\n');
+      console.log(JSON.stringify({ status: 'SNAPSHOT_NATIVE_LIFECYCLE_COMPLETE', executionId: receipt.executionId, completedAt, receiptPath: RECEIPT_PATH }));
+      return;
+    } finally {
+      client.release();
+      await pool.end();
+    }
+  }
+
   if (receipt.status !== 'RUNNING' || !receipt.runId || !receipt.workspaceId) {
     throw new Error(`GRAPHIFY_DAILY_LIFECYCLE_RECEIPT_NOT_COMPLETABLE:${JSON.stringify({ status: receipt.status, runId: receipt.runId })}`);
   }

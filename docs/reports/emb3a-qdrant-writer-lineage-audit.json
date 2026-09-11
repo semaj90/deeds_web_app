@@ -1,6 +1,6 @@
 {
   "schema": "atlas.emb3a.qdrant.writer.lineage.audit.v1",
-  "generatedAt": "2026-08-25T20:19:35.283Z",
+  "generatedAt": "2026-09-10T17:44:34.151Z",
   "readOnly": true,
   "collection": "codebase_chunks_768",
   "requiredPayloadFields": [

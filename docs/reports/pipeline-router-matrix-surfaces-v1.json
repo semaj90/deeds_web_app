@@ -1,6 +1,6 @@
 {
   "schema": "atlas.pipeline-router-matrix-surfaces.v1",
-  "generatedAt": "2026-09-09T23:29:21.340Z",
+  "generatedAt": "2026-09-10T20:06:23.818Z",
   "mode": "READ_ONLY",
   "writesPerformed": false,
   "authority": false,
@@ -9,7 +9,15 @@
     "executableRouter": "sveltekit-frontend/src/lib/server/routing/query-router-4x4.ts",
     "legacyMatrixVocabulary": "sveltekit-frontend/src/lib/server/retrieval/router-matrix.ts",
     "candidateFeatureMatrix": "sveltekit-frontend/src/lib/server/retrieval/retrieval-candidate-feature-matrix-v1.ts",
-    "fusionOwner": "SearchRuntime"
+    "fusionOwner": "SearchRuntime",
+    "classification": {
+      "canonicalExecutableRouter": "sveltekit-frontend/src/lib/server/routing/query-router-4x4.ts",
+      "compatibilityVocabulary": "sveltekit-frontend/src/lib/server/retrieval/router-matrix.ts",
+      "featureMatrixData": "sveltekit-frontend/src/lib/server/retrieval/retrieval-candidate-feature-matrix-v1.ts",
+      "canonicalRouterLiveConsumerCount": 2,
+      "compatibilityVocabularyLiveConsumerCount": 0,
+      "featureMatrixLiveConsumerCount": 9
+    }
   },
   "staticSurfaces": [
     {
@@ -26,7 +34,13 @@
       ],
       "executableRouter": true,
       "matrixDefinition": true,
-      "candidateMatrix": false
+      "candidateMatrix": false,
+      "ownershipClassification": "CANONICAL_EXECUTABLE_ROUTER",
+      "importConsumers": [
+        "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
+        "sveltekit-frontend/src/routes/api/admin/observability/+server.ts"
+      ],
+      "liveConsumerCount": 2
     },
     {
       "file": "sveltekit-frontend/src/lib/server/retrieval/query-router-4x4.ts",
@@ -39,7 +53,10 @@
       ],
       "executableRouter": true,
       "matrixDefinition": false,
-      "candidateMatrix": false
+      "candidateMatrix": false,
+      "ownershipClassification": "LEGACY_EXECUTABLE_ROUTER",
+      "importConsumers": [],
+      "liveConsumerCount": 0
     },
     {
       "file": "sveltekit-frontend/src/lib/server/retrieval/router-matrix.ts",
@@ -52,7 +69,10 @@
       ],
       "executableRouter": true,
       "matrixDefinition": true,
-      "candidateMatrix": false
+      "candidateMatrix": false,
+      "ownershipClassification": "COMPATIBILITY_VOCABULARY",
+      "importConsumers": [],
+      "liveConsumerCount": 0
     },
     {
       "file": "sveltekit-frontend/src/lib/server/ace/stage-a0-routing.ts",
@@ -66,7 +86,10 @@
       ],
       "executableRouter": false,
       "matrixDefinition": false,
-      "candidateMatrix": false
+      "candidateMatrix": false,
+      "ownershipClassification": "STAGE_ROUTING_ADAPTER",
+      "importConsumers": [],
+      "liveConsumerCount": 0
     },
     {
       "file": "sveltekit-frontend/src/lib/server/atlas/feature-matrix-schema.ts",
@@ -105,7 +128,18 @@
       ],
       "executableRouter": false,
       "matrixDefinition": false,
-      "candidateMatrix": false
+      "candidateMatrix": false,
+      "ownershipClassification": "FEATURE_SCHEMA",
+      "importConsumers": [
+        "sveltekit-frontend/src/lib/server/atlas/classifier-feature-manifest.spec.ts",
+        "sveltekit-frontend/src/lib/server/atlas/contracts/classification-envelope-v1.spec.ts",
+        "sveltekit-frontend/src/lib/server/atlas/contracts/classification-ledger-writer.spec.ts",
+        "sveltekit-frontend/src/lib/server/atlas/contracts/classification-ledger-writer.ts",
+        "sveltekit-frontend/src/lib/server/atlas/contracts/ontology-linked-tuple-v1.ts",
+        "sveltekit-frontend/src/lib/server/atlas/enriched-tree-node-contract.spec.ts",
+        "sveltekit-frontend/src/lib/server/atlas/okf-topic-ingestion.ts"
+      ],
+      "liveConsumerCount": 7
     },
     {
       "file": "sveltekit-frontend/src/lib/server/retrieval/retrieval-candidate-feature-matrix-v1.ts",
@@ -117,7 +151,20 @@
       ],
       "executableRouter": false,
       "matrixDefinition": false,
-      "candidateMatrix": true
+      "candidateMatrix": true,
+      "ownershipClassification": "FEATURE_MATRIX_DATA",
+      "importConsumers": [
+        "sveltekit-frontend/src/lib/server/atlas/classification/classification-control-plane-v1.ts",
+        "sveltekit-frontend/src/lib/server/atlas/graph/s-graph-candidate-projection.ts",
+        "sveltekit-frontend/src/lib/server/atlas/retrieval/qas-neural-execution-bridge.ts",
+        "sveltekit-frontend/src/lib/server/atlas/retrieval/search-runtime-adapter.ts",
+        "sveltekit-frontend/src/lib/server/atlas/retrieval/search-runtime-qas-feature-resolver.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/repair-candidate-feature-matrix-v1.spec.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/repair-candidate-feature-matrix-v1.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/repair-feature-producer-v1.spec.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/retrieval-candidate-feature-matrix-v1.spec.ts"
+      ],
+      "liveConsumerCount": 9
     }
   ],
   "postgres": {
@@ -1815,8 +1862,11 @@
     "errors": []
   },
   "blockers": [
-    "MULTIPLE_ROUTER_MATRIX_DEFINITIONS"
+    "ROUTER_OWNER_CONSOLIDATION_NOT_AUTHORIZED"
+  ],
+  "notes": [
+    "MULTIPLE_ROUTER_MATRIX_DEFINITIONS_RECLASSIFIED_BY_ROLE"
   ],
   "status": "SURFACES_CENSUSED_REVIEW_REQUIRED",
-  "firstBlockingInvariant": "MULTIPLE_ROUTER_MATRIX_DEFINITIONS"
+  "firstBlockingInvariant": "ROUTER_OWNER_CONSOLIDATION_NOT_AUTHORIZED"
 }

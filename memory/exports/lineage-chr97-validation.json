@@ -1,5 +1,5 @@
 {
-  "ts": "2026-08-26T23:45:56.706Z",
+  "ts": "2026-09-10T17:45:09.016Z",
   "overall": "FAIL",
   "passRate": 0.6154,
   "passRatePct": "61.5%",
@@ -12,47 +12,47 @@
     {
       "id": "C1:ncp_in_atlas",
       "status": "pass",
-      "message": "nes_chrom_packets in atlas_feature_map: 328/328 (100.0%)",
+      "message": "nes_chrom_packets in atlas_feature_map: 1992/1992 (100.0%)",
       "detail": {
-        "total": 328,
-        "in_atlas": 328
+        "total": 1992,
+        "in_atlas": 1992
       }
     },
     {
       "id": "C2:ncp_feature_id",
       "status": "pass",
-      "message": "nes_chrom_packets with feature_id: 328/328 (100.0%)",
+      "message": "nes_chrom_packets with feature_id: 1992/1992 (100.0%)",
       "detail": {
-        "withFeature": 328,
-        "total": 328
+        "withFeature": 1992,
+        "total": 1992
       }
     },
     {
       "id": "C3:ncp_chunk_id",
       "status": "pass",
-      "message": "nes_chrom_packets with chunk_id: 328/328 (100.0%)",
+      "message": "nes_chrom_packets with chunk_id: 1992/1992 (100.0%)",
       "detail": {
-        "withChunk": 328,
-        "total": 328
+        "withChunk": 1992,
+        "total": 1992
       }
     },
     {
       "id": "C4:ncp_kag_node_key",
       "status": "fail",
-      "message": "nes_chrom_packets with kag_node_key: 0/328 (0.0%)",
+      "message": "nes_chrom_packets with kag_node_key: 0/1992 (0.0%)",
       "detail": {
         "withKagKey": 0,
-        "total": 328
+        "total": 1992
       }
     },
     {
       "id": "C5:ncp_qdrant_reachability",
       "status": "fail",
-      "message": "nes_chrom_packets qdrant_point_id: 0/328 have ID (0.0%); Qdrant reachable: 0/0 sampled (100.0%)",
+      "message": "nes_chrom_packets qdrant_point_id: 0/1992 have ID (0.0%); Qdrant reachable: 0/0 sampled (100.0%)",
       "detail": {
         "withQdrantId": 0,
-        "qdrantMissing": 328,
-        "total": 328,
+        "qdrantMissing": 1992,
+        "total": 1992,
         "qdrantIdRate": 0,
         "qdrantReachRate": 1
       }

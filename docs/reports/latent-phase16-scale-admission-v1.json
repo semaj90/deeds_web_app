@@ -1,6 +1,6 @@
 {
   "schema": "atlas.latent-phase16-scale-admission.v1",
-  "generatedAt": "2026-09-09T22:32:23.626Z",
+  "generatedAt": "2026-09-10T18:26:32.489Z",
   "mode": "READ_ONLY",
   "status": "SCALE_ADMISSION_BLOCKED_AUTHORITY_AND_CAPACITY",
   "proofLevel": "PARTIAL_PROVEN",

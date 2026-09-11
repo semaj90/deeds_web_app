@@ -6,6 +6,9 @@
 !python-services/**
 !python/**
 !services/atlas-gpu-8098/**
+!docker/atlas-gpu-8098/
+!docker/atlas-gpu-8098/Dockerfile
+!docker/atlas-gpu-8098/requirements.txt
 !tensor_services/**
 !engine-builder/**
 !training/**

@@ -8,7 +8,9 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const canonicalPath = resolve(ROOT, 'docs/graph/codebase-graph.json');
-const builderPath = resolve(ROOT, 'scripts/atlas/graphify-trigger-downstream-pipeline.mjs');
+// The canonical graph writer is the full-repository indexer. The downstream
+// chain consumes the graph but does not own its publication contract.
+const builderPath = resolve(ROOT, 'sveltekit-frontend/scripts/index-codebase-fast.mjs');
 const exportPath = resolve(ROOT, 'scripts/atlas/generate-graph-exports.mjs');
 const reportPath = resolve(ROOT, 'docs/reports/graphify-atomic-publication-preflight-v1.json');
 

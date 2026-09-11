@@ -5,6 +5,7 @@ import { resolve } from 'node:path';
 import { loadAtlasEnv } from './load-atlas-env.mjs';
 import {
   adaptWorkspaceBindingsToSourceSelectionV1,
+  adaptSealedSnapshotSourcesToRepositoryQualifiedMembershipV2,
   recordRepositoryQualifiedSourceSelectionStageV2,
   openExecution,
   recordInventoryStage,
@@ -108,14 +109,10 @@ const selectedSnapshotSources = fullMode ? snapshot.sources : rootSources.slice(
     throw new Error(`Expected ${expectedCount} qualified source bindings from fresh materialization, got ${selectedBindings.length}`);
   }
   const bindings = adaptWorkspaceBindingsToSourceSelectionV1(workspaceRevision, selectedBindings);
-  const repositoryBindings = selectedSnapshotSources.map((source) => ({
-    repositoryId: source.repositoryId,
-    repositoryRelativePath: source.repositoryRelativePath,
-    sourceRef: source.sourceRef,
-    codeSourceRevision: source.sourceRevision,
-    contentHash: source.contentDigest,
-    byteLength: source.byteLength,
-  }));
+  const repositoryBindings = adaptSealedSnapshotSourcesToRepositoryQualifiedMembershipV2(
+    workspaceRevision,
+    selectedSnapshotSources,
+  );
 
   const workspaceResult = await client.query('SELECT id FROM public.workspaces WHERE id = $1::uuid', [WORKSPACE_ID]);
   const workspaceId = workspaceResult.rows[0]?.id as string | undefined;
@@ -151,7 +148,10 @@ const selectedSnapshotSources = fullMode ? snapshot.sources : rootSources.slice(
     receiptRef: 'docs/reports/graphify-daily-coordinator-canary-v1.json',
   });
   const structuralBinding = bindings.find((binding) => binding.sourceRef === rootSources[0]?.sourceRef) ?? bindings[0];
-  const structuralSourcePath = resolve(process.cwd(), '..', structuralBinding.sourceRef);
+  const materializedSourceRoot = process.env.ATLAS_GRAPHIFY_SOURCE_SNAPSHOT_ROOT?.trim()
+    ? resolve(process.env.ATLAS_GRAPHIFY_SOURCE_SNAPSHOT_ROOT)
+    : resolve(process.cwd(), '..');
+  const structuralSourcePath = resolve(materializedSourceRoot, structuralBinding.sourceRef);
   const structuralSourceBuffer = await readFile(structuralSourcePath);
   const structuralSource = structuralSourceBuffer.toString('utf8');
   const observedSourceRevision = `sha256:${createHash('sha256').update(structuralSourceBuffer).digest('hex')}`;

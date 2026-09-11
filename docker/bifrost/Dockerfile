@@ -1,4 +1,4 @@
-FROM maximhq/bifrost:latest
+FROM maximhq/bifrost@sha256:dba96a5a12219a8e0973f7461496def114be06a712bd552f5d33b31a75528eb2
 
 # maximhq/bifrost:latest is Alpine-based and ships without git, which disables
 # the Claude Code / Codex marketplace routes in the Bifrost UI ("git binary

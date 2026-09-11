@@ -61,7 +61,7 @@ services:
 
   # ── Valkey Bundle Server ────────────────────────────────────────────────────
   valkey:
-    image: valkey/valkey-bundle:8.1.1
+    image: valkey/valkey-bundle:8.1.1@sha256:8b6501bf71570ee597e621628b141500d9ad24a4137296dbd92ff7791c14367f
     container_name: legal-ai-valkey-prod
     restart: unless-stopped
     deploy:
@@ -102,7 +102,7 @@ services:
 
   # ── Qdrant Vector DB ───────────────────────────────────────────────────────
   qdrant:
-    image: qdrant/qdrant:v1.19.0
+    image: qdrant/qdrant:v1.19.0@sha256:057ee3a8da769fe7310dd3537b4dc7583bf87a95ce8ac43c0af5a46bc580d1fc
     container_name: legal-ai-qdrant-prod
     restart: unless-stopped
     deploy:
@@ -134,7 +134,7 @@ services:
 
   # ── Neo4j Graph DB ─────────────────────────────────────────────────────────
   neo4j:
-    image: neo4j:5-community
+    image: neo4j:5-community@sha256:937fbd163e302a5751dd329b719c1b05e2a4293af223d61b1aa17e3dea087709
     container_name: legal-ai-neo4j-prod
     restart: unless-stopped
     deploy:
@@ -173,7 +173,7 @@ services:
 
   # ── SearXNG Privacy Search ─────────────────────────────────────────────────
   searxng:
-    image: searxng/searxng:latest
+    image: searxng/searxng:latest@sha256:15275f138662b0eefd62c492a919b29c4662c42004efe4b1a245c92cc6d2fef1
     container_name: legal-ai-searxng-prod
     restart: unless-stopped
     deploy:
@@ -202,7 +202,7 @@ services:
 
   # ── SeaweedFS Master ───────────────────────────────────────────────────────
   seaweedfs-master:
-    image: chrislusf/seaweedfs:latest
+    image: chrislusf/seaweedfs:latest@sha256:800b2115c63236e8bd0e5d572dc25dd493dc2feed08b54a2a269dc0101c9d94a
     container_name: legal-ai-seaweed-master-prod
     restart: unless-stopped
     command: master -mdir=/data -ip=seaweedfs-master -port=9333
@@ -232,7 +232,7 @@ services:
 
   # ── SeaweedFS Volume ───────────────────────────────────────────────────────
   seaweedfs-volume:
-    image: chrislusf/seaweedfs:latest
+    image: chrislusf/seaweedfs:latest@sha256:800b2115c63236e8bd0e5d572dc25dd493dc2feed08b54a2a269dc0101c9d94a
     container_name: legal-ai-seaweed-volume-prod
     restart: unless-stopped
     command: volume -mserver=seaweedfs-master:9333 -ip=seaweedfs-volume -port=8080 -dir=/data -dataCenter=dc1
@@ -259,7 +259,7 @@ services:
 
   # ── SeaweedFS Filer ────────────────────────────────────────────────────────
   seaweedfs-filer:
-    image: chrislusf/seaweedfs:latest
+    image: chrislusf/seaweedfs:latest@sha256:800b2115c63236e8bd0e5d572dc25dd493dc2feed08b54a2a269dc0101c9d94a
     container_name: legal-ai-seaweed-filer-prod
     restart: unless-stopped
     command: filer -master=seaweedfs-master:9333 -port=8888
@@ -289,7 +289,7 @@ services:
 
   # ── SeaweedFS S3-Compatible Gateway ────────────────────────────────────────
   seaweedfs-s3:
-    image: chrislusf/seaweedfs:latest
+    image: chrislusf/seaweedfs:latest@sha256:800b2115c63236e8bd0e5d572dc25dd493dc2feed08b54a2a269dc0101c9d94a
     container_name: legal-ai-seaweed-s3-prod
     restart: unless-stopped
     command: s3 -filer=seaweedfs-filer:8888 -port=8333 -config=/etc/seaweedfs/s3.json

@@ -1,6 +1,6 @@
 {
   "schema": "atlas.source-lineage-model.v1",
-  "generatedAt": "2026-09-08T03:00:02.181Z",
+  "generatedAt": "2026-09-10T17:35:53.608Z",
   "readOnly": true,
   "postgresWrites": false,
   "observation": {
@@ -16,7 +16,7 @@
     "currentProjection": "READ_ONLY_QUERY_SHAPE_PROVEN_NOT_DURABLE_VIEW"
   },
   "tables": {
-    "atlas_packets": 140,
+    "atlas_packets": 141,
     "atlas_source_aliases": 12,
     "atlas_source_refs": 23,
     "atlas_workspace_source_bindings": 13,

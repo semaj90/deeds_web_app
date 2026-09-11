@@ -52,26 +52,31 @@ try {
       qdrantContentHash: payload.content_hash ?? null,
     };
   });
+  const counts = {
+    plannedSources: sourceRefs.length,
+    packetRows: packets.length,
+    packetQdrantIds: ids.length,
+    qdrantPointsFound: points.length,
+    sourceMatches: comparisons.filter((row) => row.qdrantSourceRef === row.sourceRef).length,
+    chunkIdMatches: comparisons.filter((row) => row.packetChunkId && row.packetChunkId === row.qdrantChunkId).length,
+    contentHashMatches: comparisons.filter((row) => row.packetContentHash && row.packetContentHash === row.qdrantContentHash).length,
+  };
+  const nonEmptyExactBridge = counts.packetRows > 0
+    && counts.packetQdrantIds === counts.packetRows
+    && counts.qdrantPointsFound === counts.packetRows;
   const report = {
     schema: 'atlas.current-packet-qdrant-bridge.v1',
     mode: 'READ_ONLY_CENSUS',
     collection,
     sourcePlan: path.relative(root, planPath),
-    counts: {
-      plannedSources: sourceRefs.length,
-      packetRows: packets.length,
-      packetQdrantIds: ids.length,
-      qdrantPointsFound: points.length,
-      sourceMatches: comparisons.filter((row) => row.qdrantSourceRef === row.sourceRef).length,
-      chunkIdMatches: comparisons.filter((row) => row.packetChunkId && row.packetChunkId === row.qdrantChunkId).length,
-      contentHashMatches: comparisons.filter((row) => row.packetContentHash && row.packetContentHash === row.qdrantContentHash).length,
-    },
+    counts,
     samples: comparisons.slice(0, 10),
     matchedSamples: comparisons.filter((row) => row.qdrantFound).slice(0, 10),
     writes: { postgres: false, qdrant: false, neo4j: false, valkey: false },
     canonicalAuthority: false,
-    status: points.length === packets.length ? 'PACKET_QDRANT_BRIDGE_PRESENT' : 'PACKET_QDRANT_BRIDGE_MISSING',
-    nextGate: points.length === packets.length ? 'PACKET_QDRANT_PAYLOAD_RECONCILIATION' : 'PACKET_CHUNK_IDENTITY_BRIDGE',
+    status: nonEmptyExactBridge ? 'PACKET_QDRANT_BRIDGE_PRESENT' : 'PACKET_QDRANT_BRIDGE_MISSING',
+    firstBlockingInvariant: nonEmptyExactBridge ? null : 'NON_EMPTY_EXACT_PACKET_QDRANT_COHORT_REQUIRED',
+    nextGate: nonEmptyExactBridge ? 'PACKET_QDRANT_PAYLOAD_RECONCILIATION' : 'PACKET_CHUNK_IDENTITY_BRIDGE',
   };
   fs.mkdirSync(path.dirname(reportPath), { recursive: true });
   fs.writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');

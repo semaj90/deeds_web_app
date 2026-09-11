@@ -88,7 +88,9 @@ function main() {
     sources,
   };
   fs.mkdirSync(path.dirname(REPORT_PATH), { recursive: true });
-  fs.writeFileSync(REPORT_PATH, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+  const temporaryReportPath = `${REPORT_PATH}.${process.pid}.tmp`;
+  fs.writeFileSync(temporaryReportPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+  fs.renameSync(temporaryReportPath, REPORT_PATH);
   console.log(JSON.stringify({ status: report.fullWorkspaceSafe ? 'SAFE_TO_PROJECT' : 'NOT_SAFE_TO_PROJECT', firstBlockingGate: report.firstBlockingGate, nextGate: report.nextGate, reportPath: REPORT_PATH, writesPerformed: false }, null, 2));
 }
 

@@ -3,7 +3,7 @@ version: '3.8'
 services:
   # Valkey for caching (lightweight)
   valkey:
-    image: valkey/valkey-bundle:8.1.1
+    image: valkey/valkey-bundle:8.1.1@sha256:8b6501bf71570ee597e621628b141500d9ad24a4137296dbd92ff7791c14367f
     container_name: legal-ai-valkey-light
     command: valkey-server --requirepass redis --port 6379
     ports:
@@ -40,7 +40,7 @@ services:
 
   # Caddy reverse proxy with QUIC (lightweight)
   caddy:
-    image: caddy:2.8-alpine
+    image: caddy:2.8-alpine@sha256:af32e97399febea808609119bb21544d0265c58a02836576e32a2d082c262c17
     container_name: legal-ai-caddy-light
     ports:
       - "5178:5178"  # Main QUIC port

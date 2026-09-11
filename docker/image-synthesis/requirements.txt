@@ -1,0 +1,43 @@
+# Image Synthesis + 3D Crime Scene Reconstruction
+# Python 3.11+ | RTX 3060 Ti (8GB VRAM)
+# Pipeline: FLUX.1-schnell (keyframe) → Wan2.1-1.3B (video) → DepthAnything v2 (depth)
+
+# === Core ===
+fastapi==0.138.1
+uvicorn[standard]==0.49.0
+httpx==0.28.1
+pydantic==2.13.4
+numpy==2.4.6
+Pillow==12.2.0
+
+# === PyTorch + CUDA (RTX 3060 Ti, CUDA 12.1) ===
+# Install with: pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
+torch==2.12.1
+torchvision==0.27.1
+
+# === Diffusers (FLUX.1-schnell + Wan2.1 + DepthAnything v2) ===
+diffusers==0.38.0           # WanPipeline + FluxPipeline
+transformers==5.12.1        # Wan2.1 tokenizer + DepthAnything v2
+accelerate==1.14.0
+safetensors==0.8.0
+sentencepiece==0.2.1
+
+# === FlashAttention 2 (Triton kernels, RTX 3060 Ti Ampere) ===
+# Install after torch: pip install flash-attn --no-build-isolation
+# flash-attn>=2.5.0         # uncomment after torch is installed
+xformers==0.0.35            # memory-efficient attention
+
+# === Quantization (BitsAndBytes — NF4/INT8 for FLUX transformer) ===
+bitsandbytes==0.49.2        # NF4 quantization: FLUX 12B → ~4GB VRAM
+
+# === TorchAO (TurboQuant — fast INT8/INT4 kernel fusion via Triton) ===
+torchao==0.17.0             # quantize_(transformer, int8_weight_only()) / int4_weight_only()
+
+# === MP4 encoding ===
+imageio==2.37.3
+imageio-ffmpeg==0.6.0
+
+# === Gaussian Splatting (needs ENABLE_GAUSSIAN_SPLATTING=true + COLMAP) ===
+# Training loop wired: COLMAP → gsplat rasterization → .splat/.ply export
+gsplat==1.5.3
+# Also needs: apt-get install colmap

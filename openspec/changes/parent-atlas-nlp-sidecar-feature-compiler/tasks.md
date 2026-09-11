@@ -380,6 +380,55 @@ sections above before trusting an integration claim.
 
 ## 13. Acceptance fixture
 
+## 15. Docker dependency reproducibility audit (2026-09-10)
+
+- [x] RAPIDS `atlas-gpu-8098` has an explicit runtime requirements file and CUDA-aware health check. The first CUDA 12.6/PyTorch 2.7.1 replacement image built, but its disposable smoke test failed with a cuGraph/cuSolver ABI conflict caused by the pip-bundled NVIDIA libraries; this hypothesis is rejected for the RAPIDS image.
+- [ ] The running RAPIDS container remains unchanged; its live health evidence is `torchAvailable:false`. A compatible PyTorch/RAPIDS ABI must be proven in a separate image before any container replacement. The attempted CUDA 12.9/PyTorch 2.8.0 rebuild was interrupted before completion.
+- [ ] GPU executor ownership remains duplicated across the Docker `atlas-gpu-8098` surface, the WSL2 `atlas-rapids-cu13` environment, and Python sidecars sharing port 8098. Classify one primary executor before routing or replacing any runtime.
+
+- [x] Traced SearXNG's entrypoint to `/usr/local/searxng/.venv/bin/granian`; its application Python environment contains 41 distributions. Added explicit `--python-interpreter=container:/absolute/path` selection to the all-container audit, avoiding an empty system-interpreter inventory being mistaken for the application's dependency set.
+- [ ] SearXNG omits both pip and packaging from that runtime; installed inventory is proven, dependency consistency and rebuild locking remain unproven. The audit does not install package managers into running containers.
+
+- [x] Added opt-in `--runtime-python-check` across all 25 running containers, preserving installed distribution versions and pip-check output. Seven default Python interpreters were discovered; Miniforge NLP, neural decoder, Docling, and Image Synthesis pass pip check.
+- [ ] RAPIDS 8098 requires manager reconciliation: pip reports CUDA13 requirements against the Conda CUDA12 environment, while Conda records confirm libcudf/libcuvs/libcugraph/librmm are installed. Do not treat those pip-only missing-library messages as authority to replace the Conda stack. Live `/health` separately reports `torchAvailable:false`, so torch-dependent routes remain unproven.
+- [ ] RabbitMQ and SearXNG default Python interpreters lack pip; this is not evidence of broken runtime dependencies. Actual application interpreters/virtual environments still require inspection. Installed inventory is evidence, not a portable transitive build lock.
+
+- [x] Expanded discovery from 42 to 53 Dockerfiles by including `*.Dockerfile`; the additional inventory includes Atlas and llama.cpp backend build definitions. Previous 42-file coverage was incomplete.
+- [x] Base analysis now resolves declared stage ancestry, `FROM --platform`, global default ARGs, scratch, and registry host ports. Bare external image names remain floating; stage descendants retain their external-base provenance. Five regression tests covering image and Python pin classification pass.
+- [ ] Newly discovered backend image definitions require image-specific review; unresolved argument expansions remain fail-closed. Default-ARG pin evidence does not admit arbitrary build-time overrides or GPU compatibility.
+
+- [x] Pinned Docling Whisper to installed Git commit `04f449b8a437f1bbd3dba5c9f826aca972e7709a`, verified through the running container's `direct_url.json`. No packages changed at runtime.
+- [x] Hardened requirements classification against bare names, wildcard pins, mutable VCS references, unhashed URLs, and unresolved nested requirement files; focused regression tests pass. TOML manifests now require structured review instead of receiving an unsupported exact-pin verdict.
+- [ ] Dependency build reachability remains unproven: the current six container-scoped manifests are selected by directory only. Zero loose manifests in that subset does not establish coverage of every Docker build or transitive locking.
+
+- [x] Froze 15 additional Compose references across six existing Compose files to digests observed from the actual running Qdrant, Neo4j, SearXNG, SeaweedFS, RabbitMQ, CouchDB, and Caddy images. Existing tags retained; no upstream-version selection or container recreation. All six Compose configurations validate, and all 15 pins reconcile to the running-image receipt.
+- [ ] Current Compose coverage is 44 digest pins, 17 floating references, and 15 tag-only references; unresolved image families and local build provenance remain open. Repository-wide total is 45 Compose digest pins. These counts supersede earlier census counts without implying runtime upgrades or full reproducibility.
+
+- [x] Corrected runtime image provenance: inspect the container's immutable `Image` ID, never its potentially retargeted configured tag; inventory only running containers. Independent readback checked all 25 containers with zero report mismatches.
+- [ ] Running-image recovery remains open: Docker cannot inspect the original image IDs for `miniforge-nlp-sidecar` and `legal-ai-go-embedding`. These are explicitly `IMAGE_INSPECTION_FAILED`, not local-build proof. The other 23 running containers have registry digests. No container recreation or image replacement occurred.
+
+- [x] Audited all repository Dockerfiles and Python dependency manifests with `scripts/atlas/audit-docker-reproducibility-v1.mjs`.
+- [x] Confirmed the active `miniforge-nlp-sidecar` has exact direct pins and a clean live `pip check`.
+- [x] Added selective `.rgignore` exceptions for Docker/service/Python dependency manifests and the reproducibility receipt; unrelated `*.txt` artifacts remain ignored.
+- [ ] Full repository reproducibility remains open: no floating base tags remain in the 42 Dockerfiles; 31 Dockerfiles now resolve to verified digests, while 2 tag-only bases remain (`TensorRT-LLM v0.21.0` unavailable and Platformatic GHCR access denied), 2 bases are build-argument substituted, 2 container-scoped Python manifests still use ranges, and 12 cleanup/operator scripts remain classified in the audit receipt.
+- [x] Resolved the `docker/langgraph-synthesis` Dockerfile/manifest CUDA contract mismatch by aligning both to the executable CUDA 12.8 / PyTorch 2.7.0+cu128 stack; the audit now reports zero declaration mismatches.
+- [x] Added read-only active-container inventory to the audit: 25 active containers observed, 24 with registry digests and 1 local image with image-ID-only evidence; no container was recreated or replaced.
+- [x] Confirmed dependency manifests are selectively searchable with `rg --files docker services scripts python | rg 'requirements|pyproject.toml'`; the broad `*.txt` ignore remains in place for unrelated text artifacts.
+- [x] No package, image, container, database, projection, model, or source-data deletion was performed.
+- [x] Refined compose analysis to retain all references while separating current external images from archived/fixture definitions and build-backed local images; the audit now reports 76 current external references, 25 archived/fixture references, and 13 build-backed local references.
+- [ ] Current compose reproducibility remains open: 22 current external references are floating and 35 are tag-only; these require image-specific admission and digest verification rather than blanket latest-to-current upgrades. Active runtime inventory remains read-only (25 containers, 24 registry digests, 1 local image-ID-only observation).
+- [x] Verified the compose audit implementation with `node --check scripts/atlas/audit-docker-reproducibility-v1.mjs` and a fresh read-only run; report checksum and detailed scope classifications are in `docs/reports/docker-reproducibility-v1.json`.
+- [x] Removed the active Docling VLM dependency on Ollama/Gemma defaults: `docker/docling-vlm/app.py` now calls the Ornith llama.cpp OpenAI-compatible multimodal endpoint, requires `/props` vision support, and rejects non-Ornith model overrides.
+- [x] Updated the root Docling compose service to declare `LLAMA_SERVER_URL`, `VLM_MODEL=ornith-1.5-9b`, and the matching `ORNITH_MMPROJ_PATH`; Ollama remains scoped to embedding/other non-VLM services.
+- [x] Static validation passed for the Docling image (`docker buildx build --check`), Python syntax, root Compose configuration, and OpenSpec strict validation. The running Docling container was not rebuilt or restarted.
+- [x] Selectively pinned registry-resolved exact-version compose references with tag-plus-digest across the current, development, GPU, test, frontend, and Claude-Mem stacks; compose digest coverage increased from 19 to 30 references without changing running containers.
+- [x] Froze the two remaining active container-scoped Python manifests (`docker/docling-vlm/requirements.txt` and `docker/image-synthesis/requirements.txt`) to the exact versions observed in their running containers; the audit now reports zero loose container-scoped manifests.
+- [x] Added narrow `.gitignore` exceptions so those active manifests are visible/persistable despite the repository-wide `*.txt` rule.
+- [ ] Remaining compose references require separate admission: 22 current floating tags, 25 current tag-only references, local build images, TensorRT-LLM registry access/compatibility, and any image whose registry digest could not be verified because of rate limiting.
+- [ ] Rebuild verification for Docling and Image Synthesis is pending Docker Hub access: `docker buildx build --check` reached the pinned base reference but Docker Hub returned HTTP 429 unauthenticated pull-rate-limit; no image build or container replacement occurred.
+- [x] Pinned Firecrawl's PostgreSQL base to the verified PostgreSQL 17 manifest digest while retaining `PG_MAJOR=17` for the matching package configuration; Dockerfile digest-pinned bases increased from 31 to 32 and build-argument bases decreased from 2 to 1.
+- [ ] Firecrawl Redis remains blocked: the declared `bitnami/redis:8.0.3` tag is absent from Docker Hub, and replacing it with `latest` would be an unapproved compatibility upgrade.
+
 - [ ] 13.1 One end-to-end fixture, zero LLM calls in the default path:
       source file → `AstUnit` (2.1) → linguistic facts on its docstring (3.1)
       → `SemanticCodeCard` → `semantic_768` (4) → HMM observation + Viterbi

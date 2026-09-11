@@ -2,8 +2,8 @@
   "schema": "atlas.current-source-evidence-hydration.v1",
   "mode": "READ_ONLY_SOURCE_EVIDENCE_OWNER_AUDIT",
   "inputSource": "docs/reports/graphify-lifecycle-entrypoint-v1.json",
-  "inputRows": 24101,
-  "exactRevisionMatches": 23447,
+  "inputRows": 24176,
+  "exactRevisionMatches": 23415,
   "contentHydrated": 906,
   "authoritativeNamespaces": 0,
   "namespaceStatus": "MISSING",
@@ -63,7 +63,7 @@
     }
   },
   "missingByReason": {
-    "CANONICAL_CHUNK_OWNER_MISSING": 23195,
+    "CANONICAL_CHUNK_OWNER_MISSING": 23270,
     "CHUNK_OWNER_HAS_CONTENT_BUT_NO_SOURCE_REVISION": 906
   },
   "writes": 0,
@@ -74,5 +74,5 @@
   "canonicalAuthority": false,
   "status": "SOURCE_EVIDENCE_HYDRATION_BLOCKED",
   "nextGate": "RESOLVE_REVISION_BOUND_CONTENT_AND_SOURCE_NAMESPACE_AUTHORITY",
-  "reportChecksum": "80f9706ff819263be19fcc4fb866af7ab2652b5188dfa763fdd0fa155b268575"
+  "reportChecksum": "eb48b7fbe7cdff35cbd4c7a67dbe2b92160eaa5e5eed7f8d63f2ee4053fc2f88"
 }

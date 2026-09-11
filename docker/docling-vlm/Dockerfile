@@ -2,7 +2,7 @@
 # Consolidates: docling-parse, ultralytics, whisper
 # VLM inference is NOT hosted in this container. It calls the workstation
 # Ornith 1.5 llama.cpp server on :8090 through app_ornith.py.
-FROM python:3.11-slim-bookworm AS base
+FROM python:3.11-slim-bookworm@sha256:528257d48c1da0dcecc2e725d1ae34498d60c965f1241e39cd6a85a8859bdf84 AS base
 
 # Install system dependencies for OpenCV, YOLO, and audio processing
 RUN apt-get update && apt-get install -y --no-install-recommends \

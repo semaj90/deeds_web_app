@@ -5,7 +5,8 @@
  * durable execution ledger. This is deliberately an observation gate: it
  * never assigns workspaceRevision and never admits a Graphify execution.
  */
-import { mkdir, readdir, readFile, stat, writeFile } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
+import { mkdir, readdir, readFile, rename, stat, unlink, writeFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { dirname, extname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -33,10 +34,32 @@ async function latestManifest() {
   return resolve(directory, latest.name);
 }
 
-const manifestPath = resolve(ROOT, arg('--manifest') ?? process.argv[2] ?? await latestManifest());
+async function admittedManifest() {
+  const admissionPath = resolve(ROOT, 'docs/reports/workspace-revision-tournament-admission-v1.json');
+  if (!existsSync(admissionPath)) return null;
+  try {
+    const admission = JSON.parse(await readFile(admissionPath, 'utf8')) as { snapshotRevision?: string; authority?: boolean };
+    if (admission.authority !== true || typeof admission.snapshotRevision !== 'string') return null;
+    const candidate = resolve(ROOT, 'docs/reports/workspace-source-snapshots', `${admission.snapshotRevision.replace(/^sha256:/, '')}.json`);
+    return existsSync(candidate) ? candidate : null;
+  } catch {
+    return null;
+  }
+}
+
+const manifestPath = resolve(ROOT, arg('--manifest') ?? process.argv[2] ?? await admittedManifest() ?? await latestManifest());
 const workspaceId = arg('--workspace-id') ?? process.env.ATLAS_WORKSPACE_ID?.trim() ?? null;
 const snapshot = JSON.parse(await readFile(manifestPath, 'utf8'));
-const snapshotReadback = validateSnapshot(snapshot);
+const admissionPath = resolve(ROOT, 'docs/reports/workspace-revision-tournament-admission-v1.json');
+let admittedWorkspaceRevision: string | null = null;
+let admissionAuthority = false;
+try {
+  const admission = JSON.parse(await readFile(admissionPath, 'utf8'));
+  admissionAuthority = admission.authority === true;
+  admittedWorkspaceRevision = typeof admission.workspaceRevision === 'string' ? admission.workspaceRevision : null;
+} catch {}
+const materializedRoot = resolve(ROOT, '.tmp', 'workspace-source-snapshots', String(snapshot.snapshotRevision ?? '').replace(/^sha256:/, ''));
+const snapshotReadback = validateSnapshot(snapshot, existsSync(materializedRoot) ? { sourceReadRoot: materializedRoot } : undefined);
 const snapshotSources = Array.isArray(snapshot.sources) ? snapshot.sources : [];
 const field = (value: any, camel: string, snake: string) => value?.[camel] ?? value?.[snake] ?? null;
 const identityKey = (value: any) => {
@@ -172,23 +195,24 @@ function compareExecution(execution: any) {
 
 const comparisons = executions.map(compareExecution);
 const matching = comparisons.filter((row) => row.eligibleWithoutAdmission);
-const firstBlockingInvariant = databaseError
-  ? 'GRAPHIFY_SCHEMA_OR_DATABASE_UNAVAILABLE'
-  : snapshotReadback.status !== 'SNAPSHOT_BYTES_READBACK_PROVEN'
-    ? 'SNAPSHOT_READBACK_NOT_PROVEN'
-    : matching.length === 0
-      ? 'NO_TERMINAL_GRAPHIFY_EXECUTION_MATCHES_SNAPSHOT'
-      : matching.length > 1
-        ? 'MULTIPLE_GRAPHIFY_EXECUTIONS_MATCH_SNAPSHOT'
-        : comparisons[0]?.workspaceRevision === null
-          ? 'GRAPHIFY_WORKSPACE_REVISION_UNBOUND'
+const admittedMatching = matching.filter((row) => row.workspaceRevision === admittedWorkspaceRevision);
+const firstBlockingInvariant = admissionAuthority && admittedMatching.length === 1
+  ? null
+  : databaseError
+    ? 'GRAPHIFY_SCHEMA_OR_DATABASE_UNAVAILABLE'
+    : snapshotReadback.status !== 'SNAPSHOT_BYTES_READBACK_PROVEN'
+      ? 'SNAPSHOT_READBACK_NOT_PROVEN'
+      : admittedMatching.length === 0
+        ? 'NO_TERMINAL_GRAPHIFY_EXECUTION_MATCHES_SNAPSHOT'
+        : admittedMatching.length > 1
+          ? 'MULTIPLE_GRAPHIFY_EXECUTIONS_MATCH_SNAPSHOT'
           : 'WORKSPACE_REVISION_ADMISSION_REQUIRES_TOURNAMENT';
 const status = databaseError
   ? 'GRAPHIFY_SNAPSHOT_BINDING_BLOCKED'
   : snapshotReadback.status !== 'SNAPSHOT_BYTES_READBACK_PROVEN'
     ? 'GRAPHIFY_SNAPSHOT_BINDING_BLOCKED_SNAPSHOT_READBACK'
-    : matching.length === 1 && matching[0].workspaceRevision
-      ? 'GRAPHIFY_SNAPSHOT_BINDING_OBSERVED_NOT_ADMITTED'
+    : admissionAuthority && admittedMatching.length === 1
+      ? 'GRAPHIFY_SNAPSHOT_BINDING_PROVEN'
       : 'GRAPHIFY_SNAPSHOT_BINDING_BLOCKED';
 const report = {
   schema: 'atlas.graphify-workspace-snapshot-binding.v1',
@@ -197,22 +221,32 @@ const report = {
   status,
   proofLevel: snapshotReadback.status === 'SNAPSHOT_BYTES_READBACK_PROVEN' ? 'PARTIAL_PROVEN' : 'BLOCKED',
   authority: false,
+  workspaceAuthorityAdmitted: admissionAuthority,
   workspaceRevision: null,
+  admittedWorkspaceRevision,
   writesPerformed: false,
   datastoreWritesPerformed: false,
   manifestPath,
   snapshotRevision: snapshot.snapshotRevision ?? null,
   snapshotReadback,
   workspaceId,
-  schema,
   terminalExecutionCount: executions.length,
   comparisons,
   firstBlockingInvariant,
-  nextGate: 'GRAPHIFY-SNAPSHOT-CONSUMPTION-AUTHORIZATION-01',
+  nextGate: status === 'GRAPHIFY_SNAPSHOT_BINDING_PROVEN'
+    ? 'CURRENT-STRUCTURAL-LINEAGE-01'
+    : 'SNAPSHOT-BOUND-GRAPHIFY-CANARY-01',
   safeNextCommand: 'npm run atlas:graphify:source-selection:plan',
   producerRevision: 'atlas.graphify-workspace-snapshot-binding.v1',
 };
 await mkdir(dirname(REPORT), { recursive: true });
-await writeFile(REPORT, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
-console.log(JSON.stringify({ schema: report.schema, status, proofLevel: report.proofLevel, authority: false, workspaceRevision: null, terminalExecutionCount: executions.length, matchingExecutions: matching.length, firstBlockingInvariant, reportPath: REPORT }, null, 2));
-if (status !== 'GRAPHIFY_SNAPSHOT_BINDING_OBSERVED_NOT_ADMITTED') process.exitCode = 3;
+const reportTemp = `${REPORT}.${process.pid}.tmp`;
+await writeFile(reportTemp, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+try {
+  await rename(reportTemp, REPORT);
+} catch (error) {
+  await unlink(reportTemp).catch(() => {});
+  throw new Error(`GRAPHIFY_SNAPSHOT_BINDING_REPORT_WRITE_BLOCKED:${error instanceof Error ? error.message : String(error)}`);
+}
+console.log(JSON.stringify({ schema: report.schema, status, proofLevel: report.proofLevel, authority: false, workspaceAuthorityAdmitted: admissionAuthority, admittedWorkspaceRevision, terminalExecutionCount: executions.length, matchingExecutions: admittedMatching.length, firstBlockingInvariant, reportPath: REPORT }, null, 2));
+if (status !== 'GRAPHIFY_SNAPSHOT_BINDING_PROVEN') process.exitCode = 3;

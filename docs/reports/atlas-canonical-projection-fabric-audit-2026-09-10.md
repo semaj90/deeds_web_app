@@ -1,6 +1,6 @@
 # ATLAS-CANONICAL-PROJECTION-FABRIC-01 Admission Gate — 2026-09-10
 
-**Read-only. Zero production mutations.** Repository commit: `5aab1eec351097fe6bda1bf1ab69c46f726c3fcc`. Database: `127.0.0.1:5434`.
+**Read-only. Zero production mutations.** Repository commit: `b2a60ab978f4b69c8f37565156c4cc0c492c5f7b`. Database: `127.0.0.1:5434`.
 
 Source proposal: ATLAS-CANONICAL-PROJECTION-FABRIC-01 (external architecture review, recorded 2026-09-08)
 

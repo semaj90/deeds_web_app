@@ -1,6 +1,6 @@
 {
   "schema": "atlas.langextract-ornith-classifier-fanout.v1",
-  "generatedAt": "2026-09-09T23:04:26.979Z",
+  "generatedAt": "2026-09-10T20:31:01.981Z",
   "mode": "READ_ONLY",
   "status": "BOUNDARY_REACHABLE_LINEAGE_BLOCKED",
   "proofLevel": "PARTIAL_PROVEN",

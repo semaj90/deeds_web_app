@@ -7,7 +7,7 @@
 #   - Removed EasyOCR (uses tesseract.js on client)
 #   - Multi-stage build to reduce image size
 
-FROM python:3.11-slim AS builder
+FROM python:3.11-slim@sha256:9534e5a8e315485d4061ed659af0fd78a284c015f9b73661b41d6bab25604534 AS builder
 
 WORKDIR /build
 
@@ -24,7 +24,7 @@ RUN pip install --no-cache-dir --user -r requirements.txt
 RUN python -m spacy download en_core_web_md
 
 # --- Runtime stage ---
-FROM python:3.11-slim
+FROM python:3.11-slim@sha256:9534e5a8e315485d4061ed659af0fd78a284c015f9b73661b41d6bab25604534
 
 LABEL maintainer="deeds-web-app"
 LABEL description="Optimized LangExtract - memory-efficient legal document extraction"
@@ -49,7 +49,8 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV LANGEXTRACT_PROVIDER=openai
 ENV LANGEXTRACT_MODEL_ID=ornith-1.5-9b
 ENV LANGEXTRACT_BASE_URL=http://host.docker.internal:8090/v1
-ENV LANGEXTRACT_API_KEY=local
+# Supply the local/dev key at runtime (compose or `docker run -e`); do not bake
+# credentials into the image metadata. The service retains its local fallback.
 ENV LLAMA_SERVER_URL=http://host.docker.internal:8090/v1
 ENV SPACY_MODEL=en_core_web_md
 ENV ENABLE_SPACY=true

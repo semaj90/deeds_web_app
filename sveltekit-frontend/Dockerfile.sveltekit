@@ -1,5 +1,5 @@
 # SvelteKit Frontend with Authentication - Docker Configuration
-FROM node:22-alpine AS base
+FROM node:22-alpine@sha256:c610fcdfb1d5b4740dd70c284ed3cb16bb857e0f7166196e36a5501df7a3aa32 AS base
 
 # Install Python and build dependencies for native modules
 RUN apk add --no-cache python3 py3-pip build-base

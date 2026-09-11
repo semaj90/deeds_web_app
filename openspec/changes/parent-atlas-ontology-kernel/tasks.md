@@ -3674,3 +3674,190 @@ module). All committed and pushed to `main` (`df9fed6ce0`).
   the sibling `parent-atlas-ace-rlm-bitfrost-integration` change) — still open, not started.
 - Historical table/view drift classification for `parent_atlas_documents` (view, TS schema module
   wrongly models it as a table — not corrected yet) and `route_runtime_packets`.
+
+## Independent KAG readiness recheck (2026-09-10)
+
+- [x] Ran the existing read-only ontology/KAG readiness audit. It observed
+  `5,000` candidates and `176,237` tuples.
+- [ ] Keep ontology/KAG promotion at `WARN`: user-based, semantic, authority,
+  connectivity, application, coupling, taxonomic, contextual, structural, and
+  modularity metrics remain weak. Tuple presence is not sufficient evidence for
+  GraphRAG or canonical ontology promotion.
+- [x] **Core lane recheck (2026-09-10):** ran the read-only feature/ontology
+  packet-lineage audit. It reconciled packet content lineage for `603`
+  tuples, but `595` lacked a current Graphify source and `8` aliases were not
+  approved. Ontology promotion remains blocked; no tuple or projection writes
+  occurred. Receipt: `docs/reports/feature-ontology-packet-lineage-v1.json`.
+
+### Alias-target registry recheck (2026-09-10)
+
+- [x] Ran the read-only canonical alias-target registry audit. All `6/6`
+      selected targets were registered uniquely, with zero missing targets,
+      duplicates, repository mismatches, or selection-checksum mismatches.
+- [ ] Keep ontology promotion blocked: unique alias targets do not establish
+      current source bindings or approve the remaining `8` packet-lineage
+      aliases.
+
+Receipt: `docs/reports/feature-ontology-alias-target-registry-v1.json`.
+
+### Current ontology relationship cohort recheck (2026-09-10)
+
+- [x] Ran the read-only current-cohort audit with a 100-tuple bound. Only
+  `1` exact source reference was found; `0` matched the expected workspace
+  revision and `0` relationship tuples were eligible.
+- [ ] Keep ontology relationship promotion blocked: all `100` examined tuples
+  lacked an exact Graphify source binding for the expected cohort. No tuple or
+  projection writes occurred.
+
+Receipt: `docs/reports/feature-ontology-current-cohort-v1.json`.
+
+### CONCEPT-FABRIC-READINESS-01 recheck (2026-09-10)
+
+- [x] Ran the read-only concept-fabric audit; inventory contained `346,888`
+      files with checksum `sha256:386b5fbfa30e6e7c3b7484c3ec702287815bda4b3714d5edef79f2f51818cb77`.
+- [x] Preserved the existing ownership result: concept seed exists, but the
+      directory index needs one incremental owner and external evidence needs
+      a sealed revision.
+- [ ] Keep ontology/KAG promotion blocked; this audit performed no writes and
+      does not establish current source binding, tuple admission, or GraphRAG
+      projection authority.
+
+Evidence: `docs/reports/parent-atlas-concept-fabric-audit-v1.json`.
+Status: `READ_ONLY_PARTIAL`; authority=false; writesPerformed=false.
+First blocker: `DIRECTORY_INDEX_SOURCE_BINDING_UNPROVEN`.
+Next gate: `DIRECTORY-INDEX-SOURCE-BINDING-01`.
+
+## CORE-LANE-RECHECK-2026-09-10
+
+- [x] Reconciled the ontology lane with the core authority plan.
+- [ ] Keep tuple admission and GraphRAG/Qdrant fanout blocked until grounded source bindings are revision-qualified.
+
+Evidence: `docs/reports/parent-atlas-concept-fabric-audit-v1.json`.
+First blocker remains: `DIRECTORY_INDEX_SOURCE_BINDING_UNPROVEN`.
+
+## CORE-LANE-RECHECK-2026-09-10T2
+
+- [x] Re-ran the concept-fabric audit; inventory count is `346,889`.
+- [ ] Keep ontology tuple admission and GraphRAG fanout blocked until exact
+      source/workspace revision bindings are available.
+
+Evidence: `docs/reports/parent-atlas-concept-fabric-audit-v1.json`.
+Status remains `READ_ONLY_PARTIAL`; authority=false; writesPerformed=false.
+
+## ONTOLOGY-REVISION-OWNER-RECHECK-2026-09-10
+
+- [x] Ran the read-only ontology revision owner audit.
+- [ ] Keep ontology revision authority blocked: `canonicalOntologyRevisionCount`
+      is `0`, so the admitted taxonomy mapping cannot yet bind downstream
+      tuples or GraphRAG projections to a current ontology revision.
+
+Evidence: `docs/reports/ontology-revision-owner-audit-v1.json` and
+`docs/reports/domain-ontology-taxonomy-audit-v1.json`.
+Status: `ONTOLOGY_REVISION_OWNER_UNPROVEN`; authority=false;
+writesPerformed=false.
+First blocker: `CANONICAL_ONTOLOGY_REVISION_MISSING`.
+Next gate: define/admit one revision-qualified ontology manifest after source
+lineage is available; do not promote tuple or GraphRAG projections yet.
+
+## ONTOLOGY-CURRENT-COHORT-RECHECK-2026-09-10T21
+
+- [x] Added an explicit `--workspace-revision` audit input so the ontology
+      cohort check can evaluate the admitted revision without relying on a
+      stale workspace-observation file.
+- [x] Re-ran against admitted revision `sha256:d7f9563f...91f2e`:
+      `603` tuples examined, `7` exact source refs, `0` current-workspace
+      source refs, `0` current tuples, and `595` without an exact Graphify
+      source.
+- [ ] Keep ontology tuple admission and GraphRAG/Qdrant fanout blocked until
+      Graphify produces exact source/workspace revision bindings. No tuple,
+      graph, Qdrant, or taxonomy writes occurred.
+
+Evidence: `docs/reports/feature-ontology-current-cohort-v1.json`.
+Status: `CURRENT_RELATIONSHIP_COHORT_EMPTY`; authority=false;
+writesPerformed=false.
+First blocker: `CURRENT_ONTOLOGY_SOURCE_BINDING_UNPROVEN`.
+Next gate: snapshot-bound Graphify membership and current source lineage.
+
+## HYPERGRAPH-OAK-CONTRACT-RECHECK-2026-09-11
+
+- [x] Re-ran the existing Hyperedge, n-ary materialization, ontology tuple
+      proposal, and PostgreSQL tuple contract suites: `17/17` tests passed.
+- [x] Confirmed Hyperedge and OntologyLinkedTuple remain proposal/evidence
+      structures; they do not create canonical identity or retrieval votes.
+- [ ] Keep OAK resolution and ontology-linked fanout blocked until current
+      source/workspace bindings and grounded evidence are admitted.
+
+Evidence: focused Vitest output and
+`docs/reports/feature-ontology-current-cohort-v1.json`.
+Status: `HYPERGRAPH_CONTRACT_PROVEN_LINEAGE_BLOCKED`; authority=false;
+writesPerformed=false.
+First blocker: `CURRENT_ONTOLOGY_SOURCE_BINDING_UNPROVEN`.
+Next gate: snapshot-bound Graphify membership and current source lineage.
+
+## GENIE-OAK-CONTEXT-CANDIDATE-RECHECK-2026-09-11
+
+- [x] Fresh multi-lane ontology extraction produced `304` review candidates
+      across `6` sources; `5` sources carried grounded evidence.
+- [x] Candidate validation preserved exact source bindings for `304/304` rows,
+      admitted only `9` grounded review candidates, and rejected `295` without
+      grounding. No concept, tuple, graph, or projection writes occurred.
+- [ ] Do not promote candidates or connect them to production ACE context until
+      current workspace/source lineage is revision-qualified.
+
+Evidence: `docs/reports/feature-ontology-fresh-extraction-multilane-v1.json`,
+`docs/reports/feature-ontology-fresh-candidate-validation-v1.json`.
+Status: `REVIEW_CANDIDATES_GROUNDED_PARTIAL`; authority=false;
+writesPerformed=false.
+First blocker: `CURRENT_ONTOLOGY_SOURCE_BINDING_UNPROVEN`.
+Next gate: snapshot-bound Graphify membership and current source lineage.
+
+## OAK-ATLAS-ADAPTER-RECHECK-2026-09-11
+
+- [x] Re-verified the existing Python OAK boundary in `python/atlas_oak_kernel.py`:
+      oaklib lookup/search/traversal is a read-only adapter over configured
+      ontology backends; it does not own Parent Atlas identity or persistence.
+- [x] Existing OAK adapter tests pass: `8 passed`.
+- [x] Confirmed no new concept or tuple owner is needed; the new
+      `KnowledgeSnippetV1` remains a local context proposal layer around
+      existing `ConceptV1` IDs.
+- [ ] Configure and prove a revision-qualified OAK backend for current source
+      evidence before converting OAK relationships into tuple candidates.
+
+Status: `OAK_ADAPTER_BOUNDARY_PROVEN`; authority=false; writesPerformed=false.
+First blocker: `CURRENT_ONTOLOGY_SOURCE_BINDING_UNPROVEN`.
+Next gate: snapshot-bound Graphify membership and current source lineage.
+
+## GENIE-SEMANTIC-CONTEXT-ADAPTER-2026-09-11
+
+- [x] Added `KnowledgeSnippetV1` as a Parent Atlas-native, non-canonical
+      context layer for concept definitions, metric definitions, business
+      rules, authoritative-source hints, and relationship hints.
+- [x] Included authority, freshness, usage, permission scope, evidence refs,
+      source/workspace revisions, and deterministic snippet identity.
+- [x] Preserved existing `ConceptV1`, `OntologyLinkedTupleV1`, and `HyperedgeV1`
+      as the canonical owners; no Databricks dependency or duplicate ontology
+      owner was introduced.
+- [ ] Connect admitted snippets to ACE/context selection only after current
+      source lineage and permission filtering are proven.
+
+Evidence: `sveltekit-frontend/src/lib/server/atlas/contracts/knowledge-snippet-v1.ts`.
+Status: `SNIPPET_CONTRACT_PROVEN`; authority=false; writesPerformed=false.
+First blocker: `CURRENT_ONTOLOGY_SOURCE_BINDING_UNPROVEN`.
+Next gate: snapshot-bound Graphify membership and current source lineage.
+
+## ONTOLOGY-CURRENT-COHORT-RECHECK-2026-09-10T23
+
+- [x] Re-ran the read-only ontology cohort audit against the admitted
+      workspace revision.
+- [x] Confirmed `603` tuples examined, `7` exact source references,
+      `0` current-workspace source references, `0` current tuples, and
+      `595` tuples without an exact Graphify source.
+- [ ] Keep ontology tuple admission and GraphRAG/Qdrant fanout blocked until
+      current source/workspace bindings exist. No ontology, graph, Qdrant, or
+      taxonomy writes occurred.
+
+Evidence: `docs/reports/feature-ontology-current-cohort-v1.json`.
+Status: `CURRENT_RELATIONSHIP_COHORT_EMPTY`; authority=false;
+writesPerformed=false.
+First blocker: `CURRENT_ONTOLOGY_SOURCE_BINDING_UNPROVEN`.
+Next gate: snapshot-bound Graphify membership and current source lineage.

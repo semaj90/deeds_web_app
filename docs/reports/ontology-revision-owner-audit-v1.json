@@ -17,7 +17,7 @@
       "file": "sveltekit-frontend/src/lib/server/atlas/okf-topic-ingestion.ts",
       "field": "ontologyVersion",
       "value": "okf-ontology-v1",
-      "fileChecksum": "4c83d4cbc99497004c51111e0f5e00f8ce37d5b285a2282bd18f2f81123e8463"
+      "fileChecksum": "e4ceedb25772796f6621113b85cd298f417b533af1552ebaf758b2dba7ee9e77"
     }
   ],
   "allRevisionObservations": [
@@ -25,13 +25,31 @@
       "file": "sveltekit-frontend/src/lib/server/atlas/okf-topic-ingestion.ts",
       "field": "ontologyVersion",
       "value": "okf-ontology-v1",
-      "fileChecksum": "4c83d4cbc99497004c51111e0f5e00f8ce37d5b285a2282bd18f2f81123e8463"
+      "fileChecksum": "e4ceedb25772796f6621113b85cd298f417b533af1552ebaf758b2dba7ee9e77"
     },
     {
       "file": "sveltekit-frontend/src/lib/server/atlas/okf-topic-ingestion.ts",
       "field": "sourceRevision",
       "value": "sourceRevision: OKF_FIT_VERSION",
-      "fileChecksum": "4c83d4cbc99497004c51111e0f5e00f8ce37d5b285a2282bd18f2f81123e8463"
+      "fileChecksum": "e4ceedb25772796f6621113b85cd298f417b533af1552ebaf758b2dba7ee9e77"
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/okf-topic-ingestion.ts",
+      "field": "producerRevision",
+      "value": "producerRevision: z.string().min(1)",
+      "fileChecksum": "e4ceedb25772796f6621113b85cd298f417b533af1552ebaf758b2dba7ee9e77"
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/okf-topic-ingestion.ts",
+      "field": "producerRevision",
+      "value": "producerRevision: 'okf-fit-v1' })",
+      "fileChecksum": "e4ceedb25772796f6621113b85cd298f417b533af1552ebaf758b2dba7ee9e77"
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/okf-topic-ingestion.ts",
+      "field": "producerRevision",
+      "value": "producerRevision: classified.scoreSemantics.producerRevision",
+      "fileChecksum": "e4ceedb25772796f6621113b85cd298f417b533af1552ebaf758b2dba7ee9e77"
     },
     {
       "file": "sveltekit-frontend/src/lib/server/atlas/contracts/ontology-linked-tuple-v1.ts",

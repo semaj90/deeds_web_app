@@ -25,6 +25,23 @@ const reportFiles = {
   graph: 'docs/reports/graph-projection-manifest-v1.json',
   judgment: 'docs/reports/retrieval-judgment-set-v1.json',
   parity: 'docs/reports/retrieval-parity-receipt-v1.json',
+  snapshotConsumerPreflight: 'docs/reports/graphify-snapshot-consumer-preflight-v1.json',
+};
+
+// Independent lane observations are diagnostic only. They do not override the
+// dependency gate or grant authority to any downstream projection.
+const independentLaneReports = {
+  structural: 'docs/reports/current-workspace-packet-chunk-join-v1.json',
+  semanticOwner: 'docs/reports/semantic-768-writer-ownership-v1.json',
+  representation: 'docs/reports/latent-representation-identity-audit-2026-09-10.json',
+  graph: 'docs/reports/current-graph-artifact-readiness-v1.json',
+  qdrant: 'docs/reports/qdrant-packet-fanout-v1.json',
+  rrfWeights: 'docs/reports/rrf-lane-weight-census-v1.json',
+  rrfIdentity: 'docs/reports/rrf-real-caller-identity-envelope-v1.json',
+  classifier: 'docs/reports/domain-classifier-lineage-v1.json',
+  ontology: 'docs/reports/parent-atlas-concept-fabric-audit-v1.json',
+  ace: 'docs/reports/ace-live-dry-input-readiness-v2.json',
+  judgment: 'docs/reports/golden-relevance-review-queue-validation-v1.json',
 };
 
 function readJson(relative) {
@@ -36,18 +53,65 @@ function readJson(relative) {
   }
 }
 
+function firstFailedCheck(value) {
+  if (!value || typeof value !== 'object') return null;
+  const checks = value.checks;
+  if (checks && typeof checks === 'object') {
+    const failed = Object.entries(checks).find(([, passed]) => passed !== true);
+    if (failed) return failed[0];
+  }
+  const metrics = value.metrics;
+  if (metrics && typeof metrics === 'object') {
+    const failed = Object.entries(metrics).find(([key, metric]) => {
+      if (!/missing|mismatch|unproven|ambiguous|conflict|blocked|unknown|unclassified|orphan/i.test(key)) return false;
+      return typeof metric === 'number' ? metric > 0 : metric === false;
+    });
+    if (failed) return failed[0];
+  }
+  return null;
+}
+
+function readIndependentLaneFindings() {
+  return Object.fromEntries(Object.entries(independentLaneReports).map(([lane, relative]) => {
+    const item = readJson(relative);
+    const value = item.value;
+    const status = value?.status ?? value?.verdict ?? value?.decision ?? null;
+    const firstBlockingInvariant = value?.firstBlockingInvariant
+      ?? value?.blockers?.[0]
+      ?? value?.admissionBlockers?.[0]
+      ?? value?.nextRequiredStep
+      ?? firstFailedCheck(value)
+      ?? (status && !/proven|pass|complete|admitted/i.test(String(status))
+        ? `STATUS_NOT_PROMOTABLE:${status}`
+        : null);
+    return [lane, {
+      report: relative,
+      exists: item.exists,
+      status,
+      proofLevel: value?.proofLevel ?? null,
+      authority: value?.authority ?? value?.canonicalAuthority ?? false,
+      writesPerformed: value?.writesPerformed ?? value?.databaseWrites ?? value?.datastoreWritesPerformed ?? false,
+      firstBlockingInvariant,
+    }];
+  }));
+}
+
 const admissionReceipt = readJson('docs/reports/workspace-revision-tournament-admission-v1.json');
 const derivationReceipt = readJson('docs/reports/workspace-revision-from-sealed-multi-repo-snapshot-v1.json');
 const selectionPlan = readJson('docs/reports/graphify-source-selection-plan-v1.json');
 const bindingReceipt = readJson('docs/reports/graphify-workspace-snapshot-binding-v1.json');
+const consumerPreflight = readJson('docs/reports/graphify-snapshot-consumer-preflight-v1.json');
 const ownerReceipt = readJson('docs/reports/current-graphify-run-owner-v1.json');
 const currentCandidate = derivationReceipt.value?.status === 'WORKSPACE_REVISION_CANDIDATE_READY_FOR_ADMISSION'
   && derivationReceipt.value?.snapshotRevision === selectionPlan.value?.snapshotRevision
   && derivationReceipt.value?.workspaceRevisionCandidate === selectionPlan.value?.workspaceRevisionCandidate
   ? derivationReceipt.value.workspaceRevisionCandidate : null;
+// Workspace admission is its own authority decision. Do not require the
+// derivation report to still be discoverable/current in order to preserve an
+// already admitted revision; currentness conflicts are reported separately.
 const admittedRevision = admissionReceipt.value?.status === 'WORKSPACE_REVISION_TOURNAMENT_ADMITTED'
   && admissionReceipt.value?.authority === true
-  && admissionReceipt.value?.workspaceRevision === currentCandidate
+  && typeof admissionReceipt.value?.workspaceRevision === 'string'
   ? admissionReceipt.value.workspaceRevision : null;
 const workspaceRevision = admittedRevision;
 
@@ -74,13 +138,35 @@ function gate(id, name, status, proofLevel, blocking, evidenceItems, violations 
 }
 
 const gates = [];
-const ownerProven = ownerReceipt.value?.status === 'GRAPHIFY_RUN_OWNER_COMPLETE';
+const ownerProven = ownerReceipt.value?.status === 'GRAPHIFY_RUN_OWNER_COMPLETE'
+  && ownerReceipt.value?.expectedWorkspaceRevision === admittedRevision
+  && Number(ownerReceipt.value?.completedOwnerCount ?? 0) === 1;
 const bindingObserved = bindingReceipt.value?.status === 'GRAPHIFY_SNAPSHOT_BINDING_OBSERVED_NOT_ADMITTED';
-const firstBlockingInvariant = ownerProven
+const consumerPreflightProven = consumerPreflight.value?.status === 'GRAPHIFY_SNAPSHOT_CONSUMER_PREFLIGHT_PROVEN'
+  && consumerPreflight.value?.sourceKind === 'ADMITTED_WORKSPACE_SNAPSHOT'
+  && consumerPreflight.value?.workspaceRevision === admittedRevision
+  && typeof consumerPreflight.value?.snapshotRevision === 'string'
+  && Number(consumerPreflight.value?.persistentWrites ?? 1) === 0
+  && Number(consumerPreflight.value?.liveInventoryBuilderCalls ?? 1) === 0
+  && Number(consumerPreflight.value?.gitRevisionDerivationCalls ?? 1) === 0
+  && Number(consumerPreflight.value?.unexpectedRepositoryDiscovery ?? 1) === 0
+  && Number(consumerPreflight.value?.childApplyCommands ?? 1) === 0
+  && Array.isArray(consumerPreflight.value?.violations)
+  && consumerPreflight.value.violations.length === 0;
+const firstBlockingInvariant = !admittedRevision
+  ? 'WORKSPACE_REVISION_NOT_ADMITTED'
+  : ownerProven
   ? 'CURRENT_STRUCTURAL_LINEAGE_NOT_PROVEN'
+  : consumerPreflightProven
+    ? 'SNAPSHOT_BOUND_GRAPHIFY_CANARY_NOT_AUTHORIZED'
   : bindingObserved
     ? 'CURRENT_GRAPHIFY_RUN_OWNER_UNPROVEN'
-    : 'WORKSPACE_SNAPSHOT_BINDING_UNPROVEN';
+    : 'GRAPHIFY_SNAPSHOT_CONSUMER_NOT_REVISION_ADDRESSABLE';
+const nextGate = ownerProven
+  ? 'CURRENT-STRUCTURAL-LINEAGE-01'
+  : consumerPreflightProven
+    ? 'SNAPSHOT-BOUND-GRAPHIFY-CANARY-01'
+    : 'CURRENT-SOURCE-TERMINAL-EXECUTION-01';
 
 gates.push(gate(
   'CURRENT-SOURCE-TERMINAL-EXECUTION-01',
@@ -88,7 +174,7 @@ gates.push(gate(
   ownerProven ? 'PROVEN' : 'BLOCKED',
   ownerProven ? 'PARTIAL_PROVEN' : 'BLOCKED',
   true,
-  evidence('sourceAuthority', 'sourceOwner', 'sourceHydration'),
+  evidence('sourceAuthority', 'sourceOwner', 'sourceHydration', 'snapshotConsumerPreflight'),
   ownerProven ? [] : [firstBlockingInvariant],
 ));
 
@@ -138,6 +224,24 @@ const report = {
     derivationPlanSnapshotMatch: Boolean(currentCandidate),
     admissionMatchesCurrentCandidate: Boolean(admittedRevision),
   },
+  workspaceAuthority: {
+    status: admittedRevision ? 'ADMITTED' : 'UNADMITTED',
+    workspaceRevision: admittedRevision,
+    snapshotRevision: admissionReceipt.value?.snapshotRevision ?? null,
+    sourceCount: admissionReceipt.value?.sourceCount ?? null,
+    sourceSelectionChecksum: admissionReceipt.value?.sourceSelectionChecksum ?? null,
+    receiptPath: admissionReceipt.path,
+    authority: Boolean(admittedRevision),
+  },
+  graphifyExecution: {
+    status: ownerProven ? 'PROVEN' : 'BLOCKED',
+    executionId: ownerReceipt.value?.currentRun?.executionId ?? null,
+    expectedWorkspaceRevision: ownerReceipt.value?.expectedWorkspaceRevision ?? null,
+    matchesAdmittedWorkspaceRevision: ownerProven,
+    blocker: ownerProven ? null : 'NO_TERMINAL_GRAPHIFY_EXECUTION_MATCHES_ADMITTED_SNAPSHOT',
+    receiptPath: ownerReceipt.path,
+  },
+  independentLaneFindings: readIndependentLaneFindings(),
   workspaceRevisionPolicy: admittedRevision
     ? 'TOURNAMENT_CONTROL_PLANE_ADMITTED_CANONICAL_OWNER_PENDING'
     : 'UNBOUND_UNTIL_TOURNAMENT',
@@ -146,7 +250,7 @@ const report = {
   gates,
   firstBlockingGate: ownerProven ? gates[1].id : gates[0].id,
   firstBlockingInvariant,
-  nextGate: ownerProven ? gates[1].id : gates[0].id,
+  nextGate,
   safeNextCommand: ownerProven
     ? 'npx tsx scripts/atlas/audit-current-structural-lineage-v1.mjs'
     : 'npx tsx scripts/atlas/audit-current-graphify-run-owner-v1.mjs',
@@ -156,7 +260,15 @@ const report = {
 };
 
 fs.mkdirSync(path.dirname(REPORT_PATH), { recursive: true });
-fs.writeFileSync(REPORT_PATH, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+const reportTempPath = `${REPORT_PATH}.${process.pid}.tmp`;
+fs.writeFileSync(reportTempPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+try {
+  fs.renameSync(reportTempPath, REPORT_PATH);
+} catch (error) {
+  try { fs.rmSync(reportTempPath, { force: true }); } catch {}
+  console.error(`PROMOTION_GATE_REPORT_WRITE_BLOCKED:${error instanceof Error ? error.message : String(error)}`);
+  process.exitCode = 1;
+}
 console.log(JSON.stringify({
   status: report.status,
   firstBlockingGate: report.firstBlockingGate,

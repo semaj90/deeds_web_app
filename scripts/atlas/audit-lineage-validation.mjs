@@ -122,17 +122,16 @@ async function main() {
       SELECT
         COUNT(*)::int AS total,
         COUNT(*) FILTER (WHERE feature_id IS NOT NULL AND feature_id != '')::int AS with_feature,
-        COUNT(*) FILTER (WHERE source_ref_hash IS NOT NULL)::int AS with_hash,
-        COUNT(*) FILTER (WHERE canonical_source_ref IS NOT NULL)::int AS with_canonical,
+        COUNT(*) FILTER (WHERE source_ref IS NOT NULL AND btrim(source_ref) <> '')::int AS with_source_ref,
         COUNT(DISTINCT feature_id)::int AS distinct_features
       FROM task_semantic_packets
     `);
     checks.push(check('L2:task_semantic_packets',
-      tsp.total > 0 && tsp.with_feature === tsp.total && tsp.with_hash === tsp.total,
-      `task_semantic_packets: ${tsp.total} rows, feature_id ${tsp.with_feature}/${tsp.total}, hash ${tsp.with_hash}/${tsp.total}`,
+      tsp.total > 0 && tsp.with_feature === tsp.total && tsp.with_source_ref === tsp.total,
+      `task_semantic_packets: ${tsp.total} rows, feature_id ${tsp.with_feature}/${tsp.total}, source_ref ${tsp.with_source_ref}/${tsp.total}`,
       tsp,
     ));
-    log(`  ${tsp.total} rows, feature_id ${tsp.with_feature}/${tsp.total}, hash ${tsp.with_hash}/${tsp.total}`);
+    log(`  ${tsp.total} rows, feature_id ${tsp.with_feature}/${tsp.total}, source_ref ${tsp.with_source_ref}/${tsp.total}`);
   } catch (err) {
     checks.push(check('L2:task_semantic_packets', false, `task_semantic_packets unavailable: ${err.message}`));
   }

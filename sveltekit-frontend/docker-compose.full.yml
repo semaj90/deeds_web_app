@@ -5,7 +5,7 @@ services:
   # PostgreSQL 18 + pgvector (Vector Database)
   # ============================================================================
   postgres:
-    image: pgvector/pgvector:pg18
+    image: pgvector/pgvector:pg18@sha256:2ba9ca5f2e7daa0f0e7723cba1ee9167bab54efd3640516a44ac1a928dd67e7a
     container_name: legal-ai-postgres
     environment:
       POSTGRES_DB: legal_ai_db
@@ -47,7 +47,7 @@ services:
   # Valkey Cache (Redis-compatible, AGPL-free)
   # ============================================================================
   valkey:
-    image: valkey/valkey-bundle:8.1.1
+    image: valkey/valkey-bundle:8.1.1@sha256:8b6501bf71570ee597e621628b141500d9ad24a4137296dbd92ff7791c14367f
     container_name: legal-ai-valkey
     command: valkey-server --requirepass redis --maxmemory 2gb --maxmemory-policy allkeys-lru --io-threads 4
     ports:
@@ -89,7 +89,7 @@ services:
   # Qdrant Vector Database
   # ============================================================================
   qdrant:
-    image: qdrant/qdrant:v1.19.0
+    image: qdrant/qdrant:v1.19.0@sha256:057ee3a8da769fe7310dd3537b4dc7583bf87a95ce8ac43c0af5a46bc580d1fc
     container_name: legal-ai-qdrant
     ports:
       - "6333:6333"
@@ -212,7 +212,7 @@ services:
   # RabbitMQ Message Queue
   # ============================================================================
   rabbitmq:
-    image: rabbitmq:3-management-alpine
+    image: rabbitmq:3-management-alpine@sha256:606d8c0d6b3c18d1da9afc53bc7cdb2a8d5486df91b5a9830e9e07626c9ae281
     container_name: legal-ai-rabbitmq
     environment:
       RABBITMQ_DEFAULT_USER: admin
@@ -234,7 +234,7 @@ services:
   # CouchDB (MapReduce/Graph Analysis)
   # ============================================================================
   couchdb:
-    image: couchdb:3.3
+    image: couchdb:3.3@sha256:307a3f5276f64c0db28f226b7b5c180b8f2c851afa681cfb4fbb1b1fe7fd5587
     container_name: legal-ai-couchdb
     environment:
       - COUCHDB_USER=admin

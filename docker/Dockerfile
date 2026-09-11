@@ -1,7 +1,9 @@
 # Dockerfile
 # ----------------------------------------------------------------------------------
 # Stage 1: Base image (Start from the official, verified TRT-LLM image)
-FROM nvcr.io/nvidia/tensorrt-llm/release:latest AS base
+# Resolved from NVIDIA NGC latest on 2026-09-10. Pin the amd64 manifest so
+# registry tag movement cannot silently change the TRT-LLM runtime ABI.
+FROM nvcr.io/nvidia/tensorrt-llm/release@sha256:9dbca040d53e3e173d2bfce515a0447c8b7cd554b58f60fb6664b50e3d41be99 AS base
 
 # Stage 2: Install required system packages (build-essential, rustc, cargo)
 # We use one RUN command to keep this in one cache layer

@@ -19,7 +19,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '../..');
 const FRONTEND = path.resolve(ROOT, 'sveltekit-frontend');
 const PARENT_ATLAS = path.resolve(ROOT, 'packages/parent-atlas');
-const DAILY_CHAIN_SCRIPT = 'npm run graphify:daily:chain';
+const DAILY_CHAIN_APPLY_SCRIPT = 'npm run graphify:daily:chain';
+const DAILY_CHAIN_TERMINAL_SCRIPT = 'npm run graphify:daily:dry';
 const PROMOTION_ADMISSION_SCRIPT = 'node scripts/atlas/require-canonical-projection-admission-v1.mjs';
 const FALLBACK_SCRIPT = 'npm run startup:graphify-complete:no-consumer -- --skip-audit';
 const STARTUP_LOCK_FILE = path.resolve(ROOT, '.graphify-daily-start.lock');
@@ -50,6 +51,7 @@ let derivedContextStatus = 'NOT_RUN';
 let dailyEmbeddingStatus = 'NOT_REQUESTED';
 let nesPacketStatus = 'NOT_REQUESTED';
 const provenanceScript = 'npm run atlas:phase109b:workflow:dry';
+const TERMINAL_RUN_AUTHORIZATION = 'AUTHORIZE_GRAPHIFY_POST_PHASE16_TERMINAL_RUN_V1';
 const ADMISSION_REPORT = path.resolve(ROOT, 'docs/reports/workspace-revision-tournament-admission-v1.json');
 const ADMITTED_SNAPSHOT_DIR = path.resolve(ROOT, 'docs/reports/workspace-source-snapshots');
 
@@ -84,6 +86,38 @@ function stable(value) {
 
 function sha256(value) {
   return createHash('sha256').update(typeof value === 'string' ? value : stable(value), 'utf8').digest('hex');
+}
+
+function writeGraphifyExecutionSourceV2({ admission, snapshot, materializedRoot }) {
+  const repositoryRows = new Map();
+  for (const source of snapshot.sources) {
+    const repositoryId = String(source.repositoryId ?? '');
+    const repositoryRelativePath = String(source.repositoryRelativePath ?? source.sourceRef ?? '').replaceAll('\\', '/');
+    const row = repositoryRows.get(repositoryId) ?? { repositoryId, paths: [] };
+    row.paths.push(repositoryRelativePath);
+    repositoryRows.set(repositoryId, row);
+  }
+  const repositories = [...repositoryRows.values()].sort((a, b) => a.repositoryId.localeCompare(b.repositoryId)).map((row) => ({
+    repositoryId: row.repositoryId,
+    sourceCount: row.paths.length,
+    membershipChecksum: `sha256:${sha256([...row.paths].sort())}`,
+  }));
+  const descriptor = {
+    schema: 'atlas.graphify-execution-source.v2',
+    sourceKind: 'ADMITTED_WORKSPACE_SNAPSHOT',
+    workspaceRevision: admission.workspaceRevision,
+    snapshotRevision: admission.snapshotRevision,
+    materializedRoot,
+    sourceCount: snapshot.sources.length,
+    repositoryCount: repositories.length,
+    sourceCohortChecksum: snapshot.sourceMembershipChecksum ?? null,
+    selectionChecksum: admission.sourceSelectionChecksum ?? snapshot.sourceMembershipChecksum ?? null,
+    repositories,
+    admissionReceiptRef: 'docs/reports/workspace-revision-tournament-admission-v1.json',
+  };
+  const descriptorPath = path.resolve(ROOT, 'docs/reports/graphify-execution-source-v2.json');
+  writeFileSync(descriptorPath, `${JSON.stringify(descriptor, null, 2)}\n`, 'utf8');
+  return descriptorPath;
 }
 
 function writeNativeStructuralReachability(state) {
@@ -206,6 +240,11 @@ try {
     timeout: 10 * 60 * 1000,
   });
   process.env.ATLAS_GRAPHIFY_SOURCE_SNAPSHOT_ROOT = path.resolve(ROOT, '.tmp', 'workspace-source-snapshots', admittedSnapshotBinding.snapshot.snapshotRevision.replace(/^sha256:/, ''));
+  process.env.ATLAS_GRAPHIFY_EXECUTION_SOURCE_DESCRIPTOR = writeGraphifyExecutionSourceV2({
+    admission: admittedSnapshotBinding.admission,
+    snapshot: admittedSnapshotBinding.snapshot,
+    materializedRoot: process.env.ATLAS_GRAPHIFY_SOURCE_SNAPSHOT_ROOT,
+  });
   if (!quiet) console.log(`[graphify:daily] Bound to admitted workspace snapshot (${admittedSnapshotBinding.snapshot.sources.length} sources)...`);
 
   if (!quiet) console.log('[graphify:daily] Running repository provenance dry-run...');
@@ -384,18 +423,24 @@ try {
     process.exit(0);
   }
 
-  // GRAPHIFY-PROMOTION-ADMISSION-01: the ordinary daily entrypoint must not
-  // reach its apply-capable chain until the existing read-only fabric audit
-  // proves SAFE_TO_PROJECT. The audit writes only a local receipt and exits
-  // non-zero for NOT_SAFE_TO_PROJECT; no datastore or projection mutation is
-  // authorized by this gate.
-  if (!quiet) console.log('[graphify:daily] Checking canonical projection admission...');
-  execSync(PROMOTION_ADMISSION_SCRIPT, {
-    cwd: ROOT,
-    stdio: quiet ? 'ignore' : 'inherit',
-    timeout: 10 * 60 * 1000,
-    shell: true,
-  });
+  // GRAPHIFY-PROMOTION-ADMISSION-01: ordinary daily runs must not reach their
+  // apply-capable chain until the read-only fabric audit proves SAFE_TO_PROJECT.
+  // A snapshot-bound terminal run is a distinct, explicitly authorized
+  // bootstrap boundary: it must establish the execution/membership receipt
+  // before graph and ordinal manifests can exist. It does not promote any
+  // projection and does not authorize later repair or broad reindex work.
+  const snapshotTerminalRunAuthorized = process.env.ATLAS_GRAPHIFY_TERMINAL_AUTHORIZATION === TERMINAL_RUN_AUTHORIZATION;
+  if (snapshotTerminalRunAuthorized) {
+    if (!quiet) console.log('[graphify:daily] Snapshot terminal authorization accepted; deferring projection admission until post-run readback.');
+  } else {
+    if (!quiet) console.log('[graphify:daily] Checking canonical projection admission...');
+    execSync(PROMOTION_ADMISSION_SCRIPT, {
+      cwd: ROOT,
+      stdio: quiet ? 'ignore' : 'inherit',
+      timeout: 10 * 60 * 1000,
+      shell: true,
+    });
+  }
 
   // GRAPHIFY-OPEN-CLOSE-LIVE-WIRING-01 (2026-09-03): opens a real graphify_runs row and binds a
   // real, materialized WorkspaceRevisionRecordV1 to it before the actual indexing chain runs.
@@ -420,7 +465,13 @@ try {
   // own fanout orchestrator already grants itself a 2h overall-timeout
   // (see run-atlas-phase8-fanout.mjs), so the outer wrapper must not be
   // shorter than that. 3h gives headroom for the steps around it.
-  execSync(DAILY_CHAIN_SCRIPT, {
+  const dailyChainScript = snapshotTerminalRunAuthorized
+    ? DAILY_CHAIN_TERMINAL_SCRIPT
+    : DAILY_CHAIN_APPLY_SCRIPT;
+  if (!quiet) {
+    console.log(`[graphify:daily] Running ${snapshotTerminalRunAuthorized ? 'snapshot terminal read-only' : 'production apply'} chain...`);
+  }
+  execSync(dailyChainScript, {
     cwd: FRONTEND,
     stdio: 'inherit',
     timeout: 3 * 60 * 60 * 1000 // 3 hour timeout
@@ -649,7 +700,10 @@ try {
   process.exit(0);
 } catch (err) {
   console.error(`ERROR: graphify:daily failed: ${err.message}`);
-  if (!allowFallback) {
+  // The terminal authorization is deliberately limited to establishing a
+  // snapshot-bound execution receipt. Never fall back from its read-only
+  // chain into the legacy startup path, which may contain apply-capable work.
+  if (!allowFallback || process.env.ATLAS_GRAPHIFY_TERMINAL_AUTHORIZATION === TERMINAL_RUN_AUTHORIZATION) {
     console.error('[graphify:daily] Fallback disabled; exiting with failure.');
     console.log('graphify:daily complete');
     process.exit(1);

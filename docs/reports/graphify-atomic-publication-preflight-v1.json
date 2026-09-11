@@ -1,8 +1,8 @@
 {
   "schema": "atlas.graphify-atomic-publication-preflight.v1",
-  "generatedAt": "2026-09-09T22:30:14.219Z",
+  "generatedAt": "2026-09-10T19:11:03.063Z",
   "mode": "READ_ONLY",
-  "status": "PUBLICATION_PREFLIGHT_BLOCKED",
+  "status": "PUBLICATION_PREFLIGHT_READY_CANDIDATE_ONLY",
   "proofLevel": "PARTIAL_PROVEN",
   "authority": false,
   "writesPerformed": false,
@@ -16,11 +16,11 @@
     "builderUsesRunScopedTemporaryPath": true,
     "builderUsesAtomicRename": true,
     "exportUsesTemporaryFallback": true,
-    "candidateValidationHookPresent": false,
+    "candidateValidationHookPresent": true,
     "noDirectProgressiveCanonicalWriteProven": true
   },
   "admission": {
-    "candidateRunAllowed": false,
+    "candidateRunAllowed": true,
     "canonicalPromotionAllowed": false,
     "requiresSealedSnapshotBinding": true,
     "requiresIndependentReceipt": true

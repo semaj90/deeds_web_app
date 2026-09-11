@@ -1,6 +1,6 @@
 {
   "schema": "atlas.graphify-daily-feature-alignment.v1",
-  "generatedAt": "2026-09-08T05:21:04.964Z",
+  "generatedAt": "2026-09-10T22:46:20.618Z",
   "readOnly": true,
   "scope": {
     "table": "codebase_chunk_index",
@@ -75,9 +75,9 @@
   "valkey": {
     "reachable": true,
     "counts": {
-      "centroid:*": 66,
+      "centroid:*": 0,
       "som:*": 0,
-      "ace:*": 93,
+      "ace:*": 1,
       "gpu:karpathy:*": 0
     }
   }

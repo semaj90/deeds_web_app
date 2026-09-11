@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-24T16:56:48.932Z",
+  "generated_at": "2026-09-10T17:23:55.444Z",
   "status": "WARN",
   "source_artifacts": {
     "candidates": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\turbovec-candidates.ndjson",
@@ -32,7 +32,7 @@
     "semantic": {
       "score": 1,
       "coverage_pct": 100,
-      "evidence": "TurboVec ANN gRPC proof passed over Qdrant vectors"
+      "evidence": "candidate semantic_score present from tuple-derived ranker"
     },
     "context": {
       "score": 1,
@@ -1380,18 +1380,19 @@
       "implementation": "Use embeddings and graph consistency to detect incompatible relationships between concepts.",
       "created": true,
       "wired": true,
-      "proven": true,
+      "proven": false,
       "evidence": [
         "tuple-derived semantic candidate score exists",
-        "TurboVec ANN gRPC proof PASS over Qdrant vectors",
+        "TurboVec ANN gRPC proof missing or not passing",
         "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\turbovec-ann-grpc-proof.json"
       ],
       "missing": [
+        "EmbeddingGemma/Qdrant vectors loaded into TurboVec ANN",
         "summary embedding similarity",
         "graph consistency proof"
       ],
       "proof_command": "npm run atlas:turbovec:ann-grpc:proof && npm run atlas:ontology-kag:readiness",
-      "gan_status": "PROVEN"
+      "gan_status": "WIRED"
     },
     {
       "category": "context",
@@ -1488,18 +1489,15 @@
     }
   ],
   "accelerator_proof": {
-    "status": "PASS",
+    "status": "FAIL",
     "sidecar_dim": 64,
-    "http_indexed": 1000,
-    "grpc_candidates": 10,
-    "backend": "bridge:py(python)+addon(cuda)",
+    "http_indexed": 0,
+    "grpc_candidates": 0,
+    "backend": null,
     "gates": {
-      "qdrant_vectors": true,
-      "http_indexed": true,
-      "grpc_ok": true,
-      "grpc_search_nonempty": true,
-      "identity_preserved": true,
-      "pass": true
+      "qdrant_vectors": false,
+      "qdrant_identity_qualified": false,
+      "pass": false
     },
     "report": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\turbovec-ann-grpc-proof.json"
   },

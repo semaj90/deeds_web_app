@@ -11369,6 +11369,21 @@ Receipt: `docs/reports/emb3a-upstream-revision-owner-audit.json`.
 
 Receipt: `docs/reports/neo4j-candidate-ordinal-join-v1.json`.
 
+### GRAPH-ORDINAL-01 recheck (2026-09-10)
+
+- [x] Re-ran the read-only Neo4j/CandidateOrdinal join audit against the
+  current candidate map. It observed `4,951` candidates and `25,000` Neo4j
+  nodes.
+- [ ] Keep ordinal admission blocked: `198` candidates resolved through
+  strong identity, `19,013` resolved by source-reference-only matching,
+  `165` were ambiguous, and `5,624` were unresolved. Source-reference-only
+  matches are diagnostic and cannot establish canonical graph identity.
+- [ ] Do not seal an ordinal map or promote graph features until the join is
+  revision-qualified, repository-aware, ambiguity-free, and bound to one
+  graph manifest checksum.
+
+Receipt: `docs/reports/neo4j-candidate-ordinal-join-v1.json`.
+
 ## GPU-RETRIEVAL-VALIDATION-01: current readiness and recommendation dry-run (2026-08-27)
 
 - [x] Confirmed WSL2 `atlas-rapids-cu13` is reachable with cuGraph,
@@ -13084,6 +13099,18 @@ projection/artifact revision and reconciled to PostgreSQL. No points were
 deleted or modified. Receipt:
 `docs/reports/qdrant-semantic768-population-audit-v1.json`.
 
+### Core evaluation-lane recheck (2026-09-10)
+
+- [x] Re-ran the golden-review corpus compatibility audit. The current
+      result is `COMPATIBLE_CORPUS_MISSING`: one manifest was found, zero are
+      compatible with `embeddinggemma:latest` / 768D / `codebase_chunks_768`,
+      and judgment import remains disabled.
+- [x] Re-ran the golden-review query binding audit. It resolved `60/60`
+      review-pool query bindings with zero unresolved bindings; this is only
+      review-artifact binding and does not establish reviewed relevance.
+- [ ] Keep retrieval judgment and parity promotion blocked until a compatible
+      current semantic corpus manifest and human-reviewed judgments exist.
+
 Detailed classification shows 53,042 records marked `semantic_768`, 52,365
 marked `embeddinggemma_768_native_v1`, and 528 signature-only vectors. A large
 remainder has missing lineage/payload fields. This confirms multiple historical
@@ -14235,3 +14262,96 @@ Receipt: `docs/reports/kernel-dag-operator-owner-reconciliation-v1.json`.
   `REPRESENTATION_REVISION_MISSING`.
 - This proves the collection shape is 768D but does not prove current semantic
   lineage. No Qdrant, PostgreSQL, Neo4j, Valkey, or model writes occurred.
+
+### Semantic corpus manifest recheck (2026-09-10)
+
+- [x] Re-ran `node scripts/atlas/plan-current-semantic768-corpus-manifest-v1.mjs`.
+      It reports `55,169` PostgreSQL chunks and two live 768D Qdrant
+      collections (`109,776` and `52,816` points).
+- [ ] Keep semantic manifest admission blocked: live corpus selection is
+      unresolved between the two collections, `judgmentSetHash=pending`, and
+      `importAllowed=false`. No manifest registration or vector write occurred.
+
+### SEMANTIC-768 bounded lineage cohort recheck (2026-09-10)
+
+- [x] Re-ran the independent read-only semantic cohort audit. The bounded
+      cohort resolved `15/15` exact chunk rows, had `0` missing or ambiguous
+      chunk joins, and had vectors plus producer metadata for all `15` rows.
+- [x] Recorded `SEMANTIC_768_COHORT_PROVEN` for this bounded cohort only.
+- [ ] Do not generalize this result to the full corpus: the current semantic
+      manifest remains blocked by competing 768D collections, missing sealed
+      judgment-set lineage, and unresolved full-corpus authority.
+
+Receipt: `docs/reports/lineage-semantic-768-cohort-v1.json`.
+
+### Qdrant missing-population recheck (2026-09-10)
+
+- [x] Re-ran the read-only missing-population audit for
+      `codebase_chunks_768_v2`. It found `675` missing rows, all marked
+      `embedding_eligible=false`; none were absent from PostgreSQL.
+- [x] Ruled out a simple `id` versus `qdrant_id` lookup mismatch for the
+      sampled values.
+- [ ] Keep the population lane open: `28/675` rows still contain a non-null
+      768D embedding while marked ineligible. The ingestion/eligibility policy
+      needs separate review before any projection conclusion is made.
+
+Receipt: `docs/reports/qdrant-point-missing-population-v1.json`.
+
+### Qualified semantic coverage recheck (2026-09-10)
+
+- [x] Re-ran the read-only semantic coverage canary: `15/15` Qdrant exact
+      `semantic_768` matches and `15/15` PostgreSQL vectors were present.
+- [x] Physical contract is proven for `semantic_768`, 768 dimensions, Cosine,
+      and Qdrant vector name `content`.
+- [ ] Keep full semantic promotion blocked: this is a bounded 15-row canary;
+      it does not resolve the competing full-corpus collection owners or
+      missing workspace/revision admission.
+
+Receipt: `docs/reports/lineage-qualified-semantic-coverage-v1.json`.
+
+### Embedding/Qdrant writer-lineage recheck (2026-09-10)
+
+- [x] Ran the read-only writer-lineage census: `9` writer surfaces were
+      discovered and `2` satisfy the complete contract checks.
+- [ ] Keep projection population and promotion open. The audit reports
+      `WRITER_CONTRACT_PRESENT_PROJECTION_POPULATION_OPEN`; it does not prove
+      one current writer, full identity coverage, or Qdrant parity.
+
+Receipt: `docs/reports/emb3a-qdrant-writer-lineage-audit.json`.
+
+### Latent representation identity recheck (2026-09-10)
+
+- [x] Ran the read-only latent representation identity audit with transaction
+      rollback. Schema inventory, packet identity, Qdrant join classification,
+      report generation, and zero-mutation checks passed.
+- [ ] Keep representation promotion blocked: source-version and symbol joins
+      are not proven, tree identity is only partial, BYTEA encoding is only
+      partial, and the representation ledger is not proven.
+
+Receipt: `docs/reports/latent-representation-identity-audit-2026-09-10.json`.
+
+### Core lane progression update: representation identity blocker (2026-09-10)
+
+- [x] Classified the current latent representation audit as a read-only
+      `PARTIAL_PROVEN` result. The byte-length/encoding check, packet identity,
+      report generation, and zero-mutation guard passed for the bounded sample.
+- [ ] Keep representation admission blocked until the current source-version
+      join, symbol-version join, and representation ledger are proven. The live
+      audit found `0/1000` source-version joins, `0/1000` symbol-version joins,
+      and `0/1000` generic representation-record joins; no revision or producer
+      metadata was synthesized.
+- [x] Switched progression to the next independent core lane after recording
+      first blocker `REPRESENTATION_SOURCE_AND_LEDGER_LINEAGE_UNPROVEN`.
+
+Receipt: `docs/reports/latent-representation-identity-audit-2026-09-10.json`.
+
+### Golden-review query binding recheck (2026-09-10)
+
+- [x] Ran the read-only query-binding audit: `60` review-pool queries and
+      `112` evaluation queries were found; all `60` queue queries have exact
+      text bindings and `0` bindings are unresolved.
+- [ ] Keep evaluation import and quality promotion blocked: the bindings are
+      not reviewed judgments, `canonicalAuthority=false`, and
+      `importAllowed=false`.
+
+Receipt: `docs/reports/golden-review-query-bindings-v1.json`.

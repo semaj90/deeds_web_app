@@ -12,7 +12,7 @@
 # Run:   docker compose -f docker/omni-worker/docker-compose.omni.yml up
 
 # ── Stage 1: Conda base with CUDA 12.1 ────────────────────────────────
-FROM continuumio/miniconda3:latest AS conda-base
+FROM continuumio/miniconda3@sha256:08e13ed38d9807f7bf2093ed0ba6403343bce05e83df6b6866d9223060bd4e6f AS conda-base
 
 # CUDA toolkit from conda-forge (avoids NVIDIA base image restrictions)
 RUN conda install -y -c conda-forge -c nvidia \

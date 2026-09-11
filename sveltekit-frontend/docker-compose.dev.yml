@@ -3,7 +3,7 @@ version: '3.8'
 services:
   # Valkey with authentication
   valkey:
-    image: valkey/valkey-bundle:8.1.1
+    image: valkey/valkey-bundle:8.1.1@sha256:8b6501bf71570ee597e621628b141500d9ad24a4137296dbd92ff7791c14367f
     container_name: deeds-valkey
     ports:
       - "6379:6379"
@@ -39,7 +39,7 @@ services:
 
   # Neo4j Graph Database
   neo4j:
-    image: neo4j:5-community
+    image: neo4j:5-community@sha256:937fbd163e302a5751dd329b719c1b05e2a4293af223d61b1aa17e3dea087709
     container_name: deeds-neo4j
     ports:
       - "7474:7474"
@@ -77,7 +77,7 @@ services:
 
   # Qdrant Vector Database
   qdrant:
-    image: qdrant/qdrant:v1.19.0
+    image: qdrant/qdrant:v1.19.0@sha256:057ee3a8da769fe7310dd3537b4dc7583bf87a95ce8ac43c0af5a46bc580d1fc
     container_name: deeds-qdrant
     ports:
       - "6333:6333"

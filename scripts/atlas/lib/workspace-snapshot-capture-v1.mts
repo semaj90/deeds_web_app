@@ -112,7 +112,7 @@ export function sealSnapshot(first: ReturnType<typeof observeSnapshot>, second: 
     canonicalAuthority: false, datastoreWritesPerformed: false };
 }
 
-export function validateSnapshot(snapshot: ReturnType<typeof sealSnapshot>) {
+export function validateSnapshot(snapshot: ReturnType<typeof sealSnapshot>, options?: { sourceReadRoot?: string }) {
   const { schema, snapshotRevision, workspaceRevision, status, canonicalAuthority, datastoreWritesPerformed, ...body } = snapshot;
   const violations: string[] = [];
   if (schema !== 'atlas.workspace-source-snapshot-capture.v1' || hash(body) !== snapshotRevision) violations.push('MANIFEST_CHECKSUM_MISMATCH');
@@ -127,8 +127,13 @@ export function validateSnapshot(snapshot: ReturnType<typeof sealSnapshot>) {
     // reporting, but the bytes live under repositoryPath. Resolve against
     // that repository root so readback validates the sealed multi-repo
     // snapshot rather than incorrectly treating every entry as root-owned.
-    const repositoryRoot = path.resolve(root, source.repositoryPath ?? '');
-    const relativeSource = source.repositoryRelativePath ?? source.sourceRef;
+    const materializedRoot = options?.sourceReadRoot ? realpathSync(options.sourceReadRoot) : null;
+    const repositoryRoot = materializedRoot
+      ? materializedRoot
+      : path.resolve(root, source.repositoryPath ?? '');
+    const relativeSource = materializedRoot
+      ? source.sourceRef
+      : source.repositoryRelativePath ?? source.sourceRef;
     const file = path.resolve(repositoryRoot, relativeSource);
     try {
       const resolvedRepositoryRoot = realpathSync(repositoryRoot);

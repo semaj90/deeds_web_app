@@ -2,16 +2,16 @@
 # GPU-accelerated RAG → KAG → LangGraph DAG pipeline
 # Connects to: Ollama (:11434), Qdrant (:6333), Neo4j (:7687), PostgreSQL (:5432), RabbitMQ (:5672)
 #
-# Install (local Windows .venv, CUDA 13.0 — skip tensorrt-llm):
-#   pip install --index-url https://download.pytorch.org/whl/cu130 \
+# Install (local Windows .venv, CUDA 12.8 — skip tensorrt-llm):
+#   pip install --index-url https://download.pytorch.org/whl/cu128 \
 #     $(grep -v tensorrt-llm requirements.txt | grep -v '^#')
 #
-# Install (Docker, Linux — CUDA 13.0):
+# Install (Docker, Linux — CUDA 12.8):
 #   pip install --no-cache-dir \
-#     --index-url https://download.pytorch.org/whl/cu130 \
+#     --index-url https://download.pytorch.org/whl/cu128 \
 #     --extra-index-url https://pypi.nvidia.com \
 #     -r requirements.txt
-# Alignment: LibTorch 2.9.0+cu130 (simd-bridge C++ addon). Updated 2026-05-27.
+# Alignment: Docker runtime CUDA 12.8 with PyTorch 2.7.0+cu128.
 
 # ── LangChain + LangGraph ─────────────────────────────────────────────────────
 langchain==1.2.3
@@ -29,12 +29,12 @@ redis==5.3.0
 aio-pika==9.5.5          # RabbitMQ async
 
 # ── Embeddings / Inference ────────────────────────────────────────────────────
-ollama>=0.6.0,<1.0.0
-numpy>=1.26.0             # HMM Viterbi tagger (LegalHMM) — also required by torch
+ollama==0.6.1
+numpy==2.4.3              # HMM Viterbi tagger (LegalHMM) — also required by torch
 sentence-transformers==3.4.1
-torch==2.9.0+cu130        # CUDA 13.0 — aligned with LibTorch 2.9.0+cu130 (simd-bridge)
-torchvision==0.24.0+cu130
-torchaudio==2.9.0+cu130
+torch==2.7.0+cu128        # CUDA 12.8 — matches the Dockerfile install layer
+torchvision==0.22.0+cu128
+torchaudio==2.7.0+cu128
 
 # ── TensorRT-LLM (DISABLED — nvidia-smi unavailable at Docker build time) ─────
 # tensorrt-llm>=0.18.0    # requires TensorRT 10.x; LLM inference via Ollama/TurboQuant instead

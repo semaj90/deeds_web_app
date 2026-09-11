@@ -128,8 +128,16 @@ function mergedEnv(extra = {}) {
     VITE_GPU_ENABLED: 'true',
     CUDA_VISIBLE_DEVICES: envFromFiles.CUDA_VISIBLE_DEVICES ?? '0',
     EMBEDDING_BACKEND: embeddingBackend,
+    // EMBEDDING_BACKEND controls launcher/session policy, while
+    // EMBEDDING_PROVIDER controls the /api/embed route. Keep them aligned so
+    // `EMBEDDING_BACKEND=onnx_directml` actually reaches the DirectML branch
+    // instead of being shadowed by a stale .env EMBEDDING_PROVIDER=ollama.
+    EMBEDDING_PROVIDER: embeddingBackend,
     // Explicit undefined (not omission) so a leftover value from process.env
     // or envFromFiles is actually cleared for the child process, not inherited.
+    EMBEDDING_BASE_URL: wantOnnxEmbedServer
+      ? (envFromFiles.EMBEDDING_BASE_URL ?? envFromFiles.EMBED_SERVER_URL ?? 'http://127.0.0.1:8081')
+      : undefined,
     OLLAMA_EMBED_BASE_URL: wantOnnxEmbedServer
       ? (envFromFiles.OLLAMA_EMBED_BASE_URL ?? envFromFiles.EMBED_SERVER_URL ?? 'http://127.0.0.1:8081')
       : undefined,
@@ -593,6 +601,7 @@ async function main() {
   // near-instantly when :8081 isn't up.
   const embedPort = parseInt(process.env.EMBED_SERVER_PORT ?? '8081');
   const embeddingBackend = resolveEmbeddingBackend();
+  let runtimeEmbeddingBackend = embeddingBackend;
   const wantEmbedServer = embeddingBackend === 'llama_cpp_gguf';
   if (embeddingBackend === 'onnx_directml') {
     console.log('[dev:gpu] ✅ Embedding backend: onnx_directml — in-process ONNX Runtime session, no separate port');
@@ -608,6 +617,11 @@ async function main() {
       });
       console.log('[dev:gpu] ✅ Embedding backend: llama_cpp_gguf — GGUF/CUDA server on :8081 (EMBEDDING_BACKEND=llama_cpp_gguf)');
     } catch {
+      // The requested dedicated server is optional. Propagate the fallback
+      // choice to every child process; otherwise the child can retain a stale
+      // EMBEDDING_PROVIDER/EMBEDDING_BASE_URL from .env and keep dialing the
+      // failed 8081 endpoint instead of using Ollama.
+      runtimeEmbeddingBackend = 'ollama';
       console.log('[dev:gpu] ⚠️  llama_cpp_gguf embed server unavailable, using Ollama fallback');
       console.log('[dev:gpu] Embedding backend: ollama — model embeddinggemma:latest, endpoint http://127.0.0.1:11434/api/embed, execution provider Ollama-managed');
     }
@@ -615,6 +629,12 @@ async function main() {
     console.log('[dev:gpu] Embedding backend: ollama — model embeddinggemma:latest, endpoint http://127.0.0.1:11434/api/embed, execution provider Ollama-managed (on-demand)');
     console.log('[dev:gpu]    Set EMBEDDING_BACKEND=llama_cpp_gguf to eagerly start a dedicated GGUF/CUDA embed server on :8081');
   }
+
+  const runtimeEmbeddingEnv = (extra = {}) => mergedEnv({
+    EMBEDDING_BACKEND: runtimeEmbeddingBackend,
+    EMBEDDING_PROVIDER: runtimeEmbeddingBackend,
+    ...extra,
+  });
 
   // Start the NLP sidecar unless already running on :8095
   const nlpPort = parseInt(process.env.MINIFORGE_SIDECAR_PORT ?? '8095', 10);
@@ -631,7 +651,7 @@ async function main() {
       '-Detached',
       '-Port',
       String(nlpPort),
-    ], { cwd: REPO_ROOT, env: mergedEnv({ MINIFORGE_SIDECAR_PORT: String(nlpPort) }) });
+    ], { cwd: REPO_ROOT, env: runtimeEmbeddingEnv({ MINIFORGE_SIDECAR_PORT: String(nlpPort) }) });
     console.log(`[dev:gpu] ✅ NLP sidecar started on :${nlpPort}`);
   }
 
@@ -703,7 +723,7 @@ async function main() {
 
   // Launch downstream pipeline orchestrator in background (after Vite warmup)
   const orchestratorScript = path.resolve(REPO_ROOT, 'scripts/atlas/graphify-trigger-downstream-pipeline.mjs');
-  const orchestratorEnv = mergedEnv({ SVELTEKIT_URL: `http://127.0.0.1:${vitePort}` });
+  const orchestratorEnv = runtimeEmbeddingEnv({ SVELTEKIT_URL: `http://127.0.0.1:${vitePort}` });
   const orchestratorChild = spawn('node', [orchestratorScript, '--wait-ready', '--verbose'], {
     cwd: REPO_ROOT,
     env: orchestratorEnv,
@@ -738,7 +758,7 @@ async function main() {
   const npx = process.platform === 'win32' ? 'npx.cmd' : 'npx';
   spawnForeground(npx, ['vite', 'dev', '--port', String(vitePort)], {
     cwd: FRONTEND_ROOT,
-    env: mergedEnv({ VITE_PORT: String(vitePort) }),
+    env: runtimeEmbeddingEnv({ VITE_PORT: String(vitePort) }),
   });
 }
 

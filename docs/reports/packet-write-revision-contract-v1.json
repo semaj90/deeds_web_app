@@ -1,6 +1,6 @@
 {
   "schema": "atlas.packet-write-revision-contract.v1",
-  "generatedAt": "2026-09-09T03:34:31.732Z",
+  "generatedAt": "2026-09-10T17:44:01.115Z",
   "mode": "READ_ONLY",
   "writesPerformed": false,
   "gate": "PACKET_WRITE_REVISION_CONTRACT_01",
@@ -36,7 +36,7 @@
     "revisionColumnGroundTruth": [
       {
         "column": "source_revision",
-        "existsLive": false
+        "existsLive": true
       },
       {
         "column": "workspace_revision",
@@ -127,7 +127,7 @@
     "identity_lane_default_unset": 3352,
     "interpretation": "distinct_workspace_revisions=1 across 61,718 rows means every row shares the identical workspace_revision value (the schema default, 0) -- the column exists and is NOT NULL, but has never actually been incremented/exercised in this dataset. content_hash is 99.4% NULL (61,365/61,718) and lineage_version is 99.997% NULL (61,716/61,718) -- both exist as columns but are effectively unused. None of the three live revision-adjacent columns (workspace_revision, content_hash, lineage_version) currently carries real, populated revision evidence at scale. identity_lane: 58,365 canonical / 0 recoverable / the remainder default ('qdrant_chunk', the column's default value, meaning identity_lane was never explicitly set for those rows either) -- toolIdentityRecover has apparently been invoked for at most 58,365 rows historically (or those rows reached 'canonical' via a different path; this audit does not distinguish which without a timestamped write-history table, which does not exist)."
   },
-  "packetKeyIdentitySemantics": "LOGICAL_STABLE_ACROSS_REVISIONS_BY_NECESSITY",
+  "packetKeyIdentitySemantics": "UNPROVEN",
   "packetKeyIdentitySemanticsReasoning": "With no source_revision column and a live UNIQUE(packet_key) constraint, the schema currently permits at most ONE row per packet_key regardless of how many times its source content changes -- there is no schema-level mechanism to hold multiple revision-qualified rows for the same logical packet_key. packet_key is therefore LOGICAL_STABLE_ACROSS_REVISIONS by construction (one row per key, mutated in place), NOT revision-bound, until/unless a schema change introduces a composable (packet_key, source_revision) identity or an explicit version-history side table.",
   "columnClassification": {
     "HARD_CANONICAL": {
@@ -182,9 +182,9 @@
   ],
   "acceptance": {
     "overlapExists": false,
-    "sourceRevisionColumnExistsLive": false,
+    "sourceRevisionColumnExistsLive": true,
     "packetKeyHasLiveUniqueConstraint": true,
-    "packetKeyIdentitySemanticsProven": true,
+    "packetKeyIdentitySemanticsProven": false,
     "revisionInputsProven": false,
     "allLiveCallersRevisionQualified": false,
     "conflictPolicySafe": true,

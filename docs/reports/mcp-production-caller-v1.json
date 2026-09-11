@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-04T02:29:36.773Z",
+  "generatedAt": "2026-09-11T05:43:22.470Z",
   "schema": "atlas.mcp-production-caller.v1",
   "registryPath": "docs/reports/mcp-tool-registry-index.json",
-  "registryRevision": "sha256:84487fe9b2184b19ac6d340b808d95d9605554825d44ab5f26959ad097321df4",
+  "registryRevision": "sha256:f456fe6b6fe4cfc3da6548e95a41e94565dbdde218b73321de8c10cd5ff0fc4b",
   "callers": [
     "sveltekit-frontend/src/mcp/server.ts",
     "sveltekit-frontend/src/routes/api/acp/tools/+server.ts"
@@ -24,5 +24,5 @@
   "canonicalAuthority": false,
   "writesPerformed": false,
   "status": "PROVEN_READ_ONLY_BOUNDED_CALLER",
-  "reportChecksum": "sha256:590111582da3471fd9a911190e66be2249d3759a29c9fbf3a036575bf2bbc228"
+  "reportChecksum": "sha256:c3d251e8a3007536ffb6016963791ffb381bf1c7abfff28f5c78ab689f964aa5"
 }

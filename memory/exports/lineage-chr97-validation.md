@@ -1,6 +1,6 @@
 # Atlas CHR97 Lineage Validation
 
-Generated: 2026-08-26T23:45:56.706Z
+Generated: 2026-09-10T17:45:09.016Z
 
 ## Result: ❌ FAIL (8/13 checks, 61.5% pass rate)
 
@@ -8,11 +8,11 @@ Generated: 2026-08-26T23:45:56.706Z
 
 | Check | Status | Message |
 |-------|--------|---------|
-| C1:ncp_in_atlas | ✅ | nes_chrom_packets in atlas_feature_map: 328/328 (100.0%) |
-| C2:ncp_feature_id | ✅ | nes_chrom_packets with feature_id: 328/328 (100.0%) |
-| C3:ncp_chunk_id | ✅ | nes_chrom_packets with chunk_id: 328/328 (100.0%) |
-| C4:ncp_kag_node_key | ❌ | nes_chrom_packets with kag_node_key: 0/328 (0.0%) |
-| C5:ncp_qdrant_reachability | ❌ | nes_chrom_packets qdrant_point_id: 0/328 have ID (0.0%); Qdrant reachable: 0/0 sampled (100.0%) |
+| C1:ncp_in_atlas | ✅ | nes_chrom_packets in atlas_feature_map: 1992/1992 (100.0%) |
+| C2:ncp_feature_id | ✅ | nes_chrom_packets with feature_id: 1992/1992 (100.0%) |
+| C3:ncp_chunk_id | ✅ | nes_chrom_packets with chunk_id: 1992/1992 (100.0%) |
+| C4:ncp_kag_node_key | ❌ | nes_chrom_packets with kag_node_key: 0/1992 (0.0%) |
+| C5:ncp_qdrant_reachability | ❌ | nes_chrom_packets qdrant_point_id: 0/1992 have ID (0.0%); Qdrant reachable: 0/0 sampled (100.0%) |
 | C6:kag_hits_to_ncp | ❌ | nes_chrom_kag_dag_hits → nes_chrom_packets: 0/0 (0.0%) |
 | C7:kag_chunk_join | ❌ | kag_dag_hits chunk_id → nes_chrom_packets: 0/0 (0.0%) |
 | C8:kag_source_ref_join | ❌ | kag_dag_hits → nes_chrom_packets (source_ref OR chunk_id): 0/0 (0.0%) |

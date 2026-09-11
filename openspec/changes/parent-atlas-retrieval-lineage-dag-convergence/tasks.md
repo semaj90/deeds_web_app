@@ -4400,6 +4400,41 @@ missing source revisions, and write-capable tools must continue to fail closed. 
 NLP names or byte spans directly to symbol identity, and do not create a second ACE/registry
 owner.
 
+### MCP-TOOL-VITERBI-PROPOSAL-RECHECK-01 (2026-09-11, PROPOSAL-PROVEN)
+
+Re-ran the revisioned MCP/Viterbi proposal bridge tests. Both bridge versions
+passed (`18/18` tests total). The bridge remains proposal-only: it validates
+server-qualified tool identity and registry revisions, rejects unsafe or
+unknown tools, and performs no MCP calls or durable writes. This proves the
+bounded proposal seam, not live dense tool-manifest coverage or execution.
+
+- [x] `mcp-tool-viterbi-bridge-v1.spec.ts` passed: `5/5`.
+- [x] `mcp-tool-viterbi-bridge-v2.spec.ts` passed: `13/13`.
+- [ ] Keep live execution and promotion blocked until current registry and
+  source/revision evidence are admitted.
+
+Evidence: focused Vitest output and the two bridge test files.
+
+### MCP-TOOL-BOUNDED-CANDIDATE-SHORTLIST-01 (2026-09-11, PARTIAL)
+
+Re-ran `scripts/atlas/runtime-mcp-tool-selector.mjs --audit`. EmbeddingGemma
+retrieval and the revisioned registry fallback both returned bounded tool
+selections, but dense Qdrant coverage remains `0/20` known tool-manifest
+mappings with zero `tool_manifest` packets. The selector now clamps retrieval
+shortlists to at most `20` candidates and reports `requested_top_k`,
+`effective_top_k`, and `candidate_budget=BOUNDED_RETRIEVAL_SHORTLIST`.
+The existing router remains responsible for final top-three selection and FSM
+legality; no new Qdrant producer or execution path was added.
+
+- [x] Preserve the existing revisioned registry fallback.
+- [x] Enforce a maximum 20-tool retrieval shortlist.
+- [x] Verify an excessive `topK=100` request returns at most 20 tools.
+- [ ] Restore/prove dense tool-manifest projection coverage before claiming
+  semantic MCP pickup.
+
+Evidence: `docs/reports/mcp-tool-selection-audit.json` and
+`scripts/atlas/runtime-mcp-tool-selector.mjs`.
+
 ### WORKSPACE-REVISION-AWARE-GRAPHIFY-OPEN-05 (2026-09-03, DRY-RUN ADAPTER CONTRACT — PROVEN)
 
 Added coverage proving that `createGraphifyLifecycleWriterDepsV1` constructs exactly three
@@ -4582,6 +4617,13 @@ Evidence: `docs/reports/mcp-tool-registry-drift-classification-v1.json`, `docs/r
   `CandidateOrdinalMapV1`, `CandidateFeatureSnapshotV1`, or
   `RevisionAuthorityEnvelopeV1` artifacts were supplied; no replacements were
   synthesized. Evidence: `docs/reports/ace-live-dry-input-readiness-v2.json`.
+
+  **ACE live dry-input recheck (2026-09-10):** the read-only checker remains
+  `ACE_LIVE_DRY_INPUT_BLOCKED` when invoked without authoritative artifacts.
+  `CandidateOrdinalMapV1`, `CandidateFeatureSnapshotV1`, and
+  `RevisionAuthorityEnvelopeV1` were all missing arguments; no bundle was
+  synthesized and no cache or canonical writes occurred. This is an expected
+  fail-closed result, not evidence of ACE readiness.
 
   **ACE-FEATURE-SOURCE-OWNER-01 owner census + bounded canary (2026-09-04) — real progress, still
   NOT closing this checkbox.** Per operator direction: do not build another retrieval engine or
@@ -8695,6 +8737,14 @@ the database uniqueness prerequisite without closing 08A-07/08.
 Receipt:
 `docs/reports/pkt-lineage-08a-membership-writer-preflight-v1.json`.
 
+**Namespace-owner recheck (2026-09-10):** the bounded namespace proof still
+returns `SOURCE_NAMESPACE_AUTHORITY_PROVEN` for repository ID `deeds-web-app`
+with `50` safe source paths, zero ambiguity, and zero synthetic namespaces.
+Registry coverage remains `0/50`, so this proves namespace normalization only;
+it does not prove current source membership or full-workspace authority.
+
+Receipt: `docs/reports/source-namespace-authority-v1.json`.
+
 **08A-04 through 08A-06 evidence (2026-09-05):** The bounded snapshot regenerated
 as `BOUNDED_LINEAGE_SNAPSHOT_PROVEN` for 50 sources and 434 chunks with a stable
 receipt checksum across immediate replay. The guarded physical-row apply consumed
@@ -10363,6 +10413,30 @@ treated as unreadable current sources. The two `turbovec/.github/workflows`
 files found in the latest capture are confirmed tracked deletions. They still
 require base-snapshot hydration before a temporal tombstone can be admitted.
 
+### Workspace revision admission hardening (2026-09-10)
+
+- [x] Harden `admit-workspace-revision-tournament-v1.mts` so explicit
+  admission requires the supplied workspace revision to equal the current
+  preflight candidate, and requires the preflight manifest to exist with the
+  matching snapshot revision, source count, and `sourceMembershipChecksum`.
+  This prevents stale or cross-paired workspace/snapshot admissions.
+- [x] Verify the admission boundary fails closed when explicit confirmation is
+  absent; no authority receipt is rewritten by the negative check.
+- [x] Capture a fresh stable seven-repository snapshot after the hardening:
+  `25,267` sources, `0` capture violations, snapshot
+  `sha256:5700bc8d33b8f81110604d6ef74b304772019e7b85fdd9314e25198b9e96dc45`.
+  Derivation/preflight produced candidate
+  `sha256:e5d7d7783b3df8905baf8aefca7541310fce7da88fdd76c68b8e459ee451fdaa`.
+- [ ] Admit the new candidate only with explicit operator authorization;
+  Graphify execution and projection writes remain unauthorized.
+- [ ] Re-run snapshot-bound Graphify consumption against the newly admitted
+  pair and independently prove a terminal execution/membership readback.
+
+The post-edit read-only binding audit correctly returned
+`SNAPSHOT_READBACK_NOT_PROVEN` with `25,266/25,267` exact matches because the
+admitted snapshot predates the admission-script edit. This is expected stale
+snapshot evidence, not permission to bypass byte readback.
+
 Fresh full-workspace capture and independent readback then passed:
 `CAPTURE_VERIFIED_REQUIRES_PROCESSING_READBACK`, snapshot revision
 `sha256:fe8e848a7b2d75073f00f29d6996e773c7d9c29c865c309fb0aa86646c06f738`,
@@ -10730,3 +10804,1106 @@ Evidence: `scripts/atlas/graphify-report-to-openspec-draft.mjs`, bounded
 `GET http://127.0.0.1:8090/v1/models`. `writesPerformed=false` for database,
 projection, cache, source, and model state; dry-run report discovery remains a
 derived filesystem read path.
+
+### Qdrant identity lane recheck (2026-09-10)
+
+- [x] Re-ran the read-only packet fan-out identity census for
+      `codebase_chunks_768`.
+- [ ] Keep Qdrant identity promotion blocked: `109,776` points and `9,964`
+      packet keys were observed, but `1,616` conflicting-source groups,
+      `2,630` exact duplicate projection groups, `5,701` revision-unproven
+      groups, and only `30` points with source/workspace revision metadata
+      remain. `promotionEligible=false`; no Qdrant repair occurred.
+
+### Postgres-to-Qdrant exact parity recheck (2026-09-10)
+
+- [x] Ran the independent read-only parity proof for the bounded cohort.
+      `15/15` identity matches, vector matches, and score matches were
+      observed; `rankParity=true`.
+- [ ] Keep full Qdrant promotion blocked. The bounded parity result does not
+      override the full collection census showing duplicate, conflicting, and
+      revision-unproven projection groups.
+
+Receipt: `docs/reports/lineage-pgvector-qdrant-parity-v1.json`.
+
+### Canonical projection fabric recheck (2026-09-10)
+
+- [x] Re-ran the read-only canonical projection admission audit. PostgreSQL
+      transaction rollback confirmed zero production mutations.
+- [ ] Keep projection admission blocked: `10/11` predicates remain below
+      `PASS`, including revision qualification, symbol resolution, latent
+      family proof, graph/ordinal sealing, checksum alignment, BitFrost key
+      derivation, and ACE grounding. Only ontology cohort presence passes.
+
+Receipt: `docs/reports/atlas-canonical-projection-fabric-audit-2026-09-10.json`.
+
+### Source-lineage model recheck (2026-09-10)
+
+- [x] Re-ran the read-only source-lineage model audit. Stable identity has
+      `22,604` rows; Graphify-backed version observations have `26,014` rows;
+      packet rows total `61,718`.
+- [ ] Keep the binding layer blocked: only `117` of `25,643` Graphify source
+      references are present in the stable registry, `25,526` are missing
+      registry coverage, and current packet-to-workspace joins remain `0`.
+- [ ] Do not populate or promote bindings from this audit; it proves the
+      schema/layers exist but not current authority.
+
+Receipt: `docs/reports/source-lineage-model-v1.json`.
+
+### Packet/Qdrant bridge audit hardening (2026-09-10)
+
+- [x] Corrected `scripts/atlas/audit-current-packet-qdrant-bridge-v1.mjs`
+      so an empty cohort cannot return `PACKET_QDRANT_BRIDGE_PRESENT`.
+- [x] Re-ran the read-only audit: the current plan produced `0` planned
+      sources and `0` packet rows, so the corrected result is
+      `PACKET_QDRANT_BRIDGE_MISSING` with
+      `NON_EMPTY_EXACT_PACKET_QDRANT_COHORT_REQUIRED`.
+- [ ] Do not treat this empty-plan result as a Qdrant identity proof; a
+      non-empty, revision-qualified cohort is still required.
+
+Receipt: `docs/reports/current-packet-qdrant-bridge-v1.json`.
+
+### Packet-to-chunk bridge recheck (2026-09-10)
+
+- [x] Ran the read-only exact packet-to-chunk bridge census. Of `353` examined
+      rows, `100` had exact source/content-qualified chunk identity.
+- [ ] Keep full lineage promotion blocked: `74` rows were source-only
+      ambiguous and `179` were revision-unproven. The audit's bounded
+      `promotionEligible=true` applies only to constructing a bounded exact
+      canary, not to full-workspace authority.
+
+Receipt: `docs/reports/chunk-bridge-v1.json`.
+
+### Candidate-corpus lineage recheck (2026-09-10)
+
+- [x] Ran the read-only candidate-corpus lineage audit across `61,718`
+      `atlas_packets` rows.
+- [ ] Keep candidate admission blocked: `0` rows were admitted, `61,717`
+      lacked a source revision, and `1` lacked a source reference. The
+      resulting lineage checksum is diagnostic only.
+
+Receipt: `docs/reports/candidate-corpus-lineage-v1.json`.
+
+### Packet-write revision contract recheck (2026-09-10)
+
+- [x] Ran the read-only packet-writer contract audit. `source_revision` is
+      present in the live schema and the inspected identity-recovery writer
+      does not overwrite packet identity fields.
+- [ ] Keep the contract at `PARTIAL_PROVEN`: packet-key identity semantics
+      remain unproven, and this does not establish current source authority or
+      qualify the full candidate corpus.
+
+Receipt: `docs/reports/packet-write-revision-contract-v1.json`.
+
+### Source-selection authority alignment recheck (2026-09-10)
+
+- [x] Ran the read-only comparison of current batch, registry, projection,
+      and lineage plans. It found `5` batch rows, `0` registry rows,
+      `52` projection rows, and `0` shared references.
+- [ ] Keep authority alignment blocked with decision `DO_NOT_APPLY`.
+      No workspace-revision mismatch was observed, but registry admission is
+      not ready and the plans do not share an admitted source cohort.
+
+Receipt: `docs/reports/source-selection-authority-alignment-v1.json`.
+
+### Source-registry contract recheck (2026-09-10)
+
+- [x] Ran the read-only registry contract audit. The registry contains
+      `22,604` rows, `111` workspace binding rows, and `2` foreign keys.
+- [ ] Keep reconciliation blocked: the current source plan supplied
+      `selectedSourceCount=0`, so no current cohort could be compared or
+      admitted. Structural schema presence is not source authority.
+
+Receipt: `docs/reports/current-source-registry-contract-v1.json`.
+
+### Git-source authority recheck (2026-09-10)
+
+- [x] Ran the read-only Git/blob authority audit for the configured Graphify
+      run. The repository tree contained `25,365` entries, but the run had
+      `0` associated `graphify_files` rows.
+- [ ] Keep Git source authority unproven: no file-level comparison could be
+      performed and `gitAuthorityProven=false`. Do not infer authority from
+      the repository tree alone.
+
+Receipt: `docs/reports/graphify-git-source-authority-v1.json`.
+
+### Current-source cohort lineage recheck (2026-09-10)
+
+- [x] Ran the read-only current-source cohort lineage audit. The cohort has
+      `52` rows, all `52` source-revision-qualified and Graphify-matched.
+- [ ] Keep workspace lineage blocked: the cohort revision is
+      `sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3`
+      while the live binding revision is
+      `sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9`;
+      `currentWorkspaceMatched=0` and all `52` rows mismatch after source
+      qualification.
+
+Receipt: `docs/reports/current-source-cohort-lineage-v1.json`.
+
+### Fresh-origin bounded cohort recheck (2026-09-10)
+
+- [x] Ran the read-only fresh-origin cohort readback for `5` proposed rows.
+      All `5` were present with matching source revisions, content hashes, and
+      byte lengths.
+- [ ] Keep the cohort blocked: `0/5` workspace revisions matched the live
+      binding. No authorization or database/projection write occurred.
+
+Receipt: `docs/reports/fresh-origin-bounded-cohort-lineage-v1.json`.
+
+### Current-source evidence hydration recheck (2026-09-10)
+
+- [x] Ran the read-only source-evidence hydration audit across `24,176`
+      input rows. `23,415` matched a source revision and `906` had content
+      hydrated.
+- [ ] Keep evidence admission blocked: authoritative namespaces,
+      revision-bound spans, and classifier-ready rows are all `0`; `23,270`
+      rows lack a canonical chunk owner and `906` owners have content but no
+      source revision.
+
+Receipt: `docs/reports/current-source-evidence-hydration-v1.json`.
+
+### Qdrant projection-target census recheck (2026-09-10)
+
+- [x] Ran the read-only projection-target census for the bounded cohort. All
+      `15` candidates had a target and no projection-ID mismatch was observed.
+- [ ] Keep identity promotion blocked: all `15` candidates resolved to
+      duplicate targets within the collection (`duplicateSameCollection=15`),
+      so no exact single-target authority exists. No Qdrant writes occurred.
+
+Receipt: `docs/reports/lineage-qdrant-projection-targets-v1.json`.
+## GRAPHIFY-SOURCE-REF-RESOLUTION-01 (2026-09-10) — diagnostic blocker
+
+- [x] Run the read-only source-reference resolution census.
+- [x] Preserve raw exact matching as the only potentially promotable class;
+  normalized and basename matches remain diagnostic until an approved bridge
+  carries repository identity, source revision, and content checksum.
+- [x] Record the current result: 61,717 packet source references, 25,643
+  Graphify source references, 100 exact packet/chunk/Graphify bridges,
+  17,307 raw exact matches, 3,003 normalized matches, 215 unique-basename
+  matches, 5,155 ambiguous-basename matches, and 36,037 unresolved.
+- [x] Keep `writesPerformed=false`, `authority=false`, and reject ambiguous
+  or basename-only joins from projection admission.
+- [ ] Design and validate `DESIGN_CANONICAL_SOURCE_REF_BRIDGE` using the
+  repository-qualified membership owner and independent revision/checksum
+  evidence. Do not backfill or rewrite projections in this audit.
+
+Evidence: `docs/reports/graphify-source-ref-resolution-v1.json`.
+Status: `PARTIAL_PROVEN`; first blocker:
+`CANONICAL_SOURCE_REF_BRIDGE_UNPROVEN`.
+Next gate: `DESIGN_CANONICAL_SOURCE_REF_BRIDGE`.
+## QDRANT-V2-IDENTITY-PARITY-01 recheck (2026-09-10)
+
+- [x] Run the independent 15-candidate Qdrant semantic canary.
+- [x] Confirm vector/identity values matched on returned rows: 30 exact
+  matches and zero value mismatches or missing rows.
+- [x] Keep the gate blocked because all 15 candidates duplicated across the
+  projection (`duplicates=15`); this is not a one-to-one identity proof.
+- [x] Preserve `writesPerformed=false` and do not repair or rewrite Qdrant.
+- [ ] Reconcile one canonical packet/chunk identity to one current Qdrant
+  point using revision-qualified payloads before promotion.
+
+Evidence: `docs/reports/lineage-qdrant-semantic-canary-v1.json`.
+Status: `CANARY_QDRANT_IDENTITY_BLOCKED`; first blocker:
+`QDRANT_DUPLICATE_PROJECTION_IDENTITY`.
+Next gate: `QDRANT-V2-IDENTITY-LINEAGE-RECONCILIATION-01`.
+## GRAPHIFY-MEMBERSHIP-V2-DELTA-01 recheck (2026-09-10)
+
+- [x] Run the read-only source-population delta against the repository-aware
+  snapshot and Graphify origin manifests.
+- [x] Confirm snapshot population 25,267 versus origin population 24,176;
+  1,091 snapshot-only entries, including 1,086 nested-repository entries and
+  5 root-policy differences.
+- [x] Confirm `unknown=0`, `onlyOrigin=0`, `writesPerformed=false`, and
+  `authority=false`.
+- [ ] Add an explicit nested-repository source binding so the Graphify origin
+  covers the admitted repository-qualified population. Do not reinterpret the
+  legacy membership relation or seed projections from this result.
+
+Evidence: `docs/reports/graphify-source-population-delta-v1.json`.
+Status: `NESTED_REPOSITORY_BINDING_MISMATCH`; first blocker:
+`GRAPHIFY_ORIGIN_DOES_NOT_COVER_SNAPSHOT_POPULATION`.
+Next gate: `NESTED-REPOSITORY-SOURCE-BINDING-01`.
+## GRAPHIFY-LIFECYCLE-ENTRYPOINT-01 recheck (2026-09-10)
+
+- [x] Run the lifecycle-entrypoint audit.
+- [x] Confirm the entrypoint is `READY_FOR_INJECTED_WIRING` with 24,181
+  bindings and an internally derived workspace revision.
+- [x] Keep it non-authoritative because that revision does not match the
+  admitted repository-qualified snapshot and the origin still omits nested
+  repository population.
+- [ ] Inject the admitted snapshot/materialization into the lifecycle owner;
+  require exact snapshot revision, repository count, membership checksum, and
+  byte readback before creating an execution membership cohort.
+
+Evidence: `docs/reports/graphify-lifecycle-entrypoint-v1.json`.
+Status: `PARTIAL_PROVEN`; first blocker:
+`GRAPHIFY_ORIGIN_SNAPSHOT_INJECTION_NOT_BOUND`.
+Next gate: `NESTED-REPOSITORY-SOURCE-BINDING-01`.
+## WORKSPACE-SNAPSHOT-BYTE-CONSUMPTION-01 (2026-09-10)
+
+- [x] Add opt-in `ATLAS_GRAPHIFY_SOURCE_SNAPSHOT_ROOT` support to the
+  canonical indexer.
+- [x] Carry `ATLAS_GRAPHIFY_EXPECTED_WORKSPACE_REVISION` into graph and index
+  provenance metadata.
+- [x] Force snapshot-root scans to remain probe-only; they cannot publish the
+  canonical graph artifact.
+- [x] Verify the snapshot-root path with a read-only index run; the canonical
+  graph remained untouched and the probe completed successfully.
+- [ ] Bind the full Graphify lifecycle and all downstream stages to this same
+  snapshot root and prove membership/readback before terminal execution.
+
+Evidence: `sveltekit-frontend/scripts/index-codebase-fast.mjs` and the generated
+probe receipt under `sveltekit-frontend/docs/reports/graph-probes/`.
+Status: `IMPLEMENTED_PARTIAL_PROVEN`; authority=false; writesPerformed=false
+for canonical stores.
+First blocker: `GRAPHIFY_ORIGIN_SNAPSHOT_INJECTION_NOT_BOUND`.
+Next gate: `NESTED-REPOSITORY-SOURCE-BINDING-01`.
+## NESTED-REPOSITORY-SOURCE-BINDING-01 (2026-09-10)
+
+- [x] Added the pure snapshot-to-V2 repository-qualified adapter in
+  `graphify-daily-coordinator-v1.ts`.
+- [x] Validate repository ID, traversal-free relative path, source revision,
+  content digest, and byte length before producing membership rows.
+- [x] Reject duplicate `(repositoryId, repositoryRelativePath)` identities
+  before any database writer can run.
+- [x] Add adapter coverage proving two repositories can contain the same
+  relative path without identity collapse; focused tests pass 10/10.
+- [ ] Bind the adapter to the admitted snapshot in the lifecycle opener and
+  independently read back the V2 membership cohort. No writer cutover is
+  authorized by this contract change.
+
+Evidence: `sveltekit-frontend/src/lib/server/atlas/indexing/graphify-daily-coordinator-v1.ts`
+and `graphify-daily-coordinator-v1.adapter.spec.ts`.
+Status: `CONTRACT_PROVEN`; live authority=false; writesPerformed=false.
+First blocker: `GRAPHIFY_ORIGIN_SNAPSHOT_INJECTION_NOT_BOUND`.
+Next gate: `GRAPHIFY-SNAPSHOT-CONSUMPTION-AUTHORIZATION-01`.
+## GRAPHIFY-SNAPSHOT-CANARY-WIRING-01 (2026-09-10)
+
+- [x] Wire the bounded coordinator canary to
+  `adaptSealedSnapshotSourcesToRepositoryQualifiedMembershipV2`.
+- [x] Resolve its structural source read from
+  `ATLAS_GRAPHIFY_SOURCE_SNAPSHOT_ROOT` when provided, avoiding a live
+  checkout read during the canary.
+- [x] Verify coordinator import and focused adapter tests: 10/10 passed.
+- [ ] Launch only after the operator-authorized canary contract is supplied;
+  independently read back execution, V2 membership, source revisions, and
+  content checksums.
+
+Evidence: `sveltekit-frontend/scripts/atlas/graphify-daily-coordinator-canary-v1.mts`
+and focused coordinator tests.
+Status: `IMPLEMENTED_PARTIAL_PROVEN`; authority=false; writesPerformed=false.
+First blocker: `GRAPHIFY_SNAPSHOT_CONSUMPTION_AUTHORIZATION_REQUIRED`.
+Next gate: `GRAPHIFY-SNAPSHOT-CONSUMPTION-AUTHORIZATION-01`.
+## GRAPHIFY-SNAPSHOT-BINDING-01 recheck (2026-09-10)
+
+- [x] Re-ran the independent snapshot-binding audit after the materialization
+      work.
+- [x] Confirmed the live schema contains repository-qualified membership V2 and
+      execution-stage receipt fields.
+- [x] Confirmed `25` terminal executions exist but `0` match the currently
+      admitted workspace revision.
+- [ ] Keep source authority blocked: the audit returned
+      `GRAPHIFY_SNAPSHOT_BINDING_BLOCKED_SNAPSHOT_READBACK` with
+      `SNAPSHOT_READBACK_NOT_PROVEN`; no execution or projection writes were
+      performed.
+
+Evidence: `docs/reports/graphify-workspace-snapshot-binding-v1.json`.
+Status: `BLOCKED`; authority=false; writesPerformed=false.
+
+## CORE-LANE-SWITCH-RECHECK-2026-09-10
+
+- [x] Refreshed semantic, graph, Qdrant, judgment, ACE, context, and
+      aggregate receipts after the RRF/classifier lane switch.
+- [ ] Preserve the first unresolved authority gate:
+      `CURRENT-SOURCE-TERMINAL-EXECUTION-01` /
+      `WORKSPACE_SNAPSHOT_BINDING_UNPROVEN`.
+- [ ] Keep all downstream promotion lanes diagnostic-only until the admitted
+      snapshot has a terminal Graphify execution and independent readback.
+
+Evidence: `docs/reports/parent-atlas-promotion-gates-v1.json`,
+`docs/reports/semantic-768-writer-ownership-v1.json`,
+`docs/reports/current-graph-artifact-readiness-v1.json`,
+`docs/reports/qdrant-packet-fanout-v1.json`,
+`docs/reports/ace-live-dry-input-readiness-v2.json`, and
+`docs/reports/golden-relevance-review-queue-v1.json`.
+Status remains `BLOCKED`; no canonical or projection writes were performed.
+
+## WORKSPACE-SNAPSHOT-CONSUMPTION-IMPLEMENTATION-BLOCKER — 2026-09-10
+
+- [x] Re-ran `npm run atlas:graphify:snapshot-binding:audit`: `25` terminal
+      executions exist, but `0` match the admitted snapshot.
+- [x] Traced the lifecycle seam. The startup wrapper sets the materialized
+      snapshot root, but `graphify-daily-lifecycle-open-v1.mjs` still invokes
+      the legacy Git-backed single-repository origin runtime against the live
+      repository root. A materialized root has no Git metadata and cannot
+      represent the admitted multi-repository revision under that old schema.
+- [ ] Replace the legacy opener with a snapshot-native coordinator path that
+      consumes the sealed source list and writes repository-qualified
+      membership only under the terminal-run authorization.
+
+Evidence: `scripts/startup/run-graphify-daily-startup.mjs`,
+`scripts/atlas/graphify-daily-lifecycle-open-v1.mjs`,
+`sveltekit-frontend/src/lib/server/atlas/indexing/graphify-daily-coordinator-v1.ts`,
+and `docs/reports/graphify-workspace-snapshot-binding-v1.json`.
+Status remains `GRAPHIFY_SNAPSHOT_BINDING_BLOCKED`; no Graphify or projection
+writes were performed this turn.
+
+### GRAPHIFY-SNAPSHOT-LEGACY-OPENER-GUARD — 2026-09-10
+
+- [x] Added a fail-closed preflight to the legacy lifecycle opener. When a
+      materialized snapshot root is supplied without Git metadata, it now
+      stops before opening a database execution row.
+- [x] Made the selected source root explicit in the legacy path.
+- [ ] Replace the guarded legacy path with the snapshot-native coordinator;
+      the guard is a safety fix, not snapshot-consumption proof.
+
+Evidence: `scripts/atlas/graphify-daily-lifecycle-open-v1.mjs`.
+Status remains `GRAPHIFY_SNAPSHOT_BINDING_BLOCKED`; writesPerformed=false.
+
+### SNAPSHOT-NATIVE-COORDINATOR-OPEN-01 — 2026-09-10
+
+- [x] Added `scripts/atlas/graphify-daily-snapshot-native-open-v1.mts`.
+      It validates the admitted snapshot, materialized source bytes, and
+      repository-qualified identities before opening an execution.
+- [x] Wired the lifecycle entrypoint to delegate snapshot-bound runs to this
+      coordinator instead of the legacy Git-backed opener.
+- [x] Required the exact terminal authorization token before any coordinator
+      write; an unauthorized invocation fails before connecting to PostgreSQL.
+- [ ] Run the bounded snapshot-native opener only after fresh snapshot
+      admission and explicit terminal-run authorization. Later stage owners
+      remain unbound until their actual receipts exist.
+
+Evidence: `scripts/atlas/graphify-daily-snapshot-native-open-v1.mts`,
+`scripts/atlas/graphify-daily-lifecycle-open-v1.mjs`.
+Validation: Node syntax, authorization guard, and strict OpenSpec validation
+passed. No database or projection writes were performed.
+
+### SNAPSHOT-NATIVE-COORDINATOR-CLOSE-01 — 2026-09-10
+
+- [x] Added schema-gated completion support for snapshot-native receipts.
+      `graphify-daily-lifecycle-complete-v1.mjs` now closes
+      `graphify_executions` through `completeExecution` and leaves the legacy
+      `graphify_runs` completion branch unchanged.
+- [x] Required the same terminal authorization token for snapshot-native
+      completion.
+- [ ] Keep terminal execution proof open until one freshly admitted run
+      completes and independent membership readback passes; no completion was
+      invoked in this turn.
+
+Evidence: `scripts/atlas/graphify-daily-lifecycle-complete-v1.mjs`.
+Validation: Node syntax and strict OpenSpec validation passed.
+
+### SNAPSHOT-NATIVE-COORDINATOR-ATOMICITY-01 — 2026-09-10
+
+- [x] Wrapped snapshot-native execution open, repository-qualified membership,
+      inventory receipt, and readback in one PostgreSQL transaction.
+- [x] Added rollback on any validation or database error, preventing a partial
+      execution/membership cohort from surviving a failed opener.
+- [ ] Keep live proof pending until the authorized opener is run and a fresh
+      connection independently reads back the committed cohort.
+
+Evidence: `scripts/atlas/graphify-daily-snapshot-native-open-v1.mts`.
+No transaction was opened by this turn; no datastore writes were performed.
+
+### GRAPHIFY-SNAPSHOT-BINDING-READBACK-01 — 2026-09-10
+
+- [x] Added an independent, fresh-connection readback audit for the
+      snapshot-native execution and repository-qualified membership owner.
+- [x] Bounded the receipt to counts plus samples so a full-workspace miss does
+      not create an unusable report or console payload.
+- [x] Re-ran the audit: `selectedSourceCount=25267`,
+      `membershipV2Count=0`, `missingMembershipCount=25267`, and
+      `executionId=null`.
+- [ ] Keep the gate blocked until one authorized terminal execution matches
+      the admitted workspace snapshot and its membership readback has zero
+      missing, unexpected, duplicate, revision, checksum, and byte mismatches.
+
+Evidence: `scripts/atlas/audit-graphify-snapshot-native-readback-v1.mts` and
+`docs/reports/graphify-snapshot-native-readback-v1.json`.
+Status: `SNAPSHOT_NATIVE_READBACK_BLOCKED`; authority=false;
+writesPerformed=false for canonical stores and projections.
+First blockers: `NO_TERMINAL_EXECUTION_MATCHES_ADMITTED_SNAPSHOT`,
+`SNAPSHOT_MEMBERSHIP_MISSING`.
+Next gate: fresh snapshot admission followed by the separately authorized
+snapshot-native terminal Graphify execution.
+
+## CORE-PROMOTION-BLOCKER-EXTRACTION-2026-09-10
+
+- [x] Hardened the aggregate audit to emit a first-blocker fallback for lane
+      receipts that omit an explicit invariant.
+- [x] Re-ran the aggregate audit successfully; the dependency gate remains
+      `CURRENT-SOURCE-TERMINAL-EXECUTION-01` with `workspaceRevision=null`.
+- [ ] Preserve downstream authority=false until the snapshot-bound terminal
+      execution and independent membership readback pass.
+
+Evidence: `scripts/atlas/audit-parent-atlas-promotion-gates-v1.mjs` and
+`docs/reports/parent-atlas-promotion-gates-v1.json`.
+Status: `BLOCKED`; writesPerformed=false.
+Next gate: current source/structural lineage on a successfully materialized
+snapshot-bound execution.
+**2026-09-10 materialized snapshot verifier integration:** updated the
+read-only snapshot-binding audit to prefer the explicitly admitted snapshot
+manifest over mtime-based report discovery and to validate against its
+revision-addressed materialized source root. The audit now proves
+`25,267/25,267` materialized bytes with zero violations. The lane remains
+blocked for the correct next reason: `25` terminal executions exist but
+`0` match the admitted snapshot. No Graphify or projection writes occurred.
+Receipt: `docs/reports/graphify-workspace-snapshot-binding-v1.json`.
+First blocker: `NO_TERMINAL_GRAPHIFY_EXECUTION_MATCHES_SNAPSHOT`.
+### CURRENT-GRAPHIFY-RUN-OWNER-01 explicit revision recheck (2026-09-10)
+
+- [x] Ran the read-only owner audit against admitted revision
+      `sha256:c11d261f16a90ba80a8772f5ea10b24d0e2d28a27ef93afcee1f8398898c06ad`.
+- [x] Confirmed `runCount=0`, `completedOwnerCount=0`,
+      `workspaceRowCount=0`, and `coordinatorExecutionCount=0`.
+- [ ] Keep the terminal execution gate blocked. The materialized snapshot is
+      readable, but no Graphify execution has consumed it yet.
+
+Evidence: `docs/reports/current-graphify-run-owner-v1.json`.
+Status: `GRAPHIFY_RUN_OWNER_BLOCKED`; authority=false; writesPerformed=false.
+First blocker: `NO_TERMINAL_GRAPHIFY_EXECUTION_FOR_ADMITTED_SNAPSHOT`.
+### PHASE16-SCALE-ADMISSION-01 recheck (2026-09-10)
+
+- [x] Re-ran the read-only Phase-16 scale-admission audit; the bounded cohort
+      remains `576` rows and the frozen canary/replay remains proven.
+- [x] Confirmed the production scale predicates remain closed: current source
+      authority, representation-ledger admission, capacity/recovery receipt,
+      and independent full-cohort readback are absent.
+- [ ] Keep bulk apply blocked; `unboundedApplyAuthorized=false` and no latent
+      writer was invoked.
+
+Evidence: `docs/reports/latent-phase16-scale-admission-v1.json`.
+Status: `SCALE_ADMISSION_BLOCKED_AUTHORITY_AND_CAPACITY`; authority=false;
+writesPerformed=false. First blocker: `WORKSPACE_REVISION_AUTHORITY_NOT_ADMITTED`.
+Next gate: `GRAPHIFY-SNAPSHOT-BINDING-01`.
+### CURRENT-PACKET-CHUNK-JOIN-01 recheck (2026-09-10)
+
+- [x] Ran the read-only current workspace packet/chunk join audit.
+- [x] Confirmed `111` binding rows and `111` binding sources are present, but
+      `0` exact Graphify sources, `0` binding-to-chunk content matches, and
+      `0` packet-to-chunk exact sources were found for the observed revision.
+- [ ] Keep structural lineage blocked; no packet, chunk, or source identity was
+      synthesized and no canonical writes occurred.
+
+Evidence: `docs/reports/current-workspace-packet-chunk-join-v1.json`.
+
+## CURRENT-PACKET-CHUNK-JOIN-RECHECK-2026-09-10T21
+
+- [x] Re-ran the exact read-only current-workspace packet/chunk join audit.
+- [x] Confirmed `111` binding rows and `111` binding sources, but `0` exact
+      Graphify sources, `0` binding-to-chunk content matches, `0` exact
+      packet/chunk sources, and `0` packet content matches.
+- [ ] Keep structural lineage blocked; do not repair or backfill packet/chunk
+      identity until a snapshot-bound Graphify execution supplies the current
+      source revision cohort.
+
+Evidence: `docs/reports/current-workspace-packet-chunk-join-v1.json`.
+Status: `CURRENT_PACKET_CHUNK_JOIN_MISSING`; authority=false;
+writesPerformed=false.
+First blocker: `CURRENT_SOURCE_PACKET_CHUNK_JOIN_UNPROVEN`.
+Next gate: snapshot-bound Graphify execution, then exact packet/chunk
+reconciliation.
+
+## QDRANT-V2-IDENTITY-RECHECK-2026-09-10T21
+
+- [x] Re-ran the read-only Qdrant fanout identity census.
+- [x] Confirmed `109,776` points, `9,964` packet keys, `4,351` multi-point
+      groups, `1,616` conflicting-source groups, `2,630` duplicate projection
+      groups, and `5,701` revision-unproven groups.
+- [x] Confirmed only `30` points have source/workspace revision payloads and
+      `677` have representation revision payloads; zero chunk ordinals are
+      present.
+- [ ] Keep Qdrant promotion blocked. No payload repair, reindex, or projection
+      write occurred; path and point IDs remain inadmissible as canonical
+      identity.
+
+Evidence: `docs/reports/qdrant-packet-fanout-v1.json`.
+Status: `IDENTITY_OR_REVISION_GAPS`; promotionEligible=false;
+writesPerformed=false.
+First blocker: `QDRANT_V2_CANONICAL_IDENTITY_AND_REVISION_COVERAGE_UNPROVEN`.
+Next gate: current packet/chunk/source lineage, then bounded payload parity
+canary.
+Status: `CURRENT_PACKET_CHUNK_JOIN_MISSING`; authority=false;
+writesPerformed=false. First blocker: `CURRENT_PACKET_CHUNK_IDENTITY_RECONCILIATION`.
+Next gate: admitted snapshot-bound Graphify membership and exact packet/chunk
+content lineage.
+
+## CORE-LANE-PROGRESSION-RESEARCH-01 (2026-09-10)
+
+- [x] Consolidated current blocker evidence across workspace, structural,
+  semantic, representation, graph, Qdrant, Leiden, RRF, classifier, ontology,
+  ACE, judgment-set, parity, and bounded-projection lanes.
+- [x] Defined lane switching: stop at the first invariant, keep authority false,
+  update the owning ledger, and switch to the next independent lane.
+- [x] Recorded implementation order and acceptance predicates in
+  `docs/reports/parent-atlas-core-lane-blocker-research-plan-v1.md`.
+- [ ] Correct the lifecycle opener so the admitted materialized snapshot is
+  consumed directly; materialized bytes are proven but no terminal execution is
+  bound to the admitted revision.
+
+Status: `BLOCKED_AT_SNAPSHOT_BOUND_TERMINAL_EXECUTION`; authority=false;
+writesPerformed=false for canonical stores and projections.
+First blocker: `NO_TERMINAL_GRAPHIFY_EXECUTION_MATCHES_SNAPSHOT`.
+Next gate: `GRAPHIFY-SNAPSHOT-BINDING-READBACK-01`.
+
+### GRAPHIFY-SNAPSHOT-BINDING-READBACK-01 — 2026-09-10
+
+- [x] Independent readback found exactly one terminal execution matching the
+      admitted workspace revision and snapshot membership checksum.
+- [x] Matching execution contains 25,271 sources across 7 repositories with
+      no missing members, unexpected members, source-revision mismatches, or
+      content-digest mismatches.
+- [x] Corrected the audit’s stale blocker derivation; workspace admission is
+      true while canonical authority remains false.
+
+Evidence: `docs/reports/graphify-workspace-snapshot-binding-v1.json`.
+Status: `GRAPHIFY_SNAPSHOT_BINDING_PROVEN`; canonicalAuthority=false;
+writesPerformed=false for this readback.
+Next gate: `CURRENT-STRUCTURAL-LINEAGE-01`.
+
+## CORE-LANE-AUDIT-RECHECK-2026-09-10
+
+- [x] Re-ran independent RRF baseline and identity audits: `93` callers,
+  `36` fusion callers, `90` unmapped callers, `2` executor-as-lane entries,
+  and `0/20` complete identity envelopes.
+- [x] Re-ran Qdrant fan-out identity census: `109,776` points, `1,616`
+  conflicting-source groups, `2,630` exact-duplicate groups, and `5,701`
+  revision-unproven groups.
+- [x] Re-ran LangExtract/Ornith/classifier fanout: service boundary remains
+  reachable, but classifier execution, source revision, and grounded fixture
+  proof remain absent.
+- [ ] Keep RRF, Qdrant, classifier, and projection authority closed; no repair,
+  ranking migration, or model retraining was authorized.
+
+Evidence: `docs/reports/rrf-caller-baseline-v1.json`,
+`docs/reports/rrf-real-caller-identity-envelope-v1.json`,
+`docs/reports/qdrant-packet-fanout-v1.json`, and
+`docs/reports/langextract-ornith-classifier-fanout-v1.json`.
+First blockers: `UNMAPPED_RRF_CALLERS`, `IDENTITY_ENVELOPE_PARTIAL`,
+`QDRANT_V2_IDENTITY_PARITY`, and `SOURCE_REVISION_UNKNOWN` respectively.
+
+## RRF-CALLER-BASELINE-RECHECK-2026-09-11
+
+- [x] Re-ran `scripts/atlas/audit-rrf-caller-baseline-v1.mjs` read-only.
+- [x] Current census reports `93` callers, `36` fusion callers, `90`
+      unmapped callers, `0` ambiguous mappings, and `2` executor-as-lane
+      entries.
+- [ ] Keep migration unauthorized until every fusion caller has an explicit
+      logical-lane mapping and executor vote inflation is resolved.
+
+Evidence: `docs/reports/rrf-caller-baseline-v1.json`.
+Status: `CALLER_BASELINE_INCOMPLETE_MIGRATION_BLOCKED`;
+`migrationAuthorized=false`; writesPerformed=false.
+First blocker: `UNMAPPED_RRF_CALLERS`.
+Next gate: classify the 90 unmapped callers and resolve the 2 executor-as-lane
+entries without changing ranking behavior.
+
+## CORE-LANE-STRUCTURAL-ONTOLOGY-RECHECK-2026-09-10
+
+- [x] Ran packet/chunk lineage promotion preflight: `0` qualified candidates.
+- [x] Ran concept-fabric audit: inventory grew to `346,889` records; no
+      canonical tuple or GraphRAG promotion was attempted.
+- [ ] Keep structural and ontology lanes blocked until admitted source and
+      revision-qualified packet identities exist.
+
+Evidence: `docs/reports/packet-chunk-lineage-promotion-preflight-v1.json` and
+`docs/reports/parent-atlas-concept-fabric-audit-v1.json`.
+First blockers: `BLOCKED_NO_QUALIFIED_CANDIDATE` and
+`DIRECTORY_INDEX_SOURCE_BINDING_UNPROVEN`.
+
+## CORE-LANE-AUTHORITY-RECHECK-2026-09-10
+
+- [x] Re-ran snapshot binding: `25` terminal executions observed,
+      `0` match the admitted snapshot, and authority remains false.
+- [x] Re-ran packet/chunk lineage preflight: `eligibleCandidateCount=0`;
+      no identity or revision-qualified promotion candidate exists.
+- [x] Re-ran the canonical projection fabric audit in a read-only
+      transaction. `10/11` authority predicates remain below PASS, including
+      revision qualification, semantic owner, latent family, graph manifest,
+      ordinal map, projection alignment, BitFrost derivability, and ACE
+      grounding.
+- [ ] Keep all downstream lanes closed and switch only to code/spec work that
+      does not infer authority from these diagnostic receipts.
+
+Evidence: `docs/reports/graphify-workspace-snapshot-binding-v1.json`,
+`docs/reports/packet-chunk-lineage-promotion-preflight-v1.json`, and
+`docs/reports/atlas-canonical-projection-fabric-audit-2026-09-10.json`.
+Status: `BLOCKED_AT_WORKSPACE_AUTHORITY`; authority=false;
+writesPerformed=false.
+First blocker: `NO_TERMINAL_GRAPHIFY_EXECUTION_MATCHES_SNAPSHOT`.
+
+## QDRANT-IDENTITY-RECHECK-2026-09-10
+
+- [x] Re-ran the read-only packet fan-out census against
+      `codebase_chunks_768`: `109,776` points and `9,964` packet keys.
+- [x] Confirmed `15` valid revisioned chunk groups, but also `1,616`
+      conflicting-source groups, `2,630` exact duplicate projection groups,
+      `5,701` revision-unproven groups, and `0` chunk ordinals.
+- [x] Confirmed only `30` points carry source/workspace revision metadata and
+      `677` carry representation revision metadata; promotion remains false.
+- [ ] Do not repair payloads or promote Qdrant identity until the admitted
+      source/lineage cohort supplies exact packet/chunk/symbol identity and
+      complete revision/checksum parity.
+
+Evidence: `scripts/atlas/audit-qdrant-packet-fanout-identity-v1.mjs` and
+`docs/reports/qdrant-packet-fanout-v1.json`.
+Status: `IDENTITY_OR_REVISION_GAPS`; authority=false;
+writesPerformed=false.
+First blocker: `QDRANT_V2_IDENTITY_PARITY`.
+
+## CORE-PROMOTION-AGGREGATE-FINDINGS-2026-09-10
+
+- [x] Extended the aggregate promotion audit with independent lane findings
+      for structural, semantic, representation, graph, Qdrant, RRF, classifier,
+      ontology, ACE, and judgment-set receipts.
+- [x] Re-ran the aggregate audit; first blocking gate remains
+      `CURRENT-SOURCE-TERMINAL-EXECUTION-01` and `workspaceRevision` remains
+      null.
+- [ ] Do not interpret independent findings as authority or use them to bypass
+      the Graphify dependency chain.
+
+Evidence: `scripts/atlas/audit-parent-atlas-promotion-gates-v1.mjs` and
+`docs/reports/parent-atlas-promotion-gates-v1.json`.
+Status: `BLOCKED`; authority=false; writesPerformed=false.
+
+## CORE-LANE-SWITCH-RECHECK-2026-09-10
+
+- [x] Switched from the unchanged snapshot-native terminal blocker to the
+      independent semantic owner and RRF caller lanes.
+- [x] Semantic owner audit completed: `19` writer records remain across
+      populated 768D surfaces; live counts are `atlas_packets.embedding`
+      `61659/61718`, `content_embedding` `55169/55853`, and
+      `content_embedding_768` `1386/55853`.
+- [x] RRF caller baseline completed: `93` callers, `36` fusion callers,
+      `90` unmapped callers, and `2` executor-as-lane findings.
+- [x] Graph publication preflight is a candidate only (`6/6` checks,
+      authority=false); context-forest readiness remains blocked by Graphify
+      source membership.
+- [ ] Keep semantic ownership, RRF migration, and downstream projection
+      authority closed until their identity/revision/readback predicates pass.
+
+Evidence: `docs/reports/semantic-768-writer-ownership-v1.json`,
+`docs/reports/rrf-caller-baseline-v1.json`,
+`docs/reports/graphify-atomic-publication-preflight-v1.json`, and
+`docs/reports/parent-atlas-context-forest-readiness-v1.json`.
+Status: `PARTIAL_PROVEN`; authority=false; writesPerformed=false for
+canonical stores and projections.
+First blockers: `AMBIGUOUS_SEMANTIC_768_OWNER`, `UNMAPPED_LOGICAL_LANE`,
+`EXECUTOR_AS_LANE`, and `GRAPHIFY_SOURCE_MEMBERSHIP`.
+Next gate: structural lineage and repository-qualified membership after a
+successful snapshot-bound terminal execution.
+
+## GRAPHIFY-TERMINAL-BOOTSTRAP-ORDER-01 — 2026-09-10
+
+- [x] Identified the admission-order deadlock: ordinary projection admission
+      was evaluated before the snapshot-native execution could establish the
+      graphify execution and membership evidence required by downstream graph
+      and ordinal gates.
+- [x] Added an exact-token terminal bootstrap mode. With an admitted snapshot
+      and `AUTHORIZE_GRAPHIFY_POST_PHASE16_TERMINAL_RUN_V1`, the runner defers
+      projection admission until after the terminal lifecycle/readback; all
+      ordinary daily runs retain the existing fail-closed projection guard.
+- [x] Added source-level admission-order coverage; startup syntax, the 3-case
+      order test, OpenSpec strict validation, and diff checks pass.
+- [ ] Do not claim terminal execution proof until the authorized run and fresh
+      membership readback actually complete. This code change authorizes no
+      run by itself and does not authorize Qdrant, Neo4j, ontology, classifier,
+      or broad projection repair.
+
+Evidence: `scripts/startup/run-graphify-daily-startup.mjs`,
+`scripts/startup/run-graphify-daily-admission-order.spec.mjs`.
+Status: `IMPLEMENTED_NOT_LIVE_PROVEN`; authority=false;
+writesPerformed=false in this turn.
+First blocker remains `NO_TERMINAL_EXECUTION_MATCHES_ADMITTED_SNAPSHOT`.
+
+### PROMOTION-GATE-RECEIPT-CURRENTNESS-01 — 2026-09-11
+
+- [x] Added the read-only receipt-currentness compiler at
+      `scripts/atlas/audit-promotion-gate-receipt-currentness-v1.mjs` and
+      exposed it as `npm run atlas:promotion:receipt-currentness`.
+- [x] The compiler records receipt checksums, generation metadata, workspace
+      and snapshot revisions, source-cohort references, execution IDs,
+      authority scope, and writes status.
+- [x] It reconciles Graphify execution
+      `14667026-459c-4a99-b3c2-c20b739a6e0d` as valid for its own admitted
+      revision without treating it as proof for a different current cohort.
+- [x] Mixed revision evidence fails closed with
+      `AGGREGATE_MIXED_REVISION_EVIDENCE` and identifies the blocker as
+      aggregate-derived.
+- [x] Added explicit `--workspace-revision=<sha256:...>` selection. Selecting
+      the admitted `sha256:3be7901e...` yields
+      `SELECTED_REVISION_RECONCILED_HISTORICAL_EVIDENCE` while retaining the
+      full mixed-revision set for auditability.
+- [ ] Rerun dependent structural/semantic lineage audits for the selected
+      revision before any promotion decision.
+
+Evidence: `docs/reports/promotion-gate-receipt-currentness-v1.json`.
+Status: `SELECTED_REVISION_RECONCILED_HISTORICAL_EVIDENCE` for the explicit
+admitted revision; aggregate mixed evidence remains visible; authority=false;
+writesPerformed=false except for the derived report.
+First blocker: `GRAPHIFY_EXECUTION_DOES_NOT_PROVE_CURRENT_SOURCE_COHORT`.
+Next gate: rerun dependent lineage audits for the selected revision.
+
+### MASTER-ATLAS-INDEX-HISTORICAL-RECONCILIATION-01 — 2026-09-11
+
+- [x] Reviewed the supplied Master Atlas index generated
+      `2026-07-14T16:55:04.003Z` with `3,424` indexed documents.
+- [x] Classified it as historical design/context evidence, not a current
+      promotion receipt. Its tool counts, model availability, and lane status
+      cannot override revisioned live reports.
+- [x] Reconciled the useful routing design with current owners: existing
+      MCP registry retrieval, CandidateFeatureMatrixV1, FSM/Viterbi proposal
+      bridge, HyperedgeV1, and classifier feature production remain the
+      relevant local surfaces.
+- [ ] Do not treat historical index claims as proof of current source
+      lineage, Qdrant tool-manifest coverage, Graphify execution, or classifier
+      promotion.
+
+Evidence: supplied historical Master Atlas index and current reports
+`docs/reports/mcp-tool-selection-audit.json`,
+`docs/reports/current-repair-candidate-feature-matrix-v1.json`, and
+`docs/reports/domain-classifier-lineage-v1.json`.
+Status: `HISTORICAL_INDEX_RECONCILED`; authority=false;
+writesPerformed=false.
+First blocker: `CURRENT_REVISION_QUALIFIED_EVIDENCE_REQUIRED`.
+Next gate: continue only from current revisioned lane receipts.
+
+### MCP-TOOL-FEATURE-MATRIX-RECHECK-01 — 2026-09-11
+
+- [x] Re-ran the existing bounded CandidateFeatureMatrix proof with
+      `15` candidates.
+- [x] Contract preserved `25` base features plus `24` repair-overlay
+      features (`49` total); overlay presence remained `0`.
+- [x] Deterministic replay was identical and the base feature plane was
+      preserved.
+- [ ] Do not treat the fixture as live tool-routing proof; current semantic
+      tool-manifest projection coverage remains `0/20`.
+
+Evidence: `docs/reports/current-repair-candidate-feature-matrix-v1.json`.
+Status: `REPAIR_CANDIDATE_FEATURE_MATRIX_CONTRACT_PROVEN`;
+authority=false; writesPerformed=false.
+First blocker: `LIVE_TOOL_FEATURES_AND_MANIFEST_COHORT_UNPROVEN`.
+Next gate: current revision-qualified tool-manifest cohort, then live feature
+materialization without changing CandidateFeatureMatrixV1 ownership.
+
+### SNAPSHOT-NATIVE-TERMINAL-RUN-01 — 2026-09-10
+
+- [x] Admitted workspace revision `sha256:3be7901e...` against snapshot
+      `sha256:9b61929b...` (25,271 sources, 7 repositories).
+- [x] Snapshot consumer preflight proven: zero live inventory calls, zero Git
+      revision derivations, zero unexpected repositories, and zero missing or
+      mismatched materialized sources.
+- [x] Fixed the consumer adapter to accept producer metadata fields while
+      preserving strict identity, checksum, and duplicate validation.
+- [x] Focused coordinator tests pass (`10/10`).
+- [x] One foreground snapshot-native Graphify lifecycle completed with exit
+      code `0`; execution `14667026-459c-4a99-b3c2-c20b739a6e0d` is persisted.
+- [x] Independent readback confirms `COMPLETED`, 25,271 membership rows, 7
+      repositories, zero duplicate namespace keys, and zero revision/checksum
+      mismatches.
+- [ ] Do not promote canonical authority or projections: downstream semantic,
+      graph, and retrieval stages remain partial/deferred.
+
+Evidence: `docs/reports/graphify-snapshot-consumer-preflight-v1.json`,
+`docs/reports/graphify-daily-lifecycle-v1.json`, and live PostgreSQL readback.
+Status: `TERMINAL_GRAPHIFY_EXECUTION_PROVEN`; canonicalAuthority=false;
+writesPerformed=true for the admitted execution/membership evidence only.
+Next gate: `GRAPHIFY-SNAPSHOT-BINDING-READBACK-01`.
+
+## GRAPHIFY-SNAPSHOT-BINDING-READBACK-RECHECK-2026-09-11
+
+- [x] Ran the read-only snapshot-native binding readback audit.
+- [x] Confirmed the admitted selection contains `25,267` sources.
+- [x] Confirmed no terminal execution exists yet and `0` membership-v2 rows
+      are present for the admitted execution (`25,267` memberships missing).
+- [ ] Keep structural lineage and all downstream promotion gates blocked until
+      one separately authorized snapshot-native terminal execution completes
+      and its membership is independently read back.
+
+Evidence: `docs/reports/graphify-snapshot-native-readback-v1.json`.
+Status: `SNAPSHOT_NATIVE_READBACK_BLOCKED`; authority=false;
+writesPerformed=false.
+First blocker: `NO_TERMINAL_EXECUTION_MATCHES_ADMITTED_SNAPSHOT`.
+Next gate: separately authorized snapshot-native terminal Graphify execution.
+
+## CURRENT-SOURCE-COHORT-LINEAGE-RECHECK-2026-09-11
+
+- [x] Ran the read-only current source-cohort lineage audit.
+- [x] Confirmed `52` cohort rows are source-revision-qualified and match
+      Graphify rows, but `0` match the current workspace revision; all `52`
+      are workspace-mismatched.
+- [ ] Keep semantic ownership, ontology admission, graph sealing, Qdrant
+      parity, and ACE promotion blocked until the cohort is rebound to the
+      admitted workspace snapshot. No data or projection writes occurred.
+
+Evidence: `docs/reports/current-source-cohort-lineage-v1.json`.
+Status: `WORKSPACE_REVISION_SOURCE_MISMATCH`; authority=false;
+writesPerformed=false.
+First blocker: `CURRENT_SOURCE_COHORT_WORKSPACE_REVISION_MISMATCH`.
+Next gate: snapshot-bound Graphify membership and current source readback.
+
+## QDRANT-V2-IDENTITY-RECHECK-2026-09-10T23
+
+- [x] Re-ran the read-only Qdrant packet fan-out identity census.
+- [x] Confirmed `109,776` points, `9,964` packet keys, `4,351` multi-point
+      groups, `1,616` conflicting-source groups, and `5,701`
+      revision-unproven groups.
+- [ ] Keep Qdrant promotion blocked: only `15` groups are validly
+      revision-qualified; no payload repair or projection write occurred.
+
+Evidence: `docs/reports/qdrant-packet-fanout-v1.json`.
+Status: `IDENTITY_OR_REVISION_GAPS`; authority=false; writesPerformed=false.
+First blocker: `QDRANT_V2_CANONICAL_IDENTITY_AND_REVISION_COVERAGE_UNPROVEN`.
+Next gate: current source/packet/chunk lineage, then bounded Qdrant identity
+readback.
+
+## CURRENT-PACKET-CHUNK-JOIN-RECHECK-2026-09-11
+
+- [x] Re-ran the read-only current workspace packet/chunk join audit.
+- [x] Confirmed `111` binding rows and `111` normalized source/revision/content
+      matches, but `0` Graphify exact sources, `0` binding chunk-content
+      matches, and `0` packet/chunk exact-source matches.
+- [x] Confirmed all `111` rows have workspace mismatches against the only
+      observed database workspace revision; no repair or backfill was run.
+- [ ] Keep structural lineage and every dependent promotion gate blocked until
+      a terminal snapshot-bound Graphify execution supplies current bindings.
+
+Evidence: `docs/reports/current-workspace-packet-chunk-join-v1.json`.
+Status: `CURRENT_PACKET_CHUNK_JOIN_MISSING`; authority=false;
+writesPerformed=false.
+First blocker: `CURRENT_SOURCE_PACKET_CHUNK_JOIN_UNPROVEN`.
+Next gate: snapshot-bound Graphify membership, then exact source/packet/chunk
+reconciliation.
+
+### GRAPHIFY-SNAPSHOT-BINDING-RECHECK-2026-09-10T21
+
+- [x] Hardened the read-only binding receipt to distinguish an admitted
+      workspace revision from a Graphify-consumed workspace revision.
+- [x] Added atomic report replacement for intermittent Windows report-file
+      contention.
+- [x] Recheck reports `admittedWorkspaceRevision=sha256:d7f9563f...91f2e`,
+      `workspaceRevision=null`, `25` terminal executions observed, and `0`
+      matching executions.
+- [ ] Keep the terminal Graphify gate blocked until one execution consumes the
+      admitted materialized snapshot. No Graphify or projection execution was
+      launched by this recheck.
+
+Evidence: `docs/reports/graphify-workspace-snapshot-binding-v1.json`.
+Status: `GRAPHIFY_SNAPSHOT_BINDING_BLOCKED`; authority=false;
+writesPerformed=false.
+First blocker: `NO_TERMINAL_GRAPHIFY_EXECUTION_MATCHES_SNAPSHOT`.
+Next gate: separately authorized snapshot-bound Graphify canary.
+
+### SNAPSHOT-CONSUMER-PREFLIGHT-RERUN — 2026-09-10T20
+
+- [x] Re-ran the snapshot-consumer preflight after the semantic and graph
+      lane rechecks. The admitted materialized source remains internally
+      consistent: `25,267` sources, `7` repositories, matching selection and
+      source-membership checksums, and zero missing, hash, size, or duplicate
+      identity violations.
+- [x] Confirmed zero live-inventory construction, Git-derived revision calls,
+      unexpected repository discovery, child apply commands, and persistent
+      writes.
+- [ ] Keep terminal execution unproven: this is consumer readiness only and
+      does not create an execution owner or authorize the canary.
+
+Evidence: `docs/reports/graphify-snapshot-consumer-preflight-v1.json`.
+Status: `GRAPHIFY_SNAPSHOT_CONSUMER_PREFLIGHT_PROVEN`;
+proofLevel=`BOUNDED_LIVE_PROVEN`; authority=false; writesPerformed=false.
+First blocker: `SNAPSHOT_BOUND_GRAPHIFY_CANARY_NOT_AUTHORIZED`.
+Next gate: separately authorized snapshot-native terminal Graphify execution.
+
+### PROMOTION-AGGREGATE-NEXT-GATE-CORRECTION-2026-09-10T20
+
+- [x] Corrected the aggregate receipt's `nextGate` so a proven snapshot
+      consumer points to `SNAPSHOT-BOUND-GRAPHIFY-CANARY-01` rather than
+      looping back to the parent terminal-execution gate.
+- [x] Re-ran syntax, aggregate reconciliation, and strict OpenSpec
+      validation; the aggregate remains blocked with no writes.
+
+Evidence: `scripts/atlas/audit-parent-atlas-promotion-gates-v1.mjs` and
+`docs/reports/parent-atlas-promotion-gates-v1.json`.
+Status: `BLOCKED`; first blocker=`SNAPSHOT_BOUND_GRAPHIFY_CANARY_NOT_AUTHORIZED`;
+nextGate=`SNAPSHOT-BOUND-GRAPHIFY-CANARY-01`; authority=false;
+writesPerformed=false.
+
+### PROMOTION-AGGREGATE-CURRENTNESS-FIX-2026-09-10T20
+
+- [x] Updated the read-only aggregate to consume the current snapshot-consumer
+      preflight receipt. It now recognizes the admitted revision as
+      revision-addressable when the preflight proves the materialized source,
+      zero live inventory/Git derivation, zero unexpected repositories, zero
+      child apply commands, and zero violations.
+- [x] Re-ran the aggregate: workspace revision remains admitted, while the
+      first blocker correctly advances to `SNAPSHOT_BOUND_GRAPHIFY_CANARY_NOT_AUTHORIZED`.
+- [ ] Keep terminal execution, canonical source authority, and all dependent
+      promotion gates blocked until the separately authorized canary produces
+      a terminal execution and independent membership readback.
+
+Evidence: `scripts/atlas/audit-parent-atlas-promotion-gates-v1.mjs` and
+`docs/reports/parent-atlas-promotion-gates-v1.json`.
+Status: `BLOCKED`; workspaceAuthority=`ADMITTED`;
+graphifyExecution=`BLOCKED`; authority=false; writesPerformed=false.
+First blocker: `SNAPSHOT_BOUND_GRAPHIFY_CANARY_NOT_AUTHORIZED`.
+Next gate: separately authorized snapshot-native terminal Graphify execution.
+
+## GRAPHIFY-EXECUTION-SOURCE-V2-DESCRIPTOR-01 — 2026-09-10
+
+- [x] Wired startup to emit and pass an explicit
+      `atlas.graphify-execution-source.v2` descriptor containing the admitted
+      workspace/snapshot revisions, materialized root, repository count,
+      source cohort checksum, and selection checksum.
+- [x] Wired the snapshot-native opener to reject a descriptor whose source
+      kind, revisions, root, counts, or checksums do not match the admitted
+      snapshot.
+- [x] Preserved the hard boundary: the descriptor does not authorize a run or
+      any projection; it only makes the execution source revision-addressable.
+- [ ] Run the separately authorized canary and independently read back its
+      terminal execution and membership rows.
+
+Evidence: `scripts/startup/run-graphify-daily-startup.mjs`,
+`scripts/atlas/graphify-daily-snapshot-native-open-v1.mts`, and
+`docs/reports/graphify-snapshot-consumer-preflight-v1.json`.
+Status: `IMPLEMENTED_PREFLIGHT_PROVEN_NOT_LIVE_EXECUTED`;
+authority=false; writesPerformed=false in this turn.
+First blocker: `SNAPSHOT_BOUND_GRAPHIFY_CANARY_NOT_AUTHORIZED`.
+Next gate: `SNAPSHOT-BOUND-GRAPHIFY-CANARY-01`.
+
+## CURRENT-STRUCTURAL-LINEAGE-RECHECK-2026-09-10
+
+- [x] Re-ran the read-only current packet/chunk reconciliation.
+- [x] Confirmed `111` binding rows and `111` binding sources, but `0` exact
+      Graphify source matches, `0` packet/chunk content matches, and `0` exact
+      packet/chunk current sources.
+- [ ] Keep structural lineage blocked downstream of the snapshot-bound
+      Graphify execution; no path-only or historical revision join is
+      admissible as current evidence.
+
+Evidence: `scripts/atlas/audit-current-workspace-packet-chunk-join-v1.mjs`
+and `docs/reports/current-workspace-packet-chunk-join-v1.json`.
+Status: `CURRENT_PACKET_CHUNK_JOIN_MISSING`; authority=false;
+writesPerformed=false.
+First blocker: `CURRENT_PACKET_CHUNK_IDENTITY_RECONCILIATION`.
+Next gate: terminal Graphify membership readback, then current source-to-packet
+and packet-to-chunk reconciliation.
+
+## SOURCE-NAMESPACE-RECHECK-2026-09-10
+
+- [x] Confirmed the workspace source namespace contract exists for
+      `legal-ai:deeds-web-app` / `deeds-web-app` and is read-only proven.
+- [x] Re-ran source-reference reconciliation: `0` exact-current joins,
+      `204` truncated hashes, `887` chunk hash mismatches, `32` Graphify hash
+      mismatches, and `15,444` missing PostgreSQL chunks.
+- [ ] Keep structural/source authority blocked; namespace existence does not
+      establish current source-to-packet-to-chunk identity.
+
+Evidence: `docs/reports/workspace-source-namespace-v1.json` and
+`docs/reports/source-ref-namespace-reconciliation-v1.json`.
+Status: `WORKSPACE_SOURCE_NAMESPACE_PROVEN` for the namespace contract, with
+`SOURCE_BINDING_RECONCILIATION_REQUIRED` for current lineage;
+authority=false; writesPerformed=false.
+First blocker: `CURRENT_SOURCE_PACKET_CHUNK_JOIN_UNPROVEN`.
+Next gate: snapshot-bound Graphify membership readback, followed by exact
+source/packet/chunk reconciliation.
+
+## PROMOTION-GATE-RECEIPT-CURRENTNESS-01 — 2026-09-10
+
+- [x] Hardened the read-only aggregate so an admitted workspace revision is
+      reported independently from Graphify execution ownership.
+- [x] The current aggregate now reports workspace authority as admitted at
+      `sha256:d7f9563f5861b6890ac7e6d2c87df4ad6fa0eebb825f66387fba0e750ef91f2e`.
+- [x] Graphify execution remains separately blocked because no terminal owner
+      matches that admitted revision.
+- [ ] Keep all dependent gates blocked; aggregate evidence must not promote a
+      workspace revision or synthesize terminal execution authority.
+
+Evidence: `scripts/atlas/audit-parent-atlas-promotion-gates-v1.mjs` and
+`docs/reports/parent-atlas-promotion-gates-v1.json`.
+Status: `BLOCKED`; workspaceAuthority=`ADMITTED`;
+graphifyExecution=`BLOCKED`; authority=false; writesPerformed=false.
+First blocker: `GRAPHIFY_SNAPSHOT_CONSUMER_NOT_REVISION_ADDRESSABLE`.
+Next gate: separately authorized snapshot-bound Graphify canary.
+
+## GRAPHIFY-SNAPSHOT-CONSUMER-PREFLIGHT-01 — 2026-09-10
+
+- [x] Added and ran a read-only preflight for the admitted,
+      revision-addressed materialized snapshot.
+- [x] Verified `sourceKind=ADMITTED_WORKSPACE_SNAPSHOT`, `25,267` sources,
+      `7` repositories, and matching workspace/snapshot membership checksums.
+- [x] Verified zero missing sources, hash mismatches, size mismatches,
+      duplicate repository-qualified identities, live-inventory builder calls,
+      Git revision derivation calls, unexpected repository discovery, or child
+      apply commands.
+- [ ] Do not infer execution or canonical authority from this preflight; the
+      bounded Graphify canary still requires separate authorization and fresh
+      terminal readback.
+
+Evidence: `scripts/atlas/audit-graphify-snapshot-consumer-preflight-v1.mts`
+and `docs/reports/graphify-snapshot-consumer-preflight-v1.json`.
+Status: `GRAPHIFY_SNAPSHOT_CONSUMER_PREFLIGHT_PROVEN`;
+proofLevel=`BOUNDED_LIVE_PROVEN`; authority=false; writesPerformed=false.
+First blocker moved to: `SNAPSHOT_BOUND_GRAPHIFY_CANARY_NOT_AUTHORIZED`.
+Next gate: `SNAPSHOT-BOUND-GRAPHIFY-CANARY-01`.
+Next gate: separately authorized snapshot-native terminal Graphify execution,
+then `GRAPHIFY-SNAPSHOT-BINDING-READBACK-01`.
+
+## CURRENT-STRUCTURAL-LINEAGE-SELECTED-EXECUTION-01 — 2026-09-11
+
+- [x] Added a read-only structural reconciliation rooted in the selected
+      terminal execution `14667026-459c-4a99-b3c2-c20b739a6e0d` and admitted
+      workspace revision `sha256:3be7901e1b6bc4f6499185f775eac2ae93e56305940703a7da66a436e4e3a3e0`.
+- [x] Read back `25,271` repository-qualified membership rows across `7`
+      repositories with zero duplicate membership keys, zero workspace
+      revision mismatches, and zero missing source revisions.
+- [x] Required exact `source_ref + content_hash` joins into the canonical
+      chunk and packet tables; no path, basename, Qdrant-ID, array-order, or
+      historical-binding fallback was used.
+- [ ] The selected execution currently has `0/25,271` exact chunk matches and
+      `0/25,271` exact packet matches, so current packet/chunk structural
+      authority remains blocked. This receipt does not reinterpret older rows.
+
+Evidence: `scripts/atlas/audit-selected-graphify-structural-lineage-v1.mjs`
+and `docs/reports/selected-graphify-structural-lineage-v1.json`.
+Status: `CURRENT_PACKET_CHUNK_JOIN_UNPROVEN`; authority=false;
+writesPerformed=false. First blocker: `CURRENT_CHUNK_EXACT_MATCH_MISSING`.
+Next gate: current source/packet/chunk reconciliation after a producer-bound
+current Graphify artifact exists.
+
+### ROUTING-OWNER-COMPARISON-RECHECK-01 — 2026-09-11
+
+- [x] Confirmed the existing production MCP caller remains bounded and
+      revisioned: five registry-backed tools selected, read-only, with no
+      execution or datastore mutation.
+- [x] Confirmed the established CandidateFeatureMatrixV1, neural-routing,
+      and MCP/Viterbi contracts are present in `origin/main`.
+- [x] Confirmed local `KnowledgeSnippetV1` is workstation-only and is not
+      present in `origin/main`; it remains a non-canonical local context
+      proposal, not a globally landed authority.
+- [ ] Do not promote the local snippet layer or add a second router until its
+      ownership and merge state are intentionally resolved.
+
+Evidence: `docs/reports/mcp-production-caller-v1.json` and local versus
+`origin/main` path existence checks.
+Status: `PROVEN_READ_ONLY_BOUNDED_CALLER`; authority=false;
+writesPerformed=false.
+First blocker: `KNOWLEDGE_SNIPPET_MAINLINE_NOT_LANDED`.
+Next gate: preserve current registry/Viterbi routing and resolve mainline
+integration deliberately, independent of Graphify authority.
+
+### TERMINAL-RUN-SCOPE-GUARD-01 — 2026-09-10
+
+- [x] Prevented the terminal authorization path from selecting the broad
+      `graphify:daily:chain` apply command; it now selects the existing
+      `graphify:daily:dry` chain.
+- [x] Prevented terminal-mode failures from entering the legacy fallback path,
+      which may contain apply-capable work.
+- [x] Added coverage for terminal-chain selection and fallback rejection;
+      startup syntax and all `4/4` admission-order tests pass.
+- [ ] Keep the terminal execution receipt unproven until a separately
+      authorized run completes and its fresh membership readback passes.
+
+Evidence: `scripts/startup/run-graphify-daily-startup.mjs` and
+`scripts/startup/run-graphify-daily-admission-order.spec.mjs`.
+Status: `IMPLEMENTED_NOT_LIVE_PROVEN`; authority=false;
+writesPerformed=false.
+First blocker remains `NO_TERMINAL_EXECUTION_MATCHES_ADMITTED_SNAPSHOT`.

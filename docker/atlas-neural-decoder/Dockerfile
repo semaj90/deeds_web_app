@@ -23,7 +23,7 @@ WORKDIR /app
 # (PEP 668) -- --break-system-packages is required and safe here since this
 # container has exactly one purpose and no other Python consumer to conflict
 # with (found by a real build failure against this exact image, not assumed).
-RUN python -m pip install --upgrade pip --break-system-packages \
+RUN python -m pip install --upgrade pip==26.2.1 --break-system-packages \
   && python -m pip install --break-system-packages \
     fastapi \
     "uvicorn[standard]" \

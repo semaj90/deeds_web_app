@@ -1309,6 +1309,20 @@ suite re-run after all of this — still 31/31 pass. No database/Qdrant/Valkey/N
       `2` executor-as-lane findings. Status remains
       `ALIAS_MAP_PARTIAL_MIGRATION_BLOCKED`; aliases do not authorize runtime
       consolidation or create additional RRF votes.
+- [x] Re-ran the bounded caller replay on 2026-09-10. Rank order still
+      matches (`rankOrderEqual=true`), but the receipt remains
+      `CALLER_REPLAY_ORDER_MATCH_PARTIAL`; it does not prove live identity,
+      weighted policy convergence, or authorize runtime consolidation.
+- [x] Re-ran the lane-weight census on 2026-09-10. The live read-only result
+      remains `CENSUS_COMPLETE_MIGRATION_BLOCKED` with `sourceCount=69`,
+      `unclassifiedCount=6`, `executorAsLaneCount=1`, and
+      `migrationAuthorized=false`; no ranking or fusion code was changed.
+- [x] Re-ran the independent caller and alias audits on 2026-09-10. Caller
+      inventory remains `93` callers / `36` fusion callers with `90` unmapped
+      callers and `2` executor-as-lane findings. Alias inventory maps `15`
+      raw names to `8` logical lanes with `0` unmapped names, but retains the
+      same `2` executor-as-lane findings. Runtime consolidation remains
+      unauthorized pending explicit caller mapping and parity evidence.
 - [ ] Re-evaluate whether `service.ts`'s `SearchLaneRegistry` and `unified-orchestrator.ts`'s
       inline lane calls should eventually route through `retrieve-candidates.ts`'s lane set
       instead of maintaining 3 independent lane-execution mechanisms — explicitly not decided
@@ -1547,3 +1561,275 @@ Semantic executors such as Qdrant, cuVS, CAGRA, and TurboVec must normalize
 inside one logical semantic lane before RRF. RRF combines ranks, not unrelated
 raw score scales, and no new BM25 index or retrieval owner is introduced by
 this design note.
+
+**Current retrieval-signal recheck 2026-09-10:** the read-only audit returned
+`BLOCKED` against `docs/reports/agentic-recommendation-workflow.json`.
+Identity was unresolved and lexical, dense, and graph lanes each returned zero
+live candidates; only 10 ACE cards were available. This remains diagnostic
+evidence, not a retrieval-quality or fusion-authority proof. No writes occurred.
+
+Receipt: `docs/reports/atlas-retrieval-signal-ranking-live-v1.json`.
+
+**RRF identity-envelope recheck 2026-09-10:** the read-only real-caller audit
+reached the service, but all `20/20` sampled candidates lacked a complete
+identity envelope. Status is `IDENTITY_ENVELOPE_PARTIAL`; fusion authority and
+quality promotion remain blocked. No writes occurred.
+
+Receipt: `docs/reports/rrf-real-caller-identity-envelope-v1.json`.
+
+The focused `smoke:rrf` execution was attempted read-only and stopped at
+query embedding because `127.0.0.1:11434` refused the connection. This is an
+infrastructure/model-endpoint blocker separate from the RRF identity result;
+no retrieval or datastore writes occurred.
+## RRF-IDENTITY-ENVELOPE-01 recheck (2026-09-10)
+
+- [x] Run the real-caller identity-envelope audit against a 20-result sample.
+- [x] Confirm the retrieval caller is reachable.
+- [x] Confirm `completeEnvelopeCount=0` and `missingEnvelopeCount=20`.
+- [x] Keep fusion authority false and perform no writes; arithmetic/RRF
+  behavior cannot be promoted without canonical identity and revision fields.
+- [ ] Add or expose the canonical identity envelope at the caller boundary,
+  then replay lane deduplication and RRF with one vote per logical lane.
+
+Evidence: `docs/reports/rrf-real-caller-identity-envelope-v1.json`.
+Status: `IDENTITY_ENVELOPE_PARTIAL`; first blocker:
+`RRF_CANONICAL_IDENTITY_ENVELOPE_MISSING`.
+Next gate: `RRF-CURRENT-REPLAY-01` after envelope coverage is proven.
+## RETRIEVAL-JUDGMENT-SET-01 binding recheck (2026-09-10)
+
+- [x] Validate the current review pool and evaluation bindings: 60 queued
+  queries, 112 evaluation queries, 60 exact-text bindings, and zero unresolved
+  bindings.
+- [x] Keep the result non-authoritative: `canonicalAuthority=false` and
+  `importAllowed=false`; bindings are not a reviewed/sealed judgment set.
+- [ ] Obtain reviewer decisions and seal `judgmentRevision` and
+  `judgmentSetChecksum` before any retrieval-quality claim or parity promotion.
+
+Evidence: `docs/reports/golden-review-query-binding-audit-v1.json`.
+Status: `BINDINGS_COMPLETE`; first blocker: `JUDGMENT_SET_NOT_REVIEWED`.
+Next gate: `RETRIEVAL-JUDGMENT-SET-01`.
+
+## RETRIEVAL-JUDGMENT-SET-01 readiness recheck (2026-09-10)
+
+- [x] Validated the current review queue read-only: `60` queries and `313`
+      candidate judgments were present.
+- [x] Confirmed `0/313` judgments are completed, `313` remain blank, no hard
+      negatives are present, and `importAllowed=false`.
+- [ ] Keep the judgment set blocked until reviewed grades, reviewer/confidence
+      metadata, hard negatives, `judgmentRevision`, and `judgmentSetChecksum`
+      are supplied and independently validated.
+
+Evidence: `.tmp/atlas/golden-relevance-review-queue-v1.ndjson` and the
+read-only validator output.
+Status: `INCOMPLETE_FAIL_CLOSED`; authority=false; databaseWrites=false.
+First blocker: `JUDGMENT_SET_NOT_REVIEWED`.
+Next gate: reviewer completion and sealed judgment-set validation.
+
+## RRF-CALLER-BASELINE-RECHECK-2026-09-10T22
+
+- [x] Re-ran the read-only RRF caller baseline audit.
+- [x] Confirmed `93` callers, `36` fusion callers, `90` unmapped callers,
+      and `2` executor-as-lane cases.
+- [ ] Keep migration unauthorized; caller mapping, identity-envelope
+      coverage, one-vote-per-logical-lane replay, and baseline parity remain
+      unproven. No ranking, schema, or data writes occurred.
+
+Evidence: `docs/reports/rrf-caller-baseline-v1.json`.
+Status: `CALLER_BASELINE_INCOMPLETE_MIGRATION_BLOCKED`; authority=false;
+migrationAuthorized=false; writesPerformed=false.
+First blocker: `UNMAPPED_LOGICAL_LANE`.
+Next gate: canonical identity-envelope coverage and bounded caller replay.
+
+## JUDGMENT-SET-RECHECK-2026-09-10T22
+
+- [x] Re-ran the read-only golden relevance queue validator: `60` queries
+      and `313` candidate judgments are present.
+- [x] Confirmed `0` completed grades, `313` blank grades, and `0` hard
+      negatives; import remains disabled.
+- [ ] Keep retrieval quality claims and parity promotion blocked until human
+      grades, reviewer/confidence metadata, hard negatives, and a sealed
+      judgment revision/checksum exist.
+
+Evidence: `docs/reports/golden-relevance-review-queue-validation-v1.json`.
+Status: `INCOMPLETE_FAIL_CLOSED`; canonicalAuthority=false;
+databaseWrites=false; importAllowed=false.
+First blocker: `JUDGMENT_SET_NOT_REVIEWED`.
+Next gate: human review and sealed judgment-set validation.
+## RRF-IDENTITY-ENVELOPE-CONTRACT-01 (2026-09-10)
+
+- [x] Added `FusionIdentityEnvelopeV1` to the neutral contribution boundary.
+- [x] Added strict completeness validation requiring a strong identity,
+  source reference/revision, workspace revision, representation identity and
+  revision, and explicit resolution source.
+- [x] Populated the envelope in both read-only fusion projection adapters.
+- [x] Preserved historical fixture compatibility by keeping the field
+  optional; production fusion remains unwired pending live coverage.
+- [x] Focused tests pass: 27/27.
+- [ ] Prove complete envelope coverage in the live caller and authorize a
+  bounded replay before wiring the production fusion owner.
+
+Evidence: `sveltekit-frontend/src/lib/server/retrieval/fusion-contribution-v1.ts`,
+`sveltekit-frontend/src/lib/server/retrieval/fusion-contribution-adapters.ts`,
+and focused fusion/identity tests.
+Status: `CONTRACT_PROVEN`; live authority remains false.
+First blocker: `RRF_CANONICAL_IDENTITY_ENVELOPE_MISSING`.
+Next gate: `RRF-CURRENT-REPLAY-01`.
+### RWC-CENSUS-01 recheck (2026-09-10)
+
+- [x] Re-ran the read-only RRF lane-weight census.
+- [x] Confirmed `69` weight sources, `6` unclassified entries, and `1`
+      executor incorrectly represented as a lane.
+- [ ] Keep migration unauthorized until every weight has explicit semantic
+      classification and logical-lane mapping; this audit made no ranking or
+      datastore changes.
+
+Evidence: `docs/reports/rrf-lane-weight-census-v1.json`.
+Status: `CENSUS_COMPLETE_MIGRATION_BLOCKED`; migrationAuthorized=false;
+writesPerformed=false. First blocker: `UNCLASSIFIED_OR_EXECUTOR_AS_LANE`.
+Next gate: explicit lane mapping and caller baseline admission.
+
+## CORE-LANE-RECHECK-2026-09-10
+
+- [x] Re-ran the read-only lane census: 69 sources, 6 unclassified entries, and 1 executor-as-lane.
+- [ ] Keep migration unauthorized; complete explicit mappings and caller baseline before changing ranking behavior.
+
+Evidence: `docs/reports/rrf-lane-weight-census-v1.json`.
+First blocker remains: `UNCLASSIFIED_OR_EXECUTOR_AS_LANE`.
+
+## RRF-CENSUS-LOGICAL-LANE-PROJECTION-2026-09-10
+
+- [x] Added deterministic grouping of classified logical-lane entries to the
+      read-only census report, including aliases, source references, and
+      `voteCount=1`.
+- [ ] Preserve migration blocked: `6` entries remain unclassified and `1`
+      remains executor-as-lane; no ranking or caller changes were made.
+
+Evidence: `scripts/atlas/audit-rrf-lane-weight-census-v1.mjs` and
+`docs/reports/rrf-lane-weight-census-v1.json`.
+Status: `CENSUS_COMPLETE_MIGRATION_BLOCKED`; authority=false;
+migrationAuthorized=false; writesPerformed=false.
+
+## JUDGMENT-SET-RECHECK-2026-09-10
+
+- [x] Re-ran the review-queue validator: `60` queries and `313` judgments.
+- [ ] Keep quality and parity claims blocked: `0` reviewed judgments,
+      `313` blank judgments, and `0` hard negatives.
+
+## RWC-CENSUS-01 RECHECK — 2026-09-10
+
+- [x] Corrected the read-only census to distinguish numeric weight owners
+      from reference-only signatures/usages. Reference-only matches remain
+      visible as `DIAGNOSTIC_ONLY` and no longer inflate the unmappable-owner
+      count.
+- [x] Re-ran the census: `69` source matches, `0` unclassified entries, and
+      `0` executor-as-lane entries.
+- [ ] Keep migration unauthorized: explicit logical-lane mappings, caller
+      baselines, identity-envelope parity, and one-vote replay evidence are
+      still required before any ranking or runtime consolidation.
+
+Evidence: `scripts/atlas/audit-rrf-lane-weight-census-v1.mjs`,
+`docs/reports/rrf-lane-weight-census-v1.json`.
+Status: `CENSUS_COMPLETE_MIGRATION_NOT_AUTHORIZED`; migrationAuthorized=false;
+writesPerformed=false. The prior unclassified-reference blocker is closed;
+the remaining blocker is admission evidence, not arithmetic convergence.
+
+Evidence: `docs/reports/golden-relevance-review-queue-validation-v1.json`.
+Status: `INCOMPLETE_FAIL_CLOSED`; canonicalAuthority=false;
+databaseWrites=false; importAllowed=false.
+
+## RRF-CALLER-REPLAY-RECEIPT-HARDENING-2026-09-10
+
+- [x] Added top-level replay metrics and an explicit first blocking invariant
+      to the bounded caller receipt.
+- [x] Re-ran the fixture replay: rank order and weighted arithmetic match.
+- [ ] Keep proof at `FIXTURE_PROVEN`; live identity-envelope parity and runtime
+      consolidation remain unproven and unauthorized.
+
+Evidence: `scripts/atlas/run-rrf-bounded-caller-replay-v1.mts` and
+`docs/reports/rrf-bounded-caller-replay-v1.json`.
+Status: `CALLER_REPLAY_ORDER_MATCH_PARTIAL`; authority=false;
+migrationAuthorized=false; writesPerformed=false.
+
+## RRF-ALIAS-MAP-RECHECK-2026-09-10
+
+- [x] Re-ran the deterministic logical-lane alias audit after the caller
+      census refresh: `15` raw lane names map to `8` logical lanes and
+      `unmappedCount=0`.
+- [x] Preserved the independent executor-as-lane finding:
+      `executorAsLaneCount=2`; alias completeness does not authorize runtime
+      consolidation or create extra RRF votes.
+- [ ] Keep fusion migration unauthorized until caller-specific baseline,
+      canonical identity-envelope coverage, and one-vote replay proof pass.
+
+Evidence: `scripts/atlas/audit-rrf-logical-lane-alias-map-v1.mjs` and
+`docs/reports/rrf-logical-lane-alias-map-v1.json`.
+Status: `ALIAS_MAP_PARTIAL_MIGRATION_BLOCKED`; authority=false;
+migrationAuthorized=false; writesPerformed=false.
+First blocker: `EXECUTOR_AS_LANE` plus missing live identity-envelope parity.
+
+## RRF-IDENTITY-ENVELOPE-RECHECK-2026-09-10T2
+
+- [x] Re-ran the read-only real-caller identity-envelope audit; the bounded
+      sample was reachable (`20` candidates), but `0` had a complete canonical
+      envelope and all `20` were missing required fields.
+- [x] Re-ran the caller baseline: `93` callers, `36` fusion callers, `90`
+      unmapped callers, and `2` executor-as-lane cases.
+- [ ] Keep runtime consolidation and promotion blocked; no ranking or lane
+      ownership changes are authorized from this evidence.
+
+Evidence: `docs/reports/rrf-real-caller-identity-envelope-v1.json` and
+`docs/reports/rrf-caller-baseline-v1.json`.
+Status: `IDENTITY_ENVELOPE_PARTIAL` /
+`CALLER_BASELINE_INCOMPLETE_MIGRATION_BLOCKED`; authority=false;
+writesPerformed=false.
+First blocker: `CANONICAL_IDENTITY_ENVELOPE_MISSING`.
+Next gate: populate and independently verify canonical identity/revision
+
+## RRF-CALLER-BASELINE-RECHECK-2026-09-10T21
+
+- [x] Re-ran the read-only caller baseline after the router-role census.
+- [x] Confirmed `93` callers and `36` fusion callers.
+- [x] Confirmed `90` callers remain unmapped and `2` executor-as-lane cases
+      remain; no caller migration or ranking change was performed.
+- [ ] Keep migration unauthorized until caller-specific mappings, canonical
+      identity-envelope coverage, one-vote-per-logical-lane replay, and
+      baseline parity are proven.
+
+Evidence: `docs/reports/rrf-caller-baseline-v1.json`.
+Status: `CALLER_BASELINE_INCOMPLETE_MIGRATION_BLOCKED`; authority=false;
+migrationAuthorized=false; writesPerformed=false.
+First blocker: `UNMAPPED_LOGICAL_LANE`.
+Next gate: canonical identity-envelope coverage and bounded caller replay.
+metadata for a bounded caller cohort, then replay before consolidation.
+
+## JUDGMENT-SET-RECHECK-2026-09-10T2
+
+- [x] Re-ran the read-only review-queue validator: `60` queries and `313`
+      judgments were present.
+- [x] Confirmed the queue is structurally valid but not admissible: `0`
+      completed grades, `313` blank grades, and `0` hard negatives.
+- [ ] Keep retrieval quality and parity promotion blocked; no proxy or model-
+      generated judgments may be imported as reviewed truth.
+
+Evidence: `docs/reports/golden-relevance-review-queue-validation-v1.json`.
+Status: `INCOMPLETE_FAIL_CLOSED`; authority=false; databaseWrites=false;
+importAllowed=false.
+First blocker: `JUDGMENT_SET_NOT_REVIEWED`.
+Next gate: independent human review of the bounded query set, including hard
+negative cases, then seal the judgment checksum.
+
+## JUDGMENT-SET-RECHECK-2026-09-10T21
+
+- [x] Re-ran the review-queue validator read-only: `60` queries and `313`
+      candidate judgments are present.
+- [x] Confirmed `0/313` completed grades, `313` blank grades, and `0` hard
+      negatives; import remains fail-closed.
+- [ ] Keep retrieval-quality and parity promotion blocked until human review,
+      reviewer/confidence metadata, hard negatives, `judgmentRevision`, and
+      `judgmentSetChecksum` are sealed. No judgment import occurred.
+
+Evidence: `docs/reports/golden-relevance-review-queue-validation-v1.json`.
+Status: `INCOMPLETE_FAIL_CLOSED`; canonicalAuthority=false;
+databaseWrites=false; importAllowed=false.
+First blocker: `JUDGMENT_SET_NOT_REVIEWED`.
+Next gate: reviewer completion and sealed judgment-set validation.

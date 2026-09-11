@@ -1,5 +1,5 @@
 # Multi-stage build for SvelteKit 2 with native C++/Rust NAPI bindings
-FROM node:22-slim AS base
+FROM node:22-slim@sha256:83f487e0a63425e5b4d146fb5e5be574bcbe1b7b843d3ebafdd95eaf7767a7e5 AS base
 
 # Install dependencies for building native C++/Rust modules
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -57,7 +57,7 @@ WORKDIR /app/sveltekit-frontend
 RUN pnpm run build
 
 # Production runner image (glibc-based node:22-slim)
-FROM node:22-slim AS production
+FROM node:22-slim@sha256:83f487e0a63425e5b4d146fb5e5be574bcbe1b7b843d3ebafdd95eaf7767a7e5 AS production
 
 WORKDIR /app
 

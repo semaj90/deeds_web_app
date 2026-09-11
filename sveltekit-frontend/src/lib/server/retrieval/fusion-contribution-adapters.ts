@@ -97,6 +97,18 @@ export function projectSearchRuntimeCandidatesToContributions(
         weight: 1,
         executorId: candidate.retrievalExecutor?.trim() || candidate.scoreSource,
         provenanceRefs: [candidate.scoreSource],
+        identityEnvelope: {
+          canonicalId: simplifiedCanonicalId(candidate),
+          packetKey: candidate.packetKey ?? candidate.packet_key ?? null,
+          chunkId: candidate.canonicalChunkId ?? null,
+          symbolVersionId: candidate.symbolVersionId ?? candidate.symbol_version_id ?? null,
+          sourceRef: candidate.sourceRef ?? candidate.source_ref ?? null,
+          sourceRevision: candidate.sourceRevision ?? null,
+          workspaceRevision: candidate.workspaceRevision ?? null,
+          representationId: candidate.representationId ?? null,
+          representationRevision: candidate.representationRevision ?? null,
+          identityResolutionSource: candidate.identitySource ?? 'legacy-unresolved',
+        },
       });
     });
   }
@@ -112,6 +124,12 @@ export interface RrfLaneInputForAdapter {
     id?: string;
     symbolVersionId?: string;
     canonicalChunkId?: string;
+    sourceRef?: string;
+    sourceRevision?: string;
+    workspaceRevision?: string;
+    representationId?: string;
+    representationRevision?: string | number;
+    identityResolutionSource?: string;
   }>;
 }
 
@@ -141,6 +159,23 @@ export function projectRrfLanesToContributions(
         weight,
         executorId: rawLane,
         provenanceRefs: [rawLane],
+        identityEnvelope: {
+          canonicalId: simplifiedCanonicalId({
+            symbolVersionId: hit.symbolVersionId,
+            packetKey: hit.packetKey,
+            canonicalChunkId: hit.canonicalChunkId,
+            id: hit.id,
+          }),
+          packetKey: hit.packetKey,
+          chunkId: hit.canonicalChunkId ?? null,
+          symbolVersionId: hit.symbolVersionId ?? null,
+          sourceRef: hit.sourceRef ?? null,
+          sourceRevision: hit.sourceRevision ?? null,
+          workspaceRevision: hit.workspaceRevision ?? null,
+          representationId: hit.representationId ?? null,
+          representationRevision: hit.representationRevision ?? null,
+          identityResolutionSource: hit.identityResolutionSource ?? 'legacy-unresolved',
+        },
       });
     }
   }

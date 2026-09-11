@@ -16,6 +16,7 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const REPORT = resolve(ROOT, 'docs/reports/feature-ontology-current-cohort-v1.json');
 const OBSERVATION = resolve(ROOT, 'docs/reports/workspace-source-binding-observation.json');
 const LIMIT = Number(process.argv.find((arg) => arg.startsWith('--limit='))?.split('=')[1] ?? 0);
+const EXPLICIT_WORKSPACE_REVISION = process.argv.find((arg) => arg.startsWith('--workspace-revision='))?.split('=').slice(1).join('=') ?? null;
 const env = loadRepoEnv(process.env);
 const pool = new pg.Pool({ connectionString: resolveDatabaseUrl(env) });
 
@@ -25,6 +26,7 @@ const clean = (value) => {
 };
 
 const loadWorkspaceRevision = () => {
+  if (clean(EXPLICIT_WORKSPACE_REVISION)) return clean(EXPLICIT_WORKSPACE_REVISION);
   try {
     const report = JSON.parse(readFileSync(OBSERVATION, 'utf8'));
     return clean(report.record?.workspaceRevision);
