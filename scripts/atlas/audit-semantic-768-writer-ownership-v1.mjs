@@ -54,7 +54,7 @@ function classify(relative, source, target) {
   const guarded = /WHERE[\s\S]{0,800}(source_revision|sourceRevision)[\s\S]{0,800}(workspace_revision|workspaceRevision)/i.test(source);
   const dryRun = /dry[-_ ]?run|read[-_ ]only/i.test(source);
   const entrypoint = /package\.json$|startup|route|worker|daemon|index-stream/i.test(relative);
-  return { path: relative, role: target.role, kind: mutation ? 'MUTATION_WRITER' : 'READER_OR_DIAGNOSTIC', revisionQualified, guarded, dryRun, productionReachableCandidate: entrypoint };
+  return { path: relative, surface: target.surface, role: target.role, kind: mutation ? 'MUTATION_WRITER' : 'READER_OR_DIAGNOSTIC', revisionQualified, guarded, dryRun, productionReachableCandidate: entrypoint };
 }
 
 async function liveCensus() {

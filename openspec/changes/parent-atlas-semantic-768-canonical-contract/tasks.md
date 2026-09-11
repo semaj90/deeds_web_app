@@ -785,3 +785,271 @@ references, not necessarily new drift of the same kind as the fixed hard-fail. L
 whoever continues this document should re-run and re-triage the current
 `semantic-contract-conflicts.ndjson` rather than assume the 102-warning breakdown above still
 matches file-for-file.
+### SEMANTIC-768-OWNER-01 and bounded cohort recheck (2026-09-10)
+
+- [x] Re-ran the read-only writer ownership audit. PostgreSQL remains
+      reachable, with `atlas_packets.embedding` populated on `61,659/61,718`
+      rows, `codebase_chunk_index.content_embedding` on `55,169/55,853`, and
+      `content_embedding_768` on `1,386/55,853`.
+- [x] Re-ran the bounded semantic cohort audit: `15/15` exact chunk joins,
+      vectors, producer metadata, and semantic qualification.
+- [ ] Keep the canonical owner unproven: `19` writer surfaces remain in the
+      census and the three populated PostgreSQL surfaces are not reconciled to
+      one current production owner. No embedding or projection writes occurred.
+
+Evidence: `docs/reports/semantic-768-writer-ownership-v1.json` and
+`docs/reports/lineage-semantic-768-cohort-v1.json`.
+Status: `OWNER_NOT_PROVEN` with bounded `SEMANTIC_768_COHORT_PROVEN`;
+authority=false; writesPerformed=false.
+First blocker: `AMBIGUOUS_SEMANTIC_768_OWNER`.
+Next gate: current source lineage and representation-owner reconciliation.
+
+## CORE-LANE-RECHECK-2026-09-10
+
+- [x] Re-ran the live writer census: 19 writers remain and the canonical owner is not proven.
+- [ ] Do not promote or create a second `semantic_768` owner until source and representation lineage close.
+
+Evidence: `docs/reports/semantic-768-writer-ownership-v1.json`.
+
+### SEMANTIC-768-PRECISION-OWNER-RECHECK — 2026-09-10
+
+- [x] Corrected `scripts/atlas/sem768-corpus-bundle-01.mts` so its declared
+      canonical physical column matches the live schema: `content_embedding`
+      with `halfvec(768)` storage.
+- [x] Regenerated the read-only bundle: `52,364` eligible rows,
+      `semantic_768`, EmbeddingGemma, dimension `768`.
+- [ ] Keep FP16 storage as the current physical owner only; do not declare
+      it permanently preferred over full `vector(768)` until precision/recall
+      and index-size evidence exists.
+
+Evidence: `scripts/atlas/sem768-corpus-bundle-01.mts` and
+`docs/reports/sem768-corpus-bundle-01.json`.
+Status: `ADMITTED_REPRESENTATION_INPUT_ONLY`; sourceAuthorityStatus=`PARTIAL`;
+canonicalAuthority=false; writesPerformed=false.
+First blocker: `SEM768_PRECISION_OWNER_UNPROVEN`.
+Next gate: bounded FP32-versus-halfvec(768) recall, ranking, latency, and
+storage comparison using the same source-qualified cohort.
+
+### SEMANTIC-768-ALIGNMENT-SWEEP-2026-09-10
+
+- [x] Swept active semantic references, physical columns, embedding endpoints,
+      and GPU/container boundaries.
+- [x] Confirmed live 768D vectors from both the dedicated `:8081` endpoint and
+      Ollama `:11434`; DirectML remains an in-process backend.
+- [x] Confirmed WSL2 RAPIDS packages are present while the running Docker
+      `atlas-gpu-8098` image still lacks PyTorch until rebuilt.
+- [ ] Keep the owner gate open: the repository still has `19` writer/reference
+      surfaces and the previously expected active-contract audit script is not
+      present.
+
+Evidence: `docs/reports/semantic-768-writer-ownership-v1.json`,
+`docs/reports/sem768-corpus-bundle-01.json`, and live 8081/11434 probes.
+Status: `SEMANTIC_768_ALIGNMENT_PARTIAL`; canonicalAuthority=false;
+writesPerformed=false.
+First blocker: `SEMANTIC_768_OWNER_AND_PRECISION_ADMISSION_UNPROVEN`.
+Next gate: add the missing read-only active-contract census or classify the
+existing writer census as its owner, then run the bounded precision comparison.
+
+## SEMANTIC-768-CONTRACT-PROOF-RECHECK-2026-09-11
+
+- [x] Re-ran the read-only semantic contract proof.
+- [x] Confirmed the Qdrant content/error/signature vectors are 768D, the
+      semantic contract is canonical, chat and embedding owners are separate,
+      and BM42 is not required for semantic contract admission.
+- [ ] Keep full-corpus owner, current cohort, and representation lineage
+      unproven; contract validity does not promote existing projections.
+
+Evidence: `docs/reports/semantic-768-contract-proof.json`.
+Status: `PROVEN` for the contract only; authority=false;
+writesPerformed=false.
+First blocker remains `FULL_CURRENT_SEMANTIC_COHORT_AND_REPRESENTATION_LINEAGE_UNPROVEN`.
+Next gate: snapshot-bound source/packet/chunk reconciliation.
+
+## SEMANTIC-768-OWNER-RECHECK-2026-09-10T23
+
+- [x] Re-ran the read-only semantic writer census against live PostgreSQL.
+- [x] Confirmed `19` writer/reference surfaces and reachable vector stores;
+      populated counts remain `61,659/61,718`, `55,169/55,853`, and
+      `1,386/55,853` across the observed semantic columns.
+- [ ] Keep owner promotion blocked: dimensional/runtime health does not prove
+      one canonical current cohort, representation revision, or source lineage.
+      No embedding, projection, or database writes occurred.
+
+Evidence: `docs/reports/semantic-768-writer-ownership-v1.json`.
+Status: `OWNER_NOT_PROVEN`; authority=false; writesPerformed=false.
+First blocker: `FULL_CURRENT_SEMANTIC_COHORT_AND_REPRESENTATION_LINEAGE_UNPROVEN`.
+Next gate: snapshot-bound source/packet/chunk reconciliation, then one
+representation-qualified semantic owner.
+
+### SEMANTIC-768-OWNER-RECHECK-2026-09-10T21
+
+- [x] Confirmed the live census still observes `19` writer/reference surfaces
+      and three populated embedding columns: `atlas_packets.embedding`
+      `61,659/61,718`, `codebase_chunk_index.content_embedding`
+      `55,169/55,853`, and `content_embedding_768` `1,386/55,853`.
+- [ ] Keep full semantic owner and representation admission blocked until the
+      current source cohort, producer, representation revision, and ordinal
+      lineage reconcile exactly. Runtime reachability and dimension alone are
+      insufficient; no embedding writes occurred.
+
+Status: `OWNER_NOT_PROVEN`; authority=false; writesPerformed=false.
+First blocker: `AMBIGUOUS_SEMANTIC_768_OWNER`.
+Next gate: current-source lineage and representation-owner reconciliation.
+
+### REPRESENTATION-IDENTITY-RECHECK — 2026-09-10
+
+- [x] Ran the read-only latent representation identity audit against the
+      live PostgreSQL/Qdrant surfaces. Packet identity and tree-node joins
+      were observable, and the bytea sample was consistently `256` bytes
+      (`64 * float32` under the current writer contract).
+- [ ] Keep representation admission blocked: source-version joins are
+      `0/1000`, symbol-version joins are `0/1000`, and the live
+      `atlas_representation_records` ledger is absent (`0/1000` packet rows
+      joined). Packet metadata is therefore not a complete representation
+      manifest.
+- [ ] Do not infer canonical lineage from latent byte length, packet/tree
+      identifiers, Qdrant payloads, or the current writer's serialization
+      code. No production mutation or projection write was performed.
+
+Evidence: `docs/reports/latent-representation-identity-audit-2026-09-10.json`
+and `docs/reports/latent-representation-identity-audit-2026-09-10.md`.
+Status: `REPRESENTATION_LEDGER_NOT_PROVEN`; authority=false;
+writesPerformed=false.
+First blocker: `REPRESENTATION_LEDGER_MISSING_AND_SOURCE_SYMBOL_LINEAGE_UNPROVEN`.
+Next gate: current structural lineage and a revision-qualified
+RepresentationManifestV1 read-only plan.
+
+## SEMANTIC-768-LIVE-RUNTIME-RECHECK-2026-09-10
+
+- [x] Ran the read-only EmbeddingGemma ranking diagnostic against Qdrant and
+      PostgreSQL.
+- [x] Qdrant returned `128` vectors at dimension `768` from collection
+      `codebase_chunks_768` / vector `content`; the PostgreSQL canonical
+      candidate column is `content_embedding_768`.
+- [x] Confirmed PostgreSQL has `1,386` populated `content_embedding_768`
+      rows and `55,169` populated `content_embedding` rows.
+- [ ] Keep live runtime alignment partial: Ollama was unreachable, so no live
+      EmbeddingGemma request or fresh model-output dimension proof was obtained;
+      PostgreSQL rows and Qdrant shape do not prove current owner/lineage.
+
+Evidence: `scripts/atlas/atlas-embedding-ranking-diagnostic-v1.mjs` and
+`docs/reports/atlas-embedding-ranking-diagnostic-v1.json`.
+Status: `WARN`; authority=false; writesPerformed=false.
+First blocker: `EMBEDDINGGEMMA_RUNTIME_UNREACHABLE_AND_CURRENT_COHORT_UNPROVEN`.
+Next gate: restore the approved embedding endpoint, then reconcile one
+revision-qualified semantic_768 cohort without creating a second owner.
+
+### SEMANTIC-768-CENSUS-METADATA-FIX — 2026-09-10
+
+- [x] Corrected the read-only writer census to retain the target surface on
+      every writer record; the report now distinguishes all three observed
+      surfaces: `atlas_packets.embedding`,
+      `codebase_chunk_index.content_embedding`, and
+      `codebase_chunk_index.content_embedding_768`.
+- [x] Re-ran the live audit: `19` writer records, `17` mutation-capable
+      records, and all three surfaces remain populated/referenced.
+- [ ] Keep owner admission blocked until one revision-qualified canonical
+      `semantic_768` owner is selected and independently reconciled.
+
+Evidence: `scripts/atlas/audit-semantic-768-writer-ownership-v1.mjs` and
+`docs/reports/semantic-768-writer-ownership-v1.json`.
+No embedding or projection writes were performed.
+First blocker remains: `AMBIGUOUS_SEMANTIC_768_OWNER`.
+
+### SEMANTIC-768-ALIGNMENT-RERUN — 2026-09-10T20
+
+- [x] Re-ran the read-only EmbeddingGemma/Qdrant/PostgreSQL alignment
+      diagnostic. Qdrant is reachable at `127.0.0.1:6333`, collection
+      `codebase_chunks_768`, vector `content`, with `128` sampled vectors at
+      dimension `768`; the PostgreSQL canonical candidate remains
+      `codebase_chunk_index.content_embedding_768`.
+- [x] Observed identity-join and document-version checks in the diagnostic;
+      no writes were performed.
+- [ ] Do not call the lane fully live-aligned: EmbeddingGemma was unreachable
+      on all configured Ollama endpoints, PostgreSQL fetched `0` comparison
+      rows, and document-version coverage is false. Shape/configuration is
+      aligned; live model-output and revision-qualified cohort parity remain
+      unproven.
+
+Evidence: `docs/reports/atlas-embedding-ranking-diagnostic-v1.json`.
+Status: `SEMANTIC_768_ALIGNMENT_PARTIAL`; authority=false;
+writesPerformed=false.
+First blocker: `EMBEDDINGGEMMA_RUNTIME_UNREACHABLE_AND_CURRENT_COHORT_UNPROVEN`.
+Next gate: restore the approved embedding endpoint, then run the bounded
+revision-qualified semantic cohort comparison.
+
+### DEV-GPU-EMBEDDING-PROVIDER-BINDING-01 — 2026-09-10
+
+- [x] Corrected `dev:gpu` to propagate the selected embedding backend to both
+      `EMBEDDING_BACKEND` and `EMBEDDING_PROVIDER`; `onnx_directml` now reaches
+      the `/api/embed` DirectML branch instead of being shadowed by a stale
+      `.env` provider value.
+- [x] Preserved the transport boundary: DirectML is an in-process ONNX
+      Runtime path and does not bind port `8081`; `8081` remains the optional
+      llama.cpp GGUF/CUDA server.
+- [x] When the optional `8081` server fails to start, propagated the effective
+      `ollama` fallback to child processes and cleared dedicated-server URLs,
+      preventing stale configuration from retrying the failed endpoint.
+- [ ] Runtime/model quality and canonical semantic ownership remain separate
+      gates; this wiring fix does not promote ONNX or Ollama output.
+
+Evidence: `sveltekit-frontend/scripts/startup/dev-gpu-runtime.mjs`,
+`sveltekit-frontend/src/routes/api/embed/+server.ts`, and the focused embedding
+tests (`4/4` passed).
+Status: `PROVIDER_BINDING_IMPLEMENTED_TEST_PROVEN_RUNTIME_NOT_LIVE_PROVEN`;
+authority=false; writesPerformed=false.
+First blocker: `EMBEDDINGGEMMA_RUNTIME_UNREACHABLE_AND_CURRENT_COHORT_UNPROVEN`.
+Next gate: run `dev:gpu` with the selected backend and perform a bounded
+768D output/parity probe.
+
+### DEV-GPU-EMBEDDING-LIVE-RECHECK — 2026-09-10T21
+
+- [x] Confirmed `8081/health` and Ollama `11434/api/tags` are reachable.
+- [x] Confirmed both `http://127.0.0.1:8081/v1/embeddings` and
+      `http://127.0.0.1:11434/api/embed` returned finite `768`-dimensional
+      EmbeddingGemma vectors for the same probe text.
+- [x] Re-ran the read-only ranking diagnostic: Qdrant returned `128` vectors
+      at dimension `768`, and the diagnostic now reports
+      `embeddinggemma768=true` with no runtime errors.
+- [ ] Keep semantic promotion partial: PostgreSQL comparison fetched `0`
+      rows and document-version coverage remains false, so live model health
+      and vector shape do not yet prove current cohort parity or ownership.
+
+Evidence: `docs/reports/atlas-embedding-ranking-diagnostic-v1.json`,
+`sveltekit-frontend/scripts/startup/dev-gpu-runtime.mjs`, and live endpoint
+probes.
+Status: `SEMANTIC_768_RUNTIME_LIVE_SHAPE_PROVEN_COHORT_PARITY_UNPROVEN`;
+authority=false; writesPerformed=false.
+First blocker: `POSTGRES_CURRENT_COHORT_COMPARISON_UNAVAILABLE`.
+Next gate: fetch a bounded revision-qualified PostgreSQL cohort and compare
+it against the live EmbeddingGemma/8081 output without projection writes.
+
+### SEMANTIC-768-BOUNDED-LINEAGE-RECHECK — 2026-09-10T21
+
+- [x] Re-ran the existing read-only lineage-qualified cohort audit. The
+      admitted bounded map passed `15/15` exact chunk joins, with `15/15`
+      vectors present, `15/15` producer-metadata records present, and
+      `15/15` semantically qualified rows.
+- [ ] Keep this as bounded proof only. It does not reconcile the full current
+      cohort, select one canonical owner among the `19` writer surfaces, or
+      prove representation-ledger/source-symbol lineage for the broader
+      population.
+
+Evidence: `scripts/atlas/audit-lineage-semantic-768-cohort-v1.mjs` and
+`docs/reports/lineage-semantic-768-cohort-v1.json`.
+Status: `SEMANTIC_768_BOUNDED_COHORT_PROVEN_FULL_OWNER_UNPROVEN`;
+authority=false; writesPerformed=false.
+First blocker: `FULL_CURRENT_SEMANTIC_COHORT_AND_REPRESENTATION_LINEAGE_UNPROVEN`.
+Next gate: reconcile the bounded cohort against a fresh admitted snapshot
+and the live EmbeddingGemma output, then resolve canonical writer ownership.
+
+### SEMANTIC-768-OWNER-RECHECK — 2026-09-10
+
+- [x] Re-ran the live writer ownership census: `19` writer/reference
+      surfaces; populated counts remain `61,659/61,718`, `55,169/55,853`,
+      and `1,386/55,853` across the observed vector columns.
+- [ ] Keep the canonical semantic owner unproven until one source- and
+      representation-qualified owner is reconciled; no embedding writes were
+      performed.
+
+Evidence: `docs/reports/semantic-768-writer-ownership-v1.json`.

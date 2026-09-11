@@ -5,7 +5,7 @@
 #   - pgai: In-database AI via Ollama (embed, generate, chat_complete, vectorizer)
 #
 # PG18 benefits: AIO, bitmap heap scan, skip scan, uuidv7, retained stats
-FROM pgvector/pgvector:pg18
+FROM pgvector/pgvector:pg18@sha256:2ba9ca5f2e7daa0f0e7723cba1ee9167bab54efd3640516a44ac1a928dd67e7a
 
 # Install pg_cron + plpython3u (pgai) + Python deps
 RUN apt-get update && \

@@ -1,5 +1,5 @@
 # Multi-stage Development Dockerfile for Legal AI Go Services
-FROM golang:1.25-alpine AS base
+FROM golang:1.25-alpine@sha256:1ae0735f00daffa3aaf1363a5184c0d2dc55c78e3db4ec70241cdac97bf84b59 AS base
 
 # Install Air for hot reloading and other dev tools
 RUN go install github.com/cosmtrek/air@latest && \
@@ -63,7 +63,7 @@ EXPOSE 8096
 CMD ["air", "-c", ".air-unified.toml"]
 
 # ===== PRODUCTION BUILD STAGE =====
-FROM alpine:latest AS production
+FROM alpine:3.21@sha256:48b0309ca019d89d40f670aa1bc06e426dc0931948452e8491e3d65087abc07d AS production
 
 RUN apk --no-cache add ca-certificates tzdata
 WORKDIR /root/

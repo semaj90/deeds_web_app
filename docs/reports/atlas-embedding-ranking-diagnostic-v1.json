@@ -1,6 +1,6 @@
 {
   "schema": "atlas.embedding-ranking-diagnostic.v1",
-  "generatedAt": "2026-08-29T00:55:22.057Z",
+  "generatedAt": "2026-09-10T19:57:57.606Z",
   "readOnly": true,
   "query": "ast semantic aware embedding retrieval ranking",
   "qdrant": {
@@ -20,7 +20,7 @@
     "table": "codebase_chunk_index",
     "vectorColumn": "content_embedding_768",
     "vectorCounts": {
-      "content_embedding_768": "739",
+      "content_embedding_768": "1386",
       "content_embedding": "55169"
     },
     "canonicalVectorColumn": "content_embedding_768",
@@ -68,7 +68,6 @@
       "token_count",
       "neo4j_gpu_cluster",
       "output_meta",
-      "content_embedding_384",
       "summary_embedding_384",
       "embedding_dimension",
       "embedding_normalized",
@@ -111,7 +110,9 @@
       "content_embedding_768",
       "centroid_id",
       "reconstruction_error",
-      "routing_tier"
+      "routing_tier",
+      "latent_256",
+      "latent_256_checkpoint_revision"
     ]
   },
   "embeddinggemma": {
@@ -4768,5 +4769,5 @@
     "turbovecCollectionAligned": true
   },
   "status": "WARN",
-  "elapsedMs": 7348
+  "elapsedMs": 822
 }

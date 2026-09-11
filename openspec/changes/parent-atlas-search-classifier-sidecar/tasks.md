@@ -588,3 +588,157 @@ write was performed.
 
 Evidence: `docs/reports/langextract-ornith-classifier-fanout-v1.json`. No
 Postgres, ontology, GraphRAG, Qdrant, cache, source, or model writes occurred.
+
+### Independent boundary recheck (2026-09-10)
+
+- [x] Re-ran `npm run atlas:langextract:ornith:classifier:fanout:audit` as a
+      read-only lane check while workspace/Graphify authority remained closed.
+- [x] Confirmed the audit remains fail-closed at
+      `BOUNDARY_REACHABLE_LINEAGE_BLOCKED` with `proofLevel=PARTIAL_PROVEN`.
+- [ ] Keep classifier promotion blocked: the current receipt reports
+      `CLASSIFIER_EXECUTION_NOT_PROVEN`, `SOURCE_REVISION_UNKNOWN`, and
+      `NO_GROUNDED_ENTITY_FIXTURE`. This does not invalidate prior service
+      reachability observations; it means this combined audit did not establish
+      the required current, grounded, source-qualified execution proof.
+
+- [x] Re-ran `node scripts/atlas/audit-domain-classifier-lineage-v1.mjs` on
+      2026-09-10. The read-only result remains `CLASSIFIER_LINEAGE_BLOCKED`:
+      `3,352` classifier rows, `3,351` with `source_ref`, only `148` with a
+      revision-qualified join, `0` source namespaces, and `3,204` missing a
+      Graphify join. No checkpoint, classifier row, or projection was changed.
+## DOMAIN-CLASSIFIER-READINESS-01 recheck (2026-09-10)
+
+- [x] Run the read-only classifier readiness audit.
+- [x] Confirm source_ref, feature_id, domain_class, naive-bayes predictions,
+  and KMeans coverage are present at or above the existing baseline.
+- [x] Record material gaps: qdrant_point_id 10.45%, summary 11.16%,
+  ast_symbols 20.27%, entities 19.45%, and latent_64 12.19%.
+- [x] Keep model artifacts and RRF helper classified as implemented/derived;
+  do not infer current classifier authority from artifact existence.
+- [ ] Resolve canonical packet-to-Qdrant identity and current source lineage
+  before any derived backfill or classifier promotion.
+
+Evidence: `docs/reports/domain-classification-readiness-audit.json`.
+Status: `READY_WITH_GAPS`; first blocker: `CLASSIFIER_DERIVED_FEATURE_COVERAGE_INSUFFICIENT`.
+Next gate: `DOMAIN-CLASSIFIER-TRAINING-RECEIPT-01` after lineage admission.
+
+### CLASSIFIER-LINEAGE-01 recheck (2026-09-10)
+
+- [x] Re-ran the read-only classifier lineage audit.
+- [x] Confirmed `3,352` classifier rows, `3,351` with `source_ref`, `148`
+      with revision-qualified joins, `0` source namespaces, and `3,204`
+      without a Graphify join.
+- [ ] Keep the classifier lane blocked. Existing live execution and model
+      availability do not prove current source lineage or the exact 300-file
+      training receipt; no checkpoint or datastore writes occurred.
+
+Evidence: `docs/reports/domain-classifier-lineage-v1.json`.
+Status: `CLASSIFIER_LINEAGE_BLOCKED`; authority=false; readOnly=true.
+First blocker: `CLASSIFIER_CURRENT_SOURCE_LINEAGE_UNPROVEN`.
+
+## LANGEXTRACT-ORNITH-CLASSIFIER-FANOUT-RECHECK-2026-09-10T21
+
+- [x] Re-ran the bounded LangExtract/Ornith/classifier fanout audit.
+- [x] Confirmed the service boundary is reachable and the result remains
+      `BOUNDARY_REACHABLE_LINEAGE_BLOCKED` with `PARTIAL_PROVEN` evidence.
+- [ ] Keep promotion blocked because the observation still reports
+      `SOURCE_REVISION_UNKNOWN` and `NO_GROUNDED_ENTITY_FIXTURE`; no ontology
+      tuple, classifier, GraphRAG, Qdrant, or model writes occurred.
+
+Evidence: `docs/reports/langextract-ornith-classifier-fanout-v1.json`.
+Status: `BOUNDARY_REACHABLE_LINEAGE_BLOCKED`; authority=false;
+writesPerformed=false.
+First blocker: `SOURCE_REVISION_UNKNOWN`.
+Next gate: source-qualified LangExtract fixture and snapshot-bound lineage.
+Next gate: snapshot-bound Graphify/source lineage, then training receipt.
+
+## CORE-LANE-RECHECK-2026-09-10
+
+- [x] Preserve live model/service availability as separate from source lineage.
+- [ ] Keep classifier promotion blocked: only 148 rows are revision-qualified and 3,204 lack a Graphify join.
+
+Evidence: `docs/reports/domain-classifier-lineage-v1.json`.
+First blocker remains: `CLASSIFIER_CURRENT_SOURCE_LINEAGE_UNPROVEN`.
+
+### CLASSIFIER-LINEAGE-01 SWITCH-LOOP RECHECK — 2026-09-10
+
+- [x] Re-ran the bounded read-only lineage audit while Graphify terminal
+      ownership remains blocked.
+- [ ] Keep promotion blocked: `3,352` classifier rows are present, but only
+      `148` have revision-qualified joins; `3,204` still lack a Graphify join
+      and no source namespace is available.
+
+Evidence: `docs/reports/domain-classifier-lineage-v1.json`.
+Status: `CLASSIFIER_LINEAGE_BLOCKED`; no writes performed. The lane is
+independent for diagnostics but cannot become current until snapshot-bound
+source lineage changes.
+
+### PIPELINE-ROUTER-MATRIX-RECHECK — 2026-09-10
+
+- [x] Re-ran the read-only router/matrix surface census. PostgreSQL is
+      reachable and `atlas_observation_feature_rows` exists.
+- [ ] Keep router promotion in review: the census still finds multiple matrix
+      definitions, including the executable `query-router-4x4.ts`, legacy
+      `router-matrix.ts` vocabulary, and the candidate feature-matrix module.
+      No migration, ALTER, index creation, ranking change, or data write was
+      performed.
+
+Evidence: `scripts/atlas/audit-pipeline-router-matrix-surfaces-v1.mjs` and
+`docs/reports/pipeline-router-matrix-surfaces-v1.json`.
+Status: `SURFACES_CENSUSED_REVIEW_REQUIRED`; authority=false;
+writesPerformed=false.
+First blocker: `MULTIPLE_ROUTER_MATRIX_DEFINITIONS`.
+Next gate: explicitly designate the executable router owner and classify the
+legacy/candidate matrices before any consolidation migration.
+
+### PIPELINE-ROUTER-MATRIX-ROLE-CENSUS-01 — 2026-09-10
+
+- [x] Corrected the read-only census to classify surfaces by ownership role
+      instead of treating every matrix-shaped file as a competing authority.
+- [x] Confirmed `routing/query-router-4x4.ts` is the canonical executable
+      router with 2 direct live import consumers.
+- [x] Confirmed `retrieval/router-matrix.ts` is compatibility vocabulary with
+      0 live import consumers.
+- [x] Confirmed `retrieval/retrieval-candidate-feature-matrix-v1.ts` is
+      feature-matrix data with 9 live consumers, not routing authority.
+- [ ] Keep runtime consolidation blocked until the legacy retrieval router is
+      explicitly retired or assigned a compatibility owner, and caller
+      baseline/parity evidence is captured. No migration or ranking change was
+      performed.
+
+Evidence: `docs/reports/pipeline-router-matrix-surfaces-v1.json`.
+Status: `SURFACES_PRESENT_REVIEW_REQUIRED`; authority=false;
+writesPerformed=false. First blocker: `ROUTER_OWNER_CONSOLIDATION_NOT_AUTHORIZED`.
+Next gate: RRF caller baseline and identity-envelope replay, then one bounded
+router compatibility migration only if separately authorized.
+
+## CLASSIFIER-READINESS-RECHECK-2026-09-10T22
+
+- [x] Ran the read-only domain-classification readiness audit.
+- [x] Confirmed classifier artifacts and RRF helper wiring are present.
+- [ ] Keep promotion blocked: `qdrant_point_id` coverage is `10.45%`,
+      `summary` coverage is `11.16%`, `ast_symbols` is `20.27%`, and
+      `entities` is `19.45%`; these are not current-source lineage proof.
+- [ ] Keep the exact 300-file training receipt and current checkpoint lineage
+      unproven; no retraining or model replacement occurred.
+
+Evidence: `docs/reports/domain-classification-readiness-audit.json`.
+Status: `READY_WITH_GAPS`; authority=false; writesPerformed=false.
+First blocker: `CLASSIFIER_CURRENT_SOURCE_LINEAGE_AND_FEATURE_COVERAGE_UNPROVEN`.
+Next gate: snapshot-bound source lineage, then revision-qualified classifier
+and feature replay.
+
+## LANGEXTRACT-ORNITH-CLASSIFIER-RECHECK-2026-09-11
+
+- [x] Re-ran the bounded LangExtract/Ornith/classifier fanout audit.
+- [x] Confirmed the service boundary remains reachable at the configured
+      model/NLP endpoints and the audit remains fail-closed.
+- [ ] Keep ontology/classifier promotion blocked because the observation
+      still has `SOURCE_REVISION_UNKNOWN` and `NO_GROUNDED_ENTITY_FIXTURE`.
+      No model, tuple, database, graph, Qdrant, or cache writes occurred.
+
+Evidence: `docs/reports/langextract-ornith-classifier-fanout-v1.json`.
+Status: `BOUNDARY_REACHABLE_LINEAGE_BLOCKED`; authority=false;
+writesPerformed=false.
+First blocker: `SOURCE_REVISION_UNKNOWN`.
+Next gate: source-qualified grounded fixture bound to the admitted snapshot.

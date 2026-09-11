@@ -1,6 +1,6 @@
 {
   "schema": "atlas.graphify-embedding-qdrant-projection.v1",
-  "generatedAt": "2026-09-08T05:21:04.489Z",
+  "generatedAt": "2026-09-10T22:46:20.227Z",
   "apply": false,
   "sourceColumn": "signature_embedding",
   "representationId": "ast_semantic_rpc_768",
@@ -56,5 +56,5 @@
   },
   "errors": [],
   "sample": [],
-  "elapsedMs": 220
+  "elapsedMs": 140
 }

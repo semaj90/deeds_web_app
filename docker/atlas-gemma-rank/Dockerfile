@@ -25,7 +25,7 @@ WORKDIR /app
 
 # Same PEP 668 externally-managed-environment note as the sibling neural-decoder Dockerfile:
 # --break-system-packages is required and safe here, single-purpose container.
-RUN python -m pip install --upgrade pip --break-system-packages \
+RUN python -m pip install --upgrade pip==26.2.1 --break-system-packages \
   && python -m pip install --break-system-packages \
     fastapi \
     "uvicorn[standard]" \

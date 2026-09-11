@@ -1,16 +1,54 @@
 {
-  "run": "2026-08-27T01:44:07.895Z",
+  "schema": "atlas.turbovec-cuvs-readiness.v2",
+  "run": "2026-09-10T20:42:23.883Z",
   "dry_run": false,
+  "canonicalAuthority": false,
+  "writesPerformed": false,
   "dependencies": {
     "turbovec": {
       "status": "OK",
-      "version": "v2.1.0",
-      "ready_for_use": true
+      "ready_for_use": true,
+      "endpoint": "http://127.0.0.1:8791/health",
+      "latencyMs": 90,
+      "observed": {
+        "ok": true,
+        "indexed": 0,
+        "dim": 64,
+        "bits": 4,
+        "turbovec": true,
+        "collection": "codebase_chunks_768"
+      },
+      "error": null,
+      "canonicalAuthority": false
     },
     "cuvs": {
-      "status": "OK",
-      "version": "v1.5.0",
-      "ready_for_use": true
+      "status": "DEGRADED",
+      "ready_for_use": false,
+      "endpoint": "http://127.0.0.1:8098/health",
+      "latencyMs": 2163,
+      "observed": {
+        "ok": true,
+        "service": "atlas-gpu-8098",
+        "executionOnly": true,
+        "cudaAvailable": true,
+        "device": "NVIDIA GeForce RTX 3060 Ti",
+        "torchAvailable": false,
+        "writes": {
+          "postgres": false,
+          "qdrant": false,
+          "valkey": false
+        }
+      },
+      "error": null,
+      "owner": "services/atlas-gpu-8098",
+      "executionOnly": true,
+      "cudaAvailable": true,
+      "torchAvailable": false,
+      "canonicalAuthority": false
     }
-  }
+  },
+  "blockers": [
+    "RAPIDS_CUDA_TORCH_EXECUTION_NOT_PROVEN"
+  ],
+  "status": "LIVE_ACCELERATOR_CHAIN_BLOCKED"
 }

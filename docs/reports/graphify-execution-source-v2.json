@@ -1,0 +1,49 @@
+{
+  "schema": "atlas.graphify-execution-source.v2",
+  "sourceKind": "ADMITTED_WORKSPACE_SNAPSHOT",
+  "workspaceRevision": "sha256:3be7901e1b6bc4f6499185f775eac2ae93e56305940703a7da66a436e4e3a3e0",
+  "snapshotRevision": "sha256:9b61929b85a6c4e2d8e459e4cca1294c934746f1430e6535f9546cf16e83c9a5",
+  "materializedRoot": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\workspace-source-snapshots\\9b61929b85a6c4e2d8e459e4cca1294c934746f1430e6535f9546cf16e83c9a5",
+  "sourceCount": 25271,
+  "repositoryCount": 7,
+  "sourceCohortChecksum": "sha256:b87ed210cf2fe7ce265a0108d1ddd750e2b3dce346581f9bce82a96a87cef0ca",
+  "selectionChecksum": "sha256:b87ed210cf2fe7ce265a0108d1ddd750e2b3dce346581f9bce82a96a87cef0ca",
+  "repositories": [
+    {
+      "repositoryId": "repo:claude-mem",
+      "sourceCount": 763,
+      "membershipChecksum": "sha256:8734a06fe39cbe4b532edc05f5f0c880aa23c52a41799dc1a81d0a44609395ae"
+    },
+    {
+      "repositoryId": "repo:granite-docling-258M",
+      "sourceCount": 10,
+      "membershipChecksum": "sha256:8310267533bd739dc3a7441994b687d31a9289f6a7819066f1e653326893cfd1"
+    },
+    {
+      "repositoryId": "repo:mcp-server-mcp",
+      "sourceCount": 192,
+      "membershipChecksum": "sha256:d08cd1499472c8908e1bb8a69b3f3caa06209219d9c4fda7aa51cdaedbb36730"
+    },
+    {
+      "repositoryId": "repo:models/embeddinggemma_300m",
+      "sourceCount": 13,
+      "membershipChecksum": "sha256:0d73c7ea49dcfac6aa81fd58b25ed70c35eefdabd7470a20da64d1da9d92d50b"
+    },
+    {
+      "repositoryId": "repo:root",
+      "sourceCount": 24185,
+      "membershipChecksum": "sha256:587c070e453a843c8b9572f4b930a2a25e1c576d5f9d482dafb71f7147bd3798"
+    },
+    {
+      "repositoryId": "repo:sites/parent-atlas-gateboard",
+      "sourceCount": 22,
+      "membershipChecksum": "sha256:bdfe967eb0e3aa11b6157f19db0b79b1de0c417cf3877bdad3ef6b40ac512a89"
+    },
+    {
+      "repositoryId": "repo:turbovec",
+      "sourceCount": 86,
+      "membershipChecksum": "sha256:748fb077f64e0e5df0186faa3915ff5fd2067b4c70b8b9b410211d4ed23efd12"
+    }
+  ],
+  "admissionReceiptRef": "docs/reports/workspace-revision-tournament-admission-v1.json"
+}

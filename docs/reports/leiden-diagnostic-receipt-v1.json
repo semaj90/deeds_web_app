@@ -11,7 +11,7 @@
   "frozenConfiguration": {
     "maxIter": 100,
     "theta": 1.0,
-    "randomSeed": 684453,
+    "randomSeed": 17,
     "resolutionsSwept": [
       0.001,
       0.01,
@@ -22,17 +22,17 @@
     ]
   },
   "fixture": {
-    "nodes": "/mnt/c/Users/james/Videos/deeds-web-app/.tmp/atlas-spectral-live-fixture-zero-duplicates/nodes.parquet",
-    "edges": "/mnt/c/Users/james/Videos/deeds-web-app/.tmp/atlas-spectral-live-fixture-zero-duplicates/edges.parquet",
+    "nodes": "/mnt/c/Users/james/Videos/deeds-web-app/docs/reports/current-structural-graph-artifact-v2/nodes.parquet",
+    "edges": "/mnt/c/Users/james/Videos/deeds-web-app/docs/reports/current-structural-graph-artifact-v2/edges.parquet",
     "nodeCount": 500,
-    "graphChecksum": "96ca0d7538b98cded7ee29bb816dbe814bb275ffabb569ea285612b15ecc68e3",
+    "graphChecksum": "5478995212e2a40803a91e2555a82831bedceda042664f4d7f5f21269c013788",
     "ordinalMapChecksum": "5a97a9b5d813c39d121c81830f566f3ef04776fa9ac13eb78a19dc18977041ea",
     "edgeWeightStats": {
-      "count": 4683,
-      "min": 0.45181119441986084,
-      "max": 1.9999996423721313,
-      "mean": 1.0117639454669125,
-      "median": 0.9999998211860657
+      "count": 48,
+      "min": 1.0,
+      "max": 1.0,
+      "mean": 1.0,
+      "median": 1.0
     }
   },
   "diagnostics": {
@@ -42,22 +42,22 @@
         "graphWeighting": "fixture_weighted",
         "runs": 3,
         "assignmentChecksums": [
-          "b27eb258d05c7b7521336784fc017b31b399177a1c602a66be9b7e93eaec3ad9",
-          "b27eb258d05c7b7521336784fc017b31b399177a1c602a66be9b7e93eaec3ad9",
-          "b27eb258d05c7b7521336784fc017b31b399177a1c602a66be9b7e93eaec3ad9"
+          "fd85ab010a2f874f284166b1305ec70d27738b446abe0520219cb527cf7bafe9",
+          "fd85ab010a2f874f284166b1305ec70d27738b446abe0520219cb527cf7bafe9",
+          "fd85ab010a2f874f284166b1305ec70d27738b446abe0520219cb527cf7bafe9"
         ],
         "gpuGpuARI": [
           1.0,
           1.0
         ],
         "gpuRepeatDeterministic": true,
-        "clusterCount": 2,
-        "reportedModularity": 0.9990605571826848,
+        "clusterCount": 9,
+        "reportedModularity": 0.9998411458333333,
         "reportedModularitySpread": 0.0,
         "elapsedMs": [
-          195.52001199917868,
-          54.83707600069465,
-          50.449886002752464
+          176.1787280011049,
+          21.831760999702965,
+          35.11210599936021
         ]
       },
       {
@@ -65,22 +65,22 @@
         "graphWeighting": "unweighted",
         "runs": 3,
         "assignmentChecksums": [
-          "b27eb258d05c7b7521336784fc017b31b399177a1c602a66be9b7e93eaec3ad9",
-          "b27eb258d05c7b7521336784fc017b31b399177a1c602a66be9b7e93eaec3ad9",
-          "b27eb258d05c7b7521336784fc017b31b399177a1c602a66be9b7e93eaec3ad9"
+          "fd85ab010a2f874f284166b1305ec70d27738b446abe0520219cb527cf7bafe9",
+          "fd85ab010a2f874f284166b1305ec70d27738b446abe0520219cb527cf7bafe9",
+          "fd85ab010a2f874f284166b1305ec70d27738b446abe0520219cb527cf7bafe9"
         ],
         "gpuGpuARI": [
           1.0,
           1.0
         ],
         "gpuRepeatDeterministic": true,
-        "clusterCount": 2,
-        "reportedModularity": 0.9990612097614422,
+        "clusterCount": 9,
+        "reportedModularity": 0.9998411458333333,
         "reportedModularitySpread": 0.0,
         "elapsedMs": [
-          61.31080599880079,
-          73.87078999454388,
-          87.97774399863556
+          33.94169899911503,
+          24.711407999348012,
+          21.66437699997914
         ]
       },
       {
@@ -88,22 +88,22 @@
         "graphWeighting": "fixture_weighted",
         "runs": 3,
         "assignmentChecksums": [
-          "b27eb258d05c7b7521336784fc017b31b399177a1c602a66be9b7e93eaec3ad9",
-          "b27eb258d05c7b7521336784fc017b31b399177a1c602a66be9b7e93eaec3ad9",
-          "b27eb258d05c7b7521336784fc017b31b399177a1c602a66be9b7e93eaec3ad9"
+          "fd85ab010a2f874f284166b1305ec70d27738b446abe0520219cb527cf7bafe9",
+          "fd85ab010a2f874f284166b1305ec70d27738b446abe0520219cb527cf7bafe9",
+          "fd85ab010a2f874f284166b1305ec70d27738b446abe0520219cb527cf7bafe9"
         ],
         "gpuGpuARI": [
           1.0,
           1.0
         ],
         "gpuRepeatDeterministic": true,
-        "clusterCount": 2,
-        "reportedModularity": 0.9906055718268488,
+        "clusterCount": 9,
+        "reportedModularity": 0.9984114583333333,
         "reportedModularitySpread": 0.0,
         "elapsedMs": [
-          61.244132004503626,
-          84.25627899850952,
-          62.33543300186284
+          14.56562000021222,
+          16.86021200112009,
+          15.662759000406368
         ]
       },
       {
@@ -111,22 +111,22 @@
         "graphWeighting": "unweighted",
         "runs": 3,
         "assignmentChecksums": [
-          "b27eb258d05c7b7521336784fc017b31b399177a1c602a66be9b7e93eaec3ad9",
-          "b27eb258d05c7b7521336784fc017b31b399177a1c602a66be9b7e93eaec3ad9",
-          "b27eb258d05c7b7521336784fc017b31b399177a1c602a66be9b7e93eaec3ad9"
+          "fd85ab010a2f874f284166b1305ec70d27738b446abe0520219cb527cf7bafe9",
+          "fd85ab010a2f874f284166b1305ec70d27738b446abe0520219cb527cf7bafe9",
+          "fd85ab010a2f874f284166b1305ec70d27738b446abe0520219cb527cf7bafe9"
         ],
         "gpuGpuARI": [
           1.0,
           1.0
         ],
         "gpuRepeatDeterministic": true,
-        "clusterCount": 2,
-        "reportedModularity": 0.9906120976144216,
+        "clusterCount": 9,
+        "reportedModularity": 0.9984114583333333,
         "reportedModularitySpread": 0.0,
         "elapsedMs": [
-          69.39564800268272,
-          80.52245200087782,
-          94.72009500314016
+          14.408463999643573,
+          15.485541000089142,
+          26.105548999112216
         ]
       },
       {
@@ -134,22 +134,22 @@
         "graphWeighting": "fixture_weighted",
         "runs": 3,
         "assignmentChecksums": [
-          "b27eb258d05c7b7521336784fc017b31b399177a1c602a66be9b7e93eaec3ad9",
-          "b27eb258d05c7b7521336784fc017b31b399177a1c602a66be9b7e93eaec3ad9",
-          "b27eb258d05c7b7521336784fc017b31b399177a1c602a66be9b7e93eaec3ad9"
+          "fd85ab010a2f874f284166b1305ec70d27738b446abe0520219cb527cf7bafe9",
+          "fd85ab010a2f874f284166b1305ec70d27738b446abe0520219cb527cf7bafe9",
+          "fd85ab010a2f874f284166b1305ec70d27738b446abe0520219cb527cf7bafe9"
         ],
         "gpuGpuARI": [
           1.0,
           1.0
         ],
         "gpuRepeatDeterministic": true,
-        "clusterCount": 2,
-        "reportedModularity": 0.953027859134244,
+        "clusterCount": 9,
+        "reportedModularity": 0.9920572916666667,
         "reportedModularitySpread": 0.0,
         "elapsedMs": [
-          83.87559000402689,
-          83.03769100166392,
-          57.14277399965795
+          17.260018999877502,
+          25.84573000058299,
+          19.47972000016307
         ]
       },
       {
@@ -157,22 +157,22 @@
         "graphWeighting": "unweighted",
         "runs": 3,
         "assignmentChecksums": [
-          "b27eb258d05c7b7521336784fc017b31b399177a1c602a66be9b7e93eaec3ad9",
-          "b27eb258d05c7b7521336784fc017b31b399177a1c602a66be9b7e93eaec3ad9",
-          "b27eb258d05c7b7521336784fc017b31b399177a1c602a66be9b7e93eaec3ad9"
+          "fd85ab010a2f874f284166b1305ec70d27738b446abe0520219cb527cf7bafe9",
+          "fd85ab010a2f874f284166b1305ec70d27738b446abe0520219cb527cf7bafe9",
+          "fd85ab010a2f874f284166b1305ec70d27738b446abe0520219cb527cf7bafe9"
         ],
         "gpuGpuARI": [
           1.0,
           1.0
         ],
         "gpuRepeatDeterministic": true,
-        "clusterCount": 2,
-        "reportedModularity": 0.9530604880721082,
+        "clusterCount": 9,
+        "reportedModularity": 0.9920572916666667,
         "reportedModularitySpread": 0.0,
         "elapsedMs": [
-          70.85989199549658,
-          87.18531599879498,
-          66.45280199882109
+          20.59523900061322,
+          17.741251998813823,
+          14.849224000499817
         ]
       },
       {
@@ -180,22 +180,22 @@
         "graphWeighting": "fixture_weighted",
         "runs": 3,
         "assignmentChecksums": [
-          "b27eb258d05c7b7521336784fc017b31b399177a1c602a66be9b7e93eaec3ad9",
-          "b27eb258d05c7b7521336784fc017b31b399177a1c602a66be9b7e93eaec3ad9",
-          "b27eb258d05c7b7521336784fc017b31b399177a1c602a66be9b7e93eaec3ad9"
+          "fd85ab010a2f874f284166b1305ec70d27738b446abe0520219cb527cf7bafe9",
+          "fd85ab010a2f874f284166b1305ec70d27738b446abe0520219cb527cf7bafe9",
+          "fd85ab010a2f874f284166b1305ec70d27738b446abe0520219cb527cf7bafe9"
         ],
         "gpuGpuARI": [
           1.0,
           1.0
         ],
         "gpuRepeatDeterministic": true,
-        "clusterCount": 2,
-        "reportedModularity": 0.9060557182684881,
+        "clusterCount": 9,
+        "reportedModularity": 0.9841145833333333,
         "reportedModularitySpread": 0.0,
         "elapsedMs": [
-          60.98715699772583,
-          59.53987400425831,
-          51.65831500198692
+          14.309746999060735,
+          18.2806310003798,
+          22.53751399985049
         ]
       },
       {
@@ -203,22 +203,22 @@
         "graphWeighting": "unweighted",
         "runs": 3,
         "assignmentChecksums": [
-          "5a97a9b5d813c39d121c81830f566f3ef04776fa9ac13eb78a19dc18977041ea",
-          "5a97a9b5d813c39d121c81830f566f3ef04776fa9ac13eb78a19dc18977041ea",
-          "5a97a9b5d813c39d121c81830f566f3ef04776fa9ac13eb78a19dc18977041ea"
+          "fd85ab010a2f874f284166b1305ec70d27738b446abe0520219cb527cf7bafe9",
+          "fd85ab010a2f874f284166b1305ec70d27738b446abe0520219cb527cf7bafe9",
+          "fd85ab010a2f874f284166b1305ec70d27738b446abe0520219cb527cf7bafe9"
         ],
         "gpuGpuARI": [
           1.0,
           1.0
         ],
         "gpuRepeatDeterministic": true,
-        "clusterCount": 500,
-        "reportedModularity": -0.005711377434401942,
+        "clusterCount": 9,
+        "reportedModularity": 0.9841145833333333,
         "reportedModularitySpread": 0.0,
         "elapsedMs": [
-          2.7781389944721013,
-          2.8761560024577193,
-          3.1535140005871654
+          14.408200999241672,
+          13.14731899947219,
+          12.729849000606919
         ]
       },
       {
@@ -226,22 +226,22 @@
         "graphWeighting": "fixture_weighted",
         "runs": 3,
         "assignmentChecksums": [
-          "5a97a9b5d813c39d121c81830f566f3ef04776fa9ac13eb78a19dc18977041ea",
-          "5a97a9b5d813c39d121c81830f566f3ef04776fa9ac13eb78a19dc18977041ea",
-          "5a97a9b5d813c39d121c81830f566f3ef04776fa9ac13eb78a19dc18977041ea"
+          "fd85ab010a2f874f284166b1305ec70d27738b446abe0520219cb527cf7bafe9",
+          "fd85ab010a2f874f284166b1305ec70d27738b446abe0520219cb527cf7bafe9",
+          "fd85ab010a2f874f284166b1305ec70d27738b446abe0520219cb527cf7bafe9"
         ],
         "gpuGpuARI": [
           1.0,
           1.0
         ],
         "gpuRepeatDeterministic": true,
-        "clusterCount": 500,
-        "reportedModularity": -0.09652129667528057,
+        "clusterCount": 9,
+        "reportedModularity": 0.9205729166666666,
         "reportedModularitySpread": 0.0,
         "elapsedMs": [
-          4.234423999150749,
-          3.0133179971016943,
-          2.954447001684457
+          13.852956000846461,
+          22.478775999843492,
+          15.76527099859959
         ]
       },
       {
@@ -249,22 +249,22 @@
         "graphWeighting": "unweighted",
         "runs": 3,
         "assignmentChecksums": [
-          "5a97a9b5d813c39d121c81830f566f3ef04776fa9ac13eb78a19dc18977041ea",
-          "5a97a9b5d813c39d121c81830f566f3ef04776fa9ac13eb78a19dc18977041ea",
-          "5a97a9b5d813c39d121c81830f566f3ef04776fa9ac13eb78a19dc18977041ea"
+          "fd85ab010a2f874f284166b1305ec70d27738b446abe0520219cb527cf7bafe9",
+          "fd85ab010a2f874f284166b1305ec70d27738b446abe0520219cb527cf7bafe9",
+          "fd85ab010a2f874f284166b1305ec70d27738b446abe0520219cb527cf7bafe9"
         ],
         "gpuGpuARI": [
           1.0,
           1.0
         ],
         "gpuRepeatDeterministic": true,
-        "clusterCount": 500,
-        "reportedModularity": -0.10201407273681859,
+        "clusterCount": 9,
+        "reportedModularity": 0.9205729166666666,
         "reportedModularitySpread": 0.0,
         "elapsedMs": [
-          3.3827239967649803,
-          3.915592998964712,
-          3.11841400252888
+          12.042345999361714,
+          12.25433299987344,
+          12.115374000131851
         ]
       },
       {
@@ -272,22 +272,22 @@
         "graphWeighting": "fixture_weighted",
         "runs": 3,
         "assignmentChecksums": [
-          "5a97a9b5d813c39d121c81830f566f3ef04776fa9ac13eb78a19dc18977041ea",
-          "5a97a9b5d813c39d121c81830f566f3ef04776fa9ac13eb78a19dc18977041ea",
-          "5a97a9b5d813c39d121c81830f566f3ef04776fa9ac13eb78a19dc18977041ea"
+          "fd85ab010a2f874f284166b1305ec70d27738b446abe0520219cb527cf7bafe9",
+          "fd85ab010a2f874f284166b1305ec70d27738b446abe0520219cb527cf7bafe9",
+          "fd85ab010a2f874f284166b1305ec70d27738b446abe0520219cb527cf7bafe9"
         ],
         "gpuGpuARI": [
           1.0,
           1.0
         ],
         "gpuRepeatDeterministic": true,
-        "clusterCount": 500,
-        "reportedModularity": -0.21979308161852879,
+        "clusterCount": 9,
+        "reportedModularity": 0.8411458333333334,
         "reportedModularitySpread": 0.0,
         "elapsedMs": [
-          4.392524002469145,
-          3.657756999018602,
-          3.437143997871317
+          13.11528899896075,
+          15.97853900057089,
+          24.20295500087377
         ]
       },
       {
@@ -295,22 +295,22 @@
         "graphWeighting": "unweighted",
         "runs": 3,
         "assignmentChecksums": [
-          "5a97a9b5d813c39d121c81830f566f3ef04776fa9ac13eb78a19dc18977041ea",
-          "5a97a9b5d813c39d121c81830f566f3ef04776fa9ac13eb78a19dc18977041ea",
-          "5a97a9b5d813c39d121c81830f566f3ef04776fa9ac13eb78a19dc18977041ea"
+          "fd85ab010a2f874f284166b1305ec70d27738b446abe0520219cb527cf7bafe9",
+          "fd85ab010a2f874f284166b1305ec70d27738b446abe0520219cb527cf7bafe9",
+          "fd85ab010a2f874f284166b1305ec70d27738b446abe0520219cb527cf7bafe9"
         ],
         "gpuGpuARI": [
           1.0,
           1.0
         ],
         "gpuRepeatDeterministic": true,
-        "clusterCount": 500,
-        "reportedModularity": -0.22239244186483942,
+        "clusterCount": 9,
+        "reportedModularity": 0.8411458333333334,
         "reportedModularitySpread": 0.0,
         "elapsedMs": [
-          3.2056069976533763,
-          2.9776110022794455,
-          3.030817002581898
+          14.495322000584565,
+          14.408397999432054,
+          13.359403999857022
         ]
       }
     ],

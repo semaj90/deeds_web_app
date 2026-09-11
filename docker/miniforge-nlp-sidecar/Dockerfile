@@ -1,4 +1,4 @@
-FROM python:3.13-slim
+FROM python:3.13-slim@sha256:9d2e5553305c7c7b0097999bb17187c69b921ccd6bc9d40e4bb5ebe652c00285
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
@@ -14,7 +14,14 @@ RUN apt-get update \
     git \
   && rm -rf /var/lib/apt/lists/*
 
-RUN python -m pip install --upgrade pip setuptools wheel \
+ARG PIP_VERSION=26.2.1
+ARG SETUPTOOLS_VERSION=81.0.0
+ARG WHEEL_VERSION=0.48.0
+
+RUN python -m pip install --upgrade \
+    pip==${PIP_VERSION} \
+    setuptools==${SETUPTOOLS_VERSION} \
+    wheel==${WHEEL_VERSION} \
   && python -m pip install \
     fastapi==0.141.1 \
     uvicorn[standard]==0.52.4 \

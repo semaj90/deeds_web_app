@@ -10,7 +10,7 @@ Tuples: 176237
 |---|---:|---:|---|
 | lexical | 1 | 100% | symbols/trigrams available for candidate rows |
 | taxonomic | 0.5009 | 50.09% | canonical feature_id plus domain_class coverage |
-| semantic | 1 | 100% | TurboVec ANN gRPC proof passed over Qdrant vectors |
+| semantic | 1 | 100% | candidate semantic_score present from tuple-derived ranker |
 | context | 1 | 100% | bounded packet context refs exist on disk |
 | syntactic | 0.9999 | 99.99% | packet_key/source_ref/feature_id contract fields |
 | structural | 0.9574 | 95.74% | IMPORTS/EXPORTS/DEFINES/ROUTE_HANDLES tuple coverage |
@@ -37,10 +37,10 @@ Tuples: 176237
 
 ## Accelerator Proof
 
-Status: PASS
-Backend: bridge:py(python)+addon(cuda)
-HTTP indexed: 1000
-gRPC candidates: 10
+Status: FAIL
+Backend: null
+HTTP indexed: 0
+gRPC candidates: 0
 
 ## Agentic Mutation Attempts
 
@@ -50,7 +50,7 @@ gRPC candidates: 10
 |---|---|---|---|---|
 | lexical | PROVEN | Compare symbols, identifiers, comments, summaries, and trigrams against LangExtract/domain vocabulary. | none | `npm run atlas:ontology-kag:readiness` |
 | taxonomic | WIRED | Verify IS_A, PART_OF/HAS_A, IMPLEMENTS, EXTENDS, and hierarchy edges from AST/source tuples. | domain_class coverage is low; HAS_A/IS_A projection to KAG/Neo4j not proven | `npm run atlas:ontology-kag:readiness` |
-| semantic | PROVEN | Use embeddings and graph consistency to detect incompatible relationships between concepts. | summary embedding similarity; graph consistency proof | `npm run atlas:turbovec:ann-grpc:proof && npm run atlas:ontology-kag:readiness` |
+| semantic | WIRED | Use embeddings and graph consistency to detect incompatible relationships between concepts. | EmbeddingGemma/Qdrant vectors loaded into TurboVec ANN; summary embedding similarity; graph consistency proof | `npm run atlas:turbovec:ann-grpc:proof && npm run atlas:ontology-kag:readiness` |
 | context | PROVEN | Compare concepts with neighboring modules, source_ref siblings, docs, and linked retrieval context. | neighbor module/document comparison still partial | `npm run atlas:ontology-kag:readiness` |
 | syntactic | PROVEN | Validate AST integrity, schema correctness, Zod/JSON schema, protobuf/gRPC, and RPC contracts. | none | `npm run atlas:ontology-kag:readiness && npm run verify:rpc-gan` |
 | structural | PROVEN | Detect orphans, duplicates, cycles, disconnected subgraphs, coupling, and missing core concepts. | Neo4j projection/PageRank/GDS not yet proven for this candidate set | `npm run atlas:source-tuples:apply && npm run atlas:ontology-kag:readiness` |

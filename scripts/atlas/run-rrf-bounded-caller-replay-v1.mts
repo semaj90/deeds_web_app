@@ -46,7 +46,17 @@ const report = {
   ],
   fixture: { candidateCount: hits.length, logicalLanes: ['dense', 'bm42'], executors: ['qdrant', 'cuvs', 'postgres'], k: 60 },
   parity: { rankOrderEqual, weightedArithmeticEqual, legacyTop: legacyOrder[0] ?? null, runtimeTop: runtimeOrder[0] ?? null, arithmeticComparable: weightedArithmeticEqual, identityEnvelopeComparable: false },
+  metrics: {
+    candidateCount: hits.length,
+    logicalLaneCount: 2,
+    executorCount: 3,
+    rankOrderEqual,
+    weightedArithmeticEqual,
+    completeIdentityEnvelopeCount: 0,
+    identityEnvelopeComparable: false,
+  },
   blockers: ['FIXTURE_ONLY_NOT_LIVE', 'IDENTITY_ENVELOPE_PARITY_NOT_PROVEN', 'RUNTIME_CONSOLIDATION_NOT_AUTHORIZED'],
+  firstBlockingInvariant: 'IDENTITY_ENVELOPE_PARITY_NOT_PROVEN',
   nextGate: 'RWC-CENSUS-04_REAL_CALLER_BASELINE_REPLAY', safeNextCommand: 'npm run atlas:rrf:caller-replay',
 };
 await mkdir(dirname(REPORT), { recursive: true });

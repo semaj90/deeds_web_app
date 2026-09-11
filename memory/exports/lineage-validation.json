@@ -1,43 +1,42 @@
 {
-  "ts": "2026-06-10T13:55:26.759Z",
-  "overall": "PASS",
-  "passed": 7,
-  "failed": 0,
+  "ts": "2026-09-10T17:42:29.930Z",
+  "overall": "FAIL",
+  "passed": 6,
+  "failed": 1,
   "checks": [
     {
       "id": "L1:atlas_feature_map",
       "status": "pass",
-      "message": "atlas_feature_map: 14471 rows, 10947 with feature_id (75.6%), 1122 distinct features",
+      "message": "atlas_feature_map: 4748 rows, 4747 with feature_id (100.0%), 3151 distinct features",
       "detail": {
-        "total": 14471,
-        "with_feature": 10947,
-        "with_source_ref": 14471,
-        "distinct_features": 1122
+        "total": 4748,
+        "with_feature": 4747,
+        "with_source_ref": 4748,
+        "distinct_features": 3151
       }
     },
     {
       "id": "L2:task_semantic_packets",
       "status": "pass",
-      "message": "task_semantic_packets: 302 rows, feature_id 302/302, hash 302/302",
+      "message": "task_semantic_packets: 2 rows, feature_id 2/2, source_ref 2/2",
       "detail": {
-        "total": 302,
-        "with_feature": 302,
-        "with_hash": 302,
-        "with_canonical": 302,
-        "distinct_features": 14
+        "total": 2,
+        "with_feature": 2,
+        "with_source_ref": 2,
+        "distinct_features": 1
       }
     },
     {
       "id": "L3:nes_chrom_packets",
       "status": "pass",
-      "message": "nes_chrom_packets: 27 rows, 18 features, 2 lanes, 27 with summary",
+      "message": "nes_chrom_packets: 1992 rows, 1378 features, 1 lanes, 0 with summary",
       "detail": {
-        "total": 27,
-        "with_feature": 27,
-        "with_source_ref": 27,
-        "with_summary": 27,
-        "distinct_features": 18,
-        "distinct_lanes": 2
+        "total": 1992,
+        "with_feature": 1992,
+        "with_source_ref": 1992,
+        "with_summary": 0,
+        "distinct_features": 1378,
+        "distinct_lanes": 1
       }
     },
     {
@@ -60,21 +59,21 @@
     },
     {
       "id": "L6:nes_chrom_kag_dag_hits",
-      "status": "pass",
-      "message": "nes_chrom_kag_dag_hits: 32 entries, 15 distinct nodes, 26 distinct chunks",
+      "status": "fail",
+      "message": "nes_chrom_kag_dag_hits: 0 entries, 0 distinct nodes, 0 distinct chunks",
       "detail": {
-        "total": 32,
-        "distinct_nodes": 15,
-        "distinct_chunks": 26
+        "total": 0,
+        "distinct_nodes": 0,
+        "distinct_chunks": 0
       }
     },
     {
       "id": "L7:feature_id_crosscheck",
       "status": "pass",
-      "message": "nes_chrom feature_ids in atlas_feature_map: 18/18",
+      "message": "nes_chrom feature_ids in atlas_feature_map: 1378/1378",
       "detail": {
-        "total": 18,
-        "inAtlas": 18,
+        "total": 1378,
+        "inAtlas": 1378,
         "missing": []
       }
     }

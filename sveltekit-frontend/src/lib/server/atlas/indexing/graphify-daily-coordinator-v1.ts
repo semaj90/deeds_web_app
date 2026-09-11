@@ -176,6 +176,56 @@ export type RepositoryQualifiedSourceSelectionBindingV1 = z.infer<
   typeof repositoryQualifiedSourceSelectionBindingV1Schema
 >;
 
+const sealedSnapshotSourceV1Schema = z.object({
+  repositoryId: z.string().min(1),
+  repositoryRelativePath: z.string().min(1).refine((value) => {
+    const normalized = value.replaceAll('\\', '/');
+    return !normalized.startsWith('/') && !normalized.split('/').includes('..');
+  }, 'repositoryRelativePath must be traversal-free'),
+  sourceRef: z.string().min(1),
+  sourceRevision: contentRevision,
+  contentDigest: z.string().regex(/^(sha256:)?[a-f0-9]{64}$/),
+  byteLength: z.number().int().nonnegative(),
+}).strip();
+
+export type SealedSnapshotSourceV1 = z.infer<typeof sealedSnapshotSourceV1Schema>;
+
+/**
+ * Pure adapter from WorkspaceSnapshotV1 source rows to the repository-qualified
+ * V2 membership owner. It validates the identity namespace and exact
+ * sourceRevision/contentDigest relationship but performs no database writes.
+ */
+export function adaptSealedSnapshotSourcesToRepositoryQualifiedMembershipV2(
+  workspaceRevision: string,
+  sources: readonly SealedSnapshotSourceV1[],
+): RepositoryQualifiedSourceSelectionBindingV1[] {
+  const parsedWorkspaceRevision = contentRevision.parse(workspaceRevision);
+  const identities = new Set<string>();
+  return sources.map((raw) => {
+    const source = sealedSnapshotSourceV1Schema.parse(raw);
+    const identity = `${source.repositoryId}:${source.repositoryRelativePath.replaceAll('\\', '/')}`;
+    if (identities.has(identity)) {
+      throw new Error(`GRAPHIFY_SNAPSHOT_V2_DUPLICATE_SOURCE_IDENTITY:${identity}`);
+    }
+    identities.add(identity);
+    const contentHash = source.contentDigest.replace(/^sha256:/, '');
+    if (source.sourceRevision !== `sha256:${contentHash}`) {
+      throw new Error(`GRAPHIFY_SNAPSHOT_V2_SOURCE_REVISION_CONTENT_MISMATCH:${identity}`);
+    }
+    // Parsing the workspace revision above is intentional: the adapter's
+    // output is consumed by a writer that binds every row to this exact value.
+    void parsedWorkspaceRevision;
+    return {
+      repositoryId: source.repositoryId,
+      repositoryRelativePath: source.repositoryRelativePath.replaceAll('\\', '/'),
+      sourceRef: source.sourceRef,
+      codeSourceRevision: source.sourceRevision,
+      contentHash,
+      byteLength: source.byteLength,
+    };
+  });
+}
+
 /**
  * Writes only the repository-qualified v2 membership owner. This is deliberately
  * separate from recordSourceSelectionStage so legacy execution evidence remains

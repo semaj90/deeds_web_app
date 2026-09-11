@@ -17,8 +17,8 @@
 // and continues the real indexing chain on failure) -- lifecycle bookkeeping must never block the
 // actual daily indexing work it is trying to observe.
 import pg from 'pg';
-import { execFileSync } from 'node:child_process';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { execFileSync, execSync } from 'node:child_process';
+import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -35,6 +35,17 @@ const RECEIPT_PATH = path.resolve(ROOT, 'docs/reports/graphify-daily-lifecycle-v
 const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
 
 async function main() {
+  // Snapshot-bound runs must use the repository-qualified coordinator. The
+  // legacy opener below is retained only for non-snapshot historical callers.
+  if (process.env.ATLAS_GRAPHIFY_SOURCE_SNAPSHOT_ROOT?.trim()) {
+    execSync('npx tsx scripts/atlas/graphify-daily-snapshot-native-open-v1.mts', {
+      cwd: ROOT,
+      stdio: 'inherit',
+      timeout: 10 * 60 * 1000,
+      shell: true,
+    });
+    return;
+  }
   const pool = new pg.Pool({ connectionString: DATABASE_URL, max: 2 });
   const client = await pool.connect();
   try {
@@ -48,6 +59,16 @@ async function main() {
     const wrappedClient = { query: (text, values) => client.query(text, values) };
     const repositoryRevision = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: ROOT, encoding: 'utf8' }).trim();
     const expectedWorkspaceRevision = process.env.ATLAS_GRAPHIFY_EXPECTED_WORKSPACE_REVISION?.trim() || null;
+    const sourceSnapshotRoot = process.env.ATLAS_GRAPHIFY_SOURCE_SNAPSHOT_ROOT?.trim()
+      ? path.resolve(process.env.ATLAS_GRAPHIFY_SOURCE_SNAPSHOT_ROOT)
+      : null;
+    // A materialized multi-repository snapshot is intentionally not a Git checkout.
+    // The legacy origin runtime below requires Git metadata and would otherwise open a
+    // database execution row before failing during origin discovery. Refuse before any
+    // lifecycle write; a snapshot-native coordinator is required for this path.
+    if (sourceSnapshotRoot && !existsSync(path.join(sourceSnapshotRoot, '.git'))) {
+      throw new Error('GRAPHIFY_SNAPSHOT_MATERIALIZED_ROOT_REQUIRES_SNAPSHOT_NATIVE_COORDINATOR');
+    }
 
     const opened = await openGraphifyRunV1({
       client: wrappedClient,
@@ -62,7 +83,7 @@ async function main() {
 
     const openedAt = new Date().toISOString();
     const materialized = materializeWorkspaceRevisionOriginV1({
-      workspaceRoot: ROOT,
+      workspaceRoot: sourceSnapshotRoot ?? ROOT,
       repositoryId: CANONICAL_REPOSITORY_ID,
       producerRevision: PARSER_CONTRACT_VERSION,
     });

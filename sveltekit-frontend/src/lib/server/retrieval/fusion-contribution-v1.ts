@@ -20,4 +20,38 @@ export interface FusionContributionV1 {
   weight: number;
   executorId: string;
   provenanceRefs: string[];
+  /**
+   * Revision-qualified identity carried alongside the simplified fusion key.
+   * Optional for historical fixtures; live promotion must require completeness.
+   */
+  identityEnvelope?: FusionIdentityEnvelopeV1;
+}
+
+export interface FusionIdentityEnvelopeV1 {
+  canonicalId: string;
+  packetKey?: string | null;
+  chunkId?: string | null;
+  symbolVersionId?: string | null;
+  sourceRef?: string | null;
+  sourceRevision?: string | null;
+  workspaceRevision?: string | null;
+  representationId?: string | null;
+  representationRevision?: string | number | null;
+  identityResolutionSource: string;
+}
+
+/** Complete means enough metadata exists to admit a contribution, not merely deduplicate it. */
+export function hasCompleteFusionIdentityEnvelope(
+  envelope: FusionIdentityEnvelopeV1 | undefined,
+): envelope is FusionIdentityEnvelopeV1 {
+  if (!envelope?.canonicalId?.trim() || !envelope.identityResolutionSource?.trim()) return false;
+  const strongIdentity = envelope.symbolVersionId || envelope.packetKey || envelope.chunkId;
+  return Boolean(
+    strongIdentity?.trim() &&
+      envelope.sourceRef?.trim() &&
+      envelope.sourceRevision?.trim() &&
+      envelope.workspaceRevision?.trim() &&
+      envelope.representationId?.trim() &&
+      String(envelope.representationRevision ?? '').trim(),
+  );
 }

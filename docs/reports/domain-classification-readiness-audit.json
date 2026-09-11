@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-01T22:12:29.970Z",
+  "generated_at": "2026-09-10T20:23:06.597Z",
   "overall_status": "READY_WITH_GAPS",
   "tables": {
     "atlas_packets": true,
@@ -10,14 +10,14 @@
   "coverage_percent": {
     "source_ref": 100,
     "feature_id": 100,
-    "title_id": 100,
-    "tree_node_id": 100,
+    "title_id": 99.91,
+    "tree_node_id": 99.9,
     "domain_class": 100,
-    "qdrant_point_id": 10.46,
-    "summary": 11.17,
-    "pagerank": 100,
-    "som": 100,
-    "latent_64": 12.2,
+    "qdrant_point_id": 10.45,
+    "summary": 11.16,
+    "pagerank": 99.9,
+    "som": 99.91,
+    "latent_64": 12.19,
     "used_concepts": 96.55,
     "lexical_features": 99.98,
     "ast_symbols": 20.27,
@@ -45,7 +45,7 @@
     {
       "name": "identity spine",
       "status": "PASS",
-      "evidence": "100% source_ref, 100% tree_node_id",
+      "evidence": "100% source_ref, 99.9% tree_node_id",
       "target": ">=95%"
     },
     {
@@ -69,13 +69,13 @@
     {
       "name": "retrieval mirror",
       "status": "FAIL",
-      "evidence": "10.46% qdrant_point_id",
+      "evidence": "10.45% qdrant_point_id",
       "target": ">=95%"
     },
     {
       "name": "topology readiness",
       "status": "FAIL",
-      "evidence": "som=100%, latent_64=12.2%, pagerank=100%",
+      "evidence": "som=99.91%, latent_64=12.19%, pagerank=99.9%",
       "target": ">=95%"
     },
     {

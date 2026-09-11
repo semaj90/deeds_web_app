@@ -79,7 +79,7 @@ services:
   # RabbitMQ — message broker (7 queues, 5 exchanges)
   # NOTE: Stop native rabbitmq first to free port 5672
   rabbitmq:
-    image: rabbitmq:3-management-alpine
+    image: rabbitmq:3-management-alpine@sha256:606d8c0d6b3c18d1da9afc53bc7cdb2a8d5486df91b5a9830e9e07626c9ae281
     container_name: legal-ai-rabbitmq
     restart: unless-stopped
     deploy:
@@ -117,7 +117,7 @@ services:
   # Valkey Bundle — caching, sessions, semantic cache, pub/sub
   # Open-source Redis-compatible bundle with JSON/Search/Bloom support.
   valkey:
-    image: valkey/valkey-bundle:8.1.1
+    image: valkey/valkey-bundle:8.1.1@sha256:8b6501bf71570ee597e621628b141500d9ad24a4137296dbd92ff7791c14367f
     container_name: legal-ai-valkey
     restart: unless-stopped
     deploy:
@@ -164,7 +164,7 @@ services:
 
   # Qdrant — vector search (72 INT8-quantized collections)
   qdrant:
-    image: qdrant/qdrant:v1.19.0
+    image: qdrant/qdrant:v1.19.0@sha256:057ee3a8da769fe7310dd3537b4dc7583bf87a95ce8ac43c0af5a46bc580d1fc
     container_name: legal-ai-qdrant
     restart: unless-stopped
     deploy:
@@ -202,7 +202,7 @@ services:
   # SeaweedFS is the canonical object-store backend in this repo.
   minio:
     profiles: ["legacy-minio"]
-    image: minio/minio:latest
+    image: minio/minio:latest@sha256:14cea493d9a34af32f524e538b8346cf79f3321eff8e708c1e2960462bd8936e
     container_name: legal-ai-minio
     restart: unless-stopped
     deploy:
@@ -248,7 +248,7 @@ services:
 
   # SeaweedFS Master — cluster metadata + volume assignment
   seaweedfs-master:
-    image: chrislusf/seaweedfs:latest
+    image: chrislusf/seaweedfs:latest@sha256:08d516132314207d10c8e37cbffc1f32b147d870169688734cc61c6231625b62
     container_name: legal-ai-seaweed-master
     restart: unless-stopped
     profiles: ["seaweedfs"]
@@ -281,7 +281,7 @@ services:
 
   # SeaweedFS Volume — actual blob storage
   seaweedfs-volume:
-    image: chrislusf/seaweedfs:latest
+    image: chrislusf/seaweedfs:latest@sha256:08d516132314207d10c8e37cbffc1f32b147d870169688734cc61c6231625b62
     container_name: legal-ai-seaweed-volume
     restart: unless-stopped
     profiles: ["seaweedfs"]
@@ -316,7 +316,7 @@ services:
       start_period: 15s
   # SeaweedFS Filer — metadata index (required by S3 gateway)
   seaweedfs-filer:
-    image: chrislusf/seaweedfs:latest
+    image: chrislusf/seaweedfs:latest@sha256:08d516132314207d10c8e37cbffc1f32b147d870169688734cc61c6231625b62
     container_name: legal-ai-seaweed-filer
     restart: unless-stopped
     profiles: ["seaweedfs"]
@@ -350,7 +350,7 @@ services:
   # SeaweedFS S3 — canonical S3-compatible API gateway (port 8333)
   # Existing S3-compatible client code connects here when SEAWEED_* env vars are set.
   seaweedfs-s3:
-    image: chrislusf/seaweedfs:latest
+    image: chrislusf/seaweedfs:latest@sha256:08d516132314207d10c8e37cbffc1f32b147d870169688734cc61c6231625b62
     container_name: legal-ai-seaweed-s3
     restart: unless-stopped
     profiles: ["seaweedfs"]
@@ -387,7 +387,7 @@ services:
   # Caddy — HTTP/3 reverse proxy (QUIC-enabled)
   # Fronts SvelteKit with H3, SSE streaming, compression, security headers
   caddy:
-    image: caddy:2.8-alpine
+    image: caddy:2.8-alpine@sha256:af32e97399febea808609119bb21544d0265c58a02836576e32a2d082c262c17
     container_name: legal-ai-caddy
     restart: unless-stopped
     deploy:
@@ -433,7 +433,7 @@ services:
 
   # CouchDB — document store (Phase 87)
   couchdb:
-    image: couchdb:3.3
+    image: couchdb:3.3@sha256:307a3f5276f64c0db28f226b7b5c180b8f2c851afa681cfb4fbb1b1fe7fd5587
     container_name: legal-ai-couchdb
     restart: unless-stopped
     profiles: ["full"]
@@ -475,7 +475,7 @@ services:
 
   # Neo4j — graph database (knowledge graph, case relationships)
   neo4j:
-    image: neo4j:5-community
+    image: neo4j:5-community@sha256:22ec5cd05a8cbb372fc4bed5e384c30bc75fd92504c72be4462039761b105f61
     container_name: legal-ai-neo4j
     restart: unless-stopped
     profiles: ["full"]
@@ -516,7 +516,7 @@ services:
 
   # SearXNG — privacy-respecting metasearch engine for agent web search
   searxng:
-    image: searxng/searxng:latest
+    image: searxng/searxng:latest@sha256:2fb0fa85096fe6df5c3ab98ecb4d6e0ee2ef66b8fb96ce6fce0f75b51c4bd90a
     container_name: legal-ai-searxng
     restart: unless-stopped
     profiles: ["full"]
@@ -548,7 +548,7 @@ services:
 
   # NATS — low-latency message transport (QUIC bridge)
   nats:
-    image: nats:latest
+    image: nats:latest@sha256:c50b0a773c6c8d033cad54f7c53cb97fd6e09b3bfc1accda7cd4fa94e19e9ed9
     container_name: legal-ai-nats
     restart: unless-stopped
     profiles: ["full"]
@@ -649,13 +649,14 @@ services:
     ports:
       - "8085:8085"
     environment:
-      OLLAMA_URL: http://host.docker.internal:11434
-      OLLAMA_BASE_URL: http://host.docker.internal:11434
+      # VLM ownership is the host llama.cpp Ornith server; Ollama remains
+      # available only to the separate embedding fallback path.
+      LLAMA_SERVER_URL: ${LLAMA_SERVER_URL:-http://host.docker.internal:8090}
+      VLM_MODEL: ${VLM_MODEL:-ornith-1.5-9b}
+      ORNITH_MMPROJ_PATH: ${ORNITH_MMPROJ_PATH:-models/ornith-1_5-9b-ad-q5_k-q4_k/mmproj-Ornith-1.5-9B-BF16.gguf}
       MINIO_ENDPOINT: minio:9000
       MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-minioadmin}
       MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-minioadmin}
-      # VLM OCR — Gemma4 via Ollama (gemma4:e4b or gemma4:e4b-it-q4_K_M)
-      VLM_MODEL: ${VLM_MODEL:-gemma4:e4b}
       # YOLO GPU model — drop yolov8x.pt in docker/docling-vlm/models/ and set YOLO_MODELS_DIR
       YOLO_MODEL_PATH: ${YOLO_MODEL_PATH:-yolov8x.pt}
       # YOLO CPU fallback — nano stays as TurboQuant / ONNX export target
@@ -731,7 +732,7 @@ services:
 
   # Langfuse ClickHouse — OLAP store for traces/observations/scores (required by Langfuse v3)
   langfuse-clickhouse:
-    image: clickhouse/clickhouse-server
+    image: clickhouse/clickhouse-server@sha256:fa394da808cc53f76d0344429421d6c422a6ee85fe7450135c0e3cff4df9bcbb
     container_name: langfuse-clickhouse
     restart: unless-stopped
     profiles: ["full"]
@@ -770,7 +771,7 @@ services:
 
   # Langfuse Worker — async trace processing
   langfuse-worker:
-    image: langfuse/langfuse-worker:3
+    image: langfuse/langfuse-worker:3@sha256:93207bd67d2e789ea55fa3d47eeba065dd6b1869187127ab24201784c52b96bc
     container_name: langfuse-worker
     restart: unless-stopped
     profiles: ["full"]
@@ -825,7 +826,7 @@ services:
 
   # Langfuse Web — LLM observability UI + API on port 3030
   langfuse-web:
-    image: langfuse/langfuse:3
+    image: langfuse/langfuse:3@sha256:a27fe525f52984fa6d36fd34e8b8c6e5ae4af43f34134cafc833b467fa9580ae
     container_name: langfuse-server
     restart: unless-stopped
     profiles: ["full"]
@@ -1130,7 +1131,7 @@ services:
   # Use: docker compose --profile tools run --rm atlas-runner sh -c "..."
   # Or:  npm run atlas:runner -- "..."
   atlas-runner:
-    image: node:22-alpine
+    image: node:22-alpine@sha256:c610fcdfb1d5b4740dd70c284ed3cb16bb857e0f7166196e36a5501df7a3aa32
     profiles: ["tools"]
     working_dir: /workspace
     volumes:

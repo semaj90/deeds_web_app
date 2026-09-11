@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /** Read-only census of router/matrix ownership and Postgres persistence surfaces. */
 import fs from 'node:fs/promises';
+import fsSync from 'node:fs';
 import path from 'node:path';
 import pg from 'pg';
 
@@ -33,9 +34,49 @@ const requiredColumns = {
 };
 
 const staticSurfaces = [];
+const sourceRoot = path.join(root, 'sveltekit-frontend/src');
+const sourceFiles = [];
+async function collectTypeScriptFiles(dir) {
+  let entries = [];
+  try { entries = await fs.readdir(dir, { withFileTypes: true }); } catch { return; }
+  for (const entry of entries) {
+    if (entry.name === 'node_modules' || entry.name.startsWith('.')) continue;
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) await collectTypeScriptFiles(full);
+    else if (/\.(?:ts|svelte)$/.test(entry.name)) sourceFiles.push(full);
+  }
+}
+await collectTypeScriptFiles(sourceRoot);
 for (const file of routerFiles) {
   let source = null;
   try { source = await fs.readFile(path.join(root, file), 'utf8'); } catch {}
+  const normalizedFile = file.replaceAll('\\', '/');
+  const moduleStem = path.basename(file, path.extname(file));
+  const modulePath = normalizedFile.replace(/^sveltekit-frontend\/src\//, '').replace(/\.ts$/, '');
+  const moduleAliases = [modulePath, modulePath.replace(/^lib\//, '$lib/'), `./${modulePath.split('/').pop()}`];
+  const importConsumers = sourceFiles.filter((candidate) => {
+    if (path.relative(root, candidate).replaceAll('\\', '/') === normalizedFile) return false;
+    try {
+      const consumer = fsSync.readFileSync(candidate, 'utf8');
+      return consumer.split(/\r?\n/).some((line) =>
+        (/^\s*import\b.*['"`]/.test(line) || /\bfrom\s+['"`]/.test(line))
+        && moduleAliases.some((alias) => line.includes(alias))
+      );
+    } catch { return false; }
+  }).map((candidate) => path.relative(root, candidate).replaceAll('\\', '/'));
+  const ownershipClassification = normalizedFile.endsWith('/routing/query-router-4x4.ts')
+    ? 'CANONICAL_EXECUTABLE_ROUTER'
+    : normalizedFile.endsWith('/retrieval/router-matrix.ts')
+      ? 'COMPATIBILITY_VOCABULARY'
+      : normalizedFile.endsWith('/retrieval/retrieval-candidate-feature-matrix-v1.ts')
+        ? 'FEATURE_MATRIX_DATA'
+        : normalizedFile.endsWith('/retrieval/query-router-4x4.ts')
+          ? 'LEGACY_EXECUTABLE_ROUTER'
+          : normalizedFile.endsWith('/atlas/feature-matrix-schema.ts')
+            ? 'FEATURE_SCHEMA'
+            : normalizedFile.endsWith('/ace/stage-a0-routing.ts')
+              ? 'STAGE_ROUTING_ADAPTER'
+              : 'UNCLASSIFIED';
   staticSurfaces.push({
     file,
     present: Boolean(source),
@@ -43,6 +84,9 @@ for (const file of routerFiles) {
     executableRouter: Boolean(source && /QueryRouter4x4|route\s*\(/.test(source)),
     matrixDefinition: Boolean(source && /DEFAULT_MATRIX|DEFAULT_ROUTER_MATRIX/.test(source)),
     candidateMatrix: Boolean(source && /candidate_feature_matrix|RetrievalCandidateFeatureMatrixV1/.test(source)),
+    ownershipClassification,
+    importConsumers,
+    liveConsumerCount: importConsumers.length,
   });
 }
 
@@ -89,11 +133,43 @@ if (report.postgres.tables.atlas_observation_feature_rows?.missingRequiredColumn
 const workspaceColumn = report.postgres.tables.atlas_observation_feature_rows?.columns?.find((column) => column === 'workspace_revision');
 const workspaceColumnType = report.postgres.tables.atlas_observation_feature_rows?.columnTypes?.workspace_revision;
 if (workspaceColumn && workspaceColumnType !== 'text') report.blockers.push('WORKSPACE_REVISION_TYPE_MISMATCH');
-if (staticSurfaces.filter((surface) => surface.matrixDefinition).length > 1) report.blockers.push('MULTIPLE_ROUTER_MATRIX_DEFINITIONS');
+const canonicalRouter = staticSurfaces.find((surface) => surface.ownershipClassification === 'CANONICAL_EXECUTABLE_ROUTER');
+const compatibilityMatrix = staticSurfaces.find((surface) => surface.ownershipClassification === 'COMPATIBILITY_VOCABULARY');
+const featureMatrix = staticSurfaces.find((surface) => surface.ownershipClassification === 'FEATURE_MATRIX_DATA');
+report.ownership.classification = {
+  canonicalExecutableRouter: canonicalRouter?.file ?? null,
+  compatibilityVocabulary: compatibilityMatrix?.file ?? null,
+  featureMatrixData: featureMatrix?.file ?? null,
+  canonicalRouterLiveConsumerCount: canonicalRouter?.liveConsumerCount ?? 0,
+  compatibilityVocabularyLiveConsumerCount: compatibilityMatrix?.liveConsumerCount ?? 0,
+  featureMatrixLiveConsumerCount: featureMatrix?.liveConsumerCount ?? 0,
+};
+if (!canonicalRouter?.present) report.blockers.push('CANONICAL_EXECUTABLE_ROUTER_NOT_PRESENT');
+if (!canonicalRouter?.liveConsumerCount) report.blockers.push('CANONICAL_EXECUTABLE_ROUTER_LIVE_CONSUMER_UNPROVEN');
+if (staticSurfaces.some((surface) => surface.ownershipClassification === 'UNCLASSIFIED' && surface.matrixDefinition)) {
+  report.blockers.push('ROUTER_MATRIX_SURFACE_UNCLASSIFIED');
+}
+if (staticSurfaces.filter((surface) => surface.matrixDefinition).length > 1) report.notes = ['MULTIPLE_ROUTER_MATRIX_DEFINITIONS_RECLASSIFIED_BY_ROLE'];
+if (!report.blockers.includes('ROUTER_MATRIX_SURFACE_UNCLASSIFIED')) {
+  report.blockers.push('ROUTER_OWNER_CONSOLIDATION_NOT_AUTHORIZED');
+}
 report.status = report.blockers.length ? 'SURFACES_CENSUSED_REVIEW_REQUIRED' : 'SURFACES_PRESENT_REVIEW_REQUIRED';
 report.firstBlockingInvariant = report.blockers[0] ?? null;
 
 await fs.mkdir(path.dirname(reportPath), { recursive: true });
-await fs.writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+const reportJson = `${JSON.stringify(report, null, 2)}\n`;
+const reportTempPath = `${reportPath}.${process.pid}.tmp`;
+await fs.writeFile(reportTempPath, reportJson, 'utf8');
+try {
+  await fs.rename(reportTempPath, reportPath);
+} catch (error) {
+  await fs.rm(reportTempPath, { force: true }).catch(() => {});
+  report.writeError = String(error?.message ?? error);
+  report.status = 'SURFACES_CENSUSED_REPORT_WRITE_BLOCKED';
+  report.firstBlockingInvariant = 'ROUTER_MATRIX_REPORT_WRITE_UNAVAILABLE';
+  console.error(JSON.stringify({ status: report.status, firstBlockingInvariant: report.firstBlockingInvariant, reportPath }, null, 2));
+  process.exitCode = 1;
+  process.exit();
+}
 console.log(JSON.stringify({ status: report.status, firstBlockingInvariant: report.firstBlockingInvariant, postgresReachable: report.postgres.reachable, observationFeatureTable: report.postgres.tables.atlas_observation_feature_rows?.exists ?? false, report: reportPath }, null, 2));
 process.exitCode = report.blockers.length ? 1 : 0;

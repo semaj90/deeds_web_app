@@ -2,18 +2,16 @@
  * POST /api/ai/tensorrt/vlm
  *
  * Vision-Language inference via Triton ensemble pipeline:
- *   SigLIP vision encoder → Projector → Gemma4 text decoder
+ *   SigLIP vision encoder → Projector → VLM challenger
  *
  * Accepts multipart form data with an image + text prompt.
- * Falls back to Ollama gemma4 multimodal if Triton is unavailable.
+ * Falls back to the canonical Ornith llama.cpp VLM when Triton is unavailable.
  */
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from '@sveltejs/kit';
 import { acquireGpuLease, releaseGpuLease } from '$lib/server/inference/gpu-arbiter.js';
-import { routeInference } from '$lib/server/inference/inference-router.js';
 import { ENV } from '$lib/server/env.server.js';
 
-import { ollamaFetch } from '$lib/server/ollama.js';
 import { z } from 'zod';
 import { resizeForVLM } from '$lib/server/image/resize-for-vlm.js';
 import { fastJsonParse } from '$lib/server/gpu/simdjson-bridge.js';
@@ -28,6 +26,8 @@ const vlmJsonSchema = z.object({
 const getTritonUrl = () => ENV.TRITON_URL.replace(/\/$/, '');
 const getVlmModel = () => ENV.TRITON_VLM_MODEL;
 const getVisionModel = () => ENV.TRITON_VISION_MODEL;
+const getOrnithUrl = () => (ENV.LLAMA_SERVER_URL ?? ENV.TURBOQUANT_BASE_URL ?? 'http://127.0.0.1:8090').replace(/\/$/, '');
+const ORNITH_MODEL = 'ornith-1.5-9b';
 
 interface VlmRequest {
   prompt: string;
@@ -82,6 +82,38 @@ async function checkTritonHealth(): Promise<boolean> {
   } catch {
     return false;
   }
+}
+
+async function callOrnithVlm(input: {
+  prompt: string;
+  imageBase64: string;
+  maxTokens: number;
+  temperature: number;
+}): Promise<{ text: string; model: string }> {
+  const baseUrl = getOrnithUrl();
+  const propsResponse = await fetch(`${baseUrl}/props`, { signal: AbortSignal.timeout(3000) });
+  if (!propsResponse.ok) throw new Error(`ORNITH_PROPS_HTTP_${propsResponse.status}`);
+  const props = await propsResponse.json() as { modalities?: { vision?: boolean }; model_alias?: string };
+  if (props.modalities?.vision !== true) throw new Error('ORNITH_VISION_PROJECTOR_UNAVAILABLE');
+  const model = props.model_alias?.startsWith('ornith-') ? props.model_alias : ORNITH_MODEL;
+  const response = await fetch(`${baseUrl}/v1/chat/completions`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model,
+      messages: [{ role: 'user', content: [
+        { type: 'text', text: input.prompt },
+        { type: 'image_url', image_url: { url: `data:image/png;base64,${input.imageBase64}` } },
+      ] }],
+      stream: false,
+      temperature: input.temperature,
+      max_tokens: input.maxTokens,
+    }),
+    signal: AbortSignal.timeout(120000),
+  });
+  if (!response.ok) throw new Error(`ORNITH_VLM_HTTP_${response.status}`);
+  const data = await response.json() as { model?: string; choices?: Array<{ message?: { content?: string } }> };
+  return { text: data.choices?.[0]?.message?.content ?? '', model: data.model ?? model };
 }
 
 export const POST: RequestHandler = async ({ request, locals }) => {
@@ -142,59 +174,29 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     );
   }
 
-  // Check Triton health — fall back to Ollama VLM cascade if unavailable
+  // Triton is a challenger. The canonical fallback is Ornith llama.cpp with
+  // its matching projector; Ollama is deliberately not a VLM provider here.
   const tritonReady = await checkTritonHealth();
   if (!tritonReady) {
-    // Fast path: try direct local llama-server VLM first (works when VRAM is free)
     try {
-      const llamaUrl = ENV.TURBOQUANT_BASE_URL ?? ENV.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090';
-      const vlmModel = ENV.OLLAMA_VLM_MODEL ?? 'gemma4:e4b-it-q4_K_M';
-      const ollamaRes = await fetch(`${llamaUrl}/chat/completions`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: vlmModel,
-          messages: [{ role: 'user', content: prompt, images: [imageBase64] }],
-          stream: false,
-          temperature,
-          max_tokens: maxTokens,
-        }),
-        signal: AbortSignal.timeout(120000),
-      });
-      if (ollamaRes.ok) {
-        const rawText = await ollamaRes.text();
-        const ollamaData = fastJsonParse<{ choices?: Array<{ message?: { content?: string } }> }>(rawText);
-        return json({
-          text: ollamaData.choices?.[0]?.message?.content ?? '',
-          model: `${vlmModel} (ollama fallback)`,
-          pipeline: ['ollama-multimodal'],
-          tritonAvailable: false,
-        });
-      }
-    } catch {
-      // Ollama direct failed — try inference router (has VRAM swap)
-    }
-
-    // Slow path: inference router with VRAM swap (stops llama-server, runs VLM, restarts)
-    const routed = await routeInference({ prompt, imageBase64, maxTokens, temperature });
-    if (!routed.error) {
+      const ornith = await callOrnithVlm({ prompt, imageBase64, maxTokens, temperature });
       return json({
-        text: routed.text,
-        model: `${routed.model} (${routed.backend} fallback)`,
-        pipeline: [routed.backend],
+        text: ornith.text,
+        model: ornith.model,
+        pipeline: ['ornith-llama.cpp-vlm'],
         tritonAvailable: false,
-        latencyMs: routed.latencyMs,
       });
+    } catch (error) {
+      return json(
+        {
+          error: 'Triton unavailable and Ornith VLM unavailable',
+          fallback: 'none',
+          hint: 'Start llama.cpp on :8090 with the Ornith model and matching mmproj projector',
+          details: error instanceof Error ? error.message : 'ORNITH_VLM_UNAVAILABLE',
+        },
+        { status: 503 },
+      );
     }
-
-    return json(
-      {
-        error: 'Triton and local llama-server VLM both unavailable',
-        fallback: 'inference-router',
-        hint: 'Start local llama-server with gemma4 VLM model or start Triton container',
-      },
-      { status: 503 }
-    );
   }
 
   // Acquire GPU lease
@@ -210,7 +212,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       return json({ error: 'Failed to load vision encoder' }, { status: 500 });
     }
 
-    // Call Triton ensemble: SigLIP → Projector → Gemma4
+    // Call the Triton challenger ensemble: SigLIP → Projector → VLM decoder
     const res = await fetch(
       `${getTritonUrl()}/v2/models/${encodeURIComponent(getVlmModel())}/infer`,
       {

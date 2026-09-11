@@ -1,14 +1,16 @@
 {
   "schema": "atlas.workspace-revision-tournament-admission.v1",
-  "generatedAt": "2026-09-10T04:10:59.072Z",
+  "generatedAt": "2026-09-10T22:30:31.288Z",
   "mode": "EXPLICIT_BOUNDED_ADMISSION_RECEIPT",
   "status": "WORKSPACE_REVISION_TOURNAMENT_ADMITTED",
   "proofLevel": "BOUNDED_LIVE_PROVEN",
   "authority": true,
-  "workspaceRevision": "sha256:d7f9563f5861b6890ac7e6d2c87df4ad6fa0eebb825f66387fba0e750ef91f2e",
-  "snapshotRevision": "sha256:c11d261f16a90ba80a8772f5ea10b24d0e2d28a27ef93afcee1f8398898c06ad",
-  "sourceCount": 25267,
-  "sourceSelectionChecksum": "sha256:5d524bf15be8ee0296d8f6b57f9edcc3f71c670dee5795b2ee6012064719798f",
+  "workspaceRevision": "sha256:3be7901e1b6bc4f6499185f775eac2ae93e56305940703a7da66a436e4e3a3e0",
+  "snapshotRevision": "sha256:9b61929b85a6c4e2d8e459e4cca1294c934746f1430e6535f9546cf16e83c9a5",
+  "sourceCount": 25271,
+  "sourceSelectionChecksum": "sha256:b87ed210cf2fe7ce265a0108d1ddd750e2b3dce346581f9bce82a96a87cef0ca",
+  "snapshotMembershipChecksum": "sha256:b87ed210cf2fe7ce265a0108d1ddd750e2b3dce346581f9bce82a96a87cef0ca",
+  "manifestPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\workspace-source-snapshots\\9b61929b85a6c4e2d8e459e4cca1294c934746f1430e6535f9546cf16e83c9a5.json",
   "approval": {
     "confirmation": "AUTHORIZE_WORKSPACE_REVISION_TOURNAMENT_ADMISSION_V1",
     "scope": "TOURNAMENT_SOURCE_AUTHORITY_ONLY"

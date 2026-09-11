@@ -6611,3 +6611,183 @@ promotion authority was introduced.
 - [ ] Gate 1 remains blocked until exactly one terminal current-source execution is bound to a non-null workspace revision; gates 2–10 remain dependency-blocked and must not be represented as promoted.
 - Report: `docs/reports/parent-atlas-promotion-gates-v1.json`.
 - [x] Gate 1 read-only refresh completed with `npx tsx scripts/atlas/audit-current-graphify-snapshot-authority-v1.mts`: `NO_TERMINAL_EXECUTION_FOR_CURRENT_WORKSPACE`, `qualifyingExecutions=0`, current observed revision `sha256:a2c7cfc5a7d7ffe53a25418a734ad8c9d0d69ada1d7a5b605239c91f0ac17759`. The first blocker remains unchanged; no Graphify execution was launched.
+
+### Lineage validation recheck (2026-09-10)
+
+- [x] Corrected `scripts/atlas/audit-lineage-validation.mjs` to use the live
+  `task_semantic_packets` columns (`feature_id` and `source_ref`) instead of
+  retired `source_ref_hash` and `canonical_source_ref` columns.
+- [x] Re-ran the read-only audit: `6/7` checks pass. L2 now passes with `2/2`
+  feature and source references; the remaining blocker is empty
+  `nes_chrom_kag_dag_hits` (`0` entries).
+- [ ] Keep KAG/ACE promotion blocked until the KAG/DAG audit trail has
+  revision-qualified entries. No canonical or projection writes occurred.
+
+Receipt: `memory/exports/lineage-validation.json`.
+
+### CHR97 lineage recheck (2026-09-10)
+
+- [x] Re-ran the read-only CHR97 lineage audit: `8/13` checks pass. NES
+  packets have complete feature and chunk coverage (`1,992/1,992`).
+- [ ] Keep the lane blocked: `0/1,992` packets have `kag_node_key` or
+  `qdrant_point_id`, and `nes_chrom_kag_dag_hits` is empty, so KAG/Qdrant
+  back-references cannot be proven.
+- [ ] Do not promote the sprite/evaluation artifacts from their local
+  completeness alone; canonical packet and graph identity remains absent.
+
+Receipt: `memory/exports/lineage-chr97-validation.json`.
+## CONTEXT-FOREST-READINESS-01 recheck (2026-09-10)
+
+- [x] Run the read-only context-forest readiness reconciliation.
+- [x] Confirm PostgreSQL remains the intended canonical owner, but current
+  source membership has no terminal execution for the active workspace.
+- [x] Preserve the blocked state for Leiden, semantic owner, packet/chunk/
+  symbol identity, representation ledger, projection identity, Qdrant, and
+  ordinal/graph manifest prerequisites.
+- [x] Confirm `writesPerformed=false`; no context forest or cache promotion
+  occurred.
+- [ ] Re-run only after current source membership, semantic owner, and graph
+  identity receipts are changed and independently proven.
+
+Evidence: `docs/reports/parent-atlas-context-forest-readiness-v1.json`.
+Status: `NOT_SAFE_TO_PROJECT`; first blocker: `GRAPHIFY_SOURCE_MEMBERSHIP`.
+Next gate: `CURRENT-SOURCE-OWNER-RECONCILIATION-01`.
+
+## ACE-LIVE-DRY-INPUT-READINESS-01 recheck (2026-09-10)
+
+- [x] Ran the read-only ACE input readiness audit against the admitted
+      snapshot, existing ordinal map, and revision-authority candidate.
+- [x] Correctly rejected all three inputs as incompatible schemas: the ordinal
+      map contains an extra field, the workspace snapshot is not a
+      `CandidateFeatureSnapshotV1`, and the revision receipt is not a
+      `RevisionAuthorityEnvelopeV1`.
+- [ ] Keep ACE live-dry materialization blocked; no replacement artifacts were
+      synthesized and no cache/context writes occurred.
+
+Evidence: `docs/reports/ace-live-dry-input-readiness-v2.json`.
+Status: `ACE_LIVE_DRY_INPUT_BLOCKED`; canonicalAuthority=false;
+writesPerformed=false. First blocker: `ACE_INPUT_CONTRACTS_NOT_ALIGNED`.
+Next gate: provide authoritative ordinal, feature-snapshot, and revision
+authority artifacts with the exact shared schemas.
+
+## CORE-LANE-RECHECK-2026-09-10
+
+- [x] Re-ran context readiness; Graphify source membership remains the first dependency.
+- [ ] Keep ACE/context promotion blocked until authoritative ordinal, feature snapshot, and revision envelopes align.
+
+Evidence: `docs/reports/ace-live-dry-input-readiness-v2.json` and
+`docs/reports/parent-atlas-context-forest-readiness-v1.json`.
+First blocker remains: `ACE_INPUT_CONTRACTS_NOT_ALIGNED`.
+
+### ACE-LIVE-INPUT-RECHECK — 2026-09-10
+
+- [x] Preserved the strict validator: the supplied ordinal map, workspace
+      snapshot, and revision artifact are different artifact kinds and do not
+      satisfy the three ACE input schemas.
+- [ ] Keep live-dry materialization blocked; do not synthesize replacement
+      feature or authority artifacts while Graphify source membership is
+      unresolved.
+
+Evidence: `docs/reports/ace-live-dry-input-readiness-v2.json`.
+Status remains `ACE_LIVE_DRY_INPUT_BLOCKED`; writesPerformed=false;
+canonicalAuthority=false.
+
+## ACE-LIVE-DRY-INPUT-RECHECK-2026-09-10T2
+
+- [x] Re-ran the read-only ACE input readiness audit without inventing input
+      artifacts.
+- [x] Confirmed all three required inputs were absent from the invocation:
+      `CandidateOrdinalMapV1`, `CandidateFeatureSnapshotV1`, and
+      `RevisionAuthorityEnvelopeV1`; cross-contract verification was not
+      attempted.
+- [ ] Keep ACE/context promotion blocked until those authoritative artifacts
+      exist and share the admitted source/revision envelope.
+
+Evidence: `scripts/atlas/audit-ace-live-dry-input-readiness-v2.mts` and
+`docs/reports/ace-live-dry-input-readiness-v2.json`.
+Status: `ACE_LIVE_DRY_INPUT_BLOCKED`; authority=false;
+writesPerformed=false; cacheWritesPerformed=false.
+First blocker: `ACE_REQUIRED_INPUT_ARTIFACTS_MISSING`.
+
+## CONTEXT-FOREST-READINESS-RECHECK-2026-09-10T21
+
+- [x] Re-ran the read-only context-forest readiness audit.
+- [x] Confirmed the first blocking gate remains Graphify source membership;
+      the report still identifies no current terminal execution for the
+      workspace.
+- [ ] Keep ACE/context promotion blocked until snapshot-bound Graphify
+      membership, current semantic/graph revisions, and required ordinal and
+      feature envelopes are available. No cache, ACE, graph, or database
+      writes occurred.
+
+Evidence: `docs/reports/parent-atlas-context-forest-readiness-v1.json`.
+Status: `NOT_SAFE_TO_PROJECT`; authority=false; writesPerformed=false.
+First blocker: `GRAPHIFY_SOURCE_MEMBERSHIP`.
+Next gate: snapshot-bound Graphify execution and current-source readback.
+Next gate: provide the exact authoritative ordinal, feature snapshot, and
+revision authority paths; do not synthesize stand-ins.
+
+## GPU-ACE-ORNITH-READONLY-CHAIN-RECHECK-2026-09-10
+
+- [x] Ran the read-only aggregation of the GPU tile, CandidateOrdinal,
+      feature-matrix, ACE/ContextManifest, Ornith replay, claim-validation,
+      read-only DAG, and mutation-blocking receipts.
+- [x] Confirmed all eight proof gates and the mutation guard are passing.
+- [ ] Keep full-corpus ordinal expansion and graph-revision ownership open;
+      this fixture/replay chain does not authorize canonical graph, Qdrant,
+      Neo4j, cache, model, or projection writes.
+
+Evidence: `docs/reports/parent-atlas-gpu-ace-ornith-readiness-v1.json`.
+Status: `GPU_ACE_ORNITH_READONLY_CHAIN_PROVEN`; writesPerformed=false;
+canonicalAuthority=false. Remaining non-blocking work: explicit mutation
+authorization, full-corpus CandidateOrdinal expansion, and graph-revision
+ownership for 128/768 scaling.
+
+## CONTEXT-FOREST-READINESS-RECHECK-2026-09-11
+
+- [x] Fixed the Windows report-writer failure by switching the readiness
+      auditor to atomic temporary-file replacement.
+- [x] Re-ran the read-only readiness audit successfully.
+- [ ] Keep ACE/context projection blocked: the first gate remains Graphify
+      source membership; no context, cache, graph, or database writes occurred.
+
+Evidence: `scripts/atlas/audit-context-forest-readiness-v1.mjs` and
+`docs/reports/parent-atlas-context-forest-readiness-v1.json`.
+Status: `NOT_SAFE_TO_PROJECT`; authority=false; writesPerformed=false.
+First blocker: `GRAPHIFY_SOURCE_MEMBERSHIP`.
+Next gate: snapshot-bound Graphify membership and current-source readback.
+
+## RAPIDS-CUVS-LIVE-READINESS-RECHECK-2026-09-10
+
+- [x] Replaced the former simulated TurboVec/cuVS readiness result with
+      live health probes for TurboVec and the WSL2/RAPIDS `:8098` executor.
+- [x] Confirmed TurboVec is reachable but remains a derived accelerator
+      projection (`indexed=0`, `canonicalAuthority=false`).
+- [ ] Keep RAPIDS promotion blocked until the `:8098` sidecar proves the
+      complete CUDA execution contract, including `torchAvailable=true`.
+
+Evidence: `docs/reports/turbovec-cuvs-readiness.json`.
+Status: `LIVE_ACCELERATOR_CHAIN_BLOCKED`; `cudaAvailable=true` and
+`executionOnly=true`, but `torchAvailable=false`; writesPerformed=false.
+First blocker: `RAPIDS_CUDA_TORCH_EXECUTION_NOT_PROVEN`.
+Next gate: repair or start the WSL2 RAPIDS/cuDF/cuVS sidecar, then rerun the
+live readiness audit. This does not authorize canonical or projection writes.
+
+## RAPIDS-CUVS-CONTAINER-PYTORCH-GAP-2026-09-10
+
+- [x] Compared the healthy WSL2 `atlas-rapids-cu13` environment with the live
+      Docker `atlas-gpu-8098` container.
+- [x] Confirmed WSL2 has PyTorch CUDA, cuDF, cuVS, cuGraph, and CuPy.
+- [x] Confirmed the live container has cuDF/cuVS/cuGraph/CuPy but no PyTorch;
+      its exact-scan routes therefore cannot be promoted as live-proven.
+- [x] Added the missing CUDA-compatible PyTorch dependency to the container
+      image definition.
+- [ ] Rebuild/restart and re-run the readiness audit only with explicit runtime
+      authorization; no restart or image mutation was performed here.
+
+Evidence: `docker/atlas-gpu-8098/Dockerfile`,
+`docs/reports/turbovec-cuvs-readiness.json`, and live WSL/container import
+checks. Status remains `LIVE_ACCELERATOR_CHAIN_BLOCKED`; writesPerformed=false.
+First blocker: `RAPIDS_CONTAINER_REBUILD_NOT_AUTHORIZED`.
+Next gate: authorized container rebuild/restart, then live `:8098/health` and
+bounded cuVS route readback.

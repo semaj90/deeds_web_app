@@ -1,6 +1,6 @@
 {
   "schema": "atlas.graphify-lexical-owner.v1",
-  "generatedAt": "2026-09-08T05:21:05.347Z",
+  "generatedAt": "2026-09-10T22:46:20.908Z",
   "readOnly": true,
   "table": "codebase_chunk_index",
   "extensions": [

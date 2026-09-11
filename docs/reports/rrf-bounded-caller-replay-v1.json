@@ -1,6 +1,6 @@
 {
   "schema": "atlas.rrf-bounded-caller-replay.v1",
-  "generatedAt": "2026-09-09T21:55:55.249Z",
+  "generatedAt": "2026-09-10T18:48:10.417Z",
   "mode": "READ_ONLY",
   "status": "CALLER_REPLAY_ORDER_MATCH_PARTIAL",
   "proofLevel": "FIXTURE_PROVEN",
@@ -53,11 +53,21 @@
     "arithmeticComparable": true,
     "identityEnvelopeComparable": false
   },
+  "metrics": {
+    "candidateCount": 3,
+    "logicalLaneCount": 2,
+    "executorCount": 3,
+    "rankOrderEqual": true,
+    "weightedArithmeticEqual": true,
+    "completeIdentityEnvelopeCount": 0,
+    "identityEnvelopeComparable": false
+  },
   "blockers": [
     "FIXTURE_ONLY_NOT_LIVE",
     "IDENTITY_ENVELOPE_PARITY_NOT_PROVEN",
     "RUNTIME_CONSOLIDATION_NOT_AUTHORIZED"
   ],
+  "firstBlockingInvariant": "IDENTITY_ENVELOPE_PARITY_NOT_PROVEN",
   "nextGate": "RWC-CENSUS-04_REAL_CALLER_BASELINE_REPLAY",
   "safeNextCommand": "npm run atlas:rrf:caller-replay"
 }

@@ -80,5 +80,13 @@
 !sveltekit-frontend/docs/reports/backfill-latent-vectors-writeback.json
 !sveltekit-frontend/docs/reports/summary-envelope-build.json
 !sveltekit-frontend/docs/reports/train-som-20x20-writeback.json
+
+# Container dependency manifests — selectively searchable even though the
+# repository-wide *.txt rule keeps generated/text artifacts out of normal rg.
+!docker/**/requirements*.txt
+!services/**/requirements*.txt
+!scripts/**/requirements*.txt
+!python/requirements*.txt
+!docs/reports/docker-reproducibility-v1.json
 !sveltekit-frontend/memory/graphify/gds/*.json
 !openspec/drafts/*.md

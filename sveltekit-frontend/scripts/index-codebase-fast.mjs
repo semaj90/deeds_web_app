@@ -61,7 +61,16 @@ const SRC_OVERRIDE = (() => {
   return idx !== -1 ? path.resolve(process.argv[idx + 1]) : null;
 })();
 
-const scanRoot = SRC_OVERRIDE ?? ROOT;
+// Graphify may provide an immutable, revision-addressed materialization. When
+// present, scan it directly so the indexer cannot observe later checkout
+// edits. Snapshot scans are intentionally probe-only; canonical publication
+// still requires an explicit full-repository run from the normal root.
+const SNAPSHOT_SOURCE_ROOT = process.env.ATLAS_GRAPHIFY_SOURCE_SNAPSHOT_ROOT?.trim()
+  ? path.resolve(process.env.ATLAS_GRAPHIFY_SOURCE_SNAPSHOT_ROOT.trim())
+  : null;
+const SNAPSHOT_WORKSPACE_REVISION = process.env.ATLAS_GRAPHIFY_EXPECTED_WORKSPACE_REVISION?.trim() || null;
+const scanRoot = SNAPSHOT_SOURCE_ROOT ?? SRC_OVERRIDE ?? ROOT;
+const relativeRoot = SNAPSHOT_SOURCE_ROOT ?? ROOT;
 
 // ── Publication safety (2026-08-09) ─────────────────────────────────────────────
 // A forgotten/orphaned probe run (--src <small-dir>, wrapped in a `timeout` that
@@ -73,7 +82,7 @@ const scanRoot = SRC_OVERRIDE ?? ROOT;
 // scoped/probe run is therefore structurally incapable of touching the
 // canonical file, regardless of flags, timeouts, or how it's killed.
 const RUN_ID = `${new Date().toISOString().replace(/[:.]/g, '-')}-${process.pid}`;
-const IS_CANONICAL_SCOPE = SRC_OVERRIDE === null && !NO_EXTRA_INDEX_DIRS;
+const IS_CANONICAL_SCOPE = SNAPSHOT_SOURCE_ROOT === null && SRC_OVERRIDE === null && !NO_EXTRA_INDEX_DIRS;
 const PUBLISH_CANONICAL_REQUESTED = process.argv.includes('--publish-canonical');
 const PUBLISH_CANONICAL = PUBLISH_CANONICAL_REQUESTED && IS_CANONICAL_SCOPE;
 if (PUBLISH_CANONICAL_REQUESTED && !IS_CANONICAL_SCOPE) {
@@ -304,7 +313,7 @@ const EXCLUDE_DIRS = new Set([
 function* walk(dir) {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
     const full = path.join(dir, entry.name);
-    const relFromRoot = path.relative(ROOT, full).replace(/\\/g, '/');
+    const relFromRoot = path.relative(relativeRoot, full).replace(/\\/g, '/');
     if (EXCLUDE_DIRS.has(entry.name) || relFromRoot === 'src') continue;
     if (entry.isDirectory()) {
       yield* walk(full);
@@ -390,7 +399,7 @@ const RE_SVELTE_SCRIPT = /<script[^>]*>/;
 // ── Per-file metadata extraction (all 20 gates) ───────────────────────────────
 
 function extractMeta(filePath, src) {
-  const rel    = path.relative(ROOT, filePath).replace(/\\/g, '/');
+    const rel    = path.relative(relativeRoot, filePath).replace(/\\/g, '/');
   const ext    = path.extname(filePath);
   
   // Adjusted for consolidated repo: rel might start with sveltekit-frontend/
@@ -645,7 +654,7 @@ let processed = 0;
 let currentFileForDiagnostics = '';
 for (const filePath of walk(scanRoot)) {
   processed++;
-  currentFileForDiagnostics = path.relative(ROOT, filePath).replace(/\\/g, '/');
+    currentFileForDiagnostics = path.relative(relativeRoot, filePath).replace(/\\/g, '/');
   if (processed % 100 === 0) writeProgress(`\r   [SCAN_FILES] ${processed} files... last: ${currentFileForDiagnostics}`);
   let src;
   try { src = fs.readFileSync(filePath, 'utf8'); } catch { continue; }
@@ -736,7 +745,7 @@ if (!NO_EXTRA_INDEX_DIRS) {
     if (!fs.existsSync(dir)) continue;
     for (const filePath of walk(dir)) {
       processed++;
-      currentFileForDiagnostics = path.relative(ROOT, filePath).replace(/\\/g, '/');
+      currentFileForDiagnostics = path.relative(relativeRoot, filePath).replace(/\\/g, '/');
       if (processed % 100 === 0) writeProgress(`\r   [SCAN_FILES] ${processed} files... last: ${currentFileForDiagnostics}`);
 
       let src;
@@ -858,7 +867,7 @@ for (const dirName of EXTRA_TEST_DIRS) {
   if (!fs.existsSync(dir)) continue;
   for (const file of walk(dir)) {
     if (/\.(test|spec)\.[mc]?[jt]s$/.test(file)) {
-      testRels.add(path.relative(ROOT, file).replace(/\\/g, '/'));
+      testRels.add(path.relative(relativeRoot, file).replace(/\\/g, '/'));
     }
   }
 }
@@ -1134,6 +1143,8 @@ const gateStats = {
 
 const manifest = {
   mode: 'fast-ast', createdAt: new Date().toISOString(), repoRoot: ROOT,
+  snapshotSourceRoot: SNAPSHOT_SOURCE_ROOT,
+  workspaceRevision: SNAPSHOT_WORKSPACE_REVISION,
   fileCount: files.length, routeCount, componentCount, apiCount,
   dbTableMentions: dbTableCount, todoCount, dirCount: dirRows.length,
   qdrantUpserted: false,
@@ -1157,6 +1168,8 @@ const topologyHash = createHash('sha256')
 const provenance = {
   runId: RUN_ID,
   scope: scanRoot,
+  snapshotSourceRoot: SNAPSHOT_SOURCE_ROOT,
+  workspaceRevision: SNAPSHOT_WORKSPACE_REVISION,
   isCanonicalScope: IS_CANONICAL_SCOPE,
   published: PUBLISH_CANONICAL,
   fileCount: files.length,

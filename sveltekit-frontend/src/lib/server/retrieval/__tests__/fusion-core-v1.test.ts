@@ -16,6 +16,7 @@ import {
   projectRrfLanesToContributions,
 } from '../fusion-contribution-adapters.js';
 import { fuseContributionsV1, FUSION_CORE_RRF_K } from '../fusion-core-v1.js';
+import { hasCompleteFusionIdentityEnvelope } from '../fusion-contribution-v1.js';
 
 function makeCandidate(overrides: Partial<Candidate> & Pick<Candidate, 'id' | 'packetKey' | 'sourceRef'>): Candidate {
   return {
@@ -28,6 +29,23 @@ function makeCandidate(overrides: Partial<Candidate> & Pick<Candidate, 'id' | 'p
 }
 
 describe('RF7-05 FusionCoreV1 — differential proof, not yet wired into production callers', () => {
+  it('requires revision-qualified identity before a contribution can be admitted', () => {
+    const [contribution] = projectSearchRuntimeCandidatesToContributions([
+      makeCandidate({ id: 'p1', packetKey: 'p1', sourceRef: 'src/p1.ts' }),
+    ]);
+    expect(hasCompleteFusionIdentityEnvelope(contribution.identityEnvelope)).toBe(false);
+    expect(hasCompleteFusionIdentityEnvelope({
+      canonicalId: 'p1',
+      packetKey: 'p1',
+      sourceRef: 'src/p1.ts',
+      sourceRevision: 'sha256:source',
+      workspaceRevision: 'sha256:workspace',
+      representationId: 'semantic_768',
+      representationRevision: 'semantic_768:v1',
+      identityResolutionSource: 'packet_key',
+    })).toBe(true);
+  });
+
   it('k defaults to the literature-standard 60, matching both existing callers', () => {
     expect(FUSION_CORE_RRF_K).toBe(60);
   });

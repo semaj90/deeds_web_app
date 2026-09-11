@@ -20,7 +20,15 @@
 
 import { z } from 'zod';
 import { publicProcedure, router } from '../init.js';
-import { createAstChunkOperationRequestV1, executeAtlasOperationV1 } from '$lib/server/atlas/operations/atlas-operation-runtime-v1.js';
+import { createAstChunkOperationRequestV1, executeAtlasOperationV1, type AstChunkOperationResultV1 } from '$lib/server/atlas/operations/atlas-operation-runtime-v1.js';
+
+function isAstChunkResult(value: unknown): value is AstChunkOperationResultV1 {
+	return (
+		value !== null &&
+		typeof value === 'object' &&
+		(value as Record<string, unknown>)['provider'] === 'treesitter-chunker-8095'
+	);
+}
 
 const AstChunkInputSchema = z.object({
   sourceRef: z.string().min(1),
@@ -69,12 +77,13 @@ export const astSidecarRouter = router({
         language: input.language,
         source: input.source,
       }, crypto.randomUUID()));
+      const astPayload = isAstChunkResult(operation.payload) ? operation.payload : null;
       return AstChunkOutputSchema.parse({
         provider: 'treesitter-chunker-8095',
-        status: operation.payload?.status ?? 'FAILED',
-        chunks: operation.payload?.chunks ?? [],
-        diagnostics: operation.payload?.diagnostics ?? [operation.errorMessage].filter(Boolean),
-        errorTag: operation.payload?.errorTag ?? operation.errorCode ?? null,
+        status: astPayload?.status ?? 'FAILED',
+        chunks: astPayload?.chunks ?? [],
+        diagnostics: astPayload?.diagnostics ?? [operation.errorMessage].filter(Boolean),
+        errorTag: astPayload?.errorTag ?? operation.errorCode ?? null,
       });
     }),
 });

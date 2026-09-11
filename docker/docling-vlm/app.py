@@ -2,7 +2,7 @@
 Docling + VLM FastAPI Service
 Exposes HTTP endpoints for document analysis, audio transcription, and vision tasks.
 
-Pipeline: YOLO detection → Gemma4 VLM OCR → Granite Docling chunking → Qdrant embedding
+Pipeline: YOLO detection → Ornith llama.cpp VLM OCR → Granite Docling chunking → Qdrant embedding
 """
 
 import asyncio
@@ -26,8 +26,9 @@ from PIL import Image
 from pydantic import BaseModel
 
 # ── Config from env ───────────────────────────────────────────────────────────
-OLLAMA_BASE_URL = os.environ.get("OLLAMA_BASE_URL", "http://host.docker.internal:11434")
-VLM_MODEL = os.environ.get("VLM_MODEL", "gemma4:e4b")
+LLAMA_SERVER_URL = os.environ.get("LLAMA_SERVER_URL", "http://host.docker.internal:8090").rstrip("/")
+VLM_MODEL = os.environ.get("VLM_MODEL", "ornith-1.5-9b")
+ORNITH_MMPROJ_PATH = os.environ.get("ORNITH_MMPROJ_PATH", "")
 # Primary GPU model — set to /models/yolov8x.pt for the full 131MB model
 YOLO_MODEL_PATH = os.environ.get("YOLO_MODEL_PATH", "yolov8x.pt")
 # CPU fallback — nano stays as TurboQuant / ONNX fallback path
@@ -43,9 +44,17 @@ yolo_model = None
 yolo_model_name = None  # tracks which model is loaded
 
 
+def _resolve_vlm_model(requested: str = "") -> str:
+    """Keep the active VLM owner on Ornith; reject legacy Gemma/Ollama names."""
+    candidate = (requested or VLM_MODEL).strip()
+    if not candidate.lower().startswith("ornith-"):
+        raise ValueError("VLM_MODEL_MUST_BE_ORNITH")
+    return candidate
+
+
 app = FastAPI(
     title="Docling + VLM Service",
-    description="Document analysis, audio transcription, and Gemma4 VLM OCR",
+    description="Document analysis, audio transcription, and Ornith VLM OCR",
     version="2.0.0",
 )
 
@@ -257,76 +266,82 @@ def _image_bytes_to_b64(image_bytes: bytes) -> str:
     return base64.b64encode(buf.getvalue()).decode("utf-8")
 
 
-def _call_ollama_vlm_sync(
+def _call_ornith_vlm_sync(
     prompt: str,
     image_b64: str,
     model: str = VLM_MODEL,
 ) -> dict:
     """
-    Call Ollama /api/chat with image in streaming mode.
+    Call llama.cpp's OpenAI-compatible multimodal endpoint.
     Returns { text, model, tokens }.
     """
     payload = {
         "model": model,
-        "messages": [{"role": "user", "content": prompt, "images": [image_b64]}],
-        "stream": True,
-        "options": {"num_ctx": OCR_NUM_CTX, "temperature": OCR_TEMPERATURE},
+        "messages": [{"role": "user", "content": [
+            {"type": "text", "text": prompt},
+            {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{image_b64}"}},
+        ]}],
+        "stream": False,
+        "temperature": OCR_TEMPERATURE,
+        "max_tokens": OCR_NUM_CTX,
     }
 
     resp = requests.post(
-        f"{OLLAMA_BASE_URL}/api/chat",
+        f"{LLAMA_SERVER_URL}/v1/chat/completions",
         json=payload,
-        timeout=(30, None),
-        stream=True,
+        timeout=(30, 180),
     )
     resp.raise_for_status()
-
-    chunks = []
-    last_chunk: dict = {}
-    for line in resp.iter_lines(decode_unicode=True):
-        if not line:
-            continue
-        data = json.loads(line)
-        token = data.get("message", {}).get("content", "")
-        if token:
-            chunks.append(token)
-        if data.get("done"):
-            last_chunk = data
+    data = resp.json()
+    message = data.get("choices", [{}])[0].get("message", {})
+    content = message.get("content", "")
+    if isinstance(content, list):
+        content = "".join(part.get("text", "") for part in content if isinstance(part, dict))
 
     return {
-        "text": "".join(chunks),
-        "model": last_chunk.get("model", model),
-        "tokens": last_chunk.get("eval_count", 0),
+        "text": content,
+        "model": data.get("model", model),
+        "tokens": data.get("usage", {}).get("completion_tokens", 0),
     }
 
 
-async def _call_ollama_vlm_stream(
+async def _call_ornith_vlm_stream(
     prompt: str,
     image_b64: str,
     model: str = VLM_MODEL,
 ) -> AsyncGenerator[str, None]:
     """
-    Async generator — yields SSE lines from Ollama VLM (streaming).
+    Async generator — converts llama.cpp OpenAI SSE chunks to the service SSE shape.
     Each line: `data: {"token": "...", "done": false}\n\n`
     """
     payload = {
         "model": model,
-        "messages": [{"role": "user", "content": prompt, "images": [image_b64]}],
+        "messages": [{"role": "user", "content": [
+            {"type": "text", "text": prompt},
+            {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{image_b64}"}},
+        ]}],
         "stream": True,
-        "options": {"num_ctx": OCR_NUM_CTX, "temperature": OCR_TEMPERATURE},
+        "temperature": OCR_TEMPERATURE,
+        "max_tokens": OCR_NUM_CTX,
     }
 
     async with httpx.AsyncClient(timeout=httpx.Timeout(30.0, read=None)) as client:
         async with client.stream(
-            "POST", f"{OLLAMA_BASE_URL}/api/chat", json=payload
+            "POST", f"{LLAMA_SERVER_URL}/v1/chat/completions", json=payload
         ) as resp:
             resp.raise_for_status()
             async for line in resp.aiter_lines():
                 if not line.strip():
                     continue
                 data = json.loads(line)
-                token = data.get("message", {}).get("content", "")
-                done = data.get("done", False)
+                if line.startswith("data:"):
+                    line = line[5:].strip()
+                if line == "[DONE]":
+                    yield f"data: {json.dumps({'token': '', 'done': True})}\n\n"
+                    break
+                data = json.loads(line)
+                token = data.get("choices", [{}])[0].get("delta", {}).get("content", "")
+                done = False
                 yield f"data: {json.dumps({'token': token, 'done': done})}\n\n"
                 if done:
                     break
@@ -335,7 +350,7 @@ async def _call_ollama_vlm_stream(
 def _detect_doc_type(image_b64: str, model: str = VLM_MODEL) -> str:
     """Auto-detect document category via one-shot VLM classification."""
     try:
-        result = _call_ollama_vlm_sync(_AUTO_DETECT_PROMPT, image_b64, model=model)
+        result = _call_ornith_vlm_sync(_AUTO_DETECT_PROMPT, image_b64, model=model)
         detected = result["text"].strip().lower()
         for cat in _OCR_PROMPTS:
             if cat in detected:
@@ -350,10 +365,13 @@ def _detect_doc_type(image_b64: str, model: str = VLM_MODEL) -> str:
 @app.get("/health", response_model=HealthResponse)
 async def health_check():
     """Check service health and available models."""
-    ollama_ok = False
+    vlm_ok = False
+    vlm_vision = False
     try:
-        r = requests.get(f"{OLLAMA_BASE_URL}/api/tags", timeout=3)
-        ollama_ok = r.status_code == 200
+        r = requests.get(f"{LLAMA_SERVER_URL}/props", timeout=3)
+        props = r.json() if r.ok else {}
+        vlm_ok = r.ok
+        vlm_vision = props.get("modalities", {}).get("vision", False) is True
     except Exception:
         pass
 
@@ -363,14 +381,17 @@ async def health_check():
             "docling": get_docling_parser() is not None,
             "whisper": get_whisper_model() is not None,
             "yolo": get_yolo_model() is not None,
-            "vlm_ocr": ollama_ok,
+            "vlm_ocr": vlm_ok and vlm_vision,
         },
         config={
             "vlm_model": VLM_MODEL,
             "yolo_model_active": yolo_model_name or "not_loaded",
             "yolo_model_gpu": YOLO_MODEL_PATH,
             "yolo_model_cpu_fallback": YOLO_CPU_FALLBACK_PATH,
-            "ollama_url": OLLAMA_BASE_URL,
+            "vlm_provider": "llama.cpp",
+            "vlm_url": f"{LLAMA_SERVER_URL}/v1",
+            "vlm_vision": vlm_vision,
+            "ornith_mmproj_path": ORNITH_MMPROJ_PATH or "not_declared",
         },
     )
 
@@ -527,16 +548,16 @@ async def ocr_vlm(
     model: str = Form(default=""),
 ):
     """
-    VLM-powered OCR using Gemma4 via Ollama.
+    VLM-powered OCR using Ornith via llama.cpp.
 
     doc_type options: auto, general, table, handwriting, scan, legal
-    model: override VLM_MODEL env (default: gemma4:e4b)
+    model: optional Ornith model override; non-Ornith models are rejected.
 
     Optimal for: handwritten deeds, scanned court filings, mixed tables.
-    Falls back gracefully when Ollama is unavailable.
+    Fails closed when the revision-qualified Ornith VLM is unavailable.
     """
     start_time = time.time()
-    effective_model = model.strip() or VLM_MODEL
+    effective_model = _resolve_vlm_model(model)
 
     content = await file.read()
 
@@ -554,7 +575,7 @@ async def ocr_vlm(
         prompt = _OCR_PROMPTS.get(doc_type, _OCR_PROMPTS["general"])
 
         result = await asyncio.get_event_loop().run_in_executor(
-            None, _call_ollama_vlm_sync, prompt, image_b64, effective_model
+            None, _call_ornith_vlm_sync, prompt, image_b64, effective_model
         )
 
         return VLMOCRResult(
@@ -568,7 +589,7 @@ async def ocr_vlm(
     except requests.exceptions.ConnectionError:
         raise HTTPException(
             status_code=503,
-            detail=f"Cannot reach Ollama at {OLLAMA_BASE_URL}. Is it running?",
+            detail=f"Cannot reach Ornith llama.cpp at {LLAMA_SERVER_URL}. Is the VLM server running with its projector?",
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"VLM OCR failed: {e}")
@@ -588,7 +609,7 @@ async def ocr_vlm_stream(
 
     Use for long documents where you want incremental display.
     """
-    effective_model = model.strip() or VLM_MODEL
+    effective_model = _resolve_vlm_model(model)
     content = await file.read()
 
     try:
@@ -604,7 +625,7 @@ async def ocr_vlm_stream(
         prompt = _OCR_PROMPTS.get(doc_type, _OCR_PROMPTS["general"])
 
         return StreamingResponse(
-            _call_ollama_vlm_stream(prompt, image_b64, effective_model),
+            _call_ornith_vlm_stream(prompt, image_b64, effective_model),
             media_type="text/event-stream",
             headers={
                 "Cache-Control": "no-cache",
@@ -625,16 +646,16 @@ async def ocr_yolo_vlm(
     model: str = Form(default=""),
 ):
     """
-    Two-stage pipeline: YOLO region detection → Gemma4 VLM OCR per region.
+    Two-stage pipeline: YOLO region detection → Ornith VLM OCR per region.
 
     1. YOLO finds regions of interest (text blocks, tables, stamps)
-    2. Each region is cropped and sent to Gemma4 VLM for precise OCR
+    2. Each region is cropped and sent to Ornith VLM for precise OCR
     3. Results are merged in spatial order (top-left → bottom-right)
 
     Best for: complex documents with mixed layouts (evidence packets, court filings).
     """
     start_time = time.time()
-    effective_model = model.strip() or VLM_MODEL
+    effective_model = _resolve_vlm_model(model)
 
     yolo = get_yolo_model()
     content = await file.read()
@@ -650,7 +671,7 @@ async def ocr_yolo_vlm(
             )
         prompt = _OCR_PROMPTS.get(doc_type, _OCR_PROMPTS["general"])
         result = await asyncio.get_event_loop().run_in_executor(
-            None, _call_ollama_vlm_sync, prompt, image_b64, effective_model
+            None, _call_ornith_vlm_sync, prompt, image_b64, effective_model
         )
         return {
             "text": result["text"],
@@ -709,7 +730,7 @@ async def ocr_yolo_vlm(
 
         try:
             ocr_result = await asyncio.get_event_loop().run_in_executor(
-                None, _call_ollama_vlm_sync, prompt, region_b64, effective_model
+                None, _call_ornith_vlm_sync, prompt, region_b64, effective_model
             )
             region_texts.append(ocr_result["text"].strip())
             total_tokens += ocr_result["tokens"]

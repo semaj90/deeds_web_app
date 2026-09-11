@@ -33,7 +33,7 @@
 # ── Base: PyTorch 2.11.0 + CUDA 12.6 + cuDNN 9 ────────────────────────────────
 # Official PyTorch devel image ships NVCC, cuBLAS, cuSPARSE, cuDNN, NCCL.
 # Pulls ~11.9 GB; pin a digest in CI for reproducibility.
-FROM pytorch/pytorch:2.11.0-cuda12.6-cudnn9-devel
+FROM pytorch/pytorch:2.11.0-cuda12.6-cudnn9-devel@sha256:46e4c2def3ea95fd217922c68838ee0e6610892676c5d78a19b217c8e6adc7f9
 
 # ── Target architecture: RTX 3060 Ti (Ampere sm_86) ───────────────────────────
 # TORCH_CUDA_ARCH_LIST restricts kernel compilation to sm_86 only — avoids
@@ -80,7 +80,15 @@ RUN git clone --depth 1 --branch v3.7.0 \
     https://github.com/NVIDIA/cutlass.git /opt/cutlass
 
 # ── Python ML dependencies ─────────────────────────────────────────────────────
-RUN pip install --upgrade pip setuptools wheel
+# Keep build tooling aligned with the pinned NLP/runtime images. Application
+# libraries below remain image-specific because their CUDA ABI constraints differ.
+ARG PIP_VERSION=26.2.1
+ARG SETUPTOOLS_VERSION=81.0.0
+ARG WHEEL_VERSION=0.48.0
+RUN pip install --upgrade \
+    pip==${PIP_VERSION} \
+    setuptools==${SETUPTOOLS_VERSION} \
+    wheel==${WHEEL_VERSION}
 
 # torchvision + torchaudio: pinned to PyTorch 2.11.0 + CUDA 12.6
 RUN pip install \

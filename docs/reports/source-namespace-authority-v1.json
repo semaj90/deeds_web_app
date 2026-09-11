@@ -1,7 +1,7 @@
 {
   "schema": "atlas.source-namespace-authority.v1",
   "gate": "SOURCE-REGISTRY-OWNER-JOIN-01",
-  "generatedAt": "2026-09-05T21:11:38.115Z",
+  "generatedAt": "2026-09-10T17:49:08.572Z",
   "mode": "READ_ONLY",
   "authorityOwner": "SourceNamespaceV1 + Atlas repositoryId contract",
   "canonicalRepositoryId": "deeds-web-app",
@@ -416,5 +416,5 @@
     "docs/reports/source-registry-owner-join-v1.json",
     "docs/reports/pkt-lineage-08-bounded-snapshot-v1.json"
   ],
-  "receiptChecksum": "sha256:04abf48cd8faf58036949a896e31aded57fe9f01067e5d9fd8cda7ea0c64844d"
+  "receiptChecksum": "sha256:d96f3468b3b02d3a0c919f88ccf801d228e8b37d48c4c5d2d6b493fa3ea0157f"
 }
