@@ -136,7 +136,7 @@ async function verifyQdrantEnrichment() {
   console.log('\n✅ Verification Gate:');
   try {
     const points = await queryQdrantByFilter({
-      must: [{ key: 'pagerank_score', is_empty: false }]
+      must_not: [{ is_empty: { key: 'pagerank_score' } }]
     }, 1);
 
     if (points.length > 0) {
