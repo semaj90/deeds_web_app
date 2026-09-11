@@ -1,42 +1,46 @@
 /**
  * CrossEncoder Rerank Orchestrator
- * Orchestrates multi-stage reranking: Semantic → TurboVec → CrossEncoder
  *
- * Phase C: Post-XGBoost stage, optional acceleration lane
- * Integrates gracefully: if sidecar unavailable, falls back to TurboVec-only reranking
- *
- * Signal blend: semantic 0.35 + topology 0.25 + latent 0.15 + glyph 0.10 + crossencoder 0.15
+ * The package owns CrossEncoder refinement only. The base retrieval/reranking
+ * stage is injected by the application so this package does not duplicate the
+ * live TurboVec/SearchRuntime owner.
  */
 
-import type { QdrantHit } from '../turbovec/turbovec-rerank.js';
-import type { RerankOptions, RerankResult } from '../turbovec/turbovec-rerank.js';
-import { turbovecRerank } from '../turbovec/turbovec-rerank.js';
+import type { BaseReranker, QdrantHit, RerankOptions, RerankResult } from './retrieval-contract.js';
 import { applyReranking, blendCrossEncoderScore } from './crossencoder-client.js';
 
 export interface CrossEncoderRerankOptions extends RerankOptions {
-  /** Enable CrossEncoder reranking (default true if sidecar available) */
+  /** Application-owned base reranker (for Parent Atlas today, adapt the live TurboVec owner). */
+  baseReranker?: BaseReranker;
+  /** Enable CrossEncoder refinement after the base reranker. */
   enableCrossEncoder?: boolean;
-  /** CrossEncoder weight in final blend (default 0.15) */
+  /** CrossEncoder weight in final blend (default 0.15). */
   crossencoderWeight?: number;
 }
 
 export interface CrossEncoderRerankResult extends RerankResult {
-  /** Indicates whether CrossEncoder was applied */
   crossencoderApplied?: boolean;
-  /** CrossEncoder latency if applied */
   crossencoderLatencyMs?: number;
+  baseRerankerApplied?: boolean;
 }
 
-/**
- * Orchestrate multi-stage reranking with CrossEncoder fallback
- *
- * Flow:
- * 1. Apply TurboVec reranking (semantic + topology + latent + glyph signals)
- * 2. Optionally apply CrossEncoder as 5th signal (if sidecar available)
- * 3. Return final ranking with trace
- *
- * Graceful fallback: if sidecar unavailable, returns TurboVec-only results
- */
+async function runBaseReranker(options: CrossEncoderRerankOptions): Promise<RerankResult> {
+  if (!options.baseReranker) {
+    return {
+      ok: true,
+      hits: [...options.hits],
+      latencyMs: 0,
+      trace: {
+        query: options.query,
+        beforeIds: options.hits.map((hit) => String(hit.id)),
+        afterIds: options.hits.map((hit) => String(hit.id)),
+        scoreDeltas: {},
+      },
+    };
+  }
+  return options.baseReranker({ query: options.query, hits: options.hits });
+}
+
 export async function crossencoderRerankOrchestrate(
   options: CrossEncoderRerankOptions
 ): Promise<CrossEncoderRerankResult> {
@@ -49,52 +53,37 @@ export async function crossencoderRerankOrchestrate(
         ok: true,
         hits: [],
         latencyMs: Math.round(performance.now() - t0),
-        crossencoderApplied: false
+        crossencoderApplied: false,
+        baseRerankerApplied: Boolean(options.baseReranker),
       };
     }
 
-    // Stage 1: Apply TurboVec reranking (4-signal blend)
-    const turboVecResult = await turbovecRerank(options);
-    if (!turboVecResult.ok) {
+    const baseResult = await runBaseReranker(options);
+    if (!baseResult.ok) {
       return {
-        ...turboVecResult,
-        crossencoderApplied: false
+        ...baseResult,
+        crossencoderApplied: false,
+        baseRerankerApplied: Boolean(options.baseReranker),
       };
     }
 
-    // Stage 2: Optional CrossEncoder reranking (5th signal)
-    let finalHits = turboVecResult.hits;
+    let finalHits = baseResult.hits;
     let ceLatencyMs = 0;
     let ceApplied = false;
 
-    if (enableCrossEncoder && turboVecResult.hits.length > 0) {
+    if (enableCrossEncoder && finalHits.length > 0) {
       const ceStart = performance.now();
-      const ceHitsWithScores = turboVecResult.hits as (QdrantHit & { crossencoder_score?: number })[];
-
-      // Apply CrossEncoder
-      const reranked = await applyReranking(query, ceHitsWithScores);
+      const hitsWithScores = finalHits as (QdrantHit & { crossencoder_score?: number })[];
+      const reranked = await applyReranking(query, hitsWithScores);
 
       if (reranked && reranked.length > 0) {
         ceApplied = true;
         ceLatencyMs = Math.round(performance.now() - ceStart);
-
-        // Blend CrossEncoder score with existing (already blended) score
-        // Recalibrate: CE is a refinement on top of TurboVec blend
         finalHits = reranked
-          .map((hit) => {
-            // Adjust semantic score to incorporate CE signal
-            // TurboVec already blended 4 signals into hit.score
-            // We now add CE as a refinement (0.15 weight)
-            const refined = blendCrossEncoderScore(
-              { ...hit, score: hit.score },
-              crossencoderWeight
-            );
-
-            return {
-              ...hit,
-              score: refined
-            };
-          })
+          .map((hit) => ({
+            ...hit,
+            score: blendCrossEncoderScore({ ...hit, score: hit.score }, crossencoderWeight),
+          }))
           .sort((a, b) => b.score - a.score);
       }
     }
@@ -105,34 +94,35 @@ export async function crossencoderRerankOrchestrate(
       latencyMs: Math.round(performance.now() - t0),
       crossencoderApplied: ceApplied,
       crossencoderLatencyMs: ceApplied ? ceLatencyMs : undefined,
+      baseRerankerApplied: Boolean(options.baseReranker),
       trace: {
         query,
-        beforeIds: turboVecResult.hits.map((h) => String(h.id)),
-        afterIds: finalHits.map((h) => String(h.id)),
-        scoreDeltas: {} // TODO: populate if needed
-      }
+        beforeIds: hits.map((hit) => String(hit.id)),
+        afterIds: finalHits.map((hit) => String(hit.id)),
+        scoreDeltas: {},
+      },
     };
-  } catch (err: any) {
+  } catch (err: unknown) {
     return {
       ok: false,
       hits: [],
       latencyMs: Math.round(performance.now() - t0),
       crossencoderApplied: false,
-      error: err?.message || String(err)
+      baseRerankerApplied: Boolean(options.baseReranker),
+      error: err instanceof Error ? err.message : String(err),
     };
   }
 }
 
 /**
- * Disable CrossEncoder gracefully (fallback mode)
- * Returns TurboVec reranking only
+ * Explicit fallback mode: run only the injected base reranker. If none is
+ * supplied, preserve the incoming order unchanged.
  */
 export async function turboVecRerankWithCEFallback(
   options: CrossEncoderRerankOptions
 ): Promise<CrossEncoderRerankResult> {
-  // Simply call orchestrator with CE disabled
   return crossencoderRerankOrchestrate({
     ...options,
-    enableCrossEncoder: false
+    enableCrossEncoder: false,
   });
 }
