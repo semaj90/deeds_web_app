@@ -11891,6 +11891,21 @@ Status: `SOURCE_REF_VOCABULARY_GUARD_AND_RECAPTURE_PROVEN`; authority=false;
 writesPerformed=false. First blocker remains `CURRENT_CHUNK_EXACT_MATCH_MISSING`
 for the historical execution. The guard does not rewrite that execution.
 
+## SOURCE-REF-NAMESPACE-RECONCILIATION-RECHECK-01 — 2026-09-11
+
+- [x] Re-ran the read-only namespace reconciliation after the physical-path
+      guard and fresh snapshot capture.
+- [x] Confirmed no current exact joins yet: `EXACT_CURRENT=0`.
+- [x] Preserved mismatch classes as evidence: `204` truncated hashes,
+      `887` chunk hash mismatches, `32` Graphify hash mismatches, and
+      `15,444` missing PostgreSQL chunks.
+- [ ] Do not promote semantic, graph, or projection lanes until a current
+      source-to-packet-to-chunk producer and exact readback exist.
+
+Evidence: `docs/reports/source-ref-namespace-reconciliation-v1.json`.
+Status: `CURRENT_SOURCE_PACKET_CHUNK_JOIN_UNPROVEN`; authority=false;
+writesPerformed=false. First blocker: `SOURCE_BINDING_RECONCILIATION_REQUIRED`.
+
 ### ROUTING-OWNER-COMPARISON-RECHECK-01 — 2026-09-11
 
 - [x] Confirmed the existing production MCP caller remains bounded and
