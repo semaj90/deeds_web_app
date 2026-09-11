@@ -11516,6 +11516,24 @@ Status: `IMPLEMENTED_NOT_LIVE_PROVEN`; authority=false;
 writesPerformed=false in this turn.
 First blocker remains `NO_TERMINAL_EXECUTION_MATCHES_ADMITTED_SNAPSHOT`.
 
+### GRAPHIFY-TOURNAMENT-ADMISSION-AUDIT-CURRENTNESS-01 — 2026-09-11
+
+- [x] Updated the read-only tournament audit to consume the current admission
+      receipt when one is admitted, rather than treating the historical source
+      selection plan as current authority.
+- [x] Verified the admitted revision `sha256:3e677c...` against its derivation:
+      workspace revision, snapshot revision, source count, and repository count
+      all agree.
+- [x] Audit result: `TOURNAMENT_ADMISSION_BOUNDARY_PROVEN`; tournament plan
+      acceptance is true, while Graphify execution and projection writes remain
+      separately unauthorized.
+
+Evidence: `scripts/atlas/audit-graphify-tournament-admission-v1.mts` and
+`docs/reports/graphify-tournament-admission-v1.json`.
+Status: `TOURNAMENT_ADMISSION_BOUNDARY_PROVEN`; authority=true for the admitted
+workspace only; graphifyExecutionAuthorized=false; projectionWritesAuthorized=false.
+First blocker: `GRAPHIFY_EXECUTION_AUTHORIZATION_REQUIRED`.
+
 ### PROMOTION-GATE-RECEIPT-CURRENTNESS-01 — 2026-09-11
 
 - [x] Added the read-only receipt-currentness compiler at

@@ -1,12 +1,12 @@
 {
   "schema": "atlas.graphify-tournament-admission.v1",
-  "generatedAt": "2026-09-10T03:40:51.753Z",
+  "generatedAt": "2026-09-11T14:40:59.010Z",
   "mode": "READ_ONLY",
   "status": "TOURNAMENT_ADMISSION_BOUNDARY_PROVEN",
-  "proofLevel": "CONTRACT_PROVEN",
-  "authority": false,
-  "workspaceRevision": null,
-  "workspaceRevisionCandidate": "sha256:d521f7f10b4918a7c83b82cdc123cb31c039720d03df8e15348e9dcc1b0cdeb7",
+  "proofLevel": "BOUNDED_LIVE_PROVEN",
+  "authority": true,
+  "workspaceRevision": "sha256:3e677c29319a4a60bc60803be4186ba108dce906945af593a3a6f5cf43d11881",
+  "workspaceRevisionCandidate": "sha256:3e677c29319a4a60bc60803be4186ba108dce906945af593a3a6f5cf43d11881",
   "writesPerformed": false,
   "datastoreWritesPerformed": false,
   "sourceSelectionPlan": {
@@ -17,12 +17,22 @@
     "sourceCount": 25266,
     "sourceSelectionChecksum": "sha256:8f279291047a8ba9ccb47b0f499c04396481cca4f9f09ab1ca70874fb42dc1b7"
   },
+  "admissionReceipt": {
+    "path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\workspace-revision-tournament-admission-v1.json",
+    "status": "WORKSPACE_REVISION_TOURNAMENT_ADMITTED",
+    "workspaceRevision": "sha256:3e677c29319a4a60bc60803be4186ba108dce906945af593a3a6f5cf43d11881",
+    "snapshotRevision": "sha256:48e1dbb326a4e249dc550cf1df06da8ec82ca4a837dd93eca114e4bafb2747e8",
+    "sourceCount": 25291,
+    "repositoryCount": 7,
+    "graphifyExecutionAuthorized": false,
+    "projectionWritesAuthorized": false
+  },
   "workspaceRevisionDerivation": {
     "path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\workspace-revision-from-sealed-multi-repo-snapshot-v1.json",
     "status": "WORKSPACE_REVISION_CANDIDATE_READY_FOR_ADMISSION",
-    "snapshotRevision": "sha256:ea55977b06a465969fda405ee5ef1aa72396dd254a5176076b316e6ebaab01e4",
-    "workspaceRevisionCandidate": "sha256:d521f7f10b4918a7c83b82cdc123cb31c039720d03df8e15348e9dcc1b0cdeb7",
-    "sourceCount": 25266,
+    "snapshotRevision": "sha256:48e1dbb326a4e249dc550cf1df06da8ec82ca4a837dd93eca114e4bafb2747e8",
+    "workspaceRevisionCandidate": "sha256:3e677c29319a4a60bc60803be4186ba108dce906945af593a3a6f5cf43d11881",
+    "sourceCount": 25291,
     "repositoryCount": 7
   },
   "tournamentContract": {
@@ -34,11 +44,11 @@
   },
   "compatibility": {
     "planRevisionNull": true,
-    "tournamentCanAcceptPlan": false,
-    "reason": "Existing tournament request schema requires a non-null workspaceRevision; null is preserved until source-authority admission."
+    "tournamentCanAcceptPlan": true,
+    "reason": "Current admission receipt binds the tournament workspace revision; Graphify execution remains separately gated."
   },
   "blockers": [],
   "firstBlockingInvariant": "TOURNAMENT_REQUIRES_BOUND_WORKSPACE_REVISION",
-  "nextGate": "WORKSPACE-REVISION-TOURNAMENT-SOURCE-AUTHORITY-01",
+  "nextGate": "AUTHORIZE-GRAPHIFY-POST-PHASE16-TERMINAL-RUN-01",
   "safeNextCommand": "npm run atlas:graphify:source-selection:plan"
 }
