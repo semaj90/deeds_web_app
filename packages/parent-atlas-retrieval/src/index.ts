@@ -4,7 +4,9 @@
 // - this package owns Bifrost support contracts, CrossEncoder client/contracts,
 //   and GPU/SIMD bridges;
 // - live TurboVec/Qdrant/SearchRuntime execution remains application-owned in
-//   SvelteKit and is injected at integration boundaries rather than duplicated.
+//   SvelteKit and is injected at integration boundaries rather than duplicated;
+// - native addon discovery remains inside the GPU/SIMD bridge implementations
+//   and is not represented as a package-owned binary artifact.
 
 // Bifrost tracing/provider surface. Cache ownership remains non-canonical.
 export { bifrost } from './bifrost/bifrost-provider.js';
@@ -68,6 +70,3 @@ export { batchCosineSimilarity, clusterEmbeddings, attentionScoreChunks, getCuda
 export { fastJsonParse, isSimdJsonAvailable, utf8ByteLength } from './gpu/simdjson-bridge.js';
 export { submitCudaCompute, getCudaDeviceInfo } from './gpu/cuda-bridge.js';
 export type { CudaComputeRequest, CudaComputeResult } from './gpu/cuda-bridge.js';
-
-// Export native addon path for manual loading.
-export const NATIVE_ADDON_PATH = new URL('../native/tensorrt_bridge.node', import.meta.url).pathname;
