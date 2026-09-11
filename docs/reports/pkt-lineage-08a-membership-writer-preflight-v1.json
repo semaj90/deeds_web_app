@@ -1,7 +1,7 @@
 {
   "schema": "atlas.pkt-lineage-08a-membership-writer-preflight.v1",
   "gate": "PKT-LINEAGE-08A-MEMBERSHIP-WRITER-PREFLIGHT-01",
-  "generatedAt": "2026-09-06T00:20:42.136Z",
+  "generatedAt": "2026-09-11T14:26:44.605Z",
   "mode": "READ_ONLY",
   "sourceSnapshot": "docs/reports/pkt-lineage-08-bounded-snapshot-v1.json",
   "sourceSetChecksum": "sha256:9ecefaf496c73c0a630d0d7214cd5bdbc864f8a75c796e88ef0360e5567048c7",
@@ -44,5 +44,5 @@
   "outOfScope": [],
   "namespaceMismatches": [],
   "namespaceAuthorityReceipt": "docs/reports/source-namespace-authority-v1.json",
-  "receiptChecksum": "sha256:1d7501f57ea0a0920b797312789e6de064f5a907f680c0e1d71f3126c7b1607b"
+  "receiptChecksum": "sha256:17bee85f428269a0eac912cb121026e1ac4d589dcdeb7acc02990894626c4298"
 }

@@ -11968,6 +11968,20 @@ Status: `CHUNK_PREIMAGE_PROVEN_BOUNDED`; authority=false;
 writesPerformed=false. First blocker remains
 `CURRENT_SOURCE_PACKET_CHUNK_JOIN_UNPROVEN` for the full current cohort.
 
+### PKT-LINEAGE-08A-MEMBERSHIP-WRITER-PREFLIGHT-RECHECK-01 — 2026-09-11
+
+- [x] Re-ran the bounded membership-writer preflight in read-only mode.
+- [x] Existing 50-source / 434-chunk cohort is exactly applied: `434/434`
+      memberships, zero missing, zero conflicts.
+- [x] Namespace authority is proven for this bounded cohort.
+- [ ] Do not generalize this result to the current 25,291-source snapshot or
+      execute a broad writer/backfill.
+
+Evidence: `docs/reports/pkt-lineage-08a-membership-writer-preflight-v1.json`.
+Status: `ALREADY_APPLIED_EXACT_BOUNDED`; authority=false for the full cohort;
+writesPerformed=false. First blocker remains
+`CURRENT_SOURCE_PACKET_CHUNK_JOIN_UNPROVEN` for current full-workspace data.
+
 ### TERMINAL-RUN-SCOPE-GUARD-01 — 2026-09-10
 
 - [x] Prevented the terminal authorization path from selecting the broad
