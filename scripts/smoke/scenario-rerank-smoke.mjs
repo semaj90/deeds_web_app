@@ -2,7 +2,6 @@
 import fetch from 'node-fetch';
 import crypto from 'crypto';
 import fs from 'fs/promises';
-import fsSync from 'fs';
 import { fileURLToPath } from 'node:url';
 
 const QDRANT_URL = process.env.QDRANT_URL || 'http://127.0.0.1:6333';
@@ -27,8 +26,7 @@ async function redisGet(key) {
     const v = await client.get(key);
     await client.disconnect();
     return v;
-  } catch (e) {
-    // Redis not available — treat as cache miss
+  } catch {
     return null;
   }
 }
@@ -40,11 +38,12 @@ function cosine(a, b) {
 }
 
 async function qdrantSearch(vector, limit = 10) {
-  const url = `${QDRANT_URL.replace(/\/$/, '')}/collections/${encodeURIComponent(QDRANT_COLLECTION)}/points/search`;
-  const body = { vector, limit, with_payload: true, with_vector: true };
+  const url = `${QDRANT_URL.replace(/\/$/, '')}/collections/${encodeURIComponent(QDRANT_COLLECTION)}/points/query`;
+  const body = { query: vector, limit, with_payload: true, with_vector: true };
   const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-  if (!res.ok) throw new Error('Qdrant search failed: ' + await res.text());
-  return res.json();
+  if (!res.ok) throw new Error('Qdrant query failed: ' + await res.text());
+  const data = await res.json();
+  return data.result?.points ?? [];
 }
 
 async function main() {
@@ -57,21 +56,19 @@ async function main() {
     return;
   }
 
-  // embed
   let qvec = null;
   if (process.env.EMBED_URL) {
     try {
       const res = await fetch(process.env.EMBED_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ texts: [query] }) });
       const j = await res.json();
       qvec = j.embeddings?.[0] || null;
-    } catch (e) { qvec = null; }
+    } catch { qvec = null; }
   }
   if (!qvec) qvec = pseudoEmbed(query);
 
   const before = await qdrantSearch(qvec, 10);
-  const hits = (before.result || []).map(h => ({ id: String(h.id || h.payload?.content_hash || h.payload?.source_ref || ''), score: h.score ?? 0, payload: h.payload || {}, vector: h.vector || null }));
+  const hits = before.map(h => ({ id: String(h.id || h.payload?.content_hash || h.payload?.source_ref || ''), score: h.score ?? 0, payload: h.payload || {}, vector: h.vector || null }));
 
-  // Rerank using simple cosine (TurboVec placeholder) preserving sourceRefs
   const reranked = hits.map(h => ({ ...h, sim: h.vector ? cosine(qvec, h.vector) : h.score })).sort((a,b)=>b.sim - a.sim);
 
   console.log('=== Before Rerank (top 5) ===');
@@ -79,7 +76,6 @@ async function main() {
   console.log('\n=== After Rerank (top 5) ===');
   reranked.slice(0,5).forEach((h,i)=> console.log(`#${i+1}`, h.payload.source_ref || h.id, 'sim:', h.sim));
 
-  // Emit before/after diff JSON to stdout file for acceptance
   const out = { query, before: hits.slice(0,10), after: reranked.slice(0,10) };
   const outFile = process.env.OUT || '.tmp/scenario_rerank_diff.json';
   await fs.mkdir('.tmp', { recursive: true });
