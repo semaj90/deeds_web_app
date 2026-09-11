@@ -4400,6 +4400,41 @@ missing source revisions, and write-capable tools must continue to fail closed. 
 NLP names or byte spans directly to symbol identity, and do not create a second ACE/registry
 owner.
 
+### MCP-TOOL-VITERBI-PROPOSAL-RECHECK-01 (2026-09-11, PROPOSAL-PROVEN)
+
+Re-ran the revisioned MCP/Viterbi proposal bridge tests. Both bridge versions
+passed (`18/18` tests total). The bridge remains proposal-only: it validates
+server-qualified tool identity and registry revisions, rejects unsafe or
+unknown tools, and performs no MCP calls or durable writes. This proves the
+bounded proposal seam, not live dense tool-manifest coverage or execution.
+
+- [x] `mcp-tool-viterbi-bridge-v1.spec.ts` passed: `5/5`.
+- [x] `mcp-tool-viterbi-bridge-v2.spec.ts` passed: `13/13`.
+- [ ] Keep live execution and promotion blocked until current registry and
+  source/revision evidence are admitted.
+
+Evidence: focused Vitest output and the two bridge test files.
+
+### MCP-TOOL-BOUNDED-CANDIDATE-SHORTLIST-01 (2026-09-11, PARTIAL)
+
+Re-ran `scripts/atlas/runtime-mcp-tool-selector.mjs --audit`. EmbeddingGemma
+retrieval and the revisioned registry fallback both returned bounded tool
+selections, but dense Qdrant coverage remains `0/20` known tool-manifest
+mappings with zero `tool_manifest` packets. The selector now clamps retrieval
+shortlists to at most `20` candidates and reports `requested_top_k`,
+`effective_top_k`, and `candidate_budget=BOUNDED_RETRIEVAL_SHORTLIST`.
+The existing router remains responsible for final top-three selection and FSM
+legality; no new Qdrant producer or execution path was added.
+
+- [x] Preserve the existing revisioned registry fallback.
+- [x] Enforce a maximum 20-tool retrieval shortlist.
+- [x] Verify an excessive `topK=100` request returns at most 20 tools.
+- [ ] Restore/prove dense tool-manifest projection coverage before claiming
+  semantic MCP pickup.
+
+Evidence: `docs/reports/mcp-tool-selection-audit.json` and
+`scripts/atlas/runtime-mcp-tool-selector.mjs`.
+
 ### WORKSPACE-REVISION-AWARE-GRAPHIFY-OPEN-05 (2026-09-03, DRY-RUN ADAPTER CONTRACT — PROVEN)
 
 Added coverage proving that `createGraphifyLifecycleWriterDepsV1` constructs exactly three
@@ -11347,6 +11382,22 @@ Evidence: `docs/reports/rrf-caller-baseline-v1.json`,
 First blockers: `UNMAPPED_RRF_CALLERS`, `IDENTITY_ENVELOPE_PARTIAL`,
 `QDRANT_V2_IDENTITY_PARITY`, and `SOURCE_REVISION_UNKNOWN` respectively.
 
+## RRF-CALLER-BASELINE-RECHECK-2026-09-11
+
+- [x] Re-ran `scripts/atlas/audit-rrf-caller-baseline-v1.mjs` read-only.
+- [x] Current census reports `93` callers, `36` fusion callers, `90`
+      unmapped callers, `0` ambiguous mappings, and `2` executor-as-lane
+      entries.
+- [ ] Keep migration unauthorized until every fusion caller has an explicit
+      logical-lane mapping and executor vote inflation is resolved.
+
+Evidence: `docs/reports/rrf-caller-baseline-v1.json`.
+Status: `CALLER_BASELINE_INCOMPLETE_MIGRATION_BLOCKED`;
+`migrationAuthorized=false`; writesPerformed=false.
+First blocker: `UNMAPPED_RRF_CALLERS`.
+Next gate: classify the 90 unmapped callers and resolve the 2 executor-as-lane
+entries without changing ranking behavior.
+
 ## CORE-LANE-STRUCTURAL-ONTOLOGY-RECHECK-2026-09-10
 
 - [x] Ran packet/chunk lineage promotion preflight: `0` qualified candidates.
@@ -11464,6 +11515,76 @@ Evidence: `scripts/startup/run-graphify-daily-startup.mjs`,
 Status: `IMPLEMENTED_NOT_LIVE_PROVEN`; authority=false;
 writesPerformed=false in this turn.
 First blocker remains `NO_TERMINAL_EXECUTION_MATCHES_ADMITTED_SNAPSHOT`.
+
+### PROMOTION-GATE-RECEIPT-CURRENTNESS-01 — 2026-09-11
+
+- [x] Added the read-only receipt-currentness compiler at
+      `scripts/atlas/audit-promotion-gate-receipt-currentness-v1.mjs` and
+      exposed it as `npm run atlas:promotion:receipt-currentness`.
+- [x] The compiler records receipt checksums, generation metadata, workspace
+      and snapshot revisions, source-cohort references, execution IDs,
+      authority scope, and writes status.
+- [x] It reconciles Graphify execution
+      `14667026-459c-4a99-b3c2-c20b739a6e0d` as valid for its own admitted
+      revision without treating it as proof for a different current cohort.
+- [x] Mixed revision evidence fails closed with
+      `AGGREGATE_MIXED_REVISION_EVIDENCE` and identifies the blocker as
+      aggregate-derived.
+- [x] Added explicit `--workspace-revision=<sha256:...>` selection. Selecting
+      the admitted `sha256:3be7901e...` yields
+      `SELECTED_REVISION_RECONCILED_HISTORICAL_EVIDENCE` while retaining the
+      full mixed-revision set for auditability.
+- [ ] Rerun dependent structural/semantic lineage audits for the selected
+      revision before any promotion decision.
+
+Evidence: `docs/reports/promotion-gate-receipt-currentness-v1.json`.
+Status: `SELECTED_REVISION_RECONCILED_HISTORICAL_EVIDENCE` for the explicit
+admitted revision; aggregate mixed evidence remains visible; authority=false;
+writesPerformed=false except for the derived report.
+First blocker: `GRAPHIFY_EXECUTION_DOES_NOT_PROVE_CURRENT_SOURCE_COHORT`.
+Next gate: rerun dependent lineage audits for the selected revision.
+
+### MASTER-ATLAS-INDEX-HISTORICAL-RECONCILIATION-01 — 2026-09-11
+
+- [x] Reviewed the supplied Master Atlas index generated
+      `2026-07-14T16:55:04.003Z` with `3,424` indexed documents.
+- [x] Classified it as historical design/context evidence, not a current
+      promotion receipt. Its tool counts, model availability, and lane status
+      cannot override revisioned live reports.
+- [x] Reconciled the useful routing design with current owners: existing
+      MCP registry retrieval, CandidateFeatureMatrixV1, FSM/Viterbi proposal
+      bridge, HyperedgeV1, and classifier feature production remain the
+      relevant local surfaces.
+- [ ] Do not treat historical index claims as proof of current source
+      lineage, Qdrant tool-manifest coverage, Graphify execution, or classifier
+      promotion.
+
+Evidence: supplied historical Master Atlas index and current reports
+`docs/reports/mcp-tool-selection-audit.json`,
+`docs/reports/current-repair-candidate-feature-matrix-v1.json`, and
+`docs/reports/domain-classifier-lineage-v1.json`.
+Status: `HISTORICAL_INDEX_RECONCILED`; authority=false;
+writesPerformed=false.
+First blocker: `CURRENT_REVISION_QUALIFIED_EVIDENCE_REQUIRED`.
+Next gate: continue only from current revisioned lane receipts.
+
+### MCP-TOOL-FEATURE-MATRIX-RECHECK-01 — 2026-09-11
+
+- [x] Re-ran the existing bounded CandidateFeatureMatrix proof with
+      `15` candidates.
+- [x] Contract preserved `25` base features plus `24` repair-overlay
+      features (`49` total); overlay presence remained `0`.
+- [x] Deterministic replay was identical and the base feature plane was
+      preserved.
+- [ ] Do not treat the fixture as live tool-routing proof; current semantic
+      tool-manifest projection coverage remains `0/20`.
+
+Evidence: `docs/reports/current-repair-candidate-feature-matrix-v1.json`.
+Status: `REPAIR_CANDIDATE_FEATURE_MATRIX_CONTRACT_PROVEN`;
+authority=false; writesPerformed=false.
+First blocker: `LIVE_TOOL_FEATURES_AND_MANIFEST_COHORT_UNPROVEN`.
+Next gate: current revision-qualified tool-manifest cohort, then live feature
+materialization without changing CandidateFeatureMatrixV1 ownership.
 
 ### SNAPSHOT-NATIVE-TERMINAL-RUN-01 — 2026-09-10
 
@@ -11725,6 +11846,49 @@ First blocker moved to: `SNAPSHOT_BOUND_GRAPHIFY_CANARY_NOT_AUTHORIZED`.
 Next gate: `SNAPSHOT-BOUND-GRAPHIFY-CANARY-01`.
 Next gate: separately authorized snapshot-native terminal Graphify execution,
 then `GRAPHIFY-SNAPSHOT-BINDING-READBACK-01`.
+
+## CURRENT-STRUCTURAL-LINEAGE-SELECTED-EXECUTION-01 — 2026-09-11
+
+- [x] Added a read-only structural reconciliation rooted in the selected
+      terminal execution `14667026-459c-4a99-b3c2-c20b739a6e0d` and admitted
+      workspace revision `sha256:3be7901e1b6bc4f6499185f775eac2ae93e56305940703a7da66a436e4e3a3e0`.
+- [x] Read back `25,271` repository-qualified membership rows across `7`
+      repositories with zero duplicate membership keys, zero workspace
+      revision mismatches, and zero missing source revisions.
+- [x] Required exact `source_ref + content_hash` joins into the canonical
+      chunk and packet tables; no path, basename, Qdrant-ID, array-order, or
+      historical-binding fallback was used.
+- [ ] The selected execution currently has `0/25,271` exact chunk matches and
+      `0/25,271` exact packet matches, so current packet/chunk structural
+      authority remains blocked. This receipt does not reinterpret older rows.
+
+Evidence: `scripts/atlas/audit-selected-graphify-structural-lineage-v1.mjs`
+and `docs/reports/selected-graphify-structural-lineage-v1.json`.
+Status: `CURRENT_PACKET_CHUNK_JOIN_UNPROVEN`; authority=false;
+writesPerformed=false. First blocker: `CURRENT_CHUNK_EXACT_MATCH_MISSING`.
+Next gate: current source/packet/chunk reconciliation after a producer-bound
+current Graphify artifact exists.
+
+### ROUTING-OWNER-COMPARISON-RECHECK-01 — 2026-09-11
+
+- [x] Confirmed the existing production MCP caller remains bounded and
+      revisioned: five registry-backed tools selected, read-only, with no
+      execution or datastore mutation.
+- [x] Confirmed the established CandidateFeatureMatrixV1, neural-routing,
+      and MCP/Viterbi contracts are present in `origin/main`.
+- [x] Confirmed local `KnowledgeSnippetV1` is workstation-only and is not
+      present in `origin/main`; it remains a non-canonical local context
+      proposal, not a globally landed authority.
+- [ ] Do not promote the local snippet layer or add a second router until its
+      ownership and merge state are intentionally resolved.
+
+Evidence: `docs/reports/mcp-production-caller-v1.json` and local versus
+`origin/main` path existence checks.
+Status: `PROVEN_READ_ONLY_BOUNDED_CALLER`; authority=false;
+writesPerformed=false.
+First blocker: `KNOWLEDGE_SNIPPET_MAINLINE_NOT_LANDED`.
+Next gate: preserve current registry/Viterbi routing and resolve mainline
+integration deliberately, independent of Graphify authority.
 
 ### TERMINAL-RUN-SCOPE-GUARD-01 — 2026-09-10
 

@@ -382,6 +382,10 @@ sections above before trusting an integration claim.
 
 ## 15. Docker dependency reproducibility audit (2026-09-10)
 
+- [x] RAPIDS `atlas-gpu-8098` has an explicit runtime requirements file and CUDA-aware health check. The first CUDA 12.6/PyTorch 2.7.1 replacement image built, but its disposable smoke test failed with a cuGraph/cuSolver ABI conflict caused by the pip-bundled NVIDIA libraries; this hypothesis is rejected for the RAPIDS image.
+- [ ] The running RAPIDS container remains unchanged; its live health evidence is `torchAvailable:false`. A compatible PyTorch/RAPIDS ABI must be proven in a separate image before any container replacement. The attempted CUDA 12.9/PyTorch 2.8.0 rebuild was interrupted before completion.
+- [ ] GPU executor ownership remains duplicated across the Docker `atlas-gpu-8098` surface, the WSL2 `atlas-rapids-cu13` environment, and Python sidecars sharing port 8098. Classify one primary executor before routing or replacing any runtime.
+
 - [x] Traced SearXNG's entrypoint to `/usr/local/searxng/.venv/bin/granian`; its application Python environment contains 41 distributions. Added explicit `--python-interpreter=container:/absolute/path` selection to the all-container audit, avoiding an empty system-interpreter inventory being mistaken for the application's dependency set.
 - [ ] SearXNG omits both pip and packaging from that runtime; installed inventory is proven, dependency consistency and rebuild locking remain unproven. The audit does not install package managers into running containers.
 

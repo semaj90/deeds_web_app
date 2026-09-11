@@ -6,6 +6,7 @@ WORKDIR /app
 COPY docker/atlas-gpu-8098/requirements.txt /tmp/atlas-gpu-8098-requirements.txt
 
 RUN python -m pip install --no-cache-dir \
+    --extra-index-url https://download.pytorch.org/whl/cu129 \
     -r /tmp/atlas-gpu-8098-requirements.txt
 
 COPY services/atlas-gpu-8098/app.py /app/services/atlas-gpu-8098/app.py

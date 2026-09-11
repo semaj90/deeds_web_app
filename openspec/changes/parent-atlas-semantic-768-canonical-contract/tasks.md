@@ -811,6 +811,26 @@ Next gate: current source lineage and representation-owner reconciliation.
 
 Evidence: `docs/reports/semantic-768-writer-ownership-v1.json`.
 
+### SEMANTIC-768-CONTRACT-RECHECK — 2026-09-11
+
+- [x] Re-ran the existing semantic contract proof: Qdrant content/error/
+      signature vectors are reachable at 768 dimensions; chat and embedding
+      owners remain separated; no BM42 dependency is required.
+- [x] Re-ran writer ownership census: `19` surfaces remain discoverable;
+      `atlas_packets.embedding` is populated `61,659/61,718`, active
+      `codebase_chunk_index.content_embedding` is halfvec populated
+      `55,169/55,853`, and `content_embedding_768` is vector populated
+      `1,386/55,853`.
+- [ ] Do not promote a physical owner until full source/revision-qualified
+      representation lineage selects one writer; no embedding writes occurred.
+
+Evidence: `docs/reports/semantic-768-contract-proof.json`,
+`docs/reports/semantic-768-writer-ownership-v1.json`.
+Status: `SEMANTIC_768_CONTRACT_PROVEN_OWNER_NOT_PROVEN`;
+authority=false; writesPerformed=false.
+First blocker: `FULL_CURRENT_SEMANTIC_COHORT_AND_REPRESENTATION_LINEAGE_UNPROVEN`.
+Next gate: snapshot-bound Graphify membership and current source lineage.
+
 ### SEMANTIC-768-PRECISION-OWNER-RECHECK — 2026-09-10
 
 - [x] Corrected `scripts/atlas/sem768-corpus-bundle-01.mts` so its declared

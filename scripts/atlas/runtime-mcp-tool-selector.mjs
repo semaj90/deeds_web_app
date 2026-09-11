@@ -31,7 +31,14 @@ const OLLAMA_URL = _ollamaRaw.startsWith('http') ? _ollamaRaw : `http://${_ollam
 const QDRANT_URL = process.env.QDRANT_URL || 'http://127.0.0.1:6333';
 const COLLECTION = 'codebase_chunks_768';
 const DEFAULT_TOP_K = 12;
+const MAX_TOOL_RETRIEVAL_K = 20;
 const EMBEDDING_MODEL = process.env.OLLAMA_EMBED_MODEL || process.env.EMBEDDING_MODEL || 'embeddinggemma:latest';
+
+function boundedTopK(value) {
+  const parsed = Number(value);
+  if (!Number.isInteger(parsed) || parsed < 1) return DEFAULT_TOP_K;
+  return Math.min(parsed, MAX_TOOL_RETRIEVAL_K);
+}
 
 // Query domain → ontology signals for boost scoring
 const DOMAIN_SIGNALS = {
@@ -218,12 +225,13 @@ const MCP_TO_LLAMA = Object.fromEntries(
  *   }
  */
 export async function selectToolsForQuery(query, { topK = DEFAULT_TOP_K } = {}) {
+  const effectiveTopK = boundedTopK(topK);
   const signals = detectSignals(query);
   const vector  = await embed(query);
   const queryText = String(query ?? '').toLowerCase();
 
   if (!vector) {
-    const registryHits = await registrySearch(queryText, topK);
+    const registryHits = await registrySearch(queryText, effectiveTopK);
     if (registryHits.length > 0) {
       const seen = new Set();
       const mcp_names = [];
@@ -246,6 +254,9 @@ export async function selectToolsForQuery(query, { topK = DEFAULT_TOP_K } = {}) 
         embed_ok: false,
         registry_ok: true,
         retrieval_source: 'registry',
+        requested_top_k: topK,
+        effective_top_k: effectiveTopK,
+        candidate_budget: 'BOUNDED_RETRIEVAL_SHORTLIST',
       };
     }
 
@@ -253,25 +264,28 @@ export async function selectToolsForQuery(query, { topK = DEFAULT_TOP_K } = {}) 
     const fallback = ['search.dev_context', 'codebase.rg_search', 'trace.kag_search',
       'graph.expand_neighborhood', 'kb.search_cards'];
     return {
-      mcp_names:   fallback.slice(0, topK),
-      llama_names: fallback.slice(0, topK).map(n => MCP_TO_LLAMA[n] ?? n.replace(/\./g, '__')),
+      mcp_names:   fallback.slice(0, effectiveTopK),
+      llama_names: fallback.slice(0, effectiveTopK).map(n => MCP_TO_LLAMA[n] ?? n.replace(/\./g, '__')),
       hits:        [],
       signals,
       embed_ok:    false,
       registry_ok: false,
       retrieval_source: 'default',
+      requested_top_k: topK,
+      effective_top_k: effectiveTopK,
+      candidate_budget: 'BOUNDED_RETRIEVAL_SHORTLIST',
     };
   }
 
-  const raw = vector ? await qdrantSearch(vector, { topK }) : [];
-  let ranked = rerank(raw, signals, topK);
+  const raw = vector ? await qdrantSearch(vector, { topK: effectiveTopK }) : [];
+  let ranked = rerank(raw, signals, effectiveTopK);
   let retrieval_source = 'qdrant';
 
   if (ranked.length === 0) {
-    ranked = await registrySearch(queryText, topK);
+    ranked = await registrySearch(queryText, effectiveTopK);
     retrieval_source = ranked.length > 0 ? 'registry' : 'default';
   } else {
-    const registryHits = await registrySearch(queryText, topK);
+    const registryHits = await registrySearch(queryText, effectiveTopK);
     const merged = new Map();
     for (const hit of [...registryHits, ...ranked]) {
       const toolName = hit.payload?.tool_name;
@@ -293,7 +307,7 @@ export async function selectToolsForQuery(query, { topK = DEFAULT_TOP_K } = {}) 
     }
     ranked = [...merged.values()]
       .sort((a, b) => (b.reranked_score ?? b.score ?? 0) - (a.reranked_score ?? a.score ?? 0))
-      .slice(0, topK);
+      .slice(0, effectiveTopK);
   }
 
   // Extract tool names from payloads
@@ -323,6 +337,9 @@ export async function selectToolsForQuery(query, { topK = DEFAULT_TOP_K } = {}) 
     embed_ok: true,
     registry_ok: ranked.length > 0,
     retrieval_source,
+    requested_top_k: topK,
+    effective_top_k: effectiveTopK,
+    candidate_budget: 'BOUNDED_RETRIEVAL_SHORTLIST',
   };
 }
 
@@ -425,7 +442,7 @@ if (isMain) {
   const args    = process.argv.slice(2);
   const isAudit = args.includes('--audit');
   const topKArg = args.find(a => a.startsWith('--top='));
-  const topK    = topKArg ? parseInt(topKArg.split('=')[1], 10) : DEFAULT_TOP_K;
+  const topK    = topKArg ? boundedTopK(topKArg.split('=')[1]) : DEFAULT_TOP_K;
   const query   = args.filter(a => !a.startsWith('--')).join(' ');
 
   if (isAudit) {

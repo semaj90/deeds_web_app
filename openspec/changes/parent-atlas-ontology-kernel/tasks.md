@@ -3778,6 +3778,73 @@ writesPerformed=false.
 First blocker: `CURRENT_ONTOLOGY_SOURCE_BINDING_UNPROVEN`.
 Next gate: snapshot-bound Graphify membership and current source lineage.
 
+## HYPERGRAPH-OAK-CONTRACT-RECHECK-2026-09-11
+
+- [x] Re-ran the existing Hyperedge, n-ary materialization, ontology tuple
+      proposal, and PostgreSQL tuple contract suites: `17/17` tests passed.
+- [x] Confirmed Hyperedge and OntologyLinkedTuple remain proposal/evidence
+      structures; they do not create canonical identity or retrieval votes.
+- [ ] Keep OAK resolution and ontology-linked fanout blocked until current
+      source/workspace bindings and grounded evidence are admitted.
+
+Evidence: focused Vitest output and
+`docs/reports/feature-ontology-current-cohort-v1.json`.
+Status: `HYPERGRAPH_CONTRACT_PROVEN_LINEAGE_BLOCKED`; authority=false;
+writesPerformed=false.
+First blocker: `CURRENT_ONTOLOGY_SOURCE_BINDING_UNPROVEN`.
+Next gate: snapshot-bound Graphify membership and current source lineage.
+
+## GENIE-OAK-CONTEXT-CANDIDATE-RECHECK-2026-09-11
+
+- [x] Fresh multi-lane ontology extraction produced `304` review candidates
+      across `6` sources; `5` sources carried grounded evidence.
+- [x] Candidate validation preserved exact source bindings for `304/304` rows,
+      admitted only `9` grounded review candidates, and rejected `295` without
+      grounding. No concept, tuple, graph, or projection writes occurred.
+- [ ] Do not promote candidates or connect them to production ACE context until
+      current workspace/source lineage is revision-qualified.
+
+Evidence: `docs/reports/feature-ontology-fresh-extraction-multilane-v1.json`,
+`docs/reports/feature-ontology-fresh-candidate-validation-v1.json`.
+Status: `REVIEW_CANDIDATES_GROUNDED_PARTIAL`; authority=false;
+writesPerformed=false.
+First blocker: `CURRENT_ONTOLOGY_SOURCE_BINDING_UNPROVEN`.
+Next gate: snapshot-bound Graphify membership and current source lineage.
+
+## OAK-ATLAS-ADAPTER-RECHECK-2026-09-11
+
+- [x] Re-verified the existing Python OAK boundary in `python/atlas_oak_kernel.py`:
+      oaklib lookup/search/traversal is a read-only adapter over configured
+      ontology backends; it does not own Parent Atlas identity or persistence.
+- [x] Existing OAK adapter tests pass: `8 passed`.
+- [x] Confirmed no new concept or tuple owner is needed; the new
+      `KnowledgeSnippetV1` remains a local context proposal layer around
+      existing `ConceptV1` IDs.
+- [ ] Configure and prove a revision-qualified OAK backend for current source
+      evidence before converting OAK relationships into tuple candidates.
+
+Status: `OAK_ADAPTER_BOUNDARY_PROVEN`; authority=false; writesPerformed=false.
+First blocker: `CURRENT_ONTOLOGY_SOURCE_BINDING_UNPROVEN`.
+Next gate: snapshot-bound Graphify membership and current source lineage.
+
+## GENIE-SEMANTIC-CONTEXT-ADAPTER-2026-09-11
+
+- [x] Added `KnowledgeSnippetV1` as a Parent Atlas-native, non-canonical
+      context layer for concept definitions, metric definitions, business
+      rules, authoritative-source hints, and relationship hints.
+- [x] Included authority, freshness, usage, permission scope, evidence refs,
+      source/workspace revisions, and deterministic snippet identity.
+- [x] Preserved existing `ConceptV1`, `OntologyLinkedTupleV1`, and `HyperedgeV1`
+      as the canonical owners; no Databricks dependency or duplicate ontology
+      owner was introduced.
+- [ ] Connect admitted snippets to ACE/context selection only after current
+      source lineage and permission filtering are proven.
+
+Evidence: `sveltekit-frontend/src/lib/server/atlas/contracts/knowledge-snippet-v1.ts`.
+Status: `SNIPPET_CONTRACT_PROVEN`; authority=false; writesPerformed=false.
+First blocker: `CURRENT_ONTOLOGY_SOURCE_BINDING_UNPROVEN`.
+Next gate: snapshot-bound Graphify membership and current source lineage.
+
 ## ONTOLOGY-CURRENT-COHORT-RECHECK-2026-09-10T23
 
 - [x] Re-ran the read-only ontology cohort audit against the admitted

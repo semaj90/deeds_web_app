@@ -36,6 +36,21 @@ retirement; no model training or runtime/index writes were performed.
 - [x] Audited the live error-agent API route and recorded the missing producer
       inputs in `docs/reports/query-routing-live-producer-audit.json`.
 
+## Classification export proof recheck (2026-09-11)
+
+- [x] Re-ran `npm run atlas:embedding:classification:export:proof`.
+- [x] Fixture result remains `FIXTURE_PROVEN_LIVE_PRODUCER_NOT_WIRED` with
+      `canonicalWrites=false`.
+- [ ] Keep the live classifier export blocked until a same-corpus producer
+      supplies grounded AST/CST evidence, EmbeddingGemma representation
+      revisions, labels, and replay-stable source lineage.
+
+Evidence: `docs/reports/query-routing-classification-export-proof.json`.
+Status: `FIXTURE_PROVEN_LIVE_PRODUCER_NOT_WIRED`; authority=false;
+writesPerformed=false.
+First blocker: `LIVE_CLASSIFIER_PRODUCER_NOT_WIRED`.
+Next gate: current source-bound query/label producer proof.
+
 ## Built this session (2026-08-12)
 
 - [x] New module: `sveltekit-frontend/src/lib/server/ai/parent-atlas-workstation-domain-classifier.ts`
@@ -183,6 +198,20 @@ pass) before any live-wiring decision is worth making.
   join first; `workspace_revision` availability alone is not sufficient.
 
 Evidence: `docs/reports/domain-classifier-lineage-v1.json`.
+
+## Classifier contract recheck (2026-09-11)
+
+- [x] Re-ran the focused classifier contract suite without retraining,
+  checkpoint replacement, or runtime promotion.
+- [x] `domain-classification-adapter-v1.spec.ts`, `domain-taxonomy.spec.ts`,
+  and `classifier-feature-manifest.spec.ts` passed: `10/10` tests.
+- [ ] Keep classifier probabilities as routing/ranking features only; do not
+  promote them to canonical ontology identity or an additional retrieval vote.
+- [ ] Current-source admission remains blocked by
+  `CLASSIFIER_LINEAGE_BLOCKED`; the latest lineage receipt still reports only
+  `148` revision-qualified joins and `3,204` missing Graphify joins.
+
+Evidence: focused Vitest output and `docs/reports/domain-classifier-lineage-v1.json`.
 
 ## Reference
 

@@ -1,0 +1,179 @@
+{
+  "schema": "atlas.current-repair-candidate-feature-matrix-proof.v1",
+  "mode": "READ_ONLY_TOURNAMENT_MATRIX_CONTRACT_REPLAY",
+  "candidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
+  "ordinalMapChecksum": "86fee5d38619d3065d8710942068f26fb5b0d3c09992b1b523083ae0a593d297",
+  "candidateCount": 15,
+  "baseFeatureCount": 25,
+  "repairOverlayFeatureCount": 24,
+  "totalFeatureCount": 49,
+  "baseMatrixManifestChecksum": "sha256:fbc7abc28bd5eae484fdc3c20ce8970a08e21913e5833001074da106b6fd0bf8",
+  "baseMatrixChecksum": "sha256:a4b3761e0c7b9e81afd4f9af288556a44c37d1b18d1d437015edf4b154148271",
+  "basePlanePreserved": true,
+  "overlayPresenceCount": 0,
+  "overlayFeatureStates": {
+    "semantic_mrl_512_query_similarity": "UNAVAILABLE",
+    "semantic_mrl_256_query_similarity": "UNAVAILABLE",
+    "semantic_mrl_128_query_similarity": "UNAVAILABLE",
+    "latent_256_query_similarity": "UNAVAILABLE",
+    "latent_128_query_similarity": "UNAVAILABLE",
+    "latent_64_query_similarity": "UNAVAILABLE",
+    "postgres_fts_score": "UNAVAILABLE",
+    "bm25_sparse_score": "UNAVAILABLE",
+    "ast_direct_span_match": "UNAVAILABLE",
+    "ast_same_function": "UNAVAILABLE",
+    "ast_same_class": "UNAVAILABLE",
+    "compiler_diagnostic_match": "UNAVAILABLE",
+    "error_stack_overlap": "UNAVAILABLE",
+    "test_ownership_fit": "UNAVAILABLE",
+    "recent_edit_affinity": "UNAVAILABLE",
+    "graph_hop_proximity": "UNAVAILABLE",
+    "graph_typed_edge_fit": "UNAVAILABLE",
+    "graph_path_confidence": "UNAVAILABLE",
+    "ppr_query_score": "UNAVAILABLE",
+    "som_row_norm": "UNAVAILABLE",
+    "som_col_norm": "UNAVAILABLE",
+    "topology_ae64_neighbor_fit": "UNAVAILABLE",
+    "topology_manifold4_similarity": "UNAVAILABLE",
+    "tang_nomination_weight": "UNAVAILABLE"
+  },
+  "overlayCoverage": {
+    "semantic_mrl_512_query_similarity": {
+      "state": "UNAVAILABLE",
+      "presentRows": 0,
+      "missingRows": 15
+    },
+    "semantic_mrl_256_query_similarity": {
+      "state": "UNAVAILABLE",
+      "presentRows": 0,
+      "missingRows": 15
+    },
+    "semantic_mrl_128_query_similarity": {
+      "state": "UNAVAILABLE",
+      "presentRows": 0,
+      "missingRows": 15
+    },
+    "latent_256_query_similarity": {
+      "state": "UNAVAILABLE",
+      "presentRows": 0,
+      "missingRows": 15
+    },
+    "latent_128_query_similarity": {
+      "state": "UNAVAILABLE",
+      "presentRows": 0,
+      "missingRows": 15
+    },
+    "latent_64_query_similarity": {
+      "state": "UNAVAILABLE",
+      "presentRows": 0,
+      "missingRows": 15
+    },
+    "postgres_fts_score": {
+      "state": "UNAVAILABLE",
+      "presentRows": 0,
+      "missingRows": 15
+    },
+    "bm25_sparse_score": {
+      "state": "UNAVAILABLE",
+      "presentRows": 0,
+      "missingRows": 15
+    },
+    "ast_direct_span_match": {
+      "state": "UNAVAILABLE",
+      "presentRows": 0,
+      "missingRows": 15
+    },
+    "ast_same_function": {
+      "state": "UNAVAILABLE",
+      "presentRows": 0,
+      "missingRows": 15
+    },
+    "ast_same_class": {
+      "state": "UNAVAILABLE",
+      "presentRows": 0,
+      "missingRows": 15
+    },
+    "compiler_diagnostic_match": {
+      "state": "UNAVAILABLE",
+      "presentRows": 0,
+      "missingRows": 15
+    },
+    "error_stack_overlap": {
+      "state": "UNAVAILABLE",
+      "presentRows": 0,
+      "missingRows": 15
+    },
+    "test_ownership_fit": {
+      "state": "UNAVAILABLE",
+      "presentRows": 0,
+      "missingRows": 15
+    },
+    "recent_edit_affinity": {
+      "state": "UNAVAILABLE",
+      "presentRows": 0,
+      "missingRows": 15
+    },
+    "graph_hop_proximity": {
+      "state": "UNAVAILABLE",
+      "presentRows": 0,
+      "missingRows": 15
+    },
+    "graph_typed_edge_fit": {
+      "state": "UNAVAILABLE",
+      "presentRows": 0,
+      "missingRows": 15
+    },
+    "graph_path_confidence": {
+      "state": "UNAVAILABLE",
+      "presentRows": 0,
+      "missingRows": 15
+    },
+    "ppr_query_score": {
+      "state": "UNAVAILABLE",
+      "presentRows": 0,
+      "missingRows": 15
+    },
+    "som_row_norm": {
+      "state": "UNAVAILABLE",
+      "presentRows": 0,
+      "missingRows": 15
+    },
+    "som_col_norm": {
+      "state": "UNAVAILABLE",
+      "presentRows": 0,
+      "missingRows": 15
+    },
+    "topology_ae64_neighbor_fit": {
+      "state": "UNAVAILABLE",
+      "presentRows": 0,
+      "missingRows": 15
+    },
+    "topology_manifold4_similarity": {
+      "state": "UNAVAILABLE",
+      "presentRows": 0,
+      "missingRows": 15
+    },
+    "tang_nomination_weight": {
+      "state": "UNAVAILABLE",
+      "presentRows": 0,
+      "missingRows": 15
+    }
+  },
+  "replay": {
+    "manifest0": "sha256:e6039a998cba2945e6c79b5aae7e6926d7477786cb8b22da6f397425fad842a7",
+    "manifest1": "sha256:e6039a998cba2945e6c79b5aae7e6926d7477786cb8b22da6f397425fad842a7",
+    "identical": true,
+    "matrixIdentical": true,
+    "presenceIdentical": true,
+    "identityIdentical": true
+  },
+  "authority": {
+    "canonicalAuthority": false,
+    "retrievalVote": false,
+    "rankingPromotion": false,
+    "mutationAuthority": false
+  },
+  "writesPerformed": false,
+  "status": "REPAIR_CANDIDATE_FEATURE_MATRIX_CONTRACT_PROVEN",
+  "nextGate": "JOIN_ONE_REVISION_BOUND_REPAIR_FEATURE_PRODUCER_THEN_RUN_TOURNAMENT_ABLATION"
+}
