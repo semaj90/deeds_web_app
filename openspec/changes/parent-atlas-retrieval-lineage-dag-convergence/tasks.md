@@ -11997,6 +11997,20 @@ Evidence: `docs/reports/graphify-packet-lineage-census-v1.json`.
 Status: `SOURCE_LINEAGE_CENSUS_GAPS`; authority=false; writesPerformed=false.
 First blocker: `CURRENT_SOURCE_REVISION_PACKET_BINDING_UNPROVEN`.
 
+### CURRENT-SOURCE-COHORT-LINEAGE-RECHECK-01 — 2026-09-11
+
+- [x] Ran the read-only current source-cohort lineage audit.
+- [x] Confirmed the 52-row cohort is source-revision-qualified and matches
+      its historical Graphify cohort exactly.
+- [x] Confirmed it does not match the current workspace revision: `0/52`
+      current matches and `52` workspace mismatches.
+- [ ] Keep this cohort historical; do not promote or use it to seed current
+      packet/chunk lineage.
+
+Evidence: `docs/reports/current-source-cohort-lineage-v1.json`.
+Status: `WORKSPACE_REVISION_SOURCE_MISMATCH`; authority=false;
+writesPerformed=false. First blocker: `CURRENT_WORKSPACE_COHORT_UNAVAILABLE`.
+
 ### TERMINAL-RUN-SCOPE-GUARD-01 — 2026-09-10
 
 - [x] Prevented the terminal authorization path from selecting the broad
