@@ -1,15 +1,14 @@
 /**
  * CrossEncoder Reranker Client
- * Connects to CrossEncoder sidecar (port 8092)
- * Integrates as Phase C reranking stage after XGBoost/TurboVec
+ * Connects to CrossEncoder sidecar (port 8092).
  *
- * Model: mixedbread-ai/mxbai-rerank-base-v2 (0.5B params, 384-dim output)
- * Port: 8092 (independent of SvelteKit and Gemma4)
- * Graceful fallback: returns null if sidecar unavailable
+ * The client consumes a minimal package-local retrieval-hit contract. It does
+ * not import or own TurboVec/Qdrant execution; application-owned retrieval
+ * lanes adapt their hits at the package boundary.
  */
 
-import type { QdrantHit } from '../turbovec/turbovec-rerank.js';
-export type { QdrantHit } from '../turbovec/turbovec-rerank.js';
+import type { QdrantHit } from './retrieval-contract.js';
+export type { QdrantHit } from './retrieval-contract.js';
 
 export interface CrossEncoderCandidate {
   packet_key: string;
@@ -43,18 +42,11 @@ export interface CrossEncoderHealthStatus {
   model_id: string;
 }
 
-/**
- * Get CrossEncoder sidecar URL from environment or default
- */
 function getCrossEncoderUrl(): string {
   const raw = (process.env.CROSSENCODER_SIDECAR || 'http://127.0.0.1:8092').trim();
   return raw.startsWith('http') ? raw : `http://${raw}`;
 }
 
-/**
- * Check if CrossEncoder sidecar is available
- * Non-blocking: timeout 5s, returns null on failure
- */
 export async function checkCrossEncoderHealth(): Promise<CrossEncoderHealthStatus | null> {
   const url = getCrossEncoderUrl();
   try {
@@ -79,15 +71,6 @@ export async function checkCrossEncoderHealth(): Promise<CrossEncoderHealthStatu
   }
 }
 
-/**
- * Rerank candidates using CrossEncoder
- * Returns null if sidecar unavailable (graceful fallback)
- *
- * @param query - Query text
- * @param candidates - Candidates with packet_key and text
- * @param batchSize - Optional batch size (default 8, max 64)
- * @returns Ranked results or null on failure
- */
 export async function rerankCandidates(
   query: string,
   candidates: CrossEncoderCandidate[],
@@ -123,15 +106,6 @@ export async function rerankCandidates(
   }
 }
 
-/**
- * Apply CrossEncoder reranking to Qdrant hits
- * Extracts text from hits, calls reranker, maps scores back
- *
- * @param query - Query text
- * @param hits - Qdrant hits with semantic_score
- * @param topK - Slice to top K after reranking (optional)
- * @returns Reranked hits with crossencoder_score added, or null on failure
- */
 export async function applyReranking(
   query: string,
   hits: (QdrantHit & { crossencoder_score?: number })[],
@@ -139,17 +113,14 @@ export async function applyReranking(
 ): Promise<(QdrantHit & { crossencoder_score: number })[] | null> {
   if (!hits || hits.length === 0) return [];
 
-  // Extract candidates for reranking
   const candidates: CrossEncoderCandidate[] = hits.map((hit) => ({
     packet_key: String(hit.id),
     text: String(hit.payload?.content || hit.payload?.text || '')
   }));
 
-  // Call reranker
   const ranked = await rerankCandidates(query, candidates);
-  if (!ranked) return null; // Sidecar unavailable
+  if (!ranked) return null;
 
-  // Map reranker scores back to hits
   const scoreMap = new Map(ranked.map((r) => [r.packet_key, r.score]));
   const reranked = hits
     .map((hit) => ({
@@ -162,14 +133,6 @@ export async function applyReranking(
   return reranked as (QdrantHit & { crossencoder_score: number })[];
 }
 
-/**
- * Blend CrossEncoder score with existing semantic score
- * Weight: crossencoder 0.30, semantic 0.70 (tunable)
- *
- * @param hit - Hit with semantic_score and optional crossencoder_score
- * @param ceWeight - CrossEncoder weight (default 0.30)
- * @returns Blended score
- */
 export function blendCrossEncoderScore(
   hit: QdrantHit & { crossencoder_score?: number },
   ceWeight: number = 0.30
