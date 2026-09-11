@@ -15,6 +15,13 @@ import pyarrow as pa
 
 from parent_atlas_ontology.arrow_adapter import to_arrow_table
 from parent_atlas_ontology.models import OntologyLinkedTupleV1
+from parent_atlas_ontology.rich_nary import (
+    OntologyFanoutAuthorityViewV1,
+    RichNaryRelationV1,
+    build_authority_rdf_dataset_v1,
+    ontology_linked_tuple_to_rich_nary_v1,
+    project_binary_edge_v1,
+)
 from parent_atlas_ontology.semantic_bridge import ontology_linked_tuples_to_nary_relations
 from parent_atlas_ontology.validation import validate_ontology_linked_tuple
 
@@ -23,6 +30,8 @@ class OntologyLinkedTupleAdapter:
     """Projection-only adapter over the canonical `OntologyLinkedTupleV1`
     contract (owned by Postgres + the TS schema, never redefined here).
     """
+
+    canonicalAuthority = False
 
     def validate(self, value: OntologyLinkedTupleV1) -> OntologyLinkedTupleV1:
         """Real enforcement, not a structural pass-through: raises
@@ -37,41 +46,69 @@ class OntologyLinkedTupleAdapter:
         (see onto_py_03_arrow_parity_check.py, 9/9 PASS)."""
         return to_arrow_table(values)
 
-    def to_rdf(self, values: Sequence[OntologyLinkedTupleV1]):
-        """ONTO-PY-02, revised 2026-08-31 per the operator's decision to
-        layer on `atlas_semantic_ontology_projection.py` (the general
-        semantic substrate) rather than build a second, duplicate RDF
-        adapter. Converts to `NarySemanticRelation` via
-        `semantic_bridge.py` and delegates to that module's
-        `build_rdflib_dataset()`.
+    def to_rich_nary(
+        self,
+        value: OntologyLinkedTupleV1,
+        authority: OntologyFanoutAuthorityViewV1,
+        *,
+        require_graph_revision: bool = False,
+    ) -> RichNaryRelationV1:
+        """Authority-qualified rich n-ary view.
 
-        Still genuinely NOT_PROVEN in this environment: `rdflib` is not
-        installed (checked directly, not assumed), so the delegated call
-        raises `RuntimeError('rdflib is required for RDF projection')`
-        from inside `atlas_semantic_ontology_projection.py` itself — the
-        same honest failure as before, just now surfaced by the shared
-        substrate instead of a locally hand-written stub."""
+        This is the governed seam for new callers. It never falls back from
+        sourceRevision to relationRevision and never emits ``unknown`` as a
+        substitute for a missing authority axis.
+        """
+        return ontology_linked_tuple_to_rich_nary_v1(
+            value,
+            authority,
+            require_graph_revision=require_graph_revision,
+        )
+
+    def to_authority_rdf(
+        self,
+        values: Sequence[tuple[OntologyLinkedTupleV1, OntologyFanoutAuthorityViewV1]],
+    ):
+        """RDF projection of authority-qualified n-ary relations.
+
+        Relation nodes and participation nodes remain derived; the original
+        tuple + authority envelope remains the evidence-bearing source object.
+        """
+        relations = tuple(self.to_rich_nary(value, authority) for value, authority in values)
+        return build_authority_rdf_dataset_v1(relations)
+
+    def to_binary_graph_edge(
+        self,
+        value: OntologyLinkedTupleV1,
+        authority: OntologyFanoutAuthorityViewV1,
+        *,
+        from_role: str,
+        to_role: str,
+    ) -> dict:
+        """Explicit lossy pairwise projection for Neo4j/cuGraph consumers."""
+        relation = self.to_rich_nary(value, authority, require_graph_revision=True)
+        return project_binary_edge_v1(relation, from_role=from_role, to_role=to_role)
+
+    def to_rdf(self, values: Sequence[OntologyLinkedTupleV1]):
+        """ONTO-PY-02 compatibility path.
+
+        Revised 2026-08-31 per the operator's decision to layer on
+        `atlas_semantic_ontology_projection.py` rather than build a duplicate
+        RDF adapter. Historical fixtures may still use the compatibility
+        semantic bridge. New governed callers should prefer `to_authority_rdf`.
+        """
         from atlas_semantic_ontology_projection import build_rdflib_dataset
 
         relations = ontology_linked_tuples_to_nary_relations(values)
         return build_rdflib_dataset(assertions=(), relations=relations)
 
     def to_graph_projection(self, values: Sequence[OntologyLinkedTupleV1], *, graph_revision: str) -> dict:
-        """ONTO-PY-04, revised 2026-08-31 per the operator's decision:
-        delegates to `atlas_semantic_ontology_projection.py` /
-        `networkx_snapshot.py` (the shared substrate, already proven —
-        `test_networkx_snapshot_replay.py`, 2/2 tests pass) instead of
-        `graph_projection.py`'s own hand-rolled NetworkX logic, which is
-        now superseded (kept on disk for its real, still-relevant
-        `GraphNodeKeyV1` finding — see that file's updated docstring —
-        but no longer the adapter's default path).
+        """ONTO-PY-04 compatibility graph snapshot path.
 
-        Signature changed from the superseded version: no more
-        `ordinal_map` parameter — the shared substrate assigns its own
-        internal dense ordinals from sorted node identity strings (see
-        `networkx_snapshot.py`'s `_canonical_graph_payload`), it does not
-        take an externally-supplied one. Returns the checksum-sealed
-        snapshot dict from `build_networkx_snapshot()`."""
+        Delegates to the existing shared NetworkX substrate. New governed
+        pairwise graph consumers should prefer `to_binary_graph_edge`, which
+        requires an explicit graphRevision in OntologyFanoutAuthorityV1.
+        """
         from parent_atlas_ontology.networkx_snapshot import build_networkx_snapshot
 
         relations = ontology_linked_tuples_to_nary_relations(values)
