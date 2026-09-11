@@ -11956,6 +11956,18 @@ First blocker: `KNOWLEDGE_SNIPPET_MAINLINE_NOT_LANDED`.
 Next gate: preserve current registry/Viterbi routing and resolve mainline
 integration deliberately, independent of Graphify authority.
 
+### PKT-LINEAGE-08A-CHUNK-PREIMAGE-RECHECK-01 — 2026-09-11
+
+- [x] Re-ran the read-only chunk-preimage proof.
+- [x] Exact chunk preimages passed with independent readback: `434/434`.
+- [ ] Keep this bounded evidence separate from the admitted 25,291-source
+      snapshot; it does not establish full current source-to-packet coverage.
+
+Evidence: `docs/reports/pkt-lineage-08a-chunk-preimage-proof-v1.json`.
+Status: `CHUNK_PREIMAGE_PROVEN_BOUNDED`; authority=false;
+writesPerformed=false. First blocker remains
+`CURRENT_SOURCE_PACKET_CHUNK_JOIN_UNPROVEN` for the full current cohort.
+
 ### TERMINAL-RUN-SCOPE-GUARD-01 — 2026-09-10
 
 - [x] Prevented the terminal authorization path from selecting the broad
