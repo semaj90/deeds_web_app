@@ -1,38 +1,29 @@
 import { createHash } from 'node:crypto';
+import { existsSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { ENV } from '$lib/server/env.server.js';
 
 /**
  * EMBED-PROVIDER-CONVERGENCE-01
  *
- * Found live 2026-09-02: generateEmbeddings()'s Tier-1 fallback read
- * ENV.OLLAMA_EMBED_BASE_URL while the GET /api/embed diagnostic route
- * reported the live server through a *different* env var
- * (ENV.EMBEDDING_BASE_URL, resolved via resolveEmbeddingBackend's
- * `configuredBaseUrl` option) — two independent interpretations of "where
- * is the embedding endpoint", silently pointing at different values.
+ * This module is the ONE place that interprets embedding provider routing.
+ * Network endpoint variables are compatibility inputs; EMBEDDING_PROVIDER and
+ * the dev-launcher-only EMBEDDING_BACKEND hint may select the in-process ONNX
+ * lane, which deliberately has no HTTP base URL.
  *
- * This module is the ONE place that interprets the compatibility env vars.
- * Every consumer (the /api/embed route, embedding-client.ts's Tier-1,
- * embed-chunks.mjs, any future canonical semantic_768 backfill or query-time
- * embed call) MUST call resolveEmbeddingProviderV1() rather than reading
- * EMBEDDING_BASE_URL / OLLAMA_EMBED_BASE_URL / EMBED_SERVER_URL /
- * OLLAMA_BASE_URL / EMBEDDING_PROVIDER itself. Those four env vars remain
- * valid — they are compatibility INPUTS to this one resolver, not parallel
- * routing decisions.
+ * dev:gpu integration:
+ *   dev-gpu-runtime.mjs already exports GPU_ENABLED=true. On Windows, when it
+ *   has not selected the dedicated llama_cpp_gguf :8081 backend and a local
+ *   embeddinggemma ONNX export exists, this resolver prefers onnx_directml.
+ *   That session is lazy: Vite startup itself does not load the model. Local
+ *   inference is DirectML -> CPU; the API caller retains Ollama as its outer
+ *   network fallback when local ONNX returns null.
  *
- * Precedence (documented, not implicit — first one set wins):
- *   1. EMBEDDING_BASE_URL      — current primary; already resolves to the
- *                                 live :8081 GGUF/CUDA server in this env
- *   2. OLLAMA_EMBED_BASE_URL   — legacy name for the same dedicated server
- *   3. EMBED_SERVER_URL        — scripts/startup/dev-gpu-runtime.mjs's own
- *                                 name for the same server
- *   4. OLLAMA_BASE_URL         — Ollama-managed fallback (provider: 'ollama')
- * EMBEDDING_PROVIDER='onnx_directml' is the one recognized override — it
- * opts into the in-process ONNX path even when a dedicated-server URL is
- * also configured. Any other EMBEDDING_PROVIDER value (including a stale
- * 'ollama' left over from before the dedicated server existed) is ignored
- * once a dedicated-server URL resolves — the URL is stronger evidence than
- * a label. EMBEDDING_PROVIDER never substitutes for a baseUrl.
+ * Network URL precedence:
+ *   1. EMBEDDING_BASE_URL
+ *   2. OLLAMA_EMBED_BASE_URL
+ *   3. EMBED_SERVER_URL
+ *   4. OLLAMA_BASE_URL (Ollama fallback)
  */
 
 export const EMBEDDING_PROVIDER_NAMES = ['llama_cpp_gguf', 'ollama', 'onnx_directml'] as const;
@@ -46,36 +37,69 @@ export interface EmbeddingProviderV1 {
   representationId: 'semantic_768';
 }
 
+export interface EmbeddingProviderEnvV1 {
+  EMBEDDING_PROVIDER?: string | null;
+  EMBEDDING_BACKEND?: string | null;
+  EMBEDDING_BASE_URL?: string | null;
+  OLLAMA_EMBED_BASE_URL?: string | null;
+  EMBED_SERVER_URL?: string | null;
+  OLLAMA_BASE_URL?: string | null;
+  GPU_ENABLED?: string | null;
+  LOCAL_ONNX_AVAILABLE?: string | boolean | null;
+}
+
 function stripTrailingSlash(url: string): string {
   return url.replace(/\/+$/, '');
 }
 
-export function resolveEmbeddingProviderV1(): EmbeddingProviderV1 {
-  const modelId = 'embeddinggemma:latest';
-  const explicitProvider = String(ENV.EMBEDDING_PROVIDER ?? '').toLowerCase();
+function clean(value: string | null | undefined): string {
+  return String(value ?? '').trim();
+}
 
+function enabled(value: unknown): boolean {
+  return ['1', 'true', 'yes', 'on'].includes(String(value ?? '').trim().toLowerCase());
+}
+
+/** Pure resolver used by tests and by the ENV-backed production wrapper. */
+export function resolveEmbeddingProviderFromEnvV1(
+  input: EmbeddingProviderEnvV1,
+  platform = process.platform,
+): EmbeddingProviderV1 {
+  const modelId = 'embeddinggemma:latest';
+  const explicitProvider = clean(input.EMBEDDING_PROVIDER).toLowerCase();
+  const backendHint = clean(input.EMBEDDING_BACKEND).toLowerCase();
   const candidateUrl =
-    ENV.EMBEDDING_BASE_URL ||
-    ENV.OLLAMA_EMBED_BASE_URL ||
-    ENV.EMBED_SERVER_URL ||
+    clean(input.EMBEDDING_BASE_URL) ||
+    clean(input.OLLAMA_EMBED_BASE_URL) ||
+    clean(input.EMBED_SERVER_URL) ||
     null;
 
-  if (candidateUrl) {
-    // A resolved dedicated-server URL always means llama_cpp_gguf, UNLESS
-    // EMBEDDING_PROVIDER explicitly opts into onnx_directml (a deliberate,
-    // in-process override that coexists with URL config rather than being
-    // contradicted by it). EMBEDDING_PROVIDER='ollama' must NOT override a
-    // resolved dedicated-server URL — found live 2026-09-02: a stale
-    // EMBEDDING_PROVIDER=ollama in this env, left from before the :8081
-    // server existed, silently mislabeled the resolved provider as 'ollama'
-    // while baseUrl correctly pointed at :8081, which made every consumer
-    // gated on `provider === 'llama_cpp_gguf'` skip the live server. The URL
-    // is the stronger evidence; 'ollama' is only ever inferred in the
-    // no-URL-configured fallback branch below.
-    const provider: EmbeddingProviderNameV1 =
-      explicitProvider === 'onnx_directml' ? 'onnx_directml' : 'llama_cpp_gguf';
+  const explicitOnnx = explicitProvider === 'onnx_directml' || backendHint === 'onnx_directml';
+  const dedicatedLlamaCpp = backendHint === 'llama_cpp_gguf' || Boolean(candidateUrl);
+  const devGpuAutoOnnx =
+    platform === 'win32'
+    && enabled(input.GPU_ENABLED)
+    && enabled(input.LOCAL_ONNX_AVAILABLE)
+    && !dedicatedLlamaCpp
+    && explicitProvider !== 'ollama';
+
+  // ONNX is in-process and therefore does NOT require or own an HTTP base URL.
+  // Explicit ONNX always wins on Windows; dev:gpu additionally auto-selects it
+  // when a local model has actually been discovered. EMBEDDING_PROVIDER=ollama
+  // is the hard escape hatch for operators who want to suppress auto-DirectML.
+  if ((explicitOnnx || devGpuAutoOnnx) && platform === 'win32') {
     return {
-      provider,
+      provider: 'onnx_directml',
+      baseUrl: null,
+      modelId,
+      dimensions: 768,
+      representationId: 'semantic_768',
+    };
+  }
+
+  if (candidateUrl) {
+    return {
+      provider: 'llama_cpp_gguf',
       baseUrl: stripTrailingSlash(candidateUrl),
       modelId,
       dimensions: 768,
@@ -85,20 +109,44 @@ export function resolveEmbeddingProviderV1(): EmbeddingProviderV1 {
 
   return {
     provider: 'ollama',
-    baseUrl: stripTrailingSlash(ENV.OLLAMA_BASE_URL ?? 'http://127.0.0.1:11434'),
+    baseUrl: stripTrailingSlash(clean(input.OLLAMA_BASE_URL) || 'http://127.0.0.1:11434'),
     modelId,
     dimensions: 768,
     representationId: 'semantic_768',
   };
 }
 
+function localOnnxModelAvailable(): boolean {
+  const cwd = process.cwd();
+  const candidates = [
+    resolve(cwd, 'static', 'embeddinggemma_300m_onnx', 'model.onnx'),
+    resolve(cwd, 'static', 'models', 'embeddinggemma_300m_onnx', 'model.onnx'),
+    resolve(cwd, 'models', 'embeddinggemma_300m_onnx', 'model.onnx'),
+    resolve(cwd, '..', 'models', 'embeddinggemma_300m_onnx', 'model.onnx'),
+  ];
+  return candidates.some((candidate) => existsSync(candidate));
+}
+
+export function resolveEmbeddingProviderV1(): EmbeddingProviderV1 {
+  return resolveEmbeddingProviderFromEnvV1({
+    EMBEDDING_PROVIDER: ENV.EMBEDDING_PROVIDER,
+    // Compatibility bridge only. Keep interpretation centralized here rather
+    // than adding another routing decision to env.server.ts or call sites.
+    EMBEDDING_BACKEND: process.env.EMBEDDING_BACKEND,
+    EMBEDDING_BASE_URL: ENV.EMBEDDING_BASE_URL,
+    OLLAMA_EMBED_BASE_URL: ENV.OLLAMA_EMBED_BASE_URL,
+    EMBED_SERVER_URL: ENV.EMBED_SERVER_URL,
+    OLLAMA_BASE_URL: ENV.OLLAMA_BASE_URL,
+    GPU_ENABLED: process.env.GPU_ENABLED,
+    LOCAL_ONNX_AVAILABLE: localOnnxModelAvailable(),
+  });
+}
+
 // ── EmbeddingReceiptV1 — fail-closed validation, applied globally ──────────
 //
-// Not just "is this a zero vector" (embed-chunks.mjs's original, narrower
-// check) — every embedding receipt must prove: correct dimensionality, every
-// value finite, a real (non-zero, non-degenerate) norm, and full identity/
-// provenance metadata. A receipt failing any of these must never be treated
-// as a successful embedding by any caller.
+// Not just "is this a zero vector" — every embedding receipt must prove:
+// correct dimensionality, every value finite, a real non-degenerate norm, and
+// complete identity/provenance metadata.
 
 export interface EmbeddingReceiptV1 {
   embedding: number[];
@@ -127,9 +175,7 @@ export type VectorShapeFailureV1 = Extract<
   'DIMENSIONS_NOT_768' | 'NON_FINITE_VALUES' | 'ZERO_OR_DEGENERATE_NORM'
 >;
 
-/** Just the vector-shape half of a receipt — for call sites (raw executor
- * tiers) that produce a vector but not yet the full identity/provenance
- * metadata a persisted EmbeddingReceiptV1 requires. */
+/** Just the vector-shape half of a receipt — for raw executor tiers. */
 export function checkVectorShapeV1(vec: unknown): { ok: boolean; failures: VectorShapeFailureV1[] } {
   const failures: VectorShapeFailureV1[] = [];
   if (!Array.isArray(vec) || vec.length !== 768) {
@@ -165,8 +211,7 @@ export function sha256Hex(value: string): string {
   return createHash('sha256').update(value, 'utf8').digest('hex');
 }
 
-/** Builds a complete EmbeddingReceiptV1 from a raw vector + the text that
- * produced it, computing both checksums so callers don't reimplement this. */
+/** Builds a complete EmbeddingReceiptV1 from a raw vector + source text. */
 export function buildEmbeddingReceiptV1(
   embedding: number[],
   inputText: string,
