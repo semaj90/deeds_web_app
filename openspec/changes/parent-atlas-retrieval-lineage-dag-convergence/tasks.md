@@ -11881,7 +11881,13 @@ current Graphify artifact exists.
 - [ ] Recapture and explicitly admit a fresh snapshot generated from physical
       repository paths before any structural lineage write or promotion.
 
-Status: `SOURCE_REF_VOCABULARY_GUARD_IMPLEMENTED`; authority=false;
+- [x] Fresh recapture completed after archiving the unused literal `$lib` mock
+      fixture: 25,291 sources across 7 repositories, zero capture violations,
+      snapshot revision `sha256:2a1d964da2c85ba1a5f75d8251268ceec939d3cbd6b1dc599941fe961b07b6a7`.
+- [ ] Explicitly admit this new snapshot before any Graphify execution or
+      structural lineage write.
+
+Status: `SOURCE_REF_VOCABULARY_GUARD_AND_RECAPTURE_PROVEN`; authority=false;
 writesPerformed=false. First blocker remains `CURRENT_CHUNK_EXACT_MATCH_MISSING`
 for the historical execution. The guard does not rewrite that execution.
 
