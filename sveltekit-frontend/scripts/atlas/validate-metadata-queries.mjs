@@ -19,45 +19,34 @@ async function getRandomVector(collection) {
   return point.vector;
 }
 
-async function searchWithoutFilter(collection, vector) {
+async function queryPoints(collection, vector, filter) {
   const start = Date.now();
   const response = await fetch(
-    `${QDRANT_URL}/collections/${collection}/points/search`,
+    `${QDRANT_URL}/collections/${collection}/points/query`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        vector,
+        query: vector,
         limit: 100,
+        ...(filter ? { filter } : {}),
         with_payload: true,
       }),
     }
   );
+  if (!response.ok) throw new Error(`Qdrant query failed: ${response.status} ${await response.text()}`);
   const data = await response.json();
-  const latency = Date.now() - start;
-  return { results: data.result || [], latency };
+  return { results: data.result?.points ?? [], latency: Date.now() - start };
+}
+
+async function searchWithoutFilter(collection, vector) {
+  return queryPoints(collection, vector);
 }
 
 async function searchWithFilter(collection, vector, filterField, filterValue) {
-  const start = Date.now();
-  const response = await fetch(
-    `${QDRANT_URL}/collections/${collection}/points/search`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        vector,
-        limit: 100,
-        query_filter: {
-          must: [{ key: filterField, match: { value: filterValue } }],
-        },
-        with_payload: true,
-      }),
-    }
-  );
-  const data = await response.json();
-  const latency = Date.now() - start;
-  return { results: data.result || [], latency };
+  return queryPoints(collection, vector, {
+    must: [{ key: filterField, match: { value: filterValue } }],
+  });
 }
 
 async function main() {
@@ -73,23 +62,16 @@ async function main() {
     const vector = await getRandomVector(collection);
     console.log('Test vector obtained from collection\n');
 
-    const results = {
-      queries: [],
-      summary: {},
-    };
+    const results = { queries: [], summary: {} };
 
     for (let i = 0; i < iterations; i++) {
       console.log(`Iteration ${i + 1}/${iterations}:`);
-
-      // Query 1: No filter (baseline)
       const noFilter = await searchWithoutFilter(collection, vector);
       console.log(`  • Vector ANN (no filter): ${noFilter.latency}ms, ${noFilter.results.length} results`);
 
-      // Query 2: Filter on packet_key
       const withPacketKey = await searchWithFilter(collection, vector, 'packet_key', 'ace:packet:*');
       console.log(`  • With packet_key filter: ${withPacketKey.latency}ms, ${withPacketKey.results.length} results`);
 
-      // Query 3: Filter on feature_id
       const withFeatureId = await searchWithFilter(collection, vector, 'feature_id', 'auth.sessions');
       console.log(`  • With feature_id filter: ${withFeatureId.latency}ms, ${withFeatureId.results.length} results`);
 
@@ -101,7 +83,6 @@ async function main() {
       });
     }
 
-    // Calculate averages
     const avgNoFilter = results.queries.reduce((sum, q) => sum + q.no_filter.latency, 0) / iterations;
     const avgPacketKeyFilter = results.queries.reduce((sum, q) => sum + q.packet_key_filter.latency, 0) / iterations;
     const avgFeatureIdFilter = results.queries.reduce((sum, q) => sum + q.feature_id_filter.latency, 0) / iterations;
@@ -123,12 +104,6 @@ async function main() {
     console.log(`   Avg latency (packet_key filter): ${results.summary.avg_packet_key_filter_ms}ms (${filterOverhead1}% overhead)`);
     console.log(`   Avg latency (feature_id filter): ${results.summary.avg_feature_id_filter_ms}ms (${filterOverhead2}% overhead)`);
     console.log(`   Indexes operational: ${results.summary.indexes_operational ? '✅' : '⚠️'}\n`);
-
-    if (results.summary.indexes_operational) {
-      console.log('✅ Phase 3 Complete: Filters are operational with <20% overhead\n');
-    } else {
-      console.log('⚠️  Phase 3 Complete: Filter overhead detected, may need index tuning\n');
-    }
   } catch (err) {
     console.error('ERROR:', err.message);
     process.exit(1);
