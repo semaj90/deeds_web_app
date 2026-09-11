@@ -25,18 +25,20 @@ async function embed(text) {
 }
 
 async function qdrantANN(vector, limit = 10) {
-  const res = await fetch(`${QDRANT}/collections/${COLLECTION}/points/search`, {
+  const res = await fetch(`${QDRANT}/collections/${COLLECTION}/points/query`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      vector: { name: 'content', vector },
+      query: vector,
+      using: 'content',
       limit,
       with_payload: true,
       with_vector: false
     })
   });
+  if (!res.ok) throw new Error(`Qdrant query failed: ${res.status} ${await res.text()}`);
   const { result } = await res.json();
-  return result;
+  return result?.points ?? [];
 }
 
 async function pgBM25(query, limit = 10) {
