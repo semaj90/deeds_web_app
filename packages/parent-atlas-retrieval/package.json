@@ -25,14 +25,13 @@
   },
   "files": [
     "dist",
-    "src",
-    "native"
+    "src"
   ],
   "scripts": {
     "build": "tsc",
-    "build:native": "node-gyp rebuild",
     "test": "vitest run",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "audit:boundary": "node ../../scripts/atlas/audit-parent-atlas-retrieval-package-boundary-v1.mjs"
   },
   "dependencies": {
     "@ai-sdk/openai-compatible": "2.0.47",
@@ -42,13 +41,7 @@
   },
   "devDependencies": {
     "@types/node": "^20.19.27",
-    "node-gyp": "^10.2.0",
     "typescript": "^5.7.2",
     "vitest": "^2.0.0"
-  },
-  "binary": {
-    "module_name": "tensorrt_bridge",
-    "module_path": "./native/",
-    "host": "https://github.com/semaj90/deeds-web-app/releases/download/"
   }
 }
