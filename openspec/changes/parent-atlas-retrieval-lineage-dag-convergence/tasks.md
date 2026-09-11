@@ -12027,6 +12027,21 @@ Evidence: `docs/reports/graphify-workspace-snapshot-binding-v1.json`.
 Status: `GRAPHIFY_SNAPSHOT_BINDING_PROVEN`; authority=false;
 writesPerformed=false. First blocker: `NEW_SNAPSHOT_ADMISSION_REQUIRED`.
 
+### WORKSPACE-REVISION-TOURNAMENT-ADMISSION-RECHECK-01 — 2026-09-11
+
+- [x] Explicitly admitted the stable snapshot-derived workspace revision
+      `sha256:3e677c29319a4a60bc60803be4186ba108dce906945af593a3a6f5cf43d11881`.
+- [x] Admission proof is `BOUNDED_LIVE_PROVEN`; workspace authority is enabled
+      for tournament control only.
+- [x] Kept Graphify execution and projection writes unauthorized.
+- [ ] Require separate Graphify execution authorization and snapshot-bound
+      consumer preflight before processing this revision.
+
+Evidence: `docs/reports/workspace-revision-tournament-admission-v1.json`.
+Status: `WORKSPACE_REVISION_TOURNAMENT_ADMITTED`; authority=true for tournament
+control only; graphifyExecutionAuthorized=false; projectionWritesAuthorized=false.
+First blocker: `GRAPHIFY_EXECUTION_AUTHORIZATION_REQUIRED`.
+
 ### TERMINAL-RUN-SCOPE-GUARD-01 — 2026-09-10
 
 - [x] Prevented the terminal authorization path from selecting the broad
