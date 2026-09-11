@@ -11534,6 +11534,19 @@ Status: `TOURNAMENT_ADMISSION_BOUNDARY_PROVEN`; authority=true for the admitted
 workspace only; graphifyExecutionAuthorized=false; projectionWritesAuthorized=false.
 First blocker: `GRAPHIFY_EXECUTION_AUTHORIZATION_REQUIRED`.
 
+### GRAPHIFY-CURRENT-TERMINAL-OWNER-RECHECK-01 — 2026-09-11
+
+- [x] Ran the read-only current Graphify owner audit against the admitted
+      workspace revision `sha256:3e677c...`.
+- [x] Confirmed no matching execution exists: `runCount=0`,
+      `completedOwnerCount=0`, `workspaceRowCount=0`.
+- [ ] Keep the terminal execution gate blocked until the exact execution
+      authorization is freshly supplied.
+
+Evidence: `docs/reports/current-graphify-run-owner-v1.json`.
+Status: `GRAPHIFY_RUN_OWNER_BLOCKED`; authority=false; writesPerformed=false.
+First blocker: `AUTHORIZE_GRAPHIFY_POST_PHASE16_TERMINAL_RUN_V1_REQUIRED`.
+
 ### PROMOTION-GATE-RECEIPT-CURRENTNESS-01 — 2026-09-11
 
 - [x] Added the read-only receipt-currentness compiler at
