@@ -12,8 +12,16 @@
     "declarationMap": true,
     "sourceMap": true,
     "resolveJsonModule": true,
+    "types": ["node"],
     "lib": ["ES2022"]
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "tests", "native"]
+  "include": ["src/**/*.ts"],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "tests",
+    "native",
+    "src/**/*.test.ts",
+    "src/**/*.spec.ts"
+  ]
 }
