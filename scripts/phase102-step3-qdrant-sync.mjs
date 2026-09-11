@@ -23,7 +23,6 @@ dotenv.config({ path: '.env' });
 
 const { Pool } = pg;
 
-// Config
 const QDRANT_URL = process.env.QDRANT_URL || 'http://127.0.0.1:6333';
 const QDRANT_COLLECTION = 'codebase_chunks_768';
 
@@ -33,7 +32,6 @@ const DB_USER = process.env.DATABASE_USER || 'legal_admin';
 const DB_PASSWORD = process.env.DATABASE_PASSWORD || '123456';
 const DB_NAME = process.env.DATABASE_NAME || 'legal_ai_db';
 
-// Args
 const dryRun = process.argv.includes('--dry-run');
 const apply = process.argv.includes('--apply');
 const MODE = dryRun ? 'DRY_RUN' : apply ? 'APPLY' : 'DRY_RUN';
@@ -47,9 +45,6 @@ const pool = new Pool({
 });
 
 async function getFeatureStatistics() {
-  /**
-   * Fetch all features with graph statistics
-   */
   const result = await pool.query(`
     SELECT
       feature_id,
@@ -60,59 +55,44 @@ async function getFeatureStatistics() {
     FROM feature_statistics
     WHERE pagerank IS NOT NULL AND pagerank > 0
   `);
-
   return result.rows;
 }
 
+async function queryQdrantByFilter(filter, limit = 100) {
+  const response = await fetch(`${QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/query`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      filter,
+      limit,
+      with_payload: true,
+      with_vector: false
+    }),
+    timeout: 10000
+  });
+  if (!response.ok) throw new Error(`Qdrant query failed: ${response.status}`);
+  const data = await response.json();
+  return data.result?.points ?? [];
+}
+
 async function findQdrantPointsByFeature(featureId) {
-  /**
-   * Find Qdrant points that belong to this feature
-   * Uses payload filter: feature_id matches
-   */
   try {
-    const response = await fetch(`${QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/search`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        filter: {
-          must: [
-            {
-              key: 'feature_id',
-              match: { value: featureId }
-            }
-          ]
-        },
-        limit: 100,
-        with_payload: true,
-        with_vectors: false
-      }),
-      timeout: 10000
+    const points = await queryQdrantByFilter({
+      must: [{ key: 'feature_id', match: { value: featureId } }]
     });
-
-    if (!response.ok) {
-      console.warn(`  ⚠️  Qdrant search failed for ${featureId}: ${response.status}`);
-      return [];
-    }
-
-    const data = await response.json();
-    return data.result?.map(p => p.id) || [];
+    return points.map((p) => p.id);
   } catch (e) {
-    console.warn(`  ⚠️  Error searching Qdrant: ${e.message}`);
+    console.warn(`  ⚠️  Error querying Qdrant: ${e.message}`);
     return [];
   }
 }
 
 async function updateQdrantPointPayload(pointId, payload) {
-  /**
-   * Update a single Qdrant point's payload with graph enrichment
-   */
   try {
     const response = await fetch(`${QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/${pointId}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        payload: payload
-      }),
+      body: JSON.stringify({ payload }),
       timeout: 10000
     });
 
@@ -129,19 +109,10 @@ async function updateQdrantPointPayload(pointId, payload) {
 }
 
 async function syncFeatureToQdrant(feature) {
-  /**
-   * For one feature:
-   * 1. Find all Qdrant points with this feature_id
-   * 2. Update each point's payload with graph scores
-   */
   const points = await findQdrantPointsByFeature(feature.feature_id);
-
-  if (points.length === 0) {
-    return 0;
-  }
+  if (points.length === 0) return 0;
 
   let updated = 0;
-
   for (const pointId of points) {
     const payload = {
       pagerank_score: feature.pagerank,
@@ -153,11 +124,8 @@ async function syncFeatureToQdrant(feature) {
 
     if (MODE === 'DRY_RUN') {
       updated++;
-    } else {
-      const success = await updateQdrantPointPayload(pointId, payload);
-      if (success) {
-        updated++;
-      }
+    } else if (await updateQdrantPointPayload(pointId, payload)) {
+      updated++;
     }
   }
 
@@ -165,39 +133,17 @@ async function syncFeatureToQdrant(feature) {
 }
 
 async function verifyQdrantEnrichment() {
-  /**
-   * Proof gate: Check one Qdrant point has pagerank_score in payload
-   */
   console.log('\n✅ Verification Gate:');
-
   try {
-    const response = await fetch(`${QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/search`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        filter: {
-          must: [
-            {
-              key: 'pagerank_score',
-              exists: {}
-            }
-          ]
-        },
-        limit: 1,
-        with_payload: true,
-        with_vectors: false
-      }),
-      timeout: 10000
-    });
+    const points = await queryQdrantByFilter({
+      must: [{ key: 'pagerank_score', is_empty: false }]
+    }, 1);
 
-    if (response.ok) {
-      const data = await response.json();
-      if (data.result?.length > 0) {
-        const point = data.result[0];
-        console.log(`  ✓ Found Qdrant point with pagerank_score: ${point.id}`);
-        console.log(`    Payload: ${JSON.stringify(point.payload, null, 2).split('\n').slice(0, 5).join('\n')}`);
-        return true;
-      }
+    if (points.length > 0) {
+      const point = points[0];
+      console.log(`  ✓ Found Qdrant point with pagerank_score: ${point.id}`);
+      console.log(`    Payload: ${JSON.stringify(point.payload, null, 2).split('\n').slice(0, 5).join('\n')}`);
+      return true;
     }
 
     console.log('  ⚠️  No Qdrant points found with pagerank_score');
@@ -213,7 +159,6 @@ async function main() {
   console.log(`Mode: ${MODE}`);
 
   try {
-    // Step 1: Fetch features from Postgres
     console.log('\n📥 Fetching feature_statistics...');
     const features = await getFeatureStatistics();
     console.log(`  ✓ Loaded ${features.length} features with graph scores`);
@@ -223,26 +168,18 @@ async function main() {
       return;
     }
 
-    // Step 2: Sync each feature to Qdrant
     console.log(`\n📊 Syncing ${features.length} features to Qdrant...`);
     let totalUpdated = 0;
 
     for (const feature of features) {
       const updated = await syncFeatureToQdrant(feature);
       totalUpdated += updated;
-
-      if (updated > 0) {
-        console.log(`  ✓ Feature ${feature.feature_id}: ${updated} Qdrant points updated`);
-      }
+      if (updated > 0) console.log(`  ✓ Feature ${feature.feature_id}: ${updated} Qdrant points updated`);
     }
 
     console.log(`\n  ✓ Total Qdrant points updated: ${totalUpdated}`);
-
-    // Step 3: Verify enrichment
     const verified = await verifyQdrantEnrichment();
-
     console.log(`\n${verified ? '✅' : '⚠️'} Step 3 ${verified ? 'PROVEN' : 'PARTIAL'}`);
-
   } catch (err) {
     console.error('\n❌ Error:', err.message);
     process.exit(1);
