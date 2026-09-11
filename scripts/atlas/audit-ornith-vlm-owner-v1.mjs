@@ -23,13 +23,21 @@ const surfaces = {
 };
 
 const text = Object.fromEntries(Object.entries(surfaces).map(([key, rel]) => [key, read(rel)]));
+const executableText = (value) => value
+  .replace(/\/\*[\s\S]*?\*\//g, '')
+  .replace(/\/\/.*$/gm, '')
+  .replace(/^\s*#.*$/gm, '')
+  .replace(/'''[\s\S]*?'''/g, '')
+  .replace(/"""[\s\S]*?"""/g, '');
+const activeDoclingClient = executableText(text.doclingClient);
+const activeTensorRtRoute = executableText(text.tensorRtRoute);
 const checks = [
   ['docling_entrypoint_is_ornith', /uvicorn\",\s*\"app_ornith:app/.test(text.doclingDockerfile)],
   ['docling_client_targets_8090', /host\.docker\.internal:8090\/v1/.test(text.doclingClient)],
   ['docling_client_uses_openai_multimodal', /image_url/.test(text.doclingClient) && /chat\/completions/.test(text.doclingClient)],
   ['docling_active_wrapper_has_no_ollama', !/ollama/i.test(text.doclingWrapper) || /historical Ollama/.test(text.doclingWrapper)],
-  ['docling_client_has_no_ollama', !/ollama/i.test(text.doclingClient)],
-  ['tensorrt_fallback_has_no_ollama', !/ollama/i.test(text.tensorRtRoute)],
+  ['docling_client_has_no_ollama', !/ollama/i.test(activeDoclingClient)],
+  ['tensorrt_fallback_has_no_ollama', !/ollama/i.test(activeTensorRtRoute)],
   ['tensorrt_fallback_requires_ornith', /ornith-1\.5/.test(text.tensorRtRoute)],
   ['tensorrt_fallback_requires_vision_prop', /modalities\?\.vision|modalities\.vision/.test(text.tensorRtRoute)],
   ['launcher_has_ornith_vlm_profile', /ornith-1\.5-vlm/.test(text.launcher)],

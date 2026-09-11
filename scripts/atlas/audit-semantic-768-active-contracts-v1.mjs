@@ -35,8 +35,8 @@ const FORBIDDEN_ACTIVE_PATTERNS = [
   { pattern: /\bMRL_384\b/, reason: '384 must not be declared as an EmbeddingGemma MRL width' },
   { pattern: /projectionVersion:\s*['"]mrl-384/i, reason: 'mrl-384 is not an admitted EmbeddingGemma projection' },
   { pattern: /supported_mrl_dimensions\s*:\s*\[[^\]]*384/i, reason: '384 must not appear in supported MRL widths' },
-  { pattern: /retrieval_embedding_dimension\s*:\s*384\b/, reason: 'active retrieval dimension must be 768' },
-  { pattern: /embedding_dimension\s*:\s*384\b/, reason: 'active EmbeddingGemma dimension must be 768' },
+  { pattern: /(?<!legacy_)retrieval_embedding_dimension\s*:\s*384\b/, reason: 'active retrieval dimension must be 768' },
+  { pattern: /(?<!legacy_retrieval_)embedding_dimension\s*:\s*384\b/, reason: 'active EmbeddingGemma dimension must be 768' },
 ];
 
 const LEGACY_ALLOWED_FILES = new Set([
