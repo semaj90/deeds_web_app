@@ -11982,6 +11982,21 @@ Status: `ALREADY_APPLIED_EXACT_BOUNDED`; authority=false for the full cohort;
 writesPerformed=false. First blocker remains
 `CURRENT_SOURCE_PACKET_CHUNK_JOIN_UNPROVEN` for current full-workspace data.
 
+### GRAPHIFY-PACKET-LINEAGE-CENSUS-RECHECK-01 — 2026-09-11
+
+- [x] Ran the read-only Graphify packet-lineage census.
+- [x] Found `61,718` packet rows; `17,307` exact source-ref matches and
+      `44,410` missing Graphify source bindings.
+- [x] Preserved integrity findings: `163` duplicate source refs,
+      `25,243` exact source-content matches, and `446` content/revision
+      mismatches; packet source-revision matches remain `0`.
+- [ ] Do not run packet backfill or source repair from this census; a current
+      producer-bound source revision and duplicate-resolution plan are required.
+
+Evidence: `docs/reports/graphify-packet-lineage-census-v1.json`.
+Status: `SOURCE_LINEAGE_CENSUS_GAPS`; authority=false; writesPerformed=false.
+First blocker: `CURRENT_SOURCE_REVISION_PACKET_BINDING_UNPROVEN`.
+
 ### TERMINAL-RUN-SCOPE-GUARD-01 — 2026-09-10
 
 - [x] Prevented the terminal authorization path from selecting the broad

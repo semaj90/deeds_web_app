@@ -1,52 +1,52 @@
 {
   "schema": "atlas.graphify-packet-lineage-census-v1",
-  "generatedAt": "2026-09-03T23:55:19.610Z",
+  "generatedAt": "2026-09-11T14:27:57.508Z",
   "readOnly": true,
   "postgresWrites": false,
   "packetSourceColumn": "source_ref",
   "packetContentHashColumn": "content_hash",
-  "packetSourceRevisionColumn": null,
+  "packetSourceRevisionColumn": "source_revision",
   "sourceRevisionAuthorityColumn": "code_source_revision",
   "gitProvenanceColumn": "graphify_files.source_revision",
   "packetWorkspaceRevisionColumn": "workspace_revision",
   "counts": {
-    "packet_rows": 61715,
-    "packet_rows_with_source_ref": 61714,
+    "packet_rows": 61718,
+    "packet_rows_with_source_ref": 61717,
     "exact_source_ref": 17307,
-    "missing_graphify_source": 44407,
-    "duplicate_source_ref": 46,
+    "missing_graphify_source": 44410,
+    "duplicate_source_ref": 163,
     "source_revision_match": 0,
     "stale_packet": 17307
   },
   "classificationCounts": {
-    "DUPLICATE_LOGICAL_SOURCE": 46,
+    "DUPLICATE_LOGICAL_SOURCE": 163,
     "IDENTITY_UNRESOLVED": 1,
-    "MISSING_GRAPHIFY_SOURCE": 44407,
-    "PACKET_CONTENT_HASH_UNAVAILABLE": 17182,
-    "SOURCE_JOINED_PACKET_HASH_REQUIRES_CHUNK_GATE": 79
+    "MISSING_GRAPHIFY_SOURCE": 44410,
+    "PACKET_CONTENT_HASH_UNAVAILABLE": 17044,
+    "SOURCE_JOINED_PACKET_HASH_REQUIRES_CHUNK_GATE": 100
   },
   "packetContentIntegrity": {
     "identity_unresolved": 1,
-    "chunk_source_missing": 57166,
-    "packet_chunk_hash_ambiguous": 4207,
-    "packet_content_hash_unavailable": 9,
-    "packet_chunk_hash_exact": 332,
+    "chunk_source_missing": 57119,
+    "packet_chunk_hash_ambiguous": 4245,
+    "packet_content_hash_unavailable": 0,
+    "packet_chunk_hash_exact": 353,
     "packet_chunk_hash_mismatch": 0
   },
   "sourceContentIntegrity": {
     "observedBindingPath": "docs/reports/workspace-source-binding-observation.json",
-    "workspaceBindingMatches": 25317,
-    "hashExact": 25162,
-    "hashMismatch": 155,
-    "observationMissing": 0,
-    "revisionExact": 25162,
-    "revisionMismatch": 155
+    "workspaceBindingMatches": 25689,
+    "hashExact": 25243,
+    "hashMismatch": 446,
+    "observationMissing": 325,
+    "revisionExact": 25243,
+    "revisionMismatch": 446
   },
   "reconciliation": {
-    "graphify_files_total_rows": 25317,
-    "graphify_distinct_source_refs": 25258,
-    "workspace_binding_matches": 25317,
-    "source_digest_matches": 25162,
+    "graphify_files_total_rows": 26014,
+    "graphify_distinct_source_refs": 25643,
+    "workspace_binding_matches": 25689,
+    "source_digest_matches": 25243,
     "latest_batch_selection_checksum": "b10d96c96e018e9b8317a918a768d025af7fa3c653ca9a7d5e45b2bb62a7efb9",
     "latest_batch_applied": true,
     "latest_batch_readback_count": 6,
@@ -138,15 +138,47 @@
     ],
     "graphifyOnly": [
       {
+        "source_ref": "docs/OPENSPEC-WORKBOARD.md",
+        "count": 4
+      },
+      {
+        "source_ref": "openspec/changes/parent-atlas-retrieval-fusion-reachability/tasks.md",
+        "count": 4
+      },
+      {
+        "source_ref": "reports/parent-atlas-workstation-todo.md",
+        "count": 4
+      },
+      {
+        "source_ref": ".claude/settings.local.json",
+        "count": 3
+      },
+      {
+        "source_ref": "openspec/changes/parent-atlas-retrieval-fusion-reachability/design.md",
+        "count": 3
+      },
+      {
+        "source_ref": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
+        "count": 3
+      },
+      {
         "source_ref": ".claude/hooks/pretooluse-deny.mjs",
         "count": 2
       },
       {
-        "source_ref": ".claude/settings.local.json",
+        "source_ref": "claude.md",
         "count": 2
       },
       {
         "source_ref": ".claude/skills/codebase-indexing-agentic-error-fixing.md",
+        "count": 2
+      },
+      {
+        "source_ref": ".claude/skills/metadata-context-analysis/SKILL.md",
+        "count": 2
+      },
+      {
+        "source_ref": ".claude/skills/trace-mcp-tooling/SKILL.md",
         "count": 2
       },
       {
@@ -162,94 +194,62 @@
         "count": 2
       },
       {
-        "source_ref": ".okf/concepts/cluster-run-lineage-gap.yaml",
+        "source_ref": "docker/miniforge-nlp-sidecar/docker-compose.yml",
         "count": 2
       },
       {
-        "source_ref": ".okf/concepts/concept-edge-ledger-gap.yaml",
+        "source_ref": "docs/architecture/runtime-ownership-registry.json",
         "count": 2
       },
       {
-        "source_ref": ".okf/concepts/domain-lineage-gap.yaml",
+        "source_ref": "docs/archive-manifest.json",
         "count": 2
       },
       {
-        "source_ref": ".okf/concepts/representation-fragmentation-gap.yaml",
+        "source_ref": "docs/MASTER-TOC.md",
         "count": 2
       },
       {
-        "source_ref": ".okf/concepts/som-run-lineage-gap.yaml",
+        "source_ref": "docs/.okf/registry.yaml",
         "count": 2
       },
       {
-        "source_ref": ".okf/concepts/topology-schema-drift-gap.yaml",
+        "source_ref": "docs/parent-atlas-workstation-todo.md",
         "count": 2
-      },
-      {
-        "source_ref": ".okf/pipelines/ast-entity-prefill.yaml",
-        "count": 2
-      },
-      {
-        "source_ref": "2-CONTEXT.md",
-        "count": 1
-      },
-      {
-        "source_ref": "724_agents.md",
-        "count": 1
-      },
-      {
-        "source_ref": "ACE-BITFROST-WORKER-INTEGRATION.md",
-        "count": 1
-      },
-      {
-        "source_ref": "ACE-QUICK-REFERENCE.md",
-        "count": 1
-      },
-      {
-        "source_ref": "ACE-SUMMARY-LATENCY-IMPACT.md",
-        "count": 1
-      },
-      {
-        "source_ref": "ace-vector-selection-slice/INTEGRATION-NOTES.md",
-        "count": 1
-      },
-      {
-        "source_ref": "ace-vector-selection-slice/src/lib/server/ace/ranking/packet-feature-matrix.test.ts",
-        "count": 1
       }
     ]
   },
   "gates": {
     "sourceBinding": {
       "exact": 17307,
-      "missing": 44407,
+      "missing": 44410,
       "unresolved": 1,
-      "duplicate": 46,
+      "duplicate": 163,
       "proven": false
     },
     "packetContentIntegrity": {
-      "exact": 332,
-      "unavailable": 9,
-      "ambiguous": 4207,
+      "exact": 353,
+      "unavailable": 0,
+      "ambiguous": 4245,
       "mismatch": 0,
       "proven": true
     },
     "sourceContentIntegrity": {
-      "exact": 25162,
-      "mismatch": 155,
-      "observationMissing": 0,
+      "exact": 25243,
+      "mismatch": 446,
+      "observationMissing": 325,
       "proven": false
     },
     "sourceRevisionBinding": {
-      "exact": 25162,
-      "mismatch": 155,
+      "exact": 25243,
+      "mismatch": 446,
       "available": true,
       "proven": false
     },
     "exactSourceRefAvailable": true,
     "exactContentHashAvailable": true,
     "sourceRevisionMatchAvailable": true,
-    "sourceRevisionMatchStatus": "PACKET_LOCAL_FIELD_NOT_REQUIRED_JOIN_DERIVED_SOURCE_REVISION_PROVEN",
+    "sourceRevisionMatchStatus": "MEASURED",
     "workspaceRevisionStatus": "MEASURED",
     "cleanForBackfill": false
   }
