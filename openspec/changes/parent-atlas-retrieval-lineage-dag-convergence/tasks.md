@@ -12011,6 +12011,22 @@ Evidence: `docs/reports/current-source-cohort-lineage-v1.json`.
 Status: `WORKSPACE_REVISION_SOURCE_MISMATCH`; authority=false;
 writesPerformed=false. First blocker: `CURRENT_WORKSPACE_COHORT_UNAVAILABLE`.
 
+### GRAPHIFY-SNAPSHOT-BINDING-RECHECK-01 — 2026-09-11
+
+- [x] Re-ran the read-only snapshot-binding audit.
+- [x] Confirmed the previously admitted revision
+      `sha256:3be7901e1b6bc4f6499185f775eac2ae93e56305940703a7da66a436e4e3a3e0`
+      has one matching terminal execution among `26` observed executions.
+- [x] Kept authority honest: binding proof is partial and does not promote
+      the graph or downstream projections.
+- [ ] Do not combine this admitted historical revision with the newer
+      `sha256:2a1d964d...` snapshot; the newer snapshot requires separate
+      explicit admission.
+
+Evidence: `docs/reports/graphify-workspace-snapshot-binding-v1.json`.
+Status: `GRAPHIFY_SNAPSHOT_BINDING_PROVEN`; authority=false;
+writesPerformed=false. First blocker: `NEW_SNAPSHOT_ADMISSION_REQUIRED`.
+
 ### TERMINAL-RUN-SCOPE-GUARD-01 — 2026-09-10
 
 - [x] Prevented the terminal authorization path from selecting the broad
