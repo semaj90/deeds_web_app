@@ -11920,6 +11920,21 @@ Evidence: `docs/reports/packet-chunk-lineage-promotion-preflight-v1.json`.
 Status: `BLOCKED_NO_QUALIFIED_CANDIDATE`; authority=false; writesPerformed=false.
 First blocker: `NO_QUALIFIED_SOURCE_BOUND_PACKET_CHUNK_CANDIDATE`.
 
+## CURRENT-WORKSPACE-PACKET-CHUNK-JOIN-RECHECK-01 — 2026-09-11
+
+- [x] Ran the current workspace packet/chunk join audit in read-only mode.
+- [x] Confirmed the available binding cohort is historical and not current:
+      `111` binding rows under workspace revision
+      `sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9`.
+- [x] Confirmed exact Graphify sources, binding-to-chunk content matches,
+      packet-to-chunk exact sources, and packet content matches are all `0`.
+- [ ] Keep structural lineage blocked until a current producer-bound cohort
+      exists; do not use this historical 111-row cohort as authority.
+
+Evidence: `docs/reports/current-workspace-packet-chunk-join-v1.json`.
+Status: `CURRENT_PACKET_CHUNK_JOIN_MISSING`; authority=false;
+writesPerformed=false. First blocker: `CURRENT_SOURCE_BINDING_COHORT_NOT_AVAILABLE`.
+
 ### ROUTING-OWNER-COMPARISON-RECHECK-01 — 2026-09-11
 
 - [x] Confirmed the existing production MCP caller remains bounded and
