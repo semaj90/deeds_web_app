@@ -76,8 +76,8 @@ export const EMBEDDING_CONTRACT = {
    * source: 768-dim lane
    * retrieval: 768-dim canonical lane
    */
-  qdrant_source_collection: 'codebase_chunks_768_v2',
-  qdrant_collection: 'codebase_chunks_768_v2',
+  qdrant_source_collection: 'codebase_chunks_768',
+  qdrant_collection: 'codebase_chunks_768',
   qdrant_legacy_collection: 'codebase_chunks_384_hybrid',
 
   /**
@@ -152,7 +152,7 @@ export const EMBEDDING_CONTRACT = {
       projection_method: 'none',
       projection_version: 'embeddinggemma-native-768-v1',
       normalization: 'L2',
-      collection: 'codebase_chunks_768_v2',
+      collection: 'codebase_chunks_768',
     },
     semantic_512: {
       lane_id: 'mrl_512',
