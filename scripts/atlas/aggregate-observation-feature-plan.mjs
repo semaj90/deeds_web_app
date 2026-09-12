@@ -14,6 +14,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const featureRevision = 'atlas-ast-entity-prefill-v2';
+const allowHistoricalUnqualified = process.argv.includes('--historical-unqualified');
 const inputPath = path.join(root, '.tmp/atlas/graphify-file-index-v1/ast-entity-identity.jsonl');
 const domainPath = path.join(root, '.tmp/atlas/graphify-file-index-v1/ast-entity-okf-domain.jsonl');
 const outputPath = path.join(root, '.tmp/atlas/graphify-file-index-v1/observation-feature-projection-plan.jsonl');
@@ -36,6 +37,31 @@ const astKinds = new Map([
 
 const identity = await readJsonl(inputPath);
 const domains = await readJsonl(domainPath);
+const invalidRevisionRows = identity.filter((row) => {
+  const revision = typeof row.source_revision === 'string' ? row.source_revision.trim() : '';
+  return !revision || revision === 'workspace:0' || revision.endsWith('_PENDING');
+});
+if (invalidRevisionRows.length > 0 && !allowHistoricalUnqualified) {
+  const report = {
+    schema: 'atlas.observation-feature-aggregation-receipt.v1',
+    generatedAt: new Date().toISOString(),
+    readOnly: true,
+    writes: false,
+    status: 'AGGREGATION_BLOCKED_SOURCE_REVISION',
+    featureRevision,
+    inputIdentityRows: identity.length,
+    invalidSourceRevisionRows: invalidRevisionRows.length,
+    sourceRevisionPlaceholders: invalidRevisionRows.filter((row) => row.source_revision === 'workspace:0').length,
+    nextGate: 'REGENERATE_IDENTITY_FROM_ADMITTED_GRAPHIFY_EXECUTION',
+    historicalOptIn: '--historical-unqualified',
+    outputPath: null,
+    planChecksum: null,
+  };
+  await fs.mkdir(path.dirname(reportPath), { recursive: true });
+  await fs.writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+  console.error(JSON.stringify(report, null, 2));
+  process.exitCode = 1;
+} else {
 const domainBySubject = new Map(domains.map((row) => [row.subject_ref, row]));
 const groups = new Map();
 
@@ -104,3 +130,4 @@ const report = {
 };
 await fs.writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
 console.log(JSON.stringify(report, null, 2));
+}
