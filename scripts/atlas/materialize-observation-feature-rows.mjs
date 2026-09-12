@@ -35,7 +35,7 @@
  *
  * Usage (run from sveltekit-frontend/):
  *   npx tsx ../scripts/atlas/materialize-observation-feature-rows.mjs                    # dry-run
- *   npx tsx ../scripts/atlas/materialize-observation-feature-rows.mjs --apply --limit=50  # bounded apply
+ *   npx tsx ../scripts/atlas/materialize-observation-feature-rows.mjs --apply --limit=50 --workspace-revision=sha256:...  # bounded, revision-bound apply
  */
 
 import fs from 'node:fs/promises';
@@ -53,7 +53,7 @@ const DATABASE_URL = process.env.DATABASE_URL
   || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
 const INPUT = path.resolve(ROOT, '.tmp/atlas/graphify-file-index-v1/observation-feature-projection-plan.jsonl');
 
-async function materializeDirect(pool, projection) {
+async function materializeDirect(pool, projection, workspaceRevision) {
   const structuralFlags = {
     hasFunction: projection.hasFunction,
     hasCall: projection.hasCall,
@@ -100,7 +100,7 @@ async function materializeDirect(pool, projection) {
        updated_at = now()`,
     [
       projection.packetKey, projection.featureRevision, projection.sourceRef,
-      projection.sourceVersionReceiptId, null, projection.representationId,
+      projection.sourceVersionReceiptId, workspaceRevision, projection.representationId,
       projection.representationRevision, projection.treeNodeId,
       projection.ontologyClasses, projection.astObservationKinds,
       projection.langextractClasses, projection.flattenedTags,
@@ -115,11 +115,16 @@ async function materializeDirect(pool, projection) {
 const args = process.argv.slice(2);
 const APPLY = args.includes('--apply');
 const LIMIT = Number((args.find((a) => a.startsWith('--limit=')) || '').split('=')[1] || 0) || null;
+const WORKSPACE_REVISION = (args.find((a) => a.startsWith('--workspace-revision=')) || '').split('=').slice(1).join('=').trim() || null;
 const PRODUCER_REVISION = 'materialize-observation-feature-rows:v1';
 
 async function main() {
   if (APPLY && !LIMIT) {
     console.error('Refusing --apply without --limit=N.');
+    process.exit(1);
+  }
+  if (APPLY && !WORKSPACE_REVISION) {
+    console.error('Refusing --apply without --workspace-revision=<admitted revision>.');
     process.exit(1);
   }
 
@@ -129,6 +134,7 @@ async function main() {
     mode: APPLY ? 'APPLY' : 'DRY_RUN',
     input: INPUT,
     limit: LIMIT,
+    workspaceRevision: WORKSPACE_REVISION,
     planRows: lines.length,
     rowsAttempted: 0,
     rowsMaterialized: 0,
@@ -174,7 +180,7 @@ async function main() {
     }
 
     if (APPLY) {
-      await materializeDirect(pool, projection);
+      await materializeDirect(pool, projection, WORKSPACE_REVISION);
       report.rowsMaterialized++;
     }
   }
