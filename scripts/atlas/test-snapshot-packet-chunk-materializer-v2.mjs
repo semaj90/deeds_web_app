@@ -34,6 +34,20 @@ function exactChunkMatch() {
   }];
 }
 
+function exactExistingLineage(overrides = {}) {
+  return {
+    packet_key: 'packet:file',
+    canonical_chunk_id: 'chunk-a',
+    chunk_row_id: '11111111-1111-1111-1111-111111111111',
+    source_ref: membership.source_ref,
+    source_namespace: `workspace:${membership.workspace_id}`,
+    source_revision: membership.code_source_revision,
+    membership_status: 'EXACT_SINGLE_MEMBER',
+    revision_status: 'PROVEN',
+    ...overrides,
+  };
+}
+
 test('language detection covers supported code sources', () => {
   assert.equal(languageForSourceRef('src/a.ts'), 'typescript');
   assert.equal(languageForSourceRef('src/a.mjs'), 'javascript');
@@ -105,6 +119,25 @@ test('explicit packet revision conflict fails closed', () => {
   assert.equal(result.exact.length, 0);
 });
 
+test('duplicate rows for one packet key with conflicting revisions fail closed', () => {
+  const result = classifyPacketRows(membership, [
+    { packet_key: 'packet:file', source_revision: sourceHash },
+    { packet_key: 'packet:file', source_revision: hash(Buffer.from('old source')) },
+  ]);
+  assert.equal(result.classification, 'DUPLICATE_PACKET_KEY_REVISION_CONFLICT');
+  assert.equal(result.exact.length, 0);
+  assert.equal(result.duplicateRevisionConflicts.length, 1);
+});
+
+test('duplicate rows for one packet key with the same revision remain one packet identity', () => {
+  const result = classifyPacketRows(membership, [
+    { packet_key: 'packet:file', source_revision: sourceHash },
+    { packet_key: 'packet:file', source_revision: sourceHash },
+  ]);
+  assert.equal(result.classification, 'EXACT_CURRENT_FILE_PACKET');
+  assert.equal(result.exact[0].observedRowCount, 2);
+});
+
 test('multiple packet keys for one source fail closed', () => {
   const result = classifyPacketRows(membership, [
     { packet_key: 'packet:a', source_revision: null },
@@ -133,15 +166,7 @@ test('matching existing lineage is already complete', () => {
     membership,
     packetResult,
     observationMatches: exactChunkMatch(),
-    existingLineageRows: [{
-      packet_key: 'packet:file',
-      canonical_chunk_id: 'chunk-a',
-      chunk_row_id: '11111111-1111-1111-1111-111111111111',
-      source_ref: membership.source_ref,
-      source_namespace: `workspace:${membership.workspace_id}`,
-      source_revision: membership.code_source_revision,
-      revision_status: 'PROVEN',
-    }],
+    existingLineageRows: [exactExistingLineage()],
   });
   assert.equal(plan.classification, 'ALREADY_COMPLETE_FOR_OBSERVED_CHUNKS');
   assert.equal(plan.alreadyPresentCount, 1);
@@ -153,18 +178,36 @@ test('existing lineage with stale revision blocks instead of being treated as pr
     membership,
     packetResult,
     observationMatches: exactChunkMatch(),
-    existingLineageRows: [{
-      packet_key: 'packet:file',
-      canonical_chunk_id: 'chunk-a',
-      chunk_row_id: '11111111-1111-1111-1111-111111111111',
-      source_ref: membership.source_ref,
-      source_namespace: `workspace:${membership.workspace_id}`,
-      source_revision: 'sha256:' + 'b'.repeat(64),
-      revision_status: 'PROVEN',
-    }],
+    existingLineageRows: [exactExistingLineage({ source_revision: 'sha256:' + 'b'.repeat(64) })],
   });
   assert.equal(plan.classification, 'BLOCKED_AMBIGUOUS_OR_UNPROVEN');
   assert.ok(plan.blockers.includes('EXISTING_LINEAGE_CONFLICT'));
+});
+
+test('existing lineage with wrong membership status blocks', () => {
+  const packetResult = classifyPacketRows(membership, [{ packet_key: 'packet:file', source_revision: sourceHash }]);
+  const plan = classifySourceMaterializerPlan({
+    membership,
+    packetResult,
+    observationMatches: exactChunkMatch(),
+    existingLineageRows: [exactExistingLineage({ membership_status: 'EXACT_MULTI_MEMBER' })],
+  });
+  assert.equal(plan.classification, 'BLOCKED_AMBIGUOUS_OR_UNPROVEN');
+  assert.ok(plan.blockers.includes('EXISTING_LINEAGE_CONFLICT'));
+});
+
+test('duplicate existing canonical membership identity blocks', () => {
+  const packetResult = classifyPacketRows(membership, [{ packet_key: 'packet:file', source_revision: sourceHash }]);
+  const row = exactExistingLineage();
+  const plan = classifySourceMaterializerPlan({
+    membership,
+    packetResult,
+    observationMatches: exactChunkMatch(),
+    existingLineageRows: [row, { ...row }],
+  });
+  assert.equal(plan.classification, 'BLOCKED_AMBIGUOUS_OR_UNPROVEN');
+  assert.ok(plan.blockers.includes('DUPLICATE_EXISTING_LINEAGE_IDENTITY'));
+  assert.equal(plan.duplicateExistingIdentityCount, 1);
 });
 
 test('missing workspace namespace fails closed', () => {
