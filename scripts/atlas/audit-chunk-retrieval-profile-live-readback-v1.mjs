@@ -36,6 +36,7 @@ const pool = new Pool({
 
 let rows = [];
 let error = null;
+let diagnostics = null;
 try {
   const client = await pool.connect();
   try {
@@ -103,6 +104,42 @@ try {
       LIMIT $3
     `;
     rows = (await client.query(sql, [receipt.executionId, receipt.workspaceRevision, limit])).rows;
+    const diagnosticSql = `
+      WITH members AS (
+        SELECT DISTINCT source_ref::text AS source_ref, code_source_revision::text AS source_revision
+        FROM public.graphify_execution_file_membership_v2
+        WHERE execution_id = $1::uuid
+          AND workspace_revision = $2::text
+      ), proven_lineage AS (
+        SELECT DISTINCT l.packet_key::text AS packet_key, l.chunk_row_id::text AS chunk_row_id,
+          l.source_ref::text AS source_ref, l.source_revision::text AS source_revision
+        FROM public.atlas_packet_chunk_lineage l
+        JOIN members m ON m.source_ref = l.source_ref AND m.source_revision = l.source_revision
+        WHERE l.revision_status = 'PROVEN'
+      ), feature_sources AS (
+        SELECT DISTINCT o.source_ref::text AS source_ref,
+          o.feature_revision::text AS feature_revision,
+          o.workspace_revision::text AS workspace_revision
+        FROM public.atlas_observation_feature_rows o
+        JOIN members m ON m.source_ref = o.source_ref
+      )
+      SELECT
+        (SELECT count(*)::int FROM members) AS distinct_source_refs,
+        (SELECT count(*)::int FROM proven_lineage) AS proven_lineage_rows,
+        (SELECT count(DISTINCT packet_key)::int FROM proven_lineage) AS proven_packet_keys,
+        (SELECT count(DISTINCT chunk_row_id)::int FROM proven_lineage) AS proven_chunk_rows,
+        (SELECT count(DISTINCT source_ref)::int FROM feature_sources
+          WHERE feature_revision IS NOT NULL) AS feature_source_refs,
+        (SELECT count(DISTINCT feature_revision)::int FROM feature_sources
+          WHERE feature_revision IS NOT NULL) AS feature_revision_count,
+        (SELECT array_agg(DISTINCT feature_revision ORDER BY feature_revision)
+          FROM feature_sources WHERE feature_revision IS NOT NULL) AS feature_revisions,
+        (SELECT count(DISTINCT workspace_revision)::int FROM feature_sources
+          WHERE workspace_revision IS NOT NULL) AS feature_workspace_revision_count,
+        (SELECT array_agg(DISTINCT workspace_revision ORDER BY workspace_revision)
+          FROM feature_sources WHERE workspace_revision IS NOT NULL) AS feature_workspace_revisions
+    `;
+    diagnostics = (await client.query(diagnosticSql, [receipt.executionId, receipt.workspaceRevision])).rows[0] ?? null;
     await client.query('ROLLBACK');
   } finally {
     client.release();
@@ -210,6 +247,7 @@ const report = {
   rowCount: projected.length,
   blockers: uniqueBlockers,
   rows: projected,
+  diagnostics,
   error,
   readOnly: true,
   writesPerformed: false,

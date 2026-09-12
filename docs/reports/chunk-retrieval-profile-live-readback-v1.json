@@ -1,0 +1,1265 @@
+{
+  "schema": "atlas.chunk-retrieval-profile-live-readback.v1",
+  "generatedAt": "2026-09-12T05:56:12.175Z",
+  "gate": "RETRIEVAL-PROFILE-LIVE-READBACK-01",
+  "status": "PROFILE_LIVE_READBACK_BLOCKED",
+  "selectedExecutionId": "14667026-459c-4a99-b3c2-c20b739a6e0d",
+  "selectedWorkspaceRevision": "sha256:3be7901e1b6bc4f6499185f775eac2ae93e56305940703a7da66a436e4e3a3e0",
+  "boundedLimit": 16,
+  "rowCount": 16,
+  "blockers": [
+    "FEATURE_REVISION_MISSING"
+  ],
+  "rows": [
+    {
+      "schema": "atlas.chunk-retrieval-profile-live-row.v1",
+      "identity": {
+        "canonicalChunkId": "fullrepo:crates/atlas_packet_parser/build.rs:0",
+        "chunkRowId": "76266fe6-4285-4dbb-8724-270c139fd4f8",
+        "packetKey": "packet:8589ed47d789",
+        "repositoryId": "repo:root",
+        "repositoryRelativePath": "crates/atlas_packet_parser/build.rs",
+        "sourceRef": "crates/atlas_packet_parser/build.rs",
+        "workspaceRevision": "sha256:3be7901e1b6bc4f6499185f775eac2ae93e56305940703a7da66a436e4e3a3e0",
+        "sourceRevision": "sha256:aa7d2ac01ee024deb2df8891a498123bb7c15d9303fb767f6085a9aac92f0d4f"
+      },
+      "featureRevision": null,
+      "lexicalStructural": {
+        "language": "rust",
+        "keywords": [
+          "compiler",
+          "crates-atlas_packet_parser-build.rs-build",
+          "rust",
+          "rs",
+          "text",
+          "repo-chunk",
+          "qdrant",
+          "vector",
+          "search",
+          "fullrepo"
+        ],
+        "identifiers": [],
+        "imports": [],
+        "exports": []
+      },
+      "semantic": {
+        "semanticTags": [],
+        "representationRevision": "semantic_768:embeddinggemma:latest:fea29b92856b32923629d4aefbee190a0d7b9bd8628f6a552e4810116451ca14",
+        "modelRevision": "embeddinggemma:latest"
+      },
+      "topology": {
+        "kmeansCluster": 137,
+        "clusterMargin": 0.037586074,
+        "somX": 0,
+        "somY": 0,
+        "somCell": 0,
+        "topologyRevision": "mbk-spherical-content768-k256-v1"
+      },
+      "evidenceRefs": [
+        "docs/reports/packet-chunk-lineage-canary-01-results.json"
+      ],
+      "sourceEvidence": {
+        "astLanguage": null,
+        "astExtractionMethod": null,
+        "astHash": null,
+        "usedConcepts": [
+          "crates",
+          "build"
+        ]
+      }
+    },
+    {
+      "schema": "atlas.chunk-retrieval-profile-live-row.v1",
+      "identity": {
+        "canonicalChunkId": "fullrepo:crates/atlas_packet_parser/Cargo.toml:0",
+        "chunkRowId": "822a81b8-5e81-4ff0-a645-b1ed7df2584e",
+        "packetKey": "packet:41aaad7c7e65",
+        "repositoryId": "repo:root",
+        "repositoryRelativePath": "crates/atlas_packet_parser/Cargo.toml",
+        "sourceRef": "crates/atlas_packet_parser/Cargo.toml",
+        "workspaceRevision": "sha256:3be7901e1b6bc4f6499185f775eac2ae93e56305940703a7da66a436e4e3a3e0",
+        "sourceRevision": "sha256:fb7c517edecc838e066c2cd04b41e9e60975d0f4c915faef4ebe9d654334c068"
+      },
+      "featureRevision": null,
+      "lexicalStructural": {
+        "language": "toml",
+        "keywords": [
+          "compiler",
+          "crates-atlas_packet_parser-cargo.toml-cargo",
+          "toml",
+          "toml",
+          "text",
+          "repo-chunk",
+          "qdrant",
+          "vector",
+          "search",
+          "fullrepo"
+        ],
+        "identifiers": [],
+        "imports": [],
+        "exports": []
+      },
+      "semantic": {
+        "semanticTags": [],
+        "representationRevision": "semantic_768:embeddinggemma:latest:eae73ddfb07efc85380e9d02f994b6a9431573396d9d02a49dd1a411e9985b3d",
+        "modelRevision": "embeddinggemma:latest"
+      },
+      "topology": {
+        "kmeansCluster": 219,
+        "clusterMargin": 0.043687705,
+        "somX": 0,
+        "somY": 0,
+        "somCell": 0,
+        "topologyRevision": "mbk-spherical-content768-k256-v1"
+      },
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-fresh-classification-v1.json",
+        "docs/reports/pkt-lineage-09-frozen-proposal-v1.json"
+      ],
+      "sourceEvidence": {
+        "astLanguage": null,
+        "astExtractionMethod": null,
+        "astHash": null,
+        "usedConcepts": [
+          "crates",
+          "cargo"
+        ]
+      }
+    },
+    {
+      "schema": "atlas.chunk-retrieval-profile-live-row.v1",
+      "identity": {
+        "canonicalChunkId": "fullrepo:crates/atlas_packet_parser/index.d.ts:0",
+        "chunkRowId": "144079f0-43df-42f1-a363-e77fb913b76e",
+        "packetKey": "packet:225fa0b05a89",
+        "repositoryId": "repo:root",
+        "repositoryRelativePath": "crates/atlas_packet_parser/index.d.ts",
+        "sourceRef": "crates/atlas_packet_parser/index.d.ts",
+        "workspaceRevision": "sha256:3be7901e1b6bc4f6499185f775eac2ae93e56305940703a7da66a436e4e3a3e0",
+        "sourceRevision": "sha256:0e7602dfb459b9ac3c51f34542f7461bbd9d6fc073de96b106740680ec671733"
+      },
+      "featureRevision": null,
+      "lexicalStructural": {
+        "language": "typescript",
+        "keywords": [
+          "compiler",
+          "crates-atlas_packet_parser-index.d.ts-index.d",
+          "typescript",
+          "ts",
+          "text",
+          "repo-chunk",
+          "qdrant",
+          "vector",
+          "search",
+          "fullrepo"
+        ],
+        "identifiers": [],
+        "imports": [],
+        "exports": []
+      },
+      "semantic": {
+        "semanticTags": [],
+        "representationRevision": "semantic_768:embeddinggemma:latest:291832d023e8529d1740425fa76a9445d3ce0e0bb82787a8732168ac162645ff",
+        "modelRevision": "embeddinggemma:latest"
+      },
+      "topology": {
+        "kmeansCluster": 202,
+        "clusterMargin": 0.055775743,
+        "somX": 0,
+        "somY": 0,
+        "somCell": 0,
+        "topologyRevision": "mbk-spherical-content768-k256-v1"
+      },
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-fresh-classification-v1.json",
+        "docs/reports/pkt-lineage-09-frozen-proposal-v1.json"
+      ],
+      "sourceEvidence": {
+        "astLanguage": null,
+        "astExtractionMethod": null,
+        "astHash": null,
+        "usedConcepts": [
+          "fn:parse",
+          "json",
+          "large",
+          "msgpack"
+        ]
+      }
+    },
+    {
+      "schema": "atlas.chunk-retrieval-profile-live-row.v1",
+      "identity": {
+        "canonicalChunkId": "fullrepo:crates/atlas_packet_parser/index.js:0",
+        "chunkRowId": "ed72be55-79b0-4114-95b4-86f9ebcde039",
+        "packetKey": "packet:0ef4e5eff91e",
+        "repositoryId": "repo:root",
+        "repositoryRelativePath": "crates/atlas_packet_parser/index.js",
+        "sourceRef": "crates/atlas_packet_parser/index.js",
+        "workspaceRevision": "sha256:3be7901e1b6bc4f6499185f775eac2ae93e56305940703a7da66a436e4e3a3e0",
+        "sourceRevision": "sha256:5bb2826a27ba9434029c48b27ccf75dd1b08857d6b9ab110a14f0833cabc4769"
+      },
+      "featureRevision": null,
+      "lexicalStructural": {
+        "language": "javascript",
+        "keywords": [
+          "compiler",
+          "crates-atlas_packet_parser-index.js-index",
+          "javascript",
+          "js",
+          "text",
+          "repo-chunk",
+          "qdrant",
+          "vector",
+          "search",
+          "fullrepo"
+        ],
+        "identifiers": [
+          {
+            "kind": "variable",
+            "name": "{ existsSync, readFileSync }",
+            "node_id": "2571a84d-b54f-5bf3-439c-309eb91d8290",
+            "line_end": 7,
+            "line_start": 7
+          },
+          {
+            "kind": "variable",
+            "name": "{ join }",
+            "node_id": "dbf51f03-8370-5821-109c-0f72afa4919e",
+            "line_end": 8,
+            "line_start": 8
+          },
+          {
+            "kind": "variable",
+            "name": "{ platform, arch }",
+            "node_id": "8031e158-1f9e-5b5f-d78f-f056a777a92f",
+            "line_end": 10,
+            "line_start": 10
+          },
+          {
+            "kind": "variable",
+            "name": "nativeBinding",
+            "node_id": "3a908456-de88-534e-f7f5-85fc523ca02f",
+            "line_end": 12,
+            "line_start": 12
+          },
+          {
+            "kind": "variable",
+            "name": "localFileExisted",
+            "node_id": "34859091-9886-53f0-8dad-e1fcb49c78ee",
+            "line_end": 13,
+            "line_start": 13
+          },
+          {
+            "kind": "variable",
+            "name": "loadError",
+            "node_id": "96d8a356-ed3d-593a-3637-e83c9decb734",
+            "line_end": 14,
+            "line_start": 14
+          },
+          {
+            "kind": "function",
+            "name": "isMusl",
+            "node_id": "0174c192-45d2-5f00-4e3d-b4a9e30d0b45",
+            "line_end": 29,
+            "line_start": 16
+          },
+          {
+            "kind": "variable",
+            "name": "lddPath",
+            "node_id": "fecdd933-8e98-5121-8a1d-da1c975de060",
+            "line_end": 20,
+            "line_start": 20
+          },
+          {
+            "kind": "variable",
+            "name": "{ glibcVersionRuntime }",
+            "node_id": "56587512-e3ca-5465-2d04-4ff040efda29",
+            "line_end": 26,
+            "line_start": 26
+          }
+        ],
+        "imports": [],
+        "exports": [
+          "{ existsSync, readFileSync }",
+          "{ join }",
+          "{ platform, arch }",
+          "nativeBinding",
+          "localFileExisted",
+          "loadError",
+          "isMusl",
+          "lddPath",
+          "{ glibcVersionRuntime }",
+          "{ parseLargeJsonToMsgpack }"
+        ]
+      },
+      "semantic": {
+        "semanticTags": [],
+        "representationRevision": "qdrant-backfill-v1",
+        "modelRevision": "embeddinggemma:latest:eg-task-prefix-v1"
+      },
+      "topology": {
+        "kmeansCluster": 76,
+        "clusterMargin": 0.3807751,
+        "somCell": 0,
+        "topologyRevision": "mbk-spherical-content768-k256-v1"
+      },
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-fresh-classification-v1.json",
+        "docs/reports/pkt-lineage-09-frozen-proposal-v1.json"
+      ],
+      "sourceEvidence": {
+        "astLanguage": null,
+        "astExtractionMethod": null,
+        "astHash": null,
+        "usedConcepts": [
+          "binding",
+          "error",
+          "existed",
+          "file",
+          "ldd",
+          "load",
+          "local",
+          "native",
+          "path"
+        ]
+      }
+    },
+    {
+      "schema": "atlas.chunk-retrieval-profile-live-row.v1",
+      "identity": {
+        "canonicalChunkId": "fullrepo:crates/atlas_packet_parser/index.js:1",
+        "chunkRowId": "c7397c90-443c-4b08-8f01-3094c5182b7c",
+        "packetKey": "packet:0ef4e5eff91e",
+        "repositoryId": "repo:root",
+        "repositoryRelativePath": "crates/atlas_packet_parser/index.js",
+        "sourceRef": "crates/atlas_packet_parser/index.js",
+        "workspaceRevision": "sha256:3be7901e1b6bc4f6499185f775eac2ae93e56305940703a7da66a436e4e3a3e0",
+        "sourceRevision": "sha256:5bb2826a27ba9434029c48b27ccf75dd1b08857d6b9ab110a14f0833cabc4769"
+      },
+      "featureRevision": null,
+      "lexicalStructural": {
+        "language": "javascript",
+        "keywords": [
+          "compiler",
+          "crates-atlas_packet_parser-index.js-index",
+          "javascript",
+          "js",
+          "text",
+          "repo-chunk",
+          "qdrant",
+          "vector",
+          "search",
+          "fullrepo"
+        ],
+        "identifiers": [
+          {
+            "kind": "function",
+            "name": "isMusl",
+            "node_id": "0174c192-45d2-5f00-4e3d-b4a9e30d0b45",
+            "line_end": 29,
+            "line_start": 16
+          }
+        ],
+        "imports": [],
+        "exports": [
+          "{ existsSync, readFileSync }",
+          "{ join }",
+          "{ platform, arch }",
+          "nativeBinding",
+          "localFileExisted",
+          "loadError",
+          "isMusl",
+          "lddPath",
+          "{ glibcVersionRuntime }",
+          "{ parseLargeJsonToMsgpack }"
+        ]
+      },
+      "semantic": {
+        "semanticTags": [],
+        "representationRevision": "qdrant-backfill-v1",
+        "modelRevision": "embeddinggemma:latest:eg-task-prefix-v1"
+      },
+      "topology": {
+        "kmeansCluster": 76,
+        "clusterMargin": 0.76497996,
+        "somCell": 0,
+        "topologyRevision": "mbk-spherical-content768-k256-v1"
+      },
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-fresh-classification-v1.json",
+        "docs/reports/pkt-lineage-09-frozen-proposal-v1.json"
+      ],
+      "sourceEvidence": {
+        "astLanguage": null,
+        "astExtractionMethod": null,
+        "astHash": null,
+        "usedConcepts": [
+          "binding",
+          "error",
+          "existed",
+          "file",
+          "ldd",
+          "load",
+          "local",
+          "native",
+          "path"
+        ]
+      }
+    },
+    {
+      "schema": "atlas.chunk-retrieval-profile-live-row.v1",
+      "identity": {
+        "canonicalChunkId": "fullrepo:crates/atlas_packet_parser/index.js:10",
+        "chunkRowId": "f76609f8-52f9-40b0-9146-3450b0a0f9ae",
+        "packetKey": "packet:0ef4e5eff91e",
+        "repositoryId": "repo:root",
+        "repositoryRelativePath": "crates/atlas_packet_parser/index.js",
+        "sourceRef": "crates/atlas_packet_parser/index.js",
+        "workspaceRevision": "sha256:3be7901e1b6bc4f6499185f775eac2ae93e56305940703a7da66a436e4e3a3e0",
+        "sourceRevision": "sha256:5bb2826a27ba9434029c48b27ccf75dd1b08857d6b9ab110a14f0833cabc4769"
+      },
+      "featureRevision": null,
+      "lexicalStructural": {
+        "language": "javascript",
+        "keywords": [
+          "compiler",
+          "crates-atlas_packet_parser-index.js-index",
+          "javascript",
+          "js",
+          "text",
+          "repo-chunk",
+          "qdrant",
+          "vector",
+          "search",
+          "fullrepo"
+        ],
+        "identifiers": [],
+        "imports": [],
+        "exports": [
+          "{ existsSync, readFileSync }",
+          "{ join }",
+          "{ platform, arch }",
+          "nativeBinding",
+          "localFileExisted",
+          "loadError",
+          "isMusl",
+          "lddPath",
+          "{ glibcVersionRuntime }",
+          "{ parseLargeJsonToMsgpack }"
+        ]
+      },
+      "semantic": {
+        "semanticTags": [],
+        "representationRevision": "qdrant-backfill-v1",
+        "modelRevision": "embeddinggemma:latest:eg-task-prefix-v1"
+      },
+      "topology": {
+        "kmeansCluster": 76,
+        "clusterMargin": 0.7912702,
+        "somCell": 0,
+        "topologyRevision": "mbk-spherical-content768-k256-v1"
+      },
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-fresh-classification-v1.json",
+        "docs/reports/pkt-lineage-09-frozen-proposal-v1.json"
+      ],
+      "sourceEvidence": {
+        "astLanguage": null,
+        "astExtractionMethod": null,
+        "astHash": null,
+        "usedConcepts": [
+          "binding",
+          "error",
+          "existed",
+          "file",
+          "ldd",
+          "load",
+          "local",
+          "native",
+          "path"
+        ]
+      }
+    },
+    {
+      "schema": "atlas.chunk-retrieval-profile-live-row.v1",
+      "identity": {
+        "canonicalChunkId": "fullrepo:crates/atlas_packet_parser/index.js:11",
+        "chunkRowId": "f0dbde17-a5b8-498f-b635-befbab50aac3",
+        "packetKey": "packet:0ef4e5eff91e",
+        "repositoryId": "repo:root",
+        "repositoryRelativePath": "crates/atlas_packet_parser/index.js",
+        "sourceRef": "crates/atlas_packet_parser/index.js",
+        "workspaceRevision": "sha256:3be7901e1b6bc4f6499185f775eac2ae93e56305940703a7da66a436e4e3a3e0",
+        "sourceRevision": "sha256:5bb2826a27ba9434029c48b27ccf75dd1b08857d6b9ab110a14f0833cabc4769"
+      },
+      "featureRevision": null,
+      "lexicalStructural": {
+        "language": "javascript",
+        "keywords": [
+          "compiler",
+          "crates-atlas_packet_parser-index.js-index",
+          "javascript",
+          "js",
+          "text",
+          "repo-chunk",
+          "qdrant",
+          "vector",
+          "search",
+          "fullrepo"
+        ],
+        "identifiers": [],
+        "imports": [],
+        "exports": [
+          "{ existsSync, readFileSync }",
+          "{ join }",
+          "{ platform, arch }",
+          "nativeBinding",
+          "localFileExisted",
+          "loadError",
+          "isMusl",
+          "lddPath",
+          "{ glibcVersionRuntime }",
+          "{ parseLargeJsonToMsgpack }"
+        ]
+      },
+      "semantic": {
+        "semanticTags": [],
+        "representationRevision": "qdrant-backfill-v1",
+        "modelRevision": "embeddinggemma:latest:eg-task-prefix-v1"
+      },
+      "topology": {
+        "kmeansCluster": 76,
+        "clusterMargin": 0.8069566,
+        "somCell": 0,
+        "topologyRevision": "mbk-spherical-content768-k256-v1"
+      },
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-fresh-classification-v1.json",
+        "docs/reports/pkt-lineage-09-frozen-proposal-v1.json"
+      ],
+      "sourceEvidence": {
+        "astLanguage": null,
+        "astExtractionMethod": null,
+        "astHash": null,
+        "usedConcepts": [
+          "binding",
+          "error",
+          "existed",
+          "file",
+          "ldd",
+          "load",
+          "local",
+          "native",
+          "path"
+        ]
+      }
+    },
+    {
+      "schema": "atlas.chunk-retrieval-profile-live-row.v1",
+      "identity": {
+        "canonicalChunkId": "fullrepo:crates/atlas_packet_parser/index.js:12",
+        "chunkRowId": "50a9fd00-6c5f-492e-97a5-bea1e577230c",
+        "packetKey": "packet:0ef4e5eff91e",
+        "repositoryId": "repo:root",
+        "repositoryRelativePath": "crates/atlas_packet_parser/index.js",
+        "sourceRef": "crates/atlas_packet_parser/index.js",
+        "workspaceRevision": "sha256:3be7901e1b6bc4f6499185f775eac2ae93e56305940703a7da66a436e4e3a3e0",
+        "sourceRevision": "sha256:5bb2826a27ba9434029c48b27ccf75dd1b08857d6b9ab110a14f0833cabc4769"
+      },
+      "featureRevision": null,
+      "lexicalStructural": {
+        "language": "javascript",
+        "keywords": [
+          "compiler",
+          "crates-atlas_packet_parser-index.js-index",
+          "javascript",
+          "js",
+          "text",
+          "repo-chunk",
+          "qdrant",
+          "vector",
+          "search",
+          "fullrepo"
+        ],
+        "identifiers": [],
+        "imports": [],
+        "exports": [
+          "{ existsSync, readFileSync }",
+          "{ join }",
+          "{ platform, arch }",
+          "nativeBinding",
+          "localFileExisted",
+          "loadError",
+          "isMusl",
+          "lddPath",
+          "{ glibcVersionRuntime }",
+          "{ parseLargeJsonToMsgpack }"
+        ]
+      },
+      "semantic": {
+        "semanticTags": [],
+        "representationRevision": "qdrant-backfill-v1",
+        "modelRevision": "embeddinggemma:latest:eg-task-prefix-v1"
+      },
+      "topology": {
+        "kmeansCluster": 76,
+        "clusterMargin": 0.7505551,
+        "somX": 0,
+        "somY": 0,
+        "somCell": 0,
+        "topologyRevision": "mbk-spherical-content768-k256-v1"
+      },
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-fresh-classification-v1.json",
+        "docs/reports/pkt-lineage-09-frozen-proposal-v1.json"
+      ],
+      "sourceEvidence": {
+        "astLanguage": null,
+        "astExtractionMethod": null,
+        "astHash": null,
+        "usedConcepts": [
+          "binding",
+          "error",
+          "existed",
+          "file",
+          "ldd",
+          "load",
+          "local",
+          "native",
+          "path"
+        ]
+      }
+    },
+    {
+      "schema": "atlas.chunk-retrieval-profile-live-row.v1",
+      "identity": {
+        "canonicalChunkId": "fullrepo:crates/atlas_packet_parser/index.js:13",
+        "chunkRowId": "eadbd9f4-e5d4-41f3-9e14-7e430d9e415e",
+        "packetKey": "packet:0ef4e5eff91e",
+        "repositoryId": "repo:root",
+        "repositoryRelativePath": "crates/atlas_packet_parser/index.js",
+        "sourceRef": "crates/atlas_packet_parser/index.js",
+        "workspaceRevision": "sha256:3be7901e1b6bc4f6499185f775eac2ae93e56305940703a7da66a436e4e3a3e0",
+        "sourceRevision": "sha256:5bb2826a27ba9434029c48b27ccf75dd1b08857d6b9ab110a14f0833cabc4769"
+      },
+      "featureRevision": null,
+      "lexicalStructural": {
+        "language": "javascript",
+        "keywords": [
+          "compiler",
+          "crates-atlas_packet_parser-index.js-index",
+          "javascript",
+          "js",
+          "text",
+          "repo-chunk",
+          "qdrant",
+          "vector",
+          "search",
+          "fullrepo"
+        ],
+        "identifiers": [
+          {
+            "kind": "variable",
+            "name": "{ parseLargeJsonToMsgpack }",
+            "node_id": "5bb10bef-280c-5a4f-8ac5-7f72b777c3e5",
+            "line_end": 313,
+            "line_start": 313
+          }
+        ],
+        "imports": [],
+        "exports": [
+          "{ existsSync, readFileSync }",
+          "{ join }",
+          "{ platform, arch }",
+          "nativeBinding",
+          "localFileExisted",
+          "loadError",
+          "isMusl",
+          "lddPath",
+          "{ glibcVersionRuntime }",
+          "{ parseLargeJsonToMsgpack }"
+        ]
+      },
+      "semantic": {
+        "semanticTags": [],
+        "representationRevision": "qdrant-backfill-v1",
+        "modelRevision": "embeddinggemma:latest:eg-task-prefix-v1"
+      },
+      "topology": {
+        "kmeansCluster": 76,
+        "clusterMargin": 0.43039736,
+        "somCell": 0,
+        "topologyRevision": "mbk-spherical-content768-k256-v1"
+      },
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-fresh-classification-v1.json",
+        "docs/reports/pkt-lineage-09-frozen-proposal-v1.json"
+      ],
+      "sourceEvidence": {
+        "astLanguage": null,
+        "astExtractionMethod": null,
+        "astHash": null,
+        "usedConcepts": [
+          "binding",
+          "error",
+          "existed",
+          "file",
+          "ldd",
+          "load",
+          "local",
+          "native",
+          "path"
+        ]
+      }
+    },
+    {
+      "schema": "atlas.chunk-retrieval-profile-live-row.v1",
+      "identity": {
+        "canonicalChunkId": "fullrepo:crates/atlas_packet_parser/index.js:2",
+        "chunkRowId": "002f6da1-91cd-42d1-af3f-78be87dee29a",
+        "packetKey": "packet:0ef4e5eff91e",
+        "repositoryId": "repo:root",
+        "repositoryRelativePath": "crates/atlas_packet_parser/index.js",
+        "sourceRef": "crates/atlas_packet_parser/index.js",
+        "workspaceRevision": "sha256:3be7901e1b6bc4f6499185f775eac2ae93e56305940703a7da66a436e4e3a3e0",
+        "sourceRevision": "sha256:5bb2826a27ba9434029c48b27ccf75dd1b08857d6b9ab110a14f0833cabc4769"
+      },
+      "featureRevision": null,
+      "lexicalStructural": {
+        "language": "javascript",
+        "keywords": [
+          "compiler",
+          "crates-atlas_packet_parser-index.js-index",
+          "javascript",
+          "js",
+          "text",
+          "repo-chunk",
+          "qdrant",
+          "vector",
+          "search",
+          "fullrepo"
+        ],
+        "identifiers": [],
+        "imports": [],
+        "exports": [
+          "{ existsSync, readFileSync }",
+          "{ join }",
+          "{ platform, arch }",
+          "nativeBinding",
+          "localFileExisted",
+          "loadError",
+          "isMusl",
+          "lddPath",
+          "{ glibcVersionRuntime }",
+          "{ parseLargeJsonToMsgpack }"
+        ]
+      },
+      "semantic": {
+        "summary": "This code snippet is a dynamic module loader responsible for initializing a native binding for an \"atlas packet parser\" utility. It determines the correct platform and architecture (e.g., Android ARM, Windows x64) at runtime to load the necessary pre-compiled native module. This mechanism ensures the application can reliably use platform-specific, high-performance parsing logic regardless of the target environment.",
+        "semanticTags": [],
+        "representationRevision": "qdrant-backfill-v1",
+        "modelRevision": "embeddinggemma:latest:eg-task-prefix-v1"
+      },
+      "topology": {
+        "kmeansCluster": 76,
+        "clusterMargin": 0.7669549,
+        "somX": 0,
+        "somY": 0,
+        "somCell": 0,
+        "topologyRevision": "mbk-spherical-content768-k256-v1"
+      },
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-fresh-classification-v1.json",
+        "docs/reports/pkt-lineage-09-frozen-proposal-v1.json"
+      ],
+      "sourceEvidence": {
+        "astLanguage": null,
+        "astExtractionMethod": null,
+        "astHash": null,
+        "usedConcepts": [
+          "binding",
+          "error",
+          "existed",
+          "file",
+          "ldd",
+          "load",
+          "local",
+          "native",
+          "path"
+        ]
+      }
+    },
+    {
+      "schema": "atlas.chunk-retrieval-profile-live-row.v1",
+      "identity": {
+        "canonicalChunkId": "fullrepo:crates/atlas_packet_parser/index.js:3",
+        "chunkRowId": "ac05cf41-4489-4764-8c52-5328dcb71934",
+        "packetKey": "packet:0ef4e5eff91e",
+        "repositoryId": "repo:root",
+        "repositoryRelativePath": "crates/atlas_packet_parser/index.js",
+        "sourceRef": "crates/atlas_packet_parser/index.js",
+        "workspaceRevision": "sha256:3be7901e1b6bc4f6499185f775eac2ae93e56305940703a7da66a436e4e3a3e0",
+        "sourceRevision": "sha256:5bb2826a27ba9434029c48b27ccf75dd1b08857d6b9ab110a14f0833cabc4769"
+      },
+      "featureRevision": null,
+      "lexicalStructural": {
+        "language": "javascript",
+        "keywords": [
+          "compiler",
+          "crates-atlas_packet_parser-index.js-index",
+          "javascript",
+          "js",
+          "text",
+          "repo-chunk",
+          "qdrant",
+          "vector",
+          "search",
+          "fullrepo"
+        ],
+        "identifiers": [],
+        "imports": [],
+        "exports": [
+          "{ existsSync, readFileSync }",
+          "{ join }",
+          "{ platform, arch }",
+          "nativeBinding",
+          "localFileExisted",
+          "loadError",
+          "isMusl",
+          "lddPath",
+          "{ glibcVersionRuntime }",
+          "{ parseLargeJsonToMsgpack }"
+        ]
+      },
+      "semantic": {
+        "semanticTags": [],
+        "representationRevision": "qdrant-backfill-v1",
+        "modelRevision": "embeddinggemma:latest:eg-task-prefix-v1"
+      },
+      "topology": {
+        "kmeansCluster": 76,
+        "clusterMargin": 0.7306185,
+        "somX": 0,
+        "somY": 0,
+        "somCell": 0,
+        "topologyRevision": "mbk-spherical-content768-k256-v1"
+      },
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-fresh-classification-v1.json",
+        "docs/reports/pkt-lineage-09-frozen-proposal-v1.json"
+      ],
+      "sourceEvidence": {
+        "astLanguage": null,
+        "astExtractionMethod": null,
+        "astHash": null,
+        "usedConcepts": [
+          "binding",
+          "error",
+          "existed",
+          "file",
+          "ldd",
+          "load",
+          "local",
+          "native",
+          "path"
+        ]
+      }
+    },
+    {
+      "schema": "atlas.chunk-retrieval-profile-live-row.v1",
+      "identity": {
+        "canonicalChunkId": "fullrepo:crates/atlas_packet_parser/index.js:4",
+        "chunkRowId": "479014b5-3dfa-440c-8918-ff87bc8d52df",
+        "packetKey": "packet:0ef4e5eff91e",
+        "repositoryId": "repo:root",
+        "repositoryRelativePath": "crates/atlas_packet_parser/index.js",
+        "sourceRef": "crates/atlas_packet_parser/index.js",
+        "workspaceRevision": "sha256:3be7901e1b6bc4f6499185f775eac2ae93e56305940703a7da66a436e4e3a3e0",
+        "sourceRevision": "sha256:5bb2826a27ba9434029c48b27ccf75dd1b08857d6b9ab110a14f0833cabc4769"
+      },
+      "featureRevision": null,
+      "lexicalStructural": {
+        "language": "javascript",
+        "keywords": [
+          "compiler",
+          "crates-atlas_packet_parser-index.js-index",
+          "javascript",
+          "js",
+          "text",
+          "repo-chunk",
+          "qdrant",
+          "vector",
+          "search",
+          "fullrepo"
+        ],
+        "identifiers": [],
+        "imports": [],
+        "exports": [
+          "{ existsSync, readFileSync }",
+          "{ join }",
+          "{ platform, arch }",
+          "nativeBinding",
+          "localFileExisted",
+          "loadError",
+          "isMusl",
+          "lddPath",
+          "{ glibcVersionRuntime }",
+          "{ parseLargeJsonToMsgpack }"
+        ]
+      },
+      "semantic": {
+        "semanticTags": [],
+        "representationRevision": "qdrant-backfill-v1",
+        "modelRevision": "embeddinggemma:latest:eg-task-prefix-v1"
+      },
+      "topology": {
+        "kmeansCluster": 76,
+        "clusterMargin": 0.7676655,
+        "somX": 0,
+        "somY": 0,
+        "somCell": 0,
+        "topologyRevision": "mbk-spherical-content768-k256-v1"
+      },
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-fresh-classification-v1.json",
+        "docs/reports/pkt-lineage-09-frozen-proposal-v1.json"
+      ],
+      "sourceEvidence": {
+        "astLanguage": null,
+        "astExtractionMethod": null,
+        "astHash": null,
+        "usedConcepts": [
+          "binding",
+          "error",
+          "existed",
+          "file",
+          "ldd",
+          "load",
+          "local",
+          "native",
+          "path"
+        ]
+      }
+    },
+    {
+      "schema": "atlas.chunk-retrieval-profile-live-row.v1",
+      "identity": {
+        "canonicalChunkId": "fullrepo:crates/atlas_packet_parser/index.js:5",
+        "chunkRowId": "73ea1537-b990-47da-9711-e9f6555bde82",
+        "packetKey": "packet:0ef4e5eff91e",
+        "repositoryId": "repo:root",
+        "repositoryRelativePath": "crates/atlas_packet_parser/index.js",
+        "sourceRef": "crates/atlas_packet_parser/index.js",
+        "workspaceRevision": "sha256:3be7901e1b6bc4f6499185f775eac2ae93e56305940703a7da66a436e4e3a3e0",
+        "sourceRevision": "sha256:5bb2826a27ba9434029c48b27ccf75dd1b08857d6b9ab110a14f0833cabc4769"
+      },
+      "featureRevision": null,
+      "lexicalStructural": {
+        "language": "javascript",
+        "keywords": [
+          "compiler",
+          "crates-atlas_packet_parser-index.js-index",
+          "javascript",
+          "js",
+          "text",
+          "repo-chunk",
+          "qdrant",
+          "vector",
+          "search",
+          "fullrepo"
+        ],
+        "identifiers": [],
+        "imports": [],
+        "exports": [
+          "{ existsSync, readFileSync }",
+          "{ join }",
+          "{ platform, arch }",
+          "nativeBinding",
+          "localFileExisted",
+          "loadError",
+          "isMusl",
+          "lddPath",
+          "{ glibcVersionRuntime }",
+          "{ parseLargeJsonToMsgpack }"
+        ]
+      },
+      "semantic": {
+        "semanticTags": [],
+        "representationRevision": "qdrant-backfill-v1",
+        "modelRevision": "embeddinggemma:latest:eg-task-prefix-v1"
+      },
+      "topology": {
+        "kmeansCluster": 76,
+        "clusterMargin": 0.7732105,
+        "somX": 0,
+        "somY": 0,
+        "somCell": 0,
+        "topologyRevision": "mbk-spherical-content768-k256-v1"
+      },
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-fresh-classification-v1.json",
+        "docs/reports/pkt-lineage-09-frozen-proposal-v1.json"
+      ],
+      "sourceEvidence": {
+        "astLanguage": null,
+        "astExtractionMethod": null,
+        "astHash": null,
+        "usedConcepts": [
+          "binding",
+          "error",
+          "existed",
+          "file",
+          "ldd",
+          "load",
+          "local",
+          "native",
+          "path"
+        ]
+      }
+    },
+    {
+      "schema": "atlas.chunk-retrieval-profile-live-row.v1",
+      "identity": {
+        "canonicalChunkId": "fullrepo:crates/atlas_packet_parser/index.js:6",
+        "chunkRowId": "6c74c659-cf76-4bb6-8c22-f5485f483a32",
+        "packetKey": "packet:0ef4e5eff91e",
+        "repositoryId": "repo:root",
+        "repositoryRelativePath": "crates/atlas_packet_parser/index.js",
+        "sourceRef": "crates/atlas_packet_parser/index.js",
+        "workspaceRevision": "sha256:3be7901e1b6bc4f6499185f775eac2ae93e56305940703a7da66a436e4e3a3e0",
+        "sourceRevision": "sha256:5bb2826a27ba9434029c48b27ccf75dd1b08857d6b9ab110a14f0833cabc4769"
+      },
+      "featureRevision": null,
+      "lexicalStructural": {
+        "language": "javascript",
+        "keywords": [
+          "compiler",
+          "crates-atlas_packet_parser-index.js-index",
+          "javascript",
+          "js",
+          "text",
+          "repo-chunk",
+          "qdrant",
+          "vector",
+          "search",
+          "fullrepo"
+        ],
+        "identifiers": [],
+        "imports": [],
+        "exports": [
+          "{ existsSync, readFileSync }",
+          "{ join }",
+          "{ platform, arch }",
+          "nativeBinding",
+          "localFileExisted",
+          "loadError",
+          "isMusl",
+          "lddPath",
+          "{ glibcVersionRuntime }",
+          "{ parseLargeJsonToMsgpack }"
+        ]
+      },
+      "semantic": {
+        "semanticTags": [],
+        "representationRevision": "qdrant-backfill-v1",
+        "modelRevision": "embeddinggemma:latest:eg-task-prefix-v1"
+      },
+      "topology": {
+        "kmeansCluster": 76,
+        "clusterMargin": 0.74402314,
+        "somX": 0,
+        "somY": 0,
+        "somCell": 0,
+        "topologyRevision": "mbk-spherical-content768-k256-v1"
+      },
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-fresh-classification-v1.json",
+        "docs/reports/pkt-lineage-09-frozen-proposal-v1.json"
+      ],
+      "sourceEvidence": {
+        "astLanguage": null,
+        "astExtractionMethod": null,
+        "astHash": null,
+        "usedConcepts": [
+          "binding",
+          "error",
+          "existed",
+          "file",
+          "ldd",
+          "load",
+          "local",
+          "native",
+          "path"
+        ]
+      }
+    },
+    {
+      "schema": "atlas.chunk-retrieval-profile-live-row.v1",
+      "identity": {
+        "canonicalChunkId": "fullrepo:crates/atlas_packet_parser/index.js:7",
+        "chunkRowId": "ff278d2b-cf1a-4002-8ced-7e3e1d003dcc",
+        "packetKey": "packet:0ef4e5eff91e",
+        "repositoryId": "repo:root",
+        "repositoryRelativePath": "crates/atlas_packet_parser/index.js",
+        "sourceRef": "crates/atlas_packet_parser/index.js",
+        "workspaceRevision": "sha256:3be7901e1b6bc4f6499185f775eac2ae93e56305940703a7da66a436e4e3a3e0",
+        "sourceRevision": "sha256:5bb2826a27ba9434029c48b27ccf75dd1b08857d6b9ab110a14f0833cabc4769"
+      },
+      "featureRevision": null,
+      "lexicalStructural": {
+        "language": "javascript",
+        "keywords": [
+          "compiler",
+          "crates-atlas_packet_parser-index.js-index",
+          "javascript",
+          "js",
+          "text",
+          "repo-chunk",
+          "qdrant",
+          "vector",
+          "search",
+          "fullrepo"
+        ],
+        "identifiers": [],
+        "imports": [],
+        "exports": [
+          "{ existsSync, readFileSync }",
+          "{ join }",
+          "{ platform, arch }",
+          "nativeBinding",
+          "localFileExisted",
+          "loadError",
+          "isMusl",
+          "lddPath",
+          "{ glibcVersionRuntime }",
+          "{ parseLargeJsonToMsgpack }"
+        ]
+      },
+      "semantic": {
+        "semanticTags": [],
+        "representationRevision": "qdrant-backfill-v1",
+        "modelRevision": "embeddinggemma:latest:eg-task-prefix-v1"
+      },
+      "topology": {
+        "kmeansCluster": 76,
+        "clusterMargin": 0.7975593,
+        "somCell": 0,
+        "topologyRevision": "mbk-spherical-content768-k256-v1"
+      },
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-fresh-classification-v1.json",
+        "docs/reports/pkt-lineage-09-frozen-proposal-v1.json"
+      ],
+      "sourceEvidence": {
+        "astLanguage": null,
+        "astExtractionMethod": null,
+        "astHash": null,
+        "usedConcepts": [
+          "binding",
+          "error",
+          "existed",
+          "file",
+          "ldd",
+          "load",
+          "local",
+          "native",
+          "path"
+        ]
+      }
+    },
+    {
+      "schema": "atlas.chunk-retrieval-profile-live-row.v1",
+      "identity": {
+        "canonicalChunkId": "fullrepo:crates/atlas_packet_parser/index.js:8",
+        "chunkRowId": "9b76e7bf-a7ca-44f0-ac0d-2f9d73fa8fc2",
+        "packetKey": "packet:0ef4e5eff91e",
+        "repositoryId": "repo:root",
+        "repositoryRelativePath": "crates/atlas_packet_parser/index.js",
+        "sourceRef": "crates/atlas_packet_parser/index.js",
+        "workspaceRevision": "sha256:3be7901e1b6bc4f6499185f775eac2ae93e56305940703a7da66a436e4e3a3e0",
+        "sourceRevision": "sha256:5bb2826a27ba9434029c48b27ccf75dd1b08857d6b9ab110a14f0833cabc4769"
+      },
+      "featureRevision": null,
+      "lexicalStructural": {
+        "language": "javascript",
+        "keywords": [
+          "compiler",
+          "crates-atlas_packet_parser-index.js-index",
+          "javascript",
+          "js",
+          "text",
+          "repo-chunk",
+          "qdrant",
+          "vector",
+          "search",
+          "fullrepo"
+        ],
+        "identifiers": [],
+        "imports": [],
+        "exports": [
+          "{ existsSync, readFileSync }",
+          "{ join }",
+          "{ platform, arch }",
+          "nativeBinding",
+          "localFileExisted",
+          "loadError",
+          "isMusl",
+          "lddPath",
+          "{ glibcVersionRuntime }",
+          "{ parseLargeJsonToMsgpack }"
+        ]
+      },
+      "semantic": {
+        "semanticTags": [],
+        "representationRevision": "qdrant-backfill-v1",
+        "modelRevision": "embeddinggemma:latest:eg-task-prefix-v1"
+      },
+      "topology": {
+        "kmeansCluster": 76,
+        "clusterMargin": 0.82255346,
+        "somX": 0,
+        "somY": 0,
+        "somCell": 0,
+        "topologyRevision": "mbk-spherical-content768-k256-v1"
+      },
+      "evidenceRefs": [
+        "docs/reports/pkt-lineage-09-fresh-classification-v1.json",
+        "docs/reports/pkt-lineage-09-frozen-proposal-v1.json"
+      ],
+      "sourceEvidence": {
+        "astLanguage": null,
+        "astExtractionMethod": null,
+        "astHash": null,
+        "usedConcepts": [
+          "binding",
+          "error",
+          "existed",
+          "file",
+          "ldd",
+          "load",
+          "local",
+          "native",
+          "path"
+        ]
+      }
+    }
+  ],
+  "diagnostics": {
+    "distinct_source_refs": 25271,
+    "proven_lineage_rows": 6732,
+    "proven_packet_keys": 577,
+    "proven_chunk_rows": 6732,
+    "feature_source_refs": 19,
+    "feature_revision_count": 1,
+    "feature_revisions": [
+      "atlas-ast-entity-prefill-v2"
+    ],
+    "feature_workspace_revision_count": 0,
+    "feature_workspace_revisions": null
+  },
+  "error": null,
+  "readOnly": true,
+  "writesPerformed": false,
+  "canonicalAuthorityChanged": false,
+  "nextGate": "REVIEW_PROFILE_LIVE_READBACK_BLOCKERS"
+}
