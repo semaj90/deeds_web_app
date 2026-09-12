@@ -405,3 +405,10 @@ node scripts/atlas/audit-chunk-retrieval-profile-live-readback-v1.mjs --limit=16
 
 Each check must retain `writesPerformed=false`; any cleanup requires a later
 change naming exact targets and recording rollback/consumer evidence.
+
+The role audit also checks runtime ownership against the declared storage
+contract. Current evidence exposes a conflict: the declared projection owner
+is `codebase_chunks_768`, while the runtime lane registry still names
+`codebase_chunks_768_v2`. This must be resolved as an explicit owner decision;
+the audit now fails closed with `SEMANTIC_OWNER_RUNTIME_CONTRACT_CONFLICT`
+instead of silently treating both statements as aligned.

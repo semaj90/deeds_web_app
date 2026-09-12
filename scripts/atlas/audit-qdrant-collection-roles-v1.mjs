@@ -112,12 +112,31 @@ const ownerContractText = ownerContractFiles.map((relativePath) => {
   const fullPath = path.join(root, relativePath);
   return fs.existsSync(fullPath) ? fs.readFileSync(fullPath, 'utf8') : '';
 }).join('\n');
+const runtimeOwnerFiles = [
+  'sveltekit-frontend/src/lib/server/vector/lane-registry.ts',
+  'sveltekit-frontend/src/lib/server/vector/vector-contracts.ts',
+  'sveltekit-frontend/src/lib/server/vector/retrieval-semantics.ts',
+];
+const runtimeOwnerText = runtimeOwnerFiles.map((relativePath) => {
+  const fullPath = path.join(root, relativePath);
+  return fs.existsSync(fullPath) ? fs.readFileSync(fullPath, 'utf8') : '';
+}).join('\n');
+const runtimeSemanticCollections = [...runtimeOwnerText.matchAll(/(?:collection|CANONICAL_SOURCE_COLLECTION|QDRANT_SOURCE_COLLECTION)\s*(?::|=)\s*['"](codebase_chunks_768(?:_v2)?)['"]/g)]
+  .map((match) => match[1]);
+const runtimeSemanticCollection = runtimeSemanticCollections.includes('codebase_chunks_768_v2')
+  ? 'codebase_chunks_768_v2'
+  : runtimeSemanticCollections.includes('codebase_chunks_768')
+    ? 'codebase_chunks_768'
+    : null;
 const semanticOwnerChecks = {
   postgresColumn: ownerContractText.includes("postgresColumn: 'content_embedding'") || ownerContractText.includes('canonicalColumn: \'content_embedding\''),
   qdrantCollection: ownerContractText.includes('codebase_chunks_768'),
   qdrantVectorName: ownerContractText.includes("qdrantVectorSlot: 'content'") || ownerContractText.includes("CANONICAL_VECTOR_NAME = 'content'"),
   dimension768: collections.filter((item) => item.name === 'codebase_chunks_768').every((item) => Object.values(item.vectors ?? {}).some((vector) => vector.size === 768)),
   singleDeclaredActiveCollection: activeSemantic.length === 1 && activeSemantic[0].name === 'codebase_chunks_768',
+  runtimeSemanticCollection,
+  runtimeOwnerFiles,
+  runtimeOwnerMatchesDeclared: runtimeSemanticCollection === null || runtimeSemanticCollection === 'codebase_chunks_768',
 };
 const violations = [];
 if (!collectionsResult.available) violations.push('QDRANT_COLLECTION_CENSUS_UNAVAILABLE');
@@ -126,6 +145,7 @@ if (!semanticOwnerChecks.postgresColumn) violations.push('POSTGRES_SEMANTIC_OWNE
 if (!semanticOwnerChecks.qdrantCollection || !semanticOwnerChecks.qdrantVectorName) violations.push('QDRANT_SEMANTIC_OWNER_CONTRACT_MISSING');
 if (activeLegacy384Consumers.length > 0) violations.push('ACTIVE_LEGACY_384_CONSUMER_REFERENCES');
 if (transientCandidateCollections.length > 0) violations.push('PERSISTENT_TRANSIENT_CANDIDATE_COLLECTIONS');
+if (runtimeSemanticCollection && runtimeSemanticCollection !== 'codebase_chunks_768') violations.push('SEMANTIC_OWNER_RUNTIME_CONTRACT_CONFLICT');
 
 const report = {
   schema: 'QdrantCollectionRolesAuditV1',
