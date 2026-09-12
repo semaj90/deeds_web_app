@@ -418,7 +418,7 @@ export const POST: RequestHandler = async (event) => {
       },
       retrievalPlan: {
         sourceFreshness: 'source_ref + trusted snapshot sha256 + git_mutation_provenance; no fabricated source_revision',
-        dense: 'codebase_chunks_768_v2 (persisted EmbeddingGemma native semantic_768, cosine)',
+        dense: 'codebase_chunks_768 (persisted EmbeddingGemma native semantic_768, cosine)',
         exactDense: shouldRunExactSemantic ? 'cuVS brute_force cosine v2 over bounded non-stale semantic_768 rows' : null,
         routing: 'latent_64 autoencoder + KMeans is routing-only and requires its own revision receipt before use',
         lexical: 'PostgreSQL atlas_packets FTS via websearch_to_tsquery + ts_rank_cd',

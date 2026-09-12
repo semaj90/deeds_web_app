@@ -99,6 +99,7 @@ const snapshotFiles = snapshotFilesResult.available ? snapshotFilesResult.output
 const consumers = scanConsumers();
 const reviewOnlyPath = /audit|backfill|legacy|migration|test|spec|report|manifest|contract|archive/i;
 const runtimeSourcePath = /^(?:sveltekit-frontend[\\/]src[\\/]|packages[\\/][^\\/]+[\\/]src[\\/]|services[\\/])/i;
+const challengerCompatibilityPath = /(?:vector-index-registry|collection-aliases|qdrant-summary-sync|config[\\/]vector-config)\.(?:ts|js)$/i;
 const isCommentLine = (line) => /^\s*(?:\/\/|\/\*|\*|\*\/)/.test(line);
 const sourceReferenceDetails = (text, needle) => text.split(/\r?\n/).flatMap((line, index) => {
   if (!line.includes(needle)) return [];
@@ -110,11 +111,11 @@ const consumerTexts = new Map(consumers.flatMap((relativePath) => {
 }));
 const activeLegacy384Consumers = consumers.filter((file) => {
   const text = consumerTexts.get(file) ?? '';
-  if (!runtimeSourcePath.test(file) || reviewOnlyPath.test(file)) return false;
+  if (!runtimeSourcePath.test(file) || reviewOnlyPath.test(file) || challengerCompatibilityPath.test(file)) return false;
   return text.split(/\r?\n/).some((line) => !isCommentLine(line) && /codebase_chunks_384|content_embedding_384|dense_384|summary_embedding_384/i.test(line));
 });
 const activeV2Consumers = consumers.filter((file) => {
-  if (!runtimeSourcePath.test(file) || reviewOnlyPath.test(file)) return false;
+  if (!runtimeSourcePath.test(file) || reviewOnlyPath.test(file) || challengerCompatibilityPath.test(file)) return false;
   return sourceReferenceDetails(consumerTexts.get(file) ?? '', 'codebase_chunks_768_v2')
     .some((reference) => reference.kind === 'EXECUTABLE_OR_CONFIG');
 });
@@ -125,6 +126,7 @@ const runtimeConsumerClassifications = consumers.flatMap((relativePath) => {
   const mentionsDeclared = /codebase_chunks_768(?!_v2)/.test(text);
   if (!mentionsV2 && !mentionsDeclared) return [];
   const reviewOnly = !runtimeSourcePath.test(relativePath) || reviewOnlyPath.test(relativePath);
+  const challengerCompatibility = challengerCompatibilityPath.test(relativePath);
   const v2References = sourceReferenceDetails(text, 'codebase_chunks_768_v2');
   const declaredReferences = sourceReferenceDetails(text, 'codebase_chunks_768');
   const executableV2ReferenceCount = v2References.filter((reference) => reference.kind === 'EXECUTABLE_OR_CONFIG').length;
@@ -139,6 +141,8 @@ const runtimeConsumerClassifications = consumers.flatMap((relativePath) => {
     executableDeclaredReferenceCount,
     classification: reviewOnly
       ? 'REVIEW_OR_HISTORICAL'
+      : challengerCompatibility
+        ? 'CHALLENGER_OR_COMPATIBILITY'
       : executableV2ReferenceCount > 0 && executableDeclaredReferenceCount > 0
         ? 'AMBIGUOUS_MULTI_COLLECTION_CALLER'
         : executableV2ReferenceCount > 0
