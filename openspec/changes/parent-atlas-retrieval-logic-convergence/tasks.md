@@ -94,7 +94,7 @@ retained. `Vibreti` is not treated as a current implementation or owner.
 
 ### Shared retrieval profile contracts
 
-- [ ] **RETRIEVAL-PROFILE-01 — Freeze `ChunkRetrievalProfileV1`.** Define one
+- [x] **RETRIEVAL-PROFILE-01 — Freeze `ChunkRetrievalProfileV1`/V2.** Define one
   revision-qualified contract that normalizes existing surfaces without adding
   a competing database. Required identity fields:
   `canonicalChunkId`, `packetKey`, `repositoryId`,
@@ -102,20 +102,25 @@ retained. `Vibreti` is not treated as a current implementation or owner.
   Feature groups must be explicit and optional-by-presence rather than
   fabricated: lexical/structural, semantic, topic/domain, topology, ontology,
   and feature/model revisions.
-- [ ] **RETRIEVAL-PROFILE-02 — Build a read-only profile adapter.** Hydrate the
+- [x] **RETRIEVAL-PROFILE-02 — Build a read-only profile adapter.** Hydrate the
   contract from existing canonical chunk/packet joins plus current AST,
   semantic, topology, classifier, and ontology surfaces. Emit presence masks,
   evidence refs, and revision provenance. Missing features remain missing.
-- [ ] **RETRIEVAL-PROFILE-03 — Prove deterministic profile identity.** Same
+- [x] **RETRIEVAL-PROFILE-03 — Prove deterministic profile identity.** Same
   canonical chunk + same referenced revisions must produce the same profile
   checksum independent of executor or retrieval order.
 
 ### File and directory aggregation
 
-- [ ] **FILE-PROFILE-01 — Freeze `FileProfileV1`.** Aggregate only from
+- [x] **FILE-PROFILE-01 — Freeze `FileProfileV1`.** Aggregate only from
   canonical chunk identities belonging to one revision-qualified source file.
   Preserve chunk membership checksum and source revision; do not infer file
   identity from directory names, Qdrant IDs, or array position.
+
+  Contract and pure aggregation implementation are proven by the focused
+  ChunkRetrievalProfileV2/FileRetrievalProfileV1 suite (`11/11`). Live profile
+  readback, replay, and file aggregation remain separately gated below because
+  the selected execution currently lacks qualified feature revisions.
 - [ ] **DIRECTORY-PROFILE-01 — Freeze `DirectoryProfileV1`.** Directory identity
   must be deterministic from repository identity + normalized path + workspace
   revision (UUIDv5 or equivalently deterministic content-addressed scheme).
