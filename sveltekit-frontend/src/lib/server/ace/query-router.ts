@@ -30,6 +30,7 @@ import {
 import { readSomPacketById } from './som-packet-store.js';
 import { readCardBySourceRef, normalizeCardId, cardIdVariants } from './nes-chrom-card-store.js';
 import { nearestCluster } from '$lib/server/retrieval/centroid-cache.js';
+import { CANONICAL_SOURCE_COLLECTION } from '$lib/server/vector/vector-contracts.js';
 import crypto from 'crypto';
 
 // ── Embed query via embeddinggemma :8081 or Ollama fallback ──────────────
@@ -88,7 +89,7 @@ interface QdrantHit {
   payload: Record<string, unknown>;
 }
 
-async function qdrantSearch(embedding: number[], limit = 10, collection = 'codebase_chunks_768_v2'): Promise<QdrantHit[]> {
+async function qdrantSearch(embedding: number[], limit = 10, collection = CANONICAL_SOURCE_COLLECTION): Promise<QdrantHit[]> {
   const qdrantUrl = ENV.QDRANT_URL ?? 'http://127.0.0.1:6333';
   try {
     const res = await fetch(`${qdrantUrl}/collections/${collection}/points/query`, {
@@ -180,7 +181,7 @@ export interface QueryRouterResult {
 }
 
 export async function routeQuery(opts: QueryRouterOpts): Promise<QueryRouterResult> {
-  const { query, clusterHint, featureHint, limit = 10, collection = 'codebase_chunks_768_v2' } = opts;
+  const { query, clusterHint, featureHint, limit = 10, collection = CANONICAL_SOURCE_COLLECTION } = opts;
   const redis = getValkeyClient();
   const queryHash = makeQueryHash(query);
   const trace: RouteTrace[] = [];

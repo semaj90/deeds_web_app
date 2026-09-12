@@ -142,8 +142,11 @@ retained. `Vibreti` is not treated as a current implementation or owner.
   runtime owner until the caller census, lineage receipt, and explicit owner
   decision agree. The declared owner is now wired through the central runtime
   retrieval constants and `retrieve-candidates` path, but the audit remains
-  blocked while active `_v2` callers exist; those callers must be migrated or
-  explicitly classified as challenger-only before this task can close.
+  blocked while active `_v2` callers exist. The focused migration tranche
+  moved five ACE/ACP defaults to the central owner constant; the remaining
+  16 executable `_v2` references and 16 executable legacy-384 references are
+  still listed by the audit and must be migrated or explicitly classified as
+  challenger-only before this task can close.
 - [x] **RETRIEVAL-OWNERSHIP-03 — Keep candidate sets ephemeral.** KNN and Top-K
   are query operations. Do not create persistent `knn*`, `topk*`, KMeans, SOM,
   or PageRank collections to store transient candidate universes. The role

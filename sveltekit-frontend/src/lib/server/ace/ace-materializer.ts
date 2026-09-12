@@ -25,6 +25,7 @@ import { invalidateBitfrostPacket } from '$lib/server/cache/atlas-reward-cache.j
 import { eq, sql } from 'drizzle-orm';
 import { toRedisValue, type SemanticPacketDomainObject as RedisPacketProjection } from '$lib/server/atlas/projections/redis-packet-projection.js';
 import { buildCanonicalAcePacketEnvelope } from './canonical-packet-envelope.js';
+import { CANONICAL_SOURCE_COLLECTION } from '$lib/server/vector/vector-contracts.js';
 
 export interface MaterializeOptions {
   packetKey: string;
@@ -44,7 +45,7 @@ export interface MaterializeResult {
   duration: number;
 }
 
-const DEFAULT_COLLECTION = 'codebase_chunks_768_v2';
+const DEFAULT_COLLECTION = CANONICAL_SOURCE_COLLECTION;
 const DEFAULT_REDIS_TTL = 86400; // 24 hours
 const VECTOR_DIM = 768;
 

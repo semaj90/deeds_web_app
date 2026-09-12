@@ -99,16 +99,24 @@ const snapshotFiles = snapshotFilesResult.available ? snapshotFilesResult.output
 const consumers = scanConsumers();
 const reviewOnlyPath = /audit|backfill|legacy|migration|test|spec|report|manifest|contract|archive/i;
 const runtimeSourcePath = /^(?:sveltekit-frontend[\\/]src[\\/]|packages[\\/][^\\/]+[\\/]src[\\/]|services[\\/])/i;
+const isCommentLine = (line) => /^\s*(?:\/\/|\/\*|\*|\*\/)/.test(line);
+const sourceReferenceDetails = (text, needle) => text.split(/\r?\n/).flatMap((line, index) => {
+  if (!line.includes(needle)) return [];
+  return [{ line: index + 1, text: line.trim().slice(0, 240), kind: isCommentLine(line) ? 'COMMENT' : 'EXECUTABLE_OR_CONFIG' }];
+});
 const consumerTexts = new Map(consumers.flatMap((relativePath) => {
   const fullPath = path.join(root, relativePath);
   return fs.existsSync(fullPath) ? [[relativePath, fs.readFileSync(fullPath, 'utf8')]] : [];
 }));
 const activeLegacy384Consumers = consumers.filter((file) => {
   const text = consumerTexts.get(file) ?? '';
-  return /codebase_chunks_384|content_embedding_384|dense_384|summary_embedding_384/i.test(text) && runtimeSourcePath.test(file) && !reviewOnlyPath.test(file);
+  if (!runtimeSourcePath.test(file) || reviewOnlyPath.test(file)) return false;
+  return text.split(/\r?\n/).some((line) => !isCommentLine(line) && /codebase_chunks_384|content_embedding_384|dense_384|summary_embedding_384/i.test(line));
 });
 const activeV2Consumers = consumers.filter((file) => {
-  return /codebase_chunks_768_v2/i.test(consumerTexts.get(file) ?? '') && runtimeSourcePath.test(file) && !reviewOnlyPath.test(file);
+  if (!runtimeSourcePath.test(file) || reviewOnlyPath.test(file)) return false;
+  return sourceReferenceDetails(consumerTexts.get(file) ?? '', 'codebase_chunks_768_v2')
+    .some((reference) => reference.kind === 'EXECUTABLE_OR_CONFIG');
 });
 const runtimeConsumerClassifications = consumers.flatMap((relativePath) => {
   const text = consumerTexts.get(relativePath);
@@ -117,17 +125,27 @@ const runtimeConsumerClassifications = consumers.flatMap((relativePath) => {
   const mentionsDeclared = /codebase_chunks_768(?!_v2)/.test(text);
   if (!mentionsV2 && !mentionsDeclared) return [];
   const reviewOnly = !runtimeSourcePath.test(relativePath) || reviewOnlyPath.test(relativePath);
+  const v2References = sourceReferenceDetails(text, 'codebase_chunks_768_v2');
+  const declaredReferences = sourceReferenceDetails(text, 'codebase_chunks_768');
+  const executableV2ReferenceCount = v2References.filter((reference) => reference.kind === 'EXECUTABLE_OR_CONFIG').length;
+  const executableDeclaredReferenceCount = declaredReferences.filter((reference) => reference.kind === 'EXECUTABLE_OR_CONFIG').length;
   return [{
     relativePath,
     mentionsV2,
     mentionsDeclaredCollection: mentionsDeclared,
+    v2References,
+    declaredReferences,
+    executableV2ReferenceCount,
+    executableDeclaredReferenceCount,
     classification: reviewOnly
       ? 'REVIEW_OR_HISTORICAL'
-      : mentionsV2 && mentionsDeclared
+      : executableV2ReferenceCount > 0 && executableDeclaredReferenceCount > 0
         ? 'AMBIGUOUS_MULTI_COLLECTION_CALLER'
-        : mentionsV2
+        : executableV2ReferenceCount > 0
           ? 'ACTIVE_RUNTIME_OWNER_CANDIDATE'
-          : 'UNSUFFIXED_COLLECTION_CALLER_REQUIRES_CLASSIFICATION',
+          : executableDeclaredReferenceCount > 0
+            ? 'UNSUFFIXED_COLLECTION_CALLER_REQUIRES_CLASSIFICATION'
+            : 'COMMENT_OR_METADATA_ONLY',
   }];
 });
 const activeSemantic = collections.filter((item) => item.role === 'ACTIVE_SEMANTIC_PROJECTION');
