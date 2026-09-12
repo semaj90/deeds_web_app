@@ -9,6 +9,7 @@ import { getGraphMLStatus } from '$lib/server/grpc/graph-ml-client.js';
 import { getRedis } from '$lib/server/redis.js';
 import { getOllamaEndpoint } from '$lib/server/ollama.js';
 import { LIBRARY_DOMAIN_MAP } from '../../phase72/routeGraphAdapter.js';
+import { CANONICAL_SOURCE_COLLECTION } from '$lib/server/vector/vector-contracts.js';
 
 /**
  * Code Intel Service: Aggregates statistics and health metrics for the
@@ -298,7 +299,7 @@ export async function generateClaudePlan(params: { goal: string; scope: string }
 	const queryEmbedding = await generateSingleEmbedding(params.goal);
 	const qdrant = getQdrantClient();
 	// Canonical EmbeddingGemma semantic_768 retrieval lane.
-	const { points: hits } = await qdrant.query('codebase_chunks_768_v2', {
+	const { points: hits } = await qdrant.query(CANONICAL_SOURCE_COLLECTION, {
 		query: queryEmbedding,
 		using: 'content',
 		limit: 3,

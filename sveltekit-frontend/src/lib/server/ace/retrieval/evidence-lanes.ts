@@ -7,6 +7,7 @@ import {
   resolveCanonicalIdentity,
   type CanonicalIdentityResolution,
 } from '../identity-contract.js';
+import { CANONICAL_SOURCE_COLLECTION } from '$lib/server/vector/vector-contracts.js';
 
 export interface EvidenceLaneConfig {
   maxCandidates: number;
@@ -128,7 +129,7 @@ export class QdrantDenseLane {
     embedding: number[],
     limit: number = 20
   ): Promise<AceEvidence[]> {
-      const response = await fetch(`${ENV.QDRANT_URL}/collections/codebase_chunks_768_v2/points/query`, {
+      const response = await fetch(`${ENV.QDRANT_URL}/collections/${CANONICAL_SOURCE_COLLECTION}/points/query`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

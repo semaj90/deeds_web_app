@@ -5,6 +5,7 @@ import { sql } from 'drizzle-orm';
 import { getNeo4jDriver } from '$lib/server/neo4j-driver.js';
 import { embedText } from '$lib/server/embedding/embed.js';
 import crypto from 'crypto';
+import { CANONICAL_SOURCE_COLLECTION } from '$lib/server/vector/vector-contracts.js';
 
 export interface MultihopOpts {
   query: string;
@@ -87,7 +88,7 @@ export async function retrieveMultihopContext(opts: MultihopOpts): Promise<Multi
   if (embedding) {
     const qdrantUrl = ENV.QDRANT_URL || 'http://127.0.0.1:6333';
     try {
-      const res = await fetch(`${qdrantUrl}/collections/codebase_chunks_768_v2/points/query`, {
+      const res = await fetch(`${qdrantUrl}/collections/${CANONICAL_SOURCE_COLLECTION}/points/query`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

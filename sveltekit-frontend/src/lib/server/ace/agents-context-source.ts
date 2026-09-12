@@ -18,6 +18,7 @@ import {
 	readCardFromCouchdb,
 	type AgentsDirectoryCard,
 } from '$lib/server/agents/agents-card-store';
+import { CANONICAL_SOURCE_COLLECTION } from '$lib/server/vector/vector-contracts.js';
 
 export interface AgentsContextHit {
 	card:     AgentsDirectoryCard;
@@ -209,7 +210,7 @@ async function qdrantPayloadCardIds(query: string, limit: number): Promise<strin
 		const res = await qdrant.hybridSearch({
 			query,
 			queryEmbedding: vec,
-			collection:     'codebase_chunks_768_v2',
+			collection:     CANONICAL_SOURCE_COLLECTION,
 			limit:          Math.min(limit * 3, 30),
 		});
 		const seen = new Set<string>();
