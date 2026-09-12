@@ -14,11 +14,29 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
+import { execFileSync } from 'node:child_process';
 
 const ROOT = path.resolve(import.meta.dirname, '../..');
 const REPORT_PATH = path.join(ROOT, 'docs/reports/qdrant-storage-breakdown-v1.json');
 const QDRANT_URL = (process.env.QDRANT_URL || process.env.QDRANT_BASE_URL || 'http://127.0.0.1:6333').replace(/\/$/, '');
 const noReport = process.argv.includes('--no-report');
+
+function scanConsumers() {
+  try {
+    const output = execFileSync('rg', [
+      '-l', '-i', 'codebase_chunks_768|codebase_chunks_768_v2|content_embedding_768|content_embedding|latent_256|latent_128|latent_64',
+      'scripts', 'services', 'docker', 'sveltekit-frontend', 'packages',
+      '--glob', '!**/node_modules/**', '--glob', '!**/.venv*/**', '--glob', '!**/dist/**',
+      '--glob', '!**/build/**', '--glob', '!**/docs/reports/**', '--glob', '!sveltekit-frontend/NUL',
+      '--glob', '*.{mjs,mts,js,ts,tsx,jsx,py,go,rs,sql,yml,yaml,json}',
+    ], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: 15000, maxBuffer: 32 * 1024 * 1024 });
+    return { available: true, files: output.split(/\r?\n/).filter(Boolean).sort() };
+  } catch (error) {
+    return { available: false, files: [], error: error?.message ?? String(error) };
+  }
+}
+
+const consumerCensus = scanConsumers();
 
 const CODEBASE_CLASS = new Map([
   ['codebase_chunks_768', 'ACTIVE_SEMANTIC_PROJECTION'],
@@ -112,7 +130,7 @@ function vectorConfigSummary(infoBody) {
   };
 }
 
-function snapshotSummary(body, collection, classification) {
+function snapshotSummary(body, collection, classification, consumerReferences) {
   const snapshots = Array.isArray(unwrap(body)) ? unwrap(body) : [];
   const normalized = snapshots.map((row) => ({
     collection,
@@ -139,7 +157,8 @@ function snapshotSummary(body, collection, classification) {
         : row.name === rollbackCandidateName
           ? 'ROLLBACK_CHECKPOINT_CANDIDATE'
           : 'OLDER_REVIEW_CANDIDATE',
-      consumerReferences: [],
+      consumerReferences,
+      consumerReferenceScope: 'NOT_YET_RECONCILED',
       consumerReferencesProven: false,
       deletionAuthorized: false,
     })),
@@ -154,6 +173,12 @@ const report = {
   mode: 'READ_ONLY',
   writesPerformed: false,
   destructiveActionsPerformed: false,
+  consumerCensus: {
+    available: consumerCensus.available,
+    count: consumerCensus.files.length,
+    files: consumerCensus.files,
+    error: consumerCensus.available ? null : consumerCensus.error,
+  },
   collections: [],
   totals: {
     collectionCount: 0,
@@ -176,7 +201,8 @@ try {
   report.totals.collectionCount = names.length;
 
   for (const name of names) {
-    const entry = { name, classification: classifyCollection(name), info: null, memory: null, snapshots: null, errors: [] };
+    const classification = classifyCollection(name);
+    const entry = { name, classification, info: null, memory: null, snapshots: null, errors: [] };
     try {
       entry.info = vectorConfigSummary(await getJson(`/collections/${encodeURIComponent(name)}`));
     } catch (error) {
@@ -193,7 +219,7 @@ try {
       entry.errors.push(`MEMORY:${error.message}`);
     }
     try {
-      entry.snapshots = snapshotSummary(await getJson(`/collections/${encodeURIComponent(name)}/snapshots`), name, entry.classification);
+      entry.snapshots = snapshotSummary(await getJson(`/collections/${encodeURIComponent(name)}/snapshots`), name, entry.classification, []);
       report.totals.apiVisibleSnapshotBytes += entry.snapshots.totalBytes;
       report.totals.apiVisibleSnapshotCount += entry.snapshots.count;
       for (const snapshot of entry.snapshots.snapshots) {
