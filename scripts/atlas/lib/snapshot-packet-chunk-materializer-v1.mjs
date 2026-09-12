@@ -113,34 +113,55 @@ export function classifyPacketRows(membership, packetRows) {
   for (const row of packetRows ?? []) {
     const packetKey = normalizeText(row?.packet_key);
     if (!packetKey) continue;
-    if (!byPacketKey.has(packetKey)) byPacketKey.set(packetKey, row);
+    if (!byPacketKey.has(packetKey)) byPacketKey.set(packetKey, []);
+    byPacketKey.get(packetKey).push(row);
   }
-  const rows = [...byPacketKey.entries()].map(([packetKey, row]) => ({
-    packetKey,
-    sourceRevision: normalizeSha256(row?.source_revision) || null,
-  }));
 
+  const duplicateRevisionConflicts = [];
+  const rows = [];
+  for (const [packetKey, groupedRows] of byPacketKey.entries()) {
+    const revisions = [...new Set(groupedRows.map((row) => normalizeSha256(row?.source_revision)).filter(Boolean))];
+    if (revisions.length > 1) {
+      duplicateRevisionConflicts.push({ packetKey, sourceRevisions: revisions, rowCount: groupedRows.length });
+      continue;
+    }
+    rows.push({
+      packetKey,
+      sourceRevision: revisions[0] ?? null,
+      observedRowCount: groupedRows.length,
+    });
+  }
+
+  if (duplicateRevisionConflicts.length > 0) {
+    return {
+      candidates: rows,
+      exact: [],
+      duplicateRevisionConflicts,
+      classification: 'DUPLICATE_PACKET_KEY_REVISION_CONFLICT',
+    };
+  }
   if (rows.length === 0) {
-    return { candidates: [], exact: [], classification: 'CURRENT_PACKET_MATERIALIZATION_REQUIRED' };
+    return { candidates: [], exact: [], duplicateRevisionConflicts: [], classification: 'CURRENT_PACKET_MATERIALIZATION_REQUIRED' };
   }
   if (rows.length > 1) {
-    return { candidates: rows, exact: [], classification: 'AMBIGUOUS_FILE_PACKET_IDENTITY' };
+    return { candidates: rows, exact: [], duplicateRevisionConflicts: [], classification: 'AMBIGUOUS_FILE_PACKET_IDENTITY' };
   }
 
   const only = rows[0];
   if (only.sourceRevision && expectedRevision && only.sourceRevision !== expectedRevision) {
-    return { candidates: rows, exact: [], classification: 'CONFLICTING_PACKET_SOURCE_REVISION' };
+    return { candidates: rows, exact: [], duplicateRevisionConflicts: [], classification: 'CONFLICTING_PACKET_SOURCE_REVISION' };
   }
   if (only.sourceRevision && expectedRevision && only.sourceRevision === expectedRevision) {
-    return { candidates: rows, exact: [only], classification: 'EXACT_CURRENT_FILE_PACKET' };
+    return { candidates: rows, exact: [only], duplicateRevisionConflicts: [], classification: 'EXACT_CURRENT_FILE_PACKET' };
   }
-  return { candidates: rows, exact: [only], classification: 'UNIQUE_FILE_PACKET_REVISION_UNPROVEN' };
+  return { candidates: rows, exact: [only], duplicateRevisionConflicts: [], classification: 'UNIQUE_FILE_PACKET_REVISION_UNPROVEN' };
 }
 
 function lineageRowConflict(existingRow, proposed) {
   return normalizeText(existingRow?.source_ref) !== proposed.sourceRef
     || normalizeText(existingRow?.source_namespace) !== proposed.sourceNamespace
     || normalizeSha256(existingRow?.source_revision) !== normalizeSha256(proposed.sourceRevision)
+    || normalizeText(existingRow?.membership_status) !== proposed.membershipStatus
     || normalizeText(existingRow?.revision_status) !== proposed.revisionStatus
     || normalizeText(existingRow?.chunk_row_id) !== proposed.chunkRowId;
 }
@@ -164,11 +185,18 @@ export function classifySourceMaterializerPlan({ membership, packetResult, obser
   if (!sourceNamespace) blockers.push('SOURCE_NAMESPACE_UNPROVEN');
   if (!sourceRevision) blockers.push('SOURCE_REVISION_UNPROVEN');
 
-  const existing = new Map((existingLineageRows ?? []).map((row) => [
-    `${normalizeText(row.packet_key)}|${normalizeText(row.canonical_chunk_id)}`,
-    row,
-  ]));
+  const existingByIdentity = new Map();
+  for (const row of existingLineageRows ?? []) {
+    const key = `${normalizeText(row.packet_key)}|${normalizeText(row.canonical_chunk_id)}`;
+    if (!existingByIdentity.has(key)) existingByIdentity.set(key, []);
+    existingByIdentity.get(key).push(row);
+  }
+  const duplicateExistingIdentities = [...existingByIdentity.entries()]
+    .filter(([, rows]) => rows.length > 1)
+    .map(([identity, rows]) => ({ identity, rowCount: rows.length }));
+  if (duplicateExistingIdentities.length > 0) blockers.push('DUPLICATE_EXISTING_LINEAGE_IDENTITY');
 
+  const expectedMembershipStatus = observationMatches.length === 1 ? 'EXACT_SINGLE_MEMBER' : 'EXACT_MULTI_MEMBER';
   const proposedMemberships = packetKey && sourceNamespace && sourceRevision
     ? observationMatches
         .filter((row) => row.classification === 'EXACT_EXISTING_CHUNK')
@@ -181,18 +209,19 @@ export function classifySourceMaterializerPlan({ membership, packetResult, obser
             sourceRef,
             sourceNamespace,
             sourceRevision,
-            membershipStatus: observationMatches.length === 1 ? 'EXACT_SINGLE_MEMBER' : 'EXACT_MULTI_MEMBER',
+            membershipStatus: expectedMembershipStatus,
             revisionStatus: 'PROVEN',
             chunkOrdinal: null,
             lineageProducerRevision: 'snapshot-packet-chunk-materializer-plan-v2',
             evidenceRefs: ['docs/reports/snapshot-packet-chunk-materializer-plan-v2.json'],
             matchBasis: row.matchBasis,
           };
-          const current = existing.get(`${packetKey}|${row.canonicalChunkId}`) ?? null;
+          const currentRows = existingByIdentity.get(`${packetKey}|${row.canonicalChunkId}`) ?? [];
+          const current = currentRows.length === 1 ? currentRows[0] : null;
           return {
             ...proposed,
             alreadyPresent: current ? !lineageRowConflict(current, proposed) : false,
-            existingConflict: current ? lineageRowConflict(current, proposed) : false,
+            existingConflict: current ? lineageRowConflict(current, proposed) : currentRows.length > 1,
           };
         })
     : [];
@@ -210,10 +239,13 @@ export function classifySourceMaterializerPlan({ membership, packetResult, obser
     workspaceRevision: normalizeText(membership?.workspace_revision) || null,
     packetKey,
     packetClassification: packetResult.classification,
+    duplicatePacketKeyRevisionConflictCount: packetResult.duplicateRevisionConflicts?.length ?? 0,
     structuralChunkCount: observationMatches.length,
     proposedMembershipCount: proposedMemberships.length,
     alreadyPresentCount: proposedMemberships.filter((row) => row.alreadyPresent).length,
     existingConflictCount: proposedMemberships.filter((row) => row.existingConflict).length,
+    duplicateExistingIdentityCount: duplicateExistingIdentities.length,
+    duplicateExistingIdentities,
     missingLineageCount: missingLineageMemberships.length,
     proposedMemberships,
     blockers: [...new Set(blockers)],
