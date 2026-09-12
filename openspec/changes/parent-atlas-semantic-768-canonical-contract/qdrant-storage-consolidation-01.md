@@ -1,6 +1,6 @@
 # QDRANT-STORAGE-CONSOLIDATION-01
 
-Status: IMPLEMENTED_AUDIT_PENDING_WORKSTATION_PROOF
+Status: IMPLEMENTED_AUDIT_AND_RETENTION_PLAN_PENDING_WORKSTATION_PROOF
 
 Owner: `parent-atlas-semantic-768-canonical-contract`
 
@@ -18,7 +18,7 @@ This gate reduces persistent vector duplication without changing Parent Atlas ca
 - Collection metadata mutation requires separate authorization.
 - Vector datatype migration requires same-cohort retrieval-quality and storage receipts.
 
-## Implemented read-only audit
+## Implemented read-only storage audit
 
 - `scripts/atlas/lib/qdrant-storage-consolidation-v1.mjs`
 - `scripts/atlas/audit-qdrant-storage-consolidation-v1.mjs`
@@ -34,6 +34,35 @@ The audit:
 6. Classifies only explicitly-known surfaces as `CURRENT_OWNER`, `MIGRATION_ROLLBACK`, `ROUTING_ONLY`, or `CHALLENGER`; unknown populated collections fail closed to `REVIEW_REQUIRED`.
 7. Emits proposed collection metadata but never applies it.
 8. Never deletes collections or snapshots.
+
+## Implemented read-only snapshot retention planner
+
+- `scripts/atlas/lib/qdrant-snapshot-retention-v1.mjs`
+- `scripts/atlas/plan-qdrant-snapshot-retention-v1.mjs`
+- `scripts/atlas/test-qdrant-snapshot-retention-v1.mjs`
+
+The planner inventories both per-collection snapshots and full-storage snapshots and emits recommendations only.
+
+Retention rules are deliberately conservative:
+
+- `CURRENT_OWNER`: every observed snapshot is `KEEP_REQUIRED_CURRENT_OWNER` until a future recovery policy explicitly narrows this.
+- Healthy `MIGRATION_ROLLBACK`: preserve the newest rollback snapshot (or `--keep-rollback-count=N` newest); older copies may be marked `ARCHIVE_THEN_RECLAIM_CANDIDATE`.
+- Unhealthy `MIGRATION_ROLLBACK`: fail closed; every snapshot is `REVIEW_REQUIRED`.
+- `ROUTING_ONLY` and `CHALLENGER`: preserve the newest snapshot, leave older snapshots `REVIEW_AFTER_EVAL`.
+- Unknown collections: `REVIEW_REQUIRED`.
+- Full-storage snapshots: always `REVIEW_REQUIRED_FULL_STORAGE`; the planner never makes them automatic reclaim candidates.
+
+`ARCHIVE_THEN_RECLAIM_CANDIDATE` is not delete authority. It only reports bytes that could be recovered after separate archival/readback proof and explicit authorization.
+
+Every plan carries:
+
+```text
+deleteNow                 []
+deleteCollections         false
+deleteSnapshots           false
+archiveSnapshots          false
+mutateQdrant              false
+```
 
 ## Initial explicit policy
 
@@ -91,12 +120,18 @@ node --test scripts/atlas/test-qdrant-storage-consolidation-v1.mjs
 node --check scripts/atlas/audit-qdrant-storage-consolidation-v1.mjs
 node scripts/atlas/audit-qdrant-storage-consolidation-v1.mjs --no-report
 node scripts/atlas/audit-qdrant-storage-consolidation-v1.mjs
+
+node --test scripts/atlas/test-qdrant-snapshot-retention-v1.mjs
+node --check scripts/atlas/plan-qdrant-snapshot-retention-v1.mjs
+node scripts/atlas/plan-qdrant-snapshot-retention-v1.mjs --no-report
+node scripts/atlas/plan-qdrant-snapshot-retention-v1.mjs
 ```
 
-Expected audit-only status:
+Expected statuses:
 
 ```text
 QDRANT_STORAGE_CONSOLIDATION_AUDIT_COMPLETE
+QDRANT_SNAPSHOT_RETENTION_PLAN_READY
 ```
 
-A successful audit authorizes no deletion or mutation. The next gate is a reviewed retention plan based on measured live bytes and a refreshed caller census.
+A successful audit or retention plan authorizes no deletion or mutation. The next destructive step, if ever requested, requires separate archival/readback proof, current caller/rollback parity, and explicit operator authorization.
