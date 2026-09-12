@@ -23,13 +23,15 @@ const membership = {
   workspace_id: '11111111-1111-1111-1111-111111111111',
 };
 
-function exactChunkMatch() {
+function exactChunkMatch({ canonicalChunkId = 'chunk-a', chunkRowId = '11111111-1111-1111-1111-111111111111', observationOrdinal = 0 } = {}) {
   return [{
     classification: 'EXACT_EXISTING_CHUNK',
+    evidence: { observationOrdinal },
     candidates: [{
-      canonicalChunkId: 'chunk-a',
-      chunkRowId: '11111111-1111-1111-1111-111111111111',
+      canonicalChunkId,
+      chunkRowId,
       matchBasis: 'EXACT_CHUNK_CONTENT_HASH',
+      observationOrdinal,
     }],
   }];
 }
@@ -61,7 +63,7 @@ test('sealed source bytes match whole-source membership digest', () => {
   assert.equal(result.sourceRevisionMatches, true);
 });
 
-test('sidecar chunk maps only to existing canonical chunk identity', () => {
+test('sidecar chunk maps only to existing canonical chunk identity and preserves observation ordinal', () => {
   const text = 'function a() {\n  return 1;\n}';
   const start = source.indexOf(Buffer.from(text));
   const result = matchObservationToCanonicalChunkRows(
@@ -75,9 +77,12 @@ test('sidecar chunk maps only to existing canonical chunk identity', () => {
       line_start: 1,
       line_end: 3,
     }],
+    4,
   );
   assert.equal(result.classification, 'EXACT_EXISTING_CHUNK');
   assert.equal(result.candidates[0].canonicalChunkId, 'chunk-a');
+  assert.equal(result.candidates[0].observationOrdinal, 4);
+  assert.equal(result.evidence.observationOrdinal, 4);
 });
 
 test('sidecar-only chunk identity is never promoted', () => {
@@ -146,18 +151,34 @@ test('multiple packet keys for one source fail closed', () => {
   assert.equal(result.classification, 'AMBIGUOUS_FILE_PACKET_IDENTITY');
 });
 
-test('ready lineage fill uses workspace identity, not repository id, as source namespace', () => {
+test('ready lineage fill uses workspace identity, current source revision, and observed chunk ordinal', () => {
   const packetResult = classifyPacketRows(membership, [{ packet_key: 'packet:file', source_revision: null }]);
   const plan = classifySourceMaterializerPlan({
     membership,
     packetResult,
-    observationMatches: exactChunkMatch(),
+    observationMatches: exactChunkMatch({ observationOrdinal: 3 }),
     existingLineageRows: [],
   });
   assert.equal(plan.classification, 'READY_LINEAGE_FILL_EXISTING_PACKET_EXISTING_CHUNKS');
   assert.equal(plan.sourceNamespace, `workspace:${membership.workspace_id}`);
   assert.equal(plan.proposedMemberships[0].revisionStatus, 'PROVEN');
   assert.equal(plan.proposedMemberships[0].sourceRevision, membership.code_source_revision);
+  assert.equal(plan.proposedMemberships[0].chunkOrdinal, 3);
+});
+
+test('duplicate proposed canonical chunk identity blocks instead of silently deduplicating', () => {
+  const packetResult = classifyPacketRows(membership, [{ packet_key: 'packet:file', source_revision: sourceHash }]);
+  const first = exactChunkMatch({ observationOrdinal: 0 })[0];
+  const second = exactChunkMatch({ observationOrdinal: 1 })[0];
+  const plan = classifySourceMaterializerPlan({
+    membership,
+    packetResult,
+    observationMatches: [first, second],
+    existingLineageRows: [],
+  });
+  assert.equal(plan.classification, 'BLOCKED_AMBIGUOUS_OR_UNPROVEN');
+  assert.ok(plan.blockers.includes('DUPLICATE_PROPOSED_CHUNK_IDENTITY'));
+  assert.equal(plan.duplicateProposedChunkIdentityCount, 1);
 });
 
 test('matching existing lineage is already complete', () => {
