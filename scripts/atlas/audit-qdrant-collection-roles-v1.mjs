@@ -98,16 +98,25 @@ const snapshotFilesResult = command('docker', ['exec', 'legal-ai-qdrant', 'find'
 const snapshotFiles = snapshotFilesResult.available ? snapshotFilesResult.output.split(/\r?\n/).filter(Boolean).sort() : [];
 const consumers = scanConsumers();
 const reviewOnlyPath = /audit|backfill|legacy|migration|test|spec|report|manifest|contract|archive/i;
-const activeLegacy384Consumers = consumers.filter((file) => /codebase_chunks_384|content_embedding_384|dense_384|summary_embedding_384/i.test(file) && !reviewOnlyPath.test(file));
-const activeV2Consumers = consumers.filter((file) => /codebase_chunks_768_v2/i.test(file) && !reviewOnlyPath.test(file));
-const runtimeConsumerClassifications = consumers.flatMap((relativePath) => {
+const runtimeSourcePath = /^(?:sveltekit-frontend[\\/]src[\\/]|packages[\\/][^\\/]+[\\/]src[\\/]|services[\\/])/i;
+const consumerTexts = new Map(consumers.flatMap((relativePath) => {
   const fullPath = path.join(root, relativePath);
-  if (!fs.existsSync(fullPath)) return [];
-  const text = fs.readFileSync(fullPath, 'utf8');
+  return fs.existsSync(fullPath) ? [[relativePath, fs.readFileSync(fullPath, 'utf8')]] : [];
+}));
+const activeLegacy384Consumers = consumers.filter((file) => {
+  const text = consumerTexts.get(file) ?? '';
+  return /codebase_chunks_384|content_embedding_384|dense_384|summary_embedding_384/i.test(text) && runtimeSourcePath.test(file) && !reviewOnlyPath.test(file);
+});
+const activeV2Consumers = consumers.filter((file) => {
+  return /codebase_chunks_768_v2/i.test(consumerTexts.get(file) ?? '') && runtimeSourcePath.test(file) && !reviewOnlyPath.test(file);
+});
+const runtimeConsumerClassifications = consumers.flatMap((relativePath) => {
+  const text = consumerTexts.get(relativePath);
+  if (text === undefined) return [];
   const mentionsV2 = /codebase_chunks_768_v2/.test(text);
   const mentionsDeclared = /codebase_chunks_768(?!_v2)/.test(text);
   if (!mentionsV2 && !mentionsDeclared) return [];
-  const reviewOnly = reviewOnlyPath.test(relativePath);
+  const reviewOnly = !runtimeSourcePath.test(relativePath) || reviewOnlyPath.test(relativePath);
   return [{
     relativePath,
     mentionsV2,
@@ -165,6 +174,7 @@ if (collections.length > 0 && activeSemantic.length !== 1) violations.push('MULT
 if (!semanticOwnerChecks.postgresColumn) violations.push('POSTGRES_SEMANTIC_OWNER_CONTRACT_MISSING');
 if (!semanticOwnerChecks.qdrantCollection || !semanticOwnerChecks.qdrantVectorName) violations.push('QDRANT_SEMANTIC_OWNER_CONTRACT_MISSING');
 if (activeLegacy384Consumers.length > 0) violations.push('ACTIVE_LEGACY_384_CONSUMER_REFERENCES');
+if (activeV2Consumers.length > 0) violations.push('ACTIVE_COMPETING_768_CONSUMER_REFERENCES');
 if (transientCandidateCollections.length > 0) violations.push('PERSISTENT_TRANSIENT_CANDIDATE_COLLECTIONS');
 if (runtimeSemanticCollection && runtimeSemanticCollection !== 'codebase_chunks_768') violations.push('SEMANTIC_OWNER_RUNTIME_CONTRACT_CONFLICT');
 

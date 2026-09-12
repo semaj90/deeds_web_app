@@ -394,7 +394,7 @@ async function retrieveBM25Trigram(query: string): Promise<Candidate[]> {
 
 /**
  * Semantic retrieval via Qdrant ANN search
- * Primary: codebase_chunks_768_v2 (clean dense 768-dim lane)
+ * Primary: codebase_chunks_768 (declared dense 768-dim lane)
  * Legacy hybrid/sparse lanes remain available via separate call sites.
  */
 export async function retrieveQdrant(query: string): Promise<Candidate[]> {
@@ -406,7 +406,7 @@ export async function retrieveQdrant(query: string): Promise<Candidate[]> {
   if (!embedding) return [];
 
   const qdrant = await getQdrantManager();
-  const collections = [VECTOR_INDEX_REGISTRY.qdrantSource768V2.collection];
+  const collections = [VECTOR_INDEX_REGISTRY.qdrantSource768.collection];
   const resultsByKey = new Map<string, Candidate>();
 
   try {
@@ -474,7 +474,7 @@ export async function retrieveQdrant(query: string): Promise<Candidate[]> {
   // Fallback: dense-only v2 collection
   try {
     const results = await qdrant.denseSearch({
-      collection: VECTOR_INDEX_REGISTRY.qdrantSource768V2.collection ?? 'codebase_chunks_768_v2',
+      collection: VECTOR_INDEX_REGISTRY.qdrantSource768.collection ?? 'codebase_chunks_768',
       query,
       queryVector: Array.from(embedding),
       vectorName: QDRANT_DENSE_VECTOR_NAME,

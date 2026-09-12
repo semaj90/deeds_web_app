@@ -47,7 +47,7 @@ export const VECTOR_LANES = {
     role: 'canonical',
     modelId: 'embeddinggemma:latest',
     vectorName: 'content',
-    collection: 'codebase_chunks_768_v2',
+    collection: 'codebase_chunks_768',
     dimension: SEMANTIC_DIMENSION,
     projection: 'none',
     normalization: 'l2',
@@ -94,7 +94,7 @@ export function getVectorLaneByCollection(collection: string): VectorLaneContrac
 
 /**
  * The single active semantic lane. Fails loudly if the runtime registry drifts
- * away from native semantic_768 or its admitted v2 projection contract.
+ * away from native semantic_768 or its declared projection contract.
  */
 export function getActiveSemanticVectorLane(): VectorLaneContract & { dimension: SemanticDimension } {
   const lane = VECTOR_LANES.source768;
@@ -102,9 +102,9 @@ export function getActiveSemanticVectorLane(): VectorLaneContract & { dimension:
     lane.kind !== 'semantic' ||
     lane.status !== 'active' ||
     lane.dimension !== SEMANTIC_DIMENSION ||
-    lane.collection !== 'codebase_chunks_768_v2'
+    lane.collection !== 'codebase_chunks_768'
   ) {
-    throw new Error('SEMANTIC_768_LANE_INVARIANT_BROKEN: active semantic lane must be codebase_chunks_768_v2/content/768');
+    throw new Error('SEMANTIC_768_LANE_INVARIANT_BROKEN: active semantic lane must be codebase_chunks_768/content/768');
   }
   return lane as VectorLaneContract & { dimension: SemanticDimension };
 }

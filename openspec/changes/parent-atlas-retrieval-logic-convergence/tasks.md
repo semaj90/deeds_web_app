@@ -64,9 +64,9 @@ snapshot, cache, package, or VHDX operation is authorized by this ledger.
   errors. All 70 API-visible snapshot records now have a retention candidate
   classification (43 latest, 5 rollback, 22 older review); these labels are
   not consumer or rollback proof, so per-snapshot consumer reconciliation
-  remains open. The repository-wide collection-name census found 883 raw
-  references to `codebase_chunks_768` and 1 to `_v2`; these are file-level
-  matches, not proof that any individual snapshot is still required.
+  remains open. The repository-wide collection-name census is a file-level
+  inventory, not proof that any individual snapshot is still required; the
+  role audit separately classifies runtime `_v2` references.
 - [ ] **STORAGE-REVIEW-04 — Require explicit cleanup admission.** A later
   cleanup change must name exact image IDs or snapshot paths, prove zero
   consumers and rollback coverage, capture a before/after inventory, and be
@@ -140,7 +140,10 @@ retained. `Vibreti` is not treated as a current implementation or owner.
   `AMBIGUOUS_MULTI_COLLECTION_CALLER`, or `REVIEW_OR_HISTORICAL`) so this
   cannot be resolved by counting raw string references. Do not flip either
   runtime owner until the caller census, lineage receipt, and explicit owner
-  decision agree.
+  decision agree. The declared owner is now wired through the central runtime
+  retrieval constants and `retrieve-candidates` path, but the audit remains
+  blocked while active `_v2` callers exist; those callers must be migrated or
+  explicitly classified as challenger-only before this task can close.
 - [x] **RETRIEVAL-OWNERSHIP-03 — Keep candidate sets ephemeral.** KNN and Top-K
   are query operations. Do not create persistent `knn*`, `topk*`, KMeans, SOM,
   or PageRank collections to store transient candidate universes. The role
@@ -418,10 +421,10 @@ Each check must retain `writesPerformed=false`; any cleanup requires a later
 change naming exact targets and recording rollback/consumer evidence.
 
 The role audit also checks runtime ownership against the declared storage
-contract. Current evidence exposes a conflict: the declared projection owner
-is `codebase_chunks_768`, while the runtime lane registry still names
-`codebase_chunks_768_v2`. This must be resolved as an explicit owner decision;
-the audit now fails closed with `SEMANTIC_OWNER_RUNTIME_CONTRACT_CONFLICT`
-instead of silently treating both statements as aligned. Its receipt also
-records the exact runtime caller classifications, separating active candidates
-from legacy, advisory, test, and ambiguous multi-collection references.
+contract. The declared projection owner and central runtime lane now both use
+`codebase_chunks_768`, but active callers still reference
+`codebase_chunks_768_v2`. This remains an explicit migration gate; the audit
+fails closed with `ACTIVE_COMPETING_768_CONSUMER_REFERENCES` instead of
+silently treating all callers as aligned. Its receipt also records the exact
+runtime caller classifications, separating active candidates from legacy,
+advisory, test, and ambiguous multi-collection references.
