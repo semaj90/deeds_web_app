@@ -1,0 +1,13 @@
+# Parent Atlas workstation storage guards.
+#
+# Apply together with the root compose file:
+#   docker compose -f docker-compose.yml -f docker-compose.storage-guards.yml --profile full up -d neo4j
+#
+# This override intentionally does not change Neo4j /data or /logs ownership.
+# It only moves ephemeral /tmp activity out of the container writable layer and
+# bounds it so repeated Browser/plugin decompression cannot grow the Docker VHDX
+# indefinitely.
+services:
+  neo4j:
+    tmpfs:
+      - /tmp:size=768m,mode=1777

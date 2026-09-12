@@ -1,0 +1,24 @@
+# Parent Atlas GPU executor runtime requirements.
+#
+# The first four versions are restored from the 2026-09-10 Docker
+# reproducibility audit. That audit recorded the prior atlas-gpu-8098
+# requirements manifest as:
+#   fastapi==0.141.1
+#   uvicorn[standard]==0.52.4
+#   pyarrow==23.0.1
+#   pandas==3.0.5
+#   torch==2.7.1
+#
+# The current Dockerfile installs from the official PyTorch CUDA 12.9 wheel
+# index. PyTorch 2.7.1 was not published for cu129 (its CUDA wheels stop at
+# cu128), so retaining 2.7.1 here would make the restored manifest disagree
+# with the active build contract. PyTorch 2.8.0 is the first official release
+# with cu129 wheels and is therefore the explicit compatibility correction for
+# the isolated canary build. Promotion still requires the existing bounded
+# PyTorch <-> cuVS CandidateOrdinal parity proof.
+
+fastapi==0.141.1
+uvicorn[standard]==0.52.4
+pyarrow==23.0.1
+pandas==3.0.5
+torch==2.8.0
