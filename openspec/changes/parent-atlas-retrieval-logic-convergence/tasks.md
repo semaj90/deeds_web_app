@@ -132,9 +132,12 @@ retained. `Vibreti` is not treated as a current implementation or owner.
   `semantic_768` is one evidence lane. Qdrant HNSW, PostgreSQL exact pgvector,
   cuVS exact, CAGRA, and TurboVec are executors/challengers over that lane and
   must not receive independent RRF votes solely because execution differs.
-- [ ] **RETRIEVAL-OWNERSHIP-03 — Keep candidate sets ephemeral.** KNN and Top-K
+- [x] **RETRIEVAL-OWNERSHIP-03 — Keep candidate sets ephemeral.** KNN and Top-K
   are query operations. Do not create persistent `knn*`, `topk*`, KMeans, SOM,
-  or PageRank collections to store transient candidate universes.
+  or PageRank collections to store transient candidate universes. The role
+  audit now checks collection names for these transient-store patterns; a zero
+  result is required before this invariant can be closed. The current audit
+  found zero matching collections and all declared semantic-owner checks pass.
 - [x] **RETRIEVAL-OWNERSHIP-04 — No collection/storage promotion in this change.**
   Do not create a new Qdrant collection, delete a legacy collection/named
   vector, add an ANN index, or promote a representation without separate
@@ -351,9 +354,10 @@ This planning change does not authorize:
 The detailed live evidence is recorded in
 `tasks-20260911-v6.md`. The current status is:
 
-- Six of the 52 tracked tasks are now complete: the three retrieval-profile
-  contracts, file-profile contract, storage census, and no-storage-promotion
-  invariant. The remaining 46 tasks stay open; this is not a claim that the
+- Seven of the 52 tracked tasks are now complete: the three retrieval-profile
+  contracts, file-profile contract, storage census, no-storage-promotion, and
+  candidate-ephemerality invariants. The remaining 45 tasks stay open; this is
+  not a claim that the
   full retrieval or storage program is complete.
 - `ChunkRetrievalProfileV2` and `FileRetrievalProfileV1` contract tests: proven
   (`11/11` focused tests);

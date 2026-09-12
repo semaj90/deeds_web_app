@@ -101,6 +101,9 @@ const reviewOnlyPath = /audit|backfill|legacy|migration|test|spec|report|manifes
 const activeLegacy384Consumers = consumers.filter((file) => /codebase_chunks_384|content_embedding_384|dense_384|summary_embedding_384/i.test(file) && !reviewOnlyPath.test(file));
 const activeV2Consumers = consumers.filter((file) => /codebase_chunks_768_v2/i.test(file) && !reviewOnlyPath.test(file));
 const activeSemantic = collections.filter((item) => item.role === 'ACTIVE_SEMANTIC_PROJECTION');
+const transientCandidateCollections = collections
+  .filter((item) => /(^|[_-])(knn|topk|kmeans|som|pagerank)([_-]|$)/i.test(item.name))
+  .map((item) => item.name);
 const ownerContractFiles = [
   'packages/semantic-contracts/src/vector-manifest.ts',
   'scripts/atlas/sem768-corpus-bundle-01.mts',
@@ -122,6 +125,7 @@ if (collections.length > 0 && activeSemantic.length !== 1) violations.push('MULT
 if (!semanticOwnerChecks.postgresColumn) violations.push('POSTGRES_SEMANTIC_OWNER_CONTRACT_MISSING');
 if (!semanticOwnerChecks.qdrantCollection || !semanticOwnerChecks.qdrantVectorName) violations.push('QDRANT_SEMANTIC_OWNER_CONTRACT_MISSING');
 if (activeLegacy384Consumers.length > 0) violations.push('ACTIVE_LEGACY_384_CONSUMER_REFERENCES');
+if (transientCandidateCollections.length > 0) violations.push('PERSISTENT_TRANSIENT_CANDIDATE_COLLECTIONS');
 
 const report = {
   schema: 'QdrantCollectionRolesAuditV1',
@@ -144,6 +148,10 @@ const report = {
     snapshotFiles,
   },
   consumers: { count: consumers.length, files: consumers, activeLegacy384Consumers, activeV2Consumers },
+  candidateStorageChecks: {
+    transientCandidateCollections,
+    candidateSetsMustRemainEphemeral: transientCandidateCollections.length === 0,
+  },
   semanticOwnerChecks,
   violations,
   status: violations.length === 0 ? 'QDRANT_COLLECTION_ROLES_PROVEN' : 'QDRANT_COLLECTION_ROLES_REVIEW_REQUIRED',
