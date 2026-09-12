@@ -12,6 +12,7 @@
     "atlas:docker:reproducibility:audit": "node scripts/atlas/audit-docker-reproducibility-v1.mjs",
     "atlas:docker:storage:retention:audit": "node scripts/atlas/audit-docker-storage-retention-v1.mjs",
     "atlas:qdrant:collection-roles:audit": "node scripts/atlas/audit-qdrant-collection-roles-v1.mjs",
+    "atlas:qdrant:storage:breakdown:audit": "node scripts/atlas/audit-qdrant-storage-breakdown-v1.mjs",
     "atlas:context-forest:readiness": "node scripts/atlas/audit-context-forest-readiness-v1.mjs",
     "atlas:promotion:gates": "node scripts/atlas/audit-parent-atlas-promotion-gates-v1.mjs",
     "atlas:promotion:receipt-currentness": "node scripts/atlas/audit-promotion-gate-receipt-currentness-v1.mjs",
