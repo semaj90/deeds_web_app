@@ -117,6 +117,10 @@ const APPLY = args.includes('--apply');
 const LIMIT = Number((args.find((a) => a.startsWith('--limit=')) || '').split('=')[1] || 0) || null;
 const WORKSPACE_REVISION = (args.find((a) => a.startsWith('--workspace-revision=')) || '').split('=').slice(1).join('=').trim() || null;
 const PRODUCER_REVISION = 'materialize-observation-feature-rows:v1';
+const isAdmittedSourceRevision = (value) => {
+  const normalized = typeof value === 'string' ? value.trim() : '';
+  return Boolean(normalized) && normalized !== 'workspace:0' && !normalized.endsWith('_PENDING');
+};
 
 async function main() {
   if (APPLY && !LIMIT) {
@@ -129,6 +133,25 @@ async function main() {
   }
 
   const lines = (await fs.readFile(INPUT, 'utf8')).split(/\r?\n/).filter(Boolean);
+  if (APPLY) {
+    const invalidSourceRevisionRows = lines
+      .map((line, index) => ({ row: JSON.parse(line), line: index + 1 }))
+      .filter(({ row }) => !isAdmittedSourceRevision(row.sourceRevision));
+    if (invalidSourceRevisionRows.length > 0) {
+      console.error(JSON.stringify({
+        error: 'Refusing --apply because the plan contains missing or placeholder source revisions.',
+        blocker: 'SOURCE_REVISION_NOT_ADMITTED',
+        invalidRowCount: invalidSourceRevisionRows.length,
+        sampleLines: invalidSourceRevisionRows.slice(0, 5).map(({ line, row }) => ({
+          line,
+          packetKey: row.packetKey ?? null,
+          sourceRef: row.sourceRef ?? null,
+          sourceRevision: row.sourceRevision ?? null,
+        })),
+      }, null, 2));
+      process.exit(1);
+    }
+  }
   const report = {
     schema: 'atlas.observation-feature-row-materialization-report.v1',
     mode: APPLY ? 'APPLY' : 'DRY_RUN',
