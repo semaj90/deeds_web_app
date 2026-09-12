@@ -160,7 +160,10 @@ function assertSameFileIdentity(chunks: ChunkRetrievalProfileV2[]): void {
   for (const chunk of chunks.slice(1)) {
     for (const field of fields) {
       if (chunk[field] !== first[field]) {
-        throw new Error(`FILE_PROFILE_MIXED_${String(field).toUpperCase()}`);
+        const errorField = field === 'sourceRevision'
+          ? 'SOURCE_REVISION'
+          : String(field).toUpperCase();
+        throw new Error(`FILE_PROFILE_MIXED_${errorField}`);
       }
     }
   }
