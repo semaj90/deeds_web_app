@@ -341,6 +341,10 @@ This planning change does not authorize:
 The detailed live evidence is recorded in
 `tasks-20260911-v6.md`. The current status is:
 
+- Six of the 52 tracked tasks are now complete: the three retrieval-profile
+  contracts, file-profile contract, storage census, and no-storage-promotion
+  invariant. The remaining 46 tasks stay open; this is not a claim that the
+  full retrieval or storage program is complete.
 - `ChunkRetrievalProfileV2` and `FileRetrievalProfileV1` contract tests: proven
   (`11/11` focused tests);
 - selected execution readback: blocked because feature observations do not
