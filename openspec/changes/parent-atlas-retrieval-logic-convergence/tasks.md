@@ -52,7 +52,9 @@ snapshot, cache, package, or VHDX operation is authorized by this ledger.
 - [ ] **STORAGE-REVIEW-02 — Reconcile active build/runtime ancestry.** Compare
   each candidate with Compose references, Dockerfile ancestry, active image
   IDs, and the WSL2/RAPIDS and PyTorch environment census. Do not rebuild or
-  remove anything during this review.
+  remove anything during this review. The audit now maps each container to
+  its exact inspected image ID, including untagged images; Compose and WSL2
+  cross-checks remain open.
 - [ ] **STORAGE-REVIEW-03 — Classify Qdrant snapshot retention.** For each
   snapshot, record collection, revision/checksum, generation time, consumer
   references, rollback value, and whether it is active, rollback, historical,

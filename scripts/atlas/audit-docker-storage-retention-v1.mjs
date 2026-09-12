@@ -16,8 +16,8 @@ function command(command, args) {
 
 function parseContainerRows(output) {
   return output.split(/\r?\n/).filter(Boolean).map((line) => {
-    const [name, image, size, status] = line.split('\t');
-    return { name, image, size, status };
+    const [containerId, name, image, size, status] = line.split('\t');
+    return { containerId, name, image, size, status };
   });
 }
 
@@ -183,10 +183,26 @@ const qdrantVolumeStats = qdrantVolumeStatsResult.available
 
 const dockerInfo = command('docker', ['info', '--format', '{{json .}}']);
 const dockerDisk = command('docker', ['system', 'df', '-v']);
-const containerListing = command('docker', ['ps', '-as', '--format', '{{.Names}}\t{{.Image}}\t{{.Size}}\t{{.Status}}']);
+const containerListing = command('docker', ['ps', '-as', '--format', '{{.ID}}\t{{.Names}}\t{{.Image}}\t{{.Size}}\t{{.Status}}']);
 const containers = containerListing.available
-  ? parseContainerRows(containerListing.output).map((container) => ({ ...container, writableBytes: parseSize(container.size), writableDiff: diffCounts(container.name) }))
+  ? parseContainerRows(containerListing.output).map((container) => {
+    const inspectedImage = command('docker', ['inspect', '--format', '{{.Image}}', container.containerId]);
+    return {
+      ...container,
+      imageId: inspectedImage.available ? inspectedImage.output : null,
+      imageIdInspectionError: inspectedImage.available ? null : inspectedImage.error,
+      writableBytes: parseSize(container.size),
+      writableDiff: diffCounts(container.name),
+    };
+  })
   : [];
+const containerImageIndex = new Map();
+for (const container of containers) {
+  if (!container.imageId) continue;
+  const ids = containerImageIndex.get(container.imageId) ?? [];
+  ids.push(container.containerId);
+  containerImageIndex.set(container.imageId, ids);
+}
 const dockerfiles = listFiles(path.join(root, 'docker'), /^Dockerfile(?:\..*)?$/i).map(({ path: filePath }) => filePath);
 const buildImageReferences = dockerfiles.flatMap((relativePath) => {
   let text;
@@ -201,8 +217,7 @@ const imageListing = command('docker', ['image', 'ls', '-a', '--no-trunc', '--fo
 const dockerImageInventory = imageListing.available
   ? imageListing.output.split(/\r?\n/).filter(Boolean).map((line) => {
     const [id, repository, tag, size] = line.split('\t');
-    const references = command('docker', ['ps', '-a', '--filter', `ancestor=${id}`, '-q']);
-    const containerIds = references.available ? references.output.split(/\r?\n/).filter(Boolean) : [];
+    const containerIds = containerImageIndex.get(id) ?? [];
     const imageReference = `${repository}:${tag}`;
     const buildReferences = buildImageReferences.filter(({ imageWithoutDigest }) => imageWithoutDigest === imageReference);
     return {
@@ -213,7 +228,8 @@ const dockerImageInventory = imageListing.available
       allocatedBytes: parseSize(size),
       containerIds,
       buildReferences,
-      unreferencedByContainers: references.available && containerIds.length === 0,
+      containerReferenceLookup: 'docker inspect .Image exact-match',
+      unreferencedByContainers: containerListing.available && containerIds.length === 0,
       requiredByBuild: buildReferences.length > 0,
       reviewRequired: true,
       deletionAuthorized: false,
