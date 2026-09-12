@@ -11869,6 +11869,28 @@ writesPerformed=false. First blocker: `CURRENT_CHUNK_EXACT_MATCH_MISSING`.
 Next gate: current source/packet/chunk reconciliation after a producer-bound
 current Graphify artifact exists.
 
+## CURRENT-SOURCE-REF-VOCABULARY-GUARD-01 — 2026-09-11
+
+- [x] Confirmed the selected historical snapshot contains import aliases such
+      as `$lib/utils/file-reader.ts` in `sourceRef` and
+      `repositoryRelativePath`, which cannot identify a physical repository
+      file for canonical chunk joins.
+- [x] Added schema rejection for `$lib/`, `$app/`, `@/`, and `~/` aliases.
+- [x] Added regression coverage proving aliases fail closed during workspace
+      source-binding construction.
+- [ ] Recapture and explicitly admit a fresh snapshot generated from physical
+      repository paths before any structural lineage write or promotion.
+
+- [x] Fresh recapture completed after archiving the unused literal `$lib` mock
+      fixture: 25,291 sources across 7 repositories, zero capture violations,
+      snapshot revision `sha256:2a1d964da2c85ba1a5f75d8251268ceec939d3cbd6b1dc599941fe961b07b6a7`.
+- [ ] Explicitly admit this new snapshot before any Graphify execution or
+      structural lineage write.
+
+Status: `SOURCE_REF_VOCABULARY_GUARD_AND_RECAPTURE_PROVEN`; authority=false;
+writesPerformed=false. First blocker remains `CURRENT_CHUNK_EXACT_MATCH_MISSING`
+for the historical execution. The guard does not rewrite that execution.
+
 ### ROUTING-OWNER-COMPARISON-RECHECK-01 — 2026-09-11
 
 - [x] Confirmed the existing production MCP caller remains bounded and

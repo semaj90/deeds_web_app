@@ -811,6 +811,23 @@ Next gate: current source lineage and representation-owner reconciliation.
 
 Evidence: `docs/reports/semantic-768-writer-ownership-v1.json`.
 
+### SEMANTIC-768-ACTIVE-CONTRACT-DIAGNOSTIC — 2026-09-11
+
+- [x] Confirmed the active logical contract: `semantic_768`, native 768D,
+      Qdrant `codebase_chunks_768_v2/content`, with no active 384 authority.
+- [x] Confirmed PostgreSQL candidates are physically 768D: `content_embedding`
+      `halfvec(768)` with `55,169` rows and `content_embedding_768`
+      `vector(768)` with `1,386` rows.
+- [ ] Keep full-corpus promotion blocked: candidate text evidence is missing and
+      source-revision coverage remains partial.
+
+Evidence: `scripts/atlas/atlas-embedding-ranking-diagnostic-v2.mjs` and
+`docs/reports/atlas-embedding-ranking-diagnostic-v2.json`.
+Status: `SEMANTIC_768_RUNTIME_PROVEN_LINEAGE_BLOCKED`; authority=false;
+writesPerformed=false.
+First blockers: `CANDIDATE_TEXT_EVIDENCE_MISSING`,
+`SOURCE_REVISION_COVERAGE_PARTIAL`.
+
 ### SEMANTIC-768-CONTRACT-RECHECK — 2026-09-11
 
 - [x] Re-ran the existing semantic contract proof: Qdrant content/error/
