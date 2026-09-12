@@ -1,0 +1,43 @@
+{
+  "schema": "atlas.current-packet-chunk-lineage-planner-hardening.v1",
+  "status": "IMPLEMENTED_AWAITING_WORKSTATION_PROOF",
+  "branch": "agent/current-packet-chunk-lineage-reconcile-20260911",
+  "scope": "read-only packet/chunk lineage planning",
+  "changes": [
+    "packet selection now fails closed when duplicate atlas_packets rows share a packet_key but carry conflicting source revisions",
+    "duplicate atlas_packet_chunk_lineage rows for one canonical (packet_key, canonical_chunk_id) identity now fail closed instead of being silently overwritten in a Map",
+    "existing lineage parity now includes membership_status in addition to source_ref, source_namespace, source_revision, revision_status, and chunk_row_id",
+    "focused tests cover conflicting duplicate packet revisions, benign duplicate packet rows with one revision, wrong membership status, and duplicate canonical lineage identities"
+  ],
+  "preservedInvariants": [
+    "atlas_packets remains file-granularity",
+    "canonicalChunkId must come from an existing codebase_chunk_index row",
+    "sourceNamespace derives from graphify_executions.workspace_id and never atlas_packets.repository_id",
+    "whole-source Graphify content_hash is never compared to packet chunk/payload content hashes",
+    "no identity is minted from sidecar observations",
+    "no lineage mutation is authorized"
+  ],
+  "writes": {
+    "postgres": false,
+    "qdrant": false,
+    "neo4j": false,
+    "valkey": false,
+    "graphify": false,
+    "lineage": false
+  },
+  "canonicalAuthority": false,
+  "lineageFillAuthorized": false,
+  "requiredWorkstationProof": [
+    "node --test scripts/atlas/test-snapshot-packet-chunk-materializer-v2.mjs",
+    "node --check scripts/atlas/plan-snapshot-packet-chunk-materializer-v2.mjs",
+    "node scripts/atlas/plan-snapshot-packet-chunk-materializer-v2.mjs --limit=8 --no-report"
+  ],
+  "allowedPlannerOutcomes": [
+    "LINEAGE_FILL_CANARY_READY",
+    "CURRENT_CHUNK_MATERIALIZER_REQUIRED",
+    "CURRENT_PACKET_MATERIALIZER_REQUIRED",
+    "BOUNDED_PACKET_CHUNK_LINEAGE_ALREADY_COMPLETE",
+    "PACKET_CHUNK_MATERIALIZER_PLAN_BLOCKED"
+  ],
+  "nextGate": "WORKSTATION_BOUNDED_PLANNER_PROOF"
+}
