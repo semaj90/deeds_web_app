@@ -132,6 +132,15 @@ retained. `Vibreti` is not treated as a current implementation or owner.
   `semantic_768` is one evidence lane. Qdrant HNSW, PostgreSQL exact pgvector,
   cuVS exact, CAGRA, and TurboVec are executors/challengers over that lane and
   must not receive independent RRF votes solely because execution differs.
+  The current owner decision is still open: the storage contract declares
+  `codebase_chunks_768`, while the active lane registry and several runtime
+  callers select `codebase_chunks_768_v2`. The role audit now emits a
+  per-caller classification (`ACTIVE_RUNTIME_OWNER_CANDIDATE`,
+  `UNSUFFIXED_COLLECTION_CALLER_REQUIRES_CLASSIFICATION`,
+  `AMBIGUOUS_MULTI_COLLECTION_CALLER`, or `REVIEW_OR_HISTORICAL`) so this
+  cannot be resolved by counting raw string references. Do not flip either
+  runtime owner until the caller census, lineage receipt, and explicit owner
+  decision agree.
 - [x] **RETRIEVAL-OWNERSHIP-03 — Keep candidate sets ephemeral.** KNN and Top-K
   are query operations. Do not create persistent `knn*`, `topk*`, KMeans, SOM,
   or PageRank collections to store transient candidate universes. The role
@@ -411,4 +420,6 @@ contract. Current evidence exposes a conflict: the declared projection owner
 is `codebase_chunks_768`, while the runtime lane registry still names
 `codebase_chunks_768_v2`. This must be resolved as an explicit owner decision;
 the audit now fails closed with `SEMANTIC_OWNER_RUNTIME_CONTRACT_CONFLICT`
-instead of silently treating both statements as aligned.
+instead of silently treating both statements as aligned. Its receipt also
+records the exact runtime caller classifications, separating active candidates
+from legacy, advisory, test, and ambiguous multi-collection references.

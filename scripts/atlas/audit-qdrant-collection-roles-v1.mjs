@@ -100,6 +100,27 @@ const consumers = scanConsumers();
 const reviewOnlyPath = /audit|backfill|legacy|migration|test|spec|report|manifest|contract|archive/i;
 const activeLegacy384Consumers = consumers.filter((file) => /codebase_chunks_384|content_embedding_384|dense_384|summary_embedding_384/i.test(file) && !reviewOnlyPath.test(file));
 const activeV2Consumers = consumers.filter((file) => /codebase_chunks_768_v2/i.test(file) && !reviewOnlyPath.test(file));
+const runtimeConsumerClassifications = consumers.flatMap((relativePath) => {
+  const fullPath = path.join(root, relativePath);
+  if (!fs.existsSync(fullPath)) return [];
+  const text = fs.readFileSync(fullPath, 'utf8');
+  const mentionsV2 = /codebase_chunks_768_v2/.test(text);
+  const mentionsDeclared = /codebase_chunks_768(?!_v2)/.test(text);
+  if (!mentionsV2 && !mentionsDeclared) return [];
+  const reviewOnly = reviewOnlyPath.test(relativePath);
+  return [{
+    relativePath,
+    mentionsV2,
+    mentionsDeclaredCollection: mentionsDeclared,
+    classification: reviewOnly
+      ? 'REVIEW_OR_HISTORICAL'
+      : mentionsV2 && mentionsDeclared
+        ? 'AMBIGUOUS_MULTI_COLLECTION_CALLER'
+        : mentionsV2
+          ? 'ACTIVE_RUNTIME_OWNER_CANDIDATE'
+          : 'UNSUFFIXED_COLLECTION_CALLER_REQUIRES_CLASSIFICATION',
+  }];
+});
 const activeSemantic = collections.filter((item) => item.role === 'ACTIVE_SEMANTIC_PROJECTION');
 const transientCandidateCollections = collections
   .filter((item) => /(^|[_-])(knn|topk|kmeans|som|pagerank)([_-]|$)/i.test(item.name))
@@ -167,7 +188,13 @@ const report = {
     snapshotFileCount: snapshotFiles.length,
     snapshotFiles,
   },
-  consumers: { count: consumers.length, files: consumers, activeLegacy384Consumers, activeV2Consumers },
+  consumers: {
+    count: consumers.length,
+    files: consumers,
+    activeLegacy384Consumers,
+    activeV2Consumers,
+    runtimeConsumerClassifications,
+  },
   candidateStorageChecks: {
     transientCandidateCollections,
     candidateSetsMustRemainEphemeral: transientCandidateCollections.length === 0,
