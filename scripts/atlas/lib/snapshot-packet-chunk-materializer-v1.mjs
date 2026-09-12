@@ -61,7 +61,7 @@ function rowLineCompatible(row, evidence) {
   return exact || plusOne;
 }
 
-export function matchObservationToCanonicalChunkRows(sourceBuffer, observation, chunkRows) {
+export function matchObservationToCanonicalChunkRows(sourceBuffer, observation, chunkRows, observationOrdinal = null) {
   const evidence = observationSliceEvidence(sourceBuffer, observation);
   const candidates = [];
   for (const row of chunkRows ?? []) {
@@ -83,6 +83,7 @@ export function matchObservationToCanonicalChunkRows(sourceBuffer, observation, 
       endByte: evidence.endByte,
       startLine: evidence.startLine,
       endLine: evidence.endLine,
+      observationOrdinal: Number.isInteger(observationOrdinal) && observationOrdinal >= 0 ? observationOrdinal : null,
     });
   }
   return {
@@ -93,6 +94,7 @@ export function matchObservationToCanonicalChunkRows(sourceBuffer, observation, 
       upstreamChunkId: evidence.upstreamChunkId,
       startLine: evidence.startLine,
       endLine: evidence.endLine,
+      observationOrdinal: Number.isInteger(observationOrdinal) && observationOrdinal >= 0 ? observationOrdinal : null,
     },
     candidates,
     classification: candidates.length === 1 ? 'EXACT_EXISTING_CHUNK' : candidates.length === 0 ? 'CHUNK_MATERIALIZATION_REQUIRED' : 'AMBIGUOUS_EXISTING_CHUNK',
@@ -177,6 +179,19 @@ export function classifySourceMaterializerPlan({ membership, packetResult, obser
   if (chunkFailures.some((row) => row.classification === 'AMBIGUOUS_EXISTING_CHUNK')) blockers.push('AMBIGUOUS_EXISTING_CHUNK');
   if (chunkFailures.some((row) => row.classification === 'CHUNK_MATERIALIZATION_REQUIRED')) blockers.push('CHUNK_MATERIALIZATION_REQUIRED');
 
+  const exactChunkMatches = observationMatches
+    .filter((row) => row.classification === 'EXACT_EXISTING_CHUNK')
+    .map((row) => row.candidates[0]);
+  const proposedChunkIdentityCounts = new Map();
+  for (const row of exactChunkMatches) {
+    const identity = `${normalizeText(row.canonicalChunkId)}|${normalizeText(row.chunkRowId)}`;
+    proposedChunkIdentityCounts.set(identity, (proposedChunkIdentityCounts.get(identity) ?? 0) + 1);
+  }
+  const duplicateProposedChunkIdentities = [...proposedChunkIdentityCounts.entries()]
+    .filter(([, count]) => count > 1)
+    .map(([identity, count]) => ({ identity, count }));
+  if (duplicateProposedChunkIdentities.length > 0) blockers.push('DUPLICATE_PROPOSED_CHUNK_IDENTITY');
+
   const packetKey = packetResult.exact[0]?.packetKey ?? null;
   const sourceRef = normalizeText(membership?.source_ref);
   const workspaceId = normalizeText(membership?.workspace_id);
@@ -198,32 +213,29 @@ export function classifySourceMaterializerPlan({ membership, packetResult, obser
 
   const expectedMembershipStatus = observationMatches.length === 1 ? 'EXACT_SINGLE_MEMBER' : 'EXACT_MULTI_MEMBER';
   const proposedMemberships = packetKey && sourceNamespace && sourceRevision
-    ? observationMatches
-        .filter((row) => row.classification === 'EXACT_EXISTING_CHUNK')
-        .map((row) => row.candidates[0])
-        .map((row) => {
-          const proposed = {
-            packetKey,
-            canonicalChunkId: row.canonicalChunkId,
-            chunkRowId: row.chunkRowId,
-            sourceRef,
-            sourceNamespace,
-            sourceRevision,
-            membershipStatus: expectedMembershipStatus,
-            revisionStatus: 'PROVEN',
-            chunkOrdinal: null,
-            lineageProducerRevision: 'snapshot-packet-chunk-materializer-plan-v2',
-            evidenceRefs: ['docs/reports/snapshot-packet-chunk-materializer-plan-v2.json'],
-            matchBasis: row.matchBasis,
-          };
-          const currentRows = existingByIdentity.get(`${packetKey}|${row.canonicalChunkId}`) ?? [];
-          const current = currentRows.length === 1 ? currentRows[0] : null;
-          return {
-            ...proposed,
-            alreadyPresent: current ? !lineageRowConflict(current, proposed) : false,
-            existingConflict: current ? lineageRowConflict(current, proposed) : currentRows.length > 1,
-          };
-        })
+    ? exactChunkMatches.map((row) => {
+        const proposed = {
+          packetKey,
+          canonicalChunkId: row.canonicalChunkId,
+          chunkRowId: row.chunkRowId,
+          sourceRef,
+          sourceNamespace,
+          sourceRevision,
+          membershipStatus: expectedMembershipStatus,
+          revisionStatus: 'PROVEN',
+          chunkOrdinal: Number.isInteger(row.observationOrdinal) ? row.observationOrdinal : null,
+          lineageProducerRevision: 'snapshot-packet-chunk-materializer-plan-v2',
+          evidenceRefs: ['docs/reports/snapshot-packet-chunk-materializer-plan-v2.json'],
+          matchBasis: row.matchBasis,
+        };
+        const currentRows = existingByIdentity.get(`${packetKey}|${row.canonicalChunkId}`) ?? [];
+        const current = currentRows.length === 1 ? currentRows[0] : null;
+        return {
+          ...proposed,
+          alreadyPresent: current ? !lineageRowConflict(current, proposed) : false,
+          existingConflict: current ? lineageRowConflict(current, proposed) : currentRows.length > 1,
+        };
+      })
     : [];
 
   if (proposedMemberships.some((row) => row.existingConflict)) blockers.push('EXISTING_LINEAGE_CONFLICT');
@@ -242,6 +254,8 @@ export function classifySourceMaterializerPlan({ membership, packetResult, obser
     duplicatePacketKeyRevisionConflictCount: packetResult.duplicateRevisionConflicts?.length ?? 0,
     structuralChunkCount: observationMatches.length,
     proposedMembershipCount: proposedMemberships.length,
+    duplicateProposedChunkIdentityCount: duplicateProposedChunkIdentities.length,
+    duplicateProposedChunkIdentities,
     alreadyPresentCount: proposedMemberships.filter((row) => row.alreadyPresent).length,
     existingConflictCount: proposedMemberships.filter((row) => row.existingConflict).length,
     duplicateExistingIdentityCount: duplicateExistingIdentities.length,
