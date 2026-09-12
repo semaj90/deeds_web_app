@@ -25,6 +25,44 @@ content. Current admitted read evidence names 7 repository identities and
 
 with `sourceIdentityKey` binding repository identity to the relative path.
 
+## Storage retention review — 2026-09-12
+
+The storage census is evidence only and does not authorize cleanup. The
+current report identifies 13 images without running or stopped container
+ancestry, including these review candidates:
+
+- `atlas-gpu-8098:repro-v2` (approximately 29.5 GiB);
+- `atlas-gpu-8098:repro-v1` (approximately 25.9 GiB);
+- the old PyTorch decoder image (approximately 12.2 GiB).
+
+The active RAPIDS image remains container-backed and must not be treated as a
+disposable duplicate merely because an older image has the same repository
+name. Image ID, container ancestry, Dockerfile/build ancestry, and runtime
+health must be checked together before any future cleanup decision.
+
+The Qdrant census separately reports retained snapshot artifacts as the main
+identified storage consumer. These snapshots and all Qdrant collections remain
+preserved historical or derived evidence. No image, container, volume,
+snapshot, cache, package, or VHDX operation is authorized by this ledger.
+
+- [x] **STORAGE-CENSUS-01 — Record review-only retention evidence.** The
+  storage audit records image IDs, sizes, ancestry, Qdrant snapshot files and
+  directories, collection roles, and `deletionAuthorized=false` for every
+  candidate.
+- [ ] **STORAGE-REVIEW-02 — Reconcile active build/runtime ancestry.** Compare
+  each candidate with Compose references, Dockerfile ancestry, active image
+  IDs, and the WSL2/RAPIDS and PyTorch environment census. Do not rebuild or
+  remove anything during this review.
+- [ ] **STORAGE-REVIEW-03 — Classify Qdrant snapshot retention.** For each
+  snapshot, record collection, revision/checksum, generation time, consumer
+  references, rollback value, and whether it is active, rollback, historical,
+  or unclassified. Produce candidates only; preserve all artifacts.
+- [ ] **STORAGE-REVIEW-04 — Require explicit cleanup admission.** A later
+  cleanup change must name exact image IDs or snapshot paths, prove zero
+  consumers and rollback coverage, capture a before/after inventory, and be
+  separately authorized. VHDX compaction is last and is not part of this
+  change.
+
 ## Deferred/non-blocking search-tool reintegration audit
 
 Historical MCP audit evidence is useful input, not current enablement authority.
