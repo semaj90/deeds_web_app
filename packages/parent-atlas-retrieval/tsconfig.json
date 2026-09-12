@@ -15,5 +15,12 @@
     "lib": ["ES2022"]
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "tests", "native"]
+  "exclude": [
+    "node_modules",
+    "dist",
+    "tests",
+    "native",
+    "src/gpu/background-analyzer.ts",
+    "src/gpu/mapreduce-cuda-analyzer.ts"
+  ]
 }

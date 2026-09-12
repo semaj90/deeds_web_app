@@ -1,10 +1,11 @@
 /**
  * CUDA Compute Bridge for RTX 3060 Ti
- * Handles GPU-accelerated legal analysis and vector operations
- * Routes async compute jobs via RabbitMQ, direct calls via libtorch N-API
+ *
+ * Portable package boundary: this module owns compute only. Application-level
+ * queue dispatch, evidence persistence, Qdrant writes, and audit logging are
+ * bound by the host application rather than imported from this package.
  */
 
-// LibTorch N-API bridge (GPU graph analysis with CPU fallback)
 import {
 	graphSimilarity,
 	clusterEmbeddings,
@@ -13,9 +14,6 @@ import {
 } from './libtorch-bridge.js';
 
 export { graphSimilarity, clusterEmbeddings, computeCaseEmbedding, isCudaAvailable };
-
-// Background GPU evidence analysis (fire-and-forget after evidence upload)
-export { analyzeEvidenceGpu, triggerEvidenceGpuAnalysis } from './background-analyzer.js';
 
 export interface CudaComputeRequest {
 	operation: 'vector_similarity' | 'cluster' | 'weighted_embedding';
@@ -35,24 +33,14 @@ export interface CudaComputeResult {
 }
 
 /**
- * Submit CUDA compute request via RabbitMQ for async processing.
- * Falls back to direct N-API call if RabbitMQ unavailable.
+ * Execute a bounded compute request directly through the package-local
+ * LibTorch bridge. Hosts that need RabbitMQ/event tracking wrap this function
+ * at the application boundary; the portable retrieval package does not own
+ * that side effect.
  */
 export async function submitCudaCompute(request: CudaComputeRequest): Promise<CudaComputeResult> {
 	const jobId = crypto.randomUUID();
 	const start = performance.now();
-
-	try {
-		const { dispatchOrExecuteInline } = await import('../queue/dispatch-inline.js');
-		await dispatchOrExecuteInline('analytics.track', {
-			eventType: 'gpu.compute',
-			payload: { jobId, operation: request.operation, timestamp: Date.now() }
-		});
-	} catch {
-		// RabbitMQ tracking is non-critical
-	}
-
-	// Execute directly via N-API bridge (GPU or CPU fallback)
 	const { operation, data } = request;
 	let result: unknown;
 	let source: 'gpu' | 'cpu' = 'cpu';
@@ -82,9 +70,7 @@ export async function submitCudaCompute(request: CudaComputeRequest): Promise<Cu
 	};
 }
 
-/**
- * Get CUDA device info from the live addon.
- */
+/** Get CUDA device info from the live addon. */
 export async function getCudaDeviceInfo() {
 	const cudaAvailable = isCudaAvailable();
 	return {
