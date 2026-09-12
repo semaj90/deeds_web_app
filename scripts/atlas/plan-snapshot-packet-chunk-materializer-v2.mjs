@@ -14,6 +14,7 @@
  * - canonical chunk IDs come only from codebase_chunk_index
  * - atlas_packets is file-granularity; packet content_hash is not compared to
  *   the membership whole-source digest
+ * - duplicate sidecar observations resolving to one canonical chunk block
  * - no Postgres/Qdrant/Neo4j/Valkey/Graphify writes
  */
 import fs from 'node:fs';
@@ -153,7 +154,9 @@ try {
       [sourceRef],
     );
 
-    const observationMatches = ast.chunks.map((chunk) => matchObservationToCanonicalChunkRows(sourceBuffer, chunk, chunkResult.rows));
+    const observationMatches = ast.chunks.map((chunk, observationOrdinal) =>
+      matchObservationToCanonicalChunkRows(sourceBuffer, chunk, chunkResult.rows, observationOrdinal),
+    );
     const packetResult = classifyPacketRows(membership, packetResultRows.rows);
     const plan = classifySourceMaterializerPlan({
       membership,
@@ -198,6 +201,7 @@ const counts = {
   ambiguousOrBlocked: plans.filter((row) => String(row.classification).startsWith('BLOCKED')).length,
   exactCurrentFilePacket: plans.filter((row) => row.packetClassification === 'EXACT_CURRENT_FILE_PACKET').length,
   uniqueLegacyFilePacketRevisionUnproven: plans.filter((row) => row.packetClassification === 'UNIQUE_FILE_PACKET_REVISION_UNPROVEN').length,
+  duplicateProposedChunkIdentities: plans.reduce((sum, row) => sum + Number(row.duplicateProposedChunkIdentityCount || 0), 0),
   proposedMissingLineageRows: plans.reduce((sum, row) => sum + Number(row.missingLineageCount || 0), 0),
   existingLineageConflicts: plans.reduce((sum, row) => sum + Number(row.existingConflictCount || 0), 0),
 };
@@ -205,7 +209,7 @@ const counts = {
 let status = 'PACKET_CHUNK_MATERIALIZER_PLAN_BLOCKED';
 let nextGate = 'REVIEW_BLOCKERS';
 if (!error && counts.selectedSources > 0) {
-  if (counts.readyLineageFill > 0 && counts.needsChunkMaterializer === 0 && counts.needsPacketMaterializer === 0 && counts.ambiguousOrBlocked === 0 && counts.existingLineageConflicts === 0) {
+  if (counts.readyLineageFill > 0 && counts.needsChunkMaterializer === 0 && counts.needsPacketMaterializer === 0 && counts.ambiguousOrBlocked === 0 && counts.duplicateProposedChunkIdentities === 0 && counts.existingLineageConflicts === 0) {
     status = 'LINEAGE_FILL_CANARY_READY';
     nextGate = 'EXPLICIT_BOUNDED_LINEAGE_FILL_AUTHORIZATION';
   } else if (counts.needsChunkMaterializer > 0) {
