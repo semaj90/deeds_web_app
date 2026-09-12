@@ -1,0 +1,2153 @@
+{
+  "schema": "DockerStorageRetentionAuditV1",
+  "generatedAt": "2026-09-12T05:37:26.581Z",
+  "writesPerformed": false,
+  "destructiveActionsPerformed": false,
+  "docker": {
+    "available": true,
+    "infoError": null,
+    "systemDf": "Images space usage:\n\nREPOSITORY                           TAG                         IMAGE ID       CREATED         SIZE      SHARED SIZE   UNIQUE SIZE   CONTAINERS\nlegal-ai-go-retrieval                latest                      af28bddee482   3 hours ago     50MB      13.03MB       37.02MB       1\natlas-gpu-8098                       repro-v2                    05a5b136486a   24 hours ago    29.5GB    11.2GB        18.26GB       0\natlas-gpu-8098                       repro-v1                    be7e8382aa2b   25 hours ago    25.9GB    11.2GB        14.72GB       0\ndeeds-miniforge-nlp-sidecar          latest                      5aec7c5866bd   32 hours ago    2.76GB    87.46MB       2.668GB       1\n<none>                               <none>                      22ec5cd05a8c   3 days ago      987MB     87.46MB       899.3MB       1\natlas-gpu-8098                       26.08-cuda12-py3.13         3126b1b13e1b   9 days ago      17.5GB    11.2GB        6.279GB       1\natlas-neural-decoder                 torch2.13.0-cu132           49eb1f4ab836   11 days ago     8.77GB    0B            8.77GB        1\natlas-neural-decoder                 torch2.8.0-cu128            153c066f3b4d   11 days ago     12.2GB    0B            12.21GB       0\ndeeds-web-app-go-retrieval-service   latest                      56c2149bedd2   12 days ago     50MB      13.03MB       37.01MB       0\n<none>                               <none>                      c7edba24a4c1   2 weeks ago     49.6MB    13.03MB       36.59MB       0\npgvector-pgsearch                    pg18-local                  86aadc922d71   2 weeks ago     3.37GB    0B            3.369GB       1\npostgres                             18                          4ef4dbc939d6   2 weeks ago     644MB     87.46MB       556.4MB       0\nvalkey/valkey                        8-alpine                    e0eb7c480958   3 weeks ago     61.5MB    9.073MB       52.42MB       0\npgvector/pgvector                    pg18                        2ba9ca5f2e7d   4 weeks ago     631MB     0B            630.9MB       0\ndeeds-web-app-go-search-service      latest                      3c27cf146d05   5 weeks ago     49.1MB    8.503MB       40.56MB       1\nrapidsai/base                        26.08-cuda12-py3.13-amd64   16c0397eaa0d   5 weeks ago     17.4GB    11.2GB        6.24GB        0\nlegal-ai-bifrost                     git                         a1ac7dc2c574   5 weeks ago     344MB     0B            343.8MB       1\nqdrant/qdrant                        v1.19.0                     057ee3a8da76   5 weeks ago     270MB     0B            269.9MB       1\ndeeds-web-app-docling-vlm            latest                      ebcee0ea2826   2 months ago    10.5GB    147.7MB       10.4GB        1\ndeeds-web-app-image-synthesis        latest                      dbcfbe5cdfa3   2 months ago    9.19GB    147.7MB       9.042GB       1\nclickhouse/clickhouse-server         latest                      1d1f6508eba2   2 months ago    1.22GB    0B            1.218GB       1\nlangfuse/langfuse                    3                           4bf0e8dbce77   2 months ago    1.46GB    173.5MB       1.285GB       1\nlangfuse/langfuse-worker             3                           4b02c5e4c106   2 months ago    1.61GB    173.5MB       1.432GB       1\nsearxng/searxng                      latest                      15275f138662   2 months ago    377MB     0B            377.2MB       1\nchrislusf/seaweedfs                  latest                      800b2115c632   2 months ago    358MB     9.073MB       349.2MB       4\nneo4j                                5-community                 937fbd163e30   2 months ago    964MB     0B            963.6MB       0\nnats                                 latest                      bbfbb6c4cdae   2 months ago    24.8MB    0B            24.82MB       1\nqdrant/qdrant                        latest                      75eab8c4ba42   3 months ago    265MB     0B            264.9MB       0\nrabbitmq                             3-management-alpine         606d8c0d6b3c   9 months ago    275MB     0B            274.9MB       1\nvalkey/valkey-bundle                 8.1.1                       8b6501bf7157   12 months ago   294MB     0B            293.9MB       1\ncouchdb                              3.3                         307a3f5276f6   18 months ago   337MB     0B            336.6MB       1\ncaddy                                2.8-alpine                  af32e97399fe   2 years ago     69.5MB    0B            69.46MB       1\nnvcr.io/nvidia/k8s/cuda-sample       nbody                       59261e419d6d   3 years ago     456MB     0B            456.3MB       0\n\nContainers space usage:\n\nCONTAINER ID   IMAGE                                    COMMAND                  LOCAL VOLUMES   SIZE      CREATED        STATUS                 NAMES\n72eb6a007296   legal-ai-go-retrieval:latest             \"go-retrieval-service\"   0               4.1kB     3 hours ago    Up 3 hours (healthy)   legal-ai-go-retrieval\nbe58377b4b83   neo4j:5-community                        \"tini -g -- /startup…\"   2               243MB     5 hours ago    Up 3 hours (healthy)   legal-ai-neo4j\nb6f6ede18905   deeds-miniforge-nlp-sidecar:latest       \"python /app/python/…\"   0               36.9kB    29 hours ago   Up 3 hours (healthy)   f66df30803e9_miniforge-nlp-sidecar\n9942628c481d   atlas-gpu-8098:26.08-cuda12-py3.13       \"/home/rapids/entryp…\"   0               5.64MB    9 days ago     Up 3 hours             atlas-gpu-8098\nf5ee0be06f7b   atlas-neural-decoder:torch2.13.0-cu132   \"python /app/python/…\"   0               106kB     11 days ago    Up 3 hours (healthy)   atlas-neural-decoder\nb9e629155538   qdrant/qdrant:v1.19.0                    \"./entrypoint.sh\"        2               16.4kB    2 weeks ago    Up 3 hours (healthy)   legal-ai-qdrant\n8fbe6d338f88   pgvector-pgsearch:pg18-local             \"docker-entrypoint.s…\"   1               1.05GB    2 weeks ago    Up 3 hours (healthy)   legal-ai-postgres\nded617230146   chrislusf/seaweedfs:latest               \"/entrypoint.sh volu…\"   1               4.1kB     2 weeks ago    Up 3 hours (healthy)   legal-ai-seaweed-volume\n798c0dc868d2   chrislusf/seaweedfs:latest               \"/entrypoint.sh file…\"   1               8.19kB    2 weeks ago    Up 3 hours (healthy)   legal-ai-seaweed-filer\n17935f116ebf   deeds-web-app-go-search-service          \"go-search-service\"      0               4.1kB     5 weeks ago    Up 3 hours (healthy)   legal-ai-go-search\n52738d571f9f   legal-ai-bifrost:git                     \"/app/docker-entrypo…\"   1               16.4kB    5 weeks ago    Up 3 hours (healthy)   legal-ai-bifrost\n7788846bf731   431ddc0acb6f                             \"go-embedding-service\"   0               4.1kB     6 weeks ago    Up 3 hours (healthy)   legal-ai-go-embedding\nf82e400d0199   caddy:2.8-alpine                         \"caddy run --config …\"   2               283kB     6 weeks ago    Up 3 hours (healthy)   legal-ai-caddy\n12572bf43b27   rabbitmq:3-management-alpine             \"docker-entrypoint.s…\"   1               4.1kB     6 weeks ago    Up 3 hours (healthy)   legal-ai-rabbitmq\n176e24440340   valkey/valkey-bundle:8.1.1               \"bundle-docker-entry…\"   1               4.1kB     6 weeks ago    Up 3 hours (healthy)   legal-ai-valkey\nfa509876a7ed   langfuse/langfuse:3                      \"dumb-init -- ./web/…\"   0               69.6kB    2 months ago   Up 3 hours (healthy)   langfuse-server\n648ba9fa7f5b   langfuse/langfuse-worker:3               \"dumb-init -- ./work…\"   0               4.1kB     2 months ago   Up 3 hours             langfuse-worker\n6c14cff49498   searxng/searxng:latest                   \"/usr/local/searxng/…\"   2               1.26MB    2 months ago   Up 3 hours (healthy)   legal-ai-searxng\n04b6b3cc650e   nats:latest                              \"/nats-server --js -…\"   1               8.19kB    2 months ago   Up 3 hours             legal-ai-nats\nd79f44748f7b   clickhouse/clickhouse-server             \"/entrypoint.sh\"         2               41kB      2 months ago   Up 3 hours (healthy)   langfuse-clickhouse\n24aeca0fc5f8   couchdb:3.3                              \"tini -- /docker-ent…\"   2               4.1kB     2 months ago   Up 3 hours (healthy)   legal-ai-couchdb\n025f9e36c2ef   deeds-web-app-docling-vlm:latest         \"uvicorn app:app --h…\"   0               490MB     2 months ago   Up 3 hours (healthy)   legal-ai-docling-vlm\n9fc3f20ef17b   deeds-web-app-image-synthesis:latest     \"python app.py\"          0               995kB     2 months ago   Up 3 hours (healthy)   legal-ai-image-synthesis\n096f04a6ff6f   chrislusf/seaweedfs:latest               \"/entrypoint.sh s3 -…\"   1               20.5kB    2 months ago   Up 3 hours (healthy)   legal-ai-seaweed-s3\n8e8ccce2ee56   chrislusf/seaweedfs:latest               \"/entrypoint.sh mast…\"   1               4.1kB     2 months ago   Up 3 hours (healthy)   legal-ai-seaweed-master\n\nLocal Volumes space usage:\n\nVOLUME NAME                                                        LINKS     SIZE\nf08367f9815733858e8bbe24638adbab7f3ec91c9248ae5e7c469eabd0b67009   1         0B\n429627d99993618c247968dc6c6b5d6ba914b2f76f53e95abe1b495177c3bb8c   0         48.44MB\nbdbf1e132dbd10c6091c96df0a909f5d951d7eb077e2427f8f5674c238539fd3   1         0B\ndeeds-web-app_bifrost_data                                         1         30.49MB\n4ff4e27ef4dcfbb1acb5cb9c28c9b17e2417b794afa24809383874d9af124816   0         48.61MB\n81d46e804680133403afb09c780ebc8ca4140dc7819ece4ac877cfb3f3f9b249   0         48.61MB\ndeeds-web-app_couchdb_data                                         1         773.6kB\ndeeds-web-app_valkey_data                                          1         42.99MB\ndeeds_qdrant_snapshots                                             1         26.81GB\ndeeds-web-app_seaweed_master_data                                  1         21.27kB\n3b3f188e43a8bf7ffc5c60093d7b4d50b2001363845459929efa00d6b57699b2   0         48.99MB\ndeeds-web-app_caddy_config                                         1         5.651kB\ndeeds-web-app_caddy_data                                           1         3.522kB\nb90cd4b2198f726519571db47a7c1dab61cd17f73fe7b529d6571e5f299b19a4   1         0B\ndeeds-web-app_seaweed_volume_data                                  1         6.86MB\ndocker_redis_data                                                  0         0B\n2a68b389dc3b5a5ea40b3fbfc29a63256836f98f2896e590efc8ae1794a8aeb0   0         48.44MB\n56a1197f6e3c46e878f9bd2c7dbef8d17c25e08fd02095d7f45de2a99e68f01b   1         1.629MB\ndeeds-web-app_nats_data                                            1         0B\ndeeds-web-app_rabbitmq_data                                        1         3.734MB\ndocker_postgres_data                                               0         0B\n6c5598e6416e6d6b2baae6dc36ed27661e4ab5eb13969edc36a09ef51859de66   0         48.46MB\ndeeds-web-app_langfuse_clickhouse_data                             1         10GB\ndeeds-web-app_postgres_data                                        1         9.122GB\ndeeds-web-app_neo4j_logs                                           1         128.9MB\ndeeds_qdrant_production_data                                       1         16.67GB\n4bbc1000620e81d41d5e2fda309badc6932df45cde078321d7ce41519311d977   0         48.49MB\n94b13a53582c6504c8803ade222c899eaa51d59cd5bae0c9d44f24c5a6ffe626   0         48.44MB\ndeeds-web-app_couchdb_config                                       1         465B\ndeeds-web-app_langfuse_clickhouse_logs                             1         1.077GB\ndeeds-web-app_neo4j_data                                           1         1.286GB\n\nBuild cache usage: 5.866GB\n\nCACHE ID       CACHE TYPE     SIZE      CREATED        LAST USED      USAGE     SHARED\nwkibub39v9ed   regular        13MB      2 weeks ago    2 weeks ago    1         false\njxtp7zxhgt5k   regular        1.78MB    2 weeks ago    2 weeks ago    1         false\nw4f6mj1w4vkn   regular        380MB     2 weeks ago    2 weeks ago    1         false\nlbmexzh0a45j   regular        16.5kB    2 weeks ago    2 weeks ago    1         false\nuivem07iqggt   regular        13.1MB    2 weeks ago    2 weeks ago    1         false\nvcgnu34zc3pp   regular        3.65MB    2 weeks ago    2 weeks ago    1         true\nih8cisbfxunj   regular        4.13kB    2 weeks ago    2 weeks ago    1         false\n41k8847pq9qm   regular        31.4MB    2 weeks ago    2 weeks ago    2         true\n8xuos2peapwo   regular        8.19kB    2 weeks ago    2 weeks ago    2         false\nck94r3i7s782   regular        3.85MB    2 weeks ago    2 weeks ago    1         false\nui89b5qvmsb5   regular        1.47MB    2 weeks ago    2 weeks ago    1         false\nrsuy30gyy9zl   regular        315MB     2 weeks ago    2 weeks ago    1         false\nlgwi1luoomrk   regular        16.5kB    2 weeks ago    2 weeks ago    1         false\nlq6tf82d34h1   regular        20.5kB    2 weeks ago    2 weeks ago    1         false\n1iggjk7zc8kz   regular        4.13kB    2 weeks ago    2 weeks ago    1         false\ndufmwcdfccbs   regular        13.4MB    2 weeks ago    2 weeks ago    1         false\ngznv36rlc5bj   regular        8.19kB    2 weeks ago    2 weeks ago    1         false\ndtltt8sbqigp   regular        6.15MB    2 weeks ago    2 weeks ago    5         true\nn44nrvt2s7rd   regular        117MB     2 weeks ago    2 weeks ago    1         true\ng3s4d9yh9c2v   regular        6.24MB    2 weeks ago    2 weeks ago    1         false\n714k69hrmeia   regular        52.3MB    2 weeks ago    2 weeks ago    1         false\nnukt4qravbl2   regular        16.6kB    2 weeks ago    2 weeks ago    1         false\ni3nzgy30ur7h   regular        8.29kB    2 weeks ago    2 weeks ago    1         false\nt2k57rcqdizj   regular        503MB     13 days ago    13 days ago    2         false\na4njfxsda6s0   regular        28.6MB    12 days ago    12 days ago    1         false\nwk9parxsekq3   regular        8.19kB    12 days ago    12 days ago    1         false\n09v1w15k0jn3   regular        31.8MB    12 days ago    12 days ago    1         true\nr2kn24o5462q   regular        117MB     12 days ago    12 days ago    2         true\n34f033u7avgu   regular        16.6MB    12 days ago    12 days ago    2         true\nupla4nkb7nxr   regular        419MB     12 days ago    12 days ago    2         true\nt35ao6uro6f8   regular        16.6kB    12 days ago    12 days ago    2         true\ngj9r7zer402y   regular        31.5kB    12 days ago    12 days ago    1         true\nhnt7m44bqbzz   regular        47.7kB    12 days ago    12 days ago    1         true\nsid7ywz8i1bl   regular        576MB     12 days ago    12 days ago    1         true\nmvdsrcfp5k87   regular        20.7kB    12 days ago    12 days ago    1         true\nkvdzf6go13w3   regular        370MB     12 days ago    12 days ago    1         true\nlp0i65cd3scd   regular        103MB     12 days ago    12 days ago    1         true\n2bzvmhpqdtqf   regular        48kB      12 days ago    12 days ago    1         true\n65spi7r7fjn5   regular        33.2kB    12 days ago    12 days ago    1         true\ny2lgbnhwakww   regular        4.13kB    12 days ago    12 days ago    1         true\nsfgketlh0515   regular        118MB     11 days ago    11 days ago    1         true\nt70m28bi7y2m   regular        38.6MB    11 days ago    11 days ago    1         true\ndwv1z97iful7   regular        12GB      11 days ago    11 days ago    1         true\n87c3poz733ce   regular        4.13kB    11 days ago    11 days ago    1         true\nxnnhmj3gswsl   regular        118MB     11 days ago    11 days ago    1         true\nh2hrzu2pvkil   regular        177MB     11 days ago    11 days ago    1         true\nx2avf4d0mx82   regular        8.07GB    11 days ago    11 days ago    1         true\n2969c9rtlr3w   regular        102MB     11 days ago    11 days ago    1         true\n6l4kra5szr3h   regular        234MB     11 days ago    11 days ago    1         true\nbidi2e9qewi8   regular        16.6kB    11 days ago    11 days ago    1         true\nz7e59oyvj7ha   regular        8.29kB    11 days ago    11 days ago    1         true\ncolisf2q9iyg   regular        62.6MB    11 days ago    11 days ago    1         true\nviwp2ixielh6   regular        40.2kB    11 days ago    11 days ago    1         true\noz5tw0sc9ff0   regular        31.5kB    11 days ago    11 days ago    1         true\nk36uq9oqz6p8   regular        8.29kB    11 days ago    11 days ago    1         true\npmcqvfnjg1f8   regular        8.29kB    11 days ago    11 days ago    1         true\nrow7w7yjqpxz   regular        8.29kB    11 days ago    11 days ago    2         true\nauc4sqid3wum   regular        64.8MB    11 days ago    11 days ago    1         true\ntdmhq31ek62w   regular        31.5kB    11 days ago    11 days ago    1         true\n7z9zz3hax724   regular        16.6kB    11 days ago    11 days ago    1         true\nim3ufyf388rq   regular        40.2kB    11 days ago    11 days ago    1         true\nmpspai514qu9   regular        16.6kB    12 days ago    9 days ago     5         true\nlntu6z8uvreo   regular        15.8GB    9 days ago     9 days ago     1         true\np1mxgygq27e4   regular        17.3kB    9 days ago     9 days ago     1         true\nrkbb1nwgfd52   regular        8.29kB    9 days ago     9 days ago     1         true\n87agk1b6trqe   regular        31.9kB    9 days ago     9 days ago     1         false\ntxzzsc4ops5l   regular        32kB      9 days ago     9 days ago     1         false\nrd0d7bwauy3f   regular        66.4kB    9 days ago     9 days ago     1         true\nz3ft91vwwvnz   regular        106kB     9 days ago     9 days ago     1         true\n1zn00ecf0o6q   regular        39.4MB    9 days ago     9 days ago     3         true\nvxfkwlzg4lqs   regular        32.1kB    9 days ago     9 days ago     1         true\nowzo891ob46s   regular        17.4MB    8 days ago     8 days ago     1         true\nopzdopcq1at1   regular        52.3MB    8 days ago     8 days ago     1         true\nwml38w10jyav   regular        16.6kB    8 days ago     8 days ago     1         true\n2uh0d0vws8ga   regular        8.29kB    8 days ago     8 days ago     1         true\niuylylkhnbte   regular        503MB     8 days ago     8 days ago     1         true\nz1pp0ovau0y6   regular        20.5kB    4 days ago     4 days ago     1         false\nykq1bcc5higm   regular        116MB     4 days ago     4 days ago     1         false\n2lzz6zxwdfl2   regular        31.8MB    4 days ago     4 days ago     1         false\nnqfn154b4uuj   regular        1.75GB    32 hours ago   32 hours ago   1         true\ne490gw3yu18w   regular        315MB     32 hours ago   32 hours ago   1         true\nmq9if891za96   source.local   8.19kB    32 hours ago   32 hours ago   6         false\nsa6ivy3pctlh   source.local   8.19kB    32 hours ago   32 hours ago   8         false\ns67wgkra5txf   source.local   8.19kB    32 hours ago   32 hours ago   6         false\nc5b0wa0f9ysl   frontend       42.7MB    32 hours ago   32 hours ago   2         false\nu597nhj4pn43   source.local   8.19kB    2 weeks ago    25 hours ago   6         false\nvj664881ed7s   source.local   8.19kB    2 weeks ago    25 hours ago   11        false\nqeddqtn57p5c   source.local   86kB      2 weeks ago    25 hours ago   6         false\nmimh6houwib2   regular        12.6kB    25 hours ago   25 hours ago   1         false\nnpd69gywyuq4   regular        12.7kB    25 hours ago   24 hours ago   1         true\nq467tzl814z1   regular        12GB      24 hours ago   24 hours ago   1         true\np2u4eeq6wcm4   regular        106kB     24 hours ago   24 hours ago   1         true\now5jtjm3m2bq   source.local   8.19kB    2 weeks ago    24 hours ago   106       false\n6z9t260tw8en   source.local   94.2kB    2 weeks ago    24 hours ago   44        false\npz5jsq9djbnc   regular        66.4kB    24 hours ago   24 hours ago   1         true\nsnv2resw3k3d   source.local   8.19kB    2 weeks ago    24 hours ago   92        false\nop3o9lqrydbz   regular        32.1kB    24 hours ago   24 hours ago   1         true\nnvifwixz2ydm   regular        1.49GB    11 days ago    24 hours ago   2         false\nijw6gn9ni45v   regular        20.5kB    2 weeks ago    24 hours ago   2         false\nzsnmm34s7dm3   regular        66.4kB    9 days ago     24 hours ago   4         false\nlo8kpytycp7l   regular        66.4kB    9 days ago     24 hours ago   2         false\nohdq7r7t98le   regular        1.74GB    8 days ago     24 hours ago   3         false\nzuwklez0d80v   regular        68.1MB    4 days ago     24 hours ago   2         false\ntndmk627rj8g   regular        16.4kB    12 days ago    24 hours ago   2         false\nh8lgsoug3w5e   regular        116MB     2 weeks ago    24 hours ago   5         false\n099515kuzh4y   regular        503MB     2 weeks ago    24 hours ago   4         false\nsf19j8xbtttm   source.local   8.19kB    2 weeks ago    3 hours ago    17        false\ndjk8h709yzbv   source.local   68.2MB    2 weeks ago    3 hours ago    16        false\nz63jqawbxc0x   regular        68.2MB    3 hours ago    3 hours ago    1         false\nk1edq4bjbvmp   regular        31.8MB    3 hours ago    3 hours ago    1         true\nan2mo06rkys5   source.local   4.1kB     2 weeks ago    3 hours ago    17        false\nlak5k1xlxd5b   regular        289MB     3 hours ago    3 hours ago    1         false",
+    "systemDfError": null,
+    "containers": [
+      {
+        "name": "legal-ai-go-retrieval",
+        "image": "legal-ai-go-retrieval:latest",
+        "size": "4.1kB (virtual 36.9MB)",
+        "status": "Up 3 hours (healthy)",
+        "writableBytes": 4198.4,
+        "writableDiff": {
+          "available": true,
+          "additions": 0,
+          "changes": 0,
+          "deletions": 0
+        }
+      },
+      {
+        "name": "legal-ai-neo4j",
+        "image": "neo4j:5-community",
+        "size": "243MB (virtual 865MB)",
+        "status": "Up 3 hours (healthy)",
+        "writableBytes": 254803968,
+        "writableDiff": {
+          "available": true,
+          "additions": 6,
+          "changes": 257,
+          "deletions": 0
+        }
+      },
+      {
+        "name": "f66df30803e9_miniforge-nlp-sidecar",
+        "image": "deeds-miniforge-nlp-sidecar:latest",
+        "size": "36.9kB (virtual 2.11GB)",
+        "status": "Up 3 hours (healthy)",
+        "writableBytes": 37785.6,
+        "writableDiff": {
+          "available": true,
+          "additions": 6,
+          "changes": 1,
+          "deletions": 0
+        }
+      },
+      {
+        "name": "atlas-gpu-8098",
+        "image": "atlas-gpu-8098:26.08-cuda12-py3.13",
+        "size": "5.64MB (virtual 11.2GB)",
+        "status": "Up 3 hours",
+        "writableBytes": 5913968.64,
+        "writableDiff": {
+          "available": true,
+          "additions": 122,
+          "changes": 290,
+          "deletions": 0
+        }
+      },
+      {
+        "name": "atlas-neural-decoder",
+        "image": "atlas-neural-decoder:torch2.13.0-cu132",
+        "size": "106kB (virtual 5.74GB)",
+        "status": "Up 3 hours (healthy)",
+        "writableBytes": 108544,
+        "writableDiff": {
+          "available": true,
+          "additions": 23,
+          "changes": 11,
+          "deletions": 0
+        }
+      },
+      {
+        "name": "legal-ai-qdrant",
+        "image": "qdrant/qdrant:v1.19.0",
+        "size": "16.4kB (virtual 199MB)",
+        "status": "Up 3 hours (healthy)",
+        "writableBytes": 16793.6,
+        "writableDiff": {
+          "available": true,
+          "additions": 3,
+          "changes": 1,
+          "deletions": 0
+        }
+      },
+      {
+        "name": "legal-ai-postgres",
+        "image": "pgvector-pgsearch:pg18-local",
+        "size": "1.05GB (virtual 2.97GB)",
+        "status": "Up 3 hours (healthy)",
+        "writableBytes": 1127428915.2,
+        "writableDiff": {
+          "available": true,
+          "additions": 7,
+          "changes": 4,
+          "deletions": 0
+        }
+      },
+      {
+        "name": "legal-ai-seaweed-volume",
+        "image": "chrislusf/seaweedfs:latest",
+        "size": "4.1kB (virtual 255MB)",
+        "status": "Up 3 hours (healthy)",
+        "writableBytes": 4198.4,
+        "writableDiff": {
+          "available": true,
+          "additions": 0,
+          "changes": 0,
+          "deletions": 0
+        }
+      },
+      {
+        "name": "legal-ai-seaweed-filer",
+        "image": "chrislusf/seaweedfs:latest",
+        "size": "8.19kB (virtual 255MB)",
+        "status": "Up 3 hours (healthy)",
+        "writableBytes": 8386.56,
+        "writableDiff": {
+          "available": true,
+          "additions": 1,
+          "changes": 1,
+          "deletions": 0
+        }
+      },
+      {
+        "name": "legal-ai-go-search",
+        "image": "deeds-web-app-go-search-service",
+        "size": "4.1kB (virtual 36.2MB)",
+        "status": "Up 3 hours (healthy)",
+        "writableBytes": 4198.4,
+        "writableDiff": {
+          "available": true,
+          "additions": 0,
+          "changes": 0,
+          "deletions": 0
+        }
+      },
+      {
+        "name": "legal-ai-bifrost",
+        "image": "legal-ai-bifrost:git",
+        "size": "16.4kB (virtual 257MB)",
+        "status": "Up 3 hours (healthy)",
+        "writableBytes": 16793.6,
+        "writableDiff": {
+          "available": true,
+          "additions": 0,
+          "changes": 0,
+          "deletions": 0
+        }
+      },
+      {
+        "name": "legal-ai-go-embedding",
+        "image": "431ddc0acb6f",
+        "size": "4.1kB (virtual 30.5MB)",
+        "status": "Up 3 hours (healthy)",
+        "writableBytes": 4198.4,
+        "writableDiff": {
+          "available": true,
+          "additions": 0,
+          "changes": 0,
+          "deletions": 0
+        }
+      },
+      {
+        "name": "legal-ai-caddy",
+        "image": "caddy:2.8-alpine",
+        "size": "283kB (virtual 51.2MB)",
+        "status": "Up 3 hours (healthy)",
+        "writableBytes": 289792,
+        "writableDiff": {
+          "available": true,
+          "additions": 3,
+          "changes": 8,
+          "deletions": 0
+        }
+      },
+      {
+        "name": "legal-ai-rabbitmq",
+        "image": "rabbitmq:3-management-alpine",
+        "size": "4.1kB (virtual 189MB)",
+        "status": "Up 3 hours (healthy)",
+        "writableBytes": 4198.4,
+        "writableDiff": {
+          "available": true,
+          "additions": 0,
+          "changes": 0,
+          "deletions": 0
+        }
+      },
+      {
+        "name": "legal-ai-valkey",
+        "image": "valkey/valkey-bundle:8.1.1",
+        "size": "4.1kB (virtual 216MB)",
+        "status": "Up 3 hours (healthy)",
+        "writableBytes": 4198.4,
+        "writableDiff": {
+          "available": true,
+          "additions": 0,
+          "changes": 0,
+          "deletions": 0
+        }
+      },
+      {
+        "name": "langfuse-server",
+        "image": "langfuse/langfuse:3",
+        "size": "69.6kB (virtual 1.17GB)",
+        "status": "Up 3 hours (healthy)",
+        "writableBytes": 71270.4,
+        "writableDiff": {
+          "available": true,
+          "additions": 10,
+          "changes": 4,
+          "deletions": 0
+        }
+      },
+      {
+        "name": "langfuse-worker",
+        "image": "langfuse/langfuse-worker:3",
+        "size": "4.1kB (virtual 1.28GB)",
+        "status": "Up 3 hours",
+        "writableBytes": 4198.4,
+        "writableDiff": {
+          "available": true,
+          "additions": 0,
+          "changes": 0,
+          "deletions": 0
+        }
+      },
+      {
+        "name": "legal-ai-searxng",
+        "image": "searxng/searxng:latest",
+        "size": "1.26MB (virtual 281MB)",
+        "status": "Up 3 hours (healthy)",
+        "writableBytes": 1321205.76,
+        "writableDiff": {
+          "available": true,
+          "additions": 6,
+          "changes": 5,
+          "deletions": 0
+        }
+      },
+      {
+        "name": "legal-ai-nats",
+        "image": "nats:latest",
+        "size": "8.19kB (virtual 18MB)",
+        "status": "Up 3 hours",
+        "writableBytes": 8386.56,
+        "writableDiff": {
+          "available": true,
+          "additions": 1,
+          "changes": 0,
+          "deletions": 0
+        }
+      },
+      {
+        "name": "langfuse-clickhouse",
+        "image": "clickhouse/clickhouse-server",
+        "size": "41kB (virtual 942MB)",
+        "status": "Up 3 hours (healthy)",
+        "writableBytes": 41984,
+        "writableDiff": {
+          "available": true,
+          "additions": 2,
+          "changes": 4,
+          "deletions": 0
+        }
+      },
+      {
+        "name": "legal-ai-couchdb",
+        "image": "couchdb:3.3",
+        "size": "4.1kB (virtual 240MB)",
+        "status": "Up 3 hours (healthy)",
+        "writableBytes": 4198.4,
+        "writableDiff": {
+          "available": true,
+          "additions": 0,
+          "changes": 0,
+          "deletions": 0
+        }
+      },
+      {
+        "name": "legal-ai-docling-vlm",
+        "image": "deeds-web-app-docling-vlm:latest",
+        "size": "490MB (virtual 7.56GB)",
+        "status": "Up 3 hours (healthy)",
+        "writableBytes": 513802240,
+        "writableDiff": {
+          "available": true,
+          "additions": 22,
+          "changes": 4,
+          "deletions": 0
+        }
+      },
+      {
+        "name": "legal-ai-image-synthesis",
+        "image": "deeds-web-app-image-synthesis:latest",
+        "size": "995kB (virtual 6.06GB)",
+        "status": "Up 3 hours (healthy)",
+        "writableBytes": 1018880,
+        "writableDiff": {
+          "available": true,
+          "additions": 34,
+          "changes": 24,
+          "deletions": 0
+        }
+      },
+      {
+        "name": "legal-ai-seaweed-s3",
+        "image": "chrislusf/seaweedfs:latest",
+        "size": "20.5kB (virtual 255MB)",
+        "status": "Up 3 hours (healthy)",
+        "writableBytes": 20992,
+        "writableDiff": {
+          "available": true,
+          "additions": 2,
+          "changes": 3,
+          "deletions": 0
+        }
+      },
+      {
+        "name": "legal-ai-seaweed-master",
+        "image": "chrislusf/seaweedfs:latest",
+        "size": "4.1kB (virtual 255MB)",
+        "status": "Up 3 hours (healthy)",
+        "writableBytes": 4198.4,
+        "writableDiff": {
+          "available": true,
+          "additions": 0,
+          "changes": 0,
+          "deletions": 0
+        }
+      }
+    ],
+    "writableLayerHotspots": [
+      {
+        "name": "legal-ai-postgres",
+        "image": "pgvector-pgsearch:pg18-local",
+        "size": "1.05GB (virtual 2.97GB)",
+        "writableBytes": 1127428915.2,
+        "writableDiff": {
+          "available": true,
+          "additions": 7,
+          "changes": 4,
+          "deletions": 0
+        }
+      },
+      {
+        "name": "legal-ai-docling-vlm",
+        "image": "deeds-web-app-docling-vlm:latest",
+        "size": "490MB (virtual 7.56GB)",
+        "writableBytes": 513802240,
+        "writableDiff": {
+          "available": true,
+          "additions": 22,
+          "changes": 4,
+          "deletions": 0
+        }
+      },
+      {
+        "name": "legal-ai-neo4j",
+        "image": "neo4j:5-community",
+        "size": "243MB (virtual 865MB)",
+        "writableBytes": 254803968,
+        "writableDiff": {
+          "available": true,
+          "additions": 6,
+          "changes": 257,
+          "deletions": 0
+        }
+      }
+    ],
+    "imageDeletionCandidates": [
+      {
+        "id": "sha256:05a5b136486afe27e888fdac6ba7f38810783b4d95267326c4abdb5cf83aeeea",
+        "repository": "atlas-gpu-8098",
+        "tag": "repro-v2",
+        "size": "29.5GB",
+        "allocatedBytes": 31675383808,
+        "containerIds": [],
+        "buildReferences": [],
+        "unreferencedByContainers": true,
+        "requiredByBuild": false,
+        "reviewRequired": true,
+        "deletionAuthorized": false
+      },
+      {
+        "id": "sha256:be7e8382aa2bd4fe02c3c3e3a27b0300f36fabf6b7398ccdb31f94dbba2f7f3c",
+        "repository": "atlas-gpu-8098",
+        "tag": "repro-v1",
+        "size": "25.9GB",
+        "allocatedBytes": 27809913241.6,
+        "containerIds": [],
+        "buildReferences": [],
+        "unreferencedByContainers": true,
+        "requiredByBuild": false,
+        "reviewRequired": true,
+        "deletionAuthorized": false
+      },
+      {
+        "id": "sha256:153c066f3b4db667d7a68806bdb9cdd36bd6b680475276f2bbb5d2f62c2b8d48",
+        "repository": "atlas-neural-decoder",
+        "tag": "torch2.8.0-cu128",
+        "size": "12.2GB",
+        "allocatedBytes": 13099650252.8,
+        "containerIds": [],
+        "buildReferences": [],
+        "unreferencedByContainers": true,
+        "requiredByBuild": false,
+        "reviewRequired": true,
+        "deletionAuthorized": false
+      },
+      {
+        "id": "sha256:56c2149bedd24096508414e567309450900c33d2490464b5060459de31c3180b",
+        "repository": "deeds-web-app-go-retrieval-service",
+        "tag": "latest",
+        "size": "50MB",
+        "allocatedBytes": 52428800,
+        "containerIds": [],
+        "buildReferences": [],
+        "unreferencedByContainers": true,
+        "requiredByBuild": false,
+        "reviewRequired": true,
+        "deletionAuthorized": false
+      },
+      {
+        "id": "sha256:56c2149bedd24096508414e567309450900c33d2490464b5060459de31c3180b",
+        "repository": "legal-ai-go-retrieval",
+        "tag": "local-identity-v1",
+        "size": "50MB",
+        "allocatedBytes": 52428800,
+        "containerIds": [],
+        "buildReferences": [],
+        "unreferencedByContainers": true,
+        "requiredByBuild": false,
+        "reviewRequired": true,
+        "deletionAuthorized": false
+      },
+      {
+        "id": "sha256:c7edba24a4c18d3f87981593320419af5471f9ec8983f50f2c721eb9135ed11e",
+        "repository": "<none>",
+        "tag": "<none>",
+        "size": "49.6MB",
+        "allocatedBytes": 52009369.6,
+        "containerIds": [],
+        "buildReferences": [],
+        "unreferencedByContainers": true,
+        "requiredByBuild": false,
+        "reviewRequired": true,
+        "deletionAuthorized": false
+      },
+      {
+        "id": "sha256:4ef4dbc939d61acea57712655ddb4b4ab27419c913f94cca0cd57cb3ea3c2280",
+        "repository": "postgres",
+        "tag": "18",
+        "size": "644MB",
+        "allocatedBytes": 675282944,
+        "containerIds": [],
+        "buildReferences": [],
+        "unreferencedByContainers": true,
+        "requiredByBuild": false,
+        "reviewRequired": true,
+        "deletionAuthorized": false
+      },
+      {
+        "id": "sha256:e0eb7c480958d32bdc4357a74bdd70653ae15f2f9b4c93c4a5a9fad1dc471c84",
+        "repository": "valkey/valkey",
+        "tag": "8-alpine",
+        "size": "61.5MB",
+        "allocatedBytes": 64487424,
+        "containerIds": [],
+        "buildReferences": [],
+        "unreferencedByContainers": true,
+        "requiredByBuild": false,
+        "reviewRequired": true,
+        "deletionAuthorized": false
+      },
+      {
+        "id": "sha256:937fbd163e302a5751dd329b719c1b05e2a4293af223d61b1aa17e3dea087709",
+        "repository": "neo4j",
+        "tag": "5-community",
+        "size": "964MB",
+        "allocatedBytes": 1010827264,
+        "containerIds": [],
+        "buildReferences": [],
+        "unreferencedByContainers": true,
+        "requiredByBuild": false,
+        "reviewRequired": true,
+        "deletionAuthorized": false
+      },
+      {
+        "id": "sha256:75eab8c4ba42096724fdcfde8b4de0b5713d529dde32f285a1f86fdcb2c9e50c",
+        "repository": "qdrant/qdrant",
+        "tag": "latest",
+        "size": "265MB",
+        "allocatedBytes": 277872640,
+        "containerIds": [],
+        "buildReferences": [],
+        "unreferencedByContainers": true,
+        "requiredByBuild": false,
+        "reviewRequired": true,
+        "deletionAuthorized": false
+      },
+      {
+        "id": "sha256:59261e419d6d48a772aad5bb213f9f1588fcdb042b115ceb7166c89a51f03363",
+        "repository": "nvcr.io/nvidia/k8s/cuda-sample",
+        "tag": "nbody",
+        "size": "456MB",
+        "allocatedBytes": 478150656,
+        "containerIds": [],
+        "buildReferences": [],
+        "unreferencedByContainers": true,
+        "requiredByBuild": false,
+        "reviewRequired": true,
+        "deletionAuthorized": false
+      }
+    ],
+    "imageBuildDependencies": [
+      {
+        "id": "sha256:2ba9ca5f2e7daa0f0e7723cba1ee9167bab54efd3640516a44ac1a928dd67e7a",
+        "repository": "pgvector/pgvector",
+        "tag": "pg18",
+        "size": "631MB",
+        "allocatedBytes": 661651456,
+        "containerIds": [],
+        "buildReferences": [
+          {
+            "relativePath": "docker/postgres/Dockerfile",
+            "image": "pgvector/pgvector:pg18@sha256:2ba9ca5f2e7daa0f0e7723cba1ee9167bab54efd3640516a44ac1a928dd67e7a",
+            "imageWithoutDigest": "pgvector/pgvector:pg18"
+          }
+        ],
+        "unreferencedByContainers": true,
+        "requiredByBuild": true,
+        "reviewRequired": true,
+        "deletionAuthorized": false
+      },
+      {
+        "id": "sha256:16c0397eaa0ddf9727cf09db19fbd2627082b2670b9672cf4fc07baac6751fb0",
+        "repository": "rapidsai/base",
+        "tag": "26.08-cuda12-py3.13-amd64",
+        "size": "17.4GB",
+        "allocatedBytes": 18683107737.6,
+        "containerIds": [],
+        "buildReferences": [
+          {
+            "relativePath": "docker/atlas-gpu-8098/Dockerfile",
+            "image": "rapidsai/base:26.08-cuda12-py3.13-amd64@sha256:16c0397eaa0ddf9727cf09db19fbd2627082b2670b9672cf4fc07baac6751fb0",
+            "imageWithoutDigest": "rapidsai/base:26.08-cuda12-py3.13-amd64"
+          }
+        ],
+        "unreferencedByContainers": true,
+        "requiredByBuild": true,
+        "reviewRequired": true,
+        "deletionAuthorized": false
+      }
+    ]
+  },
+  "host": {
+    "dockerDataVhdx": {
+      "path": "C:/Users/james/AppData/Local/Docker/wsl/disk/docker_data.vhdx",
+      "bytes": 176924131328,
+      "gib": 164.77
+    }
+  },
+  "localWorkspace": [
+    {
+      "path": ".tmp",
+      "bytes": 9937180645,
+      "gib": 9.25,
+      "complete": true,
+      "entriesSeen": 111097
+    },
+    {
+      "path": "logs",
+      "bytes": 529185013,
+      "gib": 0.49,
+      "complete": true,
+      "entriesSeen": 166
+    },
+    {
+      "path": "backups",
+      "bytes": 3677140991,
+      "gib": 3.42,
+      "complete": true,
+      "entriesSeen": 8
+    },
+    {
+      "path": "docs/reports",
+      "bytes": 1780733731,
+      "gib": 1.66,
+      "complete": true,
+      "entriesSeen": 2518
+    }
+  ],
+  "temporaryDirectorySizes": [
+    {
+      "path": ".tmp/atlas-gemma-rank-onnx",
+      "bytes": 2526393884,
+      "gib": 2.35,
+      "complete": true
+    },
+    {
+      "path": ".tmp/workspace-source-snapshots",
+      "bytes": 1477863762,
+      "gib": 1.38,
+      "complete": true
+    },
+    {
+      "path": ".tmp/atlas-gemma-rank-onnx-layer-localization",
+      "bytes": 1174968198,
+      "gib": 1.09,
+      "complete": true
+    },
+    {
+      "path": ".tmp/backups",
+      "bytes": 563716096,
+      "gib": 0.53,
+      "complete": true
+    },
+    {
+      "path": ".tmp/colab-parent-atlas",
+      "bytes": 417208991,
+      "gib": 0.39,
+      "complete": true
+    },
+    {
+      "path": ".tmp/gpu-som-checkpoint",
+      "bytes": 395332355,
+      "gib": 0.37,
+      "complete": true
+    },
+    {
+      "path": ".tmp/atlas",
+      "bytes": 349368445,
+      "gib": 0.33,
+      "complete": true
+    },
+    {
+      "path": ".tmp/atlas-gemma-rank-onnx-repro-donor-b",
+      "bytes": 310885266,
+      "gib": 0.29,
+      "complete": true
+    },
+    {
+      "path": ".tmp/atlas-vector-snapshots",
+      "bytes": 249005642,
+      "gib": 0.23,
+      "complete": true
+    },
+    {
+      "path": ".tmp/ingest",
+      "bytes": 227576205,
+      "gib": 0.21,
+      "complete": true
+    },
+    {
+      "path": ".tmp/langextract-1.6-probe",
+      "bytes": 195576672,
+      "gib": 0.18,
+      "complete": true
+    },
+    {
+      "path": ".tmp/summary-topology-pages",
+      "bytes": 45440091,
+      "gib": 0.04,
+      "complete": true
+    },
+    {
+      "path": ".tmp/packet-context",
+      "bytes": 44769356,
+      "gib": 0.04,
+      "complete": true
+    },
+    {
+      "path": ".tmp/opencode-capture",
+      "bytes": 20626339,
+      "gib": 0.02,
+      "complete": true
+    },
+    {
+      "path": ".tmp/repairs",
+      "bytes": 18705838,
+      "gib": 0.02,
+      "complete": true
+    },
+    {
+      "path": ".tmp/parent_atlas_packets",
+      "bytes": 5243664,
+      "gib": 0,
+      "complete": true
+    },
+    {
+      "path": ".tmp/chunks",
+      "bytes": 4954181,
+      "gib": 0,
+      "complete": true
+    },
+    {
+      "path": ".tmp/phase109b",
+      "bytes": 4824156,
+      "gib": 0,
+      "complete": true
+    },
+    {
+      "path": ".tmp/offline-synthesis",
+      "bytes": 3838225,
+      "gib": 0,
+      "complete": true
+    },
+    {
+      "path": ".tmp/neo4j-import",
+      "bytes": 3783306,
+      "gib": 0,
+      "complete": true
+    },
+    {
+      "path": ".tmp/drizzle-reconciliation-probe",
+      "bytes": 1639704,
+      "gib": 0,
+      "complete": true
+    },
+    {
+      "path": ".tmp/drizzle-introspect",
+      "bytes": 1393102,
+      "gib": 0,
+      "complete": true
+    },
+    {
+      "path": ".tmp/analysis",
+      "bytes": 1335908,
+      "gib": 0,
+      "complete": true
+    },
+    {
+      "path": ".tmp/test-triage",
+      "bytes": 1148118,
+      "gib": 0,
+      "complete": true
+    },
+    {
+      "path": ".tmp/atlas-spectral-live-fixture-zero-duplicates",
+      "bytes": 319654,
+      "gib": 0,
+      "complete": true
+    },
+    {
+      "path": ".tmp/atlas-spectral-live-fixture",
+      "bytes": 299646,
+      "gib": 0,
+      "complete": true
+    },
+    {
+      "path": ".tmp/duckdb-csvs",
+      "bytes": 182108,
+      "gib": 0,
+      "complete": true
+    },
+    {
+      "path": ".tmp/atlas-spectral-live-fixture-descoped",
+      "bytes": 83468,
+      "gib": 0,
+      "complete": true
+    },
+    {
+      "path": ".tmp/phase8",
+      "bytes": 80947,
+      "gib": 0,
+      "complete": true
+    },
+    {
+      "path": ".tmp/reports",
+      "bytes": 60833,
+      "gib": 0,
+      "complete": true
+    },
+    {
+      "path": ".tmp/atlas-cards",
+      "bytes": 29428,
+      "gib": 0,
+      "complete": true
+    },
+    {
+      "path": ".tmp/docker-lock-probe",
+      "bytes": 16107,
+      "gib": 0,
+      "complete": true
+    },
+    {
+      "path": ".tmp/phase19c",
+      "bytes": 14921,
+      "gib": 0,
+      "complete": true
+    },
+    {
+      "path": ".tmp/phase19c_qdrant",
+      "bytes": 14921,
+      "gib": 0,
+      "complete": true
+    },
+    {
+      "path": ".tmp/phase109b-smoke-root-3",
+      "bytes": 10096,
+      "gib": 0,
+      "complete": true
+    },
+    {
+      "path": ".tmp/phase109b-smoke-root-2",
+      "bytes": 9970,
+      "gib": 0,
+      "complete": true
+    },
+    {
+      "path": ".tmp/phase109b-smoke-root",
+      "bytes": 9924,
+      "gib": 0,
+      "complete": true
+    },
+    {
+      "path": ".tmp/mega-audit",
+      "bytes": 3675,
+      "gib": 0,
+      "complete": true
+    },
+    {
+      "path": ".tmp/test-triage-debug",
+      "bytes": 3353,
+      "gib": 0,
+      "complete": true
+    },
+    {
+      "path": ".tmp/scripts",
+      "bytes": 3101,
+      "gib": 0,
+      "complete": true
+    },
+    {
+      "path": ".tmp/google-gemma4-e4b-assistant",
+      "bytes": 968,
+      "gib": 0,
+      "complete": true
+    },
+    {
+      "path": ".tmp/graphify",
+      "bytes": 416,
+      "gib": 0,
+      "complete": true
+    },
+    {
+      "path": ".tmp/rename-test",
+      "bytes": 3,
+      "gib": 0,
+      "complete": true
+    },
+    {
+      "path": ".tmp/atlas-gemma-rank-onnx-layer2-full-control",
+      "bytes": 0,
+      "gib": 0,
+      "complete": true
+    },
+    {
+      "path": ".tmp/feature_vectors",
+      "bytes": 0,
+      "gib": 0,
+      "complete": true
+    },
+    {
+      "path": ".tmp/kv-eval-logits",
+      "bytes": 0,
+      "gib": 0,
+      "complete": true
+    },
+    {
+      "path": ".tmp/rg-search-dump-packets",
+      "bytes": 0,
+      "gib": 0,
+      "complete": true
+    }
+  ],
+  "qdrantSnapshotFiles": [
+    {
+      "path": "backups/qdrant-upgrade-20260825-211412/codebase_chunks_768-3660490336087530-2026-08-26-04-14-17.snapshot",
+      "bytes": 1585911296,
+      "gib": 1.48
+    },
+    {
+      "path": "backups/qdrant-upgrade-20260825-211412/qdrant-snapshot-response.json",
+      "bytes": 306,
+      "gib": 0
+    },
+    {
+      "path": "docs/reports/qdrant-pre-119-upgrade-snapshots-v1.json",
+      "bytes": 4316,
+      "gib": 0
+    }
+  ],
+  "qdrantSnapshotInventorySummary": {
+    "available": true,
+    "error": null,
+    "fileCount": 140,
+    "directoryCount": 43,
+    "totalBytes": 26805799808,
+    "totalGib": 24.96
+  },
+  "qdrantSnapshotInventory": [
+    {
+      "directory": "codebase_chunks_768",
+      "fileCount": 40,
+      "bytes": 23816803584,
+      "gib": 22.18,
+      "oldestAt": "2026-07-29T16:55:21.070Z",
+      "newestAt": "2026-08-28T18:14:25.893Z"
+    },
+    {
+      "directory": "codebase_chunks_768_v2",
+      "fileCount": 6,
+      "bytes": 1795601088,
+      "gib": 1.67,
+      "oldestAt": "2026-08-26T04:51:02.443Z",
+      "newestAt": "2026-08-26T05:09:47.702Z"
+    },
+    {
+      "directory": "codebase_chunks_512",
+      "fileCount": 6,
+      "bytes": 581744832,
+      "gib": 0.54,
+      "oldestAt": "2026-08-26T04:49:50.384Z",
+      "newestAt": "2026-08-26T05:09:19.001Z"
+    },
+    {
+      "directory": "codebase_topology_64",
+      "fileCount": 6,
+      "bytes": 537835200,
+      "gib": 0.5,
+      "oldestAt": "2026-08-26T04:49:22.195Z",
+      "newestAt": "2026-08-26T05:09:53.259Z"
+    },
+    {
+      "directory": "phase110_baseline_768",
+      "fileCount": 6,
+      "bytes": 53279424,
+      "gib": 0.05,
+      "oldestAt": "2026-08-26T04:51:50.621Z",
+      "newestAt": "2026-08-26T05:10:03.135Z"
+    },
+    {
+      "directory": "llm_response_cache",
+      "fileCount": 2,
+      "bytes": 7073344,
+      "gib": 0.01,
+      "oldestAt": "2026-08-26T05:10:00.807Z",
+      "newestAt": "2026-08-26T05:10:00.810Z"
+    },
+    {
+      "directory": "codebase_chunks_sparse_test_v1",
+      "fileCount": 2,
+      "bytes": 3851328,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:09:50.446Z",
+      "newestAt": "2026-08-26T05:09:50.452Z"
+    },
+    {
+      "directory": "sc_deedscodebase_deeds-web-app",
+      "fileCount": 2,
+      "bytes": 2037312,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:10:03.875Z",
+      "newestAt": "2026-08-26T05:10:03.880Z"
+    },
+    {
+      "directory": "BifrostSemanticCachePlugin",
+      "fileCount": 2,
+      "bytes": 1209920,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:09:12.058Z",
+      "newestAt": "2026-08-26T05:09:12.062Z"
+    },
+    {
+      "directory": "codebase_chunks_384",
+      "fileCount": 2,
+      "bytes": 811584,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:09:15.397Z",
+      "newestAt": "2026-08-26T05:09:15.400Z"
+    },
+    {
+      "directory": "codebase_chunks_384_hybrid",
+      "fileCount": 2,
+      "bytes": 807488,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:09:16.261Z",
+      "newestAt": "2026-08-26T05:09:16.265Z"
+    },
+    {
+      "directory": "synthesis_memory_768",
+      "fileCount": 2,
+      "bytes": 440896,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:10:04.679Z",
+      "newestAt": "2026-08-26T05:10:04.684Z"
+    },
+    {
+      "directory": "document_knowledge_768",
+      "fileCount": 2,
+      "bytes": 393792,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:09:55.763Z",
+      "newestAt": "2026-08-26T05:09:55.766Z"
+    },
+    {
+      "directory": "agent_memory_observations",
+      "fileCount": 2,
+      "bytes": 352832,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:09:12.762Z",
+      "newestAt": "2026-08-26T05:09:12.764Z"
+    },
+    {
+      "directory": "evidence_items",
+      "fileCount": 2,
+      "bytes": 313920,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:09:57.191Z",
+      "newestAt": "2026-08-26T05:09:57.195Z"
+    },
+    {
+      "directory": "cluster_narratives",
+      "fileCount": 2,
+      "bytes": 310336,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:09:14.265Z",
+      "newestAt": "2026-08-26T05:09:14.267Z"
+    },
+    {
+      "directory": "legal_canon_chunks",
+      "fileCount": 2,
+      "bytes": 234048,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:09:59.675Z",
+      "newestAt": "2026-08-26T05:09:59.677Z"
+    },
+    {
+      "directory": "error_embeddings",
+      "fileCount": 2,
+      "bytes": 215616,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:09:56.680Z",
+      "newestAt": "2026-08-26T05:09:56.683Z"
+    },
+    {
+      "directory": "fictional_case_chunks",
+      "fileCount": 2,
+      "bytes": 195136,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:09:58.715Z",
+      "newestAt": "2026-08-26T05:09:58.718Z"
+    },
+    {
+      "directory": "feature_maps",
+      "fileCount": 2,
+      "bytes": 195136,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:09:58.311Z",
+      "newestAt": "2026-08-26T05:09:58.313Z"
+    },
+    {
+      "directory": "embedding_cache",
+      "fileCount": 2,
+      "bytes": 186944,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:09:56.388Z",
+      "newestAt": "2026-08-26T05:09:56.391Z"
+    },
+    {
+      "directory": "chat_messages",
+      "fileCount": 2,
+      "bytes": 154176,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:09:13.689Z",
+      "newestAt": "2026-08-26T05:09:13.693Z"
+    },
+    {
+      "directory": "legal_documents",
+      "fileCount": 2,
+      "bytes": 154176,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:10:00.251Z",
+      "newestAt": "2026-08-26T05:10:00.256Z"
+    },
+    {
+      "directory": "summary_lenses_768",
+      "fileCount": 2,
+      "bytes": 154176,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:10:04.391Z",
+      "newestAt": "2026-08-26T05:10:04.395Z"
+    },
+    {
+      "directory": "sc_deedssocraticode_metadata",
+      "fileCount": 2,
+      "bytes": 152128,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:10:04.127Z",
+      "newestAt": "2026-08-26T05:10:04.132Z"
+    },
+    {
+      "directory": "topic_clusters",
+      "fileCount": 2,
+      "bytes": 73280,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:10:04.903Z",
+      "newestAt": "2026-08-26T05:10:04.908Z"
+    },
+    {
+      "directory": "evidence_vectors",
+      "fileCount": 2,
+      "bytes": 73280,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:09:57.667Z",
+      "newestAt": "2026-08-26T05:09:57.669Z"
+    },
+    {
+      "directory": "research_memory_768",
+      "fileCount": 2,
+      "bytes": 73280,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:10:03.551Z",
+      "newestAt": "2026-08-26T05:10:03.556Z"
+    },
+    {
+      "directory": "chunks_web_search",
+      "fileCount": 2,
+      "bytes": 73280,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:09:13.965Z",
+      "newestAt": "2026-08-26T05:09:13.968Z"
+    },
+    {
+      "directory": "diagnosis_embeddings",
+      "fileCount": 2,
+      "bytes": 73280,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:09:55.167Z",
+      "newestAt": "2026-08-26T05:09:55.169Z"
+    },
+    {
+      "directory": "external_programming_docs_768",
+      "fileCount": 2,
+      "bytes": 73280,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:09:57.919Z",
+      "newestAt": "2026-08-26T05:09:57.924Z"
+    },
+    {
+      "directory": "codebase_topology_128",
+      "fileCount": 2,
+      "bytes": 73280,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:09:50.778Z",
+      "newestAt": "2026-08-26T05:09:50.781Z"
+    },
+    {
+      "directory": "legal_glossary",
+      "fileCount": 2,
+      "bytes": 73280,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:10:00.487Z",
+      "newestAt": "2026-08-26T05:10:00.490Z"
+    },
+    {
+      "directory": "fixer_memory_768",
+      "fileCount": 2,
+      "bytes": 73280,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:09:58.951Z",
+      "newestAt": "2026-08-26T05:09:58.952Z"
+    },
+    {
+      "directory": "audio_segments",
+      "fileCount": 2,
+      "bytes": 73280,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:09:13.025Z",
+      "newestAt": "2026-08-26T05:09:13.027Z"
+    },
+    {
+      "directory": "court_opinions",
+      "fileCount": 2,
+      "bytes": 73280,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:09:54.939Z",
+      "newestAt": "2026-08-26T05:09:54.940Z"
+    },
+    {
+      "directory": "case_chunks",
+      "fileCount": 2,
+      "bytes": 73280,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:09:13.285Z",
+      "newestAt": "2026-08-26T05:09:13.290Z"
+    },
+    {
+      "directory": "document_tags",
+      "fileCount": 2,
+      "bytes": 73280,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:09:56.023Z",
+      "newestAt": "2026-08-26T05:09:56.024Z"
+    },
+    {
+      "directory": "knowledge_base",
+      "fileCount": 2,
+      "bytes": 73280,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:09:59.187Z",
+      "newestAt": "2026-08-26T05:09:59.189Z"
+    },
+    {
+      "directory": "legal_cases",
+      "fileCount": 2,
+      "bytes": 73280,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:09:59.903Z",
+      "newestAt": "2026-08-26T05:09:59.905Z"
+    },
+    {
+      "directory": "poi_profiles",
+      "fileCount": 2,
+      "bytes": 73280,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:10:03.335Z",
+      "newestAt": "2026-08-26T05:10:03.337Z"
+    },
+    {
+      "directory": "code_llm_outputs",
+      "fileCount": 2,
+      "bytes": 73280,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:09:14.497Z",
+      "newestAt": "2026-08-26T05:09:14.502Z"
+    },
+    {
+      "directory": "evidence_items_clip_512",
+      "fileCount": 2,
+      "bytes": 45632,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:09:57.428Z",
+      "newestAt": "2026-08-26T05:09:57.430Z"
+    }
+  ],
+  "qdrantSnapshotRetentionInventory": [
+    {
+      "directory": "codebase_chunks_768",
+      "fileCount": 40,
+      "bytes": 23816803584,
+      "gib": 22.18,
+      "oldestAt": "2026-07-29T16:55:21.070Z",
+      "newestAt": "2026-08-28T18:14:25.893Z",
+      "role": "ACTIVE_PROJECTION_CHECKPOINT",
+      "retention": "KEEP",
+      "deletionAuthorized": false
+    },
+    {
+      "directory": "codebase_chunks_768_v2",
+      "fileCount": 6,
+      "bytes": 1795601088,
+      "gib": 1.67,
+      "oldestAt": "2026-08-26T04:51:02.443Z",
+      "newestAt": "2026-08-26T05:09:47.702Z",
+      "role": "COMPARISON_CHALLENGER_CHECKPOINT",
+      "retention": "KEEP_FOR_REVIEW",
+      "deletionAuthorized": false
+    },
+    {
+      "directory": "codebase_chunks_512",
+      "fileCount": 6,
+      "bytes": 581744832,
+      "gib": 0.54,
+      "oldestAt": "2026-08-26T04:49:50.384Z",
+      "newestAt": "2026-08-26T05:09:19.001Z",
+      "role": "DERIVED_EXPERIMENT_CHECKPOINT",
+      "retention": "REVIEW_BEFORE_CLEANUP",
+      "deletionAuthorized": false
+    },
+    {
+      "directory": "codebase_topology_64",
+      "fileCount": 6,
+      "bytes": 537835200,
+      "gib": 0.5,
+      "oldestAt": "2026-08-26T04:49:22.195Z",
+      "newestAt": "2026-08-26T05:09:53.259Z",
+      "role": "DERIVED_EXPERIMENT_CHECKPOINT",
+      "retention": "REVIEW_BEFORE_CLEANUP",
+      "deletionAuthorized": false
+    },
+    {
+      "directory": "phase110_baseline_768",
+      "fileCount": 6,
+      "bytes": 53279424,
+      "gib": 0.05,
+      "oldestAt": "2026-08-26T04:51:50.621Z",
+      "newestAt": "2026-08-26T05:10:03.135Z",
+      "role": "DERIVED_EXPERIMENT_CHECKPOINT",
+      "retention": "REVIEW_BEFORE_CLEANUP",
+      "deletionAuthorized": false
+    },
+    {
+      "directory": "llm_response_cache",
+      "fileCount": 2,
+      "bytes": 7073344,
+      "gib": 0.01,
+      "oldestAt": "2026-08-26T05:10:00.807Z",
+      "newestAt": "2026-08-26T05:10:00.810Z",
+      "role": "CACHE_CHECKPOINT",
+      "retention": "REVIEW_BEFORE_CLEANUP",
+      "deletionAuthorized": false
+    },
+    {
+      "directory": "codebase_chunks_sparse_test_v1",
+      "fileCount": 2,
+      "bytes": 3851328,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:09:50.446Z",
+      "newestAt": "2026-08-26T05:09:50.452Z",
+      "role": "HISTORICAL_OR_UNCLASSIFIED_CHECKPOINT",
+      "retention": "REVIEW_BEFORE_CLEANUP",
+      "deletionAuthorized": false
+    },
+    {
+      "directory": "sc_deedscodebase_deeds-web-app",
+      "fileCount": 2,
+      "bytes": 2037312,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:10:03.875Z",
+      "newestAt": "2026-08-26T05:10:03.880Z",
+      "role": "HISTORICAL_OR_UNCLASSIFIED_CHECKPOINT",
+      "retention": "REVIEW_BEFORE_CLEANUP",
+      "deletionAuthorized": false
+    },
+    {
+      "directory": "BifrostSemanticCachePlugin",
+      "fileCount": 2,
+      "bytes": 1209920,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:09:12.058Z",
+      "newestAt": "2026-08-26T05:09:12.062Z",
+      "role": "CACHE_CHECKPOINT",
+      "retention": "REVIEW_BEFORE_CLEANUP",
+      "deletionAuthorized": false
+    },
+    {
+      "directory": "codebase_chunks_384",
+      "fileCount": 2,
+      "bytes": 811584,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:09:15.397Z",
+      "newestAt": "2026-08-26T05:09:15.400Z",
+      "role": "LEGACY_SEMANTIC_CHECKPOINT",
+      "retention": "REVIEW_BEFORE_CLEANUP",
+      "deletionAuthorized": false
+    },
+    {
+      "directory": "codebase_chunks_384_hybrid",
+      "fileCount": 2,
+      "bytes": 807488,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:09:16.261Z",
+      "newestAt": "2026-08-26T05:09:16.265Z",
+      "role": "LEGACY_SEMANTIC_CHECKPOINT",
+      "retention": "REVIEW_BEFORE_CLEANUP",
+      "deletionAuthorized": false
+    },
+    {
+      "directory": "synthesis_memory_768",
+      "fileCount": 2,
+      "bytes": 440896,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:10:04.679Z",
+      "newestAt": "2026-08-26T05:10:04.684Z",
+      "role": "CACHE_CHECKPOINT",
+      "retention": "REVIEW_BEFORE_CLEANUP",
+      "deletionAuthorized": false
+    },
+    {
+      "directory": "document_knowledge_768",
+      "fileCount": 2,
+      "bytes": 393792,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:09:55.763Z",
+      "newestAt": "2026-08-26T05:09:55.766Z",
+      "role": "HISTORICAL_OR_UNCLASSIFIED_CHECKPOINT",
+      "retention": "REVIEW_BEFORE_CLEANUP",
+      "deletionAuthorized": false
+    },
+    {
+      "directory": "agent_memory_observations",
+      "fileCount": 2,
+      "bytes": 352832,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:09:12.762Z",
+      "newestAt": "2026-08-26T05:09:12.764Z",
+      "role": "CACHE_CHECKPOINT",
+      "retention": "REVIEW_BEFORE_CLEANUP",
+      "deletionAuthorized": false
+    },
+    {
+      "directory": "evidence_items",
+      "fileCount": 2,
+      "bytes": 313920,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:09:57.191Z",
+      "newestAt": "2026-08-26T05:09:57.195Z",
+      "role": "HISTORICAL_OR_UNCLASSIFIED_CHECKPOINT",
+      "retention": "REVIEW_BEFORE_CLEANUP",
+      "deletionAuthorized": false
+    },
+    {
+      "directory": "cluster_narratives",
+      "fileCount": 2,
+      "bytes": 310336,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:09:14.265Z",
+      "newestAt": "2026-08-26T05:09:14.267Z",
+      "role": "HISTORICAL_OR_UNCLASSIFIED_CHECKPOINT",
+      "retention": "REVIEW_BEFORE_CLEANUP",
+      "deletionAuthorized": false
+    },
+    {
+      "directory": "legal_canon_chunks",
+      "fileCount": 2,
+      "bytes": 234048,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:09:59.675Z",
+      "newestAt": "2026-08-26T05:09:59.677Z",
+      "role": "HISTORICAL_OR_UNCLASSIFIED_CHECKPOINT",
+      "retention": "REVIEW_BEFORE_CLEANUP",
+      "deletionAuthorized": false
+    },
+    {
+      "directory": "error_embeddings",
+      "fileCount": 2,
+      "bytes": 215616,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:09:56.680Z",
+      "newestAt": "2026-08-26T05:09:56.683Z",
+      "role": "HISTORICAL_OR_UNCLASSIFIED_CHECKPOINT",
+      "retention": "REVIEW_BEFORE_CLEANUP",
+      "deletionAuthorized": false
+    },
+    {
+      "directory": "fictional_case_chunks",
+      "fileCount": 2,
+      "bytes": 195136,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:09:58.715Z",
+      "newestAt": "2026-08-26T05:09:58.718Z",
+      "role": "HISTORICAL_OR_UNCLASSIFIED_CHECKPOINT",
+      "retention": "REVIEW_BEFORE_CLEANUP",
+      "deletionAuthorized": false
+    },
+    {
+      "directory": "feature_maps",
+      "fileCount": 2,
+      "bytes": 195136,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:09:58.311Z",
+      "newestAt": "2026-08-26T05:09:58.313Z",
+      "role": "HISTORICAL_OR_UNCLASSIFIED_CHECKPOINT",
+      "retention": "REVIEW_BEFORE_CLEANUP",
+      "deletionAuthorized": false
+    },
+    {
+      "directory": "embedding_cache",
+      "fileCount": 2,
+      "bytes": 186944,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:09:56.388Z",
+      "newestAt": "2026-08-26T05:09:56.391Z",
+      "role": "CACHE_CHECKPOINT",
+      "retention": "REVIEW_BEFORE_CLEANUP",
+      "deletionAuthorized": false
+    },
+    {
+      "directory": "chat_messages",
+      "fileCount": 2,
+      "bytes": 154176,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:09:13.689Z",
+      "newestAt": "2026-08-26T05:09:13.693Z",
+      "role": "HISTORICAL_OR_UNCLASSIFIED_CHECKPOINT",
+      "retention": "REVIEW_BEFORE_CLEANUP",
+      "deletionAuthorized": false
+    },
+    {
+      "directory": "legal_documents",
+      "fileCount": 2,
+      "bytes": 154176,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:10:00.251Z",
+      "newestAt": "2026-08-26T05:10:00.256Z",
+      "role": "HISTORICAL_OR_UNCLASSIFIED_CHECKPOINT",
+      "retention": "REVIEW_BEFORE_CLEANUP",
+      "deletionAuthorized": false
+    },
+    {
+      "directory": "summary_lenses_768",
+      "fileCount": 2,
+      "bytes": 154176,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:10:04.391Z",
+      "newestAt": "2026-08-26T05:10:04.395Z",
+      "role": "HISTORICAL_OR_UNCLASSIFIED_CHECKPOINT",
+      "retention": "REVIEW_BEFORE_CLEANUP",
+      "deletionAuthorized": false
+    },
+    {
+      "directory": "sc_deedssocraticode_metadata",
+      "fileCount": 2,
+      "bytes": 152128,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:10:04.127Z",
+      "newestAt": "2026-08-26T05:10:04.132Z",
+      "role": "HISTORICAL_OR_UNCLASSIFIED_CHECKPOINT",
+      "retention": "REVIEW_BEFORE_CLEANUP",
+      "deletionAuthorized": false
+    },
+    {
+      "directory": "topic_clusters",
+      "fileCount": 2,
+      "bytes": 73280,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:10:04.903Z",
+      "newestAt": "2026-08-26T05:10:04.908Z",
+      "role": "HISTORICAL_OR_UNCLASSIFIED_CHECKPOINT",
+      "retention": "REVIEW_BEFORE_CLEANUP",
+      "deletionAuthorized": false
+    },
+    {
+      "directory": "evidence_vectors",
+      "fileCount": 2,
+      "bytes": 73280,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:09:57.667Z",
+      "newestAt": "2026-08-26T05:09:57.669Z",
+      "role": "HISTORICAL_OR_UNCLASSIFIED_CHECKPOINT",
+      "retention": "REVIEW_BEFORE_CLEANUP",
+      "deletionAuthorized": false
+    },
+    {
+      "directory": "research_memory_768",
+      "fileCount": 2,
+      "bytes": 73280,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:10:03.551Z",
+      "newestAt": "2026-08-26T05:10:03.556Z",
+      "role": "CACHE_CHECKPOINT",
+      "retention": "REVIEW_BEFORE_CLEANUP",
+      "deletionAuthorized": false
+    },
+    {
+      "directory": "chunks_web_search",
+      "fileCount": 2,
+      "bytes": 73280,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:09:13.965Z",
+      "newestAt": "2026-08-26T05:09:13.968Z",
+      "role": "HISTORICAL_OR_UNCLASSIFIED_CHECKPOINT",
+      "retention": "REVIEW_BEFORE_CLEANUP",
+      "deletionAuthorized": false
+    },
+    {
+      "directory": "diagnosis_embeddings",
+      "fileCount": 2,
+      "bytes": 73280,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:09:55.167Z",
+      "newestAt": "2026-08-26T05:09:55.169Z",
+      "role": "HISTORICAL_OR_UNCLASSIFIED_CHECKPOINT",
+      "retention": "REVIEW_BEFORE_CLEANUP",
+      "deletionAuthorized": false
+    },
+    {
+      "directory": "external_programming_docs_768",
+      "fileCount": 2,
+      "bytes": 73280,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:09:57.919Z",
+      "newestAt": "2026-08-26T05:09:57.924Z",
+      "role": "HISTORICAL_OR_UNCLASSIFIED_CHECKPOINT",
+      "retention": "REVIEW_BEFORE_CLEANUP",
+      "deletionAuthorized": false
+    },
+    {
+      "directory": "codebase_topology_128",
+      "fileCount": 2,
+      "bytes": 73280,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:09:50.778Z",
+      "newestAt": "2026-08-26T05:09:50.781Z",
+      "role": "DERIVED_EXPERIMENT_CHECKPOINT",
+      "retention": "REVIEW_BEFORE_CLEANUP",
+      "deletionAuthorized": false
+    },
+    {
+      "directory": "legal_glossary",
+      "fileCount": 2,
+      "bytes": 73280,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:10:00.487Z",
+      "newestAt": "2026-08-26T05:10:00.490Z",
+      "role": "HISTORICAL_OR_UNCLASSIFIED_CHECKPOINT",
+      "retention": "REVIEW_BEFORE_CLEANUP",
+      "deletionAuthorized": false
+    },
+    {
+      "directory": "fixer_memory_768",
+      "fileCount": 2,
+      "bytes": 73280,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:09:58.951Z",
+      "newestAt": "2026-08-26T05:09:58.952Z",
+      "role": "CACHE_CHECKPOINT",
+      "retention": "REVIEW_BEFORE_CLEANUP",
+      "deletionAuthorized": false
+    },
+    {
+      "directory": "audio_segments",
+      "fileCount": 2,
+      "bytes": 73280,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:09:13.025Z",
+      "newestAt": "2026-08-26T05:09:13.027Z",
+      "role": "HISTORICAL_OR_UNCLASSIFIED_CHECKPOINT",
+      "retention": "REVIEW_BEFORE_CLEANUP",
+      "deletionAuthorized": false
+    },
+    {
+      "directory": "court_opinions",
+      "fileCount": 2,
+      "bytes": 73280,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:09:54.939Z",
+      "newestAt": "2026-08-26T05:09:54.940Z",
+      "role": "HISTORICAL_OR_UNCLASSIFIED_CHECKPOINT",
+      "retention": "REVIEW_BEFORE_CLEANUP",
+      "deletionAuthorized": false
+    },
+    {
+      "directory": "case_chunks",
+      "fileCount": 2,
+      "bytes": 73280,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:09:13.285Z",
+      "newestAt": "2026-08-26T05:09:13.290Z",
+      "role": "HISTORICAL_OR_UNCLASSIFIED_CHECKPOINT",
+      "retention": "REVIEW_BEFORE_CLEANUP",
+      "deletionAuthorized": false
+    },
+    {
+      "directory": "document_tags",
+      "fileCount": 2,
+      "bytes": 73280,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:09:56.023Z",
+      "newestAt": "2026-08-26T05:09:56.024Z",
+      "role": "HISTORICAL_OR_UNCLASSIFIED_CHECKPOINT",
+      "retention": "REVIEW_BEFORE_CLEANUP",
+      "deletionAuthorized": false
+    },
+    {
+      "directory": "knowledge_base",
+      "fileCount": 2,
+      "bytes": 73280,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:09:59.187Z",
+      "newestAt": "2026-08-26T05:09:59.189Z",
+      "role": "HISTORICAL_OR_UNCLASSIFIED_CHECKPOINT",
+      "retention": "REVIEW_BEFORE_CLEANUP",
+      "deletionAuthorized": false
+    },
+    {
+      "directory": "legal_cases",
+      "fileCount": 2,
+      "bytes": 73280,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:09:59.903Z",
+      "newestAt": "2026-08-26T05:09:59.905Z",
+      "role": "HISTORICAL_OR_UNCLASSIFIED_CHECKPOINT",
+      "retention": "REVIEW_BEFORE_CLEANUP",
+      "deletionAuthorized": false
+    },
+    {
+      "directory": "poi_profiles",
+      "fileCount": 2,
+      "bytes": 73280,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:10:03.335Z",
+      "newestAt": "2026-08-26T05:10:03.337Z",
+      "role": "HISTORICAL_OR_UNCLASSIFIED_CHECKPOINT",
+      "retention": "REVIEW_BEFORE_CLEANUP",
+      "deletionAuthorized": false
+    },
+    {
+      "directory": "code_llm_outputs",
+      "fileCount": 2,
+      "bytes": 73280,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:09:14.497Z",
+      "newestAt": "2026-08-26T05:09:14.502Z",
+      "role": "HISTORICAL_OR_UNCLASSIFIED_CHECKPOINT",
+      "retention": "REVIEW_BEFORE_CLEANUP",
+      "deletionAuthorized": false
+    },
+    {
+      "directory": "evidence_items_clip_512",
+      "fileCount": 2,
+      "bytes": 45632,
+      "gib": 0,
+      "oldestAt": "2026-08-26T05:09:57.428Z",
+      "newestAt": "2026-08-26T05:09:57.430Z",
+      "role": "HISTORICAL_OR_UNCLASSIFIED_CHECKPOINT",
+      "retention": "REVIEW_BEFORE_CLEANUP",
+      "deletionAuthorized": false
+    }
+  ],
+  "qdrantVolumeStats": {
+    "/qdrant/snapshots": {
+      "allocatedBytes": 26806472704,
+      "allocatedGib": 24.97
+    },
+    "/qdrant/storage/collections": {
+      "allocatedBytes": 2977468416,
+      "allocatedGib": 2.77
+    }
+  },
+  "storageFindings": {
+    "danglingVolumeCount": 10,
+    "danglingVolumeNames": [
+      "2a68b389dc3b5a5ea40b3fbfc29a63256836f98f2896e590efc8ae1794a8aeb0",
+      "3b3f188e43a8bf7ffc5c60093d7b4d50b2001363845459929efa00d6b57699b2",
+      "4bbc1000620e81d41d5e2fda309badc6932df45cde078321d7ce41519311d977",
+      "4ff4e27ef4dcfbb1acb5cb9c28c9b17e2417b794afa24809383874d9af124816",
+      "6c5598e6416e6d6b2baae6dc36ed27661e4ab5eb13969edc36a09ef51859de66",
+      "81d46e804680133403afb09c780ebc8ca4140dc7819ece4ac877cfb3f3f9b249",
+      "94b13a53582c6504c8803ade222c899eaa51d59cd5bae0c9d44f24c5a6ffe626",
+      "429627d99993618c247968dc6c6b5d6ba914b2f76f53e95abe1b495177c3bb8c",
+      "docker_postgres_data",
+      "docker_redis_data"
+    ],
+    "writableLayerHotspots": [
+      {
+        "name": "legal-ai-postgres",
+        "image": "pgvector-pgsearch:pg18-local",
+        "size": "1.05GB (virtual 2.97GB)",
+        "writableBytes": 1127428915.2,
+        "writableDiff": {
+          "available": true,
+          "additions": 7,
+          "changes": 4,
+          "deletions": 0
+        }
+      },
+      {
+        "name": "legal-ai-docling-vlm",
+        "image": "deeds-web-app-docling-vlm:latest",
+        "size": "490MB (virtual 7.56GB)",
+        "writableBytes": 513802240,
+        "writableDiff": {
+          "available": true,
+          "additions": 22,
+          "changes": 4,
+          "deletions": 0
+        }
+      },
+      {
+        "name": "legal-ai-neo4j",
+        "image": "neo4j:5-community",
+        "size": "243MB (virtual 865MB)",
+        "writableBytes": 254803968,
+        "writableDiff": {
+          "available": true,
+          "additions": 6,
+          "changes": 257,
+          "deletions": 0
+        }
+      }
+    ],
+    "neo4jWritableLayerRequiresProducerReview": true,
+    "neo4jTempGuard": {
+      "available": true,
+      "browserEnabled": false,
+      "tmpfs": "rw,exec,nosuid,size=256m,mode=1777",
+      "bounded": true
+    },
+    "imageDeletionCandidateCount": 11,
+    "imageBuildDependencyCount": 2,
+    "snapshotReviewCandidates": [
+      {
+        "directory": "codebase_chunks_768_v2",
+        "role": "COMPARISON_CHALLENGER_CHECKPOINT",
+        "retention": "KEEP_FOR_REVIEW",
+        "bytes": 1795601088,
+        "gib": 1.67,
+        "deletionAuthorized": false
+      },
+      {
+        "directory": "codebase_chunks_512",
+        "role": "DERIVED_EXPERIMENT_CHECKPOINT",
+        "retention": "REVIEW_BEFORE_CLEANUP",
+        "bytes": 581744832,
+        "gib": 0.54,
+        "deletionAuthorized": false
+      },
+      {
+        "directory": "codebase_topology_64",
+        "role": "DERIVED_EXPERIMENT_CHECKPOINT",
+        "retention": "REVIEW_BEFORE_CLEANUP",
+        "bytes": 537835200,
+        "gib": 0.5,
+        "deletionAuthorized": false
+      },
+      {
+        "directory": "phase110_baseline_768",
+        "role": "DERIVED_EXPERIMENT_CHECKPOINT",
+        "retention": "REVIEW_BEFORE_CLEANUP",
+        "bytes": 53279424,
+        "gib": 0.05,
+        "deletionAuthorized": false
+      },
+      {
+        "directory": "llm_response_cache",
+        "role": "CACHE_CHECKPOINT",
+        "retention": "REVIEW_BEFORE_CLEANUP",
+        "bytes": 7073344,
+        "gib": 0.01,
+        "deletionAuthorized": false
+      },
+      {
+        "directory": "codebase_chunks_sparse_test_v1",
+        "role": "HISTORICAL_OR_UNCLASSIFIED_CHECKPOINT",
+        "retention": "REVIEW_BEFORE_CLEANUP",
+        "bytes": 3851328,
+        "gib": 0,
+        "deletionAuthorized": false
+      },
+      {
+        "directory": "sc_deedscodebase_deeds-web-app",
+        "role": "HISTORICAL_OR_UNCLASSIFIED_CHECKPOINT",
+        "retention": "REVIEW_BEFORE_CLEANUP",
+        "bytes": 2037312,
+        "gib": 0,
+        "deletionAuthorized": false
+      },
+      {
+        "directory": "BifrostSemanticCachePlugin",
+        "role": "CACHE_CHECKPOINT",
+        "retention": "REVIEW_BEFORE_CLEANUP",
+        "bytes": 1209920,
+        "gib": 0,
+        "deletionAuthorized": false
+      },
+      {
+        "directory": "codebase_chunks_384",
+        "role": "LEGACY_SEMANTIC_CHECKPOINT",
+        "retention": "REVIEW_BEFORE_CLEANUP",
+        "bytes": 811584,
+        "gib": 0,
+        "deletionAuthorized": false
+      },
+      {
+        "directory": "codebase_chunks_384_hybrid",
+        "role": "LEGACY_SEMANTIC_CHECKPOINT",
+        "retention": "REVIEW_BEFORE_CLEANUP",
+        "bytes": 807488,
+        "gib": 0,
+        "deletionAuthorized": false
+      },
+      {
+        "directory": "synthesis_memory_768",
+        "role": "CACHE_CHECKPOINT",
+        "retention": "REVIEW_BEFORE_CLEANUP",
+        "bytes": 440896,
+        "gib": 0,
+        "deletionAuthorized": false
+      },
+      {
+        "directory": "document_knowledge_768",
+        "role": "HISTORICAL_OR_UNCLASSIFIED_CHECKPOINT",
+        "retention": "REVIEW_BEFORE_CLEANUP",
+        "bytes": 393792,
+        "gib": 0,
+        "deletionAuthorized": false
+      },
+      {
+        "directory": "agent_memory_observations",
+        "role": "CACHE_CHECKPOINT",
+        "retention": "REVIEW_BEFORE_CLEANUP",
+        "bytes": 352832,
+        "gib": 0,
+        "deletionAuthorized": false
+      },
+      {
+        "directory": "evidence_items",
+        "role": "HISTORICAL_OR_UNCLASSIFIED_CHECKPOINT",
+        "retention": "REVIEW_BEFORE_CLEANUP",
+        "bytes": 313920,
+        "gib": 0,
+        "deletionAuthorized": false
+      },
+      {
+        "directory": "cluster_narratives",
+        "role": "HISTORICAL_OR_UNCLASSIFIED_CHECKPOINT",
+        "retention": "REVIEW_BEFORE_CLEANUP",
+        "bytes": 310336,
+        "gib": 0,
+        "deletionAuthorized": false
+      },
+      {
+        "directory": "legal_canon_chunks",
+        "role": "HISTORICAL_OR_UNCLASSIFIED_CHECKPOINT",
+        "retention": "REVIEW_BEFORE_CLEANUP",
+        "bytes": 234048,
+        "gib": 0,
+        "deletionAuthorized": false
+      },
+      {
+        "directory": "error_embeddings",
+        "role": "HISTORICAL_OR_UNCLASSIFIED_CHECKPOINT",
+        "retention": "REVIEW_BEFORE_CLEANUP",
+        "bytes": 215616,
+        "gib": 0,
+        "deletionAuthorized": false
+      },
+      {
+        "directory": "fictional_case_chunks",
+        "role": "HISTORICAL_OR_UNCLASSIFIED_CHECKPOINT",
+        "retention": "REVIEW_BEFORE_CLEANUP",
+        "bytes": 195136,
+        "gib": 0,
+        "deletionAuthorized": false
+      },
+      {
+        "directory": "feature_maps",
+        "role": "HISTORICAL_OR_UNCLASSIFIED_CHECKPOINT",
+        "retention": "REVIEW_BEFORE_CLEANUP",
+        "bytes": 195136,
+        "gib": 0,
+        "deletionAuthorized": false
+      },
+      {
+        "directory": "embedding_cache",
+        "role": "CACHE_CHECKPOINT",
+        "retention": "REVIEW_BEFORE_CLEANUP",
+        "bytes": 186944,
+        "gib": 0,
+        "deletionAuthorized": false
+      },
+      {
+        "directory": "chat_messages",
+        "role": "HISTORICAL_OR_UNCLASSIFIED_CHECKPOINT",
+        "retention": "REVIEW_BEFORE_CLEANUP",
+        "bytes": 154176,
+        "gib": 0,
+        "deletionAuthorized": false
+      },
+      {
+        "directory": "legal_documents",
+        "role": "HISTORICAL_OR_UNCLASSIFIED_CHECKPOINT",
+        "retention": "REVIEW_BEFORE_CLEANUP",
+        "bytes": 154176,
+        "gib": 0,
+        "deletionAuthorized": false
+      },
+      {
+        "directory": "summary_lenses_768",
+        "role": "HISTORICAL_OR_UNCLASSIFIED_CHECKPOINT",
+        "retention": "REVIEW_BEFORE_CLEANUP",
+        "bytes": 154176,
+        "gib": 0,
+        "deletionAuthorized": false
+      },
+      {
+        "directory": "sc_deedssocraticode_metadata",
+        "role": "HISTORICAL_OR_UNCLASSIFIED_CHECKPOINT",
+        "retention": "REVIEW_BEFORE_CLEANUP",
+        "bytes": 152128,
+        "gib": 0,
+        "deletionAuthorized": false
+      },
+      {
+        "directory": "topic_clusters",
+        "role": "HISTORICAL_OR_UNCLASSIFIED_CHECKPOINT",
+        "retention": "REVIEW_BEFORE_CLEANUP",
+        "bytes": 73280,
+        "gib": 0,
+        "deletionAuthorized": false
+      },
+      {
+        "directory": "evidence_vectors",
+        "role": "HISTORICAL_OR_UNCLASSIFIED_CHECKPOINT",
+        "retention": "REVIEW_BEFORE_CLEANUP",
+        "bytes": 73280,
+        "gib": 0,
+        "deletionAuthorized": false
+      },
+      {
+        "directory": "research_memory_768",
+        "role": "CACHE_CHECKPOINT",
+        "retention": "REVIEW_BEFORE_CLEANUP",
+        "bytes": 73280,
+        "gib": 0,
+        "deletionAuthorized": false
+      },
+      {
+        "directory": "chunks_web_search",
+        "role": "HISTORICAL_OR_UNCLASSIFIED_CHECKPOINT",
+        "retention": "REVIEW_BEFORE_CLEANUP",
+        "bytes": 73280,
+        "gib": 0,
+        "deletionAuthorized": false
+      },
+      {
+        "directory": "diagnosis_embeddings",
+        "role": "HISTORICAL_OR_UNCLASSIFIED_CHECKPOINT",
+        "retention": "REVIEW_BEFORE_CLEANUP",
+        "bytes": 73280,
+        "gib": 0,
+        "deletionAuthorized": false
+      },
+      {
+        "directory": "external_programming_docs_768",
+        "role": "HISTORICAL_OR_UNCLASSIFIED_CHECKPOINT",
+        "retention": "REVIEW_BEFORE_CLEANUP",
+        "bytes": 73280,
+        "gib": 0,
+        "deletionAuthorized": false
+      },
+      {
+        "directory": "codebase_topology_128",
+        "role": "DERIVED_EXPERIMENT_CHECKPOINT",
+        "retention": "REVIEW_BEFORE_CLEANUP",
+        "bytes": 73280,
+        "gib": 0,
+        "deletionAuthorized": false
+      },
+      {
+        "directory": "legal_glossary",
+        "role": "HISTORICAL_OR_UNCLASSIFIED_CHECKPOINT",
+        "retention": "REVIEW_BEFORE_CLEANUP",
+        "bytes": 73280,
+        "gib": 0,
+        "deletionAuthorized": false
+      },
+      {
+        "directory": "fixer_memory_768",
+        "role": "CACHE_CHECKPOINT",
+        "retention": "REVIEW_BEFORE_CLEANUP",
+        "bytes": 73280,
+        "gib": 0,
+        "deletionAuthorized": false
+      },
+      {
+        "directory": "audio_segments",
+        "role": "HISTORICAL_OR_UNCLASSIFIED_CHECKPOINT",
+        "retention": "REVIEW_BEFORE_CLEANUP",
+        "bytes": 73280,
+        "gib": 0,
+        "deletionAuthorized": false
+      },
+      {
+        "directory": "court_opinions",
+        "role": "HISTORICAL_OR_UNCLASSIFIED_CHECKPOINT",
+        "retention": "REVIEW_BEFORE_CLEANUP",
+        "bytes": 73280,
+        "gib": 0,
+        "deletionAuthorized": false
+      },
+      {
+        "directory": "case_chunks",
+        "role": "HISTORICAL_OR_UNCLASSIFIED_CHECKPOINT",
+        "retention": "REVIEW_BEFORE_CLEANUP",
+        "bytes": 73280,
+        "gib": 0,
+        "deletionAuthorized": false
+      },
+      {
+        "directory": "document_tags",
+        "role": "HISTORICAL_OR_UNCLASSIFIED_CHECKPOINT",
+        "retention": "REVIEW_BEFORE_CLEANUP",
+        "bytes": 73280,
+        "gib": 0,
+        "deletionAuthorized": false
+      },
+      {
+        "directory": "knowledge_base",
+        "role": "HISTORICAL_OR_UNCLASSIFIED_CHECKPOINT",
+        "retention": "REVIEW_BEFORE_CLEANUP",
+        "bytes": 73280,
+        "gib": 0,
+        "deletionAuthorized": false
+      },
+      {
+        "directory": "legal_cases",
+        "role": "HISTORICAL_OR_UNCLASSIFIED_CHECKPOINT",
+        "retention": "REVIEW_BEFORE_CLEANUP",
+        "bytes": 73280,
+        "gib": 0,
+        "deletionAuthorized": false
+      },
+      {
+        "directory": "poi_profiles",
+        "role": "HISTORICAL_OR_UNCLASSIFIED_CHECKPOINT",
+        "retention": "REVIEW_BEFORE_CLEANUP",
+        "bytes": 73280,
+        "gib": 0,
+        "deletionAuthorized": false
+      },
+      {
+        "directory": "code_llm_outputs",
+        "role": "HISTORICAL_OR_UNCLASSIFIED_CHECKPOINT",
+        "retention": "REVIEW_BEFORE_CLEANUP",
+        "bytes": 73280,
+        "gib": 0,
+        "deletionAuthorized": false
+      },
+      {
+        "directory": "evidence_items_clip_512",
+        "role": "HISTORICAL_OR_UNCLASSIFIED_CHECKPOINT",
+        "retention": "REVIEW_BEFORE_CLEANUP",
+        "bytes": 45632,
+        "gib": 0,
+        "deletionAuthorized": false
+      }
+    ]
+  },
+  "retentionPolicy": {
+    "postgres": "KEEP_CANONICAL",
+    "qdrantLiveStorage": "KEEP_DERIVED_RUNTIME; REBUILDABLE_FROM_POSTGRES",
+    "qdrantSnapshots": "KEEP_ONE_LATEST_KNOWN_GOOD_AND_ONE_PRE_MIGRATION_CHECKPOINT; REVIEW_OLDER_FILES",
+    "graphAndProjectionExports": "KEEP_ONLY_REVISION_QUALIFIED_RECEIPTS_OR_EXPLICIT_ROLLBACK_CHECKPOINTS",
+    "buildCache": "RECLAIMABLE_AFTER_DOCKER_HEALTH_AND_BUILD_REPRODUCIBILITY_CHECK",
+    "oldTaggedImages": "RECLAIMABLE_ONLY_AFTER_ACTIVE_CONTAINER_IMAGE_PARITY_CHECK",
+    "vhdxCompaction": "RUN_ONLY_AFTER_RECLAIMING_CONTENT_AND_WITH_DOCKER_STOPPED"
+  },
+  "blockers": [
+    "DOCKER_VHDX_LARGE",
+    "RETENTION_CANDIDATES_REQUIRE_EXPLICIT_REVIEW"
+  ],
+  "nextGate": "DOCKER_STORAGE_RETENTION_REVIEW_V1"
+}

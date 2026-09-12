@@ -1,0 +1,102 @@
+{
+  "schema": "atlas.docker-rebuild-preflight.v1",
+  "generatedAt": "2026-09-12T05:40:43.289Z",
+  "host": {
+    "platform": "win32",
+    "arch": "x64"
+  },
+  "readOnly": true,
+  "writesPerformed": false,
+  "rebuildAllowed": false,
+  "blockers": [
+    "GIT_INDEX_LOCK_PRESENT"
+  ],
+  "warnings": [
+    "DEV_GPU_RUNTIME_ACTIVE_REUSE_ONLY"
+  ],
+  "git": {
+    "indexLockPresent": true,
+    "indexLockPath": "C:\\Users\\james\\Videos\\deeds-web-app\\.git\\index.lock",
+    "indexLock": {
+      "sizeBytes": 0,
+      "ageSeconds": 6380.039147216797
+    },
+    "processCount": 0,
+    "processActive": false,
+    "lockClassification": "STALE_LOCK_REQUIRES_MANUAL_REVIEW"
+  },
+  "devGpu": {
+    "supervisorLockPath": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\logs\\startup\\dev-gpu-runtime.lock",
+    "supervisorLockPresent": false,
+    "alreadyRunning": false,
+    "pid": null,
+    "duplicateSupervisorDetected": false,
+    "runtimePorts": {
+      "synthesis": {
+        "port": 8090,
+        "pid": 4860
+      },
+      "app": {
+        "port": 5173,
+        "pid": null
+      },
+      "embeddingChallenger": {
+        "port": 8081,
+        "pid": null
+      }
+    },
+    "runtimeAlreadyListening": true
+  },
+  "disk": {
+    "drive": "C:",
+    "freeBytes": 40567758848,
+    "freeGiB": 37.78166961669922
+  },
+  "docker": {
+    "available": true,
+    "configuredImages": [
+      "valkey/valkey-bundle:8.1.1@sha256:8b6501bf71570ee597e621628b141500d9ad24a4137296dbd92ff7791c14367f",
+      "qdrant/qdrant:v1.19.0@sha256:057ee3a8da769fe7310dd3537b4dc7583bf87a95ce8ac43c0af5a46bc580d1fc",
+      "pgvector-pgsearch:pg18-local",
+      "caddy:2.8-alpine@sha256:af32e97399febea808609119bb21544d0265c58a02836576e32a2d082c262c17",
+      "rabbitmq:3-management-alpine@sha256:606d8c0d6b3c18d1da9afc53bc7cdb2a8d5486df91b5a9830e9e07626c9ae281"
+    ],
+    "activeContainers": [
+      "legal-ai-go-retrieval|legal-ai-go-retrieval:latest|Up 3 hours (healthy)",
+      "legal-ai-neo4j|neo4j:5-community|Up 3 hours (healthy)",
+      "f66df30803e9_miniforge-nlp-sidecar|deeds-miniforge-nlp-sidecar:latest|Up 3 hours (healthy)",
+      "atlas-gpu-8098|atlas-gpu-8098:26.08-cuda12-py3.13|Up 3 hours",
+      "atlas-neural-decoder|atlas-neural-decoder:torch2.13.0-cu132|Up 3 hours (healthy)",
+      "legal-ai-qdrant|qdrant/qdrant:v1.19.0|Up 3 hours (healthy)",
+      "legal-ai-postgres|pgvector-pgsearch:pg18-local|Up 3 hours (healthy)",
+      "legal-ai-seaweed-volume|chrislusf/seaweedfs:latest|Up 3 hours (healthy)",
+      "legal-ai-seaweed-filer|chrislusf/seaweedfs:latest|Up 3 hours (healthy)",
+      "legal-ai-go-search|deeds-web-app-go-search-service|Up 3 hours (healthy)",
+      "legal-ai-bifrost|legal-ai-bifrost:git|Up 3 hours (healthy)",
+      "legal-ai-go-embedding|431ddc0acb6f|Up 3 hours (healthy)",
+      "legal-ai-caddy|caddy:2.8-alpine|Up 3 hours (healthy)",
+      "legal-ai-rabbitmq|rabbitmq:3-management-alpine|Up 3 hours (healthy)",
+      "legal-ai-valkey|valkey/valkey-bundle:8.1.1|Up 3 hours (healthy)",
+      "langfuse-server|langfuse/langfuse:3|Up 3 hours (healthy)",
+      "langfuse-worker|langfuse/langfuse-worker:3|Up 3 hours",
+      "legal-ai-searxng|searxng/searxng:latest|Up 3 hours (healthy)",
+      "legal-ai-nats|nats:latest|Up 3 hours",
+      "langfuse-clickhouse|clickhouse/clickhouse-server|Up 3 hours (healthy)",
+      "legal-ai-couchdb|couchdb:3.3|Up 3 hours (healthy)",
+      "legal-ai-docling-vlm|deeds-web-app-docling-vlm:latest|Up 3 hours (healthy)",
+      "legal-ai-image-synthesis|deeds-web-app-image-synthesis:latest|Up 3 hours (healthy)",
+      "legal-ai-seaweed-s3|chrislusf/seaweedfs:latest|Up 3 hours (healthy)",
+      "legal-ai-seaweed-master|chrislusf/seaweedfs:latest|Up 3 hours (healthy)"
+    ],
+    "storageCensusRead": true
+  },
+  "policy": {
+    "requireExplicitTarget": true,
+    "requirePinnedBase": true,
+    "reuseHealthyContainers": true,
+    "noDeleteOrPrune": true,
+    "noComposeBuild": true,
+    "noContainerRestart": true
+  },
+  "nextGate": "RESOLVE_REBUILD_PREFLIGHT_BLOCKERS"
+}
