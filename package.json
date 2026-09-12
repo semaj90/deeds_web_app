@@ -13,6 +13,7 @@
     "atlas:context-forest:readiness": "node scripts/atlas/audit-context-forest-readiness-v1.mjs",
     "atlas:promotion:gates": "node scripts/atlas/audit-parent-atlas-promotion-gates-v1.mjs",
     "atlas:promotion:receipt-currentness": "node scripts/atlas/audit-promotion-gate-receipt-currentness-v1.mjs",
+    "atlas:observation:plan:authority": "node scripts/atlas/audit-observation-feature-plan-authority-v1.mjs",
     "atlas:workspace:snapshot:capture": "npx tsx scripts/atlas/capture-workspace-source-snapshot-v1.mts",
     "atlas:workspace:snapshot:audit": "npx tsx scripts/atlas/audit-workspace-source-snapshot-v1.mts",
     "atlas:workspace:snapshot:namespace-dedup:audit": "npx tsx scripts/atlas/audit-workspace-snapshot-namespace-dedup-v1.mts",
