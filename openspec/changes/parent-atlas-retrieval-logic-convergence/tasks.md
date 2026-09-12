@@ -287,3 +287,28 @@ This planning change does not authorize:
 - GraphRAG canonical ownership;
 - replacement of SearchRuntime;
 - fabrication of missing identity/revision/feature values.
+
+## Current producer authority cross-reference — 2026-09-12
+
+The detailed live evidence is recorded in
+`tasks-20260911-v6.md`. The current status is:
+
+- `ChunkRetrievalProfileV2` and `FileRetrievalProfileV1` contract tests: proven
+  (`11/11` focused tests);
+- selected execution readback: blocked because feature observations do not
+  carry a qualified workspace revision;
+- observation feature plan authority: blocked (`0` exact source-revision
+  matches against the selected execution);
+- feature-row apply: fail-closed unless a bounded limit, admitted workspace
+  revision, and non-placeholder source revisions are supplied;
+- file and directory aggregation: not admitted until live chunk readback and
+  replay pass.
+
+Read-only checks:
+
+```powershell
+npm run atlas:observation:plan:authority
+node scripts/atlas/audit-chunk-retrieval-profile-live-readback-v1.mjs --limit=16
+```
+
+These checks do not backfill revisions or mutate any store.
