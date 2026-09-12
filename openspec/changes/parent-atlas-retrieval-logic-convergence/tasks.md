@@ -58,7 +58,10 @@ snapshot, cache, package, or VHDX operation is authorized by this ledger.
 - [ ] **STORAGE-REVIEW-03 — Classify Qdrant snapshot retention.** For each
   snapshot, record collection, revision/checksum, generation time, consumer
   references, rollback value, and whether it is active, rollback, historical,
-  or unclassified. Produce candidates only; preserve all artifacts.
+  or unclassified. Produce candidates only; preserve all artifacts. The
+  collection-level breakdown now reports 45 collections, 13.39 GB of live
+  collection storage, and 24.94 GiB of API-visible snapshots with zero API
+  errors; per-snapshot consumer and rollback reconciliation remains open.
 - [ ] **STORAGE-REVIEW-04 — Require explicit cleanup admission.** A later
   cleanup change must name exact image IDs or snapshot paths, prove zero
   consumers and rollback coverage, capture a before/after inventory, and be

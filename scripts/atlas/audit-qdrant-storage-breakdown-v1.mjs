@@ -21,8 +21,8 @@ const QDRANT_URL = (process.env.QDRANT_URL || process.env.QDRANT_BASE_URL || 'ht
 const noReport = process.argv.includes('--no-report');
 
 const CODEBASE_CLASS = new Map([
-  ['codebase_chunks_768_v2', 'CURRENT_SEMANTIC_CANDIDATE'],
-  ['codebase_chunks_768', 'LEGACY_SEMANTIC_OWNER'],
+  ['codebase_chunks_768', 'ACTIVE_SEMANTIC_PROJECTION'],
+  ['codebase_chunks_768_v2', 'COMPARISON_SEMANTIC_CHALLENGER'],
   ['codebase_chunks_512', 'DERIVED_REDUCED_SEMANTIC'],
   ['codebase_chunks_384', 'LEGACY_REDUCED_SEMANTIC'],
   ['codebase_chunks_384_hybrid', 'LEGACY_REDUCED_SEMANTIC'],
@@ -164,7 +164,7 @@ try {
       entry.memory = memorySummary(await getJson(`/collections/${encodeURIComponent(name)}/memory`));
       report.totals.collectionMemoryEndpointAvailable += 1;
       report.totals.liveCollectionDiskBytes += entry.memory.diskBytes;
-      if (entry.classification.startsWith('CURRENT_') || entry.classification.startsWith('LEGACY_') || entry.classification.startsWith('DERIVED_') || entry.classification === 'SPARSE_EXPERIMENT' || entry.classification === 'CODEBASE_OTHER') {
+      if (entry.classification.startsWith('ACTIVE_') || entry.classification.startsWith('CURRENT_') || entry.classification.startsWith('LEGACY_') || entry.classification.startsWith('DERIVED_') || entry.classification === 'SPARSE_EXPERIMENT' || entry.classification === 'CODEBASE_OTHER') {
         report.totals.codebaseLiveDiskBytes += entry.memory.diskBytes;
       }
     } catch (error) {
@@ -174,7 +174,7 @@ try {
       entry.snapshots = snapshotSummary(await getJson(`/collections/${encodeURIComponent(name)}/snapshots`));
       report.totals.apiVisibleSnapshotBytes += entry.snapshots.totalBytes;
       report.totals.apiVisibleSnapshotCount += entry.snapshots.count;
-      if (entry.classification.startsWith('CURRENT_') || entry.classification.startsWith('LEGACY_') || entry.classification.startsWith('DERIVED_') || entry.classification === 'SPARSE_EXPERIMENT' || entry.classification === 'CODEBASE_OTHER') {
+      if (entry.classification.startsWith('ACTIVE_') || entry.classification.startsWith('CURRENT_') || entry.classification.startsWith('LEGACY_') || entry.classification.startsWith('DERIVED_') || entry.classification === 'SPARSE_EXPERIMENT' || entry.classification === 'CODEBASE_OTHER') {
         report.totals.codebaseSnapshotBytes += entry.snapshots.totalBytes;
       }
     } catch (error) {
