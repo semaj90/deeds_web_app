@@ -146,7 +146,9 @@ retained. `Vibreti` is not treated as a current implementation or owner.
   or PageRank collections to store transient candidate universes. The role
   audit now checks collection names for these transient-store patterns; a zero
   result is required before this invariant can be closed. The current audit
-  found zero matching collections and all declared semantic-owner checks pass.
+  found zero matching collections. This closes only the ephemeral-candidate
+  invariant; semantic-owner alignment remains separately blocked by
+  `SEMANTIC_OWNER_RUNTIME_CONTRACT_CONFLICT`.
 - [x] **RETRIEVAL-OWNERSHIP-04 — No collection/storage promotion in this change.**
   Do not create a new Qdrant collection, delete a legacy collection/named
   vector, add an ANN index, or promote a representation without separate
