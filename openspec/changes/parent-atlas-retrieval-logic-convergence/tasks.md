@@ -125,10 +125,15 @@ retained. `Vibreti` is not treated as a current implementation or owner.
 - [ ] **RETRIEVAL-OWNERSHIP-03 — Keep candidate sets ephemeral.** KNN and Top-K
   are query operations. Do not create persistent `knn*`, `topk*`, KMeans, SOM,
   or PageRank collections to store transient candidate universes.
-- [ ] **RETRIEVAL-OWNERSHIP-04 — No collection/storage promotion in this change.**
+- [x] **RETRIEVAL-OWNERSHIP-04 — No collection/storage promotion in this change.**
   Do not create a new Qdrant collection, delete a legacy collection/named
   vector, add an ANN index, or promote a representation without separate
   lineage + caller + QRELS evidence.
+
+  Proven by the storage and collection-role audits: this tranche performed no
+  collection, snapshot, named-vector, ANN-index, or representation operation.
+  All image and snapshot candidates remain review-only with
+  `deletionAuthorized=false`.
 
 ### Shared retrieval profile contracts
 
@@ -355,3 +360,30 @@ node scripts/atlas/audit-chunk-retrieval-profile-live-readback-v1.mjs --limit=16
 ```
 
 These checks do not backfill revisions or mutate any store.
+
+## Next gated work — 2026-09-12
+
+The next work is evidence collection, not cleanup or rebuild:
+
+1. Complete `STORAGE-REVIEW-02` by reconciling image IDs against active
+   containers, Compose references, Dockerfile stage ancestry, and the WSL2
+   RAPIDS/PyTorch census.
+2. Complete `STORAGE-REVIEW-03` by classifying every Qdrant snapshot with
+   collection, checksum/revision, generation time, consumer references, and
+   rollback value. Preserve every artifact.
+3. Continue the retrieval spine with live chunk-profile readback and replay;
+   file and directory aggregation remain blocked until qualified feature
+   revisions are present.
+4. Do not authorize image removal, snapshot removal, Docker rebuilds, VHDX
+   compaction, Qdrant repair, or projection promotion from this ledger.
+
+The current read-only checks are:
+
+```powershell
+npm run atlas:docker:storage:retention:audit
+npm run atlas:qdrant:collection-roles:audit
+node scripts/atlas/audit-chunk-retrieval-profile-live-readback-v1.mjs --limit=16
+```
+
+Each check must retain `writesPerformed=false`; any cleanup requires a later
+change naming exact targets and recording rollback/consumer evidence.
