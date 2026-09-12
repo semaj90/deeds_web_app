@@ -38,6 +38,22 @@ function scanConsumers() {
 
 const consumerCensus = scanConsumers();
 
+function scanCollectionConsumers(collection) {
+  try {
+    const output = execFileSync('rg', [
+      '-l', '-i', '-F', collection,
+      'scripts', 'services', 'docker', 'sveltekit-frontend', 'packages',
+      '--glob', '!**/node_modules/**', '--glob', '!**/.venv*/**', '--glob', '!**/dist/**',
+      '--glob', '!**/build/**', '--glob', '!**/docs/reports/**', '--glob', '!sveltekit-frontend/NUL',
+      '--glob', '*.{mjs,mts,js,ts,tsx,jsx,py,go,rs,sql,yml,yaml,json}',
+    ], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: 15000, maxBuffer: 32 * 1024 * 1024 });
+    return { available: true, files: output.split(/\r?\n/).filter(Boolean).sort() };
+  } catch (error) {
+    if (error?.status === 1) return { available: true, files: [] };
+    return { available: false, files: [], error: error?.message ?? String(error) };
+  }
+}
+
 const CODEBASE_CLASS = new Map([
   ['codebase_chunks_768', 'ACTIVE_SEMANTIC_PROJECTION'],
   ['codebase_chunks_768_v2', 'COMPARISON_SEMANTIC_CHALLENGER'],
@@ -130,7 +146,7 @@ function vectorConfigSummary(infoBody) {
   };
 }
 
-function snapshotSummary(body, collection, classification, consumerReferences) {
+function snapshotSummary(body, collection, classification, consumerReferences, consumerSearchAvailable) {
   const snapshots = Array.isArray(unwrap(body)) ? unwrap(body) : [];
   const normalized = snapshots.map((row) => ({
     collection,
@@ -158,7 +174,8 @@ function snapshotSummary(body, collection, classification, consumerReferences) {
           ? 'ROLLBACK_CHECKPOINT_CANDIDATE'
           : 'OLDER_REVIEW_CANDIDATE',
       consumerReferences,
-      consumerReferenceScope: 'NOT_YET_RECONCILED',
+      consumerReferenceScope: 'COLLECTION_NAME_RG_MATCH',
+      consumerSearchAvailable,
       consumerReferencesProven: false,
       deletionAuthorized: false,
     })),
@@ -202,7 +219,18 @@ try {
 
   for (const name of names) {
     const classification = classifyCollection(name);
-    const entry = { name, classification, info: null, memory: null, snapshots: null, errors: [] };
+    const collectionConsumers = scanCollectionConsumers(name);
+    const entry = {
+      name,
+      classification,
+      consumerReferences: collectionConsumers.files,
+      consumerReferenceCount: collectionConsumers.files.length,
+      consumerSearchAvailable: collectionConsumers.available,
+      info: null,
+      memory: null,
+      snapshots: null,
+      errors: [],
+    };
     try {
       entry.info = vectorConfigSummary(await getJson(`/collections/${encodeURIComponent(name)}`));
     } catch (error) {
@@ -219,7 +247,7 @@ try {
       entry.errors.push(`MEMORY:${error.message}`);
     }
     try {
-      entry.snapshots = snapshotSummary(await getJson(`/collections/${encodeURIComponent(name)}/snapshots`), name, entry.classification, []);
+      entry.snapshots = snapshotSummary(await getJson(`/collections/${encodeURIComponent(name)}/snapshots`), name, entry.classification, collectionConsumers.files, collectionConsumers.available);
       report.totals.apiVisibleSnapshotBytes += entry.snapshots.totalBytes;
       report.totals.apiVisibleSnapshotCount += entry.snapshots.count;
       for (const snapshot of entry.snapshots.snapshots) {

@@ -64,7 +64,9 @@ snapshot, cache, package, or VHDX operation is authorized by this ledger.
   errors. All 70 API-visible snapshot records now have a retention candidate
   classification (43 latest, 5 rollback, 22 older review); these labels are
   not consumer or rollback proof, so per-snapshot consumer reconciliation
-  remains open.
+  remains open. The repository-wide collection-name census found 883 raw
+  references to `codebase_chunks_768` and 1 to `_v2`; these are file-level
+  matches, not proof that any individual snapshot is still required.
 - [ ] **STORAGE-REVIEW-04 — Require explicit cleanup admission.** A later
   cleanup change must name exact image IDs or snapshot paths, prove zero
   consumers and rollback coverage, capture a before/after inventory, and be
