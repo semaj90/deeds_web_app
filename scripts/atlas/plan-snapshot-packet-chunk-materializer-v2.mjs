@@ -10,6 +10,9 @@
  * - current receipt supplies execution/workspace/snapshot revision
  * - graphify_executions supplies workspace_id namespace authority
  * - membership_v2 supplies exact source revision + whole-source digest
+ * - repository_id + repository_relative_path is the selected source identity;
+ *   source_ref-only downstream lookups are allowed only when source_ref is
+ *   unique across repositories in the selected execution
  * - sidecar observations never mint canonical chunk identity
  * - canonical chunk IDs come only from codebase_chunk_index
  * - atlas_packets is file-granularity; packet content_hash is not compared to
@@ -86,6 +89,7 @@ async function postAst(source, language, filePath, sourceRevision) {
 let memberships = [];
 let error = null;
 const plans = [];
+let executionSourceRefCollisions = [];
 try {
   const executionResult = await pool.query(
     `select execution_id::text, workspace_id::text, workspace_revision::text, status
@@ -98,6 +102,24 @@ try {
   if (!normalizeText(execution.workspace_id)) throw new Error('SELECTED_GRAPHIFY_WORKSPACE_ID_MISSING');
   if (normalizeText(execution.workspace_revision) !== normalizeText(readback.workspaceRevision)) throw new Error('SELECTED_GRAPHIFY_WORKSPACE_REVISION_MISMATCH');
   if (normalizeText(execution.status) !== 'COMPLETED') throw new Error(`SELECTED_GRAPHIFY_EXECUTION_NOT_COMPLETED:${execution.status}`);
+
+  const collisionResult = await pool.query(
+    `select source_ref,
+            count(distinct repository_id)::int as repository_count,
+            array_agg(distinct repository_id order by repository_id) as repository_ids
+       from public.graphify_execution_file_membership_v2
+      where execution_id = $1::uuid
+      group by source_ref
+     having count(distinct repository_id) > 1
+      order by source_ref`,
+    [readback.executionId],
+  );
+  executionSourceRefCollisions = collisionResult.rows.map((row) => ({
+    sourceRef: normalizeText(row.source_ref).replaceAll('\\', '/'),
+    repositoryCount: Number(row.repository_count),
+    repositoryIds: Array.isArray(row.repository_ids) ? row.repository_ids.map(normalizeText) : [],
+  }));
+  const collisionBySourceRef = new Map(executionSourceRefCollisions.map((row) => [row.sourceRef, row]));
 
   const { rows } = await pool.query(
     `select m.execution_id::text, m.repository_id, m.repository_relative_path, m.source_ref,
@@ -115,6 +137,20 @@ try {
 
   for (const membership of memberships) {
     const sourceRef = normalizeText(membership.source_ref).replaceAll('\\', '/');
+    const sourceRefCollision = collisionBySourceRef.get(sourceRef) ?? null;
+    if (sourceRefCollision) {
+      plans.push({
+        sourceRef,
+        repositoryId: normalizeText(membership.repository_id),
+        repositoryRelativePath: normalizeText(membership.repository_relative_path),
+        classification: 'BLOCKED_MULTI_REPOSITORY_SOURCE_REF_COLLISION',
+        blockers: ['MULTI_REPOSITORY_SOURCE_REF_COLLISION'],
+        repositoryCount: sourceRefCollision.repositoryCount,
+        repositoryIds: sourceRefCollision.repositoryIds,
+      });
+      continue;
+    }
+
     const sourcePath = path.resolve(materializedRoot, sourceRef.replaceAll('/', path.sep));
     if (!sourcePath.startsWith(path.resolve(materializedRoot) + path.sep) || !fs.existsSync(sourcePath)) {
       plans.push({ sourceRef, classification: 'BLOCKED_MATERIALIZED_SOURCE_MISSING', blockers: ['MATERIALIZED_SOURCE_MISSING'] });
@@ -194,6 +230,8 @@ try {
 
 const counts = {
   selectedSources: plans.length,
+  executionSourceRefCollisionCount: executionSourceRefCollisions.length,
+  boundedMultiRepositorySourceRefCollisions: plans.filter((row) => row.classification === 'BLOCKED_MULTI_REPOSITORY_SOURCE_REF_COLLISION').length,
   readyLineageFill: plans.filter((row) => row.classification === 'READY_LINEAGE_FILL_EXISTING_PACKET_EXISTING_CHUNKS').length,
   alreadyComplete: plans.filter((row) => row.classification === 'ALREADY_COMPLETE_FOR_OBSERVED_CHUNKS').length,
   needsChunkMaterializer: plans.filter((row) => row.classification === 'NEEDS_CURRENT_CHUNK_MATERIALIZER').length,
@@ -237,6 +275,7 @@ const deterministic = {
   materializedRoot,
   limit: LIMIT,
   onlySource: ONLY_SOURCE,
+  executionSourceRefCollisions,
   counts,
   status,
   nextGate,
