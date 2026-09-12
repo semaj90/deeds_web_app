@@ -19,6 +19,7 @@ import { ensureQdrantCollection, batchUpsertPoints } from '../vector/qdrant-mana
 import { extractAstFeatures, extractDependencyFeatures } from '../analysis/ast-grep-extractor.js';
 import { LIBRARY_DOMAIN_MAP } from '../../phase72/routeGraphAdapter.js';
 import type Redis from 'ioredis';
+import { CANONICAL_SOURCE_COLLECTION } from '$lib/server/vector/vector-contracts.js';
 
 // ─── Types ────────────────────────────────────────────────────────────────
 
@@ -662,7 +663,7 @@ export async function rebuildCodeIntelCorpus(): Promise<{
 async function ingestNodesToQdrant(nodes: CodeIntelNode[]): Promise<void> {
   try {
     // Ensure collection exists
-    await ensureQdrantCollection('codebase_chunks_768_v2', 768);
+	await ensureQdrantCollection(CANONICAL_SOURCE_COLLECTION, 768);
 
     // Convert nodes to Qdrant points
     const points = nodes.map((node, idx) => ({
@@ -688,7 +689,7 @@ async function ingestNodesToQdrant(nodes: CodeIntelNode[]): Promise<void> {
       }
     }));
 
-    await batchUpsertPoints('codebase_chunks_768_v2', points, true);
+	await batchUpsertPoints(CANONICAL_SOURCE_COLLECTION, points, true);
   } catch (err) {
     console.error('[CodeIntel] Qdrant ingestion failed:', (err as Error).message);
   }

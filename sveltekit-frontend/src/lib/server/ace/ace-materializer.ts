@@ -7,7 +7,7 @@
  * Flow:
  *   1. Read ACE-validated packet from Postgres
  *   2. Generate or load embedding vector (768-dim)
- *   3. Upsert to Qdrant codebase_chunks_768_v2 with metadata
+ *   3. Upsert to the declared Qdrant semantic collection with metadata
  *   4. Cache in Redis under bifrost:sem:packet:{packet_key} (24h TTL) -- fixed
  *      2026-09-04 (BITFROST-INVALIDATION-OWNER-01): this doc comment and the
  *      code below both used to say/use bifrost:packet:{packet_key}, a shape
@@ -343,7 +343,7 @@ export async function getPacketMaterializationStatus(packetKey: string): Promise
     // Check Qdrant by packet identity. Do not use a zero-vector proxy.
     let inQdrant = false;
     try {
-      const response = await qdrant.scroll('codebase_chunks_768_v2', {
+      const response = await qdrant.scroll(DEFAULT_COLLECTION, {
         limit: 1,
         with_payload: true,
         with_vector: false,

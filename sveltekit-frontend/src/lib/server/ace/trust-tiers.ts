@@ -10,7 +10,7 @@
 
 export type LaneId =
   | 'L0'   // topo-byte prefilter  (Redis ace:topo:*)
-  | 'L1'   // Qdrant dense ANN     (codebase_chunks_768_v2 content)
+  | 'L1'   // Qdrant dense ANN     (declared semantic_768 content)
   | 'L2'   // Qdrant signature ANN (legacy signature projection)
   | 'L3'   // summary lenses       (summary_lenses_768)
   | 'L4'   // wiki / LLMS.md     (Redis wiki:note:* + agents:dir:*)
