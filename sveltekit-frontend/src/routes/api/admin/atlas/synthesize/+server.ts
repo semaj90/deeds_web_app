@@ -423,7 +423,7 @@ export const POST: RequestHandler = async (event) => {
         routing: 'latent_64 autoencoder + KMeans is routing-only and requires its own revision receipt before use',
         lexical: 'PostgreSQL atlas_packets FTS via websearch_to_tsquery + ts_rank_cd',
         queryGraph: shouldRunQueryPpr ? 'resident cuGraph personalized PageRank over the requested graphRevision' : null,
-        bm42: 'codebase_chunks_384_hybrid/bm42 experimental challenger only',
+        bm42: 'bm42 (384-dim legacy) experimental challenger only',
         fallback: gpuBudget.executionTarget === 'qdrant' ? 'qdrant' : null,
       },
       next: {

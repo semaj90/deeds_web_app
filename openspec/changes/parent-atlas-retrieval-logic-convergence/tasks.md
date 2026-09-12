@@ -128,26 +128,22 @@ retained. `Vibreti` is not treated as a current implementation or owner.
 - [ ] **RETRIEVAL-OWNERSHIP-01 — Enforce one canonical document identity.**
   PostgreSQL packet/chunk/source/workspace lineage remains canonical. Derived
   algorithms may not mint a replacement document identity.
-- [ ] **RETRIEVAL-OWNERSHIP-02 — Enforce one semantic logical lane.**
+- [x] **RETRIEVAL-OWNERSHIP-02 — Enforce one semantic logical lane.**
   `semantic_768` is one evidence lane. Qdrant HNSW, PostgreSQL exact pgvector,
   cuVS exact, CAGRA, and TurboVec are executors/challengers over that lane and
   must not receive independent RRF votes solely because execution differs.
-  The current owner decision is still open: the storage contract declares
-  `codebase_chunks_768`, while the active lane registry and several runtime
-  callers select `codebase_chunks_768_v2`. The role audit now emits a
+  The storage contract and central runtime owner are `codebase_chunks_768`;
+  `_v2` is explicitly challenger/compatibility-only. The role audit emits a
   per-caller classification (`ACTIVE_RUNTIME_OWNER_CANDIDATE`,
   `UNSUFFIXED_COLLECTION_CALLER_REQUIRES_CLASSIFICATION`,
   `AMBIGUOUS_MULTI_COLLECTION_CALLER`, or `REVIEW_OR_HISTORICAL`) so this
-  cannot be resolved by counting raw string references. Do not flip either
-  runtime owner until the caller census, lineage receipt, and explicit owner
-  decision agree. The declared owner is now wired through the central runtime
-  retrieval constants and `retrieve-candidates` path, but the audit remains
-  blocked while active competing callers exist. The focused migration tranche
-  moved the live ACE/ACP/provenance defaults to the central owner constant;
-  the audit now finds zero active `_v2` retrieval callers. Four `_v2` files
-  remain explicitly classified as challenger/compatibility surfaces, while
-  14 executable legacy-384 references still require migration or explicit
-  challenger-only classification before this task can close.
+  cannot be resolved by counting raw string references. The focused migration
+  moved live retrieval, ACE/ACP, provenance, and projection defaults to the
+  owner constant. The audit finds zero active `_v2` retrieval callers and
+  zero active executable legacy-384 callers; challenger/compatibility files
+  remain explicitly classified. This closes the runtime collection-owner
+  portion of the task; lineage and physical precision admission remain
+  separate gates.
 - [x] **RETRIEVAL-OWNERSHIP-03 — Keep candidate sets ephemeral.** KNN and Top-K
   are query operations. Do not create persistent `knn*`, `topk*`, KMeans, SOM,
   or PageRank collections to store transient candidate universes. The role
