@@ -1,0 +1,153 @@
+{
+  "schema": "atlas.observation-feature-plan-authority.v1",
+  "generatedAt": "2026-09-12T06:02:00.929Z",
+  "gate": "OBSERVATION-FEATURE-PLAN-AUTHORITY-01",
+  "status": "PLAN_AUTHORITY_BLOCKED",
+  "selectedExecutionId": "cbcd35c6-b26c-4d1a-a08b-9aa16a1afbcc",
+  "selectedWorkspaceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+  "planPath": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas\\graphify-file-index-v1\\observation-feature-projection-plan.jsonl",
+  "planRowCount": 174,
+  "selectedExecutionSourceCount": 25291,
+  "exactSourceRevisionRows": 0,
+  "invalidRowCount": 344,
+  "reasonCounts": {
+    "SOURCE_NOT_IN_SELECTED_EXECUTION": 155,
+    "SOURCE_REVISION_MISMATCH": 19,
+    "SOURCE_REVISION_PLACEHOLDER": 170
+  },
+  "sampleInvalid": [
+    {
+      "line": 1,
+      "reason": "SOURCE_REVISION_PLACEHOLDER",
+      "sourceRevision": "workspace:0"
+    },
+    {
+      "line": 1,
+      "reason": "SOURCE_REVISION_MISMATCH",
+      "sourceRef": "packages/atlas-core/src/smoke-test.ts",
+      "sourceRevision": "workspace:0",
+      "admittedRevisions": [
+        "sha256:9700695c04a15de374ab20bddf4579f7877ac16f79b623f21baf97721a9a43d5"
+      ]
+    },
+    {
+      "line": 2,
+      "reason": "SOURCE_REVISION_PLACEHOLDER",
+      "sourceRevision": "workspace:0"
+    },
+    {
+      "line": 2,
+      "reason": "SOURCE_REVISION_MISMATCH",
+      "sourceRef": "scripts/agent/dag-reducer.mjs",
+      "sourceRevision": "workspace:0",
+      "admittedRevisions": [
+        "sha256:5c8f353f871b180d8104212dc2a14d5d0c45d60d223f78674feb2fce68563c86"
+      ]
+    },
+    {
+      "line": 3,
+      "reason": "SOURCE_REVISION_PLACEHOLDER",
+      "sourceRevision": "workspace:0"
+    },
+    {
+      "line": 3,
+      "reason": "SOURCE_NOT_IN_SELECTED_EXECUTION",
+      "sourceRef": "src/lib/client/search-client.ts",
+      "sourceRevision": "workspace:0",
+      "admittedRevisions": []
+    },
+    {
+      "line": 4,
+      "reason": "SOURCE_REVISION_PLACEHOLDER",
+      "sourceRevision": "workspace:0"
+    },
+    {
+      "line": 4,
+      "reason": "SOURCE_NOT_IN_SELECTED_EXECUTION",
+      "sourceRef": "src/lib/config/env.server.ts",
+      "sourceRevision": "workspace:0",
+      "admittedRevisions": []
+    },
+    {
+      "line": 5,
+      "reason": "SOURCE_REVISION_PLACEHOLDER",
+      "sourceRevision": "workspace:0"
+    },
+    {
+      "line": 5,
+      "reason": "SOURCE_REVISION_MISMATCH",
+      "sourceRef": "packages/atlas-core/src/langgraph/run-error-fixing-agent.ts",
+      "sourceRevision": "workspace:0",
+      "admittedRevisions": [
+        "sha256:aef97b36ec6ed2a20b5cde417fce68f9ddc14b6230c8c266a00bfa1c2c520032"
+      ]
+    },
+    {
+      "line": 6,
+      "reason": "SOURCE_REVISION_PLACEHOLDER",
+      "sourceRevision": "workspace:0"
+    },
+    {
+      "line": 6,
+      "reason": "SOURCE_NOT_IN_SELECTED_EXECUTION",
+      "sourceRef": "src/lib/components/ui/modular/types.ts",
+      "sourceRevision": "workspace:0",
+      "admittedRevisions": []
+    },
+    {
+      "line": 7,
+      "reason": "SOURCE_REVISION_PLACEHOLDER",
+      "sourceRevision": "workspace:0"
+    },
+    {
+      "line": 7,
+      "reason": "SOURCE_NOT_IN_SELECTED_EXECUTION",
+      "sourceRef": "src/lib/client/workflow-event-stream.ts",
+      "sourceRevision": "workspace:0",
+      "admittedRevisions": []
+    },
+    {
+      "line": 8,
+      "reason": "SOURCE_REVISION_PLACEHOLDER",
+      "sourceRevision": "workspace:0"
+    },
+    {
+      "line": 8,
+      "reason": "SOURCE_REVISION_MISMATCH",
+      "sourceRef": "packages/parent-atlas/src/core/summary-context.ts",
+      "sourceRevision": "workspace:0",
+      "admittedRevisions": [
+        "sha256:f9f0faa0674eb1033fe1e7a1fa6b1df6edbb1d8b03917548641f8f9179a7d087"
+      ]
+    },
+    {
+      "line": 9,
+      "reason": "SOURCE_REVISION_PLACEHOLDER",
+      "sourceRevision": "workspace:0"
+    },
+    {
+      "line": 9,
+      "reason": "SOURCE_NOT_IN_SELECTED_EXECUTION",
+      "sourceRef": "src/lib/client/db/loki-client.ts",
+      "sourceRevision": "workspace:0",
+      "admittedRevisions": []
+    },
+    {
+      "line": 10,
+      "reason": "SOURCE_REVISION_PLACEHOLDER",
+      "sourceRevision": "workspace:0"
+    },
+    {
+      "line": 10,
+      "reason": "SOURCE_NOT_IN_SELECTED_EXECUTION",
+      "sourceRef": "src/lib/components/ui/gaming/constants/gaming-constants-minimal.ts",
+      "sourceRevision": "workspace:0",
+      "admittedRevisions": []
+    }
+  ],
+  "error": null,
+  "readOnly": true,
+  "writesPerformed": false,
+  "canonicalAuthorityChanged": false,
+  "nextGate": "REGENERATE_PLAN_FROM_SELECTED_EXECUTION"
+}
