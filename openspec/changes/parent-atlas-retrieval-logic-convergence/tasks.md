@@ -61,7 +61,10 @@ snapshot, cache, package, or VHDX operation is authorized by this ledger.
   or unclassified. Produce candidates only; preserve all artifacts. The
   collection-level breakdown now reports 45 collections, 13.39 GB of live
   collection storage, and 24.94 GiB of API-visible snapshots with zero API
-  errors; per-snapshot consumer and rollback reconciliation remains open.
+  errors. All 71 API-visible snapshot records now have a retention candidate
+  classification (43 latest, 5 rollback, 22 older review); these labels are
+  not consumer or rollback proof, so per-snapshot consumer reconciliation
+  remains open.
 - [ ] **STORAGE-REVIEW-04 — Require explicit cleanup admission.** A later
   cleanup change must name exact image IDs or snapshot paths, prove zero
   consumers and rollback coverage, capture a before/after inventory, and be

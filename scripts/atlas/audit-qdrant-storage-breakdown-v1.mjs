@@ -112,16 +112,36 @@ function vectorConfigSummary(infoBody) {
   };
 }
 
-function snapshotSummary(body) {
+function snapshotSummary(body, collection, classification) {
   const snapshots = Array.isArray(unwrap(body)) ? unwrap(body) : [];
+  const normalized = snapshots.map((row) => ({
+    collection,
+    name: row?.name ?? null,
+    sizeBytes: numeric(row?.size),
+    checksum: row?.checksum ?? null,
+    creationTime: row?.creation_time ?? row?.creationTime ?? null,
+  }));
+  const ordered = normalized
+    .filter((row) => row.creationTime)
+    .sort((a, b) => String(b.creationTime).localeCompare(String(a.creationTime)));
+  const latestName = ordered[0]?.name ?? null;
+  const rollbackCandidateName = ordered[1]?.name ?? null;
   return {
     count: snapshots.length,
     totalBytes: snapshots.reduce((sum, row) => sum + numeric(row?.size), 0),
-    snapshots: snapshots.map((row) => ({
-      name: row?.name ?? null,
-      sizeBytes: numeric(row?.size),
-      checksum: row?.checksum ?? null,
-      creationTime: row?.creation_time ?? row?.creationTime ?? null,
+    snapshots: normalized.map((row) => ({
+      ...row,
+      classification,
+      retentionDisposition: !row.creationTime
+        ? 'UNCLASSIFIED_METADATA_MISSING_CREATION_TIME'
+        : row.name === latestName
+        ? 'LATEST_KNOWN_GOOD_CANDIDATE'
+        : row.name === rollbackCandidateName
+          ? 'ROLLBACK_CHECKPOINT_CANDIDATE'
+          : 'OLDER_REVIEW_CANDIDATE',
+      consumerReferences: [],
+      consumerReferencesProven: false,
+      deletionAuthorized: false,
     })),
   };
 }
@@ -141,6 +161,8 @@ const report = {
     liveCollectionDiskBytes: 0,
     apiVisibleSnapshotBytes: 0,
     apiVisibleSnapshotCount: 0,
+    snapshotMetadataIncompleteCount: 0,
+    snapshotRetentionDispositionCounts: {},
     codebaseLiveDiskBytes: 0,
     codebaseSnapshotBytes: 0,
   },
@@ -171,9 +193,14 @@ try {
       entry.errors.push(`MEMORY:${error.message}`);
     }
     try {
-      entry.snapshots = snapshotSummary(await getJson(`/collections/${encodeURIComponent(name)}/snapshots`));
+      entry.snapshots = snapshotSummary(await getJson(`/collections/${encodeURIComponent(name)}/snapshots`), name, entry.classification);
       report.totals.apiVisibleSnapshotBytes += entry.snapshots.totalBytes;
       report.totals.apiVisibleSnapshotCount += entry.snapshots.count;
+      for (const snapshot of entry.snapshots.snapshots) {
+        const disposition = snapshot.retentionDisposition;
+        report.totals.snapshotRetentionDispositionCounts[disposition] = (report.totals.snapshotRetentionDispositionCounts[disposition] ?? 0) + 1;
+        if (disposition === 'UNCLASSIFIED_METADATA_MISSING_CREATION_TIME') report.totals.snapshotMetadataIncompleteCount += 1;
+      }
       if (entry.classification.startsWith('ACTIVE_') || entry.classification.startsWith('CURRENT_') || entry.classification.startsWith('LEGACY_') || entry.classification.startsWith('DERIVED_') || entry.classification === 'SPARSE_EXPERIMENT' || entry.classification === 'CODEBASE_OTHER') {
         report.totals.codebaseSnapshotBytes += entry.snapshots.totalBytes;
       }
@@ -206,6 +233,8 @@ console.log(JSON.stringify({
   memoryEndpointCount: report.totals.collectionMemoryEndpointAvailable,
   liveCollectionDiskBytes: report.totals.liveCollectionDiskBytes,
   apiVisibleSnapshotBytes: report.totals.apiVisibleSnapshotBytes,
+  snapshotMetadataIncompleteCount: report.totals.snapshotMetadataIncompleteCount,
+  snapshotRetentionDispositionCounts: report.totals.snapshotRetentionDispositionCounts,
   codebaseLiveDiskBytes: report.totals.codebaseLiveDiskBytes,
   codebaseSnapshotBytes: report.totals.codebaseSnapshotBytes,
   largestCollections: report.collections.slice(0, 10).map((row) => ({ name: row.name, classification: row.classification, diskBytes: row.memory?.diskBytes ?? null, snapshotBytes: row.snapshots?.totalBytes ?? null })),
