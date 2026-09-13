@@ -24,15 +24,16 @@ loadAtlasEnv();
 const DATABASE_URL = process.env.DATABASE_URL?.trim();
 const WORKSPACE_ID = process.env.ATLAS_GRAPHIFY_CANARY_WORKSPACE_ID?.trim() ?? '';
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-const fullMode = process.argv.includes('--full');
+const fullModeRequested = process.argv.includes('--full');
+if (fullModeRequested) {
+  throw new Error('GRAPHIFY_COORDINATOR_CANARY_FULL_MODE_BLOCKED_PENDING_STAGE_OWNER_BINDING');
+}
 const limitArg = process.argv.find((arg) => arg.startsWith('--limit='))?.slice('--limit='.length);
 const requestedLimit = Number(limitArg ?? process.env.GRAPHIFY_CANARY_SOURCE_LIMIT ?? '3');
-if (!fullMode && (!Number.isInteger(requestedLimit) || requestedLimit < 1 || requestedLimit > 50)) {
+if (!Number.isInteger(requestedLimit) || requestedLimit < 1 || requestedLimit > 50) {
   throw new Error('GRAPHIFY_COORDINATOR_CANARY_LIMIT_MUST_BE_AN_INTEGER_FROM_1_TO_50');
 }
-const confirmation = fullMode
-  ? 'AUTHORIZE_GRAPHIFY_FULL_WORKSPACE_SOURCE_SELECTION_V1'
-  : requestedLimit === 50
+const confirmation = requestedLimit === 50
   ? 'AUTHORIZE_GRAPHIFY_50_SOURCE_CANARY_V1'
   : 'AUTHORIZE_GRAPHIFY_COMMITTED_BOUNDED_CANARY_V1';
 
@@ -78,13 +79,13 @@ try {
   await acquireCoordinatorLock(client);
   locked = true;
 
-const workspaceRevision = admission.workspaceRevision;
-const rootSources = snapshot.sources.filter((source) => source.repositoryId === 'repo:root');
-const rootRepositoryHead = snapshot.repositories.find((repository) => repository.relativePath === '')?.head;
-if (!rootRepositoryHead || !/^[0-9a-f]{40}$/i.test(rootRepositoryHead)) {
-  throw new Error('GRAPHIFY_COORDINATOR_CANARY_ROOT_REPOSITORY_HEAD_MISSING');
-}
-const selectedSnapshotSources = fullMode ? snapshot.sources : rootSources.slice(0, requestedLimit);
+  const workspaceRevision = admission.workspaceRevision;
+  const rootSources = snapshot.sources.filter((source) => source.repositoryId === 'repo:root');
+  const rootRepositoryHead = snapshot.repositories.find((repository) => repository.relativePath === '')?.head;
+  if (!rootRepositoryHead || !/^[0-9a-f]{40}$/i.test(rootRepositoryHead)) {
+    throw new Error('GRAPHIFY_COORDINATOR_CANARY_ROOT_REPOSITORY_HEAD_MISSING');
+  }
+  const selectedSnapshotSources = rootSources.slice(0, requestedLimit);
   const expectedCount = selectedSnapshotSources.length;
   if (expectedCount === 0) throw new Error('GRAPHIFY_COORDINATOR_CANARY_NO_ROOT_SNAPSHOT_SOURCES');
   const selectedBindings = selectedSnapshotSources.map((source, index) => ({
@@ -124,13 +125,13 @@ const selectedSnapshotSources = fullMode ? snapshot.sources : rootSources.slice(
     parserContractVersion: 'graphify.parser.v1',
     extractionContractVersion: 'graphify.extraction.v1',
     graphAlgorithmRevision: 'graphify.graph.v1',
-    triggerKind: fullMode ? 'CURRENT_WORKSPACE_SOURCE_SELECTION' : 'BOUNDED_COMMITTED_CANARY',
+    triggerKind: 'BOUNDED_COMMITTED_CANARY',
     schedulerRevision: 'atlas.graphify-daily-coordinator.v1',
     environmentRevision: 'operator-authorized-canary',
   });
   executionId = opened.executionId;
   const selection = await recordRepositoryQualifiedSourceSelectionStageV2(client, executionId, workspaceRevision, repositoryBindings, {
-    selectionPolicyRevision: fullMode ? 'graphify-current-workspace-source-selection:v1' : 'committed-canary-fresh-materialization-v1',
+    selectionPolicyRevision: 'committed-canary-fresh-materialization-v1',
   });
   const orderedInventoryBindings = [...bindings].sort((a, b) => a.sourceRef.localeCompare(b.sourceRef));
   const inventoryOutputChecksum = `sha256:${createHash('sha256')
@@ -202,7 +203,7 @@ const selectedSnapshotSources = fullMode ? snapshot.sources : rootSources.slice(
   const row = readback.rows[0];
   const report = {
     gate: 'GRAPHIFY-DAILY-COORDINATOR-01',
-    status: row?.status === 'COMPLETED' && row?.completed_at && Number(row.file_count) === expectedCount && Number(row.completed_stage_count) === 5 ? (fullMode ? 'PROVEN_CURRENT_WORKSPACE_SOURCE_SELECTION' : 'PROVEN_COMMITTED_BOUNDED_CANARY') : 'READBACK_FAILED',
+    status: row?.status === 'COMPLETED' && row?.completed_at && Number(row.file_count) === expectedCount && Number(row.completed_stage_count) === 5 ? 'PROVEN_COMMITTED_BOUNDED_CANARY' : 'READBACK_FAILED',
     executionId,
     workspaceRevision: row?.workspace_revision ?? null,
     workspaceRevisionSource: 'WORKSPACE_REVISION_TOURNAMENT_ADMISSION_RECEIPT',
@@ -219,7 +220,7 @@ const selectedSnapshotSources = fullMode ? snapshot.sources : rootSources.slice(
     completedStageCount: Number(row?.completed_stage_count ?? 0),
     completedAt: row?.completed_at ?? null,
     historicalGraphifyRunsChanged: false,
-    broadGraphifyRun: fullMode,
+    broadGraphifyRun: false,
     canonicalAuthority: false,
     writesPerformed: true,
   };
