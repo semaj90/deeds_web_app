@@ -50,7 +50,7 @@ try {
     throw new Error('SOURCE_AUTHORITY_UNAVAILABLE:no completed bound Graphify owner');
   }
   const result = await pool.query(`
-    SELECT source_ref, source_revision, content_hash, workspace_revision,
+    SELECT source_ref, source_revision, code_source_revision, content_hash, workspace_revision,
            byte_length, parse_status, last_seen_run_id
       FROM public.graphify_files
      WHERE last_seen_run_id = $1
@@ -81,25 +81,37 @@ const rows = graphRows.map((row) => {
   const binding = bindingByRef.get(sourceRef);
   const absolute = safePath(sourceRef);
   if (!absolute || !fs.existsSync(absolute)) {
-    return { sourceRef, status: 'SOURCE_UNAVAILABLE', graphSourceRevision: row.source_revision ?? null, graphContentHash: row.content_hash ?? null };
+    return { sourceRef, status: 'SOURCE_UNAVAILABLE', graphSourceRevisionLegacy: row.source_revision ?? null, graphCodeSourceRevision: row.code_source_revision ?? null, graphContentHash: row.content_hash ?? null };
   }
   if (!binding) {
-    return { sourceRef, status: 'NOT_IN_CURRENT_WORKSPACE', graphSourceRevision: row.source_revision ?? null, graphContentHash: row.content_hash ?? null };
+    return { sourceRef, status: 'NOT_IN_CURRENT_WORKSPACE', graphSourceRevisionLegacy: row.source_revision ?? null, graphCodeSourceRevision: row.code_source_revision ?? null, graphContentHash: row.content_hash ?? null };
   }
   const currentBytes = fs.readFileSync(absolute);
   const currentHash = digest(currentBytes);
   const graphHash = normalizeHash(row.content_hash);
-  const graphRevision = row.source_revision ? normalizeHash(row.source_revision) : null;
+  // `source_revision` is a legacy column that (for this cohort) holds a bare git-blob SHA1
+  // (40 hex chars), never a sha256 content digest -- normalizeHash() blindly prepending
+  // 'sha256:' to it produced a value shaped like a sha256 hash but numerically meaningless,
+  // guaranteeing SOURCE_REVISION_MISMATCH on every row regardless of real content freshness
+  // (confirmed live: content_hash/code_source_revision already match currentContentDigest
+  // exactly for the affected rows). `code_source_revision` is the column the live
+  // `chk` constraint (`graphify_files_code_source_revision_sha256_v2`) actually enforces as
+  // `^sha256:[a-f0-9]{64}$`, and it already carries the correct value -- compare against that
+  // instead. Legacy `source_revision` is still reported (below) for debugging visibility, just
+  // no longer used as the comparison authority.
+  const graphRevision = row.code_source_revision ? normalizeHash(row.code_source_revision) : null;
   const mismatchReasons = [
     ...(currentHash !== graphHash ? ['CONTENT_DIGEST_MISMATCH'] : []),
-    ...(binding.sourceRevision !== graphRevision ? ['SOURCE_REVISION_MISMATCH'] : []),
+    ...(graphRevision !== null && binding.sourceRevision !== graphRevision ? ['SOURCE_REVISION_MISMATCH'] : []),
+    ...(graphRevision === null ? ['CODE_SOURCE_REVISION_MISSING'] : []),
     ...(binding.byteLength !== currentBytes.byteLength ? ['BYTE_LENGTH_MISMATCH'] : []),
   ];
   const exact = mismatchReasons.length === 0;
   return {
     sourceRef,
     status: exact ? 'EXACT_CURRENT_BINDING' : 'CURRENT_BINDING_MISMATCH',
-    graphSourceRevision: row.source_revision ?? null,
+    graphSourceRevisionLegacy: row.source_revision ?? null,
+    graphCodeSourceRevision: row.code_source_revision ?? null,
     currentSourceRevision: binding.sourceRevision,
     graphContentHash: row.content_hash ?? null,
     currentContentDigest: binding.contentDigest,

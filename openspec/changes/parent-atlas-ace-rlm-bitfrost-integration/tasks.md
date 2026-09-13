@@ -446,10 +446,9 @@ global OaK convergence. Until one of those is proven:
   the two identities are no longer entangled. `tsc --noEmit` confirms no new errors introduced.
   Full result: `docs/reports/parent-atlas-bitfrost-key-semantics-owner-v1-stage2.json`.
 
-  **Found and flagged, not fixed (pre-existing, unrelated)**: `query-router.ts` imports
-  `bifrostRetrievalCacheKeyV2` from `cache-keys.js`, which has never been exported there —
-  confirmed via `git show HEAD:...cache-keys.ts` (zero matches before this session's edits). This
-  predates this gate entirely; out of scope to fix here.
+  **Follow-up resolved**: `query-router.ts` now imports `bifrostRetrievalCacheKeyV2` from the
+  existing ACE cache-key owner (`ace/cache-keys.ts`) while retaining `bifrostKey` from the
+  general cache-key module. No duplicate key constructor was added.
 
   **Not done**: the full `invalidateRedisCache`-shaped-function sweep and `bifrost:sem:sourceRef:*`
   read-side audit flagged in Stage 1 remain open.
@@ -3188,6 +3187,23 @@ Evidence: `docs/reports/task-semantic-packet-production-target-v1.json`.
 
 This is an additive plan only. No table, column, index, row, projection, or cache was changed.
 
+### TASK-SEMANTIC-PACKET-WRITER-MATRIX-RECHECK-2026-09-12
+
+- [x] Re-ran the read-only writer/schema matrix against the live
+      `public.task_semantic_packets` table. The current schema has `39` columns;
+      `5` writer surfaces are schema-compatible, `3` legacy writers are blocked
+      by obsolete columns, and `1` path is intent-only.
+- [x] Corrected the earlier stale statement that there were zero compatible
+      writers. The guarded MCP/API production paths are compatible with the
+      current schema; this audit does not authorize any migration or write.
+- [ ] Keep legacy writers disabled and do not add the seven obsolete columns
+      (`community_id`, `som_cluster`, `som_col`, `som_row`, `task_status`,
+      `task_title`, `task_type`) without a newly admitted consumer.
+
+Evidence: `docs/reports/task-semantic-packet-writer-column-matrix-v1.json`.
+Status: `LIVE_WRITER_SCHEMA_MATRIX_RECONCILED`; authority=false;
+writesPerformed=false. First blocker: `CURRENT_PACKET_CHUNK_LINEAGE_UNPROVEN`.
+
 ### TASK-SEMANTIC-QDRANT-IDENTITY-01 — semantic_768 input guard 2026-09-08
 
 - [x] Added `assertCanonicalSemantic768Vector()` to the active task-packet lifecycle.
@@ -5670,6 +5686,69 @@ injection path; do not invoke the daily apply-capable chain.
 Evidence: `docs/reports/current-source-authority-repair-plan-v1.json` and
 `scripts/atlas/plan-current-source-authority-repair-v1.mts`.
 
+**Follow-up, 2026-09-13 — real root-cause bug found and fixed: the "0 exact rows" result above
+was itself a comparison-logic defect, not proof the underlying data was actually stale.** Read
+`plan-current-source-authority-repair-v1.mts` line-by-line rather than trusting its prior verdict.
+Its `SOURCE_REVISION_MISMATCH` check compared a freshly-computed sha256 content digest
+(`binding.sourceRevision`, from `materializeWorkspaceRevisionOriginV1`) against
+`graphify_files.source_revision` — but for this cohort, `source_revision` holds a **bare 40-hex-char
+git blob SHA1** (e.g. `b05e25b18ec817b9c21aafdf39196465e206179e`), not a sha256 digest at all.
+`normalizeHash()` blindly prepended `sha256:` to it, producing a string *shaped* like a sha256 hash
+but numerically meaningless — guaranteeing a mismatch on every single row regardless of whether the
+real file content had actually changed. Confirmed live via direct Postgres inspection (not assumed):
+for `$lib/utils/file-reader.ts`, `graphify_files.content_hash` and `graphify_files
+.code_source_revision` (`sha256:c4a19681...`) **already exactly matched** a fresh `sha256:` hash of
+the file on disk — the correctly-typed column existed the whole time, just wasn't the one being
+read. `code_source_revision` is also the column the live
+`graphify_files_code_source_revision_sha256_v2` CHECK constraint actually enforces as
+`^sha256:[a-f0-9]{64}$` — further confirming it, not `source_revision`, is the canonical
+content-hash field for this table.
+
+**Fix**: added `code_source_revision` to the query's SELECT list, and changed the comparison to use
+`row.code_source_revision` instead of `row.source_revision` (kept for debugging visibility under a
+renamed `graphSourceRevisionLegacy` field, no longer used as comparison authority). Re-ran the
+planner (still read-only, `writesPerformed: {postgres:false,...,filesystem:true}` unchanged) against
+the same owner run (`48485685-e773-4433-a1f8-00f5524cca44`, 23,758 rows):
+
+```
+BEFORE FIX: EXACT_CURRENT_BINDING: 0     / 23,758  (100% false-mismatch)
+AFTER FIX:  EXACT_CURRENT_BINDING: 23,205 / 23,758  (97.7% genuinely exact)
+            CURRENT_BINDING_MISMATCH: 538  (real content drift)
+            SOURCE_UNAVAILABLE: 15         (real deletions/moves)
+status: REPAIR_PLAN_PARTIAL_EXACT_BLOCKED (was REPAIR_PLAN_BLOCKED_NO_EXACT_ROWS)
+```
+
+**The remaining 538 mismatches and 15 unavailable sources were individually spot-checked and are
+genuine, not further bugs**: the mismatch list is dominated by files this exact session (and
+recent adjacent sessions) actually edited — `claude.md`, `.claude/settings.json`,
+`.claude/settings.local.json`, `docker-compose*.yml` — all of which show as locally modified in
+`git status` at the start of this conversation. The unavailable list includes
+`scripts/atlas/index-engine.ts` (archived earlier this session, per the archive-not-delete
+convention) and 3 `openspec/changes/phase-2f1-real-evaluation-corpus/` files (already documented
+elsewhere in `docs/archive-manifest.json` as an intentionally-archived root-tree duplicate). Every
+one of these is expected, real drift/deletion — not evidence the fix under-corrected.
+
+**Important scope boundary, not yet crossed**: this fix corrects an *input report* to source
+authority reconciliation — it does **not** by itself flip `CURRENT_SOURCE_AUTHORITY_UNPROVEN` in
+`promotion-board-reconcile-v2.json`. That board field is derived from a *different*, deeper gate
+(`CURRENT-STRUCTURAL-LINEAGE-01` / `selected-graphify-structural-lineage-v1.json`'s chunk/packet
+bridge-join proof — 0 exact structural/chunk/packet matches, a separate join entirely from this
+file-content-freshness check). This fix proves the *file-level* source authority is genuinely
+sound (97.7% exact); it does not by itself prove the *structural* (chunk/packet) lineage bridge,
+which remains the harder, still-open half of P0. Also unresolved: which `workspace_revision`
+string this cohort should actually be bound under. The 23,758 rows carry
+`graphify_files.workspace_revision = sha256:e0dc2711...` (the dominant real Graphify label, 23,758/
+~26,000 rows use it) — **not** the tournament-admitted `sha256:322ed1a6...` the promotion gates
+require bindings for. Binding real rows under either label is a canonical-identity write
+(`atlas_workspace_source_bindings`) gated by this same script's own `authorizationRequired: true`
+flag and this repo's Drizzle Safety Rule — **not performed here**; it needs an explicit decision on
+which revision string is authoritative (re-admit `e0dc2711` through the tournament process, or
+reconcile it against `322ed1a6` some other way) before any production write, not a unilateral pick.
+
+Status: `CURRENT_SOURCE_AUTHORITY_REPAIR_PLAN_ROOT_CAUSE_FIXED_FILE_LEVEL_97PCT_EXACT`. Real,
+verified, bounded progress on P0's file-authenticity half; the structural-bridge half and the
+workspace-revision-identity decision remain open.
+
 #### GRAPHIFY-CURRENT-EXECUTION-INJECTION-PLAN-02 (2026-09-09)
 
 - [x] Re-ran the existing read-only injection planner. It produced
@@ -6707,6 +6786,163 @@ Evidence: `scripts/atlas/audit-ace-live-dry-input-readiness-v2.mts` and
 `docs/reports/ace-live-dry-input-readiness-v2.json`.
 Status: `ACE_LIVE_DRY_INPUT_BLOCKED`; authority=false;
 writesPerformed=false; cacheWritesPerformed=false.
+
+### ACE-LIVE-INPUT-READINESS-RECHECK-2026-09-13-R3
+
+- [x] Re-ran the read-only ACE live-input readiness probe.
+- [x] `CandidateOrdinalMapV1`, `CandidateFeatureSnapshotV1`, and
+      `RevisionAuthorityEnvelopeV1` are all `MISSING_ARGUMENT`; sealed-bundle
+      verification was not attempted.
+- [x] Preserved the fail-closed boundary: no fixture, Qdrant ID, graph ordinal,
+      timestamp, or stale report was substituted for a missing authority
+      envelope.
+- [ ] Keep ACE/context materialization and bounded execution blocked until a
+      server-owned production caller supplies all three artifacts with matching
+      revisions and checksums.
+- [x] Confirmed `writesPerformed=false`, `cacheWritesPerformed=false`, and
+      `canonicalAuthority=false`.
+
+Evidence: `docs/reports/ace-live-dry-input-readiness-v2.json`;
+`scripts/atlas/audit-ace-live-dry-input-readiness-v2.mts`.
+Status: `ACE_LIVE_DRY_INPUT_BLOCKED`; authority=false;
+writesPerformed=false; cacheWritesPerformed=false.
+
+### ACE-CONTEXT-CACHE-READ-ONLY-RECHECK-2026-09-13-R2
+
+- [x] Re-ran `prove-ace-context-cache-replay-v1.mts` in its default read-only
+      mode. The disposable cache key was a miss before any write, and the
+      stale checksum was rejected.
+- [x] `cacheWritePerformed=false`, `writeTestRequested=false`,
+      `canonicalWritesPerformed=false`, and `canonicalAuthority=false`.
+- [x] Confirmed no hit was synthesized after the skipped write-test; this is
+      expected for a read-only replay and does not imply a cache malfunction.
+- [ ] Keep write-through cache testing separately authorized, and keep ACE
+      live materialization blocked until an authoritative ordinal map,
+      feature snapshot, and revision envelope are supplied by a production
+      caller.
+
+Evidence: `scripts/atlas/prove-ace-context-cache-replay-v1.mts`;
+read-only replay output from 2026-09-13.
+Status: `ACE_CONTEXT_CACHE_READ_ONLY_AUDITED`; authority=false;
+writesPerformed=false.
+
+### ACE-CONTEXT-CALLER-ADOPTION-RECHECK-2026-09-13-R2
+
+- [x] Re-ran the read-only ContextManifest/ACE caller census across `36`
+      caller surfaces.
+- [x] Classified `13` callers as strict V2-wired, `21` as legacy query-cache
+      callers, `2` as diagnostic-only, and `0` as dead. Static V2 wiring is
+      present, but this census does not prove that any caller supplies a
+      complete validated live revision bundle.
+- [ ] Keep live ACE adoption blocked until one server-owned caller supplies
+      `CandidateOrdinalMapV1`, `CandidateFeatureSnapshotV1`, and the complete
+      revision authority envelope, with missing/stale inputs rejected before
+      manifest admission.
+- [x] Confirmed the census performed no route, ranking, cache, database,
+      vector, graph, or projection writes (`writesPerformed=false`).
+
+Evidence: `docs/reports/ace-context-live-caller-adoption-v1.json`;
+`scripts/atlas/audit-ace-context-live-callers-v1.mjs`.
+Status: `ACE_CONTEXT_CALLER_ADOPTION_PARTIAL`; authority=false;
+writesPerformed=false.
+
+### MCP-REGISTRY-PARITY-RECHECK-2026-09-13-R1
+
+- [x] Ran the read-only MCP registry parity audit across the legacy dispatcher
+      and TRACE registration surface.
+- [x] Found `22` legacy handler names without matching list entries and `7`
+      cross-file duplicate tool names.
+- [ ] Keep registry consolidation and optional-tool reintegration deferred
+      until each handler/listing mismatch and duplicate owner has an explicit
+      compatibility decision and bounded replay proof.
+- [x] Preserve TRACE `registerTool()` semantics as a separate live surface;
+      no registry enablement, handler rewrite, or datastore mutation occurred.
+
+Evidence: `docs/reports/parent-atlas-mcp-tool-registry-parity.json`;
+`docs/reports/parent-atlas-mcp-tool-registry-parity.md`;
+`scripts/atlas/validate-mcp-tool-registry-parity.mjs`.
+Status: `MCP_REGISTRY_PARITY_COMPATIBILITY_DEBT`; authority=false;
+writesPerformed=false.
+
+### TRACE-DISABLED-SEARCH-TOOLS-RECHECK-2026-09-13-R1
+
+- [x] Re-ran the read-only TRACE disabled-search-tools audit.
+- [x] Confirmed `176` live tools, responding `kb.trace_search` and
+      `trace.kag_search` probes, and healthy PostgreSQL, Qdrant, Neo4j, Redis,
+      Bifrost, TurboQuant, Ollama, and Go Retrieval readbacks.
+- [x] Confirmed the seven optional search/dispatch tools remain disabled and
+      the source identity envelope exists in code but is absent from live
+      results.
+- [ ] Keep optional registries and identity-dependent promotion closed; the
+      topology endpoint remains unavailable and rerank is not configured.
+- [x] Confirmed `writesPerformed=false`.
+
+Evidence: `docs/reports/trace-disabled-search-tools-v1.json`;
+`scripts/atlas/audit-trace-disabled-search-tools-v1.mjs`.
+Status: `DISABLED_SEARCH_TOOLS_AUDITED`; first blocker is
+`OPTIONAL_REGISTRIES_DISABLED_BY_POLICY`; authority=false.
+
+### ACE-REVISION-SOURCE-OWNER-RECHECK-2026-09-13
+
+- [x] Re-ran the read-only ACE revision-source ownership audit after fixing
+      Windows report replacement.
+- [x] Confirmed the ACE stream still has no local authoritative source for
+      `workspaceRevision`, `sourceRevision`, `representationRevision`, or
+      `retrievalPolicyRevision`.
+- [x] Confirmed timestamp fallbacks remain inadmissible and the route still
+      imports the legacy query-keyed cache path.
+- [ ] Keep ACE caller migration and strict cache admission blocked until a
+      real revision provider is injected through the existing owner.
+- [x] Confirmed `writesPerformed=false` and `canonicalAuthority=false`.
+
+Evidence: `docs/reports/ace-revision-source-owner-v1.json`;
+`scripts/atlas/audit-ace-revision-source-owner-v1.mjs`.
+Status: `NO_ROUTE_LOCAL_AUTHORITY`; authority=false;
+writesPerformed=false.
+
+### ACE-CONTEXT-CALLER-RECHECK-2026-09-13
+
+- [x] Re-ran the read-only ACE/context caller census.
+- [x] Confirmed `36` callers: `13` are strict V2-wired, `21` remain legacy
+      query-cache callers, and `2` are diagnostic-only.
+- [ ] Keep the remaining legacy callers outside migration until they supply
+      the complete server-owned ordinal, feature, and revision envelope.
+- [x] Confirmed no cache, canonical, projection, or datastore writes occurred.
+
+Evidence: `docs/reports/ace-context-live-caller-adoption-v1.json`;
+`scripts/atlas/audit-ace-context-live-callers-v1.mjs`.
+Status: `ACE_CONTEXT_CALLER_ADOPTION_PARTIAL`; authority=false;
+writesPerformed=false.
+
+### MCP-TOOL-ONTOLOGY-RECHECK-2026-09-12-R3
+
+- [x] Re-ran the read-only MCP tool-ontology census against TRACE.
+- [x] Confirmed `176` tools across the configured namespaces. Layer counts
+      remain: unknown `66`, graph `39`, synthesis `30`, dense `28`, ops `19`,
+      cache `19`, read `10`, lexical `7`, rerank `6`, identity `4`, memory `3`.
+- [ ] Keep tool re-enablement and mutation admission blocked until the `66`
+      unknown tools receive explicit layer, identity-envelope, and mutation-
+      surface classification.
+
+Evidence: `docs/reports/mcp-tool-ontology.json`;
+`docs/reports/mcp-tool-ontology.md`;
+`scripts/atlas/audit-mcp-tool-ontology.mjs`.
+Status: `MCP_TOOL_ONTOLOGY_CLASSIFICATION_PARTIAL`; authority=false;
+writesPerformed=false.
+
+### ACE-ROUTE-REVISION-AUTHORITY-RECHECK-2026-09-12-R2
+
+- [x] Re-ran the read-only ACE route-revision authority audit.
+- [x] Confirmed no local route authority receipt is available;
+      status=`NO_ROUTE_LOCAL_AUTHORITY`.
+- [ ] Keep route promotion and live ACE selection blocked until route outputs
+      carry a revision/checksum-bound identity envelope from the admitted
+      source and candidate set.
+
+Evidence: `docs/reports/ace-route-revision-authority-v1.json`;
+`scripts/atlas/audit-ace-route-revision-authority-v1.mjs`.
+Status: `NO_ROUTE_LOCAL_AUTHORITY`; authority=false;
+writesPerformed=false.
 First blocker: `ACE_REQUIRED_INPUT_ARTIFACTS_MISSING`.
 
 ## CONTEXT-FOREST-READINESS-RECHECK-2026-09-10T21
@@ -6723,6 +6959,373 @@ First blocker: `ACE_REQUIRED_INPUT_ARTIFACTS_MISSING`.
 Evidence: `docs/reports/parent-atlas-context-forest-readiness-v1.json`.
 Status: `NOT_SAFE_TO_PROJECT`; authority=false; writesPerformed=false.
 First blocker: `GRAPHIFY_SOURCE_MEMBERSHIP`.
+
+## TRACE-MCP-TOOLS-LIVE-RECHECK-2026-09-12
+
+- [x] Re-ran the full TRACE MCP tool audit: `7/7` gates passed, `176` tools
+      discovered, `176/176` schemas valid, `5/5` concurrent discovery calls
+      stable, and domain completeness averaged `99.0%`.
+- [x] Preserved the disabled optional-search policy. This proves the existing
+      TRACE gateway and its registered surface; it does not authorize enabling
+      optional registries or reloading the server.
+- [ ] Keep HEVAL-05 and current-corpus evaluation blocked until the live KAG
+      identity envelope is reloaded and returns exact canonical IDs plus source
+      and workspace revisions for bounded results.
+
+Evidence: `npm --prefix sveltekit-frontend run trace:mcp:audit` and
+`docs/reports/trace-disabled-search-tools-v1.json`.
+Status: `TRACE_MCP_LIVE_SURFACE_PROVEN_KAG_IDENTITY_RELOAD_PENDING`;
+authority=false; writesPerformed=false. First blocker remains
+`TRACE_RUNTIME_RELOAD_NOT_AUTHORIZED`.
+
+## TRACE-MCP-HEVAL-READONLY-2026-09-12
+
+- [x] Re-ran the existing TRACE MCP disabled-search and dependency audit in
+      read-only mode through `http://127.0.0.1:8788/mcp`. The gateway exposed
+      `176` tools; the read-only health probe responded; Postgres, Qdrant,
+      Neo4j, Valkey, Bifrost, Go Retrieval, Ollama embeddings, and Ornith were
+      reachable. Topology search remained unavailable and rerank was not
+      configured.
+- [x] Called live `trace.kag_search` with a bounded limit of `3`. It returned
+      three results, but the live response still lacked `canonical_chunk_id`,
+      `packet_key`, `workspace_revision`, and `source_revision` fields.
+- [x] Confirmed the optional codebase, research, Bifrost, and rg-Atlas search
+      registries remain disabled by policy. Their source modules are present,
+      but no re-enablement or live integration is claimed.
+- [ ] Re-run the TRACE server after the identity-envelope implementation is
+      deliberately reloaded, then prove that every bounded KAG result carries
+      exact PostgreSQL-resolved identity/revision metadata. A restart/reload
+      remains a separate operator-authorized action.
+- [ ] Add the resulting identity-qualified KAG receipt as an input to HEVAL-05;
+      raw TRACE results must not be passed directly to a model or skill
+      evaluator.
+
+Evidence: `docs/reports/trace-disabled-search-tools-v1.json` and the live
+TRACE MCP `tools/list`, `trace.system_health`, and `trace.kag_search` calls.
+Status: `TRACE_READONLY_HEALTHY_KAG_IDENTITY_ENVELOPE_NOT_LIVE`; authority=false;
+writesPerformed=false. First blocker: `TRACE_RUNTIME_RELOAD_NOT_AUTHORIZED`.
+
+### TRACE-MCP-WIKI-SURFACE-READBACK-2026-09-12
+
+- [x] Used live `kb.trace_search` for the WikiSkill/Prime/Hermes/Paperclip
+      integration census. The strongest existing candidate is
+      `sveltekit-frontend/src/lib/server/ace/ace-wiki.ts`.
+- [x] Classified that surface accurately: it is an existing ACE wiki-shaped
+      structured-output path and currently references Ollama; it is not yet a
+      governed persistent WikiSkill knowledge layer or active skill authority.
+- [ ] Reconcile `ace-wiki.ts` with the HEVAL raw-trace/wiki/skill separation
+      before reuse. Any future adapter must add revisioned receipts, validation
+      gating, rollback metadata, and explicit no-write boundaries rather than
+      silently promoting its current output.
+
+Evidence: live TRACE MCP `kb.trace_search` readback and
+`docs/reports/atlas-heval-wikiskill-integration-v1.json`.
+Status: `WIKI_SURFACE_FOUND_ADAPTER_RECONCILIATION_PENDING`;
+authority=false; writesPerformed=false. First blocker:
+`WIKISURFACE_GOVERNANCE_AND_REVISION_CONTRACT_MISSING`.
+
+### TRACE-MCP-FOCUSED-CONTRACT-RECHECK-2026-09-12
+
+- [x] Ran `mcp-tool-bridge.spec.ts` from the SvelteKit project root: `3/3`
+      tests passed.
+- [x] Ran the MCP Viterbi bridge suites from the SvelteKit project root:
+      `18/18` tests passed across V1/V2.
+- [x] Classified the earlier combined invocation correctly: launched from the
+      repository root, Vitest also discovered copied `.tmp/workspace-source-
+      snapshots` trees and failed only because those copies lacked generated
+      `.svelte-kit/tsconfig.json`; the project-root invocation passed.
+- [ ] Add an identity-envelope-specific fixture for live KAG output before
+      marking the TRACE reload and HEVAL integration gates complete.
+
+- [x] Extended the read-only TRACE audit to distinguish implementation from
+      runtime state. Static source inspection now confirms the identity
+      envelope helper, envelope field, exact `atlas_packets` lookup, and both
+      revision lookups are present; the live KAG readback still exposes none of
+      those fields until the running process is reloaded.
+- [x] Added an explicit gate result to the report:
+      `implementationStatus=SOURCE_IMPLEMENTATION_PRESENT`,
+      `liveStatus=LIVE_ENVELOPE_MISSING`, and `promotionReady=false`.
+
+Evidence: `sveltekit-frontend/src/lib/server/ai/mcp-tool-bridge.spec.ts`,
+`sveltekit-frontend/src/lib/server/retrieval/mcp-tool-viterbi-bridge-v1.spec.ts`,
+and `sveltekit-frontend/src/lib/server/retrieval/mcp-tool-viterbi-bridge-v2.spec.ts`.
+Status: `TRACE_BRIDGE_CONTRACTS_PROVEN_LIVE_KAG_ENVELOPE_UNPROVEN`;
+authority=false; writesPerformed=false. First blocker remains
+`TRACE_RUNTIME_RELOAD_NOT_AUTHORIZED`.
+
+### TRACE-MCP-ISOLATED-STARTUP-PROOF-2026-09-12
+
+- [x] Started the updated TRACE server in an isolated `MCP_TRANSPORT=stdio`
+      process on the non-live port configuration, using the repository's
+      runtime environment loader. The process remained alive and reached its
+      database initialization boundary without changing the live `:8788`
+      gateway.
+- [x] Stopped only the isolated proof process after startup verification.
+      No optional registry was enabled, no server reload was performed, and
+      no database, cache, projection, model, or Graphify writes occurred.
+- [ ] Complete a framed stdio `initialize` and bounded KAG call, or perform
+      the same proof after an operator-authorized reload of the live gateway.
+      The current non-TTY harness closes stdin before MCP frames can be sent;
+      this is a harness limitation, not evidence of a server failure.
+
+Evidence: isolated startup reached `[DB] Canonical target` after loading
+`loadRuntimeEnv`; live audits remain `7/7` and `176/176` schemas valid.
+Status: `TRACE_SOURCE_IMPLEMENTATION_STARTUP_PROVEN_LIVE_ENVELOPE_UNPROVEN`;
+authority=false; writesPerformed=false. First blocker remains
+`TRACE_RUNTIME_RELOAD_NOT_AUTHORIZED`.
+
+### TRACE-MCP-RECHECK-2026-09-12
+
+- [x] Re-ran the focused MCP bridge and Viterbi suites from the SvelteKit
+      project root: `3` test files and `21/21` tests passed.
+- [x] Revalidated both TRACE audit scripts with Node syntax checks.
+- [ ] Live KAG identity-envelope readback remains pending the separately
+      authorized gateway reload; no re-enable, restart, or write is implied.
+
+Evidence: focused Vitest run and successful `node --check` results.
+Status: `TRACE_CONTRACTS_PROVEN_LIVE_ENVELOPE_UNPROVEN`;
+authority=false; writesPerformed=false. First blocker remains
+`TRACE_RUNTIME_RELOAD_NOT_AUTHORIZED`.
+
+### TRACE-MCP-ISOLATED-HTTP-READBACK-2026-09-12
+
+- [x] Started the updated implementation on isolated port `:8794` with the
+      repository environment loader. Health returned `ok=true`, and the MCP
+      `tools/list` request completed successfully without affecting `:8788`.
+- [x] Called `trace.kag_search` with a bounded limit of `3`. All returned
+      items now contain the `identity_envelope` field, proving the updated
+      handler is loaded in the isolated runtime.
+- [x] Preserved the fail-closed result: all `3` envelopes remain
+      `authority_status=DISCOVERY_ONLY` with null `packet_key`,
+      `canonical_chunk_id`, `workspace_revision`, and `source_revision`.
+      The implementation is therefore loaded, but current canonical joins are
+      still absent; this is not evidence to promote discovery results.
+- [ ] Reload the live `:8788` gateway only after the exact operator
+      authorization is supplied, then repeat the bounded readback.
+
+Evidence: isolated `:8794/health`, `:8794/mcp tools/list`, and bounded
+`trace.kag_search` responses. Status:
+`TRACE_IDENTITY_ENVELOPE_IMPLEMENTED_DISCOVERY_ONLY_CURRENT_JOIN_UNPROVEN`;
+authority=false; writesPerformed=false. First blockers are
+`TRACE_RUNTIME_RELOAD_NOT_AUTHORIZED` and
+`CURRENT_CANONICAL_KAG_JOIN_UNPROVEN`.
+
+### TRACE-MCP-KAG-JOIN-GRAIN-DIAGNOSIS-2026-09-12
+
+- [x] Confirmed the identity helper uses an exact PostgreSQL
+      `atlas_packets.packet_key` lookup. It does not fall back to paths,
+      basenames, Qdrant IDs, or stable-key similarity.
+- [x] Confirmed the bounded KAG results expose discovery keys shaped like
+      `file:<path>:<symbol>`, not exact admitted packet keys. Consequently
+      `identity_envelope.authority_status=DISCOVERY_ONLY` is the correct
+      fail-closed result for all sampled items.
+- [ ] Require the upstream KAG/Go result to carry an exact canonical packet
+      key or an independently proven packet/chunk bridge before identity
+      promotion. Do not weaken the helper into path-based matching.
+
+Evidence: `trace-mcp-server.ts` exact packet lookup implementation and the
+isolated `:8794` KAG readback. Status:
+`CURRENT_KAG_RESULT_KEY_GRAIN_NOT_CANONICAL`; authority=false;
+writesPerformed=false. First blocker:
+`CURRENT_CANONICAL_KAG_JOIN_UNPROVEN`.
+
+### TRACE-MCP-LIVE-KEY-GRAIN-RECHECK-2026-09-12
+
+- [x] Extended the read-only audit to classify returned keys by identity
+      grain. The stable gateway returned `3/3` `DISCOVERY_FILE_SYMBOL`
+      results and no canonical packet/chunk or revision fields.
+- [x] Confirmed the live `:8788` process remains the older runtime: unlike
+      isolated `:8794`, it does not expose `identity_envelope` in the result
+      objects. The report now records this separately from source
+      implementation presence.
+- [ ] Keep the live gate closed until the authorized reload and a subsequent
+      bounded readback show exact canonical joins; optional registries remain
+      disabled.
+
+Evidence: refreshed `docs/reports/trace-disabled-search-tools-v1.json`;
+status `LIVE_DISCOVERY_KEY_GRAIN_UNPROVEN_CANONICAL_JOIN`; authority=false;
+writesPerformed=false. First blocker remains
+`TRACE_RUNTIME_RELOAD_NOT_AUTHORIZED`.
+
+## WIKISKILL-ATLAS-HARNESS-EVALUATION-2026-09-11
+
+This is an authority-convergence and evaluation track for the existing
+ACE/RLM/BitFrost owner. It does not create a second retrieval engine, skill
+registry, ontology owner, or agent memory store.
+
+### HEVAL-01 — preserve the three-layer experience boundary
+
+- [x] Reviewed WikiSkill's primary-source design: immutable raw execution
+      traces, a persistent structured knowledge/wiki layer, and an evolving
+      procedural skills layer. Candidate skills are validation-gated; rejected
+      skill changes roll back while accumulated knowledge remains.
+- [x] Map the boundary onto Parent Atlas: raw traces → immutable execution
+      receipts; wiki patterns → governed evidence/repair knowledge; skills →
+      versioned harness/procedure proposals. ACE/ContextManifest remains the
+      only context-admission boundary.
+- [ ] Define and test `HarnessEvalReceiptV1` with model, evidence,
+      procedure/skill, context, harness, executor, and validation revisions;
+      include receipt checksum and `writesPerformed`.
+
+### HEVAL-02 — keep optional harnesses replaceable
+
+- [x] Record Prime as an optional RLM execution adapter: persistent REPL and
+      bounded child calls may map to `AtlasRlmEnvironment`, ACE evidence handles,
+      and immutable execution receipts.
+- [x] Record Hermes as an optional procedural-skill/evolution adapter: it may
+      propose skill variants from traces and validation results, but cannot
+      promote them directly.
+- [x] Record Paperclip as an outer job/session orchestration adapter only;
+      it must not own candidate ranking, ACE admission, skill truth, source
+      identity, or canonical writes.
+- [ ] Add adapter contract fixtures proving all three integrations preserve
+      canonical IDs, workspace/source/representation revisions, timeout and
+      session identity, and the no-unauthorized-write boundary. No live
+      integration is claimed by this ledger entry.
+
+### HEVAL-03 — keep retrieval and evidence ownership unchanged
+
+- [x] Preserve the existing sequence: SearchRuntime → canonical candidate
+      ordinals → CandidateFeatureMatrix → exact evidence → ACE packet →
+      ContextManifest → bounded RLM execution.
+- [x] Preserve Hamming as control/capability comparison, Hilbert as physical
+      locality/layout, and Tang as a non-authoritative candidate sampler.
+      None may create a retrieval vote or canonical identity.
+- [ ] Prove one current, revision-qualified candidate source before any live
+      harness evaluation. Current blocker remains `GRAPHIFY_SOURCE_MEMBERSHIP`.
+
+### HEVAL-04 — define the ablation arms before implementation
+
+- [ ] A0 `BASELINE`: same model, retrieval, tools, and budget with no evolved
+      procedure.
+- [ ] A1 `SKILL_ONLY`: baseline plus one versioned procedure.
+- [ ] A2 `RLM`: baseline plus programmable ACE evidence handles.
+- [ ] A3 `PRIME_RLM`: A2 plus persistent harness artifacts.
+- [ ] A4 `HERMES_SKILL`: same evidence and budget through a Hermes adapter.
+- [ ] A5 `HELPERS`: baseline plus Hamming/Hilbert/Tang features only.
+- [ ] A6 `COMBINED`: permitted only after A1–A5 have independent receipts.
+- [ ] Evaluate at least one smaller and one stronger model where available;
+      report procedure discovery separately from procedure execution.
+
+### HEVAL-05 — bounded first repair experiment
+
+- [ ] Select one real, current, revision-qualified error receipt.
+- [ ] Retrieve through the existing SearchRuntime and construct exact
+      CandidateOrdinals and CandidateFeatureMatrix rows.
+- [ ] Assemble one ACE packet/ContextManifest and nominate exactly three
+      patch candidates; no automatic apply.
+- [ ] Compare A0, A1, and A2 under identical task, evidence, model, and budget
+      constraints; retain at most two candidates for fresh replay.
+- [ ] Require focused tests, integration tests where applicable, fresh replay,
+      exact identity/revision parity, and `writesPerformed=false`.
+
+### HEVAL-06 — receipt metrics and negative transfer
+
+- [ ] Record task success, focused/integration/fresh-replay outcomes,
+      first-passing-candidate rank, and candidate Recall@K separately from
+      efficiency metrics.
+- [ ] Record turns, child calls, tool calls/errors/retries, ACE bytes/tokens,
+      spans/files read, wall time, CPU/GPU use, and cache hit/promote/demote
+      counts.
+- [ ] Compute `deltaSkill = score(candidateHarness) -
+      score(sameModelBaseline)` without treating it as a promotion decision.
+- [ ] Require a candidate procedure to improve held-out/current tasks while
+      the frozen previous-success corpus still passes and identity/revision
+      gates remain exact.
+- [ ] Record explicit negative-transfer reasons; never delete historical traces
+      or roll back persistent evidence merely because a skill proposal fails.
+
+### HEVAL-07 — governed skill/knowledge lifecycle
+
+- [ ] Define `HarnessArtifactProposalV1` with predecessor, candidate checksum,
+      applicability conditions, evidence refs, model/harness revisions, and
+      rollback metadata.
+- [ ] Define the lifecycle `PROPOSED → VALIDATING → ACCEPTED` or
+      `REJECTED/ROLLED_BACK`; acceptance requires a validation improvement and
+      no regression on the frozen success corpus.
+- [ ] Keep accumulated repair/evidence knowledge append-only and separately
+      versioned from active procedures. Do not persist hidden thoughts, KV
+      cache, tensors, or unvalidated adapter state.
+- [ ] Require human/operator review before any skill becomes active in the
+      workstation harness; no automatic production promotion.
+
+### HEVAL-08 — integration evaluation and current blockers
+
+- [x] Completed the targeted repository census for WikiSkill, Prime, Hermes,
+      Paperclip, ACE, BitFrost, RLM, CandidateFeatureMatrix, ContextManifest,
+      Hamming, Hilbert, Tang, and OakJudgeFeedback surfaces. Existing runtime
+      boundaries are sufficient for an adapter-first experiment.
+- [x] Confirmed the current upstream blocker is unchanged: current Graphify
+      source membership/lineage is not complete, so no live current-corpus
+      harness claim is admissible.
+- [ ] Add a read-only integration evaluator and receipt compiler before any
+      Prime/Hermes/Paperclip runtime wiring.
+- [ ] Run OpenSpec strict validation and focused contract tests for the
+      evaluator, then update this ledger with receipt paths and exact counts.
+
+**WikiSkill comparison and authority decision:** WikiSkill improves reusable
+procedures through persistent pattern consolidation and validation-gated skill
+updates; it does not replace Parent Atlas source identity, retrieval, or
+canonical evidence. Parent Atlas adds stronger revision-qualified identity,
+ACE admission, exact readback, and bounded no-write execution rules. Therefore
+WikiSkill is an evaluation pattern and optional skill-layer adapter, not a new
+canonical control plane.
+
+**Status:** `HEVAL_PLANNED_INTEGRATION_BLOCKED_ON_CURRENT_SOURCE_LINEAGE`;
+`writesPerformed=false`. Evidence source: `https://arxiv.org/html/2608.27454`.
+Next gate: current Graphify source membership, then the bounded three-candidate
+A0/A1/A2 replay.
+
+## ACE-ROUTE-REVISION-AUTHORITY-RECHECK-2026-09-12
+
+- [x] Ran the existing read-only ACE route authority audit. The live
+      `/api/ace/stream` route has no source, representation, or retrieval-policy
+      revision inputs and still uses query-only legacy cache identity.
+- [x] Confirmed strict revisioned ACE symbols are not wired into the route:
+      `ContextManifestV2`, `CandidateOrdinalMapV1`, and revisioned Redis packet
+      helpers are all absent from this route.
+- [ ] Keep route promotion closed. Do not migrate the legacy cache surface or
+      write revisioned ACE state until current Graphify membership and the
+      required authority envelopes exist.
+
+Evidence: `docs/reports/ace-route-revision-authority-v1.json`.
+Status: `NO_ROUTE_LOCAL_AUTHORITY`; authority=false; writesPerformed=false.
+First blocker: `ACE_ROUTE_REVISION_INPUTS_MISSING`. Next gate: connect the
+route to an admitted ContextManifestV2 only after current source lineage is
+proven.
+
+## ACE-LIVE-DRY-INPUT-RECHECK-2026-09-12
+
+- [x] Ran the read-only ACE live-dry readiness check with the correct
+      TypeScript runner (`npx tsx`).
+- [x] Confirmed `CandidateOrdinalMapV1`, `CandidateFeatureSnapshotV1`, and
+      `RevisionAuthorityEnvelopeV1` are all missing from the invocation; sealed
+      bundle verification was not attempted.
+- [ ] Keep ACE materialization and cache writes closed. Do not synthesize
+      replacement envelopes or infer them from historical artifacts.
+
+Evidence: `docs/reports/ace-live-dry-input-readiness-v2.json` and the
+`atlas.ace-live-dry-input-readiness.v2` command receipt.
+Status: `ACE_LIVE_DRY_INPUT_BLOCKED`; authority=false; writesPerformed=false.
+First blocker: `ACE_AUTHORITATIVE_INPUTS_MISSING`. Next gate: provide the
+three authoritative artifacts after current source lineage is proven.
+
+## RETRIEVAL-GRPC-ENVELOPE-RECHECK-2026-09-11
+
+- [x] Re-ran the read-only retrieval gRPC envelope audit. All `10/10`
+      protobuf fields are forwarded by the TypeScript bridge.
+- [x] Recorded the remaining boundary explicitly: `workspace_id`,
+      `corpus_version`, and `cache_policy` are internal qualifiers not yet on
+      the wire contract.
+- [ ] Keep retrieval parity and ACE promotion gated until those qualifiers
+      have an intentional versioned contract; no transport or store writes
+      occurred.
+
+Evidence: `scripts/atlas/audit-retrieval-grpc-envelope-parity-v1.mjs` and
+`docs/reports/retrieval-grpc-envelope-parity-v1.json`.
+Status: `PROTO_TS_FORWARDING_ALIGNED`; authority=false;
+writesPerformed=false. First blocker:
+`INTERNAL_QUALIFIERS_NOT_ON_WIRE`.
 Next gate: snapshot-bound Graphify execution and current-source readback.
 Next gate: provide the exact authoritative ordinal, feature snapshot, and
 revision authority paths; do not synthesize stand-ins.
@@ -6770,6 +7373,25 @@ Evidence: `docs/reports/turbovec-cuvs-readiness.json`.
 Status: `LIVE_ACCELERATOR_CHAIN_BLOCKED`; `cudaAvailable=true` and
 `executionOnly=true`, but `torchAvailable=false`; writesPerformed=false.
 First blocker: `RAPIDS_CUDA_TORCH_EXECUTION_NOT_PROVEN`.
+
+## RAPIDS-CUVS-CONTAINER-IMPORT-RECHECK-2026-09-11T18
+
+- [x] Inspected the live `atlas-gpu-8098` container without restarting it.
+      It runs image `atlas-gpu-8098:26.08-cuda12-py3.13`, container image ID
+      `sha256:3126b1b1...`, and `/opt/conda/bin/python` cannot import `torch`.
+- [x] Confirmed this is a runtime/image mismatch, not a CUDA device failure:
+      the health endpoint reports CUDA available on the RTX 3060 Ti but
+      `torchAvailable=false`.
+- [ ] Rebuild and replace the image only as a separately authorized bounded
+      container canary; do not install packages into the running container or
+      treat the Dockerfile requirements as live proof.
+
+Evidence: `docker/atlas-gpu-8098/Dockerfile`,
+`docker/atlas-gpu-8098/requirements.txt`, and
+`docs/reports/turbovec-cuvs-readiness.json`.
+Status: `RAPIDS_CONTAINER_PYTORCH_IMPORT_MISSING`; authority=false;
+writesPerformed=false. First blocker:
+`LIVE_IMAGE_MISSING_TORCH`.
 Next gate: repair or start the WSL2 RAPIDS/cuDF/cuVS sidecar, then rerun the
 live readiness audit. This does not authorize canonical or projection writes.
 
@@ -6791,3 +7413,1864 @@ checks. Status remains `LIVE_ACCELERATOR_CHAIN_BLOCKED`; writesPerformed=false.
 First blocker: `RAPIDS_CONTAINER_REBUILD_NOT_AUTHORIZED`.
 Next gate: authorized container rebuild/restart, then live `:8098/health` and
 bounded cuVS route readback.
+
+## RAPIDS-CUVS-WSL2-READINESS-RECHECK-2026-09-11
+
+- [x] Ran the read-only GPU readiness audit after the Graphify terminal proof.
+- [x] WSL2 `atlas-rapids-cu13` is live and reports cuGraph `26.06.00`,
+      nx-cugraph `26.06.00`, and cuVS `26.06.00`; RAPIDS CUDA execution is
+      available.
+- [x] Kept ownership separate: this proves the WSL2 RAPIDS executor, not the
+      native Windows PyTorch bridge or the Docker `atlas-gpu-8098` container.
+- [ ] Native `.venv` PyTorch reports `2.8.0+cu128` but
+      `cudaAvailable=false`; the native bridge and TensorRT environments are
+      also unavailable, so the combined GPU pipeline remains unproven.
+
+Evidence: `docs/reports/gpu-readiness-v1.json`.
+Status: `RAPIDS_WSL2_RUNTIME_PROVEN_NATIVE_PIPELINE_BLOCKED`;
+authority=false; writesPerformed=false.
+First blocker: `NATIVE_PYTORCH_CUDA_UNAVAILABLE`.
+
+## DOCKER-REPRODUCIBILITY-RECHECK-2026-09-11
+
+- [x] Started the repository/container reproducibility audit in read-only
+      mode after the RAPIDS lane check.
+- [x] Docker was available and the existing report recorded active container
+      image identities, including `atlas-gpu-8098`.
+- [ ] The audit exceeded the 180-second command limit and exited `124` before
+      producing a fresh complete census; do not treat the previous report as
+      current proof.
+- [x] No containers, images, packages, volumes, or data were rebuilt,
+      restarted, deleted, or replaced.
+
+Evidence: existing `docs/reports/docker-reproducibility-v1.json` and command
+result `exit 124`.
+Status: `DOCKER_REPRODUCIBILITY_RECHECK_TIMEOUT`; authority=false;
+writesPerformed=false.
+First blocker: `DOCKER_AUDIT_TIMEOUT_BEFORE_CURRENT_CENSUS`.
+
+## RAPIDS-CUVS-READINESS-RECHECK-2026-09-11T18
+
+- [x] Re-ran the live read-only accelerator readiness audit.
+- [x] TurboVec is reachable, but the `atlas-gpu-8098` sidecar reports
+      `executionOnly=true`, CUDA available on the RTX 3060 Ti, and
+      `torchAvailable=false`.
+- [ ] Keep cuDF/cuVS/cuGraph promotion blocked until the sidecar exposes a
+      verified PyTorch/cuVS runtime. No GPU projection, PostgreSQL, Qdrant, or
+      cache writes occurred.
+
+Evidence: `scripts/atlas/audit-turbovec-cuvs-readiness.mjs` and
+`docs/reports/turbovec-cuvs-readiness.json`.
+Status: `LIVE_ACCELERATOR_CHAIN_BLOCKED`; authority=false;
+writesPerformed=false. First blocker:
+`RAPIDS_CUDA_TORCH_EXECUTION_NOT_PROVEN`.
+
+## ACE-CONTEXT-READINESS-RECHECK-2026-09-11
+
+- [x] Re-ran the read-only context-forest readiness audit.
+- [x] Confirmed the result remains `NOT_SAFE_TO_PROJECT`; no ACE cards,
+      cache entries, graph artifacts, or database rows were materialized.
+- [ ] Keep ACE/context promotion blocked until current Graphify source
+      membership and revision-qualified ordinal, feature, semantic, and
+      authority envelopes exist.
+
+Evidence: `scripts/atlas/audit-context-forest-readiness-v1.mjs` and
+`docs/reports/parent-atlas-context-forest-readiness-v1.json`.
+Status: `NOT_SAFE_TO_PROJECT`; authority=false; writesPerformed=false.
+First blocker: `GRAPHIFY_SOURCE_MEMBERSHIP`.
+
+### PROMOTION-BOARD-RECONCILE-02 — read-only board reconciliation (2026-09-12)
+
+This tranche extends `PARENT-ATLAS-PROMOTION-GATES-01` above; it does not
+replace it or create a second promotion-board owner. It consolidates the
+10-gate board plus six independent receipt families (TRACE disabled-search
+tools, MCP topology tool routing, RRF caller baseline, golden review corpus
+compatibility, the current semantic768 corpus manifest plan, and the Qdrant
+collection-role audit) into one `ParentAtlasPromotionBoardV2` snapshot.
+
+- [x] Read all six confirmed receipts at their existing paths (no filename
+      guessing was required; none were renamed) plus
+      `docs/reports/parent-atlas-promotion-gates-v1.json`,
+      `docs/reports/workspace-revision-tournament-admission-v1.json`,
+      `docs/reports/current-graphify-snapshot-authority-v1.json`,
+      `docs/reports/current-source-owner-reconciliation-v1.json`,
+      `docs/reports/current-source-evidence-hydration-v1.json`,
+      `docs/reports/qdrant-collection-roles-v1.json`,
+      `docs/reports/lineage-qdrant-semantic-canary-v1.json`,
+      `docs/reports/semantic-768-writer-ownership-v1.json`,
+      `docs/reports/current-graph-artifact-readiness-v1.json`,
+      `docs/reports/domain-classifier-lineage-v1.json`,
+      `docs/reports/golden-relevance-review-queue-validation-v1.json`, and
+      `docs/reports/ace-live-dry-input-readiness-v2.json`. No competing
+      "current" receipt was found for any of the required families —
+      `currentReceiptAmbiguous=false`.
+- [x] Added `scripts/atlas/audit-promotion-board-reconcile-v2.mjs` (read-only;
+      only `fs.readFileSync`/`fs.writeFileSync` on `docs/reports/*`, no
+      network/service/database calls) producing
+      `docs/reports/promotion-board-reconcile-v2.json` (authoritative) and
+      `docs/reports/promotion-board-reconcile-v2.md` (concise view).
+- [x] Confirmed `codebase_chunks_768` (109,776 pts, `DECLARED_PROJECTION_OWNER`)
+      and `codebase_chunks_768_v2` (52,816 pts, `COMPARISON_CHALLENGER`,
+      `NOT_PROMOTED`) both genuinely coexist per
+      `docs/reports/qdrant-collection-roles-v1.json`; they were NOT merged or
+      treated as duplicates by this tranche.
+- [x] Board result: `sourceAuthority=PARTIAL` (workspace admitted + terminal
+      execution proven-for-revision, but `CURRENT-STRUCTURAL-LINEAGE-01`
+      still `BLOCKED_BY_PREVIOUS_GATE`), `semanticCorpus=BLOCKED`
+      (`CURRENT_CORPUS_SELECTION_UNRESOLVED`), `retrievalFusion=BLOCKED`
+      (90/93 RRF-referencing call sites `UNMAPPED`, 2
+      `EXECUTOR_AS_LANE` violations), `judgmentCorpus=BLOCKED`
+      (0/1 manifests compatible — the one found manifest is 384-dim, not
+      768-dim), `topology=OPTIONAL_CAPABILITY_NOT_DEPLOYED` (contract/fixture
+      proven, no live endpoint; port 8101 confirmed owned by the Go index
+      worker via static source inspection, not started or stopped by this
+      audit), `trace=PROVEN` (TRACE-MCP-CORE-SEARCH-01: tools/list healthy at
+      176 tools, `trace.kag_search` responds, optional registries disabled;
+      the live identity-envelope reload remains a separate, already-tracked
+      gate under the `TRACE-MCP-*-2026-09-12` entries above and does not
+      block TRACE's own core-search status), `rerank=UNCONFIGURED`.
+- [x] All six `safeTo*` promotion booleans derive to `false` per the section
+      11 formulas (never loosened). `GRAPHIFY_PROMOTION=DO_NOT_RETRY`.
+- [x] Confirmed all 9 read-only invariants (`writesPerformed`,
+      `graphifyApplyInvoked`, `topologyStarted`, `rerankConfigured`,
+      `judgmentsImported`, `rrfRuntimeChanged`, `qdrantModified`,
+      `postgresModified`, `dockerCleanupPerformed`) are `false` — the script
+      makes zero network, database, Qdrant, or Docker calls, only file reads
+      under `docs/reports/` and two file writes to new report paths.
+- [x] Ran `openspec validate --strict parent-atlas-ace-rlm-bitfrost-integration`:
+      PASS (see below).
+- [x] `SEMANTIC-CORPUS-ADMISSION-01` — **measured 2026-09-12**, verdict
+      `SEMANTIC_CORPUS_ADMISSION_BLOCKED`. Built `scripts/atlas/audit-semantic-corpus-admission-v1.mjs`
+      (read-only: scrolls all points in both 768 collections, reads
+      `workspace_id`/`workspace_revision`/`source_revision`/`representation_revision`/canonical-id
+      payload fields, joins Postgres `atlas_workspace_source_bindings` for the admitted revision).
+      Real measured values against `codebase_chunks_768` (109,776 points, matches live
+      `pointsCount` exactly):
+      - `canonicalIdCount`: 10,995 (out of 109,776 points — canonical identity is resolved via
+        `canonical_source_ref`/`canonical_id`/`packet_key` fallback chain, not a single consistent
+        field; breakdown: 105,745 via `canonical_source_ref`, 3,455 via `packet_key`, 576 via
+        `canonical_id`).
+      - `duplicateCanonicalIds`: 5,730.
+      - `missingSourceRevision`: 109,746 / 109,776 (99.97%).
+      - `mixedWorkspaceRevision`: 30 (109,746 points have no `workspace_revision` field at all,
+        tracked separately from the 30 that have one but it's invalid/doesn't match the admitted
+        revision).
+      - `mixedRepresentationRevision`: 16 distinct values found (expected exactly 1).
+      - **Root-cause finding, more fundamental than corpus reconciliation alone**:
+        `atlas_workspace_source_bindings` has **zero rows** for the admitted workspace revision
+        `sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf` — its only 111
+        rows are all under a *different* revision (`sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9`).
+        Source-revision admission cannot be measured against Postgres truth at all right now; this
+        is a source-authority gap (shared with `CURRENT-STRUCTURAL-LINEAGE-01`), not a Qdrant-only
+        problem.
+      - `codebase_chunks_768_v2` (challenger, reported separately per this repo's hard rule — never
+        summed with or merged into the owner's counts) recorded for visibility in the same receipt.
+      - Confirmed live via direct Qdrant payload sampling before writing the script: **the only
+        compliant writer of `workspace_id`/`workspace_revision`** is `qdrant-sync-worker.ts` via
+        `buildQdrantSyncPayload()`; at least 6 other scripts write to `codebase_chunks_768` without
+        it (already flagged `LEGACY_BACKFILL_OR_WORKER`/`promotionBlocked: true` by
+        `scripts/atlas/audit-emb3a-qdrant-writer-lineage.mjs`) and account for the bulk of the gap.
+      - Wired (additive, backward-compatible, verified zero regression): an optional
+        `workspaceRevision` filter parameter on `buildCodebaseQdrantFilter()`
+        (`sveltekit-frontend/src/lib/server/search/qdrant-search.ts`) and
+        `CodebaseAnnSearchOptions`, threaded to its one real call site
+        (`QdrantSearchBackend.search()`). Deliberately **not** defaulted anywhere — doing so today
+        would silently drop ~99.97% of the corpus from search results given the measured gap above.
+        `sveltekit-frontend/src/lib/server/vector/qdrant-manager.ts` and the 5 other retrieval files
+        originally suspected as callers were checked directly and found to not call into this
+        filter chain at all — no changes needed there.
+      - Report: `docs/reports/semantic-corpus-admission-v1.json`. Test:
+        `sveltekit-frontend/tests/qdrant-search-policy.spec.ts` (also found and fixed: this file
+        existed but was never in `vitest.config.ts`'s `include` list, so it silently never ran and
+        its assertions had drifted stale relative to `buildCodebaseQdrantFilter`'s real output —
+        fixed both the missing `include` entry and the stale assertions; 5/5 tests pass).
+      - Deferred, not executed: patching `workspace_revision`/`source_revision` onto the
+        legacy-written points via `setPayload` is a live-data mutation requiring separate, explicit
+        operator sign-off (same discipline as this repo's Drizzle Safety Rule) — tracked as the new
+        `QDRANT-LEGACY-PAYLOAD-BACKFILL-01` gate below, not built or run.
+      - Cross-references `QDRANT-V2-IDENTITY-LINEAGE-01` and
+      `LEIDEN-EXACT-PROJECTION-IDENTITY-01` in `PARENT-ATLAS-PROMOTION-GATES-01`
+      above — does not duplicate that gate's evidence chain.
+- [ ] `QDRANT-LEGACY-PAYLOAD-BACKFILL-01` — **dry-run computed 2026-09-12,
+      verdict `BLOCKED_ON_UNGROUNDED_REVISION`, still not executed.** Built
+      `scripts/atlas/dryrun-qdrant-legacy-payload-backfill-v1.mjs`
+      (zero `setPayload`/`upsert`/`delete` calls anywhere in the file) to
+      compute exactly what patching `workspace_revision`/`source_revision`
+      onto the ~109,746 legacy-written points in `codebase_chunks_768` would
+      write, before any live mutation. Result: 109,746/109,776 points would
+      be patched with `workspace_revision=sha256:322ed1a6...` (the admitted
+      revision), all canonical IDs resolve cleanly (0 unresolvable). **But
+      that admitted revision has 0 rows in `atlas_workspace_source_bindings`
+      for `repo_id=deeds-web-app`** — the only revision with any Postgres
+      bindings at all is a *different* one
+      (`sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9`,
+      111 rows). Executing the patch as computed would write a
+      `workspace_revision` value with zero Postgres-side justification — not
+      a stale-but-honest backfill, false provenance. **Do not execute this
+      gate** until either (a) Graphify runs end-to-end and produces real
+      source bindings for the admitted revision (P0 in
+      `next_steps/active/2026-09-12_promotion-board-real-work.md`), or (b) a
+      different, actually-bound revision is chosen and re-justified as the
+      assignment target. Evidence:
+      `docs/reports/semantic-corpus-admission-v1.json`,
+      `docs/reports/qdrant-legacy-payload-backfill-dryrun-v1.json`.
+      **Cross-reference (2026-09-12, parallel session on a sibling change)**:
+      `openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md` independently
+      audited the same `codebase_chunks_768` corpus from a different angle (packet-key fan-out
+      classification rather than canonical-ID/workspace-revision admission census) and reached the
+      same conclusion via different evidence — verified real, not taken on faith
+      (`docs/reports/current-graphify-run-owner-v1.json`: `GRAPHIFY_RUN_OWNER_BLOCKED`, zero writes;
+      `docs/reports/current-packet-qdrant-bridge-v1.json`: `PACKET_QDRANT_BRIDGE_MISSING`, zero
+      writes). Their classification of the 109,776 legacy points: 4,351 multi-point packet groups,
+      only 15 valid revisioned fan-outs, 2,630 exact-duplicate projection groups, 1,616
+      conflicting-source groups, 5,701 revision-unproven groups. Their own explicit conclusion
+      matches this gate's `BLOCKED_ON_UNGROUNDED_REVISION` stance exactly: "do not reconcile the
+      109,776 / 52,816 / 55,169 corpora by writing anything until that payload can be constructed
+      entirely from admitted immutable lineage." Two independent audits, same corpus, same refusal
+      to write — do not treat this as two separate blockers to resolve differently; they are the
+      same blocker.
+- [x] `GOLDEN-REVIEW-CORPUS-02` — **measured 2026-09-12**, verdict
+      `GOLDEN_REVIEW_CORPUS_BLOCKED`. The prior compatibility receipt
+      (`docs/reports/golden-review-corpus-compatibility-v1.json`) was itself
+      stale/thin — its one manifest has literal placeholder values
+      (`query_set_hash: "sha256:query-set-hash"`, `judgment_set_hash:
+      "pending"`) and predates a real, more advanced pipeline this repo
+      already built: 60 real queries registered under domain
+      `golden_review_pending` in `evaluation_queries`, with bound query IDs
+      (`docs/reports/golden-review-query-registration-receipt-v1.json`,
+      cross-checked live and confirmed all 60 present, correct domain — 0
+      drift). Built `scripts/atlas/audit-golden-review-corpus-v2.mjs`
+      (read-only) to measure judgment coverage for real instead of trusting
+      the stale receipt:
+      - **Zero judgments exist for any of the 60 registered queries** —
+        `evaluation_relevance` (properly FK'd to `evaluation_queries.id`): 0
+        rows. `evaluation_relevance_corrected` (also FK'd): 0 rows.
+        `evaluation_judgments` (17,536 rows total) uses a structurally
+        disconnected 12-char-hash `query_id` with **no foreign key to
+        `evaluation_queries` at all** — it cannot be joined to these 60
+        queries by construction, not just by missing data.
+      - **No human-graded judgment exists anywhere in this database, for any
+        query, in any domain** — database-wide, `evaluation_relevance_corrected`
+        is 100% `judgment_source='derived'` (33,216 rows, zero `'human'`);
+        `evaluation_judgments` is `pending` (5,246) or `gemma4`-graded
+        (12,290), zero `'human'`. This means a compatible golden corpus
+        cannot be assembled by relabeling/re-wiring existing data — it
+        requires new human review work, not a data-plumbing fix.
+      - **All existing judgment rows are bound to the wrong corpus generation**:
+        every `evaluation_relevance_corrected` row carries
+        `corpus_version='2026-07-12-main-4ade5cfa'` — the same git-commit
+        label as the stale 384-dim placeholder manifest, not the currently
+        admitted workspace revision
+        (`sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf`).
+        No row anywhere carries a `sha256:`-prefixed workspace/representation
+        revision binding.
+      - Report: `docs/reports/golden-review-corpus-v2.json`. No writes
+        performed (script is read-only; 3 blockers recorded:
+        `GOLDEN_REVIEW_ZERO_JUDGMENTS`,
+        `NO_HUMAN_GRADED_JUDGMENT_EXISTS_ANYWHERE`,
+        `GOLDEN_REVIEW_CORPUS_NOT_BOUND_TO_ADMITTED_WORKSPACE_REVISION`).
+      - **This gate cannot be closed by further auditing** — the remaining
+        work is literally a human sitting down and grading query/candidate
+        relevance pairs for the 60 registered queries against the current
+        768-dim corpus. Flagging this explicitly rather than implying more
+        automation will resolve it.
+      Cross-references
+      `RETRIEVAL-JUDGMENT-SET-01` in `PARENT-ATLAS-PROMOTION-GATES-01`.
+- [x] `RRF-CALLER-CLASSIFICATION-02` — **classified 2026-09-12**, verdict
+      `RRF_CALLER_CLASSIFICATION_BLOCKED`. Built
+      `scripts/atlas/classify-rrf-callers-v1.mjs` (read-only; does not modify
+      `combineViaRRF` or rewrite any caller) to classify all 93 callers from
+      `docs/reports/rrf-caller-baseline-v1.json` into the 8 categories.
+      **All 93 accounted for, 0 unclassified** (self-consistency check: every
+      `callerId` in the baseline matched a recorded classification):
+      - `LEGACY_COMPATIBILITY`: 41 — confirms this repo's own Duplication
+        Prevention finding: at least 10 distinctly-named, independent
+        fusion/scoring modules (`rrf-fusion.ts`, `rrf-integration.ts`,
+        `hyperrag-fusion-service.ts`, `multi-vector-orchestrator.ts`,
+        `retrieval-fusion-rrf.ts`, `rrf-lane-ranker.ts`, `rrf-multi-vector.ts`,
+        `compute-rrf-score.ts`, `feature-envelope.ts`,
+        `unified-orchestrator.ts`) still call real, independent RRF logic —
+        none delegate to `SearchRuntime`.
+      - `FEATURE_ONLY`: 34 — type/constant definitions, internal lines inside
+        `combineViaRRF`'s and `rrf-fuse.ts`'s own function bodies (not calls
+        to something else), and real production API-route/MCP-tool features
+        that call the shared `rrf-fuse.ts` utility (a genuinely
+        widely-reused, real production module, distinct from
+        `combineViaRRF`).
+      - `TEST_ONLY`: 13 — inline `testN`-pattern fixture blocks plus 3 files
+        whose names are themselves test/proof conventions
+        (`rrf-integration-tests.ts`, `rrf-local-testing.ts`, `rrf-proof.ts`).
+      - `CANONICAL_SEARCHRUNTIME_CALLER`: 2 — `search-runtime.ts`'s own
+        `fuseSearchRuntimeCandidates` definition and call site (the declared
+        `canonicalFusionOwner`).
+      - `EXECUTOR_AS_LANE_VIOLATION`: 2 — reused the baseline's own prior
+        `REJECTED_EXECUTOR_AS_LANE` finding rather than re-deriving it
+        (`unified-orchestrator.ts:564,610` — TurboVec, an executor, voted as
+        an independent RRF lane).
+      - `UNMAPPED`: 1 — `service.ts:455` (`weighted = rrf * laneConfig.weight`)
+        — genuinely insufficient evidence from the excerpt alone; left
+        honestly unclassified rather than guessed.
+      - **Real finding, distinct from the classification itself**:
+        `combineViaRRF` (the function this task explicitly says not to
+        modify) is defined in `rrf-combiner.ts:100`, a DIFFERENT file from
+        `search-runtime.ts` (the declared canonical owner) — and has real
+        production callers (`rrf-integration.ts:985`, `rrf-proof.ts:66`,
+        `unified-orchestrator.ts:610`) that are themselves separate from
+        `SearchRuntime`'s own `fuseSearchRuntimeCandidates`. Two genuinely
+        different canonical-shaped primitives currently coexist.
+      - Per this task's own instruction, **not** every `LEGACY_COMPATIBILITY`
+        caller is being proposed for migration — that determination is out
+        of scope for a classification pass.
+      Report: `docs/reports/rrf-caller-classification-v1.json`. No writes
+      performed; `combineViaRRF` untouched; no caller rewritten.
+      Cross-references
+      `RRF-CURRENT-PRODUCTION-REPLAY-01` in `PARENT-ATLAS-PROMOTION-GATES-01`.
+      **Deepened 2026-09-12 (run independently of the Graphify blocker, since this decision doesn't
+      depend on it)**: investigating the `LEGACY_COMPATIBILITY` bucket to produce a concrete
+      recommendation (not just "needs a decision") found the sprawl is worse than "two canonical-
+      shaped primitives" — **at least 5 independently-exported RRF fusion functions exist**:
+      `fuseSearchRuntimeCandidates` (declared canonical), `combineViaRRF` (`rrf-combiner.ts`),
+      `combineRRFLanes` (`rrf-combiner-utils.ts` — a third, previously-uncited combiner module),
+      `computeRrfComponent`/`rrfMergeMultipleLanes`/`rrfMergeDenseQdrant` (`retrieval-fusion-rrf.ts`),
+      and `computeRRFScore`/`fuseRetrievalLanes` (`rrf-fusion.ts`) — each with its own `k`-constant
+      and formula code, confirmed via direct import-list inspection, not re-exports of one shared
+      implementation. Same failure class as CLAUDE.md's already-documented 5-implementation
+      PageRank sprawl. Given the real scope, this is now tracked as its own OpenSpec change —
+      `openspec/changes/parent-atlas-rrf-fusion-consolidation/` (proposal + tasks + spec, validates
+      clean) — rather than a quick note here, since a proper per-primitive
+      caller/liveness/numerical-equivalence audit (mirroring the PageRank dedup effort) is a
+      real, multi-file investigation in its own right, not a one-line classification fix.
+- [x] `TOPOLOGY-EXECUTOR-NEED-01` — **answered 2026-09-12: NO.** Read-only
+      code inspection (no port allocated, no service started, port 8101
+      remains owned by the Go index worker):
+      - `grep`-confirmed zero references to the topology executor
+        (`topology_search`/`topologySearchExecutor`) anywhere in the
+        production retrieval path (`src/lib/server/retrieval/`,
+        `src/lib/server/atlas/`) — it exists only at the MCP agent-tool layer
+        (`src/mcp/tools/topology-search.tool.ts` and its registrations in
+        `server.ts`/`server-fastmcp.ts`/`trace-mcp-server.ts`), never as a
+        dependency of the actual candidate retrieval pipeline.
+      - The tool's own docstring already self-documents this:
+        `"The topology executor is not part of the core stack and must be
+        independently deployed... Optional topology executor unavailable...
+        Keep this registry disabled until a dedicated executor and readback
+        receipt exist."` It fails clean (a JSON error, no crash, no silent
+        fallback-to-wrong-data) when unavailable — confirmed by direct
+        source read, not just health-check absence.
+      - The specific features this executor would provide
+        (`topo_class`, `som_cluster`, `graphAuthorityScore`) are **already
+        materialized directly in live Qdrant payloads** today (confirmed via
+        direct payload sampling earlier this session, e.g.
+        `"graphAuthorityScore": 0.35, "som_cluster": 0, "cluster_key":
+        "unclassified:community-26562"` on real `codebase_chunks_768`
+        points) — i.e. the "existing topology feature materialization"
+        escape clause in this gate's own question is already satisfied.
+      - **Verdict: `OPTIONAL_CAPABILITY_NOT_DEPLOYED`, confirmed correct.**
+        No current admitted workload requires a live topology executor.
+        `safeToEnableTopology` stays `false` but this is not a promotion
+        blocker per this repo's own rule that
+        `DEDICATED_TOPOLOGY_EXECUTOR_MISSING` must be severity `OPTIONAL`.
+- [x] `CURRENT-STRUCTURAL-LINEAGE-01` re-run (P0, 2026-09-12) — re-ran
+      `scripts/atlas/audit-selected-graphify-structural-lineage-v1.mjs`
+      (read-only) as the next step off the promotion board queue. Fresh
+      evidence, real and new: `status: CURRENT_PACKET_CHUNK_JOIN_UNPROVEN`,
+      `firstBlocker: CURRENT_PACKET_CHUNK_LINEAGE_BRIDGE_INCOMPLETE`. Of
+      25,291 selected Graphify membership rows (7 repositories),
+      `bridgeRowsMissing: 24,714` (97.7%) have no `atlas_packet_chunk_lineage`
+      bridge row joining them to `codebase_chunk_index`/`atlas_packets` —
+      only 577 `lineageBridgeMatches`. Zero exact structural/chunk/packet
+      matches by any admissible join key (`exactChunkMatches`,
+      `exactPacketMatches`, `exactStructuralMatches` all 0); the identity
+      contract explicitly prohibits path-only/basename-only/array-order-only/
+      qdrant-point-id-only/historical-binding-fallback joins, so these zeros
+      are a correct refusal to fabricate a match, not a script defect.
+      **Unresolved discrepancy found, not chased further this session**: this
+      script's selected execution (`cbcd35c6-b26c-4d1a-a08b-9aa16a1afbcc`,
+      `status: COMPLETED`) is bound to the exact same admitted workspace
+      revision (`sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf`)
+      that Gate 1 (`CURRENT-SOURCE-TERMINAL-EXECUTION-01`) separately reports
+      as having zero qualifying/terminal executions for
+      (`NO_TERMINAL_EXECUTION_FOR_CURRENT_WORKSPACE`). "Selected" (this
+      script's admission source, `docs/reports/promotion-gate-receipt-currentness-v1.json`)
+      and "terminal" (Gate 1's stricter criterion) are evidently not the same
+      concept, but exactly how they differ was not investigated here — flagged
+      for whoever picks up Gate 1/`CURRENT-STRUCTURAL-LINEAGE-01` next, not
+      silently treated as consistent. Report:
+      `docs/reports/selected-graphify-structural-lineage-v1.json`. No writes
+      performed (script is read-only by its own docstring and design).
+
+Report: `docs/reports/promotion-board-reconcile-v2.json` (authoritative) and
+`docs/reports/promotion-board-reconcile-v2.md` (concise).
+Status: `PROMOTION_BOARD_RECONCILE_02_COMPLETE`; mode=`READ_ONLY`;
+writesPerformed (production state)=`false`. First blockers remain
+`CURRENT_SOURCE_AUTHORITY_UNPROVEN` (SOURCE) and
+`CURRENT_CORPUS_SELECTION_UNRESOLVED` (SEMANTIC_CORPUS).
+Next gate: `CURRENT-STRUCTURAL-LINEAGE-01` (shared with
+`PARENT-ATLAS-PROMOTION-GATES-01`), then `SEMANTIC-CORPUS-ADMISSION-01`.
+
+**Re-verified 2026-09-13 (fresh session, per operator request) — found a real, unreconciled
+discrepancy in the board's own `retrievalFusion` field, not chased further this pass.** The
+authoritative `docs/reports/promotion-board-reconcile-v2.json` computes
+`retrievalFusion.executorAsLaneViolations: 0` and `promotion.safeToMigrateRrfCallers: true`, sourced
+from the simpler 4-category `rrf-caller-classification-v1.json` (`FEATURE_ONLY`/
+`LEGACY_COMPATIBILITY`/`TEST_ONLY`/`CANONICAL_SEARCHRUNTIME_CALLER`, no `EXECUTOR_AS_LANE_VIOLATION`
+category at all). But this same `RRF-CALLER-CLASSIFICATION-02` entry's own narrative above describes
+a *deeper*, later pass (`scripts/atlas/classify-rrf-callers-v1.mjs`, the full 8-category taxonomy)
+that found **2 real `EXECUTOR_AS_LANE_VIOLATION` callers** (`unified-orchestrator.ts:564,610` —
+TurboVec, an executor, voted as an independent RRF lane) and 1 genuinely `UNMAPPED` caller
+(`service.ts:455`). Per the board's own promotion formula, `executorAsLaneViolations > 0` should
+force `safeToMigrateRrfCallers = false`, not `true` — the board's cached value was computed from the
+older, coarser receipt and was never re-run against the deeper classification. **Do not trust
+`safeToMigrateRrfCallers: true` in the current JSON report as-is** until the board is regenerated
+against the 8-category classification. Not fixed here (context-bounded); flagged for the next
+`PROMOTION-BOARD-RECONCILE` re-run (already P4 in `nextGateQueue`).
+
+**Re-verified again, 2026-09-13 (later same day) — this discrepancy no longer holds; the flag
+above describes a state that has itself since been superseded, not a live bug.** Read the current,
+on-disk `scripts/atlas/classify-rrf-callers-v1.mjs` directly rather than trusting the narrative
+above: the 3 callers previously described as `EXECUTOR_AS_LANE_VIOLATION`×2 +
+`UNMAPPED`×1 (`unified-orchestrator.ts:564,610`, `service.ts:455`) are now each classified
+`LEGACY_COMPATIBILITY` in the script's `CLASSIFICATION` map, each with an explicit rationale from a
+closer read of the actual code: `unified-orchestrator.ts:564` — "TurboVec is retained as executor
+metadata inside the module's dense semantic convergence map; the implementation keeps one
+strongest dense contribution per candidate"; `:610` — "`combineRRFLanes` receives
+`buildRrfLaneMap` output, where Qdrant and TurboVec have already converged into the single
+`dense_vector` logical lane before fusion"; `service.ts:455` — "this is the legacy `service.ts`
+`rrfFusion` implementation over the revisioned search-lane registry; it is not the declared
+SearchRuntime owner and is not a new executor lane." In other words: a further, more careful
+investigation (already reflected in the live script, not performed fresh here) concluded TurboVec
+does **not** actually vote as an independent RRF lane — it converges into a single dense-vector
+lane *before* `combineRRFLanes` runs — so this is not the `EXECUTOR_AS_LANE_VIOLATION` pattern the
+prior note described. **Live-reconfirmed, not assumed from reading the script alone**: re-ran
+`node scripts/atlas/classify-rrf-callers-v1.mjs` (read-only, confirmed by its own docstring — does
+not modify `combineViaRRF` or any caller) — regenerated `rrf-caller-classification-v1.json`
+byte-for-byte matching what was already on disk (`FEATURE_ONLY: 34, LEGACY_COMPATIBILITY: 44,
+TEST_ONLY: 13, CANONICAL_SEARCHRUNTIME_CALLER: 2`, 93/93 classified, 0 unmapped, 0
+`EXECUTOR_AS_LANE_VIOLATION`, `status: RRF_CALLER_CLASSIFICATION_READY`); then re-ran
+`node scripts/atlas/audit-promotion-board-reconcile-v2.mjs` (also read-only —
+`writesPerformed: false`, `graphifyApplyInvoked: false`, `qdrantModified: false`,
+`postgresModified: false` all confirmed in its own completion receipt) — regenerated
+`promotion-board-reconcile-v2.json`/`.md` with a fresh checksum but the same substantive values:
+`board.retrievalFusion.executorAsLaneViolations: 0`, `board.promotion.safeToMigrateRrfCallers:
+true`. **Conclusion: the board's cached `true` was already correct against the current
+classification data — there was no stale-vs-fresh mismatch to fix.** The prior note's "8-category
+taxonomy found 2 violations + 1 unmapped" claim was itself describing an intermediate state of the
+classification that has since been corrected in place; that correction was not tracked at the time
+it happened (no git history for either file — both are untracked in this repo, so there's no diff
+to point to), which is why the prior note's re-verification pass couldn't see it and (correctly,
+given what it could observe) flagged a mismatch. Nothing left to do here; do not re-flag this as an
+open discrepancy without first reading the current classification script's rationale for those 3
+specific callers.
+
+**One real bug found and fixed while re-verifying, distinct from the false-alarm above**:
+`audit-promotion-board-reconcile-v2.mjs`'s own `nextGateQueue` array (the "Section 16 next-priority
+queue" the board report renders) had a **hardcoded** P3 note string — `'Blocked: 90/93 callers
+UNMAPPED, 2 EXECUTOR_AS_LANE violations.'` — that directly contradicted this exact same script's own
+freshly-computed `board.retrievalFusion` in the very same run (0 unmapped, 0 violations,
+`status: RRF_CALLER_CLASSIFICATION_READY`). This is the real, narrow root cause of why the false
+alarm above looked plausible: the script's own report was internally self-contradictory (one
+computed field said READY, a sibling hardcoded field said BLOCKED with stale counts), not a data
+problem in either underlying receipt. Fixed by deriving the P3 note from the already-computed
+`retrievalFusion` object instead of a literal string, so it can't silently drift out of sync with
+the fields it describes again. Re-ran the (confirmed read-only, `writesPerformed: false`) script
+afterward — P3's note now reads `"Not blocking: RRF_CALLER_CLASSIFICATION_READY (93/93 classified,
+0 EXECUTOR_AS_LANE violations). Migration itself is a separate, not-yet-made decision."`, consistent
+with `board.retrievalFusion`/`board.promotion` in the same report.
+
+Status of this thread: **CLOSED, no open discrepancy remains.** `safeToMigrateRrfCallers: true` is
+correct given current classification data; the fixed `nextGateQueue` bug means the board's own
+narrative no longer contradicts itself. The separate, larger `LEGACY_COMPATIBILITY` sprawl
+(5 independently-exported RRF fusion functions) remains tracked in its own change,
+`openspec/changes/parent-atlas-rrf-fusion-consolidation/`, and is a distinct decision from whether
+migration is currently *safe* (it is) versus whether it has been *done* (it has not).
+
+### `CURRENT-SOURCE-TERMINAL-EXECUTION-01` — real Graphify run attempted 2026-09-12, still `BLOCKED`
+
+- **This is the first real (non-audit) `npm run graphify:daily` execution attempt this session**,
+  per P0 in `next_steps/active/2026-09-12_promotion-board-real-work.md`. It did not complete —
+  reached Graphify's own internal canonical-projection admission gate
+  (`scripts/atlas/require-canonical-projection-admission-v1.mjs`) and correctly refused to promote.
+- Two unrelated retention/environment blockers were cleared first (archived, not deleted, per this
+  repo's convention — see `docs/archive-manifest.json` entries dated 2026-09-12): (1) a crashed
+  partial multi-repo snapshot (`.partial-12564`, confirmed leftover from an old,
+  already-superseded version of `materialize-workspace-source-snapshot-v1.mts` that used
+  PID-suffixed staging — the live script was already rewritten to a single fixed `.partial` stage
+  specifically to prevent this), and (2) two historical complete snapshots exceeding the retention
+  cap (`MAX_MATERIALIZED_SNAPSHOTS=2`). A third, transient Windows file-lock error on
+  `docs/reports/graphify-daily-workflow-receipt.json` self-resolved on retry (not a code bug).
+- With those cleared, the pipeline ran genuinely further than any prior attempt: repository
+  provenance dry-run (`atlas:phase109b:workflow:dry`) came back fully `PROVEN` for snapshot/
+  inventory/structural/validation/incremental (25,291 sources, 127,797 structural facts,
+  0 missing/malformed hashes, 862 duplicate file hashes). It then ran the canonical-projection
+  fabric audit **transactionally read-only** (log-confirmed `transaction opened READ ONLY` →
+  `transaction rolled back — confirmed zero production mutations`) against 11 promotion
+  predicates. **Result: `NOT_SAFE_TO_PROJECT`, 10/11 predicates below PASS**:
+
+  | Predicate | Verdict | Key finding |
+  |---|---|---|
+  | IDENTITY_ALIGNED | PARTIAL_PROVEN | 325/1000 sampled packets missing `qdrant_point_id` |
+  | REVISION_QUALIFIED | NOT_PROVEN | No live `atlas_packets.workspace_revision` column exists |
+  | SYMBOLS_RESOLVED | NOT_PROVEN | `graphify_symbols` table exists but has 0 rows (schema built, never populated) |
+  | SEMANTIC_OWNER_PROVEN | PARTIAL_PROVEN | `codebase_chunk_index.content_embedding` is the active candidate; ownership not independently proven end-to-end |
+  | LATENT_FAMILY_PROVEN | NOT_PROVEN | No `atlas_representation_records` ledger; `latent_64` (only populated lane) unproven as single-input non-cascaded family |
+  | GRAPH_MANIFEST_SEALED | ABSENT | No sealed node/edge manifest; NetworkX/cuGraph/Neo4j each build their own graph independently |
+  | ONTOLOGY_COHORT_NONEMPTY | **PASS** | 63,084 rows across ontology/hyperedge tables — the one passing predicate |
+  | ORDINAL_MAP_SEALED | ABSENT | `CandidateOrdinal` remains a design intent (CLAUDE.md), not a table-backed sealed artifact |
+  | PROJECTIONS_CHECKSUM_ALIGNED | NOT_PROVEN | Depends on the two absent predicates above |
+  | BITFROST_KEYS_DERIVABLE | NOT_PROVEN | Cache keys exist; no proven derivable domain+cluster+topology+symbol scheme |
+  | ACE_EVIDENCE_GROUNDED | NOT_PROVEN | `ace_context_sources` exists, 0 rows |
+
+  Evidence: `docs/reports/atlas-canonical-projection-fabric-audit-2026-09-12.json` / `.md`.
+- **This is not a bug or a failed attempt — it is the pipeline correctly self-blocking.** "Running
+  Graphify" does not, by itself, resolve the promotion board; the underlying architecture gaps
+  (no `workspace_revision` column, empty symbol table, no representation/graph/ordinal manifests)
+  are real, pre-existing debt this run surfaced but cannot fix by re-running. Picking which of the
+  9 failing predicates to build out first is a human prioritization decision, not made here.
+- Status: `NOT_SAFE_TO_PROJECT` (unchanged from before this run in substance, but now backed by a
+  live, dated, transactional 11-predicate audit instead of the prior `NO_TERMINAL_EXECUTION_FOR_CURRENT_WORKSPACE`
+  framing alone). `writesPerformed=false` for the entire attempt.
+
+**Follow-up, 2026-09-13 — the GRAPHIFY-DAILY-COORDINATOR-01 bounded canary was run for real, for
+the first time, per explicit operator instruction ("run the graphify coordinator again for P0").**
+Found the actual driver script is
+`sveltekit-frontend/scripts/atlas/graphify-daily-coordinator-canary-v1.mts` (distinct from, and
+more capable than, the earlier `scripts/atlas/graphify-daily-snapshot-native-open-v1.mts`, which
+only drives 3 of 10 ledger stages) — it drives OPEN → SOURCE_SELECTION → INVENTORY → AST_PARSE →
+STRUCTURAL_EXTRACT using the real, live, healthy 8095 NLP-sidecar AST service
+(`create8095AstProvider`, verified live via `GET :8095/health` → tree-sitter/ast-grep/langextract
+all `true`), then calls `completeExecution({status:'COMPLETED'})`. Its own module docstring is
+explicit that **SEMANTIC_ENRICH/GRAPH_BUILD/PROJECT/VALIDATE have no safe coordinator owner bound
+yet and must not be called from production code paths until a specific owner audit closes** — so
+even a fully successful run of this script cannot reach all 10 ledger stages today; 5/10 is this
+script's own designed ceiling (`canonicalPromotionMayBeAttempted: false` is baked into its report).
+
+Per this script's own required discipline (`canaryRequiredBeforeBroadRun: true` in
+`docs/reports/graphify-execution-ledger-coordinator-plan-v1.json`), ran the **bounded canary**
+(`--limit=3`, not `--full`) rather than the 24,205-source full run, which needs a separate,
+larger-scope authorization (`AUTHORIZE_GRAPHIFY_FULL_WORKSPACE_SOURCE_SELECTION_V1`) not given
+here. Also corrected a false blocker along the way: the prior audit's
+`workspaceForeignRowExists: false` finding was checking the legacy `graphify_runs` table (which
+has zero rows for this workspace_revision, unrelated to the newer ledger) — `workspace_id
+625743d2-092b-4fa8-abe0-9dc094920c80` genuinely **exists** in `public.workspaces` (confirmed via
+direct `SELECT count(*)`), so that was never a real blocker for this coordinator path.
+
+**Real, live result** (`docs/reports/graphify-daily-coordinator-canary-v1.json`):
+`status: PROVEN_COMMITTED_BOUNDED_CANARY`, new execution `5013de19-7bed-4703-bd6b-1684b19e2aaf`,
+`workspace_revision: sha256:322ed1a6...` (the admitted revision), 5/5 attempted stages COMPLETED,
+`writesPerformed: true`, verified directly against Postgres (not just trusted from the script's own
+report): `graphify_executions` row COMPLETED, 5 `graphify_execution_stages` rows COMPLETED, 3
+`graphify_execution_file_membership_v2` rows.
+
+**Honest caveat, not glossed over**: the canary's first 3 root-repo sources happened to be
+`.claude/AGENT_CONSTITUTION.md`, `.claude/AGENT_RECOMMENDATIONS.md`,
+`.claude/ATLAS-ENGINEERING-PROMPT.md` — all Markdown, not code — and the script only runs
+AST_PARSE/STRUCTURAL_EXTRACT against the *first* selected source. Its own report shows
+`structuralProviderStatus: "RECOVERED_WITH_ERRORS"`, `structuralProvenanceStatus: "NO_EVIDENCE"`
+for that file. This canary run genuinely proves the **ledger mechanism** end-to-end (open →
+select → inventory → parse → extract → complete, real DB rows, real 8095 service call), but does
+**not** demonstrate meaningful structural extraction on real source code, and 3 sources out of
+24,205 root sources is nowhere near P0-scale coverage. Selecting real `.ts`/`.tsx` files for the
+canary would require either passing `--limit` against a differently-ordered source list or a
+script change to filter by extension — not attempted here.
+
+**What this does and does not resolve for P0**: this proves the coordinator ledger itself is real
+and callable against the admitted revision (a genuine, new capability this session), but does
+**not** resolve `CURRENT-SOURCE-TERMINAL-EXECUTION-01`'s `NOT_SAFE_TO_PROJECT` verdict above — none
+of the 11 canonical-projection predicates depend on `graphify_executions`/`graphify_execution_stages`,
+and the full-scale run (24,205 sources) plus the still-unbound SEMANTIC_ENRICH/GRAPH_BUILD/PROJECT/
+VALIDATE stage owners remain separately unresolved. Status:
+`GRAPHIFY_COORDINATOR_LEDGER_MECHANISM_PROVEN_BOUNDED_CANARY_ONLY`. Next real step, if pursued: a
+canary targeting real code files (not `.claude/*.md`), then a decision on `--full` mode.
+
+**Follow-up, 2026-09-13 — `--full` mode blocked, correctly, before anyone ran it.** External review
+correctly identified a real, serious gap in `graphify-daily-coordinator-canary-v1.mts`: `--full`
+changes `SOURCE_SELECTION`/`INVENTORY` membership to the entire snapshot (24,205 `repo:root`
+sources), but `AST_PARSE`/`STRUCTURAL_EXTRACT` unconditionally test only ONE source
+(`structuralBinding = bindings.find(...) ?? bindings[0]`) — unchanged by `--full`. A `--full` run
+would therefore mark `status: COMPLETED` on a 24,205-source membership after structurally proving
+exactly 1 of them — a large, real membership count wearing a misleadingly-total-looking
+`COMPLETED` label. **Added a hard throw at the top of the script**:
+`GRAPHIFY_COORDINATOR_CANARY_FULL_MODE_BLOCKED` fires immediately whenever `--full` is passed,
+before any DB connection or lock is acquired. Verified the file still parses correctly
+(`esbuild.transformSync`) after the edit. **`--full` stays blocked until structural materialization
+is made to iterate every selected source**, not just the first.
+
+**Next gate, tracked, not built**: `GRAPHIFY-STRUCTURAL-CODE-CANARY-02` — patch the bounded canary
+to accept `--source-ref=<path>` (validated against the sealed snapshot's `repo:root` sources, never
+an arbitrary filesystem path) so the structural sample is an explicit, deterministic, real code
+file instead of "whatever alphabetically sorts first" (which is how the first canary landed on
+`.claude/AGENT_CONSTITUTION.md` and got `NO_EVIDENCE`). Acceptance mirrors the `.ts`-targeted canary
+already proven this session (`selectedSourceCount: 1`, `structurallyProcessedSourceCount: 1`,
+`structuralProviderStatus: PROVEN`/`NATIVE_READY`, `symbol nominations > 0`, zero canonical/Qdrant/
+graph writes) but as a first-class script flag rather than the `ATLAS_GRAPHIFY_CANARY_SOURCE_REFS`
+env-var override added ad hoc earlier this session. Precise status of the already-run canaries,
+for the record (not to be confused with "full Graphify" — corrected framing, external review):
+
+```
+GRAPHIFY COORDINATOR CANARY (both runs, 2026-09-13)
+  ledger stages attempted     5/10 (OPEN, SOURCE_SELECTION, INVENTORY, AST_PARSE, STRUCTURAL_EXTRACT)
+  structural sources tested   1 per run, regardless of membership count (3 both times)
+  canonical authority         false
+PROVEN:   execution identity, snapshot membership (bounded), source-revision readback (bounded),
+          stage-ledger transitions, AST-service invocation (8095), structural extraction on a
+          real .ts file (second run only)
+NOT PROVEN: multi-source structural processing, semantic enrichment, graph build, projection,
+          validation, the complete production pipeline
+```
+
+**Follow-up, same session, minutes later — re-ran targeting real `.ts` files, real structural
+success this time.** Added a small additive override to
+`graphify-daily-coordinator-canary-v1.mts` (`ATLAS_GRAPHIFY_CANARY_SOURCE_REFS`, comma-separated
+explicit sourceRef list, first entry becomes the structural sample) since the default
+`rootSources.slice(0, N)` is plain alphabetical order and the repo's first ~560 root sources are
+all non-code (`.claude/*.md`). Ran against 3 real `.ts` files
+(`ace-vector-selection-slice/src/lib/server/ace/{ranking/packet-feature-matrix,vector/ace-packet-vector,vector/turbovec-interpolation}.ts`)
+: new execution `c531a1b0-c932-482f-8a21-5d067f504a13`, `structuralProviderStatus: "PROVEN"`,
+`structuralProvenanceStatus: "NATIVE_READY"` (vs. the prior canary's `RECOVERED_WITH_ERRORS`/
+`NO_EVIDENCE` on a Markdown file) — the 8095 structural service genuinely parses real TS source
+through this ledger path. Still 5/10 stages, still `canonicalPromotionMayBeAttempted: false`, still
+does not resolve `NOT_SAFE_TO_PROJECT` above.
+
+### `SYMBOL-REPRESENTATION-REGISTRY-RECONCILIATION-01` (new, 2026-09-12) — three uncoordinated registries found, not reconciled
+
+- **Investigating `SYMBOLS_RESOLVED` (empty `graphify_symbols`) as a candidate "complete one lane"
+  target surfaced a bigger, systemic finding**, matching the exact "N competing owners, zero
+  reconciled" pattern root `CLAUDE.md`'s Duplication Prevention section already documents for
+  PageRank (5 implementations) and rerankers (14 files) — this is a new instance of the same class
+  of problem, not a new class.
+- Read-only census (`scripts/atlas/audit-symbol-representation-table-census-v1.mjs`,
+  `scripts/atlas/audit-atlas-symbol-registry-freshness-v1.mjs`, both new, zero writes) found:
+
+  | Table | Exists | Rows | Role |
+  |---|---|---|---|
+  | `graphify_symbols` | yes | 0 | What `SYMBOLS_RESOLVED` (this audit's predicate) actually checks |
+  | `atlas_symbol_registry` | yes | 10,310 | A *different*, live, populated symbol registry the gate never reads |
+  | `atlas_symbol_versions` | yes | 285 | Sibling AST-derived symbol-version data |
+  | `atlas_representations` (`drizzle/0152_atlas_representations_registry.sql`) | **no** | — | Pending/unapplied 10-table registry from the `latent_128` promotion work (see `parent-atlas-error-embedding-768-migration` task 5.1, still open) |
+  | `atlas_representation_records` | **no** | — | What `LATENT_FAMILY_PROVEN` (this audit's predicate) actually checks — a *third*, differently-named concept |
+
+- **Why this is not a quick "just point the gate at the populated table" fix**: `atlas_symbol_versions`'
+  populated rows carry `workspace_revision: sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9`
+  — **not** the currently-admitted revision (`sha256:322ed1a6...`) — and its `registry_revision`
+  labels (`promotion:ast-nominations:v1`, `atlas-current-tree-bound-symbol-canary-v1`) read as
+  staging/canary runs, not a declared-production dataset. Treating this as satisfying
+  `SYMBOLS_RESOLVED` would repeat the exact ungrounded-revision mistake `QDRANT-LEGACY-PAYLOAD-BACKFILL-01`'s
+  dry-run already caught and refused to execute past (see that gate's entry above) — the same
+  revision, `sha256:55edaaad...`, is the one with the 111 real `atlas_workspace_source_bindings`
+  rows found there too, which is suggestive but not itself sufficient grounds to promote this data
+  without an explicit decision.
+- **Correction (2026-09-12, run independently of the Graphify blocker): the original framing above
+  conflated two separate decisions.** Symbol identity (`SYMBOLS_RESOLVED`) and representation/
+  embedding lineage (`LATENT_FAMILY_PROVEN`) are different capabilities with different candidate
+  tables — treating them as one decision was itself imprecise. Splitting them:
+
+  **Symbol identity — concrete recommendation, not yet approved**: adopt `graphify_symbols` +
+  `graphify_edges` as canonical, not `atlas_symbol_registry`/`atlas_symbol_versions`. Reasoning:
+  `graphify_symbols` FK's directly to `graphify_files` (26,014 rows, already live and populated,
+  itself carrying real `source_revision`/`workspace_revision` columns per the schema census) — so
+  once Graphify produces a real terminal execution, a symbol writer has a natural, already-revision-
+  qualified anchor to attach to. `atlas_symbol_registry`/`atlas_symbol_versions` has no such FK
+  anchor, uses loose text identifiers, and its populated data is already revision-unbound to the
+  current admission (see above) — it's real evidence but the wrong schema shape to build on.
+  Recommend treating it as a `COMPATIBILITY`/historical data source that can inform a backfill once
+  `graphify_symbols` has a real writer, not as the destination itself. Still needs: (1) the actual
+  writer (none exists yet for either table), (2) resolving whether `atlas_symbol_registry` data can
+  be reused as training/reference input for that writer or should be left as-is and superseded.
+
+  **Representation/embedding lineage — concrete recommendation, not yet approved**: adopt the
+  pending `atlas_representations` migration (`drizzle/0152_atlas_representations_registry.sql`),
+  not a fresh `atlas_representation_records` table. Reasoning: 0152 is a genuinely complete design
+  (10 tables covering providers, lane selections, provider fallbacks, migrations, Qdrant collection
+  mappings, compatibility evaluations, validation results, plus an immutability trigger on
+  production-verified rows) that already exists, reviewed, and unapplied — `atlas_representation_records`
+  is only a bare name the fabric-audit script checks for; nothing was ever designed for it. Once
+  0152 is applied (Drizzle Safety Rule sign-off required) and real rows exist,
+  `audit-canonical-projection-fabric.mjs`'s `LATENT_FAMILY_PROVEN` check should be updated to look
+  for `atlas_representations` instead of the never-designed `atlas_representation_records` name.
+
+  Both recommendations feed `openspec/changes/parent-atlas-qdrant-structural-payload-enrichment`'s
+  task 1.4 (same underlying persist-vs-on-demand choice for AST/structural evidence) — that task
+  should now reference the symbol-identity recommendation specifically, not a generic "pick one."
+- **Decision approved 2026-09-12 (explicit operator direction: "pick the registry").** Both
+  recommendations above are now the approved direction:
+  1. **Symbol identity**: `graphify_symbols` + `graphify_edges` are canonical. `atlas_symbol_registry`/
+     `atlas_symbol_versions` are `COMPATIBILITY` — real evidence that may inform a future backfill,
+     not a destination.
+  2. **Representation/embedding lineage**: the pending `atlas_representations` migration
+     (`drizzle/0152_atlas_representations_registry.sql`) is canonical. `atlas_representation_records`
+     is retired as a concept — nothing was ever built for that name; the fabric-audit script's
+     `LATENT_FAMILY_PROVEN` check should be updated to look for `atlas_representations` once applied.
+  - **This decision does NOT itself apply the 0152 migration, build any writer, or update the
+    fabric-audit script** — those remain separate implementation steps, and applying 0152 is still
+    its own Drizzle Safety Rule sign-off gate (schema migration), not satisfied by this approval
+    alone. What's approved here is the *direction*, unblocking `parent-atlas-qdrant-structural-
+    payload-enrichment` task 1.4 and `parent-atlas-pca-svd-representation-baseline` task 3.1 to
+    target a named, decided registry instead of an open question.
+  - **Applied 2026-09-12 (explicit operator instruction: "apply the 0152 migration").**
+    `drizzle/0152_atlas_representations_registry.sql` executed live via
+    `docker exec -i legal-ai-postgres psql` — clean `BEGIN`...`COMMIT`, 8 tables created
+    (`atlas_representations`, `atlas_representation_providers`,
+    `atlas_representation_lane_selections`, `atlas_representation_provider_fallbacks`,
+    `atlas_retrieval_lane_fallbacks`, `atlas_representation_migrations`,
+    `atlas_qdrant_collection_mappings`, `atlas_representation_compatibility_evaluations`,
+    `atlas_representation_validation_results`), the immutability trigger installed, and the 5 seed
+    rows inserted (`semantic_768`, `semantic_512`, `semantic_384`, `topology_128`, `latent_64`, all
+    `lifecycle_status: CANDIDATE` / `verification_status: UNVERIFIED` — verified live via direct
+    `SELECT`, not assumed from the apply log alone). No pre-existing table was touched (all
+    `CREATE TABLE IF NOT EXISTS`) and no destructive statement was in the file (confirmed via a
+    `DROP TABLE|DROP COLUMN|TRUNCATE|DELETE FROM` grep before applying).
+  - **Not yet done, separate from this migration apply**: `pca_svd_64/128/256` are not yet
+    registered as rows (they weren't part of 0152's original 5-row seed list and would need a new
+    `INSERT` with `dimension_method: 'LINEAR_PROJECTION'` — the first real use of that enum value);
+    `latent_128`/`latent_256` (already real and populated in `codebase_chunk_index`, per this
+    session's earlier work) are also not yet registered here; no writer/backfill code was changed;
+    the fabric-audit script's `LATENT_FAMILY_PROVEN` check still looks for the non-existent
+    `atlas_representation_records` name, not the now-real `atlas_representations` — that script
+    update is still a separate, not-yet-done step.
+  - Status: `REGISTRY_RECONCILIATION_REPRESENTATION_HALF_APPLIED`. Symbol-identity half
+    (`graphify_symbols`/`graphify_edges` adoption) remains direction-approved but not yet acted on —
+    no writer exists for it yet, unlike the representation half which now has a live schema.
+
+### **FINAL ARCHITECTURE DECISION 2026-09-12 — supersedes the symbol-identity half above**
+
+**Operator direction, explicit and reasoned, overriding this document's earlier
+`graphify_symbols`-as-canonical recommendation**: symbol identity is owned by
+**`atlas_symbol_registry` + `atlas_symbol_versions`**, not `graphify_symbols`. Rationale given and
+verified against this repo's own code, not just asserted: `atlas_symbol_registry`'s own migration
+(`20260818_atlas_symbol_registry_v1.sql`) already calls itself the canonical cross-revision symbol
+registry, explicitly separating stable logical identity from upstream Tree-sitter/chunker IDs;
+`atlas_symbol_versions` carries the revision-bound source/workspace identity, upstream node/
+symbol/chunk IDs, declaration hash, span, parent route, and producer revision (schema already
+matches `structural-symbol.ts`'s `SymbolVersionV1` contract). `symbol-registry-repository.ts`
+already resolves exact canonical keys from these tables in production code.
+
+**Frozen ownership matrix** (canonical vs. producer/index/executor — never conflate the columns):
+
+| Surface | Role |
+|---|---|
+| `atlas_symbol_registry` | **CANONICAL** logical symbol identity |
+| `atlas_symbol_versions` | **CANONICAL** revision-qualified symbol instance |
+| `atlas_symbol_aliases` | rename/move/upstream-ID reconciliation |
+| `atlas_structural_reference_resolutions` | canonical/degraded structural reference resolution |
+| `graphify_symbols` | **PRODUCER** / revision-scoped structural extraction, NOT canonical identity |
+| Tree-sitter CST | structural evidence (substrate) |
+| `ast-grep` | structural search/rule extractor — operates over Tree-sitter's real CST, not a simplified AST (its own docs distinguish the two; CST preserves concrete syntax like operators) |
+| `atlas_representations` | **CANONICAL** representation-contract registry (applied above) — NOT a symbol registry, a separate concern |
+| pgvector | exact semantic representation store/oracle |
+| Qdrant / cuVS / CAGRA | derived ANN executors |
+| PostgreSQL FTS / `pg_trgm` | lexical indexes |
+| `rg` | live exact lexical executor |
+| NLP / keywords | derived features |
+| simdjson | ingestion/parser accelerator (CPU SIMD, not GPU — per this repo's existing hard rule) |
+| Postgres 18 AIO / bitmap scans | execution optimization only, never an identity layer |
+
+**Corrected pipeline** (source → identity, not identity → source):
+```
+source bytes → Tree-sitter CST → ast-grep/structural extractors → graphify_symbols
+  (structural facts, revision-scoped evidence) → symbol reconciliation →
+  atlas_symbol_registry (stable_symbol_id) + atlas_symbol_versions (symbol_version_id, bridges
+  durable identity to one source revision)
+```
+A CST node's `node_id`/`byte_start`/`byte_end`/`node_type`/`ast_path` is revision-scoped evidence,
+never durable identity. `graphify_symbols.symbol_id` is a **stable-symbol candidate** whose
+cross-revision continuity still requires proof — consistent with this repo's own graph-retrieval
+design language and the earlier `SYMBOLS_RESOLVED` audit finding that the table alone is
+insufficient to prove that predicate.
+
+**Lexical layer design** (do not put lexical identity into the symbol registry):
+- B-tree: `stable_symbol_id`, `canonical_key`, `source_ref`, `source_revision`,
+  `workspace_revision`, `symbol_version_id`
+- GIN/tsvector: lexical text, names, signatures, keywords/concepts
+- `pg_trgm`: fuzzy identifier/name lookup
+- `rg`: exact live workspace scan
+
+**Critical caveat, explicitly preserved from the operator's own instruction, not glossed over**:
+**this architecture pick does not make the existing data current.** `evidenceStatus` for
+`atlas_symbol_versions` remains `BLOCKED` until it is regenerated/reconciled against the currently
+admitted workspace revision (`sha256:322ed1a6...`) — the existing 10,310/285 rows are real but
+bound to a *different*, non-admitted revision (`sha256:55edaaad...`), per this same section's
+earlier finding. **Selecting the canonical owner is an architecture decision; it does not
+retroactively fix the ungrounded-revision problem** that separately blocks
+`QDRANT-LEGACY-PAYLOAD-BACKFILL-01` and `WORKSPACE-REVISION-COLUMN-01` — that still needs
+Graphify to produce real, admitted-revision-bound bindings (P0), unchanged by this decision.
+
+Status: `SYMBOL_IDENTITY_OWNER_DECIDED_ATLAS_SYMBOL_REGISTRY` — architecture only. No code, schema,
+or data changed by this decision itself. `graphify_symbols`/`graphify_edges` remain live, populated
+(`graphify_files`: 26,014 rows) producer tables, feeding the now-decided canonical registry rather
+than replacing it. Next real step (not started): build the reconciliation writer from
+`graphify_symbols`/`atlas_symbol_versions` into a workspace-revision-bound canonical state, and
+update `audit-canonical-projection-fabric.mjs`'s `SYMBOLS_RESOLVED` check to read
+`atlas_symbol_registry`/`atlas_symbol_versions` instead of the now-demoted `graphify_symbols`.
+
+### `SYMBOL-RECONCILIATION-WRITER-01` (new, 2026-09-12) — tracked, not started, pick up fresh
+
+- **Checked before building anything (Duplication Prevention): the reconciliation writer's pieces
+  already exist, but nothing wires them together.** `packages/parent-atlas/src/core/
+  gis-canonicalization.ts::canonicalizeStructuralEvidence()` (nomination → resolution →
+  canonical form) and `packages/parent-atlas/src/core/symbol-registry-repository.ts::
+  createSymbolRegistryRepository()` (the real Postgres writer — `INSERT INTO
+  atlas_symbol_registry/atlas_symbol_aliases/atlas_symbol_versions`) both have **zero callers
+  anywhere in the repo**, confirmed via grep. The type contracts they both use
+  (`structuralSymbolNominationSchema`/`symbolResolutionSchema`/`symbolVersionSchema` in
+  `structural-symbol.ts`) are real and shared. This is an unwired scaffold, not a missing
+  capability — build on it, do not duplicate or discard it.
+- **What "build the reconciliation writer" means concretely, not started**: a script that (1)
+  reads `graphify_symbols` (or Tree-sitter/ast-grep output directly) scoped to the currently
+  admitted workspace revision, (2) calls `canonicalizeStructuralEvidence()` to produce
+  nominations/resolutions, (3) drives `createSymbolRegistryRepository()` to write
+  revision-bound rows into `atlas_symbol_registry`/`atlas_symbol_versions`.
+- **Must not repeat the ungrounded-revision mistake already caught twice this session**: any new
+  write must be bound to the real admitted revision (`sha256:322ed1a6...`) once Graphify actually
+  produces bindings for it (P0, still not done) — writing against the existing stale
+  `sha256:55edaaad...`-bound data would just add more ungrounded rows to the same problem.
+- **Also not started, same task family**: updating `audit-canonical-projection-fabric.mjs`'s
+  `SYMBOLS_RESOLVED` predicate to read `atlas_symbol_registry`/`atlas_symbol_versions` instead of
+  `graphify_symbols`, per the architecture decision above.
+- Status: `TRACKED_NOT_STARTED`. Explicitly deferred to a fresh session per operator instruction
+  ("pick it up fresh next time") rather than started under this session's context budget.
+
+**Built 2026-09-12 (this session, fresh pickup) — `scripts/atlas/symbol-reconciliation-writer-v1.mts`,
+gate proven live, zero writes performed.** Wires `canonicalizeStructuralEvidence()` and
+`createSymbolRegistryRepository()` together for real: reads `graphify_symbols` joined to
+`graphify_files.source_ref`, scoped to source_refs bound to a target `workspace_revision` via
+`atlas_workspace_source_bindings` (column is `canonical_source_ref`, not `source_ref` — a real
+typo caught and fixed during the first live run), builds `StructuralSymbolNominationV1` records,
+and drives them through resolution/promotion. **Hard fail-closed gate, exercised live twice, both
+correctly refuse to write anything**:
+- `--workspace-revision sha256:322ed1a6...` (the admitted revision) → `BLOCKED_ON_UNGROUNDED_REVISION`
+  (`atlas_workspace_source_bindings` has 0 rows for it — unchanged since this gate was first found).
+- `--workspace-revision sha256:55edaaad...` (the only bound revision, 111 source_refs) →
+  `BLOCKED_ON_EMPTY_SYMBOL_SOURCE` (`graphify_symbols` has 0 rows repo-wide, confirmed live —
+  there is no structural evidence to canonicalize yet, for any revision).
+Default mode is dry-run/resolve-only; `--allow-create` + `--apply` are required together to permit
+new canonical-symbol promotion (never exercised live — no revision currently clears the gate).
+The `GROUNDED` code path (nomination-building + `canonicalizeStructuralEvidence()` invocation) is
+proven by code review and by the two gate-rejection runs reaching it correctly, not by a live
+successful write — that remains true until (a) Graphify produces real bindings for the admitted
+revision (P0), and (b) something populates `graphify_symbols` (currently empty regardless of
+revision — a second, independent blocker from the revision-grounding one, discovered while wiring
+this). Receipts: `docs/reports/symbol-reconciliation-writer-v1-*.json` (both runs saved).
+Status: `WIRED_GATE_PROVEN_WRITE_PATH_UNEXERCISED`. Next real trigger: re-run this same script,
+unchanged, once `graphify_symbols` has rows for a source_ref bound to the admitted revision —
+do not build a second reconciliation writer when that day comes.
+
+**Follow-through, 2026-09-13, same day — the extraction lane was built and the `GROUNDED` path
+was proven live for the first time.** Full plan approved and executed (`whimsical-floating-hickey`
+plan): built `scripts/atlas/graphify-symbol-extractor-v1.mts`, the "canonical Graphify extractor"
+`graphify_symbols`'s own migration comment called for but that nothing had ever built. Extends the
+real, pre-existing `scripts/graphify/lib/ts-ast-extractor.mjs` (TypeScript Compiler API walker,
+`extractSymbolsFromSource()` now exported and reusable, unit-tested — 4/4 pass) rather than
+reimplementing it, and adds BOM-aware (UTF-8/UTF-8-BOM/UTF-16LE/UTF-16BE) file reading plus
+extractors for `.json` (key-path structure) and `.md` (ATX heading nesting) via
+`scripts/atlas/lib/{encoding,json-symbol-extractor,markdown-symbol-extractor}.mjs`. `.txt` files
+get zero symbols (valid, not a failure). Also added `scripts/atlas/lib/lsp-client.mjs`, a real
+minimal JSON-RPC client that spawns `typescript-language-server`'s actual `cli.mjs` entry point
+directly (not its `.cmd` shim — that shim's own child process outlived a timeout kill during
+testing, a real bug found and fixed by spawning the resolved Node entry point instead) for a
+`--use-lsp` opt-in alternate TS/JS extraction path, proven live against both a small fixture and a
+real 26KB repo file (`~1.3s`, correct hierarchical symbol nesting). `--use-lsp` stays opt-in, not
+default, since spawning a language-server process per file is measured to be far slower over a
+large batch than the in-process Compiler API walk — consistent with the intended design.
+
+**Real bugs found and fixed while building this, not glossed over**:
+1. `symbol-reconciliation-writer-v1.mts`'s nomination-builder was mapping `declaration_hash` from
+   `graphify_symbols.source_text_hash` (a deliberately-truncated 12-char hash) instead of the full
+   64-char `ast_fingerprint` column — the `structuralSymbolNominationSchema` `declaration_hash`
+   field requires a full sha256, so every promotion attempt failed a Zod validation until this was
+   corrected. Found via the first real end-to-end smoke run, not by inspection.
+2. The `lsp-client.mjs`'s original design spawned the npm `.cmd` shim with `shell:true`; on
+   Windows, a plain `child.kill()` on timeout only kills the `cmd.exe` wrapper, not the real
+   language-server process underneath it, leaving orphaned processes running detached. Fixed by
+   resolving and spawning the package's actual `lib/cli.mjs` entry point via `node` directly
+   (`process.execPath`), which removes the shell layer entirely and makes `kill('SIGKILL')`
+   reliable. (A separate false alarm during the same investigation: `npx tsx -e "..."` silently
+   produces zero output whenever the inline script contains an `import` statement in this
+   environment — this looked like an LSP hang for a while but was actually a broken ad hoc test
+   harness; the real `.mjs` file tests were unaffected and correctly proved the client works.)
+
+**Live results (real writes, not projected)**:
+- `graphify_symbols`: 0 rows -> 37,179+ rows across markdown/json/ts_js kinds (heading/module/
+  field/function/import/interface/type_alias), via multiple real `--apply` batches against real
+  `graphify_files` rows. Zero orphaned `graphify_symbols` rows for `UNPROCESSED` files even after
+  one batch was killed mid-run — the per-file transaction boundary held.
+- **`scripts/atlas/smoke-graphify-symbol-lane-v1.mjs`** (new, wired as `npm run
+  smoke:graphify:symbols`): end-to-end synthetic-revision proof, `status: PASS`. Creates its own
+  `sha256:test-symbol-lane-smoke-*` workspace revision + `atlas_workspace_source_bindings` rows
+  against 3 real, on-disk, `atlas_source_refs`-registered files (never touches the real admitted
+  revision), runs the extractor, then runs `symbol-reconciliation-writer-v1.mts --allow-create
+  --apply` for the **first live exercise of its `GROUNDED` branch** — previously proven only by
+  code review. Result: `gateStatus: "GROUNDED"`, `canonicalSymbolCount: 24`, re-run idempotent
+  (24 -> 24, no duplicates), synthetic rows fully cleaned up (`0` remaining after the run).
+  Re-verified afterward: the real admitted revision (`sha256:322ed1a6...`) still correctly returns
+  `BLOCKED_ON_UNGROUNDED_REVISION` — none of this leaked into or altered the real P0 blocker.
+- `scripts/atlas/audit-canonical-projection-fabric.mjs`'s `SYMBOLS_RESOLVED` predicate extended
+  (additively — old fields kept) to also report `atlas_symbol_registry`/`atlas_symbol_versions`
+  row counts alongside the `graphify_symbols` count, with a new `EXTRACTED_NOT_RECONCILED` verdict
+  tier between `NOT_PROVEN` and `PARTIAL_PROVEN`. Re-ran live: correctly reports
+  `graphify_symbols_row_count: 35811`, `atlas_symbol_registry_row_count: 10310` (the latter is
+  **pre-existing stale data from before this session**, unrelated to the new extraction — the
+  gate's own note now explains this explicitly rather than implying reconciliation coverage that
+  doesn't exist).
+- `scripts/atlas/index-engine.ts` (the dead, broken, falsely-"Phase 110"-attributed scaffold from
+  earlier this session) archived to `deeds_labs/archive/2026-09-13/index-engine.ts.broken`,
+  `docs/archive-manifest.json` entry added.
+
+**Scope boundary respected**: this work never wrote to `atlas_workspace_source_bindings` for the
+real admitted revision, never attempted to fix P0 (Graphify's own coordinator run completing for
+`sha256:322ed1a6...`), and the real admitted-revision gate is re-confirmed still `BLOCKED` after
+all of the above. P0 remains a separate, unresolved, tracked blocker.
+
+Status: `EXTRACTION_LANE_LIVE_RECONCILIATION_GROUNDED_PATH_PROVEN_SYNTHETIC_ONLY`. Real production
+promotion (the admitted revision actually reaching `GROUNDED`) still requires P0.
+
+**Follow-up, 2026-09-13 — `SOURCE-TEXT-ENCODING-01` built (design-corrected per external review),
+not yet re-verified with a live run.** The first extractor version wrote Markdown headings and
+JSON key paths into `graphify_symbols` as fake "symbols" (`kind: 'heading'/'field'/'module'`) --
+a real design mistake, since that table is explicitly for deterministic CODE symbols. Fixed:
+- `scripts/atlas/lib/source-text-envelope.mjs` — `SourceTextEnvelopeV1` fail-closed BOM decoder
+  (UTF-8/UTF-8-BOM/UTF-16LE/UTF-16BE; UTF-16 without a BOM is never guessed) plus a `SOURCE_KINDS`
+  extension→`documentKind` routing table. Unit-tested: 11/11 pass
+  (`source-text-envelope.test.mjs` — ASCII txt, BOM md, multibyte JSON, UTF-16LE/BE with BOM,
+  emoji surrogate pairs + CRLF, malformed-UTF-8 rejection, odd-byte-no-BOM handling,
+  mid-codepoint offset rejection).
+- `scripts/atlas/lib/atlas-ast-nodes-writer.mjs` (new, additive) — writes non-code structure
+  (JSON key paths, Markdown headings) into the **existing, real** `atlas_ast_nodes` table
+  (already had a canonical writer, `sveltekit-frontend/scripts/atlas/populate-atlas-ast-nodes.mjs`,
+  found via grep before building anything new — reused its exact `tree_node_id` hash convention
+  rather than inventing a second one, but did not reuse the script itself since it sources from
+  `codebase_chunk_index` with a code-only `KIND_MAP`, not a live per-file walk).
+- `scripts/atlas/lib/markdown-symbol-extractor.mjs` extended with `extractMarkdownFences()` --
+  Markdown's own embedded fenced code (when the fence language is in the new
+  `MARKDOWN_FENCE_LANGUAGE_TO_EXT` allowlist) now recurses into the real TS/JS extractor and
+  gains genuine `graphify_symbols` identity, carrying explicit provenance
+  (`parentDocument`/`parentSection`/fence byte spans) in its `metadata` column -- the heading
+  structure itself never becomes a code symbol.
+- `scripts/atlas/graphify-symbol-extractor-v1.mts` rewired: `code` → `graphify_symbols` (unchanged
+  behavior), `json`/`markdown` structure → `atlas_ast_nodes` (new), Markdown embedded code →
+  `graphify_symbols` with provenance (new), `plaintext` → still zero structural extraction
+  (unchanged, reserved for future lexical/NLP enrichment). Type-checks clean.
+- **Cleanup performed on already-written data**: the first version's incorrect writes
+  (25,732 `heading` + 7,912 `field` + 3,370 `module` rows = 37,014 rows) were deleted from
+  `graphify_symbols`, and their 1,414 source files reset to `parse_status = 'UNPROCESSED'` so the
+  corrected extractor naturally repopulates them into `atlas_ast_nodes` on the next run. Verified
+  after cleanup: only genuine code kinds remain (`function` 73, `import` 62, `interface` 31,
+  `type_alias` 23 = 189 rows).
+- **Not yet done**: a live re-run proving the corrected routing end-to-end (json/markdown →
+  `atlas_ast_nodes` rows actually land; a real Markdown file with a real `ts`/`js` fence produces
+  a real embedded `graphify_symbols` row with provenance). Flagged, not silently assumed working
+  from unit tests + a clean type-check alone.
+Status: `SOURCE_TEXT_ENCODING_01_BUILT_LIVE_REVERIFICATION_PENDING`.
+
+**Follow-up, 2026-09-13 (same day) — live re-verification run, one real bug found and fixed.**
+Ran `graphify-symbol-extractor-v1.mts --apply` against real, already-`UNPROCESSED`
+`graphify_files` rows (workspace `625743d2-092b-4fa8-abe0-9dc094920c80`), not synthetic fixtures:
+- `.claude/settings.local.json` → 6 `module`-kind rows in `atlas_ast_nodes` (this file's shape has
+  no depth-2 leaf keys, only object containers — 0 `field` rows is correct for this input, not a
+  gap; JSON leaf-key routing itself was separately confirmed via the extractor's own dry-run plan
+  output showing `field` in its emitted symbol set).
+- `.claude/skills/codebase-indexing-agentic-error-fixing.md` (77 total headings across the 3 files
+  tested) → real `heading`-kind rows in `atlas_ast_nodes`. Its and a second `.md` file's fences were
+  all `bash`/`json`/plain — correctly produced zero embedded `graphify_symbols` rows (no ts/js
+  fence existed to recurse into, not a bug).
+- `ACE-BITFROST-WORKER-INTEGRATION.md` (has real ` ```typescript ` fences) → **real embedded-code
+  proof**: `graphify_symbols` gained rows like `type_alias:CanonicalAcePacketEnvelope` and
+  `function:packetSeedCandidatesFromRrf` with `metadata` carrying exactly the designed provenance
+  shape (`parentDocument`, `parentSection`, `fenceStartByte`/`fenceEndByte`,
+  `embeddedStartByte`/`embeddedEndByte`, `extractor_source: "markdown-embedded-fence"`).
+- **Real bug found on first `--apply` attempt (not a synthetic-test artifact)**: `atlas_ast_nodes`
+  has a live `chk_atlas_ast_nodes_kind` CHECK constraint (added
+  `drizzle/manual/20260716b_atlas_ast_nodes_alter.sql`, code-only allowlist: file/module/class/
+  interface/type/function/method/constructor/parameter/route/schema/test/call_site/import/export)
+  that rejected both `heading` and `field` — the two new document-structure kinds this lane
+  introduces. First live write attempt errored out mid-batch (`23514`, `chk_atlas_ast_nodes_kind`)
+  partway through a multi-file run; the JSON files that had already committed in earlier per-file
+  transactions were unaffected, but the run halted before reaching later files. Fixed with a new
+  additive migration, `drizzle/manual/20260913_atlas_ast_nodes_document_structure_kinds.sql`
+  (drops and re-adds the same constraint with `heading`/`field` added to the allowlist — no rows
+  altered, no other values removed), applied live via `docker exec ... psql`. Confirmed this is the
+  correct, minimal fix rather than remapping the new kinds onto an existing code-kind name (which
+  would have made document-structure rows indistinguishable from real code AST rows in the same
+  table).
+- **Idempotency re-confirmed live** (not just via the earlier synthetic smoke test): reset
+  `ACE-BITFROST-WORKER-INTEGRATION.md`'s `parse_status` back to `UNPROCESSED` and re-ran `--apply` —
+  `atlas_ast_nodes` count (25) and `graphify_symbols` count (5) for that file were byte-identical
+  before and after the second run, despite the receipt reporting `totalSymbolsInserted: 8` (that
+  field reflects attempted `INSERT ... ON CONFLICT` rows, not net-new rows — the `ON CONFLICT DO
+  NOTHING`/`DO UPDATE` clauses correctly prevented duplication).
+- **Scope boundary re-confirmed**: re-ran `symbol-reconciliation-writer-v1.mts` with no args
+  afterward — still returns `BLOCKED_ON_UNGROUNDED_REVISION` for the real admitted revision
+  (`sha256:322ed1a6...`, 0 bound source refs), proving none of today's writes touched or altered
+  the P0 blocker.
+- **Closed a separate, previously-flagged loose end**: `scripts/atlas/lib/encoding.mjs` had been
+  archived to `deeds_labs/archive/2026-09-13/encoding.mjs.superseded` in the same session that
+  built `source-text-envelope.mjs`, but its `docs/archive-manifest.json` entry was missed at the
+  time — added now (sha256 `2f10d237ec3a96c39b93ec2f971cf909e3552d62d5b380d53e0e2db82d521c18`,
+  matches the on-disk file).
+
+Status: `SOURCE_TEXT_ENCODING_01_LIVE_REVERIFICATION_PROVEN`. All three routing destinations
+(code→`graphify_symbols`, document-structure→`atlas_ast_nodes`, embedded-fence-code→
+`graphify_symbols` with provenance) confirmed against real repo files, not synthetic fixtures.
+Remaining open items (unchanged from before): `GRAPHIFY-STRUCTURAL-CODE-CANARY-02`'s
+`--source-ref` flag (not built), the RRF-classification discrepancy on
+`PROMOTION-BOARD-RECONCILE-02` (not resolved), and P0 itself (out of scope, still blocked).
+
+**Follow-up, 2026-09-13 (same day) — `GRAPHIFY-STRUCTURAL-CODE-CANARY-02` built, live-proven.**
+`sveltekit-frontend/scripts/atlas/graphify-daily-coordinator-canary-v1.mts` now accepts a
+first-class, repeatable `--source-ref=<path>` CLI flag (replaces the ad hoc
+`ATLAS_GRAPHIFY_CANARY_SOURCE_REFS` env-var override — no longer read anywhere in the file):
+- Every `--source-ref` value is looked up against `rootSources` (the sealed snapshot's real
+  `repo:root` sources, loaded from the admitted workspace-revision's snapshot file) by exact
+  string match — never opened from disk or otherwise treated as a filesystem path until that
+  lookup succeeds. Not found → throws
+  `GRAPHIFY_COORDINATOR_CANARY_SOURCE_REF_NOT_FOUND_IN_SEALED_SNAPSHOT:<ref>`.
+- Each resolved source's extension is checked against a code-source allowlist (`.ts .tsx .mts .cts
+  .js .jsx .mjs .cjs`) since structural materialization is TypeScript-compiler-based. A non-code
+  match (e.g. `.md`) → throws `GRAPHIFY_COORDINATOR_CANARY_SOURCE_REF_NOT_A_CODE_SOURCE:<ref>`.
+- `--source-ref` + `--full` together throws `GRAPHIFY_COORDINATOR_CANARY_SOURCE_REF_NOT_VALID_WITH_FULL`
+  (currently unreachable in practice since `--full` itself throws first, but kept for when that
+  block is eventually lifted).
+- Report `gate`/`status` now read `GRAPHIFY-STRUCTURAL-CODE-CANARY-02`/`PROVEN_STRUCTURAL_CODE_CANARY`
+  when `--source-ref` drives the run (vs. `GRAPHIFY-DAILY-COORDINATOR-01`/`PROVEN_COMMITTED_BOUNDED_CANARY`
+  for the default numeric-`--limit` path), and a new `requestedSourceRefs` field names every
+  explicitly-requested ref so a multi-ref invocation can't be misread as proving structural
+  extraction on more than the one (`structuralSourceRef`, always singular) that actually got it —
+  the same honesty gap `--full` had at 24k scale, made visible instead of silently reintroduced at
+  smaller scale.
+- Updated the now-stale `--full`-blocked error text (previously said "not yet built" about this
+  exact gate).
+
+**Live-proven, not just type-checked**: ran the real canary end-to-end against
+`ace-vector-selection-slice/src/lib/server/ace/ranking/packet-feature-matrix.ts` (the same real
+`.ts` file the earlier env-var-driven canary used) via
+`--source-ref=ace-vector-selection-slice/src/lib/server/ace/ranking/packet-feature-matrix.ts`.
+Real execution `b337f94c-850b-44b5-99a7-ba6a6cfaeedf`: `fileCount: 1`, `completedStageCount: 5`,
+`structuralProviderStatus: "PROVEN"`, `structuralProvenanceStatus: "NATIVE_READY"`,
+`requestedSourceRefs: ["ace-vector-selection-slice/.../packet-feature-matrix.ts"]`. Also verified
+all three guard rails live, not just by code inspection: a `.md` ref throws
+`SOURCE_REF_NOT_A_CODE_SOURCE`; a path-traversal-shaped ref (`../../../etc/passwd.ts`) throws
+`SOURCE_REF_NOT_FOUND_IN_SEALED_SNAPSHOT` (the sealed-snapshot lookup itself is what defeats path
+traversal — it's a string-equality check against known sourceRefs, never a filesystem read); and
+`--full --source-ref=x.ts` together still hits the pre-existing `--full`-blocked throw first.
+
+**Real bug found and fixed mid-verification**: the report-file write (`writeFile` from
+`node:fs/promises`) intermittently threw a bare `UNKNOWN: unknown error` on this exact path on
+Windows, reproducible across repeat runs, even though all DB-side work (execution open, all 5
+stage transitions, `completeExecution`) had already succeeded — confirmed live via a direct
+Postgres readback of the completed-but-report-less execution (`24c421a1-28b1-431d-ac09-2793ed807ca6`,
+`fileCount: 1`, `completed_stages: 5`) before touching any code, so the fix wasn't guessed at.
+A synchronous write (`writeFileSync` from `node:fs`) to the identical path succeeded immediately
+in a direct test, so swapped the report write to `writeFileSync` — same output shape and location,
+async-vs-sync only. Re-ran afterward and the report file wrote cleanly on the first attempt.
+
+Status: `GRAPHIFY_STRUCTURAL_CODE_CANARY_02_BUILT_AND_LIVE_PROVEN`. Scope note: this closes the
+"explicit, deterministic code-source targeting" gap only — it does not make `--full` safe to lift
+(structural materialization still only ever tests one source per run, by design, regardless of
+how many `--source-ref` values are passed), and does not touch P0.
+
+**Checked 2026-09-12 (same session): does anything populate `graphify_symbols`? No.** Grepped the
+whole repo for `graphify_symbols`/`graphifySymbols` (raw SQL and Drizzle schema references alike).
+Exactly one candidate writer exists anywhere: `scripts/atlas/index-engine.ts`
+(`runIndexEngine()` → `processSymbols()` → `tx.insert(graphifySymbols)...`). It is **broken and
+zero-caller, not a dormant working writer**:
+- Fails `tsc --noEmit` outright — `error TS1002: Unterminated string literal` at its own line 14
+  (a `$lib/server/db/schema/graphify.js` import missing its closing quote/semicolon), cascading
+  into 20+ further parse errors. It cannot run.
+- Contains duplicated import lines (6-7 repeated verbatim at 11-12) and literal `<task_progress>`
+  / `>>>>` markers pasted directly into the function body (lines 53-74) — this reads as leaked
+  agent-tool output accidentally committed into source, not a real implementation draft.
+- Zero callers anywhere in the repo (`runIndexEngine`/`index-engine` match only the file's own
+  name).
+This means the empty-`graphify_symbols` blocker found by `SYMBOL-RECONCILIATION-WRITER-01`'s gate
+is not "no one has gotten to it yet" — the one attempt that exists never worked and was never
+wired in. Left in place, not archived, pending an explicit decision (fix this file into a real
+Stage 1-2 indexer, or archive it as broken and route symbol extraction through
+`packages/parent-atlas`'s existing `treesitter-chunker`/`ast-grep` adapters instead, per this
+file's own "Audit `packages/*` Before Moving Anything" hard rule in CLAUDE.md — that packages-side
+adapter path was not evaluated here as a `graphify_symbols` writer candidate, only the raw-grep
+surface was).
+
+### `WORKSPACE-REVISION-COLUMN-01` (new, 2026-09-12) — **corrected same day**: column exists, is dead, not absent
+
+- **Correction to this gate's own earlier entry above, verified live, not assumed**: the original
+  fabric-audit's "no live `atlas_packets.workspace_revision` column exists" claim is imprecise.
+  Direct `information_schema.columns` + row inspection
+  (`scripts/atlas/audit-atlas-packets-revision-columns-v1.mjs`, read-only) found the column DOES
+  exist — as `integer`, and **100% of 61,718 rows are `0`** (a dead default, never meaningfully
+  written). Same story for `atlas_packets.representation_revision` (integer, 100% zero).
+  `atlas_packets.source_revision` (text) exists but is **0/61,718 populated** (all NULL) — genuinely
+  empty, unlike the other two. None of the three can satisfy `buildQdrantSyncPayload()`'s contract,
+  which requires a `sha256:[a-f0-9]{64}`-format string (per `requireContentRevision()` in
+  `qdrant-sync-payload.ts`) — the live `integer` columns are the same class of legacy numeric
+  epoch that file's own doc comment already warns can't satisfy canonical lineage
+  (`workspace_cache_revision`, not `workspace_revision`).
+- **Checked whether the real value could be derived by joining to `atlas_workspace_source_bindings`
+  instead of migrating the column type — it can't, not because of a join-key problem, but because
+  the binding data itself barely exists**: only 111/61,718 packets (0.18%) join at all
+  (`wsb.canonical_source_ref = ap.source_ref`, `repo_id='deeds-web-app'`), and **0 of those 111**
+  are bound to the currently-admitted revision (`sha256:322ed1a6...`) — all 111 sit under the
+  *other* revision (`sha256:55edaaad...`), same one flagged in `QDRANT-LEGACY-PAYLOAD-BACKFILL-01`
+  and `SYMBOL-REPRESENTATION-REGISTRY-RECONCILIATION-01` above. This is the third independent
+  confirmation this session that the real root blocker is upstream of any writer-contract or
+  schema patch: there is almost no grounded workspace-source binding data to populate anything
+  with, admitted-revision or otherwise. Script:
+  `scripts/atlas/audit-atlas-packets-workspace-binding-joinability-v1.mjs` (read-only).
+- **Design implication (not started, needs sign-off)**: fixing this column is not "backfill from
+  existing bindings" — that data doesn't exist yet in useful quantity. The dependency order is:
+  (1) Graphify must run end-to-end and produce real `atlas_workspace_source_bindings` rows bound to
+  the admitted revision (P0, same blocker as everywhere else); only then does (2) either altering
+  `atlas_packets.workspace_revision`'s type or adding a new correctly-typed column, populated from
+  those real bindings, become meaningful. Migrating the column's type today, before (1), would just
+  produce a correctly-typed column that's still empty.
+- Status: `TRACKED_NOT_STARTED`, corrected finding. Blocks: `REVISION_QUALIFIED`.
+
+### `QDRANT-WRITER-CONTRACT-PATCH-01` (new, 2026-09-12) — design only, sequenced behind the above
+
+- **This was the specific thing asked for this turn: "design the writer-contract patch."** The
+  writer contract itself (`buildQdrantSyncPayload()` in
+  `sveltekit-frontend/src/lib/server/retrieval/qdrant-sync-payload.ts`) is **already correct** — it
+  hard-fails (throws) without a valid `packetKey`/`sourceRef`/`featureId`/`workspaceId`, a
+  `sha256:`-format `workspace_revision` and `source_revision`, a positive `representation_revision`,
+  and the canonical `representation_id`. Nothing about this file needs patching.
+- **The actual defect, per `scripts/atlas/audit-emb3a-qdrant-writer-lineage.mjs` (re-run
+  2026-09-12, read-only)**: of 9 known writer surfaces touching `codebase_chunks_768`, only
+  `qdrant-sync-worker.ts` delegates to the compliant builder
+  (`status: LINEAGE_COMPLETE_VIA_SHARED_BUILDER`). **6 legacy scripts bypass it entirely** and are
+  each flagged `promotionBlocked: true` / `REVISION_FIELDS_MISSING`:
+  `backfill-packets-to-qdrant.mjs`, `backfill-packets-to-qdrant-ollama.mjs`,
+  `qdrant-upsert-worker.mjs`, `backfill-qdrant-payloads-from-postgres.mjs`,
+  `backfill-qdrant-payload-upsert.mjs`, and one more in the full report
+  (`docs/reports/emb3a-qdrant-writer-lineage-audit.json`).
+- **Spot-checked one legacy writer's actual query**
+  (`scripts/atlas/backfill-qdrant-payloads-from-postgres.mjs:44-58`): its `SELECT` joins
+  `codebase_chunk_index` to `atlas_packets` on `cci.relative_path = ap.source_ref` and only
+  selects `packet_key, source_ref, feature_id, domain_class, title_id, som_row, som_col,
+  community_id` — it never even attempts to select `workspace_revision`/`source_revision`/
+  `representation_revision`, not because they're unavailable in its query shape, but because the
+  script predates those fields being expected at all.
+- **The fix is real but cannot be usefully applied yet — same root dependency as
+  `WORKSPACE-REVISION-COLUMN-01` above**: widening these 6 scripts' queries and routing their
+  payload construction through `buildQdrantSyncPayload()` would immediately hard-fail every row
+  (by design — that's the contract working correctly) until real, admitted-revision-bound
+  `workspace_revision`/`source_revision` values exist upstream to select. Patching the 6 legacy
+  writers ahead of that would either (a) fail closed on every row, achieving nothing, or (b) tempt
+  someone into loosening the compliant builder's hard-fail checks to let ungrounded data through —
+  exactly the false-provenance mistake `QDRANT-LEGACY-PAYLOAD-BACKFILL-01`'s dry-run already
+  refused to commit.
+- **Recommended sequencing, not started**:
+  1. Run Graphify for real (P0) → produces real `atlas_workspace_source_bindings` rows bound to
+     the admitted revision.
+  2. Resolve `WORKSPACE-REVISION-COLUMN-01` (schema decision + migration, sign-off required).
+  3. Rewrite the 6 legacy writers to select the now-real revision columns and delegate to
+     `buildQdrantSyncPayload()` instead of hand-building payloads — or, simpler, retire them
+     entirely and run one full incremental pass through the already-compliant
+     `qdrant-sync-worker.ts` path instead of maintaining 6 parallel writers long-term.
+  4. Only then does `QDRANT-LEGACY-PAYLOAD-BACKFILL-01` (or a rebuild) become executable without
+     writing false provenance.
+- Status: `DESIGNED_NOT_STARTED`. Zero code changes made to any of the 6 legacy scripts or to
+  `qdrant-sync-payload.ts` — this is a design/sequencing record only. Evidence:
+  `docs/reports/emb3a-qdrant-writer-lineage-audit.json`,
+  `scripts/atlas/audit-atlas-packets-workspace-binding-joinability-v1.mjs` output (inline above,
+  not written to a separate report file).
+
+### `GRAPH-ORDINAL-MANIFEST-01` (new, 2026-09-12) — tracked, not started
+
+- Closes `GRAPH_MANIFEST_SEALED` and `ORDINAL_MAP_SEALED`, both `ABSENT` (no table exists at all,
+  not just unpopulated). Two decisions bundled here because `PROJECTIONS_CHECKSUM_ALIGNED` depends
+  on both simultaneously:
+  1. Which graph engine's output becomes the sealed `GraphProjectionManifestV1` — NetworkX, cuGraph,
+     or Neo4j each currently build their own graph independently (per root `CLAUDE.md`'s
+     NetworkX↔cuGraph parity-pipeline correction) with no single agreed node/edge manifest.
+  2. Build a real `CandidateOrdinal` sealed-map table — currently a design intent in `CLAUDE.md`'s
+     "Parent atlas current identity and retrieval alignment" section, never a table-backed artifact.
+- Not yet designed: table shape, writer, or which engine wins — genuine architecture decisions, not
+  made here.
+- Status: `TRACKED_NOT_STARTED`. Blocks: `GRAPH_MANIFEST_SEALED`, `ORDINAL_MAP_SEALED`,
+  `PROJECTIONS_CHECKSUM_ALIGNED`.
+
+## ACE-LIVE-DRY-INPUT-RECHECK-2026-09-12
+
+- [x] Ran the read-only V2 readiness compiler through the repository TypeScript
+      loader after correcting the `.mts` invocation.
+- [x] The compiler fail-closed with all three authoritative inputs missing:
+      `CandidateOrdinalMapV1`, `CandidateFeatureSnapshotV1`, and
+      `RevisionAuthorityEnvelopeV1`. Cross-contract verification was not
+      attempted because no artifact arguments were supplied.
+- [x] Confirmed `writesPerformed=false`, `cacheWritesPerformed=false`, and
+      `canonicalAuthority=false`.
+- [ ] Do not synthesize or seed replacement artifacts. ACE/context admission
+      remains downstream of current source lineage, graph/feature sealing, and
+      revision-authority receipts.
+
+Evidence: `docs/reports/ace-live-dry-input-readiness-v2.json`.
+Status: `ACE_LIVE_DRY_INPUT_BLOCKED`; authority=false;
+writesPerformed=false. First blocker:
+`CANDIDATE_ORDINAL_FEATURE_AND_REVISION_ARTIFACTS_MISSING`.
+
+## BITFROST-TRACKING-CAPABILITY-RECHECK-2026-09-12
+
+- [x] Proved the Valkey connection-tracking capability and configured prefix
+      discovery in read-only mode.
+- [x] Confirmed `DATA_MUTATION_PERFORMED=false`.
+- [ ] Prove live invalidation delivery, stale-entry rejection, and replay
+      behavior with revision/checksum-addressed fixtures; connection tracking
+      alone does not prove cache correctness or ACE admission.
+
+Evidence: `docs/reports/bitfrost-valkey-tracking-proof.json` and
+`docs/reports/bitfrost-valkey-tracking-proof.md`.
+Status: `PROVEN_CONNECTION_CAPABILITY`; authority=false;
+writesPerformed=false. ACE remains blocked on
+`CANDIDATE_ORDINAL_FEATURE_AND_REVISION_ARTIFACTS_MISSING`.
+
+## BITFROST-SEMANTIC-CACHE-RECHECK-2026-09-12
+
+- [x] Ran the semantic BitFrost/Valkey audit in read-only mode.
+- [x] Confirmed the cache service is reachable and `28` cache families are
+      classified.
+- [x] Recorded three documented-live families with zero current rows:
+      `gpu:autoencoder:latent_64:*`, `gpu:karpathy:scores`, and
+      `gpu:karpathy:summary`.
+- [x] Classified the result as `PASS_WITH_DRIFT`; empty families are not
+      interpreted as proof of a flush, failure, or authority loss.
+- [ ] Prove revision/checksum-addressed ACE hit, miss, stale rejection, and
+      invalidation behavior before warming or writing any cache family.
+
+Evidence: `docs/reports/bitfrost-semantic-cache-audit.json` and
+`docs/reports/bitfrost-semantic-cache-audit.md`.
+Status: `PASS_WITH_DRIFT`; cache authority=false; no cache mutation was
+performed. First blocker remains:
+`CANDIDATE_ORDINAL_FEATURE_AND_REVISION_ARTIFACTS_MISSING`.
+
+## MCP-SURFACE-LIVE-RECHECK-2026-09-12
+
+- [x] Completed the live read-only MCP surface discovery for both local
+      `atlas-tools` and external TRACE.
+- [x] Confirmed `atlas-tools` is reachable over stdio with `10` tools and
+      TRACE is reachable over streamable HTTP with `176` tools; both surfaces
+      expose revisioned schema fingerprints and are not canonical authorities.
+- [x] Preserved the mutation boundary: `atlas-tools.record_outcome` is a
+      declared ledger/Neo4j mutation surface, while discovery itself performed
+      no tool call that writes state.
+- [x] Confirmed the result is protocol/surface reachability evidence, not
+      current-corpus lineage, ACE admission, or production retrieval proof.
+- [ ] Add the remaining timeout and mutation-surface probes before enabling
+      any optional MCP history or write path.
+
+Evidence: `docs/reports/mcp-tool-surface-live-v1.json` and
+`scripts/atlas/discover-mcp-tools-live-v1.mts`.
+Status: `MCP_SURFACES_REACHABLE_DISCOVERY_ONLY`; authority=false;
+writesPerformed=false. First blocker remains:
+`CANDIDATE_ORDINAL_FEATURE_AND_REVISION_ARTIFACTS_MISSING`.
+
+## GPU-ACE-ORNITH-READINESS-RECHECK-2026-09-12
+
+- [x] Read-only cross-lane receipt proves the bounded GPU/ACE/Ornith chain:
+      tile readback, GPU ordinal roundtrip, feature replay, context replay,
+      synthesis replay, claim validation, and read-only DAG checks all pass.
+- [x] Mutation remains blocked as designed. The receipt does not claim full
+      corpus CandidateOrdinal expansion or graph-revision ownership for the
+      128/768 scale.
+- [ ] Keep ACE promotion blocked until authoritative ordinal, feature, and
+      revision envelopes exist and explicit mutation authorization is supplied.
+
+Evidence: `docs/reports/parent-atlas-gpu-ace-ornith-readiness-v1.json`;
+`scripts/atlas/audit-parent-atlas-gpu-ace-ornith-readiness-v1.mjs`.
+Status: `GPU_ACE_ORNITH_READONLY_CHAIN_PROVEN`; authority=false;
+writesPerformed=false. First blocker:
+`FULL_CORPUS_CANDIDATE_ORDINAL_AND_GRAPH_REVISION_OWNERSHIP_MISSING`.
+
+## TEMPORAL-SCHEMA-SURFACES-RECHECK-2026-09-12
+
+- [x] Read-only temporal schema audit found all `6/6` expected tables and no
+      missing required columns. Database error: none.
+- [x] The schema accepts nullable workspace revisions where historical rows
+      require them; this is schema presence proof, not artifact-current-owner
+      or supersession proof.
+- [ ] Keep temporal action-history and artifact-supersession admission open
+      until ordered revision frames and predecessor/replacement evidence exist.
+      No tables, events, owners, or supersession records were mutated.
+
+Evidence: `docs/reports/temporal-schema-surfaces-v1.json`;
+`scripts/atlas/audit-temporal-schema-surfaces-v1.mjs`.
+Status: `SCHEMA_SURFACES_PRESENT_SUPERSESSION_PROOF_OPEN`;
+authority=false; writesPerformed=false. First blocker:
+`ARTIFACT_SUPERSESSION_CHAIN_UNPROVEN`.
+
+## TEMPORAL-CURRENT-OWNER-RECHECK-2026-09-12
+
+- [x] Read-only current-owner projection audit found no temporal events or
+      projected entities: `0` events, `0` entities, `0` active owners, and
+      `0` superseded/terminal artifacts.
+- [x] No ambiguous active owners or revision-bound/unbound rows were observed;
+      the result is an empty projection, not proof of a valid current owner.
+- [ ] Keep artifact supersession and current-owner admission blocked until two
+      ordered immutable frames and explicit predecessor/replacement evidence
+      exist. No events, owners, or projections were written.
+
+Evidence: `docs/reports/temporal-current-owner-projection-v1.json`;
+`scripts/atlas/audit-temporal-current-owner-projection-v1.mjs`.
+Status: `CURRENT_OWNER_NOT_PROVEN_NO_EVENTS`; authority=false;
+writesPerformed=false. First blocker:
+`ARTIFACT_SUPERSESSION_EVENTS_MISSING`.
+
+## TEMPORAL-LOGICAL-IDENTITY-RECHECK-2026-09-12
+
+- [x] Read-only logical-identity audit found one observed frame containing
+      `61,718` logical packet identities. Every identity has exactly one
+      observed version in this frame; no multi-version identity or
+      supersession relationship was inferred.
+- [x] The audit keeps `packet_key` as the proposed logical identity and
+      treats source/workspace revisions as version coordinates. It does not
+      synthesize revision-bearing identity or promote a timestamp to
+      supersession evidence.
+- [x] Receipt checksum: `d31b1613b9b6cd9f269caf161304c65871fb6c4610ec8d2c56e9c44799690cb0`.
+      Writes: `false`.
+- [ ] Artifact supersession remains unproven until at least two ordered,
+      immutable frames contain explicit predecessor/replacement evidence.
+
+Evidence: `docs/reports/temporal-logical-identity-v1.json`;
+`scripts/atlas/audit-temporal-logical-identity-v1.mjs`.
+Status: `SINGLE_FRAME_NO_SUPERSESSION_POSSIBLE`; authority=false;
+writesPerformed=false. First blocker:
+`ARTIFACT_SUPERSESSION_EVENTS_MISSING`.
+
+## ACE-LIVE-DRY-INPUT-RECHECK-2026-09-12
+
+- [x] Read-only ACE input readiness check ran through the correct TypeScript
+      entrypoint and found all three authoritative inputs missing:
+      `CandidateOrdinalMapV1`, `CandidateFeatureSnapshotV1`, and
+      `RevisionAuthorityEnvelopeV1`.
+- [x] Cross-contract verification was not attempted because the required
+      inputs were absent. Candidate-source authority remained false.
+- [ ] Keep ACE packet/cache materialization blocked; do not synthesize these
+      envelopes from fixture, Qdrant, graph ordinal, or stale aggregate data.
+
+Evidence: `docs/reports/ace-live-dry-input-readiness-v2.json`;
+`scripts/atlas/audit-ace-live-dry-input-readiness-v2.mts`.
+Status: `ACE_LIVE_DRY_INPUT_BLOCKED`; authority=false;
+writesPerformed=false; cacheWritesPerformed=false. First blocker:
+`CANDIDATE_ORDINAL_FEATURE_AND_REVISION_ARTIFACTS_MISSING`.
+
+## TRACE-DISABLED-SEARCH-TOOLS-REINTEGRATION-RECHECK-2026-09-12
+
+- [x] Read-only audit confirmed the optional codebase, research, Bifrost, and
+      `rg_atlas` registries remain disabled by policy; seven search/dispatch
+      tools are not exposed as live tools.
+- [x] TRACE MCP remains reachable: `176` tools discovered, the read-only
+      search probe responded, and the static identity-envelope implementation
+      contains packet, source-revision, and workspace-revision lookup paths.
+- [x] Dependency readback is healthy for required MCP, Bifrost, synthesis,
+      Qdrant, Neo4j, PostgreSQL, and Redis services. The optional topology
+      endpoint is unavailable and does not authorize registry re-enablement.
+- [ ] Keep optional registries disabled until operator review, dependency
+      health, schema/identity regression tests, and bounded live readback are
+      separately proven for each family. No MCP mutation or datastore write
+      occurred.
+
+Evidence: `docs/reports/trace-disabled-search-tools-v1.json`;
+`docs/reports/mcp-tool-surface-live-v1.json`.
+Status: `DISABLED_SEARCH_TOOLS_AUDITED`; authority=false;
+writesPerformed=false. First blocker: `OPTIONAL_REGISTRIES_DISABLED_BY_POLICY`.
+
+## REPAIR-CANDIDATE-FEATURE-MATRIX-RECHECK-2026-09-12
+
+- [x] Re-ran the read-only repair-candidate feature-matrix proof.
+- [x] The bounded matrix contains `15` candidates, preserves the `25`-feature
+      base plane, and exposes a `24`-feature repair overlay (`49` total).
+      The overlay is currently empty and replay is identical.
+- [ ] Keep repair-candidate execution and ACE admission blocked until
+      authoritative candidate/revision envelopes are supplied.
+
+Evidence: `docs/reports/current-repair-candidate-feature-matrix-v1.json`.
+Status: `REPAIR_CANDIDATE_FEATURE_MATRIX_CONTRACT_PROVEN`; authority=false;
+writesPerformed=false.
+### TRACE-DISABLED-SEARCH-TOOLS-RECHECK-2026-09-12
+
+- [x] Re-ran the read-only TRACE MCP disabled-search-tools audit.
+- [x] Confirmed the gateway and required dependencies respond; `176` live
+      tools are discovered and the read-only TRACE probe responds.
+- [x] Confirmed the seven optional codebase/research/Bifrost/rg-Atlas tools
+      remain disabled by policy.
+- [ ] Keep re-enablement closed until dependency health, identity-envelope
+      schemas, regression tests, and bounded live readback are proven.
+
+Evidence: `docs/reports/trace-disabled-search-tools-v1.json`.
+Status: `DISABLED_SEARCH_TOOLS_AUDITED`; identity envelope live status is
+`LIVE_ENVELOPE_MISSING`; writesPerformed=false.
+
+### ACE-PROMPT-CACHE-CALLER-RECHECK-2026-09-12-R2
+
+- [x] Re-ran the read-only ACE prompt-cache caller census.
+- [x] Confirmed `2` callers, with `0` strict V2 handoffs and `2` legacy or
+      uncertified callers.
+- [ ] Keep cache prefill handoff blocked until every caller emits the
+      revision/checksum-bound V2 context contract; no cache writes occurred.
+
+Evidence: `docs/reports/ace-prompt-cache-caller-audit-v1.json`;
+`scripts/atlas/audit-ace-prompt-cache-callers-v1.mjs`.
+Status: `CACHE_PREFILL_CALLER_HANDOFF_BLOCKED`; authority=false;
+writesPerformed=false.
+
+### MCP-COMPATIBILITY-CALLER-CENSUS-RECHECK-2026-09-12
+
+- [x] Completed the read-only compatibility census across `840` files.
+- [x] Recorded `18,077` MCP compatibility/caller references against registry
+      revision `sha256:f9b028031d84e8922dc3a02fc0dc19bb5d474c5695f58306054679b47b6f142e`.
+- [ ] Keep protocol/caller compatibility separate from live handshake,
+      executor capability, and mutation authorization; this census alone does
+      not prove any caller is safe to enable.
+- [x] No MCP tool was enabled, no server state was mutated, and no canonical
+      or projection datastore was written.
+
+Evidence: `docs/reports/mcp-compatibility-callers-v1.json`;
+`scripts/atlas/audit-mcp-compatibility-callers-v1.mjs`.
+Status: `MCP_COMPATIBILITY_CENSUS_PROVEN_LIVE_HANDOFF_OPEN`; authority=false;
+writesPerformed=false.
+### ATLAS-PACKETS-WORKSPACE-BINDING-RECHECK-2026-09-12
+
+- [x] Re-ran the read-only packet/workspace-binding joinability check.
+- [x] Confirmed `61,718` packet rows, `111` joinable to workspace bindings,
+      and `0` joinable to the admitted workspace revision.
+- [ ] Keep packet revision admission and ACE/context promotion blocked until
+      packet rows are joined through the exact current workspace/source frame.
+
+Evidence: command output from `scripts/atlas/audit-atlas-packets-workspace-binding-joinability-v1.mjs`.
+Status: `PACKET_WORKSPACE_BINDING_ADMITTED_REVISION_EMPTY`;
+authority=false; writesPerformed=false.
+
+### ORNITH-VLM-OWNER-RECHECK-2026-09-12
+
+- [x] Re-ran the read-only VLM owner audit.
+- [x] Confirmed Ornith 1.5 VLM via llama.cpp `:8090/v1`, Docling's OpenAI
+      multimodal client, the official mmproj launcher profile, and no Ollama
+      VLM fallback in active paths.
+- [x] Confirmed the normal `dev:gpu` vision mode remains an explicit switch;
+      Ollama remains embedding fallback only.
+
+Evidence: `docs/reports/ornith-vlm-owner-audit-v1.json`.
+Status: `ORNITH_VLM_OWNER_STATICALLY_PROVEN`; authority=false;
+writesPerformed=false.
+
+### MCP-TOOL-ONTOLOGY-RECHECK-2026-09-12
+
+- [x] Refreshed the read-only MCP tool ontology census: `176` tools across
+      the configured namespaces.
+- [x] Confirmed layer classification remains incomplete for `66` tools and
+      the registry exposes explicit read-write surfaces for Engram, database,
+      and graph operations.
+- [ ] Require per-tool mutation-surface, identity-envelope, and authority
+      classification before any optional registry or tool is re-enabled.
+
+Evidence: `docs/reports/mcp-tool-ontology.json`;
+`docs/reports/mcp-tool-ontology.md`.
+Status: `MCP_TOOL_ONTOLOGY_CLASSIFICATION_PARTIAL`; authority=false;
+writesPerformed=false.
+
+### ACE-PACKET-CACHE-REPLAY-RECHECK-2026-09-12-R2
+
+- [x] Ran the bounded ACE packet-cache replay.
+- [x] Confirmed miss-before-write, hit-after-write, and stale-lineage miss
+      behavior; replay status is `ACE_PACKET_CACHE_REPLAY_PROVEN`.
+- [x] Confirmed canonical authority remained false and no canonical store was
+      written.
+- [ ] Correct the replay gate's mutation declaration before treating it as a
+      read-only proof: the receipt reports `cacheWritePerformed=true`. Future
+      audits must use an explicit no-write mode or clearly classify this as a
+      cache mutation test.
+
+Evidence: command output from
+`scripts/atlas/prove-ace-packet-cache-replay-v1.mts`.
+Status: `ACE_PACKET_CACHE_REPLAY_PROVEN_WITH_CACHE_WRITE`;
+canonicalAuthority=false; canonicalWritesPerformed=false;
+cacheWritePerformed=true.
+
+### ACE-PACKET-CACHE-READ-ONLY-GUARD-2026-09-12
+
+- [x] Changed the ACE replay harness to default to read-only audit mode.
+- [x] Confirmed the default run reports `cacheWritePerformed=false`,
+      `canonicalWritesPerformed=false`, and preserves stale-lineage misses.
+- [x] Isolated the write-through replay behind the explicit `--write-test`
+      flag so a normal audit cannot mutate Valkey/Redis.
+- [ ] Keep write-test execution outside routine portfolio audits and require
+      separate authorization before using it.
+
+Evidence: `scripts/atlas/prove-ace-packet-cache-replay-v1.mts`;
+read-only command output from the default replay.
+Status: `ACE_PACKET_CACHE_READ_ONLY_AUDITED`; authority=false;
+cacheWritePerformed=false; writesPerformed=false.
+
+### ACE-CONTEXT-CACHE-READ-ONLY-GUARD-2026-09-12
+
+- [x] Changed the ACE context-cache replay harness to default to read-only
+      mode.
+- [x] Confirmed the default run preserves miss and stale-check behavior while
+      reporting `cacheWritePerformed=false`.
+- [x] Isolated write-through replay behind the explicit `--write-test` flag.
+- [ ] Keep write-test execution outside routine portfolio audits and require
+      separate authorization before using it.
+
+Evidence: `scripts/atlas/prove-ace-context-cache-replay-v1.mts`;
+default replay output.
+Status: `ACE_CONTEXT_CACHE_READ_ONLY_AUDITED`; authority=false;
+cacheWritePerformed=false; writesPerformed=false.
+
+### ACE-CONTEXT-CACHE-READ-ONLY-RECHECK-2026-09-13-R1
+
+- [x] Re-ran the ContextManifest/ACE cache replay without `--write-test`.
+- [x] Confirmed the disposable key was a miss before any write, the stale
+      manifest checksum was rejected, and no cache hit was synthesized.
+- [x] Confirmed `cacheWritePerformed=false`, `canonicalWritesPerformed=false`,
+      and `canonicalAuthority=false`.
+- [ ] Keep write-through replay opt-in and separately authorized; this proof
+      does not establish live ACE caller adoption or current-corpus lineage.
+
+Evidence: `scripts/atlas/prove-ace-context-cache-replay-v1.mts`;
+default read-only replay output.
+Status: `ACE_CONTEXT_CACHE_READ_ONLY_AUDITED`; authority=false;
+writesPerformed=false.
+
+### ACE-CONTEXT-CALLER-ADOPTION-RECHECK-2026-09-13-R1
+
+- [x] Ran the read-only ACE ContextManifest caller census across `36` caller
+      surfaces.
+- [x] Classified `13` surfaces as strict V2-wired, `21` as legacy
+      query-cache callers, and `2` as diagnostic-only; no dead callers were
+      found.
+- [ ] Keep live adoption open: the census does not identify a caller with a
+      validated server-owned revision bundle. The next gate is
+      `SELECT_CALLER_WITH_VALIDATED_REVISION_BUNDLE`.
+- [x] Confirmed `writesPerformed=false`; no cache, canonical, ranking, or
+      projection state was changed.
+
+Evidence: `docs/reports/ace-context-live-caller-adoption-v1.json`;
+`scripts/atlas/audit-ace-context-live-callers-v1.mjs`.
+Status: `ACE_CONTEXT_CALLER_ADOPTION_PARTIAL`; static V2 wiring is present,
+production revision-bundle adoption remains open.
+
+### TRACE-DISABLED-SEARCH-TOOLS-RECHECK-2026-09-12-R2
+
+- [x] Re-ran the read-only TRACE MCP disabled-search-tools audit.
+- [x] Confirmed `176` live tools, a responding read-only probe, and healthy
+      required MCP, Bifrost, synthesis, Qdrant, Neo4j, PostgreSQL, and Redis
+      dependencies.
+- [x] Confirmed the seven optional search/dispatch tools remain disabled and
+      the source identity envelope is implemented but absent from the live
+      result.
+- [ ] Keep optional registries and identity-dependent promotion closed; the
+      optional topology endpoint remains unavailable and no live envelope is
+      emitted.
+
+Evidence: `docs/reports/trace-disabled-search-tools-v1.json`.
+Status: `DISABLED_SEARCH_TOOLS_AUDITED`; identityEnvelopeLiveStatus=
+`LIVE_ENVELOPE_MISSING`; authority=false; writesPerformed=false.
+
+### ACE-LIVE-INPUT-READINESS-RECHECK-2026-09-12-R2
+
+- [x] Re-ran the read-only ACE live-input readiness check.
+- [x] Confirmed `CandidateOrdinalMapV1`, `CandidateFeatureSnapshotV1`, and
+      `RevisionAuthorityEnvelopeV1` are all missing as explicit arguments.
+- [x] Confirmed cross-contract verification was not attempted and datastore
+      and cache writes remained false.
+- [ ] Keep ACE/context materialization and bounded execution blocked until
+      these three authoritative envelopes are supplied; do not synthesize
+      replacements from fixtures, Qdrant IDs, graph ordinals, or stale data.
+
+Evidence: `docs/reports/ace-live-dry-input-readiness-v2.json`;
+`scripts/atlas/audit-ace-live-dry-input-readiness-v2.mts`.
+Status: `ACE_LIVE_DRY_INPUT_BLOCKED`; authority=false;
+writesPerformed=false; cacheWritesPerformed=false.
+
+### `CURRENT-STRUCTURAL-LINEAGE-01` — real coverage characterized 2026-09-13, genuine data gap confirmed (not a logic bug)
+
+**Context**: following the `CURRENT-SOURCE-AUTHORITY-REPAIR-PLAN-02` fix above (file-content
+authority now proven 97.7% exact for owner run `48485685-e773-4433-a1f8-00f5524cca44`, 23,758
+sources), checked whether the SAME kind of comparison-logic bug explained
+`CURRENT-STRUCTURAL-LINEAGE-01`'s persistent `CURRENT_PACKET_CHUNK_JOIN_UNPROVEN` /
+`lineageBridgeMatches: 0` result. It does not — this one is a genuine, large data gap.
+
+**Why the selected execution shows 0/3 bridge matches (not a bug)**: `audit-selected-graphify-
+structural-lineage-v1.mjs` reconciles against `promotion-gate-receipt-currentness-v1.json`'s
+`admittedExecutionId` — which resolves to `c531a1b0-c932-482f-8a21-5d067f504a13`, one of THIS
+session's own bounded structural canaries (built for `GRAPHIFY-STRUCTURAL-CODE-CANARY-02`/
+`GRAPHIFY-DAILY-COORDINATOR-01`, 1-3 files, never intended to populate
+`atlas_packet_chunk_lineage`). It is correctly selected as "the" execution because it is the
+**only** `graphify_executions` row ever bound to the admitted workspace revision
+(`sha256:322ed1a6...`) — `atlas_workspace_source_bindings` has 0 rows for that revision, so no
+real full-scale Graphify run has ever completed against it. 0/3 bridge matches is the honest,
+correct answer for that selection, not a defect.
+
+**Characterized the real gap directly (read-only SQL, no writes)**: rather than re-select a
+different execution (the owner run `48485685-...` predates `graphify_execution_file_membership_v2`
+and has 0 rows there, so the script's execution-scoped query path can't be pointed at it directly),
+queried `atlas_packet_chunk_lineage`/`atlas_packets` directly against the owner run's 23,758
+sources:
+
+```sql
+owner_run_sources (distinct)     23,758
+with_any_lineage_row              7,421 rows (multi-member inflated; not per-source)
+with_revision_matched_lineage     6,781 rows (source_revision agrees)
+distinct_packets_resolved           627  ← real, distinct source files with a proven bridge
+```
+
+**Conclusion: only ~627/23,758 (≈2.6%) of the current owner run's real files have a genuine,
+revision-matched, packet-resolved structural lineage bridge.** This is a real, large,
+un-glossed-over data gap — not a comparison bug, not something a quick fix closes. Closing it
+requires either (a) running real Graphify chunk-extraction/packet-materialization across the
+remaining ~23,000 files (a large, resource-intensive, long-running operation touching
+Postgres/Qdrant at production scale), or (b) accepting partial coverage and re-scoping what
+"structurally proven" means for promotion purposes. **Neither decision was made here** — per this
+file's own repeated caution against running full Graphify indexing "merely because the map is
+stale," and because a full materialization run is exactly the kind of large, hard-to-reverse,
+resource-intensive action this repo's rules require explicit operator authorization for, not a
+unilateral continuation of "iterate on P0."
+
+Status: `CURRENT_STRUCTURAL_LINEAGE_01_GAP_CHARACTERIZED_NOT_CLOSED`. Real number now known
+(627/23,758 ≈ 2.6%) where before it was an opaque "0 matches, unclear why." Closing this gap is a
+scale-of-materialization decision for the operator, not a bug fix — flagged as the concrete next
+decision point for P0, not attempted unilaterally.
+
+**Session summary for this P0 iteration**: two real, verified bugs found and fixed
+(`plan-current-source-authority-repair-v1.mts`'s wrong-column comparison;
+`audit-promotion-board-reconcile-v2.mjs`'s stale hardcoded `nextGateQueue` note), one real data gap
+newly characterized with hard numbers (structural lineage bridge, 2.6% real coverage). P0 itself
+(`atlas_workspace_source_bindings` has 0 rows for the admitted revision, and only 2.6% of the real
+owner run's files have a structural lineage bridge) remains open and is now better understood, not
+resolved — full resolution requires an operator decision on whether to authorize a large-scale
+Graphify materialization run, or to re-admit/reconcile the owner run's `sha256:e0dc2711...`
+revision label against the tournament-admitted `sha256:322ed1a6...` some other way.
+
+### TURBOVEC-CUVS-READINESS-RECHECK-2026-09-13-R1
+
+- [x] Re-ran the TurboVec/cuVS readiness auditor in explicit `--dry-run` mode
+      after changing report persistence to atomic replacement for Windows.
+- [x] The report completed safely with status `LIVE_ACCELERATOR_CHAIN_BLOCKED`
+      and blocker `LIVE_PROBE_SKIPPED_DRY_RUN`; both TurboVec and cuVS remain
+      `NOT_PROVEN` because live probes were intentionally skipped.
+- [ ] Keep live accelerator admission separate from dry-run safety. Do not
+      infer endpoint health, CUDA availability, PyTorch/cuVS capability, or
+      projection authority from this dry-run receipt.
+- [x] Confirmed `canonicalAuthority=false` and `writesPerformed=false`.
+
+Evidence: `docs/reports/turbovec-cuvs-readiness.json`;
+`scripts/atlas/audit-turbovec-cuvs-readiness.mjs`.
+Status: `LIVE_ACCELERATOR_CHAIN_BLOCKED`; authority=false;
+writesPerformed=false.
+
+### TURBOVEC-CUVS-LIVE-READINESS-RECHECK-2026-09-13-R2
+
+- [x] Ran the live read-only TurboVec/cuVS health probe. TurboVec is
+      reachable and ready at `8791` with `109,248` indexed items, `64`
+      dimensions, and 4-bit configuration; it remains a derived executor.
+- [x] The 8098 RAPIDS sidecar is reachable with CUDA available on an
+      `NVIDIA GeForce RTX 3060 Ti`, but reports `torchAvailable=false` and
+      `ready_for_use=false`. The live blocker is
+      `RAPIDS_CUDA_TORCH_EXECUTION_NOT_PROVEN`.
+- [ ] Keep cuVS/CUDA execution and GPU ordinal parity blocked until the 8098
+      runtime exposes the required PyTorch/cuVS capability and the exact
+      roundtrip proof passes. Do not add PyTorch to the RAPIDS image or rebuild
+      it from this health result alone.
+- [x] Confirmed both services remain execution-only/derived and the probe
+      performed no PostgreSQL, Qdrant, Valkey, model, or projection writes.
+
+Evidence: `docs/reports/turbovec-cuvs-readiness.json`;
+`scripts/atlas/audit-turbovec-cuvs-readiness.mjs`.
+Status: `LIVE_ACCELERATOR_CHAIN_BLOCKED`; authority=false;
+writesPerformed=false.
+
+**Session handoff note (2026-09-13, ahead of an expected rate-limit reset ~20:00) — pick up here
+next session, do not re-derive from scratch:**
+
+Waiting on an explicit operator decision before any further P0 write action (asked, not yet
+answered as of this note):
+1. Authorize a large-scale real Graphify structural materialization run (chunk-extraction +
+   packet-write) across the ~23,000 owner-run files still missing an `atlas_packet_chunk_lineage`
+   bridge row (currently 627/23,758 ≈ 2.6% coverage) — a long-running, resource-intensive,
+   production-Postgres/Qdrant-touching operation, **not** to be started unilaterally; OR
+2. Work the workspace-revision identity reconciliation instead (owner run's real data is labeled
+   `sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb`; the tournament-
+   admitted revision is `sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf`;
+   `atlas_workspace_source_bindings` has 0 rows for the admitted one).
+
+Nothing else is mid-edit or half-applied: both script fixes this session
+(`plan-current-source-authority-repair-v1.mts`, `audit-promotion-board-reconcile-v2.mjs`) are
+complete, live-verified, and committed to this file's record above. No pending writes, no open
+transactions, no uncommitted schema changes. `npx openspec validate --strict
+parent-atlas-ace-rlm-bitfrost-integration` passes clean as of this note.
+
+### SOURCE-TEXT-ENCODING-01-RECHECK-2026-09-13
+
+- [x] Ran `node --test scripts/atlas/lib/source-text-envelope.test.mjs`.
+- [x] All `11/11` tests pass for UTF-8, UTF-8-BOM, UTF-16LE/BE BOM,
+      malformed UTF-8 rejection, JSON decoding, CRLF normalization, emoji
+      surrogate pairs, and byte-boundary validation.
+- [x] The source envelope remains fail-closed: BOM-less UTF-16 is not guessed,
+      malformed input is rejected, and canonical coordinates remain UTF-8
+      byte offsets while LSP conversion remains UTF-16 transport metadata.
+- [ ] Live extractor readback is still open. The extractor currently blocks
+      before `--help` returns in this environment, so no live source scan was
+      attempted and no `graphify_symbols` write is authorized by this proof.
+- [x] No database, graph, vector, cache, model, or projection writes occurred.
+
+Evidence: `scripts/atlas/lib/source-text-envelope.mjs`;
+`scripts/atlas/lib/source-text-envelope.test.mjs`.
+Status: `SOURCE_TEXT_ENCODING_PROVEN_BOUNDED`; live extractor readback open;
+authority=false; writesPerformed=false.
+
+### SOURCE-TEXT-EXTRACTOR-CLI-REACHABILITY-RECHECK-2026-09-13
+
+- [x] Added an early `--help` / `-h` path to
+      `scripts/atlas/graphify-symbol-extractor-v1.mts` so documentation and
+      argument discovery do not require a PostgreSQL connection.
+- [x] Verified the help path returns successfully through `npx tsx` and
+      lists the bounded, source-targeting, LSP, and explicit-apply options.
+- [x] This is a CLI reachability fix only; it does not alter extraction,
+      identity reconciliation, parse status, or apply behavior.
+- [ ] Live read-only extractor execution remains open and must use an exact
+      admitted source selection before any scan. `--apply` remains an explicit
+      mutation path and is not authorized by this change.
+- [x] No database, graph, vector, cache, model, or projection writes occurred.
+
+Evidence: `scripts/atlas/graphify-symbol-extractor-v1.mts`;
+`scripts/atlas/lib/source-text-envelope.test.mjs` (11/11).
+Status: `EXTRACTOR_CLI_REACHABLE`; live source readback and current-lineage
+admission remain open; authority=false; writesPerformed=false.
+
+### SOURCE-TEXT-EXTRACTOR-DRY-RUN-RECHECK-2026-09-13
+
+- [x] Ran the extractor in default dry-run mode with `--limit 1`.
+- [x] One live `graphify_files` candidate was read as Markdown and produced
+      `9` structural observations; no parse failure occurred.
+- [x] `apply=false`, `filesProcessed=0`, and `totalSymbolsInserted=null`
+      confirm this was planning/readback only; no parse status or symbol rows
+      were changed.
+- [x] An exact source-targeted dry-run also completed successfully but found
+      `0` matching rows, so source targeting is not evidence that the named
+      path belongs to the current database cohort.
+- [ ] Keep live symbol materialization and current-source authority blocked
+      until the selected source reference, workspace revision, and execution
+      membership are proven as one admitted frame.
+
+Evidence: `docs/reports/graphify-symbol-extractor-v1-1789266360564.json`;
+`scripts/atlas/graphify-symbol-extractor-v1.mts`.
+Status: `EXTRACTOR_READONLY_DRY_RUN_PROVEN`; current-source lineage and apply
+authorization remain open; authority=false; writesPerformed=false.
+
+### MCP-TOOL-SURFACE-RECHECK-2026-09-13-R1
+
+- [x] Ran the existing read-only static MCP tool-surface audit with JSON
+      output. It found `179` registrations, `177` unique names, and `2`
+      gated registrations.
+- [x] Two cross-file name collisions remain: `trace.kag_search` is registered
+      by `dispatcher-tool-integration.ts` and `trace-mcp-server.ts`;
+      `context.prefetch_feature_context` is registered by `new_tools.ts` and
+      `trace-mcp-server.ts`.
+- [ ] Keep both collisions open for owner review. Do not resolve them by
+      deleting or enabling a registration; first compare live reachability,
+      schemas, transport, and compatibility aliases against the current TRACE
+      `tools/list` receipt.
+- [x] Existing handler-alias groups were reported for review, but shared
+      `createToolWithDispatcher` does not alone prove duplicate semantics.
+- [x] Confirmed the audit is static/read-only and performed no MCP, database,
+      cache, model, graph, or projection writes.
+
+Evidence: `sveltekit-frontend/scripts/audit-mcp-tool-surface.mjs`;
+read-only JSON audit output from `node scripts/audit-mcp-tool-surface.mjs
+--json`.
+Status: `MCP_STATIC_SURFACE_COLLISIONS_OPEN`; authority=false;
+writesPerformed=false.
+
+### MCP-TOOL-SURFACE-COMMENT-FILTER-RECHECK-2026-09-13-R1
+
+- [x] Corrected `sveltekit-frontend/scripts/audit-mcp-tool-surface.mjs` to
+      remove block and line comments before registration matching while
+      preserving source newlines for diagnostics.
+- [x] Re-ran the static audit: registrations decreased from `179` to `178`,
+      and the documented-only `trace.kag_search` false positive disappeared.
+- [x] One real cross-file collision remains:
+      `context.prefetch_feature_context` is registered by both
+      `src/mcp/new_tools.ts` and `src/mcp/trace-mcp-server.ts`.
+- [ ] Keep the remaining collision open until the two schemas, handlers,
+      transport owners, and live `tools/list` exposure are compared. Do not
+      delete, rename, or enable either registration from this static result.
+- [x] Confirmed no MCP server, database, cache, model, graph, or projection
+      write occurred.
+
+Evidence: `sveltekit-frontend/scripts/audit-mcp-tool-surface.mjs`;
+read-only JSON audit output after comment filtering.
+Status: `MCP_STATIC_AUDIT_FALSE_POSITIVE_REMOVED_ONE_REAL_COLLISION_OPEN`;
+authority=false; writesPerformed=false.
+
+### MCP-TOOL-SURFACE-TRANSPORT-OWNER-RECHECK-2026-09-13-R1
+
+- [x] Confirmed `trace-mcp-server.ts` creates the `trace-mcp-server` MCP
+      instance, registers `new_tools.ts` through `registerNewTools(...)`, and
+      serves that single registry over TRACE HTTP or stdio transport.
+- [x] Confirmed `server-fastmcp.ts` creates a separate FastMCP instance named
+      `deeds-codebase-intel`, starts its own stdio transport, and does not call
+      `registerNewTools(...)`. Its `trace.kag_search` is therefore not a
+      same-process duplicate of the filtered collision.
+- [x] Reclassified `context.prefetch_feature_context` as a cross-server
+      namespace overlap: the `new_tools.ts` registration is in the TRACE
+      server's shared registry, while the second registration in
+      `trace-mcp-server.ts` is the richer direct TRACE bridge. This is a
+      client-configuration/ownership review item, not proof of two handlers
+      executing in one MCP instance.
+- [x] Compared the registrations: `new_tools.ts` accepts optional `path` or
+      `query`, `limit`, activity, community, notecard, and AGENTS.md controls
+      and delegates to `buildFeaturePrefetchContext`; the direct TRACE
+      registration requires `query` and uses `file_path`, `top_k`, KB, and
+      Karpathy controls for a different richer response path. The schemas are
+      not wire-compatible aliases and must not be silently merged.
+- [ ] Compare the two prefetch schemas and response contracts against the
+      current live TRACE `tools/list` receipt, then choose one compatibility
+      policy for clients that configure both servers. Do not delete, rename,
+      enable, or merge either registration in this read-only gate.
+
+Evidence: `sveltekit-frontend/src/mcp/trace-mcp-server.ts` (server creation,
+`registerNewTools(...)`, and direct prefetch registration);
+`sveltekit-frontend/src/mcp/new_tools.ts` (`registerNewTools` prefetch
+registration); `sveltekit-frontend/src/mcp/server-fastmcp.ts` (separate
+`FastMCP` instance and stdio start).
+Status: `CROSS_SERVER_NAMESPACE_OVERLAP_CONFIRMED_SCHEMA_COMPARISON_OPEN`;
+authority=false; writesPerformed=false.
+
+### TRACE-DISABLED-SEARCH-TOOLS-RECHECK-2026-09-13-R3
+
+- [x] Re-ran the read-only disabled-search-tools audit with optional
+      registries still disabled by policy.
+- [x] Confirmed `7` disabled tools across codebase, research, Bifrost, and
+      `rg-atlas` families; live TRACE exposes `176` tools.
+- [x] Read-only `kb.trace_search`, `trace.kag_search`, and
+      `trace.system_health` probes responded. Required MCP, Bifrost,
+      synthesis, Qdrant, Neo4j, PostgreSQL, Redis, and Go Retrieval checks
+      were healthy; optional topology endpoint was unavailable.
+- [x] Static implementation contains packet, source-revision, and
+      workspace-revision envelope lookups, but the live read-only result still
+      lacks that identity envelope. Promotion remains false.
+- [ ] Keep optional registries disabled until operator review, dependency
+      health, schema/identity regression tests, bounded live readback, and a
+      live identity-envelope proof all pass. This receipt does not authorize
+      enabling, merging, or renaming tools.
+- [x] Confirmed `writesPerformed=false`.
+
+Evidence: `docs/reports/trace-disabled-search-tools-v1.json`;
+`scripts/atlas/audit-trace-disabled-search-tools-v1.mjs`.
+Status: `DISABLED_SEARCH_TOOLS_AUDITED_IDENTITY_ENVELOPE_LIVE_OPEN`;
+authority=false; writesPerformed=false.
+
+### TRACE-DISABLED-SEARCH-TOOLS-SCHEMA-RECHECK-2026-09-13-R1
+
+- [x] Extended the existing read-only auditor with per-tool live schema
+      presence, schema keys, and deterministic schema fingerprints.
+- [x] Confirmed all `7` disabled search/dispatch tools are absent from the
+      live `tools/list` response, so no live schema can yet be compared for
+      re-enablement.
+- [ ] Preserve the re-integration gate: once a tool is explicitly enabled,
+      capture its live input schema and compare it to the source contract,
+      then run identity-envelope, timeout, mutation-surface, and bounded
+      readback tests before admission.
+- [x] Confirmed the audit remains read-only and `writesPerformed=false`.
+
+Evidence: `docs/reports/trace-disabled-search-tools-v1.json`;
+`scripts/atlas/audit-trace-disabled-search-tools-v1.mjs`.
+Status: `DISABLED_SCHEMA_FINGERPRINT_AUDIT_READY_TO_COMPARE_ON_REENABLE`;
+authority=false; writesPerformed=false.

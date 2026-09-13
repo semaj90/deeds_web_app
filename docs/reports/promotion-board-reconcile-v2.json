@@ -1,0 +1,534 @@
+{
+  "schema": "atlas.promotion-board-reconcile.v2",
+  "generatedAt": "2026-09-13T01:48:38.732Z",
+  "mode": "READ_ONLY",
+  "gate": "PROMOTION-BOARD-RECONCILE-02",
+  "owner": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration",
+  "extends": "PARENT-ATLAS-PROMOTION-GATES-01 (scripts/atlas/audit-parent-atlas-promotion-gates-v1.mjs)",
+  "board": {
+    "schemaVersion": "atlas.promotion.board.v2",
+    "workspaceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+    "sourceAuthority": {
+      "status": "PARTIAL",
+      "currentSourceOwnerProven": false,
+      "currentWorkspaceOwnerProven": true,
+      "sourceMembershipProven": false,
+      "receiptRefs": [
+        "docs/reports/parent-atlas-promotion-gates-v1.json",
+        "docs/reports/workspace-revision-tournament-admission-v1.json",
+        "docs/reports/current-source-owner-reconciliation-v1.json",
+        "docs/reports/selected-graphify-structural-lineage-v1.json",
+        "docs/reports/current-source-evidence-hydration-v1.json"
+      ],
+      "blockers": [
+        "CURRENT_SOURCE_AUTHORITY_UNPROVEN",
+        "GRAPHIFY_SOURCE_MEMBERSHIP_INCOMPLETE"
+      ]
+    },
+    "semanticCorpus": {
+      "owner": "codebase_chunks_768",
+      "challenger": "codebase_chunks_768_v2",
+      "representationRevision": null,
+      "workspaceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+      "sourceRevisionSetChecksum": "sha256:52244f10f2087277bcff0e73c01ba0e790d82a7064ac7b1825301f974ff1c795",
+      "admittedCohortChecksum": null,
+      "candidateCount": null,
+      "canonicalIdCount": null,
+      "duplicateCanonicalIds": null,
+      "missingSourceRevision": null,
+      "mixedWorkspaceRevision": null,
+      "mixedRepresentationRevision": null,
+      "status": "BLOCKED",
+      "blockers": [
+        "CURRENT_CORPUS_SELECTION_UNRESOLVED"
+      ]
+    },
+    "retrievalFusion": {
+      "searchRuntimeOwnerProven": false,
+      "rrfCallerCount": 93,
+      "fusionCallerCount": 36,
+      "mappedCallerCount": 93,
+      "unmappedCallerCount": 0,
+      "baselineUnmappedCallerCount": 89,
+      "classificationStatus": "RRF_CALLER_CLASSIFICATION_READY",
+      "executorAsLaneViolations": 0,
+      "ambiguousMappings": 0,
+      "status": "PARTIAL",
+      "blockers": []
+    },
+    "judgmentCorpus": {
+      "compatibleManifestCount": 0,
+      "currentCorpusChecksum": null,
+      "semanticCorpusChecksum": null,
+      "querySetChecksum": "sha256:query-set-hash",
+      "judgmentSetChecksum": null,
+      "reviewerRevision": null,
+      "provenanceRevision": null,
+      "importEnabled": false,
+      "status": "BLOCKED",
+      "blockers": [
+        "JUDGMENT_CORPUS_NOT_BOUND_TO_CURRENT_SEMANTIC_CORPUS"
+      ]
+    },
+    "topology": {
+      "protocolAvailable": true,
+      "routingContractProven": true,
+      "fixtureOnly": true,
+      "executorAvailable": false,
+      "status": "OPTIONAL_CAPABILITY_NOT_DEPLOYED",
+      "blockers": [
+        "DEDICATED_TOPOLOGY_EXECUTOR_MISSING"
+      ]
+    },
+    "trace": {
+      "coreSearchProven": true,
+      "kagSearchProven": true,
+      "identityEnvelopeProven": false,
+      "optionalRegistriesEnabled": false,
+      "status": "PROVEN"
+    },
+    "rerank": {
+      "protocolAvailable": true,
+      "endpointConfigured": false,
+      "compatibleJudgmentAuthorityProven": false,
+      "status": "UNCONFIGURED"
+    },
+    "promotion": {
+      "safeToProject": false,
+      "safeToImportJudgments": false,
+      "safeToEnableTopology": false,
+      "safeToMigrateRrfCallers": true,
+      "safeToConfigureRerank": false,
+      "safeToRetryGraphifyPromotion": false,
+      "blockers": [
+        {
+          "code": "CURRENT_SOURCE_AUTHORITY_UNPROVEN",
+          "lane": "SOURCE",
+          "severity": "CRITICAL",
+          "receiptRefs": [
+            "docs/reports/parent-atlas-promotion-gates-v1.json",
+            "docs/reports/current-source-evidence-hydration-v1.json"
+          ],
+          "explanation": "CURRENT-STRUCTURAL-LINEAGE-01 remains BLOCKED_BY_PREVIOUS_GATE; source evidence hydration is SOURCE_EVIDENCE_HYDRATION_BLOCKED."
+        },
+        {
+          "code": "GRAPHIFY_SOURCE_MEMBERSHIP_INCOMPLETE",
+          "lane": "SOURCE",
+          "severity": "PROMOTION_BLOCKING",
+          "receiptRefs": [
+            "docs/reports/selected-graphify-structural-lineage-v1.json"
+          ],
+          "explanation": "Selected execution structural lineage reports CURRENT_PACKET_CHUNK_JOIN_UNPROVEN with 0 bridge matches and 3 memberships still missing a bridge row."
+        },
+        {
+          "code": "CURRENT_CORPUS_SELECTION_UNRESOLVED",
+          "lane": "SEMANTIC_CORPUS",
+          "severity": "CRITICAL",
+          "receiptRefs": [
+            "docs/reports/current-semantic768-corpus-manifest-plan-v1.json",
+            "docs/reports/qdrant-collection-roles-v1.json"
+          ],
+          "explanation": "Manifest plan status is CURRENT_SEMANTIC768_MANIFEST_PLANNED with qdrantCollection=UNRESOLVED_MULTIPLE_768_COLLECTIONS. codebase_chunks_768 (109776 pts) is the declared owner and codebase_chunks_768_v2 (52816 pts) is the comparison challenger per qdrant-collection-roles-v1.json; they are NOT merged or treated as duplicates."
+        },
+        {
+          "code": "JUDGMENT_CORPUS_NOT_BOUND_TO_CURRENT_SEMANTIC_CORPUS",
+          "lane": "JUDGMENT",
+          "severity": "PROMOTION_BLOCKING",
+          "receiptRefs": [
+            "docs/reports/golden-review-corpus-compatibility-v1.json"
+          ],
+          "explanation": "1 manifest(s) found, 0 compatible. The one found manifest declares embedding_dimension=384 against an expected embeddingDimension=768; judgment_set_hash is 'pending'."
+        },
+        {
+          "code": "DEDICATED_TOPOLOGY_EXECUTOR_MISSING",
+          "lane": "TOPOLOGY",
+          "severity": "OPTIONAL",
+          "receiptRefs": [
+            "docs/reports/mcp-topology-tool-routing-v1.json",
+            "docs/reports/trace-disabled-search-tools-v1.json"
+          ],
+          "explanation": "No admitted retrieval workload currently requires a live topology executor (contract/fixture proven, no live endpoint deployed; port 8101 confirmed owned by the Go index worker, not a topology executor)."
+        },
+        {
+          "code": "RERANK_EVAL_AUTHORITY_UNPROVEN",
+          "lane": "RERANK",
+          "severity": "INFORMATIONAL",
+          "receiptRefs": [
+            "docs/reports/mcp-topology-tool-routing-v1.json",
+            "docs/reports/trace-disabled-search-tools-v1.json"
+          ],
+          "explanation": "rerank endpoint reports status=\"not_configured\" in trace.system_health; the only rerank lane in the routing fixture (atlas.rerank.cuda_graph) is dependencyReady=false/BLOCKED."
+        }
+      ]
+    },
+    "receiptRefs": [
+      "docs/reports/ace-live-dry-input-readiness-v2.json",
+      "docs/reports/current-graph-artifact-readiness-v1.json",
+      "docs/reports/current-graphify-snapshot-authority-v1.json",
+      "docs/reports/current-semantic768-corpus-manifest-plan-v1.json",
+      "docs/reports/current-source-evidence-hydration-v1.json",
+      "docs/reports/current-source-owner-reconciliation-v1.json",
+      "docs/reports/domain-classifier-lineage-v1.json",
+      "docs/reports/golden-relevance-review-queue-validation-v1.json",
+      "docs/reports/golden-review-corpus-compatibility-v1.json",
+      "docs/reports/lineage-qdrant-semantic-canary-v1.json",
+      "docs/reports/mcp-topology-tool-routing-v1.json",
+      "docs/reports/parent-atlas-promotion-gates-v1.json",
+      "docs/reports/qdrant-collection-roles-v1.json",
+      "docs/reports/rrf-caller-baseline-v1.json",
+      "docs/reports/rrf-caller-classification-v1.json",
+      "docs/reports/selected-graphify-structural-lineage-v1.json",
+      "docs/reports/semantic-768-writer-ownership-v1.json",
+      "docs/reports/trace-disabled-search-tools-v1.json",
+      "docs/reports/workspace-revision-tournament-admission-v1.json"
+    ]
+  },
+  "blockerMatrix": [
+    {
+      "lane": "SOURCE",
+      "status": "PARTIAL",
+      "promotionImpact": "BLOCKS safeToProject, safeToRetryGraphifyPromotion",
+      "nextGate": "CURRENT-STRUCTURAL-LINEAGE-01"
+    },
+    {
+      "lane": "SEMANTIC_CORPUS",
+      "status": "BLOCKED",
+      "promotionImpact": "BLOCKS safeToProject, safeToConfigureRerank, safeToRetryGraphifyPromotion",
+      "nextGate": "SEMANTIC-CORPUS-ADMISSION-01"
+    },
+    {
+      "lane": "JUDGMENT",
+      "status": "BLOCKED",
+      "promotionImpact": "BLOCKS safeToImportJudgments, safeToConfigureRerank",
+      "nextGate": "GOLDEN-REVIEW-CORPUS-02"
+    },
+    {
+      "lane": "RRF",
+      "status": "PARTIAL",
+      "promotionImpact": "BLOCKS safeToMigrateRrfCallers",
+      "nextGate": "RRF-CALLER-CLASSIFICATION-02"
+    },
+    {
+      "lane": "TOPOLOGY",
+      "status": "OPTIONAL_CAPABILITY_NOT_DEPLOYED",
+      "promotionImpact": "NONE (optional capability; does not block safeToProject)",
+      "nextGate": "TOPOLOGY-EXECUTOR-NEED-01"
+    },
+    {
+      "lane": "TRACE",
+      "status": "PROVEN",
+      "promotionImpact": "NONE — TRACE-MCP-CORE-SEARCH-01 leaves the critical path",
+      "nextGate": "none (returns to queue only if a downstream lane finds a missing contract)"
+    },
+    {
+      "lane": "RERANK",
+      "status": "UNCONFIGURED",
+      "promotionImpact": "BLOCKS safeToConfigureRerank (already blocked upstream by SEMANTIC_CORPUS + JUDGMENT)",
+      "nextGate": "rerank endpoint configuration (P7)"
+    },
+    {
+      "lane": "GRAPHIFY",
+      "status": "DO_NOT_RETRY",
+      "promotionImpact": "Retry gated behind safeToRetryGraphifyPromotion",
+      "nextGate": "CURRENT-STRUCTURAL-LINEAGE-01 (shared with SOURCE)"
+    }
+  ],
+  "receiptInventory": [
+    {
+      "key": "promotionGates",
+      "path": "docs/reports/parent-atlas-promotion-gates-v1.json",
+      "exists": true,
+      "schemaVersion": "atlas.parent-atlas-promotion-gates.v1",
+      "generatedAt": "2026-09-13T00:43:58.145Z",
+      "workspaceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+      "sourceRevisionOrChecksum": null,
+      "status": "BLOCKED"
+    },
+    {
+      "key": "traceDisabledSearchTools",
+      "path": "docs/reports/trace-disabled-search-tools-v1.json",
+      "exists": true,
+      "schemaVersion": "atlas.trace-disabled-search-tools.v1",
+      "generatedAt": "2026-09-13T01:41:45.203Z",
+      "workspaceRevision": null,
+      "sourceRevisionOrChecksum": null,
+      "status": "DISABLED_SEARCH_TOOLS_AUDITED"
+    },
+    {
+      "key": "mcpTopologyToolRouting",
+      "path": "docs/reports/mcp-topology-tool-routing-v1.json",
+      "exists": true,
+      "schemaVersion": "AtlasMcpTopologyToolRoutingReceiptV1",
+      "generatedAt": "2026-09-12T02:58:34.640Z",
+      "workspaceRevision": null,
+      "sourceRevisionOrChecksum": null,
+      "status": "PROVEN_FIXTURE_ONLY"
+    },
+    {
+      "key": "rrfCallerBaseline",
+      "path": "docs/reports/rrf-caller-baseline-v1.json",
+      "exists": true,
+      "schemaVersion": "atlas.rrf-caller-baseline.v1",
+      "generatedAt": "2026-09-13T01:19:29.702Z",
+      "workspaceRevision": null,
+      "sourceRevisionOrChecksum": null,
+      "status": "CALLER_BASELINE_INCOMPLETE_MIGRATION_BLOCKED"
+    },
+    {
+      "key": "rrfCallerClassification",
+      "path": "docs/reports/rrf-caller-classification-v1.json",
+      "exists": true,
+      "schemaVersion": "atlas.rrf-caller-classification.v1",
+      "generatedAt": "2026-09-13T01:45:54.926Z",
+      "workspaceRevision": null,
+      "sourceRevisionOrChecksum": null,
+      "status": "RRF_CALLER_CLASSIFICATION_READY"
+    },
+    {
+      "key": "goldenReviewCorpusCompatibility",
+      "path": "docs/reports/golden-review-corpus-compatibility-v1.json",
+      "exists": true,
+      "schemaVersion": "atlas.golden-review-corpus-compatibility-v1",
+      "generatedAt": null,
+      "workspaceRevision": null,
+      "sourceRevisionOrChecksum": null,
+      "status": "COMPATIBLE_CORPUS_MISSING"
+    },
+    {
+      "key": "currentSemantic768ManifestPlan",
+      "path": "docs/reports/current-semantic768-corpus-manifest-plan-v1.json",
+      "exists": true,
+      "schemaVersion": "atlas.evaluation-corpus-manifest-v1",
+      "generatedAt": null,
+      "workspaceRevision": null,
+      "sourceRevisionOrChecksum": null,
+      "status": "CURRENT_SEMANTIC768_MANIFEST_PLANNED"
+    },
+    {
+      "key": "qdrantCollectionRoles",
+      "path": "docs/reports/qdrant-collection-roles-v1.json",
+      "exists": true,
+      "schemaVersion": "QdrantCollectionRolesAuditV1",
+      "generatedAt": "2026-09-13T00:49:19.359Z",
+      "workspaceRevision": null,
+      "sourceRevisionOrChecksum": null,
+      "status": "QDRANT_COLLECTION_ROLES_PROVEN"
+    },
+    {
+      "key": "workspaceRevisionTournamentAdmission",
+      "path": "docs/reports/workspace-revision-tournament-admission-v1.json",
+      "exists": true,
+      "schemaVersion": "atlas.workspace-revision-tournament-admission.v1",
+      "generatedAt": "2026-09-11T15:10:37.412Z",
+      "workspaceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+      "sourceRevisionOrChecksum": "sha256:52244f10f2087277bcff0e73c01ba0e790d82a7064ac7b1825301f974ff1c795",
+      "status": "WORKSPACE_REVISION_TOURNAMENT_ADMITTED"
+    },
+    {
+      "key": "currentGraphifySnapshotAuthority",
+      "path": "docs/reports/current-graphify-snapshot-authority-v1.json",
+      "exists": true,
+      "schemaVersion": "atlas.current-graphify-snapshot-authority.v1",
+      "generatedAt": null,
+      "workspaceRevision": null,
+      "sourceRevisionOrChecksum": null,
+      "status": "NO_TERMINAL_EXECUTION_FOR_CURRENT_WORKSPACE"
+    },
+    {
+      "key": "selectedStructuralLineage",
+      "path": "docs/reports/selected-graphify-structural-lineage-v1.json",
+      "exists": true,
+      "schemaVersion": "atlas.selected-graphify-structural-lineage.v1",
+      "generatedAt": "2026-09-13T01:30:13.700Z",
+      "workspaceRevision": null,
+      "sourceRevisionOrChecksum": null,
+      "status": "CURRENT_PACKET_CHUNK_JOIN_UNPROVEN"
+    },
+    {
+      "key": "currentSourceOwnerReconciliation",
+      "path": "docs/reports/current-source-owner-reconciliation-v1.json",
+      "exists": true,
+      "schemaVersion": "atlas.current-source-owner-reconciliation.v1",
+      "generatedAt": "2026-09-13T01:25:25.057Z",
+      "workspaceRevision": null,
+      "sourceRevisionOrChecksum": null,
+      "status": null
+    },
+    {
+      "key": "currentSourceEvidenceHydration",
+      "path": "docs/reports/current-source-evidence-hydration-v1.json",
+      "exists": true,
+      "schemaVersion": "atlas.current-source-evidence-hydration.v1",
+      "generatedAt": null,
+      "workspaceRevision": null,
+      "sourceRevisionOrChecksum": null,
+      "status": "SOURCE_EVIDENCE_HYDRATION_BLOCKED"
+    },
+    {
+      "key": "lineageQdrantSemanticCanary",
+      "path": "docs/reports/lineage-qdrant-semantic-canary-v1.json",
+      "exists": true,
+      "schemaVersion": "atlas.lineage-qdrant-semantic-canary.v1",
+      "generatedAt": null,
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "sourceRevisionOrChecksum": null,
+      "status": "CANARY_QDRANT_IDENTITY_BLOCKED"
+    },
+    {
+      "key": "semantic768WriterOwnership",
+      "path": "docs/reports/semantic-768-writer-ownership-v1.json",
+      "exists": true,
+      "schemaVersion": "atlas.semantic-768-writer-ownership.v1",
+      "generatedAt": "2026-09-13T00:40:13.941Z",
+      "workspaceRevision": null,
+      "sourceRevisionOrChecksum": null,
+      "status": "OWNER_NOT_PROVEN"
+    },
+    {
+      "key": "currentGraphArtifactReadiness",
+      "path": "docs/reports/current-graph-artifact-readiness-v1.json",
+      "exists": true,
+      "schemaVersion": "atlas.current-graph-artifact-readiness.v1",
+      "generatedAt": "2026-09-13T00:39:12.340Z",
+      "workspaceRevision": null,
+      "sourceRevisionOrChecksum": null,
+      "status": "CURRENT_GRAPH_ARTIFACT_BLOCKED_ON_EDGE_PRODUCER"
+    },
+    {
+      "key": "domainClassifierLineage",
+      "path": "docs/reports/domain-classifier-lineage-v1.json",
+      "exists": true,
+      "schemaVersion": "atlas.domain-classifier-lineage.v1",
+      "generatedAt": "2026-09-13T00:41:39.217Z",
+      "workspaceRevision": null,
+      "sourceRevisionOrChecksum": null,
+      "status": "CLASSIFIER_LINEAGE_BLOCKED"
+    },
+    {
+      "key": "goldenRelevanceReviewQueueValidation",
+      "path": "docs/reports/golden-relevance-review-queue-validation-v1.json",
+      "exists": true,
+      "schemaVersion": "atlas.golden-relevance-review-queue-validation-v1",
+      "generatedAt": null,
+      "workspaceRevision": null,
+      "sourceRevisionOrChecksum": null,
+      "status": "INCOMPLETE_FAIL_CLOSED"
+    },
+    {
+      "key": "aceLiveDryInputReadiness",
+      "path": "docs/reports/ace-live-dry-input-readiness-v2.json",
+      "exists": true,
+      "schemaVersion": "atlas.ace-live-dry-input-readiness.v2",
+      "generatedAt": null,
+      "workspaceRevision": null,
+      "sourceRevisionOrChecksum": null,
+      "status": "ACE_LIVE_DRY_INPUT_BLOCKED"
+    }
+  ],
+  "currentReceiptAmbiguous": false,
+  "semanticCorpusAdmissionReadiness": {
+    "verdict": "SEMANTIC_CORPUS_ADMISSION_BLOCKED",
+    "requiredIdentity": {
+      "owner": "codebase_chunks_768",
+      "challenger": "codebase_chunks_768_v2",
+      "workspaceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+      "sourceRevisionSet": "sha256:52244f10f2087277bcff0e73c01ba0e790d82a7064ac7b1825301f974ff1c795",
+      "representationRevision": null
+    },
+    "blockers": [
+      "qdrantCollection resolves to UNRESOLVED_MULTIPLE_768_COLLECTIONS in the current manifest plan (postgresChunkCount=55169 vs codebase_chunks_768 pointCount=109776 vs codebase_chunks_768_v2 pointCount=52816 — none currently reconciled 1:1 with an admitted workspace revision)",
+      "representationRevision has not been established for the current admitted workspace revision",
+      "candidateCount/canonicalIdCount/duplicateCanonicalIds/missingSourceRevision/mixedWorkspaceRevision/mixedRepresentationRevision are not yet measured against the admitted workspace revision"
+    ]
+  },
+  "judgmentCompatibility": {
+    "verdict": "COMPATIBLE_CORPUS_MISSING",
+    "manifestsFound": 1,
+    "compatibleManifestCount": 0,
+    "mismatchReasons": [
+      "embedding_dimension mismatch: manifest=384 expected=768",
+      "judgment_set_hash is pending (not computed)"
+    ]
+  },
+  "rrfCallerClassification": {
+    "verdict": "RRF_CALLER_CLASSIFICATION_READY",
+    "callerCount": 93,
+    "unmappedCount": 89,
+    "executorAsLaneCount": 0,
+    "ambiguousMappingCount": 0,
+    "canonicalFusionOwner": "SearchRuntime",
+    "migrationAuthorized": false
+  },
+  "topologyOptionality": {
+    "portOwnership": {
+      "port": 8101,
+      "currentOwner": "GO_INDEX_WORKER",
+      "evidence": "sveltekit-frontend/src/lib/server/retrieval/topology-search-client.ts:7 and sveltekit-frontend/src/mcp/tools/topology-search.tool.ts (static source comment, read-only check — no port allocated or process started by this script)"
+    },
+    "needProven": false,
+    "executorDeployed": false,
+    "promotionImpact": "NONE"
+  },
+  "traceCriticalPathStatus": {
+    "gate": "TRACE-MCP-CORE-SEARCH-01",
+    "status": "PROVEN",
+    "optionalCapabilityGaps": [
+      "identity envelope not live-reloaded (blocks downstream canonical KAG joins, not TRACE core search itself)",
+      "codebase/research/bifrost/rg-atlas optional registries remain disabled by policy"
+    ]
+  },
+  "readOnlyInvariants": {
+    "writesPerformed": false,
+    "graphifyApplyInvoked": false,
+    "topologyStarted": false,
+    "rerankConfigured": false,
+    "judgmentsImported": false,
+    "rrfRuntimeChanged": false,
+    "qdrantModified": false,
+    "postgresModified": false,
+    "dockerCleanupPerformed": false
+  },
+  "nextGateQueue": [
+    {
+      "priority": "P0",
+      "gate": "CURRENT-SOURCE-OWNER/WORKSPACE-SNAPSHOT",
+      "note": "Already PARTIAL_PROVEN for the admitted revision at the terminal-execution level; CURRENT-STRUCTURAL-LINEAGE-01 is the actual next unresolved sub-gate per parent-atlas-promotion-gates-v1.json."
+    },
+    {
+      "priority": "P1",
+      "gate": "SEMANTIC-CORPUS-ADMISSION-01",
+      "note": "Blocked on CURRENT_CORPUS_SELECTION_UNRESOLVED."
+    },
+    {
+      "priority": "P2",
+      "gate": "GOLDEN-REVIEW-CORPUS-02",
+      "note": "Blocked on judgment corpus not bound to a 768-dim current semantic corpus."
+    },
+    {
+      "priority": "P3",
+      "gate": "RRF-CALLER-CLASSIFICATION-02",
+      "note": "Not blocking: RRF_CALLER_CLASSIFICATION_READY (93/93 classified, 0 EXECUTOR_AS_LANE violations). Migration itself is a separate, not-yet-made decision."
+    },
+    {
+      "priority": "P4",
+      "gate": "PROMOTION-BOARD-RECONCILE (rerun)",
+      "note": "Re-run after any of P0-P3 receipts change."
+    },
+    {
+      "priority": "P5",
+      "gate": "retrieval profile convergence",
+      "note": "Depends on P1-P3."
+    },
+    {
+      "priority": "P6",
+      "gate": "TOPOLOGY-EXECUTOR-NEED-01",
+      "note": "Optional-capability question, not currently blocking; port 8101 confirmed owned by the Go index worker."
+    },
+    {
+      "priority": "P7",
+      "gate": "rerank endpoint configuration",
+      "note": "Gated behind P1 and P2."
+    }
+  ],
+  "checksum": "sha256:68c279bf077baf8c9cf9a324ddc8bf692e255c156827abf7ffb535381b1df7c4"
+}
