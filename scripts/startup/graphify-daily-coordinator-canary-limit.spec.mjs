@@ -18,9 +18,11 @@ test('bounded canary readback compares against the requested limit', () => {
   assert.doesNotMatch(source, /file_count\) === 3/);
 });
 
-test('full mode requires its distinct authorization and selects the complete manifest', () => {
-  assert.match(source, /AUTHORIZE_GRAPHIFY_FULL_WORKSPACE_SOURCE_SELECTION_V1/);
-  assert.match(source, /fullMode \? snapshot\.sources : rootSources\.slice/);
-  assert.match(source, /fullMode \? 'graphify-current-workspace-source-selection:v1'/);
+test('full mode fails closed until downstream stage owners and completion semantics are bound', () => {
+  assert.match(source, /process\.argv\.includes\('--full'\)/);
+  assert.match(source, /GRAPHIFY_COORDINATOR_CANARY_FULL_MODE_BLOCKED_PENDING_STAGE_OWNER_BINDING/);
+  assert.doesNotMatch(source, /AUTHORIZE_GRAPHIFY_FULL_WORKSPACE_SOURCE_SELECTION_V1/);
+  assert.doesNotMatch(source, /snapshot\.sources\s*:\s*rootSources\.slice/);
   assert.match(source, /canonicalPromotionMayBeAttempted: false/);
+  assert.match(source, /broadGraphifyRun: false/);
 });
