@@ -65,8 +65,7 @@ function looksLikeBackup(path: string): boolean {
     || segment === 'archive-copy'
     || segment === 'archive-copy-old'
     || /(?:^|[-_.])backup(?:[-_.]|$)/.test(segment)
-    || /(?:^|[-_.])bak(?:[-_.]|$)/.test(segment))
-    || /(?:^|[-_.])old(?:[-_.]|$)/.test(segment))
+    || /(?:^|[-_.])bak(?:[-_.]|$)/.test(segment)
     || /(?:^|[-_.])copy(?:[-_.]|$)/.test(segment) && segment.includes('archive'));
 }
 
