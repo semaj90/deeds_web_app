@@ -7,13 +7,15 @@ const sha256RevisionSchema = z.string().regex(/^sha256:[a-f0-9]{64}$/);
  * Read-only identity envelope for a future snapshot-bound Graphify canary.
  *
  * This contract does not authorize execution and does not grant canonical
- * authority. It only freezes the four authority inputs the canary must echo
- * unchanged in its terminal receipt. Workspace and snapshot revisions are
- * deliberately independent fields so neither can stand in for the other.
+ * authority. It freezes the authority inputs the canary must echo unchanged in
+ * its terminal receipt. Workspace/snapshot identity and source-inventory
+ * provenance stay separate so none can stand in for another.
  */
 export const GraphifyCanaryExpectationInputSchema = z.object({
   workspaceRevision: sha256RevisionSchema,
   snapshotRevision: sha256RevisionSchema,
+  sourceInventoryRevision: z.string().min(1),
+  sourceInventoryChecksum: sha256RevisionSchema,
   sourceSelectionChecksum: sha256RevisionSchema,
   sourceCount: z.number().int().positive(),
 }).strict();
@@ -24,6 +26,8 @@ export const GraphifyCanaryExpectationV1Schema = z.object({
   schema: z.literal('atlas.graphify-canary-expectation.v1'),
   workspaceRevision: sha256RevisionSchema,
   snapshotRevision: sha256RevisionSchema,
+  sourceInventoryRevision: z.string().min(1),
+  sourceInventoryChecksum: sha256RevisionSchema,
   sourceSelectionChecksum: sha256RevisionSchema,
   sourceCount: z.number().int().positive(),
   identityChecksum: z.string().regex(/^[a-f0-9]{64}$/),
@@ -61,6 +65,8 @@ export function verifyGraphifyCanaryExpectationV1(
   const expected = buildGraphifyCanaryExpectationV1({
     workspaceRevision: parsed.data.workspaceRevision,
     snapshotRevision: parsed.data.snapshotRevision,
+    sourceInventoryRevision: parsed.data.sourceInventoryRevision,
+    sourceInventoryChecksum: parsed.data.sourceInventoryChecksum,
     sourceSelectionChecksum: parsed.data.sourceSelectionChecksum,
     sourceCount: parsed.data.sourceCount,
   });
