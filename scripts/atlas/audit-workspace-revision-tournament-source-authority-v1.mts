@@ -30,15 +30,23 @@ const checks = {
   sourceInventoryHygienePass: hygiene.status === 'SOURCE_INVENTORY_HYGIENE_PASS',
   sourceInventoryMatchesSnapshot: hygiene.snapshotRevision === snapshot.snapshotRevision
     && hygiene.snapshotMembershipChecksum === snapshot.sourceMembershipChecksum,
+  recurrencePreventionProven: hygiene.recurrencePrevented === true
+    && hygiene.writerUsesSharedExclusionPolicy === true
+    && hygiene.recurrenceExclusionProof?.pass === true
+    && plan.recurrencePreventionProven === true,
   planBindsSourceInventory: plan.sourceInventoryRevision === hygiene.inventoryRevision
     && plan.sourceInventoryChecksum === hygiene.sourceInventoryChecksum
     && plan.sourceSelectionChecksum === hygiene.sourceSelectionChecksum
-    && plan.sourceCount === hygiene.canonicalSourceCount,
+    && plan.sourceCount === hygiene.canonicalSourceCount
+    && plan.sourceInventoryWriterRevisionChecksum === hygiene.writerRevisionChecksum
+    && plan.sourceInventoryWriterExclusionPolicyRevision === hygiene.writerExclusionPolicyRevision
+    && plan.sourceInventoryWriterExclusionPolicyChecksum === hygiene.writerExclusionPolicyChecksum,
   knownJunkExcluded: hygiene.knownJunkMatches?.target === 0
     && hygiene.knownJunkMatches?.pythonRuntime === 0
     && hygiene.knownJunkMatches?.backup === 0
     && hygiene.knownJunkMatches?.generatedBuild === 0
-    && hygiene.knownJunkMatches?.worktreeDuplicate === 0,
+    && hygiene.knownJunkMatches?.worktreeDuplicate === 0
+    && plan.knownJunkExcluded === true,
   authorityStillFalse: derivation.authority === false && snapshot.canonicalAuthority === false,
   revisionStillNull: derivation.workspaceRevision === null && snapshot.workspaceRevision === null,
 };
@@ -67,6 +75,8 @@ const report = {
   sourceInventoryRevision: hygiene.inventoryRevision ?? null,
   sourceInventoryChecksum: hygiene.sourceInventoryChecksum ?? null,
   sourceInventoryWriterRevisionChecksum: hygiene.writerRevisionChecksum ?? null,
+  sourceInventoryWriterExclusionPolicyRevision: hygiene.writerExclusionPolicyRevision ?? null,
+  sourceInventoryWriterExclusionPolicyChecksum: hygiene.writerExclusionPolicyChecksum ?? null,
   snapshotRevision: snapshot.snapshotRevision ?? null,
   snapshotMembershipChecksum: snapshot.sourceMembershipChecksum ?? null,
   checks,
@@ -76,5 +86,5 @@ const report = {
 };
 await mkdir(dirname(REPORT), { recursive: true });
 await writeFile(REPORT, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
-console.log(JSON.stringify({ schema: report.schema, status: report.status, proofLevel: report.proofLevel, authority: false, workspaceRevision: null, workspaceRevisionCandidate: candidate, sourceInventoryChecksum: report.sourceInventoryChecksum, sourceSelectionChecksum: report.sourceSelectionChecksum, firstBlockingInvariant: report.firstBlockingInvariant, reportPath: REPORT }, null, 2));
+console.log(JSON.stringify({ schema: report.schema, status: report.status, proofLevel: report.proofLevel, authority: false, workspaceRevision: null, workspaceRevisionCandidate: candidate, sourceInventoryChecksum: report.sourceInventoryChecksum, sourceSelectionChecksum: report.sourceSelectionChecksum, recurrencePreventionProven: checks.recurrencePreventionProven, firstBlockingInvariant: report.firstBlockingInvariant, reportPath: REPORT }, null, 2));
 if (!ready) process.exitCode = 3;
