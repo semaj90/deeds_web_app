@@ -69,13 +69,20 @@ const workspaceRevisionCandidate = jsonHash({
     byteLength: source.byteLength,
   })),
 });
+const recurrencePreventionProven = hygiene.recurrencePrevented === true
+  && hygiene.writerUsesSharedExclusionPolicy === true
+  && hygiene.recurrenceExclusionProof?.pass === true;
+const knownJunkExcluded = hygiene.knownJunkMatches?.target === 0
+  && hygiene.knownJunkMatches?.pythonRuntime === 0
+  && hygiene.knownJunkMatches?.backup === 0
+  && hygiene.knownJunkMatches?.generatedBuild === 0
+  && hygiene.knownJunkMatches?.worktreeDuplicate === 0;
 const hygieneMatchesSnapshot = hygiene.status === 'SOURCE_INVENTORY_HYGIENE_PASS'
   && hygiene.snapshotRevision === snapshot.snapshotRevision
   && hygiene.snapshotMembershipChecksum === snapshot.sourceMembershipChecksum
   && hygiene.candidatePathCount === sources.length
-  && hygiene.knownJunkMatches?.target === 0
-  && hygiene.knownJunkMatches?.pythonRuntime === 0
-  && hygiene.knownJunkMatches?.backup === 0;
+  && recurrencePreventionProven
+  && knownJunkExcluded;
 const valid = snapshotReadback.status === 'SNAPSHOT_BYTES_READBACK_PROVEN'
   && bindings.length > 0
   && duplicateRefs.length === 0
@@ -93,12 +100,18 @@ const report = {
   sourceInventoryRevision: hygiene.inventoryRevision ?? null,
   sourceInventoryChecksum: hygiene.sourceInventoryChecksum ?? null,
   sourceInventoryWriterRevisionChecksum: hygiene.writerRevisionChecksum ?? null,
+  sourceInventoryWriterExclusionPolicyRevision: hygiene.writerExclusionPolicyRevision ?? null,
+  sourceInventoryWriterExclusionPolicyChecksum: hygiene.writerExclusionPolicyChecksum ?? null,
   sourceInventoryHygieneStatus: hygiene.status ?? null,
+  recurrencePreventionProven,
+  knownJunkExcluded,
   duplicateRefs: [...new Set(duplicateRefs)].sort(), bindings,
   admission: { graphifyExecutionId: null, workspaceRevision: null, requiresTournamentOrSourceAuthority: true, canCallRecordSourceSelectionStage: false },
   blockers: valid ? [] : [
     ...(snapshotReadback.status === 'SNAPSHOT_BYTES_READBACK_PROVEN' ? [] : ['SNAPSHOT_BYTES_READBACK_NOT_PROVEN']),
     ...(hygieneMatchesSnapshot ? [] : ['SOURCE_INVENTORY_HYGIENE_NOT_BOUND_TO_SNAPSHOT']),
+    ...(recurrencePreventionProven ? [] : ['SOURCE_INVENTORY_RECURRENCE_PREVENTION_NOT_PROVEN']),
+    ...(knownJunkExcluded ? [] : ['KNOWN_JUNK_REMAINS_IN_CANONICAL_SOURCE_SELECTION']),
     ...(bindings.length > 0 ? [] : ['CANONICAL_SOURCE_SELECTION_EMPTY']),
     ...(duplicateRefs.length === 0 ? [] : ['DUPLICATE_CANONICAL_SOURCE_IDENTITIES']),
     ...(sourceSelectionChecksum === hygiene.sourceSelectionChecksum ? [] : ['SOURCE_SELECTION_CHECKSUM_MISMATCH']),
@@ -109,5 +122,5 @@ const report = {
 };
 await mkdir(dirname(REPORT), { recursive: true });
 await writeFile(REPORT, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
-console.log(JSON.stringify({ schema: report.schema, status: report.status, proofLevel: report.proofLevel, authority: false, workspaceRevision: null, sourceCount: bindings.length, snapshotSourceCount: sources.length, sourceSelectionChecksum, sourceInventoryChecksum: report.sourceInventoryChecksum, reportPath: REPORT }, null, 2));
+console.log(JSON.stringify({ schema: report.schema, status: report.status, proofLevel: report.proofLevel, authority: false, workspaceRevision: null, sourceCount: bindings.length, snapshotSourceCount: sources.length, sourceSelectionChecksum, sourceInventoryChecksum: report.sourceInventoryChecksum, recurrencePreventionProven, reportPath: REPORT }, null, 2));
 if (!valid) process.exitCode = 3;
