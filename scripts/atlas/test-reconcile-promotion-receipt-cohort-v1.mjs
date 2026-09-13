@@ -5,7 +5,7 @@ import { evaluatePromotionReceiptCohort } from './reconcile-promotion-receipt-co
 
 const WORKSPACE = 'sha256:' + 'a'.repeat(64);
 const OTHER_WORKSPACE = 'sha256:' + 'b'.repeat(64);
-const CANDIDATE = 'candidate:v1';
+const CANDIDATE = 'lineage-qualified-canary:' + WORKSPACE + ':v1:2';
 const ORDINAL = 'c'.repeat(64);
 const GRAPH = 'sha256:' + 'd'.repeat(64);
 
@@ -17,7 +17,28 @@ function rawReceipts(entries) {
   }]));
 }
 
-test('proves one coherent cohort and leaves stale receipts historical', () => {
+function candidateReceipt(workspace = WORKSPACE) {
+  return {
+    lineage: { workspaceRevision: workspace },
+    actualCandidateCount: 2,
+    map: {
+      rowCount: 2,
+      candidateSnapshotRevision: CANDIDATE,
+      ordinalMapChecksum: ORDINAL,
+    },
+  };
+}
+
+function candidateMap(workspace = WORKSPACE) {
+  return {
+    workspaceRevision: workspace,
+    candidateSnapshotRevision: CANDIDATE,
+    ordinalMapChecksum: ORDINAL,
+    rowCount: 2,
+  };
+}
+
+test('proves one coherent lineage-qualified cohort and leaves stale receipts historical', () => {
   const currentness = {
     selection: { selectedWorkspaceRevision: WORKSPACE },
     admittedWorkspaceRevision: WORKSPACE,
@@ -26,12 +47,6 @@ test('proves one coherent cohort and leaves stale receipts historical', () => {
       { receiptPath: 'historical.json', exists: true, receiptChecksum: '2', workspaceRevision: OTHER_WORKSPACE },
     ],
   };
-  const ordinalAdmission = {
-    candidateSnapshotRevision: CANDIDATE,
-    ordinalMapChecksum: ORDINAL,
-    sourceMap: 'map.json',
-  };
-  const ordinalMap = { workspaceRevision: WORKSPACE };
   const graphReport = {
     selected: {
       workspaceRevision: WORKSPACE,
@@ -42,8 +57,8 @@ test('proves one coherent cohort and leaves stale receipts historical', () => {
   };
   const report = evaluatePromotionReceiptCohort({
     currentness,
-    ordinalAdmission,
-    ordinalMap,
+    candidateReceipt: candidateReceipt(),
+    candidateMap: candidateMap(),
     graphReport,
     rawReceipts: rawReceipts({
       'current.json': {
@@ -60,18 +75,19 @@ test('proves one coherent cohort and leaves stale receipts historical', () => {
   assert.deepEqual(report.currentReceiptRefs, ['current.json']);
   assert.equal(report.excludedReceipts[0].classification, 'STALE_WORKSPACE');
   assert.deepEqual(report.blockers, []);
+  assert.equal(report.checks.candidateMapMatchesReceipt, true);
   assert.equal(report.writesPerformed, false);
 });
 
-test('blocks when ordinal map lacks selected workspace binding', () => {
+test('blocks when lineage-qualified candidate map is stale to selected workspace', () => {
   const report = evaluatePromotionReceiptCohort({
     currentness: {
       selection: { selectedWorkspaceRevision: WORKSPACE },
       admittedWorkspaceRevision: WORKSPACE,
       receipts: [{ receiptPath: 'current.json', exists: true, workspaceRevision: WORKSPACE }],
     },
-    ordinalAdmission: { candidateSnapshotRevision: CANDIDATE, ordinalMapChecksum: ORDINAL },
-    ordinalMap: {},
+    candidateReceipt: candidateReceipt(OTHER_WORKSPACE),
+    candidateMap: candidateMap(OTHER_WORKSPACE),
     graphReport: {
       selected: { workspaceRevision: WORKSPACE, graphRevision: GRAPH, reviewOnly: false, workspaceRevisionMatch: true },
     },
@@ -79,7 +95,26 @@ test('blocks when ordinal map lacks selected workspace binding', () => {
   });
 
   assert.equal(report.status, 'PROMOTION_RECEIPT_COHORT_BLOCKED');
-  assert.ok(report.blockers.includes('ORDINAL_MAP_WORKSPACE_BINDING_MISSING'));
+  assert.ok(report.blockers.includes('ORDINAL_MAP_WORKSPACE_MISMATCH'));
+});
+
+test('blocks when lineage-qualified map artifact is absent even if receipt exists', () => {
+  const report = evaluatePromotionReceiptCohort({
+    currentness: {
+      selection: { selectedWorkspaceRevision: WORKSPACE },
+      admittedWorkspaceRevision: WORKSPACE,
+      receipts: [{ receiptPath: 'current.json', exists: true, workspaceRevision: WORKSPACE }],
+    },
+    candidateReceipt: candidateReceipt(),
+    candidateMap: null,
+    graphReport: {
+      selected: { workspaceRevision: WORKSPACE, graphRevision: GRAPH, reviewOnly: false, workspaceRevisionMatch: true },
+    },
+    rawReceipts: rawReceipts({ 'current.json': { workspaceRevision: WORKSPACE } }),
+  });
+
+  assert.equal(report.status, 'PROMOTION_RECEIPT_COHORT_BLOCKED');
+  assert.ok(report.blockers.includes('LINEAGE_QUALIFIED_CANDIDATE_MAP_ARTIFACT_MISSING'));
 });
 
 test('blocks when no graph revision is proven for selected workspace', () => {
@@ -88,8 +123,8 @@ test('blocks when no graph revision is proven for selected workspace', () => {
       selection: { selectedWorkspaceRevision: WORKSPACE },
       receipts: [{ receiptPath: 'current.json', exists: true, workspaceRevision: WORKSPACE }],
     },
-    ordinalAdmission: { candidateSnapshotRevision: CANDIDATE, ordinalMapChecksum: ORDINAL },
-    ordinalMap: { workspaceRevision: WORKSPACE },
+    candidateReceipt: candidateReceipt(),
+    candidateMap: candidateMap(),
     graphReport: {
       selected: { workspaceRevision: OTHER_WORKSPACE, graphRevision: GRAPH, reviewOnly: false, workspaceRevisionMatch: true },
     },
