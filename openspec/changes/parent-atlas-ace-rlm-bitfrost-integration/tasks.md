@@ -9379,3 +9379,66 @@ corpus gates, which require actual human relevance-grading work, not automation.
 
 Status: `ADMITTED_REVISION_PARTIALLY_GROUNDED_117_BINDINGS_LIVE_PROVEN`. Scripts:
 `scripts/atlas/apply-admitted-workspace-source-bindings-content-reconciled-v1.mjs` (new).
+
+### `atlas_source_refs` populated at scale — 117 → 23,369 real bindings, 194 real canonical symbols (2026-09-13, continued)
+
+**Following operator direction ("populate atlas_source_refs with whole-file entries at scale")**,
+built `scripts/atlas/apply-file-level-source-refs-content-reconciled-v1.mjs` (new, dry-run
+default/`--apply`-gated). Reused the exact, already-established writer convention from
+`apply-current-source-registry-reconciliation-v1.mjs` (read directly before writing anything, per
+Duplication Prevention) rather than inventing a new key shape: `source_ref_key === relativePath`
+(bare path, no `#file` suffix — an earlier, unrelated, differently-shaped legacy entry had briefly
+suggested a `#file` convention; the real canonical writer proved that wrong), `source_type='code'`,
+`symbol_kind` left NULL, `content_hash` bare 64-hex sha256. Scope: only the same content-exact-match
+candidate pool already computed by the binding-apply script (never unrelated or unverified data).
+
+```
+BEFORE: atlas_source_refs file-level rows:        117
+Dry-run candidateInserts:                       23,252
+APPLIED: inserted 23,252 / readback 23,252 — FILE_LEVEL_SOURCE_REFS_INSERT_AND_READBACK_PROVEN
+AFTER:  atlas_source_refs total: 45,856 (22,487 symbol-level UNCHANGED + 23,369 file-level)
+```
+
+Verified the 22,487 pre-existing symbol/fragment-level rows were untouched (purely additive) by
+direct count before/after.
+
+**Immediate cascading effect, re-ran the binding-apply script**: `notInRegistry` dropped from
+23,252 → 0. Applied: **23,369 total real bindings now exist** for the admitted revision (up from
+117 minutes earlier, up from 0 for the entire session before that). Verified live in Postgres.
+
+**Re-ran `symbol-reconciliation-writer-v1.mts` against the real admitted revision**:
+`boundSourceRefCount: 23,369`, `symbolRowCount: 194` (up from 24 — more of the real
+`graphify_symbols` rows now tie to a bound sourceRef). First dry-run without `--allow-create`
+correctly resolved 0/194 to canonical (all newly-nominated, no pre-existing canonical match to
+reuse) — a legitimate, conservative outcome, not a bug. Re-ran with `--allow-create --apply`:
+**`canonical_symbol_count: 194`, `symbol_version_count: 194`, `canonical_identity_created: true`,
+`unresolved_symbol_count: 0`**. Verified live: `atlas_symbol_versions` now has 194 real rows for
+the admitted revision, joined back to real canonical symbol names/kinds from real source files
+(including `deeds_labs/archive/scaffolds/2026-08-12-parent-atlas-event-merkle-identity-pack/
+src/daily/parent-atlas-daily-compiler.ts` and `temp_poc_amqp_test/poc_amqp_diagnostics.mjs` — real,
+existing files, not fabricated).
+
+**Minor, non-blocking imprecision noticed, not fixed (flagged)**: a handful of `import type {...}`
+statement lines were classified `symbol_kind: 'function'` by the existing `ts-ast-extractor.mjs`
+walk rather than `'import'` — a pre-existing extractor classification looseness, out of scope for
+this step, does not affect the gate's correctness (still a real, non-fabricated symbol), just a
+future precision improvement.
+
+**Board-level effect (re-ran `audit-promotion-board-reconcile-v2.mjs`, read-only)**:
+`board.sourceAuthority.currentWorkspaceOwnerProven` remains `true` (already flipped by the prior
+117-row step). `sourceMembershipProven` remains `false` — this specific board field is derived from
+`CURRENT-STRUCTURAL-LINEAGE-01`'s OWN reconciliation, which still points at the tiny canary
+execution (`b337f94c-...`, 1 file), not this new 23,369-row binding set — today's work grounds the
+*source identity* layer, not the *structural chunk/packet bridge* layer characterized earlier
+(2.6% coverage). Those remain two genuinely different gates; closing this one does not
+automatically close that one.
+
+**What changed, stated precisely**: the admitted workspace revision went from having literally
+zero real source-identity grounding to having 23,369 real, content-verified source bindings and
+194 real canonical code symbols — a first-of-its-kind result for this revision across this whole
+multi-session effort. What remains open, unchanged: the structural chunk/packet lineage bridge
+(needs either large-scale materialization across the full owner run or a re-scoped definition of
+"proven"), and the semantic/judgment corpus gates (need real human relevance grading).
+
+Status: `ADMITTED_REVISION_SOURCE_IDENTITY_FULLY_GROUNDED_23369_BINDINGS_194_CANONICAL_SYMBOLS`.
+Scripts: `scripts/atlas/apply-file-level-source-refs-content-reconciled-v1.mjs` (new).

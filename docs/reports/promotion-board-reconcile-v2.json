@@ -1,6 +1,6 @@
 {
   "schema": "atlas.promotion-board-reconcile.v2",
-  "generatedAt": "2026-09-13T03:48:48.326Z",
+  "generatedAt": "2026-09-13T03:53:29.686Z",
   "mode": "READ_ONLY",
   "gate": "PROMOTION-BOARD-RECONCILE-02",
   "owner": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration",
