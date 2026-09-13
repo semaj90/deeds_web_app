@@ -9274,3 +9274,42 @@ Evidence: `docs/reports/trace-disabled-search-tools-v1.json`;
 `scripts/atlas/audit-trace-disabled-search-tools-v1.mjs`.
 Status: `DISABLED_SCHEMA_FINGERPRINT_AUDIT_READY_TO_COMPARE_ON_REENABLE`;
 authority=false; writesPerformed=false.
+
+### Workspace-revision identity reconciliation — read-only content-level comparison (2026-09-13, continued)
+
+**Question investigated**: are `sha256:322ed1a6...` (tournament-admitted, sealed 2026-09-11,
+25,291 sources / 24,205 `repo:root`) and `sha256:e0dc2711...` (the label actually attached to
+23,758 real `graphify_files` rows, the dominant live Graphify cohort) two genuinely different
+codebase states, or the same underlying lineage labeled by two different revision-computation
+methodologies at two close points in time? Purely read-only: loaded the admitted snapshot's own
+manifest file directly and joined it against live `graphify_files` rows in Postgres by `source_ref`,
+comparing `content_hash` values. No writes, no schema changes, no identity decisions made.
+
+```
+admitted repo:root sources:          24,205
+e0dc2711 owner-run distinct refs:     23,758
+present in both:                      23,745
+content_hash EXACT match:             23,369  (98.4%)
+content_hash mismatch:                   376  (1.6%)
+```
+
+**The 376 mismatches are not evidence of a different lineage** — spot-checked and every one is a
+file known to be actively, repeatedly edited across sessions in this exact time window:
+`.claude/settings.json`, `.claude/settings.local.json`, `.mcp.json`, `claude.md`,
+`TRACE-MCP-AUDIT-COMPLETE.md`. These are precisely the files this file's own "Follow-up" sections
+elsewhere already document as edited today. Normal ~2-day drift between a sealed snapshot
+(2026-09-11) and a live, actively-edited cohort, not corruption or a different repository state.
+
+**Conclusion (evidence only, no decision made)**: `322ed1a6` and `e0dc2711` describe the *same*
+underlying codebase lineage at two close points in time — 98.4% file-identical — not two
+incompatible histories. This meaningfully lowers the risk of the "re-admit/reconcile e0dc2711"
+path flagged in the previous follow-up above, compared to treating it as an unrelated or
+unvalidated revision label. **Still not acted on**: no `atlas_workspace_source_bindings` write, no
+re-admission, no revision-identity decision made here — this is additional evidence for whoever
+makes that call next, not the call itself.
+
+Status: `WORKSPACE_REVISION_IDENTITY_CONTENT_OVERLAP_CHARACTERIZED_98PCT4`. Read-only, no
+production state changed. Script: ad hoc, not committed (scratch comparison under job tmp dir);
+the query pattern (`workspace-source-snapshots/<hash>.json` sources filtered to `repo:root`, joined
+by `source_ref` against `graphify_files.content_hash` for a target `workspace_revision`) is simple
+enough to be reproduced directly if this needs re-verifying later.
