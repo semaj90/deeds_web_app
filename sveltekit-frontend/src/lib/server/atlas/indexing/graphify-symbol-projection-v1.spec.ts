@@ -105,9 +105,10 @@ function coordinates() {
 }
 
 function referenceEvidence() {
+  const referenceId = `treesitter-chunker-xref:node-method:external:helper:CALLS:${sourceRevision}`;
   return {
-    'treesitter-chunker-xref:node-method:external:helper:CALLS:' + sourceRevision: {
-      referenceId: 'treesitter-chunker-xref:node-method:external:helper:CALLS:' + sourceRevision,
+    [referenceId]: {
+      referenceId,
       evidenceKind: 'treesitter_chunker_xref',
       startByte: 48,
       endByte: 56,
@@ -119,7 +120,9 @@ function referenceEvidence() {
   } as const;
 }
 
-function mapFixture(overrides: Parameters<typeof mapStructuralFabricToGraphifyProjectionV1>[0] extends infer T ? Partial<T> : never = {}) {
+type ProjectionInput = Parameters<typeof mapStructuralFabricToGraphifyProjectionV1>[0];
+
+function mapFixture(overrides: Partial<ProjectionInput> = {}) {
   return mapStructuralFabricToGraphifyProjectionV1({
     workspaceId,
     fileId,
