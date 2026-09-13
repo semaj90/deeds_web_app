@@ -5,8 +5,8 @@
  * Sequence:
  *   1. Anchor to the current proven Graphify snapshot workspace revision.
  *   2. Refresh promotion receipt currentness for that exact workspace.
- *   3. Rebuild the existing lineage-qualified CandidateOrdinalMap for it.
- *   4. Reconcile PROMOTION-RECEIPT-COHORT-01.
+ *   3. Build the current canonical-chunk CandidateOrdinalMapV2.
+ *   4. Reconcile PROMOTION-RECEIPT-COHORT-01 v2.
  *   5. Only if 4 passes, refresh semantic writer census.
  *   6. Reconcile SEMANTIC-768-PHYSICAL-OWNER-01.
  *
@@ -62,6 +62,7 @@ const anchor = requireGraphifyAnchor();
 console.log(JSON.stringify({
   gate: 'RICH-CHUNK-AUTHORITY-SPINE-01',
   mode: 'READ_ONLY',
+  identityGrain: 'CANONICAL_CHUNK',
   workspaceRevision: anchor.workspaceRevision,
   executionId: anchor.executionId,
   snapshotRevision: anchor.snapshotRevision,
@@ -83,19 +84,22 @@ code = run(
   process.platform === 'win32' ? 'npx.cmd' : 'npx',
   [
     'tsx',
-    'scripts/atlas/materialize-lineage-qualified-candidate-map-v1.mts',
+    'scripts/atlas/materialize-current-chunk-ordinal-map-v2.mts',
     `--workspace-revision=${anchor.workspaceRevision}`,
-    '--output=.tmp/atlas/lineage-qualified-candidate-map-v1.json',
-    '--report=docs/reports/lineage-qualified-candidate-map-v1.json',
+    '--output=.tmp/atlas/current-chunk-ordinal-map-v2.json',
+    '--report=docs/reports/current-chunk-ordinal-map-v2.json',
   ],
-  'rebuild lineage-qualified candidate ordinal map',
+  'build current canonical-chunk ordinal map v2',
 );
-if (code !== 0) process.exit(code);
+if (code !== 0) {
+  console.error('\n[rich-chunk-authority] STOP: CURRENT_CHUNK_ORDINAL_MAP_BLOCKED');
+  process.exit(code);
+}
 
 code = run(
   process.execPath,
-  ['scripts/atlas/reconcile-promotion-receipt-cohort-v1.mjs'],
-  'reconcile promotion receipt cohort',
+  ['scripts/atlas/reconcile-promotion-receipt-cohort-v2.mjs'],
+  'reconcile current-chunk promotion receipt cohort v2',
 );
 if (code !== 0) {
   console.error('\n[rich-chunk-authority] STOP: PROMOTION_RECEIPT_COHORT_BLOCKED');
@@ -121,6 +125,7 @@ if (code !== 0) {
 
 console.log(JSON.stringify({
   status: 'RICH_CHUNK_AUTHORITY_SPINE_READY',
+  identityGrain: 'CANONICAL_CHUNK',
   workspaceRevision: anchor.workspaceRevision,
   nextGate: 'RICH-CHUNK-CONTRACT-01',
   writesPerformed: false,
