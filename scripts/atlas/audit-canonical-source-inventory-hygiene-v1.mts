@@ -14,6 +14,11 @@ import {
   sourceInventoryChecksum,
   sourceSelectionChecksum,
 } from './lib/canonical-source-inventory-hygiene-v1.mts';
+import {
+  WHOLE_CODEBASE_SOURCE_EXCLUSION_POLICY_REVISION,
+  exclusionPolicyChecksum,
+  proveRequiredRecurrenceExclusions,
+} from './lib/whole-codebase-source-exclusions.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const SNAPSHOT_DIR = resolve(ROOT, 'docs/reports/workspace-source-snapshots');
@@ -49,12 +54,18 @@ const unknownCount = excluded.UNKNOWN;
 
 const writerPath = 'scripts/atlas/upsert-whole-codebase-atlas-packets.mjs';
 let writerRevisionChecksum: string | null = null;
+let writerUsesSharedExclusionPolicy = false;
 try {
   const writer = await readFile(resolve(ROOT, writerPath), 'utf8');
   writerRevisionChecksum = `sha256:${createHash('sha256').update(writer, 'utf8').digest('hex')}`;
+  writerUsesSharedExclusionPolicy = writer.includes("./lib/whole-codebase-source-exclusions.mjs")
+    && writer.includes('buildRipgrepExcludeArgs');
 } catch {
   // A missing writer is a blocker below.
 }
+
+const recurrenceExclusionProof = proveRequiredRecurrenceExclusions();
+const recurrencePrevented = writerUsesSharedExclusionPolicy && recurrenceExclusionProof.pass;
 
 const blockers: string[] = [];
 if (readback.status !== 'SNAPSHOT_BYTES_READBACK_PROVEN') blockers.push('SNAPSHOT_BYTES_READBACK_NOT_PROVEN');
@@ -67,6 +78,8 @@ if (junk.backup !== 0) blockers.push(`KNOWN_JUNK_BACKUP_IN_CANONICAL_SOURCE:${ju
 if (junk.generatedBuild !== 0) blockers.push(`KNOWN_JUNK_GENERATED_BUILD_IN_CANONICAL_SOURCE:${junk.generatedBuild}`);
 if (junk.worktreeDuplicate !== 0) blockers.push(`KNOWN_JUNK_WORKTREE_DUPLICATE_IN_CANONICAL_SOURCE:${junk.worktreeDuplicate}`);
 if (!writerRevisionChecksum) blockers.push('PACKET_WRITER_UNREADABLE');
+if (!writerUsesSharedExclusionPolicy) blockers.push('PACKET_WRITER_DOES_NOT_USE_SHARED_EXCLUSION_POLICY');
+if (!recurrenceExclusionProof.pass) blockers.push('PACKET_WRITER_REQUIRED_RECURRENCE_EXCLUSIONS_INCOMPLETE');
 
 const report = {
   schema: 'atlas.canonical-source-inventory-hygiene.v1',
@@ -88,11 +101,15 @@ const report = {
   sourceSelectionChecksum: selectionChecksum,
   writerPath,
   writerRevisionChecksum,
+  writerExclusionPolicyRevision: WHOLE_CODEBASE_SOURCE_EXCLUSION_POLICY_REVISION,
+  writerExclusionPolicyChecksum: exclusionPolicyChecksum(),
+  writerUsesSharedExclusionPolicy,
+  recurrenceExclusionProof,
   candidatePathCount: sources.length,
   canonicalSourceCount: canonicalRecords.length,
   excludedCountsByReason: excluded,
   knownJunkMatches: junk,
-  recurrencePrevented: true,
+  recurrencePrevented,
   historicalJunkIdentified: true,
   historicalJunkCleanupAuthorized: false,
   canonicalSources: canonicalRecords,
@@ -119,6 +136,8 @@ console.log(JSON.stringify({
   sourceInventoryChecksum: report.sourceInventoryChecksum,
   sourceSelectionChecksum: report.sourceSelectionChecksum,
   knownJunkMatches: report.knownJunkMatches,
+  recurrencePrevented: report.recurrencePrevented,
+  writerExclusionPolicyRevision: report.writerExclusionPolicyRevision,
   writesPerformed: false,
   reportPath: REPORT,
 }, null, 2));
