@@ -19,6 +19,11 @@ import crypto from 'crypto';
 import fs from 'fs/promises';
 import { fileURLToPath } from 'url';
 import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
+import {
+  WHOLE_CODEBASE_SOURCE_EXCLUSION_POLICY_REVISION,
+  buildRipgrepExcludeArgs,
+  exclusionPolicyChecksum,
+} from './lib/whole-codebase-source-exclusions.mjs';
 
 const { Pool } = pg;
 
@@ -30,25 +35,6 @@ Object.assign(process.env, ENV);
 const args = process.argv.slice(2);
 const dryRun = !args.includes('--apply');
 const verbose = args.includes('--verbose');
-
-const EXCLUDE_PATTERNS = [
-  '.git',
-  'node_modules',
-  '.svelte-kit',
-  '.vite',
-  'dist',
-  'build',
-  'coverage',
-  '.cache',
-  '.pytest_cache',
-  '__pycache__',
-  'models',
-  '.opencode',
-  'deeds_labs',
-  '.claude',
-  '.venv',
-  'venv',
-];
 
 function sha256(str) {
   return crypto.createHash('sha256').update(str).digest('hex');
@@ -65,10 +51,14 @@ function determineFeatureId(source_ref) {
 }
 
 /**
- * Scan repo and extract packets
+ * Scan repo and extract packets.
+ *
+ * `-uuu` intentionally disables normal ripgrep ignore filtering, so explicit
+ * negative globs from the shared policy are mandatory and are treated as part
+ * of canonical source-inventory provenance.
  */
 async function extractWholeCodebasePackets() {
-  const excludeArgs = EXCLUDE_PATTERNS.map(p => `--glob=!${p}`).join(' ');
+  const excludeArgs = buildRipgrepExcludeArgs();
 
   try {
     const cmd = `rg --files -uuu ${excludeArgs}`;
@@ -106,6 +96,8 @@ async function extractWholeCodebasePackets() {
           domain: 'codebase',
           text_safe: isTextSafe,
           size_bytes: size,
+          source_exclusion_policy_revision: WHOLE_CODEBASE_SOURCE_EXCLUSION_POLICY_REVISION,
+          source_exclusion_policy_checksum: exclusionPolicyChecksum(),
         },
       };
 
@@ -197,6 +189,8 @@ async function upsertPackets(pool, packets) {
 async function generateReports(packets, result) {
   const jsonReport = {
     generated_at: new Date().toISOString(),
+    source_exclusion_policy_revision: WHOLE_CODEBASE_SOURCE_EXCLUSION_POLICY_REVISION,
+    source_exclusion_policy_checksum: exclusionPolicyChecksum(),
     summary: {
       total_packets: packets.length,
       upserted: result.success,
@@ -209,6 +203,10 @@ async function generateReports(packets, result) {
   const mdReport = [
     '# Whole-Codebase Atlas Packet Upsert Report',
     `Generated: ${new Date().toISOString()}`,
+    '',
+    '## Source Inventory Policy',
+    `- **Revision**: ${WHOLE_CODEBASE_SOURCE_EXCLUSION_POLICY_REVISION}`,
+    `- **Checksum**: ${exclusionPolicyChecksum()}`,
     '',
     '## Summary',
     `- **Total Packets**: ${packets.length}`,
@@ -243,6 +241,8 @@ async function main() {
   console.log('[phase-d] Phase D: Whole-Codebase Atlas Packet Upsert');
   console.log(`[phase-d] Mode: ${dryRun ? 'DRY-RUN' : 'APPLY'}`);
   console.log(`[phase-d] Repo Root: ${REPO_ROOT}\n`);
+  console.log(`[phase-d] Source exclusion policy: ${WHOLE_CODEBASE_SOURCE_EXCLUSION_POLICY_REVISION}`);
+  console.log(`[phase-d] Source exclusion checksum: ${exclusionPolicyChecksum()}\n`);
 
   try {
     console.log('[step-1] Extract packets from whole codebase');
