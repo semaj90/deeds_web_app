@@ -1,6 +1,6 @@
 {
   "schema": "atlas.promotion-board-reconcile.v2",
-  "generatedAt": "2026-09-13T01:48:38.732Z",
+  "generatedAt": "2026-09-13T03:48:48.326Z",
   "mode": "READ_ONLY",
   "gate": "PROMOTION-BOARD-RECONCILE-02",
   "owner": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration",
@@ -118,7 +118,7 @@
           "receiptRefs": [
             "docs/reports/selected-graphify-structural-lineage-v1.json"
           ],
-          "explanation": "Selected execution structural lineage reports CURRENT_PACKET_CHUNK_JOIN_UNPROVEN with 0 bridge matches and 3 memberships still missing a bridge row."
+          "explanation": "Selected execution structural lineage reports CURRENT_PACKET_CHUNK_JOIN_UNPROVEN with 0 bridge matches and 0 memberships still missing a bridge row."
         },
         {
           "code": "CURRENT_CORPUS_SELECTION_UNRESOLVED",
@@ -249,7 +249,7 @@
       "path": "docs/reports/trace-disabled-search-tools-v1.json",
       "exists": true,
       "schemaVersion": "atlas.trace-disabled-search-tools.v1",
-      "generatedAt": "2026-09-13T01:41:45.203Z",
+      "generatedAt": "2026-09-13T03:11:02.252Z",
       "workspaceRevision": null,
       "sourceRevisionOrChecksum": null,
       "status": "DISABLED_SEARCH_TOOLS_AUDITED"
@@ -269,7 +269,7 @@
       "path": "docs/reports/rrf-caller-baseline-v1.json",
       "exists": true,
       "schemaVersion": "atlas.rrf-caller-baseline.v1",
-      "generatedAt": "2026-09-13T01:19:29.702Z",
+      "generatedAt": "2026-09-13T02:57:03.871Z",
       "workspaceRevision": null,
       "sourceRevisionOrChecksum": null,
       "status": "CALLER_BASELINE_INCOMPLETE_MIGRATION_BLOCKED"
@@ -339,7 +339,7 @@
       "path": "docs/reports/selected-graphify-structural-lineage-v1.json",
       "exists": true,
       "schemaVersion": "atlas.selected-graphify-structural-lineage.v1",
-      "generatedAt": "2026-09-13T01:30:13.700Z",
+      "generatedAt": "2026-09-13T02:06:31.208Z",
       "workspaceRevision": null,
       "sourceRevisionOrChecksum": null,
       "status": "CURRENT_PACKET_CHUNK_JOIN_UNPROVEN"
@@ -389,7 +389,7 @@
       "path": "docs/reports/current-graph-artifact-readiness-v1.json",
       "exists": true,
       "schemaVersion": "atlas.current-graph-artifact-readiness.v1",
-      "generatedAt": "2026-09-13T00:39:12.340Z",
+      "generatedAt": "2026-09-13T03:13:57.341Z",
       "workspaceRevision": null,
       "sourceRevisionOrChecksum": null,
       "status": "CURRENT_GRAPH_ARTIFACT_BLOCKED_ON_EDGE_PRODUCER"
@@ -399,7 +399,7 @@
       "path": "docs/reports/domain-classifier-lineage-v1.json",
       "exists": true,
       "schemaVersion": "atlas.domain-classifier-lineage.v1",
-      "generatedAt": "2026-09-13T00:41:39.217Z",
+      "generatedAt": "2026-09-13T03:15:09.250Z",
       "workspaceRevision": null,
       "sourceRevisionOrChecksum": null,
       "status": "CLASSIFIER_LINEAGE_BLOCKED"

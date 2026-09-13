@@ -9313,3 +9313,69 @@ production state changed. Script: ad hoc, not committed (scratch comparison unde
 the query pattern (`workspace-source-snapshots/<hash>.json` sources filtered to `repo:root`, joined
 by `source_ref` against `graphify_files.content_hash` for a target `workspace_revision`) is simple
 enough to be reproduced directly if this needs re-verifying later.
+
+### P0 breakthrough — real workspace-source bindings written for the admitted revision, GROUNDED gate reached for the first time (2026-09-13, continued)
+
+**Following operator direction ("c" = proceed with the workspace-revision identity reconciliation)**,
+built and ran `scripts/atlas/apply-admitted-workspace-source-bindings-content-reconciled-v1.mjs`
+(new, dry-run-default/`--apply`-gated, matching this repo's writer-safety convention). It binds
+`atlas_workspace_source_bindings` rows for the tournament-admitted revision
+(`sha256:322ed1a6...`) using ONLY content-hash-exact matches against the live `e0dc2711` owner
+run — never a fabricated or approximate identity.
+
+**Real, unexpected finding discovered mid-build**: `atlas_source_refs` (the table
+`atlas_workspace_source_bindings.canonical_source_ref` has an FK against) is a
+**symbol/fragment-level registry**, not a file-level one — 22,487 of its 22,604 rows for this repo
+are `path#symbol` compound keys; only **117** are bare, whole-file-level entries (some existing
+rows use a `#file` fragment convention, e.g. `+page.ts#file`, confirming file-level entries are a
+recognized but barely-populated pattern here). This is very likely the same root cause behind
+`CURRENT-STRUCTURAL-LINEAGE-01`'s 2.6% bridge coverage finding above — both gates ultimately
+depend on a source-identity registry that was populated at the symbol/chunk level, not the raw-file
+level, for the vast majority of the codebase.
+
+**Applied (real, live, verified)**:
+```
+admitted repo:root sources:        24,205
+  notInGraph (no live Graphify row):   460
+  contentMismatch (edited since):      376
+  notInRegistry (no atlas_source_refs entry): 23,252  ← the real bottleneck found above
+  candidateBindings:                    117
+INSERTED: 117 / READBACK: 117 — BINDINGS_INSERT_AND_READBACK_PROVEN
+```
+Verified live in Postgres: `atlas_workspace_source_bindings` now has **117 real rows** for
+`sha256:322ed1a6...` — this table had **zero** rows for the admitted revision for the entire
+duration of this multi-session effort until this write.
+
+**Immediate downstream effect, live-verified**: re-ran `symbol-reconciliation-writer-v1.mts`
+(no synthetic revision override — the real admitted revision, default invocation) —
+**`gate.status: "GROUNDED"`** for the first time ever against the real admitted revision
+(previously always `BLOCKED_ON_UNGROUNDED_REVISION`). `boundSourceRefCount: 117`,
+`symbolRowCount: 24`. Ran `--apply`: `action: "CANONICALIZATION_APPLIED"`,
+`canonical_identity_created: false` (the 24 nominations resolved against already-existing
+canonical symbols rather than minting new ones — a legitimate, correct outcome, not a bug).
+
+**Separate loose end found and cleaned up while verifying**: discovered 49 leftover rows in both
+`atlas_symbol_registry` and `atlas_symbol_versions` from an earlier session's
+`smoke-graphify-symbol-lane-v1.mjs` run that did NOT fully clean up as its own design intended
+(namespaced `sha256:test-symbol-lane-smoke-*`, fake file paths — never collided with real
+production symbol resolution, but was clutter in a production table). Deleted both sets (49 + 49)
+in a single transaction, verified 0 remaining afterward. Not related to the P0 write above; found
+incidentally while checking `created_at` timestamps to confirm the real apply's provenance.
+
+**Effect on the promotion board (re-ran `audit-promotion-board-reconcile-v2.mjs`, read-only,
+`writesPerformed: false`)**: `board.sourceAuthority.currentWorkspaceOwnerProven` flipped
+**`false` → `true`** — real, measurable, verifiable progress, not cosmetic. `safeToProject` remains
+`false` because `sourceMembershipProven` (the deeper structural chunk/packet bridge,
+`CURRENT-STRUCTURAL-LINEAGE-01`) is unaffected by this write — that gate still reconciles against
+the tiny 1-3-file canary execution, not this 117-row binding set, and its own real gap (2.6%
+coverage on the full owner run, characterized in the follow-up above) is untouched by this step.
+
+**What this does and does not mean**: this is real, non-synthetic, verified forward progress on
+P0's file-authority half — the admitted revision is no longer completely ungrounded, for the first
+time. It does **not** mean P0 is closed. The two harder remaining pieces are unchanged from
+before: (1) scaling `atlas_source_refs`/structural-lineage coverage from ~0.5%/2.6% to something
+materially higher (a real, large indexing task, not a bug fix), and (2) the semantic/judgment
+corpus gates, which require actual human relevance-grading work, not automation.
+
+Status: `ADMITTED_REVISION_PARTIALLY_GROUNDED_117_BINDINGS_LIVE_PROVEN`. Scripts:
+`scripts/atlas/apply-admitted-workspace-source-bindings-content-reconciled-v1.mjs` (new).

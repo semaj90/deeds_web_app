@@ -1,0 +1,19 @@
+{
+  "schema": "atlas.apply-admitted-workspace-source-bindings-content-reconciled.v1",
+  "generatedAt": "2026-09-13T03:47:10.039Z",
+  "apply": true,
+  "admittedWorkspaceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+  "ownerRunWorkspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+  "admittedRootSources": 24205,
+  "counts": {
+    "notInGraph": 460,
+    "contentMismatch": 376,
+    "notInRegistry": 23252,
+    "alreadyBound": 0,
+    "candidateBindings": 117
+  },
+  "committed": true,
+  "insertedCount": 117,
+  "readbackCount": 117,
+  "status": "BINDINGS_INSERT_AND_READBACK_PROVEN"
+}
