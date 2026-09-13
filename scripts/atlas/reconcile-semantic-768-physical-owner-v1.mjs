@@ -74,6 +74,10 @@ function has(source, pattern) {
   return pattern.test(source);
 }
 
+function isKnownHistoricalPhysicalMigration(normalizedPath) {
+  return /(?:^|\/)(?:reembed-corpus-document-prefix-v1|sem768-admission-dry-\d+|apply-lineage-qualified-semantic-768-backfill-v1)\.mjs$/i.test(normalizedPath);
+}
+
 export function inspectWriterContract(writer, source) {
   const normalizedPath = writer.path.replaceAll('\\', '/');
   const isTest = /(?:^|\/)(?:test|tests|__tests__|fixtures?)(?:\/|\.|$)|\.spec\.|\.test\./i.test(normalizedPath);
@@ -81,6 +85,7 @@ export function inspectWriterContract(writer, source) {
   const isLegacySurface = writer.surface === 'codebase_chunk_index.content_embedding_768'
     || writer.surface === 'atlas_packets.embedding';
   const isPhysicalOwnerSurface = writer.surface === 'codebase_chunk_index.content_embedding';
+  const knownHistoricalPhysicalMigration = isPhysicalOwnerSurface && isKnownHistoricalPhysicalMigration(normalizedPath);
 
   const evidence = {
     canonicalChunkId: has(source, /canonical_chunk_id|canonicalChunkId/i),
@@ -89,12 +94,17 @@ export function inspectWriterContract(writer, source) {
     sourceRevision: has(source, /source_revision|sourceRevision/i),
     embeddingModelRevision: has(source, /upstreamRevision|modelRevision|embedding_model_revision|embeddingModelRevision|embedding_version/i),
     representationRevision: has(source, /representation_revision|representationRevision|bindingChecksum|representationId/i),
-    dimensions768: has(source, /(?:halfvec\s*\(\s*768\s*\)|dimension\s*[=:]\s*768|dimensions\s*[=:]\s*768|length\s*!==\s*768|content_embedding)/i),
-    readbackIdentity: has(source, /RETURNING|SELECT[\s\S]{0,1000}(?:content_embedding|canonical_chunk_id|packet_key)|readback|rowCount/i),
-    physicalOwnerWrite: has(source, /(?:UPDATE\s+codebase_chunk_index|INSERT\s+INTO\s+codebase_chunk_index)[\s\S]{0,1600}content_embedding\s*=/i)
-      || has(source, /content_embedding\s*=\s*\$\d+::halfvec\(768\)/i),
+    dimensions768: has(source, /(?:halfvec\s*\(\s*768\s*\)|dimension\s*[=:]\s*768|dimensions\s*[=:]\s*768|length\s*!==\s*768|\bcontent_embedding\b(?!_768))/i),
+    readbackIdentity: has(source, /readback/i)
+      && has(source, /vector_dims\s*\(|dimensions/i)
+      && has(source, /embedding_version|representationRevision/i),
+    physicalOwnerWrite: has(source, /(?:UPDATE\s+(?:public\.)?codebase_chunk_index|INSERT\s+INTO\s+(?:public\.)?codebase_chunk_index)[\s\S]{0,2400}\bcontent_embedding\b(?!_768)\s*=/i)
+      || has(source, /\bcontent_embedding\b(?!_768)\s*=\s*\$\d+::halfvec\(768\)/i),
     explicitApplyGuard: has(source, /--apply|\bAPPLY\b|EXPLICIT_[A-Z0-9_]*AUTHORIZATION_REQUIRED|ATLAS_AUTHORIZE_/i),
-    sourceWorkspaceWriteGuard: has(source, /WHERE[\s\S]{0,1600}(?:source_revision|sourceRevision)[\s\S]{0,1600}(?:workspace_revision|workspaceRevision)/i),
+    sourceWorkspaceWriteGuard: has(source, /(?:WHERE|EXISTS\s*\()[\s\S]{0,3200}(source_revision|sourceRevision)[\s\S]{0,3200}(workspace_revision|workspaceRevision)/i),
+    provenLineageJoin: has(source, /atlas_packet_chunk_lineage/i)
+      && has(source, /revision_status\s*=\s*['"]PROVEN['"]/i)
+      && has(source, /atlas_workspace_source_bindings/i),
   };
 
   const requiredLineage = [
@@ -109,6 +119,7 @@ export function inspectWriterContract(writer, source) {
     'physicalOwnerWrite',
     'explicitApplyGuard',
     'sourceWorkspaceWriteGuard',
+    'provenLineageJoin',
   ];
   const missingRequiredEvidence = requiredLineage.filter((key) => !evidence[key]);
 
@@ -126,6 +137,9 @@ export function inspectWriterContract(writer, source) {
   } else if (!isPhysicalOwnerSurface) {
     classification = 'DERIVED_PROJECTION';
     reason = `Writer targets ${writer.surface}, not ${PHYSICAL_OWNER.table}.${PHYSICAL_OWNER.column}.`;
+  } else if (knownHistoricalPhysicalMigration) {
+    classification = 'MIGRATION_ARTIFACT';
+    reason = 'Historical/reconciliation writer for the physical semantic column; not admitted as the current operator path.';
   } else if (missingRequiredEvidence.length === 0) {
     classification = 'CANONICAL_CURRENT_WRITER';
     reason = 'Writer targets the frozen physical owner and exposes the full revision-qualified canonical writer contract.';
@@ -134,6 +148,8 @@ export function inspectWriterContract(writer, source) {
     reason = `Writer targets the physical owner but lacks required canonical writer evidence: ${missingRequiredEvidence.join(', ')}.`;
   }
 
+  if (!CLASSIFICATIONS.includes(classification)) throw new Error(`UNKNOWN_WRITER_CLASSIFICATION:${classification}`);
+
   return {
     path: writer.path,
     surface: writer.surface,
@@ -141,6 +157,9 @@ export function inspectWriterContract(writer, source) {
     censusRole: writer.role,
     revisionQualifiedByCensus: writer.revisionQualified === true,
     guardedByCensus: writer.guarded === true,
+    canonicalLineageQualifiedByCensus: writer.canonicalLineageQualified === true,
+    independentReadbackByCensus: writer.independentReadback === true,
+    explicitApplyByCensus: writer.explicitApply === true,
     productionReachableCandidate: writer.productionReachableCandidate === true,
     classification,
     evidence,
@@ -176,6 +195,8 @@ export function evaluateSemanticPhysicalOwner(census, sourceReader = readSource)
     canonicalCurrentWriterCount: canonicalWriters.length,
     unresolvedCurrentWriters: unresolvedCurrentWriters.map((surface) => surface.path),
     unresolvedCurrentWriterCount: unresolvedCurrentWriters.length,
+    migrationArtifacts: surfaces.filter((surface) => surface.classification === 'MIGRATION_ARTIFACT').map((surface) => surface.path),
+    legacyWriters: surfaces.filter((surface) => surface.classification === 'LEGACY_WRITER').map((surface) => surface.path),
     surfaces,
     blockers,
     sourceReport: DEFAULT_CENSUS,
