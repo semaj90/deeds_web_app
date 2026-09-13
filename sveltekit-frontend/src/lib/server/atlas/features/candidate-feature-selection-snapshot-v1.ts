@@ -72,6 +72,19 @@ function assertRowIdentity(row: CandidateFeatureRowV1, map: CandidateOrdinalMapV
   }
 }
 
+function assertFeatureAuthority(row: CandidateFeatureRowV1): void {
+  const carriesSemanticEvidence = row.semanticRelevance !== null || row.laneMask.includes('semantic');
+  if (carriesSemanticEvidence && row.semanticRevision === null) {
+    throw new Error(`FEATURE_SELECTION_SEMANTIC_REVISION_REQUIRED:${row.candidateOrdinal}`);
+  }
+  if (row.semanticRelevance !== null && !row.laneMask.includes('semantic')) {
+    throw new Error(`FEATURE_SELECTION_SEMANTIC_LANE_REQUIRED:${row.candidateOrdinal}`);
+  }
+  if (row.graphAuthority !== null && row.graphRevision === null) {
+    throw new Error(`FEATURE_SELECTION_GRAPH_REVISION_REQUIRED:${row.candidateOrdinal}`);
+  }
+}
+
 export function materializeCandidateFeatureSelectionSnapshotV1(input: {
   ordinalMap: CandidateOrdinalMapV1;
   selection: CandidateOrdinalSelectionV1;
@@ -100,6 +113,7 @@ export function materializeCandidateFeatureSelectionSnapshotV1(input: {
       throw new Error(`FEATURE_SELECTION_FEATURE_REVISION_MISMATCH:${row.candidateOrdinal}`);
     }
     assertRowIdentity(row, map);
+    assertFeatureAuthority(row);
     rowsByOrdinal.set(row.candidateOrdinal, row);
   }
 
