@@ -68,6 +68,8 @@ export const semanticCorpusManifestV1Schema = z.object({
     column: z.literal('content_embedding'),
     storageType: z.literal('halfvec(768)'),
   }).strict(),
+  coverageScope: z.enum(['FULL_ORDINAL_MAP', 'BOUNDED_SUBSET']),
+  ordinalMapRowCount: z.number().int().positive(),
   memberCount: z.number().int().positive(),
   sourceRevisionSetChecksum: sha256,
   identitySetChecksum: sha256,
@@ -129,6 +131,7 @@ export function buildSemanticCorpusManifestV1(input: {
   }
 
   const ordered = [...members].sort((a, b) => a.candidateOrdinal - b.candidateOrdinal);
+  const coverageScope = ordered.length === map.rowCount ? 'FULL_ORDINAL_MAP' as const : 'BOUNDED_SUBSET' as const;
   const sourceRevisionSetChecksum = checksum(sortedUnique(ordered.map((member) => member.sourceRevision)));
   const identitySetChecksum = checksum(ordered.map((member) => ({
     candidateOrdinal: member.candidateOrdinal,
@@ -159,6 +162,8 @@ export function buildSemanticCorpusManifestV1(input: {
     ordinalMapChecksum: map.ordinalMapChecksum,
     representationId: 'semantic_768' as const,
     dimensions: 768 as const,
+    coverageScope,
+    ordinalMapRowCount: map.rowCount,
     memberCount: ordered.length,
     sourceRevisionSetChecksum,
     identitySetChecksum,
@@ -182,6 +187,8 @@ export function buildSemanticCorpusManifestV1(input: {
       column: 'content_embedding' as const,
       storageType: 'halfvec(768)' as const,
     },
+    coverageScope,
+    ordinalMapRowCount: map.rowCount,
     memberCount: ordered.length,
     sourceRevisionSetChecksum,
     identitySetChecksum,
