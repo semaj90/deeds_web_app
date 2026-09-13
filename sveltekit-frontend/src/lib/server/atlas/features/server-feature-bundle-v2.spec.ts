@@ -53,7 +53,7 @@ function authority() {
   return { record, envelope: buildRevisionAuthorityEnvelopeV1({ record, bindings }) };
 }
 
-function ordinalMap(workspaceRevision: string) {
+function ordinalMap(workspaceRevision: string, admittedSemanticRevision: string | null = semanticRevision) {
   return materializeCandidateOrdinalMap({
     workspaceRevision,
     candidateSnapshotRevision: 'fixture:current-chunks:v1',
@@ -68,7 +68,7 @@ function ordinalMap(workspaceRevision: string) {
         workspaceRevision,
         sourceRevision: `sha256:${digestA}`,
         graphRevision: null,
-        semanticRevision,
+        semanticRevision: admittedSemanticRevision,
         degradedIdentity: false,
         evidenceRefs: ['fixture:a'],
         representationBindings: [],
@@ -82,7 +82,7 @@ function ordinalMap(workspaceRevision: string) {
         workspaceRevision,
         sourceRevision: `sha256:${digestB}`,
         graphRevision: null,
-        semanticRevision,
+        semanticRevision: admittedSemanticRevision,
         degradedIdentity: false,
         evidenceRefs: ['fixture:b'],
         representationBindings: [],
@@ -160,26 +160,19 @@ describe('ServerFeatureBundleV2', () => {
 
   it('rejects semantic evidence when the selected ordinal lacks a semantic revision', () => {
     const { record } = authority();
-    const map = ordinalMap(record.workspaceRevision);
-    const candidate = map.candidates[1];
-    const brokenMap = {
-      ...map,
-      candidates: map.candidates.map((item, index) => index === 1 ? { ...item, semanticRevision: null } : item),
-    };
+    const map = ordinalMap(record.workspaceRevision, null);
     const selection = materializeCandidateOrdinalSelectionV1({
       requestId: 'request:fixture:2',
       ordinalMap: map,
       selectedOrdinals: [1],
     });
-    const row = { ...semanticRow(map, 1), semanticRevision: null };
 
     expect(() => materializeCandidateFeatureSelectionSnapshotV1({
-      ordinalMap: brokenMap as typeof map,
+      ordinalMap: map,
       selection,
-      rows: [row],
+      rows: [semanticRow(map, 1)],
       featureRevision: 'semantic-only:fixture:v1',
       producerRevision: 'fixture:feature-selection:v1',
-    })).toThrow();
-    expect(candidate.semanticRevision).toBe(semanticRevision);
+    })).toThrow(/FEATURE_SELECTION_SEMANTIC_REVISION_REQUIRED:1/);
   });
 });
