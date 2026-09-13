@@ -19,6 +19,7 @@ const DATABASE_URL = process.env.DATABASE_URL?.trim()
 const WORKSPACE_ID = '625743d2-092b-4fa8-abe0-9dc094920c80';
 const AUTHORIZATION = 'AUTHORIZE_GRAPHIFY_POST_PHASE16_TERMINAL_RUN_V1';
 const admissionPath = resolve(ROOT, 'docs/reports/workspace-revision-tournament-admission-v1.json');
+const planPath = resolve(ROOT, 'docs/reports/graphify-source-selection-plan-v1.json');
 const reportPath = resolve(ROOT, 'docs/reports/graphify-daily-lifecycle-v1.json');
 
 type SnapshotSource = {
@@ -30,8 +31,31 @@ type SnapshotSource = {
   byteLength: number;
 };
 
-type Admission = { status?: string; authority?: boolean; workspaceRevision?: string; snapshotRevision?: string };
+type SelectionBinding = {
+  repositoryId: string;
+  repositoryRelativePath: string;
+  sourceRef: string;
+  codeSourceRevision: string;
+  contentHash: string;
+  byteLength: number;
+};
+
+type Admission = {
+  status?: string;
+  authority?: boolean;
+  workspaceRevision?: string;
+  snapshotRevision?: string;
+  snapshotSourceCount?: number;
+  sourceCount?: number;
+  sourceSelectionChecksum?: string;
+  sourceInventoryRevision?: string;
+  sourceInventoryChecksum?: string;
+};
+
 const sourceRowsRepositoryIds = (sources: SnapshotSource[]) => sources.map((source) => source.repositoryId);
+const normalized = (value: unknown) => String(value ?? '').replaceAll('\\', '/').replace(/^\/+/, '');
+const identity = (value: { repositoryId?: string; repositoryRelativePath?: string; sourceRef?: string }) =>
+  `${String(value.repositoryId ?? '')}:${normalized(value.repositoryRelativePath ?? value.sourceRef)}`;
 
 function sha256(value: string | Buffer): string {
   return createHash('sha256').update(value).digest('hex');
@@ -45,15 +69,73 @@ async function main() {
   if (admission.status !== 'WORKSPACE_REVISION_TOURNAMENT_ADMITTED'
     || admission.authority !== true
     || !admission.workspaceRevision
-    || !admission.snapshotRevision) {
+    || !admission.snapshotRevision
+    || !admission.sourceInventoryRevision
+    || !admission.sourceInventoryChecksum
+    || !admission.sourceSelectionChecksum
+    || !Number.isInteger(admission.sourceCount)
+    || Number(admission.sourceCount) <= 0) {
     throw new Error('GRAPHIFY_SNAPSHOT_NATIVE_OPEN_ADMISSION_REQUIRED');
   }
 
+  const plan = JSON.parse(await readFile(planPath, 'utf8')) as {
+    status?: string;
+    snapshotRevision?: string;
+    sourceCount?: number;
+    sourceSelectionChecksum?: string;
+    sourceInventoryRevision?: string;
+    sourceInventoryChecksum?: string;
+    recurrencePreventionProven?: boolean;
+    knownJunkExcluded?: boolean;
+    bindings?: SelectionBinding[];
+  };
+  if (plan.status !== 'SOURCE_SELECTION_PLAN_READY_NOT_ADMITTED'
+    || plan.snapshotRevision !== admission.snapshotRevision
+    || plan.sourceCount !== admission.sourceCount
+    || plan.sourceSelectionChecksum !== admission.sourceSelectionChecksum
+    || plan.sourceInventoryRevision !== admission.sourceInventoryRevision
+    || plan.sourceInventoryChecksum !== admission.sourceInventoryChecksum
+    || plan.recurrencePreventionProven !== true
+    || plan.knownJunkExcluded !== true
+    || !Array.isArray(plan.bindings)
+    || plan.bindings.length !== admission.sourceCount) {
+    throw new Error('GRAPHIFY_SNAPSHOT_NATIVE_OPEN_SOURCE_SELECTION_PLAN_MISMATCH');
+  }
+
   const snapshotPath = resolve(ROOT, 'docs/reports/workspace-source-snapshots', `${admission.snapshotRevision.replace(/^sha256:/, '')}.json`);
-  const snapshot = JSON.parse(await readFile(snapshotPath, 'utf8')) as { snapshotRevision?: string; sources?: SnapshotSource[] };
+  const snapshot = JSON.parse(await readFile(snapshotPath, 'utf8')) as {
+    snapshotRevision?: string;
+    sources?: SnapshotSource[];
+    sourceMembershipChecksum?: string;
+  };
   if (snapshot.snapshotRevision !== admission.snapshotRevision || !snapshot.sources?.length) {
     throw new Error('GRAPHIFY_SNAPSHOT_NATIVE_OPEN_SNAPSHOT_MISMATCH');
   }
+  if (admission.snapshotSourceCount !== undefined && snapshot.sources.length !== admission.snapshotSourceCount) {
+    throw new Error('GRAPHIFY_SNAPSHOT_NATIVE_OPEN_SNAPSHOT_SOURCE_COUNT_MISMATCH');
+  }
+
+  const snapshotByIdentity = new Map(snapshot.sources.map((source) => [identity(source), source] as const));
+  const sourceRows: SnapshotSource[] = plan.bindings.map((binding) => {
+    const key = identity(binding);
+    const source = snapshotByIdentity.get(key);
+    if (!source
+      || normalized(source.sourceRef) !== normalized(binding.sourceRef)
+      || source.sourceRevision !== binding.codeSourceRevision
+      || source.contentDigest !== binding.contentHash
+      || Number(source.byteLength) !== Number(binding.byteLength)) {
+      throw new Error(`GRAPHIFY_SNAPSHOT_NATIVE_OPEN_SELECTED_SOURCE_BINDING_MISMATCH:${key}`);
+    }
+    return {
+      repositoryId: binding.repositoryId,
+      repositoryRelativePath: normalized(binding.repositoryRelativePath),
+      sourceRef: normalized(binding.sourceRef),
+      sourceRevision: binding.codeSourceRevision,
+      contentDigest: binding.contentHash,
+      byteLength: Number(binding.byteLength),
+    };
+  });
+
   const materializedRoot = resolve(ROOT, '.tmp/workspace-source-snapshots', admission.snapshotRevision.replace(/^sha256:/, ''));
   if (!existsSync(materializedRoot)) throw new Error('GRAPHIFY_SNAPSHOT_NATIVE_OPEN_MATERIALIZATION_MISSING');
 
@@ -62,30 +144,32 @@ async function main() {
     const descriptor = JSON.parse(await readFile(resolve(descriptorPath), 'utf8')) as {
       schema?: string; sourceKind?: string; workspaceRevision?: string;
       snapshotRevision?: string; materializedRoot?: string; sourceCount?: number;
-      repositoryCount?: number; sourceCohortChecksum?: string; selectionChecksum?: string;
+      repositoryCount?: number; sourceInventoryRevision?: string; sourceInventoryChecksum?: string;
+      selectionChecksum?: string;
     };
     if (descriptor.schema !== 'atlas.graphify-execution-source.v2'
-      || descriptor.sourceKind !== 'ADMITTED_WORKSPACE_SNAPSHOT'
+      || descriptor.sourceKind !== 'ADMITTED_CANONICAL_SOURCE_SELECTION'
       || descriptor.workspaceRevision !== admission.workspaceRevision
       || descriptor.snapshotRevision !== admission.snapshotRevision
       || resolve(descriptor.materializedRoot ?? '') !== materializedRoot
-      || descriptor.sourceCount !== snapshot.sources.length
-      || descriptor.repositoryCount !== new Set(sourceRowsRepositoryIds(snapshot.sources)).size
-      || descriptor.sourceCohortChecksum !== undefined && descriptor.sourceCohortChecksum !== (snapshot as { sourceMembershipChecksum?: string }).sourceMembershipChecksum
-      || descriptor.selectionChecksum !== undefined && descriptor.selectionChecksum !== (admission as Admission & { sourceSelectionChecksum?: string }).sourceSelectionChecksum) {
+      || descriptor.sourceCount !== sourceRows.length
+      || descriptor.repositoryCount !== new Set(sourceRowsRepositoryIds(sourceRows)).size
+      || descriptor.sourceInventoryRevision !== admission.sourceInventoryRevision
+      || descriptor.sourceInventoryChecksum !== admission.sourceInventoryChecksum
+      || descriptor.selectionChecksum !== admission.sourceSelectionChecksum) {
       throw new Error('GRAPHIFY_SNAPSHOT_NATIVE_OPEN_SOURCE_DESCRIPTOR_MISMATCH');
     }
   }
 
-  const sourceRows = snapshot.sources;
   const sourceIdentities = new Set<string>();
   const inventoryParts: string[] = [];
   for (const source of sourceRows) {
-    const identity = `${source.repositoryId}:${source.repositoryRelativePath.replaceAll('\\', '/')}`;
-    if (sourceIdentities.has(identity)) throw new Error(`GRAPHIFY_SNAPSHOT_NATIVE_OPEN_DUPLICATE_IDENTITY:${identity}`);
-    sourceIdentities.add(identity);
+    const sourceIdentity = `${source.repositoryId}:${source.repositoryRelativePath.replaceAll('\\', '/')}`;
+    if (sourceIdentities.has(sourceIdentity)) throw new Error(`GRAPHIFY_SNAPSHOT_NATIVE_OPEN_DUPLICATE_IDENTITY:${sourceIdentity}`);
+    sourceIdentities.add(sourceIdentity);
     const sourcePath = resolve(materializedRoot, source.sourceRef.replaceAll('\\', '/'));
-    if (!sourcePath.startsWith(`${materializedRoot}\\`) || !existsSync(sourcePath)) {
+    const rootPrefix = `${materializedRoot}${process.platform === 'win32' ? '\\' : '/'}`;
+    if (!sourcePath.startsWith(rootPrefix) || !existsSync(sourcePath)) {
       throw new Error(`GRAPHIFY_SNAPSHOT_NATIVE_OPEN_SOURCE_MISSING:${source.sourceRef}`);
     }
     const bytes = await readFile(sourcePath);
@@ -93,7 +177,7 @@ async function main() {
     if (sha256(bytes) !== source.contentDigest || fileStat.size !== source.byteLength) {
       throw new Error(`GRAPHIFY_SNAPSHOT_NATIVE_OPEN_SOURCE_CHECKSUM_MISMATCH:${source.sourceRef}`);
     }
-    inventoryParts.push(`${identity}\0${source.sourceRevision}\0${source.contentDigest}\0${source.byteLength}`);
+    inventoryParts.push(`${sourceIdentity}\0${source.sourceRevision}\0${source.contentDigest}\0${source.byteLength}`);
   }
 
   const bindings = adaptSealedSnapshotSourcesToRepositoryQualifiedMembershipV2(admission.workspaceRevision, sourceRows);
@@ -115,7 +199,7 @@ async function main() {
       extractionContractVersion: 'graphify.extraction.v1',
       graphAlgorithmRevision: 'graphify.graph.v1',
       triggerKind: 'CURRENT_WORKSPACE_SOURCE_SELECTION',
-      schedulerRevision: 'atlas.graphify-daily-snapshot-native-open.v1',
+      schedulerRevision: 'atlas.graphify-daily-snapshot-native-open.v2',
       environmentRevision: 'operator-authorized-terminal-run',
     });
     executionId = opened.executionId;
@@ -124,7 +208,9 @@ async function main() {
       executionId,
       admission.workspaceRevision,
       bindings,
-      { selectionPolicyRevision: `sealed-snapshot:${admission.snapshotRevision}` },
+      {
+        selectionPolicyRevision: `sealed-snapshot-canonical-inventory:${admission.snapshotRevision}:${admission.sourceInventoryChecksum}`,
+      },
     );
     await recordInventoryStage(client, executionId, {
       inputChecksum: selection.outputChecksum,
@@ -151,7 +237,11 @@ async function main() {
       executionId,
       workspaceRevision: admission.workspaceRevision,
       snapshotRevision: admission.snapshotRevision,
+      snapshotSourceCount: snapshot.sources.length,
       selectedSourceCount: bindings.length,
+      sourceInventoryRevision: admission.sourceInventoryRevision,
+      sourceInventoryChecksum: admission.sourceInventoryChecksum,
+      admittedSourceSelectionChecksum: admission.sourceSelectionChecksum,
       membershipV2Count: Number(row.membership_count),
       selectionChecksum: selection.outputChecksum,
       inventoryOutputChecksum,

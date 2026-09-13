@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /** Bounded, explicit snapshot admission for the tournament control plane. */
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -29,8 +29,15 @@ if (!manifestPath) {
 const snapshotBindingValid = snapshotBindingError === null
   && snapshot?.snapshotRevision === preflight.snapshotRevision
   && Array.isArray(snapshot?.sources)
-  && snapshot.sources.length === preflight.sourceCount
+  && snapshot.sources.length === preflight.snapshotSourceCount
   && snapshot?.sourceMembershipChecksum === preflight.snapshotMembershipChecksum;
+const sourceInventoryBindingValid = typeof preflight.sourceInventoryRevision === 'string'
+  && typeof preflight.sourceInventoryChecksum === 'string'
+  && /^sha256:[0-9a-f]{64}$/i.test(preflight.sourceInventoryChecksum)
+  && typeof preflight.sourceSelectionChecksum === 'string'
+  && /^sha256:[0-9a-f]{64}$/i.test(preflight.sourceSelectionChecksum)
+  && Number.isInteger(preflight.sourceCount)
+  && preflight.sourceCount > 0;
 const ready = preflight.status === 'CANDIDATE_READY_FOR_EXPLICIT_TOURNAMENT_ADMISSION'
   && preflight.authority === false
   && preflight.workspaceRevision === null
@@ -39,12 +46,23 @@ const ready = preflight.status === 'CANDIDATE_READY_FOR_EXPLICIT_TOURNAMENT_ADMI
   && /^sha256:[0-9a-f]{64}$/i.test(workspaceRevision)
   && workspaceRevision === preflight.workspaceRevisionCandidate
   && snapshotBindingValid
+  && sourceInventoryBindingValid
   && preflight.approvalRequired === true;
+
+async function atomicWriteJson(path: string, value: unknown): Promise<void> {
+  await mkdir(dirname(path), { recursive: true });
+  const temporary = `${path}.tmp-${process.pid}-${Date.now()}`;
+  await writeFile(temporary, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
+  await rename(temporary, path);
+}
+
 if (!ready) {
   const blocker = snapshotBindingError
-    ?? (workspaceRevision !== preflight.workspaceRevisionCandidate
-      ? 'WORKSPACE_REVISION_DOES_NOT_MATCH_PREFLIGHT_CANDIDATE'
-      : (!snapshotBindingValid ? 'PREFLIGHT_SNAPSHOT_BINDING_MISMATCH' : 'SNAPSHOT_REVISION_IS_NOT_WORKSPACE_REVISION'));
+    ?? (!sourceInventoryBindingValid
+      ? 'SOURCE_INVENTORY_PROVENANCE_MISSING_OR_INVALID'
+      : (workspaceRevision !== preflight.workspaceRevisionCandidate
+        ? 'WORKSPACE_REVISION_DOES_NOT_MATCH_PREFLIGHT_CANDIDATE'
+        : (!snapshotBindingValid ? 'PREFLIGHT_SNAPSHOT_BINDING_MISMATCH' : 'SNAPSHOT_REVISION_IS_NOT_WORKSPACE_REVISION')));
   const correction = {
     schema: 'atlas.workspace-revision-tournament-admission.v1', generatedAt: new Date().toISOString(),
     mode: 'EXPLICIT_BOUNDED_ADMISSION_RECEIPT', status: 'WORKSPACE_REVISION_TOURNAMENT_ADMISSION_BLOCKED_REVISION_KIND_MISMATCH',
@@ -55,38 +73,49 @@ if (!ready) {
     blocker,
     suppliedWorkspaceRevision: workspaceRevision,
     preflightWorkspaceRevisionCandidate: preflight.workspaceRevisionCandidate ?? null,
+    sourceInventoryRevision: preflight.sourceInventoryRevision ?? null,
+    sourceInventoryChecksum: preflight.sourceInventoryChecksum ?? null,
+    sourceSelectionChecksum: preflight.sourceSelectionChecksum ?? null,
     manifestPath,
     nextGate: 'WORKSPACE-REVISION-ORIGIN-RECONCILIATION-01',
   };
-  await mkdir(dirname(REPORT), { recursive: true });
-  await writeFile(REPORT, `${JSON.stringify(correction, null, 2)}\n`, 'utf8');
+  await atomicWriteJson(REPORT, correction);
   console.log(JSON.stringify({ schema: correction.schema, status: correction.status, proofLevel: correction.proofLevel, authority: false, workspaceRevision: null, firstBlockingInvariant: correction.blocker, reportPath: REPORT }, null, 2));
   process.exitCode = 3;
 } else {
-const report = {
-  schema: 'atlas.workspace-revision-tournament-admission.v1',
-  generatedAt: new Date().toISOString(),
-  mode: 'EXPLICIT_BOUNDED_ADMISSION_RECEIPT',
-  status: 'WORKSPACE_REVISION_TOURNAMENT_ADMITTED',
-  proofLevel: 'BOUNDED_LIVE_PROVEN',
-  authority: true,
-  workspaceRevision,
-  snapshotRevision: preflight.snapshotRevision,
-  sourceCount: preflight.sourceCount,
-  sourceSelectionChecksum: preflight.sourceSelectionChecksum,
-  snapshotMembershipChecksum: preflight.snapshotMembershipChecksum,
-  manifestPath,
-  approval: { confirmation: REQUIRED, scope: 'TOURNAMENT_SOURCE_AUTHORITY_ONLY' },
-  graphifyExecutionAuthorized: false,
-  projectionWritesAuthorized: false,
-  autoApply: false,
-  training: false,
-  writesPerformed: false,
-  datastoreWritesPerformed: false,
-  preflightPath: PREFLIGHT,
-  nextGate: 'GRAPHIFY-BOUNDED-TOURNAMENT-CANARY-01',
-};
-await mkdir(dirname(REPORT), { recursive: true });
-await writeFile(REPORT, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
-console.log(JSON.stringify({ schema: report.schema, status: report.status, proofLevel: report.proofLevel, authority: true, workspaceRevision: report.workspaceRevision, graphifyExecutionAuthorized: false, projectionWritesAuthorized: false, reportPath: REPORT }, null, 2));
+  const report = {
+    schema: 'atlas.workspace-revision-tournament-admission.v1',
+    generatedAt: new Date().toISOString(),
+    mode: 'EXPLICIT_BOUNDED_ADMISSION_RECEIPT',
+    status: 'WORKSPACE_REVISION_TOURNAMENT_ADMITTED',
+    proofLevel: 'BOUNDED_LIVE_PROVEN',
+    authority: true,
+    workspaceRevision,
+    snapshotRevision: preflight.snapshotRevision,
+    snapshotSourceCount: preflight.snapshotSourceCount,
+    sourceCount: preflight.sourceCount,
+    sourceSelectionChecksum: preflight.sourceSelectionChecksum,
+    sourceInventoryRevision: preflight.sourceInventoryRevision,
+    sourceInventoryChecksum: preflight.sourceInventoryChecksum,
+    sourceInventoryWriterRevisionChecksum: preflight.sourceInventoryWriterRevisionChecksum ?? null,
+    snapshotMembershipChecksum: preflight.snapshotMembershipChecksum,
+    manifestPath,
+    approval: { confirmation: REQUIRED, scope: 'TOURNAMENT_SOURCE_AUTHORITY_ONLY' },
+    graphifyExecutionAuthorized: false,
+    projectionWritesAuthorized: false,
+    autoApply: false,
+    training: false,
+    writesPerformed: false,
+    datastoreWritesPerformed: false,
+    preflightPath: PREFLIGHT,
+    nextGate: 'GRAPHIFY-BOUNDED-TOURNAMENT-CANARY-01',
+  };
+  await atomicWriteJson(REPORT, report);
+  const readback = JSON.parse(await readFile(REPORT, 'utf8'));
+  if (readback.workspaceRevision !== workspaceRevision
+    || readback.sourceInventoryChecksum !== preflight.sourceInventoryChecksum
+    || readback.sourceSelectionChecksum !== preflight.sourceSelectionChecksum) {
+    throw new Error('WORKSPACE_REVISION_ADMISSION_ATOMIC_READBACK_MISMATCH');
+  }
+  console.log(JSON.stringify({ schema: report.schema, status: report.status, proofLevel: report.proofLevel, authority: true, workspaceRevision: report.workspaceRevision, sourceInventoryChecksum: report.sourceInventoryChecksum, sourceSelectionChecksum: report.sourceSelectionChecksum, graphifyExecutionAuthorized: false, projectionWritesAuthorized: false, reportPath: REPORT }, null, 2));
 }
