@@ -5,6 +5,11 @@
  * Read-only adjudication layer over the existing promotion receipt currentness
  * audit. It selects one revision-qualified promotion cohort without rewriting
  * or promoting historical receipts.
+ *
+ * The ordinal anchor comes from the existing lineage-qualified candidate-map
+ * producer, not the older generic candidate-ordinal admission artifact. This
+ * matters because the lineage-qualified map is explicitly bound to one
+ * workspaceRevision and source-revision set.
  */
 import crypto from 'node:crypto';
 import fs from 'node:fs';
@@ -13,7 +18,8 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const DEFAULT_CURRENTNESS = 'docs/reports/promotion-gate-receipt-currentness-v1.json';
-const DEFAULT_ORDINAL = 'docs/reports/candidate-ordinal-admission-v1.json';
+const DEFAULT_CANDIDATE_RECEIPT = 'docs/reports/lineage-qualified-candidate-map-v1.json';
+const DEFAULT_CANDIDATE_MAP = '.tmp/atlas/lineage-qualified-candidate-map-v1.json';
 const DEFAULT_GRAPH = 'docs/reports/current-graph-artifact-readiness-v1.json';
 const DEFAULT_OUT = 'docs/reports/promotion-receipt-cohort-v1.json';
 
@@ -79,7 +85,7 @@ function firstDeepString(value, keys) {
 }
 
 function normalizeGraphAnchor(graphReport, selectedWorkspaceRevision) {
-  if (!graphReport || typeof graphReport !== 'object') return null;
+  if (!graphReport || typeof graphReport !== 'object' || !selectedWorkspaceRevision) return null;
   const candidates = [];
   const walk = (value, parent = null) => {
     if (!value || typeof value !== 'object') return;
@@ -101,6 +107,26 @@ function normalizeGraphAnchor(graphReport, selectedWorkspaceRevision) {
   const explicitMismatch = exact.value?.workspaceRevisionMatch === false;
   if (reviewOnly || explicitMismatch) return null;
   return exact.graphRevision;
+}
+
+function candidateAnchors(candidateReceipt, candidateMap) {
+  const workspaceRevision = candidateReceipt?.lineage?.workspaceRevision
+    ?? candidateReceipt?.workspaceRevision
+    ?? candidateMap?.workspaceRevision
+    ?? null;
+  const candidateSnapshotRevision = candidateReceipt?.map?.candidateSnapshotRevision
+    ?? candidateReceipt?.candidateSnapshotRevision
+    ?? candidateMap?.candidateSnapshotRevision
+    ?? null;
+  const ordinalMapChecksum = candidateReceipt?.map?.ordinalMapChecksum
+    ?? candidateReceipt?.ordinalMapChecksum
+    ?? candidateMap?.ordinalMapChecksum
+    ?? null;
+  const rowCount = candidateReceipt?.map?.rowCount
+    ?? candidateReceipt?.actualCandidateCount
+    ?? candidateMap?.rowCount
+    ?? null;
+  return { workspaceRevision, candidateSnapshotRevision, ordinalMapChecksum, rowCount };
 }
 
 export function classifyReceipt(receipt, anchors) {
@@ -151,14 +177,20 @@ export function classifyReceipt(receipt, anchors) {
   };
 }
 
-export function evaluatePromotionReceiptCohort({ currentness, ordinalAdmission, ordinalMap, graphReport, rawReceipts }) {
+export function evaluatePromotionReceiptCohort({
+  currentness,
+  candidateReceipt,
+  candidateMap,
+  graphReport,
+  rawReceipts,
+}) {
   const workspaceRevision = currentness?.selection?.selectedWorkspaceRevision
     ?? currentness?.admittedWorkspaceRevision
     ?? null;
-  const candidateSnapshotRevision = ordinalAdmission?.candidateSnapshotRevision ?? null;
-  const ordinalMapChecksum = ordinalAdmission?.ordinalMapChecksum ?? null;
-  const ordinalWorkspaceRevision = firstDeepString(ordinalAdmission, ['workspaceRevision', 'workspace_revision'])
-    ?? firstDeepString(ordinalMap, ['workspaceRevision', 'workspace_revision']);
+  const candidate = candidateAnchors(candidateReceipt, candidateMap);
+  const candidateSnapshotRevision = candidate.candidateSnapshotRevision;
+  const ordinalMapChecksum = candidate.ordinalMapChecksum;
+  const ordinalWorkspaceRevision = candidate.workspaceRevision;
   const graphRevision = normalizeGraphAnchor(graphReport, workspaceRevision);
 
   const anchors = { workspaceRevision, candidateSnapshotRevision, ordinalMapChecksum, graphRevision };
@@ -191,6 +223,13 @@ export function evaluatePromotionReceiptCohort({ currentness, ordinalAdmission, 
   if (!ordinalMapChecksum) blockers.push('ORDINAL_MAP_CHECKSUM_MISSING');
   if (!ordinalWorkspaceRevision) blockers.push('ORDINAL_MAP_WORKSPACE_BINDING_MISSING');
   else if (workspaceRevision && ordinalWorkspaceRevision !== workspaceRevision) blockers.push('ORDINAL_MAP_WORKSPACE_MISMATCH');
+  if (!candidateMap) blockers.push('LINEAGE_QUALIFIED_CANDIDATE_MAP_ARTIFACT_MISSING');
+  if (candidateMap) {
+    if (candidateMap.workspaceRevision !== ordinalWorkspaceRevision) blockers.push('CANDIDATE_MAP_RECEIPT_WORKSPACE_MISMATCH');
+    if (candidateMap.candidateSnapshotRevision !== candidateSnapshotRevision) blockers.push('CANDIDATE_MAP_RECEIPT_SNAPSHOT_MISMATCH');
+    if (candidateMap.ordinalMapChecksum !== ordinalMapChecksum) blockers.push('CANDIDATE_MAP_RECEIPT_CHECKSUM_MISMATCH');
+    if (Number.isInteger(candidate.rowCount) && candidateMap.rowCount !== candidate.rowCount) blockers.push('CANDIDATE_MAP_RECEIPT_ROW_COUNT_MISMATCH');
+  }
   if (!graphRevision) blockers.push('CURRENT_GRAPH_REVISION_NOT_PROVEN_FOR_SELECTED_WORKSPACE');
 
   const selectedDetails = receiptDetails.filter((receipt) => receipt.classification === 'CURRENT_MATCH');
@@ -215,6 +254,7 @@ export function evaluatePromotionReceiptCohort({ currentness, ordinalAdmission, 
     graphRevision,
     ordinalMapChecksum,
     ordinalWorkspaceRevision,
+    candidateCount: candidate.rowCount,
     currentReceiptRefs: currentReceiptRefs.sort(),
     excludedReceipts: excludedReceipts.sort((a, b) => a.receiptRef.localeCompare(b.receiptRef)),
     receiptDetails: receiptDetails.sort((a, b) => a.receiptRef.localeCompare(b.receiptRef)),
@@ -223,21 +263,27 @@ export function evaluatePromotionReceiptCohort({ currentness, ordinalAdmission, 
       oneCandidateSnapshotRevision: Boolean(candidateSnapshotRevision),
       oneOrdinalMapChecksum: Boolean(ordinalMapChecksum),
       ordinalMapBoundToWorkspace: Boolean(workspaceRevision && ordinalWorkspaceRevision === workspaceRevision),
+      candidateMapArtifactPresent: Boolean(candidateMap),
+      candidateMapMatchesReceipt: Boolean(candidateMap
+        && candidateMap.workspaceRevision === ordinalWorkspaceRevision
+        && candidateMap.candidateSnapshotRevision === candidateSnapshotRevision
+        && candidateMap.ordinalMapChecksum === ordinalMapChecksum),
       oneCompatibleGraphRevision: Boolean(graphRevision),
       mixedRevisionAggregation: false,
       missingRevisionEvidenceInSelectedCohort: 0,
     },
-    blockers,
+    blockers: [...new Set(blockers)],
     sourceReports: {
       currentness: DEFAULT_CURRENTNESS,
-      candidateOrdinalAdmission: DEFAULT_ORDINAL,
+      lineageQualifiedCandidateReceipt: DEFAULT_CANDIDATE_RECEIPT,
+      lineageQualifiedCandidateMap: DEFAULT_CANDIDATE_MAP,
       currentGraphArtifactReadiness: DEFAULT_GRAPH,
     },
     authority: false,
     writesPerformed: false,
     nextGate: status === 'PROMOTION_RECEIPT_COHORT_PROVEN'
       ? 'SEMANTIC-768-PHYSICAL-OWNER-01'
-      : 'REBUILD_REVISION_QUALIFIED_RECEIPTS_FOR_SELECTED_COHORT',
+      : 'REBUILD_LINEAGE_QUALIFIED_CANDIDATE_MAP_AND_GRAPH_FOR_SELECTED_WORKSPACE',
   };
 
   return {
@@ -248,20 +294,19 @@ export function evaluatePromotionReceiptCohort({ currentness, ordinalAdmission, 
 
 async function main() {
   const currentnessPath = argValue('currentness', DEFAULT_CURRENTNESS);
-  const ordinalPath = argValue('ordinal', DEFAULT_ORDINAL);
+  const candidateReceiptPath = argValue('candidate-receipt', DEFAULT_CANDIDATE_RECEIPT);
+  const candidateMapPath = argValue('candidate-map', DEFAULT_CANDIDATE_MAP);
   const graphPath = argValue('graph', DEFAULT_GRAPH);
   const outputPath = argValue('out', DEFAULT_OUT);
   const noReport = process.argv.includes('--no-report');
 
   const currentnessFile = readJson(currentnessPath);
-  const ordinalFile = readJson(ordinalPath);
+  const candidateReceiptFile = readJson(candidateReceiptPath);
+  const candidateMapFile = readJson(candidateMapPath);
   const graphFile = readJson(graphPath);
   if (!currentnessFile.value) throw new Error(`CURRENTNESS_REPORT_REQUIRED:${currentnessPath}`);
-  if (!ordinalFile.value) throw new Error(`CANDIDATE_ORDINAL_ADMISSION_REQUIRED:${ordinalPath}`);
+  if (!candidateReceiptFile.value) throw new Error(`LINEAGE_QUALIFIED_CANDIDATE_RECEIPT_REQUIRED:${candidateReceiptPath}`);
   if (!graphFile.value) throw new Error(`GRAPH_READINESS_REPORT_REQUIRED:${graphPath}`);
-
-  let ordinalMap = null;
-  if (typeof ordinalFile.value.sourceMap === 'string') ordinalMap = readJson(ordinalFile.value.sourceMap).value;
 
   const rawReceipts = new Map();
   for (const receipt of currentnessFile.value.receipts ?? []) {
@@ -270,8 +315,8 @@ async function main() {
 
   const report = evaluatePromotionReceiptCohort({
     currentness: currentnessFile.value,
-    ordinalAdmission: ordinalFile.value,
-    ordinalMap,
+    candidateReceipt: candidateReceiptFile.value,
+    candidateMap: candidateMapFile.value,
     graphReport: graphFile.value,
     rawReceipts,
   });
@@ -288,6 +333,7 @@ async function main() {
     candidateSnapshotRevision: report.candidateSnapshotRevision,
     ordinalMapChecksum: report.ordinalMapChecksum,
     graphRevision: report.graphRevision,
+    candidateCount: report.candidateCount,
     currentReceiptCount: report.currentReceiptRefs.length,
     excludedReceiptCount: report.excludedReceipts.length,
     blockers: report.blockers,
