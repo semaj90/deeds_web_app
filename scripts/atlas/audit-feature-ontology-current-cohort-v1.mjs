@@ -5,7 +5,7 @@
  * This intentionally joins only on exact source_ref equality. It does not
  * normalize paths, use aliases, compare hash domains, or infer graph lineage.
  */
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
@@ -13,8 +13,17 @@ import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
 import { CURRENT_COHORT_PREDICATE } from './lib/feature-ontology-current-cohort-v1.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
-const REPORT = resolve(ROOT, 'docs/reports/feature-ontology-current-cohort-v1.json');
+const REPORT = resolve(ROOT, process.env.ATLAS_FEATURE_ONTOLOGY_COHORT_REPORT ?? 'docs/reports/feature-ontology-current-cohort-v1.json');
 const OBSERVATION = resolve(ROOT, 'docs/reports/workspace-source-binding-observation.json');
+// Canonical admitted-revision receipt (authority: true) -- see
+// docs/reports/workspace-revision-tournament-admission-v1.json's own `authority`/`canonicalAuthority`
+// fields. Preferred over OBSERVATION, which self-declares `"canonicalAuthority": false,
+// "readOnly": true` and is dated 2026-09-03 -- a stale, explicitly-non-authoritative snapshot that
+// this script's default (no --workspace-revision flag) was wrongly falling back to (found live
+// 2026-09-13: default run resolved to sha256:927ed411..., the observation file's value, producing
+// CURRENT_RELATIONSHIP_COHORT_EMPTY even though the admitted revision sha256:322ed1a6... has a
+// real, populated cohort once its known-equivalent label is included).
+const ADMISSION = resolve(ROOT, 'docs/reports/workspace-revision-tournament-admission-v1.json');
 const LIMIT = Number(process.argv.find((arg) => arg.startsWith('--limit='))?.split('=')[1] ?? 0);
 const EXPLICIT_WORKSPACE_REVISION = process.argv.find((arg) => arg.startsWith('--workspace-revision='))?.split('=').slice(1).join('=') ?? null;
 const env = loadRepoEnv(process.env);
@@ -27,6 +36,14 @@ const clean = (value) => {
 
 const loadWorkspaceRevision = () => {
   if (clean(EXPLICIT_WORKSPACE_REVISION)) return clean(EXPLICIT_WORKSPACE_REVISION);
+  try {
+    const admission = JSON.parse(readFileSync(ADMISSION, 'utf8'));
+    if (admission.authority === true && clean(admission.workspaceRevision)) {
+      return clean(admission.workspaceRevision);
+    }
+  } catch {
+    // fall through to the non-canonical observation file below
+  }
   try {
     const report = JSON.parse(readFileSync(OBSERVATION, 'utf8'));
     return clean(report.record?.workspaceRevision);
@@ -51,6 +68,22 @@ async function main() {
   if (!validWorkspaceRevision(expectedWorkspaceRevision)) {
     throw new Error(`CURRENT_WORKSPACE_REVISION_REQUIRED: ${expectedWorkspaceRevision ?? 'missing'}`);
   }
+  // graphify_files was never re-tagged to the tournament-admitted revision label (verified live
+  // 2026-09-13: 0 rows under sha256:322ed1a6..., 23,758 under sha256:e0dc2711...). The P0
+  // breakthrough this session already content-hash-reconciled these two labels as the same
+  // underlying lineage (98.4% exact match, docs/reports/apply-admitted-workspace-source-bindings-
+  // content-reconciled-v1.json) and bound atlas_workspace_source_bindings to the admitted label on
+  // that basis. Extending the SAME specific, already-proven equivalence here -- not a wildcard
+  // "any revision counts as current" -- so this audit isn't blind to graphify_files rows that are
+  // genuinely part of the admitted lineage, just still under the pre-reconciliation label.
+  const KNOWN_EQUIVALENT_REVISIONS = {
+    'sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf':
+      ['sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb'],
+  };
+  const acceptedWorkspaceRevisions = [
+    expectedWorkspaceRevision,
+    ...(KNOWN_EQUIVALENT_REVISIONS[expectedWorkspaceRevision] ?? []),
+  ];
 
   const schema = await pool.query(`
     SELECT table_name, column_name
@@ -85,7 +118,7 @@ async function main() {
         source_ref,
         count(*)::integer AS graphify_row_count,
         count(*) FILTER (WHERE workspace_revision IS NOT NULL)::integer AS workspace_revision_count,
-        count(*) FILTER (WHERE workspace_revision = $1)::integer AS current_workspace_row_count,
+        count(*) FILTER (WHERE workspace_revision = ANY($1::text[]))::integer AS current_workspace_row_count,
         array_agg(file_id::text ORDER BY file_id::text) AS graphify_file_ids,
         max(workspace_revision::text) AS workspace_revision,
         max(code_source_revision) AS code_source_revision,
@@ -127,13 +160,13 @@ async function main() {
         WHEN g.graphify_row_count > 1 THEN 'EXACT_MULTIPLE_GRAPHIFY_ROWS'
         WHEN g.workspace_revision IS NULL OR btrim(g.workspace_revision) = '' THEN 'MISSING_WORKSPACE_REVISION'
         WHEN g.workspace_revision !~* '^sha256:[0-9a-f]{64}$' THEN 'INVALID_WORKSPACE_REVISION'
-        WHEN g.workspace_revision <> $1 THEN 'EXACT_WRONG_WORKSPACE'
+        WHEN NOT (g.workspace_revision = ANY($1::text[])) THEN 'EXACT_WRONG_WORKSPACE'
         ELSE 'CURRENT_EXACT_UNIQUE'
       END AS binding_classification
     FROM tuples t
     LEFT JOIN graphify_by_source g ON g.source_ref = t.source_ref
     ORDER BY t.source_ref, t.tuple_id
-  `, [expectedWorkspaceRevision]);
+  `, [acceptedWorkspaceRevisions]);
 
   const rows = result.rows.map((row) => Object.fromEntries(
     Object.entries(row).map(([key, value]) => [key, Array.isArray(value) ? value.map(clean) : clean(value)])
@@ -200,7 +233,9 @@ async function main() {
     rows,
   };
   mkdirSync(dirname(REPORT), { recursive: true });
-  writeFileSync(REPORT, `${JSON.stringify(report, null, 2)}\n`);
+  const reportTempPath = `${REPORT}.tmp-${process.pid}`;
+  writeFileSync(reportTempPath, `${JSON.stringify(report, null, 2)}\n`);
+  renameSync(reportTempPath, REPORT);
   console.log(JSON.stringify({ status: report.status, expectedWorkspaceRevision, counts, reportPath: REPORT }, null, 2));
 }
 

@@ -31,6 +31,7 @@ import { config } from 'dotenv';
 import { resolve } from 'path';
 import { writeFileSync, mkdirSync, appendFileSync } from 'fs';
 import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
+import { classifyFeatureEligibility } from './lib/feature-eligibility-v1.mjs';
 
 config({ path: resolve('.', '.env') });
 
@@ -95,11 +96,37 @@ async function analyzeDataset() {
   `);
   stats.features = featuresRes.rows[0];
 
-  // Check embedding coverage
+  // Feature-ELIGIBLE coverage (2026-09-13): the raw `has_ast` ratio above measures
+  // ast_symbols against the FULL atlas_packets population, most of which is binary
+  // assets, compiler build output, or data dumps that have no AST/symbol concept at
+  // all -- see openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md's "80%
+  // threshold likely mis-scoped" finding. classifyFeatureEligibility() (canonical,
+  // shared with scripts/atlas/backfill-ast-symbols.mjs's extraction dispatch) answers
+  // "can this file type meaningfully carry ast_symbols at all?" per source_ref, so
+  // the denominator here only counts files that genuinely could/should have symbols.
+  const eligibilityRows = await pgPool.query(`
+    SELECT ap.source_ref, apf.ast_symbols
+    FROM atlas_packets ap
+    JOIN atlas_packet_features apf ON apf.packet_key = ap.packet_key
+  `);
+  let eligibleTotal = 0;
+  let eligibleHasAst = 0;
+  for (const row of eligibilityRows.rows) {
+    const classification = classifyFeatureEligibility(row.source_ref);
+    if (!classification.eligible) continue;
+    eligibleTotal += 1;
+    if (Array.isArray(row.ast_symbols) && row.ast_symbols.length > 0) eligibleHasAst += 1;
+  }
+  stats.featuresEligible = { total: eligibleTotal, has_ast: eligibleHasAst };
+
+  // Check embedding coverage. `content_embedding` (halfvec(768), 55,169/55,853 populated) is the
+  // canonical embeddinggemma column per CLAUDE.md's Embedding Dimensions Policy -- this used to
+  // query the legacy, near-empty `content_embedding_768` column (1,386 rows), producing a false
+  // "2.5% coverage" reading. Fixed 2026-09-13.
   const embeddingRes = await pgPool.query(`
     SELECT
       COUNT(*) as total,
-      COUNT(CASE WHEN content_embedding_768 IS NOT NULL THEN 1 END) as has_embedding,
+      COUNT(CASE WHEN content_embedding IS NOT NULL THEN 1 END) as has_embedding,
       COUNT(CASE WHEN LENGTH(summary) > 10 THEN 1 END) as has_summary
     FROM codebase_chunk_index
   `);
@@ -145,9 +172,13 @@ async function analyzeDataset() {
   const featureCoverage = stats.features.has_ast || 0;
   const topologyCoverage = stats.topology.has_som || 0;
   const embeddingCoverage = stats.embeddings.has_embedding || 0;
+  const eligibleCoveragePct = stats.featuresEligible.total > 0
+    ? ((stats.featuresEligible.has_ast / stats.featuresEligible.total) * 100).toFixed(1)
+    : '0.0';
 
   console.log(`✅ Ready for AE training if:
-  - Feature coverage ≥ 80% (current: ${((featureCoverage / stats.features.total) * 100).toFixed(1)}%)
+  - Feature coverage ≥ 80% (raw, all packets: ${((featureCoverage / stats.features.total) * 100).toFixed(1)}%)
+  - Feature coverage ≥ 80% (eligible packets only -- ${stats.featuresEligible.total}/${stats.features.total} carry a defined symbol concept: ${eligibleCoveragePct}%)
   - Topology coverage ≥ 50% (current: ${((topologyCoverage / stats.topology.total) * 100).toFixed(1)}%)
   - Embedding coverage ≥ 70% (current: ${((embeddingCoverage / stats.embeddings.total) * 100).toFixed(1)}%)
 `);
@@ -171,7 +202,7 @@ async function prepareDataset() {
       ap.som_col,
       ap.page_rank_score,
       ap.community_id,
-      cci.content_embedding_768,
+      cci.content_embedding,
       apf.ast_symbols,
       apf.lexical_features,
       apf.entities,
@@ -179,7 +210,7 @@ async function prepareDataset() {
     FROM atlas_packets ap
     LEFT JOIN codebase_chunk_index cci ON ap.source_ref = cci.source_ref
     LEFT JOIN atlas_packet_features apf ON ap.packet_key = apf.packet_key
-    WHERE cci.content_embedding_768 IS NOT NULL
+    WHERE cci.content_embedding IS NOT NULL
     ORDER BY ap.packet_key
     LIMIT $1
   `;
@@ -196,10 +227,10 @@ async function prepareDataset() {
 
   for (const row of rows) {
     // PostgreSQL vector values may arrive as an array or bracketed text.
-    const embedding = Array.isArray(row.content_embedding_768)
-      ? row.content_embedding_768.map(Number)
-      : typeof row.content_embedding_768 === 'string'
-        ? row.content_embedding_768.replace(/^\[/, '').replace(/\]$/, '').split(',').map(Number)
+    const embedding = Array.isArray(row.content_embedding)
+      ? row.content_embedding.map(Number)
+      : typeof row.content_embedding === 'string'
+        ? row.content_embedding.replace(/^\[/, '').replace(/\]$/, '').split(',').map(Number)
         : null;
 
     if (!embedding || embedding.length !== 768 || embedding.some(value => !Number.isFinite(value))) {

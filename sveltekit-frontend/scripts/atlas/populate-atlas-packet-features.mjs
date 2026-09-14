@@ -124,7 +124,18 @@ async function populateBatch(client, packets, batchNum, isDryRun) {
       ast_symbols = EXCLUDED.ast_symbols,
       concept_coverage = EXCLUDED.concept_coverage,
       updated_at = NOW()
-    WHERE atlas_packet_features.packet_key = EXCLUDED.packet_key
+    -- Fixed 2026-09-13: the old guard (\`packet_key = EXCLUDED.packet_key\`) is a no-op -- that
+    -- condition is always true whenever ON CONFLICT even fires, so this UPSERT silently
+    -- overwrote every already-populated row with this script's own weaker "keywords + ngrams"
+    -- derivation on every run, despite the fetch query (fetchPackets, above) having no
+    -- already-populated filter of its own either. This is one of (at least) 4 live, uncoordinated
+    -- writers of these columns (see openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md,
+    -- "lexical_features audited" entry) -- until an operator picks a canonical owner, the safe
+    -- default is additive-only: never clobber a row that already has data, matching the pattern
+    -- phase1.5-lexical-extraction.mjs already uses correctly.
+    WHERE COALESCE(array_length(atlas_packet_features.lexical_features, 1), 0) = 0
+       AND COALESCE(array_length(atlas_packet_features.used_concepts, 1), 0) = 0
+       AND COALESCE(array_length(atlas_packet_features.ast_symbols, 1), 0) = 0
   `;
 
   let successCount = 0;
@@ -212,7 +223,7 @@ async function main() {
         COUNT(CASE WHEN used_concepts IS NOT NULL AND array_length(used_concepts, 1) > 0 THEN 1 END) as used_concepts_populated,
         COUNT(CASE WHEN lexical_features IS NOT NULL AND array_length(lexical_features, 1) > 0 THEN 1 END) as lexical_populated,
         COUNT(CASE WHEN ast_symbols IS NOT NULL AND array_length(ast_symbols, 1) > 0 THEN 1 END) as ast_populated,
-        ROUND(AVG(concept_coverage) * 100, 1) as avg_coverage_pct
+        ROUND((AVG(concept_coverage) * 100)::numeric, 1) as avg_coverage_pct
       FROM atlas_packet_features
     `);
 

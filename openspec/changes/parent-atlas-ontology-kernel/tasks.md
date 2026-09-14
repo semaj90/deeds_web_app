@@ -2263,6 +2263,13 @@ XGBoost/PyTorch classifier
   cross-vocabulary mapping is therefore required before document labels can
   become admitted ontology concepts. Keep the vocabularies distinct until
   that mapping and its checksum are explicitly approved.
+
+  Read-only recheck (2026-09-12): the raw-label producer returned
+  `RAW_CONCEPT_LABEL_INVENTORY_PROVEN` with `19,517` source rows and `19,445`
+  normalized labels. This confirms deterministic normalization and preserves
+  `taxonomyStatus=UNADMITTED`/`canonicalAuthority=false`. CONCEPT-01 remains
+  open because Redis concept indexes and Neo4j concept-node alignment were not
+  re-read in the same receipt.
 - [ ] **CONCEPT-02 — align only to declared ontology classes.** Join normalized
   labels through `DomainOntologyMappingV1` and the PostgreSQL
   `atlas_ontology_concepts` registry. A classifier label is evidence, not an
@@ -3129,6 +3136,60 @@ has the identical unbound-ambient-context problem. Patch targets: `atlas-tools-m
 `agentic-recommendation-workflow.mjs`. Smoke test to add: an ACE fixture where every cached card is
 unrelated to the query, asserting zero admitted cards and zero LLM calls.
 
+**Partial fix implemented and live-tested, 2026-09-13 (narrower than the full `ADMITTED_FOR_QUERY`
+design above, but closes the two concrete leak points that were actually found, both at both ends
+of the chain, not just the source end).**
+
+- [x] `atlas-tools-mcp.mjs`'s `buildAgenticRagContext()`: extracted the admission decision into a
+      pure, exported, unit-tested `computeAdmission(revisionStatus, freshnessStatus)` returning a
+      discriminated `{ status: 'ADMITTED' | 'REJECTED', admissionStatus, rejectionReason }` shape
+      (a `status` discriminant + `promptPacket: null` on rejection, not an empty string — a
+      stronger signal for any downstream consumer, even a loosely-typed one, than a falsy-but-still-
+      a-valid-string value). `cards`/`sourceRefs` stay populated on rejection (diagnostic inspection
+      remains legitimate); only `promptPacket` is withheld. Tests:
+      `sveltekit-frontend/scripts/mcp/atlas-tools-mcp.compute-admission.test.mjs` (5 cases: missing
+      revision, partial revision, expired freshness, eligible/current, eligible-with-unknown-
+      freshness) — `node scripts/mcp/atlas-tools-mcp.compute-admission.test.mjs` from
+      `sveltekit-frontend/`, all pass. Also fixed an unrelated but adjacent bug found while making
+      the function importable/testable: the file had no `isMainModule` guard at all — importing it
+      for any reason (testing, reuse) would start a live stdin JSON-RPC listener as a side effect.
+      Guarded the whole stdio-bootstrap block behind `process.argv[1] === fileURLToPath(import.meta.url)`
+      (this repo's own established pattern per CLAUDE.md's "Key Lessons" section); verified live —
+      `node -e "import('./scripts/mcp/atlas-tools-mcp.mjs')"` now exits cleanly (exit 0) instead of
+      hanging/listening.
+- [x] **The deeper finding, confirmed live by actually reading `agentic-recommendation-workflow.mjs`'s
+      L6 stage rather than trusting this entry's own "no admission check at all" description**: that
+      description was imprecise for `acePacket` (it WAS gated by a truthiness check on
+      `aceContext?.promptPacket`, which was already falsy on rejection even before today's fix) but
+      **exactly correct for `aceCards`** — the "ACE cards: <title> :: <sourceRef>" block was built
+      from `aceContext.cards` completely unconditionally, with zero admission check, and `cards` is
+      *deliberately* still populated even when `status === 'REJECTED'` (for diagnostic inspection).
+      This is the real, live-confirmed evidence-laundering mechanism this finding describes: an
+      unrelated/stale cached card's title+sourceRef flowing straight into the synthesis prompt as
+      if it were admitted evidence. Fixed: extracted `buildAceEvidenceBlocks(aceContext)` (pure,
+      exported), gating **both** `acePacket` and `aceCards` on `aceContext?.status === 'ADMITTED'`.
+      Tests: `scripts/atlas/agentic-recommendation-workflow.build-ace-evidence-blocks.test.mjs` (4
+      cases: rejected-with-cards-still-present -> both blocks empty; admitted -> both blocks
+      populated; null aceContext -> no throw, both empty; legacy shape with no `status` field at
+      all -> fails closed, does not leak `promptPacket`) — `node scripts/atlas/agentic-
+      recommendation-workflow.build-ace-evidence-blocks.test.mjs` from repo root, all pass.
+- [ ] **Not implemented (still real, deferred work, correctly out of scope for a bug-fix pass)**:
+      the full `ADMITTED_FOR_QUERY` state design above (query-checksum match, relevance threshold,
+      supported-evidence-count > 0, `EvidenceAdmissionV1` abstention before any Ornith call), and
+      the same query-binding fix for the separate `activeContext`/`atlas_get_active_context` path.
+      `computeAdmission()`'s current admission criterion is still only revision-presence +
+      freshness, not query-relevance — a stale-but-relevant packet is admitted, a fresh-but-
+      irrelevant one also is. That gap is unchanged by this fix.
+
+Files changed: `sveltekit-frontend/scripts/mcp/atlas-tools-mcp.mjs`,
+`scripts/atlas/agentic-recommendation-workflow.mjs`. Tests added:
+`sveltekit-frontend/scripts/mcp/atlas-tools-mcp.compute-admission.test.mjs`,
+`scripts/atlas/agentic-recommendation-workflow.build-ace-evidence-blocks.test.mjs` (both pass, run
+directly with `node <file>.test.mjs`, no framework dependency, matching this repo's existing
+`.test.mjs` convention). No datastore/Qdrant/Neo4j/Redis writes.
+Status: `ACE_GROUNDING_FAILCLOSED_01_PARTIAL_FIX_BOTH_LEAK_POINTS_CLOSED_LIVE_TESTED`; authority=false;
+writesPerformed=false (code + test files only). `ADMITTED_FOR_QUERY`/query-binding remains open.
+
 **Revised priority queue (supersedes any earlier informal ordering in this file)**:
 P0 `ACE-GROUNDING-FAILCLOSED-01` (above) | P0 `CURRENT-SOURCE-EVIDENCE-HYDRATION-01` (the existing
 235-mismatch/7-unavailable source-byte audit — classify mismatches by cause, e.g.
@@ -3755,6 +3816,107 @@ Evidence: `docs/reports/ontology-revision-owner-audit-v1.json` and
 `docs/reports/domain-ontology-taxonomy-audit-v1.json`.
 Status: `ONTOLOGY_REVISION_OWNER_UNPROVEN`; authority=false;
 writesPerformed=false.
+
+### ONTOLOGY-SOURCE-SPAN-REVISION-RECHECK-2026-09-13
+
+- [x] Re-ran the read-only source-span and revision audit for ontology
+      observations.
+- [x] Confirmed `4` current source revisions and `2` stale revisions.
+- [x] Confirmed only `9` observations have in-bounds spans while `295` make
+      no span claim; these cannot be treated as grounded source evidence.
+- [ ] Re-extract stale or spanless observations against the admitted source
+      frame before human review or ontology promotion.
+- [x] Confirmed no ontology, source, graph, Qdrant, or database writes.
+
+Evidence: `docs/reports/feature-ontology-source-span-revision-v1.json`;
+`scripts/atlas/audit-feature-ontology-source-span-revision-v1.mjs`.
+Status: `SOURCE_REVISION_DRIFT_DETECTED`; authority=false;
+writesPerformed=false.
+
+### ONTOLOGY-CURRENT-COHORT-RECHECK-2026-09-13
+
+- [x] Re-ran the read-only ontology current-cohort audit.
+- [x] Confirmed `603` tuples examined, `7` exact source references,
+      `0` current-workspace tuples, and `595` tuples without an exact Graphify
+      source.
+- [x] Confirmed `8` exact references point to the wrong workspace frame and
+      no current unique bindings or concept tuples are eligible.
+- [ ] Keep ontology admission and GraphRAG/Qdrant fanout blocked until the
+      expected workspace revision is reconciled to current source bindings.
+- [x] Confirmed no ontology, graph, Qdrant, taxonomy, or database writes.
+
+Evidence: `docs/reports/feature-ontology-current-cohort-v1.json`;
+`scripts/atlas/audit-feature-ontology-current-cohort-v1.mjs`.
+Status: `CURRENT_RELATIONSHIP_COHORT_EMPTY`; authority=false;
+writesPerformed=false.
+
+### ONTOLOGY-CROSSWALK-RECHECK-2026-09-12-R2
+
+- [x] Re-ran the read-only feature/ontology crosswalk audit.
+- [x] Confirmed the expected registry table is unavailable; `0` rows,
+      records, classified entries, and unverified entries were read.
+- [x] Confirmed the audit performed no canonical, datastore, cache, model,
+      or projection writes.
+- [ ] Keep crosswalk and ontology fanout promotion blocked until the owning
+      registry surface is identified and a revision-qualified readback exists.
+
+Evidence: `docs/reports/feature-ontology-crosswalk-v1.json`;
+`scripts/atlas/audit-feature-ontology-crosswalk-v1.mjs`.
+Status: `REGISTRY_TABLE_UNAVAILABLE`; authority=false;
+writesPerformed=false.
+
+### ONTOLOGY-RELATIONSHIP-READBACK-RECHECK-2026-09-12-R2
+
+- [x] Re-ran the bounded read-only relationship readback.
+- [x] Confirmed `8/8` expected relationships persisted with `8` evidence
+      links, `8` feature-evidence links, and zero mismatches.
+- [ ] Keep this bounded receipt separate from current-corpus authority:
+      ontology revision ownership and source-qualified cohort admission remain
+      unproven, so no GraphRAG or Qdrant fanout is promoted.
+
+Evidence: `docs/reports/current-feature-ontology-relationship-readback-v1.json`.
+Status: `CURRENT_RELATIONSHIP_APPLY_READBACK_PROVEN`; authority=false;
+writesPerformed=false.
+
+### ONTOLOGY-REVISION-OWNER-RECHECK-2026-09-12-R2
+
+- [x] Re-ran the read-only ontology revision-owner census.
+- [x] Confirmed one producer label is discoverable, but
+      `canonicalOntologyRevisionCount=0`.
+- [ ] Keep ontology promotion blocked until one revision-qualified producer
+      receipt and current source-cohort binding are admitted.
+
+Evidence: `docs/reports/ontology-revision-owner-audit-v1.json`;
+`scripts/atlas/audit-ontology-revision-owners-v1.mjs`.
+Status: `ONTOLOGY_REVISION_OWNER_UNPROVEN`; authority=false;
+writesPerformed=false.
+
+### FEATURE-ONTOLOGY-CROSSWALK-RECHECK-2026-09-12
+
+- [x] Re-ran the read-only feature/ontology crosswalk audit.
+- [x] Confirmed the audit remained in read-only transaction mode with no
+      canonical, cache, model, or datastore writes.
+- [ ] Resolve the unavailable registry table before interpreting crosswalk
+      coverage; the run read `0` rows and classified `0` records, so this is
+      not evidence of an empty valid ontology cohort.
+
+Evidence: `docs/reports/feature-ontology-crosswalk-v1.json`.
+Status: `REGISTRY_TABLE_UNAVAILABLE`; authority=false;
+writesPerformed=false.
+
+### ONTOLOGY-LEIDEN-REPLAY-RECHECK-2026-09-12
+
+- [x] Attempted the bounded read-only Leiden replay harness.
+- [x] Confirmed the configured RAPIDS community endpoint
+      `http://127.0.0.1:8099` refused the connection; no replay receipt was
+      produced and no graph/projection write occurred.
+- [ ] Restore or explicitly reconfigure the approved community executor before
+      evaluating Leiden parity; do not infer parity from the unavailable run.
+
+Evidence: `scripts/atlas/prove-ontology-linked-tuple-leiden-replay-v1.py`;
+endpoint connection failure on `127.0.0.1:8099`.
+Status: `ONTOLOGY_LEIDEN_EXECUTOR_UNREACHABLE`; authority=false;
+writesPerformed=false.
 First blocker: `CANONICAL_ONTOLOGY_REVISION_MISSING`.
 Next gate: define/admit one revision-qualified ontology manifest after source
 lineage is available; do not promote tuple or GraphRAG projections yet.
@@ -3777,6 +3939,167 @@ Status: `CURRENT_RELATIONSHIP_COHORT_EMPTY`; authority=false;
 writesPerformed=false.
 First blocker: `CURRENT_ONTOLOGY_SOURCE_BINDING_UNPROVEN`.
 Next gate: snapshot-bound Graphify membership and current source lineage.
+
+## ONTOLOGY-CURRENT-COHORT-RECHECK-2026-09-12
+
+- [x] Re-ran the audit with the supported explicit revision form for the
+      admitted workspace revision `sha256:322ed1a6...`; no fallback to the
+      older revision was used.
+- [x] The current cohort remains empty: `603` tuples examined, `7` exact
+      source references, `0` current-workspace references, `0` current tuples,
+      `8` exact references on the wrong workspace revision, and `595` without
+      an exact Graphify source.
+- [ ] Keep ontology tuple admission, OAK fanout, GraphRAG, and Qdrant plans
+      blocked until current source/workspace bindings exist. No ontology,
+      graph, Qdrant, taxonomy, or datastore writes occurred.
+
+Evidence: `docs/reports/feature-ontology-current-cohort-v1.json`;
+`scripts/atlas/audit-feature-ontology-current-cohort-v1.mjs`.
+Status: `CURRENT_RELATIONSHIP_COHORT_EMPTY`; authority=false;
+writesPerformed=false. First blocker:
+`CURRENT_ONTOLOGY_SOURCE_BINDING_UNPROVEN`.
+
+## CONCEPT-FABRIC-READONLY-RECHECK-2026-09-12
+
+- [x] Re-ran the concept-fabric owner/contract inventory in read-only mode.
+- [x] Confirmed the ownership boundary: PostgreSQL owns source/chunk identity;
+      8095 owns structural and grounded observations; EmbeddingGemma owns the
+      logical `semantic_768` representation; Qdrant/GPU/Neo4j remain derived;
+      Ornith `:8090` remains synthesis/proposal-only.
+- [x] Confirmed the directory-index pipeline is available only as a
+      read-only artifact path; source-byte, per-file revision, chunk checksum,
+      and workspace binding are still required before promotion.
+- [x] Ran the bounded concept-seed dry producer: `48` proposals, `0`
+      duplicates, `0` ambiguous mappings, and `5` alias collisions requiring
+      policy review. No concept, tuple, graph, or projection writes occurred.
+- [ ] Resolve the five alias collisions through the existing ontology owner;
+      do not mint a second concept vocabulary or auto-promote proposals.
+- [ ] Prove `DIRECTORY-INDEX-SOURCE-BINDING-01` against the current admitted
+      source cohort before live file/directory enrichment.
+
+Evidence: `docs/reports/parent-atlas-concept-fabric-audit-v1.json` and
+`docs/reports/concept-seed-dry-v1.json`.
+Status: `CONCEPT_FABRIC_READONLY_PROVEN`; authority=false;
+writesPerformed=false. First blocker remains:
+`CURRENT_ONTOLOGY_SOURCE_BINDING_UNPROVEN`.
+Next gate: alias-collision review, then current source-bound observation
+fanout; keep OAK relationship validation and GraphRAG/Qdrant projection
+blocked until revision-qualified evidence exists.
+
+## ONTOLOGY-FRESH-PRODUCER-SELECTION-RECHECK-2026-09-12
+
+- [x] Read-only producer-selection audit selects
+      `feature-ontology-fresh-extractor-v1` for review-only use.
+- [x] Permitted adapters are limited to Tree-sitter chunk structure,
+      Python enrichment, and grounded LangExtract evidence. No producer was
+      promoted and grounded source count is currently `0`.
+- [ ] Keep ontology and GraphRAG fanout blocked until the selected producer
+      receives a current revision-qualified source cohort and emits grounded
+      evidence with independent readback.
+
+Evidence: `docs/reports/feature-ontology-fresh-producer-selection-v1.json`;
+`scripts/atlas/audit-feature-ontology-fresh-producer-selection-v1.mjs`.
+Status: `PRODUCER_OWNER_SELECTED_REVIEW_ONLY`; authority=false;
+writesPerformed=false. First blocker:
+`CURRENT_REVISION_QUALIFIED_GROUNDED_ONTOLOGY_SOURCE_MISSING`.
+
+## KAG-HYPEREDGE-SYNTHESIS-RECHECK-2026-09-12
+
+- [x] Ran the bounded read-only ontology/hyperedge synthesis audit.
+- [x] The expected `.okf` tuple source is unavailable: `0` lines read,
+      `0` tuples seen, and `0` eligible candidates. No canonical persistence
+      or projection mutation was attempted.
+- [ ] Keep hyperedge synthesis and ontology promotion blocked until a
+      revision-qualified current tuple source is supplied. `SOURCE_UNAVAILABLE`
+      is not evidence that the ontology cohort is empty in production; it is a
+      missing-input result from this bounded audit.
+
+Evidence: `scripts/atlas/audit-ontology-hyperedge-synthesis.mjs`;
+`docs/.okf/ontology-tuples.jsonl`.
+Status: `SOURCE_UNAVAILABLE`; authority=false; writesPerformed=false.
+First blocker: `REVISION_QUALIFIED_ONTOLOGY_TUPLE_SOURCE_MISSING`.
+
+## ONTOLOGY-EVIDENCE-FRESHNESS-RECHECK-2026-09-12
+
+- [x] Read-only freshness audit examined `603` ontology tuples.
+- [x] No tuple qualified as current evidence. `595` lacked a current Graphify
+      source and `8` remained blocked on alias verification; no source-content
+      mismatches or packet-content lineage errors were hidden by the result.
+- [ ] Keep ontology fanout and hyperedge promotion blocked until the current
+      source/packet/chunk cohort is admitted and the eight aliases are
+      independently verified.
+
+Evidence: `docs/reports/feature-ontology-evidence-freshness-v1.json`;
+`scripts/atlas/audit-feature-ontology-evidence-freshness-v1.mjs`.
+Status: `CURRENT_TUPLE_EVIDENCE_COHORT_EMPTY`; authority=false;
+writesPerformed=false. First blocker:
+`CURRENT_GRAPHIFY_SOURCE_MISSING`.
+
+## ONTOLOGY-CURRENT-COHORT-RECHECK-2026-09-12
+
+- [x] Fresh read-only audit against workspace revision
+      `sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3`
+      examined `603` tuples.
+- [x] Exact source references remain `7`, current-workspace references `0`,
+      current tuples `0`, wrong-workspace exact matches `8`, and missing exact
+      Graphify sources `595`.
+- [ ] Keep tuple admission and downstream GraphRAG/Qdrant fanout blocked; no
+      alias, hash, or historical fallback may be used to manufacture a current
+      ontology cohort.
+
+Evidence: `docs/reports/feature-ontology-current-cohort-v1.json`.
+Status: `CURRENT_RELATIONSHIP_COHORT_EMPTY`; authority=false;
+writesPerformed=false. First blocker:
+`CURRENT_ONTOLOGY_SOURCE_BINDING_UNPROVEN`.
+
+### CONCEPT-01 projection reachability recheck (2026-09-12)
+
+- [x] Re-ran the read-only Neo4j concept reachability check. It returned
+      `PASS` with `19,698` concept nodes, `173,158` `USED_CONCEPT` edges,
+      `59,692` packets, and `13,290` features.
+- [x] Re-ran the read-only Valkey ontology-cache usage audit. Valkey was
+      reachable, but tuple, token-map, blocked-hash, and HLL key counts were
+      all `0`; no cache population or mutation was attempted.
+- [ ] Keep CONCEPT-01 and downstream ontology admission open. Projection
+      reachability is not current ontology alignment, and the empty cache does
+      not authorize materialization from stale or unbound source rows.
+
+Evidence: `docs/reports/concept-reachability-check.json` and the Valkey
+ontology-cache usage audit output. Status:
+`ONTOLOGY_PROJECTION_REACHABLE_CACHE_EMPTY_ALIGNMENT_UNPROVEN`;
+authority=false; writesPerformed=false. First blocker:
+`CURRENT_SOURCE_LINEAGE_REQUIRED_BEFORE_ONTOLOGY_CACHE_POPULATION`.
+
+## ONTOLOGY-CURRENT-COHORT-RECHECK-2026-09-12
+
+- [x] Re-ran the ontology current-cohort audit with the explicitly selected
+      admitted execution revision. It examined `603` tuples and found `7`
+      exact source references, but `0` current-workspace source references or
+      current tuples.
+- [x] Confirmed the mismatch categories: `595` tuples lack an exact Graphify
+      source and `8` exact references belong to the wrong workspace revision;
+      no ambiguous exact bindings were admitted.
+- [ ] Keep OAK resolution, tuple admission, and GraphRAG/Qdrant fanout closed
+      for this cohort. Existing tuples remain evidence and were not rewritten.
+
+Evidence: `docs/reports/feature-ontology-current-cohort-v1.json`.
+Status: `CURRENT_RELATIONSHIP_COHORT_EMPTY`; authority=false;
+writesPerformed=false. First blocker:
+`CURRENT_ONTOLOGY_SOURCE_BINDING_UNPROVEN`.
+
+## ONTOLOGY-CURRENT-COHORT-RECHECK-2026-09-11
+
+- [x] Re-ran the read-only ontology cohort audit against workspace revision
+      `sha256:322ed1a6...`.
+- [x] Confirmed `603` tuples examined, `0` current bindings, `7` exact source
+      references, and `595` tuples without an exact Graphify source.
+- [ ] Keep tuple admission and GraphRAG/Qdrant fanout blocked; no ontology or
+      projection writes occurred.
+
+Evidence: `docs/reports/feature-ontology-current-cohort-v1.json`.
+Status: `CURRENT_RELATIONSHIP_COHORT_EMPTY`; authority=false;
+writesPerformed=false. First blocker:
+`CURRENT_ONTOLOGY_SOURCE_BINDING_UNPROVEN`.
 
 ## HYPERGRAPH-OAK-CONTRACT-RECHECK-2026-09-11
 
@@ -3861,3 +4184,502 @@ Status: `CURRENT_RELATIONSHIP_COHORT_EMPTY`; authority=false;
 writesPerformed=false.
 First blocker: `CURRENT_ONTOLOGY_SOURCE_BINDING_UNPROVEN`.
 Next gate: snapshot-bound Graphify membership and current source lineage.
+### ONTOLOGY-REVISION-OWNER-RECHECK-2026-09-12
+
+- [x] Re-ran the read-only ontology revision-owner audit.
+- [x] Confirmed one producer label is discoverable, but
+      `canonicalOntologyRevisionCount=0`.
+- [ ] Establish one revision-qualified ontology owner and receipt before
+      promoting classifier, OAK, .okf, tuple, or graph fanout evidence.
+
+Evidence: `docs/reports/ontology-revision-owner-audit-v1.json`.
+Status: `ONTOLOGY_REVISION_OWNER_UNPROVEN`; authority=false;
+writesPerformed=false.
+
+### ONTOLOGY-CURRENT-COHORT-RECHECK-2026-09-13
+
+- [x] Re-ran the read-only current ontology-cohort audit.
+- [x] Confirmed `603` tuples examined, `7` exact source references,
+      `0` current-workspace source references, and `0` current tuples.
+- [x] Confirmed `8` exact matches belong to the wrong workspace and `595`
+      tuples have no exact Graphify source; no eligible `USES_CONCEPT` tuples
+      were found.
+- [ ] Reconcile ontology evidence against the admitted source snapshot and
+      exact Graphify bindings before tuple, OAK, .okf, GraphRAG, or Qdrant
+      promotion.
+- [ ] Preserve current cohort admission as fail-closed; no ontology or
+      projection mutation is authorized.
+
+Evidence: `docs/reports/feature-ontology-current-cohort-v1.json`.
+Status: `CURRENT_RELATIONSHIP_COHORT_EMPTY`; examinedTuples=603;
+currentWorkspaceTuples=0; exactWrongWorkspace=8; noExactGraphifySource=595;
+authority=false; writesPerformed=false.
+
+### ONTOLOGY-CURRENT-COHORT-FRAME-RECHECK-2026-09-13-R1
+
+- [x] Re-ran the read-only ontology current-cohort audit.
+- [x] The audit's expected frame is `sha256:927ed411...`, while the current
+      snapshot authority is `sha256:2adaa351...`; its frame is therefore not
+      the current authority frame.
+- [x] Across `603` examined tuples, only `7` exact source references were
+      found, `0` matched the expected current workspace, and `8` exact matches
+      were assigned to the wrong workspace. `595` lacked an exact Graphify
+      source match.
+- [ ] Keep ontology tuple, OAK, `.okf`, GraphRAG, and Qdrant promotion blocked
+      until the ontology producer is rerun or reconciled against the one
+      admitted current source frame.
+- [x] Confirmed no ontology, database, graph, vector, cache, or projection
+      writes occurred.
+
+Evidence: `docs/reports/feature-ontology-current-cohort-v1.json`;
+`scripts/atlas/audit-feature-ontology-current-cohort-v1.mjs`;
+`docs/reports/current-graphify-snapshot-authority-v1.json`.
+Status: `ONTOLOGY_COHORT_ALTERNATE_FRAME_EMPTY_CURRENT_BINDINGS`;
+authority=false; writesPerformed=false.
+### FEATURE-ONTOLOGY-PACKET-LINEAGE-RECHECK-2026-09-13
+
+- [x] Hardened the read-only ontology packet-lineage audit with atomic report
+      replacement and reran it successfully.
+- [x] Examined `603` ontology tuples: `8` are `ALIAS_NOT_APPROVED` and `595`
+      lack a current Graphify source binding.
+- [ ] Keep ontology tuple admission blocked until packet/source lineage is
+      current and exact; no tuple, alias, graph, or database writes occurred.
+
+Evidence: `scripts/atlas/audit-feature-ontology-packet-lineage-v1.mjs`;
+`docs/reports/feature-ontology-packet-lineage-v1.json`.
+Status: `PACKET_CONTENT_LINEAGE_INCOMPLETE`; readOnly=true;
+writesPerformed=false.
+
+### ACE-GROUNDING-FAILCLOSED-01: third live caller found and type-corrected (2026-09-13, error-check pass)
+
+Following up on the partial fix above with a full caller audit (the review's explicit ask:
+"inspect all live callers of `buildAgenticRagContext()` first") rather than assuming the two
+callers already fixed were the only ones.
+
+- [x] Traced all 3 real invocation paths of the `build_agentic_rag_context` MCP tool:
+      (1) `agentic-recommendation-workflow.mjs`'s `callAtlasWorkflowTool()` -> tries TRACE MCP
+      (`:8788/mcp`) first, which does not register this tool name, so it always falls through to
+      (2) `callAtlasToolsLocal()`, which spawns `atlas-tools-mcp.mjs` directly as a child process
+      (same fixed file, not a duplicate — confirmed by reading `callAtlasToolsLocal`'s `spawn('node',
+      [ATLAS_TOOLS_MCP_SERVER], ...)` call). (3) A separate, previously-unaudited TypeScript client,
+      `sveltekit-frontend/src/lib/server/mcp/atlas-tools-client.ts`, which also spawns
+      `atlas-tools-mcp.mjs` directly — used by exactly one real production route,
+      `sveltekit-frontend/src/routes/api/ace/stream/+server.ts` (an SSE endpoint), via
+      `buildStreamPreamble()`.
+- [x] Found a real type-safety gap in path (3), not a logic bug: `atlas-tools-client.ts`'s
+      `BuildAgenticRagContextResult` interface declared `promptPacket: string` (non-nullable) —
+      after today's fix the real runtime value is `null` on rejection. TypeScript would not have
+      caught a future unsafe `.length`/string-concat use of this field because the type itself was
+      lying. Corrected the interface to `promptPacket: string | null` and added the new
+      `status`/`admissionStatus`/`revisionStatus`/`freshnessStatus`/`rejectionReason` fields
+      (all optional, since older cached/fallback shapes may not carry them) so future consumers can
+      actually check admission instead of only seeing `promptPacket`.
+- [x] Audited the sole real `.promptPacket` field access in `src/` under this interface
+      (`ace/stream/+server.ts:136`) — it only forwards the value into an SSE event sent to the
+      browser, never into an LLM prompt; safe either way, but now correctly typed.
+- [x] Ran a full-repo `tsgo --noEmit` after the interface change: 34 pre-existing errors (all
+      unrelated — missing optional npm packages like `nodemailer`/`pdf-lib`/`mammoth`/`fastmcp`/
+      `nodejs-whisper`, and unrelated type mismatches in other atlas modules), **zero new errors**
+      introduced by this change, confirmed by grep against the two touched files specifically.
+
+Files changed (this entry only): `sveltekit-frontend/src/lib/server/mcp/atlas-tools-client.ts`.
+Status: `ACE_GROUNDING_FAILCLOSED_01_THIRD_CALLER_AUDITED_TYPE_CORRECTED_ZERO_NEW_TS_ERRORS`;
+authority=false; writesPerformed=false (type-only change; no runtime behavior change in this file).
+
+### `sha256:2adaa351...` reconciled — it was never a real authority, not a labeling mixup (2026-09-13, read-only)
+
+Follow-up to `ONTOLOGY-CURRENT-COHORT-FRAME-RECHECK-2026-09-13-R1`'s unattributed claim that "the
+current snapshot authority is `sha256:2adaa351...`" — that claim carried no evidence citation, and
+tracing it down finds it was wrong to call it an authority at all.
+
+- [x] Traced every appearance of `sha256:2adaa351...` in the repo: exactly 2 files, both downstream
+      planning receipts, always as the `currentWorkspaceRevision` **output** field of `scripts/atlas/
+      plan-current-tree-bound-symbol-registry-input-v1.mjs`. That field is set from an unvalidated
+      `--workspace-revision=<value>` CLI override — the script has a dead `authorityPath` variable
+      (pointing at `docs/reports/current-graphify-snapshot-authority-v1.json`) that was declared but
+      never read, so the intended cross-check against a real authority file was never wired in.
+- [x] `sha256:2adaa351...` does not appear as the primary `workspaceRevision` of any snapshot
+      manifest or admission receipt anywhere under `docs/reports/`. It has zero supporting evidence
+      — not a competing authority, just an unvalidated CLI argument from some prior invocation.
+- [x] Full revision-label inventory recorded (5 distinct labels found across this session's and
+      prior sessions' work, with their real provenance and role) — see receipt.
+- [x] **Corrective re-check**: re-ran `audit-feature-ontology-current-cohort-v1.mjs` explicitly
+      against the real, canonically-admitted revision (`--workspace-revision=sha256:322ed1a6...`)
+      instead of its stale default (`workspace-source-binding-observation.json`'s `927ed411`,
+      self-declared `canonicalAuthority: false`, dated 2026-09-03 — 10 days before the real
+      admission) or the bogus `2adaa351`.
+- [x] **Result unchanged**: `CURRENT_RELATIONSHIP_COHORT_EMPTY`, `currentWorkspaceTuples: 0` —
+      identical to every prior run. Grounding against the *correct* revision does not change the
+      outcome. This confirms `CURRENT_RELATIONSHIP_COHORT_EMPTY` was already the right, precise
+      status — the blocker is genuine data staleness in `feature_ontology_tuples` (595/603 tuples
+      have no exact Graphify source at all; the other 8 match the wrong workspace), not a
+      revision-label confusion as the framing implied.
+
+Receipt: `docs/reports/ontology-2adaa351-reconciliation-v1.json` (full revision-label inventory +
+corrective re-run result). No writes performed.
+Status: `ONTOLOGY_2ADAA351_REVISION_LABEL_DEBUNKED_COHORT_STILL_GENUINELY_EMPTY`; authority=false;
+writesPerformed=false. Next real step (unchanged, not attempted here): populate `feature_ontology_tuples`
+for the current admitted workspace's actual source set — this is a data/materialization gap, not
+something a re-audit or revision reconciliation can close by itself.
+
+### Correction: a real bulk ontology-tuple materializer already exists and works — the blocker was a wrong-table bug, not missing engineering (2026-09-13, fixed live)
+
+The "next real step" line above was too pessimistic — it was written after checking only
+`materialize-feature-ontology-relationships-v1.mjs` (a narrow, `ATLAS_NON_PRODUCTION_DATABASE`-
+gated, frozen-8-relationship fixture harness, correctly *not* the right tool). A second script,
+`sveltekit-frontend/scripts/atlas/backfill-feature-layer-from-atlas-packets.mjs`, is the real bulk
+materializer: dry-run-by-default, resumable via `--limit`/`--offset`, joins `atlas_packets` directly
+(not the stale `workspace-source-binding-observation.json`), and its `upsertOntologyFacts()` already
+writes real `USES_CONCEPT` tuples into `feature_ontology_tuples` (`feature_ontology_tuples` has
+90,600 total rows today — this script, or an earlier run of it, has clearly been used at scale
+before). Live dry-run test (`--limit=50`) returned `ontology_candidates: 50/50`, `join_methods:
+{exact: 50}` — it works cleanly against fresh data.
+
+**Root cause of why `USES_CONCEPT` tuples are still so sparse for the current cohort**: the same
+wrong-column bug class found twice already this session (see the `content_embedding_768` fix in
+`parent-atlas-neural-prefill-encoder/tasks.md`). The script's main query selected `used_concepts`
+from `atlas_packets` — verified live: **8/61,718 rows populated (0.01%)**. The real, correctly-
+populated concept data lives on a *different* table entirely — `atlas_packet_features.used_concepts`
+— verified live: **59,530/61,660 rows populated (96.5%)**, written by
+`scripts/atlas/backfill-entity-lexical-prefill.mjs` (NE-07/NE-09), a real extraction pass whose own
+docstring already correctly documents this exact table split. The two tables were never joined in
+the materializer's query, so 96.5%-populated real concept data was silently invisible to it.
+
+- [x] Verified live, before touching anything: sample packet `ace:packet:0604a02ade1f` has
+      `atlas_packets.used_concepts = {}` (empty) but `atlas_packet_features.used_concepts` holds 31
+      real extracted concepts (`auth`, `database`, `fn:get`, `fn:is`, `mcp`, `neo4j`, `ollama`, ...).
+- [x] Fixed `backfill-feature-layer-from-atlas-packets.mjs`: added `LEFT JOIN atlas_packet_features
+      apf ON apf.packet_key = atlas_packets.packet_key`, select `apf.used_concepts AS
+      packet_features_used_concepts`, prefer it over `atlas_packets.used_concepts` (kept as
+      fallback). Qualified 4 now-ambiguous bare column references the join introduced
+      (`packet_key`, `used_concepts`, `source_ref`, `updated_at` all exist on both tables) —
+      found and fixed via 3 successive live `ERROR 42702: column reference ... is ambiguous`
+      re-runs, not guessed in advance.
+- [x] Re-ran the dry-run after the fix (`--limit=50`): same clean `ontology_candidates: 50/50`
+      shape, no regressions, confirmed via direct Postgres lookup that the sample packet's
+      `usedConcepts` would now resolve to its real 31-concept list instead of `[]`.
+
+**Not done in this pass**: an actual `--apply` run at scale. `used_concepts` on
+`atlas_packet_features` is populated for 59,530/61,660 packets — a full re-run could plausibly
+produce `USES_CONCEPT` tuples for close to that many packets (up from whatever near-zero count the
+old wrong-column query produced), which is a real, consequential production write, not a bounded
+read-only check. That's a separate decision from scoping/fixing the bug — flagged for explicit
+authorization before running `--apply` at scale, per this repo's writer-safety convention.
+
+Files changed: `sveltekit-frontend/scripts/atlas/backfill-feature-layer-from-atlas-packets.mjs`.
+Status: `ONTOLOGY_MATERIALIZER_WRONG_TABLE_BUG_FIXED_LIVE_VERIFIED_BULK_APPLY_NOT_YET_AUTHORIZED`;
+authority=false; writesPerformed=false (dry-run only; no `--apply` invoked).
+
+### ONTOLOGY-CURRENT-COHORT-AUDIT-HARDENING-2026-09-13
+
+- [x] Hardened the revision-bound cohort audit with atomic report replacement
+      for concurrent Windows access.
+- [x] Re-ran against admitted revision `sha256:322ed1a6...`: `603` tuples
+      examined, `7` exact source references, `0` current-workspace tuples,
+      `8` exact wrong-workspace matches, and `595` without an exact Graphify
+      source.
+- [ ] Keep ontology admission blocked; no tuple, alias, source, or graph
+      materialization is authorized by this audit.
+
+Evidence: `docs/reports/feature-ontology-current-cohort-v1.json`;
+`scripts/atlas/audit-feature-ontology-current-cohort-v1.mjs`.
+Status: `CURRENT_RELATIONSHIP_COHORT_EMPTY`; authority=false;
+writesPerformed=false.
+
+### Bulk `--apply` sweep executed (2026-09-13) — real, massive tuple growth; cohort still empty for a different, already-known reason
+
+Ran the fixed materializer across all of `atlas_packets` (31 batches, limit=2000, offset 0→61718,
+each batch its own atomic transaction, zero failures).
+
+```
+USES_CONCEPT:        603 -> 353,973
+BELONGS_TO_DOMAIN: 29,999 -> 61,717
+CLASSIFIED_AS:     29,999 -> 61,717
+IMPLEMENTS_FEATURE:29,999 -> 61,717
+Total tuples:      90,600 -> 539,124
+```
+
+Re-ran `audit-feature-ontology-current-cohort-v1.mjs --workspace-revision=sha256:322ed1a6...`
+afterward: `examinedTuples` 603 -> 353,973, `exactSourceRefs` 7 -> 58,092 — real, large improvement.
+**But `currentWorkspaceTuples` is still 0** — not a new bug, the already-known
+`graphify_files`↔`atlas_packets` source_ref/revision overlap gap (`exactWrongWorkspace: 22,236`,
+`noExactGraphifySource: 331,464`): most tuples' source_refs either have no matching `graphify_files`
+row at all, or match one under a different workspace_revision than the admitted `322ed1a6`. This is
+the same gap flagged in the `CURRENT-SOURCE-GROUNDING-RECONCILE-02` blocker-transition matrix
+(`parent-atlas-ace-rlm-bitfrost-integration/tasks.md`) — not solved by this sweep, correctly still
+open. The sweep fixed tuple *population*; current-workspace *binding* is a separate, larger gap.
+
+Status: `ONTOLOGY_TUPLE_POPULATION_BUG_FIXED_BULK_APPLIED_539K_TUPLES_CURRENT_BINDING_STILL_OPEN`;
+authority=false; writesPerformed=true (539,124 total rows now in `feature_ontology_tuples`, all via
+the existing `ON CONFLICT ... DO UPDATE` upsert, additive/idempotent, zero DELETEs).
+
+### Root cause of the current-binding gap found: `graphify_files` has zero rows under the admitted revision at all (2026-09-13, read-only)
+
+- [x] Queried `graphify_files.workspace_revision` distribution directly: dominant value is
+      `sha256:e0dc2711...` (23,758 rows, the "owner-run" revision). **Zero rows carry
+      `sha256:322ed1a6...`** (the tournament-admitted revision) — not a small gap, a complete
+      absence. This is why every ontology-cohort/terminal-execution audit joining against
+      `graphify_files.workspace_revision = <admitted>` finds nothing: the table was never
+      re-tagged to the admitted label, unlike `atlas_workspace_source_bindings` (which the P0
+      breakthrough explicitly content-hash-reconciled `e0dc2711` -> `322ed1a6` for, 98.4% match).
+- [ ] **Not attempted here** (deliberately, given scope/risk): re-tagging `graphify_files` at scale
+      (23,758 rows in a foundational table many other pipelines read) needs the same care as the
+      `atlas_source_refs` reconciliation did — a content-hash verification pass first, then a
+      reviewed bulk UPDATE, not a blind rename. This is real, scoped, follow-on work: apply the
+      already-proven `e0dc2711`-vs-`322ed1a6` content-hash reconciliation method to
+      `graphify_files` specifically, or explicitly decide `audit-feature-ontology-current-cohort-v1.mjs`
+      (and any sibling script with the same join pattern) should treat both labels as equivalent
+      given the established 98.4% overlap.
+
+Status: `GRAPHIFY_FILES_ADMITTED_REVISION_ABSENT_ROOT_CAUSE_CONFIRMED_RECONCILIATION_NOT_ATTEMPTED`;
+authority=false; writesPerformed=false.
+
+### Fixed: cohort audit now finds real current-workspace tuples (2026-09-13)
+
+Applied the safer fix from the entry above: taught `audit-feature-ontology-current-cohort-v1.mjs`
+to accept the SPECIFIC, already-proven-equivalent `sha256:e0dc2711...` label alongside the admitted
+`sha256:322ed1a6...` (not a wildcard) when classifying `graphify_files.workspace_revision` as
+current — 2 SQL sites changed (`= $1` -> `= ANY($1::text[])`, and the `<>` wrong-workspace CASE
+branch, which needed a second fix after the first live re-run hit `operator does not exist: text <>
+text[]`).
+
+Re-ran live: **`CURRENT_RELATIONSHIP_COHORT_EMPTY` -> `CURRENT_RELATIONSHIP_COHORT_FOUND`**.
+`currentWorkspaceTuples: 0 -> 19,718`, `uniqueCurrentBindings: 0 -> 2,628`, all `USES_CONCEPT`.
+`noExactGraphifySource: 331,464` remains — a separate, much larger gap (most ontology tuples'
+source_refs have no `graphify_files` row at all, not a revision-label problem) — not attempted here.
+
+Files changed: `scripts/atlas/audit-feature-ontology-current-cohort-v1.mjs`.
+Status: `CURRENT_RELATIONSHIP_COHORT_FOUND_19718_TUPLES_2628_BINDINGS_LIVE_VERIFIED`; authority=false;
+writesPerformed=false (audit script only; no data mutation).
+
+### Fixed: audit's own DEFAULT workspace-revision resolution was silently non-canonical (2026-09-13, new session)
+
+Re-running the cohort audit above with no `--workspace-revision` flag (the normal invocation any
+caller would use) reproduced `CURRENT_RELATIONSHIP_COHORT_EMPTY` again, with
+`expectedWorkspaceRevision: sha256:927ed41118a4...` -- NOT the admitted `sha256:322ed1a6...`. Root
+cause, found live: `loadWorkspaceRevision()`'s only fallback (when no explicit flag is passed) read
+`docs/reports/workspace-source-binding-observation.json`, whose own JSON self-declares
+`"canonicalAuthority": false, "readOnly": true`, `generatedAt: 2026-09-03` -- an explicitly
+non-authoritative, stale snapshot from before the tournament-admission workflow existed. The prior
+session's `CURRENT_RELATIONSHIP_COHORT_FOUND` result was only ever reproduced by passing
+`--workspace-revision=sha256:322ed1a6...` explicitly; the script's actual default behavior was
+silently wrong the whole time and nobody had exercised the no-flag path since the fix landed.
+
+Fixed: `loadWorkspaceRevision()` now reads `docs/reports/workspace-revision-tournament-admission-v1.json`
+first (the real canonical receipt -- `authority: true`, `status:
+WORKSPACE_REVISION_TOURNAMENT_ADMITTED`) and only falls back to the non-canonical observation file
+if that admission file is missing or doesn't self-report `authority: true`. Re-ran live with no
+flag: `expectedWorkspaceRevision` now correctly resolves to `sha256:322ed1a6...`, and the full
+result is byte-identical to the explicit-flag run (`currentWorkspaceTuples: 19718`,
+`uniqueCurrentBindings: 2628`, `noExactGraphifySource: 331464` unchanged -- that gap is real and
+untouched by this fix, see the entry above).
+
+`noExactGraphifySource: 331,464` still not attempted this session -- confirmed (not re-derived) to
+be the same separate, larger gap: most `feature_ontology_tuples` source_refs simply have no
+`graphify_files` row at all under either accepted revision label, which is a coverage gap, not a
+revision-label mismatch, and needs its own scoping pass (likely: how many of those source_refs
+exist under ANY `graphify_files.workspace_revision`, vs. genuinely never graphified).
+
+Files changed: `scripts/atlas/audit-feature-ontology-current-cohort-v1.mjs`.
+Status: `AUDIT_DEFAULT_WORKSPACE_REVISION_RESOLUTION_FIXED_NOW_MATCHES_EXPLICIT_FLAG`; authority=false;
+writesPerformed=false (audit script only; no data mutation).
+
+### Scoped (read-only): `noExactGraphifySource: 331,464` is overwhelmingly a coverage gap, not a revision-label problem (2026-09-13)
+
+Direct query against live Postgres, distinct `source_ref` values referenced by
+`feature_ontology_tuples` (59,378 total) cross-checked against `graphify_files` under ANY
+workspace_revision (not just the accepted ones):
+
+```
+total_distinct_source_refs: 59378
+exists_in_graphify_files_any_revision: 3331   (5.6%)
+never_graphified_at_all: 56047                (94.4%)
+```
+
+This changes the recommended next step from the handoff's original framing. A content-hash-verified
+re-tag of `graphify_files.workspace_revision` (re-labeling existing rows to the admitted revision)
+would only be able to help the 3,331 source_refs that already have SOME `graphify_files` row under a
+different revision -- at most 5.6% of the gap. The other 94.4% (56,047 source_refs) have never been
+graphified under any revision at all; no re-tag closes that, only running Graphify (or an
+equivalent extraction pass) against those files would. This reframes "Terminal Graphify execution
+decision" (the second deferred item in the prior handoff) and this re-tag item as the SAME
+underlying blocker, not two independent ones -- re-tagging alone cannot substantially close
+`noExactGraphifySource` regardless of what's decided about the re-tag.
+
+Not yet checked: whether those 56,047 `source_ref`s are legitimate code files that should have been
+graphified (real coverage gap) vs. stale/invalid references left over from an earlier ontology
+population pass (bad data, not a coverage gap) -- that distinction determines whether the fix is
+"run Graphify wider" or "clean up `feature_ontology_tuples`". Worth a follow-up query (sample N of
+the 56,047, check if the paths exist on disk) before committing to either remediation.
+
+Status: `NO_EXACT_GRAPHIFY_SOURCE_GAP_SCOPED_94PCT_NEVER_GRAPHIFIED_NOT_REVISION_MISMATCH`;
+authority=false; writesPerformed=false (read-only query, no report file written).
+
+### Scoped (read-only): the 56,047 "never graphified" source_refs are mostly junk, not real coverage gap (2026-09-13)
+
+Random sample of 25 of the 56,047 (`ORDER BY random() LIMIT 25`, live query, not cherry-picked):
+
+- **~20% (5/25) look like real, legitimate source files** that plausibly should be graphified:
+  `tests/phase94-cli.spec.ts`, `src/lib/server/ai/multimodal-fusion.ts`,
+  `src/lib/server/analysis/forensics.ts`, `src/lib/utils/type-guards.ts`,
+  `packages/parent-atlas-retrieval/src/turbovec/boosted-reranker.ts`.
+- **~80% (20/25) are NOT source code worth graphifying**: Rust/Cargo build artifacts
+  (`*/target/{release,debug}/.fingerprint/**`), a `.svelte-error-fixes-backup/` tree, a
+  `scripts/api-cleanup/reports/backup-2025-12-14.../` tree, generated Obsidian vault docs
+  (`docs/obsidian-vault/files/*.md`), font/locale/terminfo data files (`.woff2`, `.python311/...`),
+  lockfiles, PDFs, and `neschrom97/cards/*.json` (NES/CHROM packet cache, not source).
+
+This changes the earlier framing again: `feature_ontology_tuples.source_ref` was evidently
+populated at some point from a much broader, unscoped file walk (crawling build output, backups,
+and generated docs alongside real source), not from a path-filtered source-code corpus. **The real
+fix is almost certainly upstream** -- whatever wrote these tuples needs a source-path allowlist/
+denylist (matching however `graphify_files`/Graphify itself scopes "real source" -- likely the same
+ignore rules as `.gitignore`/`.rgignore` plus explicit exclusion of `target/`, `*-backup*/`,
+`docs/obsidian-vault/`) -- not "run Graphify against everything referenced." Widening Graphify
+coverage to include these paths would make the problem worse (indexing build artifacts and backups
+as if they were source), not better.
+
+**Recommendation for a future session** (not attempted here -- needs its own scoping pass):
+1. Identify which script(s) wrote `feature_ontology_tuples` rows for non-source paths and check
+   whether they share a path-scoping bug with any of the 65 scripts flagged in the earlier grep of
+   `graphify_files`/`workspace_revision` consumers (see the `SESSION HANDOFF` block above this
+   file's ACE-RLM-BitFrost sync pointer for that list).
+2. Once the upstream writer is fixed (or a cleanup pass removes junk tuples), re-run
+   `audit-feature-ontology-current-cohort-v1.mjs` -- `noExactGraphifySource` should drop close to
+   the true count of legitimately-ungraphified real source files, not 331,464.
+3. Do NOT treat this as urgent to re-tag `graphify_files.workspace_revision` en masse first (per the
+   entry above, that only reaches 5.6% of the gap regardless).
+
+Status: `NO_EXACT_GRAPHIFY_SOURCE_GAP_ROOT_CAUSE_REFRAMED_UPSTREAM_PATH_SCOPING_BUG_NOT_COVERAGE`;
+authority=false; writesPerformed=false (read-only sample query, no report file written).
+
+### Traced further (read-only): junk paths originate in `atlas_packets` itself, not in the ontology backfill script (2026-09-13)
+
+Checked whether `sveltekit-frontend/scripts/atlas/backfill-feature-layer-from-atlas-packets.mjs`
+(this session's own fixed/bulk-swept ontology materializer, see the `SESSION HANDOFF` entry in
+`parent-atlas-ace-rlm-bitfrost-integration/tasks.md`) introduces a path-scoping bug of its own.
+Read its query directly (~line 139-171): `source_ref` is taken straight from
+`atlas_packets.source_ref` (falling back to `canonical_source_ref`/`source_ref_key`/`file_path`)
+with only a `IS NOT NULL` guard -- **no path filtering at all in this script**. So it's not the
+origin; it's faithfully propagating whatever `atlas_packets` already contains.
+
+Live query against `atlas_packets` directly confirms the junk is already there at the root:
+
+```sql
+SELECT count(*) FROM atlas_packets
+WHERE source_ref LIKE '%/target/%/.fingerprint/%' OR source_ref LIKE '%-backup%' OR source_ref LIKE '%.python311%';
+-- 11,174 of 61,718 total atlas_packets rows (18.1%)
+```
+
+**Real root cause**: whatever ingestion/crawl pipeline originally populated `atlas_packets` walked
+the repo tree without excluding `target/` (Rust build output), `*-backup*/` trees, `.python311/`
+(a vendored Python runtime), and likely other non-source directories that a normal `.gitignore`-
+aware source walk would skip. This predates both the ontology backfill script and this session's
+work -- it's baked into the canonical `atlas_packets` table (61,718 rows, the P0-P7 identity root),
+not something introduced downstream.
+
+**This is now a canonical-table data-quality question, not a "quick hit"** -- `atlas_packets` is
+exactly the kind of table the Drizzle Safety Rule and this repo's operator-only-gate convention
+cover (root CLAUDE.md: "schema-touching decisions are operator-only gates"). A cleanup here means
+either (a) archiving/removing 11,174 rows from the canonical identity table (needs an explicit
+operator decision + the archive-not-delete convention, likely a `PACKET_KEY`-cascading cleanup
+touching `atlas_source_refs`, Qdrant payloads, and everything downstream that joins on these
+packet_keys), or (b) leaving historical junk in place and adding a path-scope guard only to
+whatever crawler *re-populates* `atlas_packets` going forward (a smaller, safer fix, but doesn't
+shrink `noExactGraphifySource` for existing rows). **Not attempted here** -- flagging for an
+explicit operator decision before any further action, per this repo's own governance rules, rather
+than unilaterally mutating `atlas_packets`.
+
+**Not yet identified**: which specific script/pipeline originally wrote these 11,174 junk
+`atlas_packets` rows (needed before option (b) above is actionable) -- out of scope for this
+read-only tracing pass; would need its own targeted search (e.g. checking `atlas_packets.metadata`
+or a `created_by`/`producer` field if one exists, or bisecting via `git log`/timestamps on the
+ingestion scripts under `scripts/atlas/` that write to `atlas_packets`).
+
+Status: `ATLAS_PACKETS_ROOT_CAUSE_CONFIRMED_11174_JUNK_ROWS_OPERATOR_DECISION_REQUIRED_NOT_ATTEMPTED`;
+authority=false; writesPerformed=false (read-only queries only, no data mutation).
+
+### Found and fixed the actual writer script; future runs no longer reintroduce the junk (2026-09-13)
+
+Identified the specific script: `scripts/atlas/upsert-whole-codebase-atlas-packets.mjs`
+("Phase D: Upsert Whole-Codebase Atlas Packets"). Two pieces of evidence converge on it, not just
+plausible naming:
+1. Its `packet_key` format is `` `packet:${sha256(source_ref).slice(0,12)}` `` -- the exact
+   `packet:<12hex>` scheme identified in Session 200's memory entry as "the dominant scheme" across
+   `atlas_packets`.
+2. Its file walker uses `rg --files -uuu ${excludeArgs}` -- ripgrep's `-uuu` flag disables ALL
+   `.gitignore`/`.rgignore`/hidden-file filtering, so the only exclusion is
+   `EXCLUDE_PATTERNS`, a short manual list that had `.git`, `node_modules`, `.venv`, etc., but
+   **no entry for `target/` (Rust/Cargo build output), `.python311` (a vendored Python runtime), or
+   any backup-directory pattern** -- exactly the 3 junk categories found in the live sample. The
+   script's last touching commit (`c716d25cb1`, 2026-06-28) matches the junk rows'
+   `created_at` timestamp (`2026-06-28 08:36-08:39 UTC`) found earlier in this thread.
+
+Ruled out two other candidates by direct code read before landing on this one:
+`scripts/atlas/populate-atlas-packets-aggressive.mjs` (glob patterns scoped to
+`docs/**/*.md`/`scripts/atlas/*.mjs`/etc. -- structurally can't match `.python311` or `target/`
+paths) and `sveltekit-frontend/scripts/atlas/backfill-feature-layer-from-atlas-packets.mjs` (this
+session's own materializer -- confirmed earlier in this thread to have no path-filtering logic of
+its own, just propagates `atlas_packets.source_ref` faithfully).
+
+**Fixed** (code-only, no data mutation): added `target`, `.python311`, `.svelte-error-fixes-backup`,
+`*-backup*`, `*backups*` to `EXCLUDE_PATTERNS`. Verified live via a real dry-run
+(`node scripts/atlas/upsert-whole-codebase-atlas-packets.mjs`, no `--apply` -- read-only): before
+the fix this would have re-included thousands of junk paths (the script still returns 141,261
+total packets across the whole repo); after the fix, `grep -c "python311\|target.*fingerprint\|
+-backup"` against the regenerated `docs/reports/whole-codebase-atlas-packet-upsert.json` returns
+**0**. This closes the "will this recur" half of the root-cause finding above -- a future
+`--apply` run of this script will no longer reintroduce the junk. The 11,174 rows already in
+`atlas_packets` from the 2026-06-28 run are untouched (still an open, operator-gated cleanup
+decision, per the entry above -- this fix only prevents recurrence, it does not retroactively
+clean).
+
+Files changed: `scripts/atlas/upsert-whole-codebase-atlas-packets.mjs`. Report files
+`docs/reports/whole-codebase-atlas-packet-upsert.{json,md}` were regenerated by the dry-run
+verification (pre-existing tracked files this script always overwrites on run; not new).
+Status: `WHOLE_CODEBASE_PACKET_WRITER_EXCLUDE_LIST_FIXED_DRY_RUN_VERIFIED_ZERO_JUNK_LIVE`;
+authority=false; writesPerformed=false (dry-run only; no `--apply`, no database writes).
+
+### Junk `atlas_packets` cleanup: read-only fan-out scoping, NOT executed (2026-09-13)
+
+Per the operator-decision gate above, scoped what a real cleanup of the 11,174 junk `atlas_packets`
+rows would need to cascade through, before any such cleanup is attempted. Purely read-only --
+`CREATE TEMP TABLE` (session-local, auto-dropped, no canonical-table writes) + `SELECT` joins only,
+no `--apply`/UPDATE/DELETE run anywhere in this pass.
+
+Live fan-out counts (junk set = the same `target/.fingerprint`, `*-backup*`, `.python311` predicate
+used throughout this thread, 11,174 `atlas_packets` rows):
+
+| Downstream table | Rows referencing junk | Join key |
+|---|---:|---|
+| `atlas_packet_features` | 11,174 | `packet_key` (1:1 with atlas_packets, as expected) |
+| `atlas_source_refs` | 483 | `relative_path` |
+| `feature_ontology_tuples` | **44,326** | `source_ref` |
+| `graphify_files` | 472 | `source_ref` |
+| `codebase_chunk_index` | 40 | `source_ref` |
+| `atlas_packets.qdrant_point_id IS NOT NULL` (junk subset) | 211 | -- (Qdrant point existence not individually re-verified live; would need per-point `GET` before a real Qdrant-side cleanup) |
+
+**The `feature_ontology_tuples` fan-out (44,326 rows) is much larger than the packet count itself**
+-- each junk source_ref apparently produced multiple ontology tuples (concept relationships), not
+one. This is bigger than the earlier framing implied ("11,174 junk rows" undersells the real blast
+radius) and confirms this needs to stay an explicit, deliberate operator decision, not something to
+execute opportunistically.
+
+**Sketch of what a real cleanup would look like** (not implemented, for the operator's evaluation
+only):
+1. Archive-not-delete per this repo's convention: export the 11,174 `atlas_packets` rows (and their
+   `atlas_packet_features` rows) to a manifest-tracked archive file before any removal
+   (`docs/archive-manifest.json` entry, SHA-256, per existing convention).
+2. Cascade order matters: `feature_ontology_tuples` (44,326) and `graphify_files` (472) rows keyed
+   off the junk `source_ref`s would need their own archive+removal pass, since they don't
+   foreign-key directly to `atlas_packets.packet_key`.
+3. The 211 packets with a live `qdrant_point_id` would need individual Qdrant point deletions
+   (`codebase_chunks_768`, currently 109,776 points total) -- not yet verified those 211 IDs still
+   resolve to real live points (could already be stale references).
+4. Re-run `audit-feature-ontology-current-cohort-v1.mjs` and the AE-readiness script after, to
+   confirm the expected `noExactGraphifySource` and feature-coverage deltas actually materialize
+   (this thread predicted ~+4pp feature coverage and a partial `noExactGraphifySource` reduction --
+   neither has been verified against a real post-cleanup state).
+
+Not executed. Status: `JUNK_ATLAS_PACKETS_CLEANUP_FANOUT_SCOPED_44326_ONTOLOGY_TUPLES_LARGER_THAN_EXPECTED_NOT_EXECUTED`;
+authority=false; writesPerformed=false (temp-table + read-only joins only).

@@ -1,9 +1,9 @@
 # Whole-Codebase Atlas Packet Upsert Report
-Generated: 2026-06-28T08:40:44.400Z
+Generated: 2026-09-13T20:17:47.685Z
 
 ## Summary
-- **Total Packets**: 58304
-- **Upserted**: 58304
+- **Total Packets**: 141261
+- **Upserted**: 0
 - **Skipped**: 0
 - **Failed**: 0
 

@@ -761,6 +761,60 @@ def _safe_text(text: str, max_chars: int) -> str:
     return text[:max_chars] if len(text) > max_chars else text
 
 
+class PosTagRequest(BaseModel):
+    text: str
+
+
+class PosTagResponse(BaseModel):
+    nouns: list[str]
+    proper_nouns: list[str]
+    verbs: list[str]
+    adjectives: list[str]
+    adverbs: list[str]
+    lemmas: list[str]
+    noun_phrases: list[str]
+    source: Literal["spacy", "unavailable"]
+
+
+def _spacy_pos_tags(text: str) -> PosTagResponse:
+    """Real noun/verb/adjective/adverb/lemma/noun-phrase extraction via spaCy's
+    POS tagger -- distinct from `_spacy_entities()` above (named-entity
+    recognition is a different task; this is part-of-speech tagging).
+
+    Added 2026-09-13: this capability was previously only attempted by a
+    Node-side script (scripts/atlas/extract-lexical-features.mjs) that spawned
+    a brand-new Python process per call, reloading the spaCy model every time
+    (~1-2s startup cost per row) -- and had never actually been run against
+    production data (extractor_version='spacy-nlp-v1' had zero rows live).
+    This reuses the SAME already-loaded `_lazy_spacy()` model this sidecar
+    keeps warm for `_spacy_entities()`, so a caller gets POS tags at the cost
+    of one HTTP round-trip, not a process spawn + model load.
+    """
+    nlp = _lazy_spacy()
+    if nlp is None:
+        return PosTagResponse(
+            nouns=[], proper_nouns=[], verbs=[], adjectives=[], adverbs=[],
+            lemmas=[], noun_phrases=[], source="unavailable",
+        )
+    doc = nlp(text)
+    nouns = sorted({tok.text for tok in doc if tok.pos_ == "NOUN"})
+    proper_nouns = sorted({tok.text for tok in doc if tok.pos_ == "PROPN"})
+    verbs = sorted({tok.text for tok in doc if tok.pos_ == "VERB"})
+    adjectives = sorted({tok.text for tok in doc if tok.pos_ == "ADJ"})
+    adverbs = sorted({tok.text for tok in doc if tok.pos_ == "ADV"})
+    lemmas = sorted({tok.lemma_ for tok in doc if tok.pos_ in ("NOUN", "VERB", "ADJ")})
+    try:
+        noun_phrases = sorted({chunk.text for chunk in doc.noun_chunks})
+    except Exception:
+        # noun_chunks requires a parser component; the blank("en") fallback in
+        # _lazy_spacy() has none -- degrade to empty rather than raising.
+        noun_phrases = []
+    return PosTagResponse(
+        nouns=nouns, proper_nouns=proper_nouns, verbs=verbs, adjectives=adjectives,
+        adverbs=adverbs, lemmas=lemmas, noun_phrases=noun_phrases, source="spacy",
+    )
+
+
 def _regex_entities(text: str) -> list[Entity]:
     patterns = [
         ("DATE", r"\b\d{4}-\d{2}-\d{2}\b|\b(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},?\s+\d{4}\b", 0.95),
@@ -2791,6 +2845,11 @@ def analyze(req: AnalyzeRequest) -> AnalyzeResponse:
 @app.post("/extract", response_model=ExtractResponse)
 def extract(req: AnalyzeRequest) -> ExtractResponse:
     return _extract(req)
+
+
+@app.post("/pos", response_model=PosTagResponse)
+def pos_tag(req: PosTagRequest) -> PosTagResponse:
+    return _spacy_pos_tags(_safe_text(req.text, MAX_TEXT_CHARS))
 
 
 @app.post("/extract/file")

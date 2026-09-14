@@ -1084,6 +1084,11 @@ def extract(req: legacy.AnalyzeRequest) -> legacy.ExtractResponse:
     return legacy._extract(req)
 
 
+@app.post("/pos", response_model=legacy.PosTagResponse)
+def pos_tag(req: legacy.PosTagRequest) -> legacy.PosTagResponse:
+    return legacy._spacy_pos_tags(legacy._safe_text(req.text, legacy.MAX_TEXT_CHARS))
+
+
 @app.post("/extract/documentation-facts", response_model=DocumentationFactResponseV1)
 def extract_documentation_facts(req: DocumentationFactRequestV1) -> DocumentationFactResponseV1:
     if not _source_revision_is_consistent(req.text, req.source_revision):

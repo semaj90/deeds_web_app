@@ -48,6 +48,25 @@ const EXCLUDE_PATTERNS = [
   '.claude',
   '.venv',
   'venv',
+  // Found live 2026-09-13: this script's `rg --files -uuu` flag ignores ALL
+  // .gitignore/.rgignore rules (that's what -uuu means), so this manual list is
+  // the ONLY thing standing between a real run and indexing build artifacts and
+  // vendored runtimes as "source". Traced 11,174 junk atlas_packets rows (18% of
+  // the table) to exactly this gap -- .python311 (vendored Python runtime),
+  // Rust/Cargo `target/` build output, and backup trees were all being walked
+  // and packetized. See openspec/changes/parent-atlas-ontology-kernel/tasks.md's
+  // "ATLAS_PACKETS_ROOT_CAUSE_CONFIRMED" entry for the full trace. Adding these
+  // prevents FUTURE runs from reintroducing the same junk; it does not clean up
+  // the 11,174 rows already written (a separate, operator-gated decision).
+  'target',
+  '.python311',
+  '.svelte-error-fixes-backup',
+  '*-backup*',
+  '*backups*',
+  // Found live 2026-09-13 (feature-eligibility classifier build): `qdrant-windows/` is a live
+  // Qdrant instance's own on-disk storage engine (RocksDB/WAL segment files -- LOCK, CURRENT,
+  // MANIFEST-*, OPTIONS-*, IDENTITY, wal/) -- 190 atlas_packets rows were these, not source.
+  'qdrant-windows',
 ];
 
 function sha256(str) {

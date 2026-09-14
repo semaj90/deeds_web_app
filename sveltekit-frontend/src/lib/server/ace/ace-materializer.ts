@@ -7,7 +7,7 @@
  * Flow:
  *   1. Read ACE-validated packet from Postgres
  *   2. Generate or load embedding vector (768-dim)
- *   3. Upsert to Qdrant codebase_chunks_768_v2 with metadata
+ *   3. Upsert to Qdrant codebase_chunks_768 with metadata
  *   4. Cache in Redis under bifrost:sem:packet:{packet_key} (24h TTL) -- fixed
  *      2026-09-04 (BITFROST-INVALIDATION-OWNER-01): this doc comment and the
  *      code below both used to say/use bifrost:packet:{packet_key}, a shape
@@ -44,7 +44,7 @@ export interface MaterializeResult {
   duration: number;
 }
 
-const DEFAULT_COLLECTION = 'codebase_chunks_768_v2';
+const DEFAULT_COLLECTION = 'codebase_chunks_768';
 const DEFAULT_REDIS_TTL = 86400; // 24 hours
 const VECTOR_DIM = 768;
 
@@ -52,6 +52,25 @@ type MaterializerProofFields = {
   workspace_id: string | null;
   ontology_version: string | null;
   content_hash: string | null;
+};
+
+// Added 2026-09-13: `lexical_adverbs_ly` (and `lexical_nouns`/`lexical_verbs`) are real, fully
+// schema'd fields in CanonicalAcePacketEnvelope -- Zod-validated, msgpack-tagged
+// (packet-msgpack-codec.ts, tag 20) -- but this materializer never queried the table that could
+// supply them, so every packet materialized through here got `[]` regardless of what
+// feature_lexical_facts (scripts/atlas/extract-lexical-features.mjs) actually extracted. This is
+// annotation/context data for ACE ranking, never canonical identity -- it must never gate or
+// redefine packet_key/feature_id/source_ref.
+type MaterializerLexicalFields = {
+  lexical_nouns: string[];
+  lexical_verbs: string[];
+  lexical_adverbs_ly: string[];
+};
+
+const EMPTY_LEXICAL_FIELDS: MaterializerLexicalFields = {
+  lexical_nouns: [],
+  lexical_verbs: [],
+  lexical_adverbs_ly: [],
 };
 
 export function isValidMaterializerEmbedding(vector: unknown): vector is number[] {
@@ -174,6 +193,24 @@ export async function materializePacket(options: MaterializeOptions): Promise<Ma
       content_hash: null,
     };
 
+    // Most-recent spacy-nlp-v1 row for this packet, if any -- annotation only (see
+    // MaterializerLexicalFields comment above), read-only, never affects identity fields.
+    const lexicalRows = pgRows<{ metadata: Record<string, unknown> | null }>(await db.execute(sql`
+      SELECT metadata
+      FROM feature_lexical_facts
+      WHERE packet_key = ${options.packetKey} AND extractor_version = 'spacy-nlp-v1'
+      ORDER BY created_at DESC
+      LIMIT 1
+    `));
+    const lexicalMetadata = lexicalRows[0]?.metadata;
+    const lexicalFields: MaterializerLexicalFields = lexicalMetadata
+      ? {
+          lexical_nouns: Array.isArray(lexicalMetadata.nouns) ? (lexicalMetadata.nouns as string[]) : [],
+          lexical_verbs: Array.isArray(lexicalMetadata.verbs) ? (lexicalMetadata.verbs as string[]) : [],
+          lexical_adverbs_ly: Array.isArray(lexicalMetadata.adverbs) ? (lexicalMetadata.adverbs as string[]) : [],
+        }
+      : EMPTY_LEXICAL_FIELDS;
+
     // 2. Validate required fields
     if (!pkt.packetKey || !pkt.featureId || !pkt.summary) {
       throw new Error(`Packet incomplete: missing key/feature_id/summary`);
@@ -196,6 +233,9 @@ export async function materializePacket(options: MaterializeOptions): Promise<Ma
         feature_id: pkt.featureId,
         feature_label: pkt.featureLabel,
         summary: pkt.summary,
+        lexical_nouns: lexicalFields.lexical_nouns,
+        lexical_verbs: lexicalFields.lexical_verbs,
+        lexical_adverbs_ly: lexicalFields.lexical_adverbs_ly,
       },
       {
         feature_id: pkt.featureId,
@@ -342,7 +382,7 @@ export async function getPacketMaterializationStatus(packetKey: string): Promise
     // Check Qdrant by packet identity. Do not use a zero-vector proxy.
     let inQdrant = false;
     try {
-      const response = await qdrant.scroll('codebase_chunks_768_v2', {
+      const response = await qdrant.scroll('codebase_chunks_768', {
         limit: 1,
         with_payload: true,
         with_vector: false,

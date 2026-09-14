@@ -41,7 +41,16 @@ RUN python -m pip install --upgrade \
     numpy==2.3.3 \
     scikit-learn==1.7.2 \
     joblib==1.5.2 \
-  && python -m pip check
+  && python -m pip check \
+  && python -m spacy download en_core_web_sm==3.8.0
+# Found live 2026-09-13: spacy the PACKAGE was installed but no language model ever was --
+# `spacy.load('en_core_web_sm')` failed with E050, silently falling back to `spacy.blank('en')`
+# (a tokenizer with zero pipeline components: no tagger, no parser, no NER). This sidecar's own
+# /health `capabilities.spacy: true` only checks the package import, not model availability, so
+# the gap was invisible. Every consumer of _lazy_spacy() -- _spacy_entities() (NER, feeding
+# /analyze's `entities`) and _spacy_pos_tags() (POS tags, feeding the new /pos endpoint) -- was
+# silently returning empty results with no error surfaced. en_core_web_sm 3.8.0 matches the
+# spacy==3.8.16 pin above (spaCy model versions must match the spacy package's major.minor).
 
 # Keep dependency installation independent from application source changes so
 # source-only rebuilds reuse the expensive Python package layer.
