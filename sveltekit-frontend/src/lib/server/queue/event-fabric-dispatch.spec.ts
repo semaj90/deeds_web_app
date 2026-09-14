@@ -13,6 +13,7 @@ function makeHandlers(): EventFabricProjectionHandlers {
 		'checkpoint.commit': vi.fn(async () => {}),
 		'artifact.materialized': vi.fn(async () => {}),
 		'artifact.failed': vi.fn(async () => {}),
+		'authority.audit.completed': vi.fn(async () => {}),
 	};
 }
 
@@ -126,5 +127,34 @@ describe('event fabric dispatch', () => {
 
 		expect(handlers['artifact.failed']).toHaveBeenCalledTimes(1);
 		expect(handlers['artifact.materialized']).not.toHaveBeenCalled();
+	});
+
+	it('routes revision-qualified authority receipts without authorizing mutation', async () => {
+		const handlers = makeHandlers();
+		const event = parseEventFabricMessage({
+			eventId: '55555555-5555-4555-8555-555555555555',
+			eventType: 'authority.audit.completed',
+			occurredAt: '2026-09-12T22:00:00.000Z',
+			producerId: 'current-graphify-run-owner-auditor',
+			workspaceId: 'deeds-web-app-local',
+			workspaceRevision: 'sha256:322e',
+			payload: {
+				gate: 'CURRENT-SOURCE-TERMINAL-EXECUTION-01',
+				status: 'BLOCKED',
+				blocker: 'SNAPSHOT_BOUND_GRAPHIFY_CANARY_NOT_AUTHORIZED',
+				canonicalAuthority: false,
+				mutationAuthorized: false,
+				subjectType: 'graphify_run',
+				subjectId: 'current',
+				nextGate: 'SNAPSHOT-BOUND-GRAPHIFY-CANARY-01',
+				counts: { terminalRunOwners: 0 },
+				sourceEvidenceRefs: ['docs/reports/current-graphify-run-owner-v1.json'],
+			},
+		});
+
+		await dispatchEventFabricEvent(event, handlers);
+
+		expect(handlers['authority.audit.completed']).toHaveBeenCalledTimes(1);
+		expect(handlers['policy.decision.receipt']).not.toHaveBeenCalled();
 	});
 });

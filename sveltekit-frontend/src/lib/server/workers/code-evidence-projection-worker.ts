@@ -22,6 +22,7 @@ import {
 	type AnalyticsObservationEventV1,
 	type ArtifactFailedEventV1,
 	type ArtifactMaterializedEventV1,
+	type AuthorityAuditCompletedEventV1,
 	type CheckpointCommitEventV1,
 	type EventFabricHandlerRegistry,
 	type FailureObservationEventV1,
@@ -83,6 +84,9 @@ export async function dispatchEventFabricEvent(
 			return;
 		case 'artifact.failed':
 			await handlers['artifact.failed'](event as ArtifactFailedEventV1);
+			return;
+		case 'authority.audit.completed':
+			await handlers['authority.audit.completed'](event as AuthorityAuditCompletedEventV1);
 			return;
 	}
 }
