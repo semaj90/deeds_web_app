@@ -78,7 +78,7 @@ describe('vector-index-registry', () => {
     expect(legacy[383]).toBe(source[383]);
   });
 
-  it('registers canonical v2 and explicit legacy replay indexes separately', () => {
+  it('registers the declared 768 projection and explicit challenger separately', () => {
     expect(VECTOR_INDEX_REGISTRY.vectorSnapshot5k.snapshotLimit).toBe(5000);
     expect(VECTOR_INDEX_REGISTRY.qdrantSource768V2.collection).toBe('codebase_chunks_768_v2');
     expect(VECTOR_INDEX_REGISTRY.qdrantSource768.collection).toBe('codebase_chunks_768');
@@ -96,11 +96,11 @@ describe('vector-index-registry', () => {
     expect(getVectorLane('topology128').dimension).toBe(128);
     expect(getVectorLane('source768').role).toBe('canonical');
     expect(getVectorLane('source768').dimension).toBe(768);
-    expect(getVectorLane('source768').collection).toBe('codebase_chunks_768_v2');
+    expect(getVectorLane('source768').collection).toBe('codebase_chunks_768');
 
     expect(getActiveSemanticVectorLane().laneId).toBe('embeddinggemma-semantic-768');
-    expect(getVectorLaneByCollection('codebase_chunks_768_v2')?.laneId).toBe('embeddinggemma-semantic-768');
-    expect(getVectorLaneByCollection('codebase_chunks_768')).toBeUndefined();
+    expect(getVectorLaneByCollection('codebase_chunks_768')?.laneId).toBe('embeddinggemma-semantic-768');
+    expect(getVectorLaneByCollection('codebase_chunks_768_v2')).toBeUndefined();
     expect(getVectorLaneByCollection('codebase_chunks_384_hybrid')).toBeUndefined();
     expect(Object.keys(VECTOR_LANES)).toHaveLength(3);
   });

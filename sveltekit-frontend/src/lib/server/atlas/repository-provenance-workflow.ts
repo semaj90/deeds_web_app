@@ -5,7 +5,7 @@ import path from 'node:path';
 import { TreeNodeExtractor } from '../ace/features/tree-node-extractor.js';
 import { extractAstFeatures, extractDependencyFeatures } from '../analysis/ast-grep-extractor.js';
 import { CANONICAL_EMBEDDING_DIMENSION } from './contracts/canonical-chunk-contract.js';
-import { SEMANTIC_REPRESENTATION_ID } from '../embedding/embedding-contract-768.js';
+import { CANONICAL_QDRANT_COLLECTION, SEMANTIC_REPRESENTATION_ID } from '../embedding/embedding-contract-768.js';
 
 export type WorkflowStageStatus = 'PROVEN' | 'PARTIAL' | 'SKIPPED' | 'FAILED';
 
@@ -1209,7 +1209,7 @@ export async function runRepositoryProvenanceWorkflow(
         redisProjectionRecords: lexicalEntries.length,
         representationName: SEMANTIC_REPRESENTATION_ID,
         denseVectorName: 'content',
-        collectionName: 'codebase_chunks_768_v2',
+        collectionName: CANONICAL_QDRANT_COLLECTION,
       },
       validation: {
         status: validationPass ? 'PROVEN' : 'PARTIAL',

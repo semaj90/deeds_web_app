@@ -11,7 +11,7 @@ import {
 describe('retrieval semantics', () => {
   it('keeps the dense fallback on the canonical 768 collection', () => {
     expect(QDRANT_DENSE_FALLBACK_COLLECTION).toBe(QDRANT_HYBRID_COLLECTION);
-    expect(QDRANT_DENSE_FALLBACK_COLLECTION).toBe('codebase_chunks_768_v2');
+    expect(QDRANT_DENSE_FALLBACK_COLLECTION).toBe('codebase_chunks_768');
   });
 
   it('keeps tier resolution on the canonical 768 collections', () => {

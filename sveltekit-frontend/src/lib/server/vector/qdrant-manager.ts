@@ -12,6 +12,7 @@ import {
 } from '$lib/server/config/vector-config.js';
 import {
   QDRANT_DENSE_VECTOR_NAME,
+  QDRANT_SOURCE_COLLECTION,
   QDRANT_FUSION_STRATEGY,
   QDRANT_SPARSE_VECTOR_NAME,
 } from './retrieval-semantics.js';
@@ -464,10 +465,10 @@ export class QdrantManager {
       { collection: this.collections.document_knowledge, field: 'chunkIds', schema: 'keyword' },
       { collection: this.collections.document_knowledge, field: 'clusterTags', schema: 'keyword' },
       { collection: this.collections.document_knowledge, field: 'topoClass', schema: 'keyword' },
-      // ── codebase_chunks_768_v2 canonical dense lane ──────────────────────────
+      // ── declared semantic_768 canonical dense lane ───────────────────────────
       // Index only the exact-match fields that are actually populated in the live
       // v2 collection so deterministic filters remain cheap and stable.
-      ...(['codebase_chunks_768_v2'] as const).flatMap((col) => [
+      ...([QDRANT_SOURCE_COLLECTION] as const).flatMap((col) => [
         { collection: col, field: 'postgres_id', schema: 'keyword' as const },
         { collection: col, field: 'qdrant_point_id', schema: 'keyword' as const },
         { collection: col, field: 'source_ref', schema: 'keyword' as const },

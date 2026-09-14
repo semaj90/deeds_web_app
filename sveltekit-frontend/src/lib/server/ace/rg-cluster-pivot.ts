@@ -21,8 +21,9 @@ import { getRedis } from '$lib/server/redis.js';
 import { getQdrantClient } from '$lib/server/vector/qdrant-singleton.js';
 import { readLatestQdrantClusterTags } from './cluster-tags-cache.js';
 import type { UnifiedRetrievalResult } from '$lib/server/types/retrieval.js';
+import { CANONICAL_SOURCE_COLLECTION } from '$lib/server/vector/vector-contracts.js';
 
-const CODEBASE_COLLECTION = 'codebase_chunks_768_v2';
+const CODEBASE_COLLECTION = CANONICAL_SOURCE_COLLECTION;
 const CLUSTER_PIVOT_SCORE_CAP = 0.12; // Capped to ensure Qdrant 768d ANN remains dominant
 const MAX_FILES_PER_CLUSTER = 6;
 const MAX_PIVOT_CLUSTERS = 3;

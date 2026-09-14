@@ -15,13 +15,14 @@ import { ENV } from '$lib/server/env.server.js';
 import { acePromptPreflightTool } from '$lib/server/ai/ace-prompt-preflight-tool.js';
 import { callGemma4WithTools, type Gemma4Tool, type Gemma4ToolCallResult } from './gemma4-codeintel.js';
 import { parseQdrantResponse } from '$lib/server/qdrant/parse-qdrant-json.js';
+import { CANONICAL_SOURCE_COLLECTION } from '$lib/server/vector/vector-contracts.js';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Tool definitions + executors
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
- * search_codebase — semantic search against the Qdrant codebase_chunks_768_v2 collection.
+ * search_codebase — semantic search against the declared Qdrant semantic collection.
  * Returns top-K chunk summaries + file paths for Gemma 4 to reason over.
  */
 const searchCodebase: Gemma4Tool = {
@@ -59,7 +60,7 @@ const searchCodebase: Gemma4Tool = {
         : undefined;
 
       const qdrantResp = await fetch(
-        `${ENV.QDRANT_URL}/collections/codebase_chunks_768_v2/points/query`,
+        `${ENV.QDRANT_URL}/collections/${CANONICAL_SOURCE_COLLECTION}/points/query`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -109,7 +110,7 @@ const getClusterSummary: Gemma4Tool = {
 
     try {
       const qdrantResp = await fetch(
-        `${ENV.QDRANT_URL}/collections/codebase_chunks_768_v2/points/scroll`,
+        `${ENV.QDRANT_URL}/collections/${CANONICAL_SOURCE_COLLECTION}/points/scroll`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

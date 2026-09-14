@@ -224,10 +224,10 @@ export const COLLECTION_CONTRACTS: Record<string, CollectionContract> = {
 };
 
 /** Active rebuildable semantic projection — native EmbeddingGemma semantic_768. */
-export const CANONICAL_SOURCE_COLLECTION = 'codebase_chunks_768_v2' as const;
+export const CANONICAL_SOURCE_COLLECTION = 'codebase_chunks_768' as const;
 
-/** Pre-v2 768 reference collection; dimension is still 768, authority is not. */
-export const REFERENCE_SOURCE_COLLECTION = 'codebase_chunks_768' as const;
+/** Comparison/challenger 768 collection; authority is not implied by its suffix. */
+export const REFERENCE_SOURCE_COLLECTION = 'codebase_chunks_768_v2' as const;
 
 /** @deprecated Legacy 384 hybrid migration/reference lane; never canonical. */
 export const CANONICAL_HYBRID_COLLECTION = 'codebase_chunks_384_hybrid' as const;

@@ -7,7 +7,7 @@
  * Flow:
  *   1. Read ACE-validated packet from Postgres
  *   2. Generate or load embedding vector (768-dim)
- *   3. Upsert to Qdrant codebase_chunks_768 with metadata
+ *   3. Upsert to the declared Qdrant semantic collection with metadata
  *   4. Cache in Redis under bifrost:sem:packet:{packet_key} (24h TTL) -- fixed
  *      2026-09-04 (BITFROST-INVALIDATION-OWNER-01): this doc comment and the
  *      code below both used to say/use bifrost:packet:{packet_key}, a shape
@@ -25,6 +25,7 @@ import { invalidateBitfrostPacket } from '$lib/server/cache/atlas-reward-cache.j
 import { eq, sql } from 'drizzle-orm';
 import { toRedisValue, type SemanticPacketDomainObject as RedisPacketProjection } from '$lib/server/atlas/projections/redis-packet-projection.js';
 import { buildCanonicalAcePacketEnvelope } from './canonical-packet-envelope.js';
+import { CANONICAL_SOURCE_COLLECTION } from '$lib/server/vector/vector-contracts.js';
 
 export interface MaterializeOptions {
   packetKey: string;
@@ -44,7 +45,7 @@ export interface MaterializeResult {
   duration: number;
 }
 
-const DEFAULT_COLLECTION = 'codebase_chunks_768';
+const DEFAULT_COLLECTION = CANONICAL_SOURCE_COLLECTION;
 const DEFAULT_REDIS_TTL = 86400; // 24 hours
 const VECTOR_DIM = 768;
 
@@ -382,7 +383,7 @@ export async function getPacketMaterializationStatus(packetKey: string): Promise
     // Check Qdrant by packet identity. Do not use a zero-vector proxy.
     let inQdrant = false;
     try {
-      const response = await qdrant.scroll('codebase_chunks_768', {
+      const response = await qdrant.scroll(DEFAULT_COLLECTION, {
         limit: 1,
         with_payload: true,
         with_vector: false,

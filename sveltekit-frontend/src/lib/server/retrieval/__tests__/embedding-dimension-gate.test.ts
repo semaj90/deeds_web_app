@@ -14,15 +14,15 @@ import { VECTOR_INDEX_REGISTRY } from '$lib/server/vector/vector-index-registry.
  * The dynamic half of this proof (a 768-lane call never silently accepting
  * a short/384-dim vector) lives in embedding-service.test.ts — this file
  * covers the static half: the registry entry retrieve-candidates.ts's
- * retrieveQdrant() hardcodes (`VECTOR_INDEX_REGISTRY.qdrantSource768V2`,
+ * retrieveQdrant() uses (`VECTOR_INDEX_REGISTRY.qdrantSource768`,
  * see retrieve-candidates.ts:365,428) really is the 768-dim canonical
  * contract, not a 384 lane under a misleading name.
  */
 describe('canonical SearchRuntime dense lane — embedding dimension contract', () => {
-  it('qdrantSource768V2 (the entry retrieveQdrant() actually queries) declares a 768-dim, canonical, unmutated EmbeddingGemma contract', () => {
-    const entry = VECTOR_INDEX_REGISTRY.qdrantSource768V2;
+  it('qdrantSource768 (the entry retrieveQdrant() actually queries) declares a 768-dim, canonical, unmutated EmbeddingGemma contract', () => {
+    const entry = VECTOR_INDEX_REGISTRY.qdrantSource768;
 
-    expect(entry.collection).toBe('codebase_chunks_768_v2');
+    expect(entry.collection).toBe('codebase_chunks_768');
     expect(entry.vectorContract.dimension).toBe(768);
     expect(entry.vectorContract.sourceDimension).toBe(768);
     expect(entry.vectorContract.outputDimension).toBe(768);

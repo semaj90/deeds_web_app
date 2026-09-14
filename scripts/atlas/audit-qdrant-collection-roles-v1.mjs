@@ -98,8 +98,64 @@ const snapshotFilesResult = command('docker', ['exec', 'legal-ai-qdrant', 'find'
 const snapshotFiles = snapshotFilesResult.available ? snapshotFilesResult.output.split(/\r?\n/).filter(Boolean).sort() : [];
 const consumers = scanConsumers();
 const reviewOnlyPath = /audit|backfill|legacy|migration|test|spec|report|manifest|contract|archive/i;
-const activeLegacy384Consumers = consumers.filter((file) => /codebase_chunks_384|content_embedding_384|dense_384|summary_embedding_384/i.test(file) && !reviewOnlyPath.test(file));
-const activeV2Consumers = consumers.filter((file) => /codebase_chunks_768_v2/i.test(file) && !reviewOnlyPath.test(file));
+const runtimeSourcePath = /^(?:sveltekit-frontend[\\/]src[\\/]|packages[\\/][^\\/]+[\\/]src[\\/]|services[\\/])/i;
+const challengerCompatibilityPath = /(?:vector-index-registry|collection-aliases|qdrant-summary-sync|config[\\/]vector-config)\.(?:ts|js)$/i;
+const legacyCompatibilityPath = /(?:vector-snapshots|feature-matrix-schema|okf-topic-ingestion|property-dimensions|embedding-service|resolve-embedding-lane|qdrant-multivector-schema|qdrant-packet-projection|rrf-integration|search-backend|retrieval[\\/]types|retrieval[\\/]retrieve-candidates|atlas[\\/]retrieval[\\/]qdrant-semantic-projection)\.(?:ts|js|mjs)$/i;
+const isCommentLine = (line) => /^\s*(?:\/\/|\/\*|\*|\*\/)/.test(line);
+const sourceReferenceDetails = (text, needle) => text.split(/\r?\n/).flatMap((line, index) => {
+  if (!line.includes(needle)) return [];
+  return [{ line: index + 1, text: line.trim().slice(0, 240), kind: isCommentLine(line) ? 'COMMENT' : 'EXECUTABLE_OR_CONFIG' }];
+});
+const consumerTexts = new Map(consumers.flatMap((relativePath) => {
+  const fullPath = path.join(root, relativePath);
+  return fs.existsSync(fullPath) ? [[relativePath, fs.readFileSync(fullPath, 'utf8')]] : [];
+}));
+const activeLegacy384Consumers = consumers.filter((file) => {
+  const text = consumerTexts.get(file) ?? '';
+  if (!runtimeSourcePath.test(file) || reviewOnlyPath.test(file) || challengerCompatibilityPath.test(file) || legacyCompatibilityPath.test(file)) return false;
+  return text.split(/\r?\n/).some((line) => !isCommentLine(line) && /codebase_chunks_384|content_embedding_384|dense_384|summary_embedding_384/i.test(line));
+});
+const activeV2Consumers = consumers.filter((file) => {
+  if (!runtimeSourcePath.test(file) || reviewOnlyPath.test(file) || challengerCompatibilityPath.test(file)) return false;
+  return sourceReferenceDetails(consumerTexts.get(file) ?? '', 'codebase_chunks_768_v2')
+    .some((reference) => reference.kind === 'EXECUTABLE_OR_CONFIG');
+});
+const runtimeConsumerClassifications = consumers.flatMap((relativePath) => {
+  const text = consumerTexts.get(relativePath);
+  if (text === undefined) return [];
+  const mentionsV2 = /codebase_chunks_768_v2/.test(text);
+  const mentionsDeclared = /codebase_chunks_768(?!_v2)/.test(text);
+  if (!mentionsV2 && !mentionsDeclared) return [];
+  const reviewOnly = !runtimeSourcePath.test(relativePath) || reviewOnlyPath.test(relativePath);
+  const challengerCompatibility = challengerCompatibilityPath.test(relativePath);
+  const legacyCompatibility = legacyCompatibilityPath.test(relativePath);
+  const v2References = sourceReferenceDetails(text, 'codebase_chunks_768_v2');
+  const declaredReferences = sourceReferenceDetails(text, 'codebase_chunks_768');
+  const executableV2ReferenceCount = v2References.filter((reference) => reference.kind === 'EXECUTABLE_OR_CONFIG').length;
+  const executableDeclaredReferenceCount = declaredReferences.filter((reference) => reference.kind === 'EXECUTABLE_OR_CONFIG').length;
+  return [{
+    relativePath,
+    mentionsV2,
+    mentionsDeclaredCollection: mentionsDeclared,
+    v2References,
+    declaredReferences,
+    executableV2ReferenceCount,
+    executableDeclaredReferenceCount,
+    classification: reviewOnly
+      ? 'REVIEW_OR_HISTORICAL'
+      : challengerCompatibility
+        ? 'CHALLENGER_OR_COMPATIBILITY'
+      : legacyCompatibility
+        ? 'LEGACY_OR_COMPATIBILITY'
+      : executableV2ReferenceCount > 0 && executableDeclaredReferenceCount > 0
+        ? 'AMBIGUOUS_MULTI_COLLECTION_CALLER'
+        : executableV2ReferenceCount > 0
+          ? 'ACTIVE_RUNTIME_OWNER_CANDIDATE'
+          : executableDeclaredReferenceCount > 0
+            ? 'UNSUFFIXED_COLLECTION_CALLER_REQUIRES_CLASSIFICATION'
+            : 'COMMENT_OR_METADATA_ONLY',
+  }];
+});
 const activeSemantic = collections.filter((item) => item.role === 'ACTIVE_SEMANTIC_PROJECTION');
 const transientCandidateCollections = collections
   .filter((item) => /(^|[_-])(knn|topk|kmeans|som|pagerank)([_-]|$)/i.test(item.name))
@@ -144,6 +200,7 @@ if (collections.length > 0 && activeSemantic.length !== 1) violations.push('MULT
 if (!semanticOwnerChecks.postgresColumn) violations.push('POSTGRES_SEMANTIC_OWNER_CONTRACT_MISSING');
 if (!semanticOwnerChecks.qdrantCollection || !semanticOwnerChecks.qdrantVectorName) violations.push('QDRANT_SEMANTIC_OWNER_CONTRACT_MISSING');
 if (activeLegacy384Consumers.length > 0) violations.push('ACTIVE_LEGACY_384_CONSUMER_REFERENCES');
+if (activeV2Consumers.length > 0) violations.push('ACTIVE_COMPETING_768_CONSUMER_REFERENCES');
 if (transientCandidateCollections.length > 0) violations.push('PERSISTENT_TRANSIENT_CANDIDATE_COLLECTIONS');
 if (runtimeSemanticCollection && runtimeSemanticCollection !== 'codebase_chunks_768') violations.push('SEMANTIC_OWNER_RUNTIME_CONTRACT_CONFLICT');
 
@@ -167,7 +224,13 @@ const report = {
     snapshotFileCount: snapshotFiles.length,
     snapshotFiles,
   },
-  consumers: { count: consumers.length, files: consumers, activeLegacy384Consumers, activeV2Consumers },
+  consumers: {
+    count: consumers.length,
+    files: consumers,
+    activeLegacy384Consumers,
+    activeV2Consumers,
+    runtimeConsumerClassifications,
+  },
   candidateStorageChecks: {
     transientCandidateCollections,
     candidateSetsMustRemainEphemeral: transientCandidateCollections.length === 0,

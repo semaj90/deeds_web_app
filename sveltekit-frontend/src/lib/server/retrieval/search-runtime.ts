@@ -103,9 +103,9 @@ async function validateQdrantDimensions(): Promise<void> {
       return;
     }
 
-    if (activeCollection !== 'codebase_chunks_768_v2') {
+    if (activeCollection !== 'codebase_chunks_768') {
       console.warn(
-        `[search-runtime] canonical dense collection codebase_chunks_768_v2 is not active. Using ${activeCollection} as fallback until v2 is available.`
+        `[search-runtime] declared dense collection codebase_chunks_768 is not active. Using ${activeCollection} as fallback.`
       );
     }
 
@@ -254,7 +254,7 @@ export interface Candidate {
   identitySource?: 'symbol_version_id' | 'packet_key' | 'content_hash' | 'source_ref' | 'lane_id_fallback';
   /**
    * RF-QDRANT-HYDRATION-02 (2026-09-02): the Postgres-hydrated, `ProjectionRegistryV1`-validated
-   * canonical chunk identity for a `semantic_768`/`codebase_chunks_768_v2` dense hit. Populated
+   * canonical chunk identity for a `semantic_768`/`codebase_chunks_768` dense hit. Populated
    * ONLY when `resolveProjectionsBatch` confirms the Qdrant point's own `postgres_id` payload
    * agrees with its point id (fail-closed -- absent, not guessed, on `PROJECTION_NOT_FOUND` or
    * `CANONICAL_IDENTITY_MISMATCH`). This is observability/evidence only in this step: it is not

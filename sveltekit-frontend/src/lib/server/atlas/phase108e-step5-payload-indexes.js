@@ -1,4 +1,4 @@
-export const TARGET_COLLECTION = 'codebase_chunks_768_v2';
+export const TARGET_COLLECTION = 'codebase_chunks_768';
 export const CANDIDATE_FIELDS = [
   'postgres_id',
   'source_ref',
