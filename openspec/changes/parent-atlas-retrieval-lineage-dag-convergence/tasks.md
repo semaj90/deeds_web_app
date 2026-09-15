@@ -14253,3 +14253,49 @@ jest-dom setup issue, unrelated to this change, not chased here). Confidence ins
 live execution: the new function's transactional UPDATE+readback pattern executed successfully
 against the real database with `readbackVerified: true` at every step (dry-run precondition check,
 apply, and the independent downstream stage-5 audit re-run).
+
+## CURRENT-STRUCTURAL-LINEAGE-01's primary gate: architecturally blocked, not a data gap -- 2026-09-15
+
+With stage 5 closed, investigated whether the primary `content_hash`-based gate could be closed
+next (as opposed to left at its file-hash-ceiling state). Re-ran the live audit against `repo:root`:
+
+```
+status: CURRENT_PACKET_CHUNK_JOIN_UNPROVEN
+firstBlocker: CURRENT_CHUNK_EXACT_MATCH_MISSING
+exactChunkMatches: 0 / 24185 (missingChunks: 24185)
+exactChunkMatchesViaFileHash: 19498 / 24185 (80.6%, up from the earlier 27.7%/33.6% readings)
+```
+
+**This is not a data-population problem -- the primary gate compares two genuinely different hash
+grains by construction**: `codebase_chunk_index.content_hash` is chunk-scoped (a hash of one
+chunk's text, sometimes 16-char truncated), while
+`graphify_execution_file_membership_v2.content_hash` is whole-file-scoped. A chunk hash cannot
+equal a whole-file hash except by coincidence (e.g. a single-chunk file where the chunk happens to
+equal the full file bytes under an identical hash formula) -- no backfill, re-index, or writer fix
+can make these converge for the general case. Task 6.1's own design (see the code itself,
+`audit-selected-graphify-structural-lineage-v1.mjs`) already anticipated this and drew an explicit,
+hard-coded line: the whole-file-comparable `file_content_hash` join is documented in-code as
+"corroborating evidence only, never authorizes promotion" and "MUST NEVER feed
+report.status/firstBlocker/nextGate." This is the same class of situation as stage 5 -- a
+deliberate architectural boundary, not an accidental gap -- but with the opposite resolution
+shape: stage 5 had a missing artifact a narrow adapter could produce; this gate has two
+genuinely-incompatible identity grains that no adapter can reconcile without changing what "exact
+match" means.
+
+**Not attempting to silently promote `exactChunkMatchesViaFileHash` to satisfy this gate** -- doing
+so would be exactly the "informational evidence promoted to authorize a decision" pattern this
+repo's own evidence-integrity rules (and this script's own explicit code comment) exist to
+prevent. Two legitimate paths forward, both requiring an explicit human/architecture decision, not
+a script change I should make unilaterally:
+
+1. **Redefine the primary identity contract** for this gate to be file-scoped rather than
+   chunk-scoped (i.e. promote `file_content_hash` from corroborating evidence to primary gate) --
+   a real policy change with downstream consequences for anything else that currently assumes
+   `content_hash` is chunk-scoped.
+2. **Accept the file-hash ceiling (80.6% and climbing as more of the corpus gets indexed) as the
+   practical confidence level for this gate permanently**, and route `CandidateOrdinalMapV1`
+   promotion through a different, chunk-grain-native proof mechanism instead of this one --
+   avoids touching the existing chunk-scoped semantics at all.
+
+Neither implemented this pass. Recorded for the same explicit-decision handoff pattern as Gate 0A
+and stage 5.
