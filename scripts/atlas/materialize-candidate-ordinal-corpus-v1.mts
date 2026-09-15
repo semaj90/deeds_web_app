@@ -13,6 +13,19 @@
  * Outputs:
  *   docs/reports/candidate-ordinal-corpus-v1.json
  *   docs/reports/candidate-ordinal-corpus-receipt-v1.json
+ *
+ * TODO (stage-3 review, 2026-09-15): the last receipt (2026-08-27) materialized 4,951 rows
+ * directly from `atlas_packets` -- this query has NO join through
+ * `atlas_packet_chunk_lineage`/`codebase_chunk_index`, so that 4,951-row corpus is NOT
+ * lineage-qualified the way the separate 15-row canary (frozen in
+ * openspec/changes/parent-atlas-candidate-feature-execution-fabric) is. Before using this
+ * script to scale past 15 rows toward 128, add the lineage join (source_ref + source_revision
+ * -> atlas_packet_chunk_lineage -> chunk_row_id) and filter to PROVEN rows only, or this
+ * becomes exactly the "unqualified/aliased identity" scaling this repo's own tasks.md
+ * explicitly forbids. Real blocker is CURRENT-STRUCTURAL-LINEAGE-01's primary content_hash
+ * gate (still 0 exact matches as of 2026-09-15) plus the unresolved Graphify execution-owner
+ * ambiguity (Gate 0A) -- not this script's logic, which is otherwise correct for its current,
+ * narrower (unqualified) scope.
  */
 
 import fs from 'node:fs/promises';

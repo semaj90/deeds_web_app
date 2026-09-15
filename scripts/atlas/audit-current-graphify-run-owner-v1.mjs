@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /** Read-only audit of the current Graphify run owner and completion state. */
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
@@ -136,7 +136,9 @@ const report = {
 mkdirSync(dirname(REPORT), { recursive: true });
 let reportWriteError = null;
 try {
-  writeFileSync(REPORT, `${JSON.stringify(report, null, 2)}\n`);
+  const reportTemp = `${REPORT}.${process.pid}.tmp`;
+  writeFileSync(reportTemp, `${JSON.stringify(report, null, 2)}\n`);
+  renameSync(reportTemp, REPORT);
 } catch (error) {
   // The database audit is read-only and remains valid even if another process
   // temporarily locks the report artifact. Preserve the result on stdout.

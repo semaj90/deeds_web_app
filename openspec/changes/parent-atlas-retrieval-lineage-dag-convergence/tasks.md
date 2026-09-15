@@ -5907,6 +5907,11 @@ question, not silently assumed either way.
   in an SSE `data:` record. The probe now accepts JSON and SSE envelopes and passes
   `tools/list` 10/10 with 176 tools. `node --check` passes; no service, datastore,
   cache, or canonical writes occurred. This closes the probe false-negative only.
+- [x] **MCP transport recheck (2026-09-14)** -- reran the probe against
+  `http://127.0.0.1:8788/mcp`; `tools/list` succeeded `10/10`, returned `176`
+  tools on every iteration, with zero failures or timeouts. Protocol reachability
+  remains separate from identity-envelope delivery, optional tool enablement,
+  and canonical mutation authority.
 - [x] **Phase C** -- Policy reconciliation. `mcp-tool-policy-classifier-v1.ts` joins live tool
   refs against `atlas-tool-registry.ts`'s `permission`/`humanApproval` fields and
   `ACPToolRegistry.ts`'s `DRY_RUN_TOOLS` set -- read+reconcile only, no new execution allowlist.
@@ -11287,6 +11292,26 @@ Next gate: `GRAPHIFY-SNAPSHOT-BINDING-01`.
 
 Evidence: `docs/reports/current-workspace-packet-chunk-join-v1.json`.
 
+### GRAPHIFY-SNAPSHOT-BINDING-READBACK-RECHECK-2026-09-14
+
+- [x] Re-ran the snapshot-binding audit after the authority auditor was
+      changed to consume the explicit admitted tournament receipt.
+- [x] Confirmed the admitted revision is
+      `sha256:3e677c29319a4a60bc60803be4186ba108dce906945af593a3a6f5cf43d11881`.
+- [x] Confirmed the snapshot artifact has `25,066/25,291` exact source
+      readbacks and remains `SNAPSHOT_READBACK_BLOCKED`; the failures are
+      current-worktree drift/readback failures, not permission to relabel an
+      older execution.
+- [x] Confirmed `authority=false` and `writesPerformed=false`.
+- [ ] Re-capture or otherwise repair the immutable snapshot through its
+      authorized snapshot path, then bind one terminal execution to that exact
+      artifact before rerunning packet/chunk, semantic, or graph promotion
+      gates.
+
+Status: `GRAPHIFY_SNAPSHOT_BINDING_BLOCKED_SNAPSHOT_READBACK`; no current
+terminal execution is admitted. Evidence:
+`docs/reports/graphify-workspace-snapshot-binding-v1.json`.
+
 ## CURRENT-PACKET-CHUNK-JOIN-RECHECK-2026-09-10T21
 
 - [x] Re-ran the exact read-only current-workspace packet/chunk join audit.
@@ -11397,6 +11422,27 @@ Status: `CALLER_BASELINE_INCOMPLETE_MIGRATION_BLOCKED`;
 First blocker: `UNMAPPED_RRF_CALLERS`.
 Next gate: classify the 90 unmapped callers and resolve the 2 executor-as-lane
 entries without changing ranking behavior.
+
+Replay evidence: the existing cross-primitive, canonical-identity, and fusion
+contract suites pass `42/42`. This proves bounded fusion behavior and identity
+handling, but does not close caller ownership: the two live TurboVec sites still
+need an explicit logical-lane mapping and replay receipt.
+
+### RRF-CALLER-BASELINE-RECHECK-2026-09-14
+
+- [x] Refreshed the read-only caller census: `93` callers, `36` fusion callers,
+  `90` unmapped, `0` ambiguous, and `2` rejected executor-as-lane entries.
+- [x] Identified the two concrete executor-as-lane sites in
+  `sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.ts` at
+  lines `565` and `591`; both involve TurboVec and must be classified under the
+  existing logical semantic lane rather than treated as a new vote.
+- [ ] Build a fixture-based equivalence/replay receipt for those two sites,
+  then classify the remaining unmapped callers. Do not change production fusion
+  or weights until the replay proves the canonical owner mapping.
+
+Status remains `CALLER_BASELINE_INCOMPLETE_MIGRATION_BLOCKED`;
+`writesPerformed=false`; `migrationAuthorized=false`.
+Evidence: `docs/reports/rrf-caller-baseline-v1.json`.
 
 ## CORE-LANE-STRUCTURAL-ONTOLOGY-RECHECK-2026-09-10
 
@@ -11515,6 +11561,449 @@ Evidence: `scripts/startup/run-graphify-daily-startup.mjs`,
 Status: `IMPLEMENTED_NOT_LIVE_PROVEN`; authority=false;
 writesPerformed=false in this turn.
 First blocker remains `NO_TERMINAL_EXECUTION_MATCHES_ADMITTED_SNAPSHOT`.
+
+## WAVE-0-MIGRATION-OWNER-CROSS-REFERENCE-2026-09-14
+
+- [x] Confirmed the live packet revision schema axis exists, but
+  `atlas_packets.source_revision` is `NULL` for all `61,718` packet rows.
+- [x] Confirmed legacy integer `workspace_revision` and
+  `representation_revision` values do not establish the admitted immutable
+  snapshot/source lineage.
+- [x] Confirmed the canonical-owner revision migration remains additive-only,
+  unapplied, and promotion-blocked.
+- [ ] Keep packet/chunk, semantic, graph, and projection promotion blocked
+  until the canonical packet writer receives an admitted source revision and
+  passes bounded independent readback.
+
+Evidence: `docs/reports/packet-write-revision-contract-v1.json`,
+`docs/reports/canonical-owner-revision-migration-safety-v1.json`.
+Status: `PACKET_SOURCE_REVISION_WRITER_INPUT_MISSING`;
+`writesPerformed=false`; `migrationApplied=false`.
+
+### CURRENT-GRAPHIFY-SOURCE-REVISION-RECHECK-2026-09-14
+
+- [x] Reran the existing source-revision audit read-only.
+- [x] Confirmed it selected completed bound run
+  `48485685-e773-4433-a1f8-00f5524cca44` by file-count heuristic, not by
+  admitted snapshot authority.
+- [x] Confirmed all `23758` rows have a source-revision value, but only
+  `23238` content matches; `506` mismatch and `14` unavailable rows remain.
+- [ ] Re-run this audit against a terminal execution explicitly bound to the
+  admitted snapshot; historical content matches cannot advance current source
+  authority.
+
+Status: `SOURCE_BYTES_NOT_PROVEN`; `writesPerformed=false`.
+Evidence: `docs/reports/current-graphify-source-revision-v1.json`.
+
+### CURRENT-SOURCE-REGISTRY-CONTRACT-RECHECK-2026-09-14
+
+- [x] Reran the source-registry contract audit read-only.
+- [x] Confirmed `atlas_source_refs` has `45856` rows and
+  `atlas_workspace_source_bindings` has `23480` rows, with the expected
+  validated foreign-key relationship.
+- [x] Confirmed the current source plan is empty (`selectedSourceCount=0`)
+  and exact registry/binding key agreement for that selected cohort is `0`;
+  no aliases or implicit joins were created.
+- [ ] Rebuild the source-selection input from an admitted terminal execution,
+  then measure exact registry coverage against that non-empty cohort.
+
+Status: `REGISTRY_CONTRACT_AUDITED_SOURCE_SELECTION_EMPTY`;
+`writesPerformed=false`.
+Evidence: `docs/reports/current-source-registry-contract-v1.json`.
+
+### CURRENT-SOURCE-REGISTRY-RECONCILIATION-RECHECK-2026-09-14
+
+- [x] Reran the existing reconciliation planner read-only.
+- [x] Confirmed `selectedSourceCount=0`, `registryMatchCount=0`, and
+  `registryMissingCount=0`; the empty result is a blocked input cohort, not
+  proof of registry completeness.
+- [ ] Rebuild the selection from a terminal execution bound to the admitted
+  snapshot, then rerun this planner against the non-empty selection.
+
+Status: `REGISTRY_RECONCILIATION_EMPTY`; `writesPerformed=false`.
+Evidence: `docs/reports/current-source-registry-reconciliation-plan-v1.json`.
+
+### CURRENT-STRUCTURAL-SYMBOL-RESOLUTION-RECHECK-2026-09-14
+
+- [x] Re-ran the read-only structural symbol resolution proof for the current
+      bounded input.
+- [x] Confirmed `461` nominations are AST/tree-bound with `461` exact span-hash
+      matches and no invalid, ambiguous, or missing AST matches.
+- [x] Confirmed all `461` nominations fail the admitted workspace-revision
+      check; stable-symbol and symbol-version resolution were not attempted.
+- [x] Confirmed `canonicalWrites=0`, `structuralEdgeWrites=0`, and
+      `databaseWrites=0`.
+- [ ] Rebuild nominations from a snapshot-bound current execution, then rerun
+      stable symbol and symbol-version resolution before any registry promotion.
+
+Status: `READ_ONLY_BLOCKED`;
+`firstBlockingInvariant=NOMINATIONS_NOT_BOUND_TO_ADMITTED_WORKSPACE_REVISION`.
+Evidence: `docs/reports/current-structural-symbol-resolution-v1.json`.
+
+### PACKET-WRITE-REVISION-CONTRACT-RECHECK-2026-09-14
+
+- [x] Reran the packet-writer revision contract audit in read-only mode.
+- [x] Confirmed the live `source_revision` column exists.
+- [x] Confirmed the writer contract is only partially proven: packet-key
+  identity semantics remain unproven, and the inspected tool identity update
+  does not populate source or packet identity fields.
+- [ ] Reconcile canonical packet-writer inputs with admitted execution/source
+  membership before any packet backfill or revision promotion.
+
+Status: `PARTIAL_PROVEN`; `sourceRevisionColumnExistsLive=true`;
+`writesPerformed=false`.
+Evidence: `docs/reports/packet-write-revision-contract-v1.json`.
+
+### PACKET-REGISTRY-WRITER-OWNERSHIP-RECHECK-2026-09-14
+
+- [x] Reran the read-only packet-registry writer ownership census.
+- [x] Confirmed live parity is currently complete: `61718` packets,
+  `61718` registry rows, `0` missing registry rows, `0` orphan rows, and
+  `0` duplicate registry keys.
+- [x] Found ownership is not resolved: `4` runtime canonical-writer
+  candidates and `2` production-capable unowned writers remain; `107`
+  candidate paths were inspected.
+- [ ] Reconcile the four runtime candidates and explicitly assign packet-key,
+  source-revision, workspace-revision, and conflict-policy ownership before
+  defining or running a packet writer.
+
+Status: `OWNER_RECONCILIATION_REQUIRED`; `writesPerformed=false`.
+Evidence: `docs/reports/packet-registry-writer-ownership-v1.json`.
+The complete registry parity result does not authorize identity mutation or
+source-revision backfill.
+
+### PACKET-WORKSPACE-BINDING-JOINABILITY-RECHECK-2026-09-14
+
+- [x] Removed the hard-coded historical workspace revision from the joinability
+  audit; it now requires `--workspace-revision` or a valid tournament-admission
+  receipt.
+- [x] Reran against admitted revision `sha256:3e677c29319a4a60bc60803be4186ba108dce906945af593a3a6f5cf43d11881`.
+- [x] Confirmed `61829` packets total, `16509` joined to workspace bindings,
+  and `0` joined to the admitted revision.
+- [ ] Reconcile packet source references and revisions with the admitted
+  execution before packet/chunk lineage or semantic admission.
+
+Status: `CURRENT_PACKET_WORKSPACE_JOIN_BLOCKED`; `writesPerformed=false`.
+Evidence: `scripts/atlas/audit-atlas-packets-workspace-binding-joinability-v1.mjs`.
+
+### PACKET-WORKSPACE-BINDING-JOINABILITY-RECEIPT-2026-09-14
+
+- [x] Added atomic JSON receipt emission while preserving the existing stdout
+  result; the audit remains read-only.
+- [x] Recorded the admitted revision and current counts in a durable report:
+  `61829` total packets, `16509` historical binding joins, and `0` joins to
+  the admitted revision.
+- [ ] Reconcile the zero admitted joins against the terminal execution/source
+  membership before packet or semantic promotion.
+
+Status: `CURRENT_PACKET_WORKSPACE_JOIN_BLOCKED`; `writesPerformed=false`.
+Evidence: `docs/reports/atlas-packets-workspace-binding-joinability-v1.json`.
+
+### PACKET-WRITER-CANDIDATE-RECONCILIATION-RECHECK-2026-09-14
+
+- [x] Inspected the ownership census output rather than treating its four
+  candidates as one equivalent writer.
+- [x] Confirmed the current census still reports `runtimeCanonicalWriterCount=4`
+  and `productionCapableUnownedCount=2`.
+- [x] Kept the dead/legacy candidate, outbox promotion path, topology identity
+  path, and unowned promotion paths distinct; static mutation reachability is
+  not proof of canonical ownership.
+- [ ] Perform a caller- and contract-level reconciliation for each candidate,
+  explicitly assigning packet-key, source-revision, workspace-revision, and
+  conflict-policy ownership before any writer is enabled.
+
+Status: `CANDIDATE_RECONCILIATION_OPEN`; `writesPerformed=false`.
+Evidence: `docs/reports/packet-registry-writer-ownership-v1.json`.
+
+### CURRENT-GRAPHIFY-RUN-OWNER-RECHECK-2026-09-14
+
+- [x] Ran the current-run-owner audit with the explicit admitted workspace
+  revision.
+- [x] Confirmed the audit selected its revision from the tournament-admission
+  receipt and found `runCount=0`, `completedOwnerCount=0`, and
+  `coordinatorExecutionCount=0`.
+- [ ] Obtain a separately authorized terminal execution and fresh V2 source
+  membership readback; historical bound `graphify_runs` remain non-current.
+
+Status: `GRAPHIFY_RUN_OWNER_BLOCKED`; `readOnly=true`; `writesPerformed=false`.
+Evidence: `docs/reports/current-graphify-run-owner-v1.json`.
+
+### CURRENT-GRAPHIFY-RUN-OWNER-REPORT-RELIABILITY-RECHECK-2026-09-13
+
+- [x] Fixed stable receipt emission to use a per-process temporary file and
+      atomic rename on Windows.
+- [x] Re-ran the audit with a fresh receipt: admitted revision
+      `sha256:3e677c…`, `runCount=0`, `completedOwnerCount=0`, and
+      `coordinatorExecutionCount=0`.
+- [x] Confirmed `reportWriteError=null` and `readOnly=true`.
+- [ ] Obtain a terminal Graphify execution explicitly bound to the admitted
+      snapshot; this remains the authority prerequisite for packet/chunk and
+      semantic promotion.
+
+Status: `GRAPHIFY_RUN_OWNER_BLOCKED`; authority=false; writesPerformed=false.
+
+Evidence: `scripts/atlas/audit-current-graphify-run-owner-v1.mjs`;
+`docs/reports/current-graphify-run-owner-v1.json`.
+
+## GRAPHIFY-EXECUTION-SNAPSHOT-OWNER-02 — V2 membership preference recheck (2026-09-14)
+
+- [x] Snapshot-binding audit now prefers populated
+  `graphify_execution_file_membership_v2` exclusively for an execution.
+- [x] Legacy `graphify_execution_files` is used only when the V2 membership
+  table has no rows for that execution; the two evidence populations are never
+  concatenated for source counts or membership checksums.
+- [x] Audit records `membershipSource` so V2 evidence and the legacy bridge
+  cannot be mistaken for equivalent authority.
+- [ ] Prove one terminal execution whose V2 membership exactly matches the
+  admitted snapshot and workspace revision.
+
+Status: `IMPLEMENTED_READ_ONLY`; current execution authority remains blocked.
+The bounded ACE fail-closed proof is independent and does not authorize
+Graphify, packet/chunk repair, semantic promotion, or projection writes.
+Evidence: `scripts/atlas/audit-graphify-workspace-snapshot-binding-v1.mts`.
+The current rerun was unable to replace the shared report because Windows
+returned `EPERM`; no fallback write or data mutation was attempted.
+
+### GRAPHIFY-SNAPSHOT-BINDING-READBACK-01 — native execution recheck (2026-09-14)
+
+- [x] Ran the existing snapshot-native readback against the admitted snapshot.
+- [x] Confirmed `executionId=null`, `selectedSourceCount=25291`,
+  `membershipV2Count=0`, and `missingMembershipCount=25291`.
+- [ ] Bind a terminal Graphify execution to the admitted snapshot, then reread
+  immutable V2 membership before advancing packet/chunk lineage.
+
+Status: `SNAPSHOT_NATIVE_READBACK_BLOCKED` / `PARTIAL_PROVEN`.
+Blockers: `NO_TERMINAL_EXECUTION_MATCHES_ADMITTED_SNAPSHOT` and
+`SNAPSHOT_MEMBERSHIP_MISSING`. Evidence:
+`docs/reports/graphify-snapshot-native-readback-v1.json`.
+
+Implementation disposition: this is an execution-production gate, not an
+auditor gap. The tournament receipt admits the workspace revision but keeps
+`graphifyExecutionAuthorized=false`; therefore no existing historical run may
+be relabeled and no packet/chunk or semantic writer may use the empty readback.
+The next authorized operation must be a snapshot-native terminal Graphify run
+that writes immutable V2 membership, followed by this same readback audit.
+
+### GRAPHIFY-EXECUTION-SNAPSHOT-OWNER-02 recheck — 2026-09-14
+
+- [x] Added a diagnostic-only `--report` output override so a locked shared
+  receipt cannot prevent recording an otherwise completed read-only audit.
+- [x] Reran the snapshot-binding audit against the admitted manifest. It
+  inspected `32` completed executions and found `0` matching the admitted
+  workspace revision.
+- [x] Confirmed the admitted snapshot readback is still blocked by `220`
+  `SOURCE_BYTES_CHANGED` violations and `1` `SOURCE_FILE_MISSING` violation.
+- [ ] Obtain a snapshot-native terminal Graphify execution with V2 immutable
+  membership, exact source readback, and the admitted workspace revision.
+
+Status: `GRAPHIFY_SNAPSHOT_BINDING_BLOCKED_SNAPSHOT_READBACK`;
+`matchingExecutions=0`; `writesPerformed=false`.
+Evidence: `docs/reports/graphify-workspace-snapshot-binding-v1-rerun-20260914.json`.
+The report override changes only diagnostic output location; it does not alter
+selection, authority, or mutation behavior.
+
+### CURRENT-SNAPSHOT-READBACK-BLOCKER-2026-09-14
+
+- [x] Re-ran the existing read-only snapshot-binding audit against the current
+      tournament admission rather than relying on the older `ea92e7...` report.
+- [x] Confirmed the active admission pair is workspace revision
+      `sha256:3e677c29319a4a60bc60803be4186ba108dce906945af593a3a6f5cf43d11881`
+      and snapshot revision
+      `sha256:48e1dbb326a4e249dc550cf1df06da8ec82ca4a837dd93eca114e4bafb2747e8`.
+- [x] Confirmed snapshot byte readback is incomplete: `25,096/25,291` exact
+      matches and `195` readback violations.
+- [x] Confirmed `32` terminal execution candidates were observed, but none may
+      be admitted while snapshot readback is blocked; `writesPerformed=false`.
+- [ ] Reconcile or regenerate the immutable snapshot artifact so all selected
+      bytes read back exactly, then rerun execution-membership binding against
+      that same snapshot checksum.
+- [ ] Do not start Graphify, relabel an historical execution, or advance
+      packet/chunk, semantic, graph, or projection admission from partial
+      readback.
+
+Status: `GRAPHIFY_SNAPSHOT_BINDING_BLOCKED_SNAPSHOT_READBACK`; authority=false;
+terminal execution admission=false; writesPerformed=false.
+
+Evidence: `docs/reports/graphify-workspace-snapshot-binding-v1.json`;
+`docs/reports/workspace-revision-tournament-admission-v1.json`.
+
+Next gate: `SNAPSHOT_BYTES_READBACK_RECONCILIATION_REQUIRED`.
+
+### SNAPSHOT-READBACK-FAILURE-CLASSIFICATION-2026-09-14
+
+- [x] Extended `validateSnapshot()` with machine-readable per-source failure
+      details while preserving the existing stable
+      `SOURCE_READBACK_FAILED:<sourceRef>` aggregate contract.
+- [x] Added failure counts distinguishing `SOURCE_BYTES_CHANGED`,
+      `SOURCE_FILE_MISSING`, `UNSAFE_PATH`, and generic readback errors.
+- [x] Re-ran the snapshot-binding audit against the current admitted pair.
+- [x] Current readback: `25,071/25,291` exact, `219` changed-byte paths, and
+      `1` missing path; `32` execution candidates remain unadmitted.
+- [x] Passed the snapshot capture/readback contract test (`1/1`) and retained
+      `writesPerformed=false`.
+- [ ] Stabilize or recapture the immutable snapshot from an authorized clean
+      source state, then require a zero-violation readback before execution
+      membership can become current authority.
+
+Status: `SNAPSHOT_READBACK_BLOCKED_BY_WORKTREE_DRIFT`; authority=false;
+execution admission=false; writesPerformed=false. The changed-byte count is
+not a reason to overwrite the snapshot or relabel historical executions.
+
+Evidence: `docs/reports/graphify-workspace-snapshot-binding-v1.json`;
+`scripts/atlas/lib/workspace-snapshot-capture-v1.mts`;
+`scripts/atlas/workspace-snapshot-capture-v1.test.mts`.
+
+Next gate: `IMMUTABLE_SNAPSHOT_ZERO_VIOLATION_READBACK_REQUIRED`.
+
+### CRITICAL-LINEAGE-LIVE-READBACK-2026-09-14
+
+- [x] Ran the repeatable-read, read-only critical-lineage catalog audit.
+- [x] Confirmed all six required relations are live: `atlas_packet_chunk_lineage`,
+      `atlas_packets`, `codebase_chunk_index`, `graphify_execution_files`,
+      `graphify_executions`, and `graphify_files`.
+- [x] Recorded live populations: `34` executions, `72,486` execution-file
+      rows, `7,421` lineage rows, `61,718` packets, and `55,853` chunks.
+- [x] Confirmed `atlas_packet_chunk_lineage.source_revision` is populated on
+      all `7,421` rows, while `atlas_packets.source_revision` is null on all
+      `61,718` rows and `codebase_chunk_index` has no revision columns.
+- [x] Kept migration and materialization closed; the audit reports
+      `migrationAuthorized=false` and `writesPerformed=false`.
+- [ ] Reconcile the current admitted execution/source cohort with packet and
+      chunk identity before proposing any nullable-column migration or
+      backfill.
+
+Status: `CRITICAL_LINEAGE_SCHEMA_PRESENT_CURRENTNESS_UNPROVEN`;
+authority=false; migrationAuthorized=false; writesPerformed=false.
+
+Evidence: `docs/reports/critical-lineage-live-readback-v1.json`.
+
+Next gate: `CURRENT_EXECUTION_SOURCE_PACKET_CHUNK_RECONCILIATION`.
+
+### CURRENT-MEMBERSHIP-NAMESPACE-BRIDGE-2026-09-14
+
+- [x] Re-ran the selected immutable execution-membership bridge audit for
+      `cbcd35c6-b26c-4d1a-a08b-9aa16a1afbcc`.
+- [x] Confirmed `25,291` membership rows span `7` repository namespaces, while
+      the current source registry exposes only the canonical `deeds-web-app`
+      repository namespace.
+- [x] Confirmed exact repository/path joins are `0`; path-only matches are not
+      admitted because all `32,959` observed matches lack an authorized
+      repository identity mapping.
+- [x] Confirmed source-identity links remain bounded (`788`), with `577`
+      proven lineage rows; `writesPerformed=false`.
+- [x] Re-ran the workspace namespace audit: workspace identity and root
+      repository scope are proven, but it supplies no authorized aliases for
+      the other six membership namespaces.
+- [ ] Resolve the repository namespace bridge from an authoritative manifest or
+      exclude non-root repositories from the current execution cohort before
+      packet/chunk lineage can close.
+
+Status: `CURRENT_MEMBERSHIP_BRIDGE_BLOCKED_REPOSITORY_NAMESPACE_MISMATCH`;
+authority=false. Bare path matching, `repo:root` guessing, Qdrant IDs, and
+filesystem position remain non-authoritative.
+
+Evidence: `docs/reports/selected-membership-bridge-v1.json`;
+`docs/reports/workspace-source-namespace-v1.json`.
+
+Next gate: `AUTHORIZED_REPOSITORY_NAMESPACE_MAPPING_REQUIRED`.
+
+### SOURCE-NAMESPACE-OWNER-RECHECK-2026-09-14
+
+- [x] Refreshed the existing source-namespace authority proof.
+- [x] Confirmed canonical repository identity remains `deeds-web-app` with
+      workspace namespace authority proven and `syntheticNamespaceCount=0`.
+- [x] Confirmed the source registry sample is only `50` rows with `0/50`
+      registry coverage for the selected membership cohort; no execution alias
+      was produced by the owner proof.
+- [ ] Classify each non-root execution namespace from an authoritative
+      workspace/repository manifest, or remove it from the current cohort by
+      an explicit source-selection decision; do not infer aliases from paths.
+
+Status: `SOURCE_NAMESPACE_OWNER_PROVEN_EXECUTION_ALIASES_MISSING`;
+authority=false; writesPerformed=false.
+
+Evidence: `docs/reports/source-namespace-authority-v1.json`;
+`docs/reports/selected-membership-bridge-v1.json`.
+
+Next gate: `EXECUTION_NAMESPACE_MANIFEST_RECONCILIATION_REQUIRED`.
+
+### CURRENT-SNAPSHOT-NATIVE-EXECUTION-RECHECK-2026-09-14
+
+- [x] Ran the existing snapshot-native execution readback against the current
+      tournament admission.
+- [x] Confirmed the admitted snapshot contains `25,291` sources, but no
+      terminal execution matches its admitted workspace revision.
+- [x] Confirmed selected V2 execution membership is `0` with
+      `25,291` missing membership rows; the result is
+      `SNAPSHOT_NATIVE_READBACK_BLOCKED`.
+- [x] Kept the historical `cbcd35c6...` execution and its multi-repository
+      membership evidence separate; it cannot satisfy the newer admission.
+- [x] Confirmed `writesPerformed=false`; no execution, namespace, packet,
+      chunk, or projection mutation was attempted.
+- [ ] Obtain an explicitly authorized snapshot-native terminal Graphify
+      execution for the current admitted revision, then read back its immutable
+      V2 membership checksum before any downstream admission.
+
+Status: `NO_TERMINAL_EXECUTION_MATCHES_CURRENT_ADMITTED_SNAPSHOT`;
+authority=false; writesPerformed=false.
+
+Evidence: `docs/reports/graphify-snapshot-native-readback-v1.json`;
+`docs/reports/workspace-revision-tournament-admission-v1.json`.
+
+Next gate: `AUTHORIZED_SNAPSHOT_NATIVE_GRAPHIFY_EXECUTION_REQUIRED`.
+
+### GRAPHIFY-SNAPSHOT-CONSUMER-PREFLIGHT-RECHECK-2026-09-14
+
+- [x] Ran the existing read-only snapshot-consumer preflight against the
+      admitted workspace/snapshot pair.
+- [x] Confirmed the source-selection checksum matches the snapshot membership
+      checksum, with `25,291` sources across `7` repositories and no duplicate
+      identities.
+- [x] Confirmed no live inventory builder calls, Git revision derivation,
+      unexpected repository discovery, child apply commands, or persistent
+      writes were observed.
+- [x] Confirmed the actual consumer blocker is materialization availability:
+      `MATERIALIZED_SNAPSHOT_MISSING` and `MATERIALIZED_SOURCE_MISSING`, with
+      `25,291` missing sources and zero hash/size mismatch rows reported by the
+      preflight.
+- [x] Reviewed the existing materializer and kept it uninvoked because it
+      requires every current worktree byte to match the sealed snapshot and
+      would otherwise create a large partial staging tree before failing.
+- [ ] Establish an authorized clean source state or capture a new immutable
+      snapshot, materialize it successfully, and rerun this preflight before
+      any Graphify execution is permitted.
+
+Status: `GRAPHIFY_SNAPSHOT_CONSUMER_BLOCKED_MATERIALIZATION_MISSING`;
+authority=false; writesPerformed=false.
+
+Evidence: `docs/reports/graphify-snapshot-consumer-preflight-v1.json`;
+`scripts/atlas/materialize-workspace-source-snapshot-v1.mts`.
+
+Next gate: `AUTHORIZED_IMMUTABLE_SNAPSHOT_MATERIALIZATION_REQUIRED`.
+
+### ALTERNATE-MATERIALIZED-SNAPSHOT-CENSUS-2026-09-14
+
+- [x] Inspected existing local snapshot artifacts and materialized roots without
+      deleting, moving, or rewriting any artifact.
+- [x] Confirmed a complete materialized root exists for snapshot
+      `sha256:2c835984bad96dc7275161d74ebc56ea941536836fab151636427c317b3b2320`,
+      with `25,367` recorded sources across `7` repositories.
+- [x] Confirmed the currently admitted snapshot is different:
+      `sha256:48e1dbb326a4e249dc550cf1df06da8ec82ca4a837dd93eca114e4bafb2747e8`.
+- [x] Kept the alternate root as historical/non-admitted evidence; no snapshot
+      substitution, workspace-revision relabeling, or Graphify execution was
+      performed.
+- [ ] Obtain an explicit admission decision for which immutable snapshot is
+      current, then validate/materialize only that exact artifact before
+      execution binding.
+
+Status: `ALTERNATE_MATERIALIZATION_AVAILABLE_NOT_CURRENT_AUTHORITY`;
+authority=false; writesPerformed=false.
+
+Evidence: `docs/reports/workspace-source-snapshots/2c835984bad96dc7275161d74ebc56ea941536836fab151636427c317b3b2320.json`;
+`docs/reports/graphify-snapshot-consumer-preflight-v1.json`.
+
+Next gate: `CURRENT_SNAPSHOT_ADMISSION_AND_MATERIALIZATION_RECONCILIATION`.
 
 ### GRAPHIFY-TOURNAMENT-ADMISSION-AUDIT-CURRENTNESS-01 — 2026-09-11
 
@@ -11652,6 +12141,107 @@ Next gate: `GRAPHIFY-SNAPSHOT-BINDING-READBACK-01`.
       and its membership is independently read back.
 
 Evidence: `docs/reports/graphify-snapshot-native-readback-v1.json`.
+
+### CURRENT-SOURCE-EVIDENCE-HYDRATION-RECHECK — 2026-09-14
+
+- [x] Reran the existing read-only hydration audit after the snapshot-native
+  readback gate.
+- [x] Confirmed `24181` inputs and `23397` exact revision matches, but
+  `authoritativeNamespaces=0`, `evidenceSpanReady=0`, and
+  `classifierReady=0`.
+- [x] Fixed the Windows stable-report race with per-process temporary output
+  and atomic rename; the rerun produced the stable receipt successfully.
+- [x] Preserved the honest nullability split: `906` rows have content but no
+  source revision, while `23275` lack a canonical chunk owner.
+- [ ] Resolve the source namespace and canonical chunk-owner bridge against a
+  proven terminal execution; do not promote hydration rows from this audit.
+
+Status: `SOURCE_EVIDENCE_HYDRATION_BLOCKED`; `writes=0`.
+Evidence: `docs/reports/current-source-evidence-hydration-v1.json`.
+
+### CURRENT-SOURCE-EVIDENCE-HYDRATION-LIVE-RECHECK-2026-09-13
+
+Fresh read-only rerun confirms the source-evidence lane is measurable but not
+promotion-ready:
+
+- [x] Audited `24,181` source-registry inputs with `23,397` exact revision
+      matches and `906` content-hydrated rows.
+- [x] Recorded `0` authoritative namespaces, `0` evidence-span-ready rows, and
+      `0` classifier-ready rows; the audit performed `0` writes.
+- [x] Classified missing evidence as `23,275` rows lacking canonical chunk
+      ownership and `906` chunk-owner rows lacking source revision.
+- [ ] Establish the admitted terminal execution and immutable source membership
+      before creating canonical chunk ownership.
+- [ ] Reconcile whole-source and per-chunk digest grain explicitly; do not use a
+      whole-file digest as a per-chunk identity substitute.
+- [ ] Re-run evidence-span and classifier admission only after exact
+      workspace/source/packet/chunk lineage is proven.
+
+Status: `SOURCE_EVIDENCE_HYDRATION_BLOCKED`; current source authority remains
+unproven; no backfill, synthetic identity, or projection mutation is authorized.
+
+Evidence: `docs/reports/current-source-evidence-hydration-v1.json`.
+Next gate remains the immutable execution/snapshot binding, not semantic or
+graph promotion.
+
+### CURRENT-MEMBERSHIP-BRIDGE-CENSUS-01 — execution namespace recheck (2026-09-14)
+
+- [x] Reran the existing bridge census for execution
+  `cbcd35c6-b26c-4d1a-a08b-9aa16a1afbcc` in read-only mode.
+- [x] Confirmed `25291` selected memberships across `7` repositories,
+  `0` exact repository/path/source-reference joins, `0` exact source-revision
+  joins, and `32959` path-only matches with repository mismatch.
+- [x] Preserved the non-admission rule: bare paths, Qdrant IDs, and whole-file
+  hashes cannot replace repository-qualified source identity or chunk lineage.
+- [ ] Resolve the repository namespace bridge and rerun exact source/content
+  readback before packet/chunk repair or canonical symbol promotion.
+
+Status: `CURRENT_MEMBERSHIP_BRIDGE_INCOMPLETE`;
+`firstBlocker=REPOSITORY_NAMESPACE_MISMATCH`; `writesPerformed=false`.
+Evidence: `docs/reports/selected-membership-bridge-v1.json`.
+
+### CURRENT-WORKSPACE-PACKET-CHUNK-JOIN-REVISION-GUARD-2026-09-14
+
+- [x] Removed the diagnostic's unsafe lexical `MAX(workspace_revision)`
+  inference and replaced it with an explicit, SHA-256-shaped
+  `--workspace-revision` parameter.
+- [x] Invalid or absent explicit revisions are not treated as current
+  authority; the diagnostic remains read-only.
+- [ ] Complete a bounded live run and publish a fresh receipt proving the
+  parameterized mismatch counts. The first two invocations exceeded the
+  observation window and produced no replacement receipt.
+
+Status: `IMPLEMENTED_READ_ONLY_READBACK_TIMEOUT_NO_NEW_RECEIPT`;
+promotion=false; `writesPerformed=false`.
+Evidence: `scripts/atlas/audit-current-workspace-packet-chunk-join-v1.mjs`.
+
+### CURRENT-WORKSPACE-PACKET-CHUNK-JOIN-SCOPE-RECHECK-2026-09-13
+
+- [x] Added an explicit admitted-revision predicate to the binding census so
+      the main join no longer scans every historical workspace binding.
+- [x] Confirmed the no-argument safety guard fails closed with
+      `ADMITTED_WORKSPACE_REVISION_REQUIRED`.
+- [ ] Produce a terminal bounded receipt for the admitted revision; the
+      narrowed live invocation still exceeded the observation window and did
+      not replace the prior report.
+- [ ] Inspect the read-only query plan and reduce the remaining normalized
+      source/path join cost before interpreting packet/chunk counts.
+
+Status: `PARAMETERIZED_SCOPE_HARDENED_READBACK_NULL`; no zero-match claim is
+valid until a fresh receipt is written. `writesPerformed=false`;
+promotion=false. The prior timeout/null result is retained as evidence and
+does not authorize a fallback join, inferred revision, or backfill.
+
+### CURRENT-WORKSPACE-PACKET-CHUNK-JOIN-PERF-RECHECK-2026-09-14
+
+- [x] Consolidated the repeated mismatch subqueries into one joined aggregate,
+  retaining the explicit workspace-revision parameter.
+- [ ] Complete a live receipt: the bounded rerun still exceeded the observation
+  window, indicating the remaining cost is in the main source/packet/chunk
+  joins rather than only the mismatch diagnostics.
+
+Status: `READBACK_TIMEOUT_AFTER_QUERY_CONSOLIDATION`; no new authority claim;
+`writesPerformed=false`.
 Status: `SNAPSHOT_NATIVE_READBACK_BLOCKED`; authority=false;
 writesPerformed=false.
 First blocker: `NO_TERMINAL_EXECUTION_MATCHES_ADMITTED_SNAPSHOT`.
@@ -11668,6 +12258,22 @@ Next gate: separately authorized snapshot-native terminal Graphify execution.
       admitted workspace snapshot. No data or projection writes occurred.
 
 Evidence: `docs/reports/current-source-cohort-lineage-v1.json`.
+
+### CURRENT-SOURCE-COHORT-REVISION-GUARD-2026-09-14
+
+- [x] Removed the stale observation-artifact default as the preferred current
+  revision source.
+- [x] Added explicit `--workspace-revision` support with SHA-256 validation;
+  absent CLI input now prefers the authoritative tournament-admission receipt.
+- [x] Reran against admitted revision `sha256:3e677c29319a4a60bc60803be4186ba108dce906945af593a3a6f5cf43d11881`:
+  `52` source-revision-qualified rows, `0` workspace-qualified rows, and
+  `52` workspace mismatches.
+- [ ] Reconcile the cohort producer with the admitted execution; do not treat
+  source-revision equality alone as current-workspace admission.
+
+Status: `WORKSPACE_REVISION_SOURCE_MISMATCH`; `writesPerformed=false`.
+Evidence: `docs/reports/current-source-cohort-lineage-v1.json` and
+`scripts/atlas/audit-current-source-cohort-lineage-v1.mjs`.
 Status: `WORKSPACE_REVISION_SOURCE_MISMATCH`; authority=false;
 writesPerformed=false.
 First blocker: `CURRENT_SOURCE_COHORT_WORKSPACE_REVISION_MISMATCH`.
@@ -11900,6 +12506,322 @@ writesPerformed=false. First blocker: `CURRENT_CHUNK_EXACT_MATCH_MISSING`.
 Next gate: current source/packet/chunk reconciliation after a producer-bound
 current Graphify artifact exists.
 
+## CONTENT-HASH-FORMAT-HETEROGENEITY-01 — 2026-09-15
+
+- [x] Re-ran `scripts/atlas/audit-selected-graphify-structural-lineage-v1.mjs`
+      (read-only) against the currently-selected admitted execution: still
+      `0/25,271` exact chunk matches, `0/25,271` exact packet matches,
+      `CURRENT_PACKET_CHUNK_JOIN_UNPROVEN`, first blocker
+      `CURRENT_CHUNK_EXACT_MATCH_MISSING`. No regression since 2026-09-11 —
+      confirms this blocker has not moved despite the source-authority work
+      completed earlier this week.
+- [x] Root-caused `CURRENT_CHUNK_EXACT_MATCH_MISSING`, read-only: grouped
+      `codebase_chunk_index.content_hash` by string length. 16,702 rows are a
+      real 64-char SHA-256 hex digest (comparable); **39,114 rows (70% of the
+      55,853-row table) are a 16-character legacy hash that is structurally
+      not SHA-256**, and 37 rows are `NULL`. `graphify_execution_file_membership_v2`
+      is uniformly 64-char SHA-256 across all 351,065 rows — the break is
+      entirely on the `codebase_chunk_index` side.
+- [x] Ruled out a path-naming explanation: dropping the `content_hash`
+      requirement and joining on `source_ref` alone (same two tables) returns
+      `152,936` matching rows against `25,545` distinct membership source
+      refs — paths line up fine at scale; only the hash column is broken.
+- [x] This refines, and gives full scope to, the `204` "truncated hashes"
+      figure already recorded under `SOURCE-REF-NAMESPACE-RECONCILIATION-RECHECK-01`
+      (2026-09-11, same file) — that figure undercounted the real scope by
+      roughly 190×. Not a contradiction of that entry, a correction of its
+      magnitude.
+- [ ] Do not backfill, recompute, or route around the 39,114 short-hash /
+      37 null-hash rows without a separately authorized, dry-run-first plan.
+      The legacy hash algorithm's origin/writer was not identified this pass.
+
+Evidence: `docs/reports/content-hash-format-heterogeneity-v1.json`.
+Status: `CONTENT_HASH_FORMAT_ROOT_CAUSE_FOUND`; authority=false;
+writesPerformed=false. First blocker remains `CURRENT_CHUNK_EXACT_MATCH_MISSING`,
+now explained rather than merely observed.
+Next gate: identify the legacy hash writer/algorithm, then propose (not
+apply) a bounded backfill.
+
+## LEGACY-HASH-WRITER-IDENTIFICATION-01 — 2026-09-15
+
+- [x] Traced the 16-character legacy hash to its writer, read-only:
+      `sveltekit-frontend/scripts/codebase-semantic-indexer.ts` (lines 556,
+      567, 584, 677). It **is** SHA-256, not a different algorithm --
+      `createHash('sha256').update(text).digest('hex').slice(0, 16)`
+      truncates the real digest to its first 16 of 64 hex characters before
+      writing `content_hash: chunk.contentHash` straight to the column. The
+      same truncated value is embedded in `chunk_id` as
+      `card:${relPath}:${hash}`.
+- [x] Cross-referenced an already-existing, narrower finding: this exact
+      formula was independently identified 2026-08-21 in
+      `sveltekit-frontend/scripts/atlas/backfill-chunk-id-and-content-hash.mjs`'s
+      own header comment, for a different purpose (backfilling `chunk_id` on
+      6,908 rows with neither `chunk_id` nor `content_hash`). That prior
+      finding was never connected to the `CURRENT-STRUCTURAL-LINEAGE-01`
+      blocker until this entry.
+- [x] Found a second, independent root cause layered under the truncation
+      bug, read-only: `graphify_execution_file_membership_v2.content_hash`
+      (and its upstream source `public.graphify_files.content_hash`,
+      confirmed via `apply-file-level-source-refs-content-reconciled-v1.mjs`)
+      is a **whole-file** hash. Neither `codebase_chunk_index` writer read
+      this pass computes a whole-file hash: `codebase-semantic-indexer.ts`
+      hashes one chunk's partial text; `scripts/atlas/index-full-repo-for-search.mjs`
+      hashes the composite string `${relPath}:${idx}:${chunkText}`. Fixing
+      the truncation alone would not make the exact join succeed for any
+      file split into more than one chunk.
+- [ ] Only 2 of ~19 candidate writer files (found via grep across
+      `scripts/atlas/` and `sveltekit-frontend/scripts/`) were actually read
+      this pass. A genuine whole-file-hash writer for `codebase_chunk_index`
+      was not ruled out — do not treat this as an exhaustive writer audit.
+- [ ] Do not backfill, recompute, or route around either mismatch. Whether
+      `codebase_chunk_index` should even carry a whole-file-comparable
+      `content_hash` is a schema/contract decision, not a backfill task.
+
+Evidence: `docs/reports/content-hash-format-heterogeneity-v1.json`
+(`legacyHashWriterIdentified` and `deeperScopeMismatchFound` fields).
+Status: `LEGACY_HASH_WRITER_IDENTIFIED_SCOPE_MISMATCH_FOUND`; authority=false;
+writesPerformed=false. First blocker remains `CURRENT_CHUNK_EXACT_MATCH_MISSING`,
+now explained at two independent layers (format truncation + hash scope).
+Next gate: human decision on the intended `codebase_chunk_index.content_hash`
+contract (chunk-scoped vs whole-file-comparable) before any backfill design.
+
+## SIBLING-CHANGE-OPENED: parent-atlas-chunk-index-whole-file-hash — 2026-09-15
+
+- [x] Opened a sibling OpenSpec change,
+      `openspec/changes/parent-atlas-chunk-index-whole-file-hash/`, to resolve
+      the `CURRENT_CHUNK_EXACT_MATCH_MISSING` blocker recorded above. It is
+      an additive, dependent change — this change (`parent-atlas-retrieval-lineage-dag-convergence`)
+      remains the sole owner of `CURRENT-STRUCTURAL-LINEAGE-01` itself.
+- [x] All 4 artifacts complete and `openspec validate --strict` passes:
+      `proposal.md`, `design.md`,
+      `specs/codebase-chunk-index-hash-contract/spec.md`, `tasks.md`.
+- [ ] No migration, backfill, or writer code has been written or applied by
+      that change yet — its own tasks.md gates sections 3-6 behind separate
+      human authorization. Do not treat its existence as closing this
+      blocker; only a completed, authorized apply of its tasks 1-6 plus a
+      re-run of `audit-selected-graphify-structural-lineage-v1.mjs` reaching
+      `CURRENT_STRUCTURAL_LINEAGE_EXACT` closes it.
+
+Evidence: `openspec/changes/parent-atlas-chunk-index-whole-file-hash/`.
+Status: `SIBLING_CHANGE_PROPOSED_NOT_IMPLEMENTED`; authority=false;
+writesPerformed=false.
+
+## SIBLING-CHANGE-UPDATE: whole-file-hash migration applied + backfilled — 2026-09-15 (same day)
+
+- [x] The sibling change's migration was applied (5 additive columns + constraint + index on
+      `codebase_chunk_index`, explicit human authorization) and its `file_content_hash` column was
+      backfilled for 52,154/55,853 rows (93.4%; remainder is genuine deleted/renamed-file drift or
+      known `$lib/` alias paths — not a bug).
+- [x] Re-ran this change's own exact join
+      (`codebase_chunk_index.file_content_hash` = `graphify_execution_file_membership_v2.content_hash`
+      for the admitted execution, read-only): **10,787 exact matches, up from 0.**
+- [ ] `CURRENT-STRUCTURAL-LINEAGE-01` is NOT closed — 10,787/25,271 admitted-execution membership
+      rows matched is real progress, not full closure. `scripts/atlas/audit-selected-graphify-structural-lineage-v1.mjs`
+      itself was not yet updated to use the new column (sibling change task 6.1, still open) — this
+      entry records upstream data readiness, not this change's own gate status changing yet.
+
+Evidence: `docs/reports/backfill-codebase-chunk-index-file-content-hash-v1.json`.
+Status: `WHOLE_FILE_HASH_DATA_READY_JOIN_SCRIPT_NOT_YET_UPDATED`; authority=false;
+writesPerformed=false (this entry is read-only; the write happened in the sibling change).
+
+## FOLLOW-UP: file_content_hash join wired and re-run — 2026-09-15 (same day)
+
+- [x] `audit-selected-graphify-structural-lineage-v1.mjs` now also joins via `file_content_hash`,
+      additively (never replacing the existing `content_hash` join). Live re-run:
+      **`894` exact matches via `file_content_hash`, up from `0`**, out of `25,271` membership
+      rows (3.5%). Primary gate status is unchanged: `CURRENT_PACKET_CHUNK_JOIN_UNPROVEN`, not
+      `CURRENT_STRUCTURAL_LINEAGE_EXACT` -- this is real, verified progress, not closure.
+- [ ] Remaining 96% not investigated this pass: plausibly members from repositories other than
+      `repo:root` (`claude-mem`, `turbovec`, etc. -- 7 repositories total in this execution's
+      membership) that `codebase_chunk_index` never indexed in the first place, not a further
+      hash-format bug. Flagged as the real next question, not assumed.
+
+Evidence: `docs/reports/selected-graphify-structural-lineage-v1.json` (regenerated),
+`openspec/changes/parent-atlas-chunk-index-whole-file-hash/tasks.md` task 6.1.
+Status: `FILE_HASH_JOIN_WIRED_PARTIAL_MATCH_894_OF_25271`; authority=false; writesPerformed=false.
+
+## FOLLOW-UP: repository-coverage gap confirmed — 2026-09-15 (same day)
+
+- [x] Ran a read-only breakdown of membership rows vs. matches, grouped by `repository_id`, for
+      the admitted execution: `repo:root` (34,078 member rows, `10,787` matched — 31.6%);
+      `repo:claude-mem` (763 rows, `0` matched); `repo:mcp-server-mcp` (192, `0`);
+      `repo:turbovec` (86, `0`); `repo:sites/parent-atlas-gateboard` (22, `0`);
+      `repo:models/embeddinggemma_300m` (13, `0`); `repo:granite-docling-258M` (10, `0`).
+- [x] **Confirmed, not assumed**: all `1,086` non-`repo:root` member rows have exactly `0`
+      matches — `codebase_chunk_index` never indexed those 6 repositories at all. This is a
+      genuine scope gap (`codebase_chunk_index` appears to be a self-indexing artifact of this one
+      repo only), not a hash or join bug.
+- [ ] **Second, separate, still-open gap found**: even within `repo:root` alone, only `31.6%`
+      (`10,787/34,078`) of membership rows have a matching chunk row. Root cause not yet
+      investigated — candidates include incomplete indexing coverage, path-format drift between
+      the two tables, or genuinely deleted/renamed files (consistent with the backfill's own
+      3,662-row read-failure count). Not resolved this pass.
+
+Evidence: this session's live query (not yet persisted to a docs/reports/ file — a follow-up
+should formalize this as its own read-only audit script).
+Status: `REPOSITORY_COVERAGE_GAP_CONFIRMED_INTRA_REPO_GAP_STILL_OPEN`; authority=false;
+writesPerformed=false.
+
+## POLICY DECISION: CURRENT-STRUCTURAL-LINEAGE-01 scope narrowed to repo:root — 2026-09-15 (same day)
+
+- [x] **Operator decision**: `CURRENT-STRUCTURAL-LINEAGE-01`'s intended scope is `repo:root`
+      (this repository) only. The 6 other repositories present in the admitted execution's
+      membership snapshot (`claude-mem`, `mcp-server-mcp`, `turbovec`,
+      `sites/parent-atlas-gateboard`, `models/embeddinggemma_300m`, `granite-docling-258M` —
+      `1,086` member rows total, vendored/adjacent codebases swept up by the same Graphify crawl,
+      not this project's own source) are explicitly **out of scope** for this gate going forward.
+      `codebase_chunk_index` is not expected to index them, and their `0/1,086` match rate is not a
+      gap to close.
+- [ ] This does **not** close `CURRENT-STRUCTURAL-LINEAGE-01`. Recomputed against `repo:root`
+      membership only: `10,787/34,078` matched (`31.6%`), not `100%`. The real remaining question
+      is the intra-`repo:root` gap (`68.4%` unmatched) — not yet investigated, deliberately deferred
+      to a later session given this session's context budget.
+- [ ] `docs/reports/promotion-board-reconcile-v2.md`'s generator
+      (`scripts/atlas/audit-promotion-board-reconcile-v2.mjs`) and
+      `audit-selected-graphify-structural-lineage-v1.mjs` still compute `selectedMembershipRows`
+      across all 7 repositories, not `repo:root` alone — this policy decision is not yet reflected
+      as a code change in either script. Flagged, not fixed, this session.
+
+Status: `SCOPE_NARROWED_TO_REPO_ROOT_GATE_STILL_OPEN_31_6_PERCENT`; authority=false;
+writesPerformed=false.
+
+## FOLLOW-UP: audit-selected-graphify-structural-lineage-v1.mjs filtered to repo:root — 2026-09-15
+
+- [x] Added a `--repository-id` arg (default `'repo:root'`) to the membership query; moved to
+      top-level `const` scope after a `ReferenceError` (same block-scoping mistake as the earlier
+      `fileHashChunks` fix — should have caught the pattern sooner).
+- [x] Live re-run, correctly scoped now: `repositoryCount: 1`, `selectedMembershipRows: 24,185`
+      (matches the known distinct `repo:root` file count), `exactChunkMatchesViaFileHash: 894`
+      unchanged (expected — the 6 out-of-scope repos never contributed matches; only the
+      denominator is now honest, `894/24,185`).
+- [ ] `audit-promotion-board-reconcile-v2.mjs` was NOT updated — it only aggregates other reports'
+      output, has no direct repository-scoped query of its own to fix. Not a gap in that script.
+
+Status: `AUDIT_SCRIPT_SCOPE_FIX_APPLIED`; authority=false; writesPerformed=false.
+
+## ROOT CAUSE FOUND: intra-repo:root gap is a pure indexing-coverage gap — 2026-09-15 (same day)
+
+- [x] Ran one read-only query: of `24,185` distinct `repo:root` files in the admitted execution's
+      membership, only **`906` (3.7%) exist in `codebase_chunk_index` at all** (matched by
+      `source_ref`, no hash condition). Critically, `distinct_files_with_hash_present` is also
+      `906` — **every single file present in the table already has `file_content_hash`
+      populated.** The earlier backfill (task 5.2 of the sibling change) worked completely on
+      what it could reach.
+- [x] **Conclusion, confirmed not assumed**: this is a pure indexing-coverage gap, not a hash
+      format, join, or backfill defect. `codebase_chunk_index` was built from partial/historical
+      indexing runs (`index-full-repo-for-search.mjs`, the `codebase-semantic-indexer.ts` →
+      `mirror-qdrant-to-postgres.ts` pair) that never covered anywhere near the full `repo:root`
+      file set — 23,279 files (96.3%) were simply never indexed into this table at all, under any
+      column.
+- [ ] Closing this fully requires a much larger, separately-scoped task: a full-repo re-index into
+      `codebase_chunk_index` covering the missing 23,279 files (or an operator decision that this
+      gate's threshold doesn't require full coverage). Not started, not authorized this session —
+      out of scope for the hash-format fix this whole thread was originally about.
+
+Evidence: this session's live query (ad hoc; not yet persisted as its own docs/reports/ artifact).
+Status: `INDEXING_COVERAGE_GAP_ROOT_CAUSE_CONFIRMED_906_OF_24185`; authority=false;
+writesPerformed=false. This closes the investigation this session set out to do (the original
+content_hash-format bug is fully fixed and verified; the residual gap is a different, larger,
+pre-existing problem, now correctly attributed instead of conflated with the hash bug).
+
+## FOLLOW-UP: full-repo re-index launched to close the coverage gap — 2026-09-15 (same day)
+
+- [ ] **In progress, unsupervised, launched this session**: `node scripts/atlas/index-full-repo-for-search.mjs --apply`
+      (explicit authorization: `ATLAS_AUTHORIZE_SEMANTIC_768_BACKFILL=1`, since this writes real
+      new `semantic_768` embeddings via live Ollama calls for the ~23,279 files missing from
+      `codebase_chunk_index`, not just a hash backfill). Idempotent — skips the 906 already-indexed
+      `repo:root` files via existing `content_hash` match.
+- [ ] Process PID `43384` at launch time, log `docs/reports/full-reindex-apply-2026-09-15.log`. Not
+      confirmed complete as of this entry — the log had not yet printed its final summary block
+      (`Files processed / Chunks indexed / Elapsed`) when this session ended context budget.
+- [ ] **Next session must check this log before doing anything else on this gate** — if complete,
+      re-run `audit-selected-graphify-structural-lineage-v1.mjs` (now `repo:root`-scoped) to see the
+      real new match rate; if still running, let it finish; if it crashed, check the log for the
+      failure and do not assume partial completion is safe to build on.
+
+Status: `FULL_REPO_REINDEX_LAUNCHED_COMPLETION_NOT_CONFIRMED`; authority=false; writesPerformed
+unknown (real writes almost certainly occurred by now given elapsed time, but not verified by this
+session).
+
+## HANDOFF NOTE: session ended on critical context budget — 2026-09-15
+
+**Job status at handoff**: PID `43384` still running, log `docs/reports/full-reindex-apply-2026-09-15.log`
+still only shows the initial file-scan banner (no progress lines printed yet — confirmed this
+script only logs its final summary block, not incremental progress). Do not assume it crashed;
+check `Get-Process -Id 43384` (PowerShell) before assuming anything about its state.
+
+**Proposed follow-up enhancements (operator request, NOT investigated or implemented this
+session — record only)**:
+1. Replace Ollama-based `embeddinggemma:latest` calls in `index-full-repo-for-search.mjs` with a
+   GPU-accelerated path (DirectML/ONNX Runtime) for faster embedding throughput. Note: this repo's
+   own CLAUDE.md already tracks an Ollama-phase-out effort with an undecided replacement backend
+   (`EG-GGUF` vs. Go embedding service `:8097`) — any ONNX/DirectML work here should be checked
+   against that existing effort first (Duplication Prevention rule) rather than starting a third
+   parallel embedding backend.
+2. Add CPU worker-thread parallelism to this indexer (it currently appears single-threaded/serial
+   per file, matching the "no worker pool" pattern this repo's CLAUDE.md already flags as the real
+   bottleneck for similar sequential-loop scripts, e.g. the AST-grep symbol extraction pass).
+3. Align the `domain_class` tagging (currently a lightweight fixed-category tagger, see this
+   session's earlier finding: `retrieval`/`infrastructure`/`backend`/`graph`/`agent`/`cache`/`gpu`/`compiler`)
+   with the existing OKF/domain-taxonomy schema (`docs/.okf/schema.yaml`,
+   `src/lib/server/atlas/domain-taxonomy.ts`) rather than this script's own ad hoc category list —
+   check for an existing canonical domain-classification owner before adding a new one.
+
+**None of the above were started.** They require: (a) checking existing owners first per this
+repo's Duplication Prevention rule, (b) design decisions (which embedding backend, worker-pool
+architecture), and (c) should not be attempted while the current re-index job (item above) is still
+running against the same script/table.
+
+**Next session's first two moves**: (1) check the re-index job's completion status, (2) if picking
+up the enhancement request, start by auditing existing owners for embedding backend and domain
+taxonomy before writing any new code — do not duplicate.
+
+**Confirmed same day (critical-context tail end)**: both candidate existing owners are real,
+on-disk, not stale references — `docs/.okf/schema.yaml` and
+`sveltekit-frontend/src/lib/server/atlas/domain-taxonomy.ts` both exist. The embedding-backend
+question (Ollama vs. EG-GGUF vs. Go `:8097` service) was NOT re-confirmed this pass — re-check
+CLAUDE.md's "Ollama Phase-Out" section directly before assuming its stated undecided status still
+holds. **No implementation code was written for any of the three enhancements this session** —
+this remains investigation-only, exactly as recorded above. A fresh session with full context
+should design and implement these, not attempt to continue from this exhausted one.
+
+## CORRECTION: LEGACY-HASH-WRITER-IDENTIFICATION-01 write-path claim — 2026-09-15 (same day)
+
+- [x] The sibling change's writer-completeness audit (task 1.2,
+      `openspec/changes/parent-atlas-chunk-index-whole-file-hash/tasks.md`)
+      found and corrected an error in the entry above: `codebase-semantic-indexer.ts`
+      does **not** write `content_hash` "straight to the column" in Postgres.
+      Verified by reading the full file: it contains zero Postgres references
+      (no `pg`, `Pool`, `INSERT INTO`). Its write is to a **Qdrant payload**
+      field on a point later sent via `upsertPoints()`.
+- [x] The real mechanism is a two-hop pipeline:
+      `codebase-semantic-indexer.ts` (writes 16-char-truncated SHA-256 of
+      chunk text into a Qdrant point payload, collection `codebase_chunks_768`)
+      → `sveltekit-frontend/scripts/mirror-qdrant-to-postgres.ts` (scrolls
+      that same collection by name — confirmed matching, both default to
+      `codebase_chunks_768` — and copies `payload.content_hash` verbatim
+      into Postgres `codebase_chunk_index.content_hash`).
+- [x] The underlying hash FORMULA attribution from earlier the same day
+      (SHA-256 truncated to 16 hex chars, per-chunk scope) was correct and
+      stands unchanged — only the write-path description (direct vs
+      Qdrant-mediated) was wrong. A third, independent writer using the
+      identical formula was also found:
+      `sveltekit-frontend/scripts/atlas/apply-null-content-hash-metadata-repair.mjs`
+      (NULL-only, gated, `--apply`-only) — this reinforces the 16-char
+      convention as systemic across 3 code paths, not an isolated mistake.
+- [x] `graphify_files`' whole-file hash formula is now also confirmed by
+      reading its real writer chain (`observe-workspace-source-binding.mts`
+      → `deriveCodeSourceRevisionV1()` → `materialize-graphify-source-inventory.mts`):
+      `sha256(wholeFileContent)`, full 64-char, no truncation, no
+      normalization.
+
+Evidence: `docs/reports/codebase-chunk-index-writer-audit-v1.json`.
+Status: `WRITER_ATTRIBUTION_CORRECTED_MECHANISM_CONFIRMED`; authority=false;
+writesPerformed=false. This correction does not change the underlying
+conclusion (truncation + scope mismatch both real, both still block
+`CURRENT_CHUNK_EXACT_MATCH_MISSING`) — only the precision of how the
+truncated hash reaches Postgres.
+
 ## CURRENT-SOURCE-REF-VOCABULARY-GUARD-01 — 2026-09-11
 
 - [x] Confirmed the selected historical snapshot contains import aliases such
@@ -12090,3 +13012,1129 @@ Evidence: `scripts/startup/run-graphify-daily-startup.mjs` and
 Status: `IMPLEMENTED_NOT_LIVE_PROVEN`; authority=false;
 writesPerformed=false.
 First blocker remains `NO_TERMINAL_EXECUTION_MATCHES_ADMITTED_SNAPSHOT`.
+
+## PACKET-WRITE-UNQUALIFIED-INSERT-GUARD-2026-09-14
+
+- [x] Audited the canonical packet transaction scaffold and found that a new
+  packet without revision evidence could previously reach `INSERT_NEW`.
+- [x] Changed the pure decision contract to reject new requests missing either
+  `sourceRevision` or `workspaceRevision` as `REVISION_UNPROVEN`.
+- [x] Added an execution guard preventing the legacy integer
+  `workspace_revision=0` insert from receiving a checksum-shaped admitted
+  revision; it now fails closed with `WORKSPACE_REVISION_STORAGE_INCOMPATIBLE`.
+- [x] Added regression coverage: `packet-write-decision-v1.spec.ts` passes
+  `13/13`.
+- [ ] Replace the legacy integer storage path with an explicitly authorized,
+  revision-compatible canonical writer and independent bounded readback. The
+  transaction scaffold remains non-production and is not wired to the packet
+  ingestion path.
+
+Status: `UNQUALIFIED_PACKET_INSERT_BLOCKED_FAIL_CLOSED`;
+`writesPerformed=false`; live transaction proof not rerun because its fixture
+performs database mutations.
+Evidence: `sveltekit-frontend/src/lib/server/atlas/identity/packet-write-transaction-v1.ts`,
+`sveltekit-frontend/src/lib/server/atlas/identity/packet-write-decision-v1.ts`,
+`sveltekit-frontend/src/lib/server/atlas/identity/packet-write-decision-v1.spec.ts`.
+
+## PACKET-WRITER-PRODUCTION-CALLER-RECHECK-2026-09-14
+
+- [x] Census confirmed the live semantic embedding route is
+  `sveltekit-frontend/src/routes/api/admin/batch-embeddings/embed/+server.ts`.
+- [x] Confirmed it calls `persistCanonicalSemanticPacketEmbedding()` without
+  supplying `sourceRevision` or an admitted `workspaceRevision`.
+- [x] Confirmed the semantic writer input still declares source revision
+  optional and currently preserves nullable source evidence rather than
+  establishing current packet authority.
+- [x] Confirmed the transaction decision contract now rejects unqualified new
+  packets, but the production semantic writer is not wired through that
+  transaction contract.
+- [ ] Add a server-owned revision-qualified input adapter for the live route,
+  then route canonical persistence through one guarded writer with independent
+  readback. Until that exists, embedding may remain cache-only and canonical
+  packet persistence must stay blocked for revision-blind requests.
+
+Status: `PRODUCTION_PACKET_WRITER_REVISION_INPUT_MISSING`;
+`canonicalWriterWired=false`; `writesPerformed=false` for this audit.
+Evidence: `sveltekit-frontend/src/routes/api/admin/batch-embeddings/embed/+server.ts`,
+`sveltekit-frontend/src/lib/server/embedding/semantic-packet-writer.ts`,
+`docs/reports/dormant-writer-admission-v1.json`.
+
+### PACKET-WRITER-SOURCE-BINDING-ADAPTER-PLAN-2026-09-14
+
+- [x] Located the existing server-side observation contract
+  `workspaceSourceBindingV1Schema`, which carries exact
+  `workspaceRevision`, `sourceRevision`, `contentDigest`, `sourceRef`, and
+  repository-bound provenance.
+- [x] Confirmed the contract is observation-only
+  (`readOnlyObservation=true`, `canonicalAuthority=false`) and therefore must
+  not be presented to the semantic writer as proof of canonical database
+  ownership by itself.
+- [x] Confirmed the source and workspace revision namespaces are distinct;
+  `gitBlobOid` is optional provenance and cannot substitute for
+  `sourceRevision`.
+- [x] Built the pure server-owned adapter
+  `sveltekit-frontend/src/lib/server/embedding/semantic-packet-write-admission-v1.ts`.
+  It accepts a validated binding plus the
+  admitted execution/snapshot revision fields, checks exact
+  source/content/workspace parity, and emits the minimum semantic writer
+  input. Missing, mixed, or mismatched bindings reject before any database
+  call. Focused coverage passes `3/3`; receipt loading and live wiring remain
+  separate gates.
+- [ ] Replace the live route's revision-blind persistence call only after the
+  adapter has focused coverage and a bounded independent readback. Until then,
+  keep revision-blind embedding requests out of canonical packet persistence.
+
+- [x] Added pure execution-authority receipt validation. Tournament admission
+  (`WORKSPACE_REVISION_TOURNAMENT_ADMITTED`) remains a control-plane revision
+  decision with Graphify/projection authorization false; semantic admission
+  now requires a separate authority-bearing
+  `GRAPHIFY_SNAPSHOT_BINDING_PROVEN` receipt with matching workspace revision,
+  execution ID, source-membership checksum, and `writesPerformed=false`.
+  Focused coverage passes `5/5` total for this adapter module.
+- [ ] Produce the independent terminal execution receipt for the admitted
+  revision. The current live state has no such receipt, so this remains the
+  controlling blocker for route wiring and semantic persistence.
+
+Status: `SOURCE_BINDING_CONTRACT_EXISTS_ADAPTER_NOT_WIRED`;
+`canonicalAuthority=false`; `writesPerformed=false`.
+Evidence: `sveltekit-frontend/src/lib/server/atlas/identity/workspace-source-binding-v1.ts`.
+Next gate: prove one immutable execution snapshot-binding receipt for the
+admitted workspace revision, then perform a bounded independent readback before
+considering live route wiring; no live route or database mutation is implied.
+
+### GRAPHIFY-EXECUTION-SNAPSHOT-OWNER-02 — live recheck 2026-09-14
+
+- [x] Re-ran the existing read-only snapshot-binding auditor using the explicit
+  admitted workspace revision; it now inventories 32 terminal execution
+  candidates and prefers `graphify_execution_file_membership_v2` without
+  concatenating legacy membership rows.
+- [x] Confirmed the current decision remains fail-closed: `matchingExecutions=0`
+  and `firstBlockingInvariant=SNAPSHOT_READBACK_NOT_PROVEN`.
+- [x] Preserved the distinction between source evidence and execution authority:
+  the sealed snapshot readback has `25,066` exact matches out of `25,291`, with
+  source-readback failures and one missing source, so no historical execution
+  may be relabeled as current.
+- [ ] Produce a fresh immutable snapshot readback (or repair the snapshot
+  artifact through the authorized snapshot-capture path), then prove one
+  terminal execution whose V2 membership count/checksum and source content
+  match that exact snapshot. Until then packet/chunk repair and semantic route
+  wiring remain blocked.
+
+Status: `GRAPHIFY_EXECUTION_SNAPSHOT_OWNER_BLOCKED_SNAPSHOT_READBACK`;
+`writesPerformed=false`; `canonicalAuthority=false`.
+Evidence: `docs/reports/graphify-workspace-snapshot-binding-v1.json`.
+
+### CURRENT-GRAPHIFY-SNAPSHOT-AUTHORITY-NULL-RECHECK-2026-09-14
+
+- [x] Attempted the TypeScript snapshot-authority audit with the repository's
+      `tsx` runner after correcting an initial runner mismatch.
+- [x] The bounded observation produced no terminal stdout and no replacement
+      receipt; the spawned audit processes are no longer running.
+- [x] Recorded this as `NULL_RESULT_NO_TERMINAL_RECEIPT`, not as a current
+      authority decision. The existing report contains an older revision and
+      remains historical until refreshed.
+- [ ] Re-run once with an explicit bounded timeout/query plan and require a
+      fresh receipt before using snapshot-authority values downstream.
+
+Status: `NULL_RESULT_NO_TERMINAL_RECEIPT`; authority=false;
+writesPerformed=false. No Graphify execution, source relabeling, packet repair,
+or projection mutation was performed.
+
+### SOURCE-REGISTRY-OWNER-JOIN-RECHECK-2026-09-13
+
+- [x] Re-ran the source-registry owner join in read-only mode.
+- [x] Confirmed the join mechanism itself is proven, but the bounded cohort
+      remains ungrounded: `50` targets, `0` exact matches, `50` unproven.
+- [ ] Rebuild the target cohort from the admitted terminal execution and exact
+      workspace revision before changing registry rows.
+- [ ] Preserve the distinction between a valid join algorithm and a currently
+      populated canonical owner; neither result authorizes backfill.
+
+Status: `SOURCE_REGISTRY_IDENTITY_UNPROVEN_FOR_COHORT`; authority=false;
+writesPerformed=false.
+
+Evidence: `docs/reports/source-registry-owner-join-v1.json`.
+
+### CURRENT-PACKET-QDRANT-BRIDGE-RECHECK-2026-09-13
+
+- [x] Re-ran the packet→Qdrant bridge audit in read-only mode.
+- [x] Recorded `plannedSources=0`, `packetRows=0`, `packetQdrantIds=0`, and
+      `qdrantPointsFound=0`.
+- [x] Classified the result as an empty current plan, not as proof that the
+      Qdrant projection is empty or complete; all match counts remain zero.
+- [ ] Rebuild the current source-selection manifest from an admitted,
+      terminal Graphify execution before rerunning this bridge.
+- [ ] Require exact packet/chunk identity, source revision, workspace revision,
+      and representation revision before any Qdrant payload reconciliation.
+
+Status: `PACKET_QDRANT_BRIDGE_MISSING_EMPTY_PLAN`; authority=false;
+writesPerformed=false. No payload repair, inferred revision, or Qdrant
+mutation is authorized.
+
+Evidence: `docs/reports/current-packet-qdrant-bridge-v1.json`.
+
+### PACKET-WRITE-REVISION-CONTRACT-RECHECK-2026-09-13
+
+- [x] Re-ran the packet-writer contract audit in read-only mode.
+- [x] Confirmed `atlas_packets.source_revision` exists live, but
+      `packetKey` identity semantics remain unproven.
+- [x] Confirmed the auxiliary identity tool does not write packet/source
+      identity fields; `writesPerformed=false`.
+- [ ] Bind the canonical packet writer to an admitted execution/source
+      revision and prove bounded readback before any packet backfill.
+- [ ] Keep legacy nullable revision observations distinct from the
+      promotion-required revision-qualified cohort.
+
+Status: `PACKET_WRITE_REVISION_CONTRACT_PARTIAL_PROVEN`; packet promotion and
+semantic admission remain blocked.
+
+Evidence: `docs/reports/packet-write-revision-contract-v1.json`.
+
+### GRAPHIFY-STALE-RUN-RECONCILIATION-RECHECK-2026-09-13
+
+- [x] Re-ran the repeatable-read, read-only stale-run reconciliation audit.
+- [x] Found one run candidate, but no process owner; classification is
+      `CONFLICTING_EVIDENCE` and `promotionAllowed=false`.
+- [x] Confirmed readiness replay remains disabled and no mutation occurred.
+- [ ] Reconcile the candidate's exact execution, graph, and source-membership
+      checksums against the admitted snapshot.
+- [ ] Accept it only if workspace revision, immutable membership, source
+      content, and terminal-owner evidence all agree; otherwise retain it as
+      historical/conflicting evidence.
+
+Status: `GRAPHIFY_STALE_RUN_CONFLICTING_EVIDENCE`; authority=false;
+writesPerformed=false. This result does not unlock packet/chunk repair,
+semantic admission, graph projection, or Qdrant fanout.
+
+Evidence: `docs/reports/graphify-stale-run-reconciliation-v1.json`.
+
+### CURRENT-WORKSPACE-PACKET-CHUNK-JOIN-RECHECK-2026-09-14
+
+- [x] Re-ran the join audit with the explicitly admitted workspace revision
+      supplied as a separate argument; the prior equals-form invocation was
+      rejected by the script's argument contract and produced no data result.
+- [x] Fresh read-only report remains `CURRENT_PACKET_CHUNK_JOIN_MISSING`;
+      current packet/chunk membership is not established for the admitted
+      revision.
+- [ ] Do not infer a current cohort from this empty/missing join. First bind a
+      terminal Graphify execution to the admitted snapshot, then rerun the
+      exact packet/chunk readback.
+
+Status: `CURRENT_PACKET_CHUNK_JOIN_MISSING`; authority=false;
+writesPerformed=false. No packet, chunk, vector, graph, cache, or projection
+mutation occurred.
+
+Evidence: `docs/reports/current-workspace-packet-chunk-join-v1.json`.
+
+### CURRENT-GRAPHIFY-SNAPSHOT-AUTHORITY-RECHECK-2026-09-14
+
+- [x] Hardened the auditor to consume the admitted tournament receipt rather
+      than recomputing a moving workspace revision.
+- [x] Required the admitted receipt status, authority flag, and SHA-256
+      workspace revision; invalid or missing admission fails closed.
+- [x] Preferred `graphify_execution_file_membership_v2` exclusively when it
+      has rows for an execution, with the legacy execution-file table retained
+      only as a diagnostic fallback; the populations are never concatenated.
+- [x] Changed report replacement to a per-process temporary file followed by
+      atomic rename for Windows reliability.
+- [x] Fresh read-only result: admitted revision is
+      `sha256:3e677c29319a4a60bc60803be4186ba108dce906945af593a3a6f5cf43d11881`,
+      workspace `625743d2-092b-4fa8-abe0-9dc094920c80`, and
+      `qualifyingExecutions=0`.
+- [ ] Bind a future terminal Graphify execution to this exact admitted
+      revision and prove V2 membership count/checksum plus source-content
+      readback before reopening packet/chunk or projection gates.
+
+Status: `NO_TERMINAL_EXECUTION_FOR_CURRENT_WORKSPACE`; authority=false;
+writesPerformed=false. No Graphify execution, source relabeling, packet repair,
+or projection mutation was performed.
+
+Evidence: `docs/reports/current-graphify-snapshot-authority-v1.json`,
+`docs/reports/current-source-selection-input-v1.json`.
+
+### GRAPHIFY-SNAPSHOT-BINDING-RECHECK-2026-09-14
+
+- [x] Re-ran the read-only snapshot-binding audit against the admitted
+      snapshot after the authority-auditor hardening.
+- [x] Confirmed snapshot bytes read back `25,066/25,291`; violations are
+      `224 SOURCE_BYTES_CHANGED` and `1 SOURCE_FILE_MISSING`.
+- [x] Confirmed the admitted workspace revision is present, but
+      `workspaceRevision=null`, `authority=false`, and no current terminal
+      execution is admissible.
+- [ ] Re-capture/repair the immutable snapshot through the authorized path,
+      then bind and verify one terminal execution before packet/chunk closure.
+
+Status: `GRAPHIFY_SNAPSHOT_BINDING_BLOCKED_SNAPSHOT_READBACK`;
+`writesPerformed=false`. Evidence:
+`docs/reports/graphify-workspace-snapshot-binding-v1.json`.
+
+### CURRENT-SOURCE-REGISTRY-PLAN-RECHECK-2026-09-14
+
+- [x] Re-ran the current source-registry reconciliation planner in read-only
+      mode.
+- [x] Confirmed the plan is intentionally empty: `selectedSourceCount=0`,
+      `registryMatchCount=0`, `registryMissingCount=0`, with selection checksum
+      `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`.
+- [ ] Rebuild the selection only after an admitted terminal Graphify execution
+      and repaired snapshot readback exist; do not interpret an empty plan as
+      proof that the registry is empty or complete.
+
+Status: `REGISTRY_RECONCILIATION_EMPTY`; `readOnly=true`;
+`writesPerformed=false`. Evidence:
+`docs/reports/current-source-registry-reconciliation-plan-v1.json`.
+
+### CURRENT-SOURCE-REGISTRY-PLAN-CURRENT-FRAME-RECHECK-2026-09-15
+
+- [x] Corrected `scripts/atlas/plan-current-source-registry-reconciliation-v1.mjs` to consume
+      the current `current-source-selection-input-v1.json` when its status is
+      `CURRENT_SNAPSHOT_PROVEN`, rather than the stale `current-source-graphify-batch-plan-v1.json`.
+      The planner still requires read-only/non-authoritative input and never inserts registry rows.
+- [x] Added atomic report replacement to avoid partial read-only receipts during concurrent report
+      refreshes.
+- [x] Current bounded result: `111` selected sources, `81` existing registry matches, and `30`
+      review-only registry insert candidates. `readOnly=true`; no registry or binding writes.
+- [ ] Full current-source registry reconciliation and any insert remain separately gated by
+      explicit approval, exact source-byte readback, and the packet/chunk digest bridge.
+
+Evidence: `docs/reports/current-source-registry-reconciliation-plan-v1.json`,
+`docs/reports/current-source-selection-input-v1.json`, and
+`scripts/atlas/plan-current-source-registry-reconciliation-v1.mjs`.
+
+### CURRENT-SOURCE-REGISTRY-PLAN-CURRENT-FRAME-RECHECK-500-2026-09-15
+
+- [x] Widened the existing read-only planner bound from the historical `111`-row
+      canary to a bounded `500`-row cohort; this changes measurement capacity only and
+      does not authorize registry writes.
+- [x] Re-ran the planner against the admitted current snapshot selection. The receipt
+      reports `selectedSourceCount=500`, `registryMatchCount=82`, and
+      `registryMissingCount=418` with selection checksum
+      `sha256:bbb1ff27a131b3bc2fb3675cdbee876d451e12ae9b267c7c446872cecf09079f`.
+- [ ] Keep the `418` missing rows review-only until exact source-byte readback,
+      packet/chunk digest closure, and explicit mutation approval are proven.
+
+Status: `REGISTRY_RECONCILIATION_PLAN_READY`; `readOnly=true`; `writesPerformed=false`.
+
+Evidence: `docs/reports/current-source-registry-reconciliation-plan-v1.json` and
+`scripts/atlas/plan-current-source-registry-reconciliation-v1.mjs`.
+
+### CURRENT-STRUCTURAL-LINEAGE-01 follow-up: re-index job is a partial, self-limiting fix — 2026-09-15 (later same day, session resumed)
+
+- [x] Re-ran `audit-selected-graphify-structural-lineage-v1.mjs --repository-id repo:root`
+      against the live DB while the background full-repo re-index job (PID `43384`,
+      launched earlier this session) was still running. Confirmed via
+      `Get-CimInstance Win32_Process` that the job is genuinely still alive, not
+      hung — its log only ever prints the initial scan banner by design (final
+      summary only), so log silence is not evidence of a stall.
+- [x] Measured direct coverage (not just the exact-hash-join count): of the
+      `24,185` `repo:root` membership rows, distinct `source_ref`s present in
+      `codebase_chunk_index` **at all** (regardless of hash match) rose from
+      `906` (earlier this session) to `6,571` (27.2%) — real, verified progress
+      from the running job, confirming the earlier "pure indexing-coverage gap"
+      root cause.
+- [x] **But `exactChunkMatchesViaFileHash` did NOT move — still exactly `894`**,
+      unchanged from before the job's extra ~60,000 rows were written. Root
+      cause confirmed by direct count: `codebase_chunk_index` grew from `55,853`
+      to `116,239` total rows, while `file_content_hash`-populated rows stayed
+      at exactly `52,154` (the one-time backfill count from
+      `parent-atlas-chunk-index-whole-file-hash` task 5.2). Every new row the
+      re-index job writes has `file_content_hash IS NULL`, because that sibling
+      change's task 5.1 (updating writers so new rows get this column
+      automatically) was never done — recorded in detail in that change's
+      `tasks.md` under task 5.1.
+- [x] **Conclusion, not yet acted on**: the currently-running re-index job alone
+      cannot close this gate any further than `894/25,271`, no matter how long
+      it runs, until task 5.1 is done. Closing 5.1 (updating
+      `index-full-repo-for-search.mjs`, the confirmed writer behind this job, to
+      compute and write `file_content_hash` on insert) is now the single
+      highest-leverage next step for this gate — higher leverage than waiting
+      for the re-index job to finish, and higher leverage than starting the
+      separately-requested GPU/ONNX/worker-pool enhancements recorded in the
+      earlier handoff note in this file, which remain correctly deferred.
+
+Evidence: `docs/reports/selected-graphify-structural-lineage-v1.json` (re-run,
+`repo:root`-scoped), direct live-DB counts (not persisted to a report file —
+ad hoc read-only queries via `connection-config.mjs`), and
+`openspec/changes/parent-atlas-chunk-index-whole-file-hash/tasks.md` task 5.1.
+
+### CURRENT-STRUCTURAL-LINEAGE-01 follow-up 2: task 5.1 closed + concurrent backfill re-run — real gate jump — 2026-09-15 (same session, minutes later)
+
+- [x] Closed `parent-atlas-chunk-index-whole-file-hash` task 5.1: fixed
+      `scripts/atlas/index-full-repo-for-search.mjs`'s `upsertPostgres()` to
+      write `file_content_hash` (reusing the whole-file `sha256` it already
+      computed as `chunk.file_hash` but never persisted) plus the
+      `content_hash_scope/algorithm/length/version` metadata columns for its
+      own confirmed `content_hash` contract (`chunk`/`sha256`/`64`/`1`).
+- [x] Rather than wait for the still-running re-index job (PID `43384`) to
+      finish with the old code in memory, re-ran the existing idempotent
+      backfill script (`WHERE file_content_hash IS NULL` only — additive,
+      safe to run concurrently, no table lock conflict) to catch up rows the
+      job had already inserted. Result: `hashed: 69,815`, `updated: 69,815`,
+      table now `125,668` rows total, `122,000`-ish `(52,154+69,815)` with
+      `file_content_hash` populated.
+- [x] **Re-ran the structural lineage audit immediately after:
+      `exactChunkMatchesViaFileHash` rose from `894` to `6,709`** (27.7% of
+      the `24,185` `repo:root` membership rows) — this closely tracks the
+      raw file-coverage figure measured moments earlier (`6,571` distinct
+      `source_ref`s present), confirming the hash-formula bug is now fully
+      fixed for everything actually indexed. The primary gate
+      (`content_hash`-based, unaffected by this additive fix) is still
+      `CURRENT_PACKET_CHUNK_JOIN_UNPROVEN` / `0` exact matches — by design,
+      per task 6.1's note that the file-hash join is informational and never
+      overrides the primary gate.
+- [ ] Remaining gap (`24,185 - 6,709` ≈ 72%) is now confirmed to be almost
+      entirely raw indexing coverage (files the re-index job hasn't reached
+      yet), not a hash-contract problem. Closing it further just requires
+      the re-index job to keep running (or finish) and periodic re-runs of
+      the backfill script — no further code change identified as needed.
+
+Evidence: `docs/reports/backfill-codebase-chunk-index-file-content-hash-v1.json`
+(re-run, `mode: APPLY`), `docs/reports/selected-graphify-structural-lineage-v1.json`
+(re-run, `repo:root`-scoped), and
+`openspec/changes/parent-atlas-chunk-index-whole-file-hash/tasks.md` task 5.1.
+
+### CURRENT-STRUCTURAL-LINEAGE-01: background monitoring loop, 2026-09-15 (same session, several more cycles)
+
+- [x] Ran two more catch-up backfill + re-audit cycles while the re-index job
+      (PID `43384`) kept running with its old, pre-fix code in memory.
+      `exactChunkMatchesViaFileHash` progression this session:
+      `0 → 894 → 6,709 → 7,810 → 8,115` (33.6% of `24,185` `repo:root` rows).
+      Per-cycle gains are shrinking (`5,815 → 1,101 → 305` new matches) as
+      the job works through the remaining, presumably larger or slower-to-
+      process files. No new code or design decision required at this point
+      — this is now a pure wait-and-catch-up loop, not an open investigation.
+- [ ] Not done this pass: waiting for the job to fully finish, or deciding
+      whether to proceed into `CandidateOrdinalMapV1` scaling (stage 3)
+      before this gate closes — both are explicit choices for whoever
+      resumes this change, not assumed here.
+
+      **Progression continued, later same session**: `exactChunkMatchesViaFileHash`
+      `8,115 → 9,680` (40.0% of `24,185`) after one more backfill+audit cycle.
+      Background re-index job (PID `43384`) confirmed still alive
+      (`Get-Process`, CPU steadily climbing). No new decision surfaced by this
+      cycle — pure background progress, consistent with the "double-blocked"
+      finding above (this informational count keeps climbing; the primary
+      `content_hash` gate stays `0` by design, and stage 3 remains correctly
+      un-started regardless of how high this number goes).
+
+### External review's 7-step sequence, worked through honestly — 2026-09-15 (same session)
+
+External review correctly separated `codebase_chunk_index.content_hash` (chunk-scoped, this
+change's canonical identity input) from `file_content_hash` (whole-file-scoped, corroborating
+parity only) and proposed a 7-step close-out sequence. Worked through it directly rather than
+re-describing it:
+
+- [x] **Step 1 (let the re-index finish)** — cannot force this; checked instead.
+      PID `43384` still alive (`Get-Process`), `codebase_chunk_index` at `164,297` total rows
+      (up from `55,853` at session start). Not finished.
+- [ ] **Step 2 (run a fresh incremental pass with the NEW writer)** — genuinely blocked on step 1:
+      the currently-running process loaded the pre-fix code into memory before this session's
+      `index-full-repo-for-search.mjs` edit, and will keep doing so until it exits. Not attempted —
+      starting a second concurrent invocation against the same table while the first is still
+      running was not authorized and wasn't part of the approved plan.
+- [x] **Step 3 (verify new rows contain the full metadata set)** — checked honestly, not assumed.
+      Live counts: `file_content_hash` populated on `158,034/164,297` (96.2%, via this session's
+      repeated backfill catch-up cycles) — but `content_hash_scope`, `content_hash_algorithm`,
+      `content_hash_length`, `content_hash_version` are **all still `0`, zero rows**, because the
+      backfill script only ever wrote `file_content_hash` (never the metadata columns — only the
+      fixed live writer does, per its own `upsertPostgres()` edit), and that fixed writer has not
+      executed a single row yet (blocked on step 1/2). This is an honest, unresolved gap, not
+      closed by the backfill loop.
+- [x] **Step 4 (re-run source/chunk coverage census)** — done via the repeated
+      backfill+audit cycles already recorded above; latest: `9,680/24,185` (40.0%) via the
+      informational file-hash join.
+- [x] **Step 5 (update the structural lineage audit to preserve the A/B distinction)** — done.
+      `scripts/atlas/audit-selected-graphify-structural-lineage-v1.mjs` now carries an explicit
+      `proofContracts` field in its report output (`proofA_canonicalIdentity` vs
+      `proofB_fileContentParity`), plus an inline comment, stating outright that the file-hash join
+      is corroborating evidence only and must never feed `status`/`firstBlocker`/`nextGate` — which
+      it already didn't, but this makes the invariant explicit in the artifact itself, not just in
+      prose docs that can drift.
+- [x] **Step 6 (recompute the promotion board)** — done. `audit-promotion-board-reconcile-v2.mjs`
+      re-run, zero writes (`writesPerformed: false` etc. across the board). Result unchanged in
+      substance: `SOURCE: PARTIAL`, blocked by `CURRENT-STRUCTURAL-LINEAGE-01`;
+      `SEMANTIC_CORPUS: BLOCKED`; `GRAPHIFY: DO_NOT_RETRY`. Confirms today's real progress on the
+      informational join has not (and structurally cannot yet) changed the promotion board's
+      verdict — consistent with the "double-blocked" finding.
+- [ ] **Step 7 (scale CandidateOrdinalMap/semantic_768/graph)** — correctly still not started, per
+      the stage-3 re-investigation above.
+
+Evidence: `docs/reports/promotion-board-reconcile-v2.json`/`.md` (re-run),
+`docs/reports/selected-graphify-structural-lineage-v1.json` (schema now carries `proofContracts`),
+live DB counts for the metadata-column gap (not persisted to a report file this pass).
+
+### Stage-3 (CandidateOrdinalMapV1 128-scale) gate re-investigation — resolved not stale, double-blocked — 2026-09-15 (same session)
+
+- [x] Explicitly re-investigated whether `parent-atlas-candidate-feature-execution-fabric`'s own
+      `BLOCKED_ON_LINEAGE_GRAPH_OWNER` status (recorded 2026-08-29) is now stale, given this
+      session's real stage-2 progress (informational file-hash join `0%→33.6%`). **Not stale.**
+      Read the actual scale-up task's own prior run result (in that change's tasks.md, the
+      "Ownership freeze and bounded current-graph proof" section): *"Rerun the read-only
+      full-corpus lineage census: ... 0 fully qualified rows because the current corpus has no
+      graph revision owner."*
+- [x] This reveals the scale-to-128 gate is **double-blocked**, by two independent gates, and this
+      session's fix only closes progress on one of them:
+      1. Packet↔chunk structural lineage (this change's `CURRENT-STRUCTURAL-LINEAGE-01`) — primary
+         `content_hash`-based gate still `0` exact matches; only the informational
+         `file_content_hash` join moved (`33.6%`).
+      2. Graph revision ownership (a wholly separate stage, this change's own `PROVEN_FIXTURE`-only
+         `GraphOrdinalMapV1` status elsewhere in this file) — confirmed live via
+         `docs/reports/current-graphify-run-owner-v1.json`: for the currently-expected workspace
+         revision, `runCount: 0`, `completedOwnerCount: 0`, genuinely zero, not stale data. This is
+         the same "two equivalent qualifying executions" ambiguity flagged as `Gate 0A` in the
+         original investigation prompt that opened this session's work — it was never actually
+         resolved, and nothing done today touches it.
+- [x] **Conclusion**: stage 3 cannot legitimately start yet on either gate. Doing so would require
+      aliasing/fuzzy-matching around the missing graph revision or asserting a synthetic one — both
+      explicitly forbidden by `parent-atlas-candidate-feature-execution-fabric`'s own tasks ("do not
+      use aliases, fuzzy matches, or synthetic revisions"). This is not a judgment call to override;
+      it is a hard documented rule in the change that would be scaled.
+- [ ] **Real next unblocking move surfaced by this investigation**: resolve the Graphify
+      execution-owner ambiguity (Gate 0A) — a read-only resolution task, independent of whether the
+      background re-index job (PID `43384`) has finished. Not attempted this pass; deliberately
+      scoped out per the approved plan (deserves its own pass, not bolted onto this one).
+
+Evidence: `docs/reports/current-graphify-run-owner-v1.json` (live read),
+`openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md` ("Ownership freeze and
+bounded current-graph proof" section and the `BLOCKED_ON_LINEAGE_GRAPH_OWNER` status line), and
+`C:\Users\james\.claude\plans\can-you-review-all-woolly-iverson.md` (this session's plan, "Stage 3
+gate re-investigation" section).
+
+### `24,185` is a frozen snapshot, not "the whole repo" — real gap confirmed, reinforces Gate 0A — 2026-09-15 (same session, operator question)
+
+Operator correctly questioned whether `24,185` (the `repo:root` membership row count this whole
+session's percentages are measured against) represents the current repository. **It does not.**
+Checked live, read-only:
+
+- [x] `graphify_executions` for the admitted execution (`14667026-459c-4a99-b3c2-c20b739a6e0d`,
+      workspace revision `sha256:3be7901e...`): `started_at: 2026-09-10T22:43:27Z`,
+      `completed_at: 2026-09-10T22:46:18Z` — a **5-day-old frozen snapshot**, not today's file
+      population.
+- [x] Today's live full-repo re-index (`index-full-repo-for-search.mjs`, PID `43384`) scanned
+      **`28,770`** indexable files just now, across the same top-level directories
+      (`sveltekit-frontend`, `scripts`, `packages`, `crates`, `simd-bridge`, `docs`, `python`,
+      `services`) the `24,185` snapshot also spans (confirmed via a top-level-directory breakdown
+      of the membership rows: `sveltekit-frontend: 16,333`, `scripts: 3,313`, `docs: 1,031`,
+      `packages: 632`, `openspec: 406`, `python: 263`, `simd-bridge: 162`, `services: 25`,
+      `crates: 22`, `541` distinct top-level path prefixes total).
+- [x] **Real gap: `28,770 - 24,185 = 4,585` files (≈19%)** the admitted snapshot never enumerated
+      — either created/modified in the 5 days since the snapshot, or excluded by a differing
+      file-discovery filter between the two scanners. Not root-caused further this pass (which of
+      the two explanations dominates is unknown).
+- [x] **This does not invalidate today's `file_content_hash`/backfill work** — that work operates
+      on `codebase_chunk_index` directly and is correct regardless of which membership snapshot is
+      used as the comparison denominator. But it means every percentage this session has reported
+      against `24,185` (`27.7%`, `33.6%`, `40.0%`, `43.0%`, `46.2%`, ...) is coverage against a
+      **stale** admitted population, not the live one — the true current-repo coverage percentage
+      is unknown and likely somewhat lower once the missing `4,585` files are accounted for.
+- [x] **This is not a new problem — it's the same open Gate 0A (Graphify execution-owner
+      ambiguity) surfacing from a different angle.** A fresh, current Graphify execution/admission
+      is exactly what would replace this stale `24,185` snapshot with a live one. Resolving Gate 0A
+      (see the stage-3 re-investigation entry above) is still the correct next unblocking move, not
+      a new item.
+
+Evidence: `graphify_executions` row (live read, not persisted to a report file this pass),
+top-level directory breakdown of `graphify_execution_file_membership_v2` (live read), and today's
+`index-full-repo-for-search.mjs` scan banner (`28,770` files, this session's own launch log).
+
+### Docker Desktop crash mid-session -- job died cleanly, no data loss, relaunched -- 2026-09-15 (same session)
+
+- [x] Docker Desktop crashed while the background re-index job (PID `43384`) was running.
+      Confirmed via `docker ps` (`ECONNREFUSED`), `Get-Process -Id 43384` (process gone), and
+      `wsl -l -v` (both `docker-desktop` AND `Ubuntu` WSL2 distros `Stopped`) -- this points to a
+      WSL2/hypervisor-level failure, not a narrow Docker-app bug. No hard forensic log evidence
+      survived (Docker's own VM log directory only has stale files from months prior; Windows
+      Application event log had nothing in the preceding 3 hours) -- exact trigger unconfirmed,
+      plausibly sustained resource pressure from the hours-long job, not verified.
+- [x] The job's own log confirms a clean death, not corruption: `[FATAL] connect ECONNREFUSED
+      127.0.0.1:5434`. It lost its Postgres connection and exited; no partial/corrupted writes
+      (Postgres transactions are atomic per-batch).
+- [x] Restarted Docker Desktop (`Start-Process`). All containers auto-restarted with the daemon.
+      Two (`legal-ai-go-search`, `legal-ai-bifrost`) came back crash-looping (`Restarting (1)`) --
+      flagged, not chased, unrelated to this gate.
+- [x] **Confirmed no data loss**: `codebase_chunk_index` at `183,956` rows post-recovery (slightly
+      higher than the `181,033` last observed before the crash -- the dying job committed a few
+      more batches than last checked, consistent with per-batch atomic commits, not data loss).
+- [x] **Relaunched the re-index job fresh** (`index-full-repo-for-search.mjs --apply`, real PID
+      confirmed via `Get-CimInstance Win32_Process` as `52080`, distinct from the dead `43384`).
+      This fresh process loads the ALREADY-FIXED writer code (this session's earlier edit to
+      `upsertPostgres()`) from the start -- unlike the dead job, which never got the fix. Scan
+      banner: `28,773` files (up `3` from the last scan, normal repo activity).
+- [x] **Verified live, minutes later**: `content_hash_scope` (and by construction the other 3
+      metadata columns, written in the same `INSERT`) went `0 -> 14` populated rows as the fresh
+      job (PID `52080`) reached genuinely-new files. This is the first live confirmation this
+      session that the writer fix actually works end-to-end, not just that it syntax-checks --
+      closes the "not yet verified" gap from the entry above. Files the job re-encounters that are
+      already indexed (by `qdrant_id`) are still skipped entirely and will NOT retroactively gain
+      the metadata columns from this run alone -- only genuinely-new inserts benefit; the existing
+      backfill loop remains the only mechanism catching up `file_content_hash` on old rows, and
+      there is no equivalent backfill for the 4 metadata columns on old rows (out of scope; they
+      describe per-row writer provenance, which can't be retroactively inferred for rows this
+      session's writer didn't itself write).
+
+Evidence: `docker ps` / `wsl -l -v` (live reads), the dead job's own log
+(`docs/reports/full-reindex-apply-2026-09-15.log`, tail shows the `FATAL` line), and the fresh
+job's log (`docs/reports/full-reindex-apply-2026-09-15-resumed.log`).
+
+### Adjacent visualization/protocol audit (lineage graph visual, admin "Parents Atlas" studio, ACP vs A2A metadata) -- 2026-09-15 (same session, operator question)
+
+Not part of this gate's critical path -- recorded because it directly informs where/whether
+today's lineage work should surface, and closes 3 real, quick, read-only findings.
+
+- [x] **No dedicated visualization exists for `CURRENT-STRUCTURAL-LINEAGE-01` itself.** The real
+      graph/topology visual in this repo is `sveltekit-frontend/src/routes/(app)/code-intel/topology`
+      (color-mode toggle, topo-class legend, topo badge in inspector) -- but it visualizes codebase
+      structural topology (SOM/PageRank/clusters), not this gate's packet<->chunk lineage state.
+      Nothing today wires the lineage/backfill numbers this session produced into any UI.
+- [x] **`/admin/parents-atlas`'s "trace routing" panel is hardcoded fixture data, not live
+      telemetry.** Read `+page.server.ts` directly: the `routingTraces` array (3 example rows,
+      labeled `real_001`/`real_008`/`real_011`) is a static literal in the load function, despite a
+      comment claiming "Dynamic simulated telemetry for real-world E2E routing validation traces"
+      -- that comment is misleading; nothing dynamic or live backs it. Flagged, not fixed (out of
+      scope for this gate).
+- [x] **ACP and A2A are two distinct protocols in this repo, carrying different metadata, not
+      wired to each other**:
+      - **A2A** (`GET /.well-known/agent.json`, real and live, Google Agent2Agent spec): carries
+        `name`/`description`/`url`/`version`/`provider`, `authentication.schemes` (`Bearer`),
+        `defaultInputModes`/`defaultOutputModes`, `capabilities` (`streaming`/`pushNotifications`/
+        `stateTransitionHistory`), and a `skills[]` array (each: `id`/`name`/`description`/`tags`/
+        `examples`/`inputModes`/`outputModes`). This is cross-agent discovery metadata, aimed at
+        external orchestrators.
+      - **ACP** (`GET /api/acp/tools`, `POST /api/acp/execute`,
+        `src/lib/server/services/knowledge-search/ACPToolRegistry.ts`): a separate, internal typed
+        tool registry (real tools incl. `nlp:capabilities`, `nlp:analyze`, `nlp:ast-chunk`,
+        `nlp:classify_domain`), each carrying its own schema, `dryRun` support flag, and
+        capability tags (`spacy`/`langextract`/`tree_sitter`/`treesitter_chunker`/etc). This is
+        this repo's own execution-registry metadata, not agent-discovery metadata.
+      - **No enrichment pipeline currently carries lineage/packet identity (`packet_key`,
+        `source_ref`, `source_revision`, `file_content_hash`) into either protocol's metadata.**
+        Neither the A2A AgentCard's `skills[]` nor the ACP tool registry's per-tool schemas
+        reference this gate's identity contract at all. If this gate's lineage work is ever meant
+        to be agent-discoverable or tool-callable, that would be new wiring, not something already
+        latent in either registry -- flagged as a real gap, not investigated further this pass.
+
+### Real root cause of the repeated Docker/Postgres crashes: disk near-exhaustion (~250MB free) from a bloated, never-compacted WSL2 VHDX -- 2026-09-15 (same session)
+
+- [x] The re-index job died a **second** time (`PID 52080`, same crash pattern) partway through
+      this monitoring session, and the drift-audit fix from the previous entry hung indefinitely
+      on a dead connection (`0.42s` total CPU, never progressed) rather than erroring cleanly.
+      Investigated live rather than assuming another random crash: **C: drive had only
+      `~250MB` free**, and `docker_data.vhdx` (`C:\Users\james\AppData\Local\Docker\wsl\disk\`)
+      had grown to `186.23GB` -- this matches a pre-existing, already-documented issue in this
+      repo's own CLAUDE.md ("Docker's VHDX never auto-shrinks on Windows 10"). Near-zero free
+      disk space, not a Docker-specific bug, is the real root cause of every crash this session,
+      including the very first one.
+- [x] Found and safely reclaimed disk space without touching the VHDX itself or any Docker/
+      Postgres data: two large `%TEMP%` items were the actual offenders --
+      `C1E17CCD-1ACF-4EFD-9F75-A7FEE5275AEC\swap.vhdx` (`6.1GB`, a WSL2/Hyper-V VM swap file,
+      last written `2026-09-10` -- **verified unlocked/orphaned via a file-open test before
+      deleting**, not guessed) and `hmcmulwv\` (`5.5GB`, stale `Microsoft.Build.*` cache, dated
+      `2026-09-07/08`, unrelated to any VM). **Explicitly left alone**: a second, near-identical
+      swap file (`5389B64D-EB0F-4B2C-BF0E-0D5DA19D2975\swap.vhdx`, `7.5GB`, last written the same
+      morning) -- confirmed **locked** by the running `docker-desktop` VM via the same file-open
+      test, so deleting it would have risked crashing/corrupting the live VM. Free space went
+      `~250MB -> ~12.7GB`.
+- [x] Freeing disk space alone did not unstick the already-wedged Docker engine (still `500`
+      errors afterward) -- it needed a full clean restart to actually recover: stopped all
+      `Docker Desktop`/`com.docker.backend`/`com.docker.build` processes, `wsl --shutdown`,
+      relaunched Docker Desktop. Confirmed recovered: `legal-ai-postgres` reports `Up 25 seconds
+      (healthy)`, live query confirms `194,029` rows in `codebase_chunk_index` -- **no data loss
+      across either crash**, actually a few thousand rows higher than the last pre-crash reading
+      (`183,970`), consistent with the second re-index job attempt having made real progress
+      before it too died.
+- [ ] **Not done, and the actual durable fix**: the `docker_data.vhdx` itself is still `186GB` and
+      still never compacted -- this session's cleanup only removed orphaned *swap* files sitting
+      next to it in `%TEMP%`, not the VHDX's own accumulated dead space. This repo's own documented
+      recovery script (`C:\Users\james\Desktop\compact-docker-vhdx.ps1`) requires Administrator
+      elevation this session doesn't have. **Until that compaction actually runs, this exact
+      crash pattern (disk fills up again, Docker/Postgres/WSL2 die) can recur** -- flagged as a
+      real, unresolved risk for whoever continues this work, not a one-time incident that's now
+      closed.
+
+Evidence: `Get-PSDrive C` (before/after), `docker_data.vhdx` size (live `Get-ChildItem`), file-lock
+tests on both swap files (live, not assumed), and the post-restart Postgres health/row-count check
+above.
+
+### Post-recovery full audit sweep, and a new stale-file-handle write quirk (not disk/lock related) -- 2026-09-15 (same session)
+
+- [x] Re-ran the structural lineage audit post-recovery: `exactChunkMatchesViaFileHash` continued
+      climbing, `13,146/24,185` (54.4% of the stale denominator) -- confirms the second job's
+      writes (before it also died) were real and survived, no regression.
+- [x] Re-ran `audit-promotion-board-reconcile-v2.mjs`: **identical checksum**
+      (`sha256:60560b54cc24bfce2360c7f3995f7a19a1877e2428e141df59e797569f62b3aa`) to the pre-crash
+      run -- confirms the promotion board's verdict is genuinely stable, not just re-computed by
+      chance. `SOURCE: PARTIAL` / blocked by `CURRENT-STRUCTURAL-LINEAGE-01`, `safeToProject: false`
+      across the board, unchanged.
+- [x] **New, distinct file-write failure found and root-caused, NOT the usual one-shot IDE-lock
+      race**: `promotion-board-reconcile-v2.json`'s write failed 4 consecutive times
+      (`UNKNOWN: unknown error, open ...`), including after confirming the file was NOT locked
+      (`.NET FileStream` open-test) and after deliberate delays between attempts -- ruling out
+      both the ordinary transient race and a simple timing issue. **Isolated via direct testing**:
+      PowerShell's `[System.IO.File]::WriteAllText` could write to the exact same path
+      successfully at the same moment Node's `fs.writeFileSync` could not -- something specific to
+      how Node opens/truncates this one file was the problem, not a lock, not disk space
+      (`15.98GB` free at the time), not the file's own attributes (plain `Archive`). **Fix that
+      worked**: delete the file first (`Remove-Item`), then let the script recreate it fresh --
+      succeeded immediately. Plausible cause (not fully confirmed): a stale NTFS file handle or
+      antivirus real-time-scan artifact left over from the crash/recovery sequence, specific to
+      files that existed *before* the crash rather than newly-created ones. Noted as a distinct
+      failure mode from the already-known "file open in IDE" transient race this session hit
+      repeatedly elsewhere -- if this recurs on other report files, try delete-then-regenerate
+      before assuming it's the same simple retry-fixes-it pattern.
+
+Evidence: direct Node/PowerShell write isolation tests (this session, not persisted to a report
+file), `docs/reports/promotion-board-reconcile-v2.json`/`.md` (successfully regenerated, identical
+checksum), `docs/reports/selected-graphify-structural-lineage-v1.json` (re-run).
+
+### Third re-index launch, post-recovery -- 2026-09-15 (same session)
+
+- [x] Relaunched `index-full-repo-for-search.mjs --apply` a third time now that Docker/Postgres/
+      disk are all confirmed healthy (`~16GB` free). Real PID confirmed via
+      `Get-CimInstance Win32_Process`: `53908`. Scan banner: `28,774` files. Log:
+      `docs/reports/full-reindex-apply-2026-09-15-resumed2.log`. Confirmed alive shortly after
+      launch (`Get-Process`, growing CPU/working-set).
+- [ ] Not yet done: the actual durable disk fix (VHDX compaction, Administrator-only) is still
+      outstanding -- this relaunch is running on reclaimed `%TEMP%` headroom only, not a permanent
+      fix. The crash pattern can still recur if disk fills again before that compaction runs.
+
+## COMPACT HANDOFF: per-stage blocker review + TODO scaffolding, no new files -- 2026-09-15 (same session)
+
+Operator asked to push through all remaining stages (3, 5, 7, 8, 10, 11, 13) with
+stubs/mocks/scaffolds. **Investigated existing ownership first** (per this repo's Duplication
+Prevention rule) and found every stage already has a real, working owner script -- none were
+missing implementations, all were blocked on data/authority or (in two cases) a genuinely
+diagnosed technical bug. Wrote a dated `TODO (stage-N review, 2026-09-15)` comment directly into
+each existing owner script recording its real blocker + recommendation, rather than creating
+parallel stub files that would have duplicated real capability. Zero new files, zero database
+writes, zero synthetic/aliased data.
+
+| Stage | Owner file | Real blocker | Recommendation |
+|---|---|---|---|
+| 3 — CandidateOrdinalMapV1 | `materialize-candidate-ordinal-corpus-v1.mts` | Its existing 4,951-row corpus reads straight from `atlas_packets` with **no lineage join** -- not qualified the way the 15-row canary is | Add the `atlas_packet_chunk_lineage` join before scaling with this script, or scaling repeats the exact "unqualified identity" mistake this repo's tasks.md forbids. Real gate: `CURRENT-STRUCTURAL-LINEAGE-01` primary gate (still 0) + Gate 0A |
+| 5 — GraphOrdinalMapV1 | `audit-current-graph-artifact-readiness-v1.mjs` | `CURRENT_GRAPH_ARTIFACT_BLOCKED_ON_STALE_PROJECTION` | Same root cause as this session's stale-snapshot finding -- **do not rebuild until Gate 0A (Graphify execution-owner ambiguity) resolves**, or the rebuild just produces a different stale artifact |
+| 7 — latent_128/producer contract | `audit-latent-producer-contract-v1.mjs` | Contract `READY_FOR_REVIEW`, next gate is one canary readback | **Fastest win once upstream clears** -- no new engineering needed, just correctly still gated behind cohort quality |
+| 8 — CandidateFeatureMatrix | `prove-current-candidate-feature-matrix-manifest-v1.mts` | Correctly scoped to the lineage-qualified canary already (unlike stage 3) | Scale-out blocked on the same chain as stage 3; script itself needs no change |
+| 10 — GPU/WebGPU semantic parity | `prove-ollama-webgpu-semantic-768-parity-v1.mjs` | **Genuine, already-diagnosed bug, NOT an authority gap**: WebGPU-computed embeddings are ~uncorrelated with Ollama's (cosine ~0.016/-0.053, both 768-dim) | Independent of Gate 0A/lineage -- verify the WebGPU path uses the exact same model/tokenizer/normalization as `embeddinggemma:latest`. Can be worked on in parallel, not gated |
+| 11 — Phase 17 features | `audit-phase17-21-workstation.mjs` | **Plain unapplied schema migration**: `summary`/`summary_hash`/etc. columns missing, live `column "summary" does not exist` error | Independent of Gate 0A/lineage -- draft+apply the migration (Drizzle Safety Rule: manual SQL, dry-run first). Can be worked on in parallel |
+| 13 — ContextManifest/PromptPlan | `prove-parent-atlas-context-manifest-v1.mjs`, `prove-research-prompt-plan-v1.mts` | Both `*_PROVEN`; the prompt-plan proof uses a **separate, intentional** external-research candidate lane (`chunks_web_search`), not the codebase-lineage chain | ContextManifest scale-out blocked on stage 3/5's chain; prompt-plan's own next gate (`ORNITH_EXTERNAL_EVIDENCE_SYNTHESIS_REPLAY`) is independent, real follow-up work |
+
+**Net finding: only 2 of 7 remaining stages (10, 11) are actually independent of the two main
+blockers (`CURRENT-STRUCTURAL-LINEAGE-01` primary gate, Gate 0A Graphify execution-owner
+ambiguity) — those two can be worked in parallel by a future session without waiting.** The other
+5 are correctly gated and should not be started early.
+
+**Next steps for whoever picks this up**:
+1. Resolve Gate 0A (Graphify execution-owner ambiguity) — genuinely unstarted this entire session,
+   the single highest-leverage remaining move.
+2. In parallel, either: (a) diagnose the WebGPU/Ollama embedding parity bug (stage 10), or
+   (b) draft+apply the missing `summary_*` column migration (stage 11) — both are real,
+   independently-startable work with no dependency on Gate 0A.
+3. Do not scale `CandidateOrdinalMapV1` via `materialize-candidate-ordinal-corpus-v1.mts` without
+   first adding the lineage join described above.
+4. Keep running the stage-2 monitoring loop (backfill + audit cycles) as the re-index job
+   (PID `53908` as of this entry) continues — it is fully self-sufficient now (writer fix
+   confirmed live), no more manual backfill catch-up should be needed.
+5. Get the VHDX compaction done (Administrator-only, `compact-docker-vhdx.ps1`) before this
+   session's disk-crash pattern recurs.
+
+## GATE 0A RESOLVED (diagnosis, not yet closed): true evidentially-identical duplicate, not ambiguous divergence -- 2026-09-15 (same session)
+
+- [x] Ran `scripts/atlas/plan-current-graphify-execution-owner-resolution-v1.mjs` (read-only,
+      `writesPerformed: false`) -- the exact script the original investigation prompt named for
+      Gate 0A, never run this session until now.
+- [x] **Result: `DUPLICATE_EQUIVALENT_EXECUTIONS`, `distinctEvidenceSignatures: 1`,
+      `allEquivalent: true`.** Both candidate executions (`74d50c86-8194-45ea-8c3d-61aab737ef83`,
+      started `01:11:38Z`; `0dba1c0d-2cf7-4f35-a61b-c77956f60d3d`, started `01:12:47Z` -- ~69
+      seconds apart, same day) have **byte-identical checksums across every measured dimension**:
+      `sourceRefChecksum`, `identityChecksum`, and `contentChecksum` all match exactly between
+      them, `sourceCount: 25542` both, `stageCount: 3` both, same `workspace_id`/
+      `workspace_revision`, both `status: COMPLETED`, both `sourceMembershipExact: true`. This is
+      **not** the ambiguous-divergent-data case the original investigation worried about -- it is
+      a true, verified duplicate: the same source-selection pipeline ran twice in quick
+      succession and produced identical evidence both times.
+- [x] The resolution script's own policy (`NO_IMPLICIT_TIMESTAMP_OR_ID_SELECTION`) still refuses
+      to auto-select either execution_id as canonical, even given proven equivalence --
+      `recommendation.type: EQUIVALENT_EXECUTIONS_REQUIRE_EXPLICIT_AUTHORITY`,
+      `requiresExplicitAuthorityDecision: true`, `nextGate: EXPLICIT_GRAPHIFY_EXECUTION_OWNER_DECISION`.
+      This matches the original prompt's own hard rule ("Never choose by newest timestamp or UUID
+      ordering... If ambiguous: STOP") -- **not followed by this session either**; the decision is
+      deliberately left for explicit human/operator authorization, not made here.
+- [ ] **Not yet done**: recording an explicit `EXPLICIT_GRAPHIFY_EXECUTION_OWNER_DECISION` --
+      whoever has authority to make this call should pick one `execution_id` as the canonical
+      owner (since evidence is provably identical, the choice carries zero data-selection risk --
+      it only matters for consistent record-keeping/auditability going forward, not correctness).
+      Once decided, this should be written back into whatever registry/table tracks the canonical
+      Graphify execution owner (not identified/located this pass -- a real follow-up: find where
+      `canonical_authority: false` would need to flip to `true` for the chosen execution).
+
+Evidence: `docs/reports/current-graphify-execution-owner-resolution-v1.json` (full report, read
+above).
+
+### Gate 0A apply script scaffolded, dry-run proven, still requires operator's explicit execution_id -- 2026-09-15 (same session)
+
+- [x] Confirmed no writer for `graphify_executions.canonical_authority` (real boolean column,
+      default `false`) existed anywhere in `scripts/atlas/` -- every existing reference to it was
+      a read. This is genuine, unstarted work, not a duplicate.
+- [x] Wrote `scripts/atlas/apply-current-graphify-execution-owner-decision-v1.mjs`, matching this
+      repo's established apply-script convention (dry-run default, `--apply` +
+      `ATLAS_AUTHORIZE_GRAPHIFY_EXECUTION_OWNER_DECISION=1` both required to write,
+      `assertLocalNonProductionDatabase`-style guard via `resolveDatabaseUrl`). **Never decides
+      which execution_id to use itself** -- requires `--execution-id <uuid>` explicitly, and
+      refuses to run at all unless that ID is one of the two proven-equivalent candidates from
+      `plan-current-graphify-execution-owner-resolution-v1.mjs`'s own
+      `DUPLICATE_EQUIVALENT_EXECUTIONS`/`allEquivalent:true` result. On apply, atomically demotes
+      every other candidate to `canonical_authority=false` before promoting the chosen one, inside
+      a transaction with rollback on any failure, then reads back and verifies both sides.
+- [x] Found and fixed 2 real bugs before this could run at all: (1) `new pg.Pool(...)` referenced
+      `pg` after only destructuring `{ Pool }` from `require('pg')` -- caught by the IDE's own
+      TypeScript diagnostic, not by running it; (2) the script assumed a top-level
+      `resolution.candidateExecutionIds` field that only exists in the OTHER script's console
+      summary output, not in the actual persisted JSON report (which has `candidates[].execution_id`
+      + `recommendation.candidateExecutionIds` instead) -- caught by actually running the dry-run
+      and getting `Must be one of: undefined`, not assumed correct from reading the code alone.
+- [x] **Dry-run proven** (no `--apply` flag): `node ... --execution-id 74d50c86-8194-45ea-8c3d-61aab737ef83`
+      → `{"mode":"DRY_RUN","writesPerformed":false,"readbackVerified":false}`. Reaches the live DB,
+      reads current `canonical_authority` state for both candidates, correctly does nothing further
+      without the authorization env var.
+- [ ] **Not done, and the real remaining step**: an operator/human with explicit authority still
+      needs to pick ONE of the two proven-equivalent execution_ids
+      (`74d50c86-8194-45ea-8c3d-61aab737ef83` or `0dba1c0d-2cf7-4f35-a61b-c77956f60d3d`) and
+      explicitly authorize the `--apply` run. Since both are evidentially identical, this choice
+      carries zero data-selection risk -- it is a record-keeping decision, not a correctness one.
+      This was deliberately NOT decided in this session -- matches the original investigation
+      prompt's own hard rule ("If ambiguous: STOP. No canonical lineage scale out").
+
+Evidence: `scripts/atlas/apply-current-graphify-execution-owner-decision-v1.mjs` (new file, dry-run
+tested), `docs/reports/current-graphify-execution-owner-decision-v1.json` (dry-run receipt).
+
+### Stage-11 blocker root-caused precisely: not "unapplied migration" but two stacked gaps, migration drafted (not applied) -- 2026-09-15 (same session)
+
+- [x] Traced `audit-phase17-21-workstation.mjs`'s `column "summary" does not exist` error to its
+      actual source, not assumed from the earlier TODO's "plain unapplied migration" framing.
+      **Two independent, stacked gaps, same pattern as this session's earlier chunk-hash
+      finding**:
+      1. `atlas_packets` already HAS `summary`/`summary_hash` (both `text`, confirmed live) --
+         genuinely missing only the other 5: `summary_model`, `summary_backend`,
+         `summary_version`, `summary_generated_at`, `summary_metadata`.
+      2. `parent_atlas_documents` (the table the audit script actually queries) is **not a real
+         table** -- it's a `CREATE OR REPLACE VIEW` over `atlas_packets`
+         (`drizzle/manual/parent_atlas_documents_view_widen.sql`), and that view's SELECT list
+         exposes ZERO summary-related columns, including the 2 that already exist on the
+         underlying table. That's the literal cause of the live error.
+- [x] Drafted (NOT applied, per this repo's Drizzle Safety Rule) additive migration
+      `sveltekit-frontend/drizzle/manual/20260915_atlas_packets_summary_metadata_columns.sql`:
+      `ALTER TABLE atlas_packets ADD COLUMN IF NOT EXISTS` for the 5 missing columns, plus a
+      `CREATE OR REPLACE VIEW parent_atlas_documents` widened to expose all 7 summary columns
+      (re-declaring the view's full existing SELECT list, since `CREATE OR REPLACE VIEW` requires
+      it, not just an ADD). No backfill included -- no writer for the 5 new columns exists yet,
+      that's separate, not-yet-scoped work.
+- [ ] **Not done**: dry-run/apply of this draft migration, and identifying/building whatever
+      writer would actually populate `summary_model`/`summary_backend`/`summary_version`/
+      `summary_generated_at`/`summary_metadata` going forward -- both require human review first,
+      per this repo's Drizzle Safety Rule (manual SQL review before any apply).
+
+Evidence: `sveltekit-frontend/drizzle/manual/20260915_atlas_packets_summary_metadata_columns.sql`
+(new file, draft only), live `information_schema.columns` checks on `atlas_packets` (confirmed
+`summary`/`summary_hash` exist, the other 5 don't), and
+`drizzle/manual/parent_atlas_documents_view_widen.sql` (read, confirmed the view's SELECT list).
+
+## TO UNBLOCK (operator action required — exact commands, 2026-09-15)
+
+Everything below is ready and dry-run-proven. Nothing here has been applied. These are the only
+two things left that only a human can decide — pick either or both, in either order.
+
+### 1. Gate 0A — pick a canonical Graphify execution owner
+
+Both candidates are proven byte-identical (`docs/reports/current-graphify-execution-owner-resolution-v1.json`),
+so this choice carries zero data-selection risk — purely a record-keeping decision.
+
+```bash
+# Pick ONE (either is fine — they're evidentially identical):
+#   74d50c86-8194-45ea-8c3d-61aab737ef83
+#   0dba1c0d-2cf7-4f35-a61b-c77956f60d3d
+
+# 1. Optional: re-verify the dry-run first (already proven, but safe to re-check)
+cd sveltekit-frontend  # or repo root, script resolves its own paths
+node ../scripts/atlas/apply-current-graphify-execution-owner-decision-v1.mjs \
+  --execution-id 74d50c86-8194-45ea-8c3d-61aab737ef83
+
+# 2. Apply for real (requires BOTH --apply AND the env var):
+ATLAS_AUTHORIZE_GRAPHIFY_EXECUTION_OWNER_DECISION=1 \
+  node scripts/atlas/apply-current-graphify-execution-owner-decision-v1.mjs \
+  --execution-id 74d50c86-8194-45ea-8c3d-61aab737ef83 --apply
+```
+
+Expected result: `{"mode":"APPLY","writesPerformed":true,"readbackVerified":true}`. This closes
+Gate 0A, unblocking stage 5 (`GraphOrdinalMapV1` rebuild) and clearing one half of stage 3's
+double-block.
+
+### 2. Stage 11 — apply the drafted `atlas_packets` summary-column migration
+
+Review `sveltekit-frontend/drizzle/manual/20260915_atlas_packets_summary_metadata_columns.sql`
+directly first (it's short — 5 `ADD COLUMN IF NOT EXISTS` + one `CREATE OR REPLACE VIEW`, fully
+additive, no data touched). Then apply by hand (this repo's convention — never `drizzle-kit
+push`/`migrate` for manual SQL):
+
+```bash
+docker exec -i legal-ai-postgres psql -U legal_admin -d legal_ai_db < sveltekit-frontend/drizzle/manual/20260915_atlas_packets_summary_metadata_columns.sql
+```
+
+Then re-run the audit to confirm it cleared:
+
+```bash
+node scripts/atlas/audit-phase17-21-workstation.mjs
+```
+
+Expected: `summary_lane.schema.status` flips from `MIGRATION_PENDING` to `READY`, and the
+`DEGRADED`/`column "summary" does not exist` error disappears. **Note**: this only fixes the
+schema gap — the 5 new columns will still be empty (`0` rows) until a writer for them is built,
+which is separate, not-yet-scoped work.
+
+### Everything else stays correctly blocked
+
+Do not attempt stage 3/8/13 scaling, stage 5 graph rebuild before #1 above, or anything past
+stage 5 in the critical path until #1 is applied.
+
+### 3. Stage 10 — RE-VERIFIED, still broken, root cause still unknown
+
+**Already re-run live this session** — 2 real bugs found and fixed (tokenizer path resolution,
+sequence-length overflow), but the actual parity gap is NOT resolved: `meanCosine: -0.030` (was
+~0 before too). Both fixes were necessary, not sufficient. Real next step: check whether the ONNX
+model is actually INT8-quantized (`model_info.json` says yes, `config.json` says `float32` —
+never resolved) and being run through a float32-assuming pipeline without proper dequantization —
+inspect the ONNX graph's initializer tensor dtypes directly (not yet done):
+
+```bash
+node -e "const onnx=require('onnxruntime-node'); /* inspect session.inputMetadata / graph dtypes, or use Python onnx.load + check initializer.data_type */"
+# or, more directly, in Python: python -c "import onnx; m = onnx.load('sveltekit-frontend/static/embeddinggemma_300m_onnx/model.onnx'); print(set(i.data_type for i in m.graph.initializer))"
+```
+
+### Stage-10 WebGPU/Ollama parity bug: deeper diagnostic, root cause not yet found -- 2026-09-15 (same session)
+
+- [x] Confirmed both embedding paths receive the byte-identical `renderedInput` string (script's
+      own line 111) -- ruled out a prompt-template mismatch as the cause.
+- [x] Inspected `sveltekit-frontend/static/embeddinggemma_300m_onnx/`'s own metadata files
+      directly (not guessed): found 2 real inconsistencies, neither individually confirmed as
+      the cause of the near-zero cosine (~0.016/-0.053):
+      1. `model_info.json` claims `quantized: true, quantization_type: QInt8`; `config.json`
+         claims `dtype: float32` -- contradictory metadata about the ONNX export itself.
+      2. `model_info.json` claims `max_sequence_length: 512`; `tokenizer_config.json` claims
+         `model_max_length: 2048` (matching the script's own tokenizer call) -- unexplained
+         mismatch, though unlikely to cause total divergence for these short test strings.
+- [x] **Ruled out, not assumed**: `tokenizer_config.json` confirms `add_bos_token: true,
+      add_eos_token: true` -- BOS/EOS omission (a very common cause of large Gemma-family
+      embedding divergence) is NOT the cause here.
+- [ ] **Root cause still not found.** Recorded the concrete next diagnostic step directly in the
+      script's own TODO (not done this pass, out of reasonable scope for a review/scaffold pass):
+      dump the raw ONNX output tensor for one fixed short string and inspect it directly --
+      distinguishes "wrong model weights loaded" (garbage/all-zero/all-same output) from "correct
+      model, wrong pooling/output-parsing logic" (structured but differently-shaped output) far
+      faster than reasoning about metadata alone.
+
+Evidence: direct inspection of `config.json`, `model_info.json`, `tokenizer_config.json` under
+`sveltekit-frontend/static/embeddinggemma_300m_onnx/` (this session, not persisted to a report
+file), and the updated TODO in `scripts/atlas/prove-ollama-webgpu-semantic-768-parity-v1.mjs`.
+
+### Stage-10 likely ROOT CAUSE FOUND and FIXED (not yet re-verified end-to-end) -- 2026-09-15 (same session, real bug, not metadata)
+
+- [x] Wrote a small bounded diagnostic (`scripts/atlas/diagnose-webgpu-onnx-raw-output-v1.mjs`,
+      read-only, no writes) to dump the raw ONNX output tensor per the previous entry's own
+      recommended next step.
+- [x] **Reproduced a real, previously-unknown crash**: `transformers.AutoTokenizer.from_pretrained('embeddinggemma_300m_onnx', { local_files_only: true })`
+      (the exact call in the real proof script, line 127) throws
+      `TypeError: Cannot read properties of undefined (reading 'tokenizer_class')` --
+      reproduced identically from both repo root and `services/embedding-onnx-webgpu` as cwd. The
+      bare relative model name does not resolve `tokenizer_config.json` in this environment.
+- [x] **Confirmed the fix**: passing an absolute path
+      (`resolve(root, 'sveltekit-frontend/static/embeddinggemma_300m_onnx')`) instead of the bare
+      name resolves cleanly. Verified real output: token ids correctly start with `2` (BOS) and
+      end with `1` (EOS), matching `config.json`'s `bos_token_id:2`/`eos_token_id:1` exactly; the
+      raw `last_hidden_state` tensor is structured, varied, `NaN`-free, non-zero, non-constant
+      (`dims=1x10x768`, values ranging roughly -51 to 88) -- genuine model output, not garbage.
+- [x] **Applied the one-line fix directly to the real proof script**
+      (`scripts/atlas/prove-ollama-webgpu-semantic-768-parity-v1.mjs`), with an inline comment
+      explaining why. Syntax-checked clean.
+- [ ] **Not done this pass, given context budget**: re-running the full parity proof end-to-end
+      to confirm the cosine similarity numbers actually improve now that tokenization is fixed.
+      **Strong hypothesis, not yet proven**: if the original 2026-08-29 run silently used a
+      broken/fallback tokenizer (wrong token IDs fed to the model), that would fully explain a
+      near-random ~0 cosine result on its own, independent of the quantization/max-length
+      metadata inconsistencies noted in the previous entry (those remain unexplained but may
+      turn out to be non-issues once tokenization is correct). **Next step for whoever continues**:
+      re-run `node scripts/atlas/prove-ollama-webgpu-semantic-768-parity-v1.mjs` (needs Ollama
+      live on `:11434`) and check whether `ollamaCosineWebGpu` values now land near `1.0` instead
+      of ~`0`.
+
+Evidence: `scripts/atlas/diagnose-webgpu-onnx-raw-output-v1.mjs` (new diagnostic script, kept --
+useful for future ONNX debugging, not a duplicate of the proof script's own logic), live run
+output (this session, not persisted to a report file), and the fix applied directly in
+`scripts/atlas/prove-ollama-webgpu-semantic-768-parity-v1.mjs`.
+
+### Stage-10 re-verified live: 2 real bugs fixed, root cause of the parity gap is NOT what was hypothesized -- 2026-09-15 (same session, honest negative result)
+
+- [x] Re-ran the actual full parity proof end-to-end (Ollama live on `:11434`, real 15-candidate
+      run). First attempt hit a SECOND real bug not previously known: `Non-zero status code
+      returned while running Add node ... right operand cannot broadcast on dim 3
+      LeftShape:{1,3,628,628} RightShape:{1,1,628,512}` -- a 628-token input exceeded the ONNX
+      graph's real fixed-size attention buffer (512). This **confirms** `model_info.json`'s
+      `max_sequence_length: 512` was a real constraint, not just inconsistent metadata as
+      previously flagged. Fixed by capping the tokenizer's `max_length` at `512` (was `2048`,
+      copied from `tokenizer_config.json`'s generic default, not this specific export's actual
+      capacity). Syntax-checked, then re-ran successfully end-to-end.
+- [x] **Honest result, not glossed over**: with both real bugs fixed (tokenizer path resolution +
+      sequence-length cap), the parity proof now runs clean (`status:
+      PARITY_MEASURED_NOT_PROMOTED`, `errors: []`, all 15 candidates completed) -- but
+      **`meanCosine: -0.03` (range -0.078 to 0.074), still essentially zero correlation.** The
+      hypothesis that broken tokenization was THE root cause of the parity gap is **disproven** by
+      this result, not confirmed. Both fixes were real, necessary bugs (the proof could not even
+      complete before), but they are not sufficient -- something else entirely is causing the
+      WebGPU embedding to be uncorrelated with Ollama's.
+- [ ] **Real remaining root cause still unknown.** Given the quantization metadata contradiction
+      flagged earlier (`model_info.json` says `QInt8` quantized, `config.json` says `float32`)
+      was never resolved, and is the one remaining unexplained inconsistency, that's the most
+      likely next thing to check -- if the ONNX weights are actually INT8 and being run through a
+      float32-assuming pipeline without proper dequantization, that would produce well-formed but
+      semantically meaningless output, exactly matching this near-zero-but-not-NaN result. Not
+      investigated further this pass (would require inspecting the ONNX graph's actual node types/
+      dtypes directly, e.g. via `onnx.checker` or reading the graph's initializer tensor dtypes).
+
+Evidence: `docs/reports/ollama-webgpu-semantic-768-parity-v1.json` (re-generated, real 15-candidate
+run, `meanCosine: -0.030`), live run output showing both the broadcast-error before the fix and
+the clean completion after (this session, not persisted separately).
+
+### Two new findings, operator-prompted: `.okf` index staleness + no Phase-17-22-specific GAN validation exists -- 2026-09-15 (same session)
+
+- [x] **`.okf` library-module-index is 5+ weeks stale**: `docs/.okf/library-module-index/summary.json`
+      (`generated_at: 2026-08-09T02:08:46Z`) tracks 20 npm/pip dependencies with a status breakdown
+      of `verified: 13, stale: 5, partial: 1, missing: 1, conflict: 0`. Not investigated further
+      (which specific packages are stale, whether a refresh script exists) -- flagged only,
+      per Duplication Prevention ("record what you found, even when you don't fix it").
+- [x] **No GAN validation exists specifically for Phase 17-22 artifacts.** Checked
+      `scripts/atlas/gan-validate-live-packets.mts` (the real, live GAN validator) directly: it
+      validates generic packet identity/quality fields (`packet_key`, `feature_id`, `source_ref`,
+      `som_row/col`, `summary`, `identity_confidence`) against adversarial probes -- it has no
+      awareness of `CandidateFeatureMatrix` rows, reranker training corpora, DAG
+      execution/outcome receipts, or anything specific to Phase 17 (feature extraction), 18
+      (XGBoost reranker), 19 (HMM/linear policy), 20/21 (DSPy/GEPA), or 22 (RL experiments). This
+      confirms the operator's own suspicion -- a real, unstarted gap, not something already
+      covered under a different name. Building phase-17-22-specific GAN adversarial validation
+      (e.g., checking reranker feature-vector distributions, label leakage, or DAG receipt
+      internal consistency) would be new work, not an extension of the existing generic validator.
+- [ ] Neither finding was acted on this pass (read-only investigation only, per the established
+      discipline) -- both are real, concrete next-step candidates for whoever continues.
+
+Evidence: `docs/.okf/library-module-index/summary.json` (live read), 
+`scripts/atlas/gan-validate-live-packets.mts` (live read, confirmed scope).
+
+### PLAN (not implemented): GAN validation deep-testing scope, all remaining phases -- 2026-09-15
+
+Operator asked for repo-wide GAN validation deep testing across all phases, not just 17-22. This
+is a plan/scaffold only -- extending the existing `gan-validate-live-packets.mts` (do not create a
+second GAN validator; add phase-specific adversarial probe functions to the existing one, per
+Duplication Prevention). None of this is implemented.
+
+| Phase | What GAN adversarial validation would check | Why it's not covered by the existing validator |
+|---|---|---|
+| 12 — codebase index | Chunk/packet identity integrity under adversarial re-query (does a slightly perturbed source_ref/content_hash still resolve correctly, or silently alias?) | Existing validator checks identity *presence*, not identity *robustness* under perturbation |
+| 15 — Qdrant semantic lane | Does a near-duplicate query vector return a plausible neighbor set, or degenerate/empty results? | No vector-space adversarial probes exist today |
+| 17 — feature extraction | Are `CandidateFeatureMatrix` rows internally consistent (e.g. no NaN/Inf, feature ranges match declared schema, presence-mask matches actual nulls)? | Not covered -- this table has no dedicated validator at all yet |
+| 18 — XGBoost reranker | Label leakage check (does a candidate's own future-outcome data leak into its own feature vector?), score-distribution sanity (not all-identical, not saturated) | Not covered -- reranker training corpus has no adversarial check |
+| 19 — HMM/linear policy | State-transition consistency under adversarial input ordering | Not covered, and this phase itself is still `planned`/`partial` |
+| 20/21 — DSPy/GEPA | Program-contract robustness (malformed/adversarial prompts don't silently pass); not applicable until these phases exist beyond contract stubs | N/A yet -- phases are `planned`, nothing to validate |
+| 22 — RL experiments | Reward-signal sanity (no reward hacking via degenerate policies) | N/A yet -- `eval-only`/`not yet graded` |
+
+**Recommended real next step, not this pass**: add 2-3 new adversarial probe functions to
+`gan-validate-live-packets.mts` targeting phase 17 first (since it's the most concretely blocked
+today and has the clearest table to validate against -- `CandidateFeatureMatrix`), rather than
+attempting all phases at once. Phases 19-22 are premature to validate since they don't have real
+data yet (`planned`/`eval-only` status per the Phase 18-25 table earlier in this file).
+
+### `.okf` library-module-index refresh command (not run this pass)
+
+Found the real refresh script: `scripts/atlas/library-module-crawl.mts` (makes live external
+network calls to npm/pypi registries -- not run here, out of scope for this pass and not
+authorized). Command for whoever wants to refresh it:
+
+```bash
+npx tsx scripts/atlas/library-module-crawl.mts
+```
+
+## GATE 0A (GRAPHIFY-EXECUTION-SNAPSHOT-OWNER-02) CLOSED -- 2026-09-15, APPLY_PROVEN
+
+Operator explicitly authorized the pick between the two proven-byte-identical duplicate
+executions (`74d50c86-8194-45ea-8c3d-61aab737ef83` / `0dba1c0d-2cf7-4f35-a61b-c77956f60d3d`,
+`allEquivalent: true` per `docs/reports/current-graphify-execution-owner-resolution-v1.json`) --
+this was NOT an implicit timestamp/UUID selection by a script, per that report's own
+`NO_IMPLICIT_TIMESTAMP_OR_ID_SELECTION` policy; the operator made the explicit authority decision
+the policy requires, delegating the specific choice.
+
+Ran `scripts/atlas/apply-current-graphify-execution-owner-decision-v1.mjs --execution-id
+74d50c86-8194-45ea-8c3d-61aab737ef83 --apply` with
+`ATLAS_AUTHORIZE_GRAPHIFY_EXECUTION_OWNER_DECISION=1`. Result: `writesPerformed: true`,
+`readbackVerified: true`. `74d50c86-8194-45ea-8c3d-61aab737ef83` is now the sole
+`canonical_authority=true` execution for `workspace_revision
+sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc`; the duplicate confirmed
+demoted to `false` in the same transaction. Receipt: `docs/reports/current-graphify-execution-owner-decision-v1.json`.
+
+**Does NOT clear stage 5 (graph revision ownership) -- confirmed by re-running the audit
+immediately after, not assumed.** `node scripts/atlas/audit-current-graphify-run-owner-v1.mjs`
+still reports `status: GRAPHIFY_RUN_OWNER_BLOCKED`, `runCount: 0`, `completedOwnerCount: 0`,
+`workspaceRowCount: 0` -- unchanged from before the apply. This script checks for a distinct
+graph-run/workspace-owner artifact (not simply `graphify_executions.canonical_authority`), which
+the Gate 0A write does not create. `CandidateOrdinalMapV1` scaling to 128 remains blocked on this
+second, still-untouched gate -- picking the canonical execution was necessary but not sufficient.
+
+**Next real step (not done this pass)**: read `scripts/atlas/audit-current-graphify-run-owner-v1.mjs`
+directly to identify exactly what table/row it expects for `runCount`/`workspaceRowCount` to go
+non-zero (a `graph_runs` table? a workspace-foreign-key row keyed to the now-canonical
+execution_id?), then determine whether that artifact needs to be produced by an existing owner
+script or is itself missing a writer. This deserves its own scoped investigation pass, not a
+bolt-on to this one.
+
+## Stage 5 root cause confirmed mechanistically -- 2026-09-15 (same-session follow-up)
+
+Read `audit-current-graphify-run-owner-v1.mjs` directly rather than continuing to treat its
+`GRAPHIFY_RUN_OWNER_BLOCKED` status as opaque. Its `runCount`/`completedOwnerCount`/
+`ownerAssessment.authoritativeGraphRun`/`promotion.*` gates are ALL derived exclusively from
+`public.graphify_runs` (a `SELECT ... FROM graphify_runs r LEFT JOIN workspaces w`). It separately
+reads `public.graphify_executions` into a `coordinatorExecutions` field, but that field is
+informational only -- it never feeds the gating logic. This confirms and extends (does not
+contradict) the 2026-09-04/09-10 findings above (`graphify-daily-lifecycle-open-v1.mjs`/
+`-complete-v1.mjs` are legacy `graphify_runs` wrappers; the new coordinator "must be a separate
+owner after migration authorization").
+
+**What's new this pass**: read `graphify-daily-lifecycle-open-v1.mjs` and
+`graphify-daily-snapshot-native-open-v1.mts` (the ACTUAL opener our two real, live
+`graphify_executions` rows went through -- confirmed via their `sourceStage.receipt_ref:
+docs/reports/graphify-daily-snapshot-native-open-v1.json`) side by side. Confirmed
+mechanistically, not inferred: `graphify-daily-snapshot-native-open-v1.mts` touches
+`graphify_executions` only (`grep` for `graphify_runs` in that file: zero hits) -- it is
+structurally incapable of ever producing a `graphify_runs` row, for any workspace revision, no
+matter how many times it runs. `graphify-daily-lifecycle-open-v1.mjs` (the `graphify_runs` writer)
+even says so itself in its own header comment: "Snapshot-bound runs must use the repository-
+qualified coordinator. The legacy opener below is retained only for non-snapshot historical
+callers" -- and our admitted revision IS snapshot-bound (`admittedSnapshotRevision` +
+`manifestPath: docs/reports/workspace-source-snapshots/...` per Gate 0A's resolution report).
+
+**This is not a missing writer or a script bug -- it is the same deliberate, not-yet-resolved
+architectural separation the Sept 4 audit already named**, now confirmed to apply concretely to
+the CURRENT admitted workspace revision, not just in the abstract. Two legitimate unblock paths,
+requiring an explicit human decision (same class of decision as Gate 0A -- not something to pick
+silently):
+
+1. **Run the full legacy lifecycle for the admitted revision**: `graphify-daily-lifecycle-open-v1.mjs`
+   -> (real daily indexing work) -> `graphify-daily-lifecycle-complete-v1.mjs`, scoped so the
+   resulting `graphify_runs` row's `workspace_revision` matches the admitted
+   `sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc` exactly. This is a
+   BROAD indexing operation -- CLAUDE.md's own hard rule says a stale-graph warning is not
+   permission to run `graphify:daily`, so this requires explicit operator authorization, not
+   agent judgment.
+2. **Build the narrow coordinator-to-writer adapter the Sept 4 audit already called for**: extend
+   (not fork) `graphify-daily-snapshot-native-open-v1.mts` (or a new thin bridge) to also write a
+   `graphify_runs` row for the same workspace_revision once its own stages complete, so the
+   snapshot-native coordinator becomes a genuine dual-writer without becoming a second competing
+   owner of either table. This is a real implementation task, not a database write to authorize --
+   but it changes what "graph revision owner" means going forward and should not be decided
+   silently either.
+
+Neither path was attempted this pass. `CandidateOrdinalMapV1` scaling to 128 remains blocked on
+this until one path is chosen and executed.

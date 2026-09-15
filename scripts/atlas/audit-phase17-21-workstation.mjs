@@ -1,5 +1,17 @@
 #!/usr/bin/env node
 
+/**
+ * TODO (stage-11 review, 2026-09-15): last run (2026-09-09) reported overall PARTIAL, 67%,
+ * with a concrete, ALREADY-ACTIONABLE blocker independent of the lineage/graph-owner chain:
+ * summary_lane.schema.status is MIGRATION_PENDING -- missing columns `summary`, `summary_hash`,
+ * `summary_model`, `summary_backend`, `summary_version`, `summary_generated_at`,
+ * `summary_metadata`, and coverage is DEGRADED with a live error
+ * `column "summary" does not exist`. This is a plain unapplied schema migration, not a
+ * data-authority gap -- unlike stages 3/5/8's blockers, this one doesn't need Gate 0A or
+ * CURRENT-STRUCTURAL-LINEAGE-01 resolved first. Recommend: locate/draft the missing migration
+ * for these 7 columns (follow this repo's Drizzle Safety Rule -- manual SQL, dry-run first,
+ * human review before apply) as an independently-doable next step.
+ */
 import fs from 'node:fs';
 import fsPromises from 'node:fs/promises';
 import path from 'node:path';

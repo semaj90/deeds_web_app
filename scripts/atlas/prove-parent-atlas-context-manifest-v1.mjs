@@ -1,6 +1,14 @@
 #!/usr/bin/env node
 
-/** Read-only ContextManifestV1 construction and replay proof. */
+/** Read-only ContextManifestV1 construction and replay proof.
+ *
+ * TODO (stage-13 review, 2026-09-15): last run status was CONTEXT_MANIFEST_REPLAY_PROVEN,
+ * nextGate KERNEL_DAG_VALIDATOR_AND_BOUNDED_READ_ONLY_EXECUTION. Correctly sourced from the
+ * lineage-qualified 15-row canary map, same as stage 8. Downstream of the same upstream chain
+ * (CURRENT-STRUCTURAL-LINEAGE-01 + Gate 0A) for scale-out; the next gate itself
+ * (kernel DAG validator + bounded read-only execution) is real, separate follow-up work once
+ * that chain clears, not blocked on anything else.
+ */
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import crypto from 'node:crypto';
