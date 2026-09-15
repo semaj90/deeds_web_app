@@ -40,6 +40,34 @@ fabric_registry:
     random_access: "mmap"
     state: "SEALED"
 
+# Ontology concept-vocabulary registry. Same convention as fabric_registry
+# above -- this declares the owning contracts, it does not enforce them and
+# is not the real external Google Cloud OKF spec (see header). Added
+# 2026-09-15 by openspec/changes/parent-atlas-ontology-oaklib-fanout-bitmap
+# Phase 1 (resolution boundary), design.md D4.
+ontology:
+  schema: "atlas.okf.ontology.v1"
+  owner: "sveltekit-frontend/src/lib/server/atlas/ontology-resolution-boundary-postgres.ts"
+  canonical_authority: false
+  vocabulary_root: "atlas_domain_ontology"
+  resolution_contract: "sveltekit-frontend/src/lib/server/atlas/contracts/ontology-resolution-boundary-v1.ts"
+  evidence_contract: "sveltekit-frontend/src/lib/server/atlas/contracts/ontology-linked-tuple-v1.ts"
+  admission_gate: "sveltekit-frontend/src/lib/server/atlas/contracts/ontology-fanout-authority-v1.ts"
+  required_fields:
+    - resolved_concept_id
+    - ontology_revision
+  resolution_states:
+    - RESOLVED
+    - UNRESOLVED
+    - AMBIGUOUS
+    - RESOLUTION_UNAVAILABLE
+  never_mints:
+    - packet_key
+    - source_revision
+    - workspace_revision
+    - canonical_chunk_id
+    - graph_revision
+
 # ─── Top-level ontology structure ───────────────────────────────────────────
 
 root_schema:

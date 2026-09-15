@@ -15,23 +15,74 @@
 
 ## 2. Phase 1 — Ontology resolution boundary (OAKLIB-equivalent)
 
-- [ ] 2.1 Decide the concrete implementation: real `oaklib` Python package behind a small
-      FastAPI sidecar (closest to the originally-described `:8095` design) vs. a lighter
-      TypeScript-native resolver. Record the decision and rationale before writing code.
-- [ ] 2.2 Define the resolver's request/response contract matching
-      `specs/ontology-resolution-boundary/spec.md` exactly (label-to-concept, ancestor walk,
-      never-mints-lineage-identity, explicit unavailable state).
-- [ ] 2.3 Seed-grow `atlas_domain_ontology`: add new concept rows only (additive), do not modify
-      or remove the existing 7. Draft the seed data as a reviewable file before any insert.
-- [ ] 2.4 Implement the resolver against the grown vocabulary; unit-test all 4 spec scenarios
-      (known-label resolves, unknown-label doesn't fabricate, ancestor walk, never mints
-      lineage identity).
-- [ ] 2.5 Implement and test the explicit `RESOLUTION_UNAVAILABLE` degraded path (no fallback
-      guessing).
-- [ ] 2.6 Extend `docs/.okf/schema.yaml` with an `ontology` block referencing
-      `resolved_concept_id`/`ontology_revision`, following the existing `fabric_registry`
-      convention (`canonical_authority: false`, references existing owners, not a new schema
-      file).
+- [x] 2.1 **Decision: TypeScript-native resolver, not a real `oaklib` Python package /
+      FastAPI sidecar.** Rationale: (a) real `oaklib` targets OBO-family biomedical/scientific
+      ontologies (GO, ENVO, MONDO, etc.) via `.obo`/OWL files — this repo's vocabulary is
+      software/architecture concepts rooted in `atlas_domain_ontology`, a plain Postgres
+      `is_a` table, not an OBO graph; adopting `oaklib` would mean either fabricating a fake
+      OBO file to satisfy its loader or using none of its actual value. (b) Per
+      `DEPENDENCY-CAPABILITY-GUARD-01` (CLAUDE.md), a new Python service/dependency requires a
+      proven capability gap — none exists here: label→concept lookup, alias matching, and
+      parent-chain walking are plain string/graph operations with zero need for OBO-specific
+      tooling. (c) **Audited existing code before writing anything new, per Duplication
+      Prevention — found a real, already-built, already-tested match**:
+      `sveltekit-frontend/src/lib/server/atlas/taxonomy/entity-concept-taxonomy-v1.ts`
+      exports `recognizeConceptV1()`, a pure function doing exactly this proposal's
+      "resolve a label to zero-or-one concept ID via exact-id/canonical-label/alias match,
+      never invent on failure" requirement — plus `ConceptV1`/`createConceptV1` (concept
+      shape) and `createConceptBroaderThanV1` (parent/child hyperedge). Confirmed via
+      `grep -rl "recognizeConceptV1"` (excluding its own spec file): **zero live callers** —
+      dormant, same "well-built, unwired" pattern as `OntologyLinkedTupleV1` itself. The
+      Phase 1 resolver therefore **reuses `recognizeConceptV1`/`createConceptV1` rather than
+      writing a second label-matcher**, adding only: (i) a Postgres loader from
+      `atlas_domain_ontology` into `ConceptV1[]`, (ii) an ancestor-chain walker over
+      `parent_group_id` (simpler than `createConceptBroaderThanV1`'s full hyperedge — a plain
+      chain read, no graph-write apparatus needed for a lookup), and (iii) the
+      `RESOLUTION_UNAVAILABLE` wrapper this spec requires that `recognizeConceptV1` itself
+      (a pure function, no I/O) has no reason to know about.
+- [x] 2.2 Defined the request/response contract:
+      `sveltekit-frontend/src/lib/server/atlas/contracts/ontology-resolution-boundary-v1.ts`
+      (pure Zod schemas, no I/O) — `OntologyResolutionRequestV1`/`ResultV1`
+      (label-to-concept) and `OntologyAncestorRequestV1`/`ResultV1` (ancestor walk), both with
+      `resolutionState` including `RESOLUTION_UNAVAILABLE`, and a passthrough-only
+      `callerContext.packetKey`/`sourceRef` (never validated/minted — matches spec.md's
+      "Never mints Parent Atlas lineage identity" requirement).
+- [x] 2.3 Seed-grew `atlas_domain_ontology` via a new script,
+      `sveltekit-frontend/scripts/atlas/seed-atlas-domain-ontology-oaklib-phase1-v1.mjs`
+      (`--dry-run` default, `--apply` flag, `ON CONFLICT (group_id) DO NOTHING`). 10 new rows
+      grounded in real, frequently-observed `feature_ontology_tuples` labels sampled during
+      this change's own audit (`frontend`/`frontend.sveltekit`, `database`/`database.postgresql`,
+      `graph`, `gpu`, `machine-learning`, `cache`, `compiler`, `test`) — deliberately excluding
+      noisy extractor artifacts also observed in that sample (`concept:2026`, `concept:src`,
+      `concept:lib`, `concept:python311`: path/env noise, not real concepts; seeding those would
+      just relocate the anti-pattern into the vocabulary). Dry-run reviewed first, then applied.
+      **Verified live**: `atlas_domain_ontology` now has 17 rows (7 original + 10 new); the
+      original 7 (`api`/`auth`/`devops`/`devops.env-config`/`devops.process-mgmt`/
+      `error-handling`/`retrieval`) are byte-for-byte unmodified (re-selected and diffed against
+      the pre-seed sample).
+- [x] 2.4 Implemented the resolver:
+      `sveltekit-frontend/src/lib/server/atlas/ontology-resolution-boundary-postgres.ts` —
+      `resolveOntologyLabelV1()` (loads `atlas_domain_ontology` rows, builds `ConceptV1[]`
+      with `conceptId = concept:<group_id>`, delegates matching to `recognizeConceptV1()`)
+      and `resolveOntologyAncestorsV1()` (walks `parent_group_id`, cycle-guarded, truncates
+      rather than fabricates on a dangling link). Unit-tested (`.spec.ts`, mocked `pool.query`
+      per this repo's existing `ontology-linked-tuple-postgres.spec.ts` convention) — **6/6
+      passing**: known-label alias resolution, unknown-label non-fabrication (asserts no
+      INSERT side effect), ancestor walk (`concept:devops.env-config` → `[concept:devops]`,
+      the exact spec.md example), passthrough-only `packetKey` (asserts no query references
+      `packet_key`), `RESOLUTION_UNAVAILABLE` on a rejected query, and `AMBIGUOUS` on a
+      duplicate-alias fixture (not silently picking one).
+- [x] 2.5 `RESOLUTION_UNAVAILABLE` is the `catch` branch of both resolver functions above —
+      covered by the "returns RESOLUTION_UNAVAILABLE... when the boundary is unreachable"
+      test (2.4). No fallback guessing: on error, `conceptId`/`ancestorConceptIds` are always
+      empty/null, never a best-effort guess.
+- [x] 2.6 Extended `docs/.okf/schema.yaml` with an `ontology` block (right after
+      `fabric_registry`, same convention: `canonical_authority: false`, references existing
+      owners rather than duplicating them) — `required_fields: [resolved_concept_id,
+      ontology_revision]`, `resolution_states` enum, and an explicit `never_mints` list
+      matching spec.md's lineage-identity prohibition. Verified valid YAML via
+      `js-yaml.load()` after editing (parses cleanly, `ontology` block present alongside the
+      pre-existing `fabric_registry`, `root_schema`, etc.).
 
 ## 3. Phase 2 — Bridge `feature_ontology_tuples` (forward-only cutover, per design.md D2)
 
