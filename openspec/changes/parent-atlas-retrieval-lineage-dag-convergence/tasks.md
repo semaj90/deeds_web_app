@@ -14299,3 +14299,25 @@ a script change I should make unilaterally:
 
 Neither implemented this pass. Recorded for the same explicit-decision handoff pattern as Gate 0A
 and stage 5.
+
+## Blast-radius scoping for option 1 vs option 2 -- 2026-09-15 (same day)
+
+Before recommending between the two paths above, scoped option 1's actual risk rather than
+guessing. Searched for real consumers of `codebase_chunk_index.content_hash` specifically (not
+just the generic field name `content_hash`, which appears on many unrelated contracts/tables
+repo-wide -- an unfiltered grep for that term alone returns 40+ files in the first page and
+undercounts nothing useful). Narrowed to files referencing BOTH `codebase_chunk_index` and
+`content_hash`/`contentHash` together: **101 files**. This is an upper bound (not every hit
+necessarily assumes chunk-scoped semantics specifically), but it is a strong signal that
+`content_hash`'s existing meaning is widely load-bearing, not a narrow, easily-auditable surface
+like stage 5's single writer function.
+
+**Recommendation, not a decision made unilaterally**: option 2 (accept the file-hash ceiling,
+route `CandidateOrdinalMapV1` promotion through a different, chunk-grain-native mechanism) is
+almost certainly the safer, lower-risk path given this blast radius -- it matches this repo's
+demonstrated preference for narrow additive adapters over redefining existing contracts (the same
+choice already made for stage 5: a new sibling function, never a rename of
+`bindWorkspaceRevisionV1`). Designing what that "different chunk-grain-native mechanism" concretely
+looks like is itself a real, separate design task (effectively a new promotion-policy proposal),
+not something to improvise as a continuation of this gate-closing pass -- flagged as the next
+scoped piece of work, not started here.
