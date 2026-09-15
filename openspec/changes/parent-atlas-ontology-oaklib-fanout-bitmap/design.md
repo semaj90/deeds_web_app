@@ -87,6 +87,19 @@ schema.yaml` alongside the existing `fabric_registry`, referencing `resolved_con
 
 ## Risks / Trade-offs
 
+- **[`OntologyFanoutAuthorityV1` admission is never persisted anywhere — found live while
+  drafting Phase 3, 2026-09-15]** `evaluateOntologyFanoutAuthorityV1()` (`ontology-fanout-
+  authority-v1.ts`) has zero production callers (confirmed via `grep` — only its own `.spec.ts`
+  calls it); no table anywhere records an admission decision. This means Phase 3's fanout view
+  can only filter on `resolution_state = 'RESOLVED'` (Phase 2), which is necessary but NOT
+  sufficient to satisfy spec.md's "No bypass of admission gate" requirement — there is currently
+  nothing to bypass because the gate was never wired to persist a result. → Mitigation: recorded
+  explicitly in the migration file's own header comment rather than silently treating
+  `resolution_state = 'RESOLVED'` as if it were admission-equivalent; real admission-gated
+  filtering requires a separate, later piece of work (wire `evaluateOntologyFanoutAuthorityV1`
+  to a real caller that persists its verdict) before this view can honestly claim spec
+  compliance on that specific requirement.
+
 - [Resolver vocabulary starts small (7 seed concepts) and most new evidence may initially fail
   to resolve] → Mitigation: `resolution_state` explicitly includes an `UNRESOLVED` state (not a
   hard failure) so unresolved evidence keeps flowing through existing consumers unchanged while
@@ -114,6 +127,35 @@ schema.yaml` alongside the existing `fabric_registry`, referencing `resolved_con
 4. Rollback at every phase: additive-only changes (new columns default-null, new view/indexes)
    can be dropped without touching `feature_ontology_tuples`' existing rows or any other
    consumer's behavior.
+
+## Resolved consideration: would a precomputed LUT (lookup table) beat the materialized-view + bitmap-index design?
+
+Raised directly by the operator during implementation (2026-09-15) — answered with real measurements
+against this table's actual current data, not speculation:
+
+**What a LUT would mean here**: one row per `resolved_concept_id`, holding a precomputed array of
+`packet_key`/`subject_id`/`tuple_id` references (an inverted-index rollup), refreshed periodically —
+turning an N-row fanout into a single-row fetch + array deserialize.
+
+**Real measurement (proxy, since `resolved_concept_id` has zero populated rows yet)**: `EXPLAIN
+(ANALYZE, BUFFERS)` on `feature_ontology_tuples` filtered by a real high-fanout label
+(`object_id = 'concept:sveltekit'`, 14,171 of 539,124 rows) already produces a native
+`Bitmap Index Scan -> Bitmap Heap Scan` via the existing `feature_ontology_tuples_object_idx`:
+**295ms cold-cache, 29.5ms warm-cache** (10x, once Postgres's own buffer cache is warm). This
+confirms Postgres's native bitmap-scan path already behaves like an inverted index/LUT at this
+table's real scale and cardinality — a GIN/btree index IS a lookup table, just one Postgres already
+maintains transactionally, with no separate refresh/staleness concern.
+
+**Decision: do not build a separate LUT table now.** A hand-rolled LUT only wins over the native
+bitmap scan when (a) a specific concept's fanout is large enough that even a warm-cache bitmap heap
+scan is too slow for its caller's latency budget, AND (b) that concept is queried frequently enough
+to justify a second data structure's refresh/staleness overhead. Neither condition is measurable yet
+— `resolved_concept_id` has zero real rows (Phase 2 has no live writer producing new,
+resolver-annotated tuples today). Building a LUT speculatively, with no caller and no fanout data to
+size it against, repeats this exact repo's own documented failure mode (Duplication Prevention: 6
+already-dead ontology-shaped tables built ahead of real need). If real resolved data eventually shows
+a specific concept with very high fanout AND a latency-sensitive caller, revisit this as a targeted,
+evidence-backed addition — not a redesign of Phase 3's materialized view, which stays either way.
 
 ## Open Questions
 

@@ -116,14 +116,19 @@
       day, applied successfully). Result: `total=539124, resolved_populated=0,
       unresolved_count=539124` — confirms every existing row would default correctly to
       `UNRESOLVED`/`NULL`, zero unintended impact, then rolled back (nothing persisted).
-- [ ] 3.3 **NOT YET APPLIED — explicit human authorization required before running this for
-      real** (per design.md's own stated gate, and this repo's Drizzle Safety Rule). Drafted +
-      dry-run-proven only. An apply script following the same
-      `apply-codebase-chunk-index-whole-file-hash-columns-v1.mjs` pattern (separate
-      `pool.query()` calls, required for `CREATE INDEX CONCURRENTLY`) is ready to write once
-      authorized, but was deliberately not created yet — no script should exist that makes
-      applying a 539K-row production migration one keystroke away from an unreviewed "yes
-      continue."
+- [x] 3.3 **APPLIED 2026-09-15** (explicit human authorization given, confirmed "yes continue
+      migrate"). Ran `sveltekit-frontend/scripts/atlas/apply-feature-ontology-tuples-resolution-columns-v1.mjs`
+      (same `apply-codebase-chunk-index-whole-file-hash-columns-v1.mjs` pattern — separate
+      `pool.query()` calls, required for `CREATE INDEX CONCURRENTLY`). **Live readback confirms**:
+      both columns exist (`resolution_state text NOT NULL DEFAULT 'UNRESOLVED'`,
+      `resolved_concept_id text` nullable), the
+      `feature_ontology_tuples_resolution_state_check` constraint exists, the
+      `idx_feature_ontology_tuples_resolved_concept_id` partial index exists. **Zero unintended
+      impact, exactly as dry-run predicted**: `539,124` total rows, `0` with
+      `resolved_concept_id` populated, `539,124` with `resolution_state = 'UNRESOLVED'`. (Note:
+      an earlier same-day attempt to run this script was denied by the session's own auto-mode
+      permission classifier as a "Modify Shared Resources" action — re-authorized and re-run
+      successfully this turn, not bypassed.)
 - [ ] 3.4 **Reframed per the 3.1 finding above.** There is no live extractor write path to hook
       into today. The correct Phase 2 deliverable is a reusable annotation helper —
       `annotateFeatureOntologyTupleWithResolutionV1()` — that calls the Phase 1 resolver
@@ -141,23 +146,50 @@
 
 ## 4. Phase 3 — PG18 AIO-friendly bitmap fanout storage
 
-- [ ] 4.1 Verify actual installed PostgreSQL 18.4 AIO configuration (`io_method` and related
-      GUCs) live against this host's running instance — do not assume settings from memory or
-      general PG18 documentation.
-- [ ] 4.2 Draft (do not apply) the materialized view definition: `feature_ontology_tuples`
-      filtered to `resolution_state = 'RESOLVED'` AND passed `OntologyFanoutAuthorityV1`
-      admission (join against whatever table/flag records that admission decision — confirm the
-      exact admission-record location before drafting the join, do not assume one).
-- [ ] 4.3 Draft (do not apply) supporting indexes on `resolved_concept_id`, `subject_id`,
-      `packet_key` on the materialized view.
-- [ ] 4.4 Dry-run `EXPLAIN` against the drafted view/index combination (on a snapshot or
-      transaction rollback) to confirm a `Bitmap Heap Scan` plan at real row-count scale before
-      considering apply — matches `specs/ontology-fanout-storage/spec.md`'s bitmap-scan
-      requirement.
-- [ ] 4.5 Decide and document the refresh cadence and staleness bound (on-demand vs. scheduled)
-      before any consumer is wired to read from this view.
-- [ ] 4.6 Human review + explicit authorization checkpoint before applying the materialized
-      view/index migration for real.
+- [x] 4.1 Verified live against this host's actual running PG18.4 instance (not assumed from
+      docs): `server_version = "18.4 (Debian 18.4-1.pgdg12+1)"`, `io_method = worker` (PG18's
+      cross-platform AIO default — this is a Debian container, so `io_uring` isn't in play; the
+      worker-process model is), `io_combine_limit = 128kB`, `io_max_combine_limit = 128kB`,
+      `effective_io_concurrency = 16`, `maintenance_io_concurrency = 16`. AIO is genuinely active
+      on this instance (not the pre-18 synchronous-only behavior) — confirms design.md's premise
+      is real, not aspirational, on this host.
+- [x] 4.2 Drafted the materialized view:
+      `sveltekit-frontend/drizzle/manual/20260915_feature_ontology_tuples_fanout_v1.sql` —
+      `feature_ontology_tuples` filtered to `resolution_state = 'RESOLVED' AND
+      resolved_concept_id IS NOT NULL`, built `WITH NO DATA` (deliberate — zero real resolved
+      rows exist yet). **Real finding recorded in the file's own header, not silently worked
+      around**: confirmed via `grep` that `evaluateOntologyFanoutAuthorityV1()` (the admission
+      gate spec.md requires this view to filter through) has **zero production callers anywhere**
+      — no table persists an admission decision at all, so this view can only filter on
+      `resolution_state = 'RESOLVED'`, which is necessary but not sufficient for spec.md's
+      admission-gate requirement. Recorded as a new Risk in design.md rather than faking a join
+      that doesn't correspond to real data.
+- [x] 4.3 Drafted 4 supporting indexes in the same file: a unique index on `tuple_id` (required
+      for any future `REFRESH ... CONCURRENTLY`), plus btree indexes on `resolved_concept_id`,
+      `subject_id`, `packet_key`.
+- [x] 4.4 Dry-ran the full file in a rolled-back transaction (`CREATE MATERIALIZED VIEW` + 4
+      indexes + a non-concurrent `REFRESH`, since `CONCURRENTLY` can't run in a transaction
+      either, same as `CREATE INDEX CONCURRENTLY`) — all statements succeeded, `EXPLAIN` on the
+      empty view correctly picked an `Index Scan` on `resolved_concept_id`. Real bitmap-scan
+      proof used a proxy (documented precisely as a proxy, not the real filtered view, since that
+      has 0 rows today): `EXPLAIN (ANALYZE, BUFFERS)` on the base table filtered by a real
+      high-fanout label (`object_id = 'concept:sveltekit'`, 14,171/539,124 rows) shows a native
+      `Bitmap Index Scan -> Bitmap Heap Scan` via `feature_ontology_tuples_object_idx` —
+      **295ms cold-cache, 29.5ms warm-cache** — confirming the bitmap-scan mechanism this design
+      relies on already works correctly on this table's real data/index shape at real scale.
+      **This measurement also directly answered the operator's "would a LUT be faster?"
+      question** — see design.md's new "Resolved consideration" section: decision is not to
+      build a separate lookup table now (native bitmap scan + warm cache already performs well;
+      no real fanout data yet to size a LUT against; would repeat this repo's own
+      build-ahead-of-need mistake).
+- [x] 4.5 Refresh cadence: **on-demand only, for this phase.** Confirmed live —
+      `SELECT * FROM pg_available_extensions WHERE name = 'pg_cron'` returns 0 rows on this
+      instance; `pg_cron` isn't even installable without a separate image/extension change, which
+      itself would need its own `DEPENDENCY-CAPABILITY-GUARD-01` justification. No consumer is
+      wired to this view yet (matches spec.md's "refresh cadence documented before first caller"
+      gate — satisfied by recording it here, before any caller exists).
+- [ ] 4.6 **NOT YET APPLIED — explicit human authorization required before running this for
+      real**, same discipline as task 3.3. Drafted + dry-run-proven only.
 
 ## 5. Cleanup (Duplication Prevention)
 
