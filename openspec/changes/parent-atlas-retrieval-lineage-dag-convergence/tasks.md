@@ -14424,3 +14424,33 @@ silently INSERTing new near-duplicate rows instead of repairing the old ones -- 
 not the intended backfill either. Closing this gap correctly requires first reconciling the two
 key-generation schemes (or building an explicit alias/mapping between them), which is itself
 non-trivial scoped work. Not implemented this pass; flagged precisely rather than rushed.
+
+## Ontology / OAKLIB audit -- what's actually built vs. described -- 2026-09-15
+
+**OAKLIB itself: zero hits anywhere in the repo**, and the described `:8095` Python sidecar also
+has zero hits -- neither exists. Matches CLAUDE.md's own pre-existing framing (OAKLIB named as an
+intended role there already: "should never invent packetKey/sourceRevision/workspaceRevision...
+if unavailable, return an explicit unavailable state").
+
+**But the surrounding layer is far more built than expected -- audited before concluding, per
+Duplication Prevention.** `contracts/ontology-linked-tuple-v1.ts` (`OntologyLinkedTupleV1Schema`)
+closely matches the operator's proposed shape and is MORE flexible (n-ary via typed
+`participants[]`, not just triples), with a real writer/cache/10+ consumers. **But its backing
+table `atlas_ontology_linked_tuples` has ZERO rows** -- dormant in production, same pattern as the
+5-competing-PageRank finding (Aug 9). The REAL live system is `feature_ontology_tuples`
+(539,124 rows) + `ontology_domain_tuples` (61,659) + `ontology_keywords` (31,097). Sampled rows:
+`object_id: "concept:fn-call"`, raw extractor-invented labels with no resolution against any
+controlled vocabulary -- exactly the "classifier owns the truth" anti-pattern the operator named.
+`ontology_edges` (252,102 rows) is NOT concept relations despite the name -- it's packet-to-packet
+`similar_to` similarity, unrelated. `atlas_domain_ontology` (7 rows) IS a genuine tiny `is_a`
+hierarchy, hand-seeded 2026-06-29, unchanged since, never connected to the live tuple store. Six
+more ontology-shaped tables are completely empty (`atlas_concepts`, `concept_records`,
+`registry_ontology_tuples`, `atlas_ontology_concepts`, `atlas_ontology_relations`,
+`atlas_ontology_tuples`) -- duplication-risk dead weight, separate from the OAKLIB gap.
+
+**Direct answer**: (1) OAKLIB/resolution layer doesn't exist -- the one clean gap. (2) The
+well-designed tuple contract is unused (0 rows); real data flows through a simpler, ungrounded
+store instead. (3) The 7-row `is_a` seed is the only real hierarchy, disconnected from live data.
+(4) Six dead tables are a separate cleanup candidate. Not implemented -- standing up OAKLIB and
+grounding `feature_ontology_tuples` is a large, separate initiative deserving its own OpenSpec
+proposal, not a rushed continuation here.
