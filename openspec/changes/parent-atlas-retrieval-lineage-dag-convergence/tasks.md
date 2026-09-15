@@ -14404,3 +14404,23 @@ computed):
 Not implemented this pass -- this is real production-writer code with schema-column and
 CLI-surface implications, warranting its own dry-run-first pass (Drizzle Safety Rule discipline)
 rather than being folded into this investigation turn.
+
+**Found a better existing candidate, then found a real blocker before implementing it**: this same
+file already has `runGraphifyParseProbe()` (`--graphify-parse` mode) -- a genuine, working,
+ast-grep-based byte-precise candidate generator that ALSO resolves `packet_key`/`feature_id`/
+`source_revision`/`workspace_revision` per candidate from a packet index (lines 267-282). It is
+explicitly and only read-only (`status: 'DRY_RUN'`, `readOnly: true`, `databaseWrites: false` in
+its own report schema) -- it writes a candidates JSONL file and a report, never `atlas_ast_nodes`
+itself. This looked like a much smaller fix than reimplementing byte computation: just add an
+apply mode that upserts these already-computed candidates.
+
+**Real complication found before implementing, not glossed over**: the ast-grep candidate path and
+the default chunk-index-sourced path use different, non-overlapping vocabularies for kind/symbol
+naming (`graphifyAstCandidates` emits e.g. `variable`/`enum`, which are not in the default path's
+`VALID_KINDS` set) and compute `tree_node_id`/`normalized_node_hash`/`qualified_symbol` from
+different inputs. Naively adding `ON CONFLICT (...) DO UPDATE` keyed the same way as the default
+path would very likely fail to match the existing stale rows at all (different computed keys),
+silently INSERTing new near-duplicate rows instead of repairing the old ones -- not dangerous, but
+not the intended backfill either. Closing this gap correctly requires first reconciling the two
+key-generation schemes (or building an explicit alias/mapping between them), which is itself
+non-trivial scoped work. Not implemented this pass; flagged precisely rather than rushed.
