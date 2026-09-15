@@ -14,5 +14,6 @@ export const load: PageServerLoad = async ({ locals, fetch }) => {
 		vocabulary: data?.vocabulary ?? [],
 		resolutionStats: data?.resolutionStats ?? null,
 		totalTuples: data?.totalTuples ?? 0,
+		oakKernel: data?.oakKernel ?? { reachable: false },
 	};
 };

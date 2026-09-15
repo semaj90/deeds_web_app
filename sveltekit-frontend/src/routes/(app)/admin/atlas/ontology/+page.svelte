@@ -22,12 +22,19 @@
 		ontologyRevision: string | null;
 	};
 
+	type OakSearchMatch = { entityId: string; label: string | null };
+
 	let { data }: { data: PageData } = $props();
 
 	let testLabel = $state('');
 	let testResult = $state<ResolutionResult | null>(null);
 	let testError = $state<string | null>(null);
 	let testPending = $state(false);
+
+	let oakQuery = $state('');
+	let oakMatches = $state<OakSearchMatch[] | null>(null);
+	let oakError = $state<string | null>(null);
+	let oakPending = $state(false);
 
 	const vocabulary = $derived((data.vocabulary as VocabularyRow[]) ?? []);
 	const topLevel = $derived(vocabulary.filter((row) => row.parentGroupId === null));
@@ -63,6 +70,30 @@
 			testError = err instanceof Error ? err.message : String(err);
 		} finally {
 			testPending = false;
+		}
+	}
+
+	async function runOakSearch() {
+		if (!oakQuery.trim()) return;
+		oakPending = true;
+		oakError = null;
+		oakMatches = null;
+		try {
+			const res = await fetch('/api/admin/atlas/ontology-resolution/oak-search', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ query: oakQuery.trim(), limit: 20 }),
+			});
+			const body = await res.json();
+			if (!res.ok || !body.ok) {
+				oakError = body.error ?? `Request failed (${res.status})`;
+			} else {
+				oakMatches = body.result.matches ?? [];
+			}
+		} catch (err) {
+			oakError = err instanceof Error ? err.message : String(err);
+		} finally {
+			oakPending = false;
 		}
 	}
 
@@ -166,6 +197,55 @@
 				{/if}
 				<div>Match method: {testResult.matchMethod ?? '(none)'}</div>
 			</div>
+		{/if}
+	</div>
+
+	<div class="panel p-4">
+		<h2 class="text-lg font-medium mb-1">OAK kernel (concept-level, port 8095)</h2>
+		<p class="text-xs opacity-60 mb-3">
+			A separate system this page does not own — real <code>oaklib</code> behind
+			<code>python/atlas_oak_kernel.py</code>, owned by
+			<code>openspec/changes/parent-atlas-ontology-kernel</code>. Resolves against
+			<code>atlas_ontology_concepts</code>/<code>atlas_ontology_relations</code> (currently
+			empty), not the <code>atlas_domain_ontology</code> vocabulary above.
+		</p>
+
+		{#if data.oakKernel.reachable}
+			<div class="text-sm flex flex-wrap gap-x-6 gap-y-1 mb-3">
+				<span>oaklib: <strong>{data.oakKernel.oaklibVersion ?? 'unknown'}</strong></span>
+				<span>adapter: <strong>{data.oakKernel.adapterType ?? '(none)'}</strong></span>
+				<span>mode: <strong>{data.oakKernel.mode ?? 'unknown'}</strong></span>
+			</div>
+		{:else}
+			<div class="text-warning text-sm mb-3">Sidecar unreachable (is miniforge-nlp-sidecar running on :8095?)</div>
+		{/if}
+
+		<div class="flex gap-2">
+			<input
+				class="border rounded px-2 py-1 flex-1"
+				placeholder="concept-level search, e.g. postgres"
+				bind:value={oakQuery}
+				onkeydown={(e) => e.key === 'Enter' && runOakSearch()}
+			/>
+			<button class="btn-primary" disabled={oakPending} onclick={runOakSearch}>
+				{oakPending ? 'Searching…' : 'Search'}
+			</button>
+		</div>
+
+		{#if oakError}
+			<p class="text-danger mt-2">{oakError}</p>
+		{/if}
+
+		{#if oakMatches}
+			{#if oakMatches.length === 0}
+				<p class="text-xs opacity-60 mt-2">No matches (expected — atlas_ontology_concepts has 0 rows today).</p>
+			{:else}
+				<ul class="mt-2 text-sm">
+					{#each oakMatches as match (match.entityId)}
+						<li><code>{match.entityId}</code> — {match.label ?? '(no label)'}</li>
+					{/each}
+				</ul>
+			{/if}
 		{/if}
 	</div>
 </div>

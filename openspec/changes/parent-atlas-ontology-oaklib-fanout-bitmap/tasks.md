@@ -207,3 +207,70 @@
 - [ ] 6.3 Update `parent-atlas-retrieval-lineage-dag-convergence/tasks.md`'s ontology audit
       section with a pointer to this change once Phase 1 is live, so the two records stay
       linked.
+
+## 7. Correction: a real, LIVE OAK/oaklib FastAPI kernel already existed and was missed by
+      task 2.1's original decision (2026-09-15, found while researching per operator request)
+
+- [x] 7.1 **Real gap in the original Duplication Prevention audit, found and recorded
+      honestly.** Task 2.1 decided "TypeScript-native resolver, not real `oaklib`/FastAPI" on
+      the premise that no such sidecar existed. That premise was wrong. Live-verified this
+      session: `python/atlas_oak_kernel.py` (402 lines) is a real FastAPI router
+      (`prefix="/oak"`), mounted into `python/miniforge_nlp_sidecar_oak.py`, running in the
+      **already-live** `miniforge-nlp-sidecar` Docker container (port 8095, confirmed via
+      `docker ps` — "Up 2 hours (healthy)"). `curl :8095/oak/health` confirms **real `oaklib`
+      0.7.4 is genuinely installed** (`available: true`), and an `adapterConfigured: true,
+      adapterType: "atlas-postgres"` — it's currently wired to a `AtlasPostgresOntologyAdapter`
+      (not a real OBO/OLS adapter) that reads/writes-nothing-but-reads two of the "6 empty
+      ontology tables" task 1.6 flagged as archival candidates: `atlas_ontology_concepts`
+      (concept_id/canonical_label/aliases, 11-value `concept_type` CHECK constraint including
+      `domain`/`category`/`capability`) and `atlas_ontology_relations` (14-value `predicate`
+      CHECK constraint: IS_A/INSTANCE_OF/ALIAS_OF/IMPLEMENTS/USES_SYSTEM/CALLS/FOLLOWS/
+      IMPROVES/DEPENDS_ON/PART_OF/PRODUCES/CONSUMES/STORES_IN/READS_FROM). This schema is
+      **richer and more deliberately designed than `atlas_domain_ontology`** (the flat, 17-row
+      `is_a`-only table this change's Phase 1 grew and built a resolver against) — real FK
+      constraints between the two tables, a GIN alias index, 11 concept types vs.
+      `atlas_domain_ontology`'s implicit single kind. Both tables remain 0 rows in production
+      (unchanged), so nothing was actually duplicated in data terms — but the CODE-level
+      duplication (a second, independent, well-built resolution boundary) is real and should
+      have been caught before task 2.1 committed to a decision.
+- [x] 7.2 Traced ownership: `python/atlas_oak_kernel.py` and its `AtlasPostgresOntologyAdapter`
+      belong to a SEPARATE, far larger, pre-existing OpenSpec change —
+      `openspec/changes/parent-atlas-ontology-kernel/` (4,843-line tasks.md, proposal.md scoped
+      to "OWL/SHACL profile-check admission... Preserve Postgres, Neo4j, oaklib, NetworkX,
+      cuGraph, FastAPI, and MCP ownership boundaries"). That change's own stated scope is the
+      profile-check/ConstraintV2/OWL-SHACL kernel mechanics, NOT label-to-concept resolution or
+      the `feature_ontology_tuples` bridge this change (`parent-atlas-ontology-oaklib-fanout-
+      bitmap`) covers — its "Modified Capabilities: None" and narrow Impact section confirm zero
+      overlap with `feature_ontology_tuples`/`atlas_domain_ontology`/the fanout materialized
+      view. Not fully read (4,843 lines exceeds this pass's bounded scope) — only cross-
+      referenced for ownership boundaries, per Duplication Prevention rule 4 ("layered
+      ownership, not competing owners") rather than treated as fully audited.
+- [x] 7.3 **Resolution: layered ownership, not a rewrite.** `atlas_domain_ontology` (this
+      change's Phase 1 vocabulary root) stays as the coarse DOMAIN-level bucket layer — already
+      migrated, already matches `feature_ontology_tuples`' real `domain:X`-shaped labels sampled
+      during the original audit, already has a working resolver + admin page. The live OAK
+      kernel (`:8095/oak/*`, owned by `parent-atlas-ontology-kernel`) is a separate, deeper
+      CONCEPT-level lexical/graph-traversal layer, real `oaklib` underneath, currently pointed at
+      the still-empty richer schema. Neither replaces the other. Did NOT attempt to merge, move
+      Phase 1's vocabulary root, or rewrite `parent-atlas-ontology-kernel`'s territory in this
+      pass — that would be new, separately-scoped work requiring a real decision about which
+      schema (`atlas_domain_ontology` vs. `atlas_ontology_concepts`) becomes canonical, out of
+      bounds for a same-session correction.
+- [x] 7.4 Confirmed via direct web search (INCATools/oaklib docs, berkeleybop.org) that real
+      `oaklib`'s actual capability set is lexical/CURIE/synonym matching + graph traversal over
+      pluggable backends (OLS/BioPortal/OBO/SPARQL) — it does NOT do dense/embedding-based
+      retrieval or PyTorch-style classification. This matches `atlas_oak_kernel.py`'s own real
+      endpoints (`lookup`/`search`/`ancestors`/`descendants`, all lexical/graph, zero embedding
+      calls) — confirms this repo's existing separation is architecturally correct: OAK/oaklib
+      owns lexical/CURIE resolution; `embeddinggemma` + Qdrant (768-dim) already owns dense
+      semantic retrieval; `python/train_domain_classifier.py` (sklearn KMeans + MultinomialNB +
+      LogisticRegression, NOT PyTorch — confirmed live: the sidecar's own `/health` reports
+      `"torch": false`) owns offline weak-label classification. No new PyTorch classifier or
+      dense-search sidecar is needed — all three layers already exist; nothing here should be
+      duplicated a third time.
+- [x] 7.5 Added a small, additive proxy so the admin page surfaces the live OAK kernel's health
+      + lets an admin run a concept-level search against it, clearly labeled as a distinct
+      system from the domain-level vocabulary above — see
+      `sveltekit-frontend/src/routes/api/admin/atlas/ontology-resolution/+server.ts` (new
+      `oakKernel` field on GET, new `POST .../oak-search` action) and the admin page's new "OAK
+      kernel (concept-level, port 8095)" panel. Read-only proxy only; no write path added.
