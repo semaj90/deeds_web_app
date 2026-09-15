@@ -14064,6 +14064,29 @@ This lowers option 2's estimated cost relative to option 1 (running the full leg
 `graphify:daily` pipeline), but does not decide between them -- still an explicit, pending
 human/architecture decision. Not implemented this pass.
 
+**CORRECTION, same day, before any implementation started**: the claim above that option 2 needs
+"no new SQL, no new primitive" is only true for `openGraphifyRunV1` and `completeGraphifyRunV2`.
+`bindWorkspaceRevisionV1` is NOT reusable as-is -- its input, `WorkspaceRevisionRecordV1`
+(`workspace-source-binding-v1.ts`), is validated by a `.strict().superRefine()` schema that hard-
+requires real git OIDs: `baseCommitOid`/`baseTreeOid` matched against `gitOidSchema(gitObjectFormat)`,
+and `buildWorkspaceRevisionRecordV1()` (the only producer of this record) requires a
+per-entry `gitBlobOid`. The snapshot-native source model
+(`SealedSnapshotSourceV1`/`SnapshotSource` in `graphify-daily-coordinator-v1.ts` /
+`graphify-daily-snapshot-native-open-v1.mts`) has no git blob OIDs at all -- it is explicitly NOT a
+git checkout, which is the exact reason `graphify-daily-lifecycle-open-v1.mjs` already refuses to
+run against a snapshot root. Grepped for a git-free variant of this record/binding function across
+`indexing/` and `identity/`: none exists. This means the bind step genuinely needs either (a) a new,
+narrow, git-free sibling function (e.g. `bindSealedSnapshotWorkspaceRevisionV1`) that performs the
+same `UPDATE public.graphify_runs SET workspace_revision=..., source_manifest_digest=...,
+source_manifest_source_count=... WHERE run_id=$1 AND status='RUNNING' AND workspace_revision IS
+NULL` as the existing function but validates a schema without git-OID fields, or (b) accepting a
+real design tradeoff (populating placeholder git-OID-shaped values, which this repo's own rules
+forbid as synthetic identity). Option (a) is still small (one new function, no new table, no new
+migration -- `graphify_runs.workspace_revision`/`source_manifest_digest`/
+`source_manifest_source_count` are already nullable, no schema change needed), but it is real new
+code requiring its own review, not pure wiring. Revising the earlier "no new SQL/primitive" framing
+accordingly -- option 2 remains cheaper than option 1, just not free.
+
 **Recommended real next step, not this pass**: add 2-3 new adversarial probe functions to
 `gan-validate-live-packets.mts` targeting phase 17 first (since it's the most concretely blocked
 today and has the clearest table to validate against -- `CandidateFeatureMatrix`), rather than
