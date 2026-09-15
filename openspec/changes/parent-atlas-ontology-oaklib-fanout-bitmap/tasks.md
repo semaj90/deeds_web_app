@@ -274,3 +274,64 @@
       `sveltekit-frontend/src/routes/api/admin/atlas/ontology-resolution/+server.ts` (new
       `oakKernel` field on GET, new `POST .../oak-search` action) and the admin page's new "OAK
       kernel (concept-level, port 8095)" panel. Read-only proxy only; no write path added.
+
+## 8. Blocked: agentic-error-fixing wiring found a deeper infrastructure gap, not attempted
+      (2026-09-15, operator asked to wire the resolver into agentic error fixing)
+
+- [x] 8.1 **`error_logs` — the table the entire P1 agentic-error-fixing pipeline reads from
+      (`scripts/atlas/audit-error-fixes.mjs`, `plan-error-fixes.mjs`, `apply-error-fixes.mjs`,
+      `npm run atlas:error:*`) — does not exist in this database.** Confirmed live:
+      `SELECT EXISTS(...information_schema.tables WHERE table_name='error_logs')` returns
+      `false`. `audit-error-fixes.mjs` already knows this and degrades gracefully (prints
+      "P1 infrastructure is in setup phase," recommends creating the table first) — this is not
+      a bug I introduced, it's a pre-existing, self-aware gap. **Wiring the ontology resolver
+      into this pipeline is not meaningful right now — there is no live pipeline to wire into.**
+- [x] 8.2 **Found a THIRD parallel domain-classification taxonomy, not two.** In addition to
+      this change's `atlas_domain_ontology` (17 rows) and the OAK kernel's dormant
+      `atlas_ontology_concepts`/`atlas_ontology_relations` (section 7), a completely separate,
+      hardcoded, static JS object taxonomy exists in
+      `scripts/atlas/agentic-error-domain-ontology.mjs`: `ERROR_DOMAIN_MAP` (14 `errorClass:
+      domainClass` pairs, e.g. `TimeoutError:llm`) and `DOMAIN_CLASSES` (10 domains: auth/db/
+      cache/search/grpc/sse/llm/gpu/neo4j/ui — genuinely different bucket names than this
+      change's own `atlas_domain_ontology` seed, e.g. no `frontend`/`compiler`/`machine-learning`
+      here, no `auth`/`error-handling` there). **This script is a standalone CLI diagnostic, not
+      a live pipeline** — its `--export` mode claims to "export to Postgres" but only creates a
+      session-scoped `CREATE TEMP TABLE` (discarded when the process exits) and otherwise just
+      `console.log`s a report; nothing durable is written, nothing else in the repo reads its
+      output. Confirmed zero other callers.
+- [x] 8.3 **Decision: do not wire anything further into agentic error fixing this pass.**
+      Building a 4th consumer of the ontology resolver on top of (a) a non-existent
+      `error_logs` table and (b) three already-unreconciled domain taxonomies would compound
+      exactly the failure mode Duplication Prevention exists to catch, not fix it. Recorded
+      here per rule 6 ("record what you found, even when you don't fix it") rather than forcing
+      a fourth taxonomy or a fake `error_logs` table into existence to make "wiring" possible.
+      **Real next step, if/when prioritized**: (1) decide whether `error_logs` should exist at
+      all (it may be superseded by a different live error-tracking surface not yet checked), and
+      (2) reconcile the 3 domain taxonomies into one before adding a 4th caller — neither
+      decision was authorized or made in this pass.
+- [x] 8.4 **The rest of the same request, checked for existing owners before building anything
+      new (Duplication Prevention), status recorded honestly:**
+      - **BM25 / lexical retrieval**: already fully live — `multi-lane-retrieval.ts`,
+        `canonical-rerank-executor.ts`, `retrieve-candidates.ts`, `unified-orchestrator.ts` all
+        reference it; part of this repo's documented 6-signal blend. No new work needed.
+      - **Go-retrieval search engine**: already live — `go-retrieval-grpc-client.ts` +
+        `go-search-bridge.ts` (documented in CLAUDE.md's "SESSION 84" section, ports :8096/:8100).
+        No new work needed.
+      - **DAG synthesis**: already live — `kag-dag-runner.ts`, `search-unified/+server.ts`'s
+        `workflowDag` field (documented in CLAUDE.md's API response shape). No new work needed.
+      - **ACE JSON packet inserts**: already extensively documented/built per CLAUDE.md's ACE
+        sections (context-assembler.ts, PacketGlyphV1, etc.) — not re-audited line-by-line this
+        pass, but no evidence of a gap prompting new work.
+      - **LUT (lookup tables)**: already answered last turn (design.md's "Resolved
+        consideration" section) — native bitmap-scan index already performs well, no separate
+        LUT justified without real fanout data.
+      - **DSPy/GEPA**: explicitly named as **not a P0 dependency** in this workstation's own
+        standing critical-path rules (established before this change existed). Not built —
+        would need explicit reauthorization to bring into scope, not implied by this request.
+      - **Ewin Tang recommendation algorithm** (quantum-inspired classical sampling-based
+        low-rank recommendation): confirmed via `grep` — **does not exist anywhere in this
+        repo**, and nothing currently calls for it (`recommendation-glyph.ts` is an unrelated
+        byte-packing transport encoder, not a recommendation algorithm). Not built this pass —
+        implementing a real Tang-style sampling algorithm from scratch is a disproportionately
+        large research effort with no identified caller in this pipeline; flagged rather than
+        attempted speculatively.
