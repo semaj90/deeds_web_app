@@ -72,6 +72,7 @@ const clean = (value: unknown): string | null => {
 	const text = String(value).trim();
 	return text || null;
 };
+const isNonNullString = (value: string | null): value is string => value !== null;
 const normalizeSourceRef = (value: unknown): string => String(value ?? '').trim().replaceAll('\\', '/').replace(/^\/+/, '').replace(/^\.\//, '');
 const stable = (value: unknown): string => {
 	if (Array.isArray(value)) return `[${value.map(stable).join(',')}]`;
@@ -118,7 +119,7 @@ try {
 		: packetColumns.has('file_content_hash')
 			? 'file_content_hash'
 			: null;
-	const wholeDigestKind = wholeDigestColumn === 'source_content_digest'
+	const wholeDigestKind: CurrentPacketDigestCandidateV1['wholeSourceDigestKind'] = wholeDigestColumn === 'source_content_digest'
 		? 'SOURCE_CONTENT_DIGEST'
 		: wholeDigestColumn === 'file_content_hash'
 			? 'FILE_CONTENT_HASH'
@@ -180,8 +181,10 @@ try {
 			[sourceRef],
 		)).rows;
 
-		const distinctPacketKeys = [...new Set(packetCandidates.map((row) => clean(row.packet_key)).filter(Boolean))];
-		const provisionalPacketKey = distinctPacketKeys.length === 1 ? distinctPacketKeys[0]! : 'UNRESOLVED_PACKET_KEY';
+		const distinctPacketKeys = [...new Set(
+			packetCandidates.map((row) => clean(row.packet_key)).filter(isNonNullString),
+		)];
+		const provisionalPacketKey = distinctPacketKeys.length === 1 ? distinctPacketKeys[0] : 'UNRESOLVED_PACKET_KEY';
 		const bridge = buildPacketDigestBridgeV1({
 			packetKey: provisionalPacketKey,
 			sourceRef,
