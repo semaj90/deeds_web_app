@@ -14355,3 +14355,52 @@ rows), and (3) a NEW audit script analogous to `audit-selected-graphify-structur
 that joins on this finer grain instead of `codebase_chunk_index.content_hash`. This is real,
 multi-step, currently-unscoped work -- not started here, and not a quick follow-on to today's two
 gate closures.
+
+## Root-caused the atlas_ast_nodes byte-range gap precisely -- 2026-09-15 (same day, "how to fix")
+
+Operator asked how to actually fix the gap. Traced both known `atlas_ast_nodes` writers to their
+real INSERT statements rather than guessing:
+
+- `scripts/atlas/lib/atlas-ast-nodes-writer.mjs` -- its own docstring says it is specifically for
+  NON-CODE document structure (JSON key paths, Markdown headings), invoked by
+  `graphify-symbol-extractor-v1.mts`. It DOES correctly compute and write `start_byte`/`end_byte`/
+  `workspace_id`/`source_revision` -- this is why the 150 `heading` + 6 `module` rows (the only
+  ones with real byte ranges) are populated. Its `ON CONFLICT DO NOTHING` would still silently
+  block any future backfill re-run from updating an existing stale row, but this writer was never
+  the source of the bulk gap.
+- `sveltekit-frontend/scripts/atlas/populate-atlas-ast-nodes.mjs` -- the REAL bulk writer (sourced
+  from `codebase_chunk_index`, producing the `class`/`file`/`type`/`function`/`schema`/`route`
+  rows). Read its actual INSERT (~line 475-485): the column list is `tree_node_id, structural_key,
+  repo_id, relative_path, node_kind, qualified_symbol, parser_language, normalized_signature,
+  parent_tree_node_id, line_start, line_end, normalized_node_hash, source_content_hash,
+  parser_name, parser_version, source_ref_key` -- **`start_byte`/`end_byte`/`workspace_id`/
+  `source_revision` are entirely absent from this INSERT's column list**, not merely unpopulated.
+  This writer only ever tracks line numbers (`line_start`/`line_end`, sourced from
+  `codebase_chunk_index`'s own line-level chunk boundaries), never byte offsets. This is why the
+  gap exists: it isn't that byte ranges are computed and silently dropped by `ON CONFLICT DO
+  NOTHING` -- they are never computed for this code path at all.
+- Confirms `ON CONFLICT DO NOTHING` is a REAL, separate bug too (same file, same INSERT) --
+  contrasted directly against the SAME file's own `atlas_source_refs` INSERT 40 lines below, which
+  correctly uses `ON CONFLICT (source_ref_key, repo_id) DO UPDATE SET ...`. The inconsistency is
+  within one file, not a repo-wide pattern question.
+
+**Concrete fix, precisely scoped, not yet implemented**: `populate-atlas-ast-nodes.mjs`'s
+`atlas_ast_nodes` INSERT needs three changes together (partial fixes would be misleading -- e.g.
+adding ON CONFLICT DO UPDATE alone would upsert nothing new since no byte values are ever
+computed):
+1. Compute `start_byte`/`end_byte` from real source bytes when building `fileNodes`/`symbolNodes`
+   (a working `Buffer.byteLength(sourceText.slice(0, range.start.index), 'utf8')` pattern already
+   exists elsewhere in this same file -- reuse it, don't reinvent).
+2. Add `workspace_id`/`source_revision` parameters to the INSERT, sourced from the admitted
+   workspace-revision context (this script's current CLI surface doesn't appear to accept these
+   yet -- needs its own small addition, not assumed already wired).
+3. Change `ON CONFLICT DO NOTHING` to `ON CONFLICT (<the real unique constraint columns>) DO
+   UPDATE SET start_byte = EXCLUDED.start_byte, end_byte = EXCLUDED.end_byte, workspace_id =
+   EXCLUDED.workspace_id, source_revision = EXCLUDED.source_revision WHERE
+   atlas_ast_nodes.start_byte IS NULL` (matching the file's own established upsert pattern), so a
+   re-run actually backfills the ~11,000 existing stale rows instead of silently no-op'ing on an
+   already-present unique key.
+
+Not implemented this pass -- this is real production-writer code with schema-column and
+CLI-surface implications, warranting its own dry-run-first pass (Drizzle Safety Rule discipline)
+rather than being folded into this investigation turn.
