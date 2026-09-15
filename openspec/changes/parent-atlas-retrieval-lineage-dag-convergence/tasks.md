@@ -14321,3 +14321,37 @@ choice already made for stage 5: a new sibling function, never a rename of
 looks like is itself a real, separate design task (effectively a new promotion-policy proposal),
 not something to improvise as a continuation of this gate-closing pass -- flagged as the next
 scoped piece of work, not started here.
+
+## Audited both existing candidates for a chunk-grain-native mechanism: neither is usable as-is -- 2026-09-15
+
+Operator asked "what is needed, what is it" -- audited the two most plausible existing candidates
+directly (live `\d`/`SELECT` against Postgres, not assumed from table names) rather than proposing
+a design in the abstract.
+
+- **`atlas_source_refs`** (populated at scale by the Sept 12 commit `9fc154d18d`): 4,834 rows carry
+  a genuine sub-file `symbol_kind` (`type`/`function`/`schema`/`route`/`class`/`module`) with real
+  `start_byte`/`end_byte` ranges -- a plausible chunk-grain analog. But `corpus_version` and
+  `commit_sha` are **100% empty** across all 4,834 of them (`count(*) GROUP BY corpus_version`
+  returns one row, blank, count 4834). There is no existing binding from these rows to the admitted
+  workspace revision at all -- using this table would require building that binding from scratch,
+  not just querying it.
+- **`atlas_ast_nodes`** (11,223 rows, the same table behind this week's "AST/structural features"
+  coverage jump 20.3%->88.7%): has purpose-built `workspace_id`/`source_revision` columns already
+  on the schema -- but only **156/11223 (1.4%) have workspace_id populated** and **48/11223 (0.4%)
+  have source_revision populated**. Worse, breaking down by `node_kind`: of 11,223 rows, only
+  **160 total have a real `start_byte`/`end_byte` range** (150 `heading`, 6 `module`, 2 `class`,
+  2 `function`) -- the dominant kinds (`class`: 3675, `file`: 2744, `type`: 2281, `function`: 1764,
+  `schema`: 343, `route`: 260) have essentially **zero byte-range population** despite the columns
+  existing on every row.
+
+**Direct answer**: neither table is a ready-made alternate promotion mechanism. Both have the right
+*shape* (sub-file granularity, hash + byte-range + revision-binding columns) but neither has the
+*data* populated at meaningful scale. Building a real chunk-grain-native mechanism from here would
+require, at minimum: (1) a byte-range backfill for `atlas_ast_nodes` at the ~11K-row scale (or a
+fresh AST pass that populates it correctly going forward), (2) a workspace/revision-binding pass
+tying rows to the admitted workspace revision (the same kind of binding work the Sept 12 commit
+already did for whole-file `atlas_source_refs` rows, but not yet done for either table's sub-file
+rows), and (3) a NEW audit script analogous to `audit-selected-graphify-structural-lineage-v1.mjs`
+that joins on this finer grain instead of `codebase_chunk_index.content_hash`. This is real,
+multi-step, currently-unscoped work -- not started here, and not a quick follow-on to today's two
+gate closures.
