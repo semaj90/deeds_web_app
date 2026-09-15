@@ -14042,6 +14042,28 @@ Duplication Prevention). None of this is implemented.
 | 20/21 — DSPy/GEPA | Program-contract robustness (malformed/adversarial prompts don't silently pass); not applicable until these phases exist beyond contract stubs | N/A yet -- phases are `planned`, nothing to validate |
 | 22 — RL experiments | Reward-signal sanity (no reward hacking via degenerate policies) | N/A yet -- `eval-only`/`not yet graded` |
 
+## Stage 5 option 2 (narrow adapter) scoped, not implemented -- 2026-09-15
+
+Read `graphify-source-inventory-writer-v2.ts` directly to scope option 2's real effort/risk before
+any decision. Finding: **the primitives already exist and are already proven** --
+`openGraphifyRunV1`/`bindWorkspaceRevisionV1` (used today by the legacy
+`graphify-daily-lifecycle-open-v1.mjs`) and `completeGraphifyRunV2` (transactional, with a
+readback-verified receipt: `GraphifyRunCompletionReceiptV2`, `UPDATE ... WHERE status='RUNNING'`
+guarding against double-completion). All three were already live-proved together by
+`prove-graphify-open-bind-complete-lifecycle-v1.mjs` per this file's own header comment. This means
+option 2 does NOT require new SQL, a new writer, or a new proof harness -- it requires wiring
+`graphify-daily-snapshot-native-open-v1.mts` (or a thin adapter alongside it) to additionally call
+`openGraphifyRunV1` at open time and `completeGraphifyRunV2` once its own SOURCE_SELECTION/INVENTORY
+stages complete, using the identical `workspace_revision` its `graphify_executions` row already
+carries. Real remaining design question (not resolved here): whether `run_id` should be a fresh
+UUID cross-referenced to `execution_id`, or whether the two identities should be unified -- this is
+exactly the kind of "keep the two identities separate, narrow adapter not a rename" caution this
+file's 2026-09-04 entry already raised, and still applies.
+
+This lowers option 2's estimated cost relative to option 1 (running the full legacy
+`graphify:daily` pipeline), but does not decide between them -- still an explicit, pending
+human/architecture decision. Not implemented this pass.
+
 **Recommended real next step, not this pass**: add 2-3 new adversarial probe functions to
 `gan-validate-live-packets.mts` targeting phase 17 first (since it's the most concretely blocked
 today and has the clearest table to validate against -- `CandidateFeatureMatrix`), rather than
