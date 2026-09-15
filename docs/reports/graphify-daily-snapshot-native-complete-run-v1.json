@@ -1,0 +1,13 @@
+{
+  "schema": "atlas.graphify-daily-snapshot-native-complete-run.v1",
+  "gate": "GRAPHIFY-SNAPSHOT-NATIVE-RUN-BRIDGE-01",
+  "mode": "APPLY",
+  "writesPerformed": true,
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+  "preconditionsVerified": true,
+  "runId": "01a8d8fc-2507-4f39-868e-039039237b98",
+  "boundWorkspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "finalStatus": "COMPLETED",
+  "readbackVerified": true
+}

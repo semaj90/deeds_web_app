@@ -14215,3 +14215,41 @@ an additive backfill). Do not relaunch the full re-index job expecting this numb
 further from file-hash population alone; the CURRENT-STRUCTURAL-LINEAGE-01 gate's remaining gap at
 this coverage level is now attributable to file-hash ceiling + stage-5's still-open graph-owner
 block, not to under-indexing.
+
+## STAGE 5 CLOSED -- GRAPHIFY-SNAPSHOT-NATIVE-RUN-BRIDGE-01, APPLY_PROVEN -- 2026-09-15
+
+Operator confirmed option 2. Implemented the narrow adapter exactly as scoped in the corrected
+finding above: added `bindSealedSnapshotWorkspaceRevisionV1` (git-free sibling of
+`bindWorkspaceRevisionV1`, same UPDATE guard, no schema/table change --
+`sveltekit-frontend/src/lib/server/atlas/indexing/graphify-source-inventory-writer-v2.ts`) and a
+new script `scripts/atlas/graphify-daily-snapshot-native-complete-run-v1.mts` that derives its
+inputs directly from Postgres (the transient open-receipt file this bridge would naturally read
+is no longer on disk) and refuses to run unless exactly one `graphify_executions` row is
+`COMPLETED`+`canonical_authority=true` and no `graphify_runs` row already exists for that
+workspace_revision.
+
+Dry-run: `preconditionsVerified: true`, correctly resolved the canonical execution
+(`74d50c86-8194-45ea-8c3d-61aab737ef83`). Apply (with explicit
+`ATLAS_AUTHORIZE_GRAPHIFY_SNAPSHOT_NATIVE_RUN_BRIDGE_01=1 --apply`): `writesPerformed: true`,
+`runId: 01a8d8fc-2507-4f39-868e-039039237b98`, `finalStatus: COMPLETED`, `readbackVerified: true`.
+
+Re-ran `audit-current-graphify-run-owner-v1.mjs` immediately after (not assumed):
+
+```
+status: GRAPHIFY_RUN_OWNER_COMPLETE
+runCount: 1, completedOwnerCount: 1, workspaceRowCount: 1
+```
+
+**Stage 5 (graph revision ownership) is closed.** This resolves the second half of the
+`CandidateOrdinalMapV1` 128-scaling double-gate from the earlier stage-3 re-investigation section.
+The FIRST half (`CURRENT-STRUCTURAL-LINEAGE-01`'s primary `content_hash`-based join) remains
+`NOT_PROVEN` at its confirmed 98.66% file-hash ceiling (see the coverage-ceiling entry above) --
+`CandidateOrdinalMapV1` scaling to 128 is still blocked, now solely on that gate, not on graph
+ownership.
+
+Existing vitest suite for the modified file (`graphify-source-inventory-writer-v2.spec.ts`) could
+not run in this environment (`Cannot find package '@adobe/css-tools'` -- a pre-existing global
+jest-dom setup issue, unrelated to this change, not chased here). Confidence instead comes from
+live execution: the new function's transactional UPDATE+readback pattern executed successfully
+against the real database with `readbackVerified: true` at every step (dry-run precondition check,
+apply, and the independent downstream stage-5 audit re-run).

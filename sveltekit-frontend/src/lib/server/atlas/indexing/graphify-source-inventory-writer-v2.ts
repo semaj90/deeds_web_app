@@ -656,3 +656,102 @@ export async function bindWorkspaceRevisionV1(input: Parameters<
     throw error;
   }
 }
+
+// GRAPHIFY-SNAPSHOT-NATIVE-RUN-BRIDGE-01 (2026-09-15): bindWorkspaceRevisionV1 above requires a
+// WorkspaceRevisionRecordV1, whose schema (workspace-source-binding-v1.ts) hard-requires real git
+// OIDs (baseCommitOid/baseTreeOid/per-entry gitBlobOid) via buildWorkspaceRevisionRecordV1(). The
+// sealed-multi-repository-snapshot source model used by graphify-daily-snapshot-native-open-v1.mts
+// has no git blob OIDs at all -- it is deliberately not a git checkout (the same reason
+// graphify-daily-lifecycle-open-v1.mjs refuses to run against a snapshot root). This sibling
+// function performs the identical graphify_runs UPDATE (same WHERE guard: RUNNING status,
+// workspace_revision IS NULL -- a one-time bind, not an upsert) against a narrower, git-free input
+// shape. It does not touch WorkspaceRevisionRecordV1 or bindWorkspaceRevisionV1 in any way -- this
+// is an additive sibling for a source model that genuinely cannot satisfy the git-shaped contract,
+// not a replacement or a loosening of it.
+export const sealedSnapshotWorkspaceRevisionBindingInputV1Schema = z.object({
+  schema: z.literal('atlas.sealed-snapshot-workspace-revision-binding.v1'),
+  workspaceRevision: contentRevision,
+  snapshotRevision: contentRevision,
+  sourceManifestDigest: sha256,
+  sourceCount: z.number().int().nonnegative(),
+}).strict();
+export type SealedSnapshotWorkspaceRevisionBindingInputV1 = z.infer<
+  typeof sealedSnapshotWorkspaceRevisionBindingInputV1Schema
+>;
+
+export async function bindSealedSnapshotWorkspaceRevisionInTransactionV1(input: {
+  client: GraphifySourceInventorySqlClientV2;
+  runId: string;
+  workspaceId: string;
+  record: SealedSnapshotWorkspaceRevisionBindingInputV1;
+}): Promise<GraphifyRunRevisionBindingReceiptV1> {
+  const runId = uuid.parse(input.runId);
+  const workspaceId = uuid.parse(input.workspaceId);
+  const record = sealedSnapshotWorkspaceRevisionBindingInputV1Schema.parse(input.record);
+
+  const update = await input.client.query(
+    `UPDATE public.graphify_runs
+        SET workspace_revision = $1,
+            source_manifest_digest = $2,
+            source_manifest_source_count = $3
+      WHERE run_id = $4
+        AND workspace_id = $5
+        AND status = 'RUNNING'
+        AND workspace_revision IS NULL
+      RETURNING run_id, workspace_id, workspace_revision, source_manifest_digest,
+                source_manifest_source_count`,
+    [record.workspaceRevision, record.sourceManifestDigest, record.sourceCount, runId, workspaceId],
+  );
+  if (update.rowCount !== 1 || !update.rows[0]) {
+    throw new Error('GRAPHIFY_RUN_SEALED_SNAPSHOT_REVISION_BINDING_CONFLICT_NOT_RUNNING_OR_ALREADY_BOUND');
+  }
+  const updated = update.rows[0];
+  if (String(updated.workspace_revision) !== record.workspaceRevision) {
+    throw new Error('GRAPHIFY_RUN_SEALED_SNAPSHOT_REVISION_BINDING_WRITE_MISMATCH');
+  }
+
+  const readback = await input.client.query(
+    `SELECT run_id, workspace_id, workspace_revision, source_manifest_digest,
+            source_manifest_source_count, status
+       FROM public.graphify_runs
+      WHERE run_id = $1`,
+    [runId],
+  );
+  if (readback.rowCount !== 1 || !readback.rows[0]) {
+    throw new Error('GRAPHIFY_RUN_SEALED_SNAPSHOT_REVISION_BINDING_READBACK_FAILED');
+  }
+  const persisted = readback.rows[0];
+  if (String(persisted.run_id) !== runId || String(persisted.workspace_id) !== workspaceId) {
+    throw new Error('GRAPHIFY_RUN_SEALED_SNAPSHOT_REVISION_BINDING_IDENTITY_READBACK_MISMATCH');
+  }
+  if (String(persisted.workspace_revision) !== record.workspaceRevision) {
+    throw new Error('GRAPHIFY_RUN_SEALED_SNAPSHOT_REVISION_BINDING_STATE_READBACK_MISMATCH');
+  }
+  if (normalizeDigest(persisted.source_manifest_digest) !== record.sourceManifestDigest) {
+    throw new Error('GRAPHIFY_RUN_SEALED_SNAPSHOT_REVISION_BINDING_MANIFEST_READBACK_MISMATCH');
+  }
+
+  return graphifyRunRevisionBindingReceiptV1Schema.parse({
+    schema: 'atlas.graphify-run-revision-binding.v1',
+    runId,
+    workspaceId,
+    workspaceRevision: record.workspaceRevision,
+    sourceManifestDigest: record.sourceManifestDigest,
+    sourceManifestSourceCount: Number(persisted.source_manifest_source_count),
+    readbackVerified: true,
+  });
+}
+
+export async function bindSealedSnapshotWorkspaceRevisionV1(input: Parameters<
+  typeof bindSealedSnapshotWorkspaceRevisionInTransactionV1
+>[0]): Promise<GraphifyRunRevisionBindingReceiptV1> {
+  await input.client.query('BEGIN');
+  try {
+    const receipt = await bindSealedSnapshotWorkspaceRevisionInTransactionV1(input);
+    await input.client.query('COMMIT');
+    return receipt;
+  } catch (error) {
+    try { await input.client.query('ROLLBACK'); } catch {}
+    throw error;
+  }
+}

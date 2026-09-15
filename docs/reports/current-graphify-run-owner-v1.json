@@ -1,6 +1,6 @@
 {
   "schema": "atlas.current-graphify-run-owner.v1",
-  "generatedAt": "2026-09-11T14:42:17.782Z",
+  "generatedAt": "2026-09-15T22:05:08.294Z",
   "mode": "READ_ONLY_RUN_OWNER_AUDIT",
   "readOnly": true,
   "writes": {
@@ -9,28 +9,79 @@
     "neo4j": false,
     "valkey": false
   },
-  "expectedWorkspaceRevision": "sha256:3e677c29319a4a60bc60803be4186ba108dce906945af593a3a6f5cf43d11881",
+  "expectedWorkspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
   "expectedWorkspaceRevisionSource": "WORKSPACE_REVISION_TOURNAMENT_ADMISSION_RECEIPT",
   "currentWorkspaceRevisionCandidate": null,
   "databaseError": null,
-  "currentRun": null,
-  "runCount": 0,
-  "completedOwnerCount": 0,
-  "workspaceRowCount": 0,
-  "coordinatorExecutionCount": 0,
-  "coordinatorExecutions": [],
+  "currentRun": {
+    "run_id": "01a8d8fc-2507-4f39-868e-039039237b98",
+    "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+    "repository_revision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+    "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "source_manifest_digest": "841f106d08e55a3b61fd29133eaa47cf5df5373e325d762d94479609e893b59d",
+    "source_manifest_source_count": 25542,
+    "parser_contract_version": "graphify.parser.v1",
+    "extraction_contract_version": "graphify.extraction.v1",
+    "status": "COMPLETED",
+    "dry_run": false,
+    "started_at": "2026-09-15T22:05:02.952Z",
+    "completed_at": "2026-09-15T22:05:02.995Z",
+    "workspace_row_present": true
+  },
+  "runCount": 1,
+  "completedOwnerCount": 1,
+  "workspaceRowCount": 1,
+  "coordinatorExecutionCount": 2,
+  "coordinatorExecutions": [
+    {
+      "execution_id": "0dba1c0d-2cf7-4f35-a61b-c77956f60d3d",
+      "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+      "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "status": "COMPLETED",
+      "started_at": "2026-09-15T01:12:47.469Z",
+      "completed_at": "2026-09-15T01:13:15.628Z",
+      "canonical_authority": false,
+      "completed_stage_count": 3
+    },
+    {
+      "execution_id": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+      "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "status": "COMPLETED",
+      "started_at": "2026-09-15T01:11:38.335Z",
+      "completed_at": "2026-09-15T01:11:57.965Z",
+      "canonical_authority": true,
+      "completed_stage_count": 3
+    }
+  ],
   "ownerAssessment": {
-    "runExists": false,
-    "runCompleted": false,
-    "workspaceForeignRowExists": false,
-    "sourceManifestBound": false,
-    "authoritativeGraphRun": false
+    "runExists": true,
+    "runCompleted": true,
+    "workspaceForeignRowExists": true,
+    "sourceManifestBound": true,
+    "authoritativeGraphRun": true
   },
   "promotion": {
     "graphRevisionAllowed": false,
     "edgeAdmissionAllowed": false,
-    "reason": "Current run is incomplete and the referenced workspace owner row is absent; no graph revision may be promoted from it."
+    "reason": "Graph revision promotion is closed by policy until the completion contract is independently read back."
   },
-  "runs": [],
-  "status": "GRAPHIFY_RUN_OWNER_BLOCKED"
+  "runs": [
+    {
+      "run_id": "01a8d8fc-2507-4f39-868e-039039237b98",
+      "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+      "repository_revision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+      "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "source_manifest_digest": "841f106d08e55a3b61fd29133eaa47cf5df5373e325d762d94479609e893b59d",
+      "source_manifest_source_count": 25542,
+      "parser_contract_version": "graphify.parser.v1",
+      "extraction_contract_version": "graphify.extraction.v1",
+      "status": "COMPLETED",
+      "dry_run": false,
+      "started_at": "2026-09-15T22:05:02.952Z",
+      "completed_at": "2026-09-15T22:05:02.995Z",
+      "workspace_row_present": true
+    }
+  ],
+  "status": "GRAPHIFY_RUN_OWNER_COMPLETE"
 }
