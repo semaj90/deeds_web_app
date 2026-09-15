@@ -14138,3 +14138,35 @@ silently):
 
 Neither path was attempted this pass. `CandidateOrdinalMapV1` scaling to 128 remains blocked on
 this until one path is chosen and executed.
+
+## Stage-2 file_content_hash coverage: practical ceiling confirmed at 98.66%, not a bug -- 2026-09-15
+
+The re-index job that had died during today's disk-full crash had actually reached
+`270,766/274,465` (98.66%) `file_content_hash` coverage before dying -- higher than earlier
+recorded (93.4%). Rather than relaunch the full multi-hour re-index job (repeating today's
+disk-risk exposure for uncertain benefit), ran the idempotent backfill script
+(`backfill-codebase-chunk-index-file-content-hash-v1.mjs`, dry-run) to close the remainder
+directly. Result: `hashed: 0, updated: 0` -- **zero progress possible**, not a script failure.
+
+Root-caused the two skip categories precisely, not assumed:
+- `aliasPathSkipped: 37` -- `relative_path` is null/empty, already correctly categorized.
+- `readErrorSkipped: 3662` -- every sampled row's error message showed a "doubled"
+  `sveltekit-frontend/sveltekit-frontend/...` path, which looked at first like a real
+  path-resolution bug in the script's dual-candidate-root fallback
+  (`CANDIDATE_ROOTS = [root, path.join(root, 'sveltekit-frontend')]`). Checked directly: this is
+  NOT a bug -- the doubled path is just the error string's last-attempted candidate (the script
+  correctly tries the bare repo root first). Verified the CORRECT single-prefix path for the same
+  sampled files (e.g. `sveltekit-frontend/docs/graph/multihop-codebase-map.enriched.json`,
+  `src/lib/services/error-analysis/KAGTraverser.ts`) -- confirmed genuinely absent from disk at
+  the correct path too. These are stale `codebase_chunk_index` rows referencing source files that
+  have since been deleted/renamed/moved in the repo; there are no bytes left to hash.
+
+**Conclusion**: 98.66% is very likely the practical coverage ceiling for `file_content_hash` via
+hashing alone -- the remaining 1.34% cannot be closed by any backfill or re-index run, only by
+either (a) accepting it as permanent drift consistent with any codebase index of a live,
+evolving repo, or (b) a separate stale-row pruning pass (out of scope here -- would need its own
+authorization per this repo's archive-not-delete convention, since removing rows is a delete, not
+an additive backfill). Do not relaunch the full re-index job expecting this number to improve
+further from file-hash population alone; the CURRENT-STRUCTURAL-LINEAGE-01 gate's remaining gap at
+this coverage level is now attributable to file-hash ceiling + stage-5's still-open graph-owner
+block, not to under-indexing.
