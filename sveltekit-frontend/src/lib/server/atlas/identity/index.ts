@@ -18,3 +18,4 @@
  */
 
 export * from './packet-key-builder.js';
+export * from './packet-digest-bridge-v1.js';
