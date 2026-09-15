@@ -4440,6 +4440,9 @@ export const codebaseChunkIndex = pgTable('codebase_chunk_index', {
 
 	repoId: uuid('repo_id'),
 	relativePath: text('relative_path').notNull(),
+	// Live column, previously undeclared here (schema/DB drift) -- added because the new
+	// fileContentHashIdx below needs it; not a broader drift-remediation pass.
+	sourceRef: text('source_ref'),
 	symbol: varchar('symbol', { length: 255 }),
 	kind: varchar('kind', { length: 50 }),
 	domain: varchar('domain', { length: 50 }),
@@ -4451,8 +4454,21 @@ export const codebaseChunkIndex = pgTable('codebase_chunk_index', {
 	tokenCount: integer('token_count'),
 
 	content: text('content'),
-	contentHash: text('content_hash'),
+	contentHash: text('content_hash'), // NOTE: chunk-scoped, sometimes truncated to 16 hex chars -- see fileContentHash below for whole-file-comparable identity
 	signature: text('summary'), // summary field doubles as chunk signature
+
+	// Additive whole-file-hash contract (openspec/changes/parent-atlas-chunk-index-whole-file-hash,
+	// drizzle/manual/20260915_codebase_chunk_index_whole_file_hash.sql). Never redefines contentHash
+	// above; fileContentHash is always full 64-char untruncated SHA-256 of the whole source file,
+	// joinable exactly against graphify_files/graphify_execution_file_membership_v2.content_hash.
+	fileContentHash: text('file_content_hash'),
+	// Describes contentHash's (not fileContentHash's) per-row provenance -- populated only once a
+	// row's writer has been read and confirmed (see that change's tasks.md task 2.3); NULL means
+	// unconfirmed, never inferred from the hash string's length or shape alone.
+	contentHashScope: text('content_hash_scope'), // 'chunk' | 'whole_file' | null
+	contentHashAlgorithm: text('content_hash_algorithm'),
+	contentHashLength: integer('content_hash_length'),
+	contentHashVersion: integer('content_hash_version'),
 
 	gpuCluster: integer('gpu_cluster'),
 	somCluster: integer('som_cluster'),
@@ -4542,6 +4558,9 @@ export const codebaseChunkIndex = pgTable('codebase_chunk_index', {
 	extensionIdx: index('codebase_chunk_index_extension_idx').on(table.extension),
 	centroidIdx:  index('codebase_chunk_index_centroid_idx').on(table.centroidId),
 	routingTierIdx: index('codebase_chunk_index_routing_tier_idx').on(table.routingTier),
+	// Declared here to match drizzle/manual/20260915_codebase_chunk_index_whole_file_hash.sql,
+	// which is the actual applier (partial index, CREATE INDEX CONCURRENTLY -- not yet run).
+	fileContentHashIdx: index('idx_codebase_chunk_index_file_content_hash').on(table.sourceRef, table.fileContentHash),
 }));
 
 /** Cluster-level LLM summaries — one row per (repo_id, gpu_cluster) pair */
@@ -5029,6 +5048,13 @@ export const featureOntologyTuples = pgTable('feature_ontology_tuples', {
   validFrom: timestamp('valid_from', { withTimezone: true }),
   validTo: timestamp('valid_to', { withTimezone: true }),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(sql`now()`),
+  // Phase 2 of parent-atlas-ontology-oaklib-fanout-bitmap (2026-09-15,
+  // drizzle/manual/20260915_feature_ontology_tuples_resolution_columns.sql).
+  // Additive/nullable-by-default -- existing 539,124 rows default to
+  // resolvedConceptId=null/resolutionState='UNRESOLVED' per design.md D2
+  // (forward-only cutover, no mass backfill).
+  resolvedConceptId: text('resolved_concept_id'),
+  resolutionState: text('resolution_state').notNull().default('UNRESOLVED'),
 }, (t) => [
   unique('feature_ontology_tuples_unique').on(
     t.packetKey,
@@ -5044,6 +5070,7 @@ export const featureOntologyTuples = pgTable('feature_ontology_tuples', {
   index('feature_ontology_tuples_subject_idx').on(t.subjectType, t.subjectId),
   index('feature_ontology_tuples_predicate_idx').on(t.predicate),
   index('feature_ontology_tuples_object_idx').on(t.objectType, t.objectId),
+  index('feature_ontology_tuples_resolved_concept_id_idx').on(t.resolvedConceptId),
 ]);
 
 export type FeatureOntologyTuples = typeof featureOntologyTuples.$inferSelect;

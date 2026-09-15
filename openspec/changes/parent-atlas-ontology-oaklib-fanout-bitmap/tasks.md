@@ -86,20 +86,58 @@
 
 ## 3. Phase 2 — Bridge `feature_ontology_tuples` (forward-only cutover, per design.md D2)
 
-- [ ] 3.1 Draft (do not apply) an additive migration: nullable `resolved_concept_id` and
-      `resolution_state` (default `UNRESOLVED`) columns on `feature_ontology_tuples`. Manually
-      review per this repo's Drizzle Safety Rule.
-- [ ] 3.2 Dry-run the migration against a copy/transaction rollback; verify zero impact on
-      existing 539,124 rows before considering apply.
-- [ ] 3.3 Human review + explicit authorization checkpoint before applying the migration for
-      real (same pattern as this session's stage-5/stage-11 gates — do not auto-apply).
-- [ ] 3.4 Wire the extractor's write path (or a thin post-write hook) to call the Phase 1
-      resolver and populate `resolved_concept_id`/`resolution_state` on NEW rows going forward.
-      Existing 539,124 rows remain `UNRESOLVED` by design (see design.md D2) — no backfill in
-      this phase.
+- [x] 3.1 Drafted the migration:
+      `sveltekit-frontend/drizzle/manual/20260915_feature_ontology_tuples_resolution_columns.sql`
+      — nullable `resolved_concept_id text`, `resolution_state text NOT NULL DEFAULT
+      'UNRESOLVED'` (chose NOT NULL with a default over a nullable third state, since the spec's
+      own `resolutionState` enum has no meaningful "null" case), a guarded CHECK constraint
+      matching `OntologyResolutionStateV1Schema`'s 4 values, and a partial index on
+      `resolved_concept_id`. Matches the exact precedent style of
+      `20260915_codebase_chunk_index_whole_file_hash.sql`. Added matching Drizzle declarations
+      to `schema-postgres.ts`'s `featureOntologyTuples` table (2 new fields + index).
+      **Real finding recorded in the migration's own header comment, not glossed over**: a live
+      audit before drafting found `feature_ontology_tuples` has **no currently-running writer**
+      — all 539,124 rows came from exactly 3 historical bulk-batch runs (2026-08-11: 150,
+      2026-08-12: 90,450, 2026-09-13: 448,524 — zero rows on any other day, zero triggers). The
+      one script in this repo matching an `INSERT INTO feature_ontology_tuples` literal
+      (`scripts/atlas/generate-ontology-tuples.mjs`) is confirmed dead: last touched 2026-07-21,
+      zero callers, and its column list (`domain_class`/`domain_confidence`/`decision`) doesn't
+      match this table's live schema at all. `scripts/atlas/plan-feature-ontology-regeneration-
+      v1.mjs` (a real, already-existing read-only planning script) independently corroborates
+      this — it already labels the historical producer `historicalProducer:
+      'atlas-packets-ontology-v1'` and names `'atlas-current-source-ontology-v2'` as the
+      not-yet-built replacement. This reframes task 3.4 below (see its note).
+- [x] 3.2 Dry-ran the `ALTER TABLE`/CHECK-constraint statements in a transaction against the
+      live DB, rolled back (verified via `docker exec ... psql <<'SQL' ... ROLLBACK`) —
+      **`CREATE INDEX CONCURRENTLY` cannot run inside a transaction block at all** (confirmed by
+      first attempt failing with exactly that Postgres error), so it was excluded from the
+      transactional dry-run and instead trusted against the already-proven-working
+      `CREATE INDEX CONCURRENTLY` pattern from the whole-file-hash migration (same repo, same
+      day, applied successfully). Result: `total=539124, resolved_populated=0,
+      unresolved_count=539124` — confirms every existing row would default correctly to
+      `UNRESOLVED`/`NULL`, zero unintended impact, then rolled back (nothing persisted).
+- [ ] 3.3 **NOT YET APPLIED — explicit human authorization required before running this for
+      real** (per design.md's own stated gate, and this repo's Drizzle Safety Rule). Drafted +
+      dry-run-proven only. An apply script following the same
+      `apply-codebase-chunk-index-whole-file-hash-columns-v1.mjs` pattern (separate
+      `pool.query()` calls, required for `CREATE INDEX CONCURRENTLY`) is ready to write once
+      authorized, but was deliberately not created yet — no script should exist that makes
+      applying a 539K-row production migration one keystroke away from an unreviewed "yes
+      continue."
+- [ ] 3.4 **Reframed per the 3.1 finding above.** There is no live extractor write path to hook
+      into today. The correct Phase 2 deliverable is a reusable annotation helper —
+      `annotateFeatureOntologyTupleWithResolutionV1()` — that calls the Phase 1 resolver
+      (`resolveOntologyLabelV1`) on a candidate tuple's `object_id`/label and returns the
+      `resolved_concept_id`/`resolution_state` values ready to include in an INSERT, for
+      whichever producer runs next (most plausibly `atlas-current-source-ontology-v2` once
+      built, per the regeneration plan). Not yet implemented — depends on 3.3's authorization
+      (the columns must exist before the helper's output has anywhere real to land), and on
+      deciding whether to build it now (dormant, like `OntologyLinkedTupleV1` before it) or wait
+      until a concrete new producer is being written. Flagging both options rather than
+      guessing which the operator wants.
 - [ ] 3.5 Record a receipt (counts: total rows, newly-resolved rows, resolution-attempt failure
       rate) after the first live batch of new writes — read-only verification, not a promotion
-      claim.
+      claim. Blocked on 3.3/3.4; no new writes exist yet to measure.
 
 ## 4. Phase 3 — PG18 AIO-friendly bitmap fanout storage
 
