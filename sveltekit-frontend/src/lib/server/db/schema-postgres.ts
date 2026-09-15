@@ -5029,6 +5029,32 @@ export const featureStructuralFacts = pgTable('feature_structural_facts', {
 export type FeatureStructuralFacts = typeof featureStructuralFacts.$inferSelect;
 export type NewFeatureStructuralFacts = typeof featureStructuralFacts.$inferInsert;
 
+// Concept vocabulary root for the OAKLIB-equivalent resolution boundary
+// (openspec/changes/parent-atlas-ontology-oaklib-fanout-bitmap Phase 1).
+// Previously live in Postgres with NO Drizzle declaration at all (a real
+// schema/DB drift found while auditing field parity 2026-09-15, same class
+// of gap as `source_ref`'s pre-existing drift on featureOntologyTuples noted
+// above) -- added here so schema.ts and the live table finally agree.
+export const atlasDomainOntology = pgTable('atlas_domain_ontology', {
+  id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
+  groupId: varchar('group_id', { length: 255 }).notNull().unique(),
+  groupLabel: varchar('group_label', { length: 255 }).notNull(),
+  parentGroupId: varchar('parent_group_id', { length: 255 }),
+  description: text('description'),
+  taxonomyLevel: integer('taxonomy_level').default(0),
+  confidence: real('confidence').default(1.0),
+  examples: text('examples').array(),
+  createdAt: timestamp('created_at', { withTimezone: true }).default(sql`now()`),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).default(sql`now()`),
+}, (t) => [
+  index('idx_domain_ontology_group_id').on(t.groupId),
+  index('idx_domain_ontology_level').on(t.taxonomyLevel),
+  index('idx_domain_ontology_parent').on(t.parentGroupId),
+]);
+
+export type AtlasDomainOntology = typeof atlasDomainOntology.$inferSelect;
+export type NewAtlasDomainOntology = typeof atlasDomainOntology.$inferInsert;
+
 export const featureOntologyTuples = pgTable('feature_ontology_tuples', {
   id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
   packetKey: text('packet_key').notNull(),
