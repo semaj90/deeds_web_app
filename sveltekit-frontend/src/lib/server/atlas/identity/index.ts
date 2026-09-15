@@ -19,3 +19,4 @@
 
 export * from './packet-key-builder.js';
 export * from './packet-digest-bridge-v1.js';
+export * from './current-packet-digest-readback-v1.js';
