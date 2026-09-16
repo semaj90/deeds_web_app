@@ -14657,3 +14657,70 @@ if the operator wants to recover this work: start narrow — pull just
 review it against the Gate 1 plan above, and decide whether to adapt it into
 `CURRENT-WORKSPACE-FRAME-ADMISSION-01`'s implementation or supersede it — not a blind branch
 merge.
+
+### `CURRENT-WORKSPACE-FRAME-ADMISSION-01` — RUN FOR REAL (2026-09-16), built from the recovered file above
+
+Pulled exactly the two additive, non-conflicting files recommended above — nothing else from the
+branch chain — reviewed them, and used them:
+
+- `scripts/atlas/lib/current-workspace-frame-selector-v1.mjs` (recovered verbatim from
+  `origin/agent/current-revision-selector-convergence-20260913`)
+- `scripts/atlas/test-current-workspace-frame-selector-v1.mjs` (recovered verbatim, same branch)
+  — **4/4 passing** (`node --test scripts/atlas/test-current-workspace-frame-selector-v1.mjs`),
+  unmodified.
+- New: `scripts/atlas/audit-current-workspace-frame-admission-v1.mjs` — combines the recovered
+  selector with the existing, already-live `audit-current-source-cohort-lineage-v1.mjs` receipt
+  into the `CurrentWorkspaceFrameReceiptV1` shape planned above. Read-only, `writesPerformed:
+  false`, no datastore access of its own (reads two JSON report files only).
+
+**First, re-ran the pre-existing `audit-current-source-cohort-lineage-v1.mjs` script itself**
+(unmodified, already lived on `main`, already reads the admission receipt preferentially — this
+was not previously re-run after `workspace-revision-tournament-admission-v1.json` was admitted at
+`2026-09-15T01:04:38Z`). Fresh result:
+
+```
+currentWorkspaceRevision: sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc
+cohortRows: 52, graphifyMatched: 52, sourceRevisionQualified: 52
+currentWorkspaceMatched: 0, workspaceMismatchAfterSourceQualification: 52
+missing: 0, mismatched: 0, ambiguous: 0
+liveBindingWorkspaceRevisions: [sha256:322ed1a6..., sha256:55edaaad..., sha256:e24bb971...]
+status: WORKSPACE_REVISION_SOURCE_MISMATCH
+```
+
+**Then ran `audit-current-workspace-frame-admission-v1.mjs`** (the new Gate 1 receipt):
+
+```json
+{
+  "admittedWorkspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "admittedSource": "WORKSPACE_REVISION_TOURNAMENT_ADMISSION_RECEIPT",
+  "admittedAuthority": true,
+  "selectorAuthorityConflict": false,
+  "selectorBlockers": [],
+  "cohortRows": 52,
+  "exactSourceRevisionMatches": 52,
+  "currentWorkspaceMatches": 0,
+  "workspaceMismatches": 52,
+  "staleProjectionCandidates": 52,
+  "conflictingSourceRows": 0,
+  "writesPerformed": false,
+  "status": "STALE_WORKSPACE_PROJECTION"
+}
+```
+
+Receipt: `docs/reports/current-workspace-frame-admission-v1.json`.
+
+**Gate 1 result: `STALE_WORKSPACE_PROJECTION` confirmed, not assumed** — exactly the leading
+hypothesis this section named before any gate ran. The selector cleanly resolves a single
+authoritative admitted workspace revision with zero conflict; the bounded 52-row cohort's
+source-revision qualification is still perfect (52/52) but its workspace binding is 0/52 against
+that revision, and `conflictingSourceRows: 0` rules out a genuine source conflict. `note`:
+`admittedExecutionId` is `null` — `current-graphify-snapshot-authority-v1.json` still reports
+`AMBIGUOUS_QUALIFYING_EXECUTIONS` / `ownerSelection: null`, so no single admitted execution id
+exists yet; this is a separate, still-open question from workspace-revision admission and does
+not block this gate's classification.
+
+**Per this section's own `do_not_do` list: the 52 rows were NOT rewritten.** Per Gate 1's own
+instruction ("if confirmed stale, re-materialize the derived cohort from the admitted workspace
+binding instead"), the next real step is **Gate 2 (`CURRENT-SOURCE-CHUNK-OWNER-01`)** — using the
+now-confirmed admitted workspace revision `sha256:e24bb97...` to re-materialize/re-derive the
+cohort's chunk ownership, not to patch the existing 52 rows in place.

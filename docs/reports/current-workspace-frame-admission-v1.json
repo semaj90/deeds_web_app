@@ -1,0 +1,26 @@
+{
+  "schema": "atlas.current-workspace-frame-receipt.v1",
+  "generatedAt": "2026-09-16T00:52:07.576Z",
+  "mode": "READ_ONLY_GATE_1_ADMISSION",
+  "admittedExecutionId": null,
+  "admittedWorkspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "admittedSource": "WORKSPACE_REVISION_TOURNAMENT_ADMISSION_RECEIPT",
+  "admittedAuthority": true,
+  "selectorAuthorityConflict": false,
+  "selectorBlockers": [],
+  "cohortLineageReportGeneratedAt": "2026-09-16T00:51:11.840Z",
+  "cohortLineageWorkspaceRevisionMatchesSelector": true,
+  "cohortRows": 52,
+  "distinctCohortWorkspaceRevisions": [
+    "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+    "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+    "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc"
+  ],
+  "exactSourceRevisionMatches": 52,
+  "currentWorkspaceMatches": 0,
+  "workspaceMismatches": 52,
+  "staleProjectionCandidates": 52,
+  "conflictingSourceRows": 0,
+  "writesPerformed": false,
+  "status": "STALE_WORKSPACE_PROJECTION"
+}

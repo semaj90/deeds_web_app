@@ -1,17 +1,19 @@
 {
   "schema": "atlas.current-source-cohort-lineage.v1",
-  "generatedAt": "2026-09-11T14:29:01.316Z",
+  "generatedAt": "2026-09-16T00:51:11.840Z",
   "mode": "READ_ONLY_LINEAGE_AUDIT",
   "inputs": {
     "cohortChecksum": "fd88703ca428261206575d95204c31795f956645dd46dc4607a2b3048d464151",
     "observationPath": "docs/reports/workspace-source-binding-observation.json",
-    "workspaceRevisionSource": "observation-artifact-compared-with-live-postgres-bindings"
+    "workspaceRevisionSource": "tournament-admission-receipt"
   },
   "counts": {
     "cohortRows": 52,
-    "currentWorkspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
+    "currentWorkspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
     "liveBindingWorkspaceRevisions": [
-      "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9"
+      "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+      "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc"
     ],
     "workspaceRevisionSourceAligned": false,
     "graphifyMatched": 52,
@@ -605,5 +607,5 @@
   "qdrantWrites": false,
   "status": "WORKSPACE_REVISION_SOURCE_MISMATCH",
   "nextGate": "WORKSPACE_REVISION_SOURCE_RECONCILIATION_REQUIRED",
-  "reportChecksum": "c8b8ce1e979bbd5732279163d0506cd6bbf466d3c73ce637ce4d33e7a5d53e7f"
+  "reportChecksum": "06cf6eaae88bd044497225bc57958c5320c16eef0d62c7a0443c3fe1b3525318"
 }
