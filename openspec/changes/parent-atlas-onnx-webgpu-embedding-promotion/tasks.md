@@ -1,5 +1,21 @@
 # Tasks: parent-atlas-onnx-webgpu-embedding-promotion
 
+## Re-verified 2026-09-16 — not stale, not blocked by an unrelated finding
+
+Checked a hypothesis before acting on it: root `CLAUDE.md`'s 2026-09-06 finding that an ONNX
+export is "numerically broken" (delta 4.386) refers to `AtlasGemmaRankV1` — a from-scratch Gemma4
+reranker checkpoint, unrelated model, unrelated purpose. **This change is about a different
+model entirely**: `onnx-community/embeddinggemma-300m-ONNX` (confirmed live in
+`services/embedding-onnx-webgpu/prove-embeddinggemma-onnx-readonly.mjs`), the community fp32 ONNX
+export of the embedding model already canonical for `semantic_768`. The two are not the same
+export and one's proven-broken status says nothing about the other's — do not conflate them.
+
+Also confirmed live in `sveltekit-frontend/src/lib/server/grpc/embedding-client.ts:819-873`: the
+Tier-0 ONNX-local-first reorder this change is about is still in place, unchanged since
+2026-08-30, exactly as described below — real code, still unvalidated. Steps 2-11 have not been
+started (matches this file's own "Status" section). This change is accurately reflecting current
+reality; no correction needed, just confirmed current as of this date.
+
 ## Context
 
 A prior session in this project reordered `embedding-client.ts`'s 5-tier fallback chain to try

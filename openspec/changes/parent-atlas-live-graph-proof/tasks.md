@@ -2,11 +2,47 @@
 
 Date frozen: 2026-08-20
 
-## Purpose
+**⚠️ PREMISE SUPERSEDED, re-grounded 2026-09-16 — not re-executed.** This entire tranche
+(LVG-0 through LVG-9's fixture, PageRank, spectral, Leiden and Louvain results) was built and
+iterated (through 2026-08-24) on `semantic_512` as "the current persisted exact semantic
+representation." That premise was the frozen conclusion of
+`parent-atlas-semantic-512-canonicalization`, which was **operator-reversed on 2026-08-23** —
+one day *before* this file's own last edit — in favor of `semantic_768` as canonical (see root
+`CLAUDE.md`'s Embedding Dimensions Policy and `parent-atlas-semantic-768-canonical-contract`,
+now `ACCEPTED`). This file was never cross-referenced against that reversal, so its "current
+persisted exact semantic representation" framing below is stale, not current, even though the
+work continued for one more day of edits under the old premise. `parent-atlas-neural-prefill-encoder`
+(the live semantic_768 pipeline tracker) does not reference this tranche or its `LVG-*` codes —
+this proof was never re-pointed at 768 by any later change.
+
+**What survives, what doesn't**: the graph-algorithm diagnostic findings (the disconnected-graph
+root cause, the near-degenerate-eigenspace mechanism behind the spectral CPU/GPU ARI gap, the
+Leiden resolution-collapse characterization, the `proto:*`-vs-`ace:packet:` corpus-bridging
+finding) are properties of *this specific 500/1000-node candidate set and graph algorithms*, not
+of the embedding dimension per se — they may or may not reproduce once the fixture is rebuilt from
+`semantic_768`/Qdrant `codebase_chunks_768` candidates instead. They are not invalidated, but they
+are **not proven to transfer** either. The concrete artifacts that ARE dimension-specific and must
+be redone before this tranche can resume — not just relabeled — are: LVG-0's reconciliation
+(`atlas_semantic512_reconcile.py` reads `semantic_512`/`codebase_chunks_512`; would need a 768
+equivalent or a rewrite), `build_live_graph_fixture_semantic512.py` (name and Qdrant collection are
+512-specific), and proof criterion 3 ("exact cuVS semantic top-K receipt uses `semantic_512`,
+dimension 512" — now wrong per current policy). Do not resume this tranche's `Operator sequence`
+as literally written without first deciding whether to (a) rebuild the fixture pipeline against
+`semantic_768`/`codebase_chunks_768`, keeping the diagnostic methodology, or (b) explicitly
+re-justify using `semantic_512` here as a legitimate *derived/secondary* MRL-truncation lane for
+this specific graph-proof purpose (permitted by current policy, but must be stated as a deliberate
+choice, not inherited from a since-reversed "canonical" framing). Neither decision is made here —
+this is the re-grounding note, not the resolution.
+
+## Purpose (as originally framed — see correction above)
 
 Execute the bounded proof requested by the spectral-routing tranche on the **current persisted semantic representation**, rather than introducing another schema or silently restoring older 768-dimensional assumptions.
 
 This proof consumes the reviewed `semantic_512` reconciliation contract frozen by `parent-atlas-semantic-512-canonicalization`. EmbeddingGemma native width 768 remains model lineage; `semantic_512` is the current persisted exact semantic representation. `source_revision` is not fabricated; source freshness remains owned by `SourceVersionReceiptV1` / mutation-awareness receipts.
+
+**Note**: `parent-atlas-semantic-512-canonicalization` (the contract this paragraph cites) is itself
+marked `⛔ SUPERSEDED, 2026-08-23` in its own tasks.md — this paragraph is preserved verbatim above
+for record, not because it is still accurate. See the correction banner at the top of this file.
 
 ## Frozen path
 
@@ -432,6 +468,11 @@ method is the strongest untested lead (`scripts/atlas/spectral_diagnostic_receip
 
 ## Operator sequence
 
+**Do not run as literally written — see the 2026-09-16 re-grounding note at the top of this
+file.** `atlas_semantic512_reconcile.py` and `build_live_graph_fixture_semantic512.py` below are
+both `semantic_512`-specific; resume only after deciding whether to rebuild against
+`semantic_768` or explicitly re-justify `semantic_512` as a deliberate derived lane here.
+
 First complete the existing read-only semantic reconciliation:
 
 ```bash
@@ -492,7 +533,7 @@ Do not add this to `graphify:daily` until all of the following are observed on o
 
 1. at least 500 admitted semantic_512 rows with valid packet_key/source_ref and vector digest lineage;
 2. non-zero canonical relationship coverage after the proven `entity_id -> packet_key` join; if this join is wrong, fail and repair identity resolution rather than invent edges;
-3. exact cuVS semantic top-K receipt uses `semantic_512`, dimension 512, cosine, brute-force all-neighbors;
+3. exact cuVS semantic top-K receipt uses `semantic_512`, dimension 512, cosine, brute-force all-neighbors — **stale per the 2026-09-16 re-grounding note above**; per current canonical policy this should read `semantic_768`/`codebase_chunks_768` unless the 512-lane choice is explicitly re-justified as a deliberate derived-lane decision for this proof;
 4. PageRank, balanced cut, spectral modularity and Leiden all return complete dense-ordinal outputs;
 5. spectral/Leiden stability and available modularity/edge-cut/ratio-cut metrics are recorded;
 6. quality is compared against existing KMeans/SOM signals and, once historical repair cases are attached, validator/repair success is measured;
