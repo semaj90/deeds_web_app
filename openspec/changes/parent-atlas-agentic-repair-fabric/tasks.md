@@ -117,3 +117,50 @@ be made deliberately, not implied.
         async post-classification step (not inside `classifyAtlasQuery` itself) and (b) decides
         whether to wire `prompt-plan.ts`/`mastra-workflow-compiler.ts` to a live caller or leave
         them for a future gate. Neither decision was made or acted on this pass.
+
+## 19. NEXT STEPS (resume point — recorded 2026-09-15 ahead of a rate-limit pause)
+
+Current state in one line: **2/17 gates built and tested (AR-01, AR-03), 1 gate found already
+satisfied by existing live code (AR-06), 2 gates found partially built but dormant (AR-13, AR-17),
+12 gates genuinely untouched (AR-02, AR-04, AR-05, AR-08, AR-09, AR-10, AR-11, AR-12, AR-14, AR-15,
+AR-16, plus the AR-07 integration decision).** Everything below is a real open decision, not
+implied — pick up by asking the operator which to do first, don't guess.
+
+**Two concrete follow-on options identified but NOT started (from section 18.3):**
+1. Wire AR-07 (OAK evidence enrichment) as a NEW async step placed AFTER `classifyAtlasQuery`
+   returns (never inside it — `classifyAtlasQuery` must stay synchronous, it's live on
+   `/api/search/hyperrag/+server.ts`). Would call
+   `resolveOakEvidenceV1()`/`resolveOakAncestorsV1()` (already built, AR-01,
+   `sveltekit-frontend/src/lib/server/atlas/agentic/oak-resolution-evidence-client.ts`) on the
+   classified query's `domains`/`targetHints`/`symbols`, producing `OakResolutionEvidenceV1`
+   records the hyperrag route could optionally attach to its response — additive, not a
+   replacement for the existing 4-keyword `domains` regex.
+2. Decide whether to wire `prompt-plan.ts` + `mastra-workflow-compiler.ts` (AR-13/AR-17, built,
+   tested, zero live callers) to an actual HTTP entry point, or leave them dormant until a
+   specific caller needs them. This is an architecture decision for the operator, not something
+   to infer.
+
+**Untouched gates, in the order the operator's own spec implies dependency (do not start out of
+order without a reason — e.g. AR-04 blocks AR-08, AR-11/12 block nothing else and can run
+independently):**
+- AR-02 — Postgres-vs-code-defined decision for the action registry (blocks nothing else
+  immediately; `AGENTIC_ACTION_REGISTRY_V1_SEED` from AR-03 works fine code-defined for now).
+- AR-04 — `AgenticHyperEdgeV1` shape decision (new contract vs. modifying `HyperedgeV1`) — blocks
+  AR-08 (HyperGraphRAG n-ary action expansion).
+- AR-05 — bitencoded capability mask + CPU parity proof — independent, can start anytime.
+- AR-08 — HyperGraphRAG n-ary action expansion — blocked on AR-04.
+- AR-09 — CandidateFeatureMatrix action features — likely depends on AR-05's bitmask shape.
+- AR-10 — Tang low-rank recommendation challenger scaffold — independent research-adjacent gate;
+  operator explicitly said no promotion without a CPU exact-scoring oracle comparison.
+- AR-11/AR-12 — DSPy program contract + GEPA offline harness scaffold — independent of everything
+  else; explicitly offline-only, never touches canonical identity.
+- AR-14 — ParameterResolver wiring — depends on AR-09's feature-matrix shape existing first.
+- AR-15 — bounded TS2345 repair-loop fixture — the integration test that exercises AR-01, AR-03,
+  and whichever of AR-04/08/09/13 exist by the time it's attempted; natural gate to build once a
+  handful of the others land, not first.
+- AR-16 — ExecutionReceipt → HyperEdge projection — depends on AR-04's hyperedge shape decision.
+
+**Do not, on resume:** re-run the `agentic-file-compiler/` audit (section 18 is complete and
+current as of this commit); re-litigate the OAK-kernel-duplication correction (already resolved,
+`parent-atlas-ontology-oaklib-fanout-bitmap` tasks.md section 7); re-implement AR-01 or AR-03
+(done, tested, committed `03d08c3e95`).
