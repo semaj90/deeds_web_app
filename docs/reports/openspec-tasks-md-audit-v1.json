@@ -1,7 +1,7 @@
 {
   "schema": "atlas.openspec-tasks-md-audit.v1",
   "mode": "READ_ONLY_AUDIT",
-  "generatedAt": "2026-09-16T22:31:49.799Z",
+  "generatedAt": "2026-09-16T22:37:20.674Z",
   "gapThreshold": 80,
   "aggregate": {
     "totalChangesAudited": 108,
@@ -15,38 +15,6 @@
     "changesWithStalenessMarkers": 25
   },
   "changes": [
-    {
-      "tree": "root",
-      "changeName": "parent-atlas-onnx-webgpu-embedding-promotion",
-      "archived": false,
-      "path": "openspec/changes/parent-atlas-onnx-webgpu-embedding-promotion/tasks.md",
-      "done": 0,
-      "total": 17,
-      "completionPct": 0,
-      "noCheckboxes": false,
-      "hasProposal": false,
-      "hasSpecs": true,
-      "tasksNonTrivial": true,
-      "structuralScore": 60,
-      "auditScore": 24,
-      "stalenessMarkersFound": []
-    },
-    {
-      "tree": "root",
-      "changeName": "parent-atlas-opencode-replay-proof",
-      "archived": false,
-      "path": "openspec/changes/parent-atlas-opencode-replay-proof/tasks.md",
-      "done": 2,
-      "total": 19,
-      "completionPct": 11,
-      "noCheckboxes": false,
-      "hasProposal": false,
-      "hasSpecs": true,
-      "tasksNonTrivial": true,
-      "structuralScore": 60,
-      "auditScore": 31,
-      "stalenessMarkersFound": []
-    },
     {
       "tree": "root",
       "changeName": "parent-atlas-retrieval-logic-convergence",
@@ -88,6 +56,22 @@
       "path": "openspec/changes/parent-atlas-graphify-recovery-proof-ladder/tasks.md",
       "done": 0,
       "total": 9,
+      "completionPct": 0,
+      "noCheckboxes": false,
+      "hasProposal": true,
+      "hasSpecs": true,
+      "tasksNonTrivial": true,
+      "structuralScore": 100,
+      "auditScore": 40,
+      "stalenessMarkersFound": []
+    },
+    {
+      "tree": "root",
+      "changeName": "parent-atlas-onnx-webgpu-embedding-promotion",
+      "archived": false,
+      "path": "openspec/changes/parent-atlas-onnx-webgpu-embedding-promotion/tasks.md",
+      "done": 0,
+      "total": 17,
       "completionPct": 0,
       "noCheckboxes": false,
       "hasProposal": true,
@@ -217,6 +201,22 @@
     },
     {
       "tree": "root",
+      "changeName": "parent-atlas-opencode-replay-proof",
+      "archived": false,
+      "path": "openspec/changes/parent-atlas-opencode-replay-proof/tasks.md",
+      "done": 2,
+      "total": 19,
+      "completionPct": 11,
+      "noCheckboxes": false,
+      "hasProposal": true,
+      "hasSpecs": true,
+      "tasksNonTrivial": true,
+      "structuralScore": 100,
+      "auditScore": 47,
+      "stalenessMarkersFound": []
+    },
+    {
+      "tree": "root",
       "changeName": "parent-atlas-gate2-chunk-lineage-convergence",
       "archived": false,
       "path": "openspec/changes/parent-atlas-gate2-chunk-lineage-convergence/tasks.md",
@@ -310,44 +310,6 @@
       "structuralScore": 100,
       "auditScore": 53,
       "stalenessMarkersFound": []
-    },
-    {
-      "tree": "root",
-      "changeName": "parent-atlas-error-research-lane",
-      "archived": false,
-      "path": "openspec/changes/parent-atlas-error-research-lane/tasks.md",
-      "done": 0,
-      "total": 0,
-      "completionPct": null,
-      "noCheckboxes": true,
-      "hasProposal": false,
-      "hasSpecs": true,
-      "tasksNonTrivial": true,
-      "structuralScore": 60,
-      "auditScore": 54,
-      "stalenessMarkersFound": [
-        "SUPERSEDED"
-      ]
-    },
-    {
-      "tree": "root",
-      "changeName": "parent-atlas-live-graph-proof",
-      "archived": false,
-      "path": "openspec/changes/parent-atlas-live-graph-proof/tasks.md",
-      "done": 0,
-      "total": 0,
-      "completionPct": null,
-      "noCheckboxes": true,
-      "hasProposal": false,
-      "hasSpecs": true,
-      "tasksNonTrivial": true,
-      "structuralScore": 60,
-      "auditScore": 54,
-      "stalenessMarkersFound": [
-        "⛔",
-        "SUPERSEDED",
-        "PREMISE SUPERSEDED"
-      ]
     },
     {
       "tree": "root",
@@ -664,6 +626,24 @@
     },
     {
       "tree": "root",
+      "changeName": "parent-atlas-error-research-lane",
+      "archived": false,
+      "path": "openspec/changes/parent-atlas-error-research-lane/tasks.md",
+      "done": 0,
+      "total": 0,
+      "completionPct": null,
+      "noCheckboxes": true,
+      "hasProposal": true,
+      "hasSpecs": true,
+      "tasksNonTrivial": true,
+      "structuralScore": 100,
+      "auditScore": 70,
+      "stalenessMarkersFound": [
+        "SUPERSEDED"
+      ]
+    },
+    {
+      "tree": "root",
       "changeName": "parent-atlas-gpu-runtime-abi-alignment",
       "archived": false,
       "path": "openspec/changes/parent-atlas-gpu-runtime-abi-alignment/tasks.md",
@@ -677,6 +657,26 @@
       "structuralScore": 60,
       "auditScore": 70,
       "stalenessMarkersFound": []
+    },
+    {
+      "tree": "root",
+      "changeName": "parent-atlas-live-graph-proof",
+      "archived": false,
+      "path": "openspec/changes/parent-atlas-live-graph-proof/tasks.md",
+      "done": 0,
+      "total": 0,
+      "completionPct": null,
+      "noCheckboxes": true,
+      "hasProposal": true,
+      "hasSpecs": true,
+      "tasksNonTrivial": true,
+      "structuralScore": 100,
+      "auditScore": 70,
+      "stalenessMarkersFound": [
+        "⛔",
+        "SUPERSEDED",
+        "PREMISE SUPERSEDED"
+      ]
     },
     {
       "tree": "root",
@@ -1803,38 +1803,6 @@
   "gaps": [
     {
       "tree": "root",
-      "changeName": "parent-atlas-onnx-webgpu-embedding-promotion",
-      "archived": false,
-      "path": "openspec/changes/parent-atlas-onnx-webgpu-embedding-promotion/tasks.md",
-      "done": 0,
-      "total": 17,
-      "completionPct": 0,
-      "noCheckboxes": false,
-      "hasProposal": false,
-      "hasSpecs": true,
-      "tasksNonTrivial": true,
-      "structuralScore": 60,
-      "auditScore": 24,
-      "stalenessMarkersFound": []
-    },
-    {
-      "tree": "root",
-      "changeName": "parent-atlas-opencode-replay-proof",
-      "archived": false,
-      "path": "openspec/changes/parent-atlas-opencode-replay-proof/tasks.md",
-      "done": 2,
-      "total": 19,
-      "completionPct": 11,
-      "noCheckboxes": false,
-      "hasProposal": false,
-      "hasSpecs": true,
-      "tasksNonTrivial": true,
-      "structuralScore": 60,
-      "auditScore": 31,
-      "stalenessMarkersFound": []
-    },
-    {
-      "tree": "root",
       "changeName": "parent-atlas-retrieval-logic-convergence",
       "archived": false,
       "path": "openspec/changes/parent-atlas-retrieval-logic-convergence/tasks.md",
@@ -1874,6 +1842,22 @@
       "path": "openspec/changes/parent-atlas-graphify-recovery-proof-ladder/tasks.md",
       "done": 0,
       "total": 9,
+      "completionPct": 0,
+      "noCheckboxes": false,
+      "hasProposal": true,
+      "hasSpecs": true,
+      "tasksNonTrivial": true,
+      "structuralScore": 100,
+      "auditScore": 40,
+      "stalenessMarkersFound": []
+    },
+    {
+      "tree": "root",
+      "changeName": "parent-atlas-onnx-webgpu-embedding-promotion",
+      "archived": false,
+      "path": "openspec/changes/parent-atlas-onnx-webgpu-embedding-promotion/tasks.md",
+      "done": 0,
+      "total": 17,
       "completionPct": 0,
       "noCheckboxes": false,
       "hasProposal": true,
@@ -2003,6 +1987,22 @@
     },
     {
       "tree": "root",
+      "changeName": "parent-atlas-opencode-replay-proof",
+      "archived": false,
+      "path": "openspec/changes/parent-atlas-opencode-replay-proof/tasks.md",
+      "done": 2,
+      "total": 19,
+      "completionPct": 11,
+      "noCheckboxes": false,
+      "hasProposal": true,
+      "hasSpecs": true,
+      "tasksNonTrivial": true,
+      "structuralScore": 100,
+      "auditScore": 47,
+      "stalenessMarkersFound": []
+    },
+    {
+      "tree": "root",
       "changeName": "parent-atlas-gate2-chunk-lineage-convergence",
       "archived": false,
       "path": "openspec/changes/parent-atlas-gate2-chunk-lineage-convergence/tasks.md",
@@ -2096,44 +2096,6 @@
       "structuralScore": 100,
       "auditScore": 53,
       "stalenessMarkersFound": []
-    },
-    {
-      "tree": "root",
-      "changeName": "parent-atlas-error-research-lane",
-      "archived": false,
-      "path": "openspec/changes/parent-atlas-error-research-lane/tasks.md",
-      "done": 0,
-      "total": 0,
-      "completionPct": null,
-      "noCheckboxes": true,
-      "hasProposal": false,
-      "hasSpecs": true,
-      "tasksNonTrivial": true,
-      "structuralScore": 60,
-      "auditScore": 54,
-      "stalenessMarkersFound": [
-        "SUPERSEDED"
-      ]
-    },
-    {
-      "tree": "root",
-      "changeName": "parent-atlas-live-graph-proof",
-      "archived": false,
-      "path": "openspec/changes/parent-atlas-live-graph-proof/tasks.md",
-      "done": 0,
-      "total": 0,
-      "completionPct": null,
-      "noCheckboxes": true,
-      "hasProposal": false,
-      "hasSpecs": true,
-      "tasksNonTrivial": true,
-      "structuralScore": 60,
-      "auditScore": 54,
-      "stalenessMarkersFound": [
-        "⛔",
-        "SUPERSEDED",
-        "PREMISE SUPERSEDED"
-      ]
     },
     {
       "tree": "root",
@@ -2450,6 +2412,24 @@
     },
     {
       "tree": "root",
+      "changeName": "parent-atlas-error-research-lane",
+      "archived": false,
+      "path": "openspec/changes/parent-atlas-error-research-lane/tasks.md",
+      "done": 0,
+      "total": 0,
+      "completionPct": null,
+      "noCheckboxes": true,
+      "hasProposal": true,
+      "hasSpecs": true,
+      "tasksNonTrivial": true,
+      "structuralScore": 100,
+      "auditScore": 70,
+      "stalenessMarkersFound": [
+        "SUPERSEDED"
+      ]
+    },
+    {
+      "tree": "root",
       "changeName": "parent-atlas-gpu-runtime-abi-alignment",
       "archived": false,
       "path": "openspec/changes/parent-atlas-gpu-runtime-abi-alignment/tasks.md",
@@ -2463,6 +2443,26 @@
       "structuralScore": 60,
       "auditScore": 70,
       "stalenessMarkersFound": []
+    },
+    {
+      "tree": "root",
+      "changeName": "parent-atlas-live-graph-proof",
+      "archived": false,
+      "path": "openspec/changes/parent-atlas-live-graph-proof/tasks.md",
+      "done": 0,
+      "total": 0,
+      "completionPct": null,
+      "noCheckboxes": true,
+      "hasProposal": true,
+      "hasSpecs": true,
+      "tasksNonTrivial": true,
+      "structuralScore": 100,
+      "auditScore": 70,
+      "stalenessMarkersFound": [
+        "⛔",
+        "SUPERSEDED",
+        "PREMISE SUPERSEDED"
+      ]
     },
     {
       "tree": "root",
