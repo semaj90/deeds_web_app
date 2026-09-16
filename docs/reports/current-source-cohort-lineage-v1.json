@@ -1,12 +1,25 @@
 {
   "schema": "atlas.current-source-cohort-lineage.v1",
-  "generatedAt": "2026-09-16T00:51:11.840Z",
+  "generatedAt": "2026-09-16T00:58:46.193Z",
   "mode": "READ_ONLY_LINEAGE_AUDIT",
   "inputs": {
     "cohortChecksum": "fd88703ca428261206575d95204c31795f956645dd46dc4607a2b3048d464151",
     "observationPath": "docs/reports/workspace-source-binding-observation.json",
-    "workspaceRevisionSource": "tournament-admission-receipt"
+    "workspaceRevisionSource": "WORKSPACE_REVISION_TOURNAMENT_ADMISSION_RECEIPT"
   },
+  "workspaceFrame": {
+    "status": "CURRENT_WORKSPACE_FRAME_SELECTED",
+    "selectedWorkspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "selectedSource": "WORKSPACE_REVISION_TOURNAMENT_ADMISSION_RECEIPT",
+    "selectedAuthority": true,
+    "authorityConflict": false,
+    "blockers": [],
+    "frameAuthoritative": true,
+    "canonicalAuthority": true,
+    "promotionEligible": true
+  },
+  "observationWorkspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
+  "observationMatchesSelectedFrame": false,
   "counts": {
     "cohortRows": 52,
     "currentWorkspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
@@ -607,5 +620,5 @@
   "qdrantWrites": false,
   "status": "WORKSPACE_REVISION_SOURCE_MISMATCH",
   "nextGate": "WORKSPACE_REVISION_SOURCE_RECONCILIATION_REQUIRED",
-  "reportChecksum": "06cf6eaae88bd044497225bc57958c5320c16eef0d62c7a0443c3fe1b3525318"
+  "reportChecksum": "f8fcaafc80ea526374d31c77fb078a95a0e521d740cdf83725f253ed57ae6537"
 }

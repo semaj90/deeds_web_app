@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { resolveCurrentWorkspaceFrameV1 } from './lib/current-workspace-frame-selector-v1.mjs';
+import { resolveCurrentWorkspaceFrameV1, computeWorkspaceFrameAuthorityV1 } from './lib/current-workspace-frame-selector-v1.mjs';
 
 function fixture(files = {}) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'atlas-frame-selector-'));
@@ -84,4 +84,47 @@ test('derived candidate is fallback only when no authority receipt exists', () =
   assert.equal(result.selectedWorkspaceRevision, 'sha256:derived');
   assert.equal(result.selectedSource, 'CURRENT_SEALED_SNAPSHOT_DERIVATION_FALLBACK');
   assert.equal(result.selectedAuthority, false);
+});
+
+test('CURRENT-WORKSPACE-FRAME-AUTHORITY-SEMANTICS-01: a derived-fallback frame is SELECTED but never canonically authoritative', () => {
+  const root = fixture({
+    'docs/reports/workspace-revision-from-sealed-multi-repo-snapshot-v1.json': derived('sha256:derived'),
+    'docs/reports/graphify-source-selection-plan-v1.json': plan('sha256:derived'),
+  });
+  const result = resolveCurrentWorkspaceFrameV1({ root, argv: [], env: {} });
+  assert.equal(result.status, 'CURRENT_WORKSPACE_FRAME_SELECTED');
+  const authority = computeWorkspaceFrameAuthorityV1(result);
+  assert.equal(authority.frameAuthoritative, false);
+  assert.equal(authority.canonicalAuthority, false);
+  assert.equal(authority.promotionEligible, false);
+});
+
+test('CURRENT-WORKSPACE-FRAME-AUTHORITY-SEMANTICS-01: an explicit CLI override frame is SELECTED but never canonically authoritative', () => {
+  const root = fixture({
+    'docs/reports/workspace-revision-tournament-admission-v1.json': admitted('sha256:a'),
+    'docs/reports/current-graphify-snapshot-authority-v1.json': {
+      status: 'CURRENT_SNAPSHOT_PROVEN',
+      sourceSnapshot: { workspaceRevision: 'sha256:b', snapshotRevision: 'sha256:snap' },
+    },
+  });
+  const result = resolveCurrentWorkspaceFrameV1({ root, argv: ['--workspace-revision', 'sha256:operator'], env: {} });
+  assert.equal(result.status, 'CURRENT_WORKSPACE_FRAME_SELECTED');
+  assert.equal(result.explicitOverride, true);
+  const authority = computeWorkspaceFrameAuthorityV1(result);
+  assert.equal(authority.frameAuthoritative, false);
+  assert.equal(authority.canonicalAuthority, false);
+  assert.equal(authority.promotionEligible, false);
+});
+
+test('CURRENT-WORKSPACE-FRAME-AUTHORITY-SEMANTICS-01: a clean admission receipt with no conflict and no blockers IS canonically authoritative', () => {
+  const root = fixture({
+    'docs/reports/workspace-revision-tournament-admission-v1.json': admitted('sha256:admitted'),
+  });
+  const result = resolveCurrentWorkspaceFrameV1({ root, argv: [], env: {} });
+  assert.equal(result.status, 'CURRENT_WORKSPACE_FRAME_SELECTED');
+  assert.equal(result.selectedAuthority, true);
+  const authority = computeWorkspaceFrameAuthorityV1(result);
+  assert.equal(authority.frameAuthoritative, true);
+  assert.equal(authority.canonicalAuthority, true);
+  assert.equal(authority.promotionEligible, true);
 });

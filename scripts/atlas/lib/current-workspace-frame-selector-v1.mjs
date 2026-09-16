@@ -136,3 +136,37 @@ export function resolveCurrentWorkspaceFrameV1({
     blockers,
   };
 }
+
+/**
+ * CURRENT-WORKSPACE-FRAME-AUTHORITY-SEMANTICS-01.
+ *
+ * `resolveCurrentWorkspaceFrameV1()` above can SELECT a frame from a CLI override, an env
+ * override, or a non-authoritative derived/fallback candidate (`selectedAuthority: false` in
+ * all three cases) -- that is correct and useful for driving a diagnostic audit, but a selected
+ * frame is not automatically a canonically admitted one. Frame selection and frame authority are
+ * two different questions; conflating them was flagged as a real risk before any canonical gate
+ * consumed this selector. This function makes that distinction explicit and machine-checkable
+ * without changing `resolveCurrentWorkspaceFrameV1()`'s own contract or its existing tests.
+ *
+ * `frameAuthoritative` is true only when: the frame was actually selected (not blocked), the
+ * winning candidate itself carries `authority: true` (i.e. it came from
+ * `WORKSPACE_REVISION_TOURNAMENT_ADMISSION_RECEIPT` or `CURRENT_GRAPHIFY_SNAPSHOT_AUTHORITY_RECEIPT`,
+ * never CLI/env/derived), there is no unresolved authority conflict, and there are zero blockers.
+ * `canonicalAuthority` / `promotionEligible` currently mirror `frameAuthoritative` one-for-one --
+ * kept as separate named fields because Gate 2+ may need to add conditions that make a frame
+ * authoritative-but-not-yet-promotion-eligible (e.g. pending a downstream cohort recheck) without
+ * relaxing what "authoritative" itself means.
+ */
+export function computeWorkspaceFrameAuthorityV1(frame) {
+  const frameAuthoritative = frame.status === 'CURRENT_WORKSPACE_FRAME_SELECTED'
+    && frame.selectedAuthority === true
+    && frame.authorityConflict === false
+    && Array.isArray(frame.blockers)
+    && frame.blockers.length === 0;
+  return {
+    schema: 'atlas.current-workspace-frame-authority.v1',
+    frameAuthoritative,
+    canonicalAuthority: frameAuthoritative,
+    promotionEligible: frameAuthoritative,
+  };
+}

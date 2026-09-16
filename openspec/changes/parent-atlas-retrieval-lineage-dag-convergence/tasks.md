@@ -14724,3 +14724,99 @@ instruction ("if confirmed stale, re-materialize the derived cohort from the adm
 binding instead"), the next real step is **Gate 2 (`CURRENT-SOURCE-CHUNK-OWNER-01`)** — using the
 now-confirmed admitted workspace revision `sha256:e24bb97...` to re-materialize/re-derive the
 cohort's chunk ownership, not to patch the existing 52 rows in place.
+
+### Follow-up (2026-09-16, same session, external review applied): authority semantics hardened, cohort auditor rewired, single-owner cross-check run
+
+The prior entry above ported the selector but left "selected" and "admitted" conflated (a
+CLI/env/derived-fallback frame could report `selectedAuthority: false` yet still get consumed
+downstream as if canonical). Correction applied, in the order recommended:
+
+1. **`CURRENT-WORKSPACE-FRAME-SELECTOR-PORT-01`**: recovered onto `main` verbatim (no edits) —
+   `scripts/atlas/lib/current-workspace-frame-selector-v1.mjs`,
+   `scripts/atlas/test-current-workspace-frame-selector-v1.mjs` (4 original tests, still passing
+   unmodified). Also recovered its hard dependency chain (not listed in the original 3-file
+   request, but required for the single-owner audit to run at all):
+   `scripts/atlas/audit-workspace-revision-admission-single-owner-v1.mts`,
+   `scripts/atlas/audit-canonical-source-inventory-hygiene-v1.mts`,
+   `scripts/atlas/lib/canonical-source-inventory-hygiene-v1.mts`,
+   `scripts/atlas/lib/whole-codebase-source-exclusions.mjs`,
+   `tests/canonical-source-inventory-hygiene.spec.ts` — all from
+   `origin/agent/source-inventory-admission-binding-20260913` (the earliest branch in the chain;
+   the single-owner audit throws `REQUIRED_RECEIPT_MISSING` without the hygiene report it
+   produces). **Gap found and left open, not silently worked around**: the recovered
+   `.spec.ts` uses vitest but root `tests/` isn't in `sveltekit-frontend`'s vitest `include` glob
+   and there's no root-level vitest config — it currently has no wired runner. Not fixed this
+   pass; the two library functions it targets are independently exercised by the real
+   `audit-canonical-source-inventory-hygiene-v1.mts` run below (real data, stronger evidence than
+   a synthetic-fixture unit test would add, but not a substitute for one).
+
+2. **`CURRENT-WORKSPACE-FRAME-AUTHORITY-SEMANTICS-01`**: added
+   `computeWorkspaceFrameAuthorityV1(frame)` to the selector file as a separate, additive export
+   (original `resolveCurrentWorkspaceFrameV1()` untouched) — `frameAuthoritative` requires
+   `status === 'CURRENT_WORKSPACE_FRAME_SELECTED'`, `selectedAuthority === true`,
+   `authorityConflict === false`, and zero blockers; `canonicalAuthority`/`promotionEligible`
+   currently mirror it. Added 3 tests (7 total, exceeding the requested minimum of 6): a
+   derived-fallback frame is `SELECTED` but not authoritative; an explicit CLI-override frame is
+   `SELECTED` but not authoritative; a clean admission receipt with no conflict/blockers IS
+   authoritative. All 7 pass.
+
+3. **Rewired `audit-current-source-cohort-lineage-v1.mjs`** to resolve its comparison revision
+   through `resolveCurrentWorkspaceFrameV1()` + `computeWorkspaceFrameAuthorityV1()` instead of
+   reading the admission receipt inline, and demoted `workspace-source-binding-observation.json`
+   to corroborating-only (`observationWorkspaceRevision`, `observationMatchesSelectedFrame` —
+   real read: `927ed41118...` vs. the now-selected `e24bb97187...`, confirming just how stale
+   that observation artifact is). Added the pre-comparison status ladder exactly as specified:
+   `CURRENT_WORKSPACE_FRAME_UNRESOLVED` → `CURRENT_WORKSPACE_FRAME_CONFLICT` →
+   `CURRENT_WORKSPACE_FRAME_NON_AUTHORITATIVE` → (only then) run the Postgres cohort comparison.
+   The Postgres queries are now gated behind that ladder (skipped entirely on an unresolved/
+   conflicted/non-authoritative frame — previously they always ran).
+   **Rerun result: unchanged from the prior entry** (`52/52` source-revision qualified, `0/52`
+   current-workspace matched, `0` conflicting rows) — this is a meaningfully stronger negative
+   result than before: it reproduces under the strictest available revision-selection path, not
+   just the old admission-receipt shortcut, ruling out "the old script picked the wrong revision"
+   as an alternative explanation.
+
+4. **`CURRENT-WORKSPACE-FRAME-ADMISSION-01` re-confirmed**: `audit-current-workspace-frame-admission-v1.mjs`
+   rerun against the rewired cohort auditor's fresh receipt — identical verdict,
+   `STALE_WORKSPACE_PROJECTION`, `conflictingSourceRows: 0`. Receipt:
+   `docs/reports/current-workspace-frame-admission-v1.json`.
+
+5. **New finding, real and not previously surfaced**: ran the recovered single-owner audit
+   (`audit-workspace-revision-admission-single-owner-v1.mts`) for the first time. Result:
+   **`WORKSPACE_REVISION_ADMISSION_SINGLE_OWNER_BLOCKED`**, `firstBlockingInvariant: "hygienePass"`.
+   Running its own hygiene-report producer
+   (`audit-canonical-source-inventory-hygiene-v1.mts`) fresh returns
+   `SOURCE_INVENTORY_HYGIENE_BLOCKED` / `recurrencePrevented: false` right now — and 27 more
+   checksum-parity checks fail across `plan`/`derivation`/`preflight`/`admission`/`consumer`/
+   `canary`, meaning those receipts were generated against a source-inventory state that no
+   longer matches the live one. **This does not overturn Gate 1's `STALE_WORKSPACE_PROJECTION`
+   verdict** (the admission receipt is still internally self-consistent: `authority: true`, no
+   conflict, and the cohort comparison independently reproduces regardless) **but it is a
+   separate, more foundational open problem**: the operator should not treat
+   `workspace-revision-tournament-admission-v1.json`'s authority as fully trustworthy for
+   anything beyond this narrow Gate 1 check until the single-owner chain is re-run clean.
+   Receipt: `docs/reports/workspace-revision-admission-single-owner-v1.json`.
+
+**Task ledger** (distinguishing recovery from result, per explicit instruction not to conflate
+the two):
+
+```
+[x] ALL-BRANCH-PRIOR-ART-CENSUS-01                    132 branches audited
+[x] CURRENT-WORKSPACE-FRAME-SELECTOR-PRIOR-ART-FOUND  additive implementation + test found
+[x] CURRENT-WORKSPACE-FRAME-SELECTOR-PORT-01          recovered onto main, tests pass unmodified
+[x] CURRENT-WORKSPACE-FRAME-AUTHORITY-SEMANTICS-01    selected != admitted, 7/7 tests pass
+[x] CURRENT-WORKSPACE-FRAME-ADMISSION-01              live receipt: STALE_WORKSPACE_PROJECTION
+[x] CURRENT-SOURCE-COHORT-RECHECK-01                  rerun via authoritative selector: still 0/52
+[ ] CURRENT-CHUNK-LINEAGE-CORRECTNESS-01              not started (Gate 2)
+[ ] CANDIDATE-ORDINAL-128-01                           not started (downstream of Gate 2+)
+[!] WORKSPACE-REVISION-ADMISSION-SINGLE-OWNER-01       new: BLOCKED on hygienePass, unaddressed
+```
+
+**Not done, deliberately**: `packet-chunk-lineage-migration-owner-20260915` and every other
+branch flagged in the all-branch audit above remain unpulled. `CURRENT-CHUNK-LINEAGE-
+CORRECTNESS-01` (the `atlas_workspace_source_bindings` → `atlas_packet_chunk_lineage` →
+`codebase_chunk_index.id` → `canonical_chunk_id` join) has not been started — it is the next real
+gate, but should probably be sequenced after (or alongside a decision about) the new
+single-owner-chain `BLOCKED` finding above, since re-materializing chunk ownership from an
+admission receipt whose own upstream chain is checksum-inconsistent risks compounding the
+problem rather than resolving it.
