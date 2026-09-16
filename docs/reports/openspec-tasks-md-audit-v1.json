@@ -1,7 +1,7 @@
 {
   "schema": "atlas.openspec-tasks-md-audit.v1",
   "mode": "READ_ONLY_AUDIT",
-  "generatedAt": "2026-09-16T22:04:22.399Z",
+  "generatedAt": "2026-09-16T22:31:49.799Z",
   "gapThreshold": 80,
   "aggregate": {
     "totalChangesAudited": 108,
@@ -15,24 +15,6 @@
     "changesWithStalenessMarkers": 25
   },
   "changes": [
-    {
-      "tree": "root",
-      "changeName": "parent-atlas-retrieval-logic-convergence",
-      "archived": false,
-      "path": "openspec/changes/parent-atlas-retrieval-logic-convergence/tasks.md",
-      "done": 8,
-      "total": 52,
-      "completionPct": 15,
-      "noCheckboxes": false,
-      "hasProposal": false,
-      "hasSpecs": false,
-      "tasksNonTrivial": true,
-      "structuralScore": 30,
-      "auditScore": 21,
-      "stalenessMarkersFound": [
-        "SUPERSEDED"
-      ]
-    },
     {
       "tree": "root",
       "changeName": "parent-atlas-onnx-webgpu-embedding-promotion",
@@ -64,6 +46,24 @@
       "structuralScore": 60,
       "auditScore": 31,
       "stalenessMarkersFound": []
+    },
+    {
+      "tree": "root",
+      "changeName": "parent-atlas-retrieval-logic-convergence",
+      "archived": false,
+      "path": "openspec/changes/parent-atlas-retrieval-logic-convergence/tasks.md",
+      "done": 8,
+      "total": 52,
+      "completionPct": 15,
+      "noCheckboxes": false,
+      "hasProposal": true,
+      "hasSpecs": false,
+      "tasksNonTrivial": true,
+      "structuralScore": 70,
+      "auditScore": 37,
+      "stalenessMarkersFound": [
+        "SUPERSEDED"
+      ]
     },
     {
       "tree": "root",
@@ -1803,24 +1803,6 @@
   "gaps": [
     {
       "tree": "root",
-      "changeName": "parent-atlas-retrieval-logic-convergence",
-      "archived": false,
-      "path": "openspec/changes/parent-atlas-retrieval-logic-convergence/tasks.md",
-      "done": 8,
-      "total": 52,
-      "completionPct": 15,
-      "noCheckboxes": false,
-      "hasProposal": false,
-      "hasSpecs": false,
-      "tasksNonTrivial": true,
-      "structuralScore": 30,
-      "auditScore": 21,
-      "stalenessMarkersFound": [
-        "SUPERSEDED"
-      ]
-    },
-    {
-      "tree": "root",
       "changeName": "parent-atlas-onnx-webgpu-embedding-promotion",
       "archived": false,
       "path": "openspec/changes/parent-atlas-onnx-webgpu-embedding-promotion/tasks.md",
@@ -1850,6 +1832,24 @@
       "structuralScore": 60,
       "auditScore": 31,
       "stalenessMarkersFound": []
+    },
+    {
+      "tree": "root",
+      "changeName": "parent-atlas-retrieval-logic-convergence",
+      "archived": false,
+      "path": "openspec/changes/parent-atlas-retrieval-logic-convergence/tasks.md",
+      "done": 8,
+      "total": 52,
+      "completionPct": 15,
+      "noCheckboxes": false,
+      "hasProposal": true,
+      "hasSpecs": false,
+      "tasksNonTrivial": true,
+      "structuralScore": 70,
+      "auditScore": 37,
+      "stalenessMarkersFound": [
+        "SUPERSEDED"
+      ]
     },
     {
       "tree": "root",
