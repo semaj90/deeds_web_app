@@ -14875,3 +14875,59 @@ comparison itself, which was independently re-verified above through the authori
 Recorded here, not fixed: this is exactly the kind of "found but out of scope to resolve
 immediately" finding this repo's Duplication Prevention rule requires writing down rather than
 silently deferring.
+
+### 2026-09-16 — Graphify lifecycle audit revision-type correction
+
+- Fixed `scripts/atlas/audit-graphify-lifecycle-owner-v1.mjs` so SHA-256 content identities are not passed to `git rev-list`; they are not Git revisions and now remain explicitly non-comparable by commit distance.
+- The follow-up read-only audit reached report emission but could not replace `docs/reports/graphify-lifecycle-owner-v1.json` because that report is concurrently locked. No lifecycle, Graphify, or datastore mutation occurred.
+- Execution ownership remains `DUPLICATE_EQUIVALENT_EXECUTIONS`; no canonical owner was selected.
+- The explicit decision mechanism is present at `scripts/atlas/apply-current-graphify-execution-owner-decision-v1.mjs`, but remains inert without both an operator-selected execution ID, `--apply`, and the dedicated authorization variable. No implicit selection was made.
+- Current graph/semantic scaffold contract tests passed from `sveltekit-frontend`: 4 files, 27 tests (`CandidateFeatureSnapshotV1`, semantic representation, GraphOrdinalMap, and graph ordinal edge compiler).
+- HyperGraphRAG/n-ary contract and KAG reader tests remain green: 2 files, 15 tests. The adapter preserves revision-qualified n-ary evidence for existing candidates only; live API promotion and canonical tuple admission remain open.
+### 2026-09-16 — Whole-codebase packet exclusion owner converged
+
+- `PACKET_WRITER_SHARED_EXCLUSION_POLICY_01`: the packet inventory writer now imports `scripts/atlas/lib/whole-codebase-source-exclusions.mjs` and uses its shared ripgrep exclusions. The merged policy retains the incident-driven `qdrant-windows` and `.svelte-error-fixes-backup` exclusions alongside the broader generated/runtime/worktree exclusions.
+- The writer report records the exclusion-policy revision and checksum for replay/audit attribution.
+- This closes future-junk-reintroduction prevention only. The historical packet rows remain untouched, and the writer's apply path remains quarantined until revision-qualified canonical packet admission is implemented.
+- Validation: `node --check scripts/atlas/upsert-whole-codebase-atlas-packets.mjs`; shared-policy import/use inspection; no database or projection writes.
+
+### 2026-09-16 (continued, separate pass) — real 139K-file gap found and closed in the shared exclusion policy itself
+
+While independently verifying the exclusion-policy merge above by diffing actual `rg --files -uuu`
+output under the old writer list vs. the shared module (before either was aware the other had
+already repointed the writer — see the concurrent edit note below), the two lists produced wildly
+different totals: **251,572 files (old) vs. 119,264 (new)**, not the small handful expected from
+a 2-item merge. Traced the entire gap to one glob: `**/workspace-source-snapshots/**` alone
+matched 139,496 files — far more than the 65 real files in `docs/reports/workspace-source-snapshots/`.
+
+**Root cause, verified via `git worktree list` + `find`**: `.tmp/workspace-source-snapshots/`
+holds **10+ full materialized repo-tree snapshots** (139,385 real files — `.claude/`, `sveltekit-frontend/`,
+`drizzle/`, `scripts/`, etc., fully duplicated per snapshot), and neither the old writer list nor
+the shared module excluded `.tmp` by name. The shared module's smaller total was an **accident**:
+its `workspace-source-snapshots` glob happened to also match the `.tmp/workspace-source-snapshots`
+path, not a deliberate safeguard — exactly the same incident shape as the `.python311`/
+`qdrant-windows` cases already documented in this file's writer comments, two orders of magnitude
+larger.
+
+**Confirmed live, not just theoretical**: a read-only count against `atlas_packets` —
+`source_ref like '.tmp/%' or source_ref like '%workspace-source-snapshots%'` — returns
+**1,063 existing junk rows**. Real, but far smaller than 139K, meaning the writer hasn't run
+`--apply` against the current, fully-grown `.tmp/workspace-source-snapshots/` state (consistent
+with the apply path having since been quarantined, per the concurrent entry above). **Not cleaned
+up here** — per this repo's own established pattern for this exact writer ("prevents FUTURE runs
+from reintroducing the same junk; does not clean up rows already written — a separate,
+operator-gated decision").
+
+**Fix applied**: added an explicit `**/.tmp/**` glob to `WHOLE_CODEBASE_EXCLUDE_GLOBS` (revision
+bumped `v3` → `v4`) so this protection no longer depends on an unrelated pattern happening to also
+match. Re-ran the hygiene audit: `recurrencePrevented: true` now (the exclusion-policy blocker is
+fully closed); the one remaining blocker, `SNAPSHOT_BYTES_READBACK_NOT_PROVEN`, is the
+already-documented benign snapshot-drift finding above, unrelated to this fix.
+
+**Concurrency note, recorded for transparency**: partway through this investigation, the writer
+repoint described in the "Whole-codebase packet exclusion owner converged" entry immediately
+above appeared in the working tree as a real, uncommitted, verified-safe change (syntax-checked,
+`--apply` quarantine confirmed exit(2)/no writes) — not authored in this pass. Rather than
+duplicate or conflict with it, this pass built on top of it (the `.tmp` gap and its 1,063-row
+live count were found independently, on the already-repointed writer). Both are captured together
+here since they're one coherent unit of work.

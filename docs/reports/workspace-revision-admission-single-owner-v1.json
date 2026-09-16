@@ -1,6 +1,6 @@
 {
   "schema": "atlas.workspace-revision-admission-single-owner.v1",
-  "generatedAt": "2026-09-16T00:57:10.692Z",
+  "generatedAt": "2026-09-16T01:25:50.664Z",
   "mode": "READ_ONLY",
   "status": "WORKSPACE_REVISION_ADMISSION_SINGLE_OWNER_BLOCKED",
   "authority": false,

@@ -1,6 +1,6 @@
 {
   "schema": "atlas.canonical-source-inventory-hygiene.v1",
-  "generatedAt": "2026-09-16T00:56:53.192Z",
+  "generatedAt": "2026-09-16T01:27:30.184Z",
   "mode": "READ_ONLY",
   "status": "SOURCE_INVENTORY_HYGIENE_BLOCKED",
   "proofLevel": "BLOCKED",
@@ -17,10 +17,10 @@
   "sourceInventoryChecksum": "sha256:f9d049de1581b4abf76a8c785a3cbdcaab0f37fc6268a2cc39e81ace011b4585",
   "sourceSelectionChecksum": "sha256:56d162d148a5f3b05ffae0dbbc52a6bf4df334e794b3c0631229d59e9a410728",
   "writerPath": "scripts/atlas/upsert-whole-codebase-atlas-packets.mjs",
-  "writerRevisionChecksum": "sha256:6c711db448220a0b32c00335c9ade475c4035b409fc007d5cff2c5bcdc5c981e",
-  "writerExclusionPolicyRevision": "atlas.whole-codebase-source-exclusions.2026-09-13.v1",
-  "writerExclusionPolicyChecksum": "sha256:deed2059de44f8d16c879a5fe0905cad642b077235e7f148971debcafa5df41f",
-  "writerUsesSharedExclusionPolicy": false,
+  "writerRevisionChecksum": "sha256:b9d8fa509704f67dcf0a9c725714800b033e6a5a7e19a1f95cb353d7dc4eb801",
+  "writerExclusionPolicyRevision": "atlas.whole-codebase-source-exclusions.2026-09-16.v4",
+  "writerExclusionPolicyChecksum": "sha256:742a4e01f34036d431956c1b16586592d5463c86c4b24d04dba8e7569749e2d8",
+  "writerUsesSharedExclusionPolicy": true,
   "recurrenceExclusionProof": {
     "pass": true,
     "classChecks": {
@@ -29,7 +29,8 @@
       "backup": true,
       "generatedBuild": true,
       "worktreeDuplicate": true,
-      "externalDependency": true
+      "externalDependency": true,
+      "liveServiceStorage": true
     }
   },
   "candidatePathCount": 25542,
@@ -50,7 +51,7 @@
     "generatedBuild": 0,
     "worktreeDuplicate": 0
   },
-  "recurrencePrevented": false,
+  "recurrencePrevented": true,
   "historicalJunkIdentified": true,
   "historicalJunkCleanupAuthorized": false,
   "canonicalSources": [
@@ -153115,8 +153116,7 @@
     }
   ],
   "blockers": [
-    "SNAPSHOT_BYTES_READBACK_NOT_PROVEN",
-    "PACKET_WRITER_DOES_NOT_USE_SHARED_EXCLUSION_POLICY"
+    "SNAPSHOT_BYTES_READBACK_NOT_PROVEN"
   ],
   "firstBlockingInvariant": "SNAPSHOT_BYTES_READBACK_NOT_PROVEN",
   "nextGate": "SOURCE-INVENTORY-HYGIENE-01"
