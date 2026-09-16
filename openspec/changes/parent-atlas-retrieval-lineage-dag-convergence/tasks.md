@@ -14574,3 +14574,86 @@ clean.
 
 **Status: recorded as the corrected plan, zero gates from this section implemented yet.** Next
 session should start at `CURRENT-WORKSPACE-FRAME-ADMISSION-01` (read-only, safest first step).
+
+### All-branch audit (2026-09-15): real unmerged prior art found for Gate 1, flagged not pulled
+
+Following the same logic used to correct the Ewin Tang finding (a branch existing ≠ merged; check
+content, not just name), audited **all 132 remote branches** via `git fetch --prune` +
+`git merge-base --is-ancestor` + `git diff --shortstat main...<branch>` for every branch:
+
+- **25 branches are already ancestors of `main`** — fully merged, safe to ignore/delete, no action.
+- **105 branches are NOT ancestors of `main`.** Of those, 3 (`eval/claude-mem-opencode`,
+  `feat/karpathy-llm-wiki-knowledge-layer`, `merge-resolve/20260526134046`) show 54,000+ file diffs
+  — orphaned/unrelated histories, not real integration candidates, excluded from further review.
+  The remaining 102 range from trivial (0-file, content-identical-to-main despite non-ancestor
+  status — e.g. `agent/temporal-post-dispatch-proof-20260821`) to large stale divergences (e.g.
+  the already-documented `agent/sample-query-matrix-ewintang-20260822`, ~311KB diff, not pulled).
+
+**High-value finding**: a chain of 5 branches dated 2026-09-11 through 2026-09-15 —
+`agent/source-inventory-admission-binding-20260913` →
+`agent/current-packet-chunk-lineage-bridge-20260913` →
+`agent/current-revision-selector-convergence-20260913` →
+`agent/current-packet-chunk-authority-wrapper-20260913` →
+`agent/packet-chunk-lineage-migration-owner-20260915` — contains real, tested, additive
+implementation work that **directly maps onto the Gate 1 (`CURRENT-WORKSPACE-FRAME-ADMISSION-01`)
+plan recorded above**, built independently and largely *before* this session re-derived the same
+gate from scratch:
+
+- `scripts/atlas/lib/current-workspace-frame-selector-v1.mjs` (on
+  `current-revision-selector-convergence-20260913`) — a real `resolveCurrentWorkspaceFrameV1()`
+  implementation. Reads `docs/reports/workspace-revision-tournament-admission-v1.json`,
+  `current-graphify-snapshot-authority-v1.json`,
+  `workspace-revision-from-sealed-multi-repo-snapshot-v1.json`,
+  `graphify-source-selection-plan-v1.json`; resolves an authoritative workspace revision through an
+  explicit candidate-priority chain (`WORKSPACE_REVISION_TOURNAMENT_ADMISSION_RECEIPT` >
+  `CURRENT_GRAPHIFY_SNAPSHOT_AUTHORITY_RECEIPT` > derived/fallback, each requiring `authority:
+  true` or explicit non-authoritative labeling); detects authority conflicts (`authorityConflict`
+  when the receipt sources disagree) rather than silently picking one. This is the missing
+  building block for `CURRENT-WORKSPACE-FRAME-ADMISSION-01`'s workspace-revision-authority half —
+  not identical to the planned `CurrentWorkspaceFrameReceiptV1` shape (no cohort-row counting), but
+  clearly overlapping intent and directly reusable as a component.
+- `scripts/atlas/lib/canonical-source-inventory-hygiene-v1.mts` +
+  `audit-canonical-source-inventory-hygiene-v1.mts` +
+  `tests/canonical-source-inventory-hygiene.spec.ts` (present on all 5 branches in the chain,
+  earliest on `source-inventory-admission-binding-20260913`) — real, tested source-inventory
+  admission logic, present with a real spec file.
+- `scripts/atlas/audit-current-packet-chunk-lineage-bridge-v1.mjs`,
+  `audit-current-packet-chunk-lineage-deployment-v1.mjs`,
+  `audit-workspace-revision-admission-single-owner-v1.mts` — audit scripts targeting exactly the
+  "single owner" / chunk-lineage-bridge concepts this section's Gate 1-2 sequence needs.
+- The furthest branch in the chain, `packet-chunk-lineage-migration-owner-20260915` (today's
+  date), additionally **modifies 14 existing files already on `main`**
+  (`admit-workspace-revision-tournament-v1.mts`, `audit-current-graphify-run-owner-v1.mjs`,
+  `audit-current-graphify-snapshot-authority-v1.mts`,
+  `audit-current-workspace-packet-chunk-join-v1.mjs`, `audit-graphify-canary-expectation-v1.mts`,
+  `audit-graphify-snapshot-consumer-preflight-v1.mts`, `audit-graphify-tournament-admission-v1.mts`,
+  `audit-workspace-revision-tournament-source-authority-v1.mts`,
+  `build-graphify-canary-expectation-v1.mts`, `graphify-daily-snapshot-native-open-v1.mts`,
+  `plan-graphify-source-selection-from-snapshot-v1.mts`, `upsert-whole-codebase-atlas-packets.mjs`,
+  `graphify-canary-expectation-v1.ts` + its spec) — real conflict surface, **not a safe
+  fast-forward or clean cherry-pick**. This needs a reviewed merge, not an automated pull.
+
+**Other real, additive (new-files-only, not yet checked for main-file conflicts) work found on
+recent branches, unrelated to Gate 1 but potentially valuable elsewhere**:
+- `agent/packet-digest-bridge-v1-20260915` (today) — `packet-digest-bridge-v1.ts` +
+  `current-packet-digest-readback-v1.ts`, both with real `.spec.ts` test files.
+- `agent/parent-atlas-valkey-event-fabric-20260912` — `valkey-event-stream.ts` + spec +
+  `prove-valkey-authority-event-fabric.mts`.
+- `agent/graphify-symbol-projection-plan-20260912` — `graphify-symbol-projection-v1.ts` +
+  `-preflight-v1.ts` + `-writer-v1.ts`, each with a `.spec.ts`, plus a dated design doc
+  (`docs/plans/graphify-symbol-projection-e2e-plan-2026-09-12.md`).
+- `agent/promotion-owner-collision-reconcile-20260912` — `reconcile-promotion-critical-owners-v1.mjs`
+  and `-v2.mjs` plus two dated openspec task-fragment docs already scoped to
+  `parent-atlas-ace-rlm-bitfrost-integration`.
+
+**Not done, deliberately**: no branch content has been merged, cherry-picked, or copied into
+`main` by this audit. The `packet-chunk-lineage-migration-owner-20260915` branch's 14-file
+modification surface is real conflict risk against current `main` state (which has continued to
+change these same files independently — e.g. `audit-current-graphify-run-owner-v1.mjs` is also
+modified in this session's own uncommitted working tree per `git status`). Recommended next step
+if the operator wants to recover this work: start narrow — pull just
+`scripts/atlas/lib/current-workspace-frame-selector-v1.mjs` (additive, no conflict) from
+`origin/agent/current-revision-selector-convergence-20260913` via `git show <ref>:<path> ><path>`,
+review it against the Gate 1 plan above, and decide whether to adapt it into
+`CURRENT-WORKSPACE-FRAME-ADMISSION-01`'s implementation or supersede it — not a blind branch
+merge.
