@@ -312,6 +312,15 @@ export interface CompileEventHypergraphBundleInput {
 	experimentFeatureMatrix?: ExperimentFeatureMatrix | null;
 }
 
+export class HypergraphLineageUnavailableError extends Error {
+	readonly code = 'HYPERGRAPH_LINEAGE_UNAVAILABLE' as const;
+
+	constructor(message: string) {
+		super(message);
+		this.name = 'HypergraphLineageUnavailableError';
+	}
+}
+
 export interface CompileExperimentFeatureMatrixInput {
 	requestId?: string;
 	packetKey?: string | null;
@@ -450,9 +459,19 @@ function firstNonEmpty(...values: Array<string | null | undefined>): string {
 }
 
 export function compileEventHypergraphBundle(input: CompileEventHypergraphBundleInput): EventHypergraphBundle {
-	const packetKey = input.packetKey ?? input.requestId;
+	const packetKey = input.packetKey?.trim() || null;
 	const sourceRevision = input.sourceRevision;
-	const workspaceRevision = input.workspaceRevision ?? sourceRevision;
+	const workspaceRevision = input.workspaceRevision?.trim() || null;
+	if (!packetKey) {
+		throw new HypergraphLineageUnavailableError(
+			'Canonical packetKey is required; requestId cannot become packet identity.',
+		);
+	}
+	if (!workspaceRevision) {
+		throw new HypergraphLineageUnavailableError(
+			'Canonical workspaceRevision is required; sourceRevision cannot become workspace identity.',
+		);
+	}
 	const observedAt = new Date().toISOString();
 	const events: AtlasEvent[] = [];
 

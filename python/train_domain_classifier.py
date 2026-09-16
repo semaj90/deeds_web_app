@@ -215,6 +215,16 @@ def main() -> int:
         default=Path(__file__).resolve().parents[1],
         help="Repo root used to resolve bundle sourceRef paths (only relevant with --labels-file)",
     )
+    parser.add_argument(
+        "--workspace-revision",
+        default=None,
+        help="Explicit admitted sha256 workspace revision for a promotion-qualified training receipt",
+    )
+    parser.add_argument(
+        "--execution-id",
+        default=None,
+        help="Explicit terminal Graphify execution ID for a promotion-qualified training receipt",
+    )
     args = parser.parse_args()
 
     bundle_meta: Optional[dict[str, Any]] = None
@@ -349,6 +359,13 @@ def main() -> int:
     # is trustworthy without re-deriving it — real values only, never fabricated. Fields with no
     # real value at this layer (e.g. embeddingModelRevision — Ollama does not expose a content
     # hash for embeddinggemma:latest) are recorded explicitly as null, not omitted.
+    if args.workspace_revision is not None and not args.labels_file:
+        print("ERROR: --workspace-revision requires --labels-file so the source cohort is frozen", file=sys.stderr)
+        return 1
+    if args.workspace_revision is not None and not re.fullmatch(r"sha256:[0-9a-f]{64}", args.workspace_revision, re.IGNORECASE):
+        print("ERROR: --workspace-revision must be sha256:<64 hex>", file=sys.stderr)
+        return 1
+
     receipt: dict[str, Any] = {
         "schema": "atlas.domain-classifier-training-receipt.v1",
         "modelRevision": model_revision,
@@ -358,6 +375,10 @@ def main() -> int:
         "taxonomyRevision": bundle_meta.get("taxonomyRevision") if bundle_meta else None,
         "trainingFileSetChecksum": bundle_meta.get("fileSetChecksum") if bundle_meta else None,
         "trainingLabelSetChecksum": bundle_meta.get("labelSetChecksum") if bundle_meta else None,
+        "workspaceRevision": args.workspace_revision,
+        "graphifyExecutionId": args.execution_id,
+        "trainingSourceDigestChecksum": bundle_meta.get("fileSetChecksum") if bundle_meta else None,
+        "currentCohortAdmission": bool(args.workspace_revision and args.execution_id and bundle_meta),
         "embeddingModel": args.embed_model,
         "embeddingModelRevision": None,
         "nClusters": args.n_clusters,

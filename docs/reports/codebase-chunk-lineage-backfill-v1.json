@@ -1,0 +1,50 @@
+{
+  "schema": "atlas.codebase-chunk-lineage-backfill.v1",
+  "mode": "CANARY_APPLY",
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "representationRevision": null,
+  "representationRevisionPolicy": "REMAIN_NULL_UNTIL_CANONICAL_PRODUCER_PROVEN",
+  "limit": 5,
+  "writesPerformed": false,
+  "rollbackOccurred": true,
+  "candidateCount": 5,
+  "candidateSample": [
+    {
+      "id": "0000136c-8cbb-4188-a860-28dce80d3b87",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "sourceRevision": "sha256:c2807716ecbae08197f5171610ccc633347e4bb57cc9614143618799e5f64bc6",
+      "bindingChecksum": "289c9e7062856ff87b2ede9163780432522a50aa5d40eac7449825bd6bada40e",
+      "producerRevision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+    },
+    {
+      "id": "00004c2a-200b-4d4a-b422-25f4496df250",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "sourceRevision": "sha256:21dec05c45a20c22142a7b64682f67bca4180fc18fdc968e1833947ca564f4bd",
+      "bindingChecksum": "051e508350f1e3f28eefc825a3c9b741b3fe4169d6e519cc033e9af928351696",
+      "producerRevision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+    },
+    {
+      "id": "00008fb6-9ecd-4aa3-9cc4-5f9c740dc0f8",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "sourceRevision": "sha256:57c3d475369fa0ab6f82b03889d26512c557198d986cde20285081ec8b6014ac",
+      "bindingChecksum": "76f6d78b3ed43f67aac9b09b6ecf3ba122445816a15eff8a9d9c0b777d95a3d1",
+      "producerRevision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+    },
+    {
+      "id": "00010d7f-af00-47b9-b590-334b54c873ea",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "sourceRevision": "sha256:61a24fd575c731db464cb803c08973f027f7d08dc121a35aacfeb76b9343c241",
+      "bindingChecksum": "19dbed862c688cce9a08c758e91267af647f4954717ae09c773435bca0d05dd9",
+      "producerRevision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+    },
+    {
+      "id": "000201aa-dc36-4bb4-9d4a-200957bc6aeb",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "sourceRevision": "sha256:ffc7ad8aa9c60f384f2ed8f833f3ff73354a7d3b78b7e0c582ad42f228960c78",
+      "bindingChecksum": "3b946438df7f19b5f94eabbe2ee481e3855b3251e7f33676b043e318cb82b1ef",
+      "producerRevision": "graphify-execution-membership-v2:0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+    }
+  ],
+  "status": "CANARY_ROLLBACK_READBACK_PROVEN",
+  "readbackCount": 5
+}

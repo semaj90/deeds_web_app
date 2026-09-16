@@ -1080,3 +1080,15 @@ openspec/drafts/*.md
 # Large binary training-snapshot artifacts (not source; regenerable via python/export_frozen_semantic768_snapshot.py)
 docs/reports/semantic768/*.f32bin
 models/domain-classifier/*.joblib
+
+# Oversized report snapshots (40-332MB, flagged 2026-09-16 — regenerable, not source; see
+# openspec/changes/parent-atlas-canonical-directory-ingestion-fabric and related graphify-delta/
+# workspace-binding-cas changes for the producers)
+docs/reports/feature-ontology-current-cohort-v1-codex.json
+docs/reports/feature-ontology-current-cohort-v1.json.tmp-*
+docs/reports/graphify-current-candidate-binding-v1.json
+docs/reports/graphify-delta-plan-v1.json
+docs/reports/graphify-workspace-snapshot-binding-v1-rerun-*.json
+docs/reports/current-graphify-snapshot-binding-recheck-v1.json
+docs/reports/workspace-binding-cas-plan-v1.json
+docs/reports/workspace-source-snapshots/

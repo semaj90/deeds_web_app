@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
 import readline from 'node:readline';
+import path from 'node:path';
 import { Pool } from 'pg';
 import { fileURLToPath } from 'node:url';
 
@@ -99,6 +100,6 @@ async function upsertBatch(client, rows) {
   }
 }
 
-if (process.argv[1] === fileURLToPath(import.meta.url) || process.argv[1].endsWith('load-profiles-to-postgres.mjs')) {
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   main();
 }

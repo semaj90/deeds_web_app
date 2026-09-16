@@ -1,0 +1,194 @@
+{
+  "schema": "atlas.packet-dense-search.pds-proof.v1",
+  "generatedAt": "2026-09-16T09:06:00-07:00",
+  "writesPerformed": false,
+  "focusedTests": {
+    "files": 2,
+    "tests": 17,
+    "passed": 17,
+    "command": "npx vitest run --config vitest.lane-contracts.config.ts src/lib/server/retrieval/packet-bitmap-prefilter.spec.ts src/lib/server/retrieval/packet-dense-search.spec.ts --pool=threads --maxWorkers=1 --minWorkers=1",
+    "exactDenseOracle": "PASS"
+  },
+  "openSpecStrictValidation": "PASS",
+  "canonicalLineageSchema": {
+    "table": "codebase_chunk_index",
+    "drizzleOwner": "sveltekit-frontend/src/lib/server/db/schema-postgres.ts",
+    "migration": "drizzle/manual/20260916_codebase_chunk_index_lineage.sql",
+    "nullableColumns": [
+      "workspace_revision",
+      "source_revision",
+      "representation_revision",
+      "lineage_binding_checksum",
+      "lineage_producer_revision"
+    ],
+    "concurrentIndexes": 4,
+    "schemaReadback": "PASS",
+    "drizzleContractAudit": "PASS",
+    "historicalBackfill": "NOT_APPLIED",
+    "backfillCanary": {
+      "candidateCount": 5,
+      "rollbackReadback": "PASS",
+      "writesPerformed": false,
+      "representationRevision": null
+    },
+    "promotion": "BLOCKED_UNTIL_PACKET_CHUNK_AND_REPRESENTATION_LINEAGE_PROVEN"
+  },
+  "currentGraphifyOwner": {
+    "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+    "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "membershipCount": 25542,
+    "membershipChecksum": "e37edbd423c5034c306e7c088078d7d3",
+    "canonicalAuthority": true,
+    "selectionApplied": false,
+    "writesPerformed": false
+  },
+  "boundedLineageCensus": {
+    "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+    "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "selectedSources": 128,
+    "boundSources": 128,
+    "packetBoundSources": 14,
+    "exactPacketDigestSources": 0,
+    "packetDigestMismatchSources": 14,
+    "missingPacketSources": 114,
+    "chunkClosedSources": 0,
+    "fullyEmbeddedChunkSources": 0,
+    "chunkRows": 0,
+    "embeddedChunkRows": 0,
+    "writesPerformed": false,
+    "auditorNote": "The existing full join auditor exceeded its query timeout; this bounded staged census completed read-only and is the authoritative result for this sample."
+  },
+  "packetDigestProducer": {
+    "producerRevision": "current-packet-digest-bridge-v1",
+    "schemaBridge": "atlas_packets.workspace_revision_key + lineage_binding_checksum + lineage_producer_revision",
+    "planLimit": 25,
+    "readyInsert": 17,
+    "identityCollisions": 8,
+    "canaryLimit": 1,
+    "canaryReadback": "PASS",
+    "canaryRolledBack": true,
+    "writesPerformed": false,
+    "promotion": "BLOCKED_DURABLE_FULL_CORPUS_UPSERT_NOT_AUTHORIZED"
+  },
+  "postgres": {
+    "version": "18.4",
+    "representativePlan": "Index Scan using idx_atlas_packets_feature_id_idx",
+    "sequentialScan": false,
+    "bitmapPlan": false,
+    "aioSpecificSpeedupProven": false,
+    "interpretation": "Appropriate indexed plan; no claim that AIO caused end-to-end speedup"
+  },
+  "qdrantCollectionProof": {
+    "codebase_chunks_768": {
+      "points": 328348,
+      "vector": "content:768:Cosine",
+      "sourceRefPayloadIndexPoints": 328348,
+      "boundedExactVsDefaultSample": {
+        "candidateSources": 5,
+        "k": 5,
+        "overlap": 5,
+        "recallAt5": 1,
+        "writesPerformed": false
+      }
+    },
+    "codebase_chunks_768_v2": {
+      "points": 52816,
+      "vector": "content:768:Cosine",
+      "sourceRefPayloadIndexPoints": 52815,
+      "promotion": "CHALLENGER_ONLY"
+    }
+  },
+  "liveMcpProof": {
+    "healthEndpoint": "PASS",
+    "mcpInitialize": "PASS",
+    "toolDiscovery": "PASS",
+    "registeredTool": "atlas.packet_dense_search",
+    "toolCall": {
+      "status": "OK",
+      "collection": "codebase_chunks_768",
+      "filter": "source_ref=1",
+      "candidateCount": 1,
+      "returnedCount": 1,
+      "identityResolutionSource": "qdrant_payload_source_ref",
+      "writesPerformed": false
+    },
+    "writesPerformed": false,
+    "interpretation": "After the controlled TRACE listener restart, initialize, tools/list, and atlas.packet_dense_search returned real JSON-RPC/SSE responses.",
+    "diagnosedSourceFix": "trace-mcp-server.ts waits for response finish/close with a bounded timeout before closing the stateless transport; it no longer closes immediately after handleRequest schedules the body."
+  },
+  "qdrantPayloadSample": {
+    "codebase_chunks_768": {
+      "sampleCount": 1000,
+      "packetKeyPresent": 1000,
+      "sourceRefPresent": 1000,
+      "workspaceRevisionPresent": 0,
+      "sourceRevisionPresent": 0,
+      "representationRevisionPresent": 0,
+      "representationIdPresent": 1000,
+      "promotion": "BLOCKED_REVISION_QUALIFIED_BRIDGE_MISSING"
+    },
+    "codebase_chunks_768_v2": {
+      "sampleCount": 1000,
+      "packetKeyPresent": 128,
+      "sourceRefPresent": 1000,
+      "workspaceRevisionPresent": 7,
+      "sourceRevisionPresent": 128,
+      "representationRevisionPresent": 0,
+      "representationIdPresent": 7,
+      "promotion": "CHALLENGER_ONLY_SPARSE_LINEAGE"
+    }
+  },
+  "qdrantPayloadCensus": {
+    "mode": "bounded_read_only",
+    "samplePointsPerCollection": 20000,
+    "codebase_chunks_768": {
+      "packetKeyCoverage": 1,
+      "sourceRefCoverage": 1,
+      "featureIdCoverage": 1,
+      "domainClassCoverage": 0.9994,
+      "duplicatePacketKeyGroups": 3052,
+      "promotion": "BLOCKED_REVISION_QUALIFIED_BRIDGE_MISSING"
+    },
+    "codebase_chunks_768_v2": {
+      "packetKeyCoverage": 0.1196,
+      "sourceRefCoverage": 1,
+      "featureIdCoverage": 0,
+      "domainClassCoverage": 0,
+      "duplicatePacketKeyGroups": 435,
+      "promotion": "CHALLENGER_ONLY_SPARSE_LINEAGE"
+    },
+    "writesPerformed": false,
+    "reports": [
+      "docs/reports/qdrant-payload-coverage-codebase-768-expanded-v1.json",
+      "docs/reports/qdrant-payload-coverage-codebase-768-v2-expanded-v1.json"
+    ]
+  },
+  "exactVsAnnExpandedProof": {
+    "collection": "codebase_chunks_768",
+    "sourceRefs": 5,
+    "candidatePoints": 204,
+    "k": 10,
+    "vectorName": "content",
+    "recallAt10": 1,
+    "overlap": 10,
+    "writesPerformed": false,
+    "note": "Bounded read-only proof using the named content vector. This proves the sampled executor comparison, not full-corpus promotion or revision-qualified identity."
+  },
+  "implemented": [
+    "parameterized selective Postgres prefilter",
+    "bounded candidate cap",
+    "768-dimension query validation",
+    "existing dense embedding owner for query_text",
+    "payload source_ref identity requirement",
+    "source/workspace revision separation on join-back",
+    "typed status and degradedReasons",
+    "one semantic lane with no local RRF vote"
+  ],
+  "remainingBlockers": [
+    "PDS-00 canonical dense identity bridge full census and admitted current cohort",
+    "PDS-03/PDS-04/PDS-05/PDS-11 full-corpus executor crossover and revision-qualified measurements",
+    "stable workspace snapshot while concurrent edits continue",
+    "source-to-packet-to-chunk closure and representation revision producer",
+    "canonical durable event live database/outbox readback"
+  ]
+}

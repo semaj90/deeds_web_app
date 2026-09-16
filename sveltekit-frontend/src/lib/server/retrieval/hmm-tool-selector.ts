@@ -1,6 +1,7 @@
 import db from '$lib/server/db/client.js';
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import type { PoolClient } from 'pg';
+import { validateToolSchema } from '$lib/server/ai/tool-schema-validator.js';
 
 // HMM State Machine: represents intent classification + tool routing decision
 export type HMMState =
@@ -20,7 +21,7 @@ export type ToolId =
   | 'neo4j.dependency_closure'   // Graph traversal (graph/analysis)
   | 'qdrant.dense_search'        // Vector search (retrieval/vector)
   | 'rg.lexical_search'          // Lexical fallback (lexical/search)
-  | 'gemma4.explain_code';       // Synthesis (synthesis/explanation)
+  | 'ornith.explain_code';       // Synthesis (synthesis/explanation)
 
 // Observation features for HMM state inference
 export type ToolObservation = {
@@ -78,7 +79,7 @@ const STATE_TOOLS: Record<HMMState, ToolId[]> = {
   SEMANTIC_SEARCH: ['qdrant.dense_search', 'trace.kag_search', 'trace.explain_retrieval'],
   GRAPH_EXPAND: ['neo4j.dependency_closure', 'trace.kag_search', 'trace.explain_retrieval', 'atlas.topology_expand'],
   VALIDATE: ['qdrant.dense_search', 'rg.lexical_search'],
-  SYNTHESIZE: ['gemma4.explain_code', 'trace.explain_retrieval'],
+  SYNTHESIZE: ['ornith.explain_code', 'trace.explain_retrieval'],
   QUARANTINE: ['rg.lexical_search'] // Fallback only
 };
 
@@ -173,7 +174,7 @@ export function rankTools(obs: ToolObservation, signals?: RoutingSignals): Array
     },
     // Code synthesis: high validation only
     {
-      tool: 'gemma4.explain_code',
+      tool: 'ornith.explain_code',
       score: obs.validationScore > 0.8 || intent === 'code_explanation' ? Math.max(0.6 * obs.validationScore, 0.7 * intentConfidence) : 0
     }
   ];
@@ -214,8 +215,15 @@ export async function selectTool(
       };
     }
 
-    // Rank tools allowed in this state
-    const ranked = rankTools(obs, signals);
+    // Rank tools allowed in this state, then drop any tool_registry has marked deprecated.
+    // Phase 10 §5.4 (openspec/changes/add-packet-ontology-registry/) — the narrow, safe slice of
+    // schema-compatibility filtering wired here: full domain/packetType filtering is deferred
+    // (this file's RoutingSignals.domainClass vocabulary — 'graph'/'retrieval'/'schema' — doesn't
+    // line up with the migration's domainTags vocabulary — 'vector-search'/'llm-explain'/etc. —
+    // reconciling that is a real design task, not a safe wire-in; the deprecated check has no
+    // such vocabulary dependency and is safe to land now).
+    const rankedAll = rankTools(obs, signals);
+    const ranked = await filterDeprecatedTools(rankedAll);
 
     if (!ranked || ranked.length === 0) {
       // No tools scored in allowed set → fallback to lexical
@@ -332,6 +340,51 @@ export function computeObservationFromQuery(query: string, signals?: RoutingSign
 }
 
 /**
+ * Phase 10 §5.4: drop ranked candidates that tool_registry has marked deprecated.
+ *
+ * tool_registry has no Drizzle declaration (found during the Phase 10 audit,
+ * openspec/changes/add-packet-ontology-registry/tasks.md — same as every other table access in
+ * this file's original getToolMetadata TODO), so this uses db.execute with a parametrized raw
+ * query, not the ORM query builder. A tool_id with no tool_registry row (e.g.
+ * 'trace.explain_retrieval' — confirmed live this session to have zero rows despite being in this
+ * file's own ToolId union) is treated as not-deprecated (validateToolSchema's own permissive
+ * default on missing capabilities), never silently excluded.
+ */
+async function filterDeprecatedTools(
+  ranked: Array<{ tool: ToolId; score: number }>
+): Promise<Array<{ tool: ToolId; score: number }>> {
+  if (ranked.length === 0) return ranked;
+  try {
+    const toolIds = ranked.map((r) => r.tool);
+    // db/client.js's default export is { db, adminDb, closeConnections }, not the drizzle
+    // instance directly — found live via this session's own type-check output.
+    //
+    // sql`ANY(${toolIds})` is a real bug, found live this session: drizzle's sql`` tag expands
+    // an interpolated array into a comma-separated param list (`ANY(($1, $2))`), which is invalid
+    // SQL and throws — silently swallowed by this function's own fail-open catch below, so the
+    // deprecated filter never actually applied on the live route. sql.join(...) + IN (...) binds
+    // each id as its own param inside a valid parenthesized list instead.
+    const idList = sql.join(
+      toolIds.map((id) => sql`${id}`),
+      sql`, `
+    );
+    const result = await db.db.execute<{ tool_id: string; tool_capabilities: unknown }>(
+      sql`SELECT tool_id, tool_capabilities FROM tool_registry WHERE tool_id IN (${idList})`
+    );
+    const capabilitiesByToolId = new Map<string, unknown>(
+      result.rows.map((row) => [row.tool_id, row.tool_capabilities])
+    );
+    return ranked.filter((r) =>
+      validateToolSchema({}, capabilitiesByToolId.get(r.tool))
+    );
+  } catch (error) {
+    // Fail open — never let a telemetry/lookup error take down tool selection.
+    console.error('filterDeprecatedTools error (failing open, no filtering applied):', error);
+    return ranked;
+  }
+}
+
+/**
  * Get tool metadata from registry (lookup by tool_id)
  * For now, returns hardcoded metadata
  * Future: Query Postgres tool_registry table
@@ -364,7 +417,7 @@ async function getToolMetadata(
       name: 'Lexical Search (ripgrep)',
       domains: ['lexical', 'search']
     },
-    'gemma4.explain_code': {
+    'ornith.explain_code': {
       name: 'Code Explanation',
       domains: ['synthesis', 'explanation']
     }

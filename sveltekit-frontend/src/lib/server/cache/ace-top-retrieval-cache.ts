@@ -74,7 +74,10 @@ export function normalizeAceTopRetrievalEntry(entry: Partial<AceTopRetrievalCach
     createdAt: entry.createdAt,
     // Identity-less values are legacy observations, even when an older writer
     // omitted the degraded flag. They remain readable but cannot be current.
-    degraded: entry.degraded ?? !entry.identity,
+    // Identity-less entries are always degraded, even when an older writer
+    // explicitly persisted `degraded: false`. A legacy flag cannot upgrade an
+    // entry that lacks the revision-qualified identity envelope.
+    degraded: !entry.identity || entry.degraded === true,
     results: entry.results,
     retrievalTrace: entry.retrievalTrace ?? {},
     source: entry.source,

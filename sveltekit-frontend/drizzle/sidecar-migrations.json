@@ -2,6 +2,15 @@
   "_comment": "Manual sidecar SQL migrations applied outside drizzle-kit _journal.json. Listed here so audit-contract-map.mjs treats them as documented_sidecar (WARN) rather than unknown_unjournaled_sql (FAIL).",
   "sidecars": [
     {
+      "file": "manual/20260916_workspace_event_head_v1.sql",
+      "status": "planned_sidecar",
+      "reason": "Additive append-only workspace event, participant, and head tables for incremental Graphify. Unapplied until migration-owner review, disposable readback canary, and explicit authorization.",
+      "appliedBy": null,
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "validationCommand": "node scripts/atlas/audit-workspace-event-head-schema-v1.mjs"
+    },
+    {
       "file": "manual/20260909_router_feature_revision_indexes.sql",
       "status": "applied",
       "reason": "Aligns the active observation-feature owner with nullable text workspace revisions and adds bounded router lookup indexes. No row backfill or feature-matrix table is created.",

@@ -82,18 +82,24 @@
     "distinctEvidenceSignatures": 1,
     "allEquivalent": true
   },
+  "existingCanonicalOwner": {
+    "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+    "authoritySource": "graphify_executions.canonical_authority",
+    "exactEquivalentMembership": true
+  },
   "recommendation": {
-    "type": "EQUIVALENT_EXECUTIONS_REQUIRE_EXPLICIT_AUTHORITY",
+    "type": "EQUIVALENT_EXECUTIONS_CANONICAL_AUTHORITY_PRESENT",
     "candidateExecutionIds": [
       "0dba1c0d-2cf7-4f35-a61b-c77956f60d3d",
       "74d50c86-8194-45ea-8c3d-61aab737ef83"
     ],
+    "preferredExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
     "policy": "NO_IMPLICIT_TIMESTAMP_OR_ID_SELECTION",
-    "requiresExplicitAuthorityDecision": true
+    "requiresExplicitAuthorityDecision": false
   },
   "status": "DUPLICATE_EQUIVALENT_EXECUTIONS",
   "safeToApply": false,
-  "canonicalAuthority": false,
+  "canonicalAuthority": true,
   "writesPerformed": false,
-  "nextGate": "EXPLICIT_GRAPHIFY_EXECUTION_OWNER_DECISION"
+  "nextGate": "CURRENT_SOURCE_PACKET_CHUNK_LINEAGE"
 }

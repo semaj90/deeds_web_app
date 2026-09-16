@@ -93,7 +93,7 @@ async function stageA0() {
     'qdrant.dense_search',
     'rg.lexical_search',
     'topology.search_near',
-    'gemma4.explain_code',
+    'ornith.explain_code',
     'neo4j.dependency_closure'
   ];
 

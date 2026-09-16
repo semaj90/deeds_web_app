@@ -4462,6 +4462,13 @@ export const codebaseChunkIndex = pgTable('codebase_chunk_index', {
 	// above; fileContentHash is always full 64-char untruncated SHA-256 of the whole source file,
 	// joinable exactly against graphify_files/graphify_execution_file_membership_v2.content_hash.
 	fileContentHash: text('file_content_hash'),
+	// Nullable current-source lineage mirror. These values are admitted only by
+	// an exact workspace/source/packet/chunk proof; historical rows stay NULL.
+	workspaceRevision: text('workspace_revision'),
+	sourceRevision: text('source_revision'),
+	representationRevision: text('representation_revision'),
+	lineageBindingChecksum: text('lineage_binding_checksum'),
+	lineageProducerRevision: text('lineage_producer_revision'),
 	// Describes contentHash's (not fileContentHash's) per-row provenance -- populated only once a
 	// row's writer has been read and confirmed (see that change's tasks.md task 2.3); NULL means
 	// unconfirmed, never inferred from the hash string's length or shape alone.
@@ -5437,6 +5444,7 @@ export * from './schema/atlas-packets.js';
 export * from './schema/packet-binary-registry.js';
 export * from './schema/atlas-artifacts.js';
 export * from './schema/atlas-semantic-diffs.js';
+export * from './schema/workspace-events.js';
 
 // ---------------------------------------------------------------------------
 // Agent workflow tables (Step 3 of integration order)

@@ -47,6 +47,8 @@ OKF serves as curated knowledge export, not replacement.
 
 ## Related Documents
 
+- [SvelteKit Vite/Vitest Lane](pipelines/sveltekit-vitest-validation.md)
+
 - [Parent Atlas Canonical Architecture](../docs/architecture/CANONICAL-PACKET-WIRING-BLUEPRINT.md)
 - [Deep Research Infrastructure](../docs/DEEP-RESEARCH-INDEX.md)
 - [HyperRAG Control Panel Guide](../docs/architecture/trace-kag-web-development-guide.md)

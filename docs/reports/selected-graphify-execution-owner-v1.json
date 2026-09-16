@@ -4,7 +4,7 @@
   "mode": "READ_ONLY_OWNER_DECISION_PREFLIGHT",
   "selectedExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
   "sourcePlan": "docs/reports/current-graphify-execution-owner-resolution-v1.json",
-  "ownerPlanChecksum": "sha256:0e35649a1371a3996dc20f6306ae76c5dcf62377216f698380740768650589b1",
+  "ownerPlanChecksum": "sha256:d99907af3d4a87b8463272151bbbf38bb1df68daf7f5fd963e7d42024c363e4d",
   "candidateFound": true,
   "candidate": {
     "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
@@ -19,7 +19,7 @@
   "canonicalAuthority": false,
   "safeToApply": false,
   "writesPerformed": false,
-  "decisionChecksum": "sha256:831595904e846bebb27235aca9e1ff500a7557aa494882ecf8385ac20f8c16c4",
+  "decisionChecksum": "sha256:466033e0d6e23bb70856c0bb536c3f38d5d72aa4c0881d1dab4ef6dd3fa57932",
   "nextGate": "EXPLICIT_AUTHORITY_DECISION_AND_OWNER_READBACK",
   "reportPath": "docs/reports/selected-graphify-execution-owner-v1.json"
 }

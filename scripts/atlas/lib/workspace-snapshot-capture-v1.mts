@@ -112,6 +112,35 @@ export function sealSnapshot(first: ReturnType<typeof observeSnapshot>, second: 
     canonicalAuthority: false, datastoreWritesPerformed: false };
 }
 
+/**
+ * Capture a stable read-only frame with bounded quiescence retries. A retry
+ * only replaces the observation being compared; it never merges two frames or
+ * suppresses a real violation. Exhausting attempts preserves the blocked
+ * receipt, so this helper cannot turn a live worktree into authority.
+ */
+export function captureStableSnapshot(
+  root: string,
+  workspaceId: string,
+  options: { maxAttempts?: number } = {},
+) {
+  const maxAttempts = Number.isInteger(options.maxAttempts) && (options.maxAttempts ?? 0) > 0
+    ? options.maxAttempts!
+    : 3;
+  let first = observeSnapshot(root, workspaceId);
+  let transientDriftObserved = false;
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    const second = observeSnapshot(root, workspaceId);
+    const report = sealSnapshot(first, second);
+    const drifted = report.violations.includes('WORKSPACE_CHANGED_BETWEEN_SCANS');
+    if (!drifted || attempt === maxAttempts) {
+      return { ...report, captureAttempts: attempt, transientDriftObserved };
+    }
+    transientDriftObserved = true;
+    first = second;
+  }
+  throw new Error('SNAPSHOT_CAPTURE_RETRY_EXHAUSTED');
+}
+
 export function validateSnapshot(snapshot: ReturnType<typeof sealSnapshot>, options?: { sourceReadRoot?: string }) {
   const { schema, snapshotRevision, workspaceRevision, status, canonicalAuthority, datastoreWritesPerformed, ...body } = snapshot;
   const violations: string[] = [];

@@ -31,8 +31,8 @@
   },
   "strictV2": {
     "importsOrReferences": {
-      "redisGetRevisionedAcePacketV1": 0,
-      "redisSetRevisionedAcePacketV1": 0,
+      "redisGetRevisionedAcePacketV1": 2,
+      "redisSetRevisionedAcePacketV1": 2,
       "buildRevisionedAcePacketCacheKeyV1": 0,
       "ContextManifestV2": 0,
       "CandidateOrdinalMapV1": 0
@@ -42,11 +42,11 @@
   "legacyCacheSurface": [
     {
       "needle": "redisGetAcePacket",
-      "occurrenceCount": 2
+      "occurrenceCount": 0
     },
     {
       "needle": "redisSetAcePacket",
-      "occurrenceCount": 2
+      "occurrenceCount": 0
     },
     {
       "needle": "hashQuery",
@@ -58,5 +58,5 @@
   "databaseWritesPerformed": false,
   "qdrantWritesPerformed": false,
   "canonicalAuthority": false,
-  "reportChecksum": "ee3ff856037e6957d6f94d3fb46fb051e02d7448a89ff25223521102fe8d98fe"
+  "reportChecksum": "c61086ee1e640063bde173d1ce1266a010cbf9078326a09f34a932aae678e516"
 }

@@ -127,7 +127,7 @@ const TOOLS = [
     domains: ['lexical', 'search']
   },
   {
-    tool_id: 'gemma4.explain_code',
+    tool_id: 'ornith.explain_code',
     name: 'Code Explanation',
     summary: 'Generate natural language explanation of code via Gemma4',
     input_schema: {

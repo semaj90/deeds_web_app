@@ -1,0 +1,56 @@
+{
+  "schema": "atlas.pipeline-promotion-plan.v1",
+  "generatedAt": "2026-09-16T21:36:21.859Z",
+  "mode": "READ_ONLY_DERIVED_GATE_PLAN",
+  "promotionEligible": false,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "gates": {
+    "workspaceSnapshot": {
+      "status": "READY_NON_AUTHORITATIVE",
+      "evidence": "A stable capture may be used for planning, but it is not itself an admitted promotion authority.",
+      "report": "workspace-snapshot-quiescence-v1.json",
+      "blocking": false
+    },
+    "graphifyExecutionOwner": {
+      "status": "BLOCKED_DUPLICATE_OWNER",
+      "evidence": "DUPLICATE_EQUIVALENT_EXECUTIONS",
+      "report": "current-graphify-execution-owner-resolution-v1.json",
+      "blocking": true
+    },
+    "packetChunkLineage": {
+      "status": "BLOCKED_PARTIAL_LINEAGE",
+      "evidence": {
+        "bindingSources": 128,
+        "exactSources": 4,
+        "packetContentMatches": 0
+      },
+      "report": "current-workspace-packet-chunk-join-v1.json",
+      "blocking": true
+    },
+    "eventHeadDurability": {
+      "status": "BLOCKED_DURABLE_READBACK",
+      "evidence": "NOT_APPLIED_PLANNED_SIDECAR",
+      "report": "workspace-event-head-schema-audit-v1.json",
+      "blocking": true
+    },
+    "semanticClassifierAdmission": {
+      "status": "BLOCKED_CURRENT_COHORT",
+      "report": "domain-classifier-cohort-admission-v1.json",
+      "blocking": true
+    },
+    "aceRevisionQualifiedAdmission": {
+      "status": "BLOCKED_LIVE_CACHE_READBACK",
+      "evidence": "ACE_LIVE_DRY_INPUT_BLOCKED",
+      "report": "ace-live-dry-input-readiness-v2.json",
+      "blocking": true
+    }
+  },
+  "policy": {
+    "postgresIsCanonical": true,
+    "projectionsAreNonCanonical": true,
+    "semanticLaneMaxVotes": 1,
+    "missingEvidenceFailsClosed": true
+  },
+  "nextGate": "graphifyExecutionOwner"
+}

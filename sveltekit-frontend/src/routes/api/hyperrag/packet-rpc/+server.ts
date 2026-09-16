@@ -186,7 +186,11 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		trace = new HyperRagReplayTrace(query, 'hyperrag-packet-rpc');
 
 		const limit = Math.max(1, Math.min(normalizedBody.limit ?? 10, 25));
-		const useCache = normalizedBody.useExactMatchCache !== false;
+		// The legacy exact-match cache is keyed only by query text. It cannot
+		// prove workspace, candidate-snapshot, ordinal-map, representation, or
+		// policy identity, so it is intentionally quarantined here. Revisioned
+		// ACE admission must come from the existing ContextManifest boundary.
+		const useCache = false;
 		const accelerator = normalizedBody.accelerator ?? request.headers.get('x-atlas-accelerator') ?? 'cpu';
 		const cudaAvailable = normalizedBody.cudaAvailable ?? parseBooleanHeader(request.headers.get('x-atlas-cuda-available'));
 		const cuvsEnabled = normalizedBody.cuvsEnabled ?? parseBooleanHeader(request.headers.get('x-atlas-cuvs-enabled'));

@@ -1,6 +1,6 @@
 {
   "schema": "atlas.indexing-surfaces.v1",
-  "generatedAt": "2026-09-16T01:28:49.322Z",
+  "generatedAt": "2026-09-16T21:43:31.930Z",
   "readOnly": true,
   "canonicalAuthority": "postgres",
   "ast": {
@@ -221,7 +221,10 @@
         "projection_dimension",
         "encoder_revision",
         "som_revision",
-        "source_revision"
+        "source_revision",
+        "workspace_revision_key",
+        "lineage_binding_checksum",
+        "lineage_producer_revision"
       ],
       "codebase_chunk_index": [
         "id",
@@ -319,7 +322,12 @@
         "content_hash_scope",
         "content_hash_algorithm",
         "content_hash_length",
-        "content_hash_version"
+        "content_hash_version",
+        "workspace_revision",
+        "source_revision",
+        "representation_revision",
+        "lineage_binding_checksum",
+        "lineage_producer_revision"
       ],
       "atlas_packet_features": [
         "id",
@@ -1841,8 +1849,8 @@
           }
         },
         "points": 328348,
-        "indexedVectors": 325059,
-        "status": "grey"
+        "indexedVectors": 328386,
+        "status": "green"
       },
       {
         "name": "codebase_chunks_768_v2",
@@ -2256,8 +2264,8 @@
   },
   "drizzle": {
     "journalEntries": 41,
-    "manualSqlFiles": 296,
-    "declaredSidecars": 64,
+    "manualSqlFiles": 297,
+    "declaredSidecars": 65,
     "untrackedManualFiles": [
       "0009_hybrid_graph_indexes.sql",
       "0010_distilled_table_store.sql",

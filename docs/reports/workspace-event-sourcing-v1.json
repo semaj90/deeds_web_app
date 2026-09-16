@@ -1,0 +1,29 @@
+{
+  "schema": "atlas.workspace-event-sourcing-report.v1",
+  "status": "CONTRACT_AND_PURE_REDUCER_PROVEN",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "implementation": {
+    "eventContract": "sveltekit-frontend/src/lib/server/atlas/workspace/workspace-event-sourcing-v1.ts",
+    "focusedSpec": "sveltekit-frontend/src/lib/server/atlas/workspace/workspace-event-sourcing-v1.spec.ts",
+    "fullSnapshotRole": "checkpoint_compaction_only",
+    "liveStateRole": "append_only_events_plus_workspace_head",
+    "invalidationRole": "derived_explicit_participant_projection"
+  },
+  "proof": {
+    "testsPassed": 3,
+    "testsFailed": 0,
+    "sameBaseAndHeadRequired": true,
+    "optimisticHeadConflictRejected": true,
+    "eventChecksumVerified": true,
+    "invalidationsRequireExplicitCanonicalParticipants": true,
+    "hiddenStatePersisted": false
+  },
+  "remainingBlockers": [
+    "durable Postgres event/head storage owner and migration",
+    "one canonical Graphify execution owner",
+    "source-to-packet-to-chunk digest closure",
+    "current semantic and classifier cohort admission",
+    "live ACE/BitFrost readback"
+  ]
+}

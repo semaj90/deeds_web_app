@@ -25,10 +25,6 @@ const limit = Math.max(1, Math.min(Number.parseInt(limitArg?.split('=')[1] ?? '1
 const reportPath = path.resolve(root, 'docs/reports/packet-chunk-lineage-promotion-preflight-v1.json');
 const pool = new pg.Pool({ connectionString: resolveDatabaseUrl(loadRepoEnv()), max: 1, statement_timeout: 30000 });
 
-function packetKey(sourceRef) {
-  return `packet:${crypto.createHash('sha256').update(sourceRef).digest('hex').slice(0, 12)}`;
-}
-
 let candidates = [];
 let databaseError = null;
 try {
@@ -49,12 +45,28 @@ try {
       LIMIT 1
     ) gf ON TRUE
     WHERE NULLIF(BTRIM(cci.relative_path), '') IS NOT NULL
-      AND cci.relative_path NOT IN (SELECT source_ref FROM atlas_packets WHERE source_ref IS NOT NULL)
       AND NULLIF(BTRIM(cci.chunk_id::text), '') IS NOT NULL
     GROUP BY cci.relative_path, cci.chunk_id, gf.workspace_id, gf.code_source_revision
     ORDER BY cci.relative_path, cci.chunk_id
     LIMIT $1
   `, [limit * 20]);
+
+  // Resolve packet identity in one bounded-independent canonical read. The
+  // packet table remains the identity owner; keeping normalization out of the
+  // large chunk join avoids an unindexed expression join and timeout.
+  const packetResult = await pool.query(`
+    SELECT packet_key::text AS packet_key, source_ref
+    FROM atlas_packets
+    WHERE NULLIF(BTRIM(source_ref), '') IS NOT NULL
+    ORDER BY source_ref, packet_key
+  `);
+  const packetsBySource = new Map();
+  for (const packet of packetResult.rows) {
+    const key = String(packet.source_ref).trim().replaceAll('\\', '/').replace(/^\.\//, '').toLowerCase();
+    const packetKeys = packetsBySource.get(key) ?? [];
+    packetKeys.push(String(packet.packet_key));
+    packetsBySource.set(key, packetKeys);
+  }
 
   const bySource = new Map();
   for (const row of rows) {
@@ -63,16 +75,17 @@ try {
     bySource.set(row.source_ref, list);
   }
   candidates = [...bySource.entries()].slice(0, limit).map(([sourceRef, rowsForSource]) => {
+    const packetKeys = [...new Set(packetsBySource.get(sourceRef.trim().replaceAll('\\', '/').replace(/^\.\//, '').toLowerCase()) ?? [])];
     const namespaces = [...new Set(rowsForSource.map((row) => row.workspace_id).filter(Boolean))];
     const revisions = [...new Set(rowsForSource.map((row) => row.source_revision).filter(Boolean))];
-    const qualified = namespaces.length === 1 && revisions.length === 1 && rowsForSource.length > 0;
+    const qualified = packetKeys.length === 1 && namespaces.length === 1 && revisions.length === 1 && rowsForSource.length > 0;
     const memberships = rowsForSource.map((row) => ({
       canonicalChunkId: row.canonical_chunk_id,
       chunkRowId: row.chunk_row_id,
     }));
     const membershipChecksum = crypto.createHash('sha256').update(JSON.stringify(memberships)).digest('hex');
     return {
-      packetKey: packetKey(sourceRef),
+      packetKey: qualified ? packetKeys[0] : null,
       sourceRef,
       namespace: qualified ? `workspace:${namespaces[0]}` : null,
       sourceRevision: qualified ? revisions[0] : null,
@@ -81,6 +94,7 @@ try {
       memberships,
       classification: qualified ? 'READY_FOR_AUTHORIZATION' : 'BLOCKED_LINEAGE_AUTHORITY',
       blockedReasons: [
+        ...(packetKeys.length !== 1 ? ['PACKET_IDENTITY_UNPROVEN_OR_AMBIGUOUS'] : []),
         ...(namespaces.length !== 1 ? ['SOURCE_NAMESPACE_UNPROVEN_OR_AMBIGUOUS'] : []),
         ...(revisions.length !== 1 ? ['SOURCE_REVISION_UNPROVEN_OR_AMBIGUOUS'] : []),
       ],
@@ -99,7 +113,7 @@ const deterministicBody = {
   limit,
   candidates,
   eligibleCandidateCount: eligible.length,
-  plannedWrites: eligible[0] ? { atlas_packets: 1, atlas_packet_chunk_lineage: eligible[0].membershipCount, qdrant: 0, graph: 0, cache: 0 } : { atlas_packets: 0, atlas_packet_chunk_lineage: 0, qdrant: 0, graph: 0, cache: 0 },
+  plannedWrites: eligible[0] ? { atlas_packets: 0, atlas_packet_chunk_lineage: eligible[0].membershipCount, qdrant: 0, graph: 0, cache: 0 } : { atlas_packets: 0, atlas_packet_chunk_lineage: 0, qdrant: 0, graph: 0, cache: 0 },
   verdict: databaseError ? 'BLOCKED_DATABASE_READ' : eligible[0] ? 'READY_FOR_AUTHORIZATION' : 'BLOCKED_NO_QUALIFIED_CANDIDATE',
 };
 const report = {
@@ -115,4 +129,3 @@ const report = {
 fs.mkdirSync(path.dirname(reportPath), { recursive: true });
 fs.writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
 console.log(JSON.stringify({ reportPath, verdict: report.verdict, eligibleCandidateCount: report.eligibleCandidateCount, writesPerformed: false }, null, 2));
-

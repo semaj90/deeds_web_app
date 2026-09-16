@@ -1,0 +1,16 @@
+{
+  "schema": "atlas.workspace-event-head-schema-audit.v1",
+  "status": "NOT_APPLIED_PLANNED_SIDECAR",
+  "tablesExpected": [
+    "atlas_workspace_events",
+    "atlas_workspace_event_participants",
+    "atlas_workspace_heads"
+  ],
+  "tablesPresent": [],
+  "columns": [],
+  "immutableTriggers": [],
+  "migrationFile": "sveltekit-frontend/drizzle/manual/20260916_workspace_event_head_v1.sql",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "note": "This audit never applies DDL and never mutates the database."
+}

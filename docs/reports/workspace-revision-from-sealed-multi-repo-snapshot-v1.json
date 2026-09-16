@@ -1,47 +1,36 @@
 {
   "schema": "atlas.workspace-revision-from-sealed-multi-repo-snapshot.v1",
-  "generatedAt": "2026-09-15T00:53:58.006Z",
+  "generatedAt": "2026-09-16T17:54:20.604Z",
   "mode": "READ_ONLY_DERIVATION",
-  "status": "WORKSPACE_REVISION_CANDIDATE_BLOCKED",
-  "proofLevel": "BLOCKED",
+  "status": "WORKSPACE_REVISION_CANDIDATE_READY_FOR_ADMISSION",
+  "proofLevel": "PARTIAL_PROVEN",
   "authority": false,
   "canonicalAuthority": false,
   "writesPerformed": false,
   "datastoreWritesPerformed": false,
   "workspaceRevision": null,
-  "workspaceRevisionCandidate": "sha256:178f26e15947cbb92acd5c7147c431c967eed96d865dc7a238d924438ee1289a",
-  "snapshotPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\workspace-source-snapshots\\682d9dcbda6a1fa7f0b56baceec92bfc017842ea43ed2862273b917f2b79df14.json",
-  "snapshotRevision": "sha256:682d9dcbda6a1fa7f0b56baceec92bfc017842ea43ed2862273b917f2b79df14",
-  "sourceMembershipChecksum": "sha256:dccaf9f6e84b1d3b1c49f2b6f110b9b9946b895703ac0987cbb70a3608223efb",
-  "sourceContentChecksum": "sha256:c0d6b4024ba377d4bd85a3bcafdf93a2059f0784eb0ce940a26e908e7c09a8b7",
-  "sourceCount": 25542,
+  "workspaceRevisionCandidate": "sha256:aff603af68664e1b42b57fec4efaad26bad4182e1d1267e48d9edfb8d5d00922",
+  "snapshotPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\workspace-source-snapshots\\c1d650f7fa67b2e881d9d15fb3389c91ac83131593743bdea2d9a7d7663a3c73.json",
+  "snapshotRevision": "sha256:c1d650f7fa67b2e881d9d15fb3389c91ac83131593743bdea2d9a7d7663a3c73",
+  "sourceMembershipChecksum": "sha256:e9f4c3c487cfd3b1a116f7ce674b42849feec285860d5112848bafc36c4e82d5",
+  "sourceContentChecksum": "sha256:f77c9e03a9500ad266e814870bfdb75c390d0a4e630f1bc5b3840bac9b424351",
+  "sourceCount": 25667,
   "repositoryCount": 7,
   "readback": {
-    "status": "SNAPSHOT_READBACK_BLOCKED",
-    "snapshotRevision": "sha256:682d9dcbda6a1fa7f0b56baceec92bfc017842ea43ed2862273b917f2b79df14",
-    "sourceCount": 25542,
-    "exactMatches": 25541,
-    "violations": [
-      "SOURCE_READBACK_FAILED:openspec/changes/parent-atlas-best-fit-score-fabric/tasks.md"
-    ],
-    "violationDetails": [
-      {
-        "sourceRef": "openspec/changes/parent-atlas-best-fit-score-fabric/tasks.md",
-        "code": "SOURCE_BYTES_CHANGED"
-      }
-    ],
-    "violationCounts": {
-      "SOURCE_BYTES_CHANGED": 1
-    },
+    "status": "SNAPSHOT_BYTES_READBACK_PROVEN",
+    "snapshotRevision": "sha256:c1d650f7fa67b2e881d9d15fb3389c91ac83131593743bdea2d9a7d7663a3c73",
+    "sourceCount": 25667,
+    "exactMatches": 25667,
+    "violations": [],
+    "violationDetails": [],
+    "violationCounts": {},
     "canonicalAuthority": false,
     "datastoreWritesPerformed": false,
     "scope": "Recorded sources only; this does not assert current full-workspace membership or Graphify admission"
   },
-  "derivationInputChecksum": "sha256:178f26e15947cbb92acd5c7147c431c967eed96d865dc7a238d924438ee1289a",
-  "blockers": [
-    "SNAPSHOT_READBACK_NOT_PROVEN"
-  ],
-  "firstBlockingInvariant": "SNAPSHOT_READBACK_NOT_PROVEN",
+  "derivationInputChecksum": "sha256:aff603af68664e1b42b57fec4efaad26bad4182e1d1267e48d9edfb8d5d00922",
+  "blockers": [],
+  "firstBlockingInvariant": null,
   "nextGate": "WORKSPACE-REVISION-TOURNAMENT-ADMISSION-01",
   "safeNextCommand": "npx tsx scripts/atlas/derive-workspace-revision-from-sealed-multi-repo-snapshot-v1.mts"
 }

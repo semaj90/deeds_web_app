@@ -1,0 +1,782 @@
+{
+  "schema": "atlas.domain-classifier-cohort-admission.v1",
+  "generatedAt": "2026-09-16T21:43:06.758Z",
+  "readOnly": true,
+  "writesPerformed": false,
+  "labelsFile": "docs/reports/domain-classifier-weak-label-bundle-v1.json",
+  "labelsBundleSchema": "atlas.domain-classifier-training-labels.v1",
+  "labelsBundleChecksum": "sha256:17b7bb56a353ce211925e7018ef536d5234b0b1acad86ee47c8517a429cbda54",
+  "taxonomyRevision": "parent-atlas-domain-taxonomy-v1",
+  "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "identityIndex": {
+    "canonicalIdentity": false,
+    "source": "database packet_key returned by the canonical packet query"
+  },
+  "rowLimit": 100,
+  "rowCount": 35,
+  "counts": {
+    "PACKET_MISSING": 13,
+    "PACKET_UNQUALIFIED": 8,
+    "PACKET_DUPLICATE_UNQUALIFIED": 13,
+    "CONTENT_DIGEST_MISMATCH": 1
+  },
+  "ambiguousTrainingIdentities": 0,
+  "conflictingRevisions": 0,
+  "trainingManifestChecksum": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "promotionEligible": false,
+  "observations": [
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/DispatcherMiddlewareDependencies.ts",
+      "weakLabel": "agent",
+      "contentChecksum": "sha256:4b03e6ff2efdbdd784b652e9eb26ed3827802055ea3a09ccd812dff46dcf217d",
+      "sourceRevision": null,
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "packetKeys": [],
+      "packetCandidates": [],
+      "liveContentDigest": "4b03e6ff2efdbdd784b652e9eb26ed3827802055ea3a09ccd812dff46dcf217d",
+      "status": "PACKET_MISSING"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/ace-context-assembler.ts",
+      "weakLabel": "ui",
+      "contentChecksum": "sha256:28c0211b785bfb0c4269e9091a11c8322ec2bbd745e1dd855ff6e04ef2062c6c",
+      "sourceRevision": null,
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "packetKeys": [
+        "packet:8a6483339793"
+      ],
+      "packetCandidates": [
+        {
+          "packetKey": "packet:8a6483339793",
+          "sourceRef": "sveltekit-frontend/src/lib/server/ace/ace-context-assembler.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        }
+      ],
+      "liveContentDigest": "28c0211b785bfb0c4269e9091a11c8322ec2bbd745e1dd855ff6e04ef2062c6c",
+      "packetKey": "packet:8a6483339793",
+      "status": "PACKET_UNQUALIFIED"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/consumer/packet-consumer-pipeline.ts",
+      "weakLabel": "ui",
+      "contentChecksum": "sha256:ef252f43cfeca2285905ccd0972298a7e81cd7abc445ae21de121c1443825156",
+      "sourceRevision": null,
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "packetKeys": [],
+      "packetCandidates": [],
+      "liveContentDigest": "ef252f43cfeca2285905ccd0972298a7e81cd7abc445ae21de121c1443825156",
+      "status": "PACKET_MISSING"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/contracts/internal-program-ref.ts",
+      "weakLabel": "ui",
+      "contentChecksum": "sha256:c1b3d1e0ea623583806bd946a7c6aa92404bc9add39f4c478d354969707611c8",
+      "sourceRevision": null,
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "packetKeys": [],
+      "packetCandidates": [],
+      "liveContentDigest": "c1b3d1e0ea623583806bd946a7c6aa92404bc9add39f4c478d354969707611c8",
+      "status": "PACKET_MISSING"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/contracts/semantic-rpc-envelope.ts",
+      "weakLabel": "ui",
+      "contentChecksum": "sha256:7f5d40e242de9ef9b35346ecb5ca63e51869357e1ed5803f2c3ac60f9dfb37d2",
+      "sourceRevision": null,
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "packetKeys": [],
+      "packetCandidates": [],
+      "liveContentDigest": "7f5d40e242de9ef9b35346ecb5ca63e51869357e1ed5803f2c3ac60f9dfb37d2",
+      "status": "PACKET_MISSING"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/error-fingerprint.ts",
+      "weakLabel": "ui",
+      "contentChecksum": "sha256:d3bd922124af5d99fecb52875a8c44590bdfca381c6156c0ee0e6db854f34652",
+      "sourceRevision": null,
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "packetKeys": [
+        "ace:packet:9622d85a9c9e",
+        "packet:312df385c83a"
+      ],
+      "packetCandidates": [
+        {
+          "packetKey": "ace:packet:9622d85a9c9e",
+          "sourceRef": "src/lib/server/ace/error-fingerprint.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        },
+        {
+          "packetKey": "packet:312df385c83a",
+          "sourceRef": "sveltekit-frontend/src/lib/server/ace/error-fingerprint.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        }
+      ],
+      "liveContentDigest": "d3bd922124af5d99fecb52875a8c44590bdfca381c6156c0ee0e6db854f34652",
+      "status": "PACKET_DUPLICATE_UNQUALIFIED"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/error-kag-writer.ts",
+      "weakLabel": "ui",
+      "contentChecksum": "sha256:4365babe6f49596725a609a2708b969b3a4d3874aa6f27f9fa26c19b8191dcdd",
+      "sourceRevision": null,
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "packetKeys": [
+        "ace:packet:167c9cb89e3d",
+        "packet:d2adbb975590"
+      ],
+      "packetCandidates": [
+        {
+          "packetKey": "ace:packet:167c9cb89e3d",
+          "sourceRef": "src/lib/server/ace/error-kag-writer.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        },
+        {
+          "packetKey": "packet:d2adbb975590",
+          "sourceRef": "sveltekit-frontend/src/lib/server/ace/error-kag-writer.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        }
+      ],
+      "liveContentDigest": "4365babe6f49596725a609a2708b969b3a4d3874aa6f27f9fa26c19b8191dcdd",
+      "status": "PACKET_DUPLICATE_UNQUALIFIED"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/feature-context-cache.ts",
+      "weakLabel": "cache",
+      "contentChecksum": "sha256:d34ac998e3ed535c61372a2f01049699c43fdb4c0db9397a5ecc8b4e9b08b3ac",
+      "sourceRevision": null,
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "packetKeys": [
+        "packet:acadd33cbd24"
+      ],
+      "packetCandidates": [
+        {
+          "packetKey": "packet:acadd33cbd24",
+          "sourceRef": "sveltekit-frontend/src/lib/server/ace/feature-context-cache.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        }
+      ],
+      "liveContentDigest": "d34ac998e3ed535c61372a2f01049699c43fdb4c0db9397a5ecc8b4e9b08b3ac",
+      "packetKey": "packet:acadd33cbd24",
+      "status": "PACKET_UNQUALIFIED"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/hermes-packet-consumer.ts",
+      "weakLabel": "ui",
+      "contentChecksum": "sha256:769e5c4e1ad1d826b1a9a089de46ba6c624ef79c322d74c2f708152f935f4148",
+      "sourceRevision": null,
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "packetKeys": [],
+      "packetCandidates": [],
+      "liveContentDigest": "769e5c4e1ad1d826b1a9a089de46ba6c624ef79c322d74c2f708152f935f4148",
+      "status": "PACKET_MISSING"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/identity-contract.ts",
+      "weakLabel": "ui",
+      "contentChecksum": "sha256:9a6b0e5fabc84790c56c72947b56703457ad840a16848ea32cb8515d70ac7598",
+      "sourceRevision": null,
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "packetKeys": [],
+      "packetCandidates": [],
+      "liveContentDigest": "9a6b0e5fabc84790c56c72947b56703457ad840a16848ea32cb8515d70ac7598",
+      "status": "PACKET_MISSING"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/intent-synthesis-reward.ts",
+      "weakLabel": "ui",
+      "contentChecksum": "sha256:960b89700c482e35877dde82e475b3795df2d841c64e4111393077583d06f7f3",
+      "sourceRevision": null,
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "packetKeys": [
+        "packet:458981995c94"
+      ],
+      "packetCandidates": [
+        {
+          "packetKey": "packet:458981995c94",
+          "sourceRef": "sveltekit-frontend/src/lib/server/ace/intent-synthesis-reward.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        }
+      ],
+      "liveContentDigest": "960b89700c482e35877dde82e475b3795df2d841c64e4111393077583d06f7f3",
+      "packetKey": "packet:458981995c94",
+      "status": "PACKET_UNQUALIFIED"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/intent-synthesis.ts",
+      "weakLabel": "ui",
+      "contentChecksum": "sha256:ed5044d3a10fb5c03ae698a69e998b5d789f5808a3585933ecd421bb53893518",
+      "sourceRevision": null,
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "packetKeys": [
+        "packet:48fdfdee96ca"
+      ],
+      "packetCandidates": [
+        {
+          "packetKey": "packet:48fdfdee96ca",
+          "sourceRef": "sveltekit-frontend/src/lib/server/ace/intent-synthesis.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        }
+      ],
+      "liveContentDigest": "ed5044d3a10fb5c03ae698a69e998b5d789f5808a3585933ecd421bb53893518",
+      "packetKey": "packet:48fdfdee96ca",
+      "status": "PACKET_UNQUALIFIED"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/kag-dag-runner.ts",
+      "weakLabel": "ui",
+      "contentChecksum": "sha256:e88177dc89d062195c03f6efdd5d1b6f98239c16d97170207111c9acf30e0d6d",
+      "sourceRevision": null,
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "packetKeys": [
+        "ace:packet:d9c0bd0babd0",
+        "packet:1a556bef807b"
+      ],
+      "packetCandidates": [
+        {
+          "packetKey": "ace:packet:d9c0bd0babd0",
+          "sourceRef": "src/lib/server/ace/kag-dag-runner.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        },
+        {
+          "packetKey": "packet:1a556bef807b",
+          "sourceRef": "sveltekit-frontend/src/lib/server/ace/kag-dag-runner.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        }
+      ],
+      "liveContentDigest": "e88177dc89d062195c03f6efdd5d1b6f98239c16d97170207111c9acf30e0d6d",
+      "status": "PACKET_DUPLICATE_UNQUALIFIED"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/multi-lane-retrieval.ts",
+      "weakLabel": "retrieval",
+      "contentChecksum": "sha256:91cffbc7b171fbe21ba6b57ec7948cf1ecb88bc5b964255998f62e39b8e7206c",
+      "sourceRevision": null,
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "packetKeys": [
+        "ace:packet:a869825b5ab4",
+        "packet:fe9e6c68faf0"
+      ],
+      "packetCandidates": [
+        {
+          "packetKey": "ace:packet:a869825b5ab4",
+          "sourceRef": "src/lib/server/ace/multi-lane-retrieval.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        },
+        {
+          "packetKey": "packet:fe9e6c68faf0",
+          "sourceRef": "sveltekit-frontend/src/lib/server/ace/multi-lane-retrieval.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        }
+      ],
+      "liveContentDigest": "91cffbc7b171fbe21ba6b57ec7948cf1ecb88bc5b964255998f62e39b8e7206c",
+      "status": "PACKET_DUPLICATE_UNQUALIFIED"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/ngram-retrieval.ts",
+      "weakLabel": "retrieval",
+      "contentChecksum": "sha256:5704d5e9edcec962a64c8897fa793f3040d8295b97e01fc0f64d51fc85140d56",
+      "sourceRevision": null,
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "packetKeys": [
+        "ace:packet:b13be7653881",
+        "packet:ffa00673e2d0"
+      ],
+      "packetCandidates": [
+        {
+          "packetKey": "ace:packet:b13be7653881",
+          "sourceRef": "src/lib/server/ace/ngram-retrieval.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        },
+        {
+          "packetKey": "packet:ffa00673e2d0",
+          "sourceRef": "sveltekit-frontend/src/lib/server/ace/ngram-retrieval.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        }
+      ],
+      "liveContentDigest": "5704d5e9edcec962a64c8897fa793f3040d8295b97e01fc0f64d51fc85140d56",
+      "status": "PACKET_DUPLICATE_UNQUALIFIED"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/ranking/packet-feature-matrix.ts",
+      "weakLabel": "retrieval",
+      "contentChecksum": "sha256:f1b3e49f4ed6af16feb2e590387eb54d83c744bed59097f630ead905410ffb51",
+      "sourceRevision": null,
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "packetKeys": [],
+      "packetCandidates": [],
+      "liveContentDigest": "f1b3e49f4ed6af16feb2e590387eb54d83c744bed59097f630ead905410ffb51",
+      "status": "PACKET_MISSING"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/retrieval-lanes.ts",
+      "weakLabel": "retrieval",
+      "contentChecksum": "sha256:6bee78133eae5223e970ad04d06f0f3ec4197020478aaba66cd58333ff5d3a20",
+      "sourceRevision": null,
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "packetKeys": [
+        "ace:packet:fd64e09ebb04",
+        "packet:24bd0d1109b6"
+      ],
+      "packetCandidates": [
+        {
+          "packetKey": "ace:packet:fd64e09ebb04",
+          "sourceRef": "src/lib/server/ace/retrieval-lanes.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        },
+        {
+          "packetKey": "packet:24bd0d1109b6",
+          "sourceRef": "sveltekit-frontend/src/lib/server/ace/retrieval-lanes.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        }
+      ],
+      "liveContentDigest": "6bee78133eae5223e970ad04d06f0f3ec4197020478aaba66cd58333ff5d3a20",
+      "status": "PACKET_DUPLICATE_UNQUALIFIED"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/search-router.ts",
+      "weakLabel": "retrieval",
+      "contentChecksum": "sha256:2b6dc58aa08a93f778bf36cd3bc7971fff5ad735b0e3ffb96fda288d1ef22d9a",
+      "sourceRevision": null,
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "packetKeys": [
+        "packet:49e0dd6f7f1e"
+      ],
+      "packetCandidates": [
+        {
+          "packetKey": "packet:49e0dd6f7f1e",
+          "sourceRef": "sveltekit-frontend/src/lib/server/ace/search-router.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        }
+      ],
+      "liveContentDigest": "f1f7c65b169fd8074709fbedb52f77a3721708b0d2a7360804f5b195244203a0",
+      "status": "CONTENT_DIGEST_MISMATCH"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/state/index.ts",
+      "weakLabel": "ui",
+      "contentChecksum": "sha256:682f13aa7b06ca198804b4e1f94282ebf41eb4c01288d052c4c5cfa2e686c824",
+      "sourceRevision": null,
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "packetKeys": [],
+      "packetCandidates": [],
+      "liveContentDigest": "682f13aa7b06ca198804b4e1f94282ebf41eb4c01288d052c4c5cfa2e686c824",
+      "status": "PACKET_MISSING"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/tokenizer/token-accountant.ts",
+      "weakLabel": "auth",
+      "contentChecksum": "sha256:6744f495c3eb6de116a3bb5a834689b0cb9271ec50bd5b3ea6c31c3376d82c18",
+      "sourceRevision": null,
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "packetKeys": [],
+      "packetCandidates": [],
+      "liveContentDigest": "6744f495c3eb6de116a3bb5a834689b0cb9271ec50bd5b3ea6c31c3376d82c18",
+      "status": "PACKET_MISSING"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/transport/inbox-outbox.ts",
+      "weakLabel": "database",
+      "contentChecksum": "sha256:0c7abb4d306955d52e4a785a4fd2b1e63f555dc8fd009cb178353e0dda0f4c36",
+      "sourceRevision": null,
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "packetKeys": [],
+      "packetCandidates": [],
+      "liveContentDigest": "0c7abb4d306955d52e4a785a4fd2b1e63f555dc8fd009cb178353e0dda0f4c36",
+      "status": "PACKET_MISSING"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/transport/index.ts",
+      "weakLabel": "ui",
+      "contentChecksum": "sha256:a44a58cfcbdc17301569960f8db862c3e5219ee9105937eb8e102af9bb954c5b",
+      "sourceRevision": null,
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "packetKeys": [],
+      "packetCandidates": [],
+      "liveContentDigest": "a44a58cfcbdc17301569960f8db862c3e5219ee9105937eb8e102af9bb954c5b",
+      "status": "PACKET_MISSING"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/vector/ace-packet-vector.ts",
+      "weakLabel": "retrieval",
+      "contentChecksum": "sha256:d7ef44943ab1bb86afcc0956d9a9469816c3cd8de973b460e92f9a6f13485b9d",
+      "sourceRevision": null,
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "packetKeys": [],
+      "packetCandidates": [],
+      "liveContentDigest": "d7ef44943ab1bb86afcc0956d9a9469816c3cd8de973b460e92f9a6f13485b9d",
+      "status": "PACKET_MISSING"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/vector/turbovec-interpolation.ts",
+      "weakLabel": "retrieval",
+      "contentChecksum": "sha256:7e355397af72f890e772fac66bfd66365749481993035fe3df627117907643c7",
+      "sourceRevision": null,
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "packetKeys": [],
+      "packetCandidates": [],
+      "liveContentDigest": "7e355397af72f890e772fac66bfd66365749481993035fe3df627117907643c7",
+      "status": "PACKET_MISSING"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/admin/ai-chat-context.ts",
+      "weakLabel": "ui",
+      "contentChecksum": "sha256:80bebdf651eefb8d0b1c03297b6f8ee13ece0832a803bbe6226c359750d75238",
+      "sourceRevision": null,
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "packetKeys": [
+        "ace:packet:0d48507a1f86",
+        "packet:5a070fe8721e"
+      ],
+      "packetCandidates": [
+        {
+          "packetKey": "ace:packet:0d48507a1f86",
+          "sourceRef": "src/lib/server/admin/ai-chat-context.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        },
+        {
+          "packetKey": "packet:5a070fe8721e",
+          "sourceRef": "sveltekit-frontend/src/lib/server/admin/ai-chat-context.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        }
+      ],
+      "liveContentDigest": "80bebdf651eefb8d0b1c03297b6f8ee13ece0832a803bbe6226c359750d75238",
+      "status": "PACKET_DUPLICATE_UNQUALIFIED"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/admin/ai-chat-service.ts",
+      "weakLabel": "ui",
+      "contentChecksum": "sha256:9f880f20745409b8d70d3bda89de38593221cfc59eac935274e8361e8e356e34",
+      "sourceRevision": null,
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "packetKeys": [
+        "ace:packet:61995e98a577",
+        "packet:2617e9d800e6"
+      ],
+      "packetCandidates": [
+        {
+          "packetKey": "ace:packet:61995e98a577",
+          "sourceRef": "src/lib/server/admin/ai-chat-service.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        },
+        {
+          "packetKey": "packet:2617e9d800e6",
+          "sourceRef": "sveltekit-frontend/src/lib/server/admin/ai-chat-service.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        }
+      ],
+      "liveContentDigest": "9f880f20745409b8d70d3bda89de38593221cfc59eac935274e8361e8e356e34",
+      "status": "PACKET_DUPLICATE_UNQUALIFIED"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/admin/retrieval-analytics-service.ts",
+      "weakLabel": "retrieval",
+      "contentChecksum": "sha256:bde26e38e979172d7c7092d228448fc96db2cdd336979fd561ae628498933799",
+      "sourceRevision": null,
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "packetKeys": [
+        "packet:2644df2ff393"
+      ],
+      "packetCandidates": [
+        {
+          "packetKey": "packet:2644df2ff393",
+          "sourceRef": "sveltekit-frontend/src/lib/server/admin/retrieval-analytics-service.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        }
+      ],
+      "liveContentDigest": "bde26e38e979172d7c7092d228448fc96db2cdd336979fd561ae628498933799",
+      "packetKey": "packet:2644df2ff393",
+      "status": "PACKET_UNQUALIFIED"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/agent-executor.ts",
+      "weakLabel": "agent",
+      "contentChecksum": "sha256:d678333b24a47521a1a145fba508ff3c8a479e3b74e2972e4d58b747b23cfbf1",
+      "sourceRevision": null,
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "packetKeys": [
+        "packet:987bd02fa735"
+      ],
+      "packetCandidates": [
+        {
+          "packetKey": "packet:987bd02fa735",
+          "sourceRef": "sveltekit-frontend/src/lib/server/agent-executor.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        }
+      ],
+      "liveContentDigest": "d678333b24a47521a1a145fba508ff3c8a479e3b74e2972e4d58b747b23cfbf1",
+      "packetKey": "packet:987bd02fa735",
+      "status": "PACKET_UNQUALIFIED"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/agents/trace-subagent-orchestrator.ts",
+      "weakLabel": "agent",
+      "contentChecksum": "sha256:3b2c4c1aef978a743090a8661641d4961761bafeeeec8e0db38682c1bf728a89",
+      "sourceRevision": null,
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "packetKeys": [
+        "ace:packet:56625606a245",
+        "packet:0908ec85fe57"
+      ],
+      "packetCandidates": [
+        {
+          "packetKey": "ace:packet:56625606a245",
+          "sourceRef": "src/lib/server/agents/trace-subagent-orchestrator.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        },
+        {
+          "packetKey": "packet:0908ec85fe57",
+          "sourceRef": "sveltekit-frontend/src/lib/server/agents/trace-subagent-orchestrator.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        }
+      ],
+      "liveContentDigest": "3b2c4c1aef978a743090a8661641d4961761bafeeeec8e0db38682c1bf728a89",
+      "status": "PACKET_DUPLICATE_UNQUALIFIED"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/execution-transition-memory.ts",
+      "weakLabel": "cache",
+      "contentChecksum": "sha256:1efccbc3e5f0b7f682fa2af6f84a3c7f95958b8630791beb7207e67aef463390",
+      "sourceRevision": null,
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "packetKeys": [
+        "packet:4d1e1aad6419"
+      ],
+      "packetCandidates": [
+        {
+          "packetKey": "packet:4d1e1aad6419",
+          "sourceRef": "sveltekit-frontend/src/lib/server/ai/execution-transition-memory.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        }
+      ],
+      "liveContentDigest": "1efccbc3e5f0b7f682fa2af6f84a3c7f95958b8630791beb7207e67aef463390",
+      "packetKey": "packet:4d1e1aad6419",
+      "status": "PACKET_UNQUALIFIED"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/gemma4-agent.ts",
+      "weakLabel": "agent",
+      "contentChecksum": "sha256:9703c37c8beeea2e4192118d7f6fe5a4266186191b4f2ca264d020b650a9783f",
+      "sourceRevision": null,
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "packetKeys": [
+        "ace:packet:40731123a24d",
+        "packet:a3ac5bb79fbf"
+      ],
+      "packetCandidates": [
+        {
+          "packetKey": "ace:packet:40731123a24d",
+          "sourceRef": "src/lib/server/ai/gemma4-agent.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        },
+        {
+          "packetKey": "packet:a3ac5bb79fbf",
+          "sourceRef": "sveltekit-frontend/src/lib/server/ai/gemma4-agent.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        }
+      ],
+      "liveContentDigest": "9703c37c8beeea2e4192118d7f6fe5a4266186191b4f2ca264d020b650a9783f",
+      "status": "PACKET_DUPLICATE_UNQUALIFIED"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/hypergraph-store.ts",
+      "weakLabel": "cache",
+      "contentChecksum": "sha256:949146773b1eb40bc7d11d20475fb7194fc8b7ce802e1bdfb8b403e67e0ae22d",
+      "sourceRevision": null,
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "packetKeys": [
+        "ace:packet:0da0d470dead",
+        "packet:5d30c88c5ea9"
+      ],
+      "packetCandidates": [
+        {
+          "packetKey": "ace:packet:0da0d470dead",
+          "sourceRef": "src/lib/server/ai/hypergraph-store.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        },
+        {
+          "packetKey": "packet:5d30c88c5ea9",
+          "sourceRef": "sveltekit-frontend/src/lib/server/ai/hypergraph-store.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        }
+      ],
+      "liveContentDigest": "949146773b1eb40bc7d11d20475fb7194fc8b7ce802e1bdfb8b403e67e0ae22d",
+      "status": "PACKET_DUPLICATE_UNQUALIFIED"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/information-gain-validator.ts",
+      "weakLabel": "ui",
+      "contentChecksum": "sha256:a40beb39d95bd233fb4c44e69cf6ec057305f6803b0102b854b6c62ab9593372",
+      "sourceRevision": null,
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "packetKeys": [
+        "ace:packet:9fd86400e898",
+        "packet:ee294b370059"
+      ],
+      "packetCandidates": [
+        {
+          "packetKey": "ace:packet:9fd86400e898",
+          "sourceRef": "src/lib/server/ai/information-gain-validator.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        },
+        {
+          "packetKey": "packet:ee294b370059",
+          "sourceRef": "sveltekit-frontend/src/lib/server/ai/information-gain-validator.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        }
+      ],
+      "liveContentDigest": "a40beb39d95bd233fb4c44e69cf6ec057305f6803b0102b854b6c62ab9593372",
+      "status": "PACKET_DUPLICATE_UNQUALIFIED"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/intent-ranker.ts",
+      "weakLabel": "retrieval",
+      "contentChecksum": "sha256:f7c6d50964d422f004352a6c0ca4757ac9199c3a29c1c8d1cacbeb639abdf542",
+      "sourceRevision": null,
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "packetKeys": [
+        "packet:54113533d121"
+      ],
+      "packetCandidates": [
+        {
+          "packetKey": "packet:54113533d121",
+          "sourceRef": "sveltekit-frontend/src/lib/server/ai/intent-ranker.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        }
+      ],
+      "liveContentDigest": "f7c6d50964d422f004352a6c0ca4757ac9199c3a29c1c8d1cacbeb639abdf542",
+      "packetKey": "packet:54113533d121",
+      "status": "PACKET_UNQUALIFIED"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/kv-context-controller.ts",
+      "weakLabel": "ui",
+      "contentChecksum": "sha256:77a54583621615c391a839ccfd02eb7e06adbd0174ae336106aa006de5c4d1ef",
+      "sourceRevision": null,
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "packetKeys": [
+        "ace:packet:06b22fce5bbd",
+        "packet:f25994e5ae49"
+      ],
+      "packetCandidates": [
+        {
+          "packetKey": "ace:packet:06b22fce5bbd",
+          "sourceRef": "src/lib/server/ai/kv-context-controller.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        },
+        {
+          "packetKey": "packet:f25994e5ae49",
+          "sourceRef": "sveltekit-frontend/src/lib/server/ai/kv-context-controller.ts",
+          "sourceRevision": null,
+          "contentHash": null,
+          "workspaceRevisionKey": null
+        }
+      ],
+      "liveContentDigest": "77a54583621615c391a839ccfd02eb7e06adbd0174ae336106aa006de5c4d1ef",
+      "status": "PACKET_DUPLICATE_UNQUALIFIED"
+    }
+  ]
+}

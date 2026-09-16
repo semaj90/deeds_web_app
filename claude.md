@@ -5380,3 +5380,62 @@ service, and never edit the repo's real `atlas_compute/__init__.py` to work
 around it. Separately, this specific base image is Debian PEP-668
 "externally managed" — plain `pip install` fails there without
 `--break-system-packages` (safe for a single-purpose container).
+
+## Binary bytes, SHA-256, and Parent Atlas revision lineage (2026-09-16)
+
+Keep binary representation, hashing, and lineage namespaces distinct:
+
+- A bit is 0/1. A byte is eight bits with an unsigned range of 0..255 (`0x00`..`0xff`). This is the domain for packed control bytes, feature bytes, and protocol buffers; it is not a revision or identity by itself.
+- SHA-256 hashes an arbitrary byte sequence and returns a 256-bit digest, equal to 32 bytes or 64 hexadecimal characters. Parent Atlas canonical text is `sha256:<64 lowercase hex characters>`.
+- Hash exact source bytes. Do not hash decoded UTF-16 text, normalized newlines, reserialized JSON, or a different encoding from the producer contract.
+- Whole-source and chunk hashes have different grains: `file_content_hash` is the whole source digest; `codebase_chunk_index.content_hash` is the chunk digest. Never compare those fields directly.
+- Keep `workspace_revision`, `source_revision`, `representation_revision`, and `feature_revision` as separate namespaces. A SHA-256-shaped value is not interchangeable merely because its format looks valid.
+- `packet_key` is a deterministic packet identity projection. It does not replace source digest, workspace revision, source revision, or CandidateOrdinal.
+- PostgreSQL owns canonical identity. Qdrant IDs, Redis/BitFrost keys, centroids, GPU buffers, topology coordinates, and cache descriptors remain derived projections.
+
+Canonical lineage:
+
+```text
+immutable snapshot
+  → Graphify execution_id
+  → source_ref + source_revision + exact source-byte digest
+  → packet_key + binding_checksum
+  → packet→chunk lineage
+  → representation_revision
+  → ACE/Qdrant/graph/GPU projections
+```
+
+Promotion and upsert rules:
+
+- An upsert is idempotent only when all canonical identity and digest fields match exactly.
+- A differing field is an identity collision, revision mismatch, or content mismatch; fail closed.
+- Never coerce a SHA-256 workspace revision into a legacy integer such as `0`.
+- Historical nullable rows remain observable but are not promotion-eligible.
+- Every promotion needs transaction readback, checksum evidence, and `writesPerformed` status.
+
+Standards references: NIST FIPS 180-4 defines SHA-256 message digests; Python documents bytes as integer sequences constrained to `0 <= x < 256`.
+
+## UUID version policy for Parent Atlas identity and indexes (2026-09-16)
+
+Use UUID versions by lifecycle role; never use a UUID format to replace canonical `packet_key`,
+`source_ref`, source digest, or revision identity.
+
+- **UUIDv4** (`crypto.randomUUID()`): random operational IDs for requests, traces, temporary
+  jobs, and ephemeral runs. It is not replay-stable packet or training-row identity.
+- **UUIDv5**: deterministic name-based identity from a frozen namespace and canonical name.
+  Parent Atlas uses the frozen `PACKET_AGGREGATE_NAMESPACE_V1` for derived packet-index matching
+  across legacy namespaces. It is a lookup key only and never authorizes an upsert.
+- **UUIDv7**: time-ordered IDs for newly generated durable events or batches when index locality
+  matters. It does not identify source bytes or reconcile historical packet namespaces.
+- **UUIDv8**: custom application-defined identity only after its bit layout, namespace, checksum,
+  and replay semantics are explicitly frozen. Do not introduce it for packet repair casually.
+
+For YAML/JQ/JSONL indexes, preserve the real field type: UUID fields as UUID, `packet_key` as
+text, and `sha256:<64 hex>` revisions/digests as text. A UUIDv5 match is admissible only after
+exact equality of `packet_key`, `source_ref`, `workspace_revision`, `source_revision`, and the
+whole-source digest. Same UUIDv5 key with different canonical fields is an identity collision.
+Manifests must record the UUID algorithm, frozen namespace, name input, and
+`canonicalIdentity: false` when the UUID is only an index key. PostgreSQL remains canonical;
+YAML/JQ, DuckDB, Redis/BitFrost, Qdrant, centroids, and GPU IDs remain derived layers.
+
+RFC 9562 is the reference for UUIDv4, UUIDv5, UUIDv7, and UUIDv8 semantics.

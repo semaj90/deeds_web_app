@@ -1,8 +1,8 @@
 #!/usr/bin/env tsx
 
 import { createHash } from 'node:crypto';
-import { mkdir, readdir, readFile, stat, writeFile } from 'node:fs/promises';
-import { dirname, extname, resolve } from 'node:path';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { validateSnapshot } from './lib/workspace-snapshot-capture-v1.mts';
 import {
@@ -21,7 +21,6 @@ import {
 } from './lib/whole-codebase-source-exclusions.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
-const SNAPSHOT_DIR = resolve(ROOT, 'docs/reports/workspace-source-snapshots');
 const REPORT = resolve(ROOT, 'docs/reports/canonical-source-inventory-hygiene-v1.json');
 
 function argument(name: string): string | undefined {
@@ -29,18 +28,11 @@ function argument(name: string): string | undefined {
   return index >= 0 ? process.argv[index + 1] : undefined;
 }
 
-async function latestManifest(): Promise<string> {
-  const names = (await readdir(SNAPSHOT_DIR)).filter((name) => extname(name) === '.json');
-  const candidates = await Promise.all(names.map(async (name) => ({
-    name,
-    mtime: (await stat(resolve(SNAPSHOT_DIR, name))).mtimeMs,
-  })));
-  const latest = candidates.sort((a, b) => b.mtime - a.mtime)[0];
-  if (!latest) throw new Error('NO_WORKSPACE_SNAPSHOT_MANIFEST');
-  return resolve(SNAPSHOT_DIR, latest.name);
+const manifestArgument = argument('--manifest');
+if (!manifestArgument) {
+  throw new Error('EXPLICIT_WORKSPACE_SNAPSHOT_MANIFEST_REQUIRED');
 }
-
-const snapshotPath = resolve(ROOT, argument('--manifest') ?? await latestManifest());
+const snapshotPath = resolve(ROOT, manifestArgument);
 const snapshot = JSON.parse(await readFile(snapshotPath, 'utf8'));
 const readback = validateSnapshot(snapshot);
 const sources = Array.isArray(snapshot.sources) ? snapshot.sources : [];

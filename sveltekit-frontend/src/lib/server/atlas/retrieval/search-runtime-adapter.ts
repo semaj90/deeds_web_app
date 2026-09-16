@@ -20,7 +20,8 @@ import {
   buildAceContextManifestAdmissionV1,
   retrievalCacheIdentityFromAceManifestV1,
 } from '../context/ace-context-manifest-admission-v1.js';
-import { buildAceTopRetrievalQueryHash, type RetrievalCacheIdentityV1 } from '$lib/server/cache/ace-top-retrieval-cache.js';
+import { buildAceTopRetrievalQueryHash } from '$lib/server/cache/ace-top-retrieval-cache.js';
+import type { RetrievalCacheIdentityV1 } from '$lib/server/ace/cache-keys.js';
 import { hashQuery } from '$lib/server/cache/ace-packet-cache.js';
 import { bridgeAceContextManifestToPacketIdentityV1 } from '$lib/server/ace/ace-route-context-manifest-bridge-v1.js';
 import { prepareUnifiedResidencyAceBridgeV1, type UnifiedResidencyAceBridgeInputV1 } from '../tensors/unified-residency-ace-bridge-v1.js';
@@ -354,10 +355,14 @@ export function createAtlasSearchAdapter(config?: {
         : null;
       const acePacketCacheIdentity = retrievalCacheIdentity && options.packetRepresentationId
         && options.packetNormalizationPolicyRevision && options.packetArtifactChecksum
-        ? bridgeAceContextManifestToPacketIdentityV1({
+          ? bridgeAceContextManifestToPacketIdentityV1({
             admission: ace,
             queryHash: retrievalCacheIdentity.queryHash,
             requestHash: hashQuery(req.query),
+            model: options.retrievalCacheModel,
+            dim: options.retrievalCacheDim,
+            workspaceRevision: options.workspaceRevision,
+            contextPolicyRevision: options.contextPolicyRevision,
             representationId: options.packetRepresentationId,
             producerRevision: options.producerRevision,
             normalizationPolicyRevision: options.packetNormalizationPolicyRevision,

@@ -175,6 +175,6 @@ async function main(){
   console.log('Wrote:', OUT_JSONL, OUT_MD);
 }
 
-if (process.argv[1] === fileURLToPath(import.meta.url) || process.argv[1].endsWith('build-component-profiles.mjs')){
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)){
   main().catch(err=>{ console.error(err); process.exit(2); });
 }

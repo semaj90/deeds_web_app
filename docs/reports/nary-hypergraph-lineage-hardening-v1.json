@@ -1,0 +1,51 @@
+{
+  "schema": "atlas.nary-hypergraph-lineage-hardening-report.v1",
+  "status": "FAIL_CLOSED_LINEAGE_GUARD_PROVEN",
+  "changedFiles": [
+    "sveltekit-frontend/src/lib/server/analysis/nlp-feature-compiler.ts",
+    "sveltekit-frontend/src/lib/server/analysis/analysis-contracts.spec.ts",
+    "sveltekit-frontend/src/lib/server/analysis/event-hypergraph-contract.ts",
+    "sveltekit-frontend/src/lib/server/analysis/event-hypergraph-contract.spec.ts",
+    "sveltekit-frontend/src/routes/api/nlp/analyze/+server.ts",
+    "sveltekit-frontend/src/routes/api/codebase-index/analyze/+server.ts",
+    "sveltekit-frontend/src/lib/server/retrieval/hyperrag-packet-rpc.identity.spec.ts"
+  ],
+  "focusedTests": {
+    "passed": 20,
+    "failed": 0,
+    "files": [
+      "src/lib/server/analysis/event-hypergraph-contract.spec.ts",
+      "src/lib/server/analysis/analysis-contracts.spec.ts",
+      "src/lib/server/analysis/nlp-feature-compiler.spec.ts",
+      "src/lib/server/retrieval/hyperrag-packet-rpc.identity.spec.ts"
+    ]
+  },
+  "tupleAdmission": {
+    "status": "DERIVED_EVIDENCE_ONLY",
+    "requiresExistingPacketBearingEvent": true,
+    "requiresExactCandidateRevisionMatch": true,
+    "duplicateTupleStatus": "DUPLICATE_TUPLE",
+    "revisionMismatchStatus": "REVISION_MISMATCH",
+    "retrievalVoteCount": 0,
+    "createsNewCandidates": false,
+    "createsPairwiseEdges": false
+  },
+  "guards": {
+    "requestIdCannotBecomePacketKey": "PROVEN",
+    "sourceRevisionCannotBecomeWorkspaceRevision": "PROVEN",
+    "missingLineageResponse": "TYPED_409",
+    "naryTupleOwner": "EXISTING_EVENT_HYPERGRAPH_CONTRACT",
+    "extraRetrievalVote": false,
+    "writesPerformed": false,
+    "canonicalAuthority": false
+  },
+  "livePromotion": {
+    "status": "BLOCKED",
+    "reason": "current Graphify source-to-packet-to-chunk and semantic cohort admission remain unproven"
+  },
+  "validation": {
+    "openspec": "PASS",
+    "gitDiffCheck": "PASS",
+    "fullSvelteCheck": "NOT_COMPLETED_BOUNDED_OUT"
+  }
+}

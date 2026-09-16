@@ -63,6 +63,36 @@ const TABLES = [
     staticIdentityFields: ['id', 'feature_key'],
   },
   {
+    tableName: 'atlas_workspace_events',
+    schemaFiles: [
+      path.join(FRONTEND_ROOT, 'src', 'lib', 'server', 'db', 'schema', 'workspace-events.ts'),
+    ],
+    manualFiles: [
+      path.join(FRONTEND_ROOT, 'drizzle', 'manual', '20260916_workspace_event_head_v1.sql'),
+    ],
+    staticIdentityFields: ['event_id', 'event_checksum', 'workspace_id', 'sequence'],
+  },
+  {
+    tableName: 'atlas_workspace_event_participants',
+    schemaFiles: [
+      path.join(FRONTEND_ROOT, 'src', 'lib', 'server', 'db', 'schema', 'workspace-events.ts'),
+    ],
+    manualFiles: [
+      path.join(FRONTEND_ROOT, 'drizzle', 'manual', '20260916_workspace_event_head_v1.sql'),
+    ],
+    staticIdentityFields: ['event_id', 'participant_ordinal', 'canonical_id'],
+  },
+  {
+    tableName: 'atlas_workspace_heads',
+    schemaFiles: [
+      path.join(FRONTEND_ROOT, 'src', 'lib', 'server', 'db', 'schema', 'workspace-events.ts'),
+    ],
+    manualFiles: [
+      path.join(FRONTEND_ROOT, 'drizzle', 'manual', '20260916_workspace_event_head_v1.sql'),
+    ],
+    staticIdentityFields: ['workspace_id', 'workspace_head_revision', 'last_event_sequence'],
+  },
+  {
     tableName: 'task_semantic_packets',
     schemaFiles: [
       path.join(FRONTEND_ROOT, 'src', 'lib', 'server', 'db', 'schema', 'tasks.ts'),

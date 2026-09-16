@@ -11,7 +11,10 @@
  */
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { z } from 'zod';
-import { compileEventHypergraphBundle } from '$lib/server/analysis/nlp-feature-compiler.js';
+import {
+  compileEventHypergraphBundle,
+  HypergraphLineageUnavailableError,
+} from '$lib/server/analysis/nlp-feature-compiler.js';
 import { createMiniforgeNlpSidecarClient } from '$lib/server/nlp/miniforge-nlp-sidecar.js';
 
 const AnalyzeRequestSchema = z.object({
@@ -21,6 +24,8 @@ const AnalyzeRequestSchema = z.object({
   documentId: z.string().min(1).optional(),
   sourceRef: z.string().min(1).optional(),
   packetKey: z.string().min(1).optional(),
+  sourceRevision: z.string().min(1).optional(),
+  workspaceRevision: z.string().min(1).optional(),
   language: z.string().min(1).optional(),
   modelId: z.string().min(1).optional(),
   maxChars: z.number().int().positive().max(200_000).optional(),
@@ -45,18 +50,32 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
   const client = createMiniforgeNlpSidecarClient();
   const analysis = await client.analyze(parsed.data);
-  const eventHypergraph =
-    analysis.event_hypergraph ??
-    compileEventHypergraphBundle({
-      requestId: analysis.document_id,
-      packetKey: parsed.data.packetKey ?? analysis.document_id,
-      sourceRef: parsed.data.sourceRef ?? parsed.data.documentId ?? analysis.document_id,
-      sourceRevision: parsed.data.modelId ?? parsed.data.documentId ?? analysis.document_id,
-      workspaceRevision: parsed.data.modelId ?? parsed.data.documentId ?? analysis.document_id,
-      passResults: analysis.pass_results ?? [],
-      control5: analysis.control5 ?? null,
-      experimentFeatureMatrix: analysis.experiment_feature_matrix ?? null,
-    });
+  let eventHypergraph = analysis.event_hypergraph;
+  if (!eventHypergraph) {
+    try {
+      eventHypergraph = compileEventHypergraphBundle({
+        requestId: analysis.document_id,
+        packetKey: parsed.data.packetKey ?? null,
+        sourceRef: parsed.data.sourceRef ?? parsed.data.documentId ?? analysis.document_id,
+        sourceRevision: parsed.data.sourceRevision ?? '',
+        workspaceRevision: parsed.data.workspaceRevision ?? null,
+        passResults: analysis.pass_results ?? [],
+        control5: analysis.control5 ?? null,
+        experimentFeatureMatrix: analysis.experiment_feature_matrix ?? null,
+      });
+    } catch (error) {
+      if (error instanceof HypergraphLineageUnavailableError) {
+        return json({
+          error: error.message,
+          code: error.code,
+          event_hypergraph: null,
+          canonicalAuthority: false,
+          writesPerformed: false,
+        }, { status: 409 });
+      }
+      throw error;
+    }
+  }
 
   return json({
     ...analysis,

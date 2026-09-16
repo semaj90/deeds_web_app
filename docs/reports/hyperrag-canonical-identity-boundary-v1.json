@@ -1,0 +1,30 @@
+{
+  "schema": "atlas.hyperrag-canonical-identity-boundary-report.v1",
+  "status": "IDENTITY_FILTER_PROVEN_CACHE_PROMOTION_BLOCKED",
+  "focusedTests": {
+    "passed": 11,
+    "failed": 0,
+    "files": [
+      "src/lib/server/retrieval/hyperrag-packet-rpc.identity.spec.ts",
+      "src/lib/server/analysis/analysis-contracts.spec.ts",
+      "src/lib/server/analysis/nlp-feature-compiler.spec.ts"
+    ]
+  },
+  "identityBoundary": {
+    "acceptedFields": ["packet_key", "source_ref"],
+    "rejectedFallbacks": ["row.id", "qdrant_point_id", "file_path", "array_position", "source_ref_as_packet_key"],
+    "qdrantPointIdsAreCanonical": false,
+    "sourcePathCanCreatePacketIdentity": false
+  },
+  "runtimePromotion": {
+    "status": "BLOCKED_FAIL_CLOSED",
+    "reason": "query-only HyperRAG cache is quarantined; revision-qualified ContextManifest/ACE readback is still required"
+  },
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "validation": {
+    "focusedVitest": "PASS",
+    "openspec": "PASS",
+    "gitDiffCheck": "PASS"
+  }
+}

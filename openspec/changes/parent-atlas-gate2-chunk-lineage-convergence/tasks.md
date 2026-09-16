@@ -126,3 +126,31 @@ docs/reports/graphify-workspace-snapshot-binding-v1.json         44,883,450 byte
       parent change — confirmed by grep, not assumed. Leaving them untracked/uncommitted is safe
       for now; this task group exists so they aren't silently forgotten, not because Gate 2 is
       blocked on them.
+
+### 2026-09-16 — current snapshot reseal rerun
+
+- Re-captured the moving worktree with the existing two-scan snapshot owner using workspace
+  `625743d2-092b-4fa8-abe0-9dc094920c80`.
+- Fresh snapshot: `sha256:2d330876e01b0e2d3c2d80ce6ca8e433534766261b6aaf9d70e0ba3ce933a9a4`,
+  25,638 sources, zero capture violations.
+- Immediate readback: 25,638/25,638 exact byte matches, zero violations,
+  `RESEAL_READBACK_PROVEN`, `writesPerformed: false`.
+- Gate 2.1 remains intentionally open: admission still requires the exact operator confirmation
+  `AUTHORIZE_WORKSPACE_REVISION_TOURNAMENT_ADMISSION_V1`; no admission receipt or database row was
+  changed in this rerun.
+
+### 2026-09-16 — fresh-manifest hygiene and single-owner cross-check
+
+- Re-ran hygiene with the explicit fresh manifest rather than selecting a manifest by filesystem
+  mtime. Result: `SOURCE_INVENTORY_HYGIENE_PASS`, snapshot
+  `sha256:d25810ade66736ca8bc7fa31c683d09972f10ef7d241b4ab8e64b2cdd7ef6122`,
+  25,644 candidates, 25,449 canonical sources, zero known-junk matches, and
+  `recurrencePrevented: true`.
+- Re-ran `audit-workspace-revision-admission-single-owner-v1.mts`. Result remains
+  `WORKSPACE_REVISION_ADMISSION_SINGLE_OWNER_BLOCKED`, now specifically on stale
+  plan/derivation/preflight/consumer/canary receipts: `derivationReady: false`, snapshot and
+  inventory checksums do not match the fresh manifest. This is a receipt-chain refresh blocker,
+  not a snapshot-byte or exclusion-policy failure.
+- Both audits remain read-only with `writesPerformed: false`; Gate 2 chunk lineage must not start
+  until the admission-chain receipts are regenerated against this exact manifest and explicit
+  admission authorization is supplied.

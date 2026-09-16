@@ -2170,6 +2170,15 @@ to establish. `eligibleCandidateCount: 0` today is expected and correct: the cor
 fewer (here, zero) source_refs currently qualify under principled evidence. Evidence:
 `docs/reports/pkt-lineage-08-replay-stability-v1.json`.
 
+**Canonical packet identity hardening (2026-09-16):** updated
+`scripts/atlas/plan-packet-chunk-lineage-promotion-v1.mjs` to resolve
+`packet_key` only from existing `atlas_packets` rows. The prior source-reference
+hash fallback was removed. Packet lookup is now batched outside the chunk query
+to avoid an unindexed normalized cross-table join. Fresh read-only preflight at
+`--limit=10` completed with `READY_FOR_AUTHORIZATION`, `eligibleCandidateCount=9`,
+and `plannedWrites.atlas_packets=0`; no writes or packet identity fabrication
+occurred.
+
 **`CURRENT-SOURCE-SNAPSHOT-RESOLVE-01`** — implemented as `scripts/atlas/audit-current-graphify-snapshot-authority-v1.mts`.
 **A live duplicate-owner collision was found and resolved during implementation, not silently
 ignored**: a concurrent session independently wrote a script with the identical filename, an
@@ -14948,15 +14957,15 @@ duplicating it here.
 ### 2026-09-16 — recovered hygiene test runner and exclusion-policy test pair
 
 - The recovered `tests/canonical-source-inventory-hygiene.spec.ts` is present and contains
-  five Vitest tests, but it is not wired into the SvelteKit lane: the lane config only includes
-  `sveltekit-frontend` paths and there is no root Vitest config. Running it from that workspace
-  therefore returns `No test files found` (exit 1), not a passing test.
+  five Vitest tests. The SvelteKit lane now includes the repository-level test explicitly via
+  `../tests/canonical-source-inventory-hygiene.spec.ts`; no second root Vitest authority was
+  introduced. The focused run passes 1 file / 5 tests.
 - Added `scripts/atlas/lib/whole-codebase-source-exclusions.test.mjs` as the missing Node test
   pair for the `.mjs` policy module. It verifies recurrence-class coverage, explicit
   `qdrant-windows`/`.svelte-error-fixes-backup` exclusions, ripgrep argument generation, and
   deterministic SHA-256 policy checksums.
-- Node policy test: 3/3 passed. The recovered Vitest test remains an integration-wiring gap;
-  the production hygiene audit remains the current evidence source. No database, packet,
+- Node policy test: 3/3 passed, and the recovered Vitest test passes 5/5. The production hygiene
+  audit remains the live evidence source. No database, packet,
   snapshot, cache, or projection writes occurred.
 
 ### 2026-09-16 — session pause, Gate 2 in progress in the carved-out change
@@ -14967,3 +14976,37 @@ one-day-stale snapshot. Task group 2 (human-authorized re-admission) is paused �
 authorization was requested but not yet given before the break. See that change's tasks.md
 "RESUME HERE" note under section 2 for exact resume state. Nothing else in this file's Gate 1
 closure is affected.
+
+### 2026-09-16 — current continuation: packet bridge and snapshot recheck
+
+The packet digest producer now has a guarded null-only lineage fill path. Its bounded
+transactional canary read back 17 inserts and 8 legacy-null updates exactly, then rolled back
+with `writesPerformed=false`. A broader read-only 500-row plan classified 241 `READY_INSERT`,
+235 `LEGACY_LINEAGE_FIELDS_MISSING`, 22 non-null `content_hash` conflicts, and 2 source-byte
+mismatches. No durable packet promotion is authorized.
+
+The previously clean snapshot is no longer current: readback against the live worktree now
+finds 636 changed source bytes, and a fresh two-pass capture returns
+`CAPTURE_BLOCKED / WORKSPACE_CHANGED_BETWEEN_SCANS`. The current packet/chunk reconciliation
+remains read-only and reports 24,456 bound sources, 0 current `content_hash` matches,
+7,902 missing packet rows, 16,454 packet rows with null content digests, 20 non-legacy digest
+mismatches, and 627 existing lineage references. These values are diagnostic only; they do not
+authorize backfill or semantic/Qdrant promotion.
+
+### 2026-09-16 — bounded 100-source packet/chunk preflight recheck
+
+Re-ran `scripts/atlas/plan-packet-chunk-lineage-promotion-v1.mjs --limit=100`
+after removing synthetic packet-key generation and switching to a bounded,
+batched lookup of canonical `atlas_packets` rows. The read-only receipt reports
+`97` candidates `READY_FOR_AUTHORIZATION` and `3` `BLOCKED_LINEAGE_AUTHORITY`
+(two package-lock sources and one GPU architecture document with ambiguous or
+unproven source namespace/revision). It reports `atlas_packets: 0`, Qdrant: 0,
+graph: 0, and cache: 0 planned writes, with `writesPerformed=false`,
+`canonicalAuthority=false`, and `promotionAuthorized=false`. This proves the
+planner scales to the bounded cohort; it does not close packet promotion or
+chunk lineage. Packet identity is now resolved only from canonical rows, and
+the three blocked rows remain excluded rather than repaired by inference.
+
+Receipt: `docs/reports/packet-chunk-lineage-promotion-preflight-v1.json`;
+preflight checksum: `sha256:7434f3ba9539d4818996439fae5d9e7fe173075c489731ac9698f9ea115b1dd6`.
+Focused packet identity tests pass 5/5 and OpenSpec strict validation passes.

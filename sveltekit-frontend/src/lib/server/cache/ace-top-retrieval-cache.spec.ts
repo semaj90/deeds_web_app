@@ -52,6 +52,18 @@ describe('revision-qualified ACE top-K cache admission', () => {
     expect(legacy.degraded).toBe(true);
   });
 
+  it('does not allow an explicit legacy degraded=false flag to upgrade an entry', () => {
+    const legacy = normalizeAceTopRetrievalEntry({
+      queryHash: identity.queryHash,
+      topN: 20,
+      createdAt: entry.createdAt,
+      results: entry.results,
+      degraded: false,
+    });
+    expect(legacy.identity).toBeUndefined();
+    expect(legacy.degraded).toBe(true);
+  });
+
   it('rejects changed revision, query, top-N, or derived key', () => {
     expect(admitRevisionedAceTopRetrievalEntry(entry, { ...identity, graphRevision: 'graph-2' }, 20)).toBeNull();
     expect(admitRevisionedAceTopRetrievalEntry(entry, { ...identity, queryHash: 'query-2' }, 20)).toBeNull();

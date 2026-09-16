@@ -145,6 +145,10 @@ try {
 
 const signatures = new Set(candidates.map((candidate) => candidate.signature));
 const equivalent = candidates.length > 1 && signatures.size === 1 && candidates.every((candidate) => candidate.sourceMembershipExact);
+const canonicalCandidates = candidates.filter((candidate) => candidate.canonical_authority === true);
+const existingCanonicalOwner = equivalent && canonicalCandidates.length === 1
+  ? canonicalCandidates[0].execution_id
+  : null;
 // Stable report ordering is presentation only. Do not turn completion time or
 // UUID ordering into canonical execution authority: equivalent executions
 // require an explicit lifecycle decision.
@@ -168,12 +172,22 @@ const report = {
     distinctEvidenceSignatures: signatures.size,
     allEquivalent: equivalent,
   },
+  existingCanonicalOwner: existingCanonicalOwner
+    ? {
+        executionId: existingCanonicalOwner,
+        authoritySource: 'graphify_executions.canonical_authority',
+        exactEquivalentMembership: true,
+      }
+    : null,
   recommendation: equivalent
     ? {
-        type: 'EQUIVALENT_EXECUTIONS_REQUIRE_EXPLICIT_AUTHORITY',
+        type: existingCanonicalOwner
+          ? 'EQUIVALENT_EXECUTIONS_CANONICAL_AUTHORITY_PRESENT'
+          : 'EQUIVALENT_EXECUTIONS_REQUIRE_EXPLICIT_AUTHORITY',
         candidateExecutionIds: ordered.map((candidate) => candidate.execution_id),
+        preferredExecutionId: existingCanonicalOwner,
         policy: 'NO_IMPLICIT_TIMESTAMP_OR_ID_SELECTION',
-        requiresExplicitAuthorityDecision: true,
+        requiresExplicitAuthorityDecision: !existingCanonicalOwner,
       }
     : null,
   status: readError
@@ -186,11 +200,13 @@ const report = {
         ? 'NO_TERMINAL_EXECUTION_FOR_ADMITTED_REVISION'
         : 'EXECUTION_EVIDENCE_NOT_EQUIVALENT',
   safeToApply: false,
-  canonicalAuthority: false,
+  canonicalAuthority: Boolean(existingCanonicalOwner),
   writesPerformed: false,
   nextGate: readError
     ? 'RETRY_READ_ONLY_GRAPHIFY_EXECUTION_OWNER_AUDIT'
-    : equivalent ? 'EXPLICIT_GRAPHIFY_EXECUTION_OWNER_DECISION' : 'CURRENT_GRAPHIFY_EXECUTION_RECONCILIATION',
+    : existingCanonicalOwner
+      ? 'CURRENT_SOURCE_PACKET_CHUNK_LINEAGE'
+      : equivalent ? 'EXPLICIT_GRAPHIFY_EXECUTION_OWNER_DECISION' : 'CURRENT_GRAPHIFY_EXECUTION_RECONCILIATION',
 };
 await fs.mkdir(path.dirname(reportPath), { recursive: true });
 const tempPath = `${reportPath}.${process.pid}.tmp`;
@@ -200,7 +216,7 @@ console.log(JSON.stringify({
   status: report.status,
   candidateCount: candidates.length,
   distinctEvidenceSignatures: signatures.size,
-  preferredExecutionId: null,
+  preferredExecutionId: existingCanonicalOwner,
   candidateExecutionIds: report.recommendation?.candidateExecutionIds ?? null,
   safeToApply: false,
   writesPerformed: false,

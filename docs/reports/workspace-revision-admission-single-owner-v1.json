@@ -1,19 +1,19 @@
 {
   "schema": "atlas.workspace-revision-admission-single-owner.v1",
-  "generatedAt": "2026-09-16T01:25:50.664Z",
+  "generatedAt": "2026-09-16T15:18:34.719Z",
   "mode": "READ_ONLY",
   "status": "WORKSPACE_REVISION_ADMISSION_SINGLE_OWNER_BLOCKED",
   "authority": false,
   "writesPerformed": false,
   "datastoreWritesPerformed": false,
   "expected": {
-    "snapshotRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+    "snapshotRevision": "sha256:d25810ade66736ca8bc7fa31c683d09972f10ef7d241b4ab8e64b2cdd7ef6122",
     "workspaceRevisionCandidate": "sha256:178f26e15947cbb92acd5c7147c431c967eed96d865dc7a238d924438ee1289a",
     "sourceInventoryRevision": "atlas.canonical-source-inventory-hygiene-policy.2026-09-13.v1",
-    "sourceInventoryChecksum": "sha256:f9d049de1581b4abf76a8c785a3cbdcaab0f37fc6268a2cc39e81ace011b4585",
-    "sourceSelectionChecksum": "sha256:56d162d148a5f3b05ffae0dbbc52a6bf4df334e794b3c0631229d59e9a410728",
-    "sourceCount": 25347,
-    "snapshotSourceCount": 25542
+    "sourceInventoryChecksum": "sha256:adb6524b92a91dbcd0f798cf840877c58e241b9c416a12f8b985c3d00397af41",
+    "sourceSelectionChecksum": "sha256:5316d50a1c1055ea5f70d1b8ed08f40286979a8baf8c28e8db15a436cac20e69",
+    "sourceCount": 25449,
+    "snapshotSourceCount": 25644
   },
   "receiptsPresent": {
     "hygiene": true,
@@ -25,7 +25,7 @@
     "canary": true
   },
   "checks": {
-    "hygienePass": false,
+    "hygienePass": true,
     "planReady": true,
     "derivationReady": false,
     "preflightReady": false,
@@ -46,7 +46,7 @@
     "preflightSnapshotSourceCountMatches": false,
     "admissionStatusValid": true,
     "admissionWorkspaceMatchesCandidate": false,
-    "admissionSnapshotMatches": true,
+    "admissionSnapshotMatches": false,
     "admissionInventoryRevisionMatches": false,
     "admissionInventoryChecksumMatches": false,
     "admissionSelectionChecksumMatches": false,
@@ -55,13 +55,13 @@
     "admissionExecutionStillUnauthorized": true,
     "admissionProjectionWritesStillUnauthorized": true,
     "consumerWorkspaceMatches": true,
-    "consumerSnapshotMatches": true,
+    "consumerSnapshotMatches": false,
     "consumerInventoryRevisionMatches": false,
     "consumerInventoryChecksumMatches": false,
     "consumerSelectionChecksumMatches": false,
     "consumerSourceCountMatches": false,
     "canaryWorkspaceMatches": true,
-    "canarySnapshotMatches": true,
+    "canarySnapshotMatches": false,
     "canaryInventoryRevisionMatches": false,
     "canaryInventoryChecksumMatches": false,
     "canarySelectionChecksumMatches": false,
@@ -70,7 +70,6 @@
     "canaryCanonicalWritesStillUnauthorized": true
   },
   "violations": [
-    "hygienePass",
     "derivationReady",
     "preflightReady",
     "planSnapshotMatches",
@@ -89,20 +88,23 @@
     "preflightSourceCountMatches",
     "preflightSnapshotSourceCountMatches",
     "admissionWorkspaceMatchesCandidate",
+    "admissionSnapshotMatches",
     "admissionInventoryRevisionMatches",
     "admissionInventoryChecksumMatches",
     "admissionSelectionChecksumMatches",
     "admissionSourceCountMatches",
     "admissionSnapshotSourceCountMatches",
+    "consumerSnapshotMatches",
     "consumerInventoryRevisionMatches",
     "consumerInventoryChecksumMatches",
     "consumerSelectionChecksumMatches",
     "consumerSourceCountMatches",
+    "canarySnapshotMatches",
     "canaryInventoryRevisionMatches",
     "canaryInventoryChecksumMatches",
     "canarySelectionChecksumMatches",
     "canarySourceCountMatches"
   ],
-  "firstBlockingInvariant": "hygienePass",
+  "firstBlockingInvariant": "derivationReady",
   "nextGate": "WORKSPACE-REVISION-ADMISSION-SINGLE-OWNER-01"
 }

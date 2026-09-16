@@ -27,9 +27,12 @@ export default defineConfig({
       },
     },
     include: [
+      '../tests/canonical-source-inventory-hygiene.spec.ts',
       'tests/lane-contracts/**/*.spec.ts',
       'tests/hyperrag/**/*.spec.ts',
       'src/lib/server/atlas/**/*.spec.ts',
+      'src/lib/server/retrieval/packet-bitmap-prefilter.spec.ts',
+      'src/lib/server/retrieval/packet-dense-search.spec.ts',
       'src/lib/server/cache/ace-top-retrieval-cache.spec.ts',
 		'src/lib/server/queue/**/*.spec.ts',
       'src/lib/server/analysis/ast-grep-extractor.lineage.spec.ts',

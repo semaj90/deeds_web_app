@@ -122,6 +122,9 @@ import { ripgrepSearch } from '../lib/server/agent/tools/ripgrep-search.js';
 import { explainWikiPage, getWikiStatus, refreshDirectory, searchWiki } from '../lib/server/kb/wiki-logic.js';
 import { buildSubgraphV1SeedNeighborhood } from '../lib/server/retrieval/subgraph-seed-neighborhood.js';
 import { buildGraphRagStagePlan } from '../lib/server/retrieval/graphrag-stage-plan.js';
+import { runPacketDenseSearch } from '../lib/server/retrieval/packet-dense-search.js';
+import type { QdrantPointsQueryFn } from '../lib/server/retrieval/packet-dense-rerank.js';
+import { embedQueryForLane } from '../lib/server/retrieval/embedding-service.js';
 import { buildAcePacketFromSource } from '../lib/server/ace/source-to-packet.js';
 import { buildIndexedSourcePacket } from '../lib/server/ace/indexed-source-packet.js';
 import { populateFeatureDocuments } from '../lib/server/atlas/feature-doc-population.js';
@@ -8783,13 +8786,29 @@ async function handleMcp(req: http.IncomingMessage, res: http.ServerResponse) {
   try {
     await server.connect(transport);
     await transport.handleRequest(req, res);
-    // Wait for client to close before disconnecting (SSE may still be writing
-    // after handleRequest resolves); detach so the next queued request can call
-    // connect() without "Already connected" rejection.
-    await new Promise<void>((resolve) => {
-      if (res.writableEnded) resolve();
-      else res.on('close', () => resolve());
-    });
+    // Wait until the SDK has handed the response body to Node before closing
+    // this stateless transport. `handleRequest()` may return after headers/body
+    // are scheduled but before `finish`; closing immediately can produce a 200
+    // with an empty SSE body. Do not wait for keep-alive `close`, which may never
+    // arrive after a successful POST. The timeout keeps one malformed request
+    // from wedging the serialized MCP queue.
+    if (!res.writableFinished) {
+      await new Promise<void>((resolve) => {
+        let settled = false;
+        const settle = () => {
+          if (settled) return;
+          settled = true;
+          clearTimeout(timer);
+          res.off('finish', settle);
+          res.off('close', settle);
+          resolve();
+        };
+        const timer = setTimeout(settle, 5000);
+        res.on('finish', settle);
+        res.on('close', settle);
+        if (res.writableFinished) settle();
+      });
+    }
   } catch (err: any) {
     console.error('[MCP per-request handler threw]', {
       url: req.url,
@@ -9420,6 +9439,108 @@ server.registerTool(
     }
   }
 );
+
+// ── atlas.packet_dense_search ────────────────────────────────────────────────
+// Two-stage retrieval: (1) Postgres bitmap-prefilter over atlas_packets, reusing the table's
+// existing GIN/btree indexes (feature_id/tags/concept_ids/domain_class/workspace_revision) so
+// the planner can choose an appropriate indexed plan; AIO/bitmap behavior is recorded as
+// read-only evidence, not asserted as the cause of end-to-end speedup. (2) Qdrant ANN restricted
+// to the candidate source_ref set via a payload filter, never an unfiltered collection-wide sweep. Complements
+// atlas.packet_search (structural/FTS-only) — this tool adds dense semantic ranking on top of a
+// cheap structural narrowing. See openspec/changes/parent-atlas-packet-dense-bitmap-search/.
+//
+// Candidate lane note for future RRF fusion: this tool's output is a candidate lane
+// (`atlas_packet_dense_bitmap`) for the still-design-only
+// parent-atlas-rrf-weight-table-lane-registry-consolidation RRF weight-table registry. No
+// fusion code here — this is a standalone two-stage tool, not routed through
+// phase1-rrf-semantic-fusion (incomplete/untested) or the governance-gated phase18 reranker.
+server.registerTool(
+  'atlas.packet_dense_search',
+  {
+    description:
+      'Bitmap-prefiltered structural narrowing over atlas_packets (using existing GIN/btree indexes, ' +
+      'PG18 AIO-accelerated) followed by a Qdrant dense-ANN rerank restricted to the prefiltered ' +
+      'candidate set, joined back to atlas_packets by packet_key. Requires at least one of feature_id, ' +
+      'source_ref, concept_id, or tags (domain_class/workspace_revision alone are rejected — not ' +
+      'selective enough). Requires an explicit target Qdrant collection — codebase_chunks_768 (older, ' +
+      'richer payload) or codebase_chunks_768_v2 (leaner, EMB3A target); this tool does not default to ' +
+      'either. Provide either query_text (embedded via embeddinggemma) or query_vector directly. ' +
+      'Returns results in the compact packet-control-word projection with full payload attached only ' +
+      'to the top expand_top_k results.',
+    inputSchema: z.object({
+      feature_id: z.string().optional().describe('Exact feature_id to filter on.'),
+      source_ref: z.string().optional().describe('Exact source_ref to filter on.'),
+      concept_id: z.string().optional().describe('Filter to packets whose concept_ids array contains this value.'),
+      tags: z.array(z.string()).optional().describe('Filter to packets whose tags array overlaps this list.'),
+      domain_class: z.string().optional().describe('Additional (non-selective-alone) domain_class filter.'),
+      workspace_revision: z.string().optional().describe('Additional (non-selective-alone) workspace_revision filter.'),
+      collection: z.enum(['codebase_chunks_768', 'codebase_chunks_768_v2']).describe(
+        'Target Qdrant collection — required, no default (see tool description).'
+      ),
+      query_text: z.string().optional().describe('Natural-language query, embedded via embeddinggemma.'),
+      query_vector: z.array(z.number()).optional().describe('Pre-computed 768-dim query embedding (alternative to query_text).'),
+      candidate_cap: z.number().int().min(1).max(2000).default(500).optional().describe('Stage 1 candidate packet_key cap.'),
+      dense_limit: z.number().int().min(1).max(50).default(10).optional().describe('Max Qdrant hits to return.'),
+      score_threshold: z.number().min(0).max(1).optional().describe('Minimum Qdrant cosine score.'),
+      expand_top_k: z.number().int().min(0).max(50).default(10).optional().describe('How many top results get full payload attached.'),
+    }),
+  },
+  async ({
+    feature_id, source_ref, concept_id, tags, domain_class, workspace_revision,
+    collection, query_text, query_vector, candidate_cap, dense_limit, score_threshold, expand_top_k,
+  }) => {
+    try {
+      if (!query_vector?.length && !query_text) {
+        throw new Error('Provide either query_text or query_vector.');
+      }
+
+      let vector = query_vector;
+      if (!vector?.length) {
+        const embedded = await embedQueryForLane(query_text!, 'dense_768');
+        vector = Array.from(embedded.vector);
+      }
+
+      const response = await runPacketDenseSearch(
+        {
+          db: pool,
+          queryQdrantPoints: async (col, body) => {
+            const r = await fetch(`${QDRANT_URL}/collections/${col}/points/query`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(body),
+              signal: AbortSignal.timeout(8_000),
+            });
+            return (await r.json()) as Awaited<ReturnType<QdrantPointsQueryFn>>;
+          },
+        },
+        {
+          featureId: feature_id,
+          sourceRef: source_ref,
+          conceptId: concept_id,
+          tags,
+          domainClass: domain_class,
+          workspaceRevision: workspace_revision,
+          collection,
+          queryVector: vector!,
+          candidateCap: candidate_cap,
+          denseLimit: dense_limit,
+          scoreThreshold: score_threshold,
+          expandTopK: expand_top_k,
+        }
+      );
+
+      return {
+        content: [{ type: 'text' as const, text: JSON.stringify(response, (_k, v) => (typeof v === 'bigint' ? v.toString() : v), 2) }],
+      };
+    } catch (err) {
+      return {
+        content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: String(err).slice(0, 500) }) }],
+        isError: true,
+      };
+    }
+  }
+);
+
 // ── atlas.coverage ────────────────────────────────────────────────────────────
 // Phase 3I verification gate: reports coverage metrics for atlas_packets.
 // Gate: packet_key >= 95%, source_ref >= 90% before Phase 4A RRF can start.

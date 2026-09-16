@@ -23,7 +23,10 @@ import { z } from 'zod';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
 import { ENV } from '$lib/server/env.server.js';
 import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
-import { compileEventHypergraphBundle } from '$lib/server/analysis/nlp-feature-compiler.js';
+import {
+	compileEventHypergraphBundle,
+	HypergraphLineageUnavailableError,
+} from '$lib/server/analysis/nlp-feature-compiler.js';
 import { createMiniforgeNlpSidecarClient } from '$lib/server/nlp/miniforge-nlp-sidecar.js';
 
 const SRC_ROOT = resolve(process.cwd(), 'src');
@@ -206,10 +209,10 @@ ${contentForLLM}
 				structured.event_hypergraph ??
 				compileEventHypergraphBundle({
 					requestId: structured.document_id,
-					packetKey: relPath,
+					packetKey: null,
 					sourceRef: relPath,
-					sourceRevision: relPath,
-					workspaceRevision: relPath,
+					sourceRevision: '',
+					workspaceRevision: null,
 					passResults: structured.pass_results ?? [],
 					control5: structured.control5 ?? null,
 					experimentFeatureMatrix: structured.experiment_feature_matrix ?? null,
@@ -223,6 +226,15 @@ ${contentForLLM}
 				event_hypergraph: eventHypergraph,
 			};
 		} catch (structuredErr) {
+			if (structuredErr instanceof HypergraphLineageUnavailableError) {
+				return json({
+					...result,
+					error: structuredErr.message,
+					code: structuredErr.code,
+					canonicalAuthority: false,
+					writesPerformed: false,
+				}, { status: 409 });
+			}
 			console.warn('[codebase-index/analyze] structured sidecar unavailable:', structuredErr);
 		}
 

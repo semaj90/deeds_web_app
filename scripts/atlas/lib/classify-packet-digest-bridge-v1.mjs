@@ -1,5 +1,22 @@
 const SHA256_SOURCE_REVISION = /^sha256:[a-f0-9]{64}$/i;
 
+/**
+ * Resolve packet identity only from canonical packet rows. A source reference
+ * or its hash may help locate rows, but it can never mint packet identity.
+ */
+export function resolveCanonicalPacketIdentity(rows) {
+  const candidates = (Array.isArray(rows) ? rows : [])
+    .filter((row) => row && row.packet_key != null)
+    .map((row) => String(row.packet_key));
+  if (candidates.length === 0) {
+    return { status: 'MISSING_PACKET', packetKey: null, candidates: [] };
+  }
+  if (candidates.length !== 1) {
+    return { status: 'PACKET_IDENTITY_AMBIGUOUS', packetKey: null, candidates };
+  }
+  return { status: 'CANONICAL_PACKET_FOUND', packetKey: candidates[0], candidates };
+}
+
 export function classifyPacketDigestBridgeRow(row) {
   const memberDigest = String(row.member_content_hash ?? '').toLowerCase();
   const packetDigest = String(row.packet_content_hash ?? '').toLowerCase();
