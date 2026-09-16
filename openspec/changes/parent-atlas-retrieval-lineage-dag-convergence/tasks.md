@@ -14884,6 +14884,8 @@ silently deferring.
 - The explicit decision mechanism is present at `scripts/atlas/apply-current-graphify-execution-owner-decision-v1.mjs`, but remains inert without both an operator-selected execution ID, `--apply`, and the dedicated authorization variable. No implicit selection was made.
 - Current graph/semantic scaffold contract tests passed from `sveltekit-frontend`: 4 files, 27 tests (`CandidateFeatureSnapshotV1`, semantic representation, GraphOrdinalMap, and graph ordinal edge compiler).
 - HyperGraphRAG/n-ary contract and KAG reader tests remain green: 2 files, 15 tests. The adapter preserves revision-qualified n-ary evidence for existing candidates only; live API promotion and canonical tuple admission remain open.
+- Fresh indexing audit (read-only, 2026-09-16): PostgreSQL 18.4 with pgvector 0.8.3, pg_trgm, and pg_search is reachable; `atlas_packets` (61,718), `atlas_packet_features` (61,718), and `codebase_chunk_index` (274,465) exist with lexical/vector surfaces. Canonical `semantic_768` remains partial (55,169/274,465), and the ACE live cache is not admitted by this audit.
+- The same audit found 477 SQL files across the scanned Drizzle tree, 41 journal entries, 64 declared sidecars, and 326 unresolved classifications. This is an inventory/classification blocker, not authorization to apply migrations; no DDL or migration runner was invoked.
 ### 2026-09-16 — Whole-codebase packet exclusion owner converged
 
 - `PACKET_WRITER_SHARED_EXCLUSION_POLICY_01`: the packet inventory writer now imports `scripts/atlas/lib/whole-codebase-source-exclusions.mjs` and uses its shared ripgrep exclusions. The merged policy retains the incident-driven `qdrant-windows` and `.svelte-error-fixes-backup` exclusions alongside the broader generated/runtime/worktree exclusions.
@@ -14931,3 +14933,28 @@ above appeared in the working tree as a real, uncommitted, verified-safe change 
 duplicate or conflict with it, this pass built on top of it (the `.tmp` gap and its 1,063-row
 live count were found independently, on the already-repointed writer). Both are captured together
 here since they're one coherent unit of work.
+
+### 2026-09-16 — Gate 2 work carved out into its own OpenSpec change
+
+This file is 14,900+ lines; continuing to bolt every subsequent gate onto it makes each new step
+harder to find and review. The two remaining open items from the Gate 1 closure above — re-sealing
+a fresh workspace snapshot (fixes the one remaining `SNAPSHOT_BYTES_READBACK_NOT_PROVEN` blocker)
+and the chunk-native lineage join (`CURRENT-SOURCE-CHUNK-OWNER-01`, the actual next gate) — are
+now tracked in their own proposal/design/specs/tasks set:
+`openspec/changes/parent-atlas-gate2-chunk-lineage-convergence/`. Nothing has been implemented
+there yet as of this note; see that change's own tasks.md for real-time status rather than
+duplicating it here.
+
+### 2026-09-16 — recovered hygiene test runner and exclusion-policy test pair
+
+- The recovered `tests/canonical-source-inventory-hygiene.spec.ts` is present and contains
+  five Vitest tests, but it is not wired into the SvelteKit lane: the lane config only includes
+  `sveltekit-frontend` paths and there is no root Vitest config. Running it from that workspace
+  therefore returns `No test files found` (exit 1), not a passing test.
+- Added `scripts/atlas/lib/whole-codebase-source-exclusions.test.mjs` as the missing Node test
+  pair for the `.mjs` policy module. It verifies recurrence-class coverage, explicit
+  `qdrant-windows`/`.svelte-error-fixes-backup` exclusions, ripgrep argument generation, and
+  deterministic SHA-256 policy checksums.
+- Node policy test: 3/3 passed. The recovered Vitest test remains an integration-wiring gap;
+  the production hygiene audit remains the current evidence source. No database, packet,
+  snapshot, cache, or projection writes occurred.
