@@ -1,17 +1,37 @@
 ## 1. Workspace snapshot re-seal (read-only capture + validation)
 
-- [ ] 1.1 Write `scripts/atlas/reseal-current-workspace-snapshot-v1.mts`: calls the existing
-      `observeSnapshot()`/`sealSnapshot()` pair (`scripts/atlas/lib/workspace-snapshot-capture-v1.mts`)
-      twice (matching the existing two-scan-then-diff pattern already used by `sealSnapshot()`
-      itself) and writes the sealed manifest to `docs/reports/workspace-source-snapshots/<snapshotRevision>.json`.
+- [x] 1.1 **Duplication check first**: `scripts/atlas/capture-workspace-source-snapshot-v1.mts`
+      already exists and does exactly this (two-scan `observeSnapshot()`/`sealSnapshot()` pair,
+      writes to `docs/reports/workspace-source-snapshots/<snapshotRevision>.json`) — reused
+      rather than rewritten. Ran it: `npx tsx scripts/atlas/capture-workspace-source-snapshot-v1.mts
+      --workspace-id 625743d2-092b-4fa8-abe0-9dc094920c80`. Result: fresh snapshot
+      `sha256:e2fba635004f4b18396037fc1e1262adcfaf7f1d1e93c991e7a44be1a97523d9`, 25,637 sources
+      (up from 25,542), 0 capture violations, `status: "CAPTURE_VERIFIED_REQUIRES_PROCESSING_READBACK"`.
       No admission, no database access.
-- [ ] 1.2 Immediately run `validateSnapshot()` against the freshly-sealed manifest and confirm
-      `status: "SNAPSHOT_BYTES_READBACK_PROVEN"` with zero `violationCounts` entries. If not
-      clean, stop — do not proceed to admission with a snapshot that fails its own readback.
-- [ ] 1.3 Record the new snapshot's `snapshotRevision`, `sourceCount`, and readback result in
-      `docs/reports/workspace-snapshot-reseal-v1.json` (new receipt, `writesPerformed: false`).
+- [x] 1.2 Wrote `scripts/atlas/reseal-current-workspace-snapshot-v1.mts` (new — the readback+
+      receipt step genuinely didn't exist yet) to run `validateSnapshot()` against the fresh
+      manifest. Result: `status: "SNAPSHOT_BYTES_READBACK_PROVEN"`, `exactMatches: 25637` /
+      `sourceCount: 25637` (100%), `violationCounts: {}`, `totalViolations: 0` — clean, unlike
+      the prior snapshot's 303 mismatches.
+- [x] 1.3 Receipt written to `docs/reports/workspace-snapshot-reseal-v1.json`
+      (`status: "RESEAL_READBACK_PROVEN"`, `writesPerformed: false`).
 
 ## 2. Human-authorized re-admission
+
+> **RESUME HERE (paused 2026-09-16, end of session — operator taking a break).**
+> Task group 1 is fully done. Asked the operator for explicit admission authorization at the
+> start of task 2.1 (per the hard gate this task group requires) and did not receive it before
+> the session ended — **not a refusal, just not yet answered.** Do not treat silence as consent.
+> Next session: re-present the fresh snapshot's receipt
+> (`docs/reports/workspace-snapshot-reseal-v1.json`, `RESEAL_READBACK_PROVEN`,
+> `sha256:e2fba635004f4b18396037fc1e1262adcfaf7f1d1e93c991e7a44be1a97523d9`, 25,637/25,637 exact)
+> and ask again before writing anything to `workspace-revision-tournament-admission-v1.json`.
+>
+> **Note on the fresh snapshot manifest file itself**: `docs/reports/workspace-source-snapshots/
+> e2fba635...json` (~15MB) was written to disk by task 1.1 but is **NOT committed to git** —
+> every prior snapshot manifest in that directory is likewise untracked, consistent with this
+> repo's documented pre-commit hook rejecting files >10MB. This is expected, not a mistake; the
+> file is still on disk and still usable for task 2.x next session. Do not try to force-add it.
 
 - [ ] 2.1 Present the fresh snapshot's readback-proven receipt to the operator and request
       explicit authorization (matching the existing `approval.confirmation:

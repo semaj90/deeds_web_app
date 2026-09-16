@@ -1,0 +1,14 @@
+{
+  "schema": "atlas.workspace-snapshot-reseal.v1",
+  "generatedAt": "2026-09-16T01:40:45.551Z",
+  "mode": "READ_ONLY",
+  "snapshotPath": "docs/reports/workspace-source-snapshots/e2fba635004f4b18396037fc1e1262adcfaf7f1d1e93c991e7a44be1a97523d9.json",
+  "snapshotRevision": "sha256:e2fba635004f4b18396037fc1e1262adcfaf7f1d1e93c991e7a44be1a97523d9",
+  "sourceCount": 25637,
+  "exactMatches": 25637,
+  "violationCounts": {},
+  "totalViolations": 0,
+  "readbackStatus": "SNAPSHOT_BYTES_READBACK_PROVEN",
+  "writesPerformed": false,
+  "status": "RESEAL_READBACK_PROVEN"
+}

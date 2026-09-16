@@ -14958,3 +14958,12 @@ duplicating it here.
 - Node policy test: 3/3 passed. The recovered Vitest test remains an integration-wiring gap;
   the production hygiene audit remains the current evidence source. No database, packet,
   snapshot, cache, or projection writes occurred.
+
+### 2026-09-16 — session pause, Gate 2 in progress in the carved-out change
+
+`parent-atlas-gate2-chunk-lineage-convergence` task group 1 (snapshot re-seal) is done: a fresh,
+100% readback-clean snapshot (`sha256:e2fba635...`, 25,637/25,637 exact) replaces the prior
+one-day-stale snapshot. Task group 2 (human-authorized re-admission) is paused — operator
+authorization was requested but not yet given before the break. See that change's tasks.md
+"RESUME HERE" note under section 2 for exact resume state. Nothing else in this file's Gate 1
+closure is affected.
