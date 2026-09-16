@@ -43,8 +43,25 @@
 ## 6. AR-06 — Go Retrieval → canonical candidate adapter (SUPERSEDED_BY_EXISTING_OWNER — see
       section 18.3: `query-classifier.ts` + `retrieval-plan.ts`, live in `/api/search/hyperrag`,
       already do this)
-## 7. AR-07 — OAK evidence enrichment adapter (NOT DONE — AR-01's client exists but isn't wired
-      into any retrieval/candidate path yet)
+## 7. AR-07 — OAK evidence enrichment adapter
+
+- [x] 7.1 Built `enrichQueryClassificationWithOakV1()`:
+      `sveltekit-frontend/src/lib/server/atlas/agentic/oak-query-enrichment-v1.ts`. Takes an
+      already-computed `QueryClassificationV1` (from the live `agentic-file-compiler/
+      query-classifier.ts`), extracts distinct candidate labels from `domains`/`symbols`/
+      `targetHints` (deduped, bounded by `maxLabels`, default 8), resolves each independently via
+      AR-01's `resolveOakEvidenceV1()`. One label's failure never blocks the others (`Promise.all`
+      over independently fail-closed calls, not a single all-or-nothing request).
+      **Deliberately a standalone, additive module — not called from inside `classifyAtlasQuery`
+      itself**, per last turn's finding: that function is synchronous and live on
+      `/api/search/hyperrag/+server.ts`; forcing it async would be a breaking change to
+      production code, not something to do as a drive-by edit.
+- [x] 7.2 Unit-tested (mocked `fetch`) — 5/5 passing: resolves distinct labels independently,
+      deduplicates across domains/symbols/targetHints, respects `maxLabels`, one failure doesn't
+      block others, zero-candidate classification short-circuits without any fetch call.
+- [ ] 7.3 **NOT DONE, deliberately**: wiring this into `/api/search/hyperrag/+server.ts` itself
+      (or any other live caller). That remains the open decision flagged in section 18.3/19 —
+      the adapter is ready to be called, but nothing calls it yet.
 ## 8. AR-08 — HyperGraphRAG n-ary action expansion (NOT DONE)
 ## 9. AR-09 — CandidateFeatureMatrix action features (NOT DONE)
 ## 10. AR-10 — Tang low-rank recommendation challenger scaffold (NOT DONE)
@@ -118,23 +135,25 @@ be made deliberately, not implied.
         whether to wire `prompt-plan.ts`/`mastra-workflow-compiler.ts` to a live caller or leave
         them for a future gate. Neither decision was made or acted on this pass.
 
-## 19. NEXT STEPS (resume point — recorded 2026-09-15 ahead of a rate-limit pause)
+## 19. NEXT STEPS (resume point — updated 2026-09-15, AR-07 adapter now built)
 
-Current state in one line: **2/17 gates built and tested (AR-01, AR-03), 1 gate found already
-satisfied by existing live code (AR-06), 2 gates found partially built but dormant (AR-13, AR-17),
-12 gates genuinely untouched (AR-02, AR-04, AR-05, AR-08, AR-09, AR-10, AR-11, AR-12, AR-14, AR-15,
-AR-16, plus the AR-07 integration decision).** Everything below is a real open decision, not
+Current state in one line: **3/17 gates built and tested (AR-01, AR-03, AR-07's adapter), 1 gate
+found already satisfied by existing live code (AR-06), 2 gates found partially built but dormant
+(AR-13, AR-17), 11 gates genuinely untouched (AR-02, AR-04, AR-05, AR-08, AR-09, AR-10, AR-11,
+AR-12, AR-14, AR-15, AR-16), plus 2 live-wiring decisions still open (AR-07's own adapter→route
+wiring, and AR-13/17's dormant-code→route wiring).** Everything below is a real open decision, not
 implied — pick up by asking the operator which to do first, don't guess.
 
-**Two concrete follow-on options identified but NOT started (from section 18.3):**
-1. Wire AR-07 (OAK evidence enrichment) as a NEW async step placed AFTER `classifyAtlasQuery`
-   returns (never inside it — `classifyAtlasQuery` must stay synchronous, it's live on
-   `/api/search/hyperrag/+server.ts`). Would call
-   `resolveOakEvidenceV1()`/`resolveOakAncestorsV1()` (already built, AR-01,
-   `sveltekit-frontend/src/lib/server/atlas/agentic/oak-resolution-evidence-client.ts`) on the
-   classified query's `domains`/`targetHints`/`symbols`, producing `OakResolutionEvidenceV1`
-   records the hyperrag route could optionally attach to its response — additive, not a
-   replacement for the existing 4-keyword `domains` regex.
+**AR-07 status update: the adapter itself is now built and tested** (task 7.1/7.2,
+`oak-query-enrichment-v1.ts`, 5/5 tests). What remains open is only the wiring decision:
+1. Wire it into `/api/search/hyperrag/+server.ts` as a call AFTER `classifyAtlasQuery` returns
+   (never inside it — that function must stay synchronous, it's live production code). Would call
+   the now-built `enrichQueryClassificationWithOakV1()`
+   (`sveltekit-frontend/src/lib/server/atlas/agentic/oak-query-enrichment-v1.ts`) on the
+   classified query, producing `OakResolutionEvidenceV1[]` the route could optionally attach to
+   its response — additive, not a replacement for the existing 4-keyword `domains` regex. Not
+   done yet because touching a live production route's response shape needs explicit
+   authorization, not a same-pass drive-by edit.
 2. Decide whether to wire `prompt-plan.ts` + `mastra-workflow-compiler.ts` (AR-13/AR-17, built,
    tested, zero live callers) to an actual HTTP entry point, or leave them dormant until a
    specific caller needs them. This is an architecture decision for the operator, not something
