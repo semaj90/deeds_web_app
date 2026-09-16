@@ -1,7 +1,7 @@
 {
   "schema": "atlas.current-structural-edge-resolution.v1",
   "mode": "READ_ONLY_PLAN",
-  "generatedAt": "2026-09-09T01:51:34.692Z",
+  "generatedAt": "2026-09-14T16:33:08.015Z",
   "writes": {
     "postgres": false,
     "qdrant": false,
@@ -10,63 +10,37 @@
     "graphArtifacts": false
   },
   "canonicalAuthority": false,
-  "inputWorkspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
-  "totalUnresolvedEdges": 10506,
+  "inputWorkspaceRevision": "sha256:f476b4a6aac2afcafe0f82c7b0e48d52951ccbce73fca52b9706b1f1fbfabefb",
+  "totalUnresolvedEdges": 0,
   "syntaxOnly": {
-    "total": 776,
-    "sampled": 776,
-    "counts": {
-      "NODE_BUILTIN": 106,
-      "REPO_RESOLVABLE": 75,
-      "RESOLVED_INTERNAL": 468,
-      "EXTERNAL_MODULE": 87,
-      "UNKNOWN_SPECIFIER": 40
-    },
-    "siblingResolvedCount": 154
+    "total": 0,
+    "sampled": 0,
+    "counts": {},
+    "siblingResolvedCount": 0
   },
   "unresolvedTarget": {
-    "total": 9730,
-    "sampled": 210,
-    "sampleIsPartial": true,
-    "requestCount": 1,
-    "lspRequestCount": 1,
-    "requestRate": 0.004761904761904762,
+    "total": 0,
+    "sampled": 0,
+    "sampleIsPartial": false,
+    "requestCount": 0,
+    "lspRequestCount": 0,
+    "requestRate": null,
     "concurrency": 4,
     "timeoutMs": 5000,
-    "durationMs": 1047,
-    "avgMsPerRequest": 1047,
-    "lspWallTimeMs": 1047,
-    "lspMeanMs": 1031,
-    "lspP50Ms": 1031,
-    "lspP95Ms": 1031,
-    "lspMaxMs": 1031,
+    "durationMs": 0,
+    "avgMsPerRequest": null,
+    "lspWallTimeMs": 0,
+    "lspMeanMs": null,
+    "lspP50Ms": null,
+    "lspP95Ms": null,
+    "lspMaxMs": null,
     "errors": 0,
     "timeouts": 0,
-    "counts": {
-      "NODE_BUILTIN": 159,
-      "MEMBER_CALL_UNRESOLVED": 50,
-      "RESOLVED_IN_REPO": 1
-    },
-    "dimensions": {
-      "NODE_BUILTIN|javascript|REFERENCES": 110,
-      "MEMBER_CALL_UNRESOLVED|javascript|CALLS": 50,
-      "NODE_BUILTIN|javascript|CALLS": 49,
-      "RESOLVED_IN_REPO|javascript|CALLS": 1
-    },
+    "counts": {},
+    "dimensions": {},
     "diagnosticSamples": [],
-    "positionConfidenceCounts": {
-      "POSITION_UNIQUE": 13,
-      "POSITION_SHARED_WITH_2_SIBLINGS": 30,
-      "POSITION_SHARED_WITH_5_SIBLINGS": 6,
-      "POSITION_SHARED_WITH_1_SIBLINGS": 32,
-      "POSITION_SHARED_WITH_3_SIBLINGS": 12,
-      "POSITION_SHARED_WITH_4_SIBLINGS": 30,
-      "POSITION_SHARED_WITH_9_SIBLINGS": 20,
-      "POSITION_SHARED_WITH_11_SIBLINGS": 24,
-      "POSITION_SHARED_WITH_6_SIBLINGS": 34,
-      "POSITION_SHARED_WITH_8_SIBLINGS": 9
-    },
-    "uniquePositionResolvedCount": 11,
-    "sharedPositionResolvedCount": 149
+    "positionConfidenceCounts": {},
+    "uniquePositionResolvedCount": 0,
+    "sharedPositionResolvedCount": 0
   }
 }

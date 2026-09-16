@@ -1,0 +1,33 @@
+{
+  "schema": "atlas.workspace-revision-tournament-source-authority.v1",
+  "generatedAt": "2026-09-15T00:58:01.592Z",
+  "mode": "READ_ONLY_PREAUTHORITY_PREFLIGHT",
+  "status": "CANDIDATE_READY_FOR_EXPLICIT_TOURNAMENT_ADMISSION",
+  "proofLevel": "CONTRACT_PROVEN",
+  "authority": false,
+  "workspaceRevision": null,
+  "workspaceRevisionCandidate": "sha256:0cfd3f610cec5cded5228eb1fa676377cd88d2f2dbfccd8e264551f0a9fc0637",
+  "approvalRequired": true,
+  "autoApply": false,
+  "training": false,
+  "writesPerformed": false,
+  "datastoreWritesPerformed": false,
+  "planPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\graphify-source-selection-plan-v1.json",
+  "derivationPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\workspace-revision-from-sealed-multi-repo-snapshot-recheck-v2.json",
+  "manifestPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\workspace-source-snapshots\\1e33de94123d0f2475b98e75b218033eb310622c5a6cef616c361a7dabebbd52.json",
+  "sourceCount": 25542,
+  "sourceSelectionChecksum": "sha256:dccaf9f6e84b1d3b1c49f2b6f110b9b9946b895703ac0987cbb70a3608223efb",
+  "snapshotRevision": "sha256:1e33de94123d0f2475b98e75b218033eb310622c5a6cef616c361a7dabebbd52",
+  "snapshotMembershipChecksum": "sha256:dccaf9f6e84b1d3b1c49f2b6f110b9b9946b895703ac0987cbb70a3608223efb",
+  "checks": {
+    "derivationReady": true,
+    "snapshotReadback": true,
+    "candidateIsDerived": true,
+    "derivationMatchesSnapshot": true,
+    "authorityStillFalse": true,
+    "revisionStillNull": true
+  },
+  "firstBlockingInvariant": null,
+  "nextGate": "EXPLICIT-WORKSPACE-REVISION-TOURNAMENT-ADMISSION-01",
+  "safeNextCommand": "npm run atlas:graphify:tournament-admission:audit"
+}

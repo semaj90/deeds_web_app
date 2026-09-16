@@ -204,6 +204,72 @@ describe('ACE cache keys', () => {
       .toThrow('ACE_EXACT_CACHE_NOT_ADMISSIBLE:MISSING_CHAT_TEMPLATE_REVISION');
   });
 
+  it('fixture-proves complete identity reuse and invalidation across every output-affecting field', () => {
+    const base = {
+      contextManifestV2: {
+        schema: 'atlas.context-manifest.v2',
+        identityChecksum: 'a'.repeat(64),
+        identityInput: {
+          evidenceRevisions: {
+            sourceRevision: 'source:r1',
+            representationRevision: 'representation:r1',
+            featureRevision: 'feature:r1',
+            ontologyRevision: 'ontology:r1',
+            modelRevision: 'model:r1',
+            promptTemplateRevision: 'prompt:r1',
+          },
+        },
+      },
+      userQueryHash: 'query:r1',
+      modelRevision: 'model:r1',
+      chatTemplateRevision: 'chat:r1',
+      toolSchemaRevision: 'tools:r1',
+      promptTemplateRevision: 'prompt:r1',
+      renderedRequestChecksum: 'rendered:r1',
+      generationControlsSignature: 'controls:r1',
+    };
+
+    const cache = new Map<string, string>();
+    const first = buildAceRevisionedExactAnswerCacheKeyV1(base);
+    cache.set(first, 'fixture-answer');
+    expect(cache.get(buildAceRevisionedExactAnswerCacheKeyV1(base))).toBe('fixture-answer');
+
+    const changedManifestModel = structuredClone(base.contextManifestV2) as typeof base.contextManifestV2;
+    changedManifestModel.identityChecksum = 'c'.repeat(64);
+    changedManifestModel.identityInput.evidenceRevisions.modelRevision = 'model:r2';
+    const changedManifestPrompt = structuredClone(base.contextManifestV2) as typeof base.contextManifestV2;
+    changedManifestPrompt.identityChecksum = 'd'.repeat(64);
+    changedManifestPrompt.identityInput.evidenceRevisions.promptTemplateRevision = 'prompt:r2';
+
+    const changedInputs = [
+      { userQueryHash: 'query:r2' },
+      { chatTemplateRevision: 'chat:r2' },
+      { toolSchemaRevision: 'tools:r2' },
+      { renderedRequestChecksum: 'rendered:r2' },
+      { generationControlsSignature: 'controls:r2' },
+      { contextManifestV2: { ...base.contextManifestV2, identityChecksum: 'b'.repeat(64) } },
+      { contextManifestV2: changedManifestModel, modelRevision: 'model:r2' },
+      { contextManifestV2: changedManifestPrompt, promptTemplateRevision: 'prompt:r2' },
+    ];
+
+    for (const change of changedInputs) {
+      const changed = buildAceRevisionedExactAnswerCacheKeyV1({ ...base, ...change });
+      expect(changed).not.toBe(first);
+      expect(cache.get(changed)).toBeUndefined();
+    }
+
+    const missingManifestRevisions = [
+      'sourceRevision', 'representationRevision', 'featureRevision',
+      'ontologyRevision', 'modelRevision', 'promptTemplateRevision',
+    ] as const;
+    for (const field of missingManifestRevisions) {
+      const manifest = structuredClone(base.contextManifestV2) as typeof base.contextManifestV2;
+      delete (manifest.identityInput.evidenceRevisions as Record<string, unknown>)[field];
+      expect(assessAceExactAnswerCacheAdmissionV1({ ...base, contextManifestV2: manifest }))
+        .toMatchObject({ admitted: false });
+    }
+  });
+
   it('binds an opted-in prompt key to ContextPrefixIdentityV1', () => {
     const identity = buildContextPrefixIdentityV1({
       modelRevision: 'model:r1',

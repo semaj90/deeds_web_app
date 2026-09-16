@@ -11,12 +11,17 @@ import { validateSnapshot } from './lib/workspace-snapshot-capture-v1.mts';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const PLAN = resolve(ROOT, 'docs/reports/graphify-source-selection-plan-v1.json');
-const DERIVATION = resolve(ROOT, 'docs/reports/workspace-revision-from-sealed-multi-repo-snapshot-v1.json');
-const REPORT = resolve(ROOT, 'docs/reports/workspace-revision-tournament-source-authority-v1.json');
+const argValue = (name: string) => process.argv.slice(2).find((value) => value.startsWith(`${name}=`))?.slice(name.length + 1);
+const DERIVATION = resolve(ROOT, argValue('--derivation') ?? 'docs/reports/workspace-revision-from-sealed-multi-repo-snapshot-v1.json');
+const reportArg = argValue('--report');
+const REPORT = resolve(ROOT, reportArg ?? 'docs/reports/workspace-revision-tournament-source-authority-v1.json');
 const plan = JSON.parse(await readFile(PLAN, 'utf8'));
 const derivation = JSON.parse(await readFile(DERIVATION, 'utf8'));
 const snapshot = JSON.parse(await readFile(derivation.snapshotPath, 'utf8'));
-const readback = validateSnapshot(snapshot);
+const readbackPath = argValue('--readback');
+const readback = readbackPath
+  ? JSON.parse(await readFile(resolve(ROOT, readbackPath), 'utf8'))
+  : validateSnapshot(snapshot);
 const candidate = derivation.workspaceRevisionCandidate ?? null;
 const checks = {
   derivationReady: derivation.status === 'WORKSPACE_REVISION_CANDIDATE_READY_FOR_ADMISSION',

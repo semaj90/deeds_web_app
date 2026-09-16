@@ -1,0 +1,40 @@
+{
+  "schema": "atlas.graphify-symbol-extractor-receipt.v1",
+  "generatedAt": "2026-09-13T00:55:14.343Z",
+  "apply": true,
+  "useLsp": false,
+  "limit": 50,
+  "workspaceIdFilter": null,
+  "candidatesConsidered": 3,
+  "skippedUnsupported": 0,
+  "byFileKind": {
+    "ts_js": 3
+  },
+  "filesProcessed": 3,
+  "filesFailed": 0,
+  "totalSymbolsExtracted": 24,
+  "totalSymbolsInserted": 24,
+  "plan": [
+    {
+      "fileId": "c51e27f2-32fc-47d3-8db4-08fe7b9b9089",
+      "sourceRef": "scripts/atlas/append-dir-agents-llms.mjs",
+      "fileKind": "ts_js",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 12
+    },
+    {
+      "fileId": "59e8b7ee-fd24-4ea3-b01d-38c34efc4059",
+      "sourceRef": "scripts/atlas/audit-som-canonical-location.mjs",
+      "fileKind": "ts_js",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 8
+    },
+    {
+      "fileId": "c0fa0ed4-55b4-470a-8979-01bf5319d2d7",
+      "sourceRef": "scripts/atlas/audit-supersedes-packet-aware.mjs",
+      "fileKind": "ts_js",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 4
+    }
+  ]
+}

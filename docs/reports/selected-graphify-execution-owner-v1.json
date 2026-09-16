@@ -1,0 +1,25 @@
+{
+  "schema": "atlas.selected-graphify-execution-owner.v1",
+  "gate": "GRAPHIFY-EXECUTION-SNAPSHOT-OWNER-02",
+  "mode": "READ_ONLY_OWNER_DECISION_PREFLIGHT",
+  "selectedExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+  "sourcePlan": "docs/reports/current-graphify-execution-owner-resolution-v1.json",
+  "ownerPlanChecksum": "sha256:0e35649a1371a3996dc20f6306ae76c5dcf62377216f698380740768650589b1",
+  "candidateFound": true,
+  "candidate": {
+    "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+    "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "sourceCount": 25542,
+    "sourceMembershipExact": true,
+    "signature": null
+  },
+  "status": "OWNER_SELECTION_VALIDATED_NOT_APPLIED",
+  "rejectionReason": null,
+  "requiresExplicitAuthorityDecision": true,
+  "canonicalAuthority": false,
+  "safeToApply": false,
+  "writesPerformed": false,
+  "decisionChecksum": "sha256:831595904e846bebb27235aca9e1ff500a7557aa494882ecf8385ac20f8c16c4",
+  "nextGate": "EXPLICIT_AUTHORITY_DECISION_AND_OWNER_READBACK",
+  "reportPath": "docs/reports/selected-graphify-execution-owner-v1.json"
+}

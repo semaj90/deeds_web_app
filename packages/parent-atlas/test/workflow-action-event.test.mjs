@@ -11,6 +11,7 @@ const completed = {
   schema: 'atlas.workflow-action.v1',
   workflowId: 'workflow:graphify:742',
   workflowRevision: 742,
+  runId: 'run:graphify:742',
   sequence: 17,
   actionId: 'action:materialize-symbols',
   dagNodeId: 'dag:structural-materializer',

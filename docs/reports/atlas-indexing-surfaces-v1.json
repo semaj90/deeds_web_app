@@ -1,6 +1,6 @@
 {
   "schema": "atlas.indexing-surfaces.v1",
-  "generatedAt": "2026-09-09T23:07:33.577Z",
+  "generatedAt": "2026-09-16T01:28:49.322Z",
   "readOnly": true,
   "canonicalAuthority": "postgres",
   "ast": {
@@ -52,23 +52,23 @@
       },
       "codebase_chunk_index": {
         "exists": true,
-        "count": 55853
+        "count": 274465
       },
       "atlas_packet_features": {
         "exists": true,
-        "count": 61660
+        "count": 61718
       },
       "atlas_ast_nodes": {
         "exists": true,
-        "count": 11067
+        "count": 11223
       },
       "atlas_symbol_registry": {
         "exists": true,
-        "count": 10310
+        "count": 10504
       },
       "atlas_symbol_versions": {
         "exists": true,
-        "count": 285
+        "count": 479
       },
       "atlas_structural_reference_resolutions": {
         "exists": true,
@@ -306,7 +306,20 @@
         "reconstruction_error",
         "routing_tier",
         "latent_256",
-        "latent_256_checkpoint_revision"
+        "latent_256_checkpoint_revision",
+        "error_embedding_latent_256",
+        "error_embedding_latent_256_checkpoint_revision",
+        "error_embedding_latent_64",
+        "error_embedding_latent64_model",
+        "error_embedding_latent_valid",
+        "error_embedding_latent_validated_at",
+        "latent_128",
+        "error_embedding_latent_128",
+        "file_content_hash",
+        "content_hash_scope",
+        "content_hash_algorithm",
+        "content_hash_length",
+        "content_hash_version"
       ],
       "atlas_packet_features": [
         "id",
@@ -448,11 +461,11 @@
       },
       "codebaseChunkSearchVectors": {
         "exists": true,
-        "count": 55853
+        "count": 274465
       },
       "codebaseChunkQdrantIds": {
         "exists": true,
-        "count": 55853
+        "count": 274465
       },
       "codebaseChunk_content_embedding": {
         "exists": true,
@@ -460,7 +473,7 @@
       },
       "codebaseChunk_content_embedding_768": {
         "exists": true,
-        "count": 1386
+        "count": 219998
       },
       "codebaseChunk_summary_embedding": {
         "exists": true,
@@ -468,15 +481,15 @@
       },
       "codebaseChunk_signature_embedding": {
         "exists": true,
-        "count": 533
+        "count": 553
       },
       "codebaseChunk_search_vector": {
         "exists": true,
-        "count": 55853
+        "count": 274465
       },
       "packetAstSymbols": {
         "exists": true,
-        "count": 12497
+        "count": 38302
       },
       "atlasPacketsSemantic768": {
         "exists": true,
@@ -484,11 +497,11 @@
       },
       "astNodesWithSymbols": {
         "exists": true,
-        "count": 11067
+        "count": 11223
       },
       "symbolRegistryActive": {
         "exists": true,
-        "count": 10260
+        "count": 10454
       }
     },
     "bitmapTables": [],
@@ -800,8 +813,38 @@
       },
       {
         "table": "atlas_packet_features",
+        "name": "idx_atlas_packet_features_ast_symbols_gin",
+        "definition": "CREATE INDEX idx_atlas_packet_features_ast_symbols_gin ON public.atlas_packet_features USING gin (ast_symbols)"
+      },
+      {
+        "table": "atlas_packet_features",
         "name": "idx_atlas_packet_features_concepts_gin",
         "definition": "CREATE INDEX idx_atlas_packet_features_concepts_gin ON public.atlas_packet_features USING gin (used_concepts)"
+      },
+      {
+        "table": "atlas_packet_features",
+        "name": "idx_atlas_packet_features_entities_gin",
+        "definition": "CREATE INDEX idx_atlas_packet_features_entities_gin ON public.atlas_packet_features USING gin (entities)"
+      },
+      {
+        "table": "atlas_packet_features",
+        "name": "idx_atlas_packet_features_exports_gin",
+        "definition": "CREATE INDEX idx_atlas_packet_features_exports_gin ON public.atlas_packet_features USING gin (exports)"
+      },
+      {
+        "table": "atlas_packet_features",
+        "name": "idx_atlas_packet_features_imports_gin",
+        "definition": "CREATE INDEX idx_atlas_packet_features_imports_gin ON public.atlas_packet_features USING gin (imports)"
+      },
+      {
+        "table": "atlas_packet_features",
+        "name": "idx_atlas_packet_features_lexical_features_gin",
+        "definition": "CREATE INDEX idx_atlas_packet_features_lexical_features_gin ON public.atlas_packet_features USING gin (lexical_features)"
+      },
+      {
+        "table": "atlas_packet_features",
+        "name": "idx_atlas_packet_features_tree_node_ids_gin",
+        "definition": "CREATE INDEX idx_atlas_packet_features_tree_node_ids_gin ON public.atlas_packet_features USING gin (tree_node_ids)"
       },
       {
         "table": "atlas_packet_metrics",
@@ -959,6 +1002,11 @@
         "definition": "CREATE INDEX atlas_relationships_metadata_gin_idx ON public.atlas_relationships USING gin (metadata jsonb_path_ops)"
       },
       {
+        "table": "atlas_representation_providers",
+        "name": "atlas_representation_provider_representation_id_runtime_eng_key",
+        "definition": "CREATE UNIQUE INDEX atlas_representation_provider_representation_id_runtime_eng_key ON public.atlas_representation_providers USING btree (representation_id, runtime_engine, endpoint_url, api_dialect)"
+      },
+      {
         "table": "atlas_retrieval_eval_times",
         "name": "idx_eval_times_payload_gin",
         "definition": "CREATE INDEX idx_eval_times_payload_gin ON public.atlas_retrieval_eval_times USING gin (payload jsonb_path_ops)"
@@ -1090,13 +1138,33 @@
       },
       {
         "table": "codebase_chunk_index",
+        "name": "idx_codebase_chunk_error_embedding_latent64_hnsw",
+        "definition": "CREATE INDEX idx_codebase_chunk_error_embedding_latent64_hnsw ON public.codebase_chunk_index USING hnsw (error_embedding_latent_64 vector_cosine_ops) WHERE (error_embedding_latent_64 IS NOT NULL)"
+      },
+      {
+        "table": "codebase_chunk_index",
+        "name": "idx_codebase_chunk_error_embedding_latent_128_hnsw",
+        "definition": "CREATE INDEX idx_codebase_chunk_error_embedding_latent_128_hnsw ON public.codebase_chunk_index USING hnsw (error_embedding_latent_128 halfvec_cosine_ops) WHERE (error_embedding_latent_128 IS NOT NULL)"
+      },
+      {
+        "table": "codebase_chunk_index",
+        "name": "idx_codebase_chunk_error_embedding_latent_256_hnsw",
+        "definition": "CREATE INDEX idx_codebase_chunk_error_embedding_latent_256_hnsw ON public.codebase_chunk_index USING hnsw (error_embedding_latent_256 halfvec_cosine_ops) WHERE (error_embedding_latent_256 IS NOT NULL)"
+      },
+      {
+        "table": "codebase_chunk_index",
         "name": "idx_codebase_chunk_index_error_embedding_hnsw",
-        "definition": "CREATE INDEX idx_codebase_chunk_index_error_embedding_hnsw ON public.codebase_chunk_index USING hnsw (error_embedding vector_cosine_ops) WITH (m='16', ef_construction='64')"
+        "definition": "CREATE INDEX idx_codebase_chunk_index_error_embedding_hnsw ON public.codebase_chunk_index USING hnsw (error_embedding halfvec_cosine_ops) WITH (m='16', ef_construction='64')"
       },
       {
         "table": "codebase_chunk_index",
         "name": "idx_codebase_chunk_latent64_hnsw",
         "definition": "CREATE INDEX idx_codebase_chunk_latent64_hnsw ON public.codebase_chunk_index USING hnsw (latent_64 vector_cosine_ops) WHERE (latent_64 IS NOT NULL)"
+      },
+      {
+        "table": "codebase_chunk_index",
+        "name": "idx_codebase_chunk_latent_128_hnsw",
+        "definition": "CREATE INDEX idx_codebase_chunk_latent_128_hnsw ON public.codebase_chunk_index USING hnsw (latent_128 halfvec_cosine_ops) WHERE (latent_128 IS NOT NULL)"
       },
       {
         "table": "codebase_chunk_index",
@@ -1484,6 +1552,21 @@
         "definition": "CREATE INDEX rg_hits_scores_gin ON public.rg_search_hits USING gin (scores)"
       },
       {
+        "table": "route_health_event",
+        "name": "idx_route_health_event_metadata",
+        "definition": "CREATE INDEX idx_route_health_event_metadata ON public.route_health_event USING gin (metadata)"
+      },
+      {
+        "table": "route_metadata",
+        "name": "idx_route_metadata_metadata",
+        "definition": "CREATE INDEX idx_route_metadata_metadata ON public.route_metadata USING gin (metadata)"
+      },
+      {
+        "table": "route_metadata",
+        "name": "idx_route_metadata_tags",
+        "definition": "CREATE INDEX idx_route_metadata_tags ON public.route_metadata USING gin (tags)"
+      },
+      {
         "table": "route_runtime_packets",
         "name": "idx_route_runtime_packets_metadata_gin",
         "definition": "CREATE INDEX idx_route_runtime_packets_metadata_gin ON public.route_runtime_packets USING gin (metadata)"
@@ -1737,7 +1820,7 @@
           "size": 512,
           "distance": "Cosine"
         },
-        "points": 53379,
+        "points": 53380,
         "indexedVectors": 50149,
         "status": "green"
       },
@@ -1757,9 +1840,9 @@
             "distance": "Cosine"
           }
         },
-        "points": 109776,
-        "indexedVectors": 114569,
-        "status": "green"
+        "points": 328348,
+        "indexedVectors": 325059,
+        "status": "grey"
       },
       {
         "name": "codebase_chunks_768_v2",
@@ -1878,6 +1961,36 @@
           }
         },
         "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "error_embedding_mrl_128",
+        "vectors": {
+          "size": 128,
+          "distance": "Cosine"
+        },
+        "points": 20,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "error_embedding_mrl_256",
+        "vectors": {
+          "size": 256,
+          "distance": "Cosine"
+        },
+        "points": 20,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "error_embedding_mrl_512",
+        "vectors": {
+          "size": 512,
+          "distance": "Cosine"
+        },
+        "points": 20,
         "indexedVectors": 0,
         "status": "green"
       },
@@ -2143,8 +2256,8 @@
   },
   "drizzle": {
     "journalEntries": 41,
-    "manualSqlFiles": 284,
-    "declaredSidecars": 61,
+    "manualSqlFiles": 296,
+    "declaredSidecars": 64,
     "untrackedManualFiles": [
       "0009_hybrid_graph_indexes.sql",
       "0010_distilled_table_store.sql",
@@ -2214,16 +2327,8 @@
       "severity": "high",
       "message": "The canonical semantic_768 column is only partially populated; the active halfvec(768) lane must not be promoted as a substitute without a representation receipt.",
       "evidence": [
-        "55169/55853",
+        "55169/274465",
         "codebase_chunk_index.content_embedding"
-      ]
-    },
-    {
-      "id": "PACKET_AST_SYMBOL_COVERAGE_LOW",
-      "severity": "medium",
-      "message": "Fewer than half of atlas_packet_features rows have AST symbols.",
-      "evidence": [
-        "12497/61660"
       ]
     },
     {

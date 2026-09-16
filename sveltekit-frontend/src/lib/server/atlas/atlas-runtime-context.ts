@@ -86,6 +86,8 @@ export function createAtlasRuntimeContext(init: {
   resourceId: string;
   workspaceId: string;
   packetKey: string;
+  workspaceRevision?: string;
+  packetRevision?: string;
   initialState?: AtlasState;
   tokenBudget?: number;
 }): AtlasRuntimeContext {
@@ -94,9 +96,11 @@ export function createAtlasRuntimeContext(init: {
     threadId: init.threadId,
     resourceId: init.resourceId,
     workspaceId: init.workspaceId,
-    workspaceRevision: new Date().toISOString(),
+    // Legacy callers may omit revisions, but that path is diagnostic only. Promotion
+    // boundaries must supply caller-owned revision evidence explicitly.
+    workspaceRevision: init.workspaceRevision ?? new Date().toISOString(),
     packetKey: init.packetKey,
-    packetRevision: new Date().toISOString(),
+    packetRevision: init.packetRevision ?? new Date().toISOString(),
     state: init.initialState ?? AtlasState.DISCOVER,
     confidence: 0.5,
     tokenBudget: {

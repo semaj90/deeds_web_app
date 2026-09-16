@@ -1,0 +1,30 @@
+{
+  "schema": "atlas.unified-residency-vram-proof.v1",
+  "status": "BOUNDED_CUDA_CEILING_EVICTION_PROVEN",
+  "environment": {
+    "host": "WSL2 Ubuntu",
+    "pythonEnvironment": "/home/james/.venvs/atlas-cutile-cu132",
+    "gpu": "NVIDIA GeForce RTX 3060 Ti",
+    "device": "cuda"
+  },
+  "fixture": {
+    "tileShape": [512, 512],
+    "dtype": "float32",
+    "tileBytes": 1048576,
+    "tileCountAdmitted": 8,
+    "logicalCeilingBytes": 4194304,
+    "maximumResidentTiles": 4
+  },
+  "ceilingEnforced": true,
+  "observedPhysicalPeakDeltaBytes": 8388608,
+  "physicalPeakBoundBytes": 8388608,
+  "physicalPeakBoundFactor": 2,
+  "logicalAndPhysicalAccountingSeparated": true,
+  "oldestTileEvicted": true,
+  "newestTileResident": true,
+  "evictedTileReloaded": true,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "promotionEligible": false,
+  "openGates": ["productionVRAMPolicy", "physicalProviderHandoff", "sameCorpusReplay"]
+}

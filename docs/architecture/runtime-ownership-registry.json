@@ -57,7 +57,7 @@
         },
         {
           "path": "atlas_graph_authority_runs_v2 / atlas_graph_authority_scores_v2 (Postgres tables)",
-          "classification": "UNCLASSIFIED",
+          "classification": "EXPERIMENT",
           "evidence": "CORRECTED 2026-08-29 (two passes, see openspec/changes/parent-atlas-graph-analysis-contract/tasks.md for full detail): the FIXTURE_ONLY claim below is wrong — this is a real promoted run (engine=networkx, algorithm_version=stage5-simple-pagerank-v1, status=PASSED, 162234 nodes/108156 edges, topology_hash matching the Aug-12 cuGraph/NetworkX parity graphRevision dff9006f...), written by a real script (stage5-pagerank-authority-validated.mjs), not stdout-only. BUT: live cross-check (DuckDB join of this table's pagerank_raw against the Aug-12 oracle's cugraph-scores.ndjson via nodes.parquet, 162234/162234 rows matched) found top-50 rank overlap = 0 despite pearson_corr≈1 (the correlation is an artifact of a hugely fragmented graph — 54,078 components on 162,234 nodes — dominated by a long near-identical tail; it does not mean the two computations agree at the ranked head, which is what an authority signal actually uses). _v2's algorithm ran only 10 iterations vs the oracle's 100/tol=1e-8, same damping=0.85 — the likely but unconfirmed cause. Do NOT treat _v2 as validated/equivalent to the oracle. Also has the known double 'packet:packet:' node_key prefix bug (writer fixed 2026-08-24, existing rows not backfilled). Neither _v2 nor non-v2 atlas_graph_authority_scores is currently trustworthy as canonical; the only cross-validated PageRank result for this graph revision is the unpromoted Aug-12 oracle NDJSON output itself."
         },
         {
@@ -242,7 +242,7 @@
       "known_existing_duplication": [
         {
           "path": "atlas_symbol_registry.stable_symbol_id (Postgres table)",
-          "classification": "UNCLASSIFIED",
+          "classification": "EXPERIMENT",
           "evidence": "Real, populated (10,310 rows, confirmed live via docker exec psql). Format stable-symbol:<sha256hex-64chars>, produced by scripts/atlas/promote-ast-symbols-to-registry.mjs::stableSymbolIdFor(canonicalKey). Has real FK-referencing tables (atlas_symbol_aliases, atlas_symbol_versions, atlas_structural_reference_resolutions). Best candidate for canonical owner by population/usage, but not confirmed to be what any live graph-node writer actually keys against."
         },
         {
@@ -257,7 +257,7 @@
         },
         {
           "path": "sveltekit-frontend/src/lib/server/atlas/graph/graph-snapshot-materializer.ts (symbol-type node writer, ~line 322)",
-          "classification": "CANONICAL_OWNER",
+          "classification": "COMPATIBILITY",
           "evidence": "The ACTUAL live writer of node_type='symbol' rows into atlas_graph_nodes_v2 (confirmed by reading the file directly). Keys every symbol node tree:<treeNodeId>, sourced from tree-sitter parse output, gated by classifyCanonicalGraphEligibility()'s real provenance checks (extractionMethod==='tree_sitter', structuralTruth===true, rejects the known 146,655-row heuristic batch-a-structural-materializer producer). This format matches NONE of the three entries above. Marked CANONICAL_OWNER here because it is the confirmed live write path for this table/nodeType, not because the identity SCHEME itself has been endorsed as canonical over the registry's stable_symbol_id -- that cross-scheme reconciliation is exactly the open question this entry exists to flag."
         }
       ]
@@ -288,6 +288,7 @@
       ]
     },
     "tensorrt_rtx_decoder_challenger": {
+      "required_for_current_stack": false,
       "owner": {
         "classification": "OPTIONAL_CHALLENGER_NOT_WIRED",
         "path": "simd-bridge/cpp/tensor_bridge.cc",

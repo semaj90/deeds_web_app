@@ -31,7 +31,7 @@
  */
 import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, renameSync, unlinkSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { REPO_ROOT } from './connection-config.mjs';
 
@@ -127,7 +127,22 @@ function main() {
 
   const staleSourceCount = sourceRevisionResults.filter((r) => r.verdict === 'SOURCE_REVISION_STALE').length;
   const missingSourceCount = sourceRevisionResults.filter((r) => r.verdict === 'SOURCE_FILE_MISSING').length;
-  const allCurrent = staleSourceCount === 0 && missingSourceCount === 0;
+  const spanMismatchCount = spanResults.filter((r) => r.verdict === 'SPAN_TEXT_MISMATCH' || r.verdict === 'SPAN_OUT_OF_BOUNDS').length;
+  const extractionFailures = Array.isArray(input.extractionFailures) ? input.extractionFailures.length : 0;
+  const extractionCounts = input.extractionCounts ?? {};
+  const extractionIncomplete = input.extractionStatus === 'FRESH_ONTOLOGY_EXTRACTION_INCOMPLETE'
+    || extractionFailures > 0
+    || (Number.isInteger(extractionCounts.approvedSources)
+      && Number.isInteger(extractionCounts.extractedSources)
+      && extractionCounts.approvedSources !== extractionCounts.extractedSources);
+  const allCurrent = staleSourceCount === 0 && missingSourceCount === 0 && !extractionIncomplete;
+  const status = extractionIncomplete
+    ? 'FRESH_EXTRACTION_INCOMPLETE'
+    : !allCurrent
+      ? 'SOURCE_REVISION_DRIFT_DETECTED'
+      : spanMismatchCount > 0
+        ? 'SPAN_VALIDATION_REVIEW_REQUIRED'
+        : 'ALL_SOURCE_REVISIONS_CURRENT';
 
   const report = {
     schema: 'atlas.feature-ontology-source-span-revision.v1',
@@ -147,16 +162,29 @@ function main() {
     sourceRevisionResults,
     sourceRevisionVerdictCounts: verdictCounts(sourceRevisionResults),
     spanVerdictCounts: verdictCounts(spanResults),
+    extractionIncomplete,
+    extractionFailureCount: extractionFailures,
+    spanMismatchCount,
     allSourcesCurrent: allCurrent,
-    status: allCurrent ? 'ALL_SOURCE_REVISIONS_CURRENT' : 'SOURCE_REVISION_DRIFT_DETECTED',
-    nextGate: allCurrent
-      ? 'HUMAN_REVIEW_AND_GROUNDED_SEMANTIC_VALIDATION_BEFORE_REL_01B'
-      : 'RE_EXTRACT_STALE_SOURCES_BEFORE_HUMAN_REVIEW',
+    status,
+    nextGate: extractionIncomplete
+      ? 'RE_EXTRACT_STALE_SOURCES_BEFORE_HUMAN_REVIEW'
+      : !allCurrent
+        ? 'RE_EXTRACT_STALE_SOURCES_BEFORE_HUMAN_REVIEW'
+        : spanMismatchCount > 0
+          ? 'REPAIR_SOURCE_SPANS_BEFORE_HUMAN_REVIEW'
+          : 'HUMAN_REVIEW_AND_GROUNDED_SEMANTIC_VALIDATION_BEFORE_REL_01B',
   };
   report.checksum = `sha256:${sha256Hex(Buffer.from(JSON.stringify(report)))}`;
 
   mkdirSync(path.dirname(REPORT_JSON), { recursive: true });
-  writeFileSync(REPORT_JSON, `${JSON.stringify(report, null, 2)}\n`);
+  const reportJsonTmp = `${REPORT_JSON}.${process.pid}.${Date.now()}.tmp`;
+  try {
+    writeFileSync(reportJsonTmp, `${JSON.stringify(report, null, 2)}\n`);
+    renameSync(reportJsonTmp, REPORT_JSON);
+  } finally {
+    try { unlinkSync(reportJsonTmp); } catch {}
+  }
 
   const md = `# REL-01A8 — Independent Source-Span/Revision Validation
 
@@ -182,7 +210,13 @@ ${Object.entries(report.spanVerdictCounts).map(([k, v]) => `- \`${k}\`: ${v}`).j
 
 ${Object.entries(report.sourceRevisionVerdictCounts).map(([k, v]) => `- \`${k}\`: ${v}`).join('\n')}
 `;
-  writeFileSync(REPORT_MD, md);
+  const reportMdTmp = `${REPORT_MD}.${process.pid}.${Date.now()}.tmp`;
+  try {
+    writeFileSync(reportMdTmp, md);
+    renameSync(reportMdTmp, REPORT_MD);
+  } finally {
+    try { unlinkSync(reportMdTmp); } catch {}
+  }
 
   console.log(JSON.stringify({
     status: report.status,

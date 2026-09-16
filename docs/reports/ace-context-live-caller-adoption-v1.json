@@ -1,6 +1,6 @@
 {
   "schema": "atlas.ace-context-live-caller-adoption.v1",
-  "generatedAt": "2026-09-05T21:26:03.258Z",
+  "generatedAt": "2026-09-15T18:20:20.469Z",
   "mode": "READ_ONLY_SOURCE_CENSUS",
   "callers": [
     {
@@ -33,6 +33,13 @@
       ]
     },
     {
+      "file": "sveltekit-frontend/src/lib/server/ai/openai-facade.ts",
+      "classification": "STRICT_V2_WIRED",
+      "matched": [
+        "ContextManifestV2"
+      ]
+    },
+    {
       "file": "sveltekit-frontend/src/lib/server/ai/packet-stream-cache.ts",
       "classification": "LEGACY_QUERY_CACHE",
       "matched": [
@@ -56,6 +63,13 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/atlas/cache/ace-bitfrost-cache-identity-v1.ts",
+      "classification": "STRICT_V2_WIRED",
+      "matched": [
+        "ContextManifestV2"
+      ]
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/classification/reduction-router-v1.ts",
       "classification": "STRICT_V2_WIRED",
       "matched": [
         "ContextManifestV2"
@@ -108,6 +122,13 @@
       "classification": "STRICT_V2_WIRED",
       "matched": [
         "aceFeatureBundleProvider"
+      ]
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/cache-keys.ts",
+      "classification": "STRICT_V2_WIRED",
+      "matched": [
+        "ContextManifestV2"
       ]
     },
     {
@@ -246,7 +267,7 @@
   "counts": {
     "LEGACY_QUERY_CACHE": 21,
     "STRICT_V2_CAPABLE": 0,
-    "STRICT_V2_WIRED": 10,
+    "STRICT_V2_WIRED": 13,
     "DIAGNOSTIC_ONLY": 2,
     "DEAD": 0
   },

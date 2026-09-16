@@ -1,0 +1,20 @@
+{
+  "schema": "atlas.graphify-symbol-extractor-receipt.v1",
+  "generatedAt": "2026-09-13T00:25:55.754Z",
+  "apply": false,
+  "limit": 5,
+  "workspaceIdFilter": null,
+  "candidatesConsidered": 5,
+  "skippedNonTsJs": 4,
+  "filesProcessed": 0,
+  "filesFailed": 0,
+  "totalSymbolsExtracted": 0,
+  "totalSymbolsInserted": null,
+  "plan": [
+    {
+      "fileId": "b40d7531-6a47-48ee-a9ba-9f19f57be421",
+      "sourceRef": "$lib/utils/file-reader.ts",
+      "outcome": "FILE_MISSING_ON_DISK"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "schema": "atlas.current-execution-workspace-bindings.v1",
+  "mode": "READ_ONLY_PLAN",
+  "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "snapshotRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+  "counts": {
+    "executionMembers": 25542,
+    "rootMembers": 24456,
+    "unresolvedOtherRepositories": 1086,
+    "existingBindings": 24456,
+    "missingSourceRefs": 0,
+    "candidateBindings": 0
+  },
+  "missingSourceRefs": [],
+  "candidateChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "candidates": [],
+  "committed": false,
+  "insertedCount": 0,
+  "readbackCount": 0,
+  "writesPerformed": false,
+  "safeToApply": false,
+  "status": "PLAN_READY"
+}

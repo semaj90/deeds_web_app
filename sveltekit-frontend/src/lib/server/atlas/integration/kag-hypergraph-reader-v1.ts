@@ -160,6 +160,14 @@ export async function readKagHypergraphNeighborsV1(
       ? `\n            AND h.workspace_revision = $2\n            AND h.graph_revision = $3`
       : '';
     const hyperedgeParams = snapshot ? [uniqueIds, snapshot.workspaceRevision, snapshot.graphRevision] : [uniqueIds];
+    // Ontology tuples currently carry provenance in JSONB rather than typed
+    // workspace/graph columns. A strict traversal must therefore require the
+    // producer to have recorded both revisions; an unqualified tuple is
+    // unavailable, never implicitly current.
+    const tupleRevisionFilter = snapshot
+      ? `\n            AND provenance->>'workspaceRevision' = $2\n            AND provenance->>'graphRevision' = $3`
+      : '';
+    const tupleParams = snapshot ? [uniqueIds, snapshot.workspaceRevision, snapshot.graphRevision] : [uniqueIds];
     const [tupleResult, memberResult] = await Promise.all([
       pool.query<OntologyLinkedTupleRow>(
         `
@@ -169,9 +177,9 @@ export async function readKagHypergraphNeighborsV1(
                  relation_revision, evidence_span, confidence, evidence_state, lifecycle,
                  provenance
           FROM atlas_ontology_linked_tuples
-          WHERE packet_key = ANY($1::text[]) OR source_ref = ANY($1::text[])
+          WHERE (packet_key = ANY($1::text[]) OR source_ref = ANY($1::text[]))${tupleRevisionFilter}
         `,
-        [uniqueIds],
+        tupleParams,
       ),
       pool.query<HyperedgeMemberRow>(
         `

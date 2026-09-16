@@ -1,0 +1,19 @@
+{
+  "schema": "atlas.trace-cuvs-cagra-fixture.v1",
+  "status": "CAGRA_PERSISTENT_FIXTURE_PROVEN",
+  "cuvsVersion": "26.06.00",
+  "rows": 64,
+  "dimensions": 768,
+  "queryCount": 4,
+  "topK": 5,
+  "repeats": 4,
+  "buildOnce": true,
+  "meanRecallAtK": 1.0,
+  "minRecallAtK": 1.0,
+  "searchP50Ms": 2.6715855001384625,
+  "searchP95Ms": 52.12744399977964,
+  "buildMsExcludedFromSearch": 2104.4454330003646,
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "scope": "bounded in-memory fixture; not a current-corpus TRACE promotion proof"
+}

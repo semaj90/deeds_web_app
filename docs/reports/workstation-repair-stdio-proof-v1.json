@@ -1,0 +1,40 @@
+{
+  "schema": "parent-atlas.workstation-repair-stdio-proof.v1",
+  "status": "PROVEN_BOUNDED_ADAPTER",
+  "adapter": "scripts/agentic/workstation-repair-stdio-v1.mjs",
+  "packageMirror": "packages/atlas-core/src/agentic/workstation-repair-stdio.ts",
+  "command": "node scripts/agentic/workstation-repair-stdio-v1.mjs",
+  "validCase": {
+    "status": "REPAIR_CANDIDATE",
+    "eventType": "agent.repair.candidate",
+    "repairCaseKey": "repair:f6fe94d74df951a5467ef4d67201786c16157cb03236878402e48fbc0df12e8f",
+    "replayChecksum": "d04355769ff69615c469744e1311682058429eaa47302d6c76ff01c7fd590bb9",
+    "canonicalAuthority": false,
+    "writesPerformed": false
+  },
+  "invalidCase": {
+    "status": "REJECTED",
+    "errorCode": "LINEAGE_REQUIRED",
+    "canonicalAuthority": false,
+    "writesPerformed": false
+  },
+  "proofScope": {
+    "deterministicRepairCaseIdentity": true,
+    "explicitWorkspaceAndSourceRevision": true,
+    "replayChecksumPresent": true,
+    "liveRepairRegistryInvocation": false,
+    "durableEventPersistence": false,
+    "opencodeExecution": false,
+    "packageIntegration": false
+  },
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "evidenceRefs": [
+    "scripts/agentic/workstation-repair-stdio-v1.mjs",
+    "packages/atlas-core/src/agentic/workstation-repair-stdio.ts",
+    "packages/atlas-core/src/agentic/workstation-repair-stdio.spec.ts",
+    "packages/atlas-core/src/index.ts",
+    ".opencode/command/atlas-repair-stdio-proof.md",
+    "openspec/changes/parent-atlas-tensor-residency-integration/tasks.md"
+  ]
+}

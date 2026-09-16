@@ -1,0 +1,116 @@
+{
+  "schema": "atlas.typescript-error-fixer-owner-audit.v1",
+  "generatedAt": "2026-09-14T23:51:59.283Z",
+  "mode": "READ_ONLY_STATIC_OWNER_CENSUS",
+  "claim": "No live TypeScript error count was executed or accepted by this audit.",
+  "surfaces": [
+    {
+      "path": "scripts/batch-fix-ts-errors.mjs",
+      "exists": true,
+      "sourceChecksum": "sha256:d71570b39b338db1d82af31c0403c0a24610cc830846d85092da16b2db07e854",
+      "mutationCapable": true,
+      "shellCapable": false,
+      "machineJsonReader": false,
+      "classification": "LEGACY_MUTATION_SURFACE",
+      "governedEventOwner": false,
+      "writesPerformed": false
+    },
+    {
+      "path": "scripts/fix-files-4-5-6-batch.mjs",
+      "exists": true,
+      "sourceChecksum": "sha256:960d3c08ab56f47b15d317906b44cf48cddcfbfec9e2d55664e2ba7e183cc97b",
+      "mutationCapable": true,
+      "shellCapable": false,
+      "machineJsonReader": false,
+      "classification": "LEGACY_MUTATION_SURFACE",
+      "governedEventOwner": false,
+      "writesPerformed": false
+    },
+    {
+      "path": "scripts/fix-files-9-11-12-batch.mjs",
+      "exists": true,
+      "sourceChecksum": "sha256:8f2a17507e96bfd1cce431947a199bcea31878924dd226e9e5daa7e7052e6eaa",
+      "mutationCapable": true,
+      "shellCapable": false,
+      "machineJsonReader": false,
+      "classification": "LEGACY_MUTATION_SURFACE",
+      "governedEventOwner": false,
+      "writesPerformed": false
+    },
+    {
+      "path": "scripts/fix-files-13-15-16-batch.mjs",
+      "exists": true,
+      "sourceChecksum": "sha256:55f26fc016e5bdf68e7ee41b3ca140f7c782ae6207465fe3b4e465cd06f66173",
+      "mutationCapable": true,
+      "shellCapable": false,
+      "machineJsonReader": false,
+      "classification": "LEGACY_MUTATION_SURFACE",
+      "governedEventOwner": false,
+      "writesPerformed": false
+    },
+    {
+      "path": "scripts/fix-files-17-19-20-batch.mjs",
+      "exists": true,
+      "sourceChecksum": "sha256:3b4b1765f557480ab73c806ce20fb6ac137d10cc2e6d092b84129f95571eecf9",
+      "mutationCapable": true,
+      "shellCapable": false,
+      "machineJsonReader": false,
+      "classification": "LEGACY_MUTATION_SURFACE",
+      "governedEventOwner": false,
+      "writesPerformed": false
+    },
+    {
+      "path": "scripts/error-resolution/services/error-scanner.ts",
+      "exists": true,
+      "sourceChecksum": "sha256:2bcd6abcd1e43d41f75a73541fc7288c145823c89f148995084c6d63b59a976c",
+      "mutationCapable": false,
+      "shellCapable": true,
+      "machineJsonReader": true,
+      "classification": "STRUCTURED_EVIDENCE_READER",
+      "governedEventOwner": false,
+      "writesPerformed": false
+    },
+    {
+      "path": "scripts/error-resolution/services/type-fixer.ts",
+      "exists": true,
+      "sourceChecksum": "sha256:0505cfa607901ca485d91e8cec0fde3235282e3e0452f72cddb2a8fafbccf76b",
+      "mutationCapable": true,
+      "shellCapable": false,
+      "machineJsonReader": false,
+      "classification": "LEGACY_MUTATION_SURFACE",
+      "governedEventOwner": false,
+      "writesPerformed": false
+    },
+    {
+      "path": "scripts/error-resolution/services/import-fixer.ts",
+      "exists": true,
+      "sourceChecksum": "sha256:c01c323dca5ca42143af51eaaa5405fddea813c6639236831bc805d44e33633a",
+      "mutationCapable": true,
+      "shellCapable": false,
+      "machineJsonReader": false,
+      "classification": "LEGACY_MUTATION_SURFACE",
+      "governedEventOwner": false,
+      "writesPerformed": false
+    }
+  ],
+  "summary": {
+    "candidateCount": 8,
+    "legacyMutationSurfaceCount": 7,
+    "structuredEvidenceReaderCount": 1,
+    "governedReplayOwnerCount": 0
+  },
+  "replacementGate": "AGENTIC-TYPESCRIPT-ERROR-EVIDENCE-REPLACEMENT-01",
+  "requiredNextProof": [
+    "capture svelte-check machine JSON in bounded batches",
+    "bind error fingerprints to explicit workspace/source revisions when available",
+    "emit evidence-only TaskCandidate input with stable checksum",
+    "route any mutation through WorkflowActionEventV1 approval and independent validation"
+  ],
+  "separationRules": {
+    "webResearchEvidence": "separate revisioned cold evidence; never repair authorization",
+    "aceBitfrost": "context/residency descriptors only; never hidden thoughts or canonical error truth",
+    "canonicalAuthority": "Postgres receipts and governed workflow events"
+  },
+  "writesPerformed": false,
+  "safeToApply": false
+}

@@ -1,0 +1,57 @@
+{
+  "schema": "atlas.current-packet-chunk-identity-reconciliation.v1",
+  "mode": "READ_ONLY_CENSUS",
+  "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "ownerPreflight": {
+    "status": "OWNER_SELECTION_VALIDATED_NOT_APPLIED",
+    "selectedExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+    "decisionChecksum": "sha256:831595904e846bebb27235aca9e1ff500a7557aa494882ecf8385ac20f8c16c4",
+    "ownerPlanChecksum": "sha256:0e35649a1371a3996dc20f6306ae76c5dcf62377216f698380740768650589b1",
+    "applied": false
+  },
+  "execution": {
+    "execution_id": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+    "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "status": "COMPLETED"
+  },
+  "counts": {
+    "binding_sources": 24456,
+    "packet_ref_matches": 16554,
+    "packet_digest_matches": 0,
+    "packet_legacy_sha256_matches": 3230,
+    "packet_any_digest_matches": 3230,
+    "lineage_ref_matches": 627,
+    "packet_lineage_matches": 627,
+    "missing_packet_rows": 7902,
+    "packet_content_digest_missing": 16454,
+    "packet_digest_mismatches": 20,
+    "missing_lineage_rows": 0,
+    "lineage_packet_join_gaps": 0
+  },
+  "identityPolicy": {
+    "wholeSourceDigestIsNotChunkDigest": true,
+    "packetDigestMatchRequired": true,
+    "canonicalPacketDigestColumn": "content_hash",
+    "legacyPacketDigestColumn": "sha256",
+    "legacyPacketDigestIsPromotionEligible": false,
+    "provenLineageRequired": true,
+    "syntheticIdentityAllowed": false
+  },
+  "digestNamespace": {
+    "canonicalSourceBindingDigest": "atlas_workspace_source_bindings.content_digest",
+    "canonicalPacketDigest": "atlas_packets.content_hash",
+    "legacyPacketDigest": "atlas_packets.sha256",
+    "legacyMatchesAreDiagnosticOnly": true
+  },
+  "status": "PACKET_DIGEST_BRIDGE_MISSING",
+  "nextGate": "PACKET-CHUNK-IDENTITY-OWNER-DECISION-01",
+  "writesPerformed": false,
+  "writes": {
+    "postgres": false,
+    "graphify": false,
+    "qdrant": false,
+    "neo4j": false,
+    "valkey": false
+  }
+}

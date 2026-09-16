@@ -1,0 +1,99 @@
+{
+  "schema": "atlas.current-graphify-execution-owner-resolution.v1",
+  "gate": "GRAPHIFY-EXECUTION-SNAPSHOT-OWNER-02",
+  "mode": "READ_ONLY_PLAN",
+  "transaction": "REPEATABLE_READ_READ_ONLY_ROLLBACK",
+  "admittedWorkspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "admittedSnapshotRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+  "manifestPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\workspace-source-snapshots\\6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b.json",
+  "expectedSourceCount": 25542,
+  "expectedRefChecksum": "sha256:b868fdd93445a245f576944c0c0225da6799856f3cbffd9262899fe152990bc5",
+  "expectedIdentityChecksum": "sha256:841f106d08e55a3b61fd29133eaa47cf5df5373e325d762d94479609e893b59d",
+  "expectedContentChecksum": "sha256:fd93382dbe0bfbbd19dafbb92752ece2d4829a0ec29043cbc3f91a0ebde58c5d",
+  "readError": null,
+  "candidates": [
+    {
+      "execution_id": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+      "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "status": "COMPLETED",
+      "canonical_authority": true,
+      "trigger_kind": "CURRENT_WORKSPACE_SOURCE_SELECTION",
+      "started_at": "2026-09-15T01:11:38.335Z",
+      "completed_at": "2026-09-15T01:11:57.965Z",
+      "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+      "stageCount": 3,
+      "sourceCount": 25542,
+      "sourceStage": {
+        "stage": "SOURCE_SELECTION",
+        "status": "COMPLETED",
+        "output_checksum": "sha256:841f106d08e55a3b61fd29133eaa47cf5df5373e325d762d94479609e893b59d",
+        "receipt_ref": "sealed-snapshot:sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b"
+      },
+      "inventoryStage": {
+        "stage": "INVENTORY",
+        "status": "COMPLETED",
+        "output_checksum": "sha256:9f2af3d3da8137a568913f3ea2fe113583d6afba72d59c20aa9a9a4214ad1bb5",
+        "receipt_ref": "docs/reports/graphify-daily-snapshot-native-open-v1.json"
+      },
+      "sourceRefChecksum": "sha256:b868fdd93445a245f576944c0c0225da6799856f3cbffd9262899fe152990bc5",
+      "expectedRefChecksum": "sha256:b868fdd93445a245f576944c0c0225da6799856f3cbffd9262899fe152990bc5",
+      "identityChecksum": "sha256:841f106d08e55a3b61fd29133eaa47cf5df5373e325d762d94479609e893b59d",
+      "expectedIdentityChecksum": "sha256:841f106d08e55a3b61fd29133eaa47cf5df5373e325d762d94479609e893b59d",
+      "contentChecksum": "sha256:fd93382dbe0bfbbd19dafbb92752ece2d4829a0ec29043cbc3f91a0ebde58c5d",
+      "expectedContentChecksum": "sha256:fd93382dbe0bfbbd19dafbb92752ece2d4829a0ec29043cbc3f91a0ebde58c5d",
+      "sourceMembershipExact": true
+    },
+    {
+      "execution_id": "0dba1c0d-2cf7-4f35-a61b-c77956f60d3d",
+      "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+      "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "status": "COMPLETED",
+      "canonical_authority": false,
+      "trigger_kind": "CURRENT_WORKSPACE_SOURCE_SELECTION",
+      "started_at": "2026-09-15T01:12:47.469Z",
+      "completed_at": "2026-09-15T01:13:15.628Z",
+      "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+      "stageCount": 3,
+      "sourceCount": 25542,
+      "sourceStage": {
+        "stage": "SOURCE_SELECTION",
+        "status": "COMPLETED",
+        "output_checksum": "sha256:841f106d08e55a3b61fd29133eaa47cf5df5373e325d762d94479609e893b59d",
+        "receipt_ref": "sealed-snapshot:sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b"
+      },
+      "inventoryStage": {
+        "stage": "INVENTORY",
+        "status": "COMPLETED",
+        "output_checksum": "sha256:9f2af3d3da8137a568913f3ea2fe113583d6afba72d59c20aa9a9a4214ad1bb5",
+        "receipt_ref": "docs/reports/graphify-daily-snapshot-native-open-v1.json"
+      },
+      "sourceRefChecksum": "sha256:b868fdd93445a245f576944c0c0225da6799856f3cbffd9262899fe152990bc5",
+      "expectedRefChecksum": "sha256:b868fdd93445a245f576944c0c0225da6799856f3cbffd9262899fe152990bc5",
+      "identityChecksum": "sha256:841f106d08e55a3b61fd29133eaa47cf5df5373e325d762d94479609e893b59d",
+      "expectedIdentityChecksum": "sha256:841f106d08e55a3b61fd29133eaa47cf5df5373e325d762d94479609e893b59d",
+      "contentChecksum": "sha256:fd93382dbe0bfbbd19dafbb92752ece2d4829a0ec29043cbc3f91a0ebde58c5d",
+      "expectedContentChecksum": "sha256:fd93382dbe0bfbbd19dafbb92752ece2d4829a0ec29043cbc3f91a0ebde58c5d",
+      "sourceMembershipExact": true
+    }
+  ],
+  "equivalence": {
+    "candidateCount": 2,
+    "distinctEvidenceSignatures": 1,
+    "allEquivalent": true
+  },
+  "recommendation": {
+    "type": "EQUIVALENT_EXECUTIONS_REQUIRE_EXPLICIT_AUTHORITY",
+    "candidateExecutionIds": [
+      "0dba1c0d-2cf7-4f35-a61b-c77956f60d3d",
+      "74d50c86-8194-45ea-8c3d-61aab737ef83"
+    ],
+    "policy": "NO_IMPLICIT_TIMESTAMP_OR_ID_SELECTION",
+    "requiresExplicitAuthorityDecision": true
+  },
+  "status": "DUPLICATE_EQUIVALENT_EXECUTIONS",
+  "safeToApply": false,
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "nextGate": "EXPLICIT_GRAPHIFY_EXECUTION_OWNER_DECISION"
+}

@@ -1,0 +1,12 @@
+{
+  "reportVersion": "classification-provenance-nullability-v1",
+  "generatedAt": "2026-09-15",
+  "result": "PROVENANCE_NULLABLE_GUARD_COMPLETE",
+  "syntheticUnknownDefaults": false,
+  "missingVersionRepresentation": null,
+  "classifierAdmission": "BLOCKED_UNTIL_CURRENT_COHORT",
+  "writesPerformed": false,
+  "promotionEligible": false,
+  "focusedTests": 3,
+  "remainingRequirement": "Bind domain/topic/entity observations to packet, source, workspace, model, and feature revisions before admission."
+}

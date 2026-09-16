@@ -80,6 +80,28 @@ describe('canonical rerank executor', () => {
     mockRerankWithCrossEncoder.mockReset();
     mockGetRedis.mockReset();
     vi.unstubAllGlobals();
+    // Existing cross-encoder contract tests explicitly exercise the transitional
+    // lane. Production/default behavior is covered by the opt-in guard test.
+    process.env.MIXEDBREAD_RERANK_MODE = 'active';
+  });
+
+  it('keeps the transitional Mixedbread lane disabled by default', async () => {
+    delete process.env.MIXEDBREAD_RERANK_MODE;
+    const get = vi.fn().mockResolvedValue(null);
+    const setex = vi.fn().mockResolvedValue('OK');
+    const del = vi.fn().mockResolvedValue(1);
+    mockGetRedis.mockReturnValue({ get, setex, del });
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('xgboost unavailable')));
+
+    const result = await rerankCanonicalFeatureEnvelopes('query', envelopes, {
+      cachePolicy: 'disabled',
+    });
+
+    expect(mockRerankWithCrossEncoder).not.toHaveBeenCalled();
+    expect(result.provenance.crossEncoderAttempted).toBe(false);
+    expect(result.provenance.crossEncoderUsed).toBe(false);
+    expect(result.provenance.modelVersion).toBe('xgboost-fallback');
+    expect(result.results.every((row) => row.model_version !== 'mixedbread-ai/mxbai-rerank-base-v2')).toBe(true);
   });
 
   it('hydrates the canonical envelope spine and writes a cache entry on miss', async () => {
@@ -403,6 +425,7 @@ describe('canonical rerank executor', () => {
               model_loaded: true,
               modelType: 'xgboost',
               modelRevision: 'xgboost-sidecar',
+              featureSchemaRevision: 'features:v1',
               objective: 'reg:squarederror',
               scoreSemantics: 'REGRESSION_SCORE',
               calibrated: false,
@@ -412,7 +435,7 @@ describe('canonical rerank executor', () => {
         }
         if (url.endsWith('/score')) {
           return new Response(
-            JSON.stringify({ rawScores: [0.88, 0.64], modelType: 'xgboost', modelRevision: 'xgboost-sidecar', calibrated: false }),
+            JSON.stringify({ rawScores: [0.88, 0.64], modelType: 'xgboost', modelRevision: 'xgboost-sidecar', featureSchemaRevision: 'features:v1', calibrated: false }),
             { status: 200 },
           );
         }
@@ -462,12 +485,12 @@ describe('canonical rerank executor', () => {
         const url = String(input);
         if (url.endsWith('/health')) {
           return new Response(
-            JSON.stringify({ status: 'ok', model_loaded: true, modelType: 'xgboost', modelRevision: 'xgboost-sidecar' }),
+            JSON.stringify({ status: 'ok', model_loaded: true, modelType: 'xgboost', modelRevision: 'xgboost-sidecar', featureSchemaRevision: 'features:v1' }),
             { status: 200 },
           );
         }
         if (url.endsWith('/score')) {
-          return new Response(JSON.stringify({ rawScores: [0.88, 0.64], modelType: 'xgboost' }), { status: 200 });
+          return new Response(JSON.stringify({ rawScores: [0.88, 0.64], modelType: 'xgboost', featureSchemaRevision: 'features:v1' }), { status: 200 });
         }
         return new Response('not found', { status: 404 });
       });
@@ -491,6 +514,9 @@ describe('canonical rerank executor', () => {
       expect(receiptPayload.schema).toBe('atlas.xgboost-shadow-receipt.v1');
       expect(receiptPayload.evaluationPopulation).toBe('CROSS_ENCODER_FALLBACK_ELIGIBLE');
       expect(receiptPayload.eligibilityReason).toBe('CROSS_ENCODER_UNAVAILABLE');
+      expect(receiptPayload.challenger.featureRevision).toBe('features:v1');
+      expect(receiptPayload.challenger.featureRevisionStatus).toBe('PROVEN_SIDECAR_SCHEMA_ONLY');
+      expect(xaddArgs).not.toContain('unversioned');
       expect(receiptPayload.servedOrderChecksum).toBe(receiptPayload.baselineOrderChecksum);
       expect(receiptPayload.challenger.scoreMethod).toBe('LEARNED_MODEL');
       expect(receiptPayload.challenger.isProbability).toBe(false);
@@ -633,13 +659,13 @@ describe('rerank fail-open contract (Session 188)', () => {
         const url = String(rawInput);
         if (url.endsWith('/health')) {
           return new Response(
-            JSON.stringify({ status: 'ok', model_loaded: true, modelType: 'xgboost', modelRevision: 'xgboost-sidecar' }),
+            JSON.stringify({ status: 'ok', model_loaded: true, modelType: 'xgboost', modelRevision: 'xgboost-sidecar', featureSchemaRevision: 'features:v1' }),
             { status: 200 },
           );
         }
         if (url.endsWith('/score')) {
           return new Response(
-            JSON.stringify({ rawScores: [0.9, 0.8, 0.7, 0.6, 0.5], modelType: 'xgboost', modelRevision: 'xgboost-sidecar' }),
+            JSON.stringify({ rawScores: [0.9, 0.8, 0.7, 0.6, 0.5], modelType: 'xgboost', modelRevision: 'xgboost-sidecar', featureSchemaRevision: 'features:v1' }),
             { status: 200 },
           );
         }

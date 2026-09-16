@@ -388,6 +388,13 @@ async function main() {
   console.log(`  LangExtract: ${LANGEXTRACT_URL}`);
   console.log(`  Ollama:      ${OLLAMA_BASE_URL}\n`);
 
+  // The legacy path still falls back to random 768D vectors when Ollama is
+  // unavailable. Keep it diagnostic-only until the embedding and lineage
+  // admission contract is proven.
+  if (APPLY) {
+    throw new Error('BATCH_OFFLINE_INGEST_APPLY_BLOCKED_UNQUALIFIED_EMBEDDING');
+  }
+
   fs.mkdirSync(OUT_DIR, { recursive: true });
   fs.mkdirSync(EDGES_OUT_DIR, { recursive: true });
 

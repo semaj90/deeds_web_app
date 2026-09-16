@@ -10,6 +10,7 @@ export const CandidateFeatureRowV1Schema = z.object({
   candidateOrdinal: z.number().int().nonnegative(),
   canonicalId: z.string().min(1),
   packetKey: z.string().min(1).nullable().default(null),
+  sourceRef: z.string().min(1).nullable().default(null),
   treeNodeId: z.string().min(1).nullable().default(null),
   symbolVersionId: z.string().min(1).nullable().default(null),
 

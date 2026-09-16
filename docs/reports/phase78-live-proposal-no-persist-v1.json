@@ -1,0 +1,81 @@
+{
+  "schema": "atlas.phase78-live-proposal-no-persist.v1",
+  "test": "PHASE78-LIVE-PROPOSAL-NO-PERSIST-01",
+  "read_only": false,
+  "canonical_production_data_touched": true,
+  "canonical_production_data_mutated": true,
+  "canonical_production_data_mutation_note": "Real, intentional, additive-only mutations: (1) one idempotent CREATE TABLE IF NOT EXISTS migration; (2) a real run of scripts/phase78-cluster-errors.mts (user-approved) populated 1 real row in error_clusters and set cluster_id on all 148 previously-null error_events rows. No row was overwritten or deleted; all mutation was populating previously-empty/-null state. Zero writes to error_suggestions, source files, Qdrant, Valkey, or Neo4j at any point.",
+  "writesPerformed": {
+    "errorSuggestions": 0,
+    "sourceFiles": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0
+  },
+  "RESULT": "PARTIAL_PROVEN",
+  "reason": "The reader/writer schema disconnect (the deepest bug) is fixed and verified live end to end. Blocked now on a legitimate data-quality edge case -- this run's only real cluster has no source-mappable file path -- not a code bug. generateProposal()/Ornith itself was still not reached.",
+  "narrative": "Investigating why PHASE78-LIVE-PROPOSAL-NO-PERSIST-01 could not find an eligible cluster led through a chain of 8 real, independently-confirmed bugs across two scripts and one schema file, all fixed and verified live this session.",
+  "bugsFoundInOrder": [
+    {
+      "n": 1, "file": "scripts/phase78-generate-suggestions.mts",
+      "bug": "getClustersWithoutSuggestions() queried nonexistent table 'error_cluster' (singular).",
+      "fixed": true,
+      "fix": "Applied drizzle/manual/20260413_route_health_tables.sql (idempotent CREATE TABLE IF NOT EXISTS)."
+    },
+    {
+      "n": 2, "file": "scripts/phase78-generate-suggestions.mts",
+      "bug": "NOT EXISTS subquery compared error_suggestions.cluster_id (uuid) to error_cluster.cluster_id (varchar) -- 'operator does not exist: uuid = character varying'.",
+      "fixed": true,
+      "fix": "Superseded entirely by bug #8's rewrite (query no longer reads from error_cluster at all)."
+    },
+    {
+      "n": 3, "file": "scripts/phase78-cluster-errors.mts",
+      "bug": "Imported errorClustersTable/errorEventsTable from 'src/lib/server/db/schema/index.js', which does not export them. Real definitions live in a separate directory tree: 'src/lib/db/schema/cutlass.ts'.",
+      "fixed": true,
+      "fix": "Corrected import path to '../src/lib/db/schema/cutlass.js'."
+    },
+    {
+      "n": 4, "file": "scripts/phase78-cluster-errors.mts",
+      "bug": "Imported a nonexistent function 'generateCachedEmbedding' from ollama-config.ts (only 'generateEmbedding(text)' exists).",
+      "fixed": true,
+      "fix": "Aliased import to generateEmbeddingRaw, called with single text argument."
+    },
+    {
+      "n": 5, "file": "src/lib/db/schema/cutlass.ts",
+      "bug": "errorClustersTable/errorEventsTable Drizzle declarations were stale relative to the live tables (confirmed via information_schema.columns and pg_enum): wrong column names (file_path/stack_trace vs real file/stack), missing columns (collected_at, line_number, column_number, kind, severity, pattern, error_count, route_paths, radius, last_updated), and no pgEnum types for error_kind/error_severity.",
+      "fixed": true,
+      "fix": "Rewrote both table definitions in cutlass.ts to match live columns/types exactly, using pgEnum for error_kind ('runtime'|'api'|'other') and error_severity ('info'|'warn'|'error'|'critical'). No ALTER/migration was needed -- the live database was already correct; only the TypeScript declaration was wrong."
+    },
+    {
+      "n": 6, "file": "scripts/phase78-cluster-errors.mts",
+      "bug": "The clustering insert/update block used field names (errorPattern, memberCount, lastSeenAt, updatedAt) matching neither the old nor corrected schema, and called inferClusterKind()/normalizeSeverity() to invent a taxonomy (typing/nullability/import/svelte-rune/... and info/warn/error/FATAL) that does not match the real error_kind/error_severity enums ('fatal' is not a valid severity).",
+      "fixed": true,
+      "fix": "Use the real, already-correct kind/severity values straight off the representative error_events row (ingestion already tags them correctly) instead of re-deriving a fictional taxonomy. inferClusterKind()/normalizeSeverity() left in the file, unused, rather than deleted (separate decision)."
+    },
+    {
+      "n": 7, "file": "scripts/phase78-cluster-errors.mts",
+      "bug": "clusterIdStr was a fabricated string (cluster-${clusterId}) inserted into a uuid column -- would fail at the DB level with 'invalid input syntax for type uuid'.",
+      "fixed": true,
+      "fix": "Let Postgres generate the real uuid via defaultRandom(), captured via .returning({ id }), used for the per-event FK update."
+    },
+    {
+      "n": 8, "file": "scripts/phase78-generate-suggestions.mts",
+      "bug": "getClustersWithoutSuggestions() read from the orphaned 'error_cluster' (singular) table, which no real writer anywhere in the repo populates, instead of the real 'error_clusters' (plural) table bug #6's fix populates.",
+      "fixed": true,
+      "fix": "Rewrote the query to read from error_clusters, LEFT JOIN LATERAL to a representative (most recently collected) error_events row for file/stack/ts_code detail. es.cluster_id = ec.id now compares uuid to uuid directly (bug #2 no longer applies -- superseded, not separately needed)."
+    }
+  ],
+  "liveVerification": {
+    "phase78ClusterErrorsRealRun": {
+      "command": "npx tsx scripts/phase78-cluster-errors.mts (no --dry-run, user-approved real write)",
+      "result": "148 real embeddings generated via Ollama, K-means clustered into 1 cluster (data-driven outcome, not a bug), 1 real row inserted into error_clusters (id=03ffef48-3a72-4f19-8d15-4c3afc5a494a, kind=runtime, severity=warn, error_count=148, real route_paths array), all 148 error_events rows had cluster_id set. Exit code 0."
+    },
+    "phase78GenerateSuggestionsLiveNoPersistRerun": {
+      "command": "npx tsx scripts/phase78-generate-suggestions.mts --live-no-persist",
+      "result": "Correctly found the real cluster by its actual UUID (03ffef48-3a72-4f19-8d15-4c3afc5a494a) -- confirms the reader/writer disconnect (bug #8) is genuinely fixed, not just plausible. Stopped at resolveSourceSnapshot() returning null: this cluster's representative error (a Svelte onDestroy lifecycle warning) has a bundled/minified runtime stack trace with no resolvable local source file path -- a real data-quality fact about this specific error, not a code bug."
+    }
+  },
+  "conclusion": "All 8 found bugs across the full phase78-cluster-errors.mts -> error_clusters -> phase78-generate-suggestions.mts chain are fixed and verified live. This pipeline had apparently never executed successfully end to end against this database at any point before this session. generateProposal()/the real Ornith call was still not reached in this run because this run's only cluster (K-means produced exactly 1) has no source-mappable file path. Next real test (not attempted here, given session context budget): re-run against route-error data with a resolvable source file (a real TS/Svelte compile-time error rather than a bundled runtime stack trace), or tune K-means to produce more, smaller clusters so a resolvable one is more likely to surface.",
+  "modelCallOccurred": false,
+  "RESULT_FINAL": "PARTIAL_PROVEN -- 8/8 found bugs fixed and verified live end to end; the Ornith-invocation half of this gate still awaits a cluster with a resolvable source file."
+}

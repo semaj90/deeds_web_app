@@ -1,6 +1,6 @@
 {
   "schema": "atlas.graphify-stale-run-reconciliation.v1",
-  "generatedAt": "2026-09-08T23:28:53.488Z",
+  "generatedAt": "2026-09-14T03:07:08.960Z",
   "mode": "READ_ONLY_STALE_RUN_RECONCILIATION",
   "expectedWorkspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
   "staleAfterMs": 21600000,
@@ -8,8 +8,8 @@
   "transaction": {
     "isolation_level": "repeatable read",
     "read_only": "on",
-    "snapshot": "6129487:6129487:",
-    "audit_pid": 212
+    "snapshot": "6577938:6577938:",
+    "audit_pid": 15016
   },
   "graphifyRunColumns": [
     "run_id",
@@ -34,10 +34,10 @@
     "workspace_revision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
     "source_manifest_digest": "55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
     "source_manifest_source_count": 24192,
-    "status": "RUNNING",
+    "status": "SUPERSEDED",
     "dry_run": false,
     "started_at": "2026-08-28T04:01:23.454Z",
-    "completed_at": null,
+    "completed_at": "2026-09-08T23:38:12.571Z",
     "workspace_row_present": true
   },
   "runCount": 1,
@@ -45,9 +45,9 @@
   "classification": "CONFLICTING_EVIDENCE",
   "executionOwnership": {
     "processOwnerPresent": false,
-    "startupLockPresent": true,
-    "startupLockParsed": true,
-    "startupLockPid": 9152,
+    "startupLockPresent": false,
+    "startupLockParsed": false,
+    "startupLockPid": null,
     "startupLockPidAlive": false,
     "startupLockBoundToRun": false,
     "postgresBackendPresent": false,
@@ -56,14 +56,14 @@
     "anyGraphifyRelationLockPresent": true,
     "runtimeOwnerEvidenceAbsent": false,
     "staleByAge": true,
-    "currentAgeMs": 1020450488,
+    "currentAgeMs": 1465545959,
     "exactRunBoundBackends": [],
     "exactRunBoundLocks": []
   },
   "canonicalCompletion": {
     "graphRevision": null,
     "graphRevisionColumnPresent": false,
-    "structuralRevisionMatches": true,
+    "structuralRevisionMatches": false,
     "resolutionRevisionMatches": true,
     "resolutionCoverage": {
       "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
@@ -71,7 +71,7 @@
       "syntaxOnlyTotal": 776,
       "syntaxOnlyProcessed": 776,
       "unresolvedTargetTotal": 9730,
-      "unresolvedTargetProcessed": 2010,
+      "unresolvedTargetProcessed": 210,
       "unresolvedTargetSampleIsPartial": true,
       "perEdgeResultsPersisted": false
     },
@@ -91,6 +91,7 @@
     "CANONICAL_GRAPHIFY_RUN_NOT_COMPLETED",
     "GRAPH_REVISION_NOT_RECORDED_ON_RUN",
     "PER_EDGE_STRUCTURAL_OUTCOME_DETAIL_NOT_PERSISTED",
+    "STRUCTURAL_ARTIFACT_REVISION_MISMATCH_OR_MISSING",
     "RUNTIME_OWNER_BINDING_CONFLICTING_OR_UNPROVEN"
   ],
   "writes": {
@@ -108,31 +109,27 @@
       "workspace_revision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
       "source_manifest_digest": "55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
       "source_manifest_source_count": 24192,
-      "status": "RUNNING",
+      "status": "SUPERSEDED",
       "dry_run": false,
       "started_at": "2026-08-28T04:01:23.454Z",
-      "completed_at": null,
+      "completed_at": "2026-09-08T23:38:12.571Z",
       "workspace_row_present": true
     }
   ],
   "processEvidence": {
     "startupLock": {
       "path": "C:\\Users\\james\\Videos\\deeds-web-app\\.graphify-daily-start.lock",
-      "present": true,
-      "parsed": true,
-      "pid": 9152,
+      "present": false,
+      "parsed": false,
+      "pid": null,
       "pidAlive": false,
-      "metadata": {
-        "pid": 9152,
-        "startedAt": "2026-09-08T05:25:14.606Z",
-        "script": "run-graphify-daily-startup.mjs"
-      },
+      "metadata": null,
       "error": null
     },
     "activity": [],
     "locks": [
       {
-        "pid": 212,
+        "pid": 15016,
         "mode": "AccessShareLock",
         "granted": true,
         "relname": "graphify_runs"
@@ -151,7 +148,7 @@
       "syntaxOnlyTotal": 776,
       "syntaxOnlyProcessed": 776,
       "unresolvedTargetTotal": 9730,
-      "unresolvedTargetProcessed": 2010,
+      "unresolvedTargetProcessed": 210,
       "unresolvedTargetSampleIsPartial": true,
       "perEdgeResultsPersisted": false
     }

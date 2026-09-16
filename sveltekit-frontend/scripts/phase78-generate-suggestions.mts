@@ -21,6 +21,16 @@
  *   npx tsx scripts/phase78-generate-suggestions.mts --dry-run
  *   npx tsx scripts/phase78-generate-suggestions.mts --limit=10
  *   npx tsx scripts/phase78-generate-suggestions.mts --verbose
+ *   npx tsx scripts/phase78-generate-suggestions.mts --live-no-persist
+ *
+ * PHASE78-LIVE-PROPOSAL-NO-PERSIST-01 (--live-no-persist): unlike --dry-run (which returns
+ * before calling Ornith or retrieval at all -- it never exercises the model), this mode runs
+ * the REAL generateProposal() path end to end -- real error/cluster, real current source, real
+ * SearchRuntime context, real Ornith invocation, real strict proposal parsing, real
+ * unique-preimage validation, real proposal checksum -- against exactly ONE real eligible
+ * cluster, but performs ZERO persistence: no `error_suggestions` INSERT, no JSONL log append.
+ * Writes only a read-only receipt to docs/reports/. This is the proof that Ornith proposal
+ * generation itself works end to end, independent of and prior to the queue-write step.
  */
 
 import { createHash } from 'node:crypto';
@@ -49,6 +59,7 @@ if (!DATABASE_URL) {
 const args = process.argv.slice(2);
 const DRY_RUN = args.includes('--dry-run');
 const VERBOSE = args.includes('--verbose');
+const LIVE_NO_PERSIST = args.includes('--live-no-persist');
 const limitArg = args.find((arg) => arg.startsWith('--limit='));
 const LIMIT = limitArg
   ? Math.max(1, Number.parseInt(limitArg.slice('--limit='.length), 10) || 25)
@@ -176,25 +187,39 @@ function assessRiskLevel(message: string, code?: string | null): RiskLevel {
 }
 
 async function getClustersWithoutSuggestions(): Promise<ClusterData[]> {
+  // FIXED 2026-09-14 (PHASE78-LIVE-PROPOSAL-NO-PERSIST-01, bug #7): this previously read from
+  // 'error_cluster' (singular) -- an orphaned table with no real writer anywhere in the repo
+  // (see docs/reports/phase78-live-proposal-no-persist-v1.json bugs #1/#2 for that history).
+  // The REAL cluster writer is scripts/phase78-cluster-errors.mts, which populates
+  // 'error_clusters' (plural) + assigns error_events.cluster_id (fixed there as bug #6, verified
+  // live: 1 real cluster, 148 error_events assigned). Cluster identity/summary lives on
+  // error_clusters; per-error detail (file/stack/ts_code) lives on error_events, so this joins a
+  // representative (most recently collected) event per cluster via LATERAL.
   return sql<ClusterData[]>`
     SELECT
-      ec.cluster_id AS "clusterId",
-      ec.route_id AS "routeId",
-      ec.message,
-      ec.code,
-      ec.error_code AS "errorCode",
-      ec.category,
-      ec.raw_log_snippet AS "rawLogSnippet",
-      ec.file_path AS "filePath",
-      ec.count
-    FROM error_cluster ec
-    WHERE ec.cluster_id IS NOT NULL
-      AND NOT EXISTS (
+      ec.id::text AS "clusterId",
+      COALESCE(ee.route_path, ec.route_paths[1]) AS "routeId",
+      ec.pattern AS message,
+      ee.ts_code AS code,
+      ee.ts_code AS "errorCode",
+      ec.kind::text AS category,
+      ee.stack AS "rawLogSnippet",
+      ee.file AS "filePath",
+      ec.error_count AS count
+    FROM error_clusters ec
+    LEFT JOIN LATERAL (
+      SELECT route_path, ts_code, stack, file
+      FROM error_events
+      WHERE cluster_id = ec.id
+      ORDER BY collected_at DESC
+      LIMIT 1
+    ) ee ON true
+    WHERE NOT EXISTS (
         SELECT 1
         FROM error_suggestions es
-        WHERE es.cluster_id = ec.cluster_id
+        WHERE es.cluster_id = ec.id
       )
-    ORDER BY ec.count DESC, ec.updated_at DESC NULLS LAST
+    ORDER BY ec.error_count DESC, ec.last_updated DESC NULLS LAST
     LIMIT ${LIMIT}
   `;
 }
@@ -569,6 +594,72 @@ async function generateProposal(cluster: ClusterData, source: SourceSnapshot) {
   };
 }
 
+async function runLiveNoPersistProof(): Promise<void> {
+  console.log('Phase 78: PHASE78-LIVE-PROPOSAL-NO-PERSIST-01');
+  console.log('mode=LIVE_NO_PERSIST (real Ornith call, zero error_suggestions/JSONL writes)');
+
+  const OUT_PATH = path.join(REPO_ROOT, 'docs', 'reports', 'phase78-live-proposal-no-persist-v1.json');
+  const writesPerformed = { errorSuggestions: 0, sourceFiles: 0, qdrant: 0, valkey: 0, neo4j: 0 };
+  let result: Record<string, unknown>;
+
+  try {
+    const clusters = await getClustersWithoutSuggestions();
+    if (clusters.length === 0) {
+      result = {
+        RESULT: 'FAIL',
+        reason: 'NO_ELIGIBLE_CLUSTERS',
+        writesPerformed,
+      };
+    } else {
+      const cluster = clusters[0];
+      const source = await resolveSourceSnapshot(cluster);
+      if (!source) {
+        result = {
+          RESULT: 'FAIL',
+          reason: 'SOURCE_UNRESOLVED_OR_TOO_LARGE',
+          clusterId: cluster.clusterId,
+          writesPerformed,
+        };
+      } else {
+        console.log(`cluster=${cluster.clusterId} sourceRef=${source.sourceRef} sourceRevision=${source.sourceRevision}`);
+        const generated = await generateProposal(cluster, source);
+        console.log(`LIVE_PROPOSAL_GENERATED model=${generated.proposal.model} risk=${generated.riskLevel}`);
+        result = {
+          RESULT: 'DRY_RUN_PROVEN',
+          clusterId: cluster.clusterId,
+          sourceRef: source.sourceRef,
+          sourceRevision: source.sourceRevision,
+          proposal: generated.proposal,
+          writesPerformed,
+        };
+      }
+    }
+  } catch (error) {
+    result = {
+      RESULT: 'FAIL',
+      reason: error instanceof Error ? error.message : String(error),
+      writesPerformed,
+    };
+  } finally {
+    await sql.end({ timeout: 5 }).catch(() => {});
+  }
+
+  const report = {
+    schema: 'atlas.phase78-live-proposal-no-persist.v1',
+    test: 'PHASE78-LIVE-PROPOSAL-NO-PERSIST-01',
+    read_only: true,
+    canonical_production_data_touched: false,
+    canonical_production_data_mutated: false,
+    writesPerformed: false,
+    ...result,
+  };
+
+  await fs.mkdir(path.dirname(OUT_PATH), { recursive: true });
+  await fs.writeFile(OUT_PATH, JSON.stringify(report, null, 2) + '\n', 'utf8');
+  console.log('Report:', OUT_PATH);
+  if (result.RESULT !== 'DRY_RUN_PROVEN') process.exitCode = 1;
+}
+
 async function generateSuggestions(): Promise<void> {
   console.log('Phase 78: Parent Atlas Ornith Repair Proposal Producer v2');
   console.log(`mode=${DRY_RUN ? 'DRY_RUN' : 'PROPOSAL_QUEUE_WRITE'} limit=${LIMIT}`);
@@ -651,7 +742,7 @@ async function generateSuggestions(): Promise<void> {
   console.log('next=npx tsx scripts/phase79-agentic-repair.mts --dry-run --limit=1');
 }
 
-generateSuggestions().catch(async (error) => {
+(LIVE_NO_PERSIST ? runLiveNoPersistProof() : generateSuggestions()).catch(async (error) => {
   console.error('PHASE78_FATAL:', error instanceof Error ? error.message : String(error));
   await sql.end({ timeout: 5 }).catch(() => {});
   process.exitCode = 1;

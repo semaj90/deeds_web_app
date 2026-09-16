@@ -1,0 +1,33 @@
+{
+  "schema": "atlas.trace-dense-capability-runtime-receipt.v1",
+  "status": "RUNTIME_CAPABILITY_ADMISSION_PROVEN_FRESH_PROCESS",
+  "freshTracePort": 8793,
+  "productionTracePort": 8788,
+  "runtimeAdmission": {
+    "qdrantSchemaRead": true,
+    "logicalAliasResolvedBeforeSchemaLookup": true,
+    "vectorNameValidated": true,
+    "dimensionValidated": true,
+    "metricValidated": true,
+    "mismatchRejectedBeforeQuery": true,
+    "writesPerformed": false
+  },
+  "liveQdrantCollections": {
+    "codebase_chunks_768": { "vectorName": "content", "dimensions": 768, "metric": "cosine" },
+    "summary_lenses_768": { "vectorName": "summary", "dimensions": 768, "metric": "cosine" },
+    "synthesis_memory_768": { "vectorName": "synthesis", "dimensions": 768, "metric": "cosine" }
+  },
+  "freshTraceReadOnlyReplay": {
+    "kagSearchReturnedResult": true,
+    "sqlArrayError": false,
+    "qdrantVectorNameError": false,
+    "engramOptionalColumnError": false,
+    "nativeTensorRtAddonAvailable": false
+  },
+  "focusedTests": { "passed": 7, "failed": 0 },
+  "productionListenerReloaded": false,
+  "cuvsFallbackWired": false,
+  "cagraParityProven": false,
+  "writesPerformed": false,
+  "nextGate": "TRACE-CUVS-SEMANTIC-768-ORACLE-01"
+}

@@ -2701,6 +2701,26 @@ canonical chunk-owner rows); (4) only then return to DOC-13/14 once that lane se
 - [x] Added a read-only migration safety audit; it checks additive SQL and reports whether the
   new columns are already present without applying the migration.
 
+### CANONICAL-OWNER-REVISION-AXES-RECHECK-2026-09-14
+
+- [x] Re-ran the canonical-owner revision migration safety audit against the
+  live database.
+- [x] Confirmed the proposed SQL is additive-only and the revision columns are
+  not yet applied: `additiveOnly=true`, `migrationApplied=false`.
+- [x] Confirmed `promotionAllowed=false`; the audit performed no migration,
+  backfill, schema, packet, vector, graph, or cache write.
+- [ ] Review and authorize the nullable revision migration only after current
+  Graphify execution, source-content lineage, and packet/concept currentness
+  are proven in the authoritative frame.
+
+Status: `ADDITIVE_MIGRATION_SAFE_NOT_APPLIED_CURRENTNESS_BLOCKED`;
+writesPerformed=false.
+
+Evidence: `docs/reports/canonical-owner-revision-migration-safety-v1.json`;
+`scripts/atlas/audit-canonical-owner-revision-migration-safety-v1.mjs`.
+
+Next gate: `CURRENT_GRAPHIFY_LINEAGE_BEFORE_REVISION_MIGRATION`.
+
 ### CANONICAL-OWNER-ROW-ADAPTERS-01 — fail-closed row adapters implemented 2026-09-07
 
 - [x] Added packet and concept row adapters that require the dedicated source-content or
@@ -8963,6 +8983,24 @@ Evidence: `docs/reports/trace-disabled-search-tools-v1.json`.
 Status: `DISABLED_SEARCH_TOOLS_AUDITED`; identityEnvelopeLiveStatus=
 `LIVE_ENVELOPE_MISSING`; authority=false; writesPerformed=false.
 
+### TRACE-IDENTITY-ENVELOPE-RECHECK-2026-09-14
+
+- [x] Re-ran `scripts/atlas/audit-trace-disabled-search-tools-v1.mjs` in
+      read-only mode. The endpoint remains healthy, the seven optional search
+      tools remain disabled, and `kb.trace_search` responds.
+- [x] Corrected the current status interpretation: the audit reports
+      `staticIdentityEnvelope.implementationPresent=false`,
+      `envelopeFieldPresent=false`, `sourceRevisionLookupPresent=false`, and
+      `workspaceRevisionLookupPresent=false`. Exact packet lookup exists, but
+      that is not a revision-qualified identity envelope.
+- [ ] Add the live TRACE request-envelope implementation only after the
+      server-owned revision bundle exists; keep optional tools and promotion
+      closed until bounded disabled-tool replay proves delivery.
+
+Status: `DISABLED_SEARCH_TOOLS_AUDITED_IDENTITY_IMPLEMENTATION_MISSING`;
+`authority=false`; `writesPerformed=false`.
+Evidence: `docs/reports/trace-disabled-search-tools-v1.json`.
+
 ### ACE-LIVE-INPUT-READINESS-RECHECK-2026-09-12-R2
 
 - [x] Re-ran the read-only ACE live-input readiness check.
@@ -9442,3 +9480,52 @@ multi-session effort. What remains open, unchanged: the structural chunk/packet 
 
 Status: `ADMITTED_REVISION_SOURCE_IDENTITY_FULLY_GROUNDED_23369_BINDINGS_194_CANONICAL_SYMBOLS`.
 Scripts: `scripts/atlas/apply-file-level-source-refs-content-reconciled-v1.mjs` (new).
+- [x] ACE-GROUNDING-FAILCLOSED-01 expose one shared, pure ACE evidence-block
+  builder and require an explicit `ADMITTED` status before either prompt packet
+  or ACE-card evidence reaches bounded synthesis. `REJECTED`, null, and legacy
+  contexts without a status now return empty evidence blocks. Regression proof:
+  `scripts/atlas/agentic-recommendation-workflow.build-ace-evidence-blocks.test.mjs`.
+
+### TRACE representation-capability follow-up — source fixes verified, live replay still open (2026-09-14)
+
+The two downstream TRACE failures from the stale-runtime recheck are now separated
+from the source implementation status. The Qdrant path has a read-only
+`DenseRepresentationCapabilityV1` contract and `QdrantManager.getDenseRepresentationCapability()`;
+named collections resolve their configured vector name (for example `summary` on
+`summary_lenses_768`) instead of assuming the global `content` name. The capability
+checksum is verified before use and every result carries `writesPerformed=false`.
+The optional Engram 512-dimensional path now checks `information_schema` and returns
+typed `REPRESENTATION_UNAVAILABLE` when `hnsw_embedding_512` is absent; it does not
+issue query-path DDL, fabricate a truncated vector, or silently fall back.
+
+- [x] **TRACE-DENSE-CAPABILITY-DISCOVERY-01** source contract and Qdrant named-vector
+  resolution are implemented and focused-proven.
+- [x] **ENGRAM-OPTIONAL-REPRESENTATION-01** absent `hnsw_embedding_512` is represented
+  as a typed unavailable result with zero writes.
+- [x] Focused regression suite: `dense-representation-capability-v1.spec.ts`,
+  `qdrant-manager-named-vector.spec.ts`, and `engram-representation-result.spec.ts`;
+  **6/6 tests passed**.
+- [ ] **TRACE-ISOLATED-LIVE-PROOF-01** rerun a fresh isolated TRACE process and prove
+  the corrected Qdrant schema discovery and Engram optional-column behavior through
+  the actual HTTP/MCP path. The stable `:8788` process must not be restarted by this
+  audit; the prior readback was served by stale compiled code.
+- [ ] **TRACE-CUVS-SEMANTIC-768-ORACLE-01** build/read a revision-qualified
+  `semantic_768` snapshot and prove cuVS brute-force exact results against the same
+  PostgreSQL/pgvector cohort. Existing tiny-fixture cuVS evidence is not current-corpus
+  proof.
+- [ ] **TRACE-CUVS-CAGRA-01** measure CAGRA only as a challenger against that exact
+  cuVS oracle; retain it as quarantined until same-corpus recall, filter, revision,
+  and VRAM receipts pass.
+- [ ] **TRACE-SEMANTIC-EXECUTOR-SELECTION-01** prove Qdrant, pgvector, cuVS exact,
+  and CAGRA are executors of one `semantic_768` lane and do not create extra fusion
+  votes. No executor may become identity or cache authority.
+- [ ] **TRACE-GPU-POSTRANK-01** prove post-retrieval SIMT/cuTile feature parity on
+  the same candidate ordinal map; JSON remains control metadata only, not the numeric
+  GPU path.
+
+Current status: `SOURCE_FIXES_FOCUSED_PROVEN_LIVE_TRACE_RELOAD_AND_CUVS_PARITY_OPEN`;
+authority=false; `writesPerformed=false`. Do not enable optional TRACE registries,
+create `hnsw_embedding_512`, alter Qdrant schemas, backfill vectors, or promote cuVS/
+CAGRA from these source-level tests. Evidence: `sveltekit-frontend/src/lib/server/vector/
+dense-representation-capability-v1.ts`, `sveltekit-frontend/src/lib/server/vector/qdrant-manager.ts`,
+`sveltekit-frontend/src/mcp/memory-bridge.ts`, and the three focused test files above.

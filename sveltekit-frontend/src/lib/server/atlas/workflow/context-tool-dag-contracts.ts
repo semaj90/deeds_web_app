@@ -1,4 +1,14 @@
 import { z } from 'zod';
+// WORKFLOW-ACTION-SCHEMA-ADOPTION-02: workflowActionFromDagNode() below constructs via this
+// canonical schema first, then projects down to the local WorkflowActionEventV1Schema shape via
+// fromCanonicalWorkflowActionEvent(). It previously called WorkflowActionEventV1Schema.parse()
+// directly -- a second, independent construction path for the same schema identity
+// ('atlas.workflow-action.v1'), which is exactly the "second uncoordinated peer owner" pattern
+// root CLAUDE.md's "One Canonical Runtime Owner Per Capability" section prohibits. Verified
+// before this change that workflowActionFromDagNode() has zero real (non-test) callers anywhere
+// in the repo, so this was a zero-live-migration-risk conversion, not a behavior change for any
+// running code.
+import { workflowActionEventSchema } from '@deeds/parent-atlas/core/workflow-action-event';
 
 /**
  * Typed adapter boundary for the existing LangGraph/MCP tool execution owner.
@@ -151,13 +161,16 @@ export function workflowActionFromDagNode(input: {
   const dag = validateContextToolDag(input.dag);
   const node = dag.nodes.find((candidate) => candidate.nodeId === input.nodeId);
   if (!node) throw new Error(`unknown ContextToolDag node ${input.nodeId}`);
-  return WorkflowActionEventV1Schema.parse({
+  // Construct via the canonical schema first (single source of truth for the
+  // 'atlas.workflow-action.v1' identity), then project down to this file's DAG-execution-facing
+  // local shape. This function never calls WorkflowActionEventV1Schema.parse() directly.
+  const canonical = workflowActionEventSchema.parse({
     schema: 'atlas.workflow-action.v1',
     workflowId: dag.workflowId,
     workflowRevision: dag.workflowRevision,
     sequence: input.sequence,
     actionId: input.actionId,
-    parentActionId: input.parentActionId ?? null,
+    parentActionId: input.parentActionId ?? undefined,
     dagNodeId: node.nodeId,
     attempt: input.attempt ?? 1,
     lane: input.lane,
@@ -165,9 +178,82 @@ export function workflowActionFromDagNode(input: {
     kind: input.kind,
     canonicalIds: node.canonicalIds,
     evidenceRefs: [...new Set(input.evidenceRefs ?? [])].sort(),
-    toolName: node.toolName,
+    toolName: node.toolName ?? undefined,
     mutationRequested: node.kind === 'MCP_TOOL_CALL' && !node.readOnly,
     validationRequired: node.requiresValidation,
     producerRevision: input.producerRevision,
+  });
+  return fromCanonicalWorkflowActionEvent(canonical);
+}
+
+// ── WORKFLOW-ACTION-SCHEMA-OWNER-01: canonical adapter ─────────────────────────
+//
+// This local WorkflowActionEventV1 stays the DAG-execution-facing type (canonicalIds,
+// toolName, mutationRequested, validationRequired). It no longer independently claims the
+// 'atlas.workflow-action.v1' schema identity as its own contract -- that identity is owned
+// by `workflowActionEventSchema` in `@deeds/parent-atlas/core/workflow-action-event`. These
+// two functions are the explicit adapter boundary, per design.md Decision 2. Note:
+// `route-head-dag-builder-v1.ts` and `atlas-kernel-session.ts` (this file's real production
+// consumers) use only `ContextToolDagV1Schema`/`ContextToolDagNodeV1Schema`, not
+// `WorkflowActionEventV1Schema` -- these adapters exist for whenever a real caller of
+// `workflowActionFromDagNode()`'s output needs to cross into the canonical identity.
+import type { WorkflowActionEventV1 as CanonicalWorkflowActionEventV1 } from '@deeds/parent-atlas/core/workflow-action-event';
+
+export function toCanonicalWorkflowActionEvent(local: WorkflowActionEventV1): CanonicalWorkflowActionEventV1 {
+  return {
+    schema: 'atlas.workflow-action.v1',
+    workflowId: local.workflowId,
+    workflowRevision: local.workflowRevision,
+    sequence: local.sequence,
+    actionId: local.actionId,
+    parentActionId: local.parentActionId ?? undefined,
+    dagNodeId: local.dagNodeId,
+    attempt: local.attempt,
+    lane: local.lane,
+    transport: local.transport ?? undefined,
+    kind: local.kind,
+    resourceRefs: [],
+    evidenceRefs: local.evidenceRefs,
+    artifactRefs: [],
+    metadata: {},
+    producerRevision: local.producerRevision,
+    inputRefs: [],
+    outputRefs: [],
+    canonicalIds: local.canonicalIds,
+    toolName: local.toolName ?? undefined,
+    mutationRequested: local.mutationRequested,
+    validationRequired: local.validationRequired,
+  } as CanonicalWorkflowActionEventV1;
+}
+
+export function fromCanonicalWorkflowActionEvent(canonical: CanonicalWorkflowActionEventV1): WorkflowActionEventV1 {
+  if (!WorkflowActionEventV1Schema.shape.kind.options.includes(canonical.kind as never)) {
+    throw new Error(
+      `WORKFLOW_ACTION_EVENT_KIND_NOT_REPRESENTABLE_IN_DAG_SHAPE: '${canonical.kind}' has no equivalent in this local WorkflowActionEventV1Schema's kind enum`,
+    );
+  }
+  if (canonical.transport && !WorkflowActionEventV1Schema.shape.transport.unwrap().options.includes(canonical.transport as never)) {
+    throw new Error(
+      `WORKFLOW_ACTION_EVENT_TRANSPORT_NOT_REPRESENTABLE_IN_DAG_SHAPE: '${canonical.transport}' has no equivalent in this local WorkflowActionEventV1Schema's transport enum`,
+    );
+  }
+  return WorkflowActionEventV1Schema.parse({
+    schema: 'atlas.workflow-action.v1',
+    workflowId: canonical.workflowId,
+    workflowRevision: canonical.workflowRevision,
+    sequence: canonical.sequence,
+    actionId: canonical.actionId,
+    parentActionId: canonical.parentActionId ?? null,
+    dagNodeId: canonical.dagNodeId,
+    attempt: canonical.attempt,
+    lane: canonical.lane,
+    transport: canonical.transport ?? null,
+    kind: canonical.kind,
+    canonicalIds: canonical.canonicalIds ?? [],
+    evidenceRefs: canonical.evidenceRefs,
+    toolName: canonical.toolName ?? null,
+    mutationRequested: canonical.mutationRequested ?? false,
+    validationRequired: canonical.validationRequired ?? false,
+    producerRevision: canonical.producerRevision,
   });
 }

@@ -1,0 +1,91 @@
+{
+  "schema": "atlas.backfill-codebase-chunk-index-file-content-hash.v1",
+  "generatedAt": "2026-09-15T21:53:55.897Z",
+  "mode": "DRY_RUN",
+  "gate": "parent-atlas-chunk-index-whole-file-hash task 5.2",
+  "counts": {
+    "totalRows": 274465,
+    "aliasPathSkipped": 37,
+    "readErrorSkipped": 3662,
+    "hashed": 0,
+    "updated": 0,
+    "alreadyPopulated": 270766
+  },
+  "distinctFilesHashed": 358,
+  "aliasPathSamples": [
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    ""
+  ],
+  "readErrorSamples": [
+    {
+      "relPath": "sveltekit-frontend/docs/graph/multihop-codebase-map.enriched.json",
+      "error": "ENOENT: no such file or directory, open 'C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\sveltekit-frontend\\docs\\graph\\multihop-codebase-map.enriched.json'"
+    },
+    {
+      "relPath": "src/lib/services/error-analysis/KAGTraverser.ts",
+      "error": "ENOENT: no such file or directory, open 'C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\services\\error-analysis\\KAGTraverser.ts'"
+    },
+    {
+      "relPath": "src/routes/(analysis)/video-analysis/[evidenceId]/AGENTS.md",
+      "error": "ENOENT: no such file or directory, open 'C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(analysis)\\video-analysis\\[evidenceId]\\AGENTS.md'"
+    },
+    {
+      "relPath": "src/lib/services/knowledge-search/TagExtractor.ts",
+      "error": "ENOENT: no such file or directory, open 'C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\services\\knowledge-search\\TagExtractor.ts'"
+    },
+    {
+      "relPath": "src/lib/components/legal-corpus/AGENTS.md",
+      "error": "ENOENT: no such file or directory, open 'C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\legal-corpus\\AGENTS.md'"
+    },
+    {
+      "relPath": "src/lib/server/evidence/services/drizzle-stub.ts",
+      "error": "ENOENT: no such file or directory, open 'C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\server\\evidence\\services\\drizzle-stub.ts'"
+    },
+    {
+      "relPath": "src/lib/components/legal/AGENTS.md",
+      "error": "ENOENT: no such file or directory, open 'C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\legal\\AGENTS.md'"
+    },
+    {
+      "relPath": "src/lib/server/ff1/cli/AGENTS.md",
+      "error": "ENOENT: no such file or directory, open 'C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\server\\ff1\\cli\\AGENTS.md'"
+    },
+    {
+      "relPath": "src/lib/components/chat/AGENTS.md",
+      "error": "ENOENT: no such file or directory, open 'C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\chat\\AGENTS.md'"
+    },
+    {
+      "relPath": "src/lib/components/ai/AGENTS.md",
+      "error": "ENOENT: no such file or directory, open 'C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\ai\\AGENTS.md'"
+    },
+    {
+      "relPath": "src/routes/(app)/fictional-cases/[id]/AGENTS.md",
+      "error": "ENOENT: no such file or directory, open 'C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(app)\\fictional-cases\\[id]\\AGENTS.md'"
+    },
+    {
+      "relPath": "src/lib/services/error-analysis/OllamaService.ts",
+      "error": "ENOENT: no such file or directory, open 'C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\services\\error-analysis\\OllamaService.ts'"
+    },
+    {
+      "relPath": "src/lib/services/error-analysis/FixSynthesizer.ts",
+      "error": "ENOENT: no such file or directory, open 'C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\services\\error-analysis\\FixSynthesizer.ts'"
+    },
+    {
+      "relPath": "src/lib/components/evidence/AGENTS.md",
+      "error": "ENOENT: no such file or directory, open 'C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\evidence\\AGENTS.md'"
+    },
+    {
+      "relPath": "src/routes/(app)/cases/[id]/notes/AGENTS.md",
+      "error": "ENOENT: no such file or directory, open 'C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(app)\\cases\\[id]\\notes\\AGENTS.md'"
+    }
+  ],
+  "postgresWrites": false,
+  "reportChecksum": "97d7076caf46eeaee0be28b588b1f81a9f7aaad6d411c800397d0d203277e5bd"
+}

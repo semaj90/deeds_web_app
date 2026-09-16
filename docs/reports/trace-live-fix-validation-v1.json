@@ -1,0 +1,35 @@
+{
+  "schema": "parent-atlas.trace-live-fix-validation.v1",
+  "status": "SOURCE_FIXES_PROVEN_FRESH_PROCESS",
+  "testedPort": 8793,
+  "productionPort": 8788,
+  "sqlArrayJoinFix": "PROVEN",
+  "engramOptionalHnsw512Guard": "PROVEN",
+  "qdrantAliasVectorSchemaSelection": "PROVEN",
+  "freshTraceKagSearch": "READ_ONLY_RESULT_RETURNED",
+  "freshProcessErrorChecks": {
+    "invalidSqlArrayCast": false,
+    "summaryLensContentVectorMismatch": false,
+    "missingHnswEmbedding512": false
+  },
+  "focusedTests": {
+    "passed": 4,
+    "failed": 0,
+    "suites": [
+      "src/lib/server/vector/qdrant-manager-named-vector.spec.ts",
+      "src/lib/server/retrieval/executor-tree.spec.ts"
+    ]
+  },
+  "productionListenerReloaded": false,
+  "nativeTensorRtAddonAvailableInFreshWindowsProcess": false,
+  "writesPerformed": false,
+  "datastoreMutations": false,
+  "projectionMutations": false,
+  "nextGate": "RELOAD_OR_REDEPLOY_TRACE_8788_THEN_RERUN_READ_ONLY_PROBE",
+  "evidenceRefs": [
+    "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+    "sveltekit-frontend/src/lib/server/vector/qdrant-manager.ts",
+    "sveltekit-frontend/src/lib/server/mcp/memory-bridge.ts",
+    "docs/reports/trace-disabled-search-tools-v1.json"
+  ]
+}

@@ -38,9 +38,13 @@ services:
       LANGEXTRACT_BASE_URL: http://host.docker.internal:8090/v1
       LANGEXTRACT_API_KEY: ${LANGEXTRACT_API_KEY:-local}
       LLAMA_SERVER_URL: http://host.docker.internal:8090/v1
-      # Optional explicit read-only PostgreSQL OaK adapter. Keep empty by default;
-      # production must provide a reviewed, revision-qualified locator explicitly.
-      ATLAS_OAK_ADAPTER: ${ATLAS_OAK_ADAPTER:-}
+      # Read-only PostgreSQL OaK adapter. The locator is overrideable for a
+      # separately reviewed ontology artifact, but the default points only at
+      # the existing canonical PostgreSQL ontology tables. The adapter issues
+      # SET TRANSACTION READ ONLY for every request; it never promotes or
+      # writes ontology state.
+      ATLAS_OAK_ADAPTER: ${ATLAS_OAK_ADAPTER:-postgresql://legal_admin:${POSTGRES_PASSWORD:-123456}@legal-ai-postgres:5432/legal_ai_db}
+      ATLAS_OAK_ADAPTER_TYPE: ${ATLAS_OAK_ADAPTER_TYPE:-atlas-postgres}
       UVICORN_LOG_LEVEL: info
       # Dev-only: python/ is bind-mounted above, but uvicorn does not pick up source
       # edits without --reload (found live 2026-09-03 -- a bind-mounted change was

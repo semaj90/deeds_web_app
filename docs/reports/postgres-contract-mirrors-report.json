@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-08T21:25:18.248Z",
+  "generatedAt": "2026-09-15T18:47:44.745Z",
   "liveReachable": true,
   "liveError": null,
   "summary": {
@@ -794,6 +794,8 @@
         "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\drizzle\\manual\\20260611_atlas_packets_schema.sql",
         "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\drizzle\\manual\\20260612_packet_payload_expression_indexes.sql",
         "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\drizzle\\manual\\20260907_canonical_owner_revision_axes_v1.sql",
+        "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\drizzle\\manual\\20260909_atlas_packets_source_revision.sql",
+        "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\drizzle\\manual\\20260909_router_feature_revision_indexes.sql",
         "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\drizzle\\manual\\file-understanding-labels.sql",
         "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\drizzle\\manual\\phase-b-enrichment-schema.sql"
       ],
@@ -892,6 +894,7 @@
           "atlas_packets_metadata_path_idx",
           "atlas_packets_payload_gin",
           "atlas_packets_payload_hash_idx",
+          "atlas_packets_workspace_representation_idx",
           "idx_atlas_packets_betweenness",
           "idx_atlas_packets_bm25_indexed_at",
           "idx_atlas_packets_bm25_terms",
@@ -1119,6 +1122,7 @@
           "atlas_packets_metadata_path_idx",
           "atlas_packets_payload_gin",
           "atlas_packets_payload_hash_idx",
+          "atlas_packets_workspace_representation_idx",
           "idx_atlas_packets_betweenness",
           "idx_atlas_packets_bm25_indexed_at",
           "idx_atlas_packets_bm25_terms",
@@ -1264,6 +1268,7 @@
             "atlas_packets_metadata_path_idx",
             "atlas_packets_payload_gin",
             "atlas_packets_payload_hash_idx",
+            "atlas_packets_workspace_representation_idx",
             "idx_atlas_packets_bm25_indexed_at",
             "idx_atlas_packets_bm25_terms",
             "idx_atlas_packets_community_id",
@@ -1455,13 +1460,15 @@
           "projection_representation_id",
           "projection_dimension",
           "encoder_revision",
-          "som_revision"
+          "som_revision",
+          "source_revision"
         ],
         "indexes": [
           "atlas_packets_domain_unclassified_idx",
           "atlas_packets_metadata_gin_idx",
           "atlas_packets_packet_key_key",
           "atlas_packets_pkey",
+          "atlas_packets_workspace_representation_idx",
           "idx_atlas_packets_ast_score",
           "idx_atlas_packets_bm25_indexed_at",
           "idx_atlas_packets_bm25_terms",
@@ -1530,6 +1537,7 @@
           "idx_atlas_packets_source_ref",
           "idx_atlas_packets_source_ref_idx",
           "idx_atlas_packets_source_ref_key",
+          "idx_atlas_packets_source_revision",
           "idx_atlas_packets_summary_fts",
           "idx_atlas_packets_symbol_id",
           "idx_atlas_packets_tags",
@@ -1549,9 +1557,7 @@
         ],
         "rowCount": 61718,
         "columnDiffs": {
-          "onlyInA": [
-            "source_revision"
-          ],
+          "onlyInA": [],
           "onlyInB": [
             "ast_score",
             "authority_score",
@@ -1643,7 +1649,6 @@
             "idx_atlas_packets_qdrant_point",
             "idx_atlas_packets_recovery_lane",
             "idx_atlas_packets_reward_prior",
-            "idx_atlas_packets_source_revision",
             "idx_atlas_packets_summary_trgm",
             "idx_atlas_packets_test_coverage",
             "idx_atlas_packets_thoroughness",

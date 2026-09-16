@@ -1,7 +1,10 @@
 import { describe, expect, it, vi } from 'vitest';
 import { atlasPackets } from '$lib/server/db/schema/atlas-packets.js';
 import { computePacketKey as computeCanonicalPacketKey } from '$lib/server/atlas/identity/packet-key-builder.js';
-import { persistCanonicalSemanticPacketEmbedding } from './semantic-packet-writer.js';
+import {
+	persistAdmittedSemanticPacketEmbedding,
+	persistCanonicalSemanticPacketEmbedding,
+} from './semantic-packet-writer.js';
 import { CANONICAL_SEMANTIC_ENCODER_REVISION } from './semantic-lineage.js';
 
 const { mockResolveCanonicalPacketKey } = vi.hoisted(() => ({
@@ -13,6 +16,63 @@ vi.mock('$lib/server/atlas/identity/packet-identity-resolver.js', () => ({
 }));
 
 describe('persistCanonicalSemanticPacketEmbedding', () => {
+	it('requires and preserves a revision-qualified current-corpus admission', async () => {
+		const values = vi.fn().mockReturnValue({ onConflictDoUpdate: vi.fn().mockResolvedValue(undefined) });
+		const insert = vi.fn().mockReturnValue({ values });
+		const database = { insert } as any;
+		const vector = Array.from({ length: 768 }, () => 0.11);
+		const workspaceRevision = `sha256:${'a'.repeat(64)}`;
+		const sourceRevision = `sha256:${'b'.repeat(64)}`;
+		const contentDigest = 'c'.repeat(64);
+
+		await persistAdmittedSemanticPacketEmbedding({
+			admission: {
+				packetKey: 'packet:admitted:1',
+				sourceRef: 'src/lib/server/admitted.ts',
+				sourceRevision,
+				workspaceRevision,
+				contentDigest,
+				executionId: 'execution-admitted-1',
+				bindingChecksum: 'd'.repeat(64),
+				authorityScope: 'ADMITTED_EXECUTION_SOURCE_BINDING',
+				writesPerformed: false,
+			},
+			vector,
+			metadata: { test: true },
+		}, database);
+
+		const row = values.mock.calls[0]?.[0] as Record<string, unknown>;
+		expect(row.sourceRevision).toBe(sourceRevision);
+		expect(row.contentHash).toBe(contentDigest);
+		expect(row.metadata).toMatchObject({
+			test: true,
+			canonical_packet_admission: {
+				executionId: 'execution-admitted-1',
+				workspaceRevision,
+				bindingChecksum: 'd'.repeat(64),
+			},
+		});
+	});
+
+	it('rejects an admission with missing canonical content digest', async () => {
+		const database = { insert: vi.fn() } as any;
+		await expect(persistAdmittedSemanticPacketEmbedding({
+			admission: {
+				packetKey: 'packet:admitted:missing-digest',
+				sourceRef: 'src/lib/server/missing.ts',
+				sourceRevision: `sha256:${'a'.repeat(64)}`,
+				workspaceRevision: `sha256:${'b'.repeat(64)}`,
+				contentDigest: 'not-a-digest',
+				executionId: 'execution-admitted-2',
+				bindingChecksum: 'c'.repeat(64),
+				authorityScope: 'ADMITTED_EXECUTION_SOURCE_BINDING',
+				writesPerformed: false,
+			},
+			vector: Array.from({ length: 768 }, () => 0),
+		}, database)).rejects.toThrow();
+		expect(database.insert).not.toHaveBeenCalled();
+	});
+
 	it('writes canonical semantic lineage into atlas_packets', async () => {
 		const values = vi.fn().mockReturnValue({ onConflictDoUpdate: vi.fn().mockResolvedValue(undefined) });
 		const insert = vi.fn().mockReturnValue({ values });
@@ -141,12 +201,14 @@ describe('persistCanonicalSemanticPacketEmbedding', () => {
 				packetKey: 'packet:semantic:5',
 				sourceRef: 'src/lib/server/example-5.ts',
 				sourceRevision: 'sha256:abc123',
+				contentHash: 'sha256:def456',
 				vector,
 			},
 			database,
 		);
 
 		expect(values.mock.calls[0]?.[0].sourceRevision).toBe('sha256:abc123');
+		expect(values.mock.calls[0]?.[0].contentHash).toBe('sha256:def456');
 		// PACKET-WRITER-SOURCE-REVISION-PRESERVATION-01: the conflict branch now
 		// wraps sourceRevision in COALESCE(new, existing) so a proven value can
 		// never be silently clobbered by a revision-blind caller. It is therefore

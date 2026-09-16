@@ -852,6 +852,12 @@ async function stage4WarmContextCache() {
   const startTime = Date.now();
   report.stages.stage4.status = 'running';
 
+  // Stage 4 currently constructs fixed placeholder PageRank/attention/
+  // authority values. Do not persist synthetic blends to the ACE cache.
+  if (APPLY) {
+    throw new Error('ACE_CONTEXT_WARM_APPLY_BLOCKED_PLACEHOLDER_BLEND');
+  }
+
   try {
     const redis = new Redis({ host: REDIS_HOST, port: REDIS_PORT, password: REDIS_PASS });
     const pool = new pg.Pool({ connectionString: PG_URL, max: 5 });

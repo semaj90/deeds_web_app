@@ -516,6 +516,13 @@ function validateOntologyNodes(nodes) {
 async function main() {
   console.log('[MATERIALIZE ONTOLOGY NODE INDEX] Starting...\n');
 
+  // Manifold/topology values are currently generated placeholders and are not
+  // revision-qualified graph or semantic evidence. Dry-run remains useful for
+  // shape inspection; persistence is closed until real producers are wired.
+  if (!isDryRun) {
+    throw new Error('ONTOLOGY_MATERIALIZE_APPLY_BLOCKED_UNQUALIFIED_FEATURES');
+  }
+
   if (isDryRun) {
     console.log('[DRY-RUN MODE] No files will be written.\n');
   }

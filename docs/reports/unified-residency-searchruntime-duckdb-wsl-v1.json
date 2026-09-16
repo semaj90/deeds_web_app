@@ -1,0 +1,60 @@
+{
+  "schema": "atlas.unified-residency-searchruntime-duckdb-wsl.v1",
+  "status": "SEARCHRUNTIME_DUCKDB_WSL_HANDOFF_PROVEN",
+  "stages": {
+    "searchRuntime": "PROVEN_BOUNDED_FIXTURE",
+    "aceAdmission": "READ_ONLY",
+    "featurePackRows": 1,
+    "duckdb": "IN_MEMORY_READ_ONLY_SELECT",
+    "wslProvider": "RESIDENT",
+    "numericalParity": "EXACT_COSINE_PROVEN",
+    "staleQueryRejected": "FAIL_CLOSED_PROVEN"
+  },
+  "lineage": {
+    "workspaceRevision": "workspace:r1",
+    "sourceRevision": "source:r1",
+    "representationRevision": "semantic_768:r1",
+    "featureRevision": "features:r1",
+    "candidateOrdinal": 0
+  },
+  "checksums": {
+    "sourceFeatureValues": "ebb764d23a2848b85e41cc50da5d4976569de9a585f42055b645cf982cfe92b4",
+    "stagedFeatureValues": "ebb764d23a2848b85e41cc50da5d4976569de9a585f42055b645cf982cfe92b4",
+    "framedTransport": "ee0136508d26fc9eed7bbb319bb9865e24d53b0d9c4299c8865476f1788369ca"
+  },
+  "cpuOracle": {
+    "indices": [
+      0
+    ],
+    "scores": [
+      1
+    ]
+  },
+  "receipt": {
+    "state": "RESIDENT",
+    "device": "cuda",
+    "byteLength": 48,
+    "rawPointerExposed": false,
+    "writesPerformed": false,
+    "operation": "EXACT_COSINE_V1",
+    "indices": [
+      0
+    ],
+    "scores": [
+      1
+    ],
+    "resultChecksum": "1d65eed5ad8f2cc325c30afb1d78c084dfcdfaa8760763d58826a7d8210bc8cf"
+  },
+  "negativeCase": {
+    "state": "FAILED",
+    "error": "UNIFIED_RESIDENCY_QUERY_SHAPE_MISMATCH",
+    "processExitCode": 1,
+    "writesPerformed": false
+  },
+  "processExitCode": 0,
+  "stderr": "",
+  "parseError": null,
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "promotionEligible": false
+}

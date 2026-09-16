@@ -4,10 +4,11 @@ import { ENV } from "../lib/server/env.server.js";
 import { resolveLoadedLlamaModel } from '../lib/server/ai/llama-server-model-resolver.js';
 import type { DispatcherMiddleware } from './dispatcher-middleware.js';
 import { generateSessionId, createToolWithDispatcher } from './dispatcher-tool-integration.js';
+import { resolveRerankEndpoint } from '../lib/server/search/rerank-endpoint.js';
 
 const OLLAMA_URL      = ENV.OLLAMA_BASE_URL;
 const LLAMA_SERVER_URL = ENV.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090';
-const RERANK_URL      = ENV.RERANK_URL;
+const RERANK_URL      = resolveRerankEndpoint(ENV);
 const TURBOQUANT_URL  = ENV.TURBOQUANT_URL;
 
 /**
@@ -39,6 +40,9 @@ export function registerBifrostTools(server: McpServer, dispatcherMiddleware?: D
           endpoint = '/api/embeddings';
           break;
         case 'RERANK':
+          if (!RERANK_URL) {
+            throw new Error('RERANKER_ENDPOINT_UNAVAILABLE');
+          }
           targetUrl = RERANK_URL;
           endpoint = '/rerank'; // Or custom endpoint for reranker
           break;

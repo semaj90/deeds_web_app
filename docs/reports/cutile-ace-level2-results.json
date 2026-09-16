@@ -1,0 +1,55 @@
+{
+  "schema": "atlas.cutile-ace-level2.wrapped-result.v1",
+  "test": "CUTILE-ACE-01-LEVEL2",
+  "read_only": true,
+  "canonical_production_data_touched": false,
+  "canonical_production_data_mutated": false,
+  "per_size_results": [
+    {
+      "schema": "atlas.cutile-ace-level2.result.v1",
+      "test": "CUTILE-ACE-01-LEVEL2",
+      "n": 256,
+      "glyphScoreV1ExactMatch": true,
+      "glyphScoreV1FirstMismatchIndex": 0,
+      "residencyKeyPackV1ExactMatch": true,
+      "residencyKeyPackV1FirstMismatchIndex": 0,
+      "RESULT": "DRY_RUN_PROVEN"
+    },
+    {
+      "schema": "atlas.cutile-ace-level2.result.v1",
+      "test": "CUTILE-ACE-01-LEVEL2",
+      "n": 1000,
+      "glyphScoreV1ExactMatch": true,
+      "glyphScoreV1FirstMismatchIndex": 0,
+      "residencyKeyPackV1ExactMatch": true,
+      "residencyKeyPackV1FirstMismatchIndex": 0,
+      "RESULT": "DRY_RUN_PROVEN"
+    },
+    {
+      "schema": "atlas.cutile-ace-level2.result.v1",
+      "test": "CUTILE-ACE-01-LEVEL2",
+      "n": 4000,
+      "glyphScoreV1ExactMatch": true,
+      "glyphScoreV1FirstMismatchIndex": 0,
+      "residencyKeyPackV1ExactMatch": true,
+      "residencyKeyPackV1FirstMismatchIndex": 0,
+      "RESULT": "DRY_RUN_PROVEN"
+    }
+  ],
+  "gate": {
+    "criterion": "GlyphScoreV1 and ResidencySortKeyV1-GPU must exactly match their CPU oracles at every tested fixture size",
+    "fixture_sizes_tested": [
+      256,
+      1000,
+      4000
+    ],
+    "all_exact_match": true,
+    "RESULT": "DRY_RUN_PROVEN"
+  },
+  "level3_gate_status": {
+    "level1_cub_oracle": "DRY_RUN_PROVEN (docs/reports/ace-radix-01-results.json)",
+    "level2_glyph_score_and_key_pack": "DRY_RUN_PROVEN (this report)",
+    "cutile_ace_01_level3_unblocked": true,
+    "note": "LEVEL 3 (fused cuTile score->key-pack->partition) still requires a CUDA 13.2+ host with a real cuTile programming API (this dev host's native Windows CUDA 13.0 toolkit only ships a compiler-intrinsic stub, per ACE-RADIX-01's own finding) -- LEVEL 2 passing here unblocks attempting LEVEL 3, it does not itself run it."
+  }
+}

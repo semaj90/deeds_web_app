@@ -328,6 +328,13 @@ async function main() {
   log(`Mode: ${DRY_RUN ? 'DRY_RUN' : 'APPLY'}`);
   log('='.repeat(70));
 
+  // This legacy pipeline still contains mock vectors, random feature values,
+  // and compatibility fallbacks. Never allow those values to reach Postgres
+  // or Neo4j; keep the command available for bounded dry-run diagnostics.
+  if (!DRY_RUN) {
+    throw new Error('PHASE2A_APPLY_BLOCKED_SYNTHETIC_FEATURES');
+  }
+
   try {
     // Step 1: Extract AST symbols
     const symbols = await extractAstSymbols(LIMIT);

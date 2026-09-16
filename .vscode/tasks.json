@@ -11927,6 +11927,28 @@
         "clear": false
       },
       "detail": "Phase B: Asynchronous EmbeddingGemma worker. Consumes summaries from RabbitMQ atlas.enrichment.embedding queue, computes 768-dim embeddings via Ollama, logs analysis_pass_results, updates atlas_summary_layers. Runs continuously. Stop with Ctrl+C."
+    },
+    {
+      "label": "🧠 OpenCode: Atlas Residency Proof (read-only)",
+      "type": "shell",
+      "command": "opencode run --command atlas-residency-proof --agent ornith-atlas-kernel --format json",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "isBackground": false,
+      "runOptions": {
+        "runOn": "userRequest"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "detail": "Runs the existing OpenCode agent against the bounded unified-residency proof. The command is read-only and does not use --auto; no migration, datastore, projection, cleanup, or GPU-state mutation is authorized."
     }
   ]
 }

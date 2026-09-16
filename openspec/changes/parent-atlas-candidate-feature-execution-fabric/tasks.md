@@ -669,6 +669,19 @@ remaining JSON/provider, context, model-boundary, ACE, and execution-admission
 tasks may proceed in parallel as long as they do not promote graph evidence or
 claim full-corpus graph qualification.
 
+**Re-confirmed still valid, not stale — 2026-09-15 (from a sibling session working
+`parent-atlas-retrieval-lineage-dag-convergence`'s `CURRENT-STRUCTURAL-LINEAGE-01` gate)**: that
+session made real progress on the packet↔chunk structural lineage bridge (an informational
+`file_content_hash` join rose `0%→33.6%`) and, before assuming this unblocked 128-scaling here,
+explicitly re-checked this file's `BLOCKED_ON_LINEAGE_GRAPH_OWNER` status against a live read of
+`docs/reports/current-graphify-run-owner-v1.json`: for the currently-expected workspace revision,
+`runCount: 0`, `completedOwnerCount: 0` — this blocker is still genuinely, currently true, not
+inherited stale data. **The two blockers are independent** — closing `CURRENT-STRUCTURAL-LINEAGE-01`
+alone will not unblock 128/768 scaling here; the Graphify execution-owner ambiguity (this section's
+own `GRAPHIFY-RUN-OWNER-01` next-gate) is a separate, still-open prerequisite. Full trail in
+`parent-atlas-retrieval-lineage-dag-convergence/tasks.md`'s "Stage-3 (CandidateOrdinalMapV1
+128-scale) gate re-investigation" entry (same date).
+
 Parallel work order while the owner remains unresolved:
 
 ```text

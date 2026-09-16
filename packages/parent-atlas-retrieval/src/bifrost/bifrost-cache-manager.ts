@@ -72,6 +72,53 @@ export class BifrostCacheManager {
     return `bitfrost:retrieval:v2:${digest}`;
   }
 
+  /** Default TTL for a v2 revision-qualified retrieval cache entry. */
+  private static V2_TTL = 3600;
+
+  /**
+   * Write a retrieval result under its revision-qualified v2 key. A revision bump on any
+   * identity axis produces a different key (proven in cache-identity-v2.spec.ts), so a stale
+   * entry is naturally unreachable by a fresh identity — this is the primary invalidation
+   * mechanism. `invalidateRetrievalV2` exists for the secondary case: an operator or a
+   * downstream owner needs to force-evict a specific still-reachable key (e.g. a manual cache
+   * bust) without waiting for TTL or a revision change.
+   */
+  static async setRetrievalV2(
+    identity: Parameters<typeof BifrostCacheManager.buildRetrievalCacheKeyV2>[0],
+    value: unknown,
+    ttlSeconds: number = BifrostCacheManager.V2_TTL,
+  ): Promise<string> {
+    const key = this.buildRetrievalCacheKeyV2(identity);
+    const redis = getRedis();
+    await redis.set(key, JSON.stringify(value), 'EX', ttlSeconds);
+    return key;
+  }
+
+  /** Read back a v2 retrieval cache entry. Returns null on miss (stale-key or never-written). */
+  static async getRetrievalV2<T = unknown>(
+    identity: Parameters<typeof BifrostCacheManager.buildRetrievalCacheKeyV2>[0],
+  ): Promise<T | null> {
+    const key = this.buildRetrievalCacheKeyV2(identity);
+    const redis = getRedis();
+    const raw = await redis.get(key).catch(() => null);
+    if (!raw) return null;
+    try {
+      return JSON.parse(raw) as T;
+    } catch {
+      return null;
+    }
+  }
+
+  /** Force-evict a specific v2 retrieval cache entry ahead of TTL. Returns true if a key was deleted. */
+  static async invalidateRetrievalV2(
+    identity: Parameters<typeof BifrostCacheManager.buildRetrievalCacheKeyV2>[0],
+  ): Promise<boolean> {
+    const key = this.buildRetrievalCacheKeyV2(identity);
+    const redis = getRedis();
+    const deleted = await redis.del(key).catch(() => 0);
+    return deleted > 0;
+  }
+
   /**
    * Store cache metadata beside an artifact. The artifact remains disposable;
    * canonical identity and revision validation happen before this method.

@@ -48,7 +48,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cmd=$(jq -r '.tool_input.command // \"\"' 2>/dev/null); if echo \"$cmd\" | grep -qE '^git commit'; then (cd /c/Users/james/Videos/deeds-web-app/sveltekit-frontend && npm run graphify:daily >> /tmp/graphify-daily.log 2>&1 &); fi",
+            "command": "cmd=$(jq -r '.tool_input.command // \"\"' 2>/dev/null); if echo \"$cmd\" | grep -qE '^git commit'; then (cd /c/Users/james/Videos/deeds-web-app && node scripts/atlas/audit-workspace-source-snapshot-retention-v1.mjs >/tmp/graphify-retention-audit.log 2>&1); fi",
             "timeout": 5
           }
         ]

@@ -6,17 +6,19 @@
  * workspace-binding rows.
  */
 import { createHash } from 'node:crypto';
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
-const PLAN = resolve(ROOT, 'docs/reports/current-source-graphify-batch-plan-v1.json');
+const SELECTION = resolve(ROOT, 'docs/reports/current-source-selection-input-v1.json');
 const REPORT = resolve(ROOT, 'docs/reports/current-source-registry-reconciliation-plan-v1.json');
 const limitArg = process.argv.find((arg) => arg.startsWith('--limit='));
-const limit = Math.max(1, Math.min(111, Number(limitArg?.split('=')[1] ?? 111)));
+// Keep the planner bounded, but allow the current execution-owned cohort to
+// advance beyond the historical 111-row canary without enabling writes.
+const limit = Math.max(1, Math.min(500, Number(limitArg?.split('=')[1] ?? 500)));
 
 const text = (value) => {
   const valueText = String(value ?? '').trim().replaceAll('\\', '/');
@@ -27,20 +29,26 @@ const checksum = (rows) => createHash('sha256')
   .update(rows.map((row) => `${row.repoId}:${row.sourceRefKey}:${row.contentHash}:${row.sourceRevision}:${row.workspaceRevision}`).join('\n'), 'utf8')
   .digest('hex');
 
-const plan = JSON.parse(readFileSync(PLAN, 'utf8'));
-const plannedRows = (plan.records ?? [])
-  .filter((row) => row.classification === 'CURRENT_GRAPHIFY_EXACT')
+const selection = JSON.parse(readFileSync(SELECTION, 'utf8'));
+if (selection.status !== 'CURRENT_SNAPSHOT_PROVEN'
+  || selection.canonicalAuthority !== false
+  || selection.readOnly !== true
+  || selection.writesPerformed !== false
+  || !Array.isArray(selection.bindings)) {
+  throw new Error('CURRENT_SOURCE_SELECTION_INPUT_NOT_PROVEN');
+}
+const plannedRows = selection.bindings
   .sort((a, b) => String(a.sourceRef).localeCompare(String(b.sourceRef)))
   .slice(0, limit)
   .map((row) => ({
     repoId: 'deeds-web-app',
-    sourceRefKey: text(row.sourceRef),
-    relativePath: text(row.sourceRef),
+    sourceRefKey: text(row.source_ref),
+    relativePath: text(row.source_ref),
     sourceType: 'code',
-    contentHash: text(row.contentDigest),
-    sourceRevision: text(row.sourceRevision),
-    workspaceRevision: text(row.workspaceRevision),
-    byteLength: Number(row.byteLength),
+    contentHash: text(row.content_hash),
+    sourceRevision: text(row.code_source_revision),
+    workspaceRevision: text(row.workspace_revision),
+    byteLength: Number(row.byte_length),
   }));
 
 if (plannedRows.some((row) => !row.sourceRefKey || !/^[0-9a-f]{64}$/i.test(row.contentHash ?? '')
@@ -85,7 +93,10 @@ const report = {
   mode: 'READ_ONLY_PLAN',
   readOnly: true,
   writes: { postgres: false, graphify: false, qdrant: false, neo4j: false, valkey: false },
-  sourcePlan: 'docs/reports/current-source-graphify-batch-plan-v1.json',
+  sourcePlan: 'docs/reports/current-source-selection-input-v1.json',
+  sourceSelectionExecutionId: selection.executionId ?? null,
+  sourceSelectionSnapshotRevision: selection.snapshotRevision ?? null,
+  sourceSelectionChecksum: selection.sourceRefSetChecksum ?? null,
   requestedLimit: limit,
   selectedSourceCount: rows.length,
   registryMatchCount: registryRows.length,
@@ -109,7 +120,9 @@ const report = {
   rows,
 };
 mkdirSync(dirname(REPORT), { recursive: true });
-writeFileSync(REPORT, `${JSON.stringify(report, null, 2)}\n`);
+const reportTemp = `${REPORT}.${process.pid}.tmp`;
+writeFileSync(reportTemp, `${JSON.stringify(report, null, 2)}\n`);
+renameSync(reportTemp, REPORT);
 console.log(JSON.stringify({
   schema: report.schema,
   status: report.status,

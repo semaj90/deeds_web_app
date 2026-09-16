@@ -160,6 +160,106 @@ export function validateWorkflowActionEvent(event: WorkflowActionEventV1): Workf
   return { ok: errors.length === 0, errors };
 }
 
+// ── WORKFLOW-ACTION-SCHEMA-OWNER-01: canonical adapter ─────────────────────────
+//
+// This local WorkflowActionEventV1 stays the UI/Kanban-facing type (state, operation,
+// progress, target, visual). It no longer independently claims the
+// 'atlas.workflow-action.v1' schema identity as its own contract -- that identity is owned
+// by `workflowActionEventSchema` in `@deeds/parent-atlas/core/workflow-action-event`. These
+// two functions are the explicit adapter boundary between this local shape and the canonical
+// one, per design.md Decision 2.
+//
+// `WORKFLOW_EVENT_KINDS` here intentionally does NOT include every canonical `kind` value
+// (it lacks 'cancelled', 'suspended', 'resumed', 'validated', 'materialized') -- rather than
+// silently coerce an unrepresentable canonical kind to a wrong local one, conversion throws.
+// Widening this local enum is a separate decision for whoever wires a real UI/Kanban
+// consumer of those kinds, not assumed here.
+
+import type {
+  WorkflowActionEventV1 as CanonicalWorkflowActionEventV1,
+} from '@deeds/parent-atlas/core/workflow-action-event';
+
+export interface ToCanonicalExtrasV1 {
+  producerRevision: string;
+}
+
+export interface FromCanonicalExtrasV1 {
+  emittedAt: string;
+}
+
+export function toCanonicalWorkflowActionEvent(
+  local: WorkflowActionEventV1,
+  extras: ToCanonicalExtrasV1,
+): CanonicalWorkflowActionEventV1 {
+  return {
+    schema: 'atlas.workflow-action.v1',
+    workflowId: local.workflowId,
+    workflowRevision: local.workflowRevision,
+    sequence: local.sequence,
+    actionId: local.actionId,
+    parentActionId: local.parentActionId,
+    dagNodeId: local.dagNodeId,
+    attempt: local.attempt,
+    lane: local.lane,
+    transport: local.transport,
+    kind: local.kind,
+    resourceRefs: [],
+    evidenceRefs: local.evidenceRefs ?? [],
+    artifactRefs: local.artifactRefs ?? [],
+    startedAt: local.startedAt,
+    completedAt: local.finishedAt,
+    metadata: {},
+    producerRevision: extras.producerRevision,
+    inputRefs: [],
+    outputRefs: [],
+    state: local.state,
+    operation: local.operation,
+    progress: local.progress,
+    target: local.target,
+    visual: local.visual,
+    canonicalIds: local.target?.canonicalId ? [local.target.canonicalId] : [],
+  } as CanonicalWorkflowActionEventV1;
+}
+
+export function fromCanonicalWorkflowActionEvent(
+  canonical: CanonicalWorkflowActionEventV1,
+  extras: FromCanonicalExtrasV1,
+): WorkflowActionEventV1 {
+  if (!(WORKFLOW_EVENT_KINDS as readonly string[]).includes(canonical.kind)) {
+    throw new Error(
+      `WORKFLOW_ACTION_EVENT_KIND_NOT_REPRESENTABLE_IN_UI_SHAPE: '${canonical.kind}' has no equivalent in this local WorkflowActionEventV1's WORKFLOW_EVENT_KINDS`,
+    );
+  }
+  if (canonical.transport && !(WORKFLOW_TRANSPORTS as readonly string[]).includes(canonical.transport)) {
+    throw new Error(
+      `WORKFLOW_ACTION_EVENT_TRANSPORT_NOT_REPRESENTABLE_IN_UI_SHAPE: '${canonical.transport}' has no equivalent in this local WorkflowActionEventV1's WORKFLOW_TRANSPORTS (e.g. 'mcp' is canonical-only)`,
+    );
+  }
+  return {
+    schema: 'atlas.workflow-action.v1',
+    workflowId: canonical.workflowId,
+    workflowRevision: canonical.workflowRevision,
+    sequence: canonical.sequence,
+    actionId: canonical.actionId,
+    parentActionId: canonical.parentActionId,
+    dagNodeId: canonical.dagNodeId,
+    attempt: canonical.attempt,
+    lane: canonical.lane,
+    transport: canonical.transport as WorkflowTransport | undefined,
+    kind: canonical.kind as WorkflowEventKind,
+    state: canonical.state ?? 'running',
+    operation: canonical.operation ?? '',
+    progress: canonical.progress,
+    target: canonical.target,
+    evidenceRefs: canonical.evidenceRefs,
+    artifactRefs: canonical.artifactRefs,
+    startedAt: canonical.startedAt,
+    emittedAt: extras.emittedAt,
+    finishedAt: canonical.completedAt,
+    visual: canonical.visual,
+  };
+}
+
 export function workflowProgressFraction(event: Pick<WorkflowActionEventV1, 'progress' | 'state'>): number | null {
   if (event.progress?.fraction !== undefined) return event.progress.fraction;
   if (

@@ -1,0 +1,64 @@
+{
+  "schema": "atlas.trace-dense-capability-receipt.v1",
+  "generatedAt": "2026-09-14T19:57:33.715Z",
+  "endpoint": "http://127.0.0.1:6333",
+  "collections": [
+    "codebase_chunks_768",
+    "summary_lenses_768",
+    "synthesis_memory_768"
+  ],
+  "capabilities": [
+    {
+      "schema": "atlas.dense-representation-capability.v1",
+      "logicalRepresentation": "semantic_768",
+      "dimensions": 768,
+      "metric": "cosine",
+      "qdrant": {
+        "collection": "codebase_chunks_768",
+        "vectorName": "content"
+      },
+      "available": true,
+      "representationRevision": "qdrant-schema:codebase_chunks_768",
+      "writesPerformed": false,
+      "capabilityChecksum": "70e0ae54de2148e46f17deb465df0f1d8a165f2dbd3046cb8ba735c0686242a8"
+    },
+    {
+      "schema": "atlas.dense-representation-capability.v1",
+      "logicalRepresentation": "summary_768",
+      "dimensions": 768,
+      "metric": "cosine",
+      "qdrant": {
+        "collection": "summary_lenses_768",
+        "vectorName": "summary"
+      },
+      "available": true,
+      "representationRevision": "qdrant-schema:summary_lenses_768",
+      "writesPerformed": false,
+      "capabilityChecksum": "c895e3418375eff77c2f2fb32e4e58338887a3bf275f46919be312f1fe1e9556"
+    },
+    {
+      "schema": "atlas.dense-representation-capability.v1",
+      "logicalRepresentation": "synthesis_768",
+      "dimensions": 768,
+      "metric": "cosine",
+      "qdrant": {
+        "collection": "synthesis_memory_768",
+        "vectorName": "synthesis"
+      },
+      "available": true,
+      "representationRevision": "qdrant-schema:synthesis_memory_768",
+      "writesPerformed": false,
+      "capabilityChecksum": "f146d119d5c90ca13b2b40a5ad53a253731789792988cf5fc564136998788c42"
+    }
+  ],
+  "writesPerformed": false,
+  "safeToApply": false,
+  "status": "CAPABILITY_DISCOVERY_COMPLETE",
+  "errors": [],
+  "summary": {
+    "requested": 3,
+    "readable": 3,
+    "available768Cosine": 3,
+    "namedVectors": 3
+  }
+}

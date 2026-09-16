@@ -52,3 +52,32 @@
 - [x] 6.4 Run the 17-gate backend infrastructure audit. **Path finding confirmed**: `scripts/audit/backend-infrastructure-audit.sh` lives at repo-root `scripts/audit/`, not `sveltekit-frontend/scripts/audit/` as CLAUDE.md's own path implies — same class of doc-path drift as 6.3, this one harmless since the file was still findable. **Container-name drift, real and worth fixing**: the script's `DEEDS_REDIS_CONTAINER`/`RABBITMQ_CONTAINER` env-var defaults are `deeds-redis-prod`/`phase66-rabbitmq`, but `docker ps` shows the live containers are `legal-ai-valkey`/`legal-ai-rabbitmq` (confirmed via direct `docker ps --format "{{.Names}}"`) — running with the script's own defaults would false-fail every Tier A/C gate. Re-ran with `DEEDS_REDIS_CONTAINER=legal-ai-valkey RABBITMQ_CONTAINER=legal-ai-rabbitmq`. **Results: 13 passed, 1 failed, 4 skipped/warned.** G1 (Redis connection) SKIP — script reports "docker and redis-cli not available" despite docker clearly being available (ran other docker commands fine this session) — script's own G1 detection logic may be broken, not chased. G3 (Redis memory usage) **FAIL** — not root-caused this pass (0 keys reported by G2, may be a false-fail on an empty/near-empty cache rather than a real problem). G8 WARN (missing models: legal=0, embed=1). G11 WARN (125 RabbitMQ queues without consumers — matches this session's already-known RabbitMQ backlog debt from `inference-wiring-deep-audit-aug22`). G14 WARN (no Langfuse traces found). Everything else (Bifrost, Qdrant, Ollama, GPU, inference latency, RabbitMQ service, message flow, Langfuse UI, cache monitoring, codebase index, simdjson addon) PASS.
 - [x] 6.5 **FIXED, 2026-08-23.** Changed the defaults in `scripts/audit/backend-infrastructure-audit.sh`: `DEEDS_REDIS_CONTAINER` `deeds-redis-prod`→`legal-ai-valkey`, `RABBITMQ_CONTAINER` `phase66-rabbitmq`→`legal-ai-rabbitmq`. Also fixed the "Quick Fixes" footer, which still hardcoded the old container names in its `docker restart` suggestions (`sed`-replaced with `${DEEDS_REDIS_CONTAINER}`/`${RABBITMQ_CONTAINER}` variable references so the hints stay correct if the env vars are ever overridden again).
 - [x] 6.6 **FIXED, 2026-08-23 — root cause was neither of the two things this task guessed.** G1's "docker and redis-cli not available" SKIP was NOT a broken `DOCKER_AVAILABLE` detection (`command -v docker` correctly returns available in this environment, confirmed directly) — it was a symptom of the *same* container-name bug fixed in 6.5: `docker exec deeds-redis-prod ...` failed because that container doesn't exist, the whole `&&`-chained condition short-circuited false, and the script fell through to the SKIP branch rather than reporting the real error. G3's FAIL was a **third, distinct, previously-unidentified bug**: this Valkey container requires authentication (password `redis`, per this repo's documented convention — see root `CLAUDE.md`'s "Redis L1 + Bifrost L2 Cache System" / ioredis sections), but the script's `redis-cli ping`/`redis-cli info memory` calls never passed `-a`, so every call returned `NOAUTH Authentication required.` instead of `PONG`/memory stats — a silent auth failure, not a missing-data or connectivity problem. Fixed by adding `REDIS_PASSWORD=${REDIS_PASSWORD:-redis}` and appending `-a "${REDIS_PASSWORD}" --no-auth-warning` to all 4 `redis-cli` invocations (both `docker exec` and direct-TCP fallback paths, G1 and G3). **Re-ran the full script after both fixes, no env overrides needed**: went from 9 passed/5 failed/4 skipped (this task's own 6.4 baseline, after manual env overrides) to **11 passed/4 failed/3 skipped** out of the box. G1 now `✅ PASS (docker exec)`, G3 now `✅ PASS (59.53M used via docker exec)`. Remaining failures (G2 cache-stats endpoint, G15 cache monitoring, G16 codebase index, G17 simdjson) were not investigated this pass — they depend on the SvelteKit dev server being up, which was intentionally stopped earlier in this same session's ACE-crash-reproduction work; not re-verified as real failures vs. dev-server-down artifacts.
+
+## 7. Environment/package alignment gate (2026-09-14)
+
+- [x] Verify package presence and version separately in each intended runtime;
+      a package installed in one interpreter must not close a task owned by
+      another interpreter.
+- [x] Windows repository workstation `.venv`: `oaklib==0.7.4` and
+      `langextract==1.6.0`; OAK-focused tests pass (`8 passed`). This is the
+      supported environment for Parent Atlas custom helper development.
+- [x] Windows global Python: `oaklib==0.7.4` is importable, but LangExtract is
+      `0.1.0`, below the repository pin. Do not use this interpreter as the
+      workstation proof environment.
+- [x] 8095 sidecar: `/health` reports LangExtract `1.6.0`; `/oak/health`
+      reports OAKlib `0.7.4`, configured `atlas-postgres`, read-only shadow mode,
+      and `canonicalAuthority=false`.
+- [x] WSL2 default Ubuntu Python: OAKlib, LangExtract, Torch, and cuVS are
+      absent. This does not invalidate the CPU sidecar, but leaves the separate
+      RAPIDS/cuVS/cuGraph environment gate open.
+- [ ] Add or verify a dedicated WSL2 RAPIDS environment before claiming GPU
+      helper availability; do not infer it from the 8095 sidecar or Windows
+      `.venv`.
+- [ ] For every future helper claim, record interpreter path, package version,
+      import result, service endpoint (if applicable), focused test result, and
+      whether the capability is fixture-only, live read-only, or promotion-ready.
+
+Status: `PACKAGE_ALIGNMENT_PARTIAL`; workstation and 8095 CPU/OAK boundaries
+are proven, global Python is mismatched, and WSL2 GPU dependencies remain
+unproven. Missing packages are a runtime-specific blocker, not a reason to
+mark the whole Parent Atlas capability complete.

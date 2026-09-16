@@ -1,0 +1,57 @@
+{
+  "schema": "atlas.bitfrost-l2-01.wrapped-result.v2",
+  "test": "BITFROST-L2-01",
+  "read_only": true,
+  "canonical_production_data_touched": false,
+  "canonical_production_data_mutated": false,
+  "methodology": "two-buffer-eviction-pressure",
+  "streaming_buffer_sizing_policy": {
+    "marginMib": 64,
+    "maxStreamingBufferFraction": 0.3,
+    "minStreamingBufferMib": 4,
+    "maxStreamingBufferMib": 64,
+    "computedStreamingBufferMibPerSide": 43,
+    "derivedFrom": "nvidia-smi (this wrapper), NOT the .exe's own cudaMemGetInfo() call"
+  },
+  "bench_result": {
+    "schema": "atlas.bitfrost-l2-01.result.v2",
+    "test": "BITFROST-L2-01",
+    "RESULT": "DRY_RUN_PROVEN",
+    "methodology": "two-buffer-eviction-pressure",
+    "device": "NVIDIA GeForce RTX 3060 Ti",
+    "cudaRuntimeVersion": 13000,
+    "maxPersistingL2CacheSizeBytes": 2162688,
+    "persistBufferBytes": 2162688,
+    "streamingBufferMib": 43,
+    "streamingBufferMibFromWrapper": true,
+    "timedIterations": 200,
+    "warmupIterations": 10,
+    "freeVramBeforeMibCudaMemGetInfo": 6455.93,
+    "freeVramAfterMibCudaMemGetInfo": 6245.03,
+    "totalVramMib": 8191.5,
+    "persistingTotalMs": 41.4628,
+    "normalTotalMs": 37.2406,
+    "persistingVsNormalLatencyLift": -0.113376,
+    "contentionSnapshotAvailable": false,
+    "note": "contentionSnapshotAvailable=false because this binary does not itself query other OS processes; the wrapping harness script attaches a real nvidia-smi snapshot to the final report. freeVramBeforeMibCudaMemGetInfo is NOT trusted as the primary safety signal on this host -- see VRAM SAFETY NOTE in source."
+  },
+  "contention_snapshot_before": {
+    "contentionSnapshotAvailable": true,
+    "freeVramMibNvidiaSmi": 354,
+    "totalVramMibNvidiaSmi": 8192,
+    "otherGpuProcessesDetected": true
+  },
+  "contention_snapshot_after": {
+    "contentionSnapshotAvailable": true,
+    "freeVramMibNvidiaSmi": 383,
+    "totalVramMibNvidiaSmi": 8192,
+    "otherGpuProcessesDetected": true
+  },
+  "cuda_mem_get_info_vs_nvidia_smi_discrepancy": {
+    "finding": "REPRODUCIBLE (confirmed across 2 separate v1 runs, and still true here): cudaMemGetInfo() inside the CUDA process reports several GB more free VRAM than nvidia-smi reports for the whole device at the same moment.",
+    "likely_cause": "Windows WDDM GPU-memory virtualization/oversubscription -- cudaMemGetInfo reflects the driver memory-manager budget (can include pageable-to-system-RAM capacity), not nvidia-smi's physically-resident-VRAM-per-process accounting. NOT independently root-caused against NVIDIA documentation -- flagged as an open follow-up.",
+    "implication": "This is why v2 sizes the (much larger) streaming buffer from THIS wrapper's nvidia-smi reading, not from the .exe's own cudaMemGetInfo() call -- cudaMemGetInfo is checked inside the .exe only as a secondary, less-trusted gate.",
+    "cuda_reported_free_mib": 6455.93,
+    "nvidia_smi_reported_free_mib": 354
+  }
+}

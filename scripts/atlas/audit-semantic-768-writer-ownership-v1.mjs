@@ -126,7 +126,9 @@ async function main() {
     writesPerformed: false,
   };
   fs.mkdirSync(path.dirname(REPORT_PATH), { recursive: true });
-  fs.writeFileSync(REPORT_PATH, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+  const reportTempPath = `${REPORT_PATH}.${process.pid}.tmp`;
+  fs.writeFileSync(reportTempPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+  fs.renameSync(reportTempPath, REPORT_PATH);
   console.log(JSON.stringify({ reportPath: REPORT_PATH, verdict: report.verdict, writerCount: writers.length, live }, null, 2));
 }
 

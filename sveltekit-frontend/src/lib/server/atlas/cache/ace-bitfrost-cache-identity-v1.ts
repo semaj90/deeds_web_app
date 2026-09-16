@@ -8,6 +8,8 @@ export const AceBitfrostCacheIdentityV1Schema = z
   .object({
     cacheKind: z.enum(['ACE_PACKET', 'ACE_CONTEXT', 'CENTROID', 'RESIDENCY']),
     artifactKind: z.string().min(1),
+    /** Request binding for route-scoped artifacts; absent on non-request caches. */
+    requestHash: revision.optional(),
     representationId: z.string().min(1),
     representationRevision: revision,
     candidateSnapshotRevision: revision,
@@ -21,6 +23,25 @@ export const AceBitfrostCacheIdentityV1Schema = z
   .strict();
 
 export type AceBitfrostCacheIdentityV1 = z.infer<typeof AceBitfrostCacheIdentityV1Schema>;
+
+export const aceResidencyAdmissionV1Schema = z.object({
+  schema: z.literal('atlas.ace-residency-admission.v1'),
+  identity: AceBitfrostCacheIdentityV1Schema,
+  cacheKey: z.string().min(1),
+  status: z.enum(['ADMITTED', 'BLOCKED_IDENTITY', 'UNAVAILABLE']),
+  reason: z.string().min(1).nullable(),
+  canonicalAuthority: z.literal(false),
+  writesPerformed: z.literal(false),
+}).strict().superRefine((value, ctx) => {
+  if (value.status === 'ADMITTED' && value.reason !== null) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['reason'], message: 'ADMITTED ACE residency cannot carry a blocker reason.' });
+  }
+  if (value.status !== 'ADMITTED' && value.reason === null) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['reason'], message: 'Blocked or unavailable ACE residency requires an explicit reason.' });
+  }
+});
+
+export type AceResidencyAdmissionV1 = z.infer<typeof aceResidencyAdmissionV1Schema>;
 
 function canonicalJson(value: AceBitfrostCacheIdentityV1): string {
   return JSON.stringify(value, Object.keys(value).sort());
@@ -49,6 +70,24 @@ export function buildAceBitfrostCacheKeyV1(input: AceBitfrostCacheIdentityV1): s
   ]
     .map((part) => encodeURIComponent(part))
     .join(':');
+}
+
+/** Validate an ACE/BitFrost admission observation without warming or persisting cache state. */
+export function buildAceResidencyAdmissionV1(input: {
+  identity: AceBitfrostCacheIdentityV1;
+  status: AceResidencyAdmissionV1['status'];
+  reason: string | null;
+}): AceResidencyAdmissionV1 {
+  const identity = AceBitfrostCacheIdentityV1Schema.parse(input.identity);
+  return aceResidencyAdmissionV1Schema.parse({
+    schema: 'atlas.ace-residency-admission.v1',
+    identity,
+    cacheKey: buildAceBitfrostCacheKeyV1(identity),
+    status: input.status,
+    reason: input.reason,
+    canonicalAuthority: false,
+    writesPerformed: false,
+  });
 }
 
 export function buildAceContextManifestCacheKeyV1(manifest: ContextManifestV2): string {

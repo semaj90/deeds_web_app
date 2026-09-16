@@ -1,0 +1,20 @@
+{
+  "schema": "atlas.openspec-ledger-write-contention.v1",
+  "result": null,
+  "writePerformed": false,
+  "target": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
+  "reason": "Concurrent ledger rewrite prevented a safe append; no force or overwrite was attempted.",
+  "preservedEvidence": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+  "readOnlyFinding": {
+    "workspaceRevision": "sha256:ea92e7a9...",
+    "limit": 5,
+    "graphifyExactSources": 0,
+    "packetChunkExactSources": 0,
+    "lineageBridgeSources": 0,
+    "lineageBridgeChunks": 0,
+    "lineageBridgePackets": 0,
+    "status": "CURRENT_PACKET_CHUNK_JOIN_MISSING"
+  },
+  "nextSafeAction": "Retry the append only after the shared ledger is stable; retain CURRENT-EXECUTION-LINEAGE-CLOSURE-01 as blocked.",
+  "writesPerformed": false
+}

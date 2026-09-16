@@ -1640,6 +1640,51 @@ migrationAuthorized=false; writesPerformed=false.
 First blocker: `UNMAPPED_LOGICAL_LANE`.
 Next gate: canonical identity-envelope coverage and bounded caller replay.
 
+## RRF-IDENTITY-ENVELOPE-RECHECK-2026-09-14
+
+- [x] Ran the read-only real-caller identity-envelope audit.
+- [x] Confirmed the sampled caller path is reachable (`20` callers), but no
+  sample has a complete canonical envelope.
+- [x] Confirmed field coverage: `source_ref=20`,
+  `source_revision=0`, `workspace_revision=0`, and
+  `representation_revision=0`.
+- [x] Preserved the fail-closed boundary: `authority=false` and
+  `writesPerformed=false`; no caller payload or ranking behavior changed.
+- [ ] Expose caller-owned canonical identity and revision metadata from the
+  existing SearchRuntime/ordinal boundary, then replay a bounded caller set
+  before any RRF consolidation.
+
+Status: `IDENTITY_ENVELOPE_PARTIAL_REVISION_FIELDS_MISSING`;
+authority=false; migrationAuthorized=false; writesPerformed=false.
+
+Evidence: `docs/reports/rrf-real-caller-identity-envelope-v1.json`.
+
+Next gate: `RRF_CALLER_CANONICAL_REVISION_ENVELOPE_REPLAY`.
+
+## RRF-CALLER-BASELINE-RECHECK-2026-09-14
+
+- [x] Re-ran the read-only caller baseline: `93` callers, `36` fusion
+  callers, `90` unmapped references, `0` ambiguous mappings, and `2`
+  executor-as-lane classifications.
+- [x] Identified both executor-as-lane entries as references inside the live
+  `sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.ts`; this
+  is an ownership-classification issue, not evidence that a second fusion
+  implementation should be created.
+- [x] Ran the focused unified-orchestrator contract suite: `4/4` tests passed.
+- [x] Preserved the migration gate: no caller rewrite, ranking change, or
+  lane ownership mutation was performed; `writesPerformed=false`.
+- [ ] Classify the `90` unmapped callers and resolve whether the two
+  executor-as-lane references are internal orchestration or prohibited lane
+  ownership before consolidation.
+
+Status: `RRF_FUNCTIONAL_CONTRACT_PROVEN_CALLER_OWNERSHIP_INCOMPLETE`;
+authority=false; migrationAuthorized=false; writesPerformed=false.
+
+Evidence: `docs/reports/rrf-caller-baseline-v1.json`;
+`sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.spec.ts`.
+
+Next gate: `RRF_CALLER_MAPPING_AND_IDENTITY_ENVELOPE_RECONCILIATION`.
+
 ## JUDGMENT-SET-RECHECK-2026-09-10T22
 
 - [x] Re-ran the read-only golden relevance queue validator: `60` queries
@@ -1833,3 +1878,14 @@ Status: `INCOMPLETE_FAIL_CLOSED`; canonicalAuthority=false;
 databaseWrites=false; importAllowed=false.
 First blocker: `JUDGMENT_SET_NOT_REVIEWED`.
 Next gate: reviewer completion and sealed judgment-set validation.
+### RRF-IDENTITY-ENVELOPE-RECHECK-2026-09-14
+
+- [x] Reran the live-caller identity-envelope audit in read-only mode.
+- [x] Confirmed the route is reachable, but all `20/20` sampled callers lack
+  the complete revision envelope.
+- [ ] Bind the existing RRF callers to canonical source/workspace/
+  representation revisions through the current SearchRuntime owner; do not
+  create a second fusion or identity owner.
+
+Status: `IDENTITY_ENVELOPE_PARTIAL`; `authority=false`; `writesPerformed=false`.
+Evidence: `docs/reports/rrf-real-caller-identity-envelope-v1.json`.

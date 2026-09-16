@@ -1,0 +1,87 @@
+{
+  "schema": "atlas.phase16-17-receipt-consistency.v1",
+  "readOnly": true,
+  "status": "PHASE16_17_MIXED_OR_UNBOUND_REVISION_EVIDENCE",
+  "receipts": [
+    {
+      "path": "docs/reports/candidate-feature-gpu-aten-parity-live-20260911.json",
+      "status": "CANDIDATE_FEATURE_GPU_PARITY_PROVEN",
+      "candidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
+      "graphRevision": null,
+      "featureRevision": null,
+      "torchVersion": "2.14.0+cu132",
+      "cudaVersion": "13.2",
+      "backendVersion": null,
+      "algorithmRevision": null,
+      "noWrites": true
+    },
+    {
+      "path": "docs/reports/candidate-feature-gpu-parity-5k-v1.json",
+      "status": "CANDIDATE_FEATURE_GPU_PARITY_PROVEN",
+      "candidateSnapshotRevision": "sample-query:vector-snapshot-5k-768:embeddinggemma-full768-v1:v1",
+      "graphRevision": null,
+      "featureRevision": null,
+      "torchVersion": "2.8.0+cu128",
+      "cudaVersion": "12.8",
+      "backendVersion": null,
+      "algorithmRevision": null,
+      "noWrites": true
+    },
+    {
+      "path": "docs/reports/8098-feature-matrix-join-replay-v1.json",
+      "status": "8098_FEATURE_MATRIX_JOIN_REPLAY_PROVEN",
+      "candidateSnapshotRevision": null,
+      "graphRevision": "sha256:e0807b80454a71995bb87c42f62a3b966b501ce56e6a6b106e6e2237ab81d3ab",
+      "featureRevision": "graph-pagerank:cugraph-v1:alpha-0.85:tol-1e-6:maxIter-100",
+      "torchVersion": null,
+      "cudaVersion": null,
+      "backendVersion": null,
+      "algorithmRevision": null,
+      "noWrites": true
+    },
+    {
+      "path": "docs/reports/8098-candidate-ordinal-roundtrip-v1.json",
+      "status": "BLOCKED",
+      "candidateSnapshotRevision": null,
+      "graphRevision": null,
+      "featureRevision": null,
+      "torchVersion": null,
+      "cudaVersion": null,
+      "backendVersion": null,
+      "algorithmRevision": null,
+      "noWrites": false
+    },
+    {
+      "path": "docs/reports/candidate-feature-gpu-capability-live-20260912.json",
+      "status": "8098_CAPABILITY_RECEIPT_PROVEN",
+      "candidateSnapshotRevision": null,
+      "graphRevision": null,
+      "featureRevision": null,
+      "torchVersion": null,
+      "cudaVersion": null,
+      "backendVersion": "26.08.00",
+      "algorithmRevision": "atlas.cugraph-pagerank.v1",
+      "noWrites": true
+    }
+  ],
+  "checks": {
+    "receiptsLoaded": true,
+    "allReadOnly": false,
+    "oneCandidateSnapshotRevision": false,
+    "oneGraphRevision": true,
+    "noUnboundReceipts": false
+  },
+  "errors": [],
+  "summary": {
+    "candidateRevisions": [
+      "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
+      "sample-query:vector-snapshot-5k-768:embeddinggemma-full768-v1:v1"
+    ],
+    "graphRevisions": [
+      "sha256:e0807b80454a71995bb87c42f62a3b966b501ce56e6a6b106e6e2237ab81d3ab"
+    ],
+    "missingRevisionEvidence": [
+      "docs/reports/8098-candidate-ordinal-roundtrip-v1.json"
+    ]
+  }
+}

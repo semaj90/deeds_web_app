@@ -16,7 +16,17 @@ import {
   materializeCandidateFeatureSnapshotFromQasRowsV1,
   type CandidateFeatureLaneV1,
 } from '../features/retrieval-router-to-candidate-feature-snapshot-v1.js';
-import { buildAceContextManifestAdmissionV1 } from '../context/ace-context-manifest-admission-v1.js';
+import {
+  buildAceContextManifestAdmissionV1,
+  retrievalCacheIdentityFromAceManifestV1,
+} from '../context/ace-context-manifest-admission-v1.js';
+import { buildAceTopRetrievalQueryHash, type RetrievalCacheIdentityV1 } from '$lib/server/cache/ace-top-retrieval-cache.js';
+import { hashQuery } from '$lib/server/cache/ace-packet-cache.js';
+import { bridgeAceContextManifestToPacketIdentityV1 } from '$lib/server/ace/ace-route-context-manifest-bridge-v1.js';
+import { prepareUnifiedResidencyAceBridgeV1, type UnifiedResidencyAceBridgeInputV1 } from '../tensors/unified-residency-ace-bridge-v1.js';
+import { materializeCandidateFeatureColumnar } from '../features/candidate-feature-columnar-v1.js';
+import { materializeCandidateFeatureGpuPack } from '../features/candidate-feature-gpu-pack-v1.js';
+import { prepareUnifiedResidencyFeaturePackBatchV1 } from '../tensors/unified-residency-feature-pack-v1.js';
 
 export interface AtlasSearchRequest {
   query: string;
@@ -58,7 +68,20 @@ export interface AtlasSearchAceManifestOptions extends AtlasSearchQasOptions {
   ontologyRevision?: string | null;
   modelRevision?: string | null;
   promptTemplateRevision?: string | null;
+  /** Explicit runtime fields needed to derive a revisioned retrieval-cache identity. */
+  retrievalCacheModel?: string;
+  retrievalCacheDim?: number;
+  contextPolicyRevision?: string;
+  /** Optional packet-cache handoff fields; omitted means no packet admission. */
+  graphRevision?: string | null;
+  packetRepresentationId?: string;
+  packetNormalizationPolicyRevision?: string;
+  packetArtifactChecksum?: string;
 }
+
+export type SearchRuntimeUnifiedResidencyOptions = AtlasSearchAceManifestOptions
+  & Pick<UnifiedResidencyAceBridgeInputV1, 'domain' | 'lutRevision' | 'lut' | 'tokenizerRevision' | 'ropeRevision' | 'artifactChecksum' | 'dtype'>
+  & { modelRevision: string };
 
 export interface SearchRuntimeQasProjectionResult {
   requestId: string;
@@ -313,20 +336,85 @@ export function createAtlasSearchAdapter(config?: {
         representationRevision: options.representationRevision,
         acePlaybookRevision: options.acePlaybookRevision,
         tokenBudget: options.tokenBudget,
-        graphRevision: null,
+        graphRevision: options.graphRevision ?? null,
         laneMaskByCanonicalId: options.laneMaskByCanonicalId,
         producerRevision: options.producerRevision,
         ontologyRevision: options.ontologyRevision,
         modelRevision: options.modelRevision,
         promptTemplateRevision: options.promptTemplateRevision,
       });
+      const retrievalCacheIdentity = options.retrievalCacheModel && options.retrievalCacheDim && options.contextPolicyRevision
+        ? retrievalCacheIdentityFromAceManifestV1(ace, {
+            queryHash: buildAceTopRetrievalQueryHash(req.query),
+            model: options.retrievalCacheModel,
+            dim: options.retrievalCacheDim,
+            workspaceRevision: options.workspaceRevision,
+            contextPolicyRevision: options.contextPolicyRevision,
+          })
+        : null;
+      const acePacketCacheIdentity = retrievalCacheIdentity && options.packetRepresentationId
+        && options.packetNormalizationPolicyRevision && options.packetArtifactChecksum
+        ? bridgeAceContextManifestToPacketIdentityV1({
+            admission: ace,
+            queryHash: retrievalCacheIdentity.queryHash,
+            requestHash: hashQuery(req.query),
+            representationId: options.packetRepresentationId,
+            producerRevision: options.producerRevision,
+            normalizationPolicyRevision: options.packetNormalizationPolicyRevision,
+            artifactChecksum: options.packetArtifactChecksum,
+          })
+        : null;
       return {
         ...result,
         snapshot: ace.snapshot,
         admission: ace,
+        retrievalCacheIdentity,
+        acePacketCacheIdentity,
         writesPerformed: false as const,
         canonicalAuthority: false as const,
       };
+    },
+    /**
+     * Opt-in read-only composition from the canonical SearchRuntime/ACE path
+     * into logical residency descriptors. Physical providers are supplied
+     * later; no buffer or GPU handle is retained here.
+     */
+    async searchWithUnifiedResidency(
+      req: AtlasSearchRequest,
+      options: SearchRuntimeUnifiedResidencyOptions,
+    ) {
+      const admitted = await this.searchWithAceManifest(req, options);
+      const residency = prepareUnifiedResidencyAceBridgeV1({
+        snapshot: admitted.snapshot,
+        admission: admitted.admission,
+        domain: options.domain,
+        lutRevision: options.lutRevision,
+        lut: options.lut,
+        representationRevision: options.representationRevision,
+        modelRevision: options.modelRevision,
+        tokenizerRevision: options.tokenizerRevision,
+        ropeRevision: options.ropeRevision,
+        artifactChecksum: options.artifactChecksum,
+        dtype: options.dtype,
+      });
+      return { ...admitted, residency, writesPerformed: false as const, canonicalAuthority: false as const };
+    },
+    /** Lower the admitted snapshot through the existing GPU-pack owner. */
+    async searchWithUnifiedResidencyFeaturePack(
+      req: AtlasSearchRequest,
+      options: SearchRuntimeUnifiedResidencyOptions & { rowAlignment?: number },
+    ) {
+      const admitted = await this.searchWithAceManifest(req, options);
+      const columnar = materializeCandidateFeatureColumnar({ snapshot: admitted.snapshot, producerRevision: options.producerRevision });
+      const pack = materializeCandidateFeatureGpuPack({ columnar, rowAlignment: options.rowAlignment, producerRevision: options.producerRevision });
+      const residencies = prepareUnifiedResidencyFeaturePackBatchV1({
+        pack,
+        representationRevision: options.representationRevision,
+        modelRevision: options.modelRevision,
+        tokenizerRevision: options.tokenizerRevision,
+        ropeRevision: options.ropeRevision,
+      });
+      return { ...admitted, pack, residencies, writesPerformed: false as const, canonicalAuthority: false as const };
     },
   };
 }

@@ -1,0 +1,23 @@
+{
+  "schema": "atlas.candidate-ordinal-lineage-guard.v1",
+  "gate": "CURRENT-CANDIDATE-ORDINAL-LINEAGE-GUARD-01",
+  "status": "READ_ONLY_CHECK_COMPLETE",
+  "materializer": "scripts/atlas/materialize-candidate-ordinal-corpus-v1.mts",
+  "requiredBridge": {
+    "packetTable": "atlas_packets",
+    "lineageTable": "atlas_packet_chunk_lineage",
+    "chunkTable": "codebase_chunk_index",
+    "revisionStatus": "PROVEN",
+    "wholeSourceComparedDirectlyToChunkHash": false
+  },
+  "observed": {
+    "eligibleRows": 0,
+    "currentCohortAdmitted": false,
+    "bounded128Proof": false
+  },
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "promotionAuthorized": false,
+  "nextGate": "CURRENT-SOURCE-PACKET-CHUNK-COHORT-01",
+  "reportPath": "docs/reports/candidate-ordinal-lineage-guard-v1.json"
+}

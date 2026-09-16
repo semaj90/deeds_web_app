@@ -1,0 +1,10 @@
+{
+  "schema": "openspec.ledger-write-contention-null.v1",
+  "timestamp": "2026-09-13T22:45:00Z",
+  "target": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
+  "writePerformed": false,
+  "result": null,
+  "reason": "Concurrent ledger edits rejected the source-evidence hydration append after repeated retries.",
+  "auditReceipt": "docs/reports/current-source-evidence-hydration-v1-2026-09-13T22-43-47-573Z.json",
+  "nextAction": "Retry ledger append after concurrent writer is quiescent; do not overwrite or replace tasks.md."
+}

@@ -1,12 +1,12 @@
 import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
 
-process.env.DATABASE_URL = resolveDatabaseUrl(loadRepoEnv(process.env));
-// ACPToolRegistry.ts transitively imports llm/runtime-contract.ts, which
-// throws at MODULE LOAD TIME if this is unset — unrelated to the NLP tools
-// this proof exercises, but the import chain fails without it. A placeholder
-// is fine here: only the filename is derived from it, and this proof never
-// calls llm:generate.
-process.env.ROTORQUANT_MODEL_PATH ??= 'placeholder-model.gguf';
+const repoEnv = loadRepoEnv(process.env);
+process.env.DATABASE_URL = resolveDatabaseUrl(repoEnv);
+// ACPToolRegistry.ts transitively imports llm/runtime-contract.ts. Do not
+// fabricate a model path merely to load an unrelated read-only proof.
+const modelPath = String(repoEnv.ROTORQUANT_MODEL_PATH ?? repoEnv.TURBO_MODEL_PATH ?? '').trim();
+if (!modelPath) throw new Error('ROTORQUANT_MODEL_PATH_REQUIRED_FOR_ACP_PROOF');
+process.env.ROTORQUANT_MODEL_PATH = modelPath;
 
 const { executeACPTool, getACPToolRegistry } = await import('../../sveltekit-frontend/src/lib/server/services/knowledge-search/ACPToolRegistry.ts');
 

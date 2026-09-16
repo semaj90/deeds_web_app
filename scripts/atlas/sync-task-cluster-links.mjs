@@ -63,14 +63,14 @@ async function initRedis() {
 }
 
 async function getKarpathyBlend(stableKey) {
-  if (!redis || !stableKey) return 0;
+  if (!redis || !stableKey) return null;
   try {
     const raw = await redis.hget('gpu:karpathy:scores', stableKey);
-    if (!raw) return 0;
+    if (!raw) return null;
     const parsed = JSON.parse(raw);
-    return typeof parsed.blend === 'number' ? parsed.blend : 0;
+    return typeof parsed.blend === 'number' && Number.isFinite(parsed.blend) ? parsed.blend : null;
   } catch {
-    return 0;
+    return null;
   }
 }
 
@@ -81,6 +81,18 @@ async function initDb() {
   pool = new pg.Pool({ connectionString: DATABASE_URL, max: 3 });
   await pool.query('SELECT 1');
   console.log('[sync-cluster-links] Postgres connected');
+}
+
+async function probeSchemaSurface() {
+  const result = await pool.query(`
+    SELECT table_name
+    FROM information_schema.tables
+    WHERE table_schema = 'public'
+      AND table_name = ANY($1::text[])
+  `, [['workspace_tasks', 'task_semantic_packets', 'task_cluster_links']]);
+  const present = new Set(result.rows.map((row) => row.table_name));
+  const required = ['workspace_tasks', 'task_semantic_packets', 'task_cluster_links'];
+  return { required, missing: required.filter((table) => !present.has(table)) };
 }
 
 // ── Qdrant helpers ─────────────────────────────────────────────────────────────
@@ -169,6 +181,17 @@ async function main() {
   await initDb();
   await initRedis();
 
+  const schema = await probeSchemaSurface();
+  if (schema.missing.length > 0) {
+    console.warn(
+      `[sync-cluster-links] SCHEMA_SURFACE_UNAVAILABLE missing=${schema.missing.join(',')}; ` +
+      'no linking operation performed'
+    );
+    if (redis) await redis.quit().catch(() => {});
+    await pool.end();
+    return;
+  }
+
   // 1. Load workspace_tasks with feature_id
   const tasksResult = await pool.query(`
     SELECT t.id, t.feature_id, t.title, t.name,
@@ -238,13 +261,19 @@ async function main() {
     }
 
     if (!qdrantPointId) {
-      // Create a synthetic stable point ID so the row is still queryable
-      qdrantPointId = `task:${taskId}:feature:${featureId}`;
+      // A task link without a real projection point would fabricate identity.
+      // Keep it visible in the dry-run census, but never persist it.
+      skipped++;
+      console.warn(`  [${taskId}] skipped: QDRANT_POINT_READBACK_MISSING`);
+      continue;
     }
 
     const blend = await getKarpathyBlend(featureId);
     const label = task.title ?? task.name ?? `task-${taskId}`;
-    console.log(`  [${taskId}] ${label.slice(0, 60)} | cluster=${clusterId ?? 'none'} blend=${blend.toFixed(3)}`);
+    console.log(
+      `  [${taskId}] ${label.slice(0, 60)} | cluster=${clusterId ?? 'none'} ` +
+      `blend=${blend == null ? 'unavailable' : blend.toFixed(3)}`
+    );
 
     try {
       await upsertLink(taskId, featureId, qdrantPointId, clusterId, centroidId);

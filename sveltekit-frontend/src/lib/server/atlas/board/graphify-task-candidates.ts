@@ -5,8 +5,8 @@ import { ATLAS_CANONICAL_SEMANTIC_REPRESENTATION as SEMANTIC_REPRESENTATION_ID }
 export interface GraphifyTaskCandidateBuildContext {
 	producerId?: string;
 	producerRevision?: string;
-	workspaceRevision?: string;
-	sourceRevision?: string;
+	workspaceRevision?: string | null;
+	sourceRevision?: string | null;
 	graphRevision?: string | null;
 	representationRevision?: string;
 	generatedAt?: string;
@@ -26,9 +26,9 @@ export function buildDailyGraphifyTaskCandidates(
 ): GraphifyTaskCandidate[] {
 	const producerId = context.producerId ?? 'daily-graphify-board';
 	const producerRevision = context.producerRevision ?? board.generated;
-	const workspaceRevision = context.workspaceRevision ?? 'main';
-	const sourceRevision = context.sourceRevision ?? board.generated;
-	const graphRevision = context.graphRevision ?? board.generated;
+	const workspaceRevision = context.workspaceRevision ?? null;
+	const sourceRevision = context.sourceRevision ?? null;
+	const graphRevision = context.graphRevision ?? null;
 	const representationRevision = context.representationRevision ?? SEMANTIC_REPRESENTATION_ID;
 	const generatedAt = context.generatedAt ?? board.generated;
 

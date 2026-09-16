@@ -1,0 +1,61 @@
+{
+  "schema": "atlas.content-hash-format-heterogeneity.v1",
+  "generatedAt": "2026-09-15T00:00:00.000Z",
+  "mode": "READ_ONLY",
+  "gate": "CURRENT-STRUCTURAL-LINEAGE-01",
+  "owner": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence",
+  "context": "Root-cause investigation of the 0/25,271 exact chunk/packet match reported by scripts/atlas/audit-selected-graphify-structural-lineage-v1.mjs. Refines, and gives full scope to, the '204 truncated hashes' figure already recorded under SOURCE-REF-NAMESPACE-RECONCILIATION-RECHECK-01 (2026-09-11) in the same tasks.md, which undercounted this by roughly 190x.",
+  "findings": {
+    "codebaseChunkIndexContentHashLengthDistribution": [
+      { "length": 64, "rowCount": 16702, "note": "real SHA-256 hex digest; comparable to membership table" },
+      { "length": 16, "rowCount": 39114, "note": "legacy/short hash, NOT SHA-256; structurally can never equal a 64-char hash; algorithm/origin not identified this pass" },
+      { "length": null, "rowCount": 37, "note": "no hash at all" }
+    ],
+    "codebaseChunkIndexTotalRows": 55853,
+    "graphifyExecutionFileMembershipV2ContentHashLengthDistribution": [
+      { "length": 64, "rowCount": 351065, "note": "uniformly SHA-256; not the broken side of the join" }
+    ],
+    "sourceRefOnlyOverlap": {
+      "description": "join dropping the content_hash requirement entirely (source_ref match only), same two tables",
+      "matchingRowCount": 152936,
+      "distinctSourceRefsInSelectedMembershipCohort": 25545,
+      "conclusion": "source_ref paths line up fine at scale; the break is isolated to content_hash format, not path naming"
+    },
+    "selectedExecutionAuditRerun": {
+      "script": "scripts/atlas/audit-selected-graphify-structural-lineage-v1.mjs",
+      "reportPath": "docs/reports/selected-graphify-structural-lineage-v1.json",
+      "selectedMembershipRows": 25271,
+      "exactChunkMatches": 0,
+      "exactPacketMatches": 0,
+      "status": "CURRENT_PACKET_CHUNK_JOIN_UNPROVEN",
+      "firstBlocker": "CURRENT_CHUNK_EXACT_MATCH_MISSING"
+    }
+  },
+  "conclusion": "The CURRENT_CHUNK_EXACT_MATCH_MISSING blocker on CURRENT-STRUCTURAL-LINEAGE-01 is explained: ~70% of codebase_chunk_index rows (39,114/55,853) carry a 16-character legacy content_hash that is not, and can never be treated as, a full SHA-256 digest, so the required exact source_ref+content_hash join against graphify_execution_file_membership_v2 (uniformly 64-char SHA-256) returns zero regardless of source-ref coverage improvements. This is a data-format gap in the existing codebase_chunk_index writer history, not a path-naming, workspace-revision, or source-authority problem.",
+  "legacyHashWriterIdentified": {
+    "correctedSameDay": "CORRECTED 2026-09-15 (writer-completeness audit for parent-atlas-chunk-index-whole-file-hash task 1.2): the original note below said this script writes 'straight to the content_hash column' -- that is FALSE. codebase-semantic-indexer.ts has zero Postgres references (no pg/Pool/INSERT INTO anywhere in the file); its content_hash write is a QDRANT PAYLOAD field, not a Postgres column write. The real mechanism is a two-hop pipeline: this script writes the truncated hash into a Qdrant point payload (collection codebase_chunks_768); a separate script, sveltekit-frontend/scripts/mirror-qdrant-to-postgres.ts, scrolls that same collection and copies payload.content_hash verbatim into Postgres codebase_chunk_index.content_hash. See docs/reports/codebase-chunk-index-writer-audit-v1.json for full detail. The hash FORMULA/scope/length conclusion below is unaffected and remains correct.",
+    "writer": "sveltekit-frontend/scripts/codebase-semantic-indexer.ts (Qdrant payload write) + sveltekit-frontend/scripts/mirror-qdrant-to-postgres.ts (Postgres mirror write) -- a two-hop pair, not a single direct writer",
+    "lines": [556, 567, 584, 677],
+    "formula": "createHash('sha256').update(text).digest('hex').slice(0, 16)",
+    "note": "It IS SHA-256, not a different algorithm -- just truncated to the first 16 of 64 hex characters. Originally written into a Qdrant point payload (line 677: content_hash: chunk.contentHash, on a point later sent to Qdrant), then mirrored into Postgres by a separate script. The truncated value is also embedded in chunk_id as `card:${relPath}:${hash}`.",
+    "verifiedByReading": true,
+    "priorSessionCrossReference": "Independently identified in sveltekit-frontend/scripts/atlas/backfill-chunk-id-and-content-hash.mjs's own header comment (2026-08-21 session, memory/SESSION-201-EG-GGUF-PROOF-GATES-0-2.md) for a different, narrower purpose (chunk_id backfill for 6,908 NULL rows) -- this pass connects that already-documented fact to the CURRENT-STRUCTURAL-LINEAGE-01 blocker for the first time."
+  },
+  "deeperScopeMismatchFound": {
+    "description": "Independent of the truncation bug, the hashed SCOPE differs between tables. graphify_execution_file_membership_v2.content_hash (and its upstream source public.graphify_files.content_hash, confirmed via scripts/atlas/apply-file-level-source-refs-content-reconciled-v1.mjs) is a WHOLE-FILE hash. codebase_chunk_index.content_hash is a PER-CHUNK hash: codebase-semantic-indexer.ts hashes one chunk's text (a partial slice of the file, line 556); the other observed writer, scripts/atlas/index-full-repo-for-search.mjs (line 607), hashes the composite string `${relPath}:${idx}:${chunkText}`, not the file either.",
+    "implication": "Even after fixing the 16-character truncation, exact source_ref+content_hash join against a whole-file hash would still fail for any file split into more than one chunk, because no codebase_chunk_index writer found this pass ever computed a whole-file hash. This is a second, independent root cause layered under the truncation bug, not solved by fixing truncation alone.",
+    "notFullyExhausted": "Only 2 of the ~19 candidate writer files found via grep (index-full-repo-for-search.mjs, codebase-semantic-indexer.ts) were read this pass; a third writer computing a genuine whole-file hash was not ruled out."
+  },
+  "notAuthorized": [
+    "Backfilling or recomputing the 39,114 short-hash or 37 null-hash rows",
+    "Recomputing any codebase_chunk_index.content_hash to a whole-file hash",
+    "Choosing a different join key to route around either mismatch",
+    "Any write to codebase_chunk_index, atlas_packets, or graphify_execution_file_membership_v2"
+  ],
+  "nextGate": "Human decision required: whether codebase_chunk_index should even carry a whole-file-comparable content_hash (a schema/contract question, not just a backfill), before any dry-run backfill plan is proposed.",
+  "authority": false,
+  "writesPerformed": false,
+  "postgresWrites": false,
+  "qdrantWrites": false,
+  "neo4jWrites": false
+}

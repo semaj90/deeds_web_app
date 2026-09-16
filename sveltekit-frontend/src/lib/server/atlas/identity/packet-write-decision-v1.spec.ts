@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+	buildCanonicalPacketContentIdentityV1,
 	decidePacketWrite,
 	type CanonicalPacketStateV1,
 	type PacketWriteRequestV1,
@@ -38,9 +39,45 @@ function baseRequest(overrides: Partial<PacketWriteRequestV1> = {}): PacketWrite
 }
 
 describe('decidePacketWrite', () => {
+	it('builds stable whole-source packet identity without inventing workspace authority', () => {
+		const bytes = new TextEncoder().encode('export const answer = 42;\n');
+		const input = {
+			packetKey: 'packet:abc',
+			sourceRef: 'src/lib/server/example.ts',
+			workspaceRevision: `sha256:${'a'.repeat(64)}`,
+			bytes,
+			producerRevision: 'packet-content-bridge:v1',
+		};
+		const first = buildCanonicalPacketContentIdentityV1(input);
+		const second = buildCanonicalPacketContentIdentityV1(input);
+		expect(second).toEqual(first);
+		expect(first.sourceRevision).toBe(`sha256:${first.contentDigest}`);
+		expect(first.byteLength).toBe(bytes.byteLength);
+		expect(first.readOnlyObservation).toBe(true);
+		expect(first.canonicalAuthority).toBe(false);
+	});
+
+	it('rejects an unqualified workspace revision instead of fabricating a bridge', () => {
+		expect(() => buildCanonicalPacketContentIdentityV1({
+			packetKey: 'packet:abc',
+			sourceRef: 'src/lib/server/example.ts',
+			workspaceRevision: 'latest',
+			bytes: new TextEncoder().encode('x'),
+			producerRevision: 'packet-content-bridge:v1',
+		})).toThrow();
+	});
+
 	it('returns INSERT_NEW when no canonical row exists yet', () => {
 		const result = decidePacketWrite(absentRow, baseRequest());
 		expect(result.decision).toBe('INSERT_NEW');
+	});
+
+	it('rejects an unqualified new packet instead of inserting a null revision', () => {
+		const result = decidePacketWrite(absentRow, baseRequest({
+			sourceRevision: null,
+			workspaceRevision: null,
+		}));
+		expect(result.decision).toBe('REVISION_UNPROVEN');
 	});
 
 	it('returns IDENTITY_CONFLICT when sourceRef differs for the same packetKey', () => {

@@ -1,0 +1,17 @@
+{
+  "schema": "atlas.openspec.ledger-write-contention-null.v1",
+  "status": "NULL_LEDGER_WRITE_BLOCKED",
+  "value": null,
+  "target": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
+  "attempts": 3,
+  "reason": "Concurrent worktree edits prevented a safe append after three retries.",
+  "completedWork": {
+    "implementation": "scripts/atlas/audit-graphify-snapshot-native-readback-v1.mts",
+    "receipt": "docs/reports/graphify-snapshot-native-readback-v1.json",
+    "status": "SNAPSHOT_NATIVE_READBACK_BLOCKED",
+    "candidateExecutionCount": 6,
+    "exactCandidateCount": 0,
+    "writesPerformed": false
+  },
+  "safeNextAction": "Retry the append after concurrent edits stop; do not overwrite or merge task-ledger content automatically."
+}

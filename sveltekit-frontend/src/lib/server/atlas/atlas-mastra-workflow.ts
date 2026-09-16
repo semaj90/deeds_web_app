@@ -38,6 +38,45 @@ import {
 } from './go-retrieval-grpc-client';
 import { LLM_MODEL_ID } from '../llm/runtime-contract.js';
 
+export type AtlasPacketValidationResultV1 = { valid: boolean };
+
+export type AtlasWorkflowBlockedReasonV1 =
+  | 'DISCOVERY_ADAPTER_UNAVAILABLE'
+  | 'VALIDATION_RECEIPT_REQUIRED';
+
+export function blockAtlasWorkflowV1(reason: AtlasWorkflowBlockedReasonV1): {
+  state: AtlasState.RECOVER;
+  reason: AtlasWorkflowBlockedReasonV1;
+} {
+  return { state: AtlasState.RECOVER, reason };
+}
+
+/**
+ * Pure verification boundary used by the workflow and its fixture tests.
+ * Missing identity or a non-valid response is never promoted to synthesis.
+ */
+export async function verifyRetrievedPacketsV1(
+  packets: readonly unknown[],
+  validate: (packetKey: string) => Promise<AtlasPacketValidationResultV1>,
+): Promise<{ valid: true; packetCount: number } | { valid: false; reason: string }> {
+  if (packets.length === 0) return { valid: false, reason: 'NO_RETRIEVED_PACKETS_TO_VERIFY' };
+  try {
+    const results = await Promise.all(packets.map((packet) => {
+      const packetKey = typeof (packet as { packetKey?: unknown })?.packetKey === 'string'
+        ? (packet as { packetKey: string }).packetKey
+        : '';
+      if (!packetKey) throw new Error('RETRIEVED_PACKET_KEY_REQUIRED');
+      return validate(packetKey);
+    }));
+    if (results.some((result) => result.valid !== true)) {
+      return { valid: false, reason: 'PACKET_CANONICAL_VALIDATION_FAILED' };
+    }
+    return { valid: true, packetCount: results.length };
+  } catch (error) {
+    return { valid: false, reason: error instanceof Error ? error.message : 'PACKET_VALIDATOR_UNAVAILABLE' };
+  }
+}
+
 /**
  * Main Atlas Retrieval Workflow
  * Handles: discovery → retrieval → verification → synthesis → optional mutation
@@ -115,17 +154,25 @@ Never claim completion without validation. Use atlas.validate_change to prove yo
 export async function executeAtlasRetrieval(init: {
   workspaceId: string;
   query: string;
-  packetKey?: string;
+  packetKey: string;
+  workspaceRevision: string;
+  packetRevision: string;
   maxIterations?: number;
   tokenBudget?: number;
 }) {
+  if (!init.packetKey.trim()) throw new Error('CANONICAL_PACKET_KEY_REQUIRED');
+  if (!init.workspaceRevision.trim()) throw new Error('ADMITTED_WORKSPACE_REVISION_REQUIRED');
+  if (!init.packetRevision.trim()) throw new Error('PACKET_REVISION_REQUIRED');
+
   // Create runtime context
   const runtime = createAtlasRuntimeContext({
     runId: crypto.randomUUID(),
     threadId: crypto.randomUUID(),
     resourceId: init.workspaceId,
     workspaceId: init.workspaceId,
-    packetKey: init.packetKey || 'atlas:packet:query:' + Date.now(),
+    packetKey: init.packetKey,
+    workspaceRevision: init.workspaceRevision,
+    packetRevision: init.packetRevision,
     initialState: AtlasState.DISCOVER,
     tokenBudget: init.tokenBudget ?? 8192,
   });
@@ -145,6 +192,7 @@ export async function executeAtlasRetrieval(init: {
     summary: string;
     finalState: AtlasState;
     confidence: number;
+    blockedReason?: AtlasWorkflowBlockedReasonV1;
   } = {
     packets: [],
     summary: '',
@@ -161,13 +209,14 @@ export async function executeAtlasRetrieval(init: {
   ) {
     iterationNumber++;
 
-    // Create observation from previous step (stub for now)
+    // TODO PA STAGE 13: carry the actual prior tool receipt into the FSM.
+    // Until then this observation is intentionally non-promotional.
     const observation: RuntimeObservation = {
       lastTool: 'previous',
       lastToolSucceeded: true,
-      retrievalConfidence: 0.7,
+      retrievalConfidence: 0,
       evidenceCount: 0,
-      validationStatus: 'PASS',
+      validationStatus: 'WARN',
       authFailure: false,
       revisionMismatch: false,
       tokenPressure: runtime.tokenBudget.remainingInput / runtime.tokenBudget.maximumInput,
@@ -182,9 +231,15 @@ export async function executeAtlasRetrieval(init: {
     // Execute step based on state
     switch (runtime.state) {
       case AtlasState.DISCOVER:
-        // TODO: Call atlas.discover tool
-        runtime.state = AtlasState.RETRIEVE;
-        break;
+        // TODO PA STAGE 13: replace with the canonical identity discovery
+        // owner. Empty discovery is not permission to retrieve or synthesize.
+        {
+          const blocked = blockAtlasWorkflowV1('DISCOVERY_ADAPTER_UNAVAILABLE');
+          runtime.state = blocked.state;
+          results.finalState = blocked.state;
+          results.blockedReason = blocked.reason;
+          return results;
+        }
 
       case AtlasState.RETRIEVE:
         // Call Go Retrieval gRPC
@@ -202,9 +257,20 @@ export async function executeAtlasRetrieval(init: {
         break;
 
       case AtlasState.VERIFY:
-        // TODO: Call atlas.validate_change tool
-        // For now, assume validation passes
-        runtime.state = AtlasState.SYNTHESIZE;
+        // Verification must be backed by the canonical packet validator. An
+        // empty result or an unavailable validator is not proof and must not
+        // advance the workflow into synthesis.
+        try {
+          const verification = await verifyRetrievedPacketsV1(
+            results.packets,
+            (packetKey) => validatePacketFromGo(runtime, packetKey, {}),
+          );
+          if (!verification.valid) throw new Error(verification.reason);
+          runtime.state = AtlasState.SYNTHESIZE;
+        } catch (err) {
+          console.warn('Atlas packet verification blocked:', err);
+          runtime.state = AtlasState.RECOVER;
+        }
         break;
 
       case AtlasState.SYNTHESIZE:
@@ -224,18 +290,29 @@ export async function executeAtlasRetrieval(init: {
         break;
 
       case AtlasState.VALIDATE:
-        // Validation passed, mark complete
-        runtime.state = AtlasState.COMPLETE;
-        break;
+        // TODO PA STAGE 13: consume an independent validation receipt. Reaching
+        // this state alone is not a validation proof and must not mean COMPLETE.
+        {
+          const blocked = blockAtlasWorkflowV1('VALIDATION_RECEIPT_REQUIRED');
+          runtime.state = blocked.state;
+          results.finalState = blocked.state;
+          results.blockedReason = blocked.reason;
+          return results;
+        }
 
       case AtlasState.RECOVER:
-        // Log error and return partial results
-        console.warn('Atlas workflow in recovery mode');
-        runtime.state = AtlasState.COMPLETE;
-        break;
+        // Recovery is not successful completion. Return the explicit
+        // non-terminal state so callers cannot mistake a failed or blocked
+        // verification/retrieval path for a completed workflow.
+        console.warn('Atlas workflow blocked in recovery mode');
+        results.finalState = AtlasState.RECOVER;
+        results.confidence = runtime.confidence;
+        return results;
 
       default:
-        runtime.state = AtlasState.COMPLETE;
+        results.finalState = AtlasState.RECOVER;
+        results.confidence = runtime.confidence;
+        return results;
     }
   }
 

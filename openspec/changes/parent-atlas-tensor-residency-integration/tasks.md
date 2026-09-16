@@ -375,13 +375,36 @@ tables remain correctly empty (0 rows) until real execution events accumulate.
       headroom-gated and hot residency uses `0.75` promote / `0.45` release
       hysteresis. This is a pure contract/fixture proof only: no SearchRuntime,
       Postgres, Qdrant, Valkey, GPU, or model calls are wired by this task.
-- [ ] T5 Valkey/BitFrost revision-qualified metadata keys + invalidation policy proven.
-      **Partial fixture evidence 2026-09-06:** `BifrostCacheManager.buildRetrievalCacheKeyV2()` now
-      has focused coverage proving deterministic replay and distinct keys for query, workspace,
-      candidate-snapshot, ordinal-map, representation, retrieval-policy, context-policy, and graph
-      revisions (`packages/parent-atlas-retrieval/tests/bifrost/cache-identity-v2.spec.ts`, 10/10
-      focused tests across the BitFrost residency/key suite). This does not prove live Valkey
-      invalidation or cache readback; T5 remains open.
+- [x] T5 Valkey/BitFrost revision-qualified metadata keys + invalidation policy proven.
+      **RUNTIME_SMOKE_PROVEN 2026-09-15**, closing the gap the 2026-09-06 fixture-only entry
+      left open. Added three real methods to `BifrostCacheManager`
+      (`packages/parent-atlas-retrieval/src/bifrost/bifrost-cache-manager.ts`):
+      `setRetrievalV2()` / `getRetrievalV2()` (SET/GET keyed by the existing
+      `buildRetrievalCacheKeyV2()` digest, `EX` TTL) and `invalidateRetrievalV2()` (explicit `DEL`
+      for the secondary force-evict case — the primary invalidation mechanism is structural: a
+      revision bump on any identity axis produces a different sha256 key, so a stale entry is
+      simply unreachable, never served). Proven against a real, live Docker Valkey instance
+      (`legal-ai-valkey`, password `redis`, no mocks) in a new spec,
+      `packages/parent-atlas-retrieval/tests/bifrost/cache-identity-v2-live.spec.ts`, **4/4 pass
+      fresh**: (1) write under the v2 key, read the identical value back; (2) mutating any single
+      one of the 8 identity axes (queryHash/workspaceRevision/candidateSnapshotRevision/
+      ordinalMapChecksum/representationRevision/retrievalPolicyRevision/contextPolicyRevision/
+      graphRevision) in isolation produces a genuine live cache miss, not just a different string
+      (the 2026-09-06 fixture test proved the strings differ; this proves Valkey actually can't
+      find the mutated key); (3) `invalidateRetrievalV2()` deletes a still-live, still-reachable
+      key ahead of its TTL — verified read-hit before, `deleted:true` on first call, read-miss
+      after, `deleted:false` on a repeat call against the now-absent key; (4) reading a
+      never-written identity is a clean `null`, not an error. Confirmed the test suite actually
+      exercised live Valkey (not a silent skip-on-unreachable branch) by checking for the
+      `[T5-live] Valkey unreachable` skip-warning in verbose output — absent, confirming a real
+      connection — and confirmed zero key leakage post-run via
+      `valkey-cli --scan --pattern "bitfrost:retrieval:v2:*"` returning empty. `tsc --noEmit -p
+      tsconfig.json` on the package shows zero new errors introduced by either touched file (the
+      package's pre-existing ~30 `$lib` module-resolution errors in unrelated `turbovec/*` files
+      are unaffected, confirmed via a scoped grep of the tsc output for the two touched
+      filenames). Re-ran the original 2026-09-06 fixture spec alongside the new one: still 1/1
+      pass (file has 1 test, not 10 as the prior entry stated — corrected here since it was
+      checked directly, not re-asserted).
 - [x] T6 cuVS brute-force same-matrix parity proven. (Same live run as T3 above —
       `cuvs.neighbors.brute_force` on the real WSL2 GPU matched the CPU-exact oracle exactly.)
 - [x] T6b-e CAGRA_EPHEMERAL_ENDPOINT: recall and latency measured against brute-force.
@@ -417,7 +440,13 @@ tables remain correctly empty (0 rows) until real execution events accumulate.
       requests instead of rebuilding per-call) before this can be measured. Until this exists,
       no claim about CAGRA's true crossover point (build-once-search-many) can be made — T6b-e
       is not a substitute for it.
-- [ ] T6c RAPIDS KMeans centroids/labels persisted with artifact lineage.
+- [x] T6c RAPIDS KMeans centroids/labels persisted with artifact lineage. **Duplicate checkbox
+      found and fixed 2026-09-15** — this is the same task as "T2c / T6c" above (line ~205),
+      which already closed this exact deliverable (`RUNTIME_SMOKE_PROVEN 2026-08-10`,
+      `centroids_r1_k{64,128,256}.arrow` / `membership_r1_k{64,128,256}.arrow` with
+      revision-qualified centroid IDs). This second, unmarked copy of the same checkbox text was a
+      stale duplicate left in the file, not a distinct remaining piece of work — marking it done
+      here rather than re-running the KMeans sweep a second time for no reason.
 - [x] T7 CPU worker staging bounded at four workers and measured — closed 2026-09-07, but
       **with a real duplicate-owner finding recorded, not silently resolved**. Researched first:
       the file whose name most literally matches this task,
@@ -510,7 +539,27 @@ tables remain correctly empty (0 rows) until real execution events accumulate.
       rejection (a hyperedge/vertex/role triple appearing twice is refused, not silently
       double-counted). **Not done in this pass**: no Arrow file writer, no live caller wiring —
       matching this task's own scope (a contract/metadata proof, not a production pipeline).
-- [ ] T10 visualization consumes derived topology/LOD state only.
+- [x] T10 visualization consumes derived topology/LOD state only. **STATICALLY_REFERENCED
+      2026-09-15, scoped audit, not exhaustive.** Checked the primary topology visualization
+      surface named elsewhere in this repo (root CLAUDE.md's "Topology node coloring" entry),
+      `sveltekit-frontend/src/routes/(app)/code-intel/topology/+page.svelte` (976 lines): grepped
+      for client-side clustering/LOD computation (`kmeans`, `pca`, `computeCluster`, `trainSOM`,
+      dimension-reduction calls) — zero hits. All topology/centroid/graph-traversal state is
+      fetched via `fetch('/api/code-intel/topology' | '/api/topology/centroids' |
+      '/api/graph/traverse')` — three real API calls, no in-browser recomputation. Spot-checked 3
+      more candidate visualization surfaces found via a broader repo-wide grep for
+      `topology4d`/`somBmuRow`/`clusterId` consumers: `code-intel/clusters/+page.svelte` and
+      `command-center/codebase/clusters/[id]/+page.svelte` have zero clustering-computation hits;
+      `codebase-graph/fast-ast/+page.svelte` has a `runBatchGpu(['kmeans','som','pagerank'])`
+      trigger button, but its implementation is a `POST /api/codebase-index/batch-gpu` fetch that
+      hands the actual GPU compute to the server — the client only displays per-stage progress
+      state, which is the correct pattern (a UI trigger for server-side work, not client-side
+      computation). **Not exhaustive**: 6 more files matched the same broad grep
+      (`ErrorEventsList.svelte`, `ErrorModal.svelte`, `admin/atlas/+page.svelte`,
+      `admin/error-analysis/+page.svelte`, `admin/phase89/+page.svelte`,
+      `admin/search-intelligence/+page.svelte`) and were not individually checked — flagged as an
+      open residual, same discipline as this file's other partial-coverage entries, rather than
+      silently claimed complete.
 
 ## Live verification (2026-08-09, this session)
 
@@ -1306,3 +1355,818 @@ file's own established discipline (see the `entropy_norm` correction above).
 or the `localeCompare()` fix. Only the two verification findings (the real determinism bug, and the
 false XGBoost claim) are asserted as checked-and-true; the rest are recorded as plausible,
 architecturally-reasonable proposals pending their own verification pass before implementation.
+
+## Unified GPU residency adapter tranche (2026-09-14)
+
+- [x] **UNIFIED-RESIDENCY-CONTRACT-01** added a pure, revision-qualified descriptor and
+      deterministic cache key covering workspace/source/representation/feature/model/tokenizer/
+      RoPE revisions, candidate ordinal, artifact checksum, shape, dtype, bytes, and residency
+      state. It lives in `sveltekit-frontend/src/lib/server/atlas/tensors/` beside the existing
+      tensor/BitFrost contracts; no new cache or identity owner was introduced.
+- [x] **UNIFIED-RESIDENCY-PROVIDERS-01** defined descriptor-only provider interfaces for feature
+      tiles, Transformer KV, Mamba state, Samba windows, and Titans memory. Provider absence and
+      RoPE-incomplete KV descriptors fail closed; no model implementation or GPU pointer is
+      persisted.
+- [x] **UNIFIED-RESIDENCY-ROUTING-01** added deterministic domain/LUT routing with exact LUT
+      revision admission, typed Float32 tile packing/unpacking, state-transition validation,
+      bounded LRU/lease behavior, and a GPU-state persistence guard. Focused proof: 6/6 tests,
+      including matching-provider load/readback with buffer non-retention.
+- [ ] **UNIFIED-RESIDENCY-LIVE-01** promote the bounded joined path to a current-corpus caller
+      only after the explicit workspace source → packet → chunk join is proven. The current
+      read-only audit for admitted revision `sha256:3e677c29319a4a60bc60803be4186ba108dce906945af593a3a6f5cf43d11881`
+      returned `binding_rows=0`, `graphify_exact_sources=0`, and
+      `packet_chunk_exact_sources=0`; report:
+      `docs/reports/current-workspace-packet-chunk-join-v1.json`. The fixture path now proves
+      SearchRuntime/ACE → DuckDB → typed CUDA handoff, but this gate remains open for current
+      lineage, cuTile feature-corpus parity, and production promotion.
+
+### Current-corpus dependency refresh (2026-09-14)
+
+- [ ] **UNIFIED-RESIDENCY-CURRENT-COHORT-ADMISSION-01** remains blocked on the source-owner
+      spine. The latest read-only source-owner reconciliation reports `24,414` source rows,
+      `32` execution candidates, `0` exact current owners, and `4` legacy completed candidates;
+      status is `CURRENT_SOURCE_AUTHORITY_NOT_PROVEN` / `LEGACY_ONLY_NO_CURRENT_OWNER`.
+      The explicit workspace→packet→chunk join for the admitted revision likewise reports zero
+      bindings, zero exact Graphify sources, and zero packet/chunk matches. Do not feed the
+      bounded residency adapter a historical or guessed cohort. Receipts:
+      `docs/reports/current-source-owner-reconciliation-v1.json` and
+      `docs/reports/current-workspace-packet-chunk-join-v1.json`.
+- [ ] **UNIFIED-RESIDENCY-SOURCE-BINDING-CLASSIFICATION-01** remains blocked and is now
+      explicitly fail-closed against the admitted snapshot. The bounded read-only planner was
+      run with admitted workspace revision
+      `sha256:3e677c29319a4a60bc60803be4186ba108dce906945af593a3a6f5cf43d11881`; its input
+      source plan was initially revision `sha256:f476b4a6aac2afcafe0f82c7b0e48d52951ccbce73fca52b9706b1f1fbfabefb`,
+      but the planner now supports explicit `--admitted-snapshot` input and was regenerated from
+      the admitted snapshot manifest: snapshot revision `sha256:48e1dbb326a4e249dc550cf1df06da8ec82ca4a837dd93eca114e4bafb2747e8`,
+      25,291 sources, and workspace revision `sha256:3e677c29319a4a60bc60803be4186ba108dce906945af593a3a6f5cf43d11881`.
+      The bounded five-source Graphify comparison found `CURRENT_GRAPHIFY_EXACT=0`,
+      `MISSING_GRAPHIFY_SOURCE=0`, `AMBIGUOUS_GRAPHIFY_SOURCE=0`, and
+      `GRAPHIFY_REVISION_OR_CONTENT_MISMATCH=5`, all on `workspaceRevision`. The follow-up
+      binding classification found `REVISION_BOUND=0`, `WORKSPACE_IDENTITY_ONLY=0`,
+      `WRONG_WORKSPACE_REVISION=5`, `SOURCE_CONTENT_MISMATCH=0`, `AMBIGUOUS=0`. Both receipts
+      record `currentCohortEligible=false`, `safeToApply=false`, and `writesPerformed=false`:
+      `docs/reports/current-source-graphify-batch-plan-v1.json` and
+      `docs/reports/current-workspace-source-binding-classification-v1.json`.
+      Do not relabel or apply historical Graphify rows. The next gate is
+      `GRAPHIFY-EXECUTION-SNAPSHOT-OWNER-02`, followed by the explicit
+      workspace→source→packet→chunk readback before any residency or representation promotion.
+- [ ] **UNIFIED-RESIDENCY-GRAPHIFY-EXECUTION-OWNER-01** remains blocked after the snapshot
+      owner recheck. The read-only binding audit found `32` terminal execution candidates, all
+      resolved through `GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2`, but `0` candidates have
+      `workspaceRevision` equal to the admitted `sha256:3e677c29319a4a60bc60803be4186ba108dce906945af593a3a6f5cf43d11881`.
+      The largest candidate has `25,291` members, but the first failed invariant is
+      `SNAPSHOT_READBACK_NOT_PROVEN`; no candidate is eligible without admission. The receipt
+      remains `GRAPHIFY_SNAPSHOT_BINDING_BLOCKED_SNAPSHOT_READBACK`, `proofLevel=BLOCKED`,
+      `nextGate=SNAPSHOT-BOUND-GRAPHIFY-CANARY-01`, and `writesPerformed=false`:
+      `docs/reports/graphify-workspace-snapshot-binding-v1.json`. Do not relabel a historical
+      execution as current. The next implementation gate is a snapshot-native bounded canary
+      with independently proven materialized bytes and exact V2 membership readback.
+- [ ] **UNIFIED-RESIDENCY-SNAPSHOT-MATERIALIZATION-01** is blocked on the admitted snapshot’s
+      byte readback, not on manifest identity. The read-only preflight confirms workspace
+      revision `sha256:3e677c29319a4a60bc60803be4186ba108dce906945af593a3a6f5cf43d11881`,
+      snapshot revision `sha256:48e1dbb326a4e249dc550cf1df06da8ec82ca4a837dd93eca114e4bafb2747e8`,
+      `25,291` sources across `7` repositories, matching source-selection and membership
+      checksums, zero duplicate identities, and zero persistent writes. The required materialized
+      root is absent, producing `MATERIALIZED_SNAPSHOT_MISSING` and
+      `MATERIALIZED_SOURCE_MISSING` for all `25,291` sources. Receipt:
+      `docs/reports/graphify-snapshot-consumer-preflight-v1.json`.
+      The next gate is `GRAPHIFY-SNAPSHOT-CONSUMER-REPAIR-01`: provide an independently
+      verified immutable byte view of the admitted manifest. Do not derive bytes from the moving
+      checkout, relabel historical executions, or launch Graphify until hash/size readback passes.
+- [ ] **UNIFIED-RESIDENCY-SNAPSHOT-ARCHIVE-RECOVERY-01** remains unresolved after a read-only
+      search of the known sibling checkouts, Git worktrees, branch tips, and workspace archive
+      paths. None contains the expected SHA-256 bytes for the first failing source
+      `.claude/settings.json` (`2d3ee7fcce1beb28a75b8c53ea0e5417906dcd2d29fa4692475da6d7b14d0bdc`).
+      No replacement bytes were copied and no archive or datastore was changed. The admitted
+      snapshot must be recovered from its original external/archive source, or a separately
+      authorized new snapshot must be admitted; neither may be silently substituted.
+- [ ] **UNIFIED-RESIDENCY-CURRENT-CANDIDATE-STABILITY-01** produced a fresh unadmitted candidate
+      only for diagnosis. The two-scan capture observed `25,470` sources across `7` repositories
+      but failed with `WORKSPACE_CHANGED_BETWEEN_SCANS`; its status is `CAPTURE_BLOCKED` and
+      `canonicalAuthority=false`. Receipt:
+      `docs/reports/workspace-source-snapshots/e960ca89a3f733a3d8091efdfff7e51d5efacf98a875ef2445aba347d008b77e.json`.
+      Do not admit this artifact or materialize it as current authority. The next gate is a
+      stable, externally quiesced source frame followed by a fresh two-scan capture and explicit
+      admission review.
+- [ ] **UNIFIED-RESIDENCY-CURRENT-CANDIDATE-MATERIALIZATION-01** captured a stable candidate
+      successfully (`CAPTURE_VERIFIED_REQUIRES_PROCESSING_READBACK`, `25,470` sources, zero
+      violations) at snapshot `dd061572ddc18683aa3902e9d5ea3cac05665dea37b2ce5e07ea4bf8119f351a`,
+      but materialization subsequently failed closed on
+      `next_steps/active/2026-09-14_gpu-mini-fabric-cutile-level3-and-tests.md` with
+      `SNAPSHOT_SOURCE_CHANGED_BEFORE_MATERIALIZATION`. The candidate is not admitted and must
+      not be used as current authority. Receipt:
+      `docs/reports/workspace-source-snapshots/dd061572ddc18683aa3902e9d5ea3cac05665dea37b2ce5e07ea4bf8119f351a.json`.
+      The source frame must remain quiescent through both capture and materialization before
+      Graphify execution can be considered.
+- [x] **UNIFIED-RESIDENCY-CURRENT-CANDIDATE-READBACK-01** proves the new candidate’s immutable
+      byte view: `SNAPSHOT_BYTES_READBACK_PROVEN`, `25,470/25,470` exact source matches, and
+      zero snapshot violations. The same read-only binding audit examined `32` terminal
+      execution candidates and found `0` eligible matches for this candidate; the first blocker
+      is `NO_TERMINAL_GRAPHIFY_EXECUTION_MATCHES_SNAPSHOT`. The candidate remains unadmitted,
+      with `authority=false` and `writesPerformed=false`. Receipt:
+      `docs/reports/graphify-current-candidate-binding-v1.json`. The next gate is the explicitly
+      authorized snapshot-bound Graphify canary, followed by exact V2 membership readback.
+- [ ] **UNIFIED-RESIDENCY-SNAPSHOT-MATERIALIZATION-REPAIR-01** failed closed during the first
+      materialization attempt: the admitted snapshot manifest expects a different digest for
+      `.claude/settings.json` than the current moving checkout. The materializer raised
+      `SNAPSHOT_SOURCE_CHANGED_BEFORE_MATERIALIZATION` before producing a usable snapshot root;
+      no canonical or projection datastore was touched. Do not weaken the digest check or copy
+      the current file under the old snapshot identity. The next gate is to obtain the original
+      immutable snapshot bytes (or a separately verified archival source) and rerun the
+      materializer, then require complete hash/size readback before Graphify execution.
+- [x] **UNIFIED-RESIDENCY-ACE-BRIDGE-01** added the read-only bridge from an already admitted
+      `CandidateFeatureSnapshotV1`/`ContextManifestV2` into descriptor-only feature tiles. It
+      preserves candidate ordinals and row revisions, requires an exact domain/LUT revision, and
+      returns `canonicalAuthority=false` and `writesPerformed=false`. Focused proof is 7/7 across
+      the adapter and ACE bridge suites; this does not prove a production caller or GPU execution.
+- [x] **UNIFIED-RESIDENCY-SEARCHRUNTIME-01** added an opt-in `SearchRuntime` method that composes
+      the existing QAS/ACE manifest path into the unified descriptor bridge. The existing runtime
+      remains the retrieval/fusion owner; the method is read-only and requires explicit revisions
+      and LUT input. The caller proof is included in the focused adapter suite (9/9 total).
+- [x] **UNIFIED-RESIDENCY-CUTILE-SIMT-SMOKE-01** re-ran the isolated WSL2 executor probe on the
+      RTX 3060 Ti: cuTile 1.5.0 vector-add correctness and PyTorch 2.14 CUDA 13.2 SIMT GEMM
+      finiteness passed on SM86. Receipt: `docs/reports/unified-residency-cutile-simt-proof-v1.json`.
+      This proves executor reachability only; it does not prove same-corpus parity, VRAM-pressure
+      eviction, physical provider handoff, or promotion.
+- [x] **UNIFIED-RESIDENCY-PYTORCH-EXECUTOR-SMOKE-01** re-ran the existing Python tile-cache and
+      GPU-resident-executor tests in the isolated WSL2 environment: 6/6 passed, including CUDA
+      materialization/readback/release and LRU behavior. Receipt:
+      `docs/reports/unified-residency-pytorch-provider-proof-v1.json`. This is executor evidence,
+      not proof that the TypeScript descriptor has been delivered to that process.
+- [x] **UNIFIED-RESIDENCY-PYTHON-HANDOFF-01** added `UnifiedFeatureTileProvider` over the existing
+      Python `GpuTileCache`. It validates descriptor kind, loadable state, shape, and byte length,
+      retains buffers only inside the process, and returns a sanitized receipt. CPU fixture plus
+      existing executor coverage is 14/14; missing revision lineage fails closed. No deployed RPC
+      transport, cross-corpus parity, or promotion is claimed.
+      Receipt: `docs/reports/unified-residency-provider-handoff-v1.json`.
+- [x] **UNIFIED-RESIDENCY-PYTHON-HARNESS-01** corrected the WSL2 subprocess test environment to
+      resolve the package from `sveltekit-frontend/python` instead of assuming the repository
+      root is the Python import root. The RAPIDS-linked interpreter now passes the provider,
+      parity, and VRAM suites: `11/11`. This proves the bounded Python handoff harness; it does
+      not prove current-corpus admission or production GPU promotion.
+- [x] **UNIFIED-RESIDENCY-CONTROL-TRANSPORT-01** added a metadata-only control-envelope serializer
+      and Python JSON receiver. Numeric tiles remain typed array inputs outside the envelope;
+      malformed control JSON and missing lineage fail closed. The provider now also accepts a
+      separate little-endian Float32 buffer through `load_control_buffer`; the combined Python
+      provider/executor fixture passes 14/14. This proves a local typed-buffer handoff, not a
+      deployed RPC channel.
+- [x] **UNIFIED-RESIDENCY-STDIO-HANDOFF-01** added a bounded length-framed local stdio
+      transport around the existing Python provider. It accepts descriptor JSON plus a separate
+      little-endian Float32 frame and emits only a sanitized receipt; truncated/oversized frames
+      fail closed. The subprocess handoff is covered by the provider suite. This is a local
+      replayable transport proof, not a deployed network service.
+- [x] **UNIFIED-RESIDENCY-HOST-HANDOFF-01** added a Node host harness that sends the same
+      descriptor JSON plus typed Float32 frame through WSL2 to the existing Python provider and
+      validates the sanitized `RESIDENT` receipt. Receipt:
+      `docs/reports/unified-residency-stdio-handoff-v1.json`. This proves host-to-provider
+      delivery and frame checksums locally; it is not a deployed production RPC.
+- [x] **UNIFIED-RESIDENCY-FEATURE-PACK-LINEAGE-01** retained per-row `sourceRevisions` in the
+      existing GPU feature-pack contract and added a pack-to-residency adapter. A pack with one
+      source revision lowers to a typed feature buffer; mixed-source packs fail closed because
+      the unified descriptor has a singular `sourceRevision`. No current-corpus admission is
+      implied. Receipt: `docs/reports/unified-residency-feature-pack-lineage-v1.json`.
+- [x] **UNIFIED-RESIDENCY-FEATURE-PACK-ADMISSION-01** wired the revision-qualified feature-pack
+      result through the existing `FeatureTileProvider` and `UnifiedResidencyAdapter`. The
+      provider returns only the typed buffer, while the adapter owns residency state; key and
+      artifact mismatches fail closed. This is a read-only local provider proof, not canonical
+      persistence or production promotion.
+- [x] **UNIFIED-RESIDENCY-FEATURE-PACK-BATCH-01** added ordinal-preserving per-row lowering for
+      mixed-source GPU packs. Homogeneous packs may use the compact tile path; mixed packs now
+      produce one typed row tile per source revision rather than collapsing provenance. The
+      SearchRuntime opt-in path returns the resulting residency batch and remains read-only.
+- [x] **UNIFIED-RESIDENCY-SEARCHRUNTIME-LOAD-01** extended the SearchRuntime fixture proof to
+      load its emitted residency batch through the existing `UnifiedResidencyAdapter` and typed
+      provider interface, verifying `RESIDENT` state without retaining buffers in the runtime
+      adapter. This remains bounded fixture evidence, not live-corpus promotion.
+- [ ] **UNIFIED-RESIDENCY-PARITY-01** prove same-corpus CPU/PyTorch-SIMT and isolated cuTile
+      parity, NetworkX/DAG ordinal parity, and bounded replay before any promotion. Keep
+      `writesPerformed=false` for the proof lane.
+- [x] **UNIFIED-RESIDENCY-PARITY-01a** added a deterministic bounded CPU/PyTorch-SIMT
+      exact-cosine parity and replay test over one shared feature tile. The existing
+      `GpuTileCache` is reused; result indices, scores, and replay checksums match within
+      tolerance, and a dimension mismatch fails before scoring. This is a synthetic/bounded
+      executor proof only; production same-corpus, cuTile parity, ordinal parity, and VRAM
+      pressure remain open.
+- [x] **UNIFIED-RESIDENCY-PARITY-01b** re-ran the existing bounded NetworkX↔cuGraph
+      ordinal/PageRank proof through the declared RAPIDS environment. The shared six-node
+      fixture preserved `renumbered=false`, exact vertex identity, stable rank ordering, and
+      `maxAbsScoreError=7.19e-7`; receipt: `docs/reports/graph-ordinal-cpu-gpu-parity-v1.json`.
+      This is a graph-fixture proof, not current-workspace graph authority.
+- [x] **UNIFIED-RESIDENCY-PARITY-01c** re-ran the isolated cuTile FP16 GEMM against the
+      PyTorch SIMT reference on the RTX 3060 Ti. The 256×256 fixture was finite with zero
+      absolute and relative delta across three repeats; receipt:
+      `docs/reports/unified-residency-cutile-gemm-parity-v1.json`. This proves kernel-level
+      parity only; feature-corpus parity and VRAM-pressure behavior remain open.
+- [x] **UNIFIED-RESIDENCY-VRAM-01a** exercised the existing CUDA `GpuTileCache` on the RTX
+      3060 Ti with eight 1 MiB tiles against a four-tile ceiling. Logical bytes stayed within
+      the ceiling, oldest tiles were evicted, the newest tile remained resident, and an evicted
+      tile reloaded successfully. This is a bounded allocator/LRU proof; it does not authorize
+      a production VRAM policy or persistence of GPU state.
+
+### Unified residency host-staging boundary (2026-09-14)
+
+- [x] **UNIFIED-RESIDENCY-HOST-STAGING-01** proved the existing Node `@atlas/duckdb`
+      wrapper after restoring its missing native binding with `npm rebuild duckdb`. A real
+      in-memory read-only `SELECT` returned a bounded feature tile and now feeds the existing
+      host-to-WSL typed-buffer handoff. No table, snapshot, PostgreSQL row, cache entry, or GPU
+      state was written. Neither WSL2 Python environment has an importable DuckDB module outside
+      the repository, so Python DuckDB is not treated as part of the cuTile path. Pandas/PyArrow
+      remain analysis/export dependencies in the RAPIDS environment only. Receipt:
+      `docs/reports/unified-residency-host-staging-audit-v1.json`.
+- [x] **UNIFIED-RESIDENCY-E2E-FIXTURE-HANDOFF-01** joined the existing bounded
+      SearchRuntime → ACE admission → feature-pack → DuckDB in-memory SELECT → typed Float32
+      stdio → WSL2 provider path. Source and staged feature-value checksums matched; the CUDA
+      provider returned `RESIDENT` with `rawPointerExposed=false` and `writesPerformed=false`.
+      This is an end-to-end fixture proof only: no current-corpus admission, production route,
+      or projection promotion is implied. Receipt:
+      `docs/reports/unified-residency-searchruntime-duckdb-wsl-v1.json`.
+- [x] **UNIFIED-RESIDENCY-PARITY-01d** extended that joined fixture with the existing
+      provider's `EXACT_COSINE_V1` operation over a second typed query buffer. The WSL2 CUDA
+      result returned ordinal `0` and score `1.0`, matching the staged row's CPU identity
+      expectation and result checksum. This remains one-row bounded numerical proof; it does
+      not close the parent same-corpus/current-cohort parity gate.
+- [x] **UNIFIED-RESIDENCY-PARITY-01e** made the CPU oracle explicit in the joined receipt:
+      the host computes normalized cosine over the exact DuckDB-staged Float32 values, and the
+      WSL2 CUDA result must match both ordinal and rounded score arrays. This is bounded
+      CPU↔CUDA parity over the same transferred tile; full-corpus and cuTile feature-corpus
+      parity remain open.
+- [x] **UNIFIED-RESIDENCY-FAIL-CLOSED-HANDOFF-01** added a negative joined replay with a
+      mismatched query shape. The WSL2 boundary rejects it before scoring and returns a failed,
+      sanitized receipt with `writesPerformed=false`; the valid CPU↔CUDA case must pass in the
+      same run.
+- [x] **BITFROST-GPU-MEMORY-ADMISSION-01** (stage A: pure policy) added a pure, deterministic
+      multi-signal admission policy
+      (`sveltekit-frontend/src/lib/server/atlas/tensors/gpu-memory-admission-v1.ts`,
+      `decideGpuMemoryAdmissionV1()`) as a bounded pre-check BitFrost calls before
+      `UnifiedResidencyAdapter.admit()` -- deliberately NOT wired into
+      `unified-residency-adapter-v1.ts` itself in this tranche to avoid colliding with concurrent
+      edits to that file; callers compose the two explicitly, admitting only on `ADMIT` or
+      `EVICT_THEN_ADMIT` (after BitFrost's own ledger performs the eviction -- this module never
+      evicts anything itself).
+      **Structured as three strictly separated stages** (external review caught and fixed a real
+      policy bug in the first draft: an unreachable `DEFER` branch caused by conflating
+      `pressureState` with `decision`):
+      1. *Validate/normalize evidence* -- `deviceFreeObserved`, `wddmBudget`/`wddmCurrentUsage`,
+         and `cudaContextFree` are each checked for trust (finite, safe-integer, non-negative)
+         independently; an untrusted individual reading is excluded from the signal set entirely
+         rather than propagated, and a WDDM usage-exceeding-budget pair clamps to zero rather than
+         going negative. The trusted signals are combined via their MINIMUM -- never an average or
+         the optimistic reading -- reserves subtracted exactly ONCE after that combination, never
+         per-signal. This directly encodes the BITFROST-L2-01 lesson recorded earlier in this same
+         file's history, where `cudaMemGetInfo` reported ~6.68GB free while `nvidia-smi` reported
+         ~140-400MB free on this same host.
+      2. *Classify pressure* (`UNKNOWN`/`CRITICAL`/`HIGH`/`ELEVATED`/`LOW`) -- purely descriptive
+         of what was observed, decoupled from what BitFrost should do about it.
+      3. *Choose the decision* (`ADMIT`/`DEFER`/`EVICT_THEN_ADMIT`/`REJECT`) -- `DEFER` is used
+         SOLELY for `UNKNOWN` evidence (retry once evidence exists), never as a softer `REJECT`
+         under known high/critical pressure; known-evidence unsafe requests `REJECT` (or
+         `EVICT_THEN_ADMIT` if BitFrost-reported `evictableBytes` closes the gap).
+      Withholds a fixed decoder reserve (`DEFAULT_DECODER_RESERVE_BYTES=2GB`, overridable per call)
+      whenever `decoderActive=true`, treating live llama-server survival as a first-class
+      constraint per this repo's existing rule. Enforces a hard `MIN_SAFE_ALLOWANCE_BYTES=64MB`
+      floor as required post-admission headroom, applied explicitly and deterministically even for
+      a zero-byte request (an already-`CRITICAL` device still `REJECT`s a 0-byte ask -- admission
+      answers device safety, not request cost). Self-verifying via `admissionChecksum` (reuses the
+      existing `canonicalExecutionSha256` helper, not a new hashing scheme); `evidenceRefs` order
+      is explicitly defined as checksum-significant, not silently normalized away. `writesPerformed`
+      is a literal `false` on every result.
+      **Focused proof: 23/23 tests** (18 example cases covering both-absent, single-signal,
+      optimistic-vs-constrained-signal conflicts in both directions, exact/one-byte-over safe
+      boundaries, decoder on/off, eviction sufficiency/insufficiency boundaries, critical-pressure
+      rejects-not-defers, corrupt/negative evidence clamping and exclusion, checksum determinism
+      and evidenceRefs order-sensitivity, zero-byte-request policy, and a `Number.MAX_SAFE_INTEGER`
+      overflow guard) **plus 3 property-based assertions** (fast-check, 100 runs each): increasing
+      `requestedBytes` never increases permissiveness, increasing observed free bytes never
+      decreases permissiveness, and `decoderActive=true` is never more permissive than
+      `decoderActive=false` for otherwise identical input.
+      Does not touch, and is not blocked by, the current-corpus source-authority chain above --
+      this is pure device-memory-pressure policy, independent of workspace/source lineage.
+      Remaining stages (not yet built, tracked as this same gate's B-F): B. observation contract,
+      C. CUDA observation adapter, D. WDDM observation adapter, E. decoder-survival live proof,
+      F. integration with the existing residency owner (`unified-residency-adapter-v1.ts`).
+
+- [x] **BITFROST-GPU-MEMORY-ADMISSION-01** (stage B: observation contract) added
+      `GpuMemoryObservationV1` (`sveltekit-frontend/src/lib/server/atlas/tensors/gpu-memory-observation-v1.ts`,
+      Zod schema, no I/O) -- a typed, revision-agnostic envelope for exactly the four raw readings
+      `decideGpuMemoryAdmissionV1()` already accepts, each independently nullable and each tagged
+      with `{ value, source }` where `source` is `'nvidia-smi' | 'wddm' | 'cuda-context'`, plus
+      `observedAt`. Rejects an all-null observation (zero readings is not useful evidence) and
+      flags a WDDM budget/usage source mismatch as a validation error. `toAdmissionInputFields()`
+      maps an observation straight into `decideGpuMemoryAdmissionV1()`'s input shape with no lossy
+      transform -- proven by a focused test that round-trips a real observation through the
+      admission policy and checks the resulting decision. Focused proof: 6/6 tests. Deliberately
+      still has zero hardware dependency -- stages C/D (CUDA and WDDM/nvidia-smi adapters that
+      actually PRODUCE a `GpuMemoryObservationV1`) remain unstarted.
+      (The original plan considered a tagged-union-per-signal shape; the shipped design uses one
+      shared `{ value, source }` reading type reused across all four fields instead, which was
+      simpler and sufficient.) Placed beside `gpu-memory-admission-v1.ts` in the same `tensors/`
+      directory, per plan.
+- [x] **BITFROST-GPU-MEMORY-ADMISSION-01** (stage C: CUDA observation adapter) added
+      `sveltekit-frontend/python/parent_atlas_tensor/gpu_memory_probe.py` -- a standalone,
+      read-only WSL2-side probe (`torch.cuda.mem_get_info()`) emitting one
+      `GpuMemoryObservationV1`-shaped `cudaContextFree` reading. Deliberately NOT routed through
+      `unified_residency_stdio.py`'s length-framed binary protocol -- that framing exists
+      specifically for transferring a numeric tile buffer alongside a descriptor, which doesn't
+      apply to a payload-free memory query; instead reuses the SAME WSL2/venv spawn convention as
+      the existing host harness (`scripts/atlas/prove-unified-residency-stdio-handoff-v1.mjs`).
+      Node-side proof harness: `scripts/atlas/prove-gpu-memory-observation-cuda-v1.mjs`. **Real,
+      live result** on this host's RTX 3060 Ti: `cudaContextFree.value=7,472,152,576` bytes
+      (~7.47GB) of `cudaContextTotal=8,589,410,304` (~8GB) total, `torchVersion=2.14.0+cu132`,
+      plausibility check passed (`0 < free <= total`). Receipt:
+      `docs/reports/gpu-memory-observation-cuda-v1.json`. Explicitly caveated in the receipt
+      itself: this ~7.47GB reading is NOT trusted alone -- consistent with this repo's own
+      BITFROST-L2-01 finding that `cudaMemGetInfo` overstates free memory relative to `nvidia-smi`
+      on this host; stage D's WDDM/nvidia-smi adapter remains required before any real admission
+      decision is fed this signal.
+#### BITFROST-GPU-MEMORY-ADMISSION-01 handoff (2026-09-14, ALL SIX STAGES COMPLETE)
+
+**Done, tested, verified no regressions**: stages A (pure policy, 23/23 tests), B (observation
+contract, 6/6 tests), C (CUDA observation adapter, real live WSL2 CUDA reading), D (WDDM/nvidia-smi
+observation adapter, real live Windows perf-counter + nvidia-smi capture, 4/4 tests), E
+(decoder-survival live proof against a real running llama-server.exe, 3/3 tests), F (integration
+wrapper `admitWithGpuMemoryAdmissionCheck()` composing decision + `UnifiedResidencyAdapter.admit()`
+without modifying `admit()` itself, 4/4 tests). All six plus the pre-existing
+`unified-residency-adapter-v1.spec.ts` (6/6) and the concurrent tranche's own
+`unified-residency-feature-pack-v1.spec.ts` (3/3) were re-run together this session: **49/49
+passing, zero regressions**. `openspec validate parent-atlas-tensor-residency-integration --type
+change --strict` passes (run from the repo root -- this change lives in the repo-root `openspec/`
+tree, NOT `sveltekit-frontend/openspec/`).
+
+**Files added this BITFROST-GPU-MEMORY-ADMISSION-01 effort** (only ONE pre-existing file was
+modified, additively -- see below):
+`sveltekit-frontend/src/lib/server/atlas/tensors/gpu-memory-admission-v1.ts` (+`.spec.ts`) --
+**modified in stage F** to add the `admitWithGpuMemoryAdmissionCheck()` export and an import of
+`UnifiedResidencyAdapter`; every other line from stages A-C is unchanged,
+`sveltekit-frontend/src/lib/server/atlas/tensors/gpu-memory-observation-v1.ts` (+`.spec.ts`),
+`sveltekit-frontend/src/lib/server/atlas/tensors/gpu-memory-observation-wddm-v1.spec.ts`,
+`sveltekit-frontend/src/lib/server/atlas/tensors/gpu-memory-admission-decoder-survival-v1.spec.ts`,
+`sveltekit-frontend/src/lib/server/atlas/tensors/gpu-memory-admission-residency-integration-v1.spec.ts`,
+`sveltekit-frontend/python/parent_atlas_tensor/gpu_memory_probe.py`,
+`scripts/atlas/prove-gpu-memory-observation-cuda-v1.mjs`,
+`scripts/atlas/prove-gpu-memory-observation-wddm-v1.mjs`,
+`scripts/atlas/prove-gpu-memory-admission-decoder-survival-v1.mjs`,
+`docs/reports/gpu-memory-observation-cuda-v1.json`,
+`docs/reports/gpu-memory-observation-wddm-v1.json`,
+`docs/reports/gpu-memory-admission-decoder-survival-v1.json`.
+`unified-residency-adapter-v1.ts` itself was NOT modified -- the stage F wrapper lives in
+`gpu-memory-admission-v1.ts` and only imports from it.
+
+**Known, deliberate, non-blocking gaps**: `wddmBudget` (the literal DXGI
+`IDXGIAdapter3::QueryVideoMemoryInfo` Budget field) remains genuinely unobtained -- stage D
+deliberately left it `null` rather than approximate it, since PowerShell/WMI cannot reach it (only
+Usage/Committed counters are exposed that way); a real Budget value would need a small native COM
+addon, out of scope here and not currently planned as a separate stage.
+`admitWithGpuMemoryAdmissionCheck()` has zero production callers as of this handoff -- same status
+as `UnifiedResidencyAdapter.admit()`/`.load()` themselves, which stage F confirmed still have no
+live call site beyond their own spec tests (`loadUnifiedResidencyFeaturePackV1` is unwired into
+`search-runtime-adapter.ts`, which only calls the descriptor-building
+`prepareUnifiedResidencyFeaturePackBatchV1`). Wiring a real call site is a separate, future
+integration decision, not part of this gate's scope. None of A-F touch or are blocked by the
+current-corpus source-authority chain elsewhere in this file.
+
+**This BITFROST-GPU-MEMORY-ADMISSION-01 effort is complete.** Next steps for whoever picks this up
+(concurrent session or future one): (1) decide whether/where to add a real production call site for
+`admitWithGpuMemoryAdmissionCheck()`, most likely wherever `loadUnifiedResidencyFeaturePackV1` or a
+future `.admit()` caller gets wired into production; (2) optionally pursue the native-COM-addon
+route for a true `wddmBudget` reading if this stack ever needs it as a gating input rather than an
+informational one.
+
+- [x] **BITFROST-GPU-MEMORY-ADMISSION-01** (stage D: WDDM observation adapter) took the
+      PowerShell/WMI bridge option (not a native addon): `scripts/atlas/prove-gpu-memory-observation-wddm-v1.mjs`
+      reuses `run-l2-persist-bench.mjs`'s exact `nvidia-smi --query-gpu=memory.free,memory.total`
+      pattern verbatim for `deviceFreeObserved`, adds a real Windows
+      `\GPU Process Memory(*)\Dedicated Usage` performance-counter read (summed per-LUID, dominant
+      discrete-GPU LUID auto-selected by highest aggregate usage -- no hardcoded LUID) for
+      `wddmCurrentUsage`, and re-invokes the stage-C WSL2 CUDA probe for `cudaContextFree`, all
+      three captured within the same wall-clock second. **Honest limitation, not worked around**:
+      the literal DXGI `Budget` field (`IDXGIAdapter3::QueryVideoMemoryInfo`) is not reachable from
+      PowerShell counters or WMI -- only Usage/Committed are exposed that way, so `wddmBudget` is
+      left `null` rather than fabricated from a different probe's number (this also means the
+      `GpuMemoryObservationV1` WDDM-source-mismatch check never fires here, correctly, since only
+      one WDDM-sourced field is populated). Real live capture (2026-09-14):
+      `nvidia-smi` free = 1,113,587,712 B (1.06 GiB, real contention -- another process is
+      genuinely using most of this 8GB card right now), WDDM dedicated-usage = 7,562,141,696 B
+      across the dominant LUID (one process alone at 5,801,705,472 B, almost certainly
+      llama-server.exe), `cudaContextFree` = 7,472,152,576 B. **Discrepancy formally recorded, not
+      just narrated**: cudaContextFree overstates nvidia-smi's free reading by **6.71x** at this
+      capture instant -- same direction, same root cause as the earlier ~20x BITFROST-L2-01
+      finding; magnitude differs because nvidia-smi's free figure was much smaller (tighter real
+      contention) this time, while cudaContextFree's absolute number stayed roughly constant
+      (~7.4-7.5GB) across both captures -- consistent with cudaContextFree reflecting a
+      WDDM-virtualized budget rather than physically-free VRAM. Receipt:
+      `docs/reports/gpu-memory-observation-wddm-v1.json` (`RESULT: DRY_RUN_PROVEN`). Frozen
+      regression test added (not just a one-off script run):
+      `gpu-memory-observation-wddm-v1.spec.ts` (4/4 passing) pins this exact real capture through
+      `gpuMemoryObservationV1Schema` and `decideGpuMemoryAdmissionV1()`, proving the admission
+      policy's min-of-trusted-signals rule is NOT fooled by cudaContextFree's optimistic number
+      even when nvidia-smi's real reading is far smaller and a 2GB request against the true
+      ~1.06GB free correctly does not ADMIT. Full suite re-run together: **39/39 passing, zero
+      regressions** (unified-residency-adapter-v1 6, gpu-memory-admission-v1 23,
+      gpu-memory-observation-v1 6, gpu-memory-observation-wddm-v1 4, new).
+- [x] **BITFROST-GPU-MEMORY-ADMISSION-01** (stage E: decoder-survival live proof) real
+      llama-server.exe was already running on :8090 (`ornith-1.5-9b`, per root CLAUDE.md's
+      canonical startup contract) -- confirmed via `GET /v1/models`.
+      `scripts/atlas/prove-gpu-memory-admission-decoder-survival-v1.mjs` captured a real
+      `GpuMemoryObservationV1`-shaped reading (nvidia-smi + stage-C WSL2 CUDA probe, same reuse
+      pattern as stages C/D), then ran `decideGpuMemoryAdmissionV1()` TWICE for the identical
+      `requestedBytes` -- once `decoderActive: false`, once `decoderActive: true` -- via the real
+      canonical module (invoked through a throwaway `tsx`-executed script, not a reimplementation,
+      so the numbers are the actual production logic's output, not a copy). Live capture
+      (2026-09-14): with `deviceFreeObserved` = 1,176,502,272 B and `requestedBytes` = 588,251,136 B
+      (~50% of free), `decoderActive: false` → **ADMIT** (`effectiveAdmittableBytes` =
+      1,176,502,272); `decoderActive: true` → **REJECT** (`effectiveAdmittableBytes` clamps to 0,
+      `pressureState: CRITICAL`) -- the identical request flips outcomes purely from the decoder
+      flag, proving the 2GB reserve is load-bearing on a real decision, not an inert constant.
+      llama-server confirmed alive (`GET /v1/models`, 200, same `modelId`) both immediately before
+      and immediately after. One real bug found and fixed in the PROOF SCRIPT itself (not the
+      admission policy): the first plausibility check assumed the reserve delta would equal exactly
+      `DEFAULT_DECODER_RESERVE_BYTES`, but `effectiveAdmittableBytes` correctly clamps to 0 rather
+      than going negative when the reserve exceeds the free bound -- fixed to check
+      `reservedHeadroom === 2_000_000_000` and `effectiveAdmittableBytes === max(0, freeBound -
+      reserve)` instead of a raw delta. Receipt:
+      `docs/reports/gpu-memory-admission-decoder-survival-v1.json` (`RESULT: DRY_RUN_PROVEN`).
+      Frozen regression test: `gpu-memory-admission-decoder-survival-v1.spec.ts` (3/3 passing) pins
+      this exact real capture -- ADMIT without decoder, REJECT with decoder, and a check that
+      neither call falls back to DEFER (both signals were trusted and present at capture time).
+      Full suite re-run together: **42/42 passing, zero regressions**.
+- [x] **BITFROST-GPU-MEMORY-ADMISSION-01** (stage F: integration) re-read
+      `unified-residency-adapter-v1.ts` fresh before touching it, per the standing instruction --
+      it had NOT changed structurally since stage A, but a real NEW file had appeared under it in
+      the concurrent tranche: `unified-residency-feature-pack-v1.ts` (`prepareUnifiedResidencyFeaturePackBatchV1`
+      / `prepareUnifiedResidencyFeaturePackV1` / `loadUnifiedResidencyFeaturePackV1`). Checked its
+      real callers before assuming anything: `search-runtime-adapter.ts` (confirmed live production
+      code) calls only `prepareUnifiedResidencyFeaturePackBatchV1` (descriptor-building, no
+      mutation) -- it does NOT call `loadUnifiedResidencyFeaturePackV1` (the one that reaches
+      `adapter.admit()` via `.load()`), which currently has zero callers outside its own spec test.
+      So `.admit()`/`.load()` still has no live production call site to force a signature change
+      through, matching this module's own header comment ("Deliberately NOT wired into
+      unified-residency-adapter-v1.ts ... callers compose the two explicitly"). Implemented
+      exactly that composition as the optional wrapper the task allows instead of modifying
+      `admit()`: `admitWithGpuMemoryAdmissionCheck(adapter, descriptor, admission)` in
+      `gpu-memory-admission-v1.ts` -- takes an ALREADY-COMPUTED `GpuMemoryAdmissionV1` (keeping
+      observation -> decision -> mutation as three separately-inspectable steps), throws
+      `GPU_MEMORY_ADMISSION_REFUSED_<decision>` for `REJECT`/`DEFER` before ever calling
+      `adapter.admit()`, and calls through for `ADMIT`/`EVICT_THEN_ADMIT` (the latter asserts
+      eviction already happened elsewhere -- this wrapper never evicts). `admit()`'s own signature
+      and internal budget check are untouched. New test:
+      `gpu-memory-admission-residency-integration-v1.spec.ts` (4/4 passing) -- ADMIT mutates the
+      adapter, REJECT and DEFER both throw before any mutation (`adapter.usedBytes()` stays 0),
+      EVICT_THEN_ADMIT succeeds without double-accounting against `admit()`'s own independent
+      budget check. Full suite re-run together, including the concurrent tranche's own
+      `unified-residency-feature-pack-v1.spec.ts`: **49/49 passing, zero regressions**. All six
+      stages (A-F) of `BITFROST-GPU-MEMORY-ADMISSION-01` are now complete.
+
+### OpenCode / VS Code agent-awareness integration (2026-09-14)
+
+- [x] **UNIFIED-RESIDENCY-OPENCODE-CONTEXT-01** confirmed that the existing OpenCode
+      JSONC configuration already provides the agent/model owner (`ornith-atlas-kernel`),
+      local `atlas-task-kernel` MCP, remote TRACE MCP, and deny-by-default mutation
+      permissions. Added `.opencode/command/atlas-residency-proof.md` as the bounded,
+      read-only command entrypoint. It consumes existing reports and proof scripts and
+      requires structured evidence rather than log scraping or raw backend access.
+      This is an OpenCode integration proof, not current-corpus residency promotion.
+- [ ] **UNIFIED-RESIDENCY-VSCODE-HANDOFF-01** add one VS Code task that invokes the
+      OpenCode command without auto-approval and displays the resulting structured proof.
+      Reuse `.vscode/tasks.json`; do not create a second VS Code extension, MCP server,
+      router, or cache owner. Keep the existing `vscode-extension` as optional UI only.
+- [ ] **UNIFIED-RESIDENCY-AGENTIC-LIVE-CONTEXT-01** prove one live OpenCode session
+      receives the canonicalized Atlas residency report through the existing MCP seam,
+      with `writesPerformed=false`, explicit evidence references, and a blocked promotion
+      result when current-corpus lineage is unavailable. Do not persist hidden reasoning,
+      tensors, KV state, GPU pointers, or raw retrieval output.
+- [x] **UNIFIED-RESIDENCY-RLM-REPAIR-ALIGNMENT-01** recorded the existing RLM, ACP/MCP,
+      telemetry, repair-registry, and repair-loop boundaries and added the read-only
+      `.opencode/agents/atlas-rlm-repair.md` profile. The profile produces a structured
+      repair candidate and validation plan from revision-qualified evidence, while denying
+      edits and requiring `writesPerformed=false`. This proves agent-policy alignment only;
+      it does not prove a durable event-outbox timeline or authorize repair application.
+- [ ] **UNIFIED-RESIDENCY-EVENT-TIMELINE-01** connect one verified repair result to the
+      existing authoritative receipt/event owner with predecessor evidence references and
+      replay identity. The current NATS publisher is a graceful no-op and ACP telemetry is
+      diagnostic, so neither may be treated as durable history. Do not add A2A, REPL, TOML,
+      or another event bus until the existing owner and persistence path are proven.
+
+### Prime-agent runtime alignment review (2026-09-14)
+
+- [x] **PRIME-AGENT-RUNTIME-ALIGNMENT-01** reviewed the existing OpenCode/RLM/repair
+      path. OpenCode JSONC remains the agent configuration owner; MCP remains JSON-RPC
+      capability transport; ACP tool contracts and telemetry remain capability/diagnostic
+      layers; the existing repair registry and `repair-loop.ts` remain the agentic repair
+      owner. No second REPL, router, or extension is required for the first tranche.
+- [x] **PRIME-AGENT-IPYKERNEL-CONFIG-01** classified IPython as an optional analysis
+      kernel rather than an OpenCode control-plane format. Current IPython documentation
+      uses traitlets-backed Python or limited JSON configuration, not TOML. Any future
+      kernel task must exchange bounded typed buffers and revisioned receipts; it must not
+      become a new identity, event, or cache owner.
+- [x] **PRIME-AGENT-FASTAPI-SIDECAR-01** classified FastAPI as an explicit executor/API
+      boundary only. Heavy or restart-sensitive work must use the existing worker/queue
+      pattern rather than relying on in-process request background tasks. HTTP responses
+      should acknowledge bounded work and reference a receipt; they must not imply current
+      corpus admission or durable timeline persistence.
+- [x] **PRIME-AGENT-SIMDJSON-01** confirmed simdjson belongs at the JSON/JSONL control and
+      receipt parsing boundary. Numeric GPU payloads remain Arrow/MsgPack/typed buffers;
+      JSON parsing must not enter the hot SIMT loop or mint identity.
+- [x] **PRIME-AGENT-TURBOVEC-PACKAGE-01** confirmed the repository has the TurboVec
+      N-API/Rust package and Python/sidecar integrations, but no separately proven,
+      canonical TurboVec Python wheel owner. Package/build provenance and ABI checks remain
+      an executor-readiness gate; TurboVec remains a derived retrieval executor.
+- [x] **PRIME-AGENT-TENSORRT-RTX-01** recorded TensorRT for RTX as a future inference
+      executor lane for Ampere-class RTX hardware. NVIDIA documentation describes support
+      for RTX generations including Ampere and an ONNX Runtime/Windows ML execution path;
+      this does not prove the local RTX 3060 Ti TensorRT-RTX install, model engine, or
+      parity. Require a local capability receipt before promotion and keep it separate from
+      the WSL2 RAPIDS/cuTile environment.
+- [ ] **PRIME-AGENT-TIMELINE-PROOF-01** prove one end-to-end sequence:
+      `verified error → evidence packet → repair candidate → validation receipt →
+      recommendation`, with stable repair-case identity, predecessor receipt references,
+      replay checksum, and `writesPerformed=false`. A NATS no-op, console log, or OpenCode
+      transcript alone cannot close this gate.
+
+### Parent Atlas workstation agentic-repair integration map (2026-09-14)
+
+- [x] **WORKSTATION-AGENT-OWNER-01** mapped the existing workstation owner:
+      `packages/atlas-core/src/workstation-orchestrator.ts` and its CLI/export surface.
+      This is the main-repository workspace package `@deeds/atlas-core`, not a separate
+      checkout and not `packages/atlas` (`@deeds/atlas-contracts`). It remains the
+      coordinator for bounded workstation work; OpenCode, RLM, and Mastra may invoke or
+      explain work but must not replace this owner.
+- [x] **WORKSTATION-REPAIR-OWNER-01** mapped the existing repair path:
+      `packages/atlas-core/src/langgraph/kanban-error-fixing-agent.ts`,
+      `sveltekit-frontend/scripts/agents/repair-registry.ts`, and
+      `sveltekit-frontend/scripts/agents/repair-loop.ts`. The registry remains the only
+      source of repair capabilities; dry-run is the default and `--apply` remains an
+      explicit mutation gate.
+- [x] **WORKSTATION-STDIO-HANDOFF-01** aligned local stdio with the existing typed-buffer
+      boundary. The unified residency provider and stdio handoff may carry bounded
+      descriptor JSON plus typed numeric frames, while OpenCode/MCP remains capability
+      transport. No raw GPU pointer, tensor, KV state, or hidden reasoning may cross or
+      persist through the packet.
+- [x] **WORKSTATION-ACP-AWARENESS-01** mapped ACP contracts and telemetry in
+      `packages/atlas-core/src/tools/acp-tool-contracts.ts` and
+      `packages/atlas-core/src/telemetry/acp-mcp-telemetry.ts`. These record capability
+      calls and diagnostics; they do not independently establish canonical authority or
+      durable event history.
+- [x] **WORKSTATION-EVENT-TRANSPORT-01** recorded
+      `packages/atlas-core/src/nats/nats-client.ts` and `packages/atlas-core/events/subjects.ts`
+      as optional event transport surfaces. The current NATS client is a graceful no-op
+      when unavailable, so it cannot close the timeline gate or substitute for an
+      authoritative receipt/outbox.
+- [x] **WORKSTATION-OPENCODE-BRIDGE-01** aligned the existing
+      `.opencode/agents/atlas-rlm-repair.md` and
+      `.opencode/command/atlas-residency-proof.md` with the workstation repair path.
+      OpenCode receives bounded evidence and returns a repair candidate/validation plan;
+      it does not edit, apply, or authorize repairs.
+- [ ] **WORKSTATION-AGENTIC-STDIO-REPLAY-01** prove a local OpenCode/stdio replay using
+      one synthetic verified error and one bounded residency receipt. Require stable
+      `repairCaseKey`, `workspaceRevision`, `sourceRevision`, `executionId`,
+      `evidenceRefs`, replay checksum, and `writesPerformed=false`. This must use the
+      existing repair registry and workstation receipt shape; do not create a new A2A
+      protocol, REPL service, TOML control file, or event bus.
+- [ ] **WORKSTATION-TIMELINE-AUTHORITY-01** connect the replay result to the existing
+      authoritative Parent Atlas receipt/event owner, then independently read it back.
+      Console logs, NATS delivery, MCP responses, and OpenCode transcripts remain
+      evidence only until durable persistence and replay identity are proven.
+- [x] **WORKSTATION-MAIN-REPO-STDIO-ADAPTER-01** added the main-repository-only
+      `scripts/agentic/workstation-repair-stdio-v1.mjs` adapter and the OpenCode command
+      `.opencode/command/atlas-repair-stdio-proof.md`. It validates explicit lineage,
+      derives a stable repair-case key and replay checksum, and returns either an
+      authority-blocked result or an un-authorized dry-run candidate. It performs no file,
+      database, cache, model, GPU, or projection writes. Do not copy this into an
+      `@deeds/atlas-*` package until the root proof and package-boundary review pass;
+      `@deeds/atlas-core` remains the existing orchestration owner, while
+      `@deeds/atlas-contracts` remains a contracts package.
+- [x] **WORKSTATION-MAIN-REPO-STDIO-SMOKE-01** proved the root adapter with a valid
+      synthetic evidence packet (`REPAIR_CANDIDATE`, deterministic `repairCaseKey`,
+      `replayChecksum`, `canonicalAuthority=false`, `writesPerformed=false`) and with
+      incomplete lineage (`REJECTED`, `LINEAGE_REQUIRED`, `writesPerformed=false`). This
+      is a bounded contract/adapter proof only; it does not prove live repair-registry
+      invocation, durable event persistence, OpenCode execution, or package integration.
+- [x] **WORKSTATION-ATLAS-CORE-MIRROR-01** mirrored the proven pure builder into the main-repository
+      package `@deeds/atlas-core` at `packages/atlas-core/src/agentic/workstation-repair-stdio.ts`
+      and exported it from the package index. The package mirror preserves the root schema, stable
+      repair-case identity, evidence-gated candidate status, replay checksum, and write/authority
+      guards. Its focused unit proof is separate from the root stdio process proof. No copy was made
+      into `@deeds/atlas-contracts`, `@deeds/parent-atlas-core`, or another package, and no live
+      repair registry, event store, or runtime mutation was introduced.
+
+- [x] **WORKSTATION-AGENTIC-LOGIC-CENSUS-01** recorded the local logic that may be reused
+      instead of copied from an external agent framework: Mastra workflows under
+      `packages/atlas-orchestrator` and `scripts/atlas`, workstation/repair ownership under
+      `packages/atlas-core` and `sveltekit-frontend/scripts/agents`, and claim/retry/lease
+      helpers under `scripts/agentic` and `packages/atlas-core/src/queue`. The census found
+      no Paperclip runtime or source-backed implementation. Receipt:
+      `docs/reports/paperclip-custom-logic-census-v1.json`. Paperclip remains an optional
+      adapter boundary; it must not become a second task, repair, identity, or event owner.
+- [x] **WORKSTATION-MASTRA-PAPERCLIP-BOUNDARY-01** audited the main-repository agent surfaces:
+      `packages/atlas-orchestrator` contains the Mastra workflow package and `scripts/atlas`
+      contains Mastra-labelled and agentic workflow/audit scripts, while
+      `packages/atlas-core` remains the workstation and repair owner. No Paperclip package,
+      runtime, or source-backed adapter was found. Paperclip therefore remains an external
+      adapter concept, not a second Parent Atlas control plane. No new protocol, persistence
+      owner, or runtime integration was added.
+- [x] **WORKSTATION-TRACE-MCP-DEEP-AUDIT-01** ran the existing read-only TRACE auditor against
+      `http://127.0.0.1:8788/mcp`: `tools/list` returned 176 live tools and `trace.system_health`
+      responded, while the bounded `kb.trace_search` probe timed out. `trace.kag_search` returned
+      three discovery-level items, but none carried `canonicalChunkId`, `packetKey`,
+      `workspaceRevision`, `sourceRevision`, or a complete identity envelope. Optional codebase,
+      research, Bifrost, and rg-atlas registries remain disabled by policy. Topology and rerank
+      were unavailable; Postgres, Qdrant, Neo4j, Redis, Go retrieval, Bifrost, TurboQuant, and
+      MCP responded. Receipt is the auditor output `docs/reports/trace-disabled-search-tools-v1.json`.
+      This proves protocol reachability/read-only health only; it does not close
+      `WORKSTATION-TIMELINE-AUTHORITY-01` or current-corpus lineage.
+- [x] **WORKSTATION-TRACE-MCP-NULL-SAFETY-01** hardened the read-only auditor to emit explicit
+      `null` values for absent canonical chunk, packet, workspace-revision, and source-revision
+      fields, and to classify aborts as `TIMEOUT` rather than conflating them with protocol errors.
+      The rerun confirmed `trace.kag_search` still returns discovery-only items, the
+      `kb.trace_search` call returns an MCP tool error, and the identity envelope remains absent.
+      No fallback identity or guessed revision is created; `writesPerformed=false` remains true.
+- [x] **WORKSTATION-TRACE-SEARCH-SQL-ARRAY-01** corrected the canonical TRACE source-reference
+      join in `sveltekit-frontend/src/lib/server/ai/trace-reranker.ts` so Drizzle emits a typed
+      PostgreSQL `ARRAY[...]::text[]` instead of interpolating a JavaScript array as the invalid
+      record expression `($1, $2)::text[]`. The retrieval executor-tree regression suite passes
+      3/3, and the edited source has no diff-check violations. The already-running TRACE process
+      must be reloaded separately before live MCP recovery can be claimed; no service restart,
+      database write, projection write, or tool re-enablement was performed.
+- [x] **WORKSTATION-TRACE-ENGRAM-OPTIONAL-COLUMN-01** made the optional
+      `hnsw_embedding_512` Engram lane schema-aware. Existing deployments without that column
+      now retain the base embedding search and report the 512-dimensional lane as unavailable;
+      the bridge no longer attempts an index creation or unconditional SELECT against a missing
+      column. A fresh isolated TRACE process confirmed the guarded warning and completed a
+      read-only search without the prior SQL failure. No schema or datastore write was made.
+- [x] **WORKSTATION-TRACE-QDRANT-VECTOR-SCHEMA-01** corrected hybrid-search vector selection
+      for logical collection aliases. The manager now resolves the concrete collection before
+      consulting the vector registry, so `summary_lenses` selects the live named vector
+      `summary` rather than defaulting to `content`. The named-vector regression and retrieval
+      executor suites pass 4/4. No Qdrant schema, point, or projection write was made.
+- [x] **WORKSTATION-TRACE-FRESH-SOURCE-REPLAY-01** validated the edited source in a temporary
+      TRACE listener on port 8793 without restarting the long-running listener on 8788. A raw
+      `trace.kag_search` request returned a real read-only result; the fresh process emitted no
+      SQL-array error, no `summary_lenses_768` vector-name error, and no missing
+      `hnsw_embedding_512` failure. The native simdjson/TensorRT addon remained unavailable in
+      the temporary Windows process, so this is a source-level/live dependency replay, not a
+      claim that the production 8788 process has reloaded. `writesPerformed=false` throughout.
+- [x] **TRACE-DENSE-CAPABILITY-DISCOVERY-01** add a read-only, revisioned capability receipt
+      that queries each requested Qdrant collection's actual vector names, dimensions, and
+      distance metric before selecting an executor. Implemented by
+      `DenseRepresentationCapabilityV1` and
+      `scripts/atlas/audit-trace-dense-capability-v1.mjs`; live Qdrant readback proved
+      `content`, `summary`, and `synthesis` as 768-dimensional cosine vectors. No Qdrant
+      schema or point mutation was authorized. The later appended completion note below is
+      retained as evidence; this checkbox is reconciled to the same task identity.
+- [ ] **ENGRAM-OPTIONAL-REPRESENTATION-01** typed adapter is now available through
+      `searchMemoryByHNSWResult()`, returning `REPRESENTATION_UNAVAILABLE` with representation,
+      reason, empty observations, and `writesPerformed=false` when the optional column is absent.
+      Focused contract coverage passes 2/2. The legacy array-returning method still throws for
+      compatibility and no production caller has adopted the typed result yet; caller migration
+      remains open. No column, index, or truncated 768-dimensional vector was created.
+- [ ] **TRACE-CUVS-SEMANTIC-768-ORACLE-01** produce a bounded, revision-qualified cuVS
+      brute-force receipt from the same admitted `semantic_768` cohort and compare candidate
+      IDs/scores with the CPU reference. Existing cuVS proof scripts and executor contracts are
+      fixture/configuration evidence only. The Qdrant-first, identity-preserving cuVS fallback
+      coordinator is now wired into the TRACE chunk-retrieval seam through
+      `sveltekit-frontend/src/lib/server/ai/trace-semantic-executor-v1.ts` and
+      `trace-reranker.ts`; its database cohort provider still requires an explicit SHA-256
+      admitted workspace revision and rejects cohorts beyond the bounded GPU limit. Live
+      fallback remains blocked until that provider returns an admitted current cohort.
+- [x] **TRACE-CUVS-SEMANTIC-768-FIXTURE-01** re-ran the existing WSL2 RAPIDS proof with
+      `atlas-rapids-cu13`: cuVS `26.06.00` matched the deterministic NumPy CPU neighbor IDs and
+      scores for a bounded 64-row, 768-dimensional fixture. Receipt:
+      `docs/reports/cuvs-cosine-768-proof-v1.json`. The proof is executor/ABI evidence only;
+      it does not establish current-corpus lineage, a resident index, or TRACE fallback wiring.
+- [ ] **TRACE-CUVS-CAGRA-01** evaluate CAGRA only as an approximate challenger against the
+      cuVS exact oracle, with recall and checksum evidence. No persistent index, cache, Qdrant,
+      or projection write is allowed in this gate. The bounded WSL2 fixture now proves
+      CAGRA-vs-cuVS recall at 1.0 on 64x768 vectors across four repeated searches; receipt:
+      `docs/reports/trace-cuvs-cagra-fixture-v1.json`. Current-corpus TRACE comparison and
+      revision-qualified candidate checks remain open.
+- [ ] **TRACE-SEMANTIC-EXECUTOR-SELECTION-01** connect capability discovery to one logical
+      `semantic_768` lane: Qdrant, pgvector, cuVS brute force, and CAGRA may be selected as
+      executors but must produce one normalized candidate set and one fusion vote. Current
+      retrieval executor policy remains a reusable planning contract, not a proven TRACE
+      production caller. The new TRACE semantic executor result now explicitly carries
+      `logicalLane=semantic`, `voteKey=semantic`, and `voteCount=1`; live capability-driven
+      selection and production receipt emission remain open.
+- [ ] **TRACE-GPU-POSTRANK-01** prove identical admitted candidate ordinals and feature scores
+      through the CPU reference and available SIMT/cuTile path under a bounded VRAM budget.
+      cuTile/SIMT availability, parity, and residency replay remain separate from the Qdrant
+      schema and Engram fixes.
+- [ ] **TRACE-ISOLATED-LIVE-PROOF-01** retain the port-8793 source replay as evidence, then
+      rerun the read-only audit after the existing port-8788 listener is explicitly reloaded.
+      Require the same error checks, `productionListenerReloaded=true`, and
+      `writesPerformed=false`; the current fresh-process proof must not be upgraded to a 8788
+      production claim.
+- [x] **TRACE-DENSE-CAPABILITY-DISCOVERY-01** added the read-only
+      `scripts/atlas/audit-trace-dense-capability-v1.mjs` probe and the
+      `DenseRepresentationCapabilityV1` contract. Live Qdrant readback successfully inspected
+      `codebase_chunks_768`, `summary_lenses_768`, and `synthesis_memory_768`; all three were
+      readable 768-dimensional cosine schemas with actual named vectors `content`, `summary`,
+      and `synthesis`. The receipt is
+      `docs/reports/trace-dense-capability-v1.json`; checksums and
+      `writesPerformed=false` are included. This proves schema capability, not semantic-corpus
+      lineage or executor promotion.
+- [x] **TRACE-CAPABILITY-RUNTIME-ADMISSION-01** connected Qdrant capability discovery to the
+      `QdrantManager.hybridSearch` admission boundary. The manager resolves logical aliases,
+      reads the concrete collection schema, validates the actual named vector, dimension, and
+      cosine metric, caches the read-only result briefly, and rejects an unavailable capability
+      before issuing a query. Focused named-vector, capability-contract, and retrieval tests pass
+      7/7; the isolated TRACE 8793 replay also crossed this live admission path successfully.
+      This proves runtime schema admission, not cuVS fallback or production 8788 reload.
+
+### Current missing gates after TRACE capability audit (2026-09-14)
+
+The following remain intentionally open. They are downstream of the completed source-level
+fixes and read-only Qdrant capability admission; none authorizes a datastore, projection,
+service, or cache mutation.
+
+- [x] **TRACE-RERANK-ENDPOINT-FAILCLOSED-01** added one environment-backed reranker endpoint
+      resolver shared by the Marco reranker, Bifrost dispatch, and TRACE health/tool paths. It
+      prefers `RERANK_URL`, then the existing `RERANK_BASE_URL` and
+      `RERANKER_SIDECAR_URL`, normalizes trailing slashes, and returns unavailable rather than
+      constructing an `undefined/rerank` URL. Focused endpoint and reranker coverage passes 5/5;
+      live reranker health remains a separate operational gate.
+
+- [ ] **ENGRAM-OPTIONAL-REPRESENTATION-01** propagate a typed caller-facing
+      `REPRESENTATION_UNAVAILABLE` result for the absent optional 512-dimensional Engram
+      column. The schema guard is proven, but the public result contract is not yet wired to
+      all callers. Do not add the column, create an index from a query path, or truncate the
+      canonical 768-dimensional representation.
+- [ ] **TRACE-CUVS-SEMANTIC-768-ORACLE-01** bind cuVS brute-force to an admitted,
+      revision-qualified current `semantic_768` cohort and compare IDs/scores with the CPU
+      oracle. The existing 64-row WSL2 RAPIDS proof is fixture/ABI evidence only; it is not
+      current-corpus fallback evidence. A pure Qdrant-first,
+      identity-preserving cuVS fallback coordinator now exists at
+      `sveltekit-frontend/src/lib/server/ai/trace-semantic-executor-v1.ts`; live wiring remains
+      blocked until its cohort provider can supply the admitted current revision.
+- [ ] **TRACE-CUVS-CAGRA-01** measure CAGRA as an approximate challenger against the cuVS
+      exact oracle, including recall, score/ordinal checksums, and bounded memory evidence.
+      Persistent index creation and projection writes remain out of scope.
+- [ ] **TRACE-SEMANTIC-EXECUTOR-SELECTION-01** prove one TRACE caller selects among
+      Qdrant, pgvector, cuVS, or CAGRA as executors for the single `semantic_768` lane,
+      normalizes the result, and emits one logical fusion vote. No second RRF or identity
+      owner may be introduced.
+- [ ] **TRACE-GPU-POSTRANK-01** prove CPU versus PyTorch SIMT/cuTile post-ranking parity
+      over the same admitted candidate ordinals and feature revisions under the RTX 3060 Ti
+      VRAM ceiling. cuTile availability alone is insufficient for promotion.
+- [ ] **TRACE-ISOLATED-LIVE-PROOF-01** explicitly reload or replace the long-running 8788
+      listener, then rerun the read-only audit and record
+      `productionListenerReloaded=true`. The port-8793 fresh-process replay remains valid
+      source evidence but is not a production-listener proof.
+- [ ] **TRACE-CURRENT-COHORT-ADMISSION-01** establish the exact current source/packet/chunk
+      and representation lineage required by the cuVS fallback and executor-selection gates.
+      Missing or mixed revisions, guessed IDs, and legacy Qdrant payloads must fail closed.
+      The latest read-only authority check selected
+      `sha256:3e677c29319a4a60bc60803be4186ba108dce906945af593a3a6f5cf43d11881`, found zero
+      binding rows and zero exact packet/chunk matches, and found no terminal Graphify execution
+      for that revision. Receipt:
+      `docs/reports/current-workspace-packet-chunk-join-v1.json`. The companion source-owner
+      reconciliation found `32` execution candidates but `0` exact current owners and classified
+      the state `CURRENT_SOURCE_AUTHORITY_NOT_PROVEN` / `LEGACY_ONLY_NO_CURRENT_OWNER`;
+      receipt: `docs/reports/current-source-owner-reconciliation-v1.json`. The cuVS fallback
+      therefore remains correctly blocked rather than using the two historical revisions observed
+      in the diagnostic report.
+
+Current status:
+
+```text
+SOURCE_FIXES                         PROVEN_BOUNDED
+QDRANT_SCHEMA_CAPABILITY             PROVEN_READ_ONLY
+QDRANT_RUNTIME_ADMISSION             PROVEN_BOUNDED
+CUVS_768_FIXTURE                     PROVEN_FIXTURE_ONLY
+CURRENT_SEMANTIC_COHORT              BLOCKED
+CUVS_TRACE_FALLBACK                  WIRED_BUT_COHORT_BLOCKED
+CAGRA_ORACLE_COMPARISON              OPEN
+ONE_SEMANTIC_EXECUTOR_VOTE           CONTRACT_PROVEN_LIVE_CALLER_OPEN
+GPU_POSTRANK_PARITY                  OPEN
+TRACE_8788_RELOAD_PROOF              OPEN
+MUTATION_AUTHORIZATION               CLOSED
+```
+
+### Live endpoint recheck (2026-09-14)
+
+- [ ] **TRACE-RERANKER-LIVE-HEALTH-01** remains open. A read-only probe to
+      `http://127.0.0.1:8099/health` was refused; no reranker process is listening. The source
+      resolver fix prevents malformed URLs, but it does not start or authorize the sidecar.
+      The former `curl | jq` wrapper was not Windows-shell safe; it is now replaced by the
+      cross-platform read-only `scripts/atlas/probe-reranker-health-v1.mjs` probe. This fixes
+      diagnostics only; it does not start or authorize the sidecar. This `8099` / Marco/Mixedbread
+      path is legacy compatibility and is not the intended production model owner.
+- [ ] **TRACE-TOPOLOGY-LIVE-HEALTH-01** remains open. A read-only probe to
+      `http://127.0.0.1:8101/health` was refused; topology execution remains unavailable. No
+      service launch, graph mutation, or projection change was attempted.
+
+The intended owned reranker remains the existing learned path:
+`canonical-rerank-executor.ts` → `XGBOOST_SIDECAR_URL` → XGBoost/LightGBM model. Its default
+mode is `shadow`, so it can be evaluated without changing served ordering. However, the current
+canonical executor still attempts `MixedbreadCanonicalReranker` first, whose backend defaults to
+the existing Triton/Mixedbread-compatible cross-encoder chain; this is current transitional
+behavior, not proof that the owned model is production-promoted. Training, model-artifact proof,
+sidecar health, evaluation, and promotion remain separate gates. Marco/Mixedbread must not be
+treated as the final owned model.
+
+The owned-model dry-run was rechecked on Windows after fixing the CLI's UTF-8 console boundary.
+It now fails closed cleanly because `docs/reports/xgboost-features.csv` contains `0` rows; the
+previous empty-matrix formatting crash is fixed. No training or artifact overwrite occurred.
+
+The two endpoint failures are operational readiness gates, independent of current source/packet/
+chunk authority. They must not be resolved by substituting placeholder URLs or by promoting a
+fixture/isolated-process result to production evidence.

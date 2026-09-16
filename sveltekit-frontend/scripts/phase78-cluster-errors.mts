@@ -19,13 +19,23 @@ import { isNull, sql } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import * as path from 'path';
 import postgres from 'postgres';
-import { generateCachedEmbedding } from '../src/lib/ai/ollama-config';
+// FIXED 2026-09-14 (PHASE78-LIVE-PROPOSAL-NO-PERSIST-01 investigation): 'generateCachedEmbedding'
+// does not exist in ollama-config.ts -- only 'generateEmbedding(text)' does (no options object;
+// it resolves its own endpoint/model internally, canonical embeddinggemma:latest). Aliased to
+// avoid colliding with this file's own local generateEmbedding() wrapper below.
+import { generateEmbedding as generateEmbeddingRaw } from '../src/lib/ai/ollama-config';
 
 // Load environment variables
 dotenv.config();
 
 import { fileURLToPath } from 'url';
-import { errorClustersTable, errorEventsTable } from '../src/lib/server/db/schema/index.js';
+// FIXED 2026-09-14 (PHASE78-LIVE-PROPOSAL-NO-PERSIST-01 investigation): this script imported
+// from the WRONG schema directory tree -- 'src/lib/server/db/schema/index.js' does not export
+// errorClustersTable/errorEventsTable at all. The real definitions live in the separate
+// 'src/lib/db/schema/cutlass.ts' file. This is why phase78-cluster-errors.mts has apparently
+// never successfully run (error_clusters has 0 rows despite 148 real error_events existing).
+import { errorClustersTable, errorEventsTable } from '../src/lib/db/schema/cutlass.js';
+import { kmeansCluster, type KmeansEmbedding } from './phase78-kmeans.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -134,10 +144,7 @@ async function getUnclusteredErrors() {
  */
 async function generateEmbedding(text: string, retries = 3): Promise<number[] | null> {
   try {
-    return await generateCachedEmbedding(text, {
-      model: EMBEDDING_MODEL,
-      baseUrl: OLLAMA_BASE_URL
-    });
+    return await generateEmbeddingRaw(text);
   } catch (err) {
     if (isVerbose) {
       console.warn(`   ⚠️  Failed to generate cached embedding:`, err);
@@ -149,119 +156,6 @@ async function generateEmbedding(text: string, retries = 3): Promise<number[] | 
 /**
  * Simple K-means clustering
  */
-function kmeansCluster(
-  embeddings: Array<{ id: string; embedding: number[] }>,
-  k: number
-): Map<number, string[]> {
-  if (embeddings.length === 0) return new Map();
-  if (k >= embeddings.length) {
-    // Each point is its own cluster
-    const result = new Map<number, string[]>();
-    embeddings.forEach((e, i) => {
-      result.set(i, [e.id]);
-    });
-    return result;
-  }
-
-  const dim = embeddings[0].embedding.length;
-  if (dim === 0) return new Map();
-
-  // Initialize centroids randomly
-  let centroids: number[][] = [];
-  for (let i = 0; i < k; i++) {
-    const idx = Math.floor(Math.random() * embeddings.length);
-    centroids.push([...embeddings[idx].embedding]);
-  }
-
-  // K-means iterations
-  for (let iter = 0; iter < 10; iter++) {
-    const clusters = new Map<number, string[]>();
-    const clusterSums = new Map<number, number[]>();
-    const clusterCounts = new Map<number, number>();
-
-    // Assign points to nearest centroid
-    for (const { id, embedding } of embeddings) {
-      let minDist = Infinity;
-      let bestCluster = 0;
-
-      for (let c = 0; c < k; c++) {
-        // Euclidean distance
-        let dist = 0;
-        for (let d = 0; d < dim; d++) {
-          const diff = embedding[d] - centroids[c][d];
-          dist += diff * diff;
-        }
-        if (dist < minDist) {
-          minDist = dist;
-          bestCluster = c;
-        }
-      }
-
-      if (!clusters.has(bestCluster)) {
-        clusters.set(bestCluster, []);
-        clusterSums.set(bestCluster, new Array(dim).fill(0));
-        clusterCounts.set(bestCluster, 0);
-      }
-      clusters.get(bestCluster)!.push(id);
-      clusterCounts.set(bestCluster, clusterCounts.get(bestCluster)! + 1);
-
-      // Add to sum for centroid calculation
-      const sum = clusterSums.get(bestCluster)!;
-      for (let d = 0; d < dim; d++) {
-        sum[d] += embedding[d];
-      }
-    }
-
-    // Update centroids
-    let centroidsChanged = false;
-    for (let c = 0; c < k; c++) {
-      const count = clusterCounts.get(c) || 1;
-      const sum = clusterSums.get(c) || new Array(dim).fill(0);
-      const newCentroid = sum.map(s => s / count);
-
-      // Check if centroid changed significantly
-      let changed = false;
-      for (let d = 0; d < dim; d++) {
-        if (Math.abs(newCentroid[d] - centroids[c][d]) > 0.0001) {
-          changed = true;
-          break;
-        }
-      }
-      if (changed) centroidsChanged = true;
-      centroids[c] = newCentroid;
-    }
-
-    // Early stopping if converged
-    if (!centroidsChanged && iter > 2) break;
-  }
-
-  // Final assignment
-  const clusters = new Map<number, string[]>();
-  for (const { id, embedding } of embeddings) {
-    let minDist = Infinity;
-    let bestCluster = 0;
-
-    for (let c = 0; c < k; c++) {
-      let dist = 0;
-      for (let d = 0; d < dim; d++) {
-        const diff = embedding[d] - centroids[c][d];
-        dist += diff * dist;
-      }
-      if (dist < minDist) {
-        minDist = dist;
-        bestCluster = c;
-      }
-    }
-
-    if (!clusters.has(bestCluster)) {
-      clusters.set(bestCluster, []);
-    }
-    clusters.get(bestCluster)!.push(id);
-  }
-
-  return clusters;
-}
-
 /**
  * Main clustering function
  */
@@ -344,49 +238,55 @@ async function clusterErrors(): Promise<void> {
 
     let updateCount = 0;
     for (const [clusterId, errorIds] of clusters.entries()) {
-      const clusterIdStr = `cluster-${clusterId}`;
-
-      // Infer kind and severity from first error in cluster
+      // Real error_events rows already carry a valid kind/severity from ingestion (real
+      // Postgres enum values: error_kind = runtime|api|other, error_severity =
+      // info|warn|error|critical). FIXED 2026-09-14 (PHASE78-LIVE-PROPOSAL-NO-PERSIST-01 bug
+      // #6): the old code called inferClusterKind()/normalizeSeverity() to invent a DIFFERENT
+      // taxonomy (typing/nullability/import/svelte-rune/... and info/warn/error/FATAL) that
+      // does not match either real enum -- 'fatal' is not a valid error_severity value, and
+      // none of inferClusterKind()'s outputs are valid error_kind values. Use the real,
+      // already-correct enum values straight off the representative event instead of
+      // re-deriving a fictional one. inferClusterKind()/normalizeSeverity() are no longer
+      // called here but kept in the file (unused) rather than deleted, since removing them
+      // is a separate decision from fixing this call site.
       const firstErrorId = errorIds[0];
       const firstError = errors.find(e => e.id === firstErrorId);
-      const inferredKind = firstError
-        ? inferClusterKind(firstError.tsCode, firstError.message)
-        : 'typing';
-      const inferredSeverity = normalizeSeverity(firstError?.severity);
+      if (!firstError) {
+        console.warn(`   ⚠️  Cluster ${clusterId}: no representative error found, skipping`);
+        continue;
+      }
+      const clusterKind = firstError.kind;
+      const clusterSeverity = firstError.severity;
+      const routePaths = [...new Set(errorIds.map(id => errors.find(e => e.id === id)?.routePath).filter((v): v is string => Boolean(v)))];
 
-      console.log(`   🔍 Cluster ${clusterId}: kind="${inferredKind}", severity="${inferredSeverity}", members=${errorIds.length}`);
-      if (isVerbose && firstError) {
+      console.log(`   🔍 Cluster ${clusterId}: kind="${clusterKind}", severity="${clusterSeverity}", members=${errorIds.length}`);
+      if (isVerbose) {
         console.log(`      First error: tsCode="${firstError.tsCode}", message="${firstError.message.substring(0, 60)}..."`);
       }
 
-      // Insert cluster record first with all required fields
-      await db
+      // Insert cluster record -- let Postgres generate the real uuid (defaultRandom()) rather
+      // than fabricating a non-uuid string like `cluster-${clusterId}` (bug #6 also included
+      // this -- errorClustersTable.id is uuid, a plain "cluster-0" string would fail at the DB
+      // level with 'invalid input syntax for type uuid'). Capture the real id via .returning()
+      // so the per-event update below references the actual FK target.
+      const [insertedCluster] = await db
         .insert(errorClustersTable)
         .values({
-          id: clusterIdStr,
-          kind: inferredKind,
-          severity: inferredSeverity,
-          errorPattern: `Cluster ${clusterId}`,
-          memberCount: errorIds.length,
-          lastSeenAt: new Date(),
+          kind: clusterKind,
+          severity: clusterSeverity,
+          pattern: firstError.message.slice(0, 500),
+          errorCount: errorIds.length,
+          routePaths,
+          lastUpdated: new Date(),
           createdAt: new Date(),
-          updatedAt: new Date(),
         })
-        .onConflictDoUpdate({
-          target: errorClustersTable.id,
-          set: {
-            kind: inferredKind,
-            severity: inferredSeverity,
-            memberCount: errorIds.length,
-            lastSeenAt: new Date(),
-            updatedAt: new Date(),
-          },
-        });
+        .returning({ id: errorClustersTable.id });
+      const realClusterId = insertedCluster.id;
 
       for (const errorId of errorIds) {
         await db
           .update(errorEventsTable)
-          .set({ clusterId: clusterIdStr })
+          .set({ clusterId: realClusterId })
           .where(sql`id = ${errorId}`);
         updateCount++;
       }

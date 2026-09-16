@@ -9,6 +9,10 @@ import {
 	buildCanonicalSemanticLineage,
 	type CanonicalSemanticLineage,
 } from '$lib/server/embedding/semantic-lineage.js';
+import {
+	semanticPacketWriteAdmissionV1Schema,
+	type SemanticPacketWriteAdmissionV1,
+} from './semantic-packet-write-admission-v1.js';
 
 export interface PersistCanonicalSemanticPacketEmbeddingInput {
 	packetId?: string;
@@ -22,6 +26,8 @@ export interface PersistCanonicalSemanticPacketEmbeddingInput {
 	 * no current caller supplies it yet (see PACKET_WRITE_REVISION_CONTRACT_01).
 	 */
 	sourceRevision?: string | null;
+	/** Whole-source content digest used for exact source/packet joins. */
+	contentHash?: string | null;
 	treeNodeId?: string | null;
 	titleId?: string | null;
 	vector: readonly number[] | Float32Array;
@@ -108,6 +114,7 @@ export async function persistCanonicalSemanticPacketEmbedding(
 	const sourceDimension = input.sourceDimension ?? lineage.dimension;
 	// Never synthesized: NULL when the caller has no real revision evidence.
 	const sourceRevision = input.sourceRevision?.trim() || null;
+	const contentHash = input.contentHash?.trim() || null;
 	// PACKET-WRITER-SOURCE-REVISION-PRESERVATION-01 (2026-09-09): the conflict
 	// branch below never overwrites a previously-stored source_revision with
 	// NULL. If this call supplies a real value, it wins (matches "existing A,
@@ -138,6 +145,7 @@ export async function persistCanonicalSemanticPacketEmbedding(
 			packetKey,
 			sourceRef,
 			sourceRevision,
+			contentHash,
 			directoryPath,
 			featureId,
 			featureLabel,
@@ -169,6 +177,7 @@ export async function persistCanonicalSemanticPacketEmbedding(
 				packetKey,
 				sourceRef,
 				sourceRevision: conflictSourceRevision,
+				contentHash,
 				directoryPath,
 				featureId,
 				featureLabel,
@@ -199,4 +208,40 @@ export async function persistCanonicalSemanticPacketEmbedding(
 		packetKey,
 		lineage,
 	};
+}
+
+/**
+ * Canonical current-corpus entrypoint. Unlike the historical-compatible
+ * writer above, this path cannot accept nullable source lineage: admission is
+ * produced from an exact execution-owned source binding and is validated
+ * before the existing transactional writer is reached. Workspace revision is
+ * retained in packet metadata because the legacy atlas_packets column is an
+ * integer cache epoch; the source/workspace binding remains the authority.
+ */
+export async function persistAdmittedSemanticPacketEmbedding(
+	input: Omit<PersistCanonicalSemanticPacketEmbeddingInput, 'packetKey' | 'sourceRef' | 'sourceRevision' | 'contentHash' | 'metadata'> & {
+		admission: SemanticPacketWriteAdmissionV1;
+		metadata?: Record<string, unknown>;
+	},
+	database: AtlasPacketWriter = db,
+): Promise<PersistCanonicalSemanticPacketEmbeddingResult> {
+	const admission = semanticPacketWriteAdmissionV1Schema.parse(input.admission);
+	const metadata = {
+		...(input.metadata ?? {}),
+		canonical_packet_admission: {
+			executionId: admission.executionId,
+			workspaceRevision: admission.workspaceRevision,
+			bindingChecksum: admission.bindingChecksum,
+			authorityScope: admission.authorityScope,
+		},
+	};
+
+	return persistCanonicalSemanticPacketEmbedding({
+		...input,
+		packetKey: admission.packetKey,
+		sourceRef: admission.sourceRef,
+		sourceRevision: admission.sourceRevision,
+		contentHash: admission.contentDigest,
+		metadata,
+	}, database);
 }

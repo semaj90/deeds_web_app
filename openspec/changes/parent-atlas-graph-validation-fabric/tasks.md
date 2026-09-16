@@ -297,10 +297,122 @@ ordinal and graph manifests.
       blocked until a snapshot-bound producer emits revision-qualified edges.
 
 Evidence: `docs/reports/current-graph-artifact-readiness-v1.json`.
+
+## CURRENT-GRAPH-ARTIFACT-ADMITTED-REVISION-GUARD-2026-09-15
+
+- [x] Corrected `audit-current-graph-artifact-readiness-v1.mjs` to consume the
+      admitted workspace revision from `current-graphify-snapshot-authority-v1.json`.
+      It now compares both the structural projection and relationship artifact against
+      that explicit revision and uses atomic report replacement.
+- [x] Read-only rerun detected the existing structural projection is stale relative to
+      the admitted frame: `16` observations and `16` node keys remain, but
+      `explicitRevisionQualifiedEdges=0` and status is now explicitly
+      `CURRENT_GRAPH_ARTIFACT_BLOCKED_ON_STALE_PROJECTION`.
+- [ ] Rebuild a graph projection from the selected admitted execution, then produce a
+      revision-qualified edge artifact and `GraphOrdinalMapV1`. Do not reuse the stale
+      `b19b...` projection or promote its PageRank, CheiRank, HITS, community, centroid,
+      SOM, or topology outputs.
+
+Evidence: `docs/reports/current-graph-artifact-readiness-v1.json` and
+`docs/reports/current-graphify-snapshot-authority-v1.json`.
+No graph, Neo4j, cuGraph, vector, cache, or database writes were performed.
+
+## GRAPH-REVISION-OWNER-RECHECK-2026-09-14
+
+- [x] Corrected the read-only graph-revision audit to consume the admitted
+      tournament revision instead of the stale workspace-binding observation.
+- [x] Made graph-revision report replacement atomic for Windows reliability.
+- [x] Fresh result now evaluates the admitted revision
+      `sha256:3e677c29319a4a60bc60803be4186ba108dce906945af593a3a6f5cf43d11881`.
+- [x] Confirmed historical graph data remains non-current: `atlas_hyperedges`
+      has `62,802` rows on `taxonomy-edges-v1-2026-05-08` / `git:0084288f26`;
+      graph snapshots and relationships are revisionless; ontology and
+      taxonomy assignment tables are empty.
+- [ ] Bind a future graph artifact to the admitted workspace snapshot and
+      produce revision-qualified nodes and edges before graph promotion.
+
+Status: `GRAPH_REVISION_OWNER_DATA_PRESENT_REQUIRES_CURRENT_BINDING_CHECK`;
+`readOnly=true`; `writesPerformed=false`.
+Evidence: `docs/reports/graph-revision-owner-v1.json`.
+
+## CURRENT-STRUCTURAL-EDGE-RESOLUTION-RECHECK-2026-09-14
+
+- [x] Ran the existing structural-edge resolution planner in read-only mode.
+- [x] Confirmed the planner completed with `CSGR2_SAMPLE_COMPLETE`, but its
+      current input is empty: `unresolvedTargetTotal=0` and
+      `uniquePositionResolvedCount=0`.
+- [x] Classified this as an empty-input result, not proof of graph-edge
+      completeness; `writesPerformed=false`.
+- [ ] Supply snapshot-bound, revision-qualified edge targets and rerun the
+      planner before graph ordinal, centrality, Neo4j, or GPU promotion.
+
+Status: `STRUCTURAL_EDGE_INPUT_EMPTY_NOT_PROMOTIONAL`;
+authority=false; writesPerformed=false.
+Evidence: `docs/reports/current-structural-edge-resolution-v1.json`.
+
+### CURRENT-GRAPH-EDGE-NEXT-GATES-2026-09-13
+
+The current recheck leaves the graph lane blocked at the producer boundary:
+`observationCount=16`, `uniqueGraphNodeKeyCount=16`, and
+`explicitRevisionQualifiedEdges=0`. The zero edge count is not a complete-graph
+claim and must not be converted into an empty graph artifact or a promotion receipt.
+
+- [x] Record the current node-only result as read-only diagnostic evidence.
+- [x] Keep graph revision, node identity, ordinal, centrality, Neo4j, cuGraph,
+      topology, and projection outputs downstream of a sealed source cohort.
+- [ ] Reconcile the admitted workspace snapshot and terminal Graphify execution
+      before selecting edge observations.
+- [ ] Produce a revision-qualified edge candidate set with exact source/packet/chunk
+      identity, endpoint existence, edge-shape checksum, graph revision, and
+      workspace/source revision parity.
+- [ ] Build and independently read back `GraphProjectionManifestV1` and
+      `GraphOrdinalMapV1`; mixed revisions, missing endpoints, duplicate canonical
+      identities, and zero-source fallback must fail closed.
+- [ ] Only after the manifest is sealed, compare NetworkX oracle output with the
+      existing cuGraph/topology consumers. No graph or projection writes are
+      authorized by this audit.
+
+Next gate: `node scripts/atlas/audit-graphify-workspace-snapshot-binding-v1.mts`,
+then the existing structural-edge contract/readiness audits against the exact
+admitted execution. Status remains `CURRENT_GRAPH_ARTIFACT_BLOCKED_ON_EDGE_PRODUCER`;
+authority=false; writesPerformed=false.
+
+### CURRENT-TREE-BOUND-SYMBOL-INPUT-RECHECK-2026-09-13
+
+- [x] Validated the bounded structural input artifact: `461` rows, with no
+      missing required fields, invalid spans, invalid kinds, duplicate canonical
+      keys, or duplicate proposed stable IDs.
+- [x] Classified `123` rows as promotable candidates and `338` as review-only;
+      the audit reports `promotionAuthorized=false` and zero database writes.
+- [ ] Bind the candidate rows to the admitted terminal execution and current
+      source membership before any registry write.
+- [ ] Resolve review-only rows through explicit evidence and authorization;
+      do not infer stable symbol identity from CST IDs, graph ordinals, or path
+      position.
+
+Status: `REVIEW_INPUT_VALID_PROMOTION_BLOCKED`; authority=false;
+writesPerformed=false. This validates the input contract only and does not
+prove current symbol-registry evidence or graph completeness.
+
+Evidence: `.tmp/atlas/current-tree-bound-symbol-registry-input-v1.ndjson`;
+output checksum `sha256:011a7d0b66f80f451b20ad7d8af1fd8e53f19c44b1c61b2c2b74b7f5bb88a3e2`.
 Status: `CURRENT_GRAPH_ARTIFACT_BLOCKED_ON_EDGE_PRODUCER`;
 authority=false; writesPerformed=false.
 First blocker: `CURRENT_REVISION_QUALIFIED_EDGE_PRODUCER_MISSING`.
 Next gate: snapshot-bound Graphify edge materialization.
+
+## CURRENT-STRUCTURAL-EDGE-CONTRACT-RECHECK-2026-09-14
+
+- [x] Reran the structural edge contract audit in read-only mode.
+- [x] Confirmed the input is empty (`nodeCount=0`, `edgeCount=0`), with zero
+  malformed node/edge fields, duplicate edge shapes, or unknown endpoints.
+- [x] Confirmed `graphRevision=null`; the clean empty contract is not graph
+  completeness and does not authorize centrality or projection work.
+- [ ] Provide current snapshot-bound nodes and revision-qualified edges, then
+  rerun artifact readiness and ordinal admission.
+
+Status: `CONTRACT_INCOMPLETE`; `readOnly=true`.
+Evidence: `docs/reports/current-structural-edge-contract-v1.json`.
 
 ## LEIDEN-CANDIDATE-ORDINAL-READBACK-RECHECK-2026-09-10T23
 
@@ -316,3 +428,17 @@ Evidence: `docs/reports/neo4j-candidate-ordinal-join-v1.json`.
 Status: `IDENTITY_READBACK_PARTIAL`; authority=false; writesPerformed=false.
 First blocker: `GRAPH_NODE_CANONICAL_IDENTITY_INCOMPLETE`.
 Next gate: snapshot-bound structural lineage and a sealed graph manifest.
+
+## CURRENT-GRAPH-ARTIFACT-READINESS-RECHECK-2026-09-14
+
+- [x] Reran `audit-current-graph-artifact-readiness-v1.mjs` in read-only mode.
+- [x] Confirmed `16` observations and `16` unique graph node keys.
+- [x] Confirmed `explicitRevisionQualifiedEdges=0`; this is an empty edge
+  producer boundary, not proof of graph completeness.
+- [ ] Supply a snapshot-bound, revision-qualified edge producer and then
+  regenerate the graph/ordinal manifest before any centrality, Neo4j, cuGraph,
+  or projection promotion.
+
+Status: `CURRENT_GRAPH_ARTIFACT_BLOCKED_ON_EDGE_PRODUCER`;
+`authority=false`; `writesPerformed=false`.
+Evidence: `docs/reports/current-graph-artifact-readiness-v1.json`.

@@ -1,13 +1,13 @@
 {
   "schema": "atlas.promotion-board-reconcile.v2",
-  "generatedAt": "2026-09-13T03:53:29.686Z",
+  "generatedAt": "2026-09-15T19:32:52.681Z",
   "mode": "READ_ONLY",
   "gate": "PROMOTION-BOARD-RECONCILE-02",
   "owner": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration",
   "extends": "PARENT-ATLAS-PROMOTION-GATES-01 (scripts/atlas/audit-parent-atlas-promotion-gates-v1.mjs)",
   "board": {
     "schemaVersion": "atlas.promotion.board.v2",
-    "workspaceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+    "workspaceRevision": "sha256:d7f9563f5861b6890ac7e6d2c87df4ad6fa0eebb825f66387fba0e750ef91f2e",
     "sourceAuthority": {
       "status": "PARTIAL",
       "currentSourceOwnerProven": false,
@@ -29,8 +29,8 @@
       "owner": "codebase_chunks_768",
       "challenger": "codebase_chunks_768_v2",
       "representationRevision": null,
-      "workspaceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
-      "sourceRevisionSetChecksum": "sha256:52244f10f2087277bcff0e73c01ba0e790d82a7064ac7b1825301f974ff1c795",
+      "workspaceRevision": "sha256:d7f9563f5861b6890ac7e6d2c87df4ad6fa0eebb825f66387fba0e750ef91f2e",
+      "sourceRevisionSetChecksum": "sha256:5d524bf15be8ee0296d8f6b57f9edcc3f71c670dee5795b2ee6012064719798f",
       "admittedCohortChecksum": null,
       "candidateCount": null,
       "canonicalIdCount": null,
@@ -49,12 +49,14 @@
       "fusionCallerCount": 36,
       "mappedCallerCount": 93,
       "unmappedCallerCount": 0,
-      "baselineUnmappedCallerCount": 89,
+      "baselineUnmappedCallerCount": 90,
       "classificationStatus": "RRF_CALLER_CLASSIFICATION_READY",
-      "executorAsLaneViolations": 0,
+      "executorAsLaneViolations": 2,
       "ambiguousMappings": 0,
       "status": "PARTIAL",
-      "blockers": []
+      "blockers": [
+        "RRF_EXECUTOR_AS_LANE_VIOLATION"
+      ]
     },
     "judgmentCorpus": {
       "compatibleManifestCount": 0,
@@ -81,15 +83,15 @@
       ]
     },
     "trace": {
-      "coreSearchProven": true,
+      "coreSearchProven": false,
       "kagSearchProven": true,
       "identityEnvelopeProven": false,
       "optionalRegistriesEnabled": false,
-      "status": "PROVEN"
+      "status": "PARTIAL"
     },
     "rerank": {
       "protocolAvailable": true,
-      "endpointConfigured": false,
+      "endpointConfigured": true,
       "compatibleJudgmentAuthorityProven": false,
       "status": "UNCONFIGURED"
     },
@@ -97,7 +99,7 @@
       "safeToProject": false,
       "safeToImportJudgments": false,
       "safeToEnableTopology": false,
-      "safeToMigrateRrfCallers": true,
+      "safeToMigrateRrfCallers": false,
       "safeToConfigureRerank": false,
       "safeToRetryGraphifyPromotion": false,
       "blockers": [
@@ -118,7 +120,7 @@
           "receiptRefs": [
             "docs/reports/selected-graphify-structural-lineage-v1.json"
           ],
-          "explanation": "Selected execution structural lineage reports CURRENT_PACKET_CHUNK_JOIN_UNPROVEN with 0 bridge matches and 0 memberships still missing a bridge row."
+          "explanation": "Selected execution structural lineage reports CURRENT_PACKET_CHUNK_JOIN_UNPROVEN with 0 bridge matches and unknown memberships still missing a bridge row."
         },
         {
           "code": "CURRENT_CORPUS_SELECTION_UNRESOLVED",
@@ -129,6 +131,15 @@
             "docs/reports/qdrant-collection-roles-v1.json"
           ],
           "explanation": "Manifest plan status is CURRENT_SEMANTIC768_MANIFEST_PLANNED with qdrantCollection=UNRESOLVED_MULTIPLE_768_COLLECTIONS. codebase_chunks_768 (109776 pts) is the declared owner and codebase_chunks_768_v2 (52816 pts) is the comparison challenger per qdrant-collection-roles-v1.json; they are NOT merged or treated as duplicates."
+        },
+        {
+          "code": "RRF_EXECUTOR_AS_LANE_VIOLATION",
+          "lane": "RRF",
+          "severity": "PROMOTION_BLOCKING",
+          "receiptRefs": [
+            "docs/reports/rrf-caller-baseline-v1.json"
+          ],
+          "explanation": "2 call sites treat an executor (e.g. TurboVec) as a fusion lane rather than a logical retrieval signal."
         },
         {
           "code": "JUDGMENT_CORPUS_NOT_BOUND_TO_CURRENT_SEMANTIC_CORPUS",
@@ -216,7 +227,7 @@
     },
     {
       "lane": "TRACE",
-      "status": "PROVEN",
+      "status": "PARTIAL",
       "promotionImpact": "NONE — TRACE-MCP-CORE-SEARCH-01 leaves the critical path",
       "nextGate": "none (returns to queue only if a downstream lane finds a missing contract)"
     },
@@ -239,8 +250,8 @@
       "path": "docs/reports/parent-atlas-promotion-gates-v1.json",
       "exists": true,
       "schemaVersion": "atlas.parent-atlas-promotion-gates.v1",
-      "generatedAt": "2026-09-13T00:43:58.145Z",
-      "workspaceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+      "generatedAt": "2026-09-10T20:32:21.065Z",
+      "workspaceRevision": "sha256:d7f9563f5861b6890ac7e6d2c87df4ad6fa0eebb825f66387fba0e750ef91f2e",
       "sourceRevisionOrChecksum": null,
       "status": "BLOCKED"
     },
@@ -249,7 +260,7 @@
       "path": "docs/reports/trace-disabled-search-tools-v1.json",
       "exists": true,
       "schemaVersion": "atlas.trace-disabled-search-tools.v1",
-      "generatedAt": "2026-09-13T03:11:02.252Z",
+      "generatedAt": "2026-09-14T19:38:32.708Z",
       "workspaceRevision": null,
       "sourceRevisionOrChecksum": null,
       "status": "DISABLED_SEARCH_TOOLS_AUDITED"
@@ -259,7 +270,7 @@
       "path": "docs/reports/mcp-topology-tool-routing-v1.json",
       "exists": true,
       "schemaVersion": "AtlasMcpTopologyToolRoutingReceiptV1",
-      "generatedAt": "2026-09-12T02:58:34.640Z",
+      "generatedAt": "2026-08-27T04:54:46.450Z",
       "workspaceRevision": null,
       "sourceRevisionOrChecksum": null,
       "status": "PROVEN_FIXTURE_ONLY"
@@ -269,7 +280,7 @@
       "path": "docs/reports/rrf-caller-baseline-v1.json",
       "exists": true,
       "schemaVersion": "atlas.rrf-caller-baseline.v1",
-      "generatedAt": "2026-09-13T02:57:03.871Z",
+      "generatedAt": "2026-09-14T03:08:12.961Z",
       "workspaceRevision": null,
       "sourceRevisionOrChecksum": null,
       "status": "CALLER_BASELINE_INCOMPLETE_MIGRATION_BLOCKED"
@@ -309,7 +320,7 @@
       "path": "docs/reports/qdrant-collection-roles-v1.json",
       "exists": true,
       "schemaVersion": "QdrantCollectionRolesAuditV1",
-      "generatedAt": "2026-09-13T00:49:19.359Z",
+      "generatedAt": "2026-09-12T05:28:28.031Z",
       "workspaceRevision": null,
       "sourceRevisionOrChecksum": null,
       "status": "QDRANT_COLLECTION_ROLES_PROVEN"
@@ -319,9 +330,9 @@
       "path": "docs/reports/workspace-revision-tournament-admission-v1.json",
       "exists": true,
       "schemaVersion": "atlas.workspace-revision-tournament-admission.v1",
-      "generatedAt": "2026-09-11T15:10:37.412Z",
-      "workspaceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
-      "sourceRevisionOrChecksum": "sha256:52244f10f2087277bcff0e73c01ba0e790d82a7064ac7b1825301f974ff1c795",
+      "generatedAt": "2026-09-15T01:04:38.272Z",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "sourceRevisionOrChecksum": "sha256:dccaf9f6e84b1d3b1c49f2b6f110b9b9946b895703ac0987cbb70a3608223efb",
       "status": "WORKSPACE_REVISION_TOURNAMENT_ADMITTED"
     },
     {
@@ -332,14 +343,14 @@
       "generatedAt": null,
       "workspaceRevision": null,
       "sourceRevisionOrChecksum": null,
-      "status": "NO_TERMINAL_EXECUTION_FOR_CURRENT_WORKSPACE"
+      "status": "CURRENT_SNAPSHOT_PROVEN"
     },
     {
       "key": "selectedStructuralLineage",
       "path": "docs/reports/selected-graphify-structural-lineage-v1.json",
       "exists": true,
       "schemaVersion": "atlas.selected-graphify-structural-lineage.v1",
-      "generatedAt": "2026-09-13T02:06:31.208Z",
+      "generatedAt": "2026-09-15T19:30:43.911Z",
       "workspaceRevision": null,
       "sourceRevisionOrChecksum": null,
       "status": "CURRENT_PACKET_CHUNK_JOIN_UNPROVEN"
@@ -349,7 +360,7 @@
       "path": "docs/reports/current-source-owner-reconciliation-v1.json",
       "exists": true,
       "schemaVersion": "atlas.current-source-owner-reconciliation.v1",
-      "generatedAt": "2026-09-13T01:25:25.057Z",
+      "generatedAt": "2026-09-14T20:24:10.043Z",
       "workspaceRevision": null,
       "sourceRevisionOrChecksum": null,
       "status": null
@@ -379,7 +390,7 @@
       "path": "docs/reports/semantic-768-writer-ownership-v1.json",
       "exists": true,
       "schemaVersion": "atlas.semantic-768-writer-ownership.v1",
-      "generatedAt": "2026-09-13T00:40:13.941Z",
+      "generatedAt": "2026-09-14T16:24:53.495Z",
       "workspaceRevision": null,
       "sourceRevisionOrChecksum": null,
       "status": "OWNER_NOT_PROVEN"
@@ -389,17 +400,17 @@
       "path": "docs/reports/current-graph-artifact-readiness-v1.json",
       "exists": true,
       "schemaVersion": "atlas.current-graph-artifact-readiness.v1",
-      "generatedAt": "2026-09-13T03:13:57.341Z",
+      "generatedAt": "2026-09-15T18:25:25.096Z",
       "workspaceRevision": null,
       "sourceRevisionOrChecksum": null,
-      "status": "CURRENT_GRAPH_ARTIFACT_BLOCKED_ON_EDGE_PRODUCER"
+      "status": "CURRENT_GRAPH_ARTIFACT_BLOCKED_ON_STALE_PROJECTION"
     },
     {
       "key": "domainClassifierLineage",
       "path": "docs/reports/domain-classifier-lineage-v1.json",
       "exists": true,
       "schemaVersion": "atlas.domain-classifier-lineage.v1",
-      "generatedAt": "2026-09-13T03:15:09.250Z",
+      "generatedAt": "2026-09-10T19:27:49.158Z",
       "workspaceRevision": null,
       "sourceRevisionOrChecksum": null,
       "status": "CLASSIFIER_LINEAGE_BLOCKED"
@@ -431,8 +442,8 @@
     "requiredIdentity": {
       "owner": "codebase_chunks_768",
       "challenger": "codebase_chunks_768_v2",
-      "workspaceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
-      "sourceRevisionSet": "sha256:52244f10f2087277bcff0e73c01ba0e790d82a7064ac7b1825301f974ff1c795",
+      "workspaceRevision": "sha256:d7f9563f5861b6890ac7e6d2c87df4ad6fa0eebb825f66387fba0e750ef91f2e",
+      "sourceRevisionSet": "sha256:5d524bf15be8ee0296d8f6b57f9edcc3f71c670dee5795b2ee6012064719798f",
       "representationRevision": null
     },
     "blockers": [
@@ -453,8 +464,8 @@
   "rrfCallerClassification": {
     "verdict": "RRF_CALLER_CLASSIFICATION_READY",
     "callerCount": 93,
-    "unmappedCount": 89,
-    "executorAsLaneCount": 0,
+    "unmappedCount": 90,
+    "executorAsLaneCount": 2,
     "ambiguousMappingCount": 0,
     "canonicalFusionOwner": "SearchRuntime",
     "migrationAuthorized": false
@@ -471,7 +482,7 @@
   },
   "traceCriticalPathStatus": {
     "gate": "TRACE-MCP-CORE-SEARCH-01",
-    "status": "PROVEN",
+    "status": "PARTIAL",
     "optionalCapabilityGaps": [
       "identity envelope not live-reloaded (blocks downstream canonical KAG joins, not TRACE core search itself)",
       "codebase/research/bifrost/rg-atlas optional registries remain disabled by policy"
@@ -507,7 +518,7 @@
     {
       "priority": "P3",
       "gate": "RRF-CALLER-CLASSIFICATION-02",
-      "note": "Not blocking: RRF_CALLER_CLASSIFICATION_READY (93/93 classified, 0 EXECUTOR_AS_LANE violations). Migration itself is a separate, not-yet-made decision."
+      "note": "Not blocking: RRF_CALLER_CLASSIFICATION_READY (93/93 classified, 2 EXECUTOR_AS_LANE violations). Migration itself is a separate, not-yet-made decision."
     },
     {
       "priority": "P4",
@@ -530,5 +541,5 @@
       "note": "Gated behind P1 and P2."
     }
   ],
-  "checksum": "sha256:68c279bf077baf8c9cf9a324ddc8bf692e255c156827abf7ffb535381b1df7c4"
+  "checksum": "sha256:60560b54cc24bfce2360c7f3995f7a19a1877e2428e141df59e797569f62b3aa"
 }

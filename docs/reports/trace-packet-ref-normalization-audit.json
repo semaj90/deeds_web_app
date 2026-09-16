@@ -1,0 +1,42 @@
+{
+  "timestamp": "2026-09-12T18:29:17.866Z",
+  "steps": [
+    {
+      "step": "extract_trace_refs",
+      "status": "ok",
+      "unique_refs": 0,
+      "total_ref_count": 0
+    },
+    {
+      "step": "classify_refs",
+      "status": "ok",
+      "statistics": {
+        "total_refs": 0,
+        "canonical_packet_key_match": 0,
+        "canonical_source_ref_match": 0,
+        "canonical_file_path_match": 0,
+        "qdrant_payload_match": 0,
+        "legacy_unresolved": 0,
+        "ambiguous": 0
+      }
+    },
+    {
+      "step": "calculate_match_rate",
+      "status": "ok",
+      "canonical_matches": 0,
+      "total_refs": 0,
+      "match_rate_percent": 0
+    }
+  ],
+  "classifications": [],
+  "statistics": {
+    "total_refs": 0,
+    "canonical_packet_key_match": 0,
+    "canonical_source_ref_match": 0,
+    "canonical_file_path_match": 0,
+    "qdrant_payload_match": 0,
+    "legacy_unresolved": 0,
+    "ambiguous": 0
+  },
+  "status": "NO_TRACE_PACKET_REFS"
+}

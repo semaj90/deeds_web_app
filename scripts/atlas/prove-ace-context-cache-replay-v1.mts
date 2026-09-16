@@ -1,3 +1,6 @@
+import { mkdir, writeFile } from 'node:fs/promises';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { buildContextManifestV2 } from '../../sveltekit-frontend/src/lib/server/atlas/graph/context-manifest-v2.js';
 import { getValkeyClient } from '../../sveltekit-frontend/src/lib/server/cache/valkey-client.js';
 import {
@@ -50,6 +53,7 @@ const pack: AceContextPack = {
 };
 const client = getValkeyClient();
 const key = buildRevisionedAceContextCacheKeyV1(manifest);
+const reportPath = resolve(dirname(fileURLToPath(import.meta.url)), '../../docs/reports/ace-context-cache-replay-v1.json');
 
 try {
   const before = await getRevisionedAceContextPackV1(manifest, { recordMetrics: false });
@@ -59,7 +63,10 @@ try {
   if (before !== null || hit?.id !== pack.id || stale !== null) {
     throw new Error('ACE context cache replay admission failed');
   }
-  console.log(JSON.stringify({
+  const report = {
+    schema: 'atlas.ace-context-cache-replay.v1',
+    generatedAt: new Date().toISOString(),
+    mode: 'DISPOSABLE_FIXTURE',
     status: 'ACE_CONTEXT_CACHE_REPLAY_PROVEN',
     missBeforeWrite: before === null,
     hitAfterWrite: hit !== null,
@@ -67,7 +74,12 @@ try {
     cacheWritePerformed: true,
     canonicalWritesPerformed: false,
     canonicalAuthority: false,
-  }));
+    cleanupAttempted: true,
+    reportPath: 'docs/reports/ace-context-cache-replay-v1.json',
+  };
+  await mkdir(dirname(reportPath), { recursive: true });
+  await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+  console.log(JSON.stringify(report));
 } finally {
   await client.del(key).catch(() => undefined);
   await client.quit().catch(() => undefined);

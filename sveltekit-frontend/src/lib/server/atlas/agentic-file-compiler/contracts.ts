@@ -149,6 +149,78 @@ export const WorkflowActionEventSchema = z.object({
 }).strict();
 export type WorkflowActionEventV1 = z.infer<typeof WorkflowActionEventSchema>;
 
+// ── WORKFLOW-ACTION-SCHEMA-OWNER-01: canonical adapter ─────────────────────────
+//
+// This local WorkflowActionEventV1 stays the compiler-lifecycle-facing type (runId,
+// executor, revisions, inputRefs/outputRefs, errorRef, embedded checksum). It no longer
+// independently claims the 'atlas.workflow-action.v1' schema identity as its own contract --
+// that identity is owned by `workflowActionEventSchema` in
+// `@deeds/parent-atlas/core/workflow-action-event`. These two functions are the explicit
+// adapter boundary, per design.md Decision 2.
+import type { WorkflowActionEventV1 as CanonicalWorkflowActionEventV1 } from '@deeds/parent-atlas/core/workflow-action-event';
+
+export function toCanonicalWorkflowActionEvent(local: WorkflowActionEventV1): CanonicalWorkflowActionEventV1 {
+	return {
+		schema: 'atlas.workflow-action.v1',
+		workflowId: local.workflowId,
+		workflowRevision: local.workflowRevision,
+		sequence: local.sequence,
+		actionId: local.actionId,
+		parentActionId: local.parentActionId ?? undefined,
+		dagNodeId: local.dagNodeId,
+		attempt: local.attempt,
+		lane: local.lane,
+		transport: local.transport ?? undefined,
+		kind: local.kind,
+		resourceRefs: [],
+		evidenceRefs: local.evidenceRefs,
+		artifactRefs: [],
+		metadata: {},
+		producerRevision: local.producerRevision,
+		runId: local.runId,
+		executor: local.executor ?? undefined,
+		revisions: local.revisions,
+		inputRefs: local.inputRefs,
+		outputRefs: local.outputRefs,
+		errorRef: local.errorRef ?? undefined,
+		checksum: local.checksum,
+	} as CanonicalWorkflowActionEventV1;
+}
+
+export function fromCanonicalWorkflowActionEvent(
+	canonical: CanonicalWorkflowActionEventV1,
+	extras: { runId: string; revisions: WorkflowActionEventV1['revisions']; emittedAt: string; checksum: string },
+): WorkflowActionEventV1 {
+	if (!WorkflowActionEventSchema.shape.kind.options.includes(canonical.kind as never)) {
+		throw new Error(
+			`WORKFLOW_ACTION_EVENT_KIND_NOT_REPRESENTABLE_IN_COMPILER_SHAPE: '${canonical.kind}' has no equivalent in this local WorkflowActionEventSchema's kind enum`,
+		);
+	}
+	return WorkflowActionEventSchema.parse({
+		schema: ATLAS_WORKFLOW_ACTION_SCHEMA,
+		workflowId: canonical.workflowId,
+		workflowRevision: canonical.workflowRevision,
+		runId: canonical.runId ?? extras.runId,
+		sequence: canonical.sequence,
+		actionId: canonical.actionId,
+		parentActionId: canonical.parentActionId ?? null,
+		dagNodeId: canonical.dagNodeId,
+		attempt: canonical.attempt,
+		lane: canonical.lane,
+		transport: canonical.transport ?? null,
+		executor: canonical.executor ?? null,
+		kind: canonical.kind,
+		revisions: canonical.revisions ?? extras.revisions,
+		inputRefs: canonical.inputRefs ?? [],
+		outputRefs: canonical.outputRefs ?? [],
+		evidenceRefs: canonical.evidenceRefs,
+		errorRef: canonical.errorRef ?? null,
+		emittedAt: extras.emittedAt,
+		producerRevision: canonical.producerRevision,
+		checksum: canonical.checksum ?? extras.checksum,
+	});
+}
+
 export const FileMutationPlanSchema = z.object({
 	schema: z.literal(ATLAS_FILE_MUTATION_PLAN_SCHEMA),
 	mutationId: z.string().min(1),

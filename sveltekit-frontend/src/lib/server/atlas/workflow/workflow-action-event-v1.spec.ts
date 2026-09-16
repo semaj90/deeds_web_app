@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
+  fromCanonicalWorkflowActionEvent,
+  toCanonicalWorkflowActionEvent,
   validateWorkflowActionEvent,
   workflowProgressFraction,
   type WorkflowActionEventV1
@@ -66,5 +68,53 @@ describe('WorkflowActionEventV1', () => {
 
   it('does not manufacture progress for an unmeasured running action', () => {
     expect(workflowProgressFraction(event({ state: 'running', progress: undefined }))).toBeNull();
+  });
+});
+
+describe('WorkflowActionEventV1 -- canonical adapter round-trip (WORKFLOW-ACTION-SCHEMA-OWNER-01)', () => {
+  it('round-trips every field the UI/Kanban layer actually reads', () => {
+    const original = event({
+      target: { canonicalId: 'candidate-42', resource: 'src/lib/foo.ts' },
+    });
+
+    const canonical = toCanonicalWorkflowActionEvent(original, { producerRevision: 'rev-ui-1' });
+    expect(canonical.schema).toBe('atlas.workflow-action.v1');
+    expect(canonical.producerRevision).toBe('rev-ui-1');
+    expect(canonical.state).toBe(original.state);
+    expect(canonical.operation).toBe(original.operation);
+    expect(canonical.progress).toEqual(original.progress);
+    expect(canonical.visual).toEqual(original.visual);
+    expect(canonical.canonicalIds).toEqual(['candidate-42']);
+
+    const roundTripped = fromCanonicalWorkflowActionEvent(canonical, { emittedAt: original.emittedAt });
+    expect(roundTripped.workflowId).toBe(original.workflowId);
+    expect(roundTripped.workflowRevision).toBe(original.workflowRevision);
+    expect(roundTripped.sequence).toBe(original.sequence);
+    expect(roundTripped.actionId).toBe(original.actionId);
+    expect(roundTripped.dagNodeId).toBe(original.dagNodeId);
+    expect(roundTripped.attempt).toBe(original.attempt);
+    expect(roundTripped.lane).toBe(original.lane);
+    expect(roundTripped.transport).toBe(original.transport);
+    expect(roundTripped.kind).toBe(original.kind);
+    expect(roundTripped.state).toBe(original.state);
+    expect(roundTripped.operation).toBe(original.operation);
+    expect(roundTripped.progress).toEqual(original.progress);
+    expect(roundTripped.target).toEqual(original.target);
+    expect(roundTripped.visual).toEqual(original.visual);
+    expect(roundTripped.emittedAt).toBe(original.emittedAt);
+  });
+
+  it('throws rather than silently drop a canonical-only kind this local shape cannot represent', () => {
+    const canonical = toCanonicalWorkflowActionEvent(event(), { producerRevision: 'rev-ui-1' });
+    const unrepresentable = { ...canonical, kind: 'suspended' as const };
+    expect(() => fromCanonicalWorkflowActionEvent(unrepresentable, { emittedAt: '2026-09-14T00:00:00.000Z' }))
+      .toThrow(/WORKFLOW_ACTION_EVENT_KIND_NOT_REPRESENTABLE_IN_UI_SHAPE/);
+  });
+
+  it('throws rather than silently drop a canonical-only transport (mcp) this local shape cannot represent', () => {
+    const canonical = toCanonicalWorkflowActionEvent(event(), { producerRevision: 'rev-ui-1' });
+    const unrepresentable = { ...canonical, transport: 'mcp' as const };
+    expect(() => fromCanonicalWorkflowActionEvent(unrepresentable, { emittedAt: '2026-09-14T00:00:00.000Z' }))
+      .toThrow(/WORKFLOW_ACTION_EVENT_TRANSPORT_NOT_REPRESENTABLE_IN_UI_SHAPE/);
   });
 });

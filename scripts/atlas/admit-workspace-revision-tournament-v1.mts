@@ -6,8 +6,9 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
-const PREFLIGHT = resolve(ROOT, 'docs/reports/workspace-revision-tournament-source-authority-v1.json');
-const REPORT = resolve(ROOT, 'docs/reports/workspace-revision-tournament-admission-v1.json');
+const argValue = (name: string) => process.argv.slice(2).find((value) => value.startsWith(`${name}=`))?.slice(name.length + 1);
+const PREFLIGHT = resolve(ROOT, argValue('--preflight') ?? 'docs/reports/workspace-revision-tournament-source-authority-v1.json');
+const REPORT = resolve(ROOT, argValue('--report') ?? 'docs/reports/workspace-revision-tournament-admission-v1.json');
 const REQUIRED = 'AUTHORIZE_WORKSPACE_REVISION_TOURNAMENT_ADMISSION_V1';
 const confirm = process.argv.slice(2).find((value) => value.startsWith('--confirm='))?.slice('--confirm='.length)
   ?? (process.argv.includes('--confirm') ? process.argv[process.argv.indexOf('--confirm') + 1] : null);

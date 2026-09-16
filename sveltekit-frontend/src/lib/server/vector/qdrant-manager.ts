@@ -26,6 +26,10 @@ import {
   assertVectorDimension,
   buildQdrantSearchRequest,
 } from './vector-contracts.js';
+import {
+  buildDenseRepresentationCapabilityV1,
+  type DenseRepresentationCapabilityV1,
+} from './dense-representation-capability-v1.js';
 
 function toQdrantQueryRequest(request: Record<string, any>): Record<string, any> {
   const { vector, ...rest } = request;
@@ -99,6 +103,7 @@ export function deterministicChunkId(
 
 const sparseSupportCache = new Map<string, boolean>();
 const denseOnlyNoticeEmitted = new Set<string>();
+const denseCapabilityCache = new Map<string, { expiresAt: number; capability: DenseRepresentationCapabilityV1 }>();
 
 export class QdrantManager {
   public client: QdrantClient;
@@ -264,6 +269,67 @@ export class QdrantManager {
       return supported;
     } catch {
       return null;
+    }
+  }
+
+  /**
+   * Read the concrete Qdrant vector schema before using a named dense lane.
+   * This is capability discovery only: it never creates or alters a collection.
+   */
+  async getDenseRepresentationCapability(
+    collectionName: string,
+    expectedVectorName: string | null,
+    expectedDimensions: number,
+  ): Promise<DenseRepresentationCapabilityV1> {
+    const cacheKey = `${collectionName}:${expectedVectorName ?? 'unnamed'}:${expectedDimensions}`;
+    const cached = denseCapabilityCache.get(cacheKey);
+    if (cached && cached.expiresAt > Date.now()) return cached.capability;
+
+    const unavailable = (reason: string) => buildDenseRepresentationCapabilityV1({
+      schema: 'atlas.dense-representation-capability.v1',
+      logicalRepresentation: expectedDimensions === 768 ? 'semantic_768' : `qdrant_${expectedDimensions}`,
+      dimensions: expectedDimensions,
+      metric: 'cosine',
+      qdrant: { collection: collectionName, vectorName: null },
+      available: false,
+      reason,
+      representationRevision: `qdrant-schema:${collectionName}`,
+      writesPerformed: false,
+    });
+
+    try {
+      const info = await this.client.getCollection(collectionName);
+      const vectors = (info as any).config?.params?.vectors ?? (info as any).config?.vectors;
+      if (!vectors) {
+        const capability = unavailable('VECTOR_SCHEMA_ABSENT');
+        denseCapabilityCache.set(cacheKey, { expiresAt: Date.now() + 30_000, capability });
+        return capability;
+      }
+
+      const named = typeof vectors === 'object' && typeof vectors.size !== 'number';
+      const actualVectorName = named ? (Object.keys(vectors)[0] ?? null) : null;
+      const actualConfig = named ? (actualVectorName ? vectors[actualVectorName] : null) : vectors;
+      const actualDimensions = Number(actualConfig?.size ?? 0);
+      const actualMetric = String(actualConfig?.distance ?? 'cosine').toLowerCase();
+      const nameMatches = actualVectorName === expectedVectorName;
+      const available = actualDimensions === expectedDimensions && actualMetric === 'cosine' && nameMatches;
+      const capability = buildDenseRepresentationCapabilityV1({
+        schema: 'atlas.dense-representation-capability.v1',
+        logicalRepresentation: expectedDimensions === 768 ? 'semantic_768' : `qdrant_${expectedDimensions}`,
+        dimensions: actualDimensions || expectedDimensions,
+        metric: actualMetric === 'dot' || actualMetric === 'euclid' ? actualMetric : 'cosine',
+        qdrant: { collection: collectionName, vectorName: actualVectorName },
+        available,
+        ...(available ? {} : { reason: !nameMatches ? 'VECTOR_NAME_MISMATCH' : 'VECTOR_DIMENSION_OR_METRIC_MISMATCH' }),
+        representationRevision: `qdrant-schema:${collectionName}`,
+        writesPerformed: false,
+      });
+      denseCapabilityCache.set(cacheKey, { expiresAt: Date.now() + 30_000, capability });
+      return capability;
+    } catch (error) {
+      const capability = unavailable(`COLLECTION_READ_FAILED:${error instanceof Error ? error.message : String(error)}`);
+      denseCapabilityCache.set(cacheKey, { expiresAt: Date.now() + 5_000, capability });
+      return capability;
     }
   }
 
@@ -699,13 +765,29 @@ export class QdrantManager {
     scoreThreshold?: number;
     skipCache?: boolean;
   }): Promise<QdrantSearchResult> {
+    // Resolve aliases before consulting the vector schema.  Callers commonly
+    // use the logical `summary_lenses`/`synthesis_memory` names, while Qdrant
+    // stores the concrete collection names with their dimensional suffix.
+    // Looking up the alias directly would fall back to `content` and produce
+    // a misleading "vector name does not exist" error on named collections.
+    const resolvedCollection =
+      this.collections[params.collection as keyof typeof this.collections] ??
+      params.collection;
     // Named-vector collections cannot use the global `content` default. Resolve
     // from the canonical collection registry so summary/synthesis lanes keep
     // their vector space while ordinary collections retain the legacy default.
     const denseVectorName = (
-      params.vectorName ?? getNamedVectorName(params.collection) ?? QDRANT_DENSE_VECTOR_NAME
+      params.vectorName ?? getNamedVectorName(resolvedCollection) ?? QDRANT_DENSE_VECTOR_NAME
     ) as CodebaseVectorName;
-    const sparseAvailable = await this.getSparseSupport(params.collection, QDRANT_SPARSE_VECTOR_NAME);
+    const denseCapability = await this.getDenseRepresentationCapability(
+      resolvedCollection,
+      denseVectorName,
+      params.queryEmbedding.length,
+    );
+    if (!denseCapability.available) {
+      throw new Error(`QDRANT_DENSE_CAPABILITY_UNAVAILABLE:${denseCapability.reason ?? 'UNKNOWN'}`);
+    }
+    const sparseAvailable = await this.getSparseSupport(resolvedCollection, QDRANT_SPARSE_VECTOR_NAME);
 
     if (!sparseAvailable) {
       // Fall back to dense-only search when BM25 not available
@@ -714,7 +796,7 @@ export class QdrantManager {
         query: params.query,
         queryVector: params.queryEmbedding,
         vectorName: denseVectorName,
-        collection: params.collection,
+        collection: resolvedCollection,
         limit: params.limit,
         scoreThreshold: params.scoreThreshold,
         filter: params.filters,
@@ -725,7 +807,7 @@ export class QdrantManager {
     const sparseVector = await generateSparseVector(params.query);
 
     return this.multiQuerySearch({
-      collection: params.collection,
+      collection: resolvedCollection,
       queries: [
         {
           vector: params.queryEmbedding,

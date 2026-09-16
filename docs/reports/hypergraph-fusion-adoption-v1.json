@@ -1,0 +1,40 @@
+{
+  "schema": "atlas.hypergraph-fusion-adoption-report.v1",
+  "generatedAt": "2026-09-15T20:57:00.000Z",
+  "status": "BOUNDED_RUNTIME_ADOPTION_PROVEN",
+  "changes": {
+    "oneVotePerLogicalLane": true,
+    "deterministicTieBreak": true,
+    "revisionQualifiedNaryEnrichment": true,
+    "naryRelationsDecomposedToPairwise": false,
+    "naryEvidenceCreatesNewHits": false
+  },
+  "tests": {
+    "multiLaneFusion": { "passed": 5, "failed": 0 },
+    "hypergraphRetrieval": { "passed": 6, "failed": 0 },
+    "openspecStrict": "PASS",
+    "gitDiffCheck": "PASS"
+  },
+  "writesPerformed": false,
+  "frontendRuntimeAdapter": {
+    "path": "sveltekit-frontend/src/lib/server/atlas/integration/hyperrag-fusion-runtime-adapter-v1.ts",
+    "apiOptIn": "useGraph=true plus explicit workspaceRevision",
+    "staleIdentityRejected": true,
+    "naryAddsRetrievalVotes": false,
+    "liveDatabaseReadback": "NOT_PROVEN",
+    "parentAtlasTypecheck": "PASS"
+  },
+  "ppr": {
+    "cpuExecutorInjected": true,
+    "receiptReturnedByFacade": true,
+    "cuGraphNeo4jParity": "NOT_PROVEN",
+    "writesPerformed": false
+  },
+  "remainingGates": [
+    "FI-16H_LIVE_HYPERRAG_API_ADOPTION",
+    "FI-16I_PPR_BACKEND_PARITY",
+    "FI-16J_DYNAMIC_HYPEREDGE_PROMOTION",
+    "FI-16L_SVELTEKIT_PACKET_MATERIALIZATION",
+    "FI-20_CANONICAL_IDENTITY_ADMISSION"
+  ]
+}

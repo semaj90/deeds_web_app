@@ -149,7 +149,7 @@ export const EventRecommendationFeatureRowSchema = z
 		tokenCost: z.number().finite().min(0).default(0),
 		latencyMs: z.number().finite().min(0).default(0),
 		evidenceCoverage: z.number().finite().min(0).max(1).default(0),
-		freshnessScore: z.number().finite().min(0).max(1).default(0),
+		freshnessScore: z.number().finite().min(0).max(1).nullable().default(null),
 		featureRevision: z.string().min(1),
 		graphRevision: z.string().min(1).nullable().default(null),
 		eventRevision: z.string().min(1),
@@ -349,7 +349,7 @@ export function buildEventRecommendationFeatureRow(input: {
 	tokenCost?: number;
 	latencyMs?: number;
 	evidenceCoverage?: number;
-	freshnessScore?: number;
+	freshnessScore?: number | null;
 	featureRevision: string;
 	graphRevision?: string | null;
 	eventRevision: string;
@@ -368,7 +368,7 @@ export function buildEventRecommendationFeatureRow(input: {
 		tokenCost: input.tokenCost ?? 0,
 		latencyMs: input.latencyMs ?? 0,
 		evidenceCoverage: input.evidenceCoverage ?? 0,
-		freshnessScore: input.freshnessScore ?? 0,
+		freshnessScore: input.freshnessScore ?? null,
 		featureRevision: input.featureRevision,
 		graphRevision: input.graphRevision ?? null,
 		eventRevision: input.eventRevision,
@@ -379,7 +379,9 @@ export function judgeRecommendation(input: EventRecommendationFeatureRow & {
 	policyRevision: string;
 }): RecommendationJudgment {
 	const structuralCore = (input.semanticScore + input.structuralScore + input.graphScore) / 3;
-	const operationalCore = (input.workflowScore + input.breadthScore + input.freshnessScore) / 3;
+	const operationalSignals = [input.workflowScore, input.breadthScore, input.freshnessScore]
+		.filter((value): value is number => Number.isFinite(value));
+	const operationalCore = operationalSignals.reduce((sum, value) => sum + value, 0) / operationalSignals.length;
 	const approximationPenalty = input.approximationScore * 0.2;
 	const costPenalty = Math.min(1, (input.tokenCost / 10000) + (input.latencyMs / 1000) * 0.15);
 	const rawScore = structuralCore * 0.45 + operationalCore * 0.35 + input.evidenceCoverage * 0.1 + input.utilityBias * 0.1 - approximationPenalty - costPenalty;

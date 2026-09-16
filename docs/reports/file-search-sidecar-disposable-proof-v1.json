@@ -1,0 +1,45 @@
+{
+  "schema": "atlas.file-search-sidecar-disposable-proof.v1",
+  "status": "DISPOSABLE_CORRECTED_CONTRACT_PROVEN",
+  "sourceSql": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\drizzle\\manual\\20260914_graphify_file_search_bitmap_v2_revisioned.sql",
+  "sourceSha256": "491d1d599b180be22e671a5a87fc936f5be0123f05af3135834122f403df5d98",
+  "sourceMismatches": {
+    "workspaceRevisionType": null,
+    "generatedArrayToString": true
+  },
+  "correctedContract": {
+    "workspaceRevisionType": "TEXT_SHA256_REVISION",
+    "immutableArrayToStringWrapper": true
+  },
+  "disposableContainer": true,
+  "tables": [
+    "tablename              ",
+    "------------------------------------",
+    " atlas_file_search_concept_links_v2",
+    " atlas_file_search_index_v2",
+    "(2 rows)"
+  ],
+  "indexes": [
+    "indexname                      ",
+    "-----------------------------------------------------",
+    " atlas_file_search_concept_links_v2_evidence_gin",
+    " atlas_file_search_concept_links_v2_pkey",
+    " atlas_file_search_concept_links_v2_tuple_btree",
+    " atlas_file_search_index_v2_concepts_gin",
+    " atlas_file_search_index_v2_domains_gin",
+    " atlas_file_search_index_v2_embedding_hnsw",
+    " atlas_file_search_index_v2_metadata_gin",
+    " atlas_file_search_index_v2_packet_key_key",
+    " atlas_file_search_index_v2_payload_gin",
+    " atlas_file_search_index_v2_pkey",
+    " atlas_file_search_index_v2_search_gin",
+    " atlas_file_search_index_v2_source_revision_btree",
+    " atlas_file_search_index_v2_workspace_revision_btree",
+    "(13 rows)"
+  ],
+  "liveMigrationAuthorized": false,
+  "writesPerformed": false,
+  "conclusion": "The sidecar is executable only after the revision type and generated-tsvector immutability corrections are explicitly versioned and reviewed; this proof does not authorize live migration.",
+  "startedAt": "2026-09-14T00:38:16.042Z",
+  "completedAt": "2026-09-14T00:38:18.657Z"
+}

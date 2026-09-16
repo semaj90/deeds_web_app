@@ -811,6 +811,63 @@ Next gate: current source lineage and representation-owner reconciliation.
 
 Evidence: `docs/reports/semantic-768-writer-ownership-v1.json`.
 
+### SEMANTIC-CORPUS-ADMISSION-REVISION-SOURCE-FIX-2026-09-13
+
+- [x] Removed the stale hard-coded workspace revision from the read-only
+      semantic admission auditor.
+- [x] The auditor now requires and validates the authoritative
+      `workspace-revision-tournament-admission-v1.json` receipt before querying
+      Qdrant or PostgreSQL.
+- [x] Re-ran against admitted revision `sha256:3e677c29319a4a60bc60803be4186ba108dce906945af593a3a6f5cf43d11881`.
+- [x] Current result remains blocked: `109,776` owner candidates,
+      `5,730` duplicate canonical IDs, `109,746` missing source revisions,
+      `30` mixed workspace revisions, and no admitted source bindings.
+- [ ] Reconcile the legacy projection against the exact current
+      source/packet/chunk cohort before changing eligibility or payloads.
+
+Status: `SEMANTIC_CORPUS_ADMISSION_BLOCKED_CURRENT_RECEIPT_BOUND`;
+authority=false; writesPerformed=false. This correction changes only audit
+currentness and does not authorize vector, Qdrant, GPU, latent, or database
+writes.
+
+Evidence: `scripts/atlas/audit-semantic-corpus-admission-v1.mjs`;
+`docs/reports/workspace-revision-tournament-admission-v1.json`;
+`docs/reports/semantic-corpus-admission-v1.json`.
+
+### SEMANTIC-CORPUS-ADMISSION-RECHECK-2026-09-14
+
+- [x] Reran the read-only semantic corpus admission audit.
+- [x] Confirmed `109776` legacy candidates but only `10995` canonical IDs;
+  `5730` duplicate canonical IDs remain.
+- [x] Confirmed `109746` candidates lack source revision, with `30` mixed
+  workspace revisions and `16` mixed representation revisions.
+- [ ] Reconcile the legacy projection against the sealed current
+  source/packet/chunk cohort; do not repair duplicate IDs or synthesize
+  revisions.
+
+Status: `SEMANTIC_CORPUS_ADMISSION_BLOCKED`; `admittedRevisionHasAnyBindings=true`.
+Evidence: `docs/reports/semantic-corpus-admission-v1.json`.
+No vector, Qdrant, GPU, latent, or database writes occurred.
+
+### SEMANTIC-768-OWNER-RECHECK-2026-09-14
+
+- [x] Reran the live read-only writer census; `18` writer/reference surfaces
+  remain discoverable.
+- [x] Fixed the Windows report-write race by replacing the stable report via
+  a per-process temporary file and atomic rename; `node --check` and the live
+  rerun both passed.
+- [x] Confirmed the three relevant populations remain split:
+  `atlas_packets.embedding` `61659/61718`, halfvec `content_embedding`
+  `55169/55853`, and vector `content_embedding_768` `1386/55853`.
+- [ ] Reconcile one source/revision-qualified representation owner against the
+  admitted packet/chunk cohort before changing eligibility or filling vectors.
+
+Status: `OWNER_NOT_PROVEN`; `writesPerformed=false`.
+Evidence: `docs/reports/semantic-768-writer-ownership-v1.json`.
+
+The report-write fix changes audit reliability only; it does not change writer
+ownership or authorize vector/projection mutation.
+
 ### SEMANTIC-768-ACTIVE-CONTRACT-DIAGNOSTIC — 2026-09-11
 
 - [x] Confirmed the active logical contract: `semantic_768`, native 768D,

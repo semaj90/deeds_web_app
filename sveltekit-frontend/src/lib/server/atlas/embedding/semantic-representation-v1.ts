@@ -207,6 +207,52 @@ export const SemanticRepresentationV1Schema = z
 
 export type SemanticRepresentationV1 = z.infer<typeof SemanticRepresentationV1Schema>;
 
+/** Stage 4 admission receipt for one current semantic_768 cohort. */
+export const semanticCohortAdmissionV1Schema = z.object({
+  schema: z.literal('atlas.semantic-cohort-admission.v1'),
+  identity: z.object({
+    representation: z.literal('semantic_768'),
+    workspaceRevision: z.string().min(1),
+    sourceRevisionSetChecksum: sha256HexSchema,
+    representationRevision: z.string().min(1),
+    dimensions: z.literal(768),
+    modelRevision: z.string().min(1),
+  }).strict(),
+  candidateSetChecksum: sha256HexSchema,
+  ordinalMapChecksum: sha256HexSchema,
+  rowCount: z.number().int().nonnegative(),
+  payloadChecksum: sha256HexSchema.nullable(),
+  admissionStatus: z.enum(['ADMITTED', 'BLOCKED_LINEAGE', 'BLOCKED_REPRESENTATION', 'UNAVAILABLE']),
+  executor: z.enum(['POSTGRES_EXACT', 'QDRANT_HNSW', 'CUVS_BRUTE_FORCE', 'CUVS_CAGRA']).nullable(),
+  canonicalAuthority: z.literal(false),
+  writesPerformed: z.literal(false),
+  blocker: z.string().min(1).nullable(),
+}).strict().superRefine((value, ctx) => {
+  if (value.admissionStatus === 'ADMITTED' && (!value.payloadChecksum || !value.executor || value.blocker !== null)) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['admissionStatus'], message: 'ADMITTED semantic cohort requires payload checksum, executor, and no blocker.' });
+  }
+  if (value.admissionStatus === 'ADMITTED' && value.rowCount === 0) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['rowCount'], message: 'ADMITTED semantic cohort must contain at least one qualified row.' });
+  }
+  if (value.admissionStatus !== 'ADMITTED' && value.blocker === null) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['blocker'], message: 'Blocked semantic cohort requires an explicit blocker.' });
+  }
+});
+
+export type SemanticCohortAdmissionV1 = z.infer<typeof semanticCohortAdmissionV1Schema>;
+
+/** Validate an explicitly supplied admission observation; never invents rows or revisions. */
+export function buildSemanticCohortAdmissionV1(
+  input: Omit<SemanticCohortAdmissionV1, 'schema' | 'canonicalAuthority' | 'writesPerformed'>,
+): SemanticCohortAdmissionV1 {
+  return semanticCohortAdmissionV1Schema.parse({
+    schema: 'atlas.semantic-cohort-admission.v1',
+    ...input,
+    canonicalAuthority: false,
+    writesPerformed: false,
+  });
+}
+
 export type SemanticRepresentationInputV1 = Omit<
   SemanticRepresentationV1,
   'schema' | 'storage' | 'lineageStatus' | 'canonicalAuthority' | 'representationId' | 'modelId' | 'dimensions' | 'normalized'

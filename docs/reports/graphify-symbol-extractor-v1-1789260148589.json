@@ -1,0 +1,314 @@
+{
+  "schema": "atlas.graphify-symbol-extractor-receipt.v1",
+  "generatedAt": "2026-09-13T00:42:28.588Z",
+  "apply": true,
+  "useLsp": true,
+  "limit": 100,
+  "workspaceIdFilter": null,
+  "candidatesConsidered": 100,
+  "skippedUnsupported": 58,
+  "byFileKind": {
+    "markdown": 39,
+    "json": 3
+  },
+  "filesProcessed": 42,
+  "filesFailed": 0,
+  "totalSymbolsExtracted": 1172,
+  "totalSymbolsInserted": 1172,
+  "plan": [
+    {
+      "fileId": "c3fe79d8-14c8-4d33-8458-067c822f7b1d",
+      "sourceRef": "docs/PHASE-108F-REVALIDATION-COMPLETE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 17
+    },
+    {
+      "fileId": "3cdbdd37-319b-4ab2-8dd5-350489b215b6",
+      "sourceRef": "docs/PHASE-108-SCHEMA-ALIGNMENT-DECISION.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 24
+    },
+    {
+      "fileId": "66ea684b-c0a9-4153-a4fd-a2563481426b",
+      "sourceRef": "docs/PHASE-108-UNKNOWN-RESOLUTION-ARCHITECTURE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 18
+    },
+    {
+      "fileId": "9ab76d85-ff91-4757-8312-a3c4c34aaad9",
+      "sourceRef": "docs/PHASE-109A-MCP-WIRING-COMPLETE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 30
+    },
+    {
+      "fileId": "15fe7170-5e6c-444e-95f6-95f59774aae5",
+      "sourceRef": "docs/PHASE-109A-MIGRATION-VALIDATION-PROOF.json",
+      "fileKind": "json",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 41
+    },
+    {
+      "fileId": "4c2972a1-5b8d-4484-accb-27112c122c05",
+      "sourceRef": "docs/PHASE-109B-REPOSITORY-PROVENANCE-WORKFLOW-GSD.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 6
+    },
+    {
+      "fileId": "4c0f4286-04b7-4ec9-956a-ac8933a14447",
+      "sourceRef": "docs/PHASE-109-EXECUTION-PLAN.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 7
+    },
+    {
+      "fileId": "a3da3de6-c842-448a-89e4-26500b7c12bd",
+      "sourceRef": "docs/PHASE-109-UNKNOWN-RESOLUTION-DESIGN.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 21
+    },
+    {
+      "fileId": "a0d41790-398d-4b0e-8c79-d45596048767",
+      "sourceRef": "docs/phase-110-agentic-indexing/datasets/README.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 1
+    },
+    {
+      "fileId": "3f405173-b752-4f10-a910-d10983895605",
+      "sourceRef": "docs/phase-110-agentic-indexing/openspec/changes/agentic-code-index/proposal.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 4
+    },
+    {
+      "fileId": "adc34448-dc93-4c80-9631-61e4eb3820d9",
+      "sourceRef": "docs/phase-110-agentic-indexing/openspec/changes/agentic-code-index/tasks.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 8
+    },
+    {
+      "fileId": "607f5978-5f15-4134-bedb-e3e49eb91e3f",
+      "sourceRef": "docs/phase-110-agentic-indexing/README.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 3
+    },
+    {
+      "fileId": "f25c81d2-0ebc-4010-96f0-8bd9e393028c",
+      "sourceRef": "docs/phase-110-agentic-indexing/schemas/code-artifact.schema.json",
+      "fileKind": "json",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 53
+    },
+    {
+      "fileId": "34b05ac2-9d3a-4309-81aa-a346c3289823",
+      "sourceRef": "docs/phase-110-agentic-indexing/schemas/indexed-record.schema.json",
+      "fileKind": "json",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 52
+    },
+    {
+      "fileId": "d5a324ef-696d-4e81-8da7-eae390bbd77a",
+      "sourceRef": "docs/phase-110-agentic-indexing/specs/phase-110-agentic-code-index/implementation-prompt.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 10
+    },
+    {
+      "fileId": "622d7beb-504b-4e46-bbe4-b23368a4dca3",
+      "sourceRef": "docs/phase-110-agentic-indexing/specs/phase-110-agentic-code-index/spec.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 30
+    },
+    {
+      "fileId": "316c789d-0b10-4052-80ae-dbfdcf16a625",
+      "sourceRef": "docs/PHASE-110-END-TO-END-IMPLEMENTATION.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 50
+    },
+    {
+      "fileId": "4cec1147-6dfa-41ae-aa51-929b1e6a18f5",
+      "sourceRef": "docs/PHASE-110-FEATURE-EXTRACTION-CHECKLIST.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 16
+    },
+    {
+      "fileId": "70d3a570-bb8d-492c-b949-b6fcaf7af4d7",
+      "sourceRef": "docs/PHASE-110-INTEGRATION-PHASE-108D-DUAL-VECTORS.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 22
+    },
+    {
+      "fileId": "9a5fdb3b-82ea-43de-b395-d486808cd6b5",
+      "sourceRef": "docs/PHASE-110-MIGRATION-0152-REVISIONS-SUMMARY.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 30
+    },
+    {
+      "fileId": "dfa8fe71-2755-4d36-9729-6c9137e6db61",
+      "sourceRef": "docs/PHASE-110-REPRESENTATION-INFRASTRUCTURE-DEPLOYMENT.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 86
+    },
+    {
+      "fileId": "6986f436-3b27-458b-8d72-375b5ea98c13",
+      "sourceRef": "docs/PHASE-110-REPRESENTATION-SCHEMA-CORRECTIONS.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 16
+    },
+    {
+      "fileId": "a294f29c-9ece-41e8-b00d-2a1115a605fa",
+      "sourceRef": "docs/PHASE-110-REPRESENTATION-SPECIFICATION-UPDATE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 20
+    },
+    {
+      "fileId": "e334df7d-9ec5-4d26-a9cb-ee7d82ce2ff3",
+      "sourceRef": "docs/PHASE-111-PRODUCTION-DEPLOYMENT.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 29
+    },
+    {
+      "fileId": "e1a21af4-2758-44c0-9cb7-b5a529089a7a",
+      "sourceRef": "docs/PHASE-112-EVALUATION-METRICS.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 26
+    },
+    {
+      "fileId": "37251ffa-67ab-47c9-9630-015f5050ea1b",
+      "sourceRef": "docs/PHASE-113-UNKNOWN-RESOLUTION.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 26
+    },
+    {
+      "fileId": "fc1ccf85-1215-4340-99a9-cf57cc6b4089",
+      "sourceRef": "docs/PHASE-114-GRAPHIFY-AUTOMATION.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 35
+    },
+    {
+      "fileId": "0a7703b8-00e3-4d5d-9756-d29cc2295426",
+      "sourceRef": "docs/PHASE-12-EXECUTION-PLAN-2026-07-28.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 61
+    },
+    {
+      "fileId": "abbd5e05-7b2a-42f2-85f2-ba4863c30fbc",
+      "sourceRef": "docs/PHASE-12-EXECUTION-RESULTS-2026-07-28.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 14
+    },
+    {
+      "fileId": "8f692678-8fdd-4278-8fe5-e39f884a8f2a",
+      "sourceRef": "docs/PHASE-12-FINAL-STATUS-2026-07-28.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 18
+    },
+    {
+      "fileId": "b773cccd-d883-459c-aa74-5481821fa699",
+      "sourceRef": "docs/PHASE-14-15-IMPLEMENTATION-COMPLETE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 21
+    },
+    {
+      "fileId": "1751d911-6dac-477e-a8f7-aadb3bb84582",
+      "sourceRef": "docs/PHASE-14-15-PRODUCTION-HARDENING.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 41
+    },
+    {
+      "fileId": "fd3021c8-37df-40b4-8469-5f8af91cc1e1",
+      "sourceRef": "docs/PHASE-14-15-QUICK-START.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 37
+    },
+    {
+      "fileId": "e67b61b2-2dc1-4e38-ad23-7e5a1d5a7b43",
+      "sourceRef": "docs/PHASE1-4STAGE-PIPELINE-REFERENCE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 43
+    },
+    {
+      "fileId": "148c57a4-2653-4ab6-8b20-59d740aaefb0",
+      "sourceRef": "docs/PHASE1.5-PACKET-ENRICHMENT-READY.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 30
+    },
+    {
+      "fileId": "c161a137-c64d-44d8-9ef7-acd9fdda636a",
+      "sourceRef": "docs/PHASE-16-EXECUTION-LANE-STATUS.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 15
+    },
+    {
+      "fileId": "b1e0dd0b-aae9-46bc-8ae5-f76418cc976d",
+      "sourceRef": "docs/PHASE-16-H-COMPLETION-REPORT.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 36
+    },
+    {
+      "fileId": "379dc104-08ed-4371-9a00-7105af7c730c",
+      "sourceRef": "docs/PHASE-16-H-EXECUTION-GUIDE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 27
+    },
+    {
+      "fileId": "7feb9597-a667-44a5-969f-24b5de890619",
+      "sourceRef": "docs/PHASE-16-H-HIGHER-HOP-SEMANTIC-BRIDGE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 24
+    },
+    {
+      "fileId": "d1f3d83b-f0fc-49b1-9abe-840730ba8a1f",
+      "sourceRef": "docs/PHASE-16-H-SCRIPTS-CREATED.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 24
+    },
+    {
+      "fileId": "a3fc0224-85e7-4b8f-92ed-2a9d1eade603",
+      "sourceRef": "docs/PHASE-16-H-START-HERE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 50
+    },
+    {
+      "fileId": "0e390606-9d61-45b6-a712-56bf18835593",
+      "sourceRef": "docs/PHASE-16-H-START-HERE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 50
+    }
+  ]
+}

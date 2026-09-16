@@ -1,0 +1,21 @@
+{
+  "schema": "atlas.semantic-768-payload-lineage.v1",
+  "mode": "READ_ONLY_DRY_RUN",
+  "expectedWorkspaceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+  "source": "codebase_chunk_index.content_embedding_768",
+  "representationId": "semantic_768",
+  "dimension": 768,
+  "selected": 16,
+  "valid": 0,
+  "eligibleForProjection": false,
+  "missingWorkspaceId": 16,
+  "missingWorkspaceRevision": 32,
+  "missingSourceRevision": 16,
+  "missingPacketKey": 9,
+  "missingChunkId": 0,
+  "missingContentHash": 0,
+  "mixedWorkspaceRevision": 0,
+  "errors": [],
+  "writesPerformed": false,
+  "canonicalAuthority": false
+}

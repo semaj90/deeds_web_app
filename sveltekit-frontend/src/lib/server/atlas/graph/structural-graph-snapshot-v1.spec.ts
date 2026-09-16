@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { structuralGraphSnapshotV1Schema, validateStructuralGraphSnapshotV1 } from './structural-graph-snapshot-v1.js';
+import { buildGraphOrdinalManifestV1, structuralGraphSnapshotV1Schema, validateStructuralGraphSnapshotV1 } from './structural-graph-snapshot-v1.js';
 import { buildStructuralGraphSnapshotFromIncidenceV1 } from './structural-graph-snapshot-from-incidence-v1.js';
 
 const hash = 'a'.repeat(64);
@@ -19,6 +19,14 @@ function snapshot() {
 }
 
 describe('StructuralGraphSnapshotV1', () => {
+  it('binds snapshot, graph edge artifact, and ordinal map without claiming authority', () => {
+    const manifest = buildGraphOrdinalManifestV1({ snapshot: snapshot(), nodeManifestChecksum: hash });
+    expect(manifest.ordinalMapChecksum).toBe(hash);
+    expect(manifest.edgeManifestChecksum).toBe(hash);
+    expect(manifest.canonicalAuthority).toBe(false);
+    expect(manifest.writesPerformed).toBe(false);
+  });
+
   it('validates a revision-bound external edge artifact descriptor', () => {
     expect(validateStructuralGraphSnapshotV1(snapshot()).edgeArtifact.format).toBe('ARROW_IPC');
   });

@@ -1,0 +1,19 @@
+{
+  "schema": "atlas.unified-residency-cutile-simt-proof.v1",
+  "status": "ISOLATED_EXECUTOR_SMOKE_PROVEN",
+  "environment": {
+    "host": "WSL2 Ubuntu",
+    "pythonEnvironment": "/home/james/.venvs/atlas-cutile-cu132",
+    "torch": "2.14.0+cu132",
+    "torchCuda": "13.2",
+    "cuTile": "1.5.0",
+    "tileCompiler": "13.2.78"
+  },
+  "hardware": { "gpu": "NVIDIA GeForce RTX 3060 Ti", "computeCapability": "8.6" },
+  "cuTileVectorAdd": { "shape": [1024], "finiteAndCorrect": true },
+  "simtTorchFp16Gemm": { "shape": [512, 256, 256], "finite": true },
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "promotionEligible": false,
+  "openGates": ["sameCorpusParity", "measuredVramEviction", "physicalProviderHandoff"]
+}

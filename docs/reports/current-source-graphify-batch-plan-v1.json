@@ -1,6 +1,6 @@
 {
   "schema": "atlas.current-source-graphify-batch-plan.v1",
-  "generatedAt": "2026-09-09T02:43:40.576Z",
+  "generatedAt": "2026-09-14T18:32:56.612Z",
   "status": "CURRENT_GRAPHIFY_BATCH_PLAN_BLOCKED_REVIEW",
   "readOnly": true,
   "canonicalAuthority": false,
@@ -14,13 +14,15 @@
     "neo4j": false,
     "valkey": false
   },
-  "workspaceRevision": "sha256:f476b4a6aac2afcafe0f82c7b0e48d52951ccbce73fca52b9706b1f1fbfabefb",
-  "inputSource": "docs/reports/graphify-lifecycle-entrypoint-v1.json",
+  "workspaceRevision": "sha256:3e677c29319a4a60bc60803be4186ba108dce906945af593a3a6f5cf43d11881",
+  "snapshotRevision": "sha256:48e1dbb326a4e249dc550cf1df06da8ec82ca4a837dd93eca114e4bafb2747e8",
+  "sourceSelectionChecksum": "sha256:52244f10f2087277bcff0e73c01ba0e790d82a7064ac7b1825301f974ff1c795",
+  "inputSource": "docs/reports/workspace-revision-tournament-admission-v1.json -> admitted snapshot manifest",
   "cohortReport": "docs/reports/current-source-projection-cohort-v1.json",
-  "cohortEligibleSources": 24101,
+  "cohortEligibleSources": 25291,
   "requestedLimit": 5,
   "selectedSourceCount": 5,
-  "selectionChecksum": "6e3df0dce6fab8c3577b30a3cc7a335828a708133a0172d9fcfaaf624d01c7c3",
+  "selectionChecksum": "be6b49656f7df2dc370fa0b88ff0f726b01a1d59876a4ffa41cd1447e79e6c38",
   "counts": {
     "currentGraphifyExact": 0,
     "missingGraphifySource": 0,
@@ -35,44 +37,11 @@
   "nextGate": "EXPLICIT_GRAPHIFY_BATCH_REVIEW",
   "records": [
     {
-      "sourceRef": "$lib/utils/file-reader.ts",
-      "sourceRevision": "sha256:c4a196813c7d8f4ea0e22645135cc5c8df9a36a547a494ebad502c060d7550f6",
-      "contentDigest": "c4a196813c7d8f4ea0e22645135cc5c8df9a36a547a494ebad502c060d7550f6",
-      "byteLength": 737,
-      "workspaceRevision": "sha256:f476b4a6aac2afcafe0f82c7b0e48d52951ccbce73fca52b9706b1f1fbfabefb",
-      "bindingPresent": true,
-      "graphifyRows": 1,
-      "exactCurrentRows": 0,
-      "comparisons": [
-        {
-          "observed": {
-            "sourceRef": "$lib/utils/file-reader.ts",
-            "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
-            "sourceRevision": "sha256:c4a196813c7d8f4ea0e22645135cc5c8df9a36a547a494ebad502c060d7550f6",
-            "contentDigest": "c4a196813c7d8f4ea0e22645135cc5c8df9a36a547a494ebad502c060d7550f6",
-            "byteLength": "737"
-          },
-          "matches": {
-            "sourceRef": true,
-            "workspaceRevision": false,
-            "sourceRevision": true,
-            "contentDigest": true,
-            "byteLength": true
-          },
-          "mismatchedFields": [
-            "workspaceRevision"
-          ],
-          "exact": false
-        }
-      ],
-      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
-    },
-    {
       "sourceRef": ".claude/AGENT_CONSTITUTION.md",
       "sourceRevision": "sha256:2d3ee7fcce1beb28a75b8c53ea0e5417906dcd2d29fa4692475da6d7b14d0bdc",
       "contentDigest": "2d3ee7fcce1beb28a75b8c53ea0e5417906dcd2d29fa4692475da6d7b14d0bdc",
       "byteLength": 251,
-      "workspaceRevision": "sha256:f476b4a6aac2afcafe0f82c7b0e48d52951ccbce73fca52b9706b1f1fbfabefb",
+      "workspaceRevision": "sha256:3e677c29319a4a60bc60803be4186ba108dce906945af593a3a6f5cf43d11881",
       "bindingPresent": true,
       "graphifyRows": 1,
       "exactCurrentRows": 0,
@@ -105,7 +74,7 @@
       "sourceRevision": "sha256:427724d93ed9949cbf21c0373ac711059097f6a1c16f0e4aebff7f6b46cc6072",
       "contentDigest": "427724d93ed9949cbf21c0373ac711059097f6a1c16f0e4aebff7f6b46cc6072",
       "byteLength": 507,
-      "workspaceRevision": "sha256:f476b4a6aac2afcafe0f82c7b0e48d52951ccbce73fca52b9706b1f1fbfabefb",
+      "workspaceRevision": "sha256:3e677c29319a4a60bc60803be4186ba108dce906945af593a3a6f5cf43d11881",
       "bindingPresent": true,
       "graphifyRows": 1,
       "exactCurrentRows": 0,
@@ -138,7 +107,7 @@
       "sourceRevision": "sha256:9048d3550bcd088cb2cd71fcdd799af686c3b305958406d523d8d939024038fb",
       "contentDigest": "9048d3550bcd088cb2cd71fcdd799af686c3b305958406d523d8d939024038fb",
       "byteLength": 28338,
-      "workspaceRevision": "sha256:f476b4a6aac2afcafe0f82c7b0e48d52951ccbce73fca52b9706b1f1fbfabefb",
+      "workspaceRevision": "sha256:3e677c29319a4a60bc60803be4186ba108dce906945af593a3a6f5cf43d11881",
       "bindingPresent": true,
       "graphifyRows": 1,
       "exactCurrentRows": 0,
@@ -171,7 +140,7 @@
       "sourceRevision": "sha256:13bc6179f4ade55522d13a16384ef9a9603f703048181ae6c820e8f48e706252",
       "contentDigest": "13bc6179f4ade55522d13a16384ef9a9603f703048181ae6c820e8f48e706252",
       "byteLength": 111,
-      "workspaceRevision": "sha256:f476b4a6aac2afcafe0f82c7b0e48d52951ccbce73fca52b9706b1f1fbfabefb",
+      "workspaceRevision": "sha256:3e677c29319a4a60bc60803be4186ba108dce906945af593a3a6f5cf43d11881",
       "bindingPresent": true,
       "graphifyRows": 1,
       "exactCurrentRows": 0,
@@ -183,6 +152,39 @@
             "sourceRevision": "sha256:13bc6179f4ade55522d13a16384ef9a9603f703048181ae6c820e8f48e706252",
             "contentDigest": "13bc6179f4ade55522d13a16384ef9a9603f703048181ae6c820e8f48e706252",
             "byteLength": "111"
+          },
+          "matches": {
+            "sourceRef": true,
+            "workspaceRevision": false,
+            "sourceRevision": true,
+            "contentDigest": true,
+            "byteLength": true
+          },
+          "mismatchedFields": [
+            "workspaceRevision"
+          ],
+          "exact": false
+        }
+      ],
+      "classification": "GRAPHIFY_REVISION_OR_CONTENT_MISMATCH"
+    },
+    {
+      "sourceRef": ".claude/DISTILLED_MEMORY.md",
+      "sourceRevision": "sha256:e57049241dad9583d84a9545f1046e0eacbaebaf269cb2674dfa89fa32283bdd",
+      "contentDigest": "e57049241dad9583d84a9545f1046e0eacbaebaf269cb2674dfa89fa32283bdd",
+      "byteLength": 508,
+      "workspaceRevision": "sha256:3e677c29319a4a60bc60803be4186ba108dce906945af593a3a6f5cf43d11881",
+      "bindingPresent": true,
+      "graphifyRows": 1,
+      "exactCurrentRows": 0,
+      "comparisons": [
+        {
+          "observed": {
+            "sourceRef": ".claude/DISTILLED_MEMORY.md",
+            "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+            "sourceRevision": "sha256:e57049241dad9583d84a9545f1046e0eacbaebaf269cb2674dfa89fa32283bdd",
+            "contentDigest": "e57049241dad9583d84a9545f1046e0eacbaebaf269cb2674dfa89fa32283bdd",
+            "byteLength": "508"
           },
           "matches": {
             "sourceRef": true,

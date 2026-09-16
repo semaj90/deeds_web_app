@@ -78,9 +78,13 @@ async function computeAttentionScores() {
         throw new Error('Ollama returned empty embedding');
       }
 
-      // Cache for future use
-      await redisClient.setex(embedKey, 86400, JSON.stringify(riskEmbedding));
-      log(`✅ Query embedding cached (${riskEmbedding.length}-dim)`);
+      // Dry-run is observational: do not populate Redis while proving the path.
+      if (!isDryRun) {
+        await redisClient.setex(embedKey, 86400, JSON.stringify(riskEmbedding));
+        log(`✅ Query embedding cached (${riskEmbedding.length}-dim)`);
+      } else {
+        log(`✅ Query embedding loaded without cache write (${riskEmbedding.length}-dim)`);
+      }
     }
 
     // Phase 3.2: Get SOM cell centroids from Redis or compute
@@ -121,10 +125,7 @@ async function computeAttentionScores() {
         });
 
         if (!qdrantRes.ok) {
-          log(`⚠️ Qdrant fetch failed: ${qdrantRes.statusText}. Using mock centroids instead.`);
-          for (let i = 0; i < 400; i++) {
-            centroids[i] = new Array(768).fill(0).map(() => Math.random() * 0.5 - 0.25);
-          }
+          throw new Error(`P4_CENTROIDS_REQUIRED_QDRANT_READ_FAILED:${qdrantRes.status}`);
         } else {
           const qdrantData = await qdrantRes.json();
           const points = qdrantData.result?.points || [];
@@ -164,6 +165,10 @@ async function computeAttentionScores() {
           await pipeline.exec();
         }
       }
+    }
+
+    if (Object.keys(centroids).length === 0) {
+      throw new Error('P4_CENTROIDS_REQUIRED_NO_REVISION_QUALIFIED_CENTROIDS');
     }
 
     // Phase 3.3: Compute cosine similarity (attention scores)

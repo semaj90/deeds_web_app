@@ -12,8 +12,23 @@ const EXPECTATION = resolve(ROOT, 'docs/reports/graphify-canary-expectation-v1.j
 const admission = JSON.parse(readFileSync(ADMISSION, 'utf8')) as Record<string, unknown>;
 const expectation = JSON.parse(readFileSync(EXPECTATION, 'utf8')) as Record<string, unknown>;
 
+// The persisted report is an envelope around the strict expectation contract.
+// Verify only the contract-owned fields so report metadata (generatedAt,
+// mode, paths, and write flags) cannot invalidate an otherwise valid receipt.
+const expectationContract = {
+  schema: expectation.schema,
+  workspaceRevision: expectation.workspaceRevision,
+  snapshotRevision: expectation.snapshotRevision,
+  sourceSelectionChecksum: expectation.sourceSelectionChecksum,
+  sourceCount: expectation.sourceCount,
+  identityChecksum: expectation.identityChecksum,
+  graphifyExecutionAuthorized: expectation.graphifyExecutionAuthorized,
+  canonicalWritesAuthorized: expectation.canonicalWritesAuthorized,
+  authority: expectation.authority,
+};
+
 const checks = {
-  schemaValidAndChecksumMatches: verifyGraphifyCanaryExpectationV1(expectation as never),
+  schemaValidAndChecksumMatches: verifyGraphifyCanaryExpectationV1(expectationContract as never),
   workspaceRevisionMatchesAdmission: expectation.workspaceRevision === admission.workspaceRevision,
   snapshotRevisionMatchesAdmission: expectation.snapshotRevision === admission.snapshotRevision,
   sourceSelectionChecksumMatchesAdmission: expectation.sourceSelectionChecksum === admission.sourceSelectionChecksum,

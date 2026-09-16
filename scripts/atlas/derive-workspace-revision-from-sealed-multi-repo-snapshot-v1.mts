@@ -9,17 +9,25 @@ import { validateSnapshot } from './lib/workspace-snapshot-capture-v1.mts';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const SNAPSHOT_DIR = resolve(ROOT, 'docs/reports/workspace-source-snapshots');
-const REPORT = resolve(ROOT, 'docs/reports/workspace-revision-from-sealed-multi-repo-snapshot-v1.json');
+const args = process.argv.slice(2);
+const argValue = (name: string) => args.find((value) => value.startsWith(`${name}=`))?.slice(name.length + 1);
+const REPORT = resolve(ROOT, argValue('--report') ?? 'docs/reports/workspace-revision-from-sealed-multi-repo-snapshot-v1.json');
 const hash = (value: unknown) => `sha256:${createHash('sha256').update(JSON.stringify(value), 'utf8').digest('hex')}`;
 
-const names = (await readdir(SNAPSHOT_DIR)).filter((name) => extname(name) === '.json');
-const candidates = await Promise.all(names.map(async (name) => ({ name, mtime: (await stat(resolve(SNAPSHOT_DIR, name))).mtimeMs })));
-const latest = candidates.sort((a, b) => b.mtime - a.mtime)[0];
-if (!latest) throw new Error('NO_WORKSPACE_SNAPSHOT_MANIFEST');
-
-const snapshotPath = resolve(SNAPSHOT_DIR, latest.name);
+const snapshotArg = argValue('--snapshot');
+let snapshotPath = snapshotArg ? resolve(ROOT, snapshotArg) : '';
+if (!snapshotPath) {
+  const names = (await readdir(SNAPSHOT_DIR)).filter((name) => extname(name) === '.json');
+  const candidates = await Promise.all(names.map(async (name) => ({ name, mtime: (await stat(resolve(SNAPSHOT_DIR, name))).mtimeMs })));
+  const latest = candidates.sort((a, b) => b.mtime - a.mtime)[0];
+  if (!latest) throw new Error('NO_WORKSPACE_SNAPSHOT_MANIFEST');
+  snapshotPath = resolve(SNAPSHOT_DIR, latest.name);
+}
 const snapshot = JSON.parse(await readFile(snapshotPath, 'utf8'));
-const readback = validateSnapshot(snapshot);
+const readbackArg = argValue('--readback');
+const readback = readbackArg
+  ? JSON.parse(await readFile(resolve(ROOT, readbackArg), 'utf8'))
+  : validateSnapshot(snapshot);
 const sources = Array.isArray(snapshot.sources) ? snapshot.sources : [];
 const repositories = Array.isArray(snapshot.repositories) ? snapshot.repositories : [];
 const sourceManifest = sources.map((source: any) => ({

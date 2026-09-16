@@ -120,6 +120,10 @@ describe('KAG next-steps item 1: readKagHypergraphNeighborsV1', () => {
     expect(hyperedgeCall?.[0]).toContain('h.workspace_revision = $2');
     expect(hyperedgeCall?.[0]).toContain('h.graph_revision = $3');
     expect(hyperedgeCall?.[1]).toEqual([['packet:a'], 'ws-1', 'graph-1']);
+    const tupleCall = queryMock.mock.calls.find(([sql]) => String(sql).includes('atlas_ontology_linked_tuples'));
+    expect(tupleCall?.[0]).toContain("provenance->>'workspaceRevision' = $2");
+    expect(tupleCall?.[0]).toContain("provenance->>'graphRevision' = $3");
+    expect(tupleCall?.[1]).toEqual([['packet:a'], 'ws-1', 'graph-1']);
   });
 
   it('strict seam rejects an incomplete traversal snapshot before querying', async () => {

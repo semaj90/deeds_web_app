@@ -1,0 +1,31 @@
+{
+  "status": "SNAPSHOT_READBACK_BLOCKED",
+  "snapshotRevision": "sha256:682d9dcbda6a1fa7f0b56baceec92bfc017842ea43ed2862273b917f2b79df14",
+  "sourceCount": 25542,
+  "exactMatches": 25539,
+  "violations": [
+    "SOURCE_READBACK_FAILED:openspec/changes/parent-atlas-best-fit-score-fabric/tasks.md",
+    "SOURCE_READBACK_FAILED:scripts/atlas/audit-workspace-source-snapshot-v1.mts",
+    "SOURCE_READBACK_FAILED:scripts/atlas/derive-workspace-revision-from-sealed-multi-repo-snapshot-v1.mts"
+  ],
+  "violationDetails": [
+    {
+      "sourceRef": "openspec/changes/parent-atlas-best-fit-score-fabric/tasks.md",
+      "code": "SOURCE_BYTES_CHANGED"
+    },
+    {
+      "sourceRef": "scripts/atlas/audit-workspace-source-snapshot-v1.mts",
+      "code": "SOURCE_BYTES_CHANGED"
+    },
+    {
+      "sourceRef": "scripts/atlas/derive-workspace-revision-from-sealed-multi-repo-snapshot-v1.mts",
+      "code": "SOURCE_BYTES_CHANGED"
+    }
+  ],
+  "violationCounts": {
+    "SOURCE_BYTES_CHANGED": 3
+  },
+  "canonicalAuthority": false,
+  "datastoreWritesPerformed": false,
+  "scope": "Recorded sources only; this does not assert current full-workspace membership or Graphify admission"
+}

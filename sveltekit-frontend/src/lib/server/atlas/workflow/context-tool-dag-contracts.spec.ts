@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { validateContextToolDag, workflowActionFromDagNode } from './context-tool-dag-contracts.js';
+import {
+  fromCanonicalWorkflowActionEvent,
+  toCanonicalWorkflowActionEvent,
+  validateContextToolDag,
+  workflowActionFromDagNode,
+} from './context-tool-dag-contracts.js';
 
 function baseDag() {
   return {
@@ -80,5 +85,56 @@ describe('context tool DAG contracts', () => {
       toolName: 'apply_patch',
     };
     expect(() => validateContextToolDag(dag)).toThrow(/canonicalWritesAllowed=false/);
+  });
+});
+
+describe('context tool DAG contracts -- canonical workflow-action adapter (WORKFLOW-ACTION-SCHEMA-OWNER-01)', () => {
+  it('round-trips every field the DAG-execution layer actually reads', () => {
+    const local = workflowActionFromDagNode({
+      dag: baseDag(),
+      nodeId: 'tool',
+      sequence: 3,
+      actionId: 'a-3',
+      kind: 'scheduled',
+      lane: 'tool',
+      evidenceRefs: ['ev-1'],
+      producerRevision: 'test',
+    });
+
+    const canonical = toCanonicalWorkflowActionEvent(local);
+    expect(canonical.schema).toBe('atlas.workflow-action.v1');
+    expect(canonical.canonicalIds).toEqual(local.canonicalIds);
+    expect(canonical.toolName).toBe(local.toolName);
+    expect(canonical.mutationRequested).toBe(local.mutationRequested);
+    expect(canonical.validationRequired).toBe(local.validationRequired);
+    expect(canonical.transport).toBe('mcp');
+
+    const roundTripped = fromCanonicalWorkflowActionEvent(canonical);
+    expect(roundTripped.workflowId).toBe(local.workflowId);
+    expect(roundTripped.workflowRevision).toBe(local.workflowRevision);
+    expect(roundTripped.sequence).toBe(local.sequence);
+    expect(roundTripped.actionId).toBe(local.actionId);
+    expect(roundTripped.dagNodeId).toBe(local.dagNodeId);
+    expect(roundTripped.attempt).toBe(local.attempt);
+    expect(roundTripped.lane).toBe(local.lane);
+    expect(roundTripped.transport).toBe(local.transport);
+    expect(roundTripped.kind).toBe(local.kind);
+    expect(roundTripped.canonicalIds).toEqual(local.canonicalIds);
+    expect(roundTripped.evidenceRefs).toEqual(local.evidenceRefs);
+    expect(roundTripped.toolName).toBe(local.toolName);
+    expect(roundTripped.mutationRequested).toBe(local.mutationRequested);
+    expect(roundTripped.validationRequired).toBe(local.validationRequired);
+    expect(roundTripped.producerRevision).toBe(local.producerRevision);
+  });
+
+  it('throws rather than silently drop a canonical-only kind this local shape cannot represent', () => {
+    const local = workflowActionFromDagNode({
+      dag: baseDag(), nodeId: 'retrieve', sequence: 1, actionId: 'a-1',
+      kind: 'scheduled', lane: 'tool', producerRevision: 'test',
+    });
+    const canonical = { ...toCanonicalWorkflowActionEvent(local), kind: 'suspended' as const };
+    expect(() => fromCanonicalWorkflowActionEvent(canonical)).toThrow(
+      /WORKFLOW_ACTION_EVENT_KIND_NOT_REPRESENTABLE_IN_DAG_SHAPE/,
+    );
   });
 });

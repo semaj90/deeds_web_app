@@ -167,6 +167,26 @@ def generate_graph_fixture_with_dangling_v1() -> GraphFixtureV1:
     )
 
 
+def build_out_adjacency(fixture: GraphFixtureV1) -> dict[str, list[str]]:
+    """Outgoing-edge adjacency map, nodeKey -> list of nodeKey (destination),
+    in edge-insertion order. Shared by any consumer needing "direct graph
+    neighbors" of a node (query-sequence random walk, residency-promotion
+    neighbor lookup) -- do not reimplement this per-consumer."""
+    adjacency: dict[str, list[str]] = {k: [] for k in fixture.node_keys}
+    for s, d in zip(fixture.edge_src, fixture.edge_dst):
+        adjacency[s].append(d)
+    return adjacency
+
+
+def build_out_adjacency_with_types(fixture: GraphFixtureV1) -> dict[str, list[tuple[str, str]]]:
+    """Outgoing-edge adjacency map, nodeKey -> list of (destination nodeKey,
+    edge_type). Same edge-insertion-order guarantee as build_out_adjacency()."""
+    adjacency: dict[str, list[tuple[str, str]]] = {k: [] for k in fixture.node_keys}
+    for s, d, t in zip(fixture.edge_src, fixture.edge_dst, fixture.edge_type):
+        adjacency[s].append((d, t))
+    return adjacency
+
+
 if __name__ == "__main__":
     f1 = generate_graph_fixture_v1()
     f2 = generate_graph_fixture_v1()

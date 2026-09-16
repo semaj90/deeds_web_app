@@ -59,6 +59,23 @@ const XGBOOST_SIDECAR_URL = process.env.XGBOOST_SIDECAR_URL ?? 'http://127.0.0.1
  */
 type XgboostRerankMode = 'off' | 'shadow' | 'active';
 
+type MixedbreadRerankMode = 'off' | 'active';
+
+/**
+ * Mixedbread is a transitional compatibility lane, not the owned reranker.
+ * It is opt-in so the default runtime cannot silently serve Marco/Mixedbread
+ * scores while the owned XGBoost/LightGBM lane is being trained and evaluated.
+ */
+function resolveMixedbreadRerankMode(): MixedbreadRerankMode {
+  const raw = (process.env.MIXEDBREAD_RERANK_MODE ?? 'off').trim().toLowerCase();
+  if (raw === 'off' || raw === 'active') return raw;
+  console.warn(
+    `[canonical-rerank-executor] invalid MIXEDBREAD_RERANK_MODE="${raw}"; ` +
+      `falling back to "off" (valid values: off, active)`,
+  );
+  return 'off';
+}
+
 function resolveXgboostRerankMode(): XgboostRerankMode {
   const raw = (process.env.XGBOOST_RERANK_MODE ?? 'shadow').trim().toLowerCase();
   if (raw === 'off' || raw === 'shadow' || raw === 'active') return raw;
@@ -103,6 +120,7 @@ const XgboostScoreResponseSchema = z.object({
 
 interface LearnedRerankerResult {
   modelRevision: string;
+  featureSchemaRevision: string;
   modelKind: LearnedRerankerKind;
   calibrated: boolean;
   ranked: RerankedCandidate[];
@@ -174,7 +192,10 @@ async function computeLearnedRerankerOrder(
 
     const modelKindRaw = data.modelType ?? data.model ?? health.modelType ?? health.model_type ?? 'xgboost';
     const modelKind: LearnedRerankerKind = modelKindRaw === 'lightgbm' ? 'lightgbm' : 'xgboost';
-    const modelRevision = data.modelRevision ?? health.modelRevision ?? `${modelKind}-unrevisioned`;
+    const modelRevision = data.modelRevision ?? health.modelRevision;
+    if (!modelRevision?.trim()) return null;
+    const featureSchemaRevision = data.featureSchemaRevision ?? health.featureSchemaRevision;
+    if (!featureSchemaRevision?.trim()) return null;
     const calibrated = data.calibrated ?? health.calibrated ?? false;
 
     // Rank directly by the raw learned-reranker score — descending, tie-broken by prior
@@ -218,7 +239,7 @@ async function computeLearnedRerankerOrder(
       } satisfies RerankedCandidate;
     });
 
-    return { modelRevision, modelKind, calibrated, ranked };
+    return { modelRevision, featureSchemaRevision, modelKind, calibrated, ranked };
   } catch {
     return null;
   }
@@ -301,6 +322,8 @@ async function emitShadowReceipt(input: {
         modelRevision: challenger.modelRevision,
         modelKind: challenger.modelKind,
         objective: null as string | null, // populated once the sidecar's /health exposes it end-to-end (XGBOOST-SCORE-CONTRACT-01)
+        featureRevision: challenger.featureSchemaRevision,
+        featureRevisionStatus: 'PROVEN_SIDECAR_SCHEMA_ONLY' as const,
         calibrated: challenger.calibrated,
         isProbability: false,
         orderedPacketKeys: challenger.ranked.map((c) => c.packetKey),
@@ -322,7 +345,8 @@ async function emitShadowReceipt(input: {
       'schema', receipt.schema,
       'requestId', requestId,
       'modelRevision', challenger.modelRevision,
-      'featureRevision', 'unversioned', // no featureSchemaRevision plumbed through yet — see task 3.1 follow-up
+      'featureRevision', receipt.challenger.featureRevision,
+      'featureRevisionStatus', receipt.challenger.featureRevisionStatus,
       'objective', receipt.challenger.objective ?? 'unknown',
       'receipt', JSON.stringify(receipt),
     );
@@ -951,9 +975,16 @@ export async function rerankCanonicalFeatureEnvelopes(
   const cachePolicy = options.cachePolicy ?? 'enabled';
   const cacheTtlSeconds = options.cacheTtlSeconds ?? DEFAULT_CACHE_TTL_SECONDS;
   const rerankTier = options.rerankTier ?? (options.policyDecision?.action === 'FAST_RERANK' ? 'fast' : 'deep');
-  const reranker = new MixedbreadCanonicalReranker(options.weights, rerankTier);
-  const modelVersion = reranker.modelVersion();
+  const mixedbreadEnabled = resolveMixedbreadRerankMode() === 'active';
   const fallbackModelVersion = 'xgboost-fallback';
+  // Do not construct the transitional Mixedbread class when it is disabled.
+  // Besides avoiding unnecessary compatibility-lane setup, this keeps cache
+  // identity and provenance honest: disabled mode belongs to the deterministic
+  // fallback/owned-model evaluation lane, not to Marco/Mixedbread.
+  const reranker = mixedbreadEnabled
+    ? new MixedbreadCanonicalReranker(options.weights, rerankTier)
+    : null;
+  const modelVersion = reranker?.modelVersion() ?? fallbackModelVersion;
   const candidates = envelopes.map((envelope, index) =>
     canonicalEnvelopeToRerankCandidate(envelope, index, maxLength),
   );
@@ -1033,6 +1064,9 @@ export async function rerankCanonicalFeatureEnvelopes(
   let cacheKey = primaryCacheKey;
 
   try {
+    if (!mixedbreadEnabled || !reranker) {
+      throw new Error('MIXEDBREAD_DISABLED_BY_POLICY');
+    }
     const rerankOutput = await reranker.rerank({ requestId: primaryCacheKey, query, candidates, limit: candidates.length, profile: 'crossencoder' });
     const crossEncoderRanked = rerankOutput.ranked as RerankedCandidate[];
 
@@ -1093,7 +1127,7 @@ export async function rerankCanonicalFeatureEnvelopes(
               authScope: cachedFallback.authScope,
               topK: cachedFallback.topK,
               maxLength: cachedFallback.maxLength,
-              crossEncoderAttempted: true,
+              crossEncoderAttempted: mixedbreadEnabled,
               crossEncoderUsed: false,
               fallbackUsed: true,
               fallbackReason: 'crossencoder_unavailable',
@@ -1189,7 +1223,7 @@ export async function rerankCanonicalFeatureEnvelopes(
       authScope,
       topK,
       maxLength,
-      crossEncoderAttempted: true,
+      crossEncoderAttempted: mixedbreadEnabled,
       crossEncoderUsed,
       fallbackUsed,
       fallbackReason,

@@ -1,0 +1,15 @@
+{
+  "schema": "atlas.packet-chunk-join.query-plan-null.v1",
+  "status": "NULL_LEDGER_WRITE_BLOCKED",
+  "value": null,
+  "reason": "The owning OpenSpec tasks.md remained locked across three consecutive safe apply attempts.",
+  "attempts": 3,
+  "queryPlanRequired": true,
+  "writesPerformed": false,
+  "dataMutation": false,
+  "nextGate": "EXPLAIN_BUFFERS_AND_BOUNDED_CANDIDATE_STAGING",
+  "evidence": [
+    "scripts/atlas/audit-current-workspace-packet-chunk-join-v1.mjs",
+    "docs/reports/current-workspace-packet-chunk-join-v1.json"
+  ]
+}

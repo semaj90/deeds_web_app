@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  buildSemanticCohortAdmissionV1,
   buildSemanticRepresentationV1,
   deriveSemanticLineageStatusV1,
   SemanticRepresentationV1Schema,
@@ -11,7 +12,54 @@ const BASE = {
 };
 
 describe('SEM768-REPRESENTATION-CONTRACT-01', () => {
-  it('defaults to CANONICAL_CHUNK_UNPROVEN and canonicalAuthority=false when nothing else is proven', () => {
+	it('keeps semantic cohort admission revision-qualified and non-authoritative', () => {
+		const base = {
+			representation: 'semantic_768' as const,
+			workspaceRevision: 'ws:admitted',
+			sourceRevisionSetChecksum: 'a'.repeat(64),
+			representationRevision: 'semantic_768:v1',
+			dimensions: 768 as const,
+			modelRevision: 'embeddinggemma:v1',
+		};
+		const admission = buildSemanticCohortAdmissionV1({
+			identity: base,
+			candidateSetChecksum: 'b'.repeat(64),
+			ordinalMapChecksum: 'c'.repeat(64),
+			rowCount: 15,
+			payloadChecksum: 'd'.repeat(64),
+			admissionStatus: 'ADMITTED',
+			executor: 'POSTGRES_EXACT',
+			blocker: null,
+		});
+		expect(admission.canonicalAuthority).toBe(false);
+		expect(admission.writesPerformed).toBe(false);
+	});
+
+	it('requires an explicit blocker for unavailable semantic cohorts', () => {
+		expect(() => buildSemanticCohortAdmissionV1({
+			identity: {
+				representation: 'semantic_768', workspaceRevision: 'ws:admitted',
+				sourceRevisionSetChecksum: 'a'.repeat(64), representationRevision: 'semantic_768:v1',
+				dimensions: 768, modelRevision: 'embeddinggemma:v1',
+			},
+			candidateSetChecksum: 'b'.repeat(64), ordinalMapChecksum: 'c'.repeat(64), rowCount: 0,
+			payloadChecksum: null, admissionStatus: 'UNAVAILABLE', executor: null, blocker: null,
+		})).toThrow();
+	});
+
+	it('does not admit an empty semantic cohort', () => {
+		expect(() => buildSemanticCohortAdmissionV1({
+			identity: {
+				representation: 'semantic_768', workspaceRevision: 'ws:admitted',
+				sourceRevisionSetChecksum: 'a'.repeat(64), representationRevision: 'semantic_768:v1',
+				dimensions: 768, modelRevision: 'embeddinggemma:v1',
+			},
+			candidateSetChecksum: 'b'.repeat(64), ordinalMapChecksum: 'c'.repeat(64), rowCount: 0,
+			payloadChecksum: 'd'.repeat(64), admissionStatus: 'ADMITTED', executor: 'POSTGRES_EXACT', blocker: null,
+		})).toThrow(/at least one qualified row/);
+	});
+
+	it('defaults to CANONICAL_CHUNK_UNPROVEN and canonicalAuthority=false when nothing else is proven', () => {
     const rep = buildSemanticRepresentationV1(BASE);
     expect(rep.lineageStatus).toBe('CANONICAL_CHUNK_UNPROVEN');
     expect(rep.canonicalAuthority).toBe(false);

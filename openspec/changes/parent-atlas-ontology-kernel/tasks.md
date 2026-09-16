@@ -3850,6 +3850,104 @@ Evidence: `docs/reports/feature-ontology-current-cohort-v1.json`;
 Status: `CURRENT_RELATIONSHIP_COHORT_EMPTY`; authority=false;
 writesPerformed=false.
 
+### Current-workspace ontology recheck — 2026-09-14
+
+- [x] Re-ran `scripts/atlas/audit-feature-ontology-current-cohort-v1.mjs`
+  against the explicit admitted revision
+  `sha256:3e677c29319a4a60bc60803be4186ba108dce906945af593a3a6f5cf43d11881`.
+- [x] Confirmed the expanded tuple population is readable (`353,973` tuples,
+  `58,092` exact source references), but the current cohort remains empty:
+  `currentWorkspaceSourceRefs=0`, `currentWorkspaceTuples=0`, and
+  `uniqueCurrentBindings=0`.
+- [x] Recorded the concrete reconciliation signals: `41` ambiguous exact
+  bindings, `22,236` exact wrong-workspace matches, and `331,464` tuples with
+  no exact Graphify source.
+- [ ] Keep ontology promotion blocked until the admitted terminal execution
+  produces revision-qualified source membership that can bind tuples without
+  source-ref-only inference.
+
+Status: `CURRENT_RELATIONSHIP_COHORT_EMPTY`; `authority=false`;
+`writesPerformed=false` for this audit.
+Evidence: `docs/reports/feature-ontology-current-cohort-v1.json`.
+
+### OAKLIB-USE-RECHECK-2026-09-14
+
+- [x] Confirmed the repository contains an optional pinned `oaklib==0.7.4`
+      dependency and real lazy-import adapter code in
+      `python/parent_atlas_ontology/oaklib_external_adapter.py`.
+- [x] Re-ran the fixture proof
+      `python python/parent_atlas_ontology/oaklib_external_adapter_check.py`:
+      `PASS`, `canonicalAuthority=false`, `writesPerformed=false`; all concept
+      and relation outputs remain `PROPOSED` candidates.
+- [x] Re-read the live 8095 `/oak/health` boundary: `available=true`,
+      `oaklibVersion=0.7.4`, `adapterConfigured=false`,
+      `mode=READ_ONLY_SHADOW`, `canonicalAuthority=false`.
+- [x] Confirmed the local host Python environment does not have `oaklib`
+      installed; sidecar availability must not be reported as host availability.
+- [ ] Configure an explicitly approved, checksum-recorded ontology backend and
+      prove a bounded positive live lookup/replay before claiming live OAKlib
+      ontology contribution.
+
+Status: `OAKLIB_BOUNDARY_PRESENT_FIXTURE_PROVEN_LIVE_LOOKUP_UNCONFIGURED`;
+authority=false; writesPerformed=false.
+Evidence: `python/requirements-oaklib-adapter.txt`,
+`python/parent_atlas_ontology/oaklib_external_adapter.py`,
+`docs/reports/oaklib-external-adapter-v1.json`, and the live `/oak/health`
+response. This recheck does not provision an ontology artifact or enable an
+adapter.
+
+### OAKLIB-LIVE-PG-RECHECK-2026-09-14
+
+- [x] Installed the pinned workstation dependency from
+      `python/requirements-oaklib-adapter.txt`; host import reports
+      `oaklib==0.7.4` and a callable `get_adapter`.
+- [x] Confirmed the sidecar image already contains the same pinned dependency
+      and wired its compose configuration to the existing read-only PostgreSQL
+      adapter (`ATLAS_OAK_ADAPTER_TYPE=atlas-postgres`).
+- [x] Recreated the sidecar and verified `/oak/health` reports
+      `available=true`, `adapterConfigured=true`, `adapterType=atlas-postgres`,
+      `mode=READ_ONLY_SHADOW`, and `canonicalAuthority=false`.
+- [x] Replayed bounded live `/oak/lookup`, `/oak/search`, and `/oak/traverse`
+      requests. Each returned a valid schema and deterministic input/output
+      checksum with `canonicalAuthority=false`; no ontology rows were returned.
+- [x] OAK-focused validation passed: `8 passed` in
+      `python/test_atlas_oak_kernel.py`; fixture adapter proof returned
+      `status=PASS` and `writesPerformed=false`.
+- [ ] Populate or provision an explicitly approved, revision-qualified
+      ontology backend before claiming positive live ontology semantics or
+      promoting OAK results. No such provisioning was performed here.
+
+Status: `OAKLIB_LIVE_READ_ONLY_PG_BOUNDARY_PROVEN_EMPTY_OWNER`;
+authority=false; writesPerformed=false. The PostgreSQL adapter is the live
+read-only boundary; OAKlib remains available for explicitly selected external
+ontology resources, but no external resource was downloaded or configured.
+
+Environment matrix for the Parent Atlas workstation:
+
+| Environment | OAKlib | LangExtract | Status |
+|---|---:|---:|---|
+| Windows global Python 3.13 | 0.7.4 | 0.1.0 | installed, but LangExtract is below the repository pin |
+| Windows repository `.venv` | 0.7.4 | 1.6.0 | aligned for workstation helper development |
+| 8095 sidecar | 0.7.4 | 1.6.0 | live and health-verified |
+| WSL2 default Ubuntu Python | missing | missing | not the configured Parent Atlas service environment; GPU tools also missing |
+
+The WSL2 result does not invalidate the 8095 CPU-sidecar proof; it leaves the
+separate RAPIDS/cuVS/cuGraph environment gate open. No WSL packages or GPU
+services were installed in this pass.
+
+### ONTOLOGY-SOURCE-SPAN-REVISION-RECHECK-2026-09-14
+
+- [x] Re-ran the source-span/revision audit in read-only mode.
+- [x] Confirmed `4` current and `2` stale source revisions.
+- [x] Confirmed span outcomes: `7` in-bounds, `2` text mismatches, and `295`
+      with no span claim.
+- [ ] Re-extract stale, mismatched, and spanless observations against the
+      admitted source frame before human review or ontology promotion.
+
+Status: `SOURCE_REVISION_DRIFT_DETECTED`; authority=false;
+writesPerformed=false.
+Evidence: `docs/reports/feature-ontology-source-span-revision-v1.json`.
+
 ### ONTOLOGY-CROSSWALK-RECHECK-2026-09-12-R2
 
 - [x] Re-ran the read-only feature/ontology crosswalk audit.
@@ -4000,6 +4098,35 @@ blocked until revision-qualified evidence exists.
 Evidence: `docs/reports/feature-ontology-fresh-producer-selection-v1.json`;
 `scripts/atlas/audit-feature-ontology-fresh-producer-selection-v1.mjs`.
 Status: `PRODUCER_OWNER_SELECTED_REVIEW_ONLY`; authority=false;
+
+### ONTOLOGY-FRESH-PRODUCER-RECHECK-2026-09-14
+
+- [x] Re-ran the read-only fresh-producer selection audit.
+- [x] Confirmed `feature-ontology-fresh-extractor-v1` remains the selected
+      owner, with Tree-sitter, Python enrichment, and grounded LangExtract as
+      permitted adapters.
+- [x] Confirmed `groundedSources=0`; owner selection is review-only and does
+      not establish a current ontology cohort.
+- [ ] Supply revision-qualified grounded sources and independently validate
+      spans before ontology tuple admission.
+
+Status: `PRODUCER_OWNER_SELECTED_REVIEW_ONLY`; authority=false;
+writesPerformed=false.
+Evidence: `docs/reports/feature-ontology-fresh-producer-selection-v1.json`.
+
+### ONTOLOGY-FRESH-EXTRACTOR-RECHECK-2026-09-14
+
+- [x] Ran the selected fresh-extractor audit in read-only mode.
+- [x] Confirmed `6` approved source references, `595` historical tuples,
+      `3` local digest matches, and `1` compatible fresh extractor.
+- [x] Confirmed fresh ontology inputs remain incomplete; PostgreSQL writes are
+      disabled.
+- [ ] Reconcile the approved sources to the admitted snapshot and obtain
+      grounded span/revision evidence before producing ontology candidates.
+
+Status: `FRESH_ONTOLOGY_INPUTS_INCOMPLETE`; authority=false;
+postgresWrites=false.
+Evidence: `docs/reports/feature-ontology-fresh-extractor-v1.json`.
 writesPerformed=false. First blocker:
 `CURRENT_REVISION_QUALIFIED_GROUNDED_ONTOLOGY_SOURCE_MISSING`.
 
@@ -4249,6 +4376,22 @@ Evidence: `scripts/atlas/audit-feature-ontology-packet-lineage-v1.mjs`;
 `docs/reports/feature-ontology-packet-lineage-v1.json`.
 Status: `PACKET_CONTENT_LINEAGE_INCOMPLETE`; readOnly=true;
 writesPerformed=false.
+
+### FEATURE-ONTOLOGY-PACKET-LINEAGE-RECHECK-2026-09-14
+
+- [x] Re-ran the read-only packet-lineage audit against the current ontology
+      population.
+- [x] Examined `353,973` tuples; `353,120` remain `ALIAS_NOT_APPROVED` and
+      `853` have no current Graphify source match.
+- [x] Confirmed the script's `PACKET_CONTENT_LINEAGE_RECONCILED` label means
+      its deterministic comparison completed; it does not establish current
+      ontology admission because the current cohort remains empty.
+- [ ] Require approved aliases or exact current packet/source lineage before
+      admitting ontology tuples or materializing graph relationships.
+
+Status: `PACKET_CONTENT_LINEAGE_RECONCILED_BUT_CURRENT_ADMISSION_BLOCKED`;
+readOnly=true; writesPerformed=false.
+Evidence: `docs/reports/feature-ontology-packet-lineage-v1.json`.
 
 ### ACE-GROUNDING-FAILCLOSED-01: third live caller found and type-corrected (2026-09-13, error-check pass)
 
@@ -4683,3 +4826,18 @@ only):
 
 Not executed. Status: `JUNK_ATLAS_PACKETS_CLEANUP_FANOUT_SCOPED_44326_ONTOLOGY_TUPLES_LARGER_THAN_EXPECTED_NOT_EXECUTED`;
 authority=false; writesPerformed=false (temp-table + read-only joins only).
+
+### ONTOLOGY-CURRENT-COHORT-RECHECK-2026-09-14
+
+- [x] Re-ran the current ontology-cohort audit against the admitted workspace
+      revision.
+- [x] Confirmed `353,973` tuples examined, `58,092` exact source references,
+      and `0` current-workspace source references or tuples.
+- [x] Recorded `22,236` exact wrong-workspace matches, `41` ambiguous exact
+      bindings, and `331,464` rows without an exact Graphify source.
+- [ ] Rebind or regenerate ontology evidence from a terminal snapshot-bound
+      execution before admitting concepts, tuples, or graph relationships.
+
+Status: `CURRENT_RELATIONSHIP_COHORT_EMPTY`; expected workspace revision is
+the admitted tournament revision; authority=false; writesPerformed=false.
+Evidence: `docs/reports/feature-ontology-current-cohort-v1.json`.

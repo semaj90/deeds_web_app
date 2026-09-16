@@ -1,41 +1,51 @@
 {
   "schema": "atlas.current-workspace-packet-chunk-join.v1",
   "mode": "READ_ONLY_CENSUS",
+  "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+  "workspaceRevisionInput": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "scope": "BOUNDED_SAMPLE",
+  "sampleLimit": 25,
   "workspaceRevisions": [
-    "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9"
+    "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+    "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+    "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc"
   ],
   "counts": {
-    "binding_rows": 111,
-    "binding_sources": 111,
-    "graphify_exact_sources": 0,
-    "binding_chunk_content_matches": 0,
-    "packet_chunk_exact_sources": 0,
+    "binding_rows": 25,
+    "binding_sources": 25,
+    "graphify_exact_sources": 25,
+    "binding_proven_lineage_sources": 2,
+    "packet_chunk_exact_sources": 2,
     "packet_content_matches": 0
   },
   "chunkInventory": {
-    "chunk_rows": 55853,
-    "chunks_with_source_ref": 53498,
-    "chunks_with_relative_path": 55853,
-    "chunks_with_content_hash": 55816,
-    "indexed_relative_paths": 4746,
-    "indexed_source_refs": 4599
+    "chunk_rows": 274465,
+    "chunks_with_source_ref": 272110,
+    "chunks_with_relative_path": 274465,
+    "chunks_with_content_hash": 274428,
+    "indexed_relative_paths": 28207,
+    "indexed_source_refs": 28070
   },
   "pathCoverage": {
-    "binding_sources": 111,
-    "bindings_with_relative_path_chunks": 69,
-    "bindings_with_source_ref_chunks": 68
+    "binding_sources": 25,
+    "bindings_with_relative_path_chunks": 18,
+    "bindings_with_source_ref_chunks": 18
   },
   "mismatchDiagnostics": {
-    "binding_rows": 111,
-    "normalized_source_matches": 111,
-    "normalized_revision_matches": 111,
-    "normalized_content_matches": 111,
-    "normalized_workspace_matches": 0,
-    "workspace_mismatch_rows": 111,
+    "binding_rows": 25,
+    "normalized_source_matches": 25,
+    "normalized_revision_matches": 25,
+    "normalized_content_matches": 25,
+    "normalized_workspace_matches": 25,
+    "workspace_mismatch_rows": 0,
     "missing_source_rows": 0,
     "revision_mismatch_rows": 0,
     "content_mismatch_rows": 0
   },
+  "currentGraphifyEvidenceOwner": "graphify_execution_file_membership_v2; explicit execution only",
+  "legacyGraphifyEvidenceExcludedFromCurrentJoin": true,
+  "mismatchDiagnosticScope": "explicit admitted workspace revision and execution only; historical rows are not used for current-gate promotion",
+  "mismatchDiagnosticNote": null,
   "hashGrain": {
     "bindingContentDigest": "whole-source digest; exact Graphify file content hash",
     "graphifyContentHash": "whole-source digest",
@@ -50,6 +60,6 @@
     "valkey": false
   },
   "canonicalAuthority": false,
-  "status": "CURRENT_PACKET_CHUNK_JOIN_MISSING",
+  "status": "CURRENT_PACKET_CHUNK_JOIN_PARTIAL",
   "nextGate": "CURRENT_PACKET_CHUNK_IDENTITY_RECONCILIATION"
 }

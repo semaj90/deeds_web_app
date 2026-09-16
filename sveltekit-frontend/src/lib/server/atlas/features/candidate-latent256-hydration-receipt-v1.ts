@@ -134,6 +134,64 @@ export interface CandidateLatent256HydrationObservationV1 {
   vector: readonly number[] | null;
 }
 
+export const latentRepresentationLineageAdmissionV1Schema = z.object({
+  schema: z.literal('atlas.latent-representation-lineage-admission.v1'),
+  status: z.enum(['ADMITTED', 'BLOCKED_SEMANTIC_PARENT']),
+  candidateSnapshotRevision: revision,
+  ordinalMapChecksum: checksum,
+  workspaceRevision: revision,
+  semanticRepresentationId: z.literal('semantic_768'),
+  semanticRepresentationRevision: revision,
+  latentRepresentationId: z.literal(LATENT256_REPRESENTATION_ID),
+  latentRepresentationRevision: revision,
+  transformRevision: revision,
+  transformChecksum: checksum,
+  canonicalAuthority: z.literal(false),
+  writesPerformed: z.literal(false),
+  reason: z.string().min(1).nullable(),
+}).strict().superRefine((admission, ctx) => {
+  if (admission.status === 'ADMITTED' && admission.reason !== null) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['reason'], message: 'ADMITTED_LATENT_REASON_FORBIDDEN' });
+  }
+  if (admission.status === 'BLOCKED_SEMANTIC_PARENT' && admission.reason === null) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['reason'], message: 'BLOCKED_LATENT_REASON_REQUIRED' });
+  }
+});
+export type LatentRepresentationLineageAdmissionV1 = z.infer<typeof latentRepresentationLineageAdmissionV1Schema>;
+
+/** Pure Stage 7 admission; the latent representation remains derived. */
+export function admitLatent256RepresentationLineageV1(input: {
+  candidateSnapshotRevision: string;
+  ordinalMapChecksum: string;
+  workspaceRevision: string;
+  semanticRepresentationRevision: string;
+  latentRepresentationRevision: string;
+  transformRevision: string;
+  transformChecksum: string;
+  semanticParentStatus: 'ADMITTED' | 'BLOCKED' | 'UNAVAILABLE';
+}): LatentRepresentationLineageAdmissionV1 {
+  const reason = input.semanticParentStatus === 'ADMITTED'
+    ? null
+    : `SEMANTIC_PARENT_${input.semanticParentStatus}`;
+  const body = {
+    schema: 'atlas.latent-representation-lineage-admission.v1' as const,
+    status: reason ? 'BLOCKED_SEMANTIC_PARENT' as const : 'ADMITTED' as const,
+    candidateSnapshotRevision: input.candidateSnapshotRevision,
+    ordinalMapChecksum: input.ordinalMapChecksum,
+    workspaceRevision: input.workspaceRevision,
+    semanticRepresentationId: 'semantic_768' as const,
+    semanticRepresentationRevision: input.semanticRepresentationRevision,
+    latentRepresentationId: LATENT256_REPRESENTATION_ID,
+    latentRepresentationRevision: input.latentRepresentationRevision,
+    transformRevision: input.transformRevision,
+    transformChecksum: input.transformChecksum,
+    canonicalAuthority: false as const,
+    writesPerformed: false as const,
+    reason,
+  };
+  return latentRepresentationLineageAdmissionV1Schema.parse(body);
+}
+
 function canonicalJson(value: unknown): string {
   if (value === null || typeof value !== 'object') return JSON.stringify(value);
   if (Array.isArray(value)) return `[${value.map(canonicalJson).join(',')}]`;

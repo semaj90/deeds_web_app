@@ -10,7 +10,7 @@
  * Bump CONTRACT_VERSION to introduce breaking changes.
  */
 
-export const CONTRACT_VERSION = 'atlas-ae-train-v1';
+export const CONTRACT_VERSION = 'atlas-ae-train-v2';
 
 // ── Manifest Entry Schema ─────────────────────────────────────────────────────
 // One entry per atlas_packets row selected for AE training.
@@ -40,8 +40,8 @@ export const MANIFEST_ENTRY_SCHEMA = {
     version:           { type: 'string', pattern: '^[0-9]+\\.[0-9]+\\.[0-9]+$' },
     /** Qdrant collection supplying the raw embedding. */
     qdrant_collection: { type: 'string', minLength: 1 },
-    /** Qdrant point UUID for this packet's embedding. */
-    qdrant_point_id:   { type: 'string', minLength: 1 },
+    /** Qdrant point UUID for this packet's embedding; null when unresolved. */
+    qdrant_point_id:   { type: ['string', 'null'], minLength: 1 },
     /** Source embedding dimension (768 for codebase_chunks_768). */
     embed_dim:         { type: 'integer', enum: [768] },
     /** 0–100; higher = train first. Derived from feature_registry topology. */
@@ -209,7 +209,7 @@ export const REPORT_SCHEMA = {
  */
 export function validateManifestEntry(entry) {
   for (const field of MANIFEST_ENTRY_SCHEMA.required) {
-    if (entry[field] === undefined || entry[field] === null) {
+    if (entry[field] === undefined) {
       throw new Error(`AeTrainManifestEntry missing required field: ${field}`);
     }
   }
@@ -218,6 +218,12 @@ export function validateManifestEntry(entry) {
   }
   if (entry.version && !/^\d+\.\d+\.\d+$/.test(entry.version)) {
     throw new Error(`AeTrainManifestEntry version must be semver, got ${entry.version}`);
+  }
+  if (entry.status === 'pending' && (typeof entry.qdrant_point_id !== 'string' || !entry.qdrant_point_id.trim())) {
+    throw new Error('AeTrainManifestEntry pending records require a real qdrant_point_id');
+  }
+  if (entry.status === 'error' && entry.qdrant_point_id !== null) {
+    throw new Error('AeTrainManifestEntry error records must not contain a qdrant_point_id');
   }
 }
 

@@ -1,0 +1,17 @@
+{
+  "schema": "atlas.graphify-canary-expectation.v1",
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "snapshotRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+  "sourceSelectionChecksum": "sha256:dccaf9f6e84b1d3b1c49f2b6f110b9b9946b895703ac0987cbb70a3608223efb",
+  "sourceCount": 25542,
+  "identityChecksum": "c30fbda0b39901b13581a7d2de635dc1cb0f41ec9c5d676a6c01347c878a7f12",
+  "graphifyExecutionAuthorized": false,
+  "canonicalWritesAuthorized": false,
+  "authority": false,
+  "generatedAt": "2026-09-15T01:07:12.559Z",
+  "mode": "READ_ONLY_EXPECTATION_DERIVATION",
+  "admissionReceiptPath": "docs/reports/workspace-revision-tournament-admission-v1.json",
+  "writesPerformed": false,
+  "datastoreWritesPerformed": false,
+  "nextGate": "SNAPSHOT-BOUND-GRAPHIFY-CANARY-01"
+}

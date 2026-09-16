@@ -1,7 +1,7 @@
 {
   "schema": "atlas.source-registry-owner-join.v1",
   "gate": "SOURCE-REGISTRY-OWNER-JOIN-01",
-  "generatedAt": "2026-09-05T21:31:25.731Z",
+  "generatedAt": "2026-09-14T03:19:44.078Z",
   "mode": "READ_ONLY",
   "canonicalAuthority": false,
   "writesPerformed": false,
@@ -744,5 +744,5 @@
     }
   ],
   "databaseError": null,
-  "reportChecksum": "sha256:f08ae755b8c8860fa7ad880cfda2d07d5a1e4033d2fcba323dfa6ade4b578325"
+  "reportChecksum": "sha256:9dc89adc26d81f5476b3e207f7e07fd970c822ba1affe301bcbb6af35eb9ead0"
 }

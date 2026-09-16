@@ -68,6 +68,7 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { z } from 'zod';
 import { Pool } from 'pg';
 import { ENV } from '../lib/server/env.server.js';
+import { resolveRerankEndpoint } from '../lib/server/search/rerank-endpoint.js';
 import { ensureOpenTelemetry } from '../lib/server/observability/opentelemetry.js';
 import { recordToolCallBegin } from '../lib/server/telemetry/tool-call-recorder.js';
 import { asUuid, buildTraceDynamicContextRecommendation } from '../lib/server/mcp/trace-dynamic-context-audit.js';
@@ -153,7 +154,7 @@ const PG_URL            = ENV.DATABASE_URL;
 const TOPO_URL          = ENV.TOPOLOGY_SEARCH_URL;
 const GO_SEARCH_URL     = ENV.GO_SEARCH_URL;
 const GO_RETRIEVAL_URL  = ENV.RETRIEVAL_HTTP_URL;
-const RERANK_URL        = ENV.RERANK_URL;
+const RERANK_URL        = resolveRerankEndpoint(ENV);
 const TURBOQUANT_URL    = ENV.TURBOQUANT_URL;
 const OLLAMA_BASE       = ENV.OLLAMA_BASE_URL;
 const OLLAMA_EMBED_MODEL = ENV.OLLAMA_EMBED_MODEL;

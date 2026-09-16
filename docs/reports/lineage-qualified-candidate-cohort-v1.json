@@ -1,6 +1,6 @@
 {
   "schema": "atlas.lineage-qualified-candidate-cohort-v1",
-  "generatedAt": "2026-09-09T01:50:42.374Z",
+  "generatedAt": "2026-09-16T00:02:03.054Z",
   "readOnly": true,
   "postgresWrites": false,
   "authority": {
@@ -22,11 +22,11 @@
     "exact_graphify_source": 17144,
     "workspace_revision_present": 17144,
     "source_revision_present": 17144,
-    "packet_chunk_exact": 100,
-    "packet_chunk_ambiguous": 756,
+    "packet_chunk_exact": 99,
+    "packet_chunk_ambiguous": 13750,
     "graph_revision_present": 0,
     "semantic_revision_present": 17144,
-    "source_chunk_qualified": 100,
+    "source_chunk_qualified": 99,
     "fully_qualified": 0
   },
   "sampleExactJoins": [

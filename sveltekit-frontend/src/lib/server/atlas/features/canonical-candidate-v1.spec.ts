@@ -8,6 +8,7 @@ import {
   candidateOrdinalMapV1Schema,
   compareUtf8,
   materializeCandidateOrdinalMap,
+  materializeRevisionQualifiedSourceChunkOrdinalMapV1,
   assertCandidateOrdinalMapIntegrityV1,
   resolveCanonicalCandidateByOrdinal,
   type CanonicalCandidateIdentityInput,
@@ -113,6 +114,63 @@ describe('materializeCandidateOrdinalMap', () => {
       candidates: [candidate({ canonicalId: 'cand:a' }), candidate({ canonicalId: 'cand:b', packetKey: 'packet:2' })],
     });
     expect(() => assertCandidateOrdinalMapIntegrityV1(map)).not.toThrow();
+  });
+});
+
+describe('materializeRevisionQualifiedSourceChunkOrdinalMapV1', () => {
+  it('fails closed when the current source/chunk cohort is unavailable', () => {
+    expect(() => materializeRevisionQualifiedSourceChunkOrdinalMapV1({
+      cohort: null,
+      producerRevision: 'ordinal-producer-v1',
+    })).toThrow('CURRENT_SOURCE_CHUNK_COHORT_UNAVAILABLE');
+  });
+
+  it('requires packet and source identity for every admitted candidate', () => {
+    const sourceMap = materializeCandidateOrdinalMap({
+      candidateSnapshotRevision: 'snap-r1',
+      workspaceRevision: 'ws-r1',
+      producerRevision: 'source-producer-v1',
+      candidates: [candidate({ canonicalId: 'cand:source', packetKey: 'packet:source', sourceRef: 'src/source.ts' })],
+    });
+    expect(() => materializeRevisionQualifiedSourceChunkOrdinalMapV1({
+      cohort: {
+        status: 'REVISION_QUALIFIED',
+        workspaceRevision: 'ws-r1',
+        candidateSnapshotRevision: 'snap-r1',
+        sourceRevisionSetChecksum: 'source-set-checksum',
+        candidates: [{ ...sourceMap.candidates[0], packetKey: null }],
+      },
+      producerRevision: 'ordinal-producer-v1',
+    })).toThrow('PACKET_IDENTITY_REQUIRED');
+  });
+
+  it('delegates to deterministic ordinal materialization for a qualified cohort', () => {
+    const base = materializeCandidateOrdinalMap({
+      candidateSnapshotRevision: 'snap-r1',
+      workspaceRevision: 'ws-r1',
+      producerRevision: 'source-producer-v1',
+      candidates: [
+        candidate({ canonicalId: 'cand:z', packetKey: 'packet:z', sourceRef: 'src/z.ts' }),
+        candidate({ canonicalId: 'cand:a', packetKey: 'packet:a', sourceRef: 'src/a.ts' }),
+      ],
+    });
+    const input = {
+      cohort: {
+        status: 'REVISION_QUALIFIED' as const,
+        workspaceRevision: 'ws-r1',
+        candidateSnapshotRevision: 'snap-r1',
+        sourceRevisionSetChecksum: 'source-set-checksum',
+        candidates: base.candidates,
+      },
+      producerRevision: 'ordinal-producer-v1',
+    };
+    const mapA = materializeRevisionQualifiedSourceChunkOrdinalMapV1(input);
+    const mapB = materializeRevisionQualifiedSourceChunkOrdinalMapV1({
+      ...input,
+      cohort: { ...input.cohort, candidates: [...input.cohort.candidates].reverse() },
+    });
+    expect(mapA.ordinalMapChecksum).toBe(mapB.ordinalMapChecksum);
+    expect(mapA.candidates.map((item) => item.packetKey)).toEqual(['packet:a', 'packet:z']);
   });
 });
 

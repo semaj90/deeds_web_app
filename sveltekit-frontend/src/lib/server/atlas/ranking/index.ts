@@ -14,8 +14,9 @@ import type { Reranker, RerankRequest, RerankResult, RerankResultItem } from './
 import { randomUUID } from 'node:crypto';
 
 /**
- * Creates an Atlas-interface-compatible reranker backed by the canonical
- * MixedbreadCanonicalReranker + DeterministicReranker fallback.
+ * Creates an Atlas-interface-compatible reranker. The transitional
+ * Mixedbread compatibility lane is opt-in; the default is deterministic
+ * fallback until the owned model is trained and promoted.
  *
  * All errors are caught; on failure returns candidates in original score order
  * with fallbackReason set.
@@ -30,6 +31,9 @@ export function createAtlasReranker(): Reranker {
       const start = Date.now();
 
       try {
+        if ((process.env.MIXEDBREAD_RERANK_MODE ?? 'off').trim().toLowerCase() !== 'active') {
+          throw new Error('MIXEDBREAD_DISABLED_BY_POLICY');
+        }
         const { MixedbreadCanonicalReranker } =
           await import('$lib/server/retrieval/canonical-rerank-executor.js');
 

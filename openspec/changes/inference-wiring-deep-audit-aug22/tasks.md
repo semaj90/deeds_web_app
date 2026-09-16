@@ -131,3 +131,13 @@ Requested directly by the user after reviewing `summarizer.ts`'s conversion: rat
 - [x] The previously reported `openai-facade.spec.ts` failure cluster was rechecked against the current working tree. `npx vitest run tests/openai-facade.spec.ts --reporter=dot` passes **14/14**. The model assertions use the configured runtime contract (`LLAMA_SERVER_MODEL`, otherwise the configured model-path basename) rather than a hard-coded Gemma4 or Ornith filename. `openai-facade.ts` still maps friendly request aliases through `LLM_MODEL_ID`; live inference callers use `resolveLlamaInferenceTarget()`/`GET :8090/v1/models` for the loaded model identity. A bounded live `GET http://127.0.0.1:8090/v1/models` returned exactly one loaded model, `ornith-1.5-9b` (`owned_by=llamacpp`). **Disposition: ALREADY_FIXED / PROVEN_BY_FOCUSED_TEST plus live model-identity confirmation.**
 - [x] Live read-only schema verification found both previously reported tables in `public`: `intent_eval_runs` and `llm_synthesis_events`. Their primary keys and expected supporting indexes are present. No migration or table creation was added. **Disposition: FALSE_CURRENT_GAP / LIVE_SCHEMA_PRESENT.**
 - [ ] A real end-to-end facade replay against a live inference request remains a separate runtime gate; the focused mocked suite does not claim production synthesis readiness. Do not treat this note as proof of live model generation, MCP health, or database write-path coverage.
+
+## OPENAI-FACADE-FOCUSED-RECHECK-2026-09-14
+
+- [x] Re-ran `tests/openai-facade.spec.ts` against the current working tree: **15/15 tests passed**.
+- [x] Confirmed the TurboQuant-to-Bifrost fallback is observable in the focused stream test without turning fallback behavior into a production-readiness claim.
+- [ ] Live end-to-end facade replay remains open. The focused suite does not prove live model generation, MCP health, database persistence, or production synthesis readiness.
+
+Status: `FOCUSED_TEST_PROVEN_LIVE_E2E_OPEN`; `writesPerformed=false`.
+
+Evidence: `sveltekit-frontend/tests/openai-facade.spec.ts` focused Vitest run on 2026-09-14.

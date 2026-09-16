@@ -1,0 +1,176 @@
+{
+  "schema": "atlas.graphify-symbol-extractor-receipt.v1",
+  "generatedAt": "2026-09-13T00:26:19.355Z",
+  "apply": true,
+  "limit": 200,
+  "workspaceIdFilter": null,
+  "candidatesConsidered": 200,
+  "skippedNonTsJs": 173,
+  "filesProcessed": 26,
+  "filesFailed": 1,
+  "totalSymbolsExtracted": 83,
+  "totalSymbolsInserted": 83,
+  "plan": [
+    {
+      "fileId": "b40d7531-6a47-48ee-a9ba-9f19f57be421",
+      "sourceRef": "$lib/utils/file-reader.ts",
+      "outcome": "FILE_MISSING_ON_DISK"
+    },
+    {
+      "fileId": "eb5b1be7-a80f-4f78-b64b-5eb9503f4017",
+      "sourceRef": "ace-pipeline-audit.mjs",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 0
+    },
+    {
+      "fileId": "a69e756e-a1d6-49a4-ae12-4ca2d8c3ac90",
+      "sourceRef": "ace-vector-selection-slice/src/lib/server/ace/ranking/packet-feature-matrix.test.ts",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 2
+    },
+    {
+      "fileId": "f9cf7511-fb39-4f5d-8ee8-9988ab4b5317",
+      "sourceRef": "ace-vector-selection-slice/src/lib/server/ace/ranking/packet-feature-matrix.ts",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 8
+    },
+    {
+      "fileId": "e3dc04f0-0957-4d34-a044-3c48c9c03a03",
+      "sourceRef": "ace-vector-selection-slice/src/lib/server/ace/vector/ace-packet-vector.test.ts",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 3
+    },
+    {
+      "fileId": "e086bf0b-73a2-4f11-b4be-4d964488e78a",
+      "sourceRef": "ace-vector-selection-slice/src/lib/server/ace/vector/ace-packet-vector.ts",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 7
+    },
+    {
+      "fileId": "29abca28-51b2-40b2-ada3-ee7af1b66992",
+      "sourceRef": "ace-vector-selection-slice/src/lib/server/ace/vector/turbovec-interpolation.test.ts",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 3
+    },
+    {
+      "fileId": "cf5c9a23-e659-416d-9bb0-a9c072a031af",
+      "sourceRef": "ace-vector-selection-slice/src/lib/server/ace/vector/turbovec-interpolation.ts",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 7
+    },
+    {
+      "fileId": "bdbc0ee8-0a1f-4c43-9a44-730378be1721",
+      "sourceRef": "audit-opencode-state.mjs",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 3
+    },
+    {
+      "fileId": "9d9d7257-18fe-4d9a-bda2-a1083ea2e9f9",
+      "sourceRef": "backfill-neo4j-cell-id.mjs",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 5
+    },
+    {
+      "fileId": "a30f62ff-a2fa-4a12-a97b-f5064b929c8c",
+      "sourceRef": "backfill-payload-metadata.mjs",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 3
+    },
+    {
+      "fileId": "0c507b9c-77d6-4375-8d32-892a31079134",
+      "sourceRef": "backfill-qdrant-by-packet-key.mjs",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 3
+    },
+    {
+      "fileId": "1113aa15-de24-4c0c-acc1-558001323786",
+      "sourceRef": "backfill-qdrant-identity.mjs",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 3
+    },
+    {
+      "fileId": "261eefbf-8ba4-46b4-8d65-555b776b7aa4",
+      "sourceRef": "backfill-qdrant-via-patch.mjs",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 3
+    },
+    {
+      "fileId": "c056aa18-3180-4831-a16d-0949f818dc4a",
+      "sourceRef": "check-neo4j.mjs",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 1
+    },
+    {
+      "fileId": "fb2ac88f-36df-4bca-973f-65b8360085a5",
+      "sourceRef": ".claude/hooks/posttooluse-audit.mjs",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 3
+    },
+    {
+      "fileId": "f6e598c4-7055-4c08-91f6-8276622cb642",
+      "sourceRef": ".claude/hooks/pretooluse-deny.mjs",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 2
+    },
+    {
+      "fileId": "ceb13bd7-cf5f-4133-b38e-db0a42d5668f",
+      "sourceRef": ".claude/hooks/pretooluse-deny.mjs",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 2
+    },
+    {
+      "fileId": "7b3d67ba-812d-4ed8-96aa-633078949a72",
+      "sourceRef": "crates/atlas_packet_parser/index.d.ts",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 1
+    },
+    {
+      "fileId": "1b356b3d-0d53-40bc-8e0a-4d2ce39a1845",
+      "sourceRef": "crates/atlas_packet_parser/index.js",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 1
+    },
+    {
+      "fileId": "0d419941-bbd3-48d9-ae0f-acdb2878804e",
+      "sourceRef": "crates/atlas_packet_parser/wrapper.d.ts",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 3
+    },
+    {
+      "fileId": "346c1e76-7bc3-4b98-a301-8e7c2e9f308e",
+      "sourceRef": "crates/atlas_packet_parser/wrapper.js",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 0
+    },
+    {
+      "fileId": "da8ef329-5898-4b1d-866d-9f6233b56c4d",
+      "sourceRef": "crates/turbovec-napi/index.d.ts",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 6
+    },
+    {
+      "fileId": "7e9ce8a5-2f8a-4e29-b5b5-e7133b3bbb1d",
+      "sourceRef": "crates/turbovec-napi/index.js",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 1
+    },
+    {
+      "fileId": "e2014c75-28c9-4719-a92b-0a2e021a116c",
+      "sourceRef": "crates/turbovec-napi/wrapper.d.ts",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 9
+    },
+    {
+      "fileId": "9d47c811-b3e2-4cea-9df0-7db9daa6a0e3",
+      "sourceRef": "crates/turbovec-napi/wrapper.js",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 1
+    },
+    {
+      "fileId": "1b7c79f1-1336-45df-94ad-482967b12caf",
+      "sourceRef": "cypress/e2e/test-contradiction-flow.cy.ts",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 3
+    }
+  ]
+}

@@ -5,7 +5,7 @@
  * Read-only by construction: source text is inspected and a report is emitted.
  * It does not import retrieval code or execute ranking.
  */
-import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readdir, readFile, rename, writeFile } from 'node:fs/promises';
 import { dirname, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -102,7 +102,9 @@ const report = {
   safeNextCommand: 'npm run atlas:rrf:caller-baseline',
 };
 await mkdir(dirname(REPORT), { recursive: true });
-await writeFile(REPORT, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+const reportTemp = `${REPORT}.${process.pid}.tmp`;
+await writeFile(reportTemp, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+await rename(reportTemp, REPORT);
 console.log(JSON.stringify({
   schema: report.schema,
   status: report.status,

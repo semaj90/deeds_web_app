@@ -33,6 +33,12 @@ const REPORTS_DIR = path.join(REPO_ROOT, 'docs', 'reports');
 const OUT_JSON = path.join(REPORTS_DIR, 'postgres-contract-mirrors-report.json');
 const OUT_MD = path.join(REPORTS_DIR, 'postgres-contract-mirrors-report.md');
 
+async function writeReportAtomically(filePath, contents) {
+  const tempPath = `${filePath}.${process.pid}.${Date.now()}.tmp`;
+  await fs.writeFile(tempPath, contents, 'utf8');
+  await fs.rename(tempPath, filePath);
+}
+
 const TABLES = [
   {
     tableName: 'kanban_tasks',
@@ -658,8 +664,8 @@ async function main() {
   };
 
   await fs.mkdir(REPORTS_DIR, { recursive: true });
-  await fs.writeFile(OUT_JSON, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
-  await fs.writeFile(OUT_MD, buildMarkdown(report), 'utf8');
+  await writeReportAtomically(OUT_JSON, `${JSON.stringify(report, null, 2)}\n`);
+  await writeReportAtomically(OUT_MD, buildMarkdown(report));
 
   if (JSON_MODE) {
     console.log(JSON.stringify(report, null, 2));

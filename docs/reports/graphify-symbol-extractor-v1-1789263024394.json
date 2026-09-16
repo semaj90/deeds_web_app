@@ -1,0 +1,40 @@
+{
+  "schema": "atlas.graphify-symbol-extractor-receipt.v1",
+  "generatedAt": "2026-09-13T01:30:24.393Z",
+  "apply": true,
+  "useLsp": false,
+  "limit": 50,
+  "workspaceIdFilter": "625743d2-092b-4fa8-abe0-9dc094920c80",
+  "candidatesConsidered": 3,
+  "skippedUnsupported": 0,
+  "byFileKind": {
+    "markdown": 3
+  },
+  "filesProcessed": 3,
+  "filesFailed": 0,
+  "totalSymbolsExtracted": 101,
+  "totalSymbolsInserted": 77,
+  "plan": [
+    {
+      "fileId": "0135481c-0157-4e9a-a4b0-70f4bb8c70d0",
+      "sourceRef": ".claude/skills/codebase-indexing-agentic-error-fixing.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 24
+    },
+    {
+      "fileId": "ccd4bd95-9009-40d0-b4ab-d94b5fdee44c",
+      "sourceRef": ".claude/skills/codebase-indexing-agentic-error-fixing.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 24
+    },
+    {
+      "fileId": "63043e36-1f4f-4941-b10f-bde52eeca2b4",
+      "sourceRef": "docs/atlas/OPEN-LANES-NEXT-STEPS-2026-06-13.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 53
+    }
+  ]
+}

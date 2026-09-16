@@ -1,0 +1,67 @@
+{
+  "schema": "atlas.graphify-symbol-extractor-receipt.v1",
+  "generatedAt": "2026-09-13T18:45:36.815Z",
+  "apply": false,
+  "useLsp": false,
+  "limit": 5,
+  "workspaceIdFilter": null,
+  "workspaceRevisionFilter": null,
+  "workspaceRevisionCount": 1,
+  "workspaceRevisionMismatchCount": 0,
+  "candidatesConsidered": 5,
+  "skippedUnsupported": 0,
+  "byFileKind": {
+    "markdown": 5
+  },
+  "filesProcessed": 0,
+  "filesFailed": 0,
+  "totalSymbolsExtracted": 90,
+  "totalSymbolsInserted": null,
+  "plan": [
+    {
+      "fileId": "c5d4d836-2518-4f42-9b4d-db836563d5be",
+      "sourceRef": "2-CONTEXT.md",
+      "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+      "workspaceRevisionMatches": true,
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 9
+    },
+    {
+      "fileId": "abf840d1-8fd6-4fe5-b132-7697d2ec43c3",
+      "sourceRef": "724_agents.md",
+      "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+      "workspaceRevisionMatches": true,
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 4
+    },
+    {
+      "fileId": "66c86f5e-ae7c-410a-bef4-9019edd6b45c",
+      "sourceRef": "ACE-MATERIALIZATION-BLOCKER-1-FIXED.md",
+      "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+      "workspaceRevisionMatches": true,
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 35
+    },
+    {
+      "fileId": "63b5b71d-3241-4b6b-97f8-f42375616000",
+      "sourceRef": "ACE-QUICK-REFERENCE.md",
+      "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+      "workspaceRevisionMatches": true,
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 21
+    },
+    {
+      "fileId": "318c8a87-891d-4db5-a80b-73063bbdb4ce",
+      "sourceRef": "ACE-SUMMARY-LATENCY-IMPACT.md",
+      "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+      "workspaceRevisionMatches": true,
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 21
+    }
+  ]
+}

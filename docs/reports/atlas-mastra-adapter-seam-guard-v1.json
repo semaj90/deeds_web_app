@@ -1,0 +1,29 @@
+{
+  "reportVersion": "atlas-mastra-adapter-seam-guard-v1",
+  "status": "SCAFFOLD_GUARD_PROVEN",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "changes": {
+    "retrieval": "typed unavailable error",
+    "context": "typed unavailable error",
+    "validation": "explicit FAIL/unavailable result",
+    "discovery": "explicit UNAVAILABLE result",
+    "delegation": "explicit failed/unavailable result"
+  },
+  "tests": { "file": "sveltekit-frontend/src/lib/server/atlas/atlas-mastra-adapter.spec.ts", "passed": 3, "failed": 0 },
+  "legacyRepairBoundary": "scripts/phase66_automated_error_fixer.py is quarantined as historical evidence; direct shell/regex mutation is not executable",
+  "phase66ModelAlignment": {
+    "endpoint": "LLAMA_SERVER_URL (default http://127.0.0.1:8090)",
+    "model": "LLAMA_SERVER_MODEL (default ornith-1.5-9b)",
+    "runtimeProof": "PROVEN_READ_ONLY_GET_V1_MODELS",
+    "observedModel": "ornith-1.5-9b",
+    "activeCoordinator": "scripts/atlas/run-agentic-error-fixing-v1.mjs now records model resolution without invoking the model"
+  },
+  "remaining": [
+    "live retrieval owner and revision-qualified readback",
+    "ACE ContextManifest owner wiring",
+    "Postgres/Neo4j identity discovery owner",
+    "governed A2A/ACP/OpenCode delegation owner",
+    "canonical durable event DB/outbox readback"
+  ]
+}

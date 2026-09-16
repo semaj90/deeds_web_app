@@ -1,4 +1,4 @@
-# REL-01A Review Triage — 2026-09-09T00:57:59.099Z
+# REL-01A Review Triage — 2026-09-16T00:21:18.532Z
 
 **Read-only. Zero writes.** 51 candidates excluded (stale source: `sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts`).
 253 candidates triaged mechanically — confidence field ignored (uniformly 0.5, no signal).

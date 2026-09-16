@@ -1,0 +1,19 @@
+{
+  "schema": "atlas.openspec-ledger-write-contention.v1",
+  "result": null,
+  "writePerformed": false,
+  "target": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
+  "reason": "Concurrent ledger changes rejected the append; no force or overwrite was attempted.",
+  "preservedEvidence": "docs/reports/current-source-owner-reconciliation-v1.json",
+  "finding": {
+    "sourceNamespaceOwner": "PROVEN",
+    "currentInventoryCandidates": 24327,
+    "boundedCanaryRevision": "sha256:322ed1a6...",
+    "explicitSnapshotRevision": "sha256:ea92e7a9...",
+    "qualifyingTerminalExecutionsForExplicitSnapshot": 0,
+    "status": "CURRENT_SOURCE_AUTHORITY_NOT_PROVEN",
+    "blockers": ["WORKTREE_DIRTY_REQUIRES_SNAPSHOT_POLICY", "STATIC_WORKTREE_INVENTORY_DIFFERS_FROM_WORKSPACE_REVISION_MANIFEST"]
+  },
+  "nextSafeAction": "Stabilize the worktree, capture a new immutable snapshot, and retry the narrow ledger append.",
+  "writesPerformed": false
+}

@@ -9946,6 +9946,52 @@ aliases are now reported under `notChecked`, so they cannot mask MCP health.
   `docs/reports/structural-graph-pagerank-parity-v1.json`.
 - [x] Repeated both NetworkX and cuGraph twice on the same fixture; both
   backends returned zero repeat delta across all 6 nodes.
+
+### GPU environment reconciliation — 2026-09-14
+
+The current runtime audit confirms that the GPU capability is split across
+separate, intentionally non-conflated environments:
+
+- **8098 Docker RAPIDS executor:** the live `atlas-gpu-8098` container is
+  healthy with CUDA available on the RTX 3060 Ti. Its Python environment
+  imports `cudf 26.8.0`, `cuvs 26.8.0`, `cugraph 26.8.0`, and `cupy 14.1.1`.
+  `torch`, `cutile`, and Triton are not importable. The service remains
+  execution-only and its live health receipt reports PostgreSQL, Qdrant, and
+  Valkey writes as false.
+- **WSL2 RAPIDS environment:** the explicit
+  `/home/james/miniforge3/envs/atlas-rapids-cu13/bin/python` probe succeeds
+  with Python `3.14.6`, `cuvs/cugraph 26.06.00`, `cudf 26.06.01`, and CuPy
+  `14.1.1`; Torch is importable, but cuTile is not. This is the current
+  WSL2 RAPIDS/cuVS/cuGraph executor, not the 8098 Docker container.
+- **cuTile/SIMT challenger:** the repository contains read-only probes and a
+  prior bounded receipt proving cuTile `1.5.0` versus PyTorch `2.14.0+cu132`
+  FP16 GEMM parity on SM86, plus a finite SIMT companion probe. The live WSL2
+  interpreter is `/home/james/.venvs/atlas-cutile-cu132/bin/python`; the
+  earlier negative result checked the wrong Miniforge path. This environment
+  is separate from `atlas-rapids-cu13`, and remains a challenger rather than
+  a production decoder owner.
+- **Windows repository `.venv`:** Torch `2.8.0+cu128` is installed but
+  `cudaAvailable=false`; this remains a CPU/helper environment, not the CUDA
+  executor.
+- **WSL2 default Ubuntu Python:** the default `python3` does not expose the
+  RAPIDS packages; probes must use the explicit RAPIDS interpreter path.
+
+Current status:
+
+```text
+RAPIDS_CUVS_CUGRAPH_DOCKER_8098       PROVEN_LIVE_BOUNDED
+WSL2_RAPIDS_CUVS_CUGRAPH              PROVEN_LIVE_BOUNDED
+WSL2_RAPIDS_CUTILE                     NOT_PRESENT_IN_RAPIDS_ENV
+WSL2_CUTILE_SIMT_VENV                  PROVEN_LIVE_BOUNDED
+CURRENT_CUTILE_ENV_REACHABILITY        PROVEN_SEPARATE_VENV
+CPU_GPU_FULL_PIPELINE                  BLOCKED
+```
+
+This does not authorize merging the cuTile venv into the RAPIDS environment,
+adding PyTorch to the 8098 image, rebuilding containers, or promoting any
+GPU representation. The next gate is a read-only recheck of the recorded
+cuTile/SIMT probe in `/home/james/.venvs/atlas-cutile-cu132`, followed by the
+existing same-corpus CPU/GPU parity gates.
 - [x] Validated the existing production-sized frozen Parquet artifact with
   both live backends: `162234` nodes, `108156` edges, PageRank top-50 overlap
   `1.0`, correlation `1.0`, maximum delta `4.888482368395049e-9`, and Louvain
@@ -16908,6 +16954,25 @@ authority=false; writesPerformed=true (additive `atlas_packet_features.ast_symbo
 rows (separate, operator-gated decision per the earlier entries in this file and in
 `parent-atlas-ontology-kernel/tasks.md`) remains untouched and unattempted.
 
+### Autoencoder readiness recheck — 2026-09-14 (analyze-only)
+
+- [x] Re-ran `scripts/atlas/autoencoder-dataset-readiness.mjs` in analyze mode
+  against the live packet population.
+- [x] Confirmed current diagnostic coverage: AST `38,302/61,717` (`62.1%` raw,
+  `88.7%` of `40,715` eligibility-scoped rows), topology `99.9%`, and embedding
+  coverage `98.8%`.
+- [x] Kept the interpretation scoped: this supports a bounded training-data
+  readiness signal, not current semantic-corpus authority or permission to
+  export, train, promote latent representations, or write projections.
+- [ ] Reconcile semantic/source/workspace lineage before any AE export or
+  training admission; the remaining extractor gap is deferred diminishing-return
+  work, while revision-qualified corpus authority remains the blocker.
+
+Status: `AE_READINESS_DIAGNOSTIC_PROVEN_LINEAGE_ADMISSION_BLOCKED`;
+`writesPerformed=false` for this analyze pass.
+Evidence: `scripts/atlas/autoencoder-dataset-readiness.mjs` and the current
+read-only console receipt.
+
 ### Missing indexes + real CST identity (tree_node_ids) added, live-verified (2026-09-13, same day, operator request "address the missing indexes/cst piece")
 
 Follow-up to a broader gap audit against this session's own AST work (operator asked directly
@@ -17297,6 +17362,66 @@ Evidence: `docs/reports/latent-representation-identity-audit-2026-09-14.json`;
 `docs/reports/latent-representation-identity-audit-2026-09-14.md`;
 `scripts/atlas/audit-latent-representation-identity.mjs`.
 
+### RRF-CALLER-BASELINE-REPORT-RELIABILITY-RECHECK-2026-09-13
+
+- [x] Fixed the read-only RRF baseline receipt writer to use a per-process
+      temporary file followed by atomic rename, avoiding the Windows stable-
+      report replacement failure.
+- [x] Re-ran the audit successfully: `93` callers, `36` fusion callers,
+      `90` unmapped callers, `0` ambiguous mappings, and `2` executor-as-lane
+      cases.
+- [ ] Classify the `90` unmapped callers and resolve the `2` executor-as-lane
+      cases only after fixture equivalence and logical-lane ownership evidence.
+
+Status: `CALLER_BASELINE_INCOMPLETE_MIGRATION_BLOCKED`; migrationAuthorized=false;
+writesPerformed=false. This reliability fix does not change runtime fusion or
+authorize RRF migration.
+
+Evidence: `docs/reports/rrf-caller-baseline-v1.json`;
+`scripts/atlas/audit-rrf-caller-baseline-v1.mjs`.
+
+### LATENT-REPRESENTATION-NEXT-GATES-2026-09-13
+
+The latest read-only identity audit narrows the implementation blocker. The sampled
+latent bytes are present and uniformly 256 bytes (`64` little-endian float32 values),
+and packet/Qdrant identity classification is usable as diagnostic evidence. That does
+not establish promotion authority: `source_version_joined_count=0`,
+`symbol_version_id_present_count=0`, `representation_record_joined_count=0`, and
+`FULL_LINEAGE_PROVEN=0` across the bounded `1,000`-row sample. Qdrant payloads also
+carry neither source nor workspace revision in the sample (`0/250` for each).
+
+- [x] Record the latent identity result as a read-only diagnostic, not a production
+      representation admission.
+- [x] Preserve `workspace_revision`, `source_revision`, symbol-version, and
+      representation metadata as nullable observation-layer fields; NULL means
+      historical/unqualified, not an inferred revision and not an error by itself.
+- [x] Keep latent bytes classified as derived representation data; no latent row,
+      Qdrant point ID, packet key, tree-node ID, or byte offset is promoted to a
+      canonical identity by this audit.
+- [ ] `CURRENT-EXECUTION-LINEAGE-CLOSURE-01`: prove the explicit admitted snapshot
+      and terminal Graphify execution through immutable execution membership, then
+      read back exact source→packet→chunk joins before admitting latent rows.
+- [ ] `LATENT-REPRESENTATION-REGISTRY-ADMISSION-01`: reconcile each candidate to the
+      canonical representation contract with producer/model revision, input digest,
+      parameters digest, and exact parent `semantic_768` revision. Do not create or
+      populate a missing representation ledger from latent bytes alone.
+- [ ] `LATENT256-F32-DERIVATION-PARITY`: run the bounded independent derivation and
+      compare values only after the candidate cohort has exact source and representation
+      lineage. A byte-length match alone is insufficient.
+- [ ] `LATENT-CURRENT-COHORT-ADMISSION-01`: require one workspace revision, exact
+      source revision, symbol/version bridge where applicable, representation revision,
+      and deterministic readback checksum. Mixed or missing revisions fail closed.
+- [ ] Production latent projection, Qdrant fanout, cache warming, training, and
+      unbounded export remain unauthorized until the preceding gates have receipts.
+
+Current status: `LATENT_BYTES_PRESENT_LINEAGE_AUTHORITY_BLOCKED`; authority=false;
+writesPerformed=false. This entry intentionally does not mark the bounded numeric
+proof as current-corpus proof and does not authorize filling NULL provenance.
+
+Next safe gate: `node scripts/atlas/audit-graphify-workspace-snapshot-binding-v1.mts`
+followed by the existing current execution/source/packet/chunk readback audit once a
+terminal execution is available for the admitted snapshot.
+
 ### `used_concepts` AST-prefix contamination fixed (2026-09-13, closing the item flagged in the previous entry)
 
 Follow-up to the read-only census in the previous entry (4,910/59,530 packets, 8.2%, had
@@ -17549,3 +17674,58 @@ Status: `LEXICAL_FEATURES_OWNERSHIP_RESOLVED_ALL_WRITERS_ADDITIVE_ONLY_PHASE2B_R
 authority=false; writesPerformed=true (two code fixes; live verification used direct SQL probes
 against one real row each, confirming zero clobber -- no bulk apply run, no production
 `entities`/`lexical_features`/`used_concepts` data touched by this entry).
+
+### SESSION HANDOFF -- 2026-09-13, ended on context budget + pending git merge
+
+All work below is committed locally (`735d456e09`, "Fix real bugs across AST/CST coverage, POS
+tagging, and entity/concept extraction") but **NOT YET PUSHED to origin/main**. Read this section
+first before doing anything else with git in this repo.
+
+**Git state, exactly as left**:
+- Local `main` is at `735d456e09`, based on `9fc154d18d` (5 commits ahead of that base on local).
+- `origin/main` has moved to `3035675cea` ("close semantic collection owner audit") via **9 new
+  commits from other concurrent sessions** actively working this same repo (confirmed live --
+  another session's pasted output referencing `parent-atlas-graph-validation-fabric` appeared
+  mid-session; multiple new `agent/*-2026091[23]` branches also appeared on origin).
+- `git push origin main` was rejected (non-fast-forward, expected).
+- A `git merge origin/main --no-edit` was attempted but **did not actually complete** -- `git
+  status` afterward still showed "diverged, 5 and 9 different commits each" and no
+  `.git/MERGE_HEAD`, meaning the merge never started for real (the background-task notification
+  that reported it as "completed" was misleading -- verify actual state with `git log -1` and
+  `ls .git/MERGE_HEAD`, don't trust the notification alone).
+- The working tree has a large number of **unrelated, uncommitted modifications/deletions from
+  other concurrent sessions** sitting on top of this repo (many `docs/reports/*.json`, several
+  deleted files under `openspec/changes/parent-atlas-retrieval-logic-convergence/`,
+  `python/parent_atlas_ontology/oaklib_external_adapter*`, `sveltekit-frontend/src/lib/server/
+  atlas/retrieval/chunk-retrieval-profile-*`, etc.) -- **none of these are from this session, do
+  not stage or commit them.**
+- A `.git/index.lock` blocked all git writes for 6+ hours mid-session (unchanged timestamp across
+  many checks); user explicitly confirmed another session was active and explicitly authorized
+  removing it ("yes, remove the lock and commit") before it was removed. If a lock reappears,
+  get the same kind of explicit confirmation before removing it again -- don't assume stale.
+
+**Next step for whoever picks this up**: `git fetch origin`, then carefully merge `origin/main`
+into local `main` (a real `git merge`, verified this time via `git log -1` after, not just trusting
+a tool notification), resolving conflicts if any arise in the 20 files this session touched (listed
+in the commit) while leaving every other concurrent session's file changes untouched. Then
+`git push origin main`. Given 9+ unrelated commits landed upstream during this session, expect this
+merge to need real attention, not a blind auto-merge.
+
+**Substantive open items from this session, unchanged, still needing a fresh session**:
+1. `lexical_features` 4-writer canonical ownership -- policy recommendation recorded (`phase2b`),
+   not enforced; a real consolidation (extending phase2b to also produce `entities`/`used_concepts`
+   and formally deprecating the other 3) is future work.
+2. The `atlas_packets` junk-row cleanup (11,174 rows, `noExactGraphifySource`-driving-cause,
+   documented in `parent-atlas-ontology-kernel/tasks.md`) -- still an explicit operator decision,
+   untouched all session.
+3. OAK-based ontology-linking of the now-real `entities` data (via `atlas_oak_kernel.py`'s
+   `/lookup`/`/traverse`) -- flagged as a real, valuable, separate follow-up; not started.
+4. `used_concepts`' same contamination class was fixed; `atlas_oak_kernel`/`used_concepts` symmetry
+   with `entities` was NOT revisited after the entities OAK-linking question was raised -- worth a
+   fresh look together.
+5. 7 more AST-symbol extractors (rs/go/proto/sh/yaml/c-family/ps1) would close the remaining
+   ~2,400-row gap in AST/CST coverage past the already-achieved 88.7% -- explicitly deferred as
+   diminishing returns since the 80% threshold is already cleared.
+
+Status: `SESSION_HANDOFF_COMMIT_735D456E09_LOCAL_NOT_PUSHED_MERGE_NEEDED_FIRST`; authority=false;
+writesPerformed=false (this handoff entry is documentation only).

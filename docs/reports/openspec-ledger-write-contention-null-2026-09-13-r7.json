@@ -1,0 +1,16 @@
+{
+  "schema": "atlas.openspec-ledger-write-contention.v1",
+  "result": null,
+  "writePerformed": false,
+  "target": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
+  "reason": "Second append attempt was rejected because the shared ledger changed concurrently; no force or overwrite was attempted.",
+  "completedWorkNotRecordedInLedger": "Atomic receipt publication hardening in scripts/atlas/audit-current-graphify-snapshot-authority-v1.mts.",
+  "evidence": [
+    "docs/reports/current-graphify-snapshot-authority-v1.json",
+    "docs/reports/current-source-selection-input-v1.json",
+    "docs/reports/current-workspace-packet-chunk-join-v1.json"
+  ],
+  "status": "SNAPSHOT_RECEIPT_PUBLICATION_HARDENED_TERMINAL_OWNER_MISSING",
+  "nextSafeAction": "Retry the narrow ledger append after concurrent edits stop; retain CURRENT-EXECUTION-LINEAGE-CLOSURE-01 blocked.",
+  "writesPerformed": false
+}

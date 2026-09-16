@@ -1,0 +1,28 @@
+{
+  "reportVersion": "latent-backfill-revision-guard-v1",
+  "generatedAt": "2026-09-15T00:00:00.000Z",
+  "script": "scripts/atlas/backfill-latent-vectors.mjs",
+  "result": "REVISION_GUARD_PROVEN",
+  "applyRequiresExplicitWorkspaceRevision": true,
+  "workspaceRevisionFormat": "64-hex-sha256",
+  "syntheticRevisionFallback": false,
+  "dryRunMayRemainUnqualified": true,
+  "guardedApplyProbe": {
+    "invoked": true,
+    "arguments": ["--apply", "--legacy-unsafe-apply"],
+    "rejectedBeforePersistence": true,
+    "errorCode": "LATENT_WORKSPACE_REVISION_REQUIRED"
+  },
+  "writesPerformed": false,
+  "promotionEligible": false,
+  "remainingBlockers": [
+    "CURRENT_GRAPHIFY_EXECUTION_OWNER",
+    "SOURCE_PACKET_CHUNK_LINEAGE",
+    "CURRENT_SEMANTIC_PARENT_IDENTITY"
+  ],
+  "validation": {
+    "nodeCheck": "PASS",
+    "openspecStrict": "PASS",
+    "scopedDiffCheck": "PASS"
+  }
+}

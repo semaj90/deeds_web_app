@@ -1,0 +1,8 @@
+{
+  "result": null,
+  "writePerformed": false,
+  "target": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
+  "reason": "Three consecutive append attempts were rejected while concurrent edits were changing the shared ledger.",
+  "deferredFinding": "ace-vector-selection-slice/src/lib/server/ace/ranking/packet-feature-matrix.ts is tracked legacy or compatibility evidence under repo:root; active ownership remains unproven.",
+  "nextAction": "Continue read-only namespace and active-caller reconciliation without overwriting the shared ledger."
+}

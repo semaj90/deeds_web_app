@@ -1,0 +1,26 @@
+{
+  "schema": "atlas.rmm-allocator-probe.v1",
+  "generatedAt": "2026-09-11",
+  "environment": {
+    "gpu": "NVIDIA GeForce RTX 3060 Ti",
+    "computeCapability": [8, 6],
+    "rmm": "26.06.00",
+    "torch": "2.13.0+cu130",
+    "cuda": "13.0"
+  },
+  "allocation": {
+    "shape": [1024, 1024],
+    "dtype": "float16",
+    "finite": true,
+    "allocator": "rmm_cupy_allocator",
+    "elapsedMs": 3023.711
+  },
+  "status": "RMM_ALLOCATOR_FINITE_PROVEN",
+  "writes": false,
+  "canonicalAuthority": false,
+  "limitations": [
+    "allocator challenger smoke only",
+    "not the neural decoder allocator",
+    "no production residency or cache ownership"
+  ]
+}

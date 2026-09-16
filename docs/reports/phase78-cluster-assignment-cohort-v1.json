@@ -1,0 +1,36 @@
+{
+  "schema": "atlas.phase78-cluster-assignment-cohort-receipt.v1",
+  "gate": "PHASE78-CLUSTER-ASSIGNMENT-COHORT-01",
+  "status": "READ_ONLY_COHORT_IDENTIFIED",
+  "startedAt": "2026-09-14T23:44:55.709Z",
+  "finishedAt": "2026-09-14T23:44:55.873Z",
+  "databaseSnapshot": "6578109:6578109:",
+  "tables": {
+    "error_events_table": "error_events",
+    "error_clusters_table": "error_clusters",
+    "database_snapshot": "6578109:6578109:"
+  },
+  "affectedCohort": {
+    "totalEvents": 148,
+    "assignedEvents": 148,
+    "unassignedEvents": 0,
+    "distinctAssignedClusters": 1,
+    "clusterRows": 1,
+    "clusterDistribution": [
+      {
+        "cluster_id": "03ffef48-3a72-4f19-8d15-4c3afc5a494a",
+        "event_count": 148
+      }
+    ],
+    "missingParentClusters": []
+  },
+  "classification": "SINGLE_CLUSTER_ASSIGNMENT_SUSPECT",
+  "safeToRepair": false,
+  "repairAuthorization": "CLOSED",
+  "writesPerformed": false,
+  "rollbackOccurred": false,
+  "notes": [
+    "This receipt inventories persisted assignments only; it does not identify which run created them unless the live schema provides that provenance.",
+    "Existing assignments remain quarantined until a bounded replacement plan and explicit transaction authorization exist."
+  ]
+}

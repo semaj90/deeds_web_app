@@ -1,7 +1,7 @@
 {
   "schema": "atlas.qdrant-packet-fanout-v1",
-  "startedAt": "2026-09-10T20:27:34.945Z",
-  "completedAt": "2026-09-10T20:27:41.897Z",
+  "startedAt": "2026-09-14T03:18:52.516Z",
+  "completedAt": "2026-09-14T03:19:00.317Z",
   "readOnly": true,
   "qdrantWrites": false,
   "postgresWrites": false,

@@ -93,7 +93,9 @@ async function main() {
           strategy,
           JSON.stringify([concept]),
           score,
-          'gemma4'
+          // This writer creates synthetic references and randomized outcomes. Keep
+          // its provenance distinct from real model/retrieval captures.
+          'synthetic_fixture'
         ]));
       }
 

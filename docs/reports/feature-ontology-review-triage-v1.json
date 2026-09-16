@@ -1,6 +1,6 @@
 {
   "schema": "atlas.feature-ontology-review-triage.v1",
-  "generatedAt": "2026-09-09T00:57:59.099Z",
+  "generatedAt": "2026-09-16T00:21:18.532Z",
   "mode": "READ_ONLY_MECHANICAL_TRIAGE",
   "postgresWrites": false,
   "qdrantWrites": false,
@@ -23,8 +23,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
       "objectValue": "into",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_NOISE",
@@ -36,8 +35,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
       "objectValue": "reranking",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -49,8 +47,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
       "objectValue": "langgraph",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -62,8 +59,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
       "objectValue": "Parent",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -75,8 +71,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
       "objectValue": "retrieval",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -88,8 +83,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
       "objectValue": "const MIN_JOIN_COVERAGE",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -101,8 +95,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
       "objectValue": "function scoreSectionRelevance",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -114,8 +107,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
       "objectValue": "interface BinaryVectorArtifactV1",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -127,8 +119,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
       "objectValue": "const DOMAIN_PATH_HINTS",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -140,8 +131,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
       "objectValue": "limit",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_NOISE",
@@ -153,8 +143,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
       "objectValue": "W_SECTION",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -166,8 +155,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
       "objectValue": "const matched",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -179,8 +167,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
       "objectValue": "Graph",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -192,8 +179,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
       "objectValue": "function canonicalJson",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -205,8 +191,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
       "objectValue": "START",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_NOISE",
@@ -218,8 +203,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
       "objectValue": "const ent",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -231,8 +215,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
       "objectValue": "optional",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_NOISE",
@@ -244,8 +227,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
       "objectValue": "type ResearchDomain",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -257,8 +239,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
       "objectValue": "const ENTITY_CACHE_TTL",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -270,8 +251,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
       "objectValue": "type CanonicalTraceRow",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -283,8 +263,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
       "objectValue": "chunkHits",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -296,8 +275,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
       "objectValue": "registry",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -309,8 +287,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
       "objectValue": "via",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_NOISE",
@@ -322,8 +299,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
       "objectValue": "from",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_NOISE",
@@ -335,8 +311,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
       "objectValue": "Capabilities",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -348,8 +323,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
       "objectValue": "<anonymous>",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_NOISE",
@@ -361,8 +335,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
       "objectValue": "const W_ENTITY",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -374,8 +347,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
       "objectValue": "const needle",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -387,8 +359,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
       "objectValue": "suggestFix",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -400,8 +371,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
       "objectValue": "function persistTemporalRecommendationOutcomeIfEnabled",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -413,8 +383,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
       "objectValue": "CanonicalTraceRow",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -426,8 +395,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
       "objectValue": "const persisted",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -439,8 +407,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
       "objectValue": "const TEMPORAL_RECOMMENDATION_OUTCOME_PRODUCER",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -452,8 +419,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
       "objectValue": "DAG",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -465,8 +431,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
       "objectValue": "const DOMAIN_TAGS",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -478,8 +443,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
       "objectValue": "const canonicalRow",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -491,8 +455,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
       "objectValue": "run",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_NOISE",
@@ -504,8 +467,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
       "objectValue": "through",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -517,8 +479,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
       "objectValue": "const associatedLenses",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -530,8 +491,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
       "objectValue": "LangGraph",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -543,8 +503,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
       "objectValue": "ACE",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -556,8 +515,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
       "objectValue": "ace",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_NOISE",
@@ -569,8 +527,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
       "objectValue": "lensHits",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -582,8 +539,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
       "objectValue": "DOMAIN_TAGS",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -595,8 +551,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
       "objectValue": "LangExtract",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -608,8 +563,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
       "objectValue": "Implements",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -621,8 +575,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
       "objectValue": "Promise",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -634,8 +587,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
       "objectValue": "neighbor",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -647,8 +599,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
       "objectValue": "parallel",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -660,8 +611,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
       "objectValue": "W_ENTITY",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -673,8 +623,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
       "objectValue": "const chunkHits",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -686,8 +635,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
       "objectValue": "PacketIdentityV1",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -699,8 +647,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
       "objectValue": "synthesizer",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -712,8 +659,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
       "objectValue": "const canonicalRowByRef",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -725,8 +671,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
       "objectValue": "executeTool",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -738,8 +683,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
       "objectValue": "parseToolCall",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -751,8 +695,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
       "objectValue": "rerank",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -764,8 +707,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
       "objectValue": "DAG",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -777,8 +719,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
       "objectValue": "cache",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -790,8 +731,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
       "objectValue": "qdrant",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": true,
       "bucket": "GROUNDED",
@@ -803,8 +743,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
       "objectValue": "const str",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -816,8 +755,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
       "objectValue": "lensesToRetrieve",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -829,8 +767,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
       "objectValue": "lane",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -842,8 +779,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
       "objectValue": "const CANONICAL_COLLECTION",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -855,8 +791,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
       "objectValue": "server",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -868,8 +803,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
       "objectValue": "END",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -881,8 +815,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
       "objectValue": "are",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_NOISE",
@@ -894,8 +827,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
       "objectValue": "type InferenceRuntimeConfig",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -907,8 +839,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
       "objectValue": "lib",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_NOISE",
@@ -920,8 +851,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
       "objectValue": "plan",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -933,8 +863,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
       "objectValue": "classifies",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -946,8 +875,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
       "objectValue": "merge",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -959,8 +887,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
       "objectValue": "const value",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -972,8 +899,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
       "objectValue": "canonicalJson",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -985,8 +911,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
       "objectValue": "matched",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -998,8 +923,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
       "objectValue": "Qdrant",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": true,
       "bucket": "GROUNDED",
@@ -1011,8 +935,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
       "objectValue": "extension",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -1024,8 +947,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
       "objectValue": "tool",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -1037,8 +959,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
       "objectValue": "result",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -1050,8 +971,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
       "objectValue": "allSettled",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -1063,8 +983,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
       "objectValue": "concurrently",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -1076,8 +995,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
       "objectValue": "shared",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -1089,8 +1007,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
       "objectValue": "const keys",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -1102,8 +1019,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
       "objectValue": "hashContent",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -1115,8 +1031,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
       "objectValue": "the",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_NOISE",
@@ -1128,8 +1043,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
       "objectValue": "learning",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -1141,8 +1055,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
       "objectValue": "workers",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -1154,8 +1067,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
       "objectValue": "path",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -1167,8 +1079,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
       "objectValue": "orm",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_NOISE",
@@ -1180,8 +1091,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
       "objectValue": "const row",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -1193,8 +1103,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
       "objectValue": "const canonicalRows",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -1206,8 +1115,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
       "objectValue": "vector",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -1219,8 +1127,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
       "objectValue": "redis",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -1232,8 +1139,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
       "objectValue": "Aware",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -1245,8 +1151,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
       "objectValue": "final",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -1258,8 +1163,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
       "objectValue": "Research",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -1271,8 +1175,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
       "objectValue": "pattern",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -1284,8 +1187,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
       "objectValue": "function hashContent",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -1297,8 +1199,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
       "objectValue": "function adjustStrategy",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -1310,8 +1211,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
       "objectValue": "const lensHits",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -1323,8 +1223,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
       "objectValue": "function traceRerank",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -1336,8 +1235,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
       "objectValue": "Orchestrator",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -1349,8 +1247,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
       "objectValue": "const memoryHits",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -1362,8 +1259,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
       "objectValue": "shim",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -1375,8 +1271,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
       "objectValue": "Entity",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -1388,8 +1283,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
       "objectValue": "AgentState",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -1401,8 +1295,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
       "objectValue": "with",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_NOISE",
@@ -1414,8 +1307,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
       "objectValue": "query",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -1427,8 +1319,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
       "objectValue": "score",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -1440,8 +1331,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
       "objectValue": "Valkey",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -1453,8 +1343,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
       "objectValue": "const key",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -1466,8 +1355,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
       "objectValue": "Atlas",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -1479,8 +1367,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
       "objectValue": "interface GRPORerankResult",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -1492,8 +1379,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
       "objectValue": "provided",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -1505,8 +1391,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
       "objectValue": "PostgreSQL",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": true,
       "bucket": "GROUNDED",
@@ -1518,8 +1403,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
       "objectValue": "const sortedObj",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -1531,8 +1415,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
       "objectValue": "function preventLoop",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -1544,8 +1427,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
       "objectValue": "<anonymous>",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_NOISE",
@@ -1557,8 +1439,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
       "objectValue": "const authoritativeOutcome",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -1570,8 +1451,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
       "objectValue": "const result",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -1583,8 +1463,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
       "objectValue": "concurrent_research",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -1596,8 +1475,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
       "objectValue": "Neo4j",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": true,
       "bucket": "GROUNDED",
@@ -1609,8 +1487,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
       "objectValue": "Python",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -1622,8 +1499,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
       "objectValue": "topology",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -1635,8 +1511,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
       "objectValue": "client",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -1648,8 +1523,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
       "objectValue": "inspired",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -1661,8 +1535,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
       "objectValue": "bounded",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -1674,8 +1547,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
       "objectValue": "const W_SECTION",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -1687,8 +1559,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
       "objectValue": "for",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_NOISE",
@@ -1700,8 +1571,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
       "objectValue": "Multi",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -1713,8 +1583,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
       "objectValue": "interface RerankableChunk",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -1726,8 +1595,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
       "objectValue": "verification",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -1739,8 +1607,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
       "objectValue": "from",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_NOISE",
@@ -1752,8 +1619,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
       "objectValue": "service",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -1765,8 +1631,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
       "objectValue": "const contentLower",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -1778,8 +1643,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
       "objectValue": "injectACETableCache",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -1791,8 +1655,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
       "objectValue": "BinaryVectorArtifactV1",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -1804,8 +1667,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
       "objectValue": "const researchHits",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -1817,8 +1679,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
       "objectValue": "const limit",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -1830,8 +1691,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
       "objectValue": "const seenToolCalls",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -1843,8 +1703,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
       "objectValue": "NLP",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -1856,8 +1715,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
       "objectValue": "import",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -1869,8 +1727,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
       "objectValue": "GRPO",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -1882,8 +1739,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
       "objectValue": "not",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_NOISE",
@@ -1895,8 +1751,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
       "objectValue": "recordExecutionOutcome",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -1908,8 +1763,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
       "objectValue": "let intentBoost",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -1921,8 +1775,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
       "objectValue": "synthesis",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -1934,8 +1787,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
       "objectValue": "interface TopologyProjectionV1",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -1947,8 +1799,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
       "objectValue": "function scoreEntityOverlap",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -1960,8 +1811,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
       "objectValue": "Codebase",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -1973,8 +1823,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
       "objectValue": "extractQueryEntities",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -1986,8 +1835,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
       "objectValue": "LangGraphDomainClassificationRequest",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -1999,8 +1847,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
       "objectValue": "Designed",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -2012,8 +1859,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
       "objectValue": "RerankableChunk",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -2025,8 +1871,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
       "objectValue": "getQdrantManager",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -2038,8 +1883,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
       "objectValue": "MCP",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -2051,8 +1895,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
       "objectValue": "GRPORerankResult",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -2064,8 +1907,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
       "objectValue": "const sourceRef",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -2077,8 +1919,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
       "objectValue": "deep",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -2090,8 +1931,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
       "objectValue": "str",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_NOISE",
@@ -2103,8 +1943,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
       "objectValue": "const SECTION_RELEVANCE",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -2116,8 +1955,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
       "objectValue": "const lensesToRetrieve",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -2129,8 +1967,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
       "objectValue": "adjustStrategy",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -2142,8 +1979,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
       "objectValue": "canonicalRows",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -2155,8 +1991,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
       "objectValue": "const W_RETRIEVAL",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -2168,8 +2003,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
       "objectValue": "SECTION_RELEVANCE",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -2181,8 +2015,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
       "objectValue": "auto",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -2194,8 +2027,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
       "objectValue": "const joinCoverage",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -2207,8 +2039,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
       "objectValue": "const plan",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -2220,8 +2051,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
       "objectValue": "based",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -2233,8 +2063,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
       "objectValue": "MIN_JOIN_COVERAGE",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -2246,8 +2075,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
       "objectValue": "Reranker",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -2259,8 +2087,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
       "objectValue": "function shouldUseTool",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -2272,8 +2099,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
       "objectValue": "<anonymous>",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_NOISE",
@@ -2285,8 +2111,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
       "objectValue": "aggregates",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -2298,8 +2123,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
       "objectValue": "sortedObj",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -2311,8 +2135,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
       "objectValue": "that",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_NOISE",
@@ -2324,8 +2147,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
       "objectValue": "type relevance",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -2337,8 +2159,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
       "objectValue": "type TraceRerankResult",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -2350,8 +2171,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
       "objectValue": "LangGraph",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -2363,8 +2183,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
       "objectValue": "const lensKey",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -2376,8 +2195,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
       "objectValue": "face",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -2389,8 +2207,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
       "objectValue": "const score",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -2402,8 +2219,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
       "objectValue": "const selection",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -2415,8 +2231,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
       "objectValue": "ENTITY_CACHE_PREFIX",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -2428,8 +2243,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
       "objectValue": "KAG",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -2441,8 +2255,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
       "objectValue": "researchHits",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -2454,8 +2267,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
       "objectValue": "fix",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_NOISE",
@@ -2467,8 +2279,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
       "objectValue": "interface OntologyObservationV1",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -2480,8 +2291,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
       "objectValue": "manager",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -2493,8 +2303,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
       "objectValue": "orchestration",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -2506,8 +2315,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
       "objectValue": "adapters",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -2519,8 +2327,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
       "objectValue": "available",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -2532,8 +2339,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
       "objectValue": "type alignment",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -2545,8 +2351,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
       "objectValue": "const redis",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -2558,8 +2363,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
       "objectValue": "the",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_NOISE",
@@ -2571,8 +2375,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
       "objectValue": "the",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_NOISE",
@@ -2584,8 +2387,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
       "objectValue": "Code",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -2597,8 +2399,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
       "objectValue": "ENTITY_CACHE_TTL",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -2610,8 +2411,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
       "objectValue": "Concurrent",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -2623,8 +2423,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
       "objectValue": "interface LangGraphDomainClassificationRequest",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -2636,8 +2435,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
       "objectValue": "import",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -2649,8 +2447,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
       "objectValue": "drizzle",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -2662,8 +2459,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
       "objectValue": "process",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -2675,8 +2471,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
       "objectValue": "const sectionType",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -2688,8 +2483,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
       "objectValue": "Record",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": true,
       "bucket": "GROUNDED",
@@ -2701,8 +2495,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
       "objectValue": "function extractQueryEntities",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -2714,8 +2507,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
       "objectValue": "DOMAIN_QUERY_PREFIX",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -2727,8 +2519,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
       "objectValue": "const qdrant",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -2740,8 +2531,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
       "objectValue": "function explicitTemporalAlternativeToolSuccess",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -2753,8 +2543,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
       "objectValue": "style",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -2766,8 +2555,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
       "objectValue": "builder",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -2779,8 +2567,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
       "objectValue": "needle",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -2792,8 +2579,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
       "objectValue": "explicit",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -2805,8 +2591,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
       "objectValue": "buildACEPacket",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -2818,8 +2603,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
       "objectValue": "Resumable",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -2831,8 +2615,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
       "objectValue": "contentLower",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -2844,8 +2627,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
       "objectValue": "langchain",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -2857,8 +2639,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
       "objectValue": "stages",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -2870,8 +2651,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
       "objectValue": "and",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_NOISE",
@@ -2883,8 +2663,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
       "objectValue": "TraceRerankResult",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -2896,8 +2675,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
       "objectValue": "ResearchDomain",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -2909,8 +2687,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
       "objectValue": "getActiveSemanticVectorLane",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -2922,8 +2699,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
       "objectValue": "TypeScript",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -2935,8 +2711,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
       "objectValue": "tool",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -2948,8 +2723,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
       "objectValue": "ontology",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -2961,8 +2735,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
       "objectValue": "keys",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -2974,8 +2747,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
       "objectValue": "scoreEntityOverlap",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -2987,8 +2759,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
       "objectValue": "CANONICAL_COLLECTION",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -3000,8 +2771,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
       "objectValue": "OntologyObservationV1",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -3013,8 +2783,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
       "objectValue": "supervisor",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -3026,8 +2795,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
       "objectValue": "const ENTITY_CACHE_PREFIX",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -3039,8 +2807,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
       "objectValue": "type AgentState",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -3052,8 +2819,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
       "objectValue": "ingested",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -3065,8 +2831,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
       "objectValue": "TopologyProjectionV1",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -3078,8 +2843,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
       "objectValue": "domains",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -3091,8 +2855,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
       "objectValue": "sql",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_NOISE",
@@ -3104,8 +2867,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
       "objectValue": "TEMPORAL_RECOMMENDATION_OUTCOME_PRODUCER",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -3117,8 +2879,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
       "objectValue": "canonicalRowByRef",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -3130,8 +2891,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
       "objectValue": "StateGraph",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": true,
       "bucket": "GROUNDED",
@@ -3143,8 +2903,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
       "objectValue": "StateGraph",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": true,
       "bucket": "GROUNDED",
@@ -3156,8 +2915,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
       "objectValue": "W_RETRIEVAL",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -3169,8 +2927,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
       "objectValue": "caching",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -3182,8 +2939,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
       "objectValue": "model",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -3195,8 +2951,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
       "objectValue": "overlap",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -3208,8 +2963,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
       "objectValue": "interface PacketIdentityV1",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -3221,8 +2975,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
       "objectValue": "pass",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -3234,8 +2987,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
       "objectValue": "mutatePromptWithLearnings",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -3247,8 +2999,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
       "objectValue": "findings",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -3260,8 +3011,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
       "objectValue": "const DOMAIN_QUERY_PREFIX",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",
@@ -3273,8 +3023,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
       "objectValue": "Claude",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -3286,8 +3035,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
       "objectValue": "memoryHits",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "UNCERTAIN",
@@ -3299,8 +3047,7 @@
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
       "objectValue": "const results",
       "evidenceModes": [
-        "SEMANTIC_INFERRED",
-        "STRUCTURAL_EXACT"
+        "SEMANTIC_INFERRED"
       ],
       "sourceSpanGrounded": false,
       "bucket": "LIKELY_SYMBOL",

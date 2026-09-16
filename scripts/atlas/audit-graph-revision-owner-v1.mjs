@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /** Read-only audit of the owner for revision-qualified graph evidence. */
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
@@ -21,8 +21,9 @@ const pool = new pg.Pool({
 
 const loadWorkspaceRevision = () => {
   try {
-    const report = JSON.parse(readFileSync(resolve(ROOT, 'docs/reports/workspace-source-binding-observation.json'), 'utf8'));
-    return report.record?.workspaceRevision ?? null;
+    const report = JSON.parse(readFileSync(resolve(ROOT, 'docs/reports/workspace-revision-tournament-admission-v1.json'), 'utf8'));
+    if (report.status !== 'WORKSPACE_REVISION_TOURNAMENT_ADMITTED' || report.authority !== true) return null;
+    return report.workspaceRevision ?? null;
   } catch { return null; }
 };
 
@@ -94,7 +95,9 @@ async function main() {
     nextGate: 'TRACE_GRAPH_SNAPSHOT_OR_ANALYSIS_WRITER_TO_CURRENT_WORKSPACE_REVISION',
   };
   mkdirSync(dirname(REPORT), { recursive: true });
-  writeFileSync(REPORT, `${JSON.stringify(report, null, 2)}\n`);
+  const reportTemp = `${REPORT}.${process.pid}.tmp`;
+  writeFileSync(reportTemp, `${JSON.stringify(report, null, 2)}\n`);
+  renameSync(reportTemp, REPORT);
   await pool.end();
   console.log(JSON.stringify({
     schema: report.schema, status: report.status, readOnly: true,

@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { materializeCandidateOrdinalMap } from './canonical-candidate-v1.js';
 import {
   buildCandidateLatent256HydrationReceiptV1,
+  admitLatent256RepresentationLineageV1,
   type CandidateLatent256HydrationObservationV1,
 } from './candidate-latent256-hydration-receipt-v1.js';
 
@@ -106,7 +107,34 @@ function observation(
     observedCheckpointRevision: 'checkpoint:test:v1',
     vector: vector(candidateOrdinal === 0 ? 0.125 : 0.25),
     ...overrides,
+};
+
+describe('admitLatent256RepresentationLineageV1', () => {
+  const base = {
+    candidateSnapshotRevision: 'candidate-snapshot:test:v1',
+    ordinalMapChecksum: H('o'),
+    workspaceRevision: `sha256:${H('a')}`,
+    semanticRepresentationRevision: 'semantic:test:v1',
+    latentRepresentationRevision: 'latent:test:v1',
+    transformRevision: 'transform:test:v1',
+    transformChecksum: H('t'),
   };
+
+  it('admits only an admitted semantic_768 parent and remains non-canonical', () => {
+    const result = admitLatent256RepresentationLineageV1({ ...base, semanticParentStatus: 'ADMITTED' });
+    expect(result.status).toBe('ADMITTED');
+    expect(result.semanticRepresentationId).toBe('semantic_768');
+    expect(result.canonicalAuthority).toBe(false);
+    expect(result.writesPerformed).toBe(false);
+  });
+
+  it('blocks unavailable semantic parents with an explicit reason', () => {
+    const result = admitLatent256RepresentationLineageV1({ ...base, semanticParentStatus: 'UNAVAILABLE' });
+    expect(result.status).toBe('BLOCKED_SEMANTIC_PARENT');
+    expect(result.reason).toBe('SEMANTIC_PARENT_UNAVAILABLE');
+    expect(result.writesPerformed).toBe(false);
+  });
+});
 }
 
 describe('CandidateLatent256HydrationReceiptV1', () => {

@@ -1,0 +1,12 @@
+{
+  "status": "SNAPSHOT_BYTES_READBACK_PROVEN",
+  "snapshotRevision": "sha256:1e33de94123d0f2475b98e75b218033eb310622c5a6cef616c361a7dabebbd52",
+  "sourceCount": 25542,
+  "exactMatches": 25542,
+  "violations": [],
+  "violationDetails": [],
+  "violationCounts": {},
+  "canonicalAuthority": false,
+  "datastoreWritesPerformed": false,
+  "scope": "Recorded sources only; this does not assert current full-workspace membership or Graphify admission"
+}

@@ -36,8 +36,15 @@ import { AtlasState } from './atlas-runtime-context.js';
 import { handleAtlasSemanticToolCall } from './atlas-semantic-tools.js';
 
 describe('atlas semantic tools', () => {
+  const qualifiedRuntime = {
+    workspaceId: 'workspace:fixture',
+    workspaceRevision: 'sha256:' + '1'.repeat(64),
+    packetKey: 'packet:fixture',
+    packetRevision: 'sha256:' + '2'.repeat(64),
+  };
+
   it('builds a runtime discovery packet', async () => {
-    const result = await handleAtlasSemanticToolCall('atlas.discover', {});
+    const result = await handleAtlasSemanticToolCall('atlas.discover', { runtime: qualifiedRuntime });
     expect(result.ok).toBe(true);
     expect(result.tool).toBe('atlas.discover');
     expect(result.backend).toBe('grpc');
@@ -58,6 +65,7 @@ describe('atlas semantic tools', () => {
         iterationNumber: 1,
       },
       runtime: {
+        ...qualifiedRuntime,
         state: AtlasState.DISCOVER,
       },
     });
@@ -73,6 +81,7 @@ describe('atlas semantic tools', () => {
       query: 'find retry logic',
       topK: 3,
       mock: true,
+      runtime: qualifiedRuntime,
     });
 
     expect(result.ok).toBe(true);
@@ -88,6 +97,7 @@ describe('atlas semantic tools', () => {
     const result = await handleAtlasSemanticToolCall('atlas.build_context', {
       query: 'build context for retry logic',
       topK: 2,
+      runtime: qualifiedRuntime,
     });
 
     expect(result.ok).toBe(true);
@@ -101,10 +111,12 @@ describe('atlas semantic tools', () => {
     const applyResult = await handleAtlasSemanticToolCall('atlas.apply_change', {
       target: 'codebase_chunks_768_v2',
       patch: { dryRun: true },
+      runtime: qualifiedRuntime,
     });
     const delegateResult = await handleAtlasSemanticToolCall('atlas.delegate', {
       target: 'acp',
       reason: 'handoff',
+      runtime: qualifiedRuntime,
     });
 
     expect(applyResult.ok).toBe(true);

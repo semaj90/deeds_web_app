@@ -1,0 +1,43 @@
+{
+  "schema": "atlas.neural-decoder-container-forward-proof.v1",
+  "generatedAt": "2026-09-11T15:00:00-07:00",
+  "service": {
+    "container": "atlas-neural-decoder",
+    "image": "atlas-neural-decoder:torch2.13.0-cu132",
+    "endpoint": "http://127.0.0.1:8121/v1/neural-decoder/encode",
+    "healthStatus": "ok",
+    "device": "cuda",
+    "torchVersion": "2.13.0+cu132",
+    "torchCuda": "13.2"
+  },
+  "checkpoint": {
+    "revision": "d6e9395e60f0bb039dd03368012697c5c393d36bb001b8f020b6d7ba22654259",
+    "sha256": "ac5c069d714bd1b07efdbe5abb1aea993c11b3851d427c508ce76e4eebb616c5",
+    "path": "/models/nested-semantic-autoencoder/nested_semantic_autoencoder_v3_full01.pt"
+  },
+  "input": {
+    "representation": "semantic_768",
+    "batchSize": 1,
+    "dimension": 768,
+    "finite": true
+  },
+  "outputs": {
+    "latent_256": { "dimension": 256, "finite": true },
+    "latent_128": { "dimension": 128, "finite": true },
+    "latent_64": { "dimension": 64, "finite": true }
+  },
+  "replay": {
+    "runs": 2,
+    "sameInput": true,
+    "serializedOutputEqual": true
+  },
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "status": "BOUNDED_CUDA_FORWARD_REPLAY_PROVEN",
+  "notProven": [
+    "LIBTORCH_NAPI_ADMISSION",
+    "CPU_CUDA_NUMERICAL_PARITY",
+    "PEAK_VRAM_AND_LATENCY_BENCHMARK",
+    "TENSORRT_RTX_ENGINE_ADMISSION"
+  ]
+}

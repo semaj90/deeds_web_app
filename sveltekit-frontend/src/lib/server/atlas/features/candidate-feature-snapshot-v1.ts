@@ -29,6 +29,36 @@ export const candidateFeatureSnapshotV1Schema = z.object({
 }).strict();
 export type CandidateFeatureSnapshotV1 = z.infer<typeof candidateFeatureSnapshotV1Schema>;
 
+export const currentCandidateFeatureAdmissionV1Schema = z.object({
+  schema: z.literal('atlas.current-candidate-feature-admission.v1'),
+  status: z.enum(['ADMITTED', 'BLOCKED_LINEAGE', 'BLOCKED_SEMANTIC', 'BLOCKED_GRAPH']),
+  candidateSnapshotRevision: revision,
+  workspaceRevision: revision,
+  featureRevision: revision,
+  ordinalMapChecksum: z.string().regex(/^[a-f0-9]{64}$/),
+  sourceRevisionSetChecksum: z.string().regex(/^[a-f0-9]{64}$/),
+  candidateSetChecksum: z.string().regex(/^[a-f0-9]{64}$/),
+  rowCount: z.number().int().nonnegative(),
+  snapshot: candidateFeatureSnapshotV1Schema.nullable(),
+  canonicalAuthority: z.literal(false),
+  writesPerformed: z.literal(false),
+  reason: z.string().min(1).nullable(),
+}).strict().superRefine((admission, ctx) => {
+  if (admission.status === 'ADMITTED' && admission.snapshot === null) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['snapshot'], message: 'ADMITTED_FEATURE_SNAPSHOT_REQUIRED' });
+  }
+  if (admission.status !== 'ADMITTED' && admission.snapshot !== null) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['snapshot'], message: 'BLOCKED_FEATURE_SNAPSHOT_FORBIDDEN' });
+  }
+  if (admission.status === 'ADMITTED' && admission.reason !== null) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['reason'], message: 'ADMITTED_FEATURE_REASON_FORBIDDEN' });
+  }
+  if (admission.status !== 'ADMITTED' && admission.reason === null) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['reason'], message: 'BLOCKED_FEATURE_REASON_REQUIRED' });
+  }
+});
+export type CurrentCandidateFeatureAdmissionV1 = z.infer<typeof currentCandidateFeatureAdmissionV1Schema>;
+
 function canonicalJson(value: unknown): string {
   if (value === null || typeof value !== 'object') return JSON.stringify(value);
   if (Array.isArray(value)) return `[${value.map(canonicalJson).join(',')}]`;
@@ -117,6 +147,72 @@ export function materializeCandidateFeatureSnapshot(input: {
     identityAuthority: false,
     canonicalOwnerChanged: false,
     producerRevision: input.producerRevision,
+  });
+}
+
+/**
+ * Stage 8 admission boundary. The matrix is materialized only after all
+ * upstream identity gates are explicitly admitted; blocked results carry no
+ * fabricated rows, scores, revisions, or snapshot checksum.
+ */
+export function admitCurrentCandidateFeatureSnapshotV1(input: {
+  ordinalMap: z.input<typeof candidateOrdinalMapV1Schema>;
+  rows: readonly z.input<typeof CandidateFeatureRowV1Schema>[];
+  featureRevision: string;
+  producerRevision: string;
+  sourceRevisionSetChecksum: string;
+  candidateSetChecksum: string;
+  sourceChunkCohortStatus: 'REVISION_QUALIFIED' | 'BLOCKED' | 'UNAVAILABLE';
+  semanticCohortStatus: 'ADMITTED' | 'BLOCKED' | 'UNAVAILABLE';
+  graphFeatureStatus: 'ADMITTED' | 'BLOCKED' | 'UNAVAILABLE';
+}): CurrentCandidateFeatureAdmissionV1 {
+  const ordinalMap = candidateOrdinalMapV1Schema.parse(input.ordinalMap);
+  const blockedStatus = input.sourceChunkCohortStatus !== 'REVISION_QUALIFIED'
+    ? 'BLOCKED_LINEAGE' as const
+    : input.semanticCohortStatus !== 'ADMITTED'
+      ? 'BLOCKED_SEMANTIC' as const
+      : input.graphFeatureStatus !== 'ADMITTED'
+        ? 'BLOCKED_GRAPH' as const
+        : null;
+
+  if (blockedStatus) {
+    return currentCandidateFeatureAdmissionV1Schema.parse({
+      schema: 'atlas.current-candidate-feature-admission.v1',
+      status: blockedStatus,
+      candidateSnapshotRevision: ordinalMap.candidateSnapshotRevision,
+      workspaceRevision: ordinalMap.workspaceRevision,
+      featureRevision: input.featureRevision,
+      ordinalMapChecksum: ordinalMap.ordinalMapChecksum,
+      sourceRevisionSetChecksum: input.sourceRevisionSetChecksum,
+      candidateSetChecksum: input.candidateSetChecksum,
+      rowCount: 0,
+      snapshot: null,
+      canonicalAuthority: false,
+      writesPerformed: false,
+      reason: blockedStatus,
+    });
+  }
+
+  const snapshot = materializeCandidateFeatureSnapshot({
+    ordinalMap,
+    rows: input.rows,
+    featureRevision: input.featureRevision,
+    producerRevision: input.producerRevision,
+  });
+  return currentCandidateFeatureAdmissionV1Schema.parse({
+    schema: 'atlas.current-candidate-feature-admission.v1',
+    status: 'ADMITTED',
+    candidateSnapshotRevision: snapshot.candidateSnapshotRevision,
+    workspaceRevision: snapshot.workspaceRevision,
+    featureRevision: snapshot.featureRevision,
+    ordinalMapChecksum: snapshot.ordinalMapChecksum,
+    sourceRevisionSetChecksum: input.sourceRevisionSetChecksum,
+    candidateSetChecksum: input.candidateSetChecksum,
+    rowCount: snapshot.rowCount,
+    snapshot,
+    canonicalAuthority: false,
+    writesPerformed: false,
+    reason: null,
   });
 }
 

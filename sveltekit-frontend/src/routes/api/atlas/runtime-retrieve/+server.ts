@@ -46,8 +46,10 @@ import { buildSemanticSignalPacket } from '$lib/server/atlas/semantic-signal-rou
 
 const RequestSchema = z.object({
   query: z.string().min(1).max(1000),
-  workspaceId: z.string().default('default'),
-  packetKey: z.string().optional(),
+  workspaceId: z.string().min(1),
+  packetKey: z.string().min(1),
+  workspaceRevision: z.string().min(1),
+  packetRevision: z.string().min(1),
   tokenBudget: z.number().int().min(512).max(32768).default(8192),
   lanes: z.array(z.enum(['dense', 'sparse', 'graph', 'symbol', 'temporal', 'centroid']))
     .default(['dense', 'sparse', 'graph']),
@@ -78,7 +80,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       threadId: crypto.randomUUID(),
       resourceId: input.workspaceId,
       workspaceId: input.workspaceId,
-      packetKey: input.packetKey || `atlas:packet:query:${Date.now()}`,
+      packetKey: input.packetKey,
+      workspaceRevision: input.workspaceRevision,
+      packetRevision: input.packetRevision,
       initialState: AtlasState.DISCOVER,
       tokenBudget: input.tokenBudget,
     });
@@ -100,9 +104,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       status: 'RUNTIME_PROOF_PENDING',
       loopState: 'UNDERSTAND',
       loopTool: 'runtime-retrieve',
-      loopResult: 'PASS',
-      loopEvidenceCoverage: 0.25,
-      loopTokenPressure: 0.1,
+      loopResult: 'PENDING',
+      loopEvidenceCoverage: 0,
+      loopTokenPressure: 1 - (runtime.tokenBudget.remainingInput / runtime.tokenBudget.maximumInput),
     });
 
     // Execution results
@@ -137,10 +141,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       // Create observation from current state
       const observation = {
         lastTool: runtime.state,
-        lastToolSucceeded: true,
-        retrievalConfidence: 0.7,
+        lastToolSucceeded: false,
+        retrievalConfidence: 0,
         evidenceCount: results.packets.length,
-        validationStatus: 'PASS' as const,
+        validationStatus: 'WARN' as const,
         authFailure: false,
         revisionMismatch: false,
         tokenPressure: (runtime.tokenBudget.maximumInput - runtime.tokenBudget.remainingInput) /

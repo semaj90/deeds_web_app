@@ -8,12 +8,14 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '../..');
 
 const failuresPath = path.join(ROOT, 'memory', 'agentic', 'failures.ndjson');
+const typescriptEvidencePath = path.join(ROOT, 'docs', 'reports', 'typescript-error-evidence-v1.json');
 const workflowPath = path.join(ROOT, 'docs', 'reports', 'agentic-recommendation-workflow.json');
 
 // Ensure output dirs
 mkdirSync(path.dirname(workflowPath), { recursive: true });
 
-// First 5 standard seed cards
+// Historical seed cards are retained as fixtures only. They are never included in
+// the live recommendation index unless explicitly requested for a fixture replay.
 const seedCards = [
   {
     task_id: "rec-task-0001",
@@ -151,26 +153,96 @@ if (existsSync(failuresPath)) {
 
 // Convert failures into recommendation cards
 const failureCards = failures.map(f => {
+  const evidenceRefs = Array.isArray(f.evidence_refs) ? f.evidence_refs.filter(Boolean) : [];
+  const selectedFiles = Array.isArray(f.selected_files) ? f.selected_files.filter(Boolean) : [];
+  const failureSignature = f.failure_signature || f.error_code || null;
+  const stableInput = JSON.stringify({
+    traceId: f.trace_id || null,
+    signature: failureSignature,
+    selectedFiles,
+    evidenceRefs,
+  });
+  const dedupKey = `repair:${crypto.createHash('sha256').update(stableInput).digest('hex')}`;
   return {
-    task_id: `rec-task-${crypto.randomUUID().substring(0,8)}`,
-    trace_id: f.trace_id || crypto.randomUUID(),
+    task_id: dedupKey,
+    dedup_key: dedupKey,
+    trace_id: f.trace_id || null,
     intent: f.intent || "error_fix",
     query: f.query || "unknown error query",
-    symptom: f.failure_signature || "symptom observed during execution",
-    root_cause: `Root cause identified in tool path: ${f.tool_path?.join(' -> ')}`,
-    top_files: f.selected_files || [],
+    symptom: failureSignature || "unclassified failure observation",
+    root_cause: f.root_cause || null,
+    top_files: selectedFiles,
     graph_neighbors: [],
     prior_fixes: [],
-    recommended_commands: f.commands || [],
-    verification_commands: [
-      "npm run smoke:hyperrag-packet-rpc"
-    ],
-    confidence: 0.70,
-    status: "ready"
+    recommended_commands: Array.isArray(f.commands) ? f.commands : [],
+    verification_commands: Array.isArray(f.verification_commands) ? f.verification_commands : [],
+    confidence: Number.isFinite(f.confidence) ? f.confidence : null,
+    status: "observed",
+    evidence_refs: evidenceRefs,
+    canonical_authority: false,
+    executable: false,
+    authorization_required: true,
   };
 });
 
-const allCards = [...seedCards, ...failureCards];
+// Machine-readable checker evidence is planning input only. It cannot mark a
+// repair complete, mint canonical identity, or authorize command execution.
+const typescriptEvidenceCards = [];
+if (existsSync(typescriptEvidencePath)) {
+  try {
+    const evidence = JSON.parse(readFileSync(typescriptEvidencePath, 'utf8'));
+    const rows = Array.isArray(evidence.errors) ? evidence.errors : [];
+    for (const error of rows) {
+      const sourceRef = typeof error.sourceRef === 'string' && error.sourceRef ? error.sourceRef : null;
+      const errorId = typeof error.errorId === 'string' && error.errorId ? error.errorId : null;
+      if (!sourceRef || !errorId) continue;
+      const stableInput = JSON.stringify({ errorId, sourceRef, code: error.code ?? null, message: error.message ?? null });
+      const dedupKey = `repair:typescript:${crypto.createHash('sha256').update(stableInput).digest('hex')}`;
+      typescriptEvidenceCards.push({
+        task_id: dedupKey,
+        dedup_key: dedupKey,
+        trace_id: null,
+        intent: 'error_fix',
+        query: `investigate ${error.code ?? 'TypeScript error'} in ${sourceRef}`,
+        symptom: error.message || error.code || 'unclassified TypeScript checker observation',
+        root_cause: null,
+        top_files: [sourceRef],
+        graph_neighbors: [],
+        graph_neighbors_status: 'NOT_REQUESTED',
+        graph_neighbors_canonical: false,
+        prior_fixes: [],
+        recommended_commands: [],
+        verification_commands: [],
+        confidence: null,
+        status: 'observed',
+        source: 'SVELTE_CHECK_MACHINE_JSON',
+        error_id: errorId,
+        evidence_refs: [`docs/reports/typescript-error-evidence-v1.json#${errorId}`],
+        workspace_revision: error.workspaceRevision ?? evidence.lineage?.workspaceRevision ?? null,
+        source_revision: error.sourceRevision ?? evidence.lineage?.sourceRevision ?? null,
+        evidence_checksum: evidence.input?.artifactChecksum ?? null,
+        canonical_authority: false,
+        executable: false,
+        authorization_required: true,
+      });
+    }
+  } catch (error) {
+    console.warn(`⚠️ TypeScript evidence report unavailable: ${error instanceof Error ? error.message : String(error)}`);
+  }
+}
+
+const includeFixtureSeeds = process.env.ATLAS_INCLUDE_AGENTIC_FIXTURE_SEEDS === 'true';
+const fixtureCards = includeFixtureSeeds
+  ? seedCards.map((card) => ({
+      ...card,
+      source: 'STATIC_FIXTURE',
+      canonical_authority: false,
+      executable: false,
+      authorization_required: true,
+      status: 'fixture',
+    }))
+  : [];
+const allCards = [...fixtureCards, ...failureCards, ...typescriptEvidenceCards];
 
 writeFileSync(workflowPath, JSON.stringify(allCards, null, 2));
 console.log(`✓ Wrote ${allCards.length} recommendation cards to docs/reports/agentic-recommendation-workflow.json`);

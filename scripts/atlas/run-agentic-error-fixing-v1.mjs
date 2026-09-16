@@ -30,6 +30,8 @@ const inputFile = getArg('--file');
 const inlineText = getArg('--text');
 const validate = args.includes('--validate');
 const reportPath = path.resolve(ROOT, getArg('--report') ?? 'docs/reports/agentic-error-fixing-v1.json');
+const llamaServerUrl = process.env.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090';
+const configuredModel = process.env.LLAMA_SERVER_MODEL ?? 'ornith-1.5-9b';
 
 function sha256(value) {
   return `sha256:${createHash('sha256').update(value).digest('hex')}`;
@@ -135,14 +137,69 @@ function runValidation() {
   };
 }
 
+async function resolveLlamaModel() {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 5000);
+  try {
+    const response = await fetch(`${llamaServerUrl.replace(/\/$/, '')}/v1/models`, {
+      signal: controller.signal,
+      headers: { accept: 'application/json' },
+    });
+    if (!response.ok) {
+      return {
+        status: 'UNAVAILABLE',
+        configuredModel,
+        runtimeModelId: null,
+        reason: `HTTP_${response.status}`,
+      };
+    }
+    const body = await response.json();
+    const ids = Array.isArray(body?.data)
+      ? body.data.map((entry) => typeof entry?.id === 'string' ? entry.id.trim() : '').filter(Boolean)
+      : [];
+    const runtimeModelId = ids.find((id) => /ornith[-_.]?1[-_.]5/i.test(id)) ?? null;
+    if (!runtimeModelId) {
+      return {
+        status: 'UNAVAILABLE',
+        configuredModel,
+        runtimeModelId: null,
+        reason: 'ORNITH_1_5_MODEL_NOT_REPORTED',
+      };
+    }
+    return {
+      status: 'PROVEN_RUNTIME',
+      configuredModel,
+      runtimeModelId,
+      endpoint: llamaServerUrl,
+      resolutionSource: 'LLAMA_V1_MODELS',
+    };
+  } catch (error) {
+    return {
+      status: 'UNAVAILABLE',
+      configuredModel,
+      runtimeModelId: null,
+      reason: error instanceof Error ? error.message : 'MODEL_RESOLUTION_FAILED',
+    };
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 const diagnostics = readDiagnostics();
 const candidates = buildPlan(diagnostics);
 const validation = validate ? runValidation() : null;
+const modelResolution = await resolveLlamaModel();
 const deterministicBody = {
   schema: 'atlas.agentic-error-fixing.v1',
   inputChecksum: sha256(diagnostics),
   candidates: candidates.map(({ fingerprint, errorCode, kind, file, owner, proposedAction, status, mutationAllowed }) => ({ fingerprint, errorCode, kind, file, owner, proposedAction, status, mutationAllowed })),
   validation: validation ? { command: validation.command, exitCode: validation.exitCode, timedOut: validation.timedOut, outputChecksum: validation.outputChecksum } : null,
+  modelResolution: {
+    status: modelResolution.status,
+    configuredModel: modelResolution.configuredModel,
+    runtimeModelId: modelResolution.runtimeModelId,
+    resolutionSource: modelResolution.resolutionSource ?? null,
+  },
 };
 
 const report = {
@@ -154,6 +211,7 @@ const report = {
   writesPerformed: false,
   canonicalAuthority: false,
   validationDetails: validation ? { launchError: validation.launchError, outputExcerpt: validation.outputExcerpt } : null,
+  modelResolution,
   deterministicPlanChecksum: sha256(JSON.stringify(deterministicBody)),
   candidateCount: candidates.length,
   nextGate: candidates.length ? 'OPERATOR_REVIEW_THEN_SCOPED_VALIDATION' : 'SUPPLY_DIAGNOSTICS',

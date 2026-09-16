@@ -7,11 +7,11 @@ import { buildAtlasOntologyKernelSchemaV1 } from '../ontology-kernel-schema-v1.j
 import { planKnowledgePageJobV1 } from './knowledge-page-dag-binding-v1.js';
 import { sha256TextV1 } from './stable-json-v1.js';
 
-const operator = buildKernelOperatorV1({ operatorId: 'op:get_source_span', operatorRevision: 'op:v1', kind: 'GET_SOURCE_SPAN', inputSchemaId: 'knowledge-page-input:v1', outputSchemaId: 'source-evidence:v1', executorClass: 'FILE_EXECUTOR', allowedArtifactKinds: ['source'], implementationRef: 'source-registry', implementationKind: 'typescript_function', verifiedLive: false, deterministic: true, producerRevision: 'test:v1' });
+const operator = buildKernelOperatorV1({ operatorId: 'op:get_source_span', operatorRevision: 'op:v1', kind: 'GET_SOURCE_SPAN', inputSchemaId: 'knowledge-page-input:v1', outputSchemaId: 'source-evidence:v1', executorClass: 'IN_MEMORY_COMPUTE_EXECUTOR', allowedArtifactKinds: ['source'], implementationRef: 'source-registry', implementationKind: 'source_file', verifiedLive: false, deterministic: true, producerRevision: 'test:v1' });
 const library = buildKernelOperatorLibraryV1({ libraryRevision: 'operators:v1', operators: [operator] });
 const fn = buildAtlasKernelFunctionV1({ functionId: 'knowledge_page_source_evidence', kernelRevision: 'kernel:v1', inputSchemaId: 'knowledge-page-input:v1', outputSchemaId: 'source-evidence:v1', operatorLibrary: library, operatorGraph: [{ stepId: 'step:source', operatorId: operator.operatorId }], allowedEvidenceClasses: ['source'], mutationPolicy: 'READ_ONLY', producerRevision: 'test:v1' });
 const catalog = buildAtlasKernelFunctionCatalogV1({ catalogId: 'catalog:knowledge', catalogRevision: 'kernel:v1', taskClass: 'knowledge-generation', operatorLibrary: library, functions: [{ ...fn, kernelRevision: undefined }], producerRevision: 'test:v1' });
-const schema = buildAtlasOntologyKernelSchemaV1({ schemaId: 'schema:knowledge', taskClass: 'knowledge-generation', entityTypes: [{ entityTypeId: 'entity:knowledge-page', label: 'Knowledge Page', sourceContract: 'KnowledgePageJobV1', identityFields: ['pageId'] }], relationTypes: [], constraints: [], producerRevision: 'test:v1' });
+const schema = buildAtlasOntologyKernelSchemaV1({ schemaId: 'schema:knowledge', taskClass: 'knowledge-generation', entityTypes: [{ entityTypeId: 'entity:knowledge-page', label: 'Knowledge Page', sourceContract: 'other', identityFields: ['pageId'] }], relationTypes: [], constraints: [], producerRevision: 'test:v1' });
 const manifest = buildAtlasOntologyKernelManifestV1({ kernelId: 'kernel:knowledge', kernelRevision: 'kernel:v1', schema, operatorLibrary: library, functions: [fn], producerRevision: 'test:v1' });
 
 const job = {

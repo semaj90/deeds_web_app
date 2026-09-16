@@ -1,0 +1,30 @@
+{
+  "schema": "atlas.unified-residency-feature-pack-lineage.v1",
+  "status": "FEATURE_PACK_SOURCE_LINEAGE_FAIL_CLOSED_PROVEN",
+  "owner": "atlas.candidate-feature-gpu-pack.v1",
+  "adapter": "atlas.unified-residency-feature-pack.v1",
+  "checks": {
+    "sourceRevisionsRetainedPerLogicalRow": true,
+    "singleSourceRevisionLowersToDescriptor": true,
+    "mixedSourceRevisionRejected": true,
+    "denseOrdinalPrefixPreserved": true,
+    "typedFloat32BufferEmitted": true,
+    "artifactChecksumBound": true
+  },
+  "tests": { "passed": 18, "failed": 0 },
+  "mixedSourceBatch": {
+    "ordinalPreserved": true,
+    "sourceRevisionCollapsed": false,
+    "perRowTypedTiles": true
+  },
+  "searchRuntimeToResidencyLoad": {
+    "fixtureProven": true,
+    "adapterOwner": "UnifiedResidencyAdapter",
+    "providerOwner": "FeatureTileProvider",
+    "residentReadback": true
+  },
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "promotionEligible": false,
+  "openGates": ["multi-source-tile-contract", "production-current-cohort", "deployed-provider-transport"]
+}

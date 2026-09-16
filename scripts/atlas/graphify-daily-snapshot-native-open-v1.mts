@@ -106,6 +106,16 @@ async function main() {
     await client.connect();
     await acquireCoordinatorLock(client);
     locked = true;
+    const existingTerminal = await client.query(
+      `SELECT count(*)::int AS count
+         FROM public.graphify_executions
+        WHERE workspace_revision = $1
+          AND status IN ('COMPLETED', 'COMPLETED_REUSED')`,
+      [admission.workspaceRevision],
+    );
+    if (Number(existingTerminal.rows[0]?.count ?? 0) > 0) {
+      throw new Error('GRAPHIFY_SNAPSHOT_NATIVE_TERMINAL_EXECUTION_ALREADY_EXISTS');
+    }
     await client.query('BEGIN');
     transactionStarted = true;
     const opened = await openExecution(client, {

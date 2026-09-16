@@ -1,0 +1,125 @@
+{
+  "schema": "atlas.semantic-corpus-admission.v1",
+  "generatedAt": "2026-09-15T20:37:51.921Z",
+  "mode": "READ_ONLY_AUDIT",
+  "admittedWorkspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "owner": {
+    "collection": "codebase_chunks_768",
+    "pointsCountLive": 312718,
+    "pointsScrolled": 313227,
+    "pointsCountMatchesScroll": false,
+    "candidateCount": 313227,
+    "canonicalIdCount": 214446,
+    "canonicalIdFieldBreakdown": {
+      "canonical_source_ref": 105745,
+      "canonical_id": 576,
+      "packet_key": 206906
+    },
+    "missingCanonicalId": 0,
+    "duplicateCanonicalIds": 5730,
+    "missingSourceRevision": 313197,
+    "missingWorkspaceRevision": 313197,
+    "invalidWorkspaceRevisionFormat": 0,
+    "mixedWorkspaceRevision": 30,
+    "missingRepresentationRevision": 109097,
+    "representationRevisionAgreement": 16,
+    "representationRevision": null,
+    "mixedRepresentationRevision": 16,
+    "admittedCohortChecksum": "sha256:b4a617664b520d21e394a6e819cb1dc4e018640d219dec100e909a2023d1ba1d",
+    "admittedCohortCount": 208716
+  },
+  "challenger": {
+    "collection": "codebase_chunks_768_v2",
+    "pointsCountLive": 52816,
+    "pointsScrolled": 52816,
+    "pointsCountMatchesScroll": true,
+    "candidateCount": 52816,
+    "canonicalIdCount": 4531,
+    "canonicalIdFieldBreakdown": {
+      "source_ref": 46068,
+      "packet_key": 6747
+    },
+    "missingCanonicalId": 1,
+    "duplicateCanonicalIds": 4260,
+    "missingSourceRevision": 46070,
+    "missingWorkspaceRevision": 52382,
+    "invalidWorkspaceRevisionFormat": 0,
+    "mixedWorkspaceRevision": null,
+    "missingRepresentationRevision": 52816,
+    "representationRevisionAgreement": 0,
+    "representationRevision": null,
+    "mixedRepresentationRevision": 0,
+    "admittedCohortChecksum": "sha256:205ff3b3ae93d1329188d45e74b6323258d593cd0c08bfb1df3fa167025688e5",
+    "admittedCohortCount": 271,
+    "note": "Reported for visibility only. NEVER summed with, merged into, or compared as equivalent to the owner collection above -- codebase_chunks_768 and codebase_chunks_768_v2 are two distinct collections per this repo's Embedding Dimensions Policy hard rule."
+  },
+  "postgres": {
+    "codebaseChunkIndexCount": 259772,
+    "workspaceSourceBindingsForAdmittedRevision": 24456,
+    "workspaceSourceBindingsByRevision": [
+      {
+        "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "count": 24456
+      },
+      {
+        "workspace_revision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+        "count": 23369
+      },
+      {
+        "workspace_revision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+        "count": 111
+      }
+    ],
+    "admittedRevisionHasAnyBindings": true
+  },
+  "status": "SEMANTIC_CORPUS_ADMISSION_BLOCKED",
+  "blockers": [
+    {
+      "code": "SEMANTIC_CORPUS_DUPLICATE_CANONICAL_IDS",
+      "lane": "SEMANTIC_CORPUS",
+      "severity": "PROMOTION_BLOCKING",
+      "receiptRefs": [
+        "docs/reports/semantic-corpus-admission-v1.json"
+      ],
+      "explanation": "5730 canonical IDs resolve to more than one point in codebase_chunks_768 (out of 214446 distinct IDs across 313227 points)."
+    },
+    {
+      "code": "SEMANTIC_CORPUS_MISSING_SOURCE_REVISION",
+      "lane": "SEMANTIC_CORPUS",
+      "severity": "PROMOTION_BLOCKING",
+      "receiptRefs": [
+        "docs/reports/semantic-corpus-admission-v1.json"
+      ],
+      "explanation": "313197/313227 points in codebase_chunks_768 have no source_revision payload field."
+    },
+    {
+      "code": "SEMANTIC_CORPUS_MIXED_WORKSPACE_REVISION",
+      "lane": "SEMANTIC_CORPUS",
+      "severity": "PROMOTION_BLOCKING",
+      "receiptRefs": [
+        "docs/reports/semantic-corpus-admission-v1.json"
+      ],
+      "explanation": "30/313227 points in codebase_chunks_768 carry a workspace_revision that is either absent, malformed, or does not match the admitted revision sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc (missing entirely: 313197, invalid format: 0)."
+    },
+    {
+      "code": "SEMANTIC_CORPUS_MIXED_REPRESENTATION_REVISION",
+      "lane": "SEMANTIC_CORPUS",
+      "severity": "PROMOTION_BLOCKING",
+      "receiptRefs": [
+        "docs/reports/semantic-corpus-admission-v1.json"
+      ],
+      "explanation": "16 distinct representation_revision values found across codebase_chunks_768 points (expected exactly 1); 109097 points have none at all."
+    }
+  ],
+  "followUp": {
+    "code": "QDRANT_LEGACY_PAYLOAD_BACKFILL_01",
+    "description": "Patching workspace_revision/source_revision onto the legacy-written points in codebase_chunks_768 (via Qdrant setPayload, not re-embed) is a live-data mutation and is explicitly OUT OF SCOPE for this read-only measurement. Requires separate, explicit operator sign-off before execution -- same discipline as this repo's Drizzle Safety Rule for Postgres schema changes. See openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md's QDRANT-LEGACY-PAYLOAD-BACKFILL-01 entry.",
+    "mutationRequired": true,
+    "approvalRequired": true
+  },
+  "readOnlyInvariants": {
+    "writesPerformed": false,
+    "qdrantModified": false,
+    "postgresModified": false
+  }
+}

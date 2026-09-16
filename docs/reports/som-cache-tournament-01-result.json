@@ -1,0 +1,141 @@
+{
+  "schema": "atlas.som-cache-01.tournament-result.v1",
+  "test": "SOM-CACHE-01",
+  "read_only": true,
+  "canonical_production_data_touched": false,
+  "canonical_production_data_mutated": false,
+  "graph_fixture": {
+    "schema": "atlas.gpu-mini-fabric.graph-fixture.v1",
+    "num_nodes": 10000,
+    "num_edges": 50000,
+    "seed": 20260901,
+    "graph_snapshot_checksum": "cd29db1e8a171e966d977d619342ae2d301570ec084fb07f2723eeb120df6bd5"
+  },
+  "query_sequence_fixture": {
+    "schema": "atlas.bitfrost-sim-01.query-sequence-fixture.v1",
+    "trace_length": 4000,
+    "locality_probability": 0.6,
+    "seed": 20260914,
+    "graph_snapshot_checksum": "cd29db1e8a171e966d977d619342ae2d301570ec084fb07f2723eeb120df6bd5",
+    "locality_trace_checksum": "fdb3f21de790a41b784956428ef481292c5b45fb1e2648a6f286e6ead38cc555",
+    "control_trace_checksum": "9b875a8b539b439891921aa1c477fc4d7b51733be3a49b4a760a53251fb6c6ed"
+  },
+  "structural_feature_vector": {
+    "schema": "atlas.som-cache-01.structural-feature-vector.v1",
+    "feature_dim": 7,
+    "feature_names": [
+      "log1p_out_degree",
+      "log1p_in_degree",
+      "frac_IMPORTS",
+      "frac_CALLS",
+      "frac_REFERENCES",
+      "frac_IMPLEMENTS",
+      "frac_TESTS"
+    ],
+    "num_nodes": 10000,
+    "checksum": "dadd3cd66732fef659ca139381027e4bf7804e29a62231a2290cb70e1d435367"
+  },
+  "trained_som": {
+    "schema": "atlas.som-cache-01.trained-som.v1",
+    "grid_rows": 10,
+    "grid_cols": 10,
+    "num_epochs": 20,
+    "seed": 20260915,
+    "cpu_only": true
+  },
+  "strategies": {
+    "no-prefetch": {
+      "eviction_mode": "utility-score",
+      "total_queries": 4000,
+      "hitRate": 0.05825,
+      "precisionOfPrefetch": 0.0,
+      "bytesPromoted": 0,
+      "bytesWasted": 0,
+      "promotionLatency": 0.0,
+      "evictionRate": 0.79175,
+      "queryLatencyDelta": 0.90675,
+      "lod_byte_size_table": {
+        "identity": 32,
+        "glyph": 16,
+        "latent64": 256,
+        "latent128": 512,
+        "semantic768": 3072,
+        "structural": 8192,
+        "source": 16384,
+        "prompt_ready": 32768
+      }
+    },
+    "plain-LRU": {
+      "eviction_mode": "lru",
+      "total_queries": 4000,
+      "hitRate": 0.05875,
+      "precisionOfPrefetch": 0.0,
+      "bytesPromoted": 0,
+      "bytesWasted": 0,
+      "promotionLatency": 0.0,
+      "evictionRate": 0.79125,
+      "queryLatencyDelta": 0.91325,
+      "lod_byte_size_table": {
+        "identity": 32,
+        "glyph": 16,
+        "latent64": 256,
+        "latent128": 512,
+        "semantic768": 3072,
+        "structural": 8192,
+        "source": 16384,
+        "prompt_ready": 32768
+      }
+    },
+    "graph-neighbor": {
+      "eviction_mode": "utility-score",
+      "total_queries": 4000,
+      "hitRate": 0.6145,
+      "precisionOfPrefetch": 0.5878969742435609,
+      "bytesPromoted": 3015120,
+      "bytesWasted": 1979104,
+      "promotionLatency": 9.834,
+      "evictionRate": 4.85825,
+      "queryLatencyDelta": 9.2545,
+      "lod_byte_size_table": {
+        "identity": 32,
+        "glyph": 16,
+        "latent64": 256,
+        "latent128": 512,
+        "semantic768": 3072,
+        "structural": 8192,
+        "source": 16384,
+        "prompt_ready": 32768
+      }
+    },
+    "SOM-BMU-neighbor": {
+      "eviction_mode": "utility-score",
+      "total_queries": 4000,
+      "hitRate": 0.061,
+      "precisionOfPrefetch": 0.001000250062515629,
+      "bytesPromoted": 2773200,
+      "bytesWasted": 2140048,
+      "promotionLatency": 9.8835,
+      "evictionRate": 5.34425,
+      "queryLatencyDelta": 0.946,
+      "lod_byte_size_table": {
+        "identity": 32,
+        "glyph": 16,
+        "latent64": 256,
+        "latent128": 512,
+        "semantic768": 3072,
+        "structural": 8192,
+        "source": 16384,
+        "prompt_ready": 32768
+      }
+    }
+  },
+  "verdict": {
+    "criterion": "SOM-BMU-neighbor hitRate must exceed BOTH graph-neighbor and plain-LRU hitRate",
+    "som_hit_rate": 0.061,
+    "graph_neighbor_hit_rate": 0.6145,
+    "plain_lru_hit_rate": 0.05875,
+    "som_beats_graph_neighbor": false,
+    "som_beats_plain_lru": true,
+    "RESULT": "STAYS_STEP_08_EXPERIMENTAL"
+  }
+}

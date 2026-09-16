@@ -41,7 +41,10 @@ import {
 
 const RequestSchema = z.object({
   prompt: z.string().min(1).max(2000),
-  workspaceId: z.string().default('default'),
+  workspaceId: z.string().min(1),
+  packetKey: z.string().min(1),
+  workspaceRevision: z.string().min(1),
+  packetRevision: z.string().min(1),
   contextLimit: z.number().int().min(512).max(16384).default(4096),
   maxSteps: z.number().int().min(1).max(20).default(10),
   // Required to acknowledge this route is a simulated demo, not a real Mastra
@@ -96,7 +99,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       threadId: crypto.randomUUID(),
       resourceId: input.workspaceId,
       workspaceId: input.workspaceId,
-      packetKey: `atlas:packet:agent:${Date.now()}`,
+      packetKey: input.packetKey,
+      workspaceRevision: input.workspaceRevision,
+      packetRevision: input.packetRevision,
       initialState: AtlasState.DISCOVER,
       tokenBudget: input.contextLimit,
     });
@@ -118,9 +123,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       status: 'RUNTIME_PROOF_PENDING',
       loopState: 'UNDERSTAND',
       loopTool: 'atlas.inspect_runtime',
-      loopResult: 'PASS',
-      loopEvidenceCoverage: 0.2,
-      loopTokenPressure: 0.1,
+      loopResult: 'PENDING',
+      loopEvidenceCoverage: 0,
+      loopTokenPressure: 1 - (runtime.tokenBudget.remainingInput / runtime.tokenBudget.maximumInput),
     });
 
     // Create request context for Mastra integration

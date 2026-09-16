@@ -5,6 +5,77 @@ Cross-references: `parent-atlas-retrieval-lineage-dag-convergence/tasks.md` (reg
 `parent-atlas-search-classifier-sidecar/design.md` D4b (`okf-fit.ts`'s formula-based NB/LR-named
 fields, first flagged there).
 
+## SESSION HANDOFF — agentic-repair governance cluster closed (2026-09-14/15)
+
+**Do not re-open the gates listed as closed below without new evidence contradicting them.**
+Everything here was verified live, re-run fresh immediately before this note, not asserted from
+memory. This note is additive documentation only — search this file for the named gate IDs for
+their full evidence trails; this is a compressed index, not a replacement for those entries.
+
+**Closed this session, all re-verified fresh before writing this note:**
+- `AGENTIC-GOVERNED-REPLAY-01` / `AGENTIC-GOVERNED-REPLAY-PROOF-02` —
+  `sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/governed-replay-admission-v1.{ts,spec.ts}`,
+  7/7 tests pass.
+- `AGENTIC-TOOLGAN-GOVERNED-BOUNDARY-01` — `scripts/atlas/agentic-toolgan-{execute,replay,log-outcome}.mjs`,
+  `--apply`/`--test` refusals verified live (exit 2 / exit 1, before any real work).
+- `AGENTIC-ERROR-FIX-APPLY-QUARANTINE-01` — `scripts/atlas/apply-error-fixes.mjs`, `--apply`
+  refused live (exit 2) before touching Postgres; zero mutation code paths remain in the file.
+- `WORKFLOW-ACTION-SCHEMA-ADOPTION-02` / `WORKFLOW-ACTION-IMPORT-RESOLUTION-02` —
+  `sveltekit-frontend/src/lib/server/atlas/workflow/context-tool-dag-contracts.{ts,spec.ts}`,
+  5/5 tests pass.
+- `WORKFLOW-ACTION-SEQUENCE-CHECK-02` / `AGENTIC-DURABLE-WRITER-CANONICAL-EVENT-01` /
+  `AGENTIC-CANONICAL-WRITER-ADAPTER-PROOF-01` —
+  `sveltekit-frontend/src/lib/server/agent/{action-writer,canonical-action-write-adapter-v1}.{ts,spec.ts}`,
+  27/27 tests pass across the `src/lib/server/agent/` directory (1 pre-existing unrelated skip).
+
+**Real bugs found and fixed along the way (each reproduced before fixing, re-verified after):**
+1. `advanceActionStatus()` in `action-writer.ts` computed the next `workflow_events.sequence_no`
+   from the wrong table (`agent_run_actions`, a static per-action value) — would deterministically
+   violate the real `workflow_events_run_seq` unique constraint on the second status transition
+   for any run. Zero live callers today, so no production impact yet, but was a certain future
+   break.
+2. `classifyCanonicalIdentityV1` (same-identity checksum-collision detector) was declared but
+   never called from any production code path. Now wired into `writeActionAtomically()`.
+3. The mocked-transaction test's `db.transaction` fake wrote straight into a shared store
+   instead of a per-transaction draft, so it could not actually prove rollback-on-failure.
+   Upgraded to real commit-or-discard semantics; verified the fix is load-bearing by temporarily
+   reverting it and confirming the new atomicity test genuinely fails without it.
+4. **Highest-leverage finding**: the new TypeScript-error-evidence capture pipeline
+   (`scripts/atlas/{typescript-error-evidence-v1,capture-typescript-error-evidence-v1,run-typescript-error-evidence-capture-v1}.mjs`)
+   assumed `svelte-check`'s machine output was bare JSON per line. Root-caused against
+   `svelte-check`'s real source: `--output machine` never emits JSON at all (hand-formatted text
+   per diagnostic); `--output machine-verbose` emits `<epochMs> <jsonObject>` per line with a
+   different field shape than assumed (`type`/0-indexed `start.character`/numeric `code`).
+   **Every prior live capture attempt against this pipeline — including ones already logged
+   above this note as complete — captured zero real errors, silently, regardless of how many
+   existed.** Fixed the parser, the runner's checker flag, and the unit tests (which had used
+   fabricated fixtures matching the wrong shape). Proved with a real deliberate type-error probe
+   file: before the fix `captured:0`; after, `captured:1` with exactly correct
+   `line`/`column`/`code`/`message`.
+
+**Explicitly NOT touched, on purpose:** the Graphify execution-snapshot-binding workstream
+(`GRAPHIFY-EXECUTION-SNAPSHOT-OWNER-02`, `CURRENT-EXECUTION-SOURCE-PACKET-CHUNK-CLOSURE-03`, and
+everything gated behind them further down this file). That workstream's own evidence trail states
+it is blocked by active worktree concurrency during snapshot capture/readback — editing files
+anywhere in this repo while it's mid-attempt is the exact problem it's fighting. Do not resume it
+without first confirming no other session is mid-capture.
+
+**Known loose end, not fixed this session:** running the real capture pipeline (fix #4 above)
+against real files left two scratch artifacts with real git status:
+`docs/reports/typescript-error-evidence-v1.json` (untracked, references a since-deleted probe
+file) and `docs/reports/agentic-recommendation-workflow.json` (modified, contains a card
+derived from that same probe run). Both are regenerable reports, not canonical data — safe to
+regenerate via `node scripts/atlas/build-agentic-error-index.mjs` once a real bounded capture
+run is desired, or to discard if not needed.
+
+**Remaining open items in this immediate cluster** (not attempted this session, in ledger order):
+`TASK-PROGRESS-PROJECTION-01`, `GRAPHIFY-DAILY-PROGRESS-REFRESH-01`,
+`AGENTIC-TYPESCRIPT-ERROR-EVIDENCE-REPLACEMENT-01` (multi-source batch capture + TaskCandidate
+admission — fix #4 above unblocks this, doesn't complete it), `AGENTIC-REPAIR-VERTICAL-REPLAY-01`
+and everything under the Graphify/graph-edge/semantic-corpus/XGBoost/GPU-residency headings
+further down this file (all separate, larger workstreams — read their own sections before
+starting any of them).
+
 ## 0. BEST-FIT-SCORE-AUDIT-01 — READ_ONLY_COMPLETE_WITH_FINDINGS (2026-09-03)
 
 - [x] 0.1 DONE — full read-only audit of the retrieval scoring stack: RRF (`combineViaRRF()`,
@@ -2212,6 +2283,33 @@ the `canonical-rerank-executor.ts` path (per this repo's own "one canonical owne
 rule), is real, separate implementation work. Flagged per the Duplication Prevention convention;
 deferred given a context-budget warning mid-session, not attempted partially.
 
+## Reranker ownership correction (2026-09-14)
+
+The standalone Marco/Mixedbread compatibility module is not the intended owned model. A current
+caller census found no production caller for `marco-reranker.ts`; the canonical retrieval executor
+does still attempt its Mixedbread-compatible cross-encoder chain first, so the final owned-model
+cutover has not happened. The intended owner remains the existing XGBoost/LightGBM sidecar path
+(`canonical-rerank-executor.ts` → `XGBOOST_SIDECAR_URL`) with `XGBOOST_RERANK_MODE=shadow` until
+fresh leak-free training, held-out evaluation, model checksum, sidecar health, and explicit
+promotion evidence pass.
+
+The owned-model dry-run now fails closed cleanly on Windows: after the console-encoding fix it
+reports that `docs/reports/xgboost-features.csv` contains `0` rows, instead of crashing while
+formatting an empty matrix. No training or artifact promotion was performed.
+
+The documented feature-export dry-run was rechecked: `1,100` traces load, but `0` packets are
+indexed across `0` feature labels, yielding `0` feature rows and `0` positive rows. All three
+training gates therefore fail (`positive_rows_500`, `distinct_features_8`, and
+`completeness_80pct`). The next implementation gate is to reconcile the trace retrieved-packet
+references with the current packet/feature-label owner; do not fabricate labels, reuse the old
+CSV, or train until that join produces a revision-qualified dataset.
+
+The exporter now emits explicit join diagnostics and refuses inference. The live sample contains
+domain-style trace references such as `packet:database_orm:1100`, while current `atlas_packets`
+keys are opaque `packet:<id>` values and current `feature_id` values are unrelated feature names.
+No packet-key or feature-label bridge is currently proven; the exporter records unmatched labels
+and `packet_key_inference_performed=false` rather than silently manufacturing training pairs.
+
 ## export-xgboost-features.mjs join bug narrowed further: two parallel, non-identical taxonomies,
 ## not a null-handling issue (2026-09-09, same session, follow-up, ended here on context budget)
 
@@ -2385,3 +2483,3553 @@ entirely (e.g. semantic similarity between the trace label and a domain descript
 category actually covers, or a manually-authored allowlist per label reviewed against real route/
 file listings) before any `atlas.xgboost-trace-label-bridge.v1` entries should be written. This is
 now the concrete, correctly-scoped blocker — not "review candidates and pick winners."
+
+## Still missing after the reranker audit (2026-09-14)
+
+The reranker lane is not complete, and the remaining work is now narrower than the
+earlier inventory suggested. The repository does **not** need another Marco router or
+another ranking owner. `marco-reranker.ts` has no production caller, while
+`canonical-rerank-executor.ts` still attempts its transitional Mixedbread-compatible
+cross-encoder path before the owned XGBoost fallback. The owned path remains
+`XGBOOST_SIDECAR_URL`, with `XGBOOST_RERANK_MODE=shadow` as the safe default.
+
+- [x] **RERANKER-OWNER-CLARIFICATION-01** — distinguish the standalone Marco/Mixedbread
+      compatibility module, the transitional canonical cross-encoder attempt, and the
+      intended owned XGBoost/LightGBM path. No production cutover is implied.
+- [x] **RERANKER-HEALTH-DIAGNOSTIC-01** — read-only endpoint probe and resolver hardening
+      completed; unavailable `8099`/`8101` endpoints fail closed without returning a
+      fake rerank result. No service was started or restarted.
+- [x] **XGBOOST-EMPTY-DATASET-SAFETY-01** — empty training CSV and empty exporter output
+      now fail closed cleanly on Windows rather than crashing or being treated as valid
+      training evidence.
+- [x] **XGBOOST-TRACE-JOIN-DIAGNOSTICS-01** — exporter records explicit unmatched-label
+      counts and `packet_key_inference_performed=false`; it refuses to infer packet
+      identity from trace-label text.
+
+The following remain open and block training, activation, and any ownership claim:
+
+- [ ] **XGBOOST-TRACE-LABEL-BRIDGE-01** — establish a real, reviewed bridge between
+      trace references such as `packet:database_orm:1100` and the current packet/feature
+      owner. The existing lexical candidate report is not admissible: its top matches
+      target filename-derived feature names rather than the meaning of the trace domain,
+      and its schema correctly keeps `promotion_allowed=false`. Do not hand-curate those
+      candidates into a promoted bridge.
+- [x] **XGBOOST-TRACE-LABEL-BRIDGE-CONTRACT-WIRING-01** — restored the source-level
+      `atlas.xgboost-trace-label-bridge.v1` contract at
+      `packages/parent-atlas/src/core/xgboost-trace-label-bridge.ts`, exported it from
+      the package, and wired `scripts/atlas/export-xgboost-features.mjs` to require a
+      validated, checksummed, non-empty bridge before any apply path. Direct contract
+      round-trip validation passes, and an apply attempt without `--bridge=<path>` fails
+      closed as `XGBOOST_TRACE_LABEL_BRIDGE_REQUIRED` before database access. This does
+      **not** mean a real bridge instance exists; `XGBOOST-TRACE-LABEL-BRIDGE-01` remains
+      open and promotion is still prohibited.
+- [ ] **XGBOOST-REVISION-QUALIFIED-DATASET-01** — produce a non-empty dataset whose
+      trace, packet, feature label, workspace/source revision, and canonical identity
+      are all joined explicitly. Current dry-run evidence is `1,100` traces, `0` indexed
+      packets, `0` feature rows, and `0` positive rows; all training gates fail.
+- [ ] **XGBOOST-LEAKAGE-FREE-TRAINING-01** — regenerate the feature CSV only from the
+      admitted bridge, validate the trace-score/label relationship, and run a genuine
+      held-out training/evaluation. The existing empty CSV, historical CSV, fabricated
+      V2 metrics, and one-row smoke artifact are not training evidence.
+- [ ] **XGBOOST-MODEL-ARTIFACT-PROVENANCE-01** — bind any newly trained model to its
+      dataset checksum, feature schema/revision, objective/metric, model checksum, and
+      evaluation receipt. The currently served default artifact is not evidence that the
+      corrected dataset or leakage fix has been trained and served.
+- [ ] **XGBOOST-SIDECAR-LIVE-READINESS-01** — prove the intended sidecar health,
+      schema, scoring response, and bounded same-corpus replay with the revision-qualified
+      artifact. Keep `shadow` until this passes.
+- [ ] **XGBOOST-PROMOTION-CUTOVER-01** — require an explicit promotion receipt before
+      `XGBOOST_RERANK_MODE=active` or replacement of the transitional Mixedbread path.
+      Compare held-out quality, top-k agreement, latency, and failure behavior; do not
+      promote based on fixture output, endpoint reachability, or shadow volume alone.
+
+Separate blockers remain outside this reranker change and must not be silently folded
+into the training gate:
+
+- [ ] current workspace/source/packet/chunk authority and exact admitted execution
+      membership remain unproven;
+- [ ] current semantic `semantic_768` corpus admission remains blocked;
+- [ ] the canonical production ACE/ContextManifest handoff remains incomplete for
+      strict revision-qualified prompt/cache admission;
+- [ ] the unrelated Phase 18 `phase18-reranker.ts` path remains a duplicate/unbuilt
+      compatibility surface and requires an explicit retire-or-wire decision;
+- [ ] live quality evidence for a trained owned reranker is absent.
+
+Current status: **RERANKER-OWNER-RESOLVED / TRAINING-DATA-BRIDGE-MISSING /
+PROMOTION-BLOCKED**. No reranker mode, model artifact, packet identity, Qdrant point,
+PostgreSQL row, cache entry, or service state was changed by this ledger update.
+
+## Trace provenance correction: synthetic refs are not a reranker corpus (2026-09-14)
+
+The producer census found the direct origin of the failing references:
+`scripts/atlas/seed-agent-traces.mjs` constructs `retrieved_packets` as
+`packet:${concept}:${id}` plus `concept:${concept}` and assigns randomized outcomes
+and scores. These values are synthetic smoke-test references, not packet keys issued by
+the canonical retrieval boundary. They cannot be repaired into canonical packet identity
+by a lexical alias, ordinal interpretation, or null provision.
+
+- [x] **XGBOOST-TRACE-PROVENANCE-SOURCE-01** — traced the `packet:<domain>:<ordinal>`
+      producer to the synthetic trace seeder and confirmed the generated outcome/score
+      values are randomized. This explains why the exporter sees labels but no current
+      `atlas_packets.packet_key` matches.
+- [x] **XGBOOST-SYNTHETIC-CORPUS-EXCLUSION-01** — classified these trace rows as
+      smoke/fixture evidence only. They remain useful for contract tests, but are not
+      eligible for owned-model training or evaluation.
+- [ ] **XGBOOST-REAL-TRACE-CAPTURE-01** — capture a new read-only cohort from a real
+      retrieval entrypoint that records canonical packet keys, candidate ordinal-map
+      identity, workspace/source/representation revisions, and the actual query/candidate
+      feature bundle. Do not modify historical synthetic traces to make them appear real.
+- [ ] **XGBOOST-LABEL-EVIDENCE-01** — define an explicit, revision-qualified relevance
+      label source for the real cohort (human judgment, approved outcome receipt, or a
+      separately admitted evaluation manifest). Randomized seed outcomes are not labels.
+
+The training sequence is therefore:
+
+`real retrieval capture → canonical packet/feature join → admitted revision set →
+explicit relevance labels → leak audit → held-out XGBoost/LightGBM training → sidecar
+replay → promotion receipt`.
+
+Current owned-model status remains **NO-TRAINING-DATA / NO-PROMOTION**. The exporter’s
+apply guard is intentionally necessary but insufficient: even a valid bridge contract
+must not be populated from the synthetic seeder output.
+
+## Transitional Mixedbread execution disabled by default (2026-09-14)
+
+The canonical executor previously attempted `MixedbreadCanonicalReranker` before the
+owned learned fallback. That made the ownership decision easy to misread: Marco was not
+the intended owner, but the compatibility path could still affect normal execution when
+available. Added `MIXEDBREAD_RERANK_MODE` to the canonical executor with values `off` or
+`active`, defaulting to `off`. The compatibility lane is now explicitly opt-in.
+
+- [x] **RERANKER-TRANSITIONAL-LANE-GUARD-01** — default execution does not call the
+      Mixedbread-compatible cross-encoder; it records `MIXEDBREAD_DISABLED_BY_POLICY`
+      and continues through the existing owned-reranker/fail-safe path.
+- [x] **RERANKER-TRANSITIONAL-LANE-TEST-01** — focused canonical executor coverage proves
+      the default-off behavior and preserves the explicit opt-in compatibility tests;
+      `canonical-rerank-executor.spec.ts`: **16/16** passing.
+- [ ] **RERANKER-OWNED-MODEL-CUTOVER-01** — do not replace the disabled compatibility
+      path with active XGBoost until real revision-qualified training data, held-out
+      quality, artifact provenance, sidecar health, and a promotion receipt exist.
+
+This changes runtime preference only; it does not train a model, enable
+`XGBOOST_RERANK_MODE=active`, alter cached rankings, or authorize any datastore write.
+
+The unused Atlas factory was checked as well: it had a second direct construction
+path for `MixedbreadCanonicalReranker`, but no production caller was found. It now
+uses the same `MIXEDBREAD_RERANK_MODE=active` opt-in guard, preventing a future caller
+from bypassing the canonical executor's policy by accident.
+
+The live census also found all `1,100` currently loaded traces carry the historical
+`trace_source='gemma4'` value despite matching the synthetic seeder's generated
+`packet:<concept>:<id>` references. The seeder is now labeled `synthetic_fixture` for
+future runs. Existing rows were not rewritten; their provenance remains historical and
+non-admissible until independently replaced or reclassified by an authorized data
+governance step.
+
+The exporter now excludes traces with the synthetic `packet:<domain>:<number>` shape
+even when historical provenance is mislabeled. Its bounded dry-run reports
+`16` loaded, `16` synthetic excluded, `0` eligible, and `0` feature rows. This is a
+stronger training safety result: the empty dataset is now an explicit provenance gate,
+not an accidental consequence of a failed packet lookup.
+
+A larger read-only rerun (`--limit=1000`) confirmed the same result at scale:
+`1,000` loaded, `1,000` synthetic excluded, `0` eligible, `0` feature rows, and all
+training gates failed. This closes the question of whether the 16-row result was sample
+noise; it was not.
+
+## Mixedbread metadata ownership correction (2026-09-14)
+
+The default-off guard was functionally correct but still constructed the transitional
+`MixedbreadCanonicalReranker` to obtain its model version for the primary cache key.
+That could make disabled requests appear to be owned by Marco/Mixedbread even though the
+service was not called. The executor now constructs that class only when
+`MIXEDBREAD_RERANK_MODE=active`; disabled requests use the `xgboost-fallback` identity for
+cache/provenance and continue through the deterministic fallback path.
+
+- [x] **RERANKER-DISABLED-METADATA-01** — removed disabled-mode Mixedbread construction and
+      misleading primary cache identity.
+- [x] Regression proof: `canonical-rerank-executor.spec.ts`, **16/16** tests passed.
+- [ ] **RERANKER-OWNED-MODEL-CUTOVER-01** remains open: real revision-qualified capture,
+      explicit relevance labels, held-out quality, artifact provenance, sidecar health, and
+      promotion evidence are still required before `XGBOOST_RERANK_MODE=active`.
+
+Status remains `OWNED_RERANKER_TRAINING_AND_PROMOTION_PENDING`; Marco/Mixedbread is
+compatibility-only and opt-in. No model, cache, database, or service state was changed.
+
+The disabled-mode regression now also asserts that the returned provenance and every returned
+row avoid the Mixedbread model identity; the default path reports `xgboost-fallback`. This
+guards against a metadata-only ownership regression even when no cross-encoder request is sent.
+
+Bounded exporter recheck (`node scripts/atlas/export-xgboost-features.mjs --limit=1000`,
+2026-09-14) loaded `1,000` traces, excluded all `1,000` as synthetic-shaped provenance, and
+produced `0` eligible rows, `0` positive labels, and `0` distinct features. The three training
+gates therefore remain failed (`positive_rows_500`, `distinct_features_8`, and
+`completeness_80pct`). The report metadata was refreshed in dry-run mode only; no CSV, model,
+packet, cache, or database write occurred. `XGBOOST-REAL-TRACE-CAPTURE-01` and
+`XGBOOST-LABEL-EVIDENCE-01` remain the controlling blockers.
+
+### Existing workflow-trace writer is not yet an admissible reranker corpus (2026-09-14)
+
+The repository does have a separate `packages/atlas-core` `workflow_traces` writer and
+`WorkflowTrace` contract. It records the user query, route, packet/source references,
+validation result, and model output for workflow auditing. That is useful evidence, but it
+does not currently provide the complete candidate-level training contract: an admitted
+candidate ordinal map, workspace/source/representation revisions, per-candidate feature
+rows, and an explicit relevance-label source. `validator_result` and successful workflow
+completion must not be promoted to relevance labels automatically.
+
+- [x] **XGBOOST-WORKFLOW-TRACE-CENSUS-01** — located the existing writer and confirmed it is
+      distinct from the synthetic `agent_traces` seeder/export path.
+- [ ] **XGBOOST-REAL-TRACE-CAPTURE-01** — extend or adapt one existing retrieval boundary to
+      emit the missing revision-qualified candidate bundle; do not create a parallel trace
+      writer unless the current owner cannot carry the contract.
+- [ ] **XGBOOST-LABEL-EVIDENCE-01** — obtain explicit human or admitted evaluation labels;
+      workflow pass/fail remains outcome evidence, not a relevance grade.
+
+## Remaining owned-reranker implementation blockers (2026-09-14)
+
+The current audit confirms that the repository has an operational workflow trace writer,
+but it is not yet an admissible training-data producer for the owned XGBoost/LightGBM
+reranker. `packages/atlas-core/src/validation/workflow-trace-logger.ts` records query,
+route, packet/source references, feature IDs, model output, validator result, and timing,
+and persists to `workflow_traces` plus optional Redis/Qdrant projections. It does not
+currently carry a candidate-level ordinal map, candidate feature rows, the complete
+workspace/source/representation revision bundle, or an explicit relevance-label source.
+Those omissions are the controlling blockers; no existing field may be reinterpreted to
+fill them.
+
+- [x] **XGBOOST-WORKFLOW-TRACE-OWNER-02** — confirmed the existing workflow trace writer
+      is the only reusable audit boundary found for this purpose. No second trace writer,
+      reranker corpus, or route-level logging owner was introduced.
+- [ ] **XGBOOST-CANDIDATE-BUNDLE-01** — extend the existing retrieval/workflow trace
+      boundary, or prove a better existing owner, to capture one bounded candidate bundle
+      with stable canonical identity, `CandidateOrdinalMapV1` checksum, per-candidate
+      feature rows, served order, and the exact retrieval-policy revision. Qdrant IDs,
+      array order, and transport offsets remain non-canonical.
+- [ ] **XGBOOST-REVISION-BUNDLE-01** — require and read back the admitted
+      `workspaceRevision`, `sourceRevision` set/checksum, `representationRevision`,
+      `featureRevision`, model/template revisions, and artifact checksum for every
+      candidate bundle. Missing, mixed, historical-only, or placeholder revisions must
+      be recorded as rejected and excluded from training.
+- [ ] **XGBOOST-LABEL-EVIDENCE-02** — add a separate explicit label-evidence contract
+      identifying the label source (`human_judgment`, admitted evaluation receipt, or
+      approved held-out manifest), label revision, subject identity, and evidence
+      checksum. `validator_result`, workflow success, latency, and model output remain
+      audit signals and must not become relevance labels automatically.
+- [ ] **XGBOOST-REAL-CAPTURE-REPLAY-01** — produce a bounded read-only capture/replay
+      receipt proving deterministic candidate membership, feature checksum, revision
+      parity, label alignment, and `writesPerformed=false`; synthetic fixtures remain
+      contract tests only.
+- [ ] **XGBOOST-TRAINING-CORPUS-ADMISSION-01** — admit a real corpus only after the
+      capture and label gates pass, with explicit thresholds for positive labels,
+      distinct features, completeness, duplicate/identity rate, and held-out split
+      isolation. The current 1,100 historical/synthetic-shaped traces remain excluded.
+- [ ] **XGBOOST-ARTIFACT-QUALITY-01** — train the owned model only from the admitted
+      corpus, then record model/config/feature-schema/training-data/split revisions,
+      checksum, quality metrics, and rollback metadata. No artifact is promoted merely
+      because training completes.
+- [ ] **XGBOOST-SIDECAR-PROMOTION-01** — prove the owned sidecar health, request/response
+      schema, deterministic replay, bounded latency, and exact model identity before
+      enabling `XGBOOST_RERANK_MODE=active`.
+- [ ] **RERANKER-PROMOTION-RECEIPT-01** — require an independent promotion receipt that
+      binds the admitted corpus, held-out quality, artifact checksum, sidecar identity,
+      runtime policy, and rollback path. Until then, `xgboost-fallback` remains the
+      disabled-mode identity and Marco/Mixedbread remains compatibility-only opt-in.
+
+Current status remains:
+
+```text
+CANONICAL RERANKER OWNER       XGBOOST / LIGHTGBM INTENDED
+MIXEDBREAD / MARCO             COMPATIBILITY-ONLY, OPT-IN
+REAL CANDIDATE CAPTURE         MISSING
+REVISION-QUALIFIED CORPUS      NOT ADMITTED
+EXPLICIT RELEVANCE LABELS      MISSING
+OWNED MODEL ARTIFACT            NOT TRAINED / NOT PROMOTED
+SIDECAR PROMOTION               BLOCKED
+```
+
+No database, cache, Qdrant, model, or service state was changed by this audit update.
+
+## XGBoost lineage-contract alignment finding (2026-09-14)
+
+The existing `sveltekit-frontend/src/lib/server/atlas/classification/xgboost-ranking-lineage-v1.ts`
+is useful bounded contract code: it validates candidate ordinals, source/graph/feature/provider
+and label revisions, finite feature vectors, evidence references, duplicate ordinals, and
+within-query lineage consistency. Its current shape is not yet sufficient for the production
+owned-reranker gate because it does not carry the complete current promotion identity envelope:
+`workspaceRevision`, `representationRevision`, model revision, candidate-snapshot identity,
+ordinal-map checksum, or an explicit label-evidence checksum/source from a live upstream
+adapter. The pure contract now validates those fields, but it still cannot represent real
+training evidence until an admitted server-owned bundle supplies them.
+
+- [ ] **XGBOOST-LINEAGE-CONTRACT-02** — reconcile the existing ranking-lineage contract with
+      the server-owned candidate/feature bundle without creating another ordinal or identity
+      owner. Require workspace, source, representation, feature, model, and label evidence
+      revisions plus candidate-snapshot and ordinal-map checksums; reject mixed or missing
+      values before grouping.
+      Current progress: the existing pure contract now validates canonical candidate identity,
+      workspace/representation/model/snapshot revisions, ordinal-map checksum, and explicit
+      label source/evidence checksum. The full gate remains open until a live server-owned
+      adapter supplies these fields from an admitted candidate bundle.
+- [x] **XGBOOST-CANDIDATE-FEATURE-ADAPTER-01** — bounded pure adapter added in
+      `xgboost-ranking-lineage-v1.ts`; it maps an admitted feature snapshot into deterministic
+      ranking rows while preserving canonical identity and scalar feature order. Null/missing
+      scalar features fail closed. This is contract/fixture proven only; no live caller is
+      implied.
+- [x] **XGBOOST-LABEL-EVIDENCE-ADAPTER-01** — bounded pure label mapping now requires an
+      explicit allowed label source, label revision, evidence checksum, and evidence reference;
+      missing or unmatched labels reject the conversion. This does not create labels or admit a
+      real corpus.
+- [ ] **XGBOOST-REPLAY-RECEIPT-02** — replay the same bounded bundle twice and require identical
+      grouped rows, ordering, feature checksum, label alignment, and lineage checksum with
+      `writesPerformed=false` before any exporter/model-training path is opened.
+
+This finding does not authorize training, sidecar activation, cache warming, or projection
+updates. `XGBOOST_RERANK_MODE=active` remains disabled pending the gates above.
+
+## Shadow receipt placeholder correction (2026-09-14)
+
+The canonical shadow emitter previously placed the literal `featureRevision: "unversioned"`
+into the Valkey stream. That value was diagnostic intent, but it could be mistaken for a valid
+revision by downstream corpus tooling. The emitter now requires the sidecar's
+`featureSchemaRevision`, carries it as `featureRevision`, and marks it
+`PROVEN_SIDECAR_SCHEMA_ONLY`. This proves only the sidecar schema identity; no training
+consumer may admit that receipt until the same revision is verified against the server-owned
+candidate feature bundle.
+
+- [x] **XGBOOST-SHADOW-PLACEHOLDER-01** — removed the unversioned revision placeholder, require
+      the sidecar schema revision, and added a regression assertion; focused canonical executor
+      coverage remains required before promotion.
+- [ ] **XGBOOST-SHADOW-FEATURE-BUNDLE-01** — plumb the actual admitted feature snapshot and
+      revision bundle into shadow capture; until then shadow receipts remain evaluation evidence
+      only and are not training rows.
+
+## Owned-sidecar identity hardening (2026-09-14)
+
+The canonical executor also had a second placeholder path: a sidecar response without
+`modelRevision` was converted into `${modelKind}-unrevisioned`. That could make an unqualified
+model appear usable to shadow or active execution. The executor now rejects the sidecar result
+when neither `/score` nor `/health` supplies a non-empty model revision and falls back through
+the existing safe path. This is an execution guard, not evidence that a trained owned model
+exists.
+
+- [x] **XGBOOST-SIDECAR-MODEL-REVISION-01** — missing sidecar model identity fails closed;
+      canonical executor regression coverage remains **16/16**.
+- [ ] **XGBOOST-SIDECAR-FEATURE-REVISION-01** — require the sidecar feature-schema revision
+      to match the admitted candidate feature bundle before any real training or promotion use.
+
+## Owned-sidecar readiness audit (2026-09-14)
+
+The checked-in sidecar already exposes the two required identity fields: `/health` and
+`/score` return a content-addressed `modelRevision` and the deterministic
+`featureSchemaRevision` derived from the ordered `FEATURE_COLS` list. `/score` also rejects
+an explicitly supplied schema revision when it differs from the loaded sidecar schema.
+This is a source-level contract result, not live model or promotion evidence.
+
+- [x] **XGBOOST-SIDECAR-CONTRACT-READBACK-01** — verified the checked-in `/health` and
+      `/score` response shapes, content-addressed model identity, feature-schema identity,
+      score semantics, and request-side schema mismatch rejection. No sidecar was started.
+- [ ] **XGBOOST-SIDECAR-FEATURE-BUNDLE-ADMISSION-01** — compare the sidecar's
+      `featureSchemaRevision` against the exact admitted `CandidateFeatureSnapshotV1`
+      feature schema/revision and reject a bundle when either the ordered feature set or
+      revision differs. The static sidecar hash alone is not a candidate-bundle proof.
+- [ ] **XGBOOST-SIDECAR-LIVE-REPLAY-01** — with an explicitly selected trained artifact,
+      prove `/health` → `/score` deterministic replay over the same admitted bundle,
+      including model revision, feature schema revision, candidate snapshot revision,
+      ordinal-map checksum, row count, finite scores, and `writesPerformed=false`.
+- [ ] **XGBOOST-OWNED-ARTIFACT-AVAILABILITY-01** — verify that the selected model artifact
+      exists, is checksum-addressed, was produced from the admitted leak-free corpus, and
+      has a held-out quality receipt. An existing filename or a reachable endpoint is not
+      sufficient evidence.
+- [ ] **XGBOOST-TRAINING-PROMOTION-GATE-01** — keep `XGBOOST_RERANK_MODE=active` closed
+      until real candidate capture, explicit relevance labels, admitted corpus, artifact
+      quality, sidecar replay, rollback metadata, and an independent promotion receipt all
+      pass. Marco/Mixedbread remains compatibility-only and opt-in.
+
+Current owned-reranker distance remains:
+
+```text
+SIDECAR SOURCE CONTRACT       PROVEN
+SIDECAR LIVE MODEL            NOT PROVEN
+FEATURE-BUNDLE REVISION MATCH MISSING
+REAL LABELED CORPUS           MISSING
+TRAINED OWNED ARTIFACT        NOT ADMITTED
+HELD-OUT QUALITY              MISSING
+PROMOTION RECEIPT             MISSING
+MARCO/MIXEDBREAD              COMPATIBILITY-ONLY, OPT-IN
+```
+
+No model, sidecar, cache, database, Qdrant, or reranker mode was changed by this audit.
+
+## Workstation progress and agentic-repair alignment (2026-09-14)
+
+The repository already contains `scripts/atlas/rank-kanban-and-npm-inventory.mjs`, which
+computes `completionScore` and `rankScore` for the existing Kanban board. Its rubric is useful
+for prioritization, but it is not an authority receipt: it infers score from board status,
+file presence, keywords, and testing metadata, and its persisted outputs require `--apply`.
+Therefore a rank percentage must not be presented as verified implementation completion.
+
+The existing agentic repair surfaces are also not one completed end-to-end loop. The
+LangGraph Kanban agent contains a policy-model fallback and placeholder synthesis behavior,
+while the SvelteKit Mastra adapter still has TODO seams for retrieval, validation, persistence,
+ACE assembly, identity resolution, and ACP/OpenCode delegation. These are implementation gaps,
+not reasons to create another router, event bus, or reranker owner.
+
+- [x] **RERANKER-OWNERSHIP-STATUS-01** — confirmed Marco/Mixedbread is compatibility-only and
+      opt-in; owned XGBoost/LightGBM remains the intended reranker owner.
+- [x] **WORKSTATION-RANKING-UTILITY-CENSUS-01** — located the existing completion/rank rubric
+      and confirmed it is dry-run capable; no Kanban board or report was persisted in this
+      audit.
+- [ ] **WORKSTATION-PROGRESS-RECEIPT-01** — adapt the existing ranking utility or an existing
+      workstation receipt owner to emit revision-qualified, read-only progress metadata with
+      task status, completion percentage, rank, evidence references, blockers, and
+      `writesPerformed=false`. Do not equate heuristic `rankScore` with completion proof.
+- [ ] **DAILY-GRAPHIFY-PROGRESS-01** — have the daily Graphify summary consume authoritative
+      OpenSpec/validation/repair receipts and produce a deterministic delta board for Ewin
+      Tang-style recommendation ranking. Recommendations remain non-authoritative and cannot
+      authorize edits, training, or projection writes.
+- [ ] **AGENTIC-REPAIR-VERTICAL-REPLAY-01** — prove one bounded
+      `verified error → evidence packet → repair candidate → validation → replay receipt`
+      flow through the existing workstation/repair owner, with stable repair-case identity,
+      revision references, timeline correlation, and `writesPerformed=false`.
+- [ ] **AGENTIC-REPAIR-TODO-CLOSURE-01** — replace or explicitly quarantine the current Mastra
+      adapter TODO seams and LangGraph placeholder/fallback behavior only after the existing
+      retrieval, validation, ACE, identity, and OpenCode owners are proven as callers. No
+      automatic mutation or hidden reasoning persistence is permitted.
+- [ ] **PHASE18-RERANKER-PATH-DECISION-01** — make an explicit retire-or-wire decision for
+      `sveltekit-frontend/src/lib/server/ml/phase18-reranker.ts`; it must not silently become a
+      second owned reranker or bypass the canonical executor.
+- [ ] **XGBOOST-OBJECTIVE-COMPARE-01** — compare the owned model objective/metric only on an
+      admitted, leakage-free, revision-qualified corpus. Existing historical metrics and
+      synthetic traces remain inadmissible.
+
+Current progress interpretation:
+
+```text
+OWNED RERANKER CONTRACT          PROVEN
+MARCO/MIXEDBREAD DEFAULT PATH    DISABLED
+RANKING METADATA UTILITY         PRESENT, HEURISTIC
+AUTHORITATIVE PROGRESS RECEIPT   MISSING
+DAILY GRAPHIFY DELTA BOARD       NOT PROVEN
+AGENTIC REPAIR VERTICAL REPLAY   NOT PROVEN
+PHASE18 DUPLICATE PATH           DECISION OPEN
+TRAINED OWNED RERANKER           NOT ADMITTED
+```
+
+No training, sidecar activation, Kanban persistence, Graphify run, repair application, or
+datastore/projection write was performed by this audit.
+
+## Sidecar-to-candidate feature ABI admission (2026-09-14)
+
+The checked-in Python sidecar and trainer consume a 16-column ABI (`cosine_score`,
+`bm25_rank_norm`, `ann_turbovec_score`, and related trace features). The existing
+`CandidateFeatureSnapshotV1` columnar contract has a different 12-column semantic feature ABI
+(`semanticRelevance`, `lexicalRelevance`, `astAffinity`, and related features). These are not
+interchangeable by name, order, or omission. A pure admission boundary was added so the
+difference fails closed instead of silently scoring a misaligned vector.
+
+- [x] **XGBOOST-SIDECAR-FEATURE-ABI-CONTRACT-01** — added
+      `sveltekit-frontend/src/lib/server/atlas/classification/xgboost-sidecar-feature-admission-v1.ts`.
+      It validates sidecar model/schema identity, recomputes the ordered feature-schema hash,
+      requires candidate snapshot/ordinal/workspace/feature provenance and checksums, and
+      rejects missing, reordered, or mismatched feature ABI fields without I/O.
+- [x] **XGBOOST-SIDECAR-FEATURE-ABI-TEST-01** — added focused coverage for exact admission,
+      bad sidecar checksum, feature-schema mismatch, reordered columns, and missing provenance;
+      the combined sidecar-admission plus ranking-lineage suite passes **10/10**.
+- [ ] **XGBOOST-FEATURE-PROJECTION-01** — define and checksum an explicit mapping from the
+      server-owned candidate-feature snapshot ABI to the sidecar's 16 input columns, including
+      null/missing-feature policy and evidence for every derived value. Do not use positional
+      coercion, default zeros, or field-name aliases as a substitute.
+- [ ] **XGBOOST-SIDECAR-FEATURE-BUNDLE-ADMISSION-01** — invoke the pure boundary from one
+      server-owned live candidate bundle and prove the admitted feature schema/revision matches
+      the sidecar before scoring.
+- [ ] **XGBOOST-SIDECAR-LIVE-REPLAY-01** — replay that exact admitted bundle twice through a
+      selected trained artifact and verify deterministic scores, model revision, feature ABI,
+      candidate snapshot, ordinal checksum, and `writesPerformed=false`.
+
+This contract proof does not authorize a feature projection, training run, sidecar start,
+active mode, cache warming, or datastore/projection update.
+
+## Explicit sidecar feature projection contract (2026-09-14)
+
+The projection boundary is now represented without claiming that a production mapping exists.
+`xgboost-sidecar-feature-projection-v1.ts` requires every target column to name an explicit
+source column, derivation revision, evidence reference, and manifest checksum. It materializes
+only finite, present values and rejects the current canonical snapshot ABI when the required
+sidecar inputs are absent.
+
+- [x] **XGBOOST-FEATURE-PROJECTION-CONTRACT-01** — added the pure checksummed projection
+      manifest/materializer and verified exact 16-column admission, missing-source rejection,
+      checksum tamper rejection, and rejection of an unmapped canonical snapshot. Focused
+      projection coverage passes **4/4**.
+- [ ] **XGBOOST-FEATURE-PROJECTION-01** — populate and review a real mapping from the admitted
+      server-owned candidate feature snapshot to all 16 sidecar inputs. Each derived signal
+      needs a defined null policy, producer/derivation revision, evidence refs, and a
+      current-corpus checksum; the fixture mapping is not production evidence.
+- [ ] **XGBOOST-SIDECAR-FEATURE-BUNDLE-ADMISSION-01** — invoke the projection and admission
+      contracts from one live server-owned candidate bundle before sidecar scoring.
+
+No feature values were generated from production data and no training, sidecar, cache, or
+datastore state was changed.
+
+## Source-lineage correction for owned ranking rows (2026-09-14)
+
+The ranking adapter was previously attempting to substitute `canonical:<canonicalId>` when
+the feature row did not expose `sourceRef`. That is not admissible source evidence. The
+feature-row contract now carries nullable `sourceRef`, and the XGBoost training-row adapter
+rejects a null source reference instead of manufacturing one.
+
+- [x] **XGBOOST-RANKING-SOURCE-REF-01** — preserve explicit source references through
+      `CandidateFeatureRowV1` and require them before producing a revision-qualified ranking
+      candidate. Focused ranking/sidecar suites pass **14/14**.
+- [ ] **XGBOOST-REAL-CANDIDATE-CAPTURE-01** — supply those source references from one live,
+      admitted SearchRuntime/CandidateOrdinal boundary with current workspace/source
+      revisions; fixture rows do not close live capture.
+
+This correction does not create a training corpus or authorize model inference. Existing
+unrelated Svelte typecheck failures remain separately tracked; no database, cache, model,
+or projection writes occurred.
+
+- [x] **XGBOOST-SCHEMA-AUDIT-01** — matched the `CandidateFeatureRowV1` schema change to
+      ranking-lineage validation and regression coverage. A missing `sourceRef` now fails
+      closed with `XGBOOST_RANKING_SOURCE_REF_REQUIRED`; the focused suite passes **15/15**.
+
+## Still-missing implementation gates after duplicate-path audit (2026-09-14)
+
+The follow-up source census found that the repository has strong pure contracts, but the
+remaining live integration gates are still open. These are recorded here so contract proof
+is not confused with a production completion claim.
+
+- [x] **XGBOOST-DUPLICATE-PLACEHOLDER-CENSUS-01** — reviewed
+      `sveltekit-frontend/src/lib/server/ml/phase18-reranker.ts`. The file is a separate
+      uncalled scaffold: model loading and prediction are TODOs, and its fallback returns
+      `authority_score` with placeholder confidence. It is not the canonical reranker and
+      must not be enabled by import side effect. No deletion or archive was performed.
+- [ ] **PHASE18-RERANKER-PATH-DECISION-01** — make the explicit retire-or-wire decision for
+      the uncalled Phase 18 scaffold. If retained, route it through the canonical executor
+      and the revision-qualified sidecar admission contract; if retired, preserve a
+      checksum-addressed archive receipt before removing the active copy. Do not create a
+      second reranker owner.
+- [ ] **XGBOOST-FEATURE-PROJECTION-01** — populate and review a real mapping from the
+      server-owned `CandidateFeatureSnapshotV1` to all 16 sidecar inputs. Every value must
+      have a null/missing policy, producer and derivation revision, evidence references,
+      finite-value validation, and a current-corpus checksum. The fixture mapping is not
+      production evidence.
+- [ ] **XGBOOST-SIDECAR-FEATURE-BUNDLE-ADMISSION-01** — invoke the projection and pure
+      admission boundary from one server-owned live candidate bundle, proving ordered ABI,
+      feature-schema revision, workspace/source/representation revisions, ordinal-map
+      checksum, and `writesPerformed=false` before scoring.
+- [ ] **XGBOOST-SIDECAR-LIVE-REPLAY-01** — replay that exact admitted bundle twice through
+      an explicitly selected trained artifact and prove deterministic scores, model
+      revision, feature ABI, candidate snapshot, ordinal checksum, finite outputs, and
+      read-only behavior. A reachable endpoint without a qualified artifact is insufficient.
+- [ ] **XGBOOST-OWNED-ARTIFACT-AVAILABILITY-01** — verify a checksum-addressed owned model
+      artifact, its admitted leakage-free training corpus, held-out quality receipt, and
+      rollback metadata. Existing files, sidecar source, or historical metrics do not close
+      this gate.
+- [ ] **XGBOOST-TRAINING-PROMOTION-GATE-01** — keep active mode closed until real capture,
+      explicit labels, corpus admission, artifact quality, live replay, and independent
+      promotion approval all pass. Marco/Mixedbread remains compatibility-only and opt-in.
+
+### Workstation and agentic-repair gaps
+
+- [ ] **WORKSTATION-PROGRESS-RECEIPT-01** — connect the existing dry-run ranking utility to
+      a revision-qualified read-only receipt containing task status, evidence references,
+      blockers, completion metadata, rank metadata, and `writesPerformed=false`. Heuristic
+      `rankScore` remains prioritization only.
+- [ ] **DAILY-GRAPHIFY-PROGRESS-01** — consume authoritative OpenSpec, validation, and
+      repair receipts to produce a deterministic delta board for recommendation ranking.
+      Recommendations must remain non-authoritative and cannot authorize edits, training,
+      or projection writes.
+- [ ] **AGENTIC-REPAIR-VERTICAL-REPLAY-01** — prove one bounded
+      `verified error -> evidence packet -> repair candidate -> validation -> replay receipt`
+      through the existing workstation/repair owner with stable repair-case identity,
+      revision references, timeline correlation, and `writesPerformed=false`.
+- [ ] **AGENTIC-REPAIR-TODO-CLOSURE-01** — resolve or quarantine the Mastra adapter TODO
+      seams and LangGraph placeholder/fallback behavior only after existing retrieval,
+      validation, ACE, identity, and OpenCode owners are proven as callers. No hidden
+      reasoning persistence or automatic mutation is allowed.
+
+### Current status after this audit
+
+```text
+CONTRACTS / PURE ADMISSION TESTS       PROVEN
+CANONICAL RERANKER OWNER                XGBOOST / LIGHTGBM INTENDED
+MARCO / MIXEDBREAD                     COMPATIBILITY-ONLY, OPT-IN
+PHASE18 DUPLICATE SCAFFOLD              AUDITED, DECISION OPEN
+REAL FEATURE PROJECTION                 MISSING
+LIVE ADMITTED SIDECAR BUNDLE            MISSING
+TRAINED OWNED ARTIFACT                  NOT ADMITTED
+HELD-OUT QUALITY / PROMOTION            MISSING
+WORKSTATION PROGRESS RECEIPT            MISSING
+AGENTIC REPAIR VERTICAL REPLAY          MISSING
+ACTIVE RERANKER MODE                    CLOSED
+```
+
+No model training, sidecar activation, cache warming, repair application, Graphify run,
+Kanban persistence, or database/Qdrant/Valkey/Neo4j/projection write was performed by this
+audit.
+
+## Phase 18 endpoint placeholder follow-up (2026-09-14)
+
+The duplicate-path review found two additional exposed compatibility surfaces that must not
+be mistaken for the owned reranker. `sveltekit-frontend/src/mcp/tools/phase18-reranker-tool.ts`
+and `sveltekit-frontend/src/lib/server/trpc/procedures/phase18-reranker.ts` both accept a
+legacy 13-dimensional feature envelope and currently produce placeholder scores. The tRPC
+path adds `Math.random()` to scores/confidence/latency and returns `1.0-placeholder`; the MCP
+path is separately documented as placeholder scoring. Neither path proves an owned model,
+revision-qualified feature bundle, deterministic replay, or promotion authority.
+
+- [x] **PHASE18-ENDPOINT-PLACEHOLDER-CENSUS-01** — identified the MCP and tRPC endpoint
+      implementations, their legacy 13-column ABI, placeholder model identity, and
+      non-deterministic tRPC scoring. No endpoint was invoked or changed by this audit.
+- [x] **PHASE18-ENDPOINT-QUARANTINE-01** — both legacy endpoint paths now fail closed with
+      `OWNED_RERANKER_NOT_ADMITTED`, emit no synthetic score/confidence/latency/model
+      identity, and report `writesPerformed=false`. They remain compatibility envelopes,
+      not canonical scoring owners; future delegation still requires revision-qualified
+      sidecar admission.
+- [ ] **PHASE18-LEGACY-ABI-CONVERGENCE-01** — reconcile the legacy 13-dimensional MCP/tRPC
+      envelope with the checked-in 16-column sidecar ABI through an explicit, checksummed
+      projection. Reject missing or ambiguous mappings; never pad, reorder, default-zero,
+      or silently rename fields.
+- [ ] **PHASE18-DETERMINISTIC-REPLAY-01** — before any endpoint is considered usable,
+      replay one admitted bundle twice and require identical ordered outputs, model/schema
+      revisions, candidate snapshot, ordinal checksum, and `writesPerformed=false`.
+
+Current endpoint status:
+
+```text
+CANONICAL EXECUTOR GUARDS             PROVEN
+UNCALLED TS SCAFFOLD                  AUDITED, DECISION OPEN
+ MCP PHASE18 ENDPOINT                  QUARANTINED, FAIL-CLOSED
+ TRPC PHASE18 ENDPOINT                 QUARANTINED, FAIL-CLOSED
+LEGACY 13-COLUMN ABI                  NOT CONVERGED TO 16-COLUMN ABI
+PROMOTION / ACTIVE MODE               CLOSED
+```
+
+## Revised architecture alignment from objective review (2026-09-14)
+
+The legacy sidecar ABI is a feature width, not a candidate count. The newer
+`CandidateFeatureSnapshotV1` contract already carries stronger typed semantics and must
+remain the source of truth. Do not force semantically unrelated fields such as
+`reward_prior`, `ann_turbovec_score`, or `concept_overlap` into that snapshot merely to
+fill sixteen positions.
+
+- [x] **XGBOOST-FEATURE-PROJECTION-V2-01** — define a revisioned projection from the
+      server-owned semantic feature schema (`semanticRelevance`, `lexicalRelevance`,
+      `astAffinity`, graph authority/PPR, community, domain, execution, and memory
+      features) to an explicitly admitted model ABI. The projection must carry model
+      feature names, width, derivation/evidence revisions, null policy, and checksum.
+      The existing 16-column Python ABI remains `LEGACY_NEVER_PROMOTED` until this is
+      resolved; no positional coercion or invented defaults. The pure contract is now
+      implemented; live server-owned mapping remains a separate open gate below.
+- [ ] **XGBOOST-CANDIDATE-FUNNEL-01** — keep candidate count separate from feature width.
+      Prove a bounded funnel such as retrieval 128 → identity/RRF 64 → feature rows 32 →
+      final context 8–16, with ordinal-map checksums and Recall@K/MRR/NDCG/latency receipts.
+      These are evaluation parameters, not canonical identity.
+- [ ] **XGBOOST-GRAPH-FEATURE-BOUNDARY-01** — admit global PageRank, bounded query PPR,
+      community affinity, and topology coordinates only as revision-qualified derived
+      feature rows. PageRank/PPR must never create identity, an extra retrieval vote, or a
+      per-query full-graph dependency; missing graph evidence remains nullable/unavailable.
+- [ ] **XGBOOST-EXECUTOR-ABLATION-01** — retain Qdrant/cuVS/CAGRA/TurboVec as executor
+      diagnostics behind one semantic lane. Compare executor-specific deltas separately;
+      do not train four independent semantic votes into the ranker without an admitted
+      ablation and feature contract.
+- [ ] **XGBOOST-ARROW-CORPUS-01** — build the future leakage-free training corpus as an
+      immutable revision-qualified Arrow IPC artifact with logical content checksum,
+      ordinal checksum, query-group split, and mmap/PyArrow readback. CSV remains a
+      debugging export, not canonical training storage.
+- [ ] **XGBOOST-SUPERVISED-LTR-01** — keep the first owned model as supervised learning to
+      rank (`qid` groups, LambdaMART/rank-NDCG, explicit labels). Workflow success,
+      repair reward, or agent recommendation must not be converted into relevance labels
+      without an explicit reviewed bridge.
+- [ ] **XGBOOST-CUDA-TRAINING-01** — evaluate CUDA XGBoost training only after corpus
+      admission; benchmark CPU inference for small online batches separately. cuTile is a
+      later feature-gather optimization and is not an XGBoost training dependency.
+- [ ] **DAILY-GRAPHIFY-RECOMMENDATION-BRIDGE-01** — have daily Graphify consume
+      authoritative validation/repair/OpenSpec receipts and emit deterministic
+      `WorkstationProgressReceiptV1` plus non-authoritative Ewin-Tang-style recommendations.
+      It may rank work but cannot authorize training, edits, or projections.
+- [x] **MASTRA-PAPERCLIP-SHIM-CLOSURE-01** — classified the homegrown Mastra/Paperclip/Prime
+      Agent names as compatibility shims or documentation. Keep real LangGraph/Hermes and
+      existing ACP/OpenCode owners; do not install a second orchestration runtime merely
+      to make the names literal. No replacement runtime was added; any future replacement
+      requires a bounded parity replay. Current result: quarantine/classification proven,
+      production parity not claimed.
+- [ ] **AGENTIC-ERROR-FIXING-AWARENESS-01** — prove the existing agent flow can consume
+      `.okf`/JSON evidence through the ACE packet boundary, preserve revision/checksum
+      awareness, and emit a repair candidate plus validation/replay receipt. No hidden
+      reasoning, direct datastore mutation, or recommendation-as-authorization.
+
+### Updated progress interpretation
+
+```text
+FEATURE SEMANTICS OWNER                 CandidateFeatureSnapshotV1
+LEGACY 16-COLUMN SIDECAR ABI            PRESENT, LEGACY-ONLY
+MODEL ABI PROJECTION V2                 MISSING
+CANDIDATE COUNT VS FEATURE WIDTH        NOT YET EXPLICITLY PROVEN
+GRAPH / PAGERANK FEATURE BOUNDARY       DERIVED CONTRACT, CURRENT EVIDENCE PARTIAL
+ARROW/MMAP LEAKAGE-FREE CORPUS          MISSING
+SUPERVISED LTR LABELLED CORPUS          MISSING
+CUDA TRAINING                           DEFERRED UNTIL CORPUS ADMISSION
+DAILY GRAPHIFY PROGRESS BRIDGE          NOT PROVEN
+AGENTIC REPAIR AWARENESS REPLAY         NOT PROVEN
+MASTRA/PAPERCLIP                        SHIM CLASSIFICATION OPEN
+```
+
+- [x] **XGBOOST-FEATURE-PROJECTION-V2-CONTRACT-01** — added the pure
+      `xgboost-feature-projection-v2.ts` contract and regression suite. It accepts an
+      explicit model ABI mapping from the typed candidate feature schema, verifies a
+      manifest checksum, preserves ordinal/source revisions, and rejects null values or
+      missing `sourceRef`. Focused V2/ranking coverage passes **9/9**.
+- [ ] **XGBOOST-FEATURE-PROJECTION-V2-LIVE-MAPPING-01** — populate and review the mapping
+      from a real server-owned `CandidateFeatureSnapshotV1`; the current V2 contract and
+      fixture are not production-corpus evidence. Do not start training or sidecar scoring
+      until this live mapping has current-corpus evidence and a read-only receipt.
+
+## Still-missing gates after local error review (2026-09-14)
+
+The local implementation errors found in the V2 contract and quarantined Phase 18 handler
+were corrected and regression-tested. This closes code hygiene for the tranche only; it does
+not close live corpus, model, or promotion gates.
+
+- [x] **XGBOOST-V2-TYPECHECK-01** — replace the conditional `never` row inference with an
+      explicit projection-row type; the focused check no longer reports an error in the V2
+      contract.
+- [x] **PHASE18-QUARANTINE-REFERENCE-01** — remove the stale `packets` reference from the
+      fail-closed MCP response and use the validated `packetKeys` count; no synthetic result
+      is returned.
+- [ ] **XGBOOST-FEATURE-PROJECTION-V2-LIVE-MAPPING-01** — connect one real,
+      server-owned `CandidateFeatureSnapshotV1` producer and emit a read-only mapping
+      receipt with current workspace/source/feature revisions and non-null source references.
+- [ ] **XGBOOST-REAL-CANDIDATE-CAPTURE-01** — capture the bounded retrieval funnel with
+      separate candidate counts, stable ordinal membership, query groups, and replayable
+      evidence; do not use the 16-column sidecar width as a candidate count.
+- [ ] **XGBOOST-ARROW-CORPUS-01** — produce an immutable, revision-qualified Arrow
+      IPC/mmap corpus only after capture and label evidence are admitted; CSV remains
+      diagnostic.
+- [ ] **XGBOOST-SUPERVISED-LTR-01** — obtain reviewed relevance labels and leakage-free
+      query-group splits before training LambdaMART/rank-NDCG; workflow rewards are not
+      relevance labels by implication.
+- [ ] **XGBOOST-SIDECAR-LIVE-REPLAY-01** — prove health, schema/model/artifact revisions,
+      deterministic repeated scoring, and `writesPerformed=false` against the admitted
+      bundle. Active scoring remains closed.
+- [ ] **DAILY-GRAPHIFY-PROGRESS-01** — consume authoritative validation and repair receipts
+      into one deterministic workstation progress receipt; recommendations remain advisory.
+- [ ] **AGENTIC-ERROR-FIXING-AWARENESS-01** — replay one verified error through evidence
+      packet → repair candidate → validation → replay receipt, preserving revision and
+      checksum awareness without hidden reasoning or direct mutation.
+- [x] **MASTRA-PAPERCLIP-SHIM-CLOSURE-01** — classified and quarantined the existing
+      compatibility shims; real LangGraph/Hermes and OpenCode/ACP owners remain. No additional
+      orchestration runtime was added. Production parity remains unclaimed and would require a
+      separate bounded replay.
+
+Current gate summary:
+
+```text
+V2 projection contract/tests          PROVEN (9/9 focused tests)
+Phase 18 placeholder paths             QUARANTINED / NOT USABLE
+Live feature mapping                  MISSING
+Current candidate capture              MISSING
+Admitted labelled corpus               MISSING
+Owned model/artifact                  MISSING
+Sidecar live replay/promotion         BLOCKED
+Workstation receipt/recommendations   NOT PROVEN
+Agentic repair replay                 NOT PROVEN
+```
+
+- [x] **ATLAS-IDENTITY-AUDIT-PHASE2-FAILCLOSED-01** — replaced the optional
+      Qdrant/Neo4j/Redis placeholder branches in `sveltekit-frontend/src/mcp/atlas_identity_audit_tools.ts`
+      with explicit unavailable-capability blockers. Requested cross-store phases now remain
+      non-passing when their service clients are absent; no zero-count result is treated as
+      parity evidence.
+- [x] **NLP-PROOF-MODEL-PATH-FAILCLOSED-01** — removed fabricated
+      `placeholder-model.gguf` defaults from the read-only ACP/NLP proofs. They now resolve
+      the configured model path from repository environment files and fail explicitly when
+      the required configuration is absent.
+- [x] **AE-MANIFEST-QDRANT-ID-FAILCLOSED-01** — removed the synthetic
+      `synthetic:${packetKey}` fallback from the AE manifest. Unresolved Qdrant points are
+      represented as `null` error records; only queued/pending records may carry a real point
+      ID, and the manifest contract was versioned to `atlas-ae-train-v2`.
+- [ ] **PLACEHOLDER-CENSUS-REMAINDER-01** — review legacy generators and fixtures that
+      still contain synthetic vectors, random benchmark scores, or routing fallbacks. Classify
+      each as diagnostic-only, compatibility-only, or unsafe-to-run before changing it; do not
+      treat the census itself as proof that a production path is active. The active semantic MCP
+      tool path still defaults missing runtime identity to `atlas-workspace`,
+      `atlas:packet:runtime`, and timestamp-derived workspace/packet revisions; those values are
+      not admissible evidence. The boundary now rejects missing runtime identity with
+      `REVISION_QUALIFIED_RUNTIME_REQUIRED`; fixture tests pass explicit caller-owned revisions.
+      Remaining work is to prove this behavior through the live MCP envelope and remove any
+      equivalent defaults in adjacent callers. The production `runtime-retrieve` route now also
+      requires explicit `packetKey`, `workspaceRevision`, and `packetRevision` instead of
+      timestamp-derived identity; the acknowledged mock Mastra route now requires the same
+      caller-owned fields and remains separately quarantined.
+
+Residual classification from the 2026-09-14 review:
+
+- `scripts/atlas/retrieval-e2e-benchmark.mjs` remains diagnostic-only: its Qdrant/Neo4j/GPU
+  fallbacks and coherence scores are explicitly mocked and must never produce promotion,
+  relevance-label, or canonical-identity evidence.
+- `scripts/atlas/materialize-ontology-node-index.mjs` remains unsafe for promotion: its
+  4D/topology scores and graph identifiers are generated values and must be replaced by
+  revision-qualified producer inputs before any materialization is authorized.
+- `scripts/atlas/graphify-cluster-sync-partition.mjs` no longer uses a random ID fallback;
+  it now derives a deterministic executor-only projection ID from the packet key and marks
+  the payload `TURBOVEC_PROJECTION_ONLY` / `canonical_authority=false`. The script remains
+  non-promotional because its hash-derived 64D vector is diagnostic, not a canonical
+  `semantic_768` representation; replacing that vector with an admitted embedding remains
+  open.
+- `sveltekit-frontend/src/lib/server/atlas/semantic-signal-routing.ts` retains a fallback
+  routing evidence reference solely to satisfy the compatibility shape. It is non-canonical
+  and must not be accepted as source/chunk evidence; a future caller-adoption gate should
+  require explicit evidence refs instead of this fallback.
+- `scripts/atlas/batch-offline-ingest.mjs`, `scripts/atlas/phase-2a-ast-grep-lexical-kmeans-topology.mjs`,
+  and `scripts/atlas/compute-p4-attention-scores.mjs` remain fixture/benchmark generators;
+  their generated vectors or scores are not corpus, training, or promotion evidence.
+
+Reachable apply safety was tightened in this pass:
+
+- Phase 2A now rejects non-dry-run execution with
+  `PHASE2A_APPLY_BLOCKED_SYNTHETIC_FEATURES`; its mock/random vector and feature fallbacks
+  cannot reach PostgreSQL or Neo4j.
+- Ontology node materialization now rejects non-dry-run execution with
+  `ONTOLOGY_MATERIALIZE_APPLY_BLOCKED_UNQUALIFIED_FEATURES`; generated manifold/topology
+  values cannot be persisted until revision-qualified producers exist.
+- Legacy batch ingestion now rejects `--apply` with
+  `BATCH_OFFLINE_INGEST_APPLY_BLOCKED_UNQUALIFIED_EMBEDDING`; its random embedding fallback
+  and compatibility summaries remain diagnostic-only until an admitted embedding producer,
+  source lineage, and representation receipt are available.
+- P4 attention scoring no longer writes its query embedding during dry-run and no longer
+  synthesizes random centroids when Qdrant is unavailable. It now fails closed with
+  `P4_CENTROIDS_REQUIRED_QDRANT_READ_FAILED` or
+  `P4_CENTROIDS_REQUIRED_NO_REVISION_QUALIFIED_CENTROIDS`; revision-qualified centroid
+  provenance remains an open prerequisite for scoring or persistence.
+- The legacy `retrieval-e2e-benchmark.mjs` is now explicitly marked
+  `diagnosticOnly=true`, `promotionEligible=false`, and
+  `DIAGNOSTIC_ONLY_SYNTHETIC_HARNESS`; its fabricated query embedding, enrichment, graph,
+  GPU, context, and coherence stages cannot report a passing promotion result.
+- The Stage 4 ACE context warmer in `summary-ranking-retrieval-pipeline.mjs` now rejects
+  apply mode with `ACE_CONTEXT_WARM_APPLY_BLOCKED_PLACEHOLDER_BLEND`; fixed PageRank,
+  attention, and authority defaults cannot be written to Redis. Real revision-qualified
+  graph/attention/authority inputs remain required before cache warming.
+- P4 Karpathy blending now rejects incomplete PageRank or attention input sets with
+  `P4_KARPATHY_PAGERANK_INPUTS_INCOMPLETE` or
+  `P4_KARPATHY_ATTENTION_INPUTS_INCOMPLETE`; hardcoded component defaults were removed
+  before the Postgres/Redis write stage. Revision-qualified graph and attention inputs
+  remain required for any blend promotion.
+- The legacy SOM blend writer is additionally quarantined: `compute-p4-karpathy-blend.mjs`
+  now rejects non-dry-run execution with `P4_KARPATHY_APPLY_BLOCKED_UNREVISIONED_TARGET`
+  because `atlas_som_cell_karpathy_scores` has no admitted workspace/source/graph revision
+  contract. Its dry-run output remains diagnostic only.
+- `karpathy-gpu-enrich.mjs` apply mode now requires an explicit admitted
+  `sha256:<64-hex>` workspace revision and source-cohort checksum, failing with
+  `KARPATHY_APPLY_ADMITTED_WORKSPACE_REVISION_REQUIRED` or
+  `KARPATHY_APPLY_SOURCE_COHORT_CHECKSUM_REQUIRED` before service work. Its Redis outputs
+  remain derived and are not promotion evidence until the payload/readback revision binding
+  is proven.
+
+The next implementation work is to replace those generators with admitted Tree-sitter,
+semantic, graph, and ontology producer inputs, then add bounded readback proofs before
+reopening either apply path.
+
+These classifications do not authorize cleanup, deletion, projection writes, model training,
+or replacement of the existing owners. The next implementation gate is to audit each listed
+caller and either add an explicit diagnostic-only guard or replace its fallback with a
+revision-qualified input, then rerun the placeholder census.
+
+## Still-missing downstream consumer gates (2026-09-14)
+
+The producer-side guards above prevent several unsafe apply paths, but downstream consumers
+still need independent admission checks. A revision-qualified producer receipt is not enough
+if a caller reads an unqualified Redis value, substitutes a default score, or writes a
+projection with a synthetic identifier.
+
+- [ ] **KARPATHY-CONSUMER-REVISION-ADMISSION-01** — audit and harden
+      `scripts/atlas/xgboost-hotness-score.mjs`,
+      `scripts/atlas/unified-atlas-trace.mjs`, and
+      `scripts/atlas/sync-task-cluster-links.mjs` so Karpathy/PageRank/attention values are
+      accepted only when their workspace, source-cohort, graph/feature, and artifact
+      revisions/checksums match the admitted input bundle. Missing, stale, malformed, or
+      mixed values must remain unavailable (`null`/rejected), not become zero-valued ranking
+      evidence. **Progress 2026-09-14:** `xgboost-hotness-score.mjs` now requires explicit
+      admitted workspace and source-cohort checksums before any non-dry-run work; full
+      per-score revision/readback validation remains open. **Additional progress 2026-09-14:**
+      `unified-atlas-trace.mjs` now rejects bare/numeric or incomplete Redis Karpathy values;
+      it requires workspace/source-cohort/graph/feature/artifact evidence before exposing a
+      PageRank signal. Legacy `rev`/`run_at` summary timestamps remain diagnostic only.
+      Fixed freshness and unqualified topology contributions are now omitted from production
+      blends when their evidence is absent; the dry-run fixture remains diagnostic-only.
+      The CHR97 cache fast path now requires a revision-qualified trace envelope, so legacy
+      cached cartridges are bypassed rather than treated as current evidence. The pure
+      validator `scripts/atlas/lib/qualified-karpathy-evidence-v1.mjs` and focused regression
+      test cover malformed, timestamp-only, and fully qualified score/envelope cases. Live
+      producer/readback parity remains open.
+      The shared event recommendation contract now permits nullable freshness and excludes
+      unavailable freshness from its operational average; daily Graphify no longer emits the
+      fabricated `freshnessScore: 1`. A real revision-qualified freshness producer remains open.
+- [x] **DAILY-BOARD-SOURCE-IDENTITY-ADMISSION-01** — removed the remaining
+      `kanban:<taskId>` fallback in `daily-graphify-board-recommendations.ts`. A task ID may
+      identify a work item, but it is not a source reference, packet identity, or structural
+      evidence. Candidates without an admitted `sourceRef` must be represented as unavailable
+      or skipped, with an explicit rejection reason; they must not enter source-derived POS,
+      ontology, semantic, or ranking evidence. Focused board/recommendation tests pass;
+      live source-derived admission remains a separate gate.
+
+      Follow-up hardening: the implementation now also removes task-ID fallback from the
+      recommendation signal's `sourceRef`, does not synthesize a packet key from tree/title
+      metadata, and skips candidates whose evidence packet cannot be built from a real source
+      reference. This is contract/test proof only; it does not prove live source admission.
+- [ ] **KARPATHY-TRACE-DIAGNOSTIC-SEPARATION-01** — keep dry-run fixtures and ripgrep
+      fallback scores visibly diagnostic-only; a production trace or cache hit must not use
+      fixed freshness/topology defaults, synthetic confidence, or an unqualified
+      `karpathyRev` as promotion or canonical retrieval evidence.
+- [ ] **TASK-CLUSTER-LINK-IDENTITY-ADMISSION-01** — remove or quarantine the
+      `task:${taskId}:feature:${featureId}` Qdrant-ID fallback before any write-capable
+      `task_cluster_links` path. Require a real projection point readback plus canonical
+      task/feature/source/revision evidence; Redis-unavailable and missing-point cases remain
+      skipped/rejected rather than linked with invented identity. **Progress 2026-09-14:** the
+      synthetic fallback was removed from `scripts/atlas/sync-task-cluster-links.mjs`; missing
+      points now produce `QDRANT_POINT_READBACK_MISSING` and are skipped. Full revision-qualified
+      point readback and canonical task/feature evidence remain open.
+- [ ] **KARPATHY-DERIVED-WRITE-READBACK-01** — if the hotness or task-link consumers are ever
+      reopened for writes, require a bounded dry-run receipt, explicit admitted workspace and
+      source-cohort revisions, deterministic replay, and immediate readback. Derived Redis or
+      task-link state must remain non-canonical and must not feed XGBoost training labels or
+      semantic retrieval votes without a separate admission receipt.
+
+Current downstream status:
+
+```text
+Karpathy producer apply guards             PRESENT, READBACK BINDING OPEN
+Hotness consumer revision admission        PARTIAL; apply input guard added
+Unified trace diagnostic separation        PARTIAL; dry-run marked, defaults remain
+Task-cluster synthetic ID quarantine        PARTIAL; fallback removed, live surface absent
+Derived consumer write/readback             NOT PROVEN
+PageRank/PPR role                          DERIVED FEATURE ONLY
+Canonical identity                         POSTGRES / Parent Atlas, unchanged
+```
+
+**Schema-readback finding 2026-09-14:** a bounded dry run connected to PostgreSQL and Redis,
+then failed because `public.workspace_tasks` is absent. Repository migration evidence classifies
+`workspace_tasks` and the related task-link surfaces as proposal-only rather than current
+canonical tables. The linker now probes its three required tables through
+`information_schema` and exits with `SCHEMA_SURFACE_UNAVAILABLE` before any linking operation
+when the surface is absent. Do not substitute `atlas_tasks` without a separately authorized
+contract/ownership decision; the schemas and task identities are not interchangeable.
+
+No consumer gate is closed by source-level tests alone. Each requires a focused read-only
+receipt and must preserve `writesPerformed=false`; no Qdrant, Postgres, Redis/Valkey, graph,
+cache, cleanup, or model mutation is authorized by this ledger update.
+
+## Remaining implementation blockers and next gates (2026-09-14)
+
+This is the current handoff after the placeholder, consumer, workstation, and GPU-side
+audits. These are implementation gates, not requests to create parallel owners. PostgreSQL
+and the existing Parent Atlas receipts remain authoritative; Redis/Valkey, Qdrant, graph
+stores, GPU buffers, and agent runtimes remain derived or execution-only.
+
+### P0 — revision-qualified evidence and consumer admission
+
+- [ ] **KARPATHY-CONSUMER-READBACK-CLOSURE-01** — finish the read-only consumer adapter
+      for `xgboost-hotness-score.mjs` and `unified-atlas-trace.mjs`. Accept a score only when
+      its workspace revision, source-cohort checksum, graph/feature revision, and artifact
+      checksum match the admitted input bundle. Missing or stale PageRank/PPR/attention data
+      must be unavailable, never represented as `0`, a fixed freshness value, or a synthetic
+      `karpathyRev`. The producer's `log_state` carries workspace/source-cohort fields, but
+      the Redis score hash and `gpu:karpathy:summary` currently do not prove that the fields
+      survive into every consumed value. **Status: PARTIAL; consumer readback remains open.**
+- [ ] **KARPATHY-DERIVED-WRITE-READBACK-01** — keep all hotness/task-link writes closed until
+      a bounded dry-run receipt, deterministic replay, explicit admitted revisions, and
+      immediate readback exist. `sync-task-cluster-links.mjs` now stops on the absent
+      `workspace_tasks`/`task_cluster_links` schema surface; do not substitute `atlas_tasks`.
+- [ ] **CURRENT-SOURCE-AND-PACKET-CHUNK-CLOSURE-01** — bind one terminal Graphify execution
+      to the admitted workspace snapshot, prefer immutable
+      `graphify_execution_file_membership_v2`, and prove exact source membership, packet
+      membership, chunk lineage, content identity, and one semantic_768 cohort. Historical
+      NULL revisions remain observable and are not promotion-eligible. **Status: BLOCKED;
+      no current terminal execution plus source/packet/chunk closure is jointly proven.**
+- [ ] **CURRENT-GRAPH-REVISION-EDGE-PROOF-01** — produce a current revision-qualified graph
+      snapshot and `GraphOrdinalMapV1`; current observations have node keys but zero
+      revision-qualified edges. NetworkX/cuGraph/PageRank/PPR/community outputs remain
+      derived features only until this gate passes.
+
+### P1 — workstation and agentic error-fixing integration
+
+- [ ] **WORKSTATION-PROGRESS-RECEIPT-01** — connect the existing daily Graphify/workstation
+      audit to one revision-qualified `WorkstationProgressReceiptV1` containing task owner,
+      dependency wave, evidence refs, completion percentage, blockers, and checksums. Do not
+      infer progress from prose, stale reports, or OpenSpec checkbox counts alone.
+- [ ] **GRAPHIFY-RECOMMENDATION-BRIDGE-01** — convert the receipt into a deterministic
+      TaskCandidate/recommendation packet for the existing Kanban owner. Ranking may use
+      evidence-backed blocking, authority, failure, cost, and utility features; it must not
+      create duplicate tasks or authorize execution.
+- [ ] **WORKSTATION-AGENTIC-STDIO-REPLAY-01** — prove one synthetic verified-error flow:
+      evidence packet → repair candidate → schema/lineage/authorization validation → bounded
+      replay receipt. Preserve stable `repair_case_key`, revision references, replay checksum,
+      and `writesPerformed=false`.
+- [ ] **WORKSTATION-TIMELINE-AUTHORITY-01** — persist authoritative event/receipt references
+      through the existing event/control-plane owner. JSONL, OpenCode, ACP, MCP, Mastra,
+      Paperclip, Prime Agent, and terminal logs are evidence or adapters; none becomes a
+      second task/timeline authority. The live event/outbox-to-consumer proof remains open.
+- [x] **MASTRA-PAPERCLIP-SHIM-CLOSURE-01** — classified and quarantined the homegrown
+      Mastra/Paperclip/Prime Agent-shaped files; real LangGraph/Hermes and OpenCode/ACP owners
+      remain. No second orchestration runtime was installed. Any future replacement still requires
+      a bounded parity replay; this checklist entry is closed at classification/quarantine scope.
+      Agent-shaped files as compatibility shims or documentation, retain real LangGraph and
+      existing OpenCode/ACP owners, and do not install a new runtime solely to satisfy names.
+
+### P1 — unified GPU residency adapter
+
+- [ ] **GPU-RESIDENCY-DESCRIPTOR-01** — complete the revision-qualified descriptor/provider
+      seam for feature tiles, Transformer KV blocks, Mamba/Samba state, and Titans-style
+      memory. Providers may return bounded typed buffers, but may not own identity,
+      persistence, promotion, hidden thoughts, tensors, or GPU pointers.
+- [ ] **GPU-TILE-ROUTING-AND-EVICTION-01** — prove domain/LUT routing, pinned host staging,
+      bounded H2D transfer, LRU/lease eviction, and the 5.5–6.0 GiB RTX 3060 Ti ceiling.
+      JSON/simdjson is control-plane only; Arrow/MsgPack/typed buffers carry numeric tiles.
+      CUDA thread blocks/cuTile/SIMT consume an already-admitted ordinal tile and do not route
+      cache identity themselves.
+- [ ] **GPU-CPU-PARITY-01** — compare CPU reference, PyTorch SIMT, and isolated cuTile where
+      reachable on the same revision-qualified ordinal map and feature tile. Require checksum
+      parity, bounded replay, no silent CPU fallback, and `writesPerformed=false`.
+- [ ] **ROPE-KV-STATE-SAFETY-01** — reject KV reuse on model/tokenizer/RoPE/context-window or
+      artifact mismatch; keep RoPE/KV/Mamba/Samba state ephemeral. PCA/SVD may compress
+      semantic or candidate-feature matrices, not KV or recurrent state in this tranche.
+
+### P1/P2 — representation and ranking readiness
+
+- [ ] **XGBOOST-LIVE-CANDIDATE-CAPTURE-01** — capture real query groups through the existing
+      SearchRuntime funnel (broad candidates → identity/RRF → feature rows → context), with
+      `CandidateFeatureSnapshotV1` and ordinal-map identity. No fabricated labels or scores.
+- [ ] **XGBOOST-LABEL-EVIDENCE-01** — obtain revision-qualified human relevance evidence;
+      workflow success, PageRank, PPR, or agent recommendations are not relevance labels.
+- [ ] **XGBOOST-ARROW-CORPUS-01** — build a leakage-free Arrow IPC/mmap training corpus with
+      query groups, ordinal checksum, feature/model revisions, and logical artifact checksum.
+      CSV remains diagnostic only; CUDA training is blocked until this corpus is admitted.
+- [ ] **REPRESENTATION-BASELINE-CONSOLIDATION-01** — compare canonical `semantic_768` with
+      derived MRL/latent/PCA/SVD views only on the admitted current cohort. Do not promote a
+      view, create an ANN vote, or backfill vectors from historical/mixed revisions.
+
+### Explicitly still not proven
+
+```text
+current terminal Graphify execution for admitted snapshot       NOT PROVEN
+current source → packet → chunk closure                         BLOCKED
+current revision-qualified graph edges                           0 proven
+full semantic_768 corpus authority                               NOT PROVEN
+Karpathy/PageRank consumer revision readback                     OPEN
+workspace progress/recommendation receipt                        NOT PROVEN
+agentic stdio/timeline end-to-end replay                         NOT PROVEN
+unified GPU residency live streaming                              OPEN
+CPU ↔ PyTorch SIMT ↔ cuTile same-corpus parity                    NOT PROVEN
+XGBoost live candidates, labels, Arrow corpus, promotion          NOT PROVEN
+Mastra/Paperclip/Prime Agent installed runtime                    NO; shim classification remains
+```
+
+The next safe sequence is P0 source/packet/chunk closure, then current graph-edge proof,
+then workstation/agentic replay, and only then representation or GPU promotion work. No task
+above authorizes Graphify apply, migrations, Qdrant repair, Neo4j mutation, cache warming,
+model training, cleanup, deletion, commit, or push.
+
+### Additional revision-admission correction (2026-09-14)
+
+- [x] **GRAPHIFY-TASK-CANDIDATE-REVISION-ADMISSION-01** — the shared task-candidate builder
+      now leaves absent workspace/source/graph revisions nullable instead of defaulting to
+      `main` or board timestamps. Callers must supply explicit admitted revisions before a
+      candidate is eligible for source-derived promotion or downstream execution. Focused
+      contract and board tests pass; live admitted-revision delivery remains open.
+
+### Current missing gates after the 2026-09-14 blocker review
+
+These are the remaining implementation/proof gaps. They are intentionally separate from
+completed audits and do not authorize any mutation.
+
+- [ ] **CURRENT-EXECUTION-SOURCE-PACKET-CHUNK-CLOSURE-02** — bind exactly one terminal
+      Graphify execution to the admitted workspace snapshot, prefer the immutable
+      `graphify_execution_file_membership_v2` ledger exclusively when populated, and prove
+      exact source membership, packet membership, chunk lineage, content identity, and one
+      revision-qualified `semantic_768` cohort. Current execution ownership is still absent
+      or conflicting; do not use source-equivalent historical runs or lexical hash ordering.
+- [ ] **CURRENT-GRAPH-EDGE-ORDINAL-PROOF-02** — produce a current graph snapshot with
+      revision-qualified edges and `GraphOrdinalMapV1`. Current observations expose node keys
+      but zero qualified edges; PageRank, personalized PageRank (PPR), CheiRank, community,
+      NetworkX, cuGraph, and topology values remain derived/unavailable until this gate passes.
+      CheiRank, when introduced, must use the same admitted graph revision and ordinal map; it
+      is not a symbol identity, semantic vote, or authority substitute.
+- [ ] **SEMANTIC-768-CURRENT-CORPUS-ADMISSION-02** — reconcile the multiple semantic writer
+      surfaces against the sealed source/packet/chunk cohort. Legacy candidates contain
+      duplicate canonical IDs and missing/mixed revisions; do not repair IDs, infer revisions,
+      or fan out to Qdrant until one current owner and exact readback are proven.
+- [ ] **SYMBOL-REGISTRY-CURRENT-REVISION-RECONCILIATION-02** — resolve current structural
+      nominations into `atlas_symbol_registry`/`atlas_symbol_versions` only from admitted
+      source revisions. Existing bounded resolution is evidence, not full-corpus current
+      authority; `graphify_symbols` remains a producer/compatibility surface.
+- [ ] **KARPATHY-QUALIFIED-CONSUMER-LIVE-READBACK-02** — prove that the qualified
+      workspace/source-cohort, graph/feature, and artifact revisions survive the live producer
+      to every consumed score/cache value. Missing PageRank/PPR/hotness remains null/unavailable;
+      Redis/Valkey task-link writes stay closed.
+- [ ] **WORKSTATION-PROGRESS-AND-REPAIR-REPLAY-02** — connect authoritative validation and
+      repair receipts to one progress/recommendation packet and replay one verified error through
+      evidence packet → repair candidate → validation → replay receipt with stable case identity,
+      revision references, checksum, and `writesPerformed=false`. OpenCode/ACP/MCP/Mastra/
+      Paperclip/Prime Agent remain adapters or evidence, not additional owners.
+- [x] **MASTRA-SHIM-PLACEHOLDER-QUARANTINE-02** — the uncalled
+      `atlas-mastra-workflow.ts` shim was found containing placeholder workflow observations
+      (`retrievalConfidence=0.7`, `validationStatus=PASS`, and a bounded loop that assumed
+      validation success) plus a timestamp-derived packet key. The shim now requires caller-owned
+      packet/workspace/packet revisions, removes the timestamp packet fallback, and starts with
+      an unverified observation state. It remains non-production evidence until a real
+      revision-qualified caller and independent validation/replay receipts exist. Do not use its
+      output to close repair, retrieval, or promotion gates. The adjacent adapter no longer
+      returns example packets, PASS validation, successful writes, or canned context; those
+      unimplemented surfaces now fail closed explicitly. Semantic retrieval signal setup also
+      remains `PENDING` until retrieval evidence exists instead of claiming `PASS` prematurely.
+- [ ] **GPU-RESIDENCY-PARITY-02** — complete the bounded descriptor/routing/eviction proof and
+      same-corpus CPU↔PyTorch SIMT↔isolated cuTile parity on one admitted ordinal map. Keep
+      Mamba/Samba/Titans providers descriptor-only, RoPE/KV state ephemeral, and the RTX 3060 Ti
+      ceiling enforced; no GPU cache or model promotion is authorized.
+- [ ] **XGBOOST-REAL-CAPTURE-LABEL-CORPUS-02** — capture real query groups, explicit relevance
+      labels, and a leakage-free Arrow IPC/mmap corpus from the admitted feature snapshot. The
+      legacy 16-column sidecar ABI remains non-promotional; no CUDA training or active reranking.
+- [ ] **MIGRATION-AND-STORAGE-RETENTION-AUTHORITY-02** — finish read-only migration-owner and
+      Qdrant/Docker retention classification, including restore/rollback evidence and exact
+      candidate ownership. No schema apply, snapshot deletion, image deletion, cleanup, or
+      destructive prune is authorized.
+
+### P0 readback status (2026-09-14)
+
+- [x] **EXPLICIT-ADMITTED-REVISION-INPUT-01** — the current workspace packet/chunk audit rejects
+      missing or malformed revisions and consumes the explicitly supplied admitted SHA-256
+      revision. It does not infer currentness from lexical `MAX()` ordering, timestamps, source
+      paths, or historical rows.
+- [ ] **ADMITTED-REVISION-BINDING-READBACK-01** — the latest selected-revision report still
+      records `binding_rows=0`, `binding_sources=0`, `graphify_exact_sources=0`, and
+      `packet_chunk_exact_sources=0`. This is an unresolved source-authority absence, not a
+      successful empty cohort; bind/read back one terminal execution before downstream closure.
+- [ ] **SOURCE-REVISION-NAMESPACE-BRIDGE-01** — keep Graphify code/blob revisions distinct from
+      canonical Parent Atlas source revisions and prove equivalence only through exact source
+      content identity. No `COALESCE` fallback or null provision may promote an unqualified row.
+
+### Current packet/chunk readback (2026-09-15)
+
+- [x] **CURRENT-PACKET-CHUNK-READBACK-AUDIT-01** — the read-only auditor now consumes the
+      explicitly supplied workspace revision inside one `REPEATABLE READ READ ONLY` transaction,
+      prefers the selected execution frame, and keeps whole-source digests separate from per-chunk
+      hashes. Timeout-prone optional checks use savepoints; no write path is enabled.
+- [ ] **CURRENT-PACKET-CHUNK-CLOSURE-STATUS-01** — latest readback is
+      `CURRENT_PACKET_CHUNK_JOIN_PARTIAL`: `24,456` source-membership rows and
+      `24,456` exact source members are present, but only `577` sources have proven
+      `source → packet → chunk` lineage and `packet_content_matches=0`. This is evidence of
+      partial lineage, not packet-digest admission. Keep packet/chunk materialization,
+      semantic promotion, graph promotion, and cache warming blocked until the canonical packet
+      digest producer/readback and exact admitted cohort are proven. `writesPerformed=false`.
+
+### Still-missing blockers after the 2026-09-14 route and authority audit
+
+This status is intentionally narrower than the historical portfolio census. A contract,
+fixture, or diagnostic result is not promoted to live/current evidence without an exact
+revision-qualified readback.
+
+- [ ] **GRAPHIFY-EXECUTION-SNAPSHOT-OWNER-02** — prove exactly one terminal Graphify
+      execution for the admitted snapshot revision. Use
+      `graphify_execution_file_membership_v2` exclusively when it has rows for the execution;
+      do not concatenate it with the legacy execution-file ledger. Current evidence still
+      shows no jointly proven terminal owner and a conflicting historical candidate.
+      **Live recheck 2026-09-14:** the auditor was rerun against the explicitly admitted
+      workspace revision `sha256:3e677c29319a4a60bc60803be4186ba108dce906945af593a3a6f5cf43d11881`
+      using a separate report path because the shared 43 MB receipt was locked. It found
+      `terminalExecutionCount=32` but `matchingExecutions=0`, with
+      `firstBlockingInvariant=SNAPSHOT_READBACK_NOT_PROVEN` and status
+      `GRAPHIFY_SNAPSHOT_BINDING_BLOCKED_SNAPSHOT_READBACK`. The admitted revision is
+      recognized, but no execution is promoted or relabeled; packet/chunk and downstream
+      semantic/graph promotion remain blocked.
+      Evidence: `docs/reports/current-graphify-snapshot-binding-recheck-v1.json`.
+      **Root-cause detail 2026-09-15:** the recheck resolved the admitted workspace revision
+      as `sha256:3e677c29319a4a60bc60803be4186ba108dce906945af593a3a6f5cf43d11881`, but
+      selected snapshot manifest `sha256:48e1dbb326a4e249dc550cf1df06da8ec82ca4a837dd93eca114e4bafb2747e8`.
+      That manifest contains `25,291` sources, of which `24,982` read back exactly and
+      `309` fail source readback. Therefore the blocker is two-layered:
+      `ADMITTED_REVISION_MANIFEST_MISMATCH` plus `SNAPSHOT_SOURCE_READBACK_INCOMPLETE`.
+      Do not bind an existing execution or relabel the manifest. The next safe gate is a
+      newly captured immutable snapshot whose content checksum, source count, and source
+      membership checksum are all admitted together, followed by one terminal Graphify
+      execution over that exact artifact.
+      **Fresh capture/readback 2026-09-15:** a new local observation artifact was captured
+      with the explicit workspace ID and no capture violations: `25,542` sources across
+      `7` repositories, `snapshotRevision=sha256:c0c349de87ec897e5b3660ffc297415481b11333be4508f5bf13ebe3a1148687`.
+      The independent readback found `25,541/25,542` exact matches and one
+      `SOURCE_BYTES_CHANGED` for `sveltekit-frontend/src/lib/server/agent/action-writer.spec.ts`.
+      This is a reproducibility failure caused by the worktree changing between capture and
+      readback, not evidence that the snapshot is authoritative. The artifact remains
+      `canonicalAuthority=false`, `datastoreWritesPerformed=false`, and must not be admitted
+      until a stable capture/readback pair is produced. Evidence:
+      `docs/reports/workspace-source-snapshots/c0c349de87ec897e5b3660ffc297415481b11333be4508f5bf13ebe3a1148687.json`.
+      **Second capture/readback 2026-09-15:** capture produced a clean local artifact
+      `sha256:e10230a35012313465917c053684e32fdff170acb5dbe886902c8814999676f1`
+      with `25,542` sources and zero capture violations. Immediate readback again found
+      `25,541/25,542` exact matches; `openspec/changes/parent-atlas-best-fit-score-fabric/tasks.md`
+      changed during verification. This confirms active worktree concurrency is the current
+      reproducibility blocker. The refreshed terminal owner audit independently reports
+      `runCount=0`, `completedOwnerCount=0`, `workspaceRowCount=0`, and
+      `coordinatorExecutionCount=0` for the admitted revision. Evidence:
+      `docs/reports/current-graphify-run-owner-v1.json` and
+      `docs/reports/workspace-source-snapshots/e10230a35012313465917c053684e32fdff170acb5dbe886902c8814999676f1.json`.
+      **Snapshot-native preflight 2026-09-15:** the existing Graphify entrypoint was inspected
+      and not invoked because it opens a database execution ledger and requires explicit
+      authorization. Its read-only preflight reports the admitted artifact pair as
+      `workspaceRevision=sha256:3e677c29319a4a60bc60803be4186ba108dce906945af593a3a6f5cf43d11881`
+      and `snapshotRevision=sha256:48e1dbb326a4e249dc550cf1df06da8ec82ca4a837dd93eca114e4bafb2747e8`,
+      but the materialized snapshot root is missing: `missingSources=25,291` and
+      `MATERIALIZED_SNAPSHOT_MISSING`/`MATERIALIZED_SOURCE_MISSING`. Checksums and repository
+      count are otherwise present, with `persistentWrites=0`. Therefore the next prerequisite
+      is materializing and readback-verifying an admitted immutable snapshot; do not open a
+      partial Graphify execution. Evidence: `docs/reports/graphify-snapshot-consumer-preflight-v1.json`.
+      **Materialization attempt 2026-09-15:** the fail-closed materializer was run against the
+      admitted `48e1...` artifact and stopped at `.claude/settings.json` with
+      `SNAPSHOT_SOURCE_CHANGED_BEFORE_MATERIALIZATION`. No destination was published; only
+      process-scoped partial staging directories exist. This confirms the admitted artifact is
+      stale relative to the current worktree and cannot be used for Graphify execution. Do not
+      copy around the mismatch or promote a partial tree. The next gate is a stable capture,
+      complete source-byte readback, explicit re-admission, then materialization.
+      **Stable candidate and materialization 2026-09-15:** the new artifact passed independent
+      byte readback at `25,542/25,542` with zero violations. The existing read-only revision
+      derivation produced candidate `sha256:44ea163a5796b40b448e9ed706071427fe5e4d9b2117ad05b230572a2797189f`
+      over `25,542` sources and `7` repositories. The candidate source tree then materialized
+      successfully at `.tmp/workspace-source-snapshots/5a1dcf9e9a73c2b2d6b010c8e5993d2daf9d20d3092868ae1112583042a4510a`,
+      with all source hashes and byte lengths verified and `writesPerformed=false`. It is not
+      yet authoritative because the admission receipt still names the older `48e1...` snapshot;
+      explicit admission remains the next gate before opening Graphify execution.
+      **Preflight report-path hardening 2026-09-15:** added an optional `--report=<path>`
+      override to `audit-workspace-revision-tournament-source-authority-v1.mts` so locked
+      shared receipts no longer turn a read-only audit into an infrastructure error. The
+      recheck completed using a separate receipt but correctly remained
+      `CANDIDATE_ADMISSION_PREFLIGHT_BLOCKED` because `snapshotReadback=false`; no authority
+      or datastore write occurred. Evidence:
+      `docs/reports/workspace-revision-tournament-source-authority-recheck-v1.json`.
+- [ ] **CURRENT-EXECUTION-SOURCE-PACKET-CHUNK-CLOSURE-03** — after the execution owner is
+      proven, read back exact execution membership → source content revision → packet →
+      `atlas_packet_chunk_lineage` → `codebase_chunk_index` → semantic_768. Require one
+      admitted workspace revision, zero mixed revisions, zero content mismatches, zero
+      ambiguity, and no synthetic identity. Historical NULL revisions remain observable and
+      non-promotional.
+- [ ] **CURRENT-GRAPH-EDGE-ORDINAL-PROOF-03** — produce a revision-qualified current graph
+      snapshot and `GraphOrdinalMapV1` with real edges. Current graph observations remain
+      node-only/empty at the edge producer boundary. PageRank, PPR, CheiRank, community,
+      NetworkX, cuGraph, and topology coordinates remain unavailable/derived; none may fill
+      missing values with zero or create an identity/vote.
+- [ ] **SYMBOL-REGISTRY-CURRENT-REVISION-RECONCILIATION-03** — scale the bounded structural
+      bridge only after current source membership closes. Existing 90-row resolution and
+      five new-version candidates are dry-run evidence; they do not authorize registry
+      writes or imply that historical symbol versions are current.
+- [ ] **SEMANTIC-768-CURRENT-CORPUS-ADMISSION-03** — reconcile the 768 writer surfaces and
+      admit one current cohort. Legacy Qdrant/semantic populations still contain duplicate
+      canonical IDs, missing revisions, and mixed workspace/representation revisions.
+      Legacy payload reconciliation remains dry-run only; no guessed revision, ID repair, or
+      Qdrant fanout is allowed.
+- [ ] **LATENT-REVISION-IDENTITY-READBACK-01** — prove source-version, symbol-version,
+      representation, model, and byte-encoding lineage for latent_256/128/64 against the
+      admitted semantic_768 cohort. Bounded derivation parity is not full-corpus authority.
+- [ ] **TRACE-LIVE-IDENTITY-ENVELOPE-01** — replay one bounded disabled-tool request carrying
+      the same revision-qualified manifest through TRACE and prove the live process consumes
+      it. The source fix is present, but an already-running compiled TRACE process may still
+      serve stale behavior; do not restart it or enable optional tools as part of this gate.
+- [ ] **WORKSTATION-TIMELINE-REPLAY-03** — connect authoritative event/receipt references to
+      one deduplicated repair case and replay verified error → evidence packet → repair
+      candidate → validation → replay receipt. OpenCode, ACP, MCP, Mastra, Paperclip, Prime
+      Agent, JSONL, and terminal output remain adapters/evidence, not timeline owners.
+- [ ] **CACHE-PREFILL-LIVE-HANDOFF-01** — prove one real SearchRuntime request reaches the
+      server-owned CandidateFeatureSnapshot → ContextManifestV2 → prompt-cache boundary with
+      identityChecksum and all output-affecting revisions. No message-derived or timestamp-
+      derived manifest is admissible.
+- [ ] **MIGRATION-STORAGE-RETENTION-PREFLIGHT-03** — finish read-only migration classification
+      and exact Qdrant/Docker retention ownership, including restore/rollback proof. The
+      11,174 historical junk-packet cleanup and image/snapshot removal remain unauthorized;
+      archive, canary, deletion, and prune are all still closed.
+- [ ] **XGBOOST-REAL-CAPTURE-LABEL-CORPUS-03** — capture real query groups and human
+      relevance labels from the admitted feature snapshot, then emit a leakage-free
+      Arrow/mmap corpus. The legacy 16-column Python sidecar is not the newer feature ABI;
+      no CUDA training or promotion is permitted before this gate.
+
+### Agentic error-fixing census and safe hardening (2026-09-14)
+
+- [x] **AGENTIC-TYPESCRIPT-ERROR-FIXER-OWNER-AUDIT-01** — static read-only census completed
+      with `scripts/atlas/audit-typescript-error-fixer-owners-v1.mjs`. The legacy numbered
+      batch fixers and `scripts/batch-fix-ts-errors.mjs` remain mutation-capable regex/text
+      surfaces; `scripts/error-resolution/services/error-scanner.ts` is a structured
+      `svelte-check --output machine` reader. No live 80k-error count was asserted by this
+      audit, no shell checker was executed, and no source or datastore was changed.
+- [ ] **AGENTIC-TYPESCRIPT-ERROR-EVIDENCE-REPLACEMENT-01** — replace legacy batch-fixer use
+      with bounded machine-JSON error capture, stable error fingerprints, explicit
+      workspace/source revision fields when proven, and evidence-only TaskCandidate output.
+      A large error count is diagnostic telemetry, not mutation authorization. Any repair must
+      pass `WorkflowActionEventV1` approval, exact source preimage, bounded execution, and
+      independent validation. Do not mix BeautifulSoup/web-research evidence into TypeScript
+      repair authority; external evidence is a separate revisioned cold-evidence lane.
+      **Progress 2026-09-14:** `scripts/atlas/capture-typescript-error-evidence-v1.mjs` now
+      provides the bounded machine-JSONL capture/fingerprint adapter and is covered by its
+      standalone Node test. It preserves null lineage, emits stable `tserr:` IDs, and is
+      permanently non-promotional (`writesPerformed=false`, `safeToApply=false`). Live
+      TaskCandidate wiring, revision-qualified capture from the checker boundary, and any
+      governed repair replay remain open. The existing recommendation index now consumes this
+      report as `SVELTE_CHECK_MACHINE_JSON` observed cards when present; those cards retain
+      `executable=false`, `canonical_authority=false`, and `authorization_required=true`.
+      **Implementation update 2026-09-14:** extracted the pure normalizer into
+      `scripts/atlas/typescript-error-evidence-v1.mjs` and added
+      `scripts/atlas/run-typescript-error-evidence-capture-v1.mjs`. The runner invokes
+      `svelte-check --output machine --threshold error` directly with a bounded stdout
+      stream, then delegates to the same normalizer; checker exit code is reported but
+      machine JSONL remains the only parsed input. First-party `.ts/.tsx/.svelte` paths
+      are retained, generated/vendor/runtime/Qdrant-storage paths are excluded, duplicate
+      observations retain the same stable ID, and unknown lineage remains null. The runner
+      and root commands are read-only. A one-source live capture completed with checker
+      exit code 0 and zero retained diagnostics; its two non-JSON status lines were counted
+      as malformed rather than parsed as human-readable evidence.
+      **Live smoke 2026-09-14:** an unbounded scan exited `134` after Node heap exhaustion
+      and is recorded as incomplete; it must not be interpreted as zero errors. The bounded
+      one-source rerun completed with exit code 0 and `captureStatus=COMPLETE`. The next
+      implementation gate is multi-source batch capture plus TaskCandidate admission;
+      governed repair replay remains separate and open.
+      **Streaming hardening 2026-09-15:** added optional `--stream-errors <path>` mode to
+      `capture-typescript-error-evidence-v1.mjs`. Diagnostics are emitted incrementally as
+      JSONL; only bounded counters and the first 100 diagnostic line numbers remain in memory.
+      Added a seven-diagnostic stream-mode test; the focused capture suite is now `3/3` passing.
+      This removes the report-array heap bottleneck for large checker artifacts without changing
+      the nullable-lineage or non-promotional contract. Live checker-boundary capture and
+      TaskCandidate admission remain open.
+      **Runner integration 2026-09-15:** `run-typescript-error-evidence-capture-v1.mjs` now
+      forwards `--stream-errors` to the capture adapter. A live one-source `svelte-check
+      --output machine-verbose` smoke completed with checker exit `0`, `captured=0`, and
+      `writesPerformed=false`; this proves the runner boundary, not absence of errors in the
+      whole workspace.
+      **Critical correctness bug found and fixed 2026-09-14/15:** the "its two non-JSON status
+      lines were counted as malformed" observation directly above was the visible symptom of a
+      much deeper bug -- the parser's assumed input shape never occurs in real
+      `svelte-check` output at all, for ANY line, including real error diagnostics. Verified
+      by root-causing against `node_modules/svelte-check/dist/src/index.js`'s own
+      `MachineFriendlyWriter`, not assumed: (1) plain `--output machine` (what the runner was
+      using) never emits JSON per diagnostic -- it prints a hand-formatted
+      `TYPE "file" line:col "message"` string; only `--output machine-verbose` emits a JSON
+      payload, and even then each line is `<epochMs> <jsonObject>`, not a bare JSON line; (2)
+      the JSON shape itself also differed from what the normalizer assumed --
+      `{type:'ERROR'|'WARNING', filename, start:{line,character}(0-indexed), end, message, code
+      (numeric for TS), codeDescription, source}`, not `{filename, start:{line,column}, code,
+      text, severity}`. **Net effect: every previous live capture attempt against this
+      pipeline (including the "zero retained diagnostics" one-source run cited above) would
+      have captured zero real errors regardless of how many actually existed** -- confirmed by
+      writing a deliberate `const x: number = "not a number"` probe file and round-tripping it:
+      before this fix, `captured:0, malformedLineCount:2` (the ERROR line itself silently
+      misclassified as malformed, indistinguishable from the harmless START/COMPLETED lines);
+      after, `captured:1`, with correct `line:1, column:7, code:'TS2322'` matching the probe
+      exactly. The existing unit tests never caught this because both used hand-fabricated
+      bare-JSON fixtures matching the wrong assumed shape rather than real captured output --
+      fixed alongside the parser, now using real `machine-verbose`-shaped fixtures. Fixed:
+      `scripts/atlas/typescript-error-evidence-v1.mjs` (new `<epochMs> <json>` line parser,
+      correct field mapping, 0-to-1-indexed line/column conversion, numeric-code-to-`TS####`
+      normalization, a new `protocolLineCount` bucket so START/COMPLETED lines are no longer
+      indistinguishable from genuinely malformed ones), `run-typescript-error-evidence-capture-v1.mjs`
+      (`--output machine` → `--output machine-verbose`), and
+      `capture-typescript-error-evidence-v1.test.mjs` (fixtures rewritten to the real shape).
+      Re-verified: unit tests 2/2 pass; end-to-end probe-file run captures the real error
+      correctly; `build-agentic-error-index.mjs` re-run confirmed unaffected (it reads
+      `errorId`/`sourceRef`/`code`/`message`/`workspaceRevision`/`sourceRevision` off the report,
+      all unchanged field names, and sets its own independent `source` label rather than reading
+      the renamed `evidenceKind`). This is the single highest-leverage fix in this cluster: every
+      "live capture" claim recorded above this note predates it and must not be cited as
+      evidence real errors were ever actually captured -- only that the (broken) pipeline ran
+      without crashing.
+
+- [x] **AGENTIC-ERROR-INDEX-REAL-EVIDENCE-01** — the recommendation index now uses stable
+      evidence-derived repair keys for observed failures, preserves nullable evidence and
+      confidence, and does not invent a root cause from a tool path. Historical seed cards are
+      fixture-only and require explicit `ATLAS_INCLUDE_AGENTIC_FIXTURE_SEEDS=true`; they are
+      never live recommendations by default.
+- [x] **AGENTIC-GRAPH-NEIGHBOR-FAIL-CLOSED-01** — graph-neighbor expansion no longer invents
+      sibling files when Neo4j is unavailable or returns no match. It emits an empty,
+      explicitly unavailable/noncanonical result; verified graph neighbors are marked only
+      after a real readback.
+- [x] **AGENTIC-GOVERNED-REPLAY-01** — recommendation strings must not be treated as
+      mutation authorization. Closed: found the prior `--apply` refusal was incidental, not
+      structural -- `dryRunMode` could never be `false` past the refusal check (the only path
+      that would set it false already `process.exit(2)`s first), so the `writeFileSync`/
+      `card.status = 'verified'` block was unreachable dead code, not a proven safety
+      boundary. Removed that dead branch and the `writeFileSync` import entirely: the script
+      is now read-only by construction (verified live -- `rg "writeFileSync\(|execSync\(|writeFile\("`
+      returns zero matches in the file, and the workflow index's sha256 is identical before
+      and after both a dry-run invocation and a refused `--apply` invocation). `--apply` has
+      no code path left to fall through to; it always exits 2. Governed apply/verification
+      (writing a card to `verified` after real command execution, gated on an approved
+      `WorkflowActionEventV1`/mutation receipt) remains unbuilt and is tracked separately as
+      `AGENTIC-GOVERNED-REPLAY-PROOF-02` -- do not re-add a write path to this file to close
+      that gate; it belongs in its own governed executor module. Placeholder command tokens
+      such as `<target_file>` remain diagnostic and are not an execution proof.
+- [ ] **TASK-PROGRESS-PROJECTION-01** — emit a derived, revision-qualified progress card with
+      separate mechanical, evidence, validation, lineage, runtime, and composite percentages.
+      Do not write percentages into canonical task identity or infer completion from prose or
+      checkbox counts.
+- [ ] **GRAPHIFY-DAILY-PROGRESS-REFRESH-01** — connect the existing daily Graphify receipt to
+      the existing TaskCandidate/Kanban projector and recommendation owner. It must preserve
+      stable task identity, evidence refs, blocker state, and `writesPerformed=false`; no
+      second taskboard, Hermes/Mastra/Paperclip runtime, or recommendation authority may be
+      introduced.
+- [x] **WORKFLOW-ACTION-SCHEMA-ADOPTION-02** — re-ran the census wider than the original 4-file
+      scope: grepped every real (non-spec) file referencing `WorkflowActionEventV1` repo-wide,
+      not just the 4 schema-defining files. Found the real production write paths
+      (`src/lib/server/agent/action-writer.ts`, `canonical-action-write-adapter-v1.ts`,
+      `atlas/temporal/temporal-post-dispatch-recorder.ts`,
+      `atlas/temporal/temporal-tool-post-dispatch-recorder.ts`) already import
+      `workflowActionEventSchema`/`WorkflowActionEventV1` from
+      `@deeds/parent-atlas/core/workflow-action-event` directly -- cross-workspace adoption for
+      every live write path was already complete before this task started. Per-file disposition
+      of the 3 named local definitions, checked for an independent (non-adapter) construction
+      path, not just declared "local schema exists":
+      - `agentic-file-compiler/contracts.ts` (`WorkflowActionEventSchema`): already fully
+        compliant -- its only `.parse()` call site is inside `fromCanonicalWorkflowActionEvent()`
+        itself; no separate producer function exists. No change needed.
+      - `workflow/workflow-action-event-v1.ts` (hand-written `WorkflowActionEventV1` interface +
+        `validateWorkflowActionEvent()`): already fully compliant -- it has no Zod schema and no
+        producer function, only a representability validator (checks a caller-supplied object,
+        never constructs one) plus the canonical adapter pair. Zero real (non-spec) importers
+        anywhere in the repo, confirmed via `rg`. No change needed.
+      - `workflow/context-tool-dag-contracts.ts` (`WorkflowActionEventV1Schema`): the one real
+        gap. `workflowActionFromDagNode()` called `WorkflowActionEventV1Schema.parse(...)`
+        directly -- a second, independent construction path for the `'atlas.workflow-action.v1'`
+        identity. Confirmed via `rg` that this function has zero real (non-spec) callers anywhere
+        in the repo, making this a zero-live-migration-risk fix. Converted it to construct via
+        `workflowActionEventSchema` (canonical) first, then project down via the pre-existing
+        `fromCanonicalWorkflowActionEvent()` -- it no longer calls the local schema's `.parse()`
+        directly at all. Verified live: `context-tool-dag-contracts.spec.ts` 5/5 pass
+        (`--no-cache`), including the 4 tests that directly exercise
+        `workflowActionFromDagNode()`; the full `workflow/` + `agentic-file-compiler/` directory
+        suites re-run clean at 24 files / 75 tests, zero regressions.
+      "Historical persisted v1 dialects behind an explicit compatibility boundary": no evidence
+      of any persisted (DB/JSONL/file) data in any of the 3 local dialects was found during this
+      census -- consistent with each local write path having zero real production callers before
+      this fix. Not fabricating a compatibility boundary for data that does not appear to exist;
+      flagged rather than silently assumed clean, in case a persistence path was missed.
+- [x] **WORKFLOW-ACTION-IMPORT-RESOLUTION-02** — package subpath resolution from the SvelteKit
+      workspace is proven (`@deeds/parent-atlas/core/workflow-action-event` resolves and exports
+      `workflowActionEventSchema` plus the canonical action-kind list). Closed alongside
+      `WORKFLOW-ACTION-SCHEMA-ADOPTION-02` above -- the exactly-one-owner gap that entry
+      originally deferred to is now resolved.
+- [x] **AGENTIC-LEGACY-EXECUTION-CENSUS-01** — classified the remaining direct command
+      execution surfaces. `agentic-toolgan-execute.mjs`, `agentic-toolgan-replay.mjs`, and
+      `apply-error-fixes.mjs` were legacy mutation/replay paths with no proven canonical
+      approval receipt, bounded-file preimage, or independent validation boundary. Their
+      direct execution behavior is now removed or fail-closed; governed production execution
+      remains a separate open gate. Do not infer safety from a successful exit code.
+- [x] **AGENTIC-TOOLGAN-GOVERNED-BOUNDARY-01** — closed as an explicit read-only/propose-only
+      adapter (not routed through the plan-bound approval owner -- that remains future work).
+      Real bugs found and fixed, not merely gated: (1) `agentic-toolgan-execute.mjs`'s
+      simulate-only branch fabricated `result:'success'`/`proof.smoke:'PASS'` even though it
+      never runs anything real -- it now writes `result:null`/`proof.smoke:'NOT_EXECUTED'`; (2)
+      `agentic-toolgan-log-outcome.mjs` (not named in the original task text, found while
+      verifying end to end) would have taken that corrected `result:null` and logged it as a
+      FALSE FAILURE to `failures.ndjson`/`do-not-repeat.ndjson` via its naive
+      `result === 'success' ? success : failure` branch -- fixed by adding an explicit refusal
+      for `proof.smoke === 'NOT_EXECUTED' || result == null` that only writes to
+      `timeline.ndjson` (an activity log, not a verdict store) and exits 2. `--apply` fails
+      closed in both `agentic-toolgan-execute.mjs` (`TOOLGAN_APPLY_REQUIRES_GOVERNED_MUTATION_RECEIPT`)
+      and `agentic-toolgan-replay.mjs` (unconditional `REPLAY_NOT_EXECUTED_GOVERNED_APPROVAL_REQUIRED`
+      exit 2, including under `--test` -- verified live that `--test` no longer auto-passes: it
+      still requires a real `--trace_id` resolving to a real timeline event and does not skip
+      the terminal refusal). Live-verified end to end (not just per-file): ran `execute.mjs`
+      (produced `result:null`), then `log-outcome.mjs` against that exact plan --
+      `successes.ndjson`/`failures.ndjson`/`do-not-repeat.ndjson` line counts were unchanged
+      before and after. Structural sweep (`rg` for `execSync|execFile|spawn|writeFileSync|...`
+      across all three files) found zero executable matches other than one disclosed
+      `writeFileSync` in `execute.mjs` that writes only to the ephemeral, gitignored
+      `.tmp/toolgan-current-plan.json` staging file used to thread state between
+      plan/execute/log-outcome within one proposal cycle -- never a canonical or durable write,
+      kept because removing it would break the refusal mechanism this fix depends on. Full
+      receipt: `docs/reports/agentic-error-fixing-current-v3.json`.
+- [x] **AGENTIC-ERROR-FIX-APPLY-QUARANTINE-01** — closed by removing the dangerous capability
+      structurally rather than quarantining the file. The committed baseline (git HEAD before
+      this session) had a real high-risk bug beyond what this task text originally named:
+      `restartEmbeddingService()` ran `docker restart legal-ai-ollama` via `execSync`
+      UNCONDITIONALLY, before `isDryRun` was ever checked -- "dry-run" could mutate live service
+      state -- and `--apply` mode additionally ran a real `UPDATE error_logs ... RETURNING` via
+      `markErrorsAsResolved()`. A second bug: dry-run reported merely-eligible candidates as
+      `totalFixed`, representing a would-be repair as an actual one. Fixed: removed
+      `executeCommand`/`execSync`, `restartEmbeddingService`, and `markErrorsAsResolved`
+      entirely (not gated -- deleted); `--apply` now exits 2 with
+      `AGENTIC_ERROR_FIX_APPLY_BLOCKED_GOVERNED_EXECUTOR_REQUIRED` before Postgres is touched;
+      the sole remaining dry-run mode hardcodes `totalFixed:0` and `repairProof:false`, reporting
+      eligible-but-unactioned candidates as separate diagnostic-only counts
+      (`wouldAffectCount`/`unfixableCount`) that never fold into a "fixed" total; replaced the
+      nonstandard `fetch({timeout})` option with a real `AbortSignal.timeout(5000)`. Preserved
+      per the task's own instruction (real npm-script callers confirmed live:
+      `atlas:error:apply`/`:verbose`/`:force` in `sveltekit-frontend/package.json`) -- not
+      deleted, reachability was not unresolved. Verified live: `--apply` exits 2 before any
+      DB/service call; `node --check` passes; structural `rg` sweep for
+      `execSync|...|docker restart|UPDATE error_logs` returns zero executable matches (only
+      prose comments describing the fixed historical bug). Full receipt:
+      `docs/reports/agentic-error-fixing-current-v3.json`.
+- [x] **AGENTIC-GOVERNED-REPLAY-PROOF-02** — closed via
+      `governed-replay-admission-v1.spec.ts` (7/7 live). One earlier `npx vitest run` showed
+      3/7 failing with `REJECTED_APPROVAL` where `REJECTED_PREFLIGHT` was expected; a standalone
+      debug script calling the same admission function directly with identical inputs returned
+      the expected result, and a subsequent `--no-cache` re-run of the same spec file came back
+      7/7 clean. This is a non-reproducible runner/cache discrepancy, not a proven root cause --
+      the transform cache was never independently confirmed as the causal mechanism, only
+      correlated with the one-off failure. Recorded as an open anomaly, not asserted as
+      understood. Proves, against the real `admitGovernedReplayV1`/`preflightFileMutation`/
+      `resolveMutationApproval` boundary (fixture root, real filesystem, no mocks): (1) no
+      approval means no mutation (`REJECTED_NO_APPROVAL`, `writesPerformed:false`); (2) a
+      stale canonical-event workspace revision rejects (`REJECTED_EVENT_PLAN_MISMATCH`); (3)
+      an allowed-root escape rejects at preflight (`REJECTED_PREFLIGHT`, real path-containment
+      check, not a mock); (4) a stale preimage (`expectedExistingChecksum` mismatch against a
+      real on-disk file) rejects at preflight; (5) targeted validation is mandatory --
+      discovered this is enforced one layer earlier than assumed: `FileMutationPlanSchema`'s
+      `validationNodeIds` is `z.array(...).min(1)`, so a plan with zero validation nodes is
+      unconstructible and fails schema parse (`REJECTED_APPROVAL`, `'mutation plan is
+      invalid'`), never reaching preflight's own (now-provably-dead-but-harmless) empty-array
+      check -- the original task assumption that this was a preflight-level rejection was
+      wrong, fixed rather than asserted past; (6) the admitted read-only receipt carries
+      stable repair identity (`workflow_id`/`action_id`/`producer_revision` matching the
+      canonical event) and a real revision binding (`plan.workspaceRevision ===
+      event.revisions.workspace`), plus two well-formed sha256 checksums
+      (`event_checksum`/`runtime_evidence_checksum`), with `writesPerformed:false` in every
+      case including the happy path. This remains separate from
+      `AGENTIC-REPAIR-VERTICAL-REPLAY-01` and does not authorize production repair execution
+      -- `admitGovernedReplayV1` has no write/execute code path at all, by construction.
+- [x] **AGENTIC-GOVERNED-ADMISSION-PROOF-01** — added the pure
+      `admitGovernedReplayV1` boundary. It validates the canonical workflow event against the
+      mutation plan, rejects missing approval and stale event revisions, verifies plan-bound
+      approval plus file preflight, derives the canonical event/runtime-evidence receipt, and
+      always returns `writesPerformed=false`. Focused governed-replay/preflight tests pass
+      14/14, with the canonical writer adapter passing 2/2 separately. This proves
+      admission/preflight and event-receipt binding only; it does not claim mutation,
+      validation, or durable receipt completion.
+- [x] **AGENTIC-DURABLE-WRITER-CANONICAL-EVENT-01** — closed. `action-writer.ts` remains the
+      single durable writer (no second writer created); its canonical-event path routes through
+      `canonical-action-write-adapter-v1.ts` and now has a genuinely constraint-aware mocked
+      transaction proof, `action-writer.spec.ts` (7/7 live, `--no-cache`), covering everything
+      this gate required:
+      - **Sequence/causation identity preserved**: canonical `sequence`/`parentActionId` map onto
+        `agent_run_actions.sequence_no`/`causation_id` and `workflow_events.sequence_no`,
+        verified by the sequence-convention tests (see `WORKFLOW-ACTION-SEQUENCE-CHECK-02`).
+      - **Canonical event checksum/readback proven**: `writeActionAtomically()` re-selects the
+        just-written `workflow_events`/`outbox_events` payloads inside the same transaction and
+        calls `validateCanonicalActionReadbackV1()` against them -- the mocked-transaction test
+        "persists canonical identity and readback in workflow and outbox payloads" proves this
+        round-trips through a real (mocked) transaction, not just through the pure adapter.
+      - **Same-identity checksum collision rejection wired and proven**: `classifyCanonicalIdentityV1()`
+        (previously declared but never called from any production code path -- a real gap, not
+        merely "unproven") is now invoked from two places in `writeActionAtomically()`: (1) an
+        identity pre-check keyed on the canonical event's own `(runId, actionId, sequence)`
+        triple before the idempotency lookup even runs, and (2) inside the idempotencyKey-match
+        branch, comparing the incoming event against whatever is actually stored under that key.
+        These are complementary, not redundant -- each catches a collision shape the other
+        misses (reused key with different identity vs. same identity reached via a different
+        key). Proven live: "accepts same canonical identity as retry and rejects checksum
+        collision" (retry succeeds, a genuine content collision throws
+        `CANONICAL_EVENT_IDENTITY_COLLISION`, and nothing new is written for the rejected call).
+      - **Outbox atomicity proven, not assumed**: upgraded the mock's `db.transaction` from a
+        naive "write straight into a shared store" fake (which cannot actually prove rollback)
+        to real snapshot/commit-or-discard semantics -- each transaction operates on a cloned
+        draft, committed to the shared store only if the callback resolves, discarded entirely
+        on throw. Verified the upgrade itself is load-bearing, not decorative: temporarily
+        reverted it to the naive (no-rollback) form and confirmed the new atomicity test
+        genuinely fails against it (`agent_runs` leaked a row from a failed transaction attempt),
+        then restored the real fix and re-confirmed 7/7 pass. The atomicity test itself
+        pre-seeds a conflicting `agent_run_actions` row so a real write reaches and fails at the
+        `agent_run_actions` insert AFTER the `agent_runs` insert in the same attempt already
+        "succeeded" in the draft, then asserts zero rows from that attempt survive anywhere.
+      - **Legacy-caller migration**: intentionally NOT attempted here -- `writeActionAtomically()`
+        and `advanceActionStatus()` both have zero real (non-test) callers anywhere in the repo
+        today (confirmed via `rg`), so there is no legacy caller to migrate yet; this remains a
+        real open item for whenever a live caller is wired, not something this gate could close
+        against a caller that doesn't exist.
+      Full suite re-verified: `agent/` directory 15/15 pass (1 pre-existing unrelated skip),
+      `--no-cache`; `tsc --noEmit` reports zero errors for either touched file.
+- [x] **CANONICAL-EVENT-RUN-ID-SCHEMA-ALIGNMENT-01** — corrected the shared
+      `@deeds/parent-atlas` event schema to carry the durable runtime-owned
+      `runId` and revision bundle required by the canonical action writer and
+      governed replay admission. Updated stale temporal/governed-replay
+      fixtures and rebuilt the package. Package event tests pass 3/3, governed
+      replay tests pass 7/7, and the SvelteKit action-writer suite passes 7/7.
+- [x] **AGENTIC-CANONICAL-WRITER-ADAPTER-PROOF-01** — pure adapter proof complete, and the
+      database transaction / outbox atomicity / durable readback gaps this entry originally
+      deferred are now closed above under `AGENTIC-DURABLE-WRITER-CANONICAL-EVENT-01`.
+      **Implementation update 2026-09-14:** the existing writer now exposes
+      `writeCanonicalWorkflowActionAtomically()` as the single canonical entrypoint. It
+      validates and forwards caller-owned event/run/action IDs and sequence values through
+      the existing transaction; it does not create a second writer. Canonical database
+      readback, same-identity checksum collision rejection, and outbox atomicity are
+      now covered at mocked-transaction scope; live database readback and legacy-caller
+      migration remain open.
+      **Readback implementation 2026-09-14:** canonical writes now validate the inserted
+      `workflow_events` and `outbox_events` payloads inside the same transaction against the
+      canonical event and independently derived runtime receipt. Missing payloads, identity
+      drift, and receipt/checksum drift fail closed. The pure readback validator is covered
+      by the canonical adapter and action-writer suites; full rollback-on-error coverage
+      and live database readback remain open.
+      **Identity guard implementation 2026-09-14:** added pure
+      `classifyCanonicalIdentityV1()` and focused tests distinguishing `NEW`,
+      same-identity/same-checksum `IDEMPOTENT_DUPLICATE`, and
+      same-identity/different-checksum `CANONICAL_EVENT_IDENTITY_COLLISION`. Wiring this
+      decision into the existing duplicate database lookup and proving rollback/outbox
+      atomicity remain open.
+- [x] **WORKFLOW-ACTION-SEQUENCE-CHECK-02** — froze the convention (per-run `workflow_events`
+      sequence numbers start at 1 and strictly increase by 1 per event for that `run_id`,
+      matching the real `workflow_events_run_seq` unique constraint on `(run_id, sequence_no)`)
+      and proved it with a new mocked-transaction test,
+      `sveltekit-frontend/src/lib/server/agent/action-writer.spec.ts` (4/4 live,
+      `vitest run --no-cache`). The mock enforces the SAME unique constraints Postgres does
+      (`agent_run_actions_run_seq`, `workflow_events_run_seq`, both on `(run_id, sequence_no)`),
+      using the real `schema-postgres.js` table/column objects (not re-declared/mocked), so a
+      convention violation surfaces as the same constraint-violation shape a real transaction
+      would produce -- this is exactly "do not infer persisted compatibility from type-level
+      assignability alone": TypeScript's type checker cannot catch a wrong runtime sequence
+      value, only a constraint-aware execution can.
+      **Real bug found and fixed, not merely tested for**: `advanceActionStatus()` in
+      `action-writer.ts` computed the next `workflow_events.sequence_no` by querying
+      `agent_run_actions.sequenceNo` (a static value set once at action creation, never
+      updated) instead of `workflow_events.sequenceNo` (the actual per-run append-only log)
+      -- with no `ORDER BY` even on that wrong table, so the "current max" was an arbitrary row
+      under real Postgres semantics regardless. This meant every call to `advanceActionStatus()`
+      after the first for the same run recomputed the exact same next-sequence value and would
+      violate `workflow_events_run_seq` on insert. Confirmed live: the new test failed against
+      the pre-fix code with `unique constraint violation: workflow_events_run_seq (<runId>, 2)`
+      on the second status transition, exactly as predicted from reading the code, before any
+      fix was applied. Fixed by querying `workflow_events` itself,
+      `.where(eq(workflowEvents.runId, runId)).orderBy(desc(workflowEvents.sequenceNo)).limit(1)`,
+      then `+1` (falling back to `0 + 1 = 1` when no prior event exists for that run). Since
+      `advanceActionStatus()` has zero real (non-test) callers anywhere in the repo today
+      (confirmed via `rg`), this was a zero-live-migration-risk fix for a bug that would have
+      broken deterministically the moment a real caller was wired to it.
+      Producer-vs-receipt checksum distinctness: already correctly separated and documented --
+      `packages/parent-atlas/src/core/workflow-action-event.ts`'s optional `checksum` field
+      (self-computed by some producers, e.g. the compiler-lifecycle adapter) is explicitly
+      commented as distinct from `workflowActionEventReceiptSchema.event_checksum` (externally
+      computed by `workflowActionEventToRuntimeEvidence()` over the whole event); no code path
+      conflates the two. Full suite re-verified alongside this fix: `agent-writer.spec.ts` 4/4,
+      `canonical-action-write-adapter-v1.spec.ts` 3/3, `patch-tournament.spec.ts` 3/3,
+      `supervisor.integration.test.ts` 1/1 (1 pre-existing unrelated skip) -- 11/11 pass,
+      `--no-cache`.
+
+#### Gates explicitly corrected or already proven at limited scope
+
+- [x] Route scaffolds no longer claim retrieval `PASS` when they return no evidence:
+      runtime-retrieve and the Mastra-shaped route now emit pending/empty evidence and require
+      explicit workspace, packet, workspace-revision, and packet-revision inputs.
+- [x] Missing historical revisions remain nullable observations; null is not converted into a
+      current revision or a fabricated source identity.
+- [x] `atlas_symbol_registry`/`atlas_symbol_versions` remain the resolved symbol owners;
+      `graphify_symbols` remains a producer/compatibility surface.
+- [x] PageRank/PPR/CheiRank placement is fixed as derived graph-feature work, downstream of
+      current graph and ordinal proof.
+
+The next executable gate is `GRAPHIFY-EXECUTION-SNAPSHOT-OWNER-02`, followed by
+`CURRENT-EXECUTION-SOURCE-PACKET-CHUNK-CLOSURE-03`. Do not start semantic, graph, GPU,
+cache, XGBoost, cleanup, migration, or optional TRACE promotion before those readbacks pass.
+
+### Snapshot binding readback result (2026-09-14)
+
+- [x] The audit now prefers `graphify_execution_file_membership_v2` exclusively when the
+      execution has V2 rows; it no longer combines V2 and legacy execution-file populations.
+- [x] Historical execution `cbcd35c6-b26c-4d1a-a08b-9aa16a1afbcc` matches its recorded
+      `sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf` snapshot
+      membership (`25,291` sources; membership checksum match). This is historical evidence,
+      not current authority for a different admitted revision.
+- [ ] The current admitted revision is
+      `sha256:3e677c29319a4a60bc60803be4186ba108dce906945af593a3a6f5cf43d11881`.
+      Snapshot readback is still blocked: `25,066/25,291` exact source matches, `225`
+      source readback failures, and `workspaceId` is not proven in the receipt.
+- [ ] No terminal execution is jointly proven for the current admitted revision. Do not
+      relabel the `322ed1a6` execution, infer currentness from hash ordering, or use a
+      source-equivalent historical execution as the current owner.
+- [ ] The next proof must either identify one terminal execution whose workspace revision and
+      immutable membership exactly match `3e677c…`, or return an explicit
+      `NO_EXECUTION_FOR_ADMITTED_REVISION` / `SNAPSHOT_READBACK_BLOCKED` result with the
+      failed source set classified for repair. `writesPerformed=false` remains required.
+
+### Current Graphify owner audit result (2026-09-14)
+
+- [x] The explicit current-run audit consumed the tournament-admitted revision
+      `sha256:3e677c29319a4a60bc60803be4186ba108dce906945af593a3a6f5cf43d11881` and
+      completed read-only with no report-write error.
+- [ ] Current execution owner remains absent: `runCount=0`, `completedOwnerCount=0`,
+      `workspaceRowCount=0`, and `coordinatorExecutionCount=0`. The authoritative status is
+      `GRAPHIFY_RUN_OWNER_BLOCKED`, not an empty successful cohort.
+- [ ] The older `cbcd35c6…` execution remains valid only for its historical
+      `sha256:322ed1a6…` frame. It cannot satisfy the current `3e677c…` gate.
+- [ ] Do not launch Graphify, relabel an execution, or backfill memberships as part of this
+      audit. The next authorized proof must create or identify a terminal execution explicitly
+      bound to `3e677c…`, then read back its immutable V2 membership before packet/chunk work.
+
+### Explicit packet/chunk join result (2026-09-14)
+
+- [x] The packet/chunk auditor consumed the admitted revision explicitly; it did not infer a
+      current revision from timestamps, lexical hash order, or a default value.
+- [ ] Current join remains `CURRENT_PACKET_CHUNK_JOIN_MISSING`: `binding_rows=0`,
+      `binding_sources=0`, `graphify_exact_sources=0`, `packet_chunk_exact_sources=0`, and
+      `packet_content_matches=0` for the selected current frame.
+- [ ] This is an authority absence, not a successful empty cohort. Keep semantic_768,
+      symbol-registry promotion, graph edges, Qdrant fanout, GPU residency admission, cache
+      warming, and cleanup closed until an execution-bound source membership is read back and
+      joins exactly through packet/chunk lineage.
+
+### Phase 78 clustering correctness finding (2026-09-14)
+
+- [x] **PHASE78-KMEANS-FINAL-ASSIGNMENT-01** — fixed the final assignment distance formula
+      in `sveltekit-frontend/scripts/phase78-cluster-errors.mts` by extracting the pure
+      `sveltekit-frontend/scripts/phase78-kmeans.ts` implementation and correcting the
+      accumulator from `diff * dist` to `diff * diff`.
+- [x] **PHASE78-KMEANS-DETERMINISM-01** — replaced random centroid initialization with stable
+      farthest-point selection over lexically ordered event IDs; empty clusters preserve their
+      prior centroid. The focused fixture proves two obvious groups and replay stability (2/2).
+- [x] **PHASE78-CLUSTER-ASSIGNMENT-COHORT-01** — completed the live read-only census:
+      `error_events=148`, `assigned_events=148`, `unassigned_events=0`,
+      `distinct_assigned_clusters=1`, `error_clusters=1`, and no missing parent cluster
+      references. Receipt classification is `SINGLE_CLUSTER_ASSIGNMENT_SUSPECT`; the exact
+      affected population is identified, but no run provenance is available from the live
+      schema and no repair authorization was granted.
+- [x] **PHASE78-CLUSTER-ASSIGNMENT-REPLACEMENT-PLAN-01** — emitted a read-only replacement
+      plan bound to the exact predicate `error_events.cluster_id IS NOT NULL`, the 148-row
+      cohort checksum `sha256:eba2094fe601d0dc23df6b5abaa485ee5704e493691b9620efc6db50c5ecc2af`,
+      and algorithm revision `phase78-kmeans-deterministic-farthest-point-v1`. The plan
+      requires explicit authorization, archive/readback, and rollback; `safeToApply=false` and
+      `writesPerformed=false` remain enforced.
+- [ ] Existing 148 persisted assignments remain quarantined and must not be treated as valid
+      evidence. The read-only affected-cohort receipt is complete; a separate bounded replacement
+      plan is complete, but an explicitly authorized, transactionally reversible replacement run
+      is still required. No database rows were changed by this correction.
+
+### Current admitted snapshot execution recheck (2026-09-14)
+
+- [x] The admitted snapshot consumer preflight is proven read-only for workspace revision
+      `sha256:e24bb971…` and snapshot revision `sha256:6288726b…`: `25,542` sources,
+      matching source-membership checksums, zero missing sources, zero hash/size mismatches,
+      and zero live-inventory or Git-derivation fallbacks.
+- [x] Snapshot-native Graphify execution owner created and completed two terminal executions
+      for the admitted frame, each with `25,542` immutable V2 membership rows. Independent
+      per-execution readbacks pass with zero missing, unexpected, duplicate, revision,
+      checksum, or byte mismatches. Evidence:
+      `docs/reports/graphify-snapshot-native-readback-0dba-v1.json` and
+      `docs/reports/graphify-snapshot-native-readback-74d5-v1.json`.
+- [ ] Canonical execution authority remains blocked because two terminal executions match one
+      admitted workspace revision. Do not delete, relabel, or silently choose one; reconcile
+      duplicate execution identity under an explicit owner decision before promotion.
+- [ ] Current source-to-packet-to-chunk closure remains blocked: the explicit `e24bb…` join
+      reports `binding_rows=0`, `binding_sources=0`, `graphify_exact_sources=0`,
+      `packet_chunk_exact_sources=0`, and `packet_content_matches=0`. Execution membership
+      evidence is not interchangeable with `atlas_workspace_source_bindings` or packet/chunk
+      lineage. Keep semantic, symbol, graph, Qdrant, GPU, cache, and XGBoost promotion closed.
+- [x] Fixed the canary expectation auditor to validate the strict contract fields while
+      ignoring persisted report-envelope metadata. Read-only canary audit passes and the
+      focused contract suite passes `5/5`.
+
+Status: `EXECUTION_MEMBERSHIP_READBACK_PROVEN_DUPLICATE_EXECUTION_AUTHORITY_BLOCKED`;
+`CURRENT_PACKET_CHUNK_JOIN_MISSING`; no semantic, graph, vector, cache, or projection writes
+were performed by the audits.
+
+### Current execution-owned source/packet/chunk recheck (2026-09-14)
+
+- [x] The packet/chunk auditor now requires an explicit `--execution-id` and uses
+      `graphify_execution_file_membership_v2` as the current Graphify evidence owner for
+      `repo:root`; it no longer asks the legacy `graphify_files` projection to prove the
+      current execution.
+- [x] Read-only recheck against execution `0dba1c0d-2cf7-4f35-a61b-c77956f60d3d`, admitted
+      workspace revision `sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc`,
+      read back `24,456/24,456` exact execution-owned source members. No source, graph,
+      packet, chunk, vector, cache, or projection writes occurred in this recheck.
+- [ ] The downstream bridge remains blocked: `binding_chunk_content_matches=0`,
+      `packet_content_matches=0`, and `packet_chunk_exact_sources=0`. This is no longer a
+      missing current execution/source-membership result; it is an unresolved packet/chunk
+      identity or materialization gap. Whole-source digests must not be equated with
+      per-chunk digests, and no synthetic packet or chunk identity may be created.
+- [ ] The duplicate terminal execution authority remains unresolved: both current executions
+      have independently valid membership readbacks. Do not silently select, delete, or
+      relabel either execution.
+
+Next gate: `CURRENT-PACKET-CHUNK-IDENTITY-RECONCILIATION-01` — run a read-only exact join
+through `atlas_packets` and `atlas_packet_chunk_lineage` using the execution-owned source
+cohort, classify missing packet rows versus missing lineage rows versus digest-namespace
+mismatch, and leave semantic, graph, XGBoost, GPU, cache, and durable-event promotion closed.
+
+### Packet/chunk identity reconciliation result (2026-09-14)
+
+- [x] Added `scripts/atlas/audit-current-packet-chunk-identity-reconciliation-v1.mjs` as a
+      read-only, explicit-revision/explicit-execution classifier. It writes no database,
+      vector, graph, cache, or task state.
+- [x] Against the current `e24bb…` bindings and the explicitly selected execution
+      `74d50c86-8194-45ea-8c3d-61aab737ef83`, the receipt records `24,456` bound sources,
+      `24,456` exact Graphify source matches, `16,554` packet source-reference matches,
+      `0` packet whole-source digest matches, `627` proven lineage source-reference matches,
+      and `627` packet-lineage reference joins.
+- [ ] The blocker is now classified as `PACKET_DIGEST_BRIDGE_MISSING`: all `16,554` packet
+      reference matches have a digest mismatch, while `7,902` current sources have no packet
+      reference. Existing proven lineage is historical/path evidence and is not promoted to
+      the current cohort. Do not equate packet whole-source hashes with per-chunk hashes or
+      synthesize packet/chunk identities.
+
+Evidence: `docs/reports/current-packet-chunk-identity-reconciliation-v1.json` and
+`docs/reports/current-workspace-packet-chunk-join-v1.json`.
+
+Next gate: `PACKET-DIGEST-NAMESPACE-OWNER-01` — determine whether current packet content
+identity is stored under `content_hash`, `sha256`, or an independently revisioned packet
+artifact, then prove an exact source-byte bridge before any lineage materialization. The
+duplicate terminal execution authority remains unresolved in parallel.
+
+### Durable event and current-owner recheck (2026-09-14)
+
+- [x] Canonical workflow-event writer unit proof remains green: the actual writer specs
+      cover caller-owned run/action IDs, sequence and causation preservation, canonical
+      workflow/outbox payload readback, same-identity idempotency, checksum collision
+      rejection, and transaction rollback (`11/11` tests when invoked directly).
+- [ ] This does not close live durable-event adoption: no production database writer was
+      invoked in this pass, so live Postgres/outbox readback and persisted canonical checksum
+      evidence remain unproven.
+- [x] Fresh current Graphify authority readback now accepts the explicit, preflight-validated
+      execution `74d50c86-8194-45ea-8c3d-61aab737ef83` and reports `CURRENT_SNAPSHOT_PROVEN`.
+      The receipt still records two equivalent qualifying executions and keeps
+      `canonicalAuthority=false`, so this is a selected reconciliation frame rather than a
+      historical relabel or implicit canonical-owner mutation.
+
+The current queue therefore remains:
+
+explicit Graphify execution frame → `PACKET-DIGEST-NAMESPACE-OWNER-01` → exact packet/chunk
+bridge → current graph edges/ordinal map → semantic corpus admission. Canonical durable event
+live readback remains an independent P1 gate; no null provision, historical row, or fixture
+result may be promoted as current authority.
+
+### Packet writer hardening (2026-09-14)
+
+- [x] Extended `persistCanonicalSemanticPacketEmbedding()` with caller-owned optional
+      `contentHash`, preserving nullable behavior and writing it to `atlas_packets.content_hash`
+      on insert/upsert. Added focused coverage; semantic packet writer suite passes `8/8`.
+- [ ] Existing historical packet rows were not backfilled. The current cohort still requires
+      an independently proven source-byte digest and source/workspace revision before any
+      packet/chunk lineage materialization or semantic promotion.
+- [x] Quarantined the legacy `scripts/atlas/upsert-whole-codebase-atlas-packets.mjs --apply`
+      path. It now fails before database connection/write with
+      `PACKET_WRITER_QUARANTINED`; dry-run inventory remains available. This prevents an
+      unqualified historical writer from creating new packet rows while the canonical writer
+      and exact source-byte bridge remain open.
+
+### Packet digest namespace census (2026-09-14)
+
+- [x] Extended `audit-current-packet-chunk-identity-reconciliation-v1.mjs` to inspect both
+      packet digest columns without treating them as interchangeable. `content_hash` is the
+      canonical packet whole-source digest candidate; `sha256` is retained as a legacy,
+      diagnostic-only namespace.
+- [x] Read-only rerun against the explicit admitted workspace revision and execution records
+      `24,456` bound sources, `16,554` packet source-reference matches, `0` canonical
+      `content_hash` matches, `3,230` legacy `sha256` matches, `3,230` matches in either
+      digest namespace, `13,324` packet digest mismatches, and `7,902` missing packet rows.
+      No database, vector, graph, cache, or projection writes occurred.
+- [ ] The packet bridge remains blocked: legacy `sha256` matches are not promotion evidence,
+      and no exact source-byte-to-canonical-packet digest bridge has been proven for the
+      remaining cohort. Do not backfill or reinterpret `sha256` as `content_hash`.
+
+Next implementation gate: `PACKET-DIGEST-NAMESPACE-OWNER-01` must either prove the existing
+`content_hash` producer from source bytes or define an explicitly revisioned packet artifact
+and its readback contract. Only then may the exact packet/chunk bridge proceed.
+
+### Immutable snapshot authority recheck (2026-09-15)
+
+- [x] `audit-current-graphify-snapshot-authority-v1.mts` now consumes the admitted
+      `manifestPath` from the tournament admission receipt and verifies the sealed snapshot
+      checksum before comparing execution membership. It no longer uses the moving worktree
+      as the source-count or content authority.
+- [x] Against admitted workspace revision
+      `sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc` and snapshot
+      `sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b`, both terminal
+      executions (`0dba1c0d-2cf7-4f35-a61b-c77956f60d3d` and
+      `74d50c86-8194-45ea-8c3d-61aab737ef83`) pass the immutable 25,542-source membership,
+      identity, source-revision, content-hash, byte-length, and checksum checks.
+- [ ] Canonical execution ownership remains blocked as
+      `AMBIGUOUS_QUALIFYING_EXECUTIONS`: two equivalent terminal executions qualify. Neither
+      may be silently selected, relabeled, or deleted. This is now an owner-decision blocker,
+      not a snapshot/source-membership mismatch.
+
+Evidence: `docs/reports/current-graphify-snapshot-authority-v1.json`.
+The explicit next gate is a deterministic duplicate-execution owner decision, followed by
+the packet/chunk bridge. The packet reconciliation remains `PACKET_DIGEST_BRIDGE_MISSING`:
+`0` canonical `content_hash` matches, `3,230` legacy `sha256` matches (diagnostic only),
+and `7,902` current bound sources have no packet reference. No projection or backfill write
+is authorized.
+
+### Owner-bound authority recheck (2026-09-15)
+
+- [x] Added an explicit `--execution-id` path to the existing authority audit. The selected
+      execution must be present in the immutable owner plan, pass the selected-owner preflight,
+      and match its current plan checksum; stale or missing preflights fail closed.
+- [x] Bound execution `74d50c86-8194-45ea-8c3d-61aab737ef83` to the admitted snapshot for
+      read-only downstream reconciliation. The refreshed receipt reports `CURRENT_SNAPSHOT_PROVEN`
+      while retaining `qualifyingExecutions=2`, `canonicalAuthority=false`,
+      `safeToApply=false`, and `writesPerformed=false`.
+- [ ] Canonical Graphify history is not rewritten and duplicate execution cleanup remains
+      unauthorized. The selected execution is a validated input frame, not a mutation grant.
+
+Evidence: `docs/reports/current-graphify-snapshot-authority-v1.json`,
+`docs/reports/current-source-selection-input-v1.json`, and
+`docs/reports/selected-graphify-execution-owner-v1.json`. The next gate is the packet digest
+bridge and exact source-to-packet-to-chunk closure.
+
+### Duplicate current execution owner plan (2026-09-15)
+
+- [x] Added `scripts/atlas/plan-current-graphify-execution-owner-resolution-v1.mjs` as a
+      read-only owner-resolution planner. It consumes the admitted snapshot manifest,
+      prefers the immutable V2 membership ledger, and binds the comparison to source-ref,
+      repository-identity, source-revision, content-hash, byte-length, and stage checksums.
+- [x] Live plan result: two terminal executions, one distinct evidence signature, and exact
+      equivalence for the full 25,542-source cohort. The deterministic recommendation is
+      execution `74d50c86-8194-45ea-8c3d-61aab737ef83` (earliest completion, then execution ID).
+      This is only a recommendation and requires an explicit authority decision.
+- [ ] Canonical execution ownership is still not proven. The planner reports
+      `DUPLICATE_EQUIVALENT_EXECUTIONS`, `safeToApply=false`, `canonicalAuthority=false`,
+      and `writesPerformed=false`; neither execution was relabeled, deleted, or modified.
+
+Evidence: `docs/reports/current-graphify-execution-owner-resolution-v1.json`.
+
+### ACE route revision-qualified cache admission (2026-09-15)
+
+- [x] Added `admitAceRouteCacheIdentityV1()` as the route boundary for
+      production ACE packet caching. It requires a complete, schema-validated
+      `AceBitfrostCacheIdentityV1` with `cacheKind=ACE_PACKET` and derives the
+      revisioned BitFrost key from that identity.
+- [x] Changed the ACE stream route to use the revisioned packet cache only when
+      that identity is admitted. Query-only legacy cache entries are no longer
+      used or warmed by this route and are reported as degraded/blocked.
+- [x] Added focused tests for missing identity, invalid/non-packet identity,
+      request-hash mismatch, and admitted identity/key derivation. The route
+      request hash is now part of the revisioned identity checksum so two
+      queries cannot share a packet cache entry accidentally.
+- [ ] Supply the identity from the canonical SearchRuntime/ContextManifestV2
+      handoff in a live caller and prove exact cache readback. This remains a
+      downstream live-delivery gate; the route must not infer revisions from
+      timestamps, packet contents, or query hashes.
+
+Status: `ROUTE_ADMISSION_SCAFFOLD_PROVEN`; `LIVE_IDENTITY_HANDOFF_OPEN`;
+`canonicalAuthority=false`; `writesPerformed=false` for the proof.
+
+Evidence: `sveltekit-frontend/src/lib/server/ace/ace-route-cache-admission-v1.ts`,
+`sveltekit-frontend/src/lib/server/ace/ace-route-cache-admission-v1.spec.ts`,
+and `sveltekit-frontend/src/routes/api/ace/stream/+server.ts`.
+
+Follow-up reconciliation:
+
+- [x] Confirmed `SearchRuntime.searchWithAceManifest()` is an existing opt-in,
+      read-only producer and returns a `RetrievalCacheIdentityV1` only when its
+      caller supplies the required runtime fields.
+- [x] Confirmed no current route or caller invokes that method. The ACE stream
+      route therefore cannot claim live `ContextManifestV2` identity delivery;
+      its `aceCacheIdentity` input is an explicit boundary scaffold only.
+- [ ] Add one canonical caller adapter that converts the admitted manifest and
+      explicit packet artifact checksum into the `ACE_PACKET` BitFrost identity,
+      then prove route cache readback. It must reject a null graph revision,
+      missing producer/normalization revision, or query-hash mismatch.
+
+- [x] Added the pure SearchRuntime retrieval-identity → ACE packet-identity
+      bridge with explicit packet producer, normalization, representation, and
+      artifact checksum inputs; null graph revisions fail closed. The route's
+      full request hash is supplied explicitly because it is distinct from the
+      truncated SearchRuntime retrieval hash.
+- [x] Added the ContextManifestV2 → retrieval identity → ACE packet identity
+      caller adapter; incomplete manifest lineage fails closed.
+- [x] Extended `SearchRuntime.searchWithAceManifest()` to expose that packet
+      identity when callers provide an explicit graph revision and packet
+      artifact metadata; the default path remains non-promotional and returns
+      no packet identity when those fields are absent.
+
+Updated status: `ROUTE_ADMISSION_SCAFFOLD_PROVEN`;
+`SEARCH_RUNTIME_CALLER_NOT_WIRED`; `LIVE_CACHE_READBACK_OPEN`;
+`canonicalAuthority=false`; `writesPerformed=false`.
+
+Evidence: `sveltekit-frontend/src/lib/server/atlas/retrieval/search-runtime-adapter.ts`
+(`searchWithAceManifest`) and the route admission report.
+
+- [x] Corrected the ACE route authority auditor so `hashQuery` used for
+      request binding is not misclassified as a legacy cache import. The
+      rerun now reports `legacyQueryOnlyImport=false` and
+      `strictRevisionCacheImport=true`; source-revision ownership remains
+      intentionally blocked until a live canonical caller is proven.
+
+Evidence: `docs/reports/ace-revision-source-owner-v1.json`.
+
+Audit result update: `ROUTE_IDENTITY_ADMISSION_SCAFFOLD` with
+`legacyQueryOnlyImport=false`, `strictRevisionCacheImport=true`, and next gate
+`LIVE_ACE_IDENTITY_HANDOFF_READBACK`. This is source-path progress only;
+`canonicalAuthority=false` and `writesPerformed=false` remain unchanged.
+
+### Current Graphify packet-bridge recheck (2026-09-15)
+
+- [x] Re-ran the packet digest bridge with the explicitly preflight-selected
+      execution `74d50c86-8194-45ea-8c3d-61aab737ef83` and the admitted workspace
+      revision. The bounded read-only sample found 17 missing packets and 8
+      packets without canonical content digests; canonical matches remain 0.
+- [x] Confirmed the alternate equivalent execution is rejected by the bridge's
+      owner-preflight checksum, so the bridge cannot silently compare or promote
+      an unselected execution.
+- [ ] Keep packet/chunk materialization blocked until the explicit duplicate
+      execution lifecycle decision is authorized and the canonical packet digest
+      producer/readback closes the missing/mismatched rows.
+
+Status: `GRAPHIFY_OWNER_PREFLIGHT_ENFORCED`; `PACKET_DIGEST_BRIDGE_BLOCKED`;
+`writesPerformed=false`.
+
+Evidence: `docs/reports/current-packet-digest-bridge-v1.json`,
+`docs/reports/selected-graphify-execution-owner-v1.json`, and
+`docs/reports/current-graphify-execution-owner-resolution-v1.json`.
+
+### Independent feature-ontology source-span/revision validation (2026-09-16)
+
+- [x] Hardened `scripts/atlas/audit-feature-ontology-source-span-revision-v1.mjs`
+      to replace JSON and Markdown receipts atomically, avoiding the Windows
+      report-write race.
+- [x] Re-ran the read-only audit against
+      `docs/reports/feature-ontology-fresh-extraction-multilane-v1.json`:
+      304 candidates across 6 source files; 4 source revisions are current and
+      2 are stale; 7 spans are in bounds, 2 span texts mismatch, and 295
+      candidates make no span claim.
+- [ ] Re-extract the two stale sources and repair the two mismatched spans
+      before human review or ontology/semantic promotion.
+- [ ] Keep all observations non-promotional until source revision and span
+      evidence are current; do not invent revisions or repair spans by path.
+
+Status: `SOURCE_REVISION_DRIFT_DETECTED`; `HUMAN_REVIEW_BLOCKED`;
+`writesPerformed=false`.
+
+Evidence: `docs/reports/feature-ontology-source-span-revision-v1.json`.
+
+### Revision-current ontology review triage (2026-09-16)
+
+- [x] Ran the read-only mechanical triage over the 253 candidates whose source
+      file revision is current; the 51 candidates from stale sources remain
+      excluded.
+- [x] Classified the review queue without changing candidate status or granting
+      canonical authority: `GROUNDED=7`, `LIKELY_SYMBOL=72`,
+      `LIKELY_NOISE=26`, `UNCERTAIN=148`.
+- [ ] Complete human/source-grounded review and re-extract the two stale source
+      files plus the two text-mismatched spans before REL-01B admission.
+
+Status: `REVIEW_QUEUE_TRIAGED`; `REL_01B_BLOCKED`; `canonicalAuthority=false`;
+`writesPerformed=false`.
+
+Evidence: `docs/reports/feature-ontology-review-triage-v1.json`.
+
+### Feature ontology packet-lineage audit (2026-09-16)
+
+- [x] Hardened `scripts/atlas/audit-feature-ontology-packet-lineage-v1.mjs`
+      with atomic report replacement after the Windows receipt-write failure.
+- [x] Completed the read-only PostgreSQL lineage census: 353,973 tuples
+      examined; 353,120 classified `ALIAS_NOT_APPROVED`; 853 classified
+      `CURRENT_GRAPHIFY_SOURCE_MISSING`.
+- [ ] Resolve approved alias authority and current Graphify/source membership
+      before treating any ontology tuple as an admitted observation.
+
+Status: `PACKET_LINEAGE_CLASSIFIED`; `ONTOLOGY_PROMOTION_BLOCKED`;
+`canonicalAuthority=false`; `writesPerformed=false`.
+
+Evidence: `docs/reports/feature-ontology-packet-lineage-v1.json`.
+
+### Fresh ontology producer selection (2026-09-16)
+
+- [x] Confirmed the bounded owner selection: `feature-ontology-fresh-extractor-v1`.
+- [x] Kept the permitted structural, Python-enrichment, and grounded-LangExtract
+      adapters explicitly review-only; no adapter is a canonical identity owner.
+- [x] Confirmed `groundedSources=0`; no ontology candidate is eligible for live
+      promotion from this receipt.
+- [ ] Re-extract current source evidence with grounded spans, resolve stale and
+      mismatched source observations, then repeat packet-lineage admission.
+
+Status: `PRODUCER_OWNER_SELECTED_REVIEW_ONLY`; `ONTOLOGY_PROMOTION_BLOCKED`;
+`canonicalAuthority=false`; `writesPerformed=false`.
+
+Evidence: `docs/reports/feature-ontology-fresh-producer-selection-v1.json`.
+
+### Fail-closed fresh ontology extraction (2026-09-16)
+
+- [x] Updated the fresh extractor to compare every claimed source revision with
+      the live source-byte digest; stale claims are rejected rather than emitted
+      as fresh candidates.
+- [x] Updated the multilane merger to preserve extraction status, counts, and
+      failures, and to replace its report atomically.
+- [x] Updated independent source-span validation to reject incomplete extraction
+      cohorts instead of inferring completeness from the remaining candidates.
+- [x] Re-ran the chain: 6 approved sources, 4 extracted, 2 stale-source
+      rejections, 202 candidates, 3 grounded sources, and 0 retained span
+      mismatches.
+- [ ] Refresh the source-binding observation for the two stale files, rerun
+      grounded extraction, then repeat packet-lineage and human-review gates.
+
+Status: `FRESH_EXTRACTION_INCOMPLETE`; `REL_01B_BLOCKED`;
+`canonicalAuthority=false`; `writesPerformed=false`.
+
+Evidence: `docs/reports/feature-ontology-fresh-extraction-v1.json`,
+`docs/reports/feature-ontology-fresh-extraction-multilane-v1.json`,
+`docs/reports/feature-ontology-source-span-revision-v1.json`.
+
+### Current source-cohort lineage recheck (2026-09-16)
+
+- [x] Re-ran the read-only current source-cohort audit against the admitted
+      workspace revision `sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc`.
+- [x] Confirmed 52 source-revision-qualified rows and 52 Graphify matches, but
+      zero rows match the admitted workspace frame; all 52 are classified as
+      workspace-revision mismatches.
+- [ ] Obtain a terminal Graphify/source binding produced from the admitted
+      workspace snapshot before admitting packet, ontology, semantic, graph, or
+      ACE projections.
+
+Status: `WORKSPACE_REVISION_SOURCE_MISMATCH`; `CURRENT_SOURCE_AUTHORITY_BLOCKED`;
+`writesPerformed=false`.
+
+Evidence: `docs/reports/current-source-cohort-lineage-v1.json`.
+
+### Current indexing and ACE surface census (2026-09-16)
+
+- [x] Confirmed PostgreSQL `18.4` with `pgvector 0.8.3`, `pg_trgm`, and
+      `pg_search` reachable in the read-only indexing audit.
+- [x] Confirmed canonical packet/chunk surfaces exist: `atlas_packets=61,718`,
+      `atlas_packet_features=61,718`, `codebase_chunk_index=274,465`, with
+      PostgreSQL lexical indexes and HNSW vector indexes present.
+- [x] Confirmed `semantic_768` remains partial (`55,169/274,465` on the active
+      halfvec lane); Qdrant 768 collections and IVFFlat/CAGRA are projections or
+      executor options, not identity owners.
+- [x] Confirmed ACE packet/cache structures exist, but live revision-qualified
+      ACE population is not proven; legacy identity-less entries remain degraded.
+- [ ] Classify and reconcile the 296 manual SQL files against the 41-entry
+      Drizzle journal and 64 declared sidecars before migration ownership changes.
+
+Status: `INDEX_SURFACES_PRESENT`; `ACE_CURRENT_ADMISSION_UNPROVEN`;
+`SEMANTIC_768_PARTIAL`; `MIGRATION_CLASSIFICATION_OPEN`;
+`canonicalAuthority=false` for projections; `writesPerformed=false`.
+
+Evidence: `docs/reports/atlas-indexing-surfaces-v1.json`.
+
+### ACE route revision-authority audit (2026-09-16)
+
+- [x] Ran the read-only ACE revision-source-owner audit for
+      `sveltekit-frontend/src/routes/api/ace/stream/+server.ts`.
+- [x] Confirmed the route does not receive an authoritative
+      `sourceRevision`, `representationRevision`, or `retrievalPolicyRevision`
+      tuple.
+- [x] Confirmed timestamp-derived revision fallbacks in shared runtime context
+      are rejected for strict ACE cache identity.
+- [ ] Thread an admitted identity tuple from the canonical SearchRuntime /
+      ContextManifest path into the route, then prove cache admission and
+      readback with `RetrievalCacheIdentityV1`.
+
+Status: `NO_ROUTE_LOCAL_AUTHORITY`; `ACE_CURRENT_ADMISSION_BLOCKED`;
+`canonicalAuthority=false`; `writesPerformed=false`.
+
+Evidence: `docs/reports/ace-revision-source-owner-v1.json`.
+
+### Domain classifier lineage recheck (2026-09-15)
+
+- [x] Ran the read-only domain-classifier lineage audit. It found `3,352`
+      classifier rows, `3,351` source references, `148` source revisions, and
+      `3,352` workspace revisions.
+- [x] Only `148` rows have a revision-qualified join; `3,204` lack a Graphify
+      join and `0` source namespaces are currently authoritative. Classifier
+      output remains evidence/navigation input, not canonical domain identity
+      or promotion authority.
+- [ ] Keep topic/entity/POS extraction, CandidateFeatureMatrix admission,
+      XGBoost capture, and ACE fanout blocked until the current Graphify/source
+      namespace is proven for the admitted cohort.
+
+Status: `CLASSIFIER_LINEAGE_BLOCKED`; `sourceNamespaceAvailable=0`;
+`revisionQualifiedJoin=148`; `canonicalAuthority=false`; `writesPerformed=false`.
+
+Evidence: `docs/reports/domain-classifier-lineage-v1.json`.
+
+### HyperGraphRAG n-ary evidence boundary recheck (2026-09-15)
+
+- [x] The existing HyperGraphRAG fusion owner preserves canonical n-ary
+      relations and projects them only onto candidates already present in the
+      retrieval set. It does not decompose hyperedges into invented pairwise
+      facts, add a retrieval vote, or mint identity.
+- [x] Focused HyperGraphRAG tests pass `6/6`, including revision filtering,
+      hop-budget truncation, deterministic projection, and candidate-only
+      evidence enrichment.
+- [ ] Keep live HyperGraphRAG API adoption and dynamic tuple promotion blocked
+      until tuple source/workspace/graph revisions and evidence checksums are
+      bound to the admitted current cohort. NLP, LangExtract, Ornith summaries,
+      `.okf` lookups, PageRank, Naive Bayes/logistic/XGBoost, and PyTorch remain
+      evidence or ranking producers only.
+
+Status: `NARY_FUSION_SCAFFOLD_PROVEN`; `HYPERRAG_LIVE_PROMOTION_BLOCKED`;
+`canonicalAuthority=false`; `writesPerformed=false`.
+
+Evidence: `sveltekit-frontend/src/lib/server/atlas/retrieval/hypergraph-retrieval-v1.ts`,
+`sveltekit-frontend/src/lib/server/atlas/retrieval/hypergraph-retrieval-v1.spec.ts`,
+and the current source/graph lineage receipts.
+
+### Feature ontology packet-lineage recheck (2026-09-15)
+
+- [x] Ran the read-only ontology packet-lineage audit across `353,973` tuples.
+      It classified `353,120` as `ALIAS_NOT_APPROVED` and `853` as
+      `CURRENT_GRAPHIFY_SOURCE_MISSING`.
+- [x] The report's `PACKET_CONTENT_LINEAGE_RECONCILED` status is retained as a
+      reconciliation classification only; it does not establish canonical
+      entity/domain identity or authorize a second graph vote.
+- [ ] Keep `.okf`, entity, topic, POS, ontology, and HyperGraphRAG n-ary output
+      evidence-only until each tuple is bound to the admitted source/packet
+      cohort with approved identity and revision checksums.
+
+Status: `PACKET_CONTENT_LINEAGE_RECONCILED`; `ALIAS_NOT_APPROVED=353120`;
+`CURRENT_GRAPHIFY_SOURCE_MISSING=853`; `canonicalAuthority=false`;
+`writesPerformed=false`.
+
+Evidence: `docs/reports/feature-ontology-packet-lineage-v1.json`.
+
+### Graphify source-revision auditor fail-closed hardening (2026-09-15)
+
+- [x] Replaced the auditor's implicit largest-file-count run selection with an
+      explicit `--run-id`/`ATLAS_GRAPHIFY_RUN_ID` requirement. An invocation
+      without a run now returns `EXPLICIT_GRAPHIFY_RUN_ID_REQUIRED` and does not
+      treat a historical run as current authority.
+- [x] Changed report replacement to use a process-unique temporary file followed
+      by atomic rename, preventing direct truncate/write races with workstation
+      readers on Windows.
+- [x] Re-ran an explicit run: `23,758` rows audited, `22,958` content matches,
+      `786` content mismatches, and `14` unavailable sources. The result remains
+      `SOURCE_BYTES_NOT_PROVEN` and all write flags remain false.
+- [ ] Keep source authority blocked until a terminal execution explicitly bound
+      to the admitted snapshot supplies complete source-byte readback.
+
+Status: `AUDITOR_FAIL_CLOSED_HARDENED`; `SOURCE_BYTES_NOT_PROVEN`;
+`canonicalAuthority=false`; `writesPerformed=false`.
+
+Evidence: `scripts/atlas/audit-current-graphify-source-revision-v1.mjs` and
+`docs/reports/current-graphify-source-revision-v1.json`.
+
+### Current source-evidence hydration recheck (2026-09-15)
+
+- [x] Ran the read-only source-evidence hydration audit. It examined `24,181`
+      input rows; `23,397` match the selected revision exactly and `19,906`
+      contain content hydration.
+- [x] The receipt records zero authoritative namespaces, zero evidence-span
+      ready rows, and zero classifier-ready rows. Missing reasons are
+      `4,275` canonical chunk owners missing and `19,906` chunk owners with
+      content but no source revision.
+- [ ] Keep domain/topic/entity extraction, CandidateFeatureMatrix admission,
+      and semantic/ACE promotion blocked until the chunk owner supplies an
+      explicit source revision and authoritative namespace. Content presence
+      alone is not promotion evidence.
+
+Status: `SOURCE_EVIDENCE_HYDRATION_BLOCKED`; `authoritativeNamespaces=0`;
+`classifierReady=0`; `writesPerformed=false`.
+
+Evidence: `docs/reports/current-source-evidence-hydration-v1.json`.
+
+### Source-cohort lineage audit hardening and recheck (2026-09-15)
+
+- [x] Fixed the source-cohort auditor's Windows report race by replacing the
+      direct report write with a process-unique temporary file and atomic rename.
+- [x] Re-ran the audit successfully: `52` cohort rows match Graphify and have
+      source revisions, but `0` match the admitted workspace revision. All `52`
+      are classified as workspace-frame mismatches; missing, ambiguous, and
+      source-revision mismatch counts are `0`.
+- [ ] Keep source-cohort admission blocked until the cohort is regenerated from
+      the authorized current execution/workspace frame. Exact source matches
+      from another workspace revision remain historical evidence.
+
+Status: `WORKSPACE_REVISION_SOURCE_MISMATCH`; `revisionQualified=0`;
+`canonicalAuthority=false`; `writesPerformed=false`.
+
+Evidence: `scripts/atlas/audit-current-source-cohort-lineage-v1.mjs` and
+`docs/reports/current-source-cohort-lineage-v1.json`.
+
+### Explicit execution packet-bridge recheck (2026-09-15)
+
+- [x] Re-ran the packet digest planner with the explicit proposed execution
+      `74d50c86-8194-45ea-8c3d-61aab737ef83` and admitted workspace revision
+      `sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc`.
+- [x] The read-only sample used the immutable
+      `graphify_execution_file_membership_v2` surface and completed without
+      writes: `25` members sampled, `0` canonical digest matches, `17` missing
+      packets, `8` packets missing `content_hash`, and `0` digest mismatches in
+      the sampled rows.
+- [ ] Keep packet admission blocked. The proposed execution is not an
+      authorized canonical owner, and the missing packet/content-digest
+      producer/readback must be closed before any packet, chunk, semantic,
+      Qdrant, ACE, or GPU fanout.
+
+Status: `PACKET_DIGEST_BRIDGE_BLOCKED`; `OWNER_SELECTION_VALIDATED_NOT_APPLIED`;
+`canonicalAuthority=false`; `writesPerformed=false`.
+
+Evidence: `docs/reports/current-packet-digest-bridge-v1.json` and
+`docs/reports/selected-graphify-execution-owner-v1.json`.
+
+### Explicit packet-to-chunk join readback (2026-09-15)
+
+- [x] Ran the existing packet/chunk join audit with the explicit admitted
+      workspace revision and proposed execution. The read-only receipt reports
+      `25` binding rows, `25` Graphify-exact sources, `2` proven packet/chunk
+      lineage sources, and `2` packet/chunk exact sources.
+- [x] The bounded mismatch census reports `0` workspace mismatches, `0` source
+      revision mismatches, and `0` content mismatches. It also reports `0`
+      canonical packet-content matches, so the absence is a producer/material-
+      ization gap rather than permission to equate hash grains.
+- [ ] Keep source→packet→chunk admission closed until the canonical packet
+      digest producer supplies exact whole-source content identity and the
+      applied cohort can be read back under one authorized Graphify execution.
+
+Status: `CURRENT_PACKET_CHUNK_JOIN_PARTIAL`; `PACKET_DIGEST_BRIDGE_BLOCKED`;
+`canonicalAuthority=false`; `writesPerformed=false`.
+
+Evidence: `docs/reports/current-workspace-packet-chunk-join-v1.json`.
+
+### Historical packet content-hash backfill boundary (2026-09-15)
+
+- [x] Re-ran the existing `atlas-packets-content-hash-backfill-v1.mjs` in its
+      default dry-run mode. Its deterministic single-chunk join gates pass and
+      it reports `1,000` eligible historical candidates under the requested
+      limit, with `postgresWrites=false`.
+- [x] Confirmed this backfill derives a scalar packet hash from an unambiguous
+      `source_ref`→single `codebase_chunk_index.content_hash` join. It is not a
+      current Graphify execution-bound source-byte producer and does not prove
+      the admitted packet digest bridge.
+- [ ] Keep this backfill historical/deferred until its selection is explicitly
+      intersected with the authorized current execution and exact source-byte
+      cohort. Do not run `--apply-bounded` as a substitute for current packet
+      authority.
+
+Status: `HISTORICAL_PACKET_HASH_BACKFILL_READ_ONLY`; `CURRENT_AUTHORITY_BLOCKED`;
+`writesPerformed=false`.
+
+Evidence: `docs/reports/atlas-packets-content-hash-backfill-v1-dry_run.json` and
+`scripts/atlas/atlas-packets-content-hash-backfill-v1.mjs`.
+
+### Current graph artifact readiness recheck (2026-09-15)
+
+- [x] Re-ran the read-only graph artifact readiness audit. It found `16`
+      observed node keys and `16` unique graph node keys.
+- [x] The receipt reports `0` explicit revision-qualified edges and marks the
+      structural projection as not matching the admitted revision.
+- [ ] Keep graph-derived features blocked. PageRank, CheiRank, HITS,
+      communities, topology coordinates, and GPU graph outputs remain derived
+      observations until the graph projection is rebuilt from the authorized
+      execution-bound source/chunk cohort.
+
+Status: `CURRENT_GRAPH_ARTIFACT_BLOCKED_ON_STALE_PROJECTION`;
+`canonicalAuthority=false`; `writesPerformed=false`.
+
+Evidence: `docs/reports/current-graph-artifact-readiness-v1.json`.
+
+### Current structural-edge contract recheck (2026-09-15)
+
+- [x] Ran the read-only structural-edge contract audit. The current producer
+      supplies `0` nodes and `0` edges.
+- [x] No missing required node/edge fields, duplicate edge shapes, or unknown
+      endpoints were observed in the empty input.
+- [ ] Keep revision-qualified graph admission open. The clean empty contract
+      is not graph completeness and does not authorize PageRank, CheiRank,
+      HITS, communities, topology, or GPU projection.
+
+Status: `CONTRACT_INCOMPLETE`; `graphRevision=null`; `canonicalAuthority=false`;
+`writesPerformed=false`.
+
+Evidence: `docs/reports/current-structural-edge-contract-v1.json`.
+
+### Current structural symbol resolution recheck (2026-09-15)
+
+- [x] Ran the repository's existing structural symbol proof. All `461`
+      nominations matched an AST span and tree node exactly; there were `0`
+      invalid nominations, `0` ambiguous AST matches, and `0` missing AST
+      matches.
+- [x] The proof correctly found `461` workspace-revision mismatches against
+      the admitted `sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc`
+      frame. Stable-symbol and symbol-version resolution were therefore not
+      attempted, and no canonical or database writes occurred.
+- [ ] Keep current symbol/graph admission blocked until nominations are
+      regenerated or reconciled against the authorized current execution;
+      exact AST matching from another workspace revision is historical evidence,
+      not current structural authority.
+
+Status: `READ_ONLY_BLOCKED`; `NOMINATIONS_NOT_BOUND_TO_ADMITTED_WORKSPACE_REVISION`;
+`canonicalAuthority=false`; `writesPerformed=false`.
+
+Evidence: `docs/reports/current-structural-symbol-resolution-v1.json`.
+
+### Snapshot binding and terminal execution recheck (2026-09-15)
+
+- [x] Ran `audit-graphify-workspace-snapshot-binding-v1.mts` against the
+      admitted snapshot. Snapshot byte readback is proven for `25,542` sources
+      and the workspace admission is authoritative.
+- [x] Two terminal executions match the admitted snapshot, each with the exact
+      source count and terminal evidence. The proof remains read-only and
+      reports no datastore or canonical relabeling writes.
+- [ ] Keep Graphify execution authority blocked until the two equivalent
+      executions receive an explicit lifecycle decision. Do not select by time,
+      UUID ordering, or newest-run preference.
+
+Status: `GRAPHIFY_SNAPSHOT_BINDING_BLOCKED`; `PARTIAL_PROVEN`;
+`MULTIPLE_GRAPHIFY_EXECUTIONS_MATCH_SNAPSHOT`; `canonicalAuthority=false`;
+`writesPerformed=false`.
+
+Evidence: `docs/reports/graphify-workspace-snapshot-binding-v1.json`.
+
+### Semantic 768 bounded cohort recheck (2026-09-15)
+
+- [x] Re-ran the exact semantic cohort audit. The bounded candidate map has
+      `15` candidates, `15` exact chunk rows, `0` missing/ambiguous chunk rows,
+      `15` vectors, and `15` producer metadata records.
+- [x] The audit confirms PostgreSQL `content_embedding_768` as the canonical
+      vector column and records zero PostgreSQL/Qdrant/vector-generation writes.
+- [ ] Do not promote this cohort as current: its workspace revision is
+      `sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc`,
+      which differs from the admitted `sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc`.
+      Rebuild the candidate map against the authorized execution before current
+      semantic, ACE, Qdrant, XGBoost, or GPU admission.
+
+Status: `SEMANTIC_768_BOUNDED_COHORT_PROVEN`; `CURRENT_SEMANTIC_ADMISSION_BLOCKED`;
+`canonicalAuthority=false`; `writesPerformed=false`.
+
+Evidence: `docs/reports/lineage-semantic-768-cohort-v1.json`.
+
+### Candidate corpus lineage recheck (2026-09-15)
+
+- [x] Ran the read-only candidate corpus lineage audit across `61,718`
+      `atlas_packets` rows.
+- [x] The audit admits `0` candidates: `61,717` rows lack source revision and
+      `1` row lacks a source reference. The deterministic lineage checksum was
+      recorded and no packet, semantic, XGBoost, ACE, or projection writes were
+      performed.
+- [ ] Keep CandidateFeatureMatrix, XGBoost capture/training, and current ACE
+      admission blocked until a current execution-bound source/packet/chunk
+      cohort supplies required revisions and references.
+
+Status: `CURRENT_CANDIDATE_CORPUS_EMPTY`; `SEMANTIC_XGBOOST_ADMISSION_BLOCKED`;
+`canonicalAuthority=false`; `writesPerformed=false`.
+
+Evidence: `docs/reports/candidate-corpus-lineage-v1.json`.
+
+### Qualified candidate cohort recheck (2026-09-15)
+
+- [x] Ran the read-only qualified-candidate cohort audit. Of `61,718` packet
+      rows, `17,144` have exact Graphify source evidence with workspace and
+      source revisions; `99` reach an exact packet→chunk join.
+- [x] The audit reports `13,750` ambiguous packet/chunk joins and `0` graph
+      revisions. Consequently `0` rows are fully qualified for promotion,
+      despite `17,144` rows carrying partial source/semantic revision fields.
+- [ ] Keep CandidateFeatureMatrix, semantic promotion, graph-derived features,
+      XGBoost capture, ACE warming, and GPU fanout blocked until graph revision
+      ownership and ambiguous packet/chunk identities are resolved.
+
+Status: `COHORT_BLOCKED`; `GRAPH_OR_SEMANTIC_REVISION_OWNER_REQUIRED`;
+`canonicalAuthority=false`; `writesPerformed=false`.
+
+Evidence: `docs/reports/lineage-qualified-candidate-cohort-v1.json`.
+
+### PostgreSQL and ACE indexing alignment audit (2026-09-15)
+
+- [x] Re-ran the read-only indexing-surface audit against the live PostgreSQL
+      18.4 instance. PostgreSQL remains the canonical owner; existing packet,
+      chunk, FTS/GIN, trigram, pgvector/HNSW, and projection tables are
+      inventoried without creating a second search index owner.
+- [x] Confirmed the canonical dense lane is `semantic_768` in
+      `codebase_chunk_index.content_embedding`; legacy 384-dimensional lanes
+      remain compatibility/projection evidence only.
+- [x] Confirmed ACE/BitFrost identity admission is implemented and legacy
+      identity-less cache values are degraded/unqualified rather than treated
+      as current evidence.
+- [ ] Keep production ACE warming and Qdrant/GPU fanout blocked until the
+      current source→packet→chunk cohort supplies exact workspace/source/
+      representation identity, content checksums, and a readback receipt.
+- [ ] Reconcile the reported manual SQL files with the Drizzle sidecar
+      manifest before any migration or schema change. This is an ownership
+      classification task, not authorization to run DDL.
+- [ ] Replace or explicitly quarantine AST regex fallbacks after confirming
+      reachability; the active AST backfill currently reports zero regex
+      matchers, but two legacy extraction references remain.
+
+Status: `INDEXING_SURFACES_INVENTORIED`; `ACE_CURRENT_ADMISSION_BLOCKED`;
+`SEMANTIC_768_COVERAGE_PARTIAL`; `DRIZZLE_SIDECAR_CLASSIFICATION_OPEN`;
+`canonicalAuthority=false`; `writesPerformed=false`.
+
+Evidence: `docs/reports/atlas-indexing-surfaces-v1.json`,
+`sveltekit-frontend/src/lib/server/atlas/cache/ace-bitfrost-cache-identity-v1.ts`,
+and the existing semantic/packet lineage receipts.
+
+### Mastra adapter unavailable-seam guard (2026-09-15)
+
+- [x] Replaced misleading empty-success behavior in the existing Mastra-shaped
+      adapter: validation now returns explicit `FAIL`/unavailable metadata;
+      discovery returns `UNAVAILABLE`; delegation returns failed/unavailable;
+      retrieval and context assembly raise a typed `AtlasAdapterUnavailableError`.
+- [x] Added focused tests covering non-authoritative results and typed context
+      failure. The guard reports `canonicalAuthority=false` and
+      `writesPerformed=false` and does not add a retrieval, identity, ACE,
+      delegation, or mutation owner.
+- [ ] Keep live retrieval, ACE context assembly, identity discovery, governed
+      delegation, and canonical durable-event readback open until their existing
+      owners provide revision-qualified evidence and readback receipts.
+
+Status: `SCAFFOLD_GUARD_PROVEN`; live capability remains blocked.
+
+Evidence: `sveltekit-frontend/src/lib/server/atlas/atlas-mastra-adapter.ts`,
+`sveltekit-frontend/src/lib/server/atlas/atlas-mastra-adapter.spec.ts`, and
+`docs/reports/atlas-mastra-adapter-seam-guard-v1.json`.
+
+### Legacy TypeScript fixer execution quarantine (2026-09-15)
+
+- [x] Quarantined `scripts/phase66_automated_error_fixer.py` as historical
+      evidence. Its legacy shell, regex, and numbered-fixer actions are now
+      recorded but never executed by the LangGraph path.
+- [x] Preserved the file for historical inspection and kept the governed
+      replacement boundary separate: machine-JSONL evidence capture,
+      TaskCandidate evidence, FileMutationPlan, approval, preimage validation,
+      bounded executor, and receipts.
+- [ ] Keep the legacy fixer out of active repair commands until the governed
+      fixture replay and canonical durable-event readback are complete.
+
+Status: `LEGACY_MUTATOR_QUARANTINED`; `GOVERNED_REPAIR_OPEN`;
+`writesPerformed=false`.
+
+Evidence: `scripts/phase66_automated_error_fixer.py`,
+`scripts/atlas/capture-typescript-error-evidence-v1.mjs`,
+`scripts/atlas/replay-agentic-recommendations.mjs`, and
+`docs/reports/atlas-mastra-adapter-seam-guard-v1.json`.
+
+- [x] Aligned the quarantined Phase 66 model metadata with the existing
+      llama-server owner: `LLAMA_SERVER_URL` defaults to `127.0.0.1:8090` and
+      `LLAMA_SERVER_MODEL` defaults to the runtime alias `ornith-1.5-9b`.
+      A read-only `GET /v1/models` probe observed `ornith-1.5-9b`. This proves
+      runtime identity only; it does not reopen the quarantined repair path.
+- [x] Added the same bounded model-resolution receipt to the active read-only
+      coordinator `scripts/atlas/run-agentic-error-fixing-v1.mjs`; it records
+      `PROVEN_RUNTIME` or `UNAVAILABLE` from `/v1/models` and never invokes the
+      model, executes a proposal, or authorizes mutation.
+
+### Stage 13 workflow completion guard (2026-09-15)
+
+- [x] Replaced the discovery shortcut with an explicit non-terminal blocked
+      result when canonical identity discovery is unavailable.
+- [x] Prevented `VALIDATE` from marking a workflow `COMPLETE` without an
+      independent validation receipt; recovery remains non-terminal.
+- [x] Focused workflow tests pass, and the durable writer's canonical entrypoint
+      remains covered by 11 mocked-transaction tests.
+- [ ] Keep live identity discovery, independent validation receipt, and
+      canonical durable Postgres/outbox readback open.
+
+Status: `STAGE13_GUARDS_PROVEN`; `LIVE_PROOF_BLOCKED`; `writesPerformed=false`.
+
+Evidence: `sveltekit-frontend/src/lib/server/atlas/atlas-mastra-workflow.ts`,
+`sveltekit-frontend/src/lib/server/atlas/atlas-mastra-workflow.spec.ts`,
+`sveltekit-frontend/src/lib/server/agent/action-writer.spec.ts`, and
+`docs/reports/stage13-workflow-fail-closed-v1.json`.
+
+### Semantic cohort empty-admission guard (2026-09-15)
+
+- [x] Required an `ADMITTED` semantic cohort to contain at least one qualified
+      row; empty cohorts now fail schema validation instead of masquerading as
+      current semantic proof.
+- [x] Added focused fixture coverage for the empty-admission case.
+- [ ] Keep semantic promotion blocked until the current source→packet→chunk
+      cohort and representation lineage are admitted.
+
+Status: `SCAFFOLD_HARDENED`; `FIXTURE_PROVEN`; `CURRENT_AUTHORITY_BLOCKED`;
+`writesPerformed=false`.
+
+Evidence: `sveltekit-frontend/src/lib/server/atlas/embedding/semantic-representation-v1.ts`;
+`sveltekit-frontend/src/lib/server/atlas/embedding/semantic-representation-v1.spec.ts`.
+
+### Recovery state cannot masquerade as completion (2026-09-15)
+
+- [x] Corrected the Atlas retrieval workflow recovery branch so failed or
+      blocked retrieval/verification returns `AtlasState.RECOVER` instead of
+      rewriting the result to `COMPLETE`.
+- [x] Unknown workflow states now fail closed to the same explicit recovery
+      result.
+- [x] Focused workflow and feature-admission tests pass; no live workflow
+      execution or datastore mutation was performed.
+- [ ] Keep governed repair and current-data promotion closed until the
+      upstream authority receipts are complete.
+
+Status: `FAIL_CLOSED_STATE_GUARD`; `FIXTURE_PROVEN`; `LIVE_AUTHORITY_BLOCKED`;
+`writesPerformed=false`.
+
+Evidence: `sveltekit-frontend/src/lib/server/atlas/atlas-mastra-workflow.ts`;
+`sveltekit-frontend/src/lib/server/atlas/atlas-mastra-workflow.spec.ts`.
+
+### Agentic retrieval verification fail-closed hardening (2026-09-15)
+
+- [x] Replaced the Mastra workflow's unconditional VERIFY → SYNTHESIZE transition
+      with canonical packet validation through `validatePacketFromGo()`.
+- [x] Empty retrieval results, missing packet keys, validator errors, and any
+      non-valid packet now enter recovery and cannot be reported as verified
+      context.
+- [ ] Keep live governed repair, canonical Graphify ownership, packet/chunk
+      lineage, semantic admission, and GPU promotion blocked until their
+      independent receipts pass.
+
+Status: `VERIFICATION_GUARD_SCAFFOLDED`; `LIVE_AUTHORITY_BLOCKED`;
+`writesPerformed=false`.
+
+Evidence: `sveltekit-frontend/src/lib/server/atlas/atlas-mastra-workflow.ts`;
+`docs/reports/current-packet-digest-bridge-v1.json`.
+
+### Packet verification test seam (2026-09-15)
+
+- [x] Extracted the packet verification boundary as the pure
+      `verifyRetrievedPacketsV1()` helper so empty, malformed, failed, and
+      validator-error inputs are testable without service or datastore access.
+- [x] Added fixture coverage for empty retrieval, missing identity, partial
+      validation failure, and all-packets-valid behavior.
+- [ ] Keep the live retrieval/repair path blocked until current Graphify,
+      source→packet→chunk, semantic, and durable-event authority receipts pass.
+
+Status: `FIXTURE_PROVEN`; `LIVE_AUTHORITY_BLOCKED`; `writesPerformed=false`.
+
+Evidence: `sveltekit-frontend/src/lib/server/atlas/atlas-mastra-workflow.spec.ts`;
+`docs/reports/agentic-retrieval-verification-guard-v1.json`.
+
+### Stage 3 ordinal materializer lineage guard (2026-09-15)
+
+- [x] Updated `materialize-candidate-ordinal-corpus-v1.mts` to require an
+      exact `atlas_packet_chunk_lineage` row with matching packet/source
+      identity, matching `source_revision`, `revision_status='PROVEN'`, and a
+      real `codebase_chunk_index` row before a packet can enter the ordinal map.
+- [x] Preserved explicit workspace and candidate-snapshot revision inputs;
+      no current revision is inferred from ordering or nullable data.
+- [x] Read-only rerun returned `0` eligible rows from `0` rows and performed
+      no writes; this is an unavailable current cohort, not a proof of zero
+      lineage defects.
+- [ ] Run the bounded 128-row current-cohort proof only after Graphify owner
+      selection and packet digest/source→packet→chunk authority are admitted.
+
+Status: `SCAFFOLD_HARDENED`; `READ_ONLY_CHECK_COMPLETE`;
+`CURRENT_AUTHORITY_BLOCKED`; `writesPerformed=false`.
+
+Evidence: `scripts/atlas/materialize-candidate-ordinal-corpus-v1.mts`;
+`docs/reports/current-packet-digest-bridge-v1.json`.
+
+### Current source→packet→chunk recheck (2026-09-15)
+
+- [x] Re-ran the bounded read-only join against the explicit workspace revision
+      and selected execution frame.
+- [x] Confirmed the five-row bounded sample has five exact Graphify source
+      matches but zero proven packet/chunk lineage matches and zero packet
+      content matches.
+- [ ] Do not materialize CandidateOrdinalMapV1 or downstream semantic/graph
+      features from this sample until the canonical packet digest bridge and
+      `revision_status='PROVEN'` chunk lineage are available.
+
+Status: `CURRENT_PACKET_CHUNK_JOIN_MISSING`; `writesPerformed=false`.
+
+Evidence: `docs/reports/current-workspace-packet-chunk-join-v1.json`;
+`docs/reports/current-packet-digest-bridge-v1.json`.
+
+### HyperGraphRAG strict tuple lineage guard (2026-09-15)
+
+- [x] Tightened the existing `kag-hypergraph-reader-v1.ts` strict traversal
+      so ontology tuples are admitted only when their JSONB provenance records
+      the requested `workspaceRevision` and `graphRevision`.
+- [x] Added regression assertions proving both tuple and hyperedge queries
+      bind the same traversal snapshot revisions; unqualified tuples remain
+      unavailable rather than being treated as current evidence.
+- [ ] Keep live HyperGraphRAG tuple promotion and graph-derived ranking blocked
+      until the current Graphify execution, source/chunk cohort, and graph
+      revision are admitted. This is a read-side lineage guard, not an
+      ontology migration or fusion-owner change.
+
+Status: `STRICT_READ_GUARD_COMPLETE`; `LIVE_PROMOTION_BLOCKED`;
+`CURRENT_AUTHORITY_BLOCKED`.
+
+Evidence: `sveltekit-frontend/src/lib/server/atlas/integration/kag-hypergraph-reader-v1.ts`;
+`sveltekit-frontend/src/lib/server/atlas/integration/kag-hypergraph-reader-v1.spec.ts`.
+Validation: 9 focused tests passed; OpenSpec strict validation passed; no
+database, graph, cache, or projection writes occurred.
+
+### Classification provenance nullability hardening (2026-09-15)
+
+- [x] Removed the `unknown` provenance-version defaults from the existing
+      classification envelope builder.
+- [x] Provenance versions are now explicitly nullable when the producing
+      packet/feature/validation/ledger schema is not available; this preserves
+      absence instead of manufacturing a version claim.
+- [x] Added regression coverage for the null-provenance path.
+- [ ] Keep domain/topic/entity classifier outputs non-promotional until their
+      packet, source, workspace, model, and feature revisions are all bound to
+      the admitted current cohort.
+
+Status: `PROVENANCE_NULLABLE_GUARD_COMPLETE`; `LIVE_CLASSIFIER_ADMISSION_BLOCKED`.
+
+Evidence: `sveltekit-frontend/src/lib/server/atlas/contracts/classification-envelope-v1.ts`;
+`sveltekit-frontend/src/lib/server/atlas/contracts/classification-envelope-v1.spec.ts`.
+Validation: 3 focused tests passed; no classifier, database, cache, vector,
+or GPU writes occurred.
+
+### Latent backfill revision quarantine (2026-09-15)
+
+- [x] Hardened `scripts/atlas/backfill-latent-vectors.mjs` so persistence
+      requires an explicit 64-hex admitted `workspaceRevision` supplied by
+      `--workspace-revision` or `WORKSPACE_REVISION`.
+- [x] Removed the `unknown` revision fallback from checkpoint records. A
+      historical dry-run may remain unqualified, but an APPLY invocation now
+      fails before opening a writer path when the revision is absent or
+      malformed.
+- [ ] Keep latent backfill promotion blocked until the selected Graphify
+      execution, current source→packet→chunk cohort, and semantic parent
+      identity are admitted. This guard does not authorize legacy latent
+      persistence or make Qdrant/GPU output canonical.
+
+Status: `SCAFFOLD_HARDENED`; `LIVE_PROMOTION_BLOCKED`;
+`CURRENT_AUTHORITY_BLOCKED`.
+
+Evidence: `scripts/atlas/backfill-latent-vectors.mjs`.
+Validation: `node --check scripts/atlas/backfill-latent-vectors.mjs`; guarded
+APPLY invocation rejects missing revision before persistence.
+
+### Package contract-fixture build unblock (2026-09-15)
+
+- [x] Updated the stale knowledge-page DAG fixture to use the current
+      `IN_MEMORY_COMPUTE_EXECUTOR`/`source_file` operator contract and the
+      current ontology `sourceContract` vocabulary. Production schemas were
+      not weakened.
+- [x] `packages/parent-atlas` TypeScript build now passes with `--noEmit`.
+- [x] Workflow event tests, governed replay tests, strict OpenSpec validation,
+      and the scoped diff check pass.
+- [ ] This only restores reproducible contract validation. It does not close
+      live Graphify owner selection, packet/chunk authority, semantic admission,
+      GPU parity, or canonical durable-event database readback.
+
+Status: `FIXTURE_CONTRACTS_ALIGNED`; `LIVE_AUTHORITY_UNCHANGED`;
+`writesPerformed=false`.
+
+Evidence: `packages/parent-atlas/src/core/knowledge/knowledge-page-dag-binding-v1.spec.ts`,
+package TypeScript build, workflow/replay test receipts, and
+`docs/reports/current-graphify-execution-owner-resolution-v1.json`.
+
+### Stage 3–13 contract regression sweep (2026-09-15)
+
+- [x] Re-ran the existing stage-owner suites for ordinal maps, semantic
+      representation, candidate feature snapshots, ACE identity, GPU residency,
+      ContextManifest admission, structural graph snapshots, hypergraph
+      materialization, unified residency, and Phase 17 provider admission.
+- [x] All selected suites passed: `58` tests, with no live promotion or
+      persistence side effects.
+- [ ] These are contract/fixture proofs only. They do not promote the current
+      Graphify execution, admit the packet/chunk cohort, or prove live ACE,
+      semantic, durable-event, or GPU authority.
+
+Status: `STAGE_CONTRACTS_REGRESSION_PASS`; `CURRENT_AUTHORITY_BLOCKED`;
+`writesPerformed=false`.
+
+Evidence: focused lane-contracts Vitest runs on the existing Stage 3–13 owner
+modules and the current Graphify/packet authority reports.
+
+### Candidate ordinal materializer synthetic-lineage quarantine (2026-09-15)
+
+- [x] Hardened `scripts/atlas/materialize-candidate-ordinal-corpus-v1.mts` so
+      it requires explicit `--workspace-revision` and
+      `--candidate-snapshot-revision` inputs.
+- [x] Removed fabricated workspace/source/graph/semantic revisions and the
+      assumed `embeddinggemma:latest` representation binding. Missing lineage
+      now excludes a row rather than becoming a placeholder.
+- [x] The script is dry-run-only until an authorized current cohort exists;
+      missing required revision arguments fail closed before database access.
+- [ ] This does not admit the current cohort or authorize persistence. The
+      Graphify owner, packet digest, source→packet→chunk, and graph authority
+      gates remain open.
+
+Status: `SYNTHETIC_LINEAGE_REMOVED`; `CURRENT_COHORT_UNPROVEN`;
+`writesPerformed=false`.
+
+Evidence: `scripts/atlas/materialize-candidate-ordinal-corpus-v1.mts`,
+isolated TypeScript compilation, and the fail-closed missing-argument smoke run.
+
+### Graph snapshot exporter identity guard (2026-09-15)
+
+- [x] Hardened `scripts/atlas/export-graph-snapshot-v2.mts` to require explicit
+      workspace, snapshot, and source-inventory snapshot identities (or
+      explicitly supplied environment values); it no longer creates a random
+      snapshot ID or derives an inventory identity implicitly.
+- [x] Preserved the exporter as a derived artifact writer; graph nodes/edges
+      remain non-canonical until the current execution and revision-qualified
+      edge gates pass.
+- [ ] The exporter still cannot prove current graph authority by itself. Its
+      current live execution remains blocked by the duplicate-owner decision and
+      absent revision-qualified edge population.
+
+Status: `GRAPH_EXPORT_IDENTITY_FAIL_CLOSED`; `CURRENT_GRAPH_AUTHORITY_BLOCKED`;
+`writesPerformed=false`.
+
+Evidence: `scripts/atlas/export-graph-snapshot-v2.mts` and
+`docs/reports/current-graph-artifact-readiness-v1.json`.
+
+### ACE reconciliation packet cache-write quarantine (2026-09-15)
+
+- [x] Hardened `scripts/atlas/build-reconciliation-ace-packet.mts` to require
+      explicit workspace, run, and ACE packet identities; it no longer derives
+      workspace revision from moving Git `HEAD` or mints random IDs.
+- [x] Made the default mode read-only and added explicit
+      `--apply` plus `ATLAS_ALLOW_RECONCILIATION_ACE_CACHE_WRITE=1` protection.
+- [x] Removed mutable `latest` Valkey aliases from the apply path; only
+      revision-addressed ACE/BitFrost keys are written when explicitly enabled.
+- [ ] This remains a derived context projection and cannot establish current
+      packet authority or substitute for canonical PostgreSQL readback.
+
+Status: `ACE_CACHE_WRITE_FAIL_CLOSED`; `CURRENT_COHORT_REQUIRED`;
+`writesPerformed=false` by default.
+
+Evidence: `scripts/atlas/build-reconciliation-ace-packet.mts` and the
+missing-identity fail-closed smoke run.
+
+### Packet outbox null-lineage correction (2026-09-15)
+
+- [x] Removed the packet transaction writer's fabricated `"unknown"` revision
+      fallbacks. Missing workspace, source, graph, representation, and feature
+      lineage now remains `null` in the derived outbox payload.
+- [x] Isolated TypeScript compilation passed and the packet identity decision
+      suite passed `15/15`.
+- [x] Corrected the legacy integer-revision compatibility guard and removed
+      the hard-coded `workspace_revision=0` insert value; numeric legacy
+      revisions are now validated as safe integers and persisted exactly.
+- [x] Corrected packet idempotency to read/write `atlas_packets.content_hash`;
+      embedding digests are representation metadata and are no longer used as
+      whole-source packet identity.
+- [ ] Live canonical packet writer/readback remains blocked until an explicitly
+      authorized current execution and exact source bytes are available.
+
+Status: `NULL_LINEAGE_PRESERVED`; `PACKET_DIGEST_BRIDGE_BLOCKED`;
+`canonicalAuthority=false`; `writesPerformed=false`.
+
+Evidence: `sveltekit-frontend/src/lib/server/atlas/identity/packet-write-transaction-v1.ts`
+and `sveltekit-frontend/src/lib/server/atlas/identity/packet-write-decision-v1.spec.ts`.
+
+### Packet writer lineage recheck (2026-09-15)
+
+- [x] Re-ran the read-only packet writer lineage audit across five writer
+      surfaces.
+- [ ] Current writer ownership remains unproven: `1` revision-bound contract,
+      `2` legacy-SHA-256-only writers, and `2` unqualified or schema-drift
+      writers. Do not enable packet digest admission or downstream fanout until
+      one guarded writer persists canonical `content_hash` and `source_revision`
+      and proves exact readback.
+
+Status: `PACKET_WRITER_CURRENT_LINEAGE_NOT_PROVEN`; `canonicalAuthority=false`;
+`writesPerformed=false`.
+
+Evidence: `docs/reports/packet-writer-lineage-v1.json`.
+
+### Current packet/chunk identity readback (2026-09-15)
+
+- [x] Ran the guarded read-only identity reconciliation for the preflighted
+      execution `74d50c86-8194-45ea-8c3d-61aab737ef83` at the explicit admitted
+      workspace revision.
+- [ ] The canonical bridge remains blocked: `24,456` bound sources,
+      `16,554` packet references, `0` canonical packet digest matches,
+      `7,902` missing packet rows, `16,454` missing packet content digests,
+      `627` packet/lineage matches, and `20` comparable digest mismatches.
+      Legacy `sha256` matches (`3,230`) remain diagnostic only.
+
+Status: `PACKET_DIGEST_BRIDGE_MISSING`; `canonicalAuthority=false`;
+`writesPerformed=false`.
+
+Evidence: `docs/reports/current-packet-chunk-identity-reconciliation-v1.json`.
+
+### Guarded selected-execution packet bridge recheck (2026-09-15)
+
+- [x] The existing selected-execution preflight validated
+      `74d50c86-8194-45ea-8c3d-61aab737ef83` without applying an owner decision.
+- [x] Re-ran the bounded packet digest bridge for `128` immutable membership
+      rows using that preflighted execution and the explicit admitted workspace
+      revision.
+- [ ] The bridge remains blocked: `0` canonical content-digest matches,
+      `70` missing packets, and `58` packets missing canonical whole-source
+      digests. Legacy digest values remain diagnostic only.
+
+Status: `OWNER_SELECTION_VALIDATED_NOT_APPLIED`; `PACKET_DIGEST_BRIDGE_BLOCKED`;
+`canonicalAuthority=false`; `writesPerformed=false`.
+
+Evidence: `docs/reports/selected-graphify-execution-owner-v1.json` and
+`docs/reports/current-packet-digest-bridge-v1.json`.
+
+### Current graph artifact readiness recheck (2026-09-15)
+
+- [x] Re-ran the read-only graph artifact readiness audit against the current
+      workspace state: `observationCount=16` and `uniqueGraphNodeKeyCount=16`.
+- [ ] Revision-qualified current edges remain absent:
+      `explicitRevisionQualifiedEdges=0`. The observed node keys do not seal a
+      current graph snapshot or authorize PageRank, CheiRank, HITS, community,
+      topology, or GPU projection promotion.
+
+Status: `CURRENT_GRAPH_ARTIFACT_BLOCKED_ON_STALE_PROJECTION`;
+`canonicalAuthority=false`; `writesPerformed=false`.
+
+Evidence: `docs/reports/current-graph-artifact-readiness-v1.json`.
+
+### Graph ordinal map readback validation (2026-09-15)
+
+- [x] Extended the existing `GraphOrdinalMapV1` owner with a strict parser that
+      validates node-key shape, contiguous zero-based ordinals, row count, and
+      the deterministic map checksum.
+- [x] Added tamper and ordinal-sequence rejection coverage. The map remains an
+      executor-local derived coordinate artifact with `canonicalAuthority=false`
+      and `writes=false`.
+- [ ] Keep current graph promotion blocked until revision-qualified edges and a
+      sealed current GraphSnapshot bind this map to the admitted execution.
+
+Status: `GRAPH_ORDINAL_READBACK_SCAFFOLD_COMPLETE`; `LIVE_PROOF_BLOCKED`;
+`CURRENT_AUTHORITY_BLOCKED`; `writesPerformed=false`.
+
+Evidence: `sveltekit-frontend/src/lib/server/atlas/graph/graph-ordinal-map-v1.ts`
+and its focused spec.
+
+### Bounded packet digest bridge recheck (2026-09-15)
+
+- [x] Re-ran the packet digest bridge against the explicit admitted workspace
+      revision and execution with a bounded sample of 5 immutable membership
+      rows.
+- [x] Read-only result: `0` canonical content-digest matches, `2` packets
+      missing canonical content digests, `3` packet references missing, and
+      `writesPerformed=false`.
+- [ ] Keep packet admission and downstream chunk/semantic promotion blocked
+      until an approved canonical whole-source digest producer and exact
+      readback are available. This sample is diagnostic evidence only.
+
+Status: `PACKET_DIGEST_BRIDGE_BLOCKED`; `canonicalAuthority=false`;
+`writesPerformed=false`.
+
+Evidence: `docs/reports/current-packet-digest-bridge-v1.json`.
+
+### Bounded packet/chunk auditor readback (2026-09-15)
+
+- [x] Added an explicit `--limit` mode to
+      `scripts/atlas/audit-current-workspace-packet-chunk-join-v1.mjs`.
+      The mode samples the explicitly supplied workspace revision and execution
+      inside the existing repeatable-read, read-only transaction; it reports
+      `scope=BOUNDED_SAMPLE` and never upgrades the sample to authority.
+- [x] Bounded readback over 5 members completed without mutation: 5 binding
+      rows, 5 exact Graphify members, 0 packet-content matches, and 0 proven
+      packet/chunk lineage rows.
+- [ ] Keep packet digest and source→packet→chunk admission blocked until the
+      canonical whole-source packet digest producer and exact readback are
+      proven for the selected execution. Whole-source and per-chunk hashes
+      remain separate grains.
+
+Status: `CURRENT_PACKET_CHUNK_JOIN_MISSING`; `canonicalAuthority=false`;
+`writesPerformed=false`.
+
+Evidence: `docs/reports/current-workspace-packet-chunk-join-v1.json`.
+
+### HyperGraphRAG n-ary fusion scaffold review (2026-09-15)
+
+- [x] Reused the existing HyperRAG fusion adapter, n-ary contract, tuple
+      proposal, and materializer owners; no second fusion or graph owner was
+      introduced.
+- [x] Focused tests cover revision filtering, canonical-hit admission,
+      genuinely n-ary proposals, and additive HyperRAG enrichment without
+      multiplying RRF votes.
+- [ ] Keep live HyperRAG API adoption, dynamic tuple promotion, and
+      PageRank/cuGraph parity open until current graph and semantic authority
+      are proven. Hyperedges remain derived evidence and cannot invent hits or
+      create additional lane votes.
+
+Status: `HYPERRAG_FUSION_SCAFFOLD_COMPLETE`; `LIVE_PROMOTION_BLOCKED`;
+`CURRENT_GRAPH_AUTHORITY_BLOCKED`; `writesPerformed=false`.
+
+Evidence: `sveltekit-frontend/src/lib/server/atlas/integration/hyperrag-fusion-runtime-adapter-v1.ts`,
+`sveltekit-frontend/src/lib/server/atlas/graph/hypergraph-nary-materialize-v1.ts`,
+and their focused specs.
+
+### Stage 3 current source/chunk ordinal admission scaffold (2026-09-15)
+
+- [x] Added `RevisionQualifiedSourceChunkCohortV1` validation to the existing
+      `canonical-candidate-v1` owner. The cohort requires an explicit workspace
+      revision, candidate snapshot revision, source-set checksum, packet identity,
+      and source reference for every candidate.
+- [x] Added the pure
+      `materializeRevisionQualifiedSourceChunkOrdinalMapV1()` wrapper. It rejects
+      unavailable or unqualified cohorts and delegates to the existing deterministic
+      `CandidateOrdinalMapV1` materializer without I/O or persistence.
+- [x] Added focused null-identity and deterministic replay tests.
+- [ ] Keep current graph/semantic promotion blocked until one Graphify execution
+      owner and exact source-to-packet-to-chunk readback are proven. No historical
+      nullable rows are rewritten and no ordinal map is treated as canonical identity.
+
+Status: `STAGE_3_ORDINAL_SCAFFOLD_COMPLETE`; `CURRENT_AUTHORITY_BLOCKED`;
+`writesPerformed=false`.
+
+Evidence: `sveltekit-frontend/src/lib/server/atlas/features/canonical-candidate-v1.ts`
+and `sveltekit-frontend/src/lib/server/atlas/features/canonical-candidate-v1.spec.ts`.
+
+### Stage 6 current graph feature admission scaffold (2026-09-15)
+
+- [x] Extended the existing graph feature snapshot owner with
+      `GraphFeatureSnapshotAdmissionV1` and a pure sealed-current admission
+      boundary. It rejects historical/unavailable manifests, missing or duplicate
+      packet keys, unknown nodes, and graph-revision mismatches.
+- [x] Added focused tests for exact sealed admission and fail-closed observation
+      handling. The result remains `canonicalAuthority=false` and
+      `writesPerformed=false`.
+- [ ] Keep PageRank, PPR, HITS, CheiRank, community, topology, Neo4j, cuGraph,
+      and GPU promotion blocked until revision-qualified current graph edges and
+      one authorized Graphify execution are proven.
+
+Status: `STAGE_6_GRAPH_FEATURE_SCAFFOLD_COMPLETE`; `LIVE_PROOF_BLOCKED`;
+`CURRENT_AUTHORITY_BLOCKED`.
+
+Evidence: `sveltekit-frontend/src/lib/server/atlas/graph/graph-feature-snapshot.ts`
+and `sveltekit-frontend/src/lib/server/atlas/graph/graph-feature-snapshot.spec.ts`.
+
+- [x] Extended the existing structural feature snapshot contract with nullable
+      PageRank, personalized PageRank, HITS authority/hub, and CheiRank fields.
+      Missing algorithms remain observable as `null`; no zero/default score is
+      promoted as evidence.
+- [ ] Keep live metric admission blocked until revision-qualified graph edges,
+      the shared `GraphOrdinalMapV1`, and executor parity are proven.
+
+Evidence: `sveltekit-frontend/src/lib/server/atlas/graph/structural-feature-snapshot-v1.ts`
+and its focused parser spec.
+
+### Stage 7 latent representation lineage scaffold (2026-09-15)
+
+- [x] Extended the existing latent hydration owner with
+      `LatentRepresentationLineageAdmissionV1`, requiring an admitted
+      `semantic_768` parent plus explicit latent and transform revisions/checksum.
+- [x] Added pure tests for admitted and unavailable semantic parents. Latent
+      outputs remain derived, `canonicalAuthority=false`, and
+      `writesPerformed=false`.
+- [ ] Keep latent promotion blocked until the current semantic cohort and its
+      source-to-packet-to-chunk lineage are admitted. Do not synthesize vectors
+      or treat latent revisions as replacements for `semantic_768`.
+
+Status: `STAGE_7_LATENT_LINEAGE_SCAFFOLD_COMPLETE`; `LIVE_PROOF_BLOCKED`;
+`CURRENT_AUTHORITY_BLOCKED`.
+
+Evidence: `sveltekit-frontend/src/lib/server/atlas/features/candidate-latent256-hydration-receipt-v1.ts`
+and its focused spec.
+
+### Stage 8 current candidate feature admission scaffold (2026-09-15)
+
+- [x] Extended the existing `CandidateFeatureSnapshotV1` owner with
+      `CurrentCandidateFeatureAdmissionV1`. It requires explicit source/chunk,
+      semantic, and graph admission states before materializing a feature matrix.
+- [x] Added typed blocked results with no snapshot, fabricated scores, or
+      promotion state, plus focused lineage-blocking tests.
+- [ ] Keep current feature-matrix admission blocked until the Graphify owner,
+      packet digest bridge, source→packet→chunk lineage, semantic cohort, and
+      revision-qualified graph features are all proven.
+
+Status: `STAGE_8_FEATURE_MATRIX_SCAFFOLD_COMPLETE`; `LIVE_PROOF_BLOCKED`;
+`CURRENT_AUTHORITY_BLOCKED`.
+
+Evidence: `sveltekit-frontend/src/lib/server/atlas/features/candidate-feature-snapshot-v1.ts`
+and its focused spec.
+
+### Stage 13 current ContextManifest admission scaffold (2026-09-15)
+
+- [x] Extended the existing ACE ContextManifest owner with
+      `CurrentAceContextManifestAdmissionV1`. It builds `ContextManifestV2` only
+      from an admitted Stage 8 feature snapshot.
+- [x] Added a typed blocked result that carries no manifest when the feature
+      snapshot is blocked or unavailable; canonical authority and writes remain
+      false.
+- [ ] Keep current ContextManifest/DAG replay blocked until current source,
+      semantic, graph, and feature evidence reaches one revision-qualified cohort.
+
+Status: `STAGE_13_CONTEXT_SCAFFOLD_COMPLETE`; `LIVE_PROOF_BLOCKED`;
+`CURRENT_AUTHORITY_BLOCKED`.
+
+Evidence: `sveltekit-frontend/src/lib/server/atlas/context/ace-context-manifest-admission-v1.ts`
+and its focused spec.
+
+### Stage 12 reranker evaluation admission scaffold (2026-09-15)
+
+- [x] Extended the existing XGBoost ranking-lineage owner with
+      `RerankerEvaluationAdmissionV1`, separating corpus admission, held-out
+      evaluation evidence, and promotion authorization.
+- [x] Added pure tests for blocked corpus, missing evaluation, and fully evidenced
+      evaluation states. The scaffold always reports `promotionAuthorized=false`,
+      `canonicalAuthority=false`, and `writesPerformed=false`.
+- [ ] Keep XGBoost/Ornith promotion blocked until a current labeled corpus,
+      leakage checks, frozen grouped splits, and held-out quality receipt exist.
+
+Status: `STAGE_12_RERANKER_SCAFFOLD_COMPLETE`; `LIVE_PROOF_BLOCKED`;
+`PROMOTION_CLOSED`.
+
+Evidence: `sveltekit-frontend/src/lib/server/atlas/classification/xgboost-ranking-lineage-v1.ts`
+and its focused spec.
+
+### Stage 9 ACE/BitFrost admission scaffold (2026-09-15)
+
+- [x] Extended the existing ACE/BitFrost identity owner with a typed
+      `AceResidencyAdmissionV1` result and deterministic revisioned cache-key
+      derivation.
+- [x] Added blocked-identity and admitted descriptor tests. The result is
+      non-authoritative and explicitly records `writesPerformed=false`.
+- [ ] Keep live cache warming blocked until a current candidate cohort,
+      complete retrieval identity, manifest checksum, and production readback
+      are proven. Legacy entries remain degraded/unqualified.
+
+Status: `ACE_RESIDENCY_ADMISSION_SCAFFOLD_COMPLETE`; `ACE_CURRENT_ADMISSION_BLOCKED`;
+`canonicalAuthority=false`; `writesPerformed=false`.
+
+Evidence: `sveltekit-frontend/src/lib/server/atlas/cache/ace-bitfrost-cache-identity-v1.ts`
+and its focused spec.
+
+- [x] **ACE-LEGACY-CACHE-DEGRADED-READBACK-01** — the existing top-retrieval
+      cache now normalizes identity-less Redis and snapshot values as
+      `degraded=true`; only entries carrying an exact `RetrievalCacheIdentityV1`
+      can be admitted as current. Focused cache coverage passes; live warming
+      remains blocked by the missing current cohort.
+
+### Stage 10 unified GPU residency admission scaffold (2026-09-15)
+
+- [x] Reuse the existing `unified-residency-adapter-v1` owner for feature-tile,
+      Transformer KV, Mamba/Samba, and Titans-style descriptor admission.
+- [x] Preserve revision/checksum admission, bounded VRAM policy, LRU/lease
+      eviction, and the no-persisted-GPU-state boundary in that adapter.
+- [ ] Keep live residency and CPU/PyTorch/cuTile parity blocked until an
+      admitted current CandidateFeatureMatrix supplies a bounded tile on one
+      stable ordinal map.
+
+Status: `STAGE_10_RESIDENCY_SCAFFOLD_COMPLETE`; `GPU_LIVE_PROOF_BLOCKED`;
+`canonicalAuthority=false`; `writesPerformed=false`.
+
+Evidence: `sveltekit-frontend/src/lib/server/atlas/tensors/unified-residency-adapter-v1.ts`
+and its focused spec.
+
+### Stage 11 Phase 17 provider admission scaffold (2026-09-15)
+
+- [x] Reuse the existing `phase17-schema` owner and pure provider-admission
+      boundary for revision-qualified feature inputs.
+- [x] Keep provider availability, degradation, and blocked states explicit;
+      provider output remains derived and non-promotional.
+- [ ] Keep Phase 17 execution blocked until source/packet/chunk, graph,
+      semantic, and CandidateFeatureMatrix gates are admitted together.
+
+Status: `STAGE_11_PROVIDER_SCAFFOLD_COMPLETE`; `LIVE_PROOF_BLOCKED`;
+`CURRENT_AUTHORITY_BLOCKED`; `writesPerformed=false`.
+
+Evidence: `sveltekit-frontend/src/lib/server/ml/phase17-schema.ts` and
+`sveltekit-frontend/src/lib/server/ml/phase17-provider-admission.spec.ts`.
+After explicit owner authorization, rerun the packet/chunk closure against the selected
+execution; do not perform that selection implicitly inside a downstream writer.
+
+### Explicit execution-owner decision preflight (2026-09-15)
+
+- [x] Added `scripts/atlas/audit-selected-graphify-execution-owner-v1.mjs` and the
+      `atlas:graphify:execution-owner:preflight` command. It validates an operator-supplied
+      execution ID only against the existing equivalent-execution plan; it does not relabel,
+      delete, or update Graphify state.
+- [x] The recommended execution `74d50c86-8194-45ea-8c3d-61aab737ef83` passed the preflight as
+      `OWNER_SELECTION_VALIDATED_NOT_APPLIED`. The receipt retains `requiresExplicitAuthorityDecision=true`,
+      `canonicalAuthority=false`, `safeToApply=false`, and `writesPerformed=false`.
+- [ ] The owner decision and post-decision readback remain open. Only after an explicit authority
+      decision may the selected execution be used as the packet/chunk reconciliation input.
+
+Evidence: `docs/reports/selected-graphify-execution-owner-v1.json`.
+
+### Explicit owner-bound snapshot authority readback (2026-09-15)
+
+- [x] Extended `audit-current-graphify-snapshot-authority-v1.mts` with an explicit
+      `--execution-id` path. It accepts only an execution already validated by the immutable
+      owner plan and the matching owner-preflight checksum; it rejects a missing or stale
+      preflight and never relabels, deletes, or updates Graphify state.
+- [x] Read-only rerun bound the admitted snapshot to execution
+      `74d50c86-8194-45ea-8c3d-61aab737ef83`. The receipt now reports `CURRENT_SNAPSHOT_PROVEN`,
+      preserves `qualifyingExecutions=2`, records the validated owner selection, and keeps
+      `canonicalAuthority=false`, `safeToApply=false`, and `writesPerformed=false`.
+- [ ] Canonical durable owner adoption is still intentionally open. The selected execution is
+      a validated reconciliation input, not permission to mutate Graphify history or to bypass
+      the packet digest bridge.
+
+Evidence: `docs/reports/current-graphify-snapshot-authority-v1.json` and
+`docs/reports/current-source-selection-input-v1.json`. The next read-only gate is the guarded
+packet/chunk closure against this explicit execution.
+
+- [x] Hardened `audit-current-packet-chunk-identity-reconciliation-v1.mjs` to require a
+      matching selected-execution preflight receipt before it reads the join. The guarded rerun
+      against `74d50c86-8194-45ea-8c3d-61aab737ef83` reproduced the full current result without
+      writes: `0` canonical packet digest matches, `7,902` missing packet rows, and `13,324`
+      digest mismatches.
+- [ ] This guard proves provenance of the audit input only; it does not apply the owner decision
+      or authorize packet/chunk writes. Explicit authority and canonical packet digest production
+      remain required.
+- [x] Applied the same owner-preflight requirement to
+      `plan-current-packet-digest-bridge-v1.mjs`; the guarded `500`-member rerun reproduced
+      `0` canonical matches, `1` legacy-only match, `71` missing packets, and `428` mismatches.
+- [x] Bound both downstream tools to the checksum of the current owner-resolution plan; stale
+      owner-preflight receipts now fail closed if a new execution changes that plan. The guarded
+      full join rerun remains read-only and reports `PACKET_DIGEST_BRIDGE_MISSING`.
+
+### Current packet digest bridge planner (2026-09-15)
+
+- [x] Added `scripts/atlas/plan-current-packet-digest-bridge-v1.mjs` as a bounded,
+      read-only planner. It requires an explicit admitted workspace revision and execution ID,
+      reads `graphify_execution_file_membership_v2` as the source-membership owner, and uses a
+      repeatable-read transaction. It never updates packets or treats a legacy digest as
+      promotion authority.
+- [x] The bounded planner run was expanded to `500` execution-owned members: `0` canonical
+      `atlas_packets.content_hash` matches, `1` legacy-only match, `71` missing packet rows,
+      and `428` packet-content mismatches. The result is `PACKET_DIGEST_BRIDGE_BLOCKED` with
+      `safeToApply=false`, `canonicalAuthority=false`, and `writesPerformed=false`.
+- [x] Tightened promotion classification so a future digest match is not eligible unless the
+      packet also carries a valid SHA-256-shaped `atlas_packets.source_revision`. Digest equality
+      without packet source revision is now `PACKET_SOURCE_REVISION_MISSING` rather than a false
+      canonical match.
+- [ ] The packet bridge remains open. The planner must be rerun after an explicit execution-owner
+      decision and then expanded in bounded cohorts; no `content_hash`, `source_revision`, packet,
+      chunk, semantic, Qdrant, or cache backfill is authorized from this report alone.
+
+Evidence: `docs/reports/current-packet-digest-bridge-v1.json`.
+Next gate: `PACKET-DIGEST-BRIDGE-AUTHORIZATION-AND-READBACK-01`, requiring a proven packet
+content-hash producer, exact source-byte readback, and a separately authorized bounded canary.
+
+### Packet writer lineage census (2026-09-15)
+
+- [x] Added `scripts/atlas/audit-packet-writer-lineage-v1.mjs`, a read-only source census
+      covering the canonical semantic writer, ACP materializer, legacy NDJSON sync, legacy
+      indexer, and whole-codebase upsert paths. The report records source checksums,
+      referenced lineage fields, writer classification, and promotion eligibility without
+      importing or invoking any writer.
+- [x] Live/source census result: `5` writer surfaces, `0` complete revision-bound contracts,
+      `2` legacy-`sha256`-only surfaces, and `3` unqualified or schema-drift-blocked surfaces.
+      `writesPerformed=false`.
+- [ ] Packet currentness remains blocked. The canonical content digest must be produced from
+      the exact admitted source bytes, the live `atlas_packets` schema must expose the fields
+      used by the approved contract (or an explicitly approved equivalent must be documented),
+      and legacy writers must remain quarantined from current-corpus apply paths.
+
+Evidence: `docs/reports/packet-writer-lineage-v1.json` and
+`docs/reports/packet-write-revision-contract-v1.json`.
+Next gate: `PACKET-DIGEST-BRIDGE-ADMISSION-01`, then rerun the exact packet/chunk closure
+against the explicitly authorized execution. No packet, semantic, vector, graph, or cache
+write was performed.
+
+### Packet schema/current-writer correction (2026-09-15)
+
+- [x] Re-ran the live packet revision-contract audit after the schema changed concurrently.
+      `atlas_packets.source_revision` now exists live, so the earlier schema-absence finding
+      is closed and the audit was corrected to report the current state dynamically.
+- [ ] The remaining blocker is writer/data adoption, not schema existence: the five discovered
+      writer surfaces contain `1` complete revision-bound contract (the admission-bound wrapper);
+      `2` are legacy-`sha256` paths and `2` are unqualified or schema-drift-blocked. Existing packet data still has
+      one historical/default-shaped workspace revision, `61,365` null `content_hash` values,
+      and no proven current packet digest bridge.
+- [ ] Keep `PACKET-DIGEST-BRIDGE-ADMISSION-01` open. Before any packet/chunk or semantic
+      promotion, one approved writer must accept the explicit admitted workspace/source
+      evidence, persist canonical `content_hash` and `source_revision`, and prove exact
+      readback against the selected terminal execution. Legacy writers remain quarantined.
+
+Evidence: `docs/reports/packet-writer-lineage-v1.json`,
+`docs/reports/packet-write-revision-contract-v1.json`, and
+`docs/reports/current-packet-chunk-identity-reconciliation-v1.json`.
+
+### Admission-bound canonical packet writer (2026-09-15)
+
+- [x] Added `persistAdmittedSemanticPacketEmbedding()` as the current-corpus entrypoint around
+      the existing semantic packet writer. It validates `SemanticPacketWriteAdmissionV1` before
+      reaching the database writer and passes the exact packet key, source reference, source
+      revision, and whole-source content digest through unchanged.
+- [x] Preserved workspace, execution, and binding provenance in packet metadata while keeping
+      the legacy integer cache epoch column separate from the SHA-256 workspace revision
+      namespace. The wrapper performs no identity derivation and was not invoked against live DB.
+- [x] Added focused coverage for qualified input preservation and malformed digest rejection
+      before `insert`; the combined semantic writer/admission suite passes `15/15`.
+- [ ] This establishes the writer contract only. A bounded live transaction/readback remains
+      blocked until an approved packet cohort and exact source-byte bridge are available.
+
+Evidence: `sveltekit-frontend/src/lib/server/embedding/semantic-packet-writer.ts`,
+`sveltekit-frontend/src/lib/server/embedding/semantic-packet-writer.spec.ts`, and
+`docs/reports/current-packet-digest-bridge-v1.json`. No packet or datastore write was performed.
+
+### Derived Workstation progress receipt (2026-09-15)
+
+- [x] Added `scripts/atlas/build-workstation-progress-receipt-v1.mjs` as the derived
+      `WorkstationProgressReceiptV1` producer. It consumes explicit current receipts for
+      Graphify authority, packet/chunk lineage, graph readiness, packet writers, and event
+      contract state; it does not read task checkbox counts or prose as proof.
+- [x] Receipt is deterministic over the source-receipt content, records per-gate proof
+      predicates and blockers, preserves `null` for dimensions with no authoritative
+      predicate, and emits `authoritative=false` and `writesPerformed=false`.
+- [ ] The current projection remains blocked by the same upstream gates: duplicate
+      equivalent Graphify execution ownership, packet digest bridge, stale graph projection
+      with zero revision-qualified edges, incomplete packet-writer adoption, and unproven
+      live canonical event readback. This receipt cannot close tasks or authorize mutations.
+
+### Additional legacy packet apply quarantine (2026-09-15)
+
+- [x] Quarantined `scripts/atlas/index-parent-atlas-packets.mjs --apply`. Its input is a
+      historical packet-definition manifest and its INSERT/UPDATE path has no explicit admitted
+      workspace revision, source revision, or exact source-byte content digest. The script now
+      exits before database connection/write with `PACKET_WRITER_QUARANTINED`; dry-run inventory
+      remains available.
+- [x] Quarantined `scripts/atlas/sync-parent-atlas-packets-to-postgres.mjs --apply`. Its Rust
+      NDJSON import maps defaulted packet metadata and uses a legacy upsert path without the
+      current source-membership and digest bridge. It now fails closed before any sync with the
+      same structured status; read-only parsing remains available.
+- [ ] Packet writer adoption remains open. These changes are safety quarantine only, not proof
+      of a current packet writer or authorization to repair historical rows.
+
+Evidence: the two guarded scripts, `docs/reports/packet-writer-lineage-v1.json`, and
+`docs/reports/current-packet-digest-bridge-v1.json`. No database, packet, vector, graph, cache,
+or projection writes were performed.
+
+Evidence: `docs/reports/workstation-progress-receipt-v1.json`.
+
+### Daily Graphify progress projection (2026-09-15)
+
+- [x] Added `scripts/atlas/build-daily-graphify-progress-v1.mjs`. It consumes the admitted
+      Graphify authority, execution-owner, packet/chunk, Workstation-progress, and existing
+      TaskCandidate receipts and emits a derived daily summary with source observations,
+      blocked/admitted/validated classifications, and explicit delta fields.
+- [x] The projection refuses to infer changed/new/deleted/unchanged counts from a different
+      historical revision. With no same-revision per-file predecessor, those fields remain
+      `null`; the receipt records `NO_PRIOR_RECEIPT_FOR_ADMITTED_WORKSPACE_REVISION` or the
+      same-revision limitation explicitly.
+- [x] Repeated-build checksum proof passed; the prior daily receipt is retained as diagnostic
+      context but excluded from the current checksum to avoid self-reference.
+- [ ] Daily Graphify still cannot promote TaskCandidates or Kanban work. Current output has
+      `25,542` observed sources, `2` qualifying equivalent executions, and requires explicit
+      execution-owner resolution before packet/chunk or graph promotion.
+
+Evidence: `docs/reports/daily-graphify-progress-v1.json`.
+
+### TypeScript evidence capture batching (2026-09-15)
+
+- [x] Replaced whole-artifact buffering in `capture-typescript-error-evidence-v1.mjs`
+      with bounded streaming line batches (`--batch-lines`, default `5000`). The CLI hashes
+      the input stream, parses only machine-verbose JSONL, aggregates stable diagnostics, and
+      preserves nullable lineage and non-promotional flags.
+- [x] Added CLI batch-boundary coverage; `node --test
+      scripts/atlas/capture-typescript-error-evidence-v1.test.mjs` passes `2/2`.
+- [ ] Live full-corpus capture remains a separate checker-execution gate. The adapter now
+      avoids loading the entire checker artifact into memory, but it still does not create
+      canonical source revisions or authorize repair execution.
+
+Evidence: `scripts/atlas/capture-typescript-error-evidence-v1.mjs`,
+`scripts/atlas/capture-typescript-error-evidence-v1.test.mjs`.
+
+### P0 authority checkpoint recheck (2026-09-15)
+
+- [x] Re-ran the duplicate Graphify execution-owner planner. It still reports two
+      equivalent terminal executions with one evidence signature; the deterministic
+      recommendation remains `74d50c86-8194-45ea-8c3d-61aab737ef83`, but explicit
+      authority is still required. No execution was relabeled, deleted, or modified.
+- [x] Re-ran the bounded current source-registry planner at `500` rows. It reports
+      `82` existing registry matches and `418` review-only candidates under the current
+      admitted selection checksum. No registry rows were inserted.
+- [x] Re-ran canonical workflow-event tests (`11/11`) and admitted semantic packet-writer
+      tests (`15/15`). These prove in-memory contracts only; live Postgres/outbox readback
+      remains open.
+- [ ] Keep the P0 sequence blocked at explicit Graphify owner decision, canonical packet
+      digest/readback, and source→packet→chunk closure. Do not deduplicate semantic rows,
+      synthesize revisions, or promote graph/XGBoost/GPU projections from these audits.
+
+Status: `P0_RECHECKED_READ_ONLY`; `canonicalAuthority=false`; `writesPerformed=false`.
+
+Evidence: `docs/reports/current-graphify-execution-owner-resolution-v1.json`,
+`docs/reports/current-source-registry-reconciliation-plan-v1.json`,
+`docs/reports/packet-writer-lineage-v1.json`, and the focused writer test suites.
+
+### P0 downstream readiness recheck (2026-09-15)
+
+- [x] Selected-execution preflight remains `OWNER_SELECTION_VALIDATED_NOT_APPLIED` for
+      `74d50c86-8194-45ea-8c3d-61aab737ef83`; `candidateFound=true`,
+      `safeToApply=false`, and `writesPerformed=false`.
+- [x] Current graph readiness remains blocked: `16` observations and `16` node keys,
+      but `0` revision-qualified edges.
+- [x] Semantic admission remains blocked: `109,776` candidates, `10,995` canonical IDs,
+      `5,730` duplicate IDs, `109,746` missing source revisions, `30` mixed workspace
+      revisions, and `16` mixed representation revisions.
+- [x] Packet-writer lineage remains incomplete: `1` revision-bound writer, `2` legacy
+      SHA-256-only writers, and `2` unqualified/schema-drift writers.
+- [ ] Keep graph, semantic, XGBoost, and GPU promotion closed until the execution owner,
+      packet digest bridge, and current source→packet→chunk lineage are proven.
+
+Status: `P0_DOWNSTREAM_READINESS_BLOCKED`; `writesPerformed=false`.
+
+Evidence: `docs/reports/selected-graphify-execution-owner-v1.json`,
+`docs/reports/current-graph-artifact-readiness-v1.json`,
+`docs/reports/semantic-corpus-admission-v1.json`, and
+`docs/reports/packet-writer-lineage-v1.json`.
+
+### Packet digest planner bounded-query correction (2026-09-15)
+
+- [x] Corrected `scripts/atlas/plan-current-packet-digest-bridge-v1.mjs` so the
+      requested bound is applied inside the execution-membership CTE before the
+      packet join. The prior query applied `LIMIT` after joining the full current
+      population and could hit the PostgreSQL statement timeout at `500` rows.
+- [x] Re-ran the explicit current-frame planner with the admitted workspace revision,
+      preflighted execution `74d50c86-8194-45ea-8c3d-61aab737ef83`, and `--limit 500`.
+      The receipt now completes with `500` sampled members: `0` canonical digest
+      matches, `1` legacy-only match, `71` missing packets, and `428` packet digest
+      mismatches.
+- [ ] The bounded query correction changes audit reliability only. It does not create
+      packet rows, reinterpret legacy digests, or authorize source→packet→chunk
+      materialization.
+
+Status: `PACKET_DIGEST_BRIDGE_BLOCKED`; `safeToApply=false`; `writesPerformed=false`.
+
+Evidence: `docs/reports/current-packet-digest-bridge-v1.json` and
+`scripts/atlas/plan-current-packet-digest-bridge-v1.mjs`.
+
+### Current packet/chunk identity recheck (2026-09-15)
+
+- [x] Re-ran `audit-current-packet-chunk-identity-reconciliation-v1.mjs` with the
+      explicit admitted workspace revision and preflighted execution.
+- [x] The current execution-owned frame contains `24,456` binding sources and
+      `16,554` packet source-reference matches, but `0` canonical packet digest
+      matches. Only `3,230` legacy digest matches are present and remain diagnostic.
+- [x] The packet/chunk readback reports `627` lineage-reference joins,
+      `7,902` missing packet rows, and `13,324` packet digest mismatches; no
+      missing-lineage rows were observed for the matched subset.
+- [ ] Keep source→packet→chunk closure blocked. Reference joins and legacy digest
+      matches do not establish canonical whole-source identity or current promotion.
+
+Status: `PACKET_DIGEST_BRIDGE_MISSING`; `canonicalAuthority=false`; `writesPerformed=false`.
+
+Evidence: `docs/reports/current-packet-chunk-identity-reconciliation-v1.json`.
+
+### Indexing-surface recheck (2026-09-15)
+
+- [x] **AST-GREP-RUNTIME-ADMISSION-01** — the frontend workspace now imports
+      `@ast-grep/napi` successfully (`Lang`, `SgNode`, `SgRoot`, and `findInFiles`
+      are available). This closes the package-resolution subgate only; the
+      existing regex fallback paths remain a separate non-promotional finding.
+- [ ] **AST-GREP-FALLBACK-QUARANTINE-01** — remove or explicitly quarantine the
+      remaining regex fallback references in the legacy extraction scripts after
+      the AST-grep bounded extraction parity test is available. Do not treat
+      dependency importability as proof of current structural authority.
+- [ ] **DRIZZLE-SIDECAR-INVENTORY-CLASSIFICATION-01** — the live audit sees
+      `294` manual SQL files and `64` declared sidecars. The untracked remainder
+      requires read-only owner/status classification; no DDL or migration apply is
+      authorized by this finding.
+- [ ] **SEMANTIC-768-COVERAGE-READBACK-01** — PostgreSQL currently reports
+      `55,169 / 274,465` populated canonical `semantic_768` values. Existing rows
+      remain observable, but incomplete coverage cannot be promoted as a current
+      cohort or used to authorize Qdrant/GPU fanout.
+
+Evidence: `docs/reports/atlas-indexing-surfaces-v1.json`.
+
+### Canonical packet content identity scaffold (2026-09-15)
+
+- [x] Added `buildCanonicalPacketContentIdentityV1()` to the existing packet
+      identity/write-decision owner. It hashes the exact supplied whole-source
+      bytes, derives the byte-bound `sourceRevision`, preserves the caller's
+      explicit `workspaceRevision`, and emits a deterministic read-only
+      checksum.
+- [x] Added focused deterministic and invalid-workspace-revision tests. The
+      scaffold is non-authoritative and performs no database, cache, vector,
+      graph, or projection write.
+- [ ] Keep packet digest admission open until an approved caller supplies the
+      exact admitted execution bytes, persists `atlas_packets.content_hash` and
+      `source_revision` through the guarded writer, and reads the row back with
+      an exact checksum match. This scaffold does not reinterpret legacy
+      `sha256` columns or bridge whole-source digests to chunk hashes.
+
+Status: `PACKET_CONTENT_IDENTITY_SCAFFOLD_COMPLETE`; `PACKET_DIGEST_BRIDGE_BLOCKED`;
+`canonicalAuthority=false`; `writesPerformed=false`.
+
+Evidence: `sveltekit-frontend/src/lib/server/atlas/identity/packet-write-decision-v1.ts`
+and its focused spec.
+
+### Stage 4 semantic cohort admission scaffold (2026-09-15)
+
+- [x] Extended the existing `semantic-representation-v1` owner with
+      `SemanticCohortAdmissionV1`, explicit executor selection, cohort and
+      ordinal-map checksums, and typed blocked/unavailable states.
+- [x] Added focused tests for admitted and unavailable cohorts. The contract
+      always records `canonicalAuthority=false` and `writesPerformed=false`.
+- [ ] Keep live semantic admission blocked until the current source→packet→chunk
+      cohort, representation revision, and canonical `semantic_768` readback are
+      proven together. Qdrant and cuVS remain executors of the one semantic lane.
+
+Status: `SEMANTIC_COHORT_ADMISSION_SCAFFOLD_COMPLETE`; `SEMANTIC_CURRENT_COHORT_BLOCKED`;
+`canonicalAuthority=false`; `writesPerformed=false`.
+
+Evidence: `sveltekit-frontend/src/lib/server/atlas/embedding/semantic-representation-v1.ts`
+and its focused spec.
+
+### Canonical durable event live readback (2026-09-15)
+
+- [x] Extended `scripts/atlas/audit-critical-lineage-live-readback-v1.mjs` to
+      inventory `workflow_events` and `outbox_events` in the same repeatable-read,
+      read-only transaction as the lineage tables.
+- [x] Live schema readback confirms both event tables are present. Current counts are
+      `workflow_events=0` and `outbox_events=6`; canonical payload rows are `0` in
+      both tables and paired canonical payloads are `0`.
+- [ ] Live canonical WorkflowActionEventV1 persistence remains unproven. The in-memory
+      writer tests do not substitute for a live transaction/readback, and no live event
+      was inserted during this audit.
+
+Status: `CANONICAL_PAYLOADS_NOT_PRESENT`; `migrationAuthorized=false`;
+`writesPerformed=false`.
+
+Evidence: `docs/reports/critical-lineage-live-readback-v1.json` and
+`scripts/atlas/audit-critical-lineage-live-readback-v1.mjs`.
+
+### Bounded graph ordinal roundtrip recheck (2026-09-15)
+
+- [x] Re-ran the existing read-only graph ordinal roundtrip audit. The bounded
+      artifact contains `23` graph nodes, all `23` bind to candidate ordinals, and
+      `0` nodes are unbound.
+- [x] The audit reports `GRAPH_CANDIDATE_ORDINAL_ROUNDTRIP_PROVEN_BOUNDED` with
+      no workspace mismatches or conflicting packet ordinals.
+- [ ] This bounded mapping proof does not close current graph authority: the live
+      graph readiness receipt still reports `0` revision-qualified edges. Do not
+      promote PageRank, CheiRank, HITS, communities, topology, or GPU graph output.
+
+Status: `GRAPH_ORDINAL_ROUNDTRIP_PROVEN_BOUNDED`; `canonicalAuthority=false`;
+`writesPerformed=false`.
+
+Evidence: `docs/reports/current-graph-candidate-ordinal-roundtrip-v1.json` and
+`docs/reports/current-graph-artifact-readiness-v1.json`.
+
+### Legacy ACP packet materializer quarantine (2026-09-15)
+
+- [x] Added a fail-closed guard to
+      `sveltekit-frontend/src/lib/server/acp/packet-materializer-pipeline.ts`.
+      Its live Postgres path now rejects before reading or writing unless it is
+      explicitly in dry-run mode, because the module does not accept the admitted
+      execution/source binding or persist the canonical whole-source digest.
+- [x] Preserved the dry-run/inventory path and left the canonical semantic packet
+      writer as the only revision-qualified implementation path.
+- [ ] This quarantine does not produce current packet digests or close the bridge;
+      the existing canonical writer still requires an authorized admitted cohort and
+      live transaction/readback proof.
+
+Status: `LEGACY_PACKET_MATERIALIZER_QUARANTINED`; `writesPerformed=false`.
+
+Evidence: `sveltekit-frontend/src/lib/server/acp/packet-materializer-pipeline.ts`,
+`docs/reports/packet-writer-lineage-v1.json`, and
+`docs/reports/current-packet-digest-bridge-v1.json`.
+
+### Phase 17 provider admission scaffold (2026-09-15)
+
+- [x] Extended the existing Phase 17 schema owner with
+      `RevisionQualifiedFeatureInputV1`, `Phase17FeatureProviderV1`, explicit
+      `AVAILABLE`/`DEGRADED`/`BLOCKED`/`UNAVAILABLE` states, and a pure
+      `admitPhase17FeatureProviderV1()` boundary.
+- [x] Added focused tests proving available providers require their declared
+      lineage, missing graph/representation revisions are blocked, and
+      unavailable providers remain non-promotional.
+- [ ] Keep live Phase 17 execution blocked until the current
+      CandidateOrdinalMap/source→packet→chunk cohort is admitted. This scaffold
+      does not write `task_semantic_packets`, PostgreSQL, Qdrant, cache, or GPU
+      state and does not synthesize missing revisions.
+
+Status: `SCAFFOLD_COMPLETE`; `LIVE_PROOF_BLOCKED`; `CURRENT_AUTHORITY_BLOCKED`.
+
+Evidence: `sveltekit-frontend/src/lib/server/ml/phase17-schema.ts` and
+`sveltekit-frontend/src/lib/server/ml/phase17-provider-admission.spec.ts`.
+
+Validation note (2026-09-15): the lane-contracts Vitest configuration does not
+include `src/lib/server/ml/**`; the standalone Phase 17 suite therefore remains
+unverified in this environment. The general SvelteKit Vitest configuration is
+currently blocked during startup by the missing `@rollup/plugin-node-resolve`
+package. This is a test-harness limitation only and does not change the
+`LIVE_PROOF_BLOCKED` status.
+
+### Stable Graphify execution-owner comparison (2026-09-15)
+
+- [x] Hardened `scripts/atlas/plan-current-graphify-execution-owner-resolution-v1.mjs`
+      to read executions, stage receipts, and immutable V2 memberships inside
+      one `REPEATABLE READ READ ONLY` transaction, then roll it back explicitly.
+- [x] Re-ran the planner: the same two terminal executions remain byte-evidence
+      equivalent (`distinctEvidenceSignatures=1`) for the admitted workspace.
+- [ ] Owner selection remains intentionally blocked. No timestamp, UUID, or
+      completion ordering may choose the canonical execution implicitly.
+
+Status: `DUPLICATE_EQUIVALENT_EXECUTIONS`; `canonicalAuthority=false`;
+`writesPerformed=false`.
+
+Evidence: `docs/reports/current-graphify-execution-owner-resolution-v1.json`.

@@ -3,6 +3,8 @@ import { db } from '$lib/server/db/client.js';
 import { getQdrantManager } from '$lib/server/vector/qdrant-manager.js';
 import { getActiveSemanticVectorLane } from '$lib/server/vector/lane-registry.js';
 import { SEMANTIC_REPRESENTATION_ID, SEMANTIC_DIMENSION } from '$lib/server/embedding/embedding-contract-768.js';
+import { executeTraceSemanticV1, type TraceSemanticCohortRowV1, type TraceSemanticHitV1 } from './trace-semantic-executor-v1.js';
+import { createAtlasRapidsSemantic768Client } from '$lib/server/atlas/retrieval/atlas-rapids-semantic768-client.js';
 
 export type TraceRerankResult = {
 	id: string | number;
@@ -38,6 +40,8 @@ export async function traceRerank(params: {
 	queryEmbedding: number[];
 	limit?: number;
 	intentOverride?: string[];
+	/** Explicit admitted revision required before a cuVS fallback may run. */
+	admittedWorkspaceRevision?: string;
 }): Promise<TraceRerankResult[]> {
 	const qdrant = getQdrantManager();
 	const limit = params.limit ?? 10;
@@ -46,12 +50,42 @@ export async function traceRerank(params: {
 	const lensesToRetrieve = params.intentOverride ?? detectIntentLenses(params.query);
 
 	// 2. Retrieve Chunks (Codebase level)
-	const chunkHits = await qdrant.hybridSearch({
-		collection: CANONICAL_COLLECTION,
-		query: params.query,
-		queryEmbedding: params.queryEmbedding,
-		limit: limit * 3 // Over-retrieve for reranking
+	const chunkExecution = await executeTraceSemanticV1({
+		admittedWorkspaceRevision: params.admittedWorkspaceRevision ?? '',
+		queryVector: params.queryEmbedding,
+		topK: limit * 3,
+		qdrantSearch: async () => {
+			const result = await qdrant.hybridSearch({
+				collection: CANONICAL_COLLECTION,
+				query: params.query,
+				queryEmbedding: params.queryEmbedding,
+				limit: limit * 3,
+			});
+			return result.results.map((hit) => ({
+				id: hit.id,
+				score: hit.score,
+				payload: hit.payload ?? {},
+			}));
+		},
+		loadCohort: loadTraceSemanticCohort,
+		cuvsExact: async (input) => createAtlasRapidsSemantic768Client().exactKnn(input),
 	});
+	if (chunkExecution.status === 'BLOCKED') {
+		throw new Error(`TRACE_SEMANTIC_EXECUTOR_BLOCKED:${chunkExecution.reason}`);
+	}
+	const chunkHits = {
+		results: chunkExecution.hits,
+		metadata: {
+			query: params.query,
+			collection: CANONICAL_COLLECTION,
+			responseTime: 0,
+			total_results: chunkExecution.hits.length,
+			cached: false,
+			searchType: chunkExecution.executor ?? 'unknown',
+			executor: chunkExecution.executor,
+			fallbackUsed: chunkExecution.fallbackUsed,
+		},
+	};
 
 	// 3. Retrieve Lenses (Architectural intent level)
 	const lensHits = await qdrant.hybridSearch({
@@ -167,6 +201,47 @@ export async function traceRerank(params: {
 		.slice(0, limit);
 }
 
+function parsePgVector(value: unknown): number[] {
+	if (Array.isArray(value)) return value.map(Number);
+	if (typeof value !== 'string') return [];
+	const text = value.trim().replace(/^\[/, '').replace(/\]$/, '');
+	if (!text) return [];
+	return text.split(',').map((part) => Number(part.trim()));
+}
+
+async function loadTraceSemanticCohort(workspaceRevision: string): Promise<TraceSemanticCohortRowV1[]> {
+	if (!/^sha256:[a-f0-9]{64}$/i.test(workspaceRevision)) return [];
+	const maxRows = 1024;
+	const rows = await db.execute(sql`
+		SELECT DISTINCT ON (l.packet_key, l.source_revision)
+			l.canonical_chunk_id::text AS canonical_id,
+			l.packet_key::text AS packet_key,
+			c.source_ref::text AS source_ref,
+			b.workspace_revision::text AS workspace_revision,
+			l.source_revision::text AS source_revision,
+			c.content_embedding_768::text AS vector
+		FROM atlas_workspace_source_bindings b
+		JOIN atlas_packet_chunk_lineage l
+			ON l.source_ref::text = b.canonical_source_ref::text
+			AND l.source_revision::text = b.source_revision::text
+			AND l.revision_status = 'PROVEN'
+		JOIN codebase_chunk_index c ON c.id = l.chunk_row_id
+		WHERE b.workspace_revision::text = ${workspaceRevision}
+			AND c.content_embedding_768 IS NOT NULL
+		ORDER BY l.packet_key, l.source_revision, l.canonical_chunk_id
+		LIMIT ${maxRows + 1}
+	`);
+	if (rows.rows.length > maxRows) throw new Error('TRACE_CUVS_FALLBACK_COHORT_BOUND_EXCEEDED');
+	return (rows.rows as Array<Record<string, unknown>>).map((row) => ({
+		canonicalId: String(row.canonical_id ?? ''),
+		packetKey: String(row.packet_key ?? ''),
+		sourceRef: String(row.source_ref ?? ''),
+		workspaceRevision: String(row.workspace_revision ?? ''),
+		sourceRevision: String(row.source_revision ?? ''),
+		vector: parsePgVector(row.vector),
+	}));
+}
+
 function canonicalIdentity(sourceRef?: unknown, legacyPath?: unknown): string {
 	const source = typeof sourceRef === 'string' ? sourceRef.trim() : '';
 	if (source) return source;
@@ -177,6 +252,7 @@ function canonicalIdentity(sourceRef?: unknown, legacyPath?: unknown): string {
 async function joinCanonicalTraceRows(sourceRefs: string[]): Promise<CanonicalTraceRow[]> {
 	const uniqueSourceRefs = Array.from(new Set(sourceRefs.map((value) => value.trim()).filter(Boolean)));
 	if (uniqueSourceRefs.length === 0) return [];
+	const sourceRefsArray = sql`ARRAY[${sql.join(uniqueSourceRefs.map((sourceRef) => sql`${sourceRef}`), sql`, `)}]::text[]`;
 
 	const rows = await db.execute(sql`
 		SELECT
@@ -198,8 +274,8 @@ async function joinCanonicalTraceRows(sourceRefs: string[]): Promise<CanonicalTr
 		FROM codebase_chunk_index c
 		LEFT JOIN atlas_packets ap
 			ON ap.source_ref = c.relative_path
-		WHERE (c.relative_path = ANY(${uniqueSourceRefs}::text[])
-		   OR ap.source_ref = ANY(${uniqueSourceRefs}::text[]))
+		WHERE (c.relative_path = ANY(${sourceRefsArray})
+		   OR ap.source_ref = ANY(${sourceRefsArray}))
 		  AND COALESCE(NULLIF(c.content, ''), NULLIF(c.summary, ''), NULLIF(ap.summary, '')) IS NOT NULL
 	`);
 

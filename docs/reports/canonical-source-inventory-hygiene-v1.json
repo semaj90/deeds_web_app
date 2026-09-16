@@ -1,6 +1,6 @@
 {
   "schema": "atlas.canonical-source-inventory-hygiene.v1",
-  "generatedAt": "2026-09-16T01:27:30.184Z",
+  "generatedAt": "2026-09-16T01:36:08.829Z",
   "mode": "READ_ONLY",
   "status": "SOURCE_INVENTORY_HYGIENE_BLOCKED",
   "proofLevel": "BLOCKED",

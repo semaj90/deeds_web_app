@@ -1,6 +1,6 @@
 {
   "schema": "atlas.feature-ontology-fresh-extraction-multilane.v1",
-  "generatedAt": "2026-09-11T05:19:10.538Z",
+  "generatedAt": "2026-09-16T00:28:18.802Z",
   "mode": "READ_ONLY_REVIEW_CANDIDATES",
   "postgresWrites": false,
   "qdrantWrites": false,
@@ -14,11 +14,9 @@
     "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
     "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
     "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
-    "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-    "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
     "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts"
   ],
-  "sourceCount": 6,
+  "sourceCount": 4,
   "lanes": {
     "structural": {
       "adapter": "treesitter-chunker-structural-v1",
@@ -30,9 +28,9 @@
     },
     "pythonEnrichment": {
       "adapter": "python-enrichment-v1",
-      "sources": 6,
-      "candidates": 304,
-      "groundedSources": 5,
+      "sources": 4,
+      "candidates": 202,
+      "groundedSources": 3,
       "evidenceMode": "SEMANTIC_INFERRED"
     },
     "langextract": {
@@ -43,13 +41,31 @@
     }
   },
   "merge": {
-    "rawCandidates": 304,
-    "uniqueCandidates": 304,
+    "rawCandidates": 202,
+    "uniqueCandidates": 202,
     "structuralEvidenceCoLocated": 0,
     "crossLaneAgreement": 0,
     "crossLaneDisagreement": 0,
     "identityConflicts": 0
   },
+  "extractionStatus": "FRESH_ONTOLOGY_EXTRACTION_INCOMPLETE",
+  "extractionCounts": {
+    "approvedSources": 6,
+    "extractedSources": 4,
+    "failedSources": 2,
+    "candidates": 202,
+    "groundedSources": 3
+  },
+  "extractionFailures": [
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "error": "SOURCE_REVISION_STALE_LIVE:sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3:sha256:92df015d6d346fddd0bb1f841a3a87e1d9533c302f816664219b2a6ceb304b70; SOURCE_REVISION_STALE_LIVE:sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3:sha256:92df015d6d346fddd0bb1f841a3a87e1d9533c302f816664219b2a6ceb304b70; SOURCE_REVISION_STALE_LIVE:sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3:sha256:92df015d6d346fddd0bb1f841a3a87e1d9533c302f816664219b2a6ceb304b70"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
+      "error": "SOURCE_REVISION_STALE_LIVE:sha256:dd7aef6f31761d9827afde6a0bbbdec502f9b50917ed008f8ec17a434a35bcf1:sha256:642aefad40d76229964af139845601ed72e88ff26682d5cbbb97c0dfee44b404; SOURCE_REVISION_STALE_LIVE:sha256:dd7aef6f31761d9827afde6a0bbbdec502f9b50917ed008f8ec17a434a35bcf1:sha256:642aefad40d76229964af139845601ed72e88ff26682d5cbbb97c0dfee44b404; SOURCE_REVISION_STALE_LIVE:sha256:dd7aef6f31761d9827afde6a0bbbdec502f9b50917ed008f8ec17a434a35bcf1:sha256:642aefad40d76229964af139845601ed72e88ff26682d5cbbb97c0dfee44b404"
+    }
+  ],
   "candidates": [
     {
       "schema": "atlas.feature-ontology-fresh-candidate.v1",
@@ -218,72 +234,6 @@
     },
     {
       "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:7e7c2cb609f664dd402f6b5fb4de94be",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRevision": "sha256:dd7aef6f31761d9827afde6a0bbbdec502f9b50917ed008f8ec17a434a35bcf1",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:pointwise",
-      "objectValue": "pointwise",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:37",
-        "source-observation:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:642aefad40d76229964af139845601ed72e88ff26682d5cbbb97c0dfee44b404"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:79c3bdcc62ce1b0ab32384f238bb9a57",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:const-min-join-coverage",
-      "objectValue": "const MIN_JOIN_COVERAGE",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:10",
-        "source-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
       "candidateId": "fresh-multilane:869d709e0d067b105857e76c69b24711",
       "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
@@ -311,39 +261,6 @@
       "sourceSpanGrounded": false,
       "sourceSpan": null,
       "groundedExtractionCount": 0,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:0de844851238a835d991bf25ddf9719c",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRevision": "sha256:dd7aef6f31761d9827afde6a0bbbdec502f9b50917ed008f8ec17a434a35bcf1",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:redis-prefix",
-      "objectValue": "REDIS_PREFIX",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:8",
-        "source-observation:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:642aefad40d76229964af139845601ed72e88ff26682d5cbbb97c0dfee44b404"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
       "confidence": 0.5,
       "status": "REVIEW_REQUIRED",
       "canonicalAuthority": false
@@ -410,39 +327,6 @@
       "sourceSpanGrounded": false,
       "sourceSpan": null,
       "groundedExtractionCount": 2,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:77d320da0e9b7054568ea776264932bd",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:limit",
-      "objectValue": "limit",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:38",
-        "source-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
       "confidence": 0.5,
       "status": "REVIEW_REQUIRED",
       "canonicalAuthority": false
@@ -647,39 +531,6 @@
     },
     {
       "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:3644b29267fe91f488a5ddf2a09038e3",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRevision": "sha256:dd7aef6f31761d9827afde6a0bbbdec502f9b50917ed008f8ec17a434a35bcf1",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:ranked",
-      "objectValue": "ranked",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:39",
-        "source-observation:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:642aefad40d76229964af139845601ed72e88ff26682d5cbbb97c0dfee44b404"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
       "candidateId": "fresh-multilane:47f000a54338e53d836c35395ead46f3",
       "packetKey": "source:sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
@@ -779,138 +630,6 @@
     },
     {
       "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:265067620fd08c524c8a4d6d48e7e9a9",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRevision": "sha256:dd7aef6f31761d9827afde6a0bbbdec502f9b50917ed008f8ec17a434a35bcf1",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:function-mod",
-      "objectValue": "function mod",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:30",
-        "source-observation:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:642aefad40d76229964af139845601ed72e88ff26682d5cbbb97c0dfee44b404"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:aec4fbb6a6e279db94757e402f5a91d8",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:type-canonicaltracerow",
-      "objectValue": "type CanonicalTraceRow",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:47",
-        "source-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:71493cc757cc90cf82bd833f3843fe1d",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:chunkhits",
-      "objectValue": "chunkHits",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:7",
-        "source-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:027a4dad748f69145e7d7185bdfaf710",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:registry",
-      "objectValue": "registry",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:43",
-        "source-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
       "candidateId": "fresh-multilane:0a15d6895d969742bcf2cff5ca81c39b",
       "packetKey": "source:sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
@@ -958,39 +677,6 @@
       "evidenceRefs": [
         "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts:25",
         "source-observation:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts:1840825b32ee43669794fb4f8647ca6468e2033304d39a3019a224b7dc49f215"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:ebf5667ae62cf31b21172ee2525a2fa9",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRevision": "sha256:dd7aef6f31761d9827afde6a0bbbdec502f9b50917ed008f8ec17a434a35bcf1",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:rerank-backend",
-      "objectValue": "RERANK_BACKEND",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:9",
-        "source-observation:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:642aefad40d76229964af139845601ed72e88ff26682d5cbbb97c0dfee44b404"
       ],
       "evidenceModes": [
         "SEMANTIC_INFERRED"
@@ -1070,39 +756,6 @@
       "sourceSpanGrounded": false,
       "sourceSpan": null,
       "groundedExtractionCount": 0,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:24d424668521102d6ea29ee985cadcd1",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRevision": "sha256:dd7aef6f31761d9827afde6a0bbbdec502f9b50917ed008f8ec17a434a35bcf1",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:const-fast-cross-encoder-model",
-      "objectValue": "const FAST_CROSS_ENCODER_MODEL",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:19",
-        "source-observation:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:642aefad40d76229964af139845601ed72e88ff26682d5cbbb97c0dfee44b404"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
       "confidence": 0.5,
       "status": "REVIEW_REQUIRED",
       "canonicalAuthority": false
@@ -1208,39 +861,6 @@
     },
     {
       "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:3821c81e581326fca21841dfd1867e24",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRevision": "sha256:dd7aef6f31761d9827afde6a0bbbdec502f9b50917ed008f8ec17a434a35bcf1",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:score",
-      "objectValue": "score",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:41",
-        "source-observation:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:642aefad40d76229964af139845601ed72e88ff26682d5cbbb97c0dfee44b404"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
       "candidateId": "fresh-multilane:63e31e6c59f945d843f8069a72eb5304",
       "packetKey": "source:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
@@ -1255,39 +875,6 @@
       "evidenceRefs": [
         "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts:30",
         "source-observation:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts:1840825b32ee43669794fb4f8647ca6468e2033304d39a3019a224b7dc49f215"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:fa1774c3feff9ed3c7fca8740b1a6371",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:canonicaltracerow",
-      "objectValue": "CanonicalTraceRow",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:2",
-        "source-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3"
       ],
       "evidenceModes": [
         "SEMANTIC_INFERRED"
@@ -1439,72 +1026,6 @@
     },
     {
       "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:de30cb41faffa52137da3a708312a1d8",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:const-canonicalrow",
-      "objectValue": "const canonicalRow",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:12",
-        "source-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:4d151121168de5ba44ccdbe10d6b257d",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRevision": "sha256:dd7aef6f31761d9827afde6a0bbbdec502f9b50917ed008f8ec17a434a35bcf1",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:const-rerank-backend",
-      "objectValue": "const RERANK_BACKEND",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:23",
-        "source-observation:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:642aefad40d76229964af139845601ed72e88ff26682d5cbbb97c0dfee44b404"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
       "candidateId": "fresh-multilane:3f6c8019f73a5edfb6ee6f0caff9fec8",
       "packetKey": "source:sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
@@ -1565,39 +1086,6 @@
       "sourceSpanGrounded": false,
       "sourceSpan": null,
       "groundedExtractionCount": 2,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:6c1c0d27da2534ee50b1354f936138cd",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:const-associatedlenses",
-      "objectValue": "const associatedLenses",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:11",
-        "source-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
       "confidence": 0.5,
       "status": "REVIEW_REQUIRED",
       "canonicalAuthority": false
@@ -1684,39 +1172,6 @@
       "evidenceRefs": [
         "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts:5",
         "source-observation:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts:1840825b32ee43669794fb4f8647ca6468e2033304d39a3019a224b7dc49f215"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:bbdc54716d90bb0ad0424e8d33c39860",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:lenshits",
-      "objectValue": "lensHits",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:34",
-        "source-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3"
       ],
       "evidenceModes": [
         "SEMANTIC_INFERRED"
@@ -1835,39 +1290,6 @@
     },
     {
       "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:bb8258227339c6535060855cac1fb567",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRevision": "sha256:dd7aef6f31761d9827afde6a0bbbdec502f9b50917ed008f8ec17a434a35bcf1",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:rerankbackend",
-      "objectValue": "RerankBackend",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:12",
-        "source-observation:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:642aefad40d76229964af139845601ed72e88ff26682d5cbbb97c0dfee44b404"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
       "candidateId": "fresh-multilane:e14c7308e32c522fd057aaf8fde41701",
       "packetKey": "source:sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
@@ -1967,72 +1389,6 @@
     },
     {
       "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:3d0546ee1cfb8a1fc341af69a87bfa51",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRevision": "sha256:dd7aef6f31761d9827afde6a0bbbdec502f9b50917ed008f8ec17a434a35bcf1",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:const-redis-prefix",
-      "objectValue": "const REDIS_PREFIX",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:22",
-        "source-observation:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:642aefad40d76229964af139845601ed72e88ff26682d5cbbb97c0dfee44b404"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:2f367620fc48c31a53eb3bd1bcb622a7",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRevision": "sha256:dd7aef6f31761d9827afde6a0bbbdec502f9b50917ed008f8ec17a434a35bcf1",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:first",
-      "objectValue": "first",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:28",
-        "source-observation:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:642aefad40d76229964af139845601ed72e88ff26682d5cbbb97c0dfee44b404"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
       "candidateId": "fresh-multilane:a873158c0949dd6b43401a5dc699da75",
       "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
@@ -2060,72 +1416,6 @@
       "sourceSpanGrounded": false,
       "sourceSpan": null,
       "groundedExtractionCount": 0,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:c1007ae3a23ab051b4ba8597bd727b2c",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:const-chunkhits",
-      "objectValue": "const chunkHits",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:15",
-        "source-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:694ccc3f5832007b39c5fc934301bd57",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRevision": "sha256:dd7aef6f31761d9827afde6a0bbbdec502f9b50917ed008f8ec17a434a35bcf1",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:type-canonicalreranktier",
-      "objectValue": "type CanonicalRerankTier",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:45",
-        "source-observation:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:642aefad40d76229964af139845601ed72e88ff26682d5cbbb97c0dfee44b404"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
       "confidence": 0.5,
       "status": "REVIEW_REQUIRED",
       "canonicalAuthority": false
@@ -2192,72 +1482,6 @@
       "sourceSpanGrounded": false,
       "sourceSpan": null,
       "groundedExtractionCount": 2,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:c3b2e0659920c1d5a0893ba207ea5f0b",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRevision": "sha256:dd7aef6f31761d9827afde6a0bbbdec502f9b50917ed008f8ec17a434a35bcf1",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:reranker",
-      "objectValue": "Reranker",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:13",
-        "source-observation:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:642aefad40d76229964af139845601ed72e88ff26682d5cbbb97c0dfee44b404"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:9f09f066da1e5c97974404f2362c3028",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:const-canonicalrowbyref",
-      "objectValue": "const canonicalRowByRef",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:13",
-        "source-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
       "confidence": 0.5,
       "status": "REVIEW_REQUIRED",
       "canonicalAuthority": false
@@ -2396,39 +1620,6 @@
     },
     {
       "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:3b239226127538d1cc451cf516c31faf",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRevision": "sha256:dd7aef6f31761d9827afde6a0bbbdec502f9b50917ed008f8ec17a434a35bcf1",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:list",
-      "objectValue": "list",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:34",
-        "source-observation:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:642aefad40d76229964af139845601ed72e88ff26682d5cbbb97c0dfee44b404"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
       "candidateId": "fresh-multilane:cd5abcc457bab4b8b3ef5804dac1d517",
       "packetKey": "source:sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
@@ -2462,44 +1653,6 @@
     },
     {
       "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:4077fb78d776c1fe3b4015c9b0a13744",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:qdrant",
-      "objectValue": "qdrant",
-      "evidenceRefs": [
-        "langextract-grounded:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:135:141:cfc35d18e7332fde265d77541e0fc0165a811854f7158046053adb9674f9e866",
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:42",
-        "source-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": true,
-      "sourceSpan": {
-        "startChar": 135,
-        "endChar": 141,
-        "text": "qdrant"
-      },
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
       "candidateId": "fresh-multilane:093641a5f29f6e9971173e692898adf2",
       "packetKey": "source:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
@@ -2514,138 +1667,6 @@
       "evidenceRefs": [
         "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts:21",
         "source-observation:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts:1840825b32ee43669794fb4f8647ca6468e2033304d39a3019a224b7dc49f215"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:fe7ab164a8b7b5b5ca02d6aa570fb722",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:lensestoretrieve",
-      "objectValue": "lensesToRetrieve",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:35",
-        "source-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:f7650044f2143a28cd8b9ff3c25e8011",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:lane",
-      "objectValue": "lane",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:33",
-        "source-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:3581590d12c239c931222f8af66be047",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:const-canonical-collection",
-      "objectValue": "const CANONICAL_COLLECTION",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:9",
-        "source-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:6743d2813703a991626660b595d794b3",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:server",
-      "objectValue": "server",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:45",
-        "source-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3"
       ],
       "evidenceModes": [
         "SEMANTIC_INFERRED"
@@ -2731,39 +1752,6 @@
     },
     {
       "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:3eb3ed44dae2fccaa374a72ca2402a5c",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRevision": "sha256:dd7aef6f31761d9827afde6a0bbbdec502f9b50917ed008f8ec17a434a35bcf1",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:rerank-fallback-threshold",
-      "objectValue": "RERANK_FALLBACK_THRESHOLD",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:10",
-        "source-observation:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:642aefad40d76229964af139845601ed72e88ff26682d5cbbb97c0dfee44b404"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
       "candidateId": "fresh-multilane:2d8a52c5048819653e88fb07650702b9",
       "packetKey": "source:sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
@@ -2791,39 +1779,6 @@
       "sourceSpanGrounded": false,
       "sourceSpan": null,
       "groundedExtractionCount": 2,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:f88dde2cfc36cd39a50c686d0684ce21",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:lib",
-      "objectValue": "lib",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:37",
-        "source-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
       "confidence": 0.5,
       "status": "REVIEW_REQUIRED",
       "canonicalAuthority": false
@@ -2995,39 +1950,6 @@
     },
     {
       "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:f226a09382ddc8214ae2f0cd55925571",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRevision": "sha256:dd7aef6f31761d9827afde6a0bbbdec502f9b50917ed008f8ec17a434a35bcf1",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:const-deep-cross-encoder-model",
-      "objectValue": "const DEEP_CROSS_ENCODER_MODEL",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:18",
-        "source-observation:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:642aefad40d76229964af139845601ed72e88ff26682d5cbbb97c0dfee44b404"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
       "candidateId": "fresh-multilane:00f4d00edea6cdfc28fbdc80022beb18",
       "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
@@ -3055,44 +1977,6 @@
       "sourceSpanGrounded": false,
       "sourceSpan": null,
       "groundedExtractionCount": 0,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:ea9843d461210c5287ccf7763238fcb3",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:vector-database",
-      "objectValue": "Qdrant",
-      "evidenceRefs": [
-        "langextract-grounded:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:135:141:cfc35d18e7332fde265d77541e0fc0165a811854f7158046053adb9674f9e866",
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:50",
-        "source-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": true,
-      "sourceSpan": {
-        "startChar": 135,
-        "endChar": 141,
-        "text": "qdrant"
-      },
-      "groundedExtractionCount": 1,
       "confidence": 0.5,
       "status": "REVIEW_REQUIRED",
       "canonicalAuthority": false
@@ -3231,39 +2115,6 @@
     },
     {
       "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:0ca611f06f6a126731725ea479fcd2e0",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRevision": "sha256:dd7aef6f31761d9827afde6a0bbbdec502f9b50917ed008f8ec17a434a35bcf1",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:redis-list-prefix",
-      "objectValue": "REDIS_LIST_PREFIX",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:7",
-        "source-observation:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:642aefad40d76229964af139845601ed72e88ff26682d5cbbb97c0dfee44b404"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
       "candidateId": "fresh-multilane:539f3fe4290192f9bc776a13fc0ec8f2",
       "packetKey": "source:sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
@@ -3324,72 +2175,6 @@
       "sourceSpanGrounded": false,
       "sourceSpan": null,
       "groundedExtractionCount": 2,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:f0c956633de96cbaa8cac6f6b2b8f506",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRevision": "sha256:dd7aef6f31761d9827afde6a0bbbdec502f9b50917ed008f8ec17a434a35bcf1",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:scores",
-      "objectValue": "scores",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:42",
-        "source-observation:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:642aefad40d76229964af139845601ed72e88ff26682d5cbbb97c0dfee44b404"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:8a82d58ea5c8ab6cd05353ef639b91ba",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRevision": "sha256:dd7aef6f31761d9827afde6a0bbbdec502f9b50917ed008f8ec17a434a35bcf1",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:list-ttl-s",
-      "objectValue": "LIST_TTL_S",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:4",
-        "source-observation:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:642aefad40d76229964af139845601ed72e88ff26682d5cbbb97c0dfee44b404"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
       "confidence": 0.5,
       "status": "REVIEW_REQUIRED",
       "canonicalAuthority": false
@@ -3588,138 +2373,6 @@
       "sourceSpanGrounded": false,
       "sourceSpan": null,
       "groundedExtractionCount": 2,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:ae66f6da6eb822037163a7252eca0513",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:orm",
-      "objectValue": "orm",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:41",
-        "source-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:3460a99dde43e02a4d7dd41678df1a0c",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:const-row",
-      "objectValue": "const row",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:25",
-        "source-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:76e8a260679c73ce173ee02f2b709b2a",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:const-canonicalrows",
-      "objectValue": "const canonicalRows",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:14",
-        "source-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:6b5385cdc7a326305b7270c6fd7362bb",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:vector",
-      "objectValue": "vector",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:49",
-        "source-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
       "confidence": 0.5,
       "status": "REVIEW_REQUIRED",
       "canonicalAuthority": false
@@ -3957,138 +2610,6 @@
     },
     {
       "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:f9fe4a1b6a8b30c6ff1a027144feb39b",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:const-lenshits",
-      "objectValue": "const lensHits",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:17",
-        "source-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:75b6e128486173df348b154e70da9c2b",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRevision": "sha256:dd7aef6f31761d9827afde6a0bbbdec502f9b50917ed008f8ec17a434a35bcf1",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:score-ttl-s",
-      "objectValue": "SCORE_TTL_S",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:14",
-        "source-observation:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:642aefad40d76229964af139845601ed72e88ff26682d5cbbb97c0dfee44b404"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:76f26df695a05954ada7044585152074",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRevision": "sha256:dd7aef6f31761d9827afde6a0bbbdec502f9b50917ed008f8ec17a434a35bcf1",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:fast-cross-encoder-model",
-      "objectValue": "FAST_CROSS_ENCODER_MODEL",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:3",
-        "source-observation:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:642aefad40d76229964af139845601ed72e88ff26682d5cbbb97c0dfee44b404"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:13ad63c8f0f9258842a4abe50066768e",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:function-tracererank",
-      "objectValue": "function traceRerank",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:29",
-        "source-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
       "candidateId": "fresh-multilane:93ec53125b1e515f3f38b3681a6f08ef",
       "packetKey": "source:sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
@@ -4122,39 +2643,6 @@
     },
     {
       "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:04ebc9b397a791a4050be5b6ada09472",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:const-memoryhits",
-      "objectValue": "const memoryHits",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:21",
-        "source-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
       "candidateId": "fresh-multilane:7f9dff77b2f6adcf0e08468fdbed9a9c",
       "packetKey": "source:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
@@ -4169,39 +2657,6 @@
       "evidenceRefs": [
         "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts:44",
         "source-observation:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts:1840825b32ee43669794fb4f8647ca6468e2033304d39a3019a224b7dc49f215"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:130941100af30fc2ed9e2a4e3e5fa3b8",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRevision": "sha256:dd7aef6f31761d9827afde6a0bbbdec502f9b50917ed008f8ec17a434a35bcf1",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:with",
-      "objectValue": "with",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:49",
-        "source-observation:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:642aefad40d76229964af139845601ed72e88ff26682d5cbbb97c0dfee44b404"
       ],
       "evidenceModes": [
         "SEMANTIC_INFERRED"
@@ -4248,39 +2703,6 @@
       "sourceSpanGrounded": false,
       "sourceSpan": null,
       "groundedExtractionCount": 0,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:49ddccdb60b6268c6c21ad251bf49794",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRevision": "sha256:dd7aef6f31761d9827afde6a0bbbdec502f9b50917ed008f8ec17a434a35bcf1",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:const-list-ttl-s",
-      "objectValue": "const LIST_TTL_S",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:20",
-        "source-observation:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:642aefad40d76229964af139845601ed72e88ff26682d5cbbb97c0dfee44b404"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
       "confidence": 0.5,
       "status": "REVIEW_REQUIRED",
       "canonicalAuthority": false
@@ -4688,72 +3110,6 @@
     },
     {
       "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:0fe9affa6663bdc2f6598ae60caa277f",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRevision": "sha256:dd7aef6f31761d9827afde6a0bbbdec502f9b50917ed008f8ec17a434a35bcf1",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:encoder",
-      "objectValue": "Encoder",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:2",
-        "source-observation:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:642aefad40d76229964af139845601ed72e88ff26682d5cbbb97c0dfee44b404"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:c3f67b5067ee6d59a24cecb7a2439e78",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:anonymous",
-      "objectValue": "<anonymous>",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:0",
-        "source-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
       "candidateId": "fresh-multilane:4c33f60a5d6f42f3496873fb30655326",
       "packetKey": "source:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
@@ -4814,39 +3170,6 @@
       "sourceSpanGrounded": false,
       "sourceSpan": null,
       "groundedExtractionCount": 0,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:5e9feec7c2827afe0cfdb3320c6589f4",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRevision": "sha256:dd7aef6f31761d9827afde6a0bbbdec502f9b50917ed008f8ec17a434a35bcf1",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:type-unifiedretrievalresult",
-      "objectValue": "type UnifiedRetrievalResult",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:47",
-        "source-observation:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:642aefad40d76229964af139845601ed72e88ff26682d5cbbb97c0dfee44b404"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
       "confidence": 0.5,
       "status": "REVIEW_REQUIRED",
       "canonicalAuthority": false
@@ -4990,39 +3313,6 @@
     },
     {
       "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:fab7278719eea6189b81f347422aba83",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:client",
-      "objectValue": "client",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:8",
-        "source-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
       "candidateId": "fresh-multilane:3af5ac44b30217dfe8e615df4b6fd9a7",
       "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
@@ -5089,39 +3379,6 @@
     },
     {
       "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:e867da5eb4adcad44e8011f1d30cc0ab",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRevision": "sha256:dd7aef6f31761d9827afde6a0bbbdec502f9b50917ed008f8ec17a434a35bcf1",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:pair",
-      "objectValue": "pair",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:36",
-        "source-observation:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:642aefad40d76229964af139845601ed72e88ff26682d5cbbb97c0dfee44b404"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
       "candidateId": "fresh-multilane:94ddcc97163064350199321a1ba0dbc6",
       "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
@@ -5149,39 +3406,6 @@
       "sourceSpanGrounded": false,
       "sourceSpan": null,
       "groundedExtractionCount": 0,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:5050767f6fd79edf1dab69809a8bdc0a",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRevision": "sha256:dd7aef6f31761d9827afde6a0bbbdec502f9b50917ed008f8ec17a434a35bcf1",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:const-redis-list-prefix",
-      "objectValue": "const REDIS_LIST_PREFIX",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:21",
-        "source-observation:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:642aefad40d76229964af139845601ed72e88ff26682d5cbbb97c0dfee44b404"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
       "confidence": 0.5,
       "status": "REVIEW_REQUIRED",
       "canonicalAuthority": false
@@ -5320,72 +3544,6 @@
     },
     {
       "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:374b816e7a1d095d397950ff3e0320b0",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRevision": "sha256:dd7aef6f31761d9827afde6a0bbbdec502f9b50917ed008f8ec17a434a35bcf1",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:mixedbread",
-      "objectValue": "Mixedbread",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:5",
-        "source-observation:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:642aefad40d76229964af139845601ed72e88ff26682d5cbbb97c0dfee44b404"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:1d69341989e0b474f3c442b7ea331c9e",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:from",
-      "objectValue": "from",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:28",
-        "source-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
       "candidateId": "fresh-multilane:fdd8664a6ae04126b158a44686b2b6a5",
       "packetKey": "source:sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
@@ -5413,39 +3571,6 @@
       "sourceSpanGrounded": false,
       "sourceSpan": null,
       "groundedExtractionCount": 2,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:5d6eb492040bc0e09d9fd91b2238c9a1",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRevision": "sha256:dd7aef6f31761d9827afde6a0bbbdec502f9b50917ed008f8ec17a434a35bcf1",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:pipeline",
-      "objectValue": "Pipeline",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:6",
-        "source-observation:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:642aefad40d76229964af139845601ed72e88ff26682d5cbbb97c0dfee44b404"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
       "confidence": 0.5,
       "status": "REVIEW_REQUIRED",
       "canonicalAuthority": false
@@ -5545,72 +3670,6 @@
       "sourceSpanGrounded": false,
       "sourceSpan": null,
       "groundedExtractionCount": 2,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:b0f5bd1d6b5f9052b61235062ae973e5",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:const-researchhits",
-      "objectValue": "const researchHits",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:23",
-        "source-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:8a907eb298a416cad3e808867ef0eb9a",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:const-limit",
-      "objectValue": "const limit",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:20",
-        "source-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
       "confidence": 0.5,
       "status": "REVIEW_REQUIRED",
       "canonicalAuthority": false
@@ -5782,39 +3841,6 @@
     },
     {
       "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:d58c441a5de173628e578594aed1f9cb",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRevision": "sha256:dd7aef6f31761d9827afde6a0bbbdec502f9b50917ed008f8ec17a434a35bcf1",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:type-websearchresult",
-      "objectValue": "type WebSearchResult",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:48",
-        "source-observation:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:642aefad40d76229964af139845601ed72e88ff26682d5cbbb97c0dfee44b404"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
       "candidateId": "fresh-multilane:0b090c434b2734055a228783423d4fbf",
       "packetKey": "source:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
@@ -5829,39 +3855,6 @@
       "evidenceRefs": [
         "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts:42",
         "source-observation:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts:1840825b32ee43669794fb4f8647ca6468e2033304d39a3019a224b7dc49f215"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:f18de72cf527ffdcd8713230b1fddc47",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:let-intentboost",
-      "objectValue": "let intentBoost",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:36",
-        "source-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3"
       ],
       "evidenceModes": [
         "SEMANTIC_INFERRED"
@@ -6145,39 +4138,6 @@
     },
     {
       "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:40d66fd79e8f0363f954980e3994b7ba",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:getqdrantmanager",
-      "objectValue": "getQdrantManager",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:31",
-        "source-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
       "candidateId": "fresh-multilane:98a122a5ee38191a5d2ec650a70e32a4",
       "packetKey": "source:sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
@@ -6238,105 +4198,6 @@
       "sourceSpanGrounded": false,
       "sourceSpan": null,
       "groundedExtractionCount": 0,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:46d07904851f63cb7203f53b863938e4",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRevision": "sha256:dd7aef6f31761d9827afde6a0bbbdec502f9b50917ed008f8ec17a434a35bcf1",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:candidates",
-      "objectValue": "candidates",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:17",
-        "source-observation:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:642aefad40d76229964af139845601ed72e88ff26682d5cbbb97c0dfee44b404"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:fdec4b8fe5fc19e4f135415730fe207a",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:const-sourceref",
-      "objectValue": "const sourceRef",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:26",
-        "source-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:8ec65ccd60edac25943fdb2a7763b411",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRevision": "sha256:dd7aef6f31761d9827afde6a0bbbdec502f9b50917ed008f8ec17a434a35bcf1",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:function-resolvecrossencodermodel",
-      "objectValue": "function resolveCrossEncoderModel",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:31",
-        "source-observation:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:642aefad40d76229964af139845601ed72e88ff26682d5cbbb97c0dfee44b404"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
       "confidence": 0.5,
       "status": "REVIEW_REQUIRED",
       "canonicalAuthority": false
@@ -6442,72 +4303,6 @@
     },
     {
       "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:2afc925e969d51c736d6f39e7df9f5a7",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRevision": "sha256:dd7aef6f31761d9827afde6a0bbbdec502f9b50917ed008f8ec17a434a35bcf1",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:query",
-      "objectValue": "query",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:38",
-        "source-observation:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:642aefad40d76229964af139845601ed72e88ff26682d5cbbb97c0dfee44b404"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:bc2d526ad23976f92a941e6851afc01b",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:const-lensestoretrieve",
-      "objectValue": "const lensesToRetrieve",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:19",
-        "source-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
       "candidateId": "fresh-multilane:426db436badb96761b48bcfc6a38d322",
       "packetKey": "source:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
@@ -6522,72 +4317,6 @@
       "evidenceRefs": [
         "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts:6",
         "source-observation:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts:1840825b32ee43669794fb4f8647ca6468e2033304d39a3019a224b7dc49f215"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:24ae0da060e617dfe953091c7f872557",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRevision": "sha256:dd7aef6f31761d9827afde6a0bbbdec502f9b50917ed008f8ec17a434a35bcf1",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:set",
-      "objectValue": "set",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:44",
-        "source-observation:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:642aefad40d76229964af139845601ed72e88ff26682d5cbbb97c0dfee44b404"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:c7cd747ceb119c76a9236e8c6369d3f3",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:canonicalrows",
-      "objectValue": "canonicalRows",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:6",
-        "source-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3"
       ],
       "evidenceModes": [
         "SEMANTIC_INFERRED"
@@ -6706,39 +4435,6 @@
     },
     {
       "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:5eb8e89a3c6b75a7e5d31a2f4fab7712",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:const-joincoverage",
-      "objectValue": "const joinCoverage",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:16",
-        "source-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
       "candidateId": "fresh-multilane:d3a22e74b0d1b078c8ddbb403fc73aa0",
       "packetKey": "source:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
@@ -6753,39 +4449,6 @@
       "evidenceRefs": [
         "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts:16",
         "source-observation:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts:1840825b32ee43669794fb4f8647ca6468e2033304d39a3019a224b7dc49f215"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:6ceb404404649d9f5443e4909dc03def",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRevision": "sha256:dd7aef6f31761d9827afde6a0bbbdec502f9b50917ed008f8ec17a434a35bcf1",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:exact",
-      "objectValue": "exact",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:27",
-        "source-observation:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:642aefad40d76229964af139845601ed72e88ff26682d5cbbb97c0dfee44b404"
       ],
       "evidenceModes": [
         "SEMANTIC_INFERRED"
@@ -6832,39 +4495,6 @@
       "sourceSpanGrounded": false,
       "sourceSpan": null,
       "groundedExtractionCount": 2,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:b44e2b040ab04f44cf766f10d1d6145d",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:min-join-coverage",
-      "objectValue": "MIN_JOIN_COVERAGE",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:3",
-        "source-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
       "confidence": 0.5,
       "status": "REVIEW_REQUIRED",
       "canonicalAuthority": false
@@ -6918,39 +4548,6 @@
       "evidenceRefs": [
         "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts:32",
         "source-observation:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts:1840825b32ee43669794fb4f8647ca6468e2033304d39a3019a224b7dc49f215"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:0fef4387035c1cfb1a5fd80e8f960771",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRevision": "sha256:dd7aef6f31761d9827afde6a0bbbdec502f9b50917ed008f8ec17a434a35bcf1",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:hit",
-      "objectValue": "hit",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:32",
-        "source-observation:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:642aefad40d76229964af139845601ed72e88ff26682d5cbbb97c0dfee44b404"
       ],
       "evidenceModes": [
         "SEMANTIC_INFERRED"
@@ -7030,39 +4627,6 @@
       "sourceSpanGrounded": false,
       "sourceSpan": null,
       "groundedExtractionCount": 2,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:54ec8855487ea37b6d23c95dbf215ada",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRevision": "sha256:dd7aef6f31761d9827afde6a0bbbdec502f9b50917ed008f8ec17a434a35bcf1",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:deep-cross-encoder-model",
-      "objectValue": "DEEP_CROSS_ENCODER_MODEL",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:1",
-        "source-observation:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:642aefad40d76229964af139845601ed72e88ff26682d5cbbb97c0dfee44b404"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
       "confidence": 0.5,
       "status": "REVIEW_REQUIRED",
       "canonicalAuthority": false
@@ -7168,39 +4732,6 @@
     },
     {
       "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:7735e0ede34c738051138c7fa50fd408",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:type-tracererankresult",
-      "objectValue": "type TraceRerankResult",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:48",
-        "source-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
       "candidateId": "fresh-multilane:39f796fb28f26294529964bc6324badc",
       "packetKey": "source:sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
@@ -7228,72 +4759,6 @@
       "sourceSpanGrounded": false,
       "sourceSpan": null,
       "groundedExtractionCount": 2,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:061cdcb8ff85adfa0898d2d71d5621f4",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRevision": "sha256:dd7aef6f31761d9827afde6a0bbbdec502f9b50917ed008f8ec17a434a35bcf1",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:const-rerank-fallback-threshold",
-      "objectValue": "const RERANK_FALLBACK_THRESHOLD",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:24",
-        "source-observation:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:642aefad40d76229964af139845601ed72e88ff26682d5cbbb97c0dfee44b404"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:269ed01ad05f03e6bbaebd6950789821",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:const-lenskey",
-      "objectValue": "const lensKey",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:18",
-        "source-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
       "confidence": 0.5,
       "status": "REVIEW_REQUIRED",
       "canonicalAuthority": false
@@ -7465,39 +4930,6 @@
     },
     {
       "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:6f50e3946f348706513e4af8d0bd422d",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:researchhits",
-      "objectValue": "researchHits",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:44",
-        "source-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
       "candidateId": "fresh-multilane:2d28b09aceae2907957a973d84a05f1c",
       "packetKey": "source:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
@@ -7564,39 +4996,6 @@
     },
     {
       "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:fb3d5743187ddcaaacfc63b7ab616b75",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:manager",
-      "objectValue": "manager",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:39",
-        "source-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
       "candidateId": "fresh-multilane:d7653122a2d536ddfe9bd1268c5236bd",
       "packetKey": "source:sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
@@ -7657,82 +5056,6 @@
       "sourceSpanGrounded": false,
       "sourceSpan": null,
       "groundedExtractionCount": 2,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:335f75eb046a0b28c673d06cd7c9fae7",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRevision": "sha256:dd7aef6f31761d9827afde6a0bbbdec502f9b50917ed008f8ec17a434a35bcf1",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:redis",
-      "objectValue": "Redis",
-      "evidenceRefs": [
-        "langextract-grounded:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:73:78:a7f6415749a3297a04a2a5159d1542811f779562b547367d5e13a30e0ca5fc0f",
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:11",
-        "source-observation:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:642aefad40d76229964af139845601ed72e88ff26682d5cbbb97c0dfee44b404"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": true,
-      "sourceSpan": {
-        "startChar": 73,
-        "endChar": 78,
-        "text": "Redis"
-      },
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:330245de51fbb2d265b97758dde8b5cb",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRevision": "sha256:dd7aef6f31761d9827afde6a0bbbdec502f9b50917ed008f8ec17a434a35bcf1",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:caching",
-      "objectValue": "Redis",
-      "evidenceRefs": [
-        "langextract-grounded:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:73:78:a7f6415749a3297a04a2a5159d1542811f779562b547367d5e13a30e0ca5fc0f",
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:50",
-        "source-observation:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:642aefad40d76229964af139845601ed72e88ff26682d5cbbb97c0dfee44b404"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": true,
-      "sourceSpan": {
-        "startChar": 73,
-        "endChar": 78,
-        "text": "Redis"
-      },
-      "groundedExtractionCount": 1,
       "confidence": 0.5,
       "status": "REVIEW_REQUIRED",
       "canonicalAuthority": false
@@ -7871,39 +5194,6 @@
     },
     {
       "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:7d6fe212fb058198e35f88ae06414ced",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRevision": "sha256:dd7aef6f31761d9827afde6a0bbbdec502f9b50917ed008f8ec17a434a35bcf1",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:batch",
-      "objectValue": "batch",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:15",
-        "source-observation:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:642aefad40d76229964af139845601ed72e88ff26682d5cbbb97c0dfee44b404"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
       "candidateId": "fresh-multilane:141474723f4f0d2aedc12e0aa690a948",
       "packetKey": "source:sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
@@ -7964,39 +5254,6 @@
       "sourceSpanGrounded": false,
       "sourceSpan": null,
       "groundedExtractionCount": 2,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:44e7ff3af2ad428866499735edb34e55",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRevision": "sha256:dd7aef6f31761d9827afde6a0bbbdec502f9b50917ed008f8ec17a434a35bcf1",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:cross",
-      "objectValue": "Cross",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:0",
-        "source-observation:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:642aefad40d76229964af139845601ed72e88ff26682d5cbbb97c0dfee44b404"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
       "confidence": 0.5,
       "status": "REVIEW_REQUIRED",
       "canonicalAuthority": false
@@ -8102,72 +5359,6 @@
     },
     {
       "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:d09fc0825ed95f44ff3a645e39cf246f",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:import",
-      "objectValue": "import",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:32",
-        "source-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:bb994fe195511de5f42119af532d7e89",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:drizzle",
-      "objectValue": "drizzle",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:27",
-        "source-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
       "candidateId": "fresh-multilane:ecb7e4f7123c379fffd2a79d07798f5d",
       "packetKey": "source:sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
@@ -8195,39 +5386,6 @@
       "sourceSpanGrounded": false,
       "sourceSpan": null,
       "groundedExtractionCount": 2,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:f5f5861aee609ec9a6339e1a8fc3d466",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRevision": "sha256:dd7aef6f31761d9827afde6a0bbbdec502f9b50917ed008f8ec17a434a35bcf1",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:result",
-      "objectValue": "result",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:40",
-        "source-observation:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:642aefad40d76229964af139845601ed72e88ff26682d5cbbb97c0dfee44b404"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
       "confidence": 0.5,
       "status": "REVIEW_REQUIRED",
       "canonicalAuthority": false
@@ -8365,72 +5523,6 @@
       "sourceSpanGrounded": false,
       "sourceSpan": null,
       "groundedExtractionCount": 2,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:01ec186f5feb809f8d382107c5e1a224",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:const-qdrant",
-      "objectValue": "const qdrant",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:22",
-        "source-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:cb23fe583333fc5d1fb4c2e5ed9e15e1",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRevision": "sha256:dd7aef6f31761d9827afde6a0bbbdec502f9b50917ed008f8ec17a434a35bcf1",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:lookup",
-      "objectValue": "lookup",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:35",
-        "source-observation:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:642aefad40d76229964af139845601ed72e88ff26682d5cbbb97c0dfee44b404"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
       "confidence": 0.5,
       "status": "REVIEW_REQUIRED",
       "canonicalAuthority": false
@@ -8635,39 +5727,6 @@
     },
     {
       "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:d0ee475f538fcfcc88a7d9abdee1c90c",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRevision": "sha256:dd7aef6f31761d9827afde6a0bbbdec502f9b50917ed008f8ec17a434a35bcf1",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:individual",
-      "objectValue": "individual",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:33",
-        "source-observation:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:642aefad40d76229964af139845601ed72e88ff26682d5cbbb97c0dfee44b404"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
       "candidateId": "fresh-multilane:2c75c5bcea32996b82ed85dd72b69599",
       "packetKey": "source:sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
@@ -8833,39 +5892,6 @@
     },
     {
       "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:ed86b2555af3bc82014445ef9cd18464",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:tracererankresult",
-      "objectValue": "TraceRerankResult",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:4",
-        "source-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
       "candidateId": "fresh-multilane:313e506453d5c253b78371b40c2cd80d",
       "packetKey": "source:sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
@@ -8893,39 +5919,6 @@
       "sourceSpanGrounded": false,
       "sourceSpan": null,
       "groundedExtractionCount": 2,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:4bb6b301fd6ac0ef08917a1a91d19610",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:getactivesemanticvectorlane",
-      "objectValue": "getActiveSemanticVectorLane",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:30",
-        "source-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
       "confidence": 0.5,
       "status": "REVIEW_REQUIRED",
       "canonicalAuthority": false
@@ -9064,39 +6057,6 @@
     },
     {
       "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:21d1f616193a645a3b7a0da02ffab3e1",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRevision": "sha256:dd7aef6f31761d9827afde6a0bbbdec502f9b50917ed008f8ec17a434a35bcf1",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:doc",
-      "objectValue": "doc",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:26",
-        "source-observation:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:642aefad40d76229964af139845601ed72e88ff26682d5cbbb97c0dfee44b404"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
       "candidateId": "fresh-multilane:361ce59f4ab25916f46ee119d0662139",
       "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
@@ -9124,39 +6084,6 @@
       "sourceSpanGrounded": false,
       "sourceSpan": null,
       "groundedExtractionCount": 0,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:e8c7f98f91b340f9cf18e56c0519db6e",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:canonical-collection",
-      "objectValue": "CANONICAL_COLLECTION",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:1",
-        "source-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
       "confidence": 0.5,
       "status": "REVIEW_REQUIRED",
       "canonicalAuthority": false
@@ -9295,72 +6222,6 @@
     },
     {
       "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:581b101a10ed4e382d15b2db46ccd36b",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRevision": "sha256:dd7aef6f31761d9827afde6a0bbbdec502f9b50917ed008f8ec17a434a35bcf1",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:scoring",
-      "objectValue": "scoring",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:43",
-        "source-observation:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:642aefad40d76229964af139845601ed72e88ff26682d5cbbb97c0dfee44b404"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:ab613453afde1a034ed2de4d78367309",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRevision": "sha256:dd7aef6f31761d9827afde6a0bbbdec502f9b50917ed008f8ec17a434a35bcf1",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:const-score-ttl-s",
-      "objectValue": "const SCORE_TTL_S",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:25",
-        "source-observation:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:642aefad40d76229964af139845601ed72e88ff26682d5cbbb97c0dfee44b404"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
       "candidateId": "fresh-multilane:c35493edf8a406744adee3472c6cc0c7",
       "packetKey": "source:sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
@@ -9460,39 +6321,6 @@
     },
     {
       "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:b7bbbdcc5dfc53931fc41a0a1e4911ee",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:sql",
-      "objectValue": "sql",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:46",
-        "source-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
       "candidateId": "fresh-multilane:5216ac235ffc6c272b65b42fa01d2d5b",
       "packetKey": "source:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
@@ -9507,39 +6335,6 @@
       "evidenceRefs": [
         "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts:4",
         "source-observation:sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts:1840825b32ee43669794fb4f8647ca6468e2033304d39a3019a224b7dc49f215"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:4b0766e8eb44ee033b8026c8bf1b16e3",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:canonicalrowbyref",
-      "objectValue": "canonicalRowByRef",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:5",
-        "source-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3"
       ],
       "evidenceModes": [
         "SEMANTIC_INFERRED"
@@ -9767,39 +6562,6 @@
     },
     {
       "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:844ab9cd6b3a94dcce44216459621409",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRevision": "sha256:dd7aef6f31761d9827afde6a0bbbdec502f9b50917ed008f8ec17a434a35bcf1",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:full",
-      "objectValue": "full",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:29",
-        "source-observation:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:642aefad40d76229964af139845601ed72e88ff26682d5cbbb97c0dfee44b404"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
       "candidateId": "fresh-multilane:3a533f14fc2e79476f65fa62cea9e3c7",
       "packetKey": "source:sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
@@ -9860,39 +6622,6 @@
       "sourceSpanGrounded": false,
       "sourceSpan": null,
       "groundedExtractionCount": 0,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:d5a1bb81d53b6d0179ac8473b3729979",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRevision": "sha256:dd7aef6f31761d9827afde6a0bbbdec502f9b50917ed008f8ec17a434a35bcf1",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:type-rerankbackend",
-      "objectValue": "type RerankBackend",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:46",
-        "source-observation:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:642aefad40d76229964af139845601ed72e88ff26682d5cbbb97c0dfee44b404"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
       "confidence": 0.5,
       "status": "REVIEW_REQUIRED",
       "canonicalAuthority": false
@@ -9965,39 +6694,6 @@
     },
     {
       "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:7d23e319338ea0662127d0c51d7ee76f",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceRevision": "sha256:dd7aef6f31761d9827afde6a0bbbdec502f9b50917ed008f8ec17a434a35bcf1",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:cache",
-      "objectValue": "cache",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:16",
-        "source-observation:sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts:642aefad40d76229964af139845601ed72e88ff26682d5cbbb97c0dfee44b404"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
       "candidateId": "fresh-multilane:93144687b7d74a2503b7bf70b777b402",
       "packetKey": "source:sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
@@ -10061,76 +6757,10 @@
       "confidence": 0.5,
       "status": "REVIEW_REQUIRED",
       "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:6a34fa348c8d8dd54c8d3d72513256fc",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:memoryhits",
-      "objectValue": "memoryHits",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:40",
-        "source-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
-    },
-    {
-      "schema": "atlas.feature-ontology-fresh-candidate.v1",
-      "candidateId": "fresh-multilane:de96ea0aa9de78b9c937920700373763",
-      "packetKey": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-      "subjectType": "SOURCE",
-      "subjectId": "source:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-      "predicate": "USES_CONCEPT",
-      "objectType": "CONCEPT",
-      "objectId": "concept:const-results",
-      "objectValue": "const results",
-      "evidenceRefs": [
-        "sidecar:parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:24",
-        "source-observation:sveltekit-frontend/src/lib/server/ai/trace-reranker.ts:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3"
-      ],
-      "evidenceModes": [
-        "SEMANTIC_INFERRED"
-      ],
-      "extractorKinds": [
-        "python-enrichment-v1"
-      ],
-      "extractorRevision": "parent-atlas-fresh-ontology:multilane-merger-v1",
-      "crossLaneAgreement": 0,
-      "structuralEvidenceCoLocated": false,
-      "sourceSpanGrounded": false,
-      "sourceSpan": null,
-      "groundedExtractionCount": 1,
-      "confidence": 0.5,
-      "status": "REVIEW_REQUIRED",
-      "canonicalAuthority": false
     }
   ],
   "relationshipGraphRevision": null,
   "rel01bAllowed": false,
-  "status": "MULTILANE_REVIEW_CANDIDATES_READY",
+  "status": "MULTILANE_EXTRACTION_INCOMPLETE",
   "nextGate": "REL_01A8_INDEPENDENT_SOURCE_SPAN_REVISION_VALIDATION"
 }

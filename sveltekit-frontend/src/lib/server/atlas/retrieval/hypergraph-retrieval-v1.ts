@@ -47,6 +47,23 @@ export const HypergraphRetrievalResultV1Schema = z.object({
 }).strict();
 export type HypergraphRetrievalResultV1 = z.infer<typeof HypergraphRetrievalResultV1Schema>;
 
+/**
+ * Derived, query-scoped evidence consumed by the first-stage fusion owner.
+ * This is deliberately not a retrieval lane: it can enrich an existing
+ * candidate, but it cannot create a candidate or contribute another vote.
+ */
+export interface HypergraphFusionEvidenceV1 {
+	candidateId: string;
+	workspaceRevision: string;
+	sourceRevision: string;
+	queryRevision: string;
+	relationCount: number;
+	entityCount: number;
+	evidenceRefCount: number;
+	structuralScore: number;
+	projectionHash: string;
+}
+
 function stableHash(value: unknown): string {
 	return `sha256:${createHash('sha256').update(JSON.stringify(value)).digest('hex')}`;
 }
@@ -186,4 +203,40 @@ export function retrieveHypergraphContextV1(input: {
 		truncated,
 		projectionHash: stableHash(payload),
 	});
+}
+
+/**
+ * Convert a bounded n-ary result into candidate-local evidence without
+ * decomposing hyperedges into invented pairwise facts.
+ *
+ * This is the handoff point for future HyperRAG API adoption: LangExtract,
+ * local NLP/LLM summaries, `.okf` schema lookups and classifier outputs may
+ * nominate or annotate candidates, while PageRank and downstream rerankers
+ * may score them. Only exact workspace/source/query revisions and the existing
+ * candidate set are accepted here; no producer becomes an identity owner.
+ */
+export function buildHypergraphFusionEvidenceV1(
+	result: HypergraphRetrievalResultV1,
+	candidateIds: readonly string[],
+): HypergraphFusionEvidenceV1[] {
+	const candidateSet = new Set(candidateIds);
+	return [...candidateSet]
+		.map((candidateId) => {
+			const relations = result.relations.filter((relation) => relation.participantIds.includes(candidateId));
+			if (relations.length === 0) return null;
+			const structuralScore = relations.reduce((sum, relation) => sum + relation.structuralScore, 0) / relations.length;
+			return {
+				candidateId,
+				workspaceRevision: result.workspaceRevision,
+				sourceRevision: result.sourceRevision,
+				queryRevision: result.queryRevision,
+				relationCount: relations.length,
+				entityCount: new Set(relations.flatMap((relation) => relation.participantIds)).size,
+				evidenceRefCount: new Set(relations.flatMap((relation) => relation.evidenceRefs)).size,
+				structuralScore,
+				projectionHash: result.projectionHash,
+			};
+		})
+		.filter((value): value is HypergraphFusionEvidenceV1 => value !== null)
+		.sort((a, b) => a.candidateId.localeCompare(b.candidateId));
 }

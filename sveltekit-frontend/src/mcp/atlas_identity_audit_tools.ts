@@ -127,20 +127,21 @@ export async function handleAtlasIdentityAudit(
   let neo4jNodes = 0;
   let redisKeys = 0;
   const mismatches: IdentityAuditResult['mismatches'] = [];
+  const deferredPhase2Blockers: string[] = [];
 
   if (input.include_qdrant_payloads) {
-    console.log('[atlas.identity_audit] Phase 2: Qdrant payload validation (deferred, requires service)');
-    // Placeholder for Phase 2 Qdrant scroll + payload validation
+    console.log('[atlas.identity_audit] Phase 2: Qdrant payload validation unavailable; no service client is configured');
+    deferredPhase2Blockers.push('QDRANT_PAYLOAD_VALIDATION_UNAVAILABLE');
   }
 
   if (input.include_neo4j_nodes) {
-    console.log('[atlas.identity_audit] Phase 2: Neo4j node resolution (deferred, requires service)');
-    // Placeholder for Phase 2 Neo4j MATCH queries
+    console.log('[atlas.identity_audit] Phase 2: Neo4j node resolution unavailable; no service client is configured');
+    deferredPhase2Blockers.push('NEO4J_NODE_VALIDATION_UNAVAILABLE');
   }
 
   if (input.include_redis_centroids) {
-    console.log('[atlas.identity_audit] Phase 2: Redis centroid cache validation (deferred, requires service)');
-    // Placeholder for Phase 2 Redis KEYS scanning
+    console.log('[atlas.identity_audit] Phase 2: Redis centroid validation unavailable; no service client is configured');
+    deferredPhase2Blockers.push('REDIS_CENTROID_VALIDATION_UNAVAILABLE');
   }
 
   const durationMs = Date.now() - startTime;
@@ -167,9 +168,7 @@ export async function handleAtlasIdentityAudit(
       blockers:
         postgresPackets.length === 0
           ? ['No packets with packet_key found in Postgres']
-          : input.include_qdrant_payloads || input.include_neo4j_nodes
-            ? ['Phase 2+ cross-store validation requires active service connections']
-            : [],
+          : deferredPhase2Blockers,
       warnings: [
         `Phase 1 only: ${postgresPackets.length} Postgres packets validated`,
         'Phase 2+ requires Qdrant, Neo4j, Redis service connections',

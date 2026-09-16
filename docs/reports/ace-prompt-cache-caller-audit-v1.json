@@ -1,0 +1,47 @@
+{
+  "schema": "atlas.ace-prompt-cache-caller-audit.v1",
+  "generatedAt": "2026-09-15T19:05:58.539Z",
+  "scope": "sveltekit-frontend/src/**/*.ts",
+  "callerCount": 2,
+  "strictV2HandoffCount": 0,
+  "legacyOrUncertifiedCount": 2,
+  "requiredIdentityFields": [
+    "ContextManifestV2.identityChecksum",
+    "modelRevision",
+    "chatTemplateRevision",
+    "toolSchemaRevision",
+    "promptTemplateRevision",
+    "renderedRequestChecksum",
+    "generationControlsSignature",
+    "userQueryHash"
+  ],
+  "callers": [
+    {
+      "file": "sveltekit-frontend/src/lib/server/ai/streaming-cache.ts",
+      "line": 108,
+      "classification": "LEGACY_OR_UNCERTIFIED"
+    },
+    {
+      "file": "sveltekit-frontend/src/routes/api/v1/chat/completions/+server.ts",
+      "line": 34,
+      "classification": "LEGACY_OR_UNCERTIFIED"
+    }
+  ],
+  "compatibilitySurfaces": [
+    {
+      "file": "src/lib/server/ai/openai-facade.ts",
+      "symbol": "processQueryForLLM",
+      "localDefinitionCount": 1,
+      "repositoryCallerCount": 0,
+      "classification": "UNREFERENCED_LEGACY_SURFACE",
+      "strictV2": false,
+      "migrationRequired": false
+    }
+  ],
+  "blockingIssueCodes": [
+    "LIVE_CALLERS_DO_NOT_EMIT_STRICT_V2_HANDOFF"
+  ],
+  "status": "CACHE_PREFILL_CALLER_HANDOFF_BLOCKED",
+  "authority": false,
+  "writesPerformed": false
+}

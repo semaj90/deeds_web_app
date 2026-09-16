@@ -4,6 +4,7 @@ import {
   createAtlasSearchAdapter,
   projectAtlasSearchResponseToQas,
 } from './search-runtime-adapter.js';
+import { loadUnifiedResidencyFeaturePackV1 } from '../tensors/unified-residency-feature-pack-v1.js';
 
 describe('SearchRuntime QAS projection boundary', () => {
   it('composes the opt-in caller from the canonical runtime response', async () => {
@@ -52,6 +53,7 @@ describe('SearchRuntime QAS projection boundary', () => {
       representationRevision: 'semantic_768:r1', candidateSnapshotRevision: 'snapshot:search:r1',
       retrievalPolicyRevision: 'policy:r1', acePlaybookRevision: 'ace-playbook:r1', tokenBudget: 1200,
       producerRevision: 'search-snapshot:r1', laneMaskByCanonicalId: { 'symbol:one': ['semantic', 'lexical', 'graph'] },
+      retrievalCacheModel: 'embeddinggemma', retrievalCacheDim: 768, contextPolicyRevision: 'context:r1',
       sources: {
         projection: () => ({
           packet_key: 'packet:one', semantic_similarity_768: 0.9, lexical_score: 0.8,
@@ -72,6 +74,45 @@ describe('SearchRuntime QAS projection boundary', () => {
     expect(manifestResult.snapshot.rows[0]?.canonicalId).toBe('symbol:one');
     expect(manifestResult.snapshot.identityAuthority).toBe(false);
     expect(manifestResult.writesPerformed).toBe(false);
+    expect(manifestResult.retrievalCacheIdentity?.featureRevision).toBe('features:r1');
+    expect(manifestResult.retrievalCacheIdentity?.workspaceRevision).toBe('workspace:r1');
+
+    const residencyResult = await adapter.searchWithUnifiedResidency({ query: 'inspect', topK: 1 }, {
+      requestId: 'request:one', policyRevision: 'policy:r1', workspaceRevision: 'workspace:r1',
+      representationRevision: 'semantic_768:r1', candidateSnapshotRevision: 'snapshot:search:r1',
+      retrievalPolicyRevision: 'policy:r1', acePlaybookRevision: 'ace-playbook:r1', tokenBudget: 1200,
+      producerRevision: 'search-snapshot:r1', laneMaskByCanonicalId: { 'symbol:one': ['semantic', 'lexical', 'graph'] },
+      domain: 'contracts', lutRevision: 'lut:r1', modelRevision: 'model:r1', tokenizerRevision: 'tokenizer:r1', ropeRevision: 'rope:r1',
+      lut: { contracts: { lutRevision: 'lut:r1', tokenBudget: 1200, featureMask: ['semantic'], tileWidth: 256, contextWindow: 1024, residencyPriority: 1 } },
+      sources: {
+        projection: () => ({ packet_key: 'packet:one', semantic_similarity_768: 0.9, lexical_score: 0.8, ast_signal: 0.7, authority_norm: 0.6, domain_fit_query: 0.5, recency: 0.4, retrieval_frequency: 0.3, execution_utility: 0.2, process_fit: 0.1 }),
+        context: () => ({ graphRevision: 'graph:r1', featureRevision: 'features:r1', representationRevision: 'semantic_768:r1', taskKind: 'DEBUG', features: { semanticAffinity: 0, lexicalAffinity: 0, graphAuthority: 0, astAffinity: 0, processAffinity: 0, domainAffinity: 0, priorExecutionSuccess: 0, reuseProbability: 0, recency: 0 } }),
+      },
+    });
+    expect(residencyResult.residency.descriptors[0]?.candidateOrdinal).toBe(0);
+    expect(residencyResult.residency.routing.lutRevision).toBe('lut:r1');
+    expect(residencyResult.writesPerformed).toBe(false);
+
+    const featurePackResult = await adapter.searchWithUnifiedResidencyFeaturePack({ query: 'inspect', topK: 1 }, {
+      requestId: 'request:one', policyRevision: 'policy:r1', workspaceRevision: 'workspace:r1',
+      representationRevision: 'semantic_768:r1', candidateSnapshotRevision: 'snapshot:search:r1',
+      retrievalPolicyRevision: 'policy:r1', acePlaybookRevision: 'ace-playbook:r1', tokenBudget: 1200,
+      producerRevision: 'search-snapshot:r1', laneMaskByCanonicalId: { 'symbol:one': ['semantic', 'lexical', 'graph'] },
+      domain: 'contracts', lutRevision: 'lut:r1', modelRevision: 'model:r1', tokenizerRevision: 'tokenizer:r1', ropeRevision: 'rope:r1',
+      rowAlignment: 2,
+      lut: { contracts: { lutRevision: 'lut:r1', tokenBudget: 1200, featureMask: ['semantic'], tileWidth: 256, contextWindow: 1024, residencyPriority: 1 } },
+      sources: {
+        projection: () => ({ packet_key: 'packet:one', semantic_similarity_768: 0.9, lexical_score: 0.8, ast_signal: 0.7, authority_norm: 0.6, domain_fit_query: 0.5, recency: 0.4, retrieval_frequency: 0.3, execution_utility: 0.2, process_fit: 0.1 }),
+        context: () => ({ graphRevision: 'graph:r1', featureRevision: 'features:r1', representationRevision: 'semantic_768:r1', taskKind: 'DEBUG', features: { semanticAffinity: 0, lexicalAffinity: 0, graphAuthority: 0, astAffinity: 0, processAffinity: 0, domainAffinity: 0, priorExecutionSuccess: 0, reuseProbability: 0, recency: 0 } }),
+      },
+    });
+    expect(featurePackResult.pack.featureDtype).toBe('float32');
+    expect(featurePackResult.residencies).toHaveLength(1);
+    expect(featurePackResult.residencies[0]?.featureBuffer.byteLength).toBe(featurePackResult.pack.featureCount * 4);
+    expect(featurePackResult.residencies[0]?.descriptor.state).toBe('EMPTY');
+    const loadedResidencies = await Promise.all(featurePackResult.residencies.map((result) => loadUnifiedResidencyFeaturePackV1(result)));
+    expect(loadedResidencies).toHaveLength(1);
+    expect(loadedResidencies[0]?.state).toBe('RESIDENT');
 
     const admission = admitSearchRuntimeQasToAceManifestV1({
       projection: result.qas,

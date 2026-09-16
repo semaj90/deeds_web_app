@@ -2,15 +2,15 @@
   "schema": "atlas.current-source-evidence-hydration.v1",
   "mode": "READ_ONLY_SOURCE_EVIDENCE_OWNER_AUDIT",
   "inputSource": "docs/reports/graphify-lifecycle-entrypoint-v1.json",
-  "inputRows": 24176,
-  "exactRevisionMatches": 23415,
-  "contentHydrated": 906,
+  "inputRows": 24181,
+  "exactRevisionMatches": 23397,
+  "contentHydrated": 19906,
   "authoritativeNamespaces": 0,
   "namespaceStatus": "MISSING",
   "evidenceSpanReady": 0,
   "revisionBoundSpanOwner": 0,
-  "astCandidateRows": 12,
-  "astRevisionQualifiedRows": 0,
+  "astCandidateRows": 168,
+  "astRevisionQualifiedRows": 48,
   "classifierReady": 0,
   "ownerCandidates": {
     "atlas_ast_nodes": {
@@ -63,8 +63,8 @@
     }
   },
   "missingByReason": {
-    "CANONICAL_CHUNK_OWNER_MISSING": 23270,
-    "CHUNK_OWNER_HAS_CONTENT_BUT_NO_SOURCE_REVISION": 906
+    "CANONICAL_CHUNK_OWNER_MISSING": 4275,
+    "CHUNK_OWNER_HAS_CONTENT_BUT_NO_SOURCE_REVISION": 19906
   },
   "writes": 0,
   "postgresWrites": false,
@@ -74,5 +74,5 @@
   "canonicalAuthority": false,
   "status": "SOURCE_EVIDENCE_HYDRATION_BLOCKED",
   "nextGate": "RESOLVE_REVISION_BOUND_CONTENT_AND_SOURCE_NAMESPACE_AUTHORITY",
-  "reportChecksum": "eb48b7fbe7cdff35cbd4c7a67dbe2b92160eaa5e5eed7f8d63f2ee4053fc2f88"
+  "reportChecksum": "6b33382011961b185692786d7052ebd6d94181b56520dc0f869de7edc3d6150a"
 }

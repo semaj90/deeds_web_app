@@ -9,7 +9,12 @@ describe('QdrantManager hybridSearch named-vector resolution', () => {
       points: [{ id: 'summary-1', score: 0.91, payload: { summary: 'test summary' } }],
     }));
     const getCollection = vi.fn(async () => ({
-      config: { params: { sparse_vectors: {} } },
+      config: {
+        params: {
+          vectors: { summary: { size: 768, distance: 'Cosine' } },
+          sparse_vectors: {},
+        },
+      },
     }));
 
     manager.client = { query, getCollection } as any;
@@ -19,6 +24,7 @@ describe('QdrantManager hybridSearch named-vector resolution', () => {
       query: 'summary vector contract',
       queryEmbedding: new Array(768).fill(0.01),
       limit: 1,
+      skipCache: true,
     });
 
     expect(result.results).toHaveLength(1);

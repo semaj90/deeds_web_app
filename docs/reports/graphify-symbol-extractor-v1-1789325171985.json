@@ -1,0 +1,49 @@
+{
+  "schema": "atlas.graphify-symbol-extractor-receipt.v1",
+  "generatedAt": "2026-09-13T18:46:11.984Z",
+  "apply": true,
+  "useLsp": false,
+  "limit": 3,
+  "workspaceIdFilter": null,
+  "workspaceRevisionFilter": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+  "workspaceRevisionCount": 1,
+  "workspaceRevisionMismatchCount": 0,
+  "candidatesConsidered": 3,
+  "skippedUnsupported": 0,
+  "byFileKind": {
+    "markdown": 3
+  },
+  "filesProcessed": 3,
+  "filesFailed": 0,
+  "totalSymbolsExtracted": 48,
+  "totalSymbolsInserted": 48,
+  "plan": [
+    {
+      "fileId": "c5d4d836-2518-4f42-9b4d-db836563d5be",
+      "sourceRef": "2-CONTEXT.md",
+      "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+      "workspaceRevisionMatches": true,
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 9
+    },
+    {
+      "fileId": "abf840d1-8fd6-4fe5-b132-7697d2ec43c3",
+      "sourceRef": "724_agents.md",
+      "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+      "workspaceRevisionMatches": true,
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 4
+    },
+    {
+      "fileId": "66c86f5e-ae7c-410a-bef4-9019edd6b45c",
+      "sourceRef": "ACE-MATERIALIZATION-BLOCKER-1-FIXED.md",
+      "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+      "workspaceRevisionMatches": true,
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 35
+    }
+  ]
+}

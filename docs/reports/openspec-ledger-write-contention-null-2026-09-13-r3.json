@@ -1,0 +1,11 @@
+{
+  "schema": "atlas.openspec.ledger-write-contention-null.v1",
+  "generatedAt": "2026-09-13T21:45:00.000Z",
+  "result": null,
+  "writePerformed": false,
+  "target": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
+  "attemptedUpdate": "LINEAGE-QUALIFIED-CANDIDATE-COHORT-RECHECK-2026-09-13",
+  "reason": "Repeated concurrent ledger edits prevented a safe append; write was not forced.",
+  "evidencePreserved": "docs/reports/lineage-qualified-candidate-cohort-v1.json",
+  "destructiveOperations": false
+}

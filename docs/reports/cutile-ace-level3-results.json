@@ -1,0 +1,57 @@
+{
+  "schema": "atlas.cutile-ace-level3.wrapped-result.v1",
+  "test": "CUTILE-ACE-01-LEVEL3",
+  "date": "2026-09-14",
+  "read_only": true,
+  "canonical_production_data_touched": false,
+  "canonical_production_data_mutated": false,
+  "RESULT": "DRY_RUN_PROVEN",
+  "summary": "The fused GlyphScoreV1 + ResidencySortKeyV1 CUDA Tile kernel exactly matches the same CPU oracles LEVEL 1/2 used, at every tested fixture size, running for real on this host's RTX 3060 Ti (sm_86/Ampere) via the Python cuda.tile API (cuda_tile 1.5.0, PyTorch 2.14.0+cu132, WSL2 venv atlas-cutile-cu132). This supersedes the earlier same-day C++ (cuda_tile.h) attempt recorded in docs/reports/cutile-ace-level3-attempt-v1.json, which hit a genuine cross-version toolchain skew (CUDA 13.3 header/frontend vs CUDA 13.2 tileiras backend) and never produced a runnable binary. The Python API avoids that skew because atlas-cutile-cu132 provides a coherent Python Tile toolchain -- cuda.tile 1.5.0 with a matching TileIR backend available -- not because nvcc is the compiler responsible for the @ct.kernel body (cuTile Python has its own Python-to-Tile compilation pipeline; the corrected framing below reflects this).",
+  "correction_note": "An earlier version of this summary described this as the Python API 'carrying its own matched nvcc/tileiras pair' -- imprecise on two counts, corrected same-day per external review: (1) it implied nvcc is the frontend compiling @ct.kernel bodies, when cuda.tile has its own Python-to-Tile compilation pipeline; (2) a separate, unrelated wording issue in this same investigation ('genuinely SIMT-aware') incorrectly implied CUDA Tile and SIMT are the same execution space -- NVIDIA treats them as distinct programming models (Tile hides individual threads, exposes block/tile-level parallelism only); ct.mma()/ct.mma_scaled() being real Tile matrix operations does not make a Tile kernel SIMT-aware. Both LEVEL 2 (SIMT) and LEVEL 3 (Tile) implement the SAME semantic contract and can consume the same buffers, but they are distinct execution models, not variants of one model.",
+  "toolchain": {
+    "path": "python-cuda-tile",
+    "programming_model": "CUDA Tile (distinct from LEVEL 2's SIMT programming model -- see correction_note)",
+    "venv": "/home/james/.venvs/atlas-cutile-cu132",
+    "cuda_tile_version": "1.5.0",
+    "pytorch_version": "2.14.0+cu132",
+    "gpu": "NVIDIA GeForce RTX 3060 Ti",
+    "sm_arch": "sm_86 (Ampere, compute capability 8.6)",
+    "kernel_source": "native/cutile-ace-level3/glyph_fused_tile.py"
+  },
+  "real_compile_errors_found_and_fixed_in_python_api": [
+    {
+      "error": "TileTypeError: bid(): missing a required argument: 'axis'",
+      "fix": "ct.bid(0) instead of a C++-style bid().x -- this API's bid() takes an explicit axis int, not a uint3 struct"
+    },
+    {
+      "error": "TileTypeError: store(): multiple values for argument 'index'",
+      "fix": "store(array, index, tile) positional order -- not store(array, tile, index=...)"
+    },
+    {
+      "error": "TileCompilerExecutionError: 'cuda_tile.divi' op rounding mode 'negative_inf' is not allowed with 'unsigned' flag",
+      "fix": "ct.floordiv() on unsigned-dtype tiles hits a real backend codegen limitation on this compiler build -- cast operands to int32, divide, then cast the result back to uint64. Range-proven safe (see docs/reports/cutile-ace-boundary-01-results.json): the operands' real field width is uint16 (max 65535), far below INT32_MAX, so the int32 cast cannot overflow for any admissible value"
+    }
+  ],
+  "per_size_results": [
+    { "n": 256, "glyphScoreV1ExactMatch": true, "residencyKeyPackV1ExactMatch": true, "RESULT": "DRY_RUN_PROVEN" },
+    { "n": 1000, "glyphScoreV1ExactMatch": true, "residencyKeyPackV1ExactMatch": true, "RESULT": "DRY_RUN_PROVEN" },
+    { "n": 4000, "glyphScoreV1ExactMatch": true, "residencyKeyPackV1ExactMatch": true, "RESULT": "DRY_RUN_PROVEN" }
+  ],
+  "gate": {
+    "criterion": "The fused kernel's GlyphScoreV1 and ResidencySortKeyV1-GPU output must exactly match the same CPU oracles LEVEL 1/2 used, at every tested fixture size",
+    "fixture_sizes_tested": [256, 1000, 4000],
+    "all_exact_match": true,
+    "RESULT": "DRY_RUN_PROVEN"
+  },
+  "level_ladder_status": {
+    "level1_oracle_cub": "PROVEN (docs/reports/ace-radix-01-results.json)",
+    "level2_simt_cuda_c_unfused": "DRY_RUN_PROVEN (docs/reports/cutile-ace-level2-results.json)",
+    "level3_tile_python_fused": "DRY_RUN_PROVEN (this report) -- first time all 3 GPU-primitive levels are proven for this capability",
+    "level3_cpp_alternate_frontend": "PROVEN_BLOCKED (BLOCKED_TOOLCHAIN_VERSION_SKEW, docs/reports/cutile-ace-level3-attempt-v1.json) -- not a peer level, an optional alternate frontend to the same LEVEL 3 Tile programming model; not required for LEVEL 3 semantic completion",
+    "note": "This is a DRY_RUN result (correctness proof on a bounded fixture, exact-match gate only). No latency/throughput comparison against LEVEL 2's unfused SIMT kernels was measured or is claimed here -- fusion-performance benefit is a distinct, unproven claim from fusion-correctness. LEVEL 2 (SIMT) and LEVEL 3 (Tile) are named by programming model, not implementation language -- see toolchain.programming_model and correction_note above."
+  },
+  "not_attempted": [
+    "Latency/throughput comparison between the fused LEVEL 3 kernel and LEVEL 2's two separate kernel launches -- this report proves correctness only, not a performance win from fusion.",
+    "Fixing the C++ (cuda_tile.h) toolchain version skew found in the earlier attempt -- superseded by using the Python API instead, not resolved."
+  ]
+}

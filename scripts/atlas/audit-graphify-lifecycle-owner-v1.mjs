@@ -27,6 +27,11 @@ function gitHead() {
 
 function commitDistance(revision, head) {
   if (!revision || !head) return null;
+  // Graphify repository_revision may be a content identity (for example
+  // sha256:<digest>), not a Git object. Do not ask Git to resolve it or emit a
+  // misleading fatal error; such revisions are compared only by the explicit
+  // content/manifest evidence gates.
+  if (/^sha256:/i.test(String(revision))) return null;
   try { return Number(execFileSync('git', ['rev-list', '--count', `${revision}..${head}`], { cwd: root, encoding: 'utf8' }).trim()); }
   catch { return null; }
 }

@@ -1,0 +1,56 @@
+{
+  "schema": "atlas.semantic-owner-consistency.v1",
+  "generatedAt": "2026-09-13T19:49:19.736Z",
+  "mode": "READ_ONLY",
+  "writesPerformed": false,
+  "ownerPolicy": {
+    "logicalRepresentation": "semantic_768",
+    "postgresColumn": "content_embedding",
+    "qdrantCollection": "codebase_chunks_768",
+    "qdrantVectorName": "content",
+    "challengers": [
+      "codebase_chunks_768_v2"
+    ],
+    "derivedViews": [
+      "semantic_mrl_512",
+      "semantic_mrl_256",
+      "semantic_mrl_128",
+      "latent_256",
+      "latent_128",
+      "latent_64"
+    ],
+    "legacy": [
+      "codebase_chunks_384",
+      "codebase_chunks_384_hybrid",
+      "summary_embedding_384"
+    ]
+  },
+  "census": {
+    "scannedRoots": [
+      "scripts",
+      "services",
+      "docker",
+      "sveltekit-frontend",
+      "packages"
+    ],
+    "matchingFiles": 1299,
+    "competing768Files": [],
+    "legacy384Files": [],
+    "latentFiles": [
+      "sveltekit-frontend\\drizzle\\manual\\20260912_latent_128_columns.sql",
+      "sveltekit-frontend\\drizzle\\manual\\latent_256_columns.sql"
+    ],
+    "activeCompeting768": [],
+    "activeLegacy384": [],
+    "activeLatent": []
+  },
+  "checks": {
+    "declaredOwner": true,
+    "noActiveLegacy384Owner": true,
+    "noActiveCompeting768Owner": true,
+    "latentDerivedOnly": true
+  },
+  "violations": [],
+  "status": "SEMANTIC_OWNER_CONSISTENCY_PROVEN_STATIC",
+  "firstBlocker": "FULL_CORPUS_LINEAGE_AND_RUNTIME_WRITER_AUTHORITY_OPEN"
+}

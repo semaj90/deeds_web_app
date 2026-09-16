@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
+import { aceTopkRevisionedKeyV1, type RetrievalCacheIdentityV1 } from '../ace/cache-keys.js';
 
 export type AceTopRetrievalResult = {
   id: string;
@@ -21,7 +22,35 @@ export type AceTopRetrievalCacheEntry = {
   results: AceTopRetrievalResult[];
   retrievalTrace?: Record<string, unknown>;
   source?: 'redis' | 'snapshot' | 'miss';
+  /** Present only for revision-qualified entries. Legacy entries omit it. */
+  identity?: RetrievalCacheIdentityV1;
 };
+
+export type RevisionedAceTopRetrievalCacheEntry = AceTopRetrievalCacheEntry & {
+  identity: RetrievalCacheIdentityV1;
+};
+
+/**
+ * Admit a cached top-K result only when its complete revision identity and
+ * derived key match the request. Missing identity is an intentional legacy
+ * miss, never a current hit.
+ */
+export function admitRevisionedAceTopRetrievalEntry(
+  entry: AceTopRetrievalCacheEntry,
+  identity: RetrievalCacheIdentityV1,
+  expectedTopN: number,
+): RevisionedAceTopRetrievalCacheEntry | null {
+  if (!entry.identity || aceTopkRevisionedKeyV1(entry.identity) !== aceTopkRevisionedKeyV1(identity)) {
+    return null;
+  }
+  if (entry.queryHash !== identity.queryHash || entry.topN !== expectedTopN) {
+    return null;
+  }
+  if (entry.cacheKey !== aceTopkRevisionedKeyV1(identity)) {
+    return null;
+  }
+  return entry as RevisionedAceTopRetrievalCacheEntry;
+}
 
 // Cache entries are index-derived, not eternal facts — 5 min matches the sibling
 // topo-candidate-cache.ts TTL (short enough to stay warm, long enough to be useful).
@@ -43,10 +72,33 @@ export function normalizeAceTopRetrievalEntry(entry: Partial<AceTopRetrievalCach
     queryHash: entry.queryHash,
     topN: entry.topN,
     createdAt: entry.createdAt,
-    degraded: entry.degraded ?? false,
+    // Identity-less values are legacy observations, even when an older writer
+    // omitted the degraded flag. They remain readable but cannot be current.
+    degraded: entry.degraded ?? !entry.identity,
     results: entry.results,
     retrievalTrace: entry.retrievalTrace ?? {},
     source: entry.source,
+    identity: entry.identity,
+  };
+}
+
+export function buildRevisionedAceTopRetrievalEntry(
+  identity: RetrievalCacheIdentityV1,
+  results: AceTopRetrievalResult[],
+  topN = 20,
+): RevisionedAceTopRetrievalCacheEntry {
+  if (!Number.isInteger(topN) || topN < 1) {
+    throw new Error('topN must be a positive integer');
+  }
+  return {
+    cacheKey: aceTopkRevisionedKeyV1(identity),
+    queryHash: identity.queryHash,
+    topN,
+    createdAt: new Date().toISOString(),
+    degraded: false,
+    results: results.slice(0, topN),
+    retrievalTrace: { topN, source: 'revisioned-top-retrieval-cache' },
+    identity,
   };
 }
 
@@ -65,7 +117,9 @@ export async function writeAceTopRetrievalSnapshot(entry: AceTopRetrievalCacheEn
 export async function readAceTopRetrievalSnapshot(cacheKey: string): Promise<AceTopRetrievalCacheEntry | null> {
   try {
     const raw = await fs.readFile(getAceTopRetrievalSnapshotPath(cacheKey), 'utf8');
-    return JSON.parse(raw) as AceTopRetrievalCacheEntry;
+    const parsed = JSON.parse(raw) as Partial<AceTopRetrievalCacheEntry> &
+      Pick<AceTopRetrievalCacheEntry, 'queryHash' | 'topN' | 'results' | 'createdAt'>;
+    return normalizeAceTopRetrievalEntry(parsed);
   } catch {
     return null;
   }
@@ -83,6 +137,14 @@ export async function getAceTopRetrievalPointer(cacheKey: string): Promise<AceTo
   }
 }
 
+export async function getRevisionedAceTopRetrievalPointer(
+  identity: RetrievalCacheIdentityV1,
+  topN: number,
+): Promise<RevisionedAceTopRetrievalCacheEntry | null> {
+  const entry = await getAceTopRetrievalPointer(aceTopkRevisionedKeyV1(identity));
+  return entry ? admitRevisionedAceTopRetrievalEntry(entry, identity, topN) : null;
+}
+
 export async function setAceTopRetrievalPointer(entry: AceTopRetrievalCacheEntry): Promise<void> {
   try {
     const { getRedis } = await import('../redis.js');
@@ -91,6 +153,19 @@ export async function setAceTopRetrievalPointer(entry: AceTopRetrievalCacheEntry
   } catch {
     // ignore
   }
+}
+
+export async function persistRevisionedAceTopRetrievalCache(
+  identity: RetrievalCacheIdentityV1,
+  results: AceTopRetrievalResult[],
+  topN = 20,
+): Promise<RevisionedAceTopRetrievalCacheEntry> {
+  const entry = buildRevisionedAceTopRetrievalEntry(identity, results, topN);
+  await Promise.allSettled([
+    setAceTopRetrievalPointer(entry),
+    writeAceTopRetrievalSnapshot(entry),
+  ]);
+  return entry;
 }
 
 export async function persistAceTopRetrievalCache(query: string, results: AceTopRetrievalResult[], topN = 20): Promise<AceTopRetrievalCacheEntry> {
@@ -105,7 +180,9 @@ export async function persistAceTopRetrievalCache(query: string, results: AceTop
       topN,
       source: 'top-retrieval-cache',
     },
-    degraded: false,
+    // Compatibility entries have no revision-qualified identity and must never
+    // be treated as current ACE admissions by downstream readers.
+    degraded: true,
   });
 
   await Promise.allSettled([
@@ -123,9 +200,12 @@ function sanitizeCacheKey(key: string): string {
 export default {
   buildAceTopRetrievalCacheKey,
   buildAceTopRetrievalQueryHash,
+  buildRevisionedAceTopRetrievalEntry,
   getAceTopRetrievalPointer,
+  getRevisionedAceTopRetrievalPointer,
   setAceTopRetrievalPointer,
   persistAceTopRetrievalCache,
+  persistRevisionedAceTopRetrievalCache,
   readAceTopRetrievalSnapshot,
   writeAceTopRetrievalSnapshot,
 };

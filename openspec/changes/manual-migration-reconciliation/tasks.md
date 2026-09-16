@@ -16,7 +16,11 @@
 - [x] Recorded field-level mapping and rejected a duplicate table for now. `trace_events` is the closest generic event owner; task/pickup linkage remains unresolved. See `docs/reports/agent-run-events-owner-mapping-v1.json`.
 - [x] Verified linkage types are not interchangeable: workflow runs use UUIDs, active task packets use integer workspace-task relationships, and pickup rows mix text task IDs with integer workspace-task IDs. No lossless direct bridge to the proposed event schema exists yet.
 - [x] Found the closest existing event owner: live `kanban_task_events` already carries `task_id`, `run_id`, `event_type`, `payload`, and `created_at`. Prefer it over creating `agent_run_events`; unresolved pickup/agent/trace fields require an approved correlation contract.
-- [ ] **Open adapter gap checked 2026-08-31:** active route/service code still queries `agent_pickup_queue` (`src/routes/api/tasks/packets/workflow/+server.ts`, `src/lib/server/tasks/semantic-packets.ts`) and the legacy packet script publishes `agent_pickup_queue:ready`. The table is absent, so these callers require an explicit Kanban/workflow adapter or a fail-closed deprecation path before apply mode is considered usable.
+- [ ] **BLOCKED_NEEDS_OPERATOR_SIGNOFF — runtime behavior confirmed precisely 2026-09-14 (refines the 2026-08-31 entry, not just re-checked):** `docker exec legal-ai-postgres psql ... -c "SELECT 1 FROM information_schema.tables WHERE table_name='agent_pickup_queue'..."` returns zero rows — confirmed still absent live. Read each of the 3 named call sites directly, not assumed:
+  - `src/routes/api/tasks/packets/workflow/+server.ts::loadNextQueuedTask()` (line ~90-119) — raw `sql\`...FROM agent_pickup_queue q...\`` with **no existence guard of its own**. Reached by GET with no `taskId`/`queueId`, and by POST `action:'claim'` (always). Both call sites are wrapped only by the route's generic top-level `try { ... } catch (error) { return json({ok:false,...}, {status:500}) }` — a real Postgres `relation "agent_pickup_queue" does not exist` error is masked into a generic 500, not a silent no-op and not an uncaught crash.
+  - `src/lib/server/tasks/semantic-packets.ts::enqueueAgentPickup()` (line ~732-804) — the `existingQueue` `db.select().from(agentPickupQueue)...` (line ~752-758) has **zero try/catch**. The nearby `insert` try/catch (line ~767-803) only special-cases a `lane`-column error message and re-throws everything else via `else { throw error; }`. Called from `runTaskSemanticPacketLifecycle()` (line 854-866, no try/catch of its own), itself called from this same route's POST `run` action (non-dryRun) — again masked only by that route's outer generic 500 catch.
+  - `scripts/atlas/create-agent-pickup-packets.mjs` (line 63-81) — **this one is already fail-closed, correctly**: before any query (when not `--dry-run`), it runs an `information_schema.tables` existence check for `workspace_tasks`/`task_semantic_packets`/`agent_pickup_queue` and `throw`s an explicit `LEGACY_PICKUP_APPLY_BLOCKED: required legacy tables are absent: ...; use the approved Kanban/workflow adapter instead` if any are missing. This contradicts the 2026-08-31 entry's framing that this script "publishes `agent_pickup_queue:ready`" unguarded — it does, but only after passing its own guard, so it never reaches the Redis publish with a missing table.
+  - **Net finding**: 2 of 3 call sites (the live HTTP route + its service module) have no adapter and no fail-closed guard — they degrade to a masked generic 500 rather than a clear diagnostic. Only the standalone legacy script already guards correctly. The real remaining decision is product/architecture, not further investigation: (a) add the same `information_schema` existence-guard pattern already proven in `create-agent-pickup-packets.mjs` to `loadNextQueuedTask()` and `enqueueAgentPickup()` so they fail with a clear diagnostic instead of a masked 500, or (b) deprecate this route's `claim`/`run` actions entirely in favor of the live Kanban surface (`kanban_task_events`, already identified above as the preferred event owner), or (c) build the real Kanban/workflow adapter and finally apply the sidecar table. This needs the operator's product call, not another investigation pass.
 - [x] Correlation payload contract verified with the isolated lane test: 2/2 tests passed, including passthrough event fields and rejection of malformed reserved correlation values.
 - [x] Schema export audit confirms `feature_registry` is reachable from the Drizzle entrypoint but absent from the last snapshot; the wider export graph also has 23 duplicate table declarations and 7 duplicate enum declarations. Keep migration generation blocked until duplicate ownership is reconciled.
 - [x] Scoped duplicate review is clean for the migration neighborhood: `feature_registry`, `feature_tasks`, `agent_progress_log`, Kanban tables, and `task_semantic_packets` each have one dedicated Drizzle declaration. `agent_pickup_queue` has proposal/sidecar declarations but no live table; treat it as an unresolved adapter decision, not a live owner. The remaining duplicate declarations are unrelated legacy schema surfaces.
@@ -62,27 +66,46 @@ For each file: confirm target table(s) still missing, apply via `docker exec -i 
   stale. Not resolved: whether this capability is covered by another table/migration already.
 - [ ] `drizzle/manual/0007_court_opinions.sql` → `court_opinions` — **file does not exist.**
   `court_opinions` table also does not exist live. Same stale-entry situation as above.
-- [ ] `drizzle/manual/0034_split_atlas_packets_ledgers.sql` → `atlas_codebase_packets`,
-  `atlas_feature_packets` — **file does not exist.** Live check: `atlas_codebase_packets` does not
-  exist; **`atlas_feature_packets` DOES exist live** — so half of this migration's intended effect
-  already happened through some other path (not this file, since the file itself is absent). Root
-  CLAUDE.md's June 28 2026 schema-mismatch note called both tables "missing" at that time; only one
-  of the two has since appeared. Worth checking what created `atlas_feature_packets` before assuming
-  this ledger entry is fully stale — it may be partially superseded, not simply wrong.
+- [x] **SUPERSEDED (resolved 2026-09-14, not merely re-checked):** `drizzle/manual/0034_split_atlas_packets_ledgers.sql`
+  → `atlas_codebase_packets`, `atlas_feature_packets`. `git grep -l "atlas_feature_packets"` found the
+  real creator: `sveltekit-frontend/drizzle/0035_create_atlas_feature_packets.sql` — a proper
+  **journaled** (non-manual) Drizzle migration, tag `0035_dusty_baron_zemo`, dated 2026-07-21, present
+  in `drizzle/meta/_journal.json`, backed by real Drizzle schema
+  `src/lib/server/db/schema/atlas-feature-packets.ts`. This is a completely different migration file
+  from the missing manual `0034_*` entry — `atlas_feature_packets` was never created by the file this
+  ledger names, it was created through the proper journaled path instead. `atlas_codebase_packets`
+  reconfirmed still absent live (`information_schema.tables` query, zero rows, 2026-09-14). Root
+  CLAUDE.md's June 28 2026 note calling both tables "missing" is now stale on `atlas_feature_packets`
+  specifically (confirmed live and journaled), accurate on `atlas_codebase_packets`. Disposition:
+  the manual `0034_*` entry is **fully superseded** by the journaled `0035_*` migration for the
+  feature-packets half; the codebase-packets half remains a genuine, still-open gap but is not this
+  file's problem to fix (no source SQL exists for it under any name). No further action on this
+  specific ledger entry — do not write a replacement `atlas_codebase_packets` migration under this
+  task without a fresh design decision on whether that capability is still wanted at all.
 - [ ] `drizzle/manual/0048_topology_vector_storage_lookup.sql` → `atlas_topology_evidence`,
   `atlas_topology_scores`, `atlas_vector_lookup`, `atlas_centroid_lookup` — **file does not exist**;
   none of the 4 target tables exist live either. Fully stale or fully superseded by a different
   design — not investigated further this pass.
-- [ ] `drizzle/manual/20260420_web_search_index.sql` → `web_search_index` — **file does not
-  exist**; table does not exist live either. Note: a *different*, real, wired web-research system
-  was found elsewhere this session (`src/lib/server/research/web-research-ingester.ts`, Qdrant
-  collection `chunks_web_search`) — this ledger entry may simply predate that design and be
-  superseded by it, not a genuine gap. Worth closing as superseded rather than executing.
-- [ ] `drizzle/manual/20260421_ast_graph_tables.sql` → `ast_nodes`, `ast_edges`,
-  `ast_file_features` — **file does not exist**; none of the 3 target tables exist live under
-  these exact names, though this session found real, live `atlas_ast_nodes` (note the `atlas_`
-  prefix — a different, actually-populated table) via the `SYMBOL_SEMANTIC_768` investigation
-  above. Likely superseded by the `atlas_*` naming generation, not a real gap — not confirmed.
+- [x] **SUPERSEDED (confirmed 2026-09-14, not just noted):** `drizzle/manual/20260420_web_search_index.sql`
+  → `web_search_index` — file confirmed absent; `web_search_index` table reconfirmed absent live
+  (`information_schema.tables`, zero rows). Confirmed the replacement is real and wired, not
+  speculative: `src/lib/server/research/web-research-ingester.ts` declares
+  `RESEARCH_COLLECTION = 'chunks_web_search'` (768-dim Qdrant, Cosine/HNSW) and has **16 real
+  consumers** across the tree (`grep` for the module path), including two live HTTP routes
+  (`src/routes/api/research/search/+server.ts`, `src/routes/api/research/ingest/+server.ts`) and
+  an MCP server registration (`src/mcp/server.ts`) — genuinely wired, not dead scaffolding.
+  Disposition: this manual migration entry is fully superseded by the Qdrant-based web-research
+  design; do not write a `web_search_index` Postgres table under this task.
+- [x] **SUPERSEDED (confirmed 2026-09-14, not just "likely"):** `drizzle/manual/20260421_ast_graph_tables.sql`
+  → `ast_nodes`, `ast_edges`, `ast_file_features` — file confirmed absent; reconfirmed live that all
+  3 exact-name tables are absent (`information_schema.tables`, zero rows each). Confirmed
+  `atlas_ast_nodes` is real, live, and populated (`SELECT count(*)` → 11,223 rows), with 5 real
+  consumers (`grep`): `src/lib/server/atlas/integration/atlas-ast-evidence-reader-v1.ts` (+ its
+  spec), `src/lib/server/atlas/policy/oak-dag-ast-evidence-handler-v1.spec.ts`,
+  `src/lib/server/atlas/indexing/revision-owner-proof-v1.spec.ts`, and the schema declaration
+  `src/lib/server/db/schema/atlas-ast-nodes.ts`. This is the genuine, wired, current AST-identity
+  owner under the `atlas_*` naming generation. Disposition: this manual migration entry is fully
+  superseded — do not create `ast_nodes`/`ast_edges`/`ast_file_features` under this task.
 - [ ] `drizzle/manual/20260507_retrieval_acceleration.sql` → `retrieval_rank_cache`,
   `llm_summaries`, `tool_call_stats` — **file does not exist**; none of the 3 target tables exist
   live either. Not investigated further.
@@ -111,10 +134,41 @@ fresh migration or closing the entry as superseded.
 
 Per CLAUDE.md Consolidation Sweep Rule: audit canonical vs. duplicate before patching. Do not apply until each listed table is confirmed as a genuinely new concept, not a parallel/legacy name for something that already exists.
 
-- [ ] `drizzle/manual/20260606_missing_tables.sql` (204 lines) → creates `error_brain_analysis`, `error_brain_diffs`, `error_cluster`, `evidence_items`, `evidence_media_assets`, `evidence_transcript_segments`, `evidence_processing_jobs`, `evidence_frames`, `ingested_documents`, `web_pages`, `web_embeddings`, `web_crawl_jobs`, `user_analytics`, `ai_chat_sessions`.
-  - [ ] Confirm `evidence_items`/`evidence_media_assets`/`evidence_frames` are not a duplicate of the canonical `evidence` table (already live) under a different naming scheme — check `src/lib/server/db/schema-postgres.ts` evidence pipeline (8-stage flow documented in CLAUDE.md) for which name is actually wired to `/api/evidence/upload`.
-  - [ ] Confirm `ai_chat_sessions` is not a duplicate of the canonical `admin_ai_chat_sessions` (already live).
-  - [ ] If genuinely additive (new concepts, not drift): apply. If duplicate: do not apply — file a follow-up to delete/archive the stale sidecar SQL instead (per Archival Rules, don't delete outright — move to `deeds_labs/archive/` with manifest entry).
+- [ ] `drizzle/manual/20260606_missing_tables.sql` (204 lines, found at repo-root `drizzle/manual/`
+  — note there are TWO `drizzle/manual/` directories in this repo, one at root and one under
+  `sveltekit-frontend/`; this file lives only in the root one) → creates `error_brain_analysis`,
+  `error_brain_diffs`, `error_cluster`, `evidence_items`, `evidence_media_assets`,
+  `evidence_transcript_segments`, `evidence_processing_jobs`, `evidence_frames`,
+  `ingested_documents`, `web_pages`, `web_embeddings`, `web_crawl_jobs`, `user_analytics`,
+  `ai_chat_sessions`.
+  - [x] **Live-existence sweep done 2026-09-14:** `error_brain_analysis` and `error_cluster`
+    already exist live (created via some other path — not this file, since applying this file
+    wholesale was never attempted per the ledger's own record). The other 12 target tables are
+    confirmed absent live (`information_schema.tables`, zero rows each, checked individually).
+  - [x] **Confirmed `evidence_items`/`evidence_media_assets`/`evidence_frames` are naming-drift
+    duplicates, not new concepts (real evidence, not inference):** `grep` of
+    `src/routes/api/evidence/upload/+server.ts` (the actual live upload endpoint) shows it calls
+    `.insert(evidence)` — the canonical, already-live `evidence` table — not `evidence_items`.
+    `evidence_items` and its siblings have zero wiring to the real upload path. Disposition:
+    duplicate direction confirmed for `evidence_items` specifically; do not apply it. The finer
+    question of whether `evidence_media_assets`/`evidence_transcript_segments`/`evidence_frames`
+    represent genuinely new sub-concepts (media/transcript/frame extraction as separate rows from
+    the `evidence` row itself, which would make them legitimately additive rather than duplicate)
+    was not resolved — needs a read of `evidence`'s actual JSONB columns to see if that data
+    already lives there before deciding those three specifically.
+  - [x] **Confirmed `ai_chat_sessions` is a naming-drift duplicate of `admin_ai_chat_sessions`:**
+    `grep` found 2 real consumers of `admin_ai_chat_sessions` (`src/lib/server/features/ai/admin/ai-chat-service.ts`,
+    `src/lib/server/db/schema/admin-chat.ts`) — genuinely wired and live. No evidence anywhere of a
+    distinct purpose for `ai_chat_sessions`. Disposition: duplicate confirmed, do not apply.
+  - [ ] **BLOCKED_NEEDS_OPERATOR_SIGNOFF:** whether to apply the file for the genuinely-not-yet-
+    disproven-duplicate subset (`error_brain_diffs`, `evidence_processing_jobs`,
+    `ingested_documents`, `web_pages`, `web_embeddings`, `web_crawl_jobs`, `user_analytics`, plus
+    the unresolved `evidence_media_assets`/`evidence_transcript_segments`/`evidence_frames` trio)
+    is a real product decision — this file cannot be applied as one atomic statement now that 2
+    of its 14 target tables (`evidence_items`, `ai_chat_sessions`) are confirmed duplicates that
+    must be excluded. Applying the remainder requires either hand-splitting the file or an
+    explicit decision to keep it as one bundle and skip the 2 confirmed-duplicate `CREATE TABLE`
+    statements manually. Not something to decide unilaterally.
 - [ ] `drizzle/manual/proposed_20260530_task_semantic_packets.sql` (153 lines) → creates `feature_registry`, `workspace_tasks`, `task_semantic_packets`, `task_file_links`, `task_cluster_links`, `agent_pickup_queue`, `agent_run_events`.
   - [ ] Filename is literally prefixed `proposed_` — confirm with repo history / commit log whether this was ever accepted, or is still an open proposal.
   - [ ] Confirm `agent_run_events` is not a duplicate of the canonical `agent_actions` (already live).
@@ -143,3 +197,169 @@ Per CLAUDE.md Consolidation Sweep Rule: audit canonical vs. duplicate before pat
   done
   ```
 - [ ] Update this tasks.md with final APPLIED / DEFERRED / REJECTED status per file before archiving the change.
+
+## MMR1.6 - Read-only portfolio inventory recheck (2026-09-14)
+
+- [x] Ran `scripts/atlas/audit-migration-inventory-classification-v1.mjs`.
+- [x] Confirmed the inventory covers `473` SQL files, `41` journal entries,
+  and `64` sidecar declarations without performing writes.
+- [x] Confirmed current classification counts: `41` journaled canonical,
+  `34` declared sidecar, `74` accepted historical, `2` deferred, and `322`
+  unresolved.
+- [x] Preserved `unresolvedCurrentOwners=322` as a real baseline blocker;
+  unresolved lineage-domain files remain first in the review order.
+- [ ] Resolve lineage/structural/semantic migration ownership row-by-row;
+  do not apply a global migration command or infer ownership from row count.
+
+Status: `MIGRATION_INVENTORY_READONLY_COMPLETE_UNRESOLVED_OWNERS_REMAIN`;
+writesPerformed=false; schema apply unauthorized.
+
+### Migration inventory recheck — 2026-09-14
+
+- [x] Re-ran the read-only inventory after the current lineage audits.
+- [x] Counts remain stable: `473` SQL files, `41` journal entries, `64`
+  sidecar entries, and `322` unresolved owners.
+- [x] Preserved the review order: lineage (`51`), structural (`15`), semantic
+  (`49`), then downstream domains; no migration was applied.
+- [ ] Resolve each current owner from live schema and migration evidence before
+  permitting any registration or schema operation.
+
+Status: `READONLY_RECHECK_STABLE_UNRESOLVED`; `writesPerformed=false`.
+Evidence: `docs/reports/migration-inventory-classification-v1.json`.
+
+Evidence: `docs/reports/migration-inventory-classification-v1.json`.
+
+Next gate: `LINEAGE_MIGRATION_ROW_CLASSIFICATION_REQUIRED`.
+
+## MMR1.7 - Wave 0 blocker implementation plan (2026-09-14)
+
+The current read-only inventory is stable, but it is not an authorization to
+register or apply any SQL. The next work is row-level classification in
+dependency order, with live catalog evidence and an explicit disposition for
+every file:
+
+1. **Lineage first (`51` unresolved files).** Reconcile files referencing
+   `atlas_packets`, `atlas_packet_chunk_lineage`, `codebase_chunk_index`,
+   `graphify_executions`, `graphify_execution_files`, and `graphify_files`
+   against the admitted snapshot/execution owner. A file is not current merely
+   because its tables exist live; its revision namespace, writer, and migration
+   history must be identified.
+2. **Structural (`15`) and semantic (`49`) next.** Compare symbol/AST,
+   embedding, and representation surfaces against the same source/packet/chunk
+   authority. Keep `semantic_768` and symbol registries blocked when the
+   current cohort is not revision-qualified.
+3. **Feature (`35`) and ontology (`12`) after lineage.** Classify feature,
+   domain, and ontology SQL as canonical, derived, historical, or deferred;
+   do not create a second owner for existing live tables.
+4. **Projection (`84`) and other domains (`75`) last.** Keep Qdrant,
+   Neo4j/cuGraph, Valkey, cache, and generated-artifact SQL derived and
+   non-authoritative until the source/revision spine is closed.
+
+Required row disposition fields remain: `path`, location, journal/sidecar
+evidence, live readback, owner, schema surfaces, classification, reason, and
+blocking status. The gate passes only when `unresolvedCurrentOwners=0`,
+`duplicateCurrentOwners=0`, and every current owner has a recorded migration
+authority. Until then, `feature_registry` remains unregistered/unapplied and
+no global migration command is permitted.
+
+Current receipt: `docs/reports/migration-inventory-classification-v1.json`.
+Status: `W0_MIGRATION_CLASSIFICATION_PLANNED_UNRESOLVED_OWNERS=322`;
+`writesPerformed=false`; schema apply unauthorized.
+
+Next safe gate: classify the `51` unresolved lineage files against the live
+catalog and current source/execution receipts, then rerun the inventory.
+
+### MMR1.7 read-only critical-lineage disposition recheck — 2026-09-14
+
+- [x] Ran `scripts/atlas/audit-critical-lineage-migration-dispositions-v1.mjs`
+  from the current inventory and live-readback evidence.
+- [x] Enumerated `58` critical lineage files without applying or registering
+  any migration.
+- [x] Classified the current review queue as `47`
+  `MULTIPLE_OWNER_CANDIDATES_REVIEW_REQUIRED` and `11`
+  `SINGLE_OWNER_CANDIDATE_REVIEW_REQUIRED`.
+- [ ] Resolve the owner of each critical file from authoritative migration,
+  live-schema, and source/revision evidence; a candidate count is not an
+  approval and no global migration command is allowed.
+
+Status: `CRITICAL_LINEAGE_DISPOSITIONS_ENUMERATED_OWNER_REVIEW_REQUIRED`;
+`migrationAuthorized=false`; `writesPerformed=false`.
+Evidence: `docs/reports/critical-lineage-migration-dispositions-v1.json`.
+Next gate: review the seven priority-1 critical rows first, then rerun both
+the disposition and full inventory audits.
+
+Priority-1 review queue (classification only; no apply or registration):
+
+- `0101_encoder_provenance_gate2.sql`
+- `0105_latent64_vectors.sql`
+- `manual/0045_adaptive_schema_repair.generated.sql`
+- `manual/0050_add_summary_quality_score.sql`
+- `manual/20260909_atlas_packets_source_revision.sql`
+- `manual/20260912_error_embedding_latent_columns.sql`
+- `manual/atlas_packet_identity_aliases.sql`
+
+For each row, the review must prove the SQL owner, whether the live target
+already exists, whether the journal/sidecar evidence is authoritative, and
+whether the change touches current lineage. A row may be classified
+`ACCEPTED_HISTORICAL`, `DECLARED_SIDECAR`, `JOURNALED_CANONICAL`,
+`DEFERRED`, `SUPERSEDED`, or `DUPLICATE` only after that evidence is attached;
+otherwise it remains `UNRESOLVED`. The current disposition report shows all
+seven as single-owner candidates requiring review, not as safe-to-apply work.
+
+### MMR1.8 - Priority-1 packet-revision evidence recheck (2026-09-14)
+
+- [x] Read the live packet revision axes through
+  `scripts/atlas/audit-atlas-packets-revision-columns-v1.mjs`.
+- [x] Confirmed `atlas_packets.source_revision` exists as nullable `text`,
+  while all `61,718/61,718` live packet rows have it `NULL`.
+- [x] Confirmed `workspace_revision` and `representation_revision` are legacy
+  integer fields with zero-valued live observations; they are not substitutes
+  for the admitted snapshot/source revision contract.
+- [x] Confirmed the canonical-owner revision migration is additive-only,
+  unapplied, and promotion-blocked by
+  `audit-canonical-owner-revision-migration-safety-v1.mjs`.
+- [ ] Resolve the packet writer's admitted source-revision input and prove
+  bounded readback before considering any migration or packet backfill.
+
+Status: `PACKET_REVISION_AXIS_PRESENT_SOURCE_REVISION_UNPOPULATED`;
+`migrationApplied=false`; `promotionAllowed=false`; `writesPerformed=false`.
+Evidence: `docs/reports/packet-write-revision-contract-v1.json`,
+`docs/reports/canonical-owner-revision-migration-safety-v1.json`.
+
+### MMR1.9 - Priority-1 lineage disposition recheck — 2026-09-14
+
+- [x] Re-ran `audit-critical-lineage-migration-dispositions-v1.mjs`; the
+  priority queue remains seven single-owner candidates requiring review.
+- [x] Confirmed all seven remain `UNRESOLVED` because none has authoritative
+  journal or sidecar declaration evidence; this is classification debt, not
+  permission to apply them.
+- [x] Re-ran the canonical-owner revision migration safety audit; the proposed
+  change remains additive-only, unapplied, `promotionAllowed=false`, and
+  `writesPerformed=false`.
+- [ ] Review each SQL file against live schema, current source/revision
+  evidence, and migration history before assigning a disposition.
+
+Status: `PRIORITY_1_LINEAGE_MIGRATIONS_UNRESOLVED`; migration authority closed;
+no registration or schema mutation performed.
+
+Evidence: `docs/reports/critical-lineage-migration-dispositions-v1.json`,
+`docs/reports/canonical-owner-revision-migration-safety-v1.json`.
+
+### MMR1.10 - Legacy task-link consumer schema blocker — 2026-09-14
+
+- [x] Ran the bounded read-only `sync-task-cluster-links.mjs` probe against the
+  configured live database; PostgreSQL and Redis were reachable.
+- [x] Confirmed `public.workspace_tasks` and `public.task_cluster_links` are absent,
+  while `public.task_semantic_packets` is present.
+- [x] Confirmed the migration inventory already classifies `workspace_tasks`,
+  `task_file_links`, and `task_cluster_links` as proposal-only surfaces pending
+  ownership/deduplication review.
+- [x] Hardened the consumer to stop before linking when required tables are absent;
+  it must not silently substitute `atlas_tasks` or apply the proposal SQL.
+- [ ] Decide whether a reconciled task-link surface is needed at all, and if so,
+  assign one approved owner and prove its schema against the live Kanban/task model.
+
+Status: `LEGACY_TASK_LINK_SURFACE_ABSENT_PROPOSAL_ONLY`; migration and linking remain
+unauthorized; `writesPerformed=false`.
+Evidence: bounded dry-run output `SCHEMA_SURFACE_UNAVAILABLE` and
+`docs/reports/migration-inventory-classification-v1.json`.

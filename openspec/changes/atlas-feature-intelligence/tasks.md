@@ -91,19 +91,19 @@ must remain derived and `liveImplementationMembership = UNPROVEN`.
 - [x] FI-16G Define a dependency-injected second-stage hypergraph fusion facade over existing first-stage candidates.
 - [x] FI-16G2 Add query-conditioned relationship selection using semantic relevance, PPR, relation/extraction confidence, evidence coverage and expected relation type. **Test written; execution proof pending.**
 - [x] FI-16G3 Accept first-stage `family=relationship` candidates through an exact canonical relationship resolver hook; add PostgreSQL `findCanonicalRelationshipsByIds()` helper.
-- [ ] FI-16H Wire `HyperRagFusionService` to the Parent Atlas package and expose the N-ary facade on the live search/API path. **Root package links `@deeds/parent-atlas`; frontend live import/adoption remains unproven.**
-- [ ] FI-16I Add query-conditioned PPR executor over relationship/incidence candidates and write revisioned receipts. **CPU reference executor/receipt written; cuGraph/Neo4j parity + live receipt pending.**
-- [ ] FI-16J Add dynamic SQL hyperedge construction from canonical shared-entity/evidence joins and promotion review. **`atlas_evidence_entities`, event-hyperedge view, bounded SQL neighborhood function and TS reader written; extractor/backfill/apply/promotion workflow pending.**
+- [ ] FI-16H Wire `HyperRagFusionService` to the Parent Atlas package and expose the N-ary facade on the live search/API path. **The HyperRAG API now has an explicit `useGraph=true` read-only bridge through `@deeds/parent-atlas`, the PostgreSQL feature-intelligence repository, and the existing fusion boundary. It admits only exact current canonical hits and reports unavailable/degraded results without changing primary retrieval. Live production relationship rows and end-to-end API readback remain unproven.**
+- [ ] FI-16I Add query-conditioned PPR executor over relationship/incidence candidates and write revisioned receipts. **The existing deterministic CPU PPR executor is now injectable into the HyperGraph fusion facade and its receipt is returned with the fusion result; cuGraph/Neo4j parity and live current-corpus receipt remain pending.**
+- [ ] FI-16J Add dynamic SQL hyperedge construction from canonical shared-entity/evidence joins and promotion review. **`atlas_evidence_entities`, event-hyperedge view, bounded SQL neighborhood function, TS reader, and a pure fail-closed promotion-review receipt are written; extractor/backfill, live evidence review, canonical materializer, and live readback remain pending. Dynamic candidates remain `promotable=false` and `writes_performed=false`.**
 - [x] FI-16K Add executable ACE hypergraph packet fixture covering canonical entity seed + direct relationship candidate + typed evidence chain + sufficient-context synthesis gate. **Test source written; not executed in this connector session.**
-- [ ] FI-16L Attach `AceHypergraphPayloadV1` to the existing `CanonicalAcePacketEnvelope` / `HyperRAGPacketPipeline` materialization path under a versioned optional field; keep packet identity unchanged. **Explicit optional `aceHypergraph` input and revision fail-closed guard are wired; Parent Atlas build and 5/5 hypergraph tests pass; focused SvelteKit runtime proof remains pending.**
+- [ ] FI-16L Attach `AceHypergraphPayloadV1` to the existing `CanonicalAcePacketEnvelope` / `HyperRAGPacketPipeline` materialization path under a versioned optional field; keep packet identity unchanged. **Explicit optional `aceHypergraph` input and revision fail-closed guard are wired; the live HyperRAG API now exposes additive facade payloads through the same package boundary. Focused packet materialization and live DB readback remain pending.**
 - [ ] FI-16M Add retrieval-action receipt for every `NEED_* -> DAG action -> new evidence -> sufficiency re-evaluation` loop.
 
 ## P1 — Retrieval reconciliation
 
 - [ ] FI-17 Materialize Qdrant feature/evidence/relationship points with canonical IDs, revisions, domains and embedding metadata. **Postgres relationship vector(768)+HNSW surface written; Qdrant/CAGRA projection pending.**
 - [ ] FI-18 Add logical-lane candidate adapter for lexical/BM25, AST, semantic, graph and low-rank association.
-- [ ] FI-19 Enforce one vote per logical lane regardless of executor count. **`CandidateFabricV1` and ACE payload encode `semantic_lane_votes = 1`; existing runtime fusion still needs adoption proof.**
-- [ ] FI-20 Add degraded-identity observability and exact promotion before fusion.
+- [x] FI-19 Enforce one vote per logical lane regardless of executor count. **`CandidateFabricV1` and ACE payload encode `semantic_lane_votes = 1`; `mergeAndRank()` now collapses duplicate IDs within each lane before assigning RRF ranks. Focused multi-lane tests pass.**
+- [ ] FI-20 Add degraded-identity observability and exact promotion before fusion. **The new n-ary fusion input is fail-closed on workspace/source/query revision mismatch and can only enrich an existing hit; full canonical identity adoption across all live lanes remains open.**
 - [ ] FI-21 Add SVD/randomized-low-rank/leverage-sampling candidate generation over a revisioned feature/evidence matrix; never promote relations without evidence inspection.
 - [ ] FI-21B Add exact multi-view rerank after future MUVERA/FDE candidate nomination; FDE/ANN is nomination only, original views remain rerank/evidence inputs.
 
@@ -151,3 +151,44 @@ must remain derived and `liveImplementationMembership = UNPROVEN`.
 - [ ] SVD/low-rank/manifold/SO(4) derived signals cannot directly create canonical relationships.
 - [ ] Sufficient-context gate prevents synthesis when required entity/relation/evidence classes are missing, stale or contradictory.
 - [ ] Current Kanban can be reconstructed from a pinned repository + evidence revision.
+
+## 2026-09-15 — Runtime fusion adoption slice
+
+- **Fusion boundary updated:** `sveltekit-frontend/src/lib/server/features/rag/multi-lane-retrieval.ts`
+  now collapses duplicate IDs within each logical lane before assigning RRF ranks,
+  uses deterministic score/ID tie-breaking, and accepts optional HyperGraphRAG
+  evidence only when workspace/source/query revisions all match. N-ary evidence
+  is a bounded additive enrichment of an existing hit; it cannot create a hit or
+  contribute another retrieval vote.
+- **N-ary projection added:** `buildHypergraphFusionEvidenceV1()` in
+  `sveltekit-frontend/src/lib/server/atlas/retrieval/hypergraph-retrieval-v1.ts`
+  derives candidate-local relation/entity/evidence counts from intact n-ary
+  relations and preserves the projection checksum.
+- **Focused proof:** multi-lane fusion 5/5 and HyperGraphRAG retrieval 6/6
+  passed; strict OpenSpec validation and scoped diff check passed.
+- **Still open:** FI-16H live relationship-row/readback proof, FI-16I live
+  PPR/backend parity, FI-16J extraction/backfill/promotion, FI-16L focused
+  SvelteKit packet materialization, and FI-20 repository-wide canonical identity
+  admission. No database, cache, Qdrant, Neo4j, or GPU writes were performed.
+- **2026-09-15 dynamic hyperedge review boundary:** added
+  `reviewDynamicHyperedgePromotionV1()` in
+  `packages/parent-atlas/src/core/dynamic-hyperedge-sql.ts`. It requires the
+  admitted source snapshot and reviewed evidence references, emits deterministic
+  review checksums, and can only return `READY_FOR_EXPLICIT_MATERIALIZATION`;
+  it cannot authorize, persist, or convert a dynamic relationship into a
+  canonical relationship. Focused tests pass; live extractor/backfill and
+  canonical materializer remain blocked.
+- **2026-09-15 follow-up:** added
+  `sveltekit-frontend/src/lib/server/atlas/integration/hyperrag-fusion-runtime-adapter-v1.ts`
+  and its focused tests. The API invokes this adapter only when the caller
+  explicitly supplies `useGraph=true` and an admitted `workspaceRevision`.
+  Stale, degraded, or missing-identity hits are rejected; n-ary results are
+  additive metadata and never new hits or RRF votes.
+- **PPR follow-up:** the facade now optionally executes the existing CPU
+  incidence-PPR owner before query-conditioned relationship ranking and returns
+  its revisioned receipt. No GPU/Neo4j execution or persistence was added.
+- **Pipeline comment:** NLP/LangExtract/Ornith/PyTorch and Naive Bayes/logistic/XGBoost
+  outputs, `.okf` lookup validation, BM25 and PageRank are evidence/ranking inputs.
+  HyperRAG n-ary adoption may annotate existing candidates with exact-revision
+  relation context; it cannot mint IDs, invent pairwise edges, add votes, or
+  authorize promotion.

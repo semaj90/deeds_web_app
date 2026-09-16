@@ -1,0 +1,12 @@
+{
+  "schema": "atlas.openspec.ledger-write-null.v1",
+  "generatedAt": "2026-09-13T00:00:00.000Z",
+  "status": "NULL_LEDGER_APPEND_AFTER_CONTENTION",
+  "target": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
+  "attemptedSection": "GRAPHIFY-EXECUTION-INJECTION-REVISION-GUARD-2026-09-13",
+  "reason": "Shared tasks.md changed during patch publication; no append was committed by this attempt.",
+  "writePerformed": false,
+  "writesPerformed": false,
+  "sourceCodeChangesRemainValid": true,
+  "nextAction": "Re-read the ledger before a later append and continue the read-only execution-lineage gate."
+}

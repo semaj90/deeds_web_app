@@ -1,0 +1,1879 @@
+{
+  "schema": "atlas.openspec-portfolio-implementation-readiness.v1",
+  "readOnly": true,
+  "generatedAt": "2026-09-13T22:18:34.187Z",
+  "scope": "all repository-local OpenSpec changes with tasks.md",
+  "policy": {
+    "mcpDefault": "READ_ONLY",
+    "canonicalOwner": "POSTGRESQL",
+    "derivedStores": [
+      "QDRANT",
+      "NEO4J",
+      "GPU",
+      "CACHE",
+      "MODEL_ARTIFACT"
+    ],
+    "automaticMutation": false
+  },
+  "summary": {
+    "changeCount": 99,
+    "treeCounts": {
+      "ROOT": 85,
+      "SVELTEKIT": 14
+    },
+    "taskTotal": 10884,
+    "taskComplete": 7006,
+    "relationCount": 1426,
+    "relationCounts": {
+      "LAYERED_DEPENDENCY": 80,
+      "OVERLAPPING_SCOPE": 1346
+    },
+    "dependencyWaveCounts": {
+      "WAVE_0_AUTHORITY_AND_LINEAGE": 37,
+      "WAVE_1_RETRIEVAL_AND_FEATURES": 29,
+      "WAVE_2_DERIVED_ANALYSIS": 8,
+      "WAVE_3_EXECUTION_AND_INTEGRATION": 9,
+      "WAVE_UNCLASSIFIED_REVIEW": 16
+    },
+    "ownerCollisionCount": 117,
+    "ownerCollisionPriorityCounts": {
+      "P1_CANONICAL_TABLE_REVIEW": 70,
+      "P2_SHARED_DERIVED_SURFACE": 47
+    },
+    "mutationRecommendedCount": 0
+  },
+  "waves": {
+    "WAVE_0_AUTHORITY_AND_LINEAGE": {
+      "changes": [
+        "ace-hyperrag-chr97-graphify-audit",
+        "agent-branch-review-fanout-ace-centroid-aug22",
+        "codereview-semantic-dimension-regression-aug22",
+        "feature-label-semantic-derivation",
+        "inference-wiring-deep-audit-aug22",
+        "manual-migration-reconciliation",
+        "parent-atlas-ace-bitfrost-cache-correctness",
+        "parent-atlas-ace-rlm-bitfrost-integration",
+        "parent-atlas-agentic-repair-bundle-integration",
+        "parent-atlas-candidate-feature-execution-fabric",
+        "parent-atlas-canonical-directory-ingestion-fabric",
+        "parent-atlas-code-ingestion-pipeline",
+        "parent-atlas-compiler-semantic-graph-resolution",
+        "parent-atlas-error-embedding-768-migration",
+        "parent-atlas-graph-analysis-contract",
+        "parent-atlas-graph-retrieval-proof",
+        "parent-atlas-graph-validation-fabric",
+        "parent-atlas-graphify-recovery-proof-ladder",
+        "parent-atlas-neural-prefill-encoder",
+        "parent-atlas-ontology-kernel",
+        "parent-atlas-pass-fabric",
+        "parent-atlas-query-routing-classifier",
+        "parent-atlas-retrieval-fusion-reachability",
+        "parent-atlas-retrieval-lineage-dag-convergence",
+        "parent-atlas-retrieval-lod-algorithm-taxonomy",
+        "parent-atlas-search-classifier-sidecar",
+        "parent-atlas-semantic-512-canonicalization",
+        "parent-atlas-semantic-768-canonical-contract",
+        "parent-atlas-tensor-residency-integration",
+        "parent-atlas-unordered-execution-contract",
+        "parent-atlas-versioned-doc-intelligence",
+        "parent-atlas-workstation-domain-classifier",
+        "add-packet-ontology-registry",
+        "parent-atlas-ace-radix-residency",
+        "parent-atlas-packet-control-word-record",
+        "parent-atlas-trace-search-joinback-proof",
+        "phase-2f1-real-evaluation-corpus"
+      ],
+      "openTasks": 2803
+    },
+    "WAVE_1_RETRIEVAL_AND_FEATURES": {
+      "changes": [
+        "atlas-feature-intelligence",
+        "atlas-hot-vector-schema-decision",
+        "codereview-inference-wiring-followup-aug22",
+        "deep-audit-code-gates-aug22",
+        "parent-atlas-analysis-pass-ornith-adapter",
+        "parent-atlas-best-fit-score-fabric",
+        "parent-atlas-compute-rank-cache-eval-dspy-gepa",
+        "parent-atlas-gpu-graph-vector-substrate",
+        "parent-atlas-gpu-sidecar-patch-tournament",
+        "parent-atlas-graph-pagerank-okf-fanout-hardening",
+        "parent-atlas-live-graph-proof",
+        "parent-atlas-memory-architecture-freeze",
+        "parent-atlas-nlp-sidecar-feature-compiler",
+        "parent-atlas-observation-routing-fabric",
+        "parent-atlas-policy-routing-integration",
+        "parent-atlas-qdrant-structural-payload-enrichment",
+        "parent-atlas-repair-candidate-feature-matrix",
+        "parent-atlas-rrf-fusion-consolidation",
+        "parent-atlas-runtime-ownership-precall",
+        "parent-atlas-topology-representation-admission",
+        "parent-atlas-transport-memory-boundaries",
+        "parent-atlas-unified-symbol-ranking",
+        "parent-atlas-xgboost-cuda-runtime-proof",
+        "add-gemma4-retrieval-loop-hook-harness",
+        "parent-atlas-code-langextract-evidence-lane",
+        "parent-atlas-gpu-mini-fabric-01",
+        "parent-atlas-retrieval-staging-planes",
+        "parent-atlas-rrf-weight-table-lane-registry-consolidation",
+        "phase1-rrf-semantic-fusion"
+      ],
+      "openTasks": 498
+    },
+    "WAVE_2_DERIVED_ANALYSIS": {
+      "changes": [
+        "parent-atlas-gpu-prellm-recommendation-v1",
+        "parent-atlas-gpu-runtime-abi-alignment",
+        "parent-atlas-graph-runtime-enhancement",
+        "parent-atlas-graph-runtime-python-consolidation",
+        "parent-atlas-kv-cache-adaptation-research",
+        "parent-atlas-okf-knowledge-layers",
+        "parent-atlas-pca-svd-representation-baseline",
+        "wire-agentic-workflows-e2e-test"
+      ],
+      "openTasks": 166
+    },
+    "WAVE_3_EXECUTION_AND_INTEGRATION": {
+      "changes": [
+        "local-llm-offload-ownership",
+        "parent-atlas-adaptive-dag-fabric",
+        "parent-atlas-agentic-completion",
+        "parent-atlas-agentic-file-compiler",
+        "parent-atlas-agentic-run-receipt-binding",
+        "parent-atlas-native-acceleration-cabi",
+        "parent-atlas-opencode-replay-proof",
+        "parent-atlas-openspec-workstation-synthesis",
+        "phase-109b-repository-provenance-workflow"
+      ],
+      "openTasks": 117
+    },
+    "WAVE_UNCLASSIFIED_REVIEW": {
+      "changes": [
+        "docker-compose-duplication-remediation",
+        "parent-atlas-768-dim-migration",
+        "parent-atlas-autoresearch-fabric",
+        "parent-atlas-branch-merge-consolidation-aug20",
+        "parent-atlas-deep-research-ingestion",
+        "parent-atlas-deep-research-learning-circuit",
+        "parent-atlas-document-governance-master-index",
+        "parent-atlas-error-research-lane",
+        "parent-atlas-governed-compute-fabric",
+        "parent-atlas-grounded-knowledge-fabric",
+        "parent-atlas-kafka-projection-initiative",
+        "parent-atlas-onnx-webgpu-embedding-promotion",
+        "parent-atlas-telemetry-lowrank-recommendation-okf-integration",
+        "parent-atlas-triton-trtllm-readiness",
+        "route-import-infra-isolation",
+        "session-96-event-sourcing-gpu-complete"
+      ],
+      "openTasks": 294
+    }
+  },
+  "activeChanges": [
+    {
+      "tree": "ROOT",
+      "changeId": "ace-hyperrag-chr97-graphify-audit",
+      "dependencyWave": "WAVE_0_AUTHORITY_AND_LINEAGE",
+      "taskOpen": 2,
+      "taskComplete": 5,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] Ask the user (or infer from context) whether \"graphify GPU indexed json packets\" — now that",
+        "- [ ] Decide whether ACE's AST-blindness (context-assembler reads `codebase-graph.json`, which"
+      ],
+      "referencedReports": [
+        "phase2a-ast-grep-caller-chain-receipt.json"
+      ]
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "agent-branch-review-fanout-ace-centroid-aug22",
+      "dependencyWave": "WAVE_0_AUTHORITY_AND_LINEAGE",
+      "taskOpen": 3,
+      "taskComplete": 17,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] 3.3 If 3.2 fails, the operator's fallback is to patch the precise optional-lane return site in the ACE context assembler (explicitly scoped narrow — \"not a blanket catch around ACE\", citing the assembler's existing correct fail-open behavior for cached-chunk reads as the pattern to match). Deferred until 3.2 actually runs.",
+        "- [ ] 3.4 If 3.2 succeeds, the operator's stated follow-on is to leave ACE degradation alone and move to wiring proof-qualified storage/GPU capabilities into the MCP Viterbi capability registry as hard executor admission masks (replacing probabilistic Viterbi weighting for those specific capabilities). Deferred — downstream of 3.2.",
+        "- [ ] 4.3 The `fanout-proof-db-readiness` and `ace-centroid-alignment` branches remain unmerged, both still correctness-verified and low-risk per sections 1-2 above — the actual merge-to-`main` decision for those two specific branches is still an operator call, not made in this session."
+      ],
+      "referencedReports": []
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "atlas-feature-intelligence",
+      "dependencyWave": "WAVE_1_RETRIEVAL_AND_FEATURES",
+      "taskOpen": 56,
+      "taskComplete": 23,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] **FI-ONTO-04** Reconcile live feature registry and implementation bindings",
+        "- [ ] **FI-ONTO-06** Run the live crosswalk and reconcile each implementation",
+        "- [ ] FI-02 Add stable `feature_id` / `feature_key` registry with revision semantics. **Schema/repository written; live migration + identity round-trip proof pending.** Read-only contract audit on 2026-08-31 confirms `public.feature_registry` is absent. Do not apply the competing manual proposals until migration-ledger reconciliation selects one owner.",
+        "- [ ] FI-03 Add evidence identity normalization and canonical promotion. **Bounded proposal eligibility contract exists in `packages/parent-atlas/src/core/feature-promotion-eligibility-v1.ts`; live canonical promotion remains blocked on FI-02 and exact evidence-store ownership.**",
+        "- [ ] FI-04 Add Postgres migrations/materializers for canonical features, evidence edges, relationships/hyperedges and state receipts. **Manual PostgreSQL 18 migration + transactional repository written; apply/readback proof pending.**"
+      ],
+      "referencedReports": [
+        "feature-ontology-projection-proof-v1.json"
+      ]
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "codereview-semantic-dimension-regression-aug22",
+      "dependencyWave": "WAVE_0_AUTHORITY_AND_LINEAGE",
+      "taskOpen": 1,
+      "taskComplete": 11,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] 2.3 Still open: add or confirm an integration test that actually calls `/api/admin/atlas/synthesize`'s semantic512 branch end-to-end, so this class of always-throws regression is caught by CI next time, not by a code-review pass discovering it after the fact. Not done this pass — the dimension-choice question was the blocker for this task section; this sub-item is independent follow-up work."
+      ],
+      "referencedReports": []
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "deep-audit-code-gates-aug22",
+      "dependencyWave": "WAVE_1_RETRIEVAL_AND_FEATURES",
+      "taskOpen": 11,
+      "taskComplete": 10,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] 1.1 Exclude `scripts/api-cleanup/` (whole directory, ~2,558 stale route-file backups), `llama-cpp-turboquant-gemma4/`, `tools/agentic-research/`, `scripts/phase104-backups/`, `granite-docling-258M/` from the indexer's file inventory (`npm run index:codebase:fast` / `graphify:daily`) so raw gate counts aren't inflated by vendor/backup noise. Confirm no other backup-shaped directories exist via `find . -iname '*backup*' -maxdepth 4 -type d`.",
+        "- [ ] 1.2 Re-run `npm run graphify:daily` to refresh the index (currently 33.9h stale at time of this audit) before trusting any fail count here for fixing.",
+        "- [ ] 2.1 Determine whether `f.parsesBody` (referenced by the `/deep-audit` skill's own dispatch table for its \"G5\") was ever a real field that got dropped from the indexer, or a documentation error that never matched implementation. Check `scripts/index-codebase-fast.mjs` (or whatever the actual indexer script is) for its field-emission list.",
+        "- [ ] 2.2 Reconcile this session's approximation (routeHandlers-mutating-method + hasZod===false → 47 fails) against the graph's own precomputed `gateStats.routesWithoutZod: 23` — figure out which is closer to the skill's actual intended \"G5\" definition, or whether both are wrong.",
+        "- [ ] 3.1 G16 (67 fails): `npm run audit:test-stubs --filter <path>` per failing route, or in bulk."
+      ],
+      "referencedReports": []
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "feature-label-semantic-derivation",
+      "dependencyWave": "WAVE_0_AUTHORITY_AND_LINEAGE",
+      "taskOpen": 1,
+      "taskComplete": 2,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] (Separate, deferred) Decide `graphify:daily:dry` naming — see proposal.md \"Separate,"
+      ],
+      "referencedReports": [
+        "summary-index-ranker.json"
+      ]
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "inference-wiring-deep-audit-aug22",
+      "dependencyWave": "WAVE_0_AUTHORITY_AND_LINEAGE",
+      "taskOpen": 1,
+      "taskComplete": 52,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] A real end-to-end facade replay against a live inference request remains a separate runtime gate; the focused mocked suite does not claim production synthesis readiness. Do not treat this note as proof of live model generation, MCP health, or database write-path coverage."
+      ],
+      "referencedReports": [
+        "synthesis-model-identity-audit-v1.json"
+      ]
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "local-llm-offload-ownership",
+      "dependencyWave": "WAVE_3_EXECUTION_AND_INTEGRATION",
+      "taskOpen": 5,
+      "taskComplete": 57,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] **Still open**: no exhaustive prose-level sweep of every `docs/` markdown file was done (only",
+        "- [ ] Full repo-wide caller census beyond everything checked across items 1, 9, and 10 above (still",
+        "- [ ] **Generation-boundary follow-up:** the verified active summarizer, NLP analyzer, LangExtract",
+        "- [ ] No attempt made to rename the MCP process registration key or the script filename",
+        "- [ ] Old-alias vs canonical-name **output** parity is guaranteed by shared implementation"
+      ],
+      "referencedReports": [
+        "mcp-tool-registry-index.json",
+        "mcp-tool-registry-index.md"
+      ]
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "manual-migration-reconciliation",
+      "dependencyWave": "WAVE_0_AUTHORITY_AND_LINEAGE",
+      "taskOpen": 77,
+      "taskComplete": 144,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] Produce an explicit migration inventory and baseline decision (accepted history, applied-outside-Drizzle history, deferred proposals, and canonical owner) before changing either ledger or applying `feature_registry`.",
+        "- [ ] Classification is not migration authorization. Resolve the five",
+        "- [ ] Keep the migration baseline unresolved. Do not register files, repair",
+        "- [ ] Keep `public.feature_registry` absent and `feature-registry.ts` unapplied until the baseline decision and shape reconciliation are approved.",
+        "- [ ] Register the selected feature-registry owner in the sidecar/journal decision record only after the migration baseline and schema shape are approved."
+      ],
+      "referencedReports": [
+        "agent-run-events-owner-mapping-v1.json",
+        "atlas-indexing-surfaces-v1.json",
+        "atlas-migration-owner-audit-v1.json",
+        "drizzle-migration-integrity.json",
+        "feature-registry-baseline-admission-v1.json",
+        "feature-registry-disposable-proof-v1.json",
+        "feature-registry-owner-decision-v1.json",
+        "migration-inventory-classification-v1.json",
+        "packet-write-revision-contract-v1.json",
+        "parent-atlas-production-readiness-report.json",
+        "parent-atlas-production-readiness-report.md",
+        "postgres-contract-mirrors-report.json"
+      ]
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "parent-atlas-ace-bitfrost-cache-correctness",
+      "dependencyWave": "WAVE_0_AUTHORITY_AND_LINEAGE",
+      "taskOpen": 20,
+      "taskComplete": 48,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] `CACHE-PREFILL-01/02/03` remain open. The narrow RLM request-key change does not",
+        "- [ ] ORNITH-CACHE-01 prove prompt reuse, recurrent checkpoint restore, host-RAM cache,",
+        "- [ ] CACHE-PREFILL-01 audit the existing Ornith query-synthesis/prompt-build path,",
+        "- [ ] CACHE-PREFILL-02 fixture-prove identical complete identity -> HIT and changing",
+        "- [ ] CACHE-PREFILL-03 after caller ownership is verified, run a separately scoped"
+      ],
+      "referencedReports": [
+        "ace-context-live-caller-adoption-v1.json",
+        "ace-prompt-cache-caller-audit-v1.json",
+        "ace-route-revision-authority-v1.json",
+        "cache-namespace-proof.json",
+        "ornith-cache-capability-v1.json"
+      ]
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "parent-atlas-ace-rlm-bitfrost-integration",
+      "dependencyWave": "WAVE_0_AUTHORITY_AND_LINEAGE",
+      "taskOpen": 210,
+      "taskComplete": 708,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] ACE-FEATURE-SOURCE-QUERY-01 after the production bridge and feature contracts",
+        "- [ ] ACE-FEATURE-SOURCE-OWNER-01 bind one production source adapter that",
+        "- [ ] SIMD-01 run PERF0 before any simdjson implementation.",
+        "- [ ] Run the materializer against a reviewed Graphify/AST producer export;",
+        "- [ ] Deploy/restart the Go Retrieval binary containing the corrected response metadata before"
+      ],
+      "referencedReports": [
+        "ace-context-live-caller-adoption-v1.json",
+        "ace-feature-source-owner-live-audit-v1.json",
+        "ace-live-dry-input-readiness-v2.json",
+        "ace-prompt-cache-caller-audit-v1.json",
+        "ace-revision-source-owner-v1.json",
+        "ace-route-revision-authority-v1.json",
+        "addressable-packet-materializer-ownership-v1.json",
+        "admission-parameters-v1.json",
+        "atlas-canonical-projection-fabric-audit-2026-09-09.json",
+        "atlas-canonical-projection-fabric-audit-2026-09-09.md",
+        "atlas-canonical-projection-fabric-audit-2026-09-12.json",
+        "atlas-heval-wikiskill-integration-v1.json",
+        "atlas-hypergraph-current-arity-census-v1.json",
+        "atlas-indexing-surfaces-v1.json",
+        "bitfrost-semantic-cache-audit.json",
+        "bitfrost-semantic-cache-audit.md",
+        "bitfrost-valkey-tracking-proof.json",
+        "bitfrost-valkey-tracking-proof.md",
+        "contextual-tree-readiness-report.json",
+        "current-graph-artifact-readiness-v1.json"
+      ]
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "parent-atlas-adaptive-dag-fabric",
+      "dependencyWave": "WAVE_3_EXECUTION_AND_INTEGRATION",
+      "taskOpen": 6,
+      "taskComplete": 7,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] RUNTIME-QUEUE-02 Verify there is exactly **one** topology-declaration",
+        "- [ ] RUNTIME-QUEUE-03 Truthful worker readiness. `hooks.server.ts`",
+        "- [ ] DAG-CONTRACT-01 **Superseded in spirit by `research-kernel-contract-v1.ts`",
+        "- [ ] DAG-FETCH-01 **Largely covered** by `runLocalResearchCircuitV1()` +",
+        "- [ ] NATS-EVENT-01 JetStream `PARENT_ATLAS_EVENTS` shadow event stream"
+      ],
+      "referencedReports": [
+        "dag-xjson-readonly-replay-v1.json"
+      ]
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "parent-atlas-agentic-file-compiler",
+      "dependencyWave": "WAVE_3_EXECUTION_AND_INTEGRATION",
+      "taskOpen": 12,
+      "taskComplete": 22,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] AFC-04B Wire the LangGraph synthesis adapter to the existing `ContextManifestV1`/`ContextManifestV2` → `PromptPlanV1` → shared Ornith llama-server resolver path; prove a bounded multi-turn execution without hidden-state persistence, ad-hoc prompt bypass, or datastore writes.",
+        "- [ ] AFC-10 Wire query classifier to the live request front door.",
+        "- [ ] AFC-11 Wire exact promotion to the live retrieval owner.",
+        "- [ ] AFC-12 Extend existing context manifest persistence with revision/evidence refs through a migration only after compatibility proof.",
+        "- [ ] AFC-13 Persist WorkflowActionEventV1 through the existing action/outbox writer."
+      ],
+      "referencedReports": [
+        "langgraph-llama-context-capacity-v1.json"
+      ]
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "parent-atlas-agentic-repair-bundle-integration",
+      "dependencyWave": "WAVE_0_AUTHORITY_AND_LINEAGE",
+      "taskOpen": 66,
+      "taskComplete": 18,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] Obtain the actual bundle and place it in a temporary integration area (e.g.",
+        "- [ ] Before wiring anything, diff each bundle repair-script against the existing repair spine:",
+        "- [ ] Wire only: `observe-error.mts` → `repair-state-hmm.mts` → `localize-symbols.mts` →",
+        "- [ ] Explicitly do NOT wire RFF, cuVS, cuGraph, PPR, or new graph traversal in this phase.",
+        "- [ ] Milestone gate: run the full loop on one known failing test. Record whether the loop"
+      ],
+      "referencedReports": [
+        "frozen-graph-snapshot-v2.json",
+        "proto-registry-audit.json"
+      ]
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "parent-atlas-agentic-run-receipt-binding",
+      "dependencyWave": "WAVE_3_EXECUTION_AND_INTEGRATION",
+      "taskOpen": 13,
+      "taskComplete": 3,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] RUN-CHECKPOINT-BINDING-01 audit existing evidenceRefs/artifactRefs and coordinate",
+        "- [ ] RUN-EXPERIENCE-OWNER-01 reconcile the existing T5 curated digest question against",
+        "- [ ] Add 3 optional fields to `WorkflowActionEventV1`",
+        "- [ ] Confirm `WorkflowActionEventDraftV1` (the `Omit<..., 'schema'|'workflowRevision'|'sequence'|'emittedAt'>`",
+        "- [ ] Do NOT introduce a separate `filesEdited` concept if `artifactRefs` already fits — check its"
+      ],
+      "referencedReports": []
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "parent-atlas-analysis-pass-ornith-adapter",
+      "dependencyWave": "WAVE_1_RETRIEVAL_AND_FEATURES",
+      "taskOpen": 1,
+      "taskComplete": 24,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] 3.3 **Stopping here per this task's own instruction — this needs an operator decision, not"
+      ],
+      "referencedReports": [
+        "ornith-vlm-mmproj-01-proof-v1.json",
+        "parent-atlas-workstation-phase-11-17-implementation-plan-v1.md",
+        "parent-atlas/analysis-pass-current-selection-v1.json"
+      ]
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "parent-atlas-best-fit-score-fabric",
+      "dependencyWave": "WAVE_1_RETRIEVAL_AND_FEATURES",
+      "taskOpen": 41,
+      "taskComplete": 113,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] 3.6c XGBOOST-OBJECTIVE-COMPARE-01 remains open. Added the read-only comparison gate",
+        "- [ ] Freeze a read-only shadow comparison over the same revision-qualified post-fusion candidate",
+        "- [ ] Compare Recall@K/MRR/NDCG@10, top-1 agreement, top-K overlap, rank displacement, latency,",
+        "- [ ] AGMR-03B Run a separate FP16-versus-INT8 precision parity benchmark",
+        "- [ ] MICRO-04-MXBAI-CANONICAL-TEACHER-CORPUS (blocked until separately authorized) Replace the"
+      ],
+      "referencedReports": [
+        "atlas-gemma-rank-breadth-50-v1.json",
+        "atlas-gemma-rank-checkpoint-inventory-donor-b-v1.json",
+        "atlas-gemma-rank-checkpoint-inventory-v1.json",
+        "atlas-gemma-rank-cpu-batch-benchmark-v1.json",
+        "atlas-gemma-rank-cpu-warm-benchmark-v1.json",
+        "atlas-gemma-rank-cuda-forward-donor-b-v1.json",
+        "atlas-gemma-rank-cuda132-forward-probe-v1.json",
+        "atlas-gemma-rank-cuda132-forward-smoke-v1.json",
+        "atlas-gemma-rank-cuda132-fp16-control-12-v1.json",
+        "atlas-gemma-rank-cuda132-fp16-control-v1.json",
+        "atlas-gemma-rank-cuda132-precision-diagnostic-v1.json",
+        "atlas-gemma-rank-donor-ab-forward-comparison-v1.json",
+        "atlas-gemma-rank-donor-b-onnx-repro-v1.json",
+        "atlas-gemma-rank-forward-smoke-v1.json",
+        "atlas-gemma-rank-load-init-proof-v1.json",
+        "atlas-gemma-rank-micro05-train-smoke-donor-b-v1.json",
+        "atlas-gemma-rank-micro05-train-smoke-v1.json",
+        "atlas-gemma-rank-mxbai-shadow-compare-v1.json",
+        "atlas-gemma-rank-mxbai-teacher-corpus-v1.json",
+        "atlas-gemma-rank-onnx-export-feasibility-v1.json"
+      ]
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "parent-atlas-branch-merge-consolidation-aug20",
+      "dependencyWave": "WAVE_UNCLASSIFIED_REVIEW",
+      "taskOpen": 17,
+      "taskComplete": 18,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] 2.7 Reconcile the 3 SQL migration templates against the live schema",
+        "- [ ] 3.3c Before attempting any archival of root `src/` content again: map",
+        "- [ ] 3.3d Determine whether root `src/` as a whole is scaffold-for-future-integration",
+        "- [ ] 3.4 Reconcile ~12 `COMPETING_REAL` collisions (needs per-file decision,",
+        "- [ ] `ace-materializer.ts`"
+      ],
+      "referencedReports": []
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "parent-atlas-candidate-feature-execution-fabric",
+      "dependencyWave": "WAVE_0_AUTHORITY_AND_LINEAGE",
+      "taskOpen": 115,
+      "taskComplete": 262,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] QUERY-FEATURE-05 only after baseline value is established, evaluate lexical",
+        "- [ ] QUEUE-01A Reconcile object-storage callers against the SeaweedFS owner. **IMPLEMENTED_UNPROVEN / convergence open** — fresh read-only audit on 2026-09-06 reports 9 candidate adapter surfaces, 5 legacy-named adapter surfaces, 1 local-disk fallback, 47 configuration/artifact-surface files, and no object-store writes. The direct caller census is now recorded: the Parent Atlas cold adapter is used by `firecrawl-v2-capture.ts`; the SeaweedFS transport is used by the file routes, `minio-service.ts`, and the cold adapter; the compatibility `seaweed-client.ts` is used by acquisition, evidence, upload, indexing, and legal-corpus paths; legacy `minio-client.ts`, `minio.ts`, `src/minio.ts`, and `MinioKnowledgeStore.ts` still have active callers. `sveltekit-frontend/src/lib/server/minio/client.ts` retains a `.local_storage` fallback. Blockers remain caller convergence, undeclared local-disk authority risk, and legacy URI compatibility classification. Read-only audit: `scripts/atlas/audit-parent-atlas-object-storage-owner-v1.mjs`; report: `docs/reports/parent-atlas-object-storage-owner-v1.json` (`generatedAt=2026-09-06T05:17:53.935Z`). Do not rename, delete, or remove fallback behavior until runtime migration authorization and per-caller cutover proof are complete.",
+        "- [ ] QUEUE-05 Replace remaining large vector/tensor RabbitMQ payloads (for example legacy `document.embed` / `vector.index`) with artifact references where profiling shows payload amplification. **OPEN / REPRESENTATIVE PROFILE COMPLETE, LIVE CAPTURE INSTRUMENTED, DISTRIBUTION UNMEASURED** — the read-only caller census found direct compatibility publishers in `rabbitmq-client.ts` (lines 128, 144) and manager-owned publishers in `rabbitmq-manager-fixed.ts` (lines 547, 616, 1091, 1101, 2261) carrying opaque text/vector data without the artifact-reference envelope; `dispatch-inline.ts` is an in-process fallback, not a RabbitMQ publisher. The deterministic representative profile measured the existing serializers and reference-only envelope: a 768-value raw vector was 15,097 bytes versus a 743-byte reference envelope (20.319×), and the 64 KiB document boundary exceeded the policy at 65,699 bytes. Actual serialization points now attach `payloadBytes` and `payloadEncoding=json-utf8` to existing queue traces in `rabbitmq-client.ts` and `rabbitmq-manager-fixed.ts`; this is observability only, not a migration. A read-only Langfuse query found 62 historical queue-publish traces but 0 traces with `payloadBytes`, so live publisher distribution and amplification ratios remain unmeasured; no publisher was redirected or removed. Reports: `docs/reports/queue-large-payload-census-v1.json`, `docs/reports/queue-large-payload-profile-v1.json`, `docs/reports/queue-large-payload-live-profile-v1.json`; harnesses: `scripts/atlas/profile-queue05-large-payloads-v1.mts`, `scripts/atlas/audit-queue05-live-publisher-profile-v1.mts`. Next gate: `QUEUE-05-LIVE-PUBLISHER-PROFILE-01`; requires current instrumented traffic and explicit migration authorization.",
+        "- [ ] FEAT-03 Add CPU reference materializer and GPU gather/scatter/sort/compact challenger.",
+        "- [ ] MAN4-05 Wire existing SOM/manifold producer through this schema and record producer/feature revisions. **BLOCKED / producer alignment audit 2026-09-06:** `models/som/som_assignments.json` is packet-keyed (`32310` assignments in the recorded artifact) and contains only `row`, `col`, and `distance`; it has no `CandidateOrdinal`, `canonicalId`, source/workspace/feature revision, or evidence fields required by `Manifold4OrientationV1`. The existing SOM trainer and centroid path are write-capable, while `project-codebase-topology.mjs` includes synthetic manifold generation. No producer was invoked, no datastore was touched, and no identity was promoted. Report: `scripts/atlas/audit-manifold4-producer-alignment-v1.mjs` → `docs/reports/manifold4-producer-alignment-audit-v1.json`. Next: provide a revision-qualified producer receipt or an explicitly bounded adapter input with exact CandidateOrdinal/source joins; do not wire the packet-keyed or synthetic path directly."
+      ],
+      "referencedReports": [
+        "8098-candidate-ordinal-roundtrip-v1.json",
+        "8098-feature-matrix-join-replay-v1.json",
+        "action-single-flight-live-proof-v1.json",
+        "artifact-reference-envelope-policy-v1.json",
+        "ast-symbol-version-materialization-v1.json",
+        "atlas-ast-qdrant-tree-bridge-v1.json",
+        "atlas-byte-scope-reconciliation-v1.json",
+        "atlas-packets-content-hash-source-v1.json",
+        "bounded-structural-target-identity-v1.json",
+        "candidate-feature-gemm-current-proof-v1.json",
+        "candidate-feature-gpu-capability-live-20260912.json",
+        "candidate-feature-scatter-sort-compact-challenger-v1.json",
+        "candidate-ordinal-corpus-v1.json",
+        "candidate-ordinal-gpu-abi-v1.json",
+        "chunk-bridge-v1.json",
+        "current-candidate-feature-matrix-manifest-v1.json",
+        "current-graph-artifact-readiness-v1.json",
+        "current-graph-node-inventory-v1.json",
+        "current-graphify-run-owner-v1.json",
+        "current-graphify-source-revision-v1.json"
+      ]
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "parent-atlas-canonical-directory-ingestion-fabric",
+      "dependencyWave": "WAVE_0_AUTHORITY_AND_LINEAGE",
+      "taskOpen": 50,
+      "taskComplete": 17,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] **DIR-INDEX-04B** Add or align a weighted lexical `tsvector` using path, heading, symbol name, body, tags, and admitted concept labels with a GIN index.",
+        "- [ ] **DIR-INDEX-04C** Keep `pg_trgm` as an optional identifier/path/fuzzy lane; do not replace native FTS or introduce a second lexical fusion owner.",
+        "- [ ] **DIR-INDEX-04D** Run a bounded explain/analyze proof showing the intended GIN/bitmap-capable query path on a fixed corpus. Record PostgreSQL 18 server settings diagnostically; do not create a Parent Atlas AIO retriever abstraction.",
+        "- [ ] **DIR-INDEX-04E** Add lexical fixtures for exact path, heading, symbol, body, tag/concept, and typo/substring cases with canonical candidate identity readback.",
+        "- [ ] **DIR-INDEX-05A** Reuse the frozen canonical `semantic_768` contract and existing representation owner. `semantic_mrl_512/256/128` are explicit EmbeddingGemma-derived views; `latent_256/128/64` are explicit learned autoencoder views. Neither family may be inferred from raw vector length or promoted as canonical semantic identity. Retired `384` remains compatibility/audit-only."
+      ],
+      "referencedReports": [
+        "chunk-bridge-v1.json",
+        "cpu-first-packet-retrieval-readiness.json",
+        "dir-index-04-fts-configurations-v1.json",
+        "dir-index-04-lexical-owner-v1.json",
+        "postgres-fts-rejection-reasons-v1.json"
+      ]
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "parent-atlas-code-ingestion-pipeline",
+      "dependencyWave": "WAVE_0_AUTHORITY_AND_LINEAGE",
+      "taskOpen": 12,
+      "taskComplete": 23,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] **GPH-02** Canonical Graphify contracts — nominate one `SourceSpan`, `SymbolFact`, and `EdgeFact` contract without duplicating downstream embedding, ranking, or Qdrant fields.",
+        "- [ ] **GPH-03** Replacement parity — prove the selected Tree-sitter/analysis owner with behavioral tests before changing the lifecycle state.",
+        "- [ ] **GPH-04** Stable symbol identity — separate logical `symbol_id`, revisioned `symbol_version_id`, and source span.",
+        "- [ ] **GPH-05** Superseded import guard — fail the audit/CI when a `SUPERSEDED` artifact gains a new import.",
+        "- [ ] **GPH-06** Retire only after proof — transition `MIGRATION_CANDIDATE → SUPERSEDED → QUARANTINED/DELETED` only after all four promotion requirements are recorded in a receipt."
+      ],
+      "referencedReports": [
+        "emb1-semantic-card-corpus.json",
+        "emb2-semantic-card-embeddings.json",
+        "live-source-lineage-table-audit.json"
+      ]
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "parent-atlas-compiler-semantic-graph-resolution",
+      "dependencyWave": "WAVE_0_AUTHORITY_AND_LINEAGE",
+      "taskOpen": 18,
+      "taskComplete": 40,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] Join `syntax_only` `REFERENCES` edges back to their sibling `IMPORTS` edge to classify the",
+        "- [ ] Second resolver instance rooted at repo root, for `scripts/atlas/*`-style out-of-workspace",
+        "- [ ] Investigate a sample of the 52 genuine `UNRESOLVED` cases — are they real gaps (e.g. dynamic",
+        "- [ ] Resolve edge-type-agnostically: the LSP `textDocument/definition` request only needs a byte",
+        "- [ ] For `syntax_only`-resolution edges specifically (776, mostly import statements): call"
+      ],
+      "referencedReports": [
+        "ast-symbol-promotion-review-v1.json",
+        "ast-symbol-resolution-dry-run-v1.json",
+        "current-structural-edge-artifact-plan-v2.json",
+        "current-structural-edge-resolution-v1.json",
+        "graphify-run-completion-plan-v1.json",
+        "lsp-cross-file-target-alignment-proof-v1.json",
+        "structural-edge-target-replay-v1.json",
+        "typescript-lsp-readonly-proof-v1.json"
+      ]
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "parent-atlas-compute-rank-cache-eval-dspy-gepa",
+      "dependencyWave": "WAVE_1_RETRIEVAL_AND_FEATURES",
+      "taskOpen": 51,
+      "taskComplete": 18,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] Add artifact persistence adapter: immutable local/Arrow artifact + Valkey/BitFrost hot pointer.",
+        "- [ ] Add dependency-DAG invalidation test proving a source-only change does not invalidate unrelated graph/model artifacts.",
+        "- [ ] Emit stage receipts from daily Graphify without making cache state canonical truth.",
+        "- [ ] Bridge the existing live candidate/retrieval row into this staged contract without deleting the existing `packet-feature-matrix.ts` owner.",
+        "- [ ] Prove canonical identity round-trip: candidate -> packetKey/canonicalId -> FeatureRowV1 -> exact evidence."
+      ],
+      "referencedReports": [
+        "dspy-gepa-subprompt-audit-v1.json"
+      ]
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "parent-atlas-deep-research-ingestion",
+      "dependencyWave": "WAVE_UNCLASSIFIED_REVIEW",
+      "taskOpen": 5,
+      "taskComplete": 1,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] DISCOVERY-01 audit existing web-search/LDR response and acquisition contracts;",
+        "- [ ] DISCOVERY-02 freeze query normalization/checksum, normalizer revision,",
+        "- [ ] DISCOVERY-03 route selected result URLs through existing acquisition owners;",
+        "- [ ] DISCOVERY-04 reuse fetched content hashes, canonical acquisition envelope and",
+        "- [ ] DISCOVERY-05 prove observedAt/TTL affect recency policy only, never source"
+      ],
+      "referencedReports": []
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "parent-atlas-document-governance-master-index",
+      "dependencyWave": "WAVE_UNCLASSIFIED_REVIEW",
+      "taskOpen": 57,
+      "taskComplete": 7,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] 1.1 Add `DocumentGovernanceRecordV1` schema with explicit status, topic ownership, supersession, OpenSpec, validation, workflow-progress-reference, and archive fields.",
+        "- [ ] 1.3 Add deterministic topic/status extraction from explicit frontmatter/status text/path conventions; semantic/LLM classification may nominate but never promote canonical state.",
+        "- [ ] 1.4 Add one-canonical-document-per-topic validation and fail closed with `CONFLICT` when violated.",
+        "- [ ] 2.1 Discover every case-insensitive `CLAUDE.md`/`claude.md` and record scope/inheritance separately from supersession.",
+        "- [ ] 2.2 Build `ClaudeInstructionSupersessionPlanV1` with current SHA-256, topic claims, explicit supersedes/supersededBy links, contradictions, and proposed disposition."
+      ],
+      "referencedReports": [
+        "atlas-candidate-shortlist-receipt-v1.json",
+        "master-feature-todo-openspec-crosswalk-v1.json",
+        "sessions/MASTER-FEATURE-TODO-2026-05-20.md"
+      ]
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "parent-atlas-error-embedding-768-migration",
+      "dependencyWave": "WAVE_0_AUTHORITY_AND_LINEAGE",
+      "taskOpen": 1,
+      "taskComplete": 24,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] 5.1 Promote `drizzle/manual/20260903_nested_latent_representation_registry_v1.sql`'s `latent_128` entry from `CANDIDATE/UNVERIFIED` to `VERIFIED`. **Still BLOCKED — `atlas_representations` table does not exist; see note above.** Not required for the data itself to be real and usable (5.2-5.4 below)."
+      ],
+      "referencedReports": []
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "parent-atlas-governed-compute-fabric",
+      "dependencyWave": "WAVE_UNCLASSIFIED_REVIEW",
+      "taskOpen": 156,
+      "taskComplete": 2,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] COMPUTE-BACKEND-RECONCILE-01 inventory admitted backend implementations and map",
+        "- [ ] 0.1 Read this change together with `parent-atlas-ace-rlm-bitfrost-integration`,",
+        "- [ ] 0.2 Inventory the draft PR #8 kernel/skill/runtime scaffolds and classify each as",
+        "- [ ] 0.3 Audit `sveltekit-frontend/python/parent_atlas_policy` and",
+        "- [ ] 0.4 Audit `simd-bridge/cpp/binding.cc`, `cuvs_bridge.cc`, LibTorch/CUDA translation"
+      ],
+      "referencedReports": []
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "parent-atlas-gpu-graph-vector-substrate",
+      "dependencyWave": "WAVE_1_RETRIEVAL_AND_FEATURES",
+      "taskOpen": 39,
+      "taskComplete": 47,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] 0.1 Verify `atlas_rapids_sidecar.py` is still live and its exact-KNN endpoint",
+        "- [ ] 0.2 Read `openspec/changes/parent-atlas-retrieval-fusion-reachability/tasks.md`",
+        "- [ ] 0.3 Read `openspec/changes/phase-2f1-real-evaluation-corpus/` in full before",
+        "- [ ] 1.1 Write a dispatcher/registry test for",
+        "- [ ] 2.1 Canonical identity — confirm/fix the single identity join every retrieval"
+      ],
+      "referencedReports": [
+        "8098-candidate-ordinal-roundtrip-v1.json",
+        "8098-feature-matrix-join-replay-v1.json",
+        "candidate-feature-gpu-capability-live-20260912.json",
+        "current-graph-candidate-ordinal-roundtrip-v1.json",
+        "parent-atlas-gpu-ace-ornith-readiness-v1.json",
+        "turbovec-cuvs-readiness.json"
+      ]
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "parent-atlas-gpu-prellm-recommendation-v1",
+      "dependencyWave": "WAVE_2_DERIVED_ANALYSIS",
+      "taskOpen": 1,
+      "taskComplete": 36,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] 7.1 No wiring into any live path. The suggested proof-gate sequence from the pack's own"
+      ],
+      "referencedReports": [
+        "gpu-prellm-recommendation-wsl2-proof-v1.json"
+      ]
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "parent-atlas-gpu-runtime-abi-alignment",
+      "dependencyWave": "WAVE_2_DERIVED_ANALYSIS",
+      "taskOpen": 15,
+      "taskComplete": 39,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] Implement and compile the native C ABI/N-API spectral/GEMM bridge.",
+        "- [ ] Capture a real RTX 3060 Ti cuTile or LibTorch receipt.",
+        "- [ ] Prove CPU/GPU spectral parity using the same frozen ordinal map.",
+        "- [ ] Capture the first real AtlasGemma CUDA/GEMM receipt on the RTX 3060 Ti with model,",
+        "- [ ] Only after the CUDA reference receipt exists, evaluate the matching ONNX Runtime CUDA /"
+      ],
+      "referencedReports": [
+        "8098-candidate-ordinal-roundtrip-v1.json",
+        "atlas-cuda132-cutile-simt-gemm-512-probe-v1.json",
+        "atlas-cuda132-cutile-simt-gemm-probe-v1.json",
+        "atlas-cuda132-cutile-simt-probe-v1.json",
+        "atlas-gemma-rank-cuda132-forward-probe-v1.json",
+        "atlas-gemma-rank-cuda132-fp16-control-12-v1.json",
+        "atlas-gemma-rank-cuda132-fp16-control-v1.json",
+        "atlas-gemma-rank-cuda132-precision-diagnostic-v1.json",
+        "atlas-gpu-inference-stack-readiness-v1.json",
+        "candidate-ordinal-gpu-abi-v1.json",
+        "gpu-readiness-v1.json",
+        "gpu-simt-gemm-sm86-readiness-v1.json",
+        "spectral-rtx-alignment-sweep-20260823.md",
+        "turbovec-cuvs-readiness.json",
+        "workstation-live-capability-proof-v1.json"
+      ]
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "parent-atlas-gpu-sidecar-patch-tournament",
+      "dependencyWave": "WAVE_1_RETRIEVAL_AND_FEATURES",
+      "taskOpen": 51,
+      "taskComplete": 17,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] GPU-21 filter semantics parity: canonical `SearchFilter`/revision masks",
+        "- [ ] GPU-22 atomic index revision build/validate/swap; indexes remain rebuildable caches.",
+        "- [ ] GPU-23 CUDA stream/resource ownership and synchronization receipt.",
+        "- [ ] GPU-24 VRAM arbitration and CPU/Qdrant/Neo4j fallback receipt.",
+        "- [ ] GPU-25 JSON/HTTP, Arrow/mmap, ordinary H2D, and pinned non-blocking H2D benchmark."
+      ],
+      "referencedReports": [
+        "patch-tournament-replay-v1.json"
+      ]
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "parent-atlas-graph-analysis-contract",
+      "dependencyWave": "WAVE_0_AUTHORITY_AND_LINEAGE",
+      "taskOpen": 22,
+      "taskComplete": 62,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] Re-derive `IMPORTS` from current live-tree paths only.",
+        "- [ ] Reject `.claude/worktrees/...` sourceRefs during projection.",
+        "- [ ] Normalize `CALLS` targets so generic symbols like `$state` do not dominate.",
+        "- [ ] Emit a fresh graph revision and provenance receipt.",
+        "- [ ] Build the structural-proxy golden set from that repaired revision."
+      ],
+      "referencedReports": [
+        "ga8-blend-weight-sweep-llm-judged-v1.json",
+        "ga8-blend-weight-sweep-v1.json",
+        "ga8-graph-feature-ablation-v1.json",
+        "golden-proxy-relevance-eval-v1.json",
+        "graph-snapshot-parity/receipt.json",
+        "live-tree-imports-extraction-v1.json",
+        "structural-proxy-golden-set-build-v1.json"
+      ]
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "parent-atlas-graph-pagerank-okf-fanout-hardening",
+      "dependencyWave": "WAVE_1_RETRIEVAL_AND_FEATURES",
+      "taskOpen": 1,
+      "taskComplete": 3,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] **Not fixed, deliberately out of scope for this handoff**: the"
+      ],
+      "referencedReports": []
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "parent-atlas-graph-retrieval-proof",
+      "dependencyWave": "WAVE_0_AUTHORITY_AND_LINEAGE",
+      "taskOpen": 127,
+      "taskComplete": 157,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] Record which fields are stable keys, which are version-bound occurrences, and which are derived projections.",
+        "- [ ] Verify the live join semantics for packet-to-tree and packet-to-symbol links.",
+        "- [ ] Validation commands:",
+        "- [ ] Define separate contracts for `parse_node_id`, `symbol_id`, `symbol_version_id`, `chunk_id`, `packet_key`, `concept_id`, and `graph_node_key`.",
+        "- [ ] Keep `tree_node_id` as a provisional structural field until the separate contracts are proven live."
+      ],
+      "referencedReports": [
+        "materialize-feature-envelopes-receipt.json",
+        "neo4j-codebasefile-identity-audit-v1.json",
+        "neo4j-codebasefile-stablekey-backfill-apply-v1.json",
+        "parent-atlas-symbol-identity-knn-proof.json",
+        "parent-atlas-symbol-identity-knn-proof.md",
+        "session-180-s180-6-task1-identity-audit.md",
+        "session-183-s180-6c-writer-correctness-audit.md"
+      ]
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "parent-atlas-graph-runtime-enhancement",
+      "dependencyWave": "WAVE_2_DERIVED_ANALYSIS",
+      "taskOpen": 6,
+      "taskComplete": 2,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] **(a) Docs-only for now.** Keep this change as pure specification until a human explicitly",
+        "- [ ] **(b) Scaffold stub files matching the manifest**, each clearly marked not-implemented",
+        "- [ ] **(c) Actually implement GR0–GR3.** GR0 (below) confirms this is now technically unblocked —",
+        "- [ ] Formalize the already-live `codebase_file_path` index (created ad hoc in T22) into",
+        "- [ ] Run `cd sveltekit-frontend && npm run graphify:daily` for the full, unbounded refresh (not"
+      ],
+      "referencedReports": []
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "parent-atlas-graph-runtime-python-consolidation",
+      "dependencyWave": "WAVE_2_DERIVED_ANALYSIS",
+      "taskOpen": 13,
+      "taskComplete": 5,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] Add entries to `docs/architecture/runtime-ownership-registry.json` for the 4 remaining",
+        "- [ ] Re-run the caller grep fresh at reclassification time for the remaining 2",
+        "- [ ] For `atlas_compute/graph_programs.py` specifically: check `parent-atlas-graph-runtime-enhancement`",
+        "- [ ] Update `runtime-ownership-baseline.json` if any of these are judged pre-existing tolerated debt",
+        "- [ ] Present the two options to a human (not a unilateral agent decision, per this file's own"
+      ],
+      "referencedReports": []
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "parent-atlas-graph-validation-fabric",
+      "dependencyWave": "WAVE_0_AUTHORITY_AND_LINEAGE",
+      "taskOpen": 83,
+      "taskComplete": 162,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] `graph_pagerank_nx_cugraph` mode (NetworkX-API dispatch to cuGraph backend) — proposal",
+        "- [ ] Leiden, HITS, BFS, SSSP parity modes.",
+        "- [ ] `GraphGpuContext`-reused-across-algorithms architecture exists in the cuGraph oracle",
+        "- [ ] `ATLAS_COMPUTE_POLICY_V1` workstation scheduling (one heavy-compute-family at a time) — not",
+        "- [ ] Ablation studies (does PageRank/Louvain/AST/process/SOM actually improve retrieval) — none"
+      ],
+      "referencedReports": [
+        "candidate-ordinal-admission-v1.json",
+        "current-candidate-feature-matrix-manifest-v1.json",
+        "current-graph-artifact-readiness-v1.json",
+        "current-graph-candidate-ordinal-roundtrip-v1.json",
+        "current-graph-node-inventory-v1.json",
+        "current-graphify-snapshot-authority-v1.json",
+        "current-graphify-source-revision-v1.json",
+        "current-packet-qdrant-bridge-v1.json",
+        "current-source-cohort-lineage-v1.json",
+        "current-source-cohort-projection-alignment-v1.json",
+        "current-source-evidence-hydration-v1.json",
+        "current-source-graphify-batch-plan-v1.json",
+        "current-source-registry-contract-v1.json",
+        "current-structural-edge-artifact-plan-v2.json",
+        "current-structural-edge-contract-v1.json",
+        "current-structural-edge-resolution-v1.json",
+        "current-tree-bound-symbol-registry-input-v1.json",
+        "graph-revision-owner-v1.json",
+        "graph-snapshot-parity/ENVIRONMENT-AND-FILE-MAP.md",
+        "graph-snapshot-parity/receipt.json"
+      ]
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "parent-atlas-graphify-recovery-proof-ladder",
+      "dependencyWave": "WAVE_0_AUTHORITY_AND_LINEAGE",
+      "taskOpen": 10,
+      "taskComplete": 4,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] Verify the existing Qdrant projection contract still owns `packetKey`, `sourceRef`,",
+        "- [ ] Confirm `graph-projection-manifest.ts` remains the canonical place for",
+        "- [ ] Inventory the live fan-out scripts above and classify each as `created`, `wired`, or",
+        "- [ ] Add or reuse a `GraphProjectionReceipt`-shaped report for the fan-out run, including",
+        "- [ ] Prove the run in dry-run mode first, with a bounded sample, and capture a report artifact"
+      ],
+      "referencedReports": [
+        "graphify-atomic-publication-preflight-v1.json",
+        "parent-atlas-graph-artifact-manifest.json",
+        "parent-atlas-graphify-recovery.md"
+      ]
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "parent-atlas-grounded-knowledge-fabric",
+      "dependencyWave": "WAVE_UNCLASSIFIED_REVIEW",
+      "taskOpen": 11,
+      "taskComplete": 14,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] **KNOW-09 — Source snapshot/fingerprint.** Contract implemented; workstation adapter/proof against the live lineage owner remains open.",
+        "- [ ] **KNOW-11 — Page snapshot/rollback.** Exact pre-submit rollback controller exists. Durable snapshot artifact persistence + process-loss filesystem proof remain open.",
+        "- [ ] **KNOW-12 — Resumable generation run.** Lifecycle now requires `INSPECT` before `SUBMIT`; COMPLETE transitions require a verified typed `KnowledgePageCompletionReceiptV1`; opaque checksum-only completion is forbidden. Focused build/replay is still pending.",
+        "- [ ] **KNOW-13 — Durable page completion.** `KnowledgePagePersistenceReceiptV1` + `KnowledgePageCompletionReceiptV1` now bind readback-verified page/claim persistence, verification receipt, source snapshot, page snapshot, DAG binding, DAG execution receipt and CURRENT manifest identity. Runtime persistence adapter/readback proof remains open.",
+        "- [ ] **KNOW-14 — Page manifest replay.** Manifest currentness helper exists; prove page bytes + claim set + verification + source snapshot on two runs."
+      ],
+      "referencedReports": []
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "parent-atlas-kv-cache-adaptation-research",
+      "dependencyWave": "WAVE_2_DERIVED_ANALYSIS",
+      "taskOpen": 23,
+      "taskComplete": 4,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] ORNITH-CACHE-01 verify the active model/build metadata and classify attention KV,",
+        "- [ ] ORNITH-CACHE-02 measure only server-managed prefix reuse against PrefixIdentityV1:",
+        "- [ ] Stage 1: standalone rotation + quantization kernel (block-diagonal rotation, no paging, no attention integration) — isolated, testable in Node/Python without touching the live `llama-server.exe` process.",
+        "- [ ] Stage 2: quantize → dequantize round-trip numerical fixture — measure reconstruction error on a fixed sample of real KV tensors (not synthetic random data).",
+        "- [ ] Explicitly deferred: packed/paged cache layout (Stage 3), fused write kernel (Stage 4), fused attention read path (Stage 5), single/multi-request model replay (Stage 6–7), 65K-context validation (Stage 8), tool-call quality evaluation (Stage 9)."
+      ],
+      "referencedReports": []
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "parent-atlas-memory-architecture-freeze",
+      "dependencyWave": "WAVE_1_RETRIEVAL_AND_FEATURES",
+      "taskOpen": 12,
+      "taskComplete": 19,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] 2.5 If proceeding with the candidate-ordinal-indexed membership bitmap + `BITOP AND`",
+        "- [ ] 2.6 Verify PyTorch's `torch.from_file`-cannot-be-pinned constraint against the actual",
+        "- [ ] 2.8 Reconcile `parent-atlas-tensor-residency-integration/` (v1) against",
+        "- [ ] 2.12 **New follow-up, found by 2.11.** If CAGRA is revisited later: (a) tune",
+        "- [ ] 2.14 **New, highest-priority follow-up from 2.13 — an operator decision, not an agent"
+      ],
+      "referencedReports": [
+        "atlas-kag-persistence-v1.json",
+        "sessions/MASTER-FEATURE-TODO-2026-05-20.md",
+        "tensor-residency-gate-t2-t3-proof-2026-08-23.json",
+        "tensor-residency-gate-t4-proof-2026-08-23.json",
+        "tensor-residency-gate-t6-proof-2026-08-23.json"
+      ]
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "parent-atlas-native-acceleration-cabi",
+      "dependencyWave": "WAVE_3_EXECUTION_AND_INTEGRATION",
+      "taskOpen": 53,
+      "taskComplete": 21,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] P0.1 Replace session-188 global-nullable hotfix with discriminated identity contract in `feature-envelope.ts`: `identity_kind: 'symbol'|'file'|'chunk'`; symbol ⇒ `stable_symbol_id`+`symbol_version_id` non-null; file/chunk ⇒ explicitly null + `stable_file_id` required",
+        "- [ ] P0.2 Add canonical identity join in `hydrate-candidates.ts` (symbol-tree / atlas_packets source — current SQL selects only `codebase_chunk_index`; the \"optional atlas_packets join\" comment has no join)",
+        "- [ ] P0.3 Replace `envelope_build_failed` with typed counters: `canonical_row_matched`, `canonical_identity_resolved`, `envelope_validated`, `missing_stable_symbol`, `missing_stable_file`, `schema_revision_rejected`, `representation_rejected`; increment row-match BEFORE envelope construction",
+        "- [ ] P0.4 Prove `search-unified?q=test&topK=3` still returns hydrated packets under the discriminated contract (regression fixtures for symbol / file / chunk candidates)",
+        "- [ ] P1.1 Rewrite `scripts/startup-gpu-bridge-probe.mjs` classifications: MISSING_EXPORT / NO_LIBTORCH_STUB / CPU_FALLBACK / SHAPE_VALID / NOT_PROVEN / CALL_FAILED / NUMERICAL_MISMATCH / SKIPPED_EXTERNAL_PROOF; same addon resolver as `libtorch-bridge.ts`; record path + SHA-256 + mtime + build variant; missing exports counted explicitly; no \"covered by smoke\" promotion"
+      ],
+      "referencedReports": [
+        "simd-bridge-memory-audit.json",
+        "simd-bridge-memory-audit.md"
+      ]
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "parent-atlas-neural-prefill-encoder",
+      "dependencyWave": "WAVE_0_AUTHORITY_AND_LINEAGE",
+      "taskOpen": 646,
+      "taskComplete": 1520,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] Track topology representation admission in the separate",
+        "- [ ] **LINEAGE-01 — Reconcile the full source namespace.** **Current",
+        "- [ ] **LINEAGE-02 — Scale exact candidates to 128, then 768.** Never fill the",
+        "- [ ] **RETRIEVAL-01 — Prove same-corpus Qdrant payload identity** only after",
+        "- [ ] **PACKAGE-01 — Resolve package type/build closure** before package"
+      ],
+      "referencedReports": [
+        "8098-candidate-ordinal-roundtrip-v1.json",
+        "8098-feature-matrix-join-replay-v1.json",
+        "agentic-recommendation-workflow.json",
+        "apples-to-apples-diversity-eval-v1.json",
+        "ast-packet-span-review-v1.json",
+        "atlas-ast-backfill-idempotency-proof-v1.json",
+        "atlas-ast-backfill-receipt-v1-apply_bounded.json",
+        "atlas-ast-backfill-receipt-v1-dry_run.json",
+        "atlas-ast-bridge-revision-comparison-v1.json",
+        "atlas-ast-nodes-bridge-census-active-v3.json",
+        "atlas-ast-nodes-bridge-census-v1.json",
+        "atlas-ast-nodes-bridge-census-v2.json",
+        "atlas-ast-path-alias-census-v1.json",
+        "atlas-byte-scope-reconciliation-v1.json",
+        "atlas-candidate-shortlist-receipt-v1.json",
+        "atlas-corpus-reembed-document-prefix-v1-apply.json",
+        "atlas-cuda-cutile-simt-gemm-live-20260911.json",
+        "atlas-cuda-simt-live-20260911.json",
+        "atlas-gpu-kernel-lab-scope-v1.json",
+        "atlas-graphify-neural-prefill-daily-v1.json"
+      ]
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "parent-atlas-nlp-sidecar-feature-compiler",
+      "dependencyWave": "WAVE_1_RETRIEVAL_AND_FEATURES",
+      "taskOpen": 42,
+      "taskComplete": 54,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] 0.2 Read `sveltekit-frontend/src/lib/server/nlp/miniforge-nlp-sidecar.ts`",
+        "- [ ] 0.3 Read `openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/`",
+        "- [ ] 0.4 Read `openspec/changes/parent-atlas-semantic-768-canonical-contract/`",
+        "- [ ] 0.6 Read `sveltekit-frontend/src/lib/server/retrieval/router-matrix.ts`",
+        "- [ ] 0.7 Read `src/lib/server/services/knowledge-search/ACPToolRegistry.ts`"
+      ],
+      "referencedReports": [
+        "docker-reproducibility-v1.json",
+        "pos-concept-tagging-lane-proof.json"
+      ]
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "parent-atlas-observation-routing-fabric",
+      "dependencyWave": "WAVE_1_RETRIEVAL_AND_FEATURES",
+      "taskOpen": 10,
+      "taskComplete": 16,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] ORF-2R — Reconcile the exported `packages/parent-atlas` observation repository: it is currently an unused legacy writer targeting `candidate_id + workspace_revision` and a second `semantic_768` owner. Either adapt it to the packet-key exact-filter projection or explicitly split it into a separately named staging repository before enabling any caller.",
+        "- [ ] ORF-3 — Qdrant collection/materializer implementation after migration dry-run proves the target is safe.",
+        "- [ ] ORF-3A — External-doc 768→512 migration dry run. Reject zero vectors; preserve document/chunk checksums; compare Recall@K and exact identity before apply.",
+        "- [ ] ORF-3P — Qdrant payload-index benchmark: indexed selective fields vs unindexed/nested variants; record memory/storage cost and latency.",
+        "- [ ] ORF-5P — Run router-row contract tests; freeze stable numeric flattening order for PyTorch/XGBoost input tensor."
+      ],
+      "referencedReports": [
+        "atlas-indexing-surfaces-v1.json",
+        "atlas-observation-feature-row-contract-v1.json",
+        "orf-postgres-plan-receipt.json"
+      ]
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "parent-atlas-okf-knowledge-layers",
+      "dependencyWave": "WAVE_2_DERIVED_ANALYSIS",
+      "taskOpen": 16,
+      "taskComplete": 25,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] Validate existing `.okf/` files against OKF v0.2 (provenance, trust, lifecycle fields present and well-formed).",
+        "- [ ] Static pass: `rg` for `TODO|NOT_IMPLEMENTED|throw new Error.*not implemented|Math\\.random.*(mock|stub|simulate|placeholder|demo)`.",
+        "- [ ] AST-context classification per hit: test fixture (acceptable) / demo-flag-gated mock (acceptable, labeled) / unlabeled synthetic production response (flag) / throwing stub (flag) / unreferenced stub (flag).",
+        "- [ ] LLM used only to summarize post-static+runtime findings — never as sole verdict source.",
+        "- [ ] Output: one JSON + Markdown report."
+      ],
+      "referencedReports": [
+        "okf-library-ownership.json",
+        "okf-sveltekit-admin-smoke.json",
+        "okf-wiki-migration-v1.json"
+      ]
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "parent-atlas-onnx-webgpu-embedding-promotion",
+      "dependencyWave": "WAVE_UNCLASSIFIED_REVIEW",
+      "taskOpen": 17,
+      "taskComplete": 0,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] **1. Reload permissions.** `.claude/settings.local.json` env-read allow rules are JSON-valid",
+        "- [ ] **2. Inspect real env routing.** Once readable: `EMBEDDING_BACKEND`, `DEV_GPU_EMBED_SERVER`,",
+        "- [ ] **3. Inspect `onnx-embed.ts` before starting the app.** Verify: `isOnnxEmbedAvailable()`",
+        "- [ ] **4. Harden the standalone proof to fail closed.** Current",
+        "- [ ] **5. Resolve the 512 vs 2048 token-capacity export gate before claiming parity.**"
+      ],
+      "referencedReports": []
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "parent-atlas-ontology-kernel",
+      "dependencyWave": "WAVE_0_AUTHORITY_AND_LINEAGE",
+      "taskOpen": 82,
+      "taskComplete": 191,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] **22/24 operators mapped to a real, grep-verified implementation (2026-08-31)** — still not",
+        "- [ ] Translate the compiled schema candidate to OWL, validate projection",
+        "- [ ] Two full construction rounds with deterministic receipts (schema",
+        "- [ ] Same Ornith, same tasks, same evidence, same tool budget — produce",
+        "- [ ] Only after the OaK baseline (frozen kernel + kernel-bound ReAct)"
+      ],
+      "referencedReports": [
+        "adaptive-dag-plan-contract-v1.json",
+        "atlas-kag-persistence-v1.json",
+        "authorized-resource-mutation-dry-run-v1.json",
+        "concept-fabric-capability-alignment-v1.json",
+        "concept-reachability-check.json",
+        "concept-seed-dry-01.json",
+        "concept-seed-dry-v1.json",
+        "concept-vocabulary-authority-01.json",
+        "current-feature-ontology-relationship-readback-v1.json",
+        "current-graphify-snapshot-authority-v1.json",
+        "current-source-evidence-hydration-v1.json",
+        "domain-classification-readiness-audit.json",
+        "domain-classifier-lineage-v1.json",
+        "domain-classifier-real-admission-v1.json",
+        "domain-ontology-admission-v1.json",
+        "domain-ontology-taxonomy-audit-v1.json",
+        "external-doc-vocabulary-admission-v1.json",
+        "feature-ontology-alias-target-registry-v1.json",
+        "feature-ontology-crosswalk-v1.json",
+        "feature-ontology-current-cohort-v1.json"
+      ]
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "parent-atlas-opencode-replay-proof",
+      "dependencyWave": "WAVE_3_EXECUTION_AND_INTEGRATION",
+      "taskOpen": 17,
+      "taskComplete": 2,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] Reproduce a clean sequential Ornith turn-2 replay.",
+        "- [ ] Prove 10 sequential single-tool turns pass.",
+        "- [ ] Re-test parallel tool calls only after the sequential replay path is stable.",
+        "- [ ] Generate `atlas-phase3-6-proof.json`.",
+        "- [ ] Generate `atlas-phase3-6-proof.md`."
+      ],
+      "referencedReports": []
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "parent-atlas-pass-fabric",
+      "dependencyWave": "WAVE_0_AUTHORITY_AND_LINEAGE",
+      "taskOpen": 41,
+      "taskComplete": 15,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] Single Postgres query claims all free slots",
+        "- [ ] Test: 4 free → 4 jobs claimed (not 1)",
+        "- [ ] Test: 0 free → 0 jobs claimed (no error)",
+        "- [ ] embed_gate: 0/3 → 3 jobs dispatched in one pollOnce call",
+        "- [ ] entity_gate: 0/2 → 2 jobs dispatched"
+      ],
+      "referencedReports": [
+        "graph-snapshot-parity/receipt.json",
+        "lexical-pass-writer-v1.json",
+        "nx-cugraph-backend-dispatch-parity-v1.json",
+        "pos-concept-tagging-lane-proof.json"
+      ]
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "parent-atlas-pca-svd-representation-baseline",
+      "dependencyWave": "WAVE_2_DERIVED_ANALYSIS",
+      "taskOpen": 2,
+      "taskComplete": 7,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] 1.3 **Attempted 2026-09-12, blocked by a real WSL infrastructure failure, not resolved.**",
+        "- [ ] 3.1 Register the new representation with `dimension_method: 'LINEAR_PROJECTION'` in whichever"
+      ],
+      "referencedReports": []
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "parent-atlas-policy-routing-integration",
+      "dependencyWave": "WAVE_1_RETRIEVAL_AND_FEATURES",
+      "taskOpen": 15,
+      "taskComplete": 25,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] 12 allowed actions.",
+        "- [ ] 3 model targets: NO_LLM / ORNITH / GEMMA4.",
+        "- [ ] 3 budget tiers.",
+        "- [ ] State-specific action masks.",
+        "- [ ] Deterministic baseline before learned weights."
+      ],
+      "referencedReports": []
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "parent-atlas-qdrant-structural-payload-enrichment",
+      "dependencyWave": "WAVE_1_RETRIEVAL_AND_FEATURES",
+      "taskOpen": 8,
+      "taskComplete": 15,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] 1.1 Decide the exact `QdrantStructuralPayloadV1` field list — what subset of",
+        "- [ ] 1.2 Check `openspec/specs/*` for any existing capability this would modify rather than add",
+        "- [ ] 3.1 Build the `setPayload` writer once 1.1-1.3 are answered.",
+        "- [ ] 3.2 Explicit human sign-off gate before any live `setPayload` call, same as",
+        "- [ ] 4.1 Decide whether/how `buildCodebaseQdrantFilter` gains structural filter fields — not"
+      ],
+      "referencedReports": [
+        "qdrant-collection-roles-v1.json",
+        "semantic-corpus-admission-v1.json",
+        "structural-payload-join-hitrate-dryrun-v1.json"
+      ]
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "parent-atlas-query-routing-classifier",
+      "dependencyWave": "WAVE_0_AUTHORITY_AND_LINEAGE",
+      "taskOpen": 58,
+      "taskComplete": 44,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] Execute schema tests.",
+        "- [ ] Compare later against a real POS tagger only if it materially improves the",
+        "- [ ] Produce fixture embeddings with the proven EmbeddingGemma executor.",
+        "- [ ] Verify 128-d norm/digest determinism.",
+        "- [ ] Add dataset exporter from revisioned query/evaluation records."
+      ],
+      "referencedReports": [
+        "domain-classifier-lineage-v1.json"
+      ]
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "parent-atlas-repair-candidate-feature-matrix",
+      "dependencyWave": "WAVE_1_RETRIEVAL_AND_FEATURES",
+      "taskOpen": 7,
+      "taskComplete": 34,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] Run focused Vitest on the workstation.",
+        "- [ ] Run the current-cohort proof harness on the workstation and commit the resulting report only if the checked-in base manifest still matches.",
+        "- [ ] Choose one live already-revisioned repair feature producer and join it to the same frozen candidate snapshot.",
+        "- [ ] Require exact live identity/revision coverage and feature-state receipt before changing that feature from `UNAVAILABLE` in a workstation proof.",
+        "- [ ] Run a held-out baseline-vs-feature tournament with identical candidate universe."
+      ],
+      "referencedReports": []
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "parent-atlas-retrieval-fusion-reachability",
+      "dependencyWave": "WAVE_0_AUTHORITY_AND_LINEAGE",
+      "taskOpen": 29,
+      "taskComplete": 139,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] Consolidate the 7+ diverged RRF weight tables into one shared config, once the fusion",
+        "- [ ] **RWC-CENSUS-02 — Contract-first admission.** Preserve the distinctions",
+        "- [ ] Add or expose the canonical identity envelope at the caller boundary,",
+        "- [ ] Obtain reviewer decisions and seal `judgmentRevision` and",
+        "- [ ] Keep the judgment set blocked until reviewed grades, reviewer/confidence"
+      ],
+      "referencedReports": [
+        "agentic-recommendation-workflow.json",
+        "atlas-retrieval-signal-ranking-live-v1.json",
+        "current-workspace-packet-chunk-join-v1.json",
+        "golden-relevance-review-queue-validation-v1.json",
+        "golden-review-query-binding-audit-v1.json",
+        "retrieval-e2e-benchmark.json",
+        "retrieval-spine-e2e.json",
+        "rf6-executor-lane-owner-v1.json",
+        "rf6-rrf-fuse-hardening-v1.json",
+        "rf6-semantic-live-readonly-replay-v1.json",
+        "rf6-semantic-vote-preconditions-v1.json",
+        "rf6-semantic-vote-proof-v1.json",
+        "rrf-bounded-caller-replay-v1.json",
+        "rrf-caller-baseline-v1.json",
+        "rrf-lane-weight-census-v1.json",
+        "rrf-logical-lane-alias-map-v1.json",
+        "rrf-real-caller-identity-envelope-v1.json",
+        "turbovec-ann-grpc-proof-v2-replay.json"
+      ]
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "parent-atlas-retrieval-lineage-dag-convergence",
+      "dependencyWave": "WAVE_0_AUTHORITY_AND_LINEAGE",
+      "taskOpen": 807,
+      "taskComplete": 1913,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] LINEAGE-02 — **`BLOCKED_ARTIFACT_UNPROVEN`** / helper",
+        "- [ ] DAG-RUNTIME-01D — **`BLOCKED_BY_01D.2`** (2026-09-02, status corrected — not merely",
+        "- [ ] DAG-RUNTIME-01D.2 — **`BLOCKED_REVISION_BUNDLE_UNPROVEN`** (2026-09-02, formalized). Run the",
+        "- [ ] DAG-RUNTIME-01E — **`BLOCKED_BY_01D.2`**. Link the execution receipt to ContextManifest and",
+        "- [ ] NESTED-TRAIN-02 — Retrain the nested AE from an immutable source snapshot,"
+      ],
+      "referencedReports": [
+        "8098-candidate-ordinal-roundtrip-v1.json",
+        "8098-feature-matrix-join-replay-v1.json",
+        "ace-context-live-caller-adoption-v1.json",
+        "ace-feature-source-owner-live-proof-v1.json",
+        "ace-live-dry-input-readiness-v2.json",
+        "ace-prompt-cache-caller-audit-v1.json",
+        "ace-revision-source-owner-v1.json",
+        "ace-route-revision-authority-v1.json",
+        "acp-nlp-tool-review-v1.json",
+        "addressable-packet-materializer-ownership-v1.json",
+        "apply-admitted-workspace-source-bindings-content-reconciled-v1.json",
+        "apply-file-level-source-refs-content-reconciled-v1.json",
+        "ast-explore-seed-audit-v1.json",
+        "ast-node-8095-parity.json",
+        "ast-structural-revision-v1.json",
+        "atlas-canonical-projection-fabric-audit-2026-09-08.json",
+        "atlas-canonical-projection-fabric-audit-2026-09-10.json",
+        "atlas-canonical-projection-fabric-audit-2026-09-13.json",
+        "atlas-corpus-reembed-document-prefix-v1-apply.json",
+        "atlas-embedding-ranking-diagnostic-v2.json"
+      ]
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "parent-atlas-retrieval-lod-algorithm-taxonomy",
+      "dependencyWave": "WAVE_0_AUTHORITY_AND_LINEAGE",
+      "taskOpen": 52,
+      "taskComplete": 52,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] CH_BF_06 — Verify the hardened bounded backfill apply path in a disposable non-production",
+        "- [ ] If genuinely missing: scope a minimal harness — fixed query set with known-good top-k",
+        "- [ ] Do not wire this into CI or a build gate yet — first pass is a standalone script, matching",
+        "- [ ] Domain 1 (candidate fusion, 13-owner consolidation) — still untouched, still RF6's job.",
+        "- [ ] Full N×F feature-matrix object (beyond the single authority column added here) — still"
+      ],
+      "referencedReports": [
+        "atlas-byte-scope-reconciliation-v1.json",
+        "atlas-packets-content-hash-backfill-v1-dry_run.json",
+        "atlas-packets-content-hash-source-v1.json",
+        "atlas-qas-candidate-features.json",
+        "chunk-bridge-v1.json",
+        "current-source-cohort-lineage-v1.json",
+        "golden-relevance-review-pool-validation-v1.json",
+        "golden-review-query-binding-audit-v1.json",
+        "graphify-packet-lineage-census-v1.json",
+        "lineage-qualified-candidate-cohort-v1.json",
+        "lod-memory-census.json",
+        "query-adaptive-sampling-proof.json"
+      ]
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "parent-atlas-rrf-fusion-consolidation",
+      "dependencyWave": "WAVE_1_RETRIEVAL_AND_FEATURES",
+      "taskOpen": 3,
+      "taskComplete": 3,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] 1.4 Classify each primitive: `CANONICAL_OWNER` (only `fuseSearchRuntimeCandidates` by",
+        "- [ ] 2.1 Add entries to `docs/architecture/runtime-ownership-registry.json` /",
+        "- [ ] 3.1 For each non-`CANONICAL_OWNER` primitive: migrate its callers, formally designate it a"
+      ],
+      "referencedReports": [
+        "rrf-caller-classification-v1.json"
+      ]
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "parent-atlas-search-classifier-sidecar",
+      "dependencyWave": "WAVE_0_AUTHORITY_AND_LINEAGE",
+      "taskOpen": 30,
+      "taskComplete": 109,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] Keep the exact 300-file pipeline `PARTIAL_PROVEN`: the checkpoint does",
+        "- [ ] The gate remains `CLASSIFIER_LINEAGE_BLOCKED`: no source namespace is",
+        "- [ ] The probe returned `source_revision=\"unknown\"` and no grounded entities;",
+        "- [ ] Remaining blockers are explicit: `SOURCE_REVISION_UNKNOWN` and",
+        "- [ ] Keep classifier promotion blocked: the current receipt reports"
+      ],
+      "referencedReports": [
+        "domain-classification-readiness-audit.json",
+        "domain-classifier-lineage-v1.json",
+        "domain-classifier-runtime-parity-01.json",
+        "domain-classifier-weak-label-bundle-v1.json",
+        "langextract-ornith-classifier-fanout-v1.json",
+        "pipeline-router-matrix-surfaces-v1.json"
+      ]
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "parent-atlas-semantic-512-canonicalization",
+      "dependencyWave": "WAVE_0_AUTHORITY_AND_LINEAGE",
+      "taskOpen": 8,
+      "taskComplete": 23,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] S512-11 — Execute live cuVS cosine-v2 proof on real admitted 512 rows and compare exact top-K with Qdrant HNSW Recall@K.",
+        "- [ ] S512-12 — Train AE on admitted real 512 corpus only after S512-10; reject if validation/neighborhood metrics fail threshold.",
+        "- [ ] S512-13 — Compare AE-64 against deterministic PCA-64 baseline on exact-neighbor Recall@K/MRR/NDCG and routing latency.",
+        "- [ ] S512-14 — Fit seeded KMeans, materialize routing projection, and measure cluster-route Recall@K against full 512 exact oracle.",
+        "- [ ] S512-15 — Promote routing only if it reduces candidate work without breaching retrieval recall budget; otherwise keep latent/KMeans reference-only."
+      ],
+      "referencedReports": [
+        "emb3a-qdrant-writer-lineage-audit.json"
+      ]
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "parent-atlas-semantic-768-canonical-contract",
+      "dependencyWave": "WAVE_0_AUTHORITY_AND_LINEAGE",
+      "taskOpen": 51,
+      "taskComplete": 110,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] Keep the canonical owner unproven: `19` writer surfaces remain in the",
+        "- [ ] Do not promote or create a second `semantic_768` owner until source and representation lineage close.",
+        "- [ ] Keep the physical owner unresolved: `19` writer/reference surfaces are",
+        "- [ ] Keep Qdrant payload projection blocked until the immutable execution",
+        "- [ ] Keep physical-owner and full-corpus promotion separate from this"
+      ],
+      "referencedReports": [
+        "atlas-embedding-ranking-diagnostic-v1.json",
+        "atlas-embedding-ranking-diagnostic-v2.json",
+        "audit-semantic-768-active-contracts-v1.json",
+        "current-semantic768-corpus-manifest-plan-v1.json",
+        "latent-representation-identity-audit-2026-09-10.json",
+        "latent-representation-identity-audit-2026-09-10.md",
+        "lineage-semantic-768-cohort-v1.json",
+        "parent-atlas-promotion-gates-v1.json",
+        "qdrant-collection-roles-v1.json",
+        "sem768-corpus-bundle-01.json",
+        "semantic-768-active-contract-audit-v1.json",
+        "semantic-768-active-contracts-v1.json",
+        "semantic-768-contract-proof.json",
+        "semantic-768-payload-lineage-v1.json",
+        "semantic-768-writer-ownership-v1.json",
+        "semantic-candidate-cohort-v1.json",
+        "semantic-contracts/semantic-contract-identity-map.json",
+        "semantic-contracts/semantic-contract-reconciliation.json",
+        "semantic-corpus-admission-v1.json",
+        "semantic-owner-consistency-v1.json"
+      ]
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "parent-atlas-telemetry-lowrank-recommendation-okf-integration",
+      "dependencyWave": "WAVE_UNCLASSIFIED_REVIEW",
+      "taskOpen": 29,
+      "taskComplete": 2,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] Keep event records canonical and n-ary; derive telemetry breadth and",
+        "- [ ] Build a deterministic AST-to-event compiler from Tree-sitter / ast-grep",
+        "- [ ] Add a derived graph projection for Neo4j / cuGraph consumers, but keep",
+        "- [ ] Add a separate semantic enrichment pass for event annotations and keep",
+        "- [ ] Extend the OKF schema/registry to carry ontology-linked tuples as first-class evidence."
+      ],
+      "referencedReports": []
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "parent-atlas-tensor-residency-integration",
+      "dependencyWave": "WAVE_0_AUTHORITY_AND_LINEAGE",
+      "taskOpen": 27,
+      "taskComplete": 31,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] T2-lineage `FeatureSourceManifest`: prove a live source column exists for each of the 5",
+        "- [ ] T2 one Arrow `feature_matrix_5` artifact created and hash-verified. **Blocked on",
+        "- [ ] T5 Valkey/BitFrost revision-qualified metadata keys + invalidation policy proven.",
+        "- [ ] T6c RAPIDS KMeans centroids/labels persisted with artifact lineage.",
+        "- [ ] T10 visualization consumes derived topology/LOD state only."
+      ],
+      "referencedReports": [
+        "candidate-feature-gpu-parity-5k-v1.json",
+        "candidate-feature-gpu-residency-proof-v1.json",
+        "candidate-feature-gpu-residency-proof-v2.json",
+        "candidate-feature-gpu-residency-proof-v3.json",
+        "candidate-feature-gpu-residency-proof-v4.json",
+        "current-candidate-feature-matrix-manifest-v1.json",
+        "gpu-feat04-input-readiness-v1.json"
+      ]
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "parent-atlas-topology-representation-admission",
+      "dependencyWave": "WAVE_1_RETRIEVAL_AND_FEATURES",
+      "taskOpen": 19,
+      "taskComplete": 7,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] Extract reusable utilities into `packages/@deeds` (or another package)",
+        "- [ ] TOPO-01 Freeze `RepresentationDerivationDagV1` with independent",
+        "- [ ] TOPO-02 Audit representation definitions against live artifacts and",
+        "- [ ] TOPO-02A Replace the latent writer's fallback identity/update path with",
+        "- [ ] TOPO-03 Implement/read-prove `RepresentationArtifactV1` digests and"
+      ],
+      "referencedReports": [
+        "latent-dimension-coverage-audit-2026-09-03.json"
+      ]
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "parent-atlas-transport-memory-boundaries",
+      "dependencyWave": "WAVE_1_RETRIEVAL_AND_FEATURES",
+      "taskOpen": 68,
+      "taskComplete": 32,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] **PROTO-01** Freeze the transport ownership matrix for tRPC, gRPC, MCP, ACP, and A2A; record current callers and reject duplicate bus ownership.",
+        "- [ ] **PROTO-02** Audit all active sidecar transports, including HTTP, gRPC, N-API, and spawned CLI paths; assign each to exactly one owner or mark it legacy/experimental.",
+        "- [ ] **PROTO-03** Declare gRPC canonical for native polyglot compute only: Node, Python, Rust, C/CUDA, RAPIDS, TurboVec, and simdjson services.",
+        "- [ ] **PROTO-04** Declare tRPC optional for TypeScript application-local control surfaces: SvelteKit UI, Kanban, recommendations, and receipts.",
+        "- [ ] **ACP-01** Define the Parent Atlas coding-agent ACP boundary for editor sessions, permissions, tool actions, patches, terminal output, and progress."
+      ],
+      "referencedReports": [
+        "acp-packet-transport-audit.json",
+        "acp-packet-transport-audit.md",
+        "temporal-bootstrap-plan-v1.json",
+        "temporal-current-owner-projection-v1.json",
+        "temporal-event-candidates-v1.json",
+        "temporal-logical-identity-v1.json",
+        "temporal-predecessor-candidates-v1.json",
+        "temporal-schema-surfaces-v1.json",
+        "turbovec-sidecar-contract.json"
+      ]
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "parent-atlas-unordered-execution-contract",
+      "dependencyWave": "WAVE_0_AUTHORITY_AND_LINEAGE",
+      "taskOpen": 19,
+      "taskComplete": 7,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] 0A.2 Run `node scripts/index-codebase-fast.mjs --skip-redis` from",
+        "- [ ] 0A.3 (small follow-up, not blocking) Add an npm script alias (e.g.",
+        "- [ ] 0A.4 After refresh, freeze `workspace_revision`, `source_revision`,",
+        "- [ ] 0B.1 Re-run `npx tsx scripts/atlas/verify-graph-analysis-gates.mts`",
+        "- [ ] 0C — tracked entirely in `parent-atlas-retrieval-fusion-reachability`"
+      ],
+      "referencedReports": []
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "parent-atlas-versioned-doc-intelligence",
+      "dependencyWave": "WAVE_0_AUTHORITY_AND_LINEAGE",
+      "taskOpen": 15,
+      "taskComplete": 16,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] **DOC-03** Firecrawl bounded crawler — `EXISTS` (`fetch_firecrawl_v2`), verify",
+        "- [ ] **DOC-13** doc↔symbol mutual index — `NEW`. Joins `ApiRuleV1.apiSymbol` /",
+        "- [ ] **DOC-14** Neo4j/cuGraph doc-relationship projection — `NEW` edges on existing graph infra:",
+        "- [ ] **DOC-15** agentic docs retrieval fan-out — `EXTEND` the existing retrieval orchestrator",
+        "- [ ] **DOC-16** `AceRepairPacketV1` — `NEW` contract, `EXTEND` of the existing general ACE packet"
+      ],
+      "referencedReports": [
+        "parent-atlas/doc-10-12-live-contract-v1.json",
+        "parent-atlas/doc-12-api-rule-negative-matrix-v1.json",
+        "parent-atlas/doc-14-neo4j-networkx-export-v1.json",
+        "parent-atlas/doc-14-relationship-admission-fixture-v1.json",
+        "parent-atlas/doc-15-retrieval-fanout-owner-v1.json",
+        "parent-atlas/doc-16-ace-repair-packet-fixture-v1.json",
+        "parent-atlas/doc-23-ast-grep-repair-planner-v1.json",
+        "parent-atlas/doc-24-patch-proposal-fixture-v1.json",
+        "parent-atlas/doc-25-compiler-test-replay-receipt-v1.json",
+        "parent-atlas/external-doc-retrieval-proof-latest.json"
+      ]
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "parent-atlas-workstation-domain-classifier",
+      "dependencyWave": "WAVE_0_AUTHORITY_AND_LINEAGE",
+      "taskOpen": 8,
+      "taskComplete": 23,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] A live query/label producer and same-corpus EmbeddingGemma  embeddinggemma ast cst semantic 768, 512, 256, 128, derived latent256, latent128-d dataset",
+        "- [ ] The workflow loop still has no live classifier producer. It does not own",
+        "- [ ] Keep the live classifier export blocked until a same-corpus producer",
+        "- [ ] **Not done**: the 2 already-fixed files this sweep intentionally excluded because their",
+        "- [ ] **Not done**: fix `scripts/ai/embed_and_index_scenarios.mjs`'s pre-existing file-concatenation"
+      ],
+      "referencedReports": [
+        "domain-classifier-lineage-v1.json",
+        "query-routing-classification-export-proof.json",
+        "query-routing-live-producer-audit.json"
+      ]
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "parent-atlas-xgboost-cuda-runtime-proof",
+      "dependencyWave": "WAVE_1_RETRIEVAL_AND_FEATURES",
+      "taskOpen": 18,
+      "taskComplete": 12,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] 1.1 `wsl -d Ubuntu`, `source ~/miniforge3/etc/profile.d/conda.sh`, `conda activate atlas-rapids-cu13`, confirm `nvidia-smi` shows the RTX 3060 Ti.",
+        "- [ ] 1.2 Check for an existing XGBoost install: `python -c \"import json, xgboost as xgb; print(xgb.__version__); print(json.dumps(xgb.build_info(), indent=2, default=str))\"`. Inspect `build_info()`'s actual returned keys rather than assuming a fixed schema (its structure isn't a stable/guaranteed API contract per XGBoost's own docs).",
+        "- [ ] 1.3 If missing: `python -m pip install -U xgboost` (the current default Linux wheel is CUDA-13-built; do NOT install `xgboost-cpu`).",
+        "- [ ] 1.4 Run the GPU smoke test: build a synthetic 500,000×32 float32 matrix, load via `xgb.QuantileDMatrix`, train `tree_method=hist, device=cuda:0` for 300 rounds, capture elapsed time and `booster.save_config()`.",
+        "- [ ] 1.5 In a second WSL terminal, run `nvidia-smi dmon -s pucm -d 1` (or `watch -n 0.5 nvidia-smi` if `dmon` isn't supported under this WSL driver) during training to observe real VRAM allocation and GPU utilization."
+      ],
+      "referencedReports": [
+        "trace-xgboost-candidate-fabric-audit-20260822.md",
+        "xgboost-features-meta.json",
+        "xgboost-gpu-runtime-proof-native-windows-20260822.json",
+        "xgboost-training-report.json"
+      ]
+    },
+    {
+      "tree": "ROOT",
+      "changeId": "route-import-infra-isolation",
+      "dependencyWave": "WAVE_UNCLASSIFIED_REVIEW",
+      "taskOpen": 2,
+      "taskComplete": 14,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] Decide whether to fix `chrrom/predictor.ts`'s eager singleton (operator call — this pattern",
+        "- [ ] Re-run the FULL 791-file `tests/routes/auto/**` tree (not just the 137-file repaired"
+      ],
+      "referencedReports": []
+    },
+    {
+      "tree": "SVELTEKIT",
+      "changeId": "add-packet-ontology-registry",
+      "dependencyWave": "WAVE_0_AUTHORITY_AND_LINEAGE",
+      "taskOpen": 93,
+      "taskComplete": 0,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": false,
+      "openTaskSamples": [
+        "- [ ] 1.1 Create Drizzle migration file: add packet_type enum to database",
+        "- [ ] 1.2 Add packet_type enum type to Drizzle schema (code, test, doc, prompt, tool, schema, api, spec)",
+        "- [ ] 1.3 Add packet_ontology JSONB column to atlas_packets schema",
+        "- [ ] 1.4 Add parent_packet_key (nullable uuid FK) column to atlas_packets schema",
+        "- [ ] 1.5 Add related_packets (text array) column to atlas_packets schema"
+      ],
+      "referencedReports": []
+    },
+    {
+      "tree": "SVELTEKIT",
+      "changeId": "parent-atlas-ace-radix-residency",
+      "dependencyWave": "WAVE_0_AUTHORITY_AND_LINEAGE",
+      "taskOpen": 1,
+      "taskComplete": 25,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] 6.3 Implement/wire cuTile challenger path with identical permutation + group boundary output contract"
+      ],
+      "referencedReports": [
+        "ace-radix-01-results.json"
+      ]
+    },
+    {
+      "tree": "SVELTEKIT",
+      "changeId": "parent-atlas-gpu-mini-fabric-01",
+      "dependencyWave": "WAVE_1_RETRIEVAL_AND_FEATURES",
+      "taskOpen": 14,
+      "taskComplete": 27,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] 5.1 Use cuVS's CAGRA-to-HNSW conversion path (not a hand-written HNSW) as a GPU-build/CPU-search hybrid challenger",
+        "- [ ] 5.2 Compare against Phase A oracle and Phase B CAGRA result for recall/latency/memory parity",
+        "- [ ] 7.1 Design the query-sequence generation methodology (reusing GraphFixtureV1 adjacency — see design.md Open Questions)",
+        "- [ ] 7.2 Implement `AtlasAceResidencyV1` utility scoring and hot/warm/cold prediction simulation (pure logic, no CUDA)",
+        "- [ ] 7.3 Measure hitRate, precisionOfPrefetch, bytesPromoted, bytesWasted, promotionLatency, evictionRate, queryLatencyDelta"
+      ],
+      "referencedReports": [
+        "gpu-mini-fabric-01-graph-ann-01.json",
+        "gpu-mini-fabric-01-graph-ann-02-build-isolation.json",
+        "gpu-mini-fabric-01-graph-ann-02-itopk-sweep.json",
+        "gpu-mini-fabric-01-graph-ann-03-semantic-768.json",
+        "gpu-mini-fabric-01-graph-pagerank-02-dangling.json",
+        "gpu-mini-fabric-01-graph-struct-01-bfs.json",
+        "gpu-mini-fabric-01-graph-struct-02-pagerank.json",
+        "gpu-mini-fabric-01-semantic-exact-parity-01.json"
+      ]
+    },
+    {
+      "tree": "SVELTEKIT",
+      "changeId": "parent-atlas-trace-search-joinback-proof",
+      "dependencyWave": "WAVE_0_AUTHORITY_AND_LINEAGE",
+      "taskOpen": 1,
+      "taskComplete": 58,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] SOM / KMeans / topology: **corrected 2026-09-08** — the two paths originally listed here"
+      ],
+      "referencedReports": []
+    },
+    {
+      "tree": "SVELTEKIT",
+      "changeId": "phase-109b-repository-provenance-workflow",
+      "dependencyWave": "WAVE_3_EXECUTION_AND_INTEGRATION",
+      "taskOpen": 11,
+      "taskComplete": 0,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] 1.1 Record the 13-stage workflow contract in OpenSpec",
+        "- [ ] 1.2 Define the canonical artifact identity and provenance fields",
+        "- [ ] 1.3 Define the separate lexical, semantic, relationship, label, GPU, and projection stages",
+        "- [ ] 2.1 Document the recommended query pipeline",
+        "- [ ] 2.2 Capture the fusion-before-rerank rule"
+      ],
+      "referencedReports": []
+    },
+    {
+      "tree": "SVELTEKIT",
+      "changeId": "phase-2f1-real-evaluation-corpus",
+      "dependencyWave": "WAVE_0_AUTHORITY_AND_LINEAGE",
+      "taskOpen": 16,
+      "taskComplete": 40,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] 7.1 Run extraction script on full codebase, verify 50+ queries loaded into evaluation_queries",
+        "- [ ] 7.2 Spot-check 5 random queries: verify chunk_id values are real (can fetch from codebase_chunk_index)",
+        "- [ ] 7.3 Run evaluation runner on 5 sample queries (ablation 7: RRF Dense+Lexical), capture results",
+        "- [ ] 7.4 Manually verify results for one query: Dense top-3, Lexical top-3, RRF top-3 are semantically reasonable",
+        "- [ ] 7.5 Check that metrics (NDCG@10, MAP, MRR) are in expected range (0-1) and not all zero"
+      ],
+      "referencedReports": []
+    },
+    {
+      "tree": "SVELTEKIT",
+      "changeId": "phase1-rrf-semantic-fusion",
+      "dependencyWave": "WAVE_1_RETRIEVAL_AND_FEATURES",
+      "taskOpen": 31,
+      "taskComplete": 18,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] 1.5 **NOT FOUND** — no `rrf-lane-ranker.spec.ts` exists. `hyperrag-fusion-service.test.ts`",
+        "- [ ] 2.5 **NOT FOUND** — same gap as 1.5: no dedicated `rrf-combiner-utils.spec.ts`.",
+        "- [ ] 3.5 **NOT FOUND** — no dedicated `signal-grouping.spec.ts` found (not exhaustively searched",
+        "- [ ] 4.5 **NOT INDEPENDENTLY VERIFIED** — plausible given the surrounding evidence, but the \"all 9",
+        "- [ ] 5.1 Add optional `compareScoring` parameter to HyperRagQuery type"
+      ],
+      "referencedReports": []
+    },
+    {
+      "tree": "SVELTEKIT",
+      "changeId": "wire-agentic-workflows-e2e-test",
+      "dependencyWave": "WAVE_2_DERIVED_ANALYSIS",
+      "taskOpen": 90,
+      "taskComplete": 0,
+      "status": "OPEN_OR_PARTIAL",
+      "hasEvidence": true,
+      "openTaskSamples": [
+        "- [ ] 1.1 Create `src/lib/server/telemetry/dispatcher-telemetry-wrapper.ts` with telemetry emission logic",
+        "- [ ] 1.2 Add `emitDispatcherTelemetry()` function: Redis write (sync) + Postgres write (deferred via queueMicrotask)",
+        "- [ ] 1.3 Wrap all 9 dispatcher node handlers in telemetry collector (identity, cache, topology, etc.)",
+        "- [ ] 1.4 Capture routing decision metadata: decision type, confidence, alternatives, selected path",
+        "- [ ] 1.5 Capture gRPC call traces: service, method, duration, status, error_class"
+      ],
+      "referencedReports": []
+    }
+  ],
+  "acceptance": {
+    "historicalLedgersPreserved": true,
+    "mixedRevisionEvidenceFailsClosed": true,
+    "projectionPromotionRequiresAuthority": true,
+    "deletionOrCleanupIncluded": false
+  }
+}

@@ -8,7 +8,9 @@
  * and materializes the production CandidateOrdinalMapV1.
  *
  * Usage:
- *   npx tsx scripts/atlas/materialize-candidate-ordinal-corpus-v1.mts [--dry-run] [--shuffle]
+ *   npx tsx scripts/atlas/materialize-candidate-ordinal-corpus-v1.mts --dry-run
+ *     --workspace-revision <admitted-revision>
+ *     --candidate-snapshot-revision <admitted-snapshot-revision>
  *
  * Outputs:
  *   docs/reports/candidate-ordinal-corpus-v1.json
@@ -22,10 +24,9 @@
  * script to scale past 15 rows toward 128, add the lineage join (source_ref + source_revision
  * -> atlas_packet_chunk_lineage -> chunk_row_id) and filter to PROVEN rows only, or this
  * becomes exactly the "unqualified/aliased identity" scaling this repo's own tasks.md
- * explicitly forbids. Real blocker is CURRENT-STRUCTURAL-LINEAGE-01's primary content_hash
- * gate (still 0 exact matches as of 2026-09-15) plus the unresolved Graphify execution-owner
- * ambiguity (Gate 0A) -- not this script's logic, which is otherwise correct for its current,
- * narrower (unqualified) scope.
+ * explicitly forbids. The materializer therefore requires explicit admitted revisions and
+ * direct source_revision/packet identity; it never infers graph, semantic, or workspace
+ * revisions from packet fields.
  */
 
 import fs from 'node:fs/promises';
@@ -66,16 +67,28 @@ interface RawCandidateRow {
   tree_node_id: string | null;
   feature_id: string | null;
   workspace_revision: string | null;
+  source_revision: string | null;
   representation_revision: string | null;
   content_hash: string | null;
   sha256: string | null;
   metadata: Record<string, any> | null;
+  lineage_proven: boolean;
 }
 
 async function main() {
   const args = process.argv.slice(2);
   const dryRun = args.includes('--dry-run');
   const shuffle = args.includes('--shuffle');
+  const argValue = (name: string): string | null => {
+    const index = args.indexOf(name);
+    return index >= 0 && args[index + 1] ? args[index + 1].trim() : null;
+  };
+  const workspaceRevision = argValue('--workspace-revision');
+  const candidateSnapshotRevision = argValue('--candidate-snapshot-revision');
+
+  if (!workspaceRevision) throw new Error('CURRENT_WORKSPACE_REVISION_REQUIRED');
+  if (!candidateSnapshotRevision) throw new Error('CANDIDATE_SNAPSHOT_REVISION_REQUIRED');
+  if (!dryRun) throw new Error('ORDINAL_CORPUS_APPLY_REQUIRES_AUTHORIZED_CURRENT_COHORT');
 
   console.log('── Materialize Candidate Ordinal Corpus V1 ───────────────');
   console.log(`Dry run: ${dryRun} | Shuffle test: ${shuffle}`);
@@ -96,27 +109,46 @@ async function main() {
       tree_node_id,
       feature_id,
       workspace_revision,
+      source_revision,
       representation_revision,
       content_hash,
       sha256,
-      metadata
-    FROM atlas_packets
-    ORDER BY packet_id ASC
+      metadata,
+      EXISTS (
+        SELECT 1
+          FROM atlas_packet_chunk_lineage l
+          JOIN codebase_chunk_index cci ON cci.id = l.chunk_row_id
+         WHERE l.packet_key = p.packet_key
+           AND l.source_ref = COALESCE(p.canonical_source_ref, p.source_ref)
+           AND l.source_revision = p.source_revision
+           AND l.revision_status = 'PROVEN'
+           AND l.chunk_row_id IS NOT NULL
+      ) AS lineage_proven
+    FROM atlas_packets p
+    WHERE p.workspace_revision::text = $1
+    ORDER BY p.packet_id ASC
   `;
 
   let rows: RawCandidateRow[];
   try {
-    const res = await pool.query(query);
+    const res = await pool.query(query, [workspaceRevision]);
     rows = res.rows;
   } finally {
     await pool.end();
   }
 
-  // Filter for valid lineage: sourceRevision and sourceRef must be present
+  // A packet row alone is not enough for CandidateOrdinal promotion. Require
+  // an exact, revision-qualified source→packet→chunk bridge with a real chunk.
   const validRows = rows.filter((r) => {
     const sRef = r.canonical_source_ref || r.source_ref;
-    const sRev = r.content_hash || r.sha256;
-    return sRef && sRef.trim() !== '' && sRev && sRev.trim() !== '';
+    const sRev = r.source_revision;
+    return Boolean(
+      r.workspace_revision === workspaceRevision &&
+      r.packet_key?.trim() &&
+      sRef?.trim() &&
+      sRev?.trim() &&
+      r.lineage_proven === true,
+    );
   });
 
   console.log(`Valid canonical rows: ${validRows.length} / ${rows.length}`);
@@ -125,14 +157,11 @@ async function main() {
   let orderedRows = [...validRows].sort((a, b) => a.packet_id.localeCompare(b.packet_id));
 
   if (shuffle) {
-    console.log('Applying shuffle to test deterministic canonical sorting...');
-    orderedRows = [...orderedRows].sort(() => Math.random() - 0.5);
+    console.log('Applying deterministic permutation to test canonical sorting...');
+    orderedRows = [...orderedRows].reverse();
     // Sort again deterministically
     orderedRows.sort((a, b) => a.packet_id.localeCompare(b.packet_id));
   }
-
-  const workspaceRevision = 'workspace-active-v1';
-  const candidateSnapshotRevision = `corpus-snapshot:${workspaceRevision}:v1`;
 
   const candidates = orderedRows.map((row, idx) => {
     const canonicalId = row.packet_id;
@@ -140,9 +169,9 @@ async function main() {
     const sourceRef = row.canonical_source_ref || row.source_ref || null;
     const treeNodeId = row.tree_node_id || (row.metadata && row.metadata.tree_node_id) || null;
     const symbolVersionId = (row.metadata && row.metadata.symbol_version_id) || null;
-    const sourceRevision = row.content_hash || row.sha256 || 'unknown-rev';
-    const semanticRevision = row.representation_revision || (row.metadata && row.metadata.embedding_digest) || null;
-    const graphRevision = row.tree_node_id ? `graph-tree:${row.tree_node_id}` : null;
+    const sourceRevision = row.source_revision as string;
+    const semanticRevision = row.representation_revision || null;
+    const graphRevision = null;
 
     return {
       schema: 'atlas.canonical-candidate.v1' as const,
@@ -159,20 +188,7 @@ async function main() {
       candidateSnapshotRevision,
       degradedIdentity: false,
       evidenceRefs: [`atlas_packets:${canonicalId}`],
-      representationBindings: [
-        {
-          representationId: 'semantic_768' as const,
-          family: 'EMBEDDINGGEMMA_MRL' as const,
-          dimensions: 768,
-          modelRevision: 'embeddinggemma:latest',
-          projectionKind: 'NONE' as const,
-          sourceRepresentationId: null,
-          projectionRevision: null,
-          normalized: true as const,
-          available: true,
-          availabilityReason: null,
-        },
-      ],
+      representationBindings: [],
     };
   });
 
@@ -188,6 +204,8 @@ async function main() {
     candidateSnapshotRevision,
     workspaceRevision,
     rowCount: candidates.length,
+    lineageQualifiedRowCount: validRows.length,
+    lineageRequired: true,
     candidates,
     ordinalMapChecksum,
     identityAuthority: false as const,

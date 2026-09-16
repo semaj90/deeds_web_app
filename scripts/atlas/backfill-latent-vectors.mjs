@@ -15,6 +15,7 @@
  *
  * Usage:
  *   node scripts/atlas/backfill-latent-vectors.mjs [--dry-run] [--limit=N] [--batch=100]
+ *   Legacy persistence additionally requires --workspace-revision=<sha256>.
  *   Legacy persistence additionally requires --legacy-unsafe-apply. This
  *   writer is not the promotion producer for RepresentationArtifactV1.
  *
@@ -59,6 +60,10 @@ const DRY_RUN  = !APPLY || args.includes('--dry-run');
 const RESUME   = args.includes('--resume');
 const limitArg = args.find(a => a.startsWith('--limit='));
 const LIMIT    = limitArg ? parseInt(limitArg.split('=')[1], 10) : Number(process.env.LATENT_DEFAULT_LIMIT || 5000);
+const workspaceRevisionArg = args.find(a => a.startsWith('--workspace-revision='));
+const WORKSPACE_REVISION = workspaceRevisionArg
+  ? workspaceRevisionArg.slice('--workspace-revision='.length)
+  : (process.env.WORKSPACE_REVISION || null);
 const batchArg = args.find(a => a.startsWith('--batch='));
 const BATCH_SZ = batchArg ? parseInt(batchArg.split('=')[1], 10) : 100;
 const FORCE_REFRESH = args.includes('--force-refresh');
@@ -246,6 +251,17 @@ async function main() {
     );
   }
 
+  // This legacy writer can update Postgres and Redis.  Never let its
+  // checkpoint or persisted latent rows masquerade as current when the
+  // caller has not supplied the admitted workspace identity.  Historical
+  // dry-runs may remain unqualified and are reported as such.
+  if (APPLY && (!WORKSPACE_REVISION || !/^[0-9a-f]{64}$/i.test(WORKSPACE_REVISION))) {
+    throw new Error(
+      'LATENT_WORKSPACE_REVISION_REQUIRED: --workspace-revision=<64-hex-sha256> is required for persistence; '
+      + 'do not use an inferred or synthetic revision',
+    );
+  }
+
   console.log('\n╔══════════════════════════════════════════════════════════════════╗');
   console.log('║  backfill-latent-vectors.mjs — AE Encode: 768 → 128 → 64        ║');
   console.log(`╚══════════════════════════════════════════════════════════════════╝\n`);
@@ -421,7 +437,7 @@ async function main() {
     if (writeCheckpointPath) {
       writeCheckpoint({
         runId: `backfill-latent-vectors:${process.pid}`,
-        workspaceRevision: process.env.WORKSPACE_REVISION || 'unknown',
+        workspaceRevision: WORKSPACE_REVISION,
         collection: COLLECTION,
         representationId: 'latent_64',
         representationRevision: Number(meta.epoch ?? 60),
@@ -796,7 +812,7 @@ let batchNotMatched = 0;
   if (!DRY_RUN) {
     writeCheckpoint({
       runId: `backfill-latent-vectors:${process.pid}`,
-      workspaceRevision: process.env.WORKSPACE_REVISION || 'unknown',
+      workspaceRevision: WORKSPACE_REVISION,
       collection: COLLECTION,
       representationId: 'latent_64',
       representationRevision: Number(meta.epoch ?? 60),

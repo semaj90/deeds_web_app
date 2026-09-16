@@ -1,7 +1,7 @@
 # Packet Materialization Alignment & Atlas-Runner Setup
 
-**Status:** PARTIALLY SUPERSEDED  
-**Active checklist:** `reports/parent-atlas-open-lanes-todo.md`  
+**Status:** PARTIALLY SUPERSEDED
+**Active checklist:** `reports/parent-atlas-open-lanes-todo.md`
 **Archived from:** `next_steps/active/2026-06-10_packet-materialization-alignment.md`
 
 This checklist remains useful as a historical Phase 2A / packet-materialization reference, but it is no longer the canonical active board.
@@ -49,7 +49,7 @@ directory_path
   -> feature_id
   -> packet_id
   -> packet_key
-  -> Redis
+  -> Redis-valkey centroids lru 7day ttl? search
   -> Neo4j
   -> HyperRAG
   -> cold_storage_manifest
@@ -57,8 +57,8 @@ directory_path
 
 ---
 
-**Date:** 2026-06-10  
-**Original status:** READY FOR IMPLEMENTATION  
+**Date:** 2026-06-10
+**Original status:** READY FOR IMPLEMENTATION
 **Priority:** P1 (blocks full Atlas pipeline)
 
 ## Problem Statement
@@ -202,7 +202,7 @@ SELECT COUNT(*) as materialized FROM atlas_feature_map WHERE packet_id IS NOT NU
 SELECT COUNT(*) as total_packets FROM nes_chrom_packets;
 
 -- Audit sample: pick 10 random packet_keys and verify chain
-SELECT 
+SELECT
   afm.source_ref,
   afm.feature_id,
   afm.packet_id,

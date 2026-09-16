@@ -1,0 +1,40 @@
+{
+  "schema": "atlas.unified-residency-parity.v1",
+  "status": "BOUNDED_CPU_PYTORCH_SIMT_PARITY_PROVEN",
+  "environment": {
+    "host": "WSL2 Ubuntu",
+    "pythonEnvironment": "/home/james/.venvs/atlas-cutile-cu132",
+    "device": "cuda",
+    "gpu": "NVIDIA GeForce RTX 3060 Ti"
+  },
+  "corpus": {
+    "kind": "synthetic_bounded_fixture",
+    "rows": 257,
+    "dimensions": 48,
+    "queries": 1,
+    "topK": 9
+  },
+  "executor": "parent_atlas_tensor.gpu_tile_cache.GpuTileCache.exact_cosine",
+  "cpuOracle": "numpy normalized dot product with stable descending top-k",
+  "sameCorpus": true,
+  "topKIndicesMatch": true,
+  "scoresWithinTolerance": true,
+  "replayIndicesStable": true,
+  "replayChecksumStable": true,
+  "dimensionMismatchFailsClosed": true,
+  "tests": {
+    "passed": 14,
+    "failed": 0,
+    "command": "python -m unittest parent_atlas_tensor.test_unified_residency_parity parent_atlas_tensor.test_unified_residency_provider parent_atlas_tensor.test_gpu_tile_cache parent_atlas_tensor.test_gpu_resident_executor"
+  },
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "promotionEligible": false,
+  "openGates": [
+    "productionSameCorpusParity",
+    "isolatedCuTileFeatureParity",
+    "NetworkXDAGOrdinalParity",
+    "measuredVramPressureAndEviction",
+    "physicalProviderHandoff"
+  ]
+}

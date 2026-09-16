@@ -10,6 +10,7 @@ function base() {
       schema: 'atlas.workflow-action.v1' as const,
       workflowId: 'wf:graphify:1',
       workflowRevision: 7,
+      runId: 'run:graphify:1',
       sequence: 23,
       actionId: 'A53',
       dagNodeId: 'node:rg-search',

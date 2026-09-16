@@ -1,0 +1,28 @@
+{
+  "schema": "atlas.current-graphify-execution-owner-decision.v1",
+  "generatedAt": "2026-09-15T22:08:31.526Z",
+  "gate": "GRAPHIFY-EXECUTION-SNAPSHOT-OWNER-02",
+  "mode": "DRY_RUN",
+  "chosenExecutionId": "0dba1c0d-2cf7-4f35-a61b-c77956f60d3d",
+  "otherCandidateExecutionIds": [
+    "74d50c86-8194-45ea-8c3d-61aab737ef83"
+  ],
+  "authorizedEnvVarPresent": false,
+  "applyFlagPresent": false,
+  "writesPerformed": false,
+  "before": [
+    {
+      "execution_id": "0dba1c0d-2cf7-4f35-a61b-c77956f60d3d",
+      "canonical_authority": false,
+      "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc"
+    },
+    {
+      "execution_id": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "canonical_authority": true,
+      "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc"
+    }
+  ],
+  "after": null,
+  "readbackVerified": false,
+  "reportChecksum": "d3fcf914406a4ad1bcf5dc90539a79998e6d843bd499df46c7c96c61c29f7498"
+}

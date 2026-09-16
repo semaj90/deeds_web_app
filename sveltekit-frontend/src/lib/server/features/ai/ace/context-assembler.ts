@@ -134,7 +134,7 @@ import { featureMaps, grpoMemorySticks } from '$lib/server/db/schema/features.js
 import { eq, desc, sql as drizzleSql } from 'drizzle-orm';
 import { getLlmOutputHitsBulk, recordLlmOutputHit } from '$lib/server/cache/code-llm-index.js';
 import { getRedis } from '$lib/server/redis.js';
-import { aceTopkKey } from '../../../ace/cache-keys.js';
+import { aceTopkKey, type RetrievalCacheIdentityV1 } from '../../../ace/cache-keys.js';
 import {
   normalizeTelemetrySourceRefs,
   resolveTelemetryPacketFallbacks,
@@ -1543,6 +1543,8 @@ export async function assembleACEContext(opts: {
   retrievalPolicyRevision?: string;
   contextPolicyRevision?: string;
   graphRevision?: string | null;
+  /** Optional complete identity from the admitted SearchRuntime manifest. */
+  retrievalCacheIdentity?: RetrievalCacheIdentityV1;
   /**
    * nes-arch path-first preflight (LLMS.md spec). When provided, the
    * assembler does a sub-5ms Redis lookup for the nearest LLMS.md
@@ -2365,6 +2367,7 @@ export async function assembleACEContext(opts: {
                     ),
                     topK: 8,
                     skipVectorLane: true,
+                    retrievalCacheIdentity: opts.retrievalCacheIdentity,
                   })
                 )
               )

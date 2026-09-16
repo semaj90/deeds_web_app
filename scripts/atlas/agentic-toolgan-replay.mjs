@@ -1,11 +1,16 @@
 #!/usr/bin/env node
-import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+// AGENTIC-TOOLGAN-GOVERNED-BOUNDARY-01: this verifier is DIAGNOSTIC/SHAPE-ONLY BY CONSTRUCTION.
+// The committed baseline (git HEAD before this fix) re-executed every recorded command via
+// execSync and, if all of them happened to exit 0, printed "REPLAY SUCCESS: Deterministic
+// execution verified!" -- treating historical command re-execution as proof. There is no
+// execSync/execFile/spawn anywhere in this file now, in any mode, including `--test`: `--test`
+// only adds a log line (see below) and does not skip validation or the unconditional exit(2) at
+// the end -- it must never auto-pass.
+import { existsSync } from 'node:fs';
 import path from 'node:path';
-import { execSync } from 'node:child_process';
 import { ROOT, readNdjson } from './lib/agentic-toolgan-core.mjs';
 
-const traceArg = process.argv.find(a => a.startsWith('--trace_id=') || a.startsWith('--trace_id'));
-const isTest   = process.argv.includes('--test');
+const isTest = process.argv.includes('--test');
 
 function getArgValue(argKey, argvList) {
   const index = argvList.findIndex(a => a.startsWith(argKey));
@@ -24,10 +29,7 @@ const traceId = getArgValue('--trace_id', process.argv);
 
 console.log(`\n═══ Tool-GAN Replay Proof Verification ═══`);
 
-if (isTest) {
-  console.log(`[REPLAY-TEST] Running in test mode. Automatically passing.`);
-  process.exit(0);
-}
+if (isTest) console.log('[REPLAY-TEST] Shape-only verification; commands are never executed.');
 
 if (!traceId) {
   console.error(`❌ Please supply a trace_id to replay: --trace_id=<uuid>`);
@@ -52,22 +54,8 @@ if (!targetEvent) {
 console.log(`Target Event Query: "${targetEvent.query}"`);
 console.log(`Replaying Tool Path: ${targetEvent.tool_path.join(' ➔ ')}`);
 
-// Execute the commands listed in targetEvent
-let allPassed = true;
-for (const cmd of targetEvent.commands ?? []) {
-  console.log(`Re-running command: ${cmd}`);
-  try {
-    execSync(cmd, { cwd: ROOT, stdio: 'inherit' });
-    console.log(`✓ Command succeeded in replay.`);
-  } catch (err) {
-    console.error(`❌ Command failed in replay: ${err.message}`);
-    allPassed = false;
-  }
-}
-
-if (allPassed) {
-  console.log(`\n✅ REPLAY SUCCESS: Deterministic execution verified!`);
-} else {
-  console.error(`\n❌ REPLAY FAILURE: Execution drifted or failed.`);
-  process.exit(1);
-}
+const commands = Array.isArray(targetEvent.commands) ? targetEvent.commands : [];
+console.log(`Recorded commands: ${commands.length}`);
+console.error('\nREPLAY_NOT_EXECUTED_GOVERNED_APPROVAL_REQUIRED');
+console.error('This legacy verifier only inspects the recorded event; it cannot prove command execution.');
+process.exit(2);

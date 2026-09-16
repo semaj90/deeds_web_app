@@ -48,11 +48,11 @@ async function main() {
       neo4jConnected = true;
       console.log(`✓ Connected to Neo4j at ${uri}`);
     } catch (err) {
-      console.log(`⚠️ Neo4j offline (${err.message}) — using heuristic fallback.`);
+      console.log(`⚠️ Neo4j offline (${err.message}) — graph neighbors unavailable.`);
       if (driver) driver.close();
     }
   } else {
-    console.log(`⚠️ neo4j-driver package not found — using heuristic fallback.`);
+    console.log(`⚠️ neo4j-driver package not found — graph neighbors unavailable.`);
   }
 
   console.log(`Expanding graph neighbors for ${cards.length} cards...`);
@@ -83,17 +83,13 @@ async function main() {
       }
     }
 
-    // Heuristic Fallback: if graph_neighbors is still empty, populate it using parent/sibling folder files
     if (card.graph_neighbors.length === 0) {
-      const mockNeighbors = new Set();
-      for (const file of files) {
-        const basename = path.basename(file);
-        const dirname = path.dirname(file);
-        // Propose sibling neighbor
-        mockNeighbors.add(path.join(dirname, `index-registry.mjs`).replace(/\\/g, '/'));
-        mockNeighbors.add(path.join(dirname, `verify-${basename}`).replace(/\\/g, '/'));
-      }
-      card.graph_neighbors = Array.from(mockNeighbors);
+      card.graph_neighbors = [];
+      card.graph_neighbors_status = 'UNAVAILABLE_NO_CANONICAL_GRAPH_EVIDENCE';
+      card.graph_neighbors_canonical = false;
+    } else {
+      card.graph_neighbors_status = 'PROVEN_GRAPH_READBACK';
+      card.graph_neighbors_canonical = true;
     }
   }
 

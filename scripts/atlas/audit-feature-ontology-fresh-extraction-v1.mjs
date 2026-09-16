@@ -40,6 +40,10 @@ const slug = (value) => String(value).toLowerCase().replace(/[^a-z0-9]+/g, '-').
 async function extract(sourceRef, sourceRevision) {
   const file = path.join(root, sourceRef.replaceAll('/', path.sep));
   const source = fs.readFileSync(file, 'utf8');
+  const liveSourceRevision = `sha256:${digest(source)}`;
+  if (sourceRevision !== liveSourceRevision) {
+    throw new Error(`SOURCE_REVISION_STALE_LIVE:${sourceRevision}:${liveSourceRevision}`);
+  }
   const inputText = source.slice(0, groundedWindowChars);
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), requestTimeoutMs);
@@ -204,7 +208,13 @@ async function main() {
       : 'REPAIR_FRESH_ONTOLOGY_EXTRACTION_INPUTS',
   };
   fs.mkdirSync(path.dirname(reportPath), { recursive: true });
-  fs.writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`);
+  const temporaryReport = `${reportPath}.${process.pid}.${Date.now()}.tmp`;
+  try {
+    fs.writeFileSync(temporaryReport, `${JSON.stringify(report, null, 2)}\n`);
+    fs.renameSync(temporaryReport, reportPath);
+  } finally {
+    try { fs.unlinkSync(temporaryReport); } catch {}
+  }
   console.log(JSON.stringify({ status: report.status, approvedSources: approved.length, extractedSources: groups.length, candidates: candidates.length, failedSources: failures.length, reportPath: path.relative(root, reportPath).replaceAll(path.sep, '/') }, null, 2));
 }
 

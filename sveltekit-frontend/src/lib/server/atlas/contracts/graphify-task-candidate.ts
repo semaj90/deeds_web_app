@@ -11,8 +11,8 @@ export const GraphifyTaskCandidateSchema = z
 		task_id: z.string().min(1),
 		producer_id: z.string().min(1),
 		producer_revision: z.string().min(1),
-		workspace_revision: z.string().min(1),
-		source_revision: z.string().min(1),
+		workspace_revision: z.string().min(1).nullable().default(null),
+		source_revision: z.string().min(1).nullable().default(null),
 		graph_revision: z.string().min(1).nullable().optional(),
 		representation_id: z.literal(SEMANTIC_REPRESENTATION_ID),
 		representation_revision: z.string().min(1),
@@ -49,8 +49,8 @@ export interface GraphifyTaskCandidateInput {
 	kind: GraphifyTaskCandidateKind;
 	producerId: string;
 	producerRevision: string;
-	workspaceRevision: string;
-	sourceRevision: string;
+	workspaceRevision?: string | null;
+	sourceRevision?: string | null;
 	graphRevision?: string | null;
 	representationRevision: string;
 	confidence?: number | null;
@@ -109,8 +109,8 @@ export function buildGraphifyTaskCandidate(input: GraphifyTaskCandidateInput): G
 		task_id: input.taskId,
 		producer_id: input.producerId,
 		producer_revision: input.producerRevision,
-		workspace_revision: input.workspaceRevision,
-		source_revision: input.sourceRevision,
+		workspace_revision: input.workspaceRevision ?? null,
+		source_revision: input.sourceRevision ?? null,
 		graph_revision: input.graphRevision ?? null,
 		representation_id: SEMANTIC_REPRESENTATION_ID,
 		representation_revision: input.representationRevision,

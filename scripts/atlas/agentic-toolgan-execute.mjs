@@ -1,8 +1,17 @@
 #!/usr/bin/env node
+// AGENTIC-TOOLGAN-GOVERNED-BOUNDARY-01: --apply already fails closed below before any command
+// could run. The remaining bug this pass fixes: the simulation-only branch below used to write
+// result:'success' and proof.smoke:'PASS' to disk UNCONDITIONALLY -- even though it never runs
+// any real command -- and that fabricated "success" was then permanently persisted by
+// agentic-toolgan-log-outcome.mjs into memory/agentic/successes.ndjson and
+// memory/agentic/do-not-repeat.ndjson as if it were real execution evidence. A tool path that
+// was only ever *simulated* must never be indistinguishable from one that actually ran and
+// passed. Simulated runs now write result:null / proof.smoke:'NOT_EXECUTED', and
+// agentic-toolgan-log-outcome.mjs refuses to write to the permanent success/failure/DNR ledgers
+// for a plan that carries that marker (see the fix there).
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import path from 'node:path';
-import { execSync } from 'node:child_process';
-import { ROOT, buildDoNotRepeatKey } from './lib/agentic-toolgan-core.mjs';
+import { ROOT } from './lib/agentic-toolgan-core.mjs';
 
 const planPath = path.join(ROOT, '.tmp', 'toolgan-current-plan.json');
 
@@ -21,73 +30,50 @@ const command = cmdArg ? cmdArg.split('=')[1] : null;
 const applyMode = process.argv.includes('--apply');
 const dryRunMode = !applyMode || process.argv.includes('--dry-run');
 
+if (applyMode && !dryRunMode) {
+  console.error('TOOLGAN_APPLY_REQUIRES_GOVERNED_MUTATION_RECEIPT');
+  console.error('This legacy wrapper is proposal-only; no shell command may be executed here.');
+  process.exit(2);
+}
+
 console.log(`\n═══ Tool-GAN Execution Wrapper (${dryRunMode ? 'DRY-RUN' : 'APPLY'}) ═══`);
 console.log(`Trace ID:  ${currentPlan.trace_id}`);
 console.log(`Tool Path: ${currentPlan.tool_path.join(' ➔ ')}`);
 
-let result = 'success';
-let failure_signature = null;
+// Nothing below this point ever actually runs `command` or `currentPlan.tool_path` -- it only
+// prints what WOULD run. `result` therefore stays null (not "success", not "failure") until a
+// real governed executor produces real proof; a plan carrying this marker is not admissible
+// evidence of anything having happened.
+const result = null;
+const failure_signature = null;
 let stdout = '';
-let executionTimeMs = 0;
 
 if (command) {
-  if (dryRunMode) {
-    console.log(`[DRY-RUN] Would run command: ${command}`);
-    stdout = `[DRY-RUN] Simulated execution of: ${command}`;
-    result = 'success';
-  } else {
-    console.log(`Running command: ${command}`);
-    const t0 = Date.now();
-    try {
-      stdout = execSync(command, { cwd: ROOT, encoding: 'utf8', stdio: 'pipe' });
-      executionTimeMs = Date.now() - t0;
-      console.log(`✓ Command completed successfully in ${executionTimeMs}ms`);
-    } catch (err) {
-      executionTimeMs = Date.now() - t0;
-      result = 'failure';
-      stdout = err.stdout + '\n' + err.stderr;
-      failure_signature = err.message.substring(0, 100);
-      console.error(`❌ Command failed: ${err.message}`);
-    }
-  }
+  console.log(`[NOT EXECUTED] Would run command: ${command}`);
+  stdout = `[NOT EXECUTED] Simulated (not run): ${command}`;
 } else {
-  console.log(`${dryRunMode ? '[DRY-RUN] ' : ''}Executing tool path: ${currentPlan.tool_path.join(', ')}`);
-  const t0 = Date.now();
+  console.log(`[NOT EXECUTED] Would run tool path: ${currentPlan.tool_path.join(', ')}`);
   for (const tool of currentPlan.tool_path) {
-    console.log(`  ➔ ${dryRunMode ? 'Simulating' : 'Executing'} step: ${tool}...`);
+    console.log(`  ➔ Simulating step (not run): ${tool}...`);
   }
-  executionTimeMs = Date.now() - t0;
-  result = 'success';
-  stdout = `Executed: ${currentPlan.tool_path.join(' -> ')}`;
+  stdout = `[NOT EXECUTED] Simulated (not run): ${currentPlan.tool_path.join(' -> ')}`;
 }
 
-// Update plan with execution results
+// Update plan with the (non-)execution marker. Never fabricate a do_not_repeat_key here --
+// that key is keyed on a real failure_signature, and this path never produces one.
 const updatedPlan = {
   ...currentPlan,
   result,
   failure_signature,
   commands: command ? [command] : [],
   proof: {
-    smoke: result === 'success' ? 'PASS' : 'FAIL',
+    smoke: 'NOT_EXECUTED',
     replay: 'PENDING',
     diff: ''
   }
 };
 
-// Recalculate do_not_repeat_key if failure occurred
-if (result === 'failure') {
-  updatedPlan.do_not_repeat_key = buildDoNotRepeatKey(
-    currentPlan.intent,
-    currentPlan.query,
-    currentPlan.selected_files,
-    currentPlan.tool_path,
-    failure_signature
-  );
-}
-
 writeFileSync(planPath, JSON.stringify(updatedPlan, null, 2));
 
-console.log(`\nResult: ${result}`);
-if (failure_signature) {
-  console.log(`Failure Signature: ${failure_signature}`);
-}
+console.log(`\nResult: NOT_EXECUTED (proposal-only; no command was actually run)`);
+console.log(stdout);

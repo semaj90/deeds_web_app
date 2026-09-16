@@ -45,9 +45,9 @@
 
 import pg        from 'pg';
 import Redis     from 'ioredis';
-import { writeFileSync, mkdirSync } from 'node:fs';
+import { writeFileSync, mkdirSync, renameSync, readFileSync } from 'node:fs';
 import path      from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const __dir = path.dirname(fileURLToPath(import.meta.url));
 const ROOT  = path.resolve(__dir, '../..');
@@ -58,6 +58,8 @@ const VERBOSE   = process.argv.includes('--verbose');
 const DRY_RUN   = !APPLY;
 const LIMIT_ARG = process.argv.find(a => a.startsWith('--limit='));
 const MAX_TRACES = LIMIT_ARG ? parseInt(LIMIT_ARG.split('=')[1], 10) : 10_000;
+const BRIDGE_ARG = process.argv.find(a => a.startsWith('--bridge='));
+const BRIDGE_PATH = BRIDGE_ARG ? path.resolve(ROOT, BRIDGE_ARG.slice('--bridge='.length)) : null;
 
 const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
 const REDIS_HOST   = process.env.REDIS_HOST   || '127.0.0.1';
@@ -67,6 +69,32 @@ const REDIS_PASS   = process.env.REDIS_PASSWORD || process.env.REDIS_PASS || 're
 const REPORT_DIR  = path.resolve(ROOT, 'docs/reports');
 const CSV_PATH    = path.resolve(REPORT_DIR, 'xgboost-features.csv');
 const META_PATH   = path.resolve(REPORT_DIR, 'xgboost-features-meta.json');
+
+async function loadBridgeForApply() {
+  if (!APPLY) return null;
+  if (!BRIDGE_PATH) {
+    throw new Error('XGBOOST_TRACE_LABEL_BRIDGE_REQUIRED');
+  }
+  let raw;
+  try {
+    raw = JSON.parse(readFileSync(BRIDGE_PATH, 'utf8'));
+  } catch (error) {
+    throw new Error(`XGBOOST_TRACE_LABEL_BRIDGE_READ_FAILED: ${error instanceof Error ? error.message : String(error)}`);
+  }
+  const modulePath = pathToFileURL(path.resolve(ROOT, 'packages/parent-atlas/dist/core/xgboost-trace-label-bridge.js')).href;
+  const { validateXgboostTraceLabelBridge } = await import(modulePath);
+  const bridge = validateXgboostTraceLabelBridge(raw);
+  if (bridge.entries.length === 0) {
+    throw new Error('XGBOOST_TRACE_LABEL_BRIDGE_EMPTY');
+  }
+  return bridge;
+}
+
+function writeJsonAtomic(filePath, value) {
+  const temporaryPath = `${filePath}.tmp-${process.pid}-${Date.now()}`;
+  writeFileSync(temporaryPath, JSON.stringify(value, null, 2), 'utf8');
+  renameSync(temporaryPath, filePath);
+}
 
 const OUTCOME_LABEL = { success: 1.0, partial: 0.4, failure: 0.0 };
 
@@ -120,6 +148,13 @@ function labelFromRef(ref) {
   return parts[1] ?? null;
 }
 
+function isSyntheticTrace(trace) {
+  if (trace.trace_source === 'synthetic_fixture') return true;
+  return (trace.retrieved_packets ?? []).some(
+    (ref) => typeof ref === 'string' && /^packet:[^:]+:\d+$/.test(ref),
+  );
+}
+
 // CSV escape
 function csv(v) {
   if (v === null || v === undefined) return '0';
@@ -144,6 +179,10 @@ const CSV_HEADER = [
 
 async function main() {
   console.log(`\n═══ XGBoost Feature Export ${DRY_RUN ? '(dry-run)' : '(APPLY)'} ═══\n`);
+
+  // Apply is intentionally impossible without an explicit, checksummed bridge.
+  // Dry-run remains useful for measuring the current mismatch without creating data.
+  const bridge = await loadBridgeForApply();
 
   const pool = new pg.Pool({ connectionString: DATABASE_URL, max: 3 });
 
@@ -170,7 +209,7 @@ async function main() {
     const { rows: traces } = await pool.query(`
       SELECT
         trace_id, outcome, score,
-        retrieved_packets, selected_concepts
+        retrieved_packets, selected_concepts, trace_source
       FROM agent_traces
       WHERE outcome IN ('success', 'partial', 'failure')
         AND retrieved_packets IS NOT NULL
@@ -179,12 +218,14 @@ async function main() {
       LIMIT $1
     `, [MAX_TRACES]);
 
-    console.log(`Traces loaded: ${traces.length}`);
+    const syntheticTraces = traces.filter(isSyntheticTrace);
+    const eligibleTraces = traces.filter((trace) => !isSyntheticTrace(trace));
+    console.log(`Traces loaded: ${traces.length} (${syntheticTraces.length} synthetic excluded, ${eligibleTraces.length} eligible)`);
 
     // ── 2. Build packet_key → packet lookup ─────────────────────────────────
     // Collect all referenced packet feature labels first
     const allLabels = new Set();
-    for (const t of traces) {
+    for (const t of eligibleTraces) {
       for (const ref of (t.retrieved_packets ?? [])) {
         const label = labelFromRef(ref);
         if (label) allLabels.add(label);
@@ -213,7 +254,12 @@ async function main() {
       if (!packetsByFeature.has(p.feature_id)) packetsByFeature.set(p.feature_id, []);
       packetsByFeature.get(p.feature_id).push(p);
     }
+    const unmatchedFeatureLabels = [...allLabels].filter((label) => !packetsByFeature.has(label));
     console.log(`Packets indexed: ${packets.length} across ${packetsByFeature.size} feature labels`);
+    if (unmatchedFeatureLabels.length > 0) {
+      console.log(`Unmatched trace packet labels: ${unmatchedFeatureLabels.length}/${allLabels.size}`);
+      console.log('Refusing to infer packet identity from label text; an explicit bridge is required.');
+    }
 
     // ── 3. Load Karpathy blend scores from Redis ───────────────────────────────
     const karpathyScores = new Map(); // source_ref → blend score
@@ -235,7 +281,7 @@ async function main() {
 
     // ── 4. Build per-packet hit count across all success traces ───────────────
     const packetHitCount = new Map(); // packet_key → count
-    for (const t of traces) {
+    for (const t of eligibleTraces) {
       if (OUTCOME_LABEL[t.outcome] === 0) continue;
       for (const ref of (t.retrieved_packets ?? [])) {
         const label = labelFromRef(ref);
@@ -251,7 +297,7 @@ async function main() {
     const rows = [];
     let zeroLabelRows = 0;
 
-    for (const trace of traces) {
+    for (const trace of eligibleTraces) {
       const baseLabel    = OUTCOME_LABEL[trace.outcome] ?? 0;
       const traceScore   = Number(trace.score ?? 0);
       const traceConcepts = trace.selected_concepts ?? [];
@@ -395,12 +441,23 @@ async function main() {
       generated: new Date().toISOString(),
       mode: APPLY ? 'apply' : 'dry-run',
       traces_loaded: traces.length,
+      synthetic_traces_excluded: syntheticTraces.length,
+      eligible_traces: eligibleTraces.length,
       total_rows: rows.length,
       positive_rows: positiveRows,
       zero_label_rows: zeroLabelRows,
       distinct_features: distinctFeatures,
       completeness_pct: parseFloat((completenessPct * 100).toFixed(1)),
       karpathy_scores_loaded: karpathyScores.size,
+      packet_reference_join: {
+        trace_feature_labels: allLabels.size,
+        exact_feature_labels_matched: packetsByFeature.size,
+        unmatched_feature_labels: unmatchedFeatureLabels.length,
+        packet_key_inference_performed: false,
+        bridge_supplied: bridge !== null,
+        bridge_path: BRIDGE_PATH,
+        bridge_entries: bridge?.entries.length ?? 0,
+      },
       gates,
       feature_schema: CSV_HEADER.split(','),
       training_command_policy:  `python scripts/atlas/train-policy-reranker.py`,
@@ -411,7 +468,7 @@ async function main() {
     if (DRY_RUN) {
       console.log('\n(dry-run — CSV not written; run with --apply to write)');
       mkdirSync(REPORT_DIR, { recursive: true });
-      writeFileSync(META_PATH, JSON.stringify(meta, null, 2));
+      writeJsonAtomic(META_PATH, meta);
       console.log(`Meta: ${META_PATH}`);
       return;
     }
@@ -437,7 +494,7 @@ async function main() {
     }
 
     writeFileSync(CSV_PATH, lines.join('\n'), 'utf8');
-    writeFileSync(META_PATH, JSON.stringify(meta, null, 2));
+    writeJsonAtomic(META_PATH, meta);
 
     const csvSizeKB = Math.round(lines.join('\n').length / 1024);
     console.log(`CSV written: ${CSV_PATH} (${rows.length.toLocaleString()} rows, ~${csvSizeKB} KB)`);

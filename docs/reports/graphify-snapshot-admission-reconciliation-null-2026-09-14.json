@@ -1,0 +1,11 @@
+{
+  "schema": "atlas.graphify-snapshot-admission-reconciliation.null.v1",
+  "status": "NULL_LEDGER_WRITE_BLOCKED",
+  "value": null,
+  "attempts": 3,
+  "target": "scripts/atlas/audit-graphify-workspace-snapshot-binding-v1.mts",
+  "reason": "Concurrent file-write lock prevented completion of the explicit admission-snapshot mismatch classification.",
+  "writesPerformed": false,
+  "datastoreWritesPerformed": false,
+  "nextGate": "GRAPHIFY-SNAPSHOT-ADMISSION-RECONCILIATION-01"
+}
