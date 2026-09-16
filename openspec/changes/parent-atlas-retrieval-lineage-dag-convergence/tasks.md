@@ -14820,3 +14820,58 @@ gate, but should probably be sequenced after (or alongside a decision about) the
 single-owner-chain `BLOCKED` finding above, since re-materializing chunk ownership from an
 admission receipt whose own upstream chain is checksum-inconsistent risks compounding the
 problem rather than resolving it.
+
+### Root-caused the two `hygienePass` blockers (2026-09-16, same session, continued)
+
+Read `blockers`/`firstBlockingInvariant` directly off `canonical-source-inventory-hygiene-v1.json`
+instead of only trusting the aggregate `SOURCE_INVENTORY_HYGIENE_BLOCKED` status. Two real,
+independent, root-caused blockers — neither fixed here, both explained precisely:
+
+**1. `SNAPSHOT_BYTES_READBACK_NOT_PROVEN`.** Instrumented `validateSnapshot()` directly (temp
+diagnostic: `scripts/atlas/diag-snapshot-readback-v1.mts`, kept — read-only, no writes) against
+the sealed snapshot the current admission is built on
+(`workspace-source-snapshots/6288726b7362...json`, sealed 2026-09-15). Result:
+
+```
+sourceCount: 25542, exactMatches: 25239 (98.8%)
+violationCounts: { SOURCE_BYTES_CHANGED: 295, SOURCE_FILE_MISSING: 8 }
+```
+
+**Benign, expected drift, not a data-integrity bug**: most of the 295 changed files are this very
+session's own edits — `openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md`,
+`parent-atlas-ontology-kernel/tasks.md`, `docs/.okf/schema.yaml`,
+`docs/parent-atlas-workstation-todo.md`, several other `openspec/changes/*/tasks.md` — plus 8
+genuinely deleted files (`openspec/changes/workflow-action-schema-owner-01/*`, an archived
+change). **Real implication for Gate 2+, not a bug to fix**: the currently-admitted workspace
+revision (`sha256:e24bb97187...`) is built on a snapshot that is already measurably stale
+relative to the live tree, one day after it was sealed, precisely because active work (including
+this gate-closure work itself) keeps mutating tracked files. A snapshot-seal-then-admit workflow
+has an inherent staleness half-life; re-sealing immediately before any Gate 2 chunk-materialization
+run (not before this diagnostic) is the correct mitigation, not treated as urgent here.
+
+**2. `PACKET_WRITER_DOES_NOT_USE_SHARED_EXCLUSION_POLICY`.** Real, verified: `scripts/atlas/
+upsert-whole-codebase-atlas-packets.mjs` has its own hand-rolled `EXCLUDE_PATTERNS` array (22
+entries, built via `rg --files -uuu --glob=!<pattern>`) — a completely separate policy from the
+just-recovered `scripts/atlas/lib/whole-codebase-source-exclusions.mjs`
+(`WHOLE_CODEBASE_EXCLUDE_GLOBS`, 30 `**/x/**`-style globs). **This is a real Duplication
+Prevention finding, and it cuts both ways — neither list is a strict superset of the other**:
+
+| In shared policy, missing from writer | In writer, missing from shared policy |
+|---|---|
+| `.next`, `python311` (no-dot variant), `.worktrees`/`worktrees`, `workspace-source-snapshots`, `archive-copy`/`archive-copy-old`, `generated`/`.generated`, bare `backup`/`backups` | `qdrant-windows` (a live Qdrant RocksDB/WAL storage dir — its own 2026-09-13 incident comment: 190 rows of LOCK/CURRENT/MANIFEST/WAL files were being packetized as "source" before this exclusion was added), `.svelte-error-fixes-backup` (specific) |
+
+The writer's own in-code comments document two independent incident-driven fixes on the same day
+(2026-09-13) that produced these two lists — they diverged from the start, not through later
+drift. **Do not swap the writer onto the shared policy verbatim** — that would silently
+reintroduce the `qdrant-windows` incident (190 junk rows). The correct fix, not done here, is a
+**merge** of both lists into the shared module (adding `qdrant-windows` and
+`.svelte-error-fixes-backup` to `WHOLE_CODEBASE_EXCLUDE_GLOBS`), then pointing the writer at the
+merged shared module — in that order, verified against both incident write-ups before either
+list is touched.
+
+**Neither finding blocks Gate 1's `STALE_WORKSPACE_PROJECTION` verdict** — both are upstream
+data-hygiene observations about the admission receipt's foundation, not about the 52-row cohort
+comparison itself, which was independently re-verified above through the authoritative selector.
+Recorded here, not fixed: this is exactly the kind of "found but out of scope to resolve
+immediately" finding this repo's Duplication Prevention rule requires writing down rather than
+silently deferring.
