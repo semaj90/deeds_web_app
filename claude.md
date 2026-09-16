@@ -1052,26 +1052,57 @@ real: `SampleQueryMatrixV1`, squared-L2/length-square sampling, explicitly gated
 never a retrieval vote or identity authority) — architecturally identical to this file's own
 existing governance pattern below.
 
-**Two targeted `find`s for the current working tree came back empty** for `*sample-query-matrix*`
-and `low_rank.py` — so as of 2026-09-15 these specific files are not in the current checkout
-(possibly another branch/worktree, possibly renamed, possibly reverted). **Not yet confirmed**:
-whether the mechanism survives under a different filename in the current tree (a full
-mechanism-keyword `rg` sweep — `length.?square|squared.?l2|low.?rank|randomized.?svd|
-quantum.?inspired|leverage.?sampl` — was not completed before this note was written; do that
-before concluding either "still absent" or "found it").
+**CORRECTION, same day, a few hours later — the "two targeted `find`s came back empty" claim above
+was itself wrong.** Those `find`s were run scoped wrong (or against a stale snapshot) — a direct
+`Read`/`git ls-files`/`git log -- <path>` check on the real working tree shows **all three files
+exist right now, on `main`, tracked, non-empty, real**:
 
-**Rule going forward, generalizing beyond this one case**: when auditing whether a described
-algorithm/paper-inspired technique exists in this repo, search for the *mechanism* (its actual
-technical vocabulary: sampling method, math operation, data structure) in addition to any person's
-name attached to it in conversation. A person's name is often how *humans* refer to a technique in
-speech, not how the *code* names it. Check `git log --all` (not just the working tree) before
-declaring something "never built" — this repo has lost real code to branch/worktree churn before
-(see this file's own git-worktree and archive-not-delete sections).
+```
+python/atlas_compute/low_rank.py                                                    267 lines
+sveltekit-frontend/src/lib/server/atlas/sampling/sample-query-matrix-v1.ts            58 lines
+sveltekit-frontend/src/lib/server/atlas/sampling/sample-query-matrix-v1.spec.ts       17 lines
+```
 
-**Next step, not yet done**: run the full mechanism-keyword sweep above, then
-`TANG-LOW-RANK-OWNER-CENSUS-01` (see `openspec/changes/parent-atlas-agentic-repair-fabric/
-tasks.md`, AR-10 section) before building any new low-rank/sampling recommender — there is real
-prior art to either recover or explicitly supersede, not a clean slate.
+**`TANG-LOW-RANK-OWNER-CENSUS-01` — COMPLETE, run for real (2026-09-15)**:
+
+| Field | Finding |
+|---|---|
+| `literalNameHits` | 0 in current tree (outside `.tmp/`/`deeds_labs/archive/` snapshots) — the person's name is still never used in code |
+| `mechanismHits` | 3 current files (above) + the git-log commit trail already cited |
+| `currentFiles` | present, tracked, non-empty, on `main` |
+| `historicalFiles` | same files, same content lineage — no divergence between historical and current |
+| `currentCallers` | **Real.** `recommendation-evidence-bundle-v1.ts:3` imports `SampleQueryMatrixV1Schema` and embeds it as a nullable `sample` field in `RecommendationEvidenceBundle`. `python/prove_atlas_compute.py:30` imports `compare_low_rank_recommendations` from `atlas_compute.low_rank` as a CLI proof-receipt generator (`--low-rank` flag). Neither is a retrieval hot path. |
+| `tests` | Real: `sample-query-matrix-v1.spec.ts` (2 passing-shaped assertions: length-squared probability computation, row-L2 degeneracy detection) |
+| `receipts` | `LowRankComparisonReceipt` / `CandidateShortlistReceipt` (Python, `schema: "atlas.low-rank-comparison-receipt.v1"` / `"atlas.candidate-shortlist-receipt.v1"`, both `canonical_authority: False`); `SamplingDecisionV1` (TS, `canonicalIdentityAuthority: false`, `retrievalVoteAdded: false`) |
+| `productionCaller` | No — challenger/evidence-bundle-only, explicitly gated non-canonical in both languages |
+| `canonicalAuthority` | `false` everywhere it appears — by design, not by omission |
+| `retrievalVoteAdded` | `false` everywhere it appears |
+
+**Verdict: this machinery is real, current, tested, and already correctly classified as
+`EXPERIMENT`/challenger evidence — not dead, not missing, not something to rebuild.** The Sep 15
+"empty find" note above was a false negative from a bad search, not a true absence. Treat this
+file's own §"Duplication Prevention" rule as satisfied for this capability going forward: do not
+build a second low-rank/length-squared-sampling module — this is the one, and it already declines
+canonical authority correctly.
+
+**Separate finding — a stale, more-advanced unmerged branch exists and should NOT be silently
+merged**: `origin/agent/sample-query-matrix-ewintang-20260822` (fetched and diffed against `main`,
+2026-09-15) is NOT an ancestor of `main` and diverges heavily overall (~311KB whole-repo diff, dated
+2026-08-22, predates roughly three weeks of unrelated main-branch churn) — merging it wholesale
+would be reckless and is explicitly NOT done here. But its versions of these 3 files are a real,
+more mature evolution: revision/checksum-qualified (`workspaceRevision`, `sourceMatrixRevision`,
+`sourceMatrixChecksum`), integrates with the real canonical `candidateOrdinalMapV1Schema`
+(`features/canonical-candidate-v1.ts`, confirmed present on `main`), and adds a
+`samplingEvaluationV1Schema` (measures length-squared vs. uniform vs. top-k-row-norm recall — an
+actual evaluation harness, `main` has no equivalent). It also **renames** several fields
+(`canonicalIdentityAuthority`→`identityAuthority`, `retrievalVoteAdded`→`retrievalVoteProduced`,
+adds `canonicalWritesAttempted`/`producerRevision`) and restructures `rows` — a breaking contract
+change relative to `main`'s current shape, which `recommendation-evidence-bundle-v1.ts` already
+depends on by the old names. **This is a real architecture decision (port the improved contract
+forward vs. leave the branch superseded), not a mechanical sync — flagged for the operator, not
+resolved unilaterally.** Cherry-picking just these 3 files' content (not merging the branch) is the
+bounded path if the operator wants the improved version; do not attempt it without confirming every
+other caller of the old field names first.
 
 ### One Canonical Runtime Owner Per Capability (governance layer, Aug 9 2026)
 

@@ -64,7 +64,7 @@
       the adapter is ready to be called, but nothing calls it yet.
 ## 8. AR-08 — HyperGraphRAG n-ary action expansion (NOT DONE)
 ## 9. AR-09 — CandidateFeatureMatrix action features (NOT DONE)
-## 10. AR-10 — Tang low-rank recommendation challenger scaffold (CORRECTED, CENSUS PENDING —
+## 10. AR-10 — Tang low-rank recommendation challenger scaffold (CENSUS COMPLETE, REAL/LIVE —
       see also claude.md's "Correction: Ewin Tang recommendation" note)
 
 - [x] 10.1 **Corrected an earlier same-session finding.** "Ewin Tang's recommendation algorithm
@@ -80,18 +80,48 @@
       (`SampleQueryMatrixV1`, squared-L2/length-square sampling) existed, gated
       `canonicalIdentityAuthority: false`/`retrievalVoteAdded: false` — exactly the challenger-
       only pattern this gate's own design already called for.
-- [x] 10.2 **Partial census run, not complete.** Two targeted `find`s for the current working
-      tree (`*sample-query-matrix*`, `low_rank.py`) returned **zero matches** — these specific
-      files are not in the current checkout (branch/worktree/rename status unconfirmed). **Not
-      yet run**: the full mechanism-keyword `rg` sweep (`length.?square|squared.?l2|low.?rank|
-      randomized.?svd|quantum.?inspired|leverage.?sampl`) across the whole repo, or a check of
-      whether other branches/worktrees on this machine still have these files checked out.
-- [ ] 10.3 **`TANG-LOW-RANK-OWNER-CENSUS-01` — not run yet.** Required before building any new
-      recommender: `literalNameHits`, `mechanismHits`, `currentFiles`, `historicalFiles`,
-      `currentCallers`, `tests`, `receipts`, `productionCaller`, `canonicalAuthority`,
-      `retrievalVoteAdded`. **Do not build a new low-rank/sampling recommender until this runs**
-      — real prior art may exist to recover (e.g. `git show <commit>:path` from the commits in
-      10.1) rather than reimplement from scratch.
+- [x] 10.2 **The "empty find" note in 10.2 (prior revision) was ITSELF WRONG — corrected same
+      day.** Two `find`s for `*sample-query-matrix*`/`low_rank.py` had been reported empty; a
+      direct `Read`/`git ls-files`/`git log -- <path>` check shows all three files exist on
+      `main` right now: `python/atlas_compute/low_rank.py` (267 lines),
+      `sveltekit-frontend/src/lib/server/atlas/sampling/sample-query-matrix-v1.ts` (58 lines),
+      `sample-query-matrix-v1.spec.ts` (17 lines). The `find`s were run wrong, not the files
+      absent.
+- [x] 10.3 **`TANG-LOW-RANK-OWNER-CENSUS-01` — COMPLETE, run for real (2026-09-15).**
+      - `literalNameHits`: 0 in current tree (name never appears in code, by design)
+      - `mechanismHits`: the 3 current files above + the git-log commit trail from 10.1
+      - `currentFiles` / `historicalFiles`: identical — present, tracked, no divergence
+      - `currentCallers`: **real**. `recommendation-evidence-bundle-v1.ts:3` imports
+        `SampleQueryMatrixV1Schema`, embeds as nullable `sample` field in
+        `RecommendationEvidenceBundle`. `python/prove_atlas_compute.py:30` imports
+        `compare_low_rank_recommendations` as a CLI proof-receipt generator (`--low-rank` flag).
+        Neither is a retrieval hot path.
+      - `tests`: real — `sample-query-matrix-v1.spec.ts`, 2 assertions (length-squared
+        probability computation, row-L2 degeneracy detection)
+      - `receipts`: `LowRankComparisonReceipt`/`CandidateShortlistReceipt` (Python,
+        `canonical_authority: False`), `SamplingDecisionV1` (TS, `canonicalIdentityAuthority:
+        false`, `retrievalVoteAdded: false`)
+      - `productionCaller`: no — challenger/evidence-bundle-only
+      - `canonicalAuthority` / `retrievalVoteAdded`: `false` everywhere, by design
+      - **Verdict: real, current, tested, correctly classified as `EXPERIMENT`/challenger
+        evidence. Do not build a second low-rank/length-squared-sampling module — this is the
+        one, and it already declines canonical authority correctly.**
+- [x] 10.4 **Separate finding: a stale, more-advanced unmerged branch exists — flagged, NOT
+      merged.** `origin/agent/sample-query-matrix-ewintang-20260822` (fetched + diffed vs `main`,
+      2026-09-15): NOT an ancestor of `main`, diverges heavily overall (~311KB whole-repo diff,
+      dated 2026-08-22, predates ~3 weeks of unrelated `main` churn) — merging it wholesale would
+      be reckless, not attempted. But its versions of these 3 files are a real, more mature
+      evolution: revision/checksum-qualified (`workspaceRevision`, `sourceMatrixRevision`,
+      `sourceMatrixChecksum`), integrates with the real canonical `candidateOrdinalMapV1Schema`
+      (`features/canonical-candidate-v1.ts`, confirmed present on `main`), and adds a
+      `samplingEvaluationV1Schema` (length-squared vs. uniform vs. top-k-row-norm recall
+      measurement — `main` has no equivalent). It also **renames** fields
+      (`canonicalIdentityAuthority`→`identityAuthority`, `retrievalVoteAdded`→
+      `retrievalVoteProduced`, adds `canonicalWritesAttempted`/`producerRevision`) and
+      restructures `rows` — a breaking contract change relative to `main`'s current shape, which
+      `recommendation-evidence-bundle-v1.ts` already depends on by the old names. **Real
+      architecture decision (port forward vs. leave superseded) — flagged for the operator, not
+      resolved here.**
 ## 11. AR-11 — DSPy program/eval snapshot contract (NOT DONE)
 ## 12. AR-12 — GEPA offline optimization harness scaffold (NOT DONE)
 ## 13. AR-13 — Agentic DAG synthesis (PARTIALLY BUILT, DORMANT — see section 18.3:
