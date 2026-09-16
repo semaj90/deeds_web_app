@@ -224,11 +224,28 @@ archive-not-delete convention, then the column was removed. Do not reintroduce a
 do not cite `gpu:warden:cache:384d:*` Redis keys as live — they predate the drop.
 
 **Autoencoder latent lanes are a separate mechanism from MRL truncation** — a trained encoder
-projection, not a vector prefix — and currently only `latent_256` is real and populated
-(`codebase_chunk_index.latent_256` + Qdrant `codebase_chunks_latent256`, 1:1 with the 768 corpus).
-`latent_64` is schema-only (column exists, zero rows — the autoencoder producing it is untrained).
-`latent_128` does not exist anywhere in this repo (no column, no Qdrant collection) — treat any
-reference to it as a planned/future lane, not a built one, until it's actually verified live.
+projection, not a vector prefix. Corrected 2026-09-16 (via
+`parent-atlas-error-embedding-768-migration` task 7.1/7.2) — the "zero rows"/"does not exist" claims
+below were stale, verified live against Postgres and Qdrant directly, not assumed:
+
+- **`latent_256`**: real and populated — `codebase_chunk_index.latent_256` (55,169 rows) + Qdrant
+  `codebase_chunks_latent256`, 1:1 with the 768 corpus. Unchanged from the prior note.
+- **`latent_64`**: **no longer schema-only.** `codebase_chunk_index.latent_64` now has **1,703**
+  populated rows (verified live `count(latent_64)`, 2026-09-16) — the autoencoder producing it has
+  been run against at least this many rows, contradicting the old "untrained, zero rows" framing.
+  No Qdrant `codebase_chunks_latent64` collection exists yet (verified live via `GET /collections`)
+  — this lane is Postgres-only so far, not yet mirrored to Qdrant.
+- **`latent_128`**: **exists and is substantially populated**, not absent. `codebase_chunk_index`
+  has a real `latent_128` column (halfvec(128)) with **55,169** populated rows — a full match to
+  `latent_256`'s population, derived via a deterministic `SLICE_FIRST_N` + L2-renormalize of
+  `latent_256` (not a new training run, not MRL truncation of the raw 768d vector — see
+  `sveltekit-frontend/drizzle/manual/20260912_latent_128_columns.sql`'s own header comment for the
+  exact distinction). Its `atlas_representation_registry_v3` promotion (`CANDIDATE`→`VERIFIED`) was
+  explicitly, deliberately skipped by that migration's author — the column and data are real, the
+  registry bookkeeping is not. No Qdrant `codebase_chunks_latent128` collection exists yet (verified
+  live) — also Postgres-only so far. A parallel `error_embedding_latent_128` column exists too
+  (error-fixing lane, distinct from this content-embedding lane), currently populated only at
+  smoke-test scale (20 rows) — see that openspec change for the honest partial-completion detail.
 
 **PRIMARY EMBEDDING MODEL**: `embeddinggemma:latest` (768-dim)
 - **Canonical storage**: Qdrant — **two 768-dim collections currently coexist**,
@@ -291,10 +308,15 @@ referenced elsewhere in this doc, since claims about them hadn't been verified a
 - **latent_256** (`codebase_chunk_index.latent_256` halfvec(256) + Qdrant `codebase_chunks_latent256`):
   real and fully live — 55,169 rows/points, a 1:1 match with the 768 corpus.
 - **latent_64** (`codebase_chunk_index.latent_64` vector(64) + would-be Qdrant `codebase_chunks_latent64`):
-  column exists but **zero rows populated**; the Qdrant collection doesn't exist. Schema-only,
-  matches this doc's own note elsewhere that the autoencoder producing it is untrained.
-- **latent_128**: no column, no Qdrant collection — does not exist anywhere in this repo. Any future
-  reference to a "latent128" lane is speculative/planned, not built — verify before citing it as real.
+  at the time of this 2026-08-30 check, zero rows populated, Qdrant collection absent, schema-only.
+  **Superseded 2026-09-16**: now has 1,703 populated rows (verified live) — the autoencoder has
+  since been run against real data; the Qdrant collection is still absent. See the corrected note
+  in this section's earlier "Autoencoder latent lanes" paragraph for current detail.
+- **latent_128**: at the time of this 2026-08-30 check, genuinely absent (no column, no Qdrant
+  collection). **Superseded 2026-09-16**: the column now exists (`halfvec(128)`) with 55,169
+  populated rows, added via `sveltekit-frontend/drizzle/manual/20260912_latent_128_columns.sql` —
+  this 2026-08-30 note's "does not exist anywhere in this repo" is no longer accurate. Qdrant
+  mirror still absent. See the corrected note earlier in this section for current detail.
 - **Dropped `codebase_chunk_index.content_embedding_384` (legacy vector(384))**: verified zero rows
   had 384-only data with no corresponding 768 vector (no data loss), archived all 52,380 populated
   rows to `deeds_labs/archive/2026-08-30/content_embedding_384_backup.csv` per this repo's
