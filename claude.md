@@ -1036,6 +1036,43 @@ plausible "the codebase probably already does this somewhere" smell):
 (PageRank/projection findings above), `openspec/changes/parent-atlas-nlp-sidecar-feature-compiler/`
 (reranker audit + ACP registration, tasks.md sections 6 and 11).
 
+### Correction: "Ewin Tang recommendation" — literal-name search is not proof of absence (Sep 15 2026)
+
+A same-day audit concluded "Ewin Tang's recommendation algorithm doesn't exist anywhere in this
+repo" from `rg -ni --hidden --no-ignore "ewin tang"` returning zero hits. **That conclusion was
+wrong, or at least premature** — a literal-name search proves the *name* isn't used, not that the
+*mechanism* was never built. Real, mechanism-named implementation was found once actually checked:
+`git log --all --oneline` for `python/atlas_compute/low_rank.py` and
+`**/sample-query-matrix-v1.ts` returns real commits — `feat(atlas): add low-rank and Tang-inspired
+comparison receipts`, `feat(atlas): add sample query matrix and length squared sampler`,
+`feat(atlas): prove semantic low-rank parity lineage`, `Repair SampleQueryMatrixV1 merge
+corruption` — plus a whole branch, `agent/ast-xgb-tang-alignment-20260822`. This machinery was
+real: `SampleQueryMatrixV1`, squared-L2/length-square sampling, explicitly gated
+`canonicalIdentityAuthority: false` / `retrievalVoteAdded: false` (challenger/shortlist only,
+never a retrieval vote or identity authority) — architecturally identical to this file's own
+existing governance pattern below.
+
+**Two targeted `find`s for the current working tree came back empty** for `*sample-query-matrix*`
+and `low_rank.py` — so as of 2026-09-15 these specific files are not in the current checkout
+(possibly another branch/worktree, possibly renamed, possibly reverted). **Not yet confirmed**:
+whether the mechanism survives under a different filename in the current tree (a full
+mechanism-keyword `rg` sweep — `length.?square|squared.?l2|low.?rank|randomized.?svd|
+quantum.?inspired|leverage.?sampl` — was not completed before this note was written; do that
+before concluding either "still absent" or "found it").
+
+**Rule going forward, generalizing beyond this one case**: when auditing whether a described
+algorithm/paper-inspired technique exists in this repo, search for the *mechanism* (its actual
+technical vocabulary: sampling method, math operation, data structure) in addition to any person's
+name attached to it in conversation. A person's name is often how *humans* refer to a technique in
+speech, not how the *code* names it. Check `git log --all` (not just the working tree) before
+declaring something "never built" — this repo has lost real code to branch/worktree churn before
+(see this file's own git-worktree and archive-not-delete sections).
+
+**Next step, not yet done**: run the full mechanism-keyword sweep above, then
+`TANG-LOW-RANK-OWNER-CENSUS-01` (see `openspec/changes/parent-atlas-agentic-repair-fabric/
+tasks.md`, AR-10 section) before building any new low-rank/sampling recommender — there is real
+prior art to either recover or explicitly supersede, not a clean slate.
+
 ### One Canonical Runtime Owner Per Capability (governance layer, Aug 9 2026)
 
 The 6 rules above are the discipline an agent follows in the moment. This section is the
@@ -1111,6 +1148,34 @@ across a multi-phase proof sequence. **Lesson for future probes**: in WSL2, `whi
 `python3 -c "import X"` from a non-interactive shell is NOT evidence an environment is absent —
 invoke the target env's Python by its absolute path (`/home/james/miniforge3/envs/<env>/bin/python`)
 or explicitly `source /home/james/miniforge3/etc/profile.d/conda.sh && conda activate <env>` first.
+
+**Separate cuTile/SIMT challenger found (2026-09-14):** the earlier cuTile proof environment still
+exists at `/home/james/.venvs/atlas-cutile-cu132`; it is not a Miniforge environment and is not part
+of `atlas-rapids-cu13`. Direct WSL2 probing reports PyTorch `2.14.0+cu132`, CUDA `13.2`, cuTile
+`1.5.0`, Tile compiler `13.2.78`, and the RTX 3060 Ti (`sm_86`). The read-only vector-add and
+FP16 GEMM probes pass with finite output; the GEMM receipt reports zero absolute and relative
+delta against the PyTorch result. Use `/home/james/.venvs/atlas-cutile-cu132/bin/python` for
+cuTile/SIMT probes and `/home/james/miniforge3/envs/atlas-rapids-cu13/bin/python` for RAPIDS/cuVS/
+cuGraph work. Do not merge the environments or add cuTile to Docker 8098 without a separate ABI,
+memory, and reproducibility decision. These are challenger proofs, not canonical representation or
+production decoder promotion.
+
+**Ampere 8 GiB memory alignment (verified 2026-09-14):** the RTX 3060 Ti is compute capability
+`8.6`. Keep the proven WSL2 RAPIDS environment (`/home/james/miniforge3/envs/atlas-rapids-cu13`)
+on the existing 26.06 stack and keep cuTile/SIMT in the separate
+`/home/james/.venvs/atlas-cutile-cu132` venv. Do not load cuDF/cuGraph/cuVS, cuTile, and a large
+decoder concurrently on this 8 GiB device. Start with bounded fixtures, FP16/BF16 where the
+operation has a parity receipt, FP32 accumulation for reductions, and matrix dimensions divisible
+by 8. Preserve explicit host/device ownership and release temporary tensors between stages.
+
+For RAPIDS, use RMM as the common allocator and set a deliberately capped pool only inside a
+measured worker; do not accept the library default of reserving half or all available VRAM when
+other CUDA consumers share the device. For PyTorch fragmentation, test
+`PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True` per process and record allocated/reserved/free
+bytes before and after each fixture. These are operational tuning options, not identity or
+promotion evidence. NVIDIA documents cuTile Python support for Ampere in the CUDA 13.2 line,
+while RAPIDS documents RMM pool/async allocation and third-party allocator hooks; use those
+references when re-running the isolated challenger, without changing the canonical semantic lane.
 
 **`GPU-MINI-FABRIC-01`** (full roadmap in `openspec/changes/parent-atlas-gpu-mini-fabric-01/`) is a
 small, synthetic, frozen-fixture GPU proving ground built specifically so that no phase — exact vs
@@ -1368,6 +1433,225 @@ non-gating. **CUB-vs-CPU half is `DRY_RUN_PROVEN`** (see result above); cuTile h
 **See**: `sveltekit-frontend/openspec/changes/parent-atlas-ace-radix-residency/` (proposal.md,
 design.md, specs/, tasks.md — 25/26 tasks done, `openspec validate --strict` passes),
 `docs/reports/ace-radix-01-results.json` (the live benchmark result).
+
+### CUTILE-ACE-01 LEVEL 2 real result: both kernels exact-match their CPU oracles (2026-09-14)
+
+`CUTILE-ACE-01`'s LEVEL 3 fused cuTile challenger was gated behind LEVEL 1 (`ACE-RADIX-01`'s CUB
+oracle, already `DRY_RUN_PROVEN`) AND "LEVEL 2 simple custom CUDA glyph-score + residency-key-pack
+kernels," which had never been built. `parent-atlas-cutile-ace-level2` built and proved both:
+
+- **`GlyphScoreV1`** — a brand-new pure-integer scoring formula over `PacketGlyphV1` fields
+  (`pagerankQuantized×4 + recency×3 + residency×257×2 + lod×257×1 + popcount(featureBits)×50 +
+  popcount(flags)×50`), deliberately excluding `somCell` (never retrieval truth) and
+  `projectionOrdinal` (non-canonical GPU-local coordinate) as scoring inputs. No prior formula
+  existed anywhere in this repo for this — verified via `rg` before designing it. CPU oracle:
+  `scripts/atlas/ace-radix-01/glyph-score-v1.mjs` (8 unit tests, all passing, including a
+  hand-computed spot check and both field-exclusion isolation tests).
+- **`ResidencySortKeyV1` GPU packing** — not a new formula: computes the SAME
+  `(tier<<56)|(lod<<48)|(utilityBucket<<40)|(recencyBucket<<32)|projectionOrdinal` packing
+  `scripts/atlas/ace-radix-01/fixture-v1.mjs` already computes on CPU for `ACE-RADIX-01`'s
+  fixtures, just from raw glyph fields on GPU instead of pre-packed input.
+
+**Result: `DRY_RUN_PROVEN`** — both kernels (`native/cutile-ace-level2/glyph_kernels_bench.cu`)
+exactly matched their CPU oracles at all 3 tested fixture sizes (256, 1000, 4000), real runs on
+this host's RTX 3060 Ti, CUDA 13.0, sm_86: `docs/reports/cutile-ace-level2-results.json`. **LEVEL 1
++ LEVEL 2 are both now proven** (`cutile_ace_01_level3_unblocked: true` in that report), but LEVEL
+3 itself was NOT attempted — it still requires a CUDA 13.2+ host with a real cuTile programming API
+(`ACE-RADIX-01`'s own prior finding: this dev host's native Windows CUDA 13.0 toolkit only ships a
+compiler-intrinsic stub, `crt/cuda_tile.h`). "Unblocked" means the prerequisite proofs are done, not
+that LEVEL 3 has been run or would necessarily pass — do not cite this as LEVEL 3 being complete.
+
+**See**: `sveltekit-frontend/openspec/changes/archive/2026-09-14-parent-atlas-cutile-ace-level2/`
+(proposal.md, design.md, specs/, tasks.md), `docs/reports/cutile-ace-level2-results.json`,
+`native/cutile-ace-level2/glyph_kernels_bench.cu`,
+`scripts/atlas/ace-radix-01/glyph-score-v1.mjs`.
+
+### CUTILE-ACE-01 LEVEL 3 real result: DRY_RUN_PROVEN via the Python cuda.tile API, after a genuine C++ toolchain dead end (2026-09-14, same day)
+
+LEVEL 3 (the fused cuTile challenger) WAS attempted this same day, in two stages, both worth
+knowing about — a real dead end, then a real pass.
+
+**Stage 1 — C++ `cuda_tile.h` attempt: `BLOCKED_TOOLCHAIN_VERSION_SKEW`, not attempted-and-passed.**
+WSL2's `atlas-rapids-cu13` conda env genuinely ships a real 4064-line `cuda::tiles` C++20 API
+(confirmed live, not a stub) — but that alone does not mean WSL2 can compile cuTile device code.
+The fused kernel (`native/cutile-ace-level3/glyph_fused_tile.cu`) compiles with **zero C++ frontend
+errors** after finding and fixing 6 real API-usage errors via actual compiler diagnostics
+(`__tile_global__` vs `__global__`, `cuda::tiles::bid()` vs `blockIdx`, no `popcount` builtin,
+tile-code cannot call plain `__device__`/`__host__` helper functions, `constexpr` vs `__device__
+__constant__`) — but device-code generation is blocked by a genuine cross-version toolchain skew:
+the only `tileiras` Tile-IR backend compiler anywhere on this WSL2 filesystem is CUDA 13.2 (from
+the separate `atlas-cutile-cu132` pip venv), while the header/frontend is CUDA 13.3. Root-caused
+past a simple CLI-flag mismatch (`-arch=sm_86` vs the correct `--gpu-name=sm_86`) all the way to
+the `.tilebc` intermediate bytecode itself: CUDA 13.3's `cicc` encodes the target architecture in a
+form ("86") that CUDA 13.2's `tileiras` rejects outright, even though `sm_86` is confirmed present
+in that `tileiras`' own embedded architecture table. Full trail:
+`docs/reports/cutile-ace-level3-attempt-v1.json`,
+`sveltekit-frontend/openspec/changes/archive/2026-09-14-parent-atlas-cutile-ace-level3/`.
+
+**Stage 2 — Python `cuda.tile` API: `DRY_RUN_PROVEN`.** Before attempting to install a
+matched-version `tileiras`, checked whether `atlas-cutile-cu132`'s venv already had a coherent
+alternative — it does: a real, documented Python package (`cuda_tile==1.5.0`, decorator-based
+`@ct.kernel`/`ct.launch` API, `help()`-documented unlike the C++ header). **Correction (same-day
+external review, applied precisely — this is a distinct programming model, not merely a different
+frontend to the same one)**: `cuda.tile` is the **CUDA Tile programming model**; LEVEL 2's
+`glyph_kernels_bench.cu` is the **SIMT programming model**. NVIDIA treats these as distinct
+execution spaces — Tile kernels expose block/tile-level parallelism and deliberately hide
+individual threads, and intra-kernel SIMT/Tile mixing is not the model (they can consume the same
+buffers and implement the same semantic contract across separate kernels, which is exactly what
+LEVEL 2 and LEVEL 3 do here). `ct.mma()`/`ct.mma_scaled()` are real Tile matrix operations, but
+their existence does not make a Tile kernel "SIMT-aware" — that framing was wrong and is retracted.
+What the evidence actually supports: the `atlas-cutile-cu132` venv has `cuda.tile==1.5.0` with a
+**matching TileIR backend available**, giving a coherent Python Tile toolchain with sm_86 runtime
+execution proven — not a claim about `nvcc` being the Python frontend's compiler (cuTile Python has
+its own Python→Tile compilation pipeline; `tileiras` can be supplied directly in that environment).
+A minimal elementwise-add smoke test passed first (`torch.allclose`, exact), then the real fused
+kernel (`native/cutile-ace-level3/glyph_fused_tile.py`) was ported and verified:
+
+- **Result: `DRY_RUN_PROVEN`** — exact match against the same CPU oracle at all 3 tested fixture
+  sizes (256, 1000, 4000), real execution on this host's RTX 3060 Ti (sm_86/Ampere), via PyTorch
+  2.14.0+cu132 tensors as device buffers. `docs/reports/cutile-ace-level3-results.json`.
+- 3 more real API errors found and fixed while porting: `ct.bid(0)` takes an explicit axis (not a
+  C++-style `uint3.x`); `ct.store(array, index, tile)`'s positional argument order differs from a
+  naive guess; and `ct.floordiv` on `uint32` tiles hits a genuine backend codegen limitation
+  (`rounding mode 'negative_inf' is not allowed with 'unsigned' flag`) — worked around by dividing
+  as signed `int32` then casting back to `uint64`; range-proven safe (not merely "non-negative") by
+  `CUTILE-ACE-BOUNDARY-01` below, since the real field width is `uint16` (max 65535), far below
+  `INT32_MAX`.
+- **This supersedes the C++ attempt for the LEVEL 3 *gate*, but does not retract or invalidate its
+  finding, and is not "the same implementation via a different language."** The
+  CUDA-13.3-header/CUDA-13.2-`tileiras` skew in the C++ path is real and still unfixed. The Python
+  Tile kernel is a distinct, independently-proven implementation of the same semantic contract.
+- **Not claimed**: any fusion *performance* benefit (fewer kernel launches, less memory traffic,
+  lower latency) versus LEVEL 2's two separate SIMT kernels — only fusion *correctness* was
+  measured (see `CUTILE-ACE-PERF-01` as a distinct, optional, not-yet-attempted follow-up below).
+  All 3 GPU-primitive levels (CUB oracle, SIMT, Tile) are now `DRY_RUN_PROVEN` for this
+  capability — the first time this proving-ground has completed its full LEVEL 1→2→3 ladder.
+
+**See**: `sveltekit-frontend/openspec/changes/archive/2026-09-14-parent-atlas-cutile-ace-level3/`
+(the blocked C++ attempt), `sveltekit-frontend/openspec/changes/archive/2026-09-14-parent-atlas-cutile-ace-level3-python/`
+(the successful Python attempt), `docs/reports/cutile-ace-level3-attempt-v1.json`,
+`docs/reports/cutile-ace-level3-results.json`, `native/cutile-ace-level3/glyph_fused_tile.cu`,
+`native/cutile-ace-level3/glyph_fused_tile.py`.
+
+**CUTILE-ACE-BOUNDARY-01 follow-up (same day) — closed the one real gap in the above: the
+signed-division workaround's safety was asserted, not proven.** External review correctly flagged
+that `glyph_fused_tile.py`'s `ct.floordiv(ct.astype(pagerank_t, ct.int32), 257)` workaround (for a
+real `cuda.tile` backend limitation rejecting unsigned floor-division) was justified only by "all
+operands here are non-negative" — true but incomplete, since a non-negative `uint32` can still
+exceed `INT32_MAX` and wrap when cast to `int32`. Built an explicit 26-glyph boundary fixture
+(`scripts/atlas/ace-radix-01/boundary-fixture-v1.mjs` — `pagerankQuantized`/`recency` swept through
+{0, 1, 256, 257, 258, 65535}, `featureBits`/`flags` bit-pattern extremes, `lod`/`residency`
+`uint8` bounds, `projectionOrdinal` `uint32` bounds, plus dedicated all-zero and all-max glyphs) and
+ran it through all 3 lanes — CPU oracle, LEVEL 2 CUDA C++, LEVEL 3 Python `cuda.tile` — **all exact
+match at every row**. The real field contract, established directly from `fixture-v1.mjs`'s own
+docstring and `PackedGlyphInputV1`'s `uint16_t` declaration: both fields are `uint16` (max 65535),
+roughly 32,767× smaller than `INT32_MAX` — the cast can never overflow for any value either field
+may legally hold. This also closes the separately-recorded "CUDA boundary-value tests not pursued"
+gap for LEVEL 2, which previously only had seeded-random coverage. Result:
+`docs/reports/cutile-ace-boundary-01-results.json`.
+
+**Frozen capability-ladder status for this glyph-scoring/residency-key-packing capability**
+(supersedes any earlier "LEVEL 3 not attempted" framing, and — per the same external review that
+caught the SIMT-aware/nvcc-frontend wording issues above — is named by **programming model**, not
+by implementation language, since the C++ attempt was never a peer LEVEL 3, only an alternate
+frontend to the same Tile level):
+
+```
+GPU-PRIMITIVE LEVEL LADDER (atlas-glyph-score-v1 / atlas-residency-key-pack-gpu)
+
+LEVEL 1 — ORACLE           CPU/CUB, semantic reference                          PROVEN
+LEVEL 2 — SIMT              CUDA C++, separate GlyphScore + ResidencySortKey     DRY_RUN_PROVEN
+                             kernels, boundary-value coverage included
+LEVEL 3 — TILE               Python cuda.tile, FUSED GlyphScore +                DRY_RUN_PROVEN
+                             ResidencySortKey kernel, boundary-value coverage
+                             included, signed-division workaround range-proven
+LEVEL 3 C++ IMPLEMENTATION  optional alternate frontend (cuda_tile.h)           PROVEN_BLOCKED
+                             (BLOCKED_TOOLCHAIN_VERSION_SKEW) — not required
+                             for LEVEL 3 semantic completion, deliberately not
+                             reopened; re-audit only if a CUDA-13.3-matched
+                             `tileiras` becomes available in this environment
+```
+
+Exact-match evidence for LEVEL 3: score parity and residency-key parity, N = 256/1000/4000 plus a
+26-row boundary fixture (all-zero glyph, all-max glyph, per-field extremes), sm_86 RTX 3060 Ti.
+
+**Not yet attempted, deliberately separate from the above (optional)**: `CUTILE-ACE-PERF-01` — a
+LEVEL 2 (two SIMT kernels) vs LEVEL 3 (one fused Tile kernel) performance comparison (kernel-only
+latency, end-to-end latency, launch count, H2D/D2H bytes, peak VRAM, throughput, warm vs cold). The
+ladder above proves semantic equivalence across CPU → SIMT → Tile with zero required performance
+outcome — a slower-but-correct LEVEL 3 result would still be a valid, useful result if this gate is
+ever run.
+
+**See**: `sveltekit-frontend/openspec/changes/archive/2026-09-14-parent-atlas-cutile-ace-boundary-01/`,
+`docs/reports/cutile-ace-boundary-01-results.json`,
+`scripts/atlas/ace-radix-01/boundary-fixture-v1.mjs`.
+
+### BITFROST-L2-01 real result: v1 methodology was wrong (found via web research), v2 corrected but still inconclusive on this host, plus a real cudaMemGetInfo/nvidia-smi discrepancy (2026-09-14)
+
+`BITFROST-L2-01` (`parent-atlas-gpu-mini-fabric-01` section 10, gated on `AtlasAceResidencyV1`'s
+logical policy being proven — closed by `parent-atlas-bitfrost-sim-01`) benchmarked
+`cudaAccessPropertyPersisting` L2 set-aside for a HOT-tier buffer on this dev host's RTX 3060 Ti,
+Windows-native CUDA 13.0 toolkit (same environment `ACE-RADIX-01`'s CUB oracle used — kept
+separate from the WSL2 `atlas-rapids-cu13` RAPIDS environment, per this file's own "keep the three
+environments separate" rule).
+
+**v1 (superseded, methodology was wrong)**: measured a small persisting buffer in complete
+isolation — no competing memory traffic ever pressured it out of L2, so there was nothing for the
+persistence hint to protect against. `RESULT: DRY_RUN_PROVEN` across 3 runs, but lift was
+**consistently negative** (-4.95%, -3.44%, -1.29%). **Root cause found via web research (NVIDIA's
+own L2-cache-control docs + Lei Mao's independent "CUDA L2 Persistent Cache" benchmark, RTX 3090)**:
+a real benefit only shows up with a **two-buffer design** — the small persisting buffer is
+repeatedly re-accessed via modulo indexing WHILE a much larger "streaming" buffer is also touched
+every kernel launch, creating genuine L2 eviction pressure (Lei Mao's reference: 3MB persistent +
+3MB L2 set-aside + 1024MB streaming → ~20% speedup, 3.071ms→2.443ms, on an isolated GPU).
+
+**v2 (corrected methodology, real 7-run variance study)**: `native/bitfrost-l2-01/l2_persist_bench.cu`
+rewritten with a `streamingReadPersistKernel` implementing that two-buffer pattern. Since
+`cudaMemGetInfo` cannot be trusted on this host (see below), the streaming buffer size is computed
+by `scripts/atlas/bitfrost-l2-01/run-l2-persist-bench.mjs` from a REAL `nvidia-smi` reading (30% of
+free-minus-margin, floor 4 MiB, ceiling 64 MiB), not by the `.cu` binary's own `cudaMemGetInfo`
+call. Ran 7 times across this session under naturally fluctuating live contention (`nvidia-smi`
+free VRAM 138-399MiB, `llama-server.exe` running throughout, streaming buffers auto-sized 11-50MiB
+per run): lift = **+2.05%, +0.07%, -5.09%, +8.98%, -7.07%, +7.09%, -11.34%** — mean **-0.76%**, min
+**-11.34%**, max **+8.98%**, no correlation between sign/magnitude and streaming-buffer size.
+**Conclusion: no measurable net benefit or harm on this host, at this scale** — real GPU
+scheduling/contention noise (±5-11% swings) dominates whatever effect the mechanism might have at
+this scale; this is a genuine noise-dominated null result from 7 real samples, not an
+under-sampled fluke. This is a real, explained limitation: this shared 8GB card's live VRAM budget
+does not currently allow reproducing Lei Mao's 1024MiB streaming-buffer scale (the reference setup
+that showed a clean ~20% speedup on an isolated, dedicated GPU), so the eviction pressure these
+runs could safely generate is far smaller than what demonstrated the effect elsewhere. **Do not
+cite either v1 or v2 as "L2 persistence doesn't work"** — v1's negative result was a methodology
+artifact (nothing to measure); v2's null result is real but scale-limited by this host's
+contention, not a demonstration that the mechanism itself is ineffective.
+
+**Separate, more broadly-relevant finding — root-caused against primary Microsoft documentation
+(2026-09-14, not left as inference)**: `cudaMemGetInfo()` inside the CUDA process reported
+**~6.68GB free VRAM** in v1, while `nvidia-smi.exe` (queried immediately before/after, outside the
+CUDA process) reported only **~140-400MB free** — reproduced across all 10 runs so far (3 v1 + 7
+v2), not a one-off fluke. Two mechanisms found via web research, of different magnitude: (1) an
+NVIDIA-forum-confirmed CUDA-context-overhead effect (`cudaMemGetInfo` reports free memory AFTER
+context creation, `nvidia-smi`/`nvmlDeviceGetMemoryInfo` BEFORE) — real, but only tens-to-hundreds
+of MB, far too small to explain a ~6GB gap; (2) the actual primary mechanism, confirmed directly
+against **Microsoft's own WDDM 2.0 documentation** (`learn.microsoft.com/.../gpu-virtual-memory-in-
+wddm-2-0`, `IDXGIAdapter3::QueryVideoMemoryInfo`): WDDM assigns each process an OS-controlled
+**`Budget`** that the process "should target," and Microsoft's own docs state this budget
+"represents total available memory (dedicated + shared)" — i.e. it legitimately includes capacity
+the OS plans to make available via oversubscription/shared-system-memory paging, not a strict
+physically-free-right-now figure. `cudaMemGetInfo` on Windows derives its "free" figure from this
+WDDM `Budget` concept; `nvidia-smi` reports direct per-process physical VRAM usage. **This means
+any future CUDA work on this host that sizes allocations from `cudaMemGetInfo` alone is not
+getting a true safety guarantee** — it happened to be harmless in every run so far (no crash,
+`llama-server.exe` verified undisturbed every time), but a ~20x-optimistic free-memory figure could
+in principle let a much larger, unsafe allocation through. **Rule for future GPU work on this
+host**: when a real go/no-go VRAM decision matters, query `nvidia-smi` directly (outside the CUDA
+process, e.g. via a wrapper script) rather than trusting `cudaMemGetInfo` alone — see
+`scripts/atlas/bitfrost-l2-01/run-l2-persist-bench.mjs` for the pattern (computes the actual
+allocation size from `nvidia-smi`, records both figures side-by-side in the result JSON).
+
+**See**: `sveltekit-frontend/openspec/changes/archive/2026-09-14-parent-atlas-bitfrost-l2-01/`
+(proposal.md, design.md, specs/, tasks.md), `docs/reports/bitfrost-l2-01-results.json`,
+`native/bitfrost-l2-01/l2_persist_bench.cu`.
 
 ### DEPENDENCY-CAPABILITY-GUARD-01 — no install without a proven capability gap (2026-09-03)
 

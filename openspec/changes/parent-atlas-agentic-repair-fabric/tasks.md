@@ -64,7 +64,34 @@
       the adapter is ready to be called, but nothing calls it yet.
 ## 8. AR-08 — HyperGraphRAG n-ary action expansion (NOT DONE)
 ## 9. AR-09 — CandidateFeatureMatrix action features (NOT DONE)
-## 10. AR-10 — Tang low-rank recommendation challenger scaffold (NOT DONE)
+## 10. AR-10 — Tang low-rank recommendation challenger scaffold (CORRECTED, CENSUS PENDING —
+      see also claude.md's "Correction: Ewin Tang recommendation" note)
+
+- [x] 10.1 **Corrected an earlier same-session finding.** "Ewin Tang's recommendation algorithm
+      doesn't exist anywhere in this repo" (recorded 2 turns ago) was based only on
+      `rg "ewin tang"` returning zero hits — a literal-name search, not a mechanism search. The
+      operator correctly flagged this: `git log --all --oneline` for
+      `python/atlas_compute/low_rank.py` and `**/sample-query-matrix-v1.ts` returns real prior
+      commits (`feat(atlas): add low-rank and Tang-inspired comparison receipts`,
+      `feat(atlas): add sample query matrix and length squared sampler`,
+      `feat(atlas): prove semantic low-rank parity lineage`,
+      `Repair SampleQueryMatrixV1 merge corruption`), plus a whole branch
+      (`agent/ast-xgb-tang-alignment-20260822`). Real, mechanism-named machinery
+      (`SampleQueryMatrixV1`, squared-L2/length-square sampling) existed, gated
+      `canonicalIdentityAuthority: false`/`retrievalVoteAdded: false` — exactly the challenger-
+      only pattern this gate's own design already called for.
+- [x] 10.2 **Partial census run, not complete.** Two targeted `find`s for the current working
+      tree (`*sample-query-matrix*`, `low_rank.py`) returned **zero matches** — these specific
+      files are not in the current checkout (branch/worktree/rename status unconfirmed). **Not
+      yet run**: the full mechanism-keyword `rg` sweep (`length.?square|squared.?l2|low.?rank|
+      randomized.?svd|quantum.?inspired|leverage.?sampl`) across the whole repo, or a check of
+      whether other branches/worktrees on this machine still have these files checked out.
+- [ ] 10.3 **`TANG-LOW-RANK-OWNER-CENSUS-01` — not run yet.** Required before building any new
+      recommender: `literalNameHits`, `mechanismHits`, `currentFiles`, `historicalFiles`,
+      `currentCallers`, `tests`, `receipts`, `productionCaller`, `canonicalAuthority`,
+      `retrievalVoteAdded`. **Do not build a new low-rank/sampling recommender until this runs**
+      — real prior art may exist to recover (e.g. `git show <commit>:path` from the commits in
+      10.1) rather than reimplement from scratch.
 ## 11. AR-11 — DSPy program/eval snapshot contract (NOT DONE)
 ## 12. AR-12 — GEPA offline optimization harness scaffold (NOT DONE)
 ## 13. AR-13 — Agentic DAG synthesis (PARTIALLY BUILT, DORMANT — see section 18.3:
