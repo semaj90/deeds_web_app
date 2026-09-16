@@ -95,3 +95,34 @@
 - [ ] 6.3 Decide, with the operator, whether to archive this change (`openspec archive`) once
       Gate 2 either closes clean or is explicitly handed off to a follow-up for the specific
       blocking classification found.
+
+## 7. New finding from the end-of-day sweep — do not silently regenerate or commit (2026-09-16)
+
+While staging the day's broader accumulated work for an end-of-session commit, found 7 report
+files that are far outside normal receipt size (40MB–332MB, one is a literal leftover
+`.tmp-3904` write-in-progress file) and deliberately did **not** commit any of them:
+
+```
+docs/reports/feature-ontology-current-cohort-v1.json            332,702,851 bytes
+docs/reports/feature-ontology-current-cohort-v1-codex.json      332,702,851 bytes  (duplicate)
+docs/reports/feature-ontology-current-cohort-v1.json.tmp-3904   332,702,851 bytes  (debris)
+docs/reports/feature-ontology-packet-lineage-v1.json            328,426,665 bytes
+docs/reports/graphify-current-candidate-binding-v1.json          44,518,241 bytes
+docs/reports/current-graphify-snapshot-binding-recheck-v1.json   43,696,635 bytes
+docs/reports/graphify-workspace-snapshot-binding-v1-rerun-20260914.json 43,680,228 bytes
+docs/reports/graphify-workspace-snapshot-binding-v1.json         44,883,450 bytes
+```
+
+- [ ] 7.1 Determine whether `feature-ontology-current-cohort-v1-codex.json` and
+      `feature-ontology-current-cohort-v1.json.tmp-3904` are genuinely stale duplicates of
+      `feature-ontology-current-cohort-v1.json` (byte-identical size strongly suggests yes) — if
+      confirmed, archive per this repo's archive-not-delete convention rather than deleting.
+- [ ] 7.2 Investigate why `feature-ontology-current-cohort-v1.json` / `-packet-lineage-v1.json`
+      are ~330MB — almost certainly a producer bug (e.g. writing a full corpus dump instead of a
+      bounded cohort, matching this same session's earlier discovery that "current cohort" work
+      is supposed to be bounded to 52/128 rows, not full-corpus). Do not regenerate at this size
+      again without root-causing first.
+- [ ] 7.3 None of these files are required inputs to Gate 1 or Gate 2 in this change or the
+      parent change — confirmed by grep, not assumed. Leaving them untracked/uncommitted is safe
+      for now; this task group exists so they aren't silently forgotten, not because Gate 2 is
+      blocked on them.
