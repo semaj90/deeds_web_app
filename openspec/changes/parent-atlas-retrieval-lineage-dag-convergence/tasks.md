@@ -14454,3 +14454,123 @@ store instead. (3) The 7-row `is_a` seed is the only real hierarchy, disconnecte
 (4) Six dead tables are a separate cleanup candidate. Not implemented -- standing up OAKLIB and
 grounding `feature_ontology_tuples` is a large, separate initiative deserving its own OpenSpec
 proposal, not a rushed continuation here.
+
+## Source-evidence lineage: corrected critical path (2026-09-15, operator diagnosis reviewed)
+
+**Reframing, not new numbers**: the operator reviewed this change's existing evidence-hydration
+audit results (23,397/24,181 exact source-revision matches, 19,906 rows already content-hydrated,
+a bounded 52-row cohort) and correctly re-diagnosed the blocker. It is NOT "find the source text"
+(that's substantially solved) -- it is attaching that evidence to the admitted workspace/chunk/
+namespace authority without fabricating identity. The bounded 52-row cohort has 52/52 exact
+`source_ref`+`source_revision` matches but **0/52 current-workspace-revision matches** -- the
+leading hypothesis is a stale derived projection, not a data-availability gap.
+
+**This section records the corrected gate sequence as planned work. Not yet implemented** --
+each gate below is real, scoped, additive/read-only-first work for a future pass, matching this
+change's own established discipline (draft → dry-run → human-authorized apply).
+
+### Gate order (do not reorder or skip)
+
+1. **`CURRENT-WORKSPACE-FRAME-ADMISSION-01`** (read-only). Reports: admitted/canonical Graphify
+   `workspaceRevision`, the distinct workspace revision(s) actually on the 52-row cohort, exact
+   `sourceRef`+`sourceRevision` parity, producer/projection revision, and a classification of
+   `STALE_WORKSPACE_PROJECTION` vs. `NON_CANONICAL_EXECUTION` vs. genuine source conflict. Since
+   all 52 source revisions already match and only the workspace differs, `STALE_WORKSPACE_
+   PROJECTION` is the leading hypothesis to confirm, not assume. **Do NOT update those 52 rows in
+   place to force ID agreement** -- if confirmed stale, re-materialize the derived cohort from the
+   admitted workspace binding instead. Receipt shape:
+   ```ts
+   interface CurrentWorkspaceFrameReceiptV1 {
+     admittedExecutionId: string | null;
+     admittedWorkspaceRevision: string | null;
+     cohortRows: number;
+     distinctCohortWorkspaceRevisions: string[];
+     exactSourceRevisionMatches: number;
+     currentWorkspaceMatches: number;
+     workspaceMismatches: number;
+     staleProjectionCandidates: number;
+     conflictingSourceRows: number;
+     writesPerformed: false;
+     status: "CURRENT_WORKSPACE_FRAME_PROVEN" | "STALE_WORKSPACE_PROJECTION"
+           | "EXECUTION_AUTHORITY_UNAVAILABLE" | "SOURCE_CONFLICT";
+   }
+   ```
+   **Do not rerun `plan-current-graphify-execution-owner-resolution-v1.mjs`** unless execution
+   evidence actually changed -- if Gate 0A/current execution authority is already established live
+   (it is, per this change's earlier "GATE 0A CLOSED" entry), read it back and reuse it. Repeating
+   the equivalence audit does not repair a stale workspace frame.
+
+2. **`CURRENT-SOURCE-CHUNK-OWNER-01`**, using the already-established chunk-grain-native join
+   (current workspace source binding → `source_ref`+`source_revision` →
+   `atlas_packet_chunk_lineage` WHERE `revision_status='PROVEN'` → `chunk_row_id` →
+   `codebase_chunk_index.id` → `canonical_chunk_id` parity). Classifies the 4,275 "canonical chunk
+   owner missing" and 19,906 "content present but owner lacks source revision" rows found earlier.
+   **Do not compare whole-source digest to chunk content hash; do not copy a source revision onto
+   a chunk merely because the file path matches.** Receipt shape:
+   ```ts
+   interface CurrentSourceChunkOwnerReceiptV1 {
+     workspaceRevision: string;
+     sourceBindings: number;
+     provenLineageRows: number;
+     joinedChunkRows: number;
+     canonicalChunkIdMatches: number;
+     missingCanonicalOwner: number;
+     missingSourceRevision: number;
+     sourceRevisionMismatch: number;
+     workspaceRevisionMismatch: number;
+     canonicalChunkIdMismatch: number;
+     sourceDigestComparedToChunkDigest: false;
+     writesPerformed: false;
+   }
+   ```
+
+3. **`CURRENT-SOURCE-NAMESPACE-AUTHORITY-01`** (only after step 2's exact lineage exists).
+   Resolves namespace from the existing canonical source/registry owner -- **never from the
+   classifier** (a classifier's "database"/"retrieval" label is evidence, not namespace-minting
+   authority). Required shape: `sourceRef`, `sourceRevision`, `workspaceRevision`,
+   `canonicalChunkId`, `namespaceId`, `namespaceRevision`, `namespaceAuthority: "CANONICAL"`.
+   Unresolved stays `null` + `UNRESOLVED` -- never `"unknown"`, never wildcard-current.
+
+4. **`CURRENT-EVIDENCE-SPAN-01`** (only after step 3). `evidence-span ready = 0` is expected
+   while chunk ownership/namespace authority are missing -- not a separate bug. Once the canonical
+   chunk is known, promote exact `startByte`/`endByte` from the actual chunk/AST owner. Gate
+   conditions: canonical chunk resolved, source revision exact, workspace revision exact,
+   start/end byte valid, span within source length, 0 cross-revision spans. **Do not fuzzy-match
+   AST nodes into spans.**
+
+5. **Re-run source-evidence hydration** only after steps 1-4, distinguishing: `inputRows`,
+   `exactRevisionMatches`, `currentWorkspaceMatches`, `canonicalChunkOwners`, `contentHydrated`,
+   `authoritativeNamespaces`, `evidenceSpanReady`, `classifierReady`. **The first real target is
+   NOT 24,181/24,181** -- a deterministic bounded cohort (the existing 52-row cohort, or extended
+   to ~128 rows) with zero identity/revision errors is sufficient to reopen Stage 3. Full-
+   repository coverage improves in parallel afterward and no longer blocks the pipeline.
+
+6. **Only once a clean ~128-row current-evidence cohort passes**, advance Stage 3:
+   `CandidateOrdinalMapV1` consumes that exact cohort (not raw `atlas_packets`), then
+   `semantic_768` admission → current graph/structural features → `CandidateFeatureMatrix` →
+   classifier/XGBoost → ACE/BitFrost → GPU execution → ContextManifest/DAG.
+
+### Frozen diagnosis (as of 2026-09-15, not yet re-verified this pass)
+
+| Dimension | Status |
+|---|---|
+| Source content availability | substantially present |
+| Source revision parity | strong: 23,397/24,181 |
+| Bounded cohort source revision | 52/52 exact |
+| **Current workspace parity** | **0/52 — primary immediate blocker** |
+| Canonical chunk ownership | incomplete |
+| Namespace authority | 0 |
+| Evidence spans | 0 |
+| Classifier admission | 0 |
+
+**likely_cause**: the evidence cohort is a valid revision-qualified snapshot attached to an
+older/non-admitted workspace frame; downstream chunk ownership also lacks revision-qualified
+bindings. **next_real_gate**: `CURRENT-WORKSPACE-FRAME-ADMISSION-01`.
+
+**do_not_do**: rerun the same Graphify equivalence audit without changed evidence; rewrite
+workspace IDs in place; infer namespaces from classifier output; copy source revisions by path
+alone; start semantic/XGBoost/ACE/GPU promotion before the bounded-cohort authority canary is
+clean.
+
+**Status: recorded as the corrected plan, zero gates from this section implemented yet.** Next
+session should start at `CURRENT-WORKSPACE-FRAME-ADMISSION-01` (read-only, safest first step).
