@@ -72,6 +72,30 @@ move to satisfy the script's narrower original assumption. This is the same disc
 staleness-marker fix above — when the audit's own heuristic produces a wrong-looking result, check
 whether the heuristic or the audited file is actually wrong before acting.
 
+## Third limitation, found while acting on a low-scoring change (2026-09-16)
+
+`parent-atlas-graphify-recovery-proof-ladder` scored 0/9 (checkboxes), reading as "not started."
+Checked the file directly before treating that as ground truth for implementation: it's an
+18-phase document tracking real, substantial work (Phases 1-6 are `PASS`/`PARTIAL_PROVEN`/`DONE,
+VERIFIED LIVE`, each with live evidence — a real concurrency test with two OS processes racing a
+lock file, a real `--apply --limit=5` database write with spot-checked output, a real stall root
+cause diagnosed and fixed in a 313KB vendored bundle) — but tracked via **prose status headers**
+(`## Phase N — STATUS`), not markdown checkboxes. The only literal `- [ ]` checkboxes in the whole
+file are a 9-item to-do list for one specific sub-lane (Neo4j→Qdrant fan-out), which genuinely is
+unstarted and is explicitly gated behind other work per the document's own ordering — so the "0/9"
+number is *accurate for what it counts*, but gives a false impression of the file's overall state.
+
+This is a real, unresolved limitation of the checkbox-counting completion model this script uses —
+not a bug with a clean fix. Detecting and scoring prose status vocabularies
+(`PASS`/`PROVEN`/`PARTIAL_PROVEN`/`NOT_PROVEN`/`BLOCKED`/`NOT STARTED`, which this repo uses
+extensively and inconsistently across different changes) would require parsing free-text status
+words per phase heading, which risks false confidence of a different kind (misreading a status
+word out of context) rather than fixing the honesty problem outright. Recorded here rather than
+attempted, per the Duplication Prevention / Agent Execution Integrity principle of flagging what's
+out of scope instead of guessing at a fix. **Do not treat a low `completionPct` alone as evidence a
+change is unstarted** — always skim the actual file, especially for large multi-phase documents,
+before picking one to "finish."
+
 ## Known limitation, found while running this for real
 
 The staleness-marker heuristic is a plain substring match, so it will flag this very change's own

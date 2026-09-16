@@ -1,7 +1,7 @@
 {
   "schema": "atlas.openspec-tasks-md-audit.v1",
   "mode": "READ_ONLY_AUDIT",
-  "generatedAt": "2026-09-16T23:05:46.233Z",
+  "generatedAt": "2026-09-16T23:08:10.847Z",
   "gapThreshold": 80,
   "aggregate": {
     "totalChangesAudited": 108,
