@@ -60,6 +60,18 @@ a real, re-runnable script instead of a manual pass.
       significantly from the manual count, treat that as a bug in the script, not a corpus change,
       and fix it before trusting the report.
 
+## Second real bug found while acting on the audit's own output (2026-09-16)
+
+While closing structural gaps the audit flagged, `parent-atlas-grounded-knowledge-fabric` was
+reported as missing `specs/` (`hasSpecs: false`) despite genuinely having a spec — just as a
+top-level `spec.md` directly in the change directory, not nested under `specs/<capability>/spec.md`
+like every other checked change. Checked before "fixing" it by moving the file: this is a real,
+existing, non-broken convention in this repo, not a missing spec. Fixed the audit script's spec
+detector (`hasSpecEvidence()`) to also accept a top-level `spec.md`, rather than forcing a file
+move to satisfy the script's narrower original assumption. This is the same discipline as the
+staleness-marker fix above — when the audit's own heuristic produces a wrong-looking result, check
+whether the heuristic or the audited file is actually wrong before acting.
+
 ## Known limitation, found while running this for real
 
 The staleness-marker heuristic is a plain substring match, so it will flag this very change's own

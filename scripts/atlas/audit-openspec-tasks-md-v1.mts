@@ -74,24 +74,30 @@ function isNonEmptyFile(path: string): boolean {
   }
 }
 
-function specsDirHasSpec(specsDir: string): boolean {
-  if (!existsSync(specsDir)) return false;
-  try {
-    if (!statSync(specsDir).isDirectory()) return false;
-  } catch {
-    return false;
-  }
-  // specs/<capability>/spec.md — one level of nesting, per this repo's convention
-  const entries = readdirSync(specsDir, { withFileTypes: true });
-  for (const entry of entries) {
-    if (entry.isDirectory()) {
-      const specFile = join(specsDir, entry.name, 'spec.md');
-      if (isNonEmptyFile(specFile)) return true;
-    } else if (entry.isFile() && entry.name.endsWith('.md')) {
-      if (isNonEmptyFile(join(specsDir, entry.name))) return true;
+function hasSpecEvidence(changeDir: string): boolean {
+  // Primary convention: specs/<capability>/spec.md (one level of nesting).
+  const specsDir = join(changeDir, 'specs');
+  if (existsSync(specsDir)) {
+    try {
+      if (statSync(specsDir).isDirectory()) {
+        const entries = readdirSync(specsDir, { withFileTypes: true });
+        for (const entry of entries) {
+          if (entry.isDirectory()) {
+            if (isNonEmptyFile(join(specsDir, entry.name, 'spec.md'))) return true;
+          } else if (entry.isFile() && entry.name.endsWith('.md')) {
+            if (isNonEmptyFile(join(specsDir, entry.name))) return true;
+          }
+        }
+      }
+    } catch {
+      // fall through to secondary convention check
     }
   }
-  return false;
+  // Secondary, legitimate convention observed live in this repo (found while auditing
+  // parent-atlas-grounded-knowledge-fabric, 2026-09-16): a top-level spec.md directly in the
+  // change directory, with no specs/ subdirectory at all. Do not penalize this shape — it's a
+  // real, existing convention, not a missing spec.
+  return isNonEmptyFile(join(changeDir, 'spec.md'));
 }
 
 function tasksIsNonTrivial(text: string, total: number): boolean {
@@ -149,7 +155,7 @@ function buildRecord(
   const completionPct = noCheckboxes ? null : Math.round((done / total) * 100);
 
   const hasProposal = isNonEmptyFile(join(changeDir, 'proposal.md'));
-  const hasSpecs = specsDirHasSpec(join(changeDir, 'specs'));
+  const hasSpecs = hasSpecEvidence(changeDir);
   const tasksNonTrivial = tasksIsNonTrivial(text, total);
 
   let structuralScore = 0;
